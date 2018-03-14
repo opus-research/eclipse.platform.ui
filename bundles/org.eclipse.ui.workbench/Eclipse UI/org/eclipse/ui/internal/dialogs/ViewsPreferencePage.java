@@ -32,8 +32,7 @@ import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.fieldassist.ControlDecoration;
-import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -48,7 +47,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -79,7 +77,6 @@ public class ViewsPreferencePage extends PreferencePage implements
 
 	private IThemeEngine engine;
 	private ComboViewer themeIdCombo;
-	private ControlDecoration themeComboDecorator;
 	private ITheme currentTheme;
 	private String defaultTheme;
 	private Button enableAnimations;
@@ -87,10 +84,8 @@ public class ViewsPreferencePage extends PreferencePage implements
 	
 	private Text colorsAndFontsThemeDescriptionText;
 	private ComboViewer colorsAndFontsThemeCombo;
-	private ControlDecoration colorFontsDecorator;
 	private ColorsAndFontsTheme currentColorsAndFontsTheme;
 	private Map<String, String> themeAssociations;
-
 
 	@Override
 	protected Control createContents(Composite parent) {
@@ -114,20 +109,9 @@ public class ViewsPreferencePage extends PreferencePage implements
 		if (this.currentTheme != null) {
 			themeIdCombo.setSelection(new StructuredSelection(currentTheme));
 		}
-		themeComboDecorator = new ControlDecoration(themeIdCombo.getCombo(), SWT.TOP | SWT.LEFT);
 		themeIdCombo.addSelectionChangedListener(new ISelectionChangedListener() {
-
 			public void selectionChanged(SelectionChangedEvent event) {
 				ITheme selection = getSelectedTheme();
-				if (!selection.equals(currentTheme)) {
-					themeComboDecorator.setDescriptionText(WorkbenchMessages.ThemeChangeWarningText);
-					Image decorationImage = FieldDecorationRegistry.getDefault()
-							.getFieldDecoration(FieldDecorationRegistry.DEC_WARNING).getImage();
-					themeComboDecorator.setImage(decorationImage);
-					themeComboDecorator.show();
-				} else {
-					themeComboDecorator.hide();
-				}
 				engine.setTheme(selection, false);
 				try {
 					((PreferencePageEnhancer) Tweaklets.get(PreferencePageEnhancer.KEY))
@@ -206,6 +190,15 @@ public class ViewsPreferencePage extends PreferencePage implements
 			engine.setTheme(getSelectedTheme(), true);
 		}
 
+		boolean themeChanged = theme != null && !theme.equals(currentTheme);
+		boolean colorsAndFontsThemeChanged = !PlatformUI.getWorkbench().getThemeManager()
+				.getCurrentTheme().getId().equals(currentColorsAndFontsTheme.getId());
+
+		if (themeChanged || colorsAndFontsThemeChanged) {
+			MessageDialog.openWarning(getShell(), WorkbenchMessages.ThemeChangeWarningTitle,
+					WorkbenchMessages.ThemeChangeWarningText);
+		}
+
 		IPreferenceStore apiStore = PrefUtil.getAPIPreferenceStore();
 		apiStore.setValue(IWorkbenchPreferenceConstants.ENABLE_ANIMATIONS,
 				enableAnimations.getSelection());
@@ -263,9 +256,6 @@ public class ViewsPreferencePage extends PreferencePage implements
 		if (colorsAndFontsTheme != null) {
 			currentColorsAndFontsTheme = colorsAndFontsTheme;
 		}
-
-		themeComboDecorator.hide();
-		colorFontsDecorator.hide();
 	}
 
 	private void createColorsAndFontsThemeCombo(Composite composite) {
@@ -279,23 +269,12 @@ public class ViewsPreferencePage extends PreferencePage implements
 				return ((ColorsAndFontsTheme) element).getLabel();
 			}
 		});
-		colorFontsDecorator = new ControlDecoration(colorsAndFontsThemeCombo.getCombo(), SWT.TOP
-				| SWT.LEFT);
 		colorsAndFontsThemeCombo.setContentProvider(new ArrayContentProvider());
 		colorsAndFontsThemeCombo.setInput(getColorsAndFontsThemes());
 		colorsAndFontsThemeCombo.getControl().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		colorsAndFontsThemeCombo.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent event) {
 				ColorsAndFontsTheme colorsAndFontsTheme = getSelectedColorsAndFontsTheme();
-				if (!colorsAndFontsTheme.equals(currentColorsAndFontsTheme)) {
-					Image decorationImage = FieldDecorationRegistry.getDefault()
-							.getFieldDecoration(FieldDecorationRegistry.DEC_WARNING).getImage();
-					colorFontsDecorator.setImage(decorationImage);
-					colorFontsDecorator
-							.setDescriptionText(WorkbenchMessages.ThemeChangeWarningText);
-					colorFontsDecorator.show();
-				} else
-					colorFontsDecorator.hide();
 				refreshColorsAndFontsThemeDescriptionText(colorsAndFontsTheme);
 				setColorsAndFontsTheme(colorsAndFontsTheme);
 			}
@@ -447,41 +426,5 @@ public class ViewsPreferencePage extends PreferencePage implements
 		public String getLabel() {
 			return label;
 		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.lang.Object#hashCode()
-		 */
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((id == null) ? 0 : id.hashCode());
-			return result;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.lang.Object#equals(java.lang.Object)
-		 */
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			ColorsAndFontsTheme other = (ColorsAndFontsTheme) obj;
-			if (id == null) {
-				if (other.id != null)
-					return false;
-			} else if (!id.equals(other.id))
-				return false;
-			return true;
-		}
-
 	}
 }
