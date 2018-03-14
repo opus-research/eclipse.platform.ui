@@ -169,7 +169,6 @@ import org.eclipse.ui.internal.handlers.IActionCommandMappingService;
 import org.eclipse.ui.internal.handlers.LegacyHandlerService;
 import org.eclipse.ui.internal.layout.ITrimManager;
 import org.eclipse.ui.internal.layout.IWindowTrim;
-import org.eclipse.ui.internal.menus.ActionSet;
 import org.eclipse.ui.internal.menus.IActionSetsListener;
 import org.eclipse.ui.internal.menus.LegacyActionPersistence;
 import org.eclipse.ui.internal.menus.MenuHelper;
@@ -206,7 +205,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	 */
 	public static final String PERSPECTIVE_SPACER_ID = "PerspectiveSpacer"; //$NON-NLS-1$
 
-	private static final String MAIN_TOOLBAR_ID = ActionSet.MAIN_TOOLBAR;
+	private static final String MAIN_TOOLBAR_ID = "org.eclipse.ui.main.toolbar"; //$NON-NLS-1$
 	private static final String COMMAND_ID_TOGGLE_COOLBAR = "org.eclipse.ui.ToggleCoolbarAction"; //$NON-NLS-1$
 
 	public static final String ACTION_SET_CMD_PREFIX = "AS::"; //$NON-NLS-1$
@@ -674,7 +673,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			Shell shell = (Shell) model.getWidget();
 			if (model.getMainMenu() == null) {
 				final MMenu mainMenu = modelService.createModelElement(MMenu.class);
-				mainMenu.setElementId(ActionSet.MAIN_MENU);
+				mainMenu.setElementId("org.eclipse.ui.main.menu"); //$NON-NLS-1$
 
 				final MenuManagerRenderer renderer = (MenuManagerRenderer) rendererFactory
 						.getRenderer(mainMenu, null);
@@ -736,18 +735,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 				page.updatePerspectiveActionSets();
 			}
 			updateActionSets();
-
-			// synchronize the main menu with the e4 model
-			IMenuManager menuBarManager = getMenuBarManager();
-			if (menuBarManager instanceof MenuManager) {
-				// TODO: remove this hack to retrieve the MenuManagerRenderer
-				MenuManagerRenderer mr = (MenuManagerRenderer) rendererFactory.getRenderer(
-						modelService.createModelElement(MMenu.class), null);
-				MMenu parent = mr.getMenuModel((MenuManager) menuBarManager);
-				if (parent != null) {
-					mr.reconcileManagerToModel((MenuManager) menuBarManager, parent);
-				}
-			}
 
 			IPreferenceStore preferenceStore = PrefUtil.getAPIPreferenceStore();
 			boolean enableAnimations = preferenceStore
@@ -2983,7 +2970,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		}
 	};
 
-	MenuManager menuManager = new MenuManager("MenuBar", ActionSet.MAIN_MENU); //$NON-NLS-1$
+	MenuManager menuManager = new MenuManager("MenuBar", "org.eclipse.ui.main.menu"); //$NON-NLS-1$//$NON-NLS-2$
 
 	public MenuManager getMenuManager() {
 		return menuManager;
