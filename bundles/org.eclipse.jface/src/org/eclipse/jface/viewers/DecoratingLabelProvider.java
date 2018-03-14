@@ -211,11 +211,6 @@ public class DecoratingLabelProvider extends LabelProvider implements
         }
     }
 
-
-    /*
-     *  (non-Javadoc)
-     * @see org.eclipse.jface.viewers.IViewerLabelProvider#updateLabel(org.eclipse.jface.viewers.ViewerLabel, java.lang.Object)
-     */
     @Override
 	public void updateLabel(ViewerLabel settings, Object element) {
 
@@ -267,9 +262,6 @@ public class DecoratingLabelProvider extends LabelProvider implements
 		
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IColorProvider#getBackground(java.lang.Object)
-	 */
 	@Override
 	public Color getBackground(Object element) {
 		if(provider instanceof IColorProvider) {
@@ -278,9 +270,6 @@ public class DecoratingLabelProvider extends LabelProvider implements
 		return null;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
-	 */
 	@Override
 	public Font getFont(Object element) {
 		if(provider instanceof IFontProvider) {
@@ -289,9 +278,6 @@ public class DecoratingLabelProvider extends LabelProvider implements
 		return null;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
-	 */
 	@Override
 	public Color getForeground(Object element) {
 		if(provider instanceof IColorProvider) {
@@ -324,9 +310,6 @@ public class DecoratingLabelProvider extends LabelProvider implements
 		this.decorationContext = decorationContext;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreePathLabelProvider#updateLabel(org.eclipse.jface.viewers.ViewerLabel, org.eclipse.jface.viewers.TreePath)
-	 */
 	@Override
 	public void updateLabel(ViewerLabel settings, TreePath elementPath) {
         ILabelDecorator currentDecorator = getLabelDecorator();

@@ -24,9 +24,6 @@ public abstract class AbstractConcurrentModel implements
 
     private ListenerList listeners = new ListenerList(); 
     
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.deferred.IConcurrentContentProvider#addListener(org.eclipse.jface.viewers.deferred.IConcurrentContentProviderListener)
-     */
     @Override
 	public void addListener(IConcurrentModelListener listener) {
         listeners.add(listener);
@@ -93,9 +90,6 @@ public abstract class AbstractConcurrentModel implements
     	return result;
     }
     
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.deferred.IConcurrentContentProvider#removeListener(org.eclipse.jface.viewers.deferred.IConcurrentContentProviderListener)
-     */
     @Override
 	public void removeListener(IConcurrentModelListener listener) {
         listeners.remove(listener);
