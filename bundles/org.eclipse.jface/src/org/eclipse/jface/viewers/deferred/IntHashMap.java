@@ -21,20 +21,21 @@ import java.util.HashMap;
  * @since 3.1
  */
 /* package */ class IntHashMap {
-    private HashMap<Object,Integer> map; 
+    private HashMap map;
+
     /**
      * @param size
      * @param loadFactor
      */
     public IntHashMap(int size, float loadFactor) {
-        map = new HashMap<Object,Integer>(size, loadFactor);
+        map = new HashMap(size, loadFactor);
     }
 
     /**
      *
      */
     public IntHashMap() {
-        map = new HashMap<Object,Integer>();
+        map = new HashMap();
     }
 
     /**
@@ -66,7 +67,8 @@ import java.util.HashMap;
      * @return the int value at the given key, or the default value if this map does not contain the given key
      */
     public int get(Object key, int defaultValue) {
-        Integer result = map.get(key);
+        Integer result = (Integer)map.get(key);
+
         if (result != null) {
             return result.intValue();
         }
