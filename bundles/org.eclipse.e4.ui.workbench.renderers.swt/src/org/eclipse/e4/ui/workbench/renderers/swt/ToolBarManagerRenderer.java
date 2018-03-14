@@ -75,7 +75,6 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
 import org.osgi.service.event.Event;
-import org.osgi.service.event.EventHandler;
 
 /**
  * Create a contribute part.
@@ -118,85 +117,49 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	EModelService modelService;
 
 	@Inject
-	IEventBroker eventBroker;
-
-	private EventHandler itemUpdater = new EventHandler() {
-		@Override
-		public void handleEvent(Event event) {
-			// Ensure that this event is for a MToolBarElement
-			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBarElement)) {
-				return;
-			}
-
-			MToolBarElement itemModel = (MToolBarElement) event.getProperty(UIEvents.EventTags.ELEMENT);
-
-			IContributionItem ici = getContribution(itemModel);
-			if (ici == null) {
-				return;
-			}
-
-			String attName = (String) event.getProperty(UIEvents.EventTags.ATTNAME);
-			if (UIEvents.UILabel.LABEL.equals(attName) || UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
-				ici.update();
-			} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
-				ici.update();
-			} else if (UIEvents.UILabel.TOOLTIP.equals(attName) || UIEvents.UILabel.LOCALIZED_TOOLTIP.equals(attName)) {
-				ici.update();
-			}
+	@Optional
+	void updateItems(@UIEventTopic(UIEvents.UILabel.TOPIC_ALL) Event event){
+		// Ensure that this event is for a MToolBarElement
+		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBarElement)) {
+			return;
 		}
-	};
 
-	private EventHandler toBeRenderedUpdater = new EventHandler() {
-		@Override
-		public void handleEvent(Event event) {
-			// Ensure that this event is for a MMenuItem
-			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBarElement)) {
+		MToolBarElement itemModel = (MToolBarElement) event.getProperty(UIEvents.EventTags.ELEMENT);
+
+		IContributionItem ici = getContribution(itemModel);
+		if (ici == null) {
+			return;
+		}
+
+		String attName = (String) event.getProperty(UIEvents.EventTags.ATTNAME);
+		if (UIEvents.UILabel.LABEL.equals(attName) || UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
+			ici.update();
+		} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
+			ici.update();
+		} else if (UIEvents.UILabel.TOOLTIP.equals(attName) || UIEvents.UILabel.LOCALIZED_TOOLTIP.equals(attName)) {
+			ici.update();
+		}
+	}
+
+	@Inject
+	@Optional
+	void updateToBeRendered(@UIEventTopic(UIEvents.UIElement.TOPIC_ALL) Event event) {
+		// Ensure that this event is for a MMenuItem
+		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBarElement)) {
+			return;
+		}
+
+		MToolBarElement itemModel = (MToolBarElement) event.getProperty(UIEvents.EventTags.ELEMENT);
+		String attName = (String) event.getProperty(UIEvents.EventTags.ATTNAME);
+		if (UIEvents.UIElement.TOBERENDERED.equals(attName)) {
+			Object obj = itemModel.getParent();
+			if (!(obj instanceof MToolBar)) {
 				return;
 			}
-
-			MToolBarElement itemModel = (MToolBarElement) event.getProperty(UIEvents.EventTags.ELEMENT);
-			String attName = (String) event.getProperty(UIEvents.EventTags.ATTNAME);
-			if (UIEvents.UIElement.TOBERENDERED.equals(attName)) {
-				Object obj = itemModel.getParent();
-				if (!(obj instanceof MToolBar)) {
-					return;
-				}
-				ToolBarManager parent = getManager((MToolBar) obj);
-				if (itemModel.isToBeRendered()) {
-					if (parent != null) {
-						modelProcessSwitch(parent, itemModel);
-						parent.update(true);
-						ToolBar tb = parent.getControl();
-						if (tb != null && !tb.isDisposed()) {
-							tb.pack(true);
-							tb.getShell().layout(new Control[] { tb }, SWT.DEFER);
-						}
-					}
-				} else {
-					IContributionItem ici = modelToContribution.remove(itemModel);
-					if (ici != null && parent != null) {
-						parent.remove(ici);
-					}
-					if (ici != null) {
-						ici.dispose();
-					}
-				}
-			} else if (UIEvents.UIElement.VISIBLE.equals(attName)) {
-				IContributionItem ici = getContribution(itemModel);
-				if (ici == null) {
-					return;
-				}
-				ici.setVisible(itemModel.isVisible());
-
-				ToolBarManager parent = null;
-				if (ici instanceof MenuManager) {
-					parent = (ToolBarManager) ((MenuManager) ici).getParent();
-				} else if (ici instanceof ContributionItem) {
-					parent = (ToolBarManager) ((ContributionItem) ici).getParent();
-				}
-
+			ToolBarManager parent = getManager((MToolBar) obj);
+			if (itemModel.isToBeRendered()) {
 				if (parent != null) {
-					parent.markDirty();
+					modelProcessSwitch(parent, itemModel);
 					parent.update(true);
 					ToolBar tb = parent.getControl();
 					if (tb != null && !tb.isDisposed()) {
@@ -204,57 +167,85 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 						tb.getShell().layout(new Control[] { tb }, SWT.DEFER);
 					}
 				}
+			} else {
+				IContributionItem ici = modelToContribution.remove(itemModel);
+				if (ici != null && parent != null) {
+					parent.remove(ici);
+				}
+				if (ici != null) {
+					ici.dispose();
+				}
 			}
-		}
-	};
-
-	private EventHandler selectionUpdater = new EventHandler() {
-		@Override
-		public void handleEvent(Event event) {
-			// Ensure that this event is for a MToolBarElement
-			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBarElement)) {
-				return;
-			}
-
-			MToolBarElement itemModel = (MToolBarElement) event.getProperty(UIEvents.EventTags.ELEMENT);
+		} else if (UIEvents.UIElement.VISIBLE.equals(attName)) {
 			IContributionItem ici = getContribution(itemModel);
-			if (ici != null) {
-				ici.update();
-			}
-		}
-	};
-
-	private EventHandler enabledUpdater = new EventHandler() {
-		@Override
-		public void handleEvent(Event event) {
-			// Ensure that this event is for a MMenuItem
-			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBarElement)) {
+			if (ici == null) {
 				return;
 			}
+			ici.setVisible(itemModel.isVisible());
 
-			MToolBarElement itemModel = (MToolBarElement) event.getProperty(UIEvents.EventTags.ELEMENT);
-			IContributionItem ici = getContribution(itemModel);
-			if (ici != null) {
-				ici.update();
+			ToolBarManager parent = null;
+			if (ici instanceof MenuManager) {
+				parent = (ToolBarManager) ((MenuManager) ici).getParent();
+			} else if (ici instanceof ContributionItem) {
+				parent = (ToolBarManager) ((ContributionItem) ici).getParent();
+			}
+
+			if (parent != null) {
+				parent.markDirty();
+				parent.update(true);
+				ToolBar tb = parent.getControl();
+				if (tb != null && !tb.isDisposed()) {
+					tb.pack(true);
+					tb.getShell().layout(new Control[] { tb }, SWT.DEFER);
+				}
 			}
 		}
-	};
+	}
 
-	private EventHandler childAdditionUpdater = new EventHandler() {
-		@SuppressWarnings("unchecked")
-		@Override
-		public void handleEvent(Event event) {
-			// Ensure that this event is for a MMenuItem
-			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBar)) {
-				return;
-			}
-			MToolBar toolbarModel = (MToolBar) event.getProperty(UIEvents.EventTags.ELEMENT);
-			if (UIEvents.isADD(event)) {
-				Object obj = toolbarModel;
-				processContents((MElementContainer<MUIElement>) obj);
-			}
+	@Inject
+	@Optional
+	void updateSelection(@UIEventTopic(UIEvents.Item.TOPIC_SELECTED) Event event) {
+		// Ensure that this event is for a MToolBarElement
+		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBarElement)) {
+			return;
 		}
-	};
+
+		MToolBarElement itemModel = (MToolBarElement) event.getProperty(UIEvents.EventTags.ELEMENT);
+		IContributionItem ici = getContribution(itemModel);
+		if (ici != null) {
+			ici.update();
+		}
+	}
+
+	@Inject
+	@Optional
+	void updateEnablement(@UIEventTopic(UIEvents.Item.TOPIC_ENABLED) Event event) {
+		// Ensure that this event is for a MMenuItem
+		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBarElement)) {
+			return;
+		}
+
+		MToolBarElement itemModel = (MToolBarElement) event.getProperty(UIEvents.EventTags.ELEMENT);
+		IContributionItem ici = getContribution(itemModel);
+		if (ici != null) {
+			ici.update();
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Inject
+	@Optional
+	void childAdded(@UIEventTopic(ElementContainer.TOPIC_CHILDREN) Event event) {
+		// Ensure that this event is for a MMenuItem
+		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBar)) {
+			return;
+		}
+		MToolBar toolbarModel = (MToolBar) event.getProperty(UIEvents.EventTags.ELEMENT);
+		if (UIEvents.isADD(event)) {
+			Object obj = toolbarModel;
+			processContents((MElementContainer<MUIElement>) obj);
+		}
+	}
 
 	private HashSet<String> updateVariables = new HashSet<String>();
 
@@ -331,12 +322,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	 */
 	@PostConstruct
 	public void init() {
-		eventBroker.subscribe(UIEvents.UILabel.TOPIC_ALL, itemUpdater);
-		eventBroker.subscribe(UIEvents.Item.TOPIC_SELECTED, selectionUpdater);
-		eventBroker.subscribe(UIEvents.Item.TOPIC_ENABLED, enabledUpdater);
-		eventBroker.subscribe(UIEvents.UIElement.TOPIC_ALL, toBeRenderedUpdater);
-		eventBroker.subscribe(ElementContainer.TOPIC_CHILDREN, childAdditionUpdater);
-
 		context.set(ToolBarManagerRenderer.class, this);
 
 		String[] vars = {
@@ -366,11 +351,8 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	 */
 	@PreDestroy
 	public void contextDisposed() {
-		eventBroker.unsubscribe(itemUpdater);
-		eventBroker.unsubscribe(selectionUpdater);
-		eventBroker.unsubscribe(enabledUpdater);
-		eventBroker.unsubscribe(toBeRenderedUpdater);
-		eventBroker.unsubscribe(childAdditionUpdater);
+		// intentionally left for debugging life cycle
+		return;
 	}
 
 	@Override
