@@ -271,8 +271,7 @@ public class PopupMenuExtender implements IMenuListener2,
             /* (non-Javadoc)
              * @see org.eclipse.jface.viewers.ISelectionProvider#addSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
              */
-            @Override
-			public void addSelectionChangedListener(
+            public void addSelectionChangedListener(
                     ISelectionChangedListener listener) {
                 throw new UnsupportedOperationException(
                 "This ISelectionProvider is static, and cannot be modified."); //$NON-NLS-1$
@@ -281,8 +280,7 @@ public class PopupMenuExtender implements IMenuListener2,
             /* (non-Javadoc)
              * @see org.eclipse.jface.viewers.ISelectionProvider#getSelection()
              */
-            @Override
-			public ISelection getSelection() {
+            public ISelection getSelection() {
                 if (part instanceof IEditorPart) {
                     final IEditorPart editorPart = (IEditorPart) part;
                     return new StructuredSelection(new Object[] { editorPart
@@ -295,8 +293,7 @@ public class PopupMenuExtender implements IMenuListener2,
             /* (non-Javadoc)
              * @see org.eclipse.jface.viewers.ISelectionProvider#removeSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
              */
-            @Override
-			public void removeSelectionChangedListener(
+            public void removeSelectionChangedListener(
                     ISelectionChangedListener listener) {
                 throw new UnsupportedOperationException(
                 "This ISelectionProvider is static, and cannot be modified."); //$NON-NLS-1$
@@ -305,8 +302,7 @@ public class PopupMenuExtender implements IMenuListener2,
             /* (non-Javadoc)
              * @see org.eclipse.jface.viewers.ISelectionProvider#setSelection(org.eclipse.jface.viewers.ISelection)
              */
-            @Override
-			public void setSelection(ISelection selection) {
+            public void setSelection(ISelection selection) {
                 throw new UnsupportedOperationException(
                         "This ISelectionProvider is static, and cannot be modified."); //$NON-NLS-1$
             }
@@ -363,8 +359,7 @@ public class PopupMenuExtender implements IMenuListener2,
     /**
      * Notifies the listener that the menu is about to be shown.
      */
-    @Override
-	public void menuAboutToShow(IMenuManager mgr) {
+    public void menuAboutToShow(IMenuManager mgr) {
 		registerE4Support();
     	
     	// Add this menu as a visible menu.
@@ -427,8 +422,7 @@ public class PopupMenuExtender implements IMenuListener2,
     /**
 	 * Notifies the listener that the menu is about to be hidden.
 	 */
-    @Override
-	public final void menuAboutToHide(final IMenuManager mgr) {
+    public final void menuAboutToHide(final IMenuManager mgr) {
     	gatherContributions(mgr);
 		cleanupNeeded = true;
     	// Remove this menu as a visible menu.
@@ -441,7 +435,6 @@ public class PopupMenuExtender implements IMenuListener2,
     			// This is less threatening if the popup: menu
     			// contributions aren't tied to the evaluation service
 				workbench.getDisplay().asyncExec(new Runnable() {
-					@Override
 					public void run() {
 						final Workbench realWorkbench = (Workbench) workbench;
 						runCleanUp(realWorkbench);
@@ -601,7 +594,6 @@ public class PopupMenuExtender implements IMenuListener2,
 	 * 
 	 * @see org.eclipse.core.runtime.IRegistryChangeListener#registryChanged(org.eclipse.core.runtime.IRegistryChangeEvent)
 	 */
-	@Override
 	public void registryChanged(final IRegistryChangeEvent event) {
 		Display display = Display.getDefault();
 		if (part != null) {
@@ -628,7 +620,6 @@ public class PopupMenuExtender implements IMenuListener2,
 										
 				if (clearPopups) {
 					display.syncExec(new Runnable() {
-						@Override
 						public void run() {
 							clearStaticActions();
 						}

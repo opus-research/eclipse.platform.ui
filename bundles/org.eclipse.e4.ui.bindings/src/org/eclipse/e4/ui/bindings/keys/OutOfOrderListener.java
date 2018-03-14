@@ -55,7 +55,6 @@ final class OutOfOrderListener implements Listener {
 	 * @param event
 	 *            The event to process; must not be <code>null</code>
 	 */
-	@Override
 	public void handleEvent(Event event) {
 		// Always remove myself as a listener.
 		final Widget widget = event.widget;

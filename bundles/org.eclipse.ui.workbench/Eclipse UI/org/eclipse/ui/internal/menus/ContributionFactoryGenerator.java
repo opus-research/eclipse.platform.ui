@@ -99,7 +99,6 @@ public class ContributionFactoryGenerator extends ContextFunction {
 
 		// return something disposable
 		return new Runnable() {
-			@Override
 			public void run() {
 				root.release();
 			}

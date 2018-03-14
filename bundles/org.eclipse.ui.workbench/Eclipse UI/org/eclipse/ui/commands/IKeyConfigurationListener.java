@@ -29,8 +29,6 @@ package org.eclipse.ui.commands;
  * plug-in instead.
  * @see org.eclipse.jface.bindings.ISchemeListener
  */
-@Deprecated
-@SuppressWarnings("all")
 public interface IKeyConfigurationListener {
 
     /**
@@ -40,6 +38,5 @@ public interface IKeyConfigurationListener {
      * @param keyConfigurationEvent
      *            the keyConfiguration event. Guaranteed not to be <code>null</code>.
      */
-	@Deprecated
     void keyConfigurationChanged(KeyConfigurationEvent keyConfigurationEvent);
 }

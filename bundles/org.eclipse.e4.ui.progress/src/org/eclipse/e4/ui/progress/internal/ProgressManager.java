@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2014 IBM Corporation and others.
+ * Copyright (c) 2003, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -73,14 +74,12 @@ public class ProgressManager extends ProgressProvider {
 
 	private static ProgressManager singleton;
 
-	final private Map<Job, JobInfo> jobs = Collections
-	        .synchronizedMap(new HashMap<Job, JobInfo>());
+	final private Map jobs = Collections.synchronizedMap(new HashMap());
 	
-	final Map<Job, JobMonitor> runnableMonitors = Collections
-	        .synchronizedMap(new HashMap<Job, JobMonitor>());
+	final Map runnableMonitors = Collections.synchronizedMap(new HashMap());
 
-	final private Map<Object, Collection<IJobBusyListener>> familyListeners = Collections
-	        .synchronizedMap(new HashMap<Object, Collection<IJobBusyListener>>());
+	final private Map familyListeners = Collections
+			.synchronizedMap(new HashMap());
 
 	//	list of IJobProgressManagerListener
 	private ListenerList listeners = new ListenerList();
@@ -112,7 +111,10 @@ public class ProgressManager extends ProgressProvider {
 	 */
 	public static final String BLOCKED_JOB_KEY = "LOCKED_JOB"; //$NON-NLS-1$
 
+	
 
+	private static final String IMAGE_KEY = "org.eclipse.ui.progress.images"; //$NON-NLS-1$
+	
 	@Inject
 	@Optional
 	IProgressService progressService;
@@ -183,7 +185,7 @@ public class ProgressManager extends ProgressProvider {
 	public JobMonitor progressFor(Job job) {
 
 		synchronized (runnableMonitors) {
-			JobMonitor monitor = runnableMonitors.get(job);
+			JobMonitor monitor = (JobMonitor) runnableMonitors.get(job);
 			if (monitor == null) {
 				monitor = new JobMonitor(job);
 				runnableMonitors.put(job, monitor);
@@ -199,7 +201,9 @@ public class ProgressManager extends ProgressProvider {
 	 * 
 	 * @see org.eclipse.core.runtime.jobs.ProgressProvider#createProgressGroup()
 	 */
+
 	public IProgressMonitor createProgressGroup() {
+		//TODO E4 circular dependency
 		return new GroupInfo(this, finishedJobs);
 	}
 
@@ -245,7 +249,7 @@ public class ProgressManager extends ProgressProvider {
 	 * @return JobInfo
 	 */
 	JobInfo internalGetJobInfo(Job job) {
-		return jobs.get(job);
+		return (JobInfo) jobs.get(job);
 	}
 
 	
@@ -457,7 +461,7 @@ public class ProgressManager extends ProgressProvider {
 			public void aboutToRun(IJobChangeEvent event) {
 				JobInfo info = getJobInfo(event.getJob());
 				refreshJobInfo(info);
-				Iterator<IJobBusyListener> startListeners = busyListenersForJob(event.getJob())
+				Iterator startListeners = busyListenersForJob(event.getJob())
 						.iterator();
 				while (startListeners.hasNext()) {
 					IJobBusyListener next = (IJobBusyListener) startListeners
@@ -475,10 +479,10 @@ public class ProgressManager extends ProgressProvider {
 				if (!PlatformUI.isWorkbenchRunning()) {
 					return;
 				}
-				Iterator<IJobBusyListener> startListeners = busyListenersForJob(event.getJob())
+				Iterator startListeners = busyListenersForJob(event.getJob())
 						.iterator();
 				while (startListeners.hasNext()) {
-					IJobBusyListener next = startListeners
+					IJobBusyListener next = (IJobBusyListener) startListeners
 							.next();
 					next.decrementBusy(event.getJob());
 				}
@@ -806,10 +810,10 @@ public class ProgressManager extends ProgressProvider {
 	 */
 	public JobInfo[] getJobInfos(boolean debug) {
 		synchronized (jobs) {
-			Iterator<Job> iterator = jobs.keySet().iterator();
-			Collection<JobInfo> result = new ArrayList<JobInfo>();
+			Iterator iterator = jobs.keySet().iterator();
+			Collection result = new ArrayList();
 			while (iterator.hasNext()) {
-				Job next = iterator.next();
+				Job next = (Job) iterator.next();
 				if (!isCurrentDisplaying(next, debug)) {
 					result.add(jobs.get(next));
 				}
@@ -828,12 +832,12 @@ public class ProgressManager extends ProgressProvider {
 	 */
 	public JobTreeElement[] getRootElements(boolean debug) {
 		synchronized (jobs) {
-			Iterator<Job> iterator = jobs.keySet().iterator();
-			Collection<JobTreeElement> result = new HashSet<JobTreeElement>();
+			Iterator iterator = jobs.keySet().iterator();
+			Collection result = new HashSet();
 			while (iterator.hasNext()) {
-				Job next = iterator.next();
+				Job next = (Job) iterator.next();
 				if (!isCurrentDisplaying(next, debug)) {
-					JobInfo jobInfo = jobs.get(next);
+					JobInfo jobInfo = (JobInfo) jobs.get(next);
 					GroupInfo group = jobInfo.getGroupInfo();
 					if (group == null) {
 						result.add(jobInfo);
@@ -855,7 +859,7 @@ public class ProgressManager extends ProgressProvider {
 	 */
 	public boolean hasJobInfos() {
 		synchronized (jobs) {
-			Iterator<Job> iterator = jobs.keySet().iterator();
+			Iterator iterator = jobs.keySet().iterator();
 			while (iterator.hasNext()) {
 				return true;
 			}
@@ -915,9 +919,9 @@ public class ProgressManager extends ProgressProvider {
 	 */
 	void addListenerToFamily(Object family, IJobBusyListener listener) {
 		synchronized (familyListeners) {
-			Collection<IJobBusyListener> currentListeners = familyListeners.get(family);
+			Collection currentListeners = (Collection) familyListeners.get(family);
 			if (currentListeners == null) {
-				currentListeners = new HashSet<IJobBusyListener>();
+				currentListeners = new HashSet();
 				familyListeners.put(family, currentListeners);
 			}
 			currentListeners.add(listener);
@@ -931,10 +935,10 @@ public class ProgressManager extends ProgressProvider {
 	 */
 	void removeListener(IJobBusyListener listener) {
 		synchronized (familyListeners) {
-			Iterator<Object> families = familyListeners.keySet().iterator();
+			Iterator families = familyListeners.keySet().iterator();
 			while (families.hasNext()) {
 				Object next = families.next();
-				Collection<IJobBusyListener> currentListeners = familyListeners
+				Collection currentListeners = (Collection) familyListeners
 						.get(next);
 				currentListeners.remove(listener);
 
@@ -952,8 +956,7 @@ public class ProgressManager extends ProgressProvider {
 	 * @param job
 	 * @return Collection of IJobBusyListener
 	 */
-	@SuppressWarnings("unchecked")
-    private Collection<IJobBusyListener> busyListenersForJob(Job job) {
+	private Collection busyListenersForJob(Job job) {
 		if (job.isSystem()) {
 			return Collections.EMPTY_LIST;
 		}
@@ -963,12 +966,12 @@ public class ProgressManager extends ProgressProvider {
 				return Collections.EMPTY_LIST;
 			}
 
-			Iterator<Object> families = familyListeners.keySet().iterator();
-			Collection<IJobBusyListener> returnValue = new HashSet<IJobBusyListener>();
+			Iterator families = familyListeners.keySet().iterator();
+			Collection returnValue = new HashSet();
 			while (families.hasNext()) {
 				Object next = families.next();
 				if (job.belongsTo(next)) {
-					Collection<IJobBusyListener> currentListeners = familyListeners
+					Collection currentListeners = (Collection) familyListeners
 							.get(next);
 					returnValue.addAll(currentListeners);
 				}

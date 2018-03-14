@@ -32,7 +32,6 @@ import org.eclipse.jface.action.IAction;
  * be proxied by org.eclipse.jface.commands.ActionHandler.
  * @noimplement This interface is not intended to be implemented by clients.
  */
-@Deprecated
 public interface IKeyBindingService {
 
     /**

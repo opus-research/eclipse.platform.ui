@@ -13,6 +13,7 @@ package org.eclipse.ui.commands;
 
 import java.util.Map;
 import java.util.Set;
+
 import org.eclipse.ui.keys.KeySequence;
 
 /**
@@ -32,8 +33,6 @@ import org.eclipse.ui.keys.KeySequence;
  * @deprecated Please use the "org.eclipse.core.commands" plug-in instead.
  * @noimplement This interface is not intended to be implemented by clients.
  */
-@Deprecated
-@SuppressWarnings("all")
 public interface ICommandManager {
 
     /**
@@ -47,7 +46,6 @@ public interface ICommandManager {
      *            <code>ICommandManagerListener</code> which is already
      *            registered with this instance, no operation is performed.
      */
-	@Deprecated
     void addCommandManagerListener(
             ICommandManagerListener commandManagerListener);
 
@@ -63,7 +61,6 @@ public interface ICommandManager {
      *         set is not empty, it is guaranteed to only contain instances of
      *         <code>String</code>.
      */
-	@Deprecated
     Set getActiveContextIds();
 
     /**
@@ -78,7 +75,6 @@ public interface ICommandManager {
      *         is not empty, it is guaranteed to only contains instances of
      *         <code>String</code>.
      */
-	@Deprecated
     String getActiveKeyConfigurationId();
 
     /**
@@ -92,7 +88,6 @@ public interface ICommandManager {
      * 
      * @return the active locale. May be <code>null</code>.
      */
-	@Deprecated
     String getActiveLocale();
 
     /**
@@ -106,7 +101,6 @@ public interface ICommandManager {
      * 
      * @return the active platform. May be <code>null</code>.
      */
-	@Deprecated
     String getActivePlatform();
 
     /**
@@ -116,7 +110,6 @@ public interface ICommandManager {
      *            an identifier. Must not be <code>null</code>
      * @return a handle to a category.
      */
-	@Deprecated
     ICategory getCategory(String categoryId);
 
     /**
@@ -126,7 +119,6 @@ public interface ICommandManager {
      *            an identifier. Must not be <code>null</code>
      * @return a handle to a command; never <code>null</code>.
      */
-	@Deprecated
     ICommand getCommand(String commandId);
 
     /**
@@ -143,7 +135,6 @@ public interface ICommandManager {
      *         set is not empty, it is guaranteed to only contain instances of
      *         <code>String</code>.
      */
-	@Deprecated
     Set getDefinedCategoryIds();
 
     /**
@@ -160,7 +151,6 @@ public interface ICommandManager {
      *         set is not empty, it is guaranteed to only contain instances of
      *         <code>String</code>.
      */
-	@Deprecated
     Set getDefinedCommandIds();
 
     /**
@@ -177,7 +167,6 @@ public interface ICommandManager {
      *         If this set is not empty, it is guaranteed to only contain
      *         instances of <code>String</code>.
      */
-	@Deprecated
     Set getDefinedKeyConfigurationIds();
 
     /**
@@ -187,7 +176,6 @@ public interface ICommandManager {
      *            an identifier. Must not be <code>null</code>
      * @return a handle to a key configuration.
      */
-	@Deprecated
     IKeyConfiguration getKeyConfiguration(String keyConfigurationId);
 
     /**
@@ -201,7 +189,6 @@ public interface ICommandManager {
      *         <code>String</code>). This map may be empty, but it is never
      *         <code>null</code>.
      */
-	@Deprecated
     Map getPartialMatches(KeySequence keySequence);
 
     /**
@@ -213,7 +200,6 @@ public interface ICommandManager {
      * @return The command id for the matching command, if any;
      *         <code>null</code> if none.
      */
-	@Deprecated
     String getPerfectMatch(KeySequence keySequence);
 
     /**
@@ -226,7 +212,6 @@ public interface ICommandManager {
      *         that starts with <code>keySequence</code>;<code>false</code>
      *         otherwise.
      */
-	@Deprecated
     boolean isPartialMatch(KeySequence keySequence);
 
     /**
@@ -238,7 +223,6 @@ public interface ICommandManager {
      * @return <code>true</code> if a command has a matching key binding;
      *         <code>false</code> otherwise.
      */
-	@Deprecated
     boolean isPerfectMatch(KeySequence keySequence);
 
     /**
@@ -252,7 +236,6 @@ public interface ICommandManager {
      *            <code>ICommandManagerListener</code> which is not already
      *            registered with this instance, no operation is performed.
      */
-	@Deprecated
     void removeCommandManagerListener(
             ICommandManagerListener commandManagerListener);
 }

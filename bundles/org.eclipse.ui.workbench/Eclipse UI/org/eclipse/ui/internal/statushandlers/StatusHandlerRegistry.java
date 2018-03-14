@@ -99,7 +99,6 @@ public class StatusHandlerRegistry implements IExtensionChangeHandler {
 	 * @see org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamichelpers.IExtensionTracker,
 	 *      org.eclipse.core.runtime.IExtension)
 	 */
-	@Override
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
 		IConfigurationElement[] configElements = extension
 				.getConfigurationElements();
@@ -128,7 +127,6 @@ public class StatusHandlerRegistry implements IExtensionChangeHandler {
 	 * @see org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension,
 	 *      java.lang.Object[])
 	 */
-	@Override
 	public void removeExtension(IExtension extension, Object[] objects) {
 		for (int i = 0; i < objects.length; i++) {
 			if (objects[i] instanceof StatusHandlerDescriptor) {

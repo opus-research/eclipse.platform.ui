@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,8 @@
 
 package org.eclipse.e4.ui.progress.internal;
 
+import com.ibm.icu.text.DateFormat;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,8 +20,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.ui.progress.IProgressConstants;
@@ -47,6 +52,7 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
@@ -55,8 +61,6 @@ import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.osgi.framework.FrameworkUtil;
-
-import com.ibm.icu.text.DateFormat;
 
 
 /**
@@ -87,7 +91,7 @@ public class ProgressInfoItem extends Composite {
 
 	ToolItem actionButton;
 	
-	List<Link> taskEntries = new ArrayList<Link>(0);
+	List taskEntries = new ArrayList(0);
 
 	private ProgressBar progressBar;
 
@@ -304,7 +308,7 @@ public class ProgressInfoItem extends Composite {
 					IDialogConstants.VERTICAL_SPACING);
 			linkData.left = new FormAttachment(progressLabel, 0, SWT.LEFT);
 			linkData.right = new FormAttachment(actionBar, 0, SWT.LEFT);
-			taskEntries.get(0).setLayoutData(linkData);
+			((Link) taskEntries.get(0)).setLayoutData(linkData);
 
 		}
 	}
@@ -562,7 +566,7 @@ public class ProgressInfoItem extends Composite {
 		// Remove completed tasks
 		if (infos.length < taskEntries.size()) {
 			for (int i = infos.length; i < taskEntries.size(); i++) {
-				taskEntries.get(i).dispose();
+				((Link) taskEntries.get(i)).dispose();
 
 			}
 			if (infos.length > 1)
@@ -716,7 +720,7 @@ public class ProgressInfoItem extends Composite {
 			// Give an initial value so as to constrain the link shortening
 			linkData.width = 20;
 
-			taskEntries.get(0).setLayoutData(linkData);
+			((Link) taskEntries.get(0)).setLayoutData(linkData);
 		}
 	}
 
@@ -743,7 +747,7 @@ public class ProgressInfoItem extends Composite {
 				// Give an initial value so as to constrain the link shortening
 				linkData.width = 20;
 			} else {
-				Link previous = taskEntries.get(index - 1);
+				Link previous = (Link) taskEntries.get(index - 1);
 				linkData.top = new FormAttachment(previous,
 						IDialogConstants.VERTICAL_SPACING);
 				linkData.left = new FormAttachment(previous, 0, SWT.LEFT);
@@ -783,7 +787,7 @@ public class ProgressInfoItem extends Composite {
 			});
 			taskEntries.add(link);
 		} else {
-			link = taskEntries.get(index);
+			link = (Link) taskEntries.get(index);
 		}
 
 		// check for action property
@@ -910,9 +914,9 @@ public class ProgressInfoItem extends Composite {
 		setForeground(color);
 		progressLabel.setForeground(color);
 
-		Iterator<Link> taskEntryIterator = taskEntries.iterator();
+		Iterator taskEntryIterator = taskEntries.iterator();
 		while (taskEntryIterator.hasNext()) {
-			taskEntryIterator.next().setForeground(color);
+			((Link) taskEntryIterator.next()).setForeground(color);
 		}
 
 	}
@@ -928,9 +932,9 @@ public class ProgressInfoItem extends Composite {
 		actionBar.setBackground(color);
 		jobImageLabel.setBackground(color);
 
-		Iterator<Link> taskEntryIterator = taskEntries.iterator();
+		Iterator taskEntryIterator = taskEntries.iterator();
 		while (taskEntryIterator.hasNext()) {
-			taskEntryIterator.next().setBackground(color);
+			((Link) taskEntryIterator.next()).setBackground(color);
 		}
 
 	}
