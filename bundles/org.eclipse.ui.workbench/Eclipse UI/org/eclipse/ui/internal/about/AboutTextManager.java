@@ -12,7 +12,6 @@ package org.eclipse.ui.internal.about;
 
 import java.util.ArrayList;
 import java.util.StringTokenizer;
-
 import org.eclipse.jface.resource.JFaceColors;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
@@ -37,13 +36,14 @@ import org.eclipse.swt.graphics.Point;
 public class AboutTextManager {
 
     /**
-     * Scan the contents of the about text
-     * @param s 
-     * @return 
-     */
+	 * Scan the contents of the about text
+	 * 
+	 * @param s
+	 * @return AboutItem
+	 */
     public static AboutItem scan(String s) {
-        ArrayList linkRanges = new ArrayList();
-        ArrayList links = new ArrayList();
+		ArrayList<int[]> linkRanges = new ArrayList<int[]>();
+		ArrayList<String> links = new ArrayList<String>();
         
         // slightly modified version of jface url detection
         // see org.eclipse.jface.text.hyperlink.URLHyperlinkDetector
@@ -92,8 +92,8 @@ public class AboutTextManager {
 			
 			urlSeparatorOffset= s.indexOf("://", urlOffset+urlLength+1); //$NON-NLS-1$
 		}
-        return new AboutItem(s, (int[][]) linkRanges.toArray(new int[linkRanges
-                .size()][2]), (String[]) links
+		return new AboutItem(s, linkRanges.toArray(new int[linkRanges.size()][2]),
+				links
                 .toArray(new String[links.size()]));
     }
 	private StyledText styledText;
