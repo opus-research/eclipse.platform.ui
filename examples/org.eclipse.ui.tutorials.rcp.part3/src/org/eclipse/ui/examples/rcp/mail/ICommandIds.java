@@ -1,4 +1,4 @@
-package org.eclipse.ui.tutorials.rcp.part3;
+package org.eclipse.ui.examples.rcp.mail;
 
 /**
  * Interface defining the application's command IDs.
