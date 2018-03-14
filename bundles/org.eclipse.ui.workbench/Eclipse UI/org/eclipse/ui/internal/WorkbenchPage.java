@@ -2498,45 +2498,21 @@ public class WorkbenchPage implements IWorkbenchPage {
 		MPerspective perspective = getCurrentPerspective();
 		if (perspective != null) {
 			int scope = allPerspectives ? WINDOW_SCOPE : EModelService.PRESENTATION;
-			List<MPart> parts = modelService.findElements(window, null, MPart.class, null, scope);
+			List<MPlaceholder> placeholders = modelService.findElements(window, null,
+					MPlaceholder.class, null, scope);
 			List<IViewReference> visibleReferences = new ArrayList<IViewReference>();
 			for (ViewReference reference : viewReferences) {
-				addVisibleReferences(perspective, parts, reference, visibleReferences);
+				for (MPlaceholder placeholder : placeholders) {
+					if (reference.getModel() == placeholder.getRef()
+							&& placeholder.isToBeRendered()) {
+						// only rendered placeholders are valid view references
+						visibleReferences.add(reference);
+					}
+				}
 			}
 			return visibleReferences.toArray(new IViewReference[visibleReferences.size()]);
 		}
 		return new IViewReference[0];
-	}
-
-	private void addVisibleReferences(MPerspective perspective, Collection<MPart> parts, ViewReference reference,
-			Collection<IViewReference> visibleReferences) {
-		for (MPart part : parts) {
-			if (reference.getModel().getElementId().equals(part.getElementId())
-					&& (isStickyView(reference.getModel().getElementId()) || partService
-							.isPartOrPlaceholderInPerspective(part.getElementId(), perspective))) {
-				// only rendered parts are valid view references
-				visibleReferences.add(reference);
-				return;
-			}
-		}
-	}
-
-    /**
-	 * Check if the elementId belongs to a sticky view.
-	 *
-	 * @param elementId
-	 *            id of the part
-	 * @return <code>true</code> in case it is a sticky view and
-	 *         <code>false</code> otherwise
-	 */
-	private boolean isStickyView(String elementId) {
-		IStickyViewDescriptor[] stickyViews = PlatformUI.getWorkbench().getViewRegistry().getStickyViews();
-		for (IStickyViewDescriptor stickyViewDescriptor : stickyViews) {
-			if (stickyViewDescriptor.getId().equals(elementId)) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	/**
