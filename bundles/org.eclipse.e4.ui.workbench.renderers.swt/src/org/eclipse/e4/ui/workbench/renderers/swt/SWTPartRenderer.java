@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Ragnar Nevries <r.eclipse@nevri.es> - Bug 443514
@@ -292,7 +292,7 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 	 * Calculates the index of the element in terms of the other <b>rendered</b>
 	 * elements. This is useful when 'inserting' elements in the middle of
 	 * existing, rendered parents.
-	 * 
+	 *
 	 * @param element
 	 *            The element to get the index for
 	 * @return The visible index or -1 if the element is not a child of the
