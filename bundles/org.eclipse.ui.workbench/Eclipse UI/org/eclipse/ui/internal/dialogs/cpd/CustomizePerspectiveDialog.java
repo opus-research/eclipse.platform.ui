@@ -162,7 +162,8 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 	static final int MIN_TOOLTIP_WIDTH = 160;
 
 	WorkbenchWindow window;
-	WorkbenchPage wPage;
+
+	private WorkbenchPage windowPage;
 
 	private Perspective perspective;
 
@@ -521,7 +522,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		this.context = context;
 		perspective = persp;
 		window = (WorkbenchWindow) configurer.getWindow();
-		wPage = (WorkbenchPage) window.getActivePage();
+		windowPage = (WorkbenchPage) window.getActivePage();
 		menuMngrRenderer = context.get(MenuManagerRenderer.class);
 		toolbarMngrRenderer = context.get(ToolBarManagerRenderer.class);
 		resUtils = (ISWTResourceUtilities) context.get(IResourceUtilities.class);
@@ -1626,8 +1627,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		// Add actionSet MenuManagers to menu
 		MenuManager menuManager = customizeActionBars.menuManager;
 		IContributionItem[] items = menuManager.getItems();
-		for (int src = 0; src < items.length; src++) {
-			IContributionItem item = items[src];
+		for (IContributionItem item : items) {
 			if (item instanceof ActionSetContributionItem) {
 				ActionSetContributionItem asci = (ActionSetContributionItem) item;
 				menuManager.add(asci.getInnerItem());
@@ -2046,7 +2046,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 
 	private boolean isHiddenItem(DisplayItem item, String prefix) {
 		String itemId = prefix + getCommandID(item) + ","; //$NON-NLS-1$
-		return wPage.getHiddenItems().contains(itemId);
+		return windowPage.getHiddenItems().contains(itemId);
 	}
 
 	/**
@@ -2324,7 +2324,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 			String itemId = prefix + id;
 			if (currentHidden.contains(itemId)) {
 				hasChanges = true;
-				wPage.removeHiddenItems(itemId);
+				windowPage.removeHiddenItems(itemId);
 			}
 		}
 
@@ -2333,7 +2333,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 			String itemId = prefix + id;
 			if (!currentHidden.contains(itemId)) {
 				hasChanges = true;
-				wPage.addHiddenItems(itemId);
+				windowPage.addHiddenItems(itemId);
 			}
 		}
 
@@ -2345,9 +2345,9 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 
 		// Shortcuts
 		if (showShortcutTab()) {
-			wPage.setNewShortcuts(getVisibleIDs(wizards), ModeledPageLayout.NEW_WIZARD_TAG);
-			wPage.setNewShortcuts(getVisibleIDs(perspectives), ModeledPageLayout.PERSP_SHORTCUT_TAG);
-			wPage.setNewShortcuts(getVisibleIDs(views), ModeledPageLayout.SHOW_VIEW_TAG);
+			windowPage.setNewShortcuts(getVisibleIDs(wizards), ModeledPageLayout.NEW_WIZARD_TAG);
+			windowPage.setNewShortcuts(getVisibleIDs(perspectives), ModeledPageLayout.PERSP_SHORTCUT_TAG);
+			windowPage.setNewShortcuts(getVisibleIDs(views), ModeledPageLayout.SHOW_VIEW_TAG);
 		}
 
 		// Determine if anything has changed and, if so, update the menu & tb's
@@ -2375,12 +2375,12 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		perspective.turnOnActionSets(toAdd.toArray(new IActionSetDescriptor[toAdd.size()]));
 		perspective.turnOffActionSets(toRemove.toArray(new IActionSetDescriptor[toRemove.size()]));
 
-		requiresUpdate |= updateHiddenElements(actionSets, wPage.getHiddenItems(),
+		requiresUpdate |= updateHiddenElements(actionSets, windowPage.getHiddenItems(),
 				ModeledPageLayout.HIDDEN_ACTIONSET_PREFIX);
 		// Menu and Toolbar Items
-		requiresUpdate |= updateHiddenElements(menuItems, wPage.getHiddenItems(),
+		requiresUpdate |= updateHiddenElements(menuItems, windowPage.getHiddenItems(),
 				ModeledPageLayout.HIDDEN_MENU_PREFIX);
-		requiresUpdate |= updateHiddenElements(toolBarItems, wPage.getHiddenItems(),
+		requiresUpdate |= updateHiddenElements(toolBarItems, windowPage.getHiddenItems(),
 				ModeledPageLayout.HIDDEN_TOOLBAR_PREFIX);
 
 		if (requiresUpdate) {

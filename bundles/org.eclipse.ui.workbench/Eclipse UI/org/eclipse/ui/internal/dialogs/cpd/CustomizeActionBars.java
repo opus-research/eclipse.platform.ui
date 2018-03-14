@@ -14,7 +14,6 @@
 package org.eclipse.ui.internal.dialogs.cpd;
 
 import java.util.ArrayList;
-import java.util.List;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
@@ -42,46 +41,37 @@ import org.eclipse.ui.internal.provisional.application.IActionBarConfigurer2;
 import org.eclipse.ui.services.IServiceLocator;
 
 /**
- * The proxy IActionBarConfigurer that gets passed to the application's
- * ActionBarAdvisor. This is used to construct a representation of the
- * window's hardwired menus and toolbars in order to display their structure
- * properly in the preview panes.
+ * Fake action bars to build the menus and toolbar contributions for the
+ * workbench. We cannot use the actual workbench action bars, since doing so
+ * would make the action set items visible.
  *
  * @since 3.5
  */
 public class CustomizeActionBars implements IActionBarConfigurer2, IActionBars2 {
 
-	IWorkbenchWindowConfigurer configurer;
+	private final IWorkbenchWindowConfigurer configurer;
+	private final StatusLineManager statusLineManager;
+	private final MApplication app;
 
-	/**
-	 * Fake action bars to use to build the menus and toolbar contributions
-	 * for the workbench. We cannot use the actual workbench action bars,
-	 * since doing so would make the action set items visible.
-	 */
-	MenuManager menuManager;
-	CoolBarToTrimManager coolBarManager;
-	private StatusLineManager statusLineManager;
-	private List<MTrimElement> workbenchTrimElements;
-	MTrimmedWindow windowModel;
-	MMenu mainMenu;
-	MenuManagerRenderer menuRenderer;
-	private MApplication app;
+	final MenuManager menuManager;
+	final CoolBarToTrimManager coolBarManager;
+	final MTrimmedWindow windowModel;
+	final MMenu mainMenu;
+	final MenuManagerRenderer menuRenderer;
 
 	/**
 	 * Create a new instance of this class.
 	 *
 	 * @param configurer
-	 *            the configurer
+	 *            non null
 	 * @param context
-	 * 			  non null
+	 *            non null
 	 */
 	public CustomizeActionBars(IWorkbenchWindowConfigurer configurer, IEclipseContext context) {
 		this.configurer = configurer;
-		workbenchTrimElements = new ArrayList<MTrimElement>();
 		statusLineManager = new StatusLineManager();
 		menuManager = new MenuManager("MenuBar", ActionSet.MAIN_MENU); //$NON-NLS-1$
 
-		this.configurer = configurer;
 		IRendererFactory rendererFactory = context.get(IRendererFactory.class);
 		EModelService modelService = context.get(EModelService.class);
 
@@ -89,7 +79,7 @@ public class CustomizeActionBars implements IActionBarConfigurer2, IActionBars2 
 		app = context.get(MApplication.class);
 		IEclipseContext eclipseContext = app.getContext().createChild("window - CustomizeActionBars"); //$NON-NLS-1$
 		windowModel.setContext(eclipseContext);
-		eclipseContext.set(MWindow.class.getName(), windowModel);
+		eclipseContext.set(MWindow.class, windowModel);
 
 		Shell shell = new Shell();
 		windowModel.setWidget(shell);
@@ -105,7 +95,7 @@ public class CustomizeActionBars implements IActionBarConfigurer2, IActionBars2 
 		menuRenderer.linkModelToManager(mainMenu, menuManager);
 		windowModel.setMainMenu(mainMenu);
 
-		coolBarManager = new CoolBarToTrimManager(app, windowModel, workbenchTrimElements, rendererFactory);
+		coolBarManager = new CoolBarToTrimManager(app, windowModel, new ArrayList<MTrimElement>(), rendererFactory);
 	}
 
 	@Override
@@ -162,7 +152,6 @@ public class CustomizeActionBars implements IActionBarConfigurer2, IActionBars2 
 		coolBarManager.dispose();
 		menuManager.dispose();
 		statusLineManager.dispose();
-		windowModel.setToBeRendered(false);
 		windowModel.getContext().deactivate();
 		windowModel.getContext().dispose();
 		((Shell) windowModel.getWidget()).dispose();
