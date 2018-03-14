@@ -188,7 +188,6 @@ public class IDEWorkbenchMessages extends NLS {
 	// --- Window Menu ---
 	public static String Workbench_window;
 	public static String Workbench_openPerspective;
-	public static String Workbench_closePerspective;
 	public static String Workbench_showView;
 
 	public static String PromptOnExitDialog_shellTitle;
