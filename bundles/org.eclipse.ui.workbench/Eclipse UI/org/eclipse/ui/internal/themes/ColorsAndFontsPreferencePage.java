@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2013 IBM Corporation and others.
+ * Copyright (c) 2003, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,8 +22,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.JFaceResources;
@@ -367,15 +365,8 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 
         private IPropertyChangeListener listener = new IPropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent event) {
-				if (event.getNewValue() != null) {
-					fireLabelProviderChanged(new LabelProviderChangedEvent(
-							PresentationLabelProvider.this));
-				} else {
-					// Some theme definition element has been modified and we
-					// need to refresh the viewer
-					tree.getViewer().setContentProvider(new ThemeContentProvider());
-					tree.getViewer().collapseAll();
-				}
+                fireLabelProviderChanged(new LabelProviderChangedEvent(
+                        PresentationLabelProvider.this));
             }
         };
 
@@ -698,8 +689,6 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
     
 	private Text descriptionText;
 
-	private IEventBroker eventBroker;
-
     /**
      * Create a new instance of the receiver.
      */
@@ -941,7 +930,6 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 
 		tree = new FilteredTree(parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER,
 				filter, true);
-		tree.setQuickSelectionMode(true);
 		GridData data = new GridData(GridData.FILL_BOTH | GridData.VERTICAL_ALIGN_FILL);
 		data.widthHint = Math.max(285, convertWidthInCharsToPixels(30));
 		data.heightHint = Math.max(175, convertHeightInCharsToPixels(10));
@@ -1241,7 +1229,6 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
      */
     public void init(IWorkbench aWorkbench) {
         this.workbench = (Workbench) aWorkbench;
-		eventBroker = (IEventBroker) workbench.getService(IEventBroker.class);
         setPreferenceStore(PrefUtil.getInternalPreferenceStore());
 
         final IThemeManager themeManager = aWorkbench.getThemeManager();
@@ -1395,10 +1382,8 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
         getApplyButton().setFont(appliedDialogFont);
         getDefaultsButton().setFont(appliedDialogFont);
 
-		if (oldFont != null) {
+        if (oldFont != null)
 			oldFont.dispose();
-		}
-		publishThemeChangedEvent();
     }
 
     private void performColorDefaults() {
@@ -1482,10 +1467,8 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
     	saveTreeExpansion();
     	saveTreeSelection();
         boolean result =  performColorOk() && performFontOk();
-		if (result) {
+        if(result)
 			PrefUtil.savePrefs();
-			publishThemeChangedEvent();
-		}
         return result;
     }
 
@@ -1867,11 +1850,11 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
         if (fontDefinition != null) {
 			boolean isDefault = isDefault(fontDefinition);
 			boolean hasDefault = fontDefinition.getDefaultsTo() != null;
-			fontChangeButton.setEnabled(!fontDefinition.isOverridden());
-			fontSystemButton.setEnabled(!fontDefinition.isOverridden());
-			fontResetButton.setEnabled(!isDefault && !fontDefinition.isOverridden());
-			editDefaultButton.setEnabled(hasDefault && isDefault && !fontDefinition.isOverridden());
-			goToDefaultButton.setEnabled(hasDefault && !fontDefinition.isOverridden());
+            fontChangeButton.setEnabled(true);
+            fontSystemButton.setEnabled(true);
+			fontResetButton.setEnabled(!isDefault);
+			editDefaultButton.setEnabled(hasDefault && isDefault);
+			goToDefaultButton.setEnabled(hasDefault);
             setCurrentFont(fontDefinition);
             return;
         }
@@ -1879,12 +1862,11 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
         if (colorDefinition != null) {
 			boolean isDefault = isDefault(getSelectedColorDefinition());
 			boolean hasDefault = colorDefinition.getDefaultsTo() != null;
-			fontChangeButton.setEnabled(!colorDefinition.isOverridden());
+            fontChangeButton.setEnabled(true);
             fontSystemButton.setEnabled(false);
-			fontResetButton.setEnabled(!isDefault && !colorDefinition.isOverridden());
-			editDefaultButton
-					.setEnabled(hasDefault && isDefault && !colorDefinition.isOverridden());
-			goToDefaultButton.setEnabled(hasDefault && !colorDefinition.isOverridden());
+			fontResetButton.setEnabled(!isDefault);
+			editDefaultButton.setEnabled(hasDefault && isDefault);
+			goToDefaultButton.setEnabled(hasDefault);
             setCurrentColor(colorDefinition);
             return;
         }
@@ -2101,12 +2083,5 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 		data.widthHint = convertWidthInCharsToPixels(30);
 		descriptionText.setLayoutData(data);
 		myApplyDialogFont(descriptionText);
-	}
-
-	private void publishThemeChangedEvent() {
-		if (eventBroker != null) {
-			eventBroker.send(UIEvents.UILifeCycle.THEME_DEFINITION_CHANGED,
-					workbench.getApplication());
-		}
 	}
 }

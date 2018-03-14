@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation and others.
+ * Copyright (c) 2005, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422040
  *******************************************************************************/
 
 package org.eclipse.ui.internal.progress;
@@ -146,35 +145,35 @@ public class ProgressInfoItem extends Composite {
 				.put(
 						STOP_IMAGE_KEY,
 						WorkbenchImages
-								.getWorkbenchImageDescriptor("elcl16/progress_stop.png"));//$NON-NLS-1$
+								.getWorkbenchImageDescriptor("elcl16/progress_stop.gif"));//$NON-NLS-1$
 
 		JFaceResources
 				.getImageRegistry()
 				.put(
 						DISABLED_STOP_IMAGE_KEY,
 						WorkbenchImages
-								.getWorkbenchImageDescriptor("dlcl16/progress_stop.png"));//$NON-NLS-1$
+								.getWorkbenchImageDescriptor("dlcl16/progress_stop.gif"));//$NON-NLS-1$
 
 		JFaceResources
 				.getImageRegistry()
 				.put(
 						DEFAULT_JOB_KEY,
 						WorkbenchImages
-								.getWorkbenchImageDescriptor("progress/progress_task.png")); //$NON-NLS-1$
+								.getWorkbenchImageDescriptor("progress/progress_task.gif")); //$NON-NLS-1$
 
 		JFaceResources
 				.getImageRegistry()
 				.put(
 						CLEAR_FINISHED_JOB_KEY,
 						WorkbenchImages
-								.getWorkbenchImageDescriptor("elcl16/progress_rem.png")); //$NON-NLS-1$
+								.getWorkbenchImageDescriptor("elcl16/progress_rem.gif")); //$NON-NLS-1$
 
 		JFaceResources
 				.getImageRegistry()
 				.put(
 						DISABLED_CLEAR_FINISHED_JOB_KEY,
 						WorkbenchImages
-								.getWorkbenchImageDescriptor("dlcl16/progress_rem.png")); //$NON-NLS-1$
+								.getWorkbenchImageDescriptor("dlcl16/progress_rem.gif")); //$NON-NLS-1$
 
 		// Mac has different Gamma value
 		int shift = Util.isMac() ? -25 : -10;
@@ -202,9 +201,9 @@ public class ProgressInfoItem extends Composite {
 			JobTreeElement progressInfo) {
 		super(parent, style);
 		info = progressInfo;
+		createChildren();
 		setData(info);
 		setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
-		createChildren();
 		ILabelDecorator labelDecorator = PlatformUI.getWorkbench().getDecoratorManager()
 				.getLabelDecorator(ContributingPluginDecorator.ID);
 		if (labelDecorator != null && info.isJobInfo()) {
@@ -741,7 +740,7 @@ public class ProgressInfoItem extends Composite {
 			linkData.left = new FormAttachment(progressBar, 0, SWT.LEFT);
 			linkData.right = new FormAttachment(progressBar, 0, SWT.RIGHT);
 			// Give an initial value so as to constrain the link shortening
-			linkData.width = 20;
+			linkData.width = IDialogConstants.INDENT;
 
 			((Link) taskEntries.get(0)).setLayoutData(linkData);
 		}
@@ -768,7 +767,7 @@ public class ProgressInfoItem extends Composite {
 				linkData.left = new FormAttachment(top, 0, SWT.LEFT);
 				linkData.right = new FormAttachment(top, 0, SWT.RIGHT);
 				// Give an initial value so as to constrain the link shortening
-				linkData.width = 20;
+				linkData.width = IDialogConstants.INDENT;
 			} else {
 				Link previous = (Link) taskEntries.get(index - 1);
 				linkData.top = new FormAttachment(previous,
@@ -776,7 +775,7 @@ public class ProgressInfoItem extends Composite {
 				linkData.left = new FormAttachment(previous, 0, SWT.LEFT);
 				linkData.right = new FormAttachment(previous, 0, SWT.RIGHT);
 				// Give an initial value so as to constrain the link shortening
-				linkData.width = 20;
+				linkData.width = IDialogConstants.INDENT;
 			}
 
 			link.setLayoutData(linkData);
@@ -878,10 +877,6 @@ public class ProgressInfoItem extends Composite {
 			}
 		}
 
-		if (link.isDisposed()) {
-			return;
-		}
-
 		Object text = link.getData(TEXT_KEY);
 		if (text == null)
 			return;
@@ -899,9 +894,6 @@ public class ProgressInfoItem extends Composite {
 	 * @param link
 	 */
 	private void updateTrigger(Object trigger, Link link) {
-		if (link.isDisposed()) {
-			return;
-		}
 
 		if (trigger instanceof IAction && ((IAction) trigger).isEnabled()) {
 			link.setData(TRIGGER_KEY, trigger);

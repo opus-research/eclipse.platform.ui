@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Jacek Pospychala - bug 187762
  *     Mohamed Tarief - tarief@eg.ibm.com - IBM - Bug 174481
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422040
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -164,15 +163,6 @@ public class FilteredTree extends Composite {
 	private boolean useNewLook = false;
 
 	/**
-	 * Tells whether this filtetered tree is used to make quick selections. In
-	 * this mode the first match in the tree is automatically selected while
-	 * filtering and the 'Enter' key is not used to move the focus to the tree.
-	 * 
-	 * @since 3.105
-	 */
-	private boolean quickSelectionMode = false;
-
-	/**
 	 * Image descriptor for enabled clear button.
 	 */
 	private static final String CLEAR_ICON = "org.eclipse.ui.internal.dialogs.CLEAR_ICON"; //$NON-NLS-1$
@@ -195,12 +185,12 @@ public class FilteredTree extends Composite {
 	static {
 		ImageDescriptor descriptor = AbstractUIPlugin
 				.imageDescriptorFromPlugin(PlatformUI.PLUGIN_ID,
-						"$nl$/icons/full/etool16/clear_co.png"); //$NON-NLS-1$
+						"$nl$/icons/full/etool16/clear_co.gif"); //$NON-NLS-1$
 		if (descriptor != null) {
 			JFaceResources.getImageRegistry().put(CLEAR_ICON, descriptor);
 		}
 		descriptor = AbstractUIPlugin.imageDescriptorFromPlugin(
-				PlatformUI.PLUGIN_ID, "$nl$/icons/full/dtool16/clear_co.png"); //$NON-NLS-1$
+				PlatformUI.PLUGIN_ID, "$nl$/icons/full/dtool16/clear_co.gif"); //$NON-NLS-1$
 		if (descriptor != null) {
 			JFaceResources.getImageRegistry().put(DISABLED_CLEAR_ICON, descriptor);
 		}
@@ -317,10 +307,7 @@ public class FilteredTree extends Composite {
 		layout.marginHeight = 0;
 		layout.marginWidth = 0;
 		setLayout(layout);
-
-		if (parent.getLayout() instanceof GridLayout) {
-			setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		}
+		setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		if (showFilterControls) {
 			if (!useNewLook || useNativeSearchField(parent)) {
@@ -563,8 +550,6 @@ public class FilteredTree extends Composite {
 							&& getViewer().getTree().getSelectionCount() == 0) {
 						treeViewer.getTree().setTopItem(items[0]);
 					}
-					if (quickSelectionMode)
-						updateTreeSelection(false);
 					redrawFalseControl.setRedraw(true);
 				}
 				return Status.OK_STATUS;
@@ -765,12 +750,31 @@ public class FilteredTree extends Composite {
 		// enter key set focus to tree
 		filterText.addTraverseListener(new TraverseListener() {
 			public void keyTraversed(TraverseEvent e) {
-				if (quickSelectionMode) {
-					return;
-				}
 				if (e.detail == SWT.TRAVERSE_RETURN) {
 					e.doit = false;
-					updateTreeSelection(true);
+					if (getViewer().getTree().getItemCount() == 0) {
+						Display.getCurrent().beep();
+					} else {
+						// if the initial filter text hasn't changed, do not try
+						// to match
+						boolean hasFocus = getViewer().getTree().setFocus();
+						boolean textChanged = !getInitialText().equals(
+								filterText.getText().trim());
+						if (hasFocus && textChanged
+								&& filterText.getText().trim().length() > 0) {
+							Tree tree = getViewer().getTree();
+							TreeItem item;
+							if (tree.getSelectionCount() > 0)
+								item = getFirstMatchingItem(tree.getSelection());
+							else
+								item = getFirstMatchingItem(tree.getItems());
+							if (item != null) {
+								tree.setSelection(new TreeItem[] { item });
+								ISelection sel = getViewer().getSelection();
+								getViewer().setSelection(sel, true);
+							}
+						}
+					}
 				}
 			}
 		});
@@ -809,39 +813,6 @@ public class FilteredTree extends Composite {
 		if ((filterText.getStyle() & SWT.ICON_CANCEL) != 0)
 			gridData.horizontalSpan = 2;
 		filterText.setLayoutData(gridData);
-	}
-
-	/**
-	 * Updates the selection in the tree, based on the filter text.
-	 * 
-	 * @param setFocus
-	 *            <code>true</code> if the focus should be set on the tree,
-	 *            <code>false</code> otherwise
-	 * @since 3.105
-	 */
-	protected void updateTreeSelection(boolean setFocus) {
-		Tree tree = getViewer().getTree();
-		if (tree.getItemCount() == 0) {
-			if (setFocus)
-				Display.getCurrent().beep();
-		} else {
-			// if the initial filter text hasn't changed, do not try
-			// to match
-			boolean hasFocus = setFocus ? tree.setFocus() : true;
-			boolean textChanged = !getInitialText().equals(filterText.getText().trim());
-			if (hasFocus && textChanged && filterText.getText().trim().length() > 0) {
-				TreeItem item;
-				if (tree.getSelectionCount() > 0)
-					item = getFirstMatchingItem(tree.getSelection());
-				else
-					item = getFirstMatchingItem(tree.getItems());
-				if (item != null) {
-					tree.setSelection(new TreeItem[] { item });
-					ISelection sel = getViewer().getSelection();
-					getViewer().setSelection(sel, true);
-				}
-			}
-		}
 	}
 
 	/**
@@ -1120,23 +1091,6 @@ public class FilteredTree extends Composite {
 			setFilterText(initialText);
 			textChanged();
 		}
-	}
-
-	/**
-	 * Sets whetther this filtetered tree is used to make quick selections. In
-	 * this mode the first match in the tree is automatically selected while
-	 * filtering and the 'Enter' key is not used to move the focus to the tree.
-	 * <p>
-	 * By default, this is set to <code>false</code>.
-	 * </p>
-	 * 
-	 * @param enabled
-	 *            <code>true</code> if this filtetered tree is used to make
-	 *            quick selections, <code>false</code> otherwise
-	 * @since 3.105
-	 */
-	public void setQuickSelectionMode(boolean enabled) {
-		this.quickSelectionMode = enabled;
 	}
 
 	/**

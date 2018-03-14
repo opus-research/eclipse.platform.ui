@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 Angelo Zerr and others.
+ * Copyright (c) 2008 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,27 +7,28 @@
  *
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation]
- *     IBM Corporation - ongoing development
+ *     IBM Corporation
  *******************************************************************************/
 
 package org.eclipse.e4.ui.css.core.impl.dom;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import org.w3c.css.sac.SACMediaList;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.stylesheets.MediaList;
 
-public class MediaListImpl implements MediaList {
+public class MediaListImpl implements MediaList, Serializable {
 
 	private List mediaList = null;
-
+	
 	public MediaListImpl(SACMediaList media) {
 		mediaList = new ArrayList();
 		for (int i = 0; i < media.getLength(); i++) {
 			mediaList.add(media.item(i));
 		}
-
+		
 	}
 
 	public void appendMedium(String newMedium) throws DOMException {
@@ -44,16 +45,15 @@ public class MediaListImpl implements MediaList {
 	}
 
 	public String getMediaText() {
-		StringBuilder media = new StringBuilder();
+		String media = "";
 		int size = mediaList.size();
 		if (size > 0) {
-			media.append(mediaList.get(0));
+			media += mediaList.get(0);
 			for (int i = 1; i < mediaList.size(); i++) {
-				media.append(", ");
-				media.append(mediaList.get(i));
+					media += ", " + mediaList.get(i);
 			}
 		}
-		return media.toString();
+		return media;
 	}
 
 	public String item(int index) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,7 +46,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolItem;
-import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.bindings.TriggerSequence;
@@ -94,13 +93,11 @@ public class ToolItemRenderer extends SWTPartRenderer {
 
 			String attName = (String) event
 					.getProperty(UIEvents.EventTags.ATTNAME);
-			if (UIEvents.UILabel.LABEL.equals(attName)
-					|| UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
+			if (UIEvents.UILabel.LABEL.equals(attName)) {
 				setItemText(itemModel, toolItem);
 			} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
 				toolItem.setImage(getImage(itemModel));
-			} else if (UIEvents.UILabel.TOOLTIP.equals(attName)
-					|| UIEvents.UILabel.LOCALIZED_TOOLTIP.equals(attName)) {
+			} else if (UIEvents.UILabel.TOOLTIP.equals(attName)) {
 				toolItem.setToolTipText(getToolTipText(itemModel));
 				toolItem.setImage(getImage(itemModel));
 			}
@@ -436,7 +433,7 @@ public class ToolItemRenderer extends SWTPartRenderer {
 			obj = ((MRenderedMenu) mmenu).getContributionManager();
 			if (obj instanceof IContextFunction) {
 				final IEclipseContext lclContext = getContext(mmenu);
-				obj = ((IContextFunction) obj).compute(lclContext, null);
+				obj = ((IContextFunction) obj).compute(lclContext);
 				((MRenderedMenu) mmenu).setContributionManager(obj);
 			}
 			if (obj instanceof IMenuCreator) {
@@ -457,15 +454,6 @@ public class ToolItemRenderer extends SWTPartRenderer {
 					return menu;
 				}
 			}
-		} else {
-			final IEclipseContext lclContext = getContext(mmenu);
-			IPresentationEngine engine = lclContext
-					.get(IPresentationEngine.class);
-			obj = engine.createGui(mmenu, toolItem.getParent(), lclContext);
-			if (obj instanceof Menu) {
-				return (Menu) obj;
-			}
-			logger.debug("Rendering returned " + obj); //$NON-NLS-1$
 		}
 		return null;
 	}

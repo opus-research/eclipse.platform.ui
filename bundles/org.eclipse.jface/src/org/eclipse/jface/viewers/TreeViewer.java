@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -140,7 +140,6 @@ public class TreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared in AbstractTreeViewer.
 	 */
-	@Override
 	protected void addTreeListener(Control c, TreeListener listener) {
 		((Tree) c).addTreeListener(listener);
 	}
@@ -150,7 +149,6 @@ public class TreeViewer extends AbstractTreeViewer {
 	 *
 	 * @see org.eclipse.jface.viewers.ColumnViewer#getColumnViewerOwner(int)
 	 */
-	@Override
 	protected Widget getColumnViewerOwner(int columnIndex) {
 		if (columnIndex < 0 || ( columnIndex > 0 && columnIndex >= getTree().getColumnCount() ) ) {
 			return null;
@@ -165,7 +163,6 @@ public class TreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared in AbstractTreeViewer.
 	 */
-	@Override
 	protected Item[] getChildren(Widget o) {
 		if (o instanceof TreeItem) {
 			return ((TreeItem) o).getItems();
@@ -179,7 +176,6 @@ public class TreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared in Viewer.
 	 */
-	@Override
 	public Control getControl() {
 		return tree;
 	}
@@ -187,7 +183,6 @@ public class TreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared in AbstractTreeViewer.
 	 */
-	@Override
 	protected boolean getExpanded(Item item) {
 		return ((TreeItem) item).getExpanded();
 	}
@@ -197,7 +192,6 @@ public class TreeViewer extends AbstractTreeViewer {
 	 *
 	 * @see org.eclipse.jface.viewers.ColumnViewer#getItemAt(org.eclipse.swt.graphics.Point)
 	 */
-	@Override
 	protected Item getItemAt(Point p) {
 		TreeItem[] selection = tree.getSelection();
 
@@ -217,7 +211,6 @@ public class TreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared in AbstractTreeViewer.
 	 */
-	@Override
 	protected int getItemCount(Control widget) {
 		return ((Tree) widget).getItemCount();
 	}
@@ -225,7 +218,6 @@ public class TreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared in AbstractTreeViewer.
 	 */
-	@Override
 	protected int getItemCount(Item item) {
 		return ((TreeItem) item).getItemCount();
 	}
@@ -233,7 +225,6 @@ public class TreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared in AbstractTreeViewer.
 	 */
-	@Override
 	protected Item[] getItems(Item item) {
 		return ((TreeItem) item).getItems();
 	}
@@ -247,7 +238,6 @@ public class TreeViewer extends AbstractTreeViewer {
 	 * <code>ILabelProvider</code>, then it provides only the label text and
 	 * image for the first column, and any remaining columns are blank.
 	 */
-	@Override
 	public IBaseLabelProvider getLabelProvider() {
 		return super.getLabelProvider();
 	}
@@ -255,7 +245,6 @@ public class TreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared in AbstractTreeViewer.
 	 */
-	@Override
 	protected Item getParentItem(Item item) {
 		return ((TreeItem) item).getParentItem();
 	}
@@ -263,7 +252,6 @@ public class TreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared in AbstractTreeViewer.
 	 */
-	@Override
 	protected Item[] getSelection(Control widget) {
 		return ((Tree) widget).getSelection();
 	}
@@ -282,7 +270,6 @@ public class TreeViewer extends AbstractTreeViewer {
 	 *
 	 * @see org.eclipse.jface.viewers.AbstractTreeViewer#hookControl(org.eclipse.swt.widgets.Control)
 	 */
-	@Override
 	protected void hookControl(Control control) {
 		super.hookControl(control);
 		Tree treeControl = (Tree) control;
@@ -311,7 +298,6 @@ public class TreeViewer extends AbstractTreeViewer {
 		}
 	}
 
-	@Override
 	protected ColumnViewerEditor createViewerEditor() {
 		return new TreeViewerEditor(this,null,new ColumnViewerEditorActivationStrategy(this),ColumnViewerEditor.DEFAULT);
 	}
@@ -319,7 +305,6 @@ public class TreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared in AbstractTreeViewer.
 	 */
-	@Override
 	protected Item newItem(Widget parent, int flags, int ix) {
 		TreeItem item;
 
@@ -336,7 +321,6 @@ public class TreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared in AbstractTreeViewer.
 	 */
-	@Override
 	protected void removeAll(Control widget) {
 		((Tree) widget).removeAll();
 	}
@@ -344,7 +328,6 @@ public class TreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared in AbstractTreeViewer.
 	 */
-	@Override
 	protected void setExpanded(Item node, boolean expand) {
 		((TreeItem) node).setExpanded(expand);
 		if (contentProviderIsLazy) {
@@ -356,7 +339,6 @@ public class TreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared in AbstractTreeViewer.
 	 */
-	@Override
 	protected void setSelection(List items) {
 
 		Item[] current = getSelection(getTree());
@@ -374,7 +356,6 @@ public class TreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared in AbstractTreeViewer.
 	 */
-	@Override
 	protected void showItem(Item item) {
 		getTree().showItem((TreeItem) item);
 	}
@@ -385,7 +366,6 @@ public class TreeViewer extends AbstractTreeViewer {
 	 * @see org.eclipse.jface.viewers.AbstractTreeViewer#getChild(org.eclipse.swt.widgets.Widget,
 	 *      int)
 	 */
-	@Override
 	protected Item getChild(Widget widget, int index) {
 		if (widget instanceof TreeItem) {
 			return ((TreeItem) widget).getItem(index);
@@ -396,7 +376,6 @@ public class TreeViewer extends AbstractTreeViewer {
 		return null;
 	}
 
-	@Override
 	protected void assertContentProviderType(IContentProvider provider) {
 		if (provider instanceof ILazyTreeContentProvider
 				|| provider instanceof ILazyTreePathContentProvider) {
@@ -405,7 +384,6 @@ public class TreeViewer extends AbstractTreeViewer {
 		super.assertContentProviderType(provider);
 	}
 
-	@Override
 	protected Object[] getRawChildren(Object parent) {
 		if (contentProviderIsLazy) {
 			return new Object[0];
@@ -413,7 +391,6 @@ public class TreeViewer extends AbstractTreeViewer {
 		return super.getRawChildren(parent);
 	}
 
-	@Override
 	void preservingSelection(Runnable updateCode, boolean reveal) {
 		if (insidePreservingSelection || !getPreserveSelection()){
 			// avoid preserving the selection if called reentrantly,
@@ -570,7 +547,7 @@ public class TreeViewer extends AbstractTreeViewer {
 	 * @param selection
 	 * @param item
 	 * @param element
-	 * @return the adjusted selection
+	 * @return
 	 */
 	private TreeSelection adjustSelectionForReplace(Item[] selectedItems,
 			TreeSelection selection, TreeItem item, Object element, Object parentElement) {
@@ -599,7 +576,6 @@ public class TreeViewer extends AbstractTreeViewer {
 		return selection;
 	}
 
-	@Override
 	public boolean isExpandable(Object element) {
 		if (contentProviderIsLazy) {
 			TreeItem treeItem = (TreeItem) internalExpand(element, false);
@@ -612,7 +588,6 @@ public class TreeViewer extends AbstractTreeViewer {
 		return super.isExpandable(element);
 	}
 
-	@Override
 	protected Object getParentElement(Object element) {
 		boolean oldBusy = isBusy();
 		setBusy(true);
@@ -635,7 +610,6 @@ public class TreeViewer extends AbstractTreeViewer {
 		}
 	}
 
-	@Override
 	void createChildren(Widget widget, boolean materialize) {
 		if (contentProviderIsLazy) {
 			Object element = widget.getData();
@@ -670,7 +644,6 @@ public class TreeViewer extends AbstractTreeViewer {
 		super.createChildren(widget, materialize);
 	}
 
-	@Override
 	protected void internalAdd(Widget widget, Object parentElement,
 			Object[] childElements) {
 		if (contentProviderIsLazy) {
@@ -719,7 +692,6 @@ public class TreeViewer extends AbstractTreeViewer {
 	 * @see org.eclipse.jface.viewers.AbstractTreeViewer#internalRefreshStruct(org.eclipse.swt.widgets.Widget,
 	 *      java.lang.Object, boolean)
 	 */
-	@Override
 	protected void internalRefreshStruct(Widget widget, Object element,
 			boolean updateLabels) {
 		if (contentProviderIsLazy) {
@@ -784,7 +756,6 @@ public class TreeViewer extends AbstractTreeViewer {
 	 * To unmap elements correctly, we need to register a dispose listener with
 	 * the item if the tree is virtual.
 	 */
-	@Override
 	protected void mapElement(Object element, final Widget item) {
 		super.mapElement(element, item);
 		// make sure to unmap elements if the tree is virtual
@@ -812,7 +783,6 @@ public class TreeViewer extends AbstractTreeViewer {
 	 *
 	 * @see org.eclipse.jface.viewers.ColumnViewer#getRowPartFromItem(org.eclipse.swt.widgets.Widget)
 	 */
-	@Override
 	protected ViewerRow getViewerRowFromItem(Widget item) {
 		if( cachedRow == null ) {
 			cachedRow = new TreeViewerRow((TreeItem) item);
@@ -853,7 +823,6 @@ public class TreeViewer extends AbstractTreeViewer {
 	 *
 	 * @see org.eclipse.jface.viewers.AbstractTreeViewer#internalInitializeTree(org.eclipse.swt.widgets.Control)
 	 */
-	@Override
 	protected void internalInitializeTree(Control widget) {
 		if (contentProviderIsLazy) {
 			if (widget instanceof Tree && widget.getData() != null) {
@@ -870,7 +839,6 @@ public class TreeViewer extends AbstractTreeViewer {
 	 * @see org.eclipse.jface.viewers.AbstractTreeViewer#updatePlus(org.eclipse.swt.widgets.Item,
 	 *      java.lang.Object)
 	 */
-	@Override
 	protected void updatePlus(Item item, Object element) {
 		if (contentProviderIsLazy) {
 			Object data = item.getData();
@@ -962,7 +930,6 @@ public class TreeViewer extends AbstractTreeViewer {
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.AbstractTreeViewer#handleTreeExpand(org.eclipse.swt.events.TreeEvent)
 	 */
-	@Override
 	protected void handleTreeExpand(TreeEvent event) {
 	    // Fix for Bug 271744 because windows expanding doesn't fire a focus lost
 		if( isCellEditorActive() ) {
@@ -985,7 +952,6 @@ public class TreeViewer extends AbstractTreeViewer {
 		super.handleTreeExpand(event);
 	}
 	
-	@Override
 	protected void handleTreeCollapse(TreeEvent event) {
 		// Fix for Bug 271744 because windows is firing collapse before
 		// focus lost event
@@ -999,7 +965,6 @@ public class TreeViewer extends AbstractTreeViewer {
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.AbstractTreeViewer#setContentProvider(org.eclipse.jface.viewers.IContentProvider)
 	 */
-	@Override
 	public void setContentProvider(IContentProvider provider) {
 		contentProviderIsLazy = (provider instanceof ILazyTreeContentProvider)
 				|| (provider instanceof ILazyTreePathContentProvider);
@@ -1144,7 +1109,6 @@ public class TreeViewer extends AbstractTreeViewer {
 		}
 	}
 
-	@Override
 	protected void disassociate(Item item) {
 		if (contentProviderIsLazy) {
 			// avoid causing a callback:
@@ -1153,7 +1117,6 @@ public class TreeViewer extends AbstractTreeViewer {
 		super.disassociate(item);
 	}
 
-	@Override
 	protected int doGetColumnCount() {
 		return tree.getColumnCount();
 	}
@@ -1172,12 +1135,10 @@ public class TreeViewer extends AbstractTreeViewer {
 	 *            <code>true</code> if the selection is to be made visible,
 	 *            and <code>false</code> otherwise
 	 */
-	@Override
 	public void setSelection(ISelection selection, boolean reveal) {
 		super.setSelection(selection, reveal);
 	}
 
-	@Override
 	public void editElement(Object element, int column) {
 		if( element instanceof TreePath ) {
 			try {

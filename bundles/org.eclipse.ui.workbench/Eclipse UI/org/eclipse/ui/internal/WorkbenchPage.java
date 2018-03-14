@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,14 +7,11 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Christian Janz  - <christian.janz@gmail.com> Fix for Bug 385592
- *     Marc-Andre Laperle (Ericsson) - Fix for Bug 413590
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,16 +28,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.WeakHashMap;
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
@@ -65,6 +59,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindowElement;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
+import org.eclipse.e4.ui.services.EContextService;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -168,7 +163,6 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.model.WorkbenchPartLabelProvider;
 import org.eclipse.ui.part.IShowInSource;
 import org.eclipse.ui.part.ShowInContext;
-import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.views.IStickyViewDescriptor;
 import org.eclipse.ui.views.IViewDescriptor;
 import org.osgi.service.event.Event;
@@ -179,8 +173,6 @@ import org.osgi.service.event.EventHandler;
  */
 public class WorkbenchPage extends CompatibleWorkbenchPage implements
         IWorkbenchPage {
-
-	private static final String ATT_AGGREGATE_WORKING_SET_ID = "aggregateWorkingSetId"; //$NON-NLS-1$
 
 	class E4PartListener implements org.eclipse.e4.ui.workbench.modeling.IPartListener {
 
@@ -208,13 +200,10 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				CompatibilityPart compatibilityPart = (CompatibilityPart) client;
 				IWorkbenchPartSite site = compatibilityPart.getPart().getSite();
 				// if it's an editor, we only want to disable the actions
-				((PartSite) site).deactivateActionBars(site instanceof ViewSite);
+				compatibilityPart.deactivateActionBars(site instanceof ViewSite);
 			}
 
-			WorkbenchWindow wwindow = (WorkbenchWindow) getWorkbenchWindow();
-			if (!wwindow.isClosing()) {
-				wwindow.getStatusLineManager().update(false);
-			}
+			((WorkbenchWindow) getWorkbenchWindow()).getStatusLineManager().update(false);
 		}
 
 		public void partHidden(MPart part) {
@@ -354,21 +343,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 			Object clientObject = part.getObject();
 			if (clientObject instanceof CompatibilityPart) {
 				return ((CompatibilityPart) clientObject).getPart();
-			} else if (clientObject != null) {
-				if (part.getTransientData().get(E4PartWrapper.E4_WRAPPER_KEY) instanceof E4PartWrapper) {
-					return (IWorkbenchPart) part.getTransientData().get(
-							E4PartWrapper.E4_WRAPPER_KEY);
-				}
-
-				ViewReference viewReference = getViewReference(part);
-				E4PartWrapper legacyPart = new E4PartWrapper(part);
-				try {
-					viewReference.initialize(legacyPart);
-				} catch (PartInitException e) {
-					WorkbenchPlugin.log(e);
-				}
-				part.getTransientData().put(E4PartWrapper.E4_WRAPPER_KEY, legacyPart);
-				return legacyPart;
 			}
 		}
 		return null;
@@ -575,7 +549,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 		private IEditorPart topEditor;
 
-		private List<IActionSetDescriptor> oldActionSets = new ArrayList<IActionSetDescriptor>();
+		private ArrayList oldActionSets = new ArrayList();
 
 		/**
 		 * Updates the contributions given the new part as the active part.
@@ -640,7 +614,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				activateContributions(newPart, true);
 			}
 
-			List<IActionSetDescriptor> newActionSets = null;
+			ArrayList newActionSets = null;
 			if (isNewPartAnEditor || (activePart == topEditor && newPart == null)) {
 				newActionSets = calculateActionSets(newPart, null);
 			} else {
@@ -702,7 +676,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				activateContributions(newEditor, false);
 			}
 
-			List<IActionSetDescriptor> newActionSets = calculateActionSets(activePart, newEditor);
+			ArrayList newActionSets = calculateActionSets(activePart, newEditor);
 			if (!updateActionSets(newActionSets)) {
 				updateActionBars();
 			}
@@ -752,9 +726,8 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		 *            active part
 		 * @return the new action sets
 		 */
-		private List<IActionSetDescriptor> calculateActionSets(IWorkbenchPart part,
-				IEditorPart editor) {
-			List<IActionSetDescriptor> newActionSets = new ArrayList<IActionSetDescriptor>();
+		private ArrayList calculateActionSets(IWorkbenchPart part, IEditorPart editor) {
+			ArrayList newActionSets = new ArrayList();
 			if (part != null) {
 				IActionSetDescriptor[] partActionSets = WorkbenchPlugin.getDefault()
 						.getActionSetRegistry().getActionSetsFor(part.getSite().getId());
@@ -780,7 +753,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		 *            the action sets to show
 		 * @return <code>true</code> if the action sets changed
 		 */
-		private boolean updateActionSets(List<IActionSetDescriptor> newActionSets) {
+		private boolean updateActionSets(ArrayList newActionSets) {
 			if (oldActionSets.equals(newActionSets)) {
 				return false;
 			}
@@ -1110,14 +1083,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	}
 
 	public void addEditorReference(EditorReference editorReference) {
-		WorkbenchPage curPage = (WorkbenchPage) editorReference.getPage();
-
-		// Ensure that the page is up-to-date
-		if (curPage != this) {
-			curPage.editorReferences.remove(editorReference);
-			editorReference.setPage(this);
-		}
-
 		editorReferences.add(editorReference);
 	}
 
@@ -1187,15 +1152,32 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 			part = (MPart) ph.getRef();
 			part.setCurSharedRef(ph);
+
+			part = showPart(mode, part);
+
+			CompatibilityView compatibilityView = (CompatibilityView) part.getObject();
+
+			if (compatibilityView != null) {
+				IWorkbenchPartReference ref = compatibilityView.getReference();
+
+				legacyWindow.firePerspectiveChanged(this, getPerspective(), ref, CHANGE_VIEW_SHOW);
+				legacyWindow.firePerspectiveChanged(this, getPerspective(), CHANGE_VIEW_SHOW);
+			}
+			return compatibilityView.getView();
 		}
 
 		part = showPart(mode, part);
 
-		ViewReference ref = getViewReference(part);
-		legacyWindow.firePerspectiveChanged(this, getPerspective(), ref, CHANGE_VIEW_SHOW);
-		legacyWindow.firePerspectiveChanged(this, getPerspective(), CHANGE_VIEW_SHOW);
+		CompatibilityView compatibilityView = (CompatibilityView) part.getObject();
 
-		return (IViewPart) ref.getPart(true);
+		if (compatibilityView != null) {
+			IWorkbenchPartReference ref = compatibilityView.getReference();
+
+			legacyWindow.firePerspectiveChanged(this, getPerspective(), ref, CHANGE_VIEW_SHOW);
+			legacyWindow.firePerspectiveChanged(this, getPerspective(), CHANGE_VIEW_SHOW);
+		}
+		return compatibilityView.getView();
+
 	}
 	private MPart showPart(int mode, MPart part) {
 		switch (mode) {
@@ -1384,7 +1366,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				IEditorReference ref = it.next();
 				// hide editors that haven't been instantiated first
 				if (ref.getPart(false) == null) {
-					if (!(hidePart(((EditorReference) ref).getModel(), false, confirm, false, false))) {
+					if (!(hidePart(((EditorReference) ref).getModel(), false, confirm, false))) {
 						return false;
 					}
 					// hidden successfully, remove it from the list
@@ -1399,7 +1381,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				MPart model = ((EditorReference) editorRef).getModel();
 				if (activePart == model) {
 					closeActivePart = true;
-				} else if (!(hidePart(model, false, confirm, false, false))) {
+				} else if (!(hidePart(model, false, confirm, false))) {
 					// saving should've been handled earlier above
 					return false;
 				}
@@ -1469,10 +1451,8 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		if (save) {
 			if (workbenchPart instanceof ISaveablePart) {
 				ISaveablePart saveablePart = (ISaveablePart) workbenchPart;
-				if (saveablePart.isSaveOnCloseNeeded()) {
-					if (!saveSaveable(saveablePart, workbenchPart, confirm, true)) {
-						return false;
-					}
+				if (!saveSaveable(saveablePart, workbenchPart, confirm, true)) {
+					return false;
 				}
 			}
 		}
@@ -1612,8 +1592,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 			}
 			modelService.removePerspectiveModel(persp, window);
 			modelToPerspectiveMapping.remove(persp);
-
-			legacyWindow.firePerspectiveClosed(this, desc);
 		}
 	}
 
@@ -1706,7 +1684,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 			broker.unsubscribe(areaWidgetHandler);
 			broker.unsubscribe(referenceRemovalEventHandler);
 			broker.unsubscribe(firingHandler);
-			broker.unsubscribe(childrenHandler);
 			partEvents.clear();
 
 			ISelectionService selectionService = getWorkbenchWindow().getSelectionService();
@@ -2146,21 +2123,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 			Object object = part.getObject();
 			if (object instanceof CompatibilityPart) {
 				return ((CompatibilityPart) object).getPart();
-			} else if (object != null) {
-				if (part.getTransientData().get(E4PartWrapper.E4_WRAPPER_KEY) instanceof E4PartWrapper) {
-					return (IWorkbenchPart) part.getTransientData().get(
-							E4PartWrapper.E4_WRAPPER_KEY);
-				}
-
-				ViewReference viewReference = getViewReference(part);
-				E4PartWrapper legacyPart = new E4PartWrapper(part);
-				try {
-					viewReference.initialize(legacyPart);
-				} catch (PartInitException e) {
-					WorkbenchPlugin.log(e);
-				}
-				part.getTransientData().put(E4PartWrapper.E4_WRAPPER_KEY, legacyPart);
-				return legacyPart;
 			}
 		}
 		return null;
@@ -2287,11 +2249,10 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	 * @see org.eclipse.ui.IWorkbenchPage#getEditors()
 	 */
 	public IEditorPart[] getEditors() {
-		final IEditorReference[] editorReferences = getEditorReferences();
-		int length = editorReferences.length;
+		int length = editorReferences.size();
 		IEditorPart[] editors = new IEditorPart[length];
 		for (int i = 0; i < length; i++) {
-			editors[i] = editorReferences[i].getEditor(true);
+			editors[i] = editorReferences.get(i).getEditor(true);
 		}
 		return editors;
 	}
@@ -2633,11 +2594,17 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		broker.subscribe(UIEvents.UIElement.TOPIC_WIDGET, areaWidgetHandler);
 		broker.subscribe(UIEvents.UIElement.TOPIC_TOBERENDERED, referenceRemovalEventHandler);
 		broker.subscribe(UIEvents.Contribution.TOPIC_OBJECT, firingHandler);
-		broker.subscribe(UIEvents.ElementContainer.TOPIC_CHILDREN, childrenHandler);
 
 		MPerspectiveStack perspectiveStack = getPerspectiveStack();
 		if (perspectiveStack != null) {
 			extendPerspectives(perspectiveStack);
+
+			MPerspective persp = perspectiveStack.getSelectedElement();
+			List<String> newIds = ModeledPageLayout.getIds(persp, ModeledPageLayout.ACTION_SET_TAG);
+			EContextService contextService = window.getContext().get(EContextService.class);
+			for (String id : newIds) {
+				contextService.activateContext(id);
+			}
 		}
 
 		IPerspectiveRegistry registry = getWorkbenchWindow().getWorkbench()
@@ -2659,78 +2626,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				sortedPerspectives.add(desc);
 			}
 		}
-		restoreWorkingSets();
     }
-
-	public void restoreWorkingSets() {
-		String workingSetName = getWindowModel().getPersistedState().get(
-				IWorkbenchConstants.TAG_WORKING_SET);
-		if (workingSetName != null) {
-			AbstractWorkingSetManager workingSetManager = (AbstractWorkingSetManager) getWorkbenchWindow()
-					.getWorkbench().getWorkingSetManager();
-			setWorkingSet(workingSetManager.getWorkingSet(workingSetName));
-		}
-
-		String workingSetMemString = getWindowModel().getPersistedState().get(
-				IWorkbenchConstants.TAG_WORKING_SETS);
-		if (workingSetMemString != null) {
-			IMemento workingSetMem;
-			try {
-				workingSetMem = XMLMemento.createReadRoot(new StringReader(workingSetMemString));
-				IMemento[] workingSetChildren = workingSetMem
-						.getChildren(IWorkbenchConstants.TAG_WORKING_SET);
-				List workingSetList = new ArrayList(workingSetChildren.length);
-				for (int i = 0; i < workingSetChildren.length; i++) {
-					IWorkingSet set = getWorkbenchWindow().getWorkbench().getWorkingSetManager()
-							.getWorkingSet(workingSetChildren[i].getID());
-					if (set != null) {
-						workingSetList.add(set);
-					}
-				}
-
-				workingSets = (IWorkingSet[]) workingSetList.toArray(new IWorkingSet[workingSetList
-						.size()]);
-			} catch (WorkbenchException e) {
-				StatusManager.getManager().handle(
-						new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, IStatus.ERROR,
-								WorkbenchMessages.WorkbenchPage_problemRestoringTitle, e));
-			}
-		}
-
-		aggregateWorkingSetId = getWindowModel().getPersistedState().get(
-				ATT_AGGREGATE_WORKING_SET_ID);
-	}
-
-	@PreDestroy
-	public void saveWorkingSets() {
-		// Save working set if set
-		if (workingSet != null) {
-			getWindowModel().getPersistedState().put(IWorkbenchConstants.TAG_WORKING_SET,
-					workingSet.getName());
-		} else {
-			getWindowModel().getPersistedState().remove(IWorkbenchConstants.TAG_WORKING_SET);
-		}
-
-		XMLMemento workingSetMem = XMLMemento.createWriteRoot(IWorkbenchConstants.TAG_WORKING_SETS);
-		for (int i = 0; i < workingSets.length; i++) {
-			workingSetMem
-					.createChild(IWorkbenchConstants.TAG_WORKING_SET, workingSets[i].getName());
-		}
-		StringWriter writer = new StringWriter();
-		try {
-			workingSetMem.save(writer);
-			getWindowModel().getPersistedState().put(IWorkbenchConstants.TAG_WORKING_SETS,
-					writer.getBuffer().toString());
-		} catch (IOException e) {
-			// Simply don't store the settings
-			StatusManager.getManager().handle(
-					new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, IStatus.ERROR,
-							WorkbenchMessages.SavingProblem, e));
-		}
-
-		getWindowModel().getPersistedState().put(ATT_AGGREGATE_WORKING_SET_ID,
-				aggregateWorkingSetId);
-	}
 
 	/**
 	 * Extends the perspectives within the given stack with action set
@@ -2828,7 +2724,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 	private EventHandler selectionHandler = new EventHandler() {
 		public void handleEvent(Event event) {
-			Object changedElement = event.getProperty(UIEvents.EventTags.ELEMENT);
+			MUIElement changedElement = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
 
 			if (!(changedElement instanceof MPerspectiveStack)) {
 				return;
@@ -3143,9 +3039,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		partService.showPart(editor, PartState.VISIBLE);
 
 		CompatibilityEditor compatibilityEditor = (CompatibilityEditor) editor.getObject();
-		if (compatibilityEditor == null) {
-			return null;
-		}
 
 		if (activate) {
 			partService.activate(editor);
@@ -3797,9 +3690,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	 */
 	public boolean saveSaveable(ISaveablePart saveable, IWorkbenchPart part, boolean confirm,
 			boolean closing) {
-		if (closing && !saveable.isSaveOnCloseNeeded()) {
-			return true;
-		}
 		return SaveableHelper.savePart(saveable, part, legacyWindow, confirm);
 	}
 
@@ -3965,7 +3855,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 		modelPerspective.getContext().activate();
 
-		legacyWindow.firePerspectiveOpened(this, perspective);
 		UIEvents.publishEvent(UIEvents.UILifeCycle.PERSPECTIVE_OPENED, modelPerspective);
 	}
 
@@ -3984,6 +3873,8 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	 * @return the stack of perspectives of this page's containing window
 	 */
 	private MPerspectiveStack getPerspectiveStack() {
+		if (_perspectiveStack != null)
+			return _perspectiveStack;
 		List<MPerspectiveStack> theStack = modelService.findElements(window, null,
 				MPerspectiveStack.class, null);
 		if (theStack.size() > 0) {
@@ -4338,8 +4229,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				for (Object child : parent.getChildren()) {
 					MPart siblingPart = child instanceof MPart ? (MPart) child
 							: (MPart) ((MPlaceholder) child).getRef();
-					// Bug 398433 - guard against NPE
-					Object siblingObject = siblingPart != null ? siblingPart.getObject() : null;
+					Object siblingObject = siblingPart.getObject();
 					if (siblingObject instanceof CompatibilityView) {
 						stack.add((CompatibilityView) siblingObject);
 					}
@@ -4483,19 +4373,12 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		if (aggregateWorkingSet == null) {
 			IWorkingSetManager workingSetManager = PlatformUI.getWorkbench()
 					.getWorkingSetManager();
-
-			if (aggregateWorkingSetId == null) {
-				aggregateWorkingSet = findAggregateWorkingSet(workingSetManager);
-				aggregateWorkingSetId = aggregateWorkingSet == null ? getDefaultAggregateWorkingSetId()
-						: aggregateWorkingSet.getName();
-			} else {
-				aggregateWorkingSet = (AggregateWorkingSet) workingSetManager
-						.getWorkingSet(aggregateWorkingSetId);
-			}
-
+			aggregateWorkingSet = (AggregateWorkingSet) workingSetManager.getWorkingSet(
+							getAggregateWorkingSetId());
 			if (aggregateWorkingSet == null) {
 				aggregateWorkingSet = (AggregateWorkingSet) workingSetManager
-						.createAggregateWorkingSet(aggregateWorkingSetId,
+						.createAggregateWorkingSet(
+								getAggregateWorkingSetId(),
 								WorkbenchMessages.WorkbenchPage_workingSet_default_label,
 								getWorkingSets());
 				workingSetManager.addWorkingSet(aggregateWorkingSet);
@@ -4504,19 +4387,13 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		return aggregateWorkingSet;
 	}
 
-	private String getDefaultAggregateWorkingSetId() {
-		return "Aggregate for window " + System.currentTimeMillis(); //$NON-NLS-1$
+	private String getAggregateWorkingSetId() {	
+		if (aggregateWorkingSetId == null) {
+			aggregateWorkingSetId = "Aggregate for window " + System.currentTimeMillis(); //$NON-NLS-1$
+		}
+		return aggregateWorkingSetId;
 	}
 	
-	private AggregateWorkingSet findAggregateWorkingSet(IWorkingSetManager workingSetManager) {
-		for (IWorkingSet workingSet : workingSetManager.getAllWorkingSets()) {
-			if (workingSet instanceof AggregateWorkingSet) {
-				return (AggregateWorkingSet) workingSet;
-			}
-		}
-		return null;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -4992,7 +4869,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 	private EventHandler firingHandler = new EventHandler() {
 		public void handleEvent(Event event) {
-			Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
+			MUIElement element = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
 			Object value = event.getProperty(UIEvents.EventTags.NEW_VALUE);
 			if (value instanceof CompatibilityPart && element instanceof MPart) {
 				Integer events = partEvents.remove(element);
@@ -5003,41 +4880,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 					}
 					if ((e & FIRE_PART_BROUGHTTOTOP) == FIRE_PART_BROUGHTTOTOP) {
 						firePartBroughtToTop((MPart) element);
-					}
-				}
-			}
-		}
-	};
-
-	private EventHandler childrenHandler = new EventHandler() {
-		public void handleEvent(Event event) {
-			Object changedObj = event.getProperty(UIEvents.EventTags.ELEMENT);
-
-			// ...in this window ?
-			MUIElement changedElement = (MUIElement) changedObj;
-			if (modelService.getTopLevelWindowFor(changedElement) != window)
-				return;
-
-			if (UIEvents.isADD(event)) {
-				for (Object o : UIEvents.asIterable(event, UIEvents.EventTags.NEW_VALUE)) {
-					if (!(o instanceof MUIElement))
-						continue;
-
-					// We have to iterate through the new elements to see if any
-					// contain (or are) MParts (e.g. we may have dragged a split
-					// editor which contains two editors, both with EditorRefs)
-					MUIElement element = (MUIElement) o;
-					List<MPart> addedParts = modelService.findElements(element, null, MPart.class,
-							null);
-					for (MPart part : addedParts) {
-						IWorkbenchPartReference ref = (IWorkbenchPartReference) part
-								.getTransientData().get(
-								IWorkbenchPartReference.class.getName());
-
-						// For now we only check for editors changing pages
-						if (ref instanceof EditorReference && getEditorReference(part) == null) {
-							addEditorReference((EditorReference) ref);
-						}
 					}
 				}
 			}
@@ -5201,8 +5043,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	 * @see #unzoomSharedArea(MUIElement)
 	 */
 	private void unzoomSharedArea() {
-		MPerspective curPersp = getPerspectiveStack().getSelectedElement();
-		MPlaceholder eaPH = (MPlaceholder) modelService.find(IPageLayout.ID_EDITOR_AREA, curPersp);
+		MPlaceholder eaPH = (MPlaceholder) modelService.find(IPageLayout.ID_EDITOR_AREA, window);
 		for (MPart part : modelService.findElements(eaPH, null, MPart.class, null)) {
 			if (part.isToBeRendered()) {
 				MPlaceholder placeholder = part.getCurSharedRef();
@@ -5372,21 +5213,5 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	public void resetToolBarLayout() {
 		ICoolBarManager2 mgr = (ICoolBarManager2) legacyWindow.getCoolBarManager2();
 		mgr.resetItemOrder();
-	}
-
-	/**
-	 * Call {@link #firePartDeactivated(MPart)} if the passed part is the
-	 * currently active part according to the part service. This method should
-	 * only be called in the case of workbench shutdown, where E4 does not fire
-	 * deactivate listeners on the active part.
-	 * 
-	 * @param part
-	 */
-	public void firePartDeactivatedIfActive(MPart part) {
-		if (partService.getActivePart() == part) {
-			// At shutdown, e4 doesn't fire part deactivated on the active
-			// part.
-			firePartDeactivated(part);
-		}
 	}
 }

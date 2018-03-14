@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Marc R. Hoffmann <hoffmann@mountainminds.com> - Bug 284265 [JFace] 
  *                  DialogSettings.save() silently ignores IOException
- *     Ruediger Herrmann <ruediger.herrmann@gmx.de> - bug 92518
  *******************************************************************************/
 package org.eclipse.jface.dialogs;
 
@@ -76,14 +75,14 @@ public class DialogSettings implements IDialogSettings {
 
     /* A Map of DialogSettings representing each sections in a DialogSettings.
      It maps the DialogSettings' name to the DialogSettings */
-    private Map<String, IDialogSettings> sections;
+    private Map sections;
 
     /* A Map with all the keys and values of this sections.
      Either the keys an values are restricted to strings. */
-    private Map<String, String> items;
+    private Map items;
 
     // A Map with all the keys mapped to array of strings.
-    private Map<String, String[]> arrayItems;
+    private Map arrayItems;
 
     private static final String TAG_SECTION = "section";//$NON-NLS-1$
 
@@ -107,9 +106,9 @@ public class DialogSettings implements IDialogSettings {
      */
     public DialogSettings(String sectionName) {
         name = sectionName;
-        items = new HashMap<String, String>();
-        arrayItems = new HashMap<String, String[]>();
-        sections = new HashMap<String, IDialogSettings>();
+        items = new HashMap();
+        arrayItems = new HashMap();
+        sections = new HashMap();
     }
 
     /* (non-Javadoc)
@@ -121,66 +120,39 @@ public class DialogSettings implements IDialogSettings {
         return section;
     }
 
-	/* (non-Javadoc)
+    /* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
     public void addSection(IDialogSettings section) {
         sections.put(section.getName(), section);
     }
 
-    /**
-	 * Remove a section in the receiver. If the given section does not exist,
-	 * nothing is done.
-	 * 
-	 * @param section
-	 *            the section to be removed. Must not be <code>null</code>.
-	 * @since 3.9
-	 */
-	public void removeSection(IDialogSettings section) {
-		if (sections.get(section.getName()) == section) {
-			sections.remove(section.getName());
-		}
-	}
-
-    /**
-	 * Remove a section by name in the receiver. If the given section does not
-	 * exist, nothing is done.
-	 * 
-	 * @param sectionName
-	 *            the name of the section to be removed.  Must not be <code>null</code>.
-     * @return The dialog section removed, or <code>null</code> if it wasn't there.
-	 * @since 3.9
-	 */
-	public IDialogSettings removeSection(String sectionName) {
-		return sections.remove(sectionName);
-	}
-
-	/* (non-Javadoc)
+    /* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
     public String get(String key) {
-        return items.get(key);
+        return (String) items.get(key);
     }
 
     /* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
     public String[] getArray(String key) {
-        return arrayItems.get(key);
+        return (String[]) arrayItems.get(key);
     }
 
     /* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
     public boolean getBoolean(String key) {
-        return Boolean.valueOf(items.get(key)).booleanValue();
+        return Boolean.valueOf((String) items.get(key)).booleanValue();
     }
 
     /* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
     public double getDouble(String key) throws NumberFormatException {
-        String setting = items.get(key);
+        String setting = (String) items.get(key);
         if (setting == null) {
 			throw new NumberFormatException(
                     "There is no setting associated with the key \"" + key + "\"");//$NON-NLS-1$ //$NON-NLS-2$
@@ -193,7 +165,7 @@ public class DialogSettings implements IDialogSettings {
      * Method declared on IDialogSettings.
      */
     public float getFloat(String key) throws NumberFormatException {
-        String setting = items.get(key);
+        String setting = (String) items.get(key);
         if (setting == null) {
 			throw new NumberFormatException(
                     "There is no setting associated with the key \"" + key + "\"");//$NON-NLS-1$ //$NON-NLS-2$
@@ -206,7 +178,7 @@ public class DialogSettings implements IDialogSettings {
      * Method declared on IDialogSettings.
      */
     public int getInt(String key) throws NumberFormatException {
-        String setting = items.get(key);
+        String setting = (String) items.get(key);
         if (setting == null) {
             //new Integer(null) will throw a NumberFormatException and meet our spec, but this message
             //is clearer.
@@ -221,7 +193,7 @@ public class DialogSettings implements IDialogSettings {
      * Method declared on IDialogSettings.
      */
     public long getLong(String key) throws NumberFormatException {
-        String setting = items.get(key);
+        String setting = (String) items.get(key);
         if (setting == null) {
             //new Long(null) will throw a NumberFormatException and meet our spec, but this message
             //is clearer.
@@ -264,14 +236,14 @@ public class DialogSettings implements IDialogSettings {
      * Method declared on IDialogSettings.
      */
     public IDialogSettings getSection(String sectionName) {
-        return sections.get(sectionName);
+        return (IDialogSettings) sections.get(sectionName);
     }
 
     /* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
     public IDialogSettings[] getSections() {
-        Collection<IDialogSettings> values = sections.values();
+        Collection values = sections.values();
         DialogSettings[] result = new DialogSettings[values.size()];
         values.toArray(result);
         return result;
@@ -336,7 +308,7 @@ public class DialogSettings implements IDialogSettings {
                 Element child = (Element) l.item(i);
                 String key = child.getAttribute(TAG_KEY);
                 NodeList list = child.getElementsByTagName(TAG_ITEM);
-                List<String> valueList = new ArrayList<String>();
+                List valueList = new ArrayList();
                 for (int j = 0; j < list.getLength(); j++) {
                     Element node = (Element) list.item(j);
                     if (child == node.getParentNode()) {
@@ -431,25 +403,25 @@ public class DialogSettings implements IDialogSettings {
      * Save the settings in the <code>document</code>.
      */
     private void save(XMLWriter out) throws IOException {
-    	HashMap<String, String> attributes = new HashMap<String, String>(2);
+    	HashMap attributes = new HashMap(2);
     	attributes.put(TAG_NAME, name == null ? "" : name); //$NON-NLS-1$
         out.startTag(TAG_SECTION, attributes);
         attributes.clear();
 
-        for (Iterator<String> i = items.keySet().iterator(); i.hasNext();) {
-            String key = i.next();
+        for (Iterator i = items.keySet().iterator(); i.hasNext();) {
+            String key = (String) i.next();
             attributes.put(TAG_KEY, key == null ? "" : key); //$NON-NLS-1$
-            String string = items.get(key);
+            String string = (String) items.get(key);
             attributes.put(TAG_VALUE, string == null ? "" : string); //$NON-NLS-1$
             out.printTag(TAG_ITEM, attributes, true);
         }
 
         attributes.clear();
-        for (Iterator<String> i = arrayItems.keySet().iterator(); i.hasNext();) {
-            String key = i.next();
+        for (Iterator i = arrayItems.keySet().iterator(); i.hasNext();) {
+            String key = (String) i.next();
             attributes.put(TAG_KEY, key == null ? "" : key); //$NON-NLS-1$
             out.startTag(TAG_LIST, attributes);
-            String[] value = arrayItems.get(key);
+            String[] value = (String[]) arrayItems.get(key);
             attributes.clear();
             if (value != null) {
                 for (int index = 0; index < value.length; index++) {
@@ -461,7 +433,7 @@ public class DialogSettings implements IDialogSettings {
             out.endTag(TAG_LIST);
             attributes.clear();
         }
-        for (Iterator<IDialogSettings> i = sections.values().iterator(); i.hasNext();) {
+        for (Iterator i = sections.values().iterator(); i.hasNext();) {
             ((DialogSettings) i.next()).save(out);
         }
         out.endTag(TAG_SECTION);
@@ -527,18 +499,18 @@ public class DialogSettings implements IDialogSettings {
     	 * @param close should the tag be ended automatically (=> empty tag)
     	 * @throws IOException 
     	 */
-    	public void printTag(String name, HashMap<String, String> parameters, boolean close) throws IOException {
+    	public void printTag(String name, HashMap parameters, boolean close) throws IOException {
     		printTag(name, parameters, true, true, close);
     	}
 
-    	private void printTag(String name, HashMap<String, String> parameters, boolean shouldTab, boolean newLine, boolean close) throws IOException {
+    	private void printTag(String name, HashMap parameters, boolean shouldTab, boolean newLine, boolean close) throws IOException {
     		StringBuffer sb = new StringBuffer();
     		sb.append('<');
     		sb.append(name);
     		if (parameters != null) {
-				for (Enumeration<String> e = Collections.enumeration(parameters.keySet()); e.hasMoreElements();) {
+				for (Enumeration e = Collections.enumeration(parameters.keySet()); e.hasMoreElements();) {
     				sb.append(" "); //$NON-NLS-1$
-    				String key = e.nextElement();
+    				String key = (String) e.nextElement();
     				sb.append(key);
     				sb.append("=\""); //$NON-NLS-1$
     				sb.append(getEscaped(String.valueOf(parameters.get(key))));
@@ -565,12 +537,12 @@ public class DialogSettings implements IDialogSettings {
     	 * @param parameters map of parameters
     	 * @throws IOException 
     	 */
-    	public void startTag(String name, HashMap<String, String> parameters) throws IOException {
+    	public void startTag(String name, HashMap parameters) throws IOException {
     		startTag(name, parameters, true);
     		tab++;
     	}
 
-    	private void startTag(String name, HashMap<String, String> parameters, boolean newLine) throws IOException {
+    	private void startTag(String name, HashMap parameters, boolean newLine) throws IOException {
     		printTag(name, parameters, true, newLine, false);
     	}
 
@@ -619,5 +591,4 @@ public class DialogSettings implements IDialogSettings {
     		return null;
     	}
     }
-
 }

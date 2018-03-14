@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2013 IBM Corporation and others.
+ * Copyright (c) 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -55,7 +55,8 @@ public class CleanupAddon {
 	private EventHandler childrenHandler = new EventHandler() {
 		public void handleEvent(Event event) {
 			Object changedObj = event.getProperty(UIEvents.EventTags.ELEMENT);
-			if (UIEvents.isREMOVE(event)) {
+			String eventType = (String) event.getProperty(UIEvents.EventTags.TYPE);
+			if (UIEvents.EventTypes.REMOVE.equals(eventType)) {
 				final MElementContainer<?> container = (MElementContainer<?>) changedObj;
 				MUIElement containerParent = container.getParent();
 
@@ -263,9 +264,6 @@ public class CleanupAddon {
 				// Bring the container back if one of its children goes visible
 				if (!container.isToBeRendered())
 					container.setToBeRendered(true);
-				if (!container.isVisible()
-						&& !container.getTags().contains(IPresentationEngine.MINIMIZED))
-					container.setVisible(true);
 			} else {
 				// Never hide the container marked as no_close
 				if (container.getTags().contains(IPresentationEngine.NO_AUTO_COLLAPSE)) {

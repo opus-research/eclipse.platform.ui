@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -101,8 +101,7 @@ public class ComboViewer extends AbstractListViewer {
         hookControl(list);
     }
 
-    @Override
-	protected void listAdd(String string, int index) {
+    protected void listAdd(String string, int index) {
         if (combo == null) {
             ccombo.add(string, index);
         } else {
@@ -110,8 +109,7 @@ public class ComboViewer extends AbstractListViewer {
         }
     }
 
-    @Override
-	protected void listSetItem(int index, String string) {
+    protected void listSetItem(int index, String string) {
         if (combo == null) {
             ccombo.setItem(index, string);
         } else {
@@ -119,24 +117,23 @@ public class ComboViewer extends AbstractListViewer {
         }
     }
 
-    @Override
-	protected int[] listGetSelectionIndices() {
+    protected int[] listGetSelectionIndices() {
         if (combo == null) {
             return new int[] { ccombo.getSelectionIndex() };
+        } else {
+            return new int[] { combo.getSelectionIndex() };
         }
-        return new int[] { combo.getSelectionIndex() };
     }
 
-    @Override
-	protected int listGetItemCount() {
+    protected int listGetItemCount() {
         if (combo == null) {
             return ccombo.getItemCount();
+        } else {
+            return combo.getItemCount();
         }
-        return combo.getItemCount();
     }
 
-    @Override
-	protected void listSetItems(String[] labels) {
+    protected void listSetItems(String[] labels) {
         if (combo == null) {
             ccombo.setItems(labels);
         } else {
@@ -144,8 +141,7 @@ public class ComboViewer extends AbstractListViewer {
         }
     }
 
-    @Override
-	protected void listRemoveAll() {
+    protected void listRemoveAll() {
         if (combo == null) {
             ccombo.removeAll();
         } else {
@@ -153,8 +149,7 @@ public class ComboViewer extends AbstractListViewer {
         }
     }
 
-    @Override
-	protected void listRemove(int index) {
+    protected void listRemove(int index) {
         if (combo == null) {
             ccombo.remove(index);
         } else {
@@ -162,12 +157,15 @@ public class ComboViewer extends AbstractListViewer {
         }
     }
 
-    @Override
-	public Control getControl() {
+    /* (non-Javadoc)
+     * Method declared on Viewer.
+     */
+    public Control getControl() {
         if (combo == null) {
             return ccombo;
+        } else {
+            return combo;
         }
-        return combo;
     }
 
     /**
@@ -198,13 +196,13 @@ public class ComboViewer extends AbstractListViewer {
      * we can ensure that the given element is visible without changing the selection.
      * Method defined on StructuredViewer.
      */
-    @Override
-	public void reveal(Object element) {
+    public void reveal(Object element) {
     }
     
-
-    @Override
-	protected void listSetSelection(int[] ixs) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.AbstractListViewer#listSetSelection(int[])
+     */
+    protected void listSetSelection(int[] ixs) {
         if (combo == null) {
             for (int idx = 0; idx < ixs.length; idx++) {
                 ccombo.select(ixs[idx]);
@@ -216,8 +214,10 @@ public class ComboViewer extends AbstractListViewer {
         }
     }
 
-    @Override
-	protected void listDeselectAll() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.AbstractListViewer#listDeselectAll()
+     */
+    protected void listDeselectAll() {
         if (combo == null) {
             ccombo.deselectAll();
             ccombo.clearSelection();
@@ -227,7 +227,9 @@ public class ComboViewer extends AbstractListViewer {
         }
     }
 
-    @Override
-	protected void listShowSelection() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.AbstractListViewer#listShowSelection()
+     */
+    protected void listShowSelection() {
     }
 }

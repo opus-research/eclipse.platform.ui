@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008, 2012 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,11 +14,9 @@ import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.MContribution;
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
-import org.eclipse.e4.ui.model.application.ui.MLocalizable;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
-import org.eclipse.e4.ui.model.application.ui.menu.*;
 import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MDirectToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledItem;
@@ -116,7 +114,6 @@ public class MenuSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseUIElement(item);
 				if (result == null) result = caseUILabel(item);
 				if (result == null) result = caseApplicationElement(item);
-				if (result == null) result = caseLocalizable(item);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -127,7 +124,6 @@ public class MenuSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseUIElement(handledItem);
 				if (result == null) result = caseUILabel(handledItem);
 				if (result == null) result = caseApplicationElement(handledItem);
-				if (result == null) result = caseLocalizable(handledItem);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -137,7 +133,6 @@ public class MenuSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseUIElement(menuElement);
 				if (result == null) result = caseUILabel(menuElement);
 				if (result == null) result = caseApplicationElement(menuElement);
-				if (result == null) result = caseLocalizable(menuElement);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -149,7 +144,6 @@ public class MenuSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseUIElement(menuItem);
 				if (result == null) result = caseUILabel(menuItem);
 				if (result == null) result = caseApplicationElement(menuItem);
-				if (result == null) result = caseLocalizable(menuItem);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -160,7 +154,6 @@ public class MenuSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseUIElement(menuSeparator);
 				if (result == null) result = caseUILabel(menuSeparator);
 				if (result == null) result = caseApplicationElement(menuSeparator);
-				if (result == null) result = caseLocalizable(menuSeparator);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -172,7 +165,6 @@ public class MenuSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseUIElement(menu);
 				if (result == null) result = caseUILabel(menu);
 				if (result == null) result = caseApplicationElement(menu);
-				if (result == null) result = caseLocalizable(menu);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -182,7 +174,6 @@ public class MenuSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseElementContainer(menuContribution);
 				if (result == null) result = caseUIElement(menuContribution);
 				if (result == null) result = caseApplicationElement(menuContribution);
-				if (result == null) result = caseLocalizable(menuContribution);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -196,7 +187,6 @@ public class MenuSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseUIElement(popupMenu);
 				if (result == null) result = caseUILabel(popupMenu);
 				if (result == null) result = caseApplicationElement(popupMenu);
-				if (result == null) result = caseLocalizable(popupMenu);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -210,7 +200,6 @@ public class MenuSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseUIElement(directMenuItem);
 				if (result == null) result = caseUILabel(directMenuItem);
 				if (result == null) result = caseApplicationElement(directMenuItem);
-				if (result == null) result = caseLocalizable(directMenuItem);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -224,7 +213,6 @@ public class MenuSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseUIElement(handledMenuItem);
 				if (result == null) result = caseUILabel(handledMenuItem);
 				if (result == null) result = caseApplicationElement(handledMenuItem);
-				if (result == null) result = caseLocalizable(handledMenuItem);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -236,7 +224,6 @@ public class MenuSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseUIElement(toolItem);
 				if (result == null) result = caseUILabel(toolItem);
 				if (result == null) result = caseApplicationElement(toolItem);
-				if (result == null) result = caseLocalizable(toolItem);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -247,7 +234,6 @@ public class MenuSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseTrimElement(toolBar);
 				if (result == null) result = caseUIElement(toolBar);
 				if (result == null) result = caseApplicationElement(toolBar);
-				if (result == null) result = caseLocalizable(toolBar);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -256,7 +242,6 @@ public class MenuSwitch<T1> extends Switch<T1> {
 				T1 result = caseToolBarElement(toolBarElement);
 				if (result == null) result = caseUIElement(toolBarElement);
 				if (result == null) result = caseApplicationElement(toolBarElement);
-				if (result == null) result = caseLocalizable(toolBarElement);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -268,7 +253,6 @@ public class MenuSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseTrimElement(toolControl);
 				if (result == null) result = caseUIElement(toolControl);
 				if (result == null) result = caseApplicationElement(toolControl);
-				if (result == null) result = caseLocalizable(toolControl);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -282,7 +266,6 @@ public class MenuSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseUIElement(handledToolItem);
 				if (result == null) result = caseUILabel(handledToolItem);
 				if (result == null) result = caseApplicationElement(handledToolItem);
-				if (result == null) result = caseLocalizable(handledToolItem);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -296,7 +279,6 @@ public class MenuSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseUIElement(directToolItem);
 				if (result == null) result = caseUILabel(directToolItem);
 				if (result == null) result = caseApplicationElement(directToolItem);
-				if (result == null) result = caseLocalizable(directToolItem);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -306,7 +288,6 @@ public class MenuSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseToolBarElement(toolBarSeparator);
 				if (result == null) result = caseUIElement(toolBarSeparator);
 				if (result == null) result = caseApplicationElement(toolBarSeparator);
-				if (result == null) result = caseLocalizable(toolBarSeparator);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -325,7 +306,6 @@ public class MenuSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseUIElement(renderedMenu);
 				if (result == null) result = caseUILabel(renderedMenu);
 				if (result == null) result = caseApplicationElement(renderedMenu);
-				if (result == null) result = caseLocalizable(renderedMenu);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -337,7 +317,6 @@ public class MenuSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseTrimElement(renderedToolBar);
 				if (result == null) result = caseUIElement(renderedToolBar);
 				if (result == null) result = caseApplicationElement(renderedToolBar);
-				if (result == null) result = caseLocalizable(renderedToolBar);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -347,7 +326,6 @@ public class MenuSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseElementContainer(toolBarContribution);
 				if (result == null) result = caseUIElement(toolBarContribution);
 				if (result == null) result = caseApplicationElement(toolBarContribution);
-				if (result == null) result = caseLocalizable(toolBarContribution);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -363,7 +341,6 @@ public class MenuSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseElementContainer(trimContribution);
 				if (result == null) result = caseUIElement(trimContribution);
 				if (result == null) result = caseApplicationElement(trimContribution);
-				if (result == null) result = caseLocalizable(trimContribution);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -382,7 +359,6 @@ public class MenuSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseUIElement(renderedMenuItem);
 				if (result == null) result = caseUILabel(renderedMenuItem);
 				if (result == null) result = caseApplicationElement(renderedMenuItem);
-				if (result == null) result = caseLocalizable(renderedMenuItem);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -395,7 +371,6 @@ public class MenuSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseUIElement(opaqueToolItem);
 				if (result == null) result = caseUILabel(opaqueToolItem);
 				if (result == null) result = caseApplicationElement(opaqueToolItem);
-				if (result == null) result = caseLocalizable(opaqueToolItem);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -408,7 +383,6 @@ public class MenuSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseUIElement(opaqueMenuItem);
 				if (result == null) result = caseUILabel(opaqueMenuItem);
 				if (result == null) result = caseApplicationElement(opaqueMenuItem);
-				if (result == null) result = caseLocalizable(opaqueMenuItem);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -420,7 +394,6 @@ public class MenuSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseUIElement(opaqueMenuSeparator);
 				if (result == null) result = caseUILabel(opaqueMenuSeparator);
 				if (result == null) result = caseApplicationElement(opaqueMenuSeparator);
-				if (result == null) result = caseLocalizable(opaqueMenuSeparator);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -433,21 +406,6 @@ public class MenuSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseUIElement(opaqueMenu);
 				if (result == null) result = caseUILabel(opaqueMenu);
 				if (result == null) result = caseApplicationElement(opaqueMenu);
-				if (result == null) result = caseLocalizable(opaqueMenu);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case MenuPackageImpl.DYNAMIC_MENU_CONTRIBUTION: {
-				MDynamicMenuContribution dynamicMenuContribution = (MDynamicMenuContribution)theEObject;
-				T1 result = caseDynamicMenuContribution(dynamicMenuContribution);
-				if (result == null) result = caseMenuItem(dynamicMenuContribution);
-				if (result == null) result = caseContribution(dynamicMenuContribution);
-				if (result == null) result = caseItem(dynamicMenuContribution);
-				if (result == null) result = caseMenuElement(dynamicMenuContribution);
-				if (result == null) result = caseUIElement(dynamicMenuContribution);
-				if (result == null) result = caseUILabel(dynamicMenuContribution);
-				if (result == null) result = caseApplicationElement(dynamicMenuContribution);
-				if (result == null) result = caseLocalizable(dynamicMenuContribution);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -891,21 +849,6 @@ public class MenuSwitch<T1> extends Switch<T1> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Dynamic Menu Contribution</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Dynamic Menu Contribution</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T1 caseDynamicMenuContribution(MDynamicMenuContribution object) {
-		return null;
-	}
-
-	/**
 	 * Returns the result of interpreting the object as an instance of '<em>Element</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
@@ -932,21 +875,6 @@ public class MenuSwitch<T1> extends Switch<T1> {
 	 * @generated
 	 */
 	public T1 caseUIElement(MUIElement object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Localizable</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Localizable</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T1 caseLocalizable(MLocalizable object) {
 		return null;
 	}
 

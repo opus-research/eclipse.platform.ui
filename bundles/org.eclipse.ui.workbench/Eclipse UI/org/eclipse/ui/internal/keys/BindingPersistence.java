@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation and others.
+ * Copyright (c) 2005, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -492,6 +492,7 @@ public class BindingPersistence extends PreferencePersistence {
 				if (commandId == null) {
 					commandId = readOptional(memento, ATT_COMMAND);
 				}
+				String viewParameter = null;
 				final Command command;
 				if (commandId != null) {
 					command = commandService.getCommand(commandId);
@@ -562,8 +563,17 @@ public class BindingPersistence extends PreferencePersistence {
 				final String platform = readOptional(memento, ATT_PLATFORM);
 
 				// Read out the parameters
-				final ParameterizedCommand parameterizedCommand = command != null ? readParameters(
-						memento, warningsToLog, command) : null;
+				final ParameterizedCommand parameterizedCommand;
+				if (command == null) {
+					parameterizedCommand = null;
+				} else if (viewParameter != null) { 
+					HashMap parms = new HashMap();
+					parms.put(ShowViewMenu.VIEW_ID_PARM, viewParameter);
+					parameterizedCommand = ParameterizedCommand.generateCommand(command, parms);
+				} else {
+					parameterizedCommand = readParameters(memento,
+							warningsToLog, command);
+				}
 
 				final Binding binding = new KeyBinding(keySequence,
 						parameterizedCommand, schemeId, contextId, locale,
@@ -1216,9 +1226,6 @@ public class BindingPersistence extends PreferencePersistence {
 			final CommandManager commandManager) {
 		this.bindingManager = bindingManager;
 		this.commandManager = commandManager;
-		// HACK.  Calling super.read() installs a required preferences change listener.
-		// See bug 266604.
-		super.read();
 	}
 
 	protected final boolean isChangeImportant(final IRegistryChangeEvent event) {

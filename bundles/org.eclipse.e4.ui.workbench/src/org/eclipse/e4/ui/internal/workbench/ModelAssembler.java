@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 BestSolution.at and others.
+ * Copyright (c) 2010, 2011 BestSolution.at and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -104,16 +104,10 @@ public class ModelAssembler {
 				}
 
 				URI uri;
-
+				String bundleName = contributor.getName();
+				String path = bundleName + '/' + attrURI;
 				try {
-					// check if the attrURI is already a platform URI
-					if (URIHelper.isPlatformURI(attrURI)) {
-						uri = URI.createURI(attrURI);
-					} else {
-						String bundleName = contributor.getName();
-						String path = bundleName + '/' + attrURI;
-						uri = URI.createPlatformPluginURI(path, false);
-					}
+					uri = URI.createPlatformPluginURI(path, false);
 				} catch (RuntimeException e) {
 					logger.warn(e, "Model extension has invalid location"); //$NON-NLS-1$
 					continue;
@@ -124,7 +118,7 @@ public class ModelAssembler {
 				try {
 					resource = resourceSet.getResource(uri, true);
 				} catch (RuntimeException e) {
-					logger.warn(e, "Unable to read model extension from " + uri.toString()); //$NON-NLS-1$
+					logger.warn(e, "Unable to read model extension"); //$NON-NLS-1$
 					continue;
 				}
 
@@ -175,8 +169,6 @@ public class ModelAssembler {
 					if (merged.size() > 0) {
 						evalImports = true;
 						addedElements.addAll(merged);
-					} else {
-						logger.info("Nothing to merge for \"{0}\"", uri); //$NON-NLS-1$				
 					}
 				}
 
@@ -231,11 +223,7 @@ public class ModelAssembler {
 			Object o = factory
 					.create("bundleclass://" + ce.getContributor().getName() + "/" + ce.getAttribute("class"), //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
 							context, localContext);
-			if (o == null) {
-				logger.warn("Unable to create processor " + ce.getAttribute("class") + " from " + ce.getContributor().getName()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			} else {
-				ContextInjectionFactory.invoke(o, Execute.class, context, localContext);
-			}
+			ContextInjectionFactory.invoke(o, Execute.class, context, localContext);
 		} catch (Exception e) {
 			logger.warn(e, "Could not run processor"); //$NON-NLS-1$
 		}
