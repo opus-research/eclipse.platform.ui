@@ -17,12 +17,11 @@ import java.util.Collection;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.model.application.ui.menu.MDirectToolItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
+import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
-import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolItem;
+import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
 import org.junit.Test;
@@ -34,10 +33,10 @@ public abstract class ModelReconcilerToolBarTest extends ModelReconcilerTest {
 
 		MWindow window = createWindow(application);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		window.getChildren().add(part);
 
-		MToolBar toolBar = ems.createModelElement(MToolBar.class);
+		MToolBar toolBar = MenuFactoryImpl.eINSTANCE.createToolBar();
 		part.setToolbar(toolBar);
 
 		saveModel();
@@ -68,17 +67,20 @@ public abstract class ModelReconcilerToolBarTest extends ModelReconcilerTest {
 
 	@Test
 	public void testToolBar_Children_Add_ToolBarSeparator() {
-		testToolBar_Children_Add(ems.createModelElement(MToolBarSeparator.class));
+		testToolBar_Children_Add(MenuFactoryImpl.eINSTANCE
+				.createToolBarSeparator());
 	}
 
 	@Test
 	public void testToolBar_Children_Add_DirectToolItem() {
-		testToolBar_Children_Add(ems.createModelElement(MDirectToolItem.class));
+		testToolBar_Children_Add(MenuFactoryImpl.eINSTANCE
+				.createDirectToolItem());
 	}
 
 	@Test
 	public void testToolBar_Children_Add_HandledToolItem() {
-		testToolBar_Children_Add(ems.createModelElement(MHandledToolItem.class));
+		testToolBar_Children_Add(MenuFactoryImpl.eINSTANCE
+				.createHandledToolItem());
 	}
 
 	@Test
@@ -87,13 +89,13 @@ public abstract class ModelReconcilerToolBarTest extends ModelReconcilerTest {
 
 		MWindow window = createWindow(application);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		window.getChildren().add(part);
 
-		MToolBar toolBar = ems.createModelElement(MToolBar.class);
+		MToolBar toolBar = MenuFactoryImpl.eINSTANCE.createToolBar();
 		part.setToolbar(toolBar);
 
-		MToolItem toolItem = ems.createModelElement(MDirectToolItem.class);
+		MToolItem toolItem = MenuFactoryImpl.eINSTANCE.createDirectToolItem();
 		toolBar.getChildren().add(toolItem);
 
 		saveModel();

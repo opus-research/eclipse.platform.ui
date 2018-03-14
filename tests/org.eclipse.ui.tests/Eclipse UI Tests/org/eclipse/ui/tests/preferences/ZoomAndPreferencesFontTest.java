@@ -31,6 +31,7 @@ import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.internal.themes.ColorsAndFontsPreferencePage;
+import org.eclipse.ui.intro.IIntroPart;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.junit.After;
@@ -48,10 +49,14 @@ public class ZoomAndPreferencesFontTest {
 
 	private static IProject project;
 	private static IFile file;
-
 	private StyledText text;
 	private AbstractTextEditor editor;
-	private int initialFontHeight;
+
+	/**
+	 * @param testName
+	 */
+	public ZoomAndPreferencesFontTest() {
+	}
 
 	@BeforeClass
 	public static void createFilesAndOpenEditor() throws Exception {
@@ -64,14 +69,19 @@ public class ZoomAndPreferencesFontTest {
 	}
 
 	@Before
-	public void openEditor() throws Exception {
+	public void restoreDefaultFontAndOpenEditor() throws Exception {
+		IIntroPart intro = PlatformUI.getWorkbench().getIntroManager().getIntro();
+		if (intro != null) {
+			PlatformUI.getWorkbench().getIntroManager().closeIntro(intro);
+		}
+
 		IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName());
 		editor = (AbstractTextEditor) PlatformUI.getWorkbench().getActiveWorkbenchWindow()
 				.getActivePage().openEditor(new FileEditorInput(file), desc.getId());
 		editor.setFocus();
 		text = (StyledText) editor.getAdapter(Control.class);
-		// assume we start on a clean state
-		initialFontHeight = text.getFont().getFontData()[0].getHeight();
+		// make sure we start from a clean state
+		Assert.assertEquals(10, text.getFont().getFontData()[0].getHeight());
 	}
 
 	@After
@@ -85,7 +95,7 @@ public class ZoomAndPreferencesFontTest {
 		page.performOk();
 		dialog.close();
 		// make sure we land on a clean state
-		Assert.assertEquals(initialFontHeight, text.getFont().getFontData()[0].getHeight());
+		Assert.assertEquals(10, text.getFont().getFontData()[0].getHeight());
 		editor.close(false);
 	}
 
@@ -109,11 +119,13 @@ public class ZoomAndPreferencesFontTest {
 		Assume.assumeNotNull(command);
 		Assume.assumeTrue("Command must be defined for this test to run", command.isDefined());
 
-		int times = 6;
-		for (int i = 0; i < times; i++) {
-			command.executeWithChecks(new ExecutionEvent(command, Collections.EMPTY_MAP, null, null));
-		}
-		Assert.assertEquals(initialFontHeight + times * 2, text.getFont().getFontData()[0].getHeight());
+		command.executeWithChecks(new ExecutionEvent(command, Collections.EMPTY_MAP, null, null));
+		command.executeWithChecks(new ExecutionEvent(command, Collections.EMPTY_MAP, null, null));
+		command.executeWithChecks(new ExecutionEvent(command, Collections.EMPTY_MAP, null, null));
+		command.executeWithChecks(new ExecutionEvent(command, Collections.EMPTY_MAP, null, null));
+		command.executeWithChecks(new ExecutionEvent(command, Collections.EMPTY_MAP, null, null));
+		command.executeWithChecks(new ExecutionEvent(command, Collections.EMPTY_MAP, null, null));
+		Assert.assertEquals(22, text.getFont().getFontData()[0].getHeight());
 	}
 
 }

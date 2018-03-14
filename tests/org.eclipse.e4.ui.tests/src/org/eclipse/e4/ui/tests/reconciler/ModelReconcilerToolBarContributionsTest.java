@@ -16,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Collection;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarContribution;
+import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
 import org.junit.Test;
@@ -32,7 +33,8 @@ public abstract class ModelReconcilerToolBarContributionsTest extends
 		ModelReconciler reconciler = createModelReconciler();
 		reconciler.recordChanges(application);
 
-		MToolBarContribution contribution = ems.createModelElement(MToolBarContribution.class);
+		MToolBarContribution contribution = MenuFactoryImpl.eINSTANCE
+				.createToolBarContribution();
 		contribution.setElementId("contributionId");
 		application.getToolBarContributions().add(contribution);
 
@@ -56,7 +58,8 @@ public abstract class ModelReconcilerToolBarContributionsTest extends
 	public void testToolBarContributions_ToolBarContributions_Remove() {
 		MApplication application = createApplication();
 
-		MToolBarContribution contribution = ems.createModelElement(MToolBarContribution.class);
+		MToolBarContribution contribution = MenuFactoryImpl.eINSTANCE
+				.createToolBarContribution();
 		contribution.setElementId("contributionId");
 		application.getToolBarContributions().add(contribution);
 
