@@ -23,8 +23,7 @@ import org.eclipse.ui.tests.views.properties.tabbed.model.Information;
 public class InformationTwoFilter
     implements IFilter {
 
-    @Override
-	public boolean select(Object object) {
+    public boolean select(Object object) {
         if (object instanceof TreeNode) {
             Element element = (Element) ((TreeNode) object).getValue();
             if (element instanceof Information) {

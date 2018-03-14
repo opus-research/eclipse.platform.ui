@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2001, 2015 IBM Corporation and others.
+ * Copyright (c) 2001, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.Adapters;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -321,8 +322,8 @@ public class TabbedPropertySheetPage
 			 * Is the part is a IContributedContentsView for the contributor,
 			 * for example, outline view.
 			 */
-			IContributedContentsView view = (IContributedContentsView) Adapters.adapt(part,
-					IContributedContentsView.class);
+			IContributedContentsView view = (IContributedContentsView) part
+				.getAdapter(IContributedContentsView.class);
 			if (view == null
 				|| (view.getContributingPart() != null && !view
 					.getContributingPart().equals(contributor))) {
@@ -867,8 +868,27 @@ public class TabbedPropertySheetPage
      *            the selected element
      * @return the TabbedPropertySheetPageContributor or null if not applicable
      */
-	private ITabbedPropertySheetPageContributor getTabbedPropertySheetPageContributor(Object object) {
-		return (ITabbedPropertySheetPageContributor) Adapters.adapt(object, ITabbedPropertySheetPageContributor.class);
+    private ITabbedPropertySheetPageContributor getTabbedPropertySheetPageContributor(
+            Object object) {
+        if (object instanceof ITabbedPropertySheetPageContributor) {
+            return (ITabbedPropertySheetPageContributor) object;
+        }
+
+        if (object instanceof IAdaptable
+            && ((IAdaptable) object)
+                .getAdapter(ITabbedPropertySheetPageContributor.class) != null) {
+            return (ITabbedPropertySheetPageContributor) (((IAdaptable) object)
+                .getAdapter(ITabbedPropertySheetPageContributor.class));
+        }
+
+        if (Platform.getAdapterManager().hasAdapter(object,
+            ITabbedPropertySheetPageContributor.class.getName())) {
+            return (ITabbedPropertySheetPageContributor) Platform
+                .getAdapterManager().loadAdapter(object,
+                    ITabbedPropertySheetPageContributor.class.getName());
+        }
+
+        return null;
 	}
 
 	/**

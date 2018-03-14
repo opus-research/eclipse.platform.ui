@@ -290,7 +290,7 @@ public class UserElement extends OrganizationElement {
      */
     private Boolean getCoop() {
         if (coop == null)
-            coop = Boolean.FALSE;
+            coop = new Boolean(false);
         return coop;
     }
 

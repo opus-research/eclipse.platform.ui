@@ -17,12 +17,10 @@ package org.eclipse.ui.tests.views.properties.tabbed.dynamic.sections;
  */
 public class DynamicTestsBlackSection extends DynamicTestsAbstractLabelSection {
 
-	@Override
 	public String getGroup() {
 		return "Black"; //$NON-NLS-1$
 	}
 
-	@Override
 	public String getLabel() {
 		return "A section for black elements."; //$NON-NLS-1$
 	}

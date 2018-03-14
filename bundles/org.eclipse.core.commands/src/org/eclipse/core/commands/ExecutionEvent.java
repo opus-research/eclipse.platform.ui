@@ -86,7 +86,6 @@ public final class ExecutionEvent {
 	 * @deprecated use
 	 *             {@link ExecutionEvent#ExecutionEvent(Command, Map, Object, Object)}
 	 */
-	@Deprecated
 	public ExecutionEvent(@SuppressWarnings("rawtypes") final Map parameters, final Object trigger,
 			final Object applicationContext) {
 		this(null, parameters, trigger, applicationContext);

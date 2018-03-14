@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -215,6 +215,11 @@ public class ProblemFilter extends MarkerFilter {
 		this.severity = severity;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.views.markers.internal.MarkerFilter#resetState()
+	 */
 	@Override
 	public void resetState() {
 		super.resetState();
@@ -224,6 +229,11 @@ public class ProblemFilter extends MarkerFilter {
 		severity = DEFAULT_SEVERITY;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.views.markers.internal.MarkerFilter#restoreFilterSettings(org.eclipse.jface.dialogs.IDialogSettings)
+	 */
 	@Override
 	public void restoreFilterSettings(IDialogSettings settings) {
 
@@ -258,6 +268,11 @@ public class ProblemFilter extends MarkerFilter {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.views.markers.internal.MarkerFilter#restoreFilterSettings(org.eclipse.ui.IMemento)
+	 */
 	@Override
 	protected void restoreFilterSettings(IMemento memento) {
 
@@ -288,6 +303,11 @@ public class ProblemFilter extends MarkerFilter {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.views.markers.internal.MarkerFilter#saveFilterSettings(org.eclipse.ui.IMemento)
+	 */
 	@Override
 	public void saveFilterSettings(IMemento settings) {
 		super.saveFilterSettings(settings);
@@ -316,11 +336,21 @@ public class ProblemFilter extends MarkerFilter {
 		final String id = element.getAttribute(MarkerSupportInternalUtilities.ATTRIBUTE_ID);
 		final String namespace = element.getNamespace();
 		contributionDescriptor = new IPluginContribution() {
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.ui.IPluginContribution#getLocalId()
+			 */
 			@Override
 			public String getLocalId() {
 				return id;
 			}
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.ui.IPluginContribution#getPluginId()
+			 */
 			@Override
 			public String getPluginId() {
 				return namespace;
