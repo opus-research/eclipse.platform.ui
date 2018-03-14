@@ -57,7 +57,8 @@ public class ExplicitlyBusyView extends ViewPart {
 
 	@Override
 	public void createPartControl(Composite parent) {
-		progressService = getSite().getAdapter(IWorkbenchSiteProgressService.class);
+		progressService = (IWorkbenchSiteProgressService) getSite().getAdapter(
+				IWorkbenchSiteProgressService.class);
 		progressService.showBusyForFamily(family);
 		{
 			final Button button = new Button(parent, SWT.CHECK);
