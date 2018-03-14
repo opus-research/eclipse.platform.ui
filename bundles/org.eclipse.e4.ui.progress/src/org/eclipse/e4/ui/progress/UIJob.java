@@ -74,8 +74,7 @@ public abstract class UIJob extends Job {
      *      Note: this message is marked final. Implementors should use
      *      runInUIThread() instead.
      */
-    @Override
-	public final IStatus run(final IProgressMonitor monitor) {
+    public final IStatus run(final IProgressMonitor monitor) {
         if (monitor.isCanceled()) {
             return Status.CANCEL_STATUS;
         }
@@ -84,8 +83,7 @@ public abstract class UIJob extends Job {
             return Status.CANCEL_STATUS;
         }
         uiSynchronize.asyncExec(new Runnable() {
-            @Override
-			public void run() {
+            public void run() {
                 IStatus result = null;
                 Throwable throwable = null;
                 try {
