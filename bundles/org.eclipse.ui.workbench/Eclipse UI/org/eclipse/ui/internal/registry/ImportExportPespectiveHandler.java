@@ -14,7 +14,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
@@ -23,8 +22,6 @@ import javax.inject.Inject;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
-import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
@@ -36,10 +33,6 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.ui.IPerspectiveDescriptor;
-import org.eclipse.ui.WorkbenchException;
-import org.eclipse.ui.XMLMemento;
-import org.eclipse.ui.internal.e4.migration.PerspectiveBuilder;
-import org.eclipse.ui.internal.e4.migration.PerspectiveReader;
 import org.eclipse.ui.internal.wizards.preferences.PreferencesExportWizard;
 import org.eclipse.ui.internal.wizards.preferences.PreferencesImportWizard;
 import org.osgi.service.event.Event;
@@ -49,8 +42,6 @@ import org.osgi.service.event.EventHandler;
 public class ImportExportPespectiveHandler {
 
 	private static final String PERSPECTIVE_SUFFIX_4X = "_e4persp"; //$NON-NLS-1$
-
-	private static final String PERSPECTIVE_SUFFIX_3X = "_persp"; //$NON-NLS-1$
 
 	private static final String ASCII_ENCODING = "ASCII"; //$NON-NLS-1$
 
@@ -68,9 +59,6 @@ public class ImportExportPespectiveHandler {
 
 	@Inject @Preference(nodePath="org.eclipse.ui.workbench")
 	private IEclipsePreferences preferences;
-
-	@Inject
-	private IEclipseContext context;
 
 	@Inject
 	private PerspectiveRegistry perspectiveRegistry;
@@ -108,37 +96,12 @@ public class ImportExportPespectiveHandler {
 		try {
 			perspective = perspFromString((String) event.getNewValue());
 		} catch (IOException e) {
-			logError(event, e);
+			logger.error(e, String.format("Cannot read perspective \"%s\" from preferences", event.getKey())); //$NON-NLS-1$
 		}
 		if (perspective == null) {
 			return;
 		}
 
-		addPerspectiveToRegistry(perspective);
-	}
-
-	private void importPerspective3x(PreferenceChangeEvent event) {
-		importedPersps.add(event.getKey());
-		StringReader reader = new StringReader((String) event.getNewValue());
-		MPerspective perspective = null;
-		IEclipseContext childContext = context.createChild();
-		try {
-			childContext.set(PerspectiveReader.class, new PerspectiveReader(XMLMemento.createReadRoot(reader)));
-			perspective = ContextInjectionFactory.make(PerspectiveBuilder.class, childContext).createPerspective();
-		} catch (WorkbenchException e) {
-			logError(event, e);
-		} finally {
-			reader.close();
-			childContext.dispose();
-		}
-		if (perspective == null) {
-			return;
-		}
-
-		addPerspectiveToRegistry(perspective);
-	}
-
-	private void addPerspectiveToRegistry(MPerspective perspective) {
 		IPerspectiveDescriptor perspToOverwrite = perspectiveRegistry.findPerspectiveWithLabel(perspective.getLabel());
 
 		// a new perspective
@@ -154,14 +117,11 @@ public class ImportExportPespectiveHandler {
 			perspectiveRegistry.deletePerspective(perspToOverwrite);
 			perspectiveRegistry.addPerspective(perspective);
 		}
+
 	}
 
 	private boolean isOpen(IPerspectiveDescriptor perspToOverwrite) {
 		return !modelService.findElements(application, perspToOverwrite.getId(), MPerspective.class, null).isEmpty();
-	}
-
-	private void logError(PreferenceChangeEvent event, Exception e) {
-		logger.error(e, String.format("Cannot read perspective \"%s\" from preferences", event.getKey())); //$NON-NLS-1$
 	}
 
 	private void copyPerspToPreferences(MPerspective persp) throws IOException {
@@ -237,9 +197,6 @@ public class ImportExportPespectiveHandler {
 		}
 		ignoreEvents = false;
 		importedPersps.clear();
-
-		// remove unused preference imported from Eclipse 3.x
-		preferences.remove("perspectives"); //$NON-NLS-1$
 	}
 
 	private void initializeEventHandlers() {
@@ -274,8 +231,6 @@ public class ImportExportPespectiveHandler {
 
 				if (event.getKey().endsWith(PERSPECTIVE_SUFFIX_4X)) {
 					importPerspective4x(event);
-				} else if (event.getKey().endsWith(PERSPECTIVE_SUFFIX_3X)) {
-					importPerspective3x(event);
 				}
 			}
 		};
