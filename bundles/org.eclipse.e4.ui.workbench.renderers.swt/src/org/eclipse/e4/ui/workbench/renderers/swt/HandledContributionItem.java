@@ -37,7 +37,6 @@ import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.bindings.EBindingService;
 import org.eclipse.e4.ui.internal.workbench.Activator;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
-import org.eclipse.e4.ui.internal.workbench.EHelpService;
 import org.eclipse.e4.ui.internal.workbench.Policy;
 import org.eclipse.e4.ui.internal.workbench.RenderedElementUtil;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.IUpdateService;
@@ -53,6 +52,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolItem;
+import org.eclipse.e4.ui.services.help.EHelpService;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.IResourceUtilities;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -107,7 +107,7 @@ public class HandledContributionItem extends ContributionItem {
 	private static final String DISPOSABLE_CHECK = "IDisposable"; //$NON-NLS-1$
 	private static final String WW_SUPPORT = "org.eclipse.ui.IWorkbenchWindow"; //$NON-NLS-1$
 	private static final String HCI_STATIC_CONTEXT = "HCI-staticContext"; //$NON-NLS-1$
-	private MHandledItem model;
+	MHandledItem model;
 	private Widget widget;
 	private Listener menuItemListener;
 	private LocalResourceManager localResourceManager;
