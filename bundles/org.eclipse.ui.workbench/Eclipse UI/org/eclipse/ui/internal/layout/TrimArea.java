@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,8 +29,6 @@ import org.eclipse.ui.internal.WindowTrimProxy;
  * @since 3.2
  */
 public class TrimArea {
-	
-	public static final String STATUS_LINE_MANAGER_ID = "org.eclipse.jface.action.StatusLineManager"; //$NON-NLS-1$
 
 	/**
 	 * This is a convenience class that caches information for a single 'tiled'
@@ -239,7 +237,7 @@ public class TrimArea {
 				prefSize.x = banner.getRightWidth() + banner.getBorderWidth() + MIN_BANNER_LEFT;
 				prefSize.y = 0;  // No height for now, computed later
 			}
-			else if (getData(ctrl).getId().equals(STATUS_LINE_MANAGER_ID)) {
+			else if (getData(ctrl).getId().equals("org.eclipse.jface.action.StatusLineManager")) { //$NON-NLS-1$
 				// Hack !! should fix StatusLine itself
 				// We have to force the StatusLine to have a consistent
 				// preferred width (it's computeSize takes the message into
