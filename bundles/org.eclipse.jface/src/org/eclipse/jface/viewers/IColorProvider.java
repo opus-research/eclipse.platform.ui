@@ -15,9 +15,10 @@ import org.eclipse.swt.graphics.Color;
 
 /**
  * Interface to provide color representation for a given element.
+ * @param <E> Type of an element of the model
  * @see org.eclipse.jface.viewers.IColorDecorator
  */
-public interface IColorProvider {
+public interface IColorProvider<E> {
 
     /**
      * Provides a foreground color for the given element.
@@ -26,7 +27,7 @@ public interface IColorProvider {
      * @return	the foreground color for the element, or <code>null</code>
      *   to use the default foreground color
      */
-    Color getForeground(Object element);
+    Color getForeground(E element);
 
     /**
      * Provides a background color for the given element.
@@ -35,5 +36,5 @@ public interface IColorProvider {
      * @return	the background color for the element, or <code>null</code>
      *   to use the default background color
      */
-    Color getBackground(Object element);
+    Color getBackground(E element);
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Hendrik Still <hendrik.still@gammas.de> - bug 413973
  ******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -15,10 +16,15 @@ package org.eclipse.jface.viewers;
  * An interface to content providers for tree-structure-oriented viewers that
  * provides content based on the path of elements in the tree viewer.
  *
+ * @param <E>
+ *            Type of an element of the model
+ * @param <I>
+ *            Type of the input
+ *
  * @see AbstractTreeViewer
  * @since 3.2
  */
-public interface ITreePathContentProvider extends IStructuredContentProvider {
+public interface ITreePathContentProvider<E,I> extends IStructuredContentProvider<E,I> {
 
 	/**
 	 * {@inheritDoc}
@@ -30,7 +36,7 @@ public interface ITreePathContentProvider extends IStructuredContentProvider {
 	 * </p>
 	 */
 	@Override
-	public Object[] getElements(Object inputElement);
+	public E[] getElements(I inputElement);
 
 	/**
 	 * Returns the child elements of the last element in the given path.
@@ -47,7 +53,7 @@ public interface ITreePathContentProvider extends IStructuredContentProvider {
 	 *            the path of the parent element
 	 * @return an array of child elements
 	 */
-	public Object[] getChildren(TreePath parentPath);
+	public E[] getChildren(TreePath<E> parentPath);
 
 	/**
 	 * Returns whether the last element of the given path has children.
@@ -62,7 +68,7 @@ public interface ITreePathContentProvider extends IStructuredContentProvider {
 	 * @return <code>true</code> if the lat element of the path has children,
 	 *         and <code>false</code> if it has no children
 	 */
-	public boolean hasChildren(TreePath path);
+	public boolean hasChildren(TreePath<E> path);
 
 	/**
 	 * Return the possible parent paths for the given element. An empty array
@@ -74,5 +80,5 @@ public interface ITreePathContentProvider extends IStructuredContentProvider {
 	 *            the element
 	 * @return the possible parent paths for the given element
 	 */
-	public TreePath[] getParents(Object element);
+	public TreePath<E>[] getParents(E element);
 }
