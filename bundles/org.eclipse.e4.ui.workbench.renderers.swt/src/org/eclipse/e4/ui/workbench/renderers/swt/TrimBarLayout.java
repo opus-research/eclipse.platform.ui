@@ -70,6 +70,7 @@ public class TrimBarLayout extends Layout {
 
 	public static String SPACER = "stretch"; //$NON-NLS-1$
 	public static String GLUE = "glue"; //$NON-NLS-1$
+	public static String NEW_LINE = "newline"; //$NON-NLS-1$
 
 	private boolean horizontal;
 
@@ -116,14 +117,15 @@ public class TrimBarLayout extends Layout {
 			// GLUE Handling; gather any glued controls up into a 'segment'
 			TrimLine segment = new TrimLine();
 			segment.addControl(ctrl);
-			while (i < (kids.length - 2) && isGlue(kids[i + 1])) {
+			while (i < (kids.length - 2) && isGlue(kids[i + 1])
+					&& !isNewLine(kids[i + 2])) {
 				segment.addControl(kids[i + 1]);
 				segment.addControl(kids[i + 2]);
 				i += 2;
 			}
 
 			// Do we have enough space ?
-			if (segment.major <= spaceLeft) {
+			if (!isNewLine(ctrl) && segment.major <= spaceLeft) {
 				// Yes, add the segment to the current line
 				curLine.mergeSegment(segment);
 				spaceLeft -= segment.major;
@@ -295,6 +297,15 @@ public class TrimBarLayout extends Layout {
 		MUIElement element = (MUIElement) ctrl
 				.getData(AbstractPartRenderer.OWNING_ME);
 		if (element != null && element.getTags().contains(GLUE))
+			return true;
+
+		return false;
+	}
+
+	private boolean isNewLine(Control ctrl) {
+		MUIElement element = (MUIElement) ctrl
+				.getData(AbstractPartRenderer.OWNING_ME);
+		if (element != null && element.getTags().contains(NEW_LINE))
 			return true;
 
 		return false;
