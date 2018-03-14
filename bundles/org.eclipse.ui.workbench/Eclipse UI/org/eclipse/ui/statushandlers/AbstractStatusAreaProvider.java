@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -53,6 +53,7 @@ public abstract class AbstractStatusAreaProvider extends ErrorSupportProvider {
 	 * @see org.eclipse.jface.dialogs.ErrorSupportProvider#createSupportArea(org.eclipse.swt.widgets.Composite,
 	 *      org.eclipse.core.runtime.IStatus)
 	 */
+	@Override
 	public final Control createSupportArea(Composite parent, IStatus status) {
 		return createSupportArea(parent, new StatusAdapter(status));
 	}

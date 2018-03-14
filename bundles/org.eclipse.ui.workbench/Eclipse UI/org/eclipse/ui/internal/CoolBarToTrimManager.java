@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2012 IBM Corporation and others.
+ * Copyright (c) 2011, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,19 +7,20 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 430116
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.SideValue;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
@@ -57,6 +58,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 	private static final String TOOLBAR_SEPARATOR = "toolbarSeparator"; //$NON-NLS-1$
 	private static final String MAIN_TOOLBAR_ID = "org.eclipse.ui.main.toolbar"; //$NON-NLS-1$
 	private static final String OBJECT = "coolbar.object"; //$NON-NLS-1$
+	private static final String PREV_CHILD_VISIBLE = "prevChildVisible"; //$NON-NLS-1$
 	private MTrimBar topTrim;
 	private List<MTrimElement> workbenchTrimElements;
 	private IRendererFactory rendererFactory;
@@ -84,38 +86,33 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 		if (topTrim == null) {
 			topTrim = modelService.getTrim(window, SideValue.TOP);
 			topTrim.setElementId(MAIN_TOOLBAR_ID);
-			topTrim.setToBeRendered(false);
 		}
-		// trimBar.setToBeRendered(false);
+		topTrim.setToBeRendered(false);
 
 		renderer = (ToolBarManagerRenderer) rendererFactory.getRenderer(
 				MenuFactoryImpl.eINSTANCE.createToolBar(), null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.IContributionManager#add(org.eclipse.jface.action
-	 * .IAction)
-	 */
+	@Override
 	public void add(IAction action) {
 		// TODO Auto-generated method stub
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.IContributionManager#add(org.eclipse.jface.action
-	 * .IContributionItem)
-	 */
+	@Override
 	public void add(IContributionItem item) {
 		add(topTrim, -1, item);
 	}
 
 	private void add(MTrimBar trimBar, int idx, IContributionItem item) {
+		// Special check to make sure that new additions are *before* the SPACER
+		if (idx == -1) {
+			MUIElement spacer = modelService.find(WorkbenchWindow.PERSPECTIVE_SPACER_ID, trimBar);
+			if (spacer != null) {
+				idx = trimBar.getChildren().indexOf(spacer);
+			}
+		}
+
 		if (item instanceof IToolBarContributionItem) {
 			IToolBarManager mgr = ((IToolBarContributionItem) item).getToolBarManager();
 			if (!(mgr instanceof ToolBarManager)) {
@@ -166,7 +163,9 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			separator.setToBeRendered(false);
 			separator.setElementId(item.getId());
 
-			MToolBar toolBar = (MToolBar) modelService.find(item.getId(), window);
+			List<MToolBar> toolbars = modelService.findElements(window, item.getId(),
+					MToolBar.class, null);
+			MToolBar toolBar = toolbars.isEmpty() ? null : toolbars.get(0);
 			boolean tbFound = toolBar != null;
 			if (!tbFound) {
 				toolBar = MenuFactoryImpl.eINSTANCE.createToolBar();
@@ -190,36 +189,18 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.ICoolBarManager#add(org.eclipse.jface.action
-	 * .IToolBarManager)
-	 */
+	@Override
 	public void add(final IToolBarManager toolBarManager) {
 		if (toolBarManager instanceof ToolBarManager) {
 			add(new ToolBarContributionItem(toolBarManager));
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.IContributionManager#appendToGroup(java.lang
-	 * .String, org.eclipse.jface.action.IAction)
-	 */
+	@Override
 	public void appendToGroup(String groupName, IAction action) {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.IContributionManager#appendToGroup(java.lang
-	 * .String, org.eclipse.jface.action.IContributionItem)
-	 */
+	@Override
 	public void appendToGroup(String groupName, IContributionItem item) {
 		List<MToolBar> toolBars = modelService
 				.findElements(window, groupName, MToolBar.class, null);
@@ -234,40 +215,40 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 		add(topTrim, -1, item);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.internal.provisional.action.ICoolBarManager2#createControl2
-	 * (org.eclipse.swt.widgets.Composite)
-	 */
+	@Override
 	public Control createControl2(Composite parent) {
 		new Exception("CBTTM:createControl2()").printStackTrace(); //$NON-NLS-1$
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.internal.provisional.action.ICoolBarManager2#dispose()
-	 */
+	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
+		ArrayList<MToolBarElement> toRemove = new ArrayList<MToolBarElement>();
+		for (MTrimElement child : topTrim.getChildren()) {
+			if (child instanceof MToolBar) {
+				MToolBar toolbar = (MToolBar) child;
+				for (MToolBarElement element : toolbar.getChildren()) {
+					if (OpaqueElementUtil.isOpaqueToolItem(element)) {
+						toRemove.add(element);
+					}
+				}
+				if (!toRemove.isEmpty()) {
+					toolbar.getChildren().removeAll(toRemove);
+					toRemove.clear();
+				}
+			}
+		}
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.IContributionManager#find(java.lang.String)
-	 */
+	@Override
 	public IContributionItem find(String id) {
-		MTrimElement el = (MTrimElement) modelService.find(id, window);
-		if (el == null || !(el instanceof MToolBar))
+		List<MToolBar> toolbars = modelService.findElements(window, id, MToolBar.class, null);
+		if (toolbars.isEmpty()) {
 			return null;
+		}
 
-		final MToolBar model = (MToolBar) el;
+		final MToolBar model = toolbars.get(0);
 		if (model.getTransientData().get(OBJECT) != null) {
 			return (IContributionItem) model.getTransientData().get(OBJECT);
 		}
@@ -294,33 +275,19 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.ICoolBarManager#getContextMenuManager()
-	 */
+	@Override
 	public IMenuManager getContextMenuManager() {
 		new Exception("CBTTM:getContextMenuManager()").printStackTrace(); //$NON-NLS-1$
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.internal.provisional.action.ICoolBarManager2#getControl2
-	 * ()
-	 */
+	@Override
 	public Control getControl2() {
 		new Exception("CBTTM:getControl2()").printStackTrace(); //$NON-NLS-1$
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.IContributionManager#getItems()
-	 */
+	@Override
 	public IContributionItem[] getItems() {
 		ArrayList<IContributionItem> items = new ArrayList<IContributionItem>();
 
@@ -356,42 +323,24 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 		return items.toArray(new IContributionItem[items.size()]);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.ICoolBarManager#getLockLayout()
-	 */
+	@Override
 	public boolean getLockLayout() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.IContributionManager#getOverrides()
-	 */
+	@Override
 	public IContributionManagerOverrides getOverrides() {
 		return toolbarOverrides;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.ICoolBarManager#getStyle()
-	 */
+	@Override
 	public int getStyle() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.IContributionManager#insertAfter(java.lang.String
-	 * , org.eclipse.jface.action.IAction)
-	 */
+	@Override
 	public void insertAfter(String id, IAction action) {
 		// TODO Auto-generated method stub
 
@@ -413,13 +362,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.IContributionManager#insertAfter(java.lang.String
-	 * , org.eclipse.jface.action.IContributionItem)
-	 */
+	@Override
 	public void insertAfter(String id, IContributionItem item) {
 		MToolBar afterElement = getToolBar(id);
 		if (afterElement == null || getTrim(afterElement) == null)
@@ -431,23 +374,11 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 		add(trimBar, index, item);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.IContributionManager#insertBefore(java.lang.
-	 * String, org.eclipse.jface.action.IAction)
-	 */
+	@Override
 	public void insertBefore(String id, IAction action) {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.IContributionManager#insertBefore(java.lang.
-	 * String, org.eclipse.jface.action.IContributionItem)
-	 */
+	@Override
 	public void insertBefore(String id, IContributionItem item) {
 		MToolBar beforeElement = getToolBar(id);
 		if (beforeElement == null || getTrim(beforeElement) == null)
@@ -458,54 +389,30 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 		add(trimBar, index, item);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.IContributionManager#isDirty()
-	 */
+	@Override
 	public boolean isDirty() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.IContributionManager#isEmpty()
-	 */
+	@Override
 	public boolean isEmpty() {
 		return topTrim.getChildren().isEmpty();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.IContributionManager#markDirty()
-	 */
+	@Override
 	public void markDirty() {
 		// TODO Auto-generated method stub
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.IContributionManager#prependToGroup(java.lang
-	 * .String, org.eclipse.jface.action.IAction)
-	 */
+	@Override
 	public void prependToGroup(String groupName, IAction action) {
 		// TODO Auto-generated method stub
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.IContributionManager#prependToGroup(java.lang
-	 * .String, org.eclipse.jface.action.IContributionItem)
-	 */
+	@Override
 	public void prependToGroup(String groupName, IContributionItem item) {
 		MUIElement gnElement = modelService.find(groupName, window);
 		if (gnElement instanceof MToolBar) {
@@ -516,24 +423,13 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 		add(topTrim, -1, item);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.internal.provisional.action.ICoolBarManager2#refresh()
-	 */
+	@Override
 	public void refresh() {
 		// TODO Auto-generated method stub
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.IContributionManager#remove(org.eclipse.jface
-	 * .action.IContributionItem)
-	 */
+	@Override
 	public IContributionItem remove(IContributionItem item) {
 		final List<MToolBar> children = modelService.findElements(window, null, MToolBar.class,
 				null);
@@ -565,77 +461,40 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.IContributionManager#remove(java.lang.String)
-	 */
+	@Override
 	public IContributionItem remove(String id) {
 		new Exception("CBTTM:remove(String id) " + id).printStackTrace(); //$NON-NLS-1$
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.IContributionManager#removeAll()
-	 */
+	@Override
 	public void removeAll() {
 		new Exception("CBTTM:removeAll").printStackTrace(); //$NON-NLS-1$
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.internal.provisional.action.ICoolBarManager2#resetItemOrder
-	 * ()
-	 */
+	@Override
 	public void resetItemOrder() {
 		updateAll(true);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.ICoolBarManager#setContextMenuManager(org.eclipse
-	 * .jface.action.IMenuManager)
-	 */
+	@Override
 	public void setContextMenuManager(IMenuManager menuManager) {
 		// TODO Auto-generated method stub
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.internal.provisional.action.ICoolBarManager2#setItems
-	 * (org.eclipse.jface.action.IContributionItem[])
-	 */
+	@Override
 	public void setItems(IContributionItem[] newItems) {
 		new Exception("CBTTM:setItems(IContributionItem[] newItems)").printStackTrace(); //$NON-NLS-1$
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.ICoolBarManager#setLockLayout(boolean)
-	 */
+	@Override
 	public void setLockLayout(boolean value) {
 		// TODO Auto-generated method stub
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.internal.provisional.action.ICoolBarManager2#setOverrides
-	 * (org.eclipse.jface.action.IContributionManagerOverrides)
-	 */
+	@Override
 	public void setOverrides(IContributionManagerOverrides newOverrides) {
 		this.toolbarOverrides = newOverrides;
 		// this is required when we need to set the overrides for the
@@ -643,11 +502,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 		topTrim.getTransientData().put(IContributionManagerOverrides.class.getName(), newOverrides);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.IContributionManager#update(boolean)
-	 */
+	@Override
 	public void update(boolean force) {
 		final List<MToolBar> children = modelService.findElements(window, null, MToolBar.class,
 				null);
@@ -707,7 +562,11 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			if (item == null) {
 				continue;
 			}
-			if (renderer.getToolElement(item) != null) {
+			MToolBarElement toolBarElem = renderer.getToolElement(item);
+			if (toolBarElem != null) {
+				if (container.isVisible()) {
+					setChildVisible(toolBarElem, item, manager);
+				}
 				continue;
 			}
 			if (item instanceof IToolBarContributionItem) {
@@ -715,6 +574,10 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 				//new Exception("fill(MToolBar container, IContributionManager manager) with " //$NON-NLS-1$
 				//		+ item + " to " + manager2).printStackTrace(); //$NON-NLS-1$
 				fill(container, manager2);
+			} else if (item instanceof IMenuManager) {
+				// No element to add in toolbar:
+				// let the menu manager control its contributions.
+				continue;
 			} else if (item instanceof IContributionManager) {
 				// new Exception(
 				//		"fill(MToolBar container, IContributionManager manager) with rogue contribution manager: " //$NON-NLS-1$
@@ -728,14 +591,47 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 					container.getChildren().add(toolItem);
 				}
 			} else {
-				MOpaqueToolItem toolItem = MenuFactoryImpl.eINSTANCE.createOpaqueToolItem();
+				MToolItem toolItem = OpaqueElementUtil.createOpaqueToolItem();
 				toolItem.setElementId(item.getId());
+				OpaqueElementUtil.setOpaqueItem(toolItem, item);
 				if (item instanceof AbstractGroupMarker) {
 					toolItem.setVisible(item.isVisible());
 				}
-				container.getChildren().add(toolItem);
+				// make sure the renderer knows this has already been processed
 				renderer.linkModelToContribution(toolItem, item);
+				container.getChildren().add(toolItem);
 			}
 		}
+	}
+
+	private void setChildVisible(MToolBarElement modelItem, IContributionItem item,
+			IContributionManager manager) {
+		Boolean currentChildVisible = isChildVisible(item, manager);
+		Boolean prevChildVisible = (Boolean) modelItem.getTransientData().get(PREV_CHILD_VISIBLE);
+
+		if (currentChildVisible != null) {
+			if (prevChildVisible == null) {
+				modelItem.getTransientData().put(PREV_CHILD_VISIBLE, modelItem.isVisible());
+				modelItem.setVisible(currentChildVisible);
+			}
+		} else if (prevChildVisible != null) {
+			modelItem.setVisible(prevChildVisible);
+			modelItem.getTransientData().remove(PREV_CHILD_VISIBLE);
+		}
+	}
+
+	private Boolean isChildVisible(IContributionItem item, IContributionManager manager) {
+		Boolean v;
+		IContributionManagerOverrides overrides = manager.getOverrides();
+		if (overrides == null) {
+			v = null;
+		} else {
+			v = overrides.getVisible(item);
+		}
+
+		if (v != null) {
+			return v.booleanValue();
+		}
+		return null;
 	}
 }

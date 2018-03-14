@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -93,7 +93,8 @@ public class NativeKeyFormatter extends AbstractKeyFormatter {
      *            The key to format; must not be <code>null</code>.
      * @return The key formatted as a string; should not be <code>null</code>.
      */
-    public String format(Key key) {
+    @Override
+	public String format(Key key) {
         String name = key.toString();
 
         // TODO consider platform-specific resource bundles
@@ -112,7 +113,8 @@ public class NativeKeyFormatter extends AbstractKeyFormatter {
      * 
      * @see org.eclipse.ui.keys.AbstractKeyFormatter#getKeyDelimiter()
      */
-    protected String getKeyDelimiter() {
+    @Override
+	protected String getKeyDelimiter() {
         // We must do the look up every time, as our locale might change.
         if (org.eclipse.jface.util.Util.isMac()) {
             return Util.translateString(RESOURCE_BUNDLE,
@@ -129,7 +131,8 @@ public class NativeKeyFormatter extends AbstractKeyFormatter {
      * 
      * @see org.eclipse.ui.keys.AbstractKeyFormatter#getKeyStrokeDelimiter()
      */
-    protected String getKeyStrokeDelimiter() {
+    @Override
+	protected String getKeyStrokeDelimiter() {
         // We must do the look up every time, as our locale might change.
         if (org.eclipse.jface.util.Util.isWindows()) {
             return Util.translateString(RESOURCE_BUNDLE,
@@ -147,7 +150,8 @@ public class NativeKeyFormatter extends AbstractKeyFormatter {
      * 
      * @see org.eclipse.ui.keys.AbstractKeyFormatter#getModifierKeyComparator()
      */
-    protected Comparator getModifierKeyComparator() {
+    @Override
+	protected Comparator getModifierKeyComparator() {
         return MODIFIER_KEY_COMPARATOR;
     }
 }

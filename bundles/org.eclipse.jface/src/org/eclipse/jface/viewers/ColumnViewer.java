@@ -9,10 +9,16 @@
  *     IBM Corporation - initial API and implementation
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation; bug 153993
  *												   fix in bug 163317, 151295, 167323, 167858, 184346, 187826, 201905
+ *     Stefan Winkler <stefan@winklerweb.net> - Bug 242231
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
 
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.internal.InternalPolicy;
+import org.eclipse.jface.util.Policy;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
@@ -21,13 +27,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Widget;
-
-import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-
-import org.eclipse.jface.internal.InternalPolicy;
-import org.eclipse.jface.util.Policy;
 
 /**
  * The ColumnViewer is the abstract superclass of viewers that have columns
@@ -70,6 +69,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 
 	}
 
+	@Override
 	protected void hookControl(Control control) {
 		super.hookControl(control);
 		viewerEditor = createViewerEditor();
@@ -89,6 +89,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 		// own impl
 		if (viewerEditor != null) {
 			mouseListener = new MouseAdapter() {
+				@Override
 				public void mouseDown(MouseEvent e) {
 					// Workaround for bug 185817
 					if (e.count != 2) {
@@ -96,6 +97,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 					}
 				}
 
+				@Override
 				public void mouseDoubleClick(MouseEvent e) {
 					handleMouseDown(e);
 				}
@@ -216,13 +218,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 		if (getCellModifier() != null) {
 			viewer.setEditingSupport(new EditingSupport(this) {
 
-				/*
-				 * (non-Javadoc)
-				 * 
-				 * @see
-				 * org.eclipse.jface.viewers.EditingSupport#canEdit(java.lang
-				 * .Object)
-				 */
+				@Override
 				public boolean canEdit(Object element) {
 					Object[] properties = getColumnProperties();
 
@@ -234,13 +230,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 					return false;
 				}
 
-				/*
-				 * (non-Javadoc)
-				 * 
-				 * @see
-				 * org.eclipse.jface.viewers.EditingSupport#getCellEditor(java
-				 * .lang.Object)
-				 */
+				@Override
 				public CellEditor getCellEditor(Object element) {
 					CellEditor[] editors = getCellEditors();
 					if (columnIndex < editors.length) {
@@ -249,13 +239,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 					return null;
 				}
 
-				/*
-				 * (non-Javadoc)
-				 * 
-				 * @see
-				 * org.eclipse.jface.viewers.EditingSupport#getValue(java.lang
-				 * .Object)
-				 */
+				@Override
 				public Object getValue(Object element) {
 					Object[] properties = getColumnProperties();
 
@@ -267,13 +251,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 					return null;
 				}
 
-				/*
-				 * (non-Javadoc)
-				 * 
-				 * @see
-				 * org.eclipse.jface.viewers.EditingSupport#setValue(java.lang
-				 * .Object, java.lang.Object)
-				 */
+				@Override
 				public void setValue(Object element, Object value) {
 					Object[] properties = getColumnProperties();
 
@@ -284,6 +262,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 					}
 				}
 
+				@Override
 				boolean isLegacySupport() {
 					return true;
 				}
@@ -333,11 +312,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 	 */
 	protected abstract Item getItemAt(Point point);
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.StructuredViewer#getItem(int, int)
-	 */
+	@Override
 	protected Item getItem(int x, int y) {
 		return getItemAt(getControl().toControl(x, y));
 	}
@@ -363,6 +338,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 	 * </p>
 	 * 
 	 */
+	@Override
 	public void setLabelProvider(IBaseLabelProvider labelProvider) {
 		Assert.isTrue(labelProvider instanceof ITableLabelProvider
 				|| labelProvider instanceof ILabelProvider
@@ -375,6 +351,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 		}
 	}
 
+	@Override
 	void internalDisposeLabelProvider(IBaseLabelProvider oldProvider) {
 		if (oldProvider instanceof CellLabelProvider) {
 			((CellLabelProvider) oldProvider).dispose(this, null);
@@ -410,10 +387,10 @@ public abstract class ColumnViewer extends StructuredViewer {
 
 	/**
 	 * Apply the value of the active cell editor if one is active.
-	 * 
-	 * @since 3.3
+	 *
+	 * @since 3.11 (public - protected since 3.3)
 	 */
-	protected void applyEditorValue() {
+	public void applyEditorValue() {
 		if (viewerEditor != null) {
 			viewerEditor.applyEditorValue();
 		}
@@ -533,6 +510,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 		return false;
 	}
 
+	@Override
 	public void refresh(Object element) {
 		if (checkBusy())
 			return;
@@ -544,6 +522,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 		super.refresh(element);
 	}
 
+	@Override
 	public void refresh(Object element, boolean updateLabels) {
 		if (checkBusy())
 			return;
@@ -555,6 +534,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 		super.refresh(element, updateLabels);
 	}
 
+	@Override
 	public void update(Object element, String[] properties) {
 		if (checkBusy())
 			return;
@@ -673,9 +653,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ContentViewer#handleDispose(org.eclipse.swt.events.DisposeEvent)
-	 */
+	@Override
 	protected void handleDispose(DisposeEvent event) {
 		if (mouseListener != null && event.widget instanceof Control) {
 			((Control)event.widget).removeMouseListener(mouseListener);
@@ -714,6 +692,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 		return viewerEditor;
 	}
 
+	@Override
 	protected Object[] getRawChildren(Object parent) {
 		boolean oldBusy = isBusy();
 		setBusy(true);

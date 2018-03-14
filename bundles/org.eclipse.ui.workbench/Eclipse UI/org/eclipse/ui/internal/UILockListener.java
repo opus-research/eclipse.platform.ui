@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2006 IBM Corporation and others.
+ * Copyright (c) 2003, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -107,13 +107,15 @@ public class UILockListener extends LockListener {
         this.display = display;
     }
 
-    public void aboutToRelease() {
+    @Override
+	public void aboutToRelease() {
         if (isUI()) {
 			ui = null;
 		}
     }
 
-    public boolean aboutToWait(Thread lockOwner) {
+    @Override
+	public boolean aboutToWait(Thread lockOwner) {
         if (isUI()) {
             // If a syncExec was executed from the current operation, it
             // has already acquired the lock. So, just return true.
@@ -142,6 +144,7 @@ public class UILockListener extends LockListener {
 	 * 
 	 * @see org.eclipse.core.runtime.jobs.LockListener#canBlock()
 	 */
+	@Override
 	public boolean canBlock() {
 		return !isUI();
 	}

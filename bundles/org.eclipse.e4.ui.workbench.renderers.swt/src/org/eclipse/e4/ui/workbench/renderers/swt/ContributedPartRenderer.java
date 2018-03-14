@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,16 +7,15 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 426460, 441150
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import javax.inject.Inject;
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.contributions.IContributionFactory;
 import org.eclipse.e4.core.services.log.Logger;
-import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
@@ -37,20 +36,22 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Widget;
 
 /**
- * Create a contribute part.
+ * Default SWT renderer responsible for an MPart. See
+ * {@link WorkbenchRendererFactory}
  */
 public class ContributedPartRenderer extends SWTPartRenderer {
 
 	@Inject
 	private IPresentationEngine engine;
 
-	@Optional
 	@Inject
+	@Optional
 	private Logger logger;
 
 	private MPart partToActivate;
 
 	private Listener activationListener = new Listener() {
+		@Override
 		public void handleEvent(Event event) {
 			// we only want to activate the part if the activated widget is
 			// actually bound to a model element
@@ -66,6 +67,7 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 		}
 	};
 
+	@Override
 	public Object createWidget(final MUIElement element, Object parent) {
 		if (!(element instanceof MPart) || !(parent instanceof Composite))
 			return null;
@@ -83,41 +85,26 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 			 */
 			private boolean beingFocused = false;
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.swt.widgets.Composite#setFocus()
-			 */
 			@Override
 			public boolean setFocus() {
 				if (!beingFocused) {
 					try {
 						// we are currently asking the part to take focus
 						beingFocused = true;
+
 						// delegate an attempt to set the focus here to the
 						// part's implementation (if there is one)
 						Object object = part.getObject();
-						if (object != null) {
-							ContextInjectionFactory.invoke(object, Focus.class,
-									part.getContext(), null);
+						if (object != null && isEnabled()) {
+							IPresentationEngine pe = part.getContext().get(
+									IPresentationEngine.class);
+							pe.focusGui(part);
 							return true;
 						}
 						return super.setFocus();
 					} finally {
 						// we are done, unset our flag
 						beingFocused = false;
-					}
-				}
-
-				if (logger != null) {
-					String id = part.getElementId();
-					if (id == null) {
-						logger.warn(new IllegalStateException(),
-								"Blocked recursive attempt to activate part " //$NON-NLS-1$
-										+ id);
-					} else {
-						logger.warn(new IllegalStateException(),
-								"Blocked recursive attempt to activate part"); //$NON-NLS-1$
 					}
 				}
 
@@ -134,10 +121,10 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 
 		// Create a context for this part
 		IEclipseContext localContext = part.getContext();
-		localContext.set(Composite.class.getName(), newComposite);
+		localContext.set(Composite.class, newComposite);
 
-		IContributionFactory contributionFactory = (IContributionFactory) localContext
-				.get(IContributionFactory.class.getName());
+		IContributionFactory contributionFactory = localContext
+				.get(IContributionFactory.class);
 		Object newPart = contributionFactory.create(part.getContributionURI(),
 				localContext);
 		part.setObject(newPart);
@@ -212,13 +199,6 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#requiresFocus
-	 * (org.eclipse.e4.ui.model.application.ui.basic.MPart)
-	 */
 	@Override
 	protected boolean requiresFocus(MPart element) {
 		if (element == partToActivate) {
@@ -227,13 +207,6 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 		return super.requiresFocus(element);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.renderers.swt.PartFactory#hookControllerLogic
-	 * (org.eclipse.e4.ui.model.application.MPart)
-	 */
 	@Override
 	public void hookControllerLogic(final MUIElement me) {
 		super.hookControllerLogic(me);
@@ -282,6 +255,21 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 				engine.removeGui(menu);
 			}
 		}
-		super.disposeWidget(element);
+
+		Composite parent = null;
+		if (element.getWidget() instanceof Composite) {
+			parent = ((Composite) element.getWidget()).getParent();
+		}
+
+		if (parent != null) {
+			try {
+				parent.setRedraw(false);
+				super.disposeWidget(element);
+			} finally {
+				parent.setRedraw(true);
+			}
+		} else {
+			super.disposeWidget(element);
+		}
 	}
 }
