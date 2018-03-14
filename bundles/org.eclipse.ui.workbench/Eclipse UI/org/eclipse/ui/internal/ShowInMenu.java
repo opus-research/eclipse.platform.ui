@@ -45,7 +45,6 @@ import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandImageService;
 import org.eclipse.ui.internal.services.IWorkbenchLocationService;
 import org.eclipse.ui.internal.services.WorkbenchSourceProvider;
@@ -79,6 +78,7 @@ public class ShowInMenu extends ContributionItem implements
 	private boolean dirty = true;
 
 	private IMenuListener menuListener = new IMenuListener() {
+		@Override
 		public void menuAboutToShow(IMenuManager manager) {
 			manager.markDirty();
 			dirty = true;
@@ -106,6 +106,7 @@ public class ShowInMenu extends ContributionItem implements
 		this.window = window;
 	}
 
+	@Override
 	public boolean isDirty() {
 		return dirty;
 	}
@@ -113,10 +114,12 @@ public class ShowInMenu extends ContributionItem implements
 	/**
 	 * Overridden to always return true and force dynamic menu building.
 	 */
+	@Override
 	public boolean isDynamic() {
 		return true;
 	}
 
+	@Override
 	public void fill(Menu menu, int index) {
 		if (getParent() instanceof MenuManager) {
 			((MenuManager) getParent()).addMenuListener(menuListener);
@@ -163,7 +166,10 @@ public class ShowInMenu extends ContributionItem implements
 	 * Fills the menu with Show In actions.
 	 */
 	private void fillMenu(IMenuManager innerMgr) {
-		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		IWorkbenchPage page = (IWorkbenchPage) locator.getService(IWorkbenchPage.class);
+		if (page == null) {
+			return;
+		}
 		WorkbenchPartReference r = (WorkbenchPartReference) page.getActivePartReference();
 		if (page != null && r != null && r.getModel() != null) {
 			((WorkbenchPage) page).updateShowInSources(r.getModel());
@@ -311,17 +317,14 @@ public class ShowInMenu extends ContributionItem implements
 	 * 
 	 * @return the source part or <code>null</code>
 	 */
-	private IWorkbenchPart getSourcePart() {
+	protected IWorkbenchPart getSourcePart() {
 		IWorkbenchWindow window = getWindow();
 
 		if (window == null)
 			return null;
 
 		IWorkbenchPage page = window.getActivePage();
-		if (page != null) {
-			return page.getActivePart();
-		}
-		return null;
+		return page != null ? page.getActivePart() : null;
 	}
 
 	/**
@@ -403,6 +406,7 @@ public class ShowInMenu extends ContributionItem implements
 	 * 
 	 * @see org.eclipse.ui.menus.IWorkbenchContribution#initialize(org.eclipse.ui.services.IServiceLocator)
 	 */
+	@Override
 	public void initialize(IServiceLocator serviceLocator) {
 		locator = serviceLocator;
 	}
@@ -430,6 +434,7 @@ public class ShowInMenu extends ContributionItem implements
 	 * 
 	 * @see org.eclipse.jface.action.ContributionItem#dispose()
 	 */
+	@Override
 	public void dispose() {
 		if (currentManager != null && currentManager.getSize() > 0) {
 			// IMenuService service = (IMenuService) locator

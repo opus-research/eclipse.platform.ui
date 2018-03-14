@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug https://bugs.eclipse.org/436247
  *******************************************************************************/
 package org.eclipse.ui.internal.themes;
 
@@ -138,7 +139,8 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
         /* (non-Javadoc)
          * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
          */
-        public Object[] getChildren(Object parentElement) {
+        @Override
+		public Object[] getChildren(Object parentElement) {
             if (parentElement instanceof ThemeElementCategory) {
                 String categoryId = ((ThemeElementCategory) parentElement)
                         .getId();
@@ -260,7 +262,8 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
         /* (non-Javadoc)
          * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
          */
-        public Object getParent(Object element) {
+        @Override
+		public Object getParent(Object element) {
 			if (element instanceof ThemeElementCategory)
 				return registry;
 
@@ -292,7 +295,8 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
         /* (non-Javadoc)
          * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
          */
-        public boolean hasChildren(Object element) {
+        @Override
+		public boolean hasChildren(Object element) {
             if (element instanceof ThemeElementCategory) {
 				return true;
 			}
@@ -325,7 +329,8 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 		 * 
 		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 		 */
-        public Object[] getElements(Object inputElement) {
+        @Override
+		public Object[] getElements(Object inputElement) {
             ArrayList list = new ArrayList();
             Object[] uncatChildren = getCategoryChildren(null);
             list.addAll(Arrays.asList(uncatChildren));
@@ -347,14 +352,16 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
         /* (non-Javadoc)
          * @see org.eclipse.jface.viewers.IContentProvider#dispose()
          */
-        public void dispose() {
+        @Override
+		public void dispose() {
             categoryMap.clear();
         }
 
         /* (non-Javadoc)
          * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
          */
-        public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+        @Override
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
             categoryMap.clear();
             registry = (IThemeRegistry) newInput;
         }
@@ -374,7 +381,8 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
         private int usableImageSize = -1;
 
         private IPropertyChangeListener listener = new IPropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent event) {
+            @Override
+			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getNewValue() != null) {
 					fireLabelProviderChanged(new LabelProviderChangedEvent(
 							PresentationLabelProvider.this));
@@ -403,7 +411,8 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
         /* (non-Javadoc)
          * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
          */
-        public void dispose() {
+        @Override
+		public void dispose() {
             super.dispose();
             colorRegistry.removeListener(listener);
             fontRegistry.removeListener(listener);
@@ -443,7 +452,8 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
         /* (non-Javadoc)
          * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
          */
-        public Font getFont(Object element) {
+        @Override
+		public Font getFont(Object element) {
             Display display = tree.getDisplay();
             if (element instanceof FontDefinition) {
                 int parentHeight = tree.getViewer().getControl().getFont()
@@ -468,7 +478,8 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
         /* (non-Javadoc)
          * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
          */
-        public Image getImage(Object element) {
+        @Override
+		public Image getImage(Object element) {
             if (element instanceof ColorDefinition) {
 				Display display = tree.getDisplay();
                 Color c = colorRegistry
@@ -523,7 +534,8 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
         /* (non-Javadoc)
          * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
          */
-        public String getText(Object element) {
+        @Override
+		public String getText(Object element) {
             if (element instanceof IHierarchalThemeElementDefinition) {
                 IHierarchalThemeElementDefinition themeElement = (IHierarchalThemeElementDefinition) element;
 				if (themeElement.getDefaultsTo() != null) {
@@ -758,7 +770,7 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 
 		private boolean isAnyThemeChanged() {
 			return currentTheme != workbench.getThemeManager().getCurrentTheme()
-					|| currentCSSTheme != themeEngine.getActiveTheme();
+					|| currentCSSTheme != getActiveTheme();
 		}
 	};
 
@@ -789,6 +801,7 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 	 * @param data
 	 *            the data to be applied
 	 */
+	@Override
 	public void applyData(Object data) {
 		if (tree == null || !(data instanceof String))
 			return;
@@ -841,6 +854,19 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
         return false;
     }
 
+	/**
+	 * Get the active theme.
+	 * 
+	 * @return the active theme if there is one; <code>null</code> if there
+	 *         isn't or {@link #themeEngine} is <code>null</code>.
+	 */
+	private org.eclipse.e4.ui.css.swt.theme.ITheme getActiveTheme() {
+		if (themeEngine != null) {
+			return themeEngine.getActiveTheme();
+		}
+		return null;
+	}
+
     /**
      * Create a button for the preference page.
      * @param parent
@@ -870,11 +896,13 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
     /* (non-Javadoc)
      * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
      */
-    protected Control createContents(Composite parent) {
+    @Override
+	protected Control createContents(Composite parent) {
     	PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IWorkbenchHelpContextIds.FONTS_PREFERENCE_PAGE);
     	
         parent.addDisposeListener(new DisposeListener() {
-            public void widgetDisposed(DisposeEvent e) {
+            @Override
+			public void widgetDisposed(DisposeEvent e) {
                 if (appliedDialogFont != null)
 					appliedDialogFont.dispose();
             }
@@ -992,6 +1020,7 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 			 * 
 			 * @since 3.7
 			 */
+			@Override
 			protected boolean isLeafMatch(Viewer viewer, Object element) {
 				if (super.isLeafMatch(viewer, element))
 					return true;
@@ -1020,6 +1049,7 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 		tree.getViewer().setLabelProvider(labelProvider);
 		tree.getViewer().setContentProvider(new ThemeContentProvider());
 		tree.getViewer().setComparator(new ViewerComparator() {
+			@Override
 			public int category(Object element) {
 				if (element instanceof ThemeElementCategory)
 					return 0;
@@ -1028,6 +1058,7 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 		});
 		tree.getViewer().setInput(WorkbenchPlugin.getDefault().getThemeRegistry());
 		tree.getViewer().addDoubleClickListener(new IDoubleClickListener() {
+			@Override
 			public void doubleClick(DoubleClickEvent event) {
 				IStructuredSelection s = (IStructuredSelection) event.getSelection();
 				Object element = s.getFirstElement();
@@ -1056,7 +1087,8 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
     /* (non-Javadoc)
      * @see org.eclipse.jface.dialogs.IDialogPage#dispose()
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
 		eventBroker.unsubscribe(themeRegistryRestyledHandler);
         workbench.getThemeManager().removePropertyChangeListener(themeChangeListener);
         clearPreviews();
@@ -1230,13 +1262,15 @@ getPreferenceStore(),
     private void hookListeners() {
         TreeViewer viewer = tree.getViewer();
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-                public void selectionChanged(SelectionChangedEvent event) {
+                @Override
+				public void selectionChanged(SelectionChangedEvent event) {
                     updateTreeSelection(event.getSelection());
                 }
 		});
 		
         fontChangeButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
+            @Override
+			public void widgetSelected(SelectionEvent event) {
             	Display display = event.display;
             	if (isFontSelected())
             		editFont(display);
@@ -1248,7 +1282,8 @@ getPreferenceStore(),
 
         fontResetButton.addSelectionListener(new SelectionAdapter() {
 
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
             	if (isFontSelected())
 					resetFont(getSelectedFontDefinition(), false);
             	else if (isColorSelected())
@@ -1258,7 +1293,8 @@ getPreferenceStore(),
         });
 
         fontSystemButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
+            @Override
+			public void widgetSelected(SelectionEvent event) {
                 FontDefinition definition = getSelectedFontDefinition();
                 if (definition == null)
                 	return;
@@ -1269,6 +1305,7 @@ getPreferenceStore(),
         });
 
 		editDefaultButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent event) {
 				Display display = event.display;
 				FontDefinition fontDefinition = getSelectedFontDefinition();
@@ -1290,6 +1327,7 @@ getPreferenceStore(),
 		});
 
 		goToDefaultButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent event) {
 				FontDefinition fontDefinition = getSelectedFontDefinition();
 				if (fontDefinition != null) {
@@ -1314,14 +1352,16 @@ getPreferenceStore(),
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
      */
-    public void init(IWorkbench aWorkbench) {
+    @Override
+	public void init(IWorkbench aWorkbench) {
         this.workbench = (Workbench) aWorkbench;
 		themeEngine = (IThemeEngine) workbench.getService(IThemeEngine.class);
         setPreferenceStore(PrefUtil.getInternalPreferenceStore());
 
         final IThemeManager themeManager = aWorkbench.getThemeManager();
         themeChangeListener = new IPropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent event) {
+            @Override
+			public void propertyChange(PropertyChangeEvent event) {
                 if (event.getProperty().equals(
                         IThemeManager.CHANGE_CURRENT_THEME)) {
                     updateThemeInfo(themeManager);
@@ -1353,7 +1393,7 @@ getPreferenceStore(),
 
         currentTheme = manager.getCurrentTheme();
 
-		currentCSSTheme = themeEngine.getActiveTheme();
+		currentCSSTheme = getActiveTheme();
 
         colorRegistry = new CascadingColorRegistry(currentTheme.getColorRegistry());
         fontRegistry = new CascadingFontRegistry(currentTheme.getFontRegistry());
@@ -1467,7 +1507,8 @@ getPreferenceStore(),
     /**
      * @see org.eclipse.jface.preference.PreferencePage#performApply()
      */
-    protected void performApply() {
+    @Override
+	protected void performApply() {
         super.performApply();
 
         //Apply the default font to the dialog.
@@ -1532,7 +1573,8 @@ getPreferenceStore(),
     /* (non-Javadoc)
      * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
      */
-    protected void performDefaults() {
+    @Override
+	protected void performDefaults() {
         performColorDefaults();
         performFontDefaults();
 		updateControls();
@@ -1571,7 +1613,8 @@ getPreferenceStore(),
     /* (non-Javadoc)
      * @see org.eclipse.jface.preference.IPreferencePage#performOk()
      */
-    public boolean performOk() {
+    @Override
+	public boolean performOk() {
     	saveTreeExpansion();
     	saveTreeSelection();
         boolean result =  performColorOk() && performFontOk();
@@ -2051,6 +2094,7 @@ getPreferenceStore(),
 		fontSampler.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		fontSampler.addPaintListener(new PaintListener() {
+			@Override
 			public void paintControl(PaintEvent e) {
 				if (currentFont != null) // do the font preview
 					paintFontSample(e.gc);
@@ -2094,6 +2138,7 @@ getPreferenceStore(),
 		colorSampler.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
 		colorSampler.addPaintListener(new PaintListener() {
+			@Override
 			public void paintControl(PaintEvent e) {
 				if (currentColor != null) // do the color preview
 					paintColorSample(e.gc);
@@ -2255,6 +2300,7 @@ getPreferenceStore(),
 			super(currentTheme, colorRegistry, fontRegistry);
 		}
 
+		@Override
 		public void fire(PropertyChangeEvent event) {
 			super.fire(event);
 		}
