@@ -940,7 +940,7 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String ChooseWorkspaceDialog_browseLabel;
 	public static String ChooseWorkspaceDialog_directoryBrowserTitle;
 	public static String ChooseWorkspaceDialog_directoryBrowserMessage;
-	public static String ChooseWorkspaceDialog_removeWorkspaceSelection;
+	public static String ChooseWorkspaceDialog_forgetWorkspace;
 	public static String ChooseWorkspaceDialog_recentWorkspaces;
 	public static String ChooseWorkspaceDialog_useDefaultMessage;
 
