@@ -55,7 +55,6 @@ public class Bug308220Test extends TestCase {
 		});
 
 		app.runAndTrack(new RunAndTrack() {
-			@Override
 			public boolean changed(IEclipseContext context) {
 				// remove this line to pass the test
 				context.get(IServiceConstants.ACTIVE_PART);
