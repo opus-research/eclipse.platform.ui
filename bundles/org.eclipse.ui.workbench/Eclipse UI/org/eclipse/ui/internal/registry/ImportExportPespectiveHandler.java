@@ -90,8 +90,14 @@ public class ImportExportPespectiveHandler {
 	private List<String> importedPersps = new ArrayList<>();
 	private Map<String, String> minMaxPersistedState;
 
+	private Boolean impExpEnabled;
+
 	@PostConstruct
 	private void init() {
+		if (!isImpExpEnabled()) {
+			return;
+		}
+
 		initializeEventHandlers();
 		preferences.addPreferenceChangeListener(preferenceListener);
 		eventBroker.subscribe(PreferencesExportWizard.EVENT_EXPORT_BEGIN, exportPreferencesBegin);
@@ -101,6 +107,10 @@ public class ImportExportPespectiveHandler {
 
 	@PreDestroy
 	private void dispose() {
+		if (!isImpExpEnabled()) {
+			return;
+		}
+
 		preferences.removePreferenceChangeListener(preferenceListener);
 		eventBroker.unsubscribe(exportPreferencesBegin);
 		eventBroker.unsubscribe(exportPreferencesEnd);
@@ -338,6 +348,18 @@ public class ImportExportPespectiveHandler {
 			}
 		};
 
+	}
+
+	private boolean isImpExpEnabled() {
+		if (impExpEnabled == null) {
+			String propertyStr = System.getProperty("e4.impExpPerspectiveEnabled"); //$NON-NLS-1$
+			if (propertyStr == null) {
+				impExpEnabled = true;
+			} else {
+				impExpEnabled = Boolean.parseBoolean(propertyStr);
+			}
+		}
+		return impExpEnabled;
 	}
 
 }

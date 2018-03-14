@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,7 @@
  *     								 removes a menu from multiple perspectives
  *     René Brandstetter - Bug 411821 - [QuickAccess] Contribute SearchField
  *                                      through a fragment or other means
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 431446, 433979, 440810, 441184, 472654, 486632
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 431446, 433979, 440810, 441184, 472654
  *     Denis Zygann <d.zygann@web.de> - Bug 457390
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
  *******************************************************************************/
@@ -170,6 +170,8 @@ import org.eclipse.ui.internal.e4.compatibility.SelectionService;
 import org.eclipse.ui.internal.handlers.ActionCommandMappingService;
 import org.eclipse.ui.internal.handlers.IActionCommandMappingService;
 import org.eclipse.ui.internal.handlers.LegacyHandlerService;
+import org.eclipse.ui.internal.layout.ITrimManager;
+import org.eclipse.ui.internal.layout.IWindowTrim;
 import org.eclipse.ui.internal.menus.ActionSet;
 import org.eclipse.ui.internal.menus.IActionSetsListener;
 import org.eclipse.ui.internal.menus.LegacyActionPersistence;
@@ -205,10 +207,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	 * The 'elementId' of the spacer used to right-align it in the trim
 	 */
 	public static final String PERSPECTIVE_SPACER_ID = "PerspectiveSpacer"; //$NON-NLS-1$
-
-	public static final String STATUS_LINE_ID = "org.eclipse.ui.StatusLine"; //$NON-NLS-1$
-
-	public static final String TRIM_CONTRIBUTION_URI = "bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.StandardTrim"; //$NON-NLS-1$
 
 	private static final String MAIN_TOOLBAR_ID = ActionSet.MAIN_TOOLBAR;
 	private static final String COMMAND_ID_TOGGLE_COOLBAR = "org.eclipse.ui.ToggleCoolbarAction"; //$NON-NLS-1$
@@ -301,7 +299,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	 *
 	 * @since 3.3
 	 */
-	private ListenerList<IPropertyChangeListener> genericPropertyListeners = new ListenerList<>();
+	private ListenerList genericPropertyListeners = new ListenerList();
 
 	private IAdaptable input;
 
@@ -1116,11 +1114,12 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	private void populateStandardTrim(MTrimBar bottomTrim) {
 		// StatusLine
 		MToolControl slElement = (MToolControl) modelService.find(
-STATUS_LINE_ID, model);
+				"org.eclipse.ui.StatusLine", model); //$NON-NLS-1$
 		if (slElement == null) {
 			slElement = modelService.createModelElement(MToolControl.class);
-			slElement.setElementId(STATUS_LINE_ID);
-			slElement.setContributionURI(TRIM_CONTRIBUTION_URI);
+			slElement.setElementId("org.eclipse.ui.StatusLine"); //$NON-NLS-1$
+			slElement
+					.setContributionURI("bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.StandardTrim"); //$NON-NLS-1$
 			bottomTrim.getChildren().add(slElement);
 		}
 		slElement.setToBeRendered(statusLineVisible);
@@ -1132,7 +1131,8 @@ STATUS_LINE_ID, model);
 		if (hsElement == null) {
 			hsElement = modelService.createModelElement(MToolControl.class);
 			hsElement.setElementId("org.eclipse.ui.HeapStatus"); //$NON-NLS-1$
-			hsElement.setContributionURI(TRIM_CONTRIBUTION_URI);
+			hsElement
+					.setContributionURI("bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.StandardTrim"); //$NON-NLS-1$
 			hsElement.getTags().add(IPresentationEngine.DRAGGABLE);
 			bottomTrim.getChildren().add(hsElement);
 		}
@@ -1145,7 +1145,8 @@ STATUS_LINE_ID, model);
 			pbElement = modelService.createModelElement(MToolControl.class);
 			pbElement.setElementId("org.eclipse.ui.ProgressBar"); //$NON-NLS-1$
 			pbElement.getTags().add(IPresentationEngine.DRAGGABLE);
-			pbElement.setContributionURI(TRIM_CONTRIBUTION_URI);
+			pbElement
+					.setContributionURI("bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.StandardTrim"); //$NON-NLS-1$
 			bottomTrim.getChildren().add(pbElement);
 		}
 		pbElement.setToBeRendered(getWindowConfigurer().getShowProgressIndicator());
@@ -1194,7 +1195,7 @@ STATUS_LINE_ID, model);
 									boolean isBefore = "before".equals(orders[0].getAttribute("position")); //$NON-NLS-1$//$NON-NLS-2$
 									String relTo = orders[0].getAttribute("relativeTo"); //$NON-NLS-1$
 									if ("status".equals(relTo)) //$NON-NLS-1$
-										relTo = STATUS_LINE_ID;
+										relTo = "org.eclipse.ui.StatusLine"; //$NON-NLS-1$
 
 									createdTrim = addTrimElement(bottomTrim, item, id, isBefore,
 											relTo, classSpec);
@@ -1415,7 +1416,7 @@ STATUS_LINE_ID, model);
 			if (globalAction instanceof CommandAction) {
 				final String actionId = globalAction.getId();
 				if (actionId != null) {
-					final IActionCommandMappingService mappingService = serviceLocator
+					final IActionCommandMappingService mappingService = (IActionCommandMappingService) serviceLocator
 							.getService(IActionCommandMappingService.class);
 					mappingService.map(actionId, commandId);
 				}
@@ -1442,7 +1443,7 @@ STATUS_LINE_ID, model);
 	 * </p>
 	 */
 	void submitGlobalActions() {
-		final IHandlerService handlerService = getService(IHandlerService.class);
+		final IHandlerService handlerService = (IHandlerService) getService(IHandlerService.class);
 
 		/*
 		 * Mash the action sets and global actions together, with global actions
@@ -1901,8 +1902,7 @@ STATUS_LINE_ID, model);
 				// We need to do our own cleanup here...
 				int vc = modelService.countRenderableChildren(phParent);
 				if (vc == 0) {
-					if (!isLastEditorStack(phParent))
-						phParent.setToBeRendered(false);
+					phParent.setToBeRendered(false);
 				}
 			}
 		}
@@ -1912,10 +1912,6 @@ STATUS_LINE_ID, model);
 		for (MPart partToRemove : sharedPartsToRemove) {
 			seList.remove(partToRemove);
 		}
-	}
-
-	private boolean isLastEditorStack(MUIElement element) {
-		return modelService.isLastEditorStack(element);
 	}
 
 	/**
@@ -2164,7 +2160,7 @@ STATUS_LINE_ID, model);
 
 				// Disable everything in the bottom trim except the status line
 				if (tpl.bottom != null && !tpl.bottom.isDisposed() && tpl.bottom.isEnabled()) {
-					MUIElement statusLine = modelService.find(STATUS_LINE_ID, model);
+					MUIElement statusLine = modelService.find("org.eclipse.ui.StatusLine", model); //$NON-NLS-1$
 					Object slCtrl = statusLine != null ? statusLine.getWidget() : null;
 					for (Control bottomCtrl : tpl.bottom.getChildren()) {
 						if (bottomCtrl != slCtrl)
@@ -2264,7 +2260,7 @@ STATUS_LINE_ID, model);
 		}
 		EvaluationReference[] refs = menuRestrictions
 				.toArray(new EvaluationReference[menuRestrictions.size()]);
-		IEvaluationService es = serviceLocator
+		IEvaluationService es = (IEvaluationService) serviceLocator
 				.getService(IEvaluationService.class);
 		IEvaluationContext currentState = es.getCurrentState();
 		for (int i = 0; i < refs.length; i++) {
@@ -2424,11 +2420,13 @@ STATUS_LINE_ID, model);
 		// there is a separator for the additions group thus >= 2
 	}
 
-	private ListenerList<IActionSetsListener> actionSetListeners = null;
+	private ListenerList actionSetListeners = null;
 
-	private ListenerList<IBackgroundSaveListener> backgroundSaveListeners = new ListenerList<>(ListenerList.IDENTITY);
+	private ListenerList backgroundSaveListeners = new ListenerList(ListenerList.IDENTITY);
 
 	private SelectionService selectionService;
+
+	private ITrimManager trimManager;
 
 	private ActionPresentation actionPresentation;
 
@@ -2452,7 +2450,7 @@ STATUS_LINE_ID, model);
 
 	final void addActionSetsListener(final IActionSetsListener listener) {
 		if (actionSetListeners == null) {
-			actionSetListeners = new ListenerList<>();
+			actionSetListeners = new ListenerList();
 		}
 
 		actionSetListeners.add(listener);
@@ -2736,6 +2734,60 @@ STATUS_LINE_ID, model);
 		return getWorkbenchImpl().getDefaultPageInput();
 	}
 
+	public ITrimManager getTrimManager() {
+		if (trimManager == null) {
+			// HACK !! Add a 'null' trim manager...this is specifically in place
+			// to prevent an NPE when using Intro's 'Go to Workbench' handling
+			// See Bug 365625 for details...
+			trimManager = new ITrimManager() {
+				@Override
+				public void addTrim(int areaId, IWindowTrim trim) {
+				}
+
+				@Override
+				public void addTrim(int areaId, IWindowTrim trim, IWindowTrim beforeMe) {
+				}
+
+				@Override
+				public void removeTrim(IWindowTrim toRemove) {
+				}
+
+				@Override
+				public IWindowTrim getTrim(String id) {
+					return null;
+				}
+
+				@Override
+				public int[] getAreaIds() {
+					return null;
+				}
+
+				@Override
+				public List getAreaTrim(int areaId) {
+					return null;
+				}
+
+				@Override
+				public void updateAreaTrim(int id, List trim, boolean removeExtra) {
+				}
+
+				@Override
+				public List getAllTrim() {
+					return null;
+				}
+
+				@Override
+				public void setTrimVisible(IWindowTrim trim, boolean visible) {
+				}
+
+				@Override
+				public void forceLayout() {
+				}
+			};
+		}
+		return trimManager;
+	}
+
 	/**
 	 * Initializes all of the default command-based services for the workbench
 	 * window.
@@ -2777,12 +2829,12 @@ STATUS_LINE_ID, model);
 	}
 
 	@Override
-	public final <T> T getService(final Class<T> key) {
+	public final Object getService(final Class key) {
 		return serviceLocator.getService(key);
 	}
 
 	@Override
-	public final boolean hasService(final Class<?> key) {
+	public final boolean hasService(final Class key) {
 		return serviceLocator.hasService(key);
 	}
 
@@ -2805,7 +2857,7 @@ STATUS_LINE_ID, model);
 		if (getWindowConfigurer().getShowPerspectiveBar()) {
 			setPerspectiveBarVisible(!perspectivebarVisible);
 		}
-		ICommandService commandService = getService(ICommandService.class);
+		ICommandService commandService = (ICommandService) getService(ICommandService.class);
 		Map<String, WorkbenchWindow> filter = new HashMap<>();
 		filter.put(IServiceScopes.WINDOW_SCOPE, this);
 		commandService.refreshElements(COMMAND_ID_TOGGLE_COOLBAR, filter);

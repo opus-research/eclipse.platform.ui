@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -105,16 +105,19 @@ abstract class DragAgent {
 	}
 
 	public void track(DnDInfo info) {
-		DropAgent newDropAgent = dndManager.getDropAgent(dragElement, info);
-		if (newDropAgent == dropAgent) {
-			if (dropAgent != null) {
-				dropAgent.track(dragElement, info);
-			}
-		} else {
-			if (dropAgent != null) {
-				dropAgent.dragLeave(dragElement, info);
-			}
-			dropAgent = newDropAgent;
+		DropAgent curAgent = dropAgent;
+
+		// Re-use the same dropAgent until it returns 'false' from track
+		if (dropAgent != null)
+			dropAgent = dropAgent.track(dragElement, info) ? dropAgent : null;
+
+		// If we don't have a drop agent currently try to get one
+		if (dropAgent == null) {
+			if (curAgent != null)
+				curAgent.dragLeave(dragElement, info);
+
+			dropAgent = dndManager.getDropAgent(dragElement, info);
+
 			if (dropAgent != null)
 				dropAgent.dragEnter(dragElement, info);
 			else {
