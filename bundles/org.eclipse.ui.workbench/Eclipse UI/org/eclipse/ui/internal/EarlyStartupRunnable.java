@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445484, 457132, 458261
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445484, 457132
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -43,7 +43,9 @@ public class EarlyStartupRunnable extends SafeRunnable {
 	public void run() throws Exception {
 		IConfigurationElement[] configElements = extension.getConfigurationElements();
 		if (configElements.length == 0) {
-			handleException(null);
+			missingStartupElementMessage("The org.eclipse.ui.IStartup extension from '" + //$NON-NLS-1$
+						extension.getNamespaceIdentifier() + "' does not provide a valid '" //$NON-NLS-1$
+					+ IWorkbenchConstants.TAG_STARTUP + "' element."); //$NON-NLS-1$
 		}
         // look for the startup tag in each element and run the extension
         for (IConfigurationElement element : configElements) {
@@ -53,11 +55,15 @@ public class EarlyStartupRunnable extends SafeRunnable {
         }
     }
 
+	private void missingStartupElementMessage(String message) {
+		IStatus status = new Status(IStatus.ERROR, extension.getNamespaceIdentifier(), 0, message, null);
+		WorkbenchPlugin.log(status);
+	}
+
     @Override
 	public void handleException(Throwable exception) {
 		IStatus status = new Status(IStatus.ERROR, extension.getNamespaceIdentifier(), 0,
-				"Unable to execute early startup code for the org.eclipse.ui.IStartup extension contributed by the '" //$NON-NLS-1$
-						+ extension.getNamespaceIdentifier() + "' plug-in.", //$NON-NLS-1$
+                "Unable to execute early startup code for an extension", //$NON-NLS-1$
                 exception);
 		WorkbenchPlugin.log(status);
     }
