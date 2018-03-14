@@ -51,8 +51,6 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.ShellAdapter;
-import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -159,8 +157,7 @@ public class SearchField {
 			protected void doClose() {
 				text.setText(""); //$NON-NLS-1$
 				resetProviders();
-				dialogHeight = shell.getSize().y;
-				dialogWidth = shell.getSize().x;
+				storeShellSize();
 				shell.setVisible(false);
 				removeAccessibleListener();
 			}
@@ -201,13 +198,6 @@ public class SearchField {
 		shell = new Shell(parent.getShell(), SWT.RESIZE | SWT.ON_TOP);
 		shell.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		shell.setText(QuickAccessMessages.QuickAccess_EnterSearch); // just for debugging, not shown anywhere
-		shell.addShellListener(new ShellAdapter() {
-			@Override
-			public void shellClosed(ShellEvent e) {
-				quickAccessContents.doClose();
-				e.doit = false;
-			}
-		});
 		GridLayoutFactory.fillDefaults().applyTo(shell);
 		table = quickAccessContents.createTable(shell, Window.getDefaultOrientation());
 		text.addFocusListener(new FocusListener() {
@@ -577,8 +567,18 @@ public class SearchField {
 		dialogSettings.put(ORDERED_PROVIDERS, orderedProviders);
 		dialogSettings.put(TEXT_ENTRIES, textEntries);
 		dialogSettings.put(TEXT_ARRAY, textArray);
-		dialogSettings.put(DIALOG_HEIGHT, shell.getSize().y);
-		dialogSettings.put(DIALOG_WIDTH, shell.getSize().x);
+		// shell size stored when shell is closed
+	}
+
+	private void storeShellSize() {
+		if (!shell.isDisposed()) {
+			Point size = shell.getSize();
+			dialogHeight = size.y;
+			dialogWidth = size.x;
+			IDialogSettings dialogSettings = getDialogSettings();
+			dialogSettings.put(DIALOG_HEIGHT, size.y);
+			dialogSettings.put(DIALOG_WIDTH, size.x);
+		}
 	}
 
 	private IDialogSettings getDialogSettings() {
