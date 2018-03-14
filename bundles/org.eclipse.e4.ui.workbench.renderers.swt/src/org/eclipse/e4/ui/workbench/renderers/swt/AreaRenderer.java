@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,8 +34,6 @@ import org.osgi.service.event.EventHandler;
  * Create a contribute part.
  */
 public class AreaRenderer extends SWTPartRenderer {
-
-	private static final String MAXIMIZEABLE_CHILDREN_TAG = "MaximizeableChildren"; //$NON-NLS-1$
 
 	@Inject
 	private IEventBroker eventBroker;
@@ -151,10 +149,8 @@ public class AreaRenderer extends SWTPartRenderer {
 			ctf.setMinimized(curCTF.getMinimized());
 			ctf.setMaximized(curCTF.getMaximized());
 
-			if (!areaModel.getTags().contains(MAXIMIZEABLE_CHILDREN_TAG)) {
-				curCTF.setMinimizeVisible(false);
-				curCTF.setMaximizeVisible(false);
-			}
+			curCTF.setMinimizeVisible(false);
+			curCTF.setMaximizeVisible(false);
 		}
 
 		CTabItem cti = new CTabItem(ctf, SWT.NONE);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *  	Sebastian Davids <sdavids@gmx.de> - Fix for bug 19346 - Dialog
  * 		font should be activated and used by other components.
  *      Robin Stocker <robin@nibor.org> - Add filter text field
+ *      Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.ui.internal.about;
 
@@ -85,12 +86,12 @@ public class AboutPluginsPage extends ProductInfoPage {
 		/**
 		 * Queue containing bundle signing info to be resolved.
 		 */
-		private LinkedList<AboutBundleData> resolveQueue = new LinkedList<AboutBundleData>();
+		private LinkedList<AboutBundleData> resolveQueue = new LinkedList<>();
 
 		/**
 		 * Queue containing bundle data that's been resolve and needs updating.
 		 */
-		private List<AboutBundleData> updateQueue = new ArrayList<AboutBundleData>();
+		private List<AboutBundleData> updateQueue = new ArrayList<>();
 
 		/*
 		 * this job will attempt to discover the signing state of a given bundle
@@ -148,13 +149,6 @@ public class AboutPluginsPage extends ProductInfoPage {
 				setPriority(Job.DECORATE);
 			}
 
-			/*
-			 * (non-Javadoc)
-			 *
-			 * @see
-			 * org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.
-			 * runtime.IProgressMonitor)
-			 */
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				while (true) {
@@ -178,13 +172,6 @@ public class AboutPluginsPage extends ProductInfoPage {
 			}
 		};
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see
-		 * org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java
-		 * .lang.Object, int)
-		 */
 		@Override
 		public Image getColumnImage(Object element, int columnIndex) {
 			if (columnIndex == 0) {
@@ -208,13 +195,6 @@ public class AboutPluginsPage extends ProductInfoPage {
 			return null;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see
-		 * org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.
-		 * lang.Object, int)
-		 */
 		@Override
 		public String getColumnText(Object element, int columnIndex) {
 			if (element instanceof AboutBundleData) {
@@ -334,7 +314,7 @@ public class AboutPluginsPage extends ProductInfoPage {
 
 		// create a data object for each bundle, remove duplicates, and include
 		// only resolved bundles (bug 65548)
-		Map<String, AboutBundleData> map = new HashMap<String, AboutBundleData>();
+		Map<String, AboutBundleData> map = new HashMap<>();
 		for (int i = 0; i < bundles.length; ++i) {
 			AboutBundleData data = new AboutBundleData(bundles[i]);
 			if (BundleUtility.isReady(data.getState())
@@ -510,11 +490,6 @@ public class AboutPluginsPage extends ProductInfoPage {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.internal.about.ProductInfoPage#getId()
-	 */
 	@Override
 	String getId() {
 		return ID;
@@ -621,13 +596,6 @@ class TableComparator extends ViewerComparator {
 	private boolean ascending = true;
 	private boolean lastAscending = true;
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.eclipse.jface.viewers.ViewerComparator#compare(org.eclipse.jface.
-	 * viewers.Viewer, java.lang.Object, java.lang.Object)
-	 */
 	@Override
 	public int compare(Viewer viewer, Object e1, Object e2) {
 		if (sortColumn == 0 && e1 instanceof AboutBundleData

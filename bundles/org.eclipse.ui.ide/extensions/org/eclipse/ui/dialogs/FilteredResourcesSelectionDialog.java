@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     James Blackburn (Broadcom Corp.) Bug 86973 Allow path pattern matching
  *     Anton Leherbauer (Wind River Systems, Inc.) - Bug 415099 Terminating with "<" or " " (space) does not work for extensions
+ *     Mickael Istria (Red Hat Inc.) - Bug 460749: filter resources with same location
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -17,7 +18,9 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
@@ -37,8 +40,6 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.text.ITextSelection;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -89,6 +90,7 @@ public class FilteredResourcesSelectionDialog extends
 	private static final String WORKINGS_SET_SETTINGS = "WorkingSet"; //$NON-NLS-1$
 
 	private static final String SHOW_DERIVED = "ShowDerived"; //$NON-NLS-1$
+	private static final String FILTER_BY_LOCATION = "FilterByLocation"; //$NON-NLS-1$
 
 	private ShowDerivedResourcesAction showDerivedResourcesAction;
 
@@ -99,6 +101,9 @@ public class FilteredResourcesSelectionDialog extends
 	private WorkingSetFilterActionGroup workingSetFilterActionGroup;
 
 	private CustomWorkingSetFilter workingSetFilter = new CustomWorkingSetFilter();
+
+	private FilterResourcesByLocation filterResourceByLocation = new FilterResourcesByLocation();
+	private GroupResourcesByLocationAction groupResourcesByLocationAction;
 
 	private String title;
 
@@ -228,6 +233,7 @@ public class FilteredResourcesSelectionDialog extends
 		super.storeDialog(settings);
 
 		settings.put(SHOW_DERIVED, showDerivedResourcesAction.isChecked());
+		settings.put(FILTER_BY_LOCATION, this.groupResourcesByLocationAction.isChecked());
 
 		XMLMemento memento = XMLMemento.createWriteRoot("workingSet"); //$NON-NLS-1$
 		workingSetFilterActionGroup.saveState(memento);
@@ -251,6 +257,11 @@ public class FilteredResourcesSelectionDialog extends
 		boolean showDerived = settings.getBoolean(SHOW_DERIVED);
 		showDerivedResourcesAction.setChecked(showDerived);
 		this.isDerived = showDerived;
+
+		boolean groupByLoation = settings.getBoolean(FILTER_BY_LOCATION);
+		this.groupResourcesByLocationAction.setChecked(groupByLoation);
+		this.filterResourceByLocation.setEnabled(groupByLoation);
+		addListFilter(this.filterResourceByLocation);
 
 		String setting = settings.get(WORKINGS_SET_SETTINGS);
 		if (setting != null) {
@@ -277,46 +288,45 @@ public class FilteredResourcesSelectionDialog extends
 
 		showDerivedResourcesAction = new ShowDerivedResourcesAction();
 		menuManager.add(showDerivedResourcesAction);
+		this.groupResourcesByLocationAction = new GroupResourcesByLocationAction();
+		menuManager.add(this.groupResourcesByLocationAction);
 
 		workingSetFilterActionGroup = new WorkingSetFilterActionGroup(
-				getShell(), new IPropertyChangeListener() {
-					@Override
-					public void propertyChange(PropertyChangeEvent event) {
-						String property = event.getProperty();
+				getShell(), event -> {
+					String property = event.getProperty();
 
-						if (WorkingSetFilterActionGroup.CHANGE_WORKING_SET
-								.equals(property)) {
+					if (WorkingSetFilterActionGroup.CHANGE_WORKING_SET
+							.equals(property)) {
 
-							IWorkingSet workingSet = (IWorkingSet) event
-									.getNewValue();
+						IWorkingSet workingSet = (IWorkingSet) event
+								.getNewValue();
 
-							if (workingSet != null
-									&& !(workingSet.isAggregateWorkingSet() && workingSet
-											.isEmpty())) {
-								workingSetFilter.setWorkingSet(workingSet);
-								setSubtitle(workingSet.getLabel());
-							} else {
-								IWorkbenchWindow window = PlatformUI
-										.getWorkbench()
-										.getActiveWorkbenchWindow();
+						if (workingSet != null
+								&& !(workingSet.isAggregateWorkingSet() && workingSet
+										.isEmpty())) {
+							workingSetFilter.setWorkingSet(workingSet);
+							setSubtitle(workingSet.getLabel());
+						} else {
+							IWorkbenchWindow window = PlatformUI
+									.getWorkbench()
+									.getActiveWorkbenchWindow();
 
-								if (window != null) {
-									IWorkbenchPage page = window
-											.getActivePage();
-									workingSet = page.getAggregateWorkingSet();
+							if (window != null) {
+								IWorkbenchPage page = window
+										.getActivePage();
+								workingSet = page.getAggregateWorkingSet();
 
-									if (workingSet.isAggregateWorkingSet()
-											&& workingSet.isEmpty()) {
-										workingSet = null;
-									}
+								if (workingSet.isAggregateWorkingSet()
+										&& workingSet.isEmpty()) {
+									workingSet = null;
 								}
-
-								workingSetFilter.setWorkingSet(workingSet);
-								setSubtitle(null);
 							}
 
-							scheduleRefresh();
+							workingSetFilter.setWorkingSet(workingSet);
+							setSubtitle(null);
 						}
+
+						scheduleRefresh();
 					}
 				});
 
@@ -398,58 +408,54 @@ public class FilteredResourcesSelectionDialog extends
 
 	@Override
 	protected Comparator getItemsComparator() {
-		return new Comparator() {
+		return (o1, o2) -> {
+			Collator collator = Collator.getInstance();
+			IResource resource1 = (IResource) o1;
+			IResource resource2 = (IResource) o2;
+			String s1 = resource1.getName();
+			String s2 = resource2.getName();
 
-			@Override
-			public int compare(Object o1, Object o2) {
-				Collator collator = Collator.getInstance();
-				IResource resource1 = (IResource) o1;
-				IResource resource2 = (IResource) o2;
-				String s1 = resource1.getName();
-				String s2 = resource2.getName();
+			// Compare names without extension first
+			int s1Dot = s1.lastIndexOf('.');
+			int s2Dot = s2.lastIndexOf('.');
+			String n1 = s1Dot == -1 ? s1 : s1.substring(0, s1Dot);
+			String n2 = s2Dot == -1 ? s2 : s2.substring(0, s2Dot);
+			int comparability = collator.compare(n1, n2);
+			if (comparability != 0)
+				return comparability;
 
-				// Compare names without extension first
-				int s1Dot = s1.lastIndexOf('.');
-				int s2Dot = s2.lastIndexOf('.');
-				String n1 = s1Dot == -1 ? s1 : s1.substring(0, s1Dot);
-				String n2 = s2Dot == -1 ? s2 : s2.substring(0, s2Dot);
-				int comparability = collator.compare(n1, n2);
+			// Compare full names
+			if (s1Dot != -1 || s2Dot != -1) {
+				comparability = collator.compare(s1, s2);
 				if (comparability != 0)
 					return comparability;
-
-				// Compare full names
-				if (s1Dot != -1 || s2Dot != -1) {
-					comparability = collator.compare(s1, s2);
-					if (comparability != 0)
-						return comparability;
-				}
-
-				// Search for resource relative paths
-				if (searchContainer != null) {
-					IContainer c1 = resource1.getParent();
-					IContainer c2 = resource2.getParent();
-
-					// Return paths 'closer' to the searchContainer first
-					comparability = pathDistance(c1) - pathDistance(c2);
-					if (comparability != 0)
-						return comparability;
-				}
-
-				// Finally compare full path segments
-				IPath p1 = resource1.getFullPath();
-				IPath p2 = resource2.getFullPath();
-				// Don't compare file names again, so subtract 1
-				int c1 = p1.segmentCount() - 1;
-				int c2 = p2.segmentCount() - 1;
-				for (int i= 0; i < c1 && i < c2; i++) {
-					comparability = collator.compare(p1.segment(i), p2.segment(i));
-					if (comparability != 0)
-						return comparability;
-				}
-				comparability = c1 - c2;
-
-				return comparability;
 			}
+
+			// Search for resource relative paths
+			if (searchContainer != null) {
+				IContainer c11 = resource1.getParent();
+				IContainer c21 = resource2.getParent();
+
+				// Return paths 'closer' to the searchContainer first
+				comparability = pathDistance(c11) - pathDistance(c21);
+				if (comparability != 0)
+					return comparability;
+			}
+
+			// Finally compare full path segments
+			IPath p1 = resource1.getFullPath();
+			IPath p2 = resource2.getFullPath();
+			// Don't compare file names again, so subtract 1
+			int c12 = p1.segmentCount() - 1;
+			int c22 = p2.segmentCount() - 1;
+			for (int i= 0; i < c12 && i < c22; i++) {
+				comparability = collator.compare(p1.segment(i), p2.segment(i));
+				if (comparability != 0)
+					return comparability;
+			}
+			comparability = c12 - c22;
+
+			return comparability;
 		};
 	}
 
@@ -541,6 +547,27 @@ public class FilteredResourcesSelectionDialog extends
 		@Override
 		public void run() {
 			FilteredResourcesSelectionDialog.this.isDerived = isChecked();
+			applyFilter();
+		}
+	}
+
+	/**
+	 * Sets the groupByLocation flag on the FilterResourceByLocation instance
+	 */
+	private class GroupResourcesByLocationAction extends Action {
+
+		/**
+		 * Creates a new instance of the action.
+		 */
+		public GroupResourcesByLocationAction() {
+			super(IDEWorkbenchMessages.FilteredResourcesSelectionDialog_groupResourcesWithSameUndelyingLocation,
+					IAction.AS_CHECK_BOX);
+		}
+
+		@Override
+		public void run() {
+			FilteredResourcesSelectionDialog.this.filterResourceByLocation.setEnabled(isChecked());
+			scheduleRefresh();
 			applyFilter();
 		}
 	}
@@ -1012,6 +1039,41 @@ public class FilteredResourcesSelectionDialog extends
 		 */
 		public boolean isShowDerived() {
 			return showDerived;
+		}
+
+	}
+
+	private class FilterResourcesByLocation extends ViewerFilter {
+
+		private boolean enabled;
+
+		public void setEnabled(boolean enabled) {
+			this.enabled = enabled;
+		}
+
+		@Override
+		public Object[] filter(Viewer viewer, Object parent, Object[] elements) {
+			if (!this.enabled) {
+				return elements;
+			}
+			Map<IPath, IResource> bestResourceForPath = new LinkedHashMap<>();
+			for (Object item : elements) {
+				if (item instanceof IResource) {
+					IResource currentResource = (IResource) item;
+					IResource otherResource = bestResourceForPath.get(currentResource.getLocation());
+					if (otherResource == null || otherResource.getFullPath().segmentCount() > currentResource
+							.getFullPath().segmentCount()) {
+						bestResourceForPath.put(currentResource.getLocation(), currentResource);
+					}
+				}
+			}
+			return bestResourceForPath.values().toArray(new IResource[bestResourceForPath.size()]);
+		}
+
+		@Override
+		public boolean select(Viewer viewer, Object parentElement, Object element) {
+			// shouldn't be called, but err on the side of caution
+			return true;
 		}
 
 	}

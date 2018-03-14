@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 462056
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 457939
+ *     Alexander Baranov <achilles-86@mail.ru> - Bug 458460
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench.swt;
 
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -104,6 +106,10 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 	private static final String defaultFactoryUrl = "bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/"
 			+ "org.eclipse.e4.ui.workbench.renderers.swt.WorkbenchRendererFactory";
+
+	public static final String ENABLED_THEME_KEY = "themeEnabled";
+
+	private static boolean enableThemePreference;
 	private String factoryUrl;
 
 	IRendererFactory curFactory = null;
@@ -472,6 +478,9 @@ public class PartRenderingEngine implements IPresentationEngine {
 		curFactory = factory;
 		context.set(IRendererFactory.class, curFactory);
 
+		IEclipsePreferences node = InstanceScope.INSTANCE.getNode("org.eclipse.e4.ui.workbench.renderers.swt");
+		enableThemePreference = node.getBoolean(ENABLED_THEME_KEY, true);
+
 		cssThemeChangedHandler = new StylingPreferencesHandler(context.get(Display.class));
 	}
 
@@ -744,13 +753,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 		return safeCreateGui(element, parent, parentContext);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.eclipse.e4.ui.workbench.IPresentationEngine#focusGui(org.eclipse.
-	 * e4.ui.model.application.ui.MUIElement)
-	 */
 	@Override
 	public void focusGui(MUIElement element) {
 		AbstractPartRenderer renderer = (AbstractPartRenderer) element
@@ -860,7 +862,8 @@ public class PartRenderingEngine implements IPresentationEngine {
 				MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) element;
 				MUIElement selectedElement = container.getSelectedElement();
 				List<MUIElement> children = container.getChildren();
-				for (MUIElement child : children) {
+				// Bug 458460: Operate on a copy in case child nulls out parent
+				for (MUIElement child : new ArrayList<MUIElement>(children)) {
 					// remove stuff in the "back" first
 					if (child != selectedElement) {
 						removeGui(child);
@@ -1223,7 +1226,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 			IEclipseContext appContext) {
 		String cssTheme = (String) appContext.get(E4Application.THEME_ID);
 		String cssURI = (String) appContext.get(IWorkbench.CSS_URI_ARG);
-		if ("none".equals(cssTheme)) {
+		if ("none".equals(cssTheme) || (!enableThemePreference)) {
 			appContext.set(IStylingEngine.SERVICE_NAME, new IStylingEngine() {
 				@Override
 				public void setClassname(Object widget, String classname) {

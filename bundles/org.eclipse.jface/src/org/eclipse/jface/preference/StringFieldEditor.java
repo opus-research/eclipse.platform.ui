@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,8 +13,6 @@ package org.eclipse.jface.preference;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.KeyAdapter;
@@ -363,12 +361,7 @@ public class StringFieldEditor extends FieldEditor {
             default:
                 Assert.isTrue(false, "Unknown validate strategy");//$NON-NLS-1$
             }
-            textField.addDisposeListener(new DisposeListener() {
-                @Override
-				public void widgetDisposed(DisposeEvent event) {
-                    textField = null;
-                }
-            });
+            textField.addDisposeListener(event -> textField = null);
             if (textLimit > 0) {//Only set limits above 0 - see SWT spec
                 textField.setTextLimit(textLimit);
             }
