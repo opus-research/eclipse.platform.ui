@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 411578
  *******************************************************************************/
 package org.eclipse.ui.ide;
 
@@ -187,6 +188,14 @@ public final class IDE {
 	 * @noimplement This interface is not intended to be implemented by clients.
 	 */
 	public interface Preferences {
+
+		/**
+		 * Specifies whether the "Recent Workspaces"- composite should be
+		 * expanded
+		 *
+		 * @since 3.12
+		 */
+		public static final String OPEN_RECENT_WORKSPACES_COMPOSITE = "OPEN_RECENT_WORKSPACES_COMPOSITE"; //$NON-NLS-1$
 
 		/**
 		 * A named preference for how a new perspective should be opened when a
