@@ -18,7 +18,22 @@
   </parent>
   <groupId>org.eclipse.ui</groupId>
   <artifactId>org.eclipse.ui.tests.navigator</artifactId>
-  <version>3.4.200-SNAPSHOT</version>
+  <version>3.4.300-SNAPSHOT</version>
   <packaging>eclipse-test-plugin</packaging>
+  
+   <build>
+    <plugins>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-compiler-plugin</artifactId>
+        <version>${tycho.version}</version>
+        <configuration>
+          <compilerArgs>
+            <arg>-warn:-raw,unchecked</arg>
+          </compilerArgs>
+        </configuration>
+      </plugin>
+    </plugins>
+ </build>
 
 </project>
