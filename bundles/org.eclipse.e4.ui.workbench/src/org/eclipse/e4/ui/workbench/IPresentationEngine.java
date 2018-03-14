@@ -8,6 +8,7 @@
  * Contributors:
  *     Tom Schindl<tom.schindl@bestsolution.at> - initial API and implementation
  *     IBM - ongoing development
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 450187
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench;
@@ -216,15 +217,33 @@ public interface IPresentationEngine {
 	public static final String ACTIVE = "active"; //$NON-NLS-1$
 
 	/**
+	 * This tag can be applied to an element (usually an MPart) to indicate that the element should
+	 * be handled as view.
+	 *
+	 * @since 1.3
+	 *
+	 */
+	public static final String VIEW_TAG = "View"; //$NON-NLS-1$
+
+	/**
+	 * This tag can be applied to an element (usually an MPart) to indicate that the element should
+	 * be handled as editor.
+	 *
+	 * @since 1.3
+	 *
+	 */
+	public static final String EDITOR_TAG = "Editor"; //$NON-NLS-1$
+
+	/**
 	 * Creates and returns the UI element for the given model element.
-	 * 
+	 *
 	 * @param element
 	 *            the model element
 	 * @param parentWidget
 	 *            the parent
 	 * @param parentContext
 	 *            the context within which this element is being rendered
-	 * 
+	 *
 	 * @return the created UI element
 	 */
 	public Object createGui(MUIElement element, Object parentWidget, IEclipseContext parentContext);
