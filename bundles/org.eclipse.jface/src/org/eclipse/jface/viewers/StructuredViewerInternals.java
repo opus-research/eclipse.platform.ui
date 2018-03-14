@@ -79,7 +79,7 @@ public class StructuredViewerInternals {
 	 * @return the Widgets corresponding to the element
 	 *
 	 * @noreference This method is not intended to be referenced by clients.
-	 * @since 3.12
+	 * @since 3.11
 	 */
 	protected static <E,I> Widget[] getItems(StructuredViewer<E,I> viewer, E element) {
 		return viewer.findItems(element);

@@ -346,7 +346,7 @@ import java.util.NoSuchElementException;
                 if (index > lastSlot) {
 					lastSlot = index;
 				}
-                entry = new HashMapEntry<>(key, value);
+                entry = new HashMapEntry<K,V>(key, value);
                 entry.next = elementData[index];
                 elementData[index] = entry;
                 return null;

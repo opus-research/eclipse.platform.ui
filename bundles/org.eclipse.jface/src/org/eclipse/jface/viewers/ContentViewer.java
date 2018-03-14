@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Hendrik Still <hendrik.still@gammas.de> - bug 412273
  *     Steven Spungin <steven@spungin.tv> - Bug 401439
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 475844, 402445
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -26,28 +25,32 @@ import org.eclipse.swt.widgets.Control;
  * A content viewer is a model-based adapter on a widget which accesses its
  * model by means of a content provider and a label provider.
  * <p>
- * A viewer's model consists of elements, represented by objects. A viewer
- * defines and implements generic infrastructure for handling model input,
- * updates, and selections in terms of elements. Input is obtained by querying
- * an <code>IContentProvider</code> which returns elements. The elements
- * themselves are not displayed directly. They are mapped to labels, containing
- * text and/or an image, using the viewer's <code>ILabelProvider</code>.
+ * A viewer's model consists of elements, represented by objects.
+ * A viewer defines and implements generic infrastructure for handling model
+ * input, updates, and selections in terms of elements.
+ * Input is obtained by querying an <code>IContentProvider</code> which returns
+ * elements. The elements themselves are not displayed directly.  They are
+ * mapped to labels, containing text and/or an image, using the viewer's
+ * <code>ILabelProvider</code>.
  * </p>
  * <p>
- * Implementing a concrete content viewer typically involves the following
- * steps:
+ * Implementing a concrete content viewer typically involves the following steps:
  * <ul>
- * <li>create SWT controls for viewer (in constructor) (optional)</li>
- * <li>initialize SWT controls from input (inputChanged)</li>
- * <li>define viewer-specific update methods</li>
- * <li>support selections (<code>setSelection</code>, <code>getSelection</code>)
+ * <li>
+ * create SWT controls for viewer (in constructor) (optional)
+ * </li>
+ * <li>
+ * initialize SWT controls from input (inputChanged)
+ * </li>
+ * <li>
+ * define viewer-specific update methods
+ * </li>
+ * <li>
+ * support selections (<code>setSelection</code>, <code>getSelection</code>)
  * </ul>
  * </p>
- *
- * @param <E>
- *            Type of an element of the model
- * @param <I>
- *            Type of the input
+ * @param <E> Type of an element of the model
+ * @param <I> Type of the input
  */
 public abstract class ContentViewer<E,I> extends Viewer<I>{
 
@@ -76,9 +79,9 @@ public abstract class ContentViewer<E,I> extends Viewer<I>{
      */
     private final ILabelProviderListener<E> labelProviderListener = new ILabelProviderListener<E>() {
     	private boolean logWhenDisposed = true; // initially true, set to false
-
+        
 		@Override
-		public void labelProviderChanged(LabelProviderChangedEvent<E> event) {
+        public void labelProviderChanged(LabelProviderChangedEvent<E> event) {
         	Control control = getControl();
         	if (control == null || control.isDisposed()) {
     			if (logWhenDisposed) {
@@ -90,7 +93,9 @@ public abstract class ContentViewer<E,I> extends Viewer<I>{
     					message += " This is only logged once per viewer instance," + //$NON-NLS-1$
     							" but similar calls will still be ignored."; //$NON-NLS-1$
     				}
-					Policy.getLog().log(new Status(IStatus.WARNING, Policy.JFACE, message, new RuntimeException()));
+    				Policy.getLog().log(
+    						new Status(IStatus.WARNING, Policy.JFACE, message,
+    								new RuntimeException()));
     			}
         		return;
         	}
@@ -129,7 +134,7 @@ public abstract class ContentViewer<E,I> extends Viewer<I>{
      * if none. The viewer's input provides the "model" for the viewer's
      * content.
      */
-	@Override
+    @Override
 	public I getInput() {
         return input;
     }
@@ -150,7 +155,7 @@ public abstract class ContentViewer<E,I> extends Viewer<I>{
      */
     public IBaseLabelProvider<E> getLabelProvider() {
         if (labelProvider == null) {
-			labelProvider = new LabelProvider<>();
+			labelProvider = new LabelProvider<E>();
 		}
         return labelProvider;
     }
@@ -220,7 +225,7 @@ public abstract class ContentViewer<E,I> extends Viewer<I>{
         control.addDisposeListener(new DisposeListener() {
 			@Override
 			public void widgetDisposed(DisposeEvent event) {
-				handleDispose(event);
+                handleDispose(event);
             }
         });
     }
@@ -278,8 +283,9 @@ public abstract class ContentViewer<E,I> extends Viewer<I>{
 					"Need an underlying widget to be able to set the input." + //$NON-NLS-1$
 							"(Has the widget been disposed?)"); //$NON-NLS-1$
 		}
-		Assert.isTrue(getContentProvider() != null,
-				"Instances of ContentViewer must have a content provider assigned before the setInput method is called."); //$NON-NLS-1$
+        Assert
+                .isTrue(getContentProvider() != null,
+                        "ContentViewer must have a content provider when input is set."); //$NON-NLS-1$
 
         I oldInput = getInput();
         contentProvider.inputChanged(this, oldInput, input);

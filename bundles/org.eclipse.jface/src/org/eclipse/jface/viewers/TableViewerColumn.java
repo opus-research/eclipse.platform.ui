@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 Tom Schindl and others.
+ * Copyright (c) 2006 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     Tom Schindl - initial API and implementation
  *     Boris Bokowski (IBM Corporation) - Javadoc improvements
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 402445
  ******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -19,7 +18,7 @@ import org.eclipse.swt.widgets.TableColumn;
 /**
  * ViewerColumn implementation for TableViewer to enable column-specific label
  * providers and editing support.
- *
+ * 
  * @param <E>
  *            Type of an element of the model
  * @param <I>
@@ -28,7 +27,6 @@ import org.eclipse.swt.widgets.TableColumn;
  * @since 3.3
  */
 public final class TableViewerColumn<E,I> extends ViewerColumn<E,I> {
-
 	private TableColumn column;
 
 	/**

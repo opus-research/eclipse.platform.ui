@@ -18,15 +18,15 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 
 /**
- * A decorating label provider is a label provider which combines a nested label
- * provider and an optional decorator. The decorator decorates the label text,
- * image, font and colors provided by the nested label provider.
- *
- * @param <E>
- *            Type of an element of the model
+ * A decorating label provider is a label provider which combines
+ * a nested label provider and an optional decorator.
+ * The decorator decorates the label text, image, font and colors provided by
+ * the nested label provider.
+ * 
+ * @param <E> Type of an element of the model
  */
-public class DecoratingLabelProvider<E> extends LabelProvider<E>
-		implements IViewerLabelProvider<E>, IColorProvider<E>, IFontProvider<E>, ITreePathLabelProvider<E> {
+public class DecoratingLabelProvider<E> extends LabelProvider<E> implements
+        IViewerLabelProvider<E>, IColorProvider<E>, IFontProvider<E>, ITreePathLabelProvider<E> {
 
     private ILabelProvider<E> provider;
 
@@ -214,7 +214,7 @@ public class DecoratingLabelProvider<E> extends LabelProvider<E>
                             .addListener(labelProviderListener);
                 }
             }
-            fireLabelProviderChanged(new LabelProviderChangedEvent<>(this));
+            fireLabelProviderChanged(new LabelProviderChangedEvent<E>(this));
         }
     }
 

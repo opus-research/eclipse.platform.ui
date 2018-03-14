@@ -9,9 +9,11 @@
  *     IBM Corporation - initial API and implementation
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation; bug 153993
  *												   fix in bug 163317, 151295, 167323, 167858, 184346, 187826, 201905
+<<<<<<< localmast
  *     Stefan Winkler <stefan@winklerweb.net> - Bug 242231
+=======
  *     Hendrik Still <hendrik.still@gammas.de> - bug 413973
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 402445
+>>>>>>> 92419b3 Bug 402445 - [Viewers] Add generics to the JFace Viewer framework
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -57,7 +59,7 @@ public abstract class ColumnViewer<E,I> extends StructuredViewer<E,I> {
 	/**
 	 * The cell is a cached viewer cell used for refreshing.
 	 */
-	private ViewerCell<E> cell = new ViewerCell<>(null, 0, null);
+	private ViewerCell<E> cell = new ViewerCell<E>(null, 0, null);
 
 	private ColumnViewerEditor<E,I> viewerEditor;
 
@@ -66,6 +68,15 @@ public abstract class ColumnViewer<E,I> extends StructuredViewer<E,I> {
 
 	private MouseListener mouseListener;
 
+	// after logging for the first
+	// time
+
+	/**
+	 * Create a new instance of the receiver.
+	 */
+	public ColumnViewer() {
+
+	}
 
 	@Override
 	protected void hookControl(Control control) {
@@ -83,7 +94,8 @@ public abstract class ColumnViewer<E,I> extends StructuredViewer<E,I> {
 	protected void hookEditingSupport(Control control) {
 		// Needed for backwards comp with AbstractTreeViewer and TableTreeViewer
 		// who are not hooked this way others may already overwrite and provide
-		// their own impl
+		// their
+		// own impl
 		if (viewerEditor != null) {
 			mouseListener = new MouseAdapter() {
 				@Override
@@ -187,11 +199,13 @@ public abstract class ColumnViewer<E,I> extends StructuredViewer<E,I> {
 			return null;
 		}
 		@SuppressWarnings("unchecked")
-		ViewerColumn<E, I> viewer = (ViewerColumn<E, I>) columnOwner.getData(ViewerColumn.COLUMN_VIEWER_KEY);
+		ViewerColumn<E, I> viewer = (ViewerColumn<E, I>) columnOwner
+				.getData(ViewerColumn.COLUMN_VIEWER_KEY);
 
 		if (viewer == null) {
 			viewer = createViewerColumn(columnOwner,
-					CellLabelProvider.createViewerLabelProvider(this, getLabelProvider()));
+					CellLabelProvider.createViewerLabelProvider(this,
+							getLabelProvider()));
 			setupEditingSupport(columnIndex, viewer);
 		}
 		if (viewer.getEditingSupport() == null && getCellModifier() != null) {
@@ -332,12 +346,14 @@ public abstract class ColumnViewer<E,I> extends StructuredViewer<E,I> {
 	 */
 	@Override
 	public void setLabelProvider(IBaseLabelProvider<E> labelProvider) {
-		Assert.isTrue(labelProvider instanceof ITableLabelProvider || labelProvider instanceof ILabelProvider
+		Assert.isTrue(labelProvider instanceof ITableLabelProvider
+				|| labelProvider instanceof ILabelProvider
 				|| labelProvider instanceof CellLabelProvider);
 		updateColumnParts(labelProvider);// Reset the label providers in the
 		// columns
 		if (labelProvider instanceof CellLabelProvider) {
-			CellLabelProvider<E> cellLabelProvider = (CellLabelProvider<E>) labelProvider;
+			@SuppressWarnings("unchecked")
+      CellLabelProvider<E> cellLabelProvider = (CellLabelProvider<E>) labelProvider;
 			cellLabelProvider.initialize(this, null);
 		}
 		super.setLabelProvider(labelProvider);
@@ -346,7 +362,8 @@ public abstract class ColumnViewer<E,I> extends StructuredViewer<E,I> {
 	@Override
 	void internalDisposeLabelProvider(IBaseLabelProvider<E> oldProvider) {
 		if (oldProvider instanceof CellLabelProvider) {
-			CellLabelProvider<E> cellLabelProvider = (CellLabelProvider<E>) oldProvider;
+			@SuppressWarnings("unchecked")
+      CellLabelProvider<E> cellLabelProvider = (CellLabelProvider<E>) oldProvider;
 			cellLabelProvider.dispose(this, null);
 		} else {
 			super.internalDisposeLabelProvider(oldProvider);
@@ -404,7 +421,7 @@ public abstract class ColumnViewer<E,I> extends StructuredViewer<E,I> {
 				getControl().setRedraw(false);
 				// Set the selection at first because in Tree's
 				// the element might not be materialized
-				setSelection(new StructuredSelection<>(element), true);
+				setSelection(new StructuredSelection(element), true);
 
 				Widget item = findItem(element);
 				if (item != null) {
@@ -529,9 +546,8 @@ public abstract class ColumnViewer<E,I> extends StructuredViewer<E,I> {
 
 	@Override
 	public void update(E element, String[] properties) {
-		if (checkBusy()) {
+		if (checkBusy())
 			return;
-		}
 		super.update(element, properties);
 	}
 
