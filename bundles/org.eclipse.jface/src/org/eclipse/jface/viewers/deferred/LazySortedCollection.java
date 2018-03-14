@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -767,9 +767,7 @@ public class LazySortedCollection {
      */
     public final void addAll(Object[] toAdd) {
     	Assert.isNotNull(toAdd);
-        for (int i = 0; i < toAdd.length; i++) {
-            Object object = toAdd[i];
-
+        for (Object object : toAdd) {
             add(object);
         }
 
@@ -831,9 +829,7 @@ public class LazySortedCollection {
     public final void removeAll(Object[] toRemove) {
     	Assert.isNotNull(toRemove);
 
-        for (int i = 0; i < toRemove.length; i++) {
-            Object object = toRemove[i];
-
+        for (Object object : toRemove) {
             internalRemove(object);
         }
     	pack();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -57,9 +57,8 @@ public class ActionProvider extends QuickAccessProvider {
 				collectContributions(menu, result);
 				ActionContributionItem[] actions = (ActionContributionItem[]) result
 						.toArray(new ActionContributionItem[result.size()]);
-				for (int i = 0; i < actions.length; i++) {
-					ActionElement actionElement = new ActionElement(actions[i],
-							this);
+				for (ActionContributionItem action : actions) {
+					ActionElement actionElement = new ActionElement(action, this);
 					idToElement.put(actionElement.getId(), actionElement);
 				}
 			}
@@ -69,9 +68,7 @@ public class ActionProvider extends QuickAccessProvider {
 	}
 
 	private void collectContributions(MenuManager menu, Set result) {
-		IContributionItem[] items = menu.getItems();
-		for (int i = 0; i < items.length; i++) {
-			IContributionItem item = items[i];
+		for (IContributionItem item : menu.getItems()) {
 			if (item instanceof SubContributionItem) {
 				item = ((SubContributionItem) item).getInnerItem();
 			}

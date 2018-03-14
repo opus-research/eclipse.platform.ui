@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2011 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -56,9 +56,8 @@ public class SwtUtil {
             return null;
         }
 
-        Control[] children = parent.getChildren();
-        for (int i = 0; i < children.length; i++) {
-            Control control = children[i];
+		for (Control element : parent.getChildren()) {
+            Control control = element;
 
             if (control == toTest) {
                 break;
@@ -221,12 +220,8 @@ public class SwtUtil {
 	 */
     public static boolean intersectsAnyMonitor(Display display,
             Rectangle someRectangle) {
-        Monitor[] monitors = display.getMonitors();
-
-        for (int idx = 0; idx < monitors.length; idx++) {
-            Monitor mon = monitors[idx];
-
-            if (mon.getClientArea().intersects(someRectangle)) {
+		for (Monitor monitor : display.getMonitors()) {
+			if (monitor.getClientArea().intersects(someRectangle)) {
                 return true;
             }
         }

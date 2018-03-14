@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2012 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -252,8 +252,7 @@ public class BindingTableManager {
 			return 0;
 		}
 		if (!schemeId2.equals(schemeId1)) {
-			for (int i = 0; i < activeSchemeIds.length; i++) {
-				final String schemePointer = activeSchemeIds[i];
+			for (final String schemePointer : activeSchemeIds) {
 				if (schemeId2.equals(schemePointer)) {
 					return 1;
 				} else if (schemeId1.equals(schemePointer)) {

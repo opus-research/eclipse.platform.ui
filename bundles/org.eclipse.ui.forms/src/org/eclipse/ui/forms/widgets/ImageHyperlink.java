@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,8 +12,6 @@
 package org.eclipse.ui.forms.widgets;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -76,19 +74,13 @@ public class ImageHyperlink extends Hyperlink {
 	public ImageHyperlink(Composite parent, int style) {
 		super(parent, removeAlignment(style));
 		extractAlignment(style);
-		addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(DisposeEvent e) {
-				if (disabledImage != null)
-					disabledImage.dispose();
-			}
+		addDisposeListener(e -> {
+			if (disabledImage != null)
+				disabledImage.dispose();
 		});
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.forms.widgets.AbstractHyperlink#paintHyperlink(org.eclipse.swt.events.PaintEvent)
-	 */
+	@Override
 	protected void paintHyperlink(GC gc) {
 		paintHyperlink(gc, getClientArea());
 	}
@@ -161,17 +153,23 @@ public class ImageHyperlink extends Hyperlink {
 	 *            if <code>true</code>, any cached layout data should be
 	 *            computed anew
 	 */
+	@Override
 	public Point computeSize(int wHint, int hHint, boolean changed) {
 		checkWidget();
+		Rectangle trim = computeTrim(0, 0, 0, 0);
 		Point isize = computeMaxImageSize();
-		int spacing = isize.x>0?textSpacing:0;
+		int spacing = isize.x > 0 ? textSpacing : 0;
 		Point textSize = null;
 		if (getText() != null) {
 			int innerWHint = wHint;
 			if (wHint != SWT.DEFAULT) {
-				innerWHint = wHint - 2 * marginWidth - isize.x - spacing;
+				innerWHint = wHint - 2 * marginWidth - isize.x - spacing - trim.width;
 			}
-			textSize = super.computeSize(innerWHint, hHint, changed);
+			int innerHHint = SWT.DEFAULT;
+			if (hHint != SWT.DEFAULT) {
+				innerHHint = hHint - trim.height;
+			}
+			textSize = super.computeSize(innerWHint, innerHHint, changed);
 		}
 		int width = isize.x;
 		int height = isize.y;
@@ -182,19 +180,28 @@ public class ImageHyperlink extends Hyperlink {
 		}
 		width += 2 * marginWidth;
 		height += 2 * marginHeight;
-		return new Point(width, height);
+
+		if (wHint != SWT.DEFAULT)
+			width = wHint;
+		if (hHint != SWT.DEFAULT)
+			height = hHint;
+
+		return new Point(width + trim.width, height + trim.height);
 	}
 
+	@Override
 	protected void handleEnter(Event e) {
 		state = HOVER;
 		super.handleEnter(e);
 	}
 
+	@Override
 	protected void handleExit(Event e) {
 		state = 0;
 		super.handleExit(e);
 	}
 
+	@Override
 	protected void handleActivate(Event e) {
 		state &= ACTIVE;
 		redraw();
@@ -257,16 +264,17 @@ public class ImageHyperlink extends Hyperlink {
 	 */
 	public void setImage(Image image) {
 		this.image = image;
-		if (disabledImage != null)
+		if (disabledImage != null) {
 			disabledImage.dispose();
-		if (image == null) {
 			disabledImage = null;
 		}
+		redraw();
 	}
 
 	private void createDisabledImage() {
-		if (this.image != null && !this.image.isDisposed())
-			disabledImage = new Image(this.image.getDevice(), this.image, SWT.IMAGE_DISABLE);
+		if ((disabledImage == null || disabledImage.isDisposed()) && image != null && !image.isDisposed()) {
+			disabledImage = new Image(image.getDevice(), image, SWT.IMAGE_DISABLE);
+		}
 	}
 
 	private Point computeMaxImageSize() {
@@ -322,10 +330,10 @@ public class ImageHyperlink extends Hyperlink {
 		}
 	}
 
+	@Override
 	public void setEnabled(boolean enabled) {
-		if (!enabled && (disabledImage == null || disabledImage.isDisposed()) && image != null && !image.isDisposed()) {
-			disabledImage = new Image(image.getDevice(), image, SWT.IMAGE_DISABLE);
-		}
+		if (!enabled)
+			createDisabledImage();
 		super.setEnabled(enabled);
 		if (enabled && disabledImage != null) {
 			disabledImage.dispose();

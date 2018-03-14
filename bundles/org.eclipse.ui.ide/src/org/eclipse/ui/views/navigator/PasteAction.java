@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -108,8 +108,8 @@ import org.eclipse.ui.part.ResourceTransfer;
      * 	resources are linked
      */
     private boolean isLinked(IResource[] resources) {
-        for (int i = 0; i < resources.length; i++) {
-            if (resources[i].isLinked()) {
+        for (IResource resource : resources) {
+            if (resource.isLinked()) {
 				return true;
 			}
         }
@@ -129,10 +129,10 @@ import org.eclipse.ui.part.ResourceTransfer;
         if (resourceData != null && resourceData.length > 0) {
             if (resourceData[0].getType() == IResource.PROJECT) {
                 // enablement checks for all projects
-                for (int i = 0; i < resourceData.length; i++) {
+                for (IResource resource : resourceData) {
                     CopyProjectOperation operation = new CopyProjectOperation(
                             this.shell);
-                    operation.copyProject((IProject) resourceData[i]);
+                    operation.copyProject((IProject) resource);
                 }
             } else {
                 // enablement should ensure that we always have access to a container
@@ -188,25 +188,22 @@ import org.eclipse.ui.part.ResourceTransfer;
 		}
 
         final IResource[][] clipboardData = new IResource[1][];
-        shell.getDisplay().syncExec(new Runnable() {
-            @Override
-			public void run() {
-                // clipboard must have resources or files
-                ResourceTransfer resTransfer = ResourceTransfer.getInstance();
-                clipboardData[0] = (IResource[]) clipboard
-                        .getContents(resTransfer);
-            }
-        });
+        shell.getDisplay().syncExec(() -> {
+		    // clipboard must have resources or files
+		    ResourceTransfer resTransfer = ResourceTransfer.getInstance();
+		    clipboardData[0] = (IResource[]) clipboard
+		            .getContents(resTransfer);
+		});
         IResource[] resourceData = clipboardData[0];
         boolean isProjectRes = resourceData != null && resourceData.length > 0
                 && resourceData[0].getType() == IResource.PROJECT;
 
         if (isProjectRes) {
-            for (int i = 0; i < resourceData.length; i++) {
+            for (IResource resource : resourceData) {
                 // make sure all resource data are open projects
                 // can paste open projects regardless of selection
-                if (resourceData[i].getType() != IResource.PROJECT
-                        || ((IProject) resourceData[i]).isOpen() == false) {
+                if (resource.getType() != IResource.PROJECT
+                        || ((IProject) resource).isOpen() == false) {
 					return false;
 				}
             }
@@ -248,8 +245,8 @@ import org.eclipse.ui.part.ResourceTransfer;
 
             if (targetResource.getType() == IResource.FOLDER) {
                 // don't try to copy folder to self
-                for (int i = 0; i < resourceData.length; i++) {
-                    if (targetResource.equals(resourceData[i])) {
+                for (IResource resource : resourceData) {
+                    if (targetResource.equals(resource)) {
 						return false;
 					}
                 }
@@ -258,8 +255,8 @@ import org.eclipse.ui.part.ResourceTransfer;
         }
         TransferData[] transfers = clipboard.getAvailableTypes();
         FileTransfer fileTransfer = FileTransfer.getInstance();
-        for (int i = 0; i < transfers.length; i++) {
-            if (fileTransfer.isSupportedType(transfers[i])) {
+        for (TransferData transfer : transfers) {
+            if (fileTransfer.isSupportedType(transfer)) {
 				return true;
 			}
         }

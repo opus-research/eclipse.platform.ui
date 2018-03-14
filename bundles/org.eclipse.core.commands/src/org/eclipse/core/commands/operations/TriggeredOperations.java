@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2010 IBM Corporation and others.
+ * Copyright (c) 2005, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,15 +11,18 @@
 package org.eclipse.core.commands.operations;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
-
-import org.eclipse.core.commands.ExecutionException;
 
 /**
  * Triggered operations are a specialized implementation of a composite
@@ -44,7 +47,7 @@ public final class TriggeredOperations extends AbstractOperation implements
 
 	private IOperationHistory history;
 
-	private List children = new ArrayList();
+	private List<IUndoableOperation> children = new ArrayList<>();
 
 	/**
 	 * Construct a composite triggered operations using the specified undoable
@@ -56,29 +59,20 @@ public final class TriggeredOperations extends AbstractOperation implements
 	 * @param history
 	 *            the operation history containing the triggered operations.
 	 */
-	public TriggeredOperations(IUndoableOperation operation,
-			IOperationHistory history) {
+	public TriggeredOperations(IUndoableOperation operation, IOperationHistory history) {
 		super(operation.getLabel());
 		triggeringOperation = operation;
 		recomputeContexts();
 		this.history = history;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.core.commands.operations.IUndoableOperation#add(org.eclipse.core.commands.operations.IUndoableOperation)
-	 */
+	@Override
 	public void add(IUndoableOperation operation) {
 		children.add(operation);
 		recomputeContexts();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.core.commands.operations.IUndoableOperation#remove(org.eclipse.core.commands.operations.IUndoableOperation)
-	 */
+	@Override
 	public void remove(IUndoableOperation operation) {
 		if (operation == triggeringOperation) {
 			// the triggering operation is being removed, so we must replace
@@ -88,15 +82,30 @@ public final class TriggeredOperations extends AbstractOperation implements
 			// operation will be disposed as part of replacing it. We don't want
 			// the children to be disposed since they are to replace this
 			// operation.
-			List childrenToRestore = new ArrayList(children);
-			children = new ArrayList(0);
+			List<IUndoableOperation> childrenToRestore = new ArrayList<>(children);
+			if (childrenToRestore.size() > 1) {
+				// the children are in the order they were executed in, so we
+				// need to reverse the order so they are put on the undo stack
+				// in the correct order. The first operation is the first one
+				// that is undone. We only need to reverse the order when the
+				// operation being replaced is on the undo stack. If it's on the
+				// redo stack, then the children are already in the correct
+				// order to be redone.
+				Set<IUndoableOperation> undoHistory = new HashSet<>();
+				for (IUndoContext context : this.getContexts()) {
+					if (context != null) {
+						undoHistory.addAll(Arrays.asList(history.getUndoHistory(context)));
+					}
+				}
+				if (undoHistory.contains(this)) {
+					Collections.reverse(childrenToRestore);
+				}
+			}
+			children = new ArrayList<>(0);
 			recomputeContexts();
 			operation.dispose();
 			// now replace the triggering operation
-			history.replaceOperation(this,
-					(IUndoableOperation[]) childrenToRestore
-							.toArray(new IUndoableOperation[childrenToRestore
-									.size()]));
+			history.replaceOperation(this, childrenToRestore.toArray(new IUndoableOperation[childrenToRestore.size()]));
 		} else {
 			children.remove(operation);
 			operation.dispose();
@@ -117,6 +126,7 @@ public final class TriggeredOperations extends AbstractOperation implements
 	 * @param context
 	 *            the undo context being removed from the receiver.
 	 */
+	@Override
 	public void removeContext(IUndoContext context) {
 
 		boolean recompute = false;
@@ -132,9 +142,9 @@ public final class TriggeredOperations extends AbstractOperation implements
 			recompute = true;
 		}
 		// the triggering operation remains, check all the children
-		ArrayList toBeRemoved = new ArrayList();
+		ArrayList<IUndoableOperation> toBeRemoved = new ArrayList<>();
 		for (int i = 0; i < children.size(); i++) {
-			IUndoableOperation child = (IUndoableOperation) children.get(i);
+			IUndoableOperation child = children.get(i);
 			if (child.hasContext(context)) {
 				if (child.getContexts().length == 1) {
 					toBeRemoved.add(child);
@@ -145,27 +155,20 @@ public final class TriggeredOperations extends AbstractOperation implements
 			}
 		}
 		for (int i = 0; i < toBeRemoved.size(); i++) {
-			remove((IUndoableOperation) toBeRemoved.get(i));
+			remove(toBeRemoved.get(i));
 		}
 		if (recompute) {
 			recomputeContexts();
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.core.commands.operations.IUndoableOperation#execute(org.eclipse.core.runtime.IProgressMonitor,
-	 *      org.eclipse.core.runtime.IAdaptable)
-	 */
-	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
+	@Override
+	public IStatus execute(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
 		if (triggeringOperation != null) {
 			history.openOperation(this, IOperationHistory.EXECUTE);
 			try {
 				IStatus status = triggeringOperation.execute(monitor, info);
-				history.closeOperation(status.isOK(), false,
-						IOperationHistory.EXECUTE);
+				history.closeOperation(status.isOK(), false, IOperationHistory.EXECUTE);
 				return status;
 			} catch (ExecutionException e) {
 				history.closeOperation(false, false, IOperationHistory.EXECUTE);
@@ -179,25 +182,19 @@ public final class TriggeredOperations extends AbstractOperation implements
 		return IOperationHistory.OPERATION_INVALID_STATUS;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.core.commands.operations.IUndoableOperation#redo(org.eclipse.core.runtime.IProgressMonitor,
-	 *      org.eclipse.core.runtime.IAdaptable)
-	 */
+	@Override
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
 		if (triggeringOperation != null) {
 			history.openOperation(this, IOperationHistory.REDO);
-			List childrenToRestore = new ArrayList(children);
+			List<IUndoableOperation> childrenToRestore = new ArrayList<>(children);
 			try {
 				removeAllChildren();
 				IStatus status = triggeringOperation.redo(monitor, info);
 				if (!status.isOK()) {
 					children = childrenToRestore;
 				}
-				history.closeOperation(status.isOK(), false,
-						IOperationHistory.REDO);
+				history.closeOperation(status.isOK(), false, IOperationHistory.REDO);
 				return status;
 			} catch (ExecutionException e) {
 				children = childrenToRestore;
@@ -212,25 +209,18 @@ public final class TriggeredOperations extends AbstractOperation implements
 		return IOperationHistory.OPERATION_INVALID_STATUS;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.core.commands.operations.IUndoableOperation#undo(org.eclipse.core.runtime.IProgressMonitor,
-	 *      org.eclipse.core.runtime.IAdaptable)
-	 */
-	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
+	@Override
+	public IStatus undo(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
 		if (triggeringOperation != null) {
 			history.openOperation(this, IOperationHistory.UNDO);
-			List childrenToRestore = new ArrayList(children);
+			List<IUndoableOperation> childrenToRestore = new ArrayList<>(children);
 			try {
 				removeAllChildren();
 				IStatus status = triggeringOperation.undo(monitor, info);
 				if (!status.isOK()) {
 					children = childrenToRestore;
 				}
-				history.closeOperation(status.isOK(), false,
-						IOperationHistory.UNDO);
+				history.closeOperation(status.isOK(), false, IOperationHistory.UNDO);
 				return status;
 			} catch (ExecutionException e) {
 				children = childrenToRestore;
@@ -245,11 +235,7 @@ public final class TriggeredOperations extends AbstractOperation implements
 		return IOperationHistory.OPERATION_INVALID_STATUS;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.core.commands.operations.IUndoableOperation#canUndo()
-	 */
+	@Override
 	public boolean canUndo() {
 		if (triggeringOperation != null) {
 			return triggeringOperation.canUndo();
@@ -257,11 +243,7 @@ public final class TriggeredOperations extends AbstractOperation implements
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.core.commands.operations.IUndoableOperation#canExecute()
-	 */
+	@Override
 	public boolean canExecute() {
 		if (triggeringOperation != null) {
 			return triggeringOperation.canExecute();
@@ -269,11 +251,7 @@ public final class TriggeredOperations extends AbstractOperation implements
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.core.commands.operations.IUndoableOperation#canRedo()
-	 */
+	@Override
 	public boolean canRedo() {
 		if (triggeringOperation != null) {
 			return triggeringOperation.canRedo();
@@ -284,9 +262,10 @@ public final class TriggeredOperations extends AbstractOperation implements
 	/*
 	 * Dispose all operations in the receiver.
 	 */
+	@Override
 	public void dispose() {
 		for (int i = 0; i < children.size(); i++) {
-			((IUndoableOperation) (children.get(i))).dispose();
+			(children.get(i)).dispose();
 		}
 		if (triggeringOperation != null) {
 			triggeringOperation.dispose();
@@ -297,16 +276,15 @@ public final class TriggeredOperations extends AbstractOperation implements
 	 * Recompute contexts in light of some change in the children
 	 */
 	private void recomputeContexts() {
-		ArrayList allContexts = new ArrayList();
+		ArrayList<IUndoContext> allContexts = new ArrayList<>();
 		if (triggeringOperation != null) {
 			IUndoContext[] contexts = triggeringOperation.getContexts();
-			for (int i = 0; i < contexts.length; i++) {
-				allContexts.add(contexts[i]);
+			for (IUndoContext context : contexts) {
+				allContexts.add(context);
 			}
 		}
 		for (int i = 0; i < children.size(); i++) {
-			IUndoContext[] contexts = ((IUndoableOperation) children.get(i))
-					.getContexts();
+			IUndoContext[] contexts = children.get(i).getContexts();
 			for (int j = 0; j < contexts.length; j++) {
 				if (!allContexts.contains(contexts[j])) {
 					allContexts.add(contexts[j]);
@@ -321,11 +299,10 @@ public final class TriggeredOperations extends AbstractOperation implements
 	 * Remove all non-triggering children
 	 */
 	private void removeAllChildren() {
-		IUndoableOperation[] nonTriggers = (IUndoableOperation[]) children
-				.toArray(new IUndoableOperation[children.size()]);
-		for (int i = 0; i < nonTriggers.length; i++) {
-			children.remove(nonTriggers[i]);
-			nonTriggers[i].dispose();
+		IUndoableOperation[] nonTriggers = children.toArray(new IUndoableOperation[children.size()]);
+		for (IUndoableOperation nonTrigger : nonTriggers) {
+			children.remove(nonTrigger);
+			nonTrigger.dispose();
 		}
 	}
 
@@ -339,42 +316,26 @@ public final class TriggeredOperations extends AbstractOperation implements
 		return triggeringOperation;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.core.commands.operations.IAdvancedModelOperation#getAffectedObjects()
-	 */
+	@Override
 	public Object[] getAffectedObjects() {
 		if (triggeringOperation instanceof IAdvancedUndoableOperation) {
-			return ((IAdvancedUndoableOperation) triggeringOperation)
-					.getAffectedObjects();
+			return ((IAdvancedUndoableOperation) triggeringOperation).getAffectedObjects();
 		}
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.core.commands.operations.IAdvancedModelOperation#aboutToNotify(org.eclipse.core.commands.operations.OperationHistoryEvent)
-	 */
+	@Override
 	public void aboutToNotify(OperationHistoryEvent event) {
 		if (triggeringOperation instanceof IAdvancedUndoableOperation) {
-			((IAdvancedUndoableOperation) triggeringOperation)
-					.aboutToNotify(event);
+			((IAdvancedUndoableOperation) triggeringOperation).aboutToNotify(event);
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.core.commands.operations.IAdvancedUndoableOperation#computeUndoableStatus(org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	public IStatus computeUndoableStatus(IProgressMonitor monitor)
-			throws ExecutionException {
+	@Override
+	public IStatus computeUndoableStatus(IProgressMonitor monitor) throws ExecutionException {
 		if (triggeringOperation instanceof IAdvancedUndoableOperation) {
 			try {
-				return ((IAdvancedUndoableOperation) triggeringOperation)
-						.computeUndoableStatus(monitor);
+				return ((IAdvancedUndoableOperation) triggeringOperation).computeUndoableStatus(monitor);
 			} catch (OperationCanceledException e) {
 				return Status.CANCEL_STATUS;
 			}
@@ -383,17 +344,11 @@ public final class TriggeredOperations extends AbstractOperation implements
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.core.commands.operations.IAdvancedUndoableOperation#computeRedoableStatus(org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	public IStatus computeRedoableStatus(IProgressMonitor monitor)
-			throws ExecutionException {
+	@Override
+	public IStatus computeRedoableStatus(IProgressMonitor monitor) throws ExecutionException {
 		if (triggeringOperation instanceof IAdvancedUndoableOperation) {
 			try {
-				return ((IAdvancedUndoableOperation) triggeringOperation)
-						.computeRedoableStatus(monitor);
+				return ((IAdvancedUndoableOperation) triggeringOperation).computeRedoableStatus(monitor);
 			} catch (OperationCanceledException e) {
 				return Status.CANCEL_STATUS;
 			}
@@ -417,14 +372,14 @@ public final class TriggeredOperations extends AbstractOperation implements
 	 *            the undo context which is replacing the original
 	 * @since 3.2
 	 */
+	@Override
 	public void replaceContext(IUndoContext original, IUndoContext replacement) {
 
 		// first check the triggering operation
 		if (triggeringOperation != null
 				&& triggeringOperation.hasContext(original)) {
 			if (triggeringOperation instanceof IContextReplacingOperation) {
-				((IContextReplacingOperation) triggeringOperation)
-						.replaceContext(original, replacement);
+				((IContextReplacingOperation) triggeringOperation).replaceContext(original, replacement);
 			} else {
 				triggeringOperation.removeContext(original);
 				triggeringOperation.addContext(replacement);
@@ -432,7 +387,7 @@ public final class TriggeredOperations extends AbstractOperation implements
 		}
 		// Now check all the children
 		for (int i = 0; i < children.size(); i++) {
-			IUndoableOperation child = (IUndoableOperation) children.get(i);
+			IUndoableOperation child = children.get(i);
 			if (child.hasContext(original)) {
 				if (child instanceof IContextReplacingOperation) {
 					((IContextReplacingOperation) child).replaceContext(
@@ -456,6 +411,7 @@ public final class TriggeredOperations extends AbstractOperation implements
 	 *
 	 * @since 3.2
 	 */
+	@Override
 	public void addContext(IUndoContext context) {
 		if (triggeringOperation != null) {
 			triggeringOperation.addContext(context);
@@ -466,11 +422,11 @@ public final class TriggeredOperations extends AbstractOperation implements
 	/**
 	 * @since 3.6
 	 */
+	@Override
 	public IStatus computeExecutionStatus(IProgressMonitor monitor) throws ExecutionException {
 		if (triggeringOperation instanceof IAdvancedUndoableOperation2) {
 			try {
-				return ((IAdvancedUndoableOperation2) triggeringOperation)
-						.computeExecutionStatus(monitor);
+				return ((IAdvancedUndoableOperation2) triggeringOperation).computeExecutionStatus(monitor);
 			} catch (OperationCanceledException e) {
 				return Status.CANCEL_STATUS;
 			}
@@ -481,6 +437,7 @@ public final class TriggeredOperations extends AbstractOperation implements
 	/**
 	 * @since 3.6
 	 */
+	@Override
 	public void setQuietCompute(boolean quiet) {
 		if (triggeringOperation instanceof IAdvancedUndoableOperation2) {
 			((IAdvancedUndoableOperation2) triggeringOperation).setQuietCompute(quiet);
@@ -490,6 +447,7 @@ public final class TriggeredOperations extends AbstractOperation implements
 	/**
 	 * @since 3.6
 	 */
+	@Override
 	public boolean runInBackground() {
 		if (triggeringOperation instanceof IAdvancedUndoableOperation2) {
 			return ((IAdvancedUndoableOperation2) triggeringOperation).runInBackground();

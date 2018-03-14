@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2010 IBM Corporation and others.
+ * Copyright (c) 2004, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -145,7 +145,7 @@ public final class BindingManager extends HandleObjectManager implements
 			return new String[0];
 		}
 
-		final List strings = new ArrayList();
+		final List<String> strings = new ArrayList<>();
 		final StringBuffer stringBuffer = new StringBuffer();
 		string = string.trim(); // remove whitespace
 		if (string.length() > 0) {
@@ -163,7 +163,7 @@ public final class BindingManager extends HandleObjectManager implements
 		Collections.reverse(strings);
 		strings.add(Util.ZERO_LENGTH_STRING);
 		strings.add(null);
-		return (String[]) strings.toArray(new String[strings.size()]);
+		return strings.toArray(new String[strings.size()]);
 	}
 
 	/**
@@ -273,7 +273,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * to bindings (<code>Binding</code>). This value may be
 	 * <code>null</code> if there is no existing solution.
 	 */
-	private Map prefixTable = null;
+	private Map prefixTable;
 
 	/**
 	 * <p>
@@ -462,8 +462,7 @@ public final class BindingManager extends HandleObjectManager implements
 	private final int compareSchemes(final String schemeId1,
 			final String schemeId2) {
 		if (!schemeId2.equals(schemeId1)) {
-			for (int i = 0; i < activeSchemeIds.length; i++) {
-				final String schemePointer = activeSchemeIds[i];
+			for (final String schemePointer : activeSchemeIds) {
 				if (schemeId2.equals(schemePointer)) {
 					return 1;
 
@@ -550,8 +549,8 @@ public final class BindingManager extends HandleObjectManager implements
 			final String schemeId = binding.getSchemeId();
 			found = false;
 			if (activeSchemeIds != null) {
-				for (int j = 0; j < activeSchemeIds.length; j++) {
-					if (Util.equals(schemeId, activeSchemeIds[j])) {
+				for (String activeSchemeId : activeSchemeIds) {
+					if (Util.equals(schemeId, activeSchemeId)) {
 						found = true;
 						break;
 					}
@@ -705,8 +704,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 */
 	private final int countStrokes(final Trigger[] triggers) {
 		int strokeCount = triggers.length;
-		for (int i = 0; i < triggers.length; i++) {
-			final Trigger trigger = triggers[i];
+		for (final Trigger trigger : triggers) {
 			if (trigger instanceof KeyStroke) {
 				final KeyStroke keyStroke = (KeyStroke) trigger;
 				final int modifierKeys = keyStroke.getModifierKeys();
@@ -896,8 +894,8 @@ public final class BindingManager extends HandleObjectManager implements
 		}
 
 		final Object[] listeners = getListeners();
-		for (int i = 0; i < listeners.length; i++) {
-			final IBindingManagerListener listener = (IBindingManagerListener) listeners[i];
+		for (Object l : listeners) {
+			final IBindingManagerListener listener = (IBindingManagerListener) l;
 			listener.bindingManagerChanged(event);
 		}
 	}
@@ -1649,8 +1647,8 @@ public final class BindingManager extends HandleObjectManager implements
 			return true; // shortcut a common case
 		}
 
-		for (int i = 0; i < locales.length; i++) {
-			if (Util.equals(locales[i], locale)) {
+		for (String localString : locales) {
+			if (Util.equals(localString, locale)) {
 				matches = true;
 				break;
 			}
@@ -1682,8 +1680,8 @@ public final class BindingManager extends HandleObjectManager implements
 			return true; // shortcut a common case
 		}
 
-		for (int i = 0; i < platforms.length; i++) {
-			if (Util.equals(platforms[i], platform)) {
+		for (String platformString : platforms) {
+			if (Util.equals(platformString, platform)) {
 				matches = true;
 				break;
 			}
@@ -1735,13 +1733,12 @@ public final class BindingManager extends HandleObjectManager implements
 			existingCache = bindingCache;
 			cachedBindings.put(existingCache, existingCache);
 		}
-		Map commandIdsByTrigger = existingCache.getBindingsByTrigger();
-		if (commandIdsByTrigger != null) {
+		if (existingCache.isInitialized()) {
 			if (DEBUG) {
 				Tracing.printTrace("BINDINGS", "Cache hit"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			setActiveBindings(commandIdsByTrigger, existingCache
-					.getTriggersByCommandId(), existingCache.getPrefixTable(),
+			setActiveBindings(existingCache.getBindingsByTrigger(), existingCache.getTriggersByCommandId(),
+					existingCache.getPrefixTable(),
 					existingCache.getConflictsByTrigger());
 			return;
 		}
@@ -1752,18 +1749,22 @@ public final class BindingManager extends HandleObjectManager implements
 		}
 
 		// Compute the active bindings.
-		commandIdsByTrigger = new HashMap();
+		final Map commandIdsByTrigger = new HashMap();
 		final Map triggersByParameterizedCommand = new HashMap();
 		final Map conflictsByTrigger = new HashMap();
 		computeBindings(activeContextTree, commandIdsByTrigger,
 				triggersByParameterizedCommand, conflictsByTrigger);
+		final Map newPrefixTable = buildPrefixTable(commandIdsByTrigger);
+
+		// init cache
 		existingCache.setBindingsByTrigger(commandIdsByTrigger);
 		existingCache.setTriggersByCommandId(triggersByParameterizedCommand);
 		existingCache.setConflictsByTrigger(conflictsByTrigger);
+		existingCache.setPrefixTable(newPrefixTable);
+
 		setActiveBindings(commandIdsByTrigger, triggersByParameterizedCommand,
-				buildPrefixTable(commandIdsByTrigger),
+				newPrefixTable,
 				conflictsByTrigger);
-		existingCache.setPrefixTable(prefixTable);
 	}
 
 	/**
@@ -2269,8 +2270,7 @@ public final class BindingManager extends HandleObjectManager implements
 		if (bindings != null) {
 			// discard bindings not applicable for this platform
 			List newList = new ArrayList();
-			for (int i = 0; i < bindings.length; i++) {
-				Binding binding = bindings[i];
+			for (Binding binding : bindings) {
 				String p = binding.getPlatform();
 				if (p == null) {
 					newList.add(binding);

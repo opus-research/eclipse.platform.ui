@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -185,8 +185,7 @@ public class NavigatorPipelineService implements INavigatorPipelineService {
 
 		final NavigatorContentExtension[] overridingExtensions = overrideableExtension
 				.getOverridingExtensions();
-		for (int i = 0; i < overridingExtensions.length; i++) {
-			final NavigatorContentExtension nceLocal = overridingExtensions[i];
+		for (final NavigatorContentExtension nceLocal : overridingExtensions) {
 			if (nceLocal.internalGetContentProvider().isPipelined()) {
 				SafeRunner.run(new NavigatorSafeRunnable() {
 					@Override
@@ -239,9 +238,8 @@ public class NavigatorPipelineService implements INavigatorPipelineService {
 		final boolean[] intercepted = new boolean[1];
 		final NavigatorContentExtension[] overridingExtensions = overrideableExtension
 				.getOverridingExtensions();
-		for (int i = 0; i < overridingExtensions.length; i++) {
-			if (overridingExtensions[i].internalGetContentProvider().isPipelined()) {
-				final NavigatorContentExtension nceLocal = overridingExtensions[i];
+		for (final NavigatorContentExtension nceLocal : overridingExtensions) {
+			if (nceLocal.internalGetContentProvider().isPipelined()) {
 				SafeRunner.run(new NavigatorSafeRunnable() {
 					@Override
 					public void run() throws Exception {

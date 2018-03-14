@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,8 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 481319, 481318
+ *     Philipp Kunz <philipp.kunz@paratix.ch> - Bug 297922
  *******************************************************************************/
 package org.eclipse.ui.plugin;
 
@@ -16,11 +18,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IPluginDescriptor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -146,26 +152,12 @@ public abstract class AbstractUIPlugin extends Plugin {
     private BundleListener bundleListener;
 
     /**
-     * Creates an abstract UI plug-in runtime object for the given plug-in
-     * descriptor.
-     * <p>
-     * Note that instances of plug-in runtime classes are automatically created
-     * by the platform in the course of plug-in activation.
-     * <p>
-     *
-     * @param descriptor the plug-in descriptor
-     * @see Plugin#Plugin(org.eclipse.core.runtime.IPluginDescriptor descriptor)
-     * @deprecated
-     * In Eclipse 3.0 this constructor has been replaced by
-     * {@link #AbstractUIPlugin()}. Implementations of
-     * <code>MyPlugin(IPluginDescriptor descriptor)</code> should be changed to
-     * <code>MyPlugin()</code> and call <code>super()</code> instead of
-     * <code>super(descriptor)</code>.
-     * The <code>MyPlugin(IPluginDescriptor descriptor)</code> constructor is
-     * called only for plug-ins which explicitly require the
-     * org.eclipse.core.runtime.compatibility plug-in (or, as in this case,
-     * subclasses which might).
-     */
+	 * The {@link #AbstractUIPlugin(IPluginDescriptor)} constructor was called
+	 * only for plug-ins which explicitly require the
+	 * org.eclipse.core.runtime.compatibility plug-in.
+	 *
+	 * It is not called anymore as Eclipse 4.6 removed this plug-in.
+	 */
     @Deprecated
 	public AbstractUIPlugin(IPluginDescriptor descriptor) {
         super(descriptor);
@@ -432,7 +424,7 @@ public abstract class AbstractUIPlugin extends Plugin {
         try {
             is = dsURL.openStream();
             BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(is, "utf-8")); //$NON-NLS-1$
+					new InputStreamReader(is, StandardCharsets.UTF_8));
             dialogSettings.load(reader);
         } catch (IOException e) {
             // load failed so ensure we have an empty settings
@@ -486,12 +478,7 @@ public abstract class AbstractUIPlugin extends Plugin {
         // startup() is not guaranteed to be called in the UI thread,
         // but refreshPluginActions must run in the UI thread,
         // so use asyncExec.  See bug 6623 for more details.
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-			public void run() {
-                WWinPluginAction.refreshActionList();
-            }
-        });
+        Display.getDefault().asyncExec(() -> WWinPluginAction.refreshActionList());
     }
 
     /**
@@ -534,23 +521,12 @@ public abstract class AbstractUIPlugin extends Plugin {
     }
 
     /**
-     * The <code>AbstractUIPlugin</code> implementation of this <code>Plugin</code>
-     * method does nothing.  Subclasses may extend this method, but must send
-     * super first.
-     * <p>
-     * WARNING: Plug-ins may not be started in the UI thread.
-     * The <code>startup()</code> method should not assume that its code runs in
-     * the UI thread, otherwise SWT thread exceptions may occur on startup.'
-     * @deprecated
-     * In Eclipse 3.0, <code>startup</code> has been replaced by {@link Plugin#start(BundleContext context)}.
-     * Implementations of <code>startup</code> should be changed to extend
-     * <code>start(BundleContext context)</code> and call <code>super.start(context)</code>
-     * instead of <code>super.startup()</code>. Like <code>super.startup()</code>,
-     * <code>super.stop(context)</code> must be called as the very first thing.
-     * The <code>startup</code> method is called only for plug-ins which explicitly require the
-     * org.eclipse.core.runtime.compatibility plug-in; in contrast,
-     * the <code>start</code> method is always called.
-     */
+	 * The startup method was called
+	 * only for plug-ins which explicitly require the
+	 * org.eclipse.core.runtime.compatibility plug-in.
+	 *
+	 * It is not called anymore as Eclipse 4.6 removed this plug-in.
+	 */
     @Deprecated
 	@Override
 	public void startup() throws CoreException {
@@ -610,17 +586,20 @@ public abstract class AbstractUIPlugin extends Plugin {
                     if (event.getType() == BundleEvent.STARTED) {
                         // We're getting notified that the bundle has been started.
                         // Make sure it's still active.  It may have been shut down between
-                        // the time this event was queued and now.
+                        // the time this event was dispatched and now.
                         if (getBundle().getState() == Bundle.ACTIVE) {
                             refreshPluginActions();
                         }
-                        fc.removeBundleListener(this);
+                        try {
+                            fc.removeBundleListener(this);
+                        } catch (IllegalStateException ex) {
+                            // bundleListener is removed in stop(BundleContext)
+                        }
                     }
                 }
             }
         };
         context.addBundleListener(bundleListener);
-        // bundleListener is removed in stop(BundleContext)
     }
 
     /**
@@ -660,8 +639,8 @@ public abstract class AbstractUIPlugin extends Plugin {
 	 * is relative to the root of the plug-in, and takes into account files
 	 * coming from plug-in fragments. The path may include $arg$ elements.
 	 * However, the path must not have a leading "." or path separator. Clients
-	 * should use a path like "icons/mysample.gif" rather than
-	 * "./icons/mysample.gif" or "/icons/mysample.gif".
+	 * should use a path like "icons/mysample.png" rather than
+	 * "./icons/mysample.png" or "/icons/mysample.png".
 	 * </p>
 	 *
 	 * @param pluginId
@@ -692,21 +671,33 @@ public abstract class AbstractUIPlugin extends Plugin {
 			return null;
 		}
 
-        // look for the image (this will check both the plugin and fragment folders
-        URL fullPathString = BundleUtility.find(bundle, imageFilePath);
-        if (fullPathString == null) {
-            try {
-                fullPathString = new URL(imageFilePath);
-            } catch (MalformedURLException e) {
-                return null;
-            }
-			URL platformURL = FileLocator.find(fullPathString);
-			if (platformURL != null) {
-				fullPathString = platformURL;
-			}
-        }
+		// Don't resolve the URL here, but create a URL using the
+		// "platform:/plugin" protocol, which also supports fragments.
+		// Caveat: The resulting URL may contain $nl$ etc., which is not
+		// directly supported by PlatformURLConnection and needs to go through
+		// FileLocator#find(URL), see bug 250432.
+		IPath uriPath = new Path("/plugin").append(pluginId).append(imageFilePath); //$NON-NLS-1$
+		URL url;
+		try {
+			URI uri = new URI("platform", null, uriPath.toString(), null); //$NON-NLS-1$
+			url = uri.toURL();
+		} catch (MalformedURLException | URISyntaxException e) {
+			return null;
+		}
 
-        return ImageDescriptor.createFromURL(fullPathString);
+		// look for the image
+		URL fullPathString = FileLocator.find(url);
+		if (fullPathString == null) {
+			// If not found, reinterpret imageFilePath as full URL.
+			// This is unspecified, but apparently widely-used, see bug 395126.
+			try {
+				url = new URL(imageFilePath);
+			} catch (MalformedURLException e) {
+				return null;
+			}
+		}
+		// create image descriptor with the platform:/ URL
+		return ImageDescriptor.createFromURL(url);
     }
 
     /**

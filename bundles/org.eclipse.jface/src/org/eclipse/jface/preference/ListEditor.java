@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,14 +10,12 @@
  *******************************************************************************/
 package org.eclipse.jface.preference;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -171,23 +169,20 @@ public abstract class ListEditor extends FieldEditor {
      * Creates a selection listener.
      */
     public void createSelectionListener() {
-        selectionListener = new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent event) {
-                Widget widget = event.widget;
-                if (widget == addButton) {
-                    addPressed();
-                } else if (widget == removeButton) {
-                    removePressed();
-                } else if (widget == upButton) {
-                    upPressed();
-                } else if (widget == downButton) {
-                    downPressed();
-                } else if (widget == list) {
-                    selectionChanged();
-                }
-            }
-        };
+        selectionListener = widgetSelectedAdapter(event -> {
+		    Widget widget = event.widget;
+		    if (widget == addButton) {
+		        addPressed();
+		    } else if (widget == removeButton) {
+		        removePressed();
+		    } else if (widget == upButton) {
+		        upPressed();
+		    } else if (widget == downButton) {
+		        downPressed();
+		    } else if (widget == list) {
+		        selectionChanged();
+		    }
+		});
     }
 
     @Override
@@ -215,8 +210,8 @@ public abstract class ListEditor extends FieldEditor {
         if (list != null) {
             String s = getPreferenceStore().getString(getPreferenceName());
             String[] array = parseString(s);
-            for (int i = 0; i < array.length; i++) {
-                list.add(array[i]);
+            for (String element : array) {
+                list.add(element);
             }
         }
     }
@@ -228,8 +223,8 @@ public abstract class ListEditor extends FieldEditor {
             String s = getPreferenceStore().getDefaultString(
                     getPreferenceName());
             String[] array = parseString(s);
-            for (int i = 0; i < array.length; i++) {
-                list.add(array[i]);
+            for (String element : array) {
+                list.add(element);
             }
         }
     }
@@ -263,16 +258,13 @@ public abstract class ListEditor extends FieldEditor {
             layout.marginWidth = 0;
             buttonBox.setLayout(layout);
             createButtons(buttonBox);
-            buttonBox.addDisposeListener(new DisposeListener() {
-                @Override
-				public void widgetDisposed(DisposeEvent event) {
-                    addButton = null;
-                    removeButton = null;
-                    upButton = null;
-                    downButton = null;
-                    buttonBox = null;
-                }
-            });
+            buttonBox.addDisposeListener(event -> {
+			    addButton = null;
+			    removeButton = null;
+			    upButton = null;
+			    downButton = null;
+			    buttonBox = null;
+			});
 
         } else {
             checkParent(buttonBox, parent);
@@ -294,12 +286,7 @@ public abstract class ListEditor extends FieldEditor {
                     | SWT.H_SCROLL);
             list.setFont(parent.getFont());
             list.addSelectionListener(getSelectionListener());
-            list.addDisposeListener(new DisposeListener() {
-                @Override
-				public void widgetDisposed(DisposeEvent event) {
-                    list = null;
-                }
-            });
+            list.addDisposeListener(event -> list = null);
         } else {
             checkParent(list, parent);
         }

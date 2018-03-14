@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2014 IBM Corporation and others.
+ * Copyright (c) 2003, 2014, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Oakland Software (Francis Upton) <francisu@ieee.org> - bug 219273
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
+ *     Stefan Xenos <sxenos@google.com> - Bug 466793
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
@@ -30,7 +31,6 @@ import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -39,8 +39,6 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.graphics.Font;
@@ -51,7 +49,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Sash;
@@ -221,8 +218,6 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 		TreeViewer tree;
 		if (!hasAtMostOnePage()) {
 			filteredTree= new PreferenceFilteredTree(parent, styleBits, new PreferencePatternFilter());
-			GridData gd= new GridData(SWT.FILL, SWT.FILL, true, true);
-			gd.horizontalIndent= IDialogConstants.HORIZONTAL_MARGIN;
 			filteredTree.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
 			tree= filteredTree.getViewer();
@@ -235,12 +230,7 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 
 		tree.addFilter(new CapabilityFilter());
 
-		tree.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
-				handleTreeSelectionChanged(event);
-			}
-		});
+		tree.addSelectionChangedListener(event -> handleTreeSelectionChanged(event));
 
 		super.addListeners(tree);
 		return tree;
@@ -535,59 +525,51 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 				return;
 			}
 			final ScrolledComposite sc = (ScrolledComposite) pageParent;
-			keyScrollingFilter = new Listener() {
-				@Override
-				public void handleEvent(Event event) {
-					if (!keyScrollingEnabled || sc.isDisposed()) {
-						return;
-					}
-					switch (event.keyCode) {
-					case SWT.ARROW_DOWN:
-						sc.setOrigin(sc.getOrigin().x, sc.getOrigin().y
-								+ INCREMENT);
-						break;
-					case SWT.ARROW_UP:
-						sc.setOrigin(sc.getOrigin().x, sc.getOrigin().y
-								- INCREMENT);
-						break;
-					case SWT.ARROW_LEFT:
-						sc.setOrigin(sc.getOrigin().x - INCREMENT, sc
-								.getOrigin().y);
-						break;
-					case SWT.ARROW_RIGHT:
-						sc.setOrigin(sc.getOrigin().x + INCREMENT, sc
-								.getOrigin().y);
-						break;
-					case SWT.PAGE_DOWN:
-						sc.setOrigin(sc.getOrigin().x, sc.getOrigin().y
-								+ PAGE_MULTIPLIER * INCREMENT);
-						break;
-					case SWT.PAGE_UP:
-						sc.setOrigin(sc.getOrigin().x, sc.getOrigin().y
-								- PAGE_MULTIPLIER * INCREMENT);
-						break;
-					case SWT.HOME:
-						sc.setOrigin(0, 0);
-						break;
-					case SWT.END:
-						sc.setOrigin(0, sc.getSize().y);
-						break;
-					default:
-						keyScrollingEnabled = false;
-					}
-					event.type = SWT.None;
-					event.doit = false;
+			keyScrollingFilter = event -> {
+				if (!keyScrollingEnabled || sc.isDisposed()) {
+					return;
 				}
+				switch (event.keyCode) {
+				case SWT.ARROW_DOWN:
+					sc.setOrigin(sc.getOrigin().x, sc.getOrigin().y
+							+ INCREMENT);
+					break;
+				case SWT.ARROW_UP:
+					sc.setOrigin(sc.getOrigin().x, sc.getOrigin().y
+							- INCREMENT);
+					break;
+				case SWT.ARROW_LEFT:
+					sc.setOrigin(sc.getOrigin().x - INCREMENT, sc
+							.getOrigin().y);
+					break;
+				case SWT.ARROW_RIGHT:
+					sc.setOrigin(sc.getOrigin().x + INCREMENT, sc
+							.getOrigin().y);
+					break;
+				case SWT.PAGE_DOWN:
+					sc.setOrigin(sc.getOrigin().x, sc.getOrigin().y
+							+ PAGE_MULTIPLIER * INCREMENT);
+					break;
+				case SWT.PAGE_UP:
+					sc.setOrigin(sc.getOrigin().x, sc.getOrigin().y
+							- PAGE_MULTIPLIER * INCREMENT);
+					break;
+				case SWT.HOME:
+					sc.setOrigin(0, 0);
+					break;
+				case SWT.END:
+					sc.setOrigin(0, sc.getSize().y);
+					break;
+				default:
+					keyScrollingEnabled = false;
+				}
+				event.type = SWT.None;
+				event.doit = false;
 			};
 			Display display = PlatformUI.getWorkbench().getDisplay();
 			display.addFilter(SWT.KeyDown, keyScrollingFilter);
 			display.addFilter(SWT.Traverse, keyScrollingFilter);
-			sc.addDisposeListener(new DisposeListener() {
-				@Override
-				public void widgetDisposed(DisposeEvent e) {
-					removeKeyScrolling();
-				}
-			});
+			sc.addDisposeListener(e -> removeKeyScrolling());
 		}
 		keyScrollingEnabled = true;
 	}
@@ -687,8 +669,8 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 		control.setFont(dialogFont);
 		if (control instanceof Composite) {
 			Control[] children = ((Composite) control).getChildren();
-			for (int i = 0; i < children.length; i++) {
-				applyDialogFont(children[i], dialogFont);
+			for (Control element : children) {
+				applyDialogFont(element, dialogFont);
 			}
 		}
 	}

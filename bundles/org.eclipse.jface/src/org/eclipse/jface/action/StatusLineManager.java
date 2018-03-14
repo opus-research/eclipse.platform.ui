@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -116,8 +116,8 @@ public class StatusLineManager extends ContributionManager implements
         statusLine = null;
 
         IContributionItem items[] = getItems();
-        for (int i = 0; i < items.length; i++) {
-            items[i].dispose();
+        for (IContributionItem item : items) {
+            item.dispose();
         }
     }
 
@@ -274,8 +274,7 @@ public class StatusLineManager extends ContributionManager implements
                 // is not possible.
 
                 Control ws[] = statusLine.getChildren();
-                for (int i = 0; i < ws.length; i++) {
-                    Control w = ws[i];
+                for (Control w : ws) {
                     Object data = w.getData();
                     if (data instanceof IContributionItem) {
                         w.dispose();
@@ -284,8 +283,7 @@ public class StatusLineManager extends ContributionManager implements
 
                 int oldChildCount = statusLine.getChildren().length;
                 IContributionItem[] items = getItems();
-                for (int i = 0; i < items.length; ++i) {
-                    IContributionItem ci = items[i];
+                for (IContributionItem ci : items) {
                     if (ci.isVisible()) {
                         ci.fill(statusLine);
                         // associate controls with contribution item

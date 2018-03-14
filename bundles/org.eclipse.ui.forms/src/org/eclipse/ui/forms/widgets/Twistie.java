@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright (c) 2000, 2008 IBM Corporation and others.
+ *  Copyright (c) 2000, 2015 IBM Corporation and others.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  *  Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Ralf M Petter<ralf.petter@gmail.com> - Bug 510902
  *******************************************************************************/
 package org.eclipse.ui.forms.widgets;
 
@@ -55,7 +56,10 @@ public class Twistie extends ToggleHyperlink {
 	/*
 	 * @see SelectableControl#paint(GC)
 	 */
+	@Override
 	protected void paintHyperlink(GC gc) {
+		int as = gc.getAntialias();
+		gc.setAntialias(SWT.ON);
 		Color bg;
 		if (!isEnabled())
 			bg = getDisplay().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW);
@@ -76,6 +80,7 @@ public class Twistie extends ToggleHyperlink {
 			data = translate(offPoints, x, y);
 		gc.fillPolygon(data);
 		gc.setBackground(getBackground());
+		gc.setAntialias(as);
 	}
 
 	private int[] translate(int[] data, int x, int y) {
@@ -89,11 +94,7 @@ public class Twistie extends ToggleHyperlink {
 		return target;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.swt.widgets.Control#setEnabled(boolean)
-	 */
+	@Override
 	public void setEnabled(boolean enabled) {
 		super.setEnabled(enabled);
 		redraw();

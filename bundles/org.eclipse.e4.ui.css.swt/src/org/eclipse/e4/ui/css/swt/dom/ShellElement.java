@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Angelo Zerr and others.
+ * Copyright (c) 2009, 2017 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,9 +8,12 @@
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  *     IBM Corporation - initial API and implementation
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 513300
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.dom;
 
+import java.util.Objects;
+import java.util.function.Supplier;
 import org.eclipse.e4.ui.css.core.dom.CSSStylableElement;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.swt.helpers.CSSSWTImageHelper;
@@ -102,41 +105,42 @@ public class ShellElement extends CompositeElement {
 
 	@Override
 	public boolean isPseudoInstanceOf(String s) {
-		if ("active".equals(s)) {
+		if ("active".equalsIgnoreCase(s)) {
 			return this.isActive;
 		}
-		if ("swt-parented".equals(s)) {
+		if ("swt-parented".equalsIgnoreCase(s)) {
 			return getShell().getParent() != null;
 		}
-		if ("swt-unparented".equals(s)) {
+		if ("swt-unparented".equalsIgnoreCase(s)) {
 			return getShell().getParent() == null;
 		}
 		return super.isPseudoInstanceOf(s);
 	}
 
 	@Override
-	public String getAttribute(String attr) {
+	protected Supplier<String> internalGetAttribute(String attr) {
 		if("title".equals(attr)) {
-			String title = getShell().getText();
-			return title != null ? title : "";
+			return () -> Objects.toString(getShell().getText(), "");
 		}
 		if ("parentage".equals(attr)) {
-			Shell shell = getShell();
-			Composite parent = shell.getParent();
-			if (parent == null) {
-				return "";
-			}
-			StringBuilder sb = new StringBuilder();
-			do {
-				String id = WidgetElement.getID(parent);
-				if (id != null && id.length() > 0) {
-					sb.append(id).append(' ');
+			return () -> {
+				Shell shell = getShell();
+				Composite parent = shell.getParent();
+				if (parent == null) {
+					return "";
 				}
-				parent = parent.getParent();
-			} while (parent != null);
-			return sb.toString().trim();
+				StringBuilder sb = new StringBuilder();
+				do {
+					String id = WidgetElement.getID(parent);
+					if (id != null && id.length() > 0) {
+						sb.append(id).append(' ');
+					}
+					parent = parent.getParent();
+				} while (parent != null);
+				return sb.toString().trim();
+			};
 		}
-		return super.getAttribute(attr);
+		return super.internalGetAttribute(attr);
 	}
 
 	@Override

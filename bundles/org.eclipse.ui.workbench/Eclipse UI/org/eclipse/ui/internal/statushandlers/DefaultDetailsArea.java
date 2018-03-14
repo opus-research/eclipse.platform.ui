@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 IBM Corporation and others.
+ * Copyright (c) 2008, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -92,14 +92,6 @@ public class DefaultDetailsArea extends AbstractStatusAreaProvider {
 				.intValue();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.eclipse.ui.statushandlers.AbstractStatusAreaProvider#createSupportArea
-	 * (org.eclipse.swt.widgets.Composite,
-	 * org.eclipse.ui.statushandlers.StatusAdapter)
-	 */
 	@Override
 	public Control createSupportArea(Composite parent,
 			StatusAdapter statusAdapter) {
@@ -152,17 +144,17 @@ public class DefaultDetailsArea extends AbstractStatusAreaProvider {
 				keyList.add(ks);
 				KeySequence sequence = KeySequence.getInstance(keyList);
 				boolean partialMatch = false;
-				for (int i = 0; i < ts.length; i++) {
-					if (ts[i].equals(sequence)) {
+				for (TriggerSequence triggerSequence : ts) {
+					if (triggerSequence.equals(sequence)) {
 						copyToClipboard();
 						keyList.clear();
 						break;
 					}
-					if (ts[i].startsWith(sequence, false)) {
+					if (triggerSequence.startsWith(sequence, false)) {
 						partialMatch = true;
 					}
-					for (int j = 0; j < ts[i].getTriggers().length; j++) {
-						if (ts[i].getTriggers()[j].equals(ks)) {
+					for (int j = 0; j < triggerSequence.getTriggers().length; j++) {
+						if (triggerSequence.getTriggers()[j].equals(ks)) {
 							partialMatch = true;
 						}
 					}
@@ -279,13 +271,6 @@ public class DefaultDetailsArea extends AbstractStatusAreaProvider {
 		copyAction.setText(JFaceResources.getString("copy")); //$NON-NLS-1$
 		copyAction.addSelectionListener(new SelectionAdapter() {
 
-			/*
-			 * (non-Javadoc)
-			 *
-			 * @see
-			 * org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse
-			 * .swt.events.SelectionEvent)
-			 */
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				copyToClipboard();
@@ -320,9 +305,8 @@ public class DefaultDetailsArea extends AbstractStatusAreaProvider {
 			appendNewLine(text, message, nesting, lineNumber[0]++);
 		}
 
-		IStatus[] children = status.getChildren();
-		for (int i = 0; i < children.length; i++) {
-			populateList(text, children[i], nesting + 1, lineNumber);
+		for (IStatus child : status.getChildren()) {
+			populateList(text, child, nesting + 1, lineNumber);
 		}
 	}
 

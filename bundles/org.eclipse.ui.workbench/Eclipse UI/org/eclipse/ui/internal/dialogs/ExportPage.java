@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,14 +7,11 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Alain Bernard <alain.bernard1224@gmail.com> - Bug 281490
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.activities.ITriggerPoint;
@@ -61,20 +58,10 @@ public class ExportPage extends ImportExportPage {
 		IWizardCategory root = WorkbenchPlugin.getDefault()
 			.getExportWizardRegistry().getRootCategory();
 		exportTree = new CategorizedWizardSelectionTree(
-				root, WorkbenchMessages.ExportWizard_selectDestination);
+				root, WorkbenchMessages.ExportWizard_selectWizard);
 		Composite exportComp = exportTree.createControl(parent);
-		exportTree.getViewer().addSelectionChangedListener(new ISelectionChangedListener(){
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
-				listSelectionChanged(event.getSelection());
-			}
-		});
-		exportTree.getViewer().addDoubleClickListener(new IDoubleClickListener(){
-	    	@Override
-			public void doubleClick(DoubleClickEvent event) {
-	    		treeDoubleClicked(event);
-	    	}
-	    });
+		exportTree.getViewer().addSelectionChangedListener(event -> listSelectionChanged(event.getSelection()));
+		exportTree.getViewer().addDoubleClickListener(event -> treeDoubleClicked(event));
 		setTreeViewer(exportTree.getViewer());
 	    return exportComp;
 	}
@@ -102,7 +89,7 @@ public class ExportPage extends ImportExportPage {
 
 	@Override
 	protected void updateMessage(){
-		setMessage(WorkbenchMessages.ImportExportPage_chooseExportDestination);
+		setMessage(WorkbenchMessages.ImportExportPage_chooseExportWizard);
 		super.updateMessage();
 	}
 }

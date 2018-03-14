@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 475879
  *******************************************************************************/
 package org.eclipse.jface.util;
 
@@ -18,11 +19,8 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -43,7 +41,7 @@ class SafeRunnableDialog extends ErrorDialog {
 
 	private TableViewer statusListViewer;
 
-	private Collection<IStatus> statuses = new ArrayList<IStatus>();
+	private Collection<IStatus> statuses = new ArrayList<>();
 
 	/**
 	 * Create a new instance of the receiver on a status.
@@ -71,9 +69,8 @@ class SafeRunnableDialog extends ErrorDialog {
 					.getException().toString() : status.getException()
 					.getMessage();
 		}
-		this.message = JFaceResources.format(
-				"SafeRunnableDialog_reason", new Object[] { //$NON-NLS-1$
-				status.getMessage(), reason });
+		this.message = JFaceResources.format("SafeRunnableDialog_reason", //$NON-NLS-1$
+				status.getMessage(), reason);
 	}
 
 	/**
@@ -165,12 +162,7 @@ class SafeRunnableDialog extends ErrorDialog {
 		statusListViewer.setContentProvider(getStatusContentProvider());
 		statusListViewer.setLabelProvider(getStatusListLabelProvider());
 		statusListViewer
-				.addSelectionChangedListener(new ISelectionChangedListener() {
-					@Override
-					public void selectionChanged(SelectionChangedEvent event) {
-						handleSelectionChange();
-					}
-				});
+				.addSelectionChangedListener(event -> handleSelectionChange());
 		applyDialogFont(parent);
 		statusListViewer.setInput(this);
 	}
@@ -262,13 +254,9 @@ class SafeRunnableDialog extends ErrorDialog {
 	 * @return IStatus or <code>null</code>.
 	 */
 	private IStatus getSingleSelection() {
-		ISelection rawSelection = statusListViewer.getSelection();
-		if (rawSelection != null
-				&& rawSelection instanceof IStructuredSelection) {
-			IStructuredSelection selection = (IStructuredSelection) rawSelection;
-			if (selection.size() == 1) {
-				return (IStatus) selection.getFirstElement();
-			}
+		IStructuredSelection selection = statusListViewer.getStructuredSelection();
+		if (selection != null && selection.size() == 1) {
+			return (IStatus) selection.getFirstElement();
 		}
 		return null;
 	}

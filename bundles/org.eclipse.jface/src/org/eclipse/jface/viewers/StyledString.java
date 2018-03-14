@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 IBM Corporation and others.
+ * Copyright (c) 2008, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,7 +36,7 @@ import org.eclipse.swt.graphics.TextStyle;
  *
  * @since 3.4
  */
-public class StyledString {
+public class StyledString implements CharSequence {
 
 	/**
 	 * A styler will be asked to apply its styles to one ore more ranges in the
@@ -156,8 +156,25 @@ public class StyledString {
 	 *
 	 * @return the length of the current string
 	 */
+	@Override
 	public int length() {
 		return fBuffer.length();
+	}
+
+	/**
+	 * @since 3.12
+	 */
+	@Override
+	public CharSequence subSequence(int start, int end) {
+		return fBuffer.subSequence(start, end);
+	}
+
+	/**
+	 * @since 3.12
+	 */
+	@Override
+	public char charAt(int index) {
+		return fBuffer.charAt(index);
 	}
 
 	/**
@@ -213,10 +230,10 @@ public class StyledString {
 		int offset = fBuffer.length();
 		fBuffer.append(string.toString());
 
-		List otherRuns = string.fStyleRuns;
+		List<StyleRun> otherRuns = string.fStyleRuns;
 		if (otherRuns != null && !otherRuns.isEmpty()) {
 			for (int i = 0; i < otherRuns.size(); i++) {
-				StyleRun curr = (StyleRun) otherRuns.get(i);
+				StyleRun curr = otherRuns.get(i);
 				if (i == 0 && curr.offset != 0) {
 					appendStyleRun(null, offset); // appended string will
 					// start with the default
@@ -319,10 +336,10 @@ public class StyledString {
 			} else {
 				runIndex = runIndex + 1;
 			}
-			StyleRunList styleRuns = getStyleRuns();
+			List<StyleRun> styleRuns = getStyleRuns();
 			final int size = styleRuns.size();
 			for (int i = runIndex; i < size; i++) {
-				StyleRun run = styleRuns.getRun(i);
+				StyleRun run = styleRuns.get(i);
 				run.offset++;
 			}
 		}
@@ -370,7 +387,7 @@ public class StyledString {
 		} else {
 			endRun = -(endRun + 1);
 			if (offset + length < fBuffer.length()) {
-				Styler prevStyle = endRun > 0 ? fStyleRuns.getRun(endRun - 1).style
+				Styler prevStyle = endRun > 0 ? fStyleRuns.get(endRun - 1).style
 						: null;
 				fStyleRuns
 						.add(endRun, new StyleRun(offset + length, prevStyle));
@@ -380,12 +397,12 @@ public class StyledString {
 		int startRun = findRun(offset);
 		if (startRun >= 0) {
 			// run with the same start index
-			StyleRun styleRun = fStyleRuns.getRun(startRun);
+			StyleRun styleRun = fStyleRuns.get(startRun);
 			styleRun.style = styler;
 		} else {
 			startRun = -(startRun + 1);
 
-			Styler prevStyle = startRun > 0 ? fStyleRuns.getRun(startRun - 1).style
+			Styler prevStyle = startRun > 0 ? fStyleRuns.get(startRun - 1).style
 					: null;
 			if (isDifferentStyle(prevStyle, styler)
 					|| (startRun == 0 && styler != null)) {
@@ -409,13 +426,13 @@ public class StyledString {
 	 */
 	public StyleRange[] getStyleRanges() {
 		if (hasRuns()) {
-			ArrayList res = new ArrayList();
+			ArrayList<StyleRange> res = new ArrayList<>();
 
-			List styleRuns = getStyleRuns();
+			List<StyleRun> styleRuns = getStyleRuns();
 			int offset = 0;
 			Styler style = null;
 			for (int i = 0; i < styleRuns.size(); i++) {
-				StyleRun curr = (StyleRun) styleRuns.get(i);
+				StyleRun curr = styleRuns.get(i);
 				if (isDifferentStyle(curr.style, style)) {
 					if (curr.offset > offset && style != null) {
 						res.add(createStyleRange(offset, curr.offset, style));
@@ -427,7 +444,7 @@ public class StyledString {
 			if (fBuffer.length() > offset && style != null) {
 				res.add(createStyleRange(offset, fBuffer.length(), style));
 			}
-			return (StyleRange[]) res.toArray(new StyleRange[res.size()]);
+			return res.toArray(new StyleRange[res.size()]);
 		}
 		return EMPTY;
 	}
@@ -438,7 +455,7 @@ public class StyledString {
 		int high = fStyleRuns.size() - 1;
 		while (low <= high) {
 			int mid = (low + high) / 2;
-			StyleRun styleRun = fStyleRuns.getRun(mid);
+			StyleRun styleRun = fStyleRuns.get(mid);
 			if (styleRun.offset < offset) {
 				low = mid + 1;
 			} else if (styleRun.offset > offset) {
@@ -486,10 +503,10 @@ public class StyledString {
 		if (fStyleRuns == null || fStyleRuns.isEmpty()) {
 			return null;
 		}
-		return fStyleRuns.getRun(fStyleRuns.size() - 1);
+		return fStyleRuns.get(fStyleRuns.size() - 1);
 	}
 
-	private StyleRunList getStyleRuns() {
+	private List<StyleRun> getStyleRuns() {
 		if (fStyleRuns == null)
 			fStyleRuns = new StyleRunList();
 		return fStyleRuns;
@@ -510,15 +527,11 @@ public class StyledString {
 		}
 	}
 
-	private static class StyleRunList extends ArrayList {
+	private static class StyleRunList extends ArrayList<StyleRun> {
 		private static final long serialVersionUID = 123L;
 
 		public StyleRunList() {
 			super(3);
-		}
-
-		public StyleRun getRun(int index) {
-			return (StyleRun) get(index);
 		}
 
 		@Override

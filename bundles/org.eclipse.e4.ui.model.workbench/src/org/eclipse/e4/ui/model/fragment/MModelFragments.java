@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010, 2013 BestSolution.at and others.
+ * Copyright (c) 2010, 2015 BestSolution.at and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,8 +22,8 @@ import org.eclipse.e4.ui.model.application.MApplicationElement;
  * <!-- begin-model-doc -->
  * <p>
  * <strong>Developers</strong>:
- * Add more detailed documentation by editing this comment in
- * /org.eclipse.e4.ui.model.workbench/model/ModelFragment.ecore.
+ * Add more detailed documentation by editing this comment in 
+ * /org.eclipse.e4.ui.model.workbench/model/ModelFragment.ecore. 
  * There is a GenModel/documentation node under each type and attribute.
  * </p>
  * @since 1.0
@@ -31,11 +31,11 @@ import org.eclipse.e4.ui.model.application.MApplicationElement;
  *
  * <p>
  * The following features are supported:
+ * </p>
  * <ul>
  *   <li>{@link org.eclipse.e4.ui.model.fragment.MModelFragments#getImports <em>Imports</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.fragment.MModelFragments#getFragments <em>Fragments</em>}</li>
  * </ul>
- * </p>
  *
  * @model
  * @generated
@@ -49,8 +49,8 @@ public interface MModelFragments {
 	 * <!-- begin-model-doc -->
 	 * <p>
 	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in
-	 * /org.eclipse.e4.ui.model.workbench/model/ModelFragment.ecore.
+	 * Add more detailed documentation by editing this comment in 
+	 * /org.eclipse.e4.ui.model.workbench/model/ModelFragment.ecore. 
 	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
@@ -68,8 +68,8 @@ public interface MModelFragments {
 	 * <!-- begin-model-doc -->
 	 * <p>
 	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in
-	 * /org.eclipse.e4.ui.model.workbench/model/ModelFragment.ecore.
+	 * Add more detailed documentation by editing this comment in 
+	 * /org.eclipse.e4.ui.model.workbench/model/ModelFragment.ecore. 
 	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->

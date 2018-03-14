@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008, 2012 IBM Corporation and others.
+ * Copyright (c) 2008, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -856,7 +856,7 @@ public class ApplicationPackageImpl extends EPackageImpl {
 
 	/**
 	 * Creates, registers, and initializes the <b>Package</b> for this model, and for any others upon which it depends.
-	 *
+	 * 
 	 * <p>This method is used to initialize {@link ApplicationPackageImpl#eINSTANCE} when that field is accessed.
 	 * Clients should not invoke it directly. Instead, they should simply access that field to obtain the package.
 	 * <!-- begin-user-doc -->
@@ -903,7 +903,7 @@ public class ApplicationPackageImpl extends EPackageImpl {
 		// Mark meta-data to indicate it can't be changed
 		theApplicationPackage.freeze();
 
-
+  
 		// Update the registry and return the package
 		EPackage.Registry.INSTANCE.put(ApplicationPackageImpl.eNS_URI, theApplicationPackage);
 		return theApplicationPackage;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,12 +10,10 @@
  *******************************************************************************/
 package org.eclipse.jface.preference;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -157,8 +155,7 @@ public class RadioGroupFieldEditor extends FieldEditor {
         if (table == null) {
 			return false;
 		}
-        for (int i = 0; i < table.length; i++) {
-            String[] array = table[i];
+        for (String[] array : table) {
             if (array == null || array.length != 2) {
 				return false;
 			}
@@ -252,23 +249,17 @@ public class RadioGroupFieldEditor extends FieldEditor {
                 radio.setText(labelAndValue[0]);
                 radio.setData(labelAndValue[1]);
                 radio.setFont(font);
-                radio.addSelectionListener(new SelectionAdapter() {
-                    @Override
-					public void widgetSelected(SelectionEvent event) {
-                        String oldValue = value;
-                        value = (String) event.widget.getData();
-                        setPresentsDefaultValue(false);
-                        fireValueChanged(VALUE, oldValue, value);
-                    }
-                });
+                radio.addSelectionListener(widgetSelectedAdapter(event -> {
+				    String oldValue = value;
+				    value = (String) event.widget.getData();
+				    setPresentsDefaultValue(false);
+				    fireValueChanged(VALUE, oldValue, value);
+				}));
             }
-            radioBox.addDisposeListener(new DisposeListener() {
-                @Override
-				public void widgetDisposed(DisposeEvent event) {
-                    radioBox = null;
-                    radioButtons = null;
-                }
-            });
+            radioBox.addDisposeListener(event -> {
+			    radioBox = null;
+			    radioButtons = null;
+			});
         } else {
             checkParent(radioBox, parent);
         }
@@ -301,8 +292,7 @@ public class RadioGroupFieldEditor extends FieldEditor {
 
         if (this.value != null) {
             boolean found = false;
-            for (int i = 0; i < radioButtons.length; i++) {
-                Button radio = radioButtons[i];
+            for (Button radio : radioButtons) {
                 boolean selection = false;
                 if (((String) radio.getData()).equals(this.value)) {
                     selection = true;
@@ -332,8 +322,8 @@ public class RadioGroupFieldEditor extends FieldEditor {
         if (!useGroup) {
 			super.setEnabled(enabled, parent);
 		}
-        for (int i = 0; i < radioButtons.length; i++) {
-            radioButtons[i].setEnabled(enabled);
+        for (Button radioButton : radioButtons) {
+            radioButton.setEnabled(enabled);
         }
 
     }

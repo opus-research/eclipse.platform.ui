@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2004 IBM Corporation and others.
+ * Copyright (c) 2000, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,16 +10,29 @@
  *******************************************************************************/
 package org.eclipse.ui.forms.examples.internal.rcp;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.viewers.*;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.*;
-import org.eclipse.swt.widgets.*;
-import org.eclipse.ui.*;
-import org.eclipse.ui.forms.*;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.forms.DetailsPart;
+import org.eclipse.ui.forms.IManagedForm;
+import org.eclipse.ui.forms.MasterDetailsBlock;
+import org.eclipse.ui.forms.SectionPart;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.examples.internal.ExamplesPlugin;
-import org.eclipse.ui.forms.widgets.*;
+import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.eclipse.ui.forms.widgets.Section;
 /**
  *
  */
@@ -33,6 +46,7 @@ public class ScrolledPropertiesBlock extends MasterDetailsBlock {
 	 * @param title
 	 */
 	class MasterContentProvider implements IStructuredContentProvider {
+		@Override
 		public Object[] getElements(Object inputElement) {
 			if (inputElement instanceof SimpleFormEditorInput) {
 				SimpleFormEditorInput input = (SimpleFormEditorInput) page
@@ -41,17 +55,21 @@ public class ScrolledPropertiesBlock extends MasterDetailsBlock {
 			}
 			return new Object[0];
 		}
+		@Override
 		public void dispose() {
 		}
+		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 	}
 	class MasterLabelProvider extends LabelProvider
 			implements
 				ITableLabelProvider {
+		@Override
 		public String getColumnText(Object obj, int index) {
 			return obj.toString();
 		}
+		@Override
 		public Image getColumnImage(Object obj, int index) {
 			if (obj instanceof TypeOne) {
 				return PlatformUI.getWorkbench().getSharedImages().getImage(
@@ -64,6 +82,7 @@ public class ScrolledPropertiesBlock extends MasterDetailsBlock {
 			return null;
 		}
 	}
+	@Override
 	protected void createMasterPart(final IManagedForm managedForm,
 			Composite parent) {
 		//final ScrolledForm form = managedForm.getForm();
@@ -94,18 +113,16 @@ public class ScrolledPropertiesBlock extends MasterDetailsBlock {
 		final SectionPart spart = new SectionPart(section);
 		managedForm.addPart(spart);
 		TableViewer viewer = new TableViewer(t);
-		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			public void selectionChanged(SelectionChangedEvent event) {
-				managedForm.fireSelectionChanged(spart, event.getSelection());
-			}
-		});
+		viewer.addSelectionChangedListener(event -> managedForm.fireSelectionChanged(spart, event.getSelection()));
 		viewer.setContentProvider(new MasterContentProvider());
 		viewer.setLabelProvider(new MasterLabelProvider());
 		viewer.setInput(page.getEditor().getEditorInput());
 	}
+	@Override
 	protected void createToolBarActions(IManagedForm managedForm) {
 		final ScrolledForm form = managedForm.getForm();
 		Action haction = new Action("hor", Action.AS_RADIO_BUTTON) {
+			@Override
 			public void run() {
 				sashForm.setOrientation(SWT.HORIZONTAL);
 				form.reflow(true);
@@ -117,6 +134,7 @@ public class ScrolledPropertiesBlock extends MasterDetailsBlock {
 				.getImageRegistry()
 				.getDescriptor(ExamplesPlugin.IMG_HORIZONTAL));
 		Action vaction = new Action("ver", Action.AS_RADIO_BUTTON) {
+			@Override
 			public void run() {
 				sashForm.setOrientation(SWT.VERTICAL);
 				form.reflow(true);
@@ -129,6 +147,7 @@ public class ScrolledPropertiesBlock extends MasterDetailsBlock {
 		form.getToolBarManager().add(haction);
 		form.getToolBarManager().add(vaction);
 	}
+	@Override
 	protected void registerPages(DetailsPart detailsPart) {
 		detailsPart.registerPage(TypeOne.class, new TypeOneDetailsPage());
 		detailsPart.registerPage(TypeTwo.class, new TypeTwoDetailsPage());

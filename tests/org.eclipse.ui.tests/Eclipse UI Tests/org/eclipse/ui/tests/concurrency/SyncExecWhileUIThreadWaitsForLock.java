@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,11 +11,17 @@
 
 package org.eclipse.ui.tests.concurrency;
 
-import org.eclipse.swt.widgets.Display;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+import org.eclipse.core.runtime.ILogListener;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.jobs.ILock;
-
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.internal.WorkbenchPlugin;
 
 import junit.framework.TestCase;
 
@@ -25,7 +31,30 @@ import junit.framework.TestCase;
  * UISynchronizer and UILockListener conspire to prevent deadlock in this case.
  */
 public class SyncExecWhileUIThreadWaitsForLock extends TestCase {
+
+	private List<IStatus> reportedErrors;
+	private ILogListener listener;
+
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+		reportedErrors = new ArrayList<>();
+		listener = (status, plugin) -> reportedErrors.add(status);
+		WorkbenchPlugin.getDefault().getLog().addLogListener(listener);
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
+		if (listener != null) {
+			WorkbenchPlugin.getDefault().getLog().removeLogListener(listener);
+		}
+		super.tearDown();
+	}
+
 	public void testDeadlock() {
+		if (Thread.interrupted()) {
+			fail("Thread was interrupted at start of test");
+		}
 		final ILock lock = Job.getJobManager().newLock();
 		final boolean[] blocked = new boolean[] {false};
 		final boolean[] lockAcquired= new boolean[] {false};
@@ -36,14 +65,11 @@ public class SyncExecWhileUIThreadWaitsForLock extends TestCase {
 					//first make sure this background thread owns the lock
 					lock.acquire();
 					//spawn an asyncExec that will cause the UI thread to be blocked
-					Display.getDefault().asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							blocked[0] = true;
-							lock.acquire();
-							lock.release();
-							blocked[0] = false;
-						}
+					Display.getDefault().asyncExec(() -> {
+						blocked[0] = true;
+						lock.acquire();
+						lock.release();
+						blocked[0] = false;
 					});
 					//wait until the UI thread is blocked waiting for the lock
 					while (!blocked[0]) {
@@ -54,18 +80,15 @@ public class SyncExecWhileUIThreadWaitsForLock extends TestCase {
 					}
 					//now attempt to do a syncExec that also acquires the lock
 					//this should succeed even while the above asyncExec is blocked, thanks to UISynchronizer
-					Display.getDefault().syncExec(new Runnable() {
-						@Override
-						public void run() {
-							try {
-								//use a timeout to avoid deadlock in case of regression
-								if (lock.acquire(60000)) {
-									//this flag is used to verify that we actually acquired the lock
-									lockAcquired[0] = true;
-									lock.release();
-								}
-							} catch (InterruptedException e) {
+					Display.getDefault().syncExec(() -> {
+						try {
+							// use a timeout to avoid deadlock in case of regression
+							if (lock.acquire(60000)) {
+								// this flag is used to verify that we actually acquired the lock
+								lockAcquired[0] = true;
+								lock.release();
 							}
+						} catch (InterruptedException e) {
 						}
 					});
 				} finally {
@@ -88,5 +111,14 @@ public class SyncExecWhileUIThreadWaitsForLock extends TestCase {
 			}
 		}
 		//if we get here, the test succeeded
+
+		assertEquals("Unexpected error count reported: " + reportedErrors, 1, reportedErrors.size());
+		MultiStatus status = (MultiStatus) reportedErrors.get(0);
+		assertEquals("Unexpected child status count reported: " + Arrays.toString(status.getChildren()), 2,
+				status.getChildren().length);
+		if (Thread.interrupted()) {
+			// TODO: re-enable this check after bug 505920 is fixed
+			// fail("Thread was interrupted at end of test");
+		}
 	}
 }

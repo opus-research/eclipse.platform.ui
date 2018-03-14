@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2008 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,6 @@ package org.eclipse.ui.internal.progress;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -61,38 +60,21 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 	private KeptJobsListener getKeptJobListener() {
 		keptJobListener = new KeptJobsListener() {
 
-			/*
-			 * (non-Javadoc)
-			 *
-			 * @see org.eclipse.ui.internal.progress.FinishedJobs.KeptJobsListener#finished(org.eclipse.ui.internal.progress.JobTreeElement)
-			 */
 			@Override
 			public void finished(JobTreeElement jte) {
 				final JobTreeElement element = jte;
 				Job updateJob = new WorkbenchJob("Refresh finished") {//$NON-NLS-1$
-					/*
-					 * (non-Javadoc)
-					 *
-					 * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
-					 */
 					@Override
 					public IStatus runInUIThread(IProgressMonitor monitor) {
 						refresh(new Object[] { element });
 						return Status.OK_STATUS;
 					}
 
-					/* (non-Javadoc)
-					 * @see org.eclipse.ui.progress.WorkbenchJob#shouldSchedule()
-					 */
 					@Override
 					public boolean shouldSchedule() {
 						return !progressViewer.getControl().isDisposed();
 					}
 
-
-					/* (non-Javadoc)
-					 * @see org.eclipse.ui.progress.WorkbenchJob#shouldRun()
-					 */
 					@Override
 					public boolean shouldRun() {
 						return !progressViewer.getControl().isDisposed();
@@ -103,27 +85,16 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 
 			}
 
-			/*
-			 * (non-Javadoc)
-			 *
-			 * @see org.eclipse.ui.internal.progress.FinishedJobs.KeptJobsListener#removed(org.eclipse.ui.internal.progress.JobTreeElement)
-			 */
 			@Override
 			public void removed(JobTreeElement jte) {
 				final JobTreeElement element = jte;
 				Job updateJob = new WorkbenchJob("Remove finished") {//$NON-NLS-1$
-					/*
-					 * (non-Javadoc)
-					 *
-					 * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
-					 */
 					@Override
 					public IStatus runInUIThread(IProgressMonitor monitor) {
 						if (element == null) {
 							refresh();
 						} else {
-							ProgressViewerContentProvider.this
-									.remove(new Object[] { element });
+							ProgressViewerContentProvider.this.remove(new Object[] { element });
 						}
 						return Status.OK_STATUS;
 					}
@@ -137,34 +108,18 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 		return keptJobListener;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.internal.progress.IProgressUpdateCollector#refresh()
-	 */
 	@Override
 	public void refresh() {
 		progressViewer.refresh(true);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.internal.progress.IProgressUpdateCollector#refresh(org.eclipse.ui.internal.progress.JobTreeElement[])
-	 */
 	@Override
 	public void refresh(Object[] elements) {
-		Object[] refreshes = getRoots(elements, true);
-		for (int i = 0; i < refreshes.length; i++) {
-			progressViewer.refresh(refreshes[i], true);
+		for (Object refresh : getRoots(elements, true)) {
+			progressViewer.refresh(refresh, true);
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
-	 */
 	@Override
 	public Object[] getElements(Object inputElement) {
 		Object[] elements = super.getElements(inputElement);
@@ -179,8 +134,7 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 
 		Set all = new HashSet();
 
-		for (int i = 0; i < elements.length; i++) {
-			Object element = elements[i];
+		for (Object element : elements) {
 			all.add(element);
 		}
 
@@ -211,19 +165,19 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 			return elements;
 		}
 		HashSet roots = new HashSet();
-		for (int i = 0; i < elements.length; i++) {
-			JobTreeElement element = (JobTreeElement) elements[i];
-			if (element.isJobInfo()) {
-				GroupInfo group = ((JobInfo) element).getGroupInfo();
+		for (Object element : elements) {
+			JobTreeElement jobTreeElement = (JobTreeElement) element;
+			if (jobTreeElement.isJobInfo()) {
+				GroupInfo group = ((JobInfo) jobTreeElement).getGroupInfo();
 				if (group == null) {
-					roots.add(element);
+					roots.add(jobTreeElement);
 				} else {
 					if (subWithParent) {
 						roots.add(group);
 					}
 				}
 			} else {
-				roots.add(element);
+				roots.add(jobTreeElement);
 			}
 		}
 		return roots.toArray();
@@ -241,11 +195,6 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
-	 */
 	@Override
 	public void dispose() {
 		super.dispose();

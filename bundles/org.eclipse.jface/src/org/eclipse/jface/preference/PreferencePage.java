@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,8 @@
  *******************************************************************************/
 package org.eclipse.jface.preference;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.DialogPage;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -19,8 +21,6 @@ import org.eclipse.jface.dialogs.IDialogPage;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -259,7 +259,7 @@ public abstract class PreferencePage extends DialogPage implements
         contributeButtons(buttonBar);
 
 		if (createApplyButton || createDefaultButton) {
-			layout.numColumns = 1 + (createApplyButton && createDefaultButton ? 1 : 0);
+			layout.numColumns += 1 + (createApplyButton && createDefaultButton ? 1 : 0);
 			int widthHint = convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH);
 
 			if (createDefaultButton) {
@@ -271,12 +271,7 @@ public abstract class PreferencePage extends DialogPage implements
 				GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
 				data.widthHint = Math.max(widthHint, minButtonSize.x);
 				defaultsButton.setLayoutData(data);
-				defaultsButton.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(SelectionEvent e) {
-						performDefaults();
-					}
-				});
+				defaultsButton.addSelectionListener(widgetSelectedAdapter(e -> performDefaults()));
 			}
 			if (createApplyButton) {
 				String label = JFaceResources.getString("apply"); //$NON-NLS-1$
@@ -288,12 +283,7 @@ public abstract class PreferencePage extends DialogPage implements
 				GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
 				data.widthHint = Math.max(widthHint, minButtonSize.x);
 				applyButton.setLayoutData(data);
-				applyButton.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(SelectionEvent e) {
-						performApply();
-					}
-				});
+				applyButton.addSelectionListener(widgetSelectedAdapter(e -> performApply()));
 				applyButton.setEnabled(isValid());
 			}
 			applyDialogFont(buttonBar);
@@ -479,7 +469,7 @@ public abstract class PreferencePage extends DialogPage implements
      * <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/aa511266.aspx#commitButtons">Windows</a>
      * wants applied changes to persist on Cancel, whereas
      * <a href="http://developer.apple.com/library/mac/#documentation/UserExperience/Conceptual/AppleHIGuidelines/Windows/Windows.html#//apple_ref/doc/uid/20000961-TPXREF58">Mac</a> and
-     * <a href="https://developer.gnome.org/hig-book/stable/windows-utility.html.en#windows-explicit-apply">GTK</a>
+     * <a href="https://developer.gnome.org/hig/stable/dialogs.html.en#instant-and-explicit-apply">GTK</a>
      * consider Apply a preview that should not be saved on Cancel. Eclipse applications
      * typically adhere to the Windows guidelines and just override {@link #performOk()} and save preferences there.
      * </p>

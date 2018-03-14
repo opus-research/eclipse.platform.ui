@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 IBM Corporation and others.
+ * Copyright (c) 2011, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 410426
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.renderers.swt;
@@ -23,7 +24,6 @@ import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
-import org.eclipse.e4.ui.model.application.ui.MCoreExpression;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarContribution;
@@ -39,8 +39,8 @@ public class ToolBarContributionRecord {
 
 	MToolBar toolbarModel;
 	MToolBarContribution toolbarContribution;
-	ArrayList<MToolBarElement> generatedElements = new ArrayList<MToolBarElement>();
-	HashSet<MToolBarElement> sharedElements = new HashSet<MToolBarElement>();
+	ArrayList<MToolBarElement> generatedElements = new ArrayList<>();
+	HashSet<MToolBarElement> sharedElements = new HashSet<>();
 	ToolBarManagerRenderer renderer;
 	boolean isVisible = true;
 	private IEclipseContext infoContext;
@@ -57,13 +57,10 @@ public class ToolBarContributionRecord {
 		return renderer.getManager(toolbarModel);
 	}
 
-	/**
-	 * @param context
-	 */
 	public void updateVisibility(IEclipseContext context) {
 		ExpressionContext exprContext = new ExpressionContext(context);
 		updateIsVisible(exprContext);
-		HashSet<ToolBarContributionRecord> recentlyUpdated = new HashSet<ToolBarContributionRecord>();
+		HashSet<ToolBarContributionRecord> recentlyUpdated = new HashSet<>();
 		recentlyUpdated.add(this);
 		boolean changed = false;
 		for (MToolBarElement item : generatedElements) {
@@ -121,10 +118,8 @@ public class ToolBarContributionRecord {
 				currentVisibility = ((Boolean) rc).booleanValue();
 			}
 		}
-		if (currentVisibility
-				&& item.getVisibleWhen() instanceof MCoreExpression) {
-			boolean val = ContributionsAnalyzer.isVisible(
-					(MCoreExpression) item.getVisibleWhen(), exprContext);
+		if (currentVisibility && item.getVisibleWhen() != null) {
+			boolean val = ContributionsAnalyzer.isVisible(item.getVisibleWhen(), exprContext);
 			currentVisibility = val;
 		}
 		return currentVisibility;
@@ -155,13 +150,16 @@ public class ToolBarContributionRecord {
 		}
 
 		for (MToolBarElement child : childrenToInspect) {
-			if (child.getVisibleWhen() != null
-					|| child.getPersistedState().get(
-							MenuManagerRenderer.VISIBILITY_IDENTIFIER) != null) {
+			if (requiresVisibilityCheck(child)) {
 				return true;
 			}
 		}
 		return false;
+	}
+
+	private boolean requiresVisibilityCheck(MToolBarElement toolBarElement) {
+		return toolBarElement.getVisibleWhen() != null
+				|| toolBarElement.getPersistedState().get(MenuManagerRenderer.VISIBILITY_IDENTIFIER) != null;
 	}
 
 	public boolean mergeIntoModel() {
@@ -175,7 +173,7 @@ public class ToolBarContributionRecord {
 		if (toolbarContribution.getTransientData().get(FACTORY) != null) {
 			copyElements = mergeFactoryIntoModel();
 		} else {
-			copyElements = new ArrayList<MToolBarElement>();
+			copyElements = new ArrayList<>();
 			for (MToolBarElement item : toolbarContribution.getChildren()) {
 				MToolBarElement copy = (MToolBarElement) EcoreUtil
 						.copy((EObject) item);
@@ -185,7 +183,7 @@ public class ToolBarContributionRecord {
 		for (MToolBarElement copy : copyElements) {
 			// if a visibleWhen clause is defined, the item should not be
 			// visible until the clause has been evaluated and returned 'true'
-			copy.setVisible(!anyVisibleWhen());
+			copy.setVisible(!requiresVisibilityCheck(copy));
 			if (copy instanceof MToolBarSeparator) {
 				MToolBarSeparator shared = findExistingSeparator(copy
 						.getElementId());

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2014 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -53,12 +53,12 @@ public class ContextModel extends CommonModel {
 		contextIdToElement = new HashMap();
 
 		Context[] definedContexts = contextService.getDefinedContexts();
-		for (int i = 0; i < definedContexts.length; i++) {
+		for (Context definedContext : definedContexts) {
 			ContextElement ce = new ContextElement(controller);
-			ce.init(definedContexts[i]);
+			ce.init(definedContext);
 			ce.setParent(this);
 			contexts.add(ce);
-			contextIdToElement.put(definedContexts[i].getId(), ce);
+			contextIdToElement.put(definedContext.getId(), ce);
 		}
 	}
 

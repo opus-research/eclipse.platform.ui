@@ -20,6 +20,7 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.application.IWorkbenchConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchAdvisor;
@@ -43,7 +44,7 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
      * value type: <code>Object</code>).
      * @see #setData
      */
-	private Map<String, Object> extraData = new HashMap<String, Object>();
+    private Map extraData = new HashMap();
 
     /**
      * Indicates whether workbench state should be saved on close and
@@ -78,26 +79,17 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
         super();
     }
 
-    /* (non-javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchConfigurer#getWorkbench
-     */
     @Override
 	public IWorkbench getWorkbench() {
         return PlatformUI.getWorkbench();
     }
 
-    /* (non-javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchConfigurer#getWorkbenchWindowManager
-     */
     @Override
 	public WindowManager getWorkbenchWindowManager() {
         // return the global workbench window manager
 		return null;
     }
 
-    /* (non-javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchConfigurer#declareImage
-     */
     @Override
 	public void declareImage(String symbolicName, ImageDescriptor descriptor,
             boolean shared) {
@@ -107,9 +99,6 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
         WorkbenchImages.declareImage(symbolicName, descriptor, shared);
     }
 
-    /* (non-javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchConfigurer#getWindowConfigurer
-     */
     @Override
 	public IWorkbenchWindowConfigurer getWindowConfigurer(
             IWorkbenchWindow window) {
@@ -178,7 +167,7 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
     }
 
 	@Override
-	public IWorkbenchWindowConfigurer restoreWorkbenchWindow(IMemento memento) {
+	public IWorkbenchWindowConfigurer restoreWorkbenchWindow(IMemento memento) throws WorkbenchException {
 		return getWindowConfigurer(null);
 	}
 

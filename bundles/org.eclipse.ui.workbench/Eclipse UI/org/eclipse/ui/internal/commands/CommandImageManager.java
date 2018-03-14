@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2008 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -178,8 +178,8 @@ public final class CommandImageManager extends EventManager {
 		}
 
 		final Object[] listeners = getListeners();
-		for (int i = 0; i < listeners.length; i++) {
-			final ICommandImageManagerListener listener = (ICommandImageManagerListener) listeners[i];
+		for (Object l : listeners) {
+			final ICommandImageManagerListener listener = (ICommandImageManagerListener) l;
 			listener.commandImageManagerChanged(event);
 		}
 	}
@@ -201,8 +201,7 @@ public final class CommandImageManager extends EventManager {
 		}
 
 		final Set existingStyles = new HashSet(3);
-		for (int type = 0; type < existingImages.length; type++) {
-			final Object styledImages = existingImages[type];
+		for (final Object styledImages : existingImages) {
 			if (styledImages instanceof ImageDescriptor) {
 				existingStyles.add(null);
 			} else if (styledImages instanceof Map) {

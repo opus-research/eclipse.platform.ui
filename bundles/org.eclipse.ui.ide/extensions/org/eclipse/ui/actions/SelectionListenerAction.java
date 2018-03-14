@@ -21,11 +21,10 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.mapping.ResourceMapping;
 import org.eclipse.core.resources.mapping.ResourceMappingContext;
 import org.eclipse.core.resources.mapping.ResourceTraversal;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IAdapterManager;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 
 /**
@@ -110,68 +109,54 @@ public abstract class SelectionListenerAction extends BaseSelectionListenerActio
 		resources = null;
 		nonResources = null;
 
-		for (Iterator<?> e = getStructuredSelection().iterator(); e.hasNext();) {
+		IStructuredSelection structuredSelection = getStructuredSelection();
+		// assume selection contains mostly resources most times
+		List<IResource> resourcesTmp = new ArrayList<>(structuredSelection.size());
+		List<Object> nonResourcesTmp = new ArrayList<>();
+
+		for (Iterator<?> e = structuredSelection.iterator(); e.hasNext();) {
 			Object next = e.next();
-			if (next instanceof IResource) {
-				if (resources == null) {
-					// assume selection contains mostly resources most times
-					resources = new ArrayList<>(getStructuredSelection().size());
-				}
-				resources.add((IResource) next);
+
+			IResource resource = Adapters.adapt(next, IResource.class);
+
+			if (resource != null) {
+				resourcesTmp.add(resource);
 				continue;
-			} else if (next instanceof IAdaptable) {
-				IResource resource = ((IAdaptable) next).getAdapter(IResource.class);
-				if (resource != null) {
-					if (resources == null) {
-						// assume selection contains mostly resources most times
-						resources = new ArrayList<>(getStructuredSelection().size());
-					}
-					resources.add(resource);
-					continue;
+			}
+
+			boolean resourcesFoundForThisSelection = false;
+			ResourceMapping mapping = Adapters.adapt(next, ResourceMapping.class);
+
+			if (mapping != null) {
+				ResourceTraversal[] traversals = null;
+				try {
+					traversals = mapping.getTraversals(ResourceMappingContext.LOCAL_CONTEXT, new NullProgressMonitor());
+				} catch (CoreException exception) {
+					IDEWorkbenchPlugin.log(exception.getLocalizedMessage(), exception.getStatus());
 				}
-			} else {
 
-				boolean resourcesFoundForThisSelection = false;
-				IAdapterManager adapterManager = Platform.getAdapterManager();
-				ResourceMapping mapping = adapterManager.getAdapter(next, ResourceMapping.class);
-
-				if (mapping != null) {
-					ResourceTraversal[] traversals = null;
-					try {
-						traversals = mapping.getTraversals(
-								ResourceMappingContext.LOCAL_CONTEXT,
-								new NullProgressMonitor());
-					} catch (CoreException exception) {
-						IDEWorkbenchPlugin.log(exception.getLocalizedMessage(), exception.getStatus());
-					}
-
-					if (traversals != null) {
-						for (int i = 0; i < traversals.length; i++) {
-							IResource[] traversalResources = traversals[i].getResources();
-							if (traversalResources != null) {
-								resourcesFoundForThisSelection = true;
-								if (resources == null) {
-									resources = new ArrayList<>(getStructuredSelection().size());
-								}
-								for (int j = 0; j < traversalResources.length; j++) {
-									resources.add(traversalResources[j]);
-								}
+				if (traversals != null) {
+					for (ResourceTraversal traversal : traversals) {
+						IResource[] traversalResources = traversal.getResources();
+						if (traversalResources != null) {
+							resourcesFoundForThisSelection = true;
+							for (IResource traversalResource : traversalResources) {
+								resourcesTmp.add(traversalResource);
 							}
 						}
 					}
 				}
-
-				if (resourcesFoundForThisSelection) {
-					continue;
-				}
 			}
 
-			if (nonResources == null) {
-				// assume selection contains mostly resources most times
-				nonResources = new ArrayList<>(1);
+			if (resourcesFoundForThisSelection) {
+				continue;
 			}
-			nonResources.add(next);
+
+			nonResourcesTmp.add(next);
 		}
+
+		resources = resourcesTmp.isEmpty() ? null : resourcesTmp;
+		nonResources = nonResourcesTmp.isEmpty() ? null : nonResourcesTmp;
 	}
 
 	/**
@@ -187,11 +172,12 @@ public abstract class SelectionListenerAction extends BaseSelectionListenerActio
 			selectionDirty = false;
 		}
 
-		if (nonResources == null) {
+		List<Object> list = nonResources;
+		if (list == null) {
 			return Collections.emptyList();
 		}
 
-		return nonResources;
+		return list;
 	}
 
 	/**
@@ -207,10 +193,11 @@ public abstract class SelectionListenerAction extends BaseSelectionListenerActio
 			selectionDirty = false;
 		}
 
-		if (resources == null) {
+		List<IResource> list = resources;
+		if (list == null) {
 			return Collections.emptyList();
 		}
-		return resources;
+		return list;
 	}
 
 	/**

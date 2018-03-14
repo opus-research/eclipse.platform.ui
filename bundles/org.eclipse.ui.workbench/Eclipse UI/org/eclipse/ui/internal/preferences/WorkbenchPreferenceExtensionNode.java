@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2010 IBM Corporation and others.
+ * Copyright (c) 2005, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -72,9 +72,8 @@ public abstract class WorkbenchPreferenceExtensionNode extends WorkbenchPreferen
 			IConfigurationElement[] references = getConfigurationElement()
 					.getChildren(IWorkbenchRegistryConstants.TAG_KEYWORD_REFERENCE);
 			HashSet list = new HashSet(references.length);
-			for (int i = 0; i < references.length; i++) {
-				IConfigurationElement page = references[i];
-				String id = page.getAttribute(IWorkbenchRegistryConstants.ATT_ID);
+			for (IConfigurationElement configElement : references) {
+				String id = configElement.getAttribute(IWorkbenchRegistryConstants.ATT_ID);
 				if (id != null) {
 					list.add(id);
 				}
@@ -127,9 +126,6 @@ public abstract class WorkbenchPreferenceExtensionNode extends WorkbenchPreferen
 		keywordLabelCache = null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.preference.IPreferenceNode#disposeResources()
-	 */
 	@Override
 	public void disposeResources() {
         if (image != null) {
@@ -139,9 +135,6 @@ public abstract class WorkbenchPreferenceExtensionNode extends WorkbenchPreferen
         super.disposeResources();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.preference.IPreferenceNode#getLabelImage()
-	 */
 	@Override
 	public Image getLabelImage() {
         if (image == null) {
@@ -154,9 +147,6 @@ public abstract class WorkbenchPreferenceExtensionNode extends WorkbenchPreferen
     }
 
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.preference.IPreferenceNode#getLabelText()
-	 */
 	@Override
 	public String getLabelText() {
 		return getConfigurationElement().getAttribute(IWorkbenchRegistryConstants.ATT_NAME);
@@ -190,45 +180,29 @@ public abstract class WorkbenchPreferenceExtensionNode extends WorkbenchPreferen
 		return configurationElement;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.activities.support.IPluginContribution#getLocalId()
-	 */
 	@Override
 	public String getLocalId() {
 		return getId();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.activities.support.IPluginContribution#getPluginId()
-	 */
 	@Override
 	public String getPluginId() {
 		return pluginId;
 	}
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.model.IComparableContribution#getAdapter(java.lang.Class)
-     */
-    @Override
-	public Object getAdapter(Class adapter)
-    {
+	@Override
+	public <T> T getAdapter(Class<T> adapter) {
         if (adapter == IConfigurationElement.class)
-            return getConfigurationElement();
+			return adapter.cast(getConfigurationElement());
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.model.IComparableContribution#getLabel()
-     */
     @Override
 	public String getLabel()
     {
         return getLabelText();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.model.IComparableContribution#getPriority()
-     */
     @Override
 	public int getPriority()
     {

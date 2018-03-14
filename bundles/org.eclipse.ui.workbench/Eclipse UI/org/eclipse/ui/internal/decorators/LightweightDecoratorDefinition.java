@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -131,9 +131,6 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 						}
 					}
 
-					/*
-					 * (non-Javadoc) Method declared on ISafeRunnable.
-					 */
 					@Override
 					public void handleException(Throwable e) {
 						// Do nothing as Core will handle the logging
@@ -174,22 +171,12 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 		return definingElement.getAttribute(ATT_ICON);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.internal.decorators.DecoratorDefinition#internalGetLabelProvider()
-	 */
 	@Override
 	protected IBaseLabelProvider internalGetLabelProvider()
 			throws CoreException {
 		return internalGetDecorator();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.internal.decorators.DecoratorDefinition#isFull()
-	 */
 	@Override
 	public boolean isFull() {
 		return false;
@@ -259,8 +246,7 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 
 			if (isAdaptable()) {
 				String[] classes = getObjectClasses();
-				for (int i = 0; i < classes.length; i++) {
-					String className = classes[i];
+				for (String className : classes) {
 					Object adapted = LegacyResourceSupport.getAdapter(element,
 							className);
 					if (adapted != null) {
@@ -288,11 +274,6 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 		return decorator;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.internal.decorators.DecoratorDefinition#refreshDecorator()
-	 */
 	@Override
 	protected void refreshDecorator() {
 		// Only do something if disabled so as to prevent
@@ -304,21 +285,11 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.internal.IObjectContributor#isApplicableTo(java.lang.Object)
-	 */
 	@Override
 	public boolean isApplicableTo(Object object) {
 		return isEnabledFor(object);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.internal.IObjectContributor#canAdapt()
-	 */
 	@Override
 	public boolean canAdapt() {
 		return isAdaptable();
@@ -337,11 +308,6 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 		return objectClasses;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.internal.decorators.DecoratorDefinition#initializeEnablement()
-	 */
 	@Override
 	protected void initializeEnablement() {
 		super.initializeEnablement();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,6 @@ package org.eclipse.ui.internal;
 
 import java.util.Iterator;
 import java.util.LinkedList;
-
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ShellAdapter;
@@ -71,10 +70,7 @@ public class ShellPool {
                         // The shell can 'cancel' the close by setting
                         // the 'doit' to false...if so, do nothing
                         if (e.doit) {
-                            Control[] children = s.getChildren();
-	                        for (int i = 0; i < children.length; i++) {
-	                            Control control = children[i];
-
+						for (Control control : s.getChildren()) {
 	                            control.dispose();
 	                        }
 	                        availableShells.add(s);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -92,14 +92,12 @@ public class SlavePartService implements IPartService, IDisposable {
 
 	@Override
 	public void dispose() {
-		Object list[] = listeners.getListeners();
-		for (int i = 0; i < list.length; i++) {
-			Object obj = list[i];
-			if (obj instanceof IPartListener) {
-				parent.removePartListener((IPartListener) obj);
+		for (Object listener : listeners.getListeners()) {
+			if (listener instanceof IPartListener) {
+				parent.removePartListener((IPartListener) listener);
 			}
-			if (obj instanceof IPartListener2) {
-				parent.removePartListener((IPartListener2) obj);
+			if (listener instanceof IPartListener2) {
+				parent.removePartListener((IPartListener2) listener);
 			}
 		}
 		listeners.clear();

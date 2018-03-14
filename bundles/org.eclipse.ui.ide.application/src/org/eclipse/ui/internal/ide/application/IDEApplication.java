@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2014 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,8 @@
  *     Helmut J. Haigermoser -  Bug 359838 - The "Workspace Unavailable" error
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422954
  *     Christian Georgi (SAP) - Bug 423882 - Warn user if workspace is newer than IDE
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 427393, 455162
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 514355
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.application;
 
@@ -28,6 +30,7 @@ import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
@@ -81,17 +84,22 @@ public class IDEApplication implements IApplication, IExecutableExtension {
 
     private static final String PROP_EXIT_CODE = "eclipse.exitcode"; //$NON-NLS-1$
 
+	/**
+	 * Return value when the user wants to retry loading the current workspace
+	 */
+    private static final int RETRY_LOAD = 0;
+
     /**
      * A special return code that will be recognized by the launcher and used to
      * restart the workbench.
      */
-    private static final Integer EXIT_RELAUNCH = new Integer(24);
+	private static final Integer EXIT_RELAUNCH = Integer.valueOf(24);
 
     /**
      * A special return code that will be recognized by the PDE launcher and used to
      * show an error dialog if the workspace is locked.
      */
-    private static final Integer EXIT_WORKSPACE_LOCKED = new Integer(15);
+	private static final Integer EXIT_WORKSPACE_LOCKED = Integer.valueOf(15);
 
     /**
      * The ID of the application plug-in
@@ -107,6 +115,12 @@ public class IDEApplication implements IApplication, IExecutableExtension {
 
     @Override
 	public Object start(IApplicationContext appContext) throws Exception {
+		// Suspend the job manager to prevent background jobs from running. This
+		// is done to reduce resource contention during startup.
+		// The job manager will be resumed by the
+		// IDEWorkbenchAdvisor.postStartup method.
+		Job.getJobManager().suspend();
+
         Display display = createDisplay();
         // processor must be created before we start event loop
         DelayedEventsProcessor processor = new DelayedEventsProcessor(display);
@@ -127,7 +141,6 @@ public class IDEApplication implements IApplication, IExecutableExtension {
             Object instanceLocationCheck = checkInstanceLocation(shell, appContext.getArguments());
 			if (instanceLocationCheck != null) {
             	WorkbenchPlugin.unsetSplashShell(display);
-                appContext.applicationRunning();
                 return instanceLocationCheck;
             }
 
@@ -247,8 +260,23 @@ public class IDEApplication implements IApplication, IExecutableExtension {
                 .getDefault());
 
         boolean force = false;
+
+		boolean parentShellVisible = false;
+		if (isValidShell(shell)) {
+			parentShellVisible = shell.getVisible();
+			// bug 455162, bug 427393: hide the splash if the workspace
+			// prompt dialog should be opened
+			if (parentShellVisible && launchData.getShowDialog()) {
+				shell.setVisible(false);
+			}
+		}
+
+		int returnValue = -1;
+		URL workspaceUrl = null;
         while (true) {
-            URL workspaceUrl = promptForWorkspace(shell, launchData, force);
+			if (returnValue != RETRY_LOAD) {
+				workspaceUrl = promptForWorkspace(shell, launchData, force);
+			}
             if (workspaceUrl == null) {
 				return EXIT_OK;
 			}
@@ -263,6 +291,13 @@ public class IDEApplication implements IApplication, IExecutableExtension {
                 if (instanceLoc.set(workspaceUrl, true)) {
                     launchData.writePersistedData();
                     writeWorkspaceVersion();
+
+					// bug 455162, bug 427393: unhide the splash after the
+					// workspace was selected to show the progress bar
+					if (parentShellVisible && isValidShell(shell)) {
+						shell.setVisible(true);
+						shell.forceActive();
+					}
                     return null;
                 }
             } catch (IllegalStateException e) {
@@ -282,8 +317,12 @@ public class IDEApplication implements IApplication, IExecutableExtension {
 
             // by this point it has been determined that the workspace is
             // already in use -- force the user to choose again
-            MessageDialog.openError(shell, IDEWorkbenchMessages.IDEApplication_workspaceInUseTitle,
-                    NLS.bind(IDEWorkbenchMessages.IDEApplication_workspaceInUseMessage, workspaceUrl.getFile()));
+			MessageDialog dialog = new MessageDialog(shell, IDEWorkbenchMessages.IDEApplication_workspaceInUseTitle,
+					null, NLS.bind(IDEWorkbenchMessages.IDEApplication_workspaceInUseMessage, workspaceUrl.getFile()),
+					MessageDialog.ERROR, 1, IDEWorkbenchMessages.IDEApplication_workspaceInUse_Retry,
+					IDEWorkbenchMessages.IDEApplication_workspaceInUse_Cancel);
+			// the return value influences the next loop's iteration
+			returnValue = dialog.open();
         }
     }
 
@@ -309,17 +348,21 @@ public class IDEApplication implements IApplication, IExecutableExtension {
      * @return An URL storing the selected workspace or null if the user has
      *         canceled the launch operation.
      */
-    private URL promptForWorkspace(Shell shell, ChooseWorkspaceData launchData,
+	private URL promptForWorkspace(Shell shell, ChooseWorkspaceData launchData,
 			boolean force) {
         URL url = null;
+
         do {
-        	// okay to use the shell now - this is the splash shell
 			new ChooseWorkspaceDialog(shell, launchData, false, true) {
 				@Override
 				protected Shell getParentShell() {
+					// Bug 429308: Make workspace selection dialog visible
+					// in the task manager of the OS
 					return null;
 				}
+
 			}.prompt(force);
+
             String instancePath = launchData.getSelection();
             if (instancePath == null) {
 				return null;
@@ -364,6 +407,13 @@ public class IDEApplication implements IApplication, IExecutableExtension {
 
         return url;
     }
+
+	/**
+	 * @return true if the shell is not <code>null</code> and not disposed
+	 */
+	static boolean isValidShell(Shell shell) {
+		return shell != null && !shell.isDisposed();
+	}
 
     /**
      * Return true if the argument directory is ok to use as a workspace and

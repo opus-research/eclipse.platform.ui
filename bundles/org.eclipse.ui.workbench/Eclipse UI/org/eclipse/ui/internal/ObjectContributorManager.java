@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IAdapterManager;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -33,7 +33,6 @@ import org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.util.Util;
 
 /**
  * This class is a default implementation of <code>IObjectContributorManager</code>.
@@ -251,12 +250,11 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
     private void internalComputeInterfaceOrder(Class[] interfaces, List result,
             Map seen) {
         List newInterfaces = new ArrayList(seen.size());
-        for (int i = 0; i < interfaces.length; i++) {
-            Class interfac = interfaces[i];
-            if (seen.get(interfac) == null) {
-                result.add(interfac);
-                seen.put(interfac, interfac);
-                newInterfaces.add(interfac);
+        for (Class currentInterface : interfaces) {
+            if (seen.get(currentInterface) == null) {
+                result.add(currentInterface);
+                seen.put(currentInterface, currentInterface);
+                newInterfaces.add(currentInterface);
             }
         }
         for (Iterator newList = newInterfaces.iterator(); newList.hasNext();) {
@@ -323,7 +321,7 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
         contributorList.add(contributor);
         flushLookup();
 
-        IConfigurationElement element = Util.getAdapter(contributor, IConfigurationElement.class);
+        IConfigurationElement element = Adapters.adapt(contributor, IConfigurationElement.class);
 
         //hook the object listener
         if (element != null) {
@@ -527,8 +525,8 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
             result.add(clazz);
             // add all the interfaces it implements
             Class[] interfaces = clazz.getInterfaces();
-            for (int i = 0; i < interfaces.length; i++) {
-                result.add(interfaces[i]);
+            for (Class currentInterface : interfaces) {
+                result.add(currentInterface);
             }
             // get the superclass
             clazz = clazz.getSuperclass();
@@ -552,9 +550,9 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
 
     @Override
 	public void removeExtension(IExtension source, Object[] objects) {
-        for (int i = 0; i < objects.length; i++) {
-            if (objects[i] instanceof ContributorRecord) {
-                ContributorRecord contributorRecord = (ContributorRecord) objects[i];
+        for (Object object : objects) {
+            if (object instanceof ContributorRecord) {
+                ContributorRecord contributorRecord = (ContributorRecord) object;
                 unregisterContributor((contributorRecord).contributor, (contributorRecord).objectClassName);
                 contributorRecordSet.remove(contributorRecord);
             }
@@ -860,9 +858,7 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
         IAdapterManager adapterMgr = Platform.getAdapterManager();
         for (Iterator list = classList.iterator(); list.hasNext();) {
             Class clazz = ((Class) list.next());
-            String[] adapters = adapterMgr.computeAdapterTypes(clazz);
-            for (int i = 0; i < adapters.length; i++) {
-                String adapter = adapters[i];
+			for (String adapter : adapterMgr.computeAdapterTypes(clazz)) {
                 if (!result.contains(adapter)) {
                     result.add(adapter);
                 }

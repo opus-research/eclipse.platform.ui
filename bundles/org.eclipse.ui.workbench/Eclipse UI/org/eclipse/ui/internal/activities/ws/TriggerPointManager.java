@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,21 +43,11 @@ public class TriggerPointManager implements ITriggerPointManager, IExtensionChan
         triggerMap.put(ITriggerPointManager.UNKNOWN_TRIGGER_POINT_ID,
                 new AbstractTriggerPoint() {
 
-                    /*
-                     * (non-Javadoc)
-                     *
-                     * @see org.eclipse.ui.activities.ITriggerPoint#getId()
-                     */
                     @Override
 					public String getId() {
                         return ITriggerPointManager.UNKNOWN_TRIGGER_POINT_ID;
                     }
 
-                    /*
-                     * (non-Javadoc)
-                     *
-                     * @see org.eclipse.ui.activities.ITriggerPoint#getStringHint(java.lang.String)
-                     */
                     @Override
 					public String getStringHint(String key) {
                         if (ITriggerPoint.HINT_INTERACTIVE.equals(key)) {
@@ -68,11 +58,6 @@ public class TriggerPointManager implements ITriggerPointManager, IExtensionChan
                         return null;
                     }
 
-                    /*
-                     * (non-Javadoc)
-                     *
-                     * @see org.eclipse.ui.activities.ITriggerPoint#getBooleanHint(java.lang.String)
-                     */
                     @Override
 					public boolean getBooleanHint(String key) {
                         if (ITriggerPoint.HINT_INTERACTIVE.equals(key)) {
@@ -88,59 +73,35 @@ public class TriggerPointManager implements ITriggerPointManager, IExtensionChan
 
         IExtensionPoint point = getExtensionPointFilter();
         IExtension[] extensions = point.getExtensions();
-        for (int i = 0; i < extensions.length; i++) {
+        for (IExtension extension : extensions) {
             addExtension(tracker,
-                    extensions[i]);
+                    extension);
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eclipse.ui.activities.ITriggerPointManager#getTriggerPoint(java.lang.String)
-     */
     @Override
 	public ITriggerPoint getTriggerPoint(String id) {
         return (ITriggerPoint) triggerMap.get(id);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eclipse.ui.activities.ITriggerPointManager#getDefinedTriggerPointIds()
-     */
     @Override
 	public Set getDefinedTriggerPointIds() {
         return triggerMap.entrySet();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionRemovalHandler#removeInstance(org.eclipse.core.runtime.IExtension,
-     *      java.lang.Object[])
-     */
     @Override
 	public void removeExtension(IExtension extension, Object[] objects) {
-        for (int i = 0; i < objects.length; i++) {
-            Object object = objects[i];
+        for (Object object : objects) {
             if (object instanceof RegistryTriggerPoint) {
                 triggerMap.remove(((RegistryTriggerPoint) object).getId());
             }
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionAdditionHandler#addInstance(org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker,
-     *      org.eclipse.core.runtime.IExtension)
-     */
     @Override
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
         IConfigurationElement[] elements = extension.getConfigurationElements();
-        for (int i = 0; i < elements.length; i++) {
-            IConfigurationElement element = elements[i];
+        for (IConfigurationElement element : elements) {
             if (element.getName().equals(
                     IWorkbenchRegistryConstants.TAG_TRIGGERPOINT)) {
                 String id = element

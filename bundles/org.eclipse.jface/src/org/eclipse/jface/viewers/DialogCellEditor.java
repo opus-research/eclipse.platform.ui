@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,11 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440270
  *******************************************************************************/
 package org.eclipse.jface.viewers;
+
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.text.MessageFormat;	// Not using ICU to support standalone JFace scenario
 
@@ -20,8 +23,6 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
@@ -91,7 +92,7 @@ public abstract class DialogCellEditor extends CellEditor {
     static {
         ImageRegistry reg = JFaceResources.getImageRegistry();
         reg.put(CELL_EDITOR_IMG_DOTS_BUTTON, ImageDescriptor.createFromFile(
-                DialogCellEditor.class, "images/dots_button.gif"));//$NON-NLS-1$
+                DialogCellEditor.class, "images/dots_button.png"));//$NON-NLS-1$
     }
 
     /**
@@ -231,33 +232,28 @@ public abstract class DialogCellEditor extends CellEditor {
 
         button.addFocusListener(getButtonFocusListener());
 
-        button.addSelectionListener(new SelectionAdapter() {
+        button.addSelectionListener(widgetSelectedAdapter(event -> {
+			// Remove the button's focus listener since it's guaranteed
+			// to lose focus when the dialog opens
+			button.removeFocusListener(getButtonFocusListener());
 
-			@Override
-			public void widgetSelected(SelectionEvent event) {
-            	// Remove the button's focus listener since it's guaranteed
-            	// to lose focus when the dialog opens
-            	button.removeFocusListener(getButtonFocusListener());
+			Object newValue = openDialogBox(editor);
 
-            	Object newValue = openDialogBox(editor);
+			// Re-add the listener once the dialog closes
+			button.addFocusListener(getButtonFocusListener());
 
-            	// Re-add the listener once the dialog closes
-            	button.addFocusListener(getButtonFocusListener());
-
-            	if (newValue != null) {
-                    boolean newValidState = isCorrect(newValue);
-                    if (newValidState) {
-                        markDirty();
-                        doSetValue(newValue);
-                    } else {
-                        // try to insert the current value into the error message.
-                        setErrorMessage(MessageFormat.format(getErrorMessage(),
-                                new Object[] { newValue.toString() }));
-                    }
-                    fireApplyEditorValue();
-                }
-            }
-        });
+			if (newValue != null) {
+		        boolean newValidState = isCorrect(newValue);
+		        if (newValidState) {
+		            markDirty();
+		            doSetValue(newValue);
+		        } else {
+		            // try to insert the current value into the error message.
+		            setErrorMessage(MessageFormat.format(getErrorMessage(), newValue.toString()));
+		        }
+		        fireApplyEditorValue();
+		    }
+		}));
 
         setValueValid(true);
 

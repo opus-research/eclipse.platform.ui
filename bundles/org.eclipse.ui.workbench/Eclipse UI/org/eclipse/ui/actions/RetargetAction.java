@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,6 @@ import org.eclipse.core.commands.IHandlerAttributes;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IActionBars;
@@ -56,12 +55,7 @@ public class RetargetAction extends PartEventAction implements
 
     private IAction handler;
 
-    private IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
-        @Override
-		public void propertyChange(PropertyChangeEvent event) {
-            RetargetAction.this.propagateChange(event);
-        }
-    };
+    private IPropertyChangeListener propertyChangeListener = event -> RetargetAction.this.propagateChange(event);
 
     /**
      * Constructs a RetargetAction with the given action id and text.
@@ -87,24 +81,21 @@ public class RetargetAction extends PartEventAction implements
         super(text, style);
         setId(actionID);
         setEnabled(false);
-        super.setHelpListener(new HelpListener() {
-            @Override
-			public void helpRequested(HelpEvent e) {
-                HelpListener listener = null;
-                if (handler != null) {
-                    // if we have a handler, see if it has a help listener
-                    listener = handler.getHelpListener();
-                    if (listener == null) {
-						// use our own help listener
-                        listener = localHelpListener;
-					}
-                }
-                if (listener != null) {
-					// pass on the event
-                    listener.helpRequested(e);
+        super.setHelpListener(e -> {
+		    HelpListener listener = null;
+		    if (handler != null) {
+		        // if we have a handler, see if it has a help listener
+		        listener = handler.getHelpListener();
+		        if (listener == null) {
+					// use our own help listener
+		            listener = localHelpListener;
 				}
-            }
-        });
+		    }
+		    if (listener != null) {
+				// pass on the event
+		        listener.helpRequested(e);
+			}
+		});
     }
 
     /**
@@ -133,10 +124,6 @@ public class RetargetAction extends PartEventAction implements
         enableAccelerator = b;
     }
 
-    /* (non-Javadoc)
-     * Retaget actions do not have accelerators.  It is up to the
-     * part to hook the accelerator.
-     */
     @Override
 	public int getAccelerator() {
         if (enableAccelerator) {
@@ -292,9 +279,6 @@ public class RetargetAction extends PartEventAction implements
                 newHandler);
     }
 
-    /* (non-Javadoc)
-     * Method declared on IAction.
-     */
     @Override
 	public void setChecked(boolean checked) {
         super.setChecked(checked);

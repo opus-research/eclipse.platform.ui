@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2011 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,9 +37,6 @@ public class Tweaklets {
 			this.tweakClass = tweakClass;
 		}
 
-		/* (non-Javadoc)
-		 * @see java.lang.Object#hashCode()
-		 */
 		@Override
 		public int hashCode() {
 			final int prime = 31;
@@ -49,9 +46,6 @@ public class Tweaklets {
 			return result;
 		}
 
-		/* (non-Javadoc)
-		 * @see java.lang.Object#equals(java.lang.Object)
-		 */
 		@Override
 		public boolean equals(Object obj) {
 			if (this == obj)
@@ -106,17 +100,16 @@ public class Tweaklets {
 		IConfigurationElement[] elements = Platform
 				.getExtensionRegistry()
 				.getConfigurationElementsFor("org.eclipse.ui.internalTweaklets"); //$NON-NLS-1$
-		for (int i = 0; i < elements.length; i++) {
+		for (IConfigurationElement element : elements) {
 			if (definition.tweakClass.getName().equals(
-					elements[i].getAttribute("definition"))) { //$NON-NLS-1$
+					element.getAttribute("definition"))) { //$NON-NLS-1$
 				try {
-					Object tweaklet = elements[i].createExecutableExtension("implementation"); //$NON-NLS-1$
+					Object tweaklet = element.createExecutableExtension("implementation"); //$NON-NLS-1$
 					tweaklets.put(definition, tweaklet);
 					return tweaklet;
 				} catch (CoreException e) {
 					StatusManager.getManager().handle(
-							StatusUtil.newStatus(IStatus.ERROR,
-									"Error with extension " + elements[i], e), //$NON-NLS-1$
+							StatusUtil.newStatus(IStatus.ERROR, "Error with extension " + element, e), //$NON-NLS-1$
 							StatusManager.LOG);
 				}
 			}

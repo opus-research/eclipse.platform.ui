@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,8 +11,6 @@
 package org.eclipse.ui.internal.browser;
 
 import java.util.HashMap;
-import java.util.Observable;
-import java.util.Observer;
 
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
@@ -29,22 +27,17 @@ public class DefaultBrowserSupport extends AbstractWorkbenchBrowserSupport {
 	static final String DEFAULT_ID_BASE = "org.eclipse.ui.defaultBrowser"; //$NON-NLS-1$
 	private static final String HELP_BROWSER_ID = "org.eclipse.help.ui"; //$NON-NLS-1$
 
-	protected HashMap<String, Object> browserIdMap = new HashMap<String, Object>();
+	protected HashMap<String, Object> browserIdMap = new HashMap<>();
 
 	protected static DefaultBrowserSupport instance;
 
 	public DefaultBrowserSupport() {
 		// do nothing
 		instance = this;
-		BrowserManager.getInstance().addObserver(new Observer() {
-			public void update(Observable o, Object arg) {
-				// TODO I am not sure what we should do here
-				// The preferences have changed so maybe we should
-				// close the opened browsers in addition to clearing
-				// the table
-				browserIdMap.clear();
-			}
-		});
+		// TODO I am not sure what we should do here
+		// The preferences have changed so maybe we should close the opened
+		// browsers in addition to clearing the table
+		BrowserManager.getInstance().addObserver((o, arg) -> browserIdMap.clear());
 	}
 
 	protected static DefaultBrowserSupport getInstance() {
@@ -75,15 +68,10 @@ public class DefaultBrowserSupport extends AbstractWorkbenchBrowserSupport {
 	}
 
 	private Integer getWindowKey(IWorkbenchWindow window) {
-		return new Integer(window.hashCode());
+		return Integer.valueOf(window.hashCode());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#createBrowser(int,
-	 *      java.lang.String, java.lang.String, java.lang.String)
-	 */
+	@Override
 	public IWebBrowser createBrowser(int style, String browserId, String name,
 			String tooltip) throws PartInitException {
 		if (browserId == null)
@@ -141,7 +129,7 @@ public class DefaultBrowserSupport extends AbstractWorkbenchBrowserSupport {
 			@SuppressWarnings("unchecked")
 			HashMap<Integer, IWebBrowser> wmap = (HashMap<Integer, IWebBrowser>) browserIdMap.get(browserId);
 			if (wmap == null) {
-				wmap = new HashMap<Integer, IWebBrowser>();
+				wmap = new HashMap<>();
 				browserIdMap.put(browserId, wmap);
 			}
 			wmap.put(key, webBrowser);
@@ -153,20 +141,12 @@ public class DefaultBrowserSupport extends AbstractWorkbenchBrowserSupport {
 		return webBrowser;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#createBrowser(java.lang.String)
-	 */
+	@Override
 	public IWebBrowser createBrowser(String browserId) throws PartInitException {
 		return createBrowser(0, browserId, null, null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#isInternalWebBrowserAvailable()
-	 */
+	@Override
 	public boolean isInternalWebBrowserAvailable() {
 		return WebBrowserUtil.canUseInternalWebBrowser();
 	}

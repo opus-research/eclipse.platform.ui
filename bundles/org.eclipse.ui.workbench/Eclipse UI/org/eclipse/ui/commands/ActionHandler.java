@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2006 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,6 @@ import java.util.Map;
 import org.eclipse.core.commands.IHandlerAttributes;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.actions.RetargetAction;
 
@@ -127,26 +126,22 @@ public final class ActionHandler extends AbstractHandler {
         if (propertyChangeListener == null) {
             attributeValuesByName = getAttributeValuesByNameFromAction();
 
-            propertyChangeListener = new IPropertyChangeListener() {
-                @Override
-				public void propertyChange(
-                        PropertyChangeEvent propertyChangeEvent) {
-                    String property = propertyChangeEvent.getProperty();
-                    if (IAction.ENABLED.equals(property)
-                            || IAction.CHECKED.equals(property)
-                            || IHandlerAttributes.ATTRIBUTE_HANDLED
-                                    .equals(property)) {
+            propertyChangeListener = propertyChangeEvent -> {
+               String property = propertyChangeEvent.getProperty();
+               if (IAction.ENABLED.equals(property)
+			    || IAction.CHECKED.equals(property)
+			    || IHandlerAttributes.ATTRIBUTE_HANDLED
+			            .equals(property)) {
 
-                        Map previousAttributeValuesByName = attributeValuesByName;
-                        attributeValuesByName = getAttributeValuesByNameFromAction();
-                        if (!attributeValuesByName
-                                .equals(previousAttributeValuesByName)) {
-							fireHandlerChanged(new HandlerEvent(
-                                    ActionHandler.this, true,
-                                    previousAttributeValuesByName));
-						}
-                    }
-                }
+			Map previousAttributeValuesByName = attributeValuesByName;
+			attributeValuesByName = getAttributeValuesByNameFromAction();
+			if (!attributeValuesByName
+			        .equals(previousAttributeValuesByName)) {
+				fireHandlerChanged(new HandlerEvent(
+			            ActionHandler.this, true,
+			            previousAttributeValuesByName));
+			}
+               }
             };
         }
 
@@ -180,9 +175,6 @@ public final class ActionHandler extends AbstractHandler {
     }
 
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.commands.IHandler#execute(java.util.Map)
-     */
 	@Override
 	@Deprecated
     public Object execute(Map parameterValuesByName) throws ExecutionException {
@@ -210,9 +202,6 @@ public final class ActionHandler extends AbstractHandler {
         return action;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.commands.IHandler#getAttributeValuesByName()
-     */
 	@Override
 	@Deprecated
     public Map getAttributeValuesByName() {
@@ -244,7 +233,7 @@ public final class ActionHandler extends AbstractHandler {
         }
         map.put(ATTRIBUTE_HANDLED, handled ? Boolean.TRUE : Boolean.FALSE);
         map.put(ATTRIBUTE_ID, action.getId());
-        map.put(ATTRIBUTE_STYLE, new Integer(action.getStyle()));
+		map.put(ATTRIBUTE_STYLE, Integer.valueOf(action.getStyle()));
         return Collections.unmodifiableMap(map);
     }
 
@@ -262,9 +251,6 @@ public final class ActionHandler extends AbstractHandler {
         }
     }
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	@Deprecated
 	public final String toString() {

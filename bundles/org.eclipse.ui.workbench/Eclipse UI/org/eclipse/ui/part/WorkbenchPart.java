@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.ui.part;
 
@@ -71,7 +72,7 @@ public abstract class WorkbenchPart extends EventManager implements
 
     private String contentDescription = ""; //$NON-NLS-1$
 
-    private ListenerList partChangeListeners = new ListenerList();
+	private ListenerList<IPropertyChangeListener> partChangeListeners = new ListenerList<>();
 
     /**
      * Creates a new workbench part.
@@ -85,16 +86,6 @@ public abstract class WorkbenchPart extends EventManager implements
         addListenerObject(l);
     }
 
-    /* (non-Javadoc)
-     * Creates the SWT controls for this workbench part.
-     * <p>
-     * Subclasses must implement this method.  For a detailed description of the
-     * requirements see <code>IWorkbenchPart</code>
-     * </p>
-     *
-     * @param parent the parent control
-     * @see IWorkbenchPart
-     */
     @Override
 	public abstract void createPartControl(Composite parent);
 
@@ -122,11 +113,10 @@ public abstract class WorkbenchPart extends EventManager implements
      * @param propertyId the id of the property that changed
      */
     protected void firePropertyChange(final int propertyId) {
-        Object[] array = getListeners();
-        for (int nX = 0; nX < array.length; nX++) {
-            final IPropertyListener l = (IPropertyListener) array[nX];
+		for (Object listener : getListeners()) {
+			final IPropertyListener propertyListener = (IPropertyListener) listener;
             try {
-                l.propertyChanged(WorkbenchPart.this, propertyId);
+				propertyListener.propertyChanged(WorkbenchPart.this, propertyId);
             } catch (RuntimeException e) {
                 WorkbenchPlugin.log(e);
             }
@@ -207,17 +197,6 @@ public abstract class WorkbenchPart extends EventManager implements
         removeListenerObject(l);
     }
 
-    /* (non-Javadoc)
-     * Asks this part to take focus within the workbench. Parts must
-     * assign focus to one of the controls contained in the part's
-     * parent composite.
-     * <p>
-     * Subclasses must implement this method.  For a detailed description of the
-     * requirements see <code>IWorkbenchPart</code>
-     * </p>
-     *
-     * @see IWorkbenchPart
-     */
     @Override
 	public abstract void setFocus();
 
@@ -488,17 +467,16 @@ public abstract class WorkbenchPart extends EventManager implements
 	 */
     protected void firePartPropertyChanged(String key, String oldValue, String newValue) {
     	final PropertyChangeEvent event = new PropertyChangeEvent(this, key, oldValue, newValue);
-    	Object[] l = partChangeListeners.getListeners();
-    	for (int i = 0; i < l.length; i++) {
+		for (IPropertyChangeListener l : partChangeListeners) {
 			try {
-				((IPropertyChangeListener)l[i]).propertyChange(event);
+				l.propertyChange(event);
 			} catch (RuntimeException e) {
 				WorkbenchPlugin.log(e);
 			}
 		}
     }
 
-	private Map<String, String> partProperties = new HashMap<String, String>();
+	private Map<String, String> partProperties = new HashMap<>();
 
     @Override
 	public void setPartProperty(String key, String value) {

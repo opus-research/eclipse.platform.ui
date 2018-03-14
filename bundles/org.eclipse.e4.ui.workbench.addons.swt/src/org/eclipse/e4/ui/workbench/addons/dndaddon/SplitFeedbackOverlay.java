@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 IBM Corporation and others.
+ * Copyright (c) 2013, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,7 @@ import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Region;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
@@ -40,8 +41,9 @@ public class SplitFeedbackOverlay {
 		curSide = side;
 		ratio = pct;
 
-		feedbackShell = new Shell(dragShell, SWT.NO_TRIM);
+		feedbackShell = new Shell(dragShell, SWT.NO_TRIM | SWT.ON_TOP);
 		feedbackShell.setBounds(dragShell.getBounds());
+		feedbackShell.setData(DragAndDropUtil.IGNORE_AS_DROP_TARGET, DragAndDropUtil.IGNORE_AS_DROP_TARGET);
 
 		MWindow winModel = (MWindow) dragShell.getData(AbstractPartRenderer.OWNING_ME);
 		stylingEngine = winModel.getContext().get(IStylingEngine.class);
@@ -55,16 +57,18 @@ public class SplitFeedbackOverlay {
 	public void dispose() {
 		if (feedbackShell != null && !feedbackShell.isDisposed()) {
 			Region region = feedbackShell.getRegion();
-			if (region != null && !region.isDisposed())
+			if (region != null && !region.isDisposed()) {
 				region.dispose();
+			}
 			feedbackShell.dispose();
 		}
 		feedbackShell = null;
 	}
 
 	private void showRects(boolean enclosed) {
-		if (curSide == 0)
+		if (curSide == 0) {
 			return;
+		}
 
 		Rectangle ca = new Rectangle(outerRect.x, outerRect.y, outerRect.width, outerRect.height);
 		rects.clear();
@@ -106,8 +110,22 @@ public class SplitFeedbackOverlay {
 			rgn.subtract(r.x + 2, r.y + 2, r.width - 4, r.height - 4);
 		}
 
-		if (feedbackShell.getRegion() != null && !feedbackShell.getRegion().isDisposed())
+		// Workaround: Some window managers draw a drop shadow even if the shell
+		// is set to NO_TRIM. By making the shell contain a component in the
+		// bottom-right of its parent shell, SWT won't resize it and any extra
+		// shadows will end up being drawn on top of the shadows for the parent
+		// shell rather than in the middle of the workbench window.
+		Composite parent = feedbackShell.getParent();
+		if (parent instanceof Shell) {
+			Shell parentShell = (Shell) parent;
+
+			Rectangle bounds = parentShell.getBounds();
+			rgn.add(bounds.width - 1, bounds.height - 1, 1, 1);
+		}
+
+		if (feedbackShell.getRegion() != null && !feedbackShell.getRegion().isDisposed()) {
 			feedbackShell.getRegion().dispose();
+		}
 		feedbackShell.setRegion(rgn);
 
 		feedbackShell.redraw();
@@ -121,8 +139,9 @@ public class SplitFeedbackOverlay {
 	}
 
 	public void setFeedback(boolean enclosed, boolean modified) {
-		if (isModified == null)
+		if (isModified == null) {
 			isModified = !modified;
+		}
 
 		// Update the feedback color if the drag is 'modified'
 		if (modified != isModified) {

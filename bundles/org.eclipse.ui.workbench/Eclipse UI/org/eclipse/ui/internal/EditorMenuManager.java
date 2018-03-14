@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,9 +38,7 @@ public class EditorMenuManager extends SubMenuManager {
          */
         public void updateEnabledAllowed() {
             // update the items in the map
-            IContributionItem[] items = EditorMenuManager.super.getItems();
-            for (int i = 0; i < items.length; i++) {
-                IContributionItem item = items[i];
+			for (IContributionItem item : EditorMenuManager.super.getItems()) {
                 item.update(IContributionManagerOverrides.P_ENABLED);
             }
             // update the wrapped menus
@@ -71,7 +69,7 @@ public class EditorMenuManager extends SubMenuManager {
                         item);
 			} else {
 				// no acclerator if the item is disabled
-                return new Integer(0);
+				return Integer.valueOf(0);
 			}
         }
 
@@ -201,9 +199,8 @@ public class EditorMenuManager extends SubMenuManager {
     }
 
     protected void getAllContributedActions(HashSet set) {
-        IContributionItem[] items = super.getItems();
-        for (int i = 0; i < items.length; i++) {
-			getAllContributedActions(set, items[i]);
+		for (IContributionItem item : super.getItems()) {
+			getAllContributedActions(set, item);
 		}
         if (wrappers == null) {
 			return;
@@ -216,9 +213,8 @@ public class EditorMenuManager extends SubMenuManager {
 
     protected void getAllContributedActions(HashSet set, IContributionItem item) {
         if (item instanceof MenuManager) {
-            IContributionItem subItems[] = ((MenuManager) item).getItems();
-            for (int j = 0; j < subItems.length; j++) {
-				getAllContributedActions(set, subItems[j]);
+			for (IContributionItem subItem : ((MenuManager) item).getItems()) {
+				getAllContributedActions(set, subItem);
 			}
         } else if (item instanceof ActionContributionItem) {
             set.add(((ActionContributionItem) item).getAction());

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -86,10 +86,10 @@ public class VisibilityAssistant implements IExtensionActivationListener {
 		if (theExtensions == null) {
 			return;
 		}
-		for (int i = 0; i < theExtensions.length; i++) {
-			programmaticVisibilityBindings.add(theExtensions[i]);
+		for (String extension : theExtensions) {
+			programmaticVisibilityBindings.add(extension);
 			if (isRoot) {
-				programmaticRootBindings.add(theExtensions[i]);
+				programmaticRootBindings.add(extension);
 			}
 		}
 		notifyClients();
@@ -121,8 +121,8 @@ public class VisibilityAssistant implements IExtensionActivationListener {
 
 	private void notifyClients() {
 		Object[] clients = listeners.getListeners();
-		for (int i = 0; i < clients.length; i++) {
-			((VisibilityListener) clients[i]).onVisibilityOrActivationChange();
+		for (Object client : clients) {
+			((VisibilityListener) client).onVisibilityOrActivationChange();
 		}
 	}
 

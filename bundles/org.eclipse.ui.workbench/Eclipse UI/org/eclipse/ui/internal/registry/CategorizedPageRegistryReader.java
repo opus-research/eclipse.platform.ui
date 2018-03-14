@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -144,9 +144,7 @@ public abstract class CategorizedPageRegistryReader extends RegistryReader {
 			//reset the flag
 			workDone = false;
 			List deferred = new ArrayList();
-			for (int i = 0; i < nodes.length; i++) {
-				// Iterate through all the nodes
-				CategoryNode categoryNode = nodes[i];
+			for (CategoryNode categoryNode : nodes) {
 				Object node = categoryNode.getNode();
 
 				String category = getCategory(node);
@@ -187,8 +185,7 @@ public abstract class CategorizedPageRegistryReader extends RegistryReader {
 		} while (nodes.length > 0 && workDone); // loop while we still have nodes to work on and the list is shrinking
 
 		// log anything left over.
-		for (int i = 0; i < nodes.length; i++) {
-			CategoryNode categoryNode = nodes[i];
+		for (CategoryNode categoryNode : nodes) {
 			// Could not find the parent - log
 			WorkbenchPlugin.log(StatusUtil.newStatus(IStatus.WARNING,
 					invalidCategoryNodeMessage(categoryNode), null));

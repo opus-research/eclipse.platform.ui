@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -93,18 +93,11 @@ public abstract class LinearUndoViolationDetector implements IOperationApprover 
 			IUndoableOperation operation, IUndoContext context,
 			IOperationHistory history, IAdaptable info);
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.core.commands.operations.IOperationApprover#proceedRedoing(org.eclipse.core.commands.operations.IUndoableOperation,
-	 *      org.eclipse.core.commands.operations.IOperationHistory,
-	 *      org.eclipse.core.runtime.IAdaptable)
-	 */
+	@Override
 	public final IStatus proceedRedoing(IUndoableOperation operation,
 			IOperationHistory history, IAdaptable info) {
 		IUndoContext[] contexts = operation.getContexts();
-		for (int i = 0; i < contexts.length; i++) {
-			IUndoContext context = contexts[i];
+		for (IUndoContext context : contexts) {
 			if (history.getRedoOperation(context) != operation) {
 				IStatus status = allowLinearRedoViolation(operation, context,
 						history, info);
@@ -116,19 +109,12 @@ public abstract class LinearUndoViolationDetector implements IOperationApprover 
 		return Status.OK_STATUS;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.core.commands.operations.IOperationApprover#proceedUndoing(org.eclipse.core.commands.operations.IUndoableOperation,
-	 *      org.eclipse.core.commands.operations.IOperationHistory,
-	 *      org.eclipse.core.runtime.IAdaptable)
-	 */
 
+	@Override
 	public final IStatus proceedUndoing(IUndoableOperation operation,
 			IOperationHistory history, IAdaptable info) {
 		IUndoContext[] contexts = operation.getContexts();
-		for (int i = 0; i < contexts.length; i++) {
-			IUndoContext context = contexts[i];
+		for (IUndoContext context : contexts) {
 			if (history.getUndoOperation(context) != operation) {
 				IStatus status = allowLinearUndoViolation(operation, context,
 						history, info);

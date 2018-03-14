@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2011 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -210,8 +210,7 @@ public class ThemeRegistryReader extends RegistryReader {
         String osname = Platform.getOS();
         String wsname = Platform.getWS();
 
-        for (int i = 0; i < elements.length; i++) {
-            IConfigurationElement element = elements[i];
+        for (IConfigurationElement element : elements) {
             String elementOs = element.getAttribute(IWorkbenchRegistryConstants.ATT_OS);
             String elementWs = element.getAttribute(IWorkbenchRegistryConstants.ATT_WS);
 
@@ -229,9 +228,6 @@ public class ThemeRegistryReader extends RegistryReader {
         return match;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.registry.RegistryReader#readElement(org.eclipse.core.runtime.IConfigurationElement)
-     */
     @Override
 	public boolean readElement(IConfigurationElement element) {
         String elementName = element.getName();

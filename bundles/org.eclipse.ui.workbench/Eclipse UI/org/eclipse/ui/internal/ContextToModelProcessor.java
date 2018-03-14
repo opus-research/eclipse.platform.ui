@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2012 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -29,7 +30,7 @@ import org.eclipse.ui.internal.contexts.ContextPersistence;
  *
  */
 public class ContextToModelProcessor {
-	private Map<String, MBindingContext> contexts = new HashMap<String, MBindingContext>();
+	private Map<String, MBindingContext> contexts = new HashMap<>();
 
 
 	@Execute
@@ -63,8 +64,7 @@ public class ContextToModelProcessor {
 				contextModel.setDescription(ctx.getDescription());
 
 			} catch (NotDefinedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				WorkbenchPlugin.log(e);
 			}
 		}
 		for (Context ctx : contextManager.getDefinedContexts()) {
@@ -87,8 +87,7 @@ public class ContextToModelProcessor {
 					}
 				}
 			} catch (NotDefinedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				WorkbenchPlugin.log(e);
 			}
 		}
 	}

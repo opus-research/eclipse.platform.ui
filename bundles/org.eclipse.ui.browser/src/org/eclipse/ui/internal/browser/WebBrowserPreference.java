@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2011 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -67,7 +67,7 @@ public class WebBrowserPreference {
 		String temp = getPreferenceStore().getString(
 				PREF_INTERNAL_WEB_BROWSER_HISTORY);
 		StringTokenizer st = new StringTokenizer(temp, "|*|"); //$NON-NLS-1$
-		List<String> l = new ArrayList<String>();
+		List<String> l = new ArrayList<>();
 		while (st.hasMoreTokens()) {
 			String s = st.nextToken();
 			l.add(s);
@@ -98,7 +98,7 @@ public class WebBrowserPreference {
 		try {
 			prefs.flush();
 		} catch (BackingStoreException e) {
-			e.printStackTrace();
+			WebBrowserUIPlugin.logError(e.getMessage(), e);
 		}
 	}
 
@@ -147,7 +147,7 @@ public class WebBrowserPreference {
 		try {
 			prefs.flush();
 		} catch (BackingStoreException e) {
-			e.printStackTrace();
+			WebBrowserUIPlugin.logError(e.getMessage(), e);
 		}
 		updateDefaultEditor(choice);
 	}
@@ -168,8 +168,7 @@ public class WebBrowserPreference {
 
 		// For each default editor that matches the oldId, change
 		// the default editor to the newId
-		for (int i = 0; i < extensions.length; i++) {
-			String[] ext = extensions[i];
+		for (String[] ext : extensions) {
 			IEditorDescriptor ddesc = registry.getDefaultEditor(ext[0]);
 			if (ddesc != null && ddesc.getId().equals(oldId)) {
 				registry.setDefaultEditor(ext[1], newId);

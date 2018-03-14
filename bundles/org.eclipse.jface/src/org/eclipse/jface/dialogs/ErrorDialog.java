@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
  * 			be activated and used by other components.
  *      Krzysztof Daniel <krzysztof.daniel@gmail.com> Bug 96373 - [ErrorHandling]
  *          ErrorDialog details area becomes huge with multi-line strings
+ *      Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 475879
  *******************************************************************************/
 package org.eclipse.jface.dialogs;
 
@@ -18,7 +19,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -144,9 +144,7 @@ public class ErrorDialog extends IconAndMessageDialog {
 				.getString("Problem_Occurred") : //$NON-NLS-1$
 				dialogTitle;
 		this.message = message == null ? status.getMessage()
-				: JFaceResources
-						.format(
-								"Reason", new Object[] { message, status.getMessage() }); //$NON-NLS-1$
+				: JFaceResources.format("Reason", message, status.getMessage()); //$NON-NLS-1$
 		this.status = status;
 		this.displayMask = displayMask;
 	}
@@ -473,8 +471,7 @@ public class ErrorDialog extends IconAndMessageDialog {
 			String message = buildingStatus.getMessage();
 			sb.append(message);
 			java.util.List<String> lines = readLines(sb.toString());
-			for (Iterator<String> iterator = lines.iterator(); iterator.hasNext();) {
-				String line = iterator.next();
+			for (String line : lines) {
 				listToPopulate.add(line);
 			}
 			incrementNesting = true;
@@ -513,13 +510,13 @@ public class ErrorDialog extends IconAndMessageDialog {
 
 		// Look for child status
 		IStatus[] children = buildingStatus.getChildren();
-		for (int i = 0; i < children.length; i++) {
-			populateList(listToPopulate, children[i], nesting, true);
+		for (IStatus element : children) {
+			populateList(listToPopulate, element, nesting, true);
 		}
 	}
 
 	private static java.util.List<String> readLines(final String s) {
-		java.util.List<String> lines = new ArrayList<String>();
+		java.util.List<String> lines = new ArrayList<>();
 		BufferedReader reader = new BufferedReader(new StringReader(s));
 		String line;
 		try {
@@ -576,8 +573,8 @@ public class ErrorDialog extends IconAndMessageDialog {
 
 		// Look for child status
 		IStatus[] children = buildingStatus.getChildren();
-		for (int i = 0; i < children.length; i++) {
-			result |= listContentExists(children[i], true);
+		for (IStatus element : children) {
+			result |= listContentExists(element, true);
 		}
 
 		return result;
@@ -599,8 +596,8 @@ public class ErrorDialog extends IconAndMessageDialog {
 		if (children == null || children.length == 0) {
 			return status.matches(mask);
 		}
-		for (int i = 0; i < children.length; i++) {
-			if (children[i].matches(mask)) {
+		for (IStatus element : children) {
+			if (element.matches(mask)) {
 				return true;
 			}
 		}
@@ -671,8 +668,8 @@ public class ErrorDialog extends IconAndMessageDialog {
 		}
 
 		IStatus[] children = buildingStatus.getChildren();
-		for (int i = 0; i < children.length; i++) {
-			populateCopyBuffer(children[i], buffer, nesting + 1);
+		for (IStatus element : children) {
+			populateCopyBuffer(element, buffer, nesting + 1);
 		}
 	}
 

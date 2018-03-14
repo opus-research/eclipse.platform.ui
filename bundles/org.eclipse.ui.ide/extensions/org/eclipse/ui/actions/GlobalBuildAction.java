@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.ErrorDialog;
@@ -170,30 +170,17 @@ public class GlobalBuildAction extends Action implements
      */
     /* package */void doBuildOperation() {
         Job buildJob = new Job(IDEWorkbenchMessages.GlobalBuildAction_jobTitle) {
-            /*
-             * (non-Javadoc)
-             *
-             * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
-             */
             @Override
 			protected IStatus run(IProgressMonitor monitor) {
-                monitor.beginTask(getOperationMessage(), 100);
+				SubMonitor subMonitor = SubMonitor.convert(monitor, getOperationMessage(), 100);
                 try {
-                    ResourcesPlugin.getWorkspace().build(buildType,
-                            new SubProgressMonitor(monitor, 100));
+					ResourcesPlugin.getWorkspace().build(buildType, subMonitor.split(100));
                 } catch (CoreException e) {
                     return e.getStatus();
-                } finally {
-                    monitor.done();
                 }
                 return Status.OK_STATUS;
             }
 
-            /*
-             * (non-Javadoc)
-             *
-             * @see org.eclipse.core.runtime.jobs.Job#belongsTo(java.lang.Object)
-             */
             @Override
 			public boolean belongsTo(Object family) {
                 return ResourcesPlugin.FAMILY_MANUAL_BUILD == family;
@@ -211,12 +198,6 @@ public class GlobalBuildAction extends Action implements
         return ResourcesPlugin.getWorkspace().getRoot().getProjects();
     }
 
-    /*
-     * (non-Javadoc) Method declared on IAction.
-     *
-     * Builds all projects within the workspace. Saves all editors prior to
-     * build depending on user's preference.
-     */
     @Override
 	public void run() {
         if (workbenchWindow == null) {
@@ -248,9 +229,9 @@ public class GlobalBuildAction extends Action implements
      */
     /* package */boolean verifyBuildersAvailable(IProject[] roots) {
         try {
-            for (int i = 0; i < roots.length; i++) {
-                if (roots[i].isAccessible()) {
-					if (roots[i].getDescription().getBuildSpec().length > 0) {
+            for (IProject root : roots) {
+                if (root.isAccessible()) {
+					if (root.getDescription().getBuildSpec().length > 0) {
 						return true;
 					}
 				}
@@ -268,11 +249,6 @@ public class GlobalBuildAction extends Action implements
         return false;
     }
 
-    /*
-     * (non-Javadoc) Method declared on ActionFactory.IWorkbenchAction.
-     *
-     * @since 3.0
-     */
     @Override
 	public void dispose() {
         if (workbenchWindow == null) {
@@ -299,8 +275,7 @@ public class GlobalBuildAction extends Action implements
                 IDEWorkbenchMessages.GlobalBuildAction_BuildRunningTitle,
                 IDEWorkbenchMessages.GlobalBuildAction_BuildRunningMessage);
         if (cancel) {
-            for (int i = 0; i < buildJobs.length; i++) {
-                Job job = buildJobs[i];
+            for (Job job : buildJobs) {
                 job.cancel();
             }
         }

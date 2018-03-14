@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008, 2012 IBM Corporation and others.
+ * Copyright (c) 2008, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -273,13 +273,40 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int PART_DESCRIPTOR__LOCALIZED_DESCRIPTION = ApplicationPackageImpl.APPLICATION_ELEMENT_FEATURE_COUNT + 15;
 
 	/**
+	 * The feature id for the '<em><b>Variables</b></em>' attribute list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int PART_DESCRIPTOR__VARIABLES = ApplicationPackageImpl.APPLICATION_ELEMENT_FEATURE_COUNT + 16;
+
+	/**
+	 * The feature id for the '<em><b>Properties</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int PART_DESCRIPTOR__PROPERTIES = ApplicationPackageImpl.APPLICATION_ELEMENT_FEATURE_COUNT + 17;
+
+	/**
+	 * The feature id for the '<em><b>Trim Bars</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int PART_DESCRIPTOR__TRIM_BARS = ApplicationPackageImpl.APPLICATION_ELEMENT_FEATURE_COUNT + 18;
+
+	/**
 	 * The number of structural features of the '<em>Part Descriptor</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int PART_DESCRIPTOR_FEATURE_COUNT = ApplicationPackageImpl.APPLICATION_ELEMENT_FEATURE_COUNT + 16;
+	public static final int PART_DESCRIPTOR_FEATURE_COUNT = ApplicationPackageImpl.APPLICATION_ELEMENT_FEATURE_COUNT + 19;
 
 	/**
 	 * The operation id for the '<em>Update Localization</em>' operation.
@@ -378,7 +405,7 @@ public class BasicPackageImpl extends EPackageImpl {
 
 	/**
 	 * Creates, registers, and initializes the <b>Package</b> for this model, and for any others upon which it depends.
-	 *
+	 * 
 	 * <p>This method is used to initialize {@link BasicPackageImpl#eINSTANCE} when that field is accessed.
 	 * Clients should not invoke it directly. Instead, they should simply access that field to obtain the package.
 	 * <!-- begin-user-doc -->
@@ -425,7 +452,7 @@ public class BasicPackageImpl extends EPackageImpl {
 		// Mark meta-data to indicate it can't be changed
 		theBasicPackage.freeze();
 
-
+  
 		// Update the registry and return the package
 		EPackage.Registry.INSTANCE.put(BasicPackageImpl.eNS_URI, theBasicPackage);
 		return theBasicPackage;
@@ -564,6 +591,48 @@ public class BasicPackageImpl extends EPackageImpl {
 
 
 	/**
+	 * Returns the meta object for the attribute list '{@link org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor#getVariables <em>Variables</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute list '<em>Variables</em>'.
+	 * @see org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor#getVariables()
+	 * @see #getPartDescriptor()
+	 * @generated
+	 */
+	public EAttribute getPartDescriptor_Variables() {
+		return (EAttribute)partDescriptorEClass.getEStructuralFeatures().get(9);
+	}
+
+
+	/**
+	 * Returns the meta object for the map '{@link org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor#getProperties <em>Properties</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the map '<em>Properties</em>'.
+	 * @see org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor#getProperties()
+	 * @see #getPartDescriptor()
+	 * @generated
+	 */
+	public EReference getPartDescriptor_Properties() {
+		return (EReference)partDescriptorEClass.getEStructuralFeatures().get(10);
+	}
+
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor#getTrimBars <em>Trim Bars</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Trim Bars</em>'.
+	 * @see org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor#getTrimBars()
+	 * @see #getPartDescriptor()
+	 * @generated
+	 */
+	public EReference getPartDescriptor_TrimBars() {
+		return (EReference)partDescriptorEClass.getEStructuralFeatures().get(11);
+	}
+
+
+	/**
 	 * Returns the meta object for class '{@link org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptorContainer <em>Part Descriptor Container</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -628,6 +697,9 @@ public class BasicPackageImpl extends EPackageImpl {
 		createEAttribute(partDescriptorEClass, PART_DESCRIPTOR__CONTRIBUTION_URI);
 		createEAttribute(partDescriptorEClass, PART_DESCRIPTOR__DESCRIPTION);
 		createEAttribute(partDescriptorEClass, PART_DESCRIPTOR__LOCALIZED_DESCRIPTION);
+		createEAttribute(partDescriptorEClass, PART_DESCRIPTOR__VARIABLES);
+		createEReference(partDescriptorEClass, PART_DESCRIPTOR__PROPERTIES);
+		createEReference(partDescriptorEClass, PART_DESCRIPTOR__TRIM_BARS);
 
 		partDescriptorContainerEClass = createEClass(PART_DESCRIPTOR_CONTAINER);
 		createEReference(partDescriptorContainerEClass, PART_DESCRIPTOR_CONTAINER__DESCRIPTORS);
@@ -661,6 +733,7 @@ public class BasicPackageImpl extends EPackageImpl {
 		UiPackageImpl theUiPackage = (UiPackageImpl)EPackage.Registry.INSTANCE.getEPackage(UiPackageImpl.eNS_URI);
 		CommandsPackageImpl theCommandsPackage = (CommandsPackageImpl)EPackage.Registry.INSTANCE.getEPackage(CommandsPackageImpl.eNS_URI);
 		MenuPackageImpl theMenuPackage = (MenuPackageImpl)EPackage.Registry.INSTANCE.getEPackage(MenuPackageImpl.eNS_URI);
+		org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl theBasicPackage_1 = (org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl)EPackage.Registry.INSTANCE.getEPackage(org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl.eNS_URI);
 
 		// Create type parameters
 
@@ -683,6 +756,9 @@ public class BasicPackageImpl extends EPackageImpl {
 		initEAttribute(getPartDescriptor_ContributionURI(), ecorePackage.getEString(), "contributionURI", null, 0, 1, MPartDescriptor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 		initEAttribute(getPartDescriptor_Description(), ecorePackage.getEString(), "description", null, 0, 1, MPartDescriptor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 		initEAttribute(getPartDescriptor_LocalizedDescription(), ecorePackage.getEString(), "localizedDescription", null, 0, 1, MPartDescriptor.class, IS_TRANSIENT, IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
+		initEAttribute(getPartDescriptor_Variables(), ecorePackage.getEString(), "variables", null, 0, -1, MPartDescriptor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, !IS_ORDERED); //$NON-NLS-1$
+		initEReference(getPartDescriptor_Properties(), theApplicationPackage.getStringToStringMap(), null, "properties", null, 0, -1, MPartDescriptor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
+		initEReference(getPartDescriptor_TrimBars(), theBasicPackage_1.getTrimBar(), null, "trimBars", null, 0, -1, MPartDescriptor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 
 		initEClass(partDescriptorContainerEClass, MPartDescriptorContainer.class, "PartDescriptorContainer", IS_ABSTRACT, IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 		initEReference(getPartDescriptorContainer_Descriptors(), this.getPartDescriptor(), null, "descriptors", null, 0, -1, MPartDescriptorContainer.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
@@ -782,6 +858,30 @@ public class BasicPackageImpl extends EPackageImpl {
 		 * @generated
 		 */
 		public static final EAttribute PART_DESCRIPTOR__LOCALIZED_DESCRIPTION = eINSTANCE.getPartDescriptor_LocalizedDescription();
+
+		/**
+		 * The meta object literal for the '<em><b>Variables</b></em>' attribute list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		public static final EAttribute PART_DESCRIPTOR__VARIABLES = eINSTANCE.getPartDescriptor_Variables();
+
+		/**
+		 * The meta object literal for the '<em><b>Properties</b></em>' map feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		public static final EReference PART_DESCRIPTOR__PROPERTIES = eINSTANCE.getPartDescriptor_Properties();
+
+		/**
+		 * The meta object literal for the '<em><b>Trim Bars</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		public static final EReference PART_DESCRIPTOR__TRIM_BARS = eINSTANCE.getPartDescriptor_TrimBars();
 
 		/**
 		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptorContainer <em>Part Descriptor Container</em>}' class.

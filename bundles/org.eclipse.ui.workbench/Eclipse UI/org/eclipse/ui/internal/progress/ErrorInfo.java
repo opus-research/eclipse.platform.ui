@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2010 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,19 +22,16 @@ import org.eclipse.swt.graphics.Image;
  * ErrorInfo is the info that displays errors.
  */
 public class ErrorInfo extends JobTreeElement {
-
 	private final IStatus errorStatus;
-
 	private final Job job;
-
 	private final long timestamp;
 
 	/**
-	 * Create a new instance of the receiver.
+	 * Creates a new instance of ErrorInfo.
 	 *
 	 * @param status
 	 * @param job
-	 *            The Job to create
+	 *            the Job to create
 	 */
 	public ErrorInfo(IStatus status, Job job) {
 		errorStatus = status;
@@ -42,31 +39,16 @@ public class ErrorInfo extends JobTreeElement {
 		timestamp = System.currentTimeMillis();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.internal.progress.JobTreeElement#hasChildren()
-	 */
 	@Override
 	boolean hasChildren() {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.internal.progress.JobTreeElement#getChildren()
-	 */
 	@Override
 	Object[] getChildren() {
 		return ProgressManagerUtil.EMPTY_OBJECT_ARRAY;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.internal.progress.JobTreeElement#getDisplayString()
-	 */
 	@Override
 	String getDisplayString() {
 		return NLS.bind(ProgressMessages.JobInfo_Error, (new Object[] {
@@ -75,7 +57,7 @@ public class ErrorInfo extends JobTreeElement {
 	}
 
 	/**
-	 * Return the image for the receiver.
+	 * Returns the image for the receiver.
 	 *
 	 * @return Image
 	 */
@@ -83,18 +65,13 @@ public class ErrorInfo extends JobTreeElement {
 		return JFaceResources.getImage(ProgressManager.ERROR_JOB_KEY);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.internal.progress.JobTreeElement#isJobInfo()
-	 */
 	@Override
 	boolean isJobInfo() {
 		return false;
 	}
 
 	/**
-	 * Return the current status of the receiver.
+	 * Returns the current status of the receiver.
 	 *
 	 * @return IStatus
 	 */
@@ -102,18 +79,13 @@ public class ErrorInfo extends JobTreeElement {
 		return errorStatus;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.internal.progress.JobTreeElement#isActive()
-	 */
 	@Override
 	boolean isActive() {
 		return true;
 	}
 
 	/**
-	 * Return the job that generated the error.
+	 * Returns the job that generated the error.
 	 *
 	 * @return the job that generated the error
 	 */
@@ -122,7 +94,7 @@ public class ErrorInfo extends JobTreeElement {
 	}
 
 	/**
-	 * Return the timestamp for the job.
+	 * Returns the timestamp for the job.
 	 *
 	 * @return long
 	 */
@@ -130,24 +102,13 @@ public class ErrorInfo extends JobTreeElement {
 		return timestamp;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.internal.progress.JobTreeElement#compareTo(java.lang.Object)
-	 */
 	@Override
-	public int compareTo(Object arg0) {
-		if (arg0 instanceof ErrorInfo) {
-			// Order ErrorInfo by time received
-			long otherTimestamp = ((ErrorInfo) arg0).timestamp;
-			if (timestamp < otherTimestamp) {
-				return -1;
-			} else if (timestamp > otherTimestamp) {
-				return 1;
-			} else {
-				return 0;
-			}
+	public int compareTo(JobTreeElement other) {
+		if (other instanceof ErrorInfo) {
+			// Order ErrorInfo by time received.
+			return Long.compare(timestamp, ((ErrorInfo) other).timestamp);
 		}
-		return super.compareTo(arg0);
+
+		return super.compareTo(other);
 	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2008 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -107,9 +107,7 @@ public abstract class TableUpdater {
 
 		private void stopListening() {
 			// Stop listening for dependency changes
-			for (int i = 0; i < dependencies.length; i++) {
-				IObservable observable = dependencies[i];
-
+			for (IObservable observable : dependencies) {
 				observable.removeChangeListener(this);
 			}
 		}
@@ -156,8 +154,7 @@ public abstract class TableUpdater {
 		@Override
 		public void handleListChange(ListChangeEvent event) {
 			ListDiffEntry[] differences = event.diff.getDifferences();
-			for (int i = 0; i < differences.length; i++) {
-				ListDiffEntry entry = differences[i];
+			for (ListDiffEntry entry : differences) {
 				if (entry.isAddition()) {
 					TableItem item = new TableItem(table, SWT.NONE, entry
 							.getPosition());

@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright (c) 2000, 2014 IBM Corporation and others.
+ *  Copyright (c) 2000, 2016 IBM Corporation and others.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -8,7 +8,8 @@
  *  Contributors:
  *     IBM Corporation - initial API and implementation
  *     Michael Williamson (eclipse-bugs@magnaworks.com) - patch (see Bugzilla #92545)
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 430205
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 430205, 458055
+ *     Ralf Petter <ralf.petter@gmail.com> - Bug 509654, 183675
  *******************************************************************************/
 package org.eclipse.ui.forms.widgets;
 
@@ -24,10 +25,8 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.internal.forms.widgets.FormImages;
 import org.eclipse.ui.internal.forms.widgets.FormUtil;
 
@@ -61,7 +60,7 @@ public class Section extends ExpandableComposite {
 
 	private Control separator;
 
-	private Hashtable titleColors;
+	private Hashtable<String, Color> titleColors;
 
 	private static final String COLOR_BG = "bg"; //$NON-NLS-1$
 
@@ -85,17 +84,15 @@ public class Section extends ExpandableComposite {
 		super(parent, cstyle | getBackgroundStyle(style), style);
 		int rtl = cstyle & SWT.RIGHT_TO_LEFT;
 		if ((style & DESCRIPTION) != 0) {
-			descriptionControl = new Text(this, SWT.READ_ONLY | SWT.WRAP | rtl);
+			descriptionControl = new Label(this, SWT.WRAP | rtl);
 		}
 		if ((style & TITLE_BAR) != 0) {
-			Listener listener = new Listener() {
-				public void handleEvent(Event e) {
-					Image image = Section.super.getBackgroundImage();
-					if (image != null) {
-						FormImages.getInstance().markFinished(image, getDisplay());
-					}
-					Section.super.setBackgroundImage(null);
+			Listener listener = e -> {
+				Image image = Section.super.getBackgroundImage();
+				if (image != null) {
+					FormImages.getInstance().markFinished(image, getDisplay());
 				}
+				Section.super.setBackgroundImage(null);
 			};
 			addListener(SWT.Dispose, listener);
 			addListener(SWT.Resize, listener);
@@ -106,6 +103,7 @@ public class Section extends ExpandableComposite {
 		return ((estyle & TITLE_BAR) != 0) ? SWT.NO_BACKGROUND : SWT.NULL;
 	}
 
+	@Override
 	protected void internalSetExpanded(boolean expanded) {
 		super.internalSetExpanded(expanded);
 		if ((getExpansionStyle() & TITLE_BAR) != 0) {
@@ -119,32 +117,9 @@ public class Section extends ExpandableComposite {
 	 * Reflows this section and all the parents up the hierarchy until a
 	 * SharedScrolledComposite is reached.
 	 */
+	@Override
 	protected void reflow() {
-		Composite c = this;
-		while (c != null) {
-			c.setRedraw(false);
-			c = c.getParent();
-			if (c instanceof SharedScrolledComposite || c instanceof Shell) {
-				break;
-			}
-		}
-		c = this;
-		while (c != null) {
-			c.layout(true);
-			c = c.getParent();
-			if (c instanceof SharedScrolledComposite) {
-				((SharedScrolledComposite) c).reflow(true);
-				break;
-			}
-		}
-		c = this;
-		while (c != null) {
-			c.setRedraw(true);
-			c = c.getParent();
-			if (c instanceof SharedScrolledComposite || c instanceof Shell) {
-				break;
-			}
-		}
+		super.reflow();
 	}
 
 	/**
@@ -154,8 +129,8 @@ public class Section extends ExpandableComposite {
 	 * @param description
 	 */
 	public void setDescription(String description) {
-		if (descriptionControl instanceof Text)
-			((Text) descriptionControl).setText(description);
+		if (descriptionControl instanceof Label)
+			((Label) descriptionControl).setText(description);
 	}
 
 	/**
@@ -165,8 +140,8 @@ public class Section extends ExpandableComposite {
 	 *         not used to create the control.
 	 */
 	public String getDescription() {
-		if (descriptionControl instanceof Text)
-			return ((Text) descriptionControl).getText();
+		if (descriptionControl instanceof Label)
+			return ((Label) descriptionControl).getText();
 		return null;
 	}
 
@@ -185,11 +160,12 @@ public class Section extends ExpandableComposite {
 	}
 
 	/**
-	 * Returns the control that is used as a separator betweeen the title and
-	 * the client, or <samp>null </samp> if not set.
+	 * Returns the control that is used as a separator between the title and the
+	 * client, or <samp>null </samp> if not set.
 	 *
 	 * @return separator control or <samp>null </samp> if not set.
 	 */
+	@Override
 	public Control getSeparatorControl() {
 		return separator;
 	}
@@ -200,6 +176,7 @@ public class Section extends ExpandableComposite {
 	 * @param bg
 	 *            the new background
 	 */
+	@Override
 	public void setBackground(Color bg) {
 		super.setBackground(bg);
 		if (descriptionControl != null
@@ -213,6 +190,7 @@ public class Section extends ExpandableComposite {
 	 * @param fg
 	 *            the new foreground.
 	 */
+	@Override
 	public void setForeground(Color fg) {
 		super.setForeground(fg);
 		if (descriptionControl != null
@@ -229,6 +207,7 @@ public class Section extends ExpandableComposite {
 	 *         not set by the client.
 	 * @see #setDescriptionControl(org.eclipse.swt.widgets.Control)
 	 */
+	@Override
 	public Control getDescriptionControl() {
 		return descriptionControl;
 	}
@@ -236,8 +215,8 @@ public class Section extends ExpandableComposite {
 	/**
 	 * Sets the description control of this section. The control must not be
 	 * <samp>null</samp> and must be a direct child of this container. If
-	 * defined, contol will be placed below the title text and the separator and
-	 * will be hidden int he collapsed state.
+	 * defined, control will be placed below the title text and the separator
+	 * and will be hidden in the collapsed state.
 	 * <p>
 	 * This method and <code>DESCRIPTION</code> style are mutually exclusive.
 	 * Use the method only if you want to create the description control
@@ -295,7 +274,7 @@ public class Section extends ExpandableComposite {
 	public Color getTitleBarBorderColor() {
 		if (titleColors == null)
 			return null;
-		return (Color) titleColors.get(COLOR_BORDER);
+		return titleColors.get(COLOR_BORDER);
 	}
 
 	/**
@@ -309,7 +288,7 @@ public class Section extends ExpandableComposite {
 			return null;
 		if ((getExpansionStyle() & SHORT_TITLE_BAR) != 0)
 			return getBackground();
-		return (Color) titleColors.get(COLOR_GBG);
+		return titleColors.get(COLOR_GBG);
 	}
 
 	/**
@@ -320,17 +299,18 @@ public class Section extends ExpandableComposite {
 	public Color getTitleBarBackground() {
 		if (titleColors == null)
 			return null;
-		return (Color) titleColors.get(COLOR_BG);
+		return titleColors.get(COLOR_BG);
 	}
 
 	private void putTitleBarColor(String key, Color color) {
 		if (color == null)
 			return;
 		if (titleColors == null)
-			titleColors = new Hashtable();
+			titleColors = new Hashtable<>();
 		titleColors.put(key, color);
 	}
 
+	@Override
 	protected void onPaint(PaintEvent e) {
 		Color bg = null;
 		Color fg = null;
@@ -350,9 +330,9 @@ public class Section extends ExpandableComposite {
 			gc = new GC(buffer);
 		}
 		if (titleColors != null) {
-			bg = (Color) titleColors.get(COLOR_BG);
+			bg = titleColors.get(COLOR_BG);
 			fg = getTitleBarForeground();
-			border = (Color) titleColors.get(COLOR_BORDER);
+			border = titleColors.get(COLOR_BORDER);
 		}
 		if (bg == null)
 			bg = getBackground();
@@ -389,7 +369,7 @@ public class Section extends ExpandableComposite {
 				updateHeaderImage(bg, bounds, gradientheight, theight);
 			gc.setBackground(getBackground());
 			gc.fillRectangle(bounds.x, bounds.y, bounds.width, bounds.height);
-			drawBackground(gc, bounds.x, bounds.y, bounds.width, theight);
+			drawBackground(gc, bounds.x, bounds.y, bounds.width, theight - 2);
 			if (marginWidth > 0) {
 				// fix up margins
 				gc.setBackground(getBackground());
@@ -431,24 +411,18 @@ public class Section extends ExpandableComposite {
 		}
 		if ((getExpansionStyle() & TITLE_BAR) != 0 || isExpanded()) {
 			// left vertical edge gradient
-			gc.fillGradientRectangle(marginWidth, marginHeight + 2, 1,
-					gradientheight - 2, true);
+			gc.fillGradientRectangle(marginWidth, marginHeight + 2, 1, theight + 2, true);
 			// right vertical edge gradient
-			gc.fillGradientRectangle(bounds.width - marginWidth - 1,
-					marginHeight + 2, 1, gradientheight - 2, true);
+			gc.fillGradientRectangle(bounds.width - marginWidth - 1, marginHeight + 2, 1, theight + 2, true);
 		}
 		if ((getExpansionStyle() & TITLE_BAR) != 0) {
-			// New in 3.3 - edge treatmant
+			// New in 3.3 - edge treatment
 			gc.setForeground(getBackground());
-			gc.drawPolyline(new int[] { marginWidth + 1,
-					marginHeight + gradientheight - 1, marginWidth + 1,
-					marginHeight + 2, marginWidth + 2, marginHeight + 2,
-					marginWidth + 2, marginHeight + 1,
-					bounds.width - marginWidth - 3, marginHeight + 1,
-					bounds.width - marginWidth - 3, marginHeight + 2,
-					bounds.width - marginWidth - 2, marginHeight + 2,
-					bounds.width - marginWidth - 2,
-					marginHeight + gradientheight - 1 });
+			gc.drawPolyline(new int[] { marginWidth + 1, marginHeight + gradientheight + 4, marginWidth + 1,
+					marginHeight + 2, marginWidth + 2, marginHeight + 2, marginWidth + 2, marginHeight + 1,
+					bounds.width - marginWidth - 3, marginHeight + 1, bounds.width - marginWidth - 3, marginHeight + 2,
+					bounds.width - marginWidth - 2, marginHeight + 2, bounds.width - marginWidth - 2,
+					marginHeight + gradientheight + 4 });
 		}
 		if (buffer != null) {
 			gc.dispose();
@@ -459,7 +433,7 @@ public class Section extends ExpandableComposite {
 
 	private void updateHeaderImage(Color bg, Rectangle bounds, int theight, int realtheight) {
 		Color gradient = getTitleBarGradientBackground() != null ? getTitleBarGradientBackground() : getBackground();
-		Image image = FormImages.getInstance().getSectionGradientImage(getBackground(), gradient, bg, realtheight,
+		Image image = FormImages.getInstance().getSectionGradientImage(gradient, bg, realtheight,
 				theight, marginHeight, getDisplay());
 		super.setBackgroundImage(image);
 	}
@@ -467,6 +441,7 @@ public class Section extends ExpandableComposite {
 	/**
 	 * Background image is used for the title gradient - does nothing.
 	 */
+	@Override
 	public final void setBackgroundImage(Image image) {
 	}
 }

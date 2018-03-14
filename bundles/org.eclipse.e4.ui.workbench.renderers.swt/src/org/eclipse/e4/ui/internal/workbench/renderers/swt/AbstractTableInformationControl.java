@@ -14,7 +14,6 @@ import org.eclipse.e4.ui.workbench.swt.internal.copy.SearchPattern;
 import org.eclipse.e4.ui.workbench.swt.internal.copy.WorkbenchSWTMessages;
 import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -22,16 +21,12 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
@@ -134,7 +129,7 @@ public abstract class AbstractTableInformationControl {
 					dispose();
 					break;
 				case SWT.DEL:
-					removeSelectedItems();
+					removeSelectedItem(null);
 					e.character = SWT.NONE;
 					e.doit = false;
 					break;
@@ -261,7 +256,7 @@ public abstract class AbstractTableInformationControl {
 							@Override
 							public void widgetSelected(
 									SelectionEvent selectionEvent) {
-								removeSelectedItems();
+								removeSelectedItem(tItem.getData());
 							}
 						});
 						menu.setVisible(true);
@@ -270,40 +265,37 @@ public abstract class AbstractTableInformationControl {
 			}
 		});
 
-		fShell.addTraverseListener(new TraverseListener() {
-			@Override
-			public void keyTraversed(TraverseEvent e) {
-				switch (e.detail) {
-				case SWT.TRAVERSE_PAGE_NEXT:
-					e.detail = SWT.TRAVERSE_NONE;
-					e.doit = true;
-					{
-						int n = table.getItemCount();
-						if (n == 0)
-							return;
+		fShell.addTraverseListener(e -> {
+			switch (e.detail) {
+			case SWT.TRAVERSE_PAGE_NEXT:
+				e.detail = SWT.TRAVERSE_NONE;
+				e.doit = true;
+				{
+					int n1 = table.getItemCount();
+					if (n1 == 0)
+						return;
 
-						int i = table.getSelectionIndex() + 1;
-						if (i >= n)
-							i = 0;
-						table.setSelection(i);
-					}
-					break;
-
-				case SWT.TRAVERSE_PAGE_PREVIOUS:
-					e.detail = SWT.TRAVERSE_NONE;
-					e.doit = true;
-					{
-						int n = table.getItemCount();
-						if (n == 0)
-							return;
-
-						int i = table.getSelectionIndex() - 1;
-						if (i < 0)
-							i = n - 1;
-						table.setSelection(i);
-					}
-					break;
+					int i1 = table.getSelectionIndex() + 1;
+					if (i1 >= n1)
+						i1 = 0;
+					table.setSelection(i1);
 				}
+				break;
+
+			case SWT.TRAVERSE_PAGE_PREVIOUS:
+				e.detail = SWT.TRAVERSE_NONE;
+				e.doit = true;
+				{
+					int n2 = table.getItemCount();
+					if (n2 == 0)
+						return;
+
+					int i2 = table.getSelectionIndex() - 1;
+					if (i2 < 0)
+						i2 = n2 - 1;
+					table.setSelection(i2);
+				}
+				break;
 			}
 		});
 
@@ -312,13 +304,16 @@ public abstract class AbstractTableInformationControl {
 	}
 
 	/**
-	 * Removes the selected items from the list and closes their corresponding
-	 * tabs Selects the next item in the list or disposes it if its presentation
-	 * is disposed
+	 * Removes the given selected item from the list and closes corresponding tab.
+	 * Selects the next item in the list or disposes it if its presentation is
+	 * disposed.
+	 *
+	 * @param selected
+	 *            can be {@code null} in this case current selection should be used
 	 */
-	protected void removeSelectedItems() {
+	protected void removeSelectedItem(Object selected) {
 		int selInd = fTableViewer.getTable().getSelectionIndex();
-		if (deleteSelectedElements()) {
+		if (deleteSelectedElement(selected)) {
 			return;
 		}
 		fTableViewer.refresh();
@@ -397,12 +392,9 @@ public abstract class AbstractTableInformationControl {
 		fFilterText.setMessage(WorkbenchSWTMessages.FilteredTree_FilterMessage);
 		fFilterText.setText(""); //$NON-NLS-1$
 
-		fFilterText.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(ModifyEvent e) {
-				String text = ((Text) e.widget).getText();
-				setMatcherString(text);
-			}
+		fFilterText.addModifyListener(e -> {
+			String text = ((Text) e.widget).getText();
+			setMatcherString(text);
 		});
 	}
 
@@ -444,18 +436,20 @@ public abstract class AbstractTableInformationControl {
 	 * Implementers can modify
 	 */
 	protected Object getSelectedElement() {
-		return ((IStructuredSelection) fTableViewer.getSelection())
-				.getFirstElement();
+		return fTableViewer.getStructuredSelection().getFirstElement();
 	}
 
 	protected abstract void gotoSelectedElement();
 
 	/**
-	 * Delete all selected elements.
+	 * Delete given selected element.
+	 *
+	 * @param element
+	 *            can be {@code null} in this case current selection should be used
 	 *
 	 * @return <code>true</code> if there are no elements left after deletion.
 	 */
-	protected abstract boolean deleteSelectedElements();
+	protected abstract boolean deleteSelectedElement(Object element);
 
 	/**
 	 * Selects the first element in the table which matches the current filter
@@ -472,10 +466,9 @@ public abstract class AbstractTableInformationControl {
 	}
 
 	private Object findElement(TableItem[] items) {
-		ILabelProvider labelProvider = (ILabelProvider) fTableViewer
-				.getLabelProvider();
-		for (int i = 0; i < items.length; i++) {
-			Object element = items[i].getData();
+		ILabelProvider labelProvider = (ILabelProvider) fTableViewer.getLabelProvider();
+		for (TableItem item : items) {
+			Object element = item.getData();
 			if (fSearchPattern == null) {
 				return element;
 			}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010 BestSolution.at and others.
+ * Copyright (c) 2010, 2015 BestSolution.at and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -234,7 +234,7 @@ public class FragmentPackageImpl extends EPackageImpl {
 
 	/**
 	 * Creates, registers, and initializes the <b>Package</b> for this model, and for any others upon which it depends.
-	 *
+	 * 
 	 * <p>This method is used to initialize {@link FragmentPackageImpl#eINSTANCE} when that field is accessed.
 	 * Clients should not invoke it directly. Instead, they should simply access that field to obtain the package.
 	 * <!-- begin-user-doc -->
@@ -264,7 +264,7 @@ public class FragmentPackageImpl extends EPackageImpl {
 		// Mark meta-data to indicate it can't be changed
 		theFragmentPackage.freeze();
 
-
+  
 		// Update the registry and return the package
 		EPackage.Registry.INSTANCE.put(FragmentPackageImpl.eNS_URI, theFragmentPackage);
 		return theFragmentPackage;
@@ -472,8 +472,8 @@ public class FragmentPackageImpl extends EPackageImpl {
 		addEParameter(op, theApplicationPackage.getApplication(), "application", 0, 1, IS_UNIQUE, IS_ORDERED); //$NON-NLS-1$
 
 		initEClass(stringModelFragmentEClass, MStringModelFragment.class, "StringModelFragment", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
-		initEAttribute(getStringModelFragment_Featurename(), ecorePackage.getEString(), "featurename", null, 0, 1, MStringModelFragment.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
-		initEAttribute(getStringModelFragment_ParentElementId(), ecorePackage.getEString(), "parentElementId", null, 0, 1, MStringModelFragment.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
+		initEAttribute(getStringModelFragment_Featurename(), ecorePackage.getEString(), "featurename", null, 1, 1, MStringModelFragment.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
+		initEAttribute(getStringModelFragment_ParentElementId(), ecorePackage.getEString(), "parentElementId", null, 1, 1, MStringModelFragment.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 		initEAttribute(getStringModelFragment_PositionInList(), ecorePackage.getEString(), "positionInList", null, 0, 1, MStringModelFragment.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 
 		// Create resource

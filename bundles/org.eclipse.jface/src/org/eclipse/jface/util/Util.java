@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,7 +34,7 @@ public final class Util {
 	 * change and never be <code>null</code>.
 	 */
 	public static final SortedSet<?> EMPTY_SORTED_SET = Collections
-			.unmodifiableSortedSet(new TreeSet<Object>());
+			.unmodifiableSortedSet(new TreeSet<>());
 
 	/**
 	 * A common zero-length string. It avoids needing write <code>NON-NLS</code>
@@ -349,8 +349,7 @@ public final class Util {
 		}
 
 		int hashCode = 89;
-		for (int i = 0; i < objects.length; i++) {
-			final Object object = objects[i];
+		for (final Object object : objects) {
 			if (object != null) {
 				hashCode = hashCode * 31 + object.hashCode();
 			}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,16 +11,15 @@
 
 package org.eclipse.jface.action;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
-import org.eclipse.jface.internal.provisional.action.IToolBarContributionItem;
+import java.util.ArrayList;
+
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.internal.provisional.action.IToolBarContributionItem;
 import org.eclipse.jface.util.Policy;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -205,41 +204,27 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
             // ToolBarManager.createControl can actually return a pre-existing control.
             // Only add the listener if the toolbar was newly created (bug 62097).
             if (oldToolBar != toolBar) {
-	            toolBar.addListener(SWT.MenuDetect, new Listener() {
-
-	                @Override
-					public void handleEvent(Event event) {
-	                    // if the toolbar does not have its own context menu then
-	                    // handle the event
-	                    if (toolBarManager.getContextMenuManager() == null) {
-	                        handleContextMenu(event);
-	                    }
-	                }
-	            });
+	            toolBar.addListener(SWT.MenuDetect, event -> {
+				    // if the toolbar does not have its own context menu then
+				    // handle the event
+				    if (toolBarManager.getContextMenuManager() == null) {
+				        handleContextMenu(event);
+				    }
+				});
             }
 
             // Handle for chevron clicking
             if (getUseChevron()) {
                 // Chevron Support
-                coolItem.addSelectionListener(new SelectionAdapter() {
-
-                    @Override
-					public void widgetSelected(SelectionEvent event) {
-                        if (event.detail == SWT.ARROW) {
-                            handleChevron(event);
-                        }
-                    }
-                });
+                coolItem.addSelectionListener(widgetSelectedAdapter(event -> {
+				    if (event.detail == SWT.ARROW) {
+				        handleChevron(event);
+				    }
+				}));
             }
 
             // Handle for disposal
-            coolItem.addDisposeListener(new DisposeListener() {
-
-                @Override
-				public void widgetDisposed(DisposeEvent event) {
-                    handleWidgetDispose(event);
-                }
-            });
+            coolItem.addDisposeListener(event -> handleWidgetDispose(event));
 
             // Sets the size of the coolItem
             updateSize(true);
@@ -353,12 +338,12 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
         ToolBar toolBar = (ToolBar) control;
         Rectangle toolBarBounds = toolBar.getBounds();
         ToolItem[] items = toolBar.getItems();
-        ArrayList<ToolItem> hidden = new ArrayList<ToolItem>();
-        for (int i = 0; i < items.length; ++i) {
-            Rectangle itemBounds = items[i].getBounds();
+        ArrayList<ToolItem> hidden = new ArrayList<>();
+        for (ToolItem toolItem : items) {
+            Rectangle itemBounds = toolItem.getBounds();
             if (!((itemBounds.x + itemBounds.width <= toolBarBounds.width) && (itemBounds.y
                     + itemBounds.height <= toolBarBounds.height))) {
-                hidden.add(items[i]);
+                hidden.add(toolItem);
             }
         }
 
@@ -367,8 +352,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
             chevronMenuManager.dispose();
         }
         chevronMenuManager = new MenuManager();
-        for (Iterator<ToolItem> i = hidden.iterator(); i.hasNext();) {
-            ToolItem toolItem = i.next();
+        for (ToolItem toolItem : hidden) {
             IContributionItem data = (IContributionItem) toolItem.getData();
             if (data instanceof ActionContributionItem) {
                 ActionContributionItem contribution = new ActionContributionItem(
@@ -452,10 +436,9 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
         boolean visibleItem = false;
         if (toolBarManager != null) {
             IContributionItem[] contributionItems = toolBarManager.getItems();
-            for (int i = 0; i < contributionItems.length; i++) {
-                IContributionItem contributionItem = contributionItems[i];
-                if ((!contributionItem.isGroupMarker())
-                        && (!contributionItem.isSeparator())) {
+            for (IContributionItem item : contributionItems) {
+                IContributionItem contributionItem = item;
+				if ((!contributionItem.isGroupMarker()) && (!contributionItem.isSeparator())) {
                     visibleItem = true;
                     break;
                 }
