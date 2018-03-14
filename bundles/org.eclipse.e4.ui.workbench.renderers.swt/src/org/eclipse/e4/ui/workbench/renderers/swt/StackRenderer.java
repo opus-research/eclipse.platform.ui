@@ -141,6 +141,20 @@ public class StackRenderer extends LazyStackRenderer {
 	@Inject
 	IEventBroker eventBroker;
 
+	@Inject
+	IPresentationEngine renderer;
+
+	private EventHandler itemUpdater;
+
+	private EventHandler dirtyUpdater;
+
+	/**
+	 * An event handler for listening to changes to the state of view menus and
+	 * its child menu items. Depending on what state these items are in, the
+	 * view menu should or should not be rendered in the tab folder.
+	 */
+	private EventHandler viewMenuUpdater;
+
 	/**
 	 * An event handler for listening to changes to the children of an element
 	 * container. The tab folder may need to layout itself again if a part's
@@ -148,8 +162,8 @@ public class StackRenderer extends LazyStackRenderer {
 	 */
 	private EventHandler tabStateHandler;
 
-	@Inject
-	IPresentationEngine renderer;
+	// Manages CSS styling based on active part changes
+	private EventHandler stylingHandler;
 
 	private boolean ignoreTabSelChanges = false;
 
@@ -164,8 +178,8 @@ public class StackRenderer extends LazyStackRenderer {
 			}
 		} else if (part.getCurSharedRef() != null) {
 			MWindow topWin = modelService.getTopLevelWindowFor(part);
-			List<MPlaceholder> partRefs = modelService.findElements(topWin, part.getElementId(), MPlaceholder.class,
-					null);
+			List<MPlaceholder> partRefs = modelService.findElements(topWin,
+					part.getElementId(), MPlaceholder.class, null);
 			for (MPlaceholder ref : partRefs) {
 				CTabItem item = findItemForPart(ref, null);
 				if (item != null) {
@@ -176,6 +190,7 @@ public class StackRenderer extends LazyStackRenderer {
 
 		return itemsToSet;
 	}
+
 
 	@SuppressWarnings("unchecked")
 	@Inject
@@ -189,9 +204,11 @@ public class StackRenderer extends LazyStackRenderer {
 
 		String key;
 		if (UIEvents.isREMOVE(event)) {
-			key = ((Entry<String, Object>) event.getProperty(UIEvents.EventTags.OLD_VALUE)).getKey();
+			key = ((Entry<String, Object>) event
+					.getProperty(UIEvents.EventTags.OLD_VALUE)).getKey();
 		} else {
-			key = ((Entry<String, Object>) event.getProperty(UIEvents.EventTags.NEW_VALUE)).getKey();
+			key = ((Entry<String, Object>) event
+					.getProperty(UIEvents.EventTags.NEW_VALUE)).getKey();
 		}
 
 		if (!IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY.equals(key)
@@ -203,7 +220,8 @@ public class StackRenderer extends LazyStackRenderer {
 		for (CTabItem item : itemsToSet) {
 			if (key.equals(IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY)) {
 				item.setImage(getImage(part));
-			} else if (key.equals(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY)) {
+			} else if (key
+					.equals(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY)) {
 				String newTip = getToolTip(part);
 				item.setToolTipText(getToolTip(newTip));
 			}
@@ -217,7 +235,8 @@ public class StackRenderer extends LazyStackRenderer {
 	 */
 	@Inject
 	@Optional
-	private void subscribeTopicTagsChanged(@UIEventTopic(UIEvents.ApplicationElement.TOPIC_TAGS) Event event) {
+	private void subscribeTopicTagsChanged(
+			@UIEventTopic(UIEvents.ApplicationElement.TOPIC_TAGS) Event event) {
 		Object changedObj = event.getProperty(EventTags.ELEMENT);
 
 		if (!(changedObj instanceof MPart))
@@ -229,21 +248,22 @@ public class StackRenderer extends LazyStackRenderer {
 			return;
 
 		if (UIEvents.isADD(event)) {
-			if (UIEvents.contains(event, UIEvents.EventTags.NEW_VALUE, IPresentationEngine.ADORNMENT_PIN)) {
+			if (UIEvents.contains(event, UIEvents.EventTags.NEW_VALUE,
+					IPresentationEngine.ADORNMENT_PIN)) {
 				item.setImage(getImage(part));
 			}
 		} else if (UIEvents.isREMOVE(event)) {
-			if (UIEvents.contains(event, UIEvents.EventTags.OLD_VALUE, IPresentationEngine.ADORNMENT_PIN)) {
+			if (UIEvents.contains(event, UIEvents.EventTags.OLD_VALUE,
+					IPresentationEngine.ADORNMENT_PIN)) {
 				item.setImage(getImage(part));
 			}
 		}
-
-		tabStateHandler.handleEvent(event);
 	}
 
 	@Inject
 	@Optional
-	private void subscribeTopicChildrenChanged(@UIEventTopic(UIEvents.ElementContainer.TOPIC_CHILDREN) Event event) {
+	private void subscribeTopicChildrenChanged(
+			@UIEventTopic(UIEvents.ElementContainer.TOPIC_CHILDREN) Event event) {
 
 		Object changedObj = event.getProperty(UIEvents.EventTags.ELEMENT);
 		// only interested in changes to toolbars
@@ -251,13 +271,15 @@ public class StackRenderer extends LazyStackRenderer {
 			return;
 		}
 
-		MUIElement container = modelService.getContainer((MUIElement) changedObj);
+		MUIElement container = modelService
+				.getContainer((MUIElement) changedObj);
 		// check if this is a part's toolbar
 		if (container instanceof MPart) {
 			MElementContainer<?> parent = ((MPart) container).getParent();
 			// only relayout if this part is the selected element and we
 			// actually rendered this element
-			if (parent instanceof MPartStack && parent.getSelectedElement() == container
+			if (parent instanceof MPartStack
+					&& parent.getSelectedElement() == container
 					&& parent.getRenderer() == StackRenderer.this) {
 				Object widget = parent.getWidget();
 				if (widget instanceof CTabFolder) {
@@ -267,197 +289,14 @@ public class StackRenderer extends LazyStackRenderer {
 		}
 	}
 
-	// TODO: Refactor using findItemForPart(MPart) method
-	@Inject
-	@Optional
-	private void subscribeTopicAllChanged(@UIEventTopic(UIEvents.UILabel.TOPIC_ALL) Event event) {
-		MUIElement element = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
-		if (!(element instanceof MPart))
-			return;
-
-		MPart part = (MPart) element;
-
-		String attName = (String) event.getProperty(UIEvents.EventTags.ATTNAME);
-		Object newValue = event.getProperty(UIEvents.EventTags.NEW_VALUE);
-
-		// is this a direct child of the stack?
-		if (element.getParent() != null && element.getParent().getRenderer() == StackRenderer.this) {
-			CTabItem cti = findItemForPart(element, element.getParent());
-			if (cti != null) {
-				updateTab(cti, part, attName, newValue);
-			}
-			return;
-		}
-
-		// Do we have any stacks with place holders for the element
-		// that's changed?
-		MWindow win = modelService.getTopLevelWindowFor(part);
-		List<MPlaceholder> refs = modelService.findElements(win, null, MPlaceholder.class, null);
-		if (refs != null) {
-			for (MPlaceholder ref : refs) {
-				if (ref.getRef() != part)
-					continue;
-
-				MElementContainer<MUIElement> refParent = ref.getParent();
-				// can be null, see bug 328296
-				if (refParent != null && refParent.getRenderer() instanceof StackRenderer) {
-					CTabItem cti = findItemForPart(ref, refParent);
-					if (cti != null) {
-						updateTab(cti, part, attName, newValue);
-					}
-				}
-			}
-		}
-	}
-
-	// TODO: Refactor using findItemForPart(MPart) method
-	@Inject
-	@Optional
-	private void subscribeDirtyChanged(@UIEventTopic(UIEvents.Dirtyable.DIRTY) Event event) {
-		Object objElement = event.getProperty(UIEvents.EventTags.ELEMENT);
-
-		// Ensure that this event is for a MMenuItem
-		if (!(objElement instanceof MPart)) {
-			return;
-		}
-
-		// Extract the data bits
-		MPart part = (MPart) objElement;
-
-		String attName = (String) event.getProperty(UIEvents.EventTags.ATTNAME);
-		Object newValue = event.getProperty(UIEvents.EventTags.NEW_VALUE);
-
-		// Is the part directly under the stack?
-		MElementContainer<MUIElement> parent = part.getParent();
-		if (parent != null && parent.getRenderer() == StackRenderer.this) {
-			CTabItem cti = findItemForPart(part, parent);
-			if (cti != null) {
-				updateTab(cti, part, attName, newValue);
-			}
-			return;
-		}
-
-		// Do we have any stacks with place holders for the element
-		// that's changed?
-		Set<MPlaceholder> refs = renderedMap.get(part);
-		if (refs != null) {
-			for (MPlaceholder ref : refs) {
-				MElementContainer<MUIElement> refParent = ref.getParent();
-				if (refParent.getRenderer() instanceof StackRenderer) {
-					CTabItem cti = findItemForPart(ref, refParent);
-					if (cti != null) {
-						updateTab(cti, part, attName, newValue);
-					}
-				}
-			}
-		}
-	}
-
-	@Inject
-	@Optional
-	private void subscribeTopicVisibleChanted(@UIEventTopic(UIEvents.UIElement.TOPIC_VISIBLE) Event event) {
-		viewMenuUpdate(event);
-	}
-
-	@Inject
-	@Optional
-	private void subscribeTopicToberenderedChanged(@UIEventTopic(UIEvents.UIElement.TOPIC_TOBERENDERED) Event event) {
-		viewMenuUpdate(event);
-	}
-
-	/**
-	 * An event handler for listening to changes to the state of view menus and
-	 * its child menu items. Depending on what state these items are in, the
-	 * view menu should or should not be rendered in the tab folder.
-	 */
-	private void viewMenuUpdate(Event event) {
-		Object objElement = event.getProperty(UIEvents.EventTags.ELEMENT);
-
-		// Ensure that this event is for a MMenuItem
-		if (!(objElement instanceof MMenuElement)) {
-			return;
-		}
-
-		// Ensure that it's a View part's menu
-		MMenuElement menuModel = (MMenuElement) objElement;
-		MUIElement menuParent = modelService.getContainer(menuModel);
-		if (!(menuParent instanceof MPart))
-			return;
-
-		MPart element = (MPart) menuParent;
-		MUIElement parentElement = element.getParent();
-		if (parentElement == null) {
-			MPlaceholder placeholder = element.getCurSharedRef();
-			if (placeholder == null) {
-				return;
-			}
-
-			parentElement = placeholder.getParent();
-			if (parentElement == null) {
-				return;
-			}
-		}
-
-		Object widget = parentElement.getWidget();
-		if (widget instanceof CTabFolder) {
-			adjustTopRight((CTabFolder) widget);
-		}
-	}
-
-	@Inject
-	@Optional
-	private void subscribeTopicSelectedElementChanged(
-			@UIEventTopic(UIEvents.ElementContainer.TOPIC_SELECTEDELEMENT) Event event) {
-		tabStateHandler.handleEvent(event);
-	}
-
-	// Manages CSS styling based on active part changes
-	// private EventHandler stylingHandler;
-	@Inject
-	@Optional
-	private void subscribeActivateChanged(@UIEventTopic(UIEvents.UILifeCycle.ACTIVATE) Event event) {
-		MUIElement changed = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
-		if (!(changed instanceof MPart))
-			return;
-
-		MPart newActivePart = (MPart) changed;
-		MUIElement partParent = newActivePart.getParent();
-		if (partParent == null && newActivePart.getCurSharedRef() != null)
-			partParent = newActivePart.getCurSharedRef().getParent();
-
-		// Skip sash containers
-		while (partParent != null && partParent instanceof MPartSashContainer)
-			partParent = partParent.getParent();
-
-		// Ensure the stack of a split part gets updated when one
-		// of its internal parts gets activated
-		if (partParent instanceof MCompositePart) {
-			partParent = partParent.getParent();
-		}
-
-		MPartStack pStack = (MPartStack) (partParent instanceof MPartStack ? partParent : null);
-
-		List<String> tags = new ArrayList<String>();
-		tags.add(CSSConstants.CSS_ACTIVE_CLASS);
-		List<MUIElement> activeElements = modelService.findElements(modelService.getTopLevelWindowFor(newActivePart),
-				null, MUIElement.class, tags);
-		for (MUIElement element : activeElements) {
-			if (element instanceof MPartStack && element != pStack) {
-				styleElement(element, false);
-			} else if (element instanceof MPart && element != newActivePart) {
-				styleElement(element, false);
-			}
-		}
-
-		if (pStack != null)
-			styleElement(pStack, true);
-		styleElement(newActivePart, true);
-	}
 
 	@Override
 	protected boolean requiresFocus(MPart element) {
-		MUIElement inStack = element.getCurSharedRef() != null ? element.getCurSharedRef() : element;
-		if (inStack.getParent() != null && inStack.getParent().getTransientData().containsKey(INHIBIT_FOCUS)) {
+		MUIElement inStack = element.getCurSharedRef() != null ? element
+				.getCurSharedRef() : element;
+		if (inStack.getParent() != null
+				&& inStack.getParent().getTransientData()
+						.containsKey(INHIBIT_FOCUS)) {
 			inStack.getParent().getTransientData().remove(INHIBIT_FOCUS);
 			return false;
 		}
@@ -469,16 +308,220 @@ public class StackRenderer extends LazyStackRenderer {
 	public void init() {
 		super.init(eventBroker);
 
+		// TODO: Refactor using findItemForPart(MPart) method
+		itemUpdater = new EventHandler() {
+			@Override
+			public void handleEvent(Event event) {
+				MUIElement element = (MUIElement) event
+						.getProperty(UIEvents.EventTags.ELEMENT);
+				if (!(element instanceof MPart))
+					return;
+
+				MPart part = (MPart) element;
+
+				String attName = (String) event
+						.getProperty(UIEvents.EventTags.ATTNAME);
+				Object newValue = event
+						.getProperty(UIEvents.EventTags.NEW_VALUE);
+
+				// is this a direct child of the stack?
+				if (element.getParent() != null
+						&& element.getParent().getRenderer() == StackRenderer.this) {
+					CTabItem cti = findItemForPart(element, element.getParent());
+					if (cti != null) {
+						updateTab(cti, part, attName, newValue);
+					}
+					return;
+				}
+
+				// Do we have any stacks with place holders for the element
+				// that's changed?
+				MWindow win = modelService.getTopLevelWindowFor(part);
+				List<MPlaceholder> refs = modelService.findElements(win, null,
+						MPlaceholder.class, null);
+				if (refs != null) {
+					for (MPlaceholder ref : refs) {
+						if (ref.getRef() != part)
+							continue;
+
+						MElementContainer<MUIElement> refParent = ref
+								.getParent();
+						// can be null, see bug 328296
+						if (refParent != null
+								&& refParent.getRenderer() instanceof StackRenderer) {
+							CTabItem cti = findItemForPart(ref, refParent);
+							if (cti != null) {
+								updateTab(cti, part, attName, newValue);
+							}
+						}
+					}
+				}
+			}
+		};
+
+		eventBroker.subscribe(UIEvents.UILabel.TOPIC_ALL, itemUpdater);
+
+		// TODO: Refactor using findItemForPart(MPart) method
+		dirtyUpdater = new EventHandler() {
+			@Override
+			public void handleEvent(Event event) {
+				Object objElement = event
+						.getProperty(UIEvents.EventTags.ELEMENT);
+
+				// Ensure that this event is for a MMenuItem
+				if (!(objElement instanceof MPart)) {
+					return;
+				}
+
+				// Extract the data bits
+				MPart part = (MPart) objElement;
+
+				String attName = (String) event
+						.getProperty(UIEvents.EventTags.ATTNAME);
+				Object newValue = event
+						.getProperty(UIEvents.EventTags.NEW_VALUE);
+
+				// Is the part directly under the stack?
+				MElementContainer<MUIElement> parent = part.getParent();
+				if (parent != null
+						&& parent.getRenderer() == StackRenderer.this) {
+					CTabItem cti = findItemForPart(part, parent);
+					if (cti != null) {
+						updateTab(cti, part, attName, newValue);
+					}
+					return;
+				}
+
+				// Do we have any stacks with place holders for the element
+				// that's changed?
+				Set<MPlaceholder> refs = renderedMap.get(part);
+				if (refs != null) {
+					for (MPlaceholder ref : refs) {
+						MElementContainer<MUIElement> refParent = ref
+								.getParent();
+						if (refParent.getRenderer() instanceof StackRenderer) {
+							CTabItem cti = findItemForPart(ref, refParent);
+							if (cti != null) {
+								updateTab(cti, part, attName, newValue);
+							}
+						}
+					}
+				}
+			}
+		};
+
+		eventBroker.subscribe(UIEvents.buildTopic(UIEvents.Dirtyable.TOPIC,
+				UIEvents.Dirtyable.DIRTY), dirtyUpdater);
+
+		viewMenuUpdater = new EventHandler() {
+			@Override
+			public void handleEvent(Event event) {
+				Object objElement = event
+						.getProperty(UIEvents.EventTags.ELEMENT);
+
+				// Ensure that this event is for a MMenuItem
+				if (!(objElement instanceof MMenuElement)) {
+					return;
+				}
+
+				// Ensure that it's a View part's menu
+				MMenuElement menuModel = (MMenuElement) objElement;
+				MUIElement menuParent = modelService.getContainer(menuModel);
+				if (!(menuParent instanceof MPart))
+					return;
+
+				MPart element = (MPart) menuParent;
+				MUIElement parentElement = element.getParent();
+				if (parentElement == null) {
+					MPlaceholder placeholder = element.getCurSharedRef();
+					if (placeholder == null) {
+						return;
+					}
+
+					parentElement = placeholder.getParent();
+					if (parentElement == null) {
+						return;
+					}
+				}
+
+				Object widget = parentElement.getWidget();
+				if (widget instanceof CTabFolder) {
+					adjustTopRight((CTabFolder) widget);
+				}
+			}
+		};
+		eventBroker
+				.subscribe(UIEvents.UIElement.TOPIC_VISIBLE, viewMenuUpdater);
+		eventBroker.subscribe(UIEvents.UIElement.TOPIC_TOBERENDERED,
+				viewMenuUpdater);
+
+
+		stylingHandler = new EventHandler() {
+			@Override
+			public void handleEvent(Event event) {
+				MUIElement changed = (MUIElement) event
+						.getProperty(UIEvents.EventTags.ELEMENT);
+				if (!(changed instanceof MPart))
+					return;
+
+				MPart newActivePart = (MPart) changed;
+				MUIElement partParent = newActivePart.getParent();
+				if (partParent == null
+						&& newActivePart.getCurSharedRef() != null)
+					partParent = newActivePart.getCurSharedRef().getParent();
+
+				// Skip sash containers
+				while (partParent != null
+						&& partParent instanceof MPartSashContainer)
+					partParent = partParent.getParent();
+
+				// Ensure the stack of a split part gets updated when one
+				// of its internal parts gets activated
+				if (partParent instanceof MCompositePart) {
+					partParent = partParent.getParent();
+				}
+
+				MPartStack pStack = (MPartStack) (partParent instanceof MPartStack ? partParent
+						: null);
+
+				List<String> tags = new ArrayList<String>();
+				tags.add(CSSConstants.CSS_ACTIVE_CLASS);
+				List<MUIElement> activeElements = modelService.findElements(
+						modelService.getTopLevelWindowFor(newActivePart), null,
+						MUIElement.class, tags);
+				for (MUIElement element : activeElements) {
+					if (element instanceof MPartStack && element != pStack) {
+						styleElement(element, false);
+					} else if (element instanceof MPart
+							&& element != newActivePart) {
+						styleElement(element, false);
+					}
+				}
+
+				if (pStack != null)
+					styleElement(pStack, true);
+				styleElement(newActivePart, true);
+			}
+		};
+		eventBroker.subscribe(UIEvents.UILifeCycle.ACTIVATE, stylingHandler);
+
 		tabStateHandler = new TabStateHandler();
+		eventBroker.subscribe(UIEvents.ApplicationElement.TOPIC_TAGS,
+				tabStateHandler);
+		eventBroker.subscribe(UIEvents.ElementContainer.TOPIC_SELECTEDELEMENT,
+				tabStateHandler);
 	}
 
-	protected void updateTab(CTabItem cti, MPart part, String attName, Object newValue) {
-		if (UIEvents.UILabel.LABEL.equals(attName) || UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
+	protected void updateTab(CTabItem cti, MPart part, String attName,
+			Object newValue) {
+		if (UIEvents.UILabel.LABEL.equals(attName)
+				|| UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
 			String newName = (String) newValue;
 			cti.setText(getLabel(part, newName));
 		} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
 			cti.setImage(getImage(part));
-		} else if (UIEvents.UILabel.TOOLTIP.equals(attName) || UIEvents.UILabel.LOCALIZED_TOOLTIP.equals(attName)) {
+		} else if (UIEvents.UILabel.TOOLTIP.equals(attName)
+				|| UIEvents.UILabel.LOCALIZED_TOOLTIP.equals(attName)) {
 			String newTTip = (String) newValue;
 			cti.setToolTipText(getToolTip(newTTip));
 		} else if (UIEvents.Dirtyable.DIRTY.equals(attName)) {
@@ -498,6 +541,12 @@ public class StackRenderer extends LazyStackRenderer {
 	@PreDestroy
 	public void contextDisposed() {
 		super.contextDisposed(eventBroker);
+
+		eventBroker.unsubscribe(itemUpdater);
+		eventBroker.unsubscribe(dirtyUpdater);
+		eventBroker.unsubscribe(viewMenuUpdater);
+		eventBroker.unsubscribe(stylingHandler);
+		eventBroker.unsubscribe(tabStateHandler);
 	}
 
 	private String getLabel(MUILabel itemPart, String newName) {
@@ -514,7 +563,8 @@ public class StackRenderer extends LazyStackRenderer {
 	}
 
 	private String getToolTip(String newToolTip) {
-		return newToolTip == null || newToolTip.length() == 0 ? null : LegacyActionTools.escapeMnemonics(newToolTip);
+		return newToolTip == null || newToolTip.length() == 0 ? null
+				: LegacyActionTools.escapeMnemonics(newToolTip);
 	}
 
 	@Override
@@ -527,7 +577,8 @@ public class StackRenderer extends LazyStackRenderer {
 		Composite parentComposite = (Composite) parent;
 
 		// Ensure that all rendered PartStacks have an Id
-		if (element.getElementId() == null || element.getElementId().length() == 0) {
+		if (element.getElementId() == null
+				|| element.getElementId().length() == 0) {
 			String generatedId = "PartStack@" + Integer.toHexString(element.hashCode()); //$NON-NLS-1$
 			element.setElementId(generatedId);
 		}
@@ -561,7 +612,8 @@ public class StackRenderer extends LazyStackRenderer {
 		if (util == null)
 			return result;
 
-		CSSValue value = util.getCSSValue(control, "MPartStack", "swt-mru-visible"); //$NON-NLS-1$ //$NON-NLS-2$
+		CSSValue value = util.getCSSValue(control,
+				"MPartStack", "swt-mru-visible"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (value == null) {
 			value = util.getCSSValue(control, "MPartStack", "mru-visible"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -577,7 +629,8 @@ public class StackRenderer extends LazyStackRenderer {
 	 */
 	private void addTopRight(CTabFolder ctf) {
 		Composite trComp = new Composite(ctf, SWT.NONE);
-		trComp.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_CYAN));
+		trComp.setBackground(Display.getCurrent().getSystemColor(
+				SWT.COLOR_DARK_CYAN));
 		RowLayout rl = new RowLayout();
 		trComp.setLayout(rl);
 		rl.marginBottom = rl.marginTop = rl.marginRight = rl.marginLeft = 0;
@@ -646,22 +699,26 @@ public class StackRenderer extends LazyStackRenderer {
 			MPart curPart = (MPart) ctf.getTopRight().getData(THE_PART_KEY);
 			MPart part = null;
 			if (element != null) {
-				part = (MPart) ((element instanceof MPart) ? element : ((MPlaceholder) element).getRef());
+				part = (MPart) ((element instanceof MPart) ? element
+						: ((MPlaceholder) element).getRef());
 			}
 
 			// Hide the old TB if we're changing
-			if (part != curPart && curPart != null && curPart.getToolbar() != null) {
+			if (part != curPart && curPart != null
+					&& curPart.getToolbar() != null) {
 				curPart.getToolbar().setVisible(false);
 			}
 
 			Composite trComp = (Composite) ctf.getTopRight();
 			Control[] kids = trComp.getChildren();
 
-			boolean needsTB = part != null && part.getToolbar() != null && part.getToolbar().isToBeRendered();
+			boolean needsTB = part != null && part.getToolbar() != null
+					&& part.getToolbar().isToBeRendered();
 
 			// View menu (if any)
 			MMenu viewMenu = getViewMenu(part);
-			boolean needsMenu = viewMenu != null && hasVisibleMenuItems(viewMenu, part);
+			boolean needsMenu = viewMenu != null
+					&& hasVisibleMenuItems(viewMenu, part);
 
 			// Check the current state of the TB's
 			ToolBar menuTB = (ToolBar) kids[kids.length - 1];
@@ -684,7 +741,8 @@ public class StackRenderer extends LazyStackRenderer {
 			ToolBar newViewTB = null;
 			if (needsTB && part != null && part.getObject() != null) {
 				part.getToolbar().setVisible(true);
-				newViewTB = (ToolBar) renderer.createGui(part.getToolbar(), ctf.getTopRight(), part.getContext());
+				newViewTB = (ToolBar) renderer.createGui(part.getToolbar(),
+						ctf.getTopRight(), part.getContext());
 				// We can get calls during shutdown in which case the
 				// rendering engine will return 'null' because you can't
 				// render anything while a removeGui is taking place...
@@ -713,7 +771,8 @@ public class StackRenderer extends LazyStackRenderer {
 	}
 
 	@Override
-	protected void createTab(MElementContainer<MUIElement> stack, MUIElement element) {
+	protected void createTab(MElementContainer<MUIElement> stack,
+			MUIElement element) {
 		MPart part = null;
 		if (element instanceof MPart)
 			part = (MPart) element;
@@ -726,7 +785,8 @@ public class StackRenderer extends LazyStackRenderer {
 
 		CTabItem cti = findItemForPart(element, stack);
 		if (cti != null) {
-			if (element.getWidget() != null && cti.getControl() != element.getWidget())
+			if (element.getWidget() != null
+					&& cti.getControl() != element.getWidget())
 				cti.setControl((Control) element.getWidget());
 			return;
 		}
@@ -758,7 +818,8 @@ public class StackRenderer extends LazyStackRenderer {
 		}
 	}
 
-	private int calcIndexFor(MElementContainer<MUIElement> stack, final MUIElement part) {
+	private int calcIndexFor(MElementContainer<MUIElement> stack,
+			final MUIElement part) {
 		int index = 0;
 
 		// Find the -visible- part before this element
@@ -772,16 +833,20 @@ public class StackRenderer extends LazyStackRenderer {
 	}
 
 	@Override
-	public void childRendered(final MElementContainer<MUIElement> parentElement, MUIElement element) {
+	public void childRendered(
+			final MElementContainer<MUIElement> parentElement,
+			MUIElement element) {
 		super.childRendered(parentElement, element);
 
-		if (!(((MUIElement) parentElement) instanceof MPartStack) || !(element instanceof MStackElement))
+		if (!(((MUIElement) parentElement) instanceof MPartStack)
+				|| !(element instanceof MStackElement))
 			return;
 
 		createTab(parentElement, element);
 	}
 
-	private CTabItem findItemForPart(MUIElement element, MElementContainer<MUIElement> stack) {
+	private CTabItem findItemForPart(MUIElement element,
+			MElementContainer<MUIElement> stack) {
 		if (stack == null)
 			stack = element.getParent();
 		if (!(stack.getWidget() instanceof CTabFolder))
@@ -804,7 +869,8 @@ public class StackRenderer extends LazyStackRenderer {
 			return null;
 
 		// is this a direct child of the stack?
-		if (part.getParent() != null && part.getParent().getRenderer() == StackRenderer.this) {
+		if (part.getParent() != null
+				&& part.getParent().getRenderer() == StackRenderer.this) {
 			CTabItem cti = findItemForPart(part, part.getParent());
 			if (cti != null) {
 				return cti;
@@ -818,7 +884,8 @@ public class StackRenderer extends LazyStackRenderer {
 		if (win == null)
 			return null;
 
-		List<MPlaceholder> refs = modelService.findElements(win, null, MPlaceholder.class, null);
+		List<MPlaceholder> refs = modelService.findElements(win, null,
+				MPlaceholder.class, null);
 		if (refs != null) {
 			for (MPlaceholder ref : refs) {
 				if (ref.getRef() != part)
@@ -826,7 +893,8 @@ public class StackRenderer extends LazyStackRenderer {
 
 				MElementContainer<MUIElement> refParent = ref.getParent();
 				// can be null, see bug 328296
-				if (refParent != null && refParent.getRenderer() instanceof StackRenderer) {
+				if (refParent != null
+						&& refParent.getRenderer() instanceof StackRenderer) {
 					CTabItem cti = findItemForPart(ref, refParent);
 					if (cti != null) {
 						return cti;
@@ -838,7 +906,8 @@ public class StackRenderer extends LazyStackRenderer {
 	}
 
 	@Override
-	public void hideChild(MElementContainer<MUIElement> parentElement, MUIElement child) {
+	public void hideChild(MElementContainer<MUIElement> parentElement,
+			MUIElement child) {
 		super.hideChild(parentElement, child);
 
 		CTabFolder ctf = (CTabFolder) parentElement.getWidget();
@@ -877,16 +946,20 @@ public class StackRenderer extends LazyStackRenderer {
 		ctf.addTraverseListener(new TraverseListener() {
 			@Override
 			public void keyTraversed(TraverseEvent e) {
-				if (e.detail == SWT.TRAVERSE_ARROW_NEXT || e.detail == SWT.TRAVERSE_ARROW_PREVIOUS) {
+				if (e.detail == SWT.TRAVERSE_ARROW_NEXT
+						|| e.detail == SWT.TRAVERSE_ARROW_PREVIOUS) {
 					me.getTransientData().put(INHIBIT_FOCUS, true);
 				} else if (e.detail == SWT.TRAVERSE_RETURN) {
 					me.getTransientData().remove(INHIBIT_FOCUS);
 					CTabItem cti = ctf.getSelection();
 					if (cti != null) {
-						MUIElement stackElement = (MUIElement) cti.getData(OWNING_ME);
+						MUIElement stackElement = (MUIElement) cti
+								.getData(OWNING_ME);
 						if (stackElement instanceof MPlaceholder)
-							stackElement = ((MPlaceholder) stackElement).getRef();
-						if ((stackElement instanceof MPart) && (ctf.isFocusControl())) {
+							stackElement = ((MPlaceholder) stackElement)
+									.getRef();
+						if ((stackElement instanceof MPart)
+								&& (ctf.isFocusControl())) {
 							MPart thePart = (MPart) stackElement;
 							renderer.focusGui(thePart);
 						}
@@ -913,7 +986,8 @@ public class StackRenderer extends LazyStackRenderer {
 					// If the item we're over is *not* the current one do
 					// nothing (it'll get activated when the tab changes)
 					if (overItem == null || overItem == ctf.getSelection()) {
-						MUIElement uiElement = (MUIElement) ctf.getSelection().getData(OWNING_ME);
+						MUIElement uiElement = (MUIElement) ctf.getSelection()
+								.getData(OWNING_ME);
 						if (uiElement instanceof MPlaceholder)
 							uiElement = ((MPlaceholder) uiElement).getRef();
 						if (uiElement instanceof MPart)
@@ -1011,7 +1085,8 @@ public class StackRenderer extends LazyStackRenderer {
 			@Override
 			public void menuDetected(MenuDetectEvent e) {
 				Point absolutePoint = new Point(e.x, e.y);
-				Point relativePoint = ctf.getDisplay().map(null, ctf, absolutePoint);
+				Point relativePoint = ctf.getDisplay().map(null, ctf,
+						absolutePoint);
 				CTabItem eventTabItem = ctf.getItem(relativePoint);
 
 				// If click happened in empty area, still show the menu
@@ -1023,9 +1098,10 @@ public class StackRenderer extends LazyStackRenderer {
 				}
 
 				if (eventTabItem != null) {
-					MUIElement uiElement = (MUIElement) eventTabItem.getData(AbstractPartRenderer.OWNING_ME);
-					MPart tabPart = (MPart) ((uiElement instanceof MPart) ? uiElement : ((MPlaceholder) uiElement)
-							.getRef());
+					MUIElement uiElement = (MUIElement) eventTabItem
+							.getData(AbstractPartRenderer.OWNING_ME);
+					MPart tabPart = (MPart) ((uiElement instanceof MPart) ? uiElement
+							: ((MPlaceholder) uiElement).getRef());
 					openMenuFor(tabPart, ctf, absolutePoint);
 				}
 			}
@@ -1034,8 +1110,10 @@ public class StackRenderer extends LazyStackRenderer {
 
 	public void showAvailableItems(MElementContainer<?> stack, CTabFolder ctf) {
 		IEclipseContext ctxt = getContext(stack);
-		final BasicPartList editorList = new BasicPartList(ctf.getShell(), SWT.ON_TOP, SWT.V_SCROLL | SWT.H_SCROLL,
-				ctxt.get(EPartService.class), stack, this, getInitialMRUValue(ctf));
+		final BasicPartList editorList = new BasicPartList(ctf.getShell(),
+				SWT.ON_TOP, SWT.V_SCROLL | SWT.H_SCROLL,
+				ctxt.get(EPartService.class), stack, this,
+				getInitialMRUValue(ctf));
 		editorList.setInput();
 
 		Point size = editorList.computeSizeHint();
@@ -1101,8 +1179,10 @@ public class StackRenderer extends LazyStackRenderer {
 	 * @return <tt>true</tt> if the part was closed, <tt>false</tt> otherwise
 	 */
 	private boolean closePart(Widget widget, boolean check) {
-		MUIElement uiElement = (MUIElement) widget.getData(AbstractPartRenderer.OWNING_ME);
-		MPart part = (MPart) ((uiElement instanceof MPart) ? uiElement : ((MPlaceholder) uiElement).getRef());
+		MUIElement uiElement = (MUIElement) widget
+				.getData(AbstractPartRenderer.OWNING_ME);
+		MPart part = (MPart) ((uiElement instanceof MPart) ? uiElement
+				: ((MPlaceholder) uiElement).getRef());
 		if (!check && !isClosable(part)) {
 			return false;
 		}
@@ -1110,9 +1190,11 @@ public class StackRenderer extends LazyStackRenderer {
 		IEclipseContext partContext = part.getContext();
 		IEclipseContext parentContext = getContextForParent(part);
 		// a part may not have a context if it hasn't been rendered
-		IEclipseContext context = partContext == null ? parentContext : partContext;
+		IEclipseContext context = partContext == null ? parentContext
+				: partContext;
 		// Allow closes to be 'canceled'
-		EPartService partService = (EPartService) context.get(EPartService.class.getName());
+		EPartService partService = (EPartService) context
+				.get(EPartService.class.getName());
 		if (partService.savePart(part, true)) {
 			partService.hidePart(part);
 			return true;
@@ -1175,7 +1257,8 @@ public class StackRenderer extends LazyStackRenderer {
 		if (menuModel == null || !menuModel.isToBeRendered())
 			return;
 
-		final Menu swtMenu = (Menu) renderer.createGui(menuModel, ctrl.getShell(), part.getContext());
+		final Menu swtMenu = (Menu) renderer.createGui(menuModel,
+				ctrl.getShell(), part.getContext());
 		if (swtMenu == null)
 			return;
 
@@ -1199,7 +1282,8 @@ public class StackRenderer extends LazyStackRenderer {
 			if (!display.readAndDispatch())
 				display.sleep();
 		}
-		if (!swtMenu.isDisposed() && !(swtMenu.getData() instanceof MenuManager)) {
+		if (!swtMenu.isDisposed()
+				&& !(swtMenu.getData() instanceof MenuManager)) {
 			swtMenu.dispose();
 		}
 	}
@@ -1214,7 +1298,8 @@ public class StackRenderer extends LazyStackRenderer {
 			Display display = Display.getCurrent();
 			GC gc = new GC(viewMenu);
 			GC maskgc = new GC(viewMenuMask);
-			gc.setForeground(display.getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW));
+			gc.setForeground(display
+					.getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW));
 			gc.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
 			int[] shapeArray = new int[] { 6, 3, 15, 3, 11, 7, 10, 7 };
@@ -1237,7 +1322,8 @@ public class StackRenderer extends LazyStackRenderer {
 			ImageData data = viewMenu.getImageData();
 			data.transparentPixel = data.getPixel(0, 0);
 
-			viewMenuImage = new Image(d, viewMenu.getImageData(), viewMenuMask.getImageData());
+			viewMenuImage = new Image(d, viewMenu.getImageData(),
+					viewMenuMask.getImageData());
 			viewMenu.dispose();
 			viewMenuMask.dispose();
 		}
@@ -1254,7 +1340,8 @@ public class StackRenderer extends LazyStackRenderer {
 	private boolean isClosable(MPart part) {
 		// if it's a shared part check its current ref
 		if (part.getCurSharedRef() != null) {
-			return !(part.getCurSharedRef().getTags().contains(IPresentationEngine.NO_CLOSE));
+			return !(part.getCurSharedRef().getTags()
+					.contains(IPresentationEngine.NO_CLOSE));
 		}
 
 		return part.isCloseable();
@@ -1282,7 +1369,8 @@ public class StackRenderer extends LazyStackRenderer {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
 					MPart part = (MPart) menu.getData(STACK_SELECTED_PART);
-					EPartService partService = getContextForParent(part).get(EPartService.class);
+					EPartService partService = getContextForParent(part).get(
+							EPartService.class);
 					if (partService.savePart(part, true))
 						partService.hidePart(part);
 
@@ -1388,10 +1476,12 @@ public class StackRenderer extends LazyStackRenderer {
 			}
 		}
 
-		EPartService partService = getContextForParent(part).get(EPartService.class);
+		EPartService partService = getContextForParent(part).get(
+				EPartService.class);
 		// try using the ISaveHandler first... This gives better control of
 		// dialogs...
-		ISaveHandler saveHandler = getContextForParent(part).get(ISaveHandler.class);
+		ISaveHandler saveHandler = getContextForParent(part).get(
+				ISaveHandler.class);
 		if (saveHandler != null) {
 			final List<MPart> toPrompt = new ArrayList<MPart>(others);
 			toPrompt.retainAll(partService.getDirtyParts());
@@ -1450,7 +1540,8 @@ public class StackRenderer extends LazyStackRenderer {
 			if (menuElement.isToBeRendered() && menuElement.isVisible()) {
 				if (OpaqueElementUtil.isOpaqueMenuItem(menuElement)
 						|| OpaqueElementUtil.isOpaqueMenuSeparator(menuElement)) {
-					IContributionItem item = (IContributionItem) OpaqueElementUtil.getOpaqueItem(menuElement);
+					IContributionItem item = (IContributionItem) OpaqueElementUtil
+							.getOpaqueItem(menuElement);
 					if (item != null && item.isVisible()) {
 						return true;
 					}
@@ -1462,7 +1553,8 @@ public class StackRenderer extends LazyStackRenderer {
 
 		Object menuRenderer = viewMenu.getRenderer();
 		if (menuRenderer instanceof MenuManagerRenderer) {
-			MenuManager manager = ((MenuManagerRenderer) menuRenderer).getManager(viewMenu);
+			MenuManager manager = ((MenuManagerRenderer) menuRenderer)
+					.getManager(viewMenu);
 			if (manager != null && manager.isVisible()) {
 				return true;
 			}
@@ -1470,12 +1562,14 @@ public class StackRenderer extends LazyStackRenderer {
 
 		Control control = (Control) part.getWidget();
 		if (control != null) {
-			Menu menu = (Menu) renderer.createGui(viewMenu, control.getShell(), part.getContext());
+			Menu menu = (Menu) renderer.createGui(viewMenu, control.getShell(),
+					part.getContext());
 			if (menu != null) {
 				menuRenderer = viewMenu.getRenderer();
 				if (menuRenderer instanceof MenuManagerRenderer) {
 					MenuManagerRenderer menuManagerRenderer = (MenuManagerRenderer) menuRenderer;
-					MenuManager manager = menuManagerRenderer.getManager(viewMenu);
+					MenuManager manager = menuManagerRenderer
+							.getManager(viewMenu);
 					if (manager != null) {
 						// remark ourselves as dirty so that the menu will be
 						// reconstructed
@@ -1496,12 +1590,13 @@ public class StackRenderer extends LazyStackRenderer {
 			Object newValue = event.getProperty(UIEvents.EventTags.NEW_VALUE);
 			Object oldValue = event.getProperty(UIEvents.EventTags.OLD_VALUE);
 
-			if (!validateElement(element) || !validateValues(oldValue, newValue)) {
+			if (!validateElement(element)
+					|| !validateValues(oldValue, newValue)) {
 				return;
 			}
 
-			MPart part = newValue instanceof MPlaceholder ? (MPart) ((MPlaceholder) newValue).getRef()
-					: (MPart) element;
+			MPart part = newValue instanceof MPlaceholder ? (MPart) ((MPlaceholder) newValue)
+					.getRef() : (MPart) element;
 			CTabItem cti = findItemForPart(part);
 
 			if (cti == null) {
@@ -1514,14 +1609,16 @@ public class StackRenderer extends LazyStackRenderer {
 					part.getTags().add(CSSConstants.CSS_HIGHLIGHTED_CLASS);
 				}
 			} else if (newValue instanceof MPlaceholder // part gets active
-					&& part.getTags().contains(CSSConstants.CSS_HIGHLIGHTED_CLASS)) {
+					&& part.getTags().contains(
+							CSSConstants.CSS_HIGHLIGHTED_CLASS)) {
 				part.getTags().remove(CSSConstants.CSS_HIGHLIGHTED_CLASS);
 			}
 
 			String prevCssCls = WidgetElement.getCSSClass(cti);
 			setCSSInfo(part, cti);
 
-			if (prevCssCls == null || !prevCssCls.equals(WidgetElement.getCSSClass(cti))) {
+			if (prevCssCls == null
+					|| !prevCssCls.equals(WidgetElement.getCSSClass(cti))) {
 				reapplyStyles(cti.getParent());
 			}
 		}
@@ -1532,23 +1629,21 @@ public class StackRenderer extends LazyStackRenderer {
 
 		public boolean validateValues(Object oldValue, Object newValue) {
 			return newValue instanceof MPlaceholder // part gets active
-					|| isTagAdded(CSSConstants.CSS_BUSY_CLASS, oldValue, newValue) // part
-																					// gets
-																					// busy
-					|| isTagRemoved(CSSConstants.CSS_BUSY_CLASS, oldValue, newValue) // part
-																						// gets
-																						// idle
-					|| isTagAdded(CSSConstants.CSS_CONTENT_CHANGE_CLASS, oldValue, newValue); // content
-																								// of
-																								// part
-																								// changed
+					|| isTagAdded(CSSConstants.CSS_BUSY_CLASS, oldValue,
+							newValue) // part gets busy
+					|| isTagRemoved(CSSConstants.CSS_BUSY_CLASS, oldValue,
+							newValue) // part gets idle
+					|| isTagAdded(CSSConstants.CSS_CONTENT_CHANGE_CLASS,
+							oldValue, newValue); // content of part changed
 		}
 
-		private boolean isTagAdded(String tagName, Object oldValue, Object newValue) {
+		private boolean isTagAdded(String tagName, Object oldValue,
+				Object newValue) {
 			return oldValue == null && tagName.equals(newValue);
 		}
 
-		private boolean isTagRemoved(String tagName, Object oldValue, Object newValue) {
+		private boolean isTagRemoved(String tagName, Object oldValue,
+				Object newValue) {
 			return newValue == null && tagName.equals(oldValue);
 		}
 	}
