@@ -126,7 +126,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.BidiUtils;
@@ -143,7 +142,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.DeviceData;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
@@ -1844,16 +1842,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 				ThemeElementHelper.populateRegistry(getThemeManager().getCurrentTheme(),
 						fontDefinitions, PrefUtil.getInternalPreferenceStore());
-				getThemeManager().getCurrentTheme().getFontRegistry().addListener(new IPropertyChangeListener() {
-					@Override
-					public void propertyChange(PropertyChangeEvent event) {
-						if (event.getNewValue() instanceof FontData[]) {
-							FontData[] fontData = (FontData[]) event.getNewValue();
-							PrefUtil.getInternalPreferenceStore().setValue(event.getProperty(),
-									PreferenceConverter.getStoredRepresentation(fontData));
-						}
-					}
-				});
 			}
 		});
 	}
