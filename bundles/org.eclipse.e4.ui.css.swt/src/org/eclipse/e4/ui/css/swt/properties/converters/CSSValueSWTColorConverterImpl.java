@@ -8,7 +8,6 @@
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  *     IBM Corporation
- *     Stefan Winkler <stefan@winklerweb.net> - Bug 459961
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.properties.converters;
 
@@ -36,26 +35,18 @@ public class CSSValueSWTColorConverterImpl extends AbstractCSSValueConverter {
 
 	public static final ICSSValueConverter INSTANCE = new CSSValueSWTColorConverterImpl();
 
-	private static final String TRANSPARENT_NAME = "transparent";
-
 	public CSSValueSWTColorConverterImpl() {
 		super(Color.class);
 	}
 
 	@Override
-	public Color convert(CSSValue value, CSSEngine engine, Object context) throws DOMException {
+	public Color convert(CSSValue value, CSSEngine engine, Object context)
+			throws DOMException {
 		Display display = (Display) context;
-		Color color = null;
-		if (TRANSPARENT_NAME.equals(value.getCssText())) {
-			color = CSSSWTColorHelper.getSWTTransparentColor(display);
-		} else {
-			color = CSSSWTColorHelper.getSWTColor(value, display);
-		}
-
-		if (color == null) {
+		Color color = CSSSWTColorHelper.getSWTColor(value, display);
+		if (color == null)
 			throw new DOMExceptionImpl(DOMException.INVALID_ACCESS_ERR,
 					DOMExceptionImpl.RGBCOLOR_ERROR);
-		}
 
 		return color;
 	}
@@ -64,9 +55,6 @@ public class CSSValueSWTColorConverterImpl extends AbstractCSSValueConverter {
 	public String convert(Object value, CSSEngine engine, Object context,
 			ICSSValueConverterConfig config) throws Exception {
 		Color color = (Color) value;
-		if (color.getAlpha() == 0) {
-			return TRANSPARENT_NAME;
-		}
 		RGBColor rgbColor = CSSSWTColorHelper.getRGBColor(color);
 		return CSS2ColorHelper.getColorStringValue(rgbColor, config);
 	}

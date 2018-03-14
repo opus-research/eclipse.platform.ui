@@ -99,30 +99,7 @@
       <themeid
             refid="org.eclipse.e4.ui.css.theme.e4_dark"></themeid>
    </stylesheet>
-   <theme
-         basestylesheeturi="css/e4-dark-simplified.css"
-         id="org.eclipse.e4.ui.css.theme.e4_dark_simplified"
-         label="%theme.dark.simplified"
-         os="linux">
-   </theme>
-   <theme
-         basestylesheeturi="css/e4-dark-simplified_win.css"
-         id="org.eclipse.e4.ui.css.theme.e4_dark_simplified"
-         label="%theme.dark.simplified"
-         os="win32">
-   </theme>
-   <theme
-         basestylesheeturi="css/e4-dark-simplified_mac.css"
-         id="org.eclipse.e4.ui.css.theme.e4_dark_simplified"
-         label="%theme.dark.simplified"
-         os="macosx">
-   </theme>
-   <stylesheet
-         uri="css/dark-simplified/e4-dark_preferencestyle.css">
-      <themeid
-            refid="org.eclipse.e4.ui.css.theme.e4_dark_simplified">
-      </themeid>
-   </stylesheet>
+
    </extension>
 
 </plugin>
