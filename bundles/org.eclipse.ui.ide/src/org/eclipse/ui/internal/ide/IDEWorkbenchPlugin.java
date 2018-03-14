@@ -129,8 +129,7 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
             final Object[] ret = new Object[1];
             final CoreException[] exc = new CoreException[1];
             BusyIndicator.showWhile(null, new Runnable() {
-                @Override
-				public void run() {
+                public void run() {
                     try {
                         ret[0] = element
                                 .createExecutableExtension(classAttribute);
@@ -249,8 +248,7 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
     /* (non-javadoc)
      * Method declared on AbstractUIPlugin
      */
-    @Override
-	protected void refreshPluginActions() {
+    protected void refreshPluginActions() {
         // do nothing
     }
 
@@ -337,7 +335,6 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
-	@Override
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
 		if (resourceManager != null)
@@ -348,7 +345,6 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
-	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 
@@ -361,7 +357,6 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
 	 */
 	private void createProblemsViews() {
 		final Runnable r= new Runnable() {
-			@Override
 			public void run() {
 				IWorkbench workbench = PlatformUI.isWorkbenchRunning() ? PlatformUI.getWorkbench() : null;
 				if (workbench != null && (workbench.getDisplay().isDisposed() || PlatformUI.getWorkbench().isClosing()))

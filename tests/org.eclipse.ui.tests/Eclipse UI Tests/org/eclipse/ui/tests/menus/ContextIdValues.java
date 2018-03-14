@@ -22,7 +22,6 @@ import org.eclipse.ui.contexts.IContextService;
 
 public class ContextIdValues implements IParameterValues {
 
-	@Override
 	public Map getParameterValues() {
 		Map values = new HashMap();
 

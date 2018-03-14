@@ -63,7 +63,6 @@ public class WizardShortcutAction extends Action implements IPluginContribution 
 	/**
 	 * This action has been invoked by the user 
 	 */
-	@Override
 	public void run() {
 		// create instance of target wizard
 
@@ -105,7 +104,6 @@ public class WizardShortcutAction extends Action implements IPluginContribution 
 	 * 
 	 * @see org.eclipse.ui.activities.support.IPluginContribution#getLocalId()
 	 */
-	@Override
 	public String getLocalId() {
 		return descriptor.getId();
 	}
@@ -115,7 +113,6 @@ public class WizardShortcutAction extends Action implements IPluginContribution 
 	 * 
 	 * @see org.eclipse.ui.activities.support.IPluginContribution#getPluginId()
 	 */
-	@Override
 	public String getPluginId() {
 		return descriptor.getId();
 	}

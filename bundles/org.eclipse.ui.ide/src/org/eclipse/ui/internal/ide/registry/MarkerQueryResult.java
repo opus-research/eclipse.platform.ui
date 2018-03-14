@@ -46,8 +46,7 @@ public class MarkerQueryResult {
     /* (non-Javadoc)
      * Method declared on Object.
      */
-    @Override
-	public boolean equals(Object o) {
+    public boolean equals(Object o) {
         if (!(o instanceof MarkerQueryResult)) {
 			return false;
 		}
@@ -73,8 +72,7 @@ public class MarkerQueryResult {
     /* (non-Javadoc)
      * Method declared on Object.
      */
-    @Override
-	public int hashCode() {
+    public int hashCode() {
         return hashCode;
     }
 

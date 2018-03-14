@@ -29,10 +29,8 @@ public class SafeRunnableErrorTest extends TestCase {
 	protected Thread runner() {
 		return new Thread(new Runnable() {
 
-			@Override
 			public void run() {
 				ISafeRunnable runnable = new SafeRunnable() {
-					@Override
 					public void run() throws Exception {
 						throw new RuntimeException("test exception " + ++count);
 					}
@@ -46,7 +44,6 @@ public class SafeRunnableErrorTest extends TestCase {
 	public void testSafeRunnableHandler() {
 		// Just make sure that nothing bad happens when we throw here
 		SafeRunnable.run(new SafeRunnable() {
-			@Override
 			public void run() throws Exception {
 				throw new RuntimeException("test exception");
 			}
@@ -61,7 +58,6 @@ public class SafeRunnableErrorTest extends TestCase {
 
 	public void testSafeRunnableHandlerMulti() {
 		ISafeRunnable runnable = new SafeRunnable() {
-			@Override
 			public void run() throws Exception {
 				throw new RuntimeException("test exception " + ++count);
 			}

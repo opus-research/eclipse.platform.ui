@@ -66,13 +66,11 @@ public class ResourceTreeAndListGroup extends EventManager {
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.ICheckStateListener#checkStateChanged(org.eclipse.jface.viewers.CheckStateChangedEvent)
 		 */
-		@Override
 		public void checkStateChanged(final CheckStateChangedEvent event) {
 			//Potentially long operation - show a busy cursor
 	        BusyIndicator.showWhile(treeViewer.getControl().getDisplay(),
 	                new Runnable() {
-	                    @Override
-						public void run() {
+	                    public void run() {
 	                        if (event.getCheckable().equals(treeViewer)) {
 								treeItemChecked(event.getElement(), event
 	                                    .getChecked());
@@ -94,7 +92,6 @@ public class ResourceTreeAndListGroup extends EventManager {
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
 		 */
-		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
 			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 	        Object selectedElement = selection.getFirstElement();
@@ -122,14 +119,12 @@ public class ResourceTreeAndListGroup extends EventManager {
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.ITreeViewerListener#treeCollapsed(org.eclipse.jface.viewers.TreeExpansionEvent)
 		 */
-		@Override
 		public void treeCollapsed(TreeExpansionEvent event) {
 		}
 
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.ITreeViewerListener#treeExpanded(org.eclipse.jface.viewers.TreeExpansionEvent)
 		 */
-		@Override
 		public void treeExpanded(TreeExpansionEvent event) {
 			expandTreeElement(event.getElement());
 		}
@@ -411,8 +406,7 @@ public class ResourceTreeAndListGroup extends EventManager {
     private void expandTreeElement(final Object item) {
         BusyIndicator.showWhile(treeViewer.getControl().getDisplay(),
                 new Runnable() {
-                    @Override
-					public void run() {
+                    public void run() {
 
                         // First see if the children need to be given their checked state at all.  If they've
                         // already been realized then this won't be necessary
@@ -597,14 +591,12 @@ public class ResourceTreeAndListGroup extends EventManager {
 
         IElementFilter passThroughFilter = new IElementFilter() {
 
-            @Override
-			public void filterElements(Collection elements,
+            public void filterElements(Collection elements,
                     IProgressMonitor monitor) {
                 returnValue.addAll(elements);
             }
 
-            @Override
-			public void filterElements(Object[] elements,
+            public void filterElements(Object[] elements,
                     IProgressMonitor monitor) {
                 for (int i = 0; i < elements.length; i++) {
                     returnValue.add(elements[i]);
@@ -631,14 +623,12 @@ public class ResourceTreeAndListGroup extends EventManager {
 
         IElementFilter passThroughFilter = new IElementFilter() {
 
-            @Override
-			public void filterElements(Collection elements,
+            public void filterElements(Collection elements,
                     IProgressMonitor monitor) {
                 returnValue.addAll(elements);
             }
 
-            @Override
-			public void filterElements(Object[] elements,
+            public void filterElements(Object[] elements,
                     IProgressMonitor monitor) {
                 for (int i = 0; i < elements.length; i++) {
                     returnValue.add(elements[i]);
@@ -841,8 +831,7 @@ public class ResourceTreeAndListGroup extends EventManager {
         for (int i = 0; i < array.length; i++) {
             final ICheckStateListener l = (ICheckStateListener) array[i];
             SafeRunner.run(new SafeRunnable() {
-                @Override
-				public void run() {
+                public void run() {
                     l.checkStateChanged(event);
                 }
             });
@@ -865,8 +854,7 @@ public class ResourceTreeAndListGroup extends EventManager {
             //Potentially long operation - show a busy cursor
             BusyIndicator.showWhile(treeViewer.getControl().getDisplay(),
                     new Runnable() {
-                        @Override
-						public void run() {
+                        public void run() {
                             setListForWhiteSelection(treeElement);
                             listViewer.setAllChecked(true);
                         }
@@ -927,8 +915,7 @@ public class ResourceTreeAndListGroup extends EventManager {
         //Potentially long operation - show a busy cursor
         BusyIndicator.showWhile(treeViewer.getControl().getDisplay(),
                 new Runnable() {
-                    @Override
-					public void run() {
+                    public void run() {
                         setTreeChecked(root, selection);
                         listViewer.setAllChecked(selection);
                     }
