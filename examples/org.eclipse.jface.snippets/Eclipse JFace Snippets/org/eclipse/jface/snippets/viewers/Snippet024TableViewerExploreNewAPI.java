@@ -34,16 +34,13 @@ public class Snippet024TableViewerExploreNewAPI {
 
 	private class MyContentProvider implements IStructuredContentProvider {
 
-		@Override
 		public Object[] getElements(Object inputElement) {
 			return (Person[]) inputElement;
 		}
 
-		@Override
 		public void dispose() {
 		}
 
-		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 
@@ -70,17 +67,14 @@ public class Snippet024TableViewerExploreNewAPI {
 			this.editor = new TextCellEditor(viewer.getTable());
 		}
 
-		@Override
 		protected boolean canEdit(Object element) {
 			return true;
 		}
 
-		@Override
 		protected CellEditor getCellEditor(Object element) {
 			return editor;
 		}
 
-		@Override
 		protected void setValue(Object element, Object value) {
 			doSetValue(element, value);
 			getViewer().update(element, null);
@@ -99,7 +93,6 @@ public class Snippet024TableViewerExploreNewAPI {
 		column.getColumn().setMoveable(true);
 		column.setLabelProvider(new ColumnLabelProvider() {
 
-			@Override
 			public String getText(Object element) {
 				return ((Person) element).givenname;
 			}
@@ -107,12 +100,10 @@ public class Snippet024TableViewerExploreNewAPI {
 
 		column.setEditingSupport(new AbstractEditingSupport(v) {
 
-			@Override
 			protected Object getValue(Object element) {
 				return ((Person) element).givenname;
 			}
 
-			@Override
 			protected void doSetValue(Object element, Object value) {
 				((Person) element).givenname = value.toString();
 			}
@@ -125,7 +116,6 @@ public class Snippet024TableViewerExploreNewAPI {
 		column.getColumn().setMoveable(true);
 		column.setLabelProvider(new ColumnLabelProvider() {
 
-			@Override
 			public String getText(Object element) {
 				return ((Person) element).surname;
 			}
@@ -134,12 +124,10 @@ public class Snippet024TableViewerExploreNewAPI {
 
 		column.setEditingSupport(new AbstractEditingSupport(v) {
 
-			@Override
 			protected Object getValue(Object element) {
 				return ((Person) element).surname;
 			}
 
-			@Override
 			protected void doSetValue(Object element, Object value) {
 				((Person) element).surname = value.toString();
 			}
@@ -152,7 +140,6 @@ public class Snippet024TableViewerExploreNewAPI {
 		column.getColumn().setMoveable(true);
 		column.setLabelProvider(new ColumnLabelProvider() {
 
-			@Override
 			public String getText(Object element) {
 				return ((Person) element).email;
 			}
@@ -161,12 +148,10 @@ public class Snippet024TableViewerExploreNewAPI {
 
 		column.setEditingSupport(new AbstractEditingSupport(v) {
 
-			@Override
 			protected Object getValue(Object element) {
 				return ((Person) element).email;
 			}
 
-			@Override
 			protected void doSetValue(Object element, Object value) {
 				((Person) element).email = value.toString();
 			}
