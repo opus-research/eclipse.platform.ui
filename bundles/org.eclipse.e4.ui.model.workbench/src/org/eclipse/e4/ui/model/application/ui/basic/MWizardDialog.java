@@ -10,7 +10,6 @@
  */
 package org.eclipse.e4.ui.model.application.ui.basic;
 
-
 /**
  * <!-- begin-user-doc -->
  * A representation of the model object '<em><b>Wizard Dialog</b></em>'.
@@ -29,5 +28,5 @@ package org.eclipse.e4.ui.model.application.ui.basic;
  * @model
  * @generated
  */
-public interface MWizardDialog extends MDialog {
+public interface MWizardDialog extends MFrame<MWizardElement> {
 } // MWizardDialog
