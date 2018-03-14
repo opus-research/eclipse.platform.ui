@@ -137,6 +137,11 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 	 */
 	public static final String MRU_CONTROLLED_BY_CSS_KEY = "MRUControlledByCSS"; //$NON-NLS-1$
 
+	/**
+	 * Default default value for MRU behavior.
+	 */
+	public static final boolean MRU_DEFAULT = true;
+
 	/*
 	 * org.eclipse.ui.internal.dialogs.ViewsPreferencePage controls currently
 	 * the MRU behavior via IEclipsePreferences, so that CSS values from the
@@ -671,7 +676,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 	}
 
 	private boolean getMRUValueFromPreferences() {
-		boolean initialMRUValue = preferences.getBoolean(MRU_KEY_DEFAULT, true);
+		boolean initialMRUValue = preferences.getBoolean(MRU_KEY_DEFAULT, MRU_DEFAULT);
 		boolean actualValue = preferences.getBoolean(MRU_KEY, initialMRUValue);
 		return actualValue;
 	}
@@ -1409,7 +1414,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		tabMenu.setVisible(true);
 	}
 
-	private boolean isClosable(MPart part) {
+	protected boolean isClosable(MPart part) {
 		// if it's a shared part check its current ref
 		if (part.getCurSharedRef() != null) {
 			return !(part.getCurSharedRef().getTags()
@@ -1432,7 +1437,19 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		}
 
 		final Menu menu = cachedMenu;
+		populateTabMenu(menu, part);
+		return menu;
+	}
 
+	/**
+	 * Populate the tab's context menu for the given part.
+	 *
+	 * @param menu
+	 *            the menu to be populated
+	 * @param part
+	 *            the relevant part
+	 */
+	protected void populateTabMenu(final Menu menu, MPart part) {
 		int closeableElements = 0;
 		if (isClosable(part)) {
 			MenuItem menuItemClose = new MenuItem(menu, SWT.NONE);
@@ -1505,8 +1522,6 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 				});
 			}
 		}
-
-		return menu;
 	}
 
 	private MElementContainer<MUIElement> getParent(MPart part) {
