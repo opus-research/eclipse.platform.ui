@@ -64,9 +64,15 @@
               http://xmlgraphics.apache.org/batik/
           -->
           <dependency>
-              <groupId>batik</groupId>
+              <groupId>org.apache.xmlgraphics</groupId>
               <artifactId>batik-rasterizer</artifactId>
-              <version>1.6-1</version>
+              <version>1.7</version>
+          </dependency>
+          
+          <dependency>
+              <groupId>org.apache.xmlgraphics</groupId>
+              <artifactId>batik-codec</artifactId>
+              <version>1.7</version>
           </dependency>
     </dependencies>
 
