@@ -187,9 +187,6 @@ public class ContributionRecord {
 			// implied to always be visible
 			return null;
 		}
-		if (coreExpressionA.equals(coreExpressionB)) {
-			return expressionA;
-		}
 
 		// combine the two expressions
 		OrExpression expression = new OrExpression();
