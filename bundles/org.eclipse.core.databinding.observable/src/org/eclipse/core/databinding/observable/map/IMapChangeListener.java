@@ -15,15 +15,11 @@ import org.eclipse.core.databinding.observable.IObservablesListener;
 
 /**
  * Listener for changes to observable maps.
- * 
- * @param <K>
- *            type of the keys to the map
- * @param <V>
- *            type of the values in the map
+ *
  * @since 1.0
  *
  */
-public interface IMapChangeListener<K, V> extends IObservablesListener {
+public interface IMapChangeListener extends IObservablesListener {
 
 	/**
 	 * Handle a change an observable map. The given event object must only be
@@ -34,6 +30,6 @@ public interface IMapChangeListener<K, V> extends IObservablesListener {
 	 * @param event
 	 *            the event
 	 */
-	void handleMapChange(MapChangeEvent<K, V> event);
+	void handleMapChange(MapChangeEvent event);
 
 }

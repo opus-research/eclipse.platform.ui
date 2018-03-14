@@ -18,13 +18,9 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 
 /**
  * An unmodifiable wrapper class for IObservableValue instances.
- * 
- * @param <T>
- * 
  * @since 1.1
  */
-public class UnmodifiableObservableValue<T> extends
-		DecoratingObservableValue<T> {
+public class UnmodifiableObservableValue extends DecoratingObservableValue {
 	/**
 	 * Constructs an UnmodifiableObservableValue which wraps the given
 	 * observable value
@@ -32,12 +28,12 @@ public class UnmodifiableObservableValue<T> extends
 	 * @param wrappedValue
 	 *            the observable value to wrap in an unmodifiable instance.
 	 */
-	public UnmodifiableObservableValue(IObservableValue<T> wrappedValue) {
+	public UnmodifiableObservableValue(IObservableValue wrappedValue) {
 		super(wrappedValue, false);
 	}
 
 	@Override
-	public void setValue(T value) {
+	public void setValue(Object value) {
 		throw new UnsupportedOperationException();
 	}
 }

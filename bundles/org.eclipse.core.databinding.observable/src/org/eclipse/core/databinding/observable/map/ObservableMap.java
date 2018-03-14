@@ -28,23 +28,19 @@ import org.eclipse.core.databinding.observable.Realm;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- * 
- * @param <K>
- * @param <V>
- * 
+ *
  * @since 1.0
  */
-public class ObservableMap<K, V> extends AbstractObservable implements
-		IObservableMap<K, V> {
+public class ObservableMap extends AbstractObservable implements IObservableMap {
 
-	protected Map<K, V> wrappedMap;
+	protected Map wrappedMap;
 
 	private boolean stale = false;
 
 	/**
 	 * @param wrappedMap
 	 */
-	public ObservableMap(Map<K, V> wrappedMap) {
+	public ObservableMap(Map wrappedMap) {
 		this(Realm.getDefault(), wrappedMap);
 	}
 
@@ -52,20 +48,18 @@ public class ObservableMap<K, V> extends AbstractObservable implements
 	 * @param realm
 	 * @param wrappedMap
 	 */
-	public ObservableMap(Realm realm, Map<K, V> wrappedMap) {
+	public ObservableMap(Realm realm, Map wrappedMap) {
 		super(realm);
 		this.wrappedMap = wrappedMap;
 	}
 
 	@Override
-	public synchronized void addMapChangeListener(
-			IMapChangeListener<K, V> listener) {
+	public synchronized void addMapChangeListener(IMapChangeListener listener) {
 		addListener(MapChangeEvent.TYPE, listener);
 	}
 
 	@Override
-	public synchronized void removeMapChangeListener(
-			IMapChangeListener<K, V> listener) {
+	public synchronized void removeMapChangeListener(IMapChangeListener listener) {
 		removeListener(MapChangeEvent.TYPE, listener);
 	}
 
@@ -89,13 +83,13 @@ public class ObservableMap<K, V> extends AbstractObservable implements
 		ObservableTracker.getterCalled(this);
 	}
 
-	protected void fireMapChange(MapDiff<K, V> diff) {
+	protected void fireMapChange(MapDiff diff) {
 		checkRealm();
 
 		// fire general change event first
 		super.fireChange();
 
-		fireEvent(new MapChangeEvent<K, V>(this, diff));
+		fireEvent(new MapChangeEvent(this, diff));
 	}
 
 	@Override
@@ -111,13 +105,13 @@ public class ObservableMap<K, V> extends AbstractObservable implements
 	}
 
 	@Override
-	public Set<Entry<K, V>> entrySet() {
+	public Set entrySet() {
 		getterCalled();
 		return wrappedMap.entrySet();
 	}
 
 	@Override
-	public V get(Object key) {
+	public Object get(Object key) {
 		getterCalled();
 		return wrappedMap.get(key);
 	}
@@ -129,7 +123,7 @@ public class ObservableMap<K, V> extends AbstractObservable implements
 	}
 
 	@Override
-	public Set<K> keySet() {
+	public Set keySet() {
 		getterCalled();
 		return wrappedMap.keySet();
 	}
@@ -141,7 +135,7 @@ public class ObservableMap<K, V> extends AbstractObservable implements
 	}
 
 	@Override
-	public Collection<V> values() {
+	public Collection values() {
 		getterCalled();
 		return wrappedMap.values();
 	}
@@ -175,12 +169,12 @@ public class ObservableMap<K, V> extends AbstractObservable implements
 	}
 
 	@Override
-	public V put(K key, V value) {
+	public Object put(Object key, Object value) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public V remove(Object key) {
+	public Object remove(Object key) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -190,7 +184,7 @@ public class ObservableMap<K, V> extends AbstractObservable implements
 	}
 
 	@Override
-	public void putAll(Map<? extends K, ? extends V> arg0) {
+	public void putAll(Map arg0) {
 		throw new UnsupportedOperationException();
 	}
 
