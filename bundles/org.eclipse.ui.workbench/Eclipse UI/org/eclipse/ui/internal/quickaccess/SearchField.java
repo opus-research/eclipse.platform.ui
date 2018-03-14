@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 428050
  ******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 import java.util.ArrayList;
@@ -277,13 +278,12 @@ public class SearchField {
 	}
 
 	private Text createText(Composite parent) {
-		Text text = new Text(parent, SWT.SEARCH | SWT.ICON_SEARCH);
-		text.setMessage(QuickAccessMessages.QuickAccess_EnterSearch);
-
+		Text text = new Text(parent, SWT.SEARCH | SWT.ICON_SEARCH | SWT.CANCEL);
+		text.setToolTipText(QuickAccessMessages.QuickAccess_EnterSearch);
 		GC gc = new GC(text);
 		FontMetrics fm = gc.getFontMetrics();
-		int width = text.computeSize(fm.getAverageCharWidth() * text.getMessage().length(),
-				SWT.DEFAULT).x + 15 /* some extra space */;
+		int width = text.computeSize(fm.getAverageCharWidth() * 10,
+				SWT.DEFAULT).x + 10 /* some extra space */;
 		gc.dispose();
 
 		GridDataFactory.fillDefaults().hint(width, SWT.DEFAULT).applyTo(text);
