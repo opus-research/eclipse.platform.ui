@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,10 +8,8 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 428050
  ******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -71,6 +69,7 @@ import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.swt.IFocusService;
+
 
 public class SearchField {
 
@@ -139,10 +138,10 @@ public class SearchField {
 
 		final CommandProvider commandProvider = new CommandProvider();
 		QuickAccessProvider[] providers = new QuickAccessProvider[] {
-				new PreviousPicksProvider(previousPicksList), new EditorProvider(),
-				new ViewProvider(application, window), new PerspectiveProvider(), commandProvider,
-				new ActionProvider(), new WizardProvider(), new PreferenceProvider(),
-				new PropertiesProvider() };
+				new PreviousPicksProvider(previousPicksList),
+				new EditorProvider(), new ViewProvider(application, window),
+				new PerspectiveProvider(), commandProvider, new ActionProvider(),
+				new WizardProvider(), new PreferenceProvider(), new PropertiesProvider() };
 		for (int i = 0; i < providers.length; i++) {
 			providerMap.put(providers[i].getId(), providers[i]);
 		}
@@ -194,10 +193,7 @@ public class SearchField {
 		quickAccessContents.hookFilterText(text);
 		shell = new Shell(parent.getShell(), SWT.RESIZE | SWT.ON_TOP);
 		shell.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-		shell.setText(QuickAccessMessages.QuickAccess_EnterSearch); // just for
-																	// debugging,
-																	// not shown
-																	// anywhere
+		shell.setText(QuickAccessMessages.QuickAccess_EnterSearch); // just for debugging, not shown anywhere
 		shell.addShellListener(new ShellAdapter() {
 			@Override
 			public void shellClosed(ShellEvent e) {
@@ -209,8 +205,7 @@ public class SearchField {
 		table = quickAccessContents.createTable(shell, Window.getDefaultOrientation());
 		text.addFocusListener(new FocusListener() {
 			public void focusLost(FocusEvent e) {
-				// Once the focus event is complete, check if we should close
-				// the shell
+				// Once the focus event is complete, check if we should close the shell
 				table.getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						checkFocusLost(table, text);
@@ -227,7 +222,7 @@ public class SearchField {
 
 				previousFocusControl = (Control) e.getSource();
 			}
-
+			
 		});
 		table.addFocusListener(new FocusAdapter() {
 			public void focusLost(FocusEvent e) {
@@ -282,12 +277,13 @@ public class SearchField {
 	}
 
 	private Text createText(Composite parent) {
-		Text text = new Text(parent, SWT.SEARCH | SWT.ICON_SEARCH | SWT.CANCEL);
-		text.setToolTipText(QuickAccessMessages.QuickAccess_EnterSearch);
+		Text text = new Text(parent, SWT.SEARCH | SWT.ICON_SEARCH);
+		text.setMessage(QuickAccessMessages.QuickAccess_EnterSearch);
+
 		GC gc = new GC(text);
 		FontMetrics fm = gc.getFontMetrics();
-		int width = text.computeSize(fm.getAverageCharWidth() * 10,
-				SWT.DEFAULT).x + 10 /* some extra space */;
+		int width = text.computeSize(fm.getAverageCharWidth() * text.getMessage().length(),
+				SWT.DEFAULT).x + 15 /* some extra space */;
 		gc.dispose();
 
 		GridDataFactory.fillDefaults().hint(width, SWT.DEFAULT).applyTo(text);
@@ -400,14 +396,14 @@ public class SearchField {
 		int preferredWidth = dialogWidth == -1 ? 350 : dialogWidth;
 		int width = Math.max(preferredWidth, compBounds.width);
 		int height = dialogHeight == -1 ? 250 : dialogHeight;
-
+		
 		// If size would extend past the right edge of the shell, try to move it
 		// to the left of the text
 		Rectangle shellBounds = text.getShell().getBounds();
-		if (compBounds.x + width > shellBounds.x + shellBounds.width) {
+		if (compBounds.x + width > shellBounds.x + shellBounds.width){
 			compBounds.x = Math.max(shellBounds.x, (compBounds.x + compBounds.width - width));
 		}
-
+		
 		shell.setBounds(getConstrainedShellBounds(display, new Rectangle(compBounds.x, compBounds.y
 				+ compBounds.height, width, height)));
 		shell.layout();
@@ -442,7 +438,8 @@ public class SearchField {
 				text.setFocus();
 				return;
 			}
-			if (!shell.isFocusControl() && !table.isFocusControl() && !text.isFocusControl()) {
+			if (!shell.isFocusControl() && !table.isFocusControl()
+					&& !text.isFocusControl()) {
 				quickAccessContents.doClose();
 			}
 		}
@@ -666,7 +663,7 @@ public class SearchField {
 	 * 
 	 * @return the table created in the shell or <code>null</code>
 	 */
-	public Table getQuickAccessTable() {
+	public Table getQuickAccessTable(){
 		return table;
 	}
 }
