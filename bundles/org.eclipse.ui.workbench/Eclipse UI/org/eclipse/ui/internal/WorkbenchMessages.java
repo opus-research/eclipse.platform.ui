@@ -324,7 +324,6 @@ public class WorkbenchMessages extends NLS {
 	public static String AboutPluginsDialog_errorTitle;
 	public static String AboutPluginsDialog_unableToOpenFile;
 	public static String AboutPluginsDialog_filterTextMessage;
-	public static String AboutPluginsPage_Load_Bundle_Data;
 	public static String AboutFeaturesDialog_shellTitle;
 	public static String AboutFeaturesDialog_featureName;
 	public static String AboutFeaturesDialog_featureId;
@@ -953,6 +952,8 @@ public class WorkbenchMessages extends NLS {
     public static String ContentAssist_Cue_Description_Key;
 
 	//Settings transfer
+	public static String WorkbenchLayoutSettings_Name;
+	public static String WorkbenchSettings_CouldNotCreateDirectories;
 	public static String WorkbenchSettings_CouldNotFindLocation;
 	public static String WorkingSets_Name;
 	public static String WorkingSets_CannotSave;
