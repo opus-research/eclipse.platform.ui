@@ -47,6 +47,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MHandledItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
+import org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolItem;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.IResourceUtilities;
@@ -782,12 +783,12 @@ public class HandledContributionItem extends ContributionItem {
 			return (Menu) obj;
 		}
 		// this is a temporary passthrough of the IMenuCreator
-		if (mmenu instanceof MMenu && mmenu.getTags().contains("Rendered")) { //$NON-NLS-1$
-			obj = mmenu.getTransientData().get("ContributionManager"); //$NON-NLS-1$
+		if (mmenu instanceof MRenderedMenu) {
+			obj = ((MRenderedMenu) mmenu).getContributionManager();
 			if (obj instanceof IContextFunction) {
 				final IEclipseContext lclContext = getContext(mmenu);
 				obj = ((IContextFunction) obj).compute(lclContext, null);
-				mmenu.getTransientData().put("ContributionManager", obj); //$NON-NLS-1$
+				((MRenderedMenu) mmenu).setContributionManager(obj);
 			}
 			if (obj instanceof IMenuCreator) {
 				final IMenuCreator creator = (IMenuCreator) obj;
@@ -798,7 +799,7 @@ public class HandledContributionItem extends ContributionItem {
 						public void widgetDisposed(DisposeEvent e) {
 							if (menu != null && !menu.isDisposed()) {
 								creator.dispose();
-								mmenu.setWidget(null);
+								((MRenderedMenu) mmenu).setWidget(null);
 							}
 						}
 					});
