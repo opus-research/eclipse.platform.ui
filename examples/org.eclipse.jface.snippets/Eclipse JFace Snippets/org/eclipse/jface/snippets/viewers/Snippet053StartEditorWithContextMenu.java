@@ -153,7 +153,8 @@ public class Snippet053StartEditorWithContextMenu implements SelectionListener {
 
 	@Override
 	public void widgetSelected(SelectionEvent e) {
-		IStructuredSelection selection = viewer.getStructuredSelection();
+		IStructuredSelection selection = (IStructuredSelection) viewer
+				.getSelection();
 		if (selection != null) {
 			viewer.editElement(selection.getFirstElement(), 0);
 		}
