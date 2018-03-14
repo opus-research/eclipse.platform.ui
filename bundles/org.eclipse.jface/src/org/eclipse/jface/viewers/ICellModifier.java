@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 442747
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -23,10 +24,13 @@ package org.eclipse.jface.viewers;
  * This interface should be implemented by classes that wish to
  * act as cell modifiers.
  * </p>
+ * @deprecated see {@link ViewerColumn#setEditingSupport(EditingSupport)} for a
+ *             more flexible way of editing values in a column viewer.
  */
+@Deprecated
 public interface ICellModifier {
     /**
-     * Checks whether the given property of the given element can be 
+     * Checks whether the given property of the given element can be
      * modified.
      *
      * @param element the element
@@ -34,6 +38,8 @@ public interface ICellModifier {
      * @return <code>true</code> if the property can be modified,
      *   and <code>false</code> if it is not modifiable
      */
+
+	@Deprecated
     public boolean canModify(Object element, String property);
 
     /**
@@ -43,7 +49,10 @@ public interface ICellModifier {
      * @param element the element
      * @param property the property
      * @return the property value
+     * 
      */
+
+	@Deprecated
     public Object getValue(Object element, String property);
 
     /**
@@ -67,5 +76,7 @@ public interface ICellModifier {
      * 
      * @see org.eclipse.swt.widgets.Item
      */
+
+	@Deprecated
     public void modify(Object element, String property, Object value);
 }
