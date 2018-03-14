@@ -38,7 +38,6 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.Dialog;
@@ -335,7 +334,7 @@ public class ResourceInfoPage extends PropertyPage {
 	}
 
 	protected void editLinkLocation() {
-		IResource resource = Adapters.adapt(getElement(), IResource.class);
+		IResource resource = Adapters.getAdapter(getElement(), IResource.class, true);
 		String locationFormat = resource.getPathVariableManager().convertFromUserEditableFormat(locationValue.getText(), true);
 		IPath location = Path.fromOSString(locationFormat);
 
@@ -354,7 +353,7 @@ public class ResourceInfoPage extends PropertyPage {
 	}
 
 	private void refreshLinkLocation() {
-		IResource resource = Adapters.adapt(getElement(), IResource.class);
+		IResource resource = Adapters.getAdapter(getElement(), IResource.class, true);
 
 		String userEditableFormat = resource.getPathVariableManager().convertToUserEditableFormat(newResourceLocation.toOSString(), true);
 		locationValue.setText(userEditableFormat);
@@ -390,7 +389,7 @@ public class ResourceInfoPage extends PropertyPage {
 				IIDEHelpContextIds.RESOURCE_INFO_PROPERTY_PAGE);
 
 		// layout the page
-		IResource resource = Adapters.adapt(getElement(), IResource.class);
+		IResource resource = Adapters.getAdapter(getElement(), IResource.class, true);
 
 		if (resource == null) {
 			Label label = new Label(parent, SWT.NONE);
@@ -848,7 +847,7 @@ public class ResourceInfoPage extends PropertyPage {
 	@Override
 	protected void performDefaults() {
 
-		IResource resource = Adapters.adapt(getElement(), IResource.class);
+		IResource resource = Adapters.getAdapter(getElement(), IResource.class, true);
 
 		if (resource == null)
 			return;
@@ -1046,22 +1045,23 @@ public class ResourceInfoPage extends PropertyPage {
 				List/*<IResource>*/ toVisit = getResourcesToVisit(resource);
 
 				// Prepare the monitor for the given amount of work
-				SubMonitor subMonitor = SubMonitor.convert(monitor,
+				monitor.beginTask(
 						IDEWorkbenchMessages.ResourceInfo_recursiveChangesJobName,
 						toVisit.size());
 
 				// Apply changes recursively
 				for (Iterator/*<IResource>*/ it = toVisit.iterator(); it.hasNext();) {
-					SubMonitor iterationMonitor = subMonitor.split(1).setWorkRemaining(changes.size());
+					if (monitor.isCanceled())
+						throw new OperationCanceledException();
 					IResource childResource = (IResource) it.next();
-					iterationMonitor.subTask(NLS
+					monitor.subTask(NLS
 							.bind(IDEWorkbenchMessages.ResourceInfo_recursiveChangesSubTaskName,
 									childResource.getFullPath()));
 					for (int i = 0; i < changes.size(); i++) {
-						iterationMonitor.split(1);
 						((IResourceChange) changes.get(i))
 								.performChange(childResource);
 					}
+					monitor.worked(1);
 				}
 			} catch (CoreException e1) {
 				IDEWorkbenchPlugin
@@ -1070,6 +1070,8 @@ public class ResourceInfoPage extends PropertyPage {
 				return e1.getStatus();
 			} catch (OperationCanceledException e2) {
 				return Status.CANCEL_STATUS;
+			} finally {
+				monitor.done();
 			}
 			return Status.OK_STATUS;
 		}).schedule();
@@ -1081,7 +1083,7 @@ public class ResourceInfoPage extends PropertyPage {
 	@Override
 	public boolean performOk() {
 
-		IResource resource = Adapters.adapt(getElement(), IResource.class);
+		IResource resource = Adapters.getAdapter(getElement(), IResource.class, true);
 
 		if (resource == null)
 			return true;

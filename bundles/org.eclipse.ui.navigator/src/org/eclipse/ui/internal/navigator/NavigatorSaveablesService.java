@@ -489,7 +489,7 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 		ITreeContentProvider contentProvider = extension
 				.getContentProvider();
 
-		return Adapters.adapt(contentProvider, SaveablesProvider.class);
+		return Adapters.getAdapter(contentProvider, SaveablesProvider.class, true);
 	}
 
 	private void recomputeSaveablesAndNotify(boolean recomputeProviders,
