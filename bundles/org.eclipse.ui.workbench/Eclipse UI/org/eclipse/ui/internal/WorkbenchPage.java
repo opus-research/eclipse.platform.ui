@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Christian Janz  - <christian.janz@gmail.com> Fix for Bug 385592
  *     Marc-Andre Laperle (Ericsson) - Fix for Bug 413590
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431340, 431348, 426535, 433234
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431340, 431348
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -64,7 +64,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindowElement;
-import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -1246,23 +1245,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 			break;
 		case VIEW_CREATE:
 			partService.showPart(part, PartState.CREATE);
-
-			// Report the visibility of the created part
-			MStackElement sElement = part;
-			if (part.getCurSharedRef() != null)
-				sElement = part.getCurSharedRef();
-			MUIElement parentElement = sElement.getParent();
-			if (parentElement instanceof MPartStack) {
-				MPartStack partStack = (MPartStack) parentElement;
-				if (partStack.getSelectedElement() == sElement
-						&& !partStack.getTags().contains(IPresentationEngine.MINIMIZED)) {
-					firePartVisible(part);
-				} else {
-					firePartHidden(part);
-				}
-			} else {
-				firePartVisible(part); // Stand-alone part
-			}
 			break;
 		}
 		return part;
@@ -3375,12 +3357,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		tags.clear();
 		tags.addAll(dummyPerspective.getTags());
 
-		// remove HIDDEN_EXPLICITLY tag from toolbar
-		List<MToolBar> toolBars = modelService.findElements(window, null, MToolBar.class, null);
-		for (MToolBar mToolBar : toolBars) {
-			mToolBar.getTags().remove(IPresentationEngine.HIDDEN_EXPLICITLY);
-		}
-
 		partService.requestActivation();
 
 		// reset complete
@@ -3958,9 +3934,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	 * @return the stack of perspectives of this page's containing window
 	 */
 	private MPerspectiveStack getPerspectiveStack() {
-		if (_perspectiveStack != null) {
-			return _perspectiveStack;
-		}
 		List<MPerspectiveStack> theStack = modelService.findElements(window, null,
 				MPerspectiveStack.class, null);
 		if (theStack.size() > 0) {

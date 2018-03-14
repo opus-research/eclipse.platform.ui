@@ -326,7 +326,6 @@ public class BindingTable {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	public Collection<Binding> getSequencesFor(ParameterizedCommand command) {
 		ArrayList<Binding> triggers = bindingsByCommand.get(command);
 		return (Collection<Binding>) (triggers == null ? Collections.EMPTY_LIST : triggers.clone());
