@@ -13,7 +13,6 @@ package org.eclipse.core.internal.databinding;
 
 import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.observable.IObservable;
-import org.eclipse.core.databinding.observable.value.ValueDiff;
 import org.eclipse.core.databinding.property.INativePropertyListener;
 import org.eclipse.core.databinding.property.ISimplePropertyListener;
 import org.eclipse.core.databinding.property.value.SimpleValueProperty;
@@ -22,36 +21,34 @@ import org.eclipse.core.databinding.property.value.SimpleValueProperty;
  * @since 3.3
  *
  */
-public class BindingTargetProperty extends
-		SimpleValueProperty<Binding<?, ?>, IObservable> {
+public class BindingTargetProperty extends SimpleValueProperty {
 	@Override
 	public Object getValueType() {
 		return IObservable.class;
 	}
 
 	@Override
-	protected IObservable doGetValue(Binding<?, ?> source) {
-		return source.getTarget();
+	protected Object doGetValue(Object source) {
+		return ((Binding) source).getTarget();
 	}
 
 	@Override
-	protected void doSetValue(Binding<?, ?> source, IObservable value) {
+	protected void doSetValue(Object source, Object value) {
 		// no setter API
 	}
 
 	@Override
-	public INativePropertyListener<Binding<?, ?>> adaptListener(
-			ISimplePropertyListener<ValueDiff<IObservable>> listener) {
+	public INativePropertyListener adaptListener(
+			ISimplePropertyListener listener) {
 		// no listener API
 		return null;
 	}
 
-	protected void doAddListener(Binding<?, ?> source,
-			INativePropertyListener<Binding<?, ?>> listener) {
+	protected void doAddListener(Object source, INativePropertyListener listener) {
 	}
 
-	protected void doRemoveListener(Binding<?, ?> source,
-			INativePropertyListener<Binding<?, ?>> listener) {
+	protected void doRemoveListener(Object source,
+			INativePropertyListener listener) {
 	}
 
 	@Override

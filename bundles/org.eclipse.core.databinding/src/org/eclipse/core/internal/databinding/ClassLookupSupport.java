@@ -21,54 +21,50 @@ import java.util.Set;
 
 /**
  * @since 1.0
- * 
+ *
  */
 public class ClassLookupSupport {
 
 	/*
 	 * code copied from AdapterManager.java
 	 */
-	private static HashMap<Class<?>, List<Class<?>>> classSearchOrderLookup;
+	private static HashMap classSearchOrderLookup;
 
 	/**
-	 * For a given class or interface, return an array containing the given type
-	 * and all its direct and indirect supertypes.
-	 * 
+	 * For a given class or interface, return an array containing the given type and all its direct and indirect supertypes.
 	 * @param type
-	 * @return an array containing the given type and all its direct and
-	 *         indirect supertypes
+	 * @return an array containing the given type and all its direct and indirect supertypes
 	 */
-	public static Class<?>[] getTypeHierarchyFlattened(Class<?> type) {
-		List<Class<?>> classes = null;
-		// cache reference to lookup to protect against concurrent flush
-		HashMap<Class<?>, List<Class<?>>> lookup = classSearchOrderLookup;
+	public static Class[] getTypeHierarchyFlattened(Class type) {
+		List classes = null;
+		//cache reference to lookup to protect against concurrent flush
+		HashMap lookup = classSearchOrderLookup;
 		if (lookup != null)
-			classes = lookup.get(type);
+			classes = (List) lookup.get(type);
 		// compute class order only if it hasn't been cached before
 		if (classes == null) {
-			classes = new ArrayList<Class<?>>();
+			classes = new ArrayList();
 			computeClassOrder(type, classes);
 			if (lookup == null)
-				classSearchOrderLookup = lookup = new HashMap<Class<?>, List<Class<?>>>();
+				classSearchOrderLookup = lookup = new HashMap();
 			lookup.put(type, classes);
 		}
-		return classes.toArray(new Class[classes.size()]);
+		return (Class[]) classes.toArray(new Class[classes.size()]);
 	}
 
 	/**
-	 * Builds and returns a table of adapters for the given adaptable type. The
-	 * table is keyed by adapter class name. The value is the <b>sole<b> factory
-	 * that defines that adapter. Note that if multiple adapters technically
-	 * define the same property, only the first found in the search order is
-	 * considered.
+	 * Builds and returns a table of adapters for the given adaptable type.
+	 * The table is keyed by adapter class name. The
+	 * value is the <b>sole<b> factory that defines that adapter. Note that
+	 * if multiple adapters technically define the same property, only the
+	 * first found in the search order is considered.
 	 *
 	 * Note that it is important to maintain a consistent class and interface
 	 * lookup order. See the class comment for more details.
 	 */
-	private static void computeClassOrder(Class<?> adaptable,
-			Collection<Class<?>> classes) {
-		Class<?> clazz = adaptable;
-		Set<Class<?>> seen = new HashSet<Class<?>>(4);
+	private static void computeClassOrder(Class adaptable, Collection classes) {
+		Class clazz = adaptable;
+		Set seen = new HashSet(4);
 		while (clazz != null) {
 			classes.add(clazz);
 			computeInterfaceOrder(clazz.getInterfaces(), classes, seen);
@@ -76,21 +72,19 @@ public class ClassLookupSupport {
 		}
 	}
 
-	private static void computeInterfaceOrder(Class<?>[] interfaces,
-			Collection<Class<?>> classes, Set<Class<?>> seen) {
-		List<Class<?>> newInterfaces = new ArrayList<Class<?>>(
-				interfaces.length);
+	private static void computeInterfaceOrder(Class[] interfaces, Collection classes, Set seen) {
+		List newInterfaces = new ArrayList(interfaces.length);
 		for (int i = 0; i < interfaces.length; i++) {
-			Class<?> interfac = interfaces[i];
+			Class interfac = interfaces[i];
 			if (seen.add(interfac)) {
-				// note we cannot recurse here without changing the resulting
-				// interface order
+				//note we cannot recurse here without changing the resulting interface order
 				classes.add(interfac);
 				newInterfaces.add(interfac);
 			}
 		}
-		for (Iterator<Class<?>> it = newInterfaces.iterator(); it.hasNext();)
-			computeInterfaceOrder(it.next().getInterfaces(), classes, seen);
+		for (Iterator it = newInterfaces.iterator(); it.hasNext();)
+			computeInterfaceOrder(((Class) it.next()).getInterfaces(), classes, seen);
 	}
+
 
 }

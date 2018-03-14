@@ -36,13 +36,12 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 
 /**
- * @param <E>
  * @since 3.3
  *
  */
-public class ValidatedObservableList<E> extends ObservableList<E> {
-	private IObservableList<E> target;
-	private IObservableValue<IStatus> validationStatus;
+public class ValidatedObservableList extends ObservableList {
+	private IObservableList target;
+	private IObservableValue validationStatus;
 
 	// Only true when out of sync with target due to validation status
 	private boolean stale;
@@ -52,20 +51,20 @@ public class ValidatedObservableList<E> extends ObservableList<E> {
 
 	private boolean updatingTarget = false;
 
-	private IListChangeListener<E> targetChangeListener = new IListChangeListener<E>() {
+	private IListChangeListener targetChangeListener = new IListChangeListener() {
 		@Override
-		public void handleListChange(ListChangeEvent<E> event) {
+		public void handleListChange(ListChangeEvent event) {
 			if (updatingTarget)
 				return;
-			IStatus status = validationStatus.getValue();
+			IStatus status = (IStatus) validationStatus.getValue();
 			if (isValid(status)) {
 				if (stale) {
 					// this.stale means we are out of sync with target,
 					// so reset wrapped list to exactly mirror target
 					stale = false;
-					updateWrappedList(new ArrayList<E>(target));
+					updateWrappedList(new ArrayList(target));
 				} else {
-					ListDiff<E> diff = event.diff;
+					ListDiff diff = event.diff;
 					if (computeNextDiff) {
 						diff = Diffs.computeListDiff(wrappedList, target);
 						computeNextDiff = false;
@@ -90,16 +89,16 @@ public class ValidatedObservableList<E> extends ObservableList<E> {
 		}
 	};
 
-	private IValueChangeListener<IStatus> validationStatusChangeListener = new IValueChangeListener<IStatus>() {
+	private IValueChangeListener validationStatusChangeListener = new IValueChangeListener() {
 		@Override
-		public void handleValueChange(ValueChangeEvent<IStatus> event) {
-			IStatus oldStatus = event.diff.getOldValue();
-			IStatus newStatus = event.diff.getNewValue();
+		public void handleValueChange(ValueChangeEvent event) {
+			IStatus oldStatus = (IStatus) event.diff.getOldValue();
+			IStatus newStatus = (IStatus) event.diff.getNewValue();
 			if (stale && !isValid(oldStatus) && isValid(newStatus)) {
 				// this.stale means we are out of sync with target,
 				// reset wrapped list to exactly mirror target
 				stale = false;
-				updateWrappedList(new ArrayList<E>(target));
+				updateWrappedList(new ArrayList(target));
 
 				// If the validation status becomes valid because of a change in
 				// target observable
@@ -112,14 +111,14 @@ public class ValidatedObservableList<E> extends ObservableList<E> {
 	 * @param target
 	 * @param validationStatus
 	 */
-	public ValidatedObservableList(final IObservableList<E> target,
-			final IObservableValue<IStatus> validationStatus) {
-		super(target.getRealm(), new ArrayList<E>(target), target
-				.getElementType());
+	public ValidatedObservableList(final IObservableList target,
+			final IObservableValue validationStatus) {
+		super(target.getRealm(), new ArrayList(target), target.getElementType());
 		Assert.isNotNull(validationStatus,
 				"Validation status observable cannot be null"); //$NON-NLS-1$
-		Assert.isTrue(target.getRealm().equals(validationStatus.getRealm()),
-				"Target and validation status observables must be on the same realm"); //$NON-NLS-1$
+		Assert
+				.isTrue(target.getRealm().equals(validationStatus.getRealm()),
+						"Target and validation status observables must be on the same realm"); //$NON-NLS-1$
 		this.target = target;
 		this.validationStatus = validationStatus;
 		target.addListChangeListener(targetChangeListener);
@@ -134,7 +133,7 @@ public class ValidatedObservableList<E> extends ObservableList<E> {
 		}
 	}
 
-	private void updateTargetList(ListDiff<E> diff) {
+	private void updateTargetList(ListDiff diff) {
 		updatingTarget = true;
 		try {
 			if (stale) {
@@ -148,20 +147,21 @@ public class ValidatedObservableList<E> extends ObservableList<E> {
 		}
 	}
 
-	private void applyDiff(ListDiff<E> diff, final List<E> list) {
-		diff.accept(new ListDiffVisitor<E>() {
+	private void applyDiff(ListDiff diff, final List list) {
+		diff.accept(new ListDiffVisitor() {
 			@Override
-			public void handleAdd(int index, E element) {
+			public void handleAdd(int index, Object element) {
 				list.add(index, element);
 			}
 
 			@Override
-			public void handleRemove(int index, E element) {
+			public void handleRemove(int index, Object element) {
 				list.remove(index);
 			}
 
 			@Override
-			public void handleReplace(int index, E oldElement, E newElement) {
+			public void handleReplace(int index, Object oldElement,
+					Object newElement) {
 				list.set(index, newElement);
 			}
 		});
@@ -174,40 +174,39 @@ public class ValidatedObservableList<E> extends ObservableList<E> {
 	}
 
 	@Override
-	public void add(int index, E element) {
+	public void add(int index, Object element) {
 		checkRealm();
 		wrappedList.add(index, element);
-		ListDiff<E> diff = Diffs.createListDiff(Diffs.createListDiffEntry(
-				index, true, element));
+		ListDiff diff = Diffs.createListDiff(Diffs.createListDiffEntry(index,
+				true, element));
 		updateTargetList(diff);
 		fireListChange(diff);
 	}
 
 	@Override
-	public boolean add(E o) {
+	public boolean add(Object o) {
 		checkRealm();
 		add(wrappedList.size(), o);
 		return true;
 	}
 
 	@Override
-	public boolean addAll(Collection<? extends E> c) {
+	public boolean addAll(Collection c) {
 		checkRealm();
 		return addAll(wrappedList.size(), c);
 	}
 
 	@Override
-	public boolean addAll(int index, Collection<? extends E> c) {
+	public boolean addAll(int index, Collection c) {
 		checkRealm();
-		List<ListDiffEntry<E>> entries = new ArrayList<ListDiffEntry<E>>(
-				c.size());
-		int i = index;
-		for (E element : c) {
-			wrappedList.add(i, element);
-			entries.add(Diffs.createListDiffEntry(i, true, element));
-			i++;
+		Object[] elements = c.toArray();
+		ListDiffEntry[] entries = new ListDiffEntry[elements.length];
+		for (int i = 0; i < elements.length; i++) {
+			wrappedList.add(index + i, elements[i]);
+			entries[i] = Diffs
+					.createListDiffEntry(index + i, true, elements[i]);
 		}
-		ListDiff<E> diff = Diffs.createListDiff(entries);
+		ListDiff diff = Diffs.createListDiff(entries);
 		updateTargetList(diff);
 		fireListChange(diff);
 		return true;
@@ -218,19 +217,19 @@ public class ValidatedObservableList<E> extends ObservableList<E> {
 		checkRealm();
 		if (isEmpty())
 			return;
-		ListDiff<E> diff = Diffs.computeListDiff(wrappedList,
-				Collections.<E> emptyList());
+		ListDiff diff = Diffs.computeListDiff(wrappedList,
+				Collections.EMPTY_LIST);
 		wrappedList.clear();
 		updateTargetList(diff);
 		fireListChange(diff);
 	}
 
 	@Override
-	public Iterator<E> iterator() {
+	public Iterator iterator() {
 		getterCalled();
-		final ListIterator<E> wrappedIterator = wrappedList.listIterator();
-		return new Iterator<E>() {
-			E last = null;
+		final ListIterator wrappedIterator = wrappedList.listIterator();
+		return new Iterator() {
+			Object last = null;
 
 			@Override
 			public boolean hasNext() {
@@ -238,7 +237,7 @@ public class ValidatedObservableList<E> extends ObservableList<E> {
 			}
 
 			@Override
-			public E next() {
+			public Object next() {
 				return last = wrappedIterator.next();
 			}
 
@@ -246,8 +245,8 @@ public class ValidatedObservableList<E> extends ObservableList<E> {
 			public void remove() {
 				int index = wrappedIterator.previousIndex();
 				wrappedIterator.remove();
-				ListDiff<E> diff = Diffs.createListDiff(Diffs
-						.createListDiffEntry(index, false, last));
+				ListDiff diff = Diffs.createListDiff(Diffs.createListDiffEntry(
+						index, false, last));
 				updateTargetList(diff);
 				fireListChange(diff);
 			}
@@ -255,24 +254,24 @@ public class ValidatedObservableList<E> extends ObservableList<E> {
 	}
 
 	@Override
-	public ListIterator<E> listIterator() {
+	public ListIterator listIterator() {
 		return listIterator(0);
 	}
 
 	@Override
-	public ListIterator<E> listIterator(int index) {
+	public ListIterator listIterator(int index) {
 		getterCalled();
-		final ListIterator<E> wrappedIterator = wrappedList.listIterator(index);
-		return new ListIterator<E>() {
+		final ListIterator wrappedIterator = wrappedList.listIterator(index);
+		return new ListIterator() {
 			int lastIndex = -1;
-			E last = null;
+			Object last = null;
 
 			@Override
-			public void add(E o) {
+			public void add(Object o) {
 				wrappedIterator.add(o);
 				lastIndex = previousIndex();
-				ListDiff<E> diff = Diffs.createListDiff(Diffs
-						.createListDiffEntry(lastIndex, true, o));
+				ListDiff diff = Diffs.createListDiff(Diffs.createListDiffEntry(
+						lastIndex, true, o));
 				updateTargetList(diff);
 				fireListChange(diff);
 			}
@@ -288,7 +287,7 @@ public class ValidatedObservableList<E> extends ObservableList<E> {
 			}
 
 			@Override
-			public E next() {
+			public Object next() {
 				last = wrappedIterator.next();
 				lastIndex = previousIndex();
 				return last;
@@ -300,7 +299,7 @@ public class ValidatedObservableList<E> extends ObservableList<E> {
 			}
 
 			@Override
-			public E previous() {
+			public Object previous() {
 				last = wrappedIterator.previous();
 				lastIndex = nextIndex();
 				return last;
@@ -314,19 +313,19 @@ public class ValidatedObservableList<E> extends ObservableList<E> {
 			@Override
 			public void remove() {
 				wrappedIterator.remove();
-				ListDiff<E> diff = Diffs.createListDiff(Diffs
-						.createListDiffEntry(lastIndex, false, last));
+				ListDiff diff = Diffs.createListDiff(Diffs.createListDiffEntry(
+						lastIndex, false, last));
 				lastIndex = -1;
 				updateTargetList(diff);
 				fireListChange(diff);
 			}
 
 			@Override
-			public void set(E o) {
+			public void set(Object o) {
 				wrappedIterator.set(o);
-				ListDiff<E> diff = Diffs.createListDiff(
-						Diffs.createListDiffEntry(lastIndex, false, last),
-						Diffs.createListDiffEntry(lastIndex, true, o));
+				ListDiff diff = Diffs.createListDiff(Diffs.createListDiffEntry(
+						lastIndex, false, last), Diffs.createListDiffEntry(
+						lastIndex, true, o));
 				last = o;
 				updateTargetList(diff);
 				fireListChange(diff);
@@ -335,7 +334,7 @@ public class ValidatedObservableList<E> extends ObservableList<E> {
 	}
 
 	@Override
-	public E move(int oldIndex, int newIndex) {
+	public Object move(int oldIndex, int newIndex) {
 		checkRealm();
 		int size = wrappedList.size();
 		if (oldIndex >= size)
@@ -346,22 +345,22 @@ public class ValidatedObservableList<E> extends ObservableList<E> {
 					"newIndex: " + newIndex + ", size:" + size); //$NON-NLS-1$ //$NON-NLS-2$
 		if (oldIndex == newIndex)
 			return wrappedList.get(oldIndex);
-		E element = wrappedList.remove(oldIndex);
+		Object element = wrappedList.remove(oldIndex);
 		wrappedList.add(newIndex, element);
-		ListDiff<E> diff = Diffs.createListDiff(
-				Diffs.createListDiffEntry(oldIndex, false, element),
-				Diffs.createListDiffEntry(newIndex, true, element));
+		ListDiff diff = Diffs.createListDiff(Diffs.createListDiffEntry(
+				oldIndex, false, element), Diffs.createListDiffEntry(newIndex,
+				true, element));
 		updateTargetList(diff);
 		fireListChange(diff);
 		return element;
 	}
 
 	@Override
-	public E remove(int index) {
+	public Object remove(int index) {
 		checkRealm();
-		E element = wrappedList.remove(index);
-		ListDiff<E> diff = Diffs.createListDiff(Diffs.createListDiffEntry(
-				index, false, element));
+		Object element = wrappedList.remove(index);
+		ListDiff diff = Diffs.createListDiff(Diffs.createListDiffEntry(index,
+				false, element));
 		updateTargetList(diff);
 		fireListChange(diff);
 		return element;
@@ -378,12 +377,12 @@ public class ValidatedObservableList<E> extends ObservableList<E> {
 	}
 
 	@Override
-	public boolean removeAll(Collection<?> c) {
+	public boolean removeAll(Collection c) {
 		checkRealm();
-		List<E> list = new ArrayList<E>(wrappedList);
+		List list = new ArrayList(wrappedList);
 		boolean changed = list.removeAll(c);
 		if (changed) {
-			ListDiff<E> diff = Diffs.computeListDiff(wrappedList, list);
+			ListDiff diff = Diffs.computeListDiff(wrappedList, list);
 			wrappedList = list;
 			updateTargetList(diff);
 			fireListChange(diff);
@@ -392,12 +391,12 @@ public class ValidatedObservableList<E> extends ObservableList<E> {
 	}
 
 	@Override
-	public boolean retainAll(Collection<?> c) {
+	public boolean retainAll(Collection c) {
 		checkRealm();
-		List<E> list = new ArrayList<E>(wrappedList);
+		List list = new ArrayList(wrappedList);
 		boolean changed = list.retainAll(c);
 		if (changed) {
-			ListDiff<E> diff = Diffs.computeListDiff(wrappedList, list);
+			ListDiff diff = Diffs.computeListDiff(wrappedList, list);
 			wrappedList = list;
 			updateTargetList(diff);
 			fireListChange(diff);
@@ -406,12 +405,12 @@ public class ValidatedObservableList<E> extends ObservableList<E> {
 	}
 
 	@Override
-	public E set(int index, E element) {
+	public Object set(int index, Object element) {
 		checkRealm();
-		E oldElement = wrappedList.set(index, element);
-		ListDiff<E> diff = Diffs.createListDiff(
-				Diffs.createListDiffEntry(index, false, oldElement),
-				Diffs.createListDiffEntry(index, true, element));
+		Object oldElement = wrappedList.set(index, element);
+		ListDiff diff = Diffs.createListDiff(Diffs.createListDiffEntry(index,
+				false, oldElement), Diffs.createListDiffEntry(index, true,
+				element));
 		updateTargetList(diff);
 		fireListChange(diff);
 		return oldElement;

@@ -25,7 +25,7 @@ import org.eclipse.core.runtime.Status;
 /**
  * @since 1.0
  */
-public class StringToDateValidator implements IValidator<String> {
+public class StringToDateValidator implements IValidator {
 	private final StringToDateConverter converter;
 
 	/**
@@ -36,12 +36,12 @@ public class StringToDateValidator implements IValidator<String> {
 	}
 
 	@Override
-	public IStatus validate(String value) {
-		if (value.trim().length() == 0) {
+	public IStatus validate(Object value) {
+		if (value instanceof String && ((String)value).trim().length()==0) {
 			return Status.OK_STATUS;
 		}
-		Date convertedValue = converter.convert(value);
-		// The StringToDateConverter returns null if it can't parse the date.
+		Object convertedValue = converter.convert(value);
+		//The StringToDateConverter returns null if it can't parse the date.
 		if (convertedValue == null) {
 			return ValidationStatus.error(getErrorMessage());
 		}
@@ -64,11 +64,11 @@ public class StringToDateValidator implements IValidator<String> {
 		samples.append('\'');
 		samples.append(util.format(sampleDate, 0));
 		samples.append('\'');
-		return BindingMessages.getString(BindingMessages.EXAMPLES)
-				+ ": " + samples + ",..."; //$NON-NLS-1$//$NON-NLS-2$
+		return BindingMessages.getString(BindingMessages.EXAMPLES) + ": " + samples + ",..."; //$NON-NLS-1$//$NON-NLS-2$
 	}
 
 	private static class FormatUtil extends DateConversionSupport {
+
 		@Override
 		protected int numFormatters() {
 			return super.numFormatters();

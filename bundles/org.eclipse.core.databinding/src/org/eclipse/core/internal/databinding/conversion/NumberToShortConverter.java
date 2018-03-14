@@ -18,7 +18,6 @@ import com.ibm.icu.text.NumberFormat;
  * <p>
  * Class is thread safe.
  * </p>
- * 
  * @since 1.0
  */
 public class NumberToShortConverter extends NumberToNumberConverter {
@@ -27,7 +26,7 @@ public class NumberToShortConverter extends NumberToNumberConverter {
 	 * @param fromType
 	 * @param primitive
 	 */
-	public NumberToShortConverter(NumberFormat numberFormat, Class<?> fromType,
+	public NumberToShortConverter(NumberFormat numberFormat, Class fromType,
 			boolean primitive) {
 
 		super(numberFormat, fromType, (primitive) ? Short.TYPE : Short.class);
