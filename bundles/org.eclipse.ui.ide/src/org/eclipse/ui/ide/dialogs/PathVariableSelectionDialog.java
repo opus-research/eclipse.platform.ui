@@ -81,6 +81,9 @@ public final class PathVariableSelectionDialog extends SelectionDialog {
         this.variableType = variableType;
         pathVariablesGroup = new PathVariablesGroup(false, variableType,
                 new Listener() {
+                    /* (non-Javadoc)
+                     * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+                     */
                     @Override
 					public void handleEvent(Event event) {
                         updateExtendButtonState();
@@ -90,6 +93,10 @@ public final class PathVariableSelectionDialog extends SelectionDialog {
         setShellStyle(getShellStyle() | SWT.SHEET);
     }
 
+
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#buttonPressed(int)
+     */
     @Override
 	protected void buttonPressed(int buttonId) {
         if (buttonId == EXTEND_ID) {
@@ -125,6 +132,9 @@ public final class PathVariableSelectionDialog extends SelectionDialog {
 		}
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
+     */
     @Override
 	protected void configureShell(Shell shell) {
         super.configureShell(shell);
@@ -132,6 +142,9 @@ public final class PathVariableSelectionDialog extends SelectionDialog {
                 IIDEHelpContextIds.PATH_VARIABLE_SELECTION_DIALOG);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
+     */
     @Override
 	protected void createButtonsForButtonBar(Composite parent) {
         createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL,
@@ -142,6 +155,9 @@ public final class PathVariableSelectionDialog extends SelectionDialog {
         updateExtendButtonState();
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
+     */
     @Override
 	protected Control createDialogArea(Composite parent) {
         // create composite 
@@ -152,6 +168,9 @@ public final class PathVariableSelectionDialog extends SelectionDialog {
     }
 
     
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.window.Window#close()
+     */
     @Override
 	public boolean close() {
         pathVariablesGroup.dispose();
@@ -159,6 +178,9 @@ public final class PathVariableSelectionDialog extends SelectionDialog {
     }
 
   
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#okPressed()
+     */
     @Override
 	protected void okPressed() {
 		//Sets the dialog result to the selected path variable name(s). 

@@ -36,6 +36,9 @@ public class SavePerspectiveAction extends PerspectiveAction {
 				IWorkbenchHelpContextIds.SAVE_PERSPECTIVE_ACTION);
     }
 
+    /* (non-Javadoc)
+     * Method declared on PerspectiveAction.
+     */
     @Override
 	protected void run(IWorkbenchPage page, IPerspectiveDescriptor persp) {
         PerspectiveDescriptor desc = (PerspectiveDescriptor) persp;

@@ -784,6 +784,10 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		return (DecoratorManager) e4Context.get(IDecoratorManager.class);
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
+     */
     @Override
 	public void start(BundleContext context) throws Exception {
     	context.addBundleListener(getBundleListener());
@@ -1079,6 +1083,9 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
         return productInfo;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+     */
     @Override
 	public void stop(BundleContext context) throws Exception {
     	if (bundleListener!=null) {
