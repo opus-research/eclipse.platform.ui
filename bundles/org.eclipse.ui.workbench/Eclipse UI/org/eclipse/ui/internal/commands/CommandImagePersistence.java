@@ -167,7 +167,6 @@ public final class CommandImagePersistence extends RegistryPersistence {
 		this.commandService = commandService;
 	}
 
-	@Override
 	protected final boolean isChangeImportant(final IRegistryChangeEvent event) {
 		final IExtensionDelta[] imageDeltas = event.getExtensionDeltas(
 				PlatformUI.PLUGIN_ID,
@@ -182,7 +181,6 @@ public final class CommandImagePersistence extends RegistryPersistence {
 	/**
 	 * Reads all of the command images from the registry.
 	 */
-	@Override
 	protected final void read() {
 		super.read();
 

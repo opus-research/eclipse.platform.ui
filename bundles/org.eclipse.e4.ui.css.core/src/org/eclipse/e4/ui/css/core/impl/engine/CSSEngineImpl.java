@@ -93,7 +93,6 @@ public abstract class CSSEngineImpl extends AbstractCSSEngine {
 		super.registerCSSValueConverter(CSSValueBooleanConverterImpl.INSTANCE);
 	}
 
-	@Override
 	public CSSParser makeCSSParser() {
 		// Create CSS Parser
 		ICSSParserFactory factory = CSSParserFactory.newInstance();

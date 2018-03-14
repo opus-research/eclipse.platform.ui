@@ -59,16 +59,14 @@ public abstract class Page implements IPageBookViewPage {
     /* (non-Javadoc)
      * Method declared on IPage.
      */
-    @Override
-	public abstract void createControl(Composite parent);
+    public abstract void createControl(Composite parent);
 
     /**
      * The <code>Page</code> implementation of this <code>IPage</code> method 
      * disposes of this page's control (if it has one and it has not already
      * been disposed). Subclasses may extend.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         Control ctrl = getControl();
         if (ctrl != null && !ctrl.isDisposed()) {
 			ctrl.dispose();
@@ -79,8 +77,7 @@ public abstract class Page implements IPageBookViewPage {
      * The <code>Page</code> implementation of this <code>IPage</code> method returns
      * <code>null</code>. Subclasses must reimplement.
      */
-    @Override
-	public abstract Control getControl();
+    public abstract Control getControl();
 
     /* (non-Javadoc)
      * This method exists for backward compatibility.
@@ -94,8 +91,7 @@ public abstract class Page implements IPageBookViewPage {
      * This method exists for backward compatibility.
      * Subclasses should reimplement <code>init</code>.
      */
-    @Override
-	public void setActionBars(IActionBars actionBars) {
+    public void setActionBars(IActionBars actionBars) {
         makeContributions(actionBars.getMenuManager(), actionBars
                 .getToolBarManager(), actionBars.getStatusLineManager());
     }
@@ -110,8 +106,7 @@ public abstract class Page implements IPageBookViewPage {
      * 
      * @since 2.0
      */
-    @Override
-	public void init(IPageSite pageSite) {
+    public void init(IPageSite pageSite) {
         site = pageSite;
     }
 
@@ -120,8 +115,7 @@ public abstract class Page implements IPageBookViewPage {
      * 
      * @return the site which contains this page
      */
-    @Override
-	public IPageSite getSite() {
+    public IPageSite getSite() {
         return site;
     }
 
@@ -129,6 +123,5 @@ public abstract class Page implements IPageBookViewPage {
      * The <code>Page</code> implementation of this <code>IPage</code> method
      * does nothing. Subclasses must implement.
      */
-    @Override
-	public abstract void setFocus();
+    public abstract void setFocus();
 }

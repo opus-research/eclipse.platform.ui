@@ -46,7 +46,6 @@ public class SACParserFactoryImpl extends SACParserFactory {
 	 *
 	 * @see org.akrogen.tkui.core.css.sac.SACParserFactory#makeParser(java.lang.String)
 	 */
-	@Override
 	public Parser makeParser(String name) throws ClassNotFoundException,
 			IllegalAccessException, InstantiationException,
 			NullPointerException, ClassCastException {

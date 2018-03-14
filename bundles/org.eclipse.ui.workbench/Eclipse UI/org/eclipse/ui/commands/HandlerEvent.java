@@ -11,6 +11,7 @@
 package org.eclipse.ui.commands;
 
 import java.util.Map;
+
 import org.eclipse.ui.internal.util.Util;
 
 /**
@@ -24,8 +25,6 @@ import org.eclipse.ui.internal.util.Util;
  * @see IHandlerListener#handlerChanged(HandlerEvent)
  * @deprecated Please use the "org.eclipse.core.commands" plug-in instead.
  */
-@Deprecated
-@SuppressWarnings("all")
 public final class HandlerEvent {
 
     /**
@@ -73,7 +72,6 @@ public final class HandlerEvent {
      *            <code>false</code> and must not be null if
      *            attributeValuesByNameChanged is <code>true</code>.
      */
-	@Deprecated
     public HandlerEvent(IHandler handler, boolean attributeValuesByNameChanged,
             Map previousAttributeValuesByName) {
         if (handler == null) {
@@ -101,7 +99,6 @@ public final class HandlerEvent {
      * @return the instance of the interface that changed. Guaranteed not to be
      *         <code>null</code>.
      */
-	@Deprecated
     public IHandler getHandler() {
         return handler;
     }
@@ -117,7 +114,6 @@ public final class HandlerEvent {
      *         guaranteed to not be null if haveAttributeValuesByNameChanged()
      *         is <code>true</code>.
      */
-	@Deprecated
     public Map getPreviousAttributeValuesByName() {
         if (originalPreviousAttributeValuesByName == null) {
             return null;
@@ -137,7 +133,6 @@ public final class HandlerEvent {
      * 
      * @return true, iff the attributeValuesByName property changed.
      */
-	@Deprecated
     public boolean haveAttributeValuesByNameChanged() {
         return attributeValuesByNameChanged;
     }
