@@ -12,7 +12,6 @@
  * Tristan Hume - <trishume@gmail.com> -
  * 		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  * 		Implemented workbench auto-save to correctly restore state in case of crash.
- * Sergey Prigogin (Google) - bug 443898 Issue warning if earlyStartup plug-in runs longer than X
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -1163,10 +1162,7 @@ public class WorkbenchMessages extends NLS {
 	public static String WorkingSetGroup_WorkingSets_group;
 	public static String WorkingSetGroup_WorkingSetSelection_message;
 	public static String WorkingSetGroup_EnableWorkingSet_button;
-
-	// Early startup
-	public static String EarlyStartupRunnable_ExtensionTookTooLong;
-
+	
 	// Util
 	public static String Util_List;
 	public static String Util_listNull;
