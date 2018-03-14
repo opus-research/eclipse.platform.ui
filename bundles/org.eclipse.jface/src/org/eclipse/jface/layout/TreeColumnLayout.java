@@ -43,12 +43,10 @@ public class TreeColumnLayout extends AbstractColumnLayout {
 	
 	private static class TreeLayoutListener implements TreeListener {
 
-		@Override
 		public void treeCollapsed(TreeEvent e) {
 			update((Tree) e.widget);
 		}
 
-		@Override
 		public void treeExpanded(TreeEvent e) {
 			update((Tree) e.widget);
 		}
@@ -56,7 +54,6 @@ public class TreeColumnLayout extends AbstractColumnLayout {
 		private void update(final Tree tree) {
 			tree.getDisplay().asyncExec(new Runnable() {
 
-				@Override
 				public void run() {
 					if (!tree.isDisposed()) {
 						tree.update();

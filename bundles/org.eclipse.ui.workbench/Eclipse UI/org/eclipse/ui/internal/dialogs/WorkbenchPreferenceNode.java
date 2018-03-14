@@ -41,7 +41,6 @@ public class WorkbenchPreferenceNode extends WorkbenchPreferenceExtensionNode {
 	/**
 	 * Creates the preference page this node stands for.
 	 */
-	@Override
 	public void createPage() {
 		IWorkbenchPreferencePage page;
 		try {

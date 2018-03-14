@@ -85,8 +85,7 @@ public class FontFieldEditor extends FieldEditor {
             string = s;
             text = new Text(parent, SWT.READ_ONLY | SWT.BORDER);
             text.addDisposeListener(new DisposeListener() {
-                @Override
-				public void widgetDisposed(DisposeEvent e) {
+                public void widgetDisposed(DisposeEvent e) {
                     if (font != null) {
 						font.dispose();
 					}
@@ -288,8 +287,7 @@ public class FontFieldEditor extends FieldEditor {
                 }
             });
             changeFontButton.addDisposeListener(new DisposeListener() {
-                @Override
-				public void widgetDisposed(DisposeEvent event) {
+                public void widgetDisposed(DisposeEvent event) {
                     changeFontButton = null;
                 }
             });
@@ -350,8 +348,7 @@ public class FontFieldEditor extends FieldEditor {
             valueControl = new Label(parent, SWT.LEFT);
             valueControl.setFont(parent.getFont());
             valueControl.addDisposeListener(new DisposeListener() {
-                @Override
-				public void widgetDisposed(DisposeEvent event) {
+                public void widgetDisposed(DisposeEvent event) {
                     valueControl = null;
                 }
             });

@@ -19,7 +19,6 @@ import org.w3c.dom.css.CSSValue;
 public abstract class AbstractCSSPropertyTextHandler implements
 		ICSSPropertyTextHandler {
 
-	@Override
 	public boolean applyCSSProperty(Object element, String property,
 			CSSValue value, String pseudo, CSSEngine engine) throws Exception {
 		if ("color".equals(property)) {
@@ -31,7 +30,6 @@ public abstract class AbstractCSSPropertyTextHandler implements
 		return false;
 	}
 
-	@Override
 	public String retrieveCSSProperty(Object element, String property,
 			String pseudo, CSSEngine engine) throws Exception {
 		if ("color".equals(property)) {
@@ -43,25 +41,21 @@ public abstract class AbstractCSSPropertyTextHandler implements
 		return null;
 	}
 
-	@Override
 	public void applyCSSPropertyColor(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		throw new UnsupportedPropertyException("color");
 	}
 
-	@Override
 	public void applyCSSPropertyTextTransform(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		throw new UnsupportedPropertyException("text-transform");
 	}
 
-	@Override
 	public String retrieveCSSPropertyColor(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		return null;
 	}
 
-	@Override
 	public String retrieveCSSPropertyTextTransform(Object element,
 			String pseudo, CSSEngine engine) throws Exception {
 		return null;

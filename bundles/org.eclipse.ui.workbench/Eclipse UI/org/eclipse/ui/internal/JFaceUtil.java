@@ -45,7 +45,6 @@ final class JFaceUtil {
 	public static void initializeJFace() {
 		// Set the SafeRunner to run all SafeRunnables
 		SafeRunnable.setRunner(new ISafeRunnableRunner() {
-			@Override
 			public void run(ISafeRunnable code) {
 				SafeRunner.run(code);
 			}
@@ -54,7 +53,6 @@ final class JFaceUtil {
 		// Pass all errors and warnings to the status handling facility
 		// and the rest to the main runtime log
 		Policy.setLog(new ILogger() {
-			@Override
 			public void log(IStatus status) {
 				if (status.getSeverity() == IStatus.WARNING
 						|| status.getSeverity() == IStatus.ERROR) {
@@ -66,7 +64,6 @@ final class JFaceUtil {
 		});
 		
 		Policy.setStatusHandler(new StatusHandler() {
-			@Override
 			public void show(IStatus status, String title) {
 				StatusAdapter statusAdapter = new StatusAdapter(status);
 				statusAdapter.setProperty(StatusAdapter.TITLE_PROPERTY, title);
@@ -98,7 +95,6 @@ final class JFaceUtil {
 			 * 
 			 * @see org.eclipse.core.runtime.preferences.IEclipsePreferences.INodeChangeListener#added(org.eclipse.core.runtime.preferences.IEclipsePreferences.NodeChangeEvent)
 			 */
-			@Override
 			public void added(NodeChangeEvent event) {
 				if (!event.getChild().name().equals(workbenchName)) {
 					return;
@@ -111,7 +107,6 @@ final class JFaceUtil {
 			 * 
 			 * @see org.eclipse.core.runtime.preferences.IEclipsePreferences.INodeChangeListener#removed(org.eclipse.core.runtime.preferences.IEclipsePreferences.NodeChangeEvent)
 			 */
-			@Override
 			public void removed(NodeChangeEvent event) {
 				// Nothing to do here
 

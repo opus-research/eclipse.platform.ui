@@ -97,8 +97,7 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
      * @param selection
      *            IStructuredSelection
      */
-    @Override
-	public IStructuredSelection adaptedSelection(IStructuredSelection selection) {
+    public IStructuredSelection adaptedSelection(IStructuredSelection selection) {
         if (canHandleSelection(selection)) {
 			return selection;
 		}
@@ -129,8 +128,7 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
      * with this object. Returns <code>null</code> if no such object can be
      * found.
      */
-    @Override
-	public Object getAdapter(Class adapter) {
+    public Object getAdapter(Class adapter) {
         if (adapter == IWorkbenchAdapter.class
                 || adapter == IWorkbenchAdapter2.class
                 || adapter == IWorkbenchAdapter3.class) {
@@ -157,16 +155,14 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
      * 
      * @return java.lang.String
      */
-    @Override
-	public String getDescription() {
+    public String getDescription() {
         return RegistryReader.getDescription(configurationElement);
     }
 
     /**
      * Answer the icon of this element.
      */
-    @Override
-	public ImageDescriptor getImageDescriptor() {
+    public ImageDescriptor getImageDescriptor() {
     	if (imageDescriptor == null) {
     		String iconName = configurationElement
                     .getAttribute(IWorkbenchRegistryConstants.ATT_ICON);
@@ -182,16 +178,14 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
     /**
      * Returns the name of this wizard element.
      */
-    @Override
-	public ImageDescriptor getImageDescriptor(Object element) {
+    public ImageDescriptor getImageDescriptor(Object element) {
         return getImageDescriptor();
     }
     
     /**
      * Returns the name of this wizard element.
      */
-    @Override
-	public String getLabel(Object element) {
+    public String getLabel(Object element) {
         return configurationElement.getAttribute(IWorkbenchRegistryConstants.ATT_NAME);
     }
 
@@ -232,16 +226,14 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
 	 * 
 	 * @see org.eclipse.ui.IPluginContribution#getLocalId()
 	 */
-    @Override
-	public String getLocalId() {
+    public String getLocalId() {
         return getId();
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IPluginContribution#getPluginId()
      */
-    @Override
-	public String getPluginId() {
+    public String getPluginId() {
         return (configurationElement != null) ? configurationElement
                 .getNamespaceIdentifier() : null;
     }
@@ -249,8 +241,7 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
     /* (non-Javadoc)
      * @see org.eclipse.ui.wizards.INewWizardDescriptor#getDescriptionImage()
      */
-    @Override
-	public ImageDescriptor getDescriptionImage() {
+    public ImageDescriptor getDescriptionImage() {
     	if (descriptionImage == null) {
     		String descImage = configurationElement.getAttribute(IWorkbenchRegistryConstants.ATT_DESCRIPTION_IMAGE);
     		if (descImage == null) {
@@ -265,15 +256,13 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
     /* (non-Javadoc)
      * @see org.eclipse.ui.wizards.INewWizardDescriptor#getHelpHref()
      */
-    @Override
-	public String getHelpHref() {
+    public String getHelpHref() {
         return configurationElement.getAttribute(IWorkbenchRegistryConstants.ATT_HELP_HREF);
     }
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.wizards.INewWizardDescriptor#createWizard()
 	 */
-	@Override
 	public IWorkbenchWizard createWizard() throws CoreException {
 		return (IWorkbenchWizard) createExecutableExtension();
 	}
@@ -281,7 +270,6 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchPartDescriptor#getId()
 	 */
-	@Override
 	public String getId() {
 		return id;
 	}
@@ -289,7 +277,6 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchPartDescriptor#getLabel()
 	 */
-	@Override
 	public String getLabel() {		
 		return getLabel(this);
 	}
@@ -297,7 +284,6 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.wizards.INewWizardDescriptor#getCategory()
 	 */
-	@Override
 	public IWizardCategory getCategory() {
 		return (IWizardCategory) getParent(this);
 	}
@@ -315,7 +301,6 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.wizards.IWizardDescriptor#getTags()
 	 */
-	@Override
 	public String [] getTags() {
  
         String flag = configurationElement.getAttribute(IWorkbenchRegistryConstants.ATT_PROJECT);
@@ -329,7 +314,6 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.model.IWorkbenchAdapter#getParent(java.lang.Object)
 	 */
-	@Override
 	public Object getParent(Object object) {
 		return parentCategory;
 	}
@@ -347,7 +331,6 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.wizards.IWizardDescriptor#canFinishEarly()
 	 */
-	@Override
 	public boolean canFinishEarly() {
 		return Boolean.valueOf(configurationElement.getAttribute(IWorkbenchRegistryConstants.ATT_CAN_FINISH_EARLY)).booleanValue();
 	}
@@ -355,7 +338,6 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.wizards.IWizardDescriptor#hasPages()
 	 */
-	@Override
 	public boolean hasPages() {
 		String hasPagesString = configurationElement.getAttribute(IWorkbenchRegistryConstants.ATT_HAS_PAGES);
 		// default value is true
