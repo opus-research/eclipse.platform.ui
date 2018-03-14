@@ -524,12 +524,14 @@ public class StackRenderer extends LazyStackRenderer {
 
 	protected void updateTab(CTabItem cti, MPart part, String attName,
 			Object newValue) {
-		if (UIEvents.UILabel.LABEL.equals(attName)) {
+		if (UIEvents.UILabel.LABEL.equals(attName)
+				|| UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
 			String newName = (String) newValue;
 			cti.setText(getLabel(part, newName));
 		} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
 			cti.setImage(getImage(part));
-		} else if (UIEvents.UILabel.TOOLTIP.equals(attName)) {
+		} else if (UIEvents.UILabel.TOOLTIP.equals(attName)
+				|| UIEvents.UILabel.LOCALIZED_TOOLTIP.equals(attName)) {
 			String newTTip = (String) newValue;
 			cti.setToolTipText(getToolTip(newTTip));
 		} else if (UIEvents.Dirtyable.DIRTY.equals(attName)) {
@@ -1221,6 +1223,11 @@ public class StackRenderer extends LazyStackRenderer {
 		}
 
 		ignoreTabSelChanges = true;
+		// Ensure that the newly selected control is correctly sized
+		if (cti.getControl() instanceof Composite) {
+			Composite ctiComp = (Composite) cti.getControl();
+			ctiComp.layout(true, true);
+		}
 		ctf.setSelection(cti);
 		ignoreTabSelChanges = false;
 
