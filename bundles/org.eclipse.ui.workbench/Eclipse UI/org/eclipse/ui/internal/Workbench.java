@@ -3125,7 +3125,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 	/* package */
 	WorkbenchConfigurer getWorkbenchConfigurer() {
 		if (workbenchConfigurer == null) {
-			workbenchConfigurer = ContextInjectionFactory.make(WorkbenchConfigurer.class, e4Context);
+			workbenchConfigurer = new WorkbenchConfigurer();
 		}
 		return workbenchConfigurer;
 	}
