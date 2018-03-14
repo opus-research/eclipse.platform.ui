@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,15 +7,16 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 448060
  *******************************************************************************/
 
 package org.eclipse.ui.internal.ide;
 
-import com.ibm.icu.text.Collator;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Locale;
 
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -31,7 +32,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.SelectionDialog;
-import org.eclipse.ui.internal.ide.dialogs.SimpleListContentProvider;
+
+import com.ibm.icu.text.Collator;
 
 /**
  * Dialog to allow the user to select a feature from a list.
@@ -68,7 +70,7 @@ public class FeatureSelectionDialog extends SelectionDialog {
      * <p>
      * There must be at least one feature.
      * </p>
-     * 
+     *
      * @param shell  the parent shell
      * @param features  the features to display
      * @param primaryFeatureId  the id of the primary feature or null if none
@@ -119,7 +121,7 @@ public class FeatureSelectionDialog extends SelectionDialog {
             }
         }
 
-        // set a safe default		
+        // set a safe default
         setInitialSelections(new Object[0]);
     }
 
@@ -136,7 +138,7 @@ public class FeatureSelectionDialog extends SelectionDialog {
 
         // Create label
         createMessageArea(composite);
-        // Create list viewer	
+        // Create list viewer
         listViewer = new ListViewer(composite, SWT.SINGLE | SWT.H_SCROLL
                 | SWT.V_SCROLL | SWT.BORDER);
         GridData data = new GridData(GridData.FILL_BOTH);
@@ -144,7 +146,7 @@ public class FeatureSelectionDialog extends SelectionDialog {
         data.widthHint = convertWidthInCharsToPixels(LIST_WIDTH);
         listViewer.getList().setLayoutData(data);
         listViewer.getList().setFont(parent.getFont());
-        // Set the label provider		
+        // Set the label provider
         listViewer.setLabelProvider(new LabelProvider() {
             @Override
 			public String getText(Object element) {
@@ -154,11 +156,8 @@ public class FeatureSelectionDialog extends SelectionDialog {
         });
 
         // Set the content provider
-        SimpleListContentProvider cp = new SimpleListContentProvider();
-        cp.setElements(features);
-        listViewer.setContentProvider(cp);
-        listViewer.setInput(new Object());
-        // it is ignored but must be non-null
+		listViewer.setContentProvider(ArrayContentProvider.getInstance());
+		listViewer.setInput(features);
 
         // Set the initial selection
         listViewer.setSelection(new StructuredSelection(

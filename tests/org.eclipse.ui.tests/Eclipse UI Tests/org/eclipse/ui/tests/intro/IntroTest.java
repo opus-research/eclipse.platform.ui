@@ -28,7 +28,6 @@ import org.eclipse.ui.internal.intro.IntroDescriptor;
 import org.eclipse.ui.internal.util.PrefUtil;
 import org.eclipse.ui.intro.IIntroManager;
 import org.eclipse.ui.intro.IIntroPart;
-import org.eclipse.ui.tests.api.PerspectiveWithFastView;
 import org.eclipse.ui.tests.harness.util.EmptyPerspective;
 import org.eclipse.ui.tests.harness.util.UITestCase;
 
@@ -47,10 +46,6 @@ public class IntroTest extends UITestCase {
     public IntroTest(String testName) {
         super(testName);
     }
-    
-    public void testCloseInFastViewPerspective() {
-    	testClose(PerspectiveWithFastView.PERSP_ID);
-	}
 
     public void testCloseInEmptyPerspective() {
     	testClose(EmptyPerspective.PERSP_ID);
@@ -73,7 +68,7 @@ public class IntroTest extends UITestCase {
 		assertTrue(((WorkbenchWindow) window).getCoolBarVisible());
 		assertTrue(((WorkbenchWindow) window).getPerspectiveBarVisible());
 	}
-    
+
     public void testShow() {
         IIntroManager introManager = window.getWorkbench().getIntroManager();
         IIntroPart part = introManager.showIntro(window, false);
@@ -135,8 +130,8 @@ public class IntroTest extends UITestCase {
     }
 
     /**
-     * Open the intro, change perspective, close the intro (ensure it still 
-     * exists), change back to the first perspective, close the intro, ensure 
+     * Open the intro, change perspective, close the intro (ensure it still
+     * exists), change back to the first perspective, close the intro, ensure
      * that it no longer exists.
      */
     public void testPerspectiveChange() {
@@ -145,7 +140,7 @@ public class IntroTest extends UITestCase {
         IPreferenceStore apiStore = PrefUtil.getAPIPreferenceStore();
         boolean oldMinMaxState = apiStore.getBoolean(IWorkbenchPreferenceConstants.ENABLE_NEW_MIN_MAX);
 		apiStore.setValue(IWorkbenchPreferenceConstants.ENABLE_NEW_MIN_MAX, false);
-        
+
     	IWorkbench workbench = window.getWorkbench();
         IIntroPart part = workbench.getIntroManager().showIntro(window, false);
         assertNotNull(part);
@@ -164,10 +159,10 @@ public class IntroTest extends UITestCase {
 		// Restore the min/max state to it's correct value
 		apiStore.setValue(IWorkbenchPreferenceConstants.ENABLE_NEW_MIN_MAX, oldMinMaxState);
     }
-    
+
     /**
-     * Open the intro, change perspective, close the intro 
-     * and ensure that the intro has not been closed in the 
+     * Open the intro, change perspective, close the intro
+     * and ensure that the intro has not been closed in the
      * other perspective.
      * See bug 174213
      * See IntroTest2.java
@@ -181,22 +176,22 @@ public class IntroTest extends UITestCase {
         activePage.setPerspective(WorkbenchPlugin.getDefault()
                 .getPerspectiveRegistry().findPerspectiveWithId(
                         "org.eclipse.ui.tests.api.SessionPerspective"));
-       
+
         IViewPart viewPart = window.getActivePage().findView(
 				IIntroConstants.INTRO_VIEW_ID);
         assertNotNull(viewPart);
-        
+
         window.getActivePage().hideView(viewPart);
         viewPart = window.getActivePage().findView(
 				IIntroConstants.INTRO_VIEW_ID);
         assertNull(viewPart);
-        
+
         activePage.setPerspective(oldDesc);
         viewPart = window.getActivePage().findView(
 				IIntroConstants.INTRO_VIEW_ID);
         assertNotNull(viewPart);
     }
-    
+
     public void testPerspectiveReset() {
         IWorkbench workbench = window.getWorkbench();
         IIntroPart part = workbench.getIntroManager().showIntro(window, false);
@@ -214,7 +209,7 @@ public class IntroTest extends UITestCase {
         assertTrue(workbench.getIntroManager().closeIntro(part));
         assertNull(workbench.getIntroManager().getIntro());
     }
-    
+
     /**
 	 * Test to ensure that the part is properly nulled out when the intro is
 	 * closed via the view close mechanism.
@@ -233,11 +228,11 @@ public class IntroTest extends UITestCase {
     @Override
 	protected void doSetUp() throws Exception {
         super.doSetUp();
-        
+
         // these tests rely on the 3.2 behavior for sticky views
     	IPreferenceStore preferenceStore = PrefUtil.getAPIPreferenceStore();
     	preferenceStore.putValue(IWorkbenchPreferenceConstants.ENABLE_32_STICKY_CLOSE_BEHAVIOR, "true");
-    	
+
         oldDesc = Workbench.getInstance().getIntroDescriptor();
         IntroDescriptor testDesc = (IntroDescriptor) WorkbenchPlugin
                 .getDefault().getIntroRegistry().getIntro(

@@ -70,7 +70,7 @@ public class RefreshAction extends WorkspaceAction {
 
 	/**
 	 * Creates a new action.
-	 * 
+	 *
 	 * @param shell
 	 *            the shell for any dialogs
 	 * @deprecated See {@link #RefreshAction(IShellProvider)}
@@ -83,7 +83,7 @@ public class RefreshAction extends WorkspaceAction {
 
 	/**
 	 * Creates a new action.
-	 * 
+	 *
 	 * @param provider
 	 *            the IShellProvider for any dialogs.
 	 * @since 3.4
@@ -92,7 +92,7 @@ public class RefreshAction extends WorkspaceAction {
 		super(provider, IDEWorkbenchMessages.RefreshAction_text);
 		initAction();
 	}
-	
+
 	/**
 	 * Initializes for the constructor.
 	 */
@@ -147,25 +147,16 @@ public class RefreshAction extends WorkspaceAction {
 		}
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on WorkspaceAction.
-	 */
 	@Override
 	protected String getOperationMessage() {
 		return IDEWorkbenchMessages.RefreshAction_progressMessage;
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on WorkspaceAction.
-	 */
 	@Override
 	protected String getProblemsMessage() {
 		return IDEWorkbenchMessages.RefreshAction_problemMessage;
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on WorkspaceAction.
-	 */
 	@Override
 	protected String getProblemsTitle() {
 		return IDEWorkbenchMessages.RefreshAction_problemTitle;
@@ -199,7 +190,7 @@ public class RefreshAction extends WorkspaceAction {
 
 	/**
 	 * Handle the key release.
-	 * 
+	 *
 	 * @param event
 	 *            the event
 	 */
@@ -220,11 +211,6 @@ public class RefreshAction extends WorkspaceAction {
 		selectionChanged(currentSelection);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.actions.WorkspaceAction#createOperation(org.eclipse.core.runtime.IStatus[])
-	 */
 	@Override
 	final protected IRunnableWithProgress createOperation(
 			final IStatus[] errorStatus) {
@@ -280,7 +266,7 @@ public class RefreshAction extends WorkspaceAction {
 	 * This method may be extended to refresh model objects related to the
 	 * resource.
 	 * </p>
-	 * 
+	 *
 	 * @param resource
 	 *            the resource to refresh. Must not be <code>null</code>.
 	 * @param monitor
@@ -305,10 +291,7 @@ public class RefreshAction extends WorkspaceAction {
 		}
 		resource.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.actions.WorkspaceAction#run()
-	 */
+
 	@Override
 	public void run() {
 		final IStatus[] errorStatus = new IStatus[1];
@@ -332,7 +315,7 @@ public class RefreshAction extends WorkspaceAction {
 				}
 				return errorStatus[0];
 			}
-			
+
 		};
 		ISchedulingRule rule = op.getRule();
 		if (rule != null) {

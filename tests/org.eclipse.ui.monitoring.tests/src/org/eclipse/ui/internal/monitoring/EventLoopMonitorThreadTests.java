@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014, Google Inc and others.
+ * Copyright (C) 2014, 2015 Google Inc and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,6 +24,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.internal.monitoring.EventLoopMonitorThread.Parameters;
 import org.eclipse.ui.monitoring.PreferenceConstants;
+import org.eclipse.ui.monitoring.StackSample;
 import org.eclipse.ui.monitoring.UiFreezeEvent;
 import org.junit.After;
 import org.junit.Before;
@@ -33,6 +34,24 @@ import org.junit.Test;
  * Tests for {@link EventLoopMonitorThread} class.
  */
 public class EventLoopMonitorThreadTests {
+	/* NOTE: All time-related values in this class are in milliseconds. */
+	private static final long MAX_TIMEOUT_MS = 1 * 1000; // 1 second
+	private static final int FREEZE_THRESHOLD_MS = 100;
+	private static final int SAMPLE_INTERVAL_MS = FREEZE_THRESHOLD_MS * 2 / 3;
+	public static final int FORCE_DEADLOCK_LOG_TIME_MS = 10 * 60 * 1000; // == 10 minutes
+	private static final int MIN_STACK_TRACES = 5;
+	private static final int MAX_STACK_TRACES = 11;
+	private static final int MIN_MAX_STACK_TRACE_DELTA = MAX_STACK_TRACES - MIN_STACK_TRACES;
+	private static final String UI_THREAD_FILTER =
+			"org.eclipse.swt.internal.gtk.OS.gtk_dialog_run"
+			+ ",org.eclipse.e4.ui.workbench.addons.dndaddon.DnDManager.startDrag";
+	private static final String NONINTERESTING_THREAD_FILTER =
+			"java.*"
+			+ ",sun.*"
+			+ ",org.eclipse.core.internal.jobs.WorkerPool.sleep"
+			+ ",org.eclipse.core.internal.jobs.WorkerPool.startJob"
+			+ ",org.eclipse.core.internal.jobs.Worker.run";
+
 	/**
 	 * A mock event loop monitor thread used for JUnit tests.
 	 */
@@ -64,17 +83,6 @@ public class EventLoopMonitorThreadTests {
 		}
 	}
 
-	private static final String FILTER_TRACES =
-			"org.eclipse.swt.internal.gtk.OS.gtk_dialog_run,"
-					+ "org.eclipse.e4.ui.workbench.addons.dndaddon.DnDManager.startDrag";
-	/* NOTE: All time-related values in this class are in milliseconds. */
-	private static final long MAX_TIMEOUT_MS = 1 * 1000; // 1 second
-	private static final int THRESHOLD_MS = 100;
-	private static final int SAMPLE_INTERVAL_MS = THRESHOLD_MS * 2 / 3;
-	public static final int FORCE_DEADLOCK_LOG_TIME_MILLIS = 10 * 60 * 1000; // == 10 minutes
-	private static final int MIN_STACK_TRACES = 5;
-	private static final int MAX_STACK_TRACES = 11;
-	private static final int MIN_MAX_STACK_TRACE_DELTA = MAX_STACK_TRACES - MIN_STACK_TRACES;
 	private MockEventLoopMonitorThread monitoringThread;
 	private MockUiFreezeEventLogger logger;
 	private List<UiFreezeEvent> loggedEvents;
@@ -108,15 +116,16 @@ public class EventLoopMonitorThreadTests {
 
 	/**
 	 * Creates and returns a EventLoopMonitorThread that fakes out the timer management to enable
-	 * testing various long event scenarios.
+	 * testing various freeze event scenarios.
 	 */
 	private static MockEventLoopMonitorThread createTestThread(int threshold) throws Exception {
 		EventLoopMonitorThread.Parameters args = new Parameters();
 		args.longEventWarningThreshold = threshold - 1;
 		args.longEventErrorThreshold = threshold - 1;
 		args.maxStackSamples = MIN_STACK_TRACES;
-		args.deadlockThreshold = FORCE_DEADLOCK_LOG_TIME_MILLIS;
-		args.filterTraces = FILTER_TRACES;
+		args.deadlockThreshold = FORCE_DEADLOCK_LOG_TIME_MS;
+		args.uiThreadFilter = UI_THREAD_FILTER;
+		args.noninterestingThreadFilter = NONINTERESTING_THREAD_FILTER;
 
 		return new MockEventLoopMonitorThread(args);
 	}
@@ -171,11 +180,23 @@ public class EventLoopMonitorThreadTests {
 		monitoringThread.handleEvent(event);
 	}
 
+	/**
+	 * Returns relative times of the stack samples in a text form.
+	 */
+	private String getStackSamplesTimeline(UiFreezeEvent event) {
+		StringBuilder buf = new StringBuilder();
+		for (StackSample sample : event.getStackTraceSamples()) {
+			if (buf.length() != 0) {
+				buf.append(' ');
+			}
+			buf.append(sample.getTimestamp() - event.getStartTimestamp());
+		}
+		return buf.toString();
+	}
+
 	@Test
 	public void testStackDecimation() throws Exception {
-		UiFreezeEvent event;
-
-		monitoringThread = createTestThread(THRESHOLD_MS * 2);
+		monitoringThread = createTestThread(FREEZE_THRESHOLD_MS * 2);
 		monitoringThread.start();
 		sendEvent(SWT.PreEvent);
 
@@ -197,8 +218,8 @@ public class EventLoopMonitorThreadTests {
 			runForCycles(3);
 		}
 
-		event = loggedEvents.get(0);
-		assertNotNull("A long running event was not automatically published", event);
+		UiFreezeEvent event = loggedEvents.get(0);
+		assertNotNull("A freeze event was not automatically published", event);
 		assertEquals("Decimation did not resize the stack trace array properly", MIN_STACK_TRACES,
 				event.getStackTraceSamples().length);
 
@@ -212,7 +233,7 @@ public class EventLoopMonitorThreadTests {
 		}
 
 		event = loggedEvents.get(1);
-		assertNotNull("A long running event was not automatically published", event);
+		assertNotNull("A freeze event was not automatically published", event);
 		assertEquals("Decimation did not reset the sampiling rate properly", MIN_STACK_TRACES,
 				event.getStackTraceSamples().length);
 
@@ -227,7 +248,7 @@ public class EventLoopMonitorThreadTests {
 		}
 
 		event = loggedEvents.get(2);
-		assertNotNull("A long running event was not automatically published", event);
+		assertNotNull("A freeze event was not automatically published", event);
 		assertEquals("Decimation did not reset the sampiling rate properly", MIN_STACK_TRACES,
 				event.getStackTraceSamples().length);
 	}
@@ -236,7 +257,7 @@ public class EventLoopMonitorThreadTests {
 	public void testPublishPossibleDeadlock() throws Exception {
 		monitoringThread = createTestThread(SAMPLE_INTERVAL_MS * 4);
 		monitoringThread.start();
-		long maxDeadlock = FORCE_DEADLOCK_LOG_TIME_MILLIS;
+		long maxDeadlock = FORCE_DEADLOCK_LOG_TIME_MS;
 		sendEvent(SWT.PreEvent);
 
 		synchronized (sleepLock) {
@@ -260,7 +281,7 @@ public class EventLoopMonitorThreadTests {
 
 			assertEquals("Incorrect number of events was logged", 1, loggedEvents.size());
 			UiFreezeEvent event = loggedEvents.get(0);
-			assertTrue("Possible deadlock logging should have stack a valid number of stack traces",
+			assertTrue("Possible deadlock logging should have a valid number of stack traces",
 					event.getStackTraceSamples().length >= MIN_STACK_TRACES);
 
 			// Extending the UI freeze shouldn't log any more events.
@@ -273,7 +294,7 @@ public class EventLoopMonitorThreadTests {
 
 	@Test
 	public void testPublishNoDeadlocksWhenSleeping() throws Exception {
-		monitoringThread = createTestThread(THRESHOLD_MS);
+		monitoringThread = createTestThread(FREEZE_THRESHOLD_MS);
 		monitoringThread.start();
 		sendEvent(SWT.PreEvent);
 
@@ -287,7 +308,7 @@ public class EventLoopMonitorThreadTests {
 			sendEvent(SWT.PreExternalEventDispatch);
 
 			// Wait for the end of the event to propagate to the deadlock tracker.
-			runForTime(FORCE_DEADLOCK_LOG_TIME_MILLIS * 2);
+			runForTime(FORCE_DEADLOCK_LOG_TIME_MS * 2);
 			runForCycles(3);
 		}
 
@@ -296,58 +317,57 @@ public class EventLoopMonitorThreadTests {
 
 	@Test
 	public void testNoLoggingForSleep() throws Exception {
-		int eventFactor = 5;
-		monitoringThread = createTestThread(THRESHOLD_MS);
+		final int freezeDurationFactor = 4;
+		monitoringThread = createTestThread(FREEZE_THRESHOLD_MS);
 		monitoringThread.start();
 
 		// One level deep
 		synchronized (sleepLock) {
 			sendEvent(SWT.PreExternalEventDispatch);
-			runForTime(eventFactor * SAMPLE_INTERVAL_MS);
+			runForTime(FREEZE_THRESHOLD_MS * freezeDurationFactor);
 			sendEvent(SWT.PostExternalEventDispatch);
 			runForCycles(3);
 		}
 
-		assertTrue("Sleeping should not trigger a long running event", loggedEvents.isEmpty());
+		assertTrue("Sleeping should not trigger a freeze event", loggedEvents.isEmpty());
 	}
 
 	@Test
 	public void testEventLogging() throws Exception {
-		int eventFactor = 5;
-		long eventStartTime = 0;
-		long eventStallDuration = 0;
-
-		monitoringThread = createTestThread(THRESHOLD_MS);
+		final int freezeDurationFactor = 5;
+		monitoringThread = createTestThread(FREEZE_THRESHOLD_MS);
 		monitoringThread.start();
+		long eventStartTime;
+		long freezeDuration;
 
 		// One level deep
 		synchronized (sleepLock) {
 			sendEvent(SWT.PreEvent); // level 1
 			eventStartTime = timestamp;
-			runForTime(eventFactor * THRESHOLD_MS);
-			eventStallDuration = timestamp - eventStartTime;
+			runForTime(FREEZE_THRESHOLD_MS * freezeDurationFactor);
+			freezeDuration = timestamp - eventStartTime;
 			sendEvent(SWT.PostEvent);
 			runForCycles(3);
 		}
 
-		assertEquals("Incorrect number of long events was logged", 1, loggedEvents.size());
+		assertEquals("Incorrect number of freeze events was logged", 1, loggedEvents.size());
 		UiFreezeEvent event = loggedEvents.get(0);
-		assertEquals("A long running event log has an incorrect start time", eventStartTime,
+		assertEquals("A freeze event log has an incorrect start time", eventStartTime,
 				event.getStartTimestamp());
-		assertEquals("A long running event's duration was incorrect", eventStallDuration,
+		assertEquals("A freeze event's duration was incorrect", freezeDuration,
 				event.getTotalDuration());
-		assertEquals("A long running event didn't capture a good range of stack traces",
-				expectedStackCount(eventStallDuration), event.getStackTraceSamples().length);
+		assertEquals("A freeze event didn't capture a good range of stack samples ("
+				+ getStackSamplesTimeline(event) + ")",
+				expectedStackCount(freezeDuration), event.getStackTraceSamples().length);
 	}
 
 	@Test
 	public void testNestedEventLogging() throws Exception {
-		int eventFactor = 6;
-
-		monitoringThread = createTestThread(THRESHOLD_MS);
+		final int freezeDurationFactor = 6;
+		monitoringThread = createTestThread(FREEZE_THRESHOLD_MS);
 		monitoringThread.start();
-		long eventStartTime = 0;
-		long eventStallDuration = 0;
+		long eventStartTime;
+		long freezeDuration;
 
 		// Two levels deep
 		synchronized (sleepLock) {
@@ -355,31 +375,31 @@ public class EventLoopMonitorThreadTests {
 			runForCycles(1);
 			sendEvent(SWT.PreEvent); // level 2
 			eventStartTime = timestamp;
-			runForTime(eventFactor * THRESHOLD_MS);
-			eventStallDuration = timestamp - eventStartTime;
+			runForTime(FREEZE_THRESHOLD_MS * freezeDurationFactor);
+			freezeDuration = timestamp - eventStartTime;
 			sendEvent(SWT.PostEvent);
 			sendEvent(SWT.PostEvent);
 			runForCycles(3);
 		}
 
-		assertEquals("Incorrect number of long events was logged", 1, loggedEvents.size());
+		assertEquals("Incorrect number of freeze events was logged", 1, loggedEvents.size());
 		UiFreezeEvent event = loggedEvents.get(0);
-		assertEquals("A long running event log has an incorrect start time", eventStartTime,
+		assertEquals("A freeze event log has an incorrect start time", eventStartTime,
 				event.getStartTimestamp());
-		assertEquals("A long running event's duration was incorrect", eventStallDuration,
+		assertEquals("A freeze event's duration was incorrect", freezeDuration,
 				event.getTotalDuration());
-		assertEquals("A long running event didn't capture a good range of stack traces",
-				expectedStackCount(eventStallDuration), event.getStackTraceSamples().length);
+		assertEquals("A freeze event didn't capture a good range of stack samples ("
+				+ getStackSamplesTimeline(event) + ")",
+				expectedStackCount(freezeDuration), event.getStackTraceSamples().length);
 	}
 
 	@Test
 	public void testDoublyNestedEventLogging() throws Exception {
-		int eventFactor = 7;
-
-		monitoringThread = createTestThread(THRESHOLD_MS);
+		final int freezeDurationFactor = 7;
+		monitoringThread = createTestThread(FREEZE_THRESHOLD_MS);
 		monitoringThread.start();
-		long eventStartTime = 0;
-		long eventStallDuration = 0;
+		long eventStartTime;
+		long freezeDuration;
 
 		// Three levels deep
 		synchronized (sleepLock) {
@@ -389,35 +409,35 @@ public class EventLoopMonitorThreadTests {
 			runForCycles(1);
 			sendEvent(SWT.PreEvent); // level 3
 			eventStartTime = timestamp;
-			runForTime(eventFactor * THRESHOLD_MS);
-			eventStallDuration = timestamp - eventStartTime;
+			runForTime(FREEZE_THRESHOLD_MS * freezeDurationFactor);
+			freezeDuration = timestamp - eventStartTime;
 			sendEvent(SWT.PostEvent);
 			sendEvent(SWT.PostEvent);
 			sendEvent(SWT.PostEvent);
 			runForCycles(3);
 		}
 
-		assertEquals("Incorrect number of long events was logged", 1, loggedEvents.size());
+		assertEquals("Incorrect number of freeze events was logged", 1, loggedEvents.size());
 		UiFreezeEvent event = loggedEvents.get(0);
-		assertEquals("A long running event log has an incorrect start time", eventStartTime,
+		assertEquals("A freeze event log has an incorrect start time", eventStartTime,
 				event.getStartTimestamp());
-		assertEquals("A long running event's duration was incorrect", eventStallDuration,
+		assertEquals("A freeze event's duration was incorrect", freezeDuration,
 				event.getTotalDuration());
-		assertEquals("A long running event didn't capture a good range of stack traces",
-				expectedStackCount(eventStallDuration), event.getStackTraceSamples().length);
+		assertEquals("A freeze event didn't capture a good range of stack samples ("
+				+ getStackSamplesTimeline(event) + ")",
+				expectedStackCount(freezeDuration), event.getStackTraceSamples().length);
 	}
 
 	@Test
 	public void testSeeLongEventInContinuationAfterNestedCall() throws Exception {
-		int eventFactor = 4;
-
-		monitoringThread = createTestThread(THRESHOLD_MS);
+		final int freezeDurationFactor = 5;
+		monitoringThread = createTestThread(FREEZE_THRESHOLD_MS);
 		monitoringThread.start();
-		long eventResumeTime = 0;
-		long eventStallDuration = 0;
+		long eventResumeTime;
+		long freezeDuration;
 
-		// Exceed the threshold after the thread is started in the middle of an event, then end the
-		// event and validate that no long event was logged.
+		// Exceed the threshold after the thread is started in the middle of an event, then end
+		// the event and validate that no freeze event was logged.
 		synchronized (sleepLock) {
 			sendEvent(SWT.PreEvent);
 			// Initially the outer thread is invoking nested events that are responsive.
@@ -428,32 +448,33 @@ public class EventLoopMonitorThreadTests {
 			}
 
 			eventResumeTime = timestamp;
-			runForTime(eventFactor * THRESHOLD_MS);
+			runForTime(FREEZE_THRESHOLD_MS * freezeDurationFactor);
 			sendEvent(SWT.PostEvent);
-			eventStallDuration = timestamp - eventResumeTime;
+			freezeDuration = timestamp - eventResumeTime;
 			runForCycles(3);
 		}
 
-		assertEquals("Incorrect number of long events was logged", 1, loggedEvents.size());
+		assertEquals("Incorrect number of freeze events was logged", 1, loggedEvents.size());
 		UiFreezeEvent event = loggedEvents.get(0);
-		assertEquals("A long running event didn't start from the nested return point",
+		assertEquals("A freeze event didn't start from the nested return point",
 				eventResumeTime, event.getStartTimestamp());
-		assertEquals("A long running event's duration was incorrect", eventStallDuration,
+		assertEquals("A freeze event's duration was incorrect", freezeDuration,
 				event.getTotalDuration());
-		assertEquals("A long running event didn't capture a good range of stack traces",
-				expectedStackCount(eventStallDuration), event.getStackTraceSamples().length);
+		assertEquals("A freeze event didn't capture a good range of stack samples ("
+				+ getStackSamplesTimeline(event) + ")",
+				expectedStackCount(freezeDuration), event.getStackTraceSamples().length);
 	}
 
 	@Test
 	public void testSeeLongEventInTheMiddleOfNestedCalls() throws Exception {
-		int eventFactor = 4;
-		monitoringThread = createTestThread(THRESHOLD_MS);
+		final int freezeDurationFactor = 5;
+		monitoringThread = createTestThread(FREEZE_THRESHOLD_MS);
 		monitoringThread.start();
-		long eventResumeTime = 0;
-		long eventStallDuration = 0;
+		long eventResumeTime;
+		long freezeDuration;
 
 		// Exceed the threshold after the thread is started in the middle of an event, then end
-		// the event and validate that no long event was logged.
+		// the event and validate that no freeze event was logged.
 		synchronized (sleepLock) {
 			sendEvent(SWT.PreEvent);
 			// Initially the outer thread is invoking nested events that are responsive.
@@ -465,8 +486,8 @@ public class EventLoopMonitorThreadTests {
 
 			// This is the nested event UI freeze
 			eventResumeTime = timestamp;
-			runForTime(eventFactor * THRESHOLD_MS);
-			eventStallDuration = timestamp - eventResumeTime;
+			runForTime(FREEZE_THRESHOLD_MS * freezeDurationFactor);
+			freezeDuration = timestamp - eventResumeTime;
 
 			// Before exiting the outer thread is invoking nested events that are responsive.
 			for (int i = 0; i < 3; i++) {
@@ -479,24 +500,25 @@ public class EventLoopMonitorThreadTests {
 			runForCycles(3);
 		}
 
-		assertEquals("Incorrect number of long events was logged", 1, loggedEvents.size());
+		assertEquals("Incorrect number of freeze events was logged", 1, loggedEvents.size());
 		UiFreezeEvent event = loggedEvents.get(0);
-		assertEquals("A long running event didn't start from the nested return point",
+		assertEquals("A freeze event didn't start from the nested return point",
 				eventResumeTime, event.getStartTimestamp());
-		assertEquals("A long running event's duration was incorrect", eventStallDuration,
+		assertEquals("A freeze event's duration was incorrect", freezeDuration,
 				event.getTotalDuration());
-		assertEquals("A long running event didn't capture a good range of stack traces",
-				expectedStackCount(eventStallDuration), event.getStackTraceSamples().length);
+		assertEquals("A freeze event didn't capture a good range of stack samples ("
+				+ getStackSamplesTimeline(event) + ")",
+				expectedStackCount(freezeDuration), event.getStackTraceSamples().length);
 	}
 
 	@Test
 	public void testSeeSleepInTheMiddleOfNestedCalls() throws Exception {
-		int eventFactor = 4;
-		monitoringThread = createTestThread(THRESHOLD_MS);
+		final int freezeDurationFactor = 4;
+		monitoringThread = createTestThread(FREEZE_THRESHOLD_MS);
 		monitoringThread.start();
 
 		// Exceed the threshold after the thread is started in the middle of an event, then end
-		// the event and validate that no long event was logged.
+		// the event and validate that no freeze event was logged.
 		synchronized (sleepLock) {
 			sendEvent(SWT.PreEvent);
 			// Initially the outer thread is invoking nested events that are responsive.
@@ -507,7 +529,7 @@ public class EventLoopMonitorThreadTests {
 			}
 
 			// Nested events
-			for (int i = 0; i < eventFactor; ++i) {
+			for (int i = 0; i < freezeDurationFactor; ++i) {
 				runForCycles(1);
 				sendEvent(SWT.PreExternalEventDispatch);
 				sendEvent(SWT.PostExternalEventDispatch);
@@ -523,35 +545,34 @@ public class EventLoopMonitorThreadTests {
 			runForCycles(3);
 		}
 
-		assertTrue("A long running event should not be published during an external event dispatch",
+		assertTrue("A freeze event should not be published during an external event dispatch",
 				loggedEvents.isEmpty());
 	}
 
 	@Test
 	public void testConsecutiveSleeps() throws Exception {
-		int eventFactor = 5;
-		long eventStartTime = 0;
-		long eventDuration = 0;
-
-		monitoringThread = createTestThread(THRESHOLD_MS);
+		final int freezeDurationFactor = 5;
+		monitoringThread = createTestThread(FREEZE_THRESHOLD_MS);
 		monitoringThread.start();
+		long eventStartTime;
+		long eventDuration;
 
 		synchronized (sleepLock) {
 			sendEvent(SWT.PreEvent);
 			sendEvent(SWT.PreExternalEventDispatch);
-			runForTime(THRESHOLD_MS);
+			runForTime(FREEZE_THRESHOLD_MS);
 			sendEvent(SWT.PostExternalEventDispatch);
 			eventStartTime = timestamp;
 			runForCycles(3);
 		}
 
-		assertTrue("A long running event shold not be published during an external event dispatch",
+		assertTrue("A freeze event shold not be published during an external event dispatch",
 				loggedEvents.isEmpty());
 
 		// Let a long time elapse between the last PostExternalEventDispatch and the next
 		// PreExternalEventDispatch.
 		synchronized (sleepLock) {
-			runForTime(THRESHOLD_MS * eventFactor);
+			runForTime(FREEZE_THRESHOLD_MS * freezeDurationFactor);
 			eventDuration = timestamp - eventStartTime;
 			sendEvent(SWT.PreExternalEventDispatch);
 			sendEvent(SWT.PostExternalEventDispatch);
@@ -559,11 +580,11 @@ public class EventLoopMonitorThreadTests {
 			runForCycles(3);
 		}
 
-		assertEquals("Incorrect number of long events was logged", 1, loggedEvents.size());
+		assertEquals("Incorrect number of freeze events was logged", 1, loggedEvents.size());
 		UiFreezeEvent event = loggedEvents.get(0);
-		assertEquals("A long running event log has an incorrect start time", eventStartTime,
+		assertEquals("A freeze event log has an incorrect start time", eventStartTime,
 				event.getStartTimestamp());
-		assertEquals("A long running event's duration is incorrect", eventDuration,
+		assertEquals("A freeze event's duration is incorrect", eventDuration,
 				event.getTotalDuration());
 	}
 }

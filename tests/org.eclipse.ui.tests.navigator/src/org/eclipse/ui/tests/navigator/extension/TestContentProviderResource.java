@@ -19,10 +19,11 @@ public class TestContentProviderResource extends
 
 	public static boolean _returnBadObject;
 
-	public static void resetTest() { 
+	public static void resetTest() {
 		_returnBadObject = false;
 	}
-	
+
+	@Override
 	public Object[] getChildren(Object parentElement) {
 
 		if (_returnBadObject && parentElement instanceof IProject)
