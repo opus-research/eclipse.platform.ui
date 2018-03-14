@@ -119,7 +119,7 @@ public final class ContributionsAnalyzer {
 		if (id == null || id.length() == 0) {
 			return;
 		}
-		ArrayList<String> popupIds = new ArrayList<String>();
+		ArrayList<String> popupIds = new ArrayList<>();
 		if (includePopups) {
 			popupIds.add(id);
 			for (String tag : menuModel.getTags()) {
@@ -131,7 +131,7 @@ public final class ContributionsAnalyzer {
 				}
 			}
 		}
-		ArrayList<MMenuContribution> includedPopups = new ArrayList<MMenuContribution>();
+		ArrayList<MMenuContribution> includedPopups = new ArrayList<>();
 		for (MMenuContribution menuContribution : menuContributionList) {
 			String parentID = menuContribution.getParentId();
 			if (parentID == null) {
@@ -264,8 +264,8 @@ public final class ContributionsAnalyzer {
 			final ArrayList<MMenuContribution> toContribute,
 			final ArrayList<MMenuElement> menuContributionsToRemove) {
 
-		HashSet<String> existingMenuIds = new HashSet<String>();
-		HashSet<String> existingSeparatorNames = new HashSet<String>();
+		HashSet<String> existingMenuIds = new HashSet<>();
+		HashSet<String> existingSeparatorNames = new HashSet<>();
 		for (MMenuElement child : menuModel.getChildren()) {
 			String elementId = child.getElementId();
 			if (child instanceof MMenu && elementId != null) {
@@ -277,7 +277,7 @@ public final class ContributionsAnalyzer {
 
 		boolean done = toContribute.size() == 0;
 		while (!done) {
-			ArrayList<MMenuContribution> curList = new ArrayList<MMenuContribution>(toContribute);
+			ArrayList<MMenuContribution> curList = new ArrayList<>(toContribute);
 			int retryCount = toContribute.size();
 			toContribute.clear();
 
@@ -569,14 +569,14 @@ public final class ContributionsAnalyzer {
 
 	public static void mergeToolBarContributions(ArrayList<MToolBarContribution> contributions,
 			ArrayList<MToolBarContribution> result) {
-		HashMap<ToolBarKey, ArrayList<MToolBarContribution>> buckets = new HashMap<ToolBarKey, ArrayList<MToolBarContribution>>();
+		HashMap<ToolBarKey, ArrayList<MToolBarContribution>> buckets = new HashMap<>();
 		trace("mergeContributions size: " + contributions.size(), null); //$NON-NLS-1$
 		// first pass, sort by parentId?position,scheme,visibleWhen
 		for (MToolBarContribution contribution : contributions) {
 			ToolBarKey key = getKey(contribution);
 			ArrayList<MToolBarContribution> slot = buckets.get(key);
 			if (slot == null) {
-				slot = new ArrayList<MToolBarContribution>();
+				slot = new ArrayList<>();
 				buckets.put(key, slot);
 			}
 			slot.add(contribution);
@@ -613,7 +613,7 @@ public final class ContributionsAnalyzer {
 
 	public static void mergeContributions(ArrayList<MMenuContribution> contributions,
 			ArrayList<MMenuContribution> result) {
-		HashMap<MenuKey, ArrayList<MMenuContribution>> buckets = new HashMap<MenuKey, ArrayList<MMenuContribution>>();
+		HashMap<MenuKey, ArrayList<MMenuContribution>> buckets = new HashMap<>();
 		trace("mergeContributions size: " + contributions.size(), null); //$NON-NLS-1$
 		printContributions(contributions);
 		// first pass, sort by parentId?position,scheme,visibleWhen
@@ -621,7 +621,7 @@ public final class ContributionsAnalyzer {
 			MenuKey key = getKey(contribution);
 			ArrayList<MMenuContribution> slot = buckets.get(key);
 			if (slot == null) {
-				slot = new ArrayList<MMenuContribution>();
+				slot = new ArrayList<>();
 				buckets.put(key, slot);
 			}
 			slot.add(contribution);
@@ -715,14 +715,14 @@ public final class ContributionsAnalyzer {
 
 	public static void mergeTrimContributions(ArrayList<MTrimContribution> contributions,
 			ArrayList<MTrimContribution> result) {
-		HashMap<TrimKey, ArrayList<MTrimContribution>> buckets = new HashMap<TrimKey, ArrayList<MTrimContribution>>();
+		HashMap<TrimKey, ArrayList<MTrimContribution>> buckets = new HashMap<>();
 		trace("mergeContributions size: " + contributions.size(), null); //$NON-NLS-1$
 		// first pass, sort by parentId?position,scheme,visibleWhen
 		for (MTrimContribution contribution : contributions) {
 			TrimKey key = getKey(contribution);
 			ArrayList<MTrimContribution> slot = buckets.get(key);
 			if (slot == null) {
-				slot = new ArrayList<MTrimContribution>();
+				slot = new ArrayList<>();
 				buckets.put(key, slot);
 			}
 			slot.add(contribution);

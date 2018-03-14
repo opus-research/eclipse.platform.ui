@@ -127,7 +127,7 @@ public class ReflectionContributionFactory implements IContributionFactory {
 	}
 
 	protected void processLanguages() {
-		languages = new HashMap<String, Object>();
+		languages = new HashMap<>();
 		String extId = "org.eclipse.e4.languages"; //$NON-NLS-1$
 		IConfigurationElement[] languageElements = registry.getConfigurationElementsFor(extId);
 		for (int i = 0; i < languageElements.length; i++) {
