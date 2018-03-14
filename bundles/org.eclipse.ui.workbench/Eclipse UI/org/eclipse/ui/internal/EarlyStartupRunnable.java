@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445484
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445484, 457132
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -42,7 +42,9 @@ public class EarlyStartupRunnable extends SafeRunnable {
     @Override
 	public void run() throws Exception {
 		IConfigurationElement[] configElements = extension.getConfigurationElements();
-
+		if (configElements.length == 0) {
+			handleException(null);
+		}
         // look for the startup tag in each element and run the extension
         for (IConfigurationElement element : configElements) {
             if (element != null&& element.getName().equals(IWorkbenchConstants.TAG_STARTUP)) {
