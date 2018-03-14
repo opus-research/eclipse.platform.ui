@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 477774
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -40,10 +41,14 @@ public interface ITreeContentProvider extends IStructuredContentProvider {
      * </p>
      * The result is not modified by the viewer.
      *
+     * The default implementation of this method assumes that there are no children.
+     *
      * @param parentElement the parent element
-     * @return an array of child elements
+     * @return an array of child elements. An empty object array is the default.
      */
-    public Object[] getChildren(Object parentElement);
+    default public Object[] getChildren(Object parentElement) {
+        return new Object[0];
+    }
 
     /**
      * Returns the parent for the given element, or <code>null</code>
@@ -51,11 +56,15 @@ public interface ITreeContentProvider extends IStructuredContentProvider {
      * In this case the tree-structured viewer can't expand
      * a given node correctly if requested.
      *
+     * The default implementation of this method assumes that there is no parent.
+     *
      * @param element the element
      * @return the parent element, or <code>null</code> if it
-     *   has none or if the parent cannot be computed
+     *   has none or if the parent cannot be computed. <code>null</code> is the default.
      */
-    public Object getParent(Object element);
+    default public Object getParent(Object element) {
+        return null;
+    }
 
     /**
      * Returns whether the given element has children.
@@ -65,9 +74,13 @@ public interface ITreeContentProvider extends IStructuredContentProvider {
      * this more efficiently than <code>getChildren</code>.
      * </p>
      *
+     * The default implementation of this method assumes that there are no children.
+     *
      * @param element the element
      * @return <code>true</code> if the given element has children,
-     *  and <code>false</code> if it has no children
+     *  and <code>false</code> if it has no children. <code>false</code> is the default.
      */
-    public boolean hasChildren(Object element);
+    default public boolean hasChildren(Object element) {
+        return false;
+    }
 }
