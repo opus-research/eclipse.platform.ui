@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Hendrik Still and others.
+ * Copyright (c) 2013 Hendrik Still and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     Hendrik Still<hendrik.still@gammas.de> - initial implementation
  *     Lars Vogel <lars.vogel@gmail.com> - Bug 414565
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414565
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -67,10 +66,10 @@ public class Snippet063ComboViewer {
 	private MyModel[] createModel() {
 		MyModel[] elements = new MyModel[11];
 
-		for (int i = 0; i < elements.length - 1; i++) {
+		for (int i = 0; i < 10; i++) {
 			elements[i] = new MyModel(i);
 		}
-		elements[elements.length - 1] = new MyModel(42);
+		elements[10] = new MyModel(42);
 
 		return elements;
 	}
@@ -88,6 +87,7 @@ public class Snippet063ComboViewer {
 				display.sleep();
 			}
 		}
+
 		display.dispose();
 
 	}
