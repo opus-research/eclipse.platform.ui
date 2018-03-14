@@ -149,7 +149,7 @@ public class ResourceHandler implements IModelResourceHandler {
 					context.set(MApplication.class, appElement);
 					ModelAssembler contribProcessor = ContextInjectionFactory.make(
 							ModelAssembler.class, context);
-					contribProcessor.processModel(true);
+					contribProcessor.processModel();
 
 					File deltaOldFile = new File(baseLocation, "deltas_42M7migration.xml"); //$NON-NLS-1$
 					deltaFile.renameTo(deltaOldFile);
@@ -199,7 +199,6 @@ public class ResourceHandler implements IModelResourceHandler {
 		// long lastApplicationModification = getLastApplicationModification();
 		// boolean restore = restoreLastModified > lastApplicationModification;
 		boolean restore = restoreLastModified > 0;
-		boolean initialModel;
 
 		resource = null;
 		if (restore && saveAndRestore) {
@@ -210,9 +209,6 @@ public class ResourceHandler implements IModelResourceHandler {
 			MApplication theApp = (MApplication) applicationResource.getContents().get(0);
 			resource = createResourceWithApp(theApp);
 			context.set(E4Workbench.NO_SAVED_MODEL_FOUND, Boolean.TRUE);
-			initialModel = true;
-		} else {
-			initialModel = false;
 		}
 
 		// Add model items described in the model extension point
@@ -222,7 +218,7 @@ public class ResourceHandler implements IModelResourceHandler {
 		this.context.set(MApplication.class, appElement);
 		ModelAssembler contribProcessor = ContextInjectionFactory.make(ModelAssembler.class,
 				context);
-		contribProcessor.processModel(initialModel);
+		contribProcessor.processModel();
 
 		if (!clearPersistedState) {
 			CommandLineOptionModelProcessor processor = ContextInjectionFactory.make(
