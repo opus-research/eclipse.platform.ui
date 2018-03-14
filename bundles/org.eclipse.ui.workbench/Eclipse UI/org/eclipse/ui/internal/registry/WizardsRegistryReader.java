@@ -121,6 +121,13 @@ public class WizardsRegistryReader extends RegistryReader {
         plugin = pluginId;
     }
 
+    /* (non-Javadoc)
+     * Method declared on WizardRegistryReader.
+     * <p>
+     * This implementation uses a defering strategy.  For more info see
+     * <code>readWizards</code>.
+     * </p>
+     */
     protected void addNewElementToResult(WorkbenchWizardElement element,
             IConfigurationElement config) {
         // TODO: can we remove the config parameter?

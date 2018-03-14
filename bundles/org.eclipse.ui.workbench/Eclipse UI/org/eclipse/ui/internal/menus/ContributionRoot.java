@@ -49,6 +49,9 @@ final class ContributionRoot implements
 		this.factory = factory;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.menus.IContributionRoot#addContributionItem(org.eclipse.jface.action.IContributionItem, org.eclipse.core.expressions.Expression, org.eclipse.core.expressions.Expression)
+	 */
 	@Override
 	public void addContributionItem(IContributionItem item,
 			Expression visibleWhen) {
@@ -100,6 +103,13 @@ final class ContributionRoot implements
 		topLevelItems.clear();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.menus.IContributionRoot#registerVisibilityForChild(org.eclipse.jface.action.IContributionItem,
+	 *      org.eclipse.core.expressions.Expression,
+	 *      org.eclipse.core.expressions.Expression)
+	 */
 	@Override
 	public void registerVisibilityForChild(IContributionItem item,
 			Expression visibleWhen) {

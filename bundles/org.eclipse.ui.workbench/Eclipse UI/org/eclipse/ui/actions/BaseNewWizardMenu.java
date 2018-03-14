@@ -61,6 +61,9 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
 
     private final IExtensionChangeHandler configListener = new IExtensionChangeHandler() {
 
+        /* (non-Javadoc)
+         * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension, java.lang.Object[])
+         */
         @Override
 		public void removeExtension(IExtension source, Object[] objects) {
             for (int i = 0; i < objects.length; i++) {
@@ -70,6 +73,9 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
             }
         }
 
+        /* (non-Javadoc)
+         * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker, org.eclipse.core.runtime.IExtension)
+         */
         @Override
 		public void addExtension(IExtensionTracker tracker, IExtension extension) {
             // Do nothing
@@ -156,6 +162,11 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
         return added;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.action.IContributionItem#dispose()
+     */
     @Override
 	public void dispose() {
         if (workbenchWindow != null) {
@@ -167,6 +178,10 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
         }
     }
 
+    /*
+     * (non-Javadoc) Returns the action for the given wizard id, or null if not
+     * found.
+     */
     private IAction getAction(String id) {
         // Keep a cache, rather than creating a new action each time,
         // so that image caching in ActionContributionItem works.
@@ -189,6 +204,11 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
         return action;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.ui.actions.CompoundContributionItem#getContributionItems()
+     */
     @Override
 	protected IContributionItem[] getContributionItems() {
         ArrayList list = new ArrayList();
