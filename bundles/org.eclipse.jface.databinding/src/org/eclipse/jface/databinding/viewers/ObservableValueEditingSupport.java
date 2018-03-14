@@ -59,19 +59,16 @@ public abstract class ObservableValueEditingSupport extends EditingSupport {
 			final IValueProperty cellEditorProperty,
 			final IValueProperty elementProperty) {
 		return new ObservableValueEditingSupport(viewer, dbc) {
-			@Override
 			protected IObservableValue doCreateCellEditorObservable(
 					CellEditor cellEditor) {
 				return cellEditorProperty.observe(cellEditor);
 			}
 
-			@Override
 			protected IObservableValue doCreateElementObservable(
 					Object element, ViewerCell cell) {
 				return elementProperty.observe(element);
 			}
 
-			@Override
 			protected CellEditor getCellEditor(Object element) {
 				return cellEditor;
 			}
@@ -116,7 +113,6 @@ public abstract class ObservableValueEditingSupport extends EditingSupport {
 	 * 
 	 * @see org.eclipse.jface.viewers.EditingSupport#canEdit(java.lang.Object)
 	 */
-	@Override
 	protected boolean canEdit(Object element) {
 		return true;
 	}
@@ -127,7 +123,6 @@ public abstract class ObservableValueEditingSupport extends EditingSupport {
 	 * 
 	 * @see org.eclipse.jface.viewers.EditingSupport#getValue(java.lang.Object)
 	 */
-	@Override
 	protected Object getValue(Object element) {
 		// no op
 		return null;
@@ -140,7 +135,6 @@ public abstract class ObservableValueEditingSupport extends EditingSupport {
 	 * @see org.eclipse.jface.viewers.EditingSupport#setValue(java.lang.Object,
 	 *      java.lang.Object)
 	 */
-	@Override
 	protected void setValue(Object element, Object value) {
 		// no op
 	}
@@ -151,7 +145,6 @@ public abstract class ObservableValueEditingSupport extends EditingSupport {
 	 * {@link #doCreateElementObservable(Object, ViewerCell)}, and then
 	 * {@link #createBinding(IObservableValue, IObservableValue)}.
 	 */
-	@Override
 	final protected void initializeCellEditorValue(CellEditor cellEditor,
 			ViewerCell cell) {
 		IObservableValue target = doCreateCellEditorObservable(cellEditor);
@@ -168,7 +161,6 @@ public abstract class ObservableValueEditingSupport extends EditingSupport {
 		Binding binding = createBinding(target, model);
 
 		target.addChangeListener(new IChangeListener() {
-			@Override
 			public void handleChange(ChangeEvent event) {
 				dirty = true;
 			}
@@ -222,7 +214,6 @@ public abstract class ObservableValueEditingSupport extends EditingSupport {
 	/**
 	 * Updates the model from the target.
 	 */
-	@Override
 	final protected void saveCellEditorValue(CellEditor cellEditor,
 			ViewerCell cell) {
 		if (dirty) {
@@ -234,12 +225,10 @@ public abstract class ObservableValueEditingSupport extends EditingSupport {
 	private class ColumnViewerEditorActivationListenerHelper extends
 			ColumnViewerEditorActivationListener {
 
-		@Override
 		public void afterEditorActivated(ColumnViewerEditorActivationEvent event) {
 			// do nothing
 		}
 
-		@Override
 		public void afterEditorDeactivated(
 				ColumnViewerEditorDeactivationEvent event) {
 			editingState.dispose();
@@ -248,13 +237,11 @@ public abstract class ObservableValueEditingSupport extends EditingSupport {
 			viewer.getColumnViewerEditor().removeEditorActivationListener(this);
 		}
 
-		@Override
 		public void beforeEditorActivated(
 				ColumnViewerEditorActivationEvent event) {
 			// do nothing
 		}
 
-		@Override
 		public void beforeEditorDeactivated(
 				ColumnViewerEditorDeactivationEvent event) {
 			// do nothing

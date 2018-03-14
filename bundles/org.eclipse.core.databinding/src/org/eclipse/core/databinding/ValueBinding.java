@@ -38,7 +38,6 @@ class ValueBinding extends Binding {
 	private boolean updatingTarget;
 	private boolean updatingModel;
 	private IValueChangeListener targetChangeListener = new IValueChangeListener() {
-		@Override
 		public void handleValueChange(ValueChangeEvent event) {
 			if (!updatingTarget
 					&& !Util.equals(event.diff.getOldValue(), event.diff
@@ -48,7 +47,6 @@ class ValueBinding extends Binding {
 		}
 	};
 	private IValueChangeListener modelChangeListener = new IValueChangeListener() {
-		@Override
 		public void handleValueChange(ValueChangeEvent event) {
 			if (!updatingModel
 					&& !Util.equals(event.diff.getOldValue(), event.diff
@@ -84,7 +82,6 @@ class ValueBinding extends Binding {
 		}
 	}
 
-	@Override
 	protected void preInit() {
 		ObservableTracker.setIgnore(true);
 		try {
@@ -95,7 +92,6 @@ class ValueBinding extends Binding {
 		}
 	}
 
-	@Override
 	protected void postInit() {
 		if (modelToTarget.getUpdatePolicy() == UpdateValueStrategy.POLICY_UPDATE) {
 			updateModelToTarget();
@@ -108,17 +104,14 @@ class ValueBinding extends Binding {
 		}
 	}
 
-	@Override
 	public IObservableValue getValidationStatus() {
 		return validationStatusObservable;
 	}
 
-	@Override
 	public void updateTargetToModel() {
 		doUpdate(target, model, targetToModel, true, false);
 	}
 
-	@Override
 	public void updateModelToTarget() {
 		doUpdate(model, target, modelToTarget, true, false);
 	}
@@ -156,7 +149,6 @@ class ValueBinding extends Binding {
 			return;
 
 		source.getRealm().exec(new Runnable() {
-			@Override
 			public void run() {
 				boolean destinationRealmReached = false;
 				final MultiStatus multiStatus = BindingStatus.ok();
@@ -194,7 +186,6 @@ class ValueBinding extends Binding {
 					// Set value
 					destinationRealmReached = true;
 					destination.getRealm().exec(new Runnable() {
-						@Override
 						public void run() {
 							if (destination == target) {
 								updatingTarget = true;
@@ -235,26 +226,22 @@ class ValueBinding extends Binding {
 		});
 	}
 
-	@Override
 	public void validateModelToTarget() {
 		doUpdate(model, target, modelToTarget, true, true);
 	}
 
-	@Override
 	public void validateTargetToModel() {
 		doUpdate(target, model, targetToModel, true, true);
 	}
 
 	private void setValidationStatus(final IStatus status) {
 		validationStatusObservable.getRealm().exec(new Runnable() {
-			@Override
 			public void run() {
 				validationStatusObservable.setValue(status);
 			}
 		});
 	}
 
-	@Override
 	public void dispose() {
 		if (targetChangeListener != null) {
 			target.removeValueChangeListener(targetChangeListener);
