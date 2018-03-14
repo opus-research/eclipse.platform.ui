@@ -23,8 +23,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -44,6 +48,7 @@ import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.internal.workbench.Activator;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
+import org.eclipse.e4.ui.internal.workbench.ModelAssembler;
 import org.eclipse.e4.ui.internal.workbench.Policy;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
@@ -1085,6 +1090,8 @@ public class PartRenderingEngine implements IPresentationEngine {
 					earlyStartup.run();
 				}
 
+				modelAssemblerFinalStep();
+
 				TestableObject testableObject = (TestableObject) runContext
 						.get(TestableObject.class.getName());
 				if (testableObject instanceof E4Testable) {
@@ -1136,6 +1143,44 @@ public class PartRenderingEngine implements IPresentationEngine {
 				if (!spinOnce) {
 					cleanUp();
 				}
+			}
+
+			/**
+			 * Starts the final model assembly phase (bug 376486)
+			 */
+			private void modelAssemblerFinalStep() {
+				final Job job = new Job("Workbench Final Model Assembly") { //$NON-NLS-1$
+					protected IStatus run(IProgressMonitor monitor) {
+						monitor.beginTask("Running Model Assembler",
+								IProgressMonitor.UNKNOWN);
+
+						while (getJobManager().find("earlyStartup").length > 0) {
+							try {
+								Thread.sleep(100);
+							} catch (InterruptedException e) {
+							}
+							if (monitor.isCanceled()) {
+								break;
+							}
+						}
+
+						if (!monitor.isCanceled()) {
+							String xmiUriArg = System
+									.getProperty(org.eclipse.e4.ui.workbench.IWorkbench.XMI_URI_ARG);
+							if ("org.eclipse.ui.workbench/LegacyIDE.e4xmi".equals(xmiUriArg)) { //$NON-NLS-1$
+								ModelAssembler contribProcessor = ContextInjectionFactory
+										.make(ModelAssembler.class, appContext);
+								contribProcessor
+										.processModel(ModelAssembler.E3_E3STEP);
+							}
+							monitor.done();
+							return Status.OK_STATUS;
+						}
+						return Status.CANCEL_STATUS;
+					}
+				};
+				job.setSystem(true);
+				job.schedule();
 			}
 
 			private void handle(Throwable ex, IEventLoopAdvisor advisor) {
