@@ -1384,12 +1384,6 @@
             id="org.eclipse.ui.activeContextInfo"
             name="%activeContextInfo.name">
       </command>
-      <command
-            categoryId="org.eclipse.ui.category.window"
-            description="%command.resetCoolbar.description"
-            id="org.eclipse.ui.resetCoolbarAction"
-            name="%command.resetCoolbar.name">
-      </command>
    </extension>
    
    <extension
@@ -1424,16 +1418,16 @@
             icon="$nl$/icons/full/etool16/redo_edit.png"/>
       <image
             commandId="org.eclipse.ui.file.save"
-            disabledIcon="$nl$/icons/full/dtool16/save_edit.gif"
-            icon="$nl$/icons/full/etool16/save_edit.gif"/>
+            disabledIcon="$nl$/icons/full/dtool16/save_edit.png"
+            icon="$nl$/icons/full/etool16/save_edit.png"/>
       <image
             commandId="org.eclipse.ui.file.saveAll"
-            disabledIcon="$nl$/icons/full/dtool16/saveall_edit.gif"
-            icon="$nl$/icons/full/etool16/saveall_edit.gif"/>
+            disabledIcon="$nl$/icons/full/dtool16/saveall_edit.png"
+            icon="$nl$/icons/full/etool16/saveall_edit.png"/>
       <image
             commandId="org.eclipse.ui.file.saveAs"
-            disabledIcon="$nl$/icons/full/dtool16/saveas_edit.gif"
-            icon="$nl$/icons/full/etool16/saveas_edit.gif"/>
+            disabledIcon="$nl$/icons/full/dtool16/saveas_edit.png"
+            icon="$nl$/icons/full/etool16/saveas_edit.png"/>
       <image
             commandId="org.eclipse.ui.file.refresh"
             disabledIcon="$nl$/icons/full/dlcl16/refresh_nav.png"
@@ -2340,18 +2334,6 @@
                   </instanceof>
                </with>
             </or>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="org.eclipse.ui.internal.handlers.ResetToolbarVisibilityHandler"
-            commandId="org.eclipse.ui.resetCoolbarAction">
-         <enabledWhen>
-            <with
-                  variable="activeWorkbenchWindow">
-               <instanceof
-                     value="org.eclipse.ui.IWorkbenchWindow">
-               </instanceof>
-            </with>
          </enabledWhen>
       </handler>
    </extension>
