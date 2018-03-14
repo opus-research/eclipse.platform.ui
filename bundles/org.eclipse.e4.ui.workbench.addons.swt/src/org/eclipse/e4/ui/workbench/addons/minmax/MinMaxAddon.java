@@ -183,7 +183,6 @@ public class MinMaxAddon {
 	};
 
 	private void setState(MUIElement element, String state) {
-		element.getTags().remove(MINIMIZED_BY_ZOOM);
 		if (MINIMIZED.equals(state)) {
 			element.getTags().remove(MAXIMIZED);
 			element.getTags().add(MINIMIZED);
@@ -461,6 +460,25 @@ public class MinMaxAddon {
 	}
 
 	/**
+	 * Handles the event that the perspective is reset
+	 * 
+	 * @param event
+	 */
+	@Inject
+	@Optional
+	private void subscribeTopicPerspReset(
+			@UIEventTopic(UIEvents.UILifeCycle.PERSPECTIVE_RESET) Event event) {
+		final MPerspective resetPersp = (MPerspective) event.getProperty(EventTags.ELEMENT);
+
+		// Find any minimized stacks and show their trim
+		List<MUIElement> minimizedElements = modelService.findElements(resetPersp, null,
+				MUIElement.class, Arrays.asList(IPresentationEngine.MINIMIZED));
+		for (MUIElement element : minimizedElements) {
+			createTrim(element);
+		}
+	}
+
+	/**
 	 * Handles the event that the perspective is opened
 	 * 
 	 * @param event
@@ -588,14 +606,17 @@ public class MinMaxAddon {
 		MWindow window = modelService.getTopLevelWindowFor(element);
 		String trimId = element.getElementId() + getMinimizedElementSuffix(element);
 		MToolControl trimStack = (MToolControl) modelService.find(trimId, window);
-		if (trimStack == null || trimStack.getObject() == null)
+		if (trimStack == null || trimStack.getObject() == null) {
+			if (element instanceof MPerspectiveStack) {
+				element.setVisible(true);
+			}
 			return;
+		}
 
 		TrimStack ts = (TrimStack) trimStack.getObject();
 		ts.restoreStack();
 
 		adjustCTFButtons(element);
-		element.getTags().remove(MINIMIZED_BY_ZOOM);
 
 		List<String> maximizeTag = new ArrayList<String>();
 		maximizeTag.add(IPresentationEngine.MAXIMIZED);
@@ -604,7 +625,14 @@ public class MinMaxAddon {
 		if (curMax.size() > 0) {
 			MUIElement maxElement = curMax.get(0);
 			List<MUIElement> elementsLeftToRestore = getElementsToRestore(maxElement);
-			if (elementsLeftToRestore.size() == 0) {
+
+			// Are any stacks still minimized ?
+			boolean unMax = true;
+			for (MUIElement toRestore : elementsLeftToRestore) {
+				if (!toRestore.isVisible())
+					unMax = false;
+			}
+			if (unMax) {
 				maxElement.getTags().remove(IPresentationEngine.MAXIMIZED);
 			}
 		}
@@ -781,6 +809,7 @@ public class MinMaxAddon {
 
 		List<MUIElement> elementsToRestore = getElementsToRestore(element);
 		for (MUIElement toRestore : elementsToRestore) {
+			toRestore.getTags().remove(IPresentationEngine.MINIMIZED_BY_ZOOM);
 			toRestore.getTags().remove(IPresentationEngine.MINIMIZED);
 		}
 

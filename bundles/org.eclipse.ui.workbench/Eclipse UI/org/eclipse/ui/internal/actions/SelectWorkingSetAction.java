@@ -68,7 +68,6 @@ public class SelectWorkingSetAction extends Action {
         if (workingSet != null) {
 			dialog.setSelection(new IWorkingSet[] { workingSet });
 		}
-		dialog.setDefaultWorkingSet(manager.getDefaultWorkingSet());
 
         if (dialog.open() == Window.OK) {
             IWorkingSet[] result = dialog.getSelection();
@@ -78,8 +77,6 @@ public class SelectWorkingSetAction extends Action {
             } else {
                 actionGroup.setWorkingSet(null);
             }
-			IWorkingSet defaultWorkingSet = dialog.getDefaultWorkingSet();
-			manager.setDefaultWorkingSet(defaultWorkingSet);
         } else {
 			actionGroup.setWorkingSet(workingSet);
 		}

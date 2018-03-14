@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 The Pampered Chef, Inc. and others.
+ * Copyright (c) 2006, 2014 The Pampered Chef, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     The Pampered Chef, Inc. - initial API and implementation
  *     Brad Reynolds - bug 116920
  *     Matthew Hall - bug 260329
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 434283
  ******************************************************************************/
 
 package org.eclipse.jface.examples.databinding.snippets;
@@ -19,12 +20,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import org.eclipse.core.databinding.DataBindingContext;
-import org.eclipse.core.databinding.beans.BeansObservables;
+import org.eclipse.core.databinding.beans.BeanProperties;
 import org.eclipse.core.databinding.observable.Observables;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.map.IObservableMap;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.ObservableMapLabelProvider;
 import org.eclipse.jface.databinding.viewers.ViewersObservables;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -181,9 +183,9 @@ public class Snippet001NestedSelectionWithCombo {
 			Combo city = new Combo(shell, SWT.BORDER | SWT.READ_ONLY);
 
 			ListViewer peopleListViewer = new ListViewer(peopleList);
-			IObservableMap attributeMap = BeansObservables.observeMap(
+			IObservableMap attributeMap = BeanProperties.value(Person.class, "name").observeDetail(
 					Observables.staticObservableSet(realm, new HashSet(
-							viewModel.getPeople())), Person.class, "name");
+							viewModel.getPeople())));
 			peopleListViewer.setLabelProvider(new ObservableMapLabelProvider(
 					attributeMap));
 			peopleListViewer.setContentProvider(new ArrayContentProvider());
@@ -192,9 +194,14 @@ public class Snippet001NestedSelectionWithCombo {
 			DataBindingContext dbc = new DataBindingContext(realm);
 			IObservableValue selectedPerson = ViewersObservables
 					.observeSingleSelection(peopleListViewer);
-			dbc.bindValue(SWTObservables.observeText(name, SWT.Modify),
-					BeansObservables.observeDetailValue(selectedPerson,
-							"name", String.class));
+			Class selectedPersonValueType = null;
+			if (selectedPerson.getValueType() instanceof Class<?>) {
+				selectedPersonValueType = (Class) selectedPerson.getValueType();
+			}
+			dbc.bindValue(
+					WidgetProperties.text(SWT.Modify).observe(name),
+					BeanProperties.value(selectedPersonValueType, "name", String.class)
+					.observeDetail(selectedPerson));
 
 			ComboViewer cityViewer = new ComboViewer(city);
 			cityViewer.setContentProvider(new ArrayContentProvider());
@@ -202,8 +209,8 @@ public class Snippet001NestedSelectionWithCombo {
 
 			IObservableValue citySelection = ViewersObservables
 					.observeSingleSelection(cityViewer);
-			dbc.bindValue(citySelection, BeansObservables.observeDetailValue(
-					selectedPerson, "city", String.class));
+			dbc.bindValue(citySelection, BeanProperties.value(selectedPersonValueType, "city", String.class)
+					.observeDetail(selectedPerson));
 
 			GridLayoutFactory.swtDefaults().applyTo(shell);
 			// Open and return the Shell

@@ -685,7 +685,7 @@ import com.ibm.icu.text.NumberFormat;
 	/*
 	 * Default converter implementation, does not perform any conversion.
 	 */
-	protected static final class DefaultConverter implements IConverter {
+	static final class DefaultConverter implements IConverter {
 
 		private final Object toType;
 
@@ -700,14 +700,17 @@ import com.ibm.icu.text.NumberFormat;
 			this.fromType = fromType;
 		}
 
+		@Override
 		public Object convert(Object fromObject) {
 			return fromObject;
 		}
 
+		@Override
 		public Object getFromType() {
 			return fromType;
 		}
 
+		@Override
 		public Object getToType() {
 			return toType;
 		}

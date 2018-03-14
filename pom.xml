@@ -8,7 +8,7 @@
 
   Contributors:
      Igor Fedorenko - initial implementation
-     Lars Vogel <Lars.Vogel@gmail.com> - Bug 421291, 427127 
+     Lars Vogel <Lars.Vogel@gmail.com> - Bug 421291, 427127, 430981 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
@@ -16,13 +16,13 @@
   <parent>
     <groupId>org.eclipse</groupId>
     <artifactId>eclipse-platform-parent</artifactId>
-    <version>4.4.0-SNAPSHOT</version>
+    <version>4.5.0-SNAPSHOT</version>
     <relativePath>../eclipse-platform-parent</relativePath>
   </parent>
 
   <groupId>eclipse.platform.ui</groupId>
   <artifactId>eclipse.platform.ui</artifactId>
-  <version>4.4.0-SNAPSHOT</version>
+  <version>4.5.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
    <properties>
@@ -103,14 +103,15 @@
     <module>bundles/org.eclipse.ui.views</module>
     <module>bundles/org.eclipse.ui.views.properties.tabbed</module>
     <module>bundles/org.eclipse.ui.workbench</module>
+    <module>bundles/org.eclipse.ui.monitoring</module>
     <module>bundles/org.eclipse.ui.navigator</module>
     <module>bundles/org.eclipse.ui.themes</module>
     <module>features/org.eclipse.e4.rcp</module>
     <module>bundles/org.eclipse.ui.ide</module>
     <module>bundles/org.eclipse.ui.ide.application</module>
     <module>bundles/org.eclipse.ui.win32</module>
+    <module>bundles/org.eclipse.ui.cocoa</module>
     <module>bundles/org.eclipse.ui.navigator.resources</module>
-    <module>bundles/org.eclipse.ui.workbench.compatibility</module>
 
     <module>tests</module>
 
