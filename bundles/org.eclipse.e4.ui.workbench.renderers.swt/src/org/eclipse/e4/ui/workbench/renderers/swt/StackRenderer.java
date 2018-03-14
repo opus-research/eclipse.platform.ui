@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728, 430166
@@ -110,7 +110,7 @@ import org.w3c.dom.css.CSSValue;
  */
 public class StackRenderer extends LazyStackRenderer {
 	/**
-	 *
+	 * 
 	 */
 	private static final String THE_PART_KEY = "thePart"; //$NON-NLS-1$
 
@@ -197,7 +197,7 @@ public class StackRenderer extends LazyStackRenderer {
 	/**
 	 * This is the new way to handle UIEvents (as opposed to subscring and
 	 * unsubscribing them with the event broker.
-	 *
+	 * 
 	 * The method is described in detail at
 	 * http://wiki.eclipse.org/Eclipse4/RCP/Event_Model
 	 */
@@ -245,7 +245,7 @@ public class StackRenderer extends LazyStackRenderer {
 
 	/**
 	 * Handles changes in tags
-	 *
+	 * 
 	 * @param event
 	 */
 	@Inject
@@ -1191,7 +1191,7 @@ public class StackRenderer extends LazyStackRenderer {
 
 	/**
 	 * Closes the part that's backed by the given widget.
-	 *
+	 * 
 	 * @param widget
 	 *            the part that owns this widget
 	 * @param check
@@ -1254,12 +1254,7 @@ public class StackRenderer extends LazyStackRenderer {
 		// Ensure that the newly selected control is correctly sized
 		if (cti.getControl() instanceof Composite) {
 			Composite ctiComp = (Composite) cti.getControl();
-			// Do not call layout(true, true) because it forces all
-			// subcomponents to relayout as well
-			// ctiComp.layout(true, true);
-			if (ctiComp != null && ctf != null) {
-				ctiComp.setBounds(ctf.getClientArea());
-			}
+			ctiComp.layout(true, true);
 		}
 		ctf.setSelection(cti);
 		ignoreTabSelChanges = false;
@@ -1547,7 +1542,7 @@ public class StackRenderer extends LazyStackRenderer {
 
 	/**
 	 * Determine whether the given view menu has any visible menu items.
-	 *
+	 * 
 	 * @param viewMenu
 	 *            the view menu to check
 	 * @param part
