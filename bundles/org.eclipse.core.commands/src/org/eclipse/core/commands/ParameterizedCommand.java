@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.internal.commands.util.Util;
@@ -170,11 +171,11 @@ public final class ParameterizedCommand implements Comparable {
 			// Make recursive call
 			return expandParameters(nextIndex, parameters);
 		}
-		final Map<?, ?> parameterValues = values.getParameterValues();
-		final Iterator<?> parameterValueItr = parameterValues.entrySet().iterator();
+		final Map<String, String> parameterValues = values.getParameterValues();
+		final Iterator<Entry<String, String>> parameterValueItr = parameterValues.entrySet().iterator();
 		while (parameterValueItr.hasNext()) {
-			final Map.Entry<?, ?> entry = (Map.Entry<?, ?>) parameterValueItr.next();
-			final Parameterization parameterization = new Parameterization(parameter, (String) entry.getValue());
+			final Map.Entry<String, String> entry = parameterValueItr.next();
+			final Parameterization parameterization = new Parameterization(parameter, entry.getValue());
 			parameterizations.add(parameterization);
 		}
 
