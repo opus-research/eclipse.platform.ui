@@ -32,11 +32,7 @@ public class UndoRedoActionProvider extends CommonActionProvider {
 
 	private UndoRedoActionGroup undoRedoGroup;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.navigator.CommonActionProvider#init(org.eclipse.ui.navigator.ICommonActionExtensionSite)
-	 */
+	@Override
 	public void init(ICommonActionExtensionSite anActionSite) {
 		IUndoContext workspaceContext = (IUndoContext) ResourcesPlugin
 				.getWorkspace().getAdapter(IUndoContext.class);
@@ -44,22 +40,27 @@ public class UndoRedoActionProvider extends CommonActionProvider {
 				workspaceContext, true);
 	}
 
+	@Override
 	public void dispose() {
 		undoRedoGroup.dispose();
 	}
 
+	@Override
 	public void fillActionBars(IActionBars actionBars) {
 		undoRedoGroup.fillActionBars(actionBars);
 	}
 
+	@Override
 	public void fillContextMenu(IMenuManager menu) {
 		undoRedoGroup.fillContextMenu(menu);
 	}
 
+	@Override
 	public void setContext(ActionContext context) {
 		undoRedoGroup.setContext(context);
 	}
 
+	@Override
 	public void updateActionBars() {
 		undoRedoGroup.updateActionBars();
 	}

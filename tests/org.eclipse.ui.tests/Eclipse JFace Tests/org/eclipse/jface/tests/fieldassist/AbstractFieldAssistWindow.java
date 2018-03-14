@@ -46,6 +46,7 @@ public abstract class AbstractFieldAssistWindow extends Window {
 		return getShell().getDisplay();
 	}
 
+	@Override
 	protected Control createContents(Composite parent) {
 		Composite content = (Composite) super.createContents(parent);
 		content.setLayout(new FillLayout());
@@ -64,10 +65,15 @@ public abstract class AbstractFieldAssistWindow extends Window {
 		return content;
 	}
 	
+	/**
+	 * @param parent
+	 *            the SWT composite
+	 */
 	protected void createExtraControls(Composite parent) {
 		// default is to do nothing
 	}
-	
+
+	@Override
 	protected Layout getLayout() {
 		return new FillLayout();
 	}

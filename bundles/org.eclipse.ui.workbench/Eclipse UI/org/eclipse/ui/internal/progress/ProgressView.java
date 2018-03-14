@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2010 IBM Corporation and others.
+ * Copyright (c) 2003, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422040
  *******************************************************************************/
 package org.eclipse.ui.internal.progress;
 
@@ -25,7 +26,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
@@ -37,7 +37,7 @@ import org.eclipse.ui.preferences.ViewPreferencesAction;
  * The ProgressView is the class that shows the details of the current workbench
  * progress.
  */
-public class ProgressView extends ViewPart implements IViewPart {
+public class ProgressView extends ViewPart {
 
 	DetailedProgressViewer viewer;
 
@@ -46,11 +46,7 @@ public class ProgressView extends ViewPart implements IViewPart {
 	Action clearAllAction;
 
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
-	 */
+	@Override
 	public void createPartControl(Composite parent) {
 		viewer = new DetailedProgressViewer(parent, SWT.MULTI | SWT.H_SCROLL);
 		viewer.setComparator(ProgressManagerUtil.getProgressViewerComparator());
@@ -70,11 +66,7 @@ public class ProgressView extends ViewPart implements IViewPart {
 		getSite().setSelectionProvider(viewer);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IWorkbenchPart#setFocus()
-	 */
+	@Override
 	public void setFocus() {
 		if (viewer != null) {
 			viewer.setFocus();
@@ -98,6 +90,7 @@ public class ProgressView extends ViewPart implements IViewPart {
 		Menu menu = menuMgr.createContextMenu(viewer.getControl());
 		menuMgr.add(cancelAction);
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				JobInfo info = getSelectedInfo();
 				if (info == null) {
@@ -114,11 +107,7 @@ public class ProgressView extends ViewPart implements IViewPart {
 		IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 		menuMgr.add(clearAllAction);
 		menuMgr.add(new ViewPreferencesAction() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.ui.internal.preferences.ViewPreferencesAction#openViewPreferencesDialog()
-			 */
+			@Override
 			public void openViewPreferencesDialog() {
 				new JobsViewPreferenceDialog(viewer.getControl().getShell())
 						.open();
@@ -176,11 +165,7 @@ public class ProgressView extends ViewPart implements IViewPart {
 	 */
 	private void createCancelAction() {
 		cancelAction = new Action(ProgressMessages.ProgressView_CancelAction) {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.action.Action#run()
-			 */
+			@Override
 			public void run() {
 				viewer.cancelSelection();
 			}
@@ -194,11 +179,7 @@ public class ProgressView extends ViewPart implements IViewPart {
 	private void createClearAllAction() {
 		clearAllAction = new Action(
 				ProgressMessages.ProgressView_ClearAllAction) {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.action.Action#run()
-			 */
+			@Override
 			public void run() {
 				FinishedJobs.getInstance().clearAll();
 			}
@@ -206,12 +187,12 @@ public class ProgressView extends ViewPart implements IViewPart {
 		clearAllAction
 				.setToolTipText(ProgressMessages.NewProgressView_RemoveAllJobsToolTip);
 		ImageDescriptor id = WorkbenchImages
-				.getWorkbenchImageDescriptor("/elcl16/progress_remall.gif"); //$NON-NLS-1$
+				.getWorkbenchImageDescriptor("/elcl16/progress_remall.png"); //$NON-NLS-1$
 		if (id != null) {
 			clearAllAction.setImageDescriptor(id);
 		}
 		id = WorkbenchImages
-				.getWorkbenchImageDescriptor("/dlcl16/progress_remall.gif"); //$NON-NLS-1$
+				.getWorkbenchImageDescriptor("/dlcl16/progress_remall.png"); //$NON-NLS-1$
 		if (id != null) {
 			clearAllAction.setDisabledImageDescriptor(id);
 		}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,11 +13,11 @@ package org.eclipse.ui.keys;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
-
 import org.eclipse.ui.internal.util.Util;
 
 /**
@@ -50,6 +50,7 @@ import org.eclipse.ui.internal.util.Util;
  * @see org.eclipse.ui.keys.ModifierKey
  * @see org.eclipse.ui.keys.NaturalKey
  */
+@Deprecated
 public final class KeyStroke implements Comparable {
 
     /**
@@ -171,7 +172,7 @@ public final class KeyStroke implements Comparable {
 
             if (i % 2 == 0) {
                 if (stringTokenizer.hasMoreTokens()) {
-                    token = token.toUpperCase();
+					token = token.toUpperCase(Locale.ENGLISH);
                     ModifierKey modifierKey = (ModifierKey) ModifierKey.modifierKeysByName
                             .get(token);
 
@@ -184,7 +185,7 @@ public final class KeyStroke implements Comparable {
                     naturalKey = CharacterKey.getInstance(token.charAt(0));
                     break;
                 } else {
-                    token = token.toUpperCase();
+					token = token.toUpperCase(Locale.ENGLISH);
                     naturalKey = (NaturalKey) CharacterKey.characterKeysByName
                             .get(token);
 
@@ -263,7 +264,8 @@ public final class KeyStroke implements Comparable {
     /**
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
-    public int compareTo(Object object) {
+    @Override
+	public int compareTo(Object object) {
         KeyStroke castedObject = (KeyStroke) object;
         int compareTo = Util.compare(modifierKeysAsArray,
                 castedObject.modifierKeysAsArray);
@@ -278,7 +280,8 @@ public final class KeyStroke implements Comparable {
     /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    public boolean equals(Object object) {
+    @Override
+	public boolean equals(Object object) {
         if (!(object instanceof KeyStroke)) {
 			return false;
 		}
@@ -324,7 +327,8 @@ public final class KeyStroke implements Comparable {
     /**
      * @see java.lang.Object#hashCode()
      */
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         if (!hashCodeComputed) {
             hashCode = HASH_INITIAL;
             hashCode = hashCode * HASH_FACTOR + modifierKeys.hashCode();
@@ -352,7 +356,8 @@ public final class KeyStroke implements Comparable {
      *         not to be <code>null</code>.
      * @see java.lang.Object#toString()
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return KeyFormatterFactory.getFormalKeyFormatter().format(this);
     }
 }

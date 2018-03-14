@@ -33,22 +33,19 @@ public class EditorDropTarget extends WorkbenchWindowDropTarget {
         return getPage().getEditors()[editorIdx];
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.tests.dnd.TestDropTarget#getName()
-     */
-    public String toString() {
+    @Override
+	public String toString() {
         return DragOperations.nameForConstant(side) + " of editor " + editorIdx;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.tests.dnd.TestDropTarget#getLocation()
-     */
-    public Point getLocation() {
+    @Override
+	public Point getLocation() {
         return DragOperations.getLocation(DragOperations.getPane(getPart()),
                 side);
     }
     
-    public Shell getShell() {
+    @Override
+	public Shell getShell() {
     	return getPart().getSite().getShell();
     }
 }

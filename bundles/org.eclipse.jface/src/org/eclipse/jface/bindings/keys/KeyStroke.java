@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2006 IBM Corporation and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 
 package org.eclipse.jface.bindings.keys;
 
+import java.util.Locale;
 import java.util.StringTokenizer;
 
 import org.eclipse.jface.bindings.Trigger;
@@ -128,7 +129,7 @@ public final class KeyStroke extends Trigger implements Comparable {
 
 			if (i % 2 == 0) {
 				if (stringTokenizer.hasMoreTokens()) {
-					token = token.toUpperCase();
+					token = token.toUpperCase(Locale.ENGLISH);
 					final int modifierKey = lookup.formalModifierLookup(token);
 					if (modifierKey == NO_KEY) {
 						throw new ParseException(
@@ -142,7 +143,7 @@ public final class KeyStroke extends Trigger implements Comparable {
 					naturalKey = token.charAt(0);
 
 				} else {
-					token = token.toUpperCase();
+					token = token.toUpperCase(Locale.ENGLISH);
 					naturalKey = lookup.formalKeyLookup(token);
 				}
 			}
@@ -184,11 +185,7 @@ public final class KeyStroke extends Trigger implements Comparable {
 		this.naturalKey = naturalKey;
 	}
 
-    /*
-     * (non-Javadoc)
-     * 
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
+	@Override
 	public final int compareTo(final Object object) {
 		final KeyStroke keyStroke = (KeyStroke) object;
 		int compareTo = Util.compare(modifierKeys, keyStroke.modifierKeys);
@@ -200,11 +197,7 @@ public final class KeyStroke extends Trigger implements Comparable {
 		return compareTo;
 	}
 
-    /*
-     * (non-Javadoc)
-     * 
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
+	@Override
 	public final boolean equals(final Object object) {
 		if (!(object instanceof KeyStroke)) {
 			return false;
@@ -249,11 +242,7 @@ public final class KeyStroke extends Trigger implements Comparable {
 		return naturalKey;
 	}
 
-    /*
-     * (non-Javadoc)
-     * 
-	 * @see java.lang.Object#hashCode()
-	 */
+	@Override
 	public final int hashCode() {
 		return modifierKeys << 4 + naturalKey;
 	}
@@ -275,6 +264,7 @@ public final class KeyStroke extends Trigger implements Comparable {
 	 *         not to be <code>null</code>.
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public final String toString() {
 		return KeyFormatterFactory.getFormalKeyFormatter().format(this);
 	}

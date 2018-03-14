@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 IBM Corporation and others.
+ * Copyright (c) 2012, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug XXXXXX
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -78,11 +79,12 @@ public final class EditorAssociationOverrideDescriptor {
 	public IEditorAssociationOverride createOverride() throws CoreException {
 		final Throwable[] exception= new Throwable[1];
 		final IEditorAssociationOverride[] result= new IEditorAssociationOverride[1];
-		String message= MessageFormat.format(IDEWorkbenchMessages.editorAssociationOverride_error_couldNotCreate_message, new String[] { getId(), fElement.getContributor().getName() });
+		String message= MessageFormat.format(IDEWorkbenchMessages.editorAssociationOverride_error_couldNotCreate_message, getId(), fElement.getContributor().getName());
 		ISafeRunnable code= new SafeRunnable(message) {
 			/*
 			 * @see org.eclipse.core.runtime.ISafeRunnable#run()
 			 */
+			@Override
 			public void run() throws Exception {
 //		 		String pluginId = fElement.getContributor().getName();
 				result[0]= (IEditorAssociationOverride)fElement.createExecutableExtension(CLASS_ATTRIBUTE);
@@ -90,6 +92,7 @@ public final class EditorAssociationOverrideDescriptor {
 			/*
 			 * @see org.eclipse.jface.util.SafeRunnable#handleException(java.lang.Throwable)
 			 */
+			@Override
 			public void handleException(Throwable ex) {
 				super.handleException(ex);
 				exception[0]= ex;
@@ -134,12 +137,14 @@ public final class EditorAssociationOverrideDescriptor {
 		return fElement.getAttribute(DESCRIPTION_ATTRIBUTE);
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == null || !obj.getClass().equals(this.getClass()) || getId() == null)
 			return false;
 		return getId().equals(((EditorAssociationOverrideDescriptor)obj).getId());
 	}
 
+	@Override
 	public int hashCode() {
 		return getId().hashCode();
 	}
@@ -153,7 +158,7 @@ public final class EditorAssociationOverrideDescriptor {
 				result.add(desc);
 			} else {
 				String message= MessageFormat.format(IDEWorkbenchMessages.editorAssociationOverride_error_invalidElementName_message,
-						new String[] { element.getContributor().getName(), element.getName() });
+						element.getContributor().getName(), element.getName());
 				IDEWorkbenchPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, IDEWorkbenchPlugin.IDE_WORKBENCH, IStatus.OK, message, null));
 			}
 		}
