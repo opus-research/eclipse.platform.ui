@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Marcus Eng (Google) - initial API and implementation
- *     Sergey Prigogin (Google)
  *******************************************************************************/
 package org.eclipse.ui.internal.monitoring;
 
@@ -30,17 +29,12 @@ import org.eclipse.ui.monitoring.UiFreezeEvent;
  */
 public class DefaultUiFreezeEventLogger implements IUiFreezeEventLogger {
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss.SSS"); //$NON-NLS-1$
-	private final long longEventErrorThresholdMillis;
 
 	private static class SeverityMultiStatus extends MultiStatus {
 		public SeverityMultiStatus(int severity, String pluginId, String message, Throwable exception) {
 			super(pluginId, OK, message, exception);
 			setSeverity(severity);
 		}
-	}
-
-	public DefaultUiFreezeEventLogger(long longEventErrorThresholdMillis) {
-		this.longEventErrorThresholdMillis = longEventErrorThresholdMillis;
 	}
 
 	/**
@@ -59,10 +53,8 @@ public class DefaultUiFreezeEventLogger implements IUiFreezeEventLogger {
 		String header = NLS.bind(pattern,
 				String.format("%.2f", event.getTotalDuration() / 1000.0), startTime); //$NON-NLS-1$
 
-		int severity = event.getTotalDuration() >= longEventErrorThresholdMillis ?
-				IStatus.ERROR : IStatus.WARNING;
 		MultiStatus loggedEvent =
-				new SeverityMultiStatus(severity, PreferenceConstants.PLUGIN_ID, header, null);
+				new SeverityMultiStatus(IStatus.WARNING, PreferenceConstants.PLUGIN_ID, header, null);
 
 		StackSample[] stackTraceSamples = event.getStackTraceSamples();
 		for (StackSample sample : stackTraceSamples) {
