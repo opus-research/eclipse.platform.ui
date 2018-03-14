@@ -10,6 +10,7 @@
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 410426
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 426535, 433234, 431868
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 431778
+ *     Andrey Loskutov <loskutov@gmx.de> - Bugs 383569, 457198
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -21,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
@@ -117,7 +119,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 	@Inject
 	@Optional
-	private void subscribeTopicUpdateItems(@UIEventTopic(UIEvents.UILabel.TOPIC_ALL) Event event) {
+	void updateItems(@UIEventTopic(UIEvents.UILabel.TOPIC_ALL) Event event){
 		// Ensure that this event is for a MToolBarElement
 		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBarElement)) {
 			return;
@@ -142,7 +144,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 	@Inject
 	@Optional
-	private void subscribeTopicUpdateToBeRendered(@UIEventTopic(UIEvents.UIElement.TOPIC_ALL) Event event) {
+	void updateToBeRendered(@UIEventTopic(UIEvents.UIElement.TOPIC_ALL) Event event) {
 		// Ensure that this event is for a MMenuItem
 		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBarElement)) {
 			return;
@@ -180,7 +182,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			if (ici == null) {
 				return;
 			}
-			ici.setVisible(itemModel.isVisible());
 
 			ToolBarManager parent = null;
 			if (ici instanceof MenuManager) {
@@ -189,21 +190,31 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 				parent = (ToolBarManager) ((ContributionItem) ici).getParent();
 			}
 
-			if (parent != null) {
-				parent.markDirty();
-				parent.update(true);
-				ToolBar tb = parent.getControl();
-				if (tb != null && !tb.isDisposed()) {
-					tb.pack(true);
-					tb.getShell().layout(new Control[] { tb }, SWT.DEFER);
-				}
+			if (parent == null) {
+				ici.setVisible(itemModel.isVisible());
+				return;
+			}
+
+			IContributionManagerOverrides ov = parent.getOverrides();
+			// partial fix for bug 383569: only change state if there are no
+			// extra override mechanics controlling element visibility
+			if (ov == null) {
+				ici.setVisible(itemModel.isVisible());
+			}
+
+			parent.markDirty();
+			parent.update(true);
+			ToolBar tb = parent.getControl();
+			if (tb != null && !tb.isDisposed()) {
+				tb.pack(true);
+				tb.getShell().layout(new Control[] { tb }, SWT.DEFER);
 			}
 		}
 	}
 
 	@Inject
 	@Optional
-	private void subscribeTopicUpdateSelection(@UIEventTopic(UIEvents.Item.TOPIC_SELECTED) Event event) {
+	void updateSelection(@UIEventTopic(UIEvents.Item.TOPIC_SELECTED) Event event) {
 		// Ensure that this event is for a MToolBarElement
 		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBarElement)) {
 			return;
@@ -218,7 +229,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 	@Inject
 	@Optional
-	private void subscribeTopicUpdateEnablement(@UIEventTopic(UIEvents.Item.TOPIC_ENABLED) Event event) {
+	void updateEnablement(@UIEventTopic(UIEvents.Item.TOPIC_ENABLED) Event event) {
 		// Ensure that this event is for a MMenuItem
 		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBarElement)) {
 			return;
@@ -234,7 +245,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	@SuppressWarnings("unchecked")
 	@Inject
 	@Optional
-	private void subscribeTopicChildAdded(@UIEventTopic(ElementContainer.TOPIC_CHILDREN) Event event) {
+	void childAdded(@UIEventTopic(ElementContainer.TOPIC_CHILDREN) Event event) {
 		// Ensure that this event is for a MMenuItem
 		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBar)) {
 			return;
@@ -251,14 +262,13 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	@SuppressWarnings("unused")
 	@Inject
 	@Optional
-	private void subscribeTopicDirtyChanged(@UIEventTopic(UIEvents.Dirtyable.TOPIC_DIRTY) Event eventData) {
+	void dirtyChanged(@UIEventTopic(UIEvents.Dirtyable.TOPIC_DIRTY) Event eventData) {
 		getUpdater().updateContributionItems(ALL_SELECTOR);
 	}
 
 	@Inject
 	@Optional
-	private void subscribeTopicUpdateToolbarEnablement(
-			@UIEventTopic(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC) Event eventData) {
+	void updateRequest(@UIEventTopic(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC) Event eventData) {
 		final Object v = eventData.getProperty(IEventBroker.DATA);
 		Selector s;
 		if (v instanceof Selector) {
@@ -344,6 +354,15 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			}
 		};
 		context.runAndTrack(enablementUpdater);
+	}
+
+	/**
+	 *
+	 */
+	@PreDestroy
+	public void contextDisposed() {
+		// intentionally left for debugging life cycle
+		return;
 	}
 
 	@Override

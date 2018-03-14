@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,9 +9,9 @@
  *     IBM Corporation - initial API and implementation
  *     Christian Janz  - <christian.janz@gmail.com> Fix for Bug 385592
  *     Marc-Andre Laperle (Ericsson) - Fix for Bug 413590
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 431340, 431348, 426535, 433234, 431868
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431340, 431348, 426535, 433234
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431868
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442214
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 454143
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -2545,12 +2545,13 @@ public class WorkbenchPage implements IWorkbenchPage {
 		MPerspective perspective = getCurrentPerspective();
 		if (perspective != null) {
 			int scope = allPerspectives ? WINDOW_SCOPE : EModelService.PRESENTATION;
-			List<MPart> parts = modelService.findElements(window, null, MPart.class, null, scope);
+			List<MPlaceholder> placeholders = modelService.findElements(window, null,
+					MPlaceholder.class, null, scope);
 			List<IViewReference> visibleReferences = new ArrayList<IViewReference>();
 			for (ViewReference reference : viewReferences) {
-				for (MPart part : parts) {
-					if (reference.getId().equals(part.getElementId())
-							&& partService.isPartOrPlaceholderInPerspective(part.getElementId(), perspective)) {
+				for (MPlaceholder placeholder : placeholders) {
+					if (reference.getModel() == placeholder.getRef()
+							&& placeholder.isToBeRendered()) {
 						// only rendered placeholders are valid view references
 						visibleReferences.add(reference);
 					}
@@ -2867,11 +2868,8 @@ public class WorkbenchPage implements IWorkbenchPage {
 	private void addActionSet(MPerspective perspective, MPerspective temporary) {
 		List<String> tags = perspective.getTags();
 		List<String> extendedTags = temporary.getTags();
-		String excludedTags = perspective.getPersistedState().get(
-				ModeledPageLayout.HIDDEN_ITEMS_KEY);
 		for (String extendedTag : extendedTags) {
-			if (!tags.contains(extendedTag) && excludedTags != null
-					&& !excludedTags.contains(extendedTag + ",")) { //$NON-NLS-1$
+			if (!tags.contains(extendedTag)) {
 				tags.add(extendedTag);
 			}
 		}
@@ -3512,6 +3510,10 @@ public class WorkbenchPage implements IWorkbenchPage {
 		updateActionSets(getPerspective(persp), getPerspective(dummyPerspective));
 		modelToPerspectiveMapping.remove(dummyPerspective);
 
+		// partly fixing toolbar refresh issue, see bug 383569 comment 10
+		getPerspective(persp).updateActionBars();
+		legacyWindow.updateActionSets();
+
 		// migrate the tags
 		List<String> tags = persp.getTags();
 		tags.clear();
@@ -4101,6 +4103,12 @@ public class WorkbenchPage implements IWorkbenchPage {
              
              IActionSetDescriptor desc = reg.findActionSet(actionSetID);
              if (desc != null) {
+				IActionSetDescriptor[] offActionSets = persp.getAlwaysOffActionSets();
+				for (IActionSetDescriptor off : offActionSets) {
+					if (off.getId().equals(desc.getId())) {
+						return;
+					}
+				}
                  persp.addActionSet(desc);
                  legacyWindow.updateActionSets();
                  legacyWindow.firePerspectiveChanged(this, getPerspective(),
