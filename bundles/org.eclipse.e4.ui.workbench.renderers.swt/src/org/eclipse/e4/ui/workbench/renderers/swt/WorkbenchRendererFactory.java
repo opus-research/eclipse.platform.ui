@@ -38,6 +38,7 @@ public class WorkbenchRendererFactory implements IRendererFactory {
 	private AreaRenderer areaRenderer;
 	private MenuManagerRenderer menuRenderer;
 	private ToolBarManagerRenderer toolbarRenderer;
+	// private ToolItemRenderer toolItemRenderer;
 	private SeparatorRenderer separatorRenderer;
 	private ContributedPartRenderer contributedPartRenderer;
 	private ElementReferenceRenderer elementRefRenderer;
