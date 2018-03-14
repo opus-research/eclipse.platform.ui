@@ -90,15 +90,6 @@ public class RenderMojo extends AbstractMojo {
     /** The amount of scaling to apply to rasterized images. */
     private double outputScale;
 
-    /** Used for creating desaturated icons */
-    private GrayscaleFilter grayFilter;
-
-    /** Used for creating desaturated icons */
-    private HSBAdjustFilter desaturator;
-
-    /** Reduces contrast for disabled icons. */
-    private ContrastFilter decontrast;
-
     /**
      * @return the number of icons rendered at the time of the call
      */
@@ -119,7 +110,7 @@ public class RenderMojo extends AbstractMojo {
      * @param icon
      *            the icon to render
      */
-    public void rasterize(IconEntry icon) {
+    public void rasterize(IconEntry icon, GrayscaleFilter grayFilter, HSBAdjustFilter desaturator, ContrastFilter decontrast) {
         if (icon == null) {
             log.error("Null icon definition, skipping.");
             failedIcons.add(icon);
@@ -213,6 +204,21 @@ public class RenderMojo extends AbstractMojo {
         }
 
         writeIcon(icon, outputWidth, outputHeight, inputImage);
+
+        try {
+            if (icon.disabledPath != null) {
+                BufferedImage desaturated16 = desaturator.filter(
+                    grayFilter.filter(inputImage, null), null);
+
+                BufferedImage deconstrast = decontrast.filter(desaturated16, null);
+
+                ImageIO.write(deconstrast, "PNG", new File(icon.disabledPath, icon.nameBase + ".png"));
+            }
+        } catch (Exception e1) {
+            log.error("Failed to render disabled icon: "  +
+                               icon.nameBase, e1);
+            failedIcons.add(icon);
+        }
     }
 
     /**
@@ -256,19 +262,11 @@ public class RenderMojo extends AbstractMojo {
         try {
             String outputName = icon.nameBase;
             if (outputScale != 1) {
-                outputName += "@" + outputScale + "x";
+                String scaleId = outputScale == (double) (int) outputScale ? Integer.toString((int) outputScale): Double.toString(outputScale);
+                outputName += "@" + scaleId + "x";
             }
             outputName += ".png";
             ImageIO.write(sourceImage, "PNG", new File(icon.outputPath, outputName));
-
-            if (icon.disabledPath != null) {
-                BufferedImage desaturated16 = desaturator.filter(
-                        grayFilter.filter(sourceImage, null), null);
-
-                BufferedImage deconstrast = decontrast.filter(desaturated16, null);
-
-                ImageIO.write(deconstrast, "PNG", new File(icon.disabledPath, outputName));
-            }
         } catch (Exception e1) {
             log.error("Failed to resize rendered icon to output size: "  +
                                icon.nameBase, e1);
@@ -286,7 +284,7 @@ public class RenderMojo extends AbstractMojo {
         int remainingIcons = icons.size();
 
         // The number of icons to distribute to a rendering callable
-        final int threadExecSize = icons.size() / this.threads;
+        final int threadExecSize = Math.max(1, icons.size() / this.threads);
 
         // The current offset to start a batch, as they're distributed
         // between rendering callables
@@ -294,7 +292,7 @@ public class RenderMojo extends AbstractMojo {
 
         // A list of callables used to render icons on multiple threads
         // Each callable gets a set of icons to render
-        List<Callable<Object>> tasks = new ArrayList<Callable<Object>>(
+        List<Callable<Object>> tasks = new ArrayList<>(
                 this.threads);
 
         // Distribute the rasterization operations between multiple threads
@@ -327,10 +325,21 @@ public class RenderMojo extends AbstractMojo {
 
             // Create the callable and add it to the task pool
             Callable<Object> runnable = new Callable<Object>() {
-                public Object call() throws Exception {
+                @Override
+				public Object call() throws Exception {
+                    // The jhlabs filters are not thread safe, so provide one set per thread
+                    GrayscaleFilter grayFilter = new GrayscaleFilter();
+
+                    HSBAdjustFilter desaturator = new HSBAdjustFilter();
+                         desaturator.setSFactor(0.0f);
+
+                    ContrastFilter decontrast = new ContrastFilter();
+                         decontrast.setBrightness(2.9f);
+                         decontrast.setContrast(0.2f);
+
                     // Rasterize this batch
                     for (int count = 0; count < execCount; count++) {
-                        rasterize(icons.get(batchStart + count));
+                        rasterize(icons.get(batchStart + count), grayFilter, desaturator, decontrast);
                     }
 
                     // Update the render counter
@@ -459,29 +468,9 @@ public class RenderMojo extends AbstractMojo {
     private void init(int threads, double scale) {
         this.threads = threads;
         this.outputScale = Math.max(1, scale);
-        icons = new ArrayList<IconEntry>();
+        icons = new ArrayList<>();
         execPool = Executors.newFixedThreadPool(threads);
         counter = new AtomicInteger();
-
-        grayFilter = new GrayscaleFilter();
-
-        desaturator = new HSBAdjustFilter();
-        desaturator.setSFactor(0.0f);
-
-        decontrast = new ContrastFilter();
-        decontrast.setBrightness(2.9f);
-        decontrast.setContrast(0.2f);
-        initFilter(decontrast);
-    }
-
-    /**
-     * Work around the fact that {@link com.jhlabs.image.TransferFilter#initialize()}
-     * is not thread-safe.
-     * @param filter the filter
-     */
-    private void initFilter(TransferFilter filter) {
-		filter.filter(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB),
-				new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB));
     }
 
     /**

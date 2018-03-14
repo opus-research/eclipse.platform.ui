@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -155,15 +155,9 @@ public class E4Application implements IApplication {
 					workbench.getContext()))
 				return EXIT_OK;
 
-			IEclipseContext workbenchContext = workbench.getContext();
-
 			// Create and run the UI (if any)
 			workbench.createAndRunUI(workbench.getApplication());
 
-			// Save the model into the targetURI
-			if (lcManager != null) {
-				ContextInjectionFactory.invoke(lcManager, PreSave.class, workbenchContext, null);
-			}
 			saveModel();
 			workbench.close();
 
@@ -181,6 +175,11 @@ public class E4Application implements IApplication {
 	}
 
 	public void saveModel() {
+		// Save the model into the targetURI
+		if (lcManager != null && workbench != null) {
+			ContextInjectionFactory.invoke(lcManager, PreSave.class, workbench.getContext(), null);
+		}
+
 		try {
 			if (!(handler instanceof ResourceHandler) || ((ResourceHandler) handler).hasTopLevelWindows()) {
 				handler.save();
