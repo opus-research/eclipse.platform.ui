@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2014 IBM Corporation and others.
+ * Copyright (c) 2003, 2014, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug https://bugs.eclipse.org/436247
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440136
+ *     Robert Roth <robert.roth.off@gmail.com> - Bug 274005
  *******************************************************************************/
 package org.eclipse.ui.internal.themes;
 
@@ -694,6 +695,13 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 	private Button goToDefaultButton;
 
 	/**
+	 * The button to expand the tree.
+	 *
+	 * @since 4.5
+	 */
+	private Button expandAllButton;
+
+	/**
 	 * Map of definition FontDefinition->FontData[] capturing the changes
 	 * explicitly made by the user. These changes need to be stored into the
 	 * preference store.
@@ -948,6 +956,9 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 		createSeparator(controlColumn);
 		editDefaultButton = createButton(controlColumn, RESOURCE_BUNDLE.getString("editDefault")); //$NON-NLS-1$
 		goToDefaultButton = createButton(controlColumn, RESOURCE_BUNDLE.getString("goToDefault")); //$NON-NLS-1$
+		createSeparator(controlColumn);
+		expandAllButton = createButton(controlColumn, RESOURCE_BUNDLE.getString("expandAll")); //$NON-NLS-1$
+		expandAllButton.setEnabled(true);
         // --- end of buttons
 
 		createDescriptionControl(mainColumn);
@@ -1342,6 +1353,13 @@ getPreferenceStore(),
 					}
 				}
 				updateControls();
+			}
+		});
+
+		expandAllButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				tree.getViewer().expandAll();
 			}
 		});
 
