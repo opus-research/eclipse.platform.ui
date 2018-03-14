@@ -283,6 +283,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 	public static String WORKBENCH_AUTO_SAVE_JOB = "Workbench Auto-Save Job"; //$NON-NLS-1$
 
+	private static final String WORKBENCH_AUTO_SAVE_BACKGROUND_JOB = "Workbench Auto-Save Background Job"; //$NON-NLS-1$
+
 	private static String MEMENTO_KEY = "memento"; //$NON-NLS-1$
 
 	private final class StartupProgressBundleListener implements SynchronousBundleListener {
@@ -1257,13 +1259,17 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 * part of persist(false) during auto-save.
 	 */
 	private void persistWorkbenchModel() {
+		Job[] cleanAndSaveJobs = Job.getJobManager().find(WORKBENCH_AUTO_SAVE_BACKGROUND_JOB);
+		if (cleanAndSaveJobs != null && cleanAndSaveJobs.length > 0) {
+			return;
+		}
 		final MApplication appCopy = (MApplication) EcoreUtil.copy((EObject) application);
 		if (detectWorkbenchCorruption(appCopy)) {
 			return;
 		}
 		final IModelResourceHandler handler = e4Context.get(IModelResourceHandler.class);
 
-		Job cleanAndSaveJob = new Job("Workbench Auto-Save Background Job") { //$NON-NLS-1$
+		Job cleanAndSaveJob = new Job(WORKBENCH_AUTO_SAVE_BACKGROUND_JOB) {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				final Resource res = handler.createResourceWithApp(appCopy);
@@ -1279,6 +1285,11 @@ public final class Workbench extends EventManager implements IWorkbench,
 					res.getResourceSet().getResources().remove(res);
 				}
 				return Status.OK_STATUS;
+			}
+
+			@Override
+			public boolean belongsTo(Object family) {
+				return WORKBENCH_AUTO_SAVE_BACKGROUND_JOB == family;
 			}
 
 		};
