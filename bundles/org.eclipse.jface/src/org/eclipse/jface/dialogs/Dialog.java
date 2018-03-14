@@ -588,6 +588,10 @@ public abstract class Dialog extends Window {
 	 * assumed to be a <code>GridLayout</code> and the number of columns in
 	 * this layout is incremented. Subclasses may override.
 	 * </p>
+	 * <p>
+	 * Note: The common button order is: <b>{other buttons}</b>, <b>OK</b>, <b>Cancel</b>.
+	 * On some platforms, {@link #initializeBounds()} will move the default button to the right.
+	 * </p>
 	 *
 	 * @param parent
 	 *            the parent composite
@@ -611,7 +615,7 @@ public abstract class Dialog extends Window {
 		Button button = new Button(parent, SWT.PUSH);
 		button.setText(label);
 		button.setFont(JFaceResources.getDialogFont());
-		button.setData(new Integer(id));
+		button.setData(Integer.valueOf(id));
 		button.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
@@ -624,7 +628,7 @@ public abstract class Dialog extends Window {
 				shell.setDefaultButton(button);
 			}
 		}
-		buttons.put(new Integer(id), button);
+		buttons.put(Integer.valueOf(id), button);
 		setButtonLayoutData(button);
 		return button;
 	}
@@ -704,6 +708,10 @@ public abstract class Dialog extends Window {
 	 */
 	@Override
 	protected void initializeBounds() {
+		// UI guidelines:
+		// https://developer.gnome.org/hig/stable/dialogs.html.en#primary-buttons
+		// https://developer.apple.com/library/mac/documentation/UserExperience/Conceptual/OSXHIGuidelines/WindowDialogs.html#//apple_ref/doc/uid/20000957-CH43-SW5
+		// https://msdn.microsoft.com/en-us/library/windows/desktop/dn742499(v=vs.85).aspx#win_dialog_box_image25
 		Shell shell = getShell();
 		if (shell != null) {
 			if (shell.getDisplay().getDismissalAlignment() == SWT.RIGHT) {
@@ -828,7 +836,7 @@ public abstract class Dialog extends Window {
 	 * @since 2.0
 	 */
 	protected Button getButton(int id) {
-		return buttons.get(new Integer(id));
+		return buttons.get(Integer.valueOf(id));
 	}
 
 	/**
