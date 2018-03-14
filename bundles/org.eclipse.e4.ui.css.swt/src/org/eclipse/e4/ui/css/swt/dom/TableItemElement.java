@@ -51,6 +51,7 @@ public class TableItemElement extends ItemElement {
 
 	@Override
 	public void reset() {
+		super.reset();
 		TableItem tableItem = getTableItem();
 		tableItem.setForeground(null);
 		tableItem.setBackground(null);
@@ -61,6 +62,5 @@ public class TableItemElement extends ItemElement {
 		parent.setForeground(null);
 		parent.setBackground(null);
 		CSSSWTFontHelper.restoreDefaultFont(parent);
-		super.reset();
 	}
 }
