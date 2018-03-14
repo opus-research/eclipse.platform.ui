@@ -91,7 +91,7 @@ public class ControlEnableState {
      */
     protected ControlEnableState(Control w, List<Control> exceptions) {
         super();
-        states = new ArrayList<>();
+        states = new ArrayList<ItemState>();
         this.exceptions = exceptions;
         readStateForAndDisable(w);
     }
