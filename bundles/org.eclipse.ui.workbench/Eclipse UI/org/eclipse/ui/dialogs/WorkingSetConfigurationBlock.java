@@ -12,11 +12,12 @@
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import com.ibm.icu.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,8 +32,6 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
@@ -332,12 +331,7 @@ public class WorkingSetConfigurationBlock {
 		newButton = new Button(composite, SWT.PUSH);
 		newButton.setText(this.newButtonLabel);
 		setButtonLayoutData(newButton);
-		newButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				createNewWorkingSet(newButton.getShell());
-			}
-		});
+		newButton.addSelectionListener(widgetSelectedAdapter(e -> createNewWorkingSet(newButton.getShell())));
 
 		workingSetLabel = new Label(composite, SWT.NONE);
 		workingSetLabel
@@ -352,44 +346,27 @@ public class WorkingSetConfigurationBlock {
 		selectButton
 				.setText(selectLabel);
 		setButtonLayoutData(selectButton);
-		selectButton.addSelectionListener(new SelectionAdapter() {
+		selectButton.addSelectionListener(widgetSelectedAdapter(e -> {
+			SimpleWorkingSetSelectionDialog dialog = new SimpleWorkingSetSelectionDialog(parent.getShell(),
+					workingSetTypeIds, selectedWorkingSets, false);
+			dialog.setMessage(WorkbenchMessages.WorkingSetGroup_WorkingSetSelection_message);
 
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				SimpleWorkingSetSelectionDialog dialog = new SimpleWorkingSetSelectionDialog(
-						parent.getShell(), workingSetTypeIds,
-						selectedWorkingSets, false);
-				dialog
-						.setMessage(WorkbenchMessages.WorkingSetGroup_WorkingSetSelection_message);
-
-				if (dialog.open() == Window.OK) {
-					IWorkingSet[] result = dialog.getSelection();
-					if (result != null && result.length > 0) {
-						selectedWorkingSets = result;
-						PlatformUI.getWorkbench().getWorkingSetManager()
-								.addRecentWorkingSet(result[0]);
-					} else {
-						selectedWorkingSets = EMPTY_WORKING_SET_ARRAY;
-					}
-					updateWorkingSetSelection();
+			if (dialog.open() == Window.OK) {
+				IWorkingSet[] result = dialog.getSelection();
+				if (result != null && result.length > 0) {
+					selectedWorkingSets = result;
+					PlatformUI.getWorkbench().getWorkingSetManager().addRecentWorkingSet(result[0]);
+				} else {
+					selectedWorkingSets = EMPTY_WORKING_SET_ARRAY;
 				}
+				updateWorkingSetSelection();
 			}
-		});
+		}));
 
-		enableButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				updateEnableState(enableButton.getSelection());
-			}
-		});
+		enableButton.addSelectionListener(widgetSelectedAdapter(e -> updateEnableState(enableButton.getSelection())));
 		updateEnableState(enableButton.getSelection());
 
-		workingSetCombo.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				updateSelectedWorkingSets();
-			}
-		});
+		workingSetCombo.addSelectionListener(widgetSelectedAdapter(e -> updateSelectedWorkingSets()));
 
 		workingSetCombo.setItems(getHistoryEntries());
 		if (selectedWorkingSets.length == 0 && selectionHistory.size() > 0) {
@@ -524,7 +501,7 @@ public class WorkingSetConfigurationBlock {
 	private List<String> loadSelectionHistory(IDialogSettings settings, String... workingSetIds) {
 		String[] strings = settings.getArray(WORKINGSET_SELECTION_HISTORY);
 		if (strings == null || strings.length == 0) {
-			return Collections.emptyList();
+			return new ArrayList<>();
 		}
 
 		List<String> result = new ArrayList<>();

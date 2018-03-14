@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,9 @@
  * Christian Georgi (SAP) - Bug 423882 - Warn user if workspace is newer than IDE
  * Lars Vogel <Lars.Vogel@vogella.com> - Bug 431862
  * Christian Georgi (SAP SE)           - bug 432480, bug 458811
+ * Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 411578
+ * Patrik Suzzi <psuzzi@gmail.com> - Bug 485201, 502050, 514355
+ * Simon Scholz <simon.scholz@vogella.com> - Bug 486777
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -31,6 +34,7 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String IDEWorkbenchAdvisor_preHistoryCompaction;
 	public static String IDEWorkbenchAdvisor_postHistoryCompaction;
 
+	public static String IDE_noFileEditorSelectedUserCanceled;
 	public static String IDE_noFileEditorFound;
 	public static String IDE_coreExceptionFileStore;
 
@@ -196,6 +200,7 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String PromptOnExitDialog_message0;
 	public static String PromptOnExitDialog_message1;
 	public static String PromptOnExitDialog_choice;
+	public static String PromptOnExitDialog_button_label_exit;
 
 	public static String Workbench_shortcuts;
 	public static String Workbench_openNewWindow;
@@ -388,6 +393,9 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String CopyFilesAndFoldersOperation_sourceCannotBeCopiedIntoAVirtualFolder;
 	public static String CopyFilesAndFoldersOperation_copyTitle;
 	public static String CopyFilesAndFoldersOperation_moveTitle;
+	public static String CopyFilesAndFoldersOperation_overwriteButtonLabel;
+	public static String CopyFilesAndFoldersOperation_overwriteAllButtonLabel;
+	public static String CopyFilesAndFoldersOperation_dontOverwriteButtonLabel;
 
 	public static String MoveFilesAndFoldersOperation_sameSourceAndDest;
 	public static String MoveFilesAndFoldersOperation_moveFailedTitle;
@@ -518,8 +526,12 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String IDEWorkspacePreference_openReferencedProjects;
 	public static String IDEWorkspacePreference_closeUnrelatedProjectsToolTip;
 	public static String IDEWorkspacePreference_workspaceLocation;
+	public static String IDEWorkspacePreference_windowTitleGroupText;
 	public static String IDEWorkspacePreference_showLocationInWindowTitle;
 	public static String IDEWorkspacePreference_showLocationInWindowTitle_lockedByCommandLine;
+	public static String IDEWorkspacePreference_showLocationNameInWindowTitle;
+	public static String IDEWorkspacePreference_showPerspectiveNameInWindowTitle;
+	public static String IDEWorkspacePreference_showProductNameInWindowTitle;
 	public static String IDEWorkspacePreference_workspaceName;
 	public static String IDEWorkbenchPreference_workbenchSystemExplorer;
 
@@ -599,6 +611,7 @@ public class IDEWorkbenchMessages extends NLS {
 
 	// --- Startup preferences ---
 	public static String StartupPreferencePage_refreshButton;
+	public static String StartupPreferencePage_showProblemsButton;
 	public static String StartupPreferencePage_launchPromptButton;
 	public static String StartupPreferencePage_exitPromptButton;
 
@@ -618,6 +631,7 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String ResourceInfo_derivedHasDerivedAncestor;
 	public static String ResourceInfo_type;
 	public static String ResourceInfo_location;
+	public static String ResourceInfo_location_button_tooltip;
 	public static String ResourceInfo_resolvedLocation;
 	public static String ResourceInfo_size;
 	public static String ResourceInfo_bytes;
@@ -693,6 +707,14 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String LinkedResourceEditor_removeMessage;
 	public static String LinkedResourceEditor_removingMessage;
 
+	// --- Auto-save ---
+	public static String AutoSavePreferencPage_autoSaveButton;
+	public static String AutoSavePreferencPage_intervalMessage;
+	public static String AutoSavePreferencPage_errorMessage;
+	public static String AutoSavePreferencPage_resetMessage;
+	public static String AutoSavePreferencPage_noteLabel;
+	public static String AutoSavePreferencPage_noteMessage;
+
 	// ==============================================================================
 	// Editors
 	// ==============================================================================
@@ -765,6 +787,7 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String ResourceSelectionDialog_showDerived;
 
 	public static String OpenResourceDialog_title;
+	public static String OpenResourceDialog_message;
 	public static String OpenResourceDialog_openWithButton_text;
 
 	public static String OpenResourceDialog_openWithMenu_label;
@@ -852,8 +875,6 @@ public class IDEWorkbenchMessages extends NLS {
 	// ==============================================================================
 	// Workbench
 	// ==============================================================================
-	public static String WorkbenchWindow_shellTitle;
-
 	public static String Internal_error;
 	public static String InternalError;
 	public static String InternalErrorNoArg;
@@ -937,8 +958,11 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String ChooseWorkspaceDialog_defaultProductName;
 	public static String ChooseWorkspaceDialog_workspaceEntryLabel;
 	public static String ChooseWorkspaceDialog_browseLabel;
+	public static String ChooseWorkspaceDialog_launchLabel;
 	public static String ChooseWorkspaceDialog_directoryBrowserTitle;
 	public static String ChooseWorkspaceDialog_directoryBrowserMessage;
+	public static String ChooseWorkspaceDialog_removeWorkspaceSelection;
+	public static String ChooseWorkspaceDialog_recentWorkspaces;
 	public static String ChooseWorkspaceDialog_useDefaultMessage;
 
 	public static String ChooseWorkspaceWithSettingsDialog_SettingsGroupName;
@@ -946,11 +970,14 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String ChooseWorkspaceWithSettingsDialog_TransferFailedMessage;
 	public static String ChooseWorkspaceWithSettingsDialog_SaveSettingsFailed;
 	public static String ChooseWorkspaceWithSettingsDialog_ClassCreationFailed;
+	public static String ChooseWorkspaceWithSettingsDialog_copySettingsDecoLabel;
 
 	public static String IDEApplication_workspaceMandatoryTitle;
 	public static String IDEApplication_workspaceMandatoryMessage;
 	public static String IDEApplication_workspaceInUseTitle;
 	public static String IDEApplication_workspaceInUseMessage;
+	public static String IDEApplication_workspaceInUse_Cancel;
+	public static String IDEApplication_workspaceInUse_Retry;
 	public static String IDEApplication_workspaceEmptyTitle;
 	public static String IDEApplication_workspaceEmptyMessage;
 	public static String IDEApplication_workspaceInvalidTitle;
@@ -969,13 +996,18 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String CleanDialog_buildCleanAuto;
 	public static String CleanDialog_buildCleanManual;
 	public static String CleanDialog_title;
-	public static String CleanDialog_cleanAllButton;
-	public static String CleanDialog_cleanSelectedButton;
+	public static String CleanDialog_clean_button_label;
+	public static String CleanDialog_selectAllButton;
+	public static String CleanDialog_deselectedAllButton;
 	public static String CleanDialog_buildNowButton;
 	public static String CleanDialog_globalBuildButton;
 	public static String CleanDialog_buildSelectedProjectsButton;
 	public static String CleanDialog_cleanSelectedTaskName;
 	public static String CleanDialog_cleanAllTaskName;
+	public static String CleanDialog_alwaysCleanAllButton;
+	public static String CleanDialog_typeFilterText;
+	public static String CleanDialog_clearToolTip;
+	public static String CleanDialog_AccessibleListenerClearButton;
 	public static String IDEEncoding_EncodingJob;
 	public static String IDEEditorsPreferencePage_WorkbenchPreference_viewsRelatedLink;
 	public static String IDEEditorsPreferencePage_WorkbenchPreference_FileEditorsRelatedLink;
@@ -1003,8 +1035,6 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String SystemSettingsChange_yes;
 	public static String SystemSettingsChange_no;
 
-	public static String UnsupportedVM_message;
-
 	public static String IDEWorkbenchActivityHelper_jobName;
 
 	public static String OpenDelayedFileAction_title;
@@ -1015,6 +1045,9 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String editorAssociationOverride_error_couldNotCreate_message;
 	public static String editorAssociationOverride_error_invalidElementName_message;
 	public static String editorAssociationOverride_error_invalidExtension_message;
+
+	public static String ExtendedFileEditorsPreferencePage_strategyForUnassociatedFiles;
+	public static String ExtendedFileEditorsPreferencePage_labelNotResolved;
 
 	static {
 		// load message values from bundle file

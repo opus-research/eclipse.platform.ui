@@ -45,7 +45,7 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
  *
  * <pre>
  * final IObservableValue count = WritableValue.withValueType(Integer.TYPE);
- * count.setValue(new Integer(0));
+ * count.setValue(Integer.valueOf(0));
  * IObservableList fibonacci = new ComputedList() {
  * 	protected List calculate() {
  * 		int size = ((Integer) count.getValue()).intValue();
@@ -53,13 +53,13 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
  * 		List result = new ArrayList();
  * 		for (int i = 0; i &lt; size; i++) {
  * 			if (i == 0)
- * 				result.add(new Integer(0));
+ * 				result.add(Integer.valueOf(0));
  * 			else if (i == 1)
- * 				result.add(new Integer(1));
+ * 				result.add(Integer.valueOf(1));
  * 			else {
  * 				Integer left = (Integer) result.get(i - 2);
  * 				Integer right = (Integer) result.get(i - 1);
- * 				result.add(new Integer(left.intValue() + right.intValue()));
+ * 				result.add(Integer.valueOf(left.intValue() + right.intValue()));
  * 			}
  * 		}
  * 		return result;
@@ -68,7 +68,7 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
  *
  * System.out.println(fibonacci); // =&gt; &quot;[]&quot;
  *
- * count.setValue(new Integer(5));
+ * count.setValue(Integer.valueOf(5));
  * System.out.println(fibonacci); // =&gt; &quot;[0, 1, 1, 2, 3]&quot;
  * </pre>
  *
@@ -207,16 +207,16 @@ public abstract class ComputedList<E> extends AbstractObservableList<E> {
 			// even if we were already stale before recomputing. This is in case
 			// clients assume that a list change is indicative of non-staleness.
 			stale = false;
-			for (int i = 0; i < newDependencies.length; i++) {
-				if (newDependencies[i].isStale()) {
+			for (IObservable newDependency : newDependencies) {
+				if (newDependency.isStale()) {
 					makeStale();
 					break;
 				}
 			}
 
 			if (!stale) {
-				for (int i = 0; i < newDependencies.length; i++) {
-					newDependencies[i].addStaleListener(privateInterface);
+				for (IObservable newDependency : newDependencies) {
+					newDependency.addStaleListener(privateInterface);
 				}
 			}
 
@@ -271,9 +271,7 @@ public abstract class ComputedList<E> extends AbstractObservableList<E> {
 
 	private void stopListening() {
 		if (dependencies != null) {
-			for (int i = 0; i < dependencies.length; i++) {
-				IObservable observable = dependencies[i];
-
+			for (IObservable observable : dependencies) {
 				observable.removeChangeListener(privateInterface);
 				observable.removeStaleListener(privateInterface);
 			}

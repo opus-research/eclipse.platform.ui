@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 400714, 441267, 441184, 445723, 445724, 472654, 481608
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -70,7 +71,6 @@ import org.eclipse.ui.internal.themes.IThemeRegistry;
 import org.eclipse.ui.internal.themes.ThemeRegistry;
 import org.eclipse.ui.internal.themes.ThemeRegistryReader;
 import org.eclipse.ui.internal.util.BundleUtility;
-import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.internal.wizards.ExportWizardRegistry;
 import org.eclipse.ui.internal.wizards.ImportWizardRegistry;
 import org.eclipse.ui.internal.wizards.NewWizardRegistry;
@@ -84,7 +84,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.BundleListener;
-import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.util.tracker.ServiceTracker;
 
 /**
@@ -283,17 +282,14 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
             }
             final Object[] ret = new Object[1];
             final CoreException[] exc = new CoreException[1];
-            BusyIndicator.showWhile(null, new Runnable() {
-                @Override
-				public void run() {
-                    try {
-                        ret[0] = element
-                                .createExecutableExtension(classAttribute);
-                    } catch (CoreException e) {
-                        exc[0] = e;
-                    }
-                }
-            });
+            BusyIndicator.showWhile(null, () -> {
+			    try {
+			        ret[0] = element
+			                .createExecutableExtension(classAttribute);
+			    } catch (CoreException e) {
+			        exc[0] = e;
+			    }
+			});
             if (exc[0] != null) {
 				throw exc[0];
 			}
@@ -497,10 +493,10 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
         IConfigurationElement targetElement = null;
         IConfigurationElement[] configElements = extensionPoint
                 .getConfigurationElements();
-        for (int j = 0; j < configElements.length; j++) {
-            String strID = configElements[j].getAttribute("id"); //$NON-NLS-1$
+        for (IConfigurationElement configElement : configElements) {
+            String strID = configElement.getAttribute("id"); //$NON-NLS-1$
             if (targetID.equals(strID)) {
-                targetElement = configElements[j];
+                targetElement = configElement;
                 break;
             }
         }
@@ -736,7 +732,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      */
     public static void log(Class clazz, String methodName, Throwable t) {
         String msg = MessageFormat.format("Exception in {0}.{1}: {2}", //$NON-NLS-1$
-                new Object[] { clazz.getName(), methodName, t });
+				clazz.getName(), methodName, t);
         log(msg, t);
     }
 
@@ -850,12 +846,12 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 			}
 		}
 		if (bidiParams != null) {
-			String[] bidiProps = Util.getArrayFromList(bidiParams, ";"); //$NON-NLS-1$
-			for (int i = 0; i < bidiProps.length; ++i) {
-				int eqPos = bidiProps[i].indexOf("="); //$NON-NLS-1$
-				if ((eqPos > 0) && (eqPos < bidiProps[i].length() - 1)) {
-					String nameProp = bidiProps[i].substring(0, eqPos);
-					String valProp = bidiProps[i].substring(eqPos + 1);
+			String[] bidiProps = bidiParams.split(";"); //$NON-NLS-1$
+			for (String bidiProp : bidiProps) {
+				int eqPos = bidiProp.indexOf("="); //$NON-NLS-1$
+				if ((eqPos > 0) && (eqPos < bidiProp.length() - 1)) {
+					String nameProp = bidiProp.substring(0, eqPos);
+					String valProp = bidiProp.substring(eqPos + 1);
 					if (nameProp.equals(BIDI_SUPPORT_OPTION)) {
 						BidiUtils.setBidiSupport("y".equals(valProp)); //$NON-NLS-1$
 					} else if (nameProp.equalsIgnoreCase(BIDI_TEXTDIR_OPTION)) {
@@ -1164,12 +1160,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 	 */
 	private BundleListener getBundleListener() {
 		if (bundleListener == null) {
-			bundleListener = new SynchronousBundleListener() {
-				@Override
-				public void bundleChanged(BundleEvent event) {
-					WorkbenchPlugin.this.bundleChanged(event);
-				}
-			};
+			bundleListener = event -> WorkbenchPlugin.this.bundleChanged(event);
 		}
 		return bundleListener;
 	}
@@ -1245,7 +1236,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 			// we're on a 32 bit platform so invoke it with splash
 			// handle as an int
 			splashShell = (Shell) method.invoke(null, new Object[] { display,
-					new Integer(splashHandle) });
+					Integer.valueOf(splashHandle) });
 		} catch (NoSuchMethodException e) {
 			// look for the 64 bit internal_new shell method
 			try {

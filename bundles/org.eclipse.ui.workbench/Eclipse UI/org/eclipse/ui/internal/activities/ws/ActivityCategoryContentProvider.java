@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.activities.IActivity;
@@ -89,8 +88,8 @@ public class ActivityCategoryContentProvider implements ITreeContentProvider {
 				currentCategory = manager.getCategory(currentCategoryId);
 				categoryActivities = getCategoryActivities(currentCategory);
 				// traverse the category's activities to find a duplicate
-				for (int index = 0; index < categoryActivities.length; index++) {
-					currentActivityId = categoryActivities[index].getId();
+				for (IActivity categoryActivity : categoryActivities) {
+					currentActivityId = categoryActivity.getId();
 					if (currentActivityId.equals(categorizedActivity
 							.getActivity().getId())) {
 						duplicateCategorizedactivities
@@ -129,9 +128,9 @@ public class ActivityCategoryContentProvider implements ITreeContentProvider {
 			requiredActivityId = currentActivityRequirementBinding
 					.getRequiredActivityId();
 			currentCategoryIds = getActivityCategories(requiredActivityId);
-			for (int index = 0; index < currentCategoryIds.length; index++) {
+			for (Object currentCategoryId : currentCategoryIds) {
 				childRequiredActivities.add(new CategorizedActivity(manager
-						.getCategory((String) currentCategoryIds[index]),
+						.getCategory((String) currentCategoryId),
 						manager.getActivity(requiredActivityId)));
 			}
 
@@ -167,11 +166,11 @@ public class ActivityCategoryContentProvider implements ITreeContentProvider {
 						.equals(activityId)) {
 					// We found one - add it to the list
 					currentCategoryIds = getActivityCategories(currentActivityId);
-					for (int index = 0; index < currentCategoryIds.length; index++) {
+					for (Object currentCategoryId : currentCategoryIds) {
 						parentRequiredActivities
 								.add(new CategorizedActivity(
 										manager
-												.getCategory((String) currentCategoryIds[index]),
+												.getCategory((String) currentCategoryId),
 										manager.getActivity(currentActivityId)));
 					}
 				}
@@ -197,8 +196,8 @@ public class ActivityCategoryContentProvider implements ITreeContentProvider {
 			currentCategoryId = (String) i.next();
 			categoryActivities = getCategoryActivities(manager
 					.getCategory(currentCategoryId));
-			for (int index = 0; index < categoryActivities.length; index++) {
-				if (categoryActivities[index].getId().equals(activityId)) {
+			for (IActivity categoryActivity : categoryActivities) {
+				if (categoryActivity.getId().equals(activityId)) {
 					activityCategories.add(currentCategoryId);
 					break;
 				}
@@ -249,6 +248,8 @@ public class ActivityCategoryContentProvider implements ITreeContentProvider {
 
     @Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-        manager = (IActivityManager) newInput;
+		if (newInput instanceof IActivityManager) {
+			manager = (IActivityManager) newInput;
+		}
     }
 }

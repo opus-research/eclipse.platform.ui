@@ -15,9 +15,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import org.eclipse.ui.themes.IThemeManager;
 
@@ -172,11 +172,10 @@ public class ThemeRegistry implements IThemeRegistry {
      */
     private IThemeElementDefinition[] overlay(IThemeElementDefinition[] defs,
             IThemeElementDefinition[] overrides) {
-        for (int i = 0; i < overrides.length; i++) {
-            int idx = Arrays.binarySearch(defs, overrides[i],
-                    IThemeRegistry.ID_COMPARATOR);
+        for (IThemeElementDefinition override : overrides) {
+			int idx = Arrays.binarySearch(defs, override, IThemeRegistry.ID_COMPARATOR);
             if (idx >= 0) {
-                defs[idx] = overlay(defs[idx], overrides[i]);
+                defs[idx] = overlay(defs[idx], override);
             }
         }
         return defs;
@@ -268,13 +267,13 @@ public class ThemeRegistry implements IThemeRegistry {
      *
      * @param otherData the other data to add
      */
-    public void addData(Map otherData) {
-        for (Iterator i = otherData.keySet().iterator(); i.hasNext();) {
-            Object key = i.next();
+    public void addData(Map<?, ?> otherData) {
+		for (Entry<?, ?> entry : otherData.entrySet()) {
+			Object key = entry.getKey();
             if (dataMap.containsKey(key)) {
 				continue;
 			}
-            dataMap.put(key, otherData.get(key));
+			dataMap.put(key, entry.getValue());
         }
     }
 

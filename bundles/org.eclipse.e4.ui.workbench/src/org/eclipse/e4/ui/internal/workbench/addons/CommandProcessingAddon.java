@@ -104,7 +104,9 @@ public class CommandProcessingAddon {
 
 	@PostConstruct
 	public void init() {
-		Activator.trace(Policy.DEBUG_CMDS, "Initialize commands from model", null); //$NON-NLS-1$
+		if (Policy.DEBUG_CMDS) {
+			Activator.trace(Policy.DEBUG_CMDS_FLAG, "Initialize commands from model", null); //$NON-NLS-1$
+		}
 		undefinedCategory = commandService.defineCategory(MApplication.class.getName(),
 				"Application Category", null); //$NON-NLS-1$
 		createCategories();
@@ -228,7 +230,8 @@ public class CommandProcessingAddon {
 		if (cmdModel.getCategory() != null) {
 			cat = commandService.getCategory(cmdModel.getCategory().getElementId());
 		}
-		commandService.defineCommand(id, name, desc, cat, parms);
+		commandService.defineCommand(id, name, desc, cat, parms,
+				cmdModel.getPersistedState().get("HelpContextId")); //$NON-NLS-1$
 	}
 
 	private void createCategories() {

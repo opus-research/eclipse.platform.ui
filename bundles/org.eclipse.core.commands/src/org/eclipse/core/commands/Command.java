@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -83,7 +83,7 @@ public final class Command extends NamedHandleObjectWithState implements Compara
 	 * A collection of objects listening to the execution of this command. This
 	 * collection is <code>null</code> if there are no listeners.
 	 */
-	private transient ListenerList executionListeners;
+	private transient ListenerList<IExecutionListener> executionListeners;
 
 	boolean shouldFireEvents = true;
 
@@ -166,7 +166,7 @@ public final class Command extends NamedHandleObjectWithState implements Compara
 		}
 
 		if (executionListeners == null) {
-			executionListeners = new ListenerList(ListenerList.IDENTITY);
+			executionListeners = new ListenerList<>(ListenerList.IDENTITY);
 		}
 
 		executionListeners.add(executionListener);
@@ -523,9 +523,8 @@ public final class Command extends NamedHandleObjectWithState implements Compara
 			throw new NullPointerException("Cannot fire a null event"); //$NON-NLS-1$
 		}
 
-		final Object[] listeners = getListeners();
-		for (int i = 0; i < listeners.length; i++) {
-			final ICommandListener listener = (ICommandListener) listeners[i];
+		for (Object listener : getListeners()) {
+			final ICommandListener commandListener = (ICommandListener) listener;
 			SafeRunner.run(new ISafeRunnable() {
 				@Override
 				public void handleException(Throwable exception) {
@@ -533,7 +532,7 @@ public final class Command extends NamedHandleObjectWithState implements Compara
 
 				@Override
 				public void run() throws Exception {
-					listener.commandChanged(commandEvent);
+					commandListener.commandChanged(commandEvent);
 				}
 			});
 		}
@@ -556,9 +555,7 @@ public final class Command extends NamedHandleObjectWithState implements Compara
 		}
 
 		if (executionListeners != null) {
-			final Object[] listeners = executionListeners.getListeners();
-			for (int i = 0; i < listeners.length; i++) {
-				final Object object = listeners[i];
+			for (final IExecutionListener object : executionListeners) {
 				if (object instanceof IExecutionListenerWithChecks) {
 					final IExecutionListenerWithChecks listener = (IExecutionListenerWithChecks) object;
 					listener.notDefined(getId(), e);
@@ -584,9 +581,7 @@ public final class Command extends NamedHandleObjectWithState implements Compara
 		}
 
 		if (executionListeners != null) {
-			final Object[] listeners = executionListeners.getListeners();
-			for (int i = 0; i < listeners.length; i++) {
-				final Object object = listeners[i];
+			for (final IExecutionListener object : executionListeners) {
 				if (object instanceof IExecutionListenerWithChecks) {
 					final IExecutionListenerWithChecks listener = (IExecutionListenerWithChecks) object;
 					listener.notEnabled(getId(), e);
@@ -611,9 +606,7 @@ public final class Command extends NamedHandleObjectWithState implements Compara
 		}
 
 		if (executionListeners != null) {
-			final Object[] listeners = executionListeners.getListeners();
-			for (int i = 0; i < listeners.length; i++) {
-				final IExecutionListener listener = (IExecutionListener) listeners[i];
+			for (final IExecutionListener listener : executionListeners) {
 				listener.notHandled(getId(), e);
 			}
 		}
@@ -636,9 +629,7 @@ public final class Command extends NamedHandleObjectWithState implements Compara
 		}
 
 		if (executionListeners != null) {
-			final Object[] listeners = executionListeners.getListeners();
-			for (int i = 0; i < listeners.length; i++) {
-				final IExecutionListener listener = (IExecutionListener) listeners[i];
+			for (final IExecutionListener listener : executionListeners) {
 				listener.postExecuteFailure(getId(), e);
 			}
 		}
@@ -660,9 +651,7 @@ public final class Command extends NamedHandleObjectWithState implements Compara
 		}
 
 		if (executionListeners != null) {
-			final Object[] listeners = executionListeners.getListeners();
-			for (int i = 0; i < listeners.length; i++) {
-				final IExecutionListener listener = (IExecutionListener) listeners[i];
+			for (final IExecutionListener listener : executionListeners) {
 				listener.postExecuteSuccess(getId(), returnValue);
 			}
 		}
@@ -683,9 +672,7 @@ public final class Command extends NamedHandleObjectWithState implements Compara
 		}
 
 		if (executionListeners != null) {
-			final Object[] listeners = executionListeners.getListeners();
-			for (int i = 0; i < listeners.length; i++) {
-				final IExecutionListener listener = (IExecutionListener) listeners[i];
+			for (final IExecutionListener listener : executionListeners) {
 				listener.preExecute(getId(), event);
 			}
 		}
@@ -757,8 +744,7 @@ public final class Command extends NamedHandleObjectWithState implements Compara
 			return null;
 		}
 
-		for (int i = 0; i < parameters.length; i++) {
-			final IParameter parameter = parameters[i];
+		for (final IParameter parameter : parameters) {
 			if (parameter.getId().equals(parameterId)) {
 				return parameter;
 			}
@@ -966,8 +952,7 @@ public final class Command extends NamedHandleObjectWithState implements Compara
 		// Swap the state around.
 		final String[] stateIds = getStateIds();
 		if (stateIds != null) {
-			for (int i = 0; i < stateIds.length; i++) {
-				final String stateId = stateIds[i];
+			for (final String stateId : stateIds) {
 				if (this.handler instanceof IObjectWithState) {
 					((IObjectWithState) this.handler).removeState(stateId);
 				}
@@ -992,7 +977,7 @@ public final class Command extends NamedHandleObjectWithState implements Compara
 
 		// Debugging output
 		if ((DEBUG_HANDLERS) && ((DEBUG_HANDLERS_COMMAND_ID == null) || (DEBUG_HANDLERS_COMMAND_ID.equals(id)))) {
-			final StringBuffer buffer = new StringBuffer("Command('"); //$NON-NLS-1$
+			final StringBuilder buffer = new StringBuilder("Command('"); //$NON-NLS-1$
 			buffer.append(id);
 			buffer.append("') has changed to "); //$NON-NLS-1$
 			if (handler == null) {
@@ -1110,8 +1095,7 @@ public final class Command extends NamedHandleObjectWithState implements Compara
 		if (stateIds != null) {
 			if (handler instanceof IObjectWithState) {
 				final IObjectWithState handlerWithState = (IObjectWithState) handler;
-				for (int i = 0; i < stateIds.length; i++) {
-					final String stateId = stateIds[i];
+				for (final String stateId : stateIds) {
 					handlerWithState.removeState(stateId);
 
 					final State state = getState(stateId);
@@ -1119,8 +1103,7 @@ public final class Command extends NamedHandleObjectWithState implements Compara
 					state.dispose();
 				}
 			} else {
-				for (int i = 0; i < stateIds.length; i++) {
-					final String stateId = stateIds[i];
+				for (final String stateId : stateIds) {
 					final State state = getState(stateId);
 					removeState(stateId);
 					state.dispose();
