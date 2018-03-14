@@ -13,7 +13,6 @@
  * 		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  * 		Implemented workbench auto-save to correctly restore state in case of crash.
  * Andrey Loskutov <loskutov@gmx.de> - Bug 388476
- * Bartosz Popiela <bartoszpop@gmail.com> - Bug 434108
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -1112,6 +1111,7 @@ public class WorkbenchMessages extends NLS {
 	
 	//Settings transfer
 	public static String WorkbenchLayoutSettings_Name;
+	public static String WorkbenchSettings_CouldNotCreateDirectories;
 	public static String WorkbenchSettings_CouldNotFindLocation;
 	public static String WorkingSets_Name;
 	public static String WorkingSets_CannotSave;

@@ -16,7 +16,6 @@
  *     Terry Parker <tparker@google.com> - Bug 416673
  *     Sergey Prigogin <eclipse.sprigogin@gmail.com> - Bug 438324
  *     Snjezana Peco <snjeza.peco@gmail.com> - Bug 405542
- *     Bartosz Popiela <bartoszpop@gmail.com> - Bug 434108
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -3808,27 +3807,5 @@ UIEvents.Context.TOPIC_CONTEXT,
 
 	protected String createId() {
 		return UUID.randomUUID().toString();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.IWorkbench#addWorkbenchListener(java.lang.
-	 * Object)
-	 */
-	@Override
-	public void addWorkbenchListener(Object listener) {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.IWorkbench#removeWorkbenchListener(java.lang.
-	 * Object)
-	 */
-	@Override
-	public void removeWorkbenchListener(Object listener) {
 	}
 }
