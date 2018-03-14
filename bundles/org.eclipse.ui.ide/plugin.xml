@@ -2391,12 +2391,5 @@
          </hiddenToolBarItem>
       </perspectiveExtension>
    </extension>
-   <extension
-         point="org.eclipse.ui.ide.editorAssociationOverride">
-      <editorAssociationOverride
-            class="org.eclipse.ui.internal.ide.misc.UnknownFileTypeEditorAssociationOverride"
-            id="org.eclipse.ui.ide.UnknownFileTypeEditorAssociationOverride">
-      </editorAssociationOverride>
-   </extension>
 
 </plugin>
