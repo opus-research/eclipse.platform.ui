@@ -30,13 +30,8 @@ public class Filter extends ViewerFilter {
 		return result.toArray();
 	}
 
-	public boolean isFilterProperty(Object element, Object aspect) {
-		return false;
-	}
-
 	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
-		// not used
 		return false;
 	}
 }
