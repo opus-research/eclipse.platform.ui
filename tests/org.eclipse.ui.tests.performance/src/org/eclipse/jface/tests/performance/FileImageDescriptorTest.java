@@ -53,18 +53,17 @@ public class FileImageDescriptorTest extends BasicPerformanceTest {
 
 		exercise(new TestRunnable() {
 			public void run() {
-				Class missing = null;
-				ArrayList images = new ArrayList();
+				Class<?> missing = null;
+				ArrayList<Image> images = new ArrayList<Image>();
 
 				Bundle bundle = UIPerformancePlugin.getDefault().getBundle();
-				Enumeration bundleEntries = bundle
+				Enumeration<String> bundleEntries = bundle
 						.getEntryPaths(IMAGES_DIRECTORY);
 
 				
 				while (bundleEntries.hasMoreElements()) {
 					ImageDescriptor descriptor;
-					String localImagePath = (String) bundleEntries
-							.nextElement();
+					String localImagePath = bundleEntries.nextElement();
 					
 					if(localImagePath.indexOf('.') < 0)
 						continue;
@@ -97,9 +96,9 @@ public class FileImageDescriptorTest extends BasicPerformanceTest {
 				}
 
 			
-				Iterator imageIterator = images.iterator();
+				Iterator<Image> imageIterator = images.iterator();
 				while (imageIterator.hasNext()) {
-					((Image) imageIterator.next()).dispose();
+					imageIterator.next().dispose();
 				}
 			}
 		}, 20, 100, JFacePerformanceSuite.MAX_TIME);

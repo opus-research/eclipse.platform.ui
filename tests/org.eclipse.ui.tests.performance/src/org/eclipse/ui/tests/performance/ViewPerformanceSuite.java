@@ -75,7 +75,7 @@ public class ViewPerformanceSuite extends TestSuite {
 	}
 
 	public static String[] getAllTestableViewIds() {
-		HashSet result = new HashSet();
+		HashSet<String> result = new HashSet<String>();
 
 		IViewDescriptor[] descriptors = PlatformUI.getWorkbench()
 				.getViewRegistry().getViews();
@@ -99,6 +99,6 @@ public class ViewPerformanceSuite extends TestSuite {
 
 		}
 
-		return (String[]) result.toArray(new String[result.size()]);
+		return result.toArray(new String[result.size()]);
 	}
 }
