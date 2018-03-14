@@ -3509,6 +3509,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 		// deactivate and activate other action sets as
 		updateActionSets(getPerspective(persp), getPerspective(dummyPerspective));
 		modelToPerspectiveMapping.remove(dummyPerspective);
+		getPerspective(persp).updateActionBars();
 
 		// migrate the tags
 		List<String> tags = persp.getTags();
