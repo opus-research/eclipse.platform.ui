@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -70,7 +69,6 @@ import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
-import org.eclipse.jface.action.IContributionManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.SubContributionItem;
@@ -102,8 +100,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 
 	private Map<MMenuElement, ContributionRecord> modelContributionToRecord = new HashMap<MMenuElement, ContributionRecord>();
 	private Map<MMenuElement, ArrayList<ContributionRecord>> sharedElementToRecord = new HashMap<MMenuElement, ArrayList<ContributionRecord>>();
-
-	private Collection<IContributionManager> mgrToUpdate = new LinkedHashSet<>();
 
 	@Inject
 	private Logger logger;
@@ -220,7 +216,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					manager.setVisible(menuModel.isVisible());
 					if (manager.getParent() != null) {
 						manager.getParent().markDirty();
-						scheduleManagerUpdate(manager.getParent());
+						manager.getParent().update(false);
 					}
 				} else if (element instanceof MMenuElement) {
 					MMenuElement itemModel = (MMenuElement) element;
@@ -232,7 +228,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					item.setVisible(itemModel.isVisible());
 					if (item.getParent() != null) {
 						item.getParent().markDirty();
-						scheduleManagerUpdate(item.getParent());
+						item.getParent().update(false);
 					}
 				}
 			}
@@ -560,7 +556,7 @@ MenuManagerEventHelper.getInstance()
 				@Override
 				public boolean changed(IEclipseContext context) {
 					record.updateVisibility(parentContext.getActiveLeaf());
-					scheduleManagerUpdate(manager);
+					manager.update(false);
 					return true;
 				}
 			});
@@ -633,7 +629,7 @@ MenuManagerEventHelper.getInstance()
 				modelProcessSwitch(parentManager, (MMenuElement) childME);
 			}
 		}
-		scheduleManagerUpdate(parentManager);
+		parentManager.update(false);
 	}
 
 	private void addToManager(MenuManager parentManager, MMenuElement model,
@@ -1154,31 +1150,5 @@ MenuManagerEventHelper.getInstance()
 		}
 		MenuManager mm = getManager(menu);
 		clearModelToManager(menu, mm);
-	}
-
-	private void scheduleManagerUpdate(IContributionManager mgr) {
-		// Bug 467000: Avoid repeatedly updating menu managers
-		synchronized (mgrToUpdate) {
-			if (this.mgrToUpdate.isEmpty()) {
-				Display display = context.get(Display.class);
-				if (display != null && !display.isDisposed()) {
-					display.timerExec(100, new Runnable() {
-
-						@Override
-						public void run() {
-							Collection<IContributionManager> toUpdate = new LinkedHashSet<>();
-							synchronized (mgrToUpdate) {
-								toUpdate.addAll(mgrToUpdate);
-								mgrToUpdate.clear();
-							}
-							for (IContributionManager mgr : toUpdate) {
-								mgr.update(false);
-							}
-					}
-					});
-				}
-				this.mgrToUpdate.add(mgr);
-			}
-		}
 	}
 }
