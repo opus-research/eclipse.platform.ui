@@ -80,6 +80,9 @@ public class NewProjectAction extends Action {
 				org.eclipse.ui.internal.IWorkbenchHelpContextIds.NEW_ACTION);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IAction.
+     */
     @Override
 	public void run() {
         // Create wizard selection wizard.

@@ -78,6 +78,9 @@ public class MoveResourceAction extends CopyResourceAction {
 				IIDEHelpContextIds.MOVE_RESOURCE_ACTION);
     }
     
+    /* (non-Javadoc)
+     * Overrides method in CopyResourceAction
+     */
     @Override
 	protected CopyFilesAndFoldersOperation createOperation() {
         return new MoveFilesAndFoldersOperation(getShell());
@@ -92,6 +95,9 @@ public class MoveResourceAction extends CopyResourceAction {
         return destinations;
     }
 
+    /* (non-Javadoc)
+     * Overrides method in CopyResourceAction
+     */
     @Override
 	protected IResource[] getResources(List resourceList) {
         ReadOnlyStateChecker checker = new ReadOnlyStateChecker(getShell(),
@@ -100,6 +106,9 @@ public class MoveResourceAction extends CopyResourceAction {
         return checker.checkReadOnlyResources(super.getResources(resourceList));
     }
 
+    /* (non-Javadoc)
+     * Overrides method in CopyResourceAction
+     */
     @Override
 	protected void runOperation(IResource[] resources, IContainer destination) {
         //Initialize the destinations
@@ -113,6 +122,9 @@ public class MoveResourceAction extends CopyResourceAction {
         }
     }
     
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.actions.CopyResourceAction#run()
+     */
     @Override
 	public void run() {
 		if (LTKLauncher.openMoveWizard(getStructuredSelection())) {
