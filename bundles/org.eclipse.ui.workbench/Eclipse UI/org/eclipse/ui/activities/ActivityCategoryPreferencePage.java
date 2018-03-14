@@ -193,7 +193,12 @@ public final class ActivityCategoryPreferencePage extends PreferencePage impleme
                     PlatformUI.PLUGIN_ID, "icons/full/ovr16/lock_ovr.png"); //$NON-NLS-1$
         }
 
-		@Override
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object,
+         *      int)
+         */
         public Image getColumnImage(Object element, int columnIndex) {
             ICategory category = (ICategory) element;
             ImageDescriptor descriptor = PlatformUI.getWorkbench()
@@ -235,7 +240,9 @@ public final class ActivityCategoryPreferencePage extends PreferencePage impleme
             return name;
         }   
        
-		@Override
+        /* (non-Javadoc)
+         * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object, int)
+         */
         public String getColumnText(Object element, int columnIndex) {
         	return getText(element);
         }
@@ -246,7 +253,11 @@ public final class ActivityCategoryPreferencePage extends PreferencePage impleme
             manager.dispose();
         }
 
-		@Override
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.eclipse.ui.activities.IActivityManagerListener#activityManagerChanged(org.eclipse.ui.activities.ActivityManagerEvent)
+         */
         public void activityManagerChanged(
                 ActivityManagerEvent activityManagerEvent) {
             if (activityManagerEvent.haveEnabledActivityIdsChanged()) {
@@ -258,19 +269,32 @@ public final class ActivityCategoryPreferencePage extends PreferencePage impleme
 
     private class CategoryContentProvider implements IStructuredContentProvider {
 
-		@Override
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+         */
         public Object[] getElements(Object inputElement) {
             // convert to category objects
             return WorkbenchActivityHelper.resolveCategories(workingCopy,
                     (Set) inputElement);
         }
 
-		@Override
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+         */
         public void dispose() {
 
         }
 
-		@Override
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
+         *      java.lang.Object, java.lang.Object)
+         */
         public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 
         }
@@ -500,7 +524,11 @@ public final class ActivityCategoryPreferencePage extends PreferencePage impleme
         categoryViewer
                 .addSelectionChangedListener(new ISelectionChangedListener() {
 
-                    @Override
+                    /*
+                     * (non-Javadoc)
+                     * 
+                     * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
+                     */
                     public void selectionChanged(SelectionChangedEvent event) {
                         ICategory element = (ICategory) ((IStructuredSelection) event
                                 .getSelection()).getFirstElement();
@@ -572,7 +600,11 @@ public final class ActivityCategoryPreferencePage extends PreferencePage impleme
         descriptionText.setText(""); //$NON-NLS-1$
     }
 
-	@Override
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
+     */
     public void init(IWorkbench workbench) {
         this.workbench = workbench;
         workingCopy = workbench.getActivitySupport().createWorkingCopy();
@@ -625,7 +657,12 @@ public final class ActivityCategoryPreferencePage extends PreferencePage impleme
         workingCopy.setEnabledActivityIds(defaultEnabled);
     }
     
-	@Override
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement,
+     *      java.lang.String, java.lang.Object)
+     */
     public void setInitializationData(IConfigurationElement config,
             String propertyName, Object data) {
         if (data instanceof Hashtable) {
