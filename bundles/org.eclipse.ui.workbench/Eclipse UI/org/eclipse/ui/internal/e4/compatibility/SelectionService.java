@@ -146,26 +146,12 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 	void setSelectionService(@Optional ESelectionService selectionService) {
 		if (this.selectionService != null) {
 			this.selectionService.removeSelectionListener(listener);
-			for (String partId : targetedListeners.keySet()) {
-				this.selectionService.removeSelectionListener(partId, listener);
-			}
-
 			this.selectionService.removePostSelectionListener(postListener);
-			for (String partId : targetedPostSelectionListeners.keySet()) {
-				this.selectionService.removePostSelectionListener(partId, listener);
-			}
 		}
 
 		if (selectionService != null) {
 			selectionService.addSelectionListener(listener);
-			for (String partId : targetedListeners.keySet()) {
-				selectionService.addSelectionListener(partId, listener);
-			}
-
 			selectionService.addPostSelectionListener(postListener);
-			for (String partId : targetedPostSelectionListeners.keySet()) {
-				selectionService.addPostSelectionListener(partId, postListener);
-			}
 			this.selectionService = selectionService;
 		}
 	 }
@@ -234,9 +220,6 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 			listeners = new HashSet<ISelectionListener>();
 			targetedListeners.put(partId, listeners);
 		}
-		if (listeners.size() == 0 && selectionService != null) {
-			selectionService.addSelectionListener(partId, this.listener);
-		}
 		listeners.add(listener);
 	}
 
@@ -265,9 +248,6 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 		if (listeners == null) {
 			listeners = new HashSet<ISelectionListener>();
 			targetedPostSelectionListeners.put(partId, listeners);
-		}
-		if (listeners.size() == 0 && selectionService != null) {
-			selectionService.addPostSelectionListener(partId, postListener);
 		}
 		listeners.add(listener);
 	}
@@ -330,9 +310,6 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 		Set<ISelectionListener> listeners = targetedListeners.get(partId);
 		if (listeners != null) {
 			listeners.remove(listener);
-			if (listeners.size() == 0 && selectionService != null) {
-				selectionService.removeSelectionListener(partId, this.listener);
-			}
 		}
 	}
 
@@ -360,9 +337,6 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 		Set<ISelectionListener> listeners = targetedPostSelectionListeners.get(partId);
 		if (listeners != null) {
 			listeners.remove(listener);
-			if (listeners.size() == 0 && selectionService != null) {
-				selectionService.removePostSelectionListener(partId, postListener);
-			}
 		}
 	}
 
