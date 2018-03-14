@@ -1019,7 +1019,7 @@ public class StackRenderer extends LazyStackRenderer {
 				SWT.ON_TOP, SWT.V_SCROLL | SWT.H_SCROLL,
 				ctxt.get(EPartService.class), stack,
 				(ISWTResourceUtilities) ctxt.get(IResourceUtilities.class),
-				ctf, getInitialMRUValue(ctf));
+				getInitialMRUValue(ctf));
 		editorList.setInput();
 
 		Point size = editorList.computeSizeHint();
