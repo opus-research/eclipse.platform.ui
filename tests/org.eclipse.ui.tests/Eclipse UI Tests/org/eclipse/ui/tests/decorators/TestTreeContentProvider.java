@@ -19,7 +19,9 @@ import org.eclipse.jface.viewers.Viewer;
 public class TestTreeContentProvider implements ITreeContentProvider {
 
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
+	 */
 	public Object[] getChildren(Object parentElement) {
 		TreeElement parent = (TreeElement) parentElement;
 		TreeElement[] children = new TreeElement[10];
@@ -30,29 +32,39 @@ public class TestTreeContentProvider implements ITreeContentProvider {
 
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
+	 */
 	public Object getParent(Object element) {
 		return ((TreeElement) element).parent;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
+	 */
 	public boolean hasChildren(Object element) {
 		return true;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+	 */
 	public Object[] getElements(Object inputElement) {
 		TreeElement root = new TreeElement(null, 0);
 		return new Object[] { root };
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+	 */
 	public void dispose() {
 		//No dispose behavior
 
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+	 */
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		
 

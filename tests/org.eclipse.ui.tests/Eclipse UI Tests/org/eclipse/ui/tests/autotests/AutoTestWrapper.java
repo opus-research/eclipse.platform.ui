@@ -26,8 +26,10 @@ public class AutoTestWrapper extends TestCase {
         this.log = resultLog;
     }
     
-    @Override
-	protected void runTest() throws Throwable {
+    /* (non-Javadoc)
+     * @see junit.framework.TestCase#runTest()
+     */
+    protected void runTest() throws Throwable {
         String testName = test.getName();
         
         TestResult result;

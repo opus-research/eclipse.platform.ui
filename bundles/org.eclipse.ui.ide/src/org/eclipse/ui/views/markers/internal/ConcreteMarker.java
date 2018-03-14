@@ -113,8 +113,7 @@ public class ConcreteMarker extends MarkerNode{
     /* (non-Javadoc)
      * @see org.eclipse.ui.views.markers.internal.MarkerNode#getDescription()
      */
-    @Override
-	public String getDescription() {
+    public String getDescription() {
         return description;
     }
 
@@ -163,8 +162,7 @@ public class ConcreteMarker extends MarkerNode{
         return marker;
     }
 
-    @Override
-	public boolean equals(Object object) {
+    public boolean equals(Object object) {
         if (!(object instanceof ConcreteMarker)) {
             return false;
         }
@@ -174,8 +172,7 @@ public class ConcreteMarker extends MarkerNode{
         return other.getMarker().equals(getMarker());
     }
 
-    @Override
-	public int hashCode() {
+    public int hashCode() {
         return getMarker().hashCode();
     }
 
@@ -191,7 +188,6 @@ public class ConcreteMarker extends MarkerNode{
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.internal.MarkerNode#getChildren()
 	 */
-	@Override
 	public MarkerNode[] getChildren() {
 		return Util.EMPTY_MARKER_ARRAY;
 	}
@@ -199,7 +195,6 @@ public class ConcreteMarker extends MarkerNode{
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.internal.MarkerNode#getParent()
 	 */
-	@Override
 	public MarkerNode getParent() {
 		return markerCategory;
 	}
@@ -207,7 +202,6 @@ public class ConcreteMarker extends MarkerNode{
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.internal.MarkerNode#isConcrete()
 	 */
-	@Override
 	public boolean isConcrete() {
 		return true;
 	}
@@ -253,7 +247,6 @@ public class ConcreteMarker extends MarkerNode{
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.internal.MarkerNode#getConcreteRepresentative()
 	 */
-	@Override
 	public ConcreteMarker getConcreteRepresentative() {
 		return this;
 	}

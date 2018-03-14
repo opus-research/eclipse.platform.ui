@@ -347,6 +347,11 @@ class NewWizardNewPage implements ISelectionChangedListener {
         treeViewer.getTree().setFont(parent.getFont());
 
         treeViewer.addDoubleClickListener(new IDoubleClickListener() {
+            /*
+             * (non-Javadoc)
+             * 
+             * @see org.eclipse.jface.viewers.IDoubleClickListener#doubleClick(org.eclipse.jface.viewers.DoubleClickEvent)
+             */
             @Override
 			public void doubleClick(DoubleClickEvent event) {
             	    IStructuredSelection s = (IStructuredSelection) event
@@ -472,6 +477,9 @@ class NewWizardNewPage implements ISelectionChangedListener {
         // hook a listener to get rid of cached images.
         descImageCanvas.addDisposeListener(new DisposeListener() {
 
+            /* (non-Javadoc)
+             * @see org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
+             */
             @Override
 			public void widgetDisposed(DisposeEvent e) {
                 for (Iterator i = imageTable.values().iterator(); i.hasNext();) {

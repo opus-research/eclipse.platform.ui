@@ -70,8 +70,7 @@ public class LinkedResourcesPreferencePage extends PreferencePage implements
      * 
      * @see PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
      */
-    @Override
-	protected Control createContents(Composite parent) {
+    protected Control createContents(Composite parent) {
         Font font = parent.getFont();
 
         PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
@@ -94,8 +93,7 @@ public class LinkedResourcesPreferencePage extends PreferencePage implements
         enableLinkedResourcesButton.setFont(font);
         enableLinkedResourcesButton
                 .addSelectionListener(new SelectionAdapter() {
-                    @Override
-					public void widgetSelected(SelectionEvent e) {
+                    public void widgetSelected(SelectionEvent e) {
                         boolean enabled = enableLinkedResourcesButton
                                 .getSelection();
                         Preferences preferences = ResourcesPlugin.getPlugin()
@@ -136,7 +134,9 @@ public class LinkedResourcesPreferencePage extends PreferencePage implements
         return pageComponent;
     }
 
-	@Override
+    /* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
+	 */
 	protected void performDefaults() {
 		dragAndDropHandlingEditor.loadDefault();
 		super.performDefaults();
@@ -182,8 +182,7 @@ public class LinkedResourcesPreferencePage extends PreferencePage implements
      * Disposes the path variables group.
      * @see org.eclipse.jface.dialogs.IDialogPage#dispose()
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         pathVariablesGroup.dispose();
         super.dispose();
     }
@@ -193,8 +192,7 @@ public class LinkedResourcesPreferencePage extends PreferencePage implements
      * 
      * @see IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
      */
-    @Override
-	public void init(IWorkbench workbench) {
+    public void init(IWorkbench workbench) {
     }
 
     /**
@@ -204,8 +202,7 @@ public class LinkedResourcesPreferencePage extends PreferencePage implements
      * @see PreferencePage#performOk()
      * @see PathVariablesGroup#performOk()
      */
-    @Override
-	public boolean performOk() {
+    public boolean performOk() {
 		dragAndDropHandlingEditor.store();
         return pathVariablesGroup.performOk();
     }

@@ -173,7 +173,6 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 			data.horizontalAlignment = GridData.BEGINNING;
 			advancedButton.setLayoutData(data);
 			advancedButton.addSelectionListener(new SelectionAdapter() {
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 					handleAdvancedButtonSelect();
 				}
@@ -181,22 +180,18 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 		}
 		linkedResourceGroup = new CreateLinkedResourceGroup(IResource.FOLDER,
 				new Listener() {
-					@Override
 					public void handleEvent(Event e) {
 						setPageComplete(validatePage());
 						firstLinkCheck = false;
 					}
 				}, new CreateLinkedResourceGroup.IStringValue() {
-					@Override
 					public String getValue() {
 						return resourceGroup.getResource();
 					}
 
-					@Override
 					public void setValue(String string) {
 						resourceGroup.setResource(string);
 					}
-					@Override
 					public IResource getResource() {
 						IPath path = resourceGroup.getContainerFullPath();
 						if (path != null) {
@@ -260,7 +255,6 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 	/**
 	 * (non-Javadoc) Method declared on IDialogPage.
 	 */
-	@Override
 	public void createControl(Composite parent) {
 		initializeDialogUnits(parent);
 		// top level group
@@ -302,7 +296,6 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 	 * @deprecated As of 3.3, use {@link #createNewFolder()} which uses the
 	 *   undoable operation support.
 	 */
-	@Deprecated
 	protected void createFolder(IFolder folderHandle, IProgressMonitor monitor)
 			throws CoreException {
 		try {
@@ -460,7 +453,6 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 			} 
 		}
 		IRunnableWithProgress op = new IRunnableWithProgress() {
-			@Override
 			public void run(IProgressMonitor monitor) {
 				AbstractOperation op;
 				op = new CreateFolderOperation(
@@ -476,7 +468,6 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 				} catch (final ExecutionException e) {
 					getContainer().getShell().getDisplay().syncExec(
 							new Runnable() {
-								@Override
 								public void run() {
 									if (e.getCause() instanceof CoreException) {
 										ErrorDialog
@@ -616,7 +607,6 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 			useLinkedResource.setLayoutData(data);
 
 			SelectionAdapter radioListener = new SelectionAdapter() {
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 					handleRadioSelect();
 				}
@@ -656,7 +646,6 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 			data.horizontalIndent = indent;
 			filterButton.setLayoutData(data);
 			filterButton.addSelectionListener(new SelectionAdapter() {
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 					handleEditFilterSelect();
 				}
@@ -691,7 +680,6 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 	 * <code>Listener</code> method handles all events and enablements for
 	 * controls on this page. Subclasses may extend.
 	 */
-	@Override
 	public void handleEvent(Event ev) {
 		setPageComplete(validatePage());
 	}
@@ -727,7 +715,6 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 	/*
 	 * @see DialogPage.setVisible(boolean)
 	 */
-	@Override
 	public void setVisible(boolean visible) {
 		super.setVisible(visible);
 		if (visible) {
