@@ -1500,11 +1500,7 @@ public class HockeyleagueEditor
 			getActionBars().getStatusLineManager() != null ?
 				getActionBars().getStatusLineManager().getProgressMonitor() :
 				new NullProgressMonitor();
-		try {
-			doSave(progressMonitor);
-		} finally {
-			progressMonitor.done();
-		}
+		doSave(progressMonitor);
 	}
 
 	/**
