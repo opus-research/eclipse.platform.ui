@@ -661,6 +661,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 						}
 					});
 				}
+				viewer.getControl().getParent().layout(true, false);
 			}
 		});
 		((Tree) viewer.getControl()).addSelectionListener(new SelectionAdapter() {
