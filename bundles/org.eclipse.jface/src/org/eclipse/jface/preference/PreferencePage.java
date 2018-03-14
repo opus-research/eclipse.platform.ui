@@ -151,8 +151,7 @@ public abstract class PreferencePage extends DialogPage implements
      *   <code>new Point(width,height)</code>, or 
      *   <code>(0,0)</code> if the page doesn't currently have any UI component
      */
-    @Override
-	public Point computeSize() {
+    public Point computeSize() {
         if (size != null) {
 			return size;
 		}
@@ -208,8 +207,7 @@ public abstract class PreferencePage extends DialogPage implements
      * it is expected to set the margins of this <code>Layout</code> to 0 pixels.
      * @see IDialogPage#createControl(Composite)
      */
-    @Override
-	public void createControl(Composite parent){
+    public void createControl(Composite parent){
 
         GridData gd;
         Composite content = new Composite(parent, SWT.NONE);
@@ -393,8 +391,7 @@ public abstract class PreferencePage extends DialogPage implements
      * to make a page invalid.
      * @see IPreferencePage#isValid()
      */
-    @Override
-	public boolean isValid() {
+    public boolean isValid() {
         return isValid;
     }
 
@@ -417,8 +414,7 @@ public abstract class PreferencePage extends DialogPage implements
      * if the page is valid.
      * @see IPreferencePage#okToLeave()
      */
-    @Override
-	public boolean okToLeave() {
+    public boolean okToLeave() {
         return isValid();
     }
 
@@ -459,8 +455,7 @@ public abstract class PreferencePage extends DialogPage implements
      * </p>
      * @see IPreferencePage#performCancel()
      */
-    @Override
-	public boolean performCancel() {
+    public boolean performCancel() {
         return true;
     }
 
@@ -480,8 +475,7 @@ public abstract class PreferencePage extends DialogPage implements
     /* (non-Javadoc)
      * @see org.eclipse.jface.preference.IPreferencePage#performOk()
      */
-    @Override
-	public boolean performOk() {
+    public boolean performOk() {
         return true;
     }
 
@@ -489,8 +483,7 @@ public abstract class PreferencePage extends DialogPage implements
     /* (non-Javadoc)
      * @see org.eclipse.jface.preference.IPreferencePage#setContainer(org.eclipse.jface.preference.IPreferencePageContainer)
      */
-    @Override
-	public void setContainer(IPreferencePageContainer container) {
+    public void setContainer(IPreferencePageContainer container) {
         this.container = container;
     }
 
@@ -512,8 +505,7 @@ public abstract class PreferencePage extends DialogPage implements
     /* (non-Javadoc)
      * @see org.eclipse.jface.preference.IPreferencePage#setSize(org.eclipse.swt.graphics.Point)
      */
-    @Override
-	public void setSize(Point uiSize) {
+    public void setSize(Point uiSize) {
         Control control = getControl();
         if (control != null) {
             control.setSize(uiSize);

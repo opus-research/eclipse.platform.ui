@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -129,7 +129,7 @@ public class WBWRenderer extends SWTPartRenderer {
 	private EventHandler shellUpdater;
 	private EventHandler visibilityHandler;
 	private EventHandler sizeHandler;
-	private ThemeDefinitionChangedHandler themeDefinitionChanged;
+	private EventHandler themeDefinitionChanged;
 
 	@Inject
 	private EModelService modelService;
@@ -324,23 +324,6 @@ public class WBWRenderer extends SWTPartRenderer {
 		eventBroker.unsubscribe(visibilityHandler);
 		eventBroker.unsubscribe(sizeHandler);
 		eventBroker.unsubscribe(themeDefinitionChanged);
-
-		themeDefinitionChanged.dispose();
-	}
-
-	/**
-	 * @param wbwModel
-	 * @return Returns the style override bits or -1 if there is no override
-	 */
-	private int getStyleOverride(MWindow wbwModel) {
-		String overrideStr = wbwModel.getPersistedState().get(
-				IPresentationEngine.STYLE_OVERRIDE_KEY);
-		if (overrideStr == null || overrideStr.length() == 0)
-			return -1;
-
-		int val = -1;
-		val = Integer.parseInt(overrideStr);
-		return val;
 	}
 
 	public Object createWidget(MUIElement element, Object parent) {
@@ -362,17 +345,16 @@ public class WBWRenderer extends SWTPartRenderer {
 				.getShell();
 
 		final Shell wbwShell;
-
-		int styleOverride = getStyleOverride(wbwModel) | rtlStyle;
 		if (parentShell == null) {
-			int style = styleOverride == -1 ? SWT.SHELL_TRIM | rtlStyle
-					: styleOverride;
-			wbwShell = new Shell(Display.getCurrent(), style);
+			wbwShell = new Shell(Display.getCurrent(), SWT.SHELL_TRIM
+					| rtlStyle);
 			wbwModel.getTags().add("topLevel"); //$NON-NLS-1$
+		} else if (wbwModel.getTags().contains("dragHost")) { //$NON-NLS-1$
+			wbwShell = new Shell(parentShell, SWT.BORDER | rtlStyle);
+			wbwShell.setAlpha(110);
 		} else {
-			int style = SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.CLOSE | rtlStyle;
-			style = styleOverride == -1 ? style : styleOverride;
-			wbwShell = new Shell(parentShell, style);
+			wbwShell = new Shell(parentShell, SWT.TITLE | SWT.RESIZE | SWT.MAX
+					| SWT.CLOSE | rtlStyle);
 
 			// Prevent ESC from closing the DW
 			wbwShell.addTraverseListener(new TraverseListener() {
@@ -748,7 +730,6 @@ public class WBWRenderer extends SWTPartRenderer {
 			shell.setMinimized(true);
 
 		shell.layout(true);
-		forceLayout(shell);
 		if (shellME.isVisible()) {
 			shell.open();
 		} else {
@@ -844,8 +825,6 @@ public class WBWRenderer extends SWTPartRenderer {
 	@SuppressWarnings("restriction")
 	protected static class ThemeDefinitionChangedHandler implements
 			EventHandler {
-		protected Set<Resource> unusedResources = new HashSet<Resource>();
-
 		public void handleEvent(Event event) {
 			Object element = event.getProperty(IEventBroker.DATA);
 
@@ -853,6 +832,7 @@ public class WBWRenderer extends SWTPartRenderer {
 				return;
 			}
 
+			List<Object> unusedResources = new ArrayList<Object>();
 			Set<CSSEngine> engines = new HashSet<CSSEngine>();
 
 			// In theory we can have multiple engines since API allows it.
@@ -865,14 +845,13 @@ public class WBWRenderer extends SWTPartRenderer {
 			}
 
 			for (CSSEngine engine : engines) {
-				for (Object resource : removeResources(engine
-						.getResourcesRegistry())) {
-					if (resource instanceof Resource
-							&& !((Resource) resource).isDisposed()) {
-						unusedResources.add((Resource) resource);
-					}
-				}
+				unusedResources.addAll(removeResources(engine
+						.getResourcesRegistry()));
 				engine.reapply();
+			}
+
+			for (Object resource : unusedResources) {
+				disposeResource(resource);
 			}
 		}
 
@@ -890,25 +869,11 @@ public class WBWRenderer extends SWTPartRenderer {
 			return Collections.emptyList();
 		}
 
-		public void dispose() {
-			for (Resource resource : unusedResources) {
-				if (!resource.isDisposed()) {
-					resource.dispose();
-				}
+		protected void disposeResource(Object resource) {
+			if (resource instanceof Resource
+					&& !((Resource) resource).isDisposed()) {
+				((Resource) resource).dispose();
 			}
-			unusedResources.clear();
-		}
-	}
-
-	private void forceLayout(Shell shell) {
-		int i = 0;
-		while(shell.isLayoutDeferred()) {
-			shell.setLayoutDeferred(false);
-			i++;
-		}
-		while(i > 0) {
-			shell.setLayoutDeferred(true);
-			i--;
 		}
 	}
 }

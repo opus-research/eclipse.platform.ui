@@ -304,8 +304,7 @@ public class OpenStrategy {
 
             boolean expandOccurred = false;
 
-            @Override
-			public void handleEvent(final Event e) {
+            public void handleEvent(final Event e) {
                 if (e.type == SWT.DefaultSelection) {
                     SelectionEvent event = new SelectionEvent(e);
                     fireDefaultSelectionEvent(event);
@@ -343,8 +342,7 @@ public class OpenStrategy {
                     mouseMoveEvent = e;
                     final Runnable runnable[] = new Runnable[1];
                     runnable[0] = new Runnable() {
-                        @Override
-						public void run() {
+                        public void run() {
                             long time = System.currentTimeMillis();
                             int diff = (int) (time - startTime);
                             if (diff <= TIME) {
@@ -419,13 +417,11 @@ public class OpenStrategy {
                     // handles the case where the user presses arrowDown/Up successively.
                     // We only want to open an editor for the last selected item.
                     display.asyncExec(new Runnable() {
-                        @Override
-						public void run() {
+                        public void run() {
                             if (arrowKeyDown) {
                                 display.timerExec(TIME, new Runnable() {
 
-                                    @Override
-									public void run() {
+                                    public void run() {
                                         if (id == count[0]) {
                                             firePostSelectionEvent(new SelectionEvent(
                                                     e));
