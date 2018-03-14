@@ -49,7 +49,7 @@ public final class KeyBindingService implements INestableKeyBindingService {
      */
     private boolean disposed;
 
-	private final Map<IWorkbenchSite, IKeyBindingService> nestedServices = new HashMap<>();
+	private final Map<IWorkbenchSite, IKeyBindingService> nestedServices = new HashMap<IWorkbenchSite, IKeyBindingService>();
 
     /**
      * The set of context identifiers enabled in this key binding service (not
@@ -69,7 +69,7 @@ public final class KeyBindingService implements INestableKeyBindingService {
 
 	private IKeyBindingService activeService;
 
-	private Map<IAction, IHandlerActivation> actionToProxy = new HashMap<>();
+	private Map<IAction, IHandlerActivation> actionToProxy = new HashMap<IAction, IHandlerActivation>();
 
     /**
      * Constructs a new instance of <code>KeyBindingService</code> on a given
@@ -290,7 +290,7 @@ public final class KeyBindingService implements INestableKeyBindingService {
 		}
 
         // Build the list of active scopes
-		final Set<String> activeScopes = new HashSet<>();
+		final Set<String> activeScopes = new HashSet<String>();
         activeScopes.addAll(enabledContextIds);
 		if (activeService instanceof KeyBindingService) {
 			activeScopes.addAll(((KeyBindingService) activeService).enabledContextIds);
@@ -373,7 +373,7 @@ public final class KeyBindingService implements INestableKeyBindingService {
 			return;
 		}
 		Set<String> oldContextIds = enabledContextIds;
-		enabledContextIds = new HashSet<>(Arrays.asList(scopes));
+		enabledContextIds = new HashSet<String>(Arrays.asList(scopes));
 		EContextService cs = workbenchPartSite.getService(EContextService.class);
 		addParents(cs, scopes);
 

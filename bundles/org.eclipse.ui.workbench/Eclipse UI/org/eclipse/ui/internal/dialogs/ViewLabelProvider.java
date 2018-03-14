@@ -43,7 +43,7 @@ public class ViewLabelProvider extends ColumnLabelProvider {
 	 */
 	private static final String FOLDER_ICON = "org.eclipse.e4.descriptor.folder"; //$NON-NLS-1$
 
-	private Map<String, Image> imageMap = new HashMap<>();
+	private Map<String, Image> imageMap = new HashMap<String, Image>();
 	private IEclipseContext context;
 	private final Color dimmedForeground;
 

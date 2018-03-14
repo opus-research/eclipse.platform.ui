@@ -405,7 +405,7 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 		return null;
 	}
 
-	private static HashMap<String, Set<EditorActionBars>> actionCache = new HashMap<>();
+	private static HashMap<String, Set<EditorActionBars>> actionCache = new HashMap<String, Set<EditorActionBars>>();
 
 	/*
 	 * Creates the action bars for an editor. Editors of the same type should
@@ -431,7 +431,7 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 		EditorActionBars actionBars = new EditorActionBars(page, page.getWorkbenchWindow(), type);
 		actionBars.addRef();
 		if (candidates == null) {
-			candidates = new HashSet<>(3);
+			candidates = new HashSet<EditorActionBars>(3);
 			candidates.add(actionBars);
 			actionCache.put(type, candidates);
 		} else

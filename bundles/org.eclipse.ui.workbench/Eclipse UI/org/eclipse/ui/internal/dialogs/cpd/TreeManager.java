@@ -56,7 +56,7 @@ public class TreeManager {
 	private static ICheckStateListener viewerCheckListener = null;
 	private static ITreeContentProvider treeContentProvider = null;
 
-	private List<CheckListener> listeners = new ArrayList<>();
+	private List<CheckListener> listeners = new ArrayList<CheckListener>();
 	private LocalResourceManager resourceManager = new LocalResourceManager(JFaceResources.getResources());
 
 	/**
@@ -244,7 +244,7 @@ public class TreeManager {
 
 		public TreeItem(String label) {
 			this.label = label;
-			this.children = new ArrayList<>();
+			this.children = new ArrayList<TreeItem>();
 		}
 
 		public String getLabel() {
@@ -444,7 +444,7 @@ public class TreeManager {
 	 * Creates a new {@link TreeManager}.
 	 */
 	public TreeManager() {
-		listeners = new ArrayList<>();
+		listeners = new ArrayList<CheckListener>();
 	}
 
 	/**

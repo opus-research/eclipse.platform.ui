@@ -1405,8 +1405,8 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
 	 */
 	private IEditorDescriptor [] findRelatedObjects(IContentType type, String fileName,
 			RelatedRegistry registry) {
-		List<IEditorDescriptor> allRelated = new ArrayList<>();
-		List<IEditorDescriptor> nonDefaultFileEditors = new ArrayList<>();
+		List<IEditorDescriptor> allRelated = new ArrayList<IEditorDescriptor>();
+		List<IEditorDescriptor> nonDefaultFileEditors = new ArrayList<IEditorDescriptor>();
 
 		if (fileName != null) {
 			FileEditorMapping mapping = getMappingFor(fileName);

@@ -56,11 +56,11 @@ public class ViewRegistry implements IViewRegistry {
 	@Inject
 	Logger logger;
 
-	private Map<String, IViewDescriptor> descriptors = new HashMap<>();
+	private Map<String, IViewDescriptor> descriptors = new HashMap<String, IViewDescriptor>();
 
-	private List<IStickyViewDescriptor> stickyDescriptors = new ArrayList<>();
+	private List<IStickyViewDescriptor> stickyDescriptors = new ArrayList<IStickyViewDescriptor>();
 
-	private HashMap<String, ViewCategory> categories = new HashMap<>();
+	private HashMap<String, ViewCategory> categories = new HashMap<String, ViewCategory>();
 
 	private Category miscCategory = new Category();
 
@@ -183,14 +183,14 @@ public class ViewRegistry implements IViewRegistry {
 	@Override
 	public IViewDescriptor[] getViews() {
 		Collection<?> allowedViews = WorkbenchActivityHelper.restrictCollection(
-				descriptors.values(), new ArrayList<>());
+				descriptors.values(), new ArrayList<Object>());
 		return allowedViews.toArray(new IViewDescriptor[allowedViews.size()]);
 	}
 
 	@Override
 	public IStickyViewDescriptor[] getStickyViews() {
 		Collection<?> allowedViews = WorkbenchActivityHelper.restrictCollection(stickyDescriptors,
-				new ArrayList<>());
+				new ArrayList<Object>());
 		return allowedViews.toArray(new IStickyViewDescriptor[allowedViews.size()]);
 	}
 

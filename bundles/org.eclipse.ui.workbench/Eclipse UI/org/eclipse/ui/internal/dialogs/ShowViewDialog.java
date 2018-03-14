@@ -412,7 +412,7 @@ public class ShowViewDialog extends Dialog implements ISelectionChangedListener,
 	 * Update the selection object.
 	 */
 	protected void updateSelection(SelectionChangedEvent event) {
-		ArrayList<MPartDescriptor> descs = new ArrayList<>();
+		ArrayList<MPartDescriptor> descs = new ArrayList<MPartDescriptor>();
 		IStructuredSelection sel = (IStructuredSelection) event.getSelection();
 		for (Iterator<?> i = sel.iterator(); i.hasNext();) {
 			Object o = i.next();

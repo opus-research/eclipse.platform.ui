@@ -155,7 +155,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
     private BundleContext bundleContext;
 
     // The set of currently starting bundles
-	private Collection<Bundle> startingBundles = new HashSet<>();
+	private Collection<Bundle> startingBundles = new HashSet<Bundle>();
 
     /**
      * Global workbench ui plugin flag. Only workbench implementation is allowed to use this flag

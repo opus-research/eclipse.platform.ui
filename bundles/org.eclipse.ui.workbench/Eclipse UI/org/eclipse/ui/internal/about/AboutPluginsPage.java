@@ -85,12 +85,12 @@ public class AboutPluginsPage extends ProductInfoPage {
 		/**
 		 * Queue containing bundle signing info to be resolved.
 		 */
-		private LinkedList<AboutBundleData> resolveQueue = new LinkedList<>();
+		private LinkedList<AboutBundleData> resolveQueue = new LinkedList<AboutBundleData>();
 
 		/**
 		 * Queue containing bundle data that's been resolve and needs updating.
 		 */
-		private List<AboutBundleData> updateQueue = new ArrayList<>();
+		private List<AboutBundleData> updateQueue = new ArrayList<AboutBundleData>();
 
 		/*
 		 * this job will attempt to discover the signing state of a given bundle
@@ -334,7 +334,7 @@ public class AboutPluginsPage extends ProductInfoPage {
 
 		// create a data object for each bundle, remove duplicates, and include
 		// only resolved bundles (bug 65548)
-		Map<String, AboutBundleData> map = new HashMap<>();
+		Map<String, AboutBundleData> map = new HashMap<String, AboutBundleData>();
 		for (int i = 0; i < bundles.length; ++i) {
 			AboutBundleData data = new AboutBundleData(bundles[i]);
 			if (BundleUtility.isReady(data.getState())

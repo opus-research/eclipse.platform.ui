@@ -68,6 +68,6 @@ public class PluginActionCoolBarContributionItem extends
 			}
 		}
 	};
-	private static HashSet<IContributionManager> managersToUpdate = new HashSet<>();
+	private static HashSet<IContributionManager> managersToUpdate = new HashSet<IContributionManager>();
 	private static boolean queued = false;
 }

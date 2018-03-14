@@ -21,7 +21,7 @@ import org.eclipse.core.commands.IParameterValues;
  */
 public class SplitValues implements IParameterValues {
 
-	private HashMap<String, String> values = new HashMap<>();
+	private HashMap<String, String> values = new HashMap<String, String>();
 
 	public SplitValues() {
 		values.put(WorkbenchMessages.SplitValues_Horizontal, "true"); //$NON-NLS-1$
