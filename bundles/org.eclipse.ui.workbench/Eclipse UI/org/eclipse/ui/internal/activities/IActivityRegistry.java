@@ -15,19 +15,21 @@ import java.util.List;
 
 public interface IActivityRegistry {
 
-	void addActivityRegistryListener(IActivityRegistryListener activityRegistryListener);
+    void addActivityRegistryListener(
+            IActivityRegistryListener activityRegistryListener);
 
-	List<ActivityRequirementBindingDefinition> getActivityRequirementBindingDefinitions();
+    List getActivityRequirementBindingDefinitions();
 
-	List<ActivityDefinition> getActivityDefinitions();
+    List getActivityDefinitions();
 
-	List<ActivityPatternBindingDefinition> getActivityPatternBindingDefinitions();
+    List getActivityPatternBindingDefinitions();
 
-	List<CategoryActivityBindingDefinition> getCategoryActivityBindingDefinitions();
+    List getCategoryActivityBindingDefinitions();
 
-	List<CategoryDefinition> getCategoryDefinitions();
+    List getCategoryDefinitions();
 
-	List<String> getDefaultEnabledActivities();
+    List getDefaultEnabledActivities();
 
-	void removeActivityRegistryListener(IActivityRegistryListener activityRegistryListener);
+    void removeActivityRegistryListener(
+            IActivityRegistryListener activityRegistryListener);
 }

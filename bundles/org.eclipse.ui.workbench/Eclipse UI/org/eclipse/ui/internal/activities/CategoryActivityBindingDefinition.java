@@ -16,130 +16,137 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+
 import org.eclipse.ui.internal.util.Util;
 
 public final class CategoryActivityBindingDefinition {
-	private final static int HASH_FACTOR = 89;
+    private final static int HASH_FACTOR = 89;
 
-	private final static int HASH_INITIAL = CategoryActivityBindingDefinition.class.getName()
-			.hashCode();
+    private final static int HASH_INITIAL = CategoryActivityBindingDefinition.class
+            .getName().hashCode();
 
-	static Map<String, Collection<CategoryActivityBindingDefinition>> categoryActivityBindingDefinitionsByCategoryId(
-			Collection<CategoryActivityBindingDefinition> categoryActivityBindingDefinitions) {
-		if (categoryActivityBindingDefinitions == null) {
+    static Map categoryActivityBindingDefinitionsByCategoryId(
+            Collection categoryActivityBindingDefinitions) {
+        if (categoryActivityBindingDefinitions == null) {
 			throw new NullPointerException();
 		}
 
-		Map<String, Collection<CategoryActivityBindingDefinition>> map = new HashMap<String, Collection<CategoryActivityBindingDefinition>>();
-		Iterator<CategoryActivityBindingDefinition> iterator = categoryActivityBindingDefinitions
-				.iterator();
+        Map map = new HashMap();
+        Iterator iterator = categoryActivityBindingDefinitions.iterator();
 
-		while (iterator.hasNext()) {
-			CategoryActivityBindingDefinition categoryActivityBindingDefinition = iterator.next();
-			String categoryId = categoryActivityBindingDefinition.getCategoryId();
+        while (iterator.hasNext()) {
+            Object object = iterator.next();
+            Util
+                    .assertInstance(object,
+                            CategoryActivityBindingDefinition.class);
+            CategoryActivityBindingDefinition categoryActivityBindingDefinition = (CategoryActivityBindingDefinition) object;
+            String categoryId = categoryActivityBindingDefinition
+                    .getCategoryId();
 
-			if (categoryId != null) {
-				Collection<CategoryActivityBindingDefinition> categoryActivityBindingDefinitions2 = map
-						.get(categoryId);
+            if (categoryId != null) {
+                Collection categoryActivityBindingDefinitions2 = (Collection) map
+                        .get(categoryId);
 
-				if (categoryActivityBindingDefinitions2 == null) {
-					categoryActivityBindingDefinitions2 = new HashSet<CategoryActivityBindingDefinition>();
-					map.put(categoryId, categoryActivityBindingDefinitions2);
-				}
+                if (categoryActivityBindingDefinitions2 == null) {
+                    categoryActivityBindingDefinitions2 = new HashSet();
+                    map.put(categoryId, categoryActivityBindingDefinitions2);
+                }
 
-				categoryActivityBindingDefinitions2.add(categoryActivityBindingDefinition);
-			}
-		}
+                categoryActivityBindingDefinitions2
+                        .add(categoryActivityBindingDefinition);
+            }
+        }
 
-		return map;
-	}
+        return map;
+    }
 
-	private String activityId;
+    private String activityId;
 
-	private String categoryId;
+    private String categoryId;
 
-	private transient int hashCode = HASH_INITIAL;
+    private transient int hashCode = HASH_INITIAL;
 
-	private String sourceId;
+    private String sourceId;
 
-	private transient String string;
+    private transient String string;
 
-	public CategoryActivityBindingDefinition(String activityId, String categoryId, String sourceId) {
-		this.activityId = activityId;
-		this.categoryId = categoryId;
-		this.sourceId = sourceId;
-	}
+    public CategoryActivityBindingDefinition(String activityId,
+            String categoryId, String sourceId) {
+        this.activityId = activityId;
+        this.categoryId = categoryId;
+        this.sourceId = sourceId;
+    }
 
-	public int compareTo(Object object) {
-		CategoryActivityBindingDefinition castedObject = (CategoryActivityBindingDefinition) object;
-		int compareTo = Util.compare(activityId, castedObject.activityId);
+    public int compareTo(Object object) {
+        CategoryActivityBindingDefinition castedObject = (CategoryActivityBindingDefinition) object;
+        int compareTo = Util.compare(activityId, castedObject.activityId);
 
-		if (compareTo == 0) {
-			compareTo = Util.compare(categoryId, castedObject.categoryId);
+        if (compareTo == 0) {
+            compareTo = Util.compare(categoryId, castedObject.categoryId);
 
-			if (compareTo == 0) {
+            if (compareTo == 0) {
 				compareTo = Util.compare(sourceId, castedObject.sourceId);
 			}
-		}
+        }
 
-		return compareTo;
-	}
+        return compareTo;
+    }
 
-	public boolean equals(Object object) {
-		if (!(object instanceof CategoryActivityBindingDefinition)) {
+    public boolean equals(Object object) {
+        if (!(object instanceof CategoryActivityBindingDefinition)) {
 			return false;
 		}
 
-		final CategoryActivityBindingDefinition castedObject = (CategoryActivityBindingDefinition) object;
-		if (!Util.equals(activityId, castedObject.activityId)) {
-			return false;
-		}
+        final CategoryActivityBindingDefinition castedObject = (CategoryActivityBindingDefinition) object;
+        if (!Util.equals(activityId, castedObject.activityId)) {
+            return false;
+        }
 
-		if (!Util.equals(categoryId, castedObject.categoryId)) {
-			return false;
-		}
+        if (!Util.equals(categoryId, castedObject.categoryId)) {
+            return false;
+        }
 
-		return Util.equals(sourceId, castedObject.sourceId);
-	}
+        return Util.equals(sourceId, castedObject.sourceId);
+    }
 
-	public String getActivityId() {
-		return activityId;
-	}
+    public String getActivityId() {
+        return activityId;
+    }
 
-	public String getCategoryId() {
-		return categoryId;
-	}
+    public String getCategoryId() {
+        return categoryId;
+    }
 
-	public String getSourceId() {
-		return sourceId;
-	}
+    public String getSourceId() {
+        return sourceId;
+    }
 
-	public int hashCode() {
-		if (hashCode == HASH_INITIAL) {
-			hashCode = hashCode * HASH_FACTOR + Util.hashCode(activityId);
-			hashCode = hashCode * HASH_FACTOR + Util.hashCode(categoryId);
-			hashCode = hashCode * HASH_FACTOR + Util.hashCode(sourceId);
-			if (hashCode == HASH_INITIAL) {
+    public int hashCode() {
+        if (hashCode == HASH_INITIAL) {
+            hashCode = hashCode * HASH_FACTOR + Util.hashCode(activityId);
+            hashCode = hashCode * HASH_FACTOR + Util.hashCode(categoryId);
+            hashCode = hashCode * HASH_FACTOR + Util.hashCode(sourceId);
+            if (hashCode == HASH_INITIAL) {
 				hashCode++;
 			}
-		}
+        }
 
-		return hashCode;
-	}
+        return hashCode;
+    }
 
-	public String toString() {
-		if (string == null) {
-			final StringBuffer stringBuffer = new StringBuffer();
-			stringBuffer.append('[');
-			stringBuffer.append(activityId);
-			stringBuffer.append(',');
-			stringBuffer.append(categoryId);
-			stringBuffer.append(',');
-			stringBuffer.append(sourceId);
-			stringBuffer.append(']');
-			string = stringBuffer.toString();
-		}
+    public String toString() {
+        if (string == null) {
+            final StringBuffer stringBuffer = new StringBuffer();
+            stringBuffer.append('[');
+            stringBuffer.append(activityId);
+            stringBuffer.append(',');
+            stringBuffer.append(categoryId);
+            stringBuffer.append(',');
+            stringBuffer.append(sourceId);
+            stringBuffer.append(']');
+            string = stringBuffer.toString();
+        }
 
-		return string;
-	}
+        return string;
+    }
 }

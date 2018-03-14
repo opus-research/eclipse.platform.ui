@@ -43,33 +43,43 @@ public class DocumentCSSImpl implements ExtendedDocumentCSS {
 	 */
 	private Map styleDeclarationMap = null;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.stylesheets.DocumentStyle#getStyleSheets()
+	 */
 	public StyleSheetList getStyleSheets() {
 		return styleSheetList;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.DocumentCSS#getOverrideStyle(org.w3c.dom.Element, java.lang.String)
+	 */
 	public CSSStyleDeclaration getOverrideStyle(Element element, String s) {
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.e4.css.core.dom.ExtendedDocumentCSS#addStyleSheet(org.w3c.dom.stylesheets.StyleSheet)
+	 */
 	public void addStyleSheet(StyleSheet styleSheet) {
 		styleSheetList.addStyleSheet(styleSheet);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.e4.css.core.dom.ExtendedDocumentCSS#removeAllStyleSheets()
+	 */
 	public void removeAllStyleSheets() {
 		styleSheetList.removeAllStyleSheets();
 		this.styleDeclarationMap = null;
 	}
 
-	@Override
 	public List queryConditionSelector(int conditionType) {
 		return querySelector(Selector.SAC_CONDITIONAL_SELECTOR, conditionType);
 	}
 
-	@Override
 	public List querySelector(int selectorType, int conditionType) {
 		List list = getCSSStyleDeclarationList(selectorType, conditionType);
 		if (list != null) {
