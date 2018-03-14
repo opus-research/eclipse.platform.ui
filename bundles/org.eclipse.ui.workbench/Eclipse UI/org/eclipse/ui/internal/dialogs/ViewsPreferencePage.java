@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Erik Chou <ekchou@ymail.com> - Bug 425962
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445664, 442278
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 388476
  *******************************************************************************/
 
 package org.eclipse.ui.internal.dialogs;
@@ -28,14 +27,11 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.RegistryFactory;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.css.swt.theme.ITheme;
 import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
 import org.eclipse.e4.ui.model.application.MApplication;
-import org.eclipse.e4.ui.workbench.renderers.swt.StackRenderer;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
@@ -72,7 +68,6 @@ import org.eclipse.ui.internal.tweaklets.PreferencePageEnhancer;
 import org.eclipse.ui.internal.tweaklets.Tweaklets;
 import org.eclipse.ui.internal.util.PrefUtil;
 import org.eclipse.ui.themes.IThemeManager;
-import org.osgi.service.prefs.BackingStoreException;
 
 /**
  * The ViewsPreferencePage is the page used to set preferences for the
@@ -90,7 +85,6 @@ public class ViewsPreferencePage extends PreferencePage implements
 	private ITheme currentTheme;
 	private String defaultTheme;
 	private Button enableAnimations;
-	private Button enableMru;
 	private Button useColoredLabels;
 	
 	private Text colorsAndFontsThemeDescriptionText;
@@ -160,7 +154,6 @@ public class ViewsPreferencePage extends PreferencePage implements
 		createColorsAndFontsThemeDescriptionText(comp);
 		createEnableAnimationsPref(comp);
 		createColoredLabelsPref(comp);
-		createEnableMruPref(comp);
 
 		((PreferencePageEnhancer) Tweaklets.get(PreferencePageEnhancer.KEY))
 				.setSelection(currentTheme);
@@ -219,17 +212,6 @@ public class ViewsPreferencePage extends PreferencePage implements
 		return button;
 	}
 
-	protected void createEnableMruPref(Composite composite) {
-		IEclipsePreferences prefs = getSwtRendererPreferences();
-		boolean mruControlledByCSS = prefs.getBoolean(StackRenderer.MRU_CONTROLLED_BY_CSS_KEY, false);
-		if (mruControlledByCSS) {
-			return;
-		}
-		boolean defaultValue = getDefaultMRUValue();
-		boolean actualValue = prefs.getBoolean(StackRenderer.MRU_KEY, defaultValue);
-		enableMru = createCheckButton(composite, WorkbenchMessages.ViewsPreference_enableMru, actualValue);
-	}
-
 	protected void createEnableAnimationsPref(Composite composite) {
 		IPreferenceStore apiStore = PrefUtil.getAPIPreferenceStore();
 
@@ -265,28 +247,10 @@ public class ViewsPreferencePage extends PreferencePage implements
 			apiStore.setValue(IWorkbenchPreferenceConstants.USE_COLORED_LABELS,
 					useColoredLabels.getSelection());
 			((PreferencePageEnhancer) Tweaklets.get(PreferencePageEnhancer.KEY)).performOK();
-
-			if (enableMru != null) {
-				IEclipsePreferences prefs = getSwtRendererPreferences();
-				prefs.putBoolean(StackRenderer.MRU_KEY, enableMru.getSelection());
-				try {
-					prefs.flush();
-				} catch (BackingStoreException e) {
-					WorkbenchPlugin.log("Failed to set SWT renderer preferences", e); //$NON-NLS-1$
-				}
-			}
 		}
 		return super.performOk();
 	}
 
-	private IEclipsePreferences getSwtRendererPreferences() {
-		return InstanceScope.INSTANCE.getNode("org.eclipse.e4.ui.workbench.renderers.swt"); //$NON-NLS-1$
-	}
-	
-	private boolean getDefaultMRUValue() {
-		return getSwtRendererPreferences().getBoolean(StackRenderer.MRU_KEY_DEFAULT, true);
-	}
-	
 	private void setColorsAndFontsTheme(ColorsAndFontsTheme theme) {
 		org.eclipse.ui.themes.ITheme currentTheme = PlatformUI.getWorkbench().getThemeManager()
 				.getCurrentTheme();
@@ -310,9 +274,6 @@ public class ViewsPreferencePage extends PreferencePage implements
 					.getDefaultBoolean(IWorkbenchPreferenceConstants.ENABLE_ANIMATIONS));
 			useColoredLabels.setSelection(apiStore
 					.getDefaultBoolean(IWorkbenchPreferenceConstants.USE_COLORED_LABELS));
-			if (enableMru != null) {
-				enableMru.setSelection(getDefaultMRUValue());
-			}
 		}
 		super.performDefaults();
 	}
