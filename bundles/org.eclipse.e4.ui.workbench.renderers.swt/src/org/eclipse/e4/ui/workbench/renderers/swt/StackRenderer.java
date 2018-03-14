@@ -7,11 +7,10 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728, 430166
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,8 +20,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -60,7 +57,6 @@ import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.LegacyActionTools;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.ACC;
 import org.eclipse.swt.accessibility.Accessible;
@@ -82,7 +78,10 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.RowData;
@@ -98,8 +97,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 import org.w3c.dom.css.CSSValue;
@@ -126,9 +123,9 @@ public class StackRenderer extends LazyStackRenderer {
 	private static final String STACK_SELECTED_PART = "stack_selected_part"; //$NON-NLS-1$
 
 	/**
-	 * Add this tag to prevent the next tab's activation from granting focus
-	 * toac the part. This is used to keep the focus on the CTF when traversing
-	 * the tabs using the keyboard.
+	 * Add this tag to prevent the next tab's activation from granting focus toac
+	 * the part. This is used to keep the focus on the CTF when traversing the
+	 * tabs using the keyboard.
 	 */
 	private static final String INHIBIT_FOCUS = "InhibitFocus"; //$NON-NLS-1$
 
@@ -302,7 +299,6 @@ public class StackRenderer extends LazyStackRenderer {
 
 		// TODO: Refactor using findItemForPart(MPart) method
 		itemUpdater = new EventHandler() {
-			@Override
 			public void handleEvent(Event event) {
 				MUIElement element = (MUIElement) event
 						.getProperty(UIEvents.EventTags.ELEMENT);
@@ -355,7 +351,6 @@ public class StackRenderer extends LazyStackRenderer {
 
 		// TODO: Refactor using findItemForPart(MPart) method
 		dirtyUpdater = new EventHandler() {
-			@Override
 			public void handleEvent(Event event) {
 				Object objElement = event
 						.getProperty(UIEvents.EventTags.ELEMENT);
@@ -406,7 +401,6 @@ public class StackRenderer extends LazyStackRenderer {
 				UIEvents.Dirtyable.DIRTY), dirtyUpdater);
 
 		viewMenuUpdater = new EventHandler() {
-			@Override
 			public void handleEvent(Event event) {
 				Object objElement = event
 						.getProperty(UIEvents.EventTags.ELEMENT);
@@ -448,7 +442,6 @@ public class StackRenderer extends LazyStackRenderer {
 				viewMenuUpdater);
 
 		childrenHandler = new EventHandler() {
-			@Override
 			public void handleEvent(Event event) {
 				Object changedObj = event
 						.getProperty(UIEvents.EventTags.ELEMENT);
@@ -480,7 +473,6 @@ public class StackRenderer extends LazyStackRenderer {
 				childrenHandler);
 
 		stylingHandler = new EventHandler() {
-			@Override
 			public void handleEvent(Event event) {
 				MUIElement changed = (MUIElement) event
 						.getProperty(UIEvents.EventTags.ELEMENT);
@@ -593,7 +585,6 @@ public class StackRenderer extends LazyStackRenderer {
 				: LegacyActionTools.escapeMnemonics(newToolTip);
 	}
 
-	@Override
 	public Object createWidget(MUIElement element, Object parent) {
 		if (!(element instanceof MPartStack) || !(parent instanceof Composite))
 			return null;
@@ -680,18 +671,15 @@ public class StackRenderer extends LazyStackRenderer {
 		menuTB.setVisible(false);
 
 		ti.addSelectionListener(new SelectionListener() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				showMenu((ToolItem) e.widget);
 			}
 
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				showMenu((ToolItem) e.widget);
 			}
 		});
 		menuTB.getAccessible().addAccessibleListener(new AccessibleAdapter() {
-			@Override
 			public void getName(AccessibleEvent e) {
 				if (e.childID != ACC.CHILDID_SELF) {
 					Accessible accessible = (Accessible) e.getSource();
@@ -796,7 +784,6 @@ public class StackRenderer extends LazyStackRenderer {
 		}
 	}
 
-	@Override
 	protected void createTab(MElementContainer<MUIElement> stack,
 			MUIElement element) {
 		MPart part = null;
@@ -969,7 +956,6 @@ public class StackRenderer extends LazyStackRenderer {
 
 		// Handle traverse events for accessibility
 		ctf.addTraverseListener(new TraverseListener() {
-			@Override
 			public void keyTraversed(TraverseEvent e) {
 				if (e.detail == SWT.TRAVERSE_ARROW_NEXT
 						|| e.detail == SWT.TRAVERSE_ARROW_PREVIOUS) {
@@ -996,7 +982,6 @@ public class StackRenderer extends LazyStackRenderer {
 		// Detect activation...picks up cases where the user clicks on the
 		// (already active) tab
 		ctf.addListener(SWT.Activate, new org.eclipse.swt.widgets.Listener() {
-			@Override
 			public void handleEvent(org.eclipse.swt.widgets.Event event) {
 				if (event.detail == SWT.MouseDown) {
 					CTabFolder ctf = (CTabFolder) event.widget;
@@ -1023,11 +1008,9 @@ public class StackRenderer extends LazyStackRenderer {
 		});
 
 		ctf.addSelectionListener(new SelectionListener() {
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				// prevent recursions
 				if (ignoreTabSelChanges)
@@ -1093,7 +1076,6 @@ public class StackRenderer extends LazyStackRenderer {
 		ctf.addMouseListener(mouseListener);
 
 		CTabFolder2Adapter closeListener = new CTabFolder2Adapter() {
-			@Override
 			public void close(CTabFolderEvent event) {
 				event.doit = closePart(event.item, true);
 			}
@@ -1107,7 +1089,6 @@ public class StackRenderer extends LazyStackRenderer {
 		ctf.addCTabFolder2Listener(closeListener);
 
 		ctf.addMenuDetectListener(new MenuDetectListener() {
-			@Override
 			public void menuDetected(MenuDetectEvent e) {
 				Point absolutePoint = new Point(e.x, e.y);
 				Point relativePoint = ctf.getDisplay().map(null, ctf,
@@ -1159,10 +1140,8 @@ public class StackRenderer extends LazyStackRenderer {
 		editorList.setVisible(true);
 		editorList.setFocus();
 		editorList.getShell().addListener(SWT.Deactivate, new Listener() {
-			@Override
 			public void handleEvent(org.eclipse.swt.widgets.Event event) {
 				editorList.getShell().getDisplay().asyncExec(new Runnable() {
-					@Override
 					public void run() {
 						editorList.dispose();
 					}
@@ -1230,7 +1209,6 @@ public class StackRenderer extends LazyStackRenderer {
 		return false;
 	}
 
-	@Override
 	protected void showTab(MUIElement element) {
 		super.showTab(element);
 
@@ -1286,7 +1264,6 @@ public class StackRenderer extends LazyStackRenderer {
 			return;
 
 		ctrl.addDisposeListener(new DisposeListener() {
-			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				if (!swtMenu.isDisposed()) {
 					swtMenu.dispose();
@@ -1313,12 +1290,42 @@ public class StackRenderer extends LazyStackRenderer {
 
 	private Image getViewMenuImage() {
 		if (viewMenuImage == null) {
-			Bundle bundle = FrameworkUtil.getBundle(this.getClass());
-			URL url = FileLocator.find(bundle, new Path(
-					"icons/full/etool16/view_dropdown.png"), null); //$NON-NLS-1$
-			ImageDescriptor imageDescriptor = ImageDescriptor
-					.createFromURL(url);
-			viewMenuImage = imageDescriptor.createImage();
+			Display d = Display.getCurrent();
+
+			Image viewMenu = new Image(d, 16, 16);
+			Image viewMenuMask = new Image(d, 16, 16);
+
+			Display display = Display.getCurrent();
+			GC gc = new GC(viewMenu);
+			GC maskgc = new GC(viewMenuMask);
+			gc.setForeground(display
+					.getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW));
+			gc.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+
+			int[] shapeArray = new int[] { 6, 1, 15, 1, 11, 5, 10, 5 };
+			gc.fillPolygon(shapeArray);
+			gc.drawPolygon(shapeArray);
+
+			Color black = display.getSystemColor(SWT.COLOR_BLACK);
+			Color white = display.getSystemColor(SWT.COLOR_WHITE);
+
+			maskgc.setBackground(black);
+			maskgc.fillRectangle(0, 0, 16, 16);
+
+			maskgc.setBackground(white);
+			maskgc.setForeground(white);
+			maskgc.fillPolygon(shapeArray);
+			maskgc.drawPolygon(shapeArray);
+			gc.dispose();
+			maskgc.dispose();
+
+			ImageData data = viewMenu.getImageData();
+			data.transparentPixel = data.getPixel(0, 0);
+
+			viewMenuImage = new Image(d, viewMenu.getImageData(),
+					viewMenuMask.getImageData());
+			viewMenu.dispose();
+			viewMenuMask.dispose();
 		}
 		return viewMenuImage;
 	}
@@ -1359,7 +1366,6 @@ public class StackRenderer extends LazyStackRenderer {
 			MenuItem menuItemClose = new MenuItem(menu, SWT.NONE);
 			menuItemClose.setText(SWTRenderersMessages.menuClose);
 			menuItemClose.addSelectionListener(new SelectionAdapter() {
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 					MPart part = (MPart) menu.getData(STACK_SELECTED_PART);
 					EPartService partService = getContextForParent(part).get(
@@ -1380,7 +1386,6 @@ public class StackRenderer extends LazyStackRenderer {
 				MenuItem menuItemOthers = new MenuItem(menu, SWT.NONE);
 				menuItemOthers.setText(SWTRenderersMessages.menuCloseOthers);
 				menuItemOthers.addSelectionListener(new SelectionAdapter() {
-					@Override
 					public void widgetSelected(SelectionEvent e) {
 						MPart part = (MPart) menu.getData(STACK_SELECTED_PART);
 						closeSiblingParts(part, true);
@@ -1390,7 +1395,6 @@ public class StackRenderer extends LazyStackRenderer {
 				MenuItem menuItemAll = new MenuItem(menu, SWT.NONE);
 				menuItemAll.setText(SWTRenderersMessages.menuCloseAll);
 				menuItemAll.addSelectionListener(new SelectionAdapter() {
-					@Override
 					public void widgetSelected(SelectionEvent e) {
 						MPart part = (MPart) menu.getData(STACK_SELECTED_PART);
 						closeSiblingParts(part, false);
@@ -1588,7 +1592,6 @@ public class StackRenderer extends LazyStackRenderer {
 
 	@SuppressWarnings("javadoc")
 	public class TabStateHandler implements EventHandler {
-		@Override
 		public void handleEvent(Event event) {
 			Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
 			Object newValue = event.getProperty(UIEvents.EventTags.NEW_VALUE);
@@ -1646,5 +1649,7 @@ public class StackRenderer extends LazyStackRenderer {
 			return newValue == null && tagName.equals(oldValue);
 		}
 	}
+
+
 
 }

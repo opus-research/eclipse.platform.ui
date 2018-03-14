@@ -44,7 +44,6 @@ public class CommandElement extends QuickAccessElement {
 		this.command = command;
 	}
 
-	@Override
 	public void execute() {
 		Object o = getProvider();
 		if (o instanceof CommandProvider) {
@@ -75,12 +74,10 @@ public class CommandElement extends QuickAccessElement {
 		}
 	}
 
-	@Override
 	public String getId() {
 		return id;
 	}
 
-	@Override
 	public ImageDescriptor getImageDescriptor() {
 		return null;
 	}
@@ -108,7 +105,6 @@ public class CommandElement extends QuickAccessElement {
 		return label.toString();
 	}
 
-	@Override
 	public String getLabel() {
 		String command = getCommand();
 		String binding = getBinding();
@@ -137,7 +133,6 @@ public class CommandElement extends QuickAccessElement {
 		return null;
 	}
 
-	@Override
 	public String getSortLabel() {
 		try {
 			return command.getName();
@@ -146,7 +141,6 @@ public class CommandElement extends QuickAccessElement {
 		}
 	}
 
-	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -154,7 +148,6 @@ public class CommandElement extends QuickAccessElement {
 		return result;
 	}
 
-	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;

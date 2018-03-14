@@ -83,7 +83,6 @@ public class QuickAccessDialog extends PopupDialog {
 		BusyIndicator.showWhile(window.getShell() == null ? null : window.getShell().getDisplay(),
 				new Runnable() {
 
-					@Override
 					public void run() {
 						QuickAccessProvider[] providers = new QuickAccessProvider[] {
 								new PreviousPicksProvider(previousPicksList),
@@ -97,7 +96,6 @@ public class QuickAccessDialog extends PopupDialog {
 							providerMap.put(providers[i].getId(), providers[i]);
 						}
 						QuickAccessDialog.this.contents = new QuickAccessContents(providers) {
-							@Override
 							protected void updateFeedback(boolean filterTextEmpty,
 									boolean showAllMatches) {
 								if (filterTextEmpty) {
@@ -223,7 +221,6 @@ public class QuickAccessDialog extends PopupDialog {
 		// Ugly hack to avoid bug 184045. If this gets fixed, replace the
 		// following code with a call to refresh("").
 		getShell().getDisplay().asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				final Shell shell = getShell();
 				if (shell != null && !shell.isDisposed()) {
@@ -234,7 +231,6 @@ public class QuickAccessDialog extends PopupDialog {
 		});
 	}
 
-	@Override
 	protected Control createTitleControl(Composite parent) {
 		filterText = new Text(parent, SWT.NONE);
 
@@ -253,7 +249,6 @@ public class QuickAccessDialog extends PopupDialog {
 	 * org.eclipse.jface.dialogs.PopupDialog#createDialogArea(org.eclipse.swt
 	 * .widgets.Composite)
 	 */
-	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite composite = (Composite) super.createDialogArea(parent);
 		boolean isWin32 = Util.isWindows();
@@ -281,7 +276,6 @@ public class QuickAccessDialog extends PopupDialog {
 	private KeyAdapter getKeyAdapter() {
 		if (keyAdapter == null) {
 			keyAdapter = new KeyAdapter() {
-				@Override
 				public void keyPressed(KeyEvent e) {
 					int accelerator = SWTKeySupport.convertEventToUnmodifiedAccelerator(e);
 					KeySequence keySequence = KeySequence.getInstance(SWTKeySupport
@@ -302,23 +296,19 @@ public class QuickAccessDialog extends PopupDialog {
 		return keyAdapter;
 	}
 
-	@Override
 	protected Control getFocusControl() {
 		return filterText;
 	}
 
-	@Override
 	public boolean close() {
 		storeDialog(getDialogSettings());
 		return super.close();
 	}
 
-	@Override
 	protected Point getDefaultSize() {
 		return new Point(350, 420);
 	}
 
-	@Override
 	protected Point getDefaultLocation(Point initialSize) {
 		Point size = new Point(400, 400);
 		Rectangle parentBounds = getParentShell().getBounds();
@@ -327,7 +317,6 @@ public class QuickAccessDialog extends PopupDialog {
 		return new Point(x, y);
 	}
 
-	@Override
 	protected IDialogSettings getDialogSettings() {
 		final IDialogSettings workbenchDialogSettings = WorkbenchPlugin.getDefault()
 				.getDialogSettings();

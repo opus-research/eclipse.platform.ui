@@ -74,8 +74,7 @@ public class PreferenceLinkArea extends Object {
                  * 
                  * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
                  */
-                @Override
-				public void widgetSelected(SelectionEvent e) {
+                public void widgetSelected(SelectionEvent e) {
                     pageContainer.openPage(pageId, pageData);
                 }
             });

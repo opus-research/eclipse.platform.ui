@@ -30,7 +30,6 @@ public class StyleSheetListImpl implements StyleSheetList {
 	 *
 	 * @see org.w3c.dom.stylesheets.StyleSheetList#getLength()
 	 */
-	@Override
 	public int getLength() {
 		return (styleSheets != null) ? styleSheets.size() : 0;
 	}
@@ -40,7 +39,6 @@ public class StyleSheetListImpl implements StyleSheetList {
 	 *
 	 * @see org.w3c.dom.stylesheets.StyleSheetList#item(int)
 	 */
-	@Override
 	public StyleSheet item(int index) {
 		return (styleSheets != null) ? (StyleSheet) styleSheets.get(index)
 				: null;

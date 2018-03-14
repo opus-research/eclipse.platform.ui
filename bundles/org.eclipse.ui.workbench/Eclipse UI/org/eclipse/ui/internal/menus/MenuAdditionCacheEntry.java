@@ -282,7 +282,6 @@ public class MenuAdditionCacheEntry {
 	}
 
 	private class IdListener implements IIdentifierListener {
-		@Override
 		public void identifierChanged(IdentifierEvent identifierEvent) {
 			application.getContext().set(identifierEvent.getIdentifier().getId(),
 					identifierEvent.getIdentifier().isEnabled());
