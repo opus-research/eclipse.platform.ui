@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
+ * Copyright (c) 2005, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -168,7 +168,7 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 	protected class WorkingSetHelper {
 
 		private final IWorkingSet workingSet;
-		private final Map parents = new WeakHashMap();
+		private final Map<IAdaptable, IAdaptable> parents = new WeakHashMap<IAdaptable, IAdaptable>();
 
 		/**
 		 * Create a Helper class for the given working set
@@ -186,12 +186,12 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 
 				IWorkingSet[] components = aggregateSet.getComponents();
 
-				for (int componentIndex = 0; componentIndex < components.length; componentIndex++) {
-					IAdaptable[] elements = getWorkingSetElements(components[componentIndex]);
-					for (int elementsIndex = 0; elementsIndex < elements.length; elementsIndex++) {
-						parents.put(elements[elementsIndex], components[componentIndex]);
+				for (IWorkingSet component : components) {
+					IAdaptable[] elements = getWorkingSetElements(component);
+					for (IAdaptable element : elements) {
+						parents.put(element, component);
 					}
-					parents.put(components[componentIndex], aggregateSet);
+					parents.put(component, aggregateSet);
 
 				}
 			} else {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,9 @@ package org.eclipse.e4.ui.workbench.modeling;
 
 import java.util.List;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.ui.model.application.MApplicationElement;
+import org.eclipse.e4.ui.model.application.commands.MHandler;
+import org.eclipse.e4.ui.model.application.commands.MHandlerContainer;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MSnippetContainer;
@@ -26,7 +29,10 @@ import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 
 /**
+ * This service is used to find, create and handle model elements
+ * 
  * @since 1.0
+ * @noimplement This interface is not intended to be implemented by clients.
  */
 public interface EModelService {
 	// Insertion constants
@@ -63,21 +69,63 @@ public interface EModelService {
 	/** Returned Location if the element is in an MTrimBar */
 	public static final int IN_TRIM = 0x10;
 
+	/**
+	 * Returned Location if the element is in a main menu of an MWindow
+	 * 
+	 * @since 1.1
+	 */
+	public static final int IN_MAIN_MENU = 0x20;
+
+	/**
+	 * Returned Location if the element is in a menu or a tool bar of an MPart
+	 * 
+	 * @since 1.1
+	 */
+	public static final int IN_PART = 0x40;
+
 	// 'Standard' searches
 
 	/** Searches for elements in the UI that the user is currently seeing (excluding trim) */
 	public static final int PRESENTATION = OUTSIDE_PERSPECTIVE | IN_ACTIVE_PERSPECTIVE
 			| IN_SHARED_AREA;
 
-	/** Searches for elements in the UI that the user is currently seeing */
+	/** Searches for elements in the UI presentation, including all perspectives */
 	public static final int ANYWHERE = OUTSIDE_PERSPECTIVE | IN_ANY_PERSPECTIVE | IN_SHARED_AREA
 			| IN_TRIM;
 
 	/**
 	 * Searches for elements in the UI that the user is currently seeing that are OUTSIDE the
-	 * perspective
+	 * perspective (i.e. visible regardless of the current perspective)
 	 */
 	public static final int GLOBAL = OUTSIDE_PERSPECTIVE | IN_SHARED_AREA;
+
+	/**
+	 * When invoking the 'cloneElement' method the newly cloned element's 'transientData' map will
+	 * contain a reference to the original element using this as a key.
+	 * 
+	 * @since 1.1
+	 */
+	public static String CLONED_FROM_KEY = "Cloned From"; //$NON-NLS-1$
+
+	/**
+	 * Creates instances of model elements. The method supports any type extending
+	 * {@link MApplicationElement}, both in the standard e4 UI model and in an extension models.
+	 * 
+	 * <p>
+	 * <b>Caution:</b> To create model element instances of extension models you need to register
+	 * them with the <code>the org.eclipse.e4.workbench.model.definition.enrichment</code>
+	 * ExtensionPoint.
+	 * </p>
+	 * 
+	 * @param elementType
+	 *            the class to instantiate. Cannot be <code>null</code>
+	 * @return a new instance
+	 * @throws NullPointerException
+	 *             if the passed class is <code>null</code>
+	 * @throws IllegalArgumentException
+	 *             if the passed class is not supported.
+	 */
+	public <T extends MApplicationElement> T createModelElement(Class<T> elementType);
 
 	/**
 	 * Return a list of any elements that match the given search criteria. The search is recursive
@@ -171,8 +219,9 @@ public interface EModelService {
 	 * @param element
 	 *            the element to locate parent context for
 	 * @return the containing context for this element
+	 * @since 1.1
 	 */
-	public IEclipseContext getContainingContext(MUIElement element);
+	public IEclipseContext getContainingContext(MApplicationElement element);
 
 	/**
 	 * Brings the specified element to the top of its containment structure. If the specified
@@ -187,6 +236,10 @@ public interface EModelService {
 
 	/**
 	 * Clones the element, creating a deep copy of its structure.
+	 * 
+	 * NOTE: The cloned element gets the original element added into its 'transientData' map using
+	 * the CLONED_FROM_KEY key. This is useful in cases where there may be other information the
+	 * newly cloned element needs from the original.
 	 * 
 	 * @param element
 	 *            The element to clone
@@ -223,6 +276,18 @@ public interface EModelService {
 	 * @return The root element of the snippet or <code>null</code> if none is found
 	 */
 	public MUIElement findSnippet(MSnippetContainer snippetContainer, String id);
+
+	/**
+	 * Finds a handler by ID in a particular container
+	 * 
+	 * @param handlerContainer
+	 *            The container to look in
+	 * @param id
+	 *            The ID of the handler
+	 * @return The handler or <code>null</code> if none is found
+	 * @since 1.1
+	 */
+	public MHandler findHandler(MHandlerContainer handlerContainer, String id);
 
 	/**
 	 * Return the count of the children whose 'toBeRendered' flag is true

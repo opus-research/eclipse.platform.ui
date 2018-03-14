@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 IBM Corporation and others.
+ * Copyright (c) 2010, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,6 +48,12 @@ public class PartDragAgent extends DragAgent {
 			if (info.itemElement.getTags().contains(IPresentationEngine.NO_MOVE))
 				return null;
 
+			// If it's an MPart only drag the part itself
+			if (info.itemElement instanceof MPart) {
+				return info.itemElement;
+			}
+
+			// check if we want to drag the placeholder or default to dragging the whole stack
 			int tbrCount = dndManager.getModelService().countRenderableChildren(stack);
 			if (tbrCount > 1 || dndManager.getModelService().isLastEditorStack(stack)) {
 				dragElement = info.itemElement;

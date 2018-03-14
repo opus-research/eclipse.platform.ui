@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2012 IBM Corporation and others.
+ * Copyright (c) 2011, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -172,7 +172,11 @@ public class KeyAssistDialog extends PopupDialog {
 			completionsTable = null;
 		}
 		matches = null;
-		return super.close();
+		boolean popupClosed = super.close();
+		if (resetState) {
+			workbenchKeyboard.resetState();
+		}
+		return popupClosed;
 	}
 
 	/**
@@ -364,6 +368,7 @@ public class KeyAssistDialog extends PopupDialog {
 		int selectionIndex = completionsTable.getSelectionIndex();
 		// Try to execute the corresponding command.
 		if (selectionIndex >= 0) {
+			close();
 			Binding binding = bindings.get(selectionIndex);
 			try {
 				// workbenchKeyboard.updateShellKludge(null);
@@ -458,6 +463,8 @@ public class KeyAssistDialog extends PopupDialog {
 			return Window.OK;
 		}
 		create();
+		// Bug 412001. Stop ShellActivationListener from creating a context for this.
+		getShell().setData("org.eclipse.e4.ui.ignoreDialog", Boolean.TRUE); //$NON-NLS-1$
 
 		// Configure the size and location.
 		Point size = configureSize();
@@ -497,7 +504,8 @@ public class KeyAssistDialog extends PopupDialog {
 			return Window.OK;
 		}
 		create();
-
+		// Bug 369860. Stop ShellActivationListener from creating a context for this.
+		getShell().setData("org.eclipse.e4.ui.ignoreDialog", Boolean.TRUE); //$NON-NLS-1$
 		// Configure the size and location.
 		Point size = configureSize();
 		configureLocation(size);

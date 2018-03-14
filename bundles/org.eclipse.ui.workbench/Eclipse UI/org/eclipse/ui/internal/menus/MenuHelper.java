@@ -505,7 +505,7 @@ public class MenuHelper {
 			}
 			IContextFunction generator = new ContextFunction() {
 				@Override
-				public Object compute(IEclipseContext context) {
+				public Object compute(IEclipseContext context, String contextKey) {
 					IWorkbenchWindow window = context.get(IWorkbenchWindow.class);
 					if (window == null) {
 						return null;
@@ -600,7 +600,7 @@ public class MenuHelper {
 			final ParameterizedCommand parmCmd = cs.createCommand(cmdId, null);
 			IContextFunction generator = new ContextFunction() {
 				@Override
-				public Object compute(IEclipseContext context) {
+				public Object compute(IEclipseContext context, String contextKey) {
 					return new IMenuCreator() {
 						private ActionDelegateHandlerProxy handlerProxy;
 
@@ -722,7 +722,7 @@ public class MenuHelper {
 			}
 
 			@Override
-			public Object compute(IEclipseContext context) {
+			public Object compute(IEclipseContext context, String contextKey) {
 				final MHandledItem model = context.get(MHandledItem.class);
 				if (model == null) {
 					return null;
@@ -805,6 +805,12 @@ public class MenuHelper {
 
 				String iconURI = null;
 				String disabledIconURI = null;
+
+				toolItem.setType(ItemType.PUSH);
+				if (data.style == CommandContributionItem.STYLE_CHECK)
+					toolItem.setType(ItemType.CHECK);
+				else if (data.style == CommandContributionItem.STYLE_RADIO)
+					toolItem.setType(ItemType.RADIO);
 
 				if (data.icon != null) {
 					iconURI = getIconURI(data.icon, application.getContext());

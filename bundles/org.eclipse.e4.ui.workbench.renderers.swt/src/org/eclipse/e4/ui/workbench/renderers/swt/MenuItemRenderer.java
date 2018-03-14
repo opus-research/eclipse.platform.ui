@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,7 @@ import org.eclipse.core.expressions.EvaluationResult;
 import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.internal.expressions.ReferenceExpression;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -30,7 +31,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.ItemType;
 import org.eclipse.e4.ui.model.application.ui.menu.MItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuItem;
 import org.eclipse.e4.ui.workbench.UIEvents;
-import org.eclipse.e4.ui.workbench.modeling.ExpressionContext;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.MenuItem;
@@ -97,7 +97,8 @@ public abstract class MenuItemRenderer extends SWTPartRenderer {
 
 			String attName = (String) event
 					.getProperty(UIEvents.EventTags.ATTNAME);
-			if (UIEvents.UILabel.LABEL.equals(attName)) {
+			if (UIEvents.UILabel.LABEL.equals(attName)
+					|| UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
 				setItemText(itemModel, menuItem);
 			} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
 				menuItem.setImage(getImage(itemModel));

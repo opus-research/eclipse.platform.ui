@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,6 +29,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
+import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.osgi.util.NLS;
@@ -223,13 +224,26 @@ public class ModeledPageLayout implements IPageLayout {
 
 	public void addStandaloneView(String viewId, boolean showTitle,
 			int relationship, float ratio, String refId) {
-		insertView(viewId, relationship, ratio, refId, true, false);
+		MUIElement newElement = insertView(viewId, relationship, ratio, refId, true, showTitle);
+		if (newElement instanceof MPartStack) {
+			MPartStack stack = (MPartStack) newElement;
+			stack.getTags().add(IPresentationEngine.STANDALONE);
+			stack.getChildren().get(0).getTags().add(IPresentationEngine.NO_MOVE);
+		} else {
+			newElement.getTags().add(IPresentationEngine.STANDALONE);
+		}
 	}
 
 	public void addStandaloneViewPlaceholder(String viewId, int relationship,
 			float ratio, String refId, boolean showTitle) {
-		insertView(viewId, relationship, ratio, refId, false,
-				false);
+		MUIElement newElement = insertView(viewId, relationship, ratio, refId, false, showTitle);
+		if (newElement instanceof MPartStack) {
+			MPartStack stack = (MPartStack) newElement;
+			stack.getTags().add(IPresentationEngine.STANDALONE);
+			stack.getChildren().get(0).getTags().add(IPresentationEngine.NO_MOVE);
+		} else {
+			newElement.getTags().add(IPresentationEngine.STANDALONE);
+		}
 	}
 
 	public void addView(String viewId, int relationship, float ratio, String refId) {
@@ -389,7 +403,7 @@ public class ModeledPageLayout implements IPageLayout {
 		return newStack;
 	}
 
-	private void insertView(String viewId, int relationship, float ratio,
+	private MUIElement insertView(String viewId, int relationship, float ratio,
 			String refId, boolean visible, boolean withStack) {
 
 		// Hide views that are filtered by capabilities
@@ -398,12 +412,15 @@ public class ModeledPageLayout implements IPageLayout {
 		MStackElement viewModel = createViewModel(application, viewId, visible && !isFiltered,
 				page, partService,
 				createReferences);
+		MUIElement retVal = viewModel;
+
 		if (viewModel != null) {
 			if (withStack) {
 				String stackId = viewId + "MStack"; // Default id...basically unusable //$NON-NLS-1$
 				MPartStack stack = insertStack(stackId, relationship, ratio, refId, visible
 						& !isFiltered);
 				stack.getChildren().add(viewModel);
+				retVal = stack;
 			} else {
 				insert(viewModel, findRefModel(refId), plRelToSwt(relationship), ratio);
 			}
@@ -413,6 +430,8 @@ public class ModeledPageLayout implements IPageLayout {
 		if (isFiltered) {
 			addViewActivator(viewModel);
 		}
+
+		return retVal;
 	}
 
 	private MUIElement findRefModel(String refId) {
@@ -572,12 +591,7 @@ public class ModeledPageLayout implements IPageLayout {
 			if (relTo.isToBeRendered() || toInsert.isToBeRendered()) {
 				// one of the items to be inserted should be rendered, render
 				// all parent elements as well
-				MUIElement parent = psc.getParent();
-				while (parent != null && !(parent instanceof MPerspective)) {
-					parent.setToBeRendered(true);
-					parent = parent.getParent();
-				}
-				psc.setToBeRendered(true);
+				resetToBeRenderedFlag(psc, true);
 			} else {
 				// no child elements need to be rendered, the parent part sash
 				// container does not need to be rendered either then
@@ -664,11 +678,20 @@ public class ModeledPageLayout implements IPageLayout {
 				stack.setSelectedElement(viewModel);
 			}
 
-			if (visible) {
+			if (visible || viewModel.isToBeRendered()) {
 				// ensure that the parent is being rendered, it may have been a
 				// placeholder folder so its flag may actually be false
-				refModel.setToBeRendered(true);
+				resetToBeRenderedFlag(viewModel, true);
 			}
 		}
+	}
+
+	private static void resetToBeRenderedFlag(MUIElement element, boolean toBeRendered) {
+		MUIElement parent = element.getParent();
+		while (parent != null && !(parent instanceof MPerspective)) {
+			parent.setToBeRendered(toBeRendered);
+			parent = parent.getParent();
+		}
+		element.setToBeRendered(toBeRendered);
 	}
 }

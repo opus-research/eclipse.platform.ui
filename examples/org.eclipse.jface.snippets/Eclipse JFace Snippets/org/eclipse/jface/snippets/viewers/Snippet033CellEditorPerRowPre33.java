@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 Tom Schindl and others.
+ * Copyright (c) 2007 - 2013 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
+ *     Lars Vogel (lars.vogel@gmail.com) - Bug 413427
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -39,16 +40,15 @@ import org.eclipse.swt.widgets.TableItem;
 /**
  * Snippet to present editor different CellEditors within one column in 3.2
  * for 3.3 and above please use the new EditingSupport class
- * 
+ *
  * @author Tom Schindl <tom.schindl@bestsolution.at>
- * 
+ *
+ *
  */
 public class Snippet033CellEditorPerRowPre33 {
 	private class MyCellModifier implements ICellModifier {
-		
+
 		private TableViewer viewer;
-		
-		private boolean enabled = true;
 
 		public void setViewer(TableViewer viewer) {
 			this.viewer = viewer;
@@ -56,20 +56,22 @@ public class Snippet033CellEditorPerRowPre33 {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.jface.viewers.ICellModifier#canModify(java.lang.Object,
 		 *      java.lang.String)
 		 */
+		@Override
 		public boolean canModify(Object element, String property) {
 			return true;
 		}
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.jface.viewers.ICellModifier#getValue(java.lang.Object,
 		 *      java.lang.String)
 		 */
+		@Override
 		public Object getValue(Object element, String property) {
 			if( element instanceof MyModel3 ) {
 				return new Boolean(((MyModel3)element).checked);
@@ -82,50 +84,54 @@ public class Snippet033CellEditorPerRowPre33 {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.jface.viewers.ICellModifier#modify(java.lang.Object,
 		 *      java.lang.String, java.lang.Object)
 		 */
+		@Override
 		public void modify(Object element, String property, Object value) {
 			TableItem item = (TableItem) element;
-			
+
 			if( item.getData() instanceof MyModel3 ) {
 				((MyModel3) item.getData()).checked=((Boolean)value).booleanValue();
 			} else {
 				((MyModel) item.getData()).counter = Integer.parseInt(value
 						.toString());
 			}
-			
+
 			viewer.update(item.getData(), null);
 		}
 	}
-	
+
 	private class MyContentProvider implements IStructuredContentProvider {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 		 */
+		@Override
 		public Object[] getElements(Object inputElement) {
 			return (MyModel[]) inputElement;
 		}
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
 		 */
+		@Override
 		public void dispose() {
 
 		}
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 		 *      java.lang.Object, java.lang.Object)
 		 */
+		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 
 		}
@@ -139,6 +145,7 @@ public class Snippet033CellEditorPerRowPre33 {
 			this.counter = counter;
 		}
 
+		@Override
 		public String toString() {
 			return "Item " + this.counter;
 		}
@@ -150,93 +157,103 @@ public class Snippet033CellEditorPerRowPre33 {
 			super(counter);
 		}
 
+		@Override
 		public String toString() {
 			return "Special Item " + this.counter;
 		}
 	}
-	
+
 	public class MyModel3 extends MyModel {
 		public boolean checked;
-		
+
 		public MyModel3(int counter) {
 			super(counter);
 		}
 
+		@Override
 		public String toString() {
 			return "Special Item " + this.counter;
 		}
 	}
-	
-	
+
+
 	public class DelegatingEditor extends CellEditor {
-		
-		private StructuredViewer viewer;
-		
-		private CellEditor delegatingTextEditor;
-		
-		private CellEditor delegatingDropDownEditor;
-		
+
+		private final StructuredViewer viewer;
+
+		private final CellEditor delegatingTextEditor;
+
+		private final CellEditor delegatingDropDownEditor;
+
 		private CellEditor activeEditor;
-		
-		private CellEditor delegatingCheckBoxEditor;
-		
+
+		private final CellEditor delegatingCheckBoxEditor;
+
 		private class DelegatingListener implements ICellEditorListener {
 
+			@Override
 			public void applyEditorValue() {
 				fireApplyEditorValue();
 			}
 
+			@Override
 			public void cancelEditor() {
 				fireCancelEditor();
 			}
 
+			@Override
 			public void editorValueChanged(boolean oldValidState,
 					boolean newValidState) {
 				fireEditorValueChanged(oldValidState, newValidState);
 			}
-			
+
 		}
-		
+
 		public DelegatingEditor(StructuredViewer viewer, Composite parent) {
 			super(parent);
 			this.viewer = viewer;
 			DelegatingListener l = new DelegatingListener();
 			this.delegatingTextEditor = new TextCellEditor(parent);
 			this.delegatingTextEditor.addListener(l);
-			
+
 			String[] elements = new String[10];
-			
+
 			for (int i = 0; i < 10; i++) {
 				elements[i] = i+"";
 			}
-			
+
 			this.delegatingDropDownEditor = new ComboBoxCellEditor(parent,elements);
 			this.delegatingDropDownEditor.addListener(l);
-			
+
 			this.delegatingCheckBoxEditor = new CheckboxCellEditor(parent);
 			this.delegatingCheckBoxEditor.addListener(l);
 		}
-		
+
+		@Override
 		protected Control createControl(Composite parent) {
 			return null;
 		}
 
+		@Override
 		protected Object doGetValue() {
 			return activeEditor.getValue();
 		}
 
+		@Override
 		protected void doSetFocus() {
 			activeEditor.setFocus();
 		}
 
+		@Override
 		public void activate() {
 			if( activeEditor != null ) {
 				activeEditor.activate();
 			}
 		}
 
+		@Override
 		protected void doSetValue(Object value) {
-			
+
 			if( ((IStructuredSelection)this.viewer.getSelection()).getFirstElement() instanceof MyModel3 ) {
 				activeEditor = delegatingCheckBoxEditor;
 			} else if( ((IStructuredSelection)this.viewer.getSelection()).getFirstElement() instanceof MyModel2 ) {
@@ -244,10 +261,11 @@ public class Snippet033CellEditorPerRowPre33 {
 			} else {
 				activeEditor = delegatingTextEditor;
 			}
-			
+
 			activeEditor.setValue(value);
 		}
-		
+
+		@Override
 		public void deactivate() {
 			if( activeEditor != null ) {
 				Control control = activeEditor.getControl();
@@ -256,23 +274,25 @@ public class Snippet033CellEditorPerRowPre33 {
 				}
 			}
 		}
-		
+
+		@Override
 		public void dispose() {
-			
+
 		}
-		
+
+		@Override
 		public Control getControl() {
 			return activeEditor.getControl();
 		}
 	}
-	
+
 	public Snippet033CellEditorPerRowPre33(Shell shell) {
 		final Table table = new Table(shell, SWT.BORDER | SWT.FULL_SELECTION);
 		final MyCellModifier modifier = new MyCellModifier();
-		
+
 		final TableViewer v = new TableViewer(table);
 		modifier.setViewer(v);
-		
+
 		TableColumn column = new TableColumn(table, SWT.NONE);
 		column.setWidth(200);
 
@@ -288,6 +308,7 @@ public class Snippet033CellEditorPerRowPre33 {
 	}
 
 	private class MyLabelProvider extends LabelProvider {
+		@Override
 		public Image getImage(Object element) {
 			if( element instanceof MyModel3 ) {
 				if( ((MyModel3)element).checked ) {
@@ -295,20 +316,20 @@ public class Snippet033CellEditorPerRowPre33 {
 				} else {
 					return JFaceResources.getImage("IMG_2");
 				}
-				
+
 			}
 			return super.getImage(element);
 		}
-		
+
 	}
-	
+
 	private MyModel[] createModel() {
 		MyModel[] elements = new MyModel[30];
 
 		for (int i = 0; i < 10; i++) {
 			elements[i] = new MyModel3(i);
 		}
-		
+
 		for (int i = 0; i < 10; i++) {
 			elements[i+10] = new MyModel(i);
 		}
@@ -316,7 +337,7 @@ public class Snippet033CellEditorPerRowPre33 {
 		for (int i = 0; i < 10; i++) {
 			elements[i+20] = new MyModel2(i);
 		}
-		
+
 		return elements;
 	}
 

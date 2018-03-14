@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 IBM Corporation and others.
+ * Copyright (c) 2008, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.di.InjectionException;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.contributions.IContributionFactory;
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -39,6 +40,7 @@ import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
 import org.eclipse.e4.ui.css.swt.engine.CSSSWTEngineImpl;
 import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.e4.ui.css.swt.theme.IThemeManager;
+import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.internal.workbench.Activator;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
@@ -52,6 +54,7 @@ import org.eclipse.e4.ui.model.application.ui.MGenericStack;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
+import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
@@ -116,14 +119,16 @@ public class PartRenderingEngine implements IPresentationEngine {
 						.eContainer();
 			}
 
-			boolean menuChild = parent instanceof MMenu;
-
-			// If the parent isn't displayed who cares?
-			if (!(parent instanceof MApplication)
-					&& (parent == null || parent.getWidget() == null || menuChild))
+			// menus are not handled here... ??
+			if (parent instanceof MMenu)
 				return;
 
-			if (changedElement.isToBeRendered()) {
+			// If the parent isn't visible we don't care (The application is
+			// never rendered)
+			boolean okToRender = parent instanceof MApplication
+					|| parent.getWidget() != null;
+
+			if (changedElement.isToBeRendered() && okToRender) {
 				Activator.trace(Policy.DEBUG_RENDERER, "visible -> true", null); //$NON-NLS-1$
 
 				// Note that the 'createGui' protocol calls 'childAdded'
@@ -140,12 +145,14 @@ public class PartRenderingEngine implements IPresentationEngine {
 				if (parent.getSelectedElement() == changedElement)
 					parent.setSelectedElement(null);
 
-				// Un-maximize the element before tearing it down
-				if (changedElement.getTags().contains(MAXIMIZED))
-					changedElement.getTags().remove(MAXIMIZED);
+				if (okToRender) {
+					// Un-maximize the element before tearing it down
+					if (changedElement.getTags().contains(MAXIMIZED))
+						changedElement.getTags().remove(MAXIMIZED);
 
-				// Note that the 'removeGui' protocol calls 'childRemoved'
-				removeGui(changedElement);
+					// Note that the 'removeGui' protocol calls 'childRemoved'
+					removeGui(changedElement);
+				}
 			}
 
 		}
@@ -380,7 +387,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				else
 					elementCtrl.moveAbove(null);
 				break;
-			} else if (kid.getWidget() instanceof Control) {
+			} else if (kid.getWidget() instanceof Control && kid.isVisible()) {
 				prevCtrl = (Control) kid.getWidget();
 			}
 		}
@@ -538,7 +545,9 @@ public class PartRenderingEngine implements IPresentationEngine {
 			if (currentWidget instanceof Control) {
 				Control control = (Control) currentWidget;
 				// make sure the control is visible
-				if (!(element instanceof MPlaceholder))
+				MUIElement elementParent = element.getParent();
+				if (!(element instanceof MPlaceholder)
+						|| !(elementParent instanceof MPartStack))
 					control.setVisible(true);
 
 				if (parentWidget instanceof Composite) {
@@ -620,9 +629,13 @@ public class PartRenderingEngine implements IPresentationEngine {
 				for (String key : props.keySet()) {
 					lclContext.set(key, props.get(key));
 				}
-
-				E4Workbench.processHierarchy(element);
 			}
+		}
+
+		// We check the widget again since it could be created by some UI event.
+		// See Bug 417399
+		if (element.getWidget() != null) {
+			return safeCreateGui(element, parentWidget, parentContext);
 		}
 
 		// Create a control appropriate to the part
@@ -731,9 +744,59 @@ public class PartRenderingEngine implements IPresentationEngine {
 		return safeCreateGui(element, parent, parentContext);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.IPresentationEngine#focusGui(org.eclipse.
+	 * e4.ui.model.application.ui.MUIElement)
+	 */
+	public void focusGui(MUIElement element) {
+		AbstractPartRenderer renderer = (AbstractPartRenderer) element
+				.getRenderer();
+		if (renderer == null || element.getWidget() == null)
+			return;
+
+		Object implementation = element instanceof MContribution ? ((MContribution) element)
+				.getObject() : null;
+
+		// If there is no class to call @Focus on then revert to the default
+		if (implementation == null) {
+			renderer.forceFocus(element);
+			return;
+		}
+
+		try {
+			IEclipseContext context = getContext(element);
+			Object defaultValue = new Object();
+			Object returnValue = ContextInjectionFactory.invoke(implementation,
+					Focus.class, context, defaultValue);
+			if (returnValue == defaultValue) {
+				// No @Focus method, force the focus
+				renderer.forceFocus(element);
+			}
+		} catch (InjectionException e) {
+			log("Failed to grant focus to element", "Failed to grant focus to element ({0})", //$NON-NLS-1$ //$NON-NLS-2$
+					element.getElementId(), e);
+		} catch (RuntimeException e) {
+			log("Failed to grant focus to element via DI", //$NON-NLS-1$
+					"Failed to grant focus via DI to element ({0})", element.getElementId(), e); //$NON-NLS-1$
+		}
+	}
+
+	private void log(String unidentifiedMessage, String identifiedMessage,
+			String id, Exception e) {
+		if (id == null || id.length() == 0) {
+			logger.error(e, unidentifiedMessage);
+		} else {
+			logger.error(e, NLS.bind(identifiedMessage, id));
+		}
+	}
+
 	private Shell getLimboShell() {
 		if (limbo == null) {
 			limbo = new Shell(Display.getCurrent(), SWT.NONE);
+			limbo.setText("PartRenderingEngine's limbo"); //$NON-NLS-1$ // just for debugging, not shown anywhere
 
 			// Place the limbo shell 'off screen'
 			limbo.setLocation(0, 10000);
@@ -998,8 +1061,13 @@ public class PartRenderingEngine implements IPresentationEngine {
 					// torn down
 					IApplicationContext ac = appContext
 							.get(IApplicationContext.class);
-					if (ac != null)
+					if (ac != null) {
 						ac.applicationRunning();
+						if (eventBroker != null)
+							eventBroker.post(
+									UIEvents.UILifeCycle.APP_STARTUP_COMPLETE,
+									theApp);
+					}
 				} else if (uiRoot instanceof MUIElement) {
 					if (uiRoot instanceof MWindow) {
 						testShell = (Shell) createGui((MUIElement) uiRoot);
@@ -1150,11 +1218,11 @@ public class PartRenderingEngine implements IPresentationEngine {
 	public static void initializeStyling(Display display,
 			IEclipseContext appContext) {
 		String cssTheme = (String) appContext.get(E4Application.THEME_ID);
-		String cssURI = (String) appContext.get(E4Workbench.CSS_URI_ARG);
+		String cssURI = (String) appContext.get(IWorkbench.CSS_URI_ARG);
 
 		if (cssTheme != null) {
 			String cssResourcesURI = (String) appContext
-					.get(E4Workbench.CSS_RESOURCE_URI_ARG);
+					.get(IWorkbench.CSS_RESOURCE_URI_ARG);
 
 			Bundle bundle = WorkbenchSWTActivator.getDefault().getBundle();
 			BundleContext context = bundle.getBundleContext();
@@ -1185,33 +1253,33 @@ public class PartRenderingEngine implements IPresentationEngine {
 			appContext.set(IStylingEngine.SERVICE_NAME, new IStylingEngine() {
 				public void setClassname(Object widget, String classname) {
 					WidgetElement.setCSSClass((Widget) widget, classname);
-					engine.applyStyles((Widget) widget, true);
+					engine.applyStyles(widget, true);
 				}
 
 				public void setId(Object widget, String id) {
 					WidgetElement.setID((Widget) widget, id);
-					engine.applyStyles((Widget) widget, true);
+					engine.applyStyles(widget, true);
 				}
 
 				public void style(Object widget) {
-					engine.applyStyles((Widget) widget, true);
+					engine.applyStyles(widget, true);
 				}
 
 				public CSSStyleDeclaration getStyle(Object widget) {
-					return engine.getStyle((Widget) widget);
+					return engine.getStyle(widget);
 				}
 
 				public void setClassnameAndId(Object widget, String classname,
 						String id) {
 					WidgetElement.setCSSClass((Widget) widget, classname);
 					WidgetElement.setID((Widget) widget, id);
-					engine.applyStyles((Widget) widget, true);
+					engine.applyStyles(widget, true);
 				}
 
 			});
 		} else if (cssURI != null) {
 			String cssResourcesURI = (String) appContext
-					.get(E4Workbench.CSS_RESOURCE_URI_ARG);
+					.get(IWorkbench.CSS_RESOURCE_URI_ARG);
 			final CSSSWTEngineImpl engine = new CSSSWTEngineImpl(display, true);
 			WidgetElement.setEngine(display, engine);
 			if (cssResourcesURI != null) {
@@ -1223,16 +1291,16 @@ public class PartRenderingEngine implements IPresentationEngine {
 			appContext.set(IStylingEngine.SERVICE_NAME, new IStylingEngine() {
 				public void setClassname(Object widget, String classname) {
 					WidgetElement.setCSSClass((Widget) widget, classname);
-					engine.applyStyles((Widget) widget, true);
+					engine.applyStyles(widget, true);
 				}
 
 				public void setId(Object widget, String id) {
 					WidgetElement.setID((Widget) widget, id);
-					engine.applyStyles((Widget) widget, true);
+					engine.applyStyles(widget, true);
 				}
 
 				public void style(Object widget) {
-					engine.applyStyles((Widget) widget, true);
+					engine.applyStyles(widget, true);
 				}
 
 				public CSSStyleDeclaration getStyle(Object widget) {
@@ -1248,7 +1316,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 						String id) {
 					WidgetElement.setCSSClass((Widget) widget, classname);
 					WidgetElement.setID((Widget) widget, id);
-					engine.applyStyles((Widget) widget, true);
+					engine.applyStyles(widget, true);
 				}
 
 			});
@@ -1295,5 +1363,9 @@ public class PartRenderingEngine implements IPresentationEngine {
 				CSSRenderingUtils.class, appContext);
 		appContext.set(CSSRenderingUtils.class, cssUtils);
 
+		IEventBroker broker = appContext.get(IEventBroker.class);
+		if (broker != null) {
+			broker.send(UIEvents.UILifeCycle.THEME_CHANGED, null);
+		}
 	}
 }
