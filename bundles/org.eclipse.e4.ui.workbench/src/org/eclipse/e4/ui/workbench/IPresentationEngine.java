@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 BestSolution.at and others.
+ * Copyright (c) 2009, 2014 BestSolution.at and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Tom Schindl<tom.schindl@bestsolution.at> - initial API and implementation
  *     IBM - ongoing development
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 426535
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench;
@@ -182,11 +183,19 @@ public interface IPresentationEngine {
 	 * This is a persistedState 'key' whose value is expected to be the URI of a subclass of
 	 * ABstractPartRenderer that is to be used to render the element
 	 */
-	public static final String CUSTOM_RENDERER_KEY = "Custom Renderer"; //$NON-NLS-1$	
+	static final String CUSTOM_RENDERER_KEY = "Custom Renderer"; //$NON-NLS-1$
+
+	/**
+	 * This is a persistedState 'key' which can be used by the renderer implementation to decide
+	 * that a user interface element has been hidden by the user
+	 *
+	 * @since 1.1
+	 */
+	public static final String HIDDEN_BY_USER = "HIDDEN_BY_USER"; //$NON-NLS-1$
 
 	/**
 	 * Creates and returns the UI element for the given model element.
-	 * 
+	 *
 	 * @param element
 	 *            the model element
 	 * @param parentWidget

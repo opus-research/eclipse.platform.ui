@@ -4,10 +4,11 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 410426
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 426535
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -48,9 +49,12 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.services.IServiceConstants;
+import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.Selector;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.ElementContainer;
+import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
+import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.action.AbstractGroupMarker;
 import org.eclipse.jface.action.ContributionItem;
@@ -66,6 +70,9 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
@@ -100,11 +107,19 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 	private ToolItemUpdater enablementUpdater = new ToolItemUpdater();
 
+	/**
+	 * The context menu for this trim stack's items.
+	 */
+	private Menu toolbarMenu;
+
 	// @Inject
 	// private Logger logger;
 
 	@Inject
 	private MApplication application;
+
+	@Inject
+	EModelService modelService;
 
 	@Inject
 	IEventBroker eventBroker;
@@ -279,6 +294,33 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		getUpdater().updateContributionItems(s);
 	}
 
+	@Inject
+	@Optional
+	private void subscribeTopicTagsChanged(
+			@UIEventTopic(UIEvents.ApplicationElement.TOPIC_TAGS) Event event) {
+
+		Object changedObj = event.getProperty(EventTags.ELEMENT);
+
+		if (!(changedObj instanceof MToolBar)
+				|| !(changedObj instanceof MToolBar))
+			return;
+
+		final MUIElement changedElement = (MUIElement) changedObj;
+
+		if (UIEvents.isADD(event)) {
+			if (UIEvents.contains(event, UIEvents.EventTags.NEW_VALUE,
+					IPresentationEngine.HIDDEN_BY_USER)) {
+				changedElement.setVisible(false);
+			}
+		} else if (UIEvents.isREMOVE(event)) {
+			if (UIEvents.contains(event, UIEvents.EventTags.OLD_VALUE,
+					IPresentationEngine.HIDDEN_BY_USER)) {
+				changedElement.setVisible(true);
+			}
+		}
+	}
+
+
 	@PostConstruct
 	public void init() {
 		eventBroker.subscribe(UIEvents.UILabel.TOPIC_ALL, itemUpdater);
@@ -352,7 +394,32 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			}
 		}
 
+		createToolbarMenu(toolbarModel, renderedCtrl);
+
 		return renderedCtrl;
+	}
+
+	private void createToolbarMenu(final MToolBar toolbarModel,
+			Control renderedCtrl) {
+		toolbarMenu = new Menu(renderedCtrl);
+		MenuItem hideItem = new MenuItem(toolbarMenu, SWT.NONE);
+		hideItem.setText(Messages.ToolBarManagerRenderer_MenuCloseText);
+		hideItem.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(org.eclipse.swt.widgets.Event event) {
+				toolbarModel.getTags().add(IPresentationEngine.HIDDEN_BY_USER);
+			}
+		});
+
+		new MenuItem(toolbarMenu, SWT.SEPARATOR);
+
+		MenuItem restoreHiddenItems = new MenuItem(toolbarMenu, SWT.NONE);
+		restoreHiddenItems.setText(Messages.ToolBarManagerRenderer_MenuRestoreText);
+		restoreHiddenItems.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(org.eclipse.swt.widgets.Event event) {
+				removeHiddenByUserTags();
+			}
+		});
+		renderedCtrl.setMenu(toolbarMenu);
 	}
 
 	/**
@@ -474,6 +541,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		bar.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
 				cleanUp((MToolBar) element);
+				toolbarMenu = null;
 			}
 		});
 		return bar;
@@ -934,4 +1002,17 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	ToolItemUpdater getUpdater() {
 		return enablementUpdater;
 	}
+
+	/**
+	 * Removes the IPresentationEngine.HIDDEN_BY_USER from the toolbars
+	 */
+	private void removeHiddenByUserTags() {
+		List<MToolBar> toolBars = modelService.findElements(
+				application, null, MToolBar.class, null);
+		for (MToolBar mToolBar : toolBars) {
+			mToolBar.getTags().remove(
+					IPresentationEngine.HIDDEN_BY_USER);
+		}
+	}
+
 }
