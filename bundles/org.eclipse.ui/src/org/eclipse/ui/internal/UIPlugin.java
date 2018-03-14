@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2007 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,17 +37,18 @@ public final class UIPlugin extends AbstractUIPlugin {
     }
 
     /**
-     * Returns the image registry for this plugin.
-     *
-     * Where are the images?  The images (typically gifs) are found in the
-     * same plugins directory.
-     *
-     * @see ImageRegistry
-     *
-     * Note: The workbench uses the standard JFace ImageRegistry to track its images. In addition
-     * the class WorkbenchGraphicResources provides convenience access to the graphics resources
-     * and fast field access for some of the commonly used graphical images.
-     */
+	 * Returns the image registry for this plugin.
+	 *
+	 * Where are the images? The images (typically png) are found in the same
+	 * plugins directory.
+	 *
+	 * Note: The workbench uses the standard JFace ImageRegistry to track its
+	 * images. In addition the class WorkbenchGraphicResources provides
+	 * convenience access to the graphics resources and fast field access for
+	 * some of the commonly used graphical images.
+	 *
+	 * @see ImageRegistry
+	 */
     @Override
 	protected ImageRegistry createImageRegistry() {
         /* Just to be sure that we don't access this
