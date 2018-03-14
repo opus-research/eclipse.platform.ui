@@ -46,13 +46,9 @@ public class DeleteMarkersOperation extends AbstractMarkersOperation {
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
 	 * Map execution to marker deletion.
-	 * 
-	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#doExecute(org.eclipse.core.runtime.IProgressMonitor,
-	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
+	@Override
 	protected void doExecute(IProgressMonitor monitor, IAdaptable info)
 			throws CoreException {
 		if (monitor == null) {
@@ -65,13 +61,9 @@ public class DeleteMarkersOperation extends AbstractMarkersOperation {
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
 	 * Map undo to marker creation.
-	 * 
-	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#doUndo(org.eclipse.core.runtime.IProgressMonitor,
-	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
+	@Override
 	protected void doUndo(IProgressMonitor monitor, IAdaptable info)
 			throws CoreException {
 		if (monitor == null) {
@@ -84,23 +76,17 @@ public class DeleteMarkersOperation extends AbstractMarkersOperation {
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
 	 * Map the undo status to marker creation status.
-	 * 
-	 * @see org.eclipse.ui.ide.undo.AbstractMarkersOperation#getBasicUndoStatus()
 	 */
+	@Override
 	protected IStatus getBasicUndoStatus() {
 		return getMarkerCreationStatus();
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
 	 * Map the redo status to marker deletion status.
-	 * 
-	 * @see org.eclipse.ui.ide.undo.AbstractMarkersOperation#getBasicRedoStatus()
 	 */
+	@Override
 	protected IStatus getBasicRedoStatus() {
 		return getMarkerDeletionStatus();
 	}

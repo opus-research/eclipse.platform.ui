@@ -35,21 +35,21 @@ import org.eclipse.ui.statushandlers.StatusAdapter;
 public class SupportTrayTest extends TestCase {
 	
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
+	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		Policy.setErrorSupportProvider(null);
 	}
 
 	private final class NullErrorSupportProvider extends ErrorSupportProvider {
+		@Override
 		public Control createSupportArea(Composite parent, IStatus status) {
 			return null;
 		}
 	}
 
 	private final class NullListener implements Listener {
+		@Override
 		public void handleEvent(Event event) {
 			
 		}
@@ -82,6 +82,7 @@ public class SupportTrayTest extends TestCase {
 		
 		Policy.setErrorSupportProvider(new ErrorSupportProvider() {
 			
+			@Override
 			public Control createSupportArea(Composite parent, IStatus status) {
 				_status[0] = status;
 				return new Composite(parent, SWT.NONE);
@@ -131,6 +132,7 @@ public class SupportTrayTest extends TestCase {
 			Map dialogState = new HashMap();
 			dialogState.put(IStatusDialogConstants.CURRENT_STATUS_ADAPTER, new StatusAdapter(Status.OK_STATUS));
 			SupportTray st = new SupportTray(dialogState, new Listener() {
+				@Override
 				public void handleEvent(Event event) {
 					td[0].closeTray();
 				}

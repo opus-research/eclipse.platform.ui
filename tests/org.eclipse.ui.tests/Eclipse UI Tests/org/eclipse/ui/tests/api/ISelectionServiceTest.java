@@ -40,7 +40,8 @@ public class ISelectionServiceTest extends UITestCase implements
         super(testName);
     }
 
-    protected void doSetUp() throws Exception {
+    @Override
+	protected void doSetUp() throws Exception {
         super.doSetUp();
         fWindow = openTestWindow();
         fPage = fWindow.getActivePage();
@@ -127,9 +128,9 @@ public class ISelectionServiceTest extends UITestCase implements
 				.showView(SelectionProviderView.ID);
 
 		ISelectionService service = fWindow.getSelectionService();
-		ISelectionService windowService = (ISelectionService) fWindow
+		ISelectionService windowService = fWindow
 				.getService(ISelectionService.class);
-		ISelectionService slaveService = (ISelectionService) view2.getSite()
+		ISelectionService slaveService = view2.getSite()
 				.getService(ISelectionService.class);
 
 		assertTrue(service != slaveService);
@@ -249,7 +250,8 @@ public class ISelectionServiceTest extends UITestCase implements
     /*
      * @see ISelectionListener#selectionChanged(IWorkbenchPart, ISelection)
      */
-    public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+    @Override
+	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
         eventReceived = true;
         eventPart = part;
         eventSelection = selection;
