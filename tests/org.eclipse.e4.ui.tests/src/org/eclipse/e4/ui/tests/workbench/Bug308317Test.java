@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,15 +7,13 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.workbench;
 
-import static org.junit.Assert.assertEquals;
-
 import javax.inject.Inject;
 import javax.inject.Named;
+import junit.framework.TestCase;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -27,11 +25,8 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.services.IServiceConstants;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
-public class Bug308317Test {
+public class Bug308317Test extends TestCase {
 
 	static class PartConsumer {
 
@@ -49,17 +44,16 @@ public class Bug308317Test {
 
 	protected IEclipseContext appContext;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		appContext = E4Application.createDefaultContext();
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@Override
+	protected void tearDown() throws Exception {
 		appContext.dispose();
 	}
 
-	@Test
 	public void testBug308317() throws Exception {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();

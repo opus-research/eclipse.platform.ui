@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,15 +7,13 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.reconciler;
 
-import static org.junit.Assert.assertNotNull;
-
 import java.io.File;
 import java.io.IOException;
+import junit.framework.TestCase;
 import org.eclipse.e4.ui.internal.workbench.E4XMIResourceFactory;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
@@ -28,10 +26,8 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.Resource.Factory;
 import org.eclipse.emf.ecore.xmi.XMLResource;
-import org.junit.After;
-import org.junit.Before;
 
-public abstract class ModelResourceTest {
+public abstract class ModelResourceTest extends TestCase {
 
 	private File temporaryFile;
 
@@ -43,19 +39,20 @@ public abstract class ModelResourceTest {
 
 	private XMLResource xmlResource;
 
-	@Before
-	public void setUp() {
+	@Override
+	protected void setUp() throws Exception {
 		temporaryFile = new File(System.getProperty("java.io.tmpdir"),
-				getClass().getSimpleName() + "_" + getClass().getName()
-						+ ".e4xmi");
+				getClass().getSimpleName() + "_" + getName() + ".e4xmi");
 		temporaryFile.delete();
 		temporaryURI = URI.createFileURI(temporaryFile.getAbsolutePath());
 		factory = createFactory();
 		assertNotNull(factory);
+		super.setUp();
 	}
 
-	@After
-	public void tearDown() {
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
 		factory = null;
 		temporaryFile.delete();
 		temporaryFile = null;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,14 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.reconciler;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 import java.util.Collection;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -26,11 +21,9 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
-import org.junit.Test;
 
 public abstract class ModelReconcilerPartTest extends ModelReconcilerTest {
 
-	@Test
 	public void testPart_Menus_Add() {
 		MApplication application = createApplication();
 
@@ -62,7 +55,6 @@ public abstract class ModelReconcilerPartTest extends ModelReconcilerTest {
 		assertEquals(1, part.getMenus().size());
 	}
 
-	@Test
 	public void testPart_Menus_Remove() {
 		MApplication application = createApplication();
 
@@ -133,27 +125,22 @@ public abstract class ModelReconcilerPartTest extends ModelReconcilerTest {
 		assertEquals(after, menu.isToBeRendered());
 	}
 
-	@Test
 	public void testPart_Menu_ToBeRendered_TrueTrue() {
 		testPart_Menu_ToBeRendered(true, true);
 	}
 
-	@Test
 	public void testPart_Menu_ToBeRendered_TrueFalse() {
 		testPart_Menu_ToBeRendered(true, false);
 	}
 
-	@Test
 	public void testPart_Menu_ToBeRendered_FalseTrue() {
 		testPart_Menu_ToBeRendered(false, true);
 	}
 
-	@Test
 	public void testPart_Menu_ToBeRendered_FalseFalse() {
 		testPart_Menu_ToBeRendered(false, false);
 	}
 
-	@Test
 	public void testPart_ToolBar_Set() {
 		MApplication application = createApplication();
 
@@ -185,7 +172,6 @@ public abstract class ModelReconcilerPartTest extends ModelReconcilerTest {
 		assertNotNull(part.getToolbar());
 	}
 
-	@Test
 	public void testPart_ToolBar_Unset() {
 		MApplication application = createApplication();
 
@@ -257,27 +243,22 @@ public abstract class ModelReconcilerPartTest extends ModelReconcilerTest {
 		assertEquals(after, toolBar.isToBeRendered());
 	}
 
-	@Test
 	public void testPart_ToolBar_ToBeRendered_TrueTrue() {
 		testPart_ToolBar_ToBeRendered(true, true);
 	}
 
-	@Test
 	public void testPart_ToolBar_ToBeRendered_TrueFalse() {
 		testPart_ToolBar_ToBeRendered(true, false);
 	}
 
-	@Test
 	public void testPart_ToolBar_ToBeRendered_FalseTrue() {
 		testPart_ToolBar_ToBeRendered(false, true);
 	}
 
-	@Test
 	public void testPart_ToolBar_ToBeRendered_FalseFalse() {
 		testPart_ToolBar_ToBeRendered(false, false);
 	}
 
-	@Test
 	public void testPart_NewWithToolBar() {
 		MApplication application = createApplication();
 
@@ -311,7 +292,6 @@ public abstract class ModelReconcilerPartTest extends ModelReconcilerTest {
 		assertNotNull(part.getToolbar());
 	}
 
-	@Test
 	public void testPart_NewWithToolBar2() {
 		MApplication application = createApplication();
 
@@ -387,22 +367,18 @@ public abstract class ModelReconcilerPartTest extends ModelReconcilerTest {
 		assertEquals(after, part.isCloseable());
 	}
 
-	@Test
 	public void testPart_Closeable_TrueTrue() {
 		testPart_Closeable(true, true);
 	}
 
-	@Test
 	public void testPart_Closeable_TrueFalse() {
 		testPart_Closeable(true, false);
 	}
 
-	@Test
 	public void testPart_Closeable_FalseTrue() {
 		testPart_Closeable(false, true);
 	}
 
-	@Test
 	public void testPart_Closeable_FalseFalse() {
 		testPart_Closeable(false, false);
 	}

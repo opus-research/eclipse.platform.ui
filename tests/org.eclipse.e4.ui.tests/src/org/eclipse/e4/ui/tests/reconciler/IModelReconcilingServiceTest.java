@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,29 +7,22 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.reconciler;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import java.util.Collection;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
-import org.junit.Test;
 
 public abstract class IModelReconcilingServiceTest extends ModelReconcilerTest {
 
-	@Test
 	public void testCreateModelReconciler() {
 		assertNotNull(service.createModelReconciler());
 	}
 
-	@Test
 	public void testApplyDeltasUnfiltered() {
 		MApplication application = createApplication();
 
@@ -57,7 +50,6 @@ public abstract class IModelReconcilingServiceTest extends ModelReconcilerTest {
 		assertEquals("newName", window.getLabel());
 	}
 
-	@Test
 	public void testApplyDeltasUnfiltered2() {
 		MApplication application = createApplication();
 
@@ -85,7 +77,6 @@ public abstract class IModelReconcilingServiceTest extends ModelReconcilerTest {
 		assertEquals("newName", window.getLabel());
 	}
 
-	@Test
 	public void testApplyDeltasUnfiltered3() {
 		MApplication application = createApplication();
 
@@ -113,7 +104,6 @@ public abstract class IModelReconcilingServiceTest extends ModelReconcilerTest {
 		assertEquals("newName", window.getLabel());
 	}
 
-	@Test
 	public void testApplyDeltasFiltered() {
 		MApplication application = createApplication();
 
