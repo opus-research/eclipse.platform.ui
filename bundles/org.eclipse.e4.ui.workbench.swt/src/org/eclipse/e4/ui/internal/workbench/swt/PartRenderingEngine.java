@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -882,8 +881,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) element;
 				MUIElement selectedElement = container.getSelectedElement();
 				List<MUIElement> children = container.getChildren();
-				List<MUIElement> childrenCopy = new ArrayList<MUIElement>(children);
-				for (MUIElement child : childrenCopy) {
+				for (MUIElement child : children) {
 					// remove stuff in the "back" first
 					if (child != selectedElement) {
 						removeGui(child);
