@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import org.eclipse.core.databinding.observable.Realm;
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
@@ -369,9 +368,13 @@ public class E4Application implements IApplication {
 			if (brandingBundle != null)
 				appModelPath = brandingBundle.getSymbolicName() + "/"
 						+ E4Application.APPLICATION_MODEL_PATH_DEFAULT;
+			else {
+				Logger logger = new WorkbenchLogger(PLUGIN_ID);
+				logger.error(
+						new Exception(), // log a stack trace for debugging
+						"applicationXMI parameter not set and no branding plugin defined. "); //$NON-NLS-1$
+			}
 		}
-		Assert.isNotNull(appModelPath, IWorkbench.XMI_URI_ARG
-				+ " argument missing"); //$NON-NLS-1$
 
 		URI initialWorkbenchDefinitionInstance;
 
@@ -545,7 +548,7 @@ public class E4Application implements IApplication {
 		Locale transformedLocale = ResourceBundleHelper.toLocale(
 				defaultLocaleString, Locale.ENGLISH);
 
-		appContext.set(TranslationService.LOCALE, transformedLocale.toString());
+		appContext.set(TranslationService.LOCALE, transformedLocale);
 		TranslationService bundleTranslationProvider = TranslationProviderFactory
 				.bundleTranslationService(appContext);
 		appContext.set(TranslationService.class, bundleTranslationProvider);

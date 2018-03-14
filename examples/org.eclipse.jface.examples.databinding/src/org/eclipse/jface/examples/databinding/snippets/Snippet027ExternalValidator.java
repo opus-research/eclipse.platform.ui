@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Code 9 Corporation and others.
+ * Copyright (c) 2008, 2014 Code 9 Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Chris Aniszczyk <zx@code9.com> - initial API and implementation
  *     Boris Bokowski, IBM - minor changes
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 434283
  ******************************************************************************/
 
 package org.eclipse.jface.examples.databinding.snippets;
@@ -16,7 +17,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
 import org.eclipse.core.databinding.DataBindingContext;
-import org.eclipse.core.databinding.beans.BeansObservables;
+import org.eclipse.core.databinding.beans.BeanProperties;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.validation.MultiValidator;
@@ -24,6 +25,7 @@ import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.wizard.WizardPageSupport;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.Wizard;
@@ -39,7 +41,7 @@ import org.eclipse.swt.widgets.Text;
 
 /**
  * This snippet demonstrates how to integrate an external validator
- * 
+ *
  * @since 3.5
  */
 public class Snippet027ExternalValidator extends WizardPage {
@@ -152,7 +154,7 @@ public class Snippet027ExternalValidator extends WizardPage {
 
 	/**
 	 * Create contents of the wizard
-	 * 
+	 *
 	 * @param parent
 	 */
 	@Override
@@ -191,19 +193,19 @@ public class Snippet027ExternalValidator extends WizardPage {
 	private void bindUI() {
 		DataBindingContext dbc = new DataBindingContext();
 
-		final IObservableValue name = BeansObservables.observeValue(contact,
-				"name");
-		dbc.bindValue(SWTObservables.observeText(nameValue, SWT.Modify), name,
+		final IObservableValue name = BeanProperties.value(contact.getClass(), "name").observe(contact);
+
+		dbc.bindValue(WidgetProperties.text(SWT.Modify).observe(nameValue), name,
 				null, null);
 
-		final IObservableValue email = BeansObservables.observeValue(contact,
-				"email");
-		dbc.bindValue(SWTObservables.observeText(emailValue, SWT.Modify),
+		final IObservableValue email = BeanProperties.value(contact.getClass(), "email").observe(contact);
+
+		dbc.bindValue(WidgetProperties.text(SWT.Modify).observe(emailValue),
 				email, null, null);
 
-		final IObservableValue phone = BeansObservables.observeValue(contact,
-				"phoneNumber");
-		dbc.bindValue(SWTObservables.observeText(phoneNumberValue, SWT.Modify),
+		final IObservableValue phone = BeanProperties.value(contact.getClass(), "phoneNumber").observe(contact);
+
+		dbc.bindValue(WidgetProperties.text(SWT.Modify).observe(phoneNumberValue),
 				phone, null, null);
 
 		MultiValidator validator = new MultiValidator() {
