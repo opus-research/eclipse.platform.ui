@@ -18,7 +18,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -50,6 +49,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.commands.ICommandImageService;
 import org.eclipse.ui.internal.services.IWorkbenchLocationService;
 import org.eclipse.ui.internal.services.WorkbenchSourceProvider;
+import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.menus.IWorkbenchContribution;
@@ -339,7 +339,7 @@ public class ShowInMenu extends ContributionItem implements
 	 * @return an <code>IShowInSource</code> or <code>null</code>
 	 */
 	private IShowInSource getShowInSource(IWorkbenchPart sourcePart) {
-		return Adapters.getAdapter(sourcePart, IShowInSource.class, true);
+		return Util.getAdapter(sourcePart, IShowInSource.class);
 	}
 
 	/**
@@ -351,7 +351,7 @@ public class ShowInMenu extends ContributionItem implements
 	 * @return the <code>IShowInTargetList</code> or <code>null</code>
 	 */
 	private IShowInTargetList getShowInTargetList(IWorkbenchPart sourcePart) {
-		return Adapters.getAdapter(sourcePart, IShowInTargetList.class, true);
+		return Util.getAdapter(sourcePart, IShowInTargetList.class);
 	}
 
 	/**
