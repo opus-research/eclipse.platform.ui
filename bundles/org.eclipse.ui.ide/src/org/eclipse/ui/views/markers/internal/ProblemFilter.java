@@ -104,7 +104,6 @@ public class ProblemFilter extends MarkerFilter {
 
 	}
 
-	@Override
 	public boolean selectMarker(ConcreteMarker marker) {
 		if (!(marker instanceof ProblemMarker)) {
 			return false;
@@ -220,7 +219,6 @@ public class ProblemFilter extends MarkerFilter {
 	 * 
 	 * @see org.eclipse.ui.views.markers.internal.MarkerFilter#resetState()
 	 */
-	@Override
 	public void resetState() {
 		super.resetState();
 		contains = DEFAULT_CONTAINS;
@@ -234,7 +232,6 @@ public class ProblemFilter extends MarkerFilter {
 	 * 
 	 * @see org.eclipse.ui.views.markers.internal.MarkerFilter#restoreFilterSettings(org.eclipse.jface.dialogs.IDialogSettings)
 	 */
-	@Override
 	public void restoreFilterSettings(IDialogSettings settings) {
 
 		super.restoreFilterSettings(settings);
@@ -273,7 +270,6 @@ public class ProblemFilter extends MarkerFilter {
 	 * 
 	 * @see org.eclipse.ui.views.markers.internal.MarkerFilter#restoreFilterSettings(org.eclipse.ui.IMemento)
 	 */
-	@Override
 	protected void restoreFilterSettings(IMemento memento) {
 
 		super.restoreFilterSettings(memento);
@@ -308,7 +304,6 @@ public class ProblemFilter extends MarkerFilter {
 	 * 
 	 * @see org.eclipse.ui.views.markers.internal.MarkerFilter#saveFilterSettings(org.eclipse.ui.IMemento)
 	 */
-	@Override
 	public void saveFilterSettings(IMemento settings) {
 		super.saveFilterSettings(settings);
 		settings.putString(TAG_CONTAINS, String.valueOf(contains));
@@ -341,7 +336,6 @@ public class ProblemFilter extends MarkerFilter {
 			 * 
 			 * @see org.eclipse.ui.IPluginContribution#getLocalId()
 			 */
-			@Override
 			public String getLocalId() {
 				return id;
 			}
@@ -351,7 +345,6 @@ public class ProblemFilter extends MarkerFilter {
 			 * 
 			 * @see org.eclipse.ui.IPluginContribution#getPluginId()
 			 */
-			@Override
 			public String getPluginId() {
 				return namespace;
 			}
@@ -375,7 +368,6 @@ public class ProblemFilter extends MarkerFilter {
 		return !identifier.isEnabled();
 	}
 
-	@Override
 	public boolean isEnabled() {
 		return super.isEnabled() && !isFilteredOutByActivity();
 	}

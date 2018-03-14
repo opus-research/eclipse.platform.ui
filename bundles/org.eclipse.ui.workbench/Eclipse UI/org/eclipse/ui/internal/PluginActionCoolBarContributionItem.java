@@ -44,6 +44,12 @@ public class PluginActionCoolBarContributionItem extends
         this.actionSetId = id;
     }
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.PluginActionContributionItem#invalidateParent()
+	 */
 	@Override
 	protected void invalidateParent() {
 		super.invalidateParent();

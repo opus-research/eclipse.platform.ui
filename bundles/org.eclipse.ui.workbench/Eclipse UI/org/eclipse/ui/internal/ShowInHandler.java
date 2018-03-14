@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 IBM Corporation and others.
+ * Copyright (c) 2008, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -44,6 +43,11 @@ import org.eclipse.ui.views.IViewRegistry;
  */
 public class ShowInHandler extends AbstractHandler implements IElementUpdater {
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchPage p = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
@@ -59,7 +63,7 @@ public class ShowInHandler extends AbstractHandler implements IElementUpdater {
 		}
 
 		final IWorkbenchWindow activeWorkbenchWindow = HandlerUtil.getActiveWorkbenchWindowChecked(event);
-		ISourceProviderService sps = activeWorkbenchWindow.getService(ISourceProviderService.class);
+		ISourceProviderService sps = (ISourceProviderService)activeWorkbenchWindow.getService(ISourceProviderService.class);
 		if (sps != null) {
 			ISourceProvider sp = sps.getSourceProvider(ISources.SHOW_IN_SELECTION);
 			if (sp instanceof WorkbenchSourceProvider) {
@@ -119,6 +123,12 @@ public class ShowInHandler extends AbstractHandler implements IElementUpdater {
 		return (IShowInTarget) Util.getAdapter(targetPart, IShowInTarget.class);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.commands.IElementUpdater#updateElement(org.eclipse.ui.menus.UIElement,
+	 *      java.util.Map)
+	 */
 	@Override
 	public void updateElement(UIElement element, Map parameters) {
 		String targetId = (String) parameters

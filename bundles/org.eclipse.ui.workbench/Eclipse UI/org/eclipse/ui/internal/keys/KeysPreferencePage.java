@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 
 package org.eclipse.ui.internal.keys;
@@ -139,6 +138,11 @@ public final class KeysPreferencePage extends PreferencePage implements
 			this.columnSelected = columnSelected;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+		 */
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			// Change the column titles.
@@ -513,6 +517,9 @@ public final class KeysPreferencePage extends PreferencePage implements
 	private KeySequenceText textTriggerSequenceManager;
 
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.PreferencePage#applyData(java.lang.Object)
+	 */
 	@Override
 	public void applyData(Object data) {
 		if(data instanceof Binding) {
@@ -1017,11 +1024,21 @@ public final class KeysPreferencePage extends PreferencePage implements
 		editButton.setLayoutData(gridData);
 		editButton.addSelectionListener(new SelectionListener() {
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
+			 */
 			@Override
 			public final void widgetDefaultSelected(final SelectionEvent event) {
 				selectedTableKeyBindings();
 			}
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+			 */
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				widgetDefaultSelected(e);
@@ -1039,11 +1056,21 @@ public final class KeysPreferencePage extends PreferencePage implements
 		buttonExport.setLayoutData(gridData);
 		buttonExport.addSelectionListener(new SelectionListener() {
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
+			 */
 			@Override
 			public final void widgetDefaultSelected(final SelectionEvent event) {
 				selectedButtonExport();
 			}
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+			 */
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				widgetDefaultSelected(e);
@@ -1217,9 +1244,9 @@ public final class KeysPreferencePage extends PreferencePage implements
 	@Override
 	public final void init(final IWorkbench workbench) {
 		activityManager = workbench.getActivitySupport().getActivityManager();
-		bindingService = workbench.getService(IBindingService.class);
-		commandService = workbench.getService(ICommandService.class);
-		contextService = workbench.getService(IContextService.class);
+		bindingService = (IBindingService) workbench.getService(IBindingService.class);
+		commandService = (ICommandService) workbench.getService(ICommandService.class);
+		contextService = (IContextService) workbench.getService(IContextService.class);
 	}
 
 	/**

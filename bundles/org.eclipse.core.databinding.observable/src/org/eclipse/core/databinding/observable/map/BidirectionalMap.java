@@ -24,10 +24,8 @@ import org.eclipse.core.databinding.observable.Realm;
  * 
  * @deprecated This class is deprecated; use {@link BidiObservableMap} instead.
  */
-@Deprecated
 public class BidirectionalMap extends ObservableMap {
 	private IMapChangeListener mapListener = new IMapChangeListener() {
-		@Override
 		public void handleMapChange(MapChangeEvent event) {
 			fireMapChange(event.diff);
 		}

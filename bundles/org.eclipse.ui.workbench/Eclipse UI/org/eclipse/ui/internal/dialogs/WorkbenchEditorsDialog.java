@@ -162,6 +162,9 @@ public class WorkbenchEditorsDialog extends SelectionDialog {
 		setShellStyle(getShellStyle() | SWT.SHEET);
     }
 
+    /* (non-Javadoc)
+     * Method declared on Window.
+     */
     @Override
 	protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
@@ -169,6 +172,10 @@ public class WorkbenchEditorsDialog extends SelectionDialog {
 				IWorkbenchHelpContextIds.WORKBENCH_EDITORS_DIALOG);
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
+     */
     @Override
 	protected void createButtonsForButtonBar(Composite parent) {
         // Typically we would use the parent's createButtonsForButtonBar.

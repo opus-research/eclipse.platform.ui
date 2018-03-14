@@ -30,7 +30,6 @@ public class NavigatorContentRegistryReader extends RegistryReader implements
 		super(NavigatorPlugin.PLUGIN_ID, TAG_NAVIGATOR_CONTENT);
 	}
 
-	@Override
 	protected boolean readElement(IConfigurationElement element) {
 		String elementName = element.getName();
 
