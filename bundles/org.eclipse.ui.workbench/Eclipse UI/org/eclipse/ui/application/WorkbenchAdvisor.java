@@ -779,6 +779,9 @@ public abstract class WorkbenchAdvisor {
 
 		final Throwable [] error = new Throwable[1];
 		Thread initThread = new Thread() {
+			/* (non-Javadoc)
+			 * @see java.lang.Thread#run()
+			 */
 			@Override
 			public void run() {
 				try {

@@ -43,12 +43,22 @@ public class MarkerColumnLabelProvider extends ColumnLabelProvider {
 		field.setImageManager(imageManager);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.BaseLabelProvider#dispose()
+	 */
 	@Override
 	public void dispose() {
 		super.dispose();
 		imageManager.dispose();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.ColumnLabelProvider#update(org.eclipse.jface.viewers.ViewerCell)
+	 */
 	@Override
 	public void update(ViewerCell cell) {
 		field.update(cell);

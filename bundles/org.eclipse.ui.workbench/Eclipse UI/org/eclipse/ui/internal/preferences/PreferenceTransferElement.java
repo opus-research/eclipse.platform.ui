@@ -130,11 +130,21 @@ public class PreferenceTransferElement extends WorkbenchAdapter implements
 				.getAttribute(IWorkbenchRegistryConstants.ATT_NAME);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.IPluginContribution#getLocalId()
+	 */
 	@Override
 	public String getLocalId() {
 		return getID();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.IPluginContribution#getPluginId()
+	 */
 	@Override
 	public String getPluginId() {
 		return (configurationElement != null) ? configurationElement
@@ -163,11 +173,23 @@ public class PreferenceTransferElement extends WorkbenchAdapter implements
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.model.WorkbenchAdapter#getLabel(java.lang.Object)
+	 */
 	@Override
 	public String getLabel(Object object) {
 		return getName();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.ui.model.WorkbenchAdapter#getImageDescriptor(java.lang.Object
+	 * )
+	 */
 	@Override
 	public ImageDescriptor getImageDescriptor(Object object) {
 		if (imageDescriptor == null) {
