@@ -11,9 +11,6 @@
  *******************************************************************************/
 package org.eclipse.jface.tests.internal.databinding.viewers;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -26,20 +23,22 @@ import org.eclipse.jface.databinding.viewers.ViewersObservables;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 /**
  * Tests for ViewerInputObservableValue.
- * 
+ *
  * @since 1.2
  */
-public class ViewerInputObservableValueTest extends
-		AbstractDefaultRealmTestCase {
+public class ViewerInputObservableValueTest extends AbstractDefaultRealmTestCase {
 	private TableViewer viewer;
 	private static String[] model = new String[] { "0", "1" };
 
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		Shell shell = new Shell();
@@ -47,6 +46,7 @@ public class ViewerInputObservableValueTest extends
 		viewer.setContentProvider(new ContentProvider());
 	}
 
+	@Override
 	protected void tearDown() throws Exception {
 		Shell shell = viewer.getTable().getShell();
 		if (!shell.isDisposed())
@@ -131,12 +131,7 @@ public class ViewerInputObservableValueTest extends
 	}
 
 	static class ContentProvider implements IStructuredContentProvider {
-		public void dispose() {
-		}
-
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		}
-
+		@Override
 		public Object[] getElements(Object inputElement) {
 			return (String[]) inputElement;
 		}
@@ -153,6 +148,7 @@ public class ViewerInputObservableValueTest extends
 	static class Delegate extends AbstractObservableValueContractDelegate {
 		TableViewer viewer;
 
+		@Override
 		public void setUp() {
 			super.setUp();
 			Shell shell = new Shell();
@@ -160,6 +156,7 @@ public class ViewerInputObservableValueTest extends
 			viewer.setContentProvider(new ContentProvider());
 		}
 
+		@Override
 		public void tearDown() {
 			Shell shell = viewer.getTable().getShell();
 			if (!shell.isDisposed())
@@ -167,19 +164,23 @@ public class ViewerInputObservableValueTest extends
 			super.tearDown();
 		}
 
+		@Override
 		public IObservableValue createObservableValue(Realm realm) {
 			return ViewerProperties.input().observe(realm, viewer);
 		}
 
+		@Override
 		public void change(IObservable observable) {
 			IObservableValue value = (IObservableValue) observable;
 			value.setValue(createValue(value));
 		}
 
+		@Override
 		public Object createValue(IObservableValue observable) {
 			return new String[] { "one", "two" };
 		}
 
+		@Override
 		public Object getValueType(IObservableValue observable) {
 			return null;
 		}

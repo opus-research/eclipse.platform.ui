@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-import org.eclipse.core.runtime.*;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.service.environment.Constants;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.PartInitException;
@@ -23,21 +23,19 @@ import org.eclipse.ui.internal.browser.Messages;
 import org.eclipse.ui.internal.browser.Trace;
 import org.eclipse.ui.internal.browser.WebBrowserUIPlugin;
 /**
- * 
+ *
  */
 public class DefaultBrowser extends AbstractWebBrowser {
 	protected String location;
 	protected String parameters;
-	
+
 	public DefaultBrowser(String id, String location, String parameters) {
 		super(id);
 		this.location = location;
 		this.parameters = parameters;
 	}
 
-	/**
-	 * @see org.eclipse.help.browser.IBrowser#displayURL(java.lang.String)
-	 */
+	@Override
 	public void openURL(URL url2) throws PartInitException {
 		String url = url2.toExternalForm();
 		String path = location;
@@ -61,19 +59,19 @@ public class DefaultBrowser extends AbstractWebBrowser {
 					+ path
 					+ "\" has failed.  Specify another browser in help preferences.", //$NON-NLS-1$
 					e);
-			throw new PartInitException(NLS.bind(Messages.errorCouldNotLaunchWebBrowser, path));
+			throw new PartInitException(NLS.bind(Messages.errorCouldNotLaunchExternalWebBrowser, path));
 		}
 	}
 
 	/**
 	 * Creates the final command to launch.
-	 * 
+	 *
 	 * @param path
 	 * @param url
 	 * @return String[]
 	 */
 	protected String[] prepareCommand(String path, String url) {
-		ArrayList<String> tokenList = new ArrayList<String>();
+		ArrayList<String> tokenList = new ArrayList<>();
 		//Divide along quotation marks
 		StringTokenizer qTokenizer = new StringTokenizer(path.trim(),
 			"\"", true); //$NON-NLS-1$
@@ -124,11 +122,11 @@ public class DefaultBrowser extends AbstractWebBrowser {
 		tokenList.toArray(command);
 		return command;
 	}
-	
+
 	/**
 	 * Replaces any occurrences of <code>"%1"</code> or <code>%1</code> with
 	 * the URL.
-	 * 
+	 *
 	 * @param token
 	 *            The token in which the substitutions should be made; must not
 	 *            be <code>null</code>.

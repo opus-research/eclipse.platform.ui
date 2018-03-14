@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.IAdaptable;
  * For example, the plug-in's XML markup might contain:
  * <pre>
  * &LT;extension point="org.eclipse.ui.elementFactories"&GT;
- *    &LT;factory id="com.example.myplugin.MyFactory" class="com.example.myplugin.MyFactory" /&GT; 
+ *    &LT;factory id="com.example.myplugin.MyFactory" class="com.example.myplugin.MyFactory" /&GT;
  * &LT;/extension&GT;
  * </pre>
  * </p>
@@ -41,7 +41,7 @@ public interface IElementFactory {
 	 * </pre>
 	 * should not return <code>null</code>.
 	 * </p>
-	 * 
+	 *
 	 * @param memento
 	 *            a memento containing the state for the object
 	 * @return an object, or <code>null</code> if the element could not be

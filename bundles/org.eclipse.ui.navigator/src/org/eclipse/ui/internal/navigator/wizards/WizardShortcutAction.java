@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2009 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,9 +33,9 @@ import org.eclipse.ui.wizards.IWizardDescriptor;
  * work nor that it will remain the same. Please do not use this API without
  * consulting with the Platform/UI team.
  * </p>
- * 
+ *
  * @since 3.2
- * 
+ *
  */
 public class WizardShortcutAction extends Action implements IPluginContribution {
 	private IWizardDescriptor descriptor;
@@ -43,7 +43,7 @@ public class WizardShortcutAction extends Action implements IPluginContribution 
 	private IWorkbenchWindow window;
 
 	/**
-	 * 
+	 *
 	 * @param aWindow
 	 *            The window to use for the shell and selection service.
 	 * @param aDescriptor
@@ -61,8 +61,9 @@ public class WizardShortcutAction extends Action implements IPluginContribution 
 	}
 
 	/**
-	 * This action has been invoked by the user 
+	 * This action has been invoked by the user
 	 */
+	@Override
 	public void run() {
 		// create instance of target wizard
 
@@ -86,7 +87,7 @@ public class WizardShortcutAction extends Action implements IPluginContribution 
 		} else {
 			wizard.init(window.getWorkbench(), StructuredSelection.EMPTY);
 		}
-		
+
 		if(descriptor.canFinishEarly() && !descriptor.hasPages()) {
 			wizard.performFinish();
 		} else {
@@ -99,20 +100,12 @@ public class WizardShortcutAction extends Action implements IPluginContribution 
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.activities.support.IPluginContribution#getLocalId()
-	 */
+	@Override
 	public String getLocalId() {
 		return descriptor.getId();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.activities.support.IPluginContribution#getPluginId()
-	 */
+	@Override
 	public String getPluginId() {
 		return descriptor.getId();
 	}

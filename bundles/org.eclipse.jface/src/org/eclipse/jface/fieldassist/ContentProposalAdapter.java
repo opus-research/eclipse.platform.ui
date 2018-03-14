@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation and others.
+ * Copyright (c) 2005, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,8 +22,6 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.SelectionEvent;
@@ -57,7 +55,7 @@ import org.eclipse.swt.widgets.Text;
  * <p>
  * This class provides some overridable methods to allow clients to manually
  * control the popup. However, most of the implementation remains private.
- * 
+ *
  * @since 3.2
  */
 public class ContentProposalAdapter {
@@ -92,31 +90,28 @@ public class ContentProposalAdapter {
 					 * scrollbar. Do this in an async since the focus is not
 					 * actually switched when this event is received.
 					 */
-					e.display.asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							if (isValid()) {
-								if (scrollbarClicked || hasFocus()) {
-									return;
-								}
-								// Workaround a problem on X and Mac, whereby at
-								// this point, the focus control is not known.
-								// This can happen, for example, when resizing
-								// the popup shell on the Mac.
-								// Check the active shell.
-								Shell activeShell = e.display.getActiveShell();
-								if (activeShell == getShell()
-										|| (infoPopup != null && infoPopup
-												.getShell() == activeShell)) {
-									return;
-								}
-								/*
-								 * System.out.println(e);
-								 * System.out.println(e.display.getFocusControl());
-								 * System.out.println(e.display.getActiveShell());
-								 */
-								close();
+					e.display.asyncExec(() -> {
+						if (isValid()) {
+							if (scrollbarClicked || hasFocus()) {
+								return;
 							}
+							// Workaround a problem on X and Mac, whereby at
+							// this point, the focus control is not known.
+							// This can happen, for example, when resizing
+							// the popup shell on the Mac.
+							// Check the active shell.
+							Shell activeShell = e.display.getActiveShell();
+							if (activeShell == getShell()
+									|| (infoPopup != null && infoPopup
+											.getShell() == activeShell)) {
+								return;
+							}
+							/*
+							 * System.out.println(e);
+							 * System.out.println(e.display.getFocusControl());
+							 * System.out.println(e.display.getActiveShell());
+							 */
+							close();
 						}
 					});
 					return;
@@ -308,8 +303,8 @@ public class ContentProposalAdapter {
 							String contents = getControlContentAdapter()
 									.getControlContents(getControl());
 							// If there are no contents, changes in cursor
-							// position have no effect. Note also that we do 
-							// not affect the filter text on ARROW_LEFT as 
+							// position have no effect. Note also that we do
+							// not affect the filter text on ARROW_LEFT as
 							// we would with BS.
 							if (contents.length() > 0) {
 								asyncRecomputeProposals(filterText);
@@ -321,7 +316,7 @@ public class ContentProposalAdapter {
 					// Modifier keys are explicitly checked and ignored because
 					// they are not complete yet (no character).
 					default:
-						if (e.keyCode != SWT.CAPS_LOCK && e.keyCode != SWT.NUM_LOCK 
+						if (e.keyCode != SWT.CAPS_LOCK && e.keyCode != SWT.NUM_LOCK
 								&& e.keyCode != SWT.MOD1
 								&& e.keyCode != SWT.MOD2
 								&& e.keyCode != SWT.MOD3
@@ -505,21 +500,13 @@ public class ContentProposalAdapter {
 				}
 				getShell().setBounds(proposedBounds);
 			}
-			
-			/*
-			 * (non-Javadoc)
-			 * @see org.eclipse.jface.dialogs.PopupDialog#getForeground()
-			 */
+
 			@Override
 			protected Color getForeground() {
 				return control.getDisplay().
 						getSystemColor(SWT.COLOR_INFO_FOREGROUND);
 			}
-			
-			/*
-			 * (non-Javadoc)
-			 * @see org.eclipse.jface.dialogs.PopupDialog#getBackground()
-			 */
+
 			@Override
 			protected Color getBackground() {
 				return control.getDisplay().
@@ -592,7 +579,7 @@ public class ContentProposalAdapter {
 		 * Constructs a new instance of this popup, specifying the control for
 		 * which this popup is showing content, and how the proposals should be
 		 * obtained and displayed.
-		 * 
+		 *
 		 * @param infoText
 		 *            Text to be shown in a lower info area, or
 		 *            <code>null</code> if there is no info area.
@@ -610,20 +597,12 @@ public class ContentProposalAdapter {
 			this.proposals = proposals;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * @see org.eclipse.jface.dialogs.PopupDialog#getForeground()
-		 */
 		@Override
 		protected Color getForeground() {
 			return JFaceResources.getColorRegistry().get(
 					JFacePreferences.CONTENT_ASSIST_FOREGROUND_COLOR);
 		}
-		
-		/*
-		 * (non-Javadoc)
-		 * @see org.eclipse.jface.dialogs.PopupDialog#getBackground()
-		 */
+
 		@Override
 		protected Color getBackground() {
 			return JFaceResources.getColorRegistry().get(
@@ -634,7 +613,7 @@ public class ContentProposalAdapter {
 		 * Creates the content area for the proposal popup. This creates a table
 		 * and places it inside the composite. The table will contain a list of
 		 * all the proposals.
-		 * 
+		 *
 		 * @param parent The parent composite to contain the dialog area; must
 		 * not be <code>null</code>.
 		 */
@@ -645,12 +624,7 @@ public class ContentProposalAdapter {
 				proposalTable = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL
 						| SWT.VIRTUAL);
 
-				Listener listener = new Listener() {
-					@Override
-					public void handleEvent(Event event) {
-						handleSetData(event);
-					}
-				};
+				Listener listener = event -> handleSetData(event);
 				proposalTable.addListener(SWT.SetData, listener);
 			} else {
 				proposalTable = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL);
@@ -684,15 +658,10 @@ public class ContentProposalAdapter {
 			return proposalTable;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.dialogs.PopupDialog.adjustBounds()
-		 */
 		@Override
 		protected void adjustBounds() {
 			// Get our control's location in display coordinates.
-			Point location = control.getDisplay().map(control.getParent(), null, control.getLocation());			
+			Point location = control.getDisplay().map(control.getParent(), null, control.getLocation());
 			int initialX = location.x + POPUP_OFFSET;
 			int initialY = location.y + control.getSize().y + POPUP_OFFSET;
 			// If we are inserting content, use the cursor position to
@@ -717,11 +686,11 @@ public class ContentProposalAdapter {
 				getShell().pack();
 				popupSize = getShell().getSize();
 			}
-			
+
 			// Constrain to the display
 			Rectangle constrainedBounds = getConstrainedShellBounds(new Rectangle(initialX, initialY, popupSize.x, popupSize.y));
-			
-			// If there has been an adjustment causing the popup to overlap 
+
+			// If there has been an adjustment causing the popup to overlap
 			// with the control, then put the popup above the control.
 			if (constrainedBounds.y < initialY)
 				getShell().setBounds(initialX, location.y - popupSize.y, popupSize.x, popupSize.y);
@@ -729,13 +698,10 @@ public class ContentProposalAdapter {
 				getShell().setBounds(initialX, initialY, popupSize.x, popupSize.y);
 
 			// Now set up a listener to monitor any changes in size.
-			getShell().addListener(SWT.Resize, new Listener() {
-				@Override
-				public void handleEvent(Event e) {
-					popupSize = getShell().getSize();
-					if (infoPopup != null) {
-						infoPopup.adjustBounds();
-					}
+			getShell().addListener(SWT.Resize, e -> {
+				popupSize = getShell().getSize();
+				if (infoPopup != null) {
+					infoPopup.adjustBounds();
 				}
 			});
 		}
@@ -896,9 +862,9 @@ public class ContentProposalAdapter {
 		 * Opens this ContentProposalPopup. This method is extended in order to
 		 * add the control listener when the popup is opened and to invoke the
 		 * secondary popup if applicable.
-		 * 
+		 *
 		 * @return the return code
-		 * 
+		 *
 		 * @see org.eclipse.jface.window.Window#open()
 		 */
 		@Override
@@ -918,7 +884,7 @@ public class ContentProposalAdapter {
 		/**
 		 * Closes this popup. This method is extended to remove the control
 		 * listener.
-		 * 
+		 *
 		 * @return <code>true</code> if the window is (or was already) closed,
 		 *         and <code>false</code> if it is still open
 		 */
@@ -945,52 +911,40 @@ public class ContentProposalAdapter {
 				// before creating the popup. We do not use Jobs since this
 				// code must be able to run independently of the Eclipse
 				// runtime.
-				Runnable runnable = new Runnable() {
-					@Override
-					public void run() {
-						pendingDescriptionUpdate = true;
-						try {
-							Thread.sleep(POPUP_DELAY);
-						} catch (InterruptedException e) {
-						}
-						if (!isValid()) {
-							return;
-						}
-						getShell().getDisplay().syncExec(new Runnable() {
-							@Override
-							public void run() {
-								// Query the current selection since we have
-								// been delayed
-								IContentProposal p = getSelectedProposal();
-								if (p != null) {
-									String description = p.getDescription();
-									if (description != null) {
-										if (infoPopup == null) {
-											infoPopup = new InfoPopupDialog(
-													getShell());
-											infoPopup.open();
-											infoPopup
-													.getShell()
-													.addDisposeListener(
-															new DisposeListener() {
-																@Override
-																public void widgetDisposed(
-																		DisposeEvent event) {
-																	infoPopup = null;
-																}
-															});
-										}
-										infoPopup.setContents(p
-												.getDescription());
-									} else if (infoPopup != null) {
-										infoPopup.close();
-									}
-									pendingDescriptionUpdate = false;
-
-								}
-							}
-						});
+				Runnable runnable = () -> {
+					pendingDescriptionUpdate = true;
+					try {
+						Thread.sleep(POPUP_DELAY);
+					} catch (InterruptedException e) {
 					}
+					if (!isValid()) {
+						return;
+					}
+					getShell().getDisplay().syncExec(() -> {
+						// Query the current selection since we have
+						// been delayed
+						IContentProposal p = getSelectedProposal();
+						if (p != null) {
+							String description = p.getDescription();
+							if (description != null) {
+								if (infoPopup == null) {
+									infoPopup = new InfoPopupDialog(
+											getShell());
+									infoPopup.open();
+									infoPopup
+											.getShell()
+											.addDisposeListener(
+													event -> infoPopup = null);
+								}
+								infoPopup.setContents(p
+										.getDescription());
+							} else if (infoPopup != null) {
+								infoPopup.close();
+							}
+							pendingDescriptionUpdate = false;
+
+						}
+					});
 				};
 				Thread t = new Thread(runnable);
 				t.start();
@@ -1038,12 +992,9 @@ public class ContentProposalAdapter {
 		 */
 		private void asyncRecomputeProposals(final String filterText) {
 			if (isValid()) {
-				control.getDisplay().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						recordCursorPosition();
-						recomputeProposals(filterText);
-					}
+				control.getDisplay().asyncExec(() -> {
+					recordCursorPosition();
+					recomputeProposals(filterText);
 				});
 			} else {
 				recomputeProposals(filterText);
@@ -1062,7 +1013,7 @@ public class ContentProposalAdapter {
 
 			// Check each string for a match. Use the string displayed to the
 			// user, not the proposal content.
-			ArrayList<IContentProposal> list = new ArrayList<IContentProposal>();
+			ArrayList<IContentProposal> list = new ArrayList<>();
 			for (int i = 0; i < proposals.length; i++) {
 				String string = getString(proposals[i]);
 				if (string.length() >= filterString.length()
@@ -1124,7 +1075,7 @@ public class ContentProposalAdapter {
 	/**
 	 * Indicates that a cumulative filter applies as keys are typed in the
 	 * popup. That is, each character typed will be added to the filter.
-	 * 
+	 *
 	 * @deprecated As of 3.4, filtering that is sensitive to changes in the
 	 *             control content should be performed by the supplied
 	 *             {@link IContentProposalProvider}, such as that performed by
@@ -1233,12 +1184,12 @@ public class ContentProposalAdapter {
 	/*
 	 * The list of IContentProposalListener listeners.
 	 */
-	private ListenerList proposalListeners = new ListenerList();
+	private ListenerList<IContentProposalListener> proposalListeners = new ListenerList<>();
 
 	/*
 	 * The list of IContentProposalListener2 listeners.
 	 */
-	private ListenerList proposalListeners2 = new ListenerList();
+	private ListenerList<IContentProposalListener2> proposalListeners2 = new ListenerList<>();
 
 	/*
 	 * Flag that indicates whether the adapter is enabled. In some cases,
@@ -1284,7 +1235,7 @@ public class ContentProposalAdapter {
 	/**
 	 * Construct a content proposal adapter that can assist the user with
 	 * choosing content for the field.
-	 * 
+	 *
 	 * @param control
 	 *            the control for which the adapter is providing content assist.
 	 *            May not be <code>null</code>.
@@ -1334,7 +1285,7 @@ public class ContentProposalAdapter {
 
 	/**
 	 * Get the control on which the content proposal adapter is installed.
-	 * 
+	 *
 	 * @return the control on which the proposal adapter is installed.
 	 */
 	public Control getControl() {
@@ -1343,7 +1294,7 @@ public class ContentProposalAdapter {
 
 	/**
 	 * Get the label provider that is used to show proposals.
-	 * 
+	 *
 	 * @return the {@link ILabelProvider} used to show proposals, or
 	 *         <code>null</code> if one has not been installed.
 	 */
@@ -1353,7 +1304,7 @@ public class ContentProposalAdapter {
 
 	/**
 	 * Return a boolean indicating whether the receiver is enabled.
-	 * 
+	 *
 	 * @return <code>true</code> if the adapter is enabled, and
 	 *         <code>false</code> if it is not.
 	 */
@@ -1365,7 +1316,7 @@ public class ContentProposalAdapter {
 	 * Set the label provider that is used to show proposals. The lifecycle of
 	 * the specified label provider is not managed by this adapter. Clients must
 	 * dispose the label provider when it is no longer needed.
-	 * 
+	 *
 	 * @param labelProvider
 	 *            the {@link ILabelProvider} used to show proposals.
 	 */
@@ -1377,7 +1328,7 @@ public class ContentProposalAdapter {
 	 * Return the proposal provider that provides content proposals given the
 	 * current content of the field. A value of <code>null</code> indicates
 	 * that there are no content proposals available for the field.
-	 * 
+	 *
 	 * @return the {@link IContentProposalProvider} used to show proposals. May
 	 *         be <code>null</code>.
 	 */
@@ -1387,7 +1338,7 @@ public class ContentProposalAdapter {
 
 	/**
 	 * Set the content proposal provider that is used to show proposals.
-	 * 
+	 *
 	 * @param proposalProvider
 	 *            the {@link IContentProposalProvider} used to show proposals
 	 */
@@ -1398,7 +1349,7 @@ public class ContentProposalAdapter {
 
 	/**
 	 * Return the array of characters on which the popup is autoactivated.
-	 * 
+	 *
 	 * @return An array of characters that trigger auto-activation of content
 	 *         proposal. If specified, these characters will trigger
 	 *         auto-activation of the proposal popup, regardless of whether an
@@ -1418,7 +1369,7 @@ public class ContentProposalAdapter {
 	/**
 	 * Set the array of characters that will trigger autoactivation of the
 	 * popup.
-	 * 
+	 *
 	 * @param autoActivationCharacters
 	 *            An array of characters that trigger auto-activation of content
 	 *            proposal. If specified, these characters will trigger
@@ -1429,7 +1380,7 @@ public class ContentProposalAdapter {
 	 *            <code>null</code> and the keyStroke value is
 	 *            <code>null</code>, then all alphanumeric characters will
 	 *            auto-activate content proposal.
-	 * 
+	 *
 	 */
 	public void setAutoActivationCharacters(char[] autoActivationCharacters) {
 		if (autoActivationCharacters == null) {
@@ -1442,7 +1393,7 @@ public class ContentProposalAdapter {
 	/**
 	 * Set the delay, in milliseconds, used before any autoactivation is
 	 * triggered.
-	 * 
+	 *
 	 * @return the time in milliseconds that will pass before a popup is
 	 *         automatically opened
 	 */
@@ -1453,7 +1404,7 @@ public class ContentProposalAdapter {
 
 	/**
 	 * Set the delay, in milliseconds, used before autoactivation is triggered.
-	 * 
+	 *
 	 * @param delay
 	 *            the time in milliseconds that will pass before a popup is
 	 *            automatically opened
@@ -1466,7 +1417,7 @@ public class ContentProposalAdapter {
 	/**
 	 * Get the integer style that indicates how an accepted proposal affects the
 	 * control's content.
-	 * 
+	 *
 	 * @return a constant indicating how an accepted proposal should affect the
 	 *         control's content. Should be one of <code>PROPOSAL_INSERT</code>,
 	 *         <code>PROPOSAL_REPLACE</code>, or <code>PROPOSAL_IGNORE</code>.
@@ -1479,7 +1430,7 @@ public class ContentProposalAdapter {
 	/**
 	 * Set the integer style that indicates how an accepted proposal affects the
 	 * control's content.
-	 * 
+	 *
 	 * @param acceptance
 	 *            a constant indicating how an accepted proposal should affect
 	 *            the control's content. Should be one of
@@ -1493,7 +1444,7 @@ public class ContentProposalAdapter {
 	/**
 	 * Return the integer style that indicates how keystrokes affect the content
 	 * of the proposal popup while it is open.
-	 * 
+	 *
 	 * @return a constant indicating how keystrokes in the proposal popup affect
 	 *         filtering of the proposals shown. <code>FILTER_NONE</code>
 	 *         specifies that no filtering will occur in the content proposal
@@ -1518,7 +1469,7 @@ public class ContentProposalAdapter {
 	 * to achieve content-sensitive filtering such as auto-completion. Filtering
 	 * that is sensitive to changes in the control content should be performed
 	 * by the supplied {@link IContentProposalProvider}.
-	 * 
+	 *
 	 * @param filterStyle
 	 *            a constant indicating how keystrokes received in the proposal
 	 *            popup affect filtering of the proposals shown.
@@ -1537,7 +1488,7 @@ public class ContentProposalAdapter {
 
 	/**
 	 * Return the size, in pixels, of the content proposal popup.
-	 * 
+	 *
 	 * @return a Point specifying the last width and height, in pixels, of the
 	 *         content proposal popup.
 	 */
@@ -1548,7 +1499,7 @@ public class ContentProposalAdapter {
 	/**
 	 * Set the size, in pixels, of the content proposal popup. This size will be
 	 * used the next time the content proposal popup is opened.
-	 * 
+	 *
 	 * @param size
 	 *            a Point specifying the desired width and height, in pixels, of
 	 *            the content proposal popup.
@@ -1562,7 +1513,7 @@ public class ContentProposalAdapter {
 	 * auto-activation characters) received by the content proposal popup should
 	 * also be propagated to the adapted control when the proposal popup is
 	 * open.
-	 * 
+	 *
 	 * @return a boolean that indicates whether key events (including
 	 *         auto-activation characters) should be propagated to the adapted
 	 *         control when the proposal popup is open. Default value is
@@ -1577,7 +1528,7 @@ public class ContentProposalAdapter {
 	 * auto-activation characters) received by the content proposal popup should
 	 * also be propagated to the adapted control when the proposal popup is
 	 * open.
-	 * 
+	 *
 	 * @param propagateKeys
 	 *            a boolean that indicates whether key events (including
 	 *            auto-activation characters) should be propagated to the
@@ -1592,7 +1543,7 @@ public class ContentProposalAdapter {
 	 * from the adapter's control. This method is used when a client, such as a
 	 * content proposal listener, needs to update the control's contents
 	 * manually.
-	 * 
+	 *
 	 * @return the {@link IControlContentAdapter} which can update the control
 	 *         text.
 	 */
@@ -1602,12 +1553,12 @@ public class ContentProposalAdapter {
 
 	/**
 	 * Set the boolean flag that determines whether the adapter is enabled.
-	 * 
+	 *
 	 * @param enabled
 	 *            <code>true</code> if the adapter is enabled and responding
 	 *            to user input, <code>false</code> if it is ignoring user
 	 *            input.
-	 * 
+	 *
 	 */
 	public void setEnabled(boolean enabled) {
 		// If we are disabling it while it's proposing content, close the
@@ -1624,13 +1575,13 @@ public class ContentProposalAdapter {
 	 * Add the specified listener to the list of content proposal listeners that
 	 * are notified when content proposals are chosen.
 	 * </p>
-	 * 
+	 *
 	 * @param listener
 	 *            the IContentProposalListener to be added as a listener. Must
 	 *            not be <code>null</code>. If an attempt is made to register
 	 *            an instance which is already registered with this instance,
 	 *            this method has no effect.
-	 * 
+	 *
 	 * @see org.eclipse.jface.fieldassist.IContentProposalListener
 	 */
 	public void addContentProposalListener(IContentProposalListener listener) {
@@ -1641,12 +1592,12 @@ public class ContentProposalAdapter {
 	 * Removes the specified listener from the list of content proposal
 	 * listeners that are notified when content proposals are chosen.
 	 * </p>
-	 * 
+	 *
 	 * @param listener
 	 *            the IContentProposalListener to be removed as a listener. Must
 	 *            not be <code>null</code>. If the listener has not already
 	 *            been registered, this method has no effect.
-	 * 
+	 *
 	 * @since 3.3
 	 * @see org.eclipse.jface.fieldassist.IContentProposalListener
 	 */
@@ -1658,13 +1609,13 @@ public class ContentProposalAdapter {
 	 * Add the specified listener to the list of content proposal listeners that
 	 * are notified when a content proposal popup is opened or closed.
 	 * </p>
-	 * 
+	 *
 	 * @param listener
 	 *            the IContentProposalListener2 to be added as a listener. Must
 	 *            not be <code>null</code>. If an attempt is made to register
 	 *            an instance which is already registered with this instance,
 	 *            this method has no effect.
-	 * 
+	 *
 	 * @since 3.3
 	 * @see org.eclipse.jface.fieldassist.IContentProposalListener2
 	 */
@@ -1676,12 +1627,12 @@ public class ContentProposalAdapter {
 	 * Remove the specified listener from the list of content proposal listeners
 	 * that are notified when a content proposal popup is opened or closed.
 	 * </p>
-	 * 
+	 *
 	 * @param listener
 	 *            the IContentProposalListener2 to be removed as a listener.
 	 *            Must not be <code>null</code>. If the listener has not
 	 *            already been registered, this method has no effect.
-	 * 
+	 *
 	 * @since 3.3
 	 * @see org.eclipse.jface.fieldassist.IContentProposalListener2
 	 */
@@ -1820,7 +1771,7 @@ public class ContentProposalAdapter {
 							}
 							watchModify = false;
 							// We are in autoactivation mode, either for specific
-							// characters or for all characters. In either case, 
+							// characters or for all characters. In either case,
 							// we should close the proposal popup when there is no
 							// content in the control.
 							if (isControlContentEmpty()) {
@@ -1852,7 +1803,7 @@ public class ContentProposalAdapter {
 
 			/**
 			 * Dump the given events to "standard" output.
-			 * 
+			 *
 			 * @param who
 			 *            who is dumping the event
 			 * @param e
@@ -1890,7 +1841,7 @@ public class ContentProposalAdapter {
 	 * proposal provider. If there are no proposals to be shown, do not show the
 	 * popup. This method returns immediately. That is, it does not wait for the
 	 * popup to open or a proposal to be selected.
-	 * 
+	 *
 	 * @param autoActivated
 	 *            a boolean indicating whether the popup was autoactivated. If
 	 *            false, a beep will sound when no proposals can be shown.
@@ -1901,6 +1852,8 @@ public class ContentProposalAdapter {
 				// Check whether there are any proposals to be shown.
 				recordCursorPosition(); // must be done before getting proposals
 				IContentProposal[] proposals = getProposals();
+				if (proposals == null)
+					return;
 				if (proposals.length > 0) {
 					if (DEBUG) {
 						System.out.println("POPUP OPENED BY PRECEDING EVENT"); //$NON-NLS-1$
@@ -1908,12 +1861,7 @@ public class ContentProposalAdapter {
 					recordCursorPosition();
 					popup = new ContentProposalPopup(null, proposals);
 					popup.open();
-					popup.getShell().addDisposeListener(new DisposeListener() {
-						@Override
-						public void widgetDisposed(DisposeEvent event) {
-							popup = null;
-						}
-					});
+					popup.getShell().addDisposeListener(event -> popup = null);
 					internalPopupOpened();
 					notifyPopupOpened();
 				} else if (!autoActivated) {
@@ -1939,7 +1887,7 @@ public class ContentProposalAdapter {
 	 * returns immediately, and has no effect if the proposal popup was not
 	 * open. This method is used by subclasses to explicitly close the popup
 	 * based on additional logic.
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	protected void closeProposalPopup() {
@@ -1951,7 +1899,7 @@ public class ContentProposalAdapter {
 	/*
 	 * A content proposal has been accepted. Update the control contents
 	 * accordingly and notify any listeners.
-	 * 
+	 *
 	 * @param proposal the accepted proposal
 	 */
 	private void proposalAccepted(IContentProposal proposal) {
@@ -2065,24 +2013,16 @@ public class ContentProposalAdapter {
 	 */
 	private void autoActivate() {
 		if (autoActivationDelay > 0) {
-			Runnable runnable = new Runnable() {
-				@Override
-				public void run() {
-					receivedKeyDown = false;
-					try {
-						Thread.sleep(autoActivationDelay);
-					} catch (InterruptedException e) {
-					}
-					if (!isValid() || receivedKeyDown) {
-						return;
-					}
-					getControl().getDisplay().syncExec(new Runnable() {
-						@Override
-						public void run() {
-							openProposalPopup(true);
-						}
-					});
+			Runnable runnable = () -> {
+				receivedKeyDown = false;
+				try {
+					Thread.sleep(autoActivationDelay);
+				} catch (InterruptedException e) {
 				}
+				if (!isValid() || receivedKeyDown) {
+					return;
+				}
+				getControl().getDisplay().syncExec(() -> openProposalPopup(true));
 			};
 			Thread t = new Thread(runnable);
 			t.start();
@@ -2093,12 +2033,9 @@ public class ContentProposalAdapter {
 			// some event that will cause the cursor position or
 			// other important info to change as a result of this
 			// event occurring.
-			getControl().getDisplay().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					if (isValid()) {
-						openProposalPopup(true);
-					}
+			getControl().getDisplay().asyncExec(() -> {
+				if (isValid()) {
+					openProposalPopup(true);
 				}
 			});
 		}
@@ -2111,10 +2048,8 @@ public class ContentProposalAdapter {
 		if (DEBUG) {
 			System.out.println("Notify listeners - proposal accepted."); //$NON-NLS-1$
 		}
-		final Object[] listenerArray = proposalListeners.getListeners();
-		for (int i = 0; i < listenerArray.length; i++) {
-			((IContentProposalListener) listenerArray[i])
-					.proposalAccepted(proposal);
+		for (IContentProposalListener l : proposalListeners) {
+			l.proposalAccepted(proposal);
 		}
 	}
 
@@ -2125,10 +2060,8 @@ public class ContentProposalAdapter {
 		if (DEBUG) {
 			System.out.println("Notify listeners - popup opened."); //$NON-NLS-1$
 		}
-		final Object[] listenerArray = proposalListeners2.getListeners();
-		for (int i = 0; i < listenerArray.length; i++) {
-			((IContentProposalListener2) listenerArray[i])
-					.proposalPopupOpened(this);
+		for (IContentProposalListener2 l : proposalListeners2) {
+			l.proposalPopupOpened(this);
 		}
 	}
 
@@ -2139,17 +2072,15 @@ public class ContentProposalAdapter {
 		if (DEBUG) {
 			System.out.println("Notify listeners - popup closed."); //$NON-NLS-1$
 		}
-		final Object[] listenerArray = proposalListeners2.getListeners();
-		for (int i = 0; i < listenerArray.length; i++) {
-			((IContentProposalListener2) listenerArray[i])
-					.proposalPopupClosed(this);
+		for (IContentProposalListener2 l : proposalListeners2) {
+			l.proposalPopupClosed(this);
 		}
 	}
 
 	/**
 	 * Returns whether the content proposal popup has the focus. This includes
 	 * both the primary popup and any secondary info popup that may have focus.
-	 * 
+	 *
 	 * @return <code>true</code> if the proposal popup or its secondary info
 	 *         popup has the focus
 	 * @since 3.4
@@ -2165,7 +2096,7 @@ public class ContentProposalAdapter {
 		return getControlContentAdapter().getControlContents(getControl())
 				.length() == 0;
 	}
-	
+
 	/*
 	 * The popup has just opened, but listeners have not yet
 	 * been notified.  Perform any cleanup that is needed.
@@ -2176,10 +2107,10 @@ public class ContentProposalAdapter {
 			((Combo)control).setListVisible(false);
 		}
 	}
-	
+
 	/*
 	 * Return whether a proposal popup should remain open.
-	 * If it was autoactivated by specific characters, and 
+	 * If it was autoactivated by specific characters, and
 	 * none of those characters remain, then it should not remain
 	 * open.  This method should not be used to determine
 	 * whether autoactivation has occurred or should occur, only whether
@@ -2196,7 +2127,7 @@ public class ContentProposalAdapter {
 		}
 		return false;
 	}
-	
+
 	/*
 	 * Return whether this adapter is configured for autoactivation, by
 	 * specific characters or by any characters.
@@ -2205,25 +2136,25 @@ public class ContentProposalAdapter {
 		return (autoActivateString != null && autoActivateString.length() > 0) // there are specific autoactivation chars supplied
 		  || (autoActivateString == null && triggerKeyStroke == null);    // we autoactivate on everything
 	}
-	
+
 	/**
 	 * Sets focus to the proposal popup. If the proposal popup is not opened,
 	 * this method is ignored. If the secondary popup has focus, focus is
 	 * returned to the main proposal popup.
-	 * 
+	 *
 	 * @since 3.6
 	 */
 	public void setProposalPopupFocus() {
 		if (isValid() && popup != null)
 			popup.getShell().setFocus();
 	}
-	
+
 	/**
 	 * Answers a boolean indicating whether the main proposal popup is open.
-	 * 
+	 *
 	 * @return <code>true</code> if the proposal popup is open, and
 	 *         <code>false</code> if it is not.
-	 * 
+	 *
 	 * @since 3.6
 	 */
 	public boolean isProposalPopupOpen() {

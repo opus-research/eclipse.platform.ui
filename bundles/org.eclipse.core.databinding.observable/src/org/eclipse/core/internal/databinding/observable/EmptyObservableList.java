@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bugs 208858, 208332, 146397, 249526
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 
 package org.eclipse.core.internal.databinding.observable;
@@ -29,18 +30,21 @@ import org.eclipse.core.runtime.Assert;
 
 /**
  * Singleton empty list
+ *
+ * @param <E>
+ *            the type of element in the list
  */
-public class EmptyObservableList implements IObservableList {
+public class EmptyObservableList<E> implements IObservableList<E> {
 
-	private static final List emptyList = Collections.EMPTY_LIST;
+	private final List<E> emptyList = Collections.emptyList();
 
 	private final Realm realm;
 	private Object elementType;
 
 	/**
-	 * Creates an empty list. This list may be disposed multiple times
-	 * without any side-effects.
-	 * 
+	 * Creates an empty list. This list may be disposed multiple times without
+	 * any side-effects.
+	 *
 	 * @param realm
 	 *            the realm of the constructed list
 	 */
@@ -49,9 +53,9 @@ public class EmptyObservableList implements IObservableList {
 	}
 
 	/**
-	 * Creates an empty list. This list may be disposed multiple times
-	 * without any side-effects.
-	 * 
+	 * Creates an empty list. This list may be disposed multiple times without
+	 * any side-effects.
+	 *
 	 * @param realm
 	 *            the realm of the constructed list
 	 * @param elementType
@@ -64,18 +68,22 @@ public class EmptyObservableList implements IObservableList {
 		ObservableTracker.observableCreated(this);
 	}
 
-	public void addListChangeListener(IListChangeListener listener) {
+	@Override
+	public void addListChangeListener(IListChangeListener<? super E> listener) {
 		// ignore
 	}
 
-	public void removeListChangeListener(IListChangeListener listener) {
+	@Override
+	public void removeListChangeListener(IListChangeListener<? super E> listener) {
 		// ignore
 	}
 
+	@Override
 	public Object getElementType() {
 		return elementType;
 	}
 
+	@Override
 	public int size() {
 		checkRealm();
 		return 0;
@@ -86,137 +94,171 @@ public class EmptyObservableList implements IObservableList {
 				"Observable cannot be accessed outside its realm"); //$NON-NLS-1$
 	}
 
+	@Override
 	public boolean isEmpty() {
 		checkRealm();
 		return true;
 	}
 
+	@Override
 	public boolean contains(Object o) {
 		checkRealm();
 		return false;
 	}
 
-	public Iterator iterator() {
+	@Override
+	public Iterator<E> iterator() {
 		checkRealm();
 		return emptyList.iterator();
 	}
 
+	@Override
 	public Object[] toArray() {
 		checkRealm();
 		return emptyList.toArray();
 	}
 
-	public Object[] toArray(Object[] a) {
+	@Override
+	public <T> T[] toArray(T[] a) {
 		return emptyList.toArray(a);
 	}
 
-	public boolean add(Object o) {
+	@Override
+	public boolean add(E o) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public boolean remove(Object o) {
 		throw new UnsupportedOperationException();
 	}
 
-	public boolean containsAll(Collection c) {
+	@Override
+	public boolean containsAll(Collection<?> c) {
 		checkRealm();
 		return c.isEmpty();
 	}
 
-	public boolean addAll(Collection c) {
+	@Override
+	public boolean addAll(Collection<? extends E> c) {
 		throw new UnsupportedOperationException();
 	}
 
-	public boolean retainAll(Collection c) {
+	@Override
+	public boolean retainAll(Collection<?> c) {
 		throw new UnsupportedOperationException();
 	}
 
-	public boolean removeAll(Collection c) {
+	@Override
+	public boolean removeAll(Collection<?> c) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public void clear() {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public void addChangeListener(IChangeListener listener) {
 	}
 
+	@Override
 	public void removeChangeListener(IChangeListener listener) {
 	}
 
+	@Override
 	public void addStaleListener(IStaleListener listener) {
 	}
 
+	@Override
 	public void removeStaleListener(IStaleListener listener) {
 	}
 
+	@Override
 	public void addDisposeListener(IDisposeListener listener) {
 	}
 
+	@Override
 	public void removeDisposeListener(IDisposeListener listener) {
 	}
 
+	@Override
 	public boolean isStale() {
 		checkRealm();
 		return false;
 	}
 
+	@Override
 	public boolean isDisposed() {
 		return false;
 	}
 
+	@Override
 	public void dispose() {
 	}
 
-	public boolean addAll(int index, Collection c) {
+	@Override
+	public boolean addAll(int index, Collection<? extends E> c) {
 		throw new UnsupportedOperationException();
 	}
 
-	public Object get(int index) {
+	@Override
+	public E get(int index) {
 		return emptyList.get(index);
 	}
 
+	@Override
 	public int indexOf(Object o) {
 		return -1;
 	}
 
+	@Override
 	public int lastIndexOf(Object o) {
 		return -1;
 	}
 
-	public ListIterator listIterator() {
+	@Override
+	public ListIterator<E> listIterator() {
 		return emptyList.listIterator();
 	}
 
-	public ListIterator listIterator(int index) {
+	@Override
+	public ListIterator<E> listIterator(int index) {
 		return emptyList.listIterator(index);
 	}
 
-	public Object remove(int index) {
+	@Override
+	public E remove(int index) {
 		throw new UnsupportedOperationException();
 	}
 
-	public Object set(int index, Object element) {
+	@Override
+	public E set(int index, E element) {
 		throw new UnsupportedOperationException();
 	}
 
-	public Object move(int oldIndex, int newIndex) {
+	@Override
+	public E move(int oldIndex, int newIndex) {
 		throw new UnsupportedOperationException();
 	}
 
-	public List subList(int fromIndex, int toIndex) {
+	@Override
+	public List<E> subList(int fromIndex, int toIndex) {
 		return emptyList.subList(fromIndex, toIndex);
 	}
 
-	public void add(int index, Object o) {
+	@Override
+	public void add(int index, E o) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public Realm getRealm() {
 		return realm;
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		checkRealm();
 		if (obj == this)
@@ -226,9 +268,10 @@ public class EmptyObservableList implements IObservableList {
 		if (!(obj instanceof List))
 			return false;
 
-		return ((List) obj).isEmpty();
+		return ((List<?>) obj).isEmpty();
 	}
 
+	@Override
 	public int hashCode() {
 		checkRealm();
 		return 1;

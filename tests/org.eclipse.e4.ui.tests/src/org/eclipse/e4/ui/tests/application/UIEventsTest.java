@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,10 @@
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.application;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +43,7 @@ import org.eclipse.e4.ui.workbench.UIEvents.UIElement;
 import org.eclipse.e4.ui.workbench.UIEvents.UILabel;
 import org.eclipse.e4.ui.workbench.UIEvents.Window;
 import org.eclipse.emf.common.notify.Notifier;
+import org.junit.Test;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
@@ -52,6 +57,7 @@ public class UIEventsTest extends HeadlessApplicationElementTest {
 		boolean[] hasFired;
 
 		EventHandler attListener = new EventHandler() {
+			@Override
 			public void handleEvent(Event event) {
 				assertTrue(event.getTopic().equals(topic),
 						"Incorrect Topic: " + event.getTopic()); //$NON-NLS-1$
@@ -111,7 +117,7 @@ public class UIEventsTest extends HeadlessApplicationElementTest {
 					atts.add(attIds[i]);
 			}
 
-			return (String[]) atts.toArray(new String[atts.size()]);
+			return atts.toArray(new String[atts.size()]);
 		}
 	}
 
@@ -207,6 +213,7 @@ public class UIEventsTest extends HeadlessApplicationElementTest {
 		return application;
 	}
 
+	@Test
 	public void testAllTopics() {
 		IEventBroker eventBroker = (IEventBroker) applicationContext
 				.get(IEventBroker.class.getName());
@@ -329,6 +336,7 @@ public class UIEventsTest extends HeadlessApplicationElementTest {
 	}
 
 	// Verify bug 374534
+	@Test
 	public void testBrokerCleanup() {
 		final String testTopic = "test/374534";
 		IEventBroker appEB = applicationContext.get(IEventBroker.class);
@@ -339,6 +347,7 @@ public class UIEventsTest extends HeadlessApplicationElementTest {
 
 		final boolean seen[] = { false };
 		childEB.subscribe(testTopic, new EventHandler() {
+			@Override
 			public void handleEvent(Event event) {
 				seen[0] = true;
 			}
@@ -367,7 +376,7 @@ public class UIEventsTest extends HeadlessApplicationElementTest {
 	/**
 	 * Ensures that no events were picked up from topics other than the one we
 	 * expect to see changes in.
-	 * 
+	 *
 	 * @param tester
 	 */
 	private void ensureNoCrossTalk(EventTester[] allTesters, EventTester skipMe) {

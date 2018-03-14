@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 IBM Corporation and others.
+ * Copyright (c) 2014, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,37 +14,33 @@ package org.eclipse.e4.ui.workbench.renderers.swt;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.e4.ui.workbench.Selector;
-import org.eclipse.swt.widgets.Display;
 
 public class ToolItemUpdater {
-	Display display = Display.getCurrent();
 
-	List<HandledContributionItem> itemsToCheck = new ArrayList<HandledContributionItem>();
-	final List<HandledContributionItem> orphanedToolItems = new ArrayList<HandledContributionItem>();
+	private List<AbstractContributionItem> itemsToCheck = new ArrayList<>();
+	private final List<AbstractContributionItem> orphanedToolItems = new ArrayList<>();
 
-	void registerItem(HandledContributionItem item) {
+	void registerItem(AbstractContributionItem item) {
 		if (!itemsToCheck.contains(item)) {
 			itemsToCheck.add(item);
 		}
 	}
 
-	void removeItem(HandledContributionItem item) {
+	void removeItem(AbstractContributionItem item) {
 		itemsToCheck.remove(item);
 	}
 
 	public void updateContributionItems(Selector selector) {
-		for (final HandledContributionItem hci : itemsToCheck) {
-			if (hci.model != null && hci.model.getParent() != null
-					&& selector.select(hci.model)) {
-				hci.updateItemEnablement();
+		for (final AbstractContributionItem ci : itemsToCheck) {
+			if (ci.getModel() != null && ci.getModel().getParent() != null && selector.select(ci.getModel())) {
+				ci.updateItemEnablement();
 			} else {
-				orphanedToolItems.add(hci);
+				orphanedToolItems.add(ci);
 			}
 		}
 		if (!orphanedToolItems.isEmpty()) {
 			itemsToCheck.removeAll(orphanedToolItems);
 			orphanedToolItems.clear();
 		}
-
 	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2007 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Sebastian Davids <sdavids@gmx.de> - Fix for bug 93353 - 
+ *     Sebastian Davids <sdavids@gmx.de> - Fix for bug 93353 -
  *     [Dialogs] InternalErrorDialog#buttonPressed should explicitly call super
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 490700
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
@@ -39,7 +40,7 @@ public class InternalErrorDialog extends MessageDialog {
 
     private Text text;
 
-    //Workaround. SWT does not seem to set the default button if 
+    //Workaround. SWT does not seem to set the default button if
     //there is not control with focus. Bug: 14668
     private int defaultButtonIndex = 0;
 
@@ -50,7 +51,7 @@ public class InternalErrorDialog extends MessageDialog {
 
     /**
      * Create a new dialog.
-     * 
+     *
      * @param parentShell the parent shell
      * @param dialogTitle the  title
      * @param dialogTitleImage the title image
@@ -64,15 +65,16 @@ public class InternalErrorDialog extends MessageDialog {
             Image dialogTitleImage, String dialogMessage, Throwable detail,
             int dialogImageType, String[] dialogButtonLabels, int defaultIndex) {
         super(parentShell, dialogTitle, dialogTitleImage, dialogMessage,
-                dialogImageType, dialogButtonLabels, defaultIndex);
+                dialogImageType, defaultIndex, dialogButtonLabels);
         defaultButtonIndex = defaultIndex;
         this.detail = detail;
         setShellStyle(getShellStyle() | SWT.APPLICATION_MODAL);
     }
 
-    //Workaround. SWT does not seem to set rigth the default button if 
+    //Workaround. SWT does not seem to set rigth the default button if
     //there is not control with focus. Bug: 14668
-    public int open() {
+    @Override
+	public int open() {
         create();
         Button b = getButton(defaultButtonIndex);
         b.setFocus();
@@ -88,10 +90,8 @@ public class InternalErrorDialog extends MessageDialog {
         detailButtonID = index;
     }
 
-    /* (non-Javadoc)
-     * Method declared on Dialog.
-     */
-    protected void buttonPressed(int buttonId) {
+    @Override
+	protected void buttonPressed(int buttonId) {
         if (buttonId == detailButtonID) {
             toggleDetailsArea();
         } else {
@@ -154,13 +154,13 @@ public class InternalErrorDialog extends MessageDialog {
         text.setLayoutData(data);
     }
 
-    /** 
+    /**
      * Convenience method to open a simple Yes/No question dialog.
      *
      * @param parent the parent shell of the dialog, or <code>null</code> if none
      * @param title the dialog's title, or <code>null</code> if none
      * @param message the message
-     * @param detail the error 
+     * @param detail the error
      * @param defaultIndex the default index of the button to select
      * @return <code>true</code> if the user presses the OK button,
      *    <code>false</code> otherwise

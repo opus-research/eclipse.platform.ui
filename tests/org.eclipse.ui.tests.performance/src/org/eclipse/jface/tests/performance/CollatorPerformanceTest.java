@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 IBM Corporation and others.
+ * Copyright (c) 2008, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  ******************************************************************************/
 
 package org.eclipse.jface.tests.performance;
@@ -23,9 +24,9 @@ import org.eclipse.ui.tests.performance.BasicPerformanceTest;
  */
 public class CollatorPerformanceTest extends BasicPerformanceTest {
 
-	private static final int ARRAYSIZE=100000; 
+	private static final int ARRAYSIZE=100000;
 	private static String[] fArray;
-	
+
 	/**
 	 * @param testName
 	 */
@@ -33,14 +34,14 @@ public class CollatorPerformanceTest extends BasicPerformanceTest {
 		super(testName);
 		generateArray();
 	}
-	
+
 	/**
 	 *  test Collator by sorting the array
 	 */
 	public void testCollator(){
-		Comparator comparator=Policy.getComparator();
+		Comparator<Object> comparator=Policy.getComparator();
 		for (int i = 0; i < 15; i++) {
-			String[] array=(String[]) fArray.clone();
+			String[] array=fArray.clone();
 			startMeasuring();
 			Arrays.sort(array, comparator);
 			stopMeasuring();
@@ -48,7 +49,7 @@ public class CollatorPerformanceTest extends BasicPerformanceTest {
         commitMeasurements();
         assertPerformance();
 	}
-	
+
 	/**
 	 * Generate a large sized array for sorting
 	 */
@@ -75,10 +76,10 @@ public class CollatorPerformanceTest extends BasicPerformanceTest {
 								});
 							--count;
 						}
-						
+
 					}
 				}
-				
+
 			}
 		}
 	}

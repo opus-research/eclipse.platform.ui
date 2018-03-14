@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2010 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,9 +41,9 @@ import org.eclipse.ui.internal.navigator.Policy;
  * {@link #inputChanged(Object, Object)}and
  * {@link #inputChanged(Viewer, Object, Object)}are not called concurrently
  * with {@link #initialize(IStructuredContentProvider)}.
- * 
- * 
- * 
+ *
+ *
+ *
  * @since 3.2
  */
 public class StructuredViewerManager {
@@ -65,7 +65,7 @@ public class StructuredViewerManager {
 	 */
 	// Map<element, NavigatorContentDescriptor>
 	private Map viewerDataMap;
-	
+
 	static class StructuredViewerAccess extends StructuredViewerInternals {
 		static class Listener implements StructuredViewerInternals.AssociateListener {
 			private final NavigatorContentService contentService;
@@ -74,6 +74,7 @@ public class StructuredViewerManager {
 				this.contentService = contentService;
 				this.viewerDataMap = viewerDataMap;
 			}
+			@Override
 			public void associate(Object element, Item item) {
 				NavigatorContentDescriptor desc = contentService.getContribution(element);
 				contentService.forgetContribution(element);
@@ -88,6 +89,7 @@ public class StructuredViewerManager {
 						System.out.println("associate: " + element + " item: " + item + " desc: " + desc); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				}
 			}
+			@Override
 			public void disassociate(Item item) {
 				synchronized (viewerDataMap) {
 					if (Policy.DEBUG_VIEWER_MAP)
@@ -96,6 +98,7 @@ public class StructuredViewerManager {
 				}
 			}
 
+			@Override
 			public void filteredOut(Object element) {
 				contentService.forgetContribution(element);
 				synchronized (viewerDataMap) {
@@ -109,7 +112,7 @@ public class StructuredViewerManager {
 			StructuredViewerInternals.setAssociateListener(v, new Listener(contentService, viewerDataMap));
 		}
 	}
-	
+
 	/**
 	 * @param element
 	 * @return the object
@@ -132,9 +135,9 @@ public class StructuredViewerManager {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param aViewer
-	 * @param contentService 
+	 * @param contentService
 	 */
 	public StructuredViewerManager(StructuredViewer aViewer, NavigatorContentService contentService) {
 		super();
@@ -144,7 +147,7 @@ public class StructuredViewerManager {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return The real viewer.
 	 */
 	public Viewer getViewer() {
@@ -152,7 +155,7 @@ public class StructuredViewerManager {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param anOldInput
 	 * @param aNewInput
 	 */
@@ -162,7 +165,7 @@ public class StructuredViewerManager {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param aViewer
 	 * @param anOldInput
 	 * @param aNewInput
@@ -174,13 +177,14 @@ public class StructuredViewerManager {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param aContentProvider
 	 * @return True if all is well.
 	 */
 	public boolean initialize(final IStructuredContentProvider aContentProvider) {
 		final boolean[] result = new boolean[1];
 		SafeRunner.run(new NavigatorSafeRunnable() {
+			@Override
 			public void run() throws Exception {
 				if (aContentProvider != null) {
 					aContentProvider.inputChanged(viewer, cachedOldInput, cachedNewInput);
@@ -192,7 +196,7 @@ public class StructuredViewerManager {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void safeRefresh() {
 
@@ -204,10 +208,12 @@ public class StructuredViewerManager {
 		if (display.isDisposed())
 			return;
 		display.syncExec(new Runnable() {
+			@Override
 			public void run() {
 				if (localViewer.getControl().isDisposed())
 					return;
 				SafeRunner.run(new NavigatorSafeRunnable() {
+					@Override
 					public void run() throws Exception {
 						localViewer.getControl().setRedraw(false);
 						localViewer.refresh();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2005 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,7 @@ package org.eclipse.core.commands;
  * <p>
  * This interface may be implemented by clients.
  * </p>
- * 
+ *
  * @since 3.1
  * @see Command#addCommandListener(ICommandListener)
  * @see Command#removeCommandListener(ICommandListener)
@@ -27,7 +27,7 @@ public interface ICommandListener {
      * Notifies that one or more properties of an instance of
      * <code>Command</code> have changed. Specific details are described in
      * the <code>CommandEvent</code>.
-     * 
+     *
      * @param commandEvent
      *            the command event. Guaranteed not to be <code>null</code>.
      */

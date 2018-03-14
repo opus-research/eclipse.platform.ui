@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,9 +16,9 @@ import org.eclipse.ui.internal.navigator.NavigatorPlugin;
 /**
  * Provides a common superclass for all consumers of the
  * <b>org.eclipse.ui.navigator.navigatorContent</b> extension point.
- * 
+ *
  * @since 3.2
- * 
+ *
  */
 public class NavigatorContentRegistryReader extends RegistryReader implements
 		INavigatorContentExtPtConstants {
@@ -30,6 +30,7 @@ public class NavigatorContentRegistryReader extends RegistryReader implements
 		super(NavigatorPlugin.PLUGIN_ID, TAG_NAVIGATOR_CONTENT);
 	}
 
+	@Override
 	protected boolean readElement(IConfigurationElement element) {
 		String elementName = element.getName();
 

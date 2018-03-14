@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2007 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.Table;
  * with lazy population.
  */
 public class VirtualLazyTableViewerTest extends VirtualTableViewerTest {
-	
+
 	private List updatedElements;
 	// by default, no failure is triggered when updateElement is called
 	int updatedElementFailureTriggerIndex = -1;
@@ -37,37 +37,39 @@ public class VirtualLazyTableViewerTest extends VirtualTableViewerTest {
 	public VirtualLazyTableViewerTest(String name) {
 		super(name);
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.tests.viewers.TableViewerTest#getContentProvider()
-	 */
+
+	@Override
 	protected TestModelContentProvider getContentProvider() {
 		return new TestLazyModelContentProvider(this);
 	}
-	
+
+	@Override
 	public void setUp() {
 		updatedElements = new ArrayList();
 		super.setUp();
 		processEvents();
 	}
-	
+
+	@Override
 	protected void setUpModel() {
 		fRootElement = TestElement.createModel(2, 100);
         fModel = fRootElement.getModel();
 	}
 
+	@Override
 	public void tearDown() {
 		super.tearDown();
 		updatedElements = null;
 	}
-	
+
 	// this method is called from TestLazyModelContentProvider
 	public void updateElementCalled(int index) {
-		updatedElements.add(new Integer(index));
+		updatedElements.add(Integer.valueOf(index));
 		if(updatedElementFailureTriggerIndex!=-1 && updatedElements.size()>=updatedElementFailureTriggerIndex) {
 			fail("unexpected call to updateElement, this is the " + updatedElements.size() + "th call");
 		}
 	}
-	
+
 	/**
 	 * Test selecting all elements.
 	 */
@@ -76,9 +78,9 @@ public class VirtualLazyTableViewerTest extends VirtualTableViewerTest {
 		int selectionSize = children.length / 2;
 		int[] indices = new int[selectionSize];
 		for (int i = 0; i < indices.length; i++) {
-			indices[i]  = i * 2;			
+			indices[i]  = i * 2;
 		}
-		
+
 		Table table = ((TableViewer) fViewer).getTable();
 		table.setSelection(indices);
 
@@ -86,9 +88,9 @@ public class VirtualLazyTableViewerTest extends VirtualTableViewerTest {
 		indices = table.getSelectionIndices();
 		selectionSize = indices.length;
 		assertTrue("Expected at least one selected element", selectionSize > 0);
-		
+
 		table.showSelection();
-		
+
 		IStructuredSelection result = (IStructuredSelection) fViewer
 				.getSelection();
 		assertEquals(selectionSize, result.size());
@@ -98,9 +100,9 @@ public class VirtualLazyTableViewerTest extends VirtualTableViewerTest {
 		assertTrue(
 				"Last elements do not match ",
 				result.toArray()[result.size() - 1] == children[lastIndex]);
-	
+
 	}
-	
+
 	public void testSetInputDoesNotMaterializeEverything() {
 		fViewer.setInput(null);
 		updatedElements.clear();
@@ -118,7 +120,7 @@ public class VirtualLazyTableViewerTest extends VirtualTableViewerTest {
 		fViewer.setInput(fRootElement);
 		assertEquals(materializedSize, updatedElements.size());
 	}
-	
+
 	public void testBug160153() {
 		int childCount = fRootElement.getChildCount();
 		TestElement lastChild = fRootElement.getChildAt(childCount-1);
@@ -129,32 +131,37 @@ public class VirtualLazyTableViewerTest extends VirtualTableViewerTest {
 		((TableViewer)fViewer).setItemCount(childCount - 1);
 		assertNull("last Child should no longer be in the map", fViewer.testFindItem(lastChild));
 	}
-	
 
+
+	@Override
 	public void testSorter() {
 		// This test is no use here as it is
 		// based on the assumption that all items
 		// are created.
 	}
-	
+
+	@Override
 	public void testRenameWithSorter() {
 		// This test is no use here as it is
 		// based on the assumption that all items
 		// are created.
 	}
-	
+
+	@Override
 	public void testSetFilters() {
 		// This test is no use here as it is
 		// based on the assumption that all items
 		// are created.
 	}
-	
+
+	@Override
 	public void testFilter() {
 		// This test is no use here as it is
 		// based on the assumption that all items
 		// are created.
 	}
-	
+
+	@Override
 	public void testRenameWithFilter() {
 		// This test is no use here as it is
 		// based on the assumption that all items

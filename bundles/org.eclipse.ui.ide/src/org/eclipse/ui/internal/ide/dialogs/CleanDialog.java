@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,8 @@
  *     Remy Chi Jian Suen <remy.suen@gmail.com> - [IDE] Project>Clean dialog should not use a question-mark icon - http://bugs.eclipse.org/155436
  *     Mark Melvin <mark_melvin@amis.com>
  *     Christian Georgi <christian.georgi@sap.com> -  [IDE] Clean dialog should scroll to reveal selected projects - http://bugs.eclipse.org/415522
+ *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 462760
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472784
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
@@ -17,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
@@ -24,13 +27,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
-import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.IShellProvider;
@@ -59,18 +60,22 @@ import org.eclipse.ui.progress.IProgressConstants2;
  * Dialog that asks the user to confirm a clean operation, and to configure
  * settings in relation to the clean. Clicking ok in the dialog will perform the
  * clean operation.
- * 
+ *
  * @since 3.0
  */
 public class CleanDialog extends MessageDialog {
+
     private class ProjectSubsetBuildAction extends BuildAction {
+
         private IProject[] projectsToBuild = new IProject[0];
+
         public ProjectSubsetBuildAction(IShellProvider shellProvider, int type, IProject[] projects) {
             super(shellProvider, type);
             this.projectsToBuild = projects;
         }
 
-        protected List getSelectedResources() {
+        @Override
+		protected List<? extends IResource> getSelectedResources() {
             return Arrays.asList(this.projectsToBuild);
         }
 	}
@@ -83,7 +88,7 @@ public class CleanDialog extends MessageDialog {
     private static final String TOGGLE_SELECTED = "TOGGLE_SELECTED"; //$NON-NLS-1$
     private static final String BUILD_NOW = "BUILD_NOW"; //$NON-NLS-1$
     private static final String BUILD_ALL = "BUILD_ALL"; //$NON-NLS-1$
-    
+
     private Button allButton, selectedButton, buildNowButton, globalBuildButton, projectBuildButton;
 
     private CheckboxTableViewer projectNames;
@@ -107,15 +112,15 @@ public class CleanDialog extends MessageDialog {
 
     /**
      * Creates a new clean dialog.
-     * 
+     *
      * @param window the window to create it in
      * @param selection the currently selected projects (may be empty)
      */
     public CleanDialog(IWorkbenchWindow window, IProject[] selection) {
         super(
                 window.getShell(),
-                IDEWorkbenchMessages.CleanDialog_title, null, getQuestion(), NONE, new String[] {
-                IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL }, 0);
+                IDEWorkbenchMessages.CleanDialog_title, null, getQuestion(), NONE, 0,
+                	IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL);
         this.window = window;
         this.selection = selection;
         if (this.selection == null) {
@@ -123,17 +128,11 @@ public class CleanDialog extends MessageDialog {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.dialogs.Dialog#buttonPressed(int)
-     */
-    protected void buttonPressed(int buttonId) {
+    @Override
+	protected void buttonPressed(int buttonId) {
         final boolean cleanAll = allButton.getSelection();
-        final boolean buildAll = buildNowButton != null
-                && buildNowButton.getSelection();
-        final boolean globalBuild = globalBuildButton != null
-                && globalBuildButton.getSelection();
+		final boolean buildAll = buildNowButton != null && buildNowButton.getSelection();
+		final boolean globalBuild = globalBuildButton != null && globalBuildButton.getSelection();
         super.buttonPressed(buttonId);
         if (buttonId != IDialogConstants.OK_ID) {
             return;
@@ -144,18 +143,20 @@ public class CleanDialog extends MessageDialog {
 		WorkspaceJob cleanJob = new WorkspaceJob(
 				cleanAll ? IDEWorkbenchMessages.CleanDialog_cleanAllTaskName
 						: IDEWorkbenchMessages.CleanDialog_cleanSelectedTaskName) {
-            public boolean belongsTo(Object family) {
+            @Override
+			public boolean belongsTo(Object family) {
                 return ResourcesPlugin.FAMILY_MANUAL_BUILD.equals(family);
             }
-            public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
+            @Override
+			public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
                 doClean(cleanAll, monitor);
                 //see if a build was requested
                 if (buildAll) {
                     // Only build what was requested
                     if (globalBuild) {
                         //start an immediate workspace build
-                        GlobalBuildAction build = new GlobalBuildAction(window,
-                                IncrementalProjectBuilder.INCREMENTAL_BUILD);
+						GlobalBuildAction build = new GlobalBuildAction(window,
+								IncrementalProjectBuilder.INCREMENTAL_BUILD);
                         build.doBuild();
                     } else {
                         // Only build what was cleaned
@@ -175,17 +176,14 @@ public class CleanDialog extends MessageDialog {
                 return Status.OK_STATUS;
             }
         };
-        cleanJob.setRule(ResourcesPlugin.getWorkspace().getRuleFactory()
-                .buildRule());
+		cleanJob.setRule(ResourcesPlugin.getWorkspace().getRuleFactory().buildRule());
         cleanJob.setUser(true);
         cleanJob.setProperty(IProgressConstants2.SHOW_IN_TASKBAR_ICON_PROPERTY, Boolean.TRUE);
         cleanJob.schedule();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.MessageDialog#createCustomArea(org.eclipse.swt.widgets.Composite)
-     */
-    protected Control createCustomArea(Composite parent) {
+    @Override
+	protected Control createCustomArea(Composite parent) {
         Composite area = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout();
         layout.marginWidth = layout.marginHeight = 0;
@@ -194,7 +192,8 @@ public class CleanDialog extends MessageDialog {
         area.setLayout(layout);
         area.setLayoutData(new GridData(GridData.FILL_BOTH));
         SelectionListener updateEnablement = new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 updateEnablement();
             }
         };
@@ -213,7 +212,7 @@ public class CleanDialog extends MessageDialog {
 
         //second row
         createProjectSelectionTable(area);
-        
+
         //third row
         //only prompt for immediate build if autobuild is off
         if (!ResourcesPlugin.getWorkspace().isAutoBuilding()) {
@@ -221,8 +220,7 @@ public class CleanDialog extends MessageDialog {
             buildNowButton.setText(IDEWorkbenchMessages.CleanDialog_buildNowButton);
             String buildNow = settings.get(BUILD_NOW);
             buildNowButton.setSelection(buildNow == null || Boolean.valueOf(buildNow).booleanValue());
-            buildNowButton.setLayoutData(new GridData(
-                    GridData.HORIZONTAL_ALIGN_BEGINNING));
+			buildNowButton.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING));
             buildNowButton.addSelectionListener(updateEnablement);
 
             globalBuildButton = new Button(parent, SWT.RADIO);
@@ -244,7 +242,8 @@ public class CleanDialog extends MessageDialog {
 
 
             SelectionListener buildRadioSelected = new SelectionAdapter() {
-                public void widgetSelected(SelectionEvent e) {
+                @Override
+				public void widgetSelected(SelectionEvent e) {
                     updateBuildRadioEnablement();
                 }
             };
@@ -255,10 +254,8 @@ public class CleanDialog extends MessageDialog {
         return area;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.IconAndMessageDialog#createContents(org.eclipse.swt.widgets.Composite)
-     */
-    protected Control createContents(Composite parent) {
+    @Override
+	protected Control createContents(Composite parent) {
     	Control contents= super.createContents(parent);
     	updateEnablement();
     	return contents;
@@ -271,7 +268,8 @@ public class CleanDialog extends MessageDialog {
         projectNames.setComparator(new ResourceComparator(ResourceComparator.NAME));
         projectNames.addFilter(new ViewerFilter() {
             private final IProject[] projectHolder = new IProject[1];
-            public boolean select(Viewer viewer, Object parentElement, Object element) {
+            @Override
+			public boolean select(Viewer viewer, Object parentElement, Object element) {
                 if (!(element instanceof IProject)) {
                     return false;
                 }
@@ -297,12 +295,10 @@ public class CleanDialog extends MessageDialog {
         }
         //table is disabled to start because all button is selected
         projectNames.getTable().setEnabled(selectedButton.getSelection());
-        projectNames.addCheckStateListener(new ICheckStateListener() {
-            public void checkStateChanged(CheckStateChangedEvent event) {
-                selection = projectNames.getCheckedElements();
-                updateEnablement();
-            }
-        });
+        projectNames.addCheckStateListener(event -> {
+		    selection = projectNames.getCheckedElements();
+		    updateEnablement();
+		});
     }
 
     /**
@@ -315,18 +311,12 @@ public class CleanDialog extends MessageDialog {
     protected void doClean(boolean cleanAll, IProgressMonitor monitor)
             throws CoreException {
         if (cleanAll) {
-            ResourcesPlugin.getWorkspace().build(
-                    IncrementalProjectBuilder.CLEAN_BUILD, monitor);
+			ResourcesPlugin.getWorkspace().build(IncrementalProjectBuilder.CLEAN_BUILD, monitor);
         } else {
-            try {
-                monitor.beginTask(IDEWorkbenchMessages.CleanDialog_cleanSelectedTaskName, selection.length);
-                for (int i = 0; i < selection.length; i++) {
-                    ((IProject) selection[i]).build(
-                            IncrementalProjectBuilder.CLEAN_BUILD,
-                            new SubProgressMonitor(monitor, 1));
-                }
-            } finally {
-                monitor.done();
+			SubMonitor subMonitor = SubMonitor.convert(monitor, IDEWorkbenchMessages.CleanDialog_cleanSelectedTaskName,
+					selection.length);
+			for (int i = 0; i < selection.length; i++) {
+				((IProject) selection[i]).build(IncrementalProjectBuilder.CLEAN_BUILD, subMonitor.split(1));
             }
         }
     }
@@ -354,36 +344,30 @@ public class CleanDialog extends MessageDialog {
     protected void updateBuildRadioEnablement() {
         projectBuildButton.setSelection(!globalBuildButton.getSelection());
     }
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.window.Window#close()
-     */
-    public boolean close() {
+
+    @Override
+	public boolean close() {
         persistDialogSettings(getShell(), DIALOG_SETTINGS_SECTION);
         return super.close();
     }
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.window.Window#getInitialLocation(org.eclipse.swt.graphics.Point)
-     */
-    protected Point getInitialLocation(Point initialSize) {
+
+    @Override
+	protected Point getInitialLocation(Point initialSize) {
         Point p = getInitialLocation(DIALOG_SETTINGS_SECTION);
         return p != null ? p : super.getInitialLocation(initialSize);
     }
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.window.Window#getInitialSize()
-     */
-    protected Point getInitialSize() {
+
+    @Override
+	protected Point getInitialSize() {
         Point p = super.getInitialSize();
         return getInitialSize(DIALOG_SETTINGS_SECTION, p);
     }
-    
+
     /**
      * Returns the initial location which is persisted in the IDE Plugin dialog settings
      * under the provided dialog setttings section name.
      * If location is not persisted in the settings, the <code>null</code> is returned.
-     * 
+     *
      * @param dialogSettingsSectionName The name of the dialog settings section
      * @return The initial location or <code>null</code>
      */
@@ -397,7 +381,7 @@ public class CleanDialog extends MessageDialog {
         }
         return null;
     }
-    
+
     private IDialogSettings getDialogSettings(String dialogSettingsSectionName) {
         IDialogSettings settings = IDEWorkbenchPlugin.getDefault().getDialogSettings();
         IDialogSettings section = settings.getSection(dialogSettingsSectionName);
@@ -410,7 +394,7 @@ public class CleanDialog extends MessageDialog {
     /**
      * Persists the location and dimensions of the shell and other user settings in the
      * plugin's dialog settings under the provided dialog settings section name
-     * 
+     *
      * @param shell The shell whose geometry is to be stored
      * @param dialogSettingsSectionName The name of the dialog settings section
      */
@@ -436,7 +420,7 @@ public class CleanDialog extends MessageDialog {
      * Returns the initial size which is the larger of the <code>initialSize</code> or
      * the size persisted in the IDE UI Plugin dialog settings under the provided dialog setttings section name.
      * If no size is persisted in the settings, the <code>initialSize</code> is returned.
-     * 
+     *
      * @param initialSize The initialSize to compare against
      * @param dialogSettingsSectionName The name of the dialog settings section
      * @return the initial size
@@ -452,12 +436,9 @@ public class CleanDialog extends MessageDialog {
         }
         return initialSize;
     }
-    
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#isResizable()
-     */
-    protected boolean isResizable() {
+
+    @Override
+	protected boolean isResizable() {
         return true;
     }
 }

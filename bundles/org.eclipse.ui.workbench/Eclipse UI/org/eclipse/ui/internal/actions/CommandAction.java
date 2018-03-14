@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 
 package org.eclipse.ui.internal.actions;
@@ -36,7 +37,7 @@ import org.eclipse.ui.services.IServiceLocator;
  * <p>
  * <b>Note:</b> Clients my instantiate, but they must not subclass.
  * </p>
- * 
+ *
  * @since 3.3
  */
 public class CommandAction extends Action {
@@ -54,7 +55,7 @@ public class CommandAction extends Action {
 	/**
 	 * Creates the action backed by a command. For commands that don't take
 	 * parameters.
-	 * 
+	 *
 	 * @param serviceLocator
 	 *            The service locator that is closest in lifecycle to this
 	 *            action.
@@ -69,7 +70,7 @@ public class CommandAction extends Action {
 	 * Creates the action backed by a parameterized command. The parameterMap
 	 * must contain only all required parameters, and may contain the optional
 	 * parameters.
-	 * 
+	 *
 	 * @param serviceLocator
 	 *            The service locator that is closest in lifecycle to this
 	 *            action.
@@ -105,7 +106,7 @@ public class CommandAction extends Action {
 
 	/**
 	 * Build a command from the executable extension information.
-	 * 
+	 *
 	 * @param commandService
 	 *            to get the Command object
 	 * @param commandId
@@ -140,11 +141,6 @@ public class CommandAction extends Action {
 		parameterizedCommand = null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.Action#runWithEvent(org.eclipse.swt.widgets.Event)
-	 */
 	@Override
 	public void runWithEvent(Event event) {
 		if (handlerService == null) {
@@ -163,11 +159,6 @@ public class CommandAction extends Action {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.Action#run()
-	 */
 	@Override
 	public void run() {
 		// hopefully this is never called
@@ -180,11 +171,11 @@ public class CommandAction extends Action {
 			// already initialized
 			return;
 		}
-		handlerService = (IHandlerService) serviceLocator
+		handlerService = serviceLocator
 				.getService(IHandlerService.class);
-		ICommandService commandService = (ICommandService) serviceLocator
+		ICommandService commandService = serviceLocator
 				.getService(ICommandService.class);
-		ICommandImageService commandImageService = (ICommandImageService) serviceLocator
+		ICommandImageService commandImageService = serviceLocator
 				.getService(ICommandImageService.class);
 
 		createCommand(commandService, commandIdIn, parameterMap);

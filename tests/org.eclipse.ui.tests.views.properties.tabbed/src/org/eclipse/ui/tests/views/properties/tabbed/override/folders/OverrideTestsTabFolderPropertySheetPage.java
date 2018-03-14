@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -24,7 +24,7 @@ import org.eclipse.ui.views.properties.IPropertySheetPage;
  * properties view before the migration to the tabbed properties view and the
  * override tabs support. When elements are selected in the OverrideTestsView,
  * TabFolder/TabItem are displayed for the elements.
- * 
+ *
  * @author Anthony Hunter
  * @since 3.4
  */
@@ -35,11 +35,7 @@ public class OverrideTestsTabFolderPropertySheetPage implements
 
 	private OverrideTestsTabFolderPropertySheetPageContentManager contentManager;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.part.IPage#createControl(org.eclipse.swt.widgets.Composite)
-	 */
+	@Override
 	public void createControl(Composite parent) {
 		composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(new FillLayout());
@@ -47,48 +43,27 @@ public class OverrideTestsTabFolderPropertySheetPage implements
 				composite);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.part.IPage#dispose()
-	 */
+	@Override
 	public void dispose() {
 		composite.dispose();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.part.IPage#getControl()
-	 */
+	@Override
 	public Control getControl() {
 		return composite;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.ISelectionListener#selectionChanged(org.eclipse.ui.IWorkbenchPart,
-	 *      org.eclipse.jface.viewers.ISelection)
-	 */
+	@Override
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 		contentManager.selectionChanged(part, selection);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.part.IPage#setActionBars(org.eclipse.ui.IActionBars)
-	 */
+	@Override
 	public void setActionBars(IActionBars actionBars) {
 		// Not implemented
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.part.IPage#setFocus()
-	 */
+	@Override
 	public void setFocus() {
 		composite.setFocus();
 	}

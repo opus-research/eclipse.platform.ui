@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2013 IBM Corporation and others.
+ * Copyright (c) 2011, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,8 +29,6 @@ import org.osgi.service.event.Event;
 /**
  * Listens for the IPresentationEngine's SPLIT_HORIZONTAL and SPLIT_VERTICAL tags being applied to
  * an MPart and takes the appropriate steps to split / unsplit the part
- * 
- * @since 1.1
  */
 public class SplitterAddon {
 	@Inject
@@ -41,7 +39,7 @@ public class SplitterAddon {
 
 	/**
 	 * Handles changes in tags
-	 * 
+	 *
 	 * @param event
 	 */
 	@Inject
@@ -77,7 +75,7 @@ public class SplitterAddon {
 
 	/**
 	 * Finds the CompositePart containing the given part (if any)
-	 * 
+	 *
 	 * @param part
 	 * @return The MCompositePart or 'null' if none is found
 	 */

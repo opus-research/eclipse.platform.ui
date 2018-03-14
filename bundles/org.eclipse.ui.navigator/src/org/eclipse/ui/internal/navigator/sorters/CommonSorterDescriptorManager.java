@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,7 +30,7 @@ import org.eclipse.ui.navigator.INavigatorContentDescriptor;
 
 /**
  * @since 3.2
- * 
+ *
  */
 public class CommonSorterDescriptorManager {
 
@@ -38,10 +38,10 @@ public class CommonSorterDescriptorManager {
 
 	private static final CommonSorterDescriptor[] NO_SORTER_DESCRIPTORS = new CommonSorterDescriptor[0];
 
-	private final Map sortersMap = new HashMap();
-	
+	private final Map<INavigatorContentDescriptor, Set> sortersMap = new HashMap<INavigatorContentDescriptor, Set>();
+
 	/**
-	 * 
+	 *
 	 * @return An initialized singleton instance of the
 	 *         CommonSorterDescriptorManager.
 	 */
@@ -54,7 +54,7 @@ public class CommonSorterDescriptorManager {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param contentService
 	 *            A content service to filter the visible filters.
 	 * @param aParent
@@ -71,7 +71,7 @@ public class CommonSorterDescriptorManager {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param aContentService
 	 *            A content service to filter the visible filters.
 	 * @param theSource
@@ -85,12 +85,12 @@ public class CommonSorterDescriptorManager {
 			NavigatorContentService aContentService,
 			INavigatorContentDescriptor theSource, Object aParent) {
 
-		List applicableSorters = new ArrayList();
+		List<CommonSorterDescriptor> applicableSorters = new ArrayList<CommonSorterDescriptor>();
 
 		CommonSorterDescriptor descriptor;
-		Set sorters = getCommonSorters(theSource);
-		for (Iterator sortersItr = sorters.iterator(); sortersItr.hasNext();) {
-			descriptor = (CommonSorterDescriptor) sortersItr.next();
+		Set<CommonSorterDescriptor> sorters = getCommonSorters(theSource);
+		for (Iterator<CommonSorterDescriptor> sortersItr = sorters.iterator(); sortersItr.hasNext();) {
+			descriptor = sortersItr.next();
 			if (descriptor.isEnabledForParent(aParent)) {
 				applicableSorters.add(descriptor);
 			}
@@ -98,25 +98,25 @@ public class CommonSorterDescriptorManager {
 		if (applicableSorters.size() == 0) {
 			return NO_SORTER_DESCRIPTORS;
 		}
-		return (CommonSorterDescriptor[]) applicableSorters
+		return applicableSorters
 				.toArray(new CommonSorterDescriptor[applicableSorters.size()]);
 	}
-	
+
 
 	/**
-	 * 
+	 *
 	 * @param theSource
-	 *            The source of each *value. 
+	 *            The source of each *value.
 	 * @return The set of filters that are 'visible' to the given viewer
 	 *         descriptor.
 	 */
 	public CommonSorterDescriptor[] findApplicableSorters(INavigatorContentDescriptor theSource) {
-  
-		Set sorters = getCommonSorters(theSource); 
+
+		Set<CommonSorterDescriptor> sorters = getCommonSorters(theSource);
 		if (sorters.size() == 0) {
 			return NO_SORTER_DESCRIPTORS;
 		}
-		return (CommonSorterDescriptor[]) sorters
+		return sorters
 				.toArray(new CommonSorterDescriptor[sorters.size()]);
 	}
 
@@ -126,11 +126,7 @@ public class CommonSorterDescriptorManager {
 		private CommonSorterDescriptorRegistry() {
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ui.internal.navigator.extensions.NavigatorContentRegistryReader#readElement(org.eclipse.core.runtime.IConfigurationElement)
-		 */
+		@Override
 		protected boolean readElement(IConfigurationElement element) {
 
 			if (TAG_NAVIGATOR_CONTENT.equals(element.getName())) {
@@ -143,7 +139,7 @@ public class CommonSorterDescriptorManager {
 								.getChildren(TAG_COMMON_SORTER);
 
 						if (children.length > 0) {
-							Set localSorters = getCommonSorters(contentDescriptor);
+							Set<CommonSorterDescriptor> localSorters = getCommonSorters(contentDescriptor);
 							for (int i = 0; i < children.length; i++) {
 								localSorters.add(new CommonSorterDescriptor(
 										children[i]));
@@ -170,7 +166,7 @@ public class CommonSorterDescriptorManager {
 									0,
 									NLS
 											.bind(
-													CommonNavigatorMessages.CommonSorterDescriptorManager_A_navigatorContent_extesnion_in_0_,
+													CommonNavigatorMessages.CommonSorterDescriptorManager_A_navigatorContent_extension_in_0_,
 													element.getNamespaceIdentifier()),
 									null);
 				}
@@ -180,12 +176,12 @@ public class CommonSorterDescriptorManager {
 
 	}
 
-	private Set getCommonSorters(INavigatorContentDescriptor contentDescriptor) {
-		Set descriptors = null;
+	private Set<CommonSorterDescriptor> getCommonSorters(INavigatorContentDescriptor contentDescriptor) {
+		Set<CommonSorterDescriptor> descriptors = null;
 		synchronized (sortersMap) {
-			descriptors = (Set) sortersMap.get(contentDescriptor);
+			descriptors = sortersMap.get(contentDescriptor);
 			if (descriptors == null) {
-				sortersMap.put(contentDescriptor, descriptors = new HashSet());
+				sortersMap.put(contentDescriptor, descriptors = new HashSet<CommonSorterDescriptor>());
 			}
 		}
 		return descriptors;

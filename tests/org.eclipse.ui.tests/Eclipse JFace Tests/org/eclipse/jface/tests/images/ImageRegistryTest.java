@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2006 IBM Corporation and others.
+ * Copyright (c) 2004, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,10 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 490700
  *******************************************************************************/
 package org.eclipse.jface.tests.images;
-
-import junit.framework.TestCase;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IconAndMessageDialog;
@@ -19,6 +18,8 @@ import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.graphics.Image;
+
+import junit.framework.TestCase;
 
 /**
  * @since 3.0
@@ -52,8 +53,7 @@ public class ImageRegistryTest extends TestCase {
 
         ImageRegistry reg = JFaceResources.getImageRegistry();
 
-        for (int i = 0; i < imageNames.length; i++) {
-            String imageName = imageNames[i];
+        for (String imageName : imageNames) {
             Image image1 = reg.get(imageName);
             assertTrue("Returned null image", image1 != null);
         }
@@ -63,22 +63,21 @@ public class ImageRegistryTest extends TestCase {
     /**
      * check that we get non-null versions of the <code>IconAndMessageDialog</code> images
      * so we know that the code using them can rely on them.
-     * 
+     *
      * Note that they can be <code>null</code> from SWT.
      *
      */
     public void testGetIconMessageDialogImages() {
 
         IconAndMessageDialog iconDialog = new MessageDialog(null,
-                "testGetDialogIcons", null, "Message", Window.CANCEL,
-                new String[] { "cancel" }, 0);
+				"testGetDialogIcons", null, "Message", Window.CANCEL, 0, "cancel");
 
         Image[] images = new Image[] { iconDialog.getErrorImage(),
                 iconDialog.getInfoImage(), iconDialog.getQuestionImage(),
                 iconDialog.getWarningImage() };
 
-        for (int i = 0; i < images.length; i++) {
-            assertTrue("Returned null image", images[i] != null);
+        for (Image image : images) {
+            assertTrue("Returned null image", image != null);
         }
 
     }

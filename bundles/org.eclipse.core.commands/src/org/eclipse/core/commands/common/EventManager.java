@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2005, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,11 @@ import org.eclipse.core.runtime.ListenerList;
  * <p>
  * Clients may extend.
  * </p>
- * 
+ * <p>
+ * <b>Warning:</b> Do not use this class! Use {@link ListenerList} directly. See
+ * <a href="https://bugs.eclipse.org/486067">bug 486067</a>.
+ * </p>
+ *
  * @since 3.2
  */
 public abstract class EventManager {
@@ -37,18 +41,18 @@ public abstract class EventManager {
 	 * A collection of objects listening to changes to this manager. This
 	 * collection is <code>null</code> if there are no listeners.
 	 */
-	private transient ListenerList listenerList = null;
+	private volatile ListenerList<Object> listenerList = null;
 
 	/**
 	 * Adds a listener to this manager that will be notified when this manager's
 	 * state changes.
-	 * 
+	 *
 	 * @param listener
 	 *            The listener to be added; must not be <code>null</code>.
 	 */
 	protected synchronized final void addListenerObject(final Object listener) {
 		if (listenerList == null) {
-			listenerList = new ListenerList(ListenerList.IDENTITY);
+			listenerList = new ListenerList<>(ListenerList.IDENTITY);
 		}
 
 		listenerList.add(listener);
@@ -57,20 +61,26 @@ public abstract class EventManager {
 	/**
 	 * Clears all of the listeners from the listener list.
 	 */
-	protected synchronized final void clearListeners() {
-		if (listenerList != null) {
-			listenerList.clear();
-		}
+	protected final void clearListeners() {
+		listenerList = null;
 	}
 
 	/**
-	 * Returns the listeners attached to this event manager.
-	 * 
+	 * Returns an array containing all the listeners attached to this event
+	 * manager. The resulting array is unaffected by subsequent adds or removes.
+	 * If there are no listeners registered, the result is an empty array. Use
+	 * this method when notifying listeners, so that any modifications to the
+	 * listener list during the notification will have no effect on the
+	 * notification itself.
+	 * <p>
+	 * Note: Callers of this method <b>must not</b> modify the returned array.
+	 * </p>
+	 *
 	 * @return The listeners currently attached; may be empty, but never
 	 *         <code>null</code>
 	 */
 	protected final Object[] getListeners() {
-		final ListenerList list = listenerList;
+		final ListenerList<Object> list = listenerList;
 		if (list == null) {
 			return EMPTY_ARRAY;
 		}
@@ -80,7 +90,7 @@ public abstract class EventManager {
 
 	/**
 	 * Whether one or more listeners are attached to the manager.
-	 * 
+	 *
 	 * @return <code>true</code> if listeners are attached to the manager;
 	 *         <code>false</code> otherwise.
 	 */
@@ -90,7 +100,7 @@ public abstract class EventManager {
 
 	/**
 	 * Removes a listener from this manager.
-	 * 
+	 *
 	 * @param listener
 	 *            The listener to be removed; must not be <code>null</code>.
 	 */

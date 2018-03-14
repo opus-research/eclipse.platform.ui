@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 IBM Corporation and others.
+ * Copyright (c) 2012, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,7 +36,7 @@ public class HandlerProcessingAddon {
 
 	/**
 	 * Do initial check of handlers and their context upon creation
-	 * 
+	 *
 	 * @param application
 	 * @param modelService
 	 */
@@ -60,7 +60,7 @@ public class HandlerProcessingAddon {
 	/**
 	 * Responds to the coming and goings of handlers in the application model by activating and
 	 * deactivating them accordingly.
-	 * 
+	 *
 	 * @param event
 	 *            The event thrown in the event bus
 	 */

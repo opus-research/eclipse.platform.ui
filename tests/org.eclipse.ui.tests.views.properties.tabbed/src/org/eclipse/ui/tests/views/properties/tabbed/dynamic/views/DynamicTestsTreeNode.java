@@ -17,7 +17,7 @@ import org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributo
 
 /**
  * A nodes in the tree of the dynamic tests view.
- * 
+ *
  * @author Anthony Hunter
  * @since 3.4
  */
@@ -28,11 +28,7 @@ public class DynamicTestsTreeNode extends TreeNode implements
 		super(object);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor#getContributorId()
-	 */
+	@Override
 	public String getContributorId() {
 		return getDynamicTestsElement().getContributorId();
 	}

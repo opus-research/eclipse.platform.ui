@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2008 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,7 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 
 /**
  * This class will perform an incremental build on a working set.
- * 
+ *
  * @since 3.0
  */
 public class BuildSetAction extends Action {
@@ -54,6 +54,7 @@ public class BuildSetAction extends Action {
 		return workingSet;
 	}
 
+	@Override
 	public void run() {
 		//register this action instance as the global handler for the build last action
 		setActionDefinitionId("org.eclipse.ui.project.buildLast"); //$NON-NLS-1$
@@ -62,8 +63,8 @@ public class BuildSetAction extends Action {
 		window.getWorkbench().getWorkingSetManager().addRecentWorkingSet(workingSet);
 		IProject[] projects = BuildUtilities.extractProjects(workingSet.getElements());
 		if (projects.length == 0) {
-			MessageDialog.openInformation(window.getShell(), 
-					IDEWorkbenchMessages.BuildSetAction_noBuildTitle, 
+			MessageDialog.openInformation(window.getShell(),
+					IDEWorkbenchMessages.BuildSetAction_noBuildTitle,
 					IDEWorkbenchMessages.BuildSetAction_noProjects);
 			return;
 		}
@@ -73,6 +74,7 @@ public class BuildSetAction extends Action {
 		build.run();
 	}
 
+	@Override
 	public void runWithEvent(Event event) {
 		//radio buttons receive an event when they become unselected,
 		//so we must not run the action in this case
@@ -84,9 +86,10 @@ public class BuildSetAction extends Action {
 		run();
 	}
 
-	/* (non-Javadoc)
+	/*
 	 * For debugging purposes only.
 	 */
+	@Override
 	public String toString() {
 		return "BuildSetAction(" + workingSet.getName() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2006 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,7 +30,7 @@ import org.eclipse.ui.navigator.CommonViewer;
 /**
  * A NavigatorSiteEditor is used to edit (i.e., rename) elements in a Navigator view. It displays a
  * text editor box overlay on the Navigator tree widget.
- *  
+ *
  * @since 3.2
  */
 public class NavigatorSiteEditor implements INavigatorSiteEditor {
@@ -46,7 +46,7 @@ public class NavigatorSiteEditor implements INavigatorSiteEditor {
 
 	/**
 	 * Creates an instance of a NavigatorSiteEditor.
-	 * 
+	 *
 	 * @param aCommonViewer
 	 *            the viewer this editor applies to
 	 * @param navigatorTree
@@ -60,7 +60,7 @@ public class NavigatorSiteEditor implements INavigatorSiteEditor {
 
 	/**
 	 * Creates the parent composite for the editor overlay.
-	 * 
+	 *
 	 * @return the parent composite for the editor overlay
 	 */
 	Composite createParent() {
@@ -74,7 +74,7 @@ public class NavigatorSiteEditor implements INavigatorSiteEditor {
 
 	/**
 	 * Creates the text editor widget.
-	 * 
+	 *
 	 * @param runnable
 	 *            the Runnable to execute when editing ends by the user pressing enter or clicking
 	 *            outside the text editor box.
@@ -84,6 +84,7 @@ public class NavigatorSiteEditor implements INavigatorSiteEditor {
 		textEditorParent = createParent();
 		textEditorParent.setVisible(false);
 		textEditorParent.addListener(SWT.Paint, new Listener() {
+			@Override
 			public void handleEvent(Event e) {
 				Point textSize = textEditor.getSize();
 				Point parentSize = textEditorParent.getSize();
@@ -95,6 +96,7 @@ public class NavigatorSiteEditor implements INavigatorSiteEditor {
 		textEditor = new Text(textEditorParent, SWT.NONE);
 		textEditorParent.setBackground(textEditor.getBackground());
 		textEditor.addListener(SWT.Modify, new Listener() {
+			@Override
 			public void handleEvent(Event e) {
 				Point textSize = textEditor.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 				textSize.x += textSize.y; // Add extra space for new characters.
@@ -104,6 +106,7 @@ public class NavigatorSiteEditor implements INavigatorSiteEditor {
 			}
 		});
 		textEditor.addListener(SWT.Traverse, new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				//Workaround for Bug 20214 due to extra
 				//traverse events
@@ -123,6 +126,7 @@ public class NavigatorSiteEditor implements INavigatorSiteEditor {
 			}
 		});
 		textEditor.addFocusListener(new FocusAdapter() {
+			@Override
 			public void focusLost(FocusEvent fe) {
 				saveChangesAndDispose(runnable);
 			}
@@ -150,11 +154,12 @@ public class NavigatorSiteEditor implements INavigatorSiteEditor {
 
 	/**
 	 * Displays a text editor overlay on the tree widget.
-	 * 
+	 *
 	 * @param runnable
 	 *            Runnable to execute when editing ends either by the user pressing enter or
 	 *            clicking outside the editor box.
 	 */
+	@Override
 	public void edit(Runnable runnable) {
 		IStructuredSelection selection = (IStructuredSelection) commonViewer.getSelection();
 
@@ -184,7 +189,7 @@ public class NavigatorSiteEditor implements INavigatorSiteEditor {
 
 	/**
 	 * Returns the displayed label of the given element.
-	 * 
+	 *
 	 * @param element
 	 *            the element that is displayed in the navigator
 	 * @return the displayed label of the given element.
@@ -193,14 +198,15 @@ public class NavigatorSiteEditor implements INavigatorSiteEditor {
 		return ((ILabelProvider) commonViewer.getLabelProvider()).getText(element);
 	}
 
- 
+
+	@Override
 	public String getText() {
 		return text;
 	}
 
 	/**
 	 * Saves the changes and disposes of the text widget.
-	 * 
+	 *
 	 * @param runnable
 	 *            Runnable to execute
 	 */
@@ -211,6 +217,7 @@ public class NavigatorSiteEditor implements INavigatorSiteEditor {
 		// icon of the item being renamed is clicked (i.e., which causes the rename
 		// text widget to lose focus and trigger this method).
 		Runnable editRunnable = new Runnable() {
+			@Override
 			public void run() {
 				disposeTextWidget();
 				if (newText.length() > 0 && newText.equals(text) == false) {
@@ -223,7 +230,8 @@ public class NavigatorSiteEditor implements INavigatorSiteEditor {
 		navigatorTree.getShell().getDisplay().asyncExec(editRunnable);
 	}
 
- 
+
+	@Override
 	public void setTextActionHandler(TextActionHandler actionHandler) {
 		textActionHandler = actionHandler;
 	}

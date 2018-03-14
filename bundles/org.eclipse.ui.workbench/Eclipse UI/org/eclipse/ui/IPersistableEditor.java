@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,14 +31,14 @@ package org.eclipse.ui;
  * On workbench shutdown, the editor state will be persisted when the editor
  * references are saved.
  * </p>
- * 
+ *
  * @since 3.3
  */
 public interface IPersistableEditor extends IPersistable {
 	/**
 	 * Called with a memento for this editor. The editor can parse the data or
 	 * save the memento. This method may not be called.
-	 * 
+	 *
 	 * @param memento
 	 *            the saved state for this editor. May be <code>null</code>.
 	 */

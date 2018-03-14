@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 194734)
  *     Matthew Hall - bug 262287
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.databinding.property;
@@ -19,10 +20,14 @@ import org.eclipse.core.internal.databinding.property.Util;
 
 /**
  * Event object events in the properties API
- * 
+ *
+ * @param <D>
+ *            type of the diff handled by this event
+ * @param <S>
+ *            type of the source object handled by this event
  * @since 1.2
  */
-public final class SimplePropertyEvent extends EventObject {
+public final class SimplePropertyEvent<S, D extends IDiff> extends EventObject {
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -53,11 +58,11 @@ public final class SimplePropertyEvent extends EventObject {
 	 * If event == CHANGE, a diff object describing the change in state, or null
 	 * for an unknown change.
 	 */
-	public final IDiff diff;
+	public final D diff;
 
 	/**
 	 * Constructs a PropertyChangeEvent with the given attributes
-	 * 
+	 *
 	 * @param type
 	 *            the property type
 	 * @param source
@@ -68,14 +73,14 @@ public final class SimplePropertyEvent extends EventObject {
 	 *            a diff describing the change in state, or null if the change
 	 *            is unknown or not applicable.
 	 */
-	public SimplePropertyEvent(int type, Object source, IProperty property,
-			IDiff diff) {
+	public SimplePropertyEvent(int type, S source, IProperty property, D diff) {
 		super(source);
 		this.type = type;
 		this.property = property;
 		this.diff = diff;
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == this)
 			return true;
@@ -84,12 +89,13 @@ public final class SimplePropertyEvent extends EventObject {
 		if (getClass() != obj.getClass())
 			return false;
 
-		SimplePropertyEvent that = (SimplePropertyEvent) obj;
+		SimplePropertyEvent<?, ?> that = (SimplePropertyEvent<?, ?>) obj;
 		return Util.equals(getSource(), that.getSource())
 				&& Util.equals(this.property, that.property)
 				&& Util.equals(this.diff, that.diff);
 	}
 
+	@Override
 	public int hashCode() {
 		int hash = 17;
 		hash = hash * 37 + getSource().hashCode();

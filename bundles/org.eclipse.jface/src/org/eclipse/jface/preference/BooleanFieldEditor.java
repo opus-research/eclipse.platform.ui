@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,8 +11,6 @@
 package org.eclipse.jface.preference;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -61,7 +59,7 @@ public class BooleanFieldEditor extends FieldEditor {
 
 	/**
 	 * Creates a boolean field editor in the given style.
-	 * 
+	 *
 	 * @param name
 	 *            the name of the preference this field editor works on
 	 * @param labelText
@@ -82,7 +80,7 @@ public class BooleanFieldEditor extends FieldEditor {
 
 	/**
 	 * Creates a boolean field editor in the default style.
-	 * 
+	 *
 	 * @param name
 	 *            the name of the preference this field editor works on
 	 * @param label
@@ -94,9 +92,6 @@ public class BooleanFieldEditor extends FieldEditor {
 		this(name, label, DEFAULT, parent);
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on FieldEditor.
-	 */
 	@Override
 	protected void adjustForNumColumns(int numColumns) {
 		if (style == SEPARATE_LABEL) {
@@ -105,9 +100,6 @@ public class BooleanFieldEditor extends FieldEditor {
 		((GridData) checkBox.getLayoutData()).horizontalSpan = numColumns;
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on FieldEditor.
-	 */
 	@Override
 	protected void doFillIntoGrid(Composite parent, int numColumns) {
 		String text = getLabelText();
@@ -135,11 +127,11 @@ public class BooleanFieldEditor extends FieldEditor {
 	 * <code>getLabelControl(parent).setToolTipText(tooltipText)</code> does not
 	 * work for boolean field editors, as it can lead to duplicate text (see bug
 	 * 259952).
-	 * 
+	 *
 	 * @param parent
 	 *            the parent composite
 	 * @return the control responsible for displaying the label
-	 * 
+	 *
 	 * @since 3.5
 	 */
 	public Control getDescriptionControl(Composite parent) {
@@ -149,10 +141,6 @@ public class BooleanFieldEditor extends FieldEditor {
 		return getChangeControl(parent);
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on FieldEditor. Loads the value from the
-	 * preference store and sets it to the check box.
-	 */
 	@Override
 	protected void doLoad() {
 		if (checkBox != null) {
@@ -162,10 +150,6 @@ public class BooleanFieldEditor extends FieldEditor {
 		}
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on FieldEditor. Loads the default value
-	 * from the preference store and sets it to the check box.
-	 */
 	@Override
 	protected void doLoadDefault() {
 		if (checkBox != null) {
@@ -175,9 +159,6 @@ public class BooleanFieldEditor extends FieldEditor {
 		}
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on FieldEditor.
-	 */
 	@Override
 	protected void doStore() {
 		getPreferenceStore().setValue(getPreferenceName(), checkBox.getSelection());
@@ -185,7 +166,7 @@ public class BooleanFieldEditor extends FieldEditor {
 
 	/**
 	 * Returns this field editor's current value.
-	 * 
+	 *
 	 * @return the value
 	 */
 	public boolean getBooleanValue() {
@@ -194,10 +175,10 @@ public class BooleanFieldEditor extends FieldEditor {
 
 	/**
 	 * Returns the change button for this field editor.
-	 * 
+	 *
 	 * @param parent
 	 *            The Composite to create the receiver in.
-	 * 
+	 *
 	 * @return the change button
 	 */
 	protected Button getChangeControl(Composite parent) {
@@ -212,21 +193,13 @@ public class BooleanFieldEditor extends FieldEditor {
 					wasSelected = isSelected;
 				}
 			});
-			checkBox.addDisposeListener(new DisposeListener() {
-				@Override
-				public void widgetDisposed(DisposeEvent event) {
-					checkBox = null;
-				}
-			});
+			checkBox.addDisposeListener(event -> checkBox = null);
 		} else {
 			checkParent(checkBox, parent);
 		}
 		return checkBox;
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on FieldEditor.
-	 */
 	@Override
 	public int getNumberOfControls() {
 		switch (style) {
@@ -237,9 +210,6 @@ public class BooleanFieldEditor extends FieldEditor {
 		}
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on FieldEditor.
-	 */
 	@Override
 	public void setFocus() {
 		if (checkBox != null) {
@@ -247,9 +217,6 @@ public class BooleanFieldEditor extends FieldEditor {
 		}
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on FieldEditor.
-	 */
 	@Override
 	public void setLabelText(String text) {
 		super.setLabelText(text);
@@ -263,7 +230,7 @@ public class BooleanFieldEditor extends FieldEditor {
 	 * Informs this field editor's listener, if it has one, about a change to
 	 * the value (<code>VALUE</code> property) provided that the old and new
 	 * values are different.
-	 * 
+	 *
 	 * @param oldValue
 	 *            the old value
 	 * @param newValue

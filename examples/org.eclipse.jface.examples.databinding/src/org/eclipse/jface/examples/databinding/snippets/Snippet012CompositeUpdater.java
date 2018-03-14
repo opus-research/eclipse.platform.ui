@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,7 @@ import java.util.TimerTask;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.list.WritableList;
 import org.eclipse.core.databinding.observable.value.WritableValue;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.internal.databinding.provisional.swt.CompositeUpdater;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -32,13 +32,13 @@ import org.eclipse.swt.widgets.Widget;
 
 /**
  * @since 3.2
- * 
+ *
  */
 public class Snippet012CompositeUpdater {
 
 	public static void main(String[] args) {
 		final Display display = new Display();
-		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
+		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
 			@Override
 			public void run() {
 				Shell shell = new Shell(display);
@@ -93,7 +93,7 @@ public class Snippet012CompositeUpdater {
 
 	static class Counter extends WritableValue {
 		Counter() {
-			super(new Integer(0), Integer.class);
+			super(Integer.valueOf(0), Integer.class);
 			scheduleIncrementTask();
 		}
 
@@ -107,7 +107,7 @@ public class Snippet012CompositeUpdater {
 						@Override
 						public void run() {
 							Integer currentVal = (Integer) getValue();
-							setValue(new Integer(currentVal.intValue() + 1));
+							setValue(Integer.valueOf(currentVal.intValue() + 1));
 						}
 					});
 					scheduleIncrementTask();

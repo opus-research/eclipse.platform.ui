@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2006 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,8 +16,8 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.navigator.ICommonContentExtensionSite;
 import org.eclipse.ui.navigator.ICommonLabelProvider;
 
-/** 
- * 
+/**
+ *
  * @since 3.2
  */
 public final class SkeletonLabelProvider implements ICommonLabelProvider {
@@ -28,83 +28,62 @@ public final class SkeletonLabelProvider implements ICommonLabelProvider {
 	public static final SkeletonLabelProvider INSTANCE = new SkeletonLabelProvider();
 
 	/**
-	 *  
+	 *
 	 */
 	private SkeletonLabelProvider() {
 		super();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
-	 */
+	@Override
 	public Image getImage(Object element) {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
-	 */
+	@Override
 	public String getText(Object element) {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.jface.viewers.ILabelProviderListener)
-	 */
+	@Override
 	public void addListener(ILabelProviderListener listener) {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
-	 */
+	@Override
 	public void dispose() {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang.Object,
-	 *      java.lang.String)
-	 */
+	@Override
 	public boolean isLabelProperty(Object element, String property) {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
-	 */
+	@Override
 	public void removeListener(ILabelProviderListener listener) {
 
 	}
 
- 
+
+	@Override
 	public void init(ICommonContentExtensionSite aConfig) {
 
 	}
 
- 
+
+	@Override
 	public String getDescription(Object anElement) {
 		return null;
 	}
 
-	public void restoreState(IMemento aMemento) { 
-		
+	@Override
+	public void restoreState(IMemento aMemento) {
+
 	}
 
-	public void saveState(IMemento aMemento) { 
-		
+	@Override
+	public void saveState(IMemento aMemento) {
+
 	}
 
 }

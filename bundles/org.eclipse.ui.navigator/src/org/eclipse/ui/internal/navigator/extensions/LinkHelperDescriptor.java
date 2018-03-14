@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2010 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,9 +26,9 @@ import org.eclipse.ui.navigator.ILinkHelper;
 /**
  * Provides a wrapper around
  * <b>org.eclipse.ui.navigator.navigatorContent/linkHelper</b> extensions.
- * 
+ *
  * @since 3.2
- * 
+ *
  */
 public class LinkHelperDescriptor implements ILinkHelperExtPtConstants {
 
@@ -87,7 +87,7 @@ public class LinkHelperDescriptor implements ILinkHelperExtPtConstants {
 
 	/**
 	 * Create a link helper instance from this descriptors class attribute.
-	 * 
+	 *
 	 * @return An instance of the helper that is defined by the extension, or a
 	 *         Skeleton Link Helper.
 	 */
@@ -96,6 +96,7 @@ public class LinkHelperDescriptor implements ILinkHelperExtPtConstants {
 			return SkeletonLinkHelper.INSTANCE;
 		final ILinkHelper[] helper = new ILinkHelper[1];
 		SafeRunner.run(new NavigatorSafeRunnable(configElement) {
+			@Override
 			public void run() throws Exception {
 				helper[0] = (ILinkHelper) configElement.createExecutableExtension(ATT_CLASS);
 			}
@@ -107,7 +108,7 @@ public class LinkHelperDescriptor implements ILinkHelperExtPtConstants {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param anInput
 	 *            The editor input from the editor that was activated.
 	 * @return True if this linkHelper descriptor can produce a selection from

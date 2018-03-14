@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2007 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,11 +12,11 @@ package org.eclipse.ui;
 
 import org.eclipse.core.resources.IMarker;
 
-/** 
- * Creates resolutions for a given marker. 
- * When run, a resolution would typically eliminate 
+/**
+ * Creates resolutions for a given marker.
+ * When run, a resolution would typically eliminate
  * the need for the marker.
- * 
+ *
  * @since 2.0
  */
 public interface IMarkerResolutionGenerator {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 Angelo Zerr and others.
+ * Copyright (c) 2008, 2015 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,17 +15,17 @@ import org.eclipse.swt.widgets.Widget;
 
 /**
  * SWT Helper to get SWT styles {@link Widget} as String.
- * 
+ *
  * @version 1.0.0
  * @author <a href="mailto:angelo.zerr@gmail.com">Angelo ZERR</a>
- * 
+ *
  */
 public class SWTStyleHelpers {
 
 	/**
 	 * Return SWT style constant from {@link Widget} <code>widget</code> as
 	 * String. Each SWT style are separate with space character.
-	 * 
+	 *
 	 * @param style
 	 * @return
 	 */
@@ -39,7 +39,7 @@ public class SWTStyleHelpers {
 	/**
 	 * Return SWT style constant <code>style</code> as String. Each SWT style
 	 * are separate with <code>separator</code> String.
-	 * 
+	 *
 	 * @param style
 	 * @return
 	 */
@@ -651,7 +651,7 @@ public class SWTStyleHelpers {
 	 * Add SWT String <code>style</code> to the {@link StringBuffer}
 	 * <cod>swtStyles</code> and separate it with <code>separator</code>
 	 * String.
-	 * 
+	 *
 	 * @param swtStyles
 	 * @param style
 	 * @param separator

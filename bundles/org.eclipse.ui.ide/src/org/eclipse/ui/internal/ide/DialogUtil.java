@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -76,9 +76,9 @@ public class DialogUtil {
 
     /**
      * Return whether or not the font in the parent is the size of a regular
-     * font.  Typically used to know if a font is smaller than the High Contrast 
+     * font.  Typically used to know if a font is smaller than the High Contrast
      * Font. This method is used to make layout decisions based on screen space.
-     * 
+     *
      * @param parent The Composite whose Font will be queried.
      * @return boolean. True if there are more than 50 lines of possible
      * text in the display.

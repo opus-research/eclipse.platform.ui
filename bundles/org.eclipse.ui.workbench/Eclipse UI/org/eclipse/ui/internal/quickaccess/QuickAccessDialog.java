@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
  *     René Brandstetter - Bug 433778
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 491410
  *******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 
@@ -17,6 +18,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import org.eclipse.core.commands.Command;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -24,6 +26,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.bindings.keys.SWTKeySupport;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -34,11 +37,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.graphics.FontMetrics;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -50,9 +54,9 @@ import org.eclipse.ui.keys.IBindingService;
 /**
  * This is the quick access popup dialog used in 3.x. The new quick access is
  * done through a shell in {@link SearchField}.
- * 
+ *
  * @since 3.3
- * 
+ *
  */
 public class QuickAccessDialog extends PopupDialog {
 	private TriggerSequence[] invokingCommandKeySequences;
@@ -236,18 +240,7 @@ public class QuickAccessDialog extends PopupDialog {
 						create();
 					}
 				});
-		// Ugly hack to avoid bug 184045. If this gets fixed, replace the
-		// following code with a call to refresh("").
-		getShell().getDisplay().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				final Shell shell = getShell();
-				if (shell != null && !shell.isDisposed()) {
-					Point size = shell.getSize();
-					shell.setSize(size.x, size.y + 1);
-				}
-			}
-		});
+		QuickAccessDialog.this.contents.refresh(""); //$NON-NLS-1$
 	}
 
 	@Override
@@ -263,13 +256,6 @@ public class QuickAccessDialog extends PopupDialog {
 		return filterText;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.dialogs.PopupDialog#createDialogArea(org.eclipse.swt
-	 * .widgets.Composite)
-	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite composite = (Composite) super.createDialogArea(parent);
@@ -286,10 +272,9 @@ public class QuickAccessDialog extends PopupDialog {
 	final protected TriggerSequence[] getInvokingCommandKeySequences() {
 		if (invokingCommandKeySequences == null) {
 			if (invokingCommand != null) {
-				IBindingService bindingService = (IBindingService) window.getWorkbench()
-						.getAdapter(IBindingService.class);
-				invokingCommandKeySequences = bindingService.getActiveBindingsFor(invokingCommand
-						.getId());
+				IBindingService bindingService =
+						Adapters.adapt(window.getWorkbench(), IBindingService.class);
+				invokingCommandKeySequences = bindingService.getActiveBindingsFor(invokingCommand.getId());
 			}
 		}
 		return invokingCommandKeySequences;
@@ -332,7 +317,18 @@ public class QuickAccessDialog extends PopupDialog {
 
 	@Override
 	protected Point getDefaultSize() {
-		return new Point(350, 420);
+		GC gc = new GC(getContents());
+		FontMetrics fontMetrics = gc.getFontMetrics();
+		gc.dispose();
+		int x = Dialog.convertHorizontalDLUsToPixels(fontMetrics, 300);
+		if (x < 350) {
+			x = 350;
+		}
+		int y = Dialog.convertVerticalDLUsToPixels(fontMetrics, 270);
+		if (y < 420) {
+			y = 420;
+		}
+		return new Point(x, y);
 	}
 
 	@Override

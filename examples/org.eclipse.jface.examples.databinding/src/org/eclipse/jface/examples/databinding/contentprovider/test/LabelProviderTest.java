@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2007 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,7 @@ import org.eclipse.core.databinding.observable.set.WritableSet;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.IValueChangeListener;
 import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.databinding.viewers.ListeningLabelProvider;
 import org.eclipse.jface.databinding.viewers.ObservableSetContentProvider;
 import org.eclipse.jface.databinding.viewers.ViewersObservables;
@@ -42,7 +42,7 @@ import org.eclipse.swt.widgets.Shell;
  * Tests UpdatableTreeContentProvider and DirtyIndicationLabelProvider. Creates
  * a tree containing three randomly-generated sets of integers, and one node
  * that contains the union of the other sets.
- * 
+ *
  * @since 1.0
  */
 public class LabelProviderTest {
@@ -51,7 +51,7 @@ public class LabelProviderTest {
 
 	private ListViewer list;
 
-	private WritableSet setOfRenamables;
+	private WritableSet<RenamableItem> setOfRenamables;
 
 	private Button addButton;
 
@@ -60,11 +60,6 @@ public class LabelProviderTest {
 	private Button renameButton;
 
 	private SelectionListener buttonSelectionListener = new SelectionAdapter() {
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-		 */
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			Button pressed = (Button) e.widget;
@@ -80,17 +75,17 @@ public class LabelProviderTest {
 		}
 	};
 
-	private IObservableValue selectedRenamable;
+	private IObservableValue<RenamableItem> selectedRenamable;
 
 	/**
-	 * 
+	 *
 	 */
 	public LabelProviderTest() {
 
 		// Create shell
 		shell = new Shell(Display.getCurrent());
 		{ // Initialize shell
-			setOfRenamables = new WritableSet();
+			setOfRenamables = new WritableSet<>();
 
 			list = new ListViewer(shell);
 			ObservableSetContentProvider contentProvider = new ObservableSetContentProvider();
@@ -104,12 +99,6 @@ public class LabelProviderTest {
 					}
 				};
 
-				/*
-				 * (non-Javadoc)
-				 * 
-				 * @see org.eclipse.jface.databinding.viewers.ViewerLabelProvider#updateLabel(org.eclipse.jface.viewers.ViewerLabel,
-				 *      java.lang.Object)
-				 */
 				@Override
 				public void updateLabel(ViewerLabel label, Object element) {
 					if (element instanceof RenamableItem) {
@@ -150,15 +139,14 @@ public class LabelProviderTest {
 				renameButton.setText("Rename"); //$NON-NLS-1$
 
 				selectedRenamable
-						.addValueChangeListener(new IValueChangeListener() {
+						.addValueChangeListener(new IValueChangeListener<RenamableItem>() {
 							@Override
-							public void handleValueChange(ValueChangeEvent event) {
-								boolean shouldEnable = selectedRenamable
-										.getValue() != null;
-								removeButton.setEnabled(shouldEnable);
-								renameButton.setEnabled(shouldEnable);
-							}
-						});
+					public void handleValueChange(ValueChangeEvent<? extends RenamableItem> event) {
+						boolean shouldEnable = selectedRenamable.getValue() != null;
+						removeButton.setEnabled(shouldEnable);
+						renameButton.setEnabled(shouldEnable);
+					}
+				});
 				removeButton.setEnabled(false);
 				renameButton.setEnabled(false);
 
@@ -186,7 +174,7 @@ public class LabelProviderTest {
 	 * @return
 	 */
 	protected RenamableItem getCurrentSelection() {
-		return (RenamableItem) selectedRenamable.getValue();
+		return selectedRenamable.getValue();
 	}
 
 	/**
@@ -194,7 +182,7 @@ public class LabelProviderTest {
 	 */
 	public static void main(String[] args) {
 		final Display display = Display.getDefault();
-		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
+		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
 
 			@Override
 			public void run() {

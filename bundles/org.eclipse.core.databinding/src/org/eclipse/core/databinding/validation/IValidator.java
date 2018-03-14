@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2007 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,20 +18,21 @@ import org.eclipse.core.runtime.IStatus;
  * String2IntValidator would only accept source Strings that can successfully be
  * converted to an integer value, and a PositiveIntegerValidator would only
  * accept positive integers.
- * 
+ *
  * @since 1.0
- * 
+ *
  */
+@FunctionalInterface
 public interface IValidator {
 
 	/**
 	 * Determines if the given value is valid.
-	 * 
+	 *
 	 * @param value
 	 *            the value to validate
 	 * @return a status object indicating whether the validation succeeded
 	 *         {@link IStatus#isOK()} or not. Never null.
 	 */
 	public IStatus validate(Object value);
-	
+
 }

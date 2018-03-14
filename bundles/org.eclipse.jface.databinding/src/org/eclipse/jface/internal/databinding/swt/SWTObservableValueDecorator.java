@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Widget;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public class SWTObservableValueDecorator extends DecoratingObservableValue
 		implements ISWTObservableValue, Listener {
@@ -38,15 +38,18 @@ public class SWTObservableValueDecorator extends DecoratingObservableValue
 		WidgetListenerUtil.asyncAddListener(widget, SWT.Dispose, this);
 	}
 
+	@Override
 	public void handleEvent(Event event) {
 		if (event.type == SWT.Dispose)
 			dispose();
 	}
 
+	@Override
 	public Widget getWidget() {
 		return widget;
 	}
 
+	@Override
 	public synchronized void dispose() {
 		if (widget != null) {
 			WidgetListenerUtil.asyncRemoveListener(widget, SWT.Dispose, this);

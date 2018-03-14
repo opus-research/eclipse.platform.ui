@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,14 +26,14 @@ import javax.inject.Qualifier;
  * </p>
  * <p>
  * Example usage:
- * 
+ *
  * <pre>
  *   public class Car {
  *     &#064;void handle(@Optional @UIEventTopic("org/eclipse/e4/some/event/topic") Payload payload);
  *     ...
  *   }
  * </pre>
- * 
+ *
  * </p>
  * @since 1.0
  */

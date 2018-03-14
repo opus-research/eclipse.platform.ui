@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,24 +16,27 @@ import org.eclipse.swt.widgets.Spinner;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public class SpinnerSelectionProperty extends WidgetIntValueProperty {
 	/**
-	 * 
+	 *
 	 */
 	public SpinnerSelectionProperty() {
 		super(SWT.Modify);
 	}
 
+	@Override
 	int doGetIntValue(Object source) {
 		return ((Spinner) source).getSelection();
 	}
 
+	@Override
 	void doSetIntValue(Object source, int value) {
 		((Spinner) source).setSelection(value);
 	}
 
+	@Override
 	public String toString() {
 		return "Spinner.selection <int>"; //$NON-NLS-1$
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,7 @@ import org.eclipse.ui.menus.UIElement;
 /**
  * Our element reference that is used during element
  * registration/unregistration.
- * 
+ *
  * @since 3.3
  */
 public class ElementReference implements IElementReference {
@@ -31,7 +31,7 @@ public class ElementReference implements IElementReference {
 
 	/**
 	 * Construct the reference.
-	 * 
+	 *
 	 * @param id
 	 *            command id. Must not be <code>null</code>.
 	 * @param adapt
@@ -49,27 +49,16 @@ public class ElementReference implements IElementReference {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.commands.IElementReference#getElement()
-	 */
 	@Override
 	public UIElement getElement() {
 		return element;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.commands.IElementReference#getCommandId()
-	 */
 	@Override
 	public String getCommandId() {
 		return commandId;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.commands.IElementReference#getParameters()
-	 */
 	@Override
 	public Map getParameters() {
 		return parameters;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -66,7 +66,7 @@ public class SelectPerspectiveDialog extends Dialog implements
 
     /**
      * PerspectiveDialog constructor comment.
-     * 
+     *
      * @param parentShell the parent shell
      * @param perspReg the perspective registry
      */
@@ -77,22 +77,12 @@ public class SelectPerspectiveDialog extends Dialog implements
 		setShellStyle(getShellStyle() | SWT.SHEET);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.dialogs.Dialog#cancelPressed()
-     */
     @Override
 	protected void cancelPressed() {
         perspDesc = null;
         super.cancelPressed();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
-     */
     @Override
 	protected void configureShell(Shell shell) {
         super.configureShell(shell);
@@ -108,7 +98,7 @@ public class SelectPerspectiveDialog extends Dialog implements
      * cancel buttons using the <code>createButton</code> framework method.
      * Subclasses may override.
      * </p>
-     * 
+     *
      * @param parent the button bar composite
      */
     @Override
@@ -123,7 +113,7 @@ public class SelectPerspectiveDialog extends Dialog implements
     /**
      * Creates and returns the contents of the upper part of this dialog (above
      * the button bar).
-     * 
+     *
      * @param parent the parent composite to contain the dialog area
      * @return the dialog area control
      */
@@ -151,7 +141,7 @@ public class SelectPerspectiveDialog extends Dialog implements
 
     /**
      * Create a show all button in the parent.
-     * 
+     *
      * @param parent the parent <code>Composite</code>.
      */
     private void createShowAllButton(Composite parent) {
@@ -160,9 +150,6 @@ public class SelectPerspectiveDialog extends Dialog implements
                 .setText(ActivityMessages.Perspective_showAll);
         showAllButton.addSelectionListener(new SelectionAdapter() {
 
-            /* (non-Javadoc)
-             * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-             */
             @Override
 			public void widgetSelected(SelectionEvent e) {
                 if (showAllButton.getSelection()) {
@@ -177,7 +164,7 @@ public class SelectPerspectiveDialog extends Dialog implements
 
     /**
      * Create a new viewer in the parent.
-     * 
+     *
      * @param parent the parent <code>Composite</code>.
      */
     private void createViewer(Composite parent) {
@@ -201,7 +188,7 @@ public class SelectPerspectiveDialog extends Dialog implements
 
     /**
      * Returns the current selection.
-     * 
+     *
      * @return the current selection
      */
     public IPerspectiveDescriptor getSelection() {
@@ -217,7 +204,7 @@ public class SelectPerspectiveDialog extends Dialog implements
 
     /**
      * Layout the top control.
-     * 
+     *
      * @param control the control.
      */
     private void layoutTopControl(Control control) {
@@ -229,7 +216,7 @@ public class SelectPerspectiveDialog extends Dialog implements
 
     /**
      * Notifies that the selection has changed.
-     * 
+     *
      * @param event event object describing the change
      */
     @Override
@@ -259,9 +246,6 @@ public class SelectPerspectiveDialog extends Dialog implements
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#okPressed()
-     */
     @Override
 	protected void okPressed() {
         ITriggerPoint triggerPoint = PlatformUI.getWorkbench()
@@ -271,11 +255,7 @@ public class SelectPerspectiveDialog extends Dialog implements
 			super.okPressed();
 		}
     }
-    
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#isResizable()
-     */
+
     @Override
 	protected boolean isResizable() {
     	return true;

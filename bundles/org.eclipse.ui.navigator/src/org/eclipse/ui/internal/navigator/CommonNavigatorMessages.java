@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2012 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,16 +13,16 @@ package org.eclipse.ui.internal.navigator;
 import org.eclipse.osgi.util.NLS;
 
 /**
- * 
+ *
  * <p>
  * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
  * part of a work in progress. There is a guarantee neither that this API will
  * work nor that it will remain the same. Please do not use this API without
  * consulting with the Platform/UI team.
  * </p>
- * 
+ *
  * @since 3.2
- * 
+ *
  */
 public class CommonNavigatorMessages extends NLS {
 
@@ -36,9 +36,6 @@ public class CommonNavigatorMessages extends NLS {
 
 	/** */
 	public static String NavigatorViewerDescriptor_Popup_Menu_Overridden;
-
-	/** */
-	public static String StructuredViewerManager_0;
 
 	/** */
 	public static String TextAction_selectAll;
@@ -116,7 +113,7 @@ public class CommonNavigatorMessages extends NLS {
 	public static String CommonFilterSelectionDialog_Available_customization_;
 
 	/** */
-	public static String CommonSorterDescriptorManager_A_navigatorContent_extesnion_in_0_;
+	public static String CommonSorterDescriptorManager_A_navigatorContent_extension_in_0_;
 
 	/** */
 	public static String CommonSorterDescriptorManager_A_navigatorContent_extension_does_n_;
@@ -129,10 +126,10 @@ public class CommonNavigatorMessages extends NLS {
 
 	/** */
 	public static String CommonViewerSorter_NoContentExtensionForObject;
-	
+
 	/** */
 	public static String NavigatorContentService_problemSavingPreferences;
-	
+
 
 	static {
 		NLS.initializeMessages(BUNDLE_NAME, CommonNavigatorMessages.class);

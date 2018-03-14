@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2014 Tom Schindl and others.
+ * Copyright (c) 2007, 2015 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,9 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
- *     Lars Vogel (lars.vogel@gmail.com) - Bug 413427
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 413427, 475361
  *     Jeanderson Candido (http://jeandersonbc.github.io) - Bug 414565
+ *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 481490
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -114,11 +115,11 @@ public class Snippet041TableViewerAlternatingColors {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (b) {
-					viewer.setFilters(new ViewerFilter[] { createFilterForViewer() });
+					viewer.setFilters(createFilterForViewer());
 					b = false;
 
 				} else {
-					viewer.setFilters(new ViewerFilter[0]);
+					viewer.setFilters();
 					b = true;
 				}
 			}
@@ -167,7 +168,7 @@ public class Snippet041TableViewerAlternatingColors {
 	}
 
 	private List<MyModel> createModel() {
-		List<MyModel> elements = new ArrayList<MyModel>();
+		List<MyModel> elements = new ArrayList<>();
 		for (int i = 0; i < 100000; i++) {
 			elements.add(new MyModel(i));
 		}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,7 +31,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
@@ -65,14 +64,12 @@ public class WizardNewProjectCreationPage extends WizardPage {
     // widgets
     Text projectNameField;
 
-    private Listener nameModifyListener = new Listener() {
-        public void handleEvent(Event e) {
-        	setLocationForSelection();
-            boolean valid = validatePage();
-            setPageComplete(valid);
-                
-        }
-    };
+    private Listener nameModifyListener = e -> {
+		setLocationForSelection();
+	    boolean valid = validatePage();
+	    setPageComplete(valid);
+
+	};
 
 	private ProjectContentsLocationArea locationArea;
 
@@ -93,11 +90,11 @@ public class WizardNewProjectCreationPage extends WizardPage {
 
     /**
 	 * Creates a new project creation wizard page.
-	 * 
+	 *
 	 * @param pageName
 	 * @param selection
 	 * @param workingSetTypes
-	 * 
+	 *
 	 * @deprecated default placement of the working set group has been removed.
 	 *             If you wish to use the working set block please call
 	 *             {@link #createWorkingSetGroup(Composite, IStructuredSelection, String[])}
@@ -105,17 +102,16 @@ public class WizardNewProjectCreationPage extends WizardPage {
 	 *             implementation.
 	 * @since 3.4
 	 */
+	@Deprecated
 	public WizardNewProjectCreationPage(String pageName,
 			IStructuredSelection selection, String[] workingSetTypes) {
 		this(pageName);
 	}
 
-	/** (non-Javadoc)
-     * Method declared on IDialogPage.
-     */
-    public void createControl(Composite parent) {
+    @Override
+	public void createControl(Composite parent) {
         Composite composite = new Composite(parent, SWT.NULL);
-    
+
 
         initializeDialogUnits(parent);
 
@@ -130,10 +126,10 @@ public class WizardNewProjectCreationPage extends WizardPage {
         if(initialProjectFieldValue != null) {
 			locationArea.updateProjectName(initialProjectFieldValue);
 		}
-        
+
 		// Scale the button based on the rest of the dialog
 		setButtonLayoutData(locationArea.getBrowseButton());
-		
+
         setPageComplete(validatePage());
         // Show description on opening
         setErrorMessage(null);
@@ -141,11 +137,11 @@ public class WizardNewProjectCreationPage extends WizardPage {
         setControl(composite);
         Dialog.applyDialogFont(composite);
     }
-    
+
     /**
 	 * Create a working set group for this page. This method can only be called
 	 * once.
-	 * 
+	 *
 	 * @param composite
 	 *            the composite in which to create the group
 	 * @param selection
@@ -165,30 +161,25 @@ public class WizardNewProjectCreationPage extends WizardPage {
 				supportedWorkingSetTypes);
 		return workingSetGroup;
 	}
-    
+
     /**
 	 * Get an error reporter for the receiver.
 	 * @return IErrorMessageReporter
 	 */
 	private IErrorMessageReporter getErrorReporter() {
-		return new IErrorMessageReporter(){
-			/* (non-Javadoc)
-			 * @see org.eclipse.ui.internal.ide.dialogs.ProjectContentsLocationArea.IErrorMessageReporter#reportError(java.lang.String)
-			 */
-			public void reportError(String errorMessage, boolean infoOnly) {
-				if (infoOnly) {
-					setMessage(errorMessage, IStatus.INFO);
-					setErrorMessage(null);
-				}
-				else
-					setErrorMessage(errorMessage);
-				boolean valid = errorMessage == null;
-				if(valid) {
-					valid = validatePage();
-				}
-				
-				setPageComplete(valid);
+		return (errorMessage, infoOnly) -> {
+			if (infoOnly) {
+				setMessage(errorMessage, IStatus.INFO);
+				setErrorMessage(null);
 			}
+			else
+				setErrorMessage(errorMessage);
+			boolean valid = errorMessage == null;
+			if(valid) {
+				valid = validatePage();
+			}
+
+			setPageComplete(valid);
 		};
 	}
 
@@ -228,7 +219,7 @@ public class WizardNewProjectCreationPage extends WizardPage {
 
 
     /**
-     * Returns the current project location path as entered by 
+     * Returns the current project location path as entered by
      * the user, or its anticipated initial value.
      * Note that if the default has been returned the path
      * in a project description used to create a project
@@ -239,10 +230,10 @@ public class WizardNewProjectCreationPage extends WizardPage {
     public IPath getLocationPath() {
         return new Path(locationArea.getProjectLocation());
     }
-    
+
     /**
     /**
-     * Returns the current project location URI as entered by 
+     * Returns the current project location URI as entered by
      * the user, or <code>null</code> if a valid project location
      * has not been entered.
      *
@@ -261,7 +252,7 @@ public class WizardNewProjectCreationPage extends WizardPage {
 	 * responsibility of <code>IProject::create</code> invoked by the new
 	 * project resource wizard.
 	 * </p>
-	 * 
+	 *
 	 * @return the new project resource handle
 	 */
     public IProject getProjectHandle() {
@@ -287,7 +278,7 @@ public class WizardNewProjectCreationPage extends WizardPage {
     /**
      * Returns the value of the project name field
      * with leading and trailing spaces removed.
-     * 
+     *
      * @return the project name in the field
      */
     private String getProjectNameFieldValue() {
@@ -303,15 +294,15 @@ public class WizardNewProjectCreationPage extends WizardPage {
      * created. The name is ignored if the createControl(Composite)
      * method has already been called. Leading and trailing spaces
      * in the name are ignored.
-     * Providing the name of an existing project will not necessarily 
-     * cause the wizard to warn the user.  Callers of this method 
-     * should first check if the project name passed already exists 
+     * Providing the name of an existing project will not necessarily
+     * cause the wizard to warn the user.  Callers of this method
+     * should first check if the project name passed already exists
      * in the workspace.
-     * 
+     *
      * @param name initial project name for this page
-     * 
+     *
      * @see IWorkspace#validateName(String, int)
-     * 
+     *
      */
     public void setInitialProjectName(String name) {
         if (name == null) {
@@ -331,9 +322,9 @@ public class WizardNewProjectCreationPage extends WizardPage {
     	locationArea.updateProjectName(getProjectNameFieldValue());
     }
 
-  
+
     /**
-     * Returns whether this page's controls currently all contain valid 
+     * Returns whether this page's controls currently all contain valid
      * values.
      *
      * @return <code>true</code> if all controls are valid, and
@@ -361,11 +352,11 @@ public class WizardNewProjectCreationPage extends WizardPage {
             setErrorMessage(IDEWorkbenchMessages.WizardNewProjectCreationPage_projectExistsMessage);
             return false;
         }
-                
+
         IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(
 				getProjectNameFieldValue());
 		locationArea.setExistingProject(project);
-		
+
 		String validLocationMessage = locationArea.checkValidLocation();
 		if (validLocationMessage != null) { // there is no destination location given
 			setErrorMessage(validLocationMessage);
@@ -380,7 +371,8 @@ public class WizardNewProjectCreationPage extends WizardPage {
     /*
      * see @DialogPage.setVisible(boolean)
      */
-    public void setVisible(boolean visible) {
+    @Override
+	public void setVisible(boolean visible) {
         super.setVisible(visible);
         if (visible) {
 			projectNameField.setFocus();
@@ -398,7 +390,7 @@ public class WizardNewProjectCreationPage extends WizardPage {
     /**
 	 * Return the selected working sets, if any. If this page is not configured
 	 * to interact with working sets this will be an empty array.
-	 * 
+	 *
 	 * @return the selected working sets
 	 * @since 3.4
 	 */

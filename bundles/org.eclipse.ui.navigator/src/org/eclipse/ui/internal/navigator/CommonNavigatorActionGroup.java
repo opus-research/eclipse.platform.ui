@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2009 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -65,12 +65,12 @@ public class CommonNavigatorActionGroup extends ActionGroup {
 	private CollapseAllHandler collapseAllHandler;
 
     private boolean frameActionsShown;
-    
 
-	
+
+
 	/**
 	 * Create a action group the common navigator actions.
-	 * 
+	 *
 	 * @param aNavigator
 	 *            The IViewPart for this action group
 	 * @param aViewer
@@ -94,15 +94,16 @@ public class CommonNavigatorActionGroup extends ActionGroup {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void makeActions() {
         FrameList frameList = commonViewer.getFrameList();
         backAction = new BackAction(frameList);
         forwardAction = new ForwardAction(frameList);
         upAction = new UpAction(frameList);
-        
+
 		frameList.addPropertyChangeListener(new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getProperty().equals(FrameList.P_RESET)) {
 					upAction.setEnabled(false);
@@ -146,11 +147,7 @@ public class CommonNavigatorActionGroup extends ActionGroup {
 		filterGroup = new FilterActionGroup(commonViewer);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.actions.ActionGroup#fillActionBars(org.eclipse.ui.IActionBars)
-	 */
+	@Override
 	public void fillActionBars(IActionBars actionBars) {
 
         actionBars.setGlobalActionHandler(ActionFactory.BACK.getId(),
@@ -159,13 +156,13 @@ public class CommonNavigatorActionGroup extends ActionGroup {
                 forwardAction);
         actionBars.setGlobalActionHandler(IWorkbenchActionConstants.UP,
                 upAction);
-		
+
 		filterGroup.fillActionBars(actionBars);
 		fillToolBar(actionBars.getToolBarManager());
 		fillViewMenu(actionBars.getMenuManager());
 		actionBars.updateActionBars();
 	}
-	
+
 	protected void fillToolBar(IToolBarManager toolBar) {
 		if (backAction.isEnabled() || upAction.isEnabled() || forwardAction.isEnabled()) {
 			toolBar.add(backAction);
@@ -183,12 +180,12 @@ public class CommonNavigatorActionGroup extends ActionGroup {
 			toolBar.add(toggleLinkingAction);
 		}
 	}
-	
+
 	protected void fillViewMenu(IMenuManager menu) {
 		menu.add(new Separator());
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS+"-end"));//$NON-NLS-1$
-		if (toggleLinkingAction != null) { 
+		if (toggleLinkingAction != null) {
 			menu
 			.insertAfter(IWorkbenchActionConstants.MB_ADDITIONS
 					+ "-end", toggleLinkingAction); //$NON-NLS-1$
@@ -213,19 +210,15 @@ public class CommonNavigatorActionGroup extends ActionGroup {
 			toolBar.update(true);
 		}
 	}
-	
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.actions.ActionGroup#dispose()
-	 */
+
+
+	@Override
 	public void dispose() {
 		super.dispose();
         backAction.dispose();
         forwardAction.dispose();
         upAction.dispose();
-        
+
 		if (toggleLinkingAction != null) {
 			toggleLinkingAction.dispose();
 		}

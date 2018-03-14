@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2012 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,9 +12,8 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.progress;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.Job;
@@ -31,7 +30,7 @@ public class JobInfo extends JobTreeElement {
     private IStatus blockedStatus;
 
     private volatile boolean canceled = false;
-    private List children = Collections.synchronizedList(new ArrayList());
+	private Queue<JobTreeElement> children = new ConcurrentLinkedQueue<>();
 
     private Job job;
 
@@ -44,7 +43,7 @@ public class JobInfo extends JobTreeElement {
 
     /**
      * Create a top level JobInfo.
-     * 
+     *
      * @param enclosingJob
      */
 	protected JobInfo(Job enclosingJob) {
@@ -53,7 +52,7 @@ public class JobInfo extends JobTreeElement {
 
     /**
      * Add the subtask to the receiver.
-     * 
+     *
      * @param subTaskName
      */
     void addSubTask(String subTaskName) {
@@ -62,7 +61,7 @@ public class JobInfo extends JobTreeElement {
 
     /**
      * Add the amount of work to the job info.
-     * 
+     *
      * @param workIncrement
      */
     void addWork(double workIncrement) {
@@ -78,7 +77,7 @@ public class JobInfo extends JobTreeElement {
 
     /**
      * Begin the task called taskName with the supplied work.
-     * 
+     *
      * @param taskName
      * @param work
      */
@@ -86,11 +85,6 @@ public class JobInfo extends JobTreeElement {
         taskInfo = new TaskInfo(this, taskName, work);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.internal.progress.JobTreeElement#cancel()
-     */
     @Override
 	public void cancel() {
         this.canceled = true;
@@ -106,11 +100,6 @@ public class JobInfo extends JobTreeElement {
         children.clear();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.internal.progress.JobTreeElement#isJobInfo()
-     */
     void clearTaskInfo() {
 		FinishedJobs.getInstance().remove(taskInfo);
         taskInfo = null;
@@ -118,7 +107,7 @@ public class JobInfo extends JobTreeElement {
 
     /**
      * Compare the the job of the receiver to job2.
-     * 
+     *
      * @param jobInfo
      *            The info we are comparing to
      * @return @see Comparable#compareTo(java.lang.Object)
@@ -163,11 +152,6 @@ public class JobInfo extends JobTreeElement {
         return 1;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
-     */
     @Override
 	public int compareTo(Object arg0) {
 
@@ -208,28 +192,18 @@ public class JobInfo extends JobTreeElement {
 
     /**
      * Return the blocked status or <code>null</code> if there isn't one.
-     * 
+     *
      * @return Returns the blockedStatus.
      */
     public IStatus getBlockedStatus() {
         return blockedStatus;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.internal.progress.JobTreeElement#getChildren()
-     */
     @Override
 	Object[] getChildren() {
         return children.toArray();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.internal.progress.JobTreeElement#getCondensedDisplayString()
-     */
     @Override
 	String getCondensedDisplayString() {
     	TaskInfo info = getTaskInfo();
@@ -239,11 +213,6 @@ public class JobInfo extends JobTreeElement {
         return getJob().getName();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.internal.progress.JobTreeElement#getDisplayImage()
-     */
     @Override
 	public Image getDisplayImage() {
         int done = getPercentDone();
@@ -264,17 +233,11 @@ public class JobInfo extends JobTreeElement {
         return super.getDisplayImage();
 
     }
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.progress.JobTreeElement#getDisplayString()
-     */
     @Override
 	String getDisplayString() {
     	return getDisplayString(true);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.progress.JobTreeElement#getDisplayString(boolean)
-     */
     @Override
 	String getDisplayString(boolean showProgress) {
         String name = getDisplayStringWithStatus(showProgress);
@@ -289,7 +252,7 @@ public class JobInfo extends JobTreeElement {
      * job.
      * @param showProgress a boolean to indicate if we should
      * show progress or not.
-     * 
+     *
      * @return String
      */
     private String getDisplayStringWithStatus(boolean showProgress) {
@@ -317,7 +280,7 @@ public class JobInfo extends JobTreeElement {
 
     /**
      * Return the GroupInfo for the receiver if it' is active.
-     * 
+     *
      * @return GroupInfo or <code>null</code>.
      */
     GroupInfo getGroupInfo() {
@@ -329,18 +292,13 @@ public class JobInfo extends JobTreeElement {
 
     /**
      * Return the job that the receiver is collecting data on.
-     * 
+     *
      * @return Job
      */
 	public Job getJob() {
         return job;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.internal.progress.JobTreeElement#getParent()
-     */
 	@Override
 	public Object getParent() {
         return parent;
@@ -349,7 +307,7 @@ public class JobInfo extends JobTreeElement {
     /**
      * Return the amount of progress we have had as a percentage. If there is no
      * progress or it is indeterminate return IProgressMonitor.UNKNOWN.
-     * 
+     *
      * @return int
      */
     int getPercentDone() {
@@ -373,30 +331,22 @@ public class JobInfo extends JobTreeElement {
         return taskInfo;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.internal.progress.JobTreeElement#hasChildren()
-     */
     @Override
 	boolean hasChildren() {
-        return children.size() > 0;
+		// Do not use children.size() as
+		// ConcurrentLinkedQueue.size() is not O(1)
+		return !children.isEmpty();
     }
 
     /**
      * Return whether or not there is a task.
-     * 
+     *
      * @return boolean
      */
     boolean hasTaskInfo() {
         return taskInfo != null;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.internal.progress.JobTreeElement#isActive()
-     */
     @Override
 	boolean isActive() {
         return getJob().getState() != Job.NONE;
@@ -404,7 +354,7 @@ public class JobInfo extends JobTreeElement {
 
     /**
      * Return whether or not the receiver is blocked.
-     * 
+     *
      * @return boolean <code>true</code> if this is a currently
      * blocked job.
      */
@@ -414,28 +364,18 @@ public class JobInfo extends JobTreeElement {
 
     /**
      * Return whether or not the job was cancelled in the UI.
-     * 
+     *
      * @return boolean
      */
     public boolean isCanceled() {
         return canceled;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.internal.progress.JobTreeElement#isCancellable()
-     */
     @Override
 	public boolean isCancellable() {
         return super.isCancellable();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.internal.progress.JobTreeElement#isJobInfo()
-     */
     @Override
 	boolean isJobInfo() {
         return true;
@@ -443,7 +383,7 @@ public class JobInfo extends JobTreeElement {
 
     /**
      * Set the description of the blocking status.
-     * 
+     *
      * @param blockedStatus
      *            The IStatus that describes the blockage or <code>null</code>
      */
@@ -453,7 +393,7 @@ public class JobInfo extends JobTreeElement {
 
     /**
      * Set the GroupInfo to be the group.
-     * 
+     *
      * @param group
      */
     void setGroupInfo(GroupInfo group) {
@@ -462,7 +402,7 @@ public class JobInfo extends JobTreeElement {
 
     /**
      * Set the name of the taskInfo.
-     * 
+     *
      * @param name
      */
     void setTaskName(String name) {
@@ -472,7 +412,7 @@ public class JobInfo extends JobTreeElement {
     /**
      * Set the number of ticks this job represents. Default is indeterminate
      * (-1).
-     * 
+     *
      * @param ticks
      *            The ticks to set.
      */

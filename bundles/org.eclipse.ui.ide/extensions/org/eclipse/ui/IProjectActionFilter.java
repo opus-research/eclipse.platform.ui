@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,10 +13,10 @@ package org.eclipse.ui;
 
 /**
  * Describes the public attributes for a project and the acceptable values
- * each may have.  
+ * each may have.
  * <p>
- * A popup menu extension may use these constants to describe its object target.  
- * Each identifies an attribute name or possible value.  
+ * A popup menu extension may use these constants to describe its object target.
+ * Each identifies an attribute name or possible value.
  * <p>
  * Clients are not expected to implement this interface.
  * </p>

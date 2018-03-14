@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,17 +16,20 @@ import org.eclipse.swt.graphics.Image;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public class CLabelImageProperty extends WidgetImageValueProperty {
+	@Override
 	Image doGetImageValue(Object source) {
 		return ((CLabel) source).getImage();
 	}
 
+	@Override
 	void doSetImageValue(Object source, Image value) {
 		((CLabel) source).setImage(value);
 	}
 
+	@Override
 	public String toString() {
 		return "CLabel.image <Image>"; //$NON-NLS-1$
 	}

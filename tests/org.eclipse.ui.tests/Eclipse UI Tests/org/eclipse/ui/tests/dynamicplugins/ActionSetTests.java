@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2011 IBM Corporation and others.
+ * Copyright (c) 2004, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,7 +37,7 @@ public class ActionSetTests extends DynamicTestCase implements
         IRegistryChangeListener {
 
     /**
-     * 
+     *
      */
     private static final String ACTION_SET_ID = "org.eclipse.newActionSet1.newActionSet1";
     private static final String PART_ID = "org.eclipse.ui.tests.part1";
@@ -50,65 +50,58 @@ public class ActionSetTests extends DynamicTestCase implements
         WorkbenchWindow window = (WorkbenchWindow) openTestWindow();
         boolean [] found = new boolean[] {false};
         WWinPluginAction [] action = new WWinPluginAction[1];
-        
+
         assertNull(window.getActionBars().getMenuManager().findUsingPath("menu1"));
         assertNull(getActionSetRegistry().findActionSet(ACTION_SET_ID));
         findInPresentation(window, action, found);
         assertFalse("Action set found", found[0]);
         assertNull("Action found", action[0]);
-        
+
         action[0] = null;
         found[0] = false;
         getBundle();
-        
+
         assertNotNull(window.getActionBars().getMenuManager().findUsingPath("menu1"));
         assertNotNull(getActionSetRegistry().findActionSet(ACTION_SET_ID));
         findInPresentation(window, action, found);
         assertTrue("Action set not found", found[0]);
         assertNotNull("Action not found", action[0]);
-        
+
         ReferenceQueue queue = new ReferenceQueue();
         WeakReference ref = new WeakReference(action[0], queue);
-        
+
         action[0] = null;
         found[0] = false;
         removeBundle();
-        
+
         assertNull(window.getActionBars().getMenuManager().findUsingPath("menu1"));
         assertNull(getActionSetRegistry().findActionSet(ACTION_SET_ID));
         LeakTests.checkRef(queue, ref);
         findInPresentation(window, action, found);
         assertFalse("Action set found", found[0]);
         assertNull("Action found", action[0]);
-        
+
     }
 
     private void findInPresentation(WorkbenchWindow window,
 			WWinPluginAction[] action, boolean[] found) {
-		IRendererFactory factory = (IRendererFactory) window
-				.getService(IRendererFactory.class);
+		IRendererFactory factory = window.getService(IRendererFactory.class);
 		MWindow mwindow = window.getModel();
-		AbstractPartRenderer obj = factory.getRenderer(mwindow.getMainMenu(),
-				null);
+		AbstractPartRenderer obj = factory.getRenderer(mwindow.getMainMenu(), null);
 		if (!(obj instanceof MenuManagerRenderer)) {
 			return;
 		}
 
-		ContributionRecord[] records = ((MenuManagerRenderer) obj)
-				.getContributionRecords();
-		for (int i = 0; i < records.length; i++) {
-			ContributionRecord rec = records[i];
+		ContributionRecord[] records = ((MenuManagerRenderer) obj).getContributionRecords();
+		for (ContributionRecord rec : records) {
 			String id = rec.getMenuContribution().getElementId();
-			if (id != null
-					&& id.startsWith("org.eclipse.newActionSet1.newActionSet2")) {
+			if (id != null && id.startsWith("org.eclipse.newActionSet1.newActionSet2")) {
 				found[0] = true;
 				Collection<MMenuElement> elements = rec.getGeneratedElements();
 				for (MMenuElement element : elements) {
-					if ("org.eclipse.ui.tests.action1".equals(element
-							.getElementId())) {
+					if ("org.eclipse.ui.tests.action1".equals(element.getElementId())) {
 						// FIXME return the plugin action
-						action[0] = new WWinPluginAction(null, window,
-								element.getElementId(), IAction.AS_PUSH_BUTTON);
+						action[0] = new WWinPluginAction(null, window, element.getElementId(), IAction.AS_PUSH_BUTTON);
 					}
 				}
 			}
@@ -144,30 +137,18 @@ public class ActionSetTests extends DynamicTestCase implements
         assertEquals(0, getActionSetRegistry().getActionSetsFor(PART_ID).length);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionId()
-     */
-    protected String getExtensionId() {
+    @Override
+	protected String getExtensionId() {
         return "newActionSet1.testDynamicActionSetAddition";
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionPoint()
-     */
-    protected String getExtensionPoint() {
+    @Override
+	protected String getExtensionPoint() {
         return IWorkbenchRegistryConstants.PL_ACTION_SETS;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getInstallLocation()
-     */
-    protected String getInstallLocation() {
+    @Override
+	protected String getInstallLocation() {
         return "data/org.eclipse.newActionSet1";
     }
 }

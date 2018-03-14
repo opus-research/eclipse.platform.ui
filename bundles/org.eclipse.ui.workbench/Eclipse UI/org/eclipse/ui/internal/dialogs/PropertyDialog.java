@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@
 package org.eclipse.ui.internal.dialogs;
 
 import java.util.Iterator;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.viewers.ISelection;
@@ -22,7 +23,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 import org.eclipse.ui.internal.WorkbenchMessages;
-import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.model.IContributionService;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
@@ -39,7 +39,7 @@ public class PropertyDialog extends FilteredPreferenceDialog {
 
 	/**
 	 * Create a new property dialog.
-	 * 
+	 *
 	 * @param shell
 	 *            the parent shell
 	 * @param propertyPageId
@@ -93,7 +93,7 @@ public class PropertyDialog extends FilteredPreferenceDialog {
 
 	/**
 	 * Returns the name of the given element(s). Prints at most 3 names.
-	 * 
+	 *
 	 * @param element
 	 *            the element / IStructuredSelection
 	 * @return the name of the element
@@ -112,8 +112,7 @@ public class PropertyDialog extends FilteredPreferenceDialog {
 				sb.append(" ..."); //$NON-NLS-1$
 				break;
 			}
-			IWorkbenchAdapter adapter = (IWorkbenchAdapter) Util.getAdapter(element,
-					IWorkbenchAdapter.class);
+			IWorkbenchAdapter adapter = Adapters.adapt(element, IWorkbenchAdapter.class);
 			if (adapter != null) {
 				if (sb.length() > 0)
 					sb.append(", "); //$NON-NLS-1$
@@ -125,7 +124,7 @@ public class PropertyDialog extends FilteredPreferenceDialog {
 
 	/**
 	 * Create an instance of the receiver.
-	 * 
+	 *
 	 * @param parentShell
 	 * @param mng
 	 * @param selection
@@ -138,7 +137,7 @@ public class PropertyDialog extends FilteredPreferenceDialog {
 
 	/**
 	 * Returns selection in the "Properties" action context.
-	 * 
+	 *
 	 * @return the selection
 	 */
 	public ISelection getSelection() {
@@ -147,7 +146,7 @@ public class PropertyDialog extends FilteredPreferenceDialog {
 
 	/**
 	 * Sets the selection that will be used to determine target object.
-	 * 
+	 *
 	 * @param newSelection
 	 *            the new selection
 	 */
@@ -173,9 +172,9 @@ public class PropertyDialog extends FilteredPreferenceDialog {
 
 	/**
 	 * Return the contributionType (used by the IContributionService).
-	 * 
+	 *
 	 * Override this with a more specific contribution type as required.
-	 * 
+	 *
 	 * @return a string, the contributionType
 	 */
 	@Override
@@ -183,6 +182,6 @@ public class PropertyDialog extends FilteredPreferenceDialog {
 		return IContributionService.TYPE_PROPERTY;
 	}
 
-	
-	
+
+
 }
