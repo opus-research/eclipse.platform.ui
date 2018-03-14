@@ -56,7 +56,7 @@ public final class ResourceUtil {
 		}
         // Note: do not treat IFileEditorInput as a special case.  Use the adapter mechanism instead.
         // See Bug 87288 [IDE] [EditorMgmt] Should avoid explicit checks for [I]FileEditorInput
-		return Adapters.adapt(editorInput, IFile.class);
+		return Adapters.getAdapter(editorInput, IFile.class, true);
     }
 
     /**
@@ -73,7 +73,7 @@ public final class ResourceUtil {
 		}
         // Note: do not treat IFileEditorInput as a special case.  Use the adapter mechanism instead.
         // See Bug 87288 [IDE] [EditorMgmt] Should avoid explicit checks for [I]FileEditorInput
-		IResource resource = Adapters.adapt(editorInput, IResource.class);
+		IResource resource = Adapters.getAdapter(editorInput, IResource.class, true);
 		if (resource != null) {
 			return resource;
 		}
@@ -238,11 +238,11 @@ public final class ResourceUtil {
 
 
 	/**
-	 * See Javadoc of {@link Adapters#adapt(Object, Class, boolean)}.
-	 *
+	 * See Javadoc of {@link Adapters#getAdapter(Object, Class, boolean)}.
+	 * 
 	 * @since 3.2
 	 *
-	 * @deprecated Use {@link Adapters#adapt(Object, Class, boolean)}
+	 * @deprecated Use {@link Adapters#getAdapter(Object, Class, boolean)}
 	 *             instead
 	 */
 	@Deprecated

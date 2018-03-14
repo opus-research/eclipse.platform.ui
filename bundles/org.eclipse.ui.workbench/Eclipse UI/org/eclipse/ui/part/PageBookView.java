@@ -569,7 +569,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	public <T> T getAdapter(Class<T> key) {
 		// delegate to the current page, if supported
 		IPage page = getCurrentPage();
-		T adapter = Adapters.adapt(page, key);
+		T adapter = Adapters.getAdapter(page, key, true);
 		if (adapter != null) {
 			return adapter;
 		}

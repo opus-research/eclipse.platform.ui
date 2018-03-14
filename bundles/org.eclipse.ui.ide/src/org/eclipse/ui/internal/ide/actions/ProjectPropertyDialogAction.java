@@ -110,7 +110,7 @@ public class ProjectPropertyDialogAction extends PartEventAction implements
 				selection = ((IStructuredSelection) sel).getFirstElement();
 			}
         }
-		IResource resource = Adapters.adapt(selection, IResource.class);
+		IResource resource = Adapters.getAdapter(selection, IResource.class, true);
         if (resource == null) {
 			return null;
 		}

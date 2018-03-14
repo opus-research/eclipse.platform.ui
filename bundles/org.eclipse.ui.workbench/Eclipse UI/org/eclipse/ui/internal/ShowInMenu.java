@@ -296,7 +296,7 @@ public class ShowInMenu extends ContributionItem implements
 				}
 			}
 		}
-		IShowInTargetList targetList = Adapters.adapt(sourcePart, IShowInTargetList.class);
+		IShowInTargetList targetList = Adapters.getAdapter(sourcePart, IShowInTargetList.class, true);
 		if (targetList != null) {
 			String[] partIds = targetList.getShowInTargetIds();
 			if (partIds != null) {
@@ -345,7 +345,7 @@ public class ShowInMenu extends ContributionItem implements
 	 */
 	protected ShowInContext getContext(IWorkbenchPart sourcePart) {
 		if (sourcePart != null) {
-			IShowInSource source = Adapters.adapt(sourcePart, IShowInSource.class);
+			IShowInSource source = Adapters.getAdapter(sourcePart, IShowInSource.class, true);
 			if (source != null) {
 				ShowInContext context = source.getShowInContext();
 				if (context != null) {
