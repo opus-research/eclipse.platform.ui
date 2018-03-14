@@ -12,6 +12,7 @@ package org.eclipse.ui.internal.about;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.signedcontent.SignedContent;
 import org.eclipse.osgi.signedcontent.SignedContentFactory;
@@ -51,9 +52,9 @@ public class AboutBundleData extends AboutData {
     }
 
     /**
-	 * @return a string representation of the argument state. Does not return
-	 *         null.
-	 */
+     * Return a string representation of the arugment state. Does not return
+     * null.
+     */
     public String getStateName() {
         switch (getState()) {
         case Bundle.INSTALLED:
@@ -82,7 +83,7 @@ public class AboutBundleData extends AboutData {
      * @return the string or null if the string cannot be found
      */
     private static String getResourceString(Bundle bundle, String headerName) {
-		String value = bundle.getHeaders().get(headerName);
+        String value = (String) bundle.getHeaders().get(headerName);
         return value == null ? null : Platform.getResourceString(bundle, value);
     }
     
@@ -97,7 +98,7 @@ public class AboutBundleData extends AboutData {
 
 		BundleContext bundleContext = WorkbenchPlugin.getDefault()
 				.getBundleContext();
-		ServiceReference<?> factoryRef = bundleContext
+		ServiceReference factoryRef = bundleContext
 				.getServiceReference(SignedContentFactory.class.getName());
 		if (factoryRef == null)
 			throw new IllegalStateException();
@@ -118,7 +119,7 @@ public class AboutBundleData extends AboutData {
 	}
 
 	/**
-	 * @return current bundle
+	 * @return
 	 */
 	public Bundle getBundle() {
 		return bundle;
