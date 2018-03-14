@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,11 +12,7 @@ package org.eclipse.ui.internal.forms.widgets;
 
 import java.util.Hashtable;
 
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.graphics.*;
 
 /**
  * @version 1.0
@@ -25,11 +21,11 @@ import org.eclipse.swt.graphics.Rectangle;
 public class ImageSegment extends ObjectSegment {
 	public static final String SEL_IMAGE_PREFIX = "isel."; //$NON-NLS-1$
 
-	public Image getImage(Hashtable<String, Object> objectTable) {
+	public Image getImage(Hashtable objectTable) {
 		return getImage(getObjectId(), objectTable);
 	}
 
-	private Image getImage(String key, Hashtable<String, Object> objectTable) {
+	private Image getImage(String key, Hashtable objectTable) {
 		if (key == null)
 			return null;
 		Object obj = objectTable.get(key);
@@ -40,7 +36,7 @@ public class ImageSegment extends ObjectSegment {
 		return null;
 	}
 
-	private Image getSelectedImage(Hashtable<String, Object> objectTable, SelectionData selData) {
+	private Image getSelectedImage(Hashtable objectTable, SelectionData selData) {
 		String key = SEL_IMAGE_PREFIX + getObjectId();
 		Image image = getImage(key, objectTable);
 		if (image==null) {
@@ -58,8 +54,7 @@ public class ImageSegment extends ObjectSegment {
 	}
 */
 
-	@Override
-	public void paint(GC gc, boolean hover, Hashtable<String, Object> resourceTable, boolean selected, SelectionData selData, Rectangle repaintRegion) {
+	public void paint(GC gc, boolean hover, Hashtable resourceTable, boolean selected, SelectionData selData, Rectangle repaintRegion) {
 		Image image = getImage(resourceTable);
 		int iwidth = 0;
 		int iheight = 0;
@@ -131,8 +126,7 @@ public class ImageSegment extends ObjectSegment {
 		gc.drawImage(image, ix, iy);
 	}
 
-	@Override
-	protected Point getObjectSize(Hashtable<String, Object> resourceTable, int wHint) {
+	protected Point getObjectSize(Hashtable resourceTable, int wHint) {
 		Image image = getImage(resourceTable);
 		if (image==null)
 			return new Point(0, 0);
