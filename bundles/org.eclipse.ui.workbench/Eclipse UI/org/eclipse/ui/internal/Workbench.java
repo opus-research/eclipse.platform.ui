@@ -630,11 +630,14 @@ public final class Workbench extends EventManager implements IWorkbench,
 					IEclipseContext context = e4Workbench.getContext();
 
 					WorkbenchMigrationProcessor migrationProcessor = null;
-					try {
-						migrationProcessor = ContextInjectionFactory.make(
-							WorkbenchMigrationProcessor.class, context);
-					} catch (@SuppressWarnings("restriction") InjectionException e) {
-						WorkbenchPlugin.log(e);
+					// migration is disabled by default
+					if (Boolean.parseBoolean(System.getProperty("e4.impExpPerspectiveEnabled"))) { //$NON-NLS-1$
+						try {
+							migrationProcessor = ContextInjectionFactory.make(
+								WorkbenchMigrationProcessor.class, context);
+						} catch (@SuppressWarnings("restriction") InjectionException e) {
+							WorkbenchPlugin.log(e);
+						}
 					}
 
 					if (migrationProcessor != null && isFirstE4WorkbenchRun(appModel)
