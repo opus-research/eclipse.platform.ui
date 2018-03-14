@@ -60,17 +60,20 @@ public class E4Testable extends TestableObject {
 		if (getTestHarness() != null) {
 			// don't use a job, since tests often wait for all jobs to complete
 			// before proceeding
-			Runnable runnable = () -> {
-				// Some tests (notably the startup performance tests) do not
-				// want to wait for early startup.
-				// Allow this to be disabled by specifying the system
-				// property: org.eclipse.ui.testsWaitForEarlyStartup=false
-				// For details, see bug 94129 [Workbench] Performance test
-				// regression caused by workbench harness change
-				if (!"false".equalsIgnoreCase(System.getProperty("org.eclipse.ui.testsWaitForEarlyStartup"))) { //$NON-NLS-1$ //$NON-NLS-2$
-					waitForEarlyStartup();
+			Runnable runnable = new Runnable() {
+				@Override
+				public void run() {
+					// Some tests (notably the startup performance tests) do not
+					// want to wait for early startup.
+					// Allow this to be disabled by specifying the system
+					// property: org.eclipse.ui.testsWaitForEarlyStartup=false
+					// For details, see bug 94129 [Workbench] Performance test
+					// regression caused by workbench harness change
+					if (!"false".equalsIgnoreCase(System.getProperty("org.eclipse.ui.testsWaitForEarlyStartup"))) { //$NON-NLS-1$ //$NON-NLS-2$
+						waitForEarlyStartup();
+					}
+					getTestHarness().runTests();
 				}
-				getTestHarness().runTests();
 			};
 			new Thread(runnable, "WorkbenchTestable").start(); //$NON-NLS-1$
 		}
@@ -123,7 +126,12 @@ public class E4Testable extends TestableObject {
 	public void testingFinished() {
 		// force events to be processed, and ensure the close is done in the UI
 		// thread
-		display.syncExec(() -> Assert.isTrue(workbench.close()));
+		display.syncExec(new Runnable() {
+			@Override
+			public void run() {
+				Assert.isTrue(workbench.close());
+			}
+		});
 		ErrorDialog.AUTOMATED_MODE = oldAutomatedMode;
 		SafeRunnable.setIgnoreErrors(oldIgnoreErrors);
 	}
