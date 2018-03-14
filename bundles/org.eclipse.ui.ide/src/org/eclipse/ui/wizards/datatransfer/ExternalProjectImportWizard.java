@@ -81,8 +81,7 @@ public class ExternalProjectImportWizard extends Wizard implements
     /* (non-Javadoc)
      * Method declared on IWizard.
      */
-    @Override
-	public void addPages() {
+    public void addPages() {
         super.addPages();
 		mainPage = new WizardProjectsImportPage(
 				"wizardExternalProjectsPage", initialPath, currentSelection); //$NON-NLS-1$
@@ -92,8 +91,7 @@ public class ExternalProjectImportWizard extends Wizard implements
     /* (non-Javadoc)
      * Method declared on IWorkbenchWizard.
      */
-    @Override
-	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
+    public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
         setWindowTitle(DataTransferMessages.DataTransfer_importTitle);
         setDefaultPageImageDescriptor(
 				IDEWorkbenchPlugin.getIDEImageDescriptor("wizban/importproj_wiz.png")); //$NON-NLS-1$
@@ -103,8 +101,7 @@ public class ExternalProjectImportWizard extends Wizard implements
     /* (non-Javadoc)
      * Method declared on IWizard.
      */
-    @Override
-	public boolean performCancel() {
+    public boolean performCancel() {
     	mainPage.performCancel();
         return true;
     }
@@ -112,8 +109,7 @@ public class ExternalProjectImportWizard extends Wizard implements
     /* (non-Javadoc)
      * Method declared on IWizard.
      */
-    @Override
-	public boolean performFinish() {
+    public boolean performFinish() {
         return mainPage.createProjects();
     }
 

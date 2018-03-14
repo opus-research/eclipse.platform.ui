@@ -41,7 +41,6 @@ public class UIEventPublisher extends EContentAdapter {
 		this.context = e4Context;
 	}
 
-	@Override
 	public void notifyChanged(Notification notification) {
 		super.notifyChanged(notification);
 
@@ -251,17 +250,14 @@ public class UIEventPublisher extends EContentAdapter {
 
 	private Map.Entry<String, Object> createMapEntry(final String key, final Object value) {
 		return new Map.Entry<String, Object>() {
-			@Override
 			public String getKey() {
 				return key;
 			}
 
-			@Override
 			public Object getValue() {
 				return value;
 			}
 
-			@Override
 			public Object setValue(Object value) {
 				throw new UnsupportedOperationException();
 			}

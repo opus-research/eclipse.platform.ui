@@ -53,7 +53,6 @@ import org.eclipse.ui.internal.help.WorkbenchHelpSystem;
  * @noinstantiate This class is not intended to be instantiated by clients.
  * @noextend This class is not intended to be subclassed by clients.
  */
-@Deprecated
 public class WorkbenchHelp {
 
     /**
@@ -173,8 +172,7 @@ public class WorkbenchHelp {
      *   <code>null</code> if no contexts have been set.
      * @deprecated as context computers are no longer supported
      */
-    @Deprecated
-	public static Object getHelp(Control control) {
+    public static Object getHelp(Control control) {
         return control.getData(WorkbenchHelpSystem.HELP_KEY);
     }
 
@@ -192,8 +190,7 @@ public class WorkbenchHelp {
      *   <code>null</code> if no contexts have been set.
      * @deprecated as context computers are no longer supported
      */
-    @Deprecated
-	public static Object getHelp(Menu menu) {
+    public static Object getHelp(Menu menu) {
         return menu.getData(WorkbenchHelpSystem.HELP_KEY);
     }
 
@@ -211,8 +208,7 @@ public class WorkbenchHelp {
      *   <code>null</code> if no contexts have been set.
      * @deprecated as context computers are no longer supported
      */
-    @Deprecated
-	public static Object getHelp(MenuItem menuItem) {
+    public static Object getHelp(MenuItem menuItem) {
         return menuItem.getData(WorkbenchHelpSystem.HELP_KEY);
     }
 
@@ -224,8 +220,7 @@ public class WorkbenchHelp {
      * {@link org.eclipse.help.HelpSystem HelpSystem} instead of the IHelp methods
      * on the object returned by this method.
      */
-    @Deprecated
-	public static IHelp getHelpSupport() {
+    public static IHelp getHelpSupport() {
     	return WorkbenchHelpSystem.getInstance().getHelpSupport();
     }
 
@@ -256,8 +251,7 @@ public class WorkbenchHelp {
      *   <code>IContext</code>)
      * @deprecated use setHelp with a single context id parameter
      */
-    @Deprecated
-	public static void setHelp(IAction action, final Object[] contexts) {
+    public static void setHelp(IAction action, final Object[] contexts) {
     	WorkbenchHelpSystem.getInstance().setHelp(action, contexts);
     }
 
@@ -275,8 +269,7 @@ public class WorkbenchHelp {
      * @deprecated context computers are no longer supported, clients should implement
      *  their own help listener
      */
-    @Deprecated
-	public static void setHelp(IAction action, final IContextComputer computer) {
+    public static void setHelp(IAction action, final IContextComputer computer) {
     	WorkbenchHelpSystem.getInstance().setHelp(action, computer);
     }
 
@@ -294,8 +287,7 @@ public class WorkbenchHelp {
      *   <code>IContext</code>)
      * @deprecated use setHelp with single context id parameter
      */
-    @Deprecated
-	public static void setHelp(Control control, Object[] contexts) {
+    public static void setHelp(Control control, Object[] contexts) {
     	WorkbenchHelpSystem.getInstance().setHelp(control, contexts);
     }
 
@@ -313,8 +305,7 @@ public class WorkbenchHelp {
      * @deprecated context computers are no longer supported, clients should implement
      *  their own help listener
      */
-    @Deprecated
-	public static void setHelp(Control control, IContextComputer computer) {
+    public static void setHelp(Control control, IContextComputer computer) {
     	WorkbenchHelpSystem.getInstance().setHelp(control, computer);
     }
 
@@ -332,8 +323,7 @@ public class WorkbenchHelp {
      *   <code>IContext</code>)
      * @deprecated use setHelp with single context id parameter
      */
-    @Deprecated
-	public static void setHelp(Menu menu, Object[] contexts) {
+    public static void setHelp(Menu menu, Object[] contexts) {
     	WorkbenchHelpSystem.getInstance().setHelp(menu, contexts);
     }
 
@@ -351,8 +341,7 @@ public class WorkbenchHelp {
      * @deprecated context computers are no longer supported, clients should implement
      *  their own help listener
      */
-    @Deprecated
-	public static void setHelp(Menu menu, IContextComputer computer) {
+    public static void setHelp(Menu menu, IContextComputer computer) {
     	WorkbenchHelpSystem.getInstance().setHelp(menu, computer);
     }
 
@@ -370,8 +359,7 @@ public class WorkbenchHelp {
      *   <code>IContext</code>)
      * @deprecated use setHelp with single context id parameter
      */
-    @Deprecated
-	public static void setHelp(MenuItem item, Object[] contexts) {
+    public static void setHelp(MenuItem item, Object[] contexts) {
     	WorkbenchHelpSystem.getInstance().setHelp(item, contexts);
     }
 
@@ -389,8 +377,7 @@ public class WorkbenchHelp {
      * @deprecated context computers are no longer supported, clients should implement
      *  their own help listener
      */
-    @Deprecated
-	public static void setHelp(MenuItem item, IContextComputer computer) {
+    public static void setHelp(MenuItem item, IContextComputer computer) {
     	WorkbenchHelpSystem.getInstance().setHelp(item, computer);
     }
 

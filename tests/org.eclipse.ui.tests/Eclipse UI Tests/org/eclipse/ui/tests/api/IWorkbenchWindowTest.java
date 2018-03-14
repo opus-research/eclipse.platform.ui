@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,8 +25,7 @@ public class IWorkbenchWindowTest extends UITestCase {
         super(testName);
     }
 
-    @Override
-	protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         super.doSetUp();
         fWin = openTestWindow();
     }
@@ -42,7 +41,7 @@ public class IWorkbenchWindowTest extends UITestCase {
         /*
          * Commented out because until test case can be updated to work
          * with new window/page/perspective implementation
-         *
+         * 
          IWorkbenchPage page1, page2;
          page1 = openTestPage(fWin);
          assertEquals(fWin.getActivePage(), page1);
@@ -66,9 +65,9 @@ public class IWorkbenchWindowTest extends UITestCase {
         openTestPage(fWin, 5);
         IWorkbenchPage[] pages = fWin.getPages();
 
-        for (IWorkbenchPage page : pages) {
-            fWin.setActivePage(page);
-            assertEquals(page, fWin.getActivePage());
+        for (int i = 0; i < pages.length; i++) {
+            fWin.setActivePage(pages[i]);
+            assertEquals(pages[i], fWin.getActivePage());
         }
 
         fWin.setActivePage(null);
@@ -79,7 +78,7 @@ public class IWorkbenchWindowTest extends UITestCase {
         /*
          * Commented out because until test case can be updated to work
          * with new window/page/perspective implementation
-         *
+         * 
          int totalBefore;
          IWorkbenchPage[] pages, domainPages;
 
@@ -114,7 +113,7 @@ public class IWorkbenchWindowTest extends UITestCase {
         /*
          * Commented out because until test case can be updated to work
          * with new window/page/perspective implementation
-         *
+         * 
          IWorkbenchPage page = null;
          try {
          page = fWin.openPage(ResourcesPlugin.getWorkspace());
@@ -134,7 +133,7 @@ public class IWorkbenchWindowTest extends UITestCase {
         /*
          * Commented out because until test case can be updated to work
          * with new window/page/perspective implementation
-         *
+         * 
          IWorkbenchPage page = null;
          try {
          page = fWin.openPage(EmptyPerspective.PERSP_ID, ResourcesPlugin.getWorkspace());
@@ -163,16 +162,14 @@ public class IWorkbenchWindowTest extends UITestCase {
         String[] ids = { IWorkbenchActionConstants.M_FILE,
                 IWorkbenchActionConstants.M_WINDOW, };
 
-        for (String id : ids) {
-			assertEquals(fWin.isApplicationMenu(id), true);
-		}
+        for (int i = 0; i < ids.length; i++)
+            assertEquals(fWin.isApplicationMenu(ids[i]), true);
 
         ids = new String[] { IWorkbenchActionConstants.M_EDIT,
                 IWorkbenchActionConstants.M_HELP,
                 IWorkbenchActionConstants.M_LAUNCH };
 
-        for (String id : ids) {
-			assertEquals(fWin.isApplicationMenu(id), false);
-		}
+        for (int i = 0; i < ids.length; i++)
+            assertEquals(fWin.isApplicationMenu(ids[i]), false);
     }
 }

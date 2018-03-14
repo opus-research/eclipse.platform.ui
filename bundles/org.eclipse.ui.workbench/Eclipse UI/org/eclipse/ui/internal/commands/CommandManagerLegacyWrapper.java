@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,6 @@ import org.eclipse.core.commands.CommandManager;
 import org.eclipse.core.commands.contexts.ContextManager;
 import org.eclipse.core.commands.contexts.ContextManagerEvent;
 import org.eclipse.core.commands.contexts.IContextManagerListener;
-import org.eclipse.e4.core.commands.internal.HandlerServiceImpl;
 import org.eclipse.jface.bindings.Binding;
 import org.eclipse.jface.bindings.BindingManager;
 import org.eclipse.jface.bindings.BindingManagerEvent;
@@ -30,12 +29,14 @@ import org.eclipse.jface.bindings.IBindingManagerListener;
 import org.eclipse.jface.bindings.Scheme;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.bindings.keys.ParseException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.CommandManagerEvent;
 import org.eclipse.ui.commands.ICategory;
 import org.eclipse.ui.commands.ICommand;
 import org.eclipse.ui.commands.ICommandManager;
 import org.eclipse.ui.commands.ICommandManagerListener;
 import org.eclipse.ui.commands.IKeyConfiguration;
+import org.eclipse.ui.internal.MakeHandlersGo;
 import org.eclipse.ui.internal.handlers.LegacyHandlerWrapper;
 import org.eclipse.ui.internal.keys.SchemeLegacyWrapper;
 import org.eclipse.ui.internal.util.Util;
@@ -138,7 +139,6 @@ public final class CommandManagerLegacyWrapper implements ICommandManager,
 		this.contextManager = contextManager;
 	}
 
-	@Override
 	public final void addCommandManagerListener(
 			final ICommandManagerListener commandManagerListener) {
 		if (commandManagerListener == null) {
@@ -162,7 +162,6 @@ public final class CommandManagerLegacyWrapper implements ICommandManager,
 	 * 
 	 * @see org.eclipse.jface.bindings.IBindingManagerListener#bindingManagerChanged(org.eclipse.jface.bindings.BindingManagerEvent)
 	 */
-	@Override
 	public final void bindingManagerChanged(final BindingManagerEvent event) {
 		final boolean schemeDefinitionsChanged = event.getScheme() != null;
 		final Set previousSchemes;
@@ -197,7 +196,6 @@ public final class CommandManagerLegacyWrapper implements ICommandManager,
 	 * 
 	 * @see org.eclipse.commands.ICommandManagerListener#commandManagerChanged(org.eclipse.commands.CommandManagerEvent)
 	 */
-	@Override
 	public final void commandManagerChanged(
 			final org.eclipse.core.commands.CommandManagerEvent event) {
 		// Figure out the set of previous category identifiers.
@@ -237,7 +235,6 @@ public final class CommandManagerLegacyWrapper implements ICommandManager,
 				previousCategoryIds, previousCommandIds, null));
 	}
 
-	@Override
 	public final void contextManagerChanged(final ContextManagerEvent event) {
 		fireCommandManagerChanged(new CommandManagerEvent(this, event
 				.isActiveContextsChanged(), false, false, false, false, false,
@@ -257,12 +254,10 @@ public final class CommandManagerLegacyWrapper implements ICommandManager,
 		}
 	}
 
-	@Override
 	public Set getActiveContextIds() {
 		return contextManager.getActiveContextIds();
 	}
 
-	@Override
 	public String getActiveKeyConfigurationId() {
 		final Scheme scheme = bindingManager.getActiveScheme();
 		if (scheme != null) {
@@ -276,28 +271,24 @@ public final class CommandManagerLegacyWrapper implements ICommandManager,
 		return Util.ZERO_LENGTH_STRING;
 	}
 
-	@Override
 	public String getActiveLocale() {
 		return bindingManager.getLocale();
 	}
 
-	@Override
 	public String getActivePlatform() {
 		return bindingManager.getPlatform();
 	}
 
-	@Override
 	public ICategory getCategory(String categoryId) {
 		// TODO Provide access to the categories.
 		// return new CategoryWrapper(commandManager.getCategory(categoryId));
 		return null;
 	}
 
-	@Override
 	public ICommand getCommand(String commandId) {
 		final Command command = commandManager.getCommand(commandId);
 		if (!command.isDefined()) {
-			command.setHandler(HandlerServiceImpl.getHandler(commandId));
+			command.setHandler(new MakeHandlersGo(PlatformUI.getWorkbench(), commandId));
 		}
 		return new CommandLegacyWrapper(command, bindingManager);
 	}
@@ -307,17 +298,14 @@ public final class CommandManagerLegacyWrapper implements ICommandManager,
 	 * 
 	 * @see org.eclipse.ui.commands.ICommandManager#getDefinedCategoryIds()
 	 */
-	@Override
 	public Set getDefinedCategoryIds() {
 		return commandManager.getDefinedCategoryIds();
 	}
 
-	@Override
 	public Set getDefinedCommandIds() {
 		return commandManager.getDefinedCommandIds();
 	}
 
-	@Override
 	public Set getDefinedKeyConfigurationIds() {
 		final Set definedIds = new HashSet();
 		final Scheme[] schemes = bindingManager.getDefinedSchemes();
@@ -327,13 +315,11 @@ public final class CommandManagerLegacyWrapper implements ICommandManager,
 		return definedIds;
 	}
 
-	@Override
 	public IKeyConfiguration getKeyConfiguration(String keyConfigurationId) {
 		final Scheme scheme = bindingManager.getScheme(keyConfigurationId);
 		return new SchemeLegacyWrapper(scheme, bindingManager);
 	}
 
-	@Override
 	public Map getPartialMatches(KeySequence keySequence) {
 		try {
 			final org.eclipse.jface.bindings.keys.KeySequence sequence = org.eclipse.jface.bindings.keys.KeySequence
@@ -360,7 +346,6 @@ public final class CommandManagerLegacyWrapper implements ICommandManager,
 		}
 	}
 
-	@Override
 	public String getPerfectMatch(KeySequence keySequence) {
 		try {
 			final org.eclipse.jface.bindings.keys.KeySequence sequence = org.eclipse.jface.bindings.keys.KeySequence
@@ -377,7 +362,6 @@ public final class CommandManagerLegacyWrapper implements ICommandManager,
 		}
 	}
 
-	@Override
 	public boolean isPartialMatch(KeySequence keySequence) {
 		try {
 			final org.eclipse.jface.bindings.keys.KeySequence sequence = org.eclipse.jface.bindings.keys.KeySequence
@@ -388,7 +372,6 @@ public final class CommandManagerLegacyWrapper implements ICommandManager,
 		}
 	}
 
-	@Override
 	public boolean isPerfectMatch(KeySequence keySequence) {
 		try {
 			final org.eclipse.jface.bindings.keys.KeySequence sequence = org.eclipse.jface.bindings.keys.KeySequence
@@ -399,7 +382,6 @@ public final class CommandManagerLegacyWrapper implements ICommandManager,
 		}
 	}
 
-	@Override
 	public void removeCommandManagerListener(
 			ICommandManagerListener commandManagerListener) {
 		if (commandManagerListener == null) {

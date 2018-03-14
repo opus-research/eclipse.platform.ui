@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 433608
  *******************************************************************************/
 
 package org.eclipse.jface.tests.wizards;
@@ -22,18 +21,18 @@ public class TheTestWizard extends Wizard {
 	public final String page1Name = "PAGE1";
 	public final String page2Name = "PAGE2";
 	public final String page3Name = "PAGE3";
-	private boolean throwExceptionOnDispose;
+	private boolean throwExceptionOnDispose; 
 
 	public TheTestWizard() {
 		super();
 		setNeedsProgressMonitor(true);
 	}
-
-
+	
+	
 	/**
 	 * Adding the page to the wizard.
 	 */
-	@Override
+
 	public void addPages() {
 		page1 = new TheTestWizardPage(page1Name);
 		addPage(page1);
@@ -45,26 +44,26 @@ public class TheTestWizard extends Wizard {
 
 	/**
 	 * This method is called when 'Finish' button is pressed in
-	 * the wizard.
+	 * the wizard. 
 	 */
-	@Override
 	public boolean performFinish() {
 		WizardTest.DID_FINISH = true;
 		return true;
 	}
-
+	
 	/**
 	 * @param throwExceptionOnDispose The throwExceptionOnDispose to set.
 	 */
 	public void setThrowExceptionOnDispose(boolean throwExceptionOnDispose) {
 		this.throwExceptionOnDispose = throwExceptionOnDispose;
 	}
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.Wizard#dispose()
+	 */
 	public void dispose() {
 		super.dispose();
-		if(throwExceptionOnDispose) {
+		if(throwExceptionOnDispose)
 			throw new NullPointerException();
-		}
 	}
 }

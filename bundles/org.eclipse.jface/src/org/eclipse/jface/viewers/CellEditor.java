@@ -331,7 +331,6 @@ public abstract class CellEditor {
 		for (int i = 0; i < array.length; i++) {
 			final ICellEditorListener l = (ICellEditorListener) array[i];
 			SafeRunnable.run(new SafeRunnable() {
-				@Override
 				public void run() {
 					l.applyEditorValue();
 				}
@@ -350,7 +349,6 @@ public abstract class CellEditor {
 		for (int i = 0; i < array.length; i++) {
 			final ICellEditorListener l = (ICellEditorListener) array[i];
 			SafeRunnable.run(new SafeRunnable() {
-				@Override
 				public void run() {
 					l.cancelEditor();
 				}
@@ -373,7 +371,6 @@ public abstract class CellEditor {
 		for (int i = 0; i < array.length; i++) {
 			final ICellEditorListener l = (ICellEditorListener) array[i];
 			SafeRunnable.run(new SafeRunnable() {
-				@Override
 				public void run() {
 					l.editorValueChanged(oldValidState, newValidState);
 				}
@@ -392,7 +389,6 @@ public abstract class CellEditor {
 		for (int i = 0; i < array.length; i++) {
 			final IPropertyChangeListener l = (IPropertyChangeListener) array[i];
 			SafeRunnable.run(new SafeRunnable() {
-				@Override
 				public void run() {
 					l.propertyChange(new PropertyChangeEvent(this, actionId,
 							null, null));

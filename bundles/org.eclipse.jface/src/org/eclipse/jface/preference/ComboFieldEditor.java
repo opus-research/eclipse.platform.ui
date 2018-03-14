@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -80,7 +80,9 @@ public class ComboFieldEditor extends FieldEditor {
 		return true;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.FieldEditor#adjustForNumColumns(int)
+	 */
 	protected void adjustForNumColumns(int numColumns) {
 		if (numColumns > 1) {
 			Control control = getLabelControl();
@@ -99,7 +101,9 @@ public class ComboFieldEditor extends FieldEditor {
 		}
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.FieldEditor#doFillIntoGrid(org.eclipse.swt.widgets.Composite, int)
+	 */
 	protected void doFillIntoGrid(Composite parent, int numColumns) {
 		int comboC = 1;
 		if (numColumns > 1) {
@@ -117,17 +121,23 @@ public class ComboFieldEditor extends FieldEditor {
 		control.setFont(parent.getFont());
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.FieldEditor#doLoad()
+	 */
 	protected void doLoad() {
 		updateComboForValue(getPreferenceStore().getString(getPreferenceName()));
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.FieldEditor#doLoadDefault()
+	 */
 	protected void doLoadDefault() {
 		updateComboForValue(getPreferenceStore().getDefaultString(getPreferenceName()));
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.FieldEditor#doStore()
+	 */
 	protected void doStore() {
 		if (fValue == null) {
 			getPreferenceStore().setToDefault(getPreferenceName());
@@ -136,7 +146,9 @@ public class ComboFieldEditor extends FieldEditor {
 		getPreferenceStore().setValue(getPreferenceName(), fValue);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.FieldEditor#getNumberOfControls()
+	 */
 	public int getNumberOfControls() {
 		return 2;
 	}
@@ -153,7 +165,6 @@ public class ComboFieldEditor extends FieldEditor {
 			}
 			
 			fCombo.addSelectionListener(new SelectionAdapter() {
-				@Override
 				public void widgetSelected(SelectionEvent evt) {
 					String oldValue = fValue;
 					String name = fCombo.getText();
@@ -196,7 +207,12 @@ public class ComboFieldEditor extends FieldEditor {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.FieldEditor#setEnabled(boolean,
+	 *      org.eclipse.swt.widgets.Composite)
+	 */
 	public void setEnabled(boolean enabled, Composite parent) {
 		super.setEnabled(enabled, parent);
 		getComboBoxControl(parent).setEnabled(enabled);

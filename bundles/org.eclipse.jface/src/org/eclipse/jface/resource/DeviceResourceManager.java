@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,8 +33,10 @@ public final class DeviceResourceManager extends AbstractResourceManager {
     private Device device;
     private Image missingImage;
     
-    @Override
-	public Device getDevice() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.resource.ResourceManager#getDevice()
+     */
+    public Device getDevice() {
         return device;
     }
     
@@ -47,26 +49,34 @@ public final class DeviceResourceManager extends AbstractResourceManager {
         this.device = device;
     }
 
-    @Override
-	protected Object allocate(DeviceResourceDescriptor descriptor) throws DeviceResourceException {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.resource.AbstractResourceManager#allocate(org.eclipse.jface.resource.DeviceResourceDescriptor)
+     */
+    protected Object allocate(DeviceResourceDescriptor descriptor) throws DeviceResourceException {
         return descriptor.createResource(device);
     }
 
-    @Override
-	protected void deallocate(Object resource, DeviceResourceDescriptor descriptor) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.resource.AbstractResourceManager#deallocate(java.lang.Object, org.eclipse.jface.resource.DeviceResourceDescriptor)
+     */
+    protected void deallocate(Object resource, DeviceResourceDescriptor descriptor) {
         descriptor.destroyResource(resource);
     }
     
-    @Override
-	protected Image getDefaultImage() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.resource.ResourceManager#getDefaultImage()
+     */
+    protected Image getDefaultImage() {
         if (missingImage == null) {
             missingImage = ImageDescriptor.getMissingImageDescriptor().createImage();
         }
         return missingImage;
     }
     
-    @Override
-	public void dispose() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.resource.AbstractResourceManager#dispose()
+     */
+    public void dispose() {
         super.dispose();
         if (missingImage != null) {
             missingImage.dispose();

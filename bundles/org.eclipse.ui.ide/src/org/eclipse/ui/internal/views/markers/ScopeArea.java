@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2013 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -77,7 +77,7 @@ class ScopeArea extends GroupFilterConfigurationArea {
 			
 			initializeFontMetrics(parent);
 			GridData layoutData = new GridData();
-			layoutData.horizontalIndent = 20;
+			layoutData.horizontalIndent = IDialogConstants.INDENT;
 			int widthHint = Dialog.convertHorizontalDLUsToPixels(getFontMetrics(),IDialogConstants.BUTTON_WIDTH);
 			Point minSize = selectButton.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 			layoutData.widthHint = Math.max(widthHint, minSize.x);
@@ -89,7 +89,6 @@ class ScopeArea extends GroupFilterConfigurationArea {
 				 * 
 				 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
 				 */
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 
 					IWorkingSetSelectionDialog dialog = PlatformUI
@@ -201,7 +200,6 @@ class ScopeArea extends GroupFilterConfigurationArea {
 	 * 
 	 * @see org.eclipse.ui.internal.provisional.views.markers.FilterConfigurationArea#applyToGroup(org.eclipse.ui.internal.provisional.views.markers.MarkerFieldFilterGroup)
 	 */
-	@Override
 	public void applyToGroup(MarkerFieldFilterGroup group) {
 		group.setScope(scope);
 		group.setWorkingSet(workingSetArea.getWorkingSet());
@@ -213,7 +211,6 @@ class ScopeArea extends GroupFilterConfigurationArea {
 	 * 
 	 * @see org.eclipse.ui.internal.provisional.views.markers.FilterConfigurationArea#createContents(org.eclipse.swt.widgets.Composite)
 	 */
-	@Override
 	public void createContents(Composite parent) {
 
 		buttons = new Button[5];
@@ -255,7 +252,6 @@ class ScopeArea extends GroupFilterConfigurationArea {
 			 * 
 			 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
 			 */
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				scope = value;
 			}
@@ -275,7 +271,6 @@ class ScopeArea extends GroupFilterConfigurationArea {
 	 * 
 	 * @see org.eclipse.ui.internal.provisional.views.markers.FilterConfigurationArea#getTitle()
 	 */
-	@Override
 	public String getTitle() {
 		return MarkerMessages.filtersDialog_scopeTitle;
 	}
@@ -285,7 +280,6 @@ class ScopeArea extends GroupFilterConfigurationArea {
 	 * 
 	 * @see org.eclipse.ui.internal.provisional.views.markers.FilterConfigurationArea#initializeFromGroup(org.eclipse.ui.internal.provisional.views.markers.MarkerFieldFilterGroup)
 	 */
-	@Override
 	public void initializeFromGroup(MarkerFieldFilterGroup group) {
 		buttons[scope].setSelection(false);
 		scope = group.getScope();
@@ -298,7 +292,6 @@ class ScopeArea extends GroupFilterConfigurationArea {
 	 * 
 	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FilterConfigurationArea#apply(org.eclipse.ui.internal.provisional.views.markers.api.MarkerFieldFilter)
 	 */
-	@Override
 	public void apply(MarkerFieldFilter filter) {
 		// Do nothing as this is a group level setting
 
@@ -309,7 +302,6 @@ class ScopeArea extends GroupFilterConfigurationArea {
 	 * 
 	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FilterConfigurationArea#initialize(org.eclipse.ui.internal.provisional.views.markers.api.MarkerFieldFilter)
 	 */
-	@Override
 	public void initialize(MarkerFieldFilter filter) {
 		// Do nothing as this is a group level setting
 

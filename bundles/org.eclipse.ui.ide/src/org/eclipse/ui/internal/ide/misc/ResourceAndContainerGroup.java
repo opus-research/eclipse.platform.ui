@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,8 +20,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.equinox.bidi.StructuredTextTypeHandlerFactory;
-import org.eclipse.jface.util.BidiUtils;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
@@ -246,7 +244,6 @@ public class ResourceAndContainerGroup implements Listener {
 		resourceNameField = new Text(nameGroup, SWT.BORDER);
 		resourceNameField.addListener(SWT.Modify, this);
 		resourceNameField.addFocusListener(new FocusAdapter() {
-			@Override
 			public void focusLost(FocusEvent e) {
 				handleResourceNameFocusLostEvent();
 			}
@@ -256,7 +253,6 @@ public class ResourceAndContainerGroup implements Listener {
 		data.widthHint = SIZING_TEXT_FIELD_WIDTH;
 		resourceNameField.setLayoutData(data);
 		resourceNameField.setFont(font);
-		BidiUtils.applyBidiProcessing(resourceNameField, StructuredTextTypeHandlerFactory.FILE);
 		validateControls();
 	}
 
@@ -362,7 +358,6 @@ public class ResourceAndContainerGroup implements Listener {
 	 * @param e
 	 *            org.eclipse.swt.widgets.Event
 	 */
-	@Override
 	public void handleEvent(Event e) {
 		validateControls();
 		if (client != null) {
