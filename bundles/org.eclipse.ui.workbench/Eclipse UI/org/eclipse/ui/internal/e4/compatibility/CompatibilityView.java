@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,11 +17,14 @@ import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
-import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
+import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenu;
+import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuItem;
+import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuSeparator;
+import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
@@ -45,9 +48,6 @@ import org.eclipse.ui.internal.PartSite;
 import org.eclipse.ui.internal.ViewActionBuilder;
 import org.eclipse.ui.internal.ViewReference;
 import org.eclipse.ui.internal.WorkbenchPartReference;
-import org.eclipse.ui.internal.registry.ViewDescriptor;
-import org.eclipse.ui.internal.testing.ContributionInfoMessages;
-import org.eclipse.ui.testing.ContributionInfo;
 
 public class CompatibilityView extends CompatibilityPart {
 
@@ -154,12 +154,6 @@ public class CompatibilityView extends CompatibilityPart {
 
 		super.createPartControl(legacyPart, parent);
 
-		ViewDescriptor desc = reference.getDescriptor();
-		if (desc != null && desc.getPluginId() != null) {
-			parent.setData(new ContributionInfo(desc.getPluginId(),
-					ContributionInfoMessages.ContributionInfo_View, null));
-		}
-
 		// dispose the tb, it will be re-created when the tab is shown
 		toolBarParent.dispose();
 
@@ -227,11 +221,11 @@ public class CompatibilityView extends CompatibilityPart {
 				renderer.clearModelToContribution(child, contribution);
 			}
 
-			if (OpaqueElementUtil.isOpaqueMenuSeparator(child)) {
-				OpaqueElementUtil.clearOpaqueItem(child);
+			if (child instanceof MOpaqueMenuSeparator) {
+				((MOpaqueMenuSeparator) child).setOpaqueItem(null);
 				it.remove();
-			} else if (OpaqueElementUtil.isOpaqueMenuItem(child)) {
-				OpaqueElementUtil.clearOpaqueItem(child);
+			} else if (child instanceof MOpaqueMenuItem) {
+				((MOpaqueMenuItem) child).setOpaqueItem(null);
 				it.remove();
 			} else if (child instanceof MMenu) {
 				MMenu submenu = (MMenu) child;
@@ -240,7 +234,7 @@ public class CompatibilityView extends CompatibilityPart {
 					renderer.clearModelToManager(submenu, manager);
 				}
 
-				if (OpaqueElementUtil.isOpaqueMenu(child)) {
+				if (child instanceof MOpaqueMenu) {
 					it.remove();
 				}
 				clearOpaqueMenuItems(renderer, submenu);
@@ -277,13 +271,13 @@ public class CompatibilityView extends CompatibilityPart {
 				// remove opaque mappings
 				for (Iterator<MToolBarElement> it = toolbar.getChildren().iterator(); it.hasNext();) {
 					MToolBarElement element = it.next();
-					if (OpaqueElementUtil.isOpaqueToolItem(element)) {
+					if (element instanceof MOpaqueToolItem) {
 						IContributionItem item = tbmr.getContribution(element);
 						if (item != null) {
 							tbmr.clearModelToContribution(element, item);
 						}
 						// clear the reference
-						OpaqueElementUtil.clearOpaqueItem(element);
+						((MOpaqueToolItem) element).setOpaqueItem(null);
 						// remove the opaque item
 						it.remove();
 					}
