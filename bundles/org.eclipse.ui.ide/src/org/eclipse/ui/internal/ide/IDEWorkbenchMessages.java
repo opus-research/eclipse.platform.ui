@@ -950,10 +950,8 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String IDEApplication_workspaceCannotBeSetMessage;
 	public static String IDEApplication_workspaceCannotLockTitle;
 	public static String IDEApplication_workspaceCannotLockMessage;
-	public static String IDEApplication_versionTitle_newerWorkspace;
-	public static String IDEApplication_versionTitle_olderWorkspace;
-	public static String IDEApplication_versionMessage_newerWorkspace;
-	public static String IDEApplication_versionMessage_olderWorkspace;
+	public static String IDEApplication_versionTitle;
+	public static String IDEApplication_versionMessage;
 	public static String GlobalBuildAction_BuildRunningTitle;
 	public static String GlobalBuildAction_BuildRunningMessage;
 	public static String CleanDialog_buildCleanAuto;
