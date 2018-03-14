@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -297,7 +297,7 @@ public interface EModelService {
 	 * @param newParent
 	 *            The new parent for the element.
 	 */
-	public <T extends MUIElement> void move(T element, MElementContainer<? super T> newParent);
+	public void move(MUIElement element, MElementContainer<MUIElement> newParent);
 
 	/**
 	 * Move the element to a new location. The element will be placed at the end of the new parent's
@@ -311,7 +311,7 @@ public interface EModelService {
 	 * @param leavePlaceholder
 	 *            true if a placeholder for the element should be added
 	 */
-	public <T extends MUIElement> void move(T element, MElementContainer<? super T> newParent,
+	public void move(MUIElement element, MElementContainer<MUIElement> newParent,
 			boolean leavePlaceholder);
 
 	/**
@@ -325,7 +325,7 @@ public interface EModelService {
 	 * @param index
 	 *            The index to insert the element at; -1 means at the end
 	 */
-	public <T extends MUIElement> void move(T element, MElementContainer<? super T> newParent, int index);
+	public void move(MUIElement element, MElementContainer<MUIElement> newParent, int index);
 
 	/**
 	 * Move the element to a new location. The element will be placed at the end of the new parent's
@@ -340,7 +340,7 @@ public interface EModelService {
 	 * @param leavePlaceholder
 	 *            true if a placeholder for the element should be added
 	 */
-	public <T extends MUIElement> void move(T element, MElementContainer<? super T> newParent, int index,
+	public void move(MUIElement element, MElementContainer<MUIElement> newParent, int index,
 			boolean leavePlaceholder);
 
 	/**
