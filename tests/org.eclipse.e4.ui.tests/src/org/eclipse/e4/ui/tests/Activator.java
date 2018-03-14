@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 IBM Corporation and others.
+ * Copyright (c) 2013, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@ package org.eclipse.e4.ui.tests;
 
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.event.EventAdmin;
 import org.osgi.service.packageadmin.PackageAdmin;
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -63,7 +64,17 @@ public class Activator extends Plugin {
 		return plugin;
 	}
 
-
+	public EventAdmin getEventAdmin() {
+		if (eventAdminTracker == null) {
+			BundleContext bundleContext = plugin.getBundle().getBundleContext();
+			if (bundleContext == null)
+				return null;
+			eventAdminTracker = new ServiceTracker(bundleContext,
+					EventAdmin.class.getName(), null);
+			eventAdminTracker.open();
+		}
+		return (EventAdmin) eventAdminTracker.getService();
+	}
 
 	public PackageAdmin getPackageAdmin() {
 		if (packageAdminTracker == null) {
