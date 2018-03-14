@@ -24,7 +24,8 @@ import org.eclipse.swt.widgets.Display;
 /**
  * @since 3.3
  */
-public class BeanObservableValueDecoratorTest extends AbstractDefaultRealmTestCase {
+public class BeanObservableValueDecoratorTest extends
+		AbstractDefaultRealmTestCase {
 	private Bean bean;
 	private IObservableValue observableValue;
 	private BeanObservableValueDecorator decorator;
@@ -36,8 +37,8 @@ public class BeanObservableValueDecoratorTest extends AbstractDefaultRealmTestCa
 
 		bean = new Bean();
 		propertyDescriptor = new PropertyDescriptor("value", Bean.class);
-		observableValue = BeansObservables.observeValue(DisplayRealm
-				.getRealm(Display.getDefault()), bean, "value");
+		observableValue = BeansObservables.observeValue(
+				DisplayRealm.getRealm(Display.getDefault()), bean, "value");
 		decorator = new BeanObservableValueDecorator(observableValue,
 				propertyDescriptor);
 	}

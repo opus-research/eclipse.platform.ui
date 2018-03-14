@@ -67,8 +67,8 @@ public class ComboObservableValueTextTest extends TestCase {
 	}
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite(ComboObservableValueTextTest.class
-				.toString());
+		TestSuite suite = new TestSuite(
+				ComboObservableValueTextTest.class.toString());
 		suite.addTestSuite(ComboObservableValueTextTest.class);
 		suite.addTest(SWTMutableObservableValueContractTest
 				.suite(new Delegate()));

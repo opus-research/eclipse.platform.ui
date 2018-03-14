@@ -71,8 +71,8 @@ public class LabelObservableValueTest extends ObservableDelegateTest {
 	}
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite(LabelObservableValueTest.class
-				.toString());
+		TestSuite suite = new TestSuite(
+				LabelObservableValueTest.class.toString());
 		suite.addTestSuite(LabelObservableValueTest.class);
 		suite.addTest(SWTMutableObservableValueContractTest
 				.suite(new Delegate()));

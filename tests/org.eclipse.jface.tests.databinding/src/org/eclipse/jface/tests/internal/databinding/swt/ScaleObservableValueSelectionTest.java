@@ -74,8 +74,8 @@ public class ScaleObservableValueSelectionTest extends ObservableDelegateTest {
 	}
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite(ScaleObservableValueSelectionTest.class
-				.toString());
+		TestSuite suite = new TestSuite(
+				ScaleObservableValueSelectionTest.class.toString());
 		suite.addTestSuite(ScaleObservableValueSelectionTest.class);
 		suite.addTest(SWTMutableObservableValueContractTest
 				.suite(new Delegate()));
@@ -107,9 +107,8 @@ public class ScaleObservableValueSelectionTest extends ObservableDelegateTest {
 
 		@Override
 		public void change(IObservable observable) {
-			scale
-					.setSelection(createIntegerValue(
-							(IObservableValue) observable).intValue());
+			scale.setSelection(createIntegerValue((IObservableValue) observable)
+					.intValue());
 			scale.notifyListeners(SWT.Selection, null);
 		}
 
