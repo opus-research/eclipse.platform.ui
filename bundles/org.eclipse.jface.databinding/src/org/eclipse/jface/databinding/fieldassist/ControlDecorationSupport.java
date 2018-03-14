@@ -9,7 +9,7 @@
  *     Matthew Hall - initial API and implementation (bug 268472)
  *     Matthew Hall - bug 300953
  *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 413611
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 481358
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 481620
  ******************************************************************************/
 
 package org.eclipse.jface.databinding.fieldassist;
@@ -28,7 +28,6 @@ import org.eclipse.core.databinding.observable.list.IListChangeListener;
 import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.list.ListChangeEvent;
 import org.eclipse.core.databinding.observable.list.ListDiffVisitor;
-import org.eclipse.core.databinding.observable.list.WritableList;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.IValueChangeListener;
 import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
@@ -76,59 +75,6 @@ public class ControlDecorationSupport {
 	}
 
 	/**
-	 * Creates a ControlDecorationSupport which observes the given validation
-	 * status and displays a {@link ControlDecoration} over the underlying SWT
-	 * control of all target observables that implement {@link ISWTObservable}
-	 * or {@link IViewerObservable}.
-	 *
-	 * @param validationStatus
-	 *            an {@link IObservable} containing an {@link IStatus}, which
-	 *            will be tracked by the {@link ControlDecorationSupport}.
-	 * @param position
-	 *            SWT alignment constant (e.g. SWT.LEFT | SWT.TOP) to use when
-	 *            constructing {@link ControlDecorationSupport}
-	 * @param targetsToBeDecorated
-	 *            the target observables, which contain widget to be decorated
-	 *            according to the current validation status
-	 * @return a ControlDecorationSupport which observes the validation status
-	 *         and displays a {@link ControlDecoration} over the underlying SWT
-	 *         control of all target observables that implement
-	 *         {@link ISWTObservable} or {@link IViewerObservable}.
-	 * @since 1.8
-	 */
-	public static ControlDecorationSupport create(IObservableValue<IStatus> validationStatus, int position,
-			IObservable... targetsToBeDecorated) {
-		return create(validationStatus, position, null, new ControlDecorationUpdater(),
-				getObservableList(targetsToBeDecorated));
-	}
-
-	/**
-	 * Creates a ControlDecorationSupport which observes the given validation
-	 * status and displays a {@link ControlDecoration} over the underlying SWT
-	 * control of all target observables that implement {@link ISWTObservable}
-	 * or {@link IViewerObservable}.
-	 *
-	 * @param validationStatus
-	 *            an {@link IObservable} containing an {@link IStatus}, which
-	 *            will be tracked by the {@link ControlDecorationSupport}.
-	 * @param position
-	 *            SWT alignment constant (e.g. SWT.LEFT | SWT.TOP) to use when
-	 *            constructing {@link ControlDecorationSupport}
-	 * @param targetsToBeDecorated
-	 *            the target observables, which contain widget to be decorated
-	 *            according to the current validation status
-	 * @return a ControlDecorationSupport which observes the validation status
-	 *         and displays a {@link ControlDecoration} over the underlying SWT
-	 *         control of all target observables that implement
-	 *         {@link ISWTObservable} or {@link IViewerObservable}.
-	 * @since 1.8
-	 */
-	public static ControlDecorationSupport create(IObservableValue<IStatus> validationStatus, int position,
-			IObservableList<IObservable> targetsToBeDecorated) {
-		return create(validationStatus, position, null, new ControlDecorationUpdater(), targetsToBeDecorated);
-	}
-
-	/**
 	 * Creates a ControlDecorationSupport which observes the validation status
 	 * of the specified {@link ValidationStatusProvider}, and displays a
 	 * {@link ControlDecoration} over the underlying SWT control of all target
@@ -158,66 +104,6 @@ public class ControlDecorationSupport {
 
 	/**
 	 * Creates a ControlDecorationSupport which observes the validation status
-	 * and displays a {@link ControlDecoration} over the underlying SWT control
-	 * of all target observables that implement {@link ISWTObservable} or
-	 * {@link IViewerObservable}.
-	 *
-	 * @param validationStatus
-	 *            an {@link IObservable} containing an {@link IStatus}, which
-	 *            will be tracked by the {@link ControlDecorationSupport}.
-	 * @param position
-	 *            SWT alignment constant (e.g. SWT.LEFT | SWT.TOP) to use when
-	 *            constructing {@link ControlDecorationSupport}
-	 * @param targetsToBeDecorated
-	 *            the target observables, which contain widget to be decorated
-	 *            according to the current validation status
-	 * @param composite
-	 *            the composite to use when constructing
-	 *            {@link ControlDecoration} instances.
-	 * @return a ControlDecorationSupport which observes the validation status
-	 *         and displays a {@link ControlDecoration} over the underlying SWT
-	 *         control of all target observables that implement
-	 *         {@link ISWTObservable} or {@link IViewerObservable}.
-	 *
-	 * @since 1.8
-	 */
-	public static ControlDecorationSupport create(IObservableValue<IStatus> validationStatus, int position,
-			Composite composite, IObservable... targetsToBeDecorated) {
-		return create(validationStatus, position, composite, new ControlDecorationUpdater(),
-				getObservableList(targetsToBeDecorated));
-	}
-
-	/**
-	 * Creates a ControlDecorationSupport which observes the validation status
-	 * and displays a {@link ControlDecoration} over the underlying SWT control
-	 * of all target observables that implement {@link ISWTObservable} or
-	 * {@link IViewerObservable}.
-	 *
-	 * @param validationStatus
-	 *            an {@link IObservable} containing an {@link IStatus}, which
-	 *            will be tracked by the {@link ControlDecorationSupport}.
-	 * @param position
-	 *            SWT alignment constant (e.g. SWT.LEFT | SWT.TOP) to use when
-	 *            constructing {@link ControlDecorationSupport}
-	 * @param targetsToBeDecorated
-	 *            the target observables, which contain widget to be decorated
-	 *            according to the current validation status
-	 * @param composite
-	 *            the composite to use when constructing
-	 *            {@link ControlDecoration} instances.
-	 * @return a ControlDecorationSupport which observes the validation status
-	 *         and displays a {@link ControlDecoration} over the underlying SWT
-	 *         control of all target observables that implement
-	 *         {@link ISWTObservable} or {@link IViewerObservable}.
-	 * @since 1.8
-	 */
-	public static ControlDecorationSupport create(IObservableValue<IStatus> validationStatus, int position,
-			Composite composite, IObservableList<IObservable> targetsToBeDecorated) {
-		return create(validationStatus, position, composite, new ControlDecorationUpdater(), targetsToBeDecorated);
-	}
-
-	/**
-	 * Creates a ControlDecorationSupport which observes the validation status
 	 * of the specified {@link ValidationStatusProvider}, and displays a
 	 * {@link ControlDecoration} over the underlying SWT control of all target
 	 * observables that implement {@link ISWTObservable} or
@@ -243,72 +129,8 @@ public class ControlDecorationSupport {
 	public static ControlDecorationSupport create(
 			ValidationStatusProvider validationStatusProvider, int position,
 			Composite composite, ControlDecorationUpdater updater) {
-		return create(validationStatusProvider.getValidationStatus(), position, composite, updater,
-				validationStatusProvider.getTargets());
-	}
-
-	/**
-	 * Creates a ControlDecorationSupport which observes the validation status
-	 * and displays a {@link ControlDecoration} over the underlying SWT control
-	 * of all target observables that implement {@link ISWTObservable} or
-	 * {@link IViewerObservable}.
-	 *
-	 * @param validationStatus
-	 *            an {@link IObservable} containing an {@link IStatus}, which
-	 *            will be tracked by the {@link ControlDecorationSupport}.
-	 * @param position
-	 *            SWT alignment constant (e.g. SWT.LEFT | SWT.TOP) to use when
-	 *            constructing {@link ControlDecorationSupport}
-	 * @param composite
-	 *            the composite to use when constructing
-	 *            {@link ControlDecoration} instances.
-	 * @param updater
-	 *            custom strategy for updating the {@link ControlDecoration}(s)
-	 *            whenever the validation status changes.
-	 * @param targetsToBeDecorated
-	 *            the target observables, which contain widget to be decorated
-	 *            according to the current validation status
-	 * @return a ControlDecorationSupport which observes the validation status
-	 *         and displays a {@link ControlDecoration} over the underlying SWT
-	 *         control of all target observables that implement
-	 *         {@link ISWTObservable} or {@link IViewerObservable}.
-	 * @since 1.8
-	 */
-	public static ControlDecorationSupport create(IObservableValue<IStatus> validationStatus, int position,
-			Composite composite, ControlDecorationUpdater updater, IObservable... targetsToBeDecorated) {
-		return create(validationStatus, position, composite, updater, getObservableList(targetsToBeDecorated));
-	}
-
-	/**
-	 * Creates a ControlDecorationSupport which observes the validation status
-	 * and displays a {@link ControlDecoration} over the underlying SWT control
-	 * of all target observables that implement {@link ISWTObservable} or
-	 * {@link IViewerObservable}.
-	 *
-	 * @param validationStatus
-	 *            an {@link IObservable} containing an {@link IStatus}, which
-	 *            will be tracked by the {@link ControlDecorationSupport}.
-	 * @param position
-	 *            SWT alignment constant (e.g. SWT.LEFT | SWT.TOP) to use when
-	 *            constructing {@link ControlDecorationSupport}
-	 * @param composite
-	 *            the composite to use when constructing
-	 *            {@link ControlDecoration} instances.
-	 * @param updater
-	 *            custom strategy for updating the {@link ControlDecoration}(s)
-	 *            whenever the validation status changes.
-	 * @param targetsToBeDecorated
-	 *            the target observables, which contain widget to be decorated
-	 *            according to the current validation status
-	 * @return a ControlDecorationSupport which observes the validation status
-	 *         and displays a {@link ControlDecoration} over the underlying SWT
-	 *         control of all target observables that implement
-	 *         {@link ISWTObservable} or {@link IViewerObservable}.
-	 * @since 1.8
-	 */
-	public static ControlDecorationSupport create(IObservableValue<IStatus> validationStatus, int position,
-			Composite composite, ControlDecorationUpdater updater, IObservableList<IObservable> targetsToBeDecorated) {
-		return new ControlDecorationSupport(validationStatus, targetsToBeDecorated, position, composite, updater);
+		return new ControlDecorationSupport(validationStatusProvider, position,
+				composite, updater);
 	}
 
 	private final int position;
@@ -333,21 +155,13 @@ public class ControlDecorationSupport {
 	};
 
 	private IListChangeListener<IObservable> targetsChangeListener = new IListChangeListener<IObservable>() {
+
 		@Override
 		public void handleListChange(ListChangeEvent<? extends IObservable> event) {
-			event.diff.accept(new ListDiffVisitor() {
-				@Override
-				public void handleAdd(int index, Object element) {
-					targetAdded((IObservable) element);
-				}
-
-				@Override
-				public void handleRemove(int index, Object element) {
-					targetRemoved((IObservable) element);
-				}
-			});
+			event.diff.accept(new TargetsListDiffAdvisor<>());
 			statusChanged(validationStatus.getValue());
 		}
+
 	};
 
 	private static class TargetDecoration {
@@ -360,19 +174,33 @@ public class ControlDecorationSupport {
 		}
 	}
 
+	private class TargetsListDiffAdvisor<E extends IObservable> extends ListDiffVisitor<E> {
+
+		@Override
+		public void handleAdd(int index, E element) {
+			targetAdded(element);
+		}
+
+		@Override
+		public void handleRemove(int index, E element) {
+			targetRemoved(element);
+		}
+
+	}
+
 	private List<TargetDecoration> targetDecorations;
 
-	private ControlDecorationSupport(IObservableValue<IStatus> validationStatus,
-			IObservableList<IObservable> targetsToBeDecorated, int position,
+	private ControlDecorationSupport(
+			ValidationStatusProvider validationStatusProvider, int position,
 			Composite composite, ControlDecorationUpdater updater) {
 		this.position = position;
 		this.composite = composite;
 		this.updater = updater;
 
-		this.validationStatus = validationStatus;
+		this.validationStatus = validationStatusProvider.getValidationStatus();
 		Assert.isTrue(!this.validationStatus.isDisposed());
 
-		this.targets = targetsToBeDecorated;
+		this.targets = validationStatusProvider.getTargets();
 		Assert.isTrue(!this.targets.isDisposed());
 
 		this.targetDecorations = new ArrayList<TargetDecoration>();
@@ -441,15 +269,6 @@ public class ControlDecorationSupport {
 			ControlDecoration decoration = targetDecoration.decoration;
 			updater.update(decoration, status);
 		}
-	}
-
-	private static IObservableList<IObservable> getObservableList(IObservable[] observables) {
-		IObservableList<IObservable> observableList = new WritableList<>();
-		for (IObservable observable : observables) {
-			observableList.add(observable);
-		}
-
-		return observableList;
 	}
 
 	/**
