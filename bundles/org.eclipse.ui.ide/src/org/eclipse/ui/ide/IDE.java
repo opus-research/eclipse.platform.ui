@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -721,7 +721,7 @@ public final class IDE {
 	}
 
 	/**
-	 * Returns an editor descriptor appropriate for opening the given file
+	 * Returns an editor id appropriate for opening the given file
 	 * store.
 	 * <p>
 	 * The editor descriptor is determined using a multi-step process. This
@@ -742,14 +742,13 @@ public final class IDE {
 	 * </ol>
 	 * </p>
 	 * 
-	 * @param fileStore
+	 * @param fileStore 
 	 *            the file store
-	 * @return the editor descriptor, appropriate for opening the file
+	 * @return the id of an editor, appropriate for opening the file
 	 * @throws PartInitException
 	 *             if no editor can be found
-	 * @since 3.11
 	 */
-	public static IEditorDescriptor getEditorDescriptorForFileStore(IFileStore fileStore) throws PartInitException {
+	private static String getEditorId(IFileStore fileStore) throws PartInitException {
 		String name = fileStore.fetchInfo().getName();
 		if (name == null) {
 			throw new IllegalArgumentException();
@@ -776,7 +775,7 @@ public final class IDE {
 
 		IEditorDescriptor defaultEditor = editorReg.getDefaultEditor(name, contentType);
 		defaultEditor = overrideDefaultEditorAssociation(new FileStoreEditorInput(fileStore), contentType, defaultEditor);
-		return getEditorDescriptor(name, editorReg, defaultEditor);
+		return getEditorDescriptor(name, editorReg, defaultEditor).getId();
 	}
 
 	/**
@@ -1134,7 +1133,7 @@ public final class IDE {
 		}
 
         IEditorInput input = getEditorInput(fileStore);
-		String editorId = getEditorDescriptorForFileStore(fileStore).getId();
+        String editorId = getEditorId(fileStore);
         
         // open the editor on the file
         return page.openEditor(input, editorId);
