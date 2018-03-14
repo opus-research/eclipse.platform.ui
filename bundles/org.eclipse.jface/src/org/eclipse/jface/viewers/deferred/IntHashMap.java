@@ -27,14 +27,14 @@ import java.util.HashMap;
      * @param loadFactor
      */
     public IntHashMap(int size, float loadFactor) {
-        map = new HashMap<>(size, loadFactor);
+        map = new HashMap<Object,Integer>(size, loadFactor);
     }
 
     /**
      *
      */
     public IntHashMap() {
-        map = new HashMap<>();
+        map = new HashMap<Object,Integer>();
     }
 
     /**

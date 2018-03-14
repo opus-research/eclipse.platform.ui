@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,17 +24,20 @@ import org.eclipse.swt.graphics.Point;
  * The CellLabelProvider is an abstract implementation of a label provider for
  * structured viewers.
  *
- * <p>
- * <b>This class is intended to be subclassed</b>
- * </p>
- *
- * @param <E>
- *            Type of an element of the model
+ * <p><b>This class is intended to be subclassed</b></p>
+ * @param <E> Type of an element of the model
  *
  * @since 3.3
  * @see ColumnLabelProvider as a concrete implementation
  */
 public abstract class CellLabelProvider<E> extends BaseLabelProvider<E> implements IToolTipProvider<E> {
+
+	/**
+	 * Create a new instance of the receiver.
+	 */
+	public CellLabelProvider() {
+		super();
+	}
 
 	/**
 	 * Create a ViewerLabelProvider for the column at index
@@ -52,13 +55,13 @@ public abstract class CellLabelProvider<E> extends BaseLabelProvider<E> implemen
 		if (!noColumnTreeViewer
 				&& (labelProvider instanceof ITableLabelProvider
 						|| labelProvider instanceof ITableColorProvider || labelProvider instanceof ITableFontProvider))
-			return new TableColumnViewerLabelProvider<>(labelProvider);
+			return new TableColumnViewerLabelProvider<E>(labelProvider);
 		if (labelProvider instanceof CellLabelProvider) {
 			@SuppressWarnings("unchecked")
 			CellLabelProvider<E> cellLabelProvider = (CellLabelProvider<E>) labelProvider;
 			return cellLabelProvider;
 		}
-		return new WrappedViewerLabelProvider<>(labelProvider);
+		return new WrappedViewerLabelProvider<E>(labelProvider);
 
 	}
 

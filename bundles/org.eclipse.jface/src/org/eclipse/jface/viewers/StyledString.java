@@ -409,7 +409,7 @@ public class StyledString {
 	 */
 	public StyleRange[] getStyleRanges() {
 		if (hasRuns()) {
-			ArrayList<StyleRange> res = new ArrayList<>();
+			ArrayList<StyleRange> res = new ArrayList<StyleRange>();
 
 			List<StyleRun> styleRuns = getStyleRuns();
 			int offset = 0;

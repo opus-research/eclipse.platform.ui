@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,17 +26,13 @@ import org.eclipse.swt.widgets.Event;
 /**
  * The ColumnViewerTooltipSupport is the class that provides tool tips for
  * ColumnViewers.
- *
- * @param <E>
- *            Type of an single element of the model
- * @param <I>
- *            Type of the input
+ * @param <E> Type of an single element of the model
+ * @param <I> Type of the input
  *
  * @since 3.3
  *
  */
 public class ColumnViewerToolTipSupport<E,I> extends DefaultToolTip {
-
 	private ColumnViewer<E,I> viewer;
 
 	private static final String VIEWER_CELL_KEY = Policy.JFACE
@@ -75,7 +71,7 @@ public class ColumnViewerToolTipSupport<E,I> extends DefaultToolTip {
 	 *            the viewer the support is attached to
 	 */
 	public static <E,I> void enableFor(ColumnViewer<E,I> viewer) {
-		new ColumnViewerToolTipSupport<>(viewer, ToolTip.NO_RECREATE, false);
+		new ColumnViewerToolTipSupport<E,I>(viewer, ToolTip.NO_RECREATE, false);
 	}
 
 	/**
@@ -92,7 +88,7 @@ public class ColumnViewerToolTipSupport<E,I> extends DefaultToolTip {
 	 * @see ToolTip#NO_RECREATE
 	 */
 	public static <E,I> void enableFor(ColumnViewer<E,I> viewer, int style) {
-		new ColumnViewerToolTipSupport<>(viewer, style, false);
+		new ColumnViewerToolTipSupport<E,I>(viewer, style, false);
 	}
 
 	@Override

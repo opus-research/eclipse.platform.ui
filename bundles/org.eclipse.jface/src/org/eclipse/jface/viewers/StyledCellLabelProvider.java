@@ -229,7 +229,7 @@ public abstract class StyledCellLabelProvider<E> extends OwnerDrawLabelProvider<
 
 	private ViewerCell<E> getViewerCell(Event event, E element) {
 		ViewerRow<E> row= viewer.getViewerRowFromItem(event.item);
-		return new ViewerCell<>(row, event.index, element);
+		return new ViewerCell<E>(row, event.index, element);
 	}
 
 	/**

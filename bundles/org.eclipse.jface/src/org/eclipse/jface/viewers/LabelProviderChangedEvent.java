@@ -14,9 +14,7 @@ import java.util.EventObject;
 
 /**
  * Event object describing a label provider state change.
- *
- * @param <E>
- *            Type of an element of the model
+ * @param <E> Type of an element of the model
  *
  * @see ILabelProviderListener
  */
@@ -31,7 +29,7 @@ public class LabelProviderChangedEvent<E> extends EventObject {
     /**
      * The elements whose labels need to be updated or <code>null</code>.
      */
-	private E[] elements;
+    private Object[] elements;
 
     /**
      * Creates a new event for the given source, indicating that all labels
@@ -50,7 +48,8 @@ public class LabelProviderChangedEvent<E> extends EventObject {
      * @param source the label provider
      * @param elements the element whose labels have changed
      */
-	public LabelProviderChangedEvent(IBaseLabelProvider<E> source, E[] elements) {
+    public LabelProviderChangedEvent(IBaseLabelProvider<E> source,
+            Object[] elements) {
         super(source);
         this.elements = elements;
     }
@@ -62,11 +61,10 @@ public class LabelProviderChangedEvent<E> extends EventObject {
      * @param source the label provider
      * @param element the element whose label needs to be updated
      */
-	public LabelProviderChangedEvent(IBaseLabelProvider<E> source, E element) {
+    public LabelProviderChangedEvent(IBaseLabelProvider<E> source, Object element) {
         super(source);
-		@SuppressWarnings("unchecked")
-		E[] castedArray = (E[]) new Object[] { element };
-		this.elements = castedArray;
+        this.elements = new Object[1];
+        this.elements[0] = element;
     }
 
     /**
@@ -75,7 +73,7 @@ public class LabelProviderChangedEvent<E> extends EventObject {
      *
      * @return the element whose label needs to be updated or <code>null</code>
      */
-	public E getElement() {
+    public Object getElement() {
         if (this.elements == null || this.elements.length == 0) {
 			return null;
 		}
@@ -88,7 +86,7 @@ public class LabelProviderChangedEvent<E> extends EventObject {
      *
      * @return the element whose labels need to be updated or <code>null</code>
      */
-	public E[] getElements() {
+    public Object[] getElements() {
         if (this.elements == null) {
 			return null;
 		}

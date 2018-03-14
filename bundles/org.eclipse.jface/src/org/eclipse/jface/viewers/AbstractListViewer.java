@@ -24,15 +24,16 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Widget;
 
 /**
- * Abstract base class for viewers that contain lists of items (such as a combo
- * or list). Most of the viewer implementation is in this base class, except for
- * the minimal code that actually communicates with the underlying widget.
+ * Abstract base class for viewers that contain lists of items (such as a combo or list).
+ * Most of the viewer implementation is in this base class, except for the minimal code that
+ * actually communicates with the underlying widget.
+<<<<<<< localmast
  *
- * @param <E>
- *            Type of an element of the model
- * @param <I>
- *            Type of the input
+=======
+ * @param <E> Type of an element of the model
+ * @param <I> Type of the input
  *
+>>>>>>> 92419b3 Bug 402445 - [Viewers] Add generics to the JFace Viewer framework
  * @see org.eclipse.jface.viewers.ListViewer
  * @see org.eclipse.jface.viewers.ComboViewer
  *
@@ -43,7 +44,7 @@ public abstract class AbstractListViewer<E,I> extends StructuredViewer<E,I> {
     /**
      * A list of viewer elements.
      */
-    private java.util.List<E> listMap = new ArrayList<>();
+    private java.util.List<E> listMap = new ArrayList<E>();
 
     /**
      * Adds the given string to the underlying widget at the given index
@@ -274,7 +275,7 @@ public abstract class AbstractListViewer<E,I> extends StructuredViewer<E,I> {
     @Override
 	protected List<E> getSelectionFromWidget() {
         int[] ixs = listGetSelectionIndices();
-        ArrayList<E> list = new ArrayList<>(ixs.length);
+        ArrayList<E> list = new ArrayList<E>(ixs.length);
         for (int i = 0; i < ixs.length; i++) {
             E e = getElementAt(ixs[i]);
             if (e != null) {

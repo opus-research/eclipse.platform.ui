@@ -222,7 +222,7 @@ public final class TreePath<E> {
 		@SuppressWarnings("unchecked")
 		E[] parentSegments = (E[]) new Object[segmentCount - 1];
 		System.arraycopy(segments, 0, parentSegments, 0, segmentCount - 1);
-		return new TreePath<>(parentSegments);
+		return new TreePath<E>(parentSegments);
 	}
 
 	/**
@@ -238,6 +238,6 @@ public final class TreePath<E> {
 			System.arraycopy(segments, 0, childSegments, 0, segmentCount);
 		}
 		childSegments[segmentCount] = newSegment;
-		return new TreePath<>(childSegments);
+		return new TreePath<E>(childSegments);
 	}
 }

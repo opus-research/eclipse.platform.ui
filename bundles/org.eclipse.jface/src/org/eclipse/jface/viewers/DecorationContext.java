@@ -29,7 +29,7 @@ public class DecorationContext implements IDecorationContext {
 	 */
 	public static final IDecorationContext DEFAULT_CONTEXT = new DecorationContext();
 
-	private Map<String,Object> properties = new HashMap<>();
+	private Map<String,Object> properties = new HashMap<String,Object>();
 
 	/**
 	 * Create a decoration context.
