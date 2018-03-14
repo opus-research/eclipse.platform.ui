@@ -37,7 +37,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -180,9 +180,12 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 			});
 		}
 		linkedResourceGroup = new CreateLinkedResourceGroup(IResource.FOLDER,
-				e -> {
-					setPageComplete(validatePage());
-					firstLinkCheck = false;
+				new Listener() {
+					@Override
+					public void handleEvent(Event e) {
+						setPageComplete(validatePage());
+						firstLinkCheck = false;
+					}
 				}, new CreateLinkedResourceGroup.IStringValue() {
 					@Override
 					public String getValue() {
@@ -299,15 +302,14 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 	@Deprecated
 	protected void createFolder(IFolder folderHandle, IProgressMonitor monitor)
 			throws CoreException {
-		SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
-
 		try {
 			// Create the folder resource in the workspace
 			// Update: Recursive to create any folders which do not exist
 			// already
 			if (!folderHandle.exists()) {
 				if (linkTargetPath != null) {
-					folderHandle.createLink(linkTargetPath, IResource.ALLOW_MISSING_LOCAL, subMonitor.newChild(100));
+					folderHandle.createLink(linkTargetPath,
+							IResource.ALLOW_MISSING_LOCAL, monitor);
 				} else {
 					IPath path = folderHandle.getFullPath();
 					IWorkspaceRoot root = ResourcesPlugin.getWorkspace()
@@ -316,8 +318,6 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 					if (numSegments > 2
 							&& !root.getFolder(path.removeLastSegments(1))
 									.exists()) {
-
-						SubMonitor loopProgress = subMonitor.newChild(90).setWorkRemaining(numSegments - 3);
 						// If the direct parent of the path doesn't exist, try
 						// to create the
 						// necessary directories.
@@ -325,25 +325,25 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 							IFolder folder = root.getFolder(path
 									.removeLastSegments(i));
 							if (!folder.exists()) {
-								folder.create(false, true, loopProgress.newChild(1));
+								folder.create(false, true, monitor);
 							}
 						}
 					}
-					subMonitor.setWorkRemaining(10);
-					folderHandle.create(false, true, subMonitor.newChild(10));
+					folderHandle.create(false, true, monitor);
 				}
 			}
 		} catch (CoreException e) {
 			// If the folder already existed locally, just refresh to get
 			// contents
 			if (e.getStatus().getCode() == IResourceStatus.PATH_OCCUPIED) {
-				folderHandle.refreshLocal(IResource.DEPTH_INFINITE, subMonitor.setWorkRemaining(1).newChild(1));
+				folderHandle.refreshLocal(IResource.DEPTH_INFINITE,
+						new SubProgressMonitor(monitor, 500));
 			} else {
 				throw e;
 			}
 		}
 
-		if (subMonitor.isCanceled()) {
+		if (monitor.isCanceled()) {
 			throw new OperationCanceledException();
 		}
 	}
@@ -456,49 +456,55 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 				return null;
 			}
 		}
-		IRunnableWithProgress op = monitor -> {
-			AbstractOperation op1;
-			op1 = new CreateFolderOperation(
-				newFolderHandle, linkTargetPath, createVirtualFolder, filterList,
-				IDEWorkbenchMessages.WizardNewFolderCreationPage_title);
-			try {
-				// see bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=219901
-				// directly execute the operation so that the undo state is
-				// not preserved.  Making this undoable can result in accidental
-				// folder (and file) deletions.
-				op1.execute(monitor, WorkspaceUndoUtil
-					.getUIInfoAdapter(getShell()));
-			} catch (final ExecutionException e) {
-				getContainer().getShell().getDisplay().syncExec(
-						() -> {
-							if (e.getCause() instanceof CoreException) {
-								ErrorDialog
-										.openError(
-												getContainer()
-														.getShell(), // Was Utilities.getFocusShell()
-												IDEWorkbenchMessages.WizardNewFolderCreationPage_errorTitle,
-												null, // no special message
-												((CoreException) e
-														.getCause())
-														.getStatus());
-							} else {
-								IDEWorkbenchPlugin
-										.log(
-												getClass(),
-												"createNewFolder()", e.getCause()); //$NON-NLS-1$
-								MessageDialog
-										.openError(
-												getContainer()
-														.getShell(),
-												IDEWorkbenchMessages.WizardNewFolderCreationPage_internalErrorTitle,
-												NLS
-														.bind(
-																IDEWorkbenchMessages.WizardNewFolder_internalError,
-																e
-																		.getCause()
-																		.getMessage()));
-							}
-						});
+		IRunnableWithProgress op = new IRunnableWithProgress() {
+			@Override
+			public void run(IProgressMonitor monitor) {
+				AbstractOperation op;
+				op = new CreateFolderOperation(
+					newFolderHandle, linkTargetPath, createVirtualFolder, filterList,
+					IDEWorkbenchMessages.WizardNewFolderCreationPage_title);
+				try {
+					// see bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=219901
+					// directly execute the operation so that the undo state is
+					// not preserved.  Making this undoable can result in accidental
+					// folder (and file) deletions.
+					op.execute(monitor, WorkspaceUndoUtil
+						.getUIInfoAdapter(getShell()));
+				} catch (final ExecutionException e) {
+					getContainer().getShell().getDisplay().syncExec(
+							new Runnable() {
+								@Override
+								public void run() {
+									if (e.getCause() instanceof CoreException) {
+										ErrorDialog
+												.openError(
+														getContainer()
+																.getShell(), // Was Utilities.getFocusShell()
+														IDEWorkbenchMessages.WizardNewFolderCreationPage_errorTitle,
+														null, // no special message
+														((CoreException) e
+																.getCause())
+																.getStatus());
+									} else {
+										IDEWorkbenchPlugin
+												.log(
+														getClass(),
+														"createNewFolder()", e.getCause()); //$NON-NLS-1$
+										MessageDialog
+												.openError(
+														getContainer()
+																.getShell(),
+														IDEWorkbenchMessages.WizardNewFolderCreationPage_internalErrorTitle,
+														NLS
+																.bind(
+																		IDEWorkbenchMessages.WizardNewFolder_internalError,
+																		e
+																				.getCause()
+																				.getMessage()));
+									}
+								}
+							});
+				}
 			}
 		};
 

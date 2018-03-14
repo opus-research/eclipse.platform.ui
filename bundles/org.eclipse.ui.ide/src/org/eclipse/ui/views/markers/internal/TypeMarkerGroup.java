@@ -133,7 +133,13 @@ public class TypeMarkerGroup extends MarkerGroup {
 
 	@Override
 	public Comparator<MarkerGroupingEntry> getEntriesComparator() {
-		return (o1, o2) -> o1.getLabel().compareTo(o2.getLabel());
+		return new Comparator<MarkerGroupingEntry>() {
+			@Override
+			public int compare(MarkerGroupingEntry o1, MarkerGroupingEntry o2) {
+				//TODO: use a collator to compare?
+				return o1.getLabel().compareTo(o2.getLabel());
+			}
+		};
 	}
 
 	private class TypesMarkerGroupingEntry extends MarkerGroupingEntry {

@@ -10,7 +10,6 @@
  *     Teddy Walker <teddy.walker@googlemail.com>
  *     		- Fix for Bug 151204 [Progress] Blocked status of jobs are not applied/reported
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422040
- *     Philipp Bumann <bumannp@gmail.com> - Bug 477602
  *******************************************************************************/
 package org.eclipse.e4.ui.progress.internal;
 
@@ -404,7 +403,8 @@ public class ProgressManager extends ProgressProvider {
 				Iterator<IJobBusyListener> startListeners = busyListenersForJob(event.getJob())
 						.iterator();
 				while (startListeners.hasNext()) {
-					IJobBusyListener next = startListeners.next();
+					IJobBusyListener next = (IJobBusyListener) startListeners
+							.next();
 					next.incrementBusy(event.getJob());
 				}
 			}
