@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Jan-Hendrik Diederich, Bredex GmbH - bug 201052
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430616, 441267, 441282, 445609
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 450187
  *******************************************************************************/
 package org.eclipse.ui.internal.registry;
 
@@ -28,7 +27,6 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
-import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.ISharedImages;
@@ -132,7 +130,7 @@ public class ViewRegistry implements IViewRegistry {
 		}
 
 		List<String> tags = descriptor.getTags();
-		tags.add(IPresentationEngine.VIEW_TAG);
+		tags.add("View"); //$NON-NLS-1$
 
 		descriptor.setCloseable(true);
 		descriptor.setAllowMultiple(Boolean.parseBoolean(element
