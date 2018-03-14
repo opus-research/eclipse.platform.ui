@@ -28,7 +28,6 @@ public class SplitValues implements IParameterValues {
 		values.put(WorkbenchMessages.SplitValues_Vertical, "false"); //$NON-NLS-1$
 	}
 
-	@Override
 	public Map getParameterValues() {
 		return values;
 	}

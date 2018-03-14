@@ -42,7 +42,6 @@ public final class ServiceLocator implements IDisposable, INestable,
 		 * @see
 		 * org.eclipse.ui.services.IServiceLocator#getService(java.lang.Class)
 		 */
-		@Override
 		public Object getService(Class api) {
 			if (key.equals(api)) {
 				return locator.getService(key);
@@ -56,7 +55,6 @@ public final class ServiceLocator implements IDisposable, INestable,
 		 * @see
 		 * org.eclipse.ui.services.IServiceLocator#hasService(java.lang.Class)
 		 */
-		@Override
 		public boolean hasService(Class api) {
 			if (key.equals(api)) {
 				return true;
@@ -106,7 +104,6 @@ public final class ServiceLocator implements IDisposable, INestable,
 		this.owner = owner;
 	}
 
-	@Override
 	public final void activate() {
 		activated = true;
 
@@ -117,7 +114,6 @@ public final class ServiceLocator implements IDisposable, INestable,
 		}
 	}
 
-	@Override
 	public final void deactivate() {
 		activated = false;
 
@@ -128,7 +124,6 @@ public final class ServiceLocator implements IDisposable, INestable,
 		}
 	}
 
-	@Override
 	public final void dispose() {
 		Iterator<Object> i = servicesToDispose.values().iterator();
 		while (i.hasNext()) {
@@ -142,7 +137,6 @@ public final class ServiceLocator implements IDisposable, INestable,
 		disposed = true;
 	}
 
-	@Override
 	public final Object getService(final Class key) {
 		if (disposed) {
 			return null;
@@ -186,7 +180,6 @@ public final class ServiceLocator implements IDisposable, INestable,
 		return service;
 	}
 
-	@Override
 	public final boolean hasService(final Class key) {
 		if (disposed) {
 			return false;

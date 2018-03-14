@@ -39,7 +39,6 @@ public class SelectAllHandler extends WidgetMethodHandler {
 	 */
 	private static final Class[] METHOD_PARAMETERS = { Point.class };
 
-	@Override
 	public final Object execute(final ExecutionEvent event)
 			throws ExecutionException {
 		final Method methodToExecute = getMethodToExecute();
@@ -75,14 +74,12 @@ public class SelectAllHandler extends WidgetMethodHandler {
 						final Object focusComponent = getFocusComponent();
 						if (focusComponent != null) {
 							Runnable methodRunnable = new Runnable() {
-								@Override
 								public void run() {
 									try {
 										methodToExecute.invoke(focusComponent);
 										// and back to the UI thread :-)
 										focusControl.getDisplay().asyncExec(
 												new Runnable() {
-													@Override
 													public void run() {
 														if (!focusControl
 																.isDisposed()) {
@@ -106,7 +103,6 @@ public class SelectAllHandler extends WidgetMethodHandler {
 										 */
 										focusControl.getDisplay().asyncExec(
 												new Runnable() {
-													@Override
 													public void run() {
 														ExceptionHandler
 																.getInstance()
@@ -182,7 +178,6 @@ public class SelectAllHandler extends WidgetMethodHandler {
 	 * 
 	 * @return The method on the focus control; <code>null</code> if none.
 	 */
-	@Override
 	protected Method getMethodToExecute() {
 		Method method = super.getMethodToExecute();
 
@@ -206,7 +201,6 @@ public class SelectAllHandler extends WidgetMethodHandler {
 	 * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement,
 	 *      java.lang.String, java.lang.Object)
 	 */
-	@Override
 	public void setInitializationData(IConfigurationElement config,
 			String propertyName, Object data) {
 		// The name is always "selectAll".

@@ -86,7 +86,6 @@ public class SupportTray extends DialogTray implements
 	 * 
 	 * @see org.eclipse.jface.dialogs.DialogTray#createContents(org.eclipse.swt.widgets.Composite)
 	 */
-	@Override
 	protected Control createContents(Composite parent) {
 		Composite container = new Composite(parent, SWT.NONE);
 
@@ -106,7 +105,6 @@ public class SupportTray extends DialogTray implements
 		container.setLayoutData(layoutData);
 
 		container.addListener(SWT.Dispose, new Listener() {
-			@Override
 			public void handleEvent(Event event) {
 				destroyImages();
 			}
@@ -208,7 +206,6 @@ public class SupportTray extends DialogTray implements
 	private void createActions() {
 		createImages();
 		closeAction = new ContributionItem() {
-			@Override
 			public void fill(ToolBar parent, int index) {
 				final ToolItem item = new ToolItem(parent, SWT.PUSH);
 				item.setImage(normal);
@@ -322,7 +319,6 @@ public class SupportTray extends DialogTray implements
 	 * 
 	 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
 	 */
-	@Override
 	public void selectionChanged(SelectionChangedEvent event) {
 		lastSelectedStatus = getStatusAdapterFromEvent(event);
 		if (supportArea != null && !supportArea.isDisposed()) {

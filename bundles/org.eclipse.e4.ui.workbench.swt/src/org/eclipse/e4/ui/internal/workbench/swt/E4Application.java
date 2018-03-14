@@ -108,7 +108,6 @@ public class E4Application implements IApplication {
 	private static final String APPLICATION_MODEL_PATH_DEFAULT = "Application.e4xmi";
 	private static final String PERSPECTIVE_ARG_NAME = "perspective";
 	private static final String DEFAULT_THEME_ID = "org.eclipse.e4.ui.css.theme.e4_default";
-	public static final String HIGH_CONTRAST_THEME_ID = "org.eclipse.e4.ui.css.theme.high-contrast";
 
 	private String[] args;
 
@@ -201,14 +200,12 @@ public class E4Application implements IApplication {
 		appContext.set(Realm.class, SWTObservables.getRealm(display));
 		appContext.set(UISynchronize.class, new UISynchronize() {
 
-			@Override
 			public void syncExec(Runnable runnable) {
 				if (display != null && !display.isDisposed()) {
 					display.syncExec(runnable);
 				}
 			}
 
-			@Override
 			public void asyncExec(Runnable runnable) {
 				if (display != null && !display.isDisposed()) {
 					display.asyncExec(runnable);
@@ -291,8 +288,30 @@ public class E4Application implements IApplication {
 				false);
 		appContext.set(IWorkbench.XMI_URI_ARG, xmiURI);
 
-		setCSSContextVariables(applicationContext, appContext);
+		String cssURI = getArgValue(IWorkbench.CSS_URI_ARG, applicationContext,
+				false);
+		if (cssURI != null) {
+			appContext.set(IWorkbench.CSS_URI_ARG, cssURI);
+		}
 
+		String themeId = getArgValue(E4Application.THEME_ID,
+				applicationContext, false);
+		if (themeId == null && cssURI == null) {
+			themeId = DEFAULT_THEME_ID;
+		}
+		appContext.set(E4Application.THEME_ID, themeId);
+
+		// validate static CSS URI
+		if (cssURI != null && !cssURI.startsWith("platform:/plugin/")) {
+			System.err
+					.println("Warning. Use the \"platform:/plugin/Bundle-SymbolicName/path/filename.extension\" URI for the  parameter:   "
+							+ IWorkbench.CSS_URI_ARG); //$NON-NLS-1$
+			appContext.set(E4Application.THEME_ID, cssURI);
+		}
+
+		String cssResourcesURI = getArgValue(IWorkbench.CSS_RESOURCE_URI_ARG,
+				applicationContext, false);
+		appContext.set(IWorkbench.CSS_RESOURCE_URI_ARG, cssResourcesURI);
 		appContext.set(
 				E4Workbench.RENDERER_FACTORY_URI,
 				getArgValue(E4Workbench.RENDERER_FACTORY_URI,
@@ -309,39 +328,6 @@ public class E4Application implements IApplication {
 		// Instantiate the Workbench (which is responsible for
 		// 'running' the UI (if any)...
 		return workbench = new E4Workbench(appModel, appContext);
-	}
-
-	private void setCSSContextVariables(IApplicationContext applicationContext,
-			IEclipseContext context) {
-		boolean highContrastMode = getApplicationDisplay().getHighContrast();
-
-		String cssURI = highContrastMode ? null : getArgValue(
-				IWorkbench.CSS_URI_ARG, applicationContext, false);
-
-		if (cssURI != null) {
-			context.set(IWorkbench.CSS_URI_ARG, cssURI);
-		}
-
-		String themeId = highContrastMode ? HIGH_CONTRAST_THEME_ID
-				: getArgValue(E4Application.THEME_ID, applicationContext, false);
-
-		if (themeId == null && cssURI == null) {
-			themeId = DEFAULT_THEME_ID;
-		}
-
-		context.set(E4Application.THEME_ID, themeId);
-
-		// validate static CSS URI
-		if (cssURI != null && !cssURI.startsWith("platform:/plugin/")) {
-			System.err
-					.println("Warning. Use the \"platform:/plugin/Bundle-SymbolicName/path/filename.extension\" URI for the  parameter:   "
-							+ IWorkbench.CSS_URI_ARG); //$NON-NLS-1$
-			context.set(E4Application.THEME_ID, cssURI);
-		}
-
-		String cssResourcesURI = getArgValue(IWorkbench.CSS_RESOURCE_URI_ARG,
-				applicationContext, false);
-		context.set(IWorkbench.CSS_RESOURCE_URI_ARG, cssResourcesURI);
 	}
 
 	private MApplication loadApplicationModel(IApplicationContext appContext,
@@ -450,7 +436,6 @@ public class E4Application implements IApplication {
 				: brandingProperty;
 	}
 
-	@Override
 	public void stop() {
 		if (workbench != null) {
 			workbench.close();
@@ -504,24 +489,19 @@ public class E4Application implements IApplication {
 						E4Workbench.LOCAL_ACTIVE_SHELL));
 
 		appContext.set(IStylingEngine.class, new IStylingEngine() {
-			@Override
 			public void setClassname(Object widget, String classname) {
 			}
 
-			@Override
 			public void setId(Object widget, String id) {
 			}
 
-			@Override
 			public void style(Object widget) {
 			}
 
-			@Override
 			public CSSStyleDeclaration getStyle(Object widget) {
 				return null;
 			}
 
-			@Override
 			public void setClassnameAndId(Object widget, String classname,
 					String id) {
 			}
@@ -800,7 +780,6 @@ public class E4Application implements IApplication {
 			initializeWindowServices(childWindow);
 		}
 		((EObject) appModel).eAdapters().add(new AdapterImpl() {
-			@Override
 			public void notifyChanged(Notification notification) {
 				if (notification.getFeatureID(MApplication.class) != UiPackageImpl.ELEMENT_CONTAINER__CHILDREN)
 					return;
@@ -817,7 +796,6 @@ public class E4Application implements IApplication {
 		// we add a special tracker to bring up current selection from
 		// the active window to the application level
 		appContext.runAndTrack(new RunAndTrack() {
-			@Override
 			public boolean changed(IEclipseContext context) {
 				IEclipseContext activeChildContext = context.getActiveChild();
 				if (activeChildContext != null) {
@@ -834,7 +812,6 @@ public class E4Application implements IApplication {
 		// about as handle needs to know its context
 		appContext.set(ESelectionService.class.getName(),
 				new ContextFunction() {
-					@Override
 					public Object compute(IEclipseContext context,
 							String contextKey) {
 						return ContextInjectionFactory.make(
@@ -849,7 +826,6 @@ public class E4Application implements IApplication {
 		// Mostly MWindow contexts are lazily created by renderers and is not
 		// set at this point.
 		((EObject) childWindow).eAdapters().add(new AdapterImpl() {
-			@Override
 			public void notifyChanged(Notification notification) {
 				if (notification.getFeatureID(MWindow.class) != BasicPackageImpl.WINDOW__CONTEXT)
 					return;

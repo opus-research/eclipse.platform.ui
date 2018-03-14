@@ -49,7 +49,6 @@ public class GradientBackgroundListener implements Listener {
 	Image gradientImage;
 	
 	private DisposeListener disposeListener = new DisposeListener() {
-		@Override
 		public void widgetDisposed(DisposeEvent e) {
 			dispose();
 		}
@@ -111,7 +110,6 @@ public class GradientBackgroundListener implements Listener {
 		}
 	}
 
-	@Override
 	public void handleEvent(Event event) {
 		Point size = control.getSize();
 		if (size.x <= 0 || size.y <= 0) {
