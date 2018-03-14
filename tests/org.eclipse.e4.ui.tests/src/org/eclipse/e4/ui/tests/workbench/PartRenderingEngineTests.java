@@ -204,7 +204,7 @@ public class PartRenderingEngineTests {
 		assertEquals(0, tabFolder.getSelectionIndex());
 
 		EPartService service = (EPartService) window.getContext().get(
-				EPartService.class.getName());
+				EPartService.class);
 		service.activate(partB);
 		assertEquals(
 				"Activating another part should've altered the tab folder's selection",
@@ -243,7 +243,7 @@ public class PartRenderingEngineTests {
 		assertEquals(0, tabFolder.getSelectionIndex());
 
 		EPartService service = (EPartService) window.getContext().get(
-				EPartService.class.getName());
+				EPartService.class);
 		service.showPart(partB.getElementId(), PartState.ACTIVATE);
 		assertEquals("Showing a part should alter the tab folder's selection",
 				1, tabFolder.getSelectionIndex());
@@ -278,7 +278,7 @@ public class PartRenderingEngineTests {
 		assertEquals(0, tabFolder.getItemCount());
 
 		EPartService service = (EPartService) window.getContext().get(
-				EPartService.class.getName());
+				EPartService.class);
 		MPart shownPart = service.showPart("part", PartState.ACTIVATE);
 
 		assertEquals(1, tabFolder.getItemCount());
@@ -441,7 +441,7 @@ public class PartRenderingEngineTests {
 		// created in the second window instead of trying to reuse the one in
 		// the first window
 		EPartService service = (EPartService) window2.getContext().get(
-				EPartService.class.getName());
+				EPartService.class);
 		service.showPart("part", EPartService.PartState.VISIBLE);
 		service.showPart("part", EPartService.PartState.CREATE);
 
@@ -482,7 +482,7 @@ public class PartRenderingEngineTests {
 		assertEquals(0, tabFolder.getSelectionIndex());
 
 		EPartService service = (EPartService) window.getContext().get(
-				EPartService.class.getName());
+				EPartService.class);
 		service.activate(partB);
 		assertEquals(1, tabFolder.getSelectionIndex());
 
@@ -654,7 +654,7 @@ public class PartRenderingEngineTests {
 		assertEquals(0, tabFolder.getSelectionIndex());
 
 		EPartService service = (EPartService) window.getContext().get(
-				EPartService.class.getName());
+				EPartService.class);
 		service.activate(partB);
 		assertEquals(1, tabFolder.getSelectionIndex());
 

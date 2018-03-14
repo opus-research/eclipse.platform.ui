@@ -416,8 +416,7 @@ public class MWindowTest {
 		window.setWidth(200);
 		window.setHeight(200);
 
-		MApplication application = ApplicationFactoryImpl.eINSTANCE
-				.createApplication();
+		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class.getName(), application);
