@@ -31,33 +31,21 @@ import org.w3c.dom.Element;
 /**
  * {@link IElementProvider} SWT implementation to retrieve w3c Element
  * {@link SWTElement} linked to SWT widget.
- * 
+ *
  * @version 1.0.0
  * @author <a href="mailto:angelo.zerr@gmail.com">Angelo ZERR</a>
- * 
+ *
  */
 public class SWTElementProvider implements IElementProvider {
 
 	public static final IElementProvider INSTANCE = new SWTElementProvider();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.core.css.dom.IElementProvider#getElement(java.lang.
-	 * Object)
-	 */
+
+	@Override
 	public Element getElement(Object element, CSSEngine engine) {
 		return createElement(element, engine);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.core.css.dom.IElementProvider#getElement(java.lang.
-	 * Object)
-	 */
 	public CSSStylableElement createElement(Object element, CSSEngine engine) {
 		if (element instanceof Text) {
 			return new TextElement((Text) element, engine);
@@ -77,8 +65,6 @@ public class SWTElementProvider implements IElementProvider {
 		if (element instanceof ToolBar) {
 			return new ToolBarElement((ToolBar) element, engine);
 		}
-
-		
 		if (element instanceof Composite) {
 			return new CompositeElement((Composite) element, engine);
 		}
