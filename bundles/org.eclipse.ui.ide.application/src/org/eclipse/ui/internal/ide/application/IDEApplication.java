@@ -105,10 +105,8 @@ public class IDEApplication implements IApplication, IExecutableExtension {
         // There is nothing to do for IDEApplication
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.IApplicationContext context)
-     */
-    public Object start(IApplicationContext appContext) throws Exception {
+    @Override
+	public Object start(IApplicationContext appContext) throws Exception {
         Display display = createDisplay();
         // processor must be created before we start event loop
         DelayedEventsProcessor processor = new DelayedEventsProcessor(display);
@@ -170,10 +168,8 @@ public class IDEApplication implements IApplication, IExecutableExtension {
         return PlatformUI.createDisplay();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
-     */
-    public void setInitializationData(IConfigurationElement config,
+    @Override
+	public void setInitializationData(IConfigurationElement config,
             String propertyName, Object data) {
         // There is nothing to do for IDEApplication
     }
@@ -318,7 +314,12 @@ public class IDEApplication implements IApplication, IExecutableExtension {
         URL url = null;
         do {
         	// okay to use the shell now - this is the splash shell
-            new ChooseWorkspaceDialog(shell, launchData, false, true).prompt(force);
+			new ChooseWorkspaceDialog(shell, launchData, false, true) {
+				@Override
+				protected Shell getParentShell() {
+					return null;
+				}
+			}.prompt(force);
             String instancePath = launchData.getSelection();
             if (instancePath == null) {
 				return null;
@@ -583,15 +584,14 @@ public class IDEApplication implements IApplication, IExecutableExtension {
         return new Version(version.getMajor(), version.getMinor(), 0);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.equinox.app.IApplication#stop()
-     */
+	@Override
 	public void stop() {
 		final IWorkbench workbench = PlatformUI.getWorkbench();
 		if (workbench == null)
 			return;
 		final Display display = workbench.getDisplay();
 		display.syncExec(new Runnable() {
+			@Override
 			public void run() {
 				if (!display.isDisposed())
 					workbench.close();

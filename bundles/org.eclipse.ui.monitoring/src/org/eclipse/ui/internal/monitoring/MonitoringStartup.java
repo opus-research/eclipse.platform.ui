@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014, Google Inc and others.
+ * Copyright (C) 2014 Google Inc and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Steve Foreman (Google) - initial API and implementation
  *     Marcus Eng (Google)
+ *     Sergey Prigogin (Google)
  *******************************************************************************/
 package org.eclipse.ui.internal.monitoring;
 
@@ -25,10 +26,6 @@ public class MonitoringStartup implements IStartup {
 
 	@Override
 	public void earlyStartup() {
-		setupPlugin();
-	}
-
-	private void setupPlugin() {
 		if (monitoringThread != null) {
 			return;
 		}
@@ -57,7 +54,7 @@ public class MonitoringStartup implements IStartup {
 
 		final EventLoopMonitorThread thread = temporaryThread;
 		final Display display = MonitoringPlugin.getDefault().getWorkbench().getDisplay();
-		// Final setup and start synced on display thread
+		// Final setup and start asynchronously on the display thread.
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
@@ -79,14 +76,17 @@ public class MonitoringStartup implements IStartup {
 		IPreferenceStore preferences = MonitoringPlugin.getDefault().getPreferenceStore();
 		EventLoopMonitorThread.Parameters args = new EventLoopMonitorThread.Parameters();
 
-		args.loggingThreshold = preferences.getInt(PreferenceConstants.MAX_EVENT_LOG_TIME_MILLIS);
-		args.samplingThreshold = preferences.getInt(PreferenceConstants.MAX_EVENT_SAMPLE_TIME_MILLIS);
-		args.dumpAllThreads = preferences.getBoolean(PreferenceConstants.DUMP_ALL_THREADS);
-		args.minimumPollingDelay = preferences.getInt(PreferenceConstants.SAMPLE_INTERVAL_TIME_MILLIS);
-		args.loggedTraceCount = preferences.getInt(PreferenceConstants.MAX_LOG_TRACE_COUNT);
-		args.deadlockDelta = preferences.getInt(PreferenceConstants.FORCE_DEADLOCK_LOG_TIME_MILLIS);
-		args.logLocally = preferences.getBoolean(PreferenceConstants.LOG_TO_ERROR_LOG);
-		args.filterTraces = preferences.getString(PreferenceConstants.FILTER_TRACES);
+		args.longEventWarningThreshold =
+				preferences.getInt(PreferenceConstants.LONG_EVENT_WARNING_THRESHOLD_MILLIS);
+		args.longEventErrorThreshold =
+				preferences.getInt(PreferenceConstants.LONG_EVENT_ERROR_THRESHOLD_MILLIS);
+		args.deadlockThreshold =
+				preferences.getInt(PreferenceConstants.DEADLOCK_REPORTING_THRESHOLD_MILLIS);
+		args.maxStackSamples = preferences.getInt(PreferenceConstants.MAX_STACK_SAMPLES);
+		args.uiThreadFilter = preferences.getString(PreferenceConstants.UI_THREAD_FILTER);
+		args.noninterestingThreadFilter =
+				preferences.getString(PreferenceConstants.NONINTERESTING_THREAD_FILTER);
+		args.logToErrorLog = preferences.getBoolean(PreferenceConstants.LOG_TO_ERROR_LOG);
 
 		return args;
 	}

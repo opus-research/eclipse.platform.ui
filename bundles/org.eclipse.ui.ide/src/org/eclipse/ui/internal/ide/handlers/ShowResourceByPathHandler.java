@@ -28,13 +28,14 @@ import org.eclipse.ui.part.ISetSelectionTarget;
 /**
  * A command handler to show a resource in the Navigator view given the resource
  * path.
- * 
+ *
  * @since 3.2
  */
 public class ShowResourceByPathHandler extends AbstractHandler {
 
 	private static final String PARAM_ID_RESOURCE_PATH = "resourcePath"; //$NON-NLS-1$
 
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		IResource resource = (IResource) event

@@ -7,14 +7,12 @@
  *
  * Contributors:
  *     Tom Schindl <tom.schindl@bestsolution.at> - adjustment to EObject
-  *     Steven Spungin <steven@spungin.tv> - Bug 442821 - [e4.emf.xpath] allow factory to accept custom functions
-******************************************************************************/
+ ******************************************************************************/
 package org.eclipse.e4.emf.internal.xpath;
-
-import java.util.List;
 
 import org.eclipse.e4.emf.xpath.XPathContext;
 import org.eclipse.e4.emf.xpath.XPathContextFactory;
+
 
 /**
  * Factory creating context using JXPath
@@ -24,25 +22,14 @@ import org.eclipse.e4.emf.xpath.XPathContextFactory;
  */
 public class JXPathContextFactoryImpl<Type> extends XPathContextFactory<Type> {
 
-	private List<Class<?>> functions;
-	private List<String> namespaces;
-
+	@Override
 	public XPathContext newContext(XPathContext parentContext, Object contextBean) {
-		JXPathContextImpl ret = new JXPathContextImpl(parentContext, contextBean);
-		ret.addFunctions(functions, namespaces);
-		return ret;
+		return new JXPathContextImpl(parentContext, contextBean);
 	}
 
-
+	@Override
 	public XPathContext newContext(Type contextBean) {
-		JXPathContextImpl ret = new JXPathContextImpl(contextBean);
-		ret.addFunctions(functions, namespaces);
-		return ret;
-	}
-
-	public void setFunctions(List<Class<?>> functions, List<String> namespaces) {
-		this.functions = functions;
-		this.namespaces = namespaces;
+		return new JXPathContextImpl(contextBean);
 	}
 
 }

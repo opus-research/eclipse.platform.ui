@@ -24,12 +24,12 @@ import org.eclipse.ui.IFileEditorMapping;
  * A label provider for displaying of <code>IFileEditorMapping</code>
  * objects in viewers.
  * <p>
- * This class has a singleton instance, 
+ * This class has a singleton instance,
  * <code>FileEditorMappingLabelProvider.INSTANCE</code>,
  * which can be used any place this kind of label provider is needed.
  * </p>
  * <p>
- * The singleton instance hangs on to images, which get freed up when 
+ * The singleton instance hangs on to images, which get freed up when
  * <code>dispose</code> is called.
  * </p>
  *
@@ -56,9 +56,6 @@ public class FileEditorMappingLabelProvider extends LabelProvider implements
         super();
     }
 
-    /* (non-Javadoc)
-     * Method declared on ILabelProvider.
-     */
     @Override
 	public void dispose() {
         super.dispose();
@@ -70,7 +67,7 @@ public class FileEditorMappingLabelProvider extends LabelProvider implements
 
     /**
      * The <code>ResourceTypeEditorMappingLabelProvider</code> implementation of this
-     * <code>ITableLabelProvider</code> method creates and returns an new image. The 
+     * <code>ITableLabelProvider</code> method creates and returns an new image. The
      * image is remembered internally and will be deallocated by
      * <code>dispose</code>.
      */
@@ -79,9 +76,6 @@ public class FileEditorMappingLabelProvider extends LabelProvider implements
         return getImage(element);
     }
 
-    /* (non-Javadoc)
-     * Method declared on ITableLabelProvider.
-     */
     @Override
 	public String getColumnText(Object element, int row) {
         return getText(element);
@@ -103,9 +97,6 @@ public class FileEditorMappingLabelProvider extends LabelProvider implements
         return null;
     }
 
-    /* (non-Javadoc)
-     * Method declared on ILabelProvider.
-     */
     @Override
 	public String getText(Object element) {
         if (element instanceof IFileEditorMapping) {

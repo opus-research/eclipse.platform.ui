@@ -30,17 +30,13 @@ import org.eclipse.ui.statushandlers.StatusManager;
 /**
  * The IDESelectionConversionService is the selection service that uses the
  * resource support available to the IDE.
- * 
+ *
  * @since 3.2
  */
 public class IDESelectionConversionService implements
 		ISelectionConversionService {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.SelectionConversionService#convertToResources(org.eclipse.jface.viewers.IStructuredSelection)
-	 */
+	@Override
 	public IStructuredSelection convertToResources(
 			IStructuredSelection originalSelection) {
 

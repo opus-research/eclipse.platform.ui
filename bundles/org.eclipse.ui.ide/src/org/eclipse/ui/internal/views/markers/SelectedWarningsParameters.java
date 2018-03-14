@@ -19,9 +19,9 @@ import org.eclipse.ui.views.markers.FiltersContributionParameters;
 
 /**
  * SelectedWarningsParameters is the parameters for warnings.
- * 
+ *
  * @since 3.4
- * 
+ *
  */
 public class SelectedWarningsParameters extends FiltersContributionParameters {
 
@@ -41,9 +41,10 @@ public class SelectedWarningsParameters extends FiltersContributionParameters {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.provisional.views.markers.FiltersContributionParameters#getParameterValues()
 	 */
+	@Override
 	public Map getParameterValues() {
 		return warningsMap;
 	}

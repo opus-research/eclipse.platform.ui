@@ -46,7 +46,7 @@ import org.eclipse.ui.internal.ide.dialogs.OpenResourceDialog;
 /**
  * Implements the open resource action. Opens a dialog prompting for a file and
  * opens the selected file in an editor.
- * 
+ *
  * @since 2.1
  */
 public final class OpenResourceHandler extends Action implements IHandler,
@@ -72,6 +72,7 @@ public final class OpenResourceHandler extends Action implements IHandler,
 				IIDEHelpContextIds.OPEN_WORKSPACE_FILE_ACTION);
 	}
 
+	@Override
 	public final void addHandlerListener(final IHandlerListener listener) {
 		if (listenerList == null) {
 			listenerList = new ListenerList(ListenerList.IDENTITY);
@@ -80,10 +81,12 @@ public final class OpenResourceHandler extends Action implements IHandler,
 		listenerList.add(listener);
 	}
 
+	@Override
 	public final void dispose() {
 		listenerList = null;
 	}
 
+	@Override
 	public final Object execute(final ExecutionEvent event)
 			throws ExecutionException {
 		final List files = new ArrayList();
@@ -136,13 +139,14 @@ public final class OpenResourceHandler extends Action implements IHandler,
 		return null;
 	}
 
+	@Override
 	public final void init(final IWorkbenchWindow window) {
 		// Do nothing.
 	}
 
 	/**
 	 * Query the user for the resources that should be opened
-	 * 
+	 *
 	 * @return the resource that should be opened.
 	 */
 	private final Object[] queryFileResource() {
@@ -166,6 +170,7 @@ public final class OpenResourceHandler extends Action implements IHandler,
 		return result;
 	}
 
+	@Override
 	public final void removeHandlerListener(final IHandlerListener listener) {
 		if (listenerList != null) {
 			listenerList.remove(listener);
@@ -176,6 +181,7 @@ public final class OpenResourceHandler extends Action implements IHandler,
 		}
 	}
 
+	@Override
 	public final void run(final IAction action) {
 		try {
 			execute(new ExecutionEvent());
@@ -184,6 +190,7 @@ public final class OpenResourceHandler extends Action implements IHandler,
 		}
 	}
 
+	@Override
 	public final void selectionChanged(final IAction action,
 			final ISelection selection) {
 		// Do nothing.

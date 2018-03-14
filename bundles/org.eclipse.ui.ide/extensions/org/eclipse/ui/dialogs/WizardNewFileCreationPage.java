@@ -117,7 +117,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 	/**
 	 * The file extension to use for this page's file name field when it does
 	 * not exist yet.
-	 * 
+	 *
 	 * @see WizardNewFileCreationPage#setFileExtension(String)
 	 * @since 3.3
 	 */
@@ -142,7 +142,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 	 * Creates a new file creation wizard page. If the initial resource
 	 * selection contains exactly one container resource then it will be used as
 	 * the default container resource.
-	 * 
+	 *
 	 * @param pageName
 	 *            the name of the page
 	 * @param selection
@@ -157,7 +157,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 
 	/**
 	 * Creates the widget for advanced options.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent composite
 	 */
@@ -182,6 +182,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 			data.horizontalAlignment = GridData.BEGINNING;
 			advancedButton.setLayoutData(data);
 			advancedButton.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					handleAdvancedButtonSelect();
 				}
@@ -189,19 +190,23 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 		}
 		linkedResourceGroup = new CreateLinkedResourceGroup(IResource.FILE,
 				new Listener() {
+					@Override
 					public void handleEvent(Event e) {
 						setPageComplete(validatePage());
 						firstLinkCheck = false;
 					}
 				}, new CreateLinkedResourceGroup.IStringValue() {
+					@Override
 					public void setValue(String string) {
 						resourceGroup.setResource(string);
 					}
 
+					@Override
 					public String getValue() {
 						return resourceGroup.getResource();
 					}
 
+					@Override
 					public IResource getResource() {
 						IPath path = resourceGroup.getContainerFullPath();
 						IWorkspaceRoot root = ResourcesPlugin.getWorkspace()
@@ -227,6 +232,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 	/**
 	 * (non-Javadoc) Method declared on IDialogPage.
 	 */
+	@Override
 	public void createControl(Composite parent) {
 		initializeDialogUnits(parent);
 		// top level group
@@ -261,7 +267,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 
 	/**
 	 * Creates a file resource given the file handle and contents.
-	 * 
+	 *
 	 * @param fileHandle
 	 *            the file handle to create a file resource with
 	 * @param contents
@@ -273,12 +279,13 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 	 *                if the operation fails
 	 * @exception OperationCanceledException
 	 *                if the operation is canceled
-	 * 
+	 *
 	 * @deprecated As of 3.3, use or override {@link #createNewFile()} which
 	 *             uses the undoable operation support. To supply customized
 	 *             file content for a subclass, use
 	 *             {@link #getInitialContents()}.
 	 */
+	@Deprecated
 	protected void createFile(IFile fileHandle, InputStream contents,
 			IProgressMonitor monitor) throws CoreException {
 		if (contents == null) {
@@ -327,7 +334,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 	 * Creates a file resource handle for the file with the given workspace
 	 * path. This method does not create the file resource; this is the
 	 * responsibility of <code>createFile</code>.
-	 * 
+	 *
 	 * @param filePath
 	 *            the path of the file resource to create a handle for
 	 * @return the new file resource handle
@@ -363,7 +370,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 	 * This method should be called within a workspace modify operation since it
 	 * creates resources.
 	 * </p>
-	 * 
+	 *
 	 * @return the created file resource, or <code>null</code> if the file was
 	 *         not created
 	 */
@@ -380,7 +387,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 		final InputStream initialContents = getInitialContents();
 
 		createLinkTarget();
-		
+
 		if (linkTargetPath != null) {
 			URI resolvedPath = newFileHandle.getPathVariableManager().resolveURI(linkTargetPath);
 			try {
@@ -389,7 +396,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 					if (!store.fetchInfo().exists()) {
 						MessageDialog dlg = new MessageDialog(getContainer().getShell(),
 								IDEWorkbenchMessages.WizardNewFileCreationPage_createLinkLocationTitle,
-								null, 
+								null,
 								NLS.bind(
 										IDEWorkbenchMessages.WizardNewFileCreationPage_createLinkLocationQuestion, linkTargetPath),
 								MessageDialog.QUESTION_WITH_CANCEL,
@@ -416,7 +423,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 										.bind(
 												IDEWorkbenchMessages.WizardNewFileCreationPage_internalErrorMessage,
 												e.getMessage()), SWT.SHEET);
-	
+
 				return null;
 			} catch (IOException e) {
 				MessageDialog
@@ -427,12 +434,13 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 										.bind(
 												IDEWorkbenchMessages.WizardNewFileCreationPage_internalErrorMessage,
 												e.getMessage()), SWT.SHEET);
-	
+
 				return null;
 			}
 		}
 
 		IRunnableWithProgress op = new IRunnableWithProgress() {
+			@Override
 			public void run(IProgressMonitor monitor) {
 				CreateFileOperation op = new CreateFileOperation(newFileHandle,
 						linkTargetPath, initialContents,
@@ -440,13 +448,14 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 				try {
 					// see bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=219901
 					// directly execute the operation so that the undo state is
-					// not preserved.  Making this undoable resulted in too many 
+					// not preserved.  Making this undoable resulted in too many
 					// accidental file deletions.
 					op.execute(monitor, WorkspaceUndoUtil
 							.getUIInfoAdapter(getShell()));
 				} catch (final ExecutionException e) {
 					getContainer().getShell().getDisplay().syncExec(
 							new Runnable() {
+								@Override
 								public void run() {
 									if (e.getCause() instanceof CoreException) {
 										ErrorDialog
@@ -512,7 +521,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 	 * Returns the scheduling rule to use when creating the resource at the
 	 * given container path. The rule should be the creation rule for the
 	 * top-most non-existing parent.
-	 * 
+	 *
 	 * @param resource
 	 *            The resource being created
 	 * @return The scheduling rule for creating the given resource
@@ -520,6 +529,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 	 * @deprecated As of 3.3, scheduling rules are provided by the undoable
 	 *             operation that this page creates and executes.
 	 */
+	@Deprecated
 	protected ISchedulingRule createRule(IResource resource) {
 		IResource parent = resource.getParent();
 		while (parent != null) {
@@ -536,7 +546,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 	/**
 	 * Returns the current full path of the containing resource as entered or
 	 * selected by the user, or its anticipated initial value.
-	 * 
+	 *
 	 * @return the container's full path, anticipated initial value, or
 	 *         <code>null</code> if no path is known
 	 */
@@ -550,9 +560,9 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 	 * <br>
 	 * The current file name will include the file extension if the
 	 * preconditions are met.
-	 * 
+	 *
 	 * @see WizardNewFileCreationPage#setFileExtension(String)
-	 * 
+	 *
 	 * @return the file name, its anticipated initial value, or
 	 *         <code>null</code> if no file name is known
 	 */
@@ -566,7 +576,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 
 	/**
 	 * Returns the file extension to use when creating the new file.
-	 * 
+	 *
 	 * @return the file extension or <code>null</code>.
 	 * @see WizardNewFileCreationPage#setFileExtension(String)
 	 * @since 3.3
@@ -582,7 +592,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 	 * Returns a stream containing the initial contents to be given to new file
 	 * resource instances. <b>Subclasses</b> may wish to override. This default
 	 * implementation provides no initial contents.
-	 * 
+	 *
 	 * @return initial contents to be given to new file resource instances
 	 */
 	protected InputStream getInitialContents() {
@@ -595,7 +605,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 	 * <p>
 	 * Subclasses may reimplement.
 	 * </p>
-	 * 
+	 *
 	 * @return the label to display in the file name specification visual
 	 *         component group
 	 */
@@ -647,7 +657,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 						if (path != null)
 							setDefaultLinkValue = path.toPortableString().length() > 0;
 					}
-					
+
 					if (setDefaultLinkValue) {
 						IPath containerPath = resourceGroup.getContainerFullPath();
 						IPath newFilePath = containerPath.append(resourceGroup.getResource());
@@ -672,6 +682,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 	 * <code>Listener</code> method handles all events and enablements for
 	 * controls on this page. Subclasses may extend.
 	 */
+	@Override
 	public void handleEvent(Event event) {
 		setPageComplete(validatePage());
 	}
@@ -711,7 +722,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 	/**
 	 * Sets the flag indicating whether existing resources are permitted to be
 	 * specified on this page.
-	 * 
+	 *
 	 * @param value
 	 *            <code>true</code> if existing resources are permitted, and
 	 *            <code>false</code> otherwise
@@ -728,7 +739,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 	/**
 	 * Sets the value of this page's container name field, or stores it for
 	 * future use if this page's controls do not exist yet.
-	 * 
+	 *
 	 * @param path
 	 *            the full path to the container
 	 */
@@ -743,7 +754,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 	/**
 	 * Sets the value of this page's file name field, or stores it for future
 	 * use if this page's controls do not exist yet.
-	 * 
+	 *
 	 * @param value
 	 *            new file name
 	 */
@@ -770,7 +781,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 	 * <br>
 	 * The file extension will not be reflected in the actual file name field
 	 * until the file name field loses focus.
-	 * 
+	 *
 	 * @param value
 	 *            The file extension without the '.' prefix (e.g. 'java', 'xml')
 	 * @since 3.3
@@ -786,7 +797,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 	/**
 	 * Checks whether the linked resource target is valid. Sets the error
 	 * message accordingly and returns the status.
-	 * 
+	 *
 	 * @return IStatus validation result from the CreateLinkedResourceGroup
 	 */
 	protected IStatus validateLinkedResource() {
@@ -812,7 +823,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 
 	/**
 	 * Returns whether this page's controls currently all contain valid values.
-	 * 
+	 *
 	 * @return <code>true</code> if all controls are valid, and
 	 *         <code>false</code> if at least one is invalid
 	 */
@@ -895,11 +906,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.DialogPage#setVisible(boolean)
-	 */
+	@Override
 	public void setVisible(boolean visible) {
 		super.setVisible(visible);
 		if (visible) {

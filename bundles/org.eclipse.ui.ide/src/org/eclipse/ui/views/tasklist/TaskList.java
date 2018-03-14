@@ -116,13 +116,14 @@ import org.eclipse.ui.views.markers.MarkerSupportView;
 /**
  * Main class for the Task List view for displaying tasks and problem annotations
  * on resources, and for opening an editor on the resource when the user commands.
- * 
+ *
  * @deprecated This view is no longer in use as of Eclipse 3.4.
  * The view referenced by {@link IPageLayout#ID_TASK_LIST} is an {@link MarkerSupportView}.
  * </p>
  * @noinstantiate This class is not intended to be instantiated by clients.
  * @noextend This class is not intended to be subclassed by clients.
  */
+@Deprecated
 public class TaskList extends ViewPart {
 
     private Table table;
@@ -229,7 +230,8 @@ public class TaskList extends ViewPart {
                 IMarkerConstants.P_CONTAINER_NAME,
                 IMarkerConstants.P_LINE_AND_LOCATION };
 
-        public String getColumnText(Object element, int columnIndex) {
+        @Override
+		public String getColumnText(Object element, int columnIndex) {
             if (columnIndex >= 3 && columnIndex <= 6) {
 				return (String) MarkerUtil.getProperty(element,
                         keys[columnIndex]);
@@ -237,7 +239,8 @@ public class TaskList extends ViewPart {
             return ""; //$NON-NLS-1$
         }
 
-        public Image getColumnImage(Object element, int columnIndex) {
+        @Override
+		public Image getColumnImage(Object element, int columnIndex) {
             if (columnIndex >= 0 && columnIndex <= 2) {
                 return (Image) MarkerUtil.getProperty(element,
                         keys[columnIndex]);
@@ -257,7 +260,8 @@ public class TaskList extends ViewPart {
             this.column = column;
         }
 
-        public void run() {
+        @Override
+		public void run() {
             comparator.setTopPriority(column);
             updateSortingState();
             viewer.refresh();
@@ -282,7 +286,8 @@ public class TaskList extends ViewPart {
             this.direction = direction;
         }
 
-        public void run() {
+        @Override
+		public void run() {
             comparator.setTopPriorityDirection(direction);
             updateSortingState();
             viewer.refresh();
@@ -298,11 +303,11 @@ public class TaskList extends ViewPart {
 
     private String columnHeaders[] = {
             TaskListMessages.TaskList_headerIcon,
-            TaskListMessages.TaskList_headerCompleted, 
-            TaskListMessages.TaskList_headerPriority, 
-            TaskListMessages.TaskList_headerDescription, 
+            TaskListMessages.TaskList_headerCompleted,
+            TaskListMessages.TaskList_headerPriority,
+            TaskListMessages.TaskList_headerDescription,
             TaskListMessages.TaskList_headerResource,
-            TaskListMessages.TaskList_headerFolder, 
+            TaskListMessages.TaskList_headerFolder,
             TaskListMessages.TaskList_headerLocation
     };
 
@@ -313,26 +318,32 @@ public class TaskList extends ViewPart {
             new ColumnWeightData(60) };
 
     private IPartListener partListener = new IPartListener() {
-        public void partActivated(IWorkbenchPart part) {
+        @Override
+		public void partActivated(IWorkbenchPart part) {
             TaskList.this.partActivated(part);
         }
 
-        public void partBroughtToTop(IWorkbenchPart part) {
+        @Override
+		public void partBroughtToTop(IWorkbenchPart part) {
         }
 
-        public void partClosed(IWorkbenchPart part) {
+        @Override
+		public void partClosed(IWorkbenchPart part) {
             TaskList.this.partClosed(part);
         }
 
-        public void partDeactivated(IWorkbenchPart part) {
+        @Override
+		public void partDeactivated(IWorkbenchPart part) {
         }
 
-        public void partOpened(IWorkbenchPart part) {
+        @Override
+		public void partOpened(IWorkbenchPart part) {
         }
     };
 
     private ISelectionChangedListener focusSelectionChangedListener = new ISelectionChangedListener() {
-        public void selectionChanged(SelectionChangedEvent event) {
+        @Override
+		public void selectionChanged(SelectionChangedEvent event) {
             TaskList.this.focusSelectionChanged(event);
         }
     };
@@ -344,18 +355,21 @@ public class TaskList extends ViewPart {
     private ISelectionProvider focusSelectionProvider;
 
     private ICellModifier cellModifier = new ICellModifier() {
-        public Object getValue(Object element, String property) {
+        @Override
+		public Object getValue(Object element, String property) {
             return MarkerUtil.getProperty(element, property);
         }
 
-        public boolean canModify(Object element, String property) {
+        @Override
+		public boolean canModify(Object element, String property) {
             return MarkerUtil.isEditable((IMarker) element);
         }
 
         /**
          * Modifies a marker as a result of a successfully completed direct editing.
          */
-        public void modify(Object element, String property, Object value) {
+        @Override
+		public void modify(Object element, String property, Object value) {
             Item item = (Item) element;
             IMarker marker = (IMarker) item.getData();
             setProperty(marker, property, value);
@@ -378,11 +392,13 @@ public class TaskList extends ViewPart {
         Transfer[] transferTypes = new Transfer[] {
                 MarkerTransfer.getInstance(), TextTransfer.getInstance() };
         DragSourceListener listener = new DragSourceAdapter() {
-            public void dragSetData(DragSourceEvent event) {
+            @Override
+			public void dragSetData(DragSourceEvent event) {
                 performDragSetData(event);
             }
 
-            public void dragFinished(DragSourceEvent event) {
+            @Override
+			public void dragFinished(DragSourceEvent event) {
             }
         };
         viewer.addDragSupport(operations, transferTypes, listener);
@@ -410,7 +426,8 @@ public class TaskList extends ViewPart {
              * presses on the same column header will
              * toggle sorting order (ascending/descending).
              */
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 // column selected - need to sort
                 int column = table.indexOf((TableColumn) e.widget);
                 if (column == comparator.getTopPriority()) {
@@ -487,17 +504,17 @@ public class TaskList extends ViewPart {
         // Create the header
         buf.append(TaskListMessages.TaskList_reportKind);
         buf.append("\t"); //$NON-NLS-1$
-        buf.append(TaskListMessages.TaskList_reportStatus); 
+        buf.append(TaskListMessages.TaskList_reportStatus);
         buf.append("\t"); //$NON-NLS-1$
-        buf.append(TaskListMessages.TaskList_reportPriority); 
+        buf.append(TaskListMessages.TaskList_reportPriority);
         buf.append("\t"); //$NON-NLS-1$
         buf.append(TaskListMessages.TaskList_headerDescription);
         buf.append("\t"); //$NON-NLS-1$
-        buf.append(TaskListMessages.TaskList_headerResource); 
+        buf.append(TaskListMessages.TaskList_headerResource);
         buf.append("\t"); //$NON-NLS-1$
-        buf.append(TaskListMessages.TaskList_headerFolder); 
+        buf.append(TaskListMessages.TaskList_headerFolder);
         buf.append("\t"); //$NON-NLS-1$
-        buf.append(TaskListMessages.TaskList_headerLocation); 
+        buf.append(TaskListMessages.TaskList_headerLocation);
         buf.append(System.getProperty("line.separator")); //$NON-NLS-1$
 
         // Create the report for the markers
@@ -548,7 +565,8 @@ public class TaskList extends ViewPart {
     /* (non-Javadoc)
      * Method declared on IWorkbenchPart.
      */
-    public void createPartControl(Composite parent) {
+    @Override
+	public void createPartControl(Composite parent) {
         //	long t = System.currentTimeMillis();
         createPartControl0(parent);
         //	t = System.currentTimeMillis() - t;
@@ -595,22 +613,25 @@ public class TaskList extends ViewPart {
         updateSortingState();
         viewer.setInput(getWorkspace().getRoot());
         viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-            public void selectionChanged(SelectionChangedEvent event) {
+            @Override
+			public void selectionChanged(SelectionChangedEvent event) {
                 TaskList.this.selectionChanged(event);
             }
         });
         viewer.addOpenListener(new IOpenListener() {
-            public void open(OpenEvent event) {
+            @Override
+			public void open(OpenEvent event) {
                 gotoTaskAction.run();
             }
         });
         viewer.getControl().addKeyListener(new KeyAdapter() {
-            public void keyPressed(KeyEvent e) {
+            @Override
+			public void keyPressed(KeyEvent e) {
                 handleKeyPressed(e);
             }
         });
 
-        //Add in some accessibility support to supplement the description that we already 
+        //Add in some accessibility support to supplement the description that we already
         //get from the SWT table.
         viewer.getControl().getAccessible().addAccessibleControlListener(
                 new AccessibleControlAdapter() {
@@ -618,7 +639,8 @@ public class TaskList extends ViewPart {
                     /* (non-Javadoc)
                      * @see org.eclipse.swt.accessibility.AccessibleControlListener#getValue(org.eclipse.swt.accessibility.AccessibleControlEvent)
                      */
-                    public void getValue(AccessibleControlEvent e) {
+                    @Override
+					public void getValue(AccessibleControlEvent e) {
 
                         int childIndex = e.childID;
 
@@ -651,8 +673,8 @@ public class TaskList extends ViewPart {
         CellEditor editors[] = new CellEditor[columnHeaders.length];
         editors[1] = new CheckboxCellEditor(table);
         String[] priorities = new String[] {
-                TaskListMessages.TaskList_high, 
-                TaskListMessages.TaskList_normal, 
+                TaskListMessages.TaskList_high,
+                TaskListMessages.TaskList_normal,
                 TaskListMessages.TaskList_low
         };
         editors[2] = new ComboBoxCellEditor(table, priorities, SWT.READ_ONLY);
@@ -665,7 +687,8 @@ public class TaskList extends ViewPart {
         MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
         menuMgr.setRemoveAllWhenShown(true);
         menuMgr.addMenuListener(new IMenuListener() {
-            public void menuAboutToShow(IMenuManager manager) {
+            @Override
+			public void menuAboutToShow(IMenuManager manager) {
                 TaskList.this.fillContextMenu(manager);
             }
         });
@@ -701,7 +724,8 @@ public class TaskList extends ViewPart {
             /*
              * @see HelpListener#helpRequested(HelpEvent)
              */
-            public void helpRequested(HelpEvent e) {
+            @Override
+			public void helpRequested(HelpEvent e) {
                 String contextId = null;
                 // See if there is a context registered for the current selection
                 IMarker marker = (IMarker) ((IStructuredSelection) getSelection())
@@ -739,7 +763,8 @@ public class TaskList extends ViewPart {
     /* (non-Javadoc)
      * Method declared on IWorkbenchPart.
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
         super.dispose();
         getSite().getPage().removePartListener(partListener);
         if (focusSelectionProvider != null) {
@@ -759,7 +784,7 @@ public class TaskList extends ViewPart {
 
     /**
      * Activates the editor on the given marker.
-     * 
+     *
      * @param marker the marker to edit
      */
     public void edit(IMarker marker) {
@@ -833,9 +858,10 @@ public class TaskList extends ViewPart {
 
         BusyIndicator.showWhile(viewer.getControl().getShell().getDisplay(),
                 new Runnable() {
-                    public void run() {
+                    @Override
+					public void run() {
                         // Filter has already been updated by dialog; just refresh.
-                        // Don't need to update labels for existing elements 
+                        // Don't need to update labels for existing elements
                         // since changes to filter settings don't affect them.
                         viewer.getControl().setRedraw(false);
                         viewer.refresh(false);
@@ -855,17 +881,20 @@ public class TaskList extends ViewPart {
     /* (non-Javadoc)
      * @see org.eclipse.core.runtime.IAdaptable#getAdapter(Class)
      */
-    public Object getAdapter(Class adapter) {
+    @Override
+	public Object getAdapter(Class adapter) {
         if (adapter == IShowInSource.class) {
             return new IShowInSource() {
-                public ShowInContext getShowInContext() {
+                @Override
+				public ShowInContext getShowInContext() {
                     return new ShowInContext(null, getSelection());
                 }
             };
         }
         if (adapter == IShowInTargetList.class) {
             return new IShowInTargetList() {
-                public String[] getShowInTargetIds() {
+                @Override
+				public String[] getShowInTargetIds() {
                     return new String[] { IPageLayout.ID_RES_NAV };
                 }
 
@@ -920,7 +949,7 @@ public class TaskList extends ViewPart {
 
     /**
      * Get the resources.
-     * 
+     *
      * @return the resources
      */
     public IResource[] getResources() {
@@ -1004,7 +1033,8 @@ public class TaskList extends ViewPart {
     /* (non-Javadoc)
      * Method declared on IViewPart.
      */
-    public void init(IViewSite site, IMemento memento) throws PartInitException {
+    @Override
+	public void init(IViewSite site, IMemento memento) throws PartInitException {
         super.init(site, memento);
         this.memento = memento;
     }
@@ -1080,15 +1110,15 @@ public class TaskList extends ViewPart {
 
         // goto
         gotoTaskAction = new GotoTaskAction(this, "gotoFile"); //$NON-NLS-1$
-        gotoTaskAction.setText(TaskListMessages.GotoTask_text); 
-        gotoTaskAction.setToolTipText(TaskListMessages.GotoTask_tooltip); 
+        gotoTaskAction.setText(TaskListMessages.GotoTask_text);
+        gotoTaskAction.setToolTipText(TaskListMessages.GotoTask_tooltip);
         gotoTaskAction.setImageDescriptor(MarkerUtil
                 .getImageDescriptor("gotoobj")); //$NON-NLS-1$
         gotoTaskAction.setEnabled(false);
 
         // new task
         newTaskAction = new NewTaskAction(this, "newTask"); //$NON-NLS-1$
-        newTaskAction.setText(TaskListMessages.NewTask_text); 
+        newTaskAction.setText(TaskListMessages.NewTask_text);
         newTaskAction.setToolTipText(TaskListMessages.NewTask_tooltip);
         newTaskAction.setImageDescriptor(MarkerUtil
                 .getImageDescriptor("addtsk")); //$NON-NLS-1$
@@ -1097,20 +1127,20 @@ public class TaskList extends ViewPart {
 
         // copy task
         copyTaskAction = new CopyTaskAction(this, "copy"); //$NON-NLS-1$
-        copyTaskAction.setText(TaskListMessages.CopyTask_text); 
+        copyTaskAction.setText(TaskListMessages.CopyTask_text);
         copyTaskAction.setToolTipText(TaskListMessages.CopyTask_tooltip);
         copyTaskAction.setEnabled(false);
 
         // paste task
         pasteTaskAction = new PasteTaskAction(this, "paste"); //$NON-NLS-1$
-        pasteTaskAction.setText(TaskListMessages.PasteTask_text); 
+        pasteTaskAction.setText(TaskListMessages.PasteTask_text);
         pasteTaskAction.setToolTipText(TaskListMessages.PasteTask_tooltip);
         pasteTaskAction.setEnabled(false);
 
         // remove task
         removeTaskAction = new RemoveTaskAction(this, "delete"); //$NON-NLS-1$
         removeTaskAction.setText(TaskListMessages.RemoveTask_text);
-        removeTaskAction.setToolTipText(TaskListMessages.RemoveTask_tooltip); 
+        removeTaskAction.setToolTipText(TaskListMessages.RemoveTask_tooltip);
         removeTaskAction.setImageDescriptor(sharedImages
                 .getImageDescriptor(ISharedImages.IMG_TOOL_DELETE));
         removeTaskAction.setDisabledImageDescriptor(sharedImages
@@ -1126,23 +1156,23 @@ public class TaskList extends ViewPart {
         //delete completed task
         purgeCompletedAction = new PurgeCompletedAction(this, "deleteCompleted"); //$NON-NLS-1$
         purgeCompletedAction.setText(TaskListMessages.PurgeCompleted_text);
-        purgeCompletedAction.setToolTipText(TaskListMessages.PurgeCompleted_tooltip); 
+        purgeCompletedAction.setToolTipText(TaskListMessages.PurgeCompleted_tooltip);
         purgeCompletedAction.setImageDescriptor(sharedImages
                 .getImageDescriptor(ISharedImages.IMG_TOOL_DELETE));
         purgeCompletedAction.setEnabled(true);
 
         // select all
         selectAllAction = new SelectAllTasksAction(this, "selectAll"); //$NON-NLS-1$
-        selectAllAction.setText(TaskListMessages.SelectAll_text); 
+        selectAllAction.setText(TaskListMessages.SelectAll_text);
         selectAllAction.setToolTipText(TaskListMessages.SelectAll_tooltip);
 
         // resolutions
         resolveMarkerAction = new ResolveMarkerAction(this, "resolve"); //$NON-NLS-1$
-        resolveMarkerAction.setText(TaskListMessages.Resolve_text); 
+        resolveMarkerAction.setText(TaskListMessages.Resolve_text);
         resolveMarkerAction.setToolTipText(TaskListMessages.Resolve_tooltip);
         resolveMarkerAction.setEnabled(false);
 
-        // Sort by ->	
+        // Sort by ->
         sortByCategoryAction = new SortByAction(TaskSorter.TYPE);
         sortByCategoryAction.setText(TaskListMessages.SortByCategory_text);
         sortByCategoryAction.setToolTipText(TaskListMessages.SortByCategory_tooltip);
@@ -1151,19 +1181,19 @@ public class TaskList extends ViewPart {
 
         sortByCompletedAction = new SortByAction(TaskSorter.COMPLETION);
         sortByCompletedAction.setText(TaskListMessages.SortByCompleted_text);
-        sortByCompletedAction.setToolTipText(TaskListMessages.SortByCompleted_tooltip); 
+        sortByCompletedAction.setToolTipText(TaskListMessages.SortByCompleted_tooltip);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(
 				sortByCompletedAction,
 				ITaskListHelpContextIds.TASK_SORT_COMPLETED_ACTION);
 
         sortByPriorityAction = new SortByAction(TaskSorter.PRIORITY);
-        sortByPriorityAction.setText(TaskListMessages.SortByPriority_text); 
-        sortByPriorityAction.setToolTipText(TaskListMessages.SortByPriority_tooltip); 
+        sortByPriorityAction.setText(TaskListMessages.SortByPriority_text);
+        sortByPriorityAction.setToolTipText(TaskListMessages.SortByPriority_tooltip);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(sortByPriorityAction,
 				ITaskListHelpContextIds.TASK_SORT_PRIORITY_ACTION);
 
         sortByDescriptionAction = new SortByAction(TaskSorter.DESCRIPTION);
-        sortByDescriptionAction.setText(TaskListMessages.SortByDescription_text); 
+        sortByDescriptionAction.setText(TaskListMessages.SortByDescription_text);
         sortByDescriptionAction.setToolTipText(TaskListMessages.SortByDescription_tooltip);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(
 				sortByDescriptionAction,
@@ -1171,26 +1201,26 @@ public class TaskList extends ViewPart {
 
         sortByResourceAction = new SortByAction(TaskSorter.RESOURCE);
         sortByResourceAction.setText(TaskListMessages.SortByResource_text);
-        sortByResourceAction.setToolTipText(TaskListMessages.SortByResource_tooltip); 
+        sortByResourceAction.setToolTipText(TaskListMessages.SortByResource_tooltip);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(sortByResourceAction,
 				ITaskListHelpContextIds.TASK_SORT_RESOURCE_ACTION);
 
         sortByContainerAction = new SortByAction(TaskSorter.FOLDER);
-        sortByContainerAction.setText(TaskListMessages.SortByContainer_text); 
+        sortByContainerAction.setText(TaskListMessages.SortByContainer_text);
         sortByContainerAction.setToolTipText(TaskListMessages.SortByContainer_tooltip);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(
 				sortByContainerAction,
 				ITaskListHelpContextIds.TASK_SORT_FOLDER_ACTION);
 
         sortByLocationAction = new SortByAction(TaskSorter.LOCATION);
-        sortByLocationAction.setText(TaskListMessages.SortByLocation_text); 
-        sortByLocationAction.setToolTipText(TaskListMessages.SortByLocation_tooltip); 
+        sortByLocationAction.setText(TaskListMessages.SortByLocation_text);
+        sortByLocationAction.setToolTipText(TaskListMessages.SortByLocation_tooltip);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(sortByLocationAction,
 				ITaskListHelpContextIds.TASK_SORT_LOCATION_ACTION);
 
         sortByCreationTimeAction = new SortByAction(TaskSorter.CREATION_TIME);
         sortByCreationTimeAction.setText(TaskListMessages.SortByCreationTime_text);
-        sortByCreationTimeAction.setToolTipText(TaskListMessages.SortByCreationTime_tooltip); 
+        sortByCreationTimeAction.setToolTipText(TaskListMessages.SortByCreationTime_tooltip);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(
 				sortByCreationTimeAction,
 				ITaskListHelpContextIds.TASK_SORT_CREATION_TIME_ACTION);
@@ -1209,14 +1239,14 @@ public class TaskList extends ViewPart {
 
         // filters...
         filtersAction = new FiltersAction(this, "filter"); //$NON-NLS-1$
-        filtersAction.setText(TaskListMessages.Filters_text); 
+        filtersAction.setText(TaskListMessages.Filters_text);
         filtersAction.setToolTipText(TaskListMessages.Filters_tooltip);
         filtersAction.setImageDescriptor(MarkerUtil
                 .getImageDescriptor("filter")); //$NON-NLS-1$
 
         // properties
         propertiesAction = new TaskPropertiesAction(this, "properties"); //$NON-NLS-1$
-        propertiesAction.setText(TaskListMessages.Properties_text); 
+        propertiesAction.setText(TaskListMessages.Properties_text);
         propertiesAction.setToolTipText(TaskListMessages.Properties_tooltip);
         propertiesAction.setEnabled(false);
     }
@@ -1328,7 +1358,8 @@ public class TaskList extends ViewPart {
     /* (non-Javadoc)
      * Method declared on IViewPart.
      */
-    public void saveState(IMemento memento) {
+    @Override
+	public void saveState(IMemento memento) {
         if (viewer == null) {
             if (this.memento != null) {
 				memento.putMemento(this.memento);
@@ -1392,7 +1423,7 @@ public class TaskList extends ViewPart {
 
         updatePasteEnablement();
 
-        // If selection is empty, then disable copy, remove and goto.	
+        // If selection is empty, then disable copy, remove and goto.
         if (selection.isEmpty()) {
             copyTaskAction.setEnabled(false);
             removeTaskAction.setEnabled(false);
@@ -1400,7 +1431,7 @@ public class TaskList extends ViewPart {
             propertiesAction.setEnabled(false);
             return;
         }
-        
+
 
         // Can only open properties for a single task at a time
         propertiesAction.setEnabled(selection.size() == 1);
@@ -1443,7 +1474,8 @@ public class TaskList extends ViewPart {
     /* (non-Javadoc)
      * Method declared on IWorkbenchPart.
      */
-    public void setFocus() {
+    @Override
+	public void setFocus() {
         viewer.getControl().setFocus();
     }
 
@@ -1470,7 +1502,7 @@ public class TaskList extends ViewPart {
                 //			}
             }
         } catch (CoreException e) {
-            String msg = TaskListMessages.TaskList_errorModifyingTask; 
+            String msg = TaskListMessages.TaskList_errorModifyingTask;
             ErrorDialog.openError(getSite().getShell(), msg, null, e
                     .getStatus());
         }
@@ -1523,7 +1555,7 @@ public class TaskList extends ViewPart {
         }
     }
 
-    // showOwnerProject() added by cagatayk@acm.org 
+    // showOwnerProject() added by cagatayk@acm.org
     boolean showOwnerProject() {
         return getFilter().onResource == TasksFilter.ON_ANY_RESOURCE_OF_SAME_PROJECT;
     }
@@ -1533,7 +1565,7 @@ public class TaskList extends ViewPart {
      * If true, it will resync with the saved input element.
      * Otherwise, it will reconfigure to show all the
      * problems/tasks in the workbench.
-     * 
+     *
      * @param value the value
      */
     void toggleInputSelection(boolean value) {
@@ -1552,7 +1584,7 @@ public class TaskList extends ViewPart {
      * If true, current input will be
      * remembered and further selections will be
      * ignored.
-     * 
+     *
      * @param value the value
      */
     void toggleLockInput(boolean value) {

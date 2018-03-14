@@ -12,8 +12,7 @@ package org.eclipse.ui.internal.part;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -22,7 +21,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 
 /**
- * 
+ *
  */
 class SelectionProviderAdapter implements ISelectionProvider {
 
@@ -51,10 +50,10 @@ class SelectionProviderAdapter implements ISelectionProvider {
         theSelection = selection;
         final SelectionChangedEvent e = new SelectionChangedEvent(this, selection);
         Object[] listenersArray = listeners.toArray();
-        
+
         for (int i = 0; i < listenersArray.length; i++) {
             final ISelectionChangedListener l = (ISelectionChangedListener) listenersArray[i];
-            Platform.run(new SafeRunnable() {
+            SafeRunner.run(new SafeRunnable() {
                 @Override
 				public void run() {
                     l.selectionChanged(e);

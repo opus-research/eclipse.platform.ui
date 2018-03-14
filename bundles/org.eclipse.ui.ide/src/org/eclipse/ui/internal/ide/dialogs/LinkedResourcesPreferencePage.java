@@ -34,12 +34,12 @@ import org.eclipse.ui.internal.ide.IIDEHelpContextIds;
 import org.eclipse.ui.internal.ide.ResourceDragAndDropEditor;
 
 /**
- * Preference page for linked resources. 
- * This preference page allows enabling and disabling the workbench linked 
+ * Preference page for linked resources.
+ * This preference page allows enabling and disabling the workbench linked
  * resource support.
- * It also shows all path variables currently defined in the workspace's path 
- * variable manager. The user may add, edit and remove path variables. 
- *  
+ * It also shows all path variables currently defined in the workspace's path
+ * variable manager. The user may add, edit and remove path variables.
+ *
  * @see org.eclipse.ui.internal.ide.dialogs.PathVariableDialog
  */
 public class LinkedResourcesPreferencePage extends PreferencePage implements
@@ -49,7 +49,7 @@ public class LinkedResourcesPreferencePage extends PreferencePage implements
     /**
      */
     public static String PREF_ID = "org.eclipse.ui.preferencePages.LinkedResources"; //$NON-NLS-1$
-    
+
     private PathVariablesGroup pathVariablesGroup;
 
 	private ResourceDragAndDropEditor dragAndDropHandlingEditor;
@@ -67,10 +67,11 @@ public class LinkedResourcesPreferencePage extends PreferencePage implements
 
     /**
      * Resets this page's internal state and creates its UI contents.
-     * 
+     *
      * @see PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
      */
-    protected Control createContents(Composite parent) {
+    @Override
+	protected Control createContents(Composite parent) {
         Font font = parent.getFont();
 
         PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
@@ -93,7 +94,8 @@ public class LinkedResourcesPreferencePage extends PreferencePage implements
         enableLinkedResourcesButton.setFont(font);
         enableLinkedResourcesButton
                 .addSelectionListener(new SelectionAdapter() {
-                    public void widgetSelected(SelectionEvent e) {
+                    @Override
+					public void widgetSelected(SelectionEvent e) {
                         boolean enabled = enableLinkedResourcesButton
                                 .getSelection();
                         Preferences preferences = ResourcesPlugin.getPlugin()
@@ -134,9 +136,7 @@ public class LinkedResourcesPreferencePage extends PreferencePage implements
         return pageComponent;
     }
 
-    /* (non-Javadoc)
-	 * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
-	 */
+	@Override
 	protected void performDefaults() {
 		dragAndDropHandlingEditor.loadDefault();
 		super.performDefaults();
@@ -144,7 +144,7 @@ public class LinkedResourcesPreferencePage extends PreferencePage implements
 
 	/**
      * Create a composite that contains the line delimiter controls
-     * 
+     *
      * @param parent
      */
     private void createLineSeparatorEditorControls(Composite parent){
@@ -157,7 +157,7 @@ public class LinkedResourcesPreferencePage extends PreferencePage implements
 
 		lineComposite.setLayoutData(new GridData(
                 GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL));
-		
+
 		dragAndDropHandlingEditor = new ResourceDragAndDropEditor(lineComposite);
 		dragAndDropHandlingEditor.doLoad();
     }
@@ -182,34 +182,37 @@ public class LinkedResourcesPreferencePage extends PreferencePage implements
      * Disposes the path variables group.
      * @see org.eclipse.jface.dialogs.IDialogPage#dispose()
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
         pathVariablesGroup.dispose();
         super.dispose();
     }
 
     /**
      * Empty implementation. This page does not use the workbench.
-     * 
+     *
      * @see IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
      */
-    public void init(IWorkbench workbench) {
+    @Override
+	public void init(IWorkbench workbench) {
     }
 
     /**
      * Commits the temporary state to the path variable manager in response to user
      * confirmation.
-     * 
+     *
      * @see PreferencePage#performOk()
      * @see PathVariablesGroup#performOk()
      */
-    public boolean performOk() {
+    @Override
+	public boolean performOk() {
 		dragAndDropHandlingEditor.store();
         return pathVariablesGroup.performOk();
     }
 
     /**
      * Set the widget enabled state
-     * 
+     *
      * @param enableLinking the new widget enabled state
      */
     protected void updateWidgetState(boolean enableLinking) {

@@ -25,7 +25,7 @@ import org.eclipse.ui.ide.FileStoreEditorInput;
 
 /**
  * Adapter factory for <code>IURIEditorInput</code>.
- * 
+ *
  * @since 3.3
  */
 public class IURIEditorInputAdapterFactory implements IAdapterFactory {
@@ -34,30 +34,26 @@ public class IURIEditorInputAdapterFactory implements IAdapterFactory {
 
 		/**
 		 * Creates a new adapter for the given file store.
-		 * 
+		 *
 		 * @param fileStore the file store;
 		 */
 		public PathEditorInputAdapter(IFileStore fileStore) {
 			super(fileStore);
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ui.IPathEditorInput#getPath()
-		 */
+		@Override
 		public IPath getPath() {
 			return URIUtil.toPath(getURI());
 		}
 	}
 
-	
+
 	/** The list of provided adapters. */
 	private static final Class[] ADAPTER_LIST= new Class[] { IPathEditorInput.class };
 
-	
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
-	 */
+
+
+	@Override
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (IPathEditorInput.class.equals(adapterType)) {
 			if (adaptableObject instanceof IURIEditorInput) {
@@ -75,10 +71,8 @@ public class IURIEditorInputAdapterFactory implements IAdapterFactory {
 		return null;
 	}
 
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
-	 */
+
+	@Override
 	public Class[] getAdapterList() {
 		return ADAPTER_LIST;
 	}

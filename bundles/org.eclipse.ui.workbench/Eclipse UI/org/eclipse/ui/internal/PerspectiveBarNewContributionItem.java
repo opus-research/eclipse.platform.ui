@@ -41,9 +41,6 @@ public class PerspectiveBarNewContributionItem extends ContributionItem {
                 .create(workbenchWindow));
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.ContributionItem#dispose()
-     */
     @Override
 	public void dispose() {
         super.dispose();
@@ -74,7 +71,7 @@ public class PerspectiveBarNewContributionItem extends ContributionItem {
             toolItem.setImage(image);
 
             toolItem.setText(""); //$NON-NLS-1$
-            toolItem.setToolTipText(WorkbenchMessages.PerspectiveBarNewContributionItem_toolTip); 
+            toolItem.setToolTipText(WorkbenchMessages.PerspectiveBarNewContributionItem_toolTip);
             toolItem.addSelectionListener(new SelectionAdapter() {
 
                 @Override

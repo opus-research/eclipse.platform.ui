@@ -104,18 +104,18 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 	private Button useDefaultLocation;
 	private Button useVirtualFolder;
 	private Button useLinkedResource;
-	
+
 	private Button filterButton;
-	
+
 	private CreateLinkedResourceGroup linkedResourceGroup;
 
 	private Composite advancedComposite;
-	
+
 	private Composite linkedResourceComposite;
 	private Composite linkedGroupComposite;
 
 	private UIResourceFilterDescription[] filterList = null;
-	
+
 	/**
 	 * Height of the "advanced" linked resource group. Set when the advanced
 	 * group is first made visible.
@@ -131,7 +131,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 	 * Creates a new folder creation wizard page. If the initial resource
 	 * selection contains exactly one container resource then it will be used as
 	 * the default container resource.
-	 * 
+	 *
 	 * @param pageName
 	 *            the name of the page
 	 * @param selection
@@ -147,7 +147,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 
 	/**
 	 * Creates the widget for advanced options.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent composite
 	 */
@@ -165,7 +165,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 			layout.marginWidth = 0;
 			advancedComposite.setLayout(layout);
 
-			
+
 			advancedButton = new Button(advancedComposite, SWT.PUSH);
 			advancedButton.setFont(advancedComposite.getFont());
 			advancedButton.setText(IDEWorkbenchMessages.showAdvanced);
@@ -173,6 +173,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 			data.horizontalAlignment = GridData.BEGINNING;
 			advancedButton.setLayoutData(data);
 			advancedButton.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					handleAdvancedButtonSelect();
 				}
@@ -180,18 +181,22 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 		}
 		linkedResourceGroup = new CreateLinkedResourceGroup(IResource.FOLDER,
 				new Listener() {
+					@Override
 					public void handleEvent(Event e) {
 						setPageComplete(validatePage());
 						firstLinkCheck = false;
 					}
 				}, new CreateLinkedResourceGroup.IStringValue() {
+					@Override
 					public String getValue() {
 						return resourceGroup.getResource();
 					}
 
+					@Override
 					public void setValue(String string) {
 						resourceGroup.setResource(string);
 					}
+					@Override
 					public IResource getResource() {
 						IPath path = resourceGroup.getContainerFullPath();
 						if (path != null) {
@@ -232,7 +237,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 						if (path != null)
 							setDefaultLinkValue = path.toPortableString().length() > 0;
 					}
-					
+
 					if (setDefaultLinkValue) {
 						IPath containerPath = resourceGroup.getContainerFullPath();
 						IPath newFilePath = containerPath.append(resourceGroup.getResource());
@@ -255,6 +260,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 	/**
 	 * (non-Javadoc) Method declared on IDialogPage.
 	 */
+	@Override
 	public void createControl(Composite parent) {
 		initializeDialogUnits(parent);
 		// top level group
@@ -283,7 +289,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 
 	/**
 	 * Creates a folder resource given the folder handle.
-	 * 
+	 *
 	 * @param folderHandle
 	 *            the folder handle to create a folder resource for
 	 * @param monitor
@@ -292,10 +298,11 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 	 *                if the operation fails
 	 * @exception OperationCanceledException
 	 *                if the operation is canceled
-	 * 
+	 *
 	 * @deprecated As of 3.3, use {@link #createNewFolder()} which uses the
 	 *   undoable operation support.
 	 */
+	@Deprecated
 	protected void createFolder(IFolder folderHandle, IProgressMonitor monitor)
 			throws CoreException {
 		try {
@@ -348,7 +355,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 	 * Creates a folder resource handle for the folder with the given workspace
 	 * path. This method does not create the folder resource; this is the
 	 * responsibility of <code>createFolder</code>.
-	 * 
+	 *
 	 * @param folderPath
 	 *            the path of the folder resource to create a handle for
 	 * @return the new folder resource handle
@@ -362,7 +369,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 	/**
 	 * Creates a container resource handle for the container with the given workspace path. This
 	 * method does not create the resource.
-	 * 
+	 *
 	 * @param containerPath the path of the container resource to create a handle for
 	 * @return the new container resource handle
 	 * @see #createFolder
@@ -401,7 +408,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 	 * This method should be called within a workspace modify operation since it
 	 * creates resources.
 	 * </p>
-	 * 
+	 *
 	 * @return the created folder resource, or <code>null</code> if the folder
 	 *         was not created
 	 */
@@ -424,7 +431,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 				if (!store.fetchInfo().exists()) {
 					MessageDialog dlg = new MessageDialog(getContainer().getShell(),
 							IDEWorkbenchMessages.WizardNewFolderCreationPage_createLinkLocationTitle,
-							null, 
+							null,
 							NLS.bind(
 									IDEWorkbenchMessages.WizardNewFolderCreationPage_createLinkLocationQuestion, linkTargetPath),
 							MessageDialog.QUESTION_WITH_CANCEL,
@@ -448,11 +455,12 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 										.bind(
 												IDEWorkbenchMessages.WizardNewFileCreationPage_internalErrorMessage,
 												e.getMessage()), SWT.SHEET);
-	
+
 				return null;
-			} 
+			}
 		}
 		IRunnableWithProgress op = new IRunnableWithProgress() {
+			@Override
 			public void run(IProgressMonitor monitor) {
 				AbstractOperation op;
 				op = new CreateFolderOperation(
@@ -468,6 +476,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 				} catch (final ExecutionException e) {
 					getContainer().getShell().getDisplay().syncExec(
 							new Runnable() {
+								@Override
 								public void run() {
 									if (e.getCause() instanceof CoreException) {
 										ErrorDialog
@@ -562,14 +571,14 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 					IDEWorkbenchPlugin.IDE_WORKBENCH,
 			"$nl$/icons/full/ovr16/link_ovr.png")}; //$NON-NLS-1$
 
-			CompositeImageDescriptor linkedFolderDescriptor = new OverlayIcon(folderDescriptor, linkedResourceOverlayMap, new Point(16, 16)); 
+			CompositeImageDescriptor linkedFolderDescriptor = new OverlayIcon(folderDescriptor, linkedResourceOverlayMap, new Point(16, 16));
 
 			ImageDescriptor[][] virtualFolderOverlayMap = new ImageDescriptor[4][1];
 			virtualFolderOverlayMap[1]= new ImageDescriptor[] {AbstractUIPlugin.imageDescriptorFromPlugin(
 					IDEWorkbenchPlugin.IDE_WORKBENCH,
 				"$nl$/icons/full/ovr16/virt_ovr.png")}; //$NON-NLS-1$
 
-			CompositeImageDescriptor virtualFolderDescriptor = new OverlayIcon(folderDescriptor, virtualFolderOverlayMap, new Point(16, 16)); 
+			CompositeImageDescriptor virtualFolderDescriptor = new OverlayIcon(folderDescriptor, virtualFolderOverlayMap, new Point(16, 16));
 
 			Image folderImage = folderDescriptor.createImage();
 			useDefaultLocation = new Button(advancedComposite, SWT.RADIO);
@@ -607,17 +616,18 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 			useLinkedResource.setLayoutData(data);
 
 			SelectionAdapter radioListener = new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					handleRadioSelect();
 				}
 			};
-			
+
 			useLinkedResource.addSelectionListener(radioListener);
 			useVirtualFolder.addSelectionListener(radioListener);
 			useDefaultLocation.addSelectionListener(radioListener);
-			
+
 			useDefaultLocation.setSelection(true);
-			
+
 			linkedGroupComposite = new Composite(advancedComposite, 0);
 			data = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
 			data.horizontalIndent = indent;
@@ -646,6 +656,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 			data.horizontalIndent = indent;
 			filterButton.setLayoutData(data);
 			filterButton.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					handleEditFilterSelect();
 				}
@@ -674,12 +685,13 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 		if (dialog.open() == Window.OK)
 			filterList = dialog.getFilters();
 	}
-	
+
 	/**
 	 * The <code>WizardNewFolderCreationPage</code> implementation of this
 	 * <code>Listener</code> method handles all events and enablements for
 	 * controls on this page. Subclasses may extend.
 	 */
+	@Override
 	public void handleEvent(Event ev) {
 		setPageComplete(validatePage());
 	}
@@ -715,6 +727,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 	/*
 	 * @see DialogPage.setVisible(boolean)
 	 */
+	@Override
 	public void setVisible(boolean visible) {
 		super.setVisible(visible);
 		if (visible) {
@@ -725,7 +738,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 	/**
 	 * Checks whether the linked resource target is valid. Sets the error
 	 * message accordingly and returns the status.
-	 * 
+	 *
 	 * @return IStatus validation result from the CreateLinkedResourceGroup
 	 */
 	protected IStatus validateLinkedResource() {
@@ -750,7 +763,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 
 	/**
 	 * Returns whether this page's controls currently all contain valid values.
-	 * 
+	 *
 	 * @return <code>true</code> if all controls are valid, and
 	 *         <code>false</code> if at least one is invalid
 	 */
@@ -791,16 +804,16 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 			setMessage(null);
 			setErrorMessage(null);
 		}
-		
+
 		if (isFilteredByParent()) {
 			setMessage(IDEWorkbenchMessages.WizardNewFolderCreationPage_resourceWillBeFilteredWarning, IMessageProvider.ERROR);
 			setupLinkedResourceTarget();
 			valid = false;
 		}
-		
+
 		return valid;
 	}
-	
+
 	private boolean isFilteredByParent() {
 		boolean createVirtualFolder = useVirtualFolder != null && useVirtualFolder.getSelection();
 		if (createVirtualFolder)

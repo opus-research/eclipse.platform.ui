@@ -39,16 +39,11 @@ import org.eclipse.ui.views.IViewRegistry;
 
 /**
  * The show in command, which only needs a target id.
- * 
+ *
  * @since 3.4
  */
 public class ShowInHandler extends AbstractHandler implements IElementUpdater {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
-	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchPage p = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
@@ -102,7 +97,7 @@ public class ShowInHandler extends AbstractHandler implements IElementUpdater {
 	 * This implementation obtains the context from global variables provide.
 	 * showInSelection and showInInput should be available.
 	 * <p>
-	 * 
+	 *
 	 * @return the <code>ShowInContext</code> to show or <code>null</code>
 	 */
 	private ShowInContext getContext(ISelection showInSelection, Object input) {
@@ -115,7 +110,7 @@ public class ShowInHandler extends AbstractHandler implements IElementUpdater {
 	/**
 	 * Returns the <code>IShowInTarget</code> for the given part, or
 	 * <code>null</code> if it does not provide one.
-	 * 
+	 *
 	 * @param targetPart
 	 *            the target part
 	 * @return the <code>IShowInTarget</code> or <code>null</code>
@@ -124,12 +119,6 @@ public class ShowInHandler extends AbstractHandler implements IElementUpdater {
 		return (IShowInTarget) Util.getAdapter(targetPart, IShowInTarget.class);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.commands.IElementUpdater#updateElement(org.eclipse.ui.menus.UIElement,
-	 *      java.util.Map)
-	 */
 	@Override
 	public void updateElement(UIElement element, Map parameters) {
 		String targetId = (String) parameters
