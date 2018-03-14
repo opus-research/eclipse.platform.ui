@@ -12,11 +12,23 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.monitoring;
 
+import static org.eclipse.ui.monitoring.PreferenceConstants.DEADLOCK_REPORTING_THRESHOLD_MILLIS;
+import static org.eclipse.ui.monitoring.PreferenceConstants.DUMP_ALL_THREADS;
+import static org.eclipse.ui.monitoring.PreferenceConstants.FILTER_TRACES;
+import static org.eclipse.ui.monitoring.PreferenceConstants.INITIAL_SAMPLE_DELAY_MILLIS;
+import static org.eclipse.ui.monitoring.PreferenceConstants.LOG_TO_ERROR_LOG;
+import static org.eclipse.ui.monitoring.PreferenceConstants.LONG_EVENT_THRESHOLD_MILLIS;
+import static org.eclipse.ui.monitoring.PreferenceConstants.MAX_STACK_SAMPLES;
+import static org.eclipse.ui.monitoring.PreferenceConstants.MONITORING_ENABLED;
+import static org.eclipse.ui.monitoring.PreferenceConstants.PLUGIN_ID;
+import static org.eclipse.ui.monitoring.PreferenceConstants.SAMPLE_INTERVAL_MILLIS;
+
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IStartup;
 import org.eclipse.ui.internal.monitoring.preferences.MonitoringPreferenceListener;
-import org.eclipse.ui.monitoring.PreferenceConstants;
 
 /**
  * Starts the event loop monitoring thread. Initializes preferences from {@link IPreferenceStore}.
@@ -35,7 +47,7 @@ public class MonitoringStartup implements IStartup {
 		}
 
 		IPreferenceStore preferences = MonitoringPlugin.getDefault().getPreferenceStore();
-		if (preferences.getBoolean(PreferenceConstants.MONITORING_ENABLED)) {
+		if (preferences.getBoolean(MONITORING_ENABLED)) {
 			monitoringThread = createAndStartMonitorThread();
 		}
 
@@ -58,7 +70,7 @@ public class MonitoringStartup implements IStartup {
 
 		final EventLoopMonitorThread thread = temporaryThread;
 		final Display display = MonitoringPlugin.getDefault().getWorkbench().getDisplay();
-		// Final setup and start synced on display thread
+		// Final setup and start of the monitoring thread.
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
@@ -77,17 +89,20 @@ public class MonitoringStartup implements IStartup {
 	}
 
 	private static EventLoopMonitorThread.Parameters loadPreferences() {
-		IPreferenceStore preferences = MonitoringPlugin.getDefault().getPreferenceStore();
+	    IPreferencesService preferences = Platform.getPreferencesService();
 		EventLoopMonitorThread.Parameters args = new EventLoopMonitorThread.Parameters();
 
-		args.longEventThreshold = preferences.getInt(PreferenceConstants.LONG_EVENT_THRESHOLD_MILLIS);
-		args.maxStackSamples = preferences.getInt(PreferenceConstants.MAX_STACK_SAMPLES);
-		args.sampleInterval = preferences.getInt(PreferenceConstants.SAMPLE_INTERVAL_MILLIS);
-		args.initialSampleDelay = preferences.getInt(PreferenceConstants.INITIAL_SAMPLE_DELAY_MILLIS);
-		args.deadlockThreshold = preferences.getInt(PreferenceConstants.DEADLOCK_REPORTING_THRESHOLD_MILLIS);
-		args.dumpAllThreads = preferences.getBoolean(PreferenceConstants.DUMP_ALL_THREADS);
-		args.filterTraces = preferences.getString(PreferenceConstants.FILTER_TRACES);
-		args.logToErrorLog = preferences.getBoolean(PreferenceConstants.LOG_TO_ERROR_LOG);
+		args.longEventThreshold = preferences.getInt(PLUGIN_ID, LONG_EVENT_THRESHOLD_MILLIS,
+				500, null);
+		args.maxStackSamples = preferences.getInt(PLUGIN_ID, MAX_STACK_SAMPLES, 3, null);
+		args.sampleInterval = preferences.getInt(PLUGIN_ID, SAMPLE_INTERVAL_MILLIS, 300, null);
+		args.initialSampleDelay = preferences.getInt(PLUGIN_ID, INITIAL_SAMPLE_DELAY_MILLIS,
+				300, null);
+		args.deadlockThreshold = preferences.getInt(PLUGIN_ID, DEADLOCK_REPORTING_THRESHOLD_MILLIS,
+				600000, null);
+		args.dumpAllThreads = preferences.getBoolean(PLUGIN_ID, DUMP_ALL_THREADS, false, null);
+		args.filterTraces = preferences.getString(PLUGIN_ID, FILTER_TRACES, "", null); //$NON-NLS-1$
+		args.logToErrorLog = preferences.getBoolean(PLUGIN_ID, LOG_TO_ERROR_LOG, true, null);
 
 		return args;
 	}
