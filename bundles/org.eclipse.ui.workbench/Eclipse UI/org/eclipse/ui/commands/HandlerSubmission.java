@@ -40,8 +40,6 @@ import org.eclipse.ui.internal.util.Util;
  *             instead.
  * @see org.eclipse.ui.handlers.IHandlerService
  */
-@Deprecated
-@SuppressWarnings("all")
 public final class HandlerSubmission implements Comparable {
 
     /**
@@ -110,7 +108,6 @@ public final class HandlerSubmission implements Comparable {
      * @param priority
      *            the priority. Must not be <code>null</code>.
      */
-	@Deprecated
     public HandlerSubmission(String activePartId, Shell activeShell,
             IWorkbenchPartSite activeWorkbenchPartSite, String commandId,
             IHandler handler, Priority priority) {
@@ -129,7 +126,6 @@ public final class HandlerSubmission implements Comparable {
     /**
      * @see Comparable#compareTo(java.lang.Object)
      */
-	@Deprecated
     public int compareTo(Object object) {
         HandlerSubmission castedObject = (HandlerSubmission) object;
         int compareTo = Util.compare(activeWorkbenchPartSite,
@@ -167,7 +163,6 @@ public final class HandlerSubmission implements Comparable {
      * @return the identifier of the part that must be active for this request
      *         to be considered. May be <code>null</code>.
      */
-	@Deprecated
     public String getActivePartId() {
         return activePartId;
     }
@@ -178,7 +173,6 @@ public final class HandlerSubmission implements Comparable {
      * @return the shell that must be active for this request to be considered.
      *         May be <code>null</code>.
      */
-	@Deprecated
     public Shell getActiveShell() {
         return activeShell;
     }
@@ -190,7 +184,6 @@ public final class HandlerSubmission implements Comparable {
      * @return the workbench part site of the part that must be active for this
      *         request to be considered. May be <code>null</code>.
      */
-	@Deprecated
     public IWorkbenchPartSite getActiveWorkbenchPartSite() {
         return activeWorkbenchPartSite;
     }
@@ -201,7 +194,6 @@ public final class HandlerSubmission implements Comparable {
      * @return the identifier of the command to be handled. Guaranteed not to be
      *         <code>null</code>.
      */
-	@Deprecated
     public String getCommandId() {
         return commandId;
     }
@@ -211,7 +203,6 @@ public final class HandlerSubmission implements Comparable {
      * 
      * @return the handler. Guaranteed not to be <code>null</code>.
      */
-	@Deprecated
     public IHandler getHandler() {
         return handler;
     }
@@ -221,7 +212,6 @@ public final class HandlerSubmission implements Comparable {
      * 
      * @return the priority. Guaranteed not to be <code>null</code>.
      */
-	@Deprecated
     public Priority getPriority() {
         return priority;
     }
