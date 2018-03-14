@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Copyright (c) 2009 EclipseSource and others. All rights reserved.
  * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v1.0 which accompanies this distribution, 
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
@@ -9,9 +9,11 @@
  ******************************************************************************/
 package org.eclipse.e4.ui.tests.css.core.parser;
 
-import java.io.IOException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
-import junit.framework.TestCase;
+import java.io.IOException;
 
 import org.eclipse.e4.ui.css.core.impl.dom.DocumentCSSImpl;
 import org.eclipse.e4.ui.css.core.impl.dom.ViewCSSImpl;
@@ -19,27 +21,31 @@ import org.eclipse.e4.ui.css.swt.engine.CSSSWTEngineImpl;
 import org.eclipse.e4.ui.tests.css.core.util.ParserTestUtil;
 import org.eclipse.e4.ui.tests.css.core.util.TestElement;
 import org.eclipse.swt.widgets.Display;
+import org.junit.Before;
+import org.junit.Test;
 import org.w3c.dom.css.CSSStyleDeclaration;
 import org.w3c.dom.css.CSSStyleSheet;
 import org.w3c.dom.css.ViewCSS;
 
 
-public class ViewCSSTest extends TestCase {
+public class ViewCSSTest {
 
 	private Display display;
 	private CSSSWTEngineImpl engine;
 
+	@Before
 	protected void setUp() throws Exception {
 		display = Display.getDefault();
 		engine = new CSSSWTEngineImpl(display);
 	}
 
+	@Test
 	public void testGetComputedStyle() throws Exception {
 		// Two rules with the same specificity, the second rule should take
 		// precedence because of its position in the stylesheet
 		String css = "Label { color: black; }"
-			+ "Button { color: blue; font-weight: bold; }\n"
-			+ "Button { color: green; }\n";
+				+ "Button { color: blue; font-weight: bold; }\n"
+				+ "Button { color: green; }\n";
 		ViewCSS viewCSS = createViewCss(css);
 
 		TestElement shell = new TestElement("Shell", engine);
