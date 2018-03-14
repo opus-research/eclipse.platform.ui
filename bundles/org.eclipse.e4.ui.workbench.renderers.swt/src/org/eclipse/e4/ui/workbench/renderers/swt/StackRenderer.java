@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -45,6 +45,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
+import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
@@ -132,13 +133,16 @@ public class StackRenderer extends LazyStackRenderer {
 	// Minimum characters in for stacks inside the shared area
 	private static int MIN_EDITOR_CHARS = 15;
 
-	private Image viewMenuImage;
+	Image viewMenuImage;
 
 	@Inject
-	private IEventBroker eventBroker;
+	IStylingEngine stylingEngine;
 
 	@Inject
-	private IPresentationEngine renderer;
+	IEventBroker eventBroker;
+
+	@Inject
+	IPresentationEngine renderer;
 
 	private EventHandler itemUpdater;
 
@@ -933,7 +937,6 @@ public class StackRenderer extends LazyStackRenderer {
 		if (!(me instanceof MElementContainer<?>))
 			return;
 
-		@SuppressWarnings("unchecked")
 		final MElementContainer<MUIElement> stack = (MElementContainer<MUIElement>) me;
 
 		// Match the selected TabItem to its Part

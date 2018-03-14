@@ -45,10 +45,10 @@ public class EmailAddress implements IPropertySource {
     public static final String P_DOMAIN = MessageUtil.getString("domain"); //$NON-NLS-1$
 
     //Property-Descriptors
-    private static Vector<PropertyDescriptor> descriptors;
+    private static Vector descriptors;
 
     static {
-        descriptors = new Vector<>(2, 2);
+        descriptors = new Vector(2, 2);
         //non-editable child properties --> provide no editors
         descriptors.addElement(new PropertyDescriptor(P_ID_USERID, P_USERID));
         descriptors.addElement(new PropertyDescriptor(P_ID_DOMAIN, P_DOMAIN));
@@ -76,7 +76,7 @@ public class EmailAddress implements IPropertySource {
     /**
      * Returns the descriptors
      */
-    private static Vector<PropertyDescriptor> getDescriptors() {
+    private static Vector getDescriptors() {
         return descriptors;
     }
 
@@ -89,18 +89,22 @@ public class EmailAddress implements IPropertySource {
         return domain;
     }
 
-    @Override
-	public Object getEditableValue() {
+    /* (non-Javadoc)
+     * Method declared on IPropertySource
+     */
+    public Object getEditableValue() {
         return this.toString();
     }
 
-    @Override
-	public IPropertyDescriptor[] getPropertyDescriptors() {
-        return getDescriptors().toArray(
+    /* (non-Javadoc)
+     * Method declared on IPropertySource
+     */
+    public IPropertyDescriptor[] getPropertyDescriptors() {
+        return (IPropertyDescriptor[]) getDescriptors().toArray(
                 new IPropertyDescriptor[getDescriptors().size()]);
     }
 
-    /**
+    /** 
      * The <code>EmailAddress</code> implementation of this
      * <code>IPropertySource</code> method returns the following properties
      *
@@ -110,8 +114,7 @@ public class EmailAddress implements IPropertySource {
      * Observe the available properties must always equal those listed
      * in the property descriptors
      */
-    @Override
-	public Object getPropertyValue(Object propKey) {
+    public Object getPropertyValue(Object propKey) {
         if (propKey.equals(P_ID_USERID))
             return getUserid();
         if (propKey.equals(P_ID_DOMAIN))
@@ -128,13 +131,17 @@ public class EmailAddress implements IPropertySource {
         return userid;
     }
 
-    @Override
-	public boolean isPropertySet(Object property) {
+    /* (non-Javadoc)
+     * Method declared on IPropertySource
+     */
+    public boolean isPropertySet(Object property) {
         return false;
     }
 
-    @Override
-	public void resetPropertyValue(Object property) {
+    /* (non-Javadoc)
+     * Method declared on IPropertySource
+     */
+    public void resetPropertyValue(Object property) {
         return;
     }
 
@@ -169,16 +176,15 @@ public class EmailAddress implements IPropertySource {
                         .getString("invalid_email_address_format_should_have_been_validated")); //$NON-NLS-1$
     }
 
-    /**
+    /** 
      * The <code>Address</code> implementation of this
-     * <code>IPropertySource</code> method
+     * <code>IPropertySource</code> method 
      * defines the following Setable properties
      *
      *	1) P_USERID, expects String
      *	2) P_DOMAIN, expects String
      */
-    @Override
-	public void setPropertyValue(Object name, Object value) {
+    public void setPropertyValue(Object name, Object value) {
         if (name.equals(P_ID_USERID)) {
             setUserid((String) value);
             return;
@@ -200,8 +206,7 @@ public class EmailAddress implements IPropertySource {
      * The value as displayed in the Property Sheet.
      * @return java.lang.String
      */
-    @Override
-	public String toString() {
+    public String toString() {
         StringBuffer strbuffer = new StringBuffer(getUserid());
         strbuffer.append('@');
         strbuffer.append(getDomain());
