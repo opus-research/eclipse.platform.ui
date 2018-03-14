@@ -13,8 +13,10 @@ package org.eclipse.ui.internal.views.properties.tabbed.view;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import com.ibm.icu.text.MessageFormat;
 
@@ -24,11 +26,9 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.internal.views.properties.tabbed.TabbedPropertyViewPlugin;
 import org.eclipse.ui.internal.views.properties.tabbed.TabbedPropertyViewStatusCodes;
@@ -437,44 +437,72 @@ public class TabbedPropertyRegistry {
 	/**
 	 * Sorts the tab descriptors in the given list according to afterTab.
 	 */
-	protected List sortTabDescriptorsByAfterTab(List tabs) {
+	protected List<TabDescriptor> sortTabDescriptorsByAfterTab(List<TabDescriptor> tabs) {
 		if (tabs.size() == 0 || propertyCategories == null) {
 			return tabs;
 		}
-		List sorted = new ArrayList();
+		List<TabDescriptor> sorted = new ArrayList<TabDescriptor>();
 		int categoryIndex = 0;
 		for (int i = 0; i < propertyCategories.size(); i++) {
-			List categoryList = new ArrayList();
+			List<TabDescriptor> categoryList = new ArrayList<TabDescriptor>();
 			String category = (String) propertyCategories.get(i);
 			int topOfCategory = categoryIndex;
 			int endOfCategory = categoryIndex;
 			while (endOfCategory < tabs.size() &&
-					((TabDescriptor) tabs.get(endOfCategory)).getCategory()
+					tabs.get(endOfCategory).getCategory()
 							.equals(category)) {
 				endOfCategory++;
 			}
-			for (int j = topOfCategory; j < endOfCategory; j++) {
-				TabDescriptor tab = (TabDescriptor) tabs.get(j);
-				if (tab.getAfterTab().equals(TOP)) {
-					categoryList.add(0, tabs.get(j));
-				} else {
-					categoryList.add(tabs.get(j));
+			
+			Map<String, List<TabDescriptor>> mapOfAfterTab = new HashMap<String, List<TabDescriptor>>();
+						
+			for (int j = topOfCategory; j < endOfCategory; j++) {				
+				TabDescriptor tab = tabs.get(j);
+				String afterTab;
+				if((afterTab = tab.getAfterTab()) == "" ){ //$NON-NLS-1$
+					afterTab = "no after tab"; //$NON-NLS-1$
 				}
+				List<TabDescriptor> tempList = mapOfAfterTab.get(afterTab);
+				if(tempList == null){
+					tempList = new ArrayList<TabDescriptor>();
+					mapOfAfterTab.put(afterTab, tempList);
+				}
+				tempList.add(tab);
+			}		
+			
+			/*Set to the beginning of the list: the afterTab top and no afterTab*/
+			List<TabDescriptor> toAdd;
+			if((toAdd = mapOfAfterTab.get(TOP)) != null){
+				categoryList.addAll(toAdd);
+				mapOfAfterTab.remove(TOP);
 			}
-			Collections.sort(categoryList, new Comparator() {
-
-				public int compare(Object arg0, Object arg1) {
-					TabDescriptor one = (TabDescriptor) arg0;
-					TabDescriptor two = (TabDescriptor) arg1;
-					if (two.getAfterTab().equals(one.getId())) {
-						return -1;
-					} else if (one.getAfterTab().equals(two.getId())) {
-						return 1;
-					} else {
-						return 0;
+			if((toAdd = mapOfAfterTab.get("no after tab")) != null){ //$NON-NLS-1$
+				categoryList.addAll(toAdd);
+				mapOfAfterTab.remove("no after tab"); //$NON-NLS-1$
+			}
+			
+			
+			for(int k = 0; k < endOfCategory - topOfCategory +1;k++){
+				if(categoryList.size() > k){
+					TabDescriptor current = categoryList.get(k);
+					if((toAdd = mapOfAfterTab.get(current.getId())) != null){
+						categoryList.addAll(toAdd);
+						mapOfAfterTab.remove(current.getId());
 					}
-				}
-			});
+				} else {
+					//check if there is other
+					if(mapOfAfterTab.keySet().size() != 0){
+						String key = mapOfAfterTab.keySet().iterator().next();
+						categoryList.addAll(mapOfAfterTab.get(key));
+						mapOfAfterTab.remove(key);
+					} else {
+						//all is already added
+						break;
+					}
+				}			
+			}
+		
+
 			for (int j = 0; j < categoryList.size(); j++) {
 				sorted.add(categoryList.get(j));
 			}
