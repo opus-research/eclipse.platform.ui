@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 433228
  ******************************************************************************/
 package org.eclipse.e4.ui.tests.application;
 
@@ -15,6 +16,7 @@ import java.util.List;
 import junit.framework.TestCase;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.E4XMIResource;
+import org.eclipse.e4.ui.internal.workbench.ModelServiceImpl;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
@@ -27,13 +29,12 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
-import org.eclipse.e4.ui.model.application.ui.advanced.impl.AdvancedFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
+import org.eclipse.e4.ui.model.application.ui.menu.MPopupMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.workbench.Selector;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -49,9 +50,12 @@ public class EModelServiceFindTest extends TestCase {
 
 	MApplication app = null;
 
+	private EModelService modelService;
+
 	@Override
 	protected void setUp() throws Exception {
 		applicationContext = E4Application.createDefaultContext();
+		modelService = new ModelServiceImpl(applicationContext);
 		super.setUp();
 	}
 
@@ -154,7 +158,7 @@ public class EModelServiceFindTest extends TestCase {
 				EModelService.ANYWHERE | EModelService.IN_MAIN_MENU
 						| EModelService.IN_PART,
 				getSelector(MMenuElement.class));
-		assertEquals(13, elements.size());
+		assertEquals(15, elements.size());
 
 		elements = modelService.findElements(application,
 				MToolBarElement.class, EModelService.ANYWHERE
@@ -166,7 +170,7 @@ public class EModelServiceFindTest extends TestCase {
 		elements = modelService.findElements(application, null,
 				EModelService.ANYWHERE | EModelService.IN_MAIN_MENU
 						| EModelService.IN_PART, getSelector());
-		assertEquals(40, elements.size());
+		assertEquals(42, elements.size());
 
 		// Should match 0 since String is not an MUIElement
 		List<String> strings = modelService.findElements(application, null,
@@ -310,29 +314,34 @@ public class EModelServiceFindTest extends TestCase {
 				EModelService.ANYWHERE, getSelector(clazz));
 		assertEquals(2, elements.size());
 
+		// search for menu elements
 		clazz = MMenuElement.class;
 		elements = modelService.findElements(application, clazz,
 				EModelService.IN_ANY_PERSPECTIVE, getSelector(clazz));
-		assertEquals(4, elements.size());
+		assertEquals(6, elements.size());
 
 		elements = modelService.findElements(application, clazz,
 				EModelService.IN_ANY_PERSPECTIVE | EModelService.IN_PART,
 				getSelector(clazz));
-		assertEquals(4, elements.size());
+		assertEquals(6, elements.size());
+
+		elements = modelService.findElements(application, clazz,
+				EModelService.IN_PART, getSelector(clazz));
+		assertEquals(6, elements.size());
 
 		elements = modelService.findElements(application, clazz,
 				EModelService.IN_ACTIVE_PERSPECTIVE, getSelector(clazz));
-		assertEquals(3, elements.size());
+		assertEquals(5, elements.size());
 
 		elements = modelService.findElements(application, clazz,
 				EModelService.IN_ACTIVE_PERSPECTIVE | EModelService.IN_PART,
 				getSelector(clazz));
-		assertEquals(3, elements.size());
+		assertEquals(5, elements.size());
 
 		elements = modelService.findElements(application, clazz,
 				EModelService.IN_ANY_PERSPECTIVE | EModelService.IN_MAIN_MENU,
 				getSelector(clazz));
-		assertEquals(13, elements.size());
+		assertEquals(15, elements.size());
 
 		elements = modelService.findElements(application, clazz,
 				EModelService.IN_MAIN_MENU, getSelector(clazz));
@@ -390,38 +399,51 @@ public class EModelServiceFindTest extends TestCase {
 		assertEquals(1, elements.size());
 	}
 
+	public void testFind_ViewMenus() {
+		MApplication application = createApplication();
+		EModelService modelService = (EModelService) application.getContext()
+				.get(EModelService.class.getName());
+		assertNotNull(modelService);
+		List<? extends MApplicationElement> elements;
+		elements = modelService.findElements(application, MPopupMenu.class,
+				EModelService.IN_PART, getSelector(MPopupMenu.class));
+		assertEquals(1, elements.size());
+
+	}
+
 	public void testBug314685() {
 		MApplication application = createApplication();
 		application.setContext(applicationContext);
 
-		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
+		MWindow window = modelService.createModelElement(MWindow.class);
 		application.getChildren().add(window);
 
-		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
-				.createPerspectiveStack();
+		MPerspectiveStack perspectiveStack = modelService
+				.createModelElement(MPerspectiveStack.class);
 		window.getChildren().add(perspectiveStack);
 
-		MPerspective perspectiveA = AdvancedFactoryImpl.eINSTANCE
-				.createPerspective();
+		MPerspective perspectiveA = modelService
+				.createModelElement(MPerspective.class);
 		perspectiveStack.getChildren().add(perspectiveA);
 
-		MPerspective perspectiveB = AdvancedFactoryImpl.eINSTANCE
-				.createPerspective();
+		MPerspective perspectiveB = modelService
+				.createModelElement(MPerspective.class);
 		perspectiveStack.getChildren().add(perspectiveB);
 
-		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
+		MPartStack partStack = modelService
+				.createModelElement(MPartStack.class);
 		window.getSharedElements().add(partStack);
 
-		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart part = modelService.createModelElement(MPart.class);
 		partStack.getChildren().add(part);
 
-		MPlaceholder placeholderA = AdvancedFactoryImpl.eINSTANCE
-				.createPlaceholder();
+		MPlaceholder placeholderA = modelService
+				.createModelElement(MPlaceholder.class);
 		placeholderA.setRef(partStack);
 		perspectiveA.getChildren().add(placeholderA);
 
-		MPlaceholder placeholderB = AdvancedFactoryImpl.eINSTANCE
-				.createPlaceholder();
+		MPlaceholder placeholderB = modelService
+				.createModelElement(MPlaceholder.class);
 		placeholderB.setRef(partStack);
 		perspectiveB.getChildren().add(placeholderB);
 
