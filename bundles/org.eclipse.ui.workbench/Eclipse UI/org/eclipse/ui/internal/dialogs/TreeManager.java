@@ -13,9 +13,6 @@ package org.eclipse.ui.internal.dialogs;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import org.eclipse.swt.graphics.Image;
-
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -30,6 +27,7 @@ import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.swt.graphics.Image;
 
 /**
  * Manages a tree which provides "standard checkbox tree behavior". I.e. it
@@ -240,6 +238,7 @@ public class TreeManager {
 		public TreeItem(String label) {
 			this.label = label;
 			this.children = new ArrayList();
+			System.out.println("New TreeItem: " + label); //$NON-NLS-1$
 		}
 		
 		public String getLabel() {
@@ -266,6 +265,7 @@ public class TreeManager {
 		
 		public void addChild(TreeItem newChild) {
             newChild.parent = this;
+			System.out.println(this.label + " <- " + newChild.label); //$NON-NLS-1$
             children.add(newChild);
             synchParents(newChild);
         }

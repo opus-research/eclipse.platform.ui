@@ -36,6 +36,7 @@ import org.eclipse.e4.ui.model.application.commands.MParameter;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
+import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MItem;
@@ -44,7 +45,9 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
+import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.IResourceUtilities;
+import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.renderers.swt.MenuManagerRenderer;
 import org.eclipse.e4.ui.workbench.renderers.swt.ToolBarManagerRenderer;
 import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
@@ -266,6 +269,14 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 	private ISWTResourceUtilities resUtils;
 	private IEclipseContext context;
 
+	// We need these for linking a MenuManager to an MMenu object
+
+	private EModelService modelService;
+	private MTrimmedWindow model;
+	private IPresentationEngine engine;
+
+	// private IRendererFactory rendererFactory;
+
 	/**
 	 * A Listener for a list of command groups, that updates the viewer and
 	 * filter who are dependent on the action set selection.
@@ -287,6 +298,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		public void selectionChanged(SelectionChangedEvent event) {
 			Object element = ((IStructuredSelection) event.getSelection())
 					.getFirstElement();
+			System.out.println("Selected Action Set changed"); //$NON-NLS-1$
 			filter.setActionSet((ActionSet) element);
 			filterViewer.refresh();
 			filterViewer.expandAll();
@@ -329,6 +341,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 			treeManager.super(label == null ? null : DialogUtil
 					.removeAccel(removeShortcut(label)));
 			this.item = item;
+			// System.out.println(item.getId());
 		}
 
 		public void setActionSet(ActionSet actionSet) {
@@ -344,6 +357,12 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 
 		public IContributionItem getIContributionItem() {
 			return item;
+		}
+
+		// Added this line for easier debugging
+		@Override
+		public String toString() {
+			return this.getLabel();
 		}
 	}
 
@@ -570,6 +589,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		}
 		
 		public void setActive(boolean active) {
+			System.out.println("In setActive"); //$NON-NLS-1$
 			boolean wasActive = this.active;
 			this.active = active;
 			if (!active) {
@@ -1536,6 +1556,12 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		resUtils = (ISWTResourceUtilities) context.get(IResourceUtilities.class);
 
 		toDispose = new HashSet<Image>();
+		modelService = context.get(EModelService.class);
+		model = context.get(MTrimmedWindow.class);
+		engine = context.get(IPresentationEngine.class);
+		// rendererFactory = context.get(IRendererFactory.class);
+
+		// toDispose = new HashSet();
 
 		initializeIcons();
 
@@ -1934,6 +1960,9 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 					public void selectionChanged(SelectionChangedEvent event) {
 						selectedActionSet[0] = (ActionSet) ((IStructuredSelection) event
 								.getSelection()).getFirstElement();
+				System.out.print("Action set sel changed: "); //$NON-NLS-1$
+				ActionSet sas = selectedActionSet[0];
+				System.out.println(sas.descriptor.getLabel());
 						actionSetMenuViewer.setInput(menuItems);
 						actionSetToolbarViewer.setInput(toolBarItems);
 					}
@@ -2775,12 +2804,45 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		makeAllContributionsVisible(customizeActionBars.menuManager);
 
 		// Get the menu from the action bars
-		customizeActionBars.menuManager
+		/* Menu menu = */customizeActionBars.menuManager
 				.createMenuBar((Decorations) workbenchWindow.getShell());
 
 		CoolBar cb = customizeActionBars.coolBarManager
 				.createControl(workbenchWindow.getShell());
 		cb.equals(cb);
+
+		// // Ensure the menu is completely built by updating the menu manager.
+		// // (This method call requires a menu already be created)
+		// customizeActionBars.menuManager.updateAll(true);
+		// customizeActionBars.coolBarManager.update(true);
+
+		// MenuManager menuManager = customizeActionBars.menuManager;
+		// MMenu mainMenu = modelService.createModelElement(MMenu.class);
+		//		mainMenu.setElementId("org.eclipse.ui.main.menu"); //$NON-NLS-1$
+		// // MenuManagerRenderer renderer = (MenuManagerRenderer)
+		// // rendererFactory.getRenderer(mainMenu,
+		// // null);
+		// // renderer.linkModelToManager(mainMenu, menuManager);
+		// menuMngrRenderer.linkModelToManager(mainMenu, menuManager);
+		// // window.fill(renderer, mainMenu, menuManager);
+		// window.fill(menuMngrRenderer, mainMenu, menuManager);
+		// // renderer.reconcileManagerToModel(menuManager, mainMenu);
+		// menuMngrRenderer.reconcileManagerToModel(menuManager, mainMenu);
+		// // MMenu mainMenu =
+		// // window.linkMenuManagerToMMenu(customizeActionBars.menuManager);
+		// // model.setMainMenu(mainMenu);
+		// // final MMenu mmenu = (MMenu)
+		// model.setMainMenu(mainMenu);
+		// engine.createGui(mainMenu, model.getWidget(), model.getContext());
+
+		MenuManager menuManager = customizeActionBars.menuManager;
+		MMenu mainMenu = modelService.createModelElement(MMenu.class);
+		mainMenu.setElementId("org.eclipse.ui.main.menu"); //$NON-NLS-1$
+		menuMngrRenderer.linkModelToManager(mainMenu, menuManager);
+		window.fill(menuMngrRenderer, mainMenu, menuManager);
+		menuMngrRenderer.reconcileManagerToModel(menuManager, mainMenu);
+		model.setMainMenu(mainMenu);
+		engine.createGui(mainMenu, model.getWidget(), model.getContext());
 
 		// Ensure the menu is completely built by updating the menu manager.
 		// (This method call requires a menu already be created)
@@ -2788,8 +2850,14 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		customizeActionBars.coolBarManager.update(true);
 
 		shortcuts = new Category(""); //$NON-NLS-1$
+
 		toolBarItems = createTrimBarEntries(window.getTopTrim());
-		menuItems = createMenuStructure(window.getModel().getMainMenu());
+		// menuItems = createMenuStructure(window.getModel().getMainMenu());
+
+		// toolBarItems = createToolBarStructure(window.getTopTrim());
+		// menuItems = createMenuStructure(window.getModel().getMainMenu());
+		menuItems = createMenuStructure(mainMenu);
+		// menuItems = createMenuStructure(mmenu);
 	}
 
 	private PluginActionSet buildMenusAndToolbarsFor(
@@ -3041,7 +3109,28 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 
 	private DisplayItem createMenuStructure(MMenu menu) {
 		DisplayItem root = new DisplayItem("", null); //$NON-NLS-1$
+		//		System.out.println("===================="); //$NON-NLS-1$
+		//		System.out.println("BEFORE"); //$NON-NLS-1$
+		// for (Object o : actionSets) {
+		// ActionSet as = (ActionSet) o;
+		// System.out.println(as.descriptor.getLabel());
+		// for (Object o2 : as.contributionItems) {
+		// DisplayItem di = (DisplayItem) o2;
+		//				System.out.println("  " + di.getLabel()); //$NON-NLS-1$
+		// }
+		// }
 		createMenuEntries(menu, root, true);
+		//		System.out.println("===================="); //$NON-NLS-1$
+		//		System.out.println("AFTER"); //$NON-NLS-1$
+		// for (Object o : actionSets) {
+		// ActionSet as = (ActionSet) o;
+		// System.out.println(as.descriptor.getLabel());
+		// for (Object o2 : as.contributionItems) {
+		// DisplayItem di = (DisplayItem) o2;
+		//				System.out.println("  " + di.getLabel()); //$NON-NLS-1$
+		// }
+		// }
+		//		System.out.println("===================="); //$NON-NLS-1$
 		return root;
 	}
 
