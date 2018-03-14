@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2016 IBM Corporation and others.
+ * Copyright (c) 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -82,8 +82,6 @@ public class PerspectiveBuilder {
 
 	private ModeledPageLayoutUtils layoutUtils;
 
-	private Integer defaultFastViewSide;
-
 	@PostConstruct
 	private void postConstruct() {
 		layoutUtils = new ModeledPageLayoutUtils(modelService);
@@ -94,11 +92,6 @@ public class PerspectiveBuilder {
 		tags = perspective.getTags();
 		populate();
 		return perspective;
-	}
-
-	public MPerspective createPerspective(Integer defaultFastViewSide) {
-		this.defaultFastViewSide = defaultFastViewSide;
-		return createPerspective();
 	}
 
 	private void create() {
@@ -190,24 +183,7 @@ public class PerspectiveBuilder {
 
 		if (defaultFastViews.size() > 0) {
 			sb.append(DEFAULT_FASTVIEW_STACK).append(' ');
-			if (defaultFastViewSide != null) {
-				switch (defaultFastViewSide) {
-				case SWT.TOP:
-					sb.append(SideValue.TOP_VALUE).append(' ').append(topCounter++);
-					break;
-				case SWT.BOTTOM:
-					sb.append(SideValue.BOTTOM_VALUE).append(' ').append(bottomCounter++);
-					break;
-				case SWT.RIGHT:
-					sb.append(SideValue.RIGHT_VALUE).append(' ').append(rightCounter++);
-					break;
-				default:
-					sb.append(SideValue.LEFT_VALUE).append(' ').append(leftCounter++);
-					break;
-				}
-			} else {
-				sb.append(SideValue.BOTTOM_VALUE).append(' ').append(bottomCounter++);
-			}
+			sb.append(SideValue.BOTTOM_VALUE).append(' ').append(bottomCounter++);
 			sb.append('#');
 		}
 
@@ -419,20 +395,7 @@ public class PerspectiveBuilder {
 		List<String> views = perspReader.getDefaultFastViewBarViewIds();
 		if (views.size() > 0) {
 			stack = layoutUtils.createStack(DEFAULT_FASTVIEW_STACK, true);
-			MPartSashContainer psc = modelService.createModelElement(MPartSashContainer.class);
-			psc.setHorizontal(true);
-			psc.setContainerData(Integer.toString(5000));
-			stack.setContainerData(Integer.toString(2500));
-			psc.getChildren().add(stack);
-			List<MPartSashContainer> list = modelService.findElements(perspective, null, MPartSashContainer.class,
-					null);
-			if (list == null || list.size() == 0) {
-				perspective.getChildren().add(psc);
-			} else {
-				int size = list.size();
-				MPartSashContainer container = list.get(size - 1);
-				container.getChildren().add(psc);
-			}
+			perspective.getChildren().add(stack);
 			setPartState(stack, org.eclipse.ui.internal.e4.migration.InfoReader.PartState.MINIMIZED);
 
 			for (String view : views) {
@@ -544,7 +507,9 @@ public class PerspectiveBuilder {
 		}
 		addLayoutTagsToPlaceholder(placeholder, partId);
 		stack.getChildren().add(placeholder);
-		viewPlaceholders.put(partId, placeholder);
+		if (viewPlaceholders.get(partId) != null) {
+			viewPlaceholders.put(partId, placeholder);
+		}
 	}
 
 	private void addLayoutTagsToPlaceholder(MPlaceholder placeholder, String partId) {

@@ -9,8 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Tom Schindl - bug 151205
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 402439, 475689
- *     Thorsten Maack <tm@tmaack.de> - Bug 482163
- *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 481490
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -559,11 +557,11 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	/**
 	 * Adds the given filter to this viewer, and triggers refiltering and
 	 * resorting of the elements. If you want to add more than one filter
-	 * consider using {@link StructuredViewer#setFilters(ViewerFilter...)}.
+	 * consider using {@link StructuredViewer#setFilters(ViewerFilter[])}.
 	 *
 	 * @param filter
 	 *            a viewer filter
-	 * @see StructuredViewer#setFilters(ViewerFilter...)
+	 * @see StructuredViewer#setFilters(ViewerFilter[])
 	 */
 	public void addFilter(ViewerFilter filter) {
 		if (filters == null) {
@@ -945,7 +943,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 * Returns this viewer's filters.
 	 *
 	 * @return an array of viewer filters
-	 * @see StructuredViewer#setFilters(ViewerFilter...)
+	 * @see StructuredViewer#setFilters(ViewerFilter[])
 	 */
 	public ViewerFilter[] getFilters() {
 		if (filters == null) {
@@ -1590,11 +1588,11 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 * Removes the given filter from this viewer, and triggers refiltering and
 	 * resorting of the elements if required. Has no effect if the identical
 	 * filter is not registered. If you want to remove more than one filter
-	 * consider using {@link StructuredViewer#setFilters(ViewerFilter...)}.
+	 * consider using {@link StructuredViewer#setFilters(ViewerFilter[])}.
 	 *
 	 * @param filter
 	 *            a viewer filter
-	 * @see StructuredViewer#setFilters(ViewerFilter...)
+	 * @see StructuredViewer#setFilters(ViewerFilter[])
 	 */
 	public void removeFilter(ViewerFilter filter) {
 		Assert.isNotNull(filter);
@@ -1776,15 +1774,13 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	/**
 	 * Sets this viewer's sorter and triggers refiltering and resorting of this
 	 * viewer's element. Passing <code>null</code> turns sorting off.
-	 * <p>
-	 *
-	 * @deprecated use <code>setComparator()</code> instead.
-	 *             </p>
+     * <p>
+     * It is recommended to use <code>setComparator()</code> instead.
+     * </p>
 	 *
 	 * @param sorter
 	 *            a viewer sorter, or <code>null</code> if none
 	 */
-	@Deprecated
 	public void setSorter(ViewerSorter sorter) {
 		if (this.sorter != sorter) {
 			this.sorter = sorter;
