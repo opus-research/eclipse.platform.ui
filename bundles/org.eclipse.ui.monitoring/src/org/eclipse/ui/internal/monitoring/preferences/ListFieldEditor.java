@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014, Google Inc and others.
+ * Copyright (C) 2014, Google Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,8 +12,6 @@ package org.eclipse.ui.internal.monitoring.preferences;
 
 import org.eclipse.jface.preference.ListEditor;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.internal.monitoring.MonitoringPlugin;
-import org.eclipse.ui.monitoring.PreferenceConstants;
 
 /**
  * Displays the list of traces to filter out and ignore.
@@ -23,12 +21,9 @@ public class ListFieldEditor extends ListEditor {
 
 	ListFieldEditor(String name, String labelText, Composite parent) {
 		super(name, labelText, parent);
-		super.getAddButton().setText(Messages.ListFieldEditor_add_filter_button_label);
 		super.getUpButton().setVisible(false);
 		super.getDownButton().setVisible(false);
 		dialog = new FilterInputDialog(super.getShell());
-		this.setEnabled(MonitoringPlugin.getDefault().getPreferenceStore()
-				.getBoolean(PreferenceConstants.MONITORING_ENABLED), parent);
 	}
 
 	/**

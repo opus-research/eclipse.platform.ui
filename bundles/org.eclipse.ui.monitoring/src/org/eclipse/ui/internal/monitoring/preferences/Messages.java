@@ -16,7 +16,6 @@ public final class Messages extends NLS {
 	public static String FilterInputDialog_filter_input_header;
 	public static String FilterInputDialog_filter_input_message;
 	public static String FilterInputDialog_filter_input_label;
-	public static String ListFieldEditor_add_filter_button_label;
 	public static String MonitoringPreferenceListener_preference_error_header;
 	public static String MonitoringPreferenceListener_preference_error;
 	public static String MonitoringPreferencePage_capture_threshold_error;

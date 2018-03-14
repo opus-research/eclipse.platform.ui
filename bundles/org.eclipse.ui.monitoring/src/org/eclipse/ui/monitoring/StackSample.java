@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014, Google Inc and others.
+ * Copyright (C) 2014, Google Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,8 +14,6 @@ import java.lang.management.ThreadInfo;
 
 /**
  * A sample of the stack that contains the stack traces and the time stamp.
- *
- * @since 1.0
  */
 public class StackSample {
 	private final long timestamp;
@@ -34,8 +32,7 @@ public class StackSample {
 	}
 
 	/**
-	 * Returns an array of {@code ThreadInfo} for this {@code StackSample}. The display thread is
-	 * always the first in the array.
+	 * Returns an array of {@code ThreadInfo} for this {@code StackSample}.
 	 */
 	public ThreadInfo[] getStackTraces() {
 		return traces;

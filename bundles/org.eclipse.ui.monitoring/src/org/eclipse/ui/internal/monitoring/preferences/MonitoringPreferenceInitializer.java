@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014, Google Inc and others.
+ * Copyright (C) 2014, Google Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,7 +29,7 @@ public class MonitoringPreferenceInitializer extends AbstractPreferenceInitializ
 	public void initializeDefaultPreferences() {
 		IPreferenceStore store = MonitoringPlugin.getDefault().getPreferenceStore();
 
-		store.setDefault(PreferenceConstants.MONITORING_ENABLED, false);
+		store.setDefault(PreferenceConstants.MONITORING_ENABLED, true);
 		store.setDefault(PreferenceConstants.FORCE_DEADLOCK_LOG_TIME_MILLIS,
 				DEFAULT_FORCE_DEADLOCK_LOG_TIME_MILLIS);
 		store.setDefault(PreferenceConstants.MAX_LOG_TRACE_COUNT, 3);

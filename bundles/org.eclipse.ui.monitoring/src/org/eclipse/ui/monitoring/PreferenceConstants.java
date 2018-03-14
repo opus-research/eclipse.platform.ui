@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014, Google Inc and others.
+ * Copyright (C) 2014, Google Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,8 +12,6 @@ package org.eclipse.ui.monitoring;
 
 /**
  * Definitions of the preference constants.
- *
- * @since 1.0
  */
 public class PreferenceConstants {
 	public static final String PLUGIN_ID = "org.eclipse.ui.monitoring"; //$NON-NLS-1$
@@ -46,6 +44,4 @@ public class PreferenceConstants {
 	public static final String LOG_TO_ERROR_LOG = "log_to_error_log"; //$NON-NLS-1$
 	/** Stack traces to filter out. Any event with a filter matching any sample will be ignored. */
 	public static final String FILTER_TRACES = "filter_traces"; //$NON-NLS-1$
-
-	private PreferenceConstants() {}
 }

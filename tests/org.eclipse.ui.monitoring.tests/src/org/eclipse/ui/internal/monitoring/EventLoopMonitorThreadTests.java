@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014, Google Inc and others.
+ * Copyright (C) 2014, Google Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,9 +15,11 @@ package org.eclipse.ui.internal.monitoring;
 import junit.framework.TestCase;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.internal.monitoring.EventLoopMonitorThread.Parameters;
 import org.eclipse.ui.monitoring.PreferenceConstants;
 import org.eclipse.ui.monitoring.UiFreezeEvent;
+import org.mockito.Mockito;
 
 import java.util.List;
 
@@ -31,6 +33,16 @@ public class EventLoopMonitorThreadTests extends TestCase {
 	private static class MockEventLoopMonitorThread extends EventLoopMonitorThread {
 		public MockEventLoopMonitorThread(Parameters args) throws Exception {
 			super(args);
+		}
+
+		/**
+		 * Provides and mock display for JUnit tests.
+		 */
+		@Override
+		protected Display getDisplay() {
+			Display display = Mockito.mock(Display.class);
+			Mockito.when(display.getThread()).thenReturn(Thread.currentThread());
+			return display;
 		}
 
 		/**

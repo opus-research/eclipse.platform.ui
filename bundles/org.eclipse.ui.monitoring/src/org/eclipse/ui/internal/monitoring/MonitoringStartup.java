@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014, Google Inc and others.
+ * Copyright (C) 2014, Google Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@ package org.eclipse.ui.internal.monitoring;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IStartup;
+import org.eclipse.ui.internal.monitoring.EventLoopMonitorThread.InitializationException;
 import org.eclipse.ui.internal.monitoring.preferences.MonitoringPreferenceListener;
 import org.eclipse.ui.monitoring.PreferenceConstants;
 
@@ -50,7 +51,7 @@ public class MonitoringStartup implements IStartup {
 
 		try {
 			temporaryThread = new EventLoopMonitorThread(args);
-		} catch (IllegalArgumentException e) {
+		} catch (InitializationException e) {
 			MonitoringPlugin.logError(Messages.MonitoringStartup_initialization_error, e);
 			return null;
 		}
@@ -58,7 +59,7 @@ public class MonitoringStartup implements IStartup {
 		final EventLoopMonitorThread thread = temporaryThread;
 		final Display display = MonitoringPlugin.getDefault().getWorkbench().getDisplay();
 		// Final setup and start synced on display thread
-		display.asyncExec(new Runnable() {
+		display.syncExec(new Runnable() {
 			@Override
 			public void run() {
 				// If we're still running when display gets disposed, shutdown the thread.

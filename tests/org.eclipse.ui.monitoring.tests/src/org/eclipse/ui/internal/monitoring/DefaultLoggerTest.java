@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014, Google Inc and others.
+ * Copyright (C) 2014, Google Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -69,6 +69,8 @@ public class DefaultLoggerTest extends TestCase {
 		String expectedHeader =
 				String.format("UI Delay of %.2fs at %s", DURATION / 1000.0, expectedTime);
 		String expectedEventMessage = String.format("Sample at %s (+%.3fs)", expectedTime, 0.000);
+		String expectedSampleTraceHeader = String.format("Thread Name: %s\nThread ID: %d\nState: %s",
+				thread.getThreadName(), thread.getThreadId(), thread.getThreadState());
 
 		logger.log(event);
 
@@ -79,10 +81,15 @@ public class DefaultLoggerTest extends TestCase {
 				loggedStatus.getChildren().length);
 
 		IStatus freezeEvent = loggedStatus.getChildren()[0];
-		assertTrue(freezeEvent.getMessage().contains(expectedEventMessage));
+		assertEquals(expectedEventMessage, freezeEvent.getMessage());
+		assertEquals("Sample nested IStatus did not get logged correctly.", 1,
+				freezeEvent.getChildren().length);
+
+		IStatus freezeSample = freezeEvent.getChildren()[0];
+		assertEquals(expectedSampleTraceHeader, freezeSample.getMessage());
 
 		StackTraceElement[] threadStackTrace = thread.getStackTrace();
-		StackTraceElement[] loggedStackTrace = freezeEvent.getException().getStackTrace();
+		StackTraceElement[] loggedStackTrace = freezeSample.getException().getStackTrace();
 		assertEquals(threadStackTrace.length, loggedStackTrace.length);
 
 		for (int i = 0; i < threadStackTrace.length; i++) {

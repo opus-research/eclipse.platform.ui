@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014, Google Inc and others.
+ * Copyright (C) 2014, Google Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,8 +17,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.monitoring.PreferenceConstants;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadMXBean;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -30,22 +28,19 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * A test that measures performance overhead of {@link EventLoopMonitorThread}.
- * This test is not included into {@link MonitoringTestSuite} due to its
+ * This test is not included into {@link AllMonitoringTests} due to its
  * low reliability and the amount of time it takes.
  */
 public class EventLoopMonitorThreadManualJUnitPluginTests extends TestCase {
-	/** Change to {@code true} to enable printing of detailed information to the console. */
-	private static final boolean PRINT_TO_CONSOLE = false;
-
 	// Test Parameters
 	/** Time each measurement should run for. This will affect the number of samples collected. */
 	protected static final double TARGET_RUNNING_TIME_PER_MEASUREMENT = 5.0; // seconds
 
 	/** Maximum allowable relative increase due to taking traces on the UI thread. */
-	protected static final double MAX_RELATIVE_INCREASE_ONE_STACK_PERCENT = 2.5; // %
+	protected static final double MAX_RELATIVE_INCREASE_ONE_STACK = 2; // %
 
-	/** Maximum allowable relative increase per thread due to taking traces on all threads. */
-	protected static final double MAX_RELATIVE_INCREASE_PER_EXTRA_THREAD_PERCENT = 0.25; // %
+	/** Maximum allowable relative increase due to taking traces on all threads. */
+	protected static final double MAX_RELATIVE_INCREASE_ALL_STACKS = 7; // %
 
 	/** Number of times to repeat the control measurement. This should always be at least 2. */
 	protected static final int NUM_CONTROL_MEASUREMENTS = 5;
@@ -172,13 +167,6 @@ public class EventLoopMonitorThreadManualJUnitPluginTests extends TestCase {
 			}
 		};
 
-		// Fetch the total number of threads.
-		ThreadMXBean jvmThreadManager = ManagementFactory.getThreadMXBean();
-		boolean dumpLockedMonitors = jvmThreadManager.isObjectMonitorUsageSupported();
-		boolean dumpLockedSynchronizers = jvmThreadManager.isSynchronizerUsageSupported();
-		int totalThreadCount =
-				jvmThreadManager.dumpAllThreads(dumpLockedMonitors, dumpLockedSynchronizers).length;
-
 		List<Double> controlResults = new ArrayList<Double>(NUM_CONTROL_MEASUREMENTS);
 		List<Double> uiStackResults = new ArrayList<Double>(NUM_UI_STACK_MEASUREMENTS);
 		List<Double> allStacksResults = new ArrayList<Double>(NUM_ALL_STACKS_MEASUREMENTS);
@@ -190,16 +178,12 @@ public class EventLoopMonitorThreadManualJUnitPluginTests extends TestCase {
 		 * mean and standard deviation, measuring each of the test case a few times, calculating the
 		 * probability of the result, and comparing that probability to some acceptable bound.
 		 */
-		if (PRINT_TO_CONSOLE) {
-			System.out.println(String.format("Starting %d control measurements without monitoring.",
-					NUM_CONTROL_MEASUREMENTS));
-		}
+		System.out.println(String.format("Starting %d control measurements without monitoring.",
+				NUM_CONTROL_MEASUREMENTS));
 		for (int i = 1; i <= NUM_CONTROL_MEASUREMENTS; ++i) {
 			display.syncExec(doFixedAmountOfWork);
-			if (PRINT_TO_CONSOLE) {
-				System.out.println(String.format("Control measurement %d/%d finished. tWork = %fs",
+			System.out.println(String.format("Control measurement %d/%d finished. tWork = %fs",
 					i, NUM_CONTROL_MEASUREMENTS, tWork[0] / 1e9));
-			}
 			controlResults.add(tWork[0]);
 			expectedRunningTime += tWork[0] / NUM_CONTROL_MEASUREMENTS;
 			if (tWork[0] > maxRunningTime) {
@@ -210,17 +194,14 @@ public class EventLoopMonitorThreadManualJUnitPluginTests extends TestCase {
 		// Calculate error bound between mean & max control runs
 		double controlDiff = Math.abs((maxRunningTime - expectedRunningTime) / expectedRunningTime);
 		double maxRelativeIncreaseOneStackAllowed =
-			(MAX_RELATIVE_INCREASE_ONE_STACK_PERCENT / 100) * (1 + controlDiff);
+				(MAX_RELATIVE_INCREASE_ONE_STACK / 100) * (1 + controlDiff);
 		double maxRelativeIncreaseAllStacksAllowed =
-				((MAX_RELATIVE_INCREASE_ONE_STACK_PERCENT + MAX_RELATIVE_INCREASE_PER_EXTRA_THREAD_PERCENT
-				* (totalThreadCount - 1)) / 100) * (1 + controlDiff);
+				(MAX_RELATIVE_INCREASE_ALL_STACKS / 100) * (1 + controlDiff);
 
 		Thread monitor1 = createAndStartMonitoringThread(display, false);
 		double worstRelativeDiffOneThread = Double.MIN_NORMAL;
-		if (PRINT_TO_CONSOLE) {
-			System.out.println(String.format("Starting %d measurements while collecting UI thread stacks.",
-					NUM_UI_STACK_MEASUREMENTS));
-		}
+		System.out.println(String.format("Starting %d measurements while collecting UI thread stacks.",
+				NUM_UI_STACK_MEASUREMENTS));
 		for (int i = 1; i <= NUM_UI_STACK_MEASUREMENTS; ++i) {
 			display.syncExec(doFixedAmountOfWork);
 			uiStackResults.add(tWork[0]);
@@ -228,26 +209,17 @@ public class EventLoopMonitorThreadManualJUnitPluginTests extends TestCase {
 			if (relativeDiffOneThread > worstRelativeDiffOneThread) {
 				worstRelativeDiffOneThread = relativeDiffOneThread;
 			}
-			if (PRINT_TO_CONSOLE) {
-				System.out.println(String.format(
-						"Measurement %d/%d finished. tWork = %fs, Relative increase = %f%%  (allowed < %f%%)",
-						i, NUM_UI_STACK_MEASUREMENTS, tWork[0] / 1e9, relativeDiffOneThread * 100,
-						maxRelativeIncreaseOneStackAllowed * 100));
-			}
-			assertTrue(
-				String.format("Relative increase with monitoring thread surpassed threshold for "
-					+ "measurement %d/%d. It took %fs with a relative increase of %f%%",
-					i, NUM_UI_STACK_MEASUREMENTS, tWork[0] / 1e9, relativeDiffOneThread * 100),
-				relativeDiffOneThread < maxRelativeIncreaseOneStackAllowed);
+			System.out.println(String.format(
+					"Measurement %d/%d finished. tWork = %fs, Relative increase = %f%%  (allowed < %f%%)",
+					i, NUM_UI_STACK_MEASUREMENTS, tWork[0] / 1e9, relativeDiffOneThread * 100,
+					maxRelativeIncreaseOneStackAllowed * 100));
 		}
 		killMonitorThread(monitor1, display);
 
 		Thread monitor2 = createAndStartMonitoringThread(display, true);
 		double worstRelativeDiffAllThreads = Double.MIN_NORMAL;
-		if (PRINT_TO_CONSOLE) {
-			System.out.println(String.format("Starting %d measurements while collecting all thread stacks.",
-					NUM_ALL_STACKS_MEASUREMENTS));
-		}
+		System.out.println(String.format("Starting %d measurements while collecting all thread stacks.",
+				NUM_ALL_STACKS_MEASUREMENTS));
 		for (int i = 1; i <= NUM_ALL_STACKS_MEASUREMENTS; ++i) {
 			display.syncExec(doFixedAmountOfWork);
 			allStacksResults.add(tWork[0]);
@@ -255,105 +227,102 @@ public class EventLoopMonitorThreadManualJUnitPluginTests extends TestCase {
 			if (relativeDiffAllThreads > worstRelativeDiffAllThreads) {
 				worstRelativeDiffAllThreads = relativeDiffAllThreads;
 			}
-			if (PRINT_TO_CONSOLE) {
-				System.out.println(String.format(
-						"Measurement %d/%d finished. tWork = %fs, Relative increase = %f%%  (allowed < %f%%)",
-						i, NUM_ALL_STACKS_MEASUREMENTS, tWork[0] / 1e9, relativeDiffAllThreads * 100,
-						maxRelativeIncreaseAllStacksAllowed * 100));
-			}
-			assertTrue(
-				String.format("Relative increase with monitoring thread (with all threads) surpassed "
-					+ "threshold for measurement %d/%d. It took %fs with a relative increase of %f%%",
-					i, NUM_ALL_STACKS_MEASUREMENTS, tWork[0] / 1e9, relativeDiffAllThreads * 100),
-				relativeDiffAllThreads < maxRelativeIncreaseAllStacksAllowed);
+			System.out.println(String.format(
+					"Measurement %d/%d finished. tWork = %fs, Relative increase = %f%%  (allowed < %f%%)",
+					i, NUM_ALL_STACKS_MEASUREMENTS, tWork[0] / 1e9, relativeDiffAllThreads * 100,
+					maxRelativeIncreaseAllStacksAllowed * 100));
 		}
 		killMonitorThread(monitor2, display);
 
 		backgroundJobsDone.countDown();
 
+		// Tabulate final results while waiting for monitor to finish
+		double controlMean = 0;
+		double controlMin = Double.MAX_VALUE;
+		double controlMax = Double.MIN_NORMAL;
+		double controlM2 = 0;
+		for (int n = 0; n < controlResults.size(); ) {
+			double v = controlResults.get(n) / 1e9;
+			controlResults.set(n, v);
+			++n;
+			double delta = v - controlMean;
+			controlMean += delta / n;
+			controlM2 += delta * (v - controlMean);
+			controlMin = Math.min(controlMin, v);
+			controlMax = Math.max(controlMax, v);
+		}
+		double controlStD = Math.sqrt(controlM2 / controlResults.size());
+
+		double uiStackMean = 0;
+		double uiStackMin = Double.MAX_VALUE;
+		double uiStackMax = Double.MIN_NORMAL;
+		double uiStackM2 = 0;
+		for (int n = 0; n < uiStackResults.size(); ) {
+			double v = uiStackResults.get(n) / 1e9;
+			uiStackResults.set(n, v);
+			++n;
+			double delta = v - uiStackMean;
+			uiStackMean += delta / n;
+			uiStackM2 += delta * (v - uiStackMean);
+			uiStackMin = Math.min(uiStackMin, v);
+			uiStackMax = Math.max(uiStackMax, v);
+		}
+
+		double allStacksMean = 0;
+		double allStacksMin = Double.MAX_VALUE;
+		double allStacksMax = Double.MIN_NORMAL;
+		double allStacksM2 = 0;
+		for (int n = 0; n < allStacksResults.size(); ) {
+			double v = allStacksResults.get(n) / 1e9;
+			allStacksResults.set(n, v);
+			++n;
+			double delta = v - allStacksMean;
+			allStacksMean += delta / n;
+			allStacksM2 += delta * (v - allStacksMean);
+			allStacksMin = Math.min(allStacksMin, v);
+			allStacksMax = Math.max(allStacksMax, v);
+		}
+
+		// Publish results to output
 		boolean gotFreezeEvents =
 		logger.getLoggedEvents().size() == NUM_UI_STACK_MEASUREMENTS + NUM_ALL_STACKS_MEASUREMENTS;
 
 		boolean oneThreadOk = worstRelativeDiffOneThread < maxRelativeIncreaseOneStackAllowed;
 		boolean allThreadsOk = worstRelativeDiffAllThreads < maxRelativeIncreaseAllStacksAllowed;
 
-		if (PRINT_TO_CONSOLE) {
-			// Tabulate final results while waiting for monitor to finish
-			double controlMean = 0;
-			double controlMin = Double.MAX_VALUE;
-			double controlMax = Double.MIN_NORMAL;
-			double controlM2 = 0;
-			for (int n = 0; n < controlResults.size(); ) {
-				double v = controlResults.get(n) / 1e9;
-				controlResults.set(n, v);
-				++n;
-				double delta = v - controlMean;
-				controlMean += delta / n;
-				controlM2 += delta * (v - controlMean);
-				controlMin = Math.min(controlMin, v);
-				controlMax = Math.max(controlMax, v);
-			}
-			double controlStD = Math.sqrt(controlM2 / controlResults.size());
+		// Ensure the work cannot be optimized away completely
+		System.out.println(String.format("Work result = %016X", workOutput[0]));
 
-			double uiStackMean = 0;
-			double uiStackMin = Double.MAX_VALUE;
-			double uiStackMax = Double.MIN_NORMAL;
-			double uiStackM2 = 0;
-			for (int n = 0; n < uiStackResults.size(); ) {
-				double v = uiStackResults.get(n) / 1e9;
-				uiStackResults.set(n, v);
-				++n;
-				double delta = v - uiStackMean;
-				uiStackMean += delta / n;
-				uiStackM2 += delta * (v - uiStackMean);
-				uiStackMin = Math.min(uiStackMin, v);
-				uiStackMax = Math.max(uiStackMax, v);
-			}
+		System.out.println(oneThreadOk && allThreadsOk && gotFreezeEvents
+				&& !logger.getLoggedEvents().isEmpty() ? "Test passed"
+						: "Test failed!");
 
-			double allStacksMean = 0;
-			double allStacksMin = Double.MAX_VALUE;
-			double allStacksMax = Double.MIN_NORMAL;
-			double allStacksM2 = 0;
-			for (int n = 0; n < allStacksResults.size(); ) {
-				double v = allStacksResults.get(n) / 1e9;
-				allStacksResults.set(n, v);
-				++n;
-				double delta = v - allStacksMean;
-				allStacksMean += delta / n;
-				allStacksM2 += delta * (v - allStacksMean);
-				allStacksMin = Math.min(allStacksMin, v);
-				allStacksMax = Math.max(allStacksMax, v);
-			}
-
-			// Ensure the work cannot be optimized away completely
-			System.out.println(String.format("Work result = %016X", workOutput[0]));
-
-			if (!oneThreadOk) {
-				System.out.println(" * Monitoring UI thread slowed down work too much");
-			}
-			if (!allThreadsOk) {
-				System.out.println(" * Monitoring all threads slowed down work too much");
-			}
-			if (!gotFreezeEvents) {
-				System.out.println(String.format(" * Didn't get expected freeze events (got %d/%d)",
-						logger.getLoggedEvents().size(),
-						NUM_UI_STACK_MEASUREMENTS + NUM_ALL_STACKS_MEASUREMENTS));
-			}
-
-			System.out.println("\nRaw results (in seconds): ");
-			System.out.println(String.format(
-					" * Control    (min = %f max = %f avg = %f stD = %f): %s",
-					controlMin, controlMax, controlMean, controlStD, joinItems(controlResults)));
-			System.out.println(String.format(
-					" * UI stack   (min = %f max = %f avg = %f stD = %f, vsC = %f): %s",
-					uiStackMin, uiStackMax, uiStackMean, Math.sqrt(uiStackM2 / uiStackResults.size()),
-					Math.abs(uiStackMean - controlMean) / controlStD, joinItems(uiStackResults)));
-			System.out.println(String.format(
-					" * All stacks (min = %f max = %f avg = %f stD = %f, vsC = %f): %s",
-					allStacksMin, allStacksMax, allStacksMean, Math.sqrt(allStacksM2 / allStacksResults.size()),
-					Math.abs(allStacksMean - controlMean) / controlStD,
-					joinItems(allStacksResults)));
+		if (!oneThreadOk) {
+			System.out.println(" * Monitoring UI thread slowed down work too much");
 		}
+		if (!allThreadsOk) {
+			System.out.println(" * Monitoring all threads slowed down work too much");
+		}
+		if (!gotFreezeEvents) {
+			System.out.println(String.format(" * Didn't get expected freeze events (got %d/%d)",
+					logger.getLoggedEvents().size(),
+					NUM_UI_STACK_MEASUREMENTS + NUM_ALL_STACKS_MEASUREMENTS));
+		}
+
+		System.out.println();
+		System.out.println("Raw results (in seconds): ");
+		System.out.println(String.format(
+				" * Control    (min = %f max = %f avg = %f stD = %f): %s",
+				controlMin, controlMax, controlMean, controlStD, joinItems(controlResults)));
+		System.out.println(String.format(
+				" * UI stack   (min = %f max = %f avg = %f stD = %f, vsC = %f): %s",
+				uiStackMin, uiStackMax, uiStackMean, Math.sqrt(uiStackM2 / uiStackResults.size()),
+				Math.abs(uiStackMean - controlMean) / controlStD, joinItems(uiStackResults)));
+		System.out.println(String.format(
+				" * All stacks (min = %f max = %f avg = %f stD = %f, vsC = %f): %s",
+				allStacksMin, allStacksMax, allStacksMean, Math.sqrt(allStacksM2 / allStacksResults.size()),
+				Math.abs(allStacksMean - controlMean) / controlStD,
+				joinItems(allStacksResults)));
 
 		// Join all threads
 		while (!threads.isEmpty()) {
@@ -365,7 +334,7 @@ public class EventLoopMonitorThreadManualJUnitPluginTests extends TestCase {
 			}
 		}
 
-		assertTrue(oneThreadOk && allThreadsOk && gotFreezeEvents && !logger.getLoggedEvents().isEmpty());
+		// Report test results
 		assertTrue("Monitoring slowed down cases too much", oneThreadOk || allThreadsOk);
 		assertTrue("Monitoring UI thread slowed down work too much", oneThreadOk);
 		assertTrue("Did not log expected freeze events", gotFreezeEvents);
@@ -415,6 +384,11 @@ public class EventLoopMonitorThreadManualJUnitPluginTests extends TestCase {
 		args.dumpAllThreads = dumpAllThreads;
 
 		return new EventLoopMonitorThread(args) {
+			@Override
+			protected Display getDisplay() {
+				return Display.getDefault();
+			}
+
 			/**
 			 * Replaces the super-class implementation with a no-op. This breaks the implicit contract
 			 * that some amount of time should have passed when sleepForMillis is called with a non-zero
@@ -485,10 +459,9 @@ public class EventLoopMonitorThreadManualJUnitPluginTests extends TestCase {
 		int activeThreads = Thread.activeCount();
 		int numBackgroundTasks = activeThreads <= 2 ? 5 + rng.nextInt(5) : 1;
 		int numBackgroundIdlers = 8 + rng.nextInt(30);
-		if (PRINT_TO_CONSOLE) {
-			System.out.println(String.format("Starting %d background tasks and %d background idlers",
-					numBackgroundTasks, numBackgroundIdlers));
-		}
+
+		System.out.println(String.format("Starting %d background tasks and %d background idlers",
+				numBackgroundTasks, numBackgroundIdlers));
 		Queue<Thread> threads = new ArrayDeque<Thread>(numBackgroundIdlers + numBackgroundTasks);
 		for (int i = 0; i < numBackgroundTasks; i++) {
 			Thread t = new Thread(backgroundTaskRunnable);
@@ -537,9 +510,7 @@ public class EventLoopMonitorThreadManualJUnitPluginTests extends TestCase {
 	 * @returns nanoseconds/unitWork
 	 */
 	protected double calibrate(final Display display) {
-		if (PRINT_TO_CONSOLE) {
-			System.out.println("Starting calibration...");
-		}
+		System.out.println("Starting calibration...");
 		final double[] tWork = {0};
 		display.syncExec(new Runnable() {
 			@Override
@@ -547,9 +518,7 @@ public class EventLoopMonitorThreadManualJUnitPluginTests extends TestCase {
 				tWork[0] = measureAvgTimePerWorkItem();
 			}
 		});
-		if (PRINT_TO_CONSOLE) {
-			System.out.println(String.format("Calibration finished. tWorkUnit = %fns", tWork[0]));
-		}
+		System.out.println(String.format("Calibration finished. tWorkUnit = %fns", tWork[0]));
 		return tWork[0];
 	}
 
@@ -598,26 +567,25 @@ public class EventLoopMonitorThreadManualJUnitPluginTests extends TestCase {
 
 			if (nextPrintAt - System.currentTimeMillis() < 0) {
 				nextPrintAt += 2000; // 2s
-				if (PRINT_TO_CONSOLE) {
-					System.out.println(String.format(
+				System.out.println(String.format(
 						"Still calibrating... n = %3d\t\ttWork = %f ns\t\tRelErr = %f\t\tOutliers = %d/%d",
 						n, 2.0 * mean / WORK_INTEGRATION_ITERATIONS, avgAbsRelErr, outliers,
 						(int) (MAX_OUTLIER_RATIO * Math.min(n, numSamplesAveraged))));
-				}
 			}
 		}
 
 		double tWork = 2.0 * mean / WORK_INTEGRATION_ITERATIONS;
 
-		// Passing the hash to println method ensures it cannot be optimized away completely.
-		System.out.println(String.format("Measurement converged in %d ms (%d loops) "
+		// Printing the hash ensures it cannot be optimized away completely
+		System.out.println(String.format("Measurement converged in %d ms (%d loops) with result=%16x. "
 				+ "tWork = %fns, relErr = %f, outliers = %d",
 				System.currentTimeMillis() - startWallTime,
 				n,
+				hash,
 				tWork,
 				avgAbsRelErr,
-				outliers,
-				hash));
+				outliers));
+
 		return tWork;
 	}
 

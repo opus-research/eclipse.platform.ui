@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014, Google Inc and others.
+ * Copyright (C) 2014, Google Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.internal.Workbench;
 
 /**
  * Used by 'Delays' menu to trigger an intentional delay on the UI thread to
@@ -22,7 +23,7 @@ import org.eclipse.swt.widgets.Display;
  */
 public class DelayHandler extends AbstractHandler {
 	private static final int NS_PER_MS = 1000 * 1000;
-	private static final Display display = Display.getDefault();
+	private static final Display display = Workbench.getInstance().getDisplay();
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {

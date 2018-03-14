@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014, Google Inc and others.
+ * Copyright (C) 2014, Google Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,7 +30,6 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -129,7 +128,7 @@ public class EventLoopMonitorThread extends Thread implements Listener {
 
 	// Accessed by both the UI and monitoring threads.
 	private final int loggingThreshold;
-	private final AtomicBoolean cancelled = new AtomicBoolean(false);
+	private final AtomicBoolean cancelled = new AtomicBoolean(true);
 	private final AtomicReference<LongEventInfo> publishEvent =
 			new AtomicReference<LongEventInfo>(null);
 
@@ -173,7 +172,6 @@ public class EventLoopMonitorThread extends Thread implements Listener {
 			if (!haveAlreadyLoggedPossibleDeadlock && lastActive > 0 && totalDuration > deadlockDelta) {
 				logEvent(new UiFreezeEvent(lastActive, totalDuration, stackTraces, numStacks, true));
 				haveAlreadyLoggedPossibleDeadlock = true;
-				Arrays.fill(stackTraces, null);
 			}
 		}
 
@@ -187,17 +185,35 @@ public class EventLoopMonitorThread extends Thread implements Listener {
 	}
 
 	/**
+	 * Indicates that the monitoring thread cannot be initialized due to an error.
+	 */
+	public class InitializationException extends Exception {
+		public InitializationException(String message) {
+			super(message);
+		}
+
+		public InitializationException(String message, Throwable t) {
+			super(message, t);
+		}
+	}
+
+	/**
 	 * Initializes the static state of the monitoring thread.
 	 *
 	 * @param args parameters derived from preferences
-	 * @throws IllegalArgumentException if monitoring thread cannot be initialized due to an error.
+	 * @throws InitializationException if monitoring thread cannot be initialized due to an error.
 	 */
-	public EventLoopMonitorThread(Parameters args) throws IllegalArgumentException {
+	public EventLoopMonitorThread(Parameters args) throws InitializationException {
 		super("Event Loop Monitor"); //$NON-NLS-1$
 
 		Assert.isNotNull(args);
 
-		args.checkParameters();
+		try {
+			args.checkParameters();
+		} catch (IllegalArgumentException e) {
+			throw new InitializationException(Messages.EventLoopMonitorThread_invalid_parameters_error,
+					e);
+		}
 
 		setDaemon(true);
 		setPriority(NORM_PRIORITY + 1);
@@ -223,12 +239,20 @@ public class EventLoopMonitorThread extends Thread implements Listener {
 		}
 	}
 
-	/**
-	 * Shuts down the monitoring thread. Must be called on the display thread.
-	 */
+	@Override
+	public synchronized void start() throws SWTException {
+		cancelled.set(false);
+		super.start();
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		shutdown();
+		super.finalize();
+	}
+
 	public void shutdown() throws SWTException {
-		cancelled.set(true);
-		if (!display.isDisposed()) {
+		if (!cancelled.getAndSet(true)) {
 			display.removeListener(SWT.PreEvent, this);
 			display.removeListener(SWT.PostEvent, this);
 			display.removeListener(SWT.Sleep, this);
@@ -449,34 +473,27 @@ public class EventLoopMonitorThread extends Thread implements Listener {
 
 					try {
 						ThreadInfo[] rawThreadStacks = dumpAllThreads
-							? jvmThreadManager.dumpAllThreads(dumpLockedMonitors, dumpLockedSynchronizers)
-									: new ThreadInfo[] {
-									jvmThreadManager.getThreadInfo(uiThreadId, Integer.MAX_VALUE)
-							};
+								? jvmThreadManager.dumpAllThreads(dumpLockedMonitors, dumpLockedSynchronizers)
+										: new ThreadInfo[] {
+										jvmThreadManager.getThreadInfo(uiThreadId, Integer.MAX_VALUE)
+								};
 
-						ThreadInfo[] threadStacks = rawThreadStacks;
-						// If all threads were dumped, we remove the info for the monitoring thread.
-						if (dumpAllThreads) {
-							int index = 0;
-							threadStacks = new ThreadInfo[rawThreadStacks.length - 1];
+								ThreadInfo[] threadStacks = rawThreadStacks;
+								// If all threads were dumped, we remove the info for the monitoring thread.
+								if (dumpAllThreads) {
+									int index = 0;
+									threadStacks = new ThreadInfo[rawThreadStacks.length - 1];
 
-							for (int i = 0; i < rawThreadStacks.length; i++) {
-								ThreadInfo currentThread = rawThreadStacks[i];
-
-								// Skip if stack trace is from the current (UI monitoring) thread.
-								if (!isCurrentThread(currentThread.getThreadId())) {
-									if (currentThread.getThreadId() == uiThreadId && i > 0) {
-										// Swap main thread to first slot in array if it is not already.
-										currentThread = threadStacks[0];
-										threadStacks[0] = rawThreadStacks[i];
+									for (ThreadInfo thread : rawThreadStacks) {
+										// Skip if stack trace is from the current (UI monitoring) thread.
+										if (!isCurrentThread(thread.getThreadId())) {
+											threadStacks[index++] = thread;
+										}
 									}
-									threadStacks[index++] = currentThread;
 								}
-							}
-						}
 
-						stackTraces[numStacks++] = new StackSample(getTimestamp(), threadStacks);
-						grabStackTraceAt += pollingDelay;
+								stackTraces[numStacks++] = new StackSample(getTimestamp(), threadStacks);
+								grabStackTraceAt += pollingDelay;
 					} catch (SWTException e) {
 						// Display is disposed so start terminating
 						cancelled.set(true);
@@ -508,22 +525,22 @@ public class EventLoopMonitorThread extends Thread implements Listener {
 				}
 
 				resetStalledEventState = true;
-				Arrays.fill(stackTraces, null);
 			}
 
 			lastEventStartOrResumeTime = currEventStartOrResumeTime;
 		}
 	}
 
-	private static Display getDisplay() throws IllegalArgumentException {
+	// VisibleForTesting
+	protected Display getDisplay() throws InitializationException {
 		IWorkbench workbench = MonitoringPlugin.getDefault().getWorkbench();
 		if (workbench == null) {
-			throw new IllegalArgumentException(Messages.EventLoopMonitorThread_workbench_was_null);
+			throw new InitializationException(Messages.EventLoopMonitorThread_workbench_was_null);
 		}
 
 		Display display = workbench.getDisplay();
 		if (display == null) {
-			throw new IllegalArgumentException(Messages.EventLoopMonitorThread_display_was_null);
+			throw new InitializationException(Messages.EventLoopMonitorThread_display_was_null);
 		}
 
 		return display;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014, Google Inc and others.
+ * Copyright (C) 2014, Google Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,8 +12,6 @@ package org.eclipse.ui.monitoring;
 
 /**
  * Responsible for holding the stack traces for a UI event.
- *
- * @since 1.0
  */
 public class UiFreezeEvent {
 	private final long startTimestamp;
