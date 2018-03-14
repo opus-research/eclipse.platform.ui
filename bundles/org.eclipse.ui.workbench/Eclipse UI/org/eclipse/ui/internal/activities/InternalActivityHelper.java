@@ -13,7 +13,6 @@ package org.eclipse.ui.internal.activities;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
 import org.eclipse.ui.activities.IActivityManager;
 import org.eclipse.ui.activities.ICategory;
 import org.eclipse.ui.activities.ICategoryActivityBinding;
@@ -38,13 +37,12 @@ import org.eclipse.ui.activities.ICategoryActivityBinding;
  */
 public final class InternalActivityHelper {
 
-	public static Set getActivityIdsForCategory(
+	public static Set<String> getActivityIdsForCategory(
 			IActivityManager activityManager, ICategory category) {
-		Set bindings = category.getCategoryActivityBindings();
-		Set activityIds = new HashSet();
-		for (Iterator i = bindings.iterator(); i.hasNext();) {
-			ICategoryActivityBinding binding = (ICategoryActivityBinding) i
-					.next();
+		Set<ICategoryActivityBinding> bindings = category.getCategoryActivityBindings();
+		Set<String> activityIds = new HashSet<String>();
+		for (Iterator<ICategoryActivityBinding> i = bindings.iterator(); i.hasNext();) {
+			ICategoryActivityBinding binding = i.next();
 			String id = binding.getActivityId();
 			if (activityManager.getActivity(id).getExpression() == null)
 				activityIds.add(id);
@@ -57,7 +55,7 @@ public final class InternalActivityHelper {
 
 		ICategory category = activityManager.getCategory(categoryId);
 		if (category.isDefined()) {
-			Set activityIds = getActivityIdsForCategory(activityManager,
+			Set<String> activityIds = getActivityIdsForCategory(activityManager,
 					category);
 			if (activityManager.getEnabledActivityIds()
 					.containsAll(activityIds)) {
@@ -68,12 +66,12 @@ public final class InternalActivityHelper {
 		return false;
 	}
 
-	public static Set getEnabledCategories(IActivityManager activityManager) {
+	public static Set<String> getEnabledCategories(IActivityManager activityManager) {
 
-		Set definedCategoryIds = activityManager.getDefinedCategoryIds();
-		Set enabledCategories = new HashSet();
-		for (Iterator i = definedCategoryIds.iterator(); i.hasNext();) {
-			String categoryId = (String) i.next();
+		Set<String> definedCategoryIds = activityManager.getDefinedCategoryIds();
+		Set<String> enabledCategories = new HashSet<String>();
+		for (Iterator<String> i = definedCategoryIds.iterator(); i.hasNext();) {
+			String categoryId = i.next();
 			if (isEnabled(activityManager, categoryId)) {
 				enabledCategories.add(categoryId);
 			}
@@ -81,12 +79,12 @@ public final class InternalActivityHelper {
 		return enabledCategories;
 	}
 
-	public static Set getPartiallyEnabledCategories(
+	public static Set<String> getPartiallyEnabledCategories(
 			IActivityManager activityManager) {
-		Set definedCategoryIds = activityManager.getDefinedCategoryIds();
-		Set partialCategories = new HashSet();
-		for (Iterator i = definedCategoryIds.iterator(); i.hasNext();) {
-			String categoryId = (String) i.next();
+		Set<String> definedCategoryIds = activityManager.getDefinedCategoryIds();
+		Set<String> partialCategories = new HashSet<String>();
+		for (Iterator<String> i = definedCategoryIds.iterator(); i.hasNext();) {
+			String categoryId = i.next();
 			if (isPartiallyEnabled(activityManager, categoryId)) {
 				partialCategories.add(categoryId);
 			}
@@ -97,11 +95,11 @@ public final class InternalActivityHelper {
 
 	private static boolean isPartiallyEnabled(IActivityManager activityManager,
 			String categoryId) {
-		Set activityIds = getActivityIdsForCategory(activityManager,
+		Set<String> activityIds = getActivityIdsForCategory(activityManager,
 				activityManager.getCategory(categoryId));
 		int foundCount = 0;
-		for (Iterator i = activityIds.iterator(); i.hasNext();) {
-			String activityId = (String) i.next();
+		for (Iterator<String> i = activityIds.iterator(); i.hasNext();) {
+			String activityId = i.next();
 			if (activityManager.getEnabledActivityIds().contains(activityId)) {
 				foundCount++;
 			}

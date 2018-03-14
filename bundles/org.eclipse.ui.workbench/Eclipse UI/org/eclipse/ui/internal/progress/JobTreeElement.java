@@ -15,15 +15,16 @@ import org.eclipse.swt.graphics.Image;
 
 /**
  * The JobTreeElement is the abstract superclass of items displayed in the tree.
+ * 
  */
-public abstract class JobTreeElement implements Comparable {
+public abstract class JobTreeElement implements Comparable<JobTreeElement> {
 
 	/**
 	 * Return the parent of this object.
 	 * 
-	 * @return Object
+	 * @return JobTreeElement
 	 */
-	public Object getParent() {
+	public JobTreeElement getParent() {
 		return null;
 	}
 
@@ -37,9 +38,9 @@ public abstract class JobTreeElement implements Comparable {
 	/**
 	 * Return the children of the receiver.
 	 * 
-	 * @return Object[]
+	 * @return JobTreeElement[]
 	 */
-	abstract Object[] getChildren();
+	abstract JobTreeElement[] getChildren();
 
 	/**
 	 * Return the displayString for the receiver.
@@ -60,7 +61,7 @@ public abstract class JobTreeElement implements Comparable {
 	}
 
 	/**
-	 * Get the image for the reciever.
+	 * Get the image for the receiver.
 	 * 
 	 * @return Image or <code>null</code>.
 	 */
@@ -84,16 +85,10 @@ public abstract class JobTreeElement implements Comparable {
 	 */
 	abstract boolean isJobInfo();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
 	@Override
-	public int compareTo(Object arg0) {
-		if (arg0 instanceof JobTreeElement)
-			return getDisplayString().compareTo(
-					((JobTreeElement) arg0).getDisplayString());
+	public int compareTo(JobTreeElement arg0) {
+		if (arg0 != null)
+			return getDisplayString().compareTo(arg0.getDisplayString());
 		return 0;
 	}
 

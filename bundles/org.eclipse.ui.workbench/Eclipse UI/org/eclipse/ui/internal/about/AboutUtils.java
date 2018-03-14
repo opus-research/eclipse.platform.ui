@@ -19,7 +19,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
-
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -47,11 +46,11 @@ public class AboutUtils {
 	 * Scan the contents of the about text
 	 * 
 	 * @param s
-	 * @return
+	 * @return AboutItem
 	 */
 	public static AboutItem scan(String s) {
-		ArrayList linkRanges = new ArrayList();
-		ArrayList links = new ArrayList();
+		ArrayList<int[]> linkRanges = new ArrayList<int[]>();
+		ArrayList<String> links = new ArrayList<String>();
 
 		// slightly modified version of jface url detection
 		// see org.eclipse.jface.text.hyperlink.URLHyperlinkDetector
@@ -74,13 +73,12 @@ public class AboutUtils {
 			urlOffset++;
 
 			// Right to "://"
-			StringTokenizer tokenizer = new StringTokenizer(s
-					.substring(urlSeparatorOffset + 3), " \t\n\r\f<>", false); //$NON-NLS-1$
+			StringTokenizer tokenizer = new StringTokenizer(s.substring(urlSeparatorOffset + 3),
+					" \t\n\r\f<>", false); //$NON-NLS-1$
 			if (!tokenizer.hasMoreTokens())
 				return null;
 
-			int urlLength = tokenizer.nextToken().length() + 3
-					+ urlSeparatorOffset - urlOffset;
+			int urlLength = tokenizer.nextToken().length() + 3 + urlSeparatorOffset - urlOffset;
 
 			if (startDoubleQuote) {
 				int endOffset = -1;
@@ -101,15 +99,16 @@ public class AboutUtils {
 
 			urlSeparatorOffset = s.indexOf("://", urlOffset + urlLength + 1); //$NON-NLS-1$
 		}
-		return new AboutItem(s, (int[][]) linkRanges.toArray(new int[linkRanges
-				.size()][2]), (String[]) links
-				.toArray(new String[links.size()]));
+		return new AboutItem(s, linkRanges.toArray(new int[linkRanges.size()][2]),
+				links.toArray(new String[links.size()]));
 	}
 
 	/**
 	 * Open a browser with the argument title on the argument url. If the url
 	 * refers to a resource within a bundle, then a temp copy of the file will
 	 * be extracted and opened.
+	 * 
+	 * @param shell
 	 * 
 	 * @see <code>Platform.asLocalUrl</code>
 	 * @param url
@@ -133,6 +132,9 @@ public class AboutUtils {
 
 	/**
 	 * Open a link
+	 * 
+	 * @param shell
+	 * @param href
 	 */
 	public static void openLink(Shell shell, String href) {
 		// format the href for an html file (file:///<filename.html>
