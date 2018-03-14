@@ -27,17 +27,13 @@ public class EditorAreaDropTarget extends WorkbenchWindowDropTarget {
         this.side = side;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.tests.dnd.TestDropTarget#getName()
-     */
-    public String toString() {
+    @Override
+	public String toString() {
         return DragOperations.nameForConstant(side) + " of editor area";
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.tests.dnd.TestDropTarget#getLocation()
-     */
-    public Point getLocation() {
+    @Override
+	public Point getLocation() {
         return DragOperations.getPointInEditorArea(getPage(), side);
     }
 

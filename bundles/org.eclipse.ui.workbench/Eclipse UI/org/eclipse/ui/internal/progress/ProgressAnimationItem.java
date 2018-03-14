@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422040
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422040, 440810
  *******************************************************************************/
 package org.eclipse.ui.internal.progress;
 
@@ -123,7 +123,12 @@ public class ProgressAnimationItem extends AnimationItem implements
 						removeTopElement(ji);
 					}
 
-					execute(ji, job);
+					// To fix a bug (335543) introduced in 3.6.1.
+					// doAction() should return if progress region button was
+					// selected to open a job result action or command.
+					if (execute(ji, job)) {
+						return;
+					}
 				}
 			}
 		}
@@ -135,21 +140,23 @@ public class ProgressAnimationItem extends AnimationItem implements
 	/**
 	 * @param ji
 	 * @param job
+	 * @return <code>true</code> if Action or Command is executed
 	 */
-	private void execute(JobInfo ji, Job job) {
+	private boolean execute(JobInfo ji, Job job) {
 
 		Object prop = job.getProperty(IProgressConstants.ACTION_PROPERTY);
 		if (prop instanceof IAction && ((IAction) prop).isEnabled()) {
 			IAction action = (IAction) prop;
 			action.run();
 			removeTopElement(ji);
+			return true;
 		}
 
 		prop = job.getProperty(IProgressConstants2.COMMAND_PROPERTY);
 		if (prop instanceof ParameterizedCommand) {
 			ParameterizedCommand command = (ParameterizedCommand) prop;
 			IWorkbenchWindow window = getWindow();
-			IHandlerService service = (IHandlerService) window
+			IHandlerService service = window
 					.getService(IHandlerService.class);
 			Exception exception = null;
 			try {
@@ -171,8 +178,9 @@ public class ProgressAnimationItem extends AnimationItem implements
 				StatusManager.getManager().handle(status,
 						StatusManager.LOG | StatusManager.SHOW);
 			}
-
+			return true;
 		}
+		return false;
 	}
 
 	/**
