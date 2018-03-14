@@ -189,8 +189,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 	private static final int WINDOW_SCOPE = EModelService.OUTSIDE_PERSPECTIVE
 			| EModelService.IN_ANY_PERSPECTIVE | EModelService.IN_SHARED_AREA;
 
-	private static String MRU_LIST_SEPARATOR = ","; //$NON-NLS-1$
-
 	class E4PartListener implements org.eclipse.e4.ui.workbench.modeling.IPartListener {
 
 		@Override
@@ -246,8 +244,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 	 * Cached perspective stack for this workbench page.
 	 */
 	private MPerspectiveStack _perspectiveStack;
-
-	private List<String> mruPartIds = new ArrayList<String>();
 
 	/**
 	 * Deactivate the last editor's action bars if another type of editor has //
@@ -2480,8 +2476,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 	 *            the id of the part that the action was performed on
 	 */
 	public void performedShowIn(String partId) {
-		mruPartIds.remove(partId);
-		mruPartIds.add(0, partId);
+		// TODO compat: show in
 	}
 
 	/**
@@ -2491,16 +2486,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 	 *            the collection of part ids to rearrange
 	 */
 	public void sortShowInPartIds(ArrayList<?> partIds) {
-		Collections.sort(partIds, new Comparator<Object>() {
-			@Override
-			public int compare(Object ob1, Object ob2) {
-				if (mruPartIds.contains(ob1) && !mruPartIds.contains(ob2))
-					return -1;
-				if (!mruPartIds.contains(ob1) && mruPartIds.contains(ob2))
-					return 1;
-				return mruPartIds.indexOf(ob1) - mruPartIds.indexOf(ob2);
-			}
-		});
+		// TODO compat: can't sort what we don't have
 	}
 
     /**
@@ -2711,7 +2697,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 			}
 		}
 		restoreWorkingSets();
-		restoreShowInMruPartIdsList();
     }
 
 	public void restoreWorkingSets() {
@@ -2753,13 +2738,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 				ATT_AGGREGATE_WORKING_SET_ID);
 	}
 
-	private void restoreShowInMruPartIdsList() {
-		String mruList = getWindowModel().getPersistedState().get(IWorkbenchConstants.TAG_MRU_LIST);
-		if (mruList != null && !mruList.isEmpty()) {
-			mruPartIds.addAll(Arrays.asList(mruList.split(MRU_LIST_SEPARATOR)));
-		}
-	}
-
 	@PreDestroy
 	public void saveWorkingSets() {
 		// Save working set if set
@@ -2789,19 +2767,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 		getWindowModel().getPersistedState().put(ATT_AGGREGATE_WORKING_SET_ID,
 				aggregateWorkingSetId);
-	}
-
-	@PreDestroy
-	public void saveShowInMruPartIdsList() {
-		if (!mruPartIds.isEmpty()) {
-			StringBuilder mruList = new StringBuilder();
-			for (Iterator<String> it = mruPartIds.iterator(); it.hasNext();) {
-				mruList.append(it.next());
-				if (it.hasNext())
-					mruList.append(MRU_LIST_SEPARATOR);
-			}
-			getWindowModel().getPersistedState().put(IWorkbenchConstants.TAG_MRU_LIST, mruList.toString());
-		}
 	}
 
 	/**
