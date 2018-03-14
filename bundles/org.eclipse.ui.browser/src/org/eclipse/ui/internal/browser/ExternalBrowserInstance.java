@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2012 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,10 +36,11 @@ public class ExternalBrowserInstance extends AbstractWebBrowser {
 		this.browser = browser;
 	}
 
+	@Override
 	public void openURL(URL url) throws PartInitException {
 		final String urlText = url == null ? null : url.toExternalForm();
 
-		ArrayList<String> cmdOptions = new ArrayList<String>();
+		ArrayList<String> cmdOptions = new ArrayList<>();
 		String location = browser.getLocation();
 		cmdOptions.add(location);
 		String parameters = browser.getParameters();
@@ -48,14 +49,32 @@ public class ExternalBrowserInstance extends AbstractWebBrowser {
 				Trace.FINEST,
 				"Launching external Web browser: " + location + " - " + parameters + " - " + urlText); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-		String[] params = WebBrowserUtil.createParameterArray(parameters, urlText);
+		// For MacOS X .app, we use open(1) to launch the app for the given URL
+		// The order of the arguments is specific:
+		//
+		// open -a APP URL --args PARAMETERS
+		//
+		// As #createParameterArray() will append the URL to the end if %URL%
+		// isn't found, we only include urlText if the parameters makes
+		// reference to %URL%. This could mean that %URL% is specified
+		// twice on the command line (e.g., "open -a XXX URL --args XXX URL
+		// %%%") but presumably the user means to do that.
+		boolean isMacBundle = Util.isMac() && isMacAppBundle(location);
+		boolean includeUrlInParams = !isMacBundle
+				|| (parameters != null && parameters.contains(IBrowserDescriptor.URL_PARAMETER));
+		String[] params = WebBrowserUtil.createParameterArray(parameters, includeUrlInParams ? urlText : null);
 
 		try {
-			if (Util.isMac() && isMacAppBundle(location)) {
+			if (isMacBundle) {
 				cmdOptions.add(0, "-a"); //$NON-NLS-1$
 				cmdOptions.add(0, "open"); //$NON-NLS-1$
+				if (urlText != null) {
+					cmdOptions.add(urlText);
+				}
 				// --args supported in 10.6 and later
-				cmdOptions.add("--args");//$NON-NLS-1$
+				if (params.length > 0) {
+					cmdOptions.add("--args");//$NON-NLS-1$
+				}
 			}
 
 			for (String param : params) {
@@ -77,6 +96,7 @@ public class ExternalBrowserInstance extends AbstractWebBrowser {
 					Messages.errorCouldNotLaunchWebBrowser, urlText));
 		}
 		Thread thread = new Thread() {
+			@Override
 			public void run() {
 				try {
 					process.waitFor();
@@ -119,6 +139,7 @@ public class ExternalBrowserInstance extends AbstractWebBrowser {
 	}
 
 
+	@Override
 	public boolean close() {
 		try {
 			process.destroy();

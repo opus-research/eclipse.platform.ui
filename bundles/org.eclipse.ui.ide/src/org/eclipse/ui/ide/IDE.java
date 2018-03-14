@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2013 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -845,7 +845,7 @@ public final class IDE {
 		for (int i = 0; i < overrides.length; i++) {
 			editorDescriptors = overrides[i].overrideEditors(editorInput, contentType, editorDescriptors);
 		}
-		return editorDescriptors;
+		return removeNullEntries(editorDescriptors);
 	}
 
 	/**
@@ -866,7 +866,27 @@ public final class IDE {
 		for (int i = 0; i < overrides.length; i++) {
 			editorDescriptors = overrides[i].overrideEditors(fileName, contentType, editorDescriptors);
 		}
-		return editorDescriptors;
+		return removeNullEntries(editorDescriptors);
+	}
+
+	private static IEditorDescriptor[] removeNullEntries(IEditorDescriptor[] editorDescriptors) {
+		boolean nullDescriptorFound = false;
+		for (IEditorDescriptor d : editorDescriptors) {
+			if (d == null) {
+				nullDescriptorFound = true;
+				break;
+			}
+		}
+		if (!nullDescriptorFound) {
+			return editorDescriptors;
+		}
+		List<IEditorDescriptor> nonNullDescriptors = new ArrayList<>(editorDescriptors.length);
+		for (IEditorDescriptor d : editorDescriptors) {
+			if (d != null) {
+				nonNullDescriptors.add(d);
+			}
+		}
+		return nonNullDescriptors.toArray(new IEditorDescriptor[nonNullDescriptors.size()]);
 	}
 
 	/**
@@ -1508,38 +1528,35 @@ public final class IDE {
 				IDEWorkbenchMessages.IDE_areYouSure, message);
 
 		final boolean[] result = new boolean[] { false };
-		Runnable runnable = new Runnable() {
-			@Override
-			public void run() {
-				ErrorDialog dialog = new ErrorDialog(shell, title,
-						dialogMessage, displayStatus, IStatus.ERROR
-								| IStatus.WARNING | IStatus.INFO) {
-					@Override
-					protected void createButtonsForButtonBar(Composite parent) {
-						createButton(parent, IDialogConstants.YES_ID,
-								IDialogConstants.YES_LABEL, false);
-						createButton(parent, IDialogConstants.NO_ID,
-								IDialogConstants.NO_LABEL, true);
-						createDetailsButton(parent);
-					}
+		Runnable runnable = () -> {
+			ErrorDialog dialog = new ErrorDialog(shell, title,
+					dialogMessage, displayStatus, IStatus.ERROR
+							| IStatus.WARNING | IStatus.INFO) {
+				@Override
+				protected void createButtonsForButtonBar(Composite parent) {
+					createButton(parent, IDialogConstants.YES_ID,
+							IDialogConstants.YES_LABEL, false);
+					createButton(parent, IDialogConstants.NO_ID,
+							IDialogConstants.NO_LABEL, true);
+					createDetailsButton(parent);
+				}
 
-					@Override
-					protected void buttonPressed(int id) {
-						if (id == IDialogConstants.YES_ID) {
-							super.buttonPressed(IDialogConstants.OK_ID);
-						} else if (id == IDialogConstants.NO_ID) {
-							super.buttonPressed(IDialogConstants.CANCEL_ID);
-						}
-						super.buttonPressed(id);
+				@Override
+				protected void buttonPressed(int id) {
+					if (id == IDialogConstants.YES_ID) {
+						super.buttonPressed(IDialogConstants.OK_ID);
+					} else if (id == IDialogConstants.NO_ID) {
+						super.buttonPressed(IDialogConstants.CANCEL_ID);
 					}
-					@Override
-					protected int getShellStyle() {
-						return super.getShellStyle() | SWT.SHEET;
-					}
-				};
-				int code = dialog.open();
-				result[0] = code == 0;
-			}
+					super.buttonPressed(id);
+				}
+				@Override
+				protected int getShellStyle() {
+					return super.getShellStyle() | SWT.SHEET;
+				}
+			};
+			int code = dialog.open();
+			result[0] = code == 0;
 		};
 		if (syncExec) {
 			shell.getDisplay().syncExec(runnable);

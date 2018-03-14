@@ -20,12 +20,12 @@ import org.eclipse.core.commands.operations.OperationStatus;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceRuleFactory;
 import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.mapping.IResourceChangeDescriptionFactory;
 import org.eclipse.core.resources.mapping.ResourceChangeValidator;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.ICoreRunnable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -193,12 +193,7 @@ public abstract class AbstractWorkspaceOperation extends AbstractOperation
 	public IStatus execute(IProgressMonitor monitor, final IAdaptable uiInfo)
 			throws ExecutionException {
 		try {
-			getWorkspace().run(new IWorkspaceRunnable() {
-				@Override
-				public void run(IProgressMonitor monitor) throws CoreException {
-					doExecute(monitor, uiInfo);
-				}
-			}, getExecuteSchedulingRule(), IWorkspace.AVOID_UPDATE, monitor);
+			getWorkspace().run(monitor1 -> doExecute(monitor1, uiInfo), getExecuteSchedulingRule(), IWorkspace.AVOID_UPDATE, monitor);
 		} catch (final CoreException e) {
 			throw new ExecutionException(NLS.bind(
 					UndoMessages.AbstractWorkspaceOperation_ExecuteErrorTitle,
@@ -235,12 +230,7 @@ public abstract class AbstractWorkspaceOperation extends AbstractOperation
 	public IStatus redo(IProgressMonitor monitor, final IAdaptable uiInfo)
 			throws ExecutionException {
 		try {
-			getWorkspace().run(new IWorkspaceRunnable() {
-				@Override
-				public void run(IProgressMonitor monitor) throws CoreException {
-					doExecute(monitor, uiInfo);
-				}
-			}, getRedoSchedulingRule(), IWorkspace.AVOID_UPDATE, monitor);
+			getWorkspace().run(monitor1 -> doExecute(monitor1, uiInfo), getRedoSchedulingRule(), IWorkspace.AVOID_UPDATE, monitor);
 		} catch (final CoreException e) {
 			throw new ExecutionException(NLS.bind(
 					UndoMessages.AbstractWorkspaceOperation_RedoErrorTitle,
@@ -278,12 +268,7 @@ public abstract class AbstractWorkspaceOperation extends AbstractOperation
 	public IStatus undo(IProgressMonitor monitor, final IAdaptable uiInfo)
 			throws ExecutionException {
 		try {
-			getWorkspace().run(new IWorkspaceRunnable() {
-				@Override
-				public void run(IProgressMonitor monitor) throws CoreException {
-					doUndo(monitor, uiInfo);
-				}
-			}, getUndoSchedulingRule(), IWorkspace.AVOID_UPDATE, monitor);
+			getWorkspace().run(monitor1 -> doUndo(monitor1, uiInfo), getUndoSchedulingRule(), IWorkspace.AVOID_UPDATE, monitor);
 		} catch (final CoreException e) {
 			throw new ExecutionException(NLS.bind(
 					UndoMessages.AbstractWorkspaceOperation_UndoErrorTitle,
@@ -652,7 +637,7 @@ public abstract class AbstractWorkspaceOperation extends AbstractOperation
 	 *         <code>null</code> if there are no scheduling restrictions for
 	 *         this operation.
 	 *
-	 * @see IWorkspace#run(IWorkspaceRunnable, ISchedulingRule, int,
+	 * @see IWorkspace#run(ICoreRunnable, ISchedulingRule, int,
 	 *      IProgressMonitor)
 	 */
 	protected ISchedulingRule getExecuteSchedulingRule() {
@@ -670,7 +655,7 @@ public abstract class AbstractWorkspaceOperation extends AbstractOperation
 	 *         <code>null</code> if there are no scheduling restrictions for
 	 *         this operation.
 	 *
-	 * @see IWorkspace#run(IWorkspaceRunnable, ISchedulingRule, int,
+	 * @see IWorkspace#run(ICoreRunnable, ISchedulingRule, int,
 	 *      IProgressMonitor)
 	 */
 	protected ISchedulingRule getUndoSchedulingRule() {
@@ -687,7 +672,7 @@ public abstract class AbstractWorkspaceOperation extends AbstractOperation
 	 *         <code>null</code> if there are no scheduling restrictions for
 	 *         this operation.
 	 *
-	 * @see IWorkspace#run(IWorkspaceRunnable, ISchedulingRule, int,
+	 * @see IWorkspace#run(ICoreRunnable, ISchedulingRule, int,
 	 *      IProgressMonitor)
 	 */
 	protected ISchedulingRule getRedoSchedulingRule() {

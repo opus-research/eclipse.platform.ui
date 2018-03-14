@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -224,6 +224,7 @@ public class WorkbenchStatusDialogManagerImpl {
 		dialogState.put(IStatusDialogConstants.DETAILS_OPENED, Boolean.FALSE);
 		dialogState.put(IStatusDialogConstants.TRAY_OPENED, Boolean.FALSE);
 		dialogState.put(IStatusDialogConstants.MODALITY_SWITCH, Boolean.FALSE);
+		dialogState.remove(IStatusDialogConstants.CURRENT_STATUS_ADAPTER);
 	}
 
 	private void doAddStatusAdapter(final StatusAdapter statusAdapter,
@@ -245,7 +246,7 @@ public class WorkbenchStatusDialogManagerImpl {
 		if (isDialogClosed()) {
 
 			getErrors().add(statusAdapter);
-			getModals().put(statusAdapter, new Boolean(modal));
+			getModals().put(statusAdapter, Boolean.valueOf(modal));
 			// Delay prompting if the status adapter property is set
 			if (shouldPrompt(statusAdapter)) {
 				// notify all interested parties that status adapters will be
@@ -308,7 +309,7 @@ public class WorkbenchStatusDialogManagerImpl {
 	private void openStatusDialog(final boolean modal,
 			final StatusAdapter statusAdapter) {
 		getErrors().add(statusAdapter);
-		getModals().put(statusAdapter, new Boolean(modal));
+		getModals().put(statusAdapter, Boolean.valueOf(modal));
 		boolean shouldBeModal = shouldBeModal();
 		if (shouldBeModal ^ dialog.isModal()) {
 			dialog.getShell().removeDisposeListener(disposeListener);

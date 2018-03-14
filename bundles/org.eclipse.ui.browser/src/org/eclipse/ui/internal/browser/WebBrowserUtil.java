@@ -86,6 +86,7 @@ public class WebBrowserUtil {
 		if (d == null)
 			d = Display.getDefault();
 		d.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				MessageDialog.openError(null, Messages.errorDialogTitle, message);
 			}
@@ -104,6 +105,7 @@ public class WebBrowserUtil {
 			d = Display.getDefault();
 
 		d.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				MessageDialog.openInformation(null, Messages.searchingTaskName, message);
 			}
@@ -135,7 +137,7 @@ public class WebBrowserUtil {
 		try {
 			Class.forName(BROWSER_PACKAGE_NAME);
 		} catch (ClassNotFoundException e) {
-			isInternalBrowserOperational = new Boolean(false);
+			isInternalBrowserOperational = Boolean.FALSE;
 			return false;
 		}
 
@@ -144,7 +146,7 @@ public class WebBrowserUtil {
 		try {
 			shell = new Shell(PlatformUI.getWorkbench().getDisplay());
 			new Browser(shell, SWT.NONE);
-			isInternalBrowserOperational = new Boolean(true);
+			isInternalBrowserOperational = Boolean.TRUE;
 			return true;
 		} catch (Throwable t) {
 			StringBuffer message = new StringBuffer("Internal browser is not available"); //$NON-NLS-1$
@@ -152,7 +154,7 @@ public class WebBrowserUtil {
 			WebBrowserUIPlugin.getInstance().getLog().log(
 					new Status(IStatus.WARNING, WebBrowserUIPlugin.PLUGIN_ID,
 							0, message.toString() , null));
-			isInternalBrowserOperational = new Boolean(false);
+			isInternalBrowserOperational = Boolean.FALSE;
 			return false;
 		} finally {
 			if (shell != null)
@@ -182,7 +184,7 @@ public class WebBrowserUtil {
 	}
 
 	public static List<String> getExternalBrowserPaths() {
-		List<String> paths = new ArrayList<String>();
+		List<String> paths = new ArrayList<>();
 		Iterator<IBrowserDescriptor> iterator = BrowserManager.getInstance()
 				.getWebBrowsers().iterator();
 		while (iterator.hasNext()) {
@@ -280,7 +282,7 @@ public class WebBrowserUtil {
 	private static File[] getUsableDrives(File[] roots) {
 		if (!Platform.getOS().equals(Platform.OS_WIN32))
 			return roots;
-		ArrayList<File> list = new ArrayList<File>();
+		ArrayList<File> list = new ArrayList<>();
 		for (int i = 0; i < roots.length; i++) {
 			String path = roots[i].getAbsolutePath();
 			if (path != null
@@ -363,6 +365,7 @@ public class WebBrowserUtil {
 	 * @deprecated Please use {@link #createParameterArray(String, String)}
 	 *             instead.
 	 */
+	@Deprecated
 	public static String createParameterString(String parameters, String urlText) {
 		String params = parameters;
 		String url = urlText;

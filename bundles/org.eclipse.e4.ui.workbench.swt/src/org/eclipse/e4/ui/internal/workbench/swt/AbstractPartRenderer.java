@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -121,7 +121,12 @@ public abstract class AbstractPartRenderer {
 	public Object getUIContainer(MUIElement element) {
 		if (element.getParent() != null)
 			return element.getParent().getWidget();
-
+		else {
+			Object value = element.getTransientData().get(IPresentationEngine.RENDERING_PARENT_KEY);
+			if (value != null) {
+				return value;
+			}
+		}
 		return null;
 	}
 

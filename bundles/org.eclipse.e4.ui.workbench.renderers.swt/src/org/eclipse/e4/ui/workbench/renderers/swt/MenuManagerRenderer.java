@@ -15,7 +15,8 @@
  *     René Brandstetter <Rene.Brandstetter@gmx.net> - Bug 378849
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 378849
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 460556
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 391430
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 391430, 472654
+ *     Daniel Kruegler <daniel.kruegler@gmail.com> - Bug 473779
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -24,6 +25,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -69,6 +71,7 @@ import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.jface.action.IContributionManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.SubContributionItem;
@@ -92,14 +95,16 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	private static final String NO_LABEL = "UnLabled"; //$NON-NLS-1$
 	public static final String GROUP_MARKER = "org.eclipse.jface.action.GroupMarker.GroupMarker(String)"; //$NON-NLS-1$
 
-	private Map<MMenu, MenuManager> modelToManager = new HashMap<MMenu, MenuManager>();
-	private Map<MenuManager, MMenu> managerToModel = new HashMap<MenuManager, MMenu>();
+	private Map<MMenu, MenuManager> modelToManager = new HashMap<>();
+	private Map<MenuManager, MMenu> managerToModel = new HashMap<>();
 
-	private Map<MMenuElement, IContributionItem> modelToContribution = new HashMap<MMenuElement, IContributionItem>();
-	private Map<IContributionItem, MMenuElement> contributionToModel = new HashMap<IContributionItem, MMenuElement>();
+	private Map<MMenuElement, IContributionItem> modelToContribution = new HashMap<>();
+	private Map<IContributionItem, MMenuElement> contributionToModel = new HashMap<>();
 
-	private Map<MMenuElement, ContributionRecord> modelContributionToRecord = new HashMap<MMenuElement, ContributionRecord>();
-	private Map<MMenuElement, ArrayList<ContributionRecord>> sharedElementToRecord = new HashMap<MMenuElement, ArrayList<ContributionRecord>>();
+	private Map<MMenuElement, ContributionRecord> modelContributionToRecord = new HashMap<>();
+	private Map<MMenuElement, ArrayList<ContributionRecord>> sharedElementToRecord = new HashMap<>();
+
+	private Collection<IContributionManager> mgrToUpdate = new LinkedHashSet<>();
 
 	@Inject
 	private Logger logger;
@@ -130,6 +135,8 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					|| UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
 				ici.update();
 			} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
+				ici.update();
+			} else if (UIEvents.UILabel.TOOLTIP.equals(attName) || UIEvents.UILabel.LOCALIZED_TOOLTIP.equals(attName)) {
 				ici.update();
 			}
 		}
@@ -216,7 +223,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					manager.setVisible(menuModel.isVisible());
 					if (manager.getParent() != null) {
 						manager.getParent().markDirty();
-						manager.getParent().update(false);
+						scheduleManagerUpdate(manager.getParent());
 					}
 				} else if (element instanceof MMenuElement) {
 					MMenuElement itemModel = (MMenuElement) element;
@@ -228,7 +235,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					item.setVisible(itemModel.isVisible());
 					if (item.getParent() != null) {
 						item.getParent().markDirty();
-						item.getParent().update(false);
+						scheduleManagerUpdate(item.getParent());
 					}
 				}
 			}
@@ -394,9 +401,15 @@ MenuManagerEventHelper.getInstance()
 			newMenu = menuManager.createContextMenu((Control) parent);
 			// we can't be sure this is the correct parent.
 			// ((Control) parent).setMenu(newMenu);
+			if (element instanceof MPopupMenu && element.isVisible()) {
+				Object data = getUIContainer(element);
+				if (data instanceof Control && parent.equals(data)) {
+					((Control) parent).setMenu(newMenu);
+				}
+			}
 			newMenu.setData(menuManager);
 		}
-		if (!menuManager.getRemoveAllWhenShown()) {
+		if (menuManager != null && !menuManager.getRemoveAllWhenShown()) {
 			processContributions(menuModel, menuModel.getElementId(), menuBar,
 					menuModel instanceof MPopupMenu);
 		}
@@ -426,7 +439,7 @@ MenuManagerEventHelper.getInstance()
 		}
 		Collection<ContributionRecord> vals = modelContributionToRecord
 				.values();
-		List<ContributionRecord> disposedRecords = new ArrayList<ContributionRecord>();
+		List<ContributionRecord> disposedRecords = new ArrayList<>();
 		for (ContributionRecord record : vals
 				.toArray(new ContributionRecord[vals.size()])) {
 			if (record.menuModel == menuModel) {
@@ -483,7 +496,7 @@ MenuManagerEventHelper.getInstance()
 		if (elementId == null) {
 			return;
 		}
-		final ArrayList<MMenuContribution> toContribute = new ArrayList<MMenuContribution>();
+		final ArrayList<MMenuContribution> toContribute = new ArrayList<>();
 		ContributionsAnalyzer.XXXgatherMenuContributions(menuModel,
 				application.getMenuContributions(), elementId, toContribute,
 				null, isPopup);
@@ -502,8 +515,8 @@ MenuManagerEventHelper.getInstance()
 	 */
 	private void generateContributions(MMenu menuModel,
 			ArrayList<MMenuContribution> toContribute, boolean menuBar) {
-		HashSet<String> existingMenuIds = new HashSet<String>();
-		HashSet<String> existingSeparatorNames = new HashSet<String>();
+		HashSet<String> existingMenuIds = new HashSet<>();
+		HashSet<String> existingSeparatorNames = new HashSet<>();
 		for (MMenuElement child : menuModel.getChildren()) {
 			String elementId = child.getElementId();
 			if (child instanceof MMenu && elementId != null) {
@@ -516,7 +529,7 @@ MenuManagerEventHelper.getInstance()
 		MenuManager manager = getManager(menuModel);
 		boolean done = toContribute.size() == 0;
 		while (!done) {
-			ArrayList<MMenuContribution> curList = new ArrayList<MMenuContribution>(
+			ArrayList<MMenuContribution> curList = new ArrayList<>(
 					toContribute);
 			int retryCount = toContribute.size();
 			toContribute.clear();
@@ -556,7 +569,7 @@ MenuManagerEventHelper.getInstance()
 				@Override
 				public boolean changed(IEclipseContext context) {
 					record.updateVisibility(parentContext.getActiveLeaf());
-					manager.update(false);
+					scheduleManagerUpdate(manager);
 					return true;
 				}
 			});
@@ -571,7 +584,7 @@ MenuManagerEventHelper.getInstance()
 				&& ((EObject) menuModel).eContainer() instanceof MPart;
 	}
 
-	private static ArrayList<ContributionRecord> DEFAULT = new ArrayList<ContributionRecord>();
+	private static ArrayList<ContributionRecord> DEFAULT = new ArrayList<>();
 
 	public ArrayList<ContributionRecord> getList(MMenuElement item) {
 		ArrayList<ContributionRecord> tmp = sharedElementToRecord.get(item);
@@ -584,7 +597,7 @@ MenuManagerEventHelper.getInstance()
 	public void addRecord(MMenuElement item, ContributionRecord rec) {
 		ArrayList<ContributionRecord> tmp = sharedElementToRecord.get(item);
 		if (tmp == null) {
-			tmp = new ArrayList<ContributionRecord>();
+			tmp = new ArrayList<>();
 			sharedElementToRecord.put(item, tmp);
 		}
 		tmp.add(rec);
@@ -629,7 +642,7 @@ MenuManagerEventHelper.getInstance()
 				modelProcessSwitch(parentManager, (MMenuElement) childME);
 			}
 		}
-		parentManager.update(false);
+		scheduleManagerUpdate(parentManager);
 	}
 
 	private void addToManager(MenuManager parentManager, MMenuElement model,
@@ -920,7 +933,7 @@ MenuManagerEventHelper.getInstance()
 	 * @return the array of active ContributionRecords.
 	 */
 	public ContributionRecord[] getContributionRecords() {
-		HashSet<ContributionRecord> records = new HashSet<ContributionRecord>(
+		HashSet<ContributionRecord> records = new HashSet<>(
 				modelContributionToRecord.values());
 		return records.toArray(new ContributionRecord[records.size()]);
 	}
@@ -937,9 +950,9 @@ MenuManagerEventHelper.getInstance()
 	public void reconcileManagerToModel(MenuManager menuManager, MMenu menuModel) {
 		List<MMenuElement> modelChildren = menuModel.getChildren();
 
-		HashSet<MMenuItem> oldModelItems = new HashSet<MMenuItem>();
-		HashSet<MMenu> oldMenus = new HashSet<MMenu>();
-		HashSet<MMenuSeparator> oldSeps = new HashSet<MMenuSeparator>();
+		HashSet<MMenuItem> oldModelItems = new HashSet<>();
+		HashSet<MMenu> oldMenus = new HashSet<>();
+		HashSet<MMenuSeparator> oldSeps = new HashSet<>();
 		for (MMenuElement itemModel : modelChildren) {
 			if (OpaqueElementUtil.isOpaqueMenuSeparator(itemModel)) {
 				oldSeps.add((MMenuSeparator) itemModel);
@@ -1150,5 +1163,37 @@ MenuManagerEventHelper.getInstance()
 		}
 		MenuManager mm = getManager(menu);
 		clearModelToManager(menu, mm);
+	}
+
+	private void scheduleManagerUpdate(IContributionManager mgr) {
+		// Bug 467000: Avoid repeatedly updating menu managers
+		// This workaround is opt-in for 4.5
+		boolean workaroundEnabled = Boolean.getBoolean("eclipse.workaround.bug467000"); //$NON-NLS-1$
+		if (!workaroundEnabled) {
+			mgr.update(false);
+			return;
+		}
+		synchronized (mgrToUpdate) {
+			if (this.mgrToUpdate.isEmpty()) {
+				Display display = context.get(Display.class);
+				if (display != null && !display.isDisposed()) {
+					display.timerExec(100, new Runnable() {
+
+						@Override
+						public void run() {
+							Collection<IContributionManager> toUpdate = new LinkedHashSet<>();
+							synchronized (mgrToUpdate) {
+								toUpdate.addAll(mgrToUpdate);
+								mgrToUpdate.clear();
+							}
+							for (IContributionManager mgr : toUpdate) {
+								mgr.update(false);
+							}
+					}
+					});
+				}
+				this.mgrToUpdate.add(mgr);
+			}
+		}
 	}
 }

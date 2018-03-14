@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005, 2006 db4objects Inc.  http://www.db4o.com
+ * Copyright (C) 2005, 2015 db4objects Inc.  http://www.db4o.com
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -93,7 +93,7 @@ public class DuckType implements InvocationHandler {
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
       if (method.getName().equals("equals") && args != null && args.length == 1) {
-         return new Boolean(equals(args[0]));
+         return Boolean.valueOf(equals(args[0]));
       }
       if (method.getName().equals("hashCode") && args == null) {
          return new Integer(hashCode());
