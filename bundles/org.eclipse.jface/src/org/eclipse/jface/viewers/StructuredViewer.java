@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.internal.InternalPolicy;
+import org.eclipse.jface.util.IOpenEventListener;
 import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.util.Policy;
 import org.eclipse.jface.util.SafeRunnable;
@@ -1268,7 +1269,12 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 				handlePostSelect(e);
 			}
 		});
-		handler.addOpenListener(e -> StructuredViewer.this.handleOpen(e));
+		handler.addOpenListener(new IOpenEventListener() {
+			@Override
+			public void handleOpen(SelectionEvent e) {
+				StructuredViewer.this.handleOpen(e);
+			}
+		});
 	}
 
 	/**
@@ -1514,7 +1520,12 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 *            the element
 	 */
 	public void refresh(final Object element) {
-		preservingSelection(() -> internalRefresh(element));
+		preservingSelection(new Runnable() {
+			@Override
+			public void run() {
+				internalRefresh(element);
+			}
+		});
 	}
 
 	/**
@@ -1537,7 +1548,12 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 * @since 2.0
 	 */
 	public void refresh(final Object element, final boolean updateLabels) {
-		preservingSelection(() -> internalRefresh(element, updateLabels));
+		preservingSelection(new Runnable() {
+			@Override
+			public void run() {
+				internalRefresh(element, updateLabels);
+			}
+		});
 	}
 
 	/**
@@ -2116,9 +2132,12 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 			}
 		}
 		if (needsRefilter) {
-			preservingSelection(() -> {
-				internalRefresh(getRoot());
-				refreshOccurred = true;
+			preservingSelection(new Runnable() {
+				@Override
+				public void run() {
+					internalRefresh(getRoot());
+					refreshOccurred = true;
+				}
 			});
 			return;
 		}
