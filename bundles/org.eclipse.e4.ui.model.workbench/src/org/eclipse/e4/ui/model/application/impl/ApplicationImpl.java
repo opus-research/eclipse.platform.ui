@@ -11,7 +11,6 @@
 package org.eclipse.e4.ui.model.application.impl;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -257,8 +256,6 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 	 */
 	protected EList<MDialog> dialogs;
 
-	protected Map<String, MCommand> elementIdToCommandMap;
-
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -459,38 +456,13 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated NOT
+	 * @generated
 	 */
 	public List<MCommand> getCommands() {
 		if (commands == null) {
-			commands = new EObjectContainmentEList<MCommand>(MCommand.class, this,
-					ApplicationPackageImpl.APPLICATION__COMMANDS) {
-
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				protected void didChange() {
-					elementIdToCommandMap = null;
-					super.didChange();
-				}
-			};
+			commands = new EObjectContainmentEList<MCommand>(MCommand.class, this, ApplicationPackageImpl.APPLICATION__COMMANDS);
 		}
 		return commands;
-	}
-
-	public MCommand getCommand(String elementId) {
-		if (elementIdToCommandMap == null) {
-			Map<String, MCommand> result = new HashMap<String, MCommand>();
-			for (MCommand command : getCommands()) {
-				MCommand otherCommand = result.put(command.getElementId(), command);
-				if (otherCommand != null) {
-					result.put(command.getElementId(), otherCommand);
-				}
-			}
-
-			elementIdToCommandMap = result;
-		}
-		return elementIdToCommandMap.get(elementId);
 	}
 
 	/**
@@ -806,51 +778,51 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 		}
 		if (baseClass == MHandlerContainer.class) {
 			switch (derivedFeatureID) {
-			case ApplicationPackageImpl.APPLICATION__HANDLERS: return CommandsPackageImpl.HANDLER_CONTAINER__HANDLERS;
-			default: return -1;
+				case ApplicationPackageImpl.APPLICATION__HANDLERS: return CommandsPackageImpl.HANDLER_CONTAINER__HANDLERS;
+				default: return -1;
 			}
 		}
 		if (baseClass == MBindingTableContainer.class) {
 			switch (derivedFeatureID) {
-			case ApplicationPackageImpl.APPLICATION__BINDING_TABLES: return CommandsPackageImpl.BINDING_TABLE_CONTAINER__BINDING_TABLES;
-			case ApplicationPackageImpl.APPLICATION__ROOT_CONTEXT: return CommandsPackageImpl.BINDING_TABLE_CONTAINER__ROOT_CONTEXT;
-			default: return -1;
+				case ApplicationPackageImpl.APPLICATION__BINDING_TABLES: return CommandsPackageImpl.BINDING_TABLE_CONTAINER__BINDING_TABLES;
+				case ApplicationPackageImpl.APPLICATION__ROOT_CONTEXT: return CommandsPackageImpl.BINDING_TABLE_CONTAINER__ROOT_CONTEXT;
+				default: return -1;
 			}
 		}
 		if (baseClass == MPartDescriptorContainer.class) {
 			switch (derivedFeatureID) {
-			case ApplicationPackageImpl.APPLICATION__DESCRIPTORS: return BasicPackageImpl.PART_DESCRIPTOR_CONTAINER__DESCRIPTORS;
-			default: return -1;
+				case ApplicationPackageImpl.APPLICATION__DESCRIPTORS: return BasicPackageImpl.PART_DESCRIPTOR_CONTAINER__DESCRIPTORS;
+				default: return -1;
 			}
 		}
 		if (baseClass == MBindings.class) {
 			switch (derivedFeatureID) {
-			case ApplicationPackageImpl.APPLICATION__BINDING_CONTEXTS: return CommandsPackageImpl.BINDINGS__BINDING_CONTEXTS;
-			default: return -1;
+				case ApplicationPackageImpl.APPLICATION__BINDING_CONTEXTS: return CommandsPackageImpl.BINDINGS__BINDING_CONTEXTS;
+				default: return -1;
 			}
 		}
 		if (baseClass == MMenuContributions.class) {
 			switch (derivedFeatureID) {
-			case ApplicationPackageImpl.APPLICATION__MENU_CONTRIBUTIONS: return MenuPackageImpl.MENU_CONTRIBUTIONS__MENU_CONTRIBUTIONS;
-			default: return -1;
+				case ApplicationPackageImpl.APPLICATION__MENU_CONTRIBUTIONS: return MenuPackageImpl.MENU_CONTRIBUTIONS__MENU_CONTRIBUTIONS;
+				default: return -1;
 			}
 		}
 		if (baseClass == MToolBarContributions.class) {
 			switch (derivedFeatureID) {
-			case ApplicationPackageImpl.APPLICATION__TOOL_BAR_CONTRIBUTIONS: return MenuPackageImpl.TOOL_BAR_CONTRIBUTIONS__TOOL_BAR_CONTRIBUTIONS;
-			default: return -1;
+				case ApplicationPackageImpl.APPLICATION__TOOL_BAR_CONTRIBUTIONS: return MenuPackageImpl.TOOL_BAR_CONTRIBUTIONS__TOOL_BAR_CONTRIBUTIONS;
+				default: return -1;
 			}
 		}
 		if (baseClass == MTrimContributions.class) {
 			switch (derivedFeatureID) {
-			case ApplicationPackageImpl.APPLICATION__TRIM_CONTRIBUTIONS: return MenuPackageImpl.TRIM_CONTRIBUTIONS__TRIM_CONTRIBUTIONS;
-			default: return -1;
+				case ApplicationPackageImpl.APPLICATION__TRIM_CONTRIBUTIONS: return MenuPackageImpl.TRIM_CONTRIBUTIONS__TRIM_CONTRIBUTIONS;
+				default: return -1;
 			}
 		}
 		if (baseClass == MSnippetContainer.class) {
 			switch (derivedFeatureID) {
-			case ApplicationPackageImpl.APPLICATION__SNIPPETS: return UiPackageImpl.SNIPPET_CONTAINER__SNIPPETS;
-			default: return -1;
+				case ApplicationPackageImpl.APPLICATION__SNIPPETS: return UiPackageImpl.SNIPPET_CONTAINER__SNIPPETS;
+				default: return -1;
 			}
 		}
 		return super.eBaseStructuralFeatureID(derivedFeatureID, baseClass);
@@ -865,59 +837,59 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 	public int eDerivedStructuralFeatureID(int baseFeatureID, Class<?> baseClass) {
 		if (baseClass == MContext.class) {
 			switch (baseFeatureID) {
-			case UiPackageImpl.CONTEXT__CONTEXT: return ApplicationPackageImpl.APPLICATION__CONTEXT;
-			case UiPackageImpl.CONTEXT__VARIABLES: return ApplicationPackageImpl.APPLICATION__VARIABLES;
-			case UiPackageImpl.CONTEXT__PROPERTIES: return ApplicationPackageImpl.APPLICATION__PROPERTIES;
-			default: return -1;
+				case UiPackageImpl.CONTEXT__CONTEXT: return ApplicationPackageImpl.APPLICATION__CONTEXT;
+				case UiPackageImpl.CONTEXT__VARIABLES: return ApplicationPackageImpl.APPLICATION__VARIABLES;
+				case UiPackageImpl.CONTEXT__PROPERTIES: return ApplicationPackageImpl.APPLICATION__PROPERTIES;
+				default: return -1;
 			}
 		}
 		if (baseClass == MHandlerContainer.class) {
 			switch (baseFeatureID) {
-			case CommandsPackageImpl.HANDLER_CONTAINER__HANDLERS: return ApplicationPackageImpl.APPLICATION__HANDLERS;
-			default: return -1;
+				case CommandsPackageImpl.HANDLER_CONTAINER__HANDLERS: return ApplicationPackageImpl.APPLICATION__HANDLERS;
+				default: return -1;
 			}
 		}
 		if (baseClass == MBindingTableContainer.class) {
 			switch (baseFeatureID) {
-			case CommandsPackageImpl.BINDING_TABLE_CONTAINER__BINDING_TABLES: return ApplicationPackageImpl.APPLICATION__BINDING_TABLES;
-			case CommandsPackageImpl.BINDING_TABLE_CONTAINER__ROOT_CONTEXT: return ApplicationPackageImpl.APPLICATION__ROOT_CONTEXT;
-			default: return -1;
+				case CommandsPackageImpl.BINDING_TABLE_CONTAINER__BINDING_TABLES: return ApplicationPackageImpl.APPLICATION__BINDING_TABLES;
+				case CommandsPackageImpl.BINDING_TABLE_CONTAINER__ROOT_CONTEXT: return ApplicationPackageImpl.APPLICATION__ROOT_CONTEXT;
+				default: return -1;
 			}
 		}
 		if (baseClass == MPartDescriptorContainer.class) {
 			switch (baseFeatureID) {
-			case BasicPackageImpl.PART_DESCRIPTOR_CONTAINER__DESCRIPTORS: return ApplicationPackageImpl.APPLICATION__DESCRIPTORS;
-			default: return -1;
+				case BasicPackageImpl.PART_DESCRIPTOR_CONTAINER__DESCRIPTORS: return ApplicationPackageImpl.APPLICATION__DESCRIPTORS;
+				default: return -1;
 			}
 		}
 		if (baseClass == MBindings.class) {
 			switch (baseFeatureID) {
-			case CommandsPackageImpl.BINDINGS__BINDING_CONTEXTS: return ApplicationPackageImpl.APPLICATION__BINDING_CONTEXTS;
-			default: return -1;
+				case CommandsPackageImpl.BINDINGS__BINDING_CONTEXTS: return ApplicationPackageImpl.APPLICATION__BINDING_CONTEXTS;
+				default: return -1;
 			}
 		}
 		if (baseClass == MMenuContributions.class) {
 			switch (baseFeatureID) {
-			case MenuPackageImpl.MENU_CONTRIBUTIONS__MENU_CONTRIBUTIONS: return ApplicationPackageImpl.APPLICATION__MENU_CONTRIBUTIONS;
-			default: return -1;
+				case MenuPackageImpl.MENU_CONTRIBUTIONS__MENU_CONTRIBUTIONS: return ApplicationPackageImpl.APPLICATION__MENU_CONTRIBUTIONS;
+				default: return -1;
 			}
 		}
 		if (baseClass == MToolBarContributions.class) {
 			switch (baseFeatureID) {
-			case MenuPackageImpl.TOOL_BAR_CONTRIBUTIONS__TOOL_BAR_CONTRIBUTIONS: return ApplicationPackageImpl.APPLICATION__TOOL_BAR_CONTRIBUTIONS;
-			default: return -1;
+				case MenuPackageImpl.TOOL_BAR_CONTRIBUTIONS__TOOL_BAR_CONTRIBUTIONS: return ApplicationPackageImpl.APPLICATION__TOOL_BAR_CONTRIBUTIONS;
+				default: return -1;
 			}
 		}
 		if (baseClass == MTrimContributions.class) {
 			switch (baseFeatureID) {
-			case MenuPackageImpl.TRIM_CONTRIBUTIONS__TRIM_CONTRIBUTIONS: return ApplicationPackageImpl.APPLICATION__TRIM_CONTRIBUTIONS;
-			default: return -1;
+				case MenuPackageImpl.TRIM_CONTRIBUTIONS__TRIM_CONTRIBUTIONS: return ApplicationPackageImpl.APPLICATION__TRIM_CONTRIBUTIONS;
+				default: return -1;
 			}
 		}
 		if (baseClass == MSnippetContainer.class) {
 			switch (baseFeatureID) {
-			case UiPackageImpl.SNIPPET_CONTAINER__SNIPPETS: return ApplicationPackageImpl.APPLICATION__SNIPPETS;
-			default: return -1;
+				case UiPackageImpl.SNIPPET_CONTAINER__SNIPPETS: return ApplicationPackageImpl.APPLICATION__SNIPPETS;
+				default: return -1;
 			}
 		}
 		return super.eDerivedStructuralFeatureID(baseFeatureID, baseClass);

@@ -55,8 +55,9 @@ public class Bug320857Test {
 		applicationContext.dispose();
 	}
 
-	private void initialize(IEclipseContext applicationContext, MApplication application) {
-		applicationContext.set(MApplication.class, application);
+	private void initialize(IEclipseContext applicationContext,
+			MApplication application) {
+		applicationContext.set(MApplication.class.getName(), application);
 		application.setContext(applicationContext);
 		final UIEventPublisher ep = new UIEventPublisher(applicationContext);
 		((Notifier) application).eAdapters().add(ep);
@@ -65,10 +66,13 @@ public class Bug320857Test {
 
 	private IPresentationEngine getEngine() {
 		if (engine == null) {
-			IContributionFactory contributionFactory = applicationContext.get(IContributionFactory.class);
-			Object newEngine = contributionFactory.create(getEngineURI(), applicationContext);
+			IContributionFactory contributionFactory = (IContributionFactory) applicationContext
+					.get(IContributionFactory.class.getName());
+			Object newEngine = contributionFactory.create(getEngineURI(),
+					applicationContext);
 			assertTrue(newEngine instanceof IPresentationEngine);
-			applicationContext.set(IPresentationEngine.class.getName(), newEngine);
+			applicationContext.set(IPresentationEngine.class.getName(),
+					newEngine);
 
 			engine = (IPresentationEngine) newEngine;
 		}
@@ -99,7 +103,8 @@ public class Bug320857Test {
 
 	@Test
 	public void testBug320857() throws Exception {
-		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
