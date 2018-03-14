@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.dom.html;
 
+import java.util.function.Supplier;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
 import org.eclipse.swt.SWT;
@@ -42,10 +43,11 @@ public class SWTHTMLElement extends WidgetElement {
 	}
 
 	@Override
-	public String getAttribute(String attr) {
-		if ("type".equals(attr))
-			return attributeType;
-		return super.getAttribute(attr);
+	protected Supplier<String> internalGetAttribute(String attr) {
+		if ("type".equals(attr)) {
+			return () -> attributeType != null ? attributeType : "";
+		}
+		return super.internalGetAttribute(attr);
 	}
 
 	@Override
@@ -54,37 +56,51 @@ public class SWTHTMLElement extends WidgetElement {
 		// HTML name
 		if (widget instanceof Text) {
 			int style = widget.getStyle();
-			if ((style | SWT.MULTI) == style)
+			if ((style | SWT.MULTI) == style) {
 				return "textarea";
+			}
 			return "input";
 		}
-		if (widget instanceof Button)
+		if (widget instanceof Button) {
 			return "input";
-		if (widget instanceof Combo)
+		}
+		if (widget instanceof Combo) {
 			return "select";
-		if (widget instanceof CCombo)
+		}
+		if (widget instanceof CCombo) {
 			return "select";
-		if (widget instanceof Label)
+		}
+		if (widget instanceof Label) {
 			return "label";
-		if (widget instanceof Shell)
+		}
+		if (widget instanceof Shell) {
 			return "body";
-		if (widget instanceof Canvas)
+		}
+		if (widget instanceof Canvas) {
 			return "canvas";
-		if (widget instanceof Scrollable)
+		}
+		if (widget instanceof Scrollable) {
 			return "div";
-		if (widget instanceof List)
+		}
+		if (widget instanceof List) {
 			return "body";
-		if (widget instanceof Group)
+		}
+		if (widget instanceof Group) {
 			return "div";
-		if (widget instanceof Link)
+		}
+		if (widget instanceof Link) {
 			return "a";
-		if (widget instanceof Composite)
+		}
+		if (widget instanceof Composite) {
 			return "div";
+		}
 		// XUL name
-		if (widget instanceof Tree)
+		if (widget instanceof Tree) {
 			return "tree";
-		if (widget instanceof Table)
+		}
+		if (widget instanceof Table) {
 			return "listbox";
+		}
 		return super.computeLocalName();
 	}
 
@@ -93,20 +109,23 @@ public class SWTHTMLElement extends WidgetElement {
 		if (widget instanceof Button) {
 			Button button = (Button) widget;
 			int style = button.getStyle();
-			if ((style | SWT.RADIO) == style)
+			if ((style | SWT.RADIO) == style) {
 				return "radio";
-			if ((style | SWT.CHECK) == style)
+			}
+			if ((style | SWT.CHECK) == style) {
 				return "checkbox";
+			}
 			return "button";
 		}
 		if (widget instanceof Text) {
 			Text text = (Text) widget;
-			if ((text.getStyle() & SWT.PASSWORD) != 0)
+			if ((text.getStyle() & SWT.PASSWORD) != 0) {
 				return "password";
-			else if ((text.getStyle() & SWT.MULTI) != 0)
+			} else if ((text.getStyle() & SWT.MULTI) != 0) {
 				return "";
-			else
+			} else {
 				return "text";
+			}
 		}
 		return "";
 	}

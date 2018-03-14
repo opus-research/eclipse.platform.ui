@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,15 +43,11 @@ public class UIExtensionTracker extends ExtensionTracker {
 		if (display.isDisposed())
 			return;
 
-		display.syncExec(new Runnable() {
-
-            @Override
-			public void run() {
-                try {
-                    handler.removeExtension(removedExtension, objects);
-                } catch (Exception e) {
-                    WorkbenchPlugin.log(getClass(), "doRemove", e); //$NON-NLS-1$
-                }
+		display.asyncExec(() -> {
+            try {
+                handler.removeExtension(removedExtension, objects);
+            } catch (Exception e) {
+                WorkbenchPlugin.log(getClass(), "doRemove", e); //$NON-NLS-1$
             }
         });
     }
@@ -61,14 +57,11 @@ public class UIExtensionTracker extends ExtensionTracker {
 		if (display.isDisposed())
 			return;
 
-        display.syncExec(new Runnable() {
-            @Override
-			public void run() {
-                try {
-                    handler.addExtension(UIExtensionTracker.this, addedExtension);
-                } catch (Exception e) {
-                    WorkbenchPlugin.log(getClass(), "doAdd", e); //$NON-NLS-1$
-                }
+		display.asyncExec(() -> {
+			try {
+				handler.addExtension(UIExtensionTracker.this, addedExtension);
+			} catch (Exception e) {
+				WorkbenchPlugin.log(getClass(), "doAdd", e); //$NON-NLS-1$
             }
         });
     }

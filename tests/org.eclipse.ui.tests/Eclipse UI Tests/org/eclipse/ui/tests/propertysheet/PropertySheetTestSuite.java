@@ -10,12 +10,15 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.propertysheet;
 
+import org.junit.runner.RunWith;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
 /**
  * Test areas of the Property Sheet API.
  */
+@RunWith(org.junit.runners.AllTests.class)
 public class PropertySheetTestSuite extends TestSuite {
 
     /**
@@ -36,5 +39,6 @@ public class PropertySheetTestSuite extends TestSuite {
         addTest(new TestSuite(NewPropertySheetHandlerTest.class));
         addTest(new TestSuite(PropertySheetAuto.class));
         addTest(new TestSuite(ComboBoxPropertyDescriptorTest.class));
+        addTest(new TestSuite(DirtyStatePropertySheetTest.class));
     }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440149, 472654
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 496319, 498301
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
@@ -65,7 +66,12 @@ import org.eclipse.ui.menus.CommandContributionItemParameter;
  * Displays information about the product.
  */
 public class AboutDialog extends TrayDialog {
-    private final static int MAX_IMAGE_WIDTH_FOR_TEXT = 250;
+	/**
+	 *
+	 */
+	private static final String COPY_BUILD_ID_COMMAND = "org.eclipse.ui.ide.copyBuildIdCommand"; //$NON-NLS-1$
+
+	private final static int MAX_IMAGE_WIDTH_FOR_TEXT = 250;
 
     private final static int DETAILS_ID = IDialogConstants.CLIENT_ID + 1;
 
@@ -133,16 +139,15 @@ public class AboutDialog extends TrayDialog {
         }
     }
 
-    @Override
+	@Override
 	public boolean close() {
-        // dispose all images
-        for (int i = 0; i < images.size(); ++i) {
-            Image image = images.get(i);
-            image.dispose();
-        }
-
-        return super.close();
-    }
+		// dispose all images
+		for (int i = 0; i < images.size(); ++i) {
+			Image image = images.get(i);
+			image.dispose();
+		}
+		return super.close();
+	}
 
     @Override
 	protected void configureShell(Shell newShell) {
@@ -397,6 +402,8 @@ public class AboutDialog extends TrayDialog {
 						CommandContributionItem.STYLE_PUSH)));
 		textManager.add(new CommandContributionItem(
 				new CommandContributionItemParameter(PlatformUI
+						.getWorkbench(), null, COPY_BUILD_ID_COMMAND, CommandContributionItem.STYLE_PUSH)));
+		textManager.add(new CommandContributionItem(new CommandContributionItemParameter(PlatformUI
 						.getWorkbench(), null, IWorkbenchCommandConstants.EDIT_SELECT_ALL,
 						CommandContributionItem.STYLE_PUSH)));
 		text.setMenu(textManager.createContextMenu(text));

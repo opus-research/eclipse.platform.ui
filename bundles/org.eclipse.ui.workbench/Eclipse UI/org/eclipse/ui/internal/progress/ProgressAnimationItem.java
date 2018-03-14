@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.progress;
 
+import java.time.Duration;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.NotHandledException;
@@ -78,6 +79,9 @@ public class ProgressAnimationItem extends AnimationItem implements
 	private int flags;
 
 	private AccessibleListener currentAccessibleListener;
+
+	private Throttler throttledRefresh = new Throttler(PlatformUI.getWorkbench().getDisplay(), Duration.ofMillis(100),
+			this::refresh);
 
 	/**
 	 * Create an instance of the receiver in the supplied region.
@@ -396,24 +400,12 @@ public class ProgressAnimationItem extends AnimationItem implements
 
 	@Override
 	public void removed(JobTreeElement info) {
-		final Display display = Display.getDefault();
-		display.asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				refresh();
-			}
-		});
+		throttledRefresh.throttledExec();
 	}
 
 	@Override
 	public void finished(final JobTreeElement jte) {
-		final Display display = Display.getDefault();
-		display.asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				refresh();
-			}
-		});
+		throttledRefresh.throttledExec();
 	}
 
 }

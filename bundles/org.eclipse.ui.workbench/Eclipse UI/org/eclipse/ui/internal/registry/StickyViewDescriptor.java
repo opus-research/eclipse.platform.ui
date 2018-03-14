@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2008 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -59,7 +59,7 @@ public class StickyViewDescriptor implements IStickyViewDescriptor,
     	id = configurationElement.getAttribute(IWorkbenchRegistryConstants.ATT_ID);
         if (id == null) {
 			throw new CoreException(new Status(IStatus.ERROR, element
-                    .getNamespace(), 0,
+					.getNamespaceIdentifier(), 0,
                     "Invalid extension (missing id) ", null));//$NON-NLS-1$
 		}
     }

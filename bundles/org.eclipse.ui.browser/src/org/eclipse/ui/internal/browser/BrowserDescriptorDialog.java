@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - Initial API and implementation
- *     John J Barton 2008, Bug 248516 – [Browser] Update Window > Pref > General >Web Browsers UI
+ *     John J Barton 2008, Bug 248516 - [Browser] Update Window > Pref > General >Web Browsers UI
  *******************************************************************************/
 package org.eclipse.ui.internal.browser;
 
@@ -18,12 +18,9 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.util.Util;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -34,6 +31,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
+
 /**
  *
  */
@@ -52,9 +50,6 @@ public class BrowserDescriptorDialog extends Dialog {
 		public void valueChanged(String s);
 	}
 
-	/**
-	 * @param parentShell
-	 */
 	public BrowserDescriptorDialog(Shell parentShell, IBrowserDescriptorWorkingCopy browser) {
 		super(parentShell);
 		this.browser = browser;
@@ -81,8 +76,22 @@ public class BrowserDescriptorDialog extends Dialog {
 
 	protected Text createText(Composite comp, String txt, final StringModifyListener listener, boolean multiLine) {
 		int style = SWT.BORDER;
-		if (multiLine) style = SWT.BORDER | SWT.V_SCROLL |  SWT.MULTI | SWT.WRAP;
+		if (multiLine) {
+			style = SWT.BORDER | SWT.V_SCROLL | SWT.MULTI | SWT.WRAP;
+		}
 		final Text text = new Text(comp, style);
+		if (multiLine) {
+			text.addTraverseListener(event -> {
+				switch (event.detail) {
+				case SWT.TRAVERSE_RETURN:
+				case SWT.TRAVERSE_TAB_NEXT:
+				case SWT.TRAVERSE_TAB_PREVIOUS:
+					event.doit = true;
+					break;
+				}
+			});
+		}
+		// final Text text = SWTUtil.createMultilineText(comp, style);
 		if (txt != null)
 			text.setText(txt);
 
@@ -92,23 +101,12 @@ public class BrowserDescriptorDialog extends Dialog {
 		if (multiLine) { // then expand this control as the dialog resizes
 			data.verticalAlignment= SWT.FILL;
 			data.grabExcessVerticalSpace = true;
+			data.heightHint = convertHeightInCharsToPixels(4);
 		}
-
-		GC gc = new GC (text);
-		org.eclipse.swt.graphics.FontMetrics fm = gc.getFontMetrics ();
-		int hHint = 8*fm.getHeight ();
-		gc.dispose ();
-
-		text.setSize(text.computeSize(SWT.DEFAULT , hHint));
 
 		text.setLayoutData(data);
 		if (listener != null)
-			text.addModifyListener(new ModifyListener() {
-				@Override
-				public void modifyText(ModifyEvent e) {
-					listener.valueChanged(text.getText());
-				}
-			});
+			text.addModifyListener(e -> listener.valueChanged(text.getText()));
 		return text;
 	}
 
@@ -122,24 +120,18 @@ public class BrowserDescriptorDialog extends Dialog {
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(composite, ContextIds.PREF_BROWSER_DIALOG);
 
 		SWTUtil.createLabel(composite, Messages.name).setFont(font);
-		browserNameTextfield = createText(composite, browser.getName(), new StringModifyListener() {
-			@Override
-			public void valueChanged(String s) {
-				browser.setName(s);
-				validateFields();
-			}
+		browserNameTextfield = createText(composite, browser.getName(), s -> {
+			browser.setName(s);
+			validateFields();
 		}, false);
 		browserNameTextfield.setFont(font);
 
 		new Label(composite, SWT.NONE);
 
 		SWTUtil.createLabel(composite, Messages.location).setFont(font);
-		browserLocationTextfield = createText(composite, browser.getLocation(), new StringModifyListener() {
-			@Override
-			public void valueChanged(String s) {
-				browser.setLocation(s);
-				validateFields();
-			}
+		browserLocationTextfield = createText(composite, browser.getLocation(), s -> {
+			browser.setLocation(s);
+			validateFields();
 		}, false);
 		browserLocationTextfield.setFont(font);
 
@@ -162,12 +154,8 @@ public class BrowserDescriptorDialog extends Dialog {
 		});
 
 		SWTUtil.createLabel(composite, Messages.parameters).setFont(font);
-		browserParametersTextfield = createText(composite, browser.getParameters(), new StringModifyListener() {
-			@Override
-			public void valueChanged(String s) {
-				browser.setParameters(s);
-			}
-		}, true);
+		browserParametersTextfield = createText(composite, browser.getParameters(), s -> browser.setParameters(s),
+				true);
 		browserParametersTextfield.setFont(font);
 
 		new Label(composite, SWT.NONE);
@@ -184,8 +172,8 @@ public class BrowserDescriptorDialog extends Dialog {
 	protected void okPressed() {
 		// do simple field validation to at least ensure target directory entered is valid pathname
 		try {
-		File file = new File(browser.getLocation());
-			if(!file.isFile() && !Util.isMac()){
+			File file = new File(browser.getLocation());
+			if (!(file.isFile() || (Util.isMac() && ExternalBrowserInstance.isMacAppBundle(file)))) {
 				WebBrowserUtil.openError(Messages.locationInvalid);
 				return;
 			}

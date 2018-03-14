@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2007 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -42,7 +42,7 @@ public class IntroDescriptor implements IIntroDescriptor, IPluginContribution {
 
     	if (configElement.getAttribute(IWorkbenchRegistryConstants.ATT_CLASS) == null) {
             throw new CoreException(new Status(IStatus.ERROR, configElement
-                    .getNamespace(), 0,
+					.getNamespaceIdentifier(), 0,
                     "Invalid extension (Missing class name): " + getId(), //$NON-NLS-1$
                     null));
         }
@@ -76,7 +76,7 @@ public class IntroDescriptor implements IIntroDescriptor, IPluginContribution {
 		}
 
         imageDescriptor = AbstractUIPlugin.imageDescriptorFromPlugin(element
-                .getNamespace(), iconName);
+				.getNamespaceIdentifier(), iconName);
         return imageDescriptor;
     }
 
@@ -87,7 +87,7 @@ public class IntroDescriptor implements IIntroDescriptor, IPluginContribution {
 
     @Override
 	public String getPluginId() {
-        return element.getNamespace();
+		return element.getNamespaceIdentifier();
     }
 
     /**

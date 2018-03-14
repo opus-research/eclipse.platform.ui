@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,8 +29,6 @@ import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
-import org.osgi.framework.Constants;
-import org.osgi.framework.Version;
 /**
  * Utility class for the Web browser tools.
  */
@@ -85,12 +83,7 @@ public class WebBrowserUtil {
 		Display d = Display.getCurrent();
 		if (d == null)
 			d = Display.getDefault();
-		d.asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				MessageDialog.openError(null, Messages.errorDialogTitle, message);
-			}
-		});
+		d.asyncExec(() -> MessageDialog.openError(null, Messages.errorDialogTitle, message));
 	}
 
 	/**
@@ -104,12 +97,7 @@ public class WebBrowserUtil {
 		if (d == null)
 			d = Display.getDefault();
 
-		d.asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				MessageDialog.openInformation(null, Messages.searchingTaskName, message);
-			}
-		});
+		d.asyncExec(() -> MessageDialog.openInformation(null, Messages.searchingTaskName, message));
 	}
 
 	/**
@@ -163,23 +151,6 @@ public class WebBrowserUtil {
 	}
 
 	public static boolean canUseSystemBrowser() {
-		// Disabling system browser on Solaris < Solaris10 due to bug 94497
-		// The problem is that the SWT Program fails with the Tooltalk / DT integration on Solaris 9 or older
-		// The GTK / Gnome integration on Solaris 10 or newer does work though.
-		// https://bugs.eclipse.org/bugs/show_bug.cgi?id=94497#c56
-		if (Platform.OS_SOLARIS.equals(Platform.getOS())) {
-			//No system browser on Solaris Motif
-			if (!Platform.WS_GTK.equals(Platform.getWS())) {
-				return false;
-			}
-			//No system browser on Solaris 9 or older
-			String osVersion = WebBrowserUIPlugin.getInstance().getBundle().getBundleContext().getProperty(Constants.FRAMEWORK_OS_VERSION);
-			int compareVal = new Version(osVersion).compareTo(new Version(5,10,0));
-			if (compareVal < 0) {
-				//older than Solaris 10
-				return false;
-			}
-		}
 		return Program.findProgram("html") != null; //$NON-NLS-1$
 	}
 

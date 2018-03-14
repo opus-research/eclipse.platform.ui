@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
 package org.eclipse.ui.internal.decorators;
 
 import java.net.URL;
-
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IDecoration;
@@ -75,7 +74,7 @@ public class DeclarativeDecorator implements ILightweightLabelDecorator {
 	public void decorate(Object element, IDecoration decoration) {
         if (descriptor == null) {
             URL url = BundleUtility.find(configElement.getDeclaringExtension()
-                    .getNamespace(), iconLocation);
+					.getNamespaceIdentifier(), iconLocation);
             if (url == null) {
 				return;
 			}

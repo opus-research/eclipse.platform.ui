@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.Adapters;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -167,7 +168,12 @@ public class ProjectReferencePage extends PropertyPage {
      * Initializes a ProjectReferencePage.
      */
     private void initialize() {
-		project = (IProject) Adapters.adapt(getElement(), IResource.class);
+		project = Adapters.adapt(getElement(), IProject.class);
+		if (project == null) {
+			IResource resource = Adapters.adapt(getElement(), IResource.class);
+			Assert.isNotNull(resource, "unable to adapt element to a project"); //$NON-NLS-1$
+			project = resource.getProject();
+		}
         noDefaultAndApplyButton();
         setDescription(NLS.bind(IDEWorkbenchMessages.ProjectReferencesPage_label, project.getName()));
     }

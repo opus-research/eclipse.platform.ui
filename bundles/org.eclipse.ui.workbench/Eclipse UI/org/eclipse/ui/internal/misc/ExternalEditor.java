@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,6 @@ package org.eclipse.ui.internal.misc;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
@@ -86,7 +85,7 @@ public class ExternalEditor {
         if (configurationElement != null) {
             try {
                 Bundle bundle = Platform.getBundle(configurationElement
-                        .getNamespace());
+						.getNamespaceIdentifier());
                 // See if the program file is in the plugin directory
                 URL entry = bundle.getEntry(descriptor.getFileName());
                 if (entry != null) {

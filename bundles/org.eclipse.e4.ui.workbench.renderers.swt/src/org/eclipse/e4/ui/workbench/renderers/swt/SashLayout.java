@@ -17,9 +17,9 @@ import org.eclipse.e4.ui.model.application.ui.MGenericTile;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.MouseTrackListener;
+import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -66,18 +66,10 @@ public class SashLayout extends Layout {
 		this.root = root;
 		this.host = host;
 
-		host.addMouseTrackListener(new MouseTrackListener() {
-			@Override
-			public void mouseHover(MouseEvent e) {
-			}
-
+		host.addMouseTrackListener(new MouseTrackAdapter() {
 			@Override
 			public void mouseExit(MouseEvent e) {
 				host.setCursor(null);
-			}
-
-			@Override
-			public void mouseEnter(MouseEvent e) {
 			}
 		});
 
@@ -86,8 +78,7 @@ public class SashLayout extends Layout {
 				// Set the cursor feedback
 				List<SashRect> sashList = getSashRects(e.x, e.y);
 				if (sashList.size() == 0) {
-					host.setCursor(host.getDisplay().getSystemCursor(
-							SWT.CURSOR_ARROW));
+					host.setCursor(host.getDisplay().getSystemCursor(SWT.CURSOR_ARROW));
 				} else if (sashList.size() == 1) {
 					if (sashList.get(0).container.isHorizontal())
 						host.setCursor(host.getDisplay().getSystemCursor(
@@ -96,8 +87,7 @@ public class SashLayout extends Layout {
 						host.setCursor(host.getDisplay().getSystemCursor(
 								SWT.CURSOR_SIZENS));
 				} else {
-					host.setCursor(host.getDisplay().getSystemCursor(
-							SWT.CURSOR_SIZEALL));
+					host.setCursor(host.getDisplay().getSystemCursor(SWT.CURSOR_SIZEALL));
 				}
 			} else {
 				try {
@@ -111,7 +101,7 @@ public class SashLayout extends Layout {
 			}
 		});
 
-		host.addMouseListener(new MouseListener() {
+		host.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent e) {
 				host.setCapture(false);
@@ -130,23 +120,6 @@ public class SashLayout extends Layout {
 					host.setCapture(true);
 				}
 			}
-
-			@Override
-			public void mouseDoubleClick(MouseEvent e) {
-			}
-		});
-
-		host.addPaintListener(e -> {
-			// for (SashRect sr : sashes) {
-			// Color color;
-			// if (sr.container.isHorizontal())
-			// color = e.display.getSystemColor(SWT.COLOR_MAGENTA);
-			// else
-			// color = e.display.getSystemColor(SWT.COLOR_CYAN);
-			// e.gc.setForeground(color);
-			// e.gc.setBackground(color);
-			// e.gc.fillRectangle(sr.rect);
-			// }
 		});
 	}
 
