@@ -25,7 +25,6 @@
   <properties>
     <defaultSigning-excludeInnerJars>true</defaultSigning-excludeInnerJars>
    	<testSuiteUITests>**/org/eclipse/ui/tests/UiTestSuite.java</testSuiteUITests>
-   	<testSuiteApiTests>**/org/eclipse/ui/tests/api/ApiTestSuite.java</testSuiteApiTests>
 	<testSuiteJFace>**/org/eclipse/jface/tests/AllTests.java</testSuiteJFace>
   </properties>
 
@@ -38,8 +37,6 @@
 				<configuration>
 					<includes>
 						<include>${testSuiteJFace}</include>
-						<include>${testSuiteApiTests}</include>
-						<include>${testSuiteUITests}</include>
 					</includes>
 					<useUIHarness>true</useUIHarness>
 					<useUIThread>true</useUIThread>
