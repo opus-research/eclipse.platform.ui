@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -57,8 +57,7 @@ public abstract class ProgressContentProvider implements
      *
      * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
      */
-    @Override
-	public Object[] getElements(Object inputElement) {
+    public Object[] getElements(Object inputElement) {
 
         return progressManager.getRootElements(debug());
     }
@@ -68,8 +67,7 @@ public abstract class ProgressContentProvider implements
      *
      * @see org.eclipse.jface.viewers.IContentProvider#dispose()
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         progressViewUpdater.removeCollector(this);
     }
 
@@ -79,8 +77,7 @@ public abstract class ProgressContentProvider implements
      * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
      *      java.lang.Object, java.lang.Object)
      */
-    @Override
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         //No change when input changes
     }
 
