@@ -214,7 +214,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 	public static final String ACTION_SET_CMD_PREFIX = "AS::"; //$NON-NLS-1$
 
-	private static final String PERSISTED_STATE_ISRESTORED = "isRestored"; //$NON-NLS-1$
+	private static final String PERSISTED_STATE_RESTORED = "isRestored"; //$NON-NLS-1$
 
 	@Inject
 	private IWorkbench workbench;
@@ -759,7 +759,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 				PrefUtil.saveAPIPrefs();
 			}
 
-			if (Boolean.valueOf(getModel().getPersistedState().get(PERSISTED_STATE_ISRESTORED))) {
+			if (Boolean.valueOf(getModel().getPersistedState().get(PERSISTED_STATE_RESTORED))) {
 				SafeRunnable.run(new SafeRunnable() {
 
 					@Override
@@ -768,7 +768,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 					}
 				});
 			} else {
-				getModel().getPersistedState().put(PERSISTED_STATE_ISRESTORED, Boolean.TRUE.toString());
+				getModel().getPersistedState().put(PERSISTED_STATE_RESTORED, Boolean.TRUE.toString());
 			}
 
 			getWindowAdvisor().postWindowCreate();
