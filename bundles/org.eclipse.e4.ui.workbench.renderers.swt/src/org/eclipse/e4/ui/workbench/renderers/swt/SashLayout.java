@@ -7,11 +7,15 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Steven Spungin <steven@spungin.tv> - Bug 361731
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.eclipse.e4.ui.internal.workbench.PartSizeInfo;
+import org.eclipse.e4.ui.internal.workbench.PartSizeInfo.PartResizeMode;
+import org.eclipse.e4.ui.internal.workbench.SashUtil;
 import org.eclipse.e4.ui.model.application.ui.MGenericTile;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
@@ -39,6 +43,9 @@ public class SashLayout extends Layout {
 	int marginBottom = 0;
 	int sashWidth = 4;
 
+	int minSashHorizontal = 20;
+	int minSashVertical = 30;
+
 	MUIElement root;
 	private Composite host;
 
@@ -62,8 +69,14 @@ public class SashLayout extends Layout {
 	boolean draggingSashes = false;
 	List<SashRect> sashesToDrag;
 
-	public boolean layoutUpdateInProgress = false;
+	private boolean isValidating;
 
+	boolean layoutUpdateInProgress = false;
+
+	/**
+	 * @param host
+	 * @param root
+	 */
 	public SashLayout(final Composite host, MUIElement root) {
 		this.root = root;
 		this.host = host;
@@ -109,7 +122,9 @@ public class SashLayout extends Layout {
 						adjustWeights(sashesToDrag, e.x, e.y);
 						host.layout();
 						host.update();
-					} finally {
+
+					} catch (Exception e2) {
+						e2.printStackTrace();
 						layoutUpdateInProgress = false;
 					}
 				}
@@ -158,9 +173,35 @@ public class SashLayout extends Layout {
 		});
 	}
 
+	/**
+	 * Changes all relative weights so they add up to 100(%).
+	 * 
+	 */
+	protected void normalizeRelativeWeights() {
+		isValidating = true;
+		double availableRelative;
+		List<MUIElement> visibleChildren = SashUtil
+				.getVisibleChildren((MGenericTile<?>) root);
+		// availableRelative = getAvailableRelative(visibleChildren);
+		availableRelative = SashUtil.getTotalWeight(visibleChildren);
+		for (MUIElement ele : visibleChildren) {
+			PartSizeInfo i2 = PartSizeInfo.parse(ele.getContainerData());
+			if (!i2.isDefaultAbsolute()) {
+				double weight = i2.getDefaultValue() * 100.0
+						/ availableRelative;
+				i2.setDefaultValue(weight);
+				ele.setContainerData(i2.getEncodedParameters());
+			}
+		}
+		isValidating = false;
+	}
+
 	@Override
 	protected void layout(Composite composite, boolean flushCache) {
-		if (root == null)
+		// setting container data in normalizeRelativeWeights() and
+		// validateContainerData() will call layout
+		// again
+		if (root == null || isValidating)
 			return;
 
 		Rectangle bounds = composite.getBounds();
@@ -177,51 +218,136 @@ public class SashLayout extends Layout {
 		bounds.y += marginTop;
 
 		sashes.clear();
+
 		tileSubNodes(bounds, root);
 	}
 
 	protected void adjustWeights(List<SashRect> sashes, int curX, int curY) {
+
 		for (SashRect sr : sashes) {
-			int totalWeight = getWeight(sr.left) + getWeight(sr.right);
-			int minSashValue = (int) (((totalWeight / 100.0) * minSashPercent) + 0.5);
 
 			Rectangle leftRect = getRectangle(sr.left);
 			Rectangle rightRect = getRectangle(sr.right);
+
+			double totalSize;
+
 			if (leftRect == null || rightRect == null)
 				continue;
 
-			int leftWeight;
-			int rightWeight;
+			PartSizeInfo infoLeft = PartSizeInfo.parse(sr.left
+					.getContainerData());
+			PartSizeInfo infoRight = PartSizeInfo.parse(sr.right
+					.getContainerData());
+
+			double newLeft;
+			double newRight;
+			int minSize;
 
 			if (sr.container.isHorizontal()) {
 				double left = leftRect.x;
 				double right = rightRect.x + rightRect.width;
-				double pct = (curX - left) / (right - left);
-				leftWeight = (int) ((totalWeight * pct) + 0.5);
-				if (leftWeight < minSashValue)
-					leftWeight = minSashValue;
-				if (leftWeight > (totalWeight - minSashValue))
-					leftWeight = totalWeight - minSashValue;
-				rightWeight = totalWeight - leftWeight;
+				totalSize = right - left;
+				newLeft = curX - leftRect.x;
+				minSize = minSashHorizontal;
 			} else {
 				double top = leftRect.y;
 				double bottom = rightRect.y + rightRect.height;
-				double pct = (curY - top) / (bottom - top);
-				leftWeight = (int) ((totalWeight * pct) + 0.5);
-				if (leftWeight < minSashValue)
-					leftWeight = minSashValue;
-				if (leftWeight > (totalWeight - minSashValue))
-					leftWeight = totalWeight - minSashValue;
-				rightWeight = totalWeight - leftWeight;
+				totalSize = bottom - top;
+				newLeft = curY - leftRect.y;
+				minSize = minSashVertical;
 			}
 
-			setWeight(sr.left, leftWeight);
-			setWeight(sr.right, rightWeight);
-		}
-	}
+			Rectangle r = getRectangle(root);
+			if (r == null) {
+				// should not happen
+				return;
+			}
+			List<MUIElement> visibleChildren = SashUtil
+					.getVisibleChildren(sr.container);
+			double availableRelative = SashUtil.getAvailableRelative(
+					sr.container.isHorizontal(),
+					sr.container.isHorizontal() ? r.width : r.height,
+					sashWidth, visibleChildren);
+			double totalRelative = SashUtil.getTotalWeight(visibleChildren);
 
-	private void setWeight(MUIElement element, int weight) {
-		element.setContainerData(Integer.toString(weight));
+			// constrain to bounds
+			if (newLeft < minSize) {
+				newLeft = minSize;
+			}
+			newRight = totalSize - sashWidth - newLeft;
+			if (newRight < minSize) {
+				newRight = minSize;
+			}
+
+			// if (false) {
+			// double minLeft = infoLeft.getMinValueAsAbsolute(totalRelative,
+			// availableRelative);
+			// if (minLeft < minSize) {
+			// minLeft = minSize;
+			// }
+			// double maxLeft = infoLeft.getMaxValueAsAbsolute(totalRelative,
+			// availableRelative);
+			// double minRight = infoRight.getMinValueAsAbsolute(
+			// totalRelative, availableRelative);
+			// if (minRight < minSize) {
+			// minRight = minSize;
+			// }
+			// double maxRight = infoRight.getMaxValueAsAbsolute(
+			// totalRelative, availableRelative);
+			//
+			// if (newLeft < minLeft) {
+			// // return;
+			// newLeft = minLeft;
+			// } else if (newLeft > maxLeft) {
+			// // return;
+			// newLeft = maxLeft;
+			// }
+			// newRight = totalSize - sashWidth - newLeft;
+			// if (newRight < minRight) {
+			// // return;
+			// newRight = minRight;
+			// newLeft = totalSize - sashWidth - newRight;
+			// } else if (newRight > maxRight) {
+			// // return;
+			// newRight = maxRight;
+			// newLeft = totalSize - sashWidth - newRight;
+			// }
+			// }
+
+			if (infoLeft.getResizeMode() == PartResizeMode.WEIGHTED) {
+				infoLeft.setDefaultAbsolute(false);
+				double newWeight = newLeft * totalRelative / availableRelative;
+				infoLeft.setDefaultValue(newWeight);
+				// if (infoLeft.isDefaultAbsolute()) {
+				// infoLeft.setDefaultValue(newLeft);
+				// } else {
+				// double newWeight = newLeft * totalRelative
+				// / (availableRelative);
+				// infoLeft.setDefaultValue((newWeight));
+				// }
+			} else {
+				infoLeft.setDefaultAbsolute(true);
+				infoLeft.setDefaultValue(newLeft);
+			}
+			sr.left.setContainerData(infoLeft.getEncodedParameters());
+
+			if (infoRight.getResizeMode() == PartResizeMode.WEIGHTED) {
+				infoRight.setDefaultAbsolute(false);
+				double newWeight = newRight * totalRelative / availableRelative;
+				infoRight.setDefaultValue(newWeight);
+				// if (infoRight.isDefaultAbsolute()) {
+				// infoRight.setDefaultValue(newRight);
+				// } else {
+				// double newWeight = newRight * totalRelative
+				// / (availableRelative);
+				// infoRight.setDefaultValue((newWeight));
+				// }
+			} else {
+				infoRight.setDefaultAbsolute(true);
+				infoRight.setDefaultValue(newRight);
+			}
+			sr.right.setContainerData(infoRight.getEncodedParameters());
+		}
 	}
 
 	private Rectangle getRectangle(MUIElement element) {
@@ -249,15 +375,6 @@ public class SashLayout extends Layout {
 		return new Point(600, 400);
 	}
 
-	private int totalWeight(MGenericTile<?> node) {
-		int total = 0;
-		for (MUIElement subNode : node.getChildren()) {
-			if (subNode.isToBeRendered() && subNode.isVisible())
-				total += getWeight(subNode);
-		}
-		return total;
-	}
-
 	private void tileSubNodes(Rectangle bounds, MUIElement node) {
 		if (node != root)
 			setRectangle(node, bounds);
@@ -266,20 +383,23 @@ public class SashLayout extends Layout {
 			return;
 
 		MGenericTile<?> sashContainer = (MGenericTile<?>) node;
-		List<MUIElement> visibleChildren = getVisibleChildren(sashContainer);
-		int childCount = visibleChildren.size();
 
-		// How many pixels do we have?
-		int availableWidth = sashContainer.isHorizontal() ? bounds.width
-				: bounds.height;
+		boolean isHorizontal = sashContainer.isHorizontal();
 
-		// Subtract off the room for the sashes
-		availableWidth -= ((childCount - 1) * sashWidth);
+		isValidating = true;
+		SashUtil.validateContainerData(sashContainer,
+				isHorizontal ? bounds.width : bounds.height, sashWidth);
+		isValidating = false;
 
-		// Get the total of the weights
-		double totalWeight = totalWeight(sashContainer);
-		int tilePos = sashContainer.isHorizontal() ? bounds.x : bounds.y;
+		List<MUIElement> visibleChildren = SashUtil
+				.getVisibleChildren(sashContainer);
 
+		double totalWeight = SashUtil.getTotalWeight(visibleChildren);
+		double availableRelative = SashUtil.getAvailableRelative(isHorizontal,
+				isHorizontal ? bounds.width : bounds.height, sashWidth,
+				visibleChildren);
+
+		int tilePos = isHorizontal ? bounds.x : bounds.y;
 		MUIElement prev = null;
 		for (MUIElement subNode : visibleChildren) {
 			// Add a 'sash' between this node and the 'prev'
@@ -294,14 +414,22 @@ public class SashLayout extends Layout {
 				tilePos += sashWidth;
 			}
 
-			// Calc the new size as a %'age of the total
-			double ratio = getWeight(subNode) / totalWeight;
-			int newSize = (int) ((availableWidth * ratio) + 0.5);
+			double newSize;
 
+			PartSizeInfo sizeInfo = PartSizeInfo.parse(subNode
+					.getContainerData());
+			newSize = sizeInfo.getValueConstrained(totalWeight,
+					availableRelative);
+			sizeInfo.setDefaultValue(newSize);
+
+			double newPx = sizeInfo.getValueAsAbsolute(totalWeight,
+					availableRelative);
+
+			int rndSize = (int) (newPx + .5);
 			Rectangle subBounds = sashContainer.isHorizontal() ? new Rectangle(
-					tilePos, bounds.y, newSize, bounds.height) : new Rectangle(
-					bounds.x, tilePos, bounds.width, newSize);
-			tilePos += newSize;
+					tilePos, bounds.y, rndSize, bounds.height) : new Rectangle(
+					bounds.x, tilePos, bounds.width, rndSize);
+			tilePos += rndSize;
 
 			tileSubNodes(subBounds, subNode);
 			prev = subNode;
@@ -322,29 +450,6 @@ public class SashLayout extends Layout {
 			theRect.y = bounds.y;
 			theRect.width = bounds.width;
 			theRect.height = bounds.height;
-		}
-	}
-
-	private List<MUIElement> getVisibleChildren(MGenericTile<?> sashContainer) {
-		List<MUIElement> visKids = new ArrayList<MUIElement>();
-		for (MUIElement child : sashContainer.getChildren()) {
-			if (child.isToBeRendered() && child.isVisible())
-				visKids.add(child);
-		}
-		return visKids;
-	}
-
-	private static int getWeight(MUIElement element) {
-		String info = element.getContainerData();
-		if (info == null || info.length() == 0) {
-			return 0;
-		}
-
-		try {
-			int value = Integer.parseInt(info);
-			return value;
-		} catch (NumberFormatException e) {
-			return 0;
 		}
 	}
 }
