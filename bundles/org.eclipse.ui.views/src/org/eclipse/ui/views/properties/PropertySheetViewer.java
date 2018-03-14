@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Gunnar Wagenknecht - fix for bug 21756 [PropertiesView] property view sorting
  *     Kevin Milburn - [Bug 423214] [PropertiesView] add support for IColorProvider and IFontProvider
+ *     Stefan Winkler <stefan@winklerweb.net> - Bug 477848 - code cleanup
  *******************************************************************************/
 
 package org.eclipse.ui.views.properties;
@@ -86,7 +87,7 @@ class PropertySheetViewer extends Viewer {
      * corresponding TreeItem. This is used in 'findItem' to
      * greatly increase the performance.
      */
-    private HashMap entryToItemMap = new HashMap();
+	private HashMap<Object, TreeItem> entryToItemMap = new HashMap<>();
 
     private TreeEditor treeEditor;
 
@@ -284,7 +285,7 @@ class PropertySheetViewer extends Viewer {
 
         // get the children and create their tree items
         Object node = widget.getData();
-        List children = getChildren(node);
+		List<?> children = getChildren(node);
         if (children.isEmpty()) {
 			// this item does't actually have any children
             return;
@@ -547,7 +548,7 @@ class PropertySheetViewer extends Viewer {
      *  (element type <code>IPropertySheetEntry</code> or
      *  <code>PropertySheetCategory</code>)
      */
-    private List getChildren(Object node) {
+	private List<Object> getChildren(Object node) {
         // cast the entry or category
         IPropertySheetEntry entry = null;
         PropertySheetCategory category = null;
@@ -558,7 +559,7 @@ class PropertySheetViewer extends Viewer {
 		}
 
         // get the child entries or categories
-        List children;
+		List<Object> children;
         if (category == null) {
 			children = getChildren(entry);
 		} else {
@@ -575,7 +576,7 @@ class PropertySheetViewer extends Viewer {
      * @return the children of the given entry (element type
      *         <code>IPropertySheetEntry</code>)
      */
-    private List getChildren(IPropertySheetEntry entry) {
+	private List<Object> getChildren(IPropertySheetEntry entry) {
         // if the entry is the root and we are showing categories, and we have
         // more than the
         // defualt category, return the categories
@@ -584,12 +585,12 @@ class PropertySheetViewer extends Viewer {
                     || (categories.length == 1 && !categories[0]
                             .getCategoryName().equals(
                                     MISCELLANEOUS_CATEGORY_NAME))) {
-				return Arrays.asList(categories);
+				return Arrays.asList((Object[]) categories);
 			}
         }
 
         // return the sorted & filtered child entries
-        return getSortedEntries(getFilteredEntries(entry.getChildEntries()));
+		return getSortedEntries(getFilteredEntries(entry.getChildEntries()));
     }
 
     /**
@@ -600,7 +601,7 @@ class PropertySheetViewer extends Viewer {
      * @return the children of the given category (element type
      *         <code>IPropertySheetEntry</code>)
      */
-    private List getChildren(PropertySheetCategory category) {
+	private List<Object> getChildren(PropertySheetCategory category) {
         return getSortedEntries(getFilteredEntries(category.getChildEntries()));
     }
 
@@ -616,14 +617,14 @@ class PropertySheetViewer extends Viewer {
      * @return the entries which match the current filter
      *  (element type <code>IPropertySheetEntry</code>)
      */
-    private List getFilteredEntries(IPropertySheetEntry[] entries) {
+	private List<IPropertySheetEntry> getFilteredEntries(IPropertySheetEntry[] entries) {
         // if no filter just return all entries
         if (isShowingExpertProperties) {
 			return Arrays.asList(entries);
 		}
 
         // check each entry for the filter
-        List filteredEntries = new ArrayList(entries.length);
+		List<IPropertySheetEntry> filteredEntries = new ArrayList<>(entries.length);
         for (int i = 0; i < entries.length; i++) {
             IPropertySheetEntry entry = entries[i];
             if (entry != null) {
@@ -652,11 +653,11 @@ class PropertySheetViewer extends Viewer {
 	 *            unsorted list of <code>IPropertySheetEntry</code>
 	 * @return a sorted list of the specified entries
 	 */
-	private List getSortedEntries(List unsortedEntries) {
-		IPropertySheetEntry[] propertySheetEntries = (IPropertySheetEntry[]) unsortedEntries
+	private List<Object> getSortedEntries(List<IPropertySheetEntry> unsortedEntries) {
+		IPropertySheetEntry[] propertySheetEntries = unsortedEntries
 				.toArray(new IPropertySheetEntry[unsortedEntries.size()]);
 		sorter.sort(propertySheetEntries);
-		return Arrays.asList(propertySheetEntries);
+		return Arrays.asList((Object[]) propertySheetEntries);
 	}
 
 
@@ -696,12 +697,12 @@ class PropertySheetViewer extends Viewer {
 			return StructuredSelection.EMPTY;
 		}
         TreeItem[] sel = tree.getSelection();
-        List entries = new ArrayList(sel.length);
+		List<IPropertySheetEntry> entries = new ArrayList<>(sel.length);
         for (int i = 0; i < sel.length; i++) {
             TreeItem ti = sel[i];
             Object data = ti.getData();
             if (data instanceof IPropertySheetEntry) {
-				entries.add(data);
+				entries.add((IPropertySheetEntry) data);
 			}
         }
         return new StructuredSelection(entries);
@@ -939,7 +940,7 @@ class PropertySheetViewer extends Viewer {
         IStructuredSelection selection = (IStructuredSelection) getSelection();
 
         // Iterate over entries and reset them
-        Iterator itr = selection.iterator();
+		Iterator<Object> itr = selection.iterator();
         while (itr.hasNext()) {
 			((IPropertySheetEntry) itr.next()).resetPropertyValue();
 		}
@@ -1093,7 +1094,7 @@ class PropertySheetViewer extends Viewer {
 		}
 
         // get all the filtered child entries of the root
-        List childEntries = getFilteredEntries(rootEntry.getChildEntries());
+		List<IPropertySheetEntry> childEntries = getFilteredEntries(rootEntry.getChildEntries());
 
         // if the list is empty, just set an empty categories array
         if (childEntries.size() == 0) {
@@ -1102,17 +1103,17 @@ class PropertySheetViewer extends Viewer {
         }
 
         // cache old categories by their descriptor name
-        Map categoryCache = new HashMap(categories.length * 2 + 1);
+		Map<String, PropertySheetCategory> categoryCache = new HashMap<>(categories.length * 2 + 1);
         for (int i = 0; i < categories.length; i++) {
             categories[i].removeAllEntries();
             categoryCache.put(categories[i].getCategoryName(), categories[i]);
         }
 
         // create a list of categories to get rid of
-        List categoriesToRemove = new ArrayList(Arrays.asList(categories));
+		List<PropertySheetCategory> categoriesToRemove = new ArrayList<>(Arrays.asList(categories));
 
         // Determine the categories
-        PropertySheetCategory misc = (PropertySheetCategory) categoryCache
+        PropertySheetCategory misc = categoryCache
                 .get(MISCELLANEOUS_CATEGORY_NAME);
         if (misc == null) {
 			misc = new PropertySheetCategory(MISCELLANEOUS_CATEGORY_NAME);
@@ -1120,7 +1121,7 @@ class PropertySheetViewer extends Viewer {
         boolean addMisc = false;
 
         for (int i = 0; i < childEntries.size(); i++) {
-            IPropertySheetEntry childEntry = (IPropertySheetEntry) childEntries
+            IPropertySheetEntry childEntry = childEntries
                     .get(i);
             String categoryName = childEntry.getCategory();
             if (categoryName == null) {
@@ -1128,7 +1129,7 @@ class PropertySheetViewer extends Viewer {
                 addMisc = true;
                 categoriesToRemove.remove(misc);
             } else {
-                PropertySheetCategory category = (PropertySheetCategory) categoryCache
+                PropertySheetCategory category = categoryCache
                         .get(categoryName);
                 if (category == null) {
                     category = new PropertySheetCategory(categoryName);
@@ -1148,15 +1149,15 @@ class PropertySheetViewer extends Viewer {
         // Sort the categories.
         // Rather than just sorting categoryCache.values(), we'd like the original order to be preserved
         // (with misc added at the end, if needed) before passing to the sorter.
-        ArrayList categoryList = new ArrayList();
-        Set seen = new HashSet(childEntries.size());
+		ArrayList<PropertySheetCategory> categoryList = new ArrayList<>();
+		Set<String> seen = new HashSet<>(childEntries.size());
         for (int i = 0; i < childEntries.size(); i++) {
-            IPropertySheetEntry childEntry = (IPropertySheetEntry) childEntries
+            IPropertySheetEntry childEntry = childEntries
                     .get(i);
             String categoryName = childEntry.getCategory();
             if (categoryName != null && !seen.contains(categoryName)) {
                 seen.add(categoryName);
-                PropertySheetCategory category = (PropertySheetCategory) categoryCache
+                PropertySheetCategory category = categoryCache
                         .get(categoryName);
                 if (category != null) {
                     categoryList.add(category);
@@ -1167,8 +1168,7 @@ class PropertySheetViewer extends Viewer {
             categoryList.add(misc);
         }
 
-        PropertySheetCategory[] categoryArray = (PropertySheetCategory[]) categoryList
-        	.toArray(new PropertySheetCategory[categoryList.size()]);
+		PropertySheetCategory[] categoryArray = categoryList.toArray(new PropertySheetCategory[categoryList.size()]);
         sorter.sort(categoryArray);
         categories = categoryArray;
     }
@@ -1266,10 +1266,10 @@ class PropertySheetViewer extends Viewer {
 			// update the categories
             updateCategories();
 		}
-        List children = getChildren(node);
+		List<Object> children = getChildren(node);
 
         // remove items
-        Set set = new HashSet(childItems.length * 2 + 1);
+		Set<Object> set = new HashSet<>(childItems.length * 2 + 1);
 
         for (int i = 0; i < childItems.length; i++) {
             Object data = childItems[i].getData();
