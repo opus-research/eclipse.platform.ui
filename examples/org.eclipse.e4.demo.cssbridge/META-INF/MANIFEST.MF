@@ -9,4 +9,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.e4.ui.css.swt.theme
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
+Require-Capability: osgi.extender;
+ filter:="(&(osgi.extender=osgi.component)(version>=1.2)(!(version>=2.0)))"
 Service-Component: OSGI-INF/mailservice.xml
