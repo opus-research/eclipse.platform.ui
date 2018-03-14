@@ -8,6 +8,7 @@
  * Contributors:
  *     Tom Schindl - initial API and implementation
  *     IBM - Improvement for Bug 159625 [Snippets] Update Snippet011CustomTooltips to reflect new API
+ *     Hendrik Still <hendrik.still@gammas.de> - bug 417676
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 414565
  *******************************************************************************/
 
@@ -26,10 +27,6 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-/**
- * Explore New API: JFace custom tooltips drawing.
- *
- */
 public class Snippet011CustomTooltips {
 	/**
 	 * @param args
@@ -39,47 +36,48 @@ public class Snippet011CustomTooltips {
 		Shell shell = new Shell(display);
 		shell.setLayout(new FillLayout());
 
-		TableViewer v = new TableViewer(shell, SWT.FULL_SELECTION);
+		TableViewer<String, Object> v = new TableViewer<String, Object>(shell,
+				SWT.FULL_SELECTION);
 		v.getTable().setLinesVisible(true);
 		v.getTable().setHeaderVisible(true);
-		v.setContentProvider(ArrayContentProvider.getInstance());
-		ColumnViewerToolTipSupport.enableFor(v,ToolTip.NO_RECREATE);
-
-		CellLabelProvider labelProvider = new CellLabelProvider() {
+		v.setContentProvider(ArrayContentProvider.getInstance(String.class));
+		ColumnViewerToolTipSupport.enableFor(v, ToolTip.NO_RECREATE);
+    CellLabelProvider<String> labelProvider = new CellLabelProvider<String>() {
 
 			@Override
-			public String getToolTipText(Object element) {
+      public String getToolTipText(String element) {
 				return "Tooltip (" + element + ")";
 			}
 
 			@Override
-			public Point getToolTipShift(Object object) {
+			public Point getToolTipShift(String object) {
 				return new Point(5, 5);
 			}
 
 			@Override
-			public int getToolTipDisplayDelayTime(Object object) {
+			public int getToolTipDisplayDelayTime(String object) {
 				return 2000;
 			}
 
 			@Override
-			public int getToolTipTimeDisplayed(Object object) {
+			public int getToolTipTimeDisplayed(String object) {
 				return 5000;
 			}
 
 			@Override
-			public void update(ViewerCell cell) {
+			public void update(ViewerCell<String> cell) {
 				cell.setText(cell.getElement().toString());
 
 			}
 		};
 
-		TableViewerColumn column = new TableViewerColumn(v, SWT.NONE);
+		TableViewerColumn<String, Object> column = new TableViewerColumn<String, Object>(
+				v, SWT.NONE);
 		column.setLabelProvider(labelProvider);
 		column.getColumn().setText("Column 1");
 		column.getColumn().setWidth(100);
-		String[] values = new String[] { "one", "two", "three", "four", "five", "six",
-				"seven", "eight", "nine", "ten" };
+		String[] values = new String[] { "one", "two", "three", "four", "five",
+				"six", "seven", "eight", "nine", "ten" };
 		v.setInput(values);
 
 		shell.setSize(200, 200);

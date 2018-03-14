@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 - 2014 Tom Schindl and others.
+ * Copyright (c) 2006, 2014 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,10 +7,14 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
+ *     Hendrik Still <hendrik.still@gammas.de> - bug 417676
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 414565
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -45,27 +49,29 @@ public class Snippet003TableLabelProvider {
 		}
 	}
 
-	public class MyLabelProvider extends LabelProvider implements ITableLabelProvider {
+	public class MyLabelProvider extends LabelProvider<MyModel> implements
+			ITableLabelProvider<MyModel> {
 
 		@Override
-		public Image getColumnImage(Object element, int columnIndex) {
-			if( columnIndex == 1 ) {
-				return images[((MyModel)element).counter%4];
+		public Image getColumnImage(MyModel element, int columnIndex) {
+			if (columnIndex == 1) {
+				return images[element.counter % 4];
 			}
 
 			return null;
 		}
 
 		@Override
-		public String getColumnText(Object element, int columnIndex) {
+		public String getColumnText(MyModel element, int columnIndex) {
 			return "Column " + columnIndex + " => " + element.toString();
 		}
 
 	}
 
-	private static Image createImage(Display display, int red, int green, int blue) {
-		Color color = new Color(display,red,green,blue);
-		Image image = new Image(display,10,10);
+	private static Image createImage(Display display, int red, int green,
+			int blue) {
+		Color color = new Color(display, red, green, blue);
+		Image image = new Image(display, 10, 10);
 		GC gc = new GC(image);
 		gc.setBackground(color);
 		gc.fillRectangle(0, 0, 10, 10);
@@ -75,31 +81,30 @@ public class Snippet003TableLabelProvider {
 	}
 
 	public Snippet003TableLabelProvider(Shell shell) {
-		final TableViewer v = new TableViewer(shell,SWT.BORDER|SWT.FULL_SELECTION);
+		final TableViewer<MyModel, List<MyModel>> v = new TableViewer<MyModel, List<MyModel>>(
+				shell, SWT.BORDER | SWT.FULL_SELECTION);
 		v.setLabelProvider(new MyLabelProvider());
-		v.setContentProvider(ArrayContentProvider.getInstance());
+		v.setContentProvider(ArrayContentProvider.getInstance(MyModel.class));
 
-		TableColumn column = new TableColumn(v.getTable(),SWT.NONE);
+		TableColumn column = new TableColumn(v.getTable(), SWT.NONE);
 		column.setWidth(200);
 		column.setText("Column 1");
 
-		column = new TableColumn(v.getTable(),SWT.NONE);
+		column = new TableColumn(v.getTable(), SWT.NONE);
 		column.setWidth(200);
 		column.setText("Column 2");
 
-		MyModel[] model = createModel();
+		List<MyModel> model = createModel();
 		v.setInput(model);
 		v.getTable().setLinesVisible(true);
 		v.getTable().setHeaderVisible(true);
 	}
 
-	private MyModel[] createModel() {
-		MyModel[] elements = new MyModel[10];
-
-		for( int i = 0; i < 10; i++ ) {
-			elements[i] = new MyModel(i);
+	private List<MyModel> createModel() {
+		List<MyModel> elements = new ArrayList<MyModel>();
+		for (int i = 0; i < 10; i++) {
+			elements.add(new MyModel(i));
 		}
-
 		return elements;
 	}
 
@@ -107,28 +112,29 @@ public class Snippet003TableLabelProvider {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Display display = new Display ();
+		Display display = new Display();
 
 		images = new Image[4];
-		images[0] = createImage(display,0,0,255);
-		images[1] = createImage(display,0,255,255);
-		images[2] = createImage(display,0,255,0);
-		images[3] = createImage(display,255,0,255);
+		images[0] = createImage(display, 0, 0, 255);
+		images[1] = createImage(display, 0, 255, 255);
+		images[2] = createImage(display, 0, 255, 0);
+		images[3] = createImage(display, 255, 0, 255);
 
 		Shell shell = new Shell(display);
 		shell.setLayout(new FillLayout());
 		new Snippet003TableLabelProvider(shell);
-		shell.open ();
+		shell.open();
 
-		while (!shell.isDisposed ()) {
-			if (!display.readAndDispatch ()) display.sleep ();
+		while (!shell.isDisposed()) {
+			if (!display.readAndDispatch())
+				display.sleep();
 		}
 
-		for( int i = 0; i < images.length; i++ ) {
+		for (int i = 0; i < images.length; i++) {
 			images[i].dispose();
 		}
 
-		display.dispose ();
+		display.dispose();
 
 	}
 

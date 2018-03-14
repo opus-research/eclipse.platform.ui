@@ -33,7 +33,7 @@ import org.eclipse.swt.widgets.Control;
  */
 public class BooleanCellEditor extends CellEditor {
 	private Button button;
-	private ViewerRow row;
+	private ViewerRow<?> row;
 	private int index;
 	private String restoredText;
 	private Image restoredImage;
@@ -124,9 +124,9 @@ public class BooleanCellEditor extends CellEditor {
 
 	@Override
 	public void activate(ColumnViewerEditorActivationEvent activationEvent) {
-		ViewerCell cell = (ViewerCell)activationEvent.getSource();
+		ViewerCell<?> cell = (ViewerCell<?>) activationEvent.getSource();
 		index = cell.getColumnIndex();
-		row = (ViewerRow) cell.getViewerRow().clone();
+		row = (ViewerRow<?>) cell.getViewerRow().clone();
 		restoredImage = row.getImage(index);
 		restoredText = row.getText(index);
 		row.setImage(index, null);

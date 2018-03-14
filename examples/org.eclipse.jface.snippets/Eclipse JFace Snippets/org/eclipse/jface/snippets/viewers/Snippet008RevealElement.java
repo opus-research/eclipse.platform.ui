@@ -7,10 +7,14 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
+ *     Hendrik Still <hendrik.still@gammas.de> - bug 417676
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 414565
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -39,20 +43,19 @@ public class Snippet008RevealElement {
 	}
 
 	public Snippet008RevealElement(Shell shell) {
-		final TableViewer v = new TableViewer(shell);
-		v.setLabelProvider(new LabelProvider());
-		v.setContentProvider(ArrayContentProvider.getInstance());
-		MyModel[] model = createModel();
+		final TableViewer<MyModel,List<MyModel>> v = new TableViewer<MyModel,List<MyModel>>(shell);
+		v.setLabelProvider(new LabelProvider<MyModel>());
+		v.setContentProvider(ArrayContentProvider.getInstance(MyModel.class));
+		List<MyModel> model = createModel();
 		v.setInput(model);
 		v.getTable().setLinesVisible(true);
-		v.reveal(model[99]);
+		v.reveal(model.get(99));
 	}
 
-	private MyModel[] createModel() {
-		MyModel[] elements = new MyModel[100];
-
+	private List<MyModel> createModel() {
+		List<MyModel> elements = new ArrayList<MyModel>();
 		for( int i = 0; i < 100; i++ ) {
-			elements[i] = new MyModel(i);
+			elements.add(new MyModel(i));
 		}
 
 		return elements;
