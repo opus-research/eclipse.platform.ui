@@ -17,8 +17,6 @@ import org.eclipse.e4.ui.css.swt.dom.ControlElement;
 import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
 import org.eclipse.e4.ui.widgets.ImageBasedFrame;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -63,13 +61,13 @@ public class CSSRenderingUtils {
 			ImageBasedFrame frame = new ImageBasedFrame(toFrame.getParent(),
 					toFrame, vertical, draggable);
 			frame.setImages(frameImage, frameInts, handleImage);
-			addFrameImageDisposedListener(frame, toFrame, classId, vertical);
+			addFrameImageDisposedListener(toFrame, classId, vertical);
 			return frame;
 		} else if (handleImage != null) {
 			ImageBasedFrame frame = new ImageBasedFrame(toFrame.getParent(),
 					toFrame, vertical, draggable);
 			frame.setImages(null, null, handleImage);
-			addHandleImageDisposedListener(frame, toFrame, classId, vertical);
+			addHandleImageDisposedListener(toFrame, classId, vertical);
 			return frame;
 		}
 
@@ -221,10 +219,9 @@ public class CSSRenderingUtils {
 		return image;
 	}
 
-	private void addHandleImageDisposedListener(
-			ImageBasedFrame imageBasedFrame, final Control toFrame,
+	private void addHandleImageDisposedListener(final Control toFrame,
 			final String classId, final boolean vertical) {
-		final Listener listener = new Listener() {
+		toFrame.getDisplay().addListener(SWT.Skin, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
 				if (!(event.widget instanceof ImageBasedFrame)) {
@@ -242,21 +239,12 @@ public class CSSRenderingUtils {
 							handleImage);
 				}
 			}
-		};
-
-		toFrame.getDisplay().addListener(SWT.Skin, listener);
-
-		imageBasedFrame.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(DisposeEvent e) {
-				e.widget.getDisplay().removeListener(SWT.Skin, listener);
-			}
 		});
 	}
 
-	private void addFrameImageDisposedListener(ImageBasedFrame imageBasedFrame,
-			final Control toFrame, final String classId, final boolean vertical) {
-		final Listener listener = new Listener() {
+	private void addFrameImageDisposedListener(final Control toFrame,
+			final String classId, final boolean vertical) {
+		toFrame.getDisplay().addListener(SWT.Skin, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
 				if (!(event.widget instanceof ImageBasedFrame)) {
@@ -281,15 +269,6 @@ public class CSSRenderingUtils {
 				if (frameImage != null) {
 					frame.setImages(frameImage, frameInts, handleImage);
 				}
-			 }
-		};
-			
-		toFrame.getDisplay().addListener(SWT.Skin, listener);
-
-		imageBasedFrame.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(DisposeEvent e) {
-				e.widget.getDisplay().removeListener(SWT.Skin, listener);
 			}
 		});
 	}
