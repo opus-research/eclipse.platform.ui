@@ -119,40 +119,6 @@
             </command>
          </menu>
       </menuContribution>
-   
-   
-         <menuContribution
-            allPopups="false"
-            locationURI="menu:window?after=openNewWindow">
-         <menu
-               id="org.eclipse.ui.perspectives"
-               label="%menu.perspective.label"
-               mnemonic="%menu.perspective.mnemonic">
-            <command
-                  commandId="org.eclipse.ui.window.customizePerspective"
-                  label="%menu.customizePerspective.name"
-                  style="push">
-            </command>
-            <command
-                  commandId="org.eclipse.ui.window.savePerspective"
-                  label="%menu.savePerspective.name"
-                  style="push">
-            </command>
-            <command
-                  commandId="org.eclipse.ui.window.resetPerspective"
-                  label="%menu.resetPerspective.name"
-                  style="push">
-            </command>
-            <command
-                  commandId="org.eclipse.ui.window.closePerspective"
-                  style="push">
-            </command>
-            <command
-                  commandId="org.eclipse.ui.window.closeAllPerspectives"
-                  style="push">
-            </command>
-         </menu>
-      </menuContribution>
    </extension>
    <extension
          id="id1"
