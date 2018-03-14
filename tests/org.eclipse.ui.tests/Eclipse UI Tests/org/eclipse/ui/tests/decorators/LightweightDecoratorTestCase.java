@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.decorators;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 
 /**
@@ -30,7 +29,7 @@ public class LightweightDecoratorTestCase extends DecoratorEnablementTestCase
     /**
      * Refresh the test decorator.
      */
-    public void testRefreshContributor() throws CoreException {
+	public void testRefreshContributor() {
 
         updated = false;
         getDecoratorManager().clearCaches();

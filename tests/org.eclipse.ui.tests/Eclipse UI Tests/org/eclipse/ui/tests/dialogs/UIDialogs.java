@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.dialogs;
 
-import java.io.IOException;
-
 import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IProject;
@@ -158,7 +156,7 @@ public class UIDialogs extends TestCase {
     }
     
     // see bug 211350
-    public void testLoadNotExistingPerspective() throws IOException{
+	public void testLoadNotExistingPerspective() {
     	fail("PerspectiveRegistry.getCustomPersp not implemented");
 //    	final String fakePerspectivID = "fakeperspetive";
 //		PerspectiveRegistry reg = (PerspectiveRegistry) WorkbenchPlugin

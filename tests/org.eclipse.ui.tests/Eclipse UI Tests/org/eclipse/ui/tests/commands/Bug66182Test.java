@@ -221,8 +221,8 @@ public final class Bug66182Test extends UITestCase {
 		final Object windowResult = new Object();
 		final IHandler windowHandler = new AbstractHandler() {
 
-			public Object execute(Map parameterValuesByName)
-					throws ExecutionException {
+			@Override
+			public Object execute(Map parameterValuesByName) {
 				// Do nothing.
 				return windowResult;
 			}

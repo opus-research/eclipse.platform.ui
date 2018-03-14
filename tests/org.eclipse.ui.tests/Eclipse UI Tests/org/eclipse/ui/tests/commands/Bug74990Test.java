@@ -16,7 +16,6 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.commands.AbstractHandler;
-import org.eclipse.ui.commands.ExecutionException;
 import org.eclipse.ui.commands.HandlerSubmission;
 import org.eclipse.ui.commands.ICommand;
 import org.eclipse.ui.commands.IHandler;
@@ -63,8 +62,8 @@ public final class Bug74990Test extends UITestCase {
 
 		// Create a handler submission.
 		final IHandler handler = new AbstractHandler() {
-			public final Object execute(final Map parameterValuesByName)
-					throws ExecutionException {
+			@Override
+			public final Object execute(final Map parameterValuesByName) {
 				// Do nothing.
 				return null;
 			}

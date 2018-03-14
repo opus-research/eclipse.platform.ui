@@ -11,7 +11,6 @@
 package org.eclipse.ui.tests.intro;
 
 import org.eclipse.ui.IMemento;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.intro.IIntroPart;
 import org.eclipse.ui.intro.IIntroSite;
 import org.eclipse.ui.tests.api.MockPart;
@@ -30,12 +29,13 @@ public class MockIntroPart extends MockPart implements IIntroPart {
         super();
     }
 
-    public IIntroSite getIntroSite() {
+    @Override
+	public IIntroSite getIntroSite() {
         return site;
     }
 
-    public void init(IIntroSite site, IMemento memento)
-            throws PartInitException {
+	@Override
+	public void init(IIntroSite site, IMemento memento) {
         setSite(site);
         callTrace.add("init");
     }
@@ -47,22 +47,16 @@ public class MockIntroPart extends MockPart implements IIntroPart {
         this.site = site;
     }
 
-    /**
-     * @see IViewPart#saveState(IMemento)
-     */
-    public void saveState(IMemento memento) {
+    @Override
+	public void saveState(IMemento memento) {
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.intro.IIntroPart#standbyStateChanged(boolean)
-     */
-    public void standbyStateChanged(boolean standby) {
+    @Override
+	public void standbyStateChanged(boolean standby) {
         callTrace.add("standbyStateChanged");
     }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.intro.IIntroPart#getTitle()
-	 */
+	@Override
 	public String getTitle() {
 		return "Mock intro title";
 	}

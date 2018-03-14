@@ -24,7 +24,6 @@ import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.internal.expressions.TestExpression;
 import org.eclipse.core.internal.expressions.WithExpression;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
@@ -78,11 +77,7 @@ public class EvaluationServiceTest extends UITestCase {
 		public int count = 0;
 		public boolean currentValue;
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
-		 */
+		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			count++;
 			if (event.getProperty() == IEvaluationService.RESULT
@@ -254,6 +249,7 @@ public class EvaluationServiceTest extends UITestCase {
 
 		IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
 
+			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getProperty().equals("foo"))
 					propertyChanged[0] = true;
@@ -266,6 +262,7 @@ public class EvaluationServiceTest extends UITestCase {
 
 		IPropertyChangeListener propertyShouldChangeListener = new IPropertyChangeListener() {
 
+			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getProperty().equals("foo"))
 					propertyShouldChange[0] = true;
@@ -359,17 +356,13 @@ public class EvaluationServiceTest extends UITestCase {
 			this.lookFor = lookFor;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.core.expressions.Expression#collectExpressionInfo(org.eclipse.core.expressions.ExpressionInfo)
-		 */
+		@Override
 		public void collectExpressionInfo(ExpressionInfo info) {
 			info.addVariableNameAccess("username");
 		}
 
-		public EvaluationResult evaluate(IEvaluationContext context)
-				throws CoreException {
+		@Override
+		public EvaluationResult evaluate(IEvaluationContext context) {
 			String variable = (String) context.getVariable("username");
 			return lookFor.equals(variable) ? EvaluationResult.TRUE
 					: EvaluationResult.FALSE;
@@ -527,25 +520,13 @@ public class EvaluationServiceTest extends UITestCase {
 			partId = id;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.core.expressions.Expression#collectExpressionInfo(org
-		 * .eclipse.core.expressions.ExpressionInfo)
-		 */
+		@Override
 		public void collectExpressionInfo(ExpressionInfo info) {
 			info.addVariableNameAccess(ISources.ACTIVE_PART_ID_NAME);
 			info.addVariableNameAccess(ISources.ACTIVE_CURRENT_SELECTION_NAME);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.core.expressions.Expression#evaluate(org.eclipse.core
-		 * .expressions.IEvaluationContext)
-		 */
+		@Override
 		public EvaluationResult evaluate(IEvaluationContext context){
 			Object v = context.getVariable(ISources.ACTIVE_PART_ID_NAME);
 			return EvaluationResult.valueOf(partId.equals(v));
@@ -583,6 +564,7 @@ public class EvaluationServiceTest extends UITestCase {
 
 		final ArrayList selection = new ArrayList();
 		IPropertyChangeListener listener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				IEvaluationContext state = service.getCurrentState();
 				try {
