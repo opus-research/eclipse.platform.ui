@@ -17,7 +17,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 
 /**
- * The DecoratorTableTreeTest is the test for table
+ * The DecoratorTableTreeTest is the test for table 
  * trees.
  */
 public class DecoratorTableTreeTest extends DecoratorViewerTest {
@@ -29,7 +29,9 @@ public class DecoratorTableTreeTest extends DecoratorViewerTest {
 	public DecoratorTableTreeTest(String testName) {
 		super(testName);
 	}
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.decorators.DecoratorViewerTest#backgroundCheck(org.eclipse.ui.IViewPart)
+	 */
 	protected void backgroundCheck(IViewPart view) {
 		TableTreeItem first = ((DecoratorTableTreeView) view).viewer.getTableTree().getItems()[0];
 		Assert.isTrue(first.getBackground().getRGB()
@@ -37,7 +39,9 @@ public class DecoratorTableTreeTest extends DecoratorViewerTest {
 
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.decorators.DecoratorViewerTest#foregroundCheck(org.eclipse.ui.IViewPart)
+	 */
 	protected void foregroundCheck(IViewPart view) {
 		TableTreeItem first = ((DecoratorTableTreeView) view).viewer.getTableTree().getItems()[0];
 		Assert.isTrue(first.getForeground().getRGB()
@@ -45,12 +49,16 @@ public class DecoratorTableTreeTest extends DecoratorViewerTest {
 
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.decorators.DecoratorViewerTest#openView(org.eclipse.ui.IWorkbenchPage)
+	 */
 	protected IViewPart openView(IWorkbenchPage page) throws PartInitException {
 		return page.showView("org.eclipse.ui.tests.decorator.TableTreeTest");
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.decorators.DecoratorViewerTest#fontCheck(org.eclipse.ui.IViewPart)
+	 */
 	protected void fontCheck(IViewPart view) {
 		TableTreeItem first = ((DecoratorTableTreeView) view).viewer.getTableTree().getItems()[0];
 		Assert.isTrue(first.getFont().getFontData()[0]

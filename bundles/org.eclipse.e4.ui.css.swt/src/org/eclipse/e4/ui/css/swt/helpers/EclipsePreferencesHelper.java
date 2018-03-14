@@ -27,10 +27,6 @@ public class EclipsePreferencesHelper {
 
 	private static IPreferenceChangeListener preferenceChangeListener;
 
-	private static String previousThemeId;
-
-	private static String currentThemeId;
-
 	public static void appendOverriddenPropertyName(
 			IEclipsePreferences preferences, String name) {
 		String value = preferences.get(PROPS_OVERRIDDEN_BY_CSS_PROP, SEPARATOR);
@@ -58,7 +54,7 @@ public class EclipsePreferencesHelper {
 	}
 
 	public static List<String> getOverriddenPropertyNames(
-			IEclipsePreferences preferences) {
+			Preferences preferences) {
 		String value = preferences.get(PROPS_OVERRIDDEN_BY_CSS_PROP, null);
 		if (value == null) {
 			return Collections.emptyList();
@@ -79,8 +75,8 @@ public class EclipsePreferencesHelper {
 		.removePreferenceChangeListener(getPreferenceChangeListener());
 	}
 
-	public static void removeOverriddenByCssProperty(
-			IEclipsePreferences preferences, String preferenceToRemove) {
+	public static void removeOverriddenByCssProperty(Preferences preferences,
+			String preferenceToRemove) {
 		StringBuilder overriddenByCSS = new StringBuilder(SEPARATOR);
 		for (String preference : getOverriddenPropertyNames(preferences)) {
 			if (!preference.equals(preferenceToRemove)) {
@@ -89,18 +85,6 @@ public class EclipsePreferencesHelper {
 		}
 		preferences.put(PROPS_OVERRIDDEN_BY_CSS_PROP,
 				overriddenByCSS.toString());
-	}
-
-	public static void setPreviousThemeId(String themeId) {
-		previousThemeId = themeId;
-	}
-
-	public static void setCurrentThemeId(String themeId) {
-		currentThemeId = themeId;
-	}
-
-	public static boolean isThemeChanged() {
-		return currentThemeId != null && !currentThemeId.equals(previousThemeId);
 	}
 
 	public static class PreferenceOverriddenByCssChangeListener implements
@@ -124,11 +108,8 @@ public class EclipsePreferencesHelper {
 		}
 
 		protected void removeOverriddenByCssProperty(PreferenceChangeEvent event) {
-			Preferences preferences = event.getNode();
-			if (preferences instanceof IEclipsePreferences) {
-				EclipsePreferencesHelper.removeOverriddenByCssProperty(
-						(IEclipsePreferences) preferences, event.getKey());
-			}
+			EclipsePreferencesHelper.removeOverriddenByCssProperty(
+					event.getNode(), event.getKey());
 		}
 	}
 }

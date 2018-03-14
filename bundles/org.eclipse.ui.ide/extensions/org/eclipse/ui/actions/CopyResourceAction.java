@@ -85,8 +85,7 @@ public class CopyResourceAction extends SelectionListenerAction implements
      * 
      * @deprecated {@link #CopyResourceAction(IShellProvider)}
      */
-    @Deprecated
-	public CopyResourceAction(Shell shell) {
+    public CopyResourceAction(Shell shell) {
         this(shell, IDEWorkbenchMessages.CopyResourceAction_title);
     }
     
@@ -109,13 +108,11 @@ public class CopyResourceAction extends SelectionListenerAction implements
      *   
      * @deprecated {@link #CopyResourceAction(IShellProvider, String)}
      */
-    @Deprecated
-	CopyResourceAction(final Shell shell, String name) {
+    CopyResourceAction(final Shell shell, String name) {
         super(name);
         Assert.isNotNull(shell);
         shellProvider = new IShellProvider(){
-        	@Override
-			public Shell getShell(){
+        	public Shell getShell(){
         		return shell;
         	}
         };
@@ -191,8 +188,7 @@ public class CopyResourceAction extends SelectionListenerAction implements
      * <code>ISelectionValidator</code> method checks whether the given path
      * is a good place to copy the selected resources.
      */
-    @Override
-	public String isValid(Object destination) {
+    public String isValid(Object destination) {
         IWorkspaceRoot root = IDEWorkbenchPlugin.getPluginWorkspace().getRoot();
         IContainer container = (IContainer) root
                 .findMember((IPath) destination);
@@ -233,8 +229,7 @@ public class CopyResourceAction extends SelectionListenerAction implements
     /* (non-Javadoc)
      * Method declared on IAction.
      */
-    @Override
-	public void run() {
+    public void run() {
         try {
             operation = createOperation();
             operation.setModelProviderIds(getModelProviderIds());
@@ -279,8 +274,7 @@ public class CopyResourceAction extends SelectionListenerAction implements
      * all of the one or more selections are sibling resources which are 
      * local (depth infinity).
      */
-    @Override
-	protected boolean updateSelection(IStructuredSelection selection) {
+    protected boolean updateSelection(IStructuredSelection selection) {
         if (!super.updateSelection(selection)) {
             return false;
         }

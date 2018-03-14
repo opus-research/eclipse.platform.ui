@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 package org.eclipse.ui.menus;
 
@@ -205,15 +204,15 @@ public class CommandContributionItem extends ContributionItem {
 		this.visibleEnabled = contributionParameters.visibleEnabled;
 		this.mode = contributionParameters.mode;
 
-		menuService = contributionParameters.serviceLocator
+		menuService = (IMenuService) contributionParameters.serviceLocator
 				.getService(IMenuService.class);
-		commandService = contributionParameters.serviceLocator
+		commandService = (ICommandService) contributionParameters.serviceLocator
 				.getService(ICommandService.class);
-		handlerService = contributionParameters.serviceLocator
+		handlerService = (IHandlerService) contributionParameters.serviceLocator
 				.getService(IHandlerService.class);
-		bindingService = contributionParameters.serviceLocator
+		bindingService = (IBindingService) contributionParameters.serviceLocator
 				.getService(IBindingService.class);
-		IWorkbenchLocationService workbenchLocationService = contributionParameters.serviceLocator.getService(IWorkbenchLocationService.class);
+		IWorkbenchLocationService workbenchLocationService = (IWorkbenchLocationService) contributionParameters.serviceLocator.getService(IWorkbenchLocationService.class);
 		display = workbenchLocationService.getWorkbench().getDisplay();
 		
 		createCommand(contributionParameters.commandId,
@@ -231,7 +230,7 @@ public class CommandContributionItem extends ContributionItem {
 						// it's OK to not have a helpContextId
 					}
 				}
-				IWorkbenchLocationService wls = contributionParameters.serviceLocator
+				IWorkbenchLocationService wls = (IWorkbenchLocationService) contributionParameters.serviceLocator
 						.getService(IWorkbenchLocationService.class);
 				final IWorkbench workbench = wls.getWorkbench();
 				if (workbench != null && helpContextId != null) {
@@ -287,7 +286,7 @@ public class CommandContributionItem extends ContributionItem {
 
 	private void setImages(IServiceLocator locator, String iconStyle) {
 		if (icon == null) {
-			ICommandImageService service = locator
+			ICommandImageService service = (ICommandImageService) locator
 					.getService(ICommandImageService.class);
 			icon = service.getImageDescriptor(command.getId(),
 					ICommandImageService.TYPE_DEFAULT, iconStyle);
@@ -574,16 +573,10 @@ public class CommandContributionItem extends ContributionItem {
 		ToolItem item = (ToolItem) widget;
 
 		String text = label;
-		String tooltip = label;
-
 		if (text == null) {
 			if (command != null) {
 				try {
 					text = command.getCommand().getName();
-					tooltip = command.getCommand().getDescription();
-					if (tooltip == null || tooltip.trim().length() == 0) {
-						tooltip = text;
-					}
 				} catch (NotDefinedException e) {
 					StatusManager.getManager().handle(
 							StatusUtil.newStatus(IStatus.ERROR,
@@ -598,7 +591,7 @@ public class CommandContributionItem extends ContributionItem {
 			item.setText(text);
 		}
 
-		String toolTipText = getToolTipText(tooltip);
+		String toolTipText = getToolTipText(text);
 		item.setToolTipText(toolTipText);
 
 		if (item.getSelection() != checkedState) {

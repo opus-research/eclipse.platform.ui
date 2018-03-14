@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  ******************************************************************************/
 
 package org.eclipse.ui.internal.handlers;
@@ -43,7 +42,7 @@ public class QuickMenuHandler extends AbstractHandler implements IMenuListener2 
 			if (!(menu instanceof ContributionManager)) {
 				return;
 			}
-			IMenuService service = PlatformUI.getWorkbench()
+			IMenuService service = (IMenuService) PlatformUI.getWorkbench()
 					.getService(IMenuService.class);
 			service.populateContributionManager((ContributionManager) menu,
 					locationURI);
@@ -93,7 +92,7 @@ public class QuickMenuHandler extends AbstractHandler implements IMenuListener2 
 
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
-				IMenuService service = PlatformUI.getWorkbench()
+				IMenuService service = (IMenuService) PlatformUI.getWorkbench()
 						.getService(IMenuService.class);
 				service.releaseContributions((ContributionManager) managerM);
 				return Status.OK_STATUS;
