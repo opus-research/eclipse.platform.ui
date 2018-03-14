@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,6 @@ import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.SideValue;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
-import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
 import org.junit.Test;
@@ -32,7 +31,7 @@ public abstract class ModelReconcilerTrimContainerTest extends
 
 		MTrimmedWindow window = createTrimmedWindow(application);
 
-		MTrimBar trimBar = BasicFactoryImpl.eINSTANCE.createTrimBar();
+		MTrimBar trimBar = ems.createModelElement(MTrimBar.class);
 		trimBar.setSide(applicationState);
 		window.getTrimBars().add(trimBar);
 
