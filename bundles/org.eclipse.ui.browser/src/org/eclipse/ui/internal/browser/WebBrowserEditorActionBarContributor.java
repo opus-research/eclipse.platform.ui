@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,6 @@ public class WebBrowserEditorActionBarContributor extends EditorActionBarContrib
 	protected Updater updater = new Updater();
 
 	class Updater implements BrowserViewer.IBackNextListener {
-		@Override
 		public void updateBackNextBusy() {
 			if (back == null)
 				return;
@@ -45,7 +44,6 @@ public class WebBrowserEditorActionBarContributor extends EditorActionBarContrib
 	/*
 	 * Sets the active editor for the contributor.
 	 */
-	@Override
 	public void setActiveEditor(IEditorPart targetEditor) {
 		if (targetEditor instanceof WebBrowserEditor) {
 			editor = (WebBrowserEditor) targetEditor;
@@ -63,8 +61,7 @@ public class WebBrowserEditorActionBarContributor extends EditorActionBarContrib
 	/*
     * Contributes to the given tool bar.
     */
-   @Override
-public void contributeToToolBar(IToolBarManager toolBarManager) {
+   public void contributeToToolBar(IToolBarManager toolBarManager) {
    	if (editor == null)
    		return;
    	/*WebBrowserEditorInput input = editor.getWebBrowserEditorInput();
