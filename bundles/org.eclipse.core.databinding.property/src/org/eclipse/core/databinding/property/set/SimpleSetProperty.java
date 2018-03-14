@@ -70,7 +70,7 @@ public abstract class SimpleSetProperty<S, E> extends SetProperty<S, E> {
 	 * @param diff
 	 *            a diff describing the change
 	 * @noreference This method is not intended to be referenced by clients.
-	 * @since 1.7
+	 * @since 1.6
 	 */
 	public final void setSet(S source, Set<E> set, SetDiff<E> diff) {
 		if (source != null && !diff.isEmpty())
