@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2007 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 468380
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -39,7 +40,7 @@ public final class UIPlugin extends AbstractUIPlugin {
     /**
      * Returns the image registry for this plugin.
      *
-     * Where are the images?  The images (typically gifs) are found in the
+     * Where are the images?  The images (typically png files) are found in the
      * same plugins directory.
      *
      * @see ImageRegistry
