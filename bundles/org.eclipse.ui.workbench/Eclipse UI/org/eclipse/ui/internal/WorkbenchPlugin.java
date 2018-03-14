@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 400714, 441267
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Replace deprecated API usage in WorkbenchPlugin#createExtension - http://bugs.eclipse.org/400714 
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -26,11 +26,9 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.e4.core.commands.internal.ICommandHelpService;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.ui.internal.workbench.IHelpService;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -52,8 +50,6 @@ import org.eclipse.ui.IWorkingSetManager;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.decorators.DecoratorManager;
 import org.eclipse.ui.internal.dialogs.WorkbenchPreferenceManager;
-import org.eclipse.ui.internal.help.CommandHelpServiceImpl;
-import org.eclipse.ui.internal.help.HelpServiceImpl;
 import org.eclipse.ui.internal.intro.IIntroRegistry;
 import org.eclipse.ui.internal.intro.IntroRegistry;
 import org.eclipse.ui.internal.misc.StatusUtil;
@@ -204,10 +200,6 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
     
 	private ServiceTracker testableTracker = null;
 	
-	private IHelpService helpService;
-
-	private ICommandHelpService commandHelpService;
-
     /**
      * Create an instance of the WorkbenchPlugin. The workbench plugin is
      * effectively the "application" for the workbench UI. The entire UI
@@ -241,7 +233,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 
         preferenceManager = null;
         if (viewRegistry != null) {
-			// nothing to dispose for viewRegistry
+            viewRegistry.dispose();
             viewRegistry = null;
         }
         if (perspRegistry != null) {
@@ -253,9 +245,6 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 
         productInfo = null;
         introRegistry = null;
-
-		helpService = null;
-		commandHelpService = null;
         
         if (operationSupport != null) {
         	operationSupport.dispose();
@@ -527,19 +516,74 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
     }
 
     /**
-	 * Returns the presentation factory with the given id, or <code>null</code>
-	 * if not found.
-	 * 
-	 * @param targetID
-	 *            The id of the presentation factory to use.
-	 * @return AbstractPresentationFactory or <code>null</code> if not factory
-	 *         matches that id.
-	 * 
-	 * @deprecated Does not do anything anymore
-	 */
-	@Deprecated
+     * Returns the presentation factory with the given id, or <code>null</code> if not found.
+     * @param targetID The id of the presentation factory to use.
+     * @return AbstractPresentationFactory or <code>null</code>
+     * if not factory matches that id.
+     */
     public AbstractPresentationFactory getPresentationFactory(String targetID) {
-		return null;
+        Object o = createExtension(
+                IWorkbenchRegistryConstants.PL_PRESENTATION_FACTORIES,
+                "factory", targetID); //$NON-NLS-1$
+        if (o instanceof AbstractPresentationFactory) {
+            return (AbstractPresentationFactory) o;
+        }
+        WorkbenchPlugin
+                .log("Error creating presentation factory: " + targetID + " -- class is not an AbstractPresentationFactory"); //$NON-NLS-1$ //$NON-NLS-2$
+        return null;
+    }
+
+    /**
+     * Looks up the configuration element with the given id on the given extension point
+     * and instantiates the class specified by the class attributes.
+     * 
+     * @param extensionPointId the extension point id (simple id)
+     * @param elementName the name of the configuration element, or <code>null</code>
+     *   to match any element
+     * @param targetID the target id
+     * @return the instantiated extension object, or <code>null</code> if not found
+     */
+    private Object createExtension(String extensionPointId, String elementName,
+            String targetID) {
+        IExtensionPoint extensionPoint = Platform.getExtensionRegistry()
+                .getExtensionPoint(PI_WORKBENCH, extensionPointId);
+        if (extensionPoint == null) {
+            WorkbenchPlugin
+                    .log("Unable to find extension. Extension point: " + extensionPointId + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
+            return null;
+        }
+
+        // Loop through the config elements.
+        IConfigurationElement targetElement = null;
+        IConfigurationElement[] elements = extensionPoint
+                .getConfigurationElements();
+        for (int j = 0; j < elements.length; j++) {
+            IConfigurationElement element = elements[j];
+            if (elementName == null || elementName.equals(element.getName())) {
+                String strID = element.getAttribute("id"); //$NON-NLS-1$
+                if (targetID.equals(strID)) {
+                    targetElement = element;
+                    break;
+                }
+            }
+        }
+        if (targetElement == null) {
+            // log it since we cannot safely display a dialog.
+            WorkbenchPlugin.log("Unable to find extension: " + targetID //$NON-NLS-1$
+                    + " in extension point: " + extensionPointId); //$NON-NLS-1$ 
+            return null;
+        }
+
+        // Create the extension.
+        try {
+            return createExtension(targetElement, "class"); //$NON-NLS-1$
+        } catch (CoreException e) {
+            // log it since we cannot safely display a dialog.
+            WorkbenchPlugin.log("Unable to create extension: " + targetID //$NON-NLS-1$
+                    + " in extension point: " + extensionPointId //$NON-NLS-1$
+                    + ", status: ", e.getStatus()); //$NON-NLS-1$
+        }
+        return null;
     }
 
     /**
@@ -1478,25 +1522,6 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 					editorRegistry = new EditorRegistry();
 				}
 				return editorRegistry;
-			}
-		});
-		context.set(IHelpService.class.getName(), new ContextFunction() {
-			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
-				if (helpService == null) {
-					helpService = new HelpServiceImpl();
-				}
-				return helpService;
-			}
-		});
-		context.set(ICommandHelpService.class.getName(), new ContextFunction() {
-			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
-				if (commandHelpService == null) {
-					commandHelpService = ContextInjectionFactory.make(CommandHelpServiceImpl.class,
-							e4Context);
-				}
-				return commandHelpService;
 			}
 		});
 	}

@@ -39,7 +39,6 @@ public class AddMarkersAction implements IWorkbenchWindowActionDelegate {
 	 * 
 	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#dispose()
 	 */
-	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
 
@@ -50,7 +49,6 @@ public class AddMarkersAction implements IWorkbenchWindowActionDelegate {
 	 * 
 	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui.IWorkbenchWindow)
 	 */
-	@Override
 	public void init(IWorkbenchWindow workbenchWindow) {
 	}
 
@@ -59,11 +57,9 @@ public class AddMarkersAction implements IWorkbenchWindowActionDelegate {
 	 * 
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
-	@Override
 	public void run(IAction action) {
 
 		Job addJob = new Job("Add Markers") {
-			@Override
 			protected IStatus run(
 					org.eclipse.core.runtime.IProgressMonitor monitor) {
 				try {
@@ -105,7 +101,6 @@ public class AddMarkersAction implements IWorkbenchWindowActionDelegate {
 	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction,
 	 *      org.eclipse.jface.viewers.ISelection)
 	 */
-	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
 		// TODO Auto-generated method stub
 

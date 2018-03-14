@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 Tom Schindl and others.
+ * Copyright (c) 2006, 2007 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414565
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -18,7 +17,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.eclipse.jface.resource.FontRegistry;
-import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableColorProvider;
 import org.eclipse.jface.viewers.ITableFontProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -44,6 +43,41 @@ import org.eclipse.swt.widgets.TableColumn;
  */
 public class Snippet045TableViewerFillFromBackgroundThread {
 	private static int COUNTER = 0;
+
+	private class MyContentProvider implements IStructuredContentProvider {
+
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+		 */
+		@Override
+		public Object[] getElements(Object inputElement) {
+			return ((List) inputElement).toArray();
+		}
+
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+		 */
+		@Override
+		public void dispose() {
+
+		}
+
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
+		 *      java.lang.Object, java.lang.Object)
+		 */
+		@Override
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+
+		}
+
+	}
 
 	public class MyModel {
 		public int counter;
@@ -103,7 +137,7 @@ public class Snippet045TableViewerFillFromBackgroundThread {
 		final TableViewer v = new TableViewer(shell, SWT.BORDER
 				| SWT.FULL_SELECTION);
 		v.setLabelProvider(new MyLabelProvider());
-		v.setContentProvider(ArrayContentProvider.getInstance());
+		v.setContentProvider(new MyContentProvider());
 
 		TableColumn column = new TableColumn(v.getTable(), SWT.NONE);
 		column.setWidth(200);
@@ -113,7 +147,7 @@ public class Snippet045TableViewerFillFromBackgroundThread {
 		column.setWidth(200);
 		column.setText("Column 2");
 
-		final List<MyModel> model = new ArrayList<MyModel>();
+		final ArrayList model = new ArrayList();
 		v.setInput(model);
 		v.setComparator(new ViewerComparator() {
 			@Override
@@ -162,7 +196,9 @@ public class Snippet045TableViewerFillFromBackgroundThread {
 			if (!display.readAndDispatch())
 				display.sleep();
 		}
+
 		display.dispose();
+
 	}
 
 }

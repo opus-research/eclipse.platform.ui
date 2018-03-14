@@ -51,7 +51,6 @@ public class MenusTest extends UITestCase {
 			super(location, namespace);
 		}
 
-		@Override
 		public void createContributionItems(IServiceLocator serviceLocator,
 				IContributionRoot additions) {
 			fooItemWithNoVisibilityClause = new CommandContributionItem(
@@ -92,13 +91,12 @@ public class MenusTest extends UITestCase {
 	 * 
 	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
 	 */
-	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		window = openTestWindow();
 		enabledActivities = window.getWorkbench().getActivitySupport()
 				.getActivityManager().getEnabledActivityIds();
-		service = window.getService(IMenuService.class);
+		service = (IMenuService) window.getService(IMenuService.class);
 		assertNotNull(service);
 	}
 
@@ -107,7 +105,6 @@ public class MenusTest extends UITestCase {
 	 * 
 	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doTearDown()
 	 */
-	@Override
 	protected void doTearDown() throws Exception {
 		window.getWorkbench().getActivitySupport().setEnabledActivityIds(
 				enabledActivities);

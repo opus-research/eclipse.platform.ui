@@ -370,16 +370,14 @@ class TaskListContentProvider implements IStructuredContentProvider,
      * The visual part that is using this content provider is about
      * to be disposed. Deallocate all allocated SWT resources.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         if (input != null) {
             input.getWorkspace().removeResourceChangeListener(this);
             input = null;
         }
     }
 
-    @Override
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         if (this.input != null) {
             this.input.getWorkspace().removeResourceChangeListener(this);
         }
@@ -398,8 +396,7 @@ class TaskListContentProvider implements IStructuredContentProvider,
      * Returns all the markers that should be shown for
      * the current settings.
      */
-    @Override
-	public Object[] getElements(Object parent) {
+    public Object[] getElements(Object parent) {
         try {
             IMarker[] markers = getMarkers();
             this.visibleMarkerCounts = getMarkerCounts(Arrays.asList(markers));
@@ -409,8 +406,7 @@ class TaskListContentProvider implements IStructuredContentProvider,
                     setMarkerLimitExceeded(true);
 
                     viewer.getControl().getDisplay().syncExec(new Runnable() {
-                        @Override
-						public void run() {
+                        public void run() {
                             viewer.refresh();
                         }
                     });
@@ -422,8 +418,7 @@ class TaskListContentProvider implements IStructuredContentProvider,
                     setMarkerLimitExceeded(false);
 
                     viewer.getControl().getDisplay().syncExec(new Runnable() {
-                        @Override
-						public void run() {
+                        public void run() {
                             viewer.refresh();
                         }
                     });
@@ -442,8 +437,7 @@ class TaskListContentProvider implements IStructuredContentProvider,
      *
      * @see IResourceChangeListener#resourceChanged
      */
-    @Override
-	public void resourceChanged(final IResourceChangeEvent event) {
+    public void resourceChanged(final IResourceChangeEvent event) {
         /*
          * gather all marker changes from the delta. be sure to do this in the 
          * calling thread, as the delta is destroyed when this method returns
@@ -546,8 +540,7 @@ class TaskListContentProvider implements IStructuredContentProvider,
          * description
          */
         viewer.getControl().getDisplay().syncExec(new Runnable() {
-            @Override
-			public void run() {
+            public void run() {
                 if (getFilterOnMarkerLimit()
                         && sum(visibleMarkerCounts) > getMarkerLimit()) {
                     if (!isMarkerLimitExceeded()) {

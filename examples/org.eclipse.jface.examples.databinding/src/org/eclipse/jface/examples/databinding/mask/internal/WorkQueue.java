@@ -36,16 +36,14 @@ public class WorkQueue {
     private Set pendingWorkSet = new HashSet();
 
     private Runnable updateJob = new Runnable() {
-        @Override
-		public void run() {
+        public void run() {
             doUpdate();
             updateScheduled = false;
         }
     };
 
     private Listener paintListener = new Listener() {
-        @Override
-		public void handleEvent(Event event) {
+        public void handleEvent(Event event) {
             paintListenerAttached = false;
             d.removeFilter(SWT.Paint, this);
             doUpdate();

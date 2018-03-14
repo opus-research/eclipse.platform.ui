@@ -106,7 +106,6 @@ public class ArbitraryPropertiesEditorTest extends TestCase {
 		 * 
 		 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
 		 */
-		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			count++;
 		}

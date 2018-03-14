@@ -21,7 +21,6 @@ import org.eclipse.core.commands.ExecutionEvent;
  */
 public class DefaultHandler extends AbstractHandler{
 
-	@Override
 	public Object execute(ExecutionEvent event){
 		// does nothing
 		return null;

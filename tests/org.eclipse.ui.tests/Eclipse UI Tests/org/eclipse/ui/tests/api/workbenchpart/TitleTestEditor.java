@@ -55,24 +55,21 @@ public class TitleTestEditor extends EditorPart {
     /* (non-Javadoc)
      * @see org.eclipse.ui.ISaveablePart#doSave(org.eclipse.core.runtime.IProgressMonitor)
      */
-    @Override
-	public void doSave(IProgressMonitor monitor) {
+    public void doSave(IProgressMonitor monitor) {
 
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.ISaveablePart#doSaveAs()
      */
-    @Override
-	public void doSaveAs() {
+    public void doSaveAs() {
 
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IEditorPart#init(org.eclipse.ui.IEditorSite, org.eclipse.ui.IEditorInput)
      */
-    @Override
-	public void init(IEditorSite site, IEditorInput input)
+    public void init(IEditorSite site, IEditorInput input)
             throws PartInitException {
 
         if (!(input instanceof IFileEditorInput))
@@ -85,8 +82,7 @@ public class TitleTestEditor extends EditorPart {
     /* (non-Javadoc)
      * @see org.eclipse.ui.ISaveablePart#isDirty()
      */
-    @Override
-	public boolean isDirty() {
+    public boolean isDirty() {
         // TODO Auto-generated method stub
         return false;
     }
@@ -94,8 +90,7 @@ public class TitleTestEditor extends EditorPart {
     /* (non-Javadoc)
      * @see org.eclipse.ui.ISaveablePart#isSaveAsAllowed()
      */
-    @Override
-	public boolean isSaveAsAllowed() {
+    public boolean isSaveAsAllowed() {
         // TODO Auto-generated method stub
         return false;
     }
@@ -103,8 +98,7 @@ public class TitleTestEditor extends EditorPart {
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
      */
-    @Override
-	public void createPartControl(Composite parent) {
+    public void createPartControl(Composite parent) {
         composite = new Composite(parent, SWT.NONE);
         CellLayout layout = new CellLayout(2).setColumn(0, Row.fixed())
                 .setColumn(1, Row.growing());
@@ -116,8 +110,7 @@ public class TitleTestEditor extends EditorPart {
         title.setText(getTitle());
 
         title.addModifyListener(new ModifyListener() {
-            @Override
-			public void modifyText(ModifyEvent e) {
+            public void modifyText(ModifyEvent e) {
                 setTitle(title.getText());
             }
         });
@@ -127,8 +120,7 @@ public class TitleTestEditor extends EditorPart {
         name = new Text(composite, SWT.BORDER);
         name.setText(getPartName());
         name.addModifyListener(new ModifyListener() {
-            @Override
-			public void modifyText(ModifyEvent e) {
+            public void modifyText(ModifyEvent e) {
                 setPartName(name.getText());
             }
         });
@@ -138,8 +130,7 @@ public class TitleTestEditor extends EditorPart {
         contentDescription = new Text(composite, SWT.BORDER);
         contentDescription.setText(getContentDescription());
         contentDescription.addModifyListener(new ModifyListener() {
-            @Override
-			public void modifyText(ModifyEvent e) {
+            public void modifyText(ModifyEvent e) {
                 setContentDescription(contentDescription.getText());
             }
         });
@@ -162,8 +153,7 @@ public class TitleTestEditor extends EditorPart {
             /* (non-Javadoc)
              * @see org.eclipse.ui.IPropertyListener#propertyChanged(java.lang.Object, int)
              */
-            @Override
-			public void propertyChanged(Object source, int propId) {
+            public void propertyChanged(Object source, int propId) {
                 updateLabels();
             }
         });
@@ -178,8 +168,7 @@ public class TitleTestEditor extends EditorPart {
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchPart#setFocus()
      */
-    @Override
-	public void setFocus() {
+    public void setFocus() {
         composite.setFocus();
 
     }

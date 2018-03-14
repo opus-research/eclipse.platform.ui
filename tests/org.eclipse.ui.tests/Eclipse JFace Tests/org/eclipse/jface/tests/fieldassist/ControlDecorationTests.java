@@ -89,11 +89,12 @@ public class ControlDecorationTests extends AbstractFieldAssistTestCase {
 		decoration.showHoverText("Show me");
 		assertOneShellUp();
 	}
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.tests.fieldassist.AbstractFieldAssistTestCase#createFieldAssistWindow()
+	 */
 	protected AbstractFieldAssistWindow createFieldAssistWindow() {
 		return new TextFieldAssistWindow() {
-				@Override
 				protected void createExtraControls(Composite parent) {
 					anotherControl = new Text(parent, SWT.DEFAULT);
 				}

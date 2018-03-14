@@ -11,7 +11,6 @@
  *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  *     		Implemented workbench auto-save to correctly restore state in case of crash.
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 366364
- *     Terry Parker <tparker@google.com> - Bug 416673
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench.swt;
@@ -26,6 +25,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import org.eclipse.core.databinding.observable.Realm;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
@@ -36,7 +36,6 @@ import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
 import org.eclipse.e4.core.internal.services.EclipseAdapter;
-import org.eclipse.e4.core.internal.services.ResourceBundleHelper;
 import org.eclipse.e4.core.services.adapter.Adapter;
 import org.eclipse.e4.core.services.contributions.IContributionFactory;
 import org.eclipse.e4.core.services.log.ILoggerProvider;
@@ -109,7 +108,6 @@ public class E4Application implements IApplication {
 	private static final String APPLICATION_MODEL_PATH_DEFAULT = "Application.e4xmi";
 	private static final String PERSPECTIVE_ARG_NAME = "perspective";
 	private static final String DEFAULT_THEME_ID = "org.eclipse.e4.ui.css.theme.e4_default";
-	public static final String HIGH_CONTRAST_THEME_ID = "org.eclipse.e4.ui.css.theme.high-contrast";
 
 	private String[] args;
 
@@ -185,19 +183,10 @@ public class E4Application implements IApplication {
 
 	public void saveModel() {
 		try {
-			if (!(handler instanceof ResourceHandler)
-					|| ((ResourceHandler) handler).hasTopLevelWindows()) {
-				handler.save();
-			} else {
-				Logger logger = new WorkbenchLogger(PLUGIN_ID);
-				logger.error(
-						new Exception(), // log a stack trace for debugging
-						"Attempted to save a workbench model that had no top-level windows! " //$NON-NLS-1$
-								+ "Skipped saving the model to avoid corruption."); //$NON-NLS-1$
-			}
+			handler.save();
 		} catch (IOException e) {
-			Logger logger = new WorkbenchLogger(PLUGIN_ID);
-			logger.error(e, "Error saving the workbench model"); //$NON-NLS-1$
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -301,8 +290,31 @@ public class E4Application implements IApplication {
 				false);
 		appContext.set(IWorkbench.XMI_URI_ARG, xmiURI);
 
-		setCSSContextVariables(applicationContext, appContext);
+		String cssURI = getArgValue(IWorkbench.CSS_URI_ARG, applicationContext,
+				false);
+		if (cssURI != null) {
+			appContext.set(IWorkbench.CSS_URI_ARG, cssURI);
+		}
 
+		String themeId = getArgValue(E4Application.THEME_ID,
+				applicationContext, false);
+		if (themeId == null && cssURI == null) {
+			themeId = DEFAULT_THEME_ID;
+		}
+		appContext.set(E4Application.THEME_ID, themeId);
+
+		// validate static CSS URI
+		if (cssURI != null && !cssURI.startsWith("platform:/plugin/")) {
+			System.err
+					.println("Warning. "
+							+ "Use the \"platform:/plugin/Bundle-SymbolicName/path/filename.extension\" "
+							+ "URI for the \"" + IWorkbench.CSS_URI_ARG + "\" parameter."); //$NON-NLS-1$
+			appContext.set(E4Application.THEME_ID, cssURI);
+		}
+
+		String cssResourcesURI = getArgValue(IWorkbench.CSS_RESOURCE_URI_ARG,
+				applicationContext, false);
+		appContext.set(IWorkbench.CSS_RESOURCE_URI_ARG, cssResourcesURI);
 		appContext.set(
 				E4Workbench.RENDERER_FACTORY_URI,
 				getArgValue(E4Workbench.RENDERER_FACTORY_URI,
@@ -321,39 +333,6 @@ public class E4Application implements IApplication {
 		return workbench = new E4Workbench(appModel, appContext);
 	}
 
-	private void setCSSContextVariables(IApplicationContext applicationContext,
-			IEclipseContext context) {
-		boolean highContrastMode = getApplicationDisplay().getHighContrast();
-
-		String cssURI = highContrastMode ? null : getArgValue(
-				IWorkbench.CSS_URI_ARG, applicationContext, false);
-
-		if (cssURI != null) {
-			context.set(IWorkbench.CSS_URI_ARG, cssURI);
-		}
-
-		String themeId = highContrastMode ? HIGH_CONTRAST_THEME_ID
-				: getArgValue(E4Application.THEME_ID, applicationContext, false);
-
-		if (themeId == null && cssURI == null) {
-			themeId = DEFAULT_THEME_ID;
-		}
-
-		context.set(E4Application.THEME_ID, themeId);
-
-		// validate static CSS URI
-		if (cssURI != null && !cssURI.startsWith("platform:/plugin/")) {
-			System.err
-					.println("Warning. Use the \"platform:/plugin/Bundle-SymbolicName/path/filename.extension\" URI for the  parameter:   "
-							+ IWorkbench.CSS_URI_ARG); //$NON-NLS-1$
-			context.set(E4Application.THEME_ID, cssURI);
-		}
-
-		String cssResourcesURI = getArgValue(IWorkbench.CSS_RESOURCE_URI_ARG,
-				applicationContext, false);
-		context.set(IWorkbench.CSS_RESOURCE_URI_ARG, cssResourcesURI);
-	}
-
 	private MApplication loadApplicationModel(IApplicationContext appContext,
 			IEclipseContext eclipseContext) {
 		MApplication theApp = null;
@@ -368,13 +347,9 @@ public class E4Application implements IApplication {
 			if (brandingBundle != null)
 				appModelPath = brandingBundle.getSymbolicName() + "/"
 						+ E4Application.APPLICATION_MODEL_PATH_DEFAULT;
-			else {
-				Logger logger = new WorkbenchLogger(PLUGIN_ID);
-				logger.error(
-						new Exception(), // log a stack trace for debugging
-						"applicationXMI parameter not set and no branding plugin defined. "); //$NON-NLS-1$
-			}
 		}
+		Assert.isNotNull(appModelPath, IWorkbench.XMI_URI_ARG
+				+ " argument missing"); //$NON-NLS-1$
 
 		URI initialWorkbenchDefinitionInstance;
 
@@ -542,13 +517,8 @@ public class E4Application implements IApplication {
 		});
 
 		// translation
-		String defaultLocaleString = Locale.getDefault().toString();
-
-		// ensure the default Locale value is correct
-		Locale transformedLocale = ResourceBundleHelper.toLocale(
-				defaultLocaleString, Locale.ENGLISH);
-
-		appContext.set(TranslationService.LOCALE, transformedLocale.toString());
+		String locale = Locale.getDefault().toString();
+		appContext.set(TranslationService.LOCALE, locale);
 		TranslationService bundleTranslationProvider = TranslationProviderFactory
 				.bundleTranslationService(appContext);
 		appContext.set(TranslationService.class, bundleTranslationProvider);

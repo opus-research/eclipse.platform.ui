@@ -55,7 +55,6 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
  * </p>
  * @deprecated use WizardResourceImportPage
  */
-@Deprecated
 public abstract class WizardImportPage extends WizardDataTransferPage {
     private IResource currentResourceSelection;
 
@@ -101,16 +100,14 @@ public abstract class WizardImportPage extends WizardDataTransferPage {
      * <code>WizardDataTransferPage</code> method returns <code>true</code>. 
      * Subclasses may override this method.
      */
-    @Override
-	protected boolean allowNewContainerName() {
+    protected boolean allowNewContainerName() {
         return true;
     }
 
     /** (non-Javadoc)
      * Method declared on IDialogPage.
      */
-    @Override
-	public void createControl(Composite parent) {
+    public void createControl(Composite parent) {
         Composite composite = new Composite(parent, SWT.NULL);
         composite.setLayout(new GridLayout());
         composite.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_FILL
@@ -187,8 +184,7 @@ public abstract class WizardImportPage extends WizardDataTransferPage {
      *
      * @param message the error message
      */
-    @Override
-	protected void displayErrorDialog(String message) {
+    protected void displayErrorDialog(String message) {
         MessageDialog.open(MessageDialog.ERROR, getContainer().getShell(), IDEWorkbenchMessages.WizardImportPage_errorDialogTitle, message, SWT.SHEET);
     }
 
@@ -263,8 +259,7 @@ public abstract class WizardImportPage extends WizardDataTransferPage {
      * <code>Listener</code> method handles all events and enablements for controls
      * on this page. Subclasses may extend.
      */
-    @Override
-	public void handleEvent(Event event) {
+    public void handleEvent(Event event) {
         Widget source = event.widget;
 
         if (source == containerBrowseButton) {
@@ -304,8 +299,7 @@ public abstract class WizardImportPage extends WizardDataTransferPage {
     /* (non-Javadoc)
      * Method declared on WizardDataTransferPage.
      */
-    @Override
-	protected final boolean validateDestinationGroup() {
+    protected final boolean validateDestinationGroup() {
         if (getContainerFullPath() == null) {
 			return false;
 		}
