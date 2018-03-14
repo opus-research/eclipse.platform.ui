@@ -37,6 +37,7 @@ public class DefaultBrowserSupport extends AbstractWorkbenchBrowserSupport {
 		// do nothing
 		instance = this;
 		BrowserManager.getInstance().addObserver(new Observer() {
+			@Override
 			public void update(Observable o, Object arg) {
 				// TODO I am not sure what we should do here
 				// The preferences have changed so maybe we should
@@ -78,12 +79,7 @@ public class DefaultBrowserSupport extends AbstractWorkbenchBrowserSupport {
 		return new Integer(window.hashCode());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#createBrowser(int,
-	 *      java.lang.String, java.lang.String, java.lang.String)
-	 */
+	@Override
 	public IWebBrowser createBrowser(int style, String browserId, String name,
 			String tooltip) throws PartInitException {
 		if (browserId == null)
@@ -153,20 +149,12 @@ public class DefaultBrowserSupport extends AbstractWorkbenchBrowserSupport {
 		return webBrowser;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#createBrowser(java.lang.String)
-	 */
+	@Override
 	public IWebBrowser createBrowser(String browserId) throws PartInitException {
 		return createBrowser(0, browserId, null, null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#isInternalWebBrowserAvailable()
-	 */
+	@Override
 	public boolean isInternalWebBrowserAvailable() {
 		return WebBrowserUtil.canUseInternalWebBrowser();
 	}
