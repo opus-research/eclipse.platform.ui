@@ -10,12 +10,21 @@
  *******************************************************************************/
 package org.eclipse.jface.tests.viewers;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.jface.viewers.ColumnLayoutData;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
@@ -28,8 +37,14 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 public class TableViewerTest extends StructuredItemViewerTest {
-	public static class TableTestLabelProvider extends TestLabelProvider
-			implements ITableLabelProvider {
+	private TestElement testElement1;
+	private TestElement testElement2;
+	private TestElement testElement3;
+	private StructuredSelection expectedSelection;
+	private StructuredSelection expectedPostSelection;
+	protected Runnable preRemoveTableItemHookExecutable;
+
+	public static class TableTestLabelProvider extends TestLabelProvider implements ITableLabelProvider {
 		public boolean fExtended = false;
 
 		@Override
@@ -190,9 +205,180 @@ public class TableViewerTest extends StructuredItemViewerTest {
 		tableviewer.remove(first);
 		assertTrue("Removed item still exists",
 				fViewer.testFindItem(first) == null);
+	}
+
+	public void testRemoveAtPosition_selectedElement0() {
+		prepRemoveAtPositionTest();
+
+		TableViewer viewer = (TableViewer) fViewer;
+		List<TestElement> selectedElementsAfterRemove = Arrays.asList(testElement1, testElement2, testElement3);
+		expectedSelection = expectedPostSelection = new StructuredSelection(selectedElementsAfterRemove);
+
+		preRemoveTableItemHook();
+
+		viewer.removeAtPosition(testElement1, 0);
+		printTable("After remove index 0", viewer.getTable());
+
+		assertThat(viewer.getTable().getSelectionIndices(), is(new int[] { 0, 1, 3 }));
+		IStructuredSelection structuredSelection = viewer.getStructuredSelection();
+		List<TestElement> selectedElements = structuredSelection.toList();
+		assertThat(selectedElements, is(selectedElementsAfterRemove));
+	}
+
+	public void testRemoveAtPosition_selectedElement1() {
+		prepRemoveAtPositionTest();
+
+		TableViewer viewer = (TableViewer) fViewer;
+		List<TestElement> selectedElementsAfterRemove = Arrays.asList(testElement1, testElement2, testElement3);
+		expectedSelection = expectedPostSelection = new StructuredSelection(selectedElementsAfterRemove);
+
+		preRemoveTableItemHook();
+
+		viewer.removeAtPosition(testElement1, 1);
+		printTable("After remove index 1", viewer.getTable());
+
+		assertThat(viewer.getTable().getSelectionIndices(), is(new int[] { 0, 1, 3 }));
+		IStructuredSelection structuredSelection = viewer.getStructuredSelection();
+		List<TestElement> list = structuredSelection.toList();
+		assertThat(list, is(selectedElementsAfterRemove));
 
 	}
 
+	public void testRemoveAtPosition_selectedElement2() {
+		prepRemoveAtPositionTest();
 
+		TableViewer viewer = (TableViewer) fViewer;
+		List<TestElement> selectedElementsAfterRemove = Arrays.asList(testElement1, testElement1, testElement3);
+		expectedSelection = expectedPostSelection = new StructuredSelection(selectedElementsAfterRemove);
+
+		preRemoveTableItemHook();
+
+		viewer.removeAtPosition(testElement2, 2);
+		printTable("After remove index 2", viewer.getTable());
+
+		assertThat(viewer.getTable().getSelectionIndices(), is(new int[] { 0, 1, 3 }));
+		IStructuredSelection structuredSelection = viewer.getStructuredSelection();
+		List<TestElement> list = structuredSelection.toList();
+		assertThat(list, is(selectedElementsAfterRemove));
+	}
+
+	public void testRemoveAtPosition_notSelectedElement() {
+		prepRemoveAtPositionTest();
+
+		TableViewer viewer = (TableViewer) fViewer;
+		List<TestElement> selectedElementsAfterRemove = Arrays.asList(testElement1, testElement1, testElement2,
+				testElement3);
+
+		preRemoveTableItemHook();
+
+		viewer.removeAtPosition(testElement1, 3);
+		printTable("After remove index 3", viewer.getTable());
+
+		assertThat(viewer.getTable().getSelectionIndices(), is(new int[] { 0, 1, 2, 3 }));
+		IStructuredSelection structuredSelection = viewer.getStructuredSelection();
+		List<TestElement> selectedElements = structuredSelection.toList();
+		assertThat(selectedElements, is(selectedElementsAfterRemove));
+	}
+
+	public void testRemoveAtPosition_selectedElement3() {
+		prepRemoveAtPositionTest();
+
+		TableViewer viewer = (TableViewer) fViewer;
+		List<TestElement> selectedElementsAfterRemove = Arrays.asList(testElement1, testElement1, testElement2);
+		expectedSelection = expectedPostSelection = new StructuredSelection(selectedElementsAfterRemove);
+
+		preRemoveTableItemHook();
+
+		viewer.removeAtPosition(testElement3, 4);
+		printTable("After remove index 4", viewer.getTable());
+
+		assertThat(viewer.getTable().getSelectionIndices(), is(new int[] { 0, 1, 2 }));
+		IStructuredSelection structuredSelection = viewer.getStructuredSelection();
+		List<TestElement> list = structuredSelection.toList();
+		assertThat(list, is(selectedElementsAfterRemove));
+	}
+
+	private void preRemoveTableItemHook() {
+		if (preRemoveTableItemHookExecutable != null) {
+			preRemoveTableItemHookExecutable.run();
+		}
+	}
+
+	private void printTable(String string, Table table) {
+		boolean debug = false;
+		if (!debug) {
+			return;
+		}
+		System.out.println(string);
+		int[] selectionIndices = table.getSelectionIndices();
+		TableItem[] items = table.getItems();
+		for (int i = 0; i < 5; i++) {
+			boolean printed = false;
+			for (int selectedIndex : selectionIndices) {
+				if (selectedIndex == i) {
+					System.out.println(i + ": [" + items[i].getText() + "]");
+					printed = true;
+					break;
+				}
+			}
+			if (!printed) {
+				System.out.println(i + ":  " + items[i].getText());
+			}
+		}
+	}
+
+	private void prepRemoveAtPositionTest() {
+		if ((fViewer.getControl().getStyle() & SWT.MULTI) == 0) {
+			fail("This test need a table that can select multiple items.");
+		}
+		// [0],[1],3
+		testElement1 = new TestElement(fModel, fRootElement);
+		// [2]
+		testElement2 = new TestElement(fModel, fRootElement);
+		// [4]
+		testElement3 = new TestElement(fModel, fRootElement);
+
+		testElement1.fId = "1";
+		testElement1.fSomeName = "Egg";
+		testElement2.fId = "2";
+		testElement2.fSomeName = "Tee";
+		testElement3.fId = "3";
+		testElement3.fSomeName = "Flower";
+
+		TestElement[] children = new TestElement[] { testElement1, testElement1, testElement2, testElement1,
+				testElement3 };
+		TestModelChange testModelChange = new TestModelChange(TestModelChange.INSERT, fRootElement, children);
+		fViewer.setInput(null);
+		fRootElement.deleteChildren();
+		fRootElement.addChildren(children, testModelChange);
+		fViewer.setInput(fRootElement);
+
+		Table table = (Table) fViewer.getControl();
+		table.select(new int[] { 0, 1, 2, 4 });
+		processEvents();
+		IStructuredSelection structuredSelection = fViewer.getStructuredSelection();
+		List<TestElement> list = structuredSelection.toList();
+		assertThat(list, is(Arrays.asList(testElement1, testElement1, testElement2, testElement3)));
+
+		printTable("Before remove", ((TableViewer) fViewer).getTable());
+		fViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				if (expectedSelection != null && event.getSelection().equals(expectedSelection)) {
+					return;
+				}
+				fail("Expected: " + expectedSelection + " but was " + event.getSelection());
+			}
+		});
+		fViewer.addPostSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				if (expectedPostSelection != null && event.getSelection().equals(expectedPostSelection)) {
+					return;
+				}
+				fail("Expected: " + expectedPostSelection + " but was " + event.getSelection());
+			}
+		});
+	}
 
 }

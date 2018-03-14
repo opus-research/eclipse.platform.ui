@@ -13,6 +13,7 @@
 package org.eclipse.jface.internal.databinding.viewers;
 
 import org.eclipse.jface.viewers.AbstractTableViewer;
+import org.eclipse.swt.widgets.Table;
 
 /**
  * NON-API - A {@link ViewerUpdater} that updates {@link AbstractTableViewer}
@@ -35,7 +36,7 @@ class TableViewerUpdater extends ViewerUpdater {
 
 	@Override
 	public void remove(Object element, int position) {
-		viewer.remove(element);
+		viewer.removeAtPosition(element, position);
 	}
 
 	@Override
@@ -55,5 +56,36 @@ class TableViewerUpdater extends ViewerUpdater {
 	@Override
 	public void remove(Object[] elements) {
 		viewer.remove(elements);
+	}
+
+	@Override
+	public void move(Object element, int oldPosition, int newPosition) {
+		// preserve the selectioin while calling super.move()
+		Table table = (Table) viewer.getControl();
+		int[] selectionIndices = table.getSelectionIndices();
+		super.move(element, oldPosition, newPosition);
+		replaceIndex(selectionIndices, oldPosition, newPosition);
+		table.setSelection(selectionIndices);
+	}
+
+	/**
+	 * Replaces the first found integer {@code oldPosition} in
+	 * {@code selectionIndices} whit {@code newPosition}.
+	 *
+	 * @param selectionIndices
+	 *            an array of unique integers
+	 * @param oldPosition
+	 *            the integer to be removed
+	 * @param newPosition
+	 *            the integer to be inserted at the index of {@code oldPosition}
+	 */
+	private void replaceIndex(int[] selectionIndices, int oldPosition, int newPosition) {
+		for (int i = 0; i < selectionIndices.length; i++) {
+			int j = selectionIndices[i];
+			if (j == oldPosition) {
+				selectionIndices[i] = newPosition;
+				return;
+			}
+		}
 	}
 }
