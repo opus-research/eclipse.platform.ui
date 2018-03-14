@@ -2047,6 +2047,7 @@
              commandId="org.eclipse.ui.ide.showInSystemExplorer"
              label="%command.showInSystemExplorer.menu.name"
              mnemonic="%command.showInSystemExplorer.menu.mnemonic"
+             icon="$nl$/icons/full/elcl16/gotoobj_tsk.png"
              style="push">
           <visibleWhen
                 checkEnabled="false">
@@ -2378,14 +2379,6 @@
             </with>
              </or>
       </definition>
-   </extension>
-   <extension
-         id="id1"
-         point="org.eclipse.e4.workbench.model">
-      <fragment
-            apply="notexists"
-            uri="model/fragment.e4xmi">
-      </fragment>
    </extension>
 
 </plugin>

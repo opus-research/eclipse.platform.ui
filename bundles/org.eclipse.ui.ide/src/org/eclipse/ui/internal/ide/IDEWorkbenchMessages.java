@@ -505,8 +505,6 @@ public class IDEWorkbenchMessages extends NLS {
 	// ---workspace ---
 	public static String IDEWorkspacePreference_autobuild;
 	public static String IDEWorkspacePreference_autobuildToolTip;
-	public static String IDEWorkspacePreference_autoSaveEditors;
-	public static String IDEWorkspacePreference_autoSaveEditorsToolTip;
 	public static String IDEWorkspacePreference_savePriorToBuilding;
 	public static String IDEWorkspacePreference_savePriorToBuildingToolTip;
 	public static String IDEWorkspacePreference_RefreshButtonText;
@@ -893,8 +891,8 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String ScrubLocalAction_progress;
 
 	public static String ShowInSystemExplorerHandler_commandUnavailable;
-
 	public static String ShowInSystemExplorerHandler_notDetermineLocation;
+	public static String ShowInSystemExplorerHandler_jobTitle;
 
 	public static String TextAction_selectAll;
 	public static String Cut;
