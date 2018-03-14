@@ -1,8 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Progress
 Bundle-SymbolicName: org.eclipse.e4.ui.progress;singleton:=true
 Bundle-Version: 0.1.0.qualifier
+Bundle-Name: %pluginName
+Bundle-Vendor: %providerName
+Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.jobs;bundle-version="3.5.400",
  org.eclipse.equinox.common;bundle-version="3.6.200",
  org.eclipse.osgi;bundle-version="3.10.0",
