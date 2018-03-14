@@ -421,8 +421,7 @@ public class E4Application implements IApplication {
 				appContext, false);
 
 		if (resourceHandler == null) {
-			resourceHandler = "bundleclass://org.eclipse.e4.ui.workbench/"
-					+ ResourceHandler.class.getName();
+			resourceHandler = "bundleclass://org.eclipse.e4.ui.workbench/" + ResourceHandler.class;
 		}
 
 		IContributionFactory factory = eclipseContext
