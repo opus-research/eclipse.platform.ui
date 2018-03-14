@@ -79,9 +79,11 @@ import org.eclipse.ui.internal.navigator.resources.plugin.WorkbenchNavigatorMess
      * @return the actual target of the paste action
      */
     private IResource getTarget() {
-        List<IResource> selectedResources = (List<IResource>)getSelectedResources();
+        List selectedResources = getSelectedResources();
 
-        for (IResource resource : selectedResources) {
+        for (int i = 0; i < selectedResources.size(); i++) {
+            IResource resource = (IResource) selectedResources.get(i);
+
             if (resource instanceof IProject && !((IProject) resource).isOpen()) {
 				return null;
 			}
@@ -157,7 +159,7 @@ import org.eclipse.ui.internal.navigator.resources.plugin.WorkbenchNavigatorMess
      * Returns the container to hold the pasted resources.
      */
     private IContainer getContainer() {
-        List<IResource> selection = (List<IResource>) getSelectedResources();
+        List selection = getSelectedResources();
         if (selection.get(0) instanceof IFile) {
 			return ((IFile) selection.get(0)).getParent();
 		}
@@ -218,9 +220,10 @@ import org.eclipse.ui.internal.navigator.resources.plugin.WorkbenchNavigatorMess
 
         // can paste files and folders to a single selection (file, folder, 
         // open project) or multiple file selection with the same parent
-        List<IResource> selectedResources = (List<IResource>)getSelectedResources();
+        List selectedResources = getSelectedResources();
         if (selectedResources.size() > 1) {
-            for (IResource resource : selectedResources) {
+            for (int i = 0; i < selectedResources.size(); i++) {
+                IResource resource = (IResource) selectedResources.get(i);
                 if (resource.getType() != IResource.FILE) {
 					return false;
 				}
