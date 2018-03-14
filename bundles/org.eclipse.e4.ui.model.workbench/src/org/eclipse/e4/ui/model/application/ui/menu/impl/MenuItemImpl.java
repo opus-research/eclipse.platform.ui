@@ -7,7 +7,6 @@
  * 
  * Contributors:
  *      IBM Corporation - initial API and implementation
- *      Steven Spungin <steven@spungin.tv> - Bug 431184
  */
 package org.eclipse.e4.ui.model.application.ui.menu.impl;
 
@@ -172,17 +171,6 @@ public abstract class MenuItemImpl extends ItemImpl implements MMenuItem {
 		if (baseClass == MMenuElement.class) {
 			switch (derivedFeatureID) {
 				case MenuPackageImpl.MENU_ITEM__MNEMONICS: return MenuPackageImpl.MENU_ELEMENT__MNEMONICS;
-				/**
-				* Fix for Bug 431184 <br />
-				* TODO It might be best to just 
-				* <li>return the derivedFeatureID
-				* instead of -1 as the default case, or even better
-				* <li>call the super class, that eventually returns the baseFeatureId
-				* <p>
-				* I used this specific case to <em>minimize</em> breaking existing code
-				* </p>
-				*/
-				case MenuPackageImpl.MENU_ELEMENT__PARENT: return MenuPackageImpl.MENU_ELEMENT__PARENT;
 				default: return -1;
 			}
 		}
