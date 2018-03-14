@@ -13,6 +13,7 @@ package org.eclipse.ui.statushandlers;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ILogListener;
 import org.eclipse.core.runtime.IStatus;
@@ -257,9 +258,7 @@ public class StatusManager {
 	 * 
 	 */
 	public void handle(CoreException coreException,String pluginId) {
-		IStatus exceptionStatus = coreException.getStatus();
-		handle(new Status(exceptionStatus.getSeverity(), pluginId,
-				coreException
+		handle(new Status(IStatus.WARNING, pluginId, coreException
 				.getLocalizedMessage(), coreException));
 	}
 
