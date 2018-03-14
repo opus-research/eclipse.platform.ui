@@ -7,7 +7,6 @@
  *
  * Contributors:
  * IBM - Initial API and implementation
- * Steven Spungin <steven@spungin.tv> - Bug 436923
  *******************************************************************************/
 package org.eclipse.e4.ui.progress.internal;
 
@@ -210,7 +209,7 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
                 handleDetailsButtonSelect();
             }
         });
-        detailsButton.setCursor(getArrowCursor());
+        detailsButton.setCursor(arrowCursor);
         detailsButton.setEnabled(enableDetailsButton);
     }
 
@@ -238,8 +237,8 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
         composite.setLayoutData(data);
         composite.setFont(parent.getFont());
         // Add the buttons to the button bar.
-        if (getArrowCursor() == null) {
-			setArrowCursor(new Cursor(parent.getDisplay(), SWT.CURSOR_ARROW));
+        if (arrowCursor == null) {
+			arrowCursor = new Cursor(parent.getDisplay(), SWT.CURSOR_ARROW);
 		}
         createButtonsForButtonBar(composite);
         return composite;
