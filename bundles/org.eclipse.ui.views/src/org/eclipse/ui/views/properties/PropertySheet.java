@@ -37,6 +37,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -321,7 +322,6 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 	public void partActivated(IWorkbenchPart part) {
 		if (wasHidden && part == this) {
 			wasHidden = false;
-			super.partActivated(part);
 			if (currentPart != null) {
 				IPropertySheetPage page = (IPropertySheetPage) getCurrentPage();
 				if (page != null) {
