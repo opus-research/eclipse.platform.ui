@@ -71,6 +71,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.ide.EditorAssociationOverrideDescriptor;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
+import org.eclipse.ui.internal.ide.SystemEditorOrTextEditor;
+import org.eclipse.ui.internal.ide.UnknownEditorStrategyRegistry;
 import org.eclipse.ui.internal.ide.model.StandardPropertiesAdapterFactory;
 import org.eclipse.ui.internal.ide.model.WorkbenchAdapterFactory;
 import org.eclipse.ui.internal.ide.registry.MarkerHelpRegistry;
@@ -133,6 +135,12 @@ public final class IDE {
 	 * The resource based perspective identifier.
 	 */
 	public static final String RESOURCE_PERSPECTIVE_ID = "org.eclipse.ui.resourcePerspective"; //$NON-NLS-1$
+
+	/**
+	 * A preference key to decide which {@link IUnknownEditorStrategy} to use
+	 * when trying to open files without associated editors.
+	 */
+	public static final String UNKNOWN_EDITOR_STRATEGY_PREFERENCE_KEY = "unknownEditorStrategy";//$NON-NLS-1$
 
 	/**
 	 * Marker help registry mapping markers to help context ids and resolutions;
@@ -999,26 +1007,8 @@ public final class IDE {
 			return defaultDescriptor;
 		}
 
-		IEditorDescriptor editorDesc = defaultDescriptor;
-
-		// next check the OS for in-place editor (OLE on Win32)
-		if (editorReg.isSystemInPlaceEditorAvailable(name)) {
-			editorDesc = editorReg
-					.findEditor(IEditorRegistry.SYSTEM_INPLACE_EDITOR_ID);
-		}
-
-		// next check with the OS for an external editor
-		if (editorDesc == null
-				&& editorReg.isSystemExternalEditorAvailable(name)) {
-			editorDesc = editorReg
-					.findEditor(IEditorRegistry.SYSTEM_EXTERNAL_EDITOR_ID);
-		}
-
-		// next lookup the default text editor
-		if (editorDesc == null) {
-			editorDesc = editorReg
-					.findEditor(IDEWorkbenchPlugin.DEFAULT_TEXT_EDITOR_ID);
-		}
+		IUnknownEditorStrategy strategy = getUnknowEditorStrategy();
+		IEditorDescriptor editorDesc = strategy.getEditorDescriptor(name, editorReg);
 
 		// if no valid editor found, bail out
 		if (editorDesc == null) {
@@ -1027,6 +1017,19 @@ public final class IDE {
 		}
 
 		return editorDesc;
+	}
+
+	/**
+	 * @return
+	 */
+	private static IUnknownEditorStrategy getUnknowEditorStrategy() {
+		String preferedStrategy = IDEWorkbenchPlugin.getDefault().getPreferenceStore()
+				.getString(UNKNOWN_EDITOR_STRATEGY_PREFERENCE_KEY);
+		IUnknownEditorStrategy res = UnknownEditorStrategyRegistry.getStrategy(preferedStrategy);
+		if (res == null) {
+			res = new SystemEditorOrTextEditor();
+		}
+		return res;
 	}
 
 	/**
