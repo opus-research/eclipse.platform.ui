@@ -21,7 +21,6 @@ import org.eclipse.ui.activities.WorkbenchActivityHelper;
 import org.eclipse.ui.internal.IWorkbenchGraphicConstants;
 import org.eclipse.ui.internal.WorkbenchImages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
-import org.eclipse.ui.quickaccess.IQuickAccessElement;
 import org.eclipse.ui.wizards.IWizardCategory;
 import org.eclipse.ui.wizards.IWizardDescriptor;
 
@@ -31,17 +30,17 @@ import org.eclipse.ui.wizards.IWizardDescriptor;
  */
 public class WizardProvider extends QuickAccessProvider {
 
-	private IQuickAccessElement[] cachedElements;
+	private QuickAccessElement[] cachedElements;
 	private Map<String, WizardElement> idToElement = new HashMap<String, WizardElement>();
 
 	@Override
-	public IQuickAccessElement getElementForId(String id) {
+	public QuickAccessElement getElementForId(String id) {
 		getElements();
 		return idToElement.get(id);
 	}
 
 	@Override
-	public IQuickAccessElement[] getElements() {
+	public QuickAccessElement[] getElements() {
 		if (cachedElements == null) {
 			IWizardCategory rootCategory = WorkbenchPlugin.getDefault()
 					.getNewWizardRegistry().getRootCategory();

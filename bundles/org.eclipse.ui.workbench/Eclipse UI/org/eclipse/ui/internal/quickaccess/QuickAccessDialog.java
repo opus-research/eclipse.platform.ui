@@ -49,8 +49,6 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.internal.progress.ProgressManagerUtil;
 import org.eclipse.ui.keys.IBindingService;
-import org.eclipse.ui.quickaccess.IQuickAccessElement;
-import org.eclipse.ui.quickaccess.IQuickAccessProvider;
 
 /**
  * This is the quick access popup dialog used in 3.x. The new quick access is
@@ -95,7 +93,7 @@ public class QuickAccessDialog extends PopupDialog {
 						final CommandProvider commandProvider = new CommandProvider();
 						commandProvider.setSnapshot(new ExpressionContext(model.getContext()
 								.getActiveLeaf()));
-						IQuickAccessProvider[] providers = new IQuickAccessProvider[] {
+						QuickAccessProvider[] providers = new QuickAccessProvider[] {
 								new PreviousPicksProvider(previousPicksList),
 								new EditorProvider(),
 								new ViewProvider(model.getContext().get(MApplication.class), model),
@@ -199,15 +197,15 @@ public class QuickAccessDialog extends PopupDialog {
 							}
 
 							@Override
-							protected IQuickAccessElement getPerfectMatch(String filter) {
-								IQuickAccessElement perfectMatch = (IQuickAccessElement) elementMap
+							protected QuickAccessElement getPerfectMatch(String filter) {
+								QuickAccessElement perfectMatch = (QuickAccessElement) elementMap
 										.get(filter);
 								return perfectMatch;
 							}
 
 							@Override
 							protected void handleElementSelected(String text, Object selectedElement) {
-						if (selectedElement instanceof IQuickAccessElement) {
+								if (selectedElement instanceof QuickAccessElement) {
 									addPreviousPick(text, selectedElement);
 									storeDialog(getDialogSettings());
 
@@ -216,7 +214,7 @@ public class QuickAccessDialog extends PopupDialog {
 									 * closed/disposed and the correct
 									 * EclipseContext is in place.
 									 */
-									final IQuickAccessElement element = (IQuickAccessElement) selectedElement;
+									final QuickAccessElement element = (QuickAccessElement) selectedElement;
 									window.getShell().getDisplay().asyncExec(new Runnable() {
 										@Override
 										public void run() {
@@ -381,7 +379,7 @@ public class QuickAccessDialog extends PopupDialog {
 		String[] textEntries = new String[previousPicksList.size()];
 		ArrayList arrayList = new ArrayList();
 		for (int i = 0; i < orderedElements.length; i++) {
-			IQuickAccessElement quickAccessElement = (IQuickAccessElement) previousPicksList.get(i);
+			QuickAccessElement quickAccessElement = (QuickAccessElement) previousPicksList.get(i);
 			ArrayList elementText = (ArrayList) textMap.get(quickAccessElement);
 			Assert.isNotNull(elementText);
 			orderedElements[i] = quickAccessElement.getId();
@@ -410,11 +408,11 @@ public class QuickAccessDialog extends PopupDialog {
 					&& textArray != null) {
 				int arrayIndex = 0;
 				for (int i = 0; i < orderedElements.length; i++) {
-					IQuickAccessProvider quickAccessProvider = (IQuickAccessProvider) providerMap
+					QuickAccessProvider quickAccessProvider = (QuickAccessProvider) providerMap
 							.get(orderedProviders[i]);
 					int numTexts = Integer.parseInt(textEntries[i]);
 					if (quickAccessProvider != null) {
-						IQuickAccessElement quickAccessElement = quickAccessProvider
+						QuickAccessElement quickAccessElement = quickAccessProvider
 								.getElementForId(orderedElements[i]);
 						if (quickAccessElement != null) {
 							ArrayList arrayList = new ArrayList();

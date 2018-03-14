@@ -28,7 +28,6 @@ import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.internal.IWorkbenchGraphicConstants;
 import org.eclipse.ui.internal.WorkbenchImages;
-import org.eclipse.ui.quickaccess.IQuickAccessElement;
 
 /**
  * @since 3.3
@@ -57,13 +56,13 @@ public class CommandProvider extends QuickAccessProvider {
 	}
 
 	@Override
-	public IQuickAccessElement getElementForId(String id) {
+	public QuickAccessElement getElementForId(String id) {
 		getElements();
 		return (CommandElement) idToElement.get(id);
 	}
 
 	@Override
-	public IQuickAccessElement[] getElements() {
+	public QuickAccessElement[] getElements() {
 		if (idToElement == null) {
 			idToElement = new HashMap();
 			ICommandService commandService = getCommandService();
@@ -92,8 +91,8 @@ public class CommandProvider extends QuickAccessProvider {
 				}
 			}
 		}
-		return (IQuickAccessElement[]) idToElement.values().toArray(
-				new IQuickAccessElement[idToElement.values().size()]);
+		return (QuickAccessElement[]) idToElement.values().toArray(
+				new QuickAccessElement[idToElement.values().size()]);
 	}
 
 	@Override

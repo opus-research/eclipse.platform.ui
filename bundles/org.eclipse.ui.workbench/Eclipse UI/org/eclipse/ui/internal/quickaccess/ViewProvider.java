@@ -25,7 +25,6 @@ import org.eclipse.ui.internal.IWorkbenchGraphicConstants;
 import org.eclipse.ui.internal.WorkbenchImages;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityPart;
-import org.eclipse.ui.quickaccess.IQuickAccessElement;
 import org.eclipse.ui.views.IViewDescriptor;
 import org.eclipse.ui.views.IViewRegistry;
 
@@ -52,16 +51,16 @@ public class ViewProvider extends QuickAccessProvider {
 	}
 
 	@Override
-	public IQuickAccessElement getElementForId(String id) {
+	public QuickAccessElement getElementForId(String id) {
 		getElements();
 		return idToElement.get(id);
 	}
 
 	@Override
-	public IQuickAccessElement[] getElements() {
+	public QuickAccessElement[] getElements() {
 		IWorkbenchWindow workbenchWindow = window.getContext().get(IWorkbenchWindow.class);
 		if (workbenchWindow == null || workbenchWindow.getActivePage() == null) {
-			return new IQuickAccessElement[0];
+			return new QuickAccessElement[0];
 		}
 
 		if (idToElement.isEmpty()) {
