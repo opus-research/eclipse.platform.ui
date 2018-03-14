@@ -285,7 +285,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 			this.filter = menuStructureFilterByActionSet;
 		}
 
-		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
 			Object element = ((IStructuredSelection) event.getSelection())
 					.getFirstElement();
@@ -308,7 +307,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 			this.rootItem = rootItem;
 		}
 
-		@Override
 		public boolean select(Viewer viewer, Object parentElement,
 				Object element) {
 			return (includeInSetStructure(rootItem, (ActionSet) element));
@@ -557,7 +555,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 			contributionItems.add(item);
 		}
 
-		@Override
 		public String toString() {
 			return descriptor.getLabel();
 		}
@@ -595,30 +592,25 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 	 */
 	private class ShortcutLabelProvider extends
 			TreeManager.TreeItemLabelProvider implements ITableLabelProvider {
-		@Override
 		public Image getColumnImage(Object element, int columnIndex) {
 			if (columnIndex == 0)
 				return this.getImage(element);
 			return null;
 		}
 
-		@Override
 		public String getColumnText(Object element, int columnIndex) {
 			if (columnIndex == 1)
 				return ((ShortcutItem) element).getDescription();
 			return this.getText(element);
 		}
 
-		@Override
 		public void addListener(ILabelProviderListener listener) {
 		}
 
-		@Override
 		public boolean isLabelProperty(Object element, String property) {
 			return false;
 		}
 
-		@Override
 		public void removeListener(ILabelProviderListener listener) {
 		}
 	}
@@ -633,7 +625,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 	 * @since 3.5
 	 */
 	private static class CategoryCheckProvider implements ICheckStateProvider {
-		@Override
 		public boolean isChecked(Object element) {
 			Category category = (Category) element;
 
@@ -659,7 +650,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 			return false;
 		}
 
-		@Override
 		public boolean isGrayed(Object element) {
 			boolean hasChecked = false;
 			boolean hasUnchecked = false;
@@ -712,13 +702,11 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		 * Adds logic to only show a tooltip if a meaningful item is under the
 		 * cursor.
 		 */
-		@Override
 		protected boolean shouldCreateToolTip(Event event) {
 			return super.shouldCreateToolTip(event)
 					&& getModelElement(event) != null;
 		}
 
-		@Override
 		protected Composite createToolTipContentArea(Event event,
 				Composite parent) {
 			Object modelElement = getModelElement(event);
@@ -855,7 +843,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 			this.table = table;
 		}
 
-		@Override
 		protected Object getModelElement(Event event) {
 			TableItem tableItem = table.getItem(new Point(event.x, event.y));
 			if (tableItem == null)
@@ -894,7 +881,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 			this.setHideOnMouseDown(false);
 		}
 		
-		@Override
 		public Point getLocation(Point tipSize, Event event) {
 			// try to position the tooltip at the bottom of the cell
 			ViewerCell cell = v.getCell(new Point(event.x, event.y));
@@ -906,13 +892,11 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 			return super.getLocation(tipSize, event);
 		}
 
-		@Override
 		protected Object getToolTipArea(Event event) {
 			// Ensure that the tooltip is hidden when the cell is left
 			return v.getCell(new Point(event.x, event.y));
 		}
 		
-		@Override
 		protected void addContent(Composite destination, Object modelElement) {
 			final DisplayItem item = (DisplayItem) modelElement;
 
@@ -995,12 +979,10 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 				if(text != null) {
 					Link link = createEntryWithLink(destination, image, text);
 					link.addSelectionListener(new SelectionListener() {
-						@Override
 						public void widgetDefaultSelected(SelectionEvent e) {
 							widgetSelected(e);
 						}
 	
-						@Override
 						public void widgetSelected(SelectionEvent e) {
 							ActionSet actionSet = (ActionSet) idToActionSet
 									.get(e.text);
@@ -1088,12 +1070,10 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 							text);
 
 					bindingLink.addSelectionListener(new SelectionListener() {
-						@Override
 						public void widgetDefaultSelected(SelectionEvent e) {
 							widgetDefaultSelected(e);
 						}
 
-						@Override
 						public void widgetSelected(SelectionEvent e) {
 							PreferenceDialog dialog = PreferencesUtil
 									.createPreferenceDialogOn(getShell(),
@@ -1128,7 +1108,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 			}
 		}
 
-		@Override
 		protected Object getModelElement(Event event) {
 			org.eclipse.swt.widgets.TreeItem treeItem = tree.getItem(new Point(
 					event.x, event.y));
@@ -1150,7 +1129,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 			this.actionSet = actionSet;
 		}
 
-		@Override
 		public boolean select(Viewer viewer, Object parentElement,
 				Object element) {
 			if (!(element instanceof DisplayItem))
@@ -1178,13 +1156,11 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 			this.filter = filter;
 		}
 
-		@Override
 		public boolean isChecked(Object element) {
 			TreeItem treeItem = (TreeItem) element;
 			return getLeafStates(treeItem, contentProvider, filter) != TreeManager.CHECKSTATE_UNCHECKED;
 		}
 
-		@Override
 		public boolean isGrayed(Object element) {
 			TreeItem treeItem = (TreeItem) element;
 			return getLeafStates(treeItem, contentProvider, filter) == TreeManager.CHECKSTATE_GRAY;
@@ -1211,7 +1187,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 			this.filter = filter;
 		}
 
-		@Override
 		public void checkStateChanged(CheckStateChangedEvent event) {
 			setAllLeafs((DisplayItem) event.getElement(), event
 					.getChecked(), contentProvider, filter);
@@ -1236,7 +1211,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 			this.viewer = viewer;
 		}
 
-		@Override
 		public void checkChanged(TreeItem changedItem) {
 			TreeItem item = changedItem;
 			boolean update = false;
@@ -1278,7 +1252,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 			this.originalListener = originalListener;
 		}
 
-		@Override
 		public void checkStateChanged(CheckStateChangedEvent event) {
 			DisplayItem item = (DisplayItem) event.getElement();
 			ViewerFilter[] filters = viewer.getFilters();
@@ -1359,12 +1332,10 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 			this.filter = filter;
 		}
 
-		@Override
 		public Color getBackground(Object element) {
 			return null;
 		}
 
-		@Override
 		public Color getForeground(Object element) {
 			if (!isEffectivelyAvailable((DisplayItem) element, filter)) {
 				return display.getSystemColor(SWT.COLOR_GRAY);
@@ -1372,7 +1343,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 			return null;
 		}
 
-		@Override
 		public Image getImage(Object element) {
 			Image actual = super.getImage(element);
 
@@ -1425,49 +1395,39 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 			this.configurer = configurer;
 		}
 
-		@Override
 		public IWorkbenchWindowConfigurer getWindowConfigurer() {
 			return configurer;
 		}
 
-		@Override
 		public IMenuManager getMenuManager() {
 			return menuManager;
 		}
 
-		@Override
 		public IStatusLineManager getStatusLineManager() {
 			return statusLineManager;
 		}
 
-		@Override
 		public ICoolBarManager getCoolBarManager() {
 			return coolBarManager;
 		}
 
-		@Override
 		public IToolBarManager getToolBarManager() {
 			return null;
 		}
 
-		@Override
 		public void setGlobalActionHandler(String actionID, IAction handler) {
 		}
 
-		@Override
 		public void updateActionBars() {
 		}
 
-		@Override
 		public void clearGlobalActionHandlers() {
 		}
 
-		@Override
 		public IAction getGlobalActionHandler(String actionId) {
 			return null;
 		}
 
-		@Override
 		public void registerGlobalAction(IAction action) {
 		}
 
@@ -1480,18 +1440,15 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 			statusLineManager.dispose();
 		}
 
-		@Override
 		public final IServiceLocator getServiceLocator() {
 			return configurer.getWindow();
 		}
 
-		@Override
 		public IToolBarContributionItem createToolBarContributionItem(
 				IToolBarManager toolBarManager, String id) {
 			return new ToolBarContributionItem2(toolBarManager, id);
 		}
 
-		@Override
 		public IToolBarManager createToolBarManager() {
 			return new ToolBarManager();
 		}
@@ -1528,7 +1485,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		loadMenuAndToolbarStructure();
 	}
 
-	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		String title = perspective.getDesc().getLabel();
@@ -1539,7 +1495,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 				IWorkbenchHelpContextIds.ACTION_SET_SELECTION_DIALOG);
 	}
 
-	@Override
 	protected Control createDialogArea(Composite parent) {
 		// Create a font for titles in the tooltips
 		FontData[] defaultFont = JFaceResources.getDefaultFont().getFontData();
@@ -1641,7 +1596,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		menuCategoriesViewer.setComparator(new WorkbenchViewerComparator());
 		menuCategoriesViewer.setCheckStateProvider(new CategoryCheckProvider());
 		menuCategoriesViewer.addCheckStateListener(new ICheckStateListener() {
-			@Override
 			public void checkStateChanged(CheckStateChangedEvent event) {
 				Category category = (Category) event.getElement();
 				category.setItemsState(event.getChecked());
@@ -1650,7 +1604,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		});
 
 		treeManager.addListener(new CheckListener() {
-			@Override
 			public void checkChanged(TreeItem changedItem) {
 				if (changedItem instanceof Category) {
 					menuCategoriesViewer.update(changedItem, null);
@@ -1692,7 +1645,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 
 		menuItemsViewer
 				.setContentProvider(new TreeManager.TreeItemContentProvider() {
-					@Override
 					public Object[] getChildren(Object parentElement) {
 						if (parentElement instanceof Category)
 							return ((Category) parentElement)
@@ -1706,7 +1658,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		// menusViewer
 		menusViewer
 				.addSelectionChangedListener(new ISelectionChangedListener() {
-					@Override
 					public void selectionChanged(SelectionChangedEvent event) {
 						Category category = (Category) ((IStructuredSelection) event
 								.getSelection()).getFirstElement();
@@ -1722,7 +1673,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		// update menuItemsViewer on a change to menuCategoriesViewer
 		menuCategoriesViewer
 				.addSelectionChangedListener(new ISelectionChangedListener() {
-					@Override
 					public void selectionChanged(SelectionChangedEvent event) {
 						Category category = (Category) ((IStructuredSelection) event
 								.getSelection()).getFirstElement();
@@ -1799,12 +1749,10 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		actionSetsViewer.setContentProvider(new ArrayContentProvider());
 		actionSetsViewer.setComparator(new WorkbenchViewerComparator());
 		actionSetsViewer.setCheckStateProvider(new ICheckStateProvider() {
-			@Override
 			public boolean isChecked(Object element) {
 				return ((ActionSet) element).isActive();
 			}
 
-			@Override
 			public boolean isGrayed(Object element) {
 				return false;
 			}
@@ -1818,7 +1766,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 
 		// Filter to show only branches necessary for the selected action set.
 		final ViewerFilter setFilter = new ViewerFilter() {
-			@Override
 			public boolean select(Viewer viewer, Object parentElement,
 					Object element) {
 				if (selectedActionSet[0] == null)
@@ -1830,7 +1777,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 
 		// Updates the check state of action sets
 		actionSetsViewer.addCheckStateListener(new ICheckStateListener() {
-			@Override
 			public void checkStateChanged(CheckStateChangedEvent event) {
 				final ActionSet actionSet = (ActionSet) event.getElement();
 				if (event.getChecked()) {
@@ -1913,7 +1859,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		// selection changes
 		actionSetsViewer
 				.addSelectionChangedListener(new ISelectionChangedListener() {
-					@Override
 					public void selectionChanged(SelectionChangedEvent event) {
 						selectedActionSet[0] = (ActionSet) ((IStructuredSelection) event
 								.getSelection()).getFirstElement();
@@ -2018,7 +1963,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		// Override any attempts to set an item to visible
 		// which exists in an unavailable action set
 		treeManager.addListener(new CheckListener() {
-			@Override
 			public void checkChanged(TreeItem changedItem) {
 				if (!(changedItem instanceof DisplayItem))
 					return;
@@ -2036,11 +1980,9 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 				.setText(WorkbenchMessages.HideItems_turnOnActionSets);
 		showCommandGroupFilterButton
 				.addSelectionListener(new SelectionListener() {
-					@Override
 					public void widgetDefaultSelected(SelectionEvent e) {
 					}
 
-					@Override
 					public void widgetSelected(SelectionEvent e) {
 						if (showCommandGroupFilterButton.getSelection()) {
 							Object o = ((StructuredSelection) menuStructureViewer1
@@ -2170,7 +2112,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		// Override any attempts to set an item to visible
 		// which exists in an unavailable action set
 		treeManager.addListener(new CheckListener() {
-			@Override
 			public void checkChanged(TreeItem changedItem) {
 				if (!(changedItem instanceof DisplayItem))
 					return;
@@ -2188,11 +2129,9 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 				.setText(WorkbenchMessages.HideItems_turnOnActionSets);
 		showCommandGroupFilterButton
 				.addSelectionListener(new SelectionListener() {
-					@Override
 					public void widgetDefaultSelected(SelectionEvent e) {
 					}
 
-					@Override
 					public void widgetSelected(SelectionEvent e) {
 						if (showCommandGroupFilterButton.getSelection()) {
 							Object o = ((StructuredSelection) toolbarStructureViewer1
@@ -3430,7 +3369,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		return hasChanges;
 	}
 	
-	@Override
 	protected void okPressed() {
 		// Shortcuts
 		if (showShortcutTab()) {
@@ -3487,7 +3425,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 	 * 
 	 * @see org.eclipse.jface.dialogs.TrayDialog#close()
 	 */
-	@Override
 	public boolean close() {
 		tooltipHeading.dispose();
 
@@ -3533,7 +3470,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 	 * 
 	 * @see org.eclipse.jface.dialogs.Dialog#isResizable()
 	 */
-	@Override
 	protected boolean isResizable() {
 		return true;
 	}

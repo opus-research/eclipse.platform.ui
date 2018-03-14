@@ -37,8 +37,7 @@ public class ActionSetMenuManager extends SubMenuManager {
      * In the case of menu's not added by this manager,
      * ensure that we return a wrapper for the menu.
      */
-    @Override
-	public IContributionItem find(String id) {
+    public IContributionItem find(String id) {
         IContributionItem item = getParentMenuManager().find(id);
         if (item instanceof SubContributionItem) {
 			// Return the item passed to us, not the wrapper.
@@ -63,24 +62,21 @@ public class ActionSetMenuManager extends SubMenuManager {
     /* (non-Javadoc)
      * Method declared on IContributionManager.
      */
-    @Override
-	public IContributionItem[] getItems() {
+    public IContributionItem[] getItems() {
         return getParentMenuManager().getItems();
     }
 
     /* (non-Javadoc)
      * Method declared on SubContributionManager.
      */
-    @Override
-	protected SubContributionItem wrap(IContributionItem item) {
+    protected SubContributionItem wrap(IContributionItem item) {
         return new ActionSetContributionItem(item, actionSetId);
     }
 
     /* (non-Javadoc)
      * Method declared on SubMenuManager.
      */
-    @Override
-	protected SubMenuManager wrapMenu(IMenuManager menu) {
+    protected SubMenuManager wrapMenu(IMenuManager menu) {
         return new ActionSetMenuManager(menu, actionSetId);
     }
 }

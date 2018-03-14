@@ -101,7 +101,6 @@ public abstract class AboutData {
 		Arrays.sort(infos, new Comparator<AboutData>() {
             Collator collator = Collator.getInstance(Locale.getDefault());
 
-			@Override
 			public int compare(AboutData info1, AboutData info2) {
 
 				String provider1 = info1.getProviderName();
@@ -136,7 +135,6 @@ public abstract class AboutData {
 		Arrays.sort(infos, new Comparator<AboutData>() {
             Collator collator = Collator.getInstance(Locale.getDefault());
 
-			@Override
 			public int compare(AboutData info1, AboutData info2) {
 				return collator.compare(info1.getName(), info2.getName());
             }
@@ -164,7 +162,6 @@ public abstract class AboutData {
 		Arrays.sort(infos, new Comparator<AboutData>() {
             Collator collator = Collator.getInstance(Locale.getDefault());
 
-			@Override
 			public int compare(AboutData info1, AboutData info2) {
 
                 String version1 = info1.getVersion();
@@ -200,7 +197,6 @@ public abstract class AboutData {
 		Arrays.sort(infos, new Comparator<AboutData>() {
             Collator collator = Collator.getInstance(Locale.getDefault());
 
-			@Override
 			public int compare(AboutData info1, AboutData info2) {
 
                 String id1 = info1.getId();

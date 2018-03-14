@@ -132,8 +132,7 @@ public class EditorActionBarContributor implements IEditorActionBarContributor {
      * <code>IEditorActionBarContributor</code> method does nothing,
      * subclasses may override.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
     }
 
     /**
@@ -142,8 +141,7 @@ public class EditorActionBarContributor implements IEditorActionBarContributor {
      * then forwards the call to <code>init(IActionBars)</code> for
      * backward compatibility
      */
-    @Override
-	public void init(IActionBars bars, IWorkbenchPage page) {
+    public void init(IActionBars bars, IWorkbenchPage page) {
         this.page = page;
         init(bars);
     }
@@ -186,7 +184,6 @@ public class EditorActionBarContributor implements IEditorActionBarContributor {
      * 
      * @param targetEditor the new target editor
      */
-    @Override
-	public void setActiveEditor(IEditorPart targetEditor) {
+    public void setActiveEditor(IEditorPart targetEditor) {
     }
 }

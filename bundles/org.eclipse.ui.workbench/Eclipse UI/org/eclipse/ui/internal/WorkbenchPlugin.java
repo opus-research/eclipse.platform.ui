@@ -276,8 +276,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
             final Object[] ret = new Object[1];
             final CoreException[] exc = new CoreException[1];
             BusyIndicator.showWhile(null, new Runnable() {
-                @Override
-				public void run() {
+                public void run() {
                     try {
                         ret[0] = element
                                 .createExecutableExtension(classAttribute);
@@ -433,8 +432,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 	 * convenience access to the graphics resources and fast field access for
 	 * some of the commonly used graphical images.
 	 */
-    @Override
-	protected ImageRegistry createImageRegistry() {
+    protected ImageRegistry createImageRegistry() {
         return WorkbenchImages.getImageRegistry();
     }
 
@@ -687,9 +685,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * Answer the workbench.
      * @deprecated Use <code>PlatformUI.getWorkbench()</code> instead.
      */
-    @Deprecated
-	@Override
-	public IWorkbench getWorkbench() {
+    public IWorkbench getWorkbench() {
         return PlatformUI.getWorkbench();
     }
 
@@ -698,8 +694,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * This method must be called whenever the preference store is initially loaded
      * because the default values are not stored in the preference store.
      */
-    @Override
-	protected void initializeDefaultPreferences(IPreferenceStore store) {
+    protected void initializeDefaultPreferences(IPreferenceStore store) {
         // Do nothing.  This should not be called.
         // Prefs are initialized in WorkbenchPreferenceInitializer.
     }
@@ -848,8 +843,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      *  (non-Javadoc)
      * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
      */
-    @Override
-	public void start(BundleContext context) throws Exception {
+    public void start(BundleContext context) throws Exception {
     	context.addBundleListener(getBundleListener());
         super.start(context);
         bundleContext = context;
@@ -1146,8 +1140,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
     /* (non-Javadoc)
      * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
      */
-    @Override
-	public void stop(BundleContext context) throws Exception {
+    public void stop(BundleContext context) throws Exception {
     	if (bundleListener!=null) {
     		context.removeBundleListener(bundleListener);
     		bundleListener = null;
@@ -1257,7 +1250,6 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 	private BundleListener getBundleListener() {
 		if (bundleListener == null) {
 			bundleListener = new SynchronousBundleListener() {
-				@Override
 				public void bundleChanged(BundleEvent event) {
 					WorkbenchPlugin.this.bundleChanged(event);
 				}

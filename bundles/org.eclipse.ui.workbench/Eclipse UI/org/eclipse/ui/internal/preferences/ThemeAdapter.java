@@ -28,8 +28,7 @@ public class ThemeAdapter extends PropertyMapAdapter {
     private ITheme targetTheme;
     
     private IPropertyChangeListener listener = new IPropertyChangeListener() {
-        @Override
-		public void propertyChange(PropertyChangeEvent event) {
+        public void propertyChange(PropertyChangeEvent event) {
             firePropertyChange(event.getProperty());
         }
     };
@@ -41,32 +40,28 @@ public class ThemeAdapter extends PropertyMapAdapter {
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.preferences.PropertyMapAdapter#attachListener()
      */
-    @Override
-	protected void attachListener() {
+    protected void attachListener() {
         targetTheme.addPropertyChangeListener(listener);
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.preferences.PropertyMapAdapter#detachListener()
      */
-    @Override
-	protected void detachListener() {
+    protected void detachListener() {
         targetTheme.removePropertyChangeListener(listener);
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.preferences.IPropertyMap#getKeySet()
      */
-    @Override
-	public Set keySet() {
+    public Set keySet() {
         return getKeySet(targetTheme);
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.preferences.IPropertyMap#getValue(java.lang.String, java.lang.Class)
      */
-    @Override
-	public Object getValue(String propertyId, Class propertyType) {
+    public Object getValue(String propertyId, Class propertyType) {
         return getValue(targetTheme, propertyId, propertyType);
     }
 
@@ -115,16 +110,14 @@ public class ThemeAdapter extends PropertyMapAdapter {
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.preferences.IPropertyMap#propertyExists(java.lang.String)
      */
-    @Override
-	public boolean propertyExists(String propertyId) {
+    public boolean propertyExists(String propertyId) {
         return keySet().contains(propertyId);
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.preferences.IPropertyMap#setValue(java.lang.String)
      */
-    @Override
-	public void setValue(String propertyId, Object newValue) {
+    public void setValue(String propertyId, Object newValue) {
         throw new UnsupportedOperationException();        
     }
 

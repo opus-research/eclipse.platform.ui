@@ -41,7 +41,6 @@ public class WorkbenchPreferenceInitializer extends
 	
 	
 
-	@Override
 	public void initializeDefaultPreferences() {
 		IScopeContext context = new DefaultScope();
 		IEclipsePreferences node = context.getNode(WorkbenchPlugin
