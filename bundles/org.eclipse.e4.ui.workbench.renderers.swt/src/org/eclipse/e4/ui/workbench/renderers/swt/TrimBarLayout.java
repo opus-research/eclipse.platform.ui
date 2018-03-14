@@ -11,6 +11,7 @@
  *     Christian Walther (Indel AG) - Bug 389012: Fix division by zero in TrimBarLayout
  *     Marc-Andre Laperle (Ericsson) - Bug 466233: Toolbar items are wrongly rendered into a "drop-down"
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 476386
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -31,6 +32,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.ToolBar;
 
+/**
+ * This class manages the {@link Layout} of the applications' TrimBar.
+ */
 public class TrimBarLayout extends Layout {
 	class TrimLine {
 		Map<Control, Point> sizeMap = new HashMap<>();
@@ -70,10 +74,23 @@ public class TrimBarLayout extends Layout {
 
 	private List<TrimLine> lines = new ArrayList<>();
 
-	public static String SPACER = "stretch"; //$NON-NLS-1$
-	public static String GLUE = "glue"; //$NON-NLS-1$
+	/**
+	 * When applied as a tag to a toolcontrol (e.g. LayoutModifierToolControl)
+	 * in a {@link MTrimBar}, it takes all available space in that
+	 * {@link MTrimBar}. So items, which are applied behind this spacer item are
+	 * aligned on the right side of the {@link MTrimBar}.
+	 */
+	public final static String SPACER = "stretch"; //$NON-NLS-1$
 
-	private boolean horizontal;
+	/**
+	 * When applied as a tag to a toolcontrol (e.g. LayoutModifierToolControl)
+	 * in a {@link MTrimBar}, it glues the items to the left and the right of it
+	 * together. So in case the {@link MTrimBar} is wrapped, the glued items
+	 * stay together in one Trimbar-line.
+	 */
+	public final static String GLUE = "glue"; //$NON-NLS-1$
+
+	private final boolean horizontal;
 
 	public int marginLeft = 0;
 	public int marginRight = 0;
@@ -81,6 +98,12 @@ public class TrimBarLayout extends Layout {
 	public int marginBottom = 0;
 	public int wrapSpacing = 0;
 
+	/**
+	 * Constructor for the TrimBarLayout.
+	 *
+	 * @param horizontal
+	 *            specifies the alignment of the {@link Layout}.
+	 */
 	public TrimBarLayout(boolean horizontal) {
 		this.horizontal = horizontal;
 	}
@@ -230,10 +253,6 @@ public class TrimBarLayout extends Layout {
 		}
 	}
 
-	/**
-	 * @param curLine
-	 * @param bounds
-	 */
 	private void tileLine(TrimLine curLine, Rectangle bounds) {
 		int curX = bounds.x;
 		int curY = bounds.y;
@@ -312,8 +331,14 @@ public class TrimBarLayout extends Layout {
 	}
 
 	/**
+	 * Get a Control at a certain position from the TrimBar.
+	 *
+	 * @param trimComp
+	 *            TrimBar {@link Composite}
 	 * @param trimPos
-	 * @return
+	 *            position in the TrimBar
+	 *
+	 * @return the {@link Control} at the given trimPos {@link Point}.
 	 */
 	public Control ctrlFromPoint(Composite trimComp, Point trimPos) {
 		if (trimComp == null || trimComp.isDisposed() || lines == null
