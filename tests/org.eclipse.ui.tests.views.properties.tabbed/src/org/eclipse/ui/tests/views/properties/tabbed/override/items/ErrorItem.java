@@ -24,18 +24,30 @@ import org.eclipse.ui.tests.views.properties.tabbed.model.Error;
  */
 public class ErrorItem extends InformationItem {
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.tests.views.properties.tabbed.override.items.InformationItem#getElement()
+	 */
 	public Class getElement() {
 		return Error.class;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.tests.views.properties.tabbed.override.items.InformationItem#getImage()
+	 */
 	public Image getImage() {
 		return PlatformUI.getWorkbench().getSharedImages().getImage(
 				ISharedImages.IMG_OBJS_ERROR_TSK);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.tests.views.properties.tabbed.override.items.InformationItem#getText()
+	 */
 	public String getText() {
 		return "Error"; //$NON-NLS-1$
 	}

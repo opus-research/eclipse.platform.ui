@@ -123,6 +123,9 @@ public class ProjectPropertyDialogAction extends PartEventAction implements
         return resource.getProject();
     }
 
+    /* (non-javadoc)
+     * Method declared on ActionFactory.IWorkbenchAction
+     */
     @Override
 	public void dispose() {
         if (workbenchWindow == null) {

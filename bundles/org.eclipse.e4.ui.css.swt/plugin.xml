@@ -443,14 +443,6 @@
       <handler
             adapter="org.eclipse.e4.ui.css.swt.dom.CTabFolderElement"
             composite="false"
-            handler="org.eclipse.e4.ui.css.swt.properties.custom.CSSPropertyUnselectHotTabsColorBackgroundHandler">
-         <property-name
-               name="unselected-hot-tab-color-background">
-         </property-name>
-      </handler>
-      <handler
-            adapter="org.eclipse.e4.ui.css.swt.dom.CTabFolderElement"
-            composite="false"
             handler="org.eclipse.e4.ui.css.swt.properties.custom.CSSPropertyShadowColorHandler">
          <property-name
                name="swt-shadow-color">
