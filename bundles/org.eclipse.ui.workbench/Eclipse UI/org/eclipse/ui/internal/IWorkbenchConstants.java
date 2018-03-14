@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,19 +21,25 @@ public interface IWorkbenchConstants {
     /**
      * @deprecated
      */
-    public static final String ACCELERATOR_CONFIGURATION_ID = "acceleratorConfigurationId"; //$NON-NLS-1$
+    @Deprecated
+	public static final String ACCELERATOR_CONFIGURATION_ID = "acceleratorConfigurationId"; //$NON-NLS-1$
 
     public static final String DEFAULT_PRESENTATION_ID = "org.eclipse.ui.presentations.default"; //$NON-NLS-1$
     
     /**
      * @deprecated 
      */
-    public static final String DEFAULT_ACCELERATOR_CONFIGURATION_ID = "org.eclipse.ui.defaultAcceleratorConfiguration"; //$NON-NLS-1$
+    @Deprecated
+	public static final String DEFAULT_ACCELERATOR_CONFIGURATION_ID = "org.eclipse.ui.defaultAcceleratorConfiguration"; //$NON-NLS-1$
 
     /**
      * @deprecated 
      */
-    public static final String DEFAULT_ACCELERATOR_SCOPE_ID = "org.eclipse.ui.globalScope"; //$NON-NLS-1$
+    @Deprecated
+	public static final String DEFAULT_ACCELERATOR_SCOPE_ID = "org.eclipse.ui.globalScope"; //$NON-NLS-1$
+
+	// ID of the MPerspectiveStack in the IDE e4 model
+	public static final String PERSPECTIVE_STACK_ID = "org.eclipse.ui.ide.perspectivestack"; //$NON-NLS-1$
 
     //mappings for type/extension to an editor - backward compatibility only.
     public final static String EDITOR_FILE_NAME = "editors.xml"; //$NON-NLS-1$
@@ -109,8 +115,6 @@ public interface IWorkbenchConstants {
     public static final String TAG_ITEM_WRAP_INDEX = "wrapIndex"; //$NON-NLS-1$
 
     public static final String TAG_TOOLBAR_LAYOUT = "toolbarLayout"; //$NON-NLS-1$
-
-	public static final String TAG_TOOLBAR_SEPARATOR = "toolbarSeparator"; //$NON-NLS-1$
 
     public static final String TAG_WIDTH = "width"; //$NON-NLS-1$
 
@@ -341,10 +345,6 @@ public interface IWorkbenchConstants {
     public static final String TAG_TRIM_AREA = "trimArea"; //$NON-NLS-1$
         
     public static final String TAG_TRIM_ITEM = "trimItem"; //$NON-NLS-1$
-
-	public static final String TRIM_PERSPECTIVE_SPACER = "PerspectiveSpacer"; //$NON-NLS-1$
-
-	public static final String ADDITIONS = "additions"; //$NON-NLS-1$
 
     //Fonts
     public static final String SMALL_FONT = "org.eclipse.ui.smallFont"; //$NON-NLS-1$
