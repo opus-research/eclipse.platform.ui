@@ -115,7 +115,8 @@ public class ModelAssembler {
 		IContributor contributor = ce.getContributor();
 		String attrURI = ce.getAttribute("uri"); //$NON-NLS-1$
 		if (attrURI == null) {
-			logger.warn("Unable to find location for the model extension \"{0}\"", //$NON-NLS-1$
+			logger.warn(
+					"ModelAssembler.processFragment(): Unable to find location for the model extension \"{0}\"", //$NON-NLS-1$
 					contributor.getName());
 			return;
 		}
@@ -141,7 +142,9 @@ public class ModelAssembler {
 		try {
 			resource = resourceSet.getResource(uri, true);
 		} catch (RuntimeException e) {
-			logger.warn(e, "Unable to read model extension from " + uri.toString()); //$NON-NLS-1$
+			logger.warn(
+					e,
+					"ModelAssembler.processFragment(): Unable to read model extension from " + uri.toString()); //$NON-NLS-1$
 			return;
 		}
 
@@ -153,7 +156,8 @@ public class ModelAssembler {
 		Object extensionRoot = contents.get(0);
 
 		if (!(extensionRoot instanceof MModelFragments)) {
-			logger.warn("Unable to create model extension \"{0}\"", //$NON-NLS-1$
+			logger.warn(
+					"ModelAssembler.processFragment(): Unable to create model extension \"{0}\"", //$NON-NLS-1$
 					contributor.getName());
 			return;
 		}
@@ -193,7 +197,7 @@ public class ModelAssembler {
 				evalImports = true;
 				addedElements.addAll(merged);
 			} else {
-				logger.info("Nothing to merge for \"{0}\"", uri); //$NON-NLS-1$
+				logger.info("ModelAssembler.processFragment(): Nothing to merge for \"{0}\"", uri); //$NON-NLS-1$
 			}
 		}
 
@@ -241,7 +245,7 @@ public class ModelAssembler {
 
 			MApplicationElement el = findElementById(application, id);
 			if (el == null) {
-				logger.warn("Could not find element with id '" + id + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+				logger.warn("ModelAssembler.runProcessor(): Could not find the element with  the id '" + id + "'."); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			localContext.set(key, el);
 		}
@@ -270,7 +274,7 @@ public class ModelAssembler {
 			MApplicationElement realElement = findElementById(application,
 					importedElement.getElementId());
 			if (realElement == null) {
-				logger.warn("Could not resolve an import element for '" + realElement + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+				logger.warn("ModelAssembler.resolveImports(): Could not resolve an import element for '" + realElement + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			importMaps.put(importedElement, realElement);
@@ -292,7 +296,7 @@ public class ModelAssembler {
 
 					MApplicationElement el = importMaps.get(importObject);
 					if (el == null) {
-						logger.warn("Could not resolve import for " + el); //$NON-NLS-1$
+						logger.warn("ModelAssembler.resolveImports(): Could not resolve import for " + el); //$NON-NLS-1$
 					}
 
 					final EObject interalTarget = o;
@@ -413,7 +417,7 @@ public class ModelAssembler {
 		};
 		Collections.sort(sortedByOutdegree, outdegreeSorter);
 		if (!requires.get(sortedByOutdegree.get(0)).isEmpty()) {
-			logger.warn("Extensions have a cycle"); //$NON-NLS-1$
+			logger.warn("ModelAssember.topoSort(): Extensions have a cycle"); //$NON-NLS-1$
 		}
 
 		while (!sortedByOutdegree.isEmpty()) {
