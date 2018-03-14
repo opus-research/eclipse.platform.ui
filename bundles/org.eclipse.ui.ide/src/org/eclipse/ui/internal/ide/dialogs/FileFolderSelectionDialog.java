@@ -46,6 +46,11 @@ public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
 		private static final Image IMG_FILE = PlatformUI.getWorkbench()
 				.getSharedImages().getImage(ISharedImages.IMG_OBJ_FILE);
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.LabelProvider#getImage(java.lang.Object)
+		 */
 		@Override
 		public Image getImage(Object element) {
 			if (element instanceof IFileStore) {
@@ -58,6 +63,11 @@ public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
 			return null;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
+		 */
 		@Override
 		public String getText(Object element) {
 			if (element instanceof IFileStore) {
@@ -85,6 +95,11 @@ public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
 		public FileContentProvider(final boolean showFiles) {
 			fileFilter = new IFileStoreFilter() {
 
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see org.eclipse.ui.internal.ide.dialogs.IFileStoreFilter#accept(org.eclipse.core.filesystem.IFileStore)
+				 */
 				@Override
 				public boolean accept(IFileStore file) {
 					if (!file.fetchInfo().isDirectory() && showFiles == false) {
@@ -108,6 +123,11 @@ public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
 			return EMPTY;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
+		 */
 		@Override
 		public Object getParent(Object element) {
 			if (element instanceof IFileStore) {
@@ -139,6 +159,11 @@ public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
 	 * Viewer sorter that places folders first, then files.
 	 */
 	private static class FileViewerSorter extends ViewerComparator {
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ViewerSorter#category(java.lang.Object)
+		 */
 		@Override
 		public int category(Object element) {
 			if (element instanceof IFileStore
@@ -173,6 +198,11 @@ public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
 			this.acceptFolders = acceptFolders;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.dialogs.ISelectionStatusValidator#validate(java.lang.Object[])
+		 */
 		@Override
 		public IStatus validate(Object[] selection) {
 			int nSelected = selection.length;

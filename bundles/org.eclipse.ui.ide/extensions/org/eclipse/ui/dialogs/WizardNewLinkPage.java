@@ -84,6 +84,9 @@ public class WizardNewLinkPage extends WizardPage {
         setPageComplete(true);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IDialogPage.
+     */
     @Override
 	public void createControl(Composite parent) {
         Font font = parent.getFont();

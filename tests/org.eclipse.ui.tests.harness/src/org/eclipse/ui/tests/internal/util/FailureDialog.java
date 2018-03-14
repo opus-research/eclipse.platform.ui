@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.internal.util;
 
@@ -82,25 +81,31 @@ public class FailureDialog extends Dialog {
         super.okPressed();
     }
 
-	/**
-	 * @return String the text contained in the input area of the dialog.
-	 */
+    /*
+     * @return String the text contained in the input area of
+     * the dialog.
+     */
     String getText() {
-		return (_log == null) ? "Empty entry." : _log;
+        if (_log == null) {
+            return "Empty entry.";
+        } else {
+            return _log;
+        }
     }
 
-	/**
-	 * Sets the text of the input area. This should only be called to set the
-	 * initial text so only call before invoking open().
-	 */
+    /*
+     * Sets the text of the input area.  This should only be
+     * called to set the initial text so only call before invoking
+     * open().
+     */
     void setText(String text) {
         _text.setText(text);
     }
 
-	/**
-	 * Returns a string representation of this class which the text contained in
-	 * the input area of the dialog.
-	 */
+    /*
+     * Returns a string representation of this class which
+     * the text contained in the input area of the dialog.
+     */
     @Override
 	public String toString() {
         return getText();
