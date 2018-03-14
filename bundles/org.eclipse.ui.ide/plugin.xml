@@ -1015,11 +1015,6 @@
             id="org.eclipse.ui.ide.showInSystemExplorer"
             description="%command.showInSystemExplorer.description">
       </command>
-      <command
-            description="%command.addFiles.description"
-            id="org.eclipse.ui.ide.addFiles"
-            name="%command.addFiles.name">
-      </command>
    </extension>
    
    <extension
@@ -2061,24 +2056,6 @@
           </visibleWhen>
          </command>
       </menuContribution>
-      <menuContribution
-            locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=export">
-         <command
-               commandId="org.eclipse.ui.ide.addFiles"
-               label="%command.addFiles.name"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <iterate
-                     ifEmpty="false"
-                     operator="and">
-                  <adapt
-                        type="org.eclipse.core.resources.IContainer">
-                  </adapt>
-               </iterate>
-            </visibleWhen>
-         </command>
-      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -2270,10 +2247,6 @@
                   definitionId="org.eclipse.ui.ide.showInDefinition">
             </reference>
          </enabledWhen>
-      </handler>
-      <handler
-            class="org.eclipse.ui.internal.ide.handlers.AddExternalFilesHandler"
-            commandId="org.eclipse.ui.ide.addFiles">
       </handler>
    </extension>
    <extension
