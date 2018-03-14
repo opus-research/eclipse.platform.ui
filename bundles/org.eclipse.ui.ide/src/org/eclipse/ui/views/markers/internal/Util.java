@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 
 package org.eclipse.ui.views.markers.internal;
 
+import com.ibm.icu.text.DateFormat;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -28,11 +29,9 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.ide.Policy;
 import org.eclipse.ui.views.markers.MarkerViewUtil;
 
-import com.ibm.icu.text.DateFormat;
-
 /**
  * The Util class is the class of general utilities used by the marker support.
- *
+ * 
  */
 public final class Util {
 
@@ -45,13 +44,13 @@ public final class Util {
 	private static DateFormat format;
 
 	static final MarkerNode[] EMPTY_MARKER_ARRAY = new MarkerNode[0];
-
+	
 	static final String TYPE_MARKER_GROUPING_ID = "org.eclipse.ui.ide.type"; //$NON-NLS-1$
 
 	/**
 	 * Get the propery called property from the marker. If it is not found
 	 * return the empty string.
-	 *
+	 * 
 	 * @param property
 	 * @param marker
 	 * @return String
@@ -74,7 +73,7 @@ public final class Util {
 
 	/**
 	 * Get the human readable creation time from the timestamp
-	 *
+	 * 
 	 * @param timestamp
 	 * @return String
 	 */
@@ -88,7 +87,7 @@ public final class Util {
 
 	/**
 	 * Get the human readable creation time from the marker.
-	 *
+	 * 
 	 * @param marker
 	 * @return String
 	 */
@@ -105,7 +104,7 @@ public final class Util {
 	 * Get the name of the container. If the marker has the
 	 * MarkerViewUtil#PATH_ATTRIBUTE set use that. Otherwise use the path of the
 	 * parent resource.
-	 *
+	 * 
 	 * @param marker
 	 * @return String
 	 */
@@ -154,15 +153,14 @@ public final class Util {
 	 * Get the name of the element. If the marker has the
 	 * MarkerViewUtil#NAME_ATTRIBUTE set use that. Otherwise use the name of the
 	 * resource.
-	 *
+	 * 
 	 * @param marker
 	 * @return String
 	 */
 	public static String getResourceName(IMarker marker) {
 
-		if (!marker.exists()) {
+		if (!marker.exists())
 			return Util.EMPTY_STRING;
-		}
 
 		try {
 			Object nameAttribute = marker
@@ -180,7 +178,7 @@ public final class Util {
 
 	/**
 	 * Return whether or not the marker is editable.
-	 *
+	 * 
 	 * @param marker
 	 * @return boolean <code>true</code> if it is editable
 	 */
@@ -199,7 +197,7 @@ public final class Util {
 
 	/**
 	 * Return an error status for the given exception.
-	 *
+	 * 
 	 * @param exception
 	 * @return IStatus
 	 */
@@ -224,7 +222,7 @@ public final class Util {
 
 	/**
 	 * Get the image for the severity if it can be identified.
-	 *
+	 * 
 	 * @param severity
 	 * @return Image or <code>null</code>
 	 */
@@ -245,7 +243,7 @@ public final class Util {
 
 	/**
 	 * Get the IDE image at path.
-	 *
+	 * 
 	 * @param path
 	 * @return Image
 	 */
@@ -258,15 +256,14 @@ public final class Util {
 
 	/**
 	 * Get the short name for the container
-	 *
+	 * 
 	 * @param marker
 	 * @return String
 	 */
 	public static String getShortContainerName(IMarker marker) {
 
-		if (!marker.exists()) {
+		if (!marker.exists())
 			return Util.EMPTY_STRING;
-		}
 
 		try {
 			Object pathAttribute = marker
@@ -302,7 +299,7 @@ public final class Util {
 
 	/**
 	 * Return whether or not the selection has one element that is concrete.
-	 *
+	 * 
 	 * @param selection
 	 * @return <true>code</true> if the selection has one element that is
 	 *         concrete.
@@ -319,13 +316,13 @@ public final class Util {
 
 	/**
 	 * Return whether or not all of the elements in the selection are concrete.
-	 *
+	 * 
 	 * @param selection
 	 * @return <true>code</true> if all of the elements are concrete.
 	 */
 	public static boolean allConcreteSelection(IStructuredSelection selection) {
 		if (selection != null && selection.size() > 0) {
-			Iterator<?> nodes = selection.iterator();
+			Iterator nodes = selection.iterator();
 			while (nodes.hasNext()) {
 				if (((MarkerNode) nodes.next()).isConcrete()) {
 					continue;

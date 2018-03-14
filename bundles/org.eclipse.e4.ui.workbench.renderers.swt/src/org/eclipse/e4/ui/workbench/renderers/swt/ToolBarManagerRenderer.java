@@ -11,7 +11,6 @@
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 426535, 433234, 431868
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 431778
  *     Andrey Loskutov <loskutov@gmx.de> - Bugs 383569, 457198
- *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 431990
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
