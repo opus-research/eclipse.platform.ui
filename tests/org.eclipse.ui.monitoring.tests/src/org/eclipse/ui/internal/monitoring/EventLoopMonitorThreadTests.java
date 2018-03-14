@@ -9,28 +9,22 @@
  *	   Steve Foreman (Google) - initial API and implementation
  *	   Marcus Eng (Google)
  *	   Sergey Prigogin (Google)
- *	   Simon Scholz <simon.scholz@vogella.com> - Bug 443391
  *******************************************************************************/
 package org.eclipse.ui.internal.monitoring;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.List;
+
+import junit.framework.TestCase;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.internal.monitoring.EventLoopMonitorThread.Parameters;
 import org.eclipse.ui.monitoring.PreferenceConstants;
 import org.eclipse.ui.monitoring.UiFreezeEvent;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * Tests for {@link EventLoopMonitorThread} class.
  */
-public class EventLoopMonitorThreadTests {
+public class EventLoopMonitorThreadTests extends TestCase {
 	/**
 	 * A mock event loop monitor thread used for JUnit tests.
 	 */
@@ -80,7 +74,7 @@ public class EventLoopMonitorThreadTests {
 	private static long numSleeps;
 	private static volatile long timestamp;
 
-	@Before
+	@Override
 	public void setUp() {
 		getPreferences().setValue(PreferenceConstants.MONITORING_ENABLED, false);
 		logger = new MockUiFreezeEventLogger();
@@ -90,7 +84,7 @@ public class EventLoopMonitorThreadTests {
 		timestamp = 1;
 	}
 
-	@After
+	@Override
 	public void tearDown() throws Exception {
 		if (monitoringThread != null) {
 			shutdownMonitoringThread();
@@ -165,7 +159,6 @@ public class EventLoopMonitorThreadTests {
 		return Math.min((int) (runningTimeMs / POLLING_RATE_MS), MIN_STACK_TRACES);
 	}
 
-	@Test
 	public void testStackDecimation() throws Exception {
 		UiFreezeEvent event;
 
@@ -226,7 +219,6 @@ public class EventLoopMonitorThreadTests {
 				event.getStackTraceSamples().length);
 	}
 
-	@Test
 	public void testPublishPossibleDeadlock() throws Exception {
 		monitoringThread = createTestThread(POLLING_RATE_MS * 4);
 		monitoringThread.start();
@@ -265,7 +257,6 @@ public class EventLoopMonitorThreadTests {
 		assertEquals("No more deadlock events should get logged", 1, loggedEvents.size());
 	}
 
-	@Test
 	public void testPublishNoDeadlocksWhenSleeping() throws Exception {
 		monitoringThread = createTestThread(THRESHOLD_MS);
 		monitoringThread.start();
@@ -288,7 +279,6 @@ public class EventLoopMonitorThreadTests {
 		assertTrue("No deadlock events should get logged", loggedEvents.isEmpty());
 	}
 
-	@Test
 	public void testNoLoggingForSleep() throws Exception {
 		int eventFactor = 5;
 		monitoringThread = createTestThread(THRESHOLD_MS);
@@ -305,7 +295,6 @@ public class EventLoopMonitorThreadTests {
 		assertTrue("Sleeping should not trigger a long running event", loggedEvents.isEmpty());
 	}
 
-	@Test
 	public void testEventLogging() throws Exception {
 		int eventFactor = 5;
 		long eventStartTime = 0;
@@ -334,7 +323,6 @@ public class EventLoopMonitorThreadTests {
 				expectedStackCount(eventStallDuration), event.getStackTraceSamples().length);
 	}
 
-	@Test
 	public void testNestedEventLogging() throws Exception {
 		int eventFactor = 6;
 
@@ -366,7 +354,6 @@ public class EventLoopMonitorThreadTests {
 				expectedStackCount(eventStallDuration), event.getStackTraceSamples().length);
 	}
 
-	@Test
 	public void testDoublyNestedEventLogging() throws Exception {
 		int eventFactor = 7;
 
@@ -401,7 +388,6 @@ public class EventLoopMonitorThreadTests {
 				expectedStackCount(eventStallDuration), event.getStackTraceSamples().length);
 	}
 
-	@Test
 	public void testSeeLongEventInContinuationAfterNestedCall() throws Exception {
 		int eventFactor = 4;
 
@@ -438,7 +424,6 @@ public class EventLoopMonitorThreadTests {
 				expectedStackCount(eventStallDuration), event.getStackTraceSamples().length);
 	}
 
-	@Test
 	public void testSeeLongEventInTheMiddleOfNestedCalls() throws Exception {
 		int eventFactor = 4;
 		monitoringThread = createTestThread(THRESHOLD_MS);
@@ -483,7 +468,6 @@ public class EventLoopMonitorThreadTests {
 				expectedStackCount(eventStallDuration), event.getStackTraceSamples().length);
 	}
 
-	@Test
 	public void testSeeSleepInTheMiddleOfNestedCalls() throws Exception {
 		int eventFactor = 4;
 		monitoringThread = createTestThread(THRESHOLD_MS);
@@ -521,7 +505,6 @@ public class EventLoopMonitorThreadTests {
 				loggedEvents.isEmpty());
 	}
 
-	@Test
 	public void testConsecutiveSleeps() throws Exception {
 		int eventFactor = 5;
 		long eventStartTime = 0;
