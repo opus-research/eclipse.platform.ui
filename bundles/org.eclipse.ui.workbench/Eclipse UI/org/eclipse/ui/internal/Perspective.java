@@ -10,6 +10,7 @@
  *     Markus Alexander Kuppe, Versant GmbH - bug 215797
  *     Sascha Zak - bug 282874
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810, 440136
+ *     Andrey Loskutov <loskutov@gmx.de> - Cleaned up code, Bug 404348, 421178
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -53,12 +54,39 @@ public class Perspective {
 
 	public void initActionSets() {
 		if (descriptor != null) {
-			List<IActionSetDescriptor> temp = new ArrayList<IActionSetDescriptor>();
 			List<String> ids = ModeledPageLayout.getIds(layout, ModeledPageLayout.ACTION_SET_TAG);
+
+			// read explicitly disabled sets.
+			String hiddenIDs = page.getHiddenItems();
+			List<String> alwaysOff = new ArrayList<String>();
+
+			String[] hiddenIds = hiddenIDs.split(","); //$NON-NLS-1$
+			for (String id : hiddenIds) {
+				if (!id.startsWith(ModeledPageLayout.HIDDEN_ACTIONSET_PREFIX)) {
+					continue;
+				}
+				id = id.substring(ModeledPageLayout.HIDDEN_ACTIONSET_PREFIX.length());
+				if (!alwaysOff.contains(id)) {
+					alwaysOff.add(id);
+				}
+			}
+
+			ids.removeAll(alwaysOff);
+
+			List<IActionSetDescriptor> temp = new ArrayList<IActionSetDescriptor>();
 			createInitialActionSets(temp, ids);
+
 			for (IActionSetDescriptor descriptor : temp) {
 				if (!alwaysOnActionSets.contains(descriptor)) {
 					alwaysOnActionSets.add(descriptor);
+				}
+			}
+
+			temp = new ArrayList<IActionSetDescriptor>();
+			createInitialActionSets(temp, alwaysOff);
+			for (IActionSetDescriptor descriptor : temp) {
+				if (!alwaysOffActionSets.contains(descriptor)) {
+					alwaysOffActionSets.add(descriptor);
 				}
 			}
 		}
@@ -228,11 +256,9 @@ public class Perspective {
 				}
 			}
 			addAlwaysOff(toRemove);
-			// remove tag
-			String tag = ModeledPageLayout.ACTION_SET_TAG + id;
-			if (layout.getTags().contains(tag)) {
-				layout.getTags().remove(tag);
-			}
+			// doesn't make sense to *remove* tag, it is "disabled" now
+			// String tag = ModeledPageLayout.ACTION_SET_TAG + id;
+			// layout.getTags().remove(tag);
 		} finally {
 			service.deferUpdates(false);
 		}
