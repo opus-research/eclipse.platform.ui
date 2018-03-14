@@ -13,15 +13,14 @@ package org.eclipse.e4.ui.css.swt.dom;
 
 import org.eclipse.e4.ui.css.core.dom.CSSStylableElement;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
-import org.eclipse.e4.ui.css.swt.helpers.CSSSWTFontHelper;
-import org.eclipse.e4.ui.css.swt.helpers.CSSSWTImageHelper;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
 
 /**
  * {@link CSSStylableElement} implementation which wrap SWT {@link TableItem}.
- *
+ * 
  */
 public class TableItemElement extends ItemElement {
 
@@ -55,12 +54,12 @@ public class TableItemElement extends ItemElement {
 		TableItem tableItem = getTableItem();
 		tableItem.setForeground(null);
 		tableItem.setBackground(null);
-		CSSSWTImageHelper.restoreDefaultImage(tableItem);
+		tableItem.setImage((Image) null);
 		tableItem.setFont(null); // in such case the parent's font will be taken
 
 		Table parent = tableItem.getParent();
 		parent.setForeground(null);
 		parent.setBackground(null);
-		CSSSWTFontHelper.restoreDefaultFont(parent);
+		parent.setFont(parent.getDisplay().getSystemFont());
 	}
 }

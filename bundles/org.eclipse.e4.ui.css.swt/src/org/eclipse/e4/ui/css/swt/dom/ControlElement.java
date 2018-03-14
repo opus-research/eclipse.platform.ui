@@ -13,8 +13,6 @@ package org.eclipse.e4.ui.css.swt.dom;
 
 import org.eclipse.e4.ui.css.core.dom.CSSStylableElement;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
-import org.eclipse.e4.ui.css.swt.helpers.CSSSWTCursorHelper;
-import org.eclipse.e4.ui.css.swt.helpers.CSSSWTFontHelper;
 import org.eclipse.e4.ui.css.swt.properties.GradientBackgroundListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
@@ -30,7 +28,7 @@ import org.w3c.dom.Node;
 
 /**
  * {@link CSSStylableElement} implementation which wrap SWT {@link Control}.
- *
+ * 
  */
 public class ControlElement extends WidgetElement {
 	private static final String WEBSITE_CLASS = "org.eclipse.swt.browser.WebSite";
@@ -147,8 +145,9 @@ public class ControlElement extends WidgetElement {
 	public void reset() {
 		super.reset();
 		Control control = getControl();
-		CSSSWTFontHelper.restoreDefaultFont(control);
-		CSSSWTCursorHelper.restoreDefaultCursor(control);
+		control.setFont(control.getDisplay().getSystemFont());
+		control.setCursor(control.getDisplay()
+				.getSystemCursor(SWT.CURSOR_ARROW));
 		control.setBackgroundImage(null);
 		GradientBackgroundListener.remove(control);
 
