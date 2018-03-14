@@ -23,7 +23,7 @@ public class SWTUtil {
     /**
      * Stores a work queue for each display
      */
-    private static Map mapDisplayOntoWorkQueue = new HashMap();
+	private static Map<Display, WorkQueue> mapDisplayOntoWorkQueue = new HashMap<Display, WorkQueue>();
 
     private SWTUtil() {
     }
@@ -111,7 +111,7 @@ public class SWTUtil {
         WorkQueue result;
         synchronized (mapDisplayOntoWorkQueue) {
             // Look for existing queue
-            result = (WorkQueue) mapDisplayOntoWorkQueue.get(d);
+			result = mapDisplayOntoWorkQueue.get(d);
 
             if (result == null) {
                 // If none, create new queue

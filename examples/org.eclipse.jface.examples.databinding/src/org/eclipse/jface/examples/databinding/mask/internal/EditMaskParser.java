@@ -12,6 +12,7 @@
 package org.eclipse.jface.examples.databinding.mask.internal;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.jface.examples.databinding.mask.EditMaskParseException;
 
@@ -27,14 +28,14 @@ public class EditMaskParser {
 	 * @throws EditMaskParseException
 	 */
 	public EditMaskParser(String editMask) throws EditMaskParseException {
-		LinkedList tokens = new LinkedList();
+		List<EditMaskLexerAndToken> tokens = new LinkedList<EditMaskLexerAndToken>();
 		int position = 0;
 		while (position < editMask.length()) {
 			EditMaskLexerAndToken token = new EditMaskLexerAndToken();
 			position += token.initializeEditMask(editMask, position);
 			tokens.add(token);
 		}
-		expectedTokens = (EditMaskLexerAndToken[]) tokens.toArray(new EditMaskLexerAndToken[tokens.size()]);
+		expectedTokens = tokens.toArray(new EditMaskLexerAndToken[tokens.size()]);
 	}
 
 	/**

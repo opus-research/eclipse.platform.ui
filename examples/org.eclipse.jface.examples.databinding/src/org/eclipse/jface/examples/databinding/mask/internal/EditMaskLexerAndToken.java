@@ -12,6 +12,7 @@
 package org.eclipse.jface.examples.databinding.mask.internal;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jface.examples.databinding.mask.EditMaskParseException;
 
@@ -27,7 +28,8 @@ public class EditMaskLexerAndToken {
 	/*
 	 * First the literals that represent the types of characters
 	 */
-	private static ArrayList reservedWords = new ArrayList();{
+	private static List<String> reservedWords = new ArrayList<String>();
+	{
 		reservedWords.add("#");
 		reservedWords.add("A");
 		reservedWords.add("a");
@@ -37,7 +39,9 @@ public class EditMaskLexerAndToken {
 	/*
 	 * ...and their corresponding regular expressions
 	 */
-	private static ArrayList inputRegexes = new ArrayList();{
+	private static List<String> inputRegexes = new ArrayList<String>();
+
+	{
 		inputRegexes.add("^[0-9]$");
 		inputRegexes.add("^[A-Z]$");
 		inputRegexes.add("^[a-zA-Z]$");
@@ -53,7 +57,7 @@ public class EditMaskLexerAndToken {
 		String input = inputMask.substring(position, position+1);
 		for (int reservedWord = 0; reservedWord < reservedWords.size(); reservedWord++) {
 			if (input.equals(reservedWords.get(reservedWord))) {
-				charRegex = (String) inputRegexes.get(reservedWord);
+				charRegex = inputRegexes.get(reservedWord);
 				literal = null;
 				input = null;
 				readOnly = false;

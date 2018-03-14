@@ -12,6 +12,7 @@
 package org.eclipse.jface.examples.databinding.model;
 
 import java.util.LinkedList;
+import java.util.List;
 
 
 public class SimpleModel {
@@ -28,9 +29,9 @@ public class SimpleModel {
 
 	// Now a PersonList property...
 
-	LinkedList personList = new LinkedList();
+	List<SimplePerson> personList = new LinkedList<SimplePerson>();
 
-	public LinkedList getPersonList() {
+	public List<SimplePerson> getPersonList() {
 		return personList;
 	}
 
