@@ -27,10 +27,10 @@ import org.eclipse.swt.widgets.TableColumn;
 public class TestTable extends TestBrowser {
 
 	@Override
-	public Viewer createViewer(Composite parent) {
-		TableViewer viewer = new TableViewer(parent);
+    public Viewer<TestElement> createViewer(Composite parent) {
+        TableViewer<TestElement,TestElement>  viewer = new TableViewer<TestElement,TestElement>(parent);
 		viewer.setContentProvider(new TestModelContentProvider());
-		viewer.setLabelProvider(new TestLabelProvider());
+        viewer.setLabelProvider(new TestLabelProvider<TestElement>());
 		viewer.getTable().setLinesVisible(true);
 
 		TableLayout layout = new TableLayout();

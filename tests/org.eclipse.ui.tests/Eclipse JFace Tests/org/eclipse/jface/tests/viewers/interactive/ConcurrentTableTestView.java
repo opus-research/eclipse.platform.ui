@@ -12,6 +12,7 @@
 package org.eclipse.jface.tests.viewers.interactive;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -37,12 +38,13 @@ import org.eclipse.ui.progress.WorkbenchJob;
  */
 public class ConcurrentTableTestView extends ViewPart {
 
-	private TableViewer table;
+	private TableViewer<Object, SetModel> table;
 	private boolean enableSlowComparisons = false;
 	private TestComparator comparator = new TestComparator() {
 
 		@Override
 		public int compare(Object arg0, Object arg1) {
+
 			if (enableSlowComparisons) {
 				int delay = 2; // Time to spin the CPU for (milliseconds)
 
@@ -85,7 +87,7 @@ public class ConcurrentTableTestView extends ViewPart {
 
 		// Create the table
 		{
-			table = new TableViewer(parent, SWT.VIRTUAL);
+			table = new TableViewer<Object, SetModel>(parent, SWT.VIRTUAL);
 			contentProvider = new DeferredContentProvider(comparator);
 			table.setContentProvider(contentProvider);
 
@@ -115,6 +117,7 @@ public class ConcurrentTableTestView extends ViewPart {
 					enableSlowComparisons = slowComparisons.getSelection();
 					super.widgetSelected(e);
 				}
+
 			});
 
 			final Button limitSize = new Button(buttonBar, SWT.CHECK);
@@ -162,7 +165,6 @@ public class ConcurrentTableTestView extends ViewPart {
 					clear();
 				}
 			});
-
 		}
 	}
 
@@ -175,8 +177,7 @@ public class ConcurrentTableTestView extends ViewPart {
 	}
 
 	public void addRandomElements(int amount) {
-
-		ArrayList tempList = new ArrayList();
+		List<String> tempList = new ArrayList<String>();
 
 		for (int counter = 0; counter < amount; counter++) {
 			tempList.add("" + rand.nextLong() + " " + counter);
