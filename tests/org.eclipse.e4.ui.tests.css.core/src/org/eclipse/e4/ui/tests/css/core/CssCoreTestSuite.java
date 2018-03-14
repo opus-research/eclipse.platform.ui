@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Stefan Winkler <stefan@winklerweb.net> - Bug 430052, 419377
+ *     Stefan Winkler <stefan@winklerweb.net> - Bug 430052
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430468
  *******************************************************************************/
 package org.eclipse.e4.ui.tests.css.core;
@@ -15,7 +15,6 @@ package org.eclipse.e4.ui.tests.css.core;
 import org.eclipse.e4.ui.tests.css.core.parser.CascadeTest;
 import org.eclipse.e4.ui.tests.css.core.parser.FontFaceRulesTest;
 import org.eclipse.e4.ui.tests.css.core.parser.ImportTest;
-import org.eclipse.e4.ui.tests.css.core.parser.InheritTest;
 import org.eclipse.e4.ui.tests.css.core.parser.MediaRulesTest;
 import org.eclipse.e4.ui.tests.css.core.parser.RGBColorImplTest;
 import org.eclipse.e4.ui.tests.css.core.parser.SelectorTest;
@@ -37,8 +36,7 @@ import org.junit.runners.Suite.SuiteClasses;
 	ValueTest.class,
 	SelectorTest.class,
 	CSSEngineTest.class,
-	ImportTest.class,
-	InheritTest.class
+	ImportTest.class
 })
 public class CssCoreTestSuite {
 }
