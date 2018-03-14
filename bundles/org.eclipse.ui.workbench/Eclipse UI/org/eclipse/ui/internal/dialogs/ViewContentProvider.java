@@ -31,9 +31,6 @@ import org.eclipse.ui.views.IViewRegistry;
  */
 public class ViewContentProvider implements ITreeContentProvider {
 
-	final private static String CATEGORY_TAG = "categoryTag:"; //$NON-NLS-1$
-	final private static int CATEGORY_TAG_LENGTH = CATEGORY_TAG.length();
-
 	/**
 	 * Child cache. Map from Object->Object[]. Our hasChildren() method is
 	 * expensive so it's better to cache the results of getChildren().
@@ -115,8 +112,8 @@ public class ViewContentProvider implements ITreeContentProvider {
 			if (isFilteredByActivity(descriptor.getElementId()) || isIntroView(descriptor.getElementId())) {
 				continue;
 			}
-			String categoryTag = getCategory(descriptor);
-			if (categoryDescription.equals(categoryTag)) {
+			String category = descriptor.getCategory();
+			if (categoryDescription.equals(category)) {
 				categoryDescriptors.add(descriptor);
 			}
 		}
@@ -138,7 +135,7 @@ public class ViewContentProvider implements ITreeContentProvider {
 			}
 
 			// determine the categories
-			String category = getCategory(descriptor);
+			String category = descriptor.getCategory();
 
 			// if view has not category show it directly
 			if (category == null) {
@@ -155,21 +152,6 @@ public class ViewContentProvider implements ITreeContentProvider {
 		return combinedTopElements;
 	}
 
-	/**
-	 * Determines the category of the part descriptor
-	 *
-	 * @param descriptor
-	 */
-	private String getCategory(MPartDescriptor descriptor) {
-		List<String> tags = descriptor.getTags();
-		String category = null;
-		for (String tag : tags) {
-			if (tag.startsWith(CATEGORY_TAG)) {
-				category = tag.substring(CATEGORY_TAG_LENGTH);
-			}
-		}
-		return category;
-	}
 
 	/**
 	 * Determines if the part is a view or and editor
