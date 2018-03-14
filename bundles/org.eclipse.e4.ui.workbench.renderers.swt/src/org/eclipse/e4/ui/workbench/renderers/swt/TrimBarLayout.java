@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2015 IBM Corporation and others.
+ * Copyright (c) 2011, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Christian Walther (Indel AG) - Bug 399458: Fix layout overlap in line-wrapped trim bar
  *     Christian Walther (Indel AG) - Bug 389012: Fix division by zero in TrimBarLayout
- *     Marc-Andre Laperle (Ericsson) - Bug 466233: Toolbar items are wrongly rendered into a "drop-down"
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -87,9 +86,8 @@ public class TrimBarLayout extends Layout {
 	@Override
 	protected Point computeSize(Composite composite, int wHint, int hHint,
 			boolean flushCache) {
-		if (flushCache) {
-			flushCache();
-		}
+		// Clear the current cache
+		lines.clear();
 
 		// First, hide any empty toolbars
 		MTrimBar bar = (MTrimBar) composite
@@ -149,11 +147,6 @@ public class TrimBarLayout extends Layout {
 		return calcSize;
 	}
 
-	private void flushCache() {
-		// Clear the current cache
-		lines.clear();
-	}
-
 	private Point computeSize(Control ctrl) {
 		Point ctrlSize = ctrl.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 
@@ -202,9 +195,6 @@ public class TrimBarLayout extends Layout {
 
 	@Override
 	protected void layout(Composite composite, boolean flushCache) {
-		if (flushCache) {
-			flushCache();
-		}
 		Rectangle bounds = composite.getBounds();
 
 		// offset the rectangle to allow for the margins
