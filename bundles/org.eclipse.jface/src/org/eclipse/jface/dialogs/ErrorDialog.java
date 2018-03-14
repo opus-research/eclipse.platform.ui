@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -168,20 +168,12 @@ public class ErrorDialog extends IconAndMessageDialog {
 		}
 	}
 
-	/*
-	 * (non-Javadoc) Method declared in Window.
-	 */
 	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		shell.setText(title);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
-	 */
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		// create OK and Details buttons
@@ -272,9 +264,6 @@ public class ErrorDialog extends IconAndMessageDialog {
 		return composite;
 	}
 
-	/*
-	 * @see IconAndMessageDialog#createDialogAndButtonArea(Composite)
-	 */
 	@Override
 	protected void createDialogAndButtonArea(Composite parent) {
 		super.createDialogAndButtonArea(parent);
@@ -287,11 +276,6 @@ public class ErrorDialog extends IconAndMessageDialog {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.IconAndMessageDialog#getImage()
-	 */
 	@Override
 	protected Image getImage() {
 		if (status != null) {
@@ -335,17 +319,11 @@ public class ErrorDialog extends IconAndMessageDialog {
 		Menu copyMenu = new Menu(list);
 		MenuItem copyItem = new MenuItem(copyMenu, SWT.NONE);
 		copyItem.addSelectionListener(new SelectionListener() {
-			/*
-			 * @see SelectionListener.widgetSelected (SelectionEvent)
-			 */
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				copyToClipboard();
 			}
 
-			/*
-			 * @see SelectionListener.widgetDefaultSelected(SelectionEvent)
-			 */
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				copyToClipboard();
@@ -715,11 +693,6 @@ public class ErrorDialog extends IconAndMessageDialog {
 				new Transfer[] { TextTransfer.getInstance() });
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.window.Window#close()
-	 */
 	@Override
 	public boolean close() {
 		if (clipboard != null) {
@@ -790,20 +763,13 @@ public class ErrorDialog extends IconAndMessageDialog {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.dialogs.IconAndMessageDialog#getColumnCount()
-	 */
 	@Override
 	int getColumnCount() {
 		if (Policy.getErrorSupportProvider() == null)
 			return 2;
 		return 3;
 	}
-	
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#isResizable()
-     */
+
     @Override
 	protected boolean isResizable() {
     	return true;
