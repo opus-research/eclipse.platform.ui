@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2016 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,7 @@
  *     Tristan Hume - <trishume@gmail.com> -
  *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  *     		Implemented workbench auto-save to correctly restore state in case of crash.
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 366364, 445724, 446088, 458033, 393171
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 366364, 445724, 446088
  *     Terry Parker <tparker@google.com> - Bug 416673
  *     Christian Georgi (SAP)            - Bug 432480
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 478896
@@ -105,7 +105,6 @@ public class E4Application implements IApplication {
 
 	// Copied from IDEApplication
 	public static final String METADATA_FOLDER = ".metadata"; //$NON-NLS-1$
-
 	private static final String VERSION_FILENAME = "version.ini"; //$NON-NLS-1$
 	private static final String WORKSPACE_VERSION_KEY = "org.eclipse.core.runtime"; //$NON-NLS-1$
 	private static final String WORKSPACE_VERSION_VALUE = "2"; //$NON-NLS-1$
@@ -319,15 +318,11 @@ public class E4Application implements IApplication {
 		Optional<String> themeId = highContrastMode ? Optional.of(HIGH_CONTRAST_THEME_ID)
 				: getArgValue(E4Application.THEME_ID, applicationContext, false);
 
-		if (!themeId.isPresent() && !cssURI.isPresent()) {
-			context.set(E4Application.THEME_ID, DEFAULT_THEME_ID);
-		} else {
-			context.set(E4Application.THEME_ID, themeId.orElseGet(() -> null));
-		}
+		context.set(E4Application.THEME_ID, themeId.filter(tId -> cssURI != null).orElse(DEFAULT_THEME_ID));
 
 
 		// validate static CSS URI
-		cssURI.filter(cssURIValue -> !cssURIValue.startsWith("platform:/plugin/")).ifPresent(cssURIValue -> {
+		cssURI.filter(cssURIValue -> cssURIValue.startsWith("platform:/plugin/")).ifPresent(cssURIValue -> {
 			System.err.println(
 					"Warning. Use the \"platform:/plugin/Bundle-SymbolicName/path/filename.extension\" URI for the  parameter:   "
 							+ IWorkbench.CSS_URI_ARG); // $NON-NLS-1$
@@ -365,6 +360,11 @@ public class E4Application implements IApplication {
 		Boolean clearPersistedState = getArgValue(IWorkbench.CLEAR_PERSISTED_STATE, appContext, true)
 				.map(value -> Boolean.parseBoolean(value)).orElse(Boolean.FALSE);
 		eclipseContext.set(IWorkbench.CLEAR_PERSISTED_STATE, clearPersistedState);
+
+		// Delta save and restore
+		Boolean deltaRestore = getArgValue(E4Workbench.DELTA_RESTORE, appContext, false)
+				.map(value -> Boolean.parseBoolean(value)).orElse(Boolean.TRUE);
+		eclipseContext.set(E4Workbench.DELTA_RESTORE, deltaRestore);
 
 		String resourceHandler = getArgValue(IWorkbench.MODEL_RESOURCE_HANDLER, appContext, false)
 				.orElse("bundleclass://org.eclipse.e4.ui.workbench/" + ResourceHandler.class.getName());
@@ -503,8 +503,6 @@ public class E4Application implements IApplication {
 
 		IEclipseContext serviceContext = createDefaultHeadlessContext();
 		final IEclipseContext appContext = serviceContext.createChild("WorkbenchContext"); //$NON-NLS-1$
-		// make application context available for dependency injection under the E4Application.APPLICATION_CONTEXT_KEY key
-		appContext.set(IWorkbench.APPLICATION_CONTEXT_KEY, appContext);
 
 		appContext.set(Logger.class, ContextInjectionFactory.make(WorkbenchLogger.class, appContext));
 		appContext.set(EModelService.class, new ModelServiceImpl(appContext));
