@@ -33,7 +33,7 @@ public class DynamicMenuTest extends MenuTestCase {
 
 	public void testDynamicMenu() throws Exception {
 		IWorkbenchWindow window = openTestWindow();
-		IMenuService menus = window
+		IMenuService menus = (IMenuService) window
 				.getService(IMenuService.class);
 		MenuManager manager = new MenuManager();
 		Menu contextMenu = null;
@@ -70,7 +70,7 @@ public class DynamicMenuTest extends MenuTestCase {
 
 	public void testDynamicMenuMultiOpen() throws Exception {
 		IWorkbenchWindow window = openTestWindow();
-		IMenuService menus = window
+		IMenuService menus = (IMenuService) window
 				.getService(IMenuService.class);
 		MenuManager manager = new MenuManager();
 		Menu contextMenu = null;
