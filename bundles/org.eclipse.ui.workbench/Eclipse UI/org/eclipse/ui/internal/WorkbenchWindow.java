@@ -730,18 +730,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			}
 			updateActionSets();
 
-			// synchronize the main menu with the e4 model
-			IMenuManager menuBarManager = getMenuBarManager();
-			if (menuBarManager instanceof MenuManager) {
-				// TODO: remove this hack to retrieve the MenuManagerRenderer
-				MenuManagerRenderer mr = (MenuManagerRenderer) rendererFactory.getRenderer(
-						modelService.createModelElement(MMenu.class), null);
-				MMenu parent = mr.getMenuModel((MenuManager) menuBarManager);
-				if (parent != null) {
-					mr.reconcileManagerToModel((MenuManager) menuBarManager, parent);
-				}
-			}
-
 			IPreferenceStore preferenceStore = PrefUtil.getAPIPreferenceStore();
 			boolean enableAnimations = preferenceStore
 					.getBoolean(IWorkbenchPreferenceConstants.ENABLE_ANIMATIONS);
@@ -1867,6 +1855,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 			getActionBarAdvisor().dispose();
 			getWindowAdvisor().dispose();
+			coolbarToTrim.dispose();
 
 			// Null out the progress region. Bug 64024.
 			progressRegion = null;
