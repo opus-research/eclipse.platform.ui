@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,9 +7,10 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.dnd;
+
+import junit.framework.Assert;
 
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.internal.WorkbenchPage;
@@ -17,7 +18,6 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.dnd.DragUtil;
 import org.eclipse.ui.internal.dnd.TestDropLocation;
 import org.eclipse.ui.views.IViewDescriptor;
-import org.junit.Assert;
 
 /**
  * @since 3.0
@@ -71,14 +71,14 @@ public class ViewDragSource extends TestDragSource {
         if (maximized) {
             page.toggleZoom(page.getReference(part));
         }
-        
+
         DragUtil.forceDropLocation(target);
 //        ViewStack parent = ((ViewStack) (pane.getContainer()));
-//        
+//
 //        PartPane presentablePart = wholeFolder ? null : pane;
 //        parent.paneDragStart(presentablePart, Display.getDefault()
 //                .getCursorLocation(), false);
-		Assert.fail("DND needs updated");
+        Assert.fail("DND needs updated");
 
         DragUtil.forceDropLocation(null);
     }

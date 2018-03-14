@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.rcp.util;
 
@@ -15,13 +14,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import junit.framework.Assert;
+
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.ui.application.IWorkbenchConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.tests.harness.util.RCPTestWorkbenchAdvisor;
-import org.junit.Assert;
 
 /**
  * This utility class is used to record the order in which the hooks are called.
@@ -77,76 +77,88 @@ public class WorkbenchAdvisorObserver extends RCPTestWorkbenchAdvisor {
     }
 
     public void assertNextOperation(String expected) {
-		Assert.assertTrue(iterator.hasNext());
-		Assert.assertEquals(expected, iterator.next());
+        Assert.assertTrue(iterator.hasNext());
+        Assert.assertEquals(expected, (String) iterator.next());
     }
 
     public void assertAllOperationsExamined() {
-		Assert.assertNotNull(iterator);
-		Assert.assertFalse(iterator.hasNext());
+        Assert.assertNotNull(iterator);
+        Assert.assertFalse(iterator.hasNext());
     }
 
     private void addOperation(String operation) {
         operations.add(operation);
     }
 
-    public void initialize(IWorkbenchConfigurer configurer) {
+    @Override
+	public void initialize(IWorkbenchConfigurer configurer) {
         super.initialize(configurer);
         workbenchConfig = configurer;
         addOperation(INITIALIZE);
     }
 
-    public void preStartup() {
+    @Override
+	public void preStartup() {
         super.preStartup();
         addOperation(PRE_STARTUP);
     }
 
-    public void preWindowOpen(IWorkbenchWindowConfigurer configurer) {
+    @Override
+	public void preWindowOpen(IWorkbenchWindowConfigurer configurer) {
         super.preWindowOpen(configurer);
         addOperation(PRE_WINDOW_OPEN);
     }
 
-    public void fillActionBars(IWorkbenchWindow window,
+    @Override
+	public void fillActionBars(IWorkbenchWindow window,
             IActionBarConfigurer configurer, int flags) {
         super.fillActionBars(window, configurer, flags);
         addOperation(FILL_ACTION_BARS);
     }
 
-    public void postWindowRestore(IWorkbenchWindowConfigurer configurer)
+    @Override
+	public void postWindowRestore(IWorkbenchWindowConfigurer configurer)
             throws WorkbenchException {
         super.postWindowRestore(configurer);
         addOperation(POST_WINDOW_RESTORE);
     }
 
-    public void postWindowOpen(IWorkbenchWindowConfigurer configurer) {
+    @Override
+	public void postWindowOpen(IWorkbenchWindowConfigurer configurer) {
         super.postWindowOpen(configurer);
         addOperation(POST_WINDOW_OPEN);
     }
 
-    public void postStartup() {
+    @Override
+	public void postStartup() {
         super.postStartup();
         addOperation(POST_STARTUP);
     }
 
-    public boolean preWindowShellClose(IWorkbenchWindowConfigurer configurer) {
-        if (!super.preWindowShellClose(configurer))
-            return false;
+    @Override
+	public boolean preWindowShellClose(IWorkbenchWindowConfigurer configurer) {
+        if (!super.preWindowShellClose(configurer)) {
+			return false;
+		}
         addOperation(PRE_WINDOW_SHELL_CLOSE);
         return true;
     }
 
-    public boolean preShutdown() {
+    @Override
+	public boolean preShutdown() {
         boolean result = super.preShutdown();
         addOperation(PRE_SHUTDOWN);
         return result;
     }
 
-    public void postShutdown() {
+    @Override
+	public void postShutdown() {
         super.postShutdown();
         addOperation(POST_SHUTDOWN);
     }
 
-    public void eventLoopException(Throwable exception) {
+    @Override
+	public void eventLoopException(Throwable exception) {
         super.eventLoopException(exception);
         addOperation(EVENT_LOOP_EXCEPTION);
     }
