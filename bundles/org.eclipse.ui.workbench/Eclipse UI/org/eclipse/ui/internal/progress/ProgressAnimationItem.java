@@ -25,7 +25,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.AccessibleAdapter;
 import org.eclipse.swt.accessibility.AccessibleEvent;
-import org.eclipse.swt.accessibility.AccessibleListener;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
@@ -76,8 +75,6 @@ public class ProgressAnimationItem extends AnimationItem implements
 
 	// ProgressBar flags
 	private int flags;
-
-	private AccessibleListener currentAccessibleListener;
 
 	/**
 	 * Create an instance of the receiver in the supplied region.
@@ -266,16 +263,13 @@ public class ProgressAnimationItem extends AnimationItem implements
 		toolButton.setToolTipText(tt);
     	toolbar.setVisible(true);
 		toolbar.getParent().layout(); // must layout
-
-		if (currentAccessibleListener != null)
-			toolbar.getAccessible().removeAccessibleListener(currentAccessibleListener);
-		currentAccessibleListener = new AccessibleAdapter() {
+		
+    	toolbar.getAccessible().addAccessibleListener(new AccessibleAdapter() {
         	@Override
 			public void getName(AccessibleEvent e) {
         		e.result = tt;
         	}
-		};
-		toolbar.getAccessible().addAccessibleListener(currentAccessibleListener);
+        });
 	}
 
 	/*
