@@ -38,6 +38,8 @@ Export-Package: org.eclipse.e4.ui.internal.workbench;
  org.eclipse.e4.ui.workbench.lifecycle;x-friends:="org.eclipse.e4.ui.workbench.swt",
  org.eclipse.e4.ui.workbench.modeling
 Bundle-Activator: org.eclipse.e4.ui.internal.workbench.Activator
+Require-Capability: osgi.extender;
+ filter:="(&(osgi.extender=osgi.component)(version>=1.2)(!(version>=2.0)))"
 Service-Component: OSGI-INF/progress.xml, OSGI-INF/partService.xml,
  OSGI-INF/localechangeservice.xml
 Import-Package: com.ibm.icu.text;version="3.8.1",
