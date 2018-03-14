@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -75,7 +75,7 @@ final class ArrayFontDescriptor extends FontDescriptor {
 
     @Override
 	public boolean equals(Object obj) {
-        if ((obj.getClass() == ArrayFontDescriptor.class)) {
+		if (obj instanceof ArrayFontDescriptor) {
             ArrayFontDescriptor descr = (ArrayFontDescriptor)obj;
 
             if (descr.originalFont != originalFont) {
@@ -113,8 +113,7 @@ final class ArrayFontDescriptor extends FontDescriptor {
 
         int code = 0;
 
-        for (int i = 0; i < data.length; i++) {
-            FontData fd = data[i];
+        for (FontData fd : data) {
             code += fd.hashCode();
         }
         return code;

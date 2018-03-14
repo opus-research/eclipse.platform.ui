@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -504,9 +505,8 @@ public class ProgressManager extends ProgressProvider {
 			sleepGroup(group,info);
 		}
 
-		Object[] listenersArray = listeners.getListeners();
-		for (int i = 0; i < listenersArray.length; i++) {
-			IJobProgressManagerListener listener = (IJobProgressManagerListener) listenersArray[i];
+		for (Object element : listeners.getListeners()) {
+			IJobProgressManagerListener listener = (IJobProgressManagerListener) element;
 			// Is this one the user never sees?
 			if (isNeverDisplaying(info.getJob(), listener.showsDebug()))
 				continue;
@@ -537,10 +537,9 @@ public class ProgressManager extends ProgressProvider {
 	 * @param group
 	 */
 	private void sleepGroup(GroupInfo group, JobInfo info) {
-		Object[] listenersArray = listeners.getListeners();
-		for (int i = 0; i < listenersArray.length; i++) {
+		for (Object element : listeners.getListeners()) {
 
-			IJobProgressManagerListener listener = (IJobProgressManagerListener) listenersArray[i];
+			IJobProgressManagerListener listener = (IJobProgressManagerListener) element;
 			if (isNeverDisplaying(info.getJob(), listener.showsDebug()))
 				continue;
 
@@ -583,9 +582,8 @@ public class ProgressManager extends ProgressProvider {
 			refreshGroup(group);
 		}
 
-		Object[] listenersArray = listeners.getListeners();
-		for (int i = 0; i < listenersArray.length; i++) {
-			IJobProgressManagerListener listener = (IJobProgressManagerListener) listenersArray[i];
+		for (Object element : listeners.getListeners()) {
+			IJobProgressManagerListener listener = (IJobProgressManagerListener) element;
 			if (!isCurrentDisplaying(info.getJob(), listener.showsDebug())) {
 				listener.refreshJobInfo(info);
 			}
@@ -599,9 +597,8 @@ public class ProgressManager extends ProgressProvider {
 	 */
 	public void refreshGroup(GroupInfo info) {
 
-		Object[] listenersArray = listeners.getListeners();
-		for (int i = 0; i < listenersArray.length; i++) {
-			((IJobProgressManagerListener)listenersArray[i]).refreshGroup(info);
+		for (Object element : listeners.getListeners()) {
+			((IJobProgressManagerListener)element).refreshGroup(info);
 		}
 	}
 
@@ -612,9 +609,8 @@ public class ProgressManager extends ProgressProvider {
 	public void refreshAll() {
 
 		pruneStaleJobs();
-		Object[] listenersArray = listeners.getListeners();
-		for (int i = 0; i < listenersArray.length; i++) {
-			((IJobProgressManagerListener)listenersArray[i]).refreshAll();
+		for (Object element : listeners.getListeners()) {
+			((IJobProgressManagerListener)element).refreshAll();
 		}
 
 	}
@@ -631,9 +627,8 @@ public class ProgressManager extends ProgressProvider {
 		jobs.remove(job);
 		runnableMonitors.remove(job);
 
-		Object[] listenersArray = listeners.getListeners();
-		for (int i = 0; i < listenersArray.length; i++) {
-			IJobProgressManagerListener listener = (IJobProgressManagerListener) listenersArray[i];
+		for (Object element : listeners.getListeners()) {
+			IJobProgressManagerListener listener = (IJobProgressManagerListener) element;
 			if (!isCurrentDisplaying(info.getJob(), listener.showsDebug())) {
 				listener.removeJob(info);
 			}
@@ -648,9 +643,8 @@ public class ProgressManager extends ProgressProvider {
 	 */
 	public void removeGroup(GroupInfo group) {
 
-		Object[] listenersArray = listeners.getListeners();
-		for (int i = 0; i < listenersArray.length; i++) {
-			((IJobProgressManagerListener)listenersArray[i]).removeGroup(group);
+		for (Object element : listeners.getListeners()) {
+			((IJobProgressManagerListener)element).removeGroup(group);
 		}
 	}
 
@@ -666,9 +660,8 @@ public class ProgressManager extends ProgressProvider {
 		}
 
 		jobs.put(info.getJob(), info);
-		Object[] listenersArray = listeners.getListeners();
-		for (int i = 0; i < listenersArray.length; i++) {
-			IJobProgressManagerListener listener = (IJobProgressManagerListener) listenersArray[i];
+		for (Object element : listeners.getListeners()) {
+			IJobProgressManagerListener listener = (IJobProgressManagerListener) element;
 			if (!isCurrentDisplaying(info.getJob(), listener.showsDebug())) {
 				listener.addJob(info);
 			}
@@ -725,12 +718,10 @@ public class ProgressManager extends ProgressProvider {
 	 */
 	public JobInfo[] getJobInfos(boolean debug) {
 		synchronized (jobs) {
-			Iterator<Job> iterator = jobs.keySet().iterator();
 			Collection<JobInfo> result = new ArrayList<>();
-			while (iterator.hasNext()) {
-				Job next = iterator.next();
-				if (!isCurrentDisplaying(next, debug)) {
-					result.add(jobs.get(next));
+			for (Entry<Job, JobInfo> entry : jobs.entrySet()) {
+				if (!isCurrentDisplaying(entry.getKey(), debug)) {
+					result.add(entry.getValue());
 				}
 			}
 			JobInfo[] infos = new JobInfo[result.size()];
@@ -747,12 +738,10 @@ public class ProgressManager extends ProgressProvider {
 	 */
 	public JobTreeElement[] getRootElements(boolean debug) {
 		synchronized (jobs) {
-			Iterator<Job> iterator = jobs.keySet().iterator();
 			Collection<JobTreeElement> result = new HashSet<>();
-			while (iterator.hasNext()) {
-				Job next = iterator.next();
-				if (!isCurrentDisplaying(next, debug)) {
-					JobInfo jobInfo = jobs.get(next);
+			for (Entry<Job, JobInfo> entry : jobs.entrySet()) {
+				if (!isCurrentDisplaying(entry.getKey(), debug)) {
+					JobInfo jobInfo = entry.getValue();
 					GroupInfo group = jobInfo.getGroupInfo();
 					if (group == null) {
 						result.add(jobInfo);
@@ -774,11 +763,7 @@ public class ProgressManager extends ProgressProvider {
 	 */
 	public boolean hasJobInfos() {
 		synchronized (jobs) {
-			Iterator<Job> iterator = jobs.keySet().iterator();
-			while (iterator.hasNext()) {
-				return true;
-			}
-			return false;
+			return !jobs.isEmpty();
 		}
 	}
 
@@ -904,8 +889,8 @@ public class ProgressManager extends ProgressProvider {
 	private boolean pruneStaleJobs() {
 		Object[] jobsToCheck = jobs.keySet().toArray();
 		boolean pruned = false;
-		for (int i = 0; i < jobsToCheck.length; i++) {
-			Job job = (Job) jobsToCheck[i];
+		for (Object element : jobsToCheck) {
+			Job job = (Job) element;
 			if (checkForStaleness(job)) {
 				pruned = true;
 			}

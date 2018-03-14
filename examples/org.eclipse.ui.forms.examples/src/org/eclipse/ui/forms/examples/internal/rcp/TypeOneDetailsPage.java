@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,13 +10,26 @@
  *******************************************************************************/
 package org.eclipse.ui.forms.examples.internal.rcp;
 
-import org.eclipse.jface.viewers.*;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.layout.*;
-import org.eclipse.swt.widgets.*;
-import org.eclipse.ui.forms.*;
-import org.eclipse.ui.forms.widgets.*;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.IDetailsPage;
+import org.eclipse.ui.forms.IFormPart;
+import org.eclipse.ui.forms.IManagedForm;
+import org.eclipse.ui.forms.widgets.FormText;
+import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.forms.widgets.TableWrapData;
+import org.eclipse.ui.forms.widgets.TableWrapLayout;
 
 /**
  * @author dejan
@@ -37,15 +50,11 @@ public class TypeOneDetailsPage implements IDetailsPage {
 
 	public TypeOneDetailsPage() {
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IDetailsPage#initialize(org.eclipse.ui.forms.IManagedForm)
-	 */
+	@Override
 	public void initialize(IManagedForm mform) {
 		this.mform = mform;
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IDetailsPage#createContents(org.eclipse.swt.widgets.Composite)
-	 */
+	@Override
 	public void createContents(Composite parent) {
 		TableWrapLayout layout = new TableWrapLayout();
 		layout.topMargin = 5;
@@ -71,6 +80,7 @@ public class TypeOneDetailsPage implements IDetailsPage {
 		//client.setBackground(client.getDisplay().getSystemColor(SWT.COLOR_CYAN));
 
 		SelectionListener choiceListener = new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Integer value = (Integer)e.widget.getData();
 				if (input!=null) {
@@ -82,7 +92,7 @@ public class TypeOneDetailsPage implements IDetailsPage {
 		choices = new Button[TypeOne.CHOICES.length];
 		for (int i=0; i<TypeOne.CHOICES.length; i++) {
 			choices[i] = toolkit.createButton(client, TypeOne.CHOICES[i], SWT.RADIO);
-			choices[i].setData(new Integer(i));
+			choices[i].setData(Integer.valueOf(i));
 			choices[i].addSelectionListener(choiceListener);
 			gd = new GridData();
 			gd.horizontalSpan = 2;
@@ -91,6 +101,7 @@ public class TypeOneDetailsPage implements IDetailsPage {
 		createSpacer(toolkit, client, 2);
 		flag = toolkit.createButton(client, "Value of the flag property", SWT.CHECK);
 		flag.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (input!=null)
 					input.setFlag(flag.getSelection());
@@ -103,11 +114,9 @@ public class TypeOneDetailsPage implements IDetailsPage {
 
 		toolkit.createLabel(client, "Text property:");
 		text = toolkit.createText(client, "", SWT.SINGLE);
-		text.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
-				if (input!=null)
-					input.setText(text.getText());
-			}
+		text.addModifyListener(e -> {
+			if (input != null)
+				input.setText(text.getText());
 		});
 		gd = new GridData(GridData.FILL_HORIZONTAL|GridData.VERTICAL_ALIGN_BEGINNING);
 		gd.widthHint = 10;
@@ -137,9 +146,7 @@ public class TypeOneDetailsPage implements IDetailsPage {
 		flag.setSelection(input!=null && input.getFlag());
 		text.setText(input!=null && input.getText()!=null?input.getText():"");
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IDetailsPage#inputChanged(org.eclipse.jface.viewers.IStructuredSelection)
-	 */
+	@Override
 	public void selectionChanged(IFormPart part, ISelection selection) {
 		IStructuredSelection ssel = (IStructuredSelection)selection;
 		if (ssel.size()==1) {
@@ -149,37 +156,29 @@ public class TypeOneDetailsPage implements IDetailsPage {
 			input = null;
 		update();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IDetailsPage#commit()
-	 */
+	@Override
 	public void commit(boolean onSave) {
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IDetailsPage#setFocus()
-	 */
+	@Override
 	public void setFocus() {
 		choices[0].setFocus();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IDetailsPage#dispose()
-	 */
+	@Override
 	public void dispose() {
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IDetailsPage#isDirty()
-	 */
+	@Override
 	public boolean isDirty() {
 		return false;
 	}
+	@Override
 	public boolean isStale() {
 		return false;
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IDetailsPage#refresh()
-	 */
+	@Override
 	public void refresh() {
 		update();
 	}
+	@Override
 	public boolean setFormInput(Object input) {
 		return false;
 	}

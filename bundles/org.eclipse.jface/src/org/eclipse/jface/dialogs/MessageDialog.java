@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -424,6 +424,40 @@ public class MessageDialog extends IconAndMessageDialog {
 		return dialog.open() == 0;
 	}
 
+	/**
+	 * Method to open a simple dialog as specified by the
+	 * <code>kind</code> flag.
+	 *
+	 * This method accepts varargs of String to set custom button labels.
+	 *
+	 * Use this method if you want to override the default labels.
+	 *
+	 * @param kind
+	 *            the kind of dialog to open, one of {@link #ERROR},
+	 *            {@link #INFORMATION}, {@link #QUESTION}, {@link #WARNING},
+	 *            {@link #CONFIRM}, or {@link #QUESTION_WITH_CANCEL}.
+	 * @param parent
+	 *            the parent shell of the dialog, or <code>null</code> if none
+	 * @param title
+	 *            the dialog's title, or <code>null</code> if none
+	 * @param message
+	 *            the message
+	 * @param style
+	 *            {@link SWT#NONE} for a default dialog, or {@link SWT#SHEET} for a
+	 *            dialog with sheet behavior
+	 * @param dialogButtonLabels
+	 *            varargs of Strings for the button labels in the button bar
+	 * @return the index of the button that was pressed.
+	 * @since 3.13
+	 */
+	public static int open(int kind, Shell parent, String title, String message, int style,
+			String... dialogButtonLabels) {
+		MessageDialog dialog = new MessageDialog(parent, title, null, message, kind, 0, dialogButtonLabels);
+		style &= SWT.SHEET;
+		dialog.setShellStyle(dialog.getShellStyle() | style);
+		return dialog.open();
+	}
+
 	static String[] getButtonLabels(int kind) {
 		String[] dialogButtonLabels;
 		switch (kind) {
@@ -496,8 +530,7 @@ public class MessageDialog extends IconAndMessageDialog {
      * @param message
      *            the message
      */
-    public static void openInformation(Shell parent, String title,
-            String message) {
+	public static void openInformation(Shell parent, String title, String message) {
         open(INFORMATION, parent, title, message, SWT.NONE);
     }
 
@@ -513,8 +546,7 @@ public class MessageDialog extends IconAndMessageDialog {
      * @return <code>true</code> if the user presses the Yes button,
      *         <code>false</code> otherwise
      */
-    public static boolean openQuestion(Shell parent, String title,
-            String message) {
+	public static boolean openQuestion(Shell parent, String title, String message) {
         return open(QUESTION, parent, title, message, SWT.NONE);
     }
 
@@ -532,13 +564,8 @@ public class MessageDialog extends IconAndMessageDialog {
         open(WARNING, parent, title, message, SWT.NONE);
     }
 
-    /*
-     * @see org.eclipse.jface.dialogs.Dialog#createButton(org.eclipse.swt.widgets.Composite,
-     *      int, java.lang.String, boolean)
-     */
     @Override
-	protected Button createButton(Composite parent, int id, String label,
-            boolean defaultButton) {
+	protected Button createButton(Composite parent, int id, String label, boolean defaultButton) {
         Button button = super.createButton(parent, id, label, defaultButton);
         //Be sure to set the focus if the custom area cannot so as not
         //to lose the defaultButton.

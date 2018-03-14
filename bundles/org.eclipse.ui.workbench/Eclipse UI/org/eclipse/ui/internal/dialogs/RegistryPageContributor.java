@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.expressions.EvaluationResult;
 import org.eclipse.core.expressions.Expression;
@@ -77,7 +78,7 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 
 	private IConfigurationElement pageElement;
 
-	private SoftReference filterProperties;
+	private SoftReference<Map<String, String>> filterProperties;
 
 	private Expression enablementExpression;
 
@@ -251,8 +252,8 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 		String nameFilter = pageElement
 				.getAttribute(PropertyPagesRegistryReader.ATT_NAME_FILTER);
 
-		for (int i = 0; i < objs.length; i++) {
-			object = objs[i];
+		for (Object obj : objs) {
+			object = obj;
 			// Name filter
 			if (nameFilter != null) {
 				String objectName = object.toString();
@@ -352,14 +353,13 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 	 * by a matcher.
 	 */
 	private boolean testCustom(Object object, IActionFilter filter) {
-		Map filterProperties = getFilterProperties();
+		Map<String, String> filterProperties = getFilterProperties();
 
 		if (filterProperties == null)
 			return false;
-		Iterator iter = filterProperties.keySet().iterator();
-		while (iter.hasNext()) {
-			String key = (String) iter.next();
-			String value = (String) filterProperties.get(key);
+		for (Entry<String, String> entry : filterProperties.entrySet()) {
+			String key = entry.getKey();
+			String value = entry.getValue();
 			if (!filter.testAttribute(object, key, value))
 				return false;
 		}
@@ -403,16 +403,16 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 		subPages.add(child);
 	}
 
-	private Map getFilterProperties() {
+	private Map<String, String> getFilterProperties() {
 		if (filterProperties == null || filterProperties.get() == null) {
-			Map map = new HashMap();
-			filterProperties = new SoftReference(map);
+			Map<String, String> map = new HashMap<>();
+			filterProperties = new SoftReference<>(map);
 			IConfigurationElement[] children = pageElement.getChildren();
-			for (int i = 0; i < children.length; i++) {
-				processChildElement(map, children[i]);
+			for (IConfigurationElement element : children) {
+				processChildElement(map, element);
 			}
 		}
-		return (Map) filterProperties.get();
+		return filterProperties.get();
 	}
 
 	/**
@@ -437,7 +437,7 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 	 *
 	 * @since 3.1
 	 */
-	private void processChildElement(Map map, IConfigurationElement element) {
+	private void processChildElement(Map<String, String> map, IConfigurationElement element) {
 		String tag = element.getName();
 		if (tag.equals(PropertyPagesRegistryReader.TAG_FILTER)) {
 			String key = element
@@ -451,9 +451,9 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 	}
 
 	@Override
-	public Object getAdapter(Class adapter) {
+	public <T> T getAdapter(Class<T> adapter) {
 		if (adapter.equals(IConfigurationElement.class)) {
-			return getConfigurationElement();
+			return adapter.cast(getConfigurationElement());
 		}
 		return null;
 	}

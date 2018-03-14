@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 IBM Corporation and others.
+ * Copyright (c) 2015, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -144,12 +145,13 @@ public class PerspectiveBuilder {
 
 	private void processStandaloneViews() {
 		Map<String, ViewLayoutReader> viewLayouts = perspReader.getViewLayouts();
-		for (String viewId : viewLayouts.keySet()) {
+		for (Entry<String, ViewLayoutReader> entry : viewLayouts.entrySet()) {
+			String viewId = entry.getKey();
 			MPlaceholder placeholder = viewPlaceholders.get(viewId);
 			if (placeholder == null) {
 				continue;
 			}
-			if (viewLayouts.get(viewId).isStandalone()) {
+			if (entry.getValue().isStandalone()) {
 				MElementContainer<MUIElement> parent = placeholder.getParent();
 				placeholder.setContainerData(parent.getContainerData());
 				parent.getChildren().remove(placeholder);
@@ -419,7 +421,20 @@ public class PerspectiveBuilder {
 		List<String> views = perspReader.getDefaultFastViewBarViewIds();
 		if (views.size() > 0) {
 			stack = layoutUtils.createStack(DEFAULT_FASTVIEW_STACK, true);
-			perspective.getChildren().add(stack);
+			MPartSashContainer psc = modelService.createModelElement(MPartSashContainer.class);
+			psc.setHorizontal(true);
+			psc.setContainerData(Integer.toString(5000));
+			stack.setContainerData(Integer.toString(2500));
+			psc.getChildren().add(stack);
+			List<MPartSashContainer> list = modelService.findElements(perspective, null, MPartSashContainer.class,
+					null);
+			if (list == null || list.size() == 0) {
+				perspective.getChildren().add(psc);
+			} else {
+				int size = list.size();
+				MPartSashContainer container = list.get(size - 1);
+				container.getChildren().add(psc);
+			}
 			setPartState(stack, org.eclipse.ui.internal.e4.migration.InfoReader.PartState.MINIMIZED);
 
 			for (String view : views) {
@@ -487,8 +502,8 @@ public class PerspectiveBuilder {
 		}
 		List<MStackElement> originalOrder = new ArrayList<>(renderedViews);
 		stackChildren.clear();
-		for (int i = 0; i < partOrder.length; i++) {
-			stackChildren.add(originalOrder.get(partOrder[i]));
+		for (int element : partOrder) {
+			stackChildren.add(originalOrder.get(element));
 		}
 		originalOrder.removeAll(stackChildren);
 		stackChildren.addAll(originalOrder);
@@ -531,9 +546,7 @@ public class PerspectiveBuilder {
 		}
 		addLayoutTagsToPlaceholder(placeholder, partId);
 		stack.getChildren().add(placeholder);
-		if (viewPlaceholders.get(partId) != null) {
-			viewPlaceholders.put(partId, placeholder);
-		}
+		viewPlaceholders.put(partId, placeholder);
 	}
 
 	private void addLayoutTagsToPlaceholder(MPlaceholder placeholder, String partId) {
@@ -603,8 +616,8 @@ public class PerspectiveBuilder {
 		ArrayList<String> list = new ArrayList<>();
 		IExtension[] extensions = getPerspectiveExtensions();
 		if (extensions != null) {
-			for (int i = 0; i < extensions.length; i++) {
-				list.addAll(getExtensionShowInPartFromRegistry(extensions[i], targetId));
+			for (IExtension extension : extensions) {
+				list.addAll(getExtensionShowInPartFromRegistry(extension, targetId));
 			}
 		}
 		return list;
@@ -624,12 +637,12 @@ public class PerspectiveBuilder {
 	private static ArrayList<String> getExtensionShowInPartFromRegistry(IExtension extension, String targetId) {
 		ArrayList<String> list = new ArrayList<>();
 		IConfigurationElement[] configElements = extension.getConfigurationElements();
-		for (int j = 0; j < configElements.length; j++) {
-			String type = configElements[j].getName();
+		for (IConfigurationElement configElement : configElements) {
+			String type = configElement.getName();
 			if (type.equals(IWorkbenchRegistryConstants.TAG_PERSPECTIVE_EXTENSION)) {
-				String id = configElements[j].getAttribute(IWorkbenchRegistryConstants.ATT_TARGET_ID);
+				String id = configElement.getAttribute(IWorkbenchRegistryConstants.ATT_TARGET_ID);
 				if (targetId.equals(id) || "*".equals(id)) { //$NON-NLS-1$
-					list.addAll(getConfigElementShowInPartsFromRegistry(configElements[j]));
+					list.addAll(getConfigElementShowInPartsFromRegistry(configElement));
 				}
 			}
 		}
@@ -640,8 +653,7 @@ public class PerspectiveBuilder {
 		ArrayList<String> list = new ArrayList<>();
 		String tag = IWorkbenchRegistryConstants.TAG_SHOW_IN_PART;
 		IConfigurationElement[] children = configElement.getChildren();
-		for (int nX = 0; nX < children.length; nX++) {
-			IConfigurationElement child = children[nX];
+		for (IConfigurationElement child : children) {
 			String ctype = child.getName();
 			if (tag.equals(ctype)) {
 				String tid = child.getAttribute(IWorkbenchRegistryConstants.ATT_ID);

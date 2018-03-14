@@ -45,7 +45,6 @@ import org.eclipse.ui.internal.e4.migration.PerspectiveBuilder;
 import org.eclipse.ui.internal.e4.migration.PerspectiveReader;
 import org.eclipse.ui.internal.wizards.preferences.PreferencesExportWizard;
 import org.eclipse.ui.internal.wizards.preferences.PreferencesImportWizard;
-import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
 @SuppressWarnings("restriction")
@@ -90,14 +89,8 @@ public class ImportExportPespectiveHandler {
 	private List<String> importedPersps = new ArrayList<>();
 	private Map<String, String> minMaxPersistedState;
 
-	private static Boolean impExpEnabled;
-
 	@PostConstruct
 	private void init() {
-		if (!isImpExpEnabled()) {
-			return;
-		}
-
 		initializeEventHandlers();
 		preferences.addPreferenceChangeListener(preferenceListener);
 		eventBroker.subscribe(PreferencesExportWizard.EVENT_EXPORT_BEGIN, exportPreferencesBegin);
@@ -107,10 +100,6 @@ public class ImportExportPespectiveHandler {
 
 	@PreDestroy
 	private void dispose() {
-		if (!isImpExpEnabled()) {
-			return;
-		}
-
 		preferences.removePreferenceChangeListener(preferenceListener);
 		eventBroker.unsubscribe(exportPreferencesBegin);
 		eventBroker.unsubscribe(exportPreferencesEnd);
@@ -312,54 +301,24 @@ public class ImportExportPespectiveHandler {
 
 	private void initializeEventHandlers() {
 
-		importPreferencesEnd = new EventHandler() {
-			@Override
-			public void handleEvent(Event event) {
-				removeImportedPreferences();
+		importPreferencesEnd = event -> removeImportedPreferences();
+
+		exportPreferencesBegin = event -> copyPerspsToPreferences();
+
+		exportPreferencesEnd = event -> removeExportedPreferences();
+
+		preferenceListener = event -> {
+			if (ignoreEvents) {
+				return;
+			}
+
+			if (event.getKey().endsWith(PERSPECTIVE_SUFFIX_4X)) {
+				importPerspective4x(event);
+			} else if (event.getKey().endsWith(PERSPECTIVE_SUFFIX_3X)) {
+				importPerspective3x(event);
 			}
 		};
 
-		exportPreferencesBegin = new EventHandler() {
-			@Override
-			public void handleEvent(Event event) {
-				copyPerspsToPreferences();
-			}
-		};
-
-		exportPreferencesEnd = new EventHandler() {
-			@Override
-			public void handleEvent(Event event) {
-				removeExportedPreferences();
-			}
-		};
-
-		preferenceListener = new IPreferenceChangeListener() {
-			@Override
-			public void preferenceChange(PreferenceChangeEvent event) {
-				if (ignoreEvents) {
-					return;
-				}
-
-				if (event.getKey().endsWith(PERSPECTIVE_SUFFIX_4X)) {
-					importPerspective4x(event);
-				} else if (event.getKey().endsWith(PERSPECTIVE_SUFFIX_3X)) {
-					importPerspective3x(event);
-				}
-			}
-		};
-
-	}
-
-	public static boolean isImpExpEnabled() {
-		if (impExpEnabled == null) {
-			String propertyStr = System.getProperty("e4.impExpPerspectiveEnabled"); //$NON-NLS-1$
-			if (propertyStr == null) {
-				impExpEnabled = true;
-			} else {
-				impExpEnabled = Boolean.parseBoolean(propertyStr);
-			}
-		}
-		return impExpEnabled;
 	}
 
 }

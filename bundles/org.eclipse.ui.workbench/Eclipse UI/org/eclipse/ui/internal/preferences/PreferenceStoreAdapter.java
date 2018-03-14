@@ -11,10 +11,8 @@
 package org.eclipse.ui.internal.preferences;
 
 import java.util.Set;
-
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 
 /**
  * @since 3.1
@@ -23,12 +21,7 @@ public final class PreferenceStoreAdapter extends PropertyMapAdapter {
 
     private IPreferenceStore store;
 
-    private IPropertyChangeListener listener = new IPropertyChangeListener() {
-        @Override
-		public void propertyChange(PropertyChangeEvent event) {
-            firePropertyChange(event.getProperty());
-        }
-    };
+    private IPropertyChangeListener listener = event -> firePropertyChange(event.getProperty());
 
     public PreferenceStoreAdapter(IPreferenceStore toConvert) {
         this.store = toConvert;
@@ -68,7 +61,7 @@ public final class PreferenceStoreAdapter extends PropertyMapAdapter {
         }
 
         if (propertyType == Integer.class) {
-            return new Integer(store.getInt(propertyId));
+			return Integer.valueOf(store.getInt(propertyId));
         }
 
         if (propertyType == Long.class) {

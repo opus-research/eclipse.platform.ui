@@ -261,8 +261,8 @@ public final class ExternalActionManager {
 								.getManager(), IAction.TEXT, null, null);
 						if (value instanceof ListenerList) {
 							Object[] listeners= ((ListenerList) value).getListeners();
-							for (int i = 0; i < listeners.length; i++) {
-								final IPropertyChangeListener listener = (IPropertyChangeListener) listeners[i];
+							for (Object l : listeners) {
+								final IPropertyChangeListener listener = (IPropertyChangeListener) l;
 								listener.propertyChange(propertyChangeEvent);
 							}
 						} else {
@@ -289,7 +289,7 @@ public final class ExternalActionManager {
 						final KeyStroke keyStroke = (KeyStroke) trigger;
 						final int accelerator = SWTKeySupport
 								.convertKeyStrokeToAccelerator(keyStroke);
-						return new Integer(accelerator);
+						return Integer.valueOf(accelerator);
 					}
 				}
 			}

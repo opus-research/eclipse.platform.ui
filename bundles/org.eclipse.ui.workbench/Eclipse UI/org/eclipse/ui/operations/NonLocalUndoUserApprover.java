@@ -164,8 +164,7 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 			// empty
 			// array of affected objects is considered a local change.
 			local = true;
-			for (int i = 0; i < modifiedElements.length; i++) {
-				Object modifiedElement = modifiedElements[i];
+			for (Object modifiedElement : modifiedElements) {
 				if (!elementsContains(modifiedElement)) {
 					// the modified element is not known by the editor
 					local = false;
@@ -195,14 +194,12 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 		// a syncExec because operation approval notifications may come from
 		// a background thread.
 		final int[] answer = new int[1];
-		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
-			@Override
-			public void run() {
-				MessageDialog dialog = new MessageDialog(part.getSite().getShell(), title,
-						null, message, MessageDialog.QUESTION, new String[] { IDialogConstants.OK_LABEL,
-		                        discardButton, IDialogConstants.CANCEL_LABEL }, 0); // yes is the default
-		        answer[0] = dialog.open();
-		}});
+		PlatformUI.getWorkbench().getDisplay().syncExec(() -> {
+			MessageDialog dialog = new MessageDialog(part.getSite().getShell(), title,
+					null, message, MessageDialog.QUESTION, 0, IDialogConstants.OK_LABEL, discardButton,
+					IDialogConstants.CANCEL_LABEL); // yes is the default
+		    answer[0] = dialog.open();
+});
 		switch (answer[0]) {
 		case 0:
 			return Status.OK_STATUS;
@@ -259,8 +256,7 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 			// may provide on the preferred class if they are not instances of
 			// the preferred class. This is done only once.
 			elementsAndAdapters = new ArrayList(elements.length);
-			for (int i = 0; i < elements.length; i++) {
-				Object element = elements[i];
+			for (Object element : elements) {
 				elementsAndAdapters.add(element);
 				if (affectedObjectsClass != null
 						&& !affectedObjectsClass.isInstance(element)) {

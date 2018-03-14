@@ -21,8 +21,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
@@ -57,7 +57,7 @@ public class MarkerHelpRegistry implements IMarkerHelpRegistry {
 	/**
 	 * Table of queries for marker resolutions
 	 */
-	private Map resolutionQueries = new LinkedHashMap();
+	private Map<MarkerQuery, Map> resolutionQueries = new LinkedHashMap<>();
 
 	/**
 	 * Help context id attribute in configuration element
@@ -133,13 +133,12 @@ public class MarkerHelpRegistry implements IMarkerHelpRegistry {
 	@Override
 	public boolean hasResolutions(IMarker marker) {
 		// Detect a match
-		for (Iterator iter = resolutionQueries.keySet().iterator(); iter
-				.hasNext();) {
-			MarkerQuery query = (MarkerQuery) iter.next();
+		for (Entry<MarkerQuery, Map> entry : resolutionQueries.entrySet()) {
+			MarkerQuery query = entry.getKey();
 			MarkerQueryResult result = query.performQuery(marker);
 			if (result != null) {
 				// See if a matching result is registered
-				Map resultsTable = (Map) resolutionQueries.get(query);
+				Map resultsTable = entry.getValue();
 
 				if (resultsTable.containsKey(result)) {
 
@@ -214,44 +213,33 @@ public class MarkerHelpRegistry implements IMarkerHelpRegistry {
 	public IMarkerResolution[] getResolutions(IMarker marker) {
 		// Collect all matches
 		ArrayList resolutions = new ArrayList();
-		for (Iterator iter = resolutionQueries.entrySet().iterator(); iter
-				.hasNext();) {
-			Map.Entry entry = (Entry) iter.next();
+		for (Object resolutionQueryEntry : resolutionQueries.entrySet()) {
+			Map.Entry entry = (Entry) resolutionQueryEntry;
 			MarkerQuery query = (MarkerQuery) entry.getKey();
 			MarkerQueryResult result = query.performQuery(marker);
 			if (result != null) {
 				// See if a matching result is registered
 				Map resultsTable = (Map) entry.getValue();
-
 				if (resultsTable.containsKey(result)) {
-
-					Iterator elements = ((Collection) resultsTable.get(result))
-							.iterator();
+					Iterator elements = ((Collection) resultsTable.get(result)).iterator();
 					while (elements.hasNext()) {
-						IConfigurationElement element = (IConfigurationElement) elements
-								.next();
-
+						IConfigurationElement element = (IConfigurationElement) elements.next();
 						IMarkerResolutionGenerator generator = null;
 						try {
-							generator = (IMarkerResolutionGenerator) element
-									.createExecutableExtension(ATT_CLASS);
+							generator = (IMarkerResolutionGenerator) element.createExecutableExtension(ATT_CLASS);
 						} catch (CoreException e) {
 							Policy.handle(e);
 						}
 						if (generator != null) {
-							IMarkerResolution[] generatedResolutions = generator
-									.getResolutions(marker);
-							for (int i = 0; i < generatedResolutions.length; i++) {
-								resolutions.add(generatedResolutions[i]);
+							for (IMarkerResolution generatedResolution : generator.getResolutions(marker)) {
+								resolutions.add(generatedResolution);
 							}
 						}
-
 					}
 				}
 			}
 		}
-		return (IMarkerResolution[]) resolutions
-				.toArray(new IMarkerResolution[resolutions.size()]);
+		return (IMarkerResolution[]) resolutions.toArray(new IMarkerResolution[resolutions.size()]);
 	}
 
 	/**
