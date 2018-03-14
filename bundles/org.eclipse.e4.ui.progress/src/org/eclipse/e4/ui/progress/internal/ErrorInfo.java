@@ -42,29 +42,17 @@ public class ErrorInfo extends JobTreeElement {
 		timestamp = System.currentTimeMillis();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.internal.progress.JobTreeElement#hasChildren()
-	 */
+	@Override
 	boolean hasChildren() {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.internal.progress.JobTreeElement#getChildren()
-	 */
+	@Override
 	Object[] getChildren() {
 		return ProgressManagerUtil.EMPTY_OBJECT_ARRAY;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.internal.progress.JobTreeElement#getDisplayString()
-	 */
+	@Override
 	String getDisplayString() {
 		return NLS.bind(ProgressMessages.JobInfo_Error, (new Object[] {
 				job.getName(),
@@ -80,11 +68,7 @@ public class ErrorInfo extends JobTreeElement {
 		return JFaceResources.getImage(ProgressManager.ERROR_JOB_KEY);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.internal.progress.JobTreeElement#isJobInfo()
-	 */
+	@Override
 	boolean isJobInfo() {
 		return false;
 	}
@@ -98,11 +82,7 @@ public class ErrorInfo extends JobTreeElement {
 		return errorStatus;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.internal.progress.JobTreeElement#isActive()
-	 */
+	@Override
 	boolean isActive() {
 		return true;
 	}
@@ -125,11 +105,7 @@ public class ErrorInfo extends JobTreeElement {
 		return timestamp;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.internal.progress.JobTreeElement#compareTo(java.lang.Object)
-	 */
+	@Override
 	public int compareTo(Object arg0) {
 		if (arg0 instanceof ErrorInfo) {
 			// Order ErrorInfo by time received

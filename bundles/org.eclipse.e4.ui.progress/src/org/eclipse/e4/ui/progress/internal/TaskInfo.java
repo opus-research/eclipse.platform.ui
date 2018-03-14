@@ -73,11 +73,7 @@ public class TaskInfo extends SubTaskInfo {
 		parentMonitor.internalWorked(workIncrement * parentTicks / totalWork);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.internal.progress.JobTreeElement#getDisplayString(boolean)
-	 */
+	@Override
 	String getDisplayString(boolean showProgress) {
 
 		if (totalWork == IProgressMonitor.UNKNOWN) {
