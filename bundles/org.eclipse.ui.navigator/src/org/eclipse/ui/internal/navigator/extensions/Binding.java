@@ -48,10 +48,25 @@ class Binding {
 	 * @see org.eclipse.ui.internal.navigator.extensions.INavigatorViewerDescriptor#isVisibleExtension(java.lang.String)
 	 */
 	boolean isVisibleExtension(String anExtensionId) {
+		
+
 		// Have we seen this pattern before?
 		if (knownIds.containsKey(anExtensionId)) {
 			// we have, don't recompute
 			return ((Boolean) knownIds.get(anExtensionId)).booleanValue();
+		}
+		
+		for (Iterator itr = includePatterns.iterator(); itr.hasNext();) {
+			Pattern pattern = (Pattern) itr.next();
+			if (pattern.matcher(anExtensionId).matches()) {
+				// keep track of the result for next time
+				knownIds.put(anExtensionId, Boolean.TRUE);
+				if (Policy.DEBUG_RESOLUTION) {
+					System.out.println("Viewer Binding: " + TAG_EXTENSION +//$NON-NLS-1$
+							" to: " + anExtensionId); //$NON-NLS-1$
+				}
+				return true;
+			}
 		}
 
 		for (Iterator itr = excludePatterns.iterator(); itr.hasNext();) {
@@ -63,19 +78,6 @@ class Binding {
 							" to: " + anExtensionId); //$NON-NLS-1$
 				}
 				return false;
-			}
-		}
-
-		for (Iterator itr = includePatterns.iterator(); itr.hasNext();) {
-			Pattern pattern = (Pattern) itr.next();
-			if (pattern.matcher(anExtensionId).matches()) {
-				// keep track of the result for next time
-				knownIds.put(anExtensionId, Boolean.TRUE);
-				if (Policy.DEBUG_RESOLUTION) {
-					System.out.println("Viewer Binding: " + TAG_EXTENSION +//$NON-NLS-1$
-							" to: " + anExtensionId); //$NON-NLS-1$
-				}
-				return true;
 			}
 		}
 
