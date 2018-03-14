@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *     Steven Spungin <steven@spungin.tv> - Bug 436908
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799, 446864
  *     Snjezana Peco <snjezana.peco@redhat.com> - Bug 414888
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 503379
  ******************************************************************************/
 
 package org.eclipse.ui.internal.e4.compatibility;
@@ -49,6 +50,7 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.internal.ErrorEditorPart;
 import org.eclipse.ui.internal.ErrorViewPart;
+import org.eclipse.ui.internal.IWorkbenchConstants;
 import org.eclipse.ui.internal.PartSite;
 import org.eclipse.ui.internal.SaveableHelper;
 import org.eclipse.ui.internal.WorkbenchPage;
@@ -64,6 +66,8 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 	public static final String COMPATIBILITY_EDITOR_URI = "bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor"; //$NON-NLS-1$
 
 	public static final String COMPATIBILITY_VIEW_URI = "bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView"; //$NON-NLS-1$
+
+	public static final String ENABLE_DEPENDENCY_INJECTION_FOR_E3_PARTS = "ENABLE_DEPENDENCY_INJECTION_FOR_E3"; ////$NON-NLS-1$
 
 	@Inject
 	Composite composite;
@@ -126,11 +130,12 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 
 		@Override
 		public void selectionChanged(SelectionChangedEvent e) {
-			ESelectionService selectionService = (ESelectionService) part.getContext().get(
-					ESelectionService.class.getName());
+			ESelectionService selectionService = part.getContext().get(ESelectionService.class);
 			selectionService.setPostSelection(e.getSelection());
 		}
 	};
+
+	private IWorkbenchPart legacyPart;
 
 	CompatibilityPart(MPart part) {
 		this.part = part;
@@ -144,10 +149,17 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 	public abstract WorkbenchPartReference getReference();
 
 	protected boolean createPartControl(final IWorkbenchPart legacyPart, Composite parent) {
+		this.legacyPart = legacyPart;
 		IWorkbenchPartSite site = null;
 		try {
 			site = legacyPart.getSite();
+			part.getContext().set(Composite.class, parent);
+			// call createPartControl after dependency injection
+			if (part.getTags().contains(IWorkbenchConstants.TAG_USE_DEPENDENCY_INJECTION)) {
+				ContextInjectionFactory.inject(legacyPart, part.getContext());
+			}
 			legacyPart.createPartControl(parent);
+
 		} catch (RuntimeException e) {
 			logger.error(e);
 
@@ -189,8 +201,7 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 				} else {
 					selectionProvider.addSelectionChangedListener(postListener);
 				}
-				ESelectionService selectionService = (ESelectionService) part.getContext().get(
-						ESelectionService.class.getName());
+				ESelectionService selectionService = part.getContext().get(ESelectionService.class);
 				selectionService.setSelection(selectionProvider.getSelection());
 			}
 		}
@@ -200,6 +211,11 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 	@Focus
 	void delegateSetFocus() {
 		try {
+			// first involve @Focus if present
+			if (part.getTags().contains(IWorkbenchConstants.TAG_USE_DEPENDENCY_INJECTION)) {
+				ContextInjectionFactory.invoke(wrapped, Focus.class, part.getContext(), null);
+			}
+			// ensure to comply to the 3.x API contract
 			wrapped.setFocus();
 		} catch (Exception e) {
 			if (logger != null) {
@@ -344,10 +360,8 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 		// Only update 'valid' parts
 		if (!(wrapped instanceof ErrorEditorPart) && !(wrapped instanceof ErrorViewPart)) {
 			part.setLabel(computeLabel());
-			part.getTransientData().put(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY,
-					wrapped.getTitleToolTip());
-			part.getTransientData().put(IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY,
-					wrapped.getTitleImage());
+			part.getTransientData().put(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY, wrapped.getTitleToolTip());
+			part.getTransientData().put(IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY, wrapped.getTitleImage());
 		}
 
 		ISaveablePart saveable = SaveableHelper.getSaveable(wrapped);
@@ -423,6 +437,9 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 	 */
 	void disposeSite(PartSite site) {
 		site.dispose();
+		if (part.getTags().contains(IWorkbenchConstants.TAG_USE_DEPENDENCY_INJECTION)) {
+			ContextInjectionFactory.uninject(legacyPart, part.getContext());
+		}
 	}
 
 	@Persist
@@ -445,8 +462,7 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 
 	@Override
 	public void selectionChanged(SelectionChangedEvent e) {
-		ESelectionService selectionService = (ESelectionService) part.getContext().get(
-				ESelectionService.class.getName());
+		ESelectionService selectionService = part.getContext().get(ESelectionService.class);
 		selectionService.setSelection(e.getSelection());
 	}
 

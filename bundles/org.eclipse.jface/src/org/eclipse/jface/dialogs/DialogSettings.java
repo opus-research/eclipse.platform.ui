@@ -365,17 +365,16 @@ public class DialogSettings implements IDialogSettings {
 
 	@Override
 	public void save(Writer writer) throws IOException {
-    	final XMLWriter xmlWriter = new XMLWriter(writer);
+		final XMLWriter xmlWriter = new XMLWriter(writer);
     	save(xmlWriter);
     	xmlWriter.flush();
     }
 
     @Override
 	public void save(String fileName) throws IOException {
-        FileOutputStream stream = new FileOutputStream(fileName);
-        XMLWriter writer = new XMLWriter(stream);
-        save(writer);
-        writer.close();
+		try (XMLWriter writer = new XMLWriter(new FileOutputStream(fileName))) {
+			save(writer);
+		}
     }
 
     private void save(XMLWriter out) throws IOException {

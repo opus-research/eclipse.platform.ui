@@ -8,14 +8,11 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Fabio Zadrozny - Bug 465711
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 506540
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
-import static org.eclipse.e4.ui.css.swt.dom.CTabFolderElement.setBackgroundOverriddenDuringRenderering;
-import static org.eclipse.e4.ui.css.swt.dom.CompositeElement.hasBackgroundOverriddenByCSS;
-
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import javax.inject.Inject;
 import org.eclipse.e4.ui.internal.css.swt.ICTabRendering;
 import org.eclipse.swt.SWT;
@@ -31,14 +28,10 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Region;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.ToolBar;
 
 @SuppressWarnings("restriction")
 public class CTabRendering extends CTabFolderRenderer implements ICTabRendering {
-	private static final String CONTAINS_TOOLBAR = "CTabRendering.containsToolbar"; //$NON-NLS-1$
 
 	// Constants for circle drawing
 	static enum CirclePart {
@@ -56,10 +49,6 @@ public class CTabRendering extends CTabFolderRenderer implements ICTabRendering 
 				return RIGHT_BOTTOM;
 			}
 			return RIGHT_TOP;
-		}
-
-		boolean isBottom() {
-			return this == LEFT_BOTTOM || this == RIGHT_BOTTOM;
 		}
 	}
 
@@ -107,7 +96,6 @@ public class CTabRendering extends CTabFolderRenderer implements ICTabRendering 
 
 	int paddingLeft = 0, paddingRight = 0, paddingTop = 0, paddingBottom = 0;
 
-	private CTabFolderRendererWrapper rendererWrapper;
 	private CTabFolderWrapper parentWrapper;
 
 	private Color hotUnselectedTabsColorBackground;
@@ -116,7 +104,6 @@ public class CTabRendering extends CTabFolderRenderer implements ICTabRendering 
 	public CTabRendering(CTabFolder parent) {
 		super(parent);
 		parentWrapper = new CTabFolderWrapper(parent);
-		rendererWrapper = new CTabFolderRendererWrapper(this);
 	}
 
 	@Override
@@ -426,18 +413,23 @@ public class CTabRendering extends CTabFolderRenderer implements ICTabRendering 
 			points[index++] = selectionY1 = bottomY;
 		}
 
-		int[] ltt = drawCircleForTabs(circX, circY, radius, CirclePart.left(onBottom));
+		int[] ltt = drawCircle(circX, circY, radius, CirclePart.left(onBottom));
 		int startX = ltt[6];
+		if (!onBottom) {
+			mirrorCirclePoints(ltt);
+		}
 		System.arraycopy(ltt, 0, points, index, ltt.length);
 		index += ltt.length;
-
-		int[] rt = drawCircleForTabs(circX + width - (radius * 2), circY, radius, CirclePart.right(onBottom));
+		int[] rt = drawCircle(circX + width - (radius * 2), circY, radius, CirclePart.right(onBottom));
 		int endX = rt[rt.length - 4];
+		if (!onBottom) {
+			mirrorCirclePoints(rt);
+		}
 		System.arraycopy(rt, 0, points, index, rt.length);
 		index += rt.length;
 
 		points[index++] = selectionX2 = bounds.width + circX - radius;
-		points[index++] = selectionY2 = bounds.y + bounds.height;
+		points[index++] = selectionY2 = bottomY;
 
 		if (active) {
 			points[index++] = parent.getSize().x
@@ -539,7 +531,10 @@ public class CTabRendering extends CTabFolderRenderer implements ICTabRendering 
 
 			int rightIndex = circX - 1;
 
-			int[] ltt = drawCircleForTabs(leftIndex, circY, radius, CirclePart.left(onBottom));
+			int[] ltt = drawCircle(leftIndex, circY, radius, CirclePart.left(onBottom));
+			if (!onBottom) {
+				mirrorCirclePoints(ltt);
+			}
 			System.arraycopy(ltt, 0, points, index, ltt.length);
 			index += ltt.length;
 
@@ -548,7 +543,10 @@ public class CTabRendering extends CTabFolderRenderer implements ICTabRendering 
 				inactive_index += 2;
 			}
 
-			int[] rt = drawCircleForTabs(rightIndex + width - (radius * 2), circY, radius, CirclePart.right(onBottom));
+			int[] rt = drawCircle(rightIndex + width - (radius * 2), circY, radius, CirclePart.right(onBottom));
+			if (!onBottom) {
+				mirrorCirclePoints(rt);
+			}
 			System.arraycopy(rt, 0, points, index, rt.length);
 			index += rt.length;
 
@@ -609,14 +607,6 @@ public class CTabRendering extends CTabFolderRenderer implements ICTabRendering 
 			circle[i + 1] = circle[circle.length - i - 1];
 			circle[circle.length - i - 1] = tmp;
 		}
-	}
-
-	private static int[] drawCircleForTabs(int xC, int yC, int r, CirclePart circlePart) {
-		int[] circle = drawCircle(xC, yC, r, circlePart);
-		if (!circlePart.isBottom()) {
-			mirrorCirclePoints(circle);
-		}
-		return circle;
 	}
 
 	static int[] drawCircle(int xC, int yC, int r, CirclePart circlePart) {
@@ -977,7 +967,6 @@ public class CTabRendering extends CTabFolderRenderer implements ICTabRendering 
 
 		drawUnselectedTabBackground(gc, partHeaderBounds, state, vertical, defaultBackground);
 		drawTabBackground(gc, partHeaderBounds, state, vertical, defaultBackground);
-		drawChildrenBackground(partHeaderBounds);
 	}
 
 	private void drawUnselectedTabBackground(GC gc, Rectangle partHeaderBounds,
@@ -994,7 +983,7 @@ public class CTabRendering extends CTabFolderRenderer implements ICTabRendering 
 			unselectedTabsPercents = new int[] { 100 };
 		}
 
-		rendererWrapper.drawBackground(gc, partHeaderBounds.x, partHeaderBounds.y - 1, partHeaderBounds.width,
+		drawBackground(gc, partHeaderBounds.x, partHeaderBounds.y - 1, partHeaderBounds.width,
 				partHeaderBounds.height, defaultBackground, unselectedTabsColors, unselectedTabsPercents, vertical);
 	}
 
@@ -1015,63 +1004,96 @@ public class CTabRendering extends CTabFolderRenderer implements ICTabRendering 
 			colors = new Color[] { gc.getDevice().getSystemColor(SWT.COLOR_WHITE) };
 			percents = new int[] { 100 };
 		}
-		rendererWrapper.drawBackground(gc, partHeaderBounds.x, partHeaderBounds.height - 1, partHeaderBounds.width,
+		drawBackground(gc, partHeaderBounds.x, partHeaderBounds.height - 1, partHeaderBounds.width,
 				parent.getBounds().height, defaultBackground, colors, percents, vertical);
 	}
 
-	// Workaround for the bug 433276. Remove it when the bug gets fixed
-	private void drawChildrenBackground(Rectangle partHeaderBounds) {
-		for (Control control : parent.getChildren()) {
-			if (!hasBackgroundOverriddenByCSS(control) && containsToolbar(control)) {
-				drawChildBackground((Composite) control, partHeaderBounds);
-			}
-		}
-	}
-
-	private boolean containsToolbar(Control control) {
-		if (control.getData(CONTAINS_TOOLBAR) != null) {
-			return true;
-		}
-
-		if (control instanceof Composite) {
-			for (Control child : ((Composite) control).getChildren()) {
-				if (child instanceof ToolBar) {
-					control.setData(CONTAINS_TOOLBAR, true);
-					return true;
+	/*
+	 * Copied the relevant parts from the package private
+	 * org.eclipse.swt.custom.CTabFolderRenderer.drawBackground(GC, int[], int,
+	 * int, int, int, Color, Image, Color[], int[], boolean) method.
+	 */
+	private void drawBackground(GC gc, int x, int y, int width, int height, Color defaultBackground, Color[] colors,
+			int[] percents, boolean vertical) {
+		if (colors != null) {
+			// draw gradient
+			if (colors.length == 1) {
+				Color background = colors[0] != null ? colors[0] : defaultBackground;
+				gc.setBackground(background);
+				gc.fillRectangle(x, y, width, height);
+			} else {
+				if (vertical) {
+					if ((parent.getStyle() & SWT.BOTTOM) != 0) {
+						int pos = 0;
+						if (percents[percents.length - 1] < 100) {
+							pos = (100 - percents[percents.length - 1]) * height / 100;
+							gc.setBackground(defaultBackground);
+							gc.fillRectangle(x, y, width, pos);
+						}
+						Color lastColor = colors[colors.length - 1];
+						if (lastColor == null)
+							lastColor = defaultBackground;
+						for (int i = percents.length - 1; i >= 0; i--) {
+							gc.setForeground(lastColor);
+							lastColor = colors[i];
+							if (lastColor == null)
+								lastColor = defaultBackground;
+							gc.setBackground(lastColor);
+							int percentage = i > 0 ? percents[i] - percents[i - 1] : percents[i];
+							int gradientHeight = percentage * height / 100;
+							gc.fillGradientRectangle(x, y + pos, width, gradientHeight, true);
+							pos += gradientHeight;
+						}
+					} else {
+						Color lastColor = colors[0];
+						if (lastColor == null)
+							lastColor = defaultBackground;
+						int pos = 0;
+						for (int i = 0; i < percents.length; i++) {
+							gc.setForeground(lastColor);
+							lastColor = colors[i + 1];
+							if (lastColor == null)
+								lastColor = defaultBackground;
+							gc.setBackground(lastColor);
+							int percentage = i > 0 ? percents[i] - percents[i - 1] : percents[i];
+							int gradientHeight = percentage * height / 100;
+							gc.fillGradientRectangle(x, y + pos, width, gradientHeight, true);
+							pos += gradientHeight;
+						}
+						if (pos < height) {
+							gc.setBackground(defaultBackground);
+							gc.fillRectangle(x, pos, width, height - pos + 1);
+						}
+					}
+				} else { // horizontal gradient
+					y = 0;
+					height = parent.getSize().y;
+					Color lastColor = colors[0];
+					if (lastColor == null)
+						lastColor = defaultBackground;
+					int pos = 0;
+					for (int i = 0; i < percents.length; ++i) {
+						gc.setForeground(lastColor);
+						lastColor = colors[i + 1];
+						if (lastColor == null)
+							lastColor = defaultBackground;
+						gc.setBackground(lastColor);
+						int gradientWidth = (percents[i] * width / 100) - pos;
+						gc.fillGradientRectangle(x + pos, y, gradientWidth, height, false);
+						pos += gradientWidth;
+					}
+					if (pos < width) {
+						gc.setBackground(defaultBackground);
+						gc.fillRectangle(x + pos, y, width - pos, height);
+					}
 				}
 			}
-		}
-		return false;
-	}
-
-	private void drawChildBackground(Composite composite, Rectangle partHeaderBounds) {
-		Rectangle rec = composite.getBounds();
-		Color background = null;
-		boolean partOfHeader = rec.y >= partHeaderBounds.y && rec.y < partHeaderBounds.height;
-
-		if (!partOfHeader && selectedTabFillColors != null) {
-			background = selectedTabFillColors.length == 2 ? selectedTabFillColors[1] : selectedTabFillColors[0];
-		}
-
-		setBackgroundOverriddenDuringRenderering(composite, background);
-	}
-
-	private static class CTabFolderRendererWrapper extends ReflectionSupport<CTabFolderRenderer> {
-		private Method drawBackgroundMethod;
-
-		public CTabFolderRendererWrapper(CTabFolderRenderer instance) {
-			super(instance);
-		}
-
-		public void drawBackground(GC gc, int x, int y, int width, int height, Color defaultBackground, Color[] colors,
-				int[] percents, boolean vertical) {
-			if (drawBackgroundMethod == null) {
-				drawBackgroundMethod = getMethod("drawBackground", //$NON-NLS-1$
-						GC.class, int[].class, int.class, int.class, int.class, int.class, Color.class, Image.class,
-						Color[].class, int[].class, boolean.class);
+		} else {
+			// draw a solid background using default background in shape
+			if ((parent.getStyle() & SWT.NO_BACKGROUND) != 0 || !defaultBackground.equals(parent.getBackground())) {
+				gc.setBackground(defaultBackground);
+				gc.fillRectangle(x, y, width, height);
 			}
-			executeMethod(drawBackgroundMethod, new Object[] { gc, null, x, y, width, height, defaultBackground, null,
-					colors, percents, vertical });
 		}
 	}
 
@@ -1165,34 +1187,6 @@ public class CTabRendering extends CTabFolderRenderer implements ICTabRendering 
 			while (!cls.equals(Object.class)) {
 				try {
 					return cls.getDeclaredField(name);
-				} catch (Exception exc) {
-					cls = cls.getSuperclass();
-				}
-			}
-			return null;
-		}
-
-		protected Object executeMethod(Method method, Object... params) {
-			Object value = null;
-			if (method != null) {
-				boolean accessible = method.isAccessible();
-				try {
-					method.setAccessible(true);
-					value = method.invoke(instance, params);
-				} catch (Exception exc) {
-					// do nothing
-				} finally {
-					method.setAccessible(accessible);
-				}
-			}
-			return value;
-		}
-
-		protected Method getMethod(String name, Class<?>... params) {
-			Class<?> cls = instance.getClass();
-			while (!cls.equals(Object.class)) {
-				try {
-					return cls.getDeclaredMethod(name, params);
 				} catch (Exception exc) {
 					cls = cls.getSuperclass();
 				}
