@@ -24,22 +24,22 @@ import org.eclipse.swt.widgets.Composite;
 /**
  * Description of the bug:
  * Initially tree is populated by way shown below and is completely expanded.
- *
+ * 
  * root
  *     |-a
  *        |-c
  *        |-d
  *     |-b
  *        |-c
- *
+ * 
  * Then 'd' model element is added as child of 'b' in model and through
  * add(parent,child) method of TreeViewer to tree.
- *
+ * 
  * The problem - It seems that calling add(parent,child) has no desired efect.
  * 'd' model element is not shown as child of 'b'!
- *
+ * 
  * @since 3.2
- *
+ * 
  */
 public class Bug138608Test extends ViewerTestCase {
 
@@ -52,7 +52,6 @@ public class Bug138608Test extends ViewerTestCase {
 		super(name);
 	}
 
-	@Override
 	protected StructuredViewer createViewer(Composite parent) {
 		final TreeViewer viewer = new TreeViewer(parent);
 		viewer.getTree().setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -63,13 +62,11 @@ public class Bug138608Test extends ViewerTestCase {
 		return viewer;
 	}
 
-	@Override
 	protected void setUpModel() {
 		// don't do anything here - we are not using the normal fModel and
 		// fRootElement
 	}
 
-	@Override
 	protected void setInput() {
 		getTreeViewer().setInput(contentProvider.root);
 		getTreeViewer().expandAll();
@@ -106,7 +103,6 @@ public class Bug138608Test extends ViewerTestCase {
 
 	}
 
-	@Override
 	public void tearDown() {
 		contentProvider = null;
 		super.tearDown();
@@ -127,31 +123,25 @@ public class Bug138608Test extends ViewerTestCase {
 			b.setChildren(new TreeNode[] { c });
 		}
 
-		@Override
 		public Object[] getChildren(Object parentElement) {
 			return ((TreeNode) parentElement).getChildren();
 		}
 
-		@Override
 		public Object getParent(Object element) {
 			return ((TreeNode) element).getParent();
 		}
 
-		@Override
 		public boolean hasChildren(Object element) {
 			return ((TreeNode) element).hasChildren();
 		}
 
-		@Override
 		public Object[] getElements(Object inputElement) {
 			return getChildren(inputElement);
 		}
 
-		@Override
 		public void dispose() {
 		}
 
-		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 	}

@@ -35,6 +35,9 @@ public final class EditorPluginAction extends PartPluginAction {
 		}
     }
 
+    /* (non-Javadoc)
+     * Method declared on PluginAction.
+     */
     @Override
 	protected IActionDelegate validateDelegate(Object obj)
             throws WorkbenchException {
@@ -46,6 +49,9 @@ public final class EditorPluginAction extends PartPluginAction {
 		}
     }
 
+    /* (non-Javadoc)
+     * Method declared on PluginAction.
+     */
     @Override
 	protected void initDelegate() {
         super.initDelegate();
@@ -76,6 +82,9 @@ public final class EditorPluginAction extends PartPluginAction {
 		}
     }
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.PluginAction#dispose()
+	 */
 	@Override
 	public void dispose() {
         if (currentEditor != null) {

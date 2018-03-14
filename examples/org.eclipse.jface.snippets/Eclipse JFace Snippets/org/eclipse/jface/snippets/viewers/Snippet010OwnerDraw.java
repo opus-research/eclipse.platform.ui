@@ -10,7 +10,6 @@
  *     oliver.schaefer@mbtech-services.com - Fix for Bug 225051 [Snippets] Snippet010OwnerDraw - Wrong german flag
  * 	   Lars Vogel <lars.vogel@gmail.com >- Bug 387367
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 414565
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414565
  *******************************************************************************/
 package org.eclipse.jface.snippets.viewers;
 
@@ -32,7 +31,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
-
 
 public class Snippet010OwnerDraw {
 
@@ -76,6 +74,10 @@ public class Snippet010OwnerDraw {
 			baseName = englishName;
 		}
 
+		/**
+		 * @param index
+		 * @return
+		 */
 		public int getHeight(Event event) {
 			switch (event.index) {
 			case 0:
@@ -89,6 +91,10 @@ public class Snippet010OwnerDraw {
 			}
 		}
 
+		/**
+		 * @param index
+		 * @return
+		 */
 		public int getWidth(Event event) {
 
 			switch (event.index) {
@@ -201,6 +207,11 @@ public class Snippet010OwnerDraw {
 			super("Deutschland", "Germany", "1954 1974 1990");
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.jface.tests.viewers.OwnerDrawExample.CountryEntry#drawFlag(org.eclipse.swt.widgets.Event)
+		 */
 		@Override
 		protected void drawFlag(Event event) {
 
@@ -236,6 +247,11 @@ public class Snippet010OwnerDraw {
 			super("\u00D6sterreich", "Austria", "TBD");
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.jface.tests.viewers.OwnerDrawExample.CountryEntry#drawFlag(org.eclipse.swt.widgets.Event)
+		 */
 		@Override
 		protected void drawFlag(Event event) {
 
@@ -269,6 +285,11 @@ public class Snippet010OwnerDraw {
 			super("Blighty", "England", "1966");
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.jface.tests.viewers.OwnerDrawExample.CountryEntry#drawFlag(org.eclipse.swt.widgets.Event)
+		 */
 		@Override
 		protected void drawFlag(Event event) {
 
@@ -296,7 +317,11 @@ public class Snippet010OwnerDraw {
 		entries[2] = new EnglandEntry();
 	}
 
-
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createPartControl(Composite parent) {
 		viewer = new TableViewer(parent, SWT.FULL_SELECTION);
 		viewer.setContentProvider(ArrayContentProvider.getInstance());
@@ -311,6 +336,12 @@ public class Snippet010OwnerDraw {
 						country.getHeight(event)));
 			}
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.jface.viewers.OwnerDrawLabelProvider#paint(org.eclipse.swt.widgets.Event,
+			 *      java.lang.Object)
+			 */
 			@Override
 			protected void paint(Event event, Object element) {
 				CountryEntry entry = (CountryEntry) element;

@@ -65,7 +65,6 @@ class QuickFixWizard extends Wizard {
 	 * 
 	 * @see org.eclipse.jface.wizard.Wizard#addPages()
 	 */
-	@Override
 	public void addPages() {
 		super.addPages();
 		addPage(new QuickFixPage(description, selectedMarkers, resolutionMap, partSite));
@@ -76,7 +75,6 @@ class QuickFixWizard extends Wizard {
 	 * 
 	 * @see org.eclipse.jface.wizard.Wizard#performFinish()
 	 */
-	@Override
 	public boolean performFinish() {
 		IRunnableWithProgress finishRunnable = new IRunnableWithProgress() {
 			/*
@@ -84,7 +82,6 @@ class QuickFixWizard extends Wizard {
 			 * 
 			 * @see org.eclipse.jface.operation.IRunnableWithProgress#run(org.eclipse.core.runtime.IProgressMonitor)
 			 */
-			@Override
 			public void run(IProgressMonitor monitor)
 				 {
 				IWizardPage[] pages = getPages();

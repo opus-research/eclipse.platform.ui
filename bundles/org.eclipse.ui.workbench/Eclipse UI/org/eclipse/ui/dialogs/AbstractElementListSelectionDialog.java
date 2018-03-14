@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -334,6 +334,9 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
         return status.isOK();
     }
 
+    /*
+     * @see Dialog#cancelPressed
+     */
     @Override
 	protected void cancelPressed() {
         setResult(null);
@@ -437,6 +440,10 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
         return text;
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.jface.window.Window#open()
+     */
     @Override
 	public int open() {
         super.open();
@@ -447,6 +454,10 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
         super.create();
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.jface.window.Window#create()
+     */
     @Override
 	public void create() {
 

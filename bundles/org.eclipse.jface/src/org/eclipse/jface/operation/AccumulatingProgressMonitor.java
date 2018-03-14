@@ -198,7 +198,7 @@ import org.eclipse.swt.widgets.Display;
 	}
 
 	@Override
-	public synchronized void setTaskName(final String name) {
+	public void setTaskName(final String name) {
 		currentTask = name;
 		if (collector == null) {
 			createCollector(name, null, 0);
@@ -233,6 +233,9 @@ import org.eclipse.swt.widgets.Display;
 		}
 
         display.asyncExec(new Runnable() {
+            /* (non-Javadoc)
+             * @see java.lang.Runnable#run()
+             */
             @Override
 			public void run() {
                 ((IProgressMonitorWithBlocking) pm).clearBlocked();
@@ -252,6 +255,9 @@ import org.eclipse.swt.widgets.Display;
 		}
 
         display.asyncExec(new Runnable() {
+            /* (non-Javadoc)
+             * @see java.lang.Runnable#run()
+             */
             @Override
 			public void run() {
                 ((IProgressMonitorWithBlocking) pm).setBlocked(reason);
