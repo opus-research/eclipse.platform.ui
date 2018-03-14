@@ -38,9 +38,7 @@ public class BooleanFieldEditorTest extends TestCase {
 	private boolean otherThreadEventOccurred = false;
 	private final Object lock = new Object();
 	
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		
@@ -131,6 +129,7 @@ public class BooleanFieldEditorTest extends TestCase {
 	
 	public void testValueChanged() {
 		bfEditorWithSameLabel.setPropertyChangeListener(new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				otherThreadEventOccurred();
 			}
@@ -159,9 +158,12 @@ public class BooleanFieldEditorTest extends TestCase {
 	
 	public void testSetFocus() {
 		bfEditorWithSameLabel = new BooleanFieldEditor("name", "label", shell){
+			@Override
 			protected Button getChangeControl(Composite parent) {
 				return new Button(parent,SWT.CHECK){
+					@Override
 					protected void checkSubclass() {}
+					@Override
 					public boolean setFocus() {
 						otherThreadEventOccurred();
 						return super.setFocus();
@@ -207,6 +209,7 @@ public class BooleanFieldEditorTest extends TestCase {
 		final BooleanFieldEditor[] editors = new BooleanFieldEditor[2];
 		
 		PreferencePage page = new FieldEditorPreferencePage(FieldEditorPreferencePage.GRID) {
+			@Override
 			protected void createFieldEditors() {
 				Composite parent = getFieldEditorParent();
 				BooleanFieldEditor bfEditorWithSameLabel = new BooleanFieldEditor("name", "label", parent);
@@ -273,9 +276,7 @@ public class BooleanFieldEditorTest extends TestCase {
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
+	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 	}

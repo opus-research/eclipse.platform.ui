@@ -25,13 +25,14 @@ import org.eclipse.swt.widgets.TableItem;
 
 /**
  * @since 3.2
- * 
+ *
  */
 public class Snippet016TableUpdater {
 	public static void main(String[] args) {
 		final Display display = new Display();
 
 		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
+			@Override
 			public void run() {
 				final Shell shell = createShell(display);
 				GridLayoutFactory.fillDefaults().generateLayout(shell);
@@ -51,6 +52,7 @@ public class Snippet016TableUpdater {
 
 		public Stuff(final Display display) {
 			display.timerExec(1000, new Runnable() {
+				@Override
 				public void run() {
 					counter.setValue(new Integer(1 + ((Integer) counter
 							.getValue()).intValue()));
@@ -58,7 +60,8 @@ public class Snippet016TableUpdater {
 				}
 			});
 		}
-		
+
+		@Override
 		public String toString() {
 			return counter.getValue().toString();
 		}
@@ -70,11 +73,13 @@ public class Snippet016TableUpdater {
 		final WritableList list = new WritableList();
 		new TableUpdater(t, list) {
 
+			@Override
 			protected void updateItem(int index, TableItem item, Object element) {
 				item.setText(element.toString());
 			}
 		};
 		display.timerExec(2000, new Runnable() {
+			@Override
 			public void run() {
 				list.add(new Stuff(display));
 				display.timerExec(2000, this);

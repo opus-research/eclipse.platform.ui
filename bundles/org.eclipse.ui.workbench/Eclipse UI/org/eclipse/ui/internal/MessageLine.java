@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Stefan Winkler <stefan@winklerweb.net> - Bug 434189
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -69,18 +68,14 @@ public class MessageLine extends CLabel {
             if (message != null && message.length() > 0) {
                 setText(message);
                 setImage(findImage(status));
-				super.setBackground(JFaceColors.getErrorBackground(getDisplay()));
+                setBackground(JFaceColors.getErrorBackground(getDisplay()));
                 return;
             }
         }
         setText(""); //$NON-NLS-1$	
         setImage(null);
-		super.setBackground(fNormalMsgAreaBackground);
-	}
-
-	@Override
-	public void setBackground(Color color) {
-		fNormalMsgAreaBackground = color;
+        setBackground(fNormalMsgAreaBackground);
     }
+
 }
 
