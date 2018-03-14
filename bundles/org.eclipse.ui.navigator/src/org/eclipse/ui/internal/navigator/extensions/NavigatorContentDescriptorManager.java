@@ -9,7 +9,6 @@
  * IBM Corporation - initial API and implementation
  * Bug 349224 Navigator content provider "appearsBefore" creates hard reference to named id - paul.fullbright@oracle.com
  * C. Sean Young <csyoung@google.com> - Bug 436645
- * Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 436645
  *******************************************************************************/
 package org.eclipse.ui.internal.navigator.extensions;
 
@@ -184,21 +183,9 @@ public class NavigatorContentDescriptorManager {
 			System.out.println("Find descriptors for: " + Policy.getObjectString(anElement) + //$NON-NLS-1$
 					(considerOverrides ? " (with overrides)" : "") + ": " + descriptors); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
-		if (canStoreInEvaluationCache(descriptors, possibleChild)) {
-			cache.setDescriptors(anElement, descriptors.toArray(new NavigatorContentDescriptor[descriptors.size()]), considerOverrides);
-		}
-		return descriptors;
-	}
+		cache.setDescriptors(anElement, descriptors.toArray(new NavigatorContentDescriptor[descriptors.size()]), considerOverrides);
 
-	private boolean canStoreInEvaluationCache(Set<NavigatorContentDescriptor> descriptors, boolean possibleChild) {
-		boolean storeInEvaluationCache = true;
-		for (NavigatorContentDescriptor descriptor : descriptors) {
-			if (possibleChild ? descriptor.canCachePossibleChildren() : descriptor.canCacheTriggerPoint()) {
-				storeInEvaluationCache = false;
-				break;
-			}
-		}
-		return storeInEvaluationCache;
+		return descriptors;
 	}
 
 	private EvaluationCache getEvaluationCache(Map<VisibilityAssistant, EvaluationCache> anEvaluationMap,

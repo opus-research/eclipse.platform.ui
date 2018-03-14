@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2016 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  * IBM Corporation - initial API and implementation
- * Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 436645
  *******************************************************************************/
 package org.eclipse.ui.internal.navigator.extensions;
 
@@ -19,19 +18,22 @@ import java.util.ListIterator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.eclipse.osgi.util.NLS;
+
 import org.eclipse.core.expressions.ElementHandler;
 import org.eclipse.core.expressions.EvaluationResult;
 import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.ExpressionConverter;
-import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.core.expressions.IEvaluationContext;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IStatus;
+
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.osgi.util.NLS;
+
 import org.eclipse.ui.IPluginContribution;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.internal.navigator.CommonNavigatorMessages;
@@ -50,7 +52,8 @@ import org.eclipse.ui.navigator.Priority;
  *
  * @since 3.2
  */
-public final class NavigatorContentDescriptor implements INavigatorContentDescriptor, INavigatorContentExtPtConstants {
+public final class NavigatorContentDescriptor implements
+		INavigatorContentDescriptor, INavigatorContentExtPtConstants {
 
 	private static final int HASH_CODE_NOT_COMPUTED = -1;
 	private String id;
@@ -62,9 +65,8 @@ public final class NavigatorContentDescriptor implements INavigatorContentDescri
 	private int priority = Priority.NORMAL_PRIORITY_VALUE;
 
 	/**
-	 * This is calculated based on the priority and appearsBeforeId when all of
-	 * the descriptors are first loaded. This is what's used to sort on after
-	 * that.
+	 * This is calculated based on the priority and appearsBeforeId when all of the descriptors
+	 * are first loaded. This is what's used to sort on after that.
 	 */
 	private int sequenceNumber;
 
@@ -72,11 +74,7 @@ public final class NavigatorContentDescriptor implements INavigatorContentDescri
 
 	private Expression enablement;
 
-	private boolean canCacheEnablement = true;
-
 	private Expression possibleChildren;
-
-	private boolean canCachePossibleChildren = true;
 
 	private Expression initialActivation;
 
@@ -89,8 +87,7 @@ public final class NavigatorContentDescriptor implements INavigatorContentDescri
 	private boolean sortOnly;
 
 	private Set overridingExtensions;
-	private List overridingExtensionsList; // FIXME: will replace
-											// 'overridingExtensions' in 3.6
+	private List overridingExtensionsList; // FIXME: will replace 'overridingExtensions' in 3.6
 
 	private OverridePolicy overridePolicy;
 
@@ -116,7 +113,8 @@ public final class NavigatorContentDescriptor implements INavigatorContentDescri
 	 *             <li>More elements are define than is allowed.</li>
 	 *             </ul>
 	 */
-	/* package */ NavigatorContentDescriptor(IConfigurationElement configElement) throws WorkbenchException {
+	/* package */ NavigatorContentDescriptor(IConfigurationElement configElement)
+			throws WorkbenchException {
 		super();
 		this.configElement = configElement;
 		init();
@@ -181,19 +179,24 @@ public final class NavigatorContentDescriptor implements INavigatorContentDescri
 		String priorityString = configElement.getAttribute(ATT_PRIORITY);
 		icon = configElement.getAttribute(ATT_ICON);
 
-		String activeByDefaultString = configElement.getAttribute(ATT_ACTIVE_BY_DEFAULT);
-		activeByDefault = (activeByDefaultString != null && activeByDefaultString.length() > 0)
-				? Boolean.valueOf(activeByDefaultString).booleanValue() : true;
+		String activeByDefaultString = configElement
+				.getAttribute(ATT_ACTIVE_BY_DEFAULT);
+		activeByDefault = (activeByDefaultString != null && activeByDefaultString
+				.length() > 0) ? Boolean.valueOf(activeByDefaultString)
+				.booleanValue() : true;
 
-		String providesSaveablesString = configElement.getAttribute(ATT_PROVIDES_SAVEABLES);
-		providesSaveables = (providesSaveablesString != null && providesSaveablesString.length() > 0)
-				? Boolean.valueOf(providesSaveablesString).booleanValue() : false;
+		String providesSaveablesString = configElement
+			.getAttribute(ATT_PROVIDES_SAVEABLES);
+		providesSaveables = (providesSaveablesString != null && providesSaveablesString
+				.length() > 0) ? Boolean.valueOf(providesSaveablesString)
+						.booleanValue() : false;
 		appearsBeforeId = configElement.getAttribute(ATT_APPEARS_BEFORE);
 
 		if (priorityString != null) {
 			try {
 				Priority p = Priority.get(priorityString);
-				priority = p != null ? p.getValue() : Priority.NORMAL_PRIORITY_VALUE;
+				priority = p != null ? p.getValue()
+						: Priority.NORMAL_PRIORITY_VALUE;
 			} catch (NumberFormatException exception) {
 				priority = Priority.NORMAL_PRIORITY_VALUE;
 			}
@@ -204,12 +207,17 @@ public final class NavigatorContentDescriptor implements INavigatorContentDescri
 		sequenceNumber = priority;
 
 		String sortOnlyString = configElement.getAttribute(ATT_SORT_ONLY);
-		sortOnly = (sortOnlyString != null && sortOnlyString.length() > 0)
-				? Boolean.valueOf(sortOnlyString).booleanValue() : false;
+		sortOnly = (sortOnlyString != null && sortOnlyString.length() > 0) ? Boolean.valueOf(
+				sortOnlyString).booleanValue() : false;
 
 		if (id == null) {
-			throw new WorkbenchException(NLS.bind(CommonNavigatorMessages.Attribute_Missing_Warning,
-					new Object[] { ATT_ID, id, configElement.getDeclaringExtension().getNamespaceIdentifier() }));
+			throw new WorkbenchException(NLS.bind(
+					CommonNavigatorMessages.Attribute_Missing_Warning,
+					new Object[] {
+							ATT_ID,
+							id,
+							configElement.getDeclaringExtension()
+									.getNamespaceIdentifier() }));
 		}
 
 		contribution = new IPluginContribution() {
@@ -233,8 +241,10 @@ public final class NavigatorContentDescriptor implements INavigatorContentDescri
 			if (children.length == 1) {
 				initialActivation = new CustomAndExpression(children[0]);
 			} else {
-				throw new WorkbenchException(NLS.bind(CommonNavigatorMessages.Attribute_Missing_Warning, new Object[] {
-						TAG_INITIAL_ACTIVATION, id, configElement.getDeclaringExtension().getNamespaceIdentifier() }));
+				throw new WorkbenchException(NLS.bind(
+						CommonNavigatorMessages.Attribute_Missing_Warning, new Object[] {
+								TAG_INITIAL_ACTIVATION, id,
+								configElement.getDeclaringExtension().getNamespaceIdentifier() }));
 			}
 		}
 
@@ -247,41 +257,60 @@ public final class NavigatorContentDescriptor implements INavigatorContentDescri
 			children = configElement.getChildren(TAG_TRIGGER_POINTS);
 			if (children.length == 1) {
 				enablement = new CustomAndExpression(children[0]);
-				canCacheEnablement = checkCacheableStatus(enablement);
 			} else {
-				throw new WorkbenchException(NLS.bind(CommonNavigatorMessages.Attribute_Missing_Warning, new Object[] {
-						TAG_TRIGGER_POINTS, id, configElement.getDeclaringExtension().getNamespaceIdentifier() }));
+				throw new WorkbenchException(NLS.bind(
+						CommonNavigatorMessages.Attribute_Missing_Warning,
+						new Object[] {
+								TAG_TRIGGER_POINTS,
+								id,
+								configElement.getDeclaringExtension()
+										.getNamespaceIdentifier() }));
 			}
 
 			children = configElement.getChildren(TAG_POSSIBLE_CHILDREN);
 			if (children.length == 1) {
 				possibleChildren = new CustomAndExpression(children[0]);
-				canCachePossibleChildren = checkCacheableStatus(possibleChildren);
-			} else if (children.length > 1) {
-				throw new WorkbenchException(NLS.bind(CommonNavigatorMessages.Attribute_Missing_Warning, new Object[] {
-						TAG_POSSIBLE_CHILDREN, id, configElement.getDeclaringExtension().getNamespaceIdentifier() }));
+			} else if(children.length > 1){
+				throw new WorkbenchException(NLS.bind(
+						CommonNavigatorMessages.Attribute_Missing_Warning,
+						new Object[] {
+								TAG_POSSIBLE_CHILDREN,
+								id,
+								configElement.getDeclaringExtension()
+										.getNamespaceIdentifier() }));
 			}
 		} else if (children.length == 1) {
 			try {
-				enablement = ElementHandler.getDefault().create(ExpressionConverter.getDefault(), children[0]);
-				canCacheEnablement = checkCacheableStatus(enablement);
+				enablement = ElementHandler.getDefault().create(
+						ExpressionConverter.getDefault(), children[0]);
 			} catch (CoreException e) {
 				NavigatorPlugin.log(IStatus.ERROR, 0, e.getMessage(), e);
 			}
 		} else if (children.length > 1) {
-			throw new WorkbenchException(NLS.bind(CommonNavigatorMessages.Attribute_Missing_Warning, new Object[] {
-					TAG_ENABLEMENT, id, configElement.getDeclaringExtension().getNamespaceIdentifier() }));
+			throw new WorkbenchException(NLS.bind(
+					CommonNavigatorMessages.Attribute_Missing_Warning,
+					new Object[] {
+							TAG_ENABLEMENT,
+							id,
+							configElement.getDeclaringExtension()
+									.getNamespaceIdentifier() }));
 		}
 
 		children = configElement.getChildren(TAG_OVERRIDE);
 		if (children.length == 0) {
 			overridePolicy = OverridePolicy.get(OverridePolicy.InvokeAlwaysRegardlessOfSuppressedExt_LITERAL);
 		} else if (children.length == 1) {
-			suppressedExtensionId = children[0].getAttribute(ATT_SUPPRESSED_EXT_ID);
-			overridePolicy = OverridePolicy.get(children[0].getAttribute(ATT_POLICY));
+			suppressedExtensionId = children[0]
+					.getAttribute(ATT_SUPPRESSED_EXT_ID);
+			overridePolicy = OverridePolicy.get(children[0]
+					.getAttribute(ATT_POLICY));
 		} else if (children.length > 1) {
-			throw new WorkbenchException(NLS.bind(CommonNavigatorMessages.Too_many_elements_Warning,
-					new Object[] { TAG_OVERRIDE, id, configElement.getDeclaringExtension().getNamespaceIdentifier() }));
+			throw new WorkbenchException(NLS.bind(
+					CommonNavigatorMessages.Too_many_elements_Warning,
+					new Object[] {
+							TAG_OVERRIDE,
+							id,configElement.getDeclaringExtension()
+							.getNamespaceIdentifier() }));
 		}
 
 	}
@@ -339,13 +368,14 @@ public final class NavigatorContentDescriptor implements INavigatorContentDescri
 	public ITreeContentProvider createContentProvider() throws CoreException {
 		if (Policy.DEBUG_EXTENSION_SETUP)
 			System.out.println("createContentProvider: " + this); //$NON-NLS-1$
-		return (ITreeContentProvider) configElement.createExecutableExtension(ATT_CONTENT_PROVIDER);
+		return (ITreeContentProvider) configElement
+				.createExecutableExtension(ATT_CONTENT_PROVIDER);
 	}
 
 	/**
 	 *
-	 * The content provider could be an instance of {@link ICommonLabelProvider}
-	 * , but only {@link ILabelProvider} is required.
+	 * The content provider could be an instance of {@link ICommonLabelProvider},
+	 * but only {@link ILabelProvider} is required.
 	 *
 	 * @return An instance of the Label provider defined for this extension
 	 * @throws CoreException
@@ -355,7 +385,8 @@ public final class NavigatorContentDescriptor implements INavigatorContentDescri
 	public ILabelProvider createLabelProvider() throws CoreException {
 		if (Policy.DEBUG_EXTENSION_SETUP)
 			System.out.println("createLabelProvider: " + this); //$NON-NLS-1$
-		return (ILabelProvider) configElement.createExecutableExtension(ATT_LABEL_PROVIDER);
+		return (ILabelProvider) configElement
+				.createExecutableExtension(ATT_LABEL_PROVIDER);
 	}
 
 	@Override
@@ -387,33 +418,6 @@ public final class NavigatorContentDescriptor implements INavigatorContentDescri
 		return NavigatorPlugin.safeEvaluate(enablement, context) == EvaluationResult.TRUE;
 	}
 
-	public boolean canCacheTriggerPoint() {
-		return canCacheEnablement;
-	}
-
-	public boolean canCachePossibleChildren() {
-		return canCachePossibleChildren;
-	}
-
-	/**
-	 * @param enablement2
-	 * @return
-	 */
-	private boolean checkCacheableStatus(Expression expression) {
-		boolean canSafelyCacheExpressionResult = true;
-
-		if (expression != null) {
-			canSafelyCacheExpressionResult = false;
-			ExpressionInfo info = expression.computeExpressionInfo();
-			if (info != null) {
-				String[] accessedPropertyNames = info.getAccessedPropertyNames();
-				canSafelyCacheExpressionResult = accessedPropertyNames == null || accessedPropertyNames.length == 0
-						|| info.getMisbehavingExpressionTypes() != null;
-			}
-		}
-		return canSafelyCacheExpressionResult;
-	}
-
 	/**
 	 * Determine if this content extension could provide the given element as a
 	 * child.
@@ -431,9 +435,10 @@ public final class NavigatorContentDescriptor implements INavigatorContentDescri
 	@Override
 	public boolean isPossibleChild(Object anElement) {
 
-		if ((enablement == null && possibleChildren == null) || anElement == null) {
+		if ((enablement == null && possibleChildren == null)
+				|| anElement == null) {
 			return false;
-		} else if (anElement instanceof IStructuredSelection) {
+		} else if(anElement instanceof IStructuredSelection) {
 			return arePossibleChildren((IStructuredSelection) anElement);
 		}
 
@@ -449,19 +454,17 @@ public final class NavigatorContentDescriptor implements INavigatorContentDescri
 	/**
 	 * A convenience method to check all elements in a selection.
 	 *
-	 * @param aSelection
-	 *            A non-null selection
-	 * @return True if and only if every element in the selection is a possible
-	 *         child.
+	 * @param aSelection A non-null selection
+	 * @return True if and only if every element in the selection is a possible child.
 	 */
 	@Override
 	public boolean arePossibleChildren(IStructuredSelection aSelection) {
-		if (aSelection.isEmpty()) {
+		if(aSelection.isEmpty()) {
 			return false;
 		}
 		for (Iterator iter = aSelection.iterator(); iter.hasNext();) {
 			Object element = iter.next();
-			if (!isPossibleChild(element)) {
+			if(!isPossibleChild(element)) {
 				return false;
 			}
 		}
@@ -492,7 +495,7 @@ public final class NavigatorContentDescriptor implements INavigatorContentDescri
 	}
 
 	/**
-	 * Returns a list iterator over the overriding extensions.
+	 *  Returns a list iterator over the overriding extensions.
 	 *
 	 * @param fromStart
 	 *            <code>true</code> if list iterator starts at the beginning and
@@ -512,7 +515,7 @@ public final class NavigatorContentDescriptor implements INavigatorContentDescri
 
 	@Override
 	public String toString() {
-		return "Content[" + id + "(" + sequenceNumber + ") " + ", \"" + name + "\"]"; //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+		return "Content[" + id  + "(" + sequenceNumber + ") " + ", \"" + name + "\"]"; //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 	}
 
 	@Override
@@ -539,7 +542,8 @@ public final class NavigatorContentDescriptor implements INavigatorContentDescri
 	 * @param theOverriddenDescriptor
 	 *            The overriddenDescriptor to set.
 	 */
-	/* package */void setOverriddenDescriptor(INavigatorContentDescriptor theOverriddenDescriptor) {
+	/* package */void setOverriddenDescriptor(
+			INavigatorContentDescriptor theOverriddenDescriptor) {
 		overriddenDescriptor = theOverriddenDescriptor;
 	}
 
