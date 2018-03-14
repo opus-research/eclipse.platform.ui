@@ -7,7 +7,7 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 426535 
+ *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 410426
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -48,6 +48,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.services.IServiceConstants;
+import org.eclipse.e4.ui.workbench.Selector;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.ElementContainer;
 import org.eclipse.emf.ecore.EObject;
@@ -57,6 +58,7 @@ import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IContributionManagerOverrides;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.SWT;
@@ -64,9 +66,6 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
@@ -77,6 +76,13 @@ import org.osgi.service.event.EventHandler;
  * Create a contribute part.
  */
 public class ToolBarManagerRenderer extends SWTPartRenderer {
+
+	private static final Selector ALL_SELECTOR = new Selector() {
+
+		public boolean select(MApplicationElement element) {
+			return true;
+		}
+	};
 
 	public static final String POST_PROCESSING_FUNCTION = "ToolBarManagerRenderer.postProcess.func"; //$NON-NLS-1$
 	public static final String POST_PROCESSING_DISPOSE = "ToolBarManagerRenderer.postProcess.dispose"; //$NON-NLS-1$
@@ -93,11 +99,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	private Map<MToolBarElement, ArrayList<ToolBarContributionRecord>> sharedElementToRecord = new HashMap<MToolBarElement, ArrayList<ToolBarContributionRecord>>();
 
 	private ToolItemUpdater enablementUpdater = new ToolItemUpdater();
-
-	/**
-	 * The context menu for this trim stack's items.
-	 */
-	private Menu toolbarMenu;
 
 	// @Inject
 	// private Logger logger;
@@ -178,8 +179,15 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 					return;
 				}
 				ici.setVisible(itemModel.isVisible());
-				ToolBarManager parent = (ToolBarManager) ((ContributionItem) ici)
-						.getParent();
+
+				ToolBarManager parent = null;
+				if (ici instanceof MenuManager) {
+					parent = (ToolBarManager) ((MenuManager) ici).getParent();
+				} else if (ici instanceof ContributionItem) {
+					parent = (ToolBarManager) ((ContributionItem) ici)
+							.getParent();
+				}
+
 				if (parent != null) {
 					parent.markDirty();
 					parent.update(true);
@@ -244,7 +252,31 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	@Optional
 	void dirtyChanged(
 			@UIEventTopic(UIEvents.Dirtyable.TOPIC_DIRTY) Event eventData) {
-		updateEnablement();
+		getUpdater().updateContributionItems(ALL_SELECTOR);
+	}
+
+	@Inject
+	@Optional
+	void updateRequest(
+			@UIEventTopic(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC) Event eventData) {
+		final Object v = eventData.getProperty(IEventBroker.DATA);
+		Selector s;
+		if (v instanceof Selector) {
+			s = (Selector) v;
+		} else {
+			if (v == null || UIEvents.ALL_ELEMENT_ID.equals(v)) {
+				s = ALL_SELECTOR;
+			} else {
+				s = new Selector() {
+
+					public boolean select(MApplicationElement element) {
+						return v.equals(element.getElementId());
+					}
+				};
+			}
+		}
+
+		getUpdater().updateContributionItems(s);
 	}
 
 	@PostConstruct
@@ -274,7 +306,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 				for (String var : updateVariables) {
 					context.get(var);
 				}
-				updateEnablement();
+				getUpdater().updateContributionItems(ALL_SELECTOR);
 				return true;
 			}
 		};
@@ -320,22 +352,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			}
 		}
 
-		createMenuToCloseToolbar(toolbarModel, renderedCtrl);
-
 		return renderedCtrl;
-	}
-
-	private void createMenuToCloseToolbar(final MToolBar toolbarModel,
-			Control renderedCtrl) {
-		toolbarMenu = new Menu(renderedCtrl);
-		MenuItem closeItem = new MenuItem(toolbarMenu, SWT.NONE);
-		closeItem.setText(Messages.ToolBarManagerRenderer_MenuCloseText);
-		closeItem.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(org.eclipse.swt.widgets.Event event) {
-				toolbarModel.setToBeRendered(false);
-			}
-		});
-		renderedCtrl.setMenu(toolbarMenu);
 	}
 
 	/**
@@ -409,7 +426,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 						public void run() {
 							manager.update(false);
-							updateEnablement();
+							getUpdater().updateContributionItems(ALL_SELECTOR);
 						}
 					});
 					// disposeToolbarIfNecessary(toolbarModel);
@@ -457,7 +474,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		bar.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
 				cleanUp((MToolBar) element);
-				toolbarMenu = null;
 			}
 		});
 		return bar;
@@ -918,9 +934,4 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	ToolItemUpdater getUpdater() {
 		return enablementUpdater;
 	}
-
-	public void updateEnablement() {
-		enablementUpdater.updateContributionItems();
-	}
-
 }
