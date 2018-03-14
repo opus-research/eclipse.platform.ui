@@ -183,12 +183,6 @@ public class SimpleWorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 		super.availableWorkingSetsChanged();
 	}
 
-	@Override
-	protected void workingSetAdded(IWorkingSet addedSet) {
-		viewer.setChecked(addedSet, true);
-		updateButtonAvailability();
-	}
-
 	/**
 	 * Called when the selection has changed.
 	 */
