@@ -10,4 +10,9 @@ Export-Package: org.eclipse.e4.ui.dialogs;x-internal:=true,
  org.eclipse.e4.ui.dialogs.filteredtree;x-internal:=true
 Require-Bundle: org.eclipse.jface;bundle-version="3.11.0",
  com.ibm.icu,
- org.eclipse.core.runtime;bundle-version="3.10.0"
+ org.eclipse.core.runtime;bundle-version="3.10.0",
+ org.eclipse.jface.databinding,
+ org.eclipse.core.databinding.observable,
+ org.eclipse.core.databinding,
+ org.eclipse.core.databinding.beans;bundle-version="1.2.200",
+ org.eclipse.core.databinding.property;bundle-version="1.4.200"
