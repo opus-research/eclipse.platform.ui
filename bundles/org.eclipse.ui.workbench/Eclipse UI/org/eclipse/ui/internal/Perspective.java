@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Markus Alexander Kuppe, Versant GmbH - bug 215797
  *     Sascha Zak - bug 282874
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810, 440136
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 404348, 421178, 456727
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -48,34 +47,10 @@ public class Perspective {
 
 	public void initActionSets() {
 		if (descriptor != null) {
-			List<String> alwaysOn = ModeledPageLayout.getIds(layout, ModeledPageLayout.ACTION_SET_TAG);
-
-			// read explicitly disabled sets.
-			String hiddenIDs = page.getHiddenItems();
-			List<String> alwaysOff = new ArrayList<String>();
-
-			String[] hiddenIds = hiddenIDs.split(","); //$NON-NLS-1$
-			for (String id : hiddenIds) {
-				if (!id.startsWith(ModeledPageLayout.HIDDEN_ACTIONSET_PREFIX)) {
-					continue;
-				}
-				id = id.substring(ModeledPageLayout.HIDDEN_ACTIONSET_PREFIX.length());
-				if (!alwaysOff.contains(id)) {
-					alwaysOff.add(id);
-				}
-			}
-
-			alwaysOn.removeAll(alwaysOff);
-
-			for (IActionSetDescriptor descriptor : createInitialActionSets(alwaysOn)) {
+			List<String> ids = ModeledPageLayout.getIds(layout, ModeledPageLayout.ACTION_SET_TAG);
+			for (IActionSetDescriptor descriptor : createInitialActionSets(ids)) {
 				if (!alwaysOnActionSets.contains(descriptor)) {
 					alwaysOnActionSets.add(descriptor);
-				}
-			}
-
-			for (IActionSetDescriptor descriptor : createInitialActionSets(alwaysOff)) {
-				if (!alwaysOffActionSets.contains(descriptor)) {
-					alwaysOffActionSets.add(descriptor);
 				}
 			}
 		}
@@ -216,9 +191,6 @@ public class Perspective {
 		IContextService service = page.getWorkbenchWindow().getService(IContextService.class);
 		try {
 			service.deferUpdates(true);
-
-			// this advance for loop only works because it breaks out of it
-			// right after the removal
 			for (IActionSetDescriptor desc : alwaysOnActionSets) {
 				if (desc.getId().equals(id)) {
 					removeAlwaysOn(desc);
@@ -226,8 +198,6 @@ public class Perspective {
 				}
 			}
 
-			// this advance for loop only works because it breaks out of it
-			// right after the removal
 			for (IActionSetDescriptor desc : alwaysOffActionSets) {
 				if (desc.getId().equals(id)) {
 					removeAlwaysOff(desc);
@@ -235,19 +205,22 @@ public class Perspective {
 				}
 			}
 			addAlwaysOff(toRemove);
-			// not necessary to remove the ModeledPageLayout.ACTION_SET_TAG + id
-			// tag as the entry is only disabled.
+			// remove tag
+			String tag = ModeledPageLayout.ACTION_SET_TAG + id;
+			if (layout.getTags().contains(tag)) {
+				layout.getTags().remove(tag);
+			}
 		} finally {
 			service.deferUpdates(false);
 		}
 	}
 
-	public List<IActionSetDescriptor> getAlwaysOnActionSets() {
-		return alwaysOnActionSets;
+	public IActionSetDescriptor[] getAlwaysOnActionSets() {
+		return alwaysOnActionSets.toArray(new IActionSetDescriptor[alwaysOnActionSets.size()]);
 	}
 
-	public List<IActionSetDescriptor> getAlwaysOffActionSets() {
-		return alwaysOffActionSets;
+	public IActionSetDescriptor[] getAlwaysOffActionSets() {
+		return alwaysOffActionSets.toArray(new IActionSetDescriptor[alwaysOffActionSets.size()]);
 	}
 
 	public void updateActionBars() {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Benjamin Muskalla <b.muskalla@gmx.net>
  *     - Fix for bug 172574 - [IDE] DeleteProjectDialog inconsequent selection behavior
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 41431
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -63,7 +62,7 @@ public class DeleteResourceAction extends SelectionListenerAction {
 
 	static class DeleteProjectDialog extends MessageDialog {
 
-		private List<IResource> projects;
+		private IResource[] projects;
 
 		private boolean deleteContent = false;
 
@@ -77,7 +76,7 @@ public class DeleteResourceAction extends SelectionListenerAction {
 
 		private Button radio2;
 
-		DeleteProjectDialog(Shell parentShell, List<IResource> projects) {
+		DeleteProjectDialog(Shell parentShell, IResource[] projects) {
 			super(parentShell, getTitle(projects), null, // accept the
 					// default window
 					// icon
@@ -89,16 +88,16 @@ public class DeleteResourceAction extends SelectionListenerAction {
 			setShellStyle(getShellStyle() | SWT.SHEET);
 		}
 
-		static String getTitle(List<IResource> projects) {
-			if (projects.size() == 1) {
+		static String getTitle(IResource[] projects) {
+			if (projects.length == 1) {
 				return IDEWorkbenchMessages.DeleteResourceAction_titleProject1;
 			}
 			return IDEWorkbenchMessages.DeleteResourceAction_titleProjectN;
 		}
 
-		static String getMessage(List<IResource> projects) {
-			if (projects.size() == 1) {
-				IProject project = (IProject) projects.get(0);
+		static String getMessage(IResource[] projects) {
+			if (projects.length == 1) {
+				IProject project = (IProject) projects[0];
 				return NLS
 						.bind(
 								IDEWorkbenchMessages.DeleteResourceAction_confirmProject1,
@@ -106,7 +105,7 @@ public class DeleteResourceAction extends SelectionListenerAction {
 			}
 			return NLS.bind(
 					IDEWorkbenchMessages.DeleteResourceAction_confirmProjectN,
-					Integer.valueOf((projects.size())));
+					new Integer(projects.length));
 		}
 
 		@Override
@@ -123,8 +122,8 @@ public class DeleteResourceAction extends SelectionListenerAction {
 			radio1 = new Button(composite, SWT.RADIO);
 			radio1.addSelectionListener(selectionListener);
 			String text1;
-			if (projects.size() == 1) {
-				IProject project = (IProject) projects.get(0);
+			if (projects.length == 1) {
+				IProject project = (IProject) projects[0];
 				if (project == null || project.getLocation() == null) {
 					text1 = IDEWorkbenchMessages.DeleteResourceAction_deleteContentsN;
 				} else {
@@ -138,7 +137,7 @@ public class DeleteResourceAction extends SelectionListenerAction {
 			}
 			radio1.setText(text1);
 			radio1.setFont(parent.getFont());
-
+			
 			// Add explanatory label that the action cannot be undone.
 			// We can't put multi-line formatted text in a radio button,
 			// so we have to create a separate label.
@@ -203,7 +202,7 @@ public class DeleteResourceAction extends SelectionListenerAction {
 		/**
 		 * Set this delete dialog into testing mode. It won't pop up, and it
 		 * returns true for deleteContent.
-		 *
+		 * 
 		 * @param t
 		 *            the testing mode
 		 */
@@ -217,7 +216,7 @@ public class DeleteResourceAction extends SelectionListenerAction {
 	 */
 	public static final String ID = PlatformUI.PLUGIN_ID
 			+ ".DeleteResourceAction";//$NON-NLS-1$
-
+	
 	private IShellProvider shellProvider = null;
 
 	/**
@@ -235,7 +234,7 @@ public class DeleteResourceAction extends SelectionListenerAction {
 
 	/**
 	 * Creates a new delete resource action.
-	 *
+	 * 
 	 * @param shell
 	 *            the shell for any dialogs
 	 * @deprecated Should take an IShellProvider, see
@@ -256,7 +255,7 @@ public class DeleteResourceAction extends SelectionListenerAction {
 
 	/**
 	 * Creates a new delete resource action.
-	 *
+	 * 
 	 * @param provider
 	 *            the shell provider to use. Must not be <code>null</code>.
 	 * @since 3.4
@@ -267,7 +266,7 @@ public class DeleteResourceAction extends SelectionListenerAction {
 		initAction();
 		setShellProvider(provider);
 	}
-
+	
 	/**
 	 * Action initialization.
 	 */
@@ -277,33 +276,33 @@ public class DeleteResourceAction extends SelectionListenerAction {
 				IIDEHelpContextIds.DELETE_RESOURCE_ACTION);
 		setId(ID);
 	}
-
+	
 	private void setShellProvider(IShellProvider provider) {
 		shellProvider = provider;
 	}
 
 	/**
 	 * Returns whether delete can be performed on the current selection.
-	 *
+	 * 
 	 * @param resources
 	 *            the selected resources
 	 * @return <code>true</code> if the resources can be deleted, and
 	 *         <code>false</code> if the selection contains non-resources or
 	 *         phantom resources
 	 */
-	private boolean canDelete(List<IResource> resources) {
+	private boolean canDelete(IResource[] resources) {
 		// allow only projects or only non-projects to be selected;
 		// note that the selection may contain multiple types of resource
 		if (!(containsOnlyProjects(resources) || containsOnlyNonProjects(resources))) {
 			return false;
 		}
 
-		if (resources.isEmpty()) {
+		if (resources.length == 0) {
 			return false;
 		}
 		// Return true if everything in the selection exists.
-		for (int i = 0; i < resources.size(); i++) {
-			IResource resource = resources.get(i);
+		for (int i = 0; i < resources.length; i++) {
+			IResource resource = resources[i];
 			if (resource.isPhantom()) {
 				return false;
 			}
@@ -313,15 +312,15 @@ public class DeleteResourceAction extends SelectionListenerAction {
 
 	/**
 	 * Returns whether the selection contains linked resources.
-	 *
+	 * 
 	 * @param resources
 	 *            the selected resources
 	 * @return <code>true</code> if the resources contain linked resources,
 	 *         and <code>false</code> otherwise
 	 */
-	private boolean containsLinkedResource(List<IResource> resources) {
-		for (int i = 0; i < resources.size(); i++) {
-			IResource resource = resources.get(i);
+	private boolean containsLinkedResource(IResource[] resources) {
+		for (int i = 0; i < resources.length; i++) {
+			IResource resource = resources[i];
 			if (resource.isLinked()) {
 				return true;
 			}
@@ -331,13 +330,13 @@ public class DeleteResourceAction extends SelectionListenerAction {
 
 	/**
 	 * Returns whether the selection contains only non-projects.
-	 *
+	 * 
 	 * @param resources
 	 *            the selected resources
 	 * @return <code>true</code> if the resources contains only non-projects,
 	 *         and <code>false</code> otherwise
 	 */
-	private boolean containsOnlyNonProjects(List<IResource> resources) {
+	private boolean containsOnlyNonProjects(IResource[] resources) {
 		int types = getSelectedResourceTypes(resources);
 		// check for empty selection
 		if (types == 0) {
@@ -349,13 +348,13 @@ public class DeleteResourceAction extends SelectionListenerAction {
 
 	/**
 	 * Returns whether the selection contains only projects.
-	 *
+	 * 
 	 * @param resources
 	 *            the selected resources
 	 * @return <code>true</code> if the resources contains only projects, and
 	 *         <code>false</code> otherwise
 	 */
-	private boolean containsOnlyProjects(List<IResource> resources) {
+	private boolean containsOnlyProjects(IResource[] resources) {
 		int types = getSelectedResourceTypes(resources);
 		// note that the selection may contain multiple types of resource
 		return types == IResource.PROJECT;
@@ -363,35 +362,35 @@ public class DeleteResourceAction extends SelectionListenerAction {
 
 	/**
 	 * Asks the user to confirm a delete operation.
-	 *
+	 * 
 	 * @param resources
 	 *            the selected resources
 	 * @return <code>true</code> if the user says to go ahead, and
 	 *         <code>false</code> if the deletion should be abandoned
 	 */
-	private boolean confirmDelete(List<IResource> resources) {
+	private boolean confirmDelete(IResource[] resources) {
 		if (containsOnlyProjects(resources)) {
 			return confirmDeleteProjects(resources);
 		}
 		return confirmDeleteNonProjects(resources);
-
+		
 	}
 
 	/**
 	 * Asks the user to confirm a delete operation, where the selection contains
 	 * no projects.
-	 *
+	 * 
 	 * @param resources
 	 *            the selected resources
 	 * @return <code>true</code> if the user says to go ahead, and
 	 *         <code>false</code> if the deletion should be abandoned
 	 */
-	private boolean confirmDeleteNonProjects(List<IResource> resources) {
+	private boolean confirmDeleteNonProjects(IResource[] resources) {
 		String title;
 		String msg;
-		if (resources.size() == 1) {
+		if (resources.length == 1) {
 			title = IDEWorkbenchMessages.DeleteResourceAction_title1;
-			IResource resource = resources.get(0);
+			IResource resource = resources[0];
 			if (resource.isLinked()) {
 				msg = NLS
 						.bind(
@@ -408,11 +407,11 @@ public class DeleteResourceAction extends SelectionListenerAction {
 				msg = NLS
 						.bind(
 								IDEWorkbenchMessages.DeleteResourceAction_confirmLinkedResourceN,
-						Integer.valueOf(resources.size()));
+								new Integer(resources.length));
 			} else {
 				msg = NLS.bind(
 						IDEWorkbenchMessages.DeleteResourceAction_confirmN,
- new Integer(resources.size()));
+						new Integer(resources.length));
 			}
 		}
 		return MessageDialog.openQuestion(shellProvider.getShell(), title, msg);
@@ -421,13 +420,13 @@ public class DeleteResourceAction extends SelectionListenerAction {
 	/**
 	 * Asks the user to confirm a delete operation, where the selection contains
 	 * only projects. Also remembers whether project content should be deleted.
-	 *
+	 * 
 	 * @param resources
 	 *            the selected resources
 	 * @return <code>true</code> if the user says to go ahead, and
 	 *         <code>false</code> if the deletion should be abandoned
 	 */
-	private boolean confirmDeleteProjects(List<IResource> resources) {
+	private boolean confirmDeleteProjects(IResource[] resources) {
 		DeleteProjectDialog dialog = new DeleteProjectDialog(shellProvider.getShell(), resources);
 		dialog.setTestingMode(fTestingMode);
 		int code = dialog.open();
@@ -435,31 +434,45 @@ public class DeleteResourceAction extends SelectionListenerAction {
 		return code == 0; // YES
 	}
 
+
+
+
+	/**
+	 * Return an array of the currently selected resources.
+	 * 
+	 * @return the selected resources
+	 */
+	private IResource[] getSelectedResourcesArray() {
+		List selection = getSelectedResources();
+		IResource[] resources = new IResource[selection.size()];
+		selection.toArray(resources);
+		return resources;
+	}
+
 	/**
 	 * Returns a bit-mask containing the types of resources in the selection.
-	 *
+	 * 
 	 * @param resources
 	 *            the selected resources
 	 */
-	private int getSelectedResourceTypes(List<IResource> resources) {
+	private int getSelectedResourceTypes(IResource[] resources) {
 		int types = 0;
-		for (int i = 0; i < resources.size(); i++) {
-			types |= resources.get(i).getType();
+		for (int i = 0; i < resources.length; i++) {
+			types |= resources[i].getType();
 		}
 		return types;
 	}
 
 	@Override
 	public void run() {
-		final List<IResource> resources = getSelectedResources();
+		final IResource[] resources = getSelectedResourcesArray();
 
 		if (!fTestingMode) {
 			if (LTKLauncher.openDeleteWizard(getStructuredSelection())) {
-				CloseResourceAction.closeMatchingEditors(resources, true);
 				return;
 			}
 		}
-
+		
 		// WARNING: do not query the selected resources more than once
 		// since the selection may change during the run,
 		// e.g. due to window activation when the prompt dialog is dismissed.
@@ -473,12 +486,12 @@ public class DeleteResourceAction extends SelectionListenerAction {
 
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
-				if (resources.isEmpty())
+				if (resources.length == 0)
 					return Status.CANCEL_STATUS;
 				scheduleDeleteJob(resources);
 				return Status.OK_STATUS;
 			}
-
+			
 			@Override
 			public boolean belongsTo(Object family) {
 				if (IDEWorkbenchMessages.DeleteResourceAction_jobName
@@ -495,10 +508,10 @@ public class DeleteResourceAction extends SelectionListenerAction {
 
 	/**
 	 * Schedule a job to delete the resources to delete.
-	 *
+	 * 
 	 * @param resourcesToDelete
 	 */
-	private void scheduleDeleteJob(final List<IResource> resourcesToDelete) {
+	private void scheduleDeleteJob(final IResource[] resourcesToDelete) {
 		// use a non-workspace job with a runnable inside so we can avoid
 		// periodic updates
 		Job deleteJob = new Job(
@@ -506,9 +519,8 @@ public class DeleteResourceAction extends SelectionListenerAction {
 			@Override
 			public IStatus run(final IProgressMonitor monitor) {
 				try {
-					final DeleteResourcesOperation op =
-						new DeleteResourcesOperation(resourcesToDelete.toArray(new IResource[resourcesToDelete.size()]),
-								IDEWorkbenchMessages.DeleteResourceAction_operationLabel, deleteContent);
+					final DeleteResourcesOperation op = 
+						new DeleteResourcesOperation(resourcesToDelete, IDEWorkbenchMessages.DeleteResourceAction_operationLabel, deleteContent);
 					op.setModelProviderIds(getModelProviderIds());
 					// If we are deleting projects and their content, do not
 					// execute the operation in the undo history, since it cannot be
@@ -520,12 +532,13 @@ public class DeleteResourceAction extends SelectionListenerAction {
 						// we are calling this from a Job.
 						WorkbenchJob statusJob = new WorkbenchJob("Status checking"){ //$NON-NLS-1$
 							@Override
-							public IStatus runInUIThread(IProgressMonitor m) {
-								return op.computeExecutionStatus(m);
+							public IStatus runInUIThread(
+									IProgressMonitor monitor) {
+								return op.computeExecutionStatus(monitor);
 							}
-
+							
 						};
-
+						
 						statusJob.setSystem(true);
 						statusJob.schedule();
 						try {//block until the status is ready
@@ -533,19 +546,19 @@ public class DeleteResourceAction extends SelectionListenerAction {
 						} catch (InterruptedException e) {
 							//Do nothing as status will be a cancel
 						}
-
+						
 						if (statusJob.getResult().isOK()) {
 							return op.execute(monitor, WorkspaceUndoUtil.getUIInfoAdapter(shellProvider.getShell()));
-						}
+						} 
 						return statusJob.getResult();
 					}
 					return PlatformUI.getWorkbench().getOperationSupport()
-							.getOperationHistory().execute(op, monitor,
+							.getOperationHistory().execute(op, monitor, 
 							WorkspaceUndoUtil.getUIInfoAdapter(shellProvider.getShell()));
 				} catch (ExecutionException e) {
 					if (e.getCause() instanceof CoreException) {
 						return ((CoreException)e.getCause()).getStatus();
-					}
+					} 
 					return new Status(IStatus.ERROR, IDEWorkbenchPlugin.IDE_WORKBENCH, e.getMessage(),e);
 				}
 			}
@@ -572,13 +585,13 @@ public class DeleteResourceAction extends SelectionListenerAction {
 	@Override
 	protected boolean updateSelection(IStructuredSelection selection) {
 		return super.updateSelection(selection)
-				&& canDelete(getSelectedResources());
+				&& canDelete(getSelectedResourcesArray());
 	}
 
 	/**
 	 * Returns the model provider ids that are known to the client that
 	 * instantiated this operation.
-	 *
+	 * 
 	 * @return the model provider ids that are known to the client that
 	 *         instantiated this operation.
 	 * @since 3.2
@@ -591,7 +604,7 @@ public class DeleteResourceAction extends SelectionListenerAction {
 	 * Sets the model provider ids that are known to the client that
 	 * instantiated this operation. Any potential side effects reported by these
 	 * models during validation will be ignored.
-	 *
+	 * 
 	 * @param modelProviderIds
 	 *            the model providers known to the client who is using this
 	 *            operation.
