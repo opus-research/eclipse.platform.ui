@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Matthew Hall and others.
+ * Copyright (c) 2008, 2014 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 124684)
  *     Matthew Hall - bugs 260329, 260337
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 442278, 434283
  ******************************************************************************/
 
 package org.eclipse.jface.examples.databinding.snippets;
@@ -28,6 +29,7 @@ import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.value.ComputedValue;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.ViewerSupport;
 import org.eclipse.jface.databinding.viewers.ViewersObservables;
 import org.eclipse.jface.dialogs.IInputValidator;
@@ -325,8 +327,7 @@ public class Snippet018CheckboxTableViewerCheckedSelection {
 			removePersonButton.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event event) {
-					IStructuredSelection selected = (IStructuredSelection) peopleViewer
-							.getSelection();
+					IStructuredSelection selected = peopleViewer.getStructuredSelection();
 					if (selected.isEmpty())
 						return;
 					Person person = (Person) selected.getFirstElement();
@@ -348,12 +349,12 @@ public class Snippet018CheckboxTableViewerCheckedSelection {
 					return Boolean.valueOf(selectedPerson.getValue() != null);
 				}
 			};
-			dbc.bindValue(SWTObservables.observeEnabled(removePersonButton),
+			dbc.bindValue(WidgetProperties.enabled().observe(removePersonButton),
 					personSelected);
-			dbc.bindValue(SWTObservables.observeEnabled(friendsViewer
+			dbc.bindValue(WidgetProperties.enabled().observe(friendsViewer
 					.getTable()), personSelected);
 
-			dbc.bindValue(SWTObservables.observeText(personName, SWT.Modify),
+			dbc.bindValue(WidgetProperties.text(SWT.Modify).observe(personName),
 					BeansObservables.observeDetailValue(selectedPerson, "name",
 							String.class));
 

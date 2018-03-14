@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 BestSolution.at and others.
+ * Copyright (c) 2009, 2014 BestSolution.at and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -93,6 +93,14 @@ public interface IPresentationEngine {
 	 * @since 1.1
 	 */
 	public static String WINDOW_MAXIMIZED_TAG = "shellMaximized"; //$NON-NLS-1$
+
+	/**
+	 * When applied to an MWindow causes the renderer to render the resulting control as a top level
+	 * window
+	 *
+	 * @since 1.2
+	 */
+	public static String WINDOW_TOP_LEVEL = "shellTopLevel"; //$NON-NLS-1$
 
 	/**
 	 * When added to an element's 'tags' this should cause the presentation to move that element to
@@ -199,6 +207,13 @@ public interface IPresentationEngine {
 	 * @since 1.1
 	 */
 	public static final String DRAGGABLE = "Draggable"; //$NON-NLS-1$
+
+	/**
+	 * This is the tag name indicates that model element is active
+	 *
+	 * @since 1.2
+	 */
+	public static final String ACTIVE = "active"; //$NON-NLS-1$
 
 	/**
 	 * Creates and returns the UI element for the given model element.

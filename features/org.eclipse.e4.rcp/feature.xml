@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.e4.rcp"
       label="%featureName"
-      version="1.3.100.qualifier"
+      version="1.3.200.qualifier"
       provider-name="%providerName"
       license-feature="org.eclipse.license"
       license-feature-version="0.0.0">
@@ -385,16 +385,6 @@
          fragment="true"/>
 
    <plugin
-         id="org.eclipse.equinox.launcher.cocoa.macosx"
-         os="macosx"
-         ws="cocoa"
-         arch="x86"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"/>
-
-   <plugin
          id="org.eclipse.equinox.launcher.cocoa.macosx.x86_64"
          os="macosx"
          ws="cocoa"
@@ -419,6 +409,16 @@
          os="linux"
          ws="gtk"
          arch="ppc64"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"/>
+
+   <plugin
+         id="org.eclipse.equinox.launcher.gtk.linux.ppc64le"
+         os="linux"
+         ws="gtk"
+         arch="ppc64le"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -621,10 +621,10 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.swt.gtk.linux.x86_64"
+         id="org.eclipse.swt.gtk.linux.ppc64le"
          os="linux"
          ws="gtk"
-         arch="x86_64"
+         arch="ppc64le"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -632,10 +632,10 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.swt.cocoa.macosx"
-         os="macosx"
-         ws="cocoa"
-         arch="x86"
+         id="org.eclipse.swt.gtk.linux.x86_64"
+         os="linux"
+         ws="gtk"
+         arch="x86_64"
          download-size="0"
          install-size="0"
          version="0.0.0"

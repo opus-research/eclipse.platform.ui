@@ -7,20 +7,14 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430988
+ *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 433603
  *******************************************************************************/
 package org.eclipse.ui.tests.dialogs;
-
-import java.io.IOException;
 
 import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.ui.model.application.MApplication;
-import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -163,7 +157,7 @@ public class UIDialogs extends TestCase {
     }
     
     // see bug 211350
-    public void testLoadNotExistingPerspective() throws IOException{
+	public void testLoadNotExistingPerspective() {
     	fail("PerspectiveRegistry.getCustomPersp not implemented");
 //    	final String fakePerspectivID = "fakeperspetive";
 //		PerspectiveRegistry reg = (PerspectiveRegistry) WorkbenchPlugin
@@ -187,16 +181,8 @@ public class UIDialogs extends TestCase {
     }
 
     public void testShowView() {
-
-    	IWorkbench workbench = getWorkbench();
-
-    	Shell shell = workbench.getActiveWorkbenchWindow().getShell();
-		// Get the view identifier, if any.
-		IEclipseContext ctx = (IEclipseContext) workbench.getService(IEclipseContext.class);
-		EModelService modelService = (EModelService) workbench.getService(EModelService.class);
-		MApplication app = (MApplication) workbench.getService(MApplication.class);
-		MWindow window = (MWindow) workbench.getService(MWindow.class);
-        Dialog dialog = new ShowViewDialog(shell, app,window, modelService, ctx);
+        Dialog dialog = new ShowViewDialog(getWorkbench().getActiveWorkbenchWindow(), WorkbenchPlugin
+                .getDefault().getViewRegistry());
         DialogCheck.assertDialog(dialog, this);
     }
     /**

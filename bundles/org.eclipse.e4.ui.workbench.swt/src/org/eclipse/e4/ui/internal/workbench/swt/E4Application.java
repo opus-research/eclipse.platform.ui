@@ -368,6 +368,12 @@ public class E4Application implements IApplication {
 			if (brandingBundle != null)
 				appModelPath = brandingBundle.getSymbolicName() + "/"
 						+ E4Application.APPLICATION_MODEL_PATH_DEFAULT;
+			else {
+				Logger logger = new WorkbenchLogger(PLUGIN_ID);
+				logger.error(
+						new Exception(), // log a stack trace for debugging
+						"applicationXMI parameter not set and no branding plugin defined. "); //$NON-NLS-1$
+			}
 		}
 
 		URI initialWorkbenchDefinitionInstance;
@@ -542,7 +548,7 @@ public class E4Application implements IApplication {
 		Locale transformedLocale = ResourceBundleHelper.toLocale(
 				defaultLocaleString, Locale.ENGLISH);
 
-		appContext.set(TranslationService.LOCALE, transformedLocale.toString());
+		appContext.set(TranslationService.LOCALE, transformedLocale);
 		TranslationService bundleTranslationProvider = TranslationProviderFactory
 				.bundleTranslationService(appContext);
 		appContext.set(TranslationService.class, bundleTranslationProvider);
