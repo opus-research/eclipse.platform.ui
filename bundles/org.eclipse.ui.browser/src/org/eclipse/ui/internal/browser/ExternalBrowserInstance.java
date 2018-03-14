@@ -48,32 +48,14 @@ public class ExternalBrowserInstance extends AbstractWebBrowser {
 				Trace.FINEST,
 				"Launching external Web browser: " + location + " - " + parameters + " - " + urlText); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-		// For MacOS X .app, we use open(1) to launch the app for the given URL
-		// The order of the arguments is specific:
-		//
-		// open -a APP URL --args PARAMETERS
-		//
-		// As #createParameterArray() will append the URL to the end if %URL%
-		// isn't found, we only include urlText if the parameters makes
-		// reference to %URL%. This could mean that %URL% is specified
-		// twice on the command line (e.g., "open -a XXX URL --args XXX URL
-		// %%%") but presumably the user means to do that.
-		boolean isMacBundle = Util.isMac() && isMacAppBundle(location);
-		boolean includeUrlInParams = !isMacBundle
-				|| (parameters != null && parameters.contains(IBrowserDescriptor.URL_PARAMETER));
-		String[] params = WebBrowserUtil.createParameterArray(parameters, includeUrlInParams ? urlText : null);
+		String[] params = WebBrowserUtil.createParameterArray(parameters, urlText);
 
 		try {
-			if (isMacBundle) {
+			if (Util.isMac() && isMacAppBundle(location)) {
 				cmdOptions.add(0, "-a"); //$NON-NLS-1$
 				cmdOptions.add(0, "open"); //$NON-NLS-1$
-				if (urlText != null) {
-					cmdOptions.add(urlText);
-				}
 				// --args supported in 10.6 and later
-				if (params.length > 0) {
-					cmdOptions.add("--args");//$NON-NLS-1$
-				}
+				cmdOptions.add("--args");//$NON-NLS-1$
 			}
 
 			for (String param : params) {
