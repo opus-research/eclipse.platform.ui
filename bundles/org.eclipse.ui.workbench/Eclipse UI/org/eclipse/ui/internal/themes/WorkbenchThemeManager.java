@@ -23,7 +23,6 @@ import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.resource.JFaceResources;
@@ -55,7 +54,7 @@ public class WorkbenchThemeManager extends EventManager implements
 		IThemeManager {
 	public static RGB EMPTY_COLOR_VALUE = new RGB(0, 1, 2);
 
-	public static FontData[] EMPRY_FONT_DATA_VALUE = PreferenceConverter.FONTDATA_ARRAY_DEFAULT_DEFAULT;
+	public static FontData[] EMPRY_FONT_DATA_VALUE = new FontData[0];
 
 	private static final String SYSTEM_DEFAULT_THEME = "org.eclipse.ui.ide.systemDefault";//$NON-NLS-1$
 
@@ -539,7 +538,7 @@ public class WorkbenchThemeManager extends EventManager implements
 
 		private void addFontDefinition(FontDefinition definition, ThemeRegistry themeRegistry,
 				FontRegistry fontRegistry) {
-			if (themeRegistry.findFont(definition.getId()) == null) {
+			if (fontRegistry.get(definition.getId()) == null) {
 				themeRegistry.add(definition);
 				fontRegistry.put(definition.getId(), definition.getValue());
 			}
@@ -547,7 +546,7 @@ public class WorkbenchThemeManager extends EventManager implements
 
 		private void addColorDefinition(ColorDefinition definition, ThemeRegistry themeRegistry,
 				ColorRegistry colorRegistry) {
-			if (themeRegistry.findColor(definition.getId()) == null) {
+			if (colorRegistry.get(definition.getId()) == null) {
 				themeRegistry.add(definition);
 				colorRegistry.put(definition.getId(), definition.getValue());
 			}
