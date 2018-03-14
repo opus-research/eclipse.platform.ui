@@ -1672,6 +1672,14 @@
                style="push">
          </command>
       </menuContribution>
+         <menuContribution
+            locationURI="menu:window?after=org.eclipse.ui.editors">
+         <command
+               commandId="org.eclipse.ui.resetCoolbarAction"
+               tooltip="%menu.resetCoolbar.tooltip"
+               style="push">
+         </command>
+      </menuContribution>
       <menuContribution
             locationURI="popup:windowCoolbarContextMenu">
          <command
