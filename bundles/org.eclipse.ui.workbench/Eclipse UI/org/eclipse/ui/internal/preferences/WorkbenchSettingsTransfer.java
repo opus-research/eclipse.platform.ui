@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,15 +7,17 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Bartosz Popiela <bartoszpop@gmail.com> - Bug 434108
  ******************************************************************************/
 
 package org.eclipse.ui.internal.preferences;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.preferences.SettingsTransfer;
 
@@ -27,36 +29,46 @@ import org.eclipse.ui.preferences.SettingsTransfer;
  * 
  */
 public abstract class WorkbenchSettingsTransfer extends SettingsTransfer {
+	private static final int CHUNK_SIZE = 8192;
+	private static final IPath DATA_LOCATION_SUFFIX = createDataLocationSuffix();
 
-	/**
-	 * Return a status message for missing workspace settings.
-	 * @return IStatus
-	 */
-	protected IStatus noWorkingSettingsStatus() {
-		return new Status(IStatus.ERROR, WorkbenchPlugin.PI_WORKBENCH,
-				WorkbenchMessages.WorkbenchSettings_CouldNotFindLocation);
-	}
-
-	/**
-	 * Return the workbench settings location for the new root 
-	 * @param newWorkspaceRoot
-	 * @return IPath or <code>null</code> if it can't be determined.
-	 */
-	protected IPath getNewWorkbenchStateLocation(IPath newWorkspaceRoot) {
+	private static IPath createDataLocationSuffix() {
+		IPath dataLocation = getDataLocation();
 		IPath currentWorkspaceRoot = Platform.getLocation();
-	
-		IPath dataLocation = WorkbenchPlugin.getDefault().getDataLocation();
-	
-		if (dataLocation == null)
-			return null;
-		int segmentsToRemove = dataLocation
-				.matchingFirstSegments(currentWorkspaceRoot);
-	
-		// Strip it down to the extension
-		dataLocation = dataLocation.removeFirstSegments(segmentsToRemove);
-		// Now add in the
-		dataLocation = newWorkspaceRoot.append(dataLocation);
-		return dataLocation;
+		int segmentsToRemove = dataLocation.matchingFirstSegments(currentWorkspaceRoot);
+		return dataLocation.removeFirstSegments(segmentsToRemove);
 	}
 
+	private static IPath getDataLocation() {
+		return WorkbenchPlugin.getDefault().getDataLocation();
+	}
+
+	protected IPath getDataLocation(IPath workspaceRoot) {
+		return workspaceRoot.append(getDataLocationSuffix());
+	}
+
+	protected IPath getDataLocationSuffix() {
+		return DATA_LOCATION_SUFFIX;
+	}
+
+	protected void createDirectoryHierarchy(IPath path) {
+		File workspaceFile = new File(path.toOSString());
+		workspaceFile.mkdirs();
+	}
+
+	protected void copyFile(String srcPath, String targetPath, String fileName) throws IOException {
+		File workbenchModel = new File(srcPath, fileName);
+		if (workbenchModel.exists()) {
+			byte[] bytes = new byte[CHUNK_SIZE];
+			FileInputStream inputStream = new FileInputStream(workbenchModel);
+			FileOutputStream outputStream = new FileOutputStream(new File(targetPath, fileName));
+			int read = inputStream.read(bytes, 0, CHUNK_SIZE);
+			while (read != -1) {
+				outputStream.write(bytes, 0, read);
+				read = inputStream.read(bytes, 0, CHUNK_SIZE);
+			}
+			inputStream.close();
+			outputStream.close();
+		}
+	}
 }
