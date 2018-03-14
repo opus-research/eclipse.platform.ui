@@ -181,7 +181,8 @@ public class IDEApplication implements IApplication, IExecutableExtension {
      * @return <code>null</code> if a valid instance location has been set and an exit code
      *         otherwise
      */
-    private Object checkInstanceLocation(Shell shell, Map applicationArguments) {
+    @SuppressWarnings("rawtypes")
+	private Object checkInstanceLocation(Shell shell, Map applicationArguments) {
         // -data @none was specified but an ide requires workspace
         Location instanceLoc = Platform.getInstanceLocation();
         if (instanceLoc == null) {
@@ -285,7 +286,8 @@ public class IDEApplication implements IApplication, IExecutableExtension {
         }
     }
 
-	private static boolean isDevLaunchMode(Map args) {
+    @SuppressWarnings("rawtypes")
+    private static boolean isDevLaunchMode(Map args) {
 		// see org.eclipse.pde.internal.core.PluginPathFinder.isDevLaunchMode()
 		if (Boolean.getBoolean("eclipse.pde.launch")) //$NON-NLS-1$
 			return true;
@@ -446,8 +448,10 @@ public class IDEApplication implements IApplication, IExecutableExtension {
             if (versionString != null) {
                 return Version.parseVersion(versionString);
             }
-
-            // be graceful if coming from legacy workspaces
+            versionString= props.getProperty(WORKSPACE_CHECK_REFERENCE_BUNDLE_NAME_LEGACY);
+            if (versionString != null) {
+                return Version.parseVersion(versionString);
+            }
             return null;
         } catch (IOException e) {
             IDEWorkbenchPlugin.log("Could not read version file " + versionFile, new Status( //$NON-NLS-1$
