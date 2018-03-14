@@ -118,7 +118,6 @@ public final class EditorSelectionDialog extends Dialog {
 	/**
 	 * This method is called if a button has been pressed.
 	 */
-	@Override
 	protected void buttonPressed(int buttonId) {
 		if (buttonId == IDialogConstants.OK_ID) {
 			saveWidgetValues();
@@ -129,7 +128,6 @@ public final class EditorSelectionDialog extends Dialog {
 	/**
 	 * Close the window.
 	 */
-	@Override
 	public boolean close() {
 		boolean result = super.close();
 		resourceManager.dispose();
@@ -140,7 +138,6 @@ public final class EditorSelectionDialog extends Dialog {
 	/*
 	 * (non-Javadoc) Method declared in Window.
 	 */
-	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		shell.setText(WorkbenchMessages.EditorSelection_title);
@@ -158,7 +155,6 @@ public final class EditorSelectionDialog extends Dialog {
 	 *            the parent composite to contain the dialog area
 	 * @return the dialog area control
 	 */
-	@Override
 	protected Control createDialogArea(Composite parent) {
 		Font font = parent.getFont();
 		// create main group
@@ -206,13 +202,11 @@ public final class EditorSelectionDialog extends Dialog {
 		editorTableViewer = new TableViewer(editorTable);
 		editorTableViewer.setContentProvider(ArrayContentProvider.getInstance());
 		editorTableViewer.setLabelProvider(new LabelProvider() {
-			@Override
 			public String getText(Object element) {
 				IEditorDescriptor d = (IEditorDescriptor) element;
 				return TextProcessor.process(d.getLabel(), "."); //$NON-NLS-1$
 			}
 
-			@Override
 			public Image getImage(Object element) {
 				IEditorDescriptor d = (IEditorDescriptor) element;
 				return (Image) resourceManager.get(d.getImageDescriptor());
@@ -459,7 +453,6 @@ public final class EditorSelectionDialog extends Dialog {
 		updateOkButton();
 	}
 
-	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		okButton = createButton(parent, IDialogConstants.OK_ID,
 				IDialogConstants.OK_LABEL, true);
@@ -494,7 +487,6 @@ public final class EditorSelectionDialog extends Dialog {
 		 * 
 		 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
 		 */
-		@Override
 		public void handleEvent(Event event) {
 			if (event.type == SWT.MouseDoubleClick) {
 				handleDoubleClickEvent();
@@ -522,7 +514,6 @@ public final class EditorSelectionDialog extends Dialog {
 	 * @see org.eclipse.jface.dialogs.Dialog#isResizable()
 	 * @since 3.4
 	 */
-	@Override
 	protected boolean isResizable() {
 		return true;
 	}

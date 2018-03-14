@@ -59,8 +59,7 @@ public abstract class WorkbenchJob extends UIJob {
             /* (non-Javadoc)
              * @see org.eclipse.core.runtime.jobs.JobChangeAdapter#done(org.eclipse.core.runtime.jobs.IJobChangeEvent)
              */
-            @Override
-			public void done(IJobChangeEvent event) {
+            public void done(IJobChangeEvent event) {
 
                 //Abort if it is not running
                 if (!PlatformUI.isWorkbenchRunning()) {
@@ -88,16 +87,14 @@ public abstract class WorkbenchJob extends UIJob {
     /* (non-Javadoc)
      * @see org.eclipse.core.internal.jobs.InternalJob#shouldSchedule()
      */
-    @Override
-	public boolean shouldSchedule() {
+    public boolean shouldSchedule() {
         return super.shouldSchedule() && PlatformUI.isWorkbenchRunning();
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.core.runtime.jobs.Job#shouldRun()
      */
-    @Override
-	public boolean shouldRun() {
+    public boolean shouldRun() {
         return super.shouldRun() && PlatformUI.isWorkbenchRunning();
     }
 

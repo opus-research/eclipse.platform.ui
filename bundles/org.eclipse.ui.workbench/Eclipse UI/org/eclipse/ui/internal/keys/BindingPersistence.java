@@ -1221,7 +1221,6 @@ public class BindingPersistence extends PreferencePersistence {
 		super.read();
 	}
 
-	@Override
 	protected final boolean isChangeImportant(final IRegistryChangeEvent event) {
 		return false;
 	}
@@ -1265,7 +1264,6 @@ public class BindingPersistence extends PreferencePersistence {
 		return true;
 	}
 	
-	@Override
 	protected final boolean isChangeImportant(final PropertyChangeEvent event) {
 		return EXTENSION_COMMANDS.equals(event.getProperty());
 	}
@@ -1274,7 +1272,6 @@ public class BindingPersistence extends PreferencePersistence {
 	 * Reads all of the binding information from the registry and from the
 	 * preference store.
 	 */
-	@Override
 	public final void read() {
 		super.read();
 		reRead();

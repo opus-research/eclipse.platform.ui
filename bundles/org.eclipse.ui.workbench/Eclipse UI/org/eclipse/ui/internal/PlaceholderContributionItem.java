@@ -78,8 +78,7 @@ final class PlaceholderContributionItem implements IContributionItem {
      * 
      * @see org.eclipse.jface.action.IContributionItem#dispose()
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         // Do nothing
     }
 
@@ -88,8 +87,7 @@ final class PlaceholderContributionItem implements IContributionItem {
      * 
      * @see org.eclipse.jface.action.IContributionItem#fill(org.eclipse.swt.widgets.Composite)
      */
-    @Override
-	public void fill(Composite parent) {
+    public void fill(Composite parent) {
         throw new UnsupportedOperationException();
     }
 
@@ -99,8 +97,7 @@ final class PlaceholderContributionItem implements IContributionItem {
      * @see org.eclipse.jface.action.IContributionItem#fill(org.eclipse.swt.widgets.CoolBar,
      *      int)
      */
-    @Override
-	public void fill(CoolBar parent, int index) {
+    public void fill(CoolBar parent, int index) {
         throw new UnsupportedOperationException();
 
     }
@@ -111,8 +108,7 @@ final class PlaceholderContributionItem implements IContributionItem {
      * @see org.eclipse.jface.action.IContributionItem#fill(org.eclipse.swt.widgets.Menu,
      *      int)
      */
-    @Override
-	public void fill(Menu parent, int index) {
+    public void fill(Menu parent, int index) {
         throw new UnsupportedOperationException();
 
     }
@@ -123,8 +119,7 @@ final class PlaceholderContributionItem implements IContributionItem {
      * @see org.eclipse.jface.action.IContributionItem#fill(org.eclipse.swt.widgets.ToolBar,
      *      int)
      */
-    @Override
-	public void fill(ToolBar parent, int index) {
+    public void fill(ToolBar parent, int index) {
         throw new UnsupportedOperationException();
 
     }
@@ -143,8 +138,7 @@ final class PlaceholderContributionItem implements IContributionItem {
      * 
      * @see org.eclipse.jface.action.IContributionItem#getId()
      */
-    @Override
-	public String getId() {
+    public String getId() {
         return id;
     }
 
@@ -185,8 +179,7 @@ final class PlaceholderContributionItem implements IContributionItem {
      * 
      * @see org.eclipse.jface.action.IContributionItem#isDirty()
      */
-    @Override
-	public boolean isDirty() {
+    public boolean isDirty() {
         return false;
     }
 
@@ -195,8 +188,7 @@ final class PlaceholderContributionItem implements IContributionItem {
      * 
      * @see org.eclipse.jface.action.IContributionItem#isDynamic()
      */
-    @Override
-	public boolean isDynamic() {
+    public boolean isDynamic() {
         return false;
     }
 
@@ -205,8 +197,7 @@ final class PlaceholderContributionItem implements IContributionItem {
      * 
      * @see org.eclipse.jface.action.IContributionItem#isEnabled()
      */
-    @Override
-	public boolean isEnabled() {
+    public boolean isEnabled() {
         // XXX Auto-generated method stub
         return false;
     }
@@ -216,8 +207,7 @@ final class PlaceholderContributionItem implements IContributionItem {
      * 
      * @see org.eclipse.jface.action.IContributionItem#isGroupMarker()
      */
-    @Override
-	public boolean isGroupMarker() {
+    public boolean isGroupMarker() {
         return false;
     }
 
@@ -226,8 +216,7 @@ final class PlaceholderContributionItem implements IContributionItem {
      * 
      * @see org.eclipse.jface.action.IContributionItem#isSeparator()
      */
-    @Override
-	public boolean isSeparator() {
+    public boolean isSeparator() {
         return false;
     }
 
@@ -236,8 +225,7 @@ final class PlaceholderContributionItem implements IContributionItem {
      * 
      * @see org.eclipse.jface.action.IContributionItem#isVisible()
      */
-    @Override
-	public boolean isVisible() {
+    public boolean isVisible() {
         return false;
     }
 
@@ -246,8 +234,7 @@ final class PlaceholderContributionItem implements IContributionItem {
      * 
      * @see org.eclipse.jface.action.IContributionItem#saveWidgetState()
      */
-    @Override
-	public void saveWidgetState() {
+    public void saveWidgetState() {
         // Do nothing.
 
     }
@@ -257,8 +244,7 @@ final class PlaceholderContributionItem implements IContributionItem {
      * 
      * @see org.eclipse.jface.action.IContributionItem#setParent(org.eclipse.jface.action.IContributionManager)
      */
-    @Override
-	public void setParent(IContributionManager parent) {
+    public void setParent(IContributionManager parent) {
         // Do nothing
 
     }
@@ -268,8 +254,7 @@ final class PlaceholderContributionItem implements IContributionItem {
      * 
      * @see org.eclipse.jface.action.IContributionItem#setVisible(boolean)
      */
-    @Override
-	public void setVisible(boolean visible) {
+    public void setVisible(boolean visible) {
         // Do nothing.
     }
 
@@ -277,8 +262,7 @@ final class PlaceholderContributionItem implements IContributionItem {
      * Displays a string representation of this contribution item, which is
      * really just a function of its identifier.
      */
-    @Override
-	public String toString() {
+    public String toString() {
         return "PlaceholderContributionItem(" + id + ")"; //$NON-NLS-1$//$NON-NLS-2$
     }
 
@@ -287,8 +271,7 @@ final class PlaceholderContributionItem implements IContributionItem {
      * 
      * @see org.eclipse.jface.action.IContributionItem#update()
      */
-    @Override
-	public void update() {
+    public void update() {
         update(null);
 
     }
@@ -298,8 +281,7 @@ final class PlaceholderContributionItem implements IContributionItem {
      * 
      * @see org.eclipse.jface.action.IContributionItem#update(java.lang.String)
      */
-    @Override
-	public void update(String identifier) {
+    public void update(String identifier) {
         // Do nothing
     }
 }

@@ -79,7 +79,6 @@ public class ShowInMenu extends ContributionItem implements
 	private boolean dirty = true;
 
 	private IMenuListener menuListener = new IMenuListener() {
-		@Override
 		public void menuAboutToShow(IMenuManager manager) {
 			manager.markDirty();
 			dirty = true;
@@ -107,7 +106,6 @@ public class ShowInMenu extends ContributionItem implements
 		this.window = window;
 	}
 
-	@Override
 	public boolean isDirty() {
 		return dirty;
 	}
@@ -115,12 +113,10 @@ public class ShowInMenu extends ContributionItem implements
 	/**
 	 * Overridden to always return true and force dynamic menu building.
 	 */
-	@Override
 	public boolean isDynamic() {
 		return true;
 	}
 
-	@Override
 	public void fill(Menu menu, int index) {
 		if (getParent() instanceof MenuManager) {
 			((MenuManager) getParent()).addMenuListener(menuListener);
@@ -407,7 +403,6 @@ public class ShowInMenu extends ContributionItem implements
 	 * 
 	 * @see org.eclipse.ui.menus.IWorkbenchContribution#initialize(org.eclipse.ui.services.IServiceLocator)
 	 */
-	@Override
 	public void initialize(IServiceLocator serviceLocator) {
 		locator = serviceLocator;
 	}
@@ -435,7 +430,6 @@ public class ShowInMenu extends ContributionItem implements
 	 * 
 	 * @see org.eclipse.jface.action.ContributionItem#dispose()
 	 */
-	@Override
 	public void dispose() {
 		if (currentManager != null && currentManager.getSize() > 0) {
 			// IMenuService service = (IMenuService) locator
