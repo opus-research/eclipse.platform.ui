@@ -8,6 +8,7 @@
 
   Contributors:
      Igor Fedorenko - initial implementation
+     Lars Vogel <Lars.Vogel@gmail.com> - Bug 441877
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
@@ -22,9 +23,9 @@
   <packaging>eclipse-test-plugin</packaging>
 
   <properties>
-    <testSuite>${project.artifactId}</testSuite>
-    <testClass>org.eclipse.jface.tests.AllTests</testClass>
-  </properties>
+    <testSuiteUITests>org.eclipse.ui.tests.UiTestSuite</testSuiteUITests>
+    <testSuiteJFace>org.eclipse.jface.tests.AllTests</testSuiteJFace>
+   </properties>
 
   <build>
   	<plugins>
@@ -41,9 +42,9 @@
 						<goal>test</goal>
 					</goals>
 					<configuration>
-		  				<testClass>org.eclipse.ui.tests.UiTestSuite</testClass>
+		  				<testClass>${testSuiteUITests}</testClass>
 						<work>${project.build.directory}/work-nouithread</work>
-		  			  	<useUIHarness>false</useUIHarness>
+		  			  	<useUIHarness>true</useUIHarness>
 			  			<useUIThread>false</useUIThread>
 		  				<dependencies>
 		  					<dependency>
