@@ -120,6 +120,9 @@ public class SetModel extends AbstractConcurrentModel {
         fireRemove(toRemove);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.deferred.IConcurrentModel#requestUpdate(org.eclipse.jface.viewers.deferred.IConcurrentModelListener)
+     */
     @Override
 	public void requestUpdate(IConcurrentModelListener listener) {
     	Assert.isNotNull(listener);
