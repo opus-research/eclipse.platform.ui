@@ -88,8 +88,7 @@ public class Snippet022TableViewerRefreshNoScroll {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				v.getTable().setTopIndex(0);
-				IStructuredSelection selection = (IStructuredSelection) v
-						.getSelection();
+				IStructuredSelection selection = v.getStructuredSelection();
 				v.getTable().deselectAll();
 				v.refresh();
 				if (!selection.isEmpty()) {
