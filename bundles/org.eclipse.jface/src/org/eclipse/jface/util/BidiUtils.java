@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.equinox.bidi.StructuredTextTypeHandlerFactory;
-import org.eclipse.jface.internal.InternalPolicy;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BidiSegmentEvent;
 import org.eclipse.swt.custom.BidiSegmentListener;
@@ -34,6 +33,8 @@ import org.eclipse.swt.widgets.Text;
  */
 public final class BidiUtils {
 	
+	private static final boolean DEBUG = false;
+
 	/**
 	 * Left-To-Right Base Text Direction.
 	 * @see #getTextDirection()
@@ -266,7 +267,7 @@ public final class BidiUtils {
 		SegmentListener listener = getSegmentListener(handlingType);
 		if (listener != null) {
 			field.addSegmentListener(listener);
-			if (InternalPolicy.DEBUG_BIDI_UTILS) {
+			if (DEBUG) {
 				int color = 0;
 				if (LEFT_TO_RIGHT.equals(handlingType)) {
 					color = SWT.COLOR_RED;
@@ -399,7 +400,7 @@ public final class BidiUtils {
 		SegmentListener listener = getSegmentListener(handlingType);
 		if (listener != null) {
 			combo.addSegmentListener(listener);
-			if (InternalPolicy.DEBUG_BIDI_UTILS) {
+			if (DEBUG) {
 				int color = 0;
 				if (LEFT_TO_RIGHT.equals(handlingType)) {
 					color = SWT.COLOR_RED;
