@@ -21,6 +21,11 @@ import org.eclipse.ui.views.markers.MarkerItem;
  */
 public class MarkerIDField extends MarkerField {
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.provisional.views.markers.MarkerField#getValue(org.eclipse.ui.internal.provisional.views.markers.MarkerItem)
+	 */
 	@Override
 	public String getValue(MarkerItem item) {
 		if (item.getMarker() != null)
@@ -28,6 +33,12 @@ public class MarkerIDField extends MarkerField {
 		return MarkerSupportInternalUtilities.EMPTY_STRING;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.provisional.views.markers.MarkerField#compare(org.eclipse.ui.internal.provisional.views.markers.MarkerItem,
+	 *      org.eclipse.ui.internal.provisional.views.markers.MarkerItem)
+	 */
 	@Override
 	public int compare(MarkerItem item1, MarkerItem item2) {
 		return (int) (((MarkerSupportItem)item1).getID() - ((MarkerSupportItem) item2).getID());

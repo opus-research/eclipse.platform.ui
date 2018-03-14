@@ -48,11 +48,21 @@ class StatusHandlerProductBindingDescriptor implements
 		handlerId = configElement.getAttribute(ATT_HANDLER_ID);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.IPluginContribution#getLocalId()
+	 */
 	@Override
 	public String getLocalId() {
 		return id;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.IPluginContribution#getPluginId()
+	 */
 	@Override
 	public String getPluginId() {
 		return pluginId;

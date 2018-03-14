@@ -59,7 +59,7 @@ public class GalleryMojo extends AbstractMojo {
         
         File iconDirectoryRoot = new File("eclipse-png/");
 
-        Map<String, List<IconEntry>> galleryIconSets = new HashMap<>();
+        Map<String, List<IconEntry>> galleryIconSets = new HashMap<String, List<IconEntry>>();
         
         // Search each subdir in the root dir for svg icons
         for (File file : iconDirectoryRoot.listFiles()) {
@@ -67,7 +67,7 @@ public class GalleryMojo extends AbstractMojo {
                 continue;
             }
 
-            List<IconEntry> icons = new ArrayList<>();
+            List<IconEntry> icons = new ArrayList<IconEntry>();
             IconGatherer.gatherIcons(icons, "png", file, file, iconDirectoryRoot, false);
             
             galleryIconSets.put(file.getName(), icons);
@@ -102,7 +102,7 @@ public class GalleryMojo extends AbstractMojo {
      */
     public void renderGalleries(File galleryDir,  File gifCompare, File master, Map<String, List<IconEntry>> iconSets, int iconSize, int width) {
         // Render each icon set and a master list
-        List<IconEntry> masterList = new ArrayList<>();
+        List<IconEntry> masterList = new ArrayList<IconEntry>();
         
         for (Entry<String, List<IconEntry>> entry : iconSets.entrySet()) {
             String key = entry.getKey();
@@ -328,7 +328,7 @@ public class GalleryMojo extends AbstractMojo {
     private void renderMasterGallery(File root, File output, String fileEnding, int iconSize, int width,
             boolean dark) {
         int headerHeight = 30;
-        List<BufferedImage> images = new ArrayList<>();
+        List<BufferedImage> images = new ArrayList<BufferedImage>();
         for (File file : root.listFiles()) {
             if (file.getName().endsWith(iconSize + fileEnding)) {
                 BufferedImage set = null;
