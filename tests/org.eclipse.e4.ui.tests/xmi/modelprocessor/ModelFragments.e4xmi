@@ -30,4 +30,14 @@
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_2n64EHY7Ed-w8OZmMuje3w" featurename="children" parentElementId="app.base.window" positionInList="after:app.base.part2">
     <elements xsi:type="basic:Part" xmi:id="_2n64EXY7Ed-w8OZmMuje3w" elementId="fragment.contributedAfterPart2"/>
   </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_wJeMkNR_EeSO5JjZMOp53Q" featurename="children" parentElementId="fragment.contributedMainMenu">
+    <elements xsi:type="menu:Menu" xmi:id="_ElgL4NSAEeSO5JjZMOp53Q" elementId="fragment.contributedMenu1"/>
+    <elements xsi:type="menu:Menu" xmi:id="_G98C4NSAEeSO5JjZMOp53Q" elementId="fragment.contributedMenu2"/>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_4TJ-kNSBEeSO5JjZMOp53Q" featurename="children" parentElementId="fragment.contributedMenu1,fragment.contributedMenu2">
+    <elements xsi:type="menu:DirectMenuItem" xmi:id="_8ShXINSBEeSO5JjZMOp53Q" elementId="fragment.contributedMenuItem.csv"/>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_BgfQ0NSCEeSO5JjZMOp53Q" featurename="children" parentElementId="xpath://*[@elementId='fragment.contributedMenu1' or @elementId='fragment.contributedMenu2']">
+    <elements xsi:type="menu:DirectMenuItem" xmi:id="_H8z0ANSCEeSO5JjZMOp53Q" elementId="fragment.contributedMenuItem.xpath"/>
+  </fragments>
 </fragment:ModelFragments>
