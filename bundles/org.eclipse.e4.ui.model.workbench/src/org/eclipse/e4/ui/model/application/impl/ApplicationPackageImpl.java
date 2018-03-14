@@ -17,6 +17,8 @@ import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.MApplicationFactory;
 import org.eclipse.e4.ui.model.application.MContribution;
+import org.eclipse.e4.ui.model.application.MLifecycleAware;
+import org.eclipse.e4.ui.model.application.MLifecycleContribution;
 import org.eclipse.e4.ui.model.application.commands.impl.CommandsPackageImpl;
 import org.eclipse.e4.ui.model.application.ui.advanced.impl.AdvancedPackageImpl;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl;
@@ -479,13 +481,22 @@ public class ApplicationPackageImpl extends EPackageImpl {
 	public static final int APPLICATION__SNIPPETS = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 11;
 
 	/**
+	 * The feature id for the '<em><b>Life Cycle Handler</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int APPLICATION__LIFE_CYCLE_HANDLER = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 12;
+
+	/**
 	 * The feature id for the '<em><b>Commands</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int APPLICATION__COMMANDS = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 12;
+	public static final int APPLICATION__COMMANDS = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 13;
 
 	/**
 	 * The feature id for the '<em><b>Addons</b></em>' containment reference list.
@@ -494,7 +505,7 @@ public class ApplicationPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int APPLICATION__ADDONS = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 13;
+	public static final int APPLICATION__ADDONS = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 14;
 
 	/**
 	 * The feature id for the '<em><b>Categories</b></em>' containment reference list.
@@ -503,7 +514,7 @@ public class ApplicationPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int APPLICATION__CATEGORIES = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 14;
+	public static final int APPLICATION__CATEGORIES = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 15;
 
 	/**
 	 * The feature id for the '<em><b>Dialogs</b></em>' reference list.
@@ -512,7 +523,7 @@ public class ApplicationPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int APPLICATION__DIALOGS = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 15;
+	public static final int APPLICATION__DIALOGS = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 16;
 
 	/**
 	 * The number of structural features of the '<em>Application</em>' class.
@@ -521,7 +532,7 @@ public class ApplicationPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int APPLICATION_FEATURE_COUNT = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 16;
+	public static final int APPLICATION_FEATURE_COUNT = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 17;
 
 	/**
 	 * The operation id for the '<em>Update Localization</em>' operation.
@@ -770,6 +781,134 @@ public class ApplicationPackageImpl extends EPackageImpl {
 	public static final int STRING_TO_OBJECT_MAP_OPERATION_COUNT = 0;
 
 	/**
+	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.MLifecycleAware <em>Lifecycle Aware</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.e4.ui.model.application.MLifecycleAware
+	 * @see org.eclipse.e4.ui.model.application.impl.ApplicationPackageImpl#getLifecycleAware()
+	 * @generated
+	 */
+	public static final int LIFECYCLE_AWARE = 6;
+
+	/**
+	 * The feature id for the '<em><b>Life Cycle Handler</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int LIFECYCLE_AWARE__LIFE_CYCLE_HANDLER = 0;
+
+	/**
+	 * The number of structural features of the '<em>Lifecycle Aware</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int LIFECYCLE_AWARE_FEATURE_COUNT = 1;
+
+	/**
+	 * The number of operations of the '<em>Lifecycle Aware</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int LIFECYCLE_AWARE_OPERATION_COUNT = 0;
+
+	/**
+	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.impl.LifecycleContributionImpl <em>Lifecycle Contribution</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.e4.ui.model.application.impl.LifecycleContributionImpl
+	 * @see org.eclipse.e4.ui.model.application.impl.ApplicationPackageImpl#getLifecycleContribution()
+	 * @generated
+	 */
+	public static final int LIFECYCLE_CONTRIBUTION = 7;
+
+	/**
+	 * The feature id for the '<em><b>Element Id</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int LIFECYCLE_CONTRIBUTION__ELEMENT_ID = CONTRIBUTION__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Persisted State</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int LIFECYCLE_CONTRIBUTION__PERSISTED_STATE = CONTRIBUTION__PERSISTED_STATE;
+
+	/**
+	 * The feature id for the '<em><b>Tags</b></em>' attribute list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int LIFECYCLE_CONTRIBUTION__TAGS = CONTRIBUTION__TAGS;
+
+	/**
+	 * The feature id for the '<em><b>Contributor URI</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int LIFECYCLE_CONTRIBUTION__CONTRIBUTOR_URI = CONTRIBUTION__CONTRIBUTOR_URI;
+
+	/**
+	 * The feature id for the '<em><b>Transient Data</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int LIFECYCLE_CONTRIBUTION__TRANSIENT_DATA = CONTRIBUTION__TRANSIENT_DATA;
+
+	/**
+	 * The feature id for the '<em><b>Contribution URI</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int LIFECYCLE_CONTRIBUTION__CONTRIBUTION_URI = CONTRIBUTION__CONTRIBUTION_URI;
+
+	/**
+	 * The feature id for the '<em><b>Object</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int LIFECYCLE_CONTRIBUTION__OBJECT = CONTRIBUTION__OBJECT;
+
+	/**
+	 * The number of structural features of the '<em>Lifecycle Contribution</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int LIFECYCLE_CONTRIBUTION_FEATURE_COUNT = CONTRIBUTION_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of operations of the '<em>Lifecycle Contribution</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int LIFECYCLE_CONTRIBUTION_OPERATION_COUNT = CONTRIBUTION_OPERATION_COUNT + 0;
+
+	/**
 	 * The meta object id for the '<em>IEclipse Context</em>' data type.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -777,7 +916,7 @@ public class ApplicationPackageImpl extends EPackageImpl {
 	 * @see org.eclipse.e4.ui.model.application.impl.ApplicationPackageImpl#getIEclipseContext()
 	 * @generated
 	 */
-	public static final int IECLIPSE_CONTEXT = 6;
+	public static final int IECLIPSE_CONTEXT = 8;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -820,6 +959,20 @@ public class ApplicationPackageImpl extends EPackageImpl {
 	 * @generated
 	 */
 	private EClass stringToObjectMapEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass lifecycleAwareEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass lifecycleContributionEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -1190,6 +1343,46 @@ public class ApplicationPackageImpl extends EPackageImpl {
 
 
 	/**
+	 * Returns the meta object for class '{@link org.eclipse.e4.ui.model.application.MLifecycleAware <em>Lifecycle Aware</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Lifecycle Aware</em>'.
+	 * @see org.eclipse.e4.ui.model.application.MLifecycleAware
+	 * @generated
+	 */
+	public EClass getLifecycleAware() {
+		return lifecycleAwareEClass;
+	}
+
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link org.eclipse.e4.ui.model.application.MLifecycleAware#getLifeCycleHandler <em>Life Cycle Handler</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Life Cycle Handler</em>'.
+	 * @see org.eclipse.e4.ui.model.application.MLifecycleAware#getLifeCycleHandler()
+	 * @see #getLifecycleAware()
+	 * @generated
+	 */
+	public EReference getLifecycleAware_LifeCycleHandler() {
+		return (EReference)lifecycleAwareEClass.getEStructuralFeatures().get(0);
+	}
+
+
+	/**
+	 * Returns the meta object for class '{@link org.eclipse.e4.ui.model.application.MLifecycleContribution <em>Lifecycle Contribution</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Lifecycle Contribution</em>'.
+	 * @see org.eclipse.e4.ui.model.application.MLifecycleContribution
+	 * @generated
+	 */
+	public EClass getLifecycleContribution() {
+		return lifecycleContributionEClass;
+	}
+
+
+	/**
 	 * Returns the meta object for data type '{@link org.eclipse.e4.core.contexts.IEclipseContext <em>IEclipse Context</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1259,6 +1452,11 @@ public class ApplicationPackageImpl extends EPackageImpl {
 		createEAttribute(stringToObjectMapEClass, STRING_TO_OBJECT_MAP__KEY);
 		createEAttribute(stringToObjectMapEClass, STRING_TO_OBJECT_MAP__VALUE);
 
+		lifecycleAwareEClass = createEClass(LIFECYCLE_AWARE);
+		createEReference(lifecycleAwareEClass, LIFECYCLE_AWARE__LIFE_CYCLE_HANDLER);
+
+		lifecycleContributionEClass = createEClass(LIFECYCLE_CONTRIBUTION);
+
 		// Create data types
 		iEclipseContextEDataType = createEDataType(IECLIPSE_CONTEXT);
 	}
@@ -1325,8 +1523,11 @@ public class ApplicationPackageImpl extends EPackageImpl {
 		applicationEClass.getEGenericSuperTypes().add(g1);
 		g1 = createEGenericType(theUiPackage.getSnippetContainer());
 		applicationEClass.getEGenericSuperTypes().add(g1);
+		g1 = createEGenericType(this.getLifecycleAware());
+		applicationEClass.getEGenericSuperTypes().add(g1);
 		contributionEClass.getESuperTypes().add(this.getApplicationElement());
 		addonEClass.getESuperTypes().add(this.getContribution());
+		lifecycleContributionEClass.getESuperTypes().add(this.getContribution());
 
 		// Initialize classes, features, and operations; add parameters
 		initEClass(stringToStringMapEClass, Map.Entry.class, "StringToStringMap", !IS_ABSTRACT, !IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
@@ -1355,6 +1556,11 @@ public class ApplicationPackageImpl extends EPackageImpl {
 		initEClass(stringToObjectMapEClass, Map.Entry.class, "StringToObjectMap", !IS_ABSTRACT, !IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 		initEAttribute(getStringToObjectMap_Key(), ecorePackage.getEString(), "key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 		initEAttribute(getStringToObjectMap_Value(), ecorePackage.getEJavaObject(), "value", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
+
+		initEClass(lifecycleAwareEClass, MLifecycleAware.class, "LifecycleAware", IS_ABSTRACT, IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
+		initEReference(getLifecycleAware_LifeCycleHandler(), this.getLifecycleContribution(), null, "lifeCycleHandler", null, 0, -1, MLifecycleAware.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
+
+		initEClass(lifecycleContributionEClass, MLifecycleContribution.class, "LifecycleContribution", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 
 		// Initialize data types
 		initEDataType(iEclipseContextEDataType, IEclipseContext.class, "IEclipseContext", !IS_SERIALIZABLE, !IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
@@ -1555,6 +1761,34 @@ public class ApplicationPackageImpl extends EPackageImpl {
 		 * @generated
 		 */
 		public static final EAttribute STRING_TO_OBJECT_MAP__VALUE = eINSTANCE.getStringToObjectMap_Value();
+
+		/**
+		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.MLifecycleAware <em>Lifecycle Aware</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.eclipse.e4.ui.model.application.MLifecycleAware
+		 * @see org.eclipse.e4.ui.model.application.impl.ApplicationPackageImpl#getLifecycleAware()
+		 * @generated
+		 */
+		public static final EClass LIFECYCLE_AWARE = eINSTANCE.getLifecycleAware();
+
+		/**
+		 * The meta object literal for the '<em><b>Life Cycle Handler</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		public static final EReference LIFECYCLE_AWARE__LIFE_CYCLE_HANDLER = eINSTANCE.getLifecycleAware_LifeCycleHandler();
+
+		/**
+		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.impl.LifecycleContributionImpl <em>Lifecycle Contribution</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.eclipse.e4.ui.model.application.impl.LifecycleContributionImpl
+		 * @see org.eclipse.e4.ui.model.application.impl.ApplicationPackageImpl#getLifecycleContribution()
+		 * @generated
+		 */
+		public static final EClass LIFECYCLE_CONTRIBUTION = eINSTANCE.getLifecycleContribution();
 
 		/**
 		 * The meta object literal for the '<em>IEclipse Context</em>' data type.
