@@ -128,8 +128,7 @@ public class PortingActionProvider extends CommonActionProvider {
 	 */
 	protected ImageDescriptor getImageDescriptor(String relativePath) {
 		String iconPath = "icons/full/"; //$NON-NLS-1$
-		URL url = FileLocator.find(WorkbenchNavigatorPlugin.getDefault().getBundle(), new Path(iconPath + relativePath),
-				Collections.<String, String> emptyMap());
+		URL url = FileLocator.find(WorkbenchNavigatorPlugin.getDefault().getBundle(), new Path(iconPath + relativePath), Collections.EMPTY_MAP);
 		if (url == null) {
 			return ImageDescriptor.getMissingImageDescriptor();
 		}
