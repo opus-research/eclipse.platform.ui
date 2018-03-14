@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005, 2008 db4objects Inc.  http://www.db4o.com
+ * Copyright (C) 2005, 2014 db4objects Inc.  http://www.db4o.com
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -57,11 +57,7 @@ public class StringToBooleanPrimitiveConverter implements IConverter {
 		return array;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.jface.binding.converter.IConverter#convert(java.lang.Object)
-	 */
+	@Override
 	public Object convert(Object source) {
 		String s = (String) source;
 		s = s.toUpperCase();
@@ -77,10 +73,12 @@ public class StringToBooleanPrimitiveConverter implements IConverter {
 		throw new IllegalArgumentException(s + " is not a legal boolean value"); //$NON-NLS-1$
 	}
 
+	@Override
 	public Object getFromType() {
 		return String.class;
 	}
 
+	@Override
 	public Object getToType() {
 		return Boolean.TYPE;
 	}

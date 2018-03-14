@@ -20,7 +20,7 @@ import org.eclipse.ui.views.properties.PropertyShowInContext;
 
 /**
  * @since 3.4
- * 
+ *
  */
 public class ShowInPropertySheetTest extends AbstractPropertySheetTest {
 
@@ -28,12 +28,7 @@ public class ShowInPropertySheetTest extends AbstractPropertySheetTest {
 		super(testName);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.tests.propertysheet.AbstractPropertySheetTest#doSetUp()
-	 */
+	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 
@@ -41,11 +36,7 @@ public class ShowInPropertySheetTest extends AbstractPropertySheetTest {
 				.showView(IPageLayout.ID_PROP_SHEET);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doTearDown()
-	 */
+	@Override
 	protected void doTearDown() throws Exception {
 		super.doTearDown();
 	}
@@ -63,7 +54,7 @@ public class ShowInPropertySheetTest extends AbstractPropertySheetTest {
 	 * Tests ShowIn PropertySheet with various inputs
 	 */
 	public void testShowInPropertySheet() {
-		IShowInTarget showInTarget = (IShowInTarget) propertySheet
+		IShowInTarget showInTarget = propertySheet
 				.getAdapter(IShowInTarget.class);
 		ShowInContext context = new PropertyShowInContext(activePage
 				.getActivePart(), StructuredSelection.EMPTY);
@@ -74,7 +65,7 @@ public class ShowInPropertySheetTest extends AbstractPropertySheetTest {
 	 * Tests ShowIn PropertySheet with various inputs
 	 */
 	public void testShowInPropertySheetWithNull() {
-		IShowInTarget showInTarget = (IShowInTarget) propertySheet
+		IShowInTarget showInTarget = propertySheet
 				.getAdapter(IShowInTarget.class);
 		assertFalse(showInTarget.show(null));
 	}
@@ -83,7 +74,7 @@ public class ShowInPropertySheetTest extends AbstractPropertySheetTest {
 	 * Tests ShowIn PropertySheet with various inputs
 	 */
 	public void testShowInPropertySheetWithNullContext() {
-		IShowInTarget showInTarget = (IShowInTarget) propertySheet
+		IShowInTarget showInTarget = propertySheet
 				.getAdapter(IShowInTarget.class);
 		assertFalse(showInTarget.show(new ShowInContext(null, null)));
 	}
@@ -92,7 +83,7 @@ public class ShowInPropertySheetTest extends AbstractPropertySheetTest {
 	 * Tests ShowIn PropertySheet with various inputs
 	 */
 	public void testShowInPropertySheetWithNullPart() {
-		IShowInTarget showInTarget = (IShowInTarget) propertySheet
+		IShowInTarget showInTarget = propertySheet
 				.getAdapter(IShowInTarget.class);
 		assertFalse(showInTarget.show(new ShowInContext(new Object(),
 				StructuredSelection.EMPTY)));

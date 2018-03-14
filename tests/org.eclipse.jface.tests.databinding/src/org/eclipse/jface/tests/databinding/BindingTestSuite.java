@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2010 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,18 +18,16 @@
  *                    255734, 263693, 169876, 266038, 268336, 270461, 271720,
  *                    283204, 281723, 283428
  *     Ovidio Mallo - bugs 237163, 235195, 299619, 306611, 305367
+ *     Eugen Neufeld - bug 461560
  *******************************************************************************/
 package org.eclipse.jface.tests.databinding;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 import org.eclipse.core.tests.databinding.AggregateValidationStatusTest;
 import org.eclipse.core.tests.databinding.BindingTest;
 import org.eclipse.core.tests.databinding.DatabindingContextTest;
 import org.eclipse.core.tests.databinding.ListBindingTest;
 import org.eclipse.core.tests.databinding.ObservablesManagerTest;
+import org.eclipse.core.tests.databinding.SideEffectTest;
 import org.eclipse.core.tests.databinding.UpdateListStrategyTest;
 import org.eclipse.core.tests.databinding.UpdateSetStrategyTest;
 import org.eclipse.core.tests.databinding.UpdateStrategyTest;
@@ -86,6 +84,7 @@ import org.eclipse.core.tests.databinding.validation.ValidationStatusTest;
 import org.eclipse.core.tests.internal.databinding.BindingMessagesTest;
 import org.eclipse.core.tests.internal.databinding.BindingStatusTest;
 import org.eclipse.core.tests.internal.databinding.ConverterValuePropertyTest;
+import org.eclipse.core.tests.internal.databinding.DifferentRealmsBindingTest;
 import org.eclipse.core.tests.internal.databinding.IdentityMapTest;
 import org.eclipse.core.tests.internal.databinding.IdentitySetTest;
 import org.eclipse.core.tests.internal.databinding.QueueTest;
@@ -196,6 +195,7 @@ import org.eclipse.jface.tests.internal.databinding.swt.DateTimeCalendarObservab
 import org.eclipse.jface.tests.internal.databinding.swt.DateTimeDateObservableValueTest;
 import org.eclipse.jface.tests.internal.databinding.swt.DateTimeSelectionPropertyTest;
 import org.eclipse.jface.tests.internal.databinding.swt.DateTimeTimeObservableValueTest;
+import org.eclipse.jface.tests.internal.databinding.swt.GroupObservableValueTest;
 import org.eclipse.jface.tests.internal.databinding.swt.LabelObservableValueTest;
 import org.eclipse.jface.tests.internal.databinding.swt.ListSingleSelectionObservableValueTest;
 import org.eclipse.jface.tests.internal.databinding.swt.SWTDelayedObservableValueDecoratorTest;
@@ -229,6 +229,10 @@ import org.eclipse.jface.tests.internal.databinding.viewers.ViewerElementSetTest
 import org.eclipse.jface.tests.internal.databinding.viewers.ViewerElementWrapperTest;
 import org.eclipse.jface.tests.internal.databinding.viewers.ViewerInputObservableValueTest;
 
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 public class BindingTestSuite extends TestSuite {
 
 	public static void main(String[] args) {
@@ -252,6 +256,7 @@ public class BindingTestSuite extends TestSuite {
 		addTestSuite(UpdateValueStrategyTest.class);
 		addTestSuite(ValueBindingTest.class);
 		addTestSuite(ObservablesManagerTest.class);
+		addTestSuite(SideEffectTest.class);
 
 		// org.eclipse.core.tests.databinding.util
 		addTestSuite(PolicyTest.class);
@@ -323,6 +328,7 @@ public class BindingTestSuite extends TestSuite {
 		addTestSuite(BindingMessagesTest.class);
 		addTestSuite(BindingStatusTest.class);
 		addTestSuite(ConverterValuePropertyTest.class);
+		addTestSuite(DifferentRealmsBindingTest.class);
 		addTestSuite(IdentityMapTest.class);
 		addTestSuite(IdentitySetTest.class);
 		addTestSuite(QueueTest.class);
@@ -466,6 +472,7 @@ public class BindingTestSuite extends TestSuite {
 
 		addTestSuite(ControlObservableValueTest.class);
 		addTest(LabelObservableValueTest.suite());
+		addTest(GroupObservableValueTest.suite());
 		addTestSuite(ListSingleSelectionObservableValueTest.class);
 		addTest(ScaleObservableValueMinTest.suite());
 		addTest(ScaleObservableValueMaxTest.suite());

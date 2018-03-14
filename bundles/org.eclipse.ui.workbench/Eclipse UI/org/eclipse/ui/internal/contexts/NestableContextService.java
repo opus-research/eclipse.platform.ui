@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,7 @@ import org.eclipse.ui.internal.services.INestable;
  * This class is not intended for use outside of the
  * <code>org.eclipse.ui.workbench</code> plug-in.
  * </p>
- * 
+ *
  * @since 3.2
  */
 public class NestableContextService extends SlaveContextService implements
@@ -40,7 +40,7 @@ public class NestableContextService extends SlaveContextService implements
 
 	/**
 	 * Construct the new nested slave context.
-	 * 
+	 *
 	 * @param parentService
 	 *            the parent context service; must not be <code>null</code>.
 	 * @param defaultExpression
@@ -54,11 +54,6 @@ public class NestableContextService extends SlaveContextService implements
 		fActive = false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.contexts.SlaveContextService#doActivateContext(org.eclipse.ui.contexts.IContextActivation)
-	 */
 	@Override
 	protected IContextActivation doActivateContext(IContextActivation activation) {
 		if (fActive) {
@@ -68,11 +63,6 @@ public class NestableContextService extends SlaveContextService implements
 		return activation;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.services.INestable#activate()
-	 */
 	@Override
 	public void activate() {
 		if (fActive) {
@@ -87,11 +77,6 @@ public class NestableContextService extends SlaveContextService implements
 		fActive = true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.services.INestable#deactivate()
-	 */
 	@Override
 	public void deactivate() {
 		if (!fActive) {

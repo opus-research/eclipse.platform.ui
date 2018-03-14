@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@ package org.eclipse.ui.internal.navigator.framelist;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * Generic "Go Into" action which goes to the frame for the current selection. 
+ * Generic "Go Into" action which goes to the frame for the current selection.
  * @since 3.4
  */
 public class GoIntoAction extends FrameAction {
@@ -22,7 +22,7 @@ public class GoIntoAction extends FrameAction {
 
 	/**
      * Constructs a new action for the specified frame list.
-     * 
+     *
      * @param frameList the frame list
      */
     public GoIntoAction(FrameList frameList) {

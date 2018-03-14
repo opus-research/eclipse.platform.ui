@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *      IBM Corporation - initial API and implementation 
+ *      IBM Corporation - initial API and implementation
  *  	Sebastian Davids <sdavids@gmx.de> - Fix for bug 19346 - Dialog font
  * 		should be activated and used by other components.
  *******************************************************************************/
@@ -18,6 +18,7 @@ import java.util.List;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
@@ -29,7 +30,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.DecoratingLabelProvider;
-import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -38,8 +38,6 @@ import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -63,12 +61,12 @@ import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 /**
- * A resource working set page allows the user to edit an 
+ * A resource working set page allows the user to edit an
  * existing working set and create a new working set.
  * <p>
  * Working set elements are presented as a simple resource tree.
  * </p>
- * 
+ *
  * @since 2.0
  */
 public class ResourceWorkingSetPage extends WizardPage implements
@@ -90,7 +88,7 @@ public class ResourceWorkingSetPage extends WizardPage implements
      */
     public ResourceWorkingSetPage() {
         super(
-                "resourceWorkingSetPage", //$NON-NLS-1$ 
+                "resourceWorkingSetPage", //$NON-NLS-1$
                 IDEWorkbenchMessages.ResourceWorkingSetPage_title,
                 IDEInternalWorkbenchImages
                         .getImageDescriptor(IDEInternalWorkbenchImages.IMG_WIZBAN_RESOURCEWORKINGSET_WIZ));
@@ -100,7 +98,7 @@ public class ResourceWorkingSetPage extends WizardPage implements
     /**
      * Adds working set elements contained in the given container to the list
      * of checked resources.
-     * 
+     *
      * @param collectedResources list of collected resources
      * @param container container to collect working set elements for
      */
@@ -110,13 +108,7 @@ public class ResourceWorkingSetPage extends WizardPage implements
         IPath containerPath = container.getFullPath();
 
         for (int i = 0; i < elements.length; i++) {
-            IResource resource = null;
-
-            if (elements[i] instanceof IResource) {
-				resource = (IResource) elements[i];
-			} else {
-				resource = (IResource) elements[i].getAdapter(IResource.class);
-			}
+			IResource resource = Adapters.adapt(elements[i], IResource.class);
 
             if (resource != null) {
                 IPath resourcePath = resource.getFullPath();
@@ -129,12 +121,13 @@ public class ResourceWorkingSetPage extends WizardPage implements
 
     /**
      * Overrides method in WizardPage.
-     * 
+     *
      * @see org.eclipse.jface.wizard.WizardPage#createControl(Composite)
      */
-    public void createControl(Composite parent) {
+    @Override
+	public void createControl(Composite parent) {
     	initializeDialogUnits(parent);
-    	
+
         Composite composite = new Composite(parent, SWT.NULL);
         composite.setLayout(new GridLayout());
         composite.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL));
@@ -152,11 +145,7 @@ public class ResourceWorkingSetPage extends WizardPage implements
         text = new Text(composite, SWT.SINGLE | SWT.BORDER);
         text.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL
                 | GridData.HORIZONTAL_ALIGN_FILL));
-        text.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent e) {
-                validateInput();
-            }
-        });
+        text.addModifyListener(e -> validateInput());
         text.setFocus();
 
         label = new Label(composite, SWT.WRAP);
@@ -182,26 +171,20 @@ public class ResourceWorkingSetPage extends WizardPage implements
         data.widthHint = SIZING_SELECTION_WIDGET_WIDTH;
         tree.getControl().setLayoutData(data);
 
-        tree.addCheckStateListener(new ICheckStateListener() {
-            public void checkStateChanged(CheckStateChangedEvent event) {
-                handleCheckStateChange(event);
-            }
-        });
+        tree.addCheckStateListener(event -> handleCheckStateChange(event));
 
         tree.addTreeListener(new ITreeViewerListener() {
-            public void treeCollapsed(TreeExpansionEvent event) {
+            @Override
+			public void treeCollapsed(TreeExpansionEvent event) {
             }
 
-            public void treeExpanded(TreeExpansionEvent event) {
+            @Override
+			public void treeExpanded(TreeExpansionEvent event) {
                 final Object element = event.getElement();
                 if (tree.getGrayed(element) == false) {
 					BusyIndicator.showWhile(getShell().getDisplay(),
-                            new Runnable() {
-                                public void run() {
-                                    setSubtreeChecked((IContainer) element,
-                                            tree.getChecked(element), false);
-                                }
-                            });
+                            () -> setSubtreeChecked((IContainer) element,
+							        tree.getChecked(element), false));
 				}
             }
         });
@@ -214,20 +197,19 @@ public class ResourceWorkingSetPage extends WizardPage implements
 		layout.horizontalSpacing = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_SPACING);
 		buttonComposite.setLayout(layout);
 		buttonComposite.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL));
-		
+
 		Button selectAllButton = new Button(buttonComposite, SWT.PUSH);
 		selectAllButton.setText(IDEWorkbenchMessages.ResourceWorkingSetPage_selectAll_label);
 		selectAllButton.setToolTipText(IDEWorkbenchMessages.ResourceWorkingSetPage_selectAll_toolTip);
 		selectAllButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent selectionEvent) {
 				BusyIndicator.showWhile(getShell().getDisplay(),
-						new Runnable() {
-							public void run() {
-								tree.setCheckedElements(treeContentProvider
-										.getElements(tree.getInput()));
-								setSubtreeChecked((IContainer) tree.getInput(),
-										true, false);
-							}
+						() -> {
+							tree.setCheckedElements(treeContentProvider
+									.getElements(tree.getInput()));
+							setSubtreeChecked((IContainer) tree.getInput(),
+									true, false);
 						});
 				validateInput();
 			}
@@ -238,31 +220,29 @@ public class ResourceWorkingSetPage extends WizardPage implements
 		deselectAllButton.setText(IDEWorkbenchMessages.ResourceWorkingSetPage_deselectAll_label);
 		deselectAllButton.setToolTipText(IDEWorkbenchMessages.ResourceWorkingSetPage_deselectAll_toolTip);
 		deselectAllButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent selectionEvent) {
-				BusyIndicator.showWhile(getShell().getDisplay(), new Runnable() {
-
-					public void run() {
-						tree.setCheckedElements(treeContentProvider.getElements(tree.getInput()));
-						setSubtreeChecked((IContainer)tree.getInput(), false, false);
-					}
+				BusyIndicator.showWhile(getShell().getDisplay(), () -> {
+					tree.setCheckedElements(treeContentProvider.getElements(tree.getInput()));
+					setSubtreeChecked((IContainer)tree.getInput(), false, false);
 				});
 				validateInput();
 			}
 		});
 		setButtonLayoutData(deselectAllButton);
-		
+
 		initializeCheckedState();
         if (workingSet != null) {
             text.setText(workingSet.getName());
         }
         setPageComplete(false);
-        
+
         Dialog.applyDialogFont(composite);
     }
 
     /**
      * Collects all checked resources in the specified container.
-     * 
+     *
      * @param checkedResources the output, list of checked resources
      * @param container the container to collect checked resources in
      */
@@ -295,10 +275,11 @@ public class ResourceWorkingSetPage extends WizardPage implements
 
     /**
      * Implements IWorkingSetPage.
-     * 
+     *
      * @see org.eclipse.ui.dialogs.IWorkingSetPage#finish()
      */
-    public void finish() {
+    @Override
+	public void finish() {
         ArrayList resources = new ArrayList(10);
         findCheckedResources(resources, (IContainer) tree.getInput());
         if (workingSet == null) {
@@ -316,16 +297,17 @@ public class ResourceWorkingSetPage extends WizardPage implements
 
     /**
      * Implements IWorkingSetPage.
-     * 
+     *
      * @see org.eclipse.ui.dialogs.IWorkingSetPage#getSelection()
      */
-    public IWorkingSet getSelection() {
+    @Override
+	public IWorkingSet getSelection() {
         return workingSet;
     }
 
     /**
      * Returns the name entered in the working set name field.
-     * 
+     *
      * @return the name entered in the working set name field.
      */
     private String getWorkingSetName() {
@@ -334,29 +316,27 @@ public class ResourceWorkingSetPage extends WizardPage implements
 
     /**
      * Called when the checked state of a tree item changes.
-     * 
+     *
      * @param event the checked state change event.
      */
     private void handleCheckStateChange(final CheckStateChangedEvent event) {
-        BusyIndicator.showWhile(getShell().getDisplay(), new Runnable() {
-            public void run() {
-                IResource resource = (IResource) event.getElement();
-                boolean state = event.getChecked();
+        BusyIndicator.showWhile(getShell().getDisplay(), () -> {
+		    IResource resource = (IResource) event.getElement();
+		    boolean state = event.getChecked();
 
-                tree.setGrayed(resource, false);
-                if (resource instanceof IContainer) {
-                    setSubtreeChecked((IContainer) resource, state, true);
-                }
-                updateParentState(resource);
-                validateInput();
-            }
-        });
+		    tree.setGrayed(resource, false);
+		    if (resource instanceof IContainer) {
+		        setSubtreeChecked((IContainer) resource, state, true);
+		    }
+		    updateParentState(resource);
+		    validateInput();
+		});
     }
 
     /**
      * Displays an error message when a CoreException occured.
-     * 
-     * @param exception the CoreException 
+     *
+     * @param exception the CoreException
      * @param shell parent shell for the message box
      * @param title the mesage box title
      * @param message additional error message
@@ -375,77 +355,65 @@ public class ResourceWorkingSetPage extends WizardPage implements
     }
 
     /**
-     * Sets the checked state of tree items based on the initial 
+     * Sets the checked state of tree items based on the initial
      * working set, if any.
      */
     private void initializeCheckedState() {
-        BusyIndicator.showWhile(getShell().getDisplay(), new Runnable() {
-            public void run() {
-            	Object[] items = null;
-            	if (workingSet == null) {
+        BusyIndicator.showWhile(getShell().getDisplay(), () -> {
+			Object[] items = null;
+			if (workingSet == null) {
 
-            		IWorkbenchPage page = IDEWorkbenchPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage();
-            		if(page == null) {
-            			return;
-            		}
-            		IWorkbenchPart part = page.getActivePart();
-            		if(part == null) {
-            			return;
-            		}
-            		ISelection selection = page.getSelection();
-            		if(selection instanceof IStructuredSelection) {
-            			items = ((IStructuredSelection)selection).toArray();
-            		}
+				IWorkbenchPage page = IDEWorkbenchPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage();
+				if(page == null) {
+					return;
+				}
+				IWorkbenchPart part = page.getActivePart();
+				if(part == null) {
+					return;
+				}
+				ISelection selection = page.getSelection();
+				if(selection instanceof IStructuredSelection) {
+					items = ((IStructuredSelection)selection).toArray();
+				}
 
-        		} else {
-        			items = workingSet.getElements();
-        		}
-            	if(items == null) {
-            		return;
-            	}
-                tree.setCheckedElements(items);
-                for (int i = 0; i < items.length; i++) {
-                	IAdaptable item = null;
-                	if(!(items[i] instanceof IAdaptable)) {
-                		continue;
-                	}
-                	item = (IAdaptable)items[i];
-                    IContainer container = null;
-                    IResource resource = null;
+			} else {
+				items = workingSet.getElements();
+			}
+			if(items == null) {
+				return;
+			}
+		    tree.setCheckedElements(items);
+		    for (int i = 0; i < items.length; i++) {
+		    	IAdaptable item = null;
+		    	if(!(items[i] instanceof IAdaptable)) {
+		    		continue;
+		    	}
+		    	item = (IAdaptable)items[i];
+				IContainer container = Adapters.adapt(item, IContainer.class);
 
-                    if (item instanceof IContainer) {
-                        container = (IContainer) item;
-                    } else {
-                        container = (IContainer) item
-                                .getAdapter(IContainer.class);
-                    }
-                    if (container != null) {
-                        setSubtreeChecked(container, true, true);
-                    }
-                    if (item instanceof IResource) {
-                        resource = (IResource) item;
-                    } else {
-                        resource = (IResource) item.getAdapter(IResource.class);
-                    }
-                    if (resource != null && resource.isAccessible() == false) {
-                        IProject project = resource.getProject();
-                        if (tree.getChecked(project) == false) {
-							tree.setGrayChecked(project, true);
-						}
-                    } else {
-                        updateParentState(resource);
-                    }
-                }
-            }
-        });
+		        if (container != null) {
+		            setSubtreeChecked(container, true, true);
+		        }
+				IResource resource = Adapters.adapt(item, IResource.class);
+		        if (resource != null && resource.isAccessible() == false) {
+		            IProject project = resource.getProject();
+		            if (tree.getChecked(project) == false) {
+						tree.setGrayChecked(project, true);
+					}
+		        } else {
+		            updateParentState(resource);
+		        }
+		    }
+		});
     }
 
     /**
      * Implements IWorkingSetPage.
-     * 
+     *
      * @see org.eclipse.ui.dialogs.IWorkingSetPage#setSelection(IWorkingSet)
      */
-    public void setSelection(IWorkingSet workingSet) {
+    @Override
+	public void setSelection(IWorkingSet workingSet) {
         if (workingSet == null) {
             throw new IllegalArgumentException("Working set must not be null"); //$NON-NLS-1$
         }
@@ -459,11 +427,11 @@ public class ResourceWorkingSetPage extends WizardPage implements
 
     /**
      * Sets the checked state of the container's members.
-     * 
+     *
      * @param container the container whose children should be checked/unchecked
-     * @param state true=check all members in the container. false=uncheck all 
+     * @param state true=check all members in the container. false=uncheck all
      * 	members in the container.
-     * @param checkExpandedState true=recurse into sub-containers and set the 
+     * @param checkExpandedState true=recurse into sub-containers and set the
      * 	checked state. false=only set checked state of members of this container
      */
     private void setSubtreeChecked(IContainer container, boolean state,
@@ -494,7 +462,7 @@ public class ResourceWorkingSetPage extends WizardPage implements
             } else {
                 tree.setGrayChecked(element, false);
             }
-            // unchecked state only needs to be set when the container is 
+            // unchecked state only needs to be set when the container is
             // checked or grayed
             if (element instanceof IContainer && (state || elementGrayChecked)) {
                 setSubtreeChecked((IContainer) element, state, true);
@@ -503,10 +471,10 @@ public class ResourceWorkingSetPage extends WizardPage implements
     }
 
     /**
-     * Check and gray the resource parent if all resources of the 
+     * Check and gray the resource parent if all resources of the
      * parent are checked.
-     * 
-     * @param child the resource whose parent checked state should 
+     *
+     * @param child the resource whose parent checked state should
      * 	be set.
      */
     private void updateParentState(IResource child) {
@@ -537,7 +505,7 @@ public class ResourceWorkingSetPage extends WizardPage implements
     }
 
     /**
-     * Validates the working set name and the checked state of the 
+     * Validates the working set name and the checked state of the
      * resource tree.
      */
     private void validateInput() {
@@ -546,7 +514,7 @@ public class ResourceWorkingSetPage extends WizardPage implements
         String newText = text.getText();
 
         if (newText.equals(newText.trim()) == false) {
-            errorMessage = IDEWorkbenchMessages.ResourceWorkingSetPage_warning_nameWhitespace; 
+            errorMessage = IDEWorkbenchMessages.ResourceWorkingSetPage_warning_nameWhitespace;
         } else if (firstCheck) {
             firstCheck = false;
             return;

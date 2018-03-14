@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -53,7 +54,7 @@ import org.osgi.framework.BundleEvent;
  * from methods that already hold the lock.
  * </p>
  * @since 3.2
- * 
+ *
  */
 public class NavigatorSaveablesService implements INavigatorSaveablesService, VisibilityListener {
 
@@ -189,17 +190,17 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 	/**
 	 * Implementation note: This is not synchronized at the method level because it needs to
 	 * synchronize on "instances" first, then on "this", to avoid potential deadlock.
-	 * 
+	 *
 	 * @param saveablesSource
 	 * @param viewer
 	 * @param outsideListener
-	 * 
+	 *
 	 */
 	@Override
 	public void init(final ISaveablesSource saveablesSource,
 			final StructuredViewer viewer,
 			ISaveablesLifecycleListener outsideListener) {
-		// Synchronize on instances to make sure that we don't miss bundle started events. 
+		// Synchronize on instances to make sure that we don't miss bundle started events.
 		synchronized (instances) {
 			// Synchronize on this because we are calling computeSaveables.
 			// Synchronization must remain in this order to avoid deadlock.
@@ -222,12 +223,12 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 	private boolean isDisposed() {
 		return contentService == null;
 	}
-	
+
 	/** helper to compute the saveables for which elements are part of the tree.
 	 * Must be called from a synchronized method.
-	 * 
+	 *
 	 * @return the saveables
-	 */ 
+	 */
 	private Saveable[] computeSaveables() {
 		ITreeContentProvider contentProvider = (ITreeContentProvider) viewer
 				.getContentProvider();
@@ -299,7 +300,7 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 		}
 		return new Saveable[0];
 	}
-	
+
 	/**
 	 * @param selection
 	 * @return the active saveables
@@ -390,7 +391,7 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 		}
 		return null;
 	}
-	
+
 	/**
 	 * @param path
 	 * @return a saveable, or null
@@ -450,7 +451,7 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 			List<SaveablesProvider> result = new ArrayList<SaveablesProvider>();
 			for (int i = 0; i < descriptors.length; i++) {
 				NavigatorContentDescriptor descriptor = (NavigatorContentDescriptor) descriptors[i];
-				String pluginId = ((NavigatorContentDescriptor) descriptor)
+				String pluginId = descriptor
 						.getContribution().getPluginId();
 				if (Platform.getBundle(pluginId).getState() != Bundle.ACTIVE) {
 					List<NavigatorContentDescriptor> inactiveDescriptors = inactivePluginsWithSaveablesProviders
@@ -487,8 +488,8 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 		// for the adaptation below. See bug 306545
 		ITreeContentProvider contentProvider = extension
 				.getContentProvider();
-        
-        return (SaveablesProvider)AdaptabilityUtility.getAdapter(contentProvider, SaveablesProvider.class);
+
+		return Adapters.adapt(contentProvider, SaveablesProvider.class);
 	}
 
 	private void recomputeSaveablesAndNotify(boolean recomputeProviders,
@@ -599,9 +600,6 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.navigator.VisibilityAssistant.VisibilityListener#onVisibilityOrActivationChange()
-	 */
 	@Override
 	public synchronized void onVisibilityOrActivationChange() {
 		if (!isDisposed()) {

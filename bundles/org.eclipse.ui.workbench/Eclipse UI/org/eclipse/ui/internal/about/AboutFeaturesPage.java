@@ -1,16 +1,16 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *      IBM Corporation - initial API and implementation 
+ *      IBM Corporation - initial API and implementation
  *  	Sebastian Davids <sdavids@gmx.de> - Fix for bug 19346 - Dialog
  *      font should be activated and used by other components.
- *      Remy Chi Jian Suen <remy.suen@gmail.com> - Fix for bug 265739 - 
- *      [About] 'Features' tab in 'Eclipse SDK Installation Details' dialog 
+ *      Remy Chi Jian Suen <remy.suen@gmail.com> - Fix for bug 265739 -
+ *      [About] 'Features' tab in 'Eclipse SDK Installation Details' dialog
  *      does not display sort direction
  *******************************************************************************/
 package org.eclipse.ui.internal.about;
@@ -53,7 +53,7 @@ import org.osgi.framework.Bundle;
 
 /**
  * Displays information about the product plugins.
- * 
+ *
  * PRIVATE This class is internal to the workbench and must not be called
  * outside the workbench.
  */
@@ -233,7 +233,7 @@ public class AboutFeaturesPage extends ProductInfoPage {
 		// text on the right
 		text = new StyledText(infoArea, SWT.MULTI | SWT.WRAP | SWT.READ_ONLY | SWT.V_SCROLL);
 		text.setAlwaysShowScrollBars(false);
-		
+
 		// Don't set caret to 'null' as this causes https://bugs.eclipse.org/293263.
 //		text.setCaret(null);
 
@@ -253,7 +253,7 @@ public class AboutFeaturesPage extends ProductInfoPage {
 
 	/**
 	 * Create the table part of the dialog.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent composite to contain the dialog area
 	 */
@@ -390,7 +390,7 @@ public class AboutFeaturesPage extends ProductInfoPage {
 
 	/**
 	 * Select the initial selection
-	 * 
+	 *
 	 * @param info
 	 *            the info
 	 */
@@ -400,7 +400,7 @@ public class AboutFeaturesPage extends ProductInfoPage {
 
 	/**
 	 * Sort the rows of the table based on the selected column.
-	 * 
+	 *
 	 * @param column
 	 *            index of table column selected as sort criteria
 	 */
@@ -476,7 +476,7 @@ public class AboutFeaturesPage extends ProductInfoPage {
 	/**
 	 * Return an array of strings containing the argument's information in the
 	 * proper order for this table's columns.
-	 * 
+	 *
 	 * @param info
 	 *            the source information for the new row, must not be null
 	 */
@@ -485,11 +485,6 @@ public class AboutFeaturesPage extends ProductInfoPage {
 				info.getVersion(), info.getId() };
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.about.TableListPage#getSelectionValue()
-	 */
 	protected Collection getSelectionValue() {
 		if (table == null || table.isDisposed())
 			return null;
@@ -526,9 +521,6 @@ public class AboutFeaturesPage extends ProductInfoPage {
 		}
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on Dialog.
-	 */
 	@Override
 	protected void buttonPressed(int buttonId) {
 		switch (buttonId) {

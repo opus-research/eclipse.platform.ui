@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,11 +22,11 @@ import org.eclipse.ui.navigator.INavigatorContentDescriptor;
 
 /**
  * @since 3.2
- * 
+ *
  */
 public class FilterDialogSelectionListener implements ISelectionChangedListener {
-	
-	
+
+
 	private Label descriptionText;
 
 	protected FilterDialogSelectionListener(Label aDescriptionText) {
@@ -34,11 +34,6 @@ public class FilterDialogSelectionListener implements ISelectionChangedListener 
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
-	 */
 	@Override
 	public void selectionChanged(SelectionChangedEvent event) {
 
@@ -57,7 +52,7 @@ public class FilterDialogSelectionListener implements ISelectionChangedListener 
 			String description = 	cfd.getDescription();
 			if(description != null)
 				descriptionText.setText(description);
-			else 
+			else
 				descriptionText.setText(NLS.bind(CommonNavigatorMessages.FilterDialogSelectionListener_Enable_the_0_filter_, cfd.getName()));
 		}
 

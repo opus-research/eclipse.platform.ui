@@ -11,8 +11,6 @@
 
 package org.eclipse.ui.tests.services;
 
-import junit.framework.TestSuite;
-
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -27,9 +25,11 @@ import org.eclipse.ui.services.IServiceLocator;
 import org.eclipse.ui.services.IServiceScopes;
 import org.eclipse.ui.tests.harness.util.UITestCase;
 
+import junit.framework.TestSuite;
+
 /**
  * @since 3.4
- * 
+ *
  */
 public class ContributedServiceTest extends UITestCase {
 
@@ -168,7 +168,7 @@ public class ContributedServiceTest extends UITestCase {
 			((IDisposable) locator).dispose();
 		}
 	}
-	
+
 	public void testLocalDialogService() throws Exception {
 		IServiceLocator parent = getWorkbench();
 		IServiceLocatorCreator lc = parent
@@ -212,8 +212,8 @@ public class ContributedServiceTest extends UITestCase {
 		assertEquals(getWorkbench().getProgressService(), progress);
 		IViewPart part = null;
 		IViewReference[] refs = window.getActivePage().getViewReferences();
-		for (int i = 0; i < refs.length; i++) {
-			if ((part = refs[i].getView(false)) != null) {
+		for (IViewReference ref : refs) {
+			if ((part = ref.getView(false)) != null) {
 				break;
 			}
 		}

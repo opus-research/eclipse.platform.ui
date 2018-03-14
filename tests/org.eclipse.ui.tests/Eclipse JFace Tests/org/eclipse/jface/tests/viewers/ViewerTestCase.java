@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.jface.tests.viewers;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.util.ILogger;
@@ -29,6 +27,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
+import junit.framework.TestCase;
+
 public abstract class ViewerTestCase extends TestCase {
 
 	Display fDisplay;
@@ -36,8 +36,10 @@ public abstract class ViewerTestCase extends TestCase {
 	protected StructuredViewer fViewer;
 	protected TestElement fRootElement;
 	public TestModel fModel;
-	
+
 	protected boolean disableTestsBug347491 = false;
+	private ILogger oldLogger;
+	private ISafeRunnableRunner oldRunner;
 
 	public ViewerTestCase(String name) {
 		super(name);
@@ -59,8 +61,9 @@ public abstract class ViewerTestCase extends TestCase {
 	    if (shell != null && !shell.isDisposed()) {
 	        Display display = shell.getDisplay();
 	        if (display != null) {
-	            while (shell.isVisible())
-	                display.readAndDispatch();
+	            while (shell.isVisible()) {
+					display.readAndDispatch();
+				}
 	        }
 	    }
 	}
@@ -105,6 +108,8 @@ public abstract class ViewerTestCase extends TestCase {
 
 	@Override
 	public void setUp() {
+		oldLogger = Policy.getLog();
+		oldRunner = SafeRunnable.getRunner();
 		Policy.setLog(new ILogger(){
 			@Override
 			public void log(IStatus status) {
@@ -139,6 +144,8 @@ public abstract class ViewerTestCase extends TestCase {
 
 	@Override
 	public void tearDown() {
+		Policy.setLog(oldLogger);
+		SafeRunnable.setRunner(oldRunner);
 	    processEvents();
 	    fViewer = null;
 	    if (fShell != null) {

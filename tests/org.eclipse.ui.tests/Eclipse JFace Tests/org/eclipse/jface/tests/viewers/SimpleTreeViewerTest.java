@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2011 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 481490
  *******************************************************************************/
 
 package org.eclipse.jface.tests.viewers;
@@ -32,7 +33,7 @@ import org.eclipse.jface.viewers.ViewerSorter;
 
 /**
  * @since 3.2
- * 
+ *
  */
 public class SimpleTreeViewerTest extends ViewerTestCase {
 
@@ -56,7 +57,7 @@ public class SimpleTreeViewerTest extends ViewerTestCase {
 		treeViewer.setInput(null);
 		treeViewer.setSorter(new TreePathViewerSorter());
 	}
-	
+
 	public void testNullLabel() {
 		treeViewer.setLabelProvider(new ITableLabelProvider(){
 
@@ -156,12 +157,13 @@ public class SimpleTreeViewerTest extends ViewerTestCase {
 		ViewerFilter filter= new ViewerFilter() {
 			@Override
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
-				if (element == children[0] || element == children[1] || element == children[2] || element == children[4])
+				if (element == children[0] || element == children[1] || element == children[2] || element == children[4]) {
 					return false;
+				}
 				return true;
 			}
 		};
-		treeViewer.setFilters(new ViewerFilter[] { filter });
+		treeViewer.setFilters(filter);
 		int i= treeViewer.getTree().getItemCount();
 
 		assertEquals(4, i); // 4 because the filter doesn't work due to equal nodes

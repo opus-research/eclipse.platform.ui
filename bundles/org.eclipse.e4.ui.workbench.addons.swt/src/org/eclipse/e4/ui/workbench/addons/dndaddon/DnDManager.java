@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2012 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,6 +38,7 @@ import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Region;
+import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -183,6 +184,13 @@ class DnDManager {
 		if (overlayFrame != null && !overlayFrame.isDisposed())
 			overlayFrame.dispose();
 		overlayFrame = null;
+
+		for (DragAgent agent : dragAgents) {
+			agent.dispose();
+		}
+		for (DropAgent agent : dropAgents) {
+			agent.dispose();
+		}
 	}
 
 	private void track() {
@@ -451,7 +459,21 @@ class DnDManager {
 		}
 
 		overlayFrame.setRegion(rgn);
+		// Region object needs to be disposed at the right point in time
+		addResourceDisposeListener(overlayFrame, rgn);
 		overlayFrame.setVisible(true);
+	}
+
+	private void addResourceDisposeListener(Control control, final Resource resource) {
+		control.addDisposeListener(new DisposeListener() {
+
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				if (!resource.isDisposed()) {
+					resource.dispose();
+				}
+			}
+		});
 	}
 
 	private Rectangle getOverlayBounds() {

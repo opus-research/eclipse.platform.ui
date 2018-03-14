@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,14 +48,12 @@ import org.osgi.service.event.EventHandler;
 
 /**
  * Theme manager for the Workbench.
- * 
+ *
  * @since 3.0
  */
 public class WorkbenchThemeManager extends EventManager implements
 		IThemeManager {
 	public static RGB EMPTY_COLOR_VALUE = new RGB(0, 1, 2);
-
-	public static FontData[] EMPRY_FONT_DATA_VALUE = PreferenceConverter.FONTDATA_ARRAY_DEFAULT_DEFAULT;
 
 	private static final String SYSTEM_DEFAULT_THEME = "org.eclipse.ui.ide.systemDefault";//$NON-NLS-1$
 
@@ -75,35 +73,16 @@ public class WorkbenchThemeManager extends EventManager implements
 
 	/**
 	 * Returns the singelton instance of the WorkbenchThemeManager
-	 * 
+	 *
 	 * @return singleton instance
 	 */
-	public static WorkbenchThemeManager getInstance() {
+	public static synchronized WorkbenchThemeManager getInstance() {
 		if (instance == null) {
-			if (PlatformUI.getWorkbench().getDisplay() != null) {
-				PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
-					@Override
-					public void run() {
-						getInternalInstance();
-					}
-				});
-			}
+			instance = new WorkbenchThemeManager();
 		}
 		return instance;
 	}
 
-	/**
-	 * Initialize the singleton theme manager. Must be called in the UI thread.
-	 * 
-	 * @return the theme manager.
-	 */
-	private static synchronized WorkbenchThemeManager getInternalInstance() {
-		if (instance == null) {
-			instance = new WorkbenchThemeManager();
-			instance.getCurrentTheme(); // initialize the current theme
-		}
-		return instance;
-	}
 
 	private ITheme currentTheme;
 
@@ -134,6 +113,11 @@ public class WorkbenchThemeManager extends EventManager implements
 
 	private EventHandler themeRegistryModifiedHandler = new ThemeRegistryModifiedHandler();
 
+	private boolean initialized = false;
+
+	private WorkbenchThemeManager() {
+	}
+
 	/*
 	 * Initialize the WorkbenchThemeManager.
 	 * Determine the default theme according to the following rules:
@@ -142,7 +126,11 @@ public class WorkbenchThemeManager extends EventManager implements
 	 *   3) Otherwise, use our default
 	 * Call dispose when we close.
 	 */
-	private WorkbenchThemeManager() {
+	private synchronized void init() {
+		if (initialized) {
+			return;
+		}
+		initialized = true;
 		defaultThemeColorRegistry = new ColorRegistry(PlatformUI.getWorkbench()
 				.getDisplay());
 
@@ -187,20 +175,21 @@ public class WorkbenchThemeManager extends EventManager implements
 			eventBroker.subscribe(IThemeEngine.Events.THEME_CHANGED, themeChangedHandler);
 			eventBroker.subscribe(Events.THEME_REGISTRY_MODIFIED, themeRegistryModifiedHandler);
 		}
+		getCurrentTheme(); // initialize the current theme
 	}
 
 	/*
 	 * Update existing theme contents, descriptors, and registries.
 	 * Reread the themes and recompute the registries.
-	 */	
+	 */
 	private void updateThemes() {
 		//reread the themes since their descriptors have changed in value
         ThemeRegistryReader reader = new ThemeRegistryReader();
-        reader.readThemes(Platform.getExtensionRegistry(),(ThemeRegistry) getThemeRegistry());   
+        reader.readThemes(Platform.getExtensionRegistry(),(ThemeRegistry) getThemeRegistry());
 
         //DEFAULT_THEME is not in getThemes() list so must be handled special
-        ThemeElementHelper.populateRegistry(getTheme(IThemeManager.DEFAULT_THEME), getThemeRegistry().getColors(), PrefUtil.getInternalPreferenceStore());			
-        
+        ThemeElementHelper.populateRegistry(getTheme(IThemeManager.DEFAULT_THEME), getThemeRegistry().getColors(), PrefUtil.getInternalPreferenceStore());
+
         IThemeDescriptor[] themeDescriptors = getThemeRegistry().getThemes();
 
        	for (int i=0; i < themeDescriptors.length; i++) {
@@ -209,18 +198,13 @@ public class WorkbenchThemeManager extends EventManager implements
     		//If theme is in our themes table then its already been populated
     		if (theme != null) {
                 ColorDefinition[] colorDefinitions = themeDescriptor.getColors();
-              
+
                if (colorDefinitions.length > 0) {
                 	ThemeElementHelper.populateRegistry(theme, colorDefinitions,PrefUtil.getInternalPreferenceStore());
                 }
     		}
 		}
 	}
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.themes.IThemeManager#addPropertyChangeListener(org.eclipse.jface.util.IPropertyChangeListener)
-	 */
 	@Override
 	public void addPropertyChangeListener(IPropertyChangeListener listener) {
 		addListenerObject(listener);
@@ -270,13 +254,9 @@ public class WorkbenchThemeManager extends EventManager implements
 		firePropertyChange(event);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.themes.IThemeManager#getCurrentTheme()
-	 */
 	@Override
 	public ITheme getCurrentTheme() {
+		init();
 		if (currentTheme == null) {
 			String themeId = PrefUtil.getAPIPreferenceStore().getString(
 					IWorkbenchPreferenceConstants.CURRENT_THEME_ID);
@@ -296,26 +276,28 @@ public class WorkbenchThemeManager extends EventManager implements
 													PlatformUI.PLUGIN_ID,
 													"Could not restore current theme: " + themeId, null)); //$NON-NLS-1$
 				}
-			}			
+			}
 		}
 		return currentTheme;
 	}
 
 	/**
 	 * Return the default color registry.
-	 * 
+	 *
 	 * @return the default color registry
 	 */
 	public ColorRegistry getDefaultThemeColorRegistry() {
+		init();
 		return defaultThemeColorRegistry;
 	}
 
 	/**
 	 * Return the default font registry.
-	 * 
+	 *
 	 * @return the default font registry
 	 */
 	public FontRegistry getDefaultThemeFontRegistry() {
+		init();
 		return defaultThemeFontRegistry;
 	}
 
@@ -328,13 +310,9 @@ public class WorkbenchThemeManager extends EventManager implements
 		return theme;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.themes.IThemeManager#getTheme(java.lang.String)
-	 */
 	@Override
 	public ITheme getTheme(String id) {
+		init();
 		if (id.equals(IThemeManager.DEFAULT_THEME)) {
 			return getTheme((IThemeDescriptor) null);
 		}
@@ -356,23 +334,14 @@ public class WorkbenchThemeManager extends EventManager implements
 		return themeRegistry;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.themes.IThemeManager#removePropertyChangeListener(org.eclipse.jface.util.IPropertyChangeListener)
-	 */
 	@Override
 	public void removePropertyChangeListener(IPropertyChangeListener listener) {
 		removeListenerObject(listener);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.themes.IThemeManager#setCurrentTheme(java.lang.String)
-	 */
 	@Override
 	public void setCurrentTheme(String id) {
+		init();
 		ITheme oldTheme = currentTheme;
 		if (WorkbenchThemeManager.getInstance().doSetCurrentTheme(id)) {
 			firePropertyChange(CHANGE_CURRENT_THEME, oldTheme,
@@ -418,7 +387,7 @@ public class WorkbenchThemeManager extends EventManager implements
 			}
 		}
 	}
-	
+
 	public static class WorkbenchThemeChangedHandler implements EventHandler {
 		@Override
 		public void handleEvent(org.osgi.service.event.Event event) {
@@ -484,7 +453,7 @@ public class WorkbenchThemeManager extends EventManager implements
 				if (def.isOverridden()) {
 					def.resetToDefaultValue();
 					fontRegistry.put(def.getId(), def.getValue() != null ? def.getValue()
-							: EMPRY_FONT_DATA_VALUE);
+							: PreferenceConverter.getFontDataArrayDefaultDefault());
 				}
 			}
 			for (ColorDefinition def : themeRegistry.getColors()) {
@@ -616,7 +585,7 @@ public class WorkbenchThemeManager extends EventManager implements
 		protected void sendThemeDefinitionChangedEvent() {
 			MApplication application = (MApplication) getContext()
 					.get(MApplication.class.getName());
-			getInternalInstance().eventBroker.send(UIEvents.UILifeCycle.THEME_DEFINITION_CHANGED,
+			getInstance().eventBroker.send(UIEvents.UILifeCycle.THEME_DEFINITION_CHANGED,
 					application);
 		}
 

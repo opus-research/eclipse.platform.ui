@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2007 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
  * <code>org.eclipse.ui.workbench</code> and <code>org.eclipse.ui.ide</code>
  * plug-ins.
  * </p>
- * 
+ *
  * @since 3.2
  */
 public interface ISelectionConversionService {
@@ -33,7 +33,7 @@ public interface ISelectionConversionService {
 	 * If all elements in the initial selection can be converted to resources
 	 * then answer a new selection containing these resources; otherwise answer
 	 * an empty selection.
-	 * 
+	 *
 	 * @param originalSelection
 	 *            the original selection; must not be <code>null</code>.
 	 * @return the converted selection or an empty selection; never

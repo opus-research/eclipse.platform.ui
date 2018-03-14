@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2007 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,7 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.IValueChangeListener;
 import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
 import org.eclipse.core.databinding.observable.value.WritableValue;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.databinding.viewers.ObservableSetContentProvider;
 import org.eclipse.jface.databinding.viewers.ViewersObservables;
 import org.eclipse.jface.internal.databinding.provisional.swt.ControlUpdater;
@@ -43,7 +43,7 @@ import org.eclipse.swt.widgets.Shell;
 /**
  * Tests UpdatableSetContentProvider, ComputableValue, ControlUpdator,
  * UpdatableFunction, and ConvertingSet.
- * 
+ *
  * <p>
  * This test displays a dialog with user-editable list of Doubles. It allows the
  * user to select a math function to apply to the set, and displays the result
@@ -52,13 +52,13 @@ import org.eclipse.swt.widgets.Shell;
  * silly, it is a good example of a dialog where a lot of things can change from
  * many directions.
  * </p>
- * 
+ *
  * <p>
  * An UpdatableSetContentProvider is used to supply the contents each
  * ListViewer. ControlUpdators
- * 
+ *
  * </p>
- * 
+ *
  * @since 1.0
  */
 public class StructuredContentProviderTest {
@@ -237,7 +237,7 @@ public class StructuredContentProviderTest {
 	/**
 	 * Creates a radio button in the given parent composite. When selected, the
 	 * button will change the given SettableValue to the given value.
-	 * 
+	 *
 	 * @param parent
 	 *            parent composite
 	 * @param model
@@ -283,7 +283,7 @@ public class StructuredContentProviderTest {
 	/**
 	 * Creates and returns a control that will allow the user to add and remove
 	 * Doubles from the given input set.
-	 * 
+	 *
 	 * @param parent
 	 *            parent control
 	 * @param inputSet
@@ -384,7 +384,7 @@ public class StructuredContentProviderTest {
 	 */
 	public static void main(String[] args) {
 		Display display = Display.getDefault();
-		realm = SWTObservables.getRealm(display);
+		realm = DisplayRealm.getRealm(display);
 		StructuredContentProviderTest test = new StructuredContentProviderTest();
 		Shell s = test.getShell();
 		s.pack();

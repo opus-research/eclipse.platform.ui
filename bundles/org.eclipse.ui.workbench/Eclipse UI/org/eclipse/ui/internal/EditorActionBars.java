@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -73,13 +73,6 @@ public class EditorActionBars extends SubActionBars2 {
 			return null;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.jface.action.IContributionManagerOverrides#getVisible
-		 * (org.eclipse.jface.action.IContributionItem)
-		 */
 		@Override
 		public Boolean getVisible(IContributionItem item) {
 			return null;
@@ -138,17 +131,11 @@ public class EditorActionBars extends SubActionBars2 {
 		++refCount;
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on SubActionBars.
-	 */
 	@Override
 	protected SubMenuManager createSubMenuManager(IMenuManager parent) {
 		return new EditorMenuManager(parent);
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on SubActionBars.
-	 */
 	@Override
 	protected SubToolBarManager createSubToolBarManager(IToolBarManager parent) {
 		// return null, editor actions are managed by CoolItemToolBarManagers
@@ -256,7 +243,7 @@ public class EditorActionBars extends SubActionBars2 {
 	 * Returns the tool bar manager. If items are added or removed from the
 	 * manager be sure to call <code>updateActionBars</code>. Overridden to
 	 * support CoolBars.
-	 * 
+	 *
 	 * @return the tool bar manager
 	 */
 	@Override
@@ -329,7 +316,7 @@ public class EditorActionBars extends SubActionBars2 {
 	 * Returns whether the contribution list is visible. If the visibility is
 	 * <code>true</code> then each item within the manager appears within the
 	 * parent manager. Otherwise, the items are not visible.
-	 * 
+	 *
 	 * @return <code>true</code> if the manager is visible
 	 */
 	private boolean isVisible() {
@@ -368,7 +355,7 @@ public class EditorActionBars extends SubActionBars2 {
 
 	/**
 	 * Activate / Deactivate the contributions.
-	 * 
+	 *
 	 * Workaround for flashing when editor contributes many menu/tool
 	 * contributions. In this case, the force visibility flag determines if the
 	 * contributions should be actually made visible/hidden or just change the
@@ -396,7 +383,7 @@ public class EditorActionBars extends SubActionBars2 {
 
 	/**
 	 * Sets the enablement ability of all the items contributed by the editor.
-	 * 
+	 *
 	 * @param enabledAllowed
 	 *            <code>true</code> if the items may enable
 	 * @since 2.0
@@ -428,7 +415,7 @@ public class EditorActionBars extends SubActionBars2 {
 	 * Sets the visibility of the manager. If the visibility is
 	 * <code>true</code> then each item within the manager appears within the
 	 * parent manager. Otherwise, the items are not visible.
-	 * 
+	 *
 	 * @param visible
 	 *            the new visibility
 	 */
@@ -451,7 +438,7 @@ public class EditorActionBars extends SubActionBars2 {
 	 * This is a workaround for the layout flashing when editors contribute
 	 * large amounts of items.
 	 * </p>
-	 * 
+	 *
 	 * @param visible
 	 *            the new visibility
 	 * @param forceVisibility
@@ -501,7 +488,7 @@ public class EditorActionBars extends SubActionBars2 {
 
 	/**
 	 * Returns the expression used for action handler activation.
-	 * 
+	 *
 	 * @return the expression used for action handler activation.
 	 */
 	public Expression getHandlerExpression() {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2009 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,42 +30,29 @@ import org.eclipse.ui.model.WorkbenchContentProvider;
  * @since 3.2
  */
 public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
- 
+
 	private static final Object[] NO_CHILDREN = new Object[0];
 	private Viewer viewer;
-	
+
 	/**
-	 *  
+	 *
 	 */
 	public ResourceExtensionContentProvider() {
 		super();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.model.BaseWorkbenchContentProvider#getElements(java.lang.Object)
-	 */
 	@Override
 	public Object[] getElements(Object element) {
 		return super.getChildren(element);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.model.BaseWorkbenchContentProvider#getChildren(java.lang.Object)
-	 */
 	@Override
 	public Object[] getChildren(Object element) {
 		if(element instanceof IResource)
 			return super.getChildren(element);
 		return NO_CHILDREN;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.model.BaseWorkbenchContentProvider#hasChildren(java.lang.Object)
-	 */
+
 	@Override
 	public boolean hasChildren(Object element) {
 		try {
@@ -83,12 +70,9 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 
 		return super.hasChildren(element);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.model.WorkbenchContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
-	 */
+
 	@Override
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) { 
+	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		super.inputChanged(viewer, oldInput, newInput);
 		this.viewer = viewer;
 	}
@@ -96,18 +80,18 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 
 	/**
 	 * Process the resource delta.
-	 * 
+	 *
 	 * @param delta
 	 */
 	@Override
-	protected void processDelta(IResourceDelta delta) {		
+	protected void processDelta(IResourceDelta delta) {
 
 		Control ctrl = viewer.getControl();
 		if (ctrl == null || ctrl.isDisposed()) {
 			return;
 		}
-		
-		
+
+
 		final Collection<Runnable> runnables = new ArrayList<Runnable>();
 		processDelta(delta, runnables);
 
@@ -120,9 +104,6 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 			runUpdates(runnables);
 		} else {
 			ctrl.getDisplay().asyncExec(new Runnable(){
-				/* (non-Javadoc)
-				 * @see java.lang.Runnable#run()
-				 */
 				@Override
 				public void run() {
 					//Abort if this happens after disposes
@@ -130,14 +111,14 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 					if (ctrl == null || ctrl.isDisposed()) {
 						return;
 					}
-					
+
 					runUpdates(runnables);
 				}
 			});
 		}
 
 	}
-	
+
 	/**
 	 * Process a resource delta. Add any runnables
 	 */
@@ -151,7 +132,7 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 
 		// Get the affected resource
 		final IResource resource = delta.getResource();
-	
+
 		// If any children have changed type, just do a full refresh of this
 		// parent,
 		// since a simple update on such children won't work,
@@ -179,8 +160,8 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 //				}
 //			};
 //			runnables.add(updateRunnable);
-			
-			/* support the Closed Projects filter; 
+
+			/* support the Closed Projects filter;
 			 * when a project is closed, it may need to be removed from the view.
 			 */
 			runnables.add(getRefreshRunnable(resource.getParent()));
@@ -254,7 +235,7 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 		}
 		// heuristic test for items moving within same folder (i.e. renames)
 		final boolean hasRename = numMovedFrom > 0 && numMovedTo > 0;
-		
+
 		Runnable addAndRemove = new Runnable(){
 			@Override
 			public void run() {
@@ -288,7 +269,7 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 		};
 		runnables.add(addAndRemove);
 	}
-	
+
 	/**
 	 * Return a runnable for refreshing a resource.
 	 * @param resource
@@ -302,7 +283,7 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 			}
 		};
 	}
-	
+
 	/**
 	 * Run all of the runnables that are the widget updates
 	 * @param runnables
@@ -311,7 +292,7 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 		for (Runnable runnable : runnables) {
 			runnable.run();
 		}
-		
+
 	}
-	
+
 }

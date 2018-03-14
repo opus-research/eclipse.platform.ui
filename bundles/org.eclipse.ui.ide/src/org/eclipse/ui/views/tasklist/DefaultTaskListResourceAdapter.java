@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.ui.views.tasklist;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IAdaptable;
 
 /**
@@ -44,14 +45,14 @@ class DefaultTaskListResourceAdapter implements ITaskListResourceAdapter {
     /*
      * @see ITaskListResourceAdapter#getAffectedResource(IAdaptable)
      */
-    public IResource getAffectedResource(IAdaptable adaptable) {
+    @Override
+	public IResource getAffectedResource(IAdaptable adaptable) {
 
-        IResource resource = (IResource) adaptable.getAdapter(IResource.class);
+		IResource resource = Adapters.adapt(adaptable, IResource.class);
         if (resource == null) {
-			return (IFile) adaptable.getAdapter(IFile.class);
-		} else {
-			return resource;
+			return Adapters.adapt(resource, IFile.class);
 		}
+		return resource;
 
     }
 

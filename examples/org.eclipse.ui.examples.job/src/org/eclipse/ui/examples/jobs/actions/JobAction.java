@@ -27,14 +27,16 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
  * Our sample action implements workbench action delegate.
  * The action proxy will be created by the workbench and
  * shown in the UI. When the user tries to use the action,
- * this delegate will be created and execution will be 
+ * this delegate will be created and execution will be
  * delegated to it.
  * @see IWorkbenchWindowActionDelegate
  */
 public class JobAction implements IWorkbenchWindowActionDelegate {
+	@Override
 	public void run(IAction action) {
 		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		Job job = new WorkspaceJob("Background job") { //$NON-NLS-1$
+			@Override
 			public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
 				monitor.beginTask("Doing something in background", 100); //$NON-NLS-1$
 				for (int i = 0; i < 100; i++) {
@@ -51,12 +53,15 @@ public class JobAction implements IWorkbenchWindowActionDelegate {
 		job.setRule(workspace.getRoot());
 		job.schedule();
 	}
+	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
 		//do nothing
 	}
+	@Override
 	public void dispose() {
 		//do nothing
 	}
+	@Override
 	public void init(IWorkbenchWindow window) {
 		//do nothing
 	}

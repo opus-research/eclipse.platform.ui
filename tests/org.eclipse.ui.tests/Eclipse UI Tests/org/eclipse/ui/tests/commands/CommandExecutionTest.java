@@ -31,7 +31,7 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
  * @since 3.103
- * 
+ *
  */
 public class CommandExecutionTest extends UITestCase {
 	static class Pair {
@@ -43,11 +43,6 @@ public class CommandExecutionTest extends UITestCase {
 		String key;
 		Object result;
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.lang.Object#toString()
-		 */
 		@Override
 		public String toString() {
 			return "(" + key + ",\n\t" + result + ")";
@@ -58,29 +53,35 @@ public class CommandExecutionTest extends UITestCase {
 		ArrayList<Pair> methods = new ArrayList<Pair>();
 		IWorkbenchWindow wbw;
 
+		@Override
 		public void preExecute(String commandId, ExecutionEvent event) {
 			methods.add(new Pair("preExecute", event));
 			// ensure HandlerUtil has proper access. See bug 412681.
 			wbw = HandlerUtil.getActiveWorkbenchWindow(event);
 		}
 
+		@Override
 		public void postExecuteSuccess(String commandId, Object returnValue) {
 			methods.add(new Pair("postExecuteSuccess", returnValue));
 		}
 
+		@Override
 		public void postExecuteFailure(String commandId,
 				ExecutionException exception) {
 			methods.add(new Pair("postExecuteFailure", exception));
 		}
 
+		@Override
 		public void notHandled(String commandId, NotHandledException exception) {
 			methods.add(new Pair("notHandled", exception));
 		}
 
+		@Override
 		public void notEnabled(String commandId, NotEnabledException exception) {
 			methods.add(new Pair("notEnabled", exception));
 		}
 
+		@Override
 		public void notDefined(String commandId, NotDefinedException exception) {
 			methods.add(new Pair("notDefined", exception));
 		}
@@ -151,7 +152,7 @@ public class CommandExecutionTest extends UITestCase {
 				"HandlerUtil.getActiveWorkbenchWindow() returned null during ICommandListener.preExecute().",
 				listener.wbw);
 	}
-	
+
 	public void testCommandListenerExecute() throws Exception {
 		EL listener = new EL();
 		ICommandService cmdService = getWorkbench()
@@ -214,7 +215,7 @@ public class CommandExecutionTest extends UITestCase {
 		compare(calls, listener.methods);
 		verifyHandlerUtilAccessDuringPreExecute(listener);
 	}
-	
+
 	public void testCommandListenerExecuteRefresh() throws Exception {
 		EL listener = new EL();
 		ICommandService cmdService = getWorkbench()
@@ -281,7 +282,7 @@ public class CommandExecutionTest extends UITestCase {
 		compare(calls, listener.methods);
 		verifyHandlerUtilAccessDuringPreExecute(listener);
 	}
-	
+
 	public void testCommandListenerExecuteClosePart() throws Exception {
 		getWorkbench().getActiveWorkbenchWindow().getActivePage()
 				.showView(IPageLayout.ID_PROGRESS_VIEW);

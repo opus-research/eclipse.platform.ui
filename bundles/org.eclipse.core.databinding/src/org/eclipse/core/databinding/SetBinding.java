@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,7 +31,7 @@ import org.eclipse.core.runtime.Status;
 
 /**
  * @since 1.1
- * 
+ *
  */
 public class SetBinding extends Binding {
 
@@ -42,6 +42,7 @@ public class SetBinding extends Binding {
 	private boolean updatingModel;
 
 	private ISetChangeListener targetChangeListener = new ISetChangeListener() {
+		@Override
 		public void handleSetChange(SetChangeEvent event) {
 			if (!updatingTarget) {
 				doUpdate((IObservableSet) getTarget(),
@@ -52,6 +53,7 @@ public class SetBinding extends Binding {
 	};
 
 	private ISetChangeListener modelChangeListener = new ISetChangeListener() {
+		@Override
 		public void handleSetChange(SetChangeEvent event) {
 			if (!updatingModel) {
 				doUpdate((IObservableSet) getModel(),
@@ -85,10 +87,12 @@ public class SetBinding extends Binding {
 		}
 	}
 
+	@Override
 	public IObservableValue getValidationStatus() {
 		return validationStatusObservable;
 	}
 
+	@Override
 	protected void preInit() {
 		ObservableTracker.setIgnore(true);
 		try {
@@ -99,6 +103,7 @@ public class SetBinding extends Binding {
 		}
 	}
 
+	@Override
 	protected void postInit() {
 		if (modelToTarget.getUpdatePolicy() == UpdateSetStrategy.POLICY_UPDATE) {
 			updateModelToTarget();
@@ -108,9 +113,11 @@ public class SetBinding extends Binding {
 		}
 	}
 
+	@Override
 	public void updateModelToTarget() {
 		final IObservableSet modelSet = (IObservableSet) getModel();
 		modelSet.getRealm().exec(new Runnable() {
+			@Override
 			public void run() {
 				SetDiff diff = Diffs.computeSetDiff(Collections.EMPTY_SET,
 						modelSet);
@@ -120,9 +127,11 @@ public class SetBinding extends Binding {
 		});
 	}
 
+	@Override
 	public void updateTargetToModel() {
 		final IObservableSet targetSet = (IObservableSet) getTarget();
 		targetSet.getRealm().exec(new Runnable() {
+			@Override
 			public void run() {
 				SetDiff diff = Diffs.computeSetDiff(Collections.EMPTY_SET,
 						targetSet);
@@ -132,10 +141,12 @@ public class SetBinding extends Binding {
 		});
 	}
 
+	@Override
 	public void validateModelToTarget() {
 		// nothing for now
 	}
 
+	@Override
 	public void validateTargetToModel() {
 		// nothing for now
 	}
@@ -154,6 +165,7 @@ public class SetBinding extends Binding {
 		if (policy == UpdateSetStrategy.POLICY_ON_REQUEST && !explicit)
 			return;
 		destination.getRealm().exec(new Runnable() {
+			@Override
 			public void run() {
 				if (destination == getTarget()) {
 					updatingTarget = true;
@@ -170,8 +182,8 @@ public class SetBinding extends Binding {
 					for (Iterator iterator = diff.getRemovals().iterator(); iterator
 							.hasNext();) {
 						IStatus setterStatus = updateSetStrategy.doRemove(
-								destination, updateSetStrategy.convert(iterator
-										.next()));
+								destination,
+								updateSetStrategy.convert(iterator.next()));
 
 						mergeStatus(multiStatus, setterStatus);
 						// TODO - at this point, the two sets
@@ -182,8 +194,8 @@ public class SetBinding extends Binding {
 					for (Iterator iterator = diff.getAdditions().iterator(); iterator
 							.hasNext();) {
 						IStatus setterStatus = updateSetStrategy.doAdd(
-								destination, updateSetStrategy.convert(iterator
-										.next()));
+								destination,
+								updateSetStrategy.convert(iterator.next()));
 
 						mergeStatus(multiStatus, setterStatus);
 						// TODO - at this point, the two sets
@@ -191,7 +203,7 @@ public class SetBinding extends Binding {
 						// occurred...
 					}
 				} finally {
-					validationStatusObservable.setValue(multiStatus);
+					setValidationStatus(multiStatus);
 
 					if (destination == getTarget()) {
 						updatingTarget = false;
@@ -203,10 +215,19 @@ public class SetBinding extends Binding {
 		});
 	}
 
+	private void setValidationStatus(final IStatus status) {
+		validationStatusObservable.getRealm().exec(new Runnable() {
+			@Override
+			public void run() {
+				validationStatusObservable.setValue(status);
+			}
+		});
+	}
+
 	/**
 	 * Merges the provided <code>newStatus</code> into the
 	 * <code>multiStatus</code>.
-	 * 
+	 *
 	 * @param multiStatus
 	 * @param newStatus
 	 */
@@ -216,6 +237,7 @@ public class SetBinding extends Binding {
 		}
 	}
 
+	@Override
 	public void dispose() {
 		if (targetChangeListener != null) {
 			((IObservableSet) getTarget())

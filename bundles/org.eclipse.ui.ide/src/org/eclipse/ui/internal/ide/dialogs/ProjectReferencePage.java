@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,17 +18,15 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
-import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
@@ -59,19 +57,20 @@ public class ProjectReferencePage extends PropertyPage {
     /*
      * @see PreferencePage#createContents
      */
-    protected Control createContents(Composite parent) {
+    @Override
+	protected Control createContents(Composite parent) {
     	PlatformUI.getWorkbench().getHelpSystem().setHelp(getControl(),
                 IIDEHelpContextIds.PROJECT_REFERENCE_PROPERTY_PAGE);
-    	
+
         Composite composite = new Composite(parent, SWT.NONE);
-        
+
         initialize();
 
         createDescriptionLabel(composite);
 
         listViewer = CheckboxTableViewer.newCheckList(composite, SWT.TOP
                 | SWT.BORDER);
-        
+
         if(!project.isOpen())
         	listViewer.getControl().setEnabled(false);
 
@@ -88,16 +87,12 @@ public class ProjectReferencePage extends PropertyPage {
         }
 
         //check for initial modification to avoid work if no changes are made
-        listViewer.addCheckStateListener(new ICheckStateListener() {
-            public void checkStateChanged(CheckStateChangedEvent event) {
-                modified = true;
-            }
-        });
+        listViewer.addCheckStateListener(event -> modified = true);
 
         applyDialogFont(composite);
-        
+
         GridLayoutFactory.fillDefaults().generateLayout(composite);
-        
+
         return composite;
     }
 
@@ -113,7 +108,8 @@ public class ProjectReferencePage extends PropertyPage {
     protected IStructuredContentProvider getContentProvider(
             final IProject project) {
         return new WorkbenchContentProvider() {
-            public Object[] getChildren(Object o) {
+            @Override
+			public Object[] getChildren(Object o) {
                 if (!(o instanceof IWorkspace)) {
                     return new Object[0];
                 }
@@ -171,7 +167,7 @@ public class ProjectReferencePage extends PropertyPage {
      * Initializes a ProjectReferencePage.
      */
     private void initialize() {
-        project = (IProject) getElement().getAdapter(IResource.class);
+		project = (IProject) Adapters.adapt(getElement(), IResource.class);
         noDefaultAndApplyButton();
         setDescription(NLS.bind(IDEWorkbenchMessages.ProjectReferencesPage_label, project.getName()));
     }
@@ -179,26 +175,24 @@ public class ProjectReferencePage extends PropertyPage {
     /**
      * @see PreferencePage#performOk
      */
-    public boolean performOk() {
+    @Override
+	public boolean performOk() {
         if (!modified) {
 			return true;
 		}
         Object[] checked = listViewer.getCheckedElements();
         final IProject[] refs = new IProject[checked.length];
         System.arraycopy(checked, 0, refs, 0, checked.length);
-        IRunnableWithProgress runnable = new IRunnableWithProgress() {
-            public void run(IProgressMonitor monitor)
-                    throws InvocationTargetException {
+        IRunnableWithProgress runnable = monitor -> {
 
-                try {
-                    IProjectDescription description = project.getDescription();
-                    description.setReferencedProjects(refs);
-                    project.setDescription(description, monitor);
-                } catch (CoreException e) {
-                    throw new InvocationTargetException(e);
-                }
+            try {
+		IProjectDescription description = project.getDescription();
+		description.setReferencedProjects(refs);
+		project.setDescription(description, monitor);
+            } catch (CoreException e) {
+		throw new InvocationTargetException(e);
             }
-        };
+         };
         IProgressService service = PlatformUI.getWorkbench().getProgressService();
         try {
             service.run(false, false, runnable);

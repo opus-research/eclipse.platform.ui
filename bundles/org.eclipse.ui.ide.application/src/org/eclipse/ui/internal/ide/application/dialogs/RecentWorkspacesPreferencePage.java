@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Eric Rizzo and others.
+ * Copyright (c) 2009, 2015 Eric Rizzo and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,7 +40,7 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 /**
  * Preference page for editing the list of recent workspaces and whether or not
  * the user is prompted at startup.
- * 
+ *
  * @since 3.5
  */
 public class RecentWorkspacesPreferencePage extends PreferencePage
@@ -58,10 +58,12 @@ public class RecentWorkspacesPreferencePage extends PreferencePage
 	private Button removeButton;
 
 
+	@Override
 	public void init(IWorkbench workbench) {
 		workspacesData = new ChooseWorkspaceData(Platform.getInstanceLocation().getURL());
 	}
 
+	@Override
 	public Control createContents(Composite parent) {
     	PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
 				IWorkbenchHelpContextIds.WORKSPACES_PREFERENCE_PAGE);
@@ -76,7 +78,7 @@ public class RecentWorkspacesPreferencePage extends PreferencePage
 		createPromptOption(container);
 		createMaxWorkspacesField(container);
 		createWorkspacesList(container);
-		
+
 		Dialog.applyDialogFont(container);
 
 		return container;
@@ -90,6 +92,7 @@ public class RecentWorkspacesPreferencePage extends PreferencePage
 
 		promptOption.setSelection(workspacesData.getShowDialog());
 		promptOption.addSelectionListener(new SelectionAdapter(){
+				@Override
 				public void widgetSelected(SelectionEvent event) {
 					workspacesData.toggleShowDialog();
 				}
@@ -116,11 +119,11 @@ public class RecentWorkspacesPreferencePage extends PreferencePage
 		final GridLayout gridLayout_1 = new GridLayout();
 		gridLayout_1.numColumns = 2;
 		recentWorkspacesGroup.setLayout(gridLayout_1);
-		
+
 		workspacesList = new List(recentWorkspacesGroup, SWT.BORDER | SWT.MULTI);
 		final GridData gd_workspacesList = new GridData(SWT.FILL, SWT.FILL, true, true);
 		workspacesList.setLayoutData(gd_workspacesList);
-		
+
 		removeButton = new Button(recentWorkspacesGroup, SWT.NONE);
 		final GridData gd_removeButton = new GridData(SWT.CENTER, SWT.TOP, false, false);
 		removeButton.setLayoutData(gd_removeButton);
@@ -128,6 +131,7 @@ public class RecentWorkspacesPreferencePage extends PreferencePage
 		removeButton.setEnabled(false);
 
 		removeButton.addSelectionListener(new SelectionAdapter(){
+				@Override
 				public void widgetSelected(SelectionEvent event) {
 					removeSelectedWorkspaces();
 					updateRemoveButton();
@@ -135,6 +139,7 @@ public class RecentWorkspacesPreferencePage extends PreferencePage
 			});
 
 		workspacesList.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent event) {
 					updateRemoveButton();
 				}
@@ -167,12 +172,14 @@ public class RecentWorkspacesPreferencePage extends PreferencePage
 	}
 
 
+	@Override
 	protected void performDefaults() {
 		promptOption.setSelection(true);
 		super.performDefaults();
 	}
 
 
+	@Override
 	public boolean performOk() {
 		int maxWorkspaces = maxWorkspacesField.getSelection();
 		String[] workspaces = new String[maxWorkspaces];
@@ -180,7 +187,7 @@ public class RecentWorkspacesPreferencePage extends PreferencePage
 		String[] listItems = new String[tmpListItem.length];
 
 		for (int i = 0; i < tmpListItem.length; i++){
-			listItems[i] = TextProcessor.deprocess(tmpListItem[i]); 
+			listItems[i] = TextProcessor.deprocess(tmpListItem[i]);
 		}
 
 		if (maxWorkspaces < listItems.length) {

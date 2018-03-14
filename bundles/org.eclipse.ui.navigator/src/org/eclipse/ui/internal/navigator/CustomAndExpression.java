@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2010 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,7 +26,7 @@ import org.eclipse.core.runtime.SafeRunner;
 /**
  * Create an AND-type core expression from an IConfigurationElement of arbitrary
  * name.
- * 
+ *
  */
 public class CustomAndExpression extends Expression {
 
@@ -36,7 +36,7 @@ public class CustomAndExpression extends Expression {
 	 * Create an AND-type core expression from an IConfigurationElement of
 	 * arbitrary name. The children elements are combined using boolean AND
 	 * semantics to evaluate the expression.
-	 * 
+	 *
 	 * @param element
 	 *            An IConfigurationElement of arbitrary name.
 	 */

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -61,6 +61,10 @@ import org.eclipse.swt.widgets.Widget;
  * interfaces <code>ITreeContentProvider</code> or (as of 3.2, to support
  * multiple equal elements) <code>ITreePathContentProvider</code>.
  * </p>
+ * <p>
+ * <strong> This class is not intended to be subclassed outside of the JFace
+ * viewers framework.</strong>
+ * <p>
  *
  * @see TreeViewer
  */
@@ -89,10 +93,10 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	 * @see #setAutoExpandLevel
 	 */
 	private int expandToLevel = 0;
-	
+
 	/**
 	 * Indicates if filters should be checked to determine expandability of
-	 * a tree node. 
+	 * a tree node.
 	 */
 	private boolean isExpandableCheckFilters = false;
 
@@ -365,10 +369,10 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 		// start position. This is the insertion position relative to the
 		// original item array.
 		int indexInItems = 0;
-		
+
 		// Count of elements we have added. See bug 205700 for why this is needed.
 		int newItems = 0;
-		
+
 		elementloop: for (int i = 0; i < elements.length; i++) {
 			Object element = elements[i];
 			// update the index relative to the original item array
@@ -761,7 +765,7 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	protected void createChildren(final Widget widget) {
 		createChildren(widget, true);
 	}
-	
+
 	/**
 	 * Creates all children for the given widget.
 	 * <p>
@@ -773,7 +777,7 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	 *
 	 * @param widget
 	 *            the widget
-	 * @param materialize 
+	 * @param materialize
 	 * 			  true if children are expected to be fully materialized
 	 */
 	void createChildren(final Widget widget, boolean materialize) {
@@ -788,38 +792,34 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 				}
 			}
 
-			BusyIndicator.showWhile(widget.getDisplay(), new Runnable() {
-				@Override
-				public void run() {
-					// fix for PR 1FW89L7:
-					// don't complain and remove all "dummies" ...
-					if (tis != null) {
-						for (int i = 0; i < tis.length; i++) {
-							if (tis[i].getData() != null) {
-								disassociate(tis[i]);
-								Assert.isTrue(tis[i].getData() == null,
-										"Second or later child is non -null");//$NON-NLS-1$
+			BusyIndicator.showWhile(widget.getDisplay(), () -> {
+				// fix for PR 1FW89L7:
+				// don't complain and remove all "dummies" ...
+				if (tis != null) {
+					for (int i1 = 0; i1 < tis.length; i1++) {
+						if (tis[i1].getData() != null) {
+							disassociate(tis[i1]);
+							Assert.isTrue(tis[i1].getData() == null,
+									"Second or later child is non -null");//$NON-NLS-1$
 
-							}
-							tis[i].dispose();
 						}
-					}
-					Object d = widget.getData();
-					if (d != null) {
-						Object parentElement = d;
-						Object[] children;
-						if (isTreePathContentProvider() && widget instanceof Item) {
-							TreePath path = getTreePathFromItem((Item) widget);
-							children = getSortedChildren(path);
-						} else {
-							children = getSortedChildren(parentElement);
-						}
-						for (int i = 0; i < children.length; i++) {
-							createTreeItem(widget, children[i], -1);
-						}
+						tis[i1].dispose();
 					}
 				}
-
+				Object d = widget.getData();
+				if (d != null) {
+					Object parentElement = d;
+					Object[] children;
+					if (isTreePathContentProvider() && widget instanceof Item) {
+						TreePath path = getTreePathFromItem((Item) widget);
+						children = getSortedChildren(path);
+					} else {
+						children = getSortedChildren(parentElement);
+					}
+					for (int i2 = 0; i2 < children.length; i2++) {
+						createTreeItem(widget, children[i2], -1);
+					}
+				}
 			});
 		} finally {
 			setBusy(oldBusy);
@@ -1385,12 +1385,12 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	/**
 	 * Asserts that the given array of elements is itself non- <code>null</code>
 	 * and contains no <code>null</code> elements.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent element
 	 * @param elements
 	 *            the array to check
-	 * 
+	 *
 	 * @see #assertElementsNotNull(Object[])
 	 */
 	private void assertElementsNotNull(Object parent, Object[] elements) {
@@ -1398,7 +1398,7 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 		for (int i = 0, n = elements.length; i < n; ++i) {
 			Assert.isNotNull(elements[i]);
 		}
-		
+
 		if (InternalPolicy.DEBUG_LOG_EQUAL_VIEWER_ELEMENTS
 				&& elements.length > 1) {
 			CustomHashtable elementSet = newHashtable(elements.length * 2);
@@ -1416,7 +1416,7 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 			}
 		}
 	}
-	
+
 	/**
 	 * Returns all selected items for the given SWT control.
 	 *
@@ -1442,9 +1442,7 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 
 	/*
 	 * Overridden in AbstractTreeViewer to fix bug 108102 (code copied from
-	 * StructuredViewer to avoid introducing new API) (non-Javadoc)
-	 *
-	 * @see org.eclipse.jface.viewers.StructuredViewer#handleDoubleSelect(org.eclipse.swt.events.SelectionEvent)
+	 * StructuredViewer to avoid introducing new API)
 	 */
 	@Override
 	protected void handleDoubleSelect(SelectionEvent event) {
@@ -1516,19 +1514,16 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 
 	@Override
 	protected void inputChanged(Object input, Object oldInput) {
-		preservingSelection(new Runnable() {
-			@Override
-			public void run() {
-	            Control tree = getControl();
-	            tree.setRedraw(false);
-	            try {
-	                removeAll(tree);
-	                tree.setData(getRoot());
-	                internalInitializeTree(tree);
-	            } finally {
-	                tree.setRedraw(true);
-	            }
-			}
+		preservingSelection(() -> {
+		    Control tree = getControl();
+		    tree.setRedraw(false);
+		    try {
+		        removeAll(tree);
+		        tree.setData(getRoot());
+		        internalInitializeTree(tree);
+		    } finally {
+		        tree.setRedraw(true);
+		    }
 		});
 	}
 
@@ -2214,12 +2209,7 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 		}
 		if (checkBusy())
 			return;
-		preservingSelection(new Runnable() {
-			@Override
-			public void run() {
-				internalRemove(elementsOrTreePaths);
-			}
-		});
+		preservingSelection(() -> internalRemove(elementsOrTreePaths));
 	}
 
 	/**
@@ -2247,12 +2237,7 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 		}
 		if (checkBusy())
 			return;
-		preservingSelection(new Runnable() {
-			@Override
-			public void run() {
-				internalRemove(parent, elements);
-			}
-		});
+		preservingSelection(() -> internalRemove(parent, elements));
 	}
 
 	/**
@@ -2360,7 +2345,7 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	 * Note that in previous releases, the Javadoc for this method had an off-by
 	 * one error. See bug 177669 for details.
 	 * </p>
-	 * 
+	 *
 	 * @param level
 	 *            non-negative level, or <code>ALL_LEVELS</code> to expand all
 	 *            levels of the tree
@@ -2370,9 +2355,10 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	}
 
 	/**
-	 * The <code>AbstractTreeViewer</code> implementation of this method
-	 * checks to ensure that the content provider is an
-	 * <code>ITreeContentProvider</code>.
+	 * Sets the content provider used by this <code>AbstractTreeViewer</code>.
+	 * <p>
+	 * Content providers for abstract tree viewers must implement either
+	 * {@link ITreeContentProvider} or {@link ITreePathContentProvider}.
 	 */
 	@Override
 	public void setContentProvider(IContentProvider provider) {
@@ -2659,7 +2645,7 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 		}
 
 		Item[] items = getChildren(widget);
-		
+
 		// save the expanded elements
 		CustomHashtable expanded = newHashtable(CustomHashtable.DEFAULT_CAPACITY); // assume
 																					// num
@@ -2834,12 +2820,12 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	/**
 	 * Not to be called by clients. Return the items to be refreshed as part of
 	 * an update. elementChildren are the new elements.
-	 * 
+	 *
 	 * @param widget
 	 * @param elementChildren
 	 * @since 3.4
 	 * @return Item[]
-	 * 
+	 *
 	 * @deprecated This method was inadvertently released as API but is not
 	 *             intended to be called by clients.
 	 */
@@ -2947,12 +2933,12 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	 * The <code>AbstractTreeViewer</code> implementation of this method returns
 	 * the result as an <code>ITreeSelection</code>.
 	 * <p>
+	 * Call {@link #getStructuredSelection()} instead to get an instance of
+	 * <code>ITreeSelection</code> directly.
+	 * </p>
 	 * Subclasses do not typically override this method, but implement
 	 * <code>getSelectionFromWidget(List)</code> instead. If they override this
 	 * method, they should return an <code>ITreeSelection</code> as well.
-	 * </p>
-	 * Call {@link #getStructuredSelection()} instead to get an instance of
-	 * <code>ITreeSelection</code> directly.
 	 *
 	 * @since 3.2
 	 */
@@ -3213,10 +3199,10 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	 * Setting this value to <code>true</code> will affect performance of the tree
 	 * viewer.
 	 * </p><p>
-	 * To improve performance, by default the tree viewer does not consult filters when 
+	 * To improve performance, by default the tree viewer does not consult filters when
 	 * determining if a tree node could be expanded.
 	 * </p>
-	 * @param checkFilters <code>true</code> to instruct tree viewer to consult filters 
+	 * @param checkFilters <code>true</code> to instruct tree viewer to consult filters
 	 * @see #isExpandable(Object)
 	 * @since 3.8
 	 */

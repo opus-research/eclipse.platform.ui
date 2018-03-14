@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2006 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,8 +21,8 @@ import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 
 /**
- *  
- * 
+ *
+ *
  * @since 3.2
  */
 public class NavigatorImages {
@@ -34,12 +34,12 @@ public class NavigatorImages {
 	private static URL ICONS_LOCATION;
 	static {
 		ICONS_LOCATION = FileLocator.find(NavigatorPlugin.getDefault()
-				.getBundle(), new Path("icons/full/"), Collections.EMPTY_MAP); //$NON-NLS-1$  
+				.getBundle(), new Path("icons/full/"), Collections.EMPTY_MAP); //$NON-NLS-1$
 	}
 
 	/**
 	 * Gets the current image.
-	 * 
+	 *
 	 * @param key
 	 *            Name of the icon.
 	 * @return Image
@@ -51,7 +51,7 @@ public class NavigatorImages {
 	/**
 	 * Create and returns a image descriptor and adds the image to the
 	 * registery.
-	 * 
+	 *
 	 * @param prefix
 	 *            Icon dir structure.
 	 * @param name
@@ -67,7 +67,7 @@ public class NavigatorImages {
 
 	/**
 	 * Creates the icon url
-	 * 
+	 *
 	 * @param prefix
 	 *            Icon dir structure.
 	 * @param name

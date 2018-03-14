@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,8 +16,9 @@ import org.eclipse.core.databinding.conversion.IConverter;
 import org.eclipse.core.runtime.IStatus;
 
 /**
- * Converts an IStatus into a String.  The message of the status is the returned value.
- * 
+ * Converts an IStatus into a String. The message of the status is the returned
+ * value.
+ *
  * @since 1.0
  */
 public class StatusToStringConverter extends Converter implements IConverter {
@@ -27,15 +28,14 @@ public class StatusToStringConverter extends Converter implements IConverter {
 	public StatusToStringConverter() {
 		super(IStatus.class, String.class);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.databinding.conversion.IConverter#convert(java.lang.Object)
-	 */
+
+	@Override
 	public Object convert(Object fromObject) {
 		if (fromObject == null) {
-			throw new IllegalArgumentException("Parameter 'fromObject' was null."); //$NON-NLS-1$
+			throw new IllegalArgumentException(
+					"Parameter 'fromObject' was null."); //$NON-NLS-1$
 		}
-		
+
 		IStatus status = (IStatus) fromObject;
 		return status.getMessage();
 	}

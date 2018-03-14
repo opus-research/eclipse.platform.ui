@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -29,7 +29,7 @@ import org.eclipse.ui.views.properties.tabbed.ITabItem;
  * <p>
  * The overridable tab list is a content provider that provides both the
  * sections and the tab labels.
- * 
+ *
  * @author Anthony Hunter
  * @since 3.4
  */
@@ -39,41 +39,25 @@ public abstract class AbstractTabList implements IOverrideTestsTabList {
 
 	private int selectedTabItem;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.views.properties.tabbed.override.tablist.IOverrideTestsTabList#appliesTo(org.eclipse.ui.tests.views.properties.tabbed.model.Element)
-	 */
+	@Override
 	public boolean appliesTo(Element element) {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.views.properties.tabbed.override.tablist.IOverrideTestsTabList#createControls(org.eclipse.swt.widgets.Composite)
-	 */
+	@Override
 	public void createControls(Composite parent) {
 		this.composite = parent;
 		OverrideTestsTabItem activeTab = (OverrideTestsTabItem) (getTabs()[selectedTabItem]);
 		activeTab.getItem().createControls(parent);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.views.properties.tabbed.override.tablist.IOverrideTestsTabList#dispose()
-	 */
+	@Override
 	public void dispose() {
 		OverrideTestsTabItem activeTab = (OverrideTestsTabItem) (getTabs()[selectedTabItem]);
 		activeTab.getItem().dispose();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.views.properties.tabbed.IOverridableTabList#getTabs()
-	 */
+	@Override
 	public ITabItem[] getTabs() {
 		IOverrideTestsItem[] items = getItems();
 		OverrideTestsTabItem[] tabs = new OverrideTestsTabItem[items.length];
@@ -88,11 +72,7 @@ public abstract class AbstractTabList implements IOverrideTestsTabList {
 		return tabs;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.views.properties.tabbed.override.tablist.IOverrideTestsTabList#selectionChanged(org.eclipse.ui.tests.views.properties.tabbed.model.Element)
-	 */
+	@Override
 	public void selectionChanged(Element element) {
 		ITabItem[] tabs = getTabs();
 		for (int i = 0; i < tabs.length; i++) {
@@ -103,11 +83,7 @@ public abstract class AbstractTabList implements IOverrideTestsTabList {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.views.properties.tabbed.IOverridableTabList#selectTab(int)
-	 */
+	@Override
 	public void selectTab(int index) {
 		if (selectedTabItem == index) {
 			return;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 IBM Corporation and others.
+ * Copyright (c) 2013, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,10 +27,10 @@ public class CSSPropertyFontDefinitionHandler extends AbstractCSSPropertyFontHan
 		if (element instanceof FontDefinitionElement) {
 			CSS2FontProperties properties = new CSS2FontPropertiesImpl();
 			IFontDefinitionOverridable definition = (IFontDefinitionOverridable) ((FontDefinitionElement) element).getNativeWidget();
-			
+
 			super.applyCSSProperty(properties, property, value, pseudo, engine);
 			setFontProperties(definition, properties);
-		}		
+		}
 		return false;
 	}
 
@@ -39,12 +39,12 @@ public class CSSPropertyFontDefinitionHandler extends AbstractCSSPropertyFontHan
 			String pseudo, CSSEngine engine) throws Exception {
 		return null;
 	}
-	
+
 	private void setFontProperties(IFontDefinitionOverridable definition, CSS2FontProperties properties) {
 		FontData fontData = definition.getValue() != null? definition.getValue()[0]: null;
 		definition.setValue(new FontData[]{CSSSWTFontHelper.getFontData(properties, fontData)});
 	}
-	
+
 	@Override
 	public String retrieveCSSPropertyFontFamily(Object element, String pseudo,
 			CSSEngine engine) throws Exception {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,7 @@ import org.eclipse.ui.navigator.INavigatorContentExtension;
 
 /**
  * @since 3.2
- * 
+ *
  */
 public class ExtensionSequenceNumberComparator implements Comparator {
 
@@ -31,25 +31,20 @@ public class ExtensionSequenceNumberComparator implements Comparator {
 	 * The initialized singleton instance.
 	 */
 	public static final ExtensionSequenceNumberComparator DESCENDING = new ExtensionSequenceNumberComparator(false);
-	
+
 	private final int sortAscending;
-	
+
 	/**
 	 * Creates an instance that sorts according to the given boolean flag.
-	 * 
+	 *
 	 * @param toSortAscending
 	 *            <code>true</code> for ascending sort order or
 	 *            <code>false</code> for descending sort order.
 	 */
 	public ExtensionSequenceNumberComparator(boolean toSortAscending) {
-		sortAscending = toSortAscending ? 1 : -1; 
+		sortAscending = toSortAscending ? 1 : -1;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-	 */
 	@Override
 	public int compare(Object o1, Object o2) {
 

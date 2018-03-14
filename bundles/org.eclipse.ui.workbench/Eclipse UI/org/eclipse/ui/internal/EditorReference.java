@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,8 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Nikolay Botev - bug 240651
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 459964
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -16,7 +18,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import org.eclipse.core.runtime.CoreException;
@@ -35,7 +36,6 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IEditorRegistry;
-import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IElementFactory;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPersistableEditor;
@@ -57,8 +57,9 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 
 	private IEditorInput input;
 	private EditorDescriptor descriptor;
-	private String descriptorId;
-	private IMemento editorState;
+	private final String descriptorId;
+	private final IMemento editorState;
+	private final String factoryId;
 
 	public EditorReference(IEclipseContext windowContext, IWorkbenchPage page, MPart part,
 			IEditorInput input, EditorDescriptor descriptor, IMemento editorState) {
@@ -67,14 +68,22 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 		this.descriptor = descriptor;
 		this.editorState = editorState;
 
+		String factory = null;
 		if (descriptor == null) {
-			try {
 				String memento = getModel().getPersistedState().get(MEMENTO_KEY);
 				if (memento == null) {
 					descriptorId = EditorRegistry.EMPTY_EDITOR_ID;
 				} else {
-					XMLMemento createReadRoot = XMLMemento
-							.createReadRoot(new StringReader(memento));
+					XMLMemento createReadRoot;
+					try {
+						createReadRoot = XMLMemento
+								.createReadRoot(new StringReader(memento));
+					} catch (WorkbenchException e) {
+						WorkbenchPlugin.log(e);
+						descriptorId = EditorRegistry.EMPTY_EDITOR_ID;
+						factoryId = null;
+						return;
+					}
 					IEditorRegistry registry = getPage().getWorkbenchWindow().getWorkbench()
 							.getEditorRegistry();
 					descriptorId = createReadRoot.getString(IWorkbenchConstants.TAG_ID);
@@ -86,13 +95,16 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 					String ttip = createReadRoot.getString(IWorkbenchConstants.TAG_TOOLTIP);
 					part.getTransientData().put(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY,
 							ttip);
+
+					IMemento inputMem = createReadRoot.getChild(IWorkbenchConstants.TAG_INPUT);
+					if (inputMem != null) {
+						factory = inputMem.getString(IWorkbenchConstants.TAG_FACTORY_ID);
+					}
 				}
-			} catch (WorkbenchException e) {
-				WorkbenchPlugin.log(e);
-			}
 		} else {
 			descriptorId = this.descriptor.getId();
 		}
+		factoryId = factory;
 	}
 
 	boolean persist() {
@@ -151,15 +163,13 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 		editorMem.putString(IWorkbenchConstants.TAG_PART_NAME, getPartName());
 
 		if (editor instanceof IWorkbenchPart3) {
-			Map properties = ((IWorkbenchPart3) editor).getPartProperties();
+			Map<String, String> properties = ((IWorkbenchPart3) editor).getPartProperties();
 			if (!properties.isEmpty()) {
 				IMemento propBag = editorMem.createChild(IWorkbenchConstants.TAG_PROPERTIES);
-				Iterator i = properties.entrySet().iterator();
-				while (i.hasNext()) {
-					Map.Entry entry = (Map.Entry) i.next();
+				for (Map.Entry<String, String> entry : properties.entrySet()) {
 					IMemento p = propBag.createChild(IWorkbenchConstants.TAG_PROPERTY,
-							(String) entry.getKey());
-					p.putTextData((String) entry.getValue());
+ entry.getKey());
+					p.putTextData(entry.getValue());
 				}
 			}
 		}
@@ -196,20 +206,7 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 		IEditorPart editor = getEditor(false);
 		if (editor == null) {
 			if (input == null) {
-				String memento = getModel().getPersistedState().get(MEMENTO_KEY);
-				if (memento != null) {
-					try {
-						XMLMemento createReadRoot = XMLMemento.createReadRoot(new StringReader(
-								memento));
-						IMemento inputMem = createReadRoot.getChild(IWorkbenchConstants.TAG_INPUT);
-						if (inputMem != null) {
-							return inputMem.getString(IWorkbenchConstants.TAG_FACTORY_ID);
-						}
-					} catch (WorkbenchException e) {
-						return null;
-					}
-				}
-				return null;
+				return factoryId;
 			}
 
 			IPersistableElement persistable = input.getPersistable();
@@ -288,21 +285,11 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 		return (IEditorInput) input;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IEditorReference#getEditor(boolean)
-	 */
 	@Override
 	public IEditorPart getEditor(boolean restore) {
 		return (IEditorPart) getPart(restore);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IEditorReference#getEditorInput()
-	 */
 	@Override
 	public IEditorInput getEditorInput() throws PartInitException {
 		IEditorPart editor = getEditor(false);
@@ -327,13 +314,6 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 		return input;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.internal.e4.compatibility.WorkbenchPartReference#createPart
-	 * ()
-	 */
 	@Override
 	public IWorkbenchPart createPart() throws PartInitException {
 		try {
@@ -357,7 +337,7 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 	@Override
 	IWorkbenchPart createErrorPart() {
 		IStatus status = new Status(IStatus.ERROR, WorkbenchPlugin.PI_WORKBENCH, NLS.bind(
-				WorkbenchMessages.EditorManager_missing_editor_descriptor, descriptorId));
+				WorkbenchMessages.EditorManager_missing_editor_descriptor, descriptorId), new Exception());
 		IEditorRegistry registry = getPage().getWorkbenchWindow().getWorkbench()
 				.getEditorRegistry();
 		descriptor = (EditorDescriptor) registry.findEditor(EditorRegistry.EMPTY_EDITOR_ID);
@@ -369,13 +349,6 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 		return new ErrorEditorPart(status);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.internal.e4.compatibility.WorkbenchPartReference#initialize
-	 * (org.eclipse.ui.IWorkbenchPart)
-	 */
 	@Override
 	public void initialize(IWorkbenchPart part) throws PartInitException {
 		IConfigurationElement element = descriptor.getConfigurationElement();
@@ -383,8 +356,7 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 		if (element == null) {
 			editorSite.setExtensionId(descriptor.getId());
 		}
-		editorSite.setActionBars(createEditorActionBars((WorkbenchPage) getPage(), descriptor,
-				editorSite));
+		editorSite.setActionBars(createEditorActionBars((WorkbenchPage) getPage(), descriptor));
 		IEditorPart editor = (IEditorPart) part;
 		try {
 			editor.init(editorSite, getEditorInput());
@@ -434,15 +406,14 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 		return null;
 	}
 
-	private static HashMap<String, Set<EditorActionBars>> actionCache = new HashMap<String, Set<EditorActionBars>>();
+	private static HashMap<String, Set<EditorActionBars>> actionCache = new HashMap<>();
 
 	/*
 	 * Creates the action bars for an editor. Editors of the same type should
 	 * share a single editor action bar, so this implementation may return an
 	 * existing action bar vector.
 	 */
-	private static EditorActionBars createEditorActionBars(WorkbenchPage page,
-			EditorDescriptor desc, final IEditorSite site) {
+	private static EditorActionBars createEditorActionBars(WorkbenchPage page, EditorDescriptor desc) {
 		// Get the editor type.
 		String type = desc.getId();
 
@@ -461,7 +432,7 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 		EditorActionBars actionBars = new EditorActionBars(page, page.getWorkbenchWindow(), type);
 		actionBars.addRef();
 		if (candidates == null) {
-			candidates = new HashSet<EditorActionBars>(3);
+			candidates = new HashSet<>(3);
 			candidates.add(actionBars);
 			actionCache.put(type, candidates);
 		} else

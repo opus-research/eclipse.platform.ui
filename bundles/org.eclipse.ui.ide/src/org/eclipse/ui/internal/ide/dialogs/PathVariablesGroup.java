@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *     Serge Beauchamp (Freescale Semiconductor) - [229633] Group and Project Path Variable Support
  *     Helena Halperin (IBM) - bug #299212
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
+ *     Robert Roth <robert.roth.off@gmail.com> - Bug 57371
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
@@ -73,10 +74,12 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
+import com.ibm.icu.text.Collator;
+
 /**
- * A widget group that displays path variables. 
+ * A widget group that displays path variables.
  * Includes buttons to edit, remove existing variables and create new ones.
- * 
+ *
  * @since 2.1
  */
 public class PathVariablesGroup {
@@ -134,7 +137,7 @@ public class PathVariablesGroup {
 
     // if set to true, variables will be saved after each change
     private boolean saveVariablesOnChange = false;
-    
+
     // file image
     private final Image FILE_IMG = PlatformUI.getWorkbench().getSharedImages()
             .getImage(ISharedImages.IMG_OBJ_FILE);
@@ -153,12 +156,12 @@ public class PathVariablesGroup {
     private IResource currentResource = null;
 
     private final static String PARENT_VARIABLE_NAME = "PARENT"; //$NON-NLS-1$
-    
+
 	/**
      * Creates a new PathVariablesGroup.
      *
      * @param multiSelect create a multi select tree
-     * @param variableType the type of variables that are displayed in 
+     * @param variableType the type of variables that are displayed in
      * 	the widget group. <code>IResource.FILE</code> and/or <code>IResource.FOLDER</code>
      * 	logically ORed together.
      */
@@ -168,7 +171,8 @@ public class PathVariablesGroup {
         pathVariableManager = ResourcesPlugin.getWorkspace()
                 .getPathVariableManager();
         removedVariableNames = new HashSet();
-        tempPathVariables = new TreeMap();
+        Collator ignoreCaseComparator = Collator.getInstance();
+        tempPathVariables = new TreeMap(ignoreCaseComparator);
         // initialize internal model
         initTemporaryState();
     }
@@ -177,7 +181,7 @@ public class PathVariablesGroup {
      * Creates a new PathVariablesGroup.
      *
      * @param multiSelect create a multi select tree
-     * @param variableType the type of variables that are displayed in 
+     * @param variableType the type of variables that are displayed in
      * 	the widget group. <code>IResource.FILE</code> and/or <code>IResource.FOLDER</code>
      * 	logically ORed together.
      * @param selectionListener listener notified when the selection changes
@@ -217,9 +221,9 @@ public class PathVariablesGroup {
 
     /**
      * Creates the widget group.
-     * Callers must call <code>dispose</code> when the group is no 
+     * Callers must call <code>dispose</code> when the group is no
      * longer needed.
-     * 
+     *
      * @param parent the widget parent
      * @return container of the widgets
      */
@@ -267,7 +271,7 @@ public class PathVariablesGroup {
         if (multiSelect) {
             tableStyle |= SWT.MULTI;
         }
-        
+
 		Composite tableComposite = new Composite(pageComponent, SWT.NONE);
 		data = new GridData(SWT.FILL, SWT.FILL, true, true);
 		data.grabExcessHorizontalSpace = true;
@@ -276,14 +280,15 @@ public class PathVariablesGroup {
 
 		variableTable = new TableViewer(tableComposite, tableStyle);
         variableTable.getTable().addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 updateEnabledState();
                 if (selectionListener != null) {
 					selectionListener.handleEvent(new Event());
 				}
             }
         });
-        
+
         variableTable.getTable().setFont(font);
 		ColumnViewerToolTipSupport.enableFor(variableTable, ToolTip.NO_RECREATE);
 
@@ -294,7 +299,7 @@ public class PathVariablesGroup {
         TableViewerColumn valueColumn = new TableViewerColumn(variableTable, SWT.NONE);
         valueColumn.setLabelProvider(new ValueLabelProvider());
         valueColumn.getColumn().setText(IDEWorkbenchMessages.PathVariablesBlock_valueColumn);
-        
+
         TableColumnLayout tableLayout = new TableColumnLayout();
 		tableComposite.setLayout( tableLayout );
 
@@ -308,23 +313,28 @@ public class PathVariablesGroup {
         variableTable.getTable().setFont(font);
 
         variableTable.getTable().addMouseListener(new MouseListener() {
+			@Override
 			public void mouseDoubleClick(MouseEvent e) {
 		        int itemsSelectedCount = variableTable.getTable().getSelectionCount();
 		        if (itemsSelectedCount == 1 && canChangeSelection())
 		        	editSelectedVariable();
 			}
+			@Override
 			public void mouseDown(MouseEvent e) { }
+			@Override
 			public void mouseUp(MouseEvent e) { }
         });
         variableTable.getTable().addSelectionListener(new SelectionListener() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 		        updateEnabledState();
 			}
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 		        updateEnabledState();
 			}
         });
-        
+
         variableTable.getTable().setToolTipText(null);
         variableTable.setContentProvider(new ContentProvider());
         variableTable.setInput(this);
@@ -334,22 +344,27 @@ public class PathVariablesGroup {
 
     class NameLabelProvider extends CellLabelProvider
     {
+		@Override
 		public String getToolTipText(Object element) {
             return null;
 		}
 
+		@Override
 		public Point getToolTipShift(Object object) {
 			return new Point(5, 5);
 		}
 
+		@Override
 		public int getToolTipDisplayDelayTime(Object object) {
 			return 0;
 		}
 
+		@Override
 		public int getToolTipTimeDisplayed(Object object) {
 			return 15000;
 		}
 
+		@Override
 		public void update(ViewerCell cell) {
 			String varName = (String) cell.getElement();
 			cell.setText(varName);
@@ -362,11 +377,12 @@ public class PathVariablesGroup {
             else
             	cell.setImage(BUILTIN_IMG);
 		}
-    	
+
     }
-    
+
     class ValueLabelProvider extends CellLabelProvider
     {
+		@Override
 		public String getToolTipText(Object element) {
             IPath value = (IPath) tempPathVariables.get(element);
         	URI resolvedURI = pathVariableManager.resolveURI(URIUtil.toURI(value));
@@ -374,27 +390,31 @@ public class PathVariablesGroup {
             return TextProcessor.process(resolvedValue.toOSString());
 		}
 
+		@Override
 		public Point getToolTipShift(Object object) {
 			return new Point(5, 5);
 		}
 
+		@Override
 		public int getToolTipDisplayDelayTime(Object object) {
 			return 0;
 		}
 
+		@Override
 		public int getToolTipTimeDisplayed(Object object) {
 			return 15000;
 		}
 
+		@Override
 		public void update(ViewerCell cell) {
             IPath value = (IPath) tempPathVariables.get(cell.getElement());
 			cell.setText(TextProcessor.process(removeParentVariable(value.toOSString())));
 		}
-    	
+
     }
 
 	/**
-     * Disposes the group's resources. 
+     * Disposes the group's resources.
      */
     public void dispose() {
         if (imageUnkown != null) {
@@ -445,9 +465,9 @@ public class PathVariablesGroup {
 
     /**
      * Returns the enabled state of the group's widgets.
-     * Returns <code>true</code> if called prior to calling 
+     * Returns <code>true</code> if called prior to calling
      * <code>createContents</code>.
-     * 
+     *
      * @return boolean the enabled state of the group's widgets.
      * 	 <code>true</code> if called prior to calling <code>createContents</code>.
      */
@@ -460,14 +480,14 @@ public class PathVariablesGroup {
 
     /**
      * Automatically save the path variable list when new variables
-     * are added, changed, or removed by the user. 
-     * @param value 
+     * are added, changed, or removed by the user.
+     * @param value
      *
      */
     public void setSaveVariablesOnChange(boolean value) {
     	saveVariablesOnChange = value;
     }
-    
+
     private void saveVariablesIfRequired() {
     	if (saveVariablesOnChange) {
     		performOk();
@@ -475,9 +495,9 @@ public class PathVariablesGroup {
     }
     /**
      * Returns the selected variables.
-     *  
-     * @return the selected variables. Returns an empty array if 
-     * 	the widget group has not been created yet by calling 
+     *
+     * @return the selected variables. Returns an empty array if
+     * 	the widget group has not been created yet by calling
      * 	<code>createContents</code>
      */
     public PathVariableElement[] getSelection() {
@@ -498,7 +518,7 @@ public class PathVariablesGroup {
 
     /**
      * Creates the add/edit/remove buttons
-     * 
+     *
      * @param parent the widget parent
      */
     private void createButtonGroup(Composite parent) {
@@ -517,7 +537,8 @@ public class PathVariablesGroup {
         addButton = new Button(groupComponent, SWT.PUSH);
         addButton.setText(IDEWorkbenchMessages.PathVariablesBlock_addVariableButton);
         addButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 addNewVariable();
             }
         });
@@ -527,7 +548,8 @@ public class PathVariablesGroup {
         editButton = new Button(groupComponent, SWT.PUSH);
         editButton.setText(IDEWorkbenchMessages.PathVariablesBlock_editVariableButton);
         editButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 editSelectedVariable();
             }
         });
@@ -537,7 +559,8 @@ public class PathVariablesGroup {
         removeButton = new Button(groupComponent, SWT.PUSH);
         removeButton.setText(IDEWorkbenchMessages.PathVariablesBlock_removeVariableButton);
         removeButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 removeSelectedVariables();
             }
         });
@@ -550,7 +573,7 @@ public class PathVariablesGroup {
      * Initializes the computation of horizontal and vertical dialog units
      * based on the size of current font.
      * <p>
-     * This method must be called before <code>setButtonLayoutData</code> 
+     * This method must be called before <code>setButtonLayoutData</code>
      * is called.
      * </p>
      *
@@ -608,12 +631,15 @@ public class PathVariablesGroup {
 
 	private class ContentProvider implements IStructuredContentProvider {
 
+		@Override
 		public Object[] getElements(Object inputElement) {
 			return tempPathVariables.keySet().toArray();
 		}
-		
+
+		@Override
 		public void dispose() { }
-		
+
+		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) { }
 	}
 
@@ -625,7 +651,7 @@ public class PathVariablesGroup {
     private String removeParentVariable(String value) {
     	return pathVariableManager.convertToUserEditableFormat(value, false);
     }
-    
+
     /**
      * Commits the temporary state to the path variable manager in response to user
      * confirmation.
@@ -634,7 +660,7 @@ public class PathVariablesGroup {
      */
     public boolean performOk() {
         try {
-            // first process removed variables  
+            // first process removed variables
             for (Iterator removed = removedVariableNames.iterator(); removed
                     .hasNext();) {
                 String removedVariableName = (String) removed.next();
@@ -724,7 +750,7 @@ public class PathVariablesGroup {
     /**
      * Sets the enabled state of the group's widgets.
      * Does nothing if called prior to calling <code>createContents</code>.
-     * 
+     *
      * @param enabled the new enabled state of the group's widgets
      */
     public void setEnabled(boolean enabled) {
@@ -742,11 +768,11 @@ public class PathVariablesGroup {
     }
 
     /**
-     * Updates the widget's current state: refreshes the table with the current 
-     * defined variables, selects the item corresponding to the given variable 
-     * (selects the first item if <code>null</code> is provided) and updates 
+     * Updates the widget's current state: refreshes the table with the current
+     * defined variables, selects the item corresponding to the given variable
+     * (selects the first item if <code>null</code> is provided) and updates
      * the enabled state for the Add/Remove/Edit buttons.
-     * 
+     *
      */
     private void updateWidgetState() {
     	variableTable.refresh();

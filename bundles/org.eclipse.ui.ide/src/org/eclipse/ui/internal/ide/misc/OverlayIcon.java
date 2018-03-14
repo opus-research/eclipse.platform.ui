@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -70,7 +70,8 @@ public class OverlayIcon extends CompositeImageDescriptor {
     /**
      * @see CompositeImageDescriptor#drawCompositeImage(int, int)
      */
-    protected void drawCompositeImage(int width, int height) {
+    @Override
+	protected void drawCompositeImage(int width, int height) {
         ImageData bg;
         if (fBase == null || (bg = fBase.getImageData()) == null) {
 			bg = DEFAULT_IMAGE_DATA;
@@ -129,7 +130,8 @@ public class OverlayIcon extends CompositeImageDescriptor {
     /**
      * @see CompositeImageDescriptor#getSize()
      */
-    protected Point getSize() {
+    @Override
+	protected Point getSize() {
         return fSize;
     }
 }

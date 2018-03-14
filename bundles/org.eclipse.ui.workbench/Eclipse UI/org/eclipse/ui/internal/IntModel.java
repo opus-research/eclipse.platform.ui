@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2006 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,7 +23,7 @@ public class IntModel extends Model {
     /**
      * Sets the value of the integer and notifies all
      * change listeners except for the one that caused the change.
-     * 
+     *
      * @param newValue the new value of the integer
      */
     public void set(int newValue, IChangeListener source) {
@@ -33,7 +33,7 @@ public class IntModel extends Model {
     /**
      * Sets the value of the integer and notifies all change listeners
      * of the change.
-     * 
+     *
      * @param newValue the new value of the integer
      */
     public void set(int newValue) {
@@ -42,7 +42,7 @@ public class IntModel extends Model {
 
     /**
      * Returns the value of the integer.
-     * 
+     *
      * @return the value of the integer
      */
     public int get() {

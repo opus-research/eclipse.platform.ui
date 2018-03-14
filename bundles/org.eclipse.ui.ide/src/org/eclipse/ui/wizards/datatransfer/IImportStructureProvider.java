@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2007 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,7 @@ import java.io.InputStream;
 import java.util.List;
 
 /**
- * Interface which can provide structure and content information 
+ * Interface which can provide structure and content information
  * for an element (for example, a file system element).
  * Used by the import wizards to abstract the commonalities
  * between importing from the file system and importing from an archive.
@@ -22,9 +22,9 @@ import java.util.List;
 public interface IImportStructureProvider {
     /**
      * Returns a collection with the children of the specified structured element.
-     * 
+     *
      * @param element the element for which to compute the children
-     * @return the list of child elements 
+     * @return the list of child elements
      */
     List getChildren(Object element);
 

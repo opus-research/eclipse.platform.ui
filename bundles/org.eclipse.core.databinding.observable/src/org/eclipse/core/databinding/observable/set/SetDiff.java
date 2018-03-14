@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bugs 251884, 194734, 301774
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.set;
@@ -20,24 +21,27 @@ import java.util.Set;
 import org.eclipse.core.databinding.observable.IDiff;
 
 /**
+ * Describes the difference between two sets
+ *
+ * @param <E>
+ *            the type of elements in this diff
  * @since 1.0
- * 
  */
-public abstract class SetDiff implements IDiff {
+public abstract class SetDiff<E> implements IDiff {
 
 	/**
 	 * @return the set of added elements
 	 */
-	public abstract Set getAdditions();
+	public abstract Set<E> getAdditions();
 
 	/**
 	 * @return the set of removed elements
 	 */
-	public abstract Set getRemovals();
+	public abstract Set<E> getRemovals();
 
 	/**
 	 * Returns true if the diff has no added or removed elements.
-	 * 
+	 *
 	 * @return true if the diff has no added or removed elements.
 	 * @since 1.2
 	 */
@@ -47,12 +51,12 @@ public abstract class SetDiff implements IDiff {
 
 	/**
 	 * Applies the changes in this diff to the given set
-	 * 
+	 *
 	 * @param set
 	 *            the set to which the diff will be applied
 	 * @since 1.2
 	 */
-	public void applyTo(Set set) {
+	public void applyTo(Set<E> set) {
 		set.addAll(getAdditions());
 		set.removeAll(getRemovals());
 	}
@@ -65,42 +69,45 @@ public abstract class SetDiff implements IDiff {
 	 * <p>
 	 * <b>Note</b>:the returned list is only guaranteed to be valid while the
 	 * passed in set remains unchanged.
-	 * 
+	 *
 	 * @param set
 	 *            the set over which the diff will be simulated
 	 * @return a {@link Set} showing what <code>set</code> would look like if it
 	 *         were passed to the {@link #applyTo(Set)} method.
 	 * @since 1.3
 	 */
-	public Set simulateOn(Set set) {
-		return new DeltaSet(set, this);
+	public Set<E> simulateOn(Set<E> set) {
+		return new DeltaSet<>(set, this);
 	}
 
-	private static class DeltaSet extends AbstractSet {
-		private Set original;
-		private final SetDiff diff;
+	private static class DeltaSet<E> extends AbstractSet<E> {
+		private Set<E> original;
+		private final SetDiff<E> diff;
 
-		public DeltaSet(Set original, SetDiff diff) {
+		public DeltaSet(Set<E> original, SetDiff<E> diff) {
 			this.original = original;
 			this.diff = diff;
 		}
 
-		public Iterator iterator() {
-			return new Iterator() {
-				Iterator orig = original.iterator();
-				Iterator add = diff.getAdditions().iterator();
+		@Override
+		public Iterator<E> iterator() {
+			return new Iterator<E>() {
+				Iterator<E> orig = original.iterator();
+				Iterator<E> add = diff.getAdditions().iterator();
 
 				boolean haveNext = false;
-				Object next;
+				E next;
 
+				@Override
 				public boolean hasNext() {
 					return findNext();
 				}
 
-				public Object next() {
+				@Override
+				public E next() {
 					if (!findNext())
 						throw new NoSuchElementException();
-					Object myNext = next;
+					E myNext = next;
 					haveNext = false;
 					next = null;
 					return myNext;
@@ -110,7 +117,7 @@ public abstract class SetDiff implements IDiff {
 					if (haveNext)
 						return true;
 					while (true) {
-						Object candidate;
+						E candidate;
 						if (orig.hasNext())
 							candidate = orig.next();
 						else if (add.hasNext())
@@ -127,17 +134,20 @@ public abstract class SetDiff implements IDiff {
 					}
 				}
 
+				@Override
 				public void remove() {
 					throw new UnsupportedOperationException();
 				}
 			};
 		}
 
+		@Override
 		public boolean contains(Object o) {
 			return (original.contains(o) || diff.getAdditions().contains(o))
 					&& !diff.getRemovals().contains(o);
 		}
 
+		@Override
 		public int size() {
 			return original.size() + diff.getAdditions().size()
 					- diff.getRemovals().size();
@@ -147,16 +157,14 @@ public abstract class SetDiff implements IDiff {
 	/**
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString() {
 		StringBuffer buffer = new StringBuffer();
-		buffer.append(getClass().getName()).append("{additions [") //$NON-NLS-1$
-				.append(
-						getAdditions() != null ? getAdditions().toString()
-								: "null") //$NON-NLS-1$
+		buffer.append(getClass().getName())
+				.append("{additions [") //$NON-NLS-1$
+				.append(getAdditions() != null ? getAdditions().toString() : "null") //$NON-NLS-1$
 				.append("], removals [") //$NON-NLS-1$
-				.append(
-						getRemovals() != null ? getRemovals().toString()
-								: "null") //$NON-NLS-1$
+				.append(getRemovals() != null ? getRemovals().toString() : "null") //$NON-NLS-1$
 				.append("]}"); //$NON-NLS-1$
 
 		return buffer.toString();

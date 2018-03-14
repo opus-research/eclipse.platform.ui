@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2015 IBM Corporation and others.
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,9 +24,9 @@ import org.eclipse.swt.widgets.Composite;
  * {@link TableViewer}) based on an {@link IPropertySourceProvider},
  * forwarding requests to the {@link IPropertySource} or
  * {@link IPropertyDescriptor} for the given property ID.
- * 
+ *
  * @since 3.3
- * 
+ *
  * @see PropertyColumnLabelProvider
  */
 public class PropertyEditingSupport extends EditingSupport {
@@ -36,7 +36,7 @@ public class PropertyEditingSupport extends EditingSupport {
 	/**
 	 * Creates a new instance to be used with the given viewer, based on the
 	 * given property source provider and property ID.
-	 * 
+	 *
 	 * @param viewer
 	 *            the column viewer
 	 * @param propertySourceProvider
@@ -51,13 +51,13 @@ public class PropertyEditingSupport extends EditingSupport {
 		this.propertyID = propertyID;
 	}
 
+	@Override
 	protected boolean canEdit(Object object) {
 		IPropertySource propertySource = propertySourceProvider
 				.getPropertySource(object);
 		IPropertyDescriptor[] propertyDescriptors = propertySource
 				.getPropertyDescriptors();
-		for (int i = 0; i < propertyDescriptors.length; i++) {
-			IPropertyDescriptor propertyDescriptor = propertyDescriptors[i];
+		for (IPropertyDescriptor propertyDescriptor : propertyDescriptors) {
 			if (propertyID.equals(propertyDescriptor.getId())) {
 				return true;
 			}
@@ -65,13 +65,13 @@ public class PropertyEditingSupport extends EditingSupport {
 		return false;
 	}
 
+	@Override
 	protected CellEditor getCellEditor(Object object) {
 		IPropertySource propertySource = propertySourceProvider
 				.getPropertySource(object);
 		IPropertyDescriptor[] propertyDescriptors = propertySource
 				.getPropertyDescriptors();
-		for (int i = 0; i < propertyDescriptors.length; i++) {
-			IPropertyDescriptor propertyDescriptor = propertyDescriptors[i];
+		for (IPropertyDescriptor propertyDescriptor : propertyDescriptors) {
 			if (propertyID.equals(propertyDescriptor.getId())) {
 				return propertyDescriptor
 						.createPropertyEditor((Composite) getViewer()
@@ -81,6 +81,7 @@ public class PropertyEditingSupport extends EditingSupport {
 		return null;
 	}
 
+	@Override
 	protected Object getValue(Object object) {
 		IPropertySource propertySource = propertySourceProvider
 				.getPropertySource(object);
@@ -93,6 +94,7 @@ public class PropertyEditingSupport extends EditingSupport {
 		return value;
 	}
 
+	@Override
 	protected void setValue(Object object, Object value) {
 		IPropertySource propertySource = propertySourceProvider
 				.getPropertySource(object);

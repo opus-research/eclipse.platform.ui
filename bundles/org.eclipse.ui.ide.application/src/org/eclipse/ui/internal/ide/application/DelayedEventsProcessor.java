@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -55,9 +55,7 @@ public class DelayedEventsProcessor implements Listener {
 		display.addListener(SWT.OpenDocument, this);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
-	 */
+	@Override
 	public void handleEvent(Event event) {
 		final String path = event.text;
 		if (path == null)
@@ -66,15 +64,15 @@ public class DelayedEventsProcessor implements Listener {
 		// line will need to be in a "synchronized" block:
 		filesToOpen.add(path);
 	}
-	
+
 	/**
 	 * Process delayed events.
-	 * @param display display associated with the workbench 
+	 * @param display display associated with the workbench
 	 */
 	public void catchUp(Display display) {
 		if (filesToOpen.isEmpty())
 			return;
-		
+
 		// If we start supporting events that can arrive on a non-UI thread, the following
 		// lines will need to be in a "synchronized" block:
 		String[] filePaths = new String[filesToOpen.size()];
@@ -88,6 +86,7 @@ public class DelayedEventsProcessor implements Listener {
 
 	private void openFile(Display display, final String path) {
 		display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 				if (window == null)

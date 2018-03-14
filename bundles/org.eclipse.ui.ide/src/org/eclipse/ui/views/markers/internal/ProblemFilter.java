@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 
 package org.eclipse.ui.views.markers.internal;
@@ -26,7 +27,7 @@ import org.eclipse.ui.internal.views.markers.MarkerSupportInternalUtilities;
 
 /**
  * ProblemFilters are the filters used in the problems view.
- * 
+ *
  */
 public class ProblemFilter extends MarkerFilter {
 
@@ -48,7 +49,7 @@ public class ProblemFilter extends MarkerFilter {
 
 	final static boolean DEFAULT_CONTAINS = true;
 
-	final static String DEFAULT_DESCRIPTION = ""; //$NON-NLS-1$	
+	final static String DEFAULT_DESCRIPTION = ""; //$NON-NLS-1$
 
 	final static boolean DEFAULT_SELECT_BY_SEVERITY = false;
 
@@ -83,7 +84,7 @@ public class ProblemFilter extends MarkerFilter {
 
 	/**
 	 * Create a new instance of the receiver with name filterName.
-	 * 
+	 *
 	 * @param filterName
 	 *            A human readable name for the filter.
 	 */
@@ -104,6 +105,7 @@ public class ProblemFilter extends MarkerFilter {
 
 	}
 
+	@Override
 	public boolean selectMarker(ConcreteMarker marker) {
 		if (!(marker instanceof ProblemMarker)) {
 			return false;
@@ -144,7 +146,7 @@ public class ProblemFilter extends MarkerFilter {
 
 	/**
 	 * Get the value for if there is a check for containing a phrase.
-	 * 
+	 *
 	 * @return boolean
 	 */
 	public boolean getContains() {
@@ -153,7 +155,7 @@ public class ProblemFilter extends MarkerFilter {
 
 	/**
 	 * Get the value for the description.
-	 * 
+	 *
 	 * @return boolean
 	 */
 	public String getDescription() {
@@ -162,7 +164,7 @@ public class ProblemFilter extends MarkerFilter {
 
 	/**
 	 * Get the value for if there is a check for severity.
-	 * 
+	 *
 	 * @return boolean
 	 */
 	public boolean getSelectBySeverity() {
@@ -171,7 +173,7 @@ public class ProblemFilter extends MarkerFilter {
 
 	/**
 	 * Get the value for if there is a severity.
-	 * 
+	 *
 	 * @return boolean
 	 */
 	public int getSeverity() {
@@ -180,7 +182,7 @@ public class ProblemFilter extends MarkerFilter {
 
 	/**
 	 * Set the value for if there is a check for containing a phrase.
-	 * 
+	 *
 	 * @param contains
 	 */
 	public void setContains(boolean contains) {
@@ -189,7 +191,7 @@ public class ProblemFilter extends MarkerFilter {
 
 	/**
 	 * Set the value for the description.
-	 * 
+	 *
 	 * @param description
 	 */
 	public void setDescription(String description) {
@@ -198,7 +200,7 @@ public class ProblemFilter extends MarkerFilter {
 
 	/**
 	 * Set the value for if there is a check for severity
-	 * 
+	 *
 	 * @param selectBySeverity
 	 */
 	public void setSelectBySeverity(boolean selectBySeverity) {
@@ -207,18 +209,14 @@ public class ProblemFilter extends MarkerFilter {
 
 	/**
 	 * Set the value for the severity to match against.
-	 * 
+	 *
 	 * @param severity
 	 */
 	public void setSeverity(int severity) {
 		this.severity = severity;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.views.markers.internal.MarkerFilter#resetState()
-	 */
+	@Override
 	public void resetState() {
 		super.resetState();
 		contains = DEFAULT_CONTAINS;
@@ -227,11 +225,7 @@ public class ProblemFilter extends MarkerFilter {
 		severity = DEFAULT_SEVERITY;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.views.markers.internal.MarkerFilter#restoreFilterSettings(org.eclipse.jface.dialogs.IDialogSettings)
-	 */
+	@Override
 	public void restoreFilterSettings(IDialogSettings settings) {
 
 		super.restoreFilterSettings(settings);
@@ -239,19 +233,19 @@ public class ProblemFilter extends MarkerFilter {
 		String setting = settings.get(TAG_CONTAINS);
 
 		if (setting != null) {
-			contains = Boolean.valueOf(setting).booleanValue();
+			contains = Boolean.parseBoolean(setting);
 		}
 
 		setting = settings.get(TAG_DESCRIPTION);
 
 		if (setting != null) {
-			description = new String(setting);
+			description = setting;
 		}
 
 		setting = settings.get(TAG_SELECT_BY_SEVERITY);
 
 		if (setting != null) {
-			selectBySeverity = Boolean.valueOf(setting).booleanValue();
+			selectBySeverity = Boolean.parseBoolean(setting);
 		}
 
 		setting = settings.get(TAG_SEVERITY);
@@ -265,11 +259,7 @@ public class ProblemFilter extends MarkerFilter {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.views.markers.internal.MarkerFilter#restoreFilterSettings(org.eclipse.ui.IMemento)
-	 */
+	@Override
 	protected void restoreFilterSettings(IMemento memento) {
 
 		super.restoreFilterSettings(memento);
@@ -277,19 +267,19 @@ public class ProblemFilter extends MarkerFilter {
 		String setting = memento.getString(TAG_CONTAINS);
 
 		if (setting != null) {
-			contains = Boolean.valueOf(setting).booleanValue();
+			contains = Boolean.parseBoolean(setting);
 		}
 
 		setting = memento.getString(TAG_DESCRIPTION);
 
 		if (setting != null) {
-			description = new String(setting);
+			description = setting;
 		}
 
 		setting = memento.getString(TAG_SELECT_BY_SEVERITY);
 
 		if (setting != null) {
-			selectBySeverity = Boolean.valueOf(setting).booleanValue();
+			selectBySeverity = Boolean.parseBoolean(setting);
 		}
 
 		Integer severitySetting = memento.getInteger(TAG_SEVERITY);
@@ -299,11 +289,7 @@ public class ProblemFilter extends MarkerFilter {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.views.markers.internal.MarkerFilter#saveFilterSettings(org.eclipse.ui.IMemento)
-	 */
+	@Override
 	public void saveFilterSettings(IMemento settings) {
 		super.saveFilterSettings(settings);
 		settings.putString(TAG_CONTAINS, String.valueOf(contains));
@@ -317,7 +303,7 @@ public class ProblemFilter extends MarkerFilter {
 	/**
 	 * Get the id of the filter. <code>null</code> if the filter is user
 	 * defined.
-	 * 
+	 *
 	 * @return String
 	 */
 	public String getId() {
@@ -331,20 +317,12 @@ public class ProblemFilter extends MarkerFilter {
 		final String id = element.getAttribute(MarkerSupportInternalUtilities.ATTRIBUTE_ID);
 		final String namespace = element.getNamespace();
 		contributionDescriptor = new IPluginContribution() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.ui.IPluginContribution#getLocalId()
-			 */
+			@Override
 			public String getLocalId() {
 				return id;
 			}
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.ui.IPluginContribution#getPluginId()
-			 */
+			@Override
 			public String getPluginId() {
 				return namespace;
 			}
@@ -354,7 +332,7 @@ public class ProblemFilter extends MarkerFilter {
 	/**
 	 * Return whether or not the receiver will be filtered out due to an
 	 * activity match.
-	 * 
+	 *
 	 * @return boolean <code>true</code> if it is filtered out.
 	 */
 	public boolean isFilteredOutByActivity() {
@@ -368,6 +346,7 @@ public class ProblemFilter extends MarkerFilter {
 		return !identifier.isEnabled();
 	}
 
+	@Override
 	public boolean isEnabled() {
 		return super.isEnabled() && !isFilteredOutByActivity();
 	}

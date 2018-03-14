@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 Brad Reynolds and others.
+ * Copyright (c) 2006, 2015 Brad Reynolds and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Brad Reynolds - initial API and implementation
  *     Matthew Hall - bug 260329
+ *     Patrik Suzzi - 479848
  ******************************************************************************/
 
 package org.eclipse.jface.examples.databinding.snippets;
@@ -19,7 +20,8 @@ import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.ComputedValue;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
@@ -33,7 +35,7 @@ import org.eclipse.swt.widgets.Text;
 /**
  * Snippet that demostrates a simple use case using ComputedValue to format a
  * name as the user enters first and last name.
- * 
+ *
  * @since 3.2
  */
 public class Snippet008ComputedValue {
@@ -42,7 +44,7 @@ public class Snippet008ComputedValue {
 	 */
 	public static void main(String[] args) {
 		final Display display = new Display();
-		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
+		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
 			@Override
 			public void run() {
 				Shell shell = new Shell(display);
@@ -53,10 +55,8 @@ public class Snippet008ComputedValue {
 
 				// Bind the UI to the Data.
 				DataBindingContext dbc = new DataBindingContext();
-				dbc.bindValue(SWTObservables.observeText(ui.firstName,
-						SWT.Modify), data.firstName);
-				dbc.bindValue(SWTObservables.observeText(ui.lastName,
-						SWT.Modify), data.lastName);
+				dbc.bindValue(WidgetProperties.text(SWT.Modify).observe(ui.firstName), data.firstName);
+				dbc.bindValue(WidgetProperties.text(SWT.Modify).observe(ui.lastName), data.lastName);
 
 				// Construct the formatted name observable.
 				FormattedName formattedName = new FormattedName(data.firstName,
@@ -64,8 +64,8 @@ public class Snippet008ComputedValue {
 
 				// Bind the formatted name Text to the formatted name
 				// observable.
-				dbc.bindValue(SWTObservables.observeText(ui.formattedName,
-						SWT.None), formattedName, new UpdateValueStrategy(false, UpdateValueStrategy.POLICY_NEVER), null);
+				dbc.bindValue(WidgetProperties.text(SWT.None).observe(ui.formattedName), formattedName,
+						new UpdateValueStrategy(false, UpdateValueStrategy.POLICY_NEVER), null);
 
 				shell.pack();
 				shell.open();
@@ -89,7 +89,7 @@ public class Snippet008ComputedValue {
 	 * queried. It then exposes those observables and <code>ComputedValue</code>
 	 * can listen to changes in those objects and react accordingly.
 	 * </p>
-	 * 
+	 *
 	 * @since 3.2
 	 */
 	static class FormattedName extends ComputedValue {
@@ -131,7 +131,7 @@ public class Snippet008ComputedValue {
 
 	/**
 	 * Composite that creates the UI.
-	 * 
+	 *
 	 * @since 3.2
 	 */
 	static class UI extends Composite {

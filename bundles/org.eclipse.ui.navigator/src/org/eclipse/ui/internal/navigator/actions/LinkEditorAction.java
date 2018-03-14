@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2013 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -42,7 +42,7 @@ import org.eclipse.ui.progress.UIJob;
 
 /**
  * This action links the activate editor with the Navigator selection.
- * 
+ *
  * @since 3.2
  */
 public class LinkEditorAction extends Action implements
@@ -58,7 +58,7 @@ public class LinkEditorAction extends Action implements
 
 	private boolean ignoreSelectionChanged;
 	private boolean ignoreEditorActivation;
-	
+
 	private UIJob activateEditorJob = new UIJob(
 			CommonNavigatorMessages.Link_With_Editor_Job_) {
 		@Override
@@ -125,7 +125,7 @@ public class LinkEditorAction extends Action implements
 
 	/**
 	 * Create a LinkEditorAction for the given navigator and viewer.
-	 * 
+	 *
 	 * @param aNavigator
 	 *            The navigator which defines whether linking is enabled and
 	 *            implements {@link ISetSelectionTarget}.
@@ -190,7 +190,7 @@ public class LinkEditorAction extends Action implements
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void dispose() {
 		commonNavigator.removePropertyListener(this);
@@ -210,11 +210,6 @@ public class LinkEditorAction extends Action implements
 		commonNavigator.setLinkingEnabled(!commonNavigator.isLinkingEnabled());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.ISelectionChangedList
-	 */
 	@Override
 	public void selectionChanged(SelectionChangedEvent event) {
 		if (commonNavigator.isLinkingEnabled() && !ignoreSelectionChanged) {
@@ -237,12 +232,6 @@ public class LinkEditorAction extends Action implements
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IPropertyListener#propertyChanged(java.lang.Object,
-	 *      int)
-	 */
 	@Override
 	public void propertyChanged(Object aSource, int aPropertyId) {
 		switch (aPropertyId) {

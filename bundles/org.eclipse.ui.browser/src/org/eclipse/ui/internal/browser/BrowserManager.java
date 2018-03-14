@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2011 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,17 +28,17 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChange
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 /**
- * 
+ *
  */
 public class BrowserManager extends Observable {
 	protected List<IBrowserDescriptor> browsers;
 	protected IBrowserDescriptor currentBrowser;
-	
+
 	private IPreferenceChangeListener pcl;
 	protected boolean ignorePreferenceChanges = false;
 
 	protected static BrowserManager instance;
-	
+
 	public static BrowserManager getInstance() {
 		if (instance == null)
 			instance = new BrowserManager();
@@ -48,6 +48,7 @@ public class BrowserManager extends Observable {
 	private BrowserManager() {
 		pcl = new IEclipsePreferences.IPreferenceChangeListener() {
 
+			@Override
 			public void preferenceChange(PreferenceChangeEvent event) {
 				String property = event.getKey();
 				if (!ignorePreferenceChanges && property.equals("browsers")) { //$NON-NLS-1$
@@ -59,7 +60,7 @@ public class BrowserManager extends Observable {
 				}
 			}
 		};
-		
+
 
 	    IScopeContext instanceScope = InstanceScope.INSTANCE;
 	    IEclipsePreferences prefs = instanceScope.getNode(WebBrowserUIPlugin.PLUGIN_ID);
@@ -80,31 +81,31 @@ public class BrowserManager extends Observable {
 
 	public IBrowserDescriptorWorkingCopy createExternalWebBrowser() {
 		return new BrowserDescriptorWorkingCopy();
-	}	
+	}
 
 	public List<IBrowserDescriptor> getWebBrowsers() {
 		if (browsers == null)
 			loadBrowsers();
-		return new ArrayList<IBrowserDescriptor>(browsers);
+		return new ArrayList<>(browsers);
 	}
 
 	public void loadBrowsers() {
 		Trace.trace(Trace.FINEST, "Loading web browsers"); //$NON-NLS-1$
-		
+
 		String xmlString = Platform.getPreferencesService().getString
 		    (WebBrowserUIPlugin.PLUGIN_ID,  "browsers", null, null); //$NON-NLS-1$
 		if (xmlString != null && xmlString.length() > 0) {
-			browsers = new ArrayList<IBrowserDescriptor>();
-			
+			browsers = new ArrayList<>();
+
 			try {
 				ByteArrayInputStream in = new ByteArrayInputStream(xmlString.getBytes("utf-8")); //$NON-NLS-1$
 				Reader reader = new InputStreamReader(in, "utf-8"); //$NON-NLS-1$
 				IMemento memento = XMLMemento.createReadRoot(reader);
-				
+
 				IMemento system = memento.getChild("system"); //$NON-NLS-1$
 				if (system != null && WebBrowserUtil.canUseSystemBrowser())
 					browsers.add(new SystemBrowserDescriptor());
-				
+
 				IMemento[] children = memento.getChildren("external"); //$NON-NLS-1$
 				int size = children.length;
 				for (int i = 0; i < size; i++) {
@@ -112,15 +113,15 @@ public class BrowserManager extends Observable {
 					browser.load(children[i]);
 					browsers.add(browser);
 				}
-				
+
 				Integer current = memento.getInteger("current"); //$NON-NLS-1$
 				if (current != null) {
-					currentBrowser = browsers.get(current.intValue()); 
+					currentBrowser = browsers.get(current.intValue());
 				}
 			} catch (Exception e) {
 				Trace.trace(Trace.WARNING, "Could not load browsers: " + e.getMessage()); //$NON-NLS-1$
 			}
-			
+
 			IBrowserDescriptor system = new SystemBrowserDescriptor();
 			if (WebBrowserUtil.canUseSystemBrowser() && !browsers.contains(system)) {
 				browsers.add(0, system);
@@ -131,7 +132,7 @@ public class BrowserManager extends Observable {
 			setupDefaultBrowsers();
 			saveBrowsers();
 		}
-		
+
 		if (currentBrowser == null && browsers.size() > 0)
 			currentBrowser = browsers.get(0);
 		setChanged();
@@ -154,7 +155,7 @@ public class BrowserManager extends Observable {
 					memento.createChild("system"); //$NON-NLS-1$
 				}
 			}
-			
+
 			memento.putInteger("current", browsers.indexOf(currentBrowser)); //$NON-NLS-1$
 
 			StringWriter writer = new StringWriter();
@@ -171,17 +172,17 @@ public class BrowserManager extends Observable {
 	}
 
 	protected void setupDefaultBrowsers() {
-		browsers = new ArrayList<IBrowserDescriptor>();
+		browsers = new ArrayList<>();
 
 		// add system browser
 		if (WebBrowserUtil.canUseSystemBrowser()) {
 			IBrowserDescriptor system = new SystemBrowserDescriptor();
 			browsers.add(system);
 		}
-		
+
 		// handle all the EXTERNAL browsers by criteria and add those too at startup
 		WebBrowserUtil.addFoundBrowsers(browsers);
-		
+
 		// by default, if internal is there, that is current, else set the first external one
 		if (!browsers.isEmpty() && currentBrowser == null)
 			currentBrowser = browsers.get(0);
@@ -200,7 +201,7 @@ public class BrowserManager extends Observable {
 		if (browsers == null)
 			loadBrowsers();
 		browsers.remove(browser);
-		
+
 		if (currentBrowser == null || currentBrowser.equals(browser)) {
 			currentBrowser = null;
 			if (browsers.size() > 0)
@@ -214,8 +215,8 @@ public class BrowserManager extends Observable {
 
 		if (currentBrowser == null && browsers.size() > 0)
 			return browsers.get(0);
-		
-		return currentBrowser; 
+
+		return currentBrowser;
 	}
 
 	public void setCurrentWebBrowser(IBrowserDescriptor wb) {
@@ -228,5 +229,5 @@ public class BrowserManager extends Observable {
 			throw new IllegalArgumentException();
 		saveBrowsers();
 	}
-	
+
 }

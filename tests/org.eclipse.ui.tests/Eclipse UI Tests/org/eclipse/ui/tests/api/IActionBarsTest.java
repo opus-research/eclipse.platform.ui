@@ -43,7 +43,8 @@ public class IActionBarsTest extends UITestCase {
             super();
         }
 
-        public void run() {
+        @Override
+		public void run() {
             hasRun = true;
         }
     }
@@ -55,7 +56,8 @@ public class IActionBarsTest extends UITestCase {
         super(testName);
     }
 
-    protected void doSetUp() throws Exception {
+    @Override
+	protected void doSetUp() throws Exception {
         super.doSetUp();
         fWindow = openTestWindow();
         fPage = fWindow.getActivePage();
@@ -92,8 +94,8 @@ public class IActionBarsTest extends UITestCase {
     }
 
     public void testGetGlobalActionHandler() throws Throwable {
-        // From Javadoc: "Returns the global action handler for 
-        // the action with the given id.  
+        // From Javadoc: "Returns the global action handler for
+        // the action with the given id.
 
         IViewPart part = fPage.showView(MockViewPart.ID);
         IActionBars bars = part.getViewSite().getActionBars();
@@ -125,39 +127,39 @@ public class IActionBarsTest extends UITestCase {
     }
 
         public void testSetGlobalActionHandler() throws Throwable {
-	        // From Javadoc: "Returns the global action handler for 
-	        // the action with the given id.  
-	
+	        // From Javadoc: "Returns the global action handler for
+	        // the action with the given id.
+
 	        IViewPart part = fPage.showView(MockViewPart.ID);
 	        IActionBars bars = part.getViewSite().getActionBars();
 	        assertNotNull(bars);
-	
+
 	        // Create actions.
 	        MockAction cut = new MockAction();
 	        MockAction copy = new MockAction();
 	        MockAction undo = new MockAction();
-	
+
 	        // Set actions.
 	        bars.setGlobalActionHandler(IWorkbenchActionConstants.CUT, cut);
 	        bars.setGlobalActionHandler(IWorkbenchActionConstants.COPY, copy);
 	        bars.setGlobalActionHandler(IWorkbenchActionConstants.UNDO, undo);
 	        bars.updateActionBars();
-	
+
 	        // Run the real workbench actions.
 	        // Verify the actions are invoked.
 	        cut.hasRun = copy.hasRun = undo.hasRun = false;
-	        
+
 	        // anything that has been converted from a RetargetAction in
 	        // WorkbenchActionBuilder must be run as a command
 	        runMatchingCommand(fWindow, ActionFactory.CUT.getId());
-	        
+
 	        ActionUtil.runActionUsingPath(this, fWindow,
 	                IWorkbenchActionConstants.M_EDIT + '/'
 	                        + IWorkbenchActionConstants.UNDO);
 	        assertTrue(cut.hasRun);
 	        assertTrue(!copy.hasRun);
 	        assertTrue(undo.hasRun);
-	
+
 	        // Now create a second view and run the actions again.
 	        // Our global actions should not be invoked.
 	        fPage.showView(MockViewPart.ID2);
@@ -169,9 +171,9 @@ public class IActionBarsTest extends UITestCase {
 	        assertTrue(!cut.hasRun);
 	        assertTrue(!copy.hasRun);
 	        assertTrue(!undo.hasRun);
-	
+
 	        // Reactivate test view and run actions again.
-	        // This time our global actions should be invoked.		
+	        // This time our global actions should be invoked.
 	        fPage.activate(part);
 	        cut.hasRun = copy.hasRun = undo.hasRun = false;
 	        runMatchingCommand(fWindow, ActionFactory.CUT.getId());
@@ -182,7 +184,7 @@ public class IActionBarsTest extends UITestCase {
 	        assertTrue(!copy.hasRun);
 	        assertTrue(undo.hasRun);
 	    }
-    
+
     private void runMatchingCommand(IWorkbenchWindow window, String actionId) {
     	IHandlerService hs = window.getService(IHandlerService.class);
     	IActionCommandMappingService ms = window.getService(IActionCommandMappingService.class);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,10 +12,9 @@ package org.eclipse.ui.internal;
 
 import java.util.HashMap;
 import java.util.Iterator;
-
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.ui.IActionFilter;
-import org.eclipse.ui.internal.util.Util;
 
 /**
  * An ObjectFilterTest is used to read an object filter from XML,
@@ -25,7 +24,7 @@ public class ObjectFilterTest {
     private HashMap filterElements;
 
     /**
-     * Create a new object filter. 
+     * Create a new object filter.
      */
     public ObjectFilterTest() {
         // do nothing
@@ -33,7 +32,7 @@ public class ObjectFilterTest {
 
     /**
      * Add a filter element to the test.  This element must contain
-     * a name value filter pair, as defined by the 
+     * a name value filter pair, as defined by the
      * <code>org.eclipse.ui.actionFilters</code> extension point.
      */
     public boolean addFilterElement(IConfigurationElement element) {
@@ -62,7 +61,7 @@ public class ObjectFilterTest {
 	 * <code>true</code> if the object is a wrapper for a resource, and the
 	 * resource produces a filter match.
 	 * </p>
-	 * 
+	 *
 	 * @param object
 	 *            the object to examine
 	 * @returns <code>true</code> if there is a filter match.
@@ -85,7 +84,7 @@ public class ObjectFilterTest {
      */
     private boolean preciselyMatches(Object object) {
         // Get the action filter.
-        IActionFilter filter = (IActionFilter)Util.getAdapter(object, IActionFilter.class);
+        IActionFilter filter = Adapters.adapt(object, IActionFilter.class);
         if (filter == null) {
 			return false;
 		}

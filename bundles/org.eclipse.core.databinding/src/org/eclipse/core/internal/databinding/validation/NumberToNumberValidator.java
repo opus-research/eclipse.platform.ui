@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,7 +23,7 @@ import org.eclipse.core.runtime.Status;
  * <p>
  * Class is thread safe.
  * </p>
- * 
+ *
  * @since 1.0
  */
 public abstract class NumberToNumberValidator implements IValidator {
@@ -53,11 +53,7 @@ public abstract class NumberToNumberValidator implements IValidator {
 		primitive = ((Class) converter.getToType()).isPrimitive();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.databinding.validation.IValidator#validate(java.lang.Object)
-	 */
+	@Override
 	public final IStatus validate(Object value) {
 		if (value == null) {
 			if (primitive) {
@@ -91,7 +87,7 @@ public abstract class NumberToNumberValidator implements IValidator {
 
 	/**
 	 * Invoked to determine if the value is in range.
-	 * 
+	 *
 	 * @param number
 	 * @return <code>true</code> if in range
 	 */

@@ -28,6 +28,7 @@ import org.eclipse.ui.handlers.IHandlerService;
 public class TextContentAssistCommandAdapterTest extends
 		AbstractContentAssistCommandAdapterTest {
 
+	@Override
 	protected AbstractFieldAssistWindow createFieldAssistWindow() {
 		return new TextCommandFieldAssistWindow();
 	}
@@ -35,23 +36,26 @@ public class TextContentAssistCommandAdapterTest extends
 	/**
 	 * bug 301196: [FieldAssist] ContentAssistCommandAdapter should provide an activation expression when activating the command handler
 	 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=301196
-	 * 
+	 *
 	 */
 	public void testBug301196CorrectHandlerConflictResolution() throws Exception {
-		
+
 		final boolean[] handlerInvocationIndicator = new boolean[] {false};
-		
+
 		IHandlerService service = PlatformUI.getWorkbench().getService(IHandlerService.class);
 		IHandlerActivation handlerActivation = service.activateHandler(IWorkbenchCommandConstants.EDIT_CONTENT_ASSIST, new AbstractHandler() {
-			
+
+			@Override
 			public Object execute(ExecutionEvent event) {
 				handlerInvocationIndicator[0] = true;
 				return null;
 			}
 		},new Expression() {
+			@Override
 			public void collectExpressionInfo(ExpressionInfo info) {
 				info.addVariableNameAccess(ISources.ACTIVE_SHELL_NAME);
 			}
+			@Override
 			public EvaluationResult evaluate(IEvaluationContext context) {
 				return EvaluationResult.TRUE; // always enabled
 			}

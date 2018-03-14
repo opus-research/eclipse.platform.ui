@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ovidio Mallo and others.
+ * Copyright (c) 2009, 2015 Ovidio Mallo and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,7 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 
 /**
  * Standard implementation of the {@link IValidationMessageProvider} interface.
- * 
+ *
  * @since 1.4
  */
 public class ValidationMessageProvider implements IValidationMessageProvider {
@@ -29,6 +29,7 @@ public class ValidationMessageProvider implements IValidationMessageProvider {
 	 * <code>validationStatusProvider</code> as is or <code>null</code> if the
 	 * <code>validationStatusProvider</code> is itself <code>null</code>.
 	 */
+	@Override
 	public String getMessage(ValidationStatusProvider statusProvider) {
 		if (statusProvider != null) {
 			IStatus status = (IStatus) statusProvider.getValidationStatus()
@@ -44,6 +45,7 @@ public class ValidationMessageProvider implements IValidationMessageProvider {
 	 * <code>IStatus</code> contained in the provided
 	 * <code>validationStatusProvider</code>.
 	 */
+	@Override
 	public int getMessageType(ValidationStatusProvider statusProvider) {
 		if (statusProvider == null) {
 			return IMessageProvider.NONE;

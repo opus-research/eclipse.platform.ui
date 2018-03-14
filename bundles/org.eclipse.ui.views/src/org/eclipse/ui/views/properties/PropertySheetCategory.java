@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,7 +26,7 @@ import java.util.List;
 
     /**
      * Create a PropertySheet category with name.
-     * @param name 
+     * @param name
      */
     public PropertySheetCategory(String name) {
         categoryName = name;
@@ -34,8 +34,8 @@ import java.util.List;
 
     /**
      * Add an <code>IPropertySheetEntry</code> to the list
-     * of entries in this category. 
-     * @param entry 
+     * of entries in this category.
+     * @param entry
      */
     public void addEntry(IPropertySheetEntry entry) {
         entries.add(entry);
@@ -50,10 +50,10 @@ import java.util.List;
     }
 
     /**
-     * Returns <code>true</code> if this category should be automatically 
+     * Returns <code>true</code> if this category should be automatically
      * expanded. The default value is <code>true</code>.
-     * 
-     * @return <code>true</code> if this category should be automatically 
+     *
+     * @return <code>true</code> if this category should be automatically
      * expanded, <code>false</code> otherwise
      */
     public boolean getAutoExpand() {
@@ -61,9 +61,9 @@ import java.util.List;
     }
 
     /**
-     * Sets if this category should be automatically 
+     * Sets if this category should be automatically
      * expanded.
-     * @param autoExpand 
+     * @param autoExpand
      */
     public void setAutoExpand(boolean autoExpand) {
         shouldAutoExpand = autoExpand;

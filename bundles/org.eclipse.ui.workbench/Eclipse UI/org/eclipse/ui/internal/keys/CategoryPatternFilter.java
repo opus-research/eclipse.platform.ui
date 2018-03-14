@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,17 +36,11 @@ class CategoryPatternFilter extends PatternFilter {
 			setPattern("org.eclipse.ui.keys.optimization.true"); //$NON-NLS-1$
 		}
 	}
-	
+
 	public boolean isFilteringCategories() {
 		return filterCategories;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.dialogs.PatternFilter#isLeafMatch(org.eclipse.jface.viewers.Viewer,
-	 *      java.lang.Object)
-	 */
 	@Override
 	protected boolean isLeafMatch(Viewer viewer, Object element) {
 		if (filterCategories) {

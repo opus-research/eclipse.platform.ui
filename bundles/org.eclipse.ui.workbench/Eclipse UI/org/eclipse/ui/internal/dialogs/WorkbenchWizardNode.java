@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2007 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SafeRunner;
@@ -26,7 +27,6 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWizard;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
-import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.statushandlers.StatusAdapter;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.wizards.IWizardDescriptor;
@@ -53,7 +53,7 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
      * Creates a <code>WorkbenchWizardNode</code> that holds onto a wizard
      * element.  The wizard element provides information on how to create
      * the wizard supplied by the ISV's extension.
-     * 
+     *
      * @param aWizardPage the wizard page
      * @param element the wizard descriptor
      */
@@ -67,15 +67,12 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
     /**
      * Returns the wizard represented by this wizard node.  <b>Subclasses</b>
      * must override this method.
-     * 
+     *
      * @return the wizard object
-     * @throws CoreException 
+     * @throws CoreException
      */
     public abstract IWorkbenchWizard createWizard() throws CoreException;
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.wizard.IWizardNode#dispose()
-     */
     @Override
 	public void dispose() {
         // Do nothing since the wizard wasn't created via reflection.
@@ -88,43 +85,29 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
         return parentWizardPage.getCurrentResourceSelection();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.wizard.IWizardNode#getExtent()
-     */
     @Override
 	public Point getExtent() {
         return new Point(-1, -1);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.IPluginContribution#getLocalId()
-     */
     @Override
 	public String getLocalId() {
-    	IPluginContribution contribution = (IPluginContribution) Util.getAdapter(wizardElement,
-				IPluginContribution.class);
+    	IPluginContribution contribution = Adapters.adapt(wizardElement, IPluginContribution.class);
 		if (contribution != null) {
 			return contribution.getLocalId();
 		}
 		return wizardElement.getId();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.IPluginContribution#getPluginId()
-     */
     @Override
 	public String getPluginId() {
-       	IPluginContribution contribution = (IPluginContribution) Util.getAdapter(wizardElement,
-				IPluginContribution.class);
+       	IPluginContribution contribution = Adapters.adapt(wizardElement, IPluginContribution.class);
 		if (contribution != null) {
 			return contribution.getPluginId();
 		}
 		return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.wizard.IWizardNode#getWizard()
-     */
     @Override
 	public IWizard getWizard() {
         if (wizard != null) {
@@ -144,7 +127,7 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
                              */
                             @Override
 							public void handleException(Throwable e) {
-                               	IPluginContribution contribution = (IPluginContribution) Util.getAdapter(wizardElement, IPluginContribution.class);
+                               	IPluginContribution contribution = Adapters.adapt(wizardElement, IPluginContribution.class);
                                 statuses[0] = new Status(
                                         IStatus.ERROR,
                                         contribution != null ? contribution.getPluginId() : WorkbenchPlugin.PI_WORKBENCH,
@@ -159,7 +142,7 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
                                     workbenchWizard[0] = createWizard();
                                     // create instance of target wizard
                                 } catch (CoreException e) {
-                                	IPluginContribution contribution = (IPluginContribution) Util.getAdapter(wizardElement, IPluginContribution.class);
+                                	IPluginContribution contribution = Adapters.adapt(wizardElement, IPluginContribution.class);
                                 	statuses[0] = new Status(
                                             IStatus.ERROR,
                                             contribution != null ? contribution.getPluginId() : WorkbenchPlugin.PI_WORKBENCH,
@@ -198,7 +181,7 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
 
     /**
      * Returns the wizard element.
-     * 
+     *
      * @return the wizard descriptor
      */
     public IWizardDescriptor getWizardElement() {
@@ -212,9 +195,6 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
         return parentWizardPage.getWorkbench();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.wizard.IWizardNode#isContentCreated()
-     */
     @Override
 	public boolean isContentCreated() {
         return wizard != null;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,7 @@ public interface IObjectActionContributor extends IObjectContributor {
      * selected object or objects. Actions should be added to the
      * provided menu object. Current selection can be obtained from
      * the given selection provider.
-     * 
+     *
      * @return <code>true</code> if any contributions were made, and <code>false</code> otherwise.
      */
     public boolean contributeObjectActions(IWorkbenchPart part,
@@ -40,14 +40,14 @@ public interface IObjectActionContributor extends IObjectContributor {
      * selected object or objects. Menus should be added to the
      * provided menu object. Current selection can be obtained from
      * the given selection provider.
-     * 
+     *
      * @return <code>true</code> if any contributions were made, and <code>false</code> otherwise.
      */
     public boolean contributeObjectMenus(IMenuManager menu,
             ISelectionProvider selProv);
 
     /**
-     * Contribute to the list the action identifiers from other contributions that 
+     * Contribute to the list the action identifiers from other contributions that
      * this contribution wants to override. Actions of these identifiers will
      * not be contributed.
      */

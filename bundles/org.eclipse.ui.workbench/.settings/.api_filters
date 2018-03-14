@@ -1,20 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <component id="org.eclipse.ui.workbench" version="2">
-    <resource path="Eclipse UI/org/eclipse/ui/dialogs/EditorSelectionDialog.java" type="org.eclipse.ui.dialogs.EditorSelectionDialog">
-        <filter id="1192230914">
+    <resource path="Eclipse UI/org/eclipse/ui/handlers/HandlerUtil.java" type="org.eclipse.ui.handlers.HandlerUtil">
+        <filter comment="Made documented restrictions official" id="336744520">
             <message_arguments>
-                <message_argument value="3.7"/>
-                <message_argument value="3.107"/>
-                <message_argument value="STORE_ID_INTERNAL_EXTERNAL"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="Eclipse UI/org/eclipse/ui/internal/themes/WorkbenchThemeManager.java" type="org.eclipse.ui.internal.themes.WorkbenchThemeManager">
-        <filter id="640712815">
-            <message_arguments>
-                <message_argument value="IStylingEngine"/>
-                <message_argument value="WorkbenchThemeManager"/>
-                <message_argument value="style(Object)"/>
+                <message_argument value="org.eclipse.ui.handlers.HandlerUtil"/>
             </message_arguments>
         </filter>
     </resource>

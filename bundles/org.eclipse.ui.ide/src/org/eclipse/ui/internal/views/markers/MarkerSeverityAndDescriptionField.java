@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,9 +18,9 @@ import org.eclipse.ui.views.markers.MarkerItem;
 
 /**
  * MarkerSeverityAndDescriptionField can handle severities for all markers.
- * 
+ *
  * @since 3.4
- * 
+ *
  */
 public class MarkerSeverityAndDescriptionField extends MarkerDescriptionField {
 
@@ -31,12 +31,7 @@ public class MarkerSeverityAndDescriptionField extends MarkerDescriptionField {
 		super();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.provisional.views.markers.IMarkerField#compare(org.eclipse.ui.provisional.views.markers.MarkerItem,
-	 *      org.eclipse.ui.provisional.views.markers.MarkerItem)
-	 */
+	@Override
 	public int compare(MarkerItem item1, MarkerItem item2) {
 
 		int severity1 = MarkerSupportInternalUtilities.getSeverity(item1);
@@ -48,29 +43,22 @@ public class MarkerSeverityAndDescriptionField extends MarkerDescriptionField {
 
 	/**
 	 * Return the image for item.
-	 * 
+	 *
 	 * @param item
 	 * @return Image or <code>null</code>
 	 */
 	private Image getImage(MarkerItem item) {
-
-		int severity = -1;
-		if (item.getMarker() == null)
-			severity = ((MarkerCategory) item).getHighestSeverity();
-		else
-			severity = MarkerSupportInternalUtilities.getSeverity(item);			
-
-		if (severity >= IMarker.SEVERITY_WARNING)
-			return MarkerSupportInternalUtilities.getSeverityImage(severity);
-		return null;
-
+		if (item.getMarker() == null) {
+			int severity = ((MarkerCategory) item).getHighestSeverity();
+			if (severity >= IMarker.SEVERITY_WARNING)
+				return MarkerSupportInternalUtilities.getSeverityImage(severity);
+			return null;
+		}
+		int severity = MarkerSupportInternalUtilities.getSeverity(item);
+		return MarkerSupportInternalUtilities.getSeverityImage(severity);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.views.markers.MarkerField#update(org.eclipse.jface.viewers.ViewerCell)
-	 */
+	@Override
 	public void update(ViewerCell cell) {
 		super.update(cell);
 

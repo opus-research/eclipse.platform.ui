@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,8 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Steven Spungin <steven@spungin.tv> - Bug 436908
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799, 446864
+ *     Snjezana Peco <snjezana.peco@redhat.com> - Bug 414888
  ******************************************************************************/
 
 package org.eclipse.ui.internal.e4.compatibility;
@@ -188,6 +190,9 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 				} else {
 					selectionProvider.addSelectionChangedListener(postListener);
 				}
+				ESelectionService selectionService = (ESelectionService) part.getContext().get(
+						ESelectionService.class.getName());
+				selectionService.setSelection(selectionProvider.getSelection());
 			}
 		}
 		return true;
@@ -235,6 +240,7 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 				// client code may have errors so we need to catch it
 				logger.error(e);
 			}
+			wrapped = null;
 		}
 
 		internalDisposeSite(site);
@@ -261,7 +267,7 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 	 * <p>
 	 * See bug 308492.
 	 * </p>
-	 * 
+	 *
 	 * @return if the part is currently being disposed
 	 */
 	public boolean isBeingDisposed() {
@@ -345,8 +351,9 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 					wrapped.getTitleImage());
 		}
 
-		if (wrapped instanceof ISaveablePart) {
-			part.setDirty(((ISaveablePart) wrapped).isDirty());
+		ISaveablePart saveable = SaveableHelper.getSaveable(wrapped);
+		if (saveable != null) {
+			part.setDirty(saveable.isDirty());
 		}
 
 		wrapped.addPropertyListener(new IPropertyListener() {
@@ -361,15 +368,15 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 						part.getTransientData().put(IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY,
 								newImage);
 					}
-					if (wrapped.getTitleToolTip() != null && wrapped.getTitleToolTip().length() > 0) {
-						part.getTransientData()
-								.put(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY,
-								wrapped.getTitleToolTip());
+					String titleToolTip = wrapped.getTitleToolTip();
+					if (titleToolTip != null) {
+						part.getTransientData().put(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY, titleToolTip);
 					}
 					break;
 				case IWorkbenchPartConstants.PROP_DIRTY:
-					if (wrapped instanceof ISaveablePart) {
-						((MDirtyable) part).setDirty(((ISaveablePart) wrapped).isDirty());
+					ISaveablePart saveable = SaveableHelper.getSaveable(wrapped);
+					if (saveable != null) {
+						((MDirtyable) part).setDirty(saveable.isDirty());
 					}
 					break;
 				case IWorkbenchPartConstants.PROP_INPUT:
@@ -411,8 +418,9 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 
 	@Persist
 	void doSave() {
-		if (wrapped instanceof ISaveablePart) {
-			SaveableHelper.savePart((ISaveablePart) wrapped, wrapped, getReference().getSite()
+		ISaveablePart saveable = SaveableHelper.getSaveable(wrapped);
+		if (saveable != null) {
+			SaveableHelper.savePart(saveable, wrapped, getReference().getSite()
 					.getWorkbenchWindow(), false);
 		}
 		// ContextInjectionFactory.invoke(wrapped, Persist.class, part.getContext(), null);
@@ -425,7 +433,7 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 	public MPart getModel() {
 		return part;
 	}
-	
+
 	@Override
 	public void selectionChanged(SelectionChangedEvent e) {
 		ESelectionService selectionService = (ESelectionService) part.getContext().get(

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Tom Schindl and others.
+ * Copyright (c) 2010, 2015 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -44,6 +44,7 @@ import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.core.util.impl.resources.FileResourcesLocatorImpl;
 import org.eclipse.e4.ui.css.core.util.impl.resources.OSGiResourceLocator;
 import org.eclipse.e4.ui.css.core.util.resources.IResourceLocator;
+import org.eclipse.e4.ui.css.swt.helpers.EclipsePreferencesHelper;
 import org.eclipse.e4.ui.css.swt.theme.ITheme;
 import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.osgi.service.datalocation.Location;
@@ -333,20 +334,13 @@ public class ThemeEngine implements IThemeEngine {
 		Bundle bundle = FrameworkUtil.getBundle(ThemeEngine.class);
 		String osname = bundle.getBundleContext().getProperty("osgi.os");
 		// TODO: Need to differentiate win32 versions
-		String os_version = System.getProperty("os.version");
-		String wsname = bundle.getBundleContext().getProperty("ogsi.ws");
+		String wsname = bundle.getBundleContext().getProperty("osgi.ws");
 		ArrayList<IConfigurationElement> matchingElements = new ArrayList<IConfigurationElement>();
 		for (IConfigurationElement element : elements) {
 			String elementOs = element.getAttribute("os");
 			String elementWs = element.getAttribute("ws");
-			String elementOsVersion = element.getAttribute("os_version");
 			if (osname != null
 					&& (elementOs == null || elementOs.contains(osname))) {
-				if (os_version != null && os_version.equalsIgnoreCase(elementOsVersion)) {
-					// best match
-					matchingElements.add(element);
-					continue;
-				}
 				matchingElements.add(element);
 			} else if (wsname != null && wsname.equalsIgnoreCase(elementWs)) {
 				matchingElements.add(element);
@@ -362,13 +356,18 @@ public class ThemeEngine implements IThemeEngine {
 		if (osVersion != null) {
 			boolean found = false;
 			for (Theme t : themes) {
-				String version = t.getOsVersion();
-				if (version != null && osVersion.contains(version)) {
-					String themeVersion = themeId + version;
-					if (t.getId().equals(themeVersion)) {
-						setTheme(t, restore);
-						found = true;
-						break;
+				String osVersionList = t.getOsVersion();
+				if (osVersionList != null) {
+					String[] osVersions = osVersionList.split(","); //$NON-NLS-1$
+					for (String osVersionFromTheme : osVersions) {
+						if (osVersionFromTheme != null && osVersion.contains(osVersionFromTheme)) {
+							String themeVersion = themeId + osVersionList;
+							if (t.getId().equals(themeVersion)) {
+								setTheme(t, restore);
+								found = true;
+								break;
+							}
+						}
 					}
 				}
 			}
@@ -453,6 +452,9 @@ public class ThemeEngine implements IThemeEngine {
 
 		if (restore) {
 			IEclipsePreferences pref = getPreferences();
+			EclipsePreferencesHelper.setPreviousThemeId(pref.get(THEMEID_KEY, null));
+			EclipsePreferencesHelper.setCurrentThemeId(theme.getId());
+
 			pref.put(THEMEID_KEY, theme.getId());
 			try {
 				pref.flush();
@@ -521,7 +523,8 @@ public class ThemeEngine implements IThemeEngine {
 	}
 
 	private IEclipsePreferences getPreferences() {
-		return new InstanceScope().getNode(FrameworkUtil.getBundle(
+		return InstanceScope.INSTANCE.getNode(
+				FrameworkUtil.getBundle(
 				ThemeEngine.class).getSymbolicName());
 	}
 

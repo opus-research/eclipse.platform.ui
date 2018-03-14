@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bugs 260329, 260337
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 442278
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 442278, 434283
  *******************************************************************************/
 package org.eclipse.jface.examples.databinding.snippets;
 
@@ -19,12 +19,12 @@ import java.util.Set;
 
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.beans.BeanProperties;
-import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.ComputedValue;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.ViewerSupport;
 import org.eclipse.jface.databinding.viewers.ViewersObservables;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -64,12 +64,12 @@ public class Snippet020TreeViewerWithSetFactory {
 
 	/**
 	 * Launch the application
-	 * 
+	 *
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		Display display = Display.getDefault();
-		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
+		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
 			@Override
 			public void run() {
 				try {
@@ -237,18 +237,16 @@ public class Snippet020TreeViewerWithSetFactory {
 	protected DataBindingContext initDataBindings() {
 		IObservableValue treeViewerSelectionObserveSelection = ViewersObservables
 				.observeSingleSelection(beanViewer);
-		IObservableValue textTextObserveWidget = SWTObservables.observeText(
-				beanText, SWT.Modify);
-		IObservableValue treeViewerValueObserveDetailValue = BeansObservables
-				.observeDetailValue(treeViewerSelectionObserveSelection,
-						"text", String.class);
-		//
-		//
+		IObservableValue textTextObserveWidget = WidgetProperties.text(SWT.Modify).observe(beanText);
+		IObservableValue treeViewerValueObserveDetailValue = BeanProperties.value(
+				(Class) treeViewerSelectionObserveSelection.getValueType(), "text", String.class)
+				.observeDetail(treeViewerSelectionObserveSelection);
+
 		DataBindingContext bindingContext = new DataBindingContext();
-		//
+
 		bindingContext.bindValue(textTextObserveWidget,
 				treeViewerValueObserveDetailValue);
-		//
+
 		return bindingContext;
 	}
 
@@ -268,14 +266,14 @@ public class Snippet020TreeViewerWithSetFactory {
 				return Boolean.valueOf(beanViewerSelection.getValue() != null);
 			}
 		};
-		dbc.bindValue(SWTObservables.observeEnabled(addChildBeanButton),
+		dbc.bindValue(WidgetProperties.enabled().observe(addChildBeanButton),
 				beanSelected);
-		dbc.bindValue(SWTObservables.observeEnabled(removeBeanButton),
+		dbc.bindValue(WidgetProperties.enabled().observe(removeBeanButton),
 				beanSelected);
 
 		clipboard = new WritableValue();
-		dbc.bindValue(SWTObservables.observeEnabled(copyButton), beanSelected);
-		dbc.bindValue(SWTObservables.observeEnabled(pasteButton),
+		dbc.bindValue(WidgetProperties.enabled().observe(copyButton), beanSelected);
+		dbc.bindValue(WidgetProperties.enabled().observe(pasteButton),
 				new ComputedValue(Boolean.TYPE) {
 					@Override
 					protected Object calculate() {

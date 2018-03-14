@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2006 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,7 @@ import org.eclipse.ui.PlatformUI;
 
 /**
  * Contains extensions defined on the <code>keywords</code> extension point.
- * 
+ *
  * @since 3.1
  */
 public final class KeywordRegistry implements IExtensionChangeHandler {
@@ -39,7 +39,7 @@ public final class KeywordRegistry implements IExtensionChangeHandler {
 
 	/**
 	 * Return the singleton instance of the <code>KeywordRegistry</code>.
-	 * 
+	 *
 	 * @return the singleton registry
 	 */
 	public static KeywordRegistry getInstance() {
@@ -54,7 +54,7 @@ public final class KeywordRegistry implements IExtensionChangeHandler {
 	 * Map of id->labels.
 	 */
 	private Map internalKeywordMap = new HashMap();
-	
+
 	/**
 	 * Private constructor.
 	 */
@@ -68,9 +68,6 @@ public final class KeywordRegistry implements IExtensionChangeHandler {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker, org.eclipse.core.runtime.IExtension)
-	 */
 	@Override
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
 		IConfigurationElement[] elements = extension.getConfigurationElements();
@@ -89,10 +86,10 @@ public final class KeywordRegistry implements IExtensionChangeHandler {
 		return Platform.getExtensionRegistry().getExtensionPoint(
 				PlatformUI.PLUGIN_ID, IWorkbenchRegistryConstants.PL_KEYWORDS);
 	}
-	
+
 	/**
 	 * Return the label associated with the given keyword.
-	 * 
+	 *
 	 * @param id the keyword id
 	 * @return the label or <code>null</code>
 	 */
@@ -100,9 +97,6 @@ public final class KeywordRegistry implements IExtensionChangeHandler {
 		return (String) internalKeywordMap.get(id);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension, java.lang.Object[])
-	 */
 	@Override
 	public void removeExtension(IExtension extension, Object[] objects) {
 		for (int i = 0; i < objects.length; i++) {

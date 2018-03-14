@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,8 +22,6 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.util.Util;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
@@ -44,7 +42,7 @@ import org.eclipse.swt.widgets.Text;
  * Incomplete key strokes are only displayed until they are made complete or
  * their component key presses are released.
  * </p>
- * 
+ *
  * @since 3.1
  */
 public final class KeySequenceText {
@@ -72,7 +70,7 @@ public final class KeySequenceText {
 		/**
 		 * Deletes the current selection. If there is no selection, then it
 		 * deletes the last key stroke.
-		 * 
+		 *
 		 * @param keyStrokes
 		 *            The key strokes from which to delete. This list must not
 		 *            be <code>null</code>, and must represent a valid key
@@ -112,7 +110,7 @@ public final class KeySequenceText {
 		 * and prompt for the next. In the case of a key release, this makes
 		 * sure that the temporary stroke is correctly displayed --
 		 * corresponding with modifier keys that may have been released.
-		 * 
+		 *
 		 * @param event
 		 *            The triggering event; must not be <code>null</code>.
 		 */
@@ -138,7 +136,7 @@ public final class KeySequenceText {
 		 * Handles the case where the key event is an <code>SWT.KeyDown</code>
 		 * event. This either causes a deletion (if it is an unmodified
 		 * backspace key stroke), or an insertion (if it is any other key).
-		 * 
+		 *
 		 * @param event
 		 *            The trigger key down event; must not be <code>null</code>.
 		 * @param keyStrokes
@@ -161,7 +159,7 @@ public final class KeySequenceText {
 		 * stroke, then that incomplete stroke is modified to match the keys
 		 * that are still held. If no keys are held, then the incomplete stroke
 		 * is removed.
-		 * 
+		 *
 		 * @param event
 		 *            The triggering event; must not be <code>null</code>
 		 * @param keyStrokes
@@ -248,7 +246,7 @@ public final class KeySequenceText {
 		 * insertion point is tracked using <code>insertionIndex</code>,
 		 * which is an index into the key stroke array.
 		 * </p>
-		 * 
+		 *
 		 * @param event
 		 *            The triggering key down event; must not be
 		 *            <code>null</code>.
@@ -342,7 +340,7 @@ public final class KeySequenceText {
 		 * It swallows all traverse events example for tab and arrow key
 		 * navigation. The other forms of navigation can be reached by tabbing
 		 * off of the control.
-		 * 
+		 *
 		 * @param event
 		 *            The trigger event; must not be <code>null</code>.
 		 */
@@ -401,12 +399,12 @@ public final class KeySequenceText {
 	private class TraversalFilterManager implements FocusListener {
 		/** The managed filter. We only need one instance. */
 		private TraversalFilter filter = new TraversalFilter();
-		
+
 		private boolean filtering = false;
 
 		/**
 		 * Attaches the global traversal filter.
-		 * 
+		 *
 		 * @param event
 		 *            Ignored.
 		 */
@@ -418,7 +416,7 @@ public final class KeySequenceText {
 
 		/**
 		 * Detaches the global traversal filter.
-		 * 
+		 *
 		 * @param event
 		 *            Ignored.
 		 */
@@ -427,7 +425,7 @@ public final class KeySequenceText {
 			Display.getCurrent().removeFilter(SWT.Traverse, filter);
 			filtering = false;
 		}
-		
+
 		/**
 		 * Remove the traverse filter if we close without focusOut.
 		 */
@@ -446,7 +444,7 @@ public final class KeySequenceText {
 	private class UpdateSequenceListener implements ModifyListener {
 		/**
 		 * Handles the modify event on the underlying text widget.
-		 * 
+		 *
 		 * @param event
 		 *            The triggering event; ignored.
 		 */
@@ -495,7 +493,7 @@ public final class KeySequenceText {
 	/**
 	 * The name of the property representing the current key sequence in this
 	 * key sequence widget.
-	 * 
+	 *
 	 * @since 3.2
 	 */
 	public static final String P_KEY_SEQUENCE = "org.eclipse.jface.bindings.keys.KeySequenceText.KeySequence"; //$NON-NLS-1$
@@ -539,7 +537,7 @@ public final class KeySequenceText {
 	 * Constructs an instance of <code>KeySequenceTextField</code> with the
 	 * text field to use. If the platform is carbon (MacOS X), then the font is
 	 * set to be the same font used to display accelerators in the menus.
-	 * 
+	 *
 	 * @param wrappedText
 	 *            The text widget to wrap; must not be <code>null</code>.
 	 */
@@ -553,12 +551,7 @@ public final class KeySequenceText {
 			final Font font = new Font(text.getDisplay(),
 					"Lucida Grande", 13, SWT.NORMAL); //$NON-NLS-1$
 			text.setFont(font);
-			text.addDisposeListener(new DisposeListener() {
-				@Override
-				public void widgetDisposed(DisposeEvent e) {
-					font.dispose();
-				}
-			});
+			text.addDisposeListener(e -> font.dispose());
 		}
 
 		// Add the key listener.
@@ -567,12 +560,7 @@ public final class KeySequenceText {
 
 		final TraversalFilterManager traversalFilterManager = new TraversalFilterManager();
 		text.addFocusListener(traversalFilterManager);
-		text.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(DisposeEvent e) {
-				traversalFilterManager.dispose();
-			} 
-		});
+		text.addDisposeListener(e -> traversalFilterManager.dispose());
 
 		// Add an internal modify listener.
 		text.addModifyListener(updateSequenceListener);
@@ -581,7 +569,7 @@ public final class KeySequenceText {
 	/**
 	 * Adds a property change listener to this key sequence widget. It will be
 	 * notified when the key sequence changes.
-	 * 
+	 *
 	 * @param listener
 	 *            The listener to be notified when changes occur; must not be
 	 *            <code>null</code>.
@@ -617,7 +605,7 @@ public final class KeySequenceText {
 	 * position). Otherwise, incomplete strokes will be removed. This modifies
 	 * <code>keyStrokes</code> in place, and has no effect on the text widget
 	 * this class wraps.
-	 * 
+	 *
 	 * @param keyStrokes
 	 *            The list of key strokes from which the selection should be
 	 *            removed; must not be <code>null</code>.
@@ -727,7 +715,7 @@ public final class KeySequenceText {
 
 	/**
 	 * Fires a property change event to all of the listeners.
-	 * 
+	 *
 	 * @param oldKeySequence
 	 *            The old key sequence; must not be <code>null</code>.
 	 * @since 3.2
@@ -749,7 +737,7 @@ public final class KeySequenceText {
 	/**
 	 * An accessor for the <code>KeySequence</code> that corresponds to the
 	 * current state of the text field. This includes incomplete strokes.
-	 * 
+	 *
 	 * @return The key sequence representation; never <code>null</code>.
 	 */
 	public KeySequence getKeySequence() {
@@ -758,7 +746,7 @@ public final class KeySequenceText {
 
 	/**
 	 * An accessor for the underlying text widget's contents.
-	 * 
+	 *
 	 * @return The text contents of this entry; never <code>null</code>.
 	 */
 	private String getText() {
@@ -767,7 +755,7 @@ public final class KeySequenceText {
 
 	/**
 	 * Tests whether the current key sequence has a stroke with no natural key.
-	 * 
+	 *
 	 * @return <code>true</code> is there is an incomplete stroke;
 	 *         <code>false</code> otherwise.
 	 */
@@ -777,7 +765,7 @@ public final class KeySequenceText {
 
 	/**
 	 * Tests whether the current text widget has some text selection.
-	 * 
+	 *
 	 * @return <code>true</code> if the number of selected characters it
 	 *         greater than zero; <code>false</code> otherwise.
 	 */
@@ -788,7 +776,7 @@ public final class KeySequenceText {
 	/**
 	 * Inserts the key stroke at the current insertion point. This does a
 	 * regular delete and insert, as if the key had been pressed.
-	 * 
+	 *
 	 * @param stroke
 	 *            The key stroke to insert; must not be <code>null</code>.
 	 */
@@ -827,7 +815,7 @@ public final class KeySequenceText {
 	 * two strokes. If merging is a complete failure (unlikely), then it will
 	 * simply overwrite the incomplete stroke. If the stroke at the index is
 	 * complete, then it simply inserts the stroke independently.
-	 * 
+	 *
 	 * @param keyStrokes
 	 *            The list of key strokes in which the key stroke should be
 	 *            appended; must not be <code>null</code>.
@@ -863,7 +851,7 @@ public final class KeySequenceText {
 	/**
 	 * Tests whether the cursor is in the last position. This means that the
 	 * selection extends to the last position.
-	 * 
+	 *
 	 * @return <code>true</code> if the selection extends to the last
 	 *         position; <code>false</code> otherwise.
 	 */
@@ -873,7 +861,7 @@ public final class KeySequenceText {
 
 	/**
 	 * Removes the given listener from this key sequence widget.
-	 * 
+	 *
 	 * @param listener
 	 *            The listener to be removed; must not be <code>null</code>.
 	 * @since 3.2
@@ -897,7 +885,7 @@ public final class KeySequenceText {
 	 * there are already that number of strokes, then it does not show
 	 * incomplete strokes, and does not keep track of them.
 	 * </p>
-	 * 
+	 *
 	 * @param newKeySequence
 	 *            The new key sequence for this widget; may be <code>null</code>
 	 *            if none.
@@ -908,9 +896,9 @@ public final class KeySequenceText {
 		if (newKeySequence == null) {
 			text.setText(""); //$NON-NLS-1$
 		} else {
-			keySequence = newKeySequence;			
+			keySequence = newKeySequence;
 		}
-		
+
 		// Trim any extra strokes.
 		if (maxStrokes != INFINITE) {
 			final KeyStroke[] oldKeyStrokes = keySequence.getKeyStrokes();
@@ -940,7 +928,7 @@ public final class KeySequenceText {
 	/**
 	 * Returns the maximum number of strokes that are permitted in this widget
 	 * at one time.
-	 * 
+	 *
 	 * @return The maximum number of strokes; will be a positive integer or
 	 *         <code>INFINITE</code>.
 	 */
@@ -951,7 +939,7 @@ public final class KeySequenceText {
 	/**
 	 * A mutator for the maximum number of strokes that are permitted in this
 	 * widget at one time.
-	 * 
+	 *
 	 * @param keyStrokeLimit
 	 *            The maximum number of strokes; must be a positive integer or
 	 *            <code>INFINITE</code>.

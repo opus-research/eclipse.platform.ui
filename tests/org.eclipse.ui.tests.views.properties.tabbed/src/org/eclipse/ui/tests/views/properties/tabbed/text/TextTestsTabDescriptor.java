@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -14,7 +14,7 @@ import org.eclipse.ui.views.properties.tabbed.AbstractTabDescriptor;
 
 /**
  * A tab descriptor for the text test view.
- * 
+ *
  * @author Anthony Hunter
  */
 public class TextTestsTabDescriptor extends AbstractTabDescriptor {
@@ -29,14 +29,17 @@ public class TextTestsTabDescriptor extends AbstractTabDescriptor {
 		getSectionDescriptors().add(new TextTestsSectionDescriptor2(aWord, getId()));
 	}
 
+	@Override
 	public String getCategory() {
 		return "default"; //$NON-NLS-1$
 	}
 
+	@Override
 	public String getId() {
 		return word + "@" + Integer.toHexString(word.hashCode());
 	}
 
+	@Override
 	public String getLabel() {
 		return word;
 	}

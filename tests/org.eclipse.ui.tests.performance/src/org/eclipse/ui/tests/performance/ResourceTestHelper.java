@@ -66,20 +66,21 @@ public class ResourceTestHelper {
 	public static void write(String dest, final String content) throws IOException, CoreException {
 		InputStream stream= new InputStream() {
 			private Reader fReader= new StringReader(content);
+			@Override
 			public int read() throws IOException {
 				return fReader.read();
 			}
 		};
 		getRoot().getFile(new Path(dest)).create(stream, true, null);
 	}
-	
+
 
 	public static void replicate(String src, String destPrefix, String destSuffix, int n, String srcName, String destNamePrefix) throws IOException, CoreException {
-		
+
 		StringBuffer s= read(src);
-		
+
 		List positions= identifierPositions(s, srcName);
-		
+
 		for (int j= 0; j < n; j++) {
 			StringBuffer c= new StringBuffer(s.toString());
 			replacePositions(c, srcName.length(), destNamePrefix + j, positions);
