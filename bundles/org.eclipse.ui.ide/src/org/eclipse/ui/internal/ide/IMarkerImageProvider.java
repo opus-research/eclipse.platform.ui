@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -25,7 +26,7 @@ import org.eclipse.core.resources.IMarker;
  *      &LT;imageprovider 
  *		   id="com.example.myplugin.myprofiderID"
  *         makertype="com.example.myMarkerType"
- *         icon="icons/basic/view16/myGIF.gif"/&GT;
+ *         icon="icons/basic/view16/myGIF.png"/&GT;
  * &LT;/extension&GT;
  * </pre>
  * It can also define the image provider using the tag <code>class</code>
