@@ -97,8 +97,7 @@ import org.eclipse.ui.part.ResourceTransfer;
      * on <code>IAction</code> copies the selected resources to the 
      * clipboard.
      */
-    @Override
-	public void run() {
+    public void run() {
         List<IResource> selectedResources = getSelectedResources();
         IResource[] resources =selectedResources
                 .toArray(new IResource[selectedResources.size()]);
@@ -177,8 +176,7 @@ import org.eclipse.ui.part.ResourceTransfer;
      * <code>SelectionListenerAction</code> method enables this action if 
      * one or more resources of compatible types are selected.
      */
-    @Override
-	protected boolean updateSelection(IStructuredSelection selection) {
+    protected boolean updateSelection(IStructuredSelection selection) {
         if (!super.updateSelection(selection)) {
 			return false;
 		}
