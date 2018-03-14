@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2011 IBM Corporation and others.
+ * Copyright (c) 2007, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Dina Sayed, dsayed@eg.ibm.com, IBM -  bug 276324
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -81,11 +82,6 @@ public abstract class CycleBaseHandler extends AbstractHandler implements
 	 */
 	private TriggerSequence[] forwardTriggerSequences = null;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
-	 */
 
 	/**
 	 * Add all items to the dialog in the activation order
@@ -220,7 +216,7 @@ public abstract class CycleBaseHandler extends AbstractHandler implements
 
 		setDialogLocation(dialog, activePart);
 
-		final IContextService contextService = (IContextService) window
+		final IContextService contextService = window
 				.getWorkbench().getService(IContextService.class);
 		try {
 			dialog.open();
@@ -294,7 +290,7 @@ public abstract class CycleBaseHandler extends AbstractHandler implements
 		commandForward = getForwardCommand();
 		commandBackward = getBackwardCommand();
 
-		final IBindingService bindingService = (IBindingService) window
+		final IBindingService bindingService = window
 				.getWorkbench().getService(IBindingService.class);
 		forwardTriggerSequences = bindingService
 				.getActiveBindingsFor(commandForward);
@@ -518,12 +514,6 @@ public abstract class CycleBaseHandler extends AbstractHandler implements
 		return forwardTriggerSequences;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement,
-	 *      java.lang.String, java.lang.Object)
-	 */
 	@Override
 	public void setInitializationData(IConfigurationElement config,
 			String propertyName, Object data) throws CoreException {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 433603
  *******************************************************************************/
 package org.eclipse.ui.tests.internal;
 
@@ -37,7 +38,7 @@ import org.eclipse.ui.views.navigator.ResourceNavigator;
 /**
  * bug 99858 [IDE] Error upon deleting a project. Tests that our delete code no
  * longer throws a CoreException when deleting a closed project.
- * 
+ *
  * @since 3.2
  */
 public class Bug99858Test extends TestCase {
@@ -60,7 +61,7 @@ public class Bug99858Test extends TestCase {
 	 * Create a project with some files, close it, and delete it. With the
 	 * changes in runtime to throw a CoreException from IContainer#members(),
 	 * the project won't get deleted if ReadOnlyStateChecker is not fixed.
-	 * 
+	 *
 	 * @throws Throwable
 	 *             if it goes wrong
 	 */
@@ -83,8 +84,8 @@ public class Bug99858Test extends TestCase {
 		view.setFocus();
 
 		// get a testing version of the delete action, and set it up.
-		MyDeleteResourceAction newDel = new MyDeleteResourceAction(view
-				.getViewSite());
+		MyDeleteResourceAction newDel = new MyDeleteResourceAction(
+				view.getViewSite());
 		newDel.setEnabled(true);
 		TextActionHandler tmpHandler = new TextActionHandler(view.getViewSite()
 				.getActionBars());
@@ -116,14 +117,12 @@ public class Bug99858Test extends TestCase {
 		// the delete even ran
 		assertTrue(newDel.fRan);
 
-		//Join twice as there are two jobs now
+		// Join twice as there are two jobs now
 		boolean joined = false;
 		while (!joined) {
 			try {
-				Platform
-						.getJobManager()
-						.join(
-								IDEWorkbenchMessages.DeleteResourceAction_jobName,
+				Platform.getJobManager()
+						.join(IDEWorkbenchMessages.DeleteResourceAction_jobName,
 								null);
 				joined = true;
 			} catch (InterruptedException ex) {
@@ -137,10 +136,8 @@ public class Bug99858Test extends TestCase {
 		joined = false;
 		while (!joined) {
 			try {
-				Platform
-						.getJobManager()
-						.join(
-								IDEWorkbenchMessages.DeleteResourceAction_jobName,
+				Platform.getJobManager()
+						.join(IDEWorkbenchMessages.DeleteResourceAction_jobName,
 								null);
 				joined = true;
 			} catch (InterruptedException ex) {
@@ -158,7 +155,7 @@ public class Bug99858Test extends TestCase {
 	/**
 	 * Subclass the delete action and go into testing mode, which limits user
 	 * dialogs.
-	 * 
+	 *
 	 * @since 3.2
 	 */
 	private class MyDeleteResourceAction extends DeleteResourceAction {
@@ -170,6 +167,7 @@ public class Bug99858Test extends TestCase {
 			fTestingMode = true;
 		}
 
+		@Override
 		public void run() {
 			super.run();
 			fRan = true;
@@ -178,7 +176,7 @@ public class Bug99858Test extends TestCase {
 
 	/**
 	 * Create a quick project file, so the project has some children to delete.
-	 * 
+	 *
 	 * @param testProject
 	 *            the project
 	 * @param name
@@ -191,25 +189,28 @@ public class Bug99858Test extends TestCase {
 	private void createProjectFile(IProject testProject, String name,
 			String contents) throws CoreException {
 		IFile textFile = testProject.getFile(name);
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(contents
-				.getBytes());
+		ByteArrayInputStream inputStream = new ByteArrayInputStream(
+				contents.getBytes());
 		textFile.create(inputStream, true, null);
 	}
 
 	/**
 	 * After an internal action, see if there are any outstanding SWT events.
 	 */
-	private void chewUpEvents() throws InterruptedException {
+	private void chewUpEvents() {
 		Display display = Display.getCurrent();
-		while (display.readAndDispatch())
+		while (display.readAndDispatch()) {
 			;
+		}
 	}
-	
+
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		AdvancedValidationUserApprover.AUTOMATED_MODE = true;
 	}
-	
+
+	@Override
 	protected void tearDown() throws Exception {
 		AdvancedValidationUserApprover.AUTOMATED_MODE = false;
 		super.tearDown();
