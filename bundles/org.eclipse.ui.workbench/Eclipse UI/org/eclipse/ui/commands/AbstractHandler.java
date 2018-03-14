@@ -15,7 +15,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.HandlerEvent;
@@ -45,7 +44,7 @@ public abstract class AbstractHandler extends
      * no listeners attached to this handler. (Most handlers don't
      * have any listeners, and this optimization saves some memory.)
      */
-    private List handlerListeners;
+	private List<org.eclipse.ui.commands.IHandlerListener> handlerListeners;
 
     /**
      * @see IHandler#addHandlerListener(IHandlerListener)
@@ -56,7 +55,7 @@ public abstract class AbstractHandler extends
 			throw new NullPointerException();
 		}
         if (handlerListeners == null) {
-			handlerListeners = new ArrayList();
+			handlerListeners = new ArrayList<org.eclipse.ui.commands.IHandlerListener>();
 		}
         if (!handlerListeners.contains(handlerListener)) {
 			handlerListeners.add(handlerListener);
@@ -95,9 +94,9 @@ public abstract class AbstractHandler extends
         if (handlerListeners != null) {
             final boolean attributesChanged = handlerEvent.isEnabledChanged()
                     || handlerEvent.isHandledChanged();
-            final Map previousAttributes;
+			final Map<String, Object> previousAttributes;
             if (attributesChanged) {
-                previousAttributes = new HashMap();
+				previousAttributes = new HashMap<String, Object>();
                 previousAttributes.putAll(getAttributeValuesByName());
                 if (handlerEvent.isEnabledChanged()) {
                 	Boolean disabled = !isEnabled() ? Boolean.TRUE: Boolean.FALSE;
@@ -116,8 +115,7 @@ public abstract class AbstractHandler extends
                     this, attributesChanged, previousAttributes);
 
             for (int i = 0; i < handlerListeners.size(); i++) {
-                ((org.eclipse.ui.commands.IHandlerListener) handlerListeners
-                        .get(i)).handlerChanged(legacyEvent);
+				handlerListeners.get(i).handlerChanged(legacyEvent);
             }
         }
     }
@@ -130,8 +128,7 @@ public abstract class AbstractHandler extends
 
         if (handlerListeners != null) {
             for (int i = 0; i < handlerListeners.size(); i++) {
-				((org.eclipse.ui.commands.IHandlerListener) handlerListeners
-                        .get(i)).handlerChanged(handlerEvent);
+				handlerListeners.get(i).handlerChanged(handlerEvent);
 			}
         }
 
@@ -139,8 +136,8 @@ public abstract class AbstractHandler extends
             final boolean enabledChanged;
             final boolean handledChanged;
             if (handlerEvent.haveAttributeValuesByNameChanged()) {
-                Map previousAttributes = handlerEvent
-                        .getPreviousAttributeValuesByName();
+				Map<String, Object> previousAttributes = handlerEvent
+						.getPreviousAttributeValuesByName();
 
                 Object attribute = previousAttributes.get("enabled"); //$NON-NLS-1$
                 if (attribute instanceof Boolean) {
@@ -172,8 +169,8 @@ public abstract class AbstractHandler extends
      * 
      * @see IHandler#getAttributeValuesByName()
      */
-    public Map getAttributeValuesByName() {
-        return Collections.EMPTY_MAP;
+	public Map<String, Object> getAttributeValuesByName() {
+		return Collections.emptyMap();
     }
     
     /**
