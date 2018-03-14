@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Bruno Medeiros <bruno.do.medeiros@gmail.com> - http://bugs.eclipse.org/447737
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -15,6 +16,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.IShellProvider;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
@@ -43,6 +45,13 @@ public class MoveResourceAction extends CopyResourceAction {
      * move.
      */
     protected List destinations;
+
+	/**
+	 * Move resource action if resource is a project.
+	 *
+	 * @since 3.11
+	 */
+	private MoveProjectAction moveProjectAction;
 
     /**
      * Creates a new action.
@@ -76,9 +85,18 @@ public class MoveResourceAction extends CopyResourceAction {
         setId(MoveResourceAction.ID);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(this,
 				IIDEHelpContextIds.MOVE_RESOURCE_ACTION);
+        
+		moveProjectAction = new MoveProjectAction(shellProvider);
     }
 
     @Override
+    protected boolean updateSelection(IStructuredSelection selection) {
+		moveProjectAction.selectionChanged(getStructuredSelection());
+
+		return moveProjectAction.isEnabled() || super.updateSelection(selection);
+    }
+
+	@Override
 	protected CopyFilesAndFoldersOperation createOperation() {
         return new MoveFilesAndFoldersOperation(getShell());
     }
@@ -115,6 +133,10 @@ public class MoveResourceAction extends CopyResourceAction {
 
     @Override
 	public void run() {
+		if (moveProjectAction.isEnabled()) {
+			moveProjectAction.run();
+			return;
+		}
 		if (LTKLauncher.openMoveWizard(getStructuredSelection())) {
 			return;
 		}
