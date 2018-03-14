@@ -384,6 +384,23 @@ public abstract class ContributionManager implements IContributionManager {
 	 * 
 	 */
 	protected void itemAdded(IContributionItem item) {
+		String id = item.getId();
+		if (id != null) {
+			// check if item exists
+			boolean found = false;
+			for (IContributionItem contItem : contributions) {
+				if (!item.isSeparator() && id.equals(contItem.getId())) {
+					if (found) {
+						// remove duplicated item
+						contributions.remove(item);
+						item.setParent(null);
+						return;
+					}
+					found = true;
+				}
+			}
+		}
+
 		item.setParent(this);
 		markDirty();
 		if (item.isDynamic()) {
