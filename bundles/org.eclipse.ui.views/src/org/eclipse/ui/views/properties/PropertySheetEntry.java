@@ -207,8 +207,7 @@ public class PropertySheetEntry extends EventManager implements
 		// the original order)
 		ArrayList result = new ArrayList(intersection.size());
 		IPropertyDescriptor[] firstDescs = firstSource.getPropertyDescriptors();
-		for (int i = 0; i < firstDescs.length; i++) {
-			IPropertyDescriptor desc = firstDescs[i];
+		for (IPropertyDescriptor desc : firstDescs) {
 			if (intersection.containsKey(desc.getId())) {
 				result.add(desc);
 			}
@@ -227,8 +226,8 @@ public class PropertySheetEntry extends EventManager implements
 	private Map computePropertyDescriptorsFor(IPropertySource source) {
 		IPropertyDescriptor[] descriptors = source.getPropertyDescriptors();
 		Map result = new HashMap(descriptors.length * 2 + 1);
-		for (int i = 0; i < descriptors.length; i++) {
-			result.put(descriptors[i].getId(), descriptors[i]);
+		for (IPropertyDescriptor descriptor2 : descriptors) {
+			result.put(descriptor2.getId(), descriptor2);
 		}
 		return result;
 	}
@@ -282,12 +281,12 @@ public class PropertySheetEntry extends EventManager implements
 		PropertySheetEntry[] entriesToDispose = childEntries;
 		childEntries = null;
 		if (entriesToDispose != null) {
-			for (int i = 0; i < entriesToDispose.length; i++) {
+			for (PropertySheetEntry element : entriesToDispose) {
 				// an error in a property source may cause refreshChildEntries
 				// to fail. Since the Workbench handles such errors we
 				// can be left in a state where a child entry is null.
-				if (entriesToDispose[i] != null) {
-					entriesToDispose[i].dispose();
+				if (element != null) {
+					element.dispose();
 				}
 			}
 		}
@@ -299,8 +298,8 @@ public class PropertySheetEntry extends EventManager implements
 	 */
 	private void fireChildEntriesChanged() {
 		Object[] array = getListeners();
-		for (int i = 0; i < array.length; i++) {
-			IPropertySheetEntryListener listener = (IPropertySheetEntryListener) array[i];
+		for (Object element : array) {
+			IPropertySheetEntryListener listener = (IPropertySheetEntryListener) element;
 			listener.childEntriesChanged(this);
 		}
 	}
@@ -311,8 +310,8 @@ public class PropertySheetEntry extends EventManager implements
 	 */
 	private void fireErrorMessageChanged() {
 		Object[] array = getListeners();
-		for (int i = 0; i < array.length; i++) {
-			IPropertySheetEntryListener listener = (IPropertySheetEntryListener) array[i];
+		for (Object element : array) {
+			IPropertySheetEntryListener listener = (IPropertySheetEntryListener) element;
 			listener.errorMessageChanged(this);
 		}
 	}
@@ -323,8 +322,8 @@ public class PropertySheetEntry extends EventManager implements
 	 */
 	private void fireValueChanged() {
 		Object[] array = getListeners();
-		for (int i = 0; i < array.length; i++) {
-			IPropertySheetEntryListener listener = (IPropertySheetEntryListener) array[i];
+		for (Object element : array) {
+			IPropertySheetEntryListener listener = (IPropertySheetEntryListener) element;
 			listener.valueChanged(this);
 		}
 	}
@@ -509,8 +508,7 @@ public class PropertySheetEntry extends EventManager implements
 
 		// cache old entries by their descriptor id
 		Map entryCache = new HashMap(childEntries.length * 2 + 1);
-		for (int i = 0; i < childEntries.length; i++) {
-			PropertySheetEntry childEntry = childEntries[i];
+		for (PropertySheetEntry childEntry : childEntries) {
 			if (childEntry != null) {
 				entryCache.put(childEntry.getDescriptor().getId(), childEntry);
 			}
@@ -609,8 +607,8 @@ public class PropertySheetEntry extends EventManager implements
 		// Use our parent's values to reset our values.
 		boolean change = false;
 		Object[] objects = parent.getValues();
-		for (int i = 0; i < objects.length; i++) {
-			IPropertySource source = getPropertySource(objects[i]);
+		for (Object object : objects) {
+			IPropertySource source = getPropertySource(object);
 			if (source.isPropertySet(descriptor.getId())) {
 				// fix for https://bugs.eclipse.org/bugs/show_bug.cgi?id=21756
 				if (source instanceof IPropertySource2) {
