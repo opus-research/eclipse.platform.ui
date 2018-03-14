@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,9 +10,6 @@
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.reconciler;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 import java.util.Collection;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -29,12 +26,10 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
-import org.junit.Test;
 
 public abstract class ModelReconcilerHandledItemTest extends
 		ModelReconcilerTest {
 
-	@Test
 	public void testHandledToolItem_Command_Set() {
 		MApplication application = createApplication();
 
@@ -79,7 +74,6 @@ public abstract class ModelReconcilerHandledItemTest extends
 		assertEquals(command, handledToolItem.getCommand());
 	}
 
-	@Test
 	public void testHandledToolItem_Command_Unset() {
 		MApplication application = createApplication();
 
@@ -124,7 +118,6 @@ public abstract class ModelReconcilerHandledItemTest extends
 		assertEquals(command, handledToolItem.getCommand());
 	}
 
-	@Test
 	public void testHandledToolItem_Parameters_Add() {
 		MApplication application = createApplication();
 
@@ -175,7 +168,6 @@ public abstract class ModelReconcilerHandledItemTest extends
 				.getName());
 	}
 
-	@Test
 	public void testHandledToolItem_Parameters_Remove() {
 		MApplication application = createApplication();
 
@@ -231,7 +223,6 @@ public abstract class ModelReconcilerHandledItemTest extends
 		assertEquals(0, handledToolItem.getParameters().size());
 	}
 
-	@Test
 	public void testHandledMenuItem_Command_Set() {
 		MApplication application = createApplication();
 
@@ -272,7 +263,6 @@ public abstract class ModelReconcilerHandledItemTest extends
 		assertEquals(command, handledMenuItem.getCommand());
 	}
 
-	@Test
 	public void testHandledMenuItem_Command_Unset() {
 		MApplication application = createApplication();
 
@@ -314,7 +304,6 @@ public abstract class ModelReconcilerHandledItemTest extends
 		assertNull(handledMenuItem.getCommand());
 	}
 
-	@Test
 	public void testHandledMenuItem_Parameters_Add() {
 		MApplication application = createApplication();
 
@@ -357,7 +346,6 @@ public abstract class ModelReconcilerHandledItemTest extends
 				.getName());
 	}
 
-	@Test
 	public void testHandledMenuItem_Parameters_Remove() {
 		MApplication application = createApplication();
 
