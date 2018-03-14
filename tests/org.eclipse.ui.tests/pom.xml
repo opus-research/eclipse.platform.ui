@@ -23,6 +23,7 @@
   <packaging>eclipse-test-plugin</packaging>
 
   <properties>
+    <skipTests>false</skipTests>
    	<testSuiteUITests>**/org/eclipse/ui/tests/UiTestSuite.java</testSuiteUITests>
 	<testSuiteJFace>**/org/eclipse/jface/tests/AllTests.java</testSuiteJFace>
   </properties>
@@ -34,10 +35,8 @@
   			<artifactId>tycho-surefire-plugin</artifactId>
   			<version>${tycho.version}</version>
 				<configuration>
-					<includes>
-						<include>${testSuiteJFace}</include>
-					 	<include>${testSuiteUITests}</include>
-					</includes>
+				    <testSuite>org.eclipse.ui.tests</testSuite>
+					<testClass>org.eclipse.jface.tests.AllTests</testClass>
 					<useUIHarness>true</useUIHarness>
 					<useUIThread>true</useUIThread>
 		  			<dependencies>
