@@ -28,7 +28,7 @@ import java.util.Date;
 /**
  * JUnit test for the {@link DefaultUiFreezeEventLogger}.
  */
-public class DefaultLoggerTests extends TestCase {
+public class DefaultLoggerTest extends TestCase {
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss.SSS");
 	private static final String RUNTIME_ID = "org.eclipse.core.runtime";
 	private static final long TIME = 120000000;
@@ -59,7 +59,7 @@ public class DefaultLoggerTests extends TestCase {
 		thread = jvmThreadManager.getThreadInfo(Thread.currentThread().getId(), Integer.MAX_VALUE);
 
 		StackSample[] samples = { new StackSample(TIME, new ThreadInfo[] { thread }) };
-		UiFreezeEvent event = new UiFreezeEvent(TIME, DURATION, samples, false);
+		UiFreezeEvent event = new UiFreezeEvent(TIME, DURATION, samples, 1, false);
 		return event;
 	}
 
