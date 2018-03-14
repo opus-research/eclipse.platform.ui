@@ -119,6 +119,39 @@
             </command>
          </menu>
       </menuContribution>
+   
+   
+         <menuContribution
+            allPopups="false"
+            locationURI="menu:window?after=showView">
+            <separator
+                  name="org.eclipse.ui.ide.application.separator1"
+                  visible="true">
+            </separator>
+         <command
+               commandId="org.eclipse.ui.window.customizePerspective"
+               label="%menu.customizePerspective.name"
+               style="push">
+         </command>
+         <command
+               commandId="org.eclipse.ui.window.savePerspective"
+               label="%menu.savePerspective.name"
+               style="push">
+         </command>
+         <command
+               commandId="org.eclipse.ui.window.resetPerspective"
+               label="%menu.resetPerspective.name"
+               style="push">
+         </command>
+         <command
+               commandId="org.eclipse.ui.window.closePerspective"
+               style="push">
+         </command>
+         <command
+               commandId="org.eclipse.ui.window.closeAllPerspectives"
+               style="push">
+         </command>
+      </menuContribution>
    </extension>
    <extension
          id="id1"
