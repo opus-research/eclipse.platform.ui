@@ -26,45 +26,40 @@ import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
 import org.eclipse.core.runtime.Assert;
 
 /**
- * @param <M>
- *            type of the master observable
- * @param <T>
- *            type of inner observable value
  * @since 1.0
  *
  */
-public class DetailObservableValue<M, T> extends AbstractObservableValue<T>
-		implements IObserving {
+public class DetailObservableValue extends AbstractObservableValue implements
+		IObserving {
 
 	private boolean updating = false;
 
-	private IValueChangeListener<T> innerChangeListener = new IValueChangeListener<T>() {
+	private IValueChangeListener innerChangeListener = new IValueChangeListener() {
 		@Override
-		public void handleValueChange(ValueChangeEvent<T> event) {
+		public void handleValueChange(ValueChangeEvent event) {
 			if (!updating) {
 				fireValueChange(event.diff);
 			}
 		}
 	};
 
-	private M currentOuterValue;
+	private Object currentOuterValue;
 
-	private IObservableValue<T> innerObservableValue;
+	private IObservableValue innerObservableValue;
 
 	private Object detailType;
 
-	private IObservableValue<M> outerObservableValue;
+	private IObservableValue outerObservableValue;
 
-	private IObservableFactory<? super M, IObservableValue<T>> factory;
+	private IObservableFactory factory;
 
 	/**
 	 * @param outerObservableValue
 	 * @param factory
 	 * @param detailType
 	 */
-	public DetailObservableValue(IObservableValue<M> outerObservableValue,
-			IObservableFactory<? super M, IObservableValue<T>> factory,
-			Object detailType) {
+	public DetailObservableValue(IObservableValue outerObservableValue,
+			IObservableFactory factory, Object detailType) {
 		super(outerObservableValue.getRealm());
 		Assert.isTrue(!outerObservableValue.isDisposed(),
 				"Master observable is disposed"); //$NON-NLS-1$
@@ -89,14 +84,14 @@ public class DetailObservableValue<M, T> extends AbstractObservableValue<T>
 		outerObservableValue.addValueChangeListener(outerChangeListener);
 	}
 
-	IValueChangeListener<M> outerChangeListener = new IValueChangeListener<M>() {
+	IValueChangeListener outerChangeListener = new IValueChangeListener() {
 		@Override
-		public void handleValueChange(ValueChangeEvent<M> event) {
+		public void handleValueChange(ValueChangeEvent event) {
 			if (isDisposed())
 				return;
 			ObservableTracker.setIgnore(true);
 			try {
-				T oldValue = doGetValue();
+				Object oldValue = doGetValue();
 				updateInnerObservableValue();
 				fireValueChange(Diffs.createValueDiff(oldValue, doGetValue()));
 			} finally {
@@ -116,7 +111,7 @@ public class DetailObservableValue<M, T> extends AbstractObservableValue<T>
 		} else {
 			ObservableTracker.setIgnore(true);
 			try {
-				innerObservableValue = factory
+				innerObservableValue = (IObservableValue) factory
 						.createObservable(currentOuterValue);
 			} finally {
 				ObservableTracker.setIgnore(false);
@@ -126,16 +121,17 @@ public class DetailObservableValue<M, T> extends AbstractObservableValue<T>
 
 			if (detailType != null) {
 				Object innerValueType = innerObservableValue.getValueType();
-				Assert.isTrue(
-						detailType.equals(innerValueType),
-						"Cannot change value type in a nested observable value, from " + innerValueType + " to " + detailType); //$NON-NLS-1$ //$NON-NLS-2$
+				Assert
+						.isTrue(
+								detailType.equals(innerValueType),
+								"Cannot change value type in a nested observable value, from " + innerValueType + " to " + detailType); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			innerObservableValue.addValueChangeListener(innerChangeListener);
 		}
 	}
 
 	@Override
-	public void doSetValue(final T value) {
+	public void doSetValue(final Object value) {
 		if (innerObservableValue != null) {
 			ObservableTracker.setIgnore(true);
 			try {
@@ -147,7 +143,7 @@ public class DetailObservableValue<M, T> extends AbstractObservableValue<T>
 	}
 
 	@Override
-	public T doGetValue() {
+	public Object doGetValue() {
 		if (innerObservableValue == null)
 			return null;
 		ObservableTracker.setIgnore(true);

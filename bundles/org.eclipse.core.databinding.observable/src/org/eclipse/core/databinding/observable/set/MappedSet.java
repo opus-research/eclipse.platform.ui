@@ -39,8 +39,6 @@ import org.eclipse.core.databinding.observable.map.MapDiff;
  * @deprecated This class is deprecated.
  */
 @Deprecated
-// OK to hide warnings on a deprecated class
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class MappedSet extends ObservableSet {
 
 	private final IObservableMap wrappedMap;
@@ -54,8 +52,7 @@ public class MappedSet extends ObservableSet {
 		@Override
 		public void handleSetChange(SetChangeEvent event) {
 			Set additions = new HashSet();
-			for (Iterator it = event.diff.getAdditions().iterator(); it
-					.hasNext();) {
+			for (Iterator it = event.diff.getAdditions().iterator(); it.hasNext();) {
 				Object added = it.next();
 				Object mapValue = wrappedMap.get(added);
 				if (handleAddition(mapValue)) {
@@ -63,8 +60,7 @@ public class MappedSet extends ObservableSet {
 				}
 			}
 			Set removals = new HashSet();
-			for (Iterator it = event.diff.getRemovals().iterator(); it
-					.hasNext();) {
+			for (Iterator it = event.diff.getRemovals().iterator(); it.hasNext();) {
 				Object removed = it.next();
 				Object mapValue = wrappedMap.get(removed);
 				if (handleRemoval(mapValue)) {

@@ -19,12 +19,10 @@ import org.eclipse.core.internal.databinding.property.Util;
 
 /**
  * Event object events in the properties API
- * 
- * @param <D>
- *            type of the diff handled by this event
+ *
  * @since 1.2
  */
-public final class SimplePropertyEvent<D extends IDiff> extends EventObject {
+public final class SimplePropertyEvent extends EventObject {
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -55,7 +53,7 @@ public final class SimplePropertyEvent<D extends IDiff> extends EventObject {
 	 * If event == CHANGE, a diff object describing the change in state, or null
 	 * for an unknown change.
 	 */
-	public final D diff;
+	public final IDiff diff;
 
 	/**
 	 * Constructs a PropertyChangeEvent with the given attributes
@@ -71,7 +69,7 @@ public final class SimplePropertyEvent<D extends IDiff> extends EventObject {
 	 *            is unknown or not applicable.
 	 */
 	public SimplePropertyEvent(int type, Object source, IProperty property,
-			D diff) {
+			IDiff diff) {
 		super(source);
 		this.type = type;
 		this.property = property;
@@ -87,7 +85,7 @@ public final class SimplePropertyEvent<D extends IDiff> extends EventObject {
 		if (getClass() != obj.getClass())
 			return false;
 
-		SimplePropertyEvent<?> that = (SimplePropertyEvent<?>) obj;
+		SimplePropertyEvent that = (SimplePropertyEvent) obj;
 		return Util.equals(getSource(), that.getSource())
 				&& Util.equals(this.property, that.property)
 				&& Util.equals(this.diff, that.diff);

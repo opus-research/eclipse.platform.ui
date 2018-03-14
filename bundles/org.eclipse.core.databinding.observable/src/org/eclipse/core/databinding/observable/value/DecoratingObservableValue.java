@@ -16,16 +16,14 @@ import org.eclipse.core.databinding.observable.DecoratingObservable;
 
 /**
  * An observable value which decorates another observable value.
- * 
- * @param <T>
- * 
+ *
  * @since 1.2
  */
-public class DecoratingObservableValue<T> extends DecoratingObservable
-		implements IObservableValue<T> {
-	private IObservableValue<T> decorated;
+public class DecoratingObservableValue extends DecoratingObservable implements
+		IObservableValue {
+	private IObservableValue decorated;
 
-	private IValueChangeListener<T> valueChangeListener;
+	private IValueChangeListener valueChangeListener;
 
 	/**
 	 * Constructs a DecoratingObservableValue which decorates the given
@@ -35,7 +33,7 @@ public class DecoratingObservableValue<T> extends DecoratingObservable
 	 *            the observable value being decorated
 	 * @param disposeDecoratedOnDispose
 	 */
-	public DecoratingObservableValue(IObservableValue<T> decorated,
+	public DecoratingObservableValue(IObservableValue decorated,
 			boolean disposeDecoratedOnDispose) {
 		super(decorated, disposeDecoratedOnDispose);
 		this.decorated = decorated;
@@ -43,20 +41,20 @@ public class DecoratingObservableValue<T> extends DecoratingObservable
 
 	@Override
 	public synchronized void addValueChangeListener(
-			IValueChangeListener<T> listener) {
+			IValueChangeListener listener) {
 		addListener(ValueChangeEvent.TYPE, listener);
 	}
 
 	@Override
 	public synchronized void removeValueChangeListener(
-			IValueChangeListener<T> listener) {
+			IValueChangeListener listener) {
 		removeListener(ValueChangeEvent.TYPE, listener);
 	}
 
-	protected void fireValueChange(ValueDiff<T> diff) {
+	protected void fireValueChange(ValueDiff diff) {
 		// fire general change event first
 		super.fireChange();
-		fireEvent(new ValueChangeEvent<T>(this, diff));
+		fireEvent(new ValueChangeEvent(this, diff));
 	}
 
 	@Override
@@ -68,9 +66,9 @@ public class DecoratingObservableValue<T> extends DecoratingObservable
 	@Override
 	protected void firstListenerAdded() {
 		if (valueChangeListener == null) {
-			valueChangeListener = new IValueChangeListener<T>() {
+			valueChangeListener = new IValueChangeListener() {
 				@Override
-				public void handleValueChange(ValueChangeEvent<T> event) {
+				public void handleValueChange(ValueChangeEvent event) {
 					DecoratingObservableValue.this.handleValueChange(event);
 				}
 			};
@@ -97,18 +95,18 @@ public class DecoratingObservableValue<T> extends DecoratingObservable
 	 * @param event
 	 *            the change event received from the decorated observable
 	 */
-	protected void handleValueChange(final ValueChangeEvent<T> event) {
+	protected void handleValueChange(final ValueChangeEvent event) {
 		fireValueChange(event.diff);
 	}
 
 	@Override
-	public T getValue() {
+	public Object getValue() {
 		getterCalled();
 		return decorated.getValue();
 	}
 
 	@Override
-	public void setValue(T value) {
+	public void setValue(Object value) {
 		checkRealm();
 		decorated.setValue(value);
 	}
