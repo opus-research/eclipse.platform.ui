@@ -28,7 +28,12 @@ public abstract class AbstractResourcesRegistry implements IResourcesRegistry {
 
 	private Map allResourcesMap = null;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.e4.ui.core.css.resources.IResourcesRegistry#getResource(java.lang.Object,
+	 *      java.lang.Object)
+	 */
 	public Object getResource(Object type, Object key) {
 		if (allResourcesMap == null) {
 			return null;
@@ -40,7 +45,12 @@ public abstract class AbstractResourcesRegistry implements IResourcesRegistry {
 		return resourcesMap.get(key);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.e4.ui.core.css.resources.IResourcesRegistry#registerResource(java.lang.Object,
+	 *      java.lang.Object, java.lang.Object)
+	 */
 	public void registerResource(Object type, Object key, Object resource) {
 		if (allResourcesMap == null) {
 			allResourcesMap = new HashMap();
@@ -63,7 +73,12 @@ public abstract class AbstractResourcesRegistry implements IResourcesRegistry {
 		return Collections.EMPTY_MAP;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.e4.ui.core.css.resources.IResourcesRegistry#unregisterResource(java.lang.Object,
+	 *      java.lang.Object)
+	 */
 	public void unregisterResource(Object type, Object key) {
 		if (allResourcesMap == null) {
 			return;
@@ -92,7 +107,11 @@ public abstract class AbstractResourcesRegistry implements IResourcesRegistry {
 		return resource.getClass();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.e4.ui.core.css.resources.IResourcesRegistry#dispose()
+	 */
 	public void dispose() {
 		if (allResourcesMap == null) {
 			return;

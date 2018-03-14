@@ -19,6 +19,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
+
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -46,11 +47,11 @@ public class AboutUtils {
 	 * Scan the contents of the about text
 	 * 
 	 * @param s
-	 * @return AboutItem
+	 * @return
 	 */
 	public static AboutItem scan(String s) {
-		ArrayList<int[]> linkRanges = new ArrayList<int[]>();
-		ArrayList<String> links = new ArrayList<String>();
+		ArrayList linkRanges = new ArrayList();
+		ArrayList links = new ArrayList();
 
 		// slightly modified version of jface url detection
 		// see org.eclipse.jface.text.hyperlink.URLHyperlinkDetector
@@ -73,12 +74,13 @@ public class AboutUtils {
 			urlOffset++;
 
 			// Right to "://"
-			StringTokenizer tokenizer = new StringTokenizer(s.substring(urlSeparatorOffset + 3),
-					" \t\n\r\f<>", false); //$NON-NLS-1$
+			StringTokenizer tokenizer = new StringTokenizer(s
+					.substring(urlSeparatorOffset + 3), " \t\n\r\f<>", false); //$NON-NLS-1$
 			if (!tokenizer.hasMoreTokens())
 				return null;
 
-			int urlLength = tokenizer.nextToken().length() + 3 + urlSeparatorOffset - urlOffset;
+			int urlLength = tokenizer.nextToken().length() + 3
+					+ urlSeparatorOffset - urlOffset;
 
 			if (startDoubleQuote) {
 				int endOffset = -1;
@@ -99,8 +101,9 @@ public class AboutUtils {
 
 			urlSeparatorOffset = s.indexOf("://", urlOffset + urlLength + 1); //$NON-NLS-1$
 		}
-		return new AboutItem(s, linkRanges.toArray(new int[linkRanges.size()][2]),
-				links.toArray(new String[links.size()]));
+		return new AboutItem(s, (int[][]) linkRanges.toArray(new int[linkRanges
+				.size()][2]), (String[]) links
+				.toArray(new String[links.size()]));
 	}
 
 	/**
@@ -108,7 +111,6 @@ public class AboutUtils {
 	 * refers to a resource within a bundle, then a temp copy of the file will
 	 * be extracted and opened.
 	 * 
-	 * @param shell
 	 * @see <code>Platform.asLocalUrl</code>
 	 * @param url
 	 *            The target url to be displayed, null will be safely ignored
@@ -131,9 +133,6 @@ public class AboutUtils {
 
 	/**
 	 * Open a link
-	 * 
-	 * @param shell
-	 * @param href
 	 */
 	public static void openLink(Shell shell, String href) {
 		// format the href for an html file (file:///<filename.html>
@@ -145,7 +144,8 @@ public class AboutUtils {
 			}
 			href = "file:///" + href; //$NON-NLS-1$
 		}
-		IWorkbenchBrowserSupport support = PlatformUI.getWorkbench().getBrowserSupport();
+		IWorkbenchBrowserSupport support = PlatformUI.getWorkbench()
+				.getBrowserSupport();
 		try {
 			IWebBrowser browser = support.getExternalBrowser();
 			browser.openURL(new URL(urlEncodeForSpaces(href.toCharArray())));
@@ -178,9 +178,12 @@ public class AboutUtils {
 	/**
 	 * display an error message
 	 */
-	private static void openWebBrowserError(Shell shell, final String href, final Throwable t) {
+	private static void openWebBrowserError(Shell shell, final String href,
+			final Throwable t) {
 		String title = WorkbenchMessages.ProductInfoDialog_errorTitle;
-		String msg = NLS.bind(WorkbenchMessages.ProductInfoDialog_unableToOpenWebBrowser, href);
+		String msg = NLS.bind(
+				WorkbenchMessages.ProductInfoDialog_unableToOpenWebBrowser,
+				href);
 		IStatus status = WorkbenchPlugin.getStatus(t);
 		StatusUtil.handleStatus(status, title + ": " + msg, StatusManager.SHOW, //$NON-NLS-1$
 				shell);
@@ -198,7 +201,8 @@ public class AboutUtils {
 			// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=97783
 			File logCopy = makeDisplayCopy(log);
 			if (logCopy != null) {
-				AboutUtils.openLink(shell, "file:///" + logCopy.getAbsolutePath()); //$NON-NLS-1$
+				AboutUtils.openLink(shell,
+						"file:///" + logCopy.getAbsolutePath()); //$NON-NLS-1$
 				return;
 			}
 			// Couldn't make copy, try to open the original log.
@@ -214,8 +218,10 @@ public class AboutUtils {
 			AboutUtils.openLink(shell, "file:///" + filename); //$NON-NLS-1$
 			return;
 		}
-		MessageDialog.openInformation(shell, WorkbenchMessages.AboutSystemDialog_noLogTitle,
-				NLS.bind(WorkbenchMessages.AboutSystemDialog_noLogMessage, filename));
+		MessageDialog.openInformation(shell,
+				WorkbenchMessages.AboutSystemDialog_noLogTitle, NLS.bind(
+						WorkbenchMessages.AboutSystemDialog_noLogMessage,
+						filename));
 	}
 
 	/**

@@ -27,12 +27,18 @@ public class CSSPropertyListImpl implements CSSPropertyList {
 	public CSSPropertyListImpl() {
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.e4.css.core.dom.CSSPropertyList#getLength()
+	 */
 	public int getLength() {
 		return (properties != null) ? properties.size() : 0;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.e4.css.core.dom.CSSPropertyList#item(int)
+	 */
 	public CSSProperty item(int index) {
 		return (properties != null) ? (CSSProperty) properties.get(index)
 				: null;
@@ -71,7 +77,10 @@ public class CSSPropertyListImpl implements CSSPropertyList {
 		properties.remove(index);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < getLength(); i++) {

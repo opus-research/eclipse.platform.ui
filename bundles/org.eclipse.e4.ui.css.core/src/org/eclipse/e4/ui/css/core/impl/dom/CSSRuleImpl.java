@@ -32,30 +32,44 @@ public abstract class CSSRuleImpl extends AbstractCSSNode implements CSSRule {
 
 	// W3C CSSRule API methods
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSRule#getCssText()
+	 */
 	public String getCssText() {
 		// TODO Auto-generated constructor stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSRule#getParentStyleSheet()
+	 */
 	public CSSStyleSheet getParentStyleSheet() {
 		return parentStyleSheet;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSRule#getParentRule()
+	 */
 	public CSSRule getParentRule() {
 		return parentRule;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSRule#getType()
+	 */
 	abstract public short getType();
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSRule#setCssText(java.lang.String)
+	 */
 	public void setCssText(String cssText) throws DOMException {
-		if(readOnly) {
+		if(readOnly)
 			throw new DOMExceptionImpl(DOMException.NO_MODIFICATION_ALLOWED_ERR, DOMExceptionImpl.NO_MODIFICATION_ALLOWED_ERROR);
-		}
 		// TODO Auto-generated method stub
 		// TODO throws SYNTAX_ERR if cssText is unparsable
 		// TODO throws INVALID_MODIFICATION_ERR: Raised if the specified CSS string value represents a different type of rule than the current one.

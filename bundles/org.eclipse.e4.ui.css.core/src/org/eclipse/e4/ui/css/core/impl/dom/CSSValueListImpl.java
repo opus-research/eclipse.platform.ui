@@ -32,17 +32,26 @@ public class CSSValueListImpl extends AbstractCSSNode implements CSSValueList {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSValueList#getLength()
+	 */
 	public int getLength() {
 		return values.size();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSValueList#item(int)
+	 */
 	public CSSValue item(int index) {
 		return values.get(index);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSValue#getCssText()
+	 */
 	public String getCssText() {
 		StringBuilder buffer = new StringBuilder();
 		for (CSSValue value : values) {
@@ -52,12 +61,18 @@ public class CSSValueListImpl extends AbstractCSSNode implements CSSValueList {
 		return buffer.toString().trim();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSValue#getCssValueType()
+	 */
 	public short getCssValueType() {
 		return CSS_VALUE_LIST;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSValue#setCssText(java.lang.String)
+	 */
 	public void setCssText(String arg0) throws DOMException {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
