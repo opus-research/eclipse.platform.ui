@@ -148,7 +148,18 @@ public final class ExternalActionManager {
 		 */
 		public CommandCallback(final BindingManager bindingManager,
 				final CommandManager commandManager) {
-			this(bindingManager, commandManager, commandId -> true, action -> true);
+			this(bindingManager, commandManager, new IActiveChecker() {
+				@Override
+				public boolean isActive(String commandId) {
+					return true;
+				}
+
+			}, new IExecuteApplicable() {
+				@Override
+				public boolean isApplicable(IAction action) {
+					return true;
+				}
+			});
 		}
 		/**
 		 * Constructs a new instance of <code>CommandCallback</code> with the
@@ -169,7 +180,13 @@ public final class ExternalActionManager {
 		public CommandCallback(final BindingManager bindingManager,
 				final CommandManager commandManager,
 				final IActiveChecker activeChecker) {
-			this(bindingManager, commandManager, activeChecker, action -> true);
+			this(bindingManager, commandManager, activeChecker,
+					new IExecuteApplicable() {
+				@Override
+				public boolean isApplicable(IAction action) {
+					return true;
+				}
+			});
 		}
 		/**
 		 * Constructs a new instance of <code>CommandCallback</code> with the
