@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ui.examples.views.properties.tabbed.article.views;
 
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.util.Assert;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -43,8 +42,10 @@ public class LabelSection
     private ModifyListener listener = new ModifyListener() {
 
         public void modifyText(ModifyEvent arg0) {
-			ButtonElementProperties properties = (ButtonElementProperties) Adapters.adapt(buttonElement, IPropertySource.class);
-			properties.setPropertyValue(ButtonElementProperties.PROPERTY_TEXT, labelText.getText());
+            ButtonElementProperties properties = (ButtonElementProperties) buttonElement
+                .getAdapter(IPropertySource.class);
+            properties.setPropertyValue(ButtonElementProperties.PROPERTY_TEXT,
+                labelText.getText());
         }
     };
 
@@ -82,8 +83,9 @@ public class LabelSection
     }
 
     public void refresh() {
-		labelText.removeModifyListener(listener);
-		ButtonElementProperties properties = (ButtonElementProperties) Adapters.adapt(buttonElement, IPropertySource.class);
+        labelText.removeModifyListener(listener);
+        ButtonElementProperties properties = (ButtonElementProperties) buttonElement
+            .getAdapter(IPropertySource.class);
         labelText.setText(properties.strText);
         labelText.addModifyListener(listener);
     }

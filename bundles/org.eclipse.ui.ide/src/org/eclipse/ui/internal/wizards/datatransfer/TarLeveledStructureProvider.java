@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Red Hat, Inc - Was TarFileStructureProvider, performed changes from
  *     IImportStructureProvider to ILeveledImportStructureProvider
- *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 package org.eclipse.ui.internal.wizards.datatransfer;
 
@@ -222,7 +221,7 @@ public class TarLeveledStructureProvider implements
 	 * Strip the leading directories from the path
 	 */
 	private String stripPath(String path) {
-		String pathOrig = path;
+		String pathOrig = new String(path);
 		for (int i = 0; i < stripLevel; i++) {
 			int firstSep = path.indexOf('/');
 			// If the first character was a seperator we must strip to the next

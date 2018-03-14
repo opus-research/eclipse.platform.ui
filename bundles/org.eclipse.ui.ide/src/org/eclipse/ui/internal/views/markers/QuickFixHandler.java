@@ -22,7 +22,6 @@ import java.util.Map;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
@@ -105,7 +104,7 @@ public class QuickFixHandler extends MarkerViewHandler {
 			monitor.done();
 		};
 
-		IWorkbenchSiteProgressService service = Adapters.adapt(view.getSite(), IWorkbenchSiteProgressService.class);
+		Object service = view.getSite().getAdapter(IWorkbenchSiteProgressService.class);
 
 		IRunnableContext context = new ProgressMonitorDialog(view.getSite().getShell());
 
@@ -113,7 +112,7 @@ public class QuickFixHandler extends MarkerViewHandler {
 			if (service == null) {
 				PlatformUI.getWorkbench().getProgressService().runInUI(context, resolutionsRunnable, null);
 			} else {
-				service.runInUI(context, resolutionsRunnable, null);
+				((IWorkbenchSiteProgressService) service).runInUI(context, resolutionsRunnable, null);
 			}
 		} catch (InvocationTargetException exception) {
 			throw new ExecutionException(exception.getLocalizedMessage(), exception);
