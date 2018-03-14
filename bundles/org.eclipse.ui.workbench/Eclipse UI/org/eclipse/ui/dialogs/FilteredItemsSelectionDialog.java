@@ -50,7 +50,6 @@ import org.eclipse.jface.action.LegacyActionTools;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ContentViewer;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IContentProvider;
@@ -73,6 +72,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.ACC;
@@ -178,8 +178,6 @@ public abstract class FilteredItemsSelectionDialog extends
 	private ItemsListLabelProvider itemsListLabelProvider;
 
 	private MenuManager menuManager;
-
-	private MenuManager contextMenuManager;
 
 	private boolean multi;
 
@@ -413,10 +411,6 @@ public abstract class FilteredItemsSelectionDialog extends
 			showViewHandler.getHandler().dispose();
 			showViewHandler = null;
 		}
-		if (menuManager != null)
-			menuManager.dispose();
-		if (contextMenuManager != null)
-			contextMenuManager.dispose();
 		storeDialog(getDialogSettings());
 		return super.close();
 	}
@@ -618,16 +612,16 @@ public abstract class FilteredItemsSelectionDialog extends
 		removeHistoryActionContributionItem = new ActionContributionItem(
 				removeHistoryItemAction);
 
-		contextMenuManager = new MenuManager();
-		contextMenuManager.setRemoveAllWhenShown(true);
-		contextMenuManager.addMenuListener(new IMenuListener() {
+		MenuManager manager = new MenuManager();
+		manager.setRemoveAllWhenShown(true);
+		manager.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(IMenuManager manager) {
 				fillContextMenu(manager);
 			}
 		});
 
 		final Table table = list.getTable();
-		Menu menu= contextMenuManager.createContextMenu(table);
+		Menu menu= manager.createContextMenu(table);
 		table.setMenu(menu);
 	}
 
