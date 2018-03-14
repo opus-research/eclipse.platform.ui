@@ -21,8 +21,8 @@
 }
 
 Label,
-Button,
-{
+Button[style~='SWT.RADIO'],
+Button[style~='SWT.CHECK'] {
 	background-color: COLOR-TRANSPARENT;
 }
 
