@@ -17,7 +17,6 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 
 import org.eclipse.core.runtime.ListenerList;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.accessibility.ACC;
@@ -61,7 +60,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.TypedListener;
-
 import org.eclipse.ui.forms.HyperlinkSettings;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.events.IHyperlinkListener;
@@ -1351,13 +1349,17 @@ public class FormText extends Canvas {
 				if (isDisposed()) return;
 				IHyperlinkSegment segmentUnder = model
 						.findHyperlinkAt(e.x, e.y);
-				if (segmentUnder != null && armed == segmentUnder && selData == null) {
+				if (segmentUnder != null && armed == segmentUnder && !isValidSelection()) {
 					activateLink(segmentUnder, e.stateMask);
 					armed = null;
 				}
 			}
 			mouseFocus = false;
 		}
+	}
+
+	private boolean isValidSelection() {
+		return selData != null && selData.getSelectionText().length() != 0;
 	}
 
 	private void handleMouseHover(MouseEvent e) {
