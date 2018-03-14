@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Part3 Plug-in
-Bundle-SymbolicName: org.eclipse.ui.examples.rcp.mail;singleton:=true
+Bundle-SymbolicName: org.eclipse.ui.tutorials.rcp.part3; singleton:=true
 Bundle-Version: 1.100.0
-Bundle-Activator: org.eclipse.ui.examples.rcp.mail.Part3Plugin
+Bundle-Activator: org.eclipse.ui.tutorials.rcp.part3.Part3Plugin
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime
