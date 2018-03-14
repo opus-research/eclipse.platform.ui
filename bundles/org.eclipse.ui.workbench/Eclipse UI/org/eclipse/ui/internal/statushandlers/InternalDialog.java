@@ -13,7 +13,6 @@ package org.eclipse.ui.internal.statushandlers;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
@@ -974,7 +973,7 @@ public class InternalDialog extends TrayDialog {
 	private IAction getGotoAction() {
 		Object property = null;
 
-		Job job = Adapters.adapt(getCurrentStatusAdapter(), Job.class);
+		Job job = (Job) (getCurrentStatusAdapter().getAdapter(Job.class));
 		if (job != null) {
 			property = job.getProperty(IProgressConstants.ACTION_PROPERTY);
 		}

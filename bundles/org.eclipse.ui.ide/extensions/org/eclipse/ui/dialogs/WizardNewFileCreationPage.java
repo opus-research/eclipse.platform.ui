@@ -685,7 +685,7 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 			Iterator it = currentSelection.iterator();
 			if (it.hasNext()) {
 				Object object = it.next();
-				IResource selectedResource = Adapters.adapt(object, IResource.class);
+				IResource selectedResource = Adapters.getAdapter(object, IResource.class, true);
 				if (selectedResource != null) {
 					if (selectedResource.getType() == IResource.FILE) {
 						selectedResource = selectedResource.getParent();

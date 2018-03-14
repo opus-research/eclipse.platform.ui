@@ -124,7 +124,7 @@ public class ResourcePatternFilter extends ViewerFilter {
 
     @Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
-		IResource resource = Adapters.adapt(element, IResource.class);
+		IResource resource = Adapters.getAdapter(element, IResource.class, true);
         if (resource != null) {
             String name = resource.getName();
             StringMatcher[] testMatchers = getMatchers();

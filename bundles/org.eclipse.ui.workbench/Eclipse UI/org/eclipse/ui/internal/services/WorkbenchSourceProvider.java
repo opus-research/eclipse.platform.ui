@@ -15,7 +15,6 @@ package org.eclipse.ui.internal.services;
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.core.expressions.IEvaluationContext;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
@@ -403,7 +402,7 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 	}
 
 	private IShowInSource getShowInSource(IWorkbenchPart sourcePart) {
-		return Adapters.adapt(sourcePart, IShowInSource.class);
+		return Util.getAdapter(sourcePart, IShowInSource.class);
 	}
 
 	private ShowInContext getContext(IWorkbenchPart sourcePart) {

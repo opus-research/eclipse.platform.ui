@@ -489,7 +489,7 @@ public final class SelectionEnabler {
 			if (sc.nameFilter == null) {
 				return true;
 			}
-			IWorkbenchAdapter de = Adapters.adapt(element, IWorkbenchAdapter.class);
+			IWorkbenchAdapter de = Adapters.getAdapter(element, IWorkbenchAdapter.class, true);
 			if ((de != null)
 					&& verifyNameMatch(de.getLabel(element), sc.nameFilter)) {
 				return true;

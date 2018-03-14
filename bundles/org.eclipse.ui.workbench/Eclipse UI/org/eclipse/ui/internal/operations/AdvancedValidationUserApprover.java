@@ -11,6 +11,7 @@
 package org.eclipse.ui.internal.operations;
 
 import java.lang.reflect.InvocationTargetException;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IAdvancedUndoableOperation;
 import org.eclipse.core.commands.operations.IAdvancedUndoableOperation2;
@@ -19,7 +20,6 @@ import org.eclipse.core.commands.operations.IOperationApprover2;
 import org.eclipse.core.commands.operations.IOperationHistory;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.commands.operations.IUndoableOperation;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -36,6 +36,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.misc.StatusUtil;
+import org.eclipse.ui.internal.util.Util;
 
 /**
  * <p>
@@ -382,7 +383,7 @@ public class AdvancedValidationUserApprover implements IOperationApprover,
 	 */
 	Shell getShell(IAdaptable uiInfo) {
 		if (uiInfo != null) {
-			Shell shell = Adapters.adapt(uiInfo, Shell.class);
+			Shell shell = Util.getAdapter(uiInfo, Shell.class);
 			if (shell != null) {
 				return shell;
 			}

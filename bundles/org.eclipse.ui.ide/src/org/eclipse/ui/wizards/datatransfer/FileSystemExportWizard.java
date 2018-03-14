@@ -91,7 +91,8 @@ public class FileSystemExportWizard extends Wizard implements IExportWizard {
             if (page != null) {
                 IEditorPart currentEditor = page.getActiveEditor();
 				if (currentEditor != null) {
-					Object selectedResource = Adapters.adapt(currentEditor.getEditorInput(), IResource.class);
+					Object selectedResource = Adapters.getAdapter(currentEditor.getEditorInput(), IResource.class,
+							true);
 					if (selectedResource != null) {
 						selection = new StructuredSelection(selectedResource);
 					}

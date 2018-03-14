@@ -47,7 +47,7 @@ public class EditorInputPropertyTester extends PropertyTester {
 					.log("IEditorPart (" + editor.getClass() + ") passed in without IEditorInput set.", new NullPointerException()); //$NON-NLS-1$ //$NON-NLS-2$
 			return false;
 		}
-		Object obj = Adapters.adapt(input, IResource.class);
+		Object obj = Adapters.getAdapter(input, IResource.class, true);
 		return obj != null;
 	}
 }

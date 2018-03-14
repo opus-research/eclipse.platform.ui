@@ -50,7 +50,7 @@ public class BaseWorkbenchContentProvider implements ITreeContentProvider {
      * @return the corresponding workbench adapter object
      */
     protected IWorkbenchAdapter getAdapter(Object element) {
-        return Adapters.adapt(element, IWorkbenchAdapter.class);
+        return Adapters.getAdapter(element, IWorkbenchAdapter.class, true);
     }
 
     @Override

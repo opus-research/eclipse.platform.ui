@@ -11,12 +11,12 @@
 package org.eclipse.ui.internal;
 
 import java.util.List;
+
 import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.expressions.EvaluationResult;
 import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.ExpressionConverter;
 import org.eclipse.core.expressions.IEvaluationContext;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -31,6 +31,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.SelectionEnabler;
 import org.eclipse.ui.internal.misc.Policy;
 import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
+import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
 /**
@@ -283,7 +284,7 @@ public class ObjectActionContributor extends PluginActionBuilder implements
 			return true;
 		}
         String objectName = null;
-        IWorkbenchAdapter de = Adapters.adapt(object, IWorkbenchAdapter.class);
+        IWorkbenchAdapter de = Util.getAdapter(object, IWorkbenchAdapter.class);
         if (de != null) {
 			objectName = de.getLabel(object);
 		}
