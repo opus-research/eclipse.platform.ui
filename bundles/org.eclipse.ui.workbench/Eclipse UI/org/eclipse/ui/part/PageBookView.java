@@ -278,12 +278,18 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 
 		private SelectionManager fPostSelectionListeners = new SelectionManager();
 
+		/*
+		 * (non-Javadoc) Method declared on ISelectionProvider.
+		 */
 		@Override
 		public void addSelectionChangedListener(
 				ISelectionChangedListener listener) {
 			fSelectionListener.addSelectionChangedListener(listener);
 		}
 
+		/*
+		 * (non-Javadoc) Method declared on ISelectionProvider.
+		 */
 		@Override
 		public ISelection getSelection() {
 			// get the selection provider from the current page
@@ -304,6 +310,9 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 			return StructuredSelection.EMPTY;
 		}
 
+		/*
+		 * (non-Javadoc) Method declared on ISelectionProvider.
+		 */
 		@Override
 		public void removeSelectionChangedListener(
 				ISelectionChangedListener listener) {
@@ -331,6 +340,9 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 			fPostSelectionListeners.selectionChanged(event);
 		}
 
+		/*
+		 * (non-Javadoc) Method declared on ISelectionProvider.
+		 */
 		@Override
 		public void setSelection(ISelection selection) {
 			// get the selection provider from the current page
@@ -351,12 +363,22 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 			}
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.jface.viewers.IPostSelectionProvider#addPostSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
+		 */
 		@Override
 		public void addPostSelectionChangedListener(
 				ISelectionChangedListener listener) {
 			fPostSelectionListeners.addSelectionChangedListener(listener);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.jface.viewers.IPostSelectionProvider#removePostSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
+		 */
 		@Override
 		public void removePostSelectionChangedListener(
 				ISelectionChangedListener listener) {
@@ -720,6 +742,9 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	 */
 	protected abstract boolean isImportant(IWorkbenchPart part);
 
+	/*
+	 * (non-Javadoc) Method declared on IViewPart.
+	 */
 	@Override
 	public void init(IViewSite site) throws PartInitException {
 		site.setSelectionProvider(selectionProvider);
@@ -803,6 +828,11 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 		// Do nothing.
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.IPartListener#partOpened(org.eclipse.ui.IWorkbenchPart)
+	 */
 	@Override
 	public void partOpened(IWorkbenchPart part) {
 		// Do nothing by default.
@@ -876,6 +906,9 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IWorkbenchPart.
+	 */
 	@Override
 	public void setFocus() {
 		// first set focus on the page book, in case the page
