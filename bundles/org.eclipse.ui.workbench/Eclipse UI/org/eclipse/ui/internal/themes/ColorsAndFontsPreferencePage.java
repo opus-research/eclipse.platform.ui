@@ -10,7 +10,6 @@
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 436247
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440136, 472654
  *     Robert Roth <robert.roth.off@gmail.com> - Bugs 274005, 456291
- *     Mickael Istria (Red Hat Inc.) - Theme and fontregistry rather than pref
  *******************************************************************************/
 package org.eclipse.ui.internal.themes;
 
@@ -1534,7 +1533,7 @@ getPreferenceStore(),
 	}
 
     @Override
-	public void performDefaults() {
+	protected void performDefaults() {
         performColorDefaults();
         performFontDefaults();
 		updateControls();
