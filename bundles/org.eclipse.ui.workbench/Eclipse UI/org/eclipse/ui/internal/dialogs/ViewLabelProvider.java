@@ -43,7 +43,7 @@ public class ViewLabelProvider extends ColumnLabelProvider {
 		this.window = window;
 		this.dimmedForeground = dimmedForeground;
 	}
-	
+
 	protected void initialize(ColumnViewer viewer, ViewerColumn column) {
 		super.initialize(viewer, column);
 	}
