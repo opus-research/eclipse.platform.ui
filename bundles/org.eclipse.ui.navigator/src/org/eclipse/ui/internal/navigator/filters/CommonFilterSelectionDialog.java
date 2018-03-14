@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2010 IBM Corporation and others.
+ * Copyright (c) 2003, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  * IBM Corporation - initial API and implementation
+ * Mickael Istria (Red Hat Inc.) - 226046 Allow user to specify filters
  *******************************************************************************/
 /*
  * Created on Feb 9, 2004
@@ -20,20 +21,17 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jface.dialogs.TrayDialog;
-import org.eclipse.jface.resource.ColorRegistry;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CTabFolder;
-import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.navigator.CommonNavigatorMessages;
@@ -62,7 +60,7 @@ public class CommonFilterSelectionDialog extends TrayDialog {
 
 	private final INavigatorContentService contentService;
 
-	private CTabFolder customizationsTabFolder;
+	private TabFolder customizationsTabFolder;
 
 	private CommonFiltersTab commonFiltersTab;
 
@@ -73,6 +71,7 @@ public class CommonFilterSelectionDialog extends TrayDialog {
 	private ISelectionChangedListener updateDescriptionSelectionListener; 
 
 	private String helpContext;
+	private UserFiltersTab userFiltersTab;
 	
 	/**
 	 * Public only for tests.
@@ -89,6 +88,13 @@ public class CommonFilterSelectionDialog extends TrayDialog {
 		INavigatorViewerDescriptor viewerDescriptor = contentService.getViewerDescriptor();
 		helpContext = viewerDescriptor
 				.getStringConfigProperty(INavigatorViewerDescriptor.PROP_CUSTOMIZE_VIEW_DIALOG_HELP_CONTEXT);
+		
+//		for (ICommonFilterDescriptor filterDesc : this.commonViewer.getNavigatorContentService().getFilterService().getVisibleFilterDescriptors()) {
+//			ViewerFilter filter = this.commonViewer.getNavigatorContentService().getFilterService().getViewerFilter(filterDesc);
+//			if (filter instanceof UserFilterViewFilter) {
+//				((UserF))
+//			}
+//		}
 
 		if (helpContext != null) {
 			PlatformUI.getWorkbench().getHelpSystem().setHelp(
@@ -123,6 +129,12 @@ public class CommonFilterSelectionDialog extends TrayDialog {
 				CommonNavigatorMessages.CommonFilterSelectionDialog_Available_Filters,
 				commonFiltersTab, FILTER_ICON);
 		
+		this.userFiltersTab = new UserFiltersTab(customizationsTabFolder, this.commonViewer);
+		createTabItem(
+				customizationsTabFolder,
+				CommonNavigatorMessages.CommonFilterSelectionDialog_User_Resource_Filters,
+				userFiltersTab, FILTER_ICON);
+		
 
 		boolean hideExtensionsTab = contentService.getViewerDescriptor()
 				.getBooleanConfigProperty(
@@ -156,7 +168,7 @@ public class CommonFilterSelectionDialog extends TrayDialog {
 	}
 
 	private void createCustomizationsTabFolder(Composite superComposite) {
-		customizationsTabFolder = new CTabFolder (superComposite, SWT.RESIZE | SWT.BORDER);
+		customizationsTabFolder = new TabFolder (superComposite, SWT.RESIZE);
  
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		gd.widthHint = convertHorizontalDLUsToPixels(TAB_WIDTH_IN_DLUS);
@@ -181,22 +193,11 @@ public class CommonFilterSelectionDialog extends TrayDialog {
 
 		});
 	  
-		customize();
-
 	}
 
-	private void customize() {
-		ColorRegistry reg = JFaceResources.getColorRegistry();
-		Color c1 = reg.get("org.eclipse.ui.workbench.ACTIVE_TAB_BG_START"), //$NON-NLS-1$
-		  c2 = reg.get("org.eclipse.ui.workbench.ACTIVE_TAB_BG_END"); //$NON-NLS-1$
-		customizationsTabFolder.setSelectionBackground(new Color[] {c1, c2},	new int[] {100}, true);
-		customizationsTabFolder.setSelectionForeground(reg.get("org.eclipse.ui.workbench.ACTIVE_TAB_TEXT_COLOR")); //$NON-NLS-1$
-		customizationsTabFolder.setSimple(true);
-	}
-
-	private CTabItem createTabItem(CTabFolder aTabFolder, String label,
+	private TabItem createTabItem(TabFolder aTabFolder, String label,
 			Composite composite, String imageKey) {
-		CTabItem extensionsTabItem = new CTabItem(aTabFolder, SWT.BORDER);
+		TabItem extensionsTabItem = new TabItem(aTabFolder, SWT.BORDER);
 		extensionsTabItem.setText(label);
  		extensionsTabItem.setControl(composite); 
  		extensionsTabItem.setImage(NavigatorPlugin.getDefault().getImage(imageKey));
@@ -247,6 +248,10 @@ public class CommonFilterSelectionDialog extends TrayDialog {
 			updateExtensions.execute(null, null);
 		}
 
+		if (this.userFiltersTab != null) {
+			this.commonViewer.setData(NavigatorPlugin.RESOURCE_REGEXP_FILTER_DATA, this.userFiltersTab.getUserFilters());
+		}
+		
 		if (commonFiltersTab != null) {
 			Set checkedFilters = commonFiltersTab.getCheckedItems();
 			
@@ -264,7 +269,7 @@ public class CommonFilterSelectionDialog extends TrayDialog {
 					commonViewer, filterIdsToActivate);
 			updateFilters.execute(null, null);
 		}
-
+		
 		super.okPressed();
 	}
 }

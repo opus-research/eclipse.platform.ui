@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2012 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Mickael Istria (Red Hat Inc.) - 226046 Add filter for user-spec'd patterns
  *******************************************************************************/
 package org.eclipse.ui.internal.navigator;
 
@@ -66,6 +67,7 @@ public class CommonNavigatorMessages extends NLS {
 
 	/** */
 	public static String CommonFilterSelectionDialog_Available_Filters;
+	/** */
 
 	/** */
 	public static String CommonFilterSelectionDialog_Available_Content;
@@ -78,6 +80,14 @@ public class CommonNavigatorMessages extends NLS {
 
 	/** */
 	public static String CommonFilterSelectionDialog_Select_the_filters_to_apply;
+	/** */
+	public static String CommonFilterSelectionDialog_User_Resource_Filters;
+	/** */
+	public static String CommonFilterSelectionDialog_RegexpFilter_New;
+	/** */
+	public static String CommonFilterSelectionDialog_RegexpFilter_Edit;
+	/** */
+	public static String CommonFilterSelectionDialog_RegexpFilter_Remove;
 
 	/** */
 	public static String SelectFiltersActionDelegate_0;
@@ -116,6 +126,9 @@ public class CommonNavigatorMessages extends NLS {
 	public static String CommonFilterSelectionDialog_Available_customization_;
 
 	/** */
+	public static String CommonFilterSelectionDialog_Set_custom_filters_to_apply;
+	
+	/** */
 	public static String CommonSorterDescriptorManager_A_navigatorContent_extesnion_in_0_;
 
 	/** */
@@ -132,6 +145,7 @@ public class CommonNavigatorMessages extends NLS {
 	
 	/** */
 	public static String NavigatorContentService_problemSavingPreferences;
+
 	
 
 	static {

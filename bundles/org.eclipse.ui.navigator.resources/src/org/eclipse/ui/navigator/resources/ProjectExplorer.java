@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2013 IBM Corporation and others.
+ * Copyright (c) 2007, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,37 +7,41 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Mickael Istria (Red Hat Inc.) - 226046 Add filter for user-spec'd patterns
  ******************************************************************************/
 package org.eclipse.ui.navigator.resources;
 
-import org.eclipse.osgi.util.NLS;
-
-import org.eclipse.swt.widgets.Composite;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.common.CommandException;
-
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
-
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-
 import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IStructuredSelection;
-
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IAggregateWorkingSet;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPageLayout;
+import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkingSet;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.internal.navigator.NavigatorPlugin;
+import org.eclipse.ui.internal.navigator.filters.UserFilter;
 import org.eclipse.ui.internal.navigator.framelist.Frame;
 import org.eclipse.ui.internal.navigator.framelist.FrameList;
 import org.eclipse.ui.internal.navigator.framelist.TreeFrame;
@@ -79,21 +83,55 @@ public final class ProjectExplorer extends CommonNavigator {
 	 * @since 3.4
 	 */
 	public static final int PROJECTS = 1;
+	
+	private static final String MEMENTO_REGEXP_FILTER_ELEMENT = "regexpFilter"; //$NON-NLS-1$
+	private static final String MEMENTO_REGEXP_FILTER_REGEXP_ATTRIBUTE = "regexp"; //$NON-NLS-1$
+	private static final String MEMENTO_REGEXP_FILTER_ENABLED_ATTRIBUTE = "enabled"; //$NON-NLS-1$
 
 	private int rootMode;
-
+	
 	/**
 	 * Used only in the case of top level = PROJECTS and only when some
 	 * working sets are selected. 
 	 */
 	private String workingSetLabel;
 
+	private List<UserFilter> userFilters;
+
+
+	@Override
+	public void init(IViewSite site, IMemento memento) throws PartInitException {
+		super.init(site, memento);
+		userFilters = new ArrayList<UserFilter>();
+		if (memento != null) {
+			IMemento[] filters = memento.getChildren(MEMENTO_REGEXP_FILTER_ELEMENT);
+			for (IMemento filterMemento : filters) {
+				String regexp = filterMemento.getString(MEMENTO_REGEXP_FILTER_REGEXP_ATTRIBUTE);
+				Boolean enabled = filterMemento.getBoolean(MEMENTO_REGEXP_FILTER_ENABLED_ATTRIBUTE);
+				userFilters.add(new UserFilter(regexp, enabled));
+			}
+		}
+	}
+	
+	@Override
+	public void saveState(IMemento aMemento) {
+		Collection<UserFilter> dataAsFilters = (Collection<UserFilter>)getCommonViewer().getData(NavigatorPlugin.RESOURCE_REGEXP_FILTER_DATA);
+		if (dataAsFilters != null) {
+			for (UserFilter filter : dataAsFilters) {
+				IMemento memento = aMemento.createChild(MEMENTO_REGEXP_FILTER_ELEMENT);
+				memento.putString(MEMENTO_REGEXP_FILTER_REGEXP_ATTRIBUTE, filter.getRegexp());
+				memento.putBoolean(MEMENTO_REGEXP_FILTER_ENABLED_ATTRIBUTE, filter.isEnabled());
+			}
+		}
+		super.saveState(aMemento);
+	}
+	
 	@Override
 	public void createPartControl(Composite aParent) {
 		super.createPartControl(aParent);
 		
-		if (!false)
-			getCommonViewer().setMapper(new ResourceToItemsMapper(getCommonViewer()));
+		getCommonViewer().setMapper(new ResourceToItemsMapper(getCommonViewer()));
+		getCommonViewer().setData(NavigatorPlugin.RESOURCE_REGEXP_FILTER_DATA, this.userFilters);
 	}	
 	
 	/**
