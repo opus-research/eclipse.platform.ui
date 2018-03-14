@@ -132,7 +132,6 @@ final class PulldownDelegateWidgetProxy implements IWidget {
 		/**
 		 * @see ISafeRunnable#handleException(java.lang.Throwable)
 		 */
-		@Override
 		public void handleException(Throwable exception) {
 			// Do nothing
 		}
@@ -140,7 +139,6 @@ final class PulldownDelegateWidgetProxy implements IWidget {
 		/**
 		 * @see ISafeRunnable#run()
 		 */
-		@Override
 		public void run() throws Exception {
 			if (parent == null) {
 				menu = delegate.getMenu(control);
@@ -179,7 +177,6 @@ final class PulldownDelegateWidgetProxy implements IWidget {
 	private final String delegateAttributeName;
 
 	private final DisposeListener disposeListener = new DisposeListener() {
-		@Override
 		public void widgetDisposed(DisposeEvent e) {
 			if (e.widget == widget) {
 				dispose();
@@ -199,7 +196,6 @@ final class PulldownDelegateWidgetProxy implements IWidget {
 	private final IServiceLocator locator;
 
 	private final Listener selectionListener = new Listener() {
-		@Override
 		public final void handleEvent(final Event event) {
 			final Widget item = event.widget;
 			if (item == null) {
@@ -296,24 +292,20 @@ final class PulldownDelegateWidgetProxy implements IWidget {
 	/**
 	 * Passes the dipose on to the proxied handler, if it has been loaded.
 	 */
-	@Override
 	public final void dispose() {
 		if (delegate != null) {
 			delegate.dispose();
 		}
 	}
 
-	@Override
 	public final void fill(final Composite parent) {
 		// This does not need to be supported.
 	}
 
-	@Override
 	public final void fill(CoolBar parent, final int index) {
 		// This does not need to be supported.
 	}
 
-	@Override
 	public final void fill(final Menu parent, final int index) {
 		if ((widget != null) || (parent == null)) {
 			return;
@@ -352,7 +344,6 @@ final class PulldownDelegateWidgetProxy implements IWidget {
 		// update(null);
 	}
 
-	@Override
 	public final void fill(final ToolBar parent, final int index) {
 		if ((widget != null) && (parent == null)) {
 			return;
@@ -425,7 +416,6 @@ final class PulldownDelegateWidgetProxy implements IWidget {
 		return true;
 	}
 
-	@Override
 	public final String toString() {
 		if (delegate == null) {
 			return configurationElement.getAttribute(delegateAttributeName);
