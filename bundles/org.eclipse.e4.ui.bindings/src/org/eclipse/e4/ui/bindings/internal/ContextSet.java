@@ -80,11 +80,6 @@ public class ContextSet {
 		return contexts;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object o) {
 		if (o == this) {
@@ -96,11 +91,6 @@ public class ContextSet {
 		return contexts.equals(((ContextSet) o).contexts);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
 		return contexts.hashCode();
