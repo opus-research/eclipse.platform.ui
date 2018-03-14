@@ -453,11 +453,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				nestedProjects = nestedProjectsCheckbox.getSelection();
-				if (projectFromDirectoryRadio.getSelection()) {
-					updateProjectsList(directoryPathField.getText().trim());
-				} else {
-					updateProjectsList(archivePathField.getText().trim());
-				}
+				updateProjectsStatus();
 			}
 		});
 
