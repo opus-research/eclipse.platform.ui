@@ -53,7 +53,6 @@ public abstract class ExtensionContributionFactory extends
 	 * 
 	 * @see org.eclipse.ui.menus.AbstractContributionFactory#getLocation()
 	 */
-	@Override
 	public final String getLocation() {
 		return locationURI;
 	}
@@ -63,7 +62,6 @@ public abstract class ExtensionContributionFactory extends
 	 * 
 	 * @see org.eclipse.ui.menus.AbstractContributionFactory#getNamespace()
 	 */
-	@Override
 	public final String getNamespace() {
 		return namespace;
 	}
@@ -76,7 +74,6 @@ public abstract class ExtensionContributionFactory extends
 	 * @throws CoreException
 	 *             so that a subclass may throw this
 	 */
-	@Override
 	public void setInitializationData(IConfigurationElement config,
 			String propertyName, Object data) throws CoreException {
 		locationURI = config

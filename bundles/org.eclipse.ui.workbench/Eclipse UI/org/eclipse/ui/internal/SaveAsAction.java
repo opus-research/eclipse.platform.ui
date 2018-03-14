@@ -43,8 +43,7 @@ public class SaveAsAction extends BaseSaveAction {
     /* (non-Javadoc)
      * Method declared on Action.
      */
-    @Override
-	public void run() {
+    public void run() {
         if (getWorkbenchWindow() == null) {
             // action has been disposed
             return;
@@ -69,8 +68,7 @@ public class SaveAsAction extends BaseSaveAction {
     /* (non-Javadoc)
      * Method declared on ActiveEditorAction.
      */
-    @Override
-	protected void updateState() {
+    protected void updateState() {
         /* **********************************************************************************
          * The code below was added to track the view with focus
          * in order to support save actions from a view (see bug 10234). 

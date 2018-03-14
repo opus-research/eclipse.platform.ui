@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 Oakland Software Incorporated and others.
+ * Copyright (c) 2009 Oakland Software Incorporated and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
-
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuManager;
@@ -28,9 +27,6 @@ import org.eclipse.ui.tests.navigator.extension.TestContentProvider;
 import org.eclipse.ui.tests.navigator.extension.TestExtensionTreeData;
 
 public class ActionProviderTest extends NavigatorTestBase {
-
-	private static final boolean SLEEP_LONG = false;
-
 
 	public ActionProviderTest() {
 		_navigatorInstanceId = TEST_VIEWER;
@@ -73,7 +69,7 @@ public class ActionProviderTest extends NavigatorTestBase {
 				((IContainer) _p2.members()[1]).members()[0]);
 		_viewer.setSelection(sel);
 
-		if (SLEEP_LONG)
+		if (false)
 			DisplayHelper.sleep(10000000);
 
 		// Overridden
@@ -124,7 +120,7 @@ public class ActionProviderTest extends NavigatorTestBase {
 			}
 		}
 
-		if (SLEEP_LONG)
+		if (false)
 			DisplayHelper.sleep(10000000);
 
 		assertEquals(4, priorityItems.size());

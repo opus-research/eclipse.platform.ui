@@ -46,8 +46,7 @@ public class WorkingSetRegistryReader extends RegistryReader {
      * 
      * @see RegistryReader#readElement(IConfigurationElement)
      */
-    @Override
-	public boolean readElement(IConfigurationElement element) {
+    public boolean readElement(IConfigurationElement element) {
         if (element.getName().equals(IWorkbenchRegistryConstants.TAG_WORKING_SET)) {
             try {
                 WorkingSetDescriptor desc = new WorkingSetDescriptor(element);

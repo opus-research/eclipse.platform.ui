@@ -233,8 +233,7 @@ public class ThemeRegistryReader extends RegistryReader {
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.registry.RegistryReader#readElement(org.eclipse.core.runtime.IConfigurationElement)
      */
-    @Override
-	public boolean readElement(IConfigurationElement element) {
+    public boolean readElement(IConfigurationElement element) {
         String elementName = element.getName();
         if (themeDescriptor == null && elementName.equals(IWorkbenchRegistryConstants.TAG_COLORDEFINITION)) {
             ColorDefinition definition = readColor(element);

@@ -39,7 +39,6 @@ public class WorkbenchHandlerServiceHandler extends HandlerServiceHandler implem
 	 * org.eclipse.ui.commands.IElementUpdater#updateElement(org.eclipse.ui.
 	 * menus.UIElement, java.util.Map)
 	 */
-	@Override
 	public void updateElement(UIElement element, Map parameters) {
 		final IEclipseContext executionContext = getExecutionContext(null);
 		if (executionContext == null) {

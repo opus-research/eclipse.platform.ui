@@ -40,7 +40,11 @@ final class CancelOnModifyListener implements Listener {
 		chainedListener = listener;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+	 */
 	public void handleEvent(Event event) {
 		Widget widget = event.widget;
 		widget.removeListener(SWT.Modify, this);

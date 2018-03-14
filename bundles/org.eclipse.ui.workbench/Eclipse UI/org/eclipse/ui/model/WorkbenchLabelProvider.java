@@ -66,7 +66,6 @@ public class WorkbenchLabelProvider extends LabelProvider implements
      * associations in the registry.
      */
     private IPropertyListener editorRegistryListener = new IPropertyListener() {
-		@Override
 		public void propertyChanged(Object source, int propId) {
 			if (propId == IEditorRegistry.PROP_CONTENTS) {
 				fireLabelProviderChanged(new LabelProviderChangedEvent(WorkbenchLabelProvider.this));
@@ -118,8 +117,7 @@ public class WorkbenchLabelProvider extends LabelProvider implements
     /* (non-Javadoc)
      * Method declared on ILabelProvider
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
     	PlatformUI.getWorkbench().getEditorRegistry().removePropertyListener(editorRegistryListener);
 		if (resourceManager != null)
 			resourceManager.dispose();
@@ -179,8 +177,7 @@ public class WorkbenchLabelProvider extends LabelProvider implements
     /* (non-Javadoc)
      * Method declared on ILabelProvider
      */
-    @Override
-	public final Image getImage(Object element) {
+    public final Image getImage(Object element) {
         //obtain the base image by querying the element
         IWorkbenchAdapter adapter = getAdapter(element);
         if (adapter == null) {
@@ -208,8 +205,7 @@ public class WorkbenchLabelProvider extends LabelProvider implements
 	 * 
 	 * @since 3.7
 	 */
-    @Override
-	public StyledString getStyledText(Object element) {
+    public StyledString getStyledText(Object element) {
         IWorkbenchAdapter3 adapter = getAdapter3(element);
 		if (adapter == null) {
 			// If adapter class doesn't implement IWorkbenchAdapter3 than use
@@ -245,8 +241,7 @@ public class WorkbenchLabelProvider extends LabelProvider implements
     /* (non-Javadoc)
      * Method declared on ILabelProvider
      */
-    @Override
-	public final String getText(Object element) {
+    public final String getText(Object element) {
         //query the element for its label
         IWorkbenchAdapter adapter = getAdapter(element);
         if (adapter == null) {
@@ -261,24 +256,21 @@ public class WorkbenchLabelProvider extends LabelProvider implements
     /* (non-Javadoc)
      * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
      */
-    @Override
-	public Color getForeground(Object element) {
+    public Color getForeground(Object element) {
         return getColor(element, true);
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.jface.viewers.IColorProvider#getBackground(java.lang.Object)
      */
-    @Override
-	public Color getBackground(Object element) {
+    public Color getBackground(Object element) {
         return getColor(element, false);
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
      */
-    @Override
-	public Font getFont(Object element) {
+    public Font getFont(Object element) {
         IWorkbenchAdapter2 adapter = getAdapter2(element);
         if (adapter == null) {
             return null;

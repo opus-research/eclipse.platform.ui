@@ -34,11 +34,9 @@ public class WorkManagementActionProvider extends CommonActionProvider {
 
 	private AddBookmarkAction addBookmarkAction;
 
-	@Override
 	public void init(ICommonActionExtensionSite aSite) {
 		final Shell shell = aSite.getViewSite().getShell();
 		IShellProvider sp = new IShellProvider() {
-			@Override
 			public Shell getShell() {
 				return shell;
 			}
@@ -54,7 +52,6 @@ public class WorkManagementActionProvider extends CommonActionProvider {
 	 * org.eclipse.ui.actions.ActionGroup#fillActionBars(org.eclipse.ui.IActionBars
 	 * )
 	 */
-	@Override
 	public void fillActionBars(IActionBars actionBars) {
 		super.fillActionBars(actionBars);
 		actionBars.setGlobalActionHandler(IDEActionFactory.BOOKMARK.getId(), addBookmarkAction);
@@ -68,7 +65,6 @@ public class WorkManagementActionProvider extends CommonActionProvider {
 	 * org.eclipse.ui.actions.ActionGroup#setContext(org.eclipse.ui.actions.
 	 * ActionContext)
 	 */
-	@Override
 	public void setContext(ActionContext context) {
 		super.setContext(context);
 		if (context != null && context.getSelection() instanceof IStructuredSelection) {

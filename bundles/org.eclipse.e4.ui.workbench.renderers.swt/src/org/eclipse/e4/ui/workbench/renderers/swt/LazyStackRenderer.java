@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 IBM Corporation and others.
+ * Copyright (c) 2008, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Fabio Zadrozny (fabiofz@gmail.com) - Bug 436763
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -29,7 +28,6 @@ import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Shell;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
@@ -45,7 +43,6 @@ import org.osgi.service.event.EventHandler;
  */
 public abstract class LazyStackRenderer extends SWTPartRenderer {
 	private EventHandler lazyLoader = new EventHandler() {
-		@Override
 		public void handleEvent(Event event) {
 			Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
 
@@ -89,7 +86,6 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 		eventBroker.unsubscribe(lazyLoader);
 	}
 
-	@Override
 	public void postProcess(MUIElement element) {
 		if (!(element instanceof MGenericStack<?>))
 			return;
@@ -164,6 +160,13 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 		if (element == null || element.getWidget() == null)
 			return;
 
+		if (element instanceof MPartStack
+				&& element.getRenderer() instanceof StackRenderer) {
+			StackRenderer sr = (StackRenderer) element.getRenderer();
+			CTabFolder ctf = (CTabFolder) element.getWidget();
+			sr.clearTR(ctf);
+		}
+
 		if (element instanceof MPlaceholder) {
 			MPlaceholder ph = (MPlaceholder) element;
 			element = ph.getRef();
@@ -217,7 +220,7 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 			if (curSel instanceof MPlaceholder) {
 				part.setCurSharedRef((MPlaceholder) curSel);
 			}
-			sr.adjustTopRight(ctf);
+			sr.adjustTR(ctf, part);
 		}
 
 		if (element instanceof MPlaceholder && element.getWidget() != null) {
@@ -245,7 +248,6 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 			}
 		}
 
-		Shell layoutShellLater = null;
 		// Show any floating windows
 		if (element instanceof MWindow && element.getWidget() != null) {
 			int visCount = 0;
@@ -253,14 +255,8 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 				if (kid.isToBeRendered() && kid.isVisible())
 					visCount++;
 			}
-			if (visCount > 0) {
+			if (visCount > 0)
 				element.setVisible(true);
-				Object widget = element.getWidget();
-				if (widget instanceof Shell) {
-					Shell shell = (Shell) widget;
-					layoutShellLater = shell;
-				}
-			}
 		}
 
 		if (element instanceof MGenericStack<?>) {
@@ -289,13 +285,6 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 					showElementRecursive(w);
 				}
 			}
-		}
-
-		// i.e.: Bug 436763: after we make items visible, if we made a new
-		// floating shell visible, we have to re-layout it for its contents to
-		// become correct.
-		if (layoutShellLater != null) {
-			layoutShellLater.layout(true, true);
 		}
 	}
 }

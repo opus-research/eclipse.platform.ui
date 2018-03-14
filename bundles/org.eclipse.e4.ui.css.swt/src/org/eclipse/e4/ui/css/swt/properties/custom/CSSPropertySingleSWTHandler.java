@@ -19,7 +19,6 @@ public class CSSPropertySingleSWTHandler extends AbstractCSSPropertySWTHandler{
 
 	public static final ICSSPropertyHandler INSTANCE = new CSSPropertySingleSWTHandler();
 	
-	@Override
 	public void applyCSSProperty(Control control, String property,
 		    CSSValue value, String pseudo, CSSEngine engine) throws Exception {
 		boolean isSingle = (Boolean)engine.convert(value, Boolean.class, null);
@@ -29,7 +28,6 @@ public class CSSPropertySingleSWTHandler extends AbstractCSSPropertySWTHandler{
 		}
 	}
 
-	@Override
 	public String retrieveCSSProperty(Control control, String property,
 			String pseudo, CSSEngine engine) throws Exception {
 		if (control instanceof CTabFolder) {

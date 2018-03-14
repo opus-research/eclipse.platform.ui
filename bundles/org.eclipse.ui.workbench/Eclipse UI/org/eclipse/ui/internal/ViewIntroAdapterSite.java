@@ -39,81 +39,70 @@ final class ViewIntroAdapterSite implements IIntroSite {
     /* (non-Javadoc)
      * @see org.eclipse.ui.intro.IIntroSite#getActionBars()
      */
-    @Override
-	public IActionBars getActionBars() {
+    public IActionBars getActionBars() {
         return viewSite.getActionBars();
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
      */
-    @Override
-	public Object getAdapter(Class adapter) {
+    public Object getAdapter(Class adapter) {
         return viewSite.getAdapter(adapter);
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchPartSite#getId()
      */
-    @Override
-	public String getId() {
+    public String getId() {
         return descriptor.getId();
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchPartSite#getKeyBindingService()
      */
-    @Override
-	public IKeyBindingService getKeyBindingService() {
+    public IKeyBindingService getKeyBindingService() {
         return viewSite.getKeyBindingService();
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchSite#getPage()
      */
-    @Override
-	public IWorkbenchPage getPage() {
+    public IWorkbenchPage getPage() {
         return viewSite.getPage();
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchPartSite#getPluginId()
      */
-    @Override
-	public String getPluginId() {
+    public String getPluginId() {
         return descriptor.getPluginId();
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchSite#getSelectionProvider()
      */
-    @Override
-	public ISelectionProvider getSelectionProvider() {
+    public ISelectionProvider getSelectionProvider() {
         return viewSite.getSelectionProvider();
     }
     
-    @Override
-	public final Object getService(final Class key) {
+    public final Object getService(final Class key) {
     		return viewSite.getService(key);
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchSite#getShell()
      */
-    @Override
-	public Shell getShell() {
+    public Shell getShell() {
         return viewSite.getShell();
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchSite#getWorkbenchWindow()
      */
-    @Override
-	public IWorkbenchWindow getWorkbenchWindow() {
+    public IWorkbenchWindow getWorkbenchWindow() {
         return viewSite.getWorkbenchWindow();
     }
 
-	@Override
 	public final boolean hasService(final Class key) {
 		return viewSite.hasService(key);
 	}
@@ -121,16 +110,14 @@ final class ViewIntroAdapterSite implements IIntroSite {
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchSite#setSelectionProvider(org.eclipse.jface.viewers.ISelectionProvider)
      */
-    @Override
-	public void setSelectionProvider(ISelectionProvider provider) {
+    public void setSelectionProvider(ISelectionProvider provider) {
         viewSite.setSelectionProvider(provider);
     }
 
 	/* (non-Javadoc)
      * @see java.lang.Object#toString()
      */
-    @Override
-	public String toString() {
+    public String toString() {
         return viewSite.toString();
     }
 }

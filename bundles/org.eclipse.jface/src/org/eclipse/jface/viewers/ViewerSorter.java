@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,8 +40,7 @@ public class ViewerSorter extends ViewerComparator {
      * 
      * @deprecated as of 3.3 Use {@link ViewerComparator#getComparator()}
      */
-    @Deprecated
-	protected Collator collator;
+    protected Collator collator;
 
     /**
      * Creates a new viewer sorter, which uses the default collator
@@ -68,8 +67,7 @@ public class ViewerSorter extends ViewerComparator {
      * @return the collator used to sort strings
      * @deprecated as of 3.3 Use {@link ViewerComparator#getComparator()}
      */
-    @Deprecated
-	public Collator getCollator() {
+    public Collator getCollator() {
         return collator;
     }
 

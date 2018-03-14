@@ -111,8 +111,7 @@ public class AdaptableList extends WorkbenchAdapter implements IAdaptable {
     /* (non-Javadoc)
      * @see IAdaptable#getAdapter
      */
-    @Override
-	public Object getAdapter(Class adapter) {
+    public Object getAdapter(Class adapter) {
         if (adapter == IWorkbenchAdapter.class) {
             return this;
         }
@@ -122,8 +121,7 @@ public class AdaptableList extends WorkbenchAdapter implements IAdaptable {
     /* (non-Javadoc)
      * @see IWorkbenchAdapter
      */
-    @Override
-	public Object[] getChildren(Object o) {
+    public Object[] getChildren(Object o) {
         // @issue suspicious - does not reference parameter
         return children.toArray();
     }
@@ -152,8 +150,7 @@ public class AdaptableList extends WorkbenchAdapter implements IAdaptable {
     /* (non-javadoc)
      * For debugging purposes only.
      */
-    @Override
-	public String toString() {
+    public String toString() {
         return children.toString();
     }
 }

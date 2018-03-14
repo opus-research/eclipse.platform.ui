@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -52,7 +52,6 @@ public class MenuManagerHideProcessor implements IMenuListener2 {
 	 * 
 	 * SWT.Hide pre-processing method for MenuManager
 	 */
-	@Override
 	public void menuAboutToShow(IMenuManager manager) {
 		if (!(manager instanceof MenuManager)) {
 			return;
@@ -78,7 +77,6 @@ public class MenuManagerHideProcessor implements IMenuListener2 {
 	private void processDynamicElements(Menu menu, final MMenu menuModel) {
 		if (!menu.isDisposed()) {
 			menu.getDisplay().asyncExec(new Runnable() {
-				@Override
 				public void run() {
 
 					MMenuElement[] ml = menuModel.getChildren().toArray(
@@ -120,7 +118,6 @@ public class MenuManagerHideProcessor implements IMenuListener2 {
 	 * org.eclipse.jface.action.IMenuListener2#menuAboutToHide(org.eclipse.jface
 	 * .action.IMenuManager)
 	 */
-	@Override
 	public void menuAboutToHide(IMenuManager manager) {
 	}
 
@@ -132,7 +129,6 @@ public class MenuManagerHideProcessor implements IMenuListener2 {
 		popupContext.remove(MenuManagerRendererFilter.TMP_ORIGINAL_CONTEXT);
 		if (!menu.isDisposed()) {
 			menu.getDisplay().asyncExec(new Runnable() {
-				@Override
 				public void run() {
 					if (originalChild == null) {
 						popupContext.deactivate();

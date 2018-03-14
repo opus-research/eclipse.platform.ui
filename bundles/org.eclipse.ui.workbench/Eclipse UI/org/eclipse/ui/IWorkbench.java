@@ -205,7 +205,6 @@ public interface IWorkbench extends IAdaptable, IServiceLocator {
 	 *             method you should move them to your own plugin preference
 	 *             store.
 	 */
-	@Deprecated
 	public IPreferenceStore getPreferenceStore();
 
 	/**
@@ -481,7 +480,6 @@ public interface IWorkbench extends IAdaptable, IServiceLocator {
 	 * @see ICommandService
 	 * @see IHandlerService
 	 */
-	@Deprecated
 	IWorkbenchCommandSupport getCommandSupport();
 
 	/**
@@ -493,7 +491,6 @@ public interface IWorkbench extends IAdaptable, IServiceLocator {
 	 * @deprecated Please use {@link IServiceLocator#getService(Class)} instead.
 	 * @see IContextService
 	 */
-	@Deprecated
 	IWorkbenchContextSupport getContextSupport();
 
 	/**
