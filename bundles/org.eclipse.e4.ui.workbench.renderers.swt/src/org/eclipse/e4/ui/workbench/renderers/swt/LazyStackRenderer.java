@@ -223,11 +223,9 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 			MUIElement ref = ph.getRef();
 			ref.setCurSharedRef(ph);
 
-			if (ref.isToBeRendered()) {
-				Composite phComp = (Composite) ph.getWidget();
-				Control refCtrl = (Control) ph.getRef().getWidget();
-				refCtrl.setParent(phComp);
-			}
+			Composite phComp = (Composite) ph.getWidget();
+			Control refCtrl = (Control) ph.getRef().getWidget();
+			refCtrl.setParent(phComp);
 
 			element = ref;
 		}
