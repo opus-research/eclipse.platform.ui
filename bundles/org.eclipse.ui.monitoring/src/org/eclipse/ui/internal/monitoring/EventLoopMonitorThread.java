@@ -73,11 +73,13 @@ public class EventLoopMonitorThread extends Thread {
 		public int maxStackSamples;
 		/** If true, log freeze events to the Eclipse error log on the local machine. */
 		public boolean logToErrorLog;
-		/** Contains the list of fully qualified methods to filter out. */
-		public String filterTraces;
+		/** @see org.eclipse.ui.monitoring.PreferenceConstants#UI_THREAD_FILTER */
+		public String uiThreadFilter;
+		/** @see org.eclipse.ui.monitoring.PreferenceConstants#NONINTERESTING_THREAD_FILTER */
+		public String noninterestingThreadFilter;
 
 		/**
-		 * Checks if parameters for plug-in are valid before startup.
+		 * Checks if the values of parameters for UI responsiveness monitoring are valid.
 		 *
 		 * @throws IllegalArgumentException if the parameter values are invalid or inconsistent.
 		 */
@@ -127,7 +129,7 @@ public class EventLoopMonitorThread extends Thread {
 		 * {@link SWT#PreExternalEventDispatch PreExternalEventDispatch} event and popped from
 		 * the stack on {@link SWT#PostExternalEventDispatch PostExternalEventDispatch} event.
 		 */
-		private int[] nestingLevelStack = new int[32];
+		private int[] nestingLevelStack = new int[64];
 		private int nestingLevelStackSize;
 
 		@Override
@@ -158,6 +160,9 @@ public class EventLoopMonitorThread extends Thread {
 			 */
 			switch (event.type) {
 			case SWT.PreEvent:
+				if (!doesEventIndicateResponsiveUI(event.detail)) {
+					break;  // Ignore events that may be produced during a UI freeze.
+				}
 				if (eventHistory != null) {
 					eventHistory.recordEvent(event.type);
 				}
@@ -166,6 +171,9 @@ public class EventLoopMonitorThread extends Thread {
 				handleEventTransition(true, true);
 				break;
 			case SWT.PostEvent:
+				if (!doesEventIndicateResponsiveUI(event.detail)) {
+					break;  // Ignore events that may be produced during a UI freeze.
+				}
 				if (eventHistory != null) {
 					eventHistory.recordEvent(event.type);
 				}
@@ -186,22 +194,40 @@ public class EventLoopMonitorThread extends Thread {
 					eventHistory.recordEvent(event.type);
 				}
 				restoreNestingLevel();
-				// Don't log a long interval, start the timer if inside another event.
-				handleEventTransition(false, nestingLevel > 0);
+				// Don't log a long interval, start the timer.
+				handleEventTransition(false, true);
 				break;
 			default:
+				break;
+			}
+		}
+
+		/**
+		 * Returns {@code true} if dispatching of an event of the given type indicates that the UI
+		 * is responsive. Events that may be produced during UI freezes are irrelevant to UI
+		 * responsiveness monitoring.
+		 */
+		private boolean doesEventIndicateResponsiveUI(int eventType) {
+			switch (eventType) {
+			case SWT.Skin:
+			case SWT.MeasureItem:
+			case SWT.Dispose:
+				return false;
+			default:
+				return true;
 			}
 		}
 
 		private void saveAndResetNestingLevel() {
-			if (nestingLevelStackSize >= nestingLevelStack.length) {
+			if (nestingLevelStackSize < nestingLevelStack.length) {
+				nestingLevelStack[nestingLevelStackSize++] = nestingLevel;
+				nestingLevel = 0;
+			} else {
 				MonitoringPlugin.logError(
 						NLS.bind(Messages.EventLoopMonitorThread_max_event_loop_depth_exceeded_1,
 						nestingLevelStack.length), null);
 				shutdown();
 			}
-			nestingLevelStack[nestingLevelStackSize++] = nestingLevel;
-			nestingLevel = 0;
 		}
 
 		private void restoreNestingLevel() {
@@ -238,7 +264,7 @@ public class EventLoopMonitorThread extends Thread {
 
 			if (!haveAlreadyLoggedPossibleDeadlock && lastActive > 0 &&
 					totalDuration > deadlockThreshold &&
-					filterHandler.shouldLogEvent(stackSamples, numSamples, uiThreadId)) {
+					uiThreadFilter.shouldLogEvent(stackSamples, numSamples, uiThreadId)) {
 				stackSamples = Arrays.copyOf(stackSamples, numSamples);
 				logEvent(new UiFreezeEvent(lastActive, totalDuration,
 						Arrays.copyOf(stackSamples, numSamples), true));
@@ -347,7 +373,8 @@ public class EventLoopMonitorThread extends Thread {
 			new ArrayList<IUiFreezeEventLogger>();
 	private DefaultUiFreezeEventLogger defaultLogger;
 	private final Display display;
-	private final FilterHandler filterHandler;
+	private final FilterHandler uiThreadFilter;
+	private final FilterHandler noninterestingThreadFilter;
 	private final int longEventErrorThreshold;
 	private final long sampleInterval;
 	private final long allThreadsSampleInterval;
@@ -392,7 +419,8 @@ public class EventLoopMonitorThread extends Thread {
 		allThreadsSampleInterval = longEventErrorThreshold * 2 / 3;
 		deadlockThreshold = args.deadlockThreshold;
 		logToErrorLog = args.logToErrorLog;
-		filterHandler = new FilterHandler(args.filterTraces);
+		uiThreadFilter = new FilterHandler(args.uiThreadFilter);
+		noninterestingThreadFilter = new FilterHandler(args.noninterestingThreadFilter);
 		sleepMonitor = new Object();
 	}
 
@@ -602,7 +630,7 @@ public class EventLoopMonitorThread extends Thread {
 						numSamples = maxLoggedStackSamples;
 					}
 
-					if (filterHandler.shouldLogEvent(stackSamples, numSamples, uiThreadId)) {
+					if (uiThreadFilter.shouldLogEvent(stackSamples, numSamples, uiThreadId)) {
 						logEvent(new UiFreezeEvent(eventSnapshot.start, eventSnapshot.duration,
 								Arrays.copyOf(stackSamples, numSamples), false));
 					}
@@ -617,33 +645,45 @@ public class EventLoopMonitorThread extends Thread {
 	}
 
 	private ThreadInfo[] captureThreadStacks(boolean dumpAllThreads) {
-		ThreadInfo[] threadStacks;
 		if (dumpAllThreads) {
-			ThreadInfo[] rawThreadStacks =
+			ThreadInfo[] threadStacks =
 					threadMXBean.dumpAllThreads(dumpLockedMonitors, dumpLockedSynchronizers);
 			// Remove the info for the monitoring thread.
-			threadStacks = new ThreadInfo[rawThreadStacks.length - 1];
 			int index = 0;
-
-			for (int i = 0; i < rawThreadStacks.length; i++) {
-				ThreadInfo thread = rawThreadStacks[i];
+			for (int i = 0; i < threadStacks.length; i++) {
+				ThreadInfo thread = threadStacks[i];
 				long threadId = thread.getThreadId();
 				// Skip the stack trace of the event loop monitoring thread.
 				if (threadId != monitoringThreadId) {
-					if (threadId == uiThreadId && i != 0) {
-						// Swap the UI thread to first slot in the array if it is not
-						// there already.
-						thread = threadStacks[0];
-						threadStacks[0] = rawThreadStacks[i];
+					if (threadId == uiThreadId) {
+						// Swap the UI thread to first slot in the array if it is not there already.
+						if (index != 0) {
+							thread = threadStacks[0];
+							threadStacks[0] = threadStacks[i];
+						}
+					} else if (!isInteresting(thread)) {
+						continue; // Skip the non-interesting thread.
 					}
 					threadStacks[index++] = thread;
 				}
 			}
+			return Arrays.copyOf(threadStacks, index);
 		} else {
-			threadStacks =
-					new ThreadInfo[] { threadMXBean.getThreadInfo(uiThreadId, Integer.MAX_VALUE) };
+			return new ThreadInfo[] { threadMXBean.getThreadInfo(uiThreadId, Integer.MAX_VALUE) };
 		}
-		return threadStacks;
+	}
+
+	/**
+	 * A thread is considered interesting if its stack trace includes at least one frame not
+	 * matching any of the methods in {@link #noninterestingThreadFilter}.
+	 */
+	private boolean isInteresting(ThreadInfo thread) {
+		for (StackTraceElement element : thread.getStackTrace()) {
+			if (!noninterestingThreadFilter.matchesFilter(element)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static Display getDisplay() throws IllegalStateException {
@@ -689,11 +729,11 @@ public class EventLoopMonitorThread extends Thread {
 				if (object instanceof IUiFreezeEventLogger) {
 					externalLoggers.add((IUiFreezeEventLogger) object);
 				} else {
-					MonitoringPlugin.logWarning(String.format(
+					MonitoringPlugin.logWarning(NLS.bind(
 							Messages.EventLoopMonitorThread_invalid_logger_type_error_4,
-							object.getClass().getName(),
-							IUiFreezeEventLogger.class.getClass().getSimpleName(),
-							EXTENSION_ID, element.getContributor().getName()));
+							new Object[] { object.getClass().getName(),
+									IUiFreezeEventLogger.class.getClass().getSimpleName(),
+									EXTENSION_ID, element.getContributor().getName() }));
 				}
 			} catch (CoreException e) {
 				MonitoringPlugin.logError(e.getMessage(), e);

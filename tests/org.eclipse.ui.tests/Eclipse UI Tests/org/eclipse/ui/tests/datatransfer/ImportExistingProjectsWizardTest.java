@@ -6,15 +6,11 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     IBM Corporation - Bits of importWizard from DeprecatedUIWizards 
+ *     IBM Corporation - Bits of importWizard from DeprecatedUIWizards
  *     Red Hat, Inc - initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.ui.tests.datatransfer;
-
-import static org.eclipse.jface.dialogs.IMessageProvider.WARNING;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,7 +47,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.dialogs.ImportExportWizard;
-import org.eclipse.ui.internal.wizards.datatransfer.DataTransferMessages;
 import org.eclipse.ui.internal.wizards.datatransfer.WizardProjectsImportPage;
 import org.eclipse.ui.internal.wizards.datatransfer.WizardProjectsImportPage.ProjectRecord;
 import org.eclipse.ui.tests.TestPlugin;
@@ -69,7 +64,6 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 	private static final String ARCHIVE_HELLOWORLD = "helloworld";
 	private static final String ARCHIVE_FILE_WITH_EMPTY_FOLDER = "EmptyFolderInArchive";
 	private static final String PROJECTS_ARCHIVE = "ProjectsArchive";
-	private static final String CORRUPT_PROJECTS_ARCHIVE = "CorruptProjectsArchive";
 
 	private static final String[] FILE_LIST = new String[] { "test-file-1.txt",
 			"test-file-2.doc", ".project" };
@@ -100,12 +94,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 		ts.addTest(new ImportExistingProjectsWizardTest("testInitialValue"));
 		ts.addTest(new ImportExistingProjectsWizardTest("testImportArchiveMultiProject"));
 		ts.addTest(new ImportExistingProjectsWizardTest("testGetProjectRecords"));
-		ts.addTest(new ImportExistingProjectsWizardTest("testGetProjectRecordsShouldHandleCorruptProjects"));
-		ts.addTest(new ImportExistingProjectsWizardTest(
-				"testGetProjectRecordsShouldHandleCorruptAndConflictingProjects"));
 		return ts;
 	}
-	
+
 	public ImportExistingProjectsWizardTest(String testName) {
 		super(testName);
 	}
@@ -194,9 +185,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
 			ArrayList projectNames = new ArrayList();
-			for (int i = 0; i < selectedProjects.length; i++) {
-				assertFalse(selectedProjects[i].hasConflicts());
-				projectNames.add(selectedProjects[i].getProjectName());
+			for (ProjectRecord selectedProject : selectedProjects) {
+				assertFalse(selectedProject.hasConflicts());
+				projectNames.add(selectedProject.getProjectName());
 			}
 
 			assertTrue("Not all projects were found correctly in zip",
@@ -225,9 +216,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
 			ArrayList projectNames = new ArrayList();
-			for (int i = 0; i < selectedProjects.length; i++) {
-				assertFalse(selectedProjects[i].hasConflicts());
-				projectNames.add(selectedProjects[i].getProjectName());
+			for (ProjectRecord selectedProject : selectedProjects) {
+				assertFalse(selectedProject.hasConflicts());
+				projectNames.add(selectedProject.getProjectName());
 			}
 
 			assertTrue("Not all projects were found correctly in tar",
@@ -250,9 +241,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
 			ArrayList projectNames = new ArrayList();
-			for (int i = 0; i < selectedProjects.length; i++) {
-				assertFalse(selectedProjects[i].hasConflicts());
-				projectNames.add(selectedProjects[i].getProjectName());
+			for (ProjectRecord selectedProject : selectedProjects) {
+				assertFalse(selectedProject.hasConflicts());
+				projectNames.add(selectedProject.getProjectName());
 			}
 
 			assertTrue("Not all projects were found correctly in directory",
@@ -275,9 +266,10 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			wpip.updateProjectsList(wsPath.toOSString());
 
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
-			for (int i = 0; i < selectedProjects.length; i++) {
-				if(selectedProjects[i].getProjectName().equals("HelloWorld"))
-					assertTrue(selectedProjects[i].hasConflicts());
+			for (ProjectRecord selectedProject : selectedProjects) {
+				if(selectedProject.getProjectName().equals("HelloWorld")) {
+					assertTrue(selectedProject.hasConflicts());
+				}
 			}
 
 		} catch (Exception e) {
@@ -290,8 +282,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 
 			IProject[] workspaceProjects = root.getProjects();
-			for (int i = 0; i < workspaceProjects.length; i++)
-				FileUtil.deleteProject(workspaceProjects[i]);
+			for (IProject workspaceProject : workspaceProjects) {
+				FileUtil.deleteProject(workspaceProject);
+			}
 			URL archiveFile = Platform.asLocalURL(Platform.find(TestPlugin
 					.getDefault().getBundle(), new Path(DATA_PATH_PREFIX
 					+ ARCHIVE_HELLOWORLD + ".zip")));
@@ -309,9 +302,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
 			ArrayList projectNames = new ArrayList();
-			for (int i = 0; i < selectedProjects.length; i++) {
-				assertFalse(selectedProjects[i].hasConflicts());
-				projectNames.add(selectedProjects[i].getProjectName());
+			for (ProjectRecord selectedProject : selectedProjects) {
+				assertFalse(selectedProject.hasConflicts());
+				projectNames.add(selectedProject.getProjectName());
 			}
 
 			assertTrue("Not all projects were found correctly in zip",
@@ -324,11 +317,13 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 			// "HelloWorld" should be the only project in the workspace
 			workspaceProjects = root.getProjects();
-			if (workspaceProjects.length != 1)
+			if (workspaceProjects.length != 1) {
 				fail("Incorrect Number of projects imported");
+			}
 			IFolder helloFolder = workspaceProjects[0].getFolder("HelloWorld");
-			if (helloFolder.exists())
+			if (helloFolder.exists()) {
 				fail("Project was imported as a folder into itself");
+			}
 
 			verifyProjectInWorkspace(true, workspaceProjects[0], FILE_LIST,
 					true);
@@ -346,8 +341,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 
 			IProject[] workspaceProjects = root.getProjects();
-			for (int i = 0; i < workspaceProjects.length; i++)
-				FileUtil.deleteProject(workspaceProjects[i]);
+			for (IProject workspaceProject : workspaceProjects) {
+				FileUtil.deleteProject(workspaceProject);
+			}
 			URL archiveFile = Platform.asLocalURL(Platform.find(TestPlugin
 					.getDefault().getBundle(), new Path(DATA_PATH_PREFIX
 					+ ARCHIVE_FILE_WITH_EMPTY_FOLDER + ".zip")));
@@ -365,8 +361,8 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
 			ArrayList projectNames = new ArrayList();
-			for (int i = 0; i < selectedProjects.length; i++) {
-				projectNames.add(selectedProjects[i].getProjectName());
+			for (ProjectRecord selectedProject : selectedProjects) {
+				projectNames.add(selectedProject.getProjectName());
 			}
 
 			assertTrue("Not all projects were found correctly in zip",
@@ -379,11 +375,13 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 			// "HelloWorld" should be the only project in the workspace
 			workspaceProjects = root.getProjects();
-			if (workspaceProjects.length != 1)
+			if (workspaceProjects.length != 1) {
 				fail("Incorrect Number of projects imported");
+			}
 			IFolder helloFolder = workspaceProjects[0].getFolder("HelloWorld");
-			if (helloFolder.exists())
+			if (helloFolder.exists()) {
 				fail("Project was imported as a folder into itself");
+			}
 
 			verifyProjectInWorkspace(true, workspaceProjects[0],
 					ARCHIVE_FILE_EMPTY_FOLDER_LIST, false);
@@ -400,8 +398,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 
 			IProject[] workspaceProjects = root.getProjects();
-			for (int i = 0; i < workspaceProjects.length; i++)
-				FileUtil.deleteProject(workspaceProjects[i]);
+			for (IProject workspaceProject : workspaceProjects) {
+				FileUtil.deleteProject(workspaceProject);
+			}
 			URL archiveFile = Platform.asLocalURL(Platform.find(TestPlugin
 					.getDefault().getBundle(), new Path(DATA_PATH_PREFIX
 					+ ARCHIVE_HELLOWORLD + ".tar")));
@@ -419,8 +418,8 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
 			ArrayList projectNames = new ArrayList();
-			for (int i = 0; i < selectedProjects.length; i++) {
-				projectNames.add(selectedProjects[i].getProjectName());
+			for (ProjectRecord selectedProject : selectedProjects) {
+				projectNames.add(selectedProject.getProjectName());
 			}
 
 			assertTrue("Not all projects were found correctly in tar",
@@ -433,11 +432,13 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 			// "HelloWorld" should be the only project in the workspace
 			workspaceProjects = root.getProjects();
-			if (workspaceProjects.length != 1)
+			if (workspaceProjects.length != 1) {
 				fail("Incorrect Number of projects imported");
+			}
 			IFolder helloFolder = workspaceProjects[0].getFolder("HelloWorld");
-			if (helloFolder.exists())
+			if (helloFolder.exists()) {
 				fail("Project was imported as a folder into itself");
+			}
 
 			verifyProjectInWorkspace(true, workspaceProjects[0], FILE_LIST,
 					true);
@@ -455,8 +456,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 
 			IProject[] workspaceProjects = root.getProjects();
-			for (int i = 0; i < workspaceProjects.length; i++)
-				FileUtil.deleteProject(workspaceProjects[i]);
+			for (IProject workspaceProject : workspaceProjects) {
+				FileUtil.deleteProject(workspaceProject);
+			}
 			URL archiveFile = Platform.asLocalURL(Platform.find(TestPlugin
 					.getDefault().getBundle(), new Path(DATA_PATH_PREFIX
 					+ ARCHIVE_FILE_WITH_EMPTY_FOLDER + ".tar")));
@@ -474,8 +476,8 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
 			ArrayList projectNames = new ArrayList();
-			for (int i = 0; i < selectedProjects.length; i++) {
-				projectNames.add(selectedProjects[i].getProjectName());
+			for (ProjectRecord selectedProject : selectedProjects) {
+				projectNames.add(selectedProject.getProjectName());
 			}
 
 			assertTrue("Not all projects were found correctly in tar",
@@ -488,12 +490,14 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 			// "HelloWorld" should be the only project in the workspace
 			workspaceProjects = root.getProjects();
-			if (workspaceProjects.length != 1)
+			if (workspaceProjects.length != 1) {
 				fail("Incorrect Number of projects imported: Expected=1, Actual="
 						+ workspaceProjects.length);
+			}
 			IFolder helloFolder = workspaceProjects[0].getFolder("A");
-			if (helloFolder.exists())
+			if (helloFolder.exists()) {
 				fail("Project was imported as a folder into itself");
+			}
 
 			verifyProjectInWorkspace(true, workspaceProjects[0],
 					ARCHIVE_FILE_EMPTY_FOLDER_LIST, false);
@@ -512,8 +516,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 
 			IProject[] workspaceProjects = root.getProjects();
-			for (int i = 0; i < workspaceProjects.length; i++)
-				FileUtil.deleteProject(workspaceProjects[i]);
+			for (IProject workspaceProject : workspaceProjects) {
+				FileUtil.deleteProject(workspaceProject);
+			}
 
 			dataLocation = copyDataLocation(WS_DATA_LOCATION);
 			wsPath = new Path(dataLocation).append("HelloWorld");
@@ -525,8 +530,8 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			wpip.updateProjectsList(wsPath.toOSString());
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
 			ArrayList projectNames = new ArrayList();
-			for (int i = 0; i < selectedProjects.length; i++) {
-				projectNames.add(selectedProjects[i].getProjectName());
+			for (ProjectRecord selectedProject : selectedProjects) {
+				projectNames.add(selectedProject.getProjectName());
 			}
 
 			assertTrue("Not all projects were found correctly in directory",
@@ -539,11 +544,13 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 			// "HelloWorld" should be the only project in the workspace
 			workspaceProjects = root.getProjects();
-			if (workspaceProjects.length != 1)
+			if (workspaceProjects.length != 1) {
 				fail("Incorrect Number of projects imported");
+			}
 			IFolder helloFolder = workspaceProjects[0].getFolder("HelloWorld");
-			if (helloFolder.exists())
+			if (helloFolder.exists()) {
 				fail("Project was imported as a folder into itself");
+			}
 
 			verifyProjectInWorkspace(false, workspaceProjects[0], FILE_LIST,
 					true);
@@ -561,8 +568,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 
 			IProject[] workspaceProjects = root.getProjects();
-			for (int i = 0; i < workspaceProjects.length; i++)
-				FileUtil.deleteProject(workspaceProjects[i]);
+			for (IProject workspaceProject : workspaceProjects) {
+				FileUtil.deleteProject(workspaceProject);
+			}
 
 			dataLocation = copyDataLocation(WS_DATA_LOCATION);
 			wsPath = new Path(dataLocation).append("HelloWorld");
@@ -578,8 +586,8 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			wpip.updateProjectsList(wsPath.toOSString());
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
 			ArrayList projectNames = new ArrayList();
-			for (int i = 0; i < selectedProjects.length; i++) {
-				projectNames.add(selectedProjects[i].getProjectName());
+			for (ProjectRecord selectedProject : selectedProjects) {
+				projectNames.add(selectedProject.getProjectName());
 			}
 
 			assertTrue("Not all projects were found correctly in zip",
@@ -592,11 +600,13 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 			// "HelloWorld" should be the only project in the workspace
 			workspaceProjects = root.getProjects();
-			if (workspaceProjects.length != 1)
+			if (workspaceProjects.length != 1) {
 				fail("Incorrect Number of projects imported");
+			}
 			IFolder helloFolder = workspaceProjects[0].getFolder("HelloWorld");
-			if (helloFolder.exists())
+			if (helloFolder.exists()) {
 				fail("Project was imported as a folder into itself");
+			}
 
 			verifyProjectInWorkspace(true, workspaceProjects[0], FILE_LIST,
 					true);
@@ -614,8 +624,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 
 			IProject[] workspaceProjects = root.getProjects();
-			for (int i = 0; i < workspaceProjects.length; i++)
-				FileUtil.deleteProject(workspaceProjects[i]);
+			for (IProject workspaceProject : workspaceProjects) {
+				FileUtil.deleteProject(workspaceProject);
+			}
 
 			dataLocation = copyDataLocation(WS_DATA_LOCATION);
 			wsPath = new Path(dataLocation).append("HelloWorld");
@@ -631,8 +642,8 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			wpip.updateProjectsList(wsPath.toOSString());
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
 			ArrayList projectNames = new ArrayList();
-			for (int i = 0; i < selectedProjects.length; i++) {
-				projectNames.add(selectedProjects[i].getProjectName());
+			for (ProjectRecord selectedProject : selectedProjects) {
+				projectNames.add(selectedProject.getProjectName());
 			}
 
 			assertTrue("Not all projects were found correctly in zip",
@@ -645,19 +656,21 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 			// "HelloWorld" should be the only project in the workspace
 			workspaceProjects = root.getProjects();
-			if (workspaceProjects.length != 1)
+			if (workspaceProjects.length != 1) {
 				fail("Incorrect Number of projects imported: "
 						+ workspaceProjects.length + " projects in workspace.");
+			}
 			IFolder helloFolder = workspaceProjects[0].getFolder("HelloWorld");
-			if (helloFolder.exists())
+			if (helloFolder.exists()) {
 				fail("Project was imported as a folder into itself");
+			}
 
 			verifyProjectInWorkspace(true, workspaceProjects[0], FILE_LIST,
 					true);
 
 			// delete projects in workspace but not contents
-			for (int i = 0; i < workspaceProjects.length; i++) {
-				workspaceProjects[i].delete(false, true, null);
+			for (IProject workspaceProject : workspaceProjects) {
+				workspaceProject.delete(false, true, null);
 			}
 			assertTrue("Test project not deleted successfully.", root
 					.getProjects().length == 0);
@@ -678,8 +691,8 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 					selectedProjects2.length == 1);
 
 			ArrayList projectNames2 = new ArrayList();
-			for (int i = 0; i < selectedProjects2.length; i++) {
-				projectNames2.add(selectedProjects2[i].getProjectName());
+			for (ProjectRecord element : selectedProjects2) {
+				projectNames2.add(element.getProjectName());
 			}
 
 			assertTrue("Not all projects were found correctly in zip (2)",
@@ -692,11 +705,13 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 			// "HelloWorld" should be the only project in the workspace
 			workspaceProjects = root.getProjects();
-			if (workspaceProjects.length != 1)
+			if (workspaceProjects.length != 1) {
 				fail("Incorrect Number of projects imported");
+			}
 			helloFolder = workspaceProjects[0].getFolder("HelloWorld");
-			if (helloFolder.exists())
+			if (helloFolder.exists()) {
 				fail("Project was imported as a folder into itself (2)");
+			}
 
 			verifyProjectInWorkspace(true, workspaceProjects[0], FILE_LIST,
 					true);
@@ -713,8 +728,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 
 			IProject[] workspaceProjects = root.getProjects();
-			for (int i = 0; i < workspaceProjects.length; i++)
-				FileUtil.deleteProject(workspaceProjects[i]);
+			for (IProject workspaceProject : workspaceProjects) {
+				FileUtil.deleteProject(workspaceProject);
+			}
 			URL archiveFile = Platform.asLocalURL(Platform.find(TestPlugin
 					.getDefault().getBundle(), new Path(DATA_PATH_PREFIX
 					+ ARCHIVE_HELLOWORLD + ".zip")));
@@ -732,8 +748,8 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
 			ArrayList projectNames = new ArrayList();
-			for (int i = 0; i < selectedProjects.length; i++) {
-				projectNames.add(selectedProjects[i].getProjectName());
+			for (ProjectRecord selectedProject : selectedProjects) {
+				projectNames.add(selectedProject.getProjectName());
 			}
 
 			assertTrue("Not all projects were found correctly in zip",
@@ -746,26 +762,29 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 			// "HelloWorld" should be the only project in the workspace
 			workspaceProjects = root.getProjects();
-			if (workspaceProjects.length != 1)
+			if (workspaceProjects.length != 1) {
 				fail("Incorrect Number of projects imported");
+			}
 			IFolder helloFolder = workspaceProjects[0].getFolder("HelloWorld");
-			if (helloFolder.exists())
+			if (helloFolder.exists()) {
 				fail("Project was imported as a folder into itself");
+			}
 
 			verifyProjectInWorkspace(true, workspaceProjects[0], FILE_LIST,
 					true);
 
 			// delete projects in workspace but not contents
-			for (int i = 0; i < workspaceProjects.length; i++) {
-				workspaceProjects[i].delete(true, true, null);
+			for (IProject workspaceProject : workspaceProjects) {
+				workspaceProject.delete(true, true, null);
 			}
 			assertTrue("Test project not deleted successfully.", root
 					.getProjects().length == 0);
 
 			// import again
 			IProject[] workspaceProjects2 = root.getProjects();
-			for (int i = 0; i < workspaceProjects2.length; i++)
-				FileUtil.deleteProject(workspaceProjects2[i]);
+			for (IProject element : workspaceProjects2) {
+				FileUtil.deleteProject(element);
+			}
 			URL archiveFile2 = Platform.asLocalURL(Platform.find(TestPlugin
 					.getDefault().getBundle(), new Path(DATA_PATH_PREFIX
 					+ ARCHIVE_HELLOWORLD + ".zip")));
@@ -783,8 +802,8 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 			ProjectRecord[] selectedProjects2 = wpip2.getProjectRecords();
 			ArrayList projectNames2 = new ArrayList();
-			for (int i = 0; i < selectedProjects2.length; i++) {
-				projectNames2.add(selectedProjects2[i].getProjectName());
+			for (ProjectRecord element : selectedProjects2) {
+				projectNames2.add(element.getProjectName());
 			}
 
 			assertTrue("Not all projects were found correctly in zip (2)",
@@ -797,12 +816,14 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 			// "HelloWorld" should be the only project in the workspace
 			workspaceProjects2 = root.getProjects();
-			if (workspaceProjects2.length != 1)
+			if (workspaceProjects2.length != 1) {
 				fail("Incorrect Number of projects imported (2)");
+			}
 			IFolder helloFolder2 = workspaceProjects2[0]
 					.getFolder("HelloWorld");
-			if (helloFolder2.exists())
+			if (helloFolder2.exists()) {
 				fail("Project was imported as a folder into itself (2)");
+			}
 
 			verifyProjectInWorkspace(true, workspaceProjects2[0], FILE_LIST,
 					true);
@@ -814,15 +835,15 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 		}
 
 	}
-	
+
 	public void testImportDirectoryNested() {
 		IPath wsPath = null;
 		try {
 			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 
 			IProject[] workspaceProjects = root.getProjects();
-			for (int i = 0; i < workspaceProjects.length; i++) {
-				FileUtil.deleteProject(workspaceProjects[i]);
+			for (IProject workspaceProject : workspaceProjects) {
+				FileUtil.deleteProject(workspaceProject);
 			}
 
 			dataLocation = copyDataLocation(WS_NESTED_DATA_LOCATION);
@@ -838,12 +859,12 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			wpip.getCopyCheckbox().setSelection(false);
 			wpip.saveWidgetValues();
 			wpip.restoreWidgetValues();
-			
+
 			wpip.updateProjectsList(wsPath.toOSString());
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
 			ArrayList projectNames = new ArrayList();
-			for (int i = 0; i < selectedProjects.length; i++) {
-				projectNames.add(selectedProjects[i].getProjectName());
+			for (ProjectRecord selectedProject : selectedProjects) {
+				projectNames.add(selectedProject.getProjectName());
 			}
 
 			assertTrue("Not all projects were found correctly in directory",
@@ -859,22 +880,22 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			if (workspaceProjects.length != 3) {
 				fail("Incorrect number of projects imported");
 			}
-			
+
 			IFolder aFolder = workspaceProjects[0].getFolder("A");
 			if (aFolder.exists()) {
 				fail("Project A was imported as a folder into itself");
 			}
-			
+
 			IFolder bFolder = workspaceProjects[1].getFolder("B");
 			if (bFolder.exists()) {
 				fail("Project B was imported as a folder into itself");
 			}
-			
+
 			IFolder cFolder = workspaceProjects[2].getFolder("C");
 			if (cFolder.exists()) {
 				fail("Project C was imported as a folder into itself");
 			}
-			
+
 			workspaceProjects[0].refreshLocal(IResource.DEPTH_INFINITE, null);
 
 			verifyProjectInWorkspace(false, workspaceProjects[0], FILE_LIST, true);
@@ -893,14 +914,15 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 			zipLocation = copyZipLocation(WS_DATA_LOCATION);
 			IProject[] workspaceProjects = root.getProjects();
-			for (int i = 0; i < workspaceProjects.length; i++)
-				FileUtil.deleteProject(workspaceProjects[i]);
+			for (IProject workspaceProject : workspaceProjects) {
+				FileUtil.deleteProject(workspaceProject);
+			}
 
 			WizardProjectsImportPage wpip = getExternalImportWizard(zipLocation);
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
 			ArrayList projectNames = new ArrayList();
-			for (int i = 0; i < selectedProjects.length; i++) {
-				projectNames.add(selectedProjects[i].getProjectName());
+			for (ProjectRecord selectedProject : selectedProjects) {
+				projectNames.add(selectedProject.getProjectName());
 			}
 
 			HashSet projects = new HashSet();
@@ -928,8 +950,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			zipLocation = copyZipLocation(WS_DATA_LOCATION);
 
 			IProject[] workspaceProjects = root.getProjects();
-			for (int i = 0; i < workspaceProjects.length; i++)
-				FileUtil.deleteProject(workspaceProjects[i]);
+			for (IProject workspaceProject : workspaceProjects) {
+				FileUtil.deleteProject(workspaceProject);
+			}
 
 			WizardProjectsImportPage wpip = getNewWizard();
 			HashSet projects = new HashSet();
@@ -946,8 +969,8 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
 			ArrayList projectNames = new ArrayList();
-			for (int i = 0; i < selectedProjects.length; i++) {
-				projectNames.add(selectedProjects[i].getProjectName());
+			for (ProjectRecord selectedProject : selectedProjects) {
+				projectNames.add(selectedProject.getProjectName());
 			}
 
 			assertTrue("Not all projects were found correctly in zip",
@@ -960,18 +983,22 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 			// "HelloWorld" should be the only project in the workspace
 			workspaceProjects = root.getProjects();
-			if (workspaceProjects.length != 2)
+			if (workspaceProjects.length != 2) {
 				fail("Incorrect Number of projects imported");
+			}
 			IFolder helloFolder = workspaceProjects[0].getFolder("HelloWorld");
-			if (helloFolder.exists())
+			if (helloFolder.exists()) {
 				fail("HelloWorld was imported as a folder into itself");
+			}
 			IFolder folder2 = workspaceProjects[0].getFolder("WorldHello");
-			if (folder2.exists())
+			if (folder2.exists()) {
 				fail("WorldHello was imported as a folder into itself");
+			}
 
-			for (int i = 0; i < workspaceProjects.length; i++)
-				verifyProjectInWorkspace(true, workspaceProjects[i], FILE_LIST,
+			for (IProject workspaceProject : workspaceProjects) {
+				verifyProjectInWorkspace(true, workspaceProject, FILE_LIST,
 						true);
+			}
 
 		} catch (IOException e) {
 			fail(e.toString());
@@ -984,7 +1011,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 	 * Verify whether or not the imported project is in the current workspace
 	 * location (i.e. copy projects was true) or in another workspace location
 	 * (i.e. copy projects was false).
-	 * 
+	 *
 	 * @param inWorkspace
 	 * @param project
 	 */
@@ -996,24 +1023,27 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 		IPath projectLocation = project.getLocation();
 		boolean isProjectInWorkspace = rootLocation.isPrefixOf(projectLocation);
 		if (inWorkspace) {
-			if (!isProjectInWorkspace)
+			if (!isProjectInWorkspace) {
 				fail(project.getName()
 						+ " should be in the workspace location: "
 						+ rootLocation.toOSString());
+			}
 		} else {
-			if (isProjectInWorkspace)
+			if (isProjectInWorkspace) {
 				fail(project.getName()
 						+ " should not be in the workspace location: "
 						+ rootLocation.toOSString());
+			}
 		}
 		StringBuffer filesNotImported = new StringBuffer();
 		// make sure the files in the project were imported
-		for (int i = 0; i < fileList.length; i++) {
+		for (String element : fileList) {
 			IResource res = isListFiles ? (IResource) project
-					.getFile(fileList[i]) : (IResource) project
-					.getFolder(fileList[i]);
-			if (!res.exists())
+					.getFile(element) : (IResource) project
+					.getFolder(element);
+			if (!res.exists()) {
 				filesNotImported.append(res.getName() + ", ");
+			}
 		}
 		assertTrue("Files expected but not in workspace for project \"" + project.getName() + "\": "
 				+ filesNotImported.toString(), filesNotImported.length() == 0);
@@ -1021,26 +1051,29 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 	/**
 	 * Copies the data to a temporary directory and returns the new location.
-	 * 
+	 *
 	 * @return the location
 	 */
 	private String copyDataLocation(String dataLocation) throws IOException {
 		TestPlugin plugin = TestPlugin.getDefault();
-		if (plugin == null)
+		if (plugin == null) {
 			throw new IllegalStateException(
 					"TestPlugin default reference is null");
+		}
 
 		URL fullPathString = plugin.getDescriptor().find(
 				new Path(WS_DATA_PREFIX).append(dataLocation + ".zip"));
 
-		if (fullPathString == null)
+		if (fullPathString == null) {
 			throw new IllegalArgumentException();
+		}
 
 		IPath path = new Path(fullPathString.getPath());
 
 		File origin = path.toFile();
-		if (!origin.exists())
+		if (!origin.exists()) {
 			throw new IllegalArgumentException();
+		}
 
 		ZipFile zFile = new ZipFile(origin);
 
@@ -1052,21 +1085,24 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 	private String copyZipLocation(String zipLocation) throws IOException {
 		TestPlugin plugin = TestPlugin.getDefault();
-		if (plugin == null)
+		if (plugin == null) {
 			throw new IllegalStateException(
 					"TestPlugin default reference is null");
+		}
 
 		URL fullPathString = plugin.getDescriptor().find(
 				new Path(WS_DATA_PREFIX).append(zipLocation + ".zip"));
 
-		if (fullPathString == null)
+		if (fullPathString == null) {
 			throw new IllegalArgumentException();
+		}
 
 		IPath path = new Path(fullPathString.getPath());
 
 		File origin = path.toFile();
-		if (!origin.exists())
+		if (!origin.exists()) {
 			throw new IllegalArgumentException();
+		}
 
 		File destination = new File(FileSystemHelper.getRandomLocation(
 				FileSystemHelper.getTempDir()).toOSString()
@@ -1076,15 +1112,17 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 	}
 
 	private WizardProjectsImportPage getNewWizard() {
-		ImportExportWizard wizard = new ImportExportWizard(ImportExportWizard.IMPORT);
+		ImportExportWizard wizard = new ImportExportWizard(
+				ImportExportWizard.IMPORT);
 		wizard.init(getWorkbench(), null);
 		IDialogSettings workbenchSettings = WorkbenchPlugin.getDefault()
 				.getDialogSettings();
 		IDialogSettings wizardSettings = workbenchSettings
 				.getSection("ImportExportTests");
-		if (wizardSettings == null)
+		if (wizardSettings == null) {
 			wizardSettings = workbenchSettings
 					.addNewSection("ImportExportTests");
+		}
 		wizard.setDialogSettings(wizardSettings);
 		wizard.setForcePreviousAndNextButtons(true);
 
@@ -1105,129 +1143,45 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 	}
 
 	public void testGetProjectRecords() throws Exception {
-		
+
 		HashSet expectedNames = new HashSet();
 		expectedNames.add("Project1");
 		expectedNames.add("Project2");
 		expectedNames.add("Project3");
 		expectedNames.add("Project4");
 		expectedNames.add("Project5");
-		
+
 		URL projectsArchive = Platform.asLocalURL(Platform.find(TestPlugin
 				.getDefault().getBundle(), new Path(DATA_PATH_PREFIX
 				+ PROJECTS_ARCHIVE + ".zip")));
 
 		List projectNames = getNonConflictingProjectsFromArchive(projectsArchive);
-		
+
 		assertTrue("Not all projects were found correctly in zip", projectNames.containsAll(expectedNames));
-		
+
 		FileUtil.createProject("Project1");
 		projectNames = getNonConflictingProjectsFromArchive(projectsArchive);
-		
+
 		assertFalse("Conflict flag is not set on the projects correctly", projectNames.contains("Project1"));
-		
+
 	}
 
 	private List getNonConflictingProjectsFromArchive(URL projectsArchive) {
 		WizardProjectsImportPage newWizard = getNewWizard();
 		newWizard.getProjectFromDirectoryRadio().setSelection(false);
 		newWizard.updateProjectsList(projectsArchive.getPath());
-		
+
 		ProjectRecord[] projectRecords = newWizard.getProjectRecords();
-		
+
 		List projectNames = new ArrayList();
 		for (int i = 0; i < projectRecords.length; i++) {
-			if(!projectRecords[i].hasConflicts())
+			if(!projectRecords[i].hasConflicts()) {
 				projectNames.add(projectRecords[i].getProjectName());
+			}
 		}
 		return projectNames;
 	}
 
-	public void testGetProjectRecordsShouldHandleCorruptProjects()
-			throws Exception {
-
-		URL projectsArchive = Platform.asLocalURL(Platform.find(TestPlugin
-				.getDefault().getBundle(), new Path(DATA_PATH_PREFIX
-				+ CORRUPT_PROJECTS_ARCHIVE + ".zip")));
-
-		WizardProjectsImportPage newWizard = spy(getNewWizard());
-		ProjectRecord[] projectRecords = getProjectsFromArchive(newWizard, projectsArchive);
-		verify(newWizard).setMessage(DataTransferMessages.WizardProjectsImportPage_projectsInvalid, WARNING);
-
-		List<String> invalidProjectNames = getInvalidProjects(projectRecords);
-		assertEquals("Expected to find invalid projects", 2, invalidProjectNames.size());
-		assertEquals("Expected pseudo name for first invalid project",
-				DataTransferMessages.WizardProjectsImportPage_invalidProjectName, invalidProjectNames.get(0));
-		assertEquals("Expected pseudo name for second invalid project",
-				DataTransferMessages.WizardProjectsImportPage_invalidProjectName, invalidProjectNames.get(1));
-
-		List<String> validProjectNames = getValidProjects(projectRecords);
-		assertEquals("Expected to find only one valid project", 1, validProjectNames.size());
-		assertEquals("Expected to find valid project", "Project1", validProjectNames.get(0));
-
-	}
-
-	public void testGetProjectRecordsShouldHandleCorruptAndConflictingProjects()
-				throws Exception {
-
-		URL projectsArchive = Platform.asLocalURL(Platform.find(TestPlugin
-				.getDefault().getBundle(), new Path(DATA_PATH_PREFIX
-				+ CORRUPT_PROJECTS_ARCHIVE + ".zip")));
-
-		WizardProjectsImportPage newWizard = spy(getNewWizard());
-		FileUtil.createProject("Project1");
-
-		ProjectRecord[] projectRecords = getProjectsFromArchive(newWizard, projectsArchive);
-		verify(newWizard).setMessage(DataTransferMessages.WizardProjectsImportPage_projectsInWorkspaceAndInvalid,
-				WARNING);
-
-		List<String> invalidProjectNames = getInvalidProjects(projectRecords);
-		assertEquals("Expected to find invalid projects", 2, invalidProjectNames.size());
-
-		List<String> validProjectNames = getValidProjects(projectRecords);
-		assertEquals("Expected to find one valid project", 1, validProjectNames.size());
-		assertEquals("Expected to find valid project", "Project1", validProjectNames.get(0));
-
-		List<String> conflictingProjectNames = getProjectsWithConflicts(projectRecords);
-		assertEquals("Expected to find one existing project", 1, conflictingProjectNames.size());
-		assertEquals("Expected to find existing project", "Project1", conflictingProjectNames.get(0));
-
-	}
-
-	private ProjectRecord[] getProjectsFromArchive(WizardProjectsImportPage newWizard, URL projectsArchive) {
-		newWizard.getProjectFromDirectoryRadio().setSelection(false);
-		newWizard.updateProjectsList(projectsArchive.getPath());
-		ProjectRecord[] projectRecords = newWizard.getProjectRecords();
-		return projectRecords;
-	}
-
-	private List<String> getValidProjects(ProjectRecord[] projectRecords) {
-		List<String> projectNames = new ArrayList<String>();
-		for (int i = 0; i < projectRecords.length; i++) {
-			if (!projectRecords[i].isInvalidProject())
-				projectNames.add(projectRecords[i].getProjectName());
-		}
-		return projectNames;
-	}
-
-	private List<String> getInvalidProjects(ProjectRecord[] projectRecords) {
-		List<String> projectNames = new ArrayList<String>();
-		for (int i = 0; i < projectRecords.length; i++) {
-			if (projectRecords[i].isInvalidProject())
-				projectNames.add(projectRecords[i].getProjectName());
-		}
-		return projectNames;
-	}
-
-	private List<String> getProjectsWithConflicts(ProjectRecord[] projectRecords) {
-		List<String> projectNames = new ArrayList<String>();
-		for (int i = 0; i < projectRecords.length; i++) {
-			if (projectRecords[i].hasConflicts())
-				projectNames.add(projectRecords[i].getProjectName());
-		}
-		return projectNames;
-	}
-	
 	private WizardProjectsImportPage getExternalImportWizard(String initialPath) {
 
 		ExternalProjectImportWizard wizard = new ExternalProjectImportWizard(
