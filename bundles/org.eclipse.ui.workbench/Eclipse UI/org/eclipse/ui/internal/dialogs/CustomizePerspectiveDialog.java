@@ -3556,6 +3556,14 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		return label;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#applyDialogFont()
+	 */
+	protected boolean applyDialogFont() {
+		return false;
+	}
 
 	@Override
 	protected boolean isResizable() {
