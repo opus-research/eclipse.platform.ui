@@ -104,7 +104,6 @@ public class FormsPerformanceTest extends PerformanceTestCase {
 		Hyperlink link = toolkit.createHyperlink(form.getBody(), "Click here.",
 				SWT.WRAP);
 		link.addHyperlinkListener(new HyperlinkAdapter() {
-			@Override
 			public void linkActivated(HyperlinkEvent e) {
 				System.out.println("Link activated!");
 			}
@@ -145,7 +144,6 @@ public class FormsPerformanceTest extends PerformanceTestCase {
 		td.colspan = 2;
 		ec.setLayoutData(td);
 		ec.addExpansionListener(new ExpansionAdapter() {
-			@Override
 			public void expansionStateChanged(ExpansionEvent e) {
 				//form.reflow(true);
 			}
@@ -155,7 +153,6 @@ public class FormsPerformanceTest extends PerformanceTestCase {
 		td.colspan = 2;
 		section.setLayoutData(td);
 		section.addExpansionListener(new ExpansionAdapter() {
-			@Override
 			public void expansionStateChanged(ExpansionEvent e) {
 				//form.reflow(true);
 			}
@@ -201,7 +198,6 @@ public class FormsPerformanceTest extends PerformanceTestCase {
 		rtext.setFont("code", JFaceResources.getTextFont());
 		rtext.setText(buf.toString(), true, false);
 		rtext.addHyperlinkListener(new HyperlinkAdapter() {
-			@Override
 			public void linkActivated(HyperlinkEvent e) {
 				System.out.println("Link active: "+e.getHref());
 			}

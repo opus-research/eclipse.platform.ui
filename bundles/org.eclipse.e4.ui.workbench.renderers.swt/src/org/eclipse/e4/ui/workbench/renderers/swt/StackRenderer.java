@@ -7,8 +7,8 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 429728, 430166, 441150, 442285, 472654
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 337588, 388476, 461573
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 429728, 430166, 441150, 442285
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 337588, 388476
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -209,7 +209,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 	private boolean ignoreTabSelChanges;
 
 	List<CTabItem> getItemsToSet(MPart part) {
-		List<CTabItem> itemsToSet = new ArrayList<>();
+		List<CTabItem> itemsToSet = new ArrayList<CTabItem>();
 
 		MUIElement partParent = part.getParent();
 		if (partParent instanceof MPartStack) {
@@ -528,7 +528,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 				MPartStack pStack = (MPartStack) (partParent instanceof MPartStack ? partParent
 						: null);
 
-				List<String> tags = new ArrayList<>();
+				List<String> tags = new ArrayList<String>();
 				tags.add(CSSConstants.CSS_ACTIVE_CLASS);
 				List<MUIElement> activeElements = modelService.findElements(
 						modelService.getTopLevelWindowFor(newActivePart), null,
@@ -1311,9 +1311,10 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		// Ensure that the newly selected control is correctly sized
 		if (cti.getControl() instanceof Composite) {
 			Composite ctiComp = (Composite) cti.getControl();
-			// see bug 461573: call below is still needed to make view
-			// descriptions visible after unhiding the view with changed bounds
-			ctiComp.layout(false, true);
+			// Do not call layout(true, true) because it forces all
+			// subcomponents to relayout as well
+			// ctiComp.layout(true, true);
+			ctiComp.setBounds(ctf.getClientArea());
 		}
 		ctf.setSelection(cti);
 		ignoreTabSelChanges = false;
@@ -1537,12 +1538,12 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 	private List<MPart> getCloseableSideParts(MPart part, boolean left) {
 		MElementContainer<MUIElement> container = getParent(part);
 		if (container == null) {
-			return new ArrayList<>();
+			return new ArrayList<MPart>();
 		}
 
 		int thisPartIdx = getPartIndex(part, container);
 		if (thisPartIdx == -1) {
-			return new ArrayList<>();
+			return new ArrayList<MPart>();
 		}
 		List<MUIElement> children = container.getChildren();
 		final int start = left ? 0 : thisPartIdx + 1;
@@ -1574,7 +1575,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 	private List<MPart> getCloseableSiblingParts(MPart part) {
 		MElementContainer<MUIElement> container = getParent(part);
 		if (container == null) {
-			return new ArrayList<>();
+			return new ArrayList<MPart>();
 		}
 
 		List<MUIElement> children = container.getChildren();
@@ -1585,7 +1586,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 			final int start, final int end) {
 		// broken out from closeSiblingParts so it can be used to determine how
 		// many closeable siblings are available
-		List<MPart> closeableSiblings = new ArrayList<>();
+		List<MPart> closeableSiblings = new ArrayList<MPart>();
 		for (int i = start; i < end; i++) {
 			MUIElement child = children.get(i);
 			// If the element isn't showing skip it
@@ -1657,7 +1658,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		ISaveHandler saveHandler = getContextForParent(part).get(
 				ISaveHandler.class);
 		if (saveHandler != null) {
-			final List<MPart> toPrompt = new ArrayList<>(others);
+			final List<MPart> toPrompt = new ArrayList<MPart>(others);
 			toPrompt.retainAll(partService.getDirtyParts());
 
 			boolean cancel = false;

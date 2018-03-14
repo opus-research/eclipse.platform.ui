@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,7 +34,6 @@ public class FormColors {
 	 *
 	 * @deprecated use <code>IFormColors.TITLE</code>.
 	 */
-	@Deprecated
 	public static final String TITLE = IFormColors.TITLE;
 
 	/**
@@ -42,7 +41,6 @@ public class FormColors {
 	 *
 	 * @deprecated use <code>IFormColors.BORDER</code>
 	 */
-	@Deprecated
 	public static final String BORDER = IFormColors.BORDER;
 
 	/**
@@ -50,7 +48,6 @@ public class FormColors {
 	 *
 	 * @deprecated use <code>IFormColors.SEPARATOR</code>.
 	 */
-	@Deprecated
 	public static final String SEPARATOR = IFormColors.SEPARATOR;
 
 	/**
@@ -58,7 +55,6 @@ public class FormColors {
 	 *
 	 * @deprecated use <code>IFormColors.TB_BG
 	 */
-	@Deprecated
 	public static final String TB_BG = IFormColors.TB_BG;
 
 	/**
@@ -66,7 +62,6 @@ public class FormColors {
 	 *
 	 * @deprecated use <code>IFormColors.TB_FG</code>
 	 */
-	@Deprecated
 	public static final String TB_FG = IFormColors.TB_FG;
 
 	/**
@@ -74,7 +69,6 @@ public class FormColors {
 	 *
 	 * @deprecated use <code>IFormColors.TB_GBG</code>
 	 */
-	@Deprecated
 	public static final String TB_GBG = IFormColors.TB_GBG;
 
 	/**
@@ -82,7 +76,6 @@ public class FormColors {
 	 *
 	 * @deprecated use <code>IFormColors.TB_BORDER</code>.
 	 */
-	@Deprecated
 	public static final String TB_BORDER = IFormColors.TB_BORDER;
 
 	/**
@@ -91,7 +84,6 @@ public class FormColors {
 	 *
 	 * @deprecated use <code>IFormColors.TB_TOGGLE</code>.
 	 */
-	@Deprecated
 	public static final String TB_TOGGLE = IFormColors.TB_TOGGLE;
 
 	/**
@@ -100,10 +92,9 @@ public class FormColors {
 	 * @since 3.1
 	 * @deprecated use <code>IFormColors.TB_TOGGLE_HOVER</code>.
 	 */
-	@Deprecated
 	public static final String TB_TOGGLE_HOVER = IFormColors.TB_TOGGLE_HOVER;
 
-	protected Map<String, Color> colorRegistry = new HashMap<>(10);
+	protected Map colorRegistry = new HashMap(10);
 
 	private LocalResourceManager resources;
 
@@ -222,7 +213,7 @@ public class FormColors {
 	 */
 	public Color createColor(String key, RGB rgb) {
 		Color c = getResourceManager().createColor(rgb);
-		Color prevC = colorRegistry.get(key);
+		Color prevC = (Color) colorRegistry.get(key);
 		if (prevC != null && !prevC.isDisposed())
 			getResourceManager().destroyColor(prevC.getRGB());
 		colorRegistry.put(key, c);
@@ -369,7 +360,7 @@ public class FormColors {
 			initializeSectionToolBarColors();
 		else if (key.startsWith(IFormColors.H_PREFIX))
 			initializeFormHeaderColors();
-		return colorRegistry.get(key);
+		return (Color) colorRegistry.get(key);
 	}
 
 	/**

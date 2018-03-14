@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440810, 444070, 472654
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810, 444070
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 451214
  *******************************************************************************/
 
@@ -18,7 +18,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -50,6 +49,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.commands.ICommandImageService;
 import org.eclipse.ui.internal.services.IWorkbenchLocationService;
 import org.eclipse.ui.internal.services.WorkbenchSourceProvider;
+import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.menus.IWorkbenchContribution;
@@ -212,8 +212,8 @@ public class ShowInMenu extends ContributionItem implements
 					.get(MApplication.class);
 
 			MMenu menuModel = MenuFactoryImpl.eINSTANCE.createMenu();
-			final ArrayList<MMenuContribution> toContribute = new ArrayList<>();
-			final ArrayList<MMenuElement> menuContributionsToRemove = new ArrayList<>();
+			final ArrayList<MMenuContribution> toContribute = new ArrayList<MMenuContribution>();
+			final ArrayList<MMenuElement> menuContributionsToRemove = new ArrayList<MMenuElement>();
 			ExpressionContext eContext = new ExpressionContext(workbenchWindow.getModel()
 					.getContext());
 			ContributionsAnalyzer.gatherMenuContributions(menuModel,
@@ -266,7 +266,7 @@ public class ShowInMenu extends ContributionItem implements
 		CommandContributionItemParameter parm = new CommandContributionItemParameter(
 				locator, viewDescriptor.getId(), IWorkbenchCommandConstants.NAVIGATE_SHOW_IN,
 				CommandContributionItem.STYLE_PUSH);
-		HashMap<String, String> targetId = new HashMap<>();
+		HashMap<String, String> targetId = new HashMap<String, String>();
 		targetId.put(IWorkbenchCommandConstants.NAVIGATE_SHOW_IN_PARM_TARGET,
 				viewDescriptor.getId());
 		parm.parameters = targetId;
@@ -283,7 +283,7 @@ public class ShowInMenu extends ContributionItem implements
 	 * the contributions from the current perspective and the source part.
 	 */
 	private ArrayList<Object> getShowInPartIds(IWorkbenchPart sourcePart) {
-		ArrayList<Object> targetIds = new ArrayList<>();
+		ArrayList<Object> targetIds = new ArrayList<Object>();
 		WorkbenchPage page = (WorkbenchPage) getWindow().getActivePage();
 		if (page != null) {
 			String srcId = sourcePart == null ? null : sourcePart.getSite().getId();
@@ -296,7 +296,7 @@ public class ShowInMenu extends ContributionItem implements
 				}
 			}
 		}
-		IShowInTargetList targetList = Adapters.adapt(sourcePart, IShowInTargetList.class);
+		IShowInTargetList targetList = getShowInTargetList(sourcePart);
 		if (targetList != null) {
 			String[] partIds = targetList.getShowInTargetIds();
 			if (partIds != null) {
@@ -331,6 +331,30 @@ public class ShowInMenu extends ContributionItem implements
 	}
 
 	/**
+	 * Returns the <code>IShowInSource</code> provided by the source part, or
+	 * <code>null</code> if it does not provide one.
+	 *
+	 * @param sourcePart
+	 *            the source part
+	 * @return an <code>IShowInSource</code> or <code>null</code>
+	 */
+	private IShowInSource getShowInSource(IWorkbenchPart sourcePart) {
+		return Util.getAdapter(sourcePart, IShowInSource.class);
+	}
+
+	/**
+	 * Returns the <code>IShowInTargetList</code> for the given source part,
+	 * or <code>null</code> if it does not provide one.
+	 *
+	 * @param sourcePart
+	 *            the source part or <code>null</code>
+	 * @return the <code>IShowInTargetList</code> or <code>null</code>
+	 */
+	private IShowInTargetList getShowInTargetList(IWorkbenchPart sourcePart) {
+		return Util.getAdapter(sourcePart, IShowInTargetList.class);
+	}
+
+	/**
 	 * Returns the <code>ShowInContext</code> to show in the selected target,
 	 * or <code>null</code> if there is no valid context to show.
 	 * <p>
@@ -345,7 +369,7 @@ public class ShowInMenu extends ContributionItem implements
 	 */
 	protected ShowInContext getContext(IWorkbenchPart sourcePart) {
 		if (sourcePart != null) {
-			IShowInSource source = Adapters.adapt(sourcePart, IShowInSource.class);
+			IShowInSource source = getShowInSource(sourcePart);
 			if (source != null) {
 				ShowInContext context = source.getShowInContext();
 				if (context != null) {
@@ -366,7 +390,7 @@ public class ShowInMenu extends ContributionItem implements
 	 */
 	private IViewDescriptor[] getViewDescriptors(IWorkbenchPart sourcePart) {
 		ArrayList<Object> ids = getShowInPartIds(sourcePart);
-		ArrayList<IViewDescriptor> descs = new ArrayList<>();
+		ArrayList<IViewDescriptor> descs = new ArrayList<IViewDescriptor>();
 		IViewRegistry reg = WorkbenchPlugin.getDefault().getViewRegistry();
 		for (Iterator<Object> i = ids.iterator(); i.hasNext();) {
 			String id = (String) i.next();
