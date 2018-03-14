@@ -37,11 +37,10 @@ public class PopupMenuExpressionTest extends ActionExpressionTest {
     @Override
 	protected void testAction(MenuManager mgr, String action, boolean expected)
             throws Throwable {
-        if (expected) {
-			assertNotNull(action, ActionUtil.getActionWithLabel(mgr, action));
-		} else {
-			assertNull(action, ActionUtil.getActionWithLabel(mgr, action));
-		}
+        if (expected)
+            assertNotNull(action, ActionUtil.getActionWithLabel(mgr, action));
+        else
+            assertNull(action, ActionUtil.getActionWithLabel(mgr, action));
     }
 
     public void testExpressionEnabledAction() throws Throwable {

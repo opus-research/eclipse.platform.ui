@@ -516,6 +516,9 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
         super.updateWidgetEnablements();
     }
 
+    /* (non-Javadoc)
+     * Method declared on WizardDataTransferPage.
+     */
     @Override
 	protected final boolean validateDestinationGroup() {
 
