@@ -8,13 +8,15 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440893
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 436344
  *******************************************************************************/
 package org.eclipse.e4.ui.bindings.tests;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
 import java.util.HashMap;
 import java.util.Map;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.commands.Category;
 import org.eclipse.core.commands.ParameterizedCommand;
@@ -43,8 +45,11 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class KeyDispatcherTest extends TestCase {
+public class KeyDispatcherTest {
 	private static final String ID_DIALOG = "org.eclipse.ui.contexts.dialog";
 	private static final String ID_DIALOG_AND_WINDOW = "org.eclipse.ui.contexts.dialogAndWindow";
 	private static final String ID_WINDOW = "org.eclipse.ui.contexts.window";
@@ -116,8 +121,8 @@ public class KeyDispatcherTest extends TestCase {
 		return bs.createBinding(sequence, command, ID_WINDOW, attrs);		
 	}
 
-	@Override
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		display = new Display();
 		IEclipseContext globalContext = Activator.getDefault().getGlobalContext(); 
 		workbenchContext = globalContext.createChild("workbenchContext");
@@ -151,14 +156,15 @@ public class KeyDispatcherTest extends TestCase {
 		btm.addTable(new BindingTable(cm.getContext(ID_DIALOG)));
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() throws Exception {
 		workbenchContext.dispose();
 		workbenchContext = null;
 		display.dispose();
 		display = null;
 	}
 
+	@Test
 	public void testExecuteOneCommand() throws Exception {
 		KeyBindingDispatcher dispatcher = new KeyBindingDispatcher();
 		ContextInjectionFactory.inject(dispatcher, workbenchContext);
@@ -184,6 +190,7 @@ public class KeyDispatcherTest extends TestCase {
 		assertTrue(handler.q2);
 	}
 
+	@Test
 	public void testExecuteMultiStrokeBinding() throws Exception {
 		KeyBindingDispatcher dispatcher = new KeyBindingDispatcher();
 		ContextInjectionFactory.inject(dispatcher, workbenchContext);
@@ -225,6 +232,7 @@ public class KeyDispatcherTest extends TestCase {
 		assertFalse(handler.q2);
 	}
 
+	@Test
 	public void TODOtestKeyDispatcherReset() throws Exception {
 		KeyBindingDispatcher dispatcher = new KeyBindingDispatcher();
 		ContextInjectionFactory.inject(dispatcher, workbenchContext);
@@ -268,6 +276,7 @@ public class KeyDispatcherTest extends TestCase {
 		assertTrue(handler.q2);
 	}
 
+	@Test
 	public void testSendKeyStroke() throws Exception {
 		KeyBindingDispatcher dispatcher = ContextInjectionFactory
 				.make(KeyBindingDispatcher.class, workbenchContext);
@@ -301,6 +310,7 @@ public class KeyDispatcherTest extends TestCase {
 		assertEquals("(", text.getText());
 	}
 
+	@Test
 	private void processEvents() {
 		while (display.readAndDispatch())
 			;

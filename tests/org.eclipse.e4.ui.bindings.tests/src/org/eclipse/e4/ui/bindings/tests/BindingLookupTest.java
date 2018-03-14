@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 IBM Corporation and others.
+ * Copyright (c) 2013, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,15 +7,20 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 436344
  *******************************************************************************/
 package org.eclipse.e4.ui.bindings.tests;
+
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.commands.Category;
 import org.eclipse.core.commands.ParameterizedCommand;
@@ -33,8 +38,11 @@ import org.eclipse.e4.ui.services.ContextServiceAddon;
 import org.eclipse.e4.ui.services.EContextService;
 import org.eclipse.jface.bindings.Binding;
 import org.eclipse.jface.bindings.TriggerSequence;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class BindingLookupTest extends TestCase {
+public class BindingLookupTest {
 	private static final String ID_DIALOG = "org.eclipse.ui.contexts.dialog";
 	private static final String ID_DIALOG_AND_WINDOW = "org.eclipse.ui.contexts.dialogAndWindow";
 	private static final String ID_WINDOW = "org.eclipse.ui.contexts.window";
@@ -61,8 +69,8 @@ public class BindingLookupTest extends TestCase {
 		cs.defineCommand(TEST_ID2, "ID2", null, category, null);
 	}
 
-	@Override
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		IEclipseContext globalContext = Activator.getDefault()
 				.getGlobalContext();
 		workbenchContext = globalContext.createChild("workbenchContext");
@@ -96,12 +104,13 @@ public class BindingLookupTest extends TestCase {
 		btm.addTable(new BindingTable(cm.getContext(ID_DIALOG)));
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() throws Exception {
 		workbenchContext.dispose();
 		workbenchContext = null;
 	}
 
+	@Test
 	public void testFindBinding() throws Exception {
 		ECommandService cs = (ECommandService) workbenchContext
 				.get(ECommandService.class.getName());
@@ -120,6 +129,7 @@ public class BindingLookupTest extends TestCase {
 		assertEquals(cmd, bs.getPerfectMatch(seq).getParameterizedCommand());
 	}
 
+	@Test
 	public void testMultipleBindings() throws Exception {
 		ECommandService cs = (ECommandService) workbenchContext
 				.get(ECommandService.class.getName());
@@ -137,6 +147,7 @@ public class BindingLookupTest extends TestCase {
 		assertEquals(cmd, bs.getPerfectMatch(seq2).getParameterizedCommand());
 	}
 
+	@Test
 	public void testLookupChildBinding() throws Exception {
 		ECommandService cs = (ECommandService) workbenchContext
 				.get(ECommandService.class.getName());
@@ -158,7 +169,8 @@ public class BindingLookupTest extends TestCase {
 		assertNull(wBS.getPerfectMatch(seq));
 		assertNull(bs1.getPerfectMatch(seq));
 	}
-
+	
+	@Test
 	public void testLookupWithTwoChildren() throws Exception {
 		ECommandService cs = (ECommandService) workbenchContext
 				.get(ECommandService.class.getName());
@@ -195,6 +207,7 @@ public class BindingLookupTest extends TestCase {
 		assertEquals(cmd2, bs2.getPerfectMatch(seq).getParameterizedCommand());
 	}
 
+	@Test
 	public void testLookupWithDifferentActiveChild() throws Exception {
 		ECommandService cs = (ECommandService) workbenchContext
 				.get(ECommandService.class.getName());
@@ -248,6 +261,7 @@ public class BindingLookupTest extends TestCase {
 		assertTrue(wBS.isPerfectMatch(seq));
 	}
 
+	@Test
 	public void testLookupShortcut() throws Exception {
 		ECommandService cs = (ECommandService) workbenchContext
 				.get(ECommandService.class.getName());
@@ -261,6 +275,7 @@ public class BindingLookupTest extends TestCase {
 		assertEquals(seq, bs.getBestSequenceFor(cmd));
 	}
 
+	@Test
 	public void testLookupShortcuts() throws Exception {
 		ECommandService cs = (ECommandService) workbenchContext
 				.get(ECommandService.class.getName());
@@ -279,6 +294,7 @@ public class BindingLookupTest extends TestCase {
 		assertEquals(seq, foundSequence);
 	}
 
+	@Test
 	public void testLookupBestShortcut() throws Exception {
 		ECommandService cs = (ECommandService) workbenchContext
 				.get(ECommandService.class.getName());
@@ -298,6 +314,7 @@ public class BindingLookupTest extends TestCase {
 		assertEquals(seq, foundSequence);
 	}
 
+	@Test
 	public void testLookupBestShortcutWithChild() throws Exception {
 		ECommandService cs = (ECommandService) workbenchContext
 				.get(ECommandService.class.getName());
@@ -322,6 +339,7 @@ public class BindingLookupTest extends TestCase {
 		assertEquals(seq2, foundSequence);
 	}
 
+	@Test
 	public void testLookupShortcutsTwoChildren() throws Exception {
 		ECommandService cs = (ECommandService) workbenchContext
 				.get(ECommandService.class.getName());
@@ -363,6 +381,7 @@ public class BindingLookupTest extends TestCase {
 		assertNull(bs2.getBestSequenceFor(cmd1));
 	}
 
+	@Test
 	public void testLookupAllShortcuts() throws Exception {
 		ECommandService cs = (ECommandService) workbenchContext
 				.get(ECommandService.class.getName());
@@ -385,6 +404,7 @@ public class BindingLookupTest extends TestCase {
 		assertEquals(list, bs.getSequencesFor(cmd));
 	}
 
+	@Test
 	public void testLookupAllShortcutsWithChild() throws Exception {
 		ECommandService cs = (ECommandService) workbenchContext
 				.get(ECommandService.class.getName());
@@ -416,6 +436,7 @@ public class BindingLookupTest extends TestCase {
 		assertEquals(list, wBS.getSequencesFor(cmd));
 	}
 
+	@Test
 	public void testPartialMatch() throws Exception {
 		ECommandService cs = (ECommandService) workbenchContext
 				.get(ECommandService.class.getName());
@@ -442,6 +463,7 @@ public class BindingLookupTest extends TestCase {
 		assertTrue(bs1.isPartialMatch(partialMatch));
 	}
 
+	@Test
 	public void testGetPartialMatches() throws Exception {
 		ECommandService cs = (ECommandService) workbenchContext
 				.get(ECommandService.class.getName());
