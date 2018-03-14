@@ -7,15 +7,19 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Steven Spungin <steven@spungin.tv> - Bug 361731, 401043
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.addons.dndaddon;
 
 import java.util.List;
+import org.eclipse.e4.ui.internal.workbench.PartSizeInfo;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
+import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
@@ -278,6 +282,9 @@ public class SplitDropAgent2 extends DropAgent {
 
 	@Override
 	public boolean drop(MUIElement dragElement, DnDInfo info) {
+
+		MElementContainer<MUIElement> originalParent = dragElement.getParent();
+
 		MPartSashContainerElement toInsert = (MPartSashContainerElement) dragElement;
 		if (dragElement instanceof MPartStack) {
 			// Ensure we restore the stack to the presentation first
@@ -329,8 +336,22 @@ public class SplitDropAgent2 extends DropAgent {
 			}
 		}
 
+		MUIElement hasSizeData = dragElement;
+		while (hasSizeData != null
+				&& (MUIElement) hasSizeData.getParent() instanceof MPartSashContainer == false) {
+			hasSizeData = hasSizeData.getParent();
+		}
+
+		if (hasSizeData != null) {
+			PartSizeInfo.copy(toInsert, hasSizeData);
+			dndManager.getModelService().insert(toInsert, (MPartSashContainerElement) relToElement,
+					where, ratio);
+		} else {
+			PartSizeInfo.copy(toInsert, originalParent);
+		}
 		dndManager.getModelService().insert(toInsert, (MPartSashContainerElement) relToElement,
 				where, ratio);
+
 		// reactivatePart(dragElement);
 
 		return true;

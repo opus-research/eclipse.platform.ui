@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 434611
+ *     Steven Spungin <steven@spungin.tv> - Bug 361731, 401043
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -570,9 +571,13 @@ public class ModelServiceImpl implements EModelService {
 
 		// Set up the container data before adding the new sash to the model
 		// To raise the granularity assume 100% == 10,000
-		int adjustedPct = (int) (ratio * 10000);
-		toInsert.setContainerData(Integer.toString(adjustedPct));
-		relTo.setContainerData(Integer.toString(10000 - adjustedPct));
+		PartSizeInfo info = PartSizeInfo.get(toInsert);
+		List<MUIElement> viskids = SashUtil.getVisibleChildren(newSash);
+		double weight = SashUtil.getTotalWeight(viskids) / viskids.size();
+		// int adjustedPct = (int) (ratio * 10000);
+		// adjustedPct = 10000 - adjustedPct;
+		info.setDefaultAbsolute(false);
+		info.setDefaultValue(weight);
 
 		// add the new sash at the same location
 		curParent.getChildren().add(index, newSash);
@@ -592,7 +597,7 @@ public class ModelServiceImpl implements EModelService {
 		newSash.setHorizontal(horizontal);
 
 		// Maintain the existing weight in the new sash
-		newSash.setContainerData(relTo.getContainerData());
+		PartSizeInfo.copy(newSash, relTo);
 
 		combine(toInsert, relTo, newSash, insertBefore, ratio);
 	}
