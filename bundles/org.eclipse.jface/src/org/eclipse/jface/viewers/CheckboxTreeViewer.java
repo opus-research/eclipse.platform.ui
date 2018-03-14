@@ -432,8 +432,9 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
      * @param item the item
      * @param state <code>true</code> if the item should be checked,
      *  and <code>false</code> if it should be unchecked
+     * @since 3.11
      */
-    private void setCheckedChildren(Item item, boolean state) {
+	protected void setCheckedChildren(Item item, boolean state) {
         createChildren(item);
         Item[] items = getChildren(item);
         if (items != null) {
