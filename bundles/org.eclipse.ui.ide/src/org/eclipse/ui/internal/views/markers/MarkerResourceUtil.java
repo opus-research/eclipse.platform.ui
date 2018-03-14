@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 IBM Corporation and others.
+ * Copyright (c) 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -53,16 +53,16 @@ class MarkerResourceUtil {
 	 * @return collection of resource we want to collect markers for, taking
 	 *         various enabled filters into account.
 	 */
-	static Set<IResource> computeResources(IResource[] selectedResources,
-			Collection<MarkerFieldFilterGroup> enabledFilters, boolean andFilters) {
+	static Set computeResources(IResource[] selectedResources,
+			Collection enabledFilters, boolean andFilters) {
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 
 		if (enabledFilters==null||enabledFilters.size() == 0) {
-			HashSet<IResource> set = new HashSet<>(1);
+			HashSet set = new HashSet(1);
 			set.add(root);
 			return set;
 		}
-		Set<IResource> resourceSet = andFilters ? getResourcesFiltersAnded(enabledFilters,
+		Set resourceSet = andFilters ? getResourcesFiltersAnded(enabledFilters,
 				selectedResources, root) : getResourcesFiltersOred(
 				enabledFilters, selectedResources, root);
 
@@ -79,7 +79,7 @@ class MarkerResourceUtil {
 	 * @param resourceSet
 	 * @return set
 	 */
-	static Set<IResource> trim2ParentResources(IWorkspaceRoot root, Set<IResource> resourceSet) {
+	static Set trim2ParentResources(IWorkspaceRoot root, Set resourceSet) {
 		if (resourceSet.isEmpty() || resourceSet.size() == 1) {
 			return resourceSet;
 		}
@@ -91,9 +91,9 @@ class MarkerResourceUtil {
 		Object[] clones = resourceSet.toArray();
 		for (int i = 0; i < clones.length; i++) {
 			IResource resource = (IResource) clones[i];
-			Iterator<IResource> iterator = resourceSet.iterator();
+			Iterator iterator = resourceSet.iterator();
 			while (iterator.hasNext()) {
-				IResource resToRemove = iterator.next();
+				IResource resToRemove = (IResource) iterator.next();
 				if (resToRemove.equals(root)) {
 					resourceSet.clear();
 					resourceSet.add(root);
@@ -102,7 +102,8 @@ class MarkerResourceUtil {
 				if (resource.equals(resToRemove)) {
 					continue;
 				}
-				if (resource.getFullPath().isPrefixOf(resToRemove.getFullPath())) {
+				if (resource.getFullPath()
+						.isPrefixOf(resToRemove.getFullPath())) {
 					iterator.remove();
 				}
 			}
@@ -120,21 +121,22 @@ class MarkerResourceUtil {
 	 * @param root
 	 * @return set
 	 */
-	static Set<IResource> getResourcesFiltersOred(Collection<MarkerFieldFilterGroup> enabledFilters,
+	static Set getResourcesFiltersOred(Collection enabledFilters,
 			IResource[] selectedResources, IWorkspaceRoot root) {
 		if (enabledFilters==null||enabledFilters.size() == 0) {
-			HashSet<IResource> set = new HashSet<>(1);
+			HashSet set = new HashSet(1);
 			set.add(root);
 			return set;
 		}
-		Set<IResource> resourceSet = new HashSet<>();
-		Iterator<MarkerFieldFilterGroup> filtersIterator = enabledFilters.iterator();
+		Set resourceSet = new HashSet();
+		Iterator filtersIterator = enabledFilters.iterator();
 		while (filtersIterator.hasNext()) {
-			MarkerFieldFilterGroup group = filtersIterator.next();
-			Set<IResource> set = getResourcesForFilter(group, selectedResources, root);
+			MarkerFieldFilterGroup group = (MarkerFieldFilterGroup) filtersIterator
+					.next();
+			Set set = getResourcesForFilter(group, selectedResources, root);
 			resourceSet.addAll(set);
 			if (resourceSet.contains(root)) {
-				set = new HashSet<>(1);
+				set = new HashSet(1);
 				set.add(root);
 				return set;
 			}
@@ -162,35 +164,40 @@ class MarkerResourceUtil {
 	 * @param root
 	 * @return set
 	 */
-	static Set<IResource> getResourcesFiltersAnded(Collection<MarkerFieldFilterGroup> enabledFilters,
+	static Set getResourcesFiltersAnded(Collection enabledFilters,
 			IResource[] selectedResources, IWorkspaceRoot root) {
 		if (enabledFilters==null||enabledFilters.size() == 0) {
-			HashSet<IResource> set = new HashSet<>(1);
+			HashSet set = new HashSet(1);
 			set.add(root);
 			return set;
 		}
-		Set<IResource> resourceSet = new HashSet<>();
+		Set resourceSet = new HashSet();
 
-		Iterator<MarkerFieldFilterGroup> filtersIterator = enabledFilters.iterator();
-		Set<IResource> removeMain = new HashSet<>();
+		Iterator filtersIterator = enabledFilters.iterator();
+		Set removeMain = new HashSet();
 		while (filtersIterator.hasNext()) {
-			MarkerFieldFilterGroup group = filtersIterator.next();
-			Set<IResource> set = getResourcesForFilter(group, selectedResources, root);
+			MarkerFieldFilterGroup group = (MarkerFieldFilterGroup) filtersIterator
+					.next();
+			Set set = getResourcesForFilter(group, selectedResources, root);
 			if (resourceSet.isEmpty()) {
 				// first time
 				resourceSet.addAll(set);
 			} else {
-				Iterator<IResource> resIterator = resourceSet.iterator();
+				Iterator resIterator = resourceSet.iterator();
 				while (resIterator.hasNext()) {
 					boolean remove = true;
-					IResource mainRes = resIterator.next();
-					Iterator<IResource> iterator = set.iterator();
+					IResource mainRes = (IResource) resIterator.next();
+					Iterator iterator = set.iterator();
 					while (iterator.hasNext() && remove) {
-						IResource grpRes = iterator.next();
+						IResource grpRes = (IResource) iterator.next();
 						remove = !grpRes.equals(mainRes);
-						if (remove && grpRes.getFullPath().isPrefixOf(mainRes.getFullPath())) {
+						if (remove
+								&& grpRes.getFullPath().isPrefixOf(
+										mainRes.getFullPath())) {
 							remove = false;
-						} else if (remove && mainRes.getFullPath().isPrefixOf(grpRes.getFullPath())) {
+						} else if (remove
+								&& mainRes.getFullPath().isPrefixOf(
+										grpRes.getFullPath())) {
 							remove = false;
 							removeMain.add(mainRes);
 						}
@@ -199,15 +206,17 @@ class MarkerResourceUtil {
 						resIterator.remove();
 					}
 				}
-				Iterator<IResource> iterator = set.iterator();
+				Iterator iterator = set.iterator();
 				while (iterator.hasNext()) {
 					boolean remove = true;
-					IResource grpRes = iterator.next();
+					IResource grpRes = (IResource) iterator.next();
 					resIterator = resourceSet.iterator();
 					while (resIterator.hasNext()&&remove) {
-						IResource mainRes = resIterator.next();
+						IResource mainRes = (IResource) resIterator.next();
 						remove = !grpRes.equals(mainRes);
-						if (remove && mainRes.getFullPath().isPrefixOf(grpRes.getFullPath())) {
+						if (remove
+								&& mainRes.getFullPath().isPrefixOf(
+										grpRes.getFullPath())) {
 							remove = false;
 						}
 					}
@@ -235,9 +244,9 @@ class MarkerResourceUtil {
 	 * @param selectedResources
 	 * @param root
 	 */
-	static Set<IResource> getResourcesForFilter(MarkerFieldFilterGroup group,
+	static Set getResourcesForFilter(MarkerFieldFilterGroup group,
 			IResource[] selectedResources, IWorkspaceRoot root) {
-		HashSet<IResource> resourceSet = new HashSet<>();
+		HashSet resourceSet = new HashSet();
 		switch (group.getScope()) {
 		case MarkerFieldFilterGroup.ON_ANY: {
 			resourceSet.add(root);
@@ -276,13 +285,12 @@ class MarkerResourceUtil {
 	 * @return IProject[]
 	 */
 	static IProject[] getProjects(IResource[] resources) {
-		if (resources == null) {
+		if (resources == null)
 			return EMPTY_PROJECT_ARRAY;
-		}
 
-		Collection<IProject> projects = getProjectsAsCollection(resources);
+		Collection projects = getProjectsAsCollection(resources);
 
-		return projects.toArray(new IProject[projects.size()]);
+		return (IProject[]) projects.toArray(new IProject[projects.size()]);
 	}
 
 	/**
@@ -292,18 +300,22 @@ class MarkerResourceUtil {
 	 *            collection of IResource or IResourceMapping
 	 * @return Collection of IProject
 	 */
-	static Collection<IProject> getProjectsAsCollection(Object[] elements) {
-		HashSet<IProject> projects = new HashSet<>();
+	static Collection getProjectsAsCollection(Object[] elements) {
+		HashSet projects = new HashSet();
+
 		for (int idx = 0; idx < elements.length; idx++) {
 			if (elements[idx] instanceof IResource) {
 				projects.add(((IResource) elements[idx]).getProject());
 			} else {
-				IProject[] mappingProjects = (((ResourceMapping) elements[idx]).getProjects());
+				IProject[] mappingProjects = (((ResourceMapping) elements[idx])
+						.getProjects());
 				for (int i = 0; i < mappingProjects.length; i++) {
 					projects.add(mappingProjects[i]);
 				}
 			}
+
 		}
+
 		return projects;
 	}
 
@@ -313,7 +325,9 @@ class MarkerResourceUtil {
 	 * @param resourceCollection
 	 * @param resourceMapping
 	 */
-	static void addResources(Collection<IResource> resourceCollection, ResourceMapping resourceMapping) {
+	static void addResources(Collection resourceCollection,
+			ResourceMapping resourceMapping) {
+
 		try {
 			ResourceTraversal[] traversals = resourceMapping.getTraversals(
 					ResourceMappingContext.LOCAL_CONTEXT,
@@ -346,19 +360,21 @@ class MarkerResourceUtil {
 	static Object adapt2ResourceElement(Object object) {
 		IResource resource = null;
 		if (object instanceof IAdaptable) {
-			ITaskListResourceAdapter adapter = Util.getAdapter(object, ITaskListResourceAdapter.class);
+			Object adapter = Util.getAdapter(object,
+					ITaskListResourceAdapter.class);
 			if (adapter != null) {
-				resource = adapter.getAffectedResource((IAdaptable) object);
+				resource = ((ITaskListResourceAdapter) adapter)
+						.getAffectedResource((IAdaptable) object);
 			}
 		}
 		if (resource == null) {
-			resource = Util.getAdapter(object, IResource.class);
+			resource = (IResource) Util.getAdapter(object, IResource.class);
 		}
 		if (resource == null) {
-			resource = Util.getAdapter(object, IFile.class);
+			resource = (IResource) Util.getAdapter(object, IFile.class);
 		}
 		if (resource == null) {
-			ResourceMapping mapping = Util.getAdapter(object, ResourceMapping.class);
+			Object mapping = Util.getAdapter(object, ResourceMapping.class);
 			if (mapping != null) {
 				return mapping;
 			}
@@ -374,7 +390,7 @@ class MarkerResourceUtil {
 	 * @param typeIds
 	 */
 	static String[] getAllSubTypesIds(String[] typeIds) {
-		HashSet<MarkerType> set = getAllSubTypes(typeIds);
+		HashSet set = getAllSubTypes(typeIds);
 		return toTypeStrings(set);
 	}
 
@@ -384,8 +400,8 @@ class MarkerResourceUtil {
 	 *
 	 * @param typeIds
 	 */
-	static HashSet<MarkerType> getAllSubTypes(String[] typeIds) {
-		HashSet<MarkerType> set = new HashSet<>();
+	static HashSet getAllSubTypes(String[] typeIds) {
+		HashSet set = new HashSet();
 		MarkerTypesModel typesModel = MarkerTypesModel.getInstance();
 		for (int i = 0; i < typeIds.length; i++) {
 			MarkerType type = typesModel.getType(typeIds[i]);
@@ -405,7 +421,7 @@ class MarkerResourceUtil {
 	 * @param typeIds
 	 */
 	static String[] getMutuallyExclusiveSupersIds(String[] typeIds) {
-		HashSet<MarkerType> set = getMutuallyExclusiveSupers(typeIds);
+		HashSet set = getMutuallyExclusiveSupers(typeIds);
 		return toTypeStrings(set);
 	}
 
@@ -415,8 +431,8 @@ class MarkerResourceUtil {
 	 *
 	 * @param typeIds
 	 */
-	static HashSet<MarkerType> getMutuallyExclusiveSupers(String[] typeIds) {
-		HashSet<MarkerType> set = new HashSet<>();
+	static HashSet getMutuallyExclusiveSupers(String[] typeIds) {
+		HashSet set = new HashSet();
 		MarkerTypesModel typesModel = MarkerTypesModel.getInstance();
 		for (int i = 0; i < typeIds.length; i++) {
 			MarkerType type = typesModel.getType(typeIds[i]);
@@ -425,7 +441,7 @@ class MarkerResourceUtil {
 		for (int i = 0; i < typeIds.length; i++) {
 			MarkerType type = typesModel.getType(typeIds[i]);
 			MarkerType[] subs = type.getAllSubTypes();
-			HashSet<MarkerType> subsOnly = new HashSet<>(Arrays.asList(subs));
+			HashSet subsOnly = new HashSet(Arrays.asList(subs));
 			subsOnly.remove(type);
 			set.removeAll(subsOnly);
 		}
@@ -438,13 +454,13 @@ class MarkerResourceUtil {
 	 *
 	 * @param collection
 	 */
-	private static String[] toTypeStrings(Collection<MarkerType> collection) {
-		HashSet<String> ids = new HashSet<>();
-		Iterator<MarkerType> iterator = collection.iterator();
+	private static String[] toTypeStrings(Collection collection) {
+		HashSet ids = new HashSet();
+		Iterator iterator = collection.iterator();
 		while (iterator.hasNext()) {
-			MarkerType type = iterator.next();
+			MarkerType type = (MarkerType) iterator.next();
 			ids.add(type.getId());
 		}
-		return ids.toArray(new String[ids.size()]);
+		return (String[]) ids.toArray(new String[ids.size()]);
 	}
 }

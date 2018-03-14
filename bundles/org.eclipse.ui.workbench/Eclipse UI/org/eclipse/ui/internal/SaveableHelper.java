@@ -400,7 +400,8 @@ public class SaveableHelper {
 				// this will cause the parts tabs to show the ongoing background operation
 				for (int i = 0; i < parts.length; i++) {
 					IWorkbenchPart workbenchPart = parts[i];
-					IWorkbenchSiteProgressService progressService = workbenchPart.getSite().getAdapter(
+					IWorkbenchSiteProgressService progressService = (IWorkbenchSiteProgressService) workbenchPart
+							.getSite().getAdapter(
 									IWorkbenchSiteProgressService.class);
 					progressService.showBusyForFamily(model);
 				}
