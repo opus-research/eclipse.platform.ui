@@ -11,10 +11,8 @@
 package org.eclipse.core.tests.databinding;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.core.databinding.observable.ISideEffect;
-import org.eclipse.core.databinding.observable.SideEffect;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 
@@ -30,7 +28,7 @@ public class SideEffectTest extends AbstractDefaultRealmTestCase {
 	// {@link SideEffect#pause()}, and {@link SideEffect#resume()}
 	// - Validate that runIfDirty does nothing when paused
 
-	private SideEffect sideEffect;
+	private ISideEffect sideEffect;
 	private int sideEffectInvocations;
 
 	private WritableValue<String> defaultDependency;
@@ -45,7 +43,7 @@ public class SideEffectTest extends AbstractDefaultRealmTestCase {
 		alternateDependency = new WritableValue<>("", null);
 		useDefaultDependency = new WritableValue<>(true, null);
 
-		sideEffect = SideEffect.createPaused(() -> {
+		sideEffect = ISideEffect.createPaused(() -> {
 			if (useDefaultDependency.getValue()) {
 				defaultDependency.getValue();
 			} else {
@@ -55,18 +53,18 @@ public class SideEffectTest extends AbstractDefaultRealmTestCase {
 		});
 	}
 
-	public void testSideEffectDoesntRunUntilActivated() throws Exception {
+	public void testSideEffectDoesntRunUntilResumed() throws Exception {
 		runAsync();
 		assertEquals(0, sideEffectInvocations);
 	}
 
-	public void testSideEffectRunsWhenActivated() throws Exception {
+	public void testSideEffectRunsWhenResumed() throws Exception {
 		sideEffect.resume();
 		runAsync();
 		assertEquals(1, sideEffectInvocations);
 	}
 
-	public void testActivatingSideEffectMultipleTimesHasNoEffect() throws Exception {
+	public void testResumingSideEffectMultipleTimesHasNoEffect() throws Exception {
 		sideEffect.resume();
 		sideEffect.resume();
 		runAsync();
@@ -162,13 +160,14 @@ public class SideEffectTest extends AbstractDefaultRealmTestCase {
 		assertEquals(1, sideEffectInvocations);
 	}
 
-	public void testDeactivatedSideEffectWontRunWhenApplyInvoked() throws Exception {
+	public void testDeactivatedSideEffectWontRunWhenRunIfDirtyInvoked() throws Exception {
 		// Run the side-effect once
 		sideEffect.resume();
 		runAsync();
 
 		assertEquals(1, sideEffectInvocations);
-		sideEffect.dispose();
+		sideEffect.pause();
+		defaultDependency.setValue("MakeItDirty");
 		sideEffect.runIfDirty();
 		runAsync();
 
@@ -176,7 +175,7 @@ public class SideEffectTest extends AbstractDefaultRealmTestCase {
 		assertEquals(1, sideEffectInvocations);
 	}
 
-	public void testApplyDoesNothingIfSideEffectNotDirty() throws Exception {
+	public void testRunIfDirtyDoesNothingIfSideEffectNotDirty() throws Exception {
 		// Run the side-effect once
 		sideEffect.resume();
 		runAsync();
@@ -189,15 +188,7 @@ public class SideEffectTest extends AbstractDefaultRealmTestCase {
 		assertEquals(1, sideEffectInvocations);
 	}
 
-	public void testApplyRunsSynchronously() throws Exception {
-		sideEffect.resume();
-		sideEffect.markDirty();
-		assertEquals(1, sideEffectInvocations);
-		sideEffect.runIfDirty();
-		assertEquals(2, sideEffectInvocations);
-	}
-
-	public void testApplyRunsIfDirty() throws Exception {
+	public void testRunIfDirty() throws Exception {
 		sideEffect.resume();
 		runAsync();
 		assertEquals(1, sideEffectInvocations);
@@ -206,14 +197,14 @@ public class SideEffectTest extends AbstractDefaultRealmTestCase {
 		assertEquals(2, sideEffectInvocations);
 	}
 
-	public void testNestedDependencyChangeAndApplyCompletes() throws Exception {
+	public void testNestedDependencyChangeAndRunIfDirtyCompletes() throws Exception {
 		AtomicBoolean hasRun = new AtomicBoolean();
 		WritableValue<Object> invalidator = new WritableValue<Object>(new Object(), null);
-		ISideEffect innerSideEffect = SideEffect.create(() -> {
+		ISideEffect innerSideEffect = ISideEffect.create(() -> {
 			invalidator.getValue();
 		});
 
-		SideEffect.createPaused(() -> {
+		ISideEffect.createPaused(() -> {
 			// Make sure that there are no infinite loops.
 			assertFalse(hasRun.get());
 			hasRun.set(true);
@@ -225,18 +216,20 @@ public class SideEffectTest extends AbstractDefaultRealmTestCase {
 		assertTrue(hasRun.get());
 	}
 
-	public void testNestedInvalidateAndApplyCompletes() throws Exception {
+	public void testNestedInvalidateAndRunIfDirtyCompletes() throws Exception {
 		AtomicBoolean hasRun = new AtomicBoolean();
-		SideEffect innerSideEffect = SideEffect.createPaused(() -> {
+		final WritableValue<Object> makesThingsDirty = new WritableValue<>(null, null);
+		ISideEffect innerSideEffect = ISideEffect.createPaused(() -> {
+			makesThingsDirty.getValue();
 		});
 
 		innerSideEffect.resume();
 
-		SideEffect.createPaused(() -> {
+		ISideEffect.createPaused(() -> {
 			// Make sure that there are no infinite loops.
 			assertFalse(hasRun.get());
 			hasRun.set(true);
-			innerSideEffect.markDirty();
+			makesThingsDirty.setValue(new Object());
 			innerSideEffect.runIfDirty();
 		}).resume();
 
@@ -249,8 +242,8 @@ public class SideEffectTest extends AbstractDefaultRealmTestCase {
 
 		// Make sure that creating a SideEffect within another side effect works
 		// propely.
-		SideEffect.createPaused(() -> {
-			SideEffect.createPaused(() -> {
+		ISideEffect.createPaused(() -> {
+			ISideEffect.createPaused(() -> {
 				assertFalse(hasRun.get());
 				hasRun.set(true);
 			}).resume();
@@ -259,41 +252,23 @@ public class SideEffectTest extends AbstractDefaultRealmTestCase {
 		assertTrue(hasRun.get());
 	}
 
-	public void testInvalidateSelf() throws Exception {
-		AtomicInteger runCount = new AtomicInteger();
-		// Make sure that if a side effect invalidates it self, it will run at
-		// least once more but eventually stop.
-		SideEffect[] sideEffect = new SideEffect[1];
-		sideEffect[0] = SideEffect.createPaused(() -> {
-			assertTrue(runCount.get() < 2);
-			int count = runCount.incrementAndGet();
-			if (count == 1) {
-				sideEffect[0].markDirty();
-			}
-		});
-		sideEffect[0].resume();
-		runAsync();
-		assertEquals(2, runCount.get());
-	}
-
 	// Doesn't currently work, but this would be a desirable property for
 	// SideEffect to have
-	// public void testInvalidateDependency() throws Exception {
+	// public void testInvalidateSelf() throws Exception {
 	// AtomicInteger runCount = new AtomicInteger();
-	// WritableValue<Object> invalidator = new WritableValue<Object>(new
-	// Object(), null);
-	// // Make sure that if a side effect invalidates itself, it will run at
-	// // least once more but will eventually stop.
-	// SideEffect[] sideEffect = new SideEffect[1];
-	// sideEffect[0] = SideEffect.create(() -> {
-	// invalidator.getValue();
+	// WritableValue<Object> invalidator = new WritableValue<>(null, null);
+	// // Make sure that if a side effect invalidates it self, it will run at
+	// // least once more but eventually stop.
+	// ISideEffect[] sideEffect = new ISideEffect[1];
+	// sideEffect[0] = ISideEffect.createPaused(() -> {
 	// assertTrue(runCount.get() < 2);
+	// invalidator.getValue();
 	// int count = runCount.incrementAndGet();
 	// if (count == 1) {
 	// invalidator.setValue(new Object());
 	// }
 	// });
-	// sideEffect[0].activate();
+	// sideEffect[0].resume();
 	// runAsync();
 	// assertEquals(2, runCount.get());
 	// }
