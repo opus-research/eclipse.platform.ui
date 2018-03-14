@@ -549,11 +549,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 		return instance;
 	}
 
-	private static boolean isFirstE4WorkbenchRun(MApplication app) {
-		IEclipseContext context = app.getContext();
-		return context.containsKey(E4Workbench.NO_SAVED_MODEL_FOUND);
-	}
-
 	/**
 	 * Creates the workbench and associates it with the the given display and
 	 * workbench advisor, and runs the workbench UI. This entails processing and
@@ -606,27 +601,9 @@ public final class Workbench extends EventManager implements IWorkbench,
 					E4Workbench e4Workbench = e4app.createE4Workbench(getApplicationContext(),
 							display);
 
-					MApplication appModel = e4Workbench.getApplication();
-					IEclipseContext context = e4Workbench.getContext();
-
-					WorkbenchMigrationProcessor migrationProcessor = null;
-					try {
-						migrationProcessor = ContextInjectionFactory.make(
-							WorkbenchMigrationProcessor.class, context);
-					} catch (@SuppressWarnings("restriction") InjectionException e) {
-						WorkbenchPlugin.log(e);
-					}
-					if (migrationProcessor != null && isFirstE4WorkbenchRun(appModel)) {
-						try {
-							migrationProcessor.process();
-						} catch (Exception e) {
-							WorkbenchPlugin.log("Workbench migration failed", e); //$NON-NLS-1$
-							migrationProcessor.restoreDefaultModel();
-						}
-					}
-
 					// create the workbench instance
-					Workbench workbench = new Workbench(display, advisor, appModel, context);
+					Workbench workbench = new Workbench(display, advisor, e4Workbench
+							.getApplication(), e4Workbench.getContext());
 
 					// prime the splash nice and early
 					if (createSplash)
@@ -650,14 +627,10 @@ public final class Workbench extends EventManager implements IWorkbench,
 							WorkbenchPlugin.getDefault().addBundleListener(bundleListener);
 						}
 					}
+					MApplication appModel = e4Workbench.getApplication();
 					setSearchContribution(appModel, true);
 					// run the legacy workbench once
 					returnCode[0] = workbench.runUI();
-					if (migrationProcessor != null && migrationProcessor.isWorkbenchMigrated()) {
-						migrationProcessor.updatePartsAfterMigration(WorkbenchPlugin.getDefault()
-								.getPerspectiveRegistry(), WorkbenchPlugin.getDefault()
-								.getViewRegistry());
-					}
 					if (returnCode[0] == PlatformUI.RETURN_OK) {
 						// run the e4 event loop and instantiate ... well, stuff
 						e4Workbench.createAndRunUI(e4Workbench.getApplication());
@@ -1195,6 +1168,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 		IPresentationEngine engine = application.getContext().get(IPresentationEngine.class);
 		engine.stop();
+		//System.err.println("stop()"); //$NON-NLS-1$
 
 		runEventLoop = false;
 		return true;
