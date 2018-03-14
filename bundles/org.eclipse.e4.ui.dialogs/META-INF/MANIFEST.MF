@@ -6,10 +6,3 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %providerName
 Export-Package: org.eclipse.e4.ui.dialogs;x-internal:=true
-Require-Bundle: org.eclipse.jface,
- org.eclipse.osgi,
- org.eclipse.jface.databinding,
- org.eclipse.core.databinding.observable,
- org.eclipse.core.databinding,
- org.eclipse.core.databinding.beans;bundle-version="1.2.200",
- org.eclipse.core.databinding.property;bundle-version="1.4.200"

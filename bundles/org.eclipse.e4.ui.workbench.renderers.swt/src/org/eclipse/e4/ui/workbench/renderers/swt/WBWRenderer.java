@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728, 441150
- *     Simon Scholz <scholzsimon@arcor.de> - Bug 429729, 446458
+ *     Simon Scholz <scholzsimon@arcor.de - Bug 429729
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -30,7 +30,6 @@ import org.eclipse.e4.ui.css.core.resources.IResourcesRegistry;
 import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
 import org.eclipse.e4.ui.css.swt.resources.ResourceByDefinitionKey;
 import org.eclipse.e4.ui.css.swt.resources.SWTResourcesRegistry;
-import org.eclipse.e4.ui.dialogs.ListSelectionDialog;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.PartServiceSaveHandler;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.SWTRenderersMessages;
@@ -55,9 +54,10 @@ import org.eclipse.e4.ui.workbench.modeling.ISaveHandler;
 import org.eclipse.e4.ui.workbench.modeling.IWindowCloseHandler;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.jface.dialogs.SelectionDialog;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.window.IShellProvider;
 import org.eclipse.jface.window.Window;
@@ -74,9 +74,11 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Resource;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
@@ -445,12 +447,12 @@ public class WBWRenderer extends SWTPartRenderer {
 			public Save promptToSave(MPart dirtyPart) {
 				Shell shell = (Shell) context
 						.get(IServiceConstants.ACTIVE_SHELL);
-				Collection<MPart> elements = promptForSave(shell,
+				Object[] elements = promptForSave(shell,
 						Collections.singleton(dirtyPart));
 				if (elements == null) {
 					return Save.CANCEL;
 				}
-				return elements.isEmpty() ? Save.NO : Save.YES;
+				return elements.length == 0 ? Save.NO : Save.YES;
 			}
 
 			@Override
@@ -459,13 +461,13 @@ public class WBWRenderer extends SWTPartRenderer {
 				Shell shell = (Shell) context
 						.get(IServiceConstants.ACTIVE_SHELL);
 				Save[] response = new Save[dirtyParts.size()];
-				Collection<MPart> elements = promptForSave(shell, parts);
+				Object[] elements = promptForSave(shell, parts);
 				if (elements == null) {
 					Arrays.fill(response, Save.CANCEL);
 				} else {
 					Arrays.fill(response, Save.NO);
-					for (MPart mPart : elements) {
-						response[parts.indexOf(mPart)] = Save.YES;
+					for (int i = 0; i < elements.length; i++) {
+						response[parts.indexOf(elements[i])] = Save.YES;
 					}
 				}
 				return response;
@@ -744,19 +746,15 @@ public class WBWRenderer extends SWTPartRenderer {
 		}
 	}
 
-	private Collection<MPart> promptForSave(Shell parentShell,
+	private Object[] promptForSave(Shell parentShell,
 			Collection<MPart> saveableParts) {
-		SelectionDialog<MPart> dialog = ListSelectionDialog.create(parentShell,
-				saveableParts, MPart.class, ArrayContentProvider.getInstance(),
-				new MPartLabelProvider(),
-				SWTRenderersMessages.choosePartsToSaveTitle,
-				SWTRenderersMessages.choosePartsToSave);
-		applyDialogStyles(dialog.getShell());
+		SaveablePartPromptDialog dialog = new SaveablePartPromptDialog(
+				parentShell, saveableParts);
 		if (dialog.open() == Window.CANCEL) {
 			return null;
 		}
 
-		return dialog.getResult();
+		return dialog.getCheckedElements();
 	}
 
 	private void applyDialogStyles(Control control) {
@@ -772,11 +770,74 @@ public class WBWRenderer extends SWTPartRenderer {
 		}
 	}
 
-	class MPartLabelProvider extends LabelProvider {
-		@Override
-		public String getText(Object element) {
-			return ((MPart) element).getLocalizedLabel();
+	class SaveablePartPromptDialog extends Dialog {
+
+		private Collection<MPart> collection;
+
+		private CheckboxTableViewer tableViewer;
+
+		private Object[] checkedElements = new Object[0];
+
+		SaveablePartPromptDialog(Shell shell, Collection<MPart> collection) {
+			super(shell);
+			this.collection = collection;
 		}
+
+		@Override
+		protected void configureShell(Shell newShell) {
+			super.configureShell(newShell);
+			newShell.setText(SWTRenderersMessages.choosePartsToSaveTitle);
+		}
+
+
+		@Override
+		protected Control createDialogArea(Composite parent) {
+			parent = (Composite) super.createDialogArea(parent);
+
+			Label label = new Label(parent, SWT.LEAD);
+			label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+			label.setText(SWTRenderersMessages.choosePartsToSave);
+
+			tableViewer = CheckboxTableViewer.newCheckList(parent, SWT.SINGLE
+					| SWT.BORDER);
+			GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+			data.heightHint = 250;
+			data.widthHint = 300;
+			tableViewer.getControl().setLayoutData(data);
+			tableViewer.setLabelProvider(new LabelProvider() {
+				@Override
+				public String getText(Object element) {
+					return ((MPart) element).getLocalizedLabel();
+				}
+			});
+			tableViewer.setContentProvider(ArrayContentProvider.getInstance());
+			tableViewer.setInput(collection);
+			tableViewer.setAllChecked(true);
+
+			return parent;
+		}
+
+		@Override
+		public void create() {
+			super.create();
+			applyDialogStyles(getShell());
+		}
+
+		@Override
+		protected void okPressed() {
+			checkedElements = tableViewer.getCheckedElements();
+			super.okPressed();
+		}
+
+		public Object[] getCheckedElements() {
+			return checkedElements;
+		}
+
+		@Override
+		protected boolean isResizable() {
+			return true;
+		}
+
 	}
 
 	@SuppressWarnings("restriction")
