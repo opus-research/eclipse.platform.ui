@@ -196,6 +196,7 @@ import org.eclipse.jface.tests.internal.databinding.swt.DateTimeCalendarObservab
 import org.eclipse.jface.tests.internal.databinding.swt.DateTimeDateObservableValueTest;
 import org.eclipse.jface.tests.internal.databinding.swt.DateTimeSelectionPropertyTest;
 import org.eclipse.jface.tests.internal.databinding.swt.DateTimeTimeObservableValueTest;
+import org.eclipse.jface.tests.internal.databinding.swt.GroupObservableValueTest;
 import org.eclipse.jface.tests.internal.databinding.swt.LabelObservableValueTest;
 import org.eclipse.jface.tests.internal.databinding.swt.ListSingleSelectionObservableValueTest;
 import org.eclipse.jface.tests.internal.databinding.swt.SWTDelayedObservableValueDecoratorTest;
@@ -466,6 +467,7 @@ public class BindingTestSuite extends TestSuite {
 
 		addTestSuite(ControlObservableValueTest.class);
 		addTest(LabelObservableValueTest.suite());
+		addTest(GroupObservableValueTest.suite());
 		addTestSuite(ListSingleSelectionObservableValueTest.class);
 		addTest(ScaleObservableValueMinTest.suite());
 		addTest(ScaleObservableValueMaxTest.suite());

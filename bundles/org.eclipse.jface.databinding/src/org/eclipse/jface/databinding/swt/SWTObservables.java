@@ -326,6 +326,7 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.custom.CCombo</li>
 	 * <li>org.eclipse.swt.custom.CLabel</li>
 	 * <li>org.eclipse.swt.widgets.Combo</li>
+	 * <li>org.eclipse.swt.widgets.Group (as of 1.7)</li>
 	 * <li>org.eclipse.swt.widgets.Item</li>
 	 * <li>org.eclipse.swt.widgets.Label</li>
 	 * <li>org.eclipse.swt.widgets.Link (as of 1.2)</li>
@@ -355,6 +356,7 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.custom.CCombo</li>
 	 * <li>org.eclipse.swt.custom.CLabel</li>
 	 * <li>org.eclipse.swt.widgets.Combo</li>
+	 * <li>org.eclipse.swt.widgets.Group (as of 1.7)</li>
 	 * <li>org.eclipse.swt.widgets.Label</li>
 	 * <li>org.eclipse.swt.widgets.Link (as of 1.2)</li>
 	 * <li>org.eclipse.swt.widgets.Shell</li>
