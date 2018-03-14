@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.ToolBar;
  * This class is intended to be the base for any trim contributions.
  * </p>
  * @since 3.2
- *
+ * 
  */
 public abstract class AbstractTrimWidget implements IWidget {
 	/**
@@ -49,10 +49,10 @@ public abstract class AbstractTrimWidget implements IWidget {
 	 * </ul>
 	 * </p>
 	 * <p>
-	 *
+	 * 
 	 * @param parent
 	 *            The parent to (re)create the widget under
-	 *
+	 * 
 	 * @param oldSide
 	 *            The previous side ({@link SWT#DEFAULT} on the initial fill)
 	 * @param newSide
@@ -60,22 +60,32 @@ public abstract class AbstractTrimWidget implements IWidget {
 	 */
 	public abstract void fill(Composite parent, int oldSide, int newSide);
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.menus.IWidget#dispose()
+	 */
 	public abstract void dispose();
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.menus.IWidget#fill(org.eclipse.swt.widgets.Composite)
+	 */
 	public void fill(Composite parent) {
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.menus.IWidget#fill(org.eclipse.swt.widgets.Menu, int)
+	 */
 	public void fill(Menu parent, int index) {
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.menus.IWidget#fill(org.eclipse.swt.widgets.ToolBar, int)
+	 */
 	public void fill(ToolBar parent, int index) {
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.menus.IWidget#fill(org.eclipse.swt.widgets.CoolBar, int)
+	 */
 	public void fill(CoolBar parent, int index) {
 	}
 }

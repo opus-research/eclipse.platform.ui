@@ -19,20 +19,17 @@ public abstract class AbstractDropTarget implements IDropTarget {
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.dnd.IDropTarget#drop()
      */
-    @Override
-	public abstract void drop();
+    public abstract void drop();
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.dnd.IDropTarget#getCursor()
      */
-    @Override
-	public abstract Cursor getCursor();
+    public abstract Cursor getCursor();
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.dnd.IDropTarget#getSnapRectangle()
      */
-    @Override
-	public Rectangle getSnapRectangle() {
+    public Rectangle getSnapRectangle() {
         return null;
     }
 }

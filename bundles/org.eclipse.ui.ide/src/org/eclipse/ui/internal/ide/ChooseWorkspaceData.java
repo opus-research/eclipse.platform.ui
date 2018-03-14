@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -66,13 +66,13 @@ public class ChooseWorkspaceData {
      * workspace list into a comma-separated list.
      */
     private static final int PERS_ENCODING_VERSION_CONFIG_PREFS = 2;
-
+    
     /**
 	 * This is the second version of the encode/decode protocol that uses the
 	 * confi area preferences store for persistence. This version is the same as
 	 * the previous version except it uses a \n character to seperate the path
 	 * entries instead of commas. (see bug 98467)
-	 *
+	 * 
 	 * @since 3.3.1
 	 */
 	private static final int PERS_ENCODING_VERSION_CONFIG_PREFS_NO_COMMAS = 3;
@@ -222,13 +222,10 @@ public class ChooseWorkspaceData {
 
 		// move the new selection to the front of the list
 		if (selection != null) {
-			File newFolder = new File(selection);
 			String oldEntry = recentWorkspaces[0];
 			recentWorkspaces[0] = selection;
 			for (int i = 1; i < recentWorkspaces.length && oldEntry != null; ++i) {
-				File oldFolder = new File (oldEntry);
-				// If selection represents a file location we already have, don't store it
-				if (newFolder.compareTo(oldFolder) == 0){
+				if (selection.equals(oldEntry)) {
 					break;
 				}
 				String tmp = recentWorkspaces[i];
@@ -258,7 +255,7 @@ public class ChooseWorkspaceData {
 	 * Look for and read data that might have been persisted from some previous
 	 * run. Leave the receiver in a default state if no persistent data is
 	 * found.
-	 *
+	 * 
 	 * @return true if a file was successfully read and false otherwise
 	 */
     private boolean readPersistedData_file() {
@@ -376,10 +373,10 @@ public class ChooseWorkspaceData {
     /**
 	 * Look in the config area preference store for the list of recently used
 	 * workspaces.
-	 *
+	 * 
 	 * NOTE: During the transition phase the file will be checked if no config
 	 * preferences are found.
-	 *
+	 * 
 	 * @return true if the values were successfully retrieved and false
 	 *         otherwise
 	 */
@@ -472,7 +469,7 @@ public class ChooseWorkspaceData {
 		if (tokens == null) // unknown version? corrupt file? we can't log it
 							// because we dont have a workspace yet...
 			return new String[0];
-
+			
 
 		StringTokenizer tokenizer = new StringTokenizer(prefValue, tokens);
 		for (int i = 0; i < paths.length && tokenizer.hasMoreTokens(); ++i) {

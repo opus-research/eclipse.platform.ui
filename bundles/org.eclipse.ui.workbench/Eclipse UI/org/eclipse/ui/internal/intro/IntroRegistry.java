@@ -26,34 +26,32 @@ import org.eclipse.ui.internal.registry.RegistryReader;
 
 /**
  * Registry for introduction elements.
- *
+ * 
  * @since 3.0
  */
 public class IntroRegistry implements IIntroRegistry {
-	private static final String TAG_INTRO = "intro";//$NON-NLS-1$
+	private static final String TAG_INTRO = "intro";//$NON-NLS-1$	
 
 	private static final String TAG_INTROPRODUCTBINDING = "introProductBinding";//$NON-NLS-1$
 
 	private static final String ATT_INTROID = "introId"; //$NON-NLS-1$
 
-	private static final String ATT_PRODUCTID = "productId"; //$NON-NLS-1$
+	private static final String ATT_PRODUCTID = "productId"; //$NON-NLS-1$	
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.internal.intro.IIntroRegistry#getIntroCount()
 	 */
-	@Override
 	public int getIntroCount() {
 		return getIntros().length;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.internal.intro.IIntroRegistry#getIntros()
 	 */
-	@Override
 	public IIntroDescriptor[] getIntros() {
 		IExtensionPoint point = Platform.getExtensionRegistry()
 				.getExtensionPoint(PlatformUI.PLUGIN_ID,
@@ -91,10 +89,9 @@ public class IntroRegistry implements IIntroRegistry {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.internal.intro.IIntroRegistry#getIntroForProduct(java.lang.String)
 	 */
-	@Override
 	public IIntroDescriptor getIntroForProduct(String targetProductId) {
 		IExtensionPoint point = Platform.getExtensionRegistry()
 				.getExtensionPoint(PlatformUI.PLUGIN_ID,
@@ -161,10 +158,9 @@ public class IntroRegistry implements IIntroRegistry {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.internal.intro.IIntroRegistry#getIntro(java.lang.String)
 	 */
-	@Override
 	public IIntroDescriptor getIntro(String id) {
 		IIntroDescriptor[] intros = getIntros();
 		for (int i = 0; i < intros.length; i++) {

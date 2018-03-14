@@ -11,12 +11,8 @@
 package org.eclipse.ui.examples.jobs;
 
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.MultiStatus;
-import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.*;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.progress.IProgressConstants;
 
 /**
@@ -44,7 +40,7 @@ public class TestJob extends Job {
 
 	/**
 	 * Creates a new test job
-	 *
+	 * 
 	 * @param duration
 	 *            Total time that the test job should sleep, in milliseconds.
 	 * @param lock
@@ -64,16 +60,16 @@ public class TestJob extends Job {
 		this.unknown = indeterminate;
 		this.reschedule = reschedule;
 		this.rescheduleWait = rescheduleWait;
-		setProperty(IProgressConstants.ICON_PROPERTY, AbstractUIPlugin
+		setProperty(IProgressConstants.ICON_PROPERTY, ProgressExamplesPlugin
 				.imageDescriptorFromPlugin(ProgressExamplesPlugin.ID,
-						"icons/sample.gif")); //$NON-NLS-1$
+						"icons/sample.gif"));
 		if (lock)
 			setRule(ResourcesPlugin.getWorkspace().getRoot());
 	}
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.core.internal.jobs.InternalJob#belongsTo(java.lang.Object)
 	 */
 	public boolean belongsTo(Object family) {
@@ -85,7 +81,7 @@ public class TestJob extends Job {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.core.internal.jobs.InternalJob#run(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public IStatus run(IProgressMonitor monitor) {

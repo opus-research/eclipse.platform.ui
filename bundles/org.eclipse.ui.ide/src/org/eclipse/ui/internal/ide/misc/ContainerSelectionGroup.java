@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Igor Fedorenko <igorfie@yahoo.com> -
+ *     Igor Fedorenko <igorfie@yahoo.com> - 
  *     		Fix for Bug 136921 [IDE] New File dialog locks for 20 seconds
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.misc;
@@ -19,9 +19,7 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.equinox.bidi.StructuredTextTypeHandlerFactory;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.util.BidiUtils;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -77,7 +75,7 @@ public class ContainerSelectionGroup extends Composite {
 
 	/**
 	 * Creates a new instance of the widget.
-	 *
+	 * 
 	 * @param parent
 	 *            The parent widget of the group.
 	 * @param listener
@@ -94,7 +92,7 @@ public class ContainerSelectionGroup extends Composite {
 
 	/**
 	 * Creates a new instance of the widget.
-	 *
+	 * 
 	 * @param parent
 	 *            The parent widget of the group.
 	 * @param listener
@@ -113,7 +111,7 @@ public class ContainerSelectionGroup extends Composite {
 
 	/**
 	 * Creates a new instance of the widget.
-	 *
+	 * 
 	 * @param parent
 	 *            The parent widget of the group.
 	 * @param listener
@@ -137,7 +135,7 @@ public class ContainerSelectionGroup extends Composite {
 
 	/**
 	 * Creates a new instance of the widget.
-	 *
+	 * 
 	 * @param parent
 	 *            The parent widget of the group.
 	 * @param listener
@@ -174,7 +172,7 @@ public class ContainerSelectionGroup extends Composite {
 	/**
 	 * The container selection has changed in the tree view. Update the
 	 * container name field value and notify all listeners.
-	 *
+	 * 
 	 * @param container
 	 *            The container that changed
 	 */
@@ -203,7 +201,7 @@ public class ContainerSelectionGroup extends Composite {
 
 	/**
 	 * Creates the contents of the composite.
-	 *
+	 * 
 	 * @param message
 	 */
 	public void createContents(String message) {
@@ -213,7 +211,7 @@ public class ContainerSelectionGroup extends Composite {
 
 	/**
 	 * Creates the contents of the composite.
-	 *
+	 * 
 	 * @param message
 	 * @param heightHint
 	 * @param widthHint
@@ -235,7 +233,6 @@ public class ContainerSelectionGroup extends Composite {
 			containerNameField.setLayoutData(gd);
 			containerNameField.addListener(SWT.Modify, listener);
 			containerNameField.setFont(this.getFont());
-			BidiUtils.applyBidiProcessing(containerNameField, StructuredTextTypeHandlerFactory.FILE);
 		} else {
 			// filler...
 			new Label(this, SWT.NONE);
@@ -247,7 +244,7 @@ public class ContainerSelectionGroup extends Composite {
 
 	/**
 	 * Returns a new drill down viewer for this dialog.
-	 *
+	 * 
 	 * @param heightHint
 	 *            height hint for the drill down composite
 	 */
@@ -270,7 +267,6 @@ public class ContainerSelectionGroup extends Composite {
 		treeViewer.setComparator(new ViewerComparator());
 		treeViewer.setUseHashlookup(true);
 		treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				IStructuredSelection selection = (IStructuredSelection) event
 						.getSelection();
@@ -279,7 +275,6 @@ public class ContainerSelectionGroup extends Composite {
 			}
 		});
 		treeViewer.addDoubleClickListener(new IDoubleClickListener() {
-			@Override
 			public void doubleClick(DoubleClickEvent event) {
 				ISelection selection = event.getSelection();
 				if (selection instanceof IStructuredSelection) {
@@ -305,7 +300,7 @@ public class ContainerSelectionGroup extends Composite {
 	 * Returns the currently entered container name. Null if the field is empty.
 	 * Note that the container may not exist yet if the user entered a new
 	 * container name in the field.
-	 *
+	 * 
 	 * @return IPath
 	 */
 	public IPath getContainerFullPath() {
@@ -338,7 +333,7 @@ public class ContainerSelectionGroup extends Composite {
 
 	/**
 	 * Sets the selected existing container.
-	 *
+	 * 
 	 * @param container
 	 */
 	public void setSelectedContainer(IContainer container) {

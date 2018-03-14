@@ -70,7 +70,6 @@ public final class CommonNavigatorManager implements ISelectionChangedListener {
 	
 	private ISelectionChangedListener statusBarListener = new ISelectionChangedListener() {
 
-		@Override
 		public void selectionChanged(SelectionChangedEvent anEvent) {
 			updateStatusBar(anEvent.getSelection());
 		}
@@ -84,10 +83,8 @@ public final class CommonNavigatorManager implements ISelectionChangedListener {
 			super(label);
 		}
 		  
-		@Override
 		public IStatus runInUIThread(IProgressMonitor monitor) {
 			SafeRunner.run(new NavigatorSafeRunnable() {
-				@Override
 				public void run() throws Exception {
 					if(commonNavigator.getCommonViewer().getInput() != null) {
 						IStructuredSelection selection = new StructuredSelection(commonNavigator.getCommonViewer().getInput());
@@ -161,7 +158,6 @@ public final class CommonNavigatorManager implements ISelectionChangedListener {
 		openAction.setActionDefinitionId(ICommonActionConstants.OPEN);
 
 		new OpenAndLinkWithEditorHelper(commonNavigator.getCommonViewer()) {
-			@Override
 			protected void activate(ISelection selection) {
 				final int currentMode = OpenStrategy.getOpenMethod();
 				try {
@@ -179,12 +175,10 @@ public final class CommonNavigatorManager implements ISelectionChangedListener {
 				}
 			}
 
-			@Override
 			protected void linkToEditor(ISelection selection) {
 				// do nothing: this is handled by org.eclipse.ui.internal.navigator.actions.LinkEditorAction
 			}
 
-			@Override
 			protected void open(ISelection selection, boolean activate) {
 				actionService.setContext(new ActionContext(commonNavigator.getCommonViewer().getSelection()));
 				actionService.fillActionBars(commonNavigator.getViewSite().getActionBars());
@@ -220,7 +214,6 @@ public final class CommonNavigatorManager implements ISelectionChangedListener {
 	 * 
 	 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
 	 */
-	@Override
 	public void selectionChanged(SelectionChangedEvent anEvent) {
 		if (anEvent.getSelection() instanceof IStructuredSelection) {
 			IStructuredSelection structuredSelection = (IStructuredSelection) anEvent
@@ -278,7 +271,6 @@ public final class CommonNavigatorManager implements ISelectionChangedListener {
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 
-			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				fillContextMenu(manager);
 			}

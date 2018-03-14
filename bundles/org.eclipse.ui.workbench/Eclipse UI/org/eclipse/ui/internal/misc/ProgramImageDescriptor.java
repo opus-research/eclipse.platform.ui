@@ -25,7 +25,7 @@ public class ProgramImageDescriptor extends ImageDescriptor {
     private int offset;
 
     /**
-     * Creates a new ImageDescriptor. The image is loaded
+     * Creates a new ImageDescriptor. The image is loaded 
      * from a file with the given name <code>name</code>.
      */
     public ProgramImageDescriptor(String fullPath, int offsetInFile) {
@@ -36,8 +36,7 @@ public class ProgramImageDescriptor extends ImageDescriptor {
     /**
      * @see Object#equals
      */
-    @Override
-	public boolean equals(Object o) {
+    public boolean equals(Object o) {
         if (!(o instanceof ProgramImageDescriptor)) {
             return false;
         }
@@ -55,10 +54,9 @@ public class ProgramImageDescriptor extends ImageDescriptor {
 
     /**
      * Returns an SWT Image that is described by the information
-     * in this descriptor.
+     * in this descriptor. 
      */
-    @Override
-	public ImageData getImageData() {
+    public ImageData getImageData() {
         /*This is a user defined offset into the file which always
          *returns us the defualt - return the default regardless*/
 
@@ -69,8 +67,7 @@ public class ProgramImageDescriptor extends ImageDescriptor {
     /**
      * @see Object#hashCode
      */
-    @Override
-	public int hashCode() {
+    public int hashCode() {
         return filename.hashCode() + offset;
     }
 }

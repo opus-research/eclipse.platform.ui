@@ -28,7 +28,7 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
  * A sorter to sort the file and the folders in the C viewer in the following
  * order: 1 Project 2 BinaryContainer 3 ArchiveContainer 4 LibraryContainer 5
  * IncludeContainer 6 Source roots 5 C Elements 6 non C Elements
- *
+ * 
  * @noextend This class is not intended to be subclassed by clients.
  */
 public class CElementSorter extends ViewerSorter {
@@ -84,7 +84,6 @@ public class CElementSorter extends ViewerSorter {
 	public CElementSorter() {
 	}
 
-	@Override
 	public int category(Object element) {
 		if (element instanceof CElement) {
 			if (element instanceof CRoot)
@@ -111,7 +110,6 @@ public class CElementSorter extends ViewerSorter {
 		return OTHERS;
 	}
 
-	@Override
 	public int compare(Viewer viewer, Object e1, Object e2) {
 		int cat1 = category(e1);
 		int cat2 = category(e2);

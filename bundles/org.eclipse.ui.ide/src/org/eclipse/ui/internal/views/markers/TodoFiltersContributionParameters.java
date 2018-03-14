@@ -24,7 +24,7 @@ import org.eclipse.ui.views.markers.MarkerSupportConstants;
  */
 public class TodoFiltersContributionParameters extends
 		FiltersContributionParameters {
-
+	
 	private static Map todoMap;
 	static {
 		todoMap = new HashMap();
@@ -41,7 +41,6 @@ public class TodoFiltersContributionParameters extends
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FiltersContributionParameters#getParameterValues()
 	 */
-	@Override
 	public Map getParameterValues() {
 		return todoMap;
 	}

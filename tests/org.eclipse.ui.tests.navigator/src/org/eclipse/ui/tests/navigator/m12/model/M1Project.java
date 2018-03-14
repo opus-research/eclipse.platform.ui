@@ -14,7 +14,6 @@ public class M1Project extends M1Container implements IAdaptable {
 	public M1Project(IProject project) {
 		super(project);
 	}
-	@Override
 	public Object getAdapter(Class adapter) {
 		return Platform.getAdapterManager().getAdapter(this, adapter);
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,15 +35,13 @@ public class IPageListenerTest extends UITestCase implements IPageListener {
         super(testName);
     }
 
-    @Override
-	protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         super.doSetUp();
         fWindow = openTestWindow();
         fWindow.addPageListener(this);
     }
 
-    @Override
-	protected void doTearDown() throws Exception {
+    protected void doTearDown() throws Exception {
         fWindow.removePageListener(this);
         super.doTearDown();
     }
@@ -55,15 +53,15 @@ public class IPageListenerTest extends UITestCase implements IPageListener {
         /*
          * Commented out because until test case can be updated to work
          * with new window/page/perspective implementation
-         *
+         * 
          // From Javadoc: "Notifies this listener that the given page has been opened."
-
+         
          // Test open page.
          eventsReceived = 0;
          IWorkbenchPage page = fWindow.openPage(EmptyPerspective.PERSP_ID,
          fWorkspace);
          assertEquals(eventsReceived, OPEN|ACTIVATE);
-
+         
          // Close page.
          page.close();
          */
@@ -76,13 +74,13 @@ public class IPageListenerTest extends UITestCase implements IPageListener {
         /*
          * Commented out because until test case can be updated to work
          * with new window/page/perspective implementation
-         *
+         * 
          // From Javadoc: "Notifies this listener that the given page has been closed."
-
+         
          // Open page.
          IWorkbenchPage page = fWindow.openPage(EmptyPerspective.PERSP_ID,
          fWorkspace);
-
+         
          // Test close page.
          eventsReceived = 0;
          pageMask = page;
@@ -98,15 +96,15 @@ public class IPageListenerTest extends UITestCase implements IPageListener {
         /*
          * Commented out because until test case can be updated to work
          * with new window/page/perspective implementation
-         *
+         * 
          // From Javadoc: "Notifies this listener that the given page has been activated."
-
+         
          // Add pages.
          IWorkbenchPage page1 = fWindow.openPage(EmptyPerspective.PERSP_ID,
          fWorkspace);
          IWorkbenchPage page2 = fWindow.openPage(EmptyPerspective.PERSP_ID,
          fWorkspace);
-
+         
          // Test activation of page 1.
          eventsReceived = 0;
          pageMask = page1;
@@ -114,11 +112,11 @@ public class IPageListenerTest extends UITestCase implements IPageListener {
          assertEquals(eventsReceived, ACTIVATE);
 
          // Test activation of page 2.
-         eventsReceived = 0;
+         eventsReceived = 0;		
          pageMask = page2;
          fWindow.setActivePage(page2);
          assertEquals(eventsReceived, ACTIVATE);
-
+         
          // Cleanup.
          page1.close();
          page2.close();
@@ -128,31 +126,25 @@ public class IPageListenerTest extends UITestCase implements IPageListener {
     /**
      * @see IPageListener#pageActivated(IWorkbenchPage)
      */
-    @Override
-	public void pageActivated(IWorkbenchPage page) {
-        if (pageMask == null || page == pageMask) {
-			eventsReceived = eventsReceived | ACTIVATE;
-		}
+    public void pageActivated(IWorkbenchPage page) {
+        if (pageMask == null || page == pageMask)
+            eventsReceived = eventsReceived | ACTIVATE;
     }
 
     /**
      * @see IPageListener#pageClosed(IWorkbenchPage)
      */
-    @Override
-	public void pageClosed(IWorkbenchPage page) {
-        if (pageMask == null || page == pageMask) {
-			eventsReceived = eventsReceived | CLOSE;
-		}
+    public void pageClosed(IWorkbenchPage page) {
+        if (pageMask == null || page == pageMask)
+        	eventsReceived = eventsReceived | CLOSE;
     }
 
     /**
      * @see IPageListener#pageOpened(IWorkbenchPage)
      */
-    @Override
-	public void pageOpened(IWorkbenchPage page) {
-        if (pageMask == null || page == pageMask) {
-			eventsReceived |= OPEN;
-		}
+    public void pageOpened(IWorkbenchPage page) {
+        if (pageMask == null || page == pageMask)
+            eventsReceived |= OPEN;
     }
 
 }

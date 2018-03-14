@@ -76,7 +76,6 @@ public class WebJavaContentProvider implements IPipelinedTreeContentProvider {
 		return m.invoke(null, new Object[] { res });
 	}
 
-	@Override
 	public void getPipelinedChildren(Object aParent, Set theCurrentChildren) {
 		try {
 			if (aParent instanceof IProject) {
@@ -113,11 +112,9 @@ public class WebJavaContentProvider implements IPipelinedTreeContentProvider {
 		return result;
 	}
 
-	@Override
 	public void getPipelinedElements(Object anInput, Set theCurrentElements) {
 	}
 
-	@Override
 	public Object getPipelinedParent(Object anObject, Object aSuggestedParent) {
 
 		try {
@@ -150,35 +147,29 @@ public class WebJavaContentProvider implements IPipelinedTreeContentProvider {
 		return null;
 	}
 
-	@Override
 	public PipelinedShapeModification interceptAdd(
 			PipelinedShapeModification anAddModification) {
 		return anAddModification;
 	}
 
-	@Override
 	public PipelinedShapeModification interceptRemove(
 			PipelinedShapeModification aRemoveModification) {
 		return aRemoveModification;
 	}
 
-	@Override
 	public boolean interceptRefresh(
 			PipelinedViewerUpdate aRefreshSynchronization) {
 
 		return false;
 	}
 
-	@Override
 	public boolean interceptUpdate(PipelinedViewerUpdate anUpdateSynchronization) {
 		return false;
 	}
 
-	@Override
 	public void init(ICommonContentExtensionSite aSite) {
 	}
 
-	@Override
 	public Object[] getChildren(Object parentElement) {
 		if (delegateContentProvider != null) {
 			if (parentElement instanceof CompressedJavaProject) {
@@ -192,7 +183,6 @@ public class WebJavaContentProvider implements IPipelinedTreeContentProvider {
 		return NO_CHILDREN;
 	}
 
-	@Override
 	public Object getParent(Object element) {
 		if (element instanceof CompressedJavaProject)
 			return ((CompressedJavaProject) element).getProject();
@@ -201,22 +191,18 @@ public class WebJavaContentProvider implements IPipelinedTreeContentProvider {
 		return null;
 	}
 
-	@Override
 	public boolean hasChildren(Object element) {
 		return (element instanceof CompressedJavaProject || element instanceof CompressedJavaLibraries);
 	}
 
-	@Override
 	public Object[] getElements(Object inputElement) {
 		return NO_CHILDREN;
 	}
 
-	@Override
 	public void dispose() {
 		compressedNodes.clear();
 	}
 
-	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		if (viewer instanceof CommonViewer) {
 			commonViewer = (CommonViewer) viewer;
@@ -231,12 +217,10 @@ public class WebJavaContentProvider implements IPipelinedTreeContentProvider {
 
 	}
 
-	@Override
 	public void restoreState(IMemento aMemento) {
 
 	}
 
-	@Override
 	public void saveState(IMemento aMemento) {
 
 	}

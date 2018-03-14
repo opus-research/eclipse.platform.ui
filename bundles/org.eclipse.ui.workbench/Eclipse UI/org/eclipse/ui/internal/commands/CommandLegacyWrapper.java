@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 package org.eclipse.ui.internal.commands;
 
@@ -35,7 +34,7 @@ import org.eclipse.ui.keys.KeySequence;
 /**
  * A wrapper around a core command so that it satisfies the deprecated
  * <code>ICommand</code> interface.
- *
+ * 
  * @since 3.1
  */
 final class CommandLegacyWrapper implements ICommand {
@@ -58,7 +57,7 @@ final class CommandLegacyWrapper implements ICommand {
 
 	/**
 	 * Constructs a new <code>CommandWrapper</code>
-	 *
+	 * 
 	 * @param command
 	 *            The command to be wrapped; must not be <code>null</code>.
 	 * @param bindingManager
@@ -83,11 +82,10 @@ final class CommandLegacyWrapper implements ICommand {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.commands.ICommand#addCommandListener(org.eclipse.ui.commands.ICommandListener)
 	 */
 
-	@Override
 	public final void addCommandListener(final ICommandListener commandListener) {
 		command.addCommandListener(new LegacyCommandListenerWrapper(
 				commandListener, bindingManager));
@@ -95,14 +93,13 @@ final class CommandLegacyWrapper implements ICommand {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.commands.ICommand#execute(java.util.Map)
 	 */
-	@Override
 	public final Object execute(Map parameterValuesByName)
 			throws ExecutionException, NotHandledException {
 		try {
-			IHandlerService service = PlatformUI.getWorkbench().getService(
+			IHandlerService service = (IHandlerService) PlatformUI.getWorkbench().getService(
 					IHandlerService.class);
 
 			return command.execute(new ExecutionEvent(command,
@@ -117,10 +114,9 @@ final class CommandLegacyWrapper implements ICommand {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.commands.ICommand#getAttributeValuesByName()
 	 */
-	@Override
 	public final Map getAttributeValuesByName() {
 		final Map attributeValues = new HashMap();
 		// avoid using Boolean.valueOf to allow compilation against JCL
@@ -134,10 +130,9 @@ final class CommandLegacyWrapper implements ICommand {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.commands.ICommand#getCategoryId()
 	 */
-	@Override
 	public final String getCategoryId() throws NotDefinedException {
 		try {
 			return command.getCategory().getId();
@@ -148,10 +143,9 @@ final class CommandLegacyWrapper implements ICommand {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.commands.ICommand#getDescription()
 	 */
-	@Override
 	public final String getDescription() throws NotDefinedException {
 		try {
 			return command.getDescription();
@@ -162,26 +156,24 @@ final class CommandLegacyWrapper implements ICommand {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.commands.ICommand#getId()
 	 */
-	@Override
 	public final String getId() {
 		return command.getId();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.commands.ICommand#getKeySequenceBindings()
 	 */
-	@Override
 	public final List getKeySequenceBindings() {
 		final List legacyBindings = new ArrayList();
 		if (parameterizedCommand == null) {
 			parameterizedCommand = new ParameterizedCommand(command, null);
 		}
-		IBindingService bindingService = PlatformUI.getWorkbench().getService(
+		IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getService(
 				IBindingService.class);
 		final TriggerSequence[] activeBindings = bindingService
 				.getActiveBindingsFor(parameterizedCommand);
@@ -202,10 +194,9 @@ final class CommandLegacyWrapper implements ICommand {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.commands.ICommand#getName()
 	 */
-	@Override
 	public final String getName() throws NotDefinedException {
 		try {
 			return command.getName();
@@ -216,30 +207,27 @@ final class CommandLegacyWrapper implements ICommand {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.commands.ICommand#isDefined()
 	 */
-	@Override
 	public final boolean isDefined() {
 		return command.isDefined();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.commands.ICommand#isHandled()
 	 */
-	@Override
 	public final boolean isHandled() {
 		return command.isHandled();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.commands.ICommand#removeCommandListener(org.eclipse.ui.commands.ICommandListener)
 	 */
-	@Override
 	public final void removeCommandListener(
 			final ICommandListener commandListener) {
 		command.removeCommandListener(new LegacyCommandListenerWrapper(
@@ -248,10 +236,9 @@ final class CommandLegacyWrapper implements ICommand {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
-	@Override
 	public final int compareTo(final Object o) {
 		return command.compareTo(o);
 	}

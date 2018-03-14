@@ -26,18 +26,17 @@ import org.eclipse.ui.views.markers.internal.MarkerMessages;
 
 /**
  * FiltersContribution is the contribution for the filters menu.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class FiltersContribution extends MarkersContribution {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.actions.CompoundContributionItem#getContributionItems()
 	 */
-	@Override
 	protected IContributionItem[] getContributionItems() {
 		final ExtendedMarkersView view = getView();
 		if (view == null)
@@ -57,11 +56,10 @@ public class FiltersContribution extends MarkersContribution {
 
 				/*
 				 * (non-Javadoc)
-				 *
+				 * 
 				 * @see org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets.Menu,
 				 *      int)
 				 */
-				@Override
 				public void fill(Menu menu, int index) {
 					MenuItem item = new MenuItem(menu, SWT.CHECK);
 					item.setText(group.getName());
@@ -75,7 +73,7 @@ public class FiltersContribution extends MarkersContribution {
 
 				/**
 				 * Return the menu item listener for selection of a filter.
-				 *
+				 * 
 				 * @param group
 				 * @param view
 				 * @return Listener
@@ -86,10 +84,9 @@ public class FiltersContribution extends MarkersContribution {
 					return new Listener() {
 						/*
 						 * (non-Javadoc)
-						 *
+						 * 
 						 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
 						 */
-						@Override
 						public void handleEvent(Event event) {
 							if (view != null)
 								view.toggleFilter(group);
@@ -108,18 +105,17 @@ public class FiltersContribution extends MarkersContribution {
 
 	/**
 	 * Return the show all contribution.
-	 *
+	 * 
 	 * @return IContributionItem
 	 */
 	private IContributionItem getShowAllContribution() {
 		return new ContributionItem() {
 			/*
 			 * (non-Javadoc)
-			 *
+			 * 
 			 * @see org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets.Menu,
 			 *      int)
 			 */
-			@Override
 			public void fill(Menu menu, int index) {
 				MenuItem item = new MenuItem(menu, SWT.CHECK);
 				item.setText(MarkerMessages.MarkerFilter_showAllCommand_title);
@@ -128,10 +124,9 @@ public class FiltersContribution extends MarkersContribution {
 				item.addListener(SWT.Selection, new Listener() {
 					/*
 					 * (non-Javadoc)
-					 *
+					 * 
 					 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
 					 */
-					@Override
 					public void handleEvent(Event event) {
 						ExtendedMarkersView view = getView();
 						if (view != null)
@@ -142,7 +137,7 @@ public class FiltersContribution extends MarkersContribution {
 
 			/**
 			 * Return whether or not any filters are selected.
-			 *
+			 * 
 			 * @return boolean <code>true</code> if none of the current
 			 *         filters are selected.
 			 */

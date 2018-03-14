@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,6 @@ package org.eclipse.ui.internal.navigator.resources.actions;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
-
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -20,9 +19,7 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.IShellProvider;
-
 import org.eclipse.swt.widgets.Shell;
-
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.actions.ActionContext;
@@ -43,12 +40,10 @@ public class PropertiesActionProvider extends CommonActionProvider {
 	private PropertyDialogAction propertiesAction;
 	private ISelectionProvider delegateSelectionProvider;
 
-	@Override
 	public void init(final ICommonActionExtensionSite aSite) {
 		
 		delegateSelectionProvider = new DelegateSelectionProvider( aSite.getViewSite().getSelectionProvider());
 		propertiesAction = new PropertyDialogAction(new IShellProvider() {
-			@Override
 			public Shell getShell() {
 				return aSite.getViewSite().getShell();
 			}
@@ -56,7 +51,11 @@ public class PropertiesActionProvider extends CommonActionProvider {
 		propertiesAction.setActionDefinitionId(IWorkbenchCommandConstants.FILE_PROPERTIES); 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.actions.ActionGroup#fillContextMenu(org.eclipse.jface.action.IMenuManager)
+	 */
 	public void fillContextMenu(IMenuManager menu) {
 		super.fillContextMenu(menu);
 
@@ -67,7 +66,13 @@ public class PropertiesActionProvider extends CommonActionProvider {
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.actions.ActionGroup#fillActionBars(org.eclipse.ui.IActionBars
+	 * )
+	 */
 	public void fillActionBars(IActionBars actionBars) {
 		super.fillActionBars(actionBars);
 
@@ -75,7 +80,11 @@ public class PropertiesActionProvider extends CommonActionProvider {
 				propertiesAction);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.actions.ActionGroup#setContext(org.eclipse.ui.actions.ActionContext)
+	 */
 	public void setContext(ActionContext context) {
 		super.setContext(context);
 
@@ -92,11 +101,14 @@ public class PropertiesActionProvider extends CommonActionProvider {
 			delegate = o;
 		}
 
-		@SuppressWarnings("unchecked")
-		@Override
-		public <T> T getAdapter(Class<T> adapter) {
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+		 */
+		public Object getAdapter(Class adapter) {
 			if (adapter.isInstance(delegate) || delegate == null) {
-				return (T) delegate;
+				return delegate;
 			}
 			return Platform.getAdapterManager().getAdapter(delegate, adapter);
 		}
@@ -110,14 +122,22 @@ public class PropertiesActionProvider extends CommonActionProvider {
 			delegate = s;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ISelectionProvider#addSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
+		 */
 		public void addSelectionChangedListener(
 				ISelectionChangedListener listener) {
 			delegate.addSelectionChangedListener(listener);
 
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ISelectionProvider#getSelection()
+		 */
 		public ISelection getSelection() {
 			if (delegate.getSelection() instanceof IStructuredSelection) {
 				IStructuredSelection sSel = (IStructuredSelection) delegate
@@ -132,14 +152,22 @@ public class PropertiesActionProvider extends CommonActionProvider {
 			return delegate.getSelection();
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ISelectionProvider#removeSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
+		 */
 		public void removeSelectionChangedListener(
 				ISelectionChangedListener listener) {
 			delegate.removeSelectionChangedListener(listener);
 
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ISelectionProvider#setSelection(org.eclipse.jface.viewers.ISelection)
+		 */
 		public void setSelection(ISelection selection) {
 			delegate.setSelection(selection);
 

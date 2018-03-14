@@ -15,7 +15,7 @@ import org.eclipse.core.databinding.observable.IDiff;
 
 /**
  * Abstract INativePropertyListener implementation
- *
+ * 
  * @since 1.2
  */
 public abstract class NativePropertyListener implements INativePropertyListener {
@@ -24,7 +24,7 @@ public abstract class NativePropertyListener implements INativePropertyListener 
 
 	/**
 	 * Constructs a NativePropertyListener with the specified arguments
-	 *
+	 * 
 	 * @param property
 	 *            the property that this listener listens to
 	 * @param listener
@@ -36,7 +36,6 @@ public abstract class NativePropertyListener implements INativePropertyListener 
 		this.listener = listener;
 	}
 
-	@Override
 	public final void addTo(Object source) {
 		if (source != null)
 			doAddTo(source);
@@ -44,7 +43,6 @@ public abstract class NativePropertyListener implements INativePropertyListener 
 
 	protected abstract void doAddTo(Object source);
 
-	@Override
 	public final void removeFrom(Object source) {
 		if (source != null)
 			doRemoveFrom(source);
@@ -55,7 +53,7 @@ public abstract class NativePropertyListener implements INativePropertyListener 
 	/**
 	 * Notifies the listener that a property change occured on the source
 	 * object.
-	 *
+	 * 
 	 * @param source
 	 *            the source object whose property changed
 	 * @param diff
@@ -69,7 +67,7 @@ public abstract class NativePropertyListener implements INativePropertyListener 
 	/**
 	 * Notifies the listener that the property became stale on the source
 	 * object.
-	 *
+	 * 
 	 * @param source
 	 *            the source object whose property became stale
 	 */

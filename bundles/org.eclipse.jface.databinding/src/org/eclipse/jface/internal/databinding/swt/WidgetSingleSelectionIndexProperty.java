@@ -35,7 +35,6 @@ public final class WidgetSingleSelectionIndexProperty extends
 		super(Integer.TYPE);
 	}
 
-	@Override
 	protected IValueProperty doGetDelegate(Object source) {
 		if (source instanceof CCombo) {
 			if (cCombo == null)

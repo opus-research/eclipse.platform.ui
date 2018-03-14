@@ -31,12 +31,10 @@ class SelectionChangedListener extends NativePropertyListener implements
 		this.isPostSelection = isPostSelection;
 	}
 
-	@Override
 	public void selectionChanged(SelectionChangedEvent event) {
 		fireChange(event.getSource(), null);
 	}
 
-	@Override
 	public void doAddTo(Object source) {
 		if (isPostSelection) {
 			((IPostSelectionProvider) source)
@@ -46,7 +44,6 @@ class SelectionChangedListener extends NativePropertyListener implements
 		}
 	}
 
-	@Override
 	public void doRemoveFrom(Object source) {
 		if (isPostSelection) {
 			((IPostSelectionProvider) source)

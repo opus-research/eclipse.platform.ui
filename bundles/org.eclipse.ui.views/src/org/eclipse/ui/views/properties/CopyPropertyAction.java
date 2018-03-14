@@ -48,8 +48,7 @@ import org.eclipse.ui.internal.views.properties.PropertiesMessages;
     /**
      * Performs this action.
      */
-    @Override
-	public void run() {
+    public void run() {
         // Get the selected property
         IStructuredSelection selection = (IStructuredSelection) getPropertySheet()
                 .getSelection();

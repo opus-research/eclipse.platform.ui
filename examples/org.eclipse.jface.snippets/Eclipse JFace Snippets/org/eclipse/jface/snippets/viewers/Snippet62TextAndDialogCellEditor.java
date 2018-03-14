@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 Eric Rizzo and others.
+ * Copyright (c) 2006, 2009 Eric Rizzo and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,19 +7,18 @@
  *
  * Contributors:
  *     Eric Rizzo - initial implementation
- *     Lars Vogel (lars.vogel@gmail.com) - Bug 413427
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 442343
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
 
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.EditingSupport;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
@@ -29,11 +28,27 @@ import org.eclipse.swt.widgets.Shell;
 /**
  * Demonstrates usage of {@link TextAndDialogCellEditor}. The email column uses the
  * TextAndDialogCellEditor; othe columns use ordinary {@link TextCellEditor}s.
- *
+ * 
  * @author Eric Rizzo
- *
+ * 
  */
 public class Snippet62TextAndDialogCellEditor {
+
+	private class MyContentProvider implements IStructuredContentProvider {
+
+		public Object[] getElements(Object inputElement) {
+			return (Person[]) inputElement;
+		}
+
+		public void dispose() {
+			// noting to do
+		}
+
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+			// noting to do
+		}
+
+	}
 
 	public class Person {
 		public String givenname;
@@ -46,7 +61,6 @@ public class Snippet62TextAndDialogCellEditor {
 			this.email = email;
 		}
 
-		@Override
 		public String toString() {
 			return '[' + givenname + ' ' + surname + ' ' + email + ']';
 		}
@@ -60,17 +74,14 @@ public class Snippet62TextAndDialogCellEditor {
 			this.editor = anEditor;
 		}
 
-		@Override
 		protected boolean canEdit(Object element) {
 			return editor != null;
 		}
 
-		@Override
 		protected CellEditor getCellEditor(Object element) {
 			return editor;
 		}
 
-		@Override
 		protected void setValue(Object element, Object value) {
 			doSetValue(element, value);
 			getViewer().update(element, null);
@@ -81,7 +92,7 @@ public class Snippet62TextAndDialogCellEditor {
 
 	public Snippet62TextAndDialogCellEditor(Shell shell) {
 		TableViewer v = new TableViewer(shell, SWT.BORDER | SWT.FULL_SELECTION);
-		v.setContentProvider(ArrayContentProvider.getInstance());
+		v.setContentProvider(new MyContentProvider());
 
 		TableViewerColumn column = new TableViewerColumn(v, SWT.NONE);
 		column.getColumn().setWidth(200);
@@ -89,7 +100,6 @@ public class Snippet62TextAndDialogCellEditor {
 		column.getColumn().setMoveable(true);
 		column.setLabelProvider(new ColumnLabelProvider() {
 
-			@Override
 			public String getText(Object element) {
 				return ((Person) element).givenname;
 			}
@@ -97,12 +107,10 @@ public class Snippet62TextAndDialogCellEditor {
 
 		column.setEditingSupport(new AbstractEditingSupport(v, new TextCellEditor(v.getTable())) {
 
-			@Override
 			protected Object getValue(Object element) {
 				return ((Person) element).givenname;
 			}
 
-			@Override
 			protected void doSetValue(Object element, Object value) {
 				((Person) element).givenname = value.toString();
 			}
@@ -115,7 +123,6 @@ public class Snippet62TextAndDialogCellEditor {
 		column.getColumn().setMoveable(true);
 		column.setLabelProvider(new ColumnLabelProvider() {
 
-			@Override
 			public String getText(Object element) {
 				return ((Person) element).surname;
 			}
@@ -123,12 +130,10 @@ public class Snippet62TextAndDialogCellEditor {
 		});
 
 		column.setEditingSupport(new AbstractEditingSupport(v, new TextCellEditor(v.getTable())) {
-			@Override
 			protected Object getValue(Object element) {
 				return ((Person) element).surname;
 			}
 
-			@Override
 			protected void doSetValue(Object element, Object value) {
 				((Person) element).surname = value.toString();
 			}
@@ -140,30 +145,26 @@ public class Snippet62TextAndDialogCellEditor {
 		column.getColumn().setText("E-Mail");
 		column.getColumn().setMoveable(true);
 		column.setLabelProvider(new ColumnLabelProvider() {
-			@Override
 			public String getText(Object element) {
 				return ((Person) element).email;
 			}
 
 		});
-
+		
 
 		TextAndDialogCellEditor cellEditor = new TextAndDialogCellEditor(v.getTable());
 		cellEditor.setDialogMessage("Enter email address");
 		column.setEditingSupport(new AbstractEditingSupport(v, cellEditor) {
 
-			@Override
 			protected Object getValue(Object element) {
 				return ((Person) element).email;
 			}
 
-			@Override
 			protected void doSetValue(Object element, Object value) {
 				((Person) element).email = value.toString();
 			}
 
 			// Print out the model after each edit to verify its values are updated correctly
-			@Override
 			protected void saveCellEditorValue(CellEditor cellEditor, ViewerCell cell) {
 				super.saveCellEditorValue(cellEditor, cell);
 				System.out.println(cell.getElement());

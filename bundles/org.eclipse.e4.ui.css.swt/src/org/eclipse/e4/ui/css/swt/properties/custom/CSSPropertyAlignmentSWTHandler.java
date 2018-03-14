@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright (c) 2009, 2012 IBM Corporation and others.
+ *  Copyright (c) 2009 IBM Corporation and others.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -28,7 +28,6 @@ public class CSSPropertyAlignmentSWTHandler extends AbstractCSSPropertySWTHandle
 
 	public static final ICSSPropertyHandler INSTANCE = new CSSPropertyAlignmentSWTHandler();
 	
-	@Override
 	public void applyCSSProperty(Control control, String property,
 		    CSSValue value, String pseudo, CSSEngine engine) throws Exception {
 		if (control instanceof Button) {
@@ -73,7 +72,6 @@ public class CSSPropertyAlignmentSWTHandler extends AbstractCSSPropertySWTHandle
 	
 	}
 
-	@Override
 	public String retrieveCSSProperty(Control control, String property,
 			String pseudo, CSSEngine engine) throws Exception {
 		if (control instanceof Button) {

@@ -21,13 +21,15 @@ import org.eclipse.ui.statushandlers.StatusManager.INotificationTypes;
 
 /**
  * This is a default workbench error handler.
- *
+ * 
  * @see WorkbenchAdvisor#getWorkbenchErrorHandler()
  * @since 3.3
  */
 public class WorkbenchErrorHandler extends AbstractStatusHandler {
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.statushandlers.AbstractStatusHandler#supportsNotification(int)
+	 */
 	public boolean supportsNotification(int type) {
 		if (type == INotificationTypes.HANDLED) {
 			return true;
@@ -37,7 +39,12 @@ public class WorkbenchErrorHandler extends AbstractStatusHandler {
 
 	private WorkbenchStatusDialogManager statusDialogManager;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.statushandlers.AbstractStatusHandler#handle(org.eclipse.ui.statushandlers.StatusAdapter,
+	 *      int)
+	 */
 	public void handle(final StatusAdapter statusAdapter, int style) {
 		statusAdapter.setProperty(WorkbenchStatusDialogManager.HINT,
 				new Integer(style));
@@ -45,13 +52,12 @@ public class WorkbenchErrorHandler extends AbstractStatusHandler {
 				|| ((style & StatusManager.BLOCK) == StatusManager.BLOCK)) {
 
 			final boolean block = ((style & StatusManager.BLOCK) == StatusManager.BLOCK);
-
+			
 			if (Display.getCurrent() != null) {
 				showStatusAdapter(statusAdapter, block);
 			} else {
 				if (block) {
 					Display.getDefault().syncExec(new Runnable() {
-						@Override
 						public void run() {
 							showStatusAdapter(statusAdapter, true);
 						}
@@ -59,7 +65,6 @@ public class WorkbenchErrorHandler extends AbstractStatusHandler {
 
 				} else {
 					Display.getDefault().asyncExec(new Runnable() {
-						@Override
 						public void run() {
 							showStatusAdapter(statusAdapter, false);
 						}
@@ -75,10 +80,10 @@ public class WorkbenchErrorHandler extends AbstractStatusHandler {
 					.log(statusAdapter.getStatus());
 		}
 	}
-
+	
 	/**
 	 * Requests the status dialog manager to show the status adapter.
-	 *
+	 * 
 	 * @param statusAdapter
 	 *            the status adapter to show
 	 * @param block
@@ -105,7 +110,7 @@ public class WorkbenchErrorHandler extends AbstractStatusHandler {
 			}
 		}
 	}
-
+	
 	private Shell getStatusDialogShell() {
 		return (Shell) getStatusDialogManager().getProperty(
 				IStatusDialogConstants.SHELL);
@@ -113,7 +118,7 @@ public class WorkbenchErrorHandler extends AbstractStatusHandler {
 
 	/**
 	 * This method returns current {@link WorkbenchStatusDialogManager}.
-	 *
+	 * 
 	 * @return current {@link WorkbenchStatusDialogManager}
 	 */
 	private WorkbenchStatusDialogManager getStatusDialogManager() {
@@ -145,7 +150,7 @@ public class WorkbenchErrorHandler extends AbstractStatusHandler {
 	 * <li>{@link WorkbenchStatusDialogManager#setSupportAreaProvider(AbstractStatusAreaProvider)}</li>
 	 * </ul>
 	 * Default configuration does nothing.
-	 *
+	 * 
 	 * @param statusDialog
 	 *            a status dialog to be configured.
 	 * @since 3.4

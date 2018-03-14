@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Steven Spungin <steven@spungin.tv> - Bug 401439
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -25,11 +24,11 @@ import org.eclipse.swt.widgets.Control;
  * model by means of a content provider and a label provider.
  * <p>
  * A viewer's model consists of elements, represented by objects.
- * A viewer defines and implements generic infrastructure for handling model
+ * A viewer defines and implements generic infrastructure for handling model 
  * input, updates, and selections in terms of elements.
  * Input is obtained by querying an <code>IContentProvider</code> which returns
  * elements. The elements themselves are not displayed directly.  They are
- * mapped to labels, containing text and/or an image, using the viewer's
+ * mapped to labels, containing text and/or an image, using the viewer's 
  * <code>ILabelProvider</code>.
  * </p>
  * <p>
@@ -76,9 +75,8 @@ public abstract class ContentViewer extends Viewer {
      */
     private final ILabelProviderListener labelProviderListener = new ILabelProviderListener() {
     	private boolean logWhenDisposed = true; // initially true, set to false
-
-        @Override
-		public void labelProviderChanged(LabelProviderChangedEvent event) {
+        
+        public void labelProviderChanged(LabelProviderChangedEvent event) {
         	Control control = getControl();
         	if (control == null || control.isDisposed()) {
     			if (logWhenDisposed) {
@@ -108,14 +106,14 @@ public abstract class ContentViewer extends Viewer {
     }
 
     /**
-     * Returns the content provider used by this viewer,
+     * Returns the content provider used by this viewer, 
      * or <code>null</code> if this view does not yet have a content
      * provider.
      * <p>
      * The <code>ContentViewer</code> implementation of this method returns the content
-     * provider recorded is an internal state variable.
-     * Overriding this method is generally not required;
-     * however, if overriding in a subclass,
+     * provider recorded is an internal state variable. 
+     * Overriding this method is generally not required; 
+     * however, if overriding in a subclass, 
      * <code>super.getContentProvider</code> must be invoked.
      * </p>
      *
@@ -126,13 +124,12 @@ public abstract class ContentViewer extends Viewer {
     }
 
     /**
-     * The <code>ContentViewer</code> implementation of this <code>IInputProvider</code>
+     * The <code>ContentViewer</code> implementation of this <code>IInputProvider</code> 
      * method returns the current input of this viewer, or <code>null</code>
      * if none. The viewer's input provides the "model" for the viewer's
      * content.
      */
-    @Override
-	public Object getInput() {
+    public Object getInput() {
         return input;
     }
 
@@ -143,7 +140,7 @@ public abstract class ContentViewer extends Viewer {
      * provider recorded in an internal state variable; if none has been
      * set (with <code>setLabelProvider</code>) a default label provider
      * will be created, remembered, and returned.
-     * Overriding this method is generally not required;
+     * Overriding this method is generally not required; 
      * however, if overriding in a subclass,
      * <code>super.getLabelProvider</code> must be invoked.
      * </p>
@@ -170,24 +167,17 @@ public abstract class ContentViewer extends Viewer {
      * @param event a dispose event
      */
     protected void handleDispose(DisposeEvent event) {
-		if (contentProvider != null) {
-			try {
-				contentProvider.inputChanged(this, getInput(), null);
-			} catch (Exception e) {
-				// ignore exception
-				String message = "Exception while calling ContentProvider.inputChanged from ContentViewer.handleDispose"; //$NON-NLS-1$
-				message += " (" + contentProvider.getClass().getName() + ")"; //$NON-NLS-1$//$NON-NLS-2$
-				Policy.getLog().log(new Status(IStatus.WARNING, Policy.JFACE, message, e));
-			}
-			contentProvider.dispose();
-			contentProvider = null;
-		}
-		if (labelProvider != null) {
-			labelProvider.removeListener(labelProviderListener);
-			labelProvider.dispose();
-			labelProvider = null;
-		}
-		input = null;
+        if (contentProvider != null) {
+            contentProvider.inputChanged(this, getInput(), null);
+            contentProvider.dispose();
+            contentProvider = null;
+        }
+        if (labelProvider != null) {
+            labelProvider.removeListener(labelProviderListener);
+            labelProvider.dispose();
+            labelProvider = null;
+        }
+        input = null;
     }
 
     /**
@@ -195,7 +185,7 @@ public abstract class ContentViewer extends Viewer {
      * <p>
      * The <code>ContentViewer</code> implementation of this method calls <code>labelProviderChanged()</code>
      * to cause a complete refresh of the viewer.
-     * Subclasses may reimplement or extend.
+     * Subclasses may reimplement or extend. 
      * </p>
      * @param event the change event
      */
@@ -208,9 +198,9 @@ public abstract class ContentViewer extends Viewer {
      * <p>
      * All subclasses must call this method when their control is
      * first established.
-     * </p>
+     * </p> 
      * <p>
-     * The <code>ContentViewer</code> implementation of this method hooks
+     * The <code>ContentViewer</code> implementation of this method hooks 
      * dispose events for the given control.
      * Subclasses may override if they need to add other control hooks;
      * however, <code>super.hookControl</code> must be invoked.
@@ -220,8 +210,7 @@ public abstract class ContentViewer extends Viewer {
      */
     protected void hookControl(Control control) {
         control.addDisposeListener(new DisposeListener() {
-            @Override
-			public void widgetDisposed(DisposeEvent event) {
+            public void widgetDisposed(DisposeEvent event) {
                 handleDispose(event);
             }
         });
@@ -241,9 +230,9 @@ public abstract class ContentViewer extends Viewer {
     /**
      * Sets the content provider used by this viewer.
      * <p>
-     * The <code>ContentViewer</code> implementation of this method records the
+     * The <code>ContentViewer</code> implementation of this method records the 
      * content provider in an internal state variable.
-     * Overriding this method is generally not required;
+     * Overriding this method is generally not required; 
      * however, if overriding in a subclass,
      * <code>super.setContentProvider</code> must be invoked.
      * </p>
@@ -268,12 +257,11 @@ public abstract class ContentViewer extends Viewer {
      * The <code>ContentViewer</code> implementation of this <code>Viewer</code>
      * method invokes <code>inputChanged</code> on the content provider and then the
      * <code>inputChanged</code> hook method. This method fails if this viewer does
-     * not have a content provider. Subclassers are advised to override
+     * not have a content provider. Subclassers are advised to override 
      * <code>inputChanged</code> rather than this method, but may extend this method
      * if required.
      */
-    @Override
-	public void setInput(Object input) {
+    public void setInput(Object input) {
     	Control control = getControl();
 		if (control == null || control.isDisposed()) {
 			throw new IllegalStateException(
@@ -298,7 +286,7 @@ public abstract class ContentViewer extends Viewer {
      * The <code>ContentViewer</code> implementation of this method ensures that the
      * given label provider is connected to this viewer and the
      * former label provider is disconnected from this viewer.
-     * Overriding this method is generally not required;
+     * Overriding this method is generally not required; 
      * however, if overriding in a subclass,
      * <code>super.setLabelProvider</code> must be invoked.
      * </p>
@@ -330,7 +318,7 @@ public abstract class ContentViewer extends Viewer {
 
 	/**
 	 * @param oldProvider
-	 *
+	 * 
 	 * @since 3.4
 	 */
 	void internalDisposeLabelProvider(IBaseLabelProvider oldProvider) {

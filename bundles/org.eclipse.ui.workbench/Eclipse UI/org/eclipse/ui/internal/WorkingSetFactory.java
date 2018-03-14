@@ -15,13 +15,15 @@ import org.eclipse.ui.IElementFactory;
 import org.eclipse.ui.IMemento;
 
 /**
- * A WorkingSetFactory is used to recreate a persisted WorkingSet
+ * A WorkingSetFactory is used to recreate a persisted WorkingSet 
  * object.
  */
 public class WorkingSetFactory implements IElementFactory {
 
-    @Override
-	public IAdaptable createElement(IMemento memento) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IElementFactory
+     */
+    public IAdaptable createElement(IMemento memento) {
         String workingSetName = memento.getString(IWorkbenchConstants.TAG_NAME);
         String label = memento.getString(IWorkbenchConstants.TAG_LABEL);
         if (label == null) {
@@ -39,13 +41,13 @@ public class WorkingSetFactory implements IElementFactory {
 		}
 
         AbstractWorkingSet workingSet = null;
-
+        
         if (isAggregate) {
 			workingSet = new AggregateWorkingSet(workingSetName, label, memento);
 		} else {
 			workingSet = new WorkingSet(workingSetName, label, memento);
 		}
-
+        
         if (workingSetEditPageId != null) {
             workingSet.setId(workingSetEditPageId);
         } else if (!isAggregate) {

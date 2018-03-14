@@ -31,8 +31,7 @@ public class TestPartListener implements IPartListener {
      * @param part the part that was activated
      * @see IPerspective#activate
      */
-    @Override
-	public void partActivated(IWorkbenchPart part) {
+    public void partActivated(IWorkbenchPart part) {
         System.out.println("partActivated(" + part + ")");//$NON-NLS-2$//$NON-NLS-1$
     }
 
@@ -41,7 +40,7 @@ public class TestPartListener implements IPartListener {
      * <p>
      * These events occur when an editor is brought to the top in the editor area,
      * or when a view is brought to the top in a page book with multiple views.
-     * They are normally only sent when a part is brought to the top
+     * They are normally only sent when a part is brought to the top 
      * programmatically (via <code>IPerspective.bringToTop</code>). When a part is
      * activated by the user clicking on it, only <code>partActivated</code> is sent.
      * </p>
@@ -49,8 +48,7 @@ public class TestPartListener implements IPartListener {
      * @param part the part that was surfaced
      * @see IPerspective#bringToTop
      */
-    @Override
-	public void partBroughtToTop(IWorkbenchPart part) {
+    public void partBroughtToTop(IWorkbenchPart part) {
         System.out.println("partBroughtToTop(" + part + ")");//$NON-NLS-2$//$NON-NLS-1$
     }
 
@@ -60,8 +58,7 @@ public class TestPartListener implements IPartListener {
      * @param part the part that was closed
      * @see IPerspective#close
      */
-    @Override
-	public void partClosed(IWorkbenchPart part) {
+    public void partClosed(IWorkbenchPart part) {
         System.out.println("partClosed(" + part + ")");//$NON-NLS-2$//$NON-NLS-1$
     }
 
@@ -71,8 +68,7 @@ public class TestPartListener implements IPartListener {
      * @param part the part that was deactivated
      * @see IPerspective#activate
      */
-    @Override
-	public void partDeactivated(IWorkbenchPart part) {
+    public void partDeactivated(IWorkbenchPart part) {
         System.out.println("partDeactivated(" + part + ")");//$NON-NLS-2$//$NON-NLS-1$
     }
 
@@ -81,8 +77,7 @@ public class TestPartListener implements IPartListener {
      *
      * @param part the part that was opened
      */
-    @Override
-	public void partOpened(IWorkbenchPart part) {
+    public void partOpened(IWorkbenchPart part) {
         System.out.println("partOpened(" + part + ")");//$NON-NLS-2$//$NON-NLS-1$
     }
 }

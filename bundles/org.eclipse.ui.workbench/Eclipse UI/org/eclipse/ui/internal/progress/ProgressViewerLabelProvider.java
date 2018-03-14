@@ -21,11 +21,10 @@ public class ProgressViewerLabelProvider extends LabelProvider {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
      */
-    @Override
-	public String getText(Object element) {
+    public String getText(Object element) {
         JobTreeElement info = (JobTreeElement) element;
         return ProgressManagerUtil.shortenText(
                 info.getCondensedDisplayString(), control);
@@ -33,7 +32,7 @@ public class ProgressViewerLabelProvider extends LabelProvider {
 
     /**
      * Create a new instance of the receiver within the control.
-     *
+     * 
      * @param progressControl The control that the label is
      * being created for.
      */

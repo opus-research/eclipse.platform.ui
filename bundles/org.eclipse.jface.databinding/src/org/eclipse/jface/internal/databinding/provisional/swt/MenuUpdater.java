@@ -58,14 +58,12 @@ public abstract class MenuUpdater {
 		DisposeListener, Runnable, IChangeListener {
 
 		// DisposeListener implementation
-		@Override
 		public void widgetDisposed(DisposeEvent e) {
 			MenuUpdater.this.dispose();
 		}
 		
 		// Runnable implementation. This method runs at most once per repaint whenever the
 		// value gets marked as dirty.
-		@Override
 		public void run() {
 			if (theMenu != null && !theMenu.isDisposed() && theMenu.isVisible()) {
 				updateIfNecessary();
@@ -73,18 +71,15 @@ public abstract class MenuUpdater {
 		}
 		
 		// IChangeListener implementation (listening to the ComputedValue)
-		@Override
 		public void handleChange(ChangeEvent event) {
 			// Whenever this updator becomes dirty, schedule the run() method 
 			makeDirty();
 		}
 
-		@Override
 		public void menuHidden(MenuEvent e) {
 			// do nothing
 		}
 
-		@Override
 		public void menuShown(MenuEvent e) {
 			updateIfNecessary();
 		}
@@ -92,7 +87,6 @@ public abstract class MenuUpdater {
 	}
 	
 	private Runnable updateRunnable = new Runnable() {
-		@Override
 		public void run() {
 			updateMenu();
 		}

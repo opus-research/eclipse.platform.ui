@@ -18,7 +18,7 @@ import org.eclipse.ui.wizards.IWizardRegistry;
 
 /**
  * Abstract base class for various workbench wizards.
- *
+ * 
  * @since 3.1
  */
 public abstract class AbstractWizardRegistry implements IWizardRegistry {
@@ -35,7 +35,7 @@ public abstract class AbstractWizardRegistry implements IWizardRegistry {
 	public AbstractWizardRegistry() {
 		super();
 	}
-
+	
 	/**
 	 * Dispose of this registry.
 	 */
@@ -47,16 +47,15 @@ public abstract class AbstractWizardRegistry implements IWizardRegistry {
 
 	/**
 	 * Perform initialization of this registry. Should never be called by
-	 * implementations.
+	 * implementations. 
 	 */
 	protected abstract void doInitialize();
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.wizards.IWizardRegistry#findCategory(java.lang.String)
 	 */
-	@Override
 	public IWizardCategory findCategory(String id) {
 		initialize();
 		return wizardElements.findCategory(id);
@@ -64,10 +63,9 @@ public abstract class AbstractWizardRegistry implements IWizardRegistry {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.wizards.IWizardRegistry#findWizard(java.lang.String)
 	 */
-	@Override
 	public IWizardDescriptor findWizard(String id) {
 		initialize();
 		return wizardElements.findWizard(id, true);
@@ -75,10 +73,9 @@ public abstract class AbstractWizardRegistry implements IWizardRegistry {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.wizards.IWizardRegistry#getPrimaryWizards()
 	 */
-	@Override
 	public IWizardDescriptor[] getPrimaryWizards() {
 		initialize();
 		return primaryWizards;
@@ -86,10 +83,9 @@ public abstract class AbstractWizardRegistry implements IWizardRegistry {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.wizards.IWizardRegistry#getRootCategory()
 	 */
-	@Override
 	public IWizardCategory getRootCategory() {
 		initialize();
 		return wizardElements;
@@ -97,7 +93,7 @@ public abstract class AbstractWizardRegistry implements IWizardRegistry {
 
 	/**
 	 * Return the wizard elements.
-	 *
+	 * 
 	 * @return the wizard elements
 	 */
 	protected WizardCollectionElement getWizardElements() {
@@ -119,7 +115,7 @@ public abstract class AbstractWizardRegistry implements IWizardRegistry {
 
 	/**
 	 * Return whether the registry has been read.
-	 *
+	 * 
 	 * @return whether the registry has been read
 	 */
 	private boolean isInitialized() {
@@ -128,7 +124,7 @@ public abstract class AbstractWizardRegistry implements IWizardRegistry {
 
 	/**
 	 * Set the primary wizards.
-	 *
+	 * 
 	 * @param primaryWizards
 	 *            the primary wizards
 	 */
@@ -138,7 +134,7 @@ public abstract class AbstractWizardRegistry implements IWizardRegistry {
 
 	/**
 	 * Set the wizard elements.
-	 *
+	 * 
 	 * @param wizardElements
 	 *            the wizard elements
 	 */

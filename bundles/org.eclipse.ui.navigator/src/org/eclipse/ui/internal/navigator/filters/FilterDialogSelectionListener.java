@@ -34,7 +34,11 @@ public class FilterDialogSelectionListener implements ISelectionChangedListener 
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
+	 */
 	public void selectionChanged(SelectionChangedEvent event) {
 
 		IStructuredSelection structuredSelection = (IStructuredSelection) event

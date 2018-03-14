@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,16 +7,12 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Tristan Hume - <trishume@gmail.com> -
- *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
- *     		Implemented workbench auto-save to correctly restore state in case of crash.
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
-import org.eclipse.e4.core.commands.ExpressionContext;
-
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -30,6 +26,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MTrimContribution;
+import org.eclipse.e4.ui.workbench.modeling.ExpressionContext;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -44,7 +41,6 @@ public class TrimBarRenderer extends SWTPartRenderer {
 	private class LayoutJob implements Runnable {
 		public List<MTrimBar> barsToLayout = new ArrayList<MTrimBar>();
 
-		@Override
 		public void run() {
 			layoutJob = null;
 			if (barsToLayout.size() == 0)
@@ -73,12 +69,28 @@ public class TrimBarRenderer extends SWTPartRenderer {
 		}
 	}
 
+	private HashMap<MTrimBar, ArrayList<ArrayList<MTrimElement>>> pendingCleanup = new HashMap<MTrimBar, ArrayList<ArrayList<MTrimElement>>>();
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#init(org.eclipse
+	 * .e4.core.contexts.IEclipseContext)
+	 */
 	@Override
 	public void init(IEclipseContext context) {
 		super.init(context);
 		application = context.get(MApplication.class);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.renderers.PartFactory#createWidget(org.eclipse
+	 * .e4.ui.model.application.MPart)
+	 */
 	@Override
 	public Object createWidget(MUIElement element, Object parent) {
 		if (!(element instanceof MTrimBar) || !(parent instanceof Composite))
@@ -108,7 +120,6 @@ public class TrimBarRenderer extends SWTPartRenderer {
 				return null;
 			}
 			trimComposite.addDisposeListener(new DisposeListener() {
-				@Override
 				public void widgetDisposed(DisposeEvent e) {
 					cleanUp(trimModel);
 				}
@@ -129,6 +140,13 @@ public class TrimBarRenderer extends SWTPartRenderer {
 		layoutTrim((MTrimBar) downCast);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartFactory#processContents
+	 * (org.eclipse.e4.ui.model.application.MPart)
+	 */
 	@Override
 	public void processContents(MElementContainer<MUIElement> me) {
 		if (!(((MUIElement) me) instanceof MTrimBar))
@@ -192,7 +210,13 @@ public class TrimBarRenderer extends SWTPartRenderer {
 							}
 						});
 					}
-					trimModel.getPendingCleanup().addAll(toRemove);
+					ArrayList<ArrayList<MTrimElement>> lists = pendingCleanup
+							.get(trimModel);
+					if (lists == null) {
+						lists = new ArrayList<ArrayList<MTrimElement>>();
+						pendingCleanup.put(trimModel, lists);
+					}
+					lists.add(toRemove);
 				}
 			}
 			// We're done if the retryList is now empty (everything done) or
@@ -202,14 +226,16 @@ public class TrimBarRenderer extends SWTPartRenderer {
 		}
 	}
 
-	/**
-	 * @param element
-	 *            the trimBar to be cleaned up
-	 */
 	protected void cleanUp(MTrimBar element) {
-		for (MTrimElement child : element.getPendingCleanup()) {
-			element.getChildren().remove(child);
+		ArrayList<ArrayList<MTrimElement>> lists = pendingCleanup
+				.remove(element);
+		if (lists == null) {
+			return;
 		}
-		element.getPendingCleanup().clear();
+		for (ArrayList<MTrimElement> list : lists) {
+			for (MTrimElement child : list) {
+				element.getChildren().remove(child);
+			}
+		}
 	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,10 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429575
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.swt.util;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -22,14 +20,11 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import org.eclipse.core.commands.ParameterizedCommand;
-import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.commands.contexts.Context;
 import org.eclipse.core.commands.contexts.ContextManager;
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.bindings.EBindingService;
 import org.eclipse.e4.ui.bindings.internal.BindingTable;
@@ -51,8 +46,6 @@ import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.bindings.Binding;
-import org.eclipse.jface.bindings.BindingManager;
-import org.eclipse.jface.bindings.Scheme;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
@@ -61,7 +54,6 @@ import org.osgi.service.event.EventHandler;
  * Process contexts in the model, feeding them into the command service.
  */
 public class BindingProcessingAddon {
-	private static final String[] DEFAULT_SCHEMES = { "org.eclipse.ui.defaultAcceleratorConfiguration" };
 
 	@Inject
 	private MApplication application;
@@ -76,10 +68,6 @@ public class BindingProcessingAddon {
 	private BindingTableManager bindingTables;
 
 	@Inject
-	@Optional
-	private BindingManager bindingManager;
-
-	@Inject
 	private ECommandService commandService;
 
 	@Inject
@@ -91,35 +79,9 @@ public class BindingProcessingAddon {
 
 	@PostConstruct
 	public void init() {
-		String[] schemes = DEFAULT_SCHEMES;
-		if (bindingManager != null) {
-			final Scheme activeScheme = bindingManager.getActiveScheme();
-			if (activeScheme != null) {
-				schemes = getSchemeIds(activeScheme.getId());
-			}
-		}
-		bindingTables.setActiveSchemes(schemes);
 		defineBindingTables();
 		activateContexts(application);
 		registerModelListeners();
-	}
-
-	private final String[] getSchemeIds(String schemeId) {
-		final List<String> strings = new ArrayList<String>();
-		while (schemeId != null) {
-			strings.add(schemeId);
-			try {
-				schemeId = getScheme(schemeId).getParentId();
-			} catch (final NotDefinedException e) {
-				return new String[0];
-			}
-		}
-
-		return strings.toArray(new String[strings.size()]);
-	}
-
-	private final Scheme getScheme(String schemeId) {
-		return bindingManager.getScheme(schemeId);
 	}
 
 	private void activateContexts(Object me) {
@@ -158,11 +120,6 @@ public class BindingProcessingAddon {
 	 * @param bindingTable
 	 */
 	private void defineBindingTable(MBindingTable bindingTable) {
-		Assert.isNotNull(
-				bindingTable.getBindingContext(),
-				"Binding context referred to by the binding table \"" + bindingTable.getElementId() + "\""); //$NON-NLS-1$
-		Assert.isNotNull(bindingTable.getBindingContext().getElementId(),
-				"Element ID of binding table \"" + bindingTable.getElementId() + "\"."); //$NON-NLS-1$
 		final Context bindingContext = contextManager.getContext(bindingTable
 				.getBindingContext().getElementId());
 		BindingTable table = bindingTables.getTable(bindingTable
@@ -258,8 +215,6 @@ public class BindingProcessingAddon {
 				}
 				keyBinding = bindingService.createBinding(sequence, cmd,
 						bindingContext.getId(), attrs);
-				binding.getTransientData().put(
-						EBindingService.MODEL_TO_BINDING_KEY, keyBinding);
 			} catch (IllegalArgumentException e) {
 				Activator.trace(Policy.DEBUG_MENUS,
 						"failed to create: " + binding, e); //$NON-NLS-1$
@@ -311,7 +266,6 @@ public class BindingProcessingAddon {
 
 	private void registerModelListeners() {
 		additionHandler = new EventHandler() {
-			@Override
 			public void handleEvent(Event event) {
 				Object elementObj = event
 						.getProperty(UIEvents.EventTags.ELEMENT);
@@ -452,7 +406,6 @@ public class BindingProcessingAddon {
 				additionHandler);
 
 		contextHandler = new EventHandler() {
-			@Override
 			public void handleEvent(Event event) {
 				Object elementObj = event
 						.getProperty(UIEvents.EventTags.ELEMENT);

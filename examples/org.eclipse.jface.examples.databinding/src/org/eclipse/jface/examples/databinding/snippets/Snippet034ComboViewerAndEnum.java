@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Eric Rizzo and others.
+ * Copyright (c) 2009 Eric Rizzo and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,17 +7,15 @@
  *
  * Contributors:
  *     Eric Rizzo - initial API and implementation
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 434283
  ******************************************************************************/
 
 package org.eclipse.jface.examples.databinding.snippets;
 
 import org.eclipse.core.databinding.DataBindingContext;
-import org.eclipse.core.databinding.beans.PojoProperties;
+import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
-import org.eclipse.jface.databinding.swt.WidgetProperties;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.viewers.ViewersObservables;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -33,8 +31,7 @@ public class Snippet034ComboViewerAndEnum {
 		Display display = new Display();
 		final Person model = new Person("Pat", Gender.Unknown);
 
-		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
-			@Override
+		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
 			public void run() {
 				final Shell shell = new View(model).createShell();
 				// The SWT event loop
@@ -56,7 +53,7 @@ public class Snippet034ComboViewerAndEnum {
 	}
 
 	// The data model class. This is normally a persistent class of some sort.
-	//
+	// 
 	// In this example, we only push changes from the GUI to the model, so we
 	// don't worry about implementing JavaBeans bound properties. If we need
 	// our GUI to automatically reflect changes in the Person object, the
@@ -121,19 +118,17 @@ public class Snippet034ComboViewerAndEnum {
 			// Bind the fields
 			DataBindingContext bindingContext = new DataBindingContext();
 
-			IObservableValue widgetObservable = WidgetProperties.text(SWT.Modify).observe(
-					name);
-			bindingContext.bindValue(widgetObservable,
-					PojoProperties.value(viewModel.getClass(), "name")
-								.observe(viewModel));
+			IObservableValue widgetObservable = SWTObservables.observeText(
+					name, SWT.Modify);
+			bindingContext.bindValue(widgetObservable, PojoObservables
+					.observeValue(viewModel, "name"));
 
 			// The second key to binding a combo to an Enum is to use a
 			// selection observable from the ComboViewer:
 			widgetObservable = ViewersObservables
 					.observeSingleSelection(gender);
-			bindingContext.bindValue(widgetObservable,
-					PojoProperties.value(viewModel.getClass(), "gender")
-								.observe(viewModel));
+			bindingContext.bindValue(widgetObservable, PojoObservables
+					.observeValue(viewModel, "gender"));
 
 			// Open and return the Shell
 			shell.pack();

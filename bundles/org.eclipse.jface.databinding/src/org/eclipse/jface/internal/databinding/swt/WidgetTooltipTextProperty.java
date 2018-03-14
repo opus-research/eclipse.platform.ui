@@ -40,7 +40,6 @@ public class WidgetTooltipTextProperty extends WidgetDelegatingValueProperty {
 		super(String.class);
 	}
 
-	@Override
 	protected IValueProperty doGetDelegate(Object source) {
 		if (source instanceof CTabItem) {
 			if (cTabItem == null)

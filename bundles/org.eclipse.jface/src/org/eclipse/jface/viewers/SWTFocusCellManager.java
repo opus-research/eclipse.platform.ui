@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2013 IBM Corporation and others.
+ * Copyright (c) 2007, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -45,7 +45,6 @@ abstract class SWTFocusCellManager {
 
 	private DisposeListener itemDeletionListener = new DisposeListener() {
 
-		@Override
 		public void widgetDisposed(DisposeEvent e) {
 			setFocusCell(null);
 		}
@@ -65,7 +64,7 @@ abstract class SWTFocusCellManager {
 		if( this.cellHighlighter != null ) {
 			this.cellHighlighter.setMgr(this);
 		}
-
+		
 		this.navigationStrategy = navigationDelegate;
 		hookListener(viewer);
 	}
@@ -126,7 +125,7 @@ abstract class SWTFocusCellManager {
 
 	/**
 	 * Handles the {@link SWT#FocusIn} event.
-	 *
+	 * 
 	 * @param event the event
 	 */
 	private void handleFocusIn(Event event) {
@@ -140,7 +139,6 @@ abstract class SWTFocusCellManager {
 	private void hookListener(final ColumnViewer viewer) {
 		Listener listener = new Listener() {
 
-			@Override
 			public void handleEvent(Event event) {
 				switch (event.type) {
 				case SWT.MouseDown:
@@ -164,7 +162,6 @@ abstract class SWTFocusCellManager {
 		viewer.getControl().addListener(SWT.Selection, listener);
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
-			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				if( event.selection.isEmpty() ) {
 					setFocusCell(null);
@@ -175,25 +172,24 @@ abstract class SWTFocusCellManager {
 		viewer.getControl().addListener(SWT.FocusIn, listener);
 		viewer.getControl().getAccessible().addAccessibleListener(
 				new AccessibleAdapter() {
-					@Override
 					public void getName(AccessibleEvent event) {
 						ViewerCell cell = getFocusCell();
 						if (cell == null)
 							return;
-
+						
 						ViewerRow row = cell.getViewerRow();
 						if (row == null)
 							return;
-
+						
 						ViewerColumn viewPart = viewer.getViewerColumn(cell
 								.getColumnIndex());
-
+						
 						if (viewPart == null)
 							return;
-
+						
 						CellLabelProvider labelProvider = viewPart
 								.getLabelProvider();
-
+						
 						if (labelProvider == null)
 							return;
 						labelProvider.update(cell);
@@ -210,7 +206,7 @@ abstract class SWTFocusCellManager {
 	public ViewerCell getFocusCell() {
 		return focusCell;
 	}
-
+	
 	final ViewerCell _getFocusCell() {
 		return focusCell;
 	}
@@ -231,9 +227,9 @@ abstract class SWTFocusCellManager {
 		if( focusCell != null ) {
 			focusCell.scrollIntoView();
 		}
-
+		
 		this.cellHighlighter.focusCellChanged(focusCell,oldCell);
-
+		
 		getViewer().getControl().getAccessible().setFocus(ACC.CHILDID_SELF);
 	}
 

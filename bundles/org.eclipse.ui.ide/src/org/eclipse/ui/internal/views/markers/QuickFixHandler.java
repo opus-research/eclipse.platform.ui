@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation and others.
+ * Copyright (c) 2005, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,9 +41,9 @@ import org.eclipse.ui.views.markers.internal.MarkerMessages;
 
 /**
  * QuickFixHandler is the command handler for the quick fix dialog.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class QuickFixHandler extends MarkerViewHandler {
 
@@ -56,17 +56,16 @@ public class QuickFixHandler extends MarkerViewHandler {
 		public QuickFixWizardDialog(Shell parentShell, IWizard newWizard) {
 			super(parentShell, newWizard);
 			setShellStyle(SWT.CLOSE | SWT.MAX | SWT.TITLE | SWT.BORDER
-					| SWT.MODELESS | SWT.RESIZE | getDefaultOrientation());
+					| SWT.MODELESS | SWT.RESIZE | getDefaultOrientation());	
 		}
 
 	}
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
 	 */
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		final ExtendedMarkersView view = getView(event);
@@ -78,7 +77,6 @@ public class QuickFixHandler extends MarkerViewHandler {
 		final IMarker firstSelectedMarker = selectedMarkers[0];
 
 		IRunnableWithProgress resolutionsRunnable = new IRunnableWithProgress() {
-			@Override
 			public void run(IProgressMonitor monitor) {
 				monitor
 						.beginTask(
@@ -151,7 +149,7 @@ public class QuickFixHandler extends MarkerViewHandler {
 						view.getSite().getShell(),
 						MarkerMessages.resolveMarkerAction_dialogTitle,
 						MarkerMessages.MarkerResolutionDialog_NoResolutionsFoundForMultiSelection);
-
+				
 			}
 		} else {
 
@@ -170,9 +168,8 @@ public class QuickFixHandler extends MarkerViewHandler {
 	}
 
 	/**
-	 * Checks whether the given extent contains all all but the first element from the given members
-	 * array.
-	 *
+	 * Checks whether the given extent contains all all but the first element from the given array.
+	 * 
 	 * @param extent the array which should contain the elements
 	 * @param members the elements to check
 	 * @return <code>true</code> if all but the first element are inside the extent

@@ -65,18 +65,33 @@ public class UpdateActiveFiltersOperation extends AbstractOperation {
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.operations.AbstractOperation#execute(org.eclipse.core.runtime.IProgressMonitor,
+	 *      org.eclipse.core.runtime.IAdaptable)
+	 */
 	public IStatus execute(IProgressMonitor monitor, IAdaptable info) {
 		contentService.getFilterService().activateFilterIdsAndUpdateViewer(filterIdsToActivate);
 		return Status.OK_STATUS;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.operations.AbstractOperation#redo(org.eclipse.core.runtime.IProgressMonitor,
+	 *      org.eclipse.core.runtime.IAdaptable)
+	 */
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info) {
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.operations.AbstractOperation#undo(org.eclipse.core.runtime.IProgressMonitor,
+	 *      org.eclipse.core.runtime.IAdaptable)
+	 */
 	public IStatus undo(IProgressMonitor monitor, IAdaptable info) {
 		return null;
 	}

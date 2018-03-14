@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 Angelo Zerr and others.
+ * Copyright (c) 2008, 2010 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,6 +22,7 @@ import org.eclipse.e4.ui.css.swt.helpers.SWTElementHelpers;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Widget;
 import org.w3c.dom.css.CSSPrimitiveValue;
 import org.w3c.dom.css.CSSValue;
 
@@ -30,9 +31,10 @@ public class CSSPropertyBorderSWTHandler extends
 
 	public final static ICSSPropertyBorderHandler INSTANCE = new CSSPropertyBorderSWTHandler();
 
-	@Override
 	public boolean applyCSSProperty(Object element, String property,
 			CSSValue value, String pseudo, CSSEngine engine) throws Exception {
+		
+		Widget widget = SWTElementHelpers.getWidget(element);
 		
 		Control control = SWTElementHelpers.getControl(element);
 		if (control != null) {
@@ -69,7 +71,6 @@ public class CSSPropertyBorderSWTHandler extends
 
 	}
 	
-	@Override
 	public void onAllCSSPropertiesApplyed(Object element, CSSEngine engine)
 			throws Exception {
 		Control control = SWTElementHelpers.getControl(element);

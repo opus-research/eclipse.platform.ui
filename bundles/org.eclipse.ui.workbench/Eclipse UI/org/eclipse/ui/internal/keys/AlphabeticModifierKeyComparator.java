@@ -17,13 +17,17 @@ import org.eclipse.ui.keys.ModifierKey;
 
 /**
  * Compares modifier keys lexicographically by the name of the key.
- *
+ * 
  * @since 3.0
  */
 public class AlphabeticModifierKeyComparator implements Comparator {
 
-    @Override
-	public int compare(Object left, Object right) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    public int compare(Object left, Object right) {
         ModifierKey modifierKeyLeft = (ModifierKey) left;
         ModifierKey modifierKeyRight = (ModifierKey) right;
         return modifierKeyLeft.toString()

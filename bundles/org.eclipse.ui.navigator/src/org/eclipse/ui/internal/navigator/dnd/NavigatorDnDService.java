@@ -73,7 +73,6 @@ public class NavigatorDnDService implements INavigatorDnDService {
 		dropAdapter = da;
 	}
 	
-	@Override
 	public synchronized CommonDragAdapterAssistant[] getCommonDragAssistants() {
 
 		if (dragAssistants == null) 
@@ -95,7 +94,6 @@ public class NavigatorDnDService implements INavigatorDnDService {
 	}
 	
 
-	@Override
 	public synchronized void bindDragAssistant(CommonDragAdapterAssistant anAssistant) {
 		if(dragAssistants == null) 
 			initializeDragAssistants(); 
@@ -105,7 +103,6 @@ public class NavigatorDnDService implements INavigatorDnDService {
 		dragAssistants = newDragAssistants;		
 	}
 
-	@Override
 	public CommonDropAdapterAssistant[] findCommonDropAdapterAssistants(
 			Object aDropTarget, TransferData aTransferType) {
  
@@ -126,7 +123,6 @@ public class NavigatorDnDService implements INavigatorDnDService {
 	}
 	
 
-	@Override
 	public CommonDropAdapterAssistant[] findCommonDropAdapterAssistants(
 			Object aDropTarget, IStructuredSelection theDragSelection) {
  
@@ -175,7 +171,6 @@ public class NavigatorDnDService implements INavigatorDnDService {
 
 	private CommonDropAdapterAssistant[] sortAssistants(CommonDropAdapterAssistant[] array) {
 		Arrays.sort(array, new Comparator() {
-			@Override
 			public int compare(Object arg0, Object arg1) {
 				CommonDropAdapterAssistant a = (CommonDropAdapterAssistant) arg0;
 				CommonDropAdapterAssistant b = (CommonDropAdapterAssistant) arg1;
