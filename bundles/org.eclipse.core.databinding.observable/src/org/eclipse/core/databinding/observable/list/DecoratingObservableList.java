@@ -9,7 +9,6 @@
  *     Matthew Hall - initial API and implementation (bug 237718)
  *     Matthew Hall - but 246626
  *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
- *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.list;
@@ -19,7 +18,6 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.eclipse.core.databinding.observable.DecoratingObservableCollection;
-import org.eclipse.core.databinding.observable.Diffs;
 
 /**
  * An observable list which decorates another observable list.
@@ -62,7 +60,7 @@ public class DecoratingObservableList<E> extends
 		removeListener(ListChangeEvent.TYPE, listener);
 	}
 
-	protected void fireListChange(ListDiff<E> diff) {
+	protected void fireListChange(ListDiff<? extends E> diff) {
 		// fire general change event first
 		super.fireChange();
 		fireEvent(new ListChangeEvent<E>(this, diff));
@@ -107,7 +105,7 @@ public class DecoratingObservableList<E> extends
 	 *            the change event received from the decorated observable
 	 */
 	protected void handleListChange(final ListChangeEvent<? extends E> event) {
-		fireListChange(Diffs.unmodifiableDiff(event.diff));
+		fireListChange(event.diff);
 	}
 
 	@Override

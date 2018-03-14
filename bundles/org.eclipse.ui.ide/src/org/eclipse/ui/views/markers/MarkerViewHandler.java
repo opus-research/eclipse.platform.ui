@@ -95,6 +95,11 @@ public abstract class MarkerViewHandler extends AbstractHandler {
 
 		final IMarker[][] result = new IMarker[1][];
 		view.getSite().getShell().getDisplay().syncExec(new Runnable() {
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see java.lang.Runnable#run()
+			 */
 			@Override
 			public void run() {
 				result[0] = view.getSelectedMarkers();

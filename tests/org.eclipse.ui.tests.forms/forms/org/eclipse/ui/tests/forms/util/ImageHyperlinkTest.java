@@ -33,7 +33,6 @@ public class ImageHyperlinkTest extends TestCase {
 	private GC gc;
 	private TestImageHyperlink imageHyperlink;
 
-	@Override
 	protected void setUp() throws Exception {
 		display = PlatformUI.getWorkbench().getDisplay();
 		shell = new Shell(display);
@@ -45,7 +44,6 @@ public class ImageHyperlinkTest extends TestCase {
 		gc = new GC(display);
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		shell.dispose();
 		gc.dispose();
@@ -129,7 +127,6 @@ public class ImageHyperlinkTest extends TestCase {
 			super(parent, style);
 		}
 
-		@Override
 		public void paintHyperlink(GC gc) {
 			super.paintHyperlink(gc);
 		}
