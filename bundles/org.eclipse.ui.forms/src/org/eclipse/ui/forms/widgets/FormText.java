@@ -1351,17 +1351,13 @@ public class FormText extends Canvas {
 				if (isDisposed()) return;
 				IHyperlinkSegment segmentUnder = model
 						.findHyperlinkAt(e.x, e.y);
-				if (segmentUnder != null && armed == segmentUnder && !isValidSelection()) {
+				if (segmentUnder != null && armed == segmentUnder && selData == null) {
 					activateLink(segmentUnder, e.stateMask);
 					armed = null;
 				}
 			}
 			mouseFocus = false;
 		}
-	}
-
-	private boolean isValidSelection() {
-		return selData != null && !selData.getSelectionText().isEmpty();
 	}
 
 	private void handleMouseHover(MouseEvent e) {
