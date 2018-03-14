@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 41431
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 41431, 461786
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -40,6 +40,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
@@ -305,7 +306,7 @@ public class CloseResourceAction extends WorkspaceAction implements
 			public void run() {
 				SafeRunner.run(new SafeRunnable(IDEWorkbenchMessages.ErrorOnCloseEditors) {
 					@Override
-					public void run() throws CoreException {
+					public void run() {
 						IWorkbenchWindow w = getActiveWindow();
 						if (w != null) {
 							List<IEditorReference> toClose = getMatchingEditors(resourceRoots, w, deletedOnly);
@@ -333,7 +334,7 @@ public class CloseResourceAction extends WorkspaceAction implements
 	}
 
 	private static List<IEditorReference> getMatchingEditors(final List<IResource> resourceRoots, IWorkbenchWindow w,
-			boolean deletedOnly) throws CoreException {
+			boolean deletedOnly) {
 		List<IEditorReference> toClose = new ArrayList<IEditorReference>();
 		IEditorReference[] editors = getEditors(w);
 		for (IEditorReference ref : editors) {
@@ -359,8 +360,14 @@ public class CloseResourceAction extends WorkspaceAction implements
 		return new IEditorReference[0];
 	}
 
-	private static IResource getAdapter(IEditorReference ref) throws CoreException {
-		IEditorInput input = ref.getEditorInput();
+	private static IResource getAdapter(IEditorReference ref) {
+		IEditorInput input;
+		try {
+			input = ref.getEditorInput();
+		} catch (PartInitException e) {
+			// ignore if factory can't restore input, see bug 461786
+			return null;
+		}
 		if (input instanceof FileEditorInput) {
 			FileEditorInput fi = (FileEditorInput) input;
 			IFile file = fi.getFile();
