@@ -43,7 +43,6 @@ import org.eclipse.e4.core.services.log.ILoggerProvider;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationProviderFactory;
 import org.eclipse.e4.core.services.translation.TranslationService;
-import org.eclipse.e4.ui.css.swt.helpers.URI;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.internal.workbench.ActiveChildLookupFunction;
 import org.eclipse.e4.ui.internal.workbench.ActivePartLookupFunction;
@@ -78,6 +77,7 @@ import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.e4.ui.workbench.swt.internal.copy.WorkbenchSWTMessages;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.equinox.app.IApplication;
@@ -94,6 +94,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.osgi.framework.Bundle;
 import org.w3c.dom.css.CSSStyleDeclaration;
 
+/**
+ *
+ */
 public class E4Application implements IApplication {
 
 	private static final String PLUGIN_ID = "org.eclipse.e4.ui.workbench.swt"; //$NON-NLS-1$
@@ -126,7 +129,8 @@ public class E4Application implements IApplication {
 	}
 
 	@Override
-	public Object start(IApplicationContext applicationContext) throws Exception {
+	public Object start(IApplicationContext applicationContext)
+			throws Exception {
 		// set the display name before the Display is
 		// created to ensure the app name is used in any
 		// platform menus, etc. See
@@ -290,7 +294,8 @@ public class E4Application implements IApplication {
 
 		// Parse out parameters from both the command line and/or the product
 		// definition (if any) and put them in the context
-		String xmiURI = getArgValue(IWorkbench.XMI_URI_ARG, applicationContext, false);
+		String xmiURI = getArgValue(IWorkbench.XMI_URI_ARG, applicationContext,
+				false);
 		appContext.set(IWorkbench.XMI_URI_ARG, xmiURI);
 
 		setCSSContextVariables(applicationContext, appContext);
@@ -301,7 +306,8 @@ public class E4Application implements IApplication {
 						applicationContext, false));
 
 		// This is a default arg, if missing we use the default rendering engine
-		String presentationURI = getArgValue(IWorkbench.PRESENTATION_URI_ARG, applicationContext, false);
+		String presentationURI = getArgValue(IWorkbench.PRESENTATION_URI_ARG,
+				applicationContext, false);
 		if (presentationURI == null) {
 			presentationURI = PartRenderingEngine.engineURI;
 		}
@@ -347,10 +353,39 @@ public class E4Application implements IApplication {
 
 	private MApplication loadApplicationModel(IApplicationContext appContext,
 			IEclipseContext eclipseContext) {
+		MApplication theApp = null;
 
-		// determine where the initial application model file is located
-		URI appModelURI = determineApplicationModelURI(appContext);
-		eclipseContext.set(E4Workbench.INITIAL_WORKBENCH_MODEL_URI, appModelURI);
+		Location instanceLocation = WorkbenchSWTActivator.getDefault()
+				.getInstanceLocation();
+
+		String appModelPath = getArgValue(IWorkbench.XMI_URI_ARG, appContext,
+				false);
+		if (appModelPath == null || appModelPath.length() == 0) {
+			Bundle brandingBundle = appContext.getBrandingBundle();
+			if (brandingBundle != null)
+				appModelPath = brandingBundle.getSymbolicName() + "/"
+						+ E4Application.APPLICATION_MODEL_PATH_DEFAULT;
+			else {
+				Logger logger = new WorkbenchLogger(PLUGIN_ID);
+				logger.error(
+						new Exception(), // log a stack trace for debugging
+						"applicationXMI parameter not set and no branding plugin defined. "); //$NON-NLS-1$
+			}
+		}
+
+		URI initialWorkbenchDefinitionInstance;
+
+		// check if the appModelPath is already a platform-URI and if so use it
+		if (URIHelper.isPlatformURI(appModelPath)) {
+			initialWorkbenchDefinitionInstance = URI.createURI(appModelPath,
+					true);
+		} else {
+			initialWorkbenchDefinitionInstance = URI.createPlatformPluginURI(
+					appModelPath, true);
+		}
+
+		eclipseContext.set(E4Workbench.INITIAL_WORKBENCH_MODEL_URI,
+				initialWorkbenchDefinitionInstance);
 
 		// Save and restore
 		boolean saveAndRestore;
@@ -361,7 +396,6 @@ public class E4Application implements IApplication {
 		eclipseContext.set(IWorkbench.PERSIST_STATE,
 				Boolean.valueOf(saveAndRestore));
 
-		Location instanceLocation = WorkbenchSWTActivator.getDefault().getInstanceLocation();
 		// when -data @none or -data @noDefault options
 		if (instanceLocation != null && instanceLocation.getURL() != null) {
 			eclipseContext.set(E4Workbench.INSTANCE_LOCATION, instanceLocation);
@@ -387,47 +421,21 @@ public class E4Application implements IApplication {
 				appContext, false);
 
 		if (resourceHandler == null) {
-			resourceHandler = "bundleclass://org.eclipse.e4.ui.workbench/" + ResourceHandler.class.getName();
+			resourceHandler = "bundleclass://org.eclipse.e4.ui.workbench/"
+					+ ResourceHandler.class.getName();
 		}
 
-		IContributionFactory factory = eclipseContext.get(IContributionFactory.class);
-		handler = (IModelResourceHandler) factory.create(resourceHandler, eclipseContext);
+		IContributionFactory factory = eclipseContext
+				.get(IContributionFactory.class);
+
+		handler = (IModelResourceHandler) factory.create(resourceHandler,
+				eclipseContext);
 		eclipseContext.set(IModelResourceHandler.class, handler);
 
 		Resource resource = handler.loadMostRecentModel();
-		MApplication theApp = (MApplication) resource.getContents().get(0);
+		theApp = (MApplication) resource.getContents().get(0);
 
 		return theApp;
-	}
-
-	/**
-	 * @param appContext
-	 * @return
-	 */
-	private URI determineApplicationModelURI(IApplicationContext appContext) {
-		String appModelPath = getArgValue(IWorkbench.XMI_URI_ARG, appContext, false);
-		if (appModelPath == null || appModelPath.length() == 0) {
-			Bundle brandingBundle = appContext.getBrandingBundle();
-			if (brandingBundle != null)
-				appModelPath = brandingBundle.getSymbolicName() + "/" + E4Application.APPLICATION_MODEL_PATH_DEFAULT;
-			else {
-				Logger logger = new WorkbenchLogger(PLUGIN_ID);
-				logger.error(
-						new Exception(), // log a stack trace for debugging
-						"applicationXMI parameter not set and no branding plugin defined. "); //$NON-NLS-1$
-			}
-		}
-
-		URI applicationModelURI = null;
-
-		// check if the appModelPath is already a platform-URI and if so use it
-		if (URIHelper.isPlatformURI(appModelPath)) {
-			applicationModelURI = URI.createURI(appModelPath, true);
-		} else {
-			applicationModelURI = URI.createPlatformPluginURI(appModelPath, true);
-		}
-		return applicationModelURI;
-
 	}
 
 	private String getArgValue(String argName, IApplicationContext appContext,
