@@ -27,20 +27,24 @@ import org.eclipse.ui.menus.UIElement;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class ToggleContextHandler extends AbstractHandler implements
 		IElementUpdater {
 	private static final String TOGGLE_ID = "toggleContext.contextId";
 	Map contextActivations = new HashMap();
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		String contextId = event.getParameter(TOGGLE_ID);
 		IWorkbenchWindow window = HandlerUtil
 				.getActiveWorkbenchWindowChecked(event);
 
-		IContextService contextService = window
+		IContextService contextService = (IContextService) window
 				.getService(IContextService.class);
 		IContextActivation a = (IContextActivation) contextActivations
 				.get(contextId);
@@ -58,7 +62,7 @@ public class ToggleContextHandler extends AbstractHandler implements
 		// to toggleContext(contextId) ... this request means
 		// only update the UI that points to this specific context
 		// id ... not the other, non-interesting ones.
-		ICommandService commandService = window
+		ICommandService commandService = (ICommandService) window
 				.getService(ICommandService.class);
 		Map filter = new HashMap();
 		filter.put(TOGGLE_ID, contextId);
@@ -66,7 +70,9 @@ public class ToggleContextHandler extends AbstractHandler implements
 		return null;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.commands.IElementUpdater#updateElement(org.eclipse.ui.menus.UIElement, java.util.Map)
+	 */
 	public void updateElement(UIElement element, Map parameters) {
 
 		// the checked state depends on if we have an activation for that

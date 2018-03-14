@@ -122,7 +122,9 @@ public class ConfigurationLogUpdateSection implements ISystemSummarySection {
 		}
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.about.ISystemSummarySection#write(java.io.PrintWriter)
+	 */
 	public void write(PrintWriter writer) {
 		writeInstalledIUs(writer);
 		writer.println();

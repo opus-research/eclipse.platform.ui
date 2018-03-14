@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 
 package org.eclipse.ui.tests.harness.util;
@@ -33,7 +32,7 @@ import org.eclipse.core.runtime.Plugin;
 
 
 public class FileTool {
-
+	
 	/**
 	 * A buffer.
 	 */
@@ -42,15 +41,22 @@ public class FileTool {
 	 * Unzips the given zip file to the given destination directory
 	 * extracting only those entries the pass through the given
 	 * filter.
-	 *
+	 * 
+	 * @param filter filters out unwanted zip entries
 	 * @param zipFile the zip file to unzip
 	 * @param dstDir the destination directory
 	 */
 	public static void unzip(ZipFile zipFile, File dstDir) throws IOException {
-		Enumeration<? extends ZipEntry> entries = zipFile.entries();
+		unzip(zipFile, dstDir, dstDir, 0);
+	}
+	
+	private static void unzip(ZipFile zipFile, File rootDstDir, File dstDir, int depth) throws IOException {
+	
+		Enumeration entries = zipFile.entries();
+	
 		try {
 			while(entries.hasMoreElements()){
-				ZipEntry entry = entries.nextElement();
+				ZipEntry entry = (ZipEntry)entries.nextElement();
 				if(entry.isDirectory()){
 					continue;
 				}
@@ -89,7 +95,7 @@ public class FileTool {
 	 * Returns the given file path with its separator
 	 * character changed from the given old separator to the
 	 * given new separator.
-	 *
+	 * 
 	 * @param path a file path
 	 * @param oldSeparator a path separator character
 	 * @param newSeparator a path separator character
@@ -103,7 +109,7 @@ public class FileTool {
 	/**
 	 * Copies all bytes in the given source file to
 	 * the given destination file.
-	 *
+	 * 
 	 * @param source the given source file
 	 * @param destination the given destination file
 	 */
@@ -134,7 +140,7 @@ public class FileTool {
 	 * Copies all bytes in the given source stream to
 	 * the given destination stream. Neither streams
 	 * are closed.
-	 *
+	 * 
 	 * @param source the given source stream
 	 * @param destination the given destination stream
 	 */
@@ -150,16 +156,16 @@ public class FileTool {
 
 	/**
 	 * Copies the given source file to the given destination file.
-	 *
+	 * 
 	 * @param src the given source file
 	 * @param dst the given destination file
 	 */
 	public static void copy(File src, File dst) throws IOException {
 		if(src.isDirectory()){
 			String[] srcChildren = src.list();
-			for (String srcChildPathName : srcChildren) {
-				File srcChild = new File(src, srcChildPathName);
-				File dstChild = new File(dst, srcChildPathName);
+			for(int i = 0; i < srcChildren.length; ++i){
+				File srcChild= new File(src, srcChildren[i]);
+				File dstChild= new File(dst, srcChildren[i]);
 				copy(srcChild, dstChild);
 			}
 		} else
@@ -177,10 +183,7 @@ public class FileTool {
 	}
 
 	public static StringBuffer read(String fileName) throws IOException {
-		FileReader reader = new FileReader(fileName);
-		StringBuffer result = read(reader);
-		reader.close();
-		return result;
+		return read(new FileReader(fileName));
 	}
 
 	public static StringBuffer read(Reader reader) throws IOException {

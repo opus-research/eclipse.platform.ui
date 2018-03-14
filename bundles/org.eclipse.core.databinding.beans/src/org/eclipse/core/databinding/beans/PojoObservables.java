@@ -35,8 +35,6 @@ import org.eclipse.core.internal.databinding.beans.BeanPropertyHelper;
  * factory is identical to {@link BeansObservables} except for this fact.
  * 
  * @since 1.1
- * 
- * @deprecated use <code>PojoProperties</code> instead
  */
 final public class PojoObservables {
 
@@ -50,7 +48,6 @@ final public class PojoObservables {
 	 *            the name of the property. May be nested e.g. "parent.name"
 	 * @return an observable value tracking the current value of the named
 	 *         property of the given pojo
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableValue observeValue(Object pojo, String propertyName) {
 		return observeValue(Realm.getDefault(), pojo, propertyName);
@@ -68,8 +65,6 @@ final public class PojoObservables {
 	 *            the name of the property. May be nested e.g. "parent.name"
 	 * @return an observable value tracking the current value of the named
 	 *         property of the given pojo
-	 * 
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableValue observeValue(Realm realm, Object pojo,
 			String propertyName) {
@@ -91,8 +86,6 @@ final public class PojoObservables {
 	 * @return an observable map tracking the current values of the named
 	 *         property for the beans in the given domain set
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableMap observeMap(IObservableSet domain,
 			String propertyName) {
@@ -111,8 +104,6 @@ final public class PojoObservables {
 	 *            the name of the property. May be nested e.g. "parent.name"
 	 * @return an observable map tracking the current values of the named
 	 *         property for the pojos in the given domain set
-	 * 
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableMap observeMap(IObservableSet domain,
 			Class pojoClass, String propertyName) {
@@ -135,8 +126,6 @@ final public class PojoObservables {
 	 * @return an array of observable maps tracking the current values of the
 	 *         named propertys for the beans in the given domain set
 	 * @since 1.2
-	 *
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableMap[] observeMaps(IObservableSet domain,
 			String[] propertyNames) {
@@ -160,8 +149,6 @@ final public class PojoObservables {
 	 *            the array of property names. May be nested e.g. "parent.name"
 	 * @return an array of observable maps tracking the current values of the
 	 *         named propertys for the pojos in the given domain set
-	 * 
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableMap[] observeMaps(IObservableSet domain,
 			Class pojoClass, String[] propertyNames) {
@@ -184,7 +171,6 @@ final public class PojoObservables {
 	 *            the name of the property
 	 * @return an observable map tracking the map-typed named property of the
 	 *         given pojo object
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableMap observeMap(Realm realm, Object pojo,
 			String propertyName) {
@@ -210,8 +196,6 @@ final public class PojoObservables {
 	 * @return an observable map tracking the map-typed named property of the
 	 *         given pojo object
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableMap observeMap(Realm realm, Object pojo,
 			String propertyName, Class keyType, Class valueType) {
@@ -230,7 +214,6 @@ final public class PojoObservables {
 	 * @return an observable map tracking the map-typed named property of the
 	 *         given pojo object
 	 * @since 1.2
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableMap observeMap(Object pojo, String propertyName) {
 		return observeMap(Realm.getDefault(), pojo, propertyName, null, null);
@@ -253,8 +236,6 @@ final public class PojoObservables {
 	 * @return an observable map tracking the map-typed named property of the
 	 *         given pojo object
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableMap observeMap(Object pojo, String propertyName,
 			Class keyType, Class valueType) {
@@ -276,8 +257,6 @@ final public class PojoObservables {
 	 * @return an observable list tracking the collection-typed named property
 	 *         of the given pojo object
 	 * @see #observeList(Realm, Object, String, Class)
-	 * 
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableList observeList(Realm realm, Object pojo,
 			String propertyName) {
@@ -297,8 +276,6 @@ final public class PojoObservables {
 	 *         of the given pojo object
 	 * @see #observeList(Realm, Object, String, Class)
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableList observeList(Object pojo, String propertyName) {
 		return observeList(Realm.getDefault(), pojo, propertyName);
@@ -326,7 +303,6 @@ final public class PojoObservables {
 	 *            element type will be <code>null</code>.
 	 * @return an observable list tracking the collection-typed named property
 	 *         of the given bean object
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableList observeList(Realm realm, Object pojo,
 			String propertyName, Class elementType) {
@@ -355,7 +331,6 @@ final public class PojoObservables {
 	 * @return an observable list tracking the collection-typed named property
 	 *         of the given bean object
 	 * @since 1.2
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableList observeList(Object pojo, String propertyName,
 			Class elementType) {
@@ -374,7 +349,6 @@ final public class PojoObservables {
 	 *            the name of the property
 	 * @return an observable set tracking the collection-typed named property of
 	 *         the given pojo object
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableSet observeSet(Realm realm, Object pojo,
 			String propertyName) {
@@ -392,8 +366,6 @@ final public class PojoObservables {
 	 * @return an observable set tracking the collection-typed named property of
 	 *         the given pojo object
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableSet observeSet(Object pojo, String propertyName) {
 		return observeSet(Realm.getDefault(), pojo, propertyName);
@@ -416,8 +388,6 @@ final public class PojoObservables {
 	 *            element type will be <code>null</code>.
 	 * @return an observable set that tracks the current value of the named
 	 *         property for given pojo object
-	 * 
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableSet observeSet(Realm realm, Object pojo,
 			String propertyName, Class elementType) {
@@ -441,8 +411,6 @@ final public class PojoObservables {
 	 * @return an observable set that tracks the current value of the named
 	 *         property for given pojo object
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableSet observeSet(Object pojo, String propertyName,
 			Class elementType) {
@@ -458,8 +426,6 @@ final public class PojoObservables {
 	 * @param propertyName
 	 *            the name of the property. May be nested e.g. "parent.name"
 	 * @return an observable value factory
-	 * 
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableFactory valueFactory(final Realm realm,
 			final String propertyName) {
@@ -474,8 +440,6 @@ final public class PojoObservables {
 	 *            the name of the property. May be nested e.g. "parent.name"
 	 * @return an observable value factory
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableFactory valueFactory(String propertyName) {
 		return valueFactory(Realm.getDefault(), propertyName);
@@ -491,8 +455,6 @@ final public class PojoObservables {
 	 *            the name of the property
 	 * @param elementType
 	 * @return an observable list factory
-	 * 
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableFactory listFactory(final Realm realm,
 			final String propertyName, final Class elementType) {
@@ -509,8 +471,6 @@ final public class PojoObservables {
 	 * @param elementType
 	 * @return an observable list factory
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableFactory listFactory(String propertyName,
 			Class elementType) {
@@ -526,8 +486,6 @@ final public class PojoObservables {
 	 * @param propertyName
 	 *            the name of the property
 	 * @return an observable set factory
-	 * 
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableFactory setFactory(final Realm realm,
 			final String propertyName) {
@@ -542,8 +500,6 @@ final public class PojoObservables {
 	 *            the name of the property
 	 * @return an observable set factory
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableFactory setFactory(String propertyName) {
 		return setFactory(Realm.getDefault(), propertyName);
@@ -563,8 +519,6 @@ final public class PojoObservables {
 	 *            <code>null</code> and the property type cannot be inferred
 	 *            element type will be <code>null</code>.
 	 * @return an observable set factory for creating observable sets
-	 * 
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableFactory setFactory(final Realm realm,
 			final String propertyName, final Class elementType) {
@@ -584,8 +538,6 @@ final public class PojoObservables {
 	 *            element type will be <code>null</code>.
 	 * @return an observable set factory for creating observable sets
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableFactory setFactory(String propertyName,
 			Class elementType) {
@@ -604,8 +556,6 @@ final public class PojoObservables {
 	 * @param propertyName
 	 *            the name of the property
 	 * @return a factory for creating {@link IObservableMap} objects.
-	 * 
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableFactory mapPropertyFactory(final Realm realm,
 			final String propertyName) {
@@ -622,8 +572,6 @@ final public class PojoObservables {
 	 *            the name of the property
 	 * @return a factory for creating {@link IObservableMap} objects.
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableFactory mapPropertyFactory(String propertyName) {
 		return mapPropertyFactory(Realm.getDefault(), propertyName);
@@ -647,21 +595,16 @@ final public class PojoObservables {
 	 * @deprecated Use
 	 *             {@link #observeDetailValue(IObservableValue, String, Class)}
 	 *             instead
-	 * 
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
-	@Deprecated
 	public static IObservableValue observeDetailValue(Realm realm,
 			IObservableValue master, String propertyName, Class propertyType) {
 		BeansObservables.warnIfDifferentRealms(realm, master.getRealm());
 
-		IObservableValue value = MasterDetailObservables.detailValue(
-				master,
+		IObservableValue value = MasterDetailObservables.detailValue(master,
 				PojoProperties.value(propertyName, propertyType).valueFactory(
 						realm), propertyType);
-		return new BeanObservableValueDecorator(value,
-				BeanPropertyHelper.getValueTypePropertyDescriptor(master,
-						propertyName));
+		return new BeanObservableValueDecorator(value, BeanPropertyHelper
+				.getValueTypePropertyDescriptor(master, propertyName));
 	}
 
 	/**
@@ -678,8 +621,6 @@ final public class PojoObservables {
 	 * 
 	 * @see MasterDetailObservables
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableValue observeDetailValue(IObservableValue master,
 			String propertyName, Class propertyType) {
@@ -707,9 +648,7 @@ final public class PojoObservables {
 	 * @deprecated Use
 	 *             {@link #observeDetailList(IObservableValue, String, Class)}
 	 *             instead
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
-	@Deprecated
 	public static IObservableList observeDetailList(Realm realm,
 			IObservableValue master, String propertyName, Class propertyType) {
 		BeansObservables.warnIfDifferentRealms(realm, master.getRealm());
@@ -734,8 +673,6 @@ final public class PojoObservables {
 	 * 
 	 * @see MasterDetailObservables
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableList observeDetailList(IObservableValue master,
 			String propertyName, Class propertyType) {
@@ -764,7 +701,6 @@ final public class PojoObservables {
 	 *             {@link #observeDetailSet(IObservableValue, String, Class)}
 	 *             instead.
 	 */
-	@Deprecated
 	public static IObservableSet observeDetailSet(Realm realm,
 			IObservableValue master, String propertyName, Class propertyType) {
 		BeansObservables.warnIfDifferentRealms(realm, master.getRealm());
@@ -772,9 +708,8 @@ final public class PojoObservables {
 		IObservableSet observableSet = MasterDetailObservables.detailSet(
 				master, PojoProperties.set(propertyName, propertyType)
 						.setFactory(realm), propertyType);
-		return new BeanObservableSetDecorator(observableSet,
-				BeanPropertyHelper.getValueTypePropertyDescriptor(master,
-						propertyName));
+		return new BeanObservableSetDecorator(observableSet, BeanPropertyHelper
+				.getValueTypePropertyDescriptor(master, propertyName));
 	}
 
 	/**
@@ -790,8 +725,6 @@ final public class PojoObservables {
 	 * 
 	 * @see MasterDetailObservables
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableSet observeDetailSet(IObservableValue master,
 			String propertyName, Class propertyType) {
@@ -813,18 +746,14 @@ final public class PojoObservables {
 	 *         current value of the master observable value.
 	 * @deprecated Use {@link #observeDetailMap(IObservableValue, String)}
 	 *             instead
-	 * 
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
-	@Deprecated
 	public static IObservableMap observeDetailMap(Realm realm,
 			IObservableValue master, String propertyName) {
 		BeansObservables.warnIfDifferentRealms(realm, master.getRealm());
 		IObservableMap observableMap = MasterDetailObservables.detailMap(
 				master, PojoProperties.map(propertyName).mapFactory(realm));
-		return new BeanObservableMapDecorator(observableMap,
-				BeanPropertyHelper.getValueTypePropertyDescriptor(master,
-						propertyName));
+		return new BeanObservableMapDecorator(observableMap, BeanPropertyHelper
+				.getValueTypePropertyDescriptor(master, propertyName));
 	}
 
 	/**
@@ -836,8 +765,6 @@ final public class PojoObservables {
 	 * @return an observable map that tracks the map-type named property for the
 	 *         current value of the master observable value.
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>PojoProperties</code> instead
 	 */
 	public static IObservableMap observeDetailMap(IObservableValue master,
 			String propertyName) {

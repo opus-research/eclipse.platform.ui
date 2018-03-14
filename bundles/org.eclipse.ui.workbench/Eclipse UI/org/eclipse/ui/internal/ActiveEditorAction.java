@@ -103,6 +103,9 @@ public abstract class ActiveEditorAction extends PageEventAction {
         return activeEditor;
     }
 
+    /* (non-Javadoc)
+     * Method declared on PageEventAction.
+     */
     @Override
 	public void pageActivated(IWorkbenchPage page) {
         super.pageActivated(page);
@@ -110,6 +113,9 @@ public abstract class ActiveEditorAction extends PageEventAction {
         updateState();
     }
 
+    /* (non-Javadoc)
+     * Method declared on PageEventAction.
+     */
     @Override
 	public void pageClosed(IWorkbenchPage page) {
         super.pageClosed(page);
@@ -117,6 +123,9 @@ public abstract class ActiveEditorAction extends PageEventAction {
         updateState();
     }
 
+    /* (non-Javadoc)
+     * Method declared on PartEventAction.
+     */
     @Override
 	public void partActivated(IWorkbenchPart part) {
         super.partActivated(part);
@@ -126,6 +135,9 @@ public abstract class ActiveEditorAction extends PageEventAction {
         }
     }
 
+    /* (non-Javadoc)
+     * Method declared on PartEventAction.
+     */
     @Override
 	public void partBroughtToTop(IWorkbenchPart part) {
         super.partBroughtToTop(part);
@@ -135,6 +147,9 @@ public abstract class ActiveEditorAction extends PageEventAction {
         }
     }
 
+    /* (non-Javadoc)
+     * Method declared on PartEventAction.
+     */
     @Override
 	public void partClosed(IWorkbenchPart part) {
         super.partClosed(part);
@@ -144,6 +159,9 @@ public abstract class ActiveEditorAction extends PageEventAction {
         }
     }
 
+    /* (non-Javadoc)
+     * Method declared on PartEventAction.
+     */
     @Override
 	public void partDeactivated(IWorkbenchPart part) {
         super.partDeactivated(part);

@@ -151,8 +151,7 @@ class TasksFilter extends ViewerFilter implements Cloneable {
         return descriptionFilterKind == FILTER_CONTAINS ? contains : !contains;
     }
 
-    @Override
-	public Object clone() {
+    public Object clone() {
         try {
             return super.clone();
         } catch (CloneNotSupportedException e) {
@@ -351,8 +350,7 @@ class TasksFilter extends ViewerFilter implements Cloneable {
         memento.putInteger(TAG_MARKER_LIMIT, markerLimit);
     }
 
-    @Override
-	public boolean select(Viewer viewer, Object parentElement, Object element) {
+    public boolean select(Viewer viewer, Object parentElement, Object element) {
         return select((IMarker) element);
     }
 
