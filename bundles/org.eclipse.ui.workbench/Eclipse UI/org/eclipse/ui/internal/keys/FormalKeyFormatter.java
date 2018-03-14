@@ -36,8 +36,7 @@ public class FormalKeyFormatter extends AbstractKeyFormatter {
      * 
      * @see org.eclipse.ui.keys.KeyFormatter#format(org.eclipse.ui.keys.KeySequence)
      */
-    @Override
-	public String format(Key key) {
+    public String format(Key key) {
         return key.toString();
     }
 
@@ -46,8 +45,7 @@ public class FormalKeyFormatter extends AbstractKeyFormatter {
      * 
      * @see org.eclipse.ui.keys.AbstractKeyFormatter#getKeyDelimiter()
      */
-    @Override
-	protected String getKeyDelimiter() {
+    protected String getKeyDelimiter() {
         return KeyStroke.KEY_DELIMITER;
     }
 
@@ -56,8 +54,7 @@ public class FormalKeyFormatter extends AbstractKeyFormatter {
      * 
      * @see org.eclipse.ui.keys.AbstractKeyFormatter#getKeyStrokeDelimiter()
      */
-    @Override
-	protected String getKeyStrokeDelimiter() {
+    protected String getKeyStrokeDelimiter() {
         return KeySequence.KEY_STROKE_DELIMITER;
     }
 
@@ -66,8 +63,7 @@ public class FormalKeyFormatter extends AbstractKeyFormatter {
      * 
      * @see org.eclipse.ui.keys.AbstractKeyFormatter#getModifierKeyComparator()
      */
-    @Override
-	protected Comparator getModifierKeyComparator() {
+    protected Comparator getModifierKeyComparator() {
         return FORMAL_MODIFIER_KEY_COMPARATOR;
     }
 

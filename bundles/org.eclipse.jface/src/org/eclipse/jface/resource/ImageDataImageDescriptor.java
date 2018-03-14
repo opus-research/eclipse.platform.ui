@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -50,8 +50,7 @@ class ImageDataImageDescriptor extends ImageDescriptor {
     /* (non-Javadoc)
      * @see org.eclipse.jface.resource.DeviceResourceDescriptor#create(org.eclipse.swt.graphics.Device)
      */
-    @Override
-	public Object createResource(Device device) throws DeviceResourceException {
+    public Object createResource(Device device) throws DeviceResourceException {
 
         // If this descriptor is an existing font, then we can return the original font
         // if this is the same device.
@@ -68,8 +67,7 @@ class ImageDataImageDescriptor extends ImageDescriptor {
     /* (non-Javadoc)
      * @see org.eclipse.jface.resource.DeviceResourceDescriptor#destroy(java.lang.Object)
      */
-    @Override
-	public void destroyResource(Object previouslyCreatedObject) {
+    public void destroyResource(Object previouslyCreatedObject) {
         if (previouslyCreatedObject == originalImage) {
             return;
         }
@@ -80,16 +78,14 @@ class ImageDataImageDescriptor extends ImageDescriptor {
     /* (non-Javadoc)
      * @see org.eclipse.jface.resource.ImageDescriptor#getImageData()
      */
-    @Override
-	public ImageData getImageData() {
+    public ImageData getImageData() {
         return data;
     }
     
     /* (non-Javadoc)
      * @see Object#hashCode
      */
-    @Override
-	public int hashCode() {
+    public int hashCode() {
     	 if (originalImage != null) {
              return System.identityHashCode(originalImage);
          }
@@ -99,8 +95,7 @@ class ImageDataImageDescriptor extends ImageDescriptor {
     /* (non-Javadoc)
      * @see Object#equals
      */
-    @Override
-	public boolean equals(Object obj) {
+    public boolean equals(Object obj) {
         if (!(obj instanceof ImageDataImageDescriptor)) {
 			return false;
 		} 

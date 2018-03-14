@@ -26,8 +26,6 @@ import java.util.Map;
  * @deprecated Please use the "org.eclipse.core.commands" plug-in instead.
  * @see org.eclipse.core.commands.IHandler
  */
-@Deprecated
-@SuppressWarnings("all")
 public interface IHandler {
 
     /**
@@ -39,7 +37,6 @@ public interface IHandler {
      *            an attempt is made to register an instance which is already
      *            registered with this instance, no operation is performed.
      */
-	@Deprecated
     void addHandlerListener(IHandlerListener handlerListener);
 
     /**
@@ -47,7 +44,6 @@ public interface IHandler {
      * longer referenced. This can be used as an opportunity to unhook listeners
      * from other objects.
      */
-	@Deprecated
     public void dispose();
 
     /**
@@ -61,7 +57,6 @@ public interface IHandler {
      * @throws ExecutionException
      *             if an exception occurred during execution.
      */
-	@Deprecated
     Object execute(Map parameterValuesByName) throws ExecutionException;
 
     /**
@@ -76,7 +71,6 @@ public interface IHandler {
      *         empty, its collection of keys is guaranteed to only contain
      *         instances of <code>String</code>.
      */
-	@Deprecated
     Map getAttributeValuesByName();
 
     /**
@@ -89,6 +83,5 @@ public interface IHandler {
      *            already registered with this instance, no operation is
      *            performed.
      */
-	@Deprecated
     void removeHandlerListener(IHandlerListener handlerListener);
 }

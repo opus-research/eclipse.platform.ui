@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 Angelo Zerr and others.
+ * Copyright (c) 2008 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,10 +7,10 @@
  *
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430639
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.dom;
 
+import org.eclipse.e4.ui.css.core.dom.CSSStylableElement;
 import org.eclipse.e4.ui.css.core.dom.IElementProvider;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.swt.custom.CTabFolder;
@@ -23,29 +23,40 @@ import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
 import org.w3c.dom.Element;
 
 /**
- * Returns the CSS class which is responsible for styling a SWT widget
- *
- * Registered via the "org.eclipse.e4.ui.css.core.elementProvider" extension
- * point for the SWT widgets
- *
- *
- *
  * {@link IElementProvider} SWT implementation to retrieve w3c Element
  * {@link SWTElement} linked to SWT widget.
- *
+ * 
+ * @version 1.0.0
+ * @author <a href="mailto:angelo.zerr@gmail.com">Angelo ZERR</a>
+ * 
  */
 public class SWTElementProvider implements IElementProvider {
 
 	public static final IElementProvider INSTANCE = new SWTElementProvider();
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.core.css.dom.IElementProvider#getElement(java.lang.
+	 * Object)
+	 */
 	public Element getElement(Object element, CSSEngine engine) {
+		return createElement(element, engine);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.core.css.dom.IElementProvider#getElement(java.lang.
+	 * Object)
+	 */
+	public CSSStylableElement createElement(Object element, CSSEngine engine) {
 		if (element instanceof Text) {
 			return new TextElement((Text) element, engine);
 		}
@@ -61,9 +72,6 @@ public class SWTElementProvider implements IElementProvider {
 		if (element instanceof CTabFolder) {
 			return new CTabFolderElement((CTabFolder) element, engine);
 		}
-		if (element instanceof ToolBar) {
-			return new ToolBarElement((ToolBar) element, engine);
-		}
 		if (element instanceof Composite) {
 			return new CompositeElement((Composite) element, engine);
 		}
@@ -75,9 +83,6 @@ public class SWTElementProvider implements IElementProvider {
 		}
 		if (element instanceof TableItem) {
 			return new TableItemElement((TableItem) element, engine);
-		}
-		if (element instanceof ToolItem) {
-			return new ToolItemElement((ToolItem) element, engine);
 		}
 		if (element instanceof Item) {
 			return new ItemElement((Item) element, engine);

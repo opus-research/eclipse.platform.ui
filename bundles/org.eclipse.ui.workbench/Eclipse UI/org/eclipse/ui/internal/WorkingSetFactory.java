@@ -23,8 +23,7 @@ public class WorkingSetFactory implements IElementFactory {
     /* (non-Javadoc)
      * @see org.eclipse.ui.IElementFactory
      */
-    @Override
-	public IAdaptable createElement(IMemento memento) {
+    public IAdaptable createElement(IMemento memento) {
         String workingSetName = memento.getString(IWorkbenchConstants.TAG_NAME);
         String label = memento.getString(IWorkbenchConstants.TAG_LABEL);
         if (label == null) {

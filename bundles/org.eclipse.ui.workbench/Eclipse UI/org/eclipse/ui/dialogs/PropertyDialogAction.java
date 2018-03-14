@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -70,7 +70,6 @@ public class PropertyDialogAction extends SelectionProviderAction {
 	 *            describe
      * @deprecated use PropertyDialogAction(IShellProvider, ISelectionProvider)
 	 */
-	@Deprecated
 	public PropertyDialogAction(Shell shell, ISelectionProvider provider) {
         this(new SameShellProvider(shell), provider);
 	}
@@ -152,7 +151,6 @@ public class PropertyDialogAction extends SelectionProviderAction {
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.action.IAction#run()
 	 */
-	@Override
 	public void run() {
 
 		PreferenceDialog dialog = createDialog();
@@ -181,7 +179,6 @@ public class PropertyDialogAction extends SelectionProviderAction {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.actions.SelectionProviderAction#selectionChanged(org.eclipse.jface.viewers.IStructuredSelection)
 	 */
-	@Override
 	public void selectionChanged(IStructuredSelection selection) {
 		setEnabled(!selection.isEmpty());
 	}

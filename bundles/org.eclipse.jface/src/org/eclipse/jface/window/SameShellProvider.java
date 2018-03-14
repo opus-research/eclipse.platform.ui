@@ -38,8 +38,7 @@ public class SameShellProvider implements IShellProvider {
     /* (non-javadoc)
      * @see IShellProvider#getShell()
      */
-    @Override
-	public Shell getShell() {
+    public Shell getShell() {
         if (targetControl instanceof Shell) {
             return (Shell)targetControl;
         }

@@ -31,7 +31,7 @@ public class TestFactoryImpl extends EFactoryImpl implements MTestFactory {
 	public static MTestFactory init() {
 		try {
 			MTestFactory theTestFactory = (MTestFactory) EPackage.Registry.INSTANCE
-					.getEFactory(MTestPackage.eNS_URI);
+					.getEFactory("http://www.eclipse.org/ui/2010/Test/UIModel/test");
 			if (theTestFactory != null) {
 				return theTestFactory;
 			}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 Angelo Zerr and others.
+ * Copyright (c) 2008 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.e4.ui.css.swt.helpers;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+
 import org.eclipse.e4.ui.css.core.dom.CSSStylableElement;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
@@ -29,20 +30,20 @@ public class SWTElementHelpers {
 	public static final String SWT_ELEMENT_KEY = "org.eclipse.e4.ui.core.css.swt.dom.SWTElement.ELEMENT";
 	public static final String SWT_NODELIST_KEY = "org.eclipse.e4.ui.core.css.swt.dom.SWTElement.NODELIST";
 
-	private static final Class<?>[] ELEMENT_CONSTRUCTOR_PARAM = { Widget.class,
-		CSSEngine.class };
+	private static final Class[] ELEMENT_CONSTRUCTOR_PARAM = { Widget.class,
+			CSSEngine.class };
 
 	/**
 	 * Return the w3c Element linked to the SWT widget.
-	 *
+	 * 
 	 * @param widget
 	 * @return
 	 */
 	public static Element getElement(Widget widget, CSSEngine engine,
-			Class<?> classElement) throws NoSuchMethodException,
+			Class classElement) throws NoSuchMethodException,
 			InvocationTargetException, InstantiationException,
 			IllegalAccessException {
-		Constructor<?> constructor = classElement
+		Constructor constructor = classElement
 				.getConstructor(ELEMENT_CONSTRUCTOR_PARAM);
 		Object[] o = { widget, engine };
 		Element newElement = (Element) constructor.newInstance(o);
@@ -51,7 +52,7 @@ public class SWTElementHelpers {
 
 	/**
 	 * Return the w3c Element linked to the SWT widget.
-	 *
+	 * 
 	 * @param widget
 	 * @return
 	 */
@@ -65,7 +66,7 @@ public class SWTElementHelpers {
 
 	/**
 	 * Return the w3c Element linked to the SWT widget.
-	 *
+	 * 
 	 * @param widget
 	 * @return
 	 */
@@ -80,7 +81,7 @@ public class SWTElementHelpers {
 	/**
 	 * Return the SWT Control which is wrapped to the object
 	 * <code>element</code>.
-	 *
+	 * 
 	 * @param element
 	 * @return
 	 */
@@ -91,9 +92,8 @@ public class SWTElementHelpers {
 			if (element instanceof CSSStylableElement) {
 				CSSStylableElement elt = (CSSStylableElement) element;
 				Object widget = elt.getNativeWidget();
-				if (widget instanceof Control) {
+				if (widget instanceof Control)
 					return (Control) widget;
-				}
 			}
 		}
 		return null;
@@ -101,7 +101,7 @@ public class SWTElementHelpers {
 
 	/**
 	 * Return the SWT Widget which is wrapped to the object <code>element</code>.
-	 *
+	 * 
 	 * @param element
 	 * @return
 	 */
@@ -112,9 +112,8 @@ public class SWTElementHelpers {
 			if (element instanceof CSSStylableElement) {
 				CSSStylableElement elt = (CSSStylableElement) element;
 				Object widget = elt.getNativeWidget();
-				if (widget instanceof Widget) {
+				if (widget instanceof Widget)
 					return (Widget) widget;
-				}
 			}
 		}
 		return null;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2012 IBM Corporation and others.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -44,15 +44,13 @@ public class CommandElement extends QuickAccessElement {
 		this.command = command;
 	}
 
-	@Override
 	public void execute() {
 		Object o = getProvider();
 		if (o instanceof CommandProvider) {
 			CommandProvider provider = (CommandProvider) o;
 			if (provider.getHandlerService() != null && provider.getContextSnapshot() != null) {
 				try {
-					provider.getHandlerService().executeCommandInContext(command, null,
-							provider.getContextSnapshot());
+					provider.getHandlerService().executeCommand(command, null);
 				} catch (Exception ex) {
 					StatusUtil.handleStatus(ex, StatusManager.SHOW
 							| StatusManager.LOG);
@@ -76,12 +74,10 @@ public class CommandElement extends QuickAccessElement {
 		}
 	}
 
-	@Override
 	public String getId() {
 		return id;
 	}
 
-	@Override
 	public ImageDescriptor getImageDescriptor() {
 		return null;
 	}
@@ -109,7 +105,6 @@ public class CommandElement extends QuickAccessElement {
 		return label.toString();
 	}
 
-	@Override
 	public String getLabel() {
 		String command = getCommand();
 		String binding = getBinding();
@@ -138,16 +133,6 @@ public class CommandElement extends QuickAccessElement {
 		return null;
 	}
 
-	@Override
-	public String getSortLabel() {
-		try {
-			return command.getName();
-		} catch (NotDefinedException e) {
-			return command.toString();
-		}
-	}
-
-	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -155,7 +140,6 @@ public class CommandElement extends QuickAccessElement {
 		return result;
 	}
 
-	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;

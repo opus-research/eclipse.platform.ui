@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2011 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -83,7 +83,6 @@ public class EvaluationServiceTest extends UITestCase {
 		 * 
 		 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
 		 */
-		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			count++;
 			if (event.getProperty() == IEvaluationService.RESULT
@@ -238,8 +237,7 @@ public class EvaluationServiceTest extends UITestCase {
 		}
 	}
 
-	// TODO fix testRestriction
-	public void TODOtestRestriction() {
+	public void testRestriction() {
 		IWorkbenchWindow window = openTestWindow();
 		IEvaluationService evaluationService = (IEvaluationService) window
 				.getService(IEvaluationService.class);
@@ -256,7 +254,6 @@ public class EvaluationServiceTest extends UITestCase {
 
 		IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
 
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getProperty().equals("foo"))
 					propertyChanged[0] = true;
@@ -269,7 +266,6 @@ public class EvaluationServiceTest extends UITestCase {
 
 		IPropertyChangeListener propertyShouldChangeListener = new IPropertyChangeListener() {
 
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getProperty().equals("foo"))
 					propertyShouldChange[0] = true;
@@ -316,8 +312,7 @@ public class EvaluationServiceTest extends UITestCase {
 		assertTrue(propertyShouldChange[0]);
 	}
 
-	// TODO fix testScopedService
-	public void TODOtestScopedService() throws Exception {
+	public void testScopedService() throws Exception {
 		IWorkbenchWindow window = openTestWindow();
 		IEvaluationService service = (IEvaluationService) window
 				.getService(IEvaluationService.class);
@@ -369,12 +364,10 @@ public class EvaluationServiceTest extends UITestCase {
 		 * 
 		 * @see org.eclipse.core.expressions.Expression#collectExpressionInfo(org.eclipse.core.expressions.ExpressionInfo)
 		 */
-		@Override
 		public void collectExpressionInfo(ExpressionInfo info) {
 			info.addVariableNameAccess("username");
 		}
 
-		@Override
 		public EvaluationResult evaluate(IEvaluationContext context)
 				throws CoreException {
 			String variable = (String) context.getVariable("username");
@@ -541,7 +534,6 @@ public class EvaluationServiceTest extends UITestCase {
 		 * org.eclipse.core.expressions.Expression#collectExpressionInfo(org
 		 * .eclipse.core.expressions.ExpressionInfo)
 		 */
-		@Override
 		public void collectExpressionInfo(ExpressionInfo info) {
 			info.addVariableNameAccess(ISources.ACTIVE_PART_ID_NAME);
 			info.addVariableNameAccess(ISources.ACTIVE_CURRENT_SELECTION_NAME);
@@ -554,7 +546,6 @@ public class EvaluationServiceTest extends UITestCase {
 		 * org.eclipse.core.expressions.Expression#evaluate(org.eclipse.core
 		 * .expressions.IEvaluationContext)
 		 */
-		@Override
 		public EvaluationResult evaluate(IEvaluationContext context){
 			Object v = context.getVariable(ISources.ACTIVE_PART_ID_NAME);
 			return EvaluationResult.valueOf(partId.equals(v));
@@ -592,7 +583,6 @@ public class EvaluationServiceTest extends UITestCase {
 
 		final ArrayList selection = new ArrayList();
 		IPropertyChangeListener listener = new IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				IEvaluationContext state = service.getCurrentState();
 				try {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2012 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,11 +36,9 @@ public class ContributedServiceTest extends UITestCase {
 	public static TestSuite suite() {
 		TestSuite ts = new TestSuite();
 		ts.addTest(new ContributedServiceTest("testGlobalService"));
-		// TODO ts.addTest(new ContributedServiceTest("testWindowService"));
-		// TODO ts.addTest(new
-		// ContributedServiceTest("testLocalServiceCreated"));
-		// TODO ts.addTest(new
-		// ContributedServiceTest("testLocalDialogService"));
+		ts.addTest(new ContributedServiceTest("testWindowService"));
+		ts.addTest(new ContributedServiceTest("testLocalServiceCreated"));
+		ts.addTest(new ContributedServiceTest("testLocalDialogService"));
 		ts.addTest(new ContributedServiceTest("testWorkbenchServiceFactory"));
 		return ts;
 	}
@@ -100,12 +98,10 @@ public class ContributedServiceTest extends UITestCase {
 			level = l;
 		}
 
-		@Override
 		public Object create(Class serviceInterface,
 				IServiceLocator parentLocator, IServiceLocator locator) {
 			return new ILevelService() {
 
-				@Override
 				public int getLevel() {
 					return level;
 				}
@@ -123,7 +119,6 @@ public class ContributedServiceTest extends UITestCase {
 				.getService(IServiceLocatorCreator.class);
 		IServiceLocator locator = lc.createServiceLocator(parent, null,
 				new IDisposable() {
-					@Override
 					public void dispose() {
 					}
 				});
@@ -140,7 +135,6 @@ public class ContributedServiceTest extends UITestCase {
 		}
 
 		locator = lc.createServiceLocator(parent, null, new IDisposable() {
-			@Override
 			public void dispose() {
 			}
 		});
@@ -155,7 +149,6 @@ public class ContributedServiceTest extends UITestCase {
 
 		locator = lc.createServiceLocator(parent, new TempLevelFactory(8),
 				new IDisposable() {
-					@Override
 					public void dispose() {
 					}
 				});
@@ -175,7 +168,6 @@ public class ContributedServiceTest extends UITestCase {
 				.getService(IServiceLocatorCreator.class);
 		IServiceLocator locator = lc.createServiceLocator(parent,
 				new AbstractServiceFactory() {
-					@Override
 					public Object create(Class serviceInterface,
 							IServiceLocator parentLocator,
 							IServiceLocator locator) {
@@ -191,7 +183,6 @@ public class ContributedServiceTest extends UITestCase {
 						return null;
 					}
 				}, new IDisposable() {
-					@Override
 					public void dispose() {
 					}
 				});

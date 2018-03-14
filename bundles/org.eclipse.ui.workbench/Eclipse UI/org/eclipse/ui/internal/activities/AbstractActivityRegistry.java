@@ -35,8 +35,7 @@ public abstract class AbstractActivityRegistry implements IActivityRegistry {
     protected AbstractActivityRegistry() {
     }
 
-    @Override
-	public void addActivityRegistryListener(
+    public void addActivityRegistryListener(
             IActivityRegistryListener activityRegistryListener) {
         if (activityRegistryListener == null) {
 			throw new NullPointerException();
@@ -64,33 +63,27 @@ public abstract class AbstractActivityRegistry implements IActivityRegistry {
         }
     }
 
-    @Override
-	public List getActivityRequirementBindingDefinitions() {
+    public List getActivityRequirementBindingDefinitions() {
         return activityRequirementBindingDefinitions;
     }
 
-    @Override
-	public List getActivityDefinitions() {
+    public List getActivityDefinitions() {
         return activityDefinitions;
     }
 
-    @Override
-	public List getActivityPatternBindingDefinitions() {
+    public List getActivityPatternBindingDefinitions() {
         return activityPatternBindingDefinitions;
     }
 
-    @Override
-	public List getCategoryActivityBindingDefinitions() {
+    public List getCategoryActivityBindingDefinitions() {
         return categoryActivityBindingDefinitions;
     }
 
-    @Override
-	public List getCategoryDefinitions() {
+    public List getCategoryDefinitions() {
         return categoryDefinitions;
     }
 
-    @Override
-	public void removeActivityRegistryListener(
+    public void removeActivityRegistryListener(
             IActivityRegistryListener activityRegistryListener) {
         if (activityRegistryListener == null) {
 			throw new NullPointerException();
@@ -101,8 +94,7 @@ public abstract class AbstractActivityRegistry implements IActivityRegistry {
 		}
     }
 
-    @Override
-	public List getDefaultEnabledActivities() {
+    public List getDefaultEnabledActivities() {
         return defaultEnabledActivities;
     }
 }
