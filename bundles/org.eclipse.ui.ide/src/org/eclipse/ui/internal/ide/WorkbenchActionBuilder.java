@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Andreas Buchen <andreas.buchen@sap.com> - Bug 206584
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810, 440975
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -68,6 +67,7 @@ import org.eclipse.ui.internal.ide.actions.RetargetActionWithDefault;
 import org.eclipse.ui.internal.provisional.application.IActionBarConfigurer2;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
+import org.eclipse.ui.menus.IMenuService;
 
 /**
  * Adds actions to a workbench window.
@@ -228,6 +228,12 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
     private boolean isDisposed = false;
 
     /**
+     * The coolbar context menu manager.
+     * @since 3.3
+     */
+	private MenuManager coolbarPopupMenuManager;
+
+    /**
      * Constructs a new action builder which contributes actions
      * to the given window.
      * 
@@ -341,6 +347,14 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
     protected void fillCoolBar(ICoolBarManager coolBar) {
 
     	IActionBarConfigurer2 actionBarConfigurer = (IActionBarConfigurer2) getActionBarConfigurer();
+        { // Set up the context Menu
+            coolbarPopupMenuManager = new MenuManager();
+			coolbarPopupMenuManager.add(new ActionContributionItem(lockToolBarAction));
+            coolbarPopupMenuManager.add(new ActionContributionItem(editActionSetAction));
+            coolBar.setContextMenuManager(coolbarPopupMenuManager);
+            IMenuService menuService = (IMenuService) window.getService(IMenuService.class);
+            menuService.populateContributionManager(coolbarPopupMenuManager, "popup:windowCoolbarContextMenu"); //$NON-NLS-1$
+        }
         coolBar.add(new GroupMarker(IIDEActionConstants.GROUP_FILE));
         { // File Group
             IToolBarManager fileToolBar = actionBarConfigurer.createToolBarManager();
@@ -772,8 +786,11 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
 			return;
 		}
     	isDisposed = true;
-
-    	getActionBarConfigurer().getStatusLineManager().remove(statusLineItem);
+    	IMenuService menuService = (IMenuService) window.getService(IMenuService.class);
+        menuService.releaseContributions(coolbarPopupMenuManager);
+        coolbarPopupMenuManager.dispose();
+        
+        getActionBarConfigurer().getStatusLineManager().remove(statusLineItem);
         if (pageListener != null) {
             window.removePageListener(pageListener);
             pageListener = null;
@@ -1306,8 +1323,8 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
             }
 
 			private void updateCommandEnablement(String commandId) {
-				IHandlerService handlerService = window.getService(IHandlerService.class);
-				ICommandService commandService = window.getService(ICommandService.class);
+				IHandlerService handlerService = (IHandlerService) window.getService(IHandlerService.class);
+				ICommandService commandService = (ICommandService) window.getService(ICommandService.class);
 				if (handlerService != null && commandService != null) {
 					Command buildAllCmd = commandService.getCommand(commandId);
 					buildAllCmd.setEnabled(handlerService.getCurrentState());
@@ -1518,7 +1535,7 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
 		ISharedImages sharedImages = getWindow().getWorkbench()
 				.getSharedImages();
 
-		IActionCommandMappingService acms = getWindow()
+		IActionCommandMappingService acms = (IActionCommandMappingService) getWindow()
 				.getService(IActionCommandMappingService.class);
 		acms.map(actionId, commandId);
 

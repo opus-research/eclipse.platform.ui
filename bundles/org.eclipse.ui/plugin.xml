@@ -733,13 +733,13 @@
          </parameter>
       </key>
       <key
-            locale="ja"
+            locale="jp"
             contextId="org.eclipse.ui.contexts.window"
             sequence="M1+_"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
       </key>
       <key
-      		locale="ja"
+      		locale="jp"
             commandId="org.eclipse.ui.window.splitEditor"
             contextId="org.eclipse.ui.contexts.window"
             sequence="M1+M2+-"
