@@ -28,8 +28,8 @@ import org.eclipse.core.resources.IResourceStatus;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -307,7 +307,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 			// already
 			if (!folderHandle.exists()) {
 				if (linkTargetPath != null) {
-					folderHandle.createLink(linkTargetPath, IResource.ALLOW_MISSING_LOCAL, subMonitor.newChild(100));
+					folderHandle.createLink(linkTargetPath, IResource.ALLOW_MISSING_LOCAL, subMonitor.split(100));
 				} else {
 					IPath path = folderHandle.getFullPath();
 					IWorkspaceRoot root = ResourcesPlugin.getWorkspace()
@@ -317,7 +317,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 							&& !root.getFolder(path.removeLastSegments(1))
 									.exists()) {
 
-						SubMonitor loopProgress = subMonitor.newChild(90).setWorkRemaining(numSegments - 3);
+						SubMonitor loopProgress = subMonitor.split(90).setWorkRemaining(numSegments - 3);
 						// If the direct parent of the path doesn't exist, try
 						// to create the
 						// necessary directories.
@@ -325,26 +325,22 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 							IFolder folder = root.getFolder(path
 									.removeLastSegments(i));
 							if (!folder.exists()) {
-								folder.create(false, true, loopProgress.newChild(1));
+								folder.create(false, true, loopProgress.split(1));
 							}
 						}
 					}
 					subMonitor.setWorkRemaining(10);
-					folderHandle.create(false, true, subMonitor.newChild(10));
+					folderHandle.create(false, true, subMonitor.split(10));
 				}
 			}
 		} catch (CoreException e) {
 			// If the folder already existed locally, just refresh to get
 			// contents
 			if (e.getStatus().getCode() == IResourceStatus.PATH_OCCUPIED) {
-				folderHandle.refreshLocal(IResource.DEPTH_INFINITE, subMonitor.setWorkRemaining(1).newChild(1));
+				folderHandle.refreshLocal(IResource.DEPTH_INFINITE, subMonitor.setWorkRemaining(1).split(1));
 			} else {
 				throw e;
 			}
-		}
-
-		if (subMonitor.isCanceled()) {
-			throw new OperationCanceledException();
 		}
 	}
 
@@ -694,12 +690,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 		Iterator it = currentSelection.iterator();
 		if (it.hasNext()) {
 			Object next = it.next();
-			IResource selectedResource = null;
-			if (next instanceof IResource) {
-				selectedResource = (IResource) next;
-			} else if (next instanceof IAdaptable) {
-				selectedResource = ((IAdaptable) next).getAdapter(IResource.class);
-			}
+			IResource selectedResource = Adapters.adapt(next, IResource.class);
 			if (selectedResource != null) {
 				if (selectedResource.getType() == IResource.FILE) {
 					selectedResource = selectedResource.getParent();

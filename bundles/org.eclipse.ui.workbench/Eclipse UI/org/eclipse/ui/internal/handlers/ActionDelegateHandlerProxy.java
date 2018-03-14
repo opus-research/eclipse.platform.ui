@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2012 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -713,6 +713,8 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 				final String className = element
 						.getAttribute(delegateAttributeName);
 				buffer.append(className);
+				final String namespaceId = element.getNamespaceIdentifier();
+				buffer.append(" in ").append(namespaceId); //$NON-NLS-1$
 			} catch (InvalidRegistryObjectException e) {
 				buffer.append(actionId);
 			}
