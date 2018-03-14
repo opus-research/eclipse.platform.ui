@@ -37,6 +37,12 @@
         <value>remoteURI</value>
       </detail>
     </annotation>
+    <configSections
+        name="gerrit">
+      <properties
+          key="createchangeid"
+          value="true"/>
+    </configSections>
     <description>Platform UI</description>
   </setupTask>
   <setupTask
@@ -139,7 +145,7 @@
     <setupTask
         xsi:type="setup:VariableTask"
         name="eclipse.target.platform"
-        value="Neon"
+        value="Oxygen"
         storageURI="scope://Workspace"/>
   </stream>
   <logicalProjectContainer

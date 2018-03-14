@@ -357,38 +357,6 @@
    </extension>
 
    <extension
-         point="org.eclipse.ui.actionSets">
-      <actionSet
-            id="org.eclipse.ui.ide.quickaccess.actionset"
-            label="%openQuickAccessActionSet.label"
-            visible="true">
-            <!-- see http://bugs.eclipse.org/bugs/show_bug.cgi?id=15684    -->
-<!-- Note: The menu (re-) definition has to be here due to bug 15684-->
-<!-- =================================================================== -->
-<!-- Search Menu                                                         -->
-<!-- =================================================================== -->
-          <menu
-               label="%searchMenu.label"
-               path="navigate"
-               id="org.eclipse.search.menu">
-				<groupMarker name="internalDialogGroup"/>   <!-- not to be used by clients  -->
-				<groupMarker name="dialogGroup"/>           <!-- to be used by clients      -->
-				<separator name="fileSearchContextMenuActionsGroup"/> <!-- to be used by clients      -->
-	         	<separator name="contextMenuActionsGroup"/> <!-- to be used by clients -->
-	         	<separator name="occurencesActionsGroup"/> <!-- to be used by clients -->
-	         	<separator name="extraSearchGroup"/> <!-- to be used by clients -->
-         </menu>
-          <action
-               class="org.eclipse.ui.internal.quickaccess.TriggerQuickAccessAction"
-               id="org.eclipse.ui.ide.search.openQuickAccess"
-               label="%openQuickAccess.label"
-               menubarPath="org.eclipse.search.menu/extraSearchGroup"
-               tooltip="%openQuickAccess.description">
-         </action>
-      </actionSet>
-   </extension>
-
-   <extension
          point="org.eclipse.ui.decorators">
       <decorator
             lightweight="true"
@@ -577,6 +545,9 @@
       <keyword
             id="org.eclipse.ui.ide.unassociated"
             label="%PreferenceKeywords.unassociated"/>
+      <keyword
+            id="org.eclipse.ui.ide.save"
+            label="%PreferenceKeywords.Save"/>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
@@ -608,6 +579,15 @@
          <keywordReference id="org.eclipse.ui.ide.recentlyOpened"/>
          <keywordReference id="org.eclipse.ui.ide.restore"/>
          <keywordReference id="org.eclipse.ui.ide.state"/>
+      </page>
+      <page
+            name="%PreferencePages.AutoSave"
+            category="org.eclipse.ui.preferencePages.Editors"
+            class="org.eclipse.ui.internal.ide.dialogs.AutoSavePreferencePage"
+            id="org.eclipse.ui.preferencePages.AutoSave">
+         <keywordReference id="org.eclipse.ui.ide.editors"/>
+         <keywordReference id="org.eclipse.ui.ide.dirty"/>
+         <keywordReference id="org.eclipse.ui.ide.save"/>
       </page>
       <page
             name="%PreferencePages.Perspectives"
@@ -1197,6 +1177,20 @@
             contextId="org.eclipse.ui.contexts.dialogAndWindow"
             sequence="M2+M3+F3"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration" />
+      <key
+            commandId="org.eclipse.ui.window.fullscreenmode"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="win32"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M3+F11">
+      </key>
+      <key
+            commandId="org.eclipse.ui.window.fullscreenmode"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="gtk"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M3+F11">
+      </key>
    </extension>
 
    <extension
@@ -1723,6 +1717,22 @@
                   commandId="org.eclipse.ui.ToggleCoolbarAction"
                   style="push"
                   tooltip="%menu.toggleCoolbar.tooltip">
+            </command>
+            <command
+                  commandId="org.eclipse.ui.window.fullscreenmode"
+                  style="push">
+            </command>
+            <separator
+                  name="org.eclipse.ui.window.appearance.separator1"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="org.eclipse.ui.window.maximizePart"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.eclipse.ui.window.minimizePart"
+                  style="push">
             </command>
          </menu>
       </menuContribution>
@@ -2480,7 +2490,14 @@
             label="%askUserViaPopup">
       </strategy>
    </extension>
-
+   <extension
+         id="org.eclipse.ui.ide.autoSave"
+         point="org.eclipse.e4.workbench.model">
+      <fragment
+            apply="notexists"
+            uri="model/fragment.e4xmi">
+      </fragment>
+   </extension>
    <!-- Smart Import -->
    <extension
          point="org.eclipse.ui.menus">
@@ -2490,6 +2507,7 @@
          <command
                commandId="org.eclipse.e4.ui.importer.openDirectory"
                id="org.eclipse.e4.ui.importer.openDirectory.menu"
+               mnemonic="%importProjectsFromFolder_mnemonic"
                style="push">
          </command>
       </menuContribution>
@@ -2499,6 +2517,7 @@
          <command
                commandId="org.eclipse.e4.ui.importer.configureProject"
                id="org.eclipse.e4.ui.importer.configureProject.popupMenu"
+               mnemonic="%configureProject_mnemonic"
                style="push">
                <visibleWhen>
 				<with variable="selection">
@@ -2515,11 +2534,11 @@
          point="org.eclipse.ui.commands">
       <command
             id="org.eclipse.e4.ui.importer.openDirectory"
-            name="%importProjectsFromFolder_menu">
+            name="%importProjectsFromFolder_command">
       </command>
       <command
             id="org.eclipse.e4.ui.importer.configureProject"
-            name="%configureProject_contextMenu">
+            name="%configureProject_command">
       </command>
    </extension>
    <extension
