@@ -1497,10 +1497,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 				PlatformAdmin admin = WorkbenchSWTActivator.getDefault()
 						.getPlatformAdmin();
 
-				if (admin == null) {
-					return prefs;
-				}
-
 				State state = admin.getState(false);
 				BundleDescription[] bundles = state.getBundles();
 
