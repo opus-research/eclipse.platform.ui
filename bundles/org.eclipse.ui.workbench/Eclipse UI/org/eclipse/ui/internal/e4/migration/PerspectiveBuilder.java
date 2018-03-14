@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2016 IBM Corporation and others.
+ * Copyright (c) 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -39,7 +38,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.IWorkbenchConstants;
 import org.eclipse.ui.internal.PerspectiveTagger;
 import org.eclipse.ui.internal.e4.compatibility.ModeledPageLayout;
 import org.eclipse.ui.internal.e4.compatibility.ModeledPageLayoutUtils;
@@ -57,8 +55,6 @@ public class PerspectiveBuilder {
 
 	static final String BASE_PERSPECTIVE_ID = "basePerspectiveId"; //$NON-NLS-1$
 
-	private static final String DEFAULT_FASTVIEW_STACK = "defaultFastViewStack"; //$NON-NLS-1$
-
 	private static final String ID_EDITOR_AREA = IPageLayout.ID_EDITOR_AREA;
 
 	@Inject
@@ -73,8 +69,6 @@ public class PerspectiveBuilder {
 
 	private List<String> renderedViews;
 
-	private List<String> defaultFastViews;
-
 	private Map<String, MPlaceholder> viewPlaceholders = new HashMap<>();
 
 	private Map<String, ViewLayoutReader> viewLayouts;
@@ -82,8 +76,6 @@ public class PerspectiveBuilder {
 	private MPlaceholder editorAreaPlaceholder;
 
 	private ModeledPageLayoutUtils layoutUtils;
-
-	private Integer defaultFastViewSide;
 
 	@PostConstruct
 	private void postConstruct() {
@@ -95,11 +87,6 @@ public class PerspectiveBuilder {
 		tags = perspective.getTags();
 		populate();
 		return perspective;
-	}
-
-	public MPerspective createPerspective(Integer defaultFastViewSide) {
-		this.defaultFastViewSide = defaultFastViewSide;
-		return createPerspective();
 	}
 
 	private void create() {
@@ -131,7 +118,6 @@ public class PerspectiveBuilder {
 			}
 		}
 
-		addDefaultFastViewStack();
 		setZoomState();
 		addDetachedWindows();
 		hideEmptyStacks();
@@ -145,13 +131,12 @@ public class PerspectiveBuilder {
 
 	private void processStandaloneViews() {
 		Map<String, ViewLayoutReader> viewLayouts = perspReader.getViewLayouts();
-		for (Entry<String, ViewLayoutReader> entry : viewLayouts.entrySet()) {
-			String viewId = entry.getKey();
+		for (String viewId : viewLayouts.keySet()) {
 			MPlaceholder placeholder = viewPlaceholders.get(viewId);
 			if (placeholder == null) {
 				continue;
 			}
-			if (entry.getValue().isStandalone()) {
+			if (viewLayouts.get(viewId).isStandalone()) {
 				MElementContainer<MUIElement> parent = placeholder.getParent();
 				placeholder.setContainerData(parent.getContainerData());
 				parent.getChildren().remove(placeholder);
@@ -180,7 +165,7 @@ public class PerspectiveBuilder {
 
 	private void addTrimBars() {
 		Map<String, Integer> fastViewBars = perspReader.getFastViewBars();
-		if (fastViewBars.size() == 0 && defaultFastViews.size() == 0) {
+		if (fastViewBars.size() == 0) {
 			return;
 		}
 
@@ -190,61 +175,37 @@ public class PerspectiveBuilder {
 		int leftCounter = 0;
 		StringBuilder sb = new StringBuilder();
 
-		if (defaultFastViews.size() > 0) {
-			sb.append(DEFAULT_FASTVIEW_STACK).append(' ');
-			if (defaultFastViewSide != null) {
-				switch (defaultFastViewSide) {
-				case SWT.TOP:
-					sb.append(SideValue.TOP_VALUE).append(' ').append(topCounter++);
-					break;
-				case SWT.BOTTOM:
-					sb.append(SideValue.BOTTOM_VALUE).append(' ').append(bottomCounter++);
-					break;
-				case SWT.RIGHT:
-					sb.append(SideValue.RIGHT_VALUE).append(' ').append(rightCounter++);
-					break;
-				default:
-					sb.append(SideValue.LEFT_VALUE).append(' ').append(leftCounter++);
-					break;
-				}
-			} else {
-				sb.append(SideValue.BOTTOM_VALUE).append(' ').append(bottomCounter++);
+		for (InfoReader folder : perspReader.getInfos()) {
+			String folderId = folder.getId();
+			if (!fastViewBars.containsKey(folderId)) {
+				continue;
 			}
+
+			sb.append(folderId).append(' ');
+
+			Integer side = fastViewBars.get(folderId);
+			if (side == null) {
+				side = SWT.LEFT;
+			}
+
+			switch (side) {
+			case SWT.TOP:
+				sb.append(SideValue.TOP_VALUE).append(' ').append(topCounter++);
+				break;
+			case SWT.BOTTOM:
+				sb.append(SideValue.BOTTOM_VALUE).append(' ').append(bottomCounter++);
+				break;
+			case SWT.RIGHT:
+				sb.append(SideValue.RIGHT_VALUE).append(' ').append(rightCounter++);
+				break;
+			default:
+				sb.append(SideValue.LEFT_VALUE).append(' ').append(leftCounter++);
+				break;
+			}
+
 			sb.append('#');
 		}
 
-		if (fastViewBars.size() > 0) {
-			for (InfoReader folder : perspReader.getInfos()) {
-				String folderId = folder.getId();
-				if (!fastViewBars.containsKey(folderId)) {
-					continue;
-				}
-
-				sb.append(folderId).append(' ');
-
-				Integer side = fastViewBars.get(folderId);
-				if (side == null) {
-					side = SWT.LEFT;
-				}
-
-				switch (side) {
-				case SWT.TOP:
-					sb.append(SideValue.TOP_VALUE).append(' ').append(topCounter++);
-					break;
-				case SWT.BOTTOM:
-					sb.append(SideValue.BOTTOM_VALUE).append(' ').append(bottomCounter++);
-					break;
-				case SWT.RIGHT:
-					sb.append(SideValue.RIGHT_VALUE).append(' ').append(rightCounter++);
-					break;
-				default:
-					sb.append(SideValue.LEFT_VALUE).append(' ').append(leftCounter++);
-					break;
-				}
-
-				sb.append('#');
-			}
-		}
 		perspective.getPersistedState().put("trims", sb.toString()); //$NON-NLS-1$
 	}
 
@@ -416,34 +377,6 @@ public class PerspectiveBuilder {
 		return stack;
 	}
 
-	private MPartStack addDefaultFastViewStack() {
-		MPartStack stack = null;
-		List<String> views = perspReader.getDefaultFastViewBarViewIds();
-		if (views.size() > 0) {
-			stack = layoutUtils.createStack(DEFAULT_FASTVIEW_STACK, true);
-			MPartSashContainer psc = modelService.createModelElement(MPartSashContainer.class);
-			psc.setHorizontal(true);
-			psc.setContainerData(Integer.toString(5000));
-			stack.setContainerData(Integer.toString(2500));
-			psc.getChildren().add(stack);
-			List<MPartSashContainer> list = modelService.findElements(perspective, null, MPartSashContainer.class,
-					null);
-			if (list == null || list.size() == 0) {
-				perspective.getChildren().add(psc);
-			} else {
-				int size = list.size();
-				MPartSashContainer container = list.get(size - 1);
-				container.getChildren().add(psc);
-			}
-			setPartState(stack, org.eclipse.ui.internal.e4.migration.InfoReader.PartState.MINIMIZED);
-
-			for (String view : views) {
-				addPlaceholderToDefaultFastViewStack(stack, view, null);
-			}
-		}
-		return stack;
-	}
-
 	private void setPartState(MUIElement element, PartState state) {
 		List<String> tags = element.getTags();
 		switch (state) {
@@ -479,7 +412,7 @@ public class PerspectiveBuilder {
 
 	private void populatePartStack(MPartStack stack, InfoReader info) {
 		for (PageReader page : info.getPages()) {
-			addPlaceholderToStack(stack, page.getId(), page.getLabel());
+			addPlaceholderToStack(stack, page.getId());
 		}
 		MStackElement selectedElement = (MStackElement) modelService.find(info.getActivePageId(), stack);
 		if (selectedElement != null) {
@@ -521,27 +454,15 @@ public class PerspectiveBuilder {
 
 	private void populatePartStack(MPartStack stack, DetachedWindowReader info) {
 		for (PageReader page : info.getPages()) {
-			addPlaceholderToStack(stack, page.getId(), page.getLabel());
+			addPlaceholderToStack(stack, page.getId());
 		}
 		stack.setSelectedElement((MStackElement) modelService.find(info.getActivePageId(), stack));
 	}
 
-	private void addPlaceholderToStack(MPartStack stack, String partId, String label) {
-		if (partId == null || isDefaultFastView(partId)) {
-			return;
-		}
-		MPlaceholder placeholder = createPlaceHolder(partId, label);
+	private void addPlaceholderToStack(MPartStack stack, String partId) {
+		MPlaceholder placeholder = modelService.createModelElement(MPlaceholder.class);
+		placeholder.setElementId(partId);
 		if (!isToBeRendered(placeholder)) {
-			placeholder.setToBeRendered(false);
-		}
-		addLayoutTagsToPlaceholder(placeholder, partId);
-		stack.getChildren().add(placeholder);
-		viewPlaceholders.put(partId, placeholder);
-	}
-
-	private void addPlaceholderToDefaultFastViewStack(MPartStack stack, String partId, String label) {
-		MPlaceholder placeholder = createPlaceHolder(partId, label);
-		if (!isDefaultFastView(placeholder)) {
 			placeholder.setToBeRendered(false);
 		}
 		addLayoutTagsToPlaceholder(placeholder, partId);
@@ -568,20 +489,6 @@ public class PerspectiveBuilder {
 			renderedViews = perspReader.getRenderedViewIds();
 		}
 		return renderedViews.contains(placeholder.getElementId());
-	}
-
-	private boolean isDefaultFastView(MPlaceholder placeholder) {
-		if (defaultFastViews == null) {
-			defaultFastViews = perspReader.getDefaultFastViewBarViewIds();
-		}
-		return defaultFastViews.contains(placeholder.getElementId());
-	}
-
-	private boolean isDefaultFastView(String placeholderId) {
-		if (defaultFastViews == null) {
-			defaultFastViews = perspReader.getDefaultFastViewBarViewIds();
-		}
-		return defaultFastViews.contains(placeholderId);
 	}
 
 	private void addPerspectiveShortcutTags() {
@@ -705,16 +612,6 @@ public class PerspectiveBuilder {
 
 	MPlaceholder getEditorAreaPlaceholder() {
 		return editorAreaPlaceholder;
-	}
-
-	MPlaceholder createPlaceHolder(String str, String label) {
-		MPlaceholder placeholder = null;
-		placeholder = modelService.createModelElement(MPlaceholder.class);
-		placeholder.setElementId(str);
-		if (modelService.getPartDescriptor(str) == null) {
-			placeholder.getTransientData().put(IWorkbenchConstants.TAG_LABEL, label);
-		}
-		return placeholder;
 	}
 
 }

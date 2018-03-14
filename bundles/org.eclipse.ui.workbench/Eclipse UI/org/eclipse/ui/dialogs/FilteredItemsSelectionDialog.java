@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,6 @@
  *     - Fix for bug 208602 - [Dialogs] Open Type dialog needs accessible labels
  *  Simon Muschel <smuschel@gmx.de> - bug 258493
  *  Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
- *  Patrik Suzzi <psuzzi@gmail.com> - Bug 485133
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -133,7 +132,8 @@ import org.eclipse.ui.statushandlers.StatusManager;
  *
  * @since 3.3
  */
-public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog {
+public abstract class FilteredItemsSelectionDialog extends
+		SelectionStatusDialog {
 
 	private static final String DIALOG_BOUNDS_SETTINGS = "DialogBoundsSettings"; //$NON-NLS-1$
 
@@ -592,7 +592,7 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
      * @since 3.5
      */
 	protected void fillContextMenu(IMenuManager menuManager) {
-		List selectedElements = list.getStructuredSelection().toList();
+		List selectedElements= ((StructuredSelection)list.getSelection()).toList();
 
 		Object item= null;
 
@@ -789,9 +789,7 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 		details = new DetailsContentViewer(content, SWT.BORDER | SWT.FLAT);
 		details.setVisible(toggleStatusLineAction.isChecked());
-		details.setContentProvider(new IContentProvider() {
-			// intentionally empty
-		});
+		details.setContentProvider(new NullContentProvider());
 		details.setLabelProvider(getDetailsLabelProvider());
 
 		applyDialogFont(content);
@@ -848,7 +846,7 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 					.setInput(NLS
 							.bind(
 									WorkbenchMessages.FilteredItemsSelectionDialog_nItemsSelected,
-									Integer.valueOf(selection.size())));
+									new Integer(selection.size())));
 			break;
 		}
 
@@ -1927,7 +1925,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 							WorkbenchMessages.FilteredItemsSelectionDialog_taskProgressMessage,
 							new Object[] {
 									message,
-									Integer.valueOf((int) ((worked * 100) / totalWork)) });
+									new Integer(
+											(int) ((worked * 100) / totalWork)) });
 
 		}
 
@@ -2955,6 +2954,21 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 			// currently filters are only added when dialog is restored
 			// if it is changed, refreshing the whole TableViewer should be
 			// added
+		}
+
+	}
+
+	/**
+	 * A content provider that does nothing.
+	 */
+	private class NullContentProvider implements IContentProvider {
+
+		@Override
+		public void dispose() {
+		}
+
+		@Override
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 
 	}
