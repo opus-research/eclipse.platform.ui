@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 444829
  *******************************************************************************/
 package org.eclipse.jface.databinding.conformance.util;
 
@@ -16,7 +15,6 @@ import java.util.List;
 import org.eclipse.core.databinding.observable.ChangeEvent;
 import org.eclipse.core.databinding.observable.IChangeListener;
 import org.eclipse.core.databinding.observable.IObservable;
-import org.eclipse.core.databinding.observable.IObservablesListener;
 
 /**
  * Listener for tracking the firing of ChangeEvents.
@@ -27,16 +25,15 @@ public class ChangeEventTracker implements IChangeListener {
 
 	/**
 	 * Queue that the listener will add itself too when it is notified of an
-	 * event. Used to determine order of notifications of listeners. Can be
-	 * null.
+	 * event. Used to determine order of notifications of listeners.  Can be null.
 	 */
-	public final List<IObservablesListener> queue;
+	public final List queue;
 
 	public ChangeEventTracker() {
 		queue = null;
 	}
 
-	public ChangeEventTracker(List<IObservablesListener> notificationQueue) {
+	public ChangeEventTracker(List notificationQueue) {
 		this.queue = notificationQueue;
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007-2014 Brad Reynolds and others.
+ * Copyright (c) 2007-2008 Brad Reynolds and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     Brad Reynolds - initial API and implementation
  *     Matthew Hall - bugs 215531, 221351, 213145
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 444829
  ******************************************************************************/
 
 package org.eclipse.jface.databinding.conformance;
@@ -21,7 +20,6 @@ import java.util.Set;
 
 import junit.framework.Test;
 
-import org.eclipse.core.databinding.observable.IObservablesListener;
 import org.eclipse.core.databinding.observable.set.IObservableSet;
 import org.eclipse.jface.databinding.conformance.delegate.IObservableCollectionContractDelegate;
 import org.eclipse.jface.databinding.conformance.util.ChangeEventTracker;
@@ -252,7 +250,7 @@ public class MutableObservableSetContractTest extends
 	 */
 	private void assertSetChangeEventFired(Runnable runnable,
 			String methodName, IObservableSet set) {
-		List<IObservablesListener> queue = new ArrayList<IObservablesListener>();
+		List queue = new ArrayList();
 		SetChangeEventTracker setListener = new SetChangeEventTracker(queue);
 		ChangeEventTracker changeListener = new ChangeEventTracker(queue);
 
@@ -261,16 +259,14 @@ public class MutableObservableSetContractTest extends
 
 		runnable.run();
 
-		assertEquals(
-				formatFail(methodName + " should fire one SetChangeEvent."), 1,
+		assertEquals(formatFail(methodName + " should fire one SetChangeEvent."), 1,
 				setListener.count);
 		assertEquals(formatFail(methodName
-				+ "'s change event observable should be the created Set."),
-				set, setListener.event.getObservable());
+				+ "'s change event observable should be the created Set."), set,
+				setListener.event.getObservable());
 
-		assertEquals(
-				formatFail("Two notifications should have been received."), 2,
-				queue.size());
+		assertEquals(formatFail("Two notifications should have been received."), 2, queue
+				.size());
 		assertEquals(formatFail("ChangeEvent of " + methodName
 				+ " should have fired before the SetChangeEvent."),
 				changeListener, queue.get(0));
@@ -295,8 +291,8 @@ public class MutableObservableSetContractTest extends
 		runnable.run();
 
 		Set entries = listener.event.diff.getAdditions();
-		assertEquals(formatFail(methodName
-				+ " should result in one diff entry."), 1, entries.size());
+		assertEquals(formatFail(methodName + " should result in one diff entry."), 1,
+				entries.size());
 
 		assertTrue(formatFail(methodName
 				+ " should result in a diff entry that is an addition."),
@@ -319,8 +315,8 @@ public class MutableObservableSetContractTest extends
 		runnable.run();
 
 		Set entries = listener.event.diff.getRemovals();
-		assertEquals(formatFail(methodName
-				+ " should result in one diff entry."), 1, entries.size());
+		assertEquals(formatFail(methodName + " should result in one diff entry."), 1,
+				entries.size());
 
 		assertTrue(formatFail(methodName
 				+ " should result in a diff entry that is a removal."),
@@ -328,9 +324,8 @@ public class MutableObservableSetContractTest extends
 	}
 
 	public static Test suite(IObservableCollectionContractDelegate delegate) {
-		return new SuiteBuilder()
-				.addObservableContractTest(
-						MutableObservableSetContractTest.class, delegate)
+		return new SuiteBuilder().addObservableContractTest(
+				MutableObservableSetContractTest.class, delegate)
 				.addObservableContractTest(
 						ObservableCollectionContractTest.class, delegate)
 				.build();
