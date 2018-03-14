@@ -241,7 +241,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 
         preferenceManager = null;
         if (viewRegistry != null) {
-			// nothing to dispose for viewRegistry
+            viewRegistry.dispose();
             viewRegistry = null;
         }
         if (perspRegistry != null) {
