@@ -952,7 +952,6 @@ public class WorkbenchMessages extends NLS {
     public static String ContentAssist_Cue_Description_Key;
 
 	//Settings transfer
-	public static String WorkbenchSettings_CouldNotFindLocation;
 	public static String WorkingSets_Name;
 	public static String WorkingSets_CannotSave;
 
