@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 448831
  *******************************************************************************/
 
 package org.eclipse.core.commands.common;
@@ -26,7 +25,7 @@ import java.util.Set;
  * <p>
  * Clients may extend.
  * </p>
- *
+ * 
  * @since 3.2
  */
 public abstract class HandleObjectManager extends EventManager {
@@ -47,13 +46,13 @@ public abstract class HandleObjectManager extends EventManager {
 	/**
 	 * Verifies that the identifier is valid. Exceptions will be thrown if the
 	 * identifier is invalid in some way.
-	 *
+	 * 
 	 * @param id
 	 *            The identifier to validate; may be anything.
 	 */
 	protected final void checkId(final String id) {
 		if (id == null) {
-			throw new IllegalArgumentException(
+			throw new NullPointerException(
 					"A handle object may not have a null identifier"); //$NON-NLS-1$
 		}
 
@@ -65,7 +64,7 @@ public abstract class HandleObjectManager extends EventManager {
 
 	/**
 	 * Returns the set of identifiers for those handle objects that are defined.
-	 *
+	 * 
 	 * @return The set of defined handle object identifiers; this value may be
 	 *         empty, but it is never <code>null</code>.
 	 */

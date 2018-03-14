@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.dialogs;
 
+import java.util.Iterator;
+
 import junit.framework.TestCase;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -42,14 +44,14 @@ public class UIPreferencesAuto extends TestCase {
             WorkbenchHelp.setHelp(dialog.getShell(),
                     IWorkbenchHelpContextIds.PREFERENCE_DIALOG);
 
-            for (Object element : manager.getElements(
-                    PreferenceManager.PRE_ORDER)) {
-            IPreferenceNode node = (IPreferenceNode) element;
-            if (node.getId().equals(id)) {
-			dialog.showPage(node);
-			break;
+            for (Iterator iterator = manager.getElements(
+                    PreferenceManager.PRE_ORDER).iterator(); iterator.hasNext();) {
+                IPreferenceNode node = (IPreferenceNode) iterator.next();
+                if (node.getId().equals(id)) {
+                    dialog.showPage(node);
+                    break;
+                }
             }
-         }
         }
         return dialog;
     }
@@ -96,7 +98,7 @@ public class UIPreferencesAuto extends TestCase {
          * Commented out because it generates a failure
          * of expect and actual width values. Suspect this
          * is an SWT issue.
-         *
+         * 
          Dialog dialog = getPropertyDialog("org.eclipse.ui.propertypages.info.file");
          DialogCheck.assertDialogTexts(dialog, this);
          */
@@ -107,7 +109,7 @@ public class UIPreferencesAuto extends TestCase {
          * Commented out because it generates a failure
          * of expect and actual width values. Suspect this
          * is an SWT issue.
-         *
+         * 
          Dialog dialog = getPropertyDialog("org.eclipse.ui.propertypages.project.reference");
          DialogCheck.assertDialogTexts(dialog, this);
          */
@@ -126,21 +128,21 @@ public class UIPreferencesAuto extends TestCase {
             dialog = new PreferenceDialogWrapper(getShell(), manager);
             dialog.create();
 
-            for (Object element : manager.getElements(
-                    PreferenceManager.PRE_ORDER)) {
-            IPreferenceNode node = (IPreferenceNode) element;
-            if (node
-			    .getId()
-			    .equals(
-			            "org.eclipse.ui.tests.dialogs.EnableTestPreferencePage")) {
-			dialog.showPage(node);
-			EnableTestPreferencePage page = (EnableTestPreferencePage) dialog
-			        .getPage(node);
-			page.flipState();
-			page.flipState();
-			break;
+            for (Iterator iterator = manager.getElements(
+                    PreferenceManager.PRE_ORDER).iterator(); iterator.hasNext();) {
+                IPreferenceNode node = (IPreferenceNode) iterator.next();
+                if (node
+                        .getId()
+                        .equals(
+                                "org.eclipse.ui.tests.dialogs.EnableTestPreferencePage")) {
+                    dialog.showPage(node);
+                    EnableTestPreferencePage page = (EnableTestPreferencePage) dialog
+                            .getPage(node);
+                    page.flipState();
+                    page.flipState();
+                    break;
+                }
             }
-         }
         }
 
     }

@@ -24,22 +24,21 @@ import org.eclipse.core.databinding.observable.value.ValueDiff;
  */
 public class DiffsTest extends TestCase {
 	/**
-	 * Asserts that the {@link SetDiff#toString()} implementation doesn't throw
-	 * a NPE if any of its properties are <code>null</code>.
+	 * Asserts that the {@link SetDiff#toString()} implementation doesn't throw a NPE if any of its properties are <code>null</code>.
 	 */
 	public void test_SetDiff() {
 		SetDiff diff = new SetDiff() {
 			@Override
-			public Set<?> getAdditions() {
+			public Set getAdditions() {
 				return null;
 			}
 
 			@Override
-			public Set<?> getRemovals() {
+			public Set getRemovals() {
 				return null;
 			}
 		};
-
+		
 		try {
 			diff.toString();
 			assertTrue(true);
@@ -49,8 +48,7 @@ public class DiffsTest extends TestCase {
 	}
 
 	/**
-	 * Asserts that if the {@link ValueDiff#toString()} implementation doesn't
-	 * throw a NPE if any of its properties are <code>null</code>.
+	 * Asserts that if the {@link ValueDiff#toString()} implementation doesn't throw a NPE if any of its properties are <code>null</code>.
 	 *
 	 */
 	public void test_ValueDiff() {
@@ -65,7 +63,7 @@ public class DiffsTest extends TestCase {
 				return null;
 			}
 		};
-
+		
 		try {
 			diff.toString();
 			assertTrue(true);

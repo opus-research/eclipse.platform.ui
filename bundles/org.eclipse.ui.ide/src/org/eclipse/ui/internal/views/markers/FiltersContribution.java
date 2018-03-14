@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,31 +26,41 @@ import org.eclipse.ui.views.markers.internal.MarkerMessages;
 
 /**
  * FiltersContribution is the contribution for the filters menu.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class FiltersContribution extends MarkersContribution {
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.actions.CompoundContributionItem#getContributionItems()
+	 */
 	@Override
 	protected IContributionItem[] getContributionItems() {
 		final ExtendedMarkersView view = getView();
-		if (view == null) {
+		if (view == null)
 			return new IContributionItem[0];
-		}
 
-		Collection<MarkerFieldFilterGroup> groups = view.getAllFilters();
+		Collection groups = view.getAllFilters();
 
-		if (groups.size() == 0) {
+		if (groups.size() == 0)
 			return new IContributionItem[0];
-		}
 
-		Iterator<MarkerFieldFilterGroup> groupsIterator = groups.iterator();
+		Iterator groupsIterator = groups.iterator();
 		IContributionItem[] items = new IContributionItem[groups.size() + 2];
 		for (int i = 0; i < groups.size(); i++) {
-			final MarkerFieldFilterGroup group = groupsIterator.next();
+			final MarkerFieldFilterGroup group = (MarkerFieldFilterGroup) groupsIterator
+					.next();
 			items[i] = new ContributionItem() {
 
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets.Menu,
+				 *      int)
+				 */
 				@Override
 				public void fill(Menu menu, int index) {
 					MenuItem item = new MenuItem(menu, SWT.CHECK);
@@ -65,19 +75,24 @@ public class FiltersContribution extends MarkersContribution {
 
 				/**
 				 * Return the menu item listener for selection of a filter.
-				 *
-				 * @param filter
-				 * @param extendedView
+				 * 
+				 * @param group
+				 * @param view
 				 * @return Listener
 				 */
-				private Listener getMenuItemListener(final MarkerFieldFilterGroup filter,
-						final ExtendedMarkersView extendedView) {
+				private Listener getMenuItemListener(
+						final MarkerFieldFilterGroup group,
+						final ExtendedMarkersView view) {
 					return new Listener() {
-
+						/*
+						 * (non-Javadoc)
+						 * 
+						 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+						 */
 						@Override
 						public void handleEvent(Event event) {
-							if (extendedView != null)
-								extendedView.toggleFilter(filter);
+							if (view != null)
+								view.toggleFilter(group);
 						}
 					};
 				}
@@ -88,16 +103,22 @@ public class FiltersContribution extends MarkersContribution {
 		items[groups.size() + 1] = getShowAllContribution();
 
 		return items;
+
 	}
 
 	/**
 	 * Return the show all contribution.
-	 *
+	 * 
 	 * @return IContributionItem
 	 */
 	private IContributionItem getShowAllContribution() {
 		return new ContributionItem() {
-
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets.Menu,
+			 *      int)
+			 */
 			@Override
 			public void fill(Menu menu, int index) {
 				MenuItem item = new MenuItem(menu, SWT.CHECK);
@@ -105,35 +126,37 @@ public class FiltersContribution extends MarkersContribution {
 				item.setSelection(noFiltersSelected());
 
 				item.addListener(SWT.Selection, new Listener() {
-
+					/*
+					 * (non-Javadoc)
+					 * 
+					 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+					 */
 					@Override
 					public void handleEvent(Event event) {
 						ExtendedMarkersView view = getView();
-						if (view != null) {
+						if (view != null)
 							view.disableAllFilters();
-						}
 					}
 				});
 			}
 
 			/**
 			 * Return whether or not any filters are selected.
-			 *
+			 * 
 			 * @return boolean <code>true</code> if none of the current
 			 *         filters are selected.
 			 */
 			private boolean noFiltersSelected() {
 				ExtendedMarkersView view = getView();
-				if (view == null) {
+				if (view == null)
 					return true;
-				}
 
-				Iterator<MarkerFieldFilterGroup> groupsIterator = view.getAllFilters().iterator();
+				Iterator groupsIterator= view.getAllFilters().iterator();
 				while (groupsIterator.hasNext()) {
-					MarkerFieldFilterGroup group = groupsIterator.next();
-					if (group.isEnabled()) {
+					MarkerFieldFilterGroup group = (MarkerFieldFilterGroup) groupsIterator
+							.next();
+					if (group.isEnabled())
 						return false;
-					}
 				}
 				return true;
 			}
