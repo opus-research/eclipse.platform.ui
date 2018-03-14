@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Mickael Istria (Red Hat Inc.) - 427887 Added method to order working sets
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -178,6 +179,12 @@ public class WorkingSetManager extends AbstractWorkingSetManager implements
 	@Override
 	protected void restoreWorkingSetState(IMemento memento) {
 		super.restoreWorkingSetState(memento);
+		saveState();
+	}
+
+	@Override
+	public void swapIndex(IWorkingSet one, IWorkingSet other) {
+		super.swapIndex(one, other);
 		saveState();
 	}
 }
