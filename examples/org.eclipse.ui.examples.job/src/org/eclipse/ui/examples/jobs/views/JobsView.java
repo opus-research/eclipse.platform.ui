@@ -49,9 +49,8 @@ import org.eclipse.ui.progress.IProgressService;
  */
 public class JobsView extends ViewPart {
 	private Combo durationField;
-	private Button lockField, failureField, threadField, systemField,
-			userField, groupField, rescheduleField, keepField, keepOneField,
-			unknownField, gotoActionField;
+	private Button lockField, failureField, threadField, systemField, userField, groupField, rescheduleField, keepField,
+			keepOneField, unknownField, gotoActionField;
 	private Text quantityField, delayField, rescheduleDelay;
 	private Button schedulingRuleField;
 	private Button noPromptField;
@@ -60,16 +59,14 @@ public class JobsView extends ViewPart {
 		try {
 			final long duration = getDuration();
 			final boolean shouldLock = lockField.getSelection();
-			PlatformUI.getWorkbench().getProgressService().busyCursorWhile(
-					new IRunnableWithProgress() {
-						public void run(IProgressMonitor monitor) {
-							if (shouldLock)
-								doRunInWorkspace(duration, monitor);
-							else
-								doRun(duration, monitor);
-						}
-
-					});
+			PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
+				public void run(IProgressMonitor monitor) {
+					if (shouldLock)
+						doRunInWorkspace(duration, monitor);
+					else
+						doRun(duration, monitor);
+				}
+			});
 		} catch (InvocationTargetException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
@@ -115,26 +112,18 @@ public class JobsView extends ViewPart {
 			if (ui)
 				result = new UITestJob(duration, lock, failure, unknown);
 			else
-				result = new TestJob(duration, lock, failure, unknown,
-						reschedule, rescheduleWait);
+				result = new TestJob(duration, lock, failure, unknown, reschedule, rescheduleWait);
 
-			result.setProperty(IProgressConstants.KEEP_PROPERTY, Boolean
-					.valueOf(keep));
-			result.setProperty(IProgressConstants.KEEPONE_PROPERTY, Boolean
-					.valueOf(keepOne));
-			result.setProperty(
-					IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY,
-					Boolean.valueOf(noPrompt));
+			result.setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.valueOf(keep));
+			result.setProperty(IProgressConstants.KEEPONE_PROPERTY, Boolean.valueOf(keepOne));
+			result.setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.valueOf(noPrompt));
 			if (gotoAction)
-				result.setProperty(IProgressConstants.ACTION_PROPERTY,
-						new Action("Pop up a dialog") { //$NON-NLS-1$
-							public void run() {
-								MessageDialog
-										.openInformation(
-												getSite().getShell(),
-												"Goto Action", "The job can have an action associated with it"); //$NON-NLS-1$ //$NON-NLS-2$
-							}
-						});
+				result.setProperty(IProgressConstants.ACTION_PROPERTY, new Action("Pop up a dialog") { //$NON-NLS-1$
+					public void run() {
+						MessageDialog.openInformation(getSite().getShell(), "Goto Action", //$NON-NLS-1$
+								"The job can have an action associated with it"); //$NON-NLS-1$
+					}
+				});
 
 			result.setProgressGroup(group, groupIncrement);
 			result.setSystem(system);
@@ -176,8 +165,7 @@ public class JobsView extends ViewPart {
 		// create jobs
 		Button create = new Button(group, SWT.PUSH);
 		create.setText("Create jobs"); //$NON-NLS-1$
-		create
-				.setToolTipText("Creates and schedules jobs according to above parameters"); //$NON-NLS-1$
+		create.setToolTipText("Creates and schedules jobs according to above parameters"); //$NON-NLS-1$
 		create.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		create.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -241,8 +229,7 @@ public class JobsView extends ViewPart {
 		// join the running test jobs
 		Button window = new Button(group, SWT.PUSH);
 		window.setText("Runnable in Window"); //$NON-NLS-1$
-		window
-				.setToolTipText("Using a runnable context in the workbench window"); //$NON-NLS-1$
+		window.setToolTipText("Using a runnable context in the workbench window"); //$NON-NLS-1$
 		window.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		window.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -312,8 +299,7 @@ public class JobsView extends ViewPart {
 			}
 		};
 		showJob.schedule();
-		PlatformUI.getWorkbench().getProgressService().showInDialog(
-				getSite().getShell(), showJob);
+		PlatformUI.getWorkbench().getProgressService().showInDialog(getSite().getShell(), showJob);
 
 	}
 
@@ -451,8 +437,7 @@ public class JobsView extends ViewPart {
 		// whether the job should use a scheduling rule
 		schedulingRuleField = new Button(group, SWT.CHECK);
 		schedulingRuleField.setText("Schedule sequentially"); //$NON-NLS-1$
-		schedulingRuleField
-				.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		schedulingRuleField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		// failure
 		failureField = new Button(group, SWT.CHECK);
@@ -462,16 +447,14 @@ public class JobsView extends ViewPart {
 		// failure
 		noPromptField = new Button(group, SWT.CHECK);
 		noPromptField.setText("No Prompt"); //$NON-NLS-1$
-		noPromptField
-				.setToolTipText("Set the IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY to true"); //$NON-NLS-1$
+		noPromptField.setToolTipText("Set the IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY to true"); //$NON-NLS-1$
 		noPromptField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 	}
 
 	protected void doRun(long duration, IProgressMonitor monitor) {
 		final long sleep = 10;
 		int ticks = (int) (duration / sleep);
-		monitor.beginTask(
-				"Spinning inside IProgressService.busyCursorWhile", ticks); //$NON-NLS-1$
+		monitor.beginTask("Spinning inside IProgressService.busyCursorWhile", ticks); //$NON-NLS-1$
 		monitor.setTaskName("Spinning inside IProgressService.busyCursorWhile"); //$NON-NLS-1$
 		for (int i = 0; i < ticks; i++) {
 			monitor.subTask("Processing tick #" + i); //$NON-NLS-1$
@@ -486,11 +469,10 @@ public class JobsView extends ViewPart {
 		}
 	}
 
-	protected void doRunInWorkspace(final long duration,
-			IProgressMonitor monitor) {
+	protected void doRunInWorkspace(final long duration, IProgressMonitor monitor) {
 		try {
 			ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
-				public void run(IProgressMonitor monitor) throws CoreException {
+				public void run(IProgressMonitor monitor) {
 					doRun(duration, monitor);
 				}
 			}, monitor);
@@ -522,7 +504,9 @@ public class JobsView extends ViewPart {
 			/*
 			 * (non-Javadoc)
 			 *
-			 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
+			 * @see
+			 * org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.
+			 * IProgressMonitor)
 			 */
 			protected IStatus run(IProgressMonitor monitor) {
 				throw new NullPointerException();
@@ -539,14 +523,11 @@ public class JobsView extends ViewPart {
 			// note that when a null progress monitor is used when in the UI
 			// thread, the workbench will create a default progress monitor
 			// that reports progress in a modal dialog with details area
-			PlatformUI.getWorkbench().getProgressService().busyCursorWhile(
-					new IRunnableWithProgress() {
-						public void run(IProgressMonitor monitor)
-								throws InterruptedException {
-							Job.getJobManager().join(TestJob.FAMILY_TEST_JOB,
-									monitor);
-						}
-					});
+			PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
+				public void run(IProgressMonitor monitor) throws InterruptedException {
+					Job.getJobManager().join(TestJob.FAMILY_TEST_JOB, monitor);
+				}
+			});
 		} catch (InterruptedException e) {
 			// thrown if the user interrupts the join by canceling the progress
 			// monitor
@@ -567,18 +548,15 @@ public class JobsView extends ViewPart {
 		try {
 			final long duration = getDuration();
 			final boolean shouldLock = lockField.getSelection();
-			IProgressService progressService = PlatformUI.getWorkbench()
-					.getProgressService();
-			progressService.runInUI(progressService,
-					new IRunnableWithProgress() {
-						public void run(IProgressMonitor monitor)
-								throws InterruptedException {
-							if (shouldLock)
-								doRunInWorkspace(duration, monitor);
-							else
-								doRun(duration, monitor);
-						}
-					}, ResourcesPlugin.getWorkspace().getRoot());
+			IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+			progressService.runInUI(progressService, new IRunnableWithProgress() {
+				public void run(IProgressMonitor monitor) {
+					if (shouldLock)
+						doRunInWorkspace(duration, monitor);
+					else
+						doRun(duration, monitor);
+				}
+			}, ResourcesPlugin.getWorkspace().getRoot());
 		} catch (InvocationTargetException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
@@ -602,12 +580,11 @@ public class JobsView extends ViewPart {
 			getSite().getShell().getDisplay().asyncExec(new Runnable() {
 				public void run() {
 					try {
-						ResourcesPlugin.getWorkspace().run(
-								new IWorkspaceRunnable() {
-									public void run(IProgressMonitor monitor) {
-										// no-op
-									}
-								}, null);
+						ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
+							public void run(IProgressMonitor monitor) {
+								// no-op
+							}
+						}, null);
 					} catch (OperationCanceledException e) {
 						// ignore
 					} catch (CoreException e) {
@@ -632,14 +609,12 @@ public class JobsView extends ViewPart {
 			/*
 			 * (non-Javadoc)
 			 *
-			 * @see org.eclipse.ui.actions.WorkspaceModifyOperation#execute(org.eclipse.core.runtime.IProgressMonitor)
+			 * @see org.eclipse.ui.actions.WorkspaceModifyOperation#execute(org.
+			 * eclipse.core.runtime.IProgressMonitor)
 			 */
-			protected void execute(IProgressMonitor monitor)
-					throws CoreException, InvocationTargetException,
-					InterruptedException {
+			protected void execute(IProgressMonitor monitor) {
 				int ticks = (int) (time / sleep);
-				monitor.beginTask(
-						"Spinning inside ApplicationWindow.run()", ticks); //$NON-NLS-1$
+				monitor.beginTask("Spinning inside ApplicationWindow.run()", ticks); //$NON-NLS-1$
 				monitor.setTaskName("Spinning inside ApplicationWindow.run()"); //$NON-NLS-1$
 				for (int i = 0; i < ticks; i++) {
 					monitor.subTask("Processing tick #" + i); //$NON-NLS-1$
@@ -656,8 +631,7 @@ public class JobsView extends ViewPart {
 
 		};
 		try {
-			PlatformUI.getWorkbench().getActiveWorkbenchWindow().run(true,
-					true, runnableTest);
+			PlatformUI.getWorkbench().getActiveWorkbenchWindow().run(true, true, runnableTest);
 
 		} catch (Exception e) {
 			e.printStackTrace();
