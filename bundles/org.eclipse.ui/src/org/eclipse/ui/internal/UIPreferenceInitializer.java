@@ -40,6 +40,7 @@ import org.osgi.service.prefs.BackingStoreException;
  */
 public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 
+	@Override
 	public void initializeDefaultPreferences() {
 
 
@@ -185,6 +186,7 @@ public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 					 * #added(org.eclipse.core.runtime.preferences
 					 * .IEclipsePreferences.NodeChangeEvent)
 					 */
+					@Override
 					public void added(NodeChangeEvent event) {
 						if (!event.getChild().name().equals(uiName)) {
 							return;
@@ -204,6 +206,7 @@ public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 					 * #removed(org.eclipse.core.runtime.preferences
 					 * .IEclipsePreferences.NodeChangeEvent)
 					 */
+					@Override
 					public void removed(NodeChangeEvent event) {
 						// Nothing to do here
 
