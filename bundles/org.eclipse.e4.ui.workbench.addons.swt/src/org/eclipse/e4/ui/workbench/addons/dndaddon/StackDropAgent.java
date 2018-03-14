@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -50,6 +50,10 @@ public class StackDropAgent extends DropAgent {
 	public boolean canDrop(MUIElement dragElement, DnDInfo info) {
 		// We only except stack elements and whole stacks
 		if (!(dragElement instanceof MStackElement) && !(dragElement instanceof MPartStack))
+			return false;
+
+		// We can't drop a standalone view
+		if (dragElement.getTags().contains(IPresentationEngine.STANDALONE))
 			return false;
 
 		// We have to be over a stack ourselves
