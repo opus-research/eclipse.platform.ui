@@ -620,8 +620,4 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 		}
 		return null;
 	}
-
-	public MTrimBar getTopTrim() {
-		return topTrim;
-	}
 }
