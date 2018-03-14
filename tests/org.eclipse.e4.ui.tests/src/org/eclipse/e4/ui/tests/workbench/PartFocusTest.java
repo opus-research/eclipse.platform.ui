@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,38 +11,45 @@
 
 package org.eclipse.e4.ui.tests.workbench;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
-import junit.framework.TestCase;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
 import org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine;
 import org.eclipse.e4.ui.model.application.MApplication;
-import org.eclipse.e4.ui.model.application.impl.ApplicationFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
+import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
-import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.tests.Activator;
+import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.IPartListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * Ensure that setting focus to a widget within an non-active part causes the
  * part to be activated while not changing the focus.
  */
-public class PartFocusTest extends TestCase {
+public class PartFocusTest {
 
 	protected IEclipseContext appContext;
 	protected E4Workbench wb;
@@ -54,53 +61,54 @@ public class PartFocusTest extends TestCase {
 	protected MToolControl toolControl;
 
 	protected MPart otherPart;
+	private EModelService ems;
 
-	@Override
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		appContext = E4Application.createDefaultContext();
 		appContext.set(E4Workbench.PRESENTATION_URI_ARG,
 				PartRenderingEngine.engineURI);
 
-		window = BasicFactoryImpl.eINSTANCE.createWindow();
+		ems = appContext.get(EModelService.class);
+
+		window = ems.createModelElement(MWindow.class);
 		window.setWidth(500);
 		window.setHeight(500);
 
-		MPartSashContainer sash = BasicFactoryImpl.eINSTANCE
-				.createPartSashContainer();
+		MPartSashContainer sash = ems.createModelElement(MPartSashContainer.class);
 		window.getChildren().add(sash);
 		window.setSelectedElement(sash);
 
-		MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
+		MPartStack stack = ems.createModelElement(MPartStack.class);
 		sash.getChildren().add(stack);
 		sash.setSelectedElement(stack);
 
-		part = BasicFactoryImpl.eINSTANCE.createPart();
+		part = ems.createModelElement(MPart.class);
 		part.setElementId("Part");
 		part.setLabel("Part");
-		part.setToolbar(MenuFactoryImpl.eINSTANCE.createToolBar());
+		part.setToolbar(ems.createModelElement(MToolBar.class));
 		part.setContributionURI(Activator.asURI(PartBackend.class));
 		stack.getChildren().add(part);
 
-		toolControl = MenuFactoryImpl.eINSTANCE.createToolControl();
+		toolControl = ems.createModelElement(MToolControl.class);
 		toolControl.setElementId("ToolControl");
 		toolControl.setContributionURI(Activator.asURI(TextField.class));
 		part.getToolbar().getChildren().add(toolControl);
 
-		stack = BasicFactoryImpl.eINSTANCE.createPartStack();
+		stack = ems.createModelElement(MPartStack.class);
 		sash.getChildren().add(stack);
 		sash.setSelectedElement(stack);
 
-		otherPart = BasicFactoryImpl.eINSTANCE.createPart();
+		otherPart = ems.createModelElement(MPart.class);
 		otherPart.setElementId("OtherPart");
 		otherPart.setLabel("OtherPart");
 		otherPart.setContributionURI(Activator.asURI(PartBackend.class));
 		stack.getChildren().add(otherPart);
 
-		MApplication application = ApplicationFactoryImpl.eINSTANCE
-				.createApplication();
+		MApplication application = ems.createModelElement(MApplication.class);
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class.getName(), application);
+		appContext.set(MApplication.class, application);
 
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
@@ -126,17 +134,14 @@ public class PartFocusTest extends TestCase {
 		assertTrue(((PartBackend) otherPart.getObject()).text1.isFocusControl());
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() throws Exception {
 		if (wb != null) {
 			wb.close();
 		}
 		appContext.dispose();
 	}
 
-	/**
-	 *
-	 */
 	private void processEvents() {
 		// renderer.run(window, appContext);
 		Display display = Display.getCurrent();
@@ -152,6 +157,7 @@ public class PartFocusTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testFocusChangesOnExplicitPartActivation() {
 		assertFalse(((PartBackend) part.getObject()).text1.isFocusControl());
 		eps.activate(part);
@@ -159,6 +165,8 @@ public class PartFocusTest extends TestCase {
 		assertTrue(((PartBackend) part.getObject()).text1.isFocusControl());
 	}
 
+	@Ignore
+	@Test
 	public void XXXtestNoFocusChangeOnExplicitWidgetSelection() {
 		assertFalse(((PartBackend) part.getObject()).text1.isFocusControl());
 		((TextField) toolControl.getObject()).text.setFocus();
@@ -168,6 +176,7 @@ public class PartFocusTest extends TestCase {
 		assertTrue(((TextField) toolControl.getObject()).text.isFocusControl());
 	}
 
+	@Test
 	public void testNoActivationOnExplicitInPartWidgetSelection() {
 		assertTrue(eps.getActivePart() == otherPart);
 		assertTrue(((PartBackend) otherPart.getObject()).text1.isFocusControl());

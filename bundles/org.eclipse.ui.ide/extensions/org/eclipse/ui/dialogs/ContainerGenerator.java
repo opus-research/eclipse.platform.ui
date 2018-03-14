@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -82,10 +82,6 @@ public class ContainerGenerator {
             throws CoreException {
         folderHandle.create(false, true, monitor);
 
-        if (monitor.isCanceled()) {
-			throw new OperationCanceledException();
-		}
-
         return folderHandle;
     }
 
@@ -115,15 +111,7 @@ public class ContainerGenerator {
             IProgressMonitor monitor) throws CoreException {
 		SubMonitor subMonitor = SubMonitor.convert(monitor, 2);
 		projectHandle.create(subMonitor.split(1));
-		if (monitor.isCanceled()) {
-			throw new OperationCanceledException();
-		}
-
 		projectHandle.open(subMonitor.split(1));
-		if (monitor.isCanceled()) {
-			throw new OperationCanceledException();
-		}
-
         return projectHandle;
     }
 
