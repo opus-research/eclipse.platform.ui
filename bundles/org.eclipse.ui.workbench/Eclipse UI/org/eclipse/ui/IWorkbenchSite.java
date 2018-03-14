@@ -11,7 +11,6 @@
 package org.eclipse.ui;
 
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.window.IShellProvider;
 import org.eclipse.swt.widgets.Shell;
@@ -62,7 +61,6 @@ public interface IWorkbenchSite extends IAdaptable, IShellProvider,
 	 *
 	 * @return the selection provider, or <code>null</code> if none
 	 */
-	@Nullable
 	public ISelectionProvider getSelectionProvider();
 
 	/**
@@ -93,6 +91,6 @@ public interface IWorkbenchSite extends IAdaptable, IShellProvider,
 	 * @param provider
 	 *            the selection provider, or <code>null</code> to clear it
 	 */
-	public void setSelectionProvider(@Nullable ISelectionProvider provider);
+	public void setSelectionProvider(ISelectionProvider provider);
 
 }

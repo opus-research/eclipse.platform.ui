@@ -26,6 +26,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.IElementUpdater;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.internal.services.WorkbenchSourceProvider;
@@ -45,7 +46,7 @@ public class ShowInHandler extends AbstractHandler implements IElementUpdater {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		IWorkbenchPage p = HandlerUtil.getActiveWorkbenchWindowChecked(event).getActivePage();
+		IWorkbenchPage p = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		WorkbenchPartReference r = (WorkbenchPartReference) p.getActivePartReference();
 		if (p != null && r != null && r.getModel() != null) {
 			((WorkbenchPage) p).updateShowInSources(r.getModel());

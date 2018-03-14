@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ui;
 
-import org.eclipse.jdt.annotation.Nullable;
-
 /**
  * The primary interface between a view part and the workbench.
  * <p>
@@ -39,6 +37,5 @@ public interface IViewSite extends IWorkbenchPartSite {
 	 * @see IWorkbenchPage#showView(String, String, int)
 	 * @since 3.0
 	 */
-	@Nullable
     public String getSecondaryId();
 }

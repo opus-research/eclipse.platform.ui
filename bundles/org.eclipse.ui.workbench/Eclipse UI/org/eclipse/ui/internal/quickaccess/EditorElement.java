@@ -15,7 +15,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 /**
@@ -39,13 +38,10 @@ public class EditorElement extends QuickAccessElement {
 	public void execute() {
 		IWorkbenchPart part = editorReference.getPart(true);
 		if (part != null) {
-			IWorkbenchWindow window = PlatformUI.getWorkbench()
-					.getActiveWorkbenchWindow();
-			if (window != null) {
-				IWorkbenchPage activePage = window.getActivePage();
-				if (activePage != null) {
-					activePage.activate(part);
-				}
+			IWorkbenchPage activePage = PlatformUI.getWorkbench()
+					.getActiveWorkbenchWindow().getActivePage();
+			if (activePage != null) {
+				activePage.activate(part);
 			}
 		}
 	}

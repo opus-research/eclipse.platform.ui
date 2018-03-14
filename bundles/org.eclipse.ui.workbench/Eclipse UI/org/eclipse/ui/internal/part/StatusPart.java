@@ -197,10 +197,7 @@ public class StatusPart {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				try {
-					IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-					if(window != null && window.getActivePage() != null) {
-						window.getActivePage().showView(LOG_VIEW_ID);
-					}
+					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(LOG_VIEW_ID);
 				} catch (CoreException ce) {
 					StatusManager.getManager().handle(ce, WorkbenchPlugin.PI_WORKBENCH);
 				}

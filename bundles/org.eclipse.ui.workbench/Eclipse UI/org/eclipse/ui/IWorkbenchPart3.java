@@ -11,7 +11,6 @@
 package org.eclipse.ui;
 
 import java.util.Map;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.util.IPropertyChangeListener;
 
 /**
@@ -57,7 +56,6 @@ public interface IWorkbenchPart3 extends IWorkbenchPart2 {
 	 *            the arbitrary property. Must not be <code>null</code>.
 	 * @return the property value, or <code>null</code>.
 	 */
-	@Nullable
 	public String getPartProperty(String key);
 
 	/**
@@ -73,7 +71,7 @@ public interface IWorkbenchPart3 extends IWorkbenchPart2 {
 	 *            the property value. A <code>null</code> value will remove
 	 *            that property.
 	 */
-	public void setPartProperty(String key, @Nullable String value);
+	public void setPartProperty(String key, String value);
 
 	/**
 	 * Return an unmodifiable map of the arbitrary properties. This method can
