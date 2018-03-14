@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,13 +22,13 @@ import org.eclipse.swt.widgets.Shell;
 /**
  * The ViewSettingsDialog is an abstract class that
  * provides some common functionality for view preferences.
- *
+ * 
  * @since 3.1
  */
 public class ViewSettingsDialog extends Dialog {
-
+	
 	private static int DEFAULTS_BUTTON_ID = 25;
-
+	
 	/**
 	 * Create a new instance of the receiver.
 	 * @param parentShell
@@ -37,6 +37,9 @@ public class ViewSettingsDialog extends Dialog {
 		super(parentShell);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.Dialog#buttonPressed(int)
+	 */
 	@Override
 	protected void buttonPressed(int buttonId) {
 		if (buttonId == DEFAULTS_BUTTON_ID) {
@@ -55,9 +58,12 @@ public class ViewSettingsDialog extends Dialog {
      */
 	protected void performDefaults() {
 		//Do nothing by default
-
+		
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		parent.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));

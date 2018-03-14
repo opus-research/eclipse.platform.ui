@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,9 +22,6 @@ import org.eclipse.core.databinding.conversion.IConverter;
 import org.eclipse.core.databinding.conversion.NumberToStringConverter;
 import org.eclipse.core.databinding.conversion.StringToNumberConverter;
 import org.eclipse.core.databinding.util.Policy;
-import org.eclipse.core.databinding.validation.ValidationStatus;
-import org.eclipse.core.internal.databinding.Activator;
-import org.eclipse.core.internal.databinding.BindingMessages;
 import org.eclipse.core.internal.databinding.ClassLookupSupport;
 import org.eclipse.core.internal.databinding.Pair;
 import org.eclipse.core.internal.databinding.conversion.CharacterToStringConverter;
@@ -90,8 +87,6 @@ import com.ibm.icu.text.NumberFormat;
 			return Character.class;
 		return clazz;
 	}
-
-	protected IConverter converter;
 
 	final protected void checkAssignable(Object toType, Object fromType,
 			String errorString) {
@@ -665,7 +660,7 @@ import com.ibm.icu.text.NumberFormat;
 	 * Returns {@link Boolean#TRUE} if the from type is assignable to the to
 	 * type, or {@link Boolean#FALSE} if it not, or <code>null</code> if
 	 * unknown.
-	 *
+	 * 
 	 * @param fromType
 	 * @param toType
 	 * @return whether fromType is assignable to toType, or <code>null</code>
@@ -687,43 +682,10 @@ import com.ibm.icu.text.NumberFormat;
 		return null;
 	}
 
-	/**
-	 * @param ex
-	 *            the exception, that was caught
-	 * @return the validation status
-	 */
-	protected IStatus logErrorWhileSettingValue(Exception ex) {
-		IStatus errorStatus = ValidationStatus
-				.error(BindingMessages.getString(BindingMessages.VALUEBINDING_ERROR_WHILE_SETTING_VALUE), ex);
-		Policy.getLog().log(errorStatus);
-		return errorStatus;
-	}
-
-	/**
-	 * Converts the value from the source type to the destination type.
-	 * <p>
-	 * Default implementation will use the setConverter(IConverter), if one
-	 * exists. If no converter exists no conversion occurs.
-	 * </p>
-	 *
-	 * @param value
-	 * @return the converted value
-	 */
-	public Object convert(Object value) {
-		if (converter != null) {
-			try {
-				return converter.convert(value);
-			} catch (Exception ex) {
-				Policy.getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, ex.getMessage(), ex));
-			}
-		}
-		return value;
-	}
-
 	/*
 	 * Default converter implementation, does not perform any conversion.
 	 */
-	static final class DefaultConverter implements IConverter {
+	protected static final class DefaultConverter implements IConverter {
 
 		private final Object toType;
 
@@ -738,17 +700,14 @@ import com.ibm.icu.text.NumberFormat;
 			this.fromType = fromType;
 		}
 
-		@Override
 		public Object convert(Object fromObject) {
 			return fromObject;
 		}
 
-		@Override
 		public Object getFromType() {
 			return fromType;
 		}
 
-		@Override
 		public Object getToType() {
 			return toType;
 		}

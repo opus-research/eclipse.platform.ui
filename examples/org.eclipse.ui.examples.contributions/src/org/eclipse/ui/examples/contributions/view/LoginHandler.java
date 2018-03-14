@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2016 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,7 +29,11 @@ import org.eclipse.ui.handlers.HandlerUtil;
  */
 public class LoginHandler extends AbstractHandler {
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchPart part = HandlerUtil.getActivePartChecked(event);
 		ISelection sel = HandlerUtil.getActiveMenuSelection(event);
@@ -39,7 +43,8 @@ public class LoginHandler extends AbstractHandler {
 		if (sel instanceof IStructuredSelection && !sel.isEmpty()) {
 			IStructuredSelection selection = (IStructuredSelection) sel;
 			Person person = (Person) selection.getFirstElement();
-			IPersonService service = part.getSite().getService(IPersonService.class);
+			IPersonService service = (IPersonService) part.getSite()
+					.getService(IPersonService.class);
 			service.login(person);
 		}
 		return null;

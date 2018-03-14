@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2016 IBM Corporation and others.
+ * Copyright (c) 2007, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440810, 472654
  *******************************************************************************/
 
 package org.eclipse.ui.internal.keys.model;
@@ -17,7 +16,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -54,7 +52,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
 
 /**
  * @since 3.4
- *
+ * 
  */
 public class KeyController {
 	private static final String DELIMITER = ","; //$NON-NLS-1$
@@ -65,7 +63,7 @@ public class KeyController {
 	 */
 	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
 			.getBundle(KeysPreferencePage.class.getName());
-	private ListenerList<IPropertyChangeListener> eventManager = null;
+	private ListenerList eventManager = null;
 	private BindingManager fBindingManager;
 	private ContextModel contextModel;
 	private SchemeModel fSchemeModel;
@@ -74,9 +72,9 @@ public class KeyController {
 	private ConflictModel conflictModel;
 	private IServiceLocator serviceLocator;
 
-	private ListenerList<IPropertyChangeListener> getEventManager() {
+	private ListenerList getEventManager() {
 		if (eventManager == null) {
-			eventManager = new ListenerList<>(ListenerList.IDENTITY);
+			eventManager = new ListenerList(ListenerList.IDENTITY);
 		}
 		return eventManager;
 	}
@@ -98,10 +96,11 @@ public class KeyController {
 			return;
 		}
 
+		Object[] listeners = getEventManager().getListeners();
 		PropertyChangeEvent event = new PropertyChangeEvent(source, propId,
 				oldVal, newVal);
-		for (IPropertyChangeListener listener : getEventManager()) {
-			listener.propertyChange(event);
+		for (int i = 0; i < listeners.length; i++) {
+			((IPropertyChangeListener) listeners[i]).propertyChange(event);
 		}
 	}
 
@@ -134,7 +133,7 @@ public class KeyController {
 	}
 
 	private static BindingManager loadModelBackend(IServiceLocator locator) {
-		IBindingService bindingService = locator
+		IBindingService bindingService = (IBindingService) locator
 				.getService(IBindingService.class);
 		BindingManager bindingManager = new BindingManager(
 				new ContextManager(), new CommandManager());
@@ -156,12 +155,12 @@ public class KeyController {
 					new Status(IStatus.WARNING, WorkbenchPlugin.PI_WORKBENCH,
 							"Keys page found an undefined scheme", e)); //$NON-NLS-1$
 		}
-
+		
 		bindingManager.setLocale(bindingService.getLocale());
 		bindingManager.setPlatform(bindingService.getPlatform());
 
-		Set<Binding> bindings = new HashSet<>();
-		EBindingService eBindingService = locator
+		Set<Binding> bindings = new HashSet<Binding>();
+		EBindingService eBindingService = (EBindingService) locator
 				.getService(EBindingService.class);
 		bindings.addAll(eBindingService.getActiveBindings());
 		for (Binding binding : bindingService.getBindings()) {
@@ -437,7 +436,7 @@ public class KeyController {
 	/**
 	 * Replaces all the current bindings with the bindings in the local copy of
 	 * the binding manager.
-	 *
+	 * 
 	 * @param bindingService
 	 *            The binding service that saves the changes made to the local
 	 *            copy of the binding manager
@@ -455,7 +454,7 @@ public class KeyController {
 	 * Logs the given exception, and opens an error dialog saying that something
 	 * went wrong. The exception is assumed to have something to do with the
 	 * preference store.
-	 *
+	 * 
 	 * @param exception
 	 *            The exception to be logged; must not be <code>null</code>.
 	 */
@@ -473,12 +472,12 @@ public class KeyController {
 
 	/**
 	 * Filters contexts for the When Combo.
-	 *
+	 * 
 	 * @param actionSets
 	 *            <code>true</code> to filter action set contexts
 	 * @param internal
 	 *            <code>false</code> to filter internal contexts
-	 *
+	 * 
 	 */
 	public void filterContexts(boolean actionSets, boolean internal) {
 		contextModel.filterContexts(actionSets, internal);
@@ -486,7 +485,7 @@ public class KeyController {
 
 	/**
 	 * Sets the bindings to default.
-	 *
+	 * 
 	 * @param bindingService
 	 */
 	public void setDefaultBindings(IBindingService bindingService) {
@@ -529,7 +528,7 @@ public class KeyController {
 				Writer fileWriter = null;
 				try {
 					fileWriter = new BufferedWriter(new OutputStreamWriter(
-							new FileOutputStream(filePath), StandardCharsets.UTF_8));
+							new FileOutputStream(filePath), "UTF-8")); //$NON-NLS-1$
 					final Object[] bindingElements = bindingModel.getBindings()
 							.toArray();
 					for (int i = 0; i < bindingElements.length; i++) {

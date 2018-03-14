@@ -23,7 +23,11 @@ public class StringToCharacterConverterTest extends TestCase {
 	private StringToCharacterConverter converter;
 	private StringToCharacterConverter primitiveConverter;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	protected void setUp() throws Exception {
 		super.setUp();
 		converter = StringToCharacterConverter.toCharacter(false);
@@ -76,7 +80,7 @@ public class StringToCharacterConverterTest extends TestCase {
 	public void testThrowsIllegalArgumentExceptionIfAskedToConvertNonString()
 			throws Exception {
 		try {
-			converter.convert(Integer.valueOf(1));
+			converter.convert(new Integer(1));
 			fail("exception should have been thrown");
 		} catch (IllegalArgumentException e) {
 		}

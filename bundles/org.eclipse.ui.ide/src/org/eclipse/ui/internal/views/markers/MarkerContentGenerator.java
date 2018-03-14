@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.mapping.ResourceMapping;
 import org.eclipse.core.runtime.CoreException;
@@ -33,6 +32,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.WorkbenchException;
@@ -53,9 +53,9 @@ import org.eclipse.ui.views.markers.internal.Util;
 /**
  * MarkerContentGenerator is the representation of the markerContentGenerator
  * extension point.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class MarkerContentGenerator {
 
@@ -69,9 +69,9 @@ public class MarkerContentGenerator {
 	private static final String TAG_LEGACY_FILTER_ENTRY = "filter"; //$NON-NLS-1$
 	private static final String TAG_MARKER_LIMIT = "markerLimit"; //$NON-NLS-1$
 	private static final String TAG_MARKER_LIMIT_ENABLED = "markerLimitEnabled"; //$NON-NLS-1$
-
+	
 	/*Use this to indicate filter change rather than a null*/
-	private final Collection<MarkerFieldFilterGroup> FILTERS_CHANGED = Collections.emptySet();
+	private final Collection FILTERS_CHANGED = Collections.EMPTY_SET;
 
 	//Carries the description for the generator, as coded in the given extension point
 	private ContentGeneratorDescriptor generatorDescriptor;
@@ -80,35 +80,36 @@ public class MarkerContentGenerator {
 	private MarkerField[] visibleFields;
 
 	// filters
-	private Collection<MarkerFieldFilterGroup> enabledFilters;
-	private Collection<MarkerFieldFilterGroup> filters;
-	private boolean andFilters;
+	private Collection enabledFilters;
+	private Collection filters;
+	private boolean andFilters = false;
 	private int markerLimits = 100;
 	private boolean markerLimitsEnabled = true;
 
 	/**
 	 * focusResources
-	 *
+	 * 
 	 */
 	private IResource[] selectedResources = MarkerSupportInternalUtilities.EMPTY_RESOURCE_ARRAY;
-
-	private Collection<IResource> currentResources = Collections.emptySet();
+	
+	private Collection currentResources = Collections.EMPTY_SET;
 
 	private CachedMarkerBuilder builder;
 	private String viewId;
 
 	private IPropertyChangeListener filterPreferenceListener;
-
+	
 	/**
 	 * Create a new MarkerContentGenerator
-	 *
+	 * 
 	 * @param generatorDescriptor
 	 * @param builder
 	 * @param viewId
 	 * 				needed for backward compatibility
 	 */
-	public MarkerContentGenerator(ContentGeneratorDescriptor generatorDescriptor, CachedMarkerBuilder builder,
-			String viewId) {
+	public MarkerContentGenerator(
+			ContentGeneratorDescriptor generatorDescriptor,
+			CachedMarkerBuilder builder, String viewId) {
 		this.generatorDescriptor = generatorDescriptor;
 		this.viewId = viewId;
 		setBuilder(builder);
@@ -116,7 +117,7 @@ public class MarkerContentGenerator {
 
 	/**
 	 * Attach the generator to a builder
-	 *
+	 * 
 	 * @param builder
 	 */
 	void setBuilder(CachedMarkerBuilder builder) {
@@ -144,17 +145,17 @@ public class MarkerContentGenerator {
 	/**
 	 * Return whether or not all of {@link MarkerTypesModel} arein the
 	 * selectedTypes.
-	 *
+	 * 
 	 * @param selectedTypes
 	 * @return boolean
 	 */
-	boolean allTypesSelected(Collection<MarkerType> selectedTypes) {
+	boolean allTypesSelected(Collection selectedTypes) {
 		return generatorDescriptor.allTypesSelected(selectedTypes);
 	}
 
 	/**
 	 * Get the all of the fields that this content generator is using.
-	 *
+	 * 
 	 * @return {@link MarkerField}[]
 	 */
 	MarkerField[] getAllFields() {
@@ -163,7 +164,7 @@ public class MarkerContentGenerator {
 
 	/**
 	 * Get the fields that this content generator is displaying.
-	 *
+	 * 
 	 * @return {@link MarkerField}[]
 	 */
 	MarkerField[] getVisibleFields() {
@@ -172,48 +173,53 @@ public class MarkerContentGenerator {
 
 	/**
 	 * Set the visible fields.
-	 *
+	 * 
 	 * @param visible
 	 */
-	void setVisibleFields(Collection<MarkerField> visible) {
+	void setVisibleFields(Collection visible) {
+
 		MarkerField[] newFields = new MarkerField[visible.size()];
 		visible.toArray(newFields);
 		visibleFields = newFields;
+
 	}
 
 	/**
 	 * Return the fields not being shown currently.
-	 *
+	 * 
 	 * @return Object[]
 	 */
 	Object[] getHiddenFields() {
 		MarkerField[] all = getAllFields();
 		MarkerField[] visible = getVisibleFields();
 
-		Collection<MarkerField> hidden = new HashSet<>();
-		for (MarkerField element : all) {
-			hidden.add(element);
+		Collection hidden = new HashSet();
+		for (int i = 0; i < all.length; i++) {
+			hidden.add(all[i]);
 		}
-		for (MarkerField element : visible) {
-			hidden.remove(element);
+		for (int i = 0; i < visible.length; i++) {
+			hidden.remove(visible[i]);
 		}
 		return hidden.toArray();
 	}
 
 	void saveState(IMemento memento, MarkerField[] displayedFields) {
-		for (MarkerField displayedField : displayedFields) {
-			memento.createChild(TAG_COLUMN_VISIBILITY, displayedField
+
+		for (int i = 0; i < displayedFields.length; i++) {
+			memento.createChild(TAG_COLUMN_VISIBILITY, displayedFields[i]
 					.getConfigurationElement().getAttribute(
 							MarkerSupportInternalUtilities.ATTRIBUTE_ID));
 		}
 	}
 
 	void restoreState(IMemento memento) {
+
 		initDefaults();
+
 		if (memento == null) {
 			return;
 		}
-
+		
 		Integer limits = memento.getInteger(TAG_MARKER_LIMIT);
 		if (limits != null) {
 			markerLimits = limits.intValue();
@@ -223,52 +229,58 @@ public class MarkerContentGenerator {
 		if (limitsEnabled != null) {
 			markerLimitsEnabled = limitsEnabled.booleanValue();
 		}
-
+		
 		if (memento.getChildren(TAG_COLUMN_VISIBILITY).length != 0) {
+
 			IMemento[] visible = memento.getChildren(TAG_COLUMN_VISIBILITY);
-			Collection<MarkerField> newVisible = new ArrayList<>();
-
+			Collection newVisible = new ArrayList();
+	
 			MarkerField[] all = getAllFields();
-			Hashtable<String, MarkerField> allTable = new Hashtable<>();
-
-			for (MarkerField element : all) {
-				allTable.put(element.getConfigurationElement().getAttribute(
-						MarkerSupportInternalUtilities.ATTRIBUTE_ID), element);
+			Hashtable allTable = new Hashtable();
+	
+			for (int i = 0; i < all.length; i++) {
+				allTable.put(all[i].getConfigurationElement().getAttribute(
+						MarkerSupportInternalUtilities.ATTRIBUTE_ID), all[i]);
 			}
-
-			for (IMemento element : visible) {
-				String key = element.getID();
+	
+			for (int i = 0; i < visible.length; i++) {
+				String key = visible[i].getID();
 				if (allTable.containsKey(key)) {
 					newVisible.add(allTable.get(key));
 				}
 			}
-
+	
 			visibleFields = new MarkerField[newVisible.size()];
 			newVisible.toArray(visibleFields);
 		}
 	}
 
 	private void initDefaults() {
-		IPreferenceStore store = IDEWorkbenchPlugin.getDefault().getPreferenceStore();
-		markerLimitsEnabled = store.getBoolean(IDEInternalPreferences.USE_MARKER_LIMITS);
+		
+		IPreferenceStore store = IDEWorkbenchPlugin.getDefault()
+				.getPreferenceStore();
+		markerLimitsEnabled = store
+				.getBoolean(IDEInternalPreferences.USE_MARKER_LIMITS);
 		markerLimits = store.getInt(IDEInternalPreferences.MARKER_LIMITS_VALUE);
 
 		MarkerField[] initialFields = getInitialVisible();
 
 		visibleFields = new MarkerField[initialFields.length];
-		System.arraycopy(initialFields, 0, visibleFields, 0, initialFields.length);
+		System.arraycopy(initialFields, 0, visibleFields, 0,
+				initialFields.length);
+
 	}
 
 	/**
 	 * Return a collection of all of the configuration fields for this generator
-	 *
+	 * 
 	 * @return Collection of {@link FilterConfigurationArea}
 	 */
-	Collection<FilterConfigurationArea> createFilterConfigurationFields() {
-		Collection<FilterConfigurationArea> result = new ArrayList<>();
-		for (MarkerField visibleField : visibleFields) {
+	Collection createFilterConfigurationFields() {
+		Collection result = new ArrayList();
+		for (int i = 0; i < visibleFields.length; i++) {
 			FilterConfigurationArea area = MarkerSupportInternalUtilities
-					.generateFilterArea(visibleField);
+					.generateFilterArea(visibleFields[i]);
 			if (area != null)
 				result.add(area);
 
@@ -281,36 +293,38 @@ public class MarkerContentGenerator {
 	 */
 	String getCategoryName() {
 		return generatorDescriptor.getCategoryName();
+
 	}
 
 	/**
 	 * Return all of the filters for the receiver.
-	 *
+	 * 
 	 * @return Collection of MarkerFieldFilterGroup
 	 */
-	Collection<MarkerFieldFilterGroup> getAllFilters() {
+	Collection getAllFilters() {
 		if (filters == null || filters == FILTERS_CHANGED) {
 			filters = getDeclaredFilters();
 			// Apply the last settings
 			loadFiltersPreference();
+
 		}
 		return filters;
 	}
 
 	/**
 	 * Return the currently enabled filters.
-	 *
+	 * 
 	 * @return Collection of MarkerFieldFilterGroup
 	 */
-	Collection<MarkerFieldFilterGroup> getEnabledFilters() {
+	Collection getEnabledFilters() {
 		if (enabledFilters == null || enabledFilters == FILTERS_CHANGED) {
-			Collection<MarkerFieldFilterGroup> enabled = new HashSet<>();
-			Iterator<MarkerFieldFilterGroup> filtersIterator = getAllFilters().iterator();
+			Collection enabled = new HashSet();
+			Iterator filtersIterator = getAllFilters().iterator();
 			while (filtersIterator.hasNext()) {
-				MarkerFieldFilterGroup next = filtersIterator.next();
-				if (next.isEnabled()) {
+				MarkerFieldFilterGroup next = (MarkerFieldFilterGroup) filtersIterator
+						.next();
+				if (next.isEnabled())
 					enabled.add(next);
-				}
 			}
 			enabledFilters = enabled;
 		}
@@ -330,10 +344,11 @@ public class MarkerContentGenerator {
 	 * Disable all of the filters in the receiver.
 	 */
 	void disableAllFilters() {
-		Collection<MarkerFieldFilterGroup> allFilters = getEnabledFilters();
-		Iterator<MarkerFieldFilterGroup> enabled = allFilters.iterator();
+		Collection allFilters = getEnabledFilters();
+		Iterator enabled = allFilters.iterator();
 		while (enabled.hasNext()) {
-			MarkerFieldFilterGroup group = enabled.next();
+			MarkerFieldFilterGroup group = (MarkerFieldFilterGroup) enabled
+					.next();
 			group.setEnabled(false);
 		}
 		allFilters.clear();
@@ -343,14 +358,15 @@ public class MarkerContentGenerator {
 
 	/**
 	 * Add group to the enabled filters.
-	 *
+	 * 
 	 * @param group
 	 */
 	void toggleFilter(MarkerFieldFilterGroup group) {
-		Collection<MarkerFieldFilterGroup> enabled = getEnabledFilters();
-		if (enabled.remove(group)) {
+		Collection enabled = getEnabledFilters();
+		if (enabled.remove(group)) // true if it was present
 			group.setEnabled(false);
-		} else {
+
+		else {
 			group.setEnabled(true);
 			enabled.add(group);
 		}
@@ -360,13 +376,13 @@ public class MarkerContentGenerator {
 
 	/**
 	 * Update the filters.
-	 *
-	 * @param newFilters
-	 * @param newAndFilters
+	 * 
+	 * @param filters
+	 * @param andFilters
 	 */
-	void updateFilters(Collection<MarkerFieldFilterGroup> newFilters, boolean newAndFilters) {
-		setAndFilters(newAndFilters);
-		this.filters = newFilters;
+	void updateFilters(Collection filters, boolean andFilters) {
+		setAndFilters(andFilters);
+		this.filters = filters;
 		enabledFilters = FILTERS_CHANGED;
 		writeFiltersPreference();
 		requestMarkerUpdate();
@@ -374,7 +390,7 @@ public class MarkerContentGenerator {
 
 	/**
 	 * Set whether the filters are being ANDed or ORed.
-	 *
+	 * 
 	 * @param and
 	 */
 	void setAndFilters(boolean and) {
@@ -383,34 +399,34 @@ public class MarkerContentGenerator {
 
 	/**
 	 * Return whether the filters are being ANDed or ORed.
-	 *
+	 * 
 	 * @return boolean
 	 */
 	boolean andFilters() {
 		return andFilters;
 	}
-
+	
 	/**
 	 * @return Returns the markerLimits.
 	 */
 	public int getMarkerLimits() {
 		return markerLimits;
 	}
-
+	
 	/**
 	 * @param markerLimits The markerLimits to set.
 	 */
 	public void setMarkerLimits(int markerLimits) {
 		this.markerLimits = markerLimits;
 	}
-
+	
 	/**
 	 * @return Returns the markerLimitsEnabled.
 	 */
 	public boolean isMarkerLimitsEnabled() {
 		return markerLimitsEnabled;
 	}
-
+	
 	/**
 	 * @param markerLimitsEnabled The markerLimitsEnabled to set.
 	 */
@@ -421,44 +437,42 @@ public class MarkerContentGenerator {
 	/**
 	 * @return Collection of declared MarkerFieldFilterGroup(s)
 	 */
-	Collection<MarkerFieldFilterGroup> getDeclaredFilters() {
-		List<MarkerFieldFilterGroup> filterList = new ArrayList<>();
+	Collection getDeclaredFilters() {
+		List filters = new ArrayList();
 		IConfigurationElement[] filterReferences = generatorDescriptor.getFilterReferences();
-		for (IConfigurationElement filterReference : filterReferences) {
-			filterList.add(new MarkerFieldFilterGroup(filterReference, this));
+		for (int i = 0; i < filterReferences.length; i++) {
+			filters.add(new MarkerFieldFilterGroup(filterReferences[i], this));
 		}
 
 		// Honour the deprecated problemFilters
 		if (viewId != null && viewId.equals(IPageLayout.ID_PROBLEM_VIEW)) {
-			Iterator<ProblemFilter> problemFilters = MarkerSupportRegistry.getInstance()
+			Iterator problemFilters = MarkerSupportRegistry.getInstance()
 					.getRegisteredFilters().iterator();
-			while (problemFilters.hasNext()) {
-				filterList.add(new CompatibilityMarkerFieldFilterGroup(problemFilters.next(), this));
-			}
+			while (problemFilters.hasNext())
+				filters.add(new CompatibilityMarkerFieldFilterGroup(
+						(ProblemFilter) problemFilters.next(), this));
 		}
-		return filterList;
+		return filters;
 	}
 
 	/**
 	 * Get the name of the filters preference for the receiver,
-	 *
+	 * 
 	 * @return String
 	 */
 	private String getLegacyFiltersPreferenceName() {
-		if (viewId != null && viewId.equals(IPageLayout.ID_BOOKMARKS)) {
+		if (viewId != null && viewId.equals(IPageLayout.ID_BOOKMARKS))
 			return IDEInternalPreferences.BOOKMARKS_FILTERS;
-		}
-		if (viewId != null && viewId.equals(IPageLayout.ID_TASK_LIST)) {
+		if (viewId != null && viewId.equals(IPageLayout.ID_TASK_LIST))
 			return IDEInternalPreferences.TASKS_FILTERS;
-		}
 		return IDEInternalPreferences.PROBLEMS_FILTERS;
 
 	}
 
 	private void loadLimitSettings(IMemento memento) {
-		if (memento == null) {
+		
+		if (memento == null)
 			return;
-		}
 
 		Integer limits = memento.getInteger(TAG_MARKER_LIMIT);
 		if (limits != null) {
@@ -469,49 +483,49 @@ public class MarkerContentGenerator {
 		if (limitsEnabled != null) {
 			markerLimitsEnabled = limitsEnabled.booleanValue();
 		}
+		
 	}
-
+	
 	/**
 	 * Load the settings from the memento.
-	 *
+	 * 
 	 * @param memento
 	 */
 	private void loadFilterSettings(IMemento memento) {
-		if (memento == null) {
+
+		if (memento == null)
 			return;
-		}
 
 		Boolean andValue = memento.getBoolean(TAG_AND);
-		if (andValue != null) {
+		if (andValue != null)
 			setAndFilters(andValue.booleanValue());
-		}
 		IMemento children[] = memento.getChildren(TAG_GROUP_ENTRY);
 
-		for (IMemento element : children) {
-			IMemento child = element;
+		for (int i = 0; i < children.length; i++) {
+			IMemento child = children[i];
 			String id = child.getString(IMemento.TAG_ID);
-			if (id == null) {
+			if (id == null)
 				continue;
-			}
-			if (!loadGroupWithID(child, id)) {
+			if (!loadGroupWithID(child, id))
+
 				// Did not find a match must have been added by the user
 				loadUserFilter(child);
-			}
 		}
+
 	}
 
 	/**
 	 * Load the filters defined in memento string.
-	 *
+	 * 
 	 * @param mementoString
 	 */
 	private void loadFiltersFrom(String mementoString) {
-		if (mementoString.equals(IPreferenceStore.STRING_DEFAULT_DEFAULT)) {
+		if (mementoString.equals(IPreferenceStore.STRING_DEFAULT_DEFAULT))
 			return;
-		}
 
 		try {
-			XMLMemento root = XMLMemento.createReadRoot(new StringReader(mementoString));
+			XMLMemento root = XMLMemento.createReadRoot(new StringReader(
+					mementoString));
 			loadLimitSettings(root);
 			loadFilterSettings(root);
 		} catch (WorkbenchException e) {
@@ -523,20 +537,25 @@ public class MarkerContentGenerator {
 	 * Load the filters preference.
 	 */
 	private void loadFiltersPreference() {
-		loadFiltersFrom(IDEWorkbenchPlugin.getDefault().getPreferenceStore().getString(getMementoPreferenceName()));
+
+		loadFiltersFrom(IDEWorkbenchPlugin.getDefault().getPreferenceStore()
+				.getString(getMementoPreferenceName()));
 
 		String legacyFilters = getLegacyFiltersPreferenceName();
-		String migrationPreference = legacyFilters + MarkerSupportInternalUtilities.MIGRATE_PREFERENCE_CONSTANT;
+		String migrationPreference = legacyFilters
+				+ MarkerSupportInternalUtilities.MIGRATE_PREFERENCE_CONSTANT;
 
-		if (IDEWorkbenchPlugin.getDefault().getPreferenceStore().getBoolean(migrationPreference)) {
+		if (IDEWorkbenchPlugin.getDefault().getPreferenceStore().getBoolean(
+				migrationPreference))
 			return;// Already migrated
-		}
 
 		// Load any defined in a pre 3.4 workbench
-		loadLegacyFiltersFrom(IDEWorkbenchPlugin.getDefault().getPreferenceStore().getString(legacyFilters));
+		loadLegacyFiltersFrom(IDEWorkbenchPlugin.getDefault()
+				.getPreferenceStore().getString(legacyFilters));
 
 		// Mark as migrated
-		IDEWorkbenchPlugin.getDefault().getPreferenceStore().setValue(migrationPreference, true);
+		IDEWorkbenchPlugin.getDefault().getPreferenceStore().setValue(
+				migrationPreference, true);
 	}
 
 	/**
@@ -549,16 +568,17 @@ public class MarkerContentGenerator {
 	/**
 	 * Load the group with id from the child if there is a matching system group
 	 * registered.
-	 *
+	 * 
 	 * @param child
 	 * @param id
 	 * @return <code>true</code> if a matching group was found
 	 */
 	private boolean loadGroupWithID(IMemento child, String id) {
-		Iterator<MarkerFieldFilterGroup> groups = getAllFilters().iterator();
+		Iterator groups = getAllFilters().iterator();
 
 		while (groups.hasNext()) {
-			MarkerFieldFilterGroup group = groups.next();
+			MarkerFieldFilterGroup group = (MarkerFieldFilterGroup) groups
+					.next();
 			if (id.equals(group.getID())) {
 				group.loadSettings(child);
 				return true;
@@ -569,37 +589,40 @@ public class MarkerContentGenerator {
 
 	/**
 	 * Load the legacy filter into the system.
-	 *
+	 * 
 	 * @param child
 	 */
 	private void loadLegacyFilter(IMemento child) {
 		MarkerFieldFilterGroup newGroup = new MarkerFieldFilterGroup(null, this);
 		newGroup.legacyLoadSettings(child);
 		getAllFilters().add(newGroup);
+
 	}
 
 	/**
 	 * Load the pre-3.4 filters.
-	 *
+	 * 
 	 * @param mementoString
 	 */
 	private void loadLegacyFiltersFrom(String mementoString) {
-		if (mementoString.equals(IPreferenceStore.STRING_DEFAULT_DEFAULT)) {
+
+		if (mementoString.equals(IPreferenceStore.STRING_DEFAULT_DEFAULT))
 			return;
-		}
 		IMemento memento;
 		try {
-			memento = XMLMemento.createReadRoot(new StringReader(mementoString));
+			memento = XMLMemento
+					.createReadRoot(new StringReader(mementoString));
 			restoreLegacyFilters(memento);
 		} catch (WorkbenchException e) {
 			StatusManager.getManager().handle(e.getStatus());
 			return;
 		}
+
 	}
 
 	/**
 	 * Load the user supplied filter
-	 *
+	 * 
 	 * @param child
 	 */
 	private void loadUserFilter(IMemento child) {
@@ -610,23 +633,28 @@ public class MarkerContentGenerator {
 
 	/**
 	 * Restore the pre-3.4 filters.
-	 *
+	 * 
 	 * @param memento
 	 */
 	private void restoreLegacyFilters(IMemento memento) {
-		IMemento[] sections = null;
-		if (memento != null) {
-			sections = memento.getChildren(TAG_LEGACY_FILTER_ENTRY);
-		}
 
-		for (IMemento child : sections) {
+		IMemento[] sections = null;
+		if (memento != null)
+			sections = memento.getChildren(TAG_LEGACY_FILTER_ENTRY);
+
+		for (int i = 0; i < sections.length; i++) {
+			IMemento child = sections[i];
 			String id = child.getString(IMemento.TAG_ID);
 			if (id == null)
 				continue;
 			loadLegacyFilter(child);
 		}
+
 	}
 
+	/**
+	 * 
+	 */
 	private void writeFiltersPreference() {
 		XMLMemento memento = XMLMemento.createWriteRoot(TAG_FILTERS_SECTION);
 
@@ -651,11 +679,14 @@ public class MarkerContentGenerator {
 	 */
 	private void initializePreferenceListener() {
 		if (filterPreferenceListener == null) {
-			filterPreferenceListener = event -> {
-				if (event.getProperty().equals(getMementoPreferenceName())) {
-					rebuildFilters();
-				}
+			filterPreferenceListener = new IPropertyChangeListener() {
 
+				public void propertyChange(PropertyChangeEvent event) {
+					if (event.getProperty().equals(getMementoPreferenceName())) {
+						rebuildFilters();
+					}
+
+				}
 			};
 			IDEWorkbenchPlugin.getDefault().getPreferenceStore()
 					.addPropertyChangeListener(filterPreferenceListener);
@@ -663,28 +694,35 @@ public class MarkerContentGenerator {
 	}
 
 	private void writeLimitSettings(XMLMemento memento) {
+		
 		memento.putInteger(TAG_MARKER_LIMIT, markerLimits);
 		memento.putBoolean(TAG_MARKER_LIMIT_ENABLED, markerLimitsEnabled);
-	}
 
+	}
+	
 	/**
 	 * Write the settings for the filters to the memento.
-	 *
+	 * 
 	 * @param memento
 	 */
 	private void writeFiltersSettings(XMLMemento memento) {
+
 		memento.putBoolean(TAG_AND, andFilters());
-		Iterator<MarkerFieldFilterGroup> groups = getAllFilters().iterator();
+
+		Iterator groups = getAllFilters().iterator();
 		while (groups.hasNext()) {
-			MarkerFieldFilterGroup group = groups.next();
-			IMemento child = memento.createChild(TAG_GROUP_ENTRY, group.getID());
+			MarkerFieldFilterGroup group = (MarkerFieldFilterGroup) groups
+					.next();
+			IMemento child = memento
+					.createChild(TAG_GROUP_ENTRY, group.getID());
 			group.saveFilterSettings(child);
 		}
+
 	}
 
 	/**
 	 * Return the id of the receiver.
-	 *
+	 * 
 	 * @return String
 	 */
 	public String getId() {
@@ -708,7 +746,7 @@ public class MarkerContentGenerator {
 
 	/**
 	 * Get the list of initially visible fields
-	 *
+	 * 
 	 * @return {@link MarkerField}[]
 	 */
 	MarkerField[] getInitialVisible() {
@@ -717,58 +755,57 @@ public class MarkerContentGenerator {
 
 	/**
 	 * Get the group called groupName from the receiver
-	 *
+	 * 
 	 * @param groupName
 	 * @return MarkerGroup or <code>null</code>
 	 */
 	MarkerGroup getMarkerGroup(String groupName) {
-		Iterator<MarkerGroup> groups = getMarkerGroups().iterator();
+		Iterator groups = getMarkerGroups().iterator();
 		while (groups.hasNext()) {
-			MarkerGroup group = groups.next();
-			if (group.getId().equals(groupName)) {
+			MarkerGroup group = (MarkerGroup) groups.next();
+			if (group.getId().equals(groupName))
 				return group;
-			}
 		}
 		return null;
 	}
 
 	/**
 	 * Get the markerGroups associated with the receiver.
-	 *
+	 * 
 	 * @return Collection of {@link MarkerGroup}
 	 */
-	Collection<MarkerGroup> getMarkerGroups() {
+	Collection getMarkerGroups() {
 		return generatorDescriptor.getMarkerGroups();
 	}
 
 	/**
 	 * Return the markerTypes for the receiver.
-	 *
+	 * 
 	 * @return Collection of {@link MarkerType}
 	 */
-	public Collection<MarkerType> getMarkerTypes() {
+	public Collection getMarkerTypes() {
 		return generatorDescriptor.getMarkerTypes();
 	}
 
 	/**
 	 * Return the markerTypes for the receiver.
-	 *
+	 * 
 	 * @return Array of type Ids
 	 */
 	public String[] getTypes() {
-		Collection<MarkerType> types = getMarkerTypes();
+		Collection types = getMarkerTypes();
 		String[] ids = new String[types.size()];
-		Iterator<MarkerType> iterator = types.iterator();
+		Iterator iterator = types.iterator();
 		int i = 0;
 		while (iterator.hasNext()) {
-			ids[i++] = iterator.next().getId();
+			ids[i++] = ((MarkerType) iterator.next()).getId();
 		}
 		return ids;
 	}
 
 	/**
 	 * Return the name for the receiver.
-	 *
+	 * 
 	 * @return String
 	 */
 	String getName() {
@@ -777,7 +814,7 @@ public class MarkerContentGenerator {
 
 	/**
 	 * Return the type for typeId.
-	 *
+	 * 
 	 * @param typeId
 	 * @return {@link MarkerType} or <code>null</code> if it is not found.
 	 */
@@ -797,14 +834,16 @@ public class MarkerContentGenerator {
 		}
 	}
 
-	static boolean select(MarkerEntry entry, IResource[] selResources,
-			Collection<MarkerFieldFilterGroup> enabledFilters, boolean andFilters) {
+	boolean select(MarkerEntry entry, IResource[] selResources,
+			Collection enabledFilters, boolean andFilters) {
 		if (enabledFilters.size() > 0) {
-			Iterator<MarkerFieldFilterGroup> filtersIterator = enabledFilters.iterator();
+			Iterator filtersIterator = enabledFilters.iterator();
 			if (andFilters) {
 				while (filtersIterator.hasNext()) {
-					MarkerFieldFilterGroup group = filtersIterator.next();
-					if (!group.selectByScope(entry, selResources) || !group.selectByFilters(entry)) {
+					MarkerFieldFilterGroup group = (MarkerFieldFilterGroup) filtersIterator
+							.next();
+					if (!group.selectByScope(entry, selResources)
+							|| !group.selectByFilters(entry)) {
 						return false;
 					}
 				}
@@ -812,8 +851,10 @@ public class MarkerContentGenerator {
 			}
 
 			while (filtersIterator.hasNext()) {
-				MarkerFieldFilterGroup group = filtersIterator.next();
-				if (group.selectByScope(entry, selResources) && group.selectByFilters(entry)) {
+				MarkerFieldFilterGroup group = (MarkerFieldFilterGroup) filtersIterator
+						.next();
+				if (group.selectByScope(entry, selResources)
+						&& group.selectByFilters(entry)) {
 					return true;
 				}
 			}
@@ -826,16 +867,17 @@ public class MarkerContentGenerator {
 	 * Update the focus resources from list. If there is an update required
 	 * return <code>true</code>. This method assumes that there are filters on
 	 * resources enabled.
-	 *
+	 * 
 	 * @param elements
 	 */
 	void internalUpdateSelectedElements(Object[] elements) {
-		Collection<IResource> resourceCollection = new ArrayList<>();
-		for (Object element : elements) {
-			if (element instanceof IResource) {
-				resourceCollection.add((IResource) element);
+		Collection resourceCollection = new ArrayList();
+		for (int i = 0; i < elements.length; i++) {
+			if (elements[i] instanceof IResource) {
+				resourceCollection.add(elements[i]);
 			} else {
-				MarkerResourceUtil.addResources(resourceCollection, ((ResourceMapping) element));
+				MarkerResourceUtil.addResources(resourceCollection,
+						((ResourceMapping) elements[i]));
 			}
 		}
 		IResource[] newSelection = new IResource[resourceCollection.size()];
@@ -845,7 +887,7 @@ public class MarkerContentGenerator {
 
 	/**
 	 * Update the receiver for a change in selection.
-	 *
+	 * 
 	 * @param newElements
 	 * @param forceUpdate <code>true</code> if update must be done, <code>false</code> to only update when needed
 	 */
@@ -862,39 +904,40 @@ public class MarkerContentGenerator {
 	/**
 	 * Return whether or not the list contains a resource that will require
 	 * update.
-	 *
+	 * 
 	 * @return boolean <code>true</code> if update is required.
 	 */
 	boolean updateNeededForSelection(Object[] newElements) {
-		Iterator<MarkerFieldFilterGroup> enabled = getEnabledFilters().iterator();
 
-		while (enabled.hasNext()) {
-			MarkerFieldFilterGroup filter = enabled.next();
+		Iterator filters = getEnabledFilters().iterator();
+
+		while (filters.hasNext()) {
+			MarkerFieldFilterGroup filter = (MarkerFieldFilterGroup) filters
+					.next();
 
 			int scope = filter.getScope();
-			if (scope == MarkerFieldFilterGroup.ON_ANY || scope == MarkerFieldFilterGroup.ON_WORKING_SET) {
+			if (scope == MarkerFieldFilterGroup.ON_ANY
+					|| scope == MarkerFieldFilterGroup.ON_WORKING_SET)
 				continue;
-			}
 
-			if (newElements == null || newElements.length < 1) {
+			if (newElements == null || newElements.length < 1)
 				continue;
-			}
 
-			if (selectedResources.length == 0) {
+			if (selectedResources.length == 0)
 				return true; // We had nothing now we have something
-			}
 
-			if (Arrays.equals(selectedResources, newElements)) {
+			if (Arrays.equals(selectedResources, newElements))
 				continue;
-			}
 
 			if (scope == MarkerFieldFilterGroup.ON_ANY_IN_SAME_CONTAINER) {
-				Collection<IProject> oldProjects = MarkerResourceUtil.getProjectsAsCollection(selectedResources);
-				Collection<IProject> newProjects = MarkerResourceUtil.getProjectsAsCollection(newElements);
+				Collection oldProjects = MarkerResourceUtil
+						.getProjectsAsCollection(selectedResources);
+				Collection newProjects = MarkerResourceUtil
+						.getProjectsAsCollection(newElements);
 
-				if (oldProjects.size() == newProjects.size() && newProjects.containsAll(oldProjects)) {
+				if (oldProjects.size() == newProjects.size()
+						&& newProjects.containsAll(oldProjects))
 					continue;
-				}
 				return true;// Something must be different
 			}
 			return true;
@@ -907,9 +950,10 @@ public class MarkerContentGenerator {
 	 * @return list of selected resources
 	 */
 	IResource[] getSelectedResources() {
-		IResource[] selected = selectedResources;
+		IResource[] selected=selectedResources;
 		IResource[] resources = new IResource[selected.length];
-		System.arraycopy(selected, 0, resources, 0, selected.length);
+		System.arraycopy(selected, 0, resources, 0,
+				selected.length);
 		return resources;
 	}
 
@@ -923,17 +967,17 @@ public class MarkerContentGenerator {
 	 * which happens real quickly.Also when filters are Anded we get a chance to
 	 * gather only on resources that actually matter.And we get a tool to check
 	 * at various places.
-	 *
+	 * 
 	 * @return list of resource we want to collect markers for taking various
 	 *         enabled filters into account.
-	 *
+	 * 
 	 */
-	Collection<IResource> getResourcesForBuild() {
+	Collection getResourcesForBuild() {
 		currentResources = MarkerResourceUtil.computeResources(
 				getSelectedResources(), getEnabledFilters(), andFilters());
 		return currentResources;
 	}
-
+	
 	/*
 	 * See Bug 296695: This method is trickier than it may seem/appears to be.If
 	 * it is ever desired to use this, it would need to be *RE-IMPLEMENTED* and
@@ -994,11 +1038,11 @@ public class MarkerContentGenerator {
 
 	/**
 	 * Refresh gathered markers entries
-	 *
+	 * 
 	 * @param monitor
 	 */
-	Collection<MarkerEntry> generateMarkerEntries(IProgressMonitor monitor) {
-		List<MarkerEntry> result = new LinkedList<>();
+	Collection generateMarkerEntries(IProgressMonitor monitor) {
+		List result = new LinkedList();
 		String[] typeIds = getTypes();
 		boolean includeSubTypes = builder.includeMarkerSubTypes();
 		boolean cancelled = gatherMarkers(typeIds, includeSubTypes, result,
@@ -1014,7 +1058,7 @@ public class MarkerContentGenerator {
 	 * @param result
 	 * @param monitor
 	 */
-	boolean generateMarkerEntries(Collection<MarkerEntry> result,IProgressMonitor monitor) {
+	boolean generateMarkerEntries(Collection result,IProgressMonitor monitor) {
 		String[] typeIds = getTypes();
 		boolean includeSubTypes = builder.includeMarkerSubTypes();
 		return gatherMarkers(typeIds, includeSubTypes, result, monitor);
@@ -1028,24 +1072,27 @@ public class MarkerContentGenerator {
 	 * @param monitor
 	 */
 	boolean gatherMarkers(String[] typeIds, boolean includeSubTypes,
-			Collection<MarkerEntry> result, IProgressMonitor monitor) {
+			Collection result, IProgressMonitor monitor) {
 		try {
-			Collection<IResource> resources = getResourcesForBuild();
+			Collection resources = getResourcesForBuild();
 			if (includeSubTypes) {
 				// Optimize and calculate super types
-				String[] superTypes = MarkerResourceUtil.getMutuallyExclusiveSupersIds(typeIds);
+				String[] superTypes = MarkerResourceUtil
+						.getMutuallyExclusiveSupersIds(typeIds);
 				if (monitor.isCanceled()) {
 					return false;
 				}
-				for (String superType : superTypes) {
-					boolean success = internalGatherMarkers(resources, superType, includeSubTypes, result, monitor);
+				for (int i = 0; i < superTypes.length; i++) {
+					boolean success = internalGatherMarkers(resources,superTypes[i],
+							includeSubTypes, result, monitor);
 					if (!success || monitor.isCanceled()) {
 						return false;
 					}
 				}
 			} else {
-				for (String typeId : typeIds) {
-					boolean success = internalGatherMarkers(resources, typeId, includeSubTypes, result, monitor);
+				for (int i = 0; i < typeIds.length; i++) {
+					boolean success = internalGatherMarkers(resources,typeIds[i],
+							includeSubTypes, result, monitor);
 					if (!success || monitor.isCanceled()) {
 						return false;
 					}
@@ -1063,30 +1110,31 @@ public class MarkerContentGenerator {
 	/**
 	 * A helper to the
 	 * {@link #gatherMarkers(String[], boolean, Collection, IProgressMonitor)}
-	 *
+	 * 
 	 * @param resources
 	 * @param typeId
 	 * @param includeSubTypes
 	 * @param result
 	 * @param monitor
 	 */
-	private boolean internalGatherMarkers(Collection<IResource> resources, String typeId,
-			boolean includeSubTypes, Collection<MarkerEntry> result, IProgressMonitor monitor) {
+	private boolean internalGatherMarkers(Collection resources, String typeId,
+			boolean includeSubTypes, Collection result, IProgressMonitor monitor) {
 		if (monitor.isCanceled()) {
 			return false;
 		}
 		IResource[] selected = getSelectedResources();
-		Collection<MarkerFieldFilterGroup> enabled = getEnabledFilters();
-		boolean filtersAreANDed = andFilters();
-		Iterator<IResource> iterator = resources.iterator();
+		Collection filters = getEnabledFilters();
+		boolean andFilters = andFilters();
+		Iterator iterator = resources.iterator();
 		while (iterator.hasNext()) {
 			IMarker[] markers = null;
 			try {
-				IResource resource = iterator.next();
+				IResource resource = (IResource) iterator.next();
 				if (!resource.isAccessible()) {
 					continue;
 				}
-				markers = resource.findMarkers(typeId, includeSubTypes, IResource.DEPTH_INFINITE);
+				markers = resource.findMarkers(typeId, includeSubTypes,
+						IResource.DEPTH_INFINITE);
 			} catch (CoreException e) {
 				MarkerSupportInternalUtilities.logViewError(e);
 			}
@@ -1097,10 +1145,10 @@ public class MarkerContentGenerator {
 				return false;
 			}
 			MarkerEntry entry = null;
-			int lenght = markers.length;
+			int lenght =  markers.length;
 			for (int i = 0; i < lenght; i++) {
 				entry = new MarkerEntry(markers[i]);
-				if (select(entry, selected, enabled, filtersAreANDed)) {
+				if (select(entry, selected, filters, andFilters)) {
 					result.add(entry);
 				}
 				entry.clearCache();

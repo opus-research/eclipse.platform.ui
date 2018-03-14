@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 476045
  *******************************************************************************/
 
 package org.eclipse.ui.internal.quickaccess;
@@ -25,7 +23,6 @@ import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.commands.ICommandImageService;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.internal.IWorkbenchGraphicConstants;
@@ -33,7 +30,7 @@ import org.eclipse.ui.internal.WorkbenchImages;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class CommandProvider extends QuickAccessProvider {
 
@@ -48,8 +45,7 @@ public class CommandProvider extends QuickAccessProvider {
 	private IHandlerService handlerService;
 	private ICommandService commandService;
 	private EHandlerService ehandlerService;
-	private ICommandImageService commandImageService;
-
+	
 	public CommandProvider() {
 	}
 
@@ -108,14 +104,14 @@ public class CommandProvider extends QuickAccessProvider {
 	public String getName() {
 		return QuickAccessMessages.QuickAccess_Commands;
 	}
-
+	
 	EHandlerService getEHandlerService() {
 		if (ehandlerService == null) {
 			if (currentSnapshot instanceof ExpressionContext) {
 				IEclipseContext ctx = ((ExpressionContext) currentSnapshot).eclipseContext;
 				ehandlerService = ctx.get(EHandlerService.class);
 			} else {
-				ehandlerService = PlatformUI.getWorkbench().getService(
+				ehandlerService = (EHandlerService) PlatformUI.getWorkbench().getService(
 						EHandlerService.class);
 			}
 		}
@@ -128,7 +124,7 @@ public class CommandProvider extends QuickAccessProvider {
 				IEclipseContext ctx = ((ExpressionContext) currentSnapshot).eclipseContext;
 				commandService = ctx.get(ICommandService.class);
 			} else {
-				commandService = PlatformUI.getWorkbench().getService(
+				commandService = (ICommandService) PlatformUI.getWorkbench().getService(
 						ICommandService.class);
 			}
 		}
@@ -141,25 +137,13 @@ public class CommandProvider extends QuickAccessProvider {
 				IEclipseContext ctx = ((ExpressionContext) currentSnapshot).eclipseContext;
 				handlerService = ctx.get(IHandlerService.class);
 			} else {
-				handlerService = PlatformUI.getWorkbench().getService(
+				handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(
 						IHandlerService.class);
 			}
 		}
 		return handlerService;
 	}
-
-	public ICommandImageService getCommandImageService() {
-		if (commandImageService == null) {
-			if (currentSnapshot instanceof ExpressionContext) {
-				IEclipseContext ctx = ((ExpressionContext) currentSnapshot).eclipseContext;
-				commandImageService = ctx.get(ICommandImageService.class);
-			} else {
-				commandImageService = PlatformUI.getWorkbench().getService(ICommandImageService.class);
-			}
-		}
-		return commandImageService;
-	}
-
+	
 	IEvaluationContext getContextSnapshot() {
 		return currentSnapshot;
 	}

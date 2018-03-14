@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,6 +20,8 @@ import java.util.HashMap;
 import org.eclipse.core.databinding.conversion.IConverter;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.validation.IValidator;
+import org.eclipse.core.databinding.validation.ValidationStatus;
+import org.eclipse.core.internal.databinding.BindingMessages;
 import org.eclipse.core.internal.databinding.Pair;
 import org.eclipse.core.internal.databinding.conversion.NumberToBigDecimalConverter;
 import org.eclipse.core.internal.databinding.conversion.NumberToBigIntegerConverter;
@@ -92,7 +94,7 @@ import org.eclipse.core.runtime.Status;
  * {@link #POLICY_NEVER}, {@link #POLICY_CONVERT}, {@link #POLICY_ON_REQUEST},
  * {@link #POLICY_UPDATE}).
  * </p>
- *
+ * 
  * @see DataBindingContext#bindValue(IObservableValue, IObservableValue,
  *      UpdateValueStrategy, UpdateValueStrategy)
  * @see Binding#getValidationStatus()
@@ -127,7 +129,7 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	/**
 	 * Policy constant denoting that the source observable's state should be
 	 * tracked, and that validation, conversion and updating the destination
-	 * observable's value should be performed automatically on every change of
+	 * observable's value should be performed automaticlly on every change of
 	 * the source observable value.
 	 */
 	public static int POLICY_UPDATE = notInlined(8);
@@ -136,7 +138,7 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	 * Helper method allowing API evolution of the above constant values. The
 	 * compiler will not inline constant values into client code if values are
 	 * "computed" using this helper.
-	 *
+	 * 
 	 * @param i
 	 *            an integer
 	 * @return the same integer
@@ -148,6 +150,8 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	protected IValidator afterGetValidator;
 	protected IValidator afterConvertValidator;
 	protected IValidator beforeSetValidator;
+	protected IConverter converter;
+
 	private int updatePolicy;
 
 	private static ValidatorRegistry validatorRegistry = new ValidatorRegistry();
@@ -174,7 +178,7 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	 * Creates a new update value strategy with a configurable update policy.
 	 * Default validators and a default converter will be provided. The defaults
 	 * can be changed by calling one of the setter methods.
-	 *
+	 * 
 	 * @param updatePolicy
 	 *            one of {@link #POLICY_NEVER}, {@link #POLICY_ON_REQUEST},
 	 *            {@link #POLICY_CONVERT}, or {@link #POLICY_UPDATE}
@@ -188,7 +192,7 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	 * Default validators and a default converter will be provided if
 	 * <code>provideDefaults</code> is <code>true</code>. The defaults can be
 	 * changed by calling one of the setter methods.
-	 *
+	 * 
 	 * @param provideDefaults
 	 *            if <code>true</code>, default validators and a default
 	 *            converter will be provided based on the observable value's
@@ -203,10 +207,24 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	}
 
 	/**
+	 * Converts the value from the source type to the destination type.
+	 * <p>
+	 * Default implementation will use the {@link #setConverter(IConverter)
+	 * converter} if one exists. If no converter exists no conversion occurs.
+	 * </p>
+	 * 
+	 * @param value
+	 * @return the converted value
+	 */
+	public Object convert(Object value) {
+		return converter == null ? value : converter.convert(value);
+	}
+
+	/**
 	 * Tries to create a validator that can validate values of type fromType.
 	 * Returns <code>null</code> if no validator could be created. Either toType
 	 * or modelDescription can be <code>null</code>, but not both.
-	 *
+	 * 
 	 * @param fromType
 	 * @param toType
 	 * @return an IValidator, or <code>null</code> if unsuccessful
@@ -215,7 +233,6 @@ public class UpdateValueStrategy extends UpdateStrategy {
 		if (fromType == null || toType == null) {
 			return new IValidator() {
 
-				@Override
 				public IStatus validate(Object value) {
 					return Status.OK_STATUS;
 				}
@@ -232,7 +249,7 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	 * attempt is made to default the {@link #validateAfterGet(Object) after get
 	 * validator}. If a validator cannot be defaulted it will be
 	 * <code>null</code>.
-	 *
+	 * 
 	 * @param source
 	 * @param destination
 	 */
@@ -363,7 +380,7 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	/**
 	 * Sets the validator to be invoked after the source value is converted to
 	 * the type of the destination observable.
-	 *
+	 * 
 	 * @param validator
 	 * @return the receiver, to enable method call chaining
 	 */
@@ -375,7 +392,7 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	/**
 	 * Sets the validator to be invoked after the source value is retrieved at
 	 * the beginning of the synchronization process.
-	 *
+	 * 
 	 * @param validator
 	 * @return the receiver, to enable method call chaining
 	 */
@@ -387,7 +404,7 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	/**
 	 * Sets the validator to be invoked before the value is to be set on the
 	 * destination at the end of the synchronization process.
-	 *
+	 * 
 	 * @param validator
 	 * @return the receiver, to enable method call chaining
 	 */
@@ -399,7 +416,7 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	/**
 	 * Sets the converter to be invoked when converting from the source type to
 	 * the destination type.
-	 *
+	 * 
 	 * @param converter
 	 * @return the receiver, to enable method call chaining
 	 */
@@ -415,7 +432,7 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	 * {@link #setAfterConvertValidator(IValidator) validator} if one exists. If
 	 * one does not exist no validation will occur.
 	 * </p>
-	 *
+	 * 
 	 * @param value
 	 * @return an ok status
 	 */
@@ -431,7 +448,7 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	 * {@link #setAfterGetValidator(IValidator) validator} if one exists. If one
 	 * does not exist no validation will occur.
 	 * </p>
-	 *
+	 * 
 	 * @param value
 	 * @return an ok status
 	 */
@@ -447,7 +464,7 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	 * {@link #setBeforeSetValidator(IValidator) validator} if one exists. If
 	 * one does not exist no validation will occur.
 	 * </p>
-	 *
+	 * 
 	 * @param value
 	 * @return an ok status
 	 */
@@ -459,7 +476,7 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	/**
 	 * Sets the current value of the given observable to the given value.
 	 * Clients may extend but must call the super implementation.
-	 *
+	 * 
 	 * @param observableValue
 	 * @param value
 	 * @return status
@@ -468,7 +485,11 @@ public class UpdateValueStrategy extends UpdateStrategy {
 		try {
 			observableValue.setValue(value);
 		} catch (Exception ex) {
-			return logErrorWhileSettingValue(ex);
+			return ValidationStatus
+					.error(
+							BindingMessages
+									.getString(BindingMessages.VALUEBINDING_ERROR_WHILE_SETTING_VALUE),
+							ex);
 		}
 		return Status.OK_STATUS;
 	}
@@ -518,7 +539,7 @@ public class UpdateValueStrategy extends UpdateStrategy {
 		/**
 		 * Associate a particular validator that can validate the conversion
 		 * (fromClass, toClass)
-		 *
+		 * 
 		 * @param fromClass
 		 *            The Class to convert from
 		 * @param toClass
@@ -533,7 +554,7 @@ public class UpdateValueStrategy extends UpdateStrategy {
 
 		/**
 		 * Return an IValidator for a specific fromClass and toClass.
-		 *
+		 * 
 		 * @param fromClass
 		 *            The Class to convert from
 		 * @param toClass
@@ -547,14 +568,12 @@ public class UpdateValueStrategy extends UpdateStrategy {
 				return result;
 			if (fromClass != null && toClass != null && fromClass == toClass) {
 				return new IValidator() {
-					@Override
 					public IStatus validate(Object value) {
 						return Status.OK_STATUS;
 					}
 				};
 			}
 			return new IValidator() {
-				@Override
 				public IStatus validate(Object value) {
 					return Status.OK_STATUS;
 				}
@@ -562,15 +581,4 @@ public class UpdateValueStrategy extends UpdateStrategy {
 		}
 	}
 
-	/**
-	 * Create an {@link UpdateValueStrategy} with a converter
-	 *
-	 * @param converter
-	 *            the converter
-	 * @return the update value strategy
-	 * @since 1.6
-	 */
-	public static UpdateValueStrategy create(IConverter converter) {
-		return new UpdateValueStrategy().setConverter(converter);
-	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006-2008, 2015 Cerner Corporation and others.
+ * Copyright (c) 2006-2008 Cerner Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     Brad Reynolds - initial API and implementation
  *     Matthew Hall - bug 208332, 237718
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.internal.databinding.observable;
@@ -25,103 +24,84 @@ import org.eclipse.core.databinding.observable.list.IObservableList;
 /**
  * ObservableList implementation that prevents modification by consumers. Events
  * in the originating wrapped list are propagated and thrown from this instance
- * when appropriate. All mutators throw an UnsupportedOperationException.
- *
- * @param <E>
- *            the type of the elements in this list
- *
+ * when appropriate.  All mutators throw an UnsupportedOperationException.
+ * 
  * @since 1.0
  */
-public class UnmodifiableObservableList<E> extends DecoratingObservableList<E> {
-	private List<E> unmodifiableList;
+public class UnmodifiableObservableList extends DecoratingObservableList {
+	private List unmodifiableList;
 
 	/**
 	 * @param decorated
 	 */
-	public UnmodifiableObservableList(IObservableList<E> decorated) {
+	public UnmodifiableObservableList(IObservableList decorated) {
 		super(decorated, false);
 		this.unmodifiableList = Collections.unmodifiableList(decorated);
 	}
 
-	@Override
 	public void add(int index, Object o) {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public boolean add(E o) {
+	public boolean add(Object o) {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public boolean addAll(Collection<? extends E> c) {
+	public boolean addAll(Collection c) {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public boolean addAll(int index, Collection<? extends E> c) {
+	public boolean addAll(int index, Collection c) {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
 	public void clear() {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public Iterator<E> iterator() {
+	public Iterator iterator() {
 		getterCalled();
 		return unmodifiableList.iterator();
 	}
 
-	@Override
-	public ListIterator<E> listIterator() {
+	public ListIterator listIterator() {
 		return listIterator(0);
 	}
 
-	@Override
-	public ListIterator<E> listIterator(int index) {
+	public ListIterator listIterator(int index) {
 		getterCalled();
 		return unmodifiableList.listIterator(index);
 	}
 
-	@Override
-	public E move(int oldIndex, int newIndex) {
+	public Object move(int oldIndex, int newIndex) {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public E remove(int index) {
+	public Object remove(int index) {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
 	public boolean remove(Object o) {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public boolean removeAll(Collection<?> c) {
+	public boolean removeAll(Collection c) {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public boolean retainAll(Collection<?> c) {
+	public boolean retainAll(Collection c) {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public E set(int index, E element) {
+	public Object set(int index, Object element) {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public List<E> subList(int fromIndex, int toIndex) {
+	public List subList(int fromIndex, int toIndex) {
 		getterCalled();
 		return unmodifiableList.subList(fromIndex, toIndex);
 	}
 
-	@Override
 	public synchronized void dispose() {
 		unmodifiableList = null;
 		super.dispose();

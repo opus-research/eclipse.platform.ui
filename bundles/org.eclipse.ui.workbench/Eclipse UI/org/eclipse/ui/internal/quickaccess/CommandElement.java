@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,9 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     ARTAL Technologies <simon.chemouil@artal.fr> - Bug 293044 added keybindings display
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 476045
+ *     ARTAL Technologies <simon.chemouil@artal.fr> - Bug 293044 added keybindings display 
  *******************************************************************************/
 
 package org.eclipse.ui.internal.quickaccess;
@@ -22,7 +20,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.commands.ICommandImageService;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.internal.keys.BindingService;
 import org.eclipse.ui.internal.menus.CommandMessages;
@@ -32,7 +29,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class CommandElement extends QuickAccessElement {
 
@@ -63,12 +60,12 @@ public class CommandElement extends QuickAccessElement {
 				return;
 			}
 		}
-
+		
 		// let's try the old fashioned way
 		IWorkbenchWindow window = PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow();
 		if (window != null) {
-			IHandlerService handlerService = window
+			IHandlerService handlerService = (IHandlerService) window
 					.getWorkbench().getService(IHandlerService.class);
 			try {
 				handlerService.executeCommand(command, null);
@@ -86,13 +83,12 @@ public class CommandElement extends QuickAccessElement {
 
 	@Override
 	public ImageDescriptor getImageDescriptor() {
-		ICommandImageService imgService = ((CommandProvider) getProvider()).getCommandImageService();
-		return (imgService == null) ? null : imgService.getImageDescriptor(getId());
+		return null;
 	}
 
 	/**
 	 * Returns a formatted string describes this command.
-	 *
+	 * 
 	 * @return a description of the command of this element
 	 * @since 3.6
 	 */
@@ -126,7 +122,7 @@ public class CommandElement extends QuickAccessElement {
 	/**
 	 * Returns a formatted string that can be used to invoke this element's
 	 * command. <code>null</code> may be returned if a binding cannot be found.
-	 *
+	 * 
 	 * @return the string keybinding for invoking this element's command, may be
 	 *         <code>null</code>
 	 * @since 3.6

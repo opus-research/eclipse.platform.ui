@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,17 +23,17 @@ import org.eclipse.ui.IMemento;
 
 
 /**
- * Factory for saving and restoring a <code>FileStoreEditorInput</code>.
+ * Factory for saving and restoring a <code>FileStoreEditorInput</code>. 
  * The stored representation of a <code>FileStoreEditorInput</code> remembers
  * the path of the editor input.
  * <p>
  * The workbench will automatically create instances of this class as required.
  * It is not intended to be instantiated or subclassed by the client.</p>
- *
+ * 
  * @since 3.3
  */
 public class FileStoreEditorInputFactory implements IElementFactory {
-
+	
 	/**
 	 * This factory's ID.
 	 * <p>
@@ -41,7 +41,7 @@ public class FileStoreEditorInputFactory implements IElementFactory {
 	 * the <code>"org.eclipse.ui.elementFactories"<code> extension point.
 	 */
 	static final String ID = "org.eclipse.ui.ide.FileStoreEditorInputFactory"; //$NON-NLS-1$
-
+	
 	/**
 	 * Saves the state of the given editor input into the given memento.
 	 *
@@ -61,20 +61,19 @@ public class FileStoreEditorInputFactory implements IElementFactory {
 	/*
 	 * @see org.eclipse.ui.IElementFactory#createElement(org.eclipse.ui.IMemento)
 	 */
-	@Override
 	public IAdaptable createElement(IMemento memento) {
 		// Get the file name.
 		String uriString = memento.getString(TAG_URI);
 		if (uriString == null)
 			return null;
-
+		
 		URI uri;
 		try {
 			uri = new URI(uriString);
 		} catch (URISyntaxException e) {
 			return null;
 		}
-
+		
 		try {
 			return new FileStoreEditorInput(EFS.getStore(uri));
 		} catch (CoreException e) {

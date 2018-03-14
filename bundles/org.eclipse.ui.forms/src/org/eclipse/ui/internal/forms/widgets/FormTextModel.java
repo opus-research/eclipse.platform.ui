@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@ package org.eclipse.ui.internal.forms.widgets;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.io.UnsupportedEncodingException;
 import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -32,21 +32,18 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 public class FormTextModel {
-
+	
 	/*
 	 * This class prevents parse errors from being written to standard output
 	 */
 	public class ParseErrorHandler implements ErrorHandler {
 
-		@Override
 		public void error(SAXParseException arg0) throws SAXException {
 		}
 
-		@Override
 		public void fatalError(SAXParseException arg0) throws SAXException {
 		}
 
-		@Override
 		public void warning(SAXParseException arg0) throws SAXException {
 		}
 	}
@@ -56,12 +53,12 @@ public class FormTextModel {
 
 	private boolean whitespaceNormalized = true;
 
-	private Vector<Paragraph> paragraphs;
+	private Vector paragraphs;
 
 	private IFocusSelectable[] selectableSegments;
 
 	private int selectedSegmentIndex = -1;
-
+	
 	private int savedSelectedLinkIndex = -1;
 
 	private HyperlinkSettings hyperlinkSettings;
@@ -84,7 +81,7 @@ public class FormTextModel {
 	public Paragraph[] getParagraphs() {
 		if (paragraphs == null)
 			return new Paragraph[0];
-		return paragraphs
+		return (Paragraph[]) paragraphs
 				.toArray(new Paragraph[paragraphs.size()]);
 	}
 
@@ -93,7 +90,7 @@ public class FormTextModel {
 			return ""; //$NON-NLS-1$
 		StringBuffer sbuf = new StringBuffer();
 		for (int i = 0; i < paragraphs.size(); i++) {
-			Paragraph paragraph = paragraphs.get(i);
+			Paragraph paragraph = (Paragraph) paragraphs.get(i);
 			String text = paragraph.getAccessibleText();
 			sbuf.append(text);
 		}
@@ -108,8 +105,13 @@ public class FormTextModel {
 			reset();
 			return;
 		}
-		InputStream stream = new ByteArrayInputStream(taggedText.getBytes(StandardCharsets.UTF_8));
-		parseInputStream(stream, expandURLs);
+		try {
+			InputStream stream = new ByteArrayInputStream(taggedText
+					.getBytes("UTF8")); //$NON-NLS-1$
+			parseInputStream(stream, expandURLs);
+		} catch (UnsupportedEncodingException e) {
+			SWT.error(SWT.ERROR_UNSUPPORTED_FORMAT, e);
+		}
 	}
 
 	public void parseInputStream(InputStream is, boolean expandURLs) {
@@ -140,7 +142,7 @@ public class FormTextModel {
 		processSubnodes(paragraphs, children, expandURLs);
 	}
 
-	private void processSubnodes(Vector<Paragraph> plist, NodeList children, boolean expandURLs) {
+	private void processSubnodes(Vector plist, NodeList children, boolean expandURLs) {
 		for (int i = 0; i < children.getLength(); i++) {
 			Node child = children.item(i);
 			if (child.getNodeType() == Node.TEXT_NODE) {
@@ -341,11 +343,11 @@ public class FormTextModel {
 		if (align != null) {
 			String value = align.getNodeValue().toLowerCase();
 			if (value.equals("top")) //$NON-NLS-1$
-				segment.setVerticalAlignment(ObjectSegment.TOP);
+				segment.setVerticalAlignment(ImageSegment.TOP);
 			else if (value.equals("middle")) //$NON-NLS-1$
-				segment.setVerticalAlignment(ObjectSegment.MIDDLE);
+				segment.setVerticalAlignment(ImageSegment.MIDDLE);
 			else if (value.equals("bottom")) //$NON-NLS-1$
-				segment.setVerticalAlignment(ObjectSegment.BOTTOM);
+				segment.setVerticalAlignment(ImageSegment.BOTTOM);
 		}
 	}
 
@@ -446,7 +448,7 @@ public class FormTextModel {
 			segment.setFontId(boldFontId);
 			Node alt = atts.getNamedItem("alt"); //$NON-NLS-1$
 			if (alt!=null)
-				segment.setTooltipText(alt.getNodeValue());
+				segment.setTooltipText(alt.getNodeValue());			
 			segment.setWordWrapAllowed(wrapAllowed);
 			return segment;
 		} else {
@@ -575,7 +577,7 @@ public class FormTextModel {
 
 	private void reset() {
 		if (paragraphs == null)
-			paragraphs = new Vector<>();
+			paragraphs = new Vector();
 		paragraphs.clear();
 		selectedSegmentIndex = -1;
 		savedSelectedLinkIndex = -1;
@@ -585,20 +587,20 @@ public class FormTextModel {
 	IFocusSelectable[] getFocusSelectableSegments() {
 		if (selectableSegments != null || paragraphs == null)
 			return selectableSegments;
-		Vector<ParagraphSegment> result = new Vector<>();
+		Vector result = new Vector();
 		for (int i = 0; i < paragraphs.size(); i++) {
-			Paragraph p = paragraphs.get(i);
+			Paragraph p = (Paragraph) paragraphs.get(i);
 			ParagraphSegment[] segments = p.getSegments();
-			for (ParagraphSegment segment : segments) {
-				if (segment instanceof IFocusSelectable)
-					result.add(segment);
+			for (int j = 0; j < segments.length; j++) {
+				if (segments[j] instanceof IFocusSelectable)
+					result.add(segments[j]);
 			}
 		}
-		selectableSegments = result
+		selectableSegments = (IFocusSelectable[]) result
 				.toArray(new IFocusSelectable[result.size()]);
 		return selectableSegments;
 	}
-
+	
 	public IHyperlinkSegment getHyperlink(int index) {
 		IFocusSelectable[] selectables = getFocusSelectableSegments();
 		if (selectables.length>index) {
@@ -608,10 +610,11 @@ public class FormTextModel {
 		}
 		return null;
 	}
-
+	
 	public IHyperlinkSegment findHyperlinkAt(int x, int y) {
 		IFocusSelectable[] selectables = getFocusSelectableSegments();
-		for (IFocusSelectable segment : selectables) {
+		for (int i = 0; i < selectables.length; i++) {
+			IFocusSelectable segment = selectables[i];
 			if (segment instanceof IHyperlinkSegment) {
 				IHyperlinkSegment link = (IHyperlinkSegment)segment;
 				if (link.contains(x, y))
@@ -620,11 +623,11 @@ public class FormTextModel {
 		}
 		return null;
 	}
-
+	
 	public int getHyperlinkCount() {
 		return getFocusSelectableSegments().length;
 	}
-
+	
 	public int indexOf(IHyperlinkSegment link) {
 		IFocusSelectable[] selectables = getFocusSelectableSegments();
 		for (int i = 0; i < selectables.length; i++) {
@@ -640,17 +643,17 @@ public class FormTextModel {
 
 	public ParagraphSegment findSegmentAt(int x, int y) {
 		for (int i = 0; i < paragraphs.size(); i++) {
-			Paragraph p = paragraphs.get(i);
+			Paragraph p = (Paragraph) paragraphs.get(i);
 			ParagraphSegment segment = p.findSegmentAt(x, y);
 			if (segment != null)
 				return segment;
 		}
 		return null;
 	}
-
+	
 	public void clearCache(String fontId) {
 		for (int i = 0; i < paragraphs.size(); i++) {
-			Paragraph p = paragraphs.get(i);
+			Paragraph p = (Paragraph) paragraphs.get(i);
 			p.clearCache(fontId);
 		}
 	}
@@ -660,16 +663,16 @@ public class FormTextModel {
 			return null;
 		return selectableSegments[selectedSegmentIndex];
 	}
-
+	
 	public int getSelectedSegmentIndex() {
 		return selectedSegmentIndex;
 	}
-
+	
 	public boolean linkExists(IHyperlinkSegment link) {
 		if (selectableSegments==null)
 			return false;
-		for (IFocusSelectable selectableSegment : selectableSegments) {
-			if (selectableSegment==link)
+		for (int i=0; i<selectableSegments.length; i++) {
+			if (selectableSegments[i]==link)
 				return true;
 		}
 		return false;
@@ -690,7 +693,7 @@ public class FormTextModel {
 		}
 		return selectedSegmentIndex != -1;
 	}
-
+	
 	public IFocusSelectable getNextFocusSegment(boolean next) {
 		IFocusSelectable[] selectables = getFocusSelectableSegments();
 		if (selectables == null)
@@ -702,7 +705,7 @@ public class FormTextModel {
 		}
 		return selectables[nextIndex];
 	}
-
+	
 	public boolean restoreSavedLink() {
 		if (savedSelectedLinkIndex!= -1) {
 			selectedSegmentIndex = savedSelectedLinkIndex;
@@ -713,7 +716,7 @@ public class FormTextModel {
 
 	public void selectLink(IHyperlinkSegment link) {
 		if (link == null) {
-			savedSelectedLinkIndex = selectedSegmentIndex;
+			savedSelectedLinkIndex = selectedSegmentIndex;	
 			selectedSegmentIndex = -1;
 		}
 		else {
@@ -721,7 +724,7 @@ public class FormTextModel {
 
 		}
 	}
-
+	
 	public void select(IFocusSelectable selectable) {
 		IFocusSelectable[] selectables = getFocusSelectableSegments();
 		selectedSegmentIndex = -1;

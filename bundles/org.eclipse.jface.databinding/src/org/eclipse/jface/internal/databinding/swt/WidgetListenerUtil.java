@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 Matthew Hall and others.
+ * Copyright (c) 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,14 +11,14 @@
 
 package org.eclipse.jface.internal.databinding.swt;
 
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Widget;
 
 /**
  * @since 3.4
- *
+ * 
  */
 public class WidgetListenerUtil {
 	/**
@@ -37,8 +37,7 @@ public class WidgetListenerUtil {
 		if (display == Display.getCurrent()) {
 			widget.addListener(event, listener);
 		} else {
-			DisplayRealm.getRealm(display).exec(new Runnable() {
-				@Override
+			SWTObservables.getRealm(display).exec(new Runnable() {
 				public void run() {
 					if (!widget.isDisposed())
 						widget.addListener(event, listener);
@@ -63,8 +62,7 @@ public class WidgetListenerUtil {
 		if (display == Display.getCurrent()) {
 			widget.removeListener(event, listener);
 		} else {
-			DisplayRealm.getRealm(display).exec(new Runnable() {
-				@Override
+			SWTObservables.getRealm(display).exec(new Runnable() {
 				public void run() {
 					if (!widget.isDisposed())
 						widget.removeListener(event, listener);

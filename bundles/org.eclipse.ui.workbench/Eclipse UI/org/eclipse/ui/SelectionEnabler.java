@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import org.eclipse.core.runtime.Adapters;
+
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
@@ -37,9 +37,9 @@ import org.osgi.framework.Bundle;
  * <p>
  * This class can be instantiated by clients. It is not intended to be extended.
  * </p>
- *
+ * 
  * @since 3.0
- *
+ * 
  * Note: The dependency on org.eclipse.jface.text for ITextSelection must be
  * severed It may be possible to do with IActionFilter generic workbench
  * registers IActionFilter for "size" property against IStructuredSelection
@@ -112,7 +112,7 @@ public final class SelectionEnabler {
 	/**
 	 * Returns <code>ITextSelection.class</code> or <code>null</code> if the
 	 * class is not available.
-	 *
+	 * 
 	 * @return <code>ITextSelection.class</code> or <code>null</code> if
 	 *         class not available
 	 * @since 3.0
@@ -163,7 +163,7 @@ public final class SelectionEnabler {
 	/**
 	 * Verifies that the given name matches the given wildcard filter. Returns
 	 * true if it does.
-	 *
+	 * 
 	 * @param name
 	 * @param filter
 	 * @return <code>true</code> if there is a match
@@ -186,7 +186,7 @@ public final class SelectionEnabler {
 
 	/**
 	 * Create a new instance of the receiver.
-	 *
+	 * 
 	 * @param configElement
 	 */
 	public SelectionEnabler(IConfigurationElement configElement) {
@@ -212,7 +212,7 @@ public final class SelectionEnabler {
 
 	/**
 	 * Computes the hash code for this object based on the id.
-	 *
+	 * 
 	 * @return The hash code for this object.
 	 */
 	@Override
@@ -326,7 +326,7 @@ public final class SelectionEnabler {
 
 	/**
 	 * Check if the receiver is enabled for the given selection.
-	 *
+	 * 
 	 * @param selection
 	 * @return <code>true</code> if the given selection matches the conditions
 	 *         specified in <code>IConfirgurationElement</code>.
@@ -489,7 +489,7 @@ public final class SelectionEnabler {
 			if (sc.nameFilter == null) {
 				return true;
 			}
-			IWorkbenchAdapter de = Adapters.adapt(element, IWorkbenchAdapter.class);
+			IWorkbenchAdapter de = (IWorkbenchAdapter) Util.getAdapter(element, IWorkbenchAdapter.class);
 			if ((de != null)
 					&& verifyNameMatch(de.getLabel(element), sc.nameFilter)) {
 				return true;

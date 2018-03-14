@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 package org.eclipse.ui.part;
 
@@ -84,7 +83,7 @@ public class PageSite implements IPageSite, INestable {
 
 	/**
 	 * Creates a new sub view site of the given parent view site.
-	 *
+	 * 
 	 * @param parentViewSite
 	 *            the parent view site
 	 */
@@ -94,7 +93,7 @@ public class PageSite implements IPageSite, INestable {
 		subActionBars = new SubActionBars(parentViewSite.getActionBars(), this);
 
 		// Initialize the service locator.
-		IServiceLocatorCreator slc = parentSite
+		IServiceLocatorCreator slc = (IServiceLocatorCreator) parentSite
 				.getService(IServiceLocatorCreator.class);
 		e4Context = ((PartSite) parentViewSite).getContext().createChild("PageSite"); //$NON-NLS-1$
 		this.serviceLocator = (ServiceLocator) slc.createServiceLocator(parentViewSite, null,
@@ -179,7 +178,7 @@ public class PageSite implements IPageSite, INestable {
 	/**
 	 * The PageSite implementation of this <code>IPageSite</code> method
 	 * returns the <code>SubActionBars</code> for this site.
-	 *
+	 * 
 	 * @return the subactionbars for this site
 	 */
 	@Override
@@ -187,45 +186,65 @@ public class PageSite implements IPageSite, INestable {
 		return subActionBars;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+	 */
 	@Override
-	public <T> T getAdapter(Class<T> adapter) {
+	public Object getAdapter(Class adapter) {
 		return Platform.getAdapterManager().getAdapter(this, adapter);
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IPageSite.
+	 */
 	@Override
 	public IWorkbenchPage getPage() {
 		return parentSite.getPage();
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IPageSite.
+	 */
 	@Override
 	public ISelectionProvider getSelectionProvider() {
 		return selectionProvider;
 	}
 
 	@Override
-	public final <T> T getService(final Class<T> key) {
-		T service = serviceLocator.getService(key);
+	public final Object getService(final Class key) {
+		Object service = serviceLocator.getService(key);
 		if (active && service instanceof INestable) {
 			((INestable) service).activate();
 		}
 		return service;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IPageSite.
+	 */
 	@Override
 	public Shell getShell() {
 		return parentSite.getShell();
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IPageSite.
+	 */
 	@Override
 	public IWorkbenchWindow getWorkbenchWindow() {
 		return parentSite.getWorkbenchWindow();
 	}
 
 	@Override
-	public final boolean hasService(final Class<?> key) {
+	public final boolean hasService(final Class key) {
 		return serviceLocator.hasService(key);
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IPageSite.
+	 */
 	@Override
 	public void registerContextMenu(String menuID, MenuManager menuMgr,
 			ISelectionProvider selProvider) {
@@ -236,6 +255,9 @@ public class PageSite implements IPageSite, INestable {
 				e4Context, menuExtenders);
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IPageSite.
+	 */
 	@Override
 	public void setSelectionProvider(ISelectionProvider provider) {
 		selectionProvider = provider;
@@ -245,6 +267,13 @@ public class PageSite implements IPageSite, INestable {
 		return e4Context;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.services.INestable#activate()
+	 * 
+	 * @since 3.2
+	 */
 	@Override
 	public void activate() {
 		active = true;
@@ -256,6 +285,13 @@ public class PageSite implements IPageSite, INestable {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.services.INestable#deactivate()
+	 * 
+	 * @since 3.2
+	 */
 	@Override
 	public void deactivate() {
 		active = false;

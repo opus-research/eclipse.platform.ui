@@ -15,19 +15,17 @@ import org.eclipse.core.commands.ParameterValueConversionException;
 
 public class IntegerConverter extends AbstractParameterValueConverter {
 
-	@Override
 	public Object convertToObject(String parameterValue)
 			throws ParameterValueConversionException {
 		try {
 			int val = Integer.parseInt(parameterValue);
-			return Integer.valueOf(val);
+			return new Integer(val);
 		} catch (NumberFormatException ex) {
 			throw new ParameterValueConversionException(
 					"Error parsing value: " + parameterValue, ex);
 		}
 	}
-
-	@Override
+	
 	public String convertToString(Object parameterValue)
 			throws ParameterValueConversionException {
 		if (!(parameterValue instanceof Integer)) {

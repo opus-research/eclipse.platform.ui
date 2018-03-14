@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,14 +31,14 @@ import org.eclipse.jface.viewers.ViewerCell;
 /**
  * {@link EditingSupport} using the JFace Data Binding concepts to handle the
  * updating of an element from a {@link CellEditor}.
- *
+ * 
  * @since 1.2
  */
 public abstract class ObservableValueEditingSupport extends EditingSupport {
 	/**
 	 * Returns an ObservableValueEditingSupport instance which binds the given
 	 * cell editor property to the given element property.
-	 *
+	 * 
 	 * @param viewer
 	 *            the column viewer
 	 * @param dbc
@@ -59,19 +59,16 @@ public abstract class ObservableValueEditingSupport extends EditingSupport {
 			final IValueProperty cellEditorProperty,
 			final IValueProperty elementProperty) {
 		return new ObservableValueEditingSupport(viewer, dbc) {
-			@Override
 			protected IObservableValue doCreateCellEditorObservable(
 					CellEditor cellEditor) {
 				return cellEditorProperty.observe(cellEditor);
 			}
 
-			@Override
 			protected IObservableValue doCreateElementObservable(
 					Object element, ViewerCell cell) {
 				return elementProperty.observe(element);
 			}
 
-			@Override
 			protected CellEditor getCellEditor(Object element) {
 				return cellEditor;
 			}
@@ -93,7 +90,7 @@ public abstract class ObservableValueEditingSupport extends EditingSupport {
 	/**
 	 * Constructs a new instance with the provided <code>viewer</code> and
 	 * <code>dbc</code>.
-	 *
+	 * 
 	 * @param viewer
 	 *            viewer to edit
 	 * @param dbc
@@ -113,10 +110,9 @@ public abstract class ObservableValueEditingSupport extends EditingSupport {
 
 	/**
 	 * Default implementation always returns <code>true</code>.
-	 *
+	 * 
 	 * @see org.eclipse.jface.viewers.EditingSupport#canEdit(java.lang.Object)
 	 */
-	@Override
 	protected boolean canEdit(Object element) {
 		return true;
 	}
@@ -124,10 +120,9 @@ public abstract class ObservableValueEditingSupport extends EditingSupport {
 	/**
 	 * Default implementation always returns <code>null</code> as this will be
 	 * handled by the Binding.
-	 *
+	 * 
 	 * @see org.eclipse.jface.viewers.EditingSupport#getValue(java.lang.Object)
 	 */
-	@Override
 	protected Object getValue(Object element) {
 		// no op
 		return null;
@@ -136,11 +131,10 @@ public abstract class ObservableValueEditingSupport extends EditingSupport {
 	/**
 	 * Default implementation does nothing as this will be handled by the
 	 * Binding.
-	 *
+	 * 
 	 * @see org.eclipse.jface.viewers.EditingSupport#setValue(java.lang.Object,
 	 *      java.lang.Object)
 	 */
-	@Override
 	protected void setValue(Object element, Object value) {
 		// no op
 	}
@@ -151,7 +145,6 @@ public abstract class ObservableValueEditingSupport extends EditingSupport {
 	 * {@link #doCreateElementObservable(Object, ViewerCell)}, and then
 	 * {@link #createBinding(IObservableValue, IObservableValue)}.
 	 */
-	@Override
 	final protected void initializeCellEditorValue(CellEditor cellEditor,
 			ViewerCell cell) {
 		IObservableValue target = doCreateCellEditorObservable(cellEditor);
@@ -168,7 +161,6 @@ public abstract class ObservableValueEditingSupport extends EditingSupport {
 		Binding binding = createBinding(target, model);
 
 		target.addChangeListener(new IChangeListener() {
-			@Override
 			public void handleChange(ChangeEvent event) {
 				dirty = true;
 			}
@@ -184,7 +176,7 @@ public abstract class ObservableValueEditingSupport extends EditingSupport {
 
 	/**
 	 * Creates the observable value for the CellEditor.
-	 *
+	 * 
 	 * @param cellEditor
 	 * @return observable value
 	 */
@@ -193,7 +185,7 @@ public abstract class ObservableValueEditingSupport extends EditingSupport {
 
 	/**
 	 * Creates the observable value for the element.
-	 *
+	 * 
 	 * @param element
 	 * @param cell
 	 * @return observable value
@@ -206,7 +198,7 @@ public abstract class ObservableValueEditingSupport extends EditingSupport {
 	 * <code>model</code>. Default {@link UpdateValueStrategy value update
 	 * strategies} are used with the target to model updating on
 	 * {@link UpdateValueStrategy#POLICY_CONVERT}.
-	 *
+	 * 
 	 * @param target
 	 * @param model
 	 * @return binding
@@ -222,7 +214,6 @@ public abstract class ObservableValueEditingSupport extends EditingSupport {
 	/**
 	 * Updates the model from the target.
 	 */
-	@Override
 	final protected void saveCellEditorValue(CellEditor cellEditor,
 			ViewerCell cell) {
 		if (dirty) {
@@ -234,12 +225,10 @@ public abstract class ObservableValueEditingSupport extends EditingSupport {
 	private class ColumnViewerEditorActivationListenerHelper extends
 			ColumnViewerEditorActivationListener {
 
-		@Override
 		public void afterEditorActivated(ColumnViewerEditorActivationEvent event) {
 			// do nothing
 		}
 
-		@Override
 		public void afterEditorDeactivated(
 				ColumnViewerEditorDeactivationEvent event) {
 			editingState.dispose();
@@ -248,13 +237,11 @@ public abstract class ObservableValueEditingSupport extends EditingSupport {
 			viewer.getColumnViewerEditor().removeEditorActivationListener(this);
 		}
 
-		@Override
 		public void beforeEditorActivated(
 				ColumnViewerEditorActivationEvent event) {
 			// do nothing
 		}
 
-		@Override
 		public void beforeEditorDeactivated(
 				ColumnViewerEditorDeactivationEvent event) {
 			// do nothing

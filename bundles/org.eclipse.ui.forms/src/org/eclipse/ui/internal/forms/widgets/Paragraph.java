@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,16 +10,13 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.forms.widgets;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import org.eclipse.swt.graphics.FontMetrics;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.graphics.*;
 import org.eclipse.ui.forms.HyperlinkSettings;
 
 /**
@@ -29,7 +26,7 @@ import org.eclipse.ui.forms.HyperlinkSettings;
 public class Paragraph {
 	public static final String[] PROTOCOLS = {"http://", "https://", "ftp://"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-	private Vector<ParagraphSegment> segments;
+	private Vector segments;
 
 	private boolean addVerticalSpace = true;
 
@@ -45,16 +42,19 @@ public class Paragraph {
 		return addVerticalSpace;
 	}
 
+	/*
+	 * @see IParagraph#getSegments()
+	 */
 	public ParagraphSegment[] getSegments() {
 		if (segments == null)
 			return new ParagraphSegment[0];
-		return segments
+		return (ParagraphSegment[]) segments
 				.toArray(new ParagraphSegment[segments.size()]);
 	}
 
 	public void addSegment(ParagraphSegment segment) {
 		if (segments == null)
-			segments = new Vector<>();
+			segments = new Vector();
 		segments.add(segment);
 	}
 
@@ -104,7 +104,7 @@ public class Paragraph {
 			addSegment(new TextSegment(text, fontId, colorId, wrapAllowed));
 		}
 	}
-
+	
 	private int findUrl(String text, int startIndex) {
 		int[] locs = new int[PROTOCOLS.length];
 		for (int i = 0; i < PROTOCOLS.length; i++)
@@ -126,14 +126,15 @@ public class Paragraph {
 	}
 
 	protected void computeRowHeights(GC gc, int width, Locator loc,
-			int lineHeight, Hashtable<String, Object> resourceTable) {
+			int lineHeight, Hashtable resourceTable) {
 		ParagraphSegment[] segments = getSegments();
 		// compute heights
 		Locator hloc = loc.create();
-		ArrayList<int[]> heights = new ArrayList<>();
+		ArrayList heights = new ArrayList();
 		hloc.heights = heights;
 		hloc.rowCounter = 0;
-		for (ParagraphSegment segment : segments) {
+		for (int j = 0; j < segments.length; j++) {
+			ParagraphSegment segment = segments[j];
 			segment.advanceLocator(gc, width, hloc, resourceTable, true);
 		}
 		if (hloc.rowHeight == 0) {
@@ -146,7 +147,7 @@ public class Paragraph {
 	}
 
 	public void layout(GC gc, int width, Locator loc, int lineHeight,
-			Hashtable<String, Object> resourceTable, IHyperlinkSegment selectedLink) {
+			Hashtable resourceTable, IHyperlinkSegment selectedLink) {
 		ParagraphSegment[] segments = getSegments();
 		//int height;
 		if (segments.length > 0) {
@@ -158,7 +159,8 @@ public class Paragraph {
 			// compute heights
 			if (loc.heights == null)
 				computeRowHeights(gc, width, loc, lineHeight, resourceTable);
-			for (ParagraphSegment segment : segments) {
+			for (int j = 0; j < segments.length; j++) {
+				ParagraphSegment segment = segments[j];
 				boolean doSelect = false;
 				if (selectedLink != null && segment.equals(selectedLink))
 					doSelect = true;
@@ -172,11 +174,12 @@ public class Paragraph {
 	}
 
 	public void paint(GC gc, Rectangle repaintRegion,
-			Hashtable<String, Object> resourceTable, IHyperlinkSegment selectedLink,
+			Hashtable resourceTable, IHyperlinkSegment selectedLink,
 			SelectionData selData) {
 		ParagraphSegment[] segments = getSegments();
 
-		for (ParagraphSegment segment : segments) {
+		for (int i = 0; i < segments.length; i++) {
+			ParagraphSegment segment = segments[i];
 			if (!segment.intersects(repaintRegion))
 				continue;
 			boolean doSelect = false;
@@ -185,12 +188,13 @@ public class Paragraph {
 			segment.paint(gc, false, resourceTable, doSelect, selData, repaintRegion);
 		}
 	}
-
-	public void computeSelection(GC gc,	Hashtable<String, Object> resourceTable, IHyperlinkSegment selectedLink,
+	
+	public void computeSelection(GC gc,	Hashtable resourceTable, IHyperlinkSegment selectedLink,
 			SelectionData selData) {
 		ParagraphSegment[] segments = getSegments();
 
-		for (ParagraphSegment segment : segments) {
+		for (int i = 0; i < segments.length; i++) {
+			ParagraphSegment segment = segments[i];
 			//boolean doSelect = false;
 			//if (selectedLink != null && segment.equals(selectedLink))
 				//doSelect = true;
@@ -202,7 +206,8 @@ public class Paragraph {
 		ParagraphSegment[] segments = getSegments();
 		StringWriter swriter = new StringWriter();
 		PrintWriter writer = new PrintWriter(swriter);
-		for (ParagraphSegment segment : segments) {
+		for (int i = 0; i < segments.length; i++) {
+			ParagraphSegment segment = segments[i];
 			if (segment instanceof TextSegment) {
 				String text = ((TextSegment) segment).getText();
 				writer.print(text);
@@ -216,7 +221,7 @@ public class Paragraph {
 	public ParagraphSegment findSegmentAt(int x, int y) {
 		if (segments != null) {
 			for (int i = 0; i < segments.size(); i++) {
-				ParagraphSegment segment = segments.get(i);
+				ParagraphSegment segment = (ParagraphSegment) segments.get(i);
 				if (segment.contains(x, y))
 					return segment;
 			}
@@ -226,7 +231,7 @@ public class Paragraph {
 	public void clearCache(String fontId) {
 		if (segments != null) {
 			for (int i = 0; i < segments.size(); i++) {
-				ParagraphSegment segment = segments.get(i);
+				ParagraphSegment segment = (ParagraphSegment) segments.get(i);
 				segment.clearCache(fontId);
 			}
 		}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Mickael Istria (Red Hat Inc.) - 483359 Remove erroneous test
  *******************************************************************************/
 package org.eclipse.ui.tests.themes;
 
@@ -18,6 +17,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.resource.ColorRegistry;
+import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
@@ -31,121 +31,121 @@ import org.eclipse.ui.themes.IThemeManager;
 
 /**
  * Tests the theme API.
- *
+ * 
  * @since 3.0
  */
 public class ThemeAPITest extends ThemeTest {
 
     /**
-	 *
+	 * 
 	 */
 	private static final String EXTENDED_THEME3 = "extendedTheme3";
 	/**
-	 *
+	 * 
 	 */
 	private static final String EXTENDED_THEME2 = "extendedTheme2";
 	/**
-	 *
+	 * 
 	 */
 	private static final String EXTENDED_THEME1 = "extendedTheme1";
 	/**
-	 *
+	 * 
 	 */
 	private static final String PLATFORMFONT = "platformfont";
 	/**
-	 *
+	 * 
 	 */
 	private static final String PLATFORMCOLOR = "platformcolor";
 	/**
-	 *
+	 * 
 	 */
 	private static final String NOOVERRIDEFONT = "nooverridefont";
 	/**
-	 *
+	 * 
 	 */
 	private static final String NOVALFONT = "novalfont";
 	/**
-	 *
+	 * 
 	 */
 	private static final String DEFAULTEDFONT3 = "defaultedfont3";
 	/**
-	 *
+	 * 
 	 */
 	private static final String DEFAULTEDFONT2 = "defaultedfont2";
 	/**
-	 *
+	 * 
 	 */
 	private static final String DEFAULTEDFONT = "defaultedfont";
 	/**
-	 *
+	 * 
 	 */
 	private static final String VALFONT = "valfont";
 	/**
-	 *
+	 * 
 	 */
 	private static final String DEFAULTEDCOLOR3 = "defaultedcolor3";
 	/**
-	 *
+	 * 
 	 */
 	private static final String DEFAULTEDCOLOR2 = "adefaultedcolor2";
 	/**
-	 *
+	 * 
 	 */
 	private static final String VALUE2 = "value2";
 	/**
-	 *
+	 * 
 	 */
 	private static final String OVERRIDE1 = "override1";
 	/**
-	 *
+	 * 
 	 */
 	private static final String NOOVERRIDECOLOR = "nooverridecolor";
 	/**
-	 *
+	 * 
 	 */
 	private static final String DEFAULTEDCOLOR = "defaultedcolor";
 	/**
-	 *
+	 * 
 	 */
 	private static final String SWTCOLOR = "swtcolor";
 	/**
-	 *
+	 * 
 	 */
 	private static final String FACTORYCOLOR = "factorycolor";
 	/**
-	 *
+	 * 
 	 */
 	private static final String RGBCOLOR = "rgbcolor";
 	/**
-	 *
+	 * 
 	 */
 	private static final String BOOL1 = "bool1";
 	/**
-	 *
+	 * 
 	 */
 	private static final String BOGUSKEY = "BOGUSKEY";
 	/**
-	 *
+	 * 
 	 */
 	private static final String INT1 = "int1";
 	/**
-	 *
+	 * 
 	 */
 	private static final String DATA2 = "data2";
 	/**
-	 *
+	 * 
 	 */
-	private static final String DATA1 = "data1";
+	private static final String DATA1 = "data1";	
 	/**
-	 *
+	 * 
 	 */
 	private static final String BAD_COLOR1 = "badColor1";
 	/**
-	 *
+	 * 
 	 */
 	private static final String BAD_COLOR2 = "badColor2";
 	/**
-	 *
+	 * 
 	 */
 	private static final String BAD_COLOR3 = "badColor3";
 
@@ -408,6 +408,29 @@ public class ThemeAPITest extends ThemeTest {
                 theme1.getColorRegistry().getRGB(DEFAULTEDCOLOR3));
     }
 
+    public void testFontCascadeEvents() {
+        ITheme currentTheme = fManager.getCurrentTheme();
+        assertNotNull(currentTheme);
+
+        ThemePropertyListener managerListener = new ThemePropertyListener();
+        ThemePropertyListener themeListener = new ThemePropertyListener();
+        fManager.addPropertyChangeListener(managerListener);
+        currentTheme.addPropertyChangeListener(themeListener);
+
+        FontRegistry fontRegistry = currentTheme.getFontRegistry();
+        FontData[] oldFont = fontRegistry.getFontData(VALFONT);
+        FontData[] newFont = new FontData[] { new FontData("Courier", 30,
+                SWT.ITALIC) };
+        fontRegistry.put(VALFONT, newFont);
+        fontRegistry.put(VALFONT, oldFont);
+
+        checkEvents(managerListener, fontRegistry, oldFont, newFont);
+        checkEvents(themeListener, fontRegistry, oldFont, newFont);
+
+        fManager.removePropertyChangeListener(managerListener);
+        currentTheme.removePropertyChangeListener(themeListener);
+    }
+
     public void testFontPreferenceListener_def_novalfont() {
         IPreferenceStore store = PrefUtil.getInternalPreferenceStore();
         ITheme defaultTheme = getDefaultTheme();
@@ -523,16 +546,15 @@ public class ThemeAPITest extends ThemeTest {
         RGB rgb = null;
         // test for two specific platforms and one general
         if (Platform.getWS().equals("win32")
-                && Platform.getOS().equals("win32")) {
-			rgb = new RGB(50, 50, 50);
-		} else if (Platform.getWS().equals("gtk")
-                && Platform.getOS().equals("linux")) {
-			rgb = new RGB(25, 25, 25);
-		} else if (Platform.getOS().equals("linux")) {
-			rgb = new RGB(75, 75, 75);
-		} else {
-			rgb = new RGB(0, 0, 0);
-		}
+                && Platform.getOS().equals("win32"))
+            rgb = new RGB(50, 50, 50);
+        else if (Platform.getWS().equals("gtk")
+                && Platform.getOS().equals("linux"))
+            rgb = new RGB(25, 25, 25);
+        else if (Platform.getOS().equals("linux"))
+            rgb = new RGB(75, 75, 75);
+        else
+            rgb = new RGB(0, 0, 0);
 
         assertEquals(rgb, defaultTheme.getColorRegistry().getRGB(
                 PLATFORMCOLOR));
@@ -542,11 +564,10 @@ public class ThemeAPITest extends ThemeTest {
         ITheme defaultTheme = getDefaultTheme();
         FontData[] data = null;
         if (Platform.getWS().equals("win32")
-                && Platform.getOS().equals("win32")) {
-			data = new FontData[] { new FontData("Courier New", 12, SWT.NORMAL) };
-		} else {
-			data = new FontData[] { new FontData("Sans", 15, SWT.BOLD) };
-		}
+                && Platform.getOS().equals("win32"))
+            data = new FontData[] { new FontData("Courier New", 12, SWT.NORMAL) };
+        else
+            data = new FontData[] { new FontData("Sans", 15, SWT.BOLD) };
 
         assertArrayEquals(data, defaultTheme.getFontRegistry().getFontData(
                 PLATFORMFONT));
@@ -624,52 +645,52 @@ public class ThemeAPITest extends ThemeTest {
                 new FontData[] { new FontData("Tahoma", 20, SWT.BOLD) },
                 defaultTheme.getFontRegistry().getFontData(VALFONT));
     }
-
+    
     /*
      * The following tests check to ensure that support for multiple extensions
      * contributing to the same theeme work. They also check to ensure that the
      * first value encountered for a given font/colour is the only one used.
      */
-
+    
     public void testThemeExtensionName() {
         ITheme ext1 = fManager.getTheme(EXTENDED_THEME1);
         ITheme ext2 = fManager.getTheme(EXTENDED_THEME2);
         ITheme ext3 = fManager.getTheme(EXTENDED_THEME3);
-
+        
         assertEquals("Extended Theme 1", ext1.getLabel());
         assertEquals("Extended Theme 2", ext2.getLabel());
         assertEquals("Extended Theme 3", ext3.getLabel());
     }
-
+    
     public void testThemeExtensionData() {
         ITheme ext1 = fManager.getTheme(EXTENDED_THEME1);
         assertNotNull(ext1.getString("d1"));
         assertEquals("d1", ext1.getString("d1"));
         assertNotNull(ext1.getString("d2"));
     }
-
+    
     public void testThemeExtensionColor() {
         ITheme ext1 = fManager.getTheme(EXTENDED_THEME1);
         assertEquals(Display.getDefault().getSystemColor(SWT.COLOR_RED)
-                .getRGB(), ext1.getColorRegistry().getRGB(SWTCOLOR));
+                .getRGB(), ext1.getColorRegistry().getRGB(SWTCOLOR)); 
 
         assertEquals(Display.getDefault().getSystemColor(SWT.COLOR_RED)
-                .getRGB(), ext1.getColorRegistry().getRGB(RGBCOLOR));
+                .getRGB(), ext1.getColorRegistry().getRGB(RGBCOLOR)); 
     }
-
+    
     public void testThemeExtensionFont() {
         ITheme ext1 = fManager.getTheme(EXTENDED_THEME1);
-
+        
         FontData[] fd = new FontData[] { new FontData("Sans", 10,
                 SWT.NORMAL) };
-
+        
         assertArrayEquals(fd, ext1.getFontRegistry()
                 .getFontData(VALFONT));
 
         assertArrayEquals(fd, ext1.getFontRegistry()
                 .getFontData(NOVALFONT));
     }
-
+    
     /**
 	 * Tests to ensure that a color with a bogus value doesn't take down the
 	 * workbench.
@@ -678,14 +699,14 @@ public class ThemeAPITest extends ThemeTest {
     	 ITheme defaultTheme = getDefaultTheme();
     	 assertEquals(new RGB(0,0,0), defaultTheme.getColorRegistry().getRGB(BAD_COLOR1)); // doesn't look like an RGB
 	}
-
+	
 	/**
 	 * Tests to ensure that a color with extra spaces doesn't take down the workbench.
 	 */
 	public void testBadColor2() {
     	 assertEquals(new RGB(0,0,1), getDefaultTheme().getColorRegistry().getRGB(BAD_COLOR2)); // rgb with extra spaces
 	}
-
+	
 	/**
 	 * Tests to ensure that a color with extra spaces doesn't take down the workbench.
 	 */

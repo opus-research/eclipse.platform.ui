@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2016 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 441150, 441120
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
-import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
@@ -26,39 +26,58 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Layout;
 import org.osgi.service.event.Event;
+import org.osgi.service.event.EventHandler;
 
-/**
- * Default SWT renderer responsible for a MPartSashContainer. See
- * {@link WorkbenchRendererFactory}
- */
 public class SashRenderer extends SWTPartRenderer {
 
+	@Inject
+	private IEventBroker eventBroker;
+
+	private static final int UNDEFINED_WEIGHT = -1;
 	private static final int DEFAULT_WEIGHT = 5000;
 
+	private EventHandler sashOrientationHandler;
+	private EventHandler sashWeightHandler;
 	private int processedContent = 0;
 
-	@SuppressWarnings("unchecked")
-	@Inject
-	@Optional
-	private void subscribeTopicOrientationChanged(@UIEventTopic(UIEvents.GenericTile.TOPIC_HORIZONTAL) Event event) {
-		// Ensure that this event is for a MPartSashContainer
-		MUIElement element = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
-		if (element.getRenderer() != SashRenderer.this) {
-			return;
-		}
-		forceLayout((MElementContainer<MUIElement>) element);
+	public SashRenderer() {
+		super();
 	}
 
-	@SuppressWarnings("unchecked")
-	@Inject
-	@Optional
-	private void subscribeTopicSashWeightChanged(@UIEventTopic(UIEvents.UIElement.TOPIC_CONTAINERDATA) Event event) {
-		// Ensure that this event is for a MPartSashContainer
-		MUIElement element = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
-		if (element.getRenderer() != SashRenderer.this) {
-			return;
-		}
-		forceLayout((MElementContainer<MUIElement>) element);
+	@PostConstruct
+	void postConstruct() {
+		sashOrientationHandler = new EventHandler() {
+			@Override
+			public void handleEvent(Event event) {
+				// Ensure that this event is for a MPartSashContainer
+				MUIElement element = (MUIElement) event
+						.getProperty(UIEvents.EventTags.ELEMENT);
+				if (element.getRenderer() != SashRenderer.this) {
+					return;
+				}
+				forceLayout((MElementContainer<MUIElement>) element);
+			}
+		};
+
+		eventBroker.subscribe(UIEvents.GenericTile.TOPIC_HORIZONTAL,
+				sashOrientationHandler);
+
+		sashWeightHandler = new EventHandler() {
+			@Override
+			public void handleEvent(Event event) {
+				// Ensure that this event is for a MPartSashContainer
+				MUIElement element = (MUIElement) event
+						.getProperty(UIEvents.EventTags.ELEMENT);
+				MElementContainer<MUIElement> parent = element.getParent();
+				if (parent.getRenderer() != SashRenderer.this)
+					return;
+
+				forceLayout(parent);
+			}
+		};
+
+		eventBroker.subscribe(UIEvents.UIElement.TOPIC_CONTAINERDATA,
+				sashWeightHandler);
 	}
 
 	/**
@@ -69,9 +88,8 @@ public class SashRenderer extends SWTPartRenderer {
 			return;
 		}
 		// layout the containing Composite
-		while (!(pscModel.getWidget() instanceof Composite)) {
+		while (!(pscModel.getWidget() instanceof Composite))
 			pscModel = pscModel.getParent();
-		}
 
 		Composite s = (Composite) pscModel.getWidget();
 		Layout layout = s.getLayout();
@@ -81,6 +99,12 @@ public class SashRenderer extends SWTPartRenderer {
 			}
 		}
 		s.layout(true, true);
+	}
+
+	@PreDestroy
+	void preDestroy() {
+		eventBroker.unsubscribe(sashOrientationHandler);
+		eventBroker.unsubscribe(sashWeightHandler);
 	}
 
 	@Override
@@ -118,23 +142,42 @@ public class SashRenderer extends SWTPartRenderer {
 			}
 		}
 		// This is a 'root' sash container, create a composite
-		if (sashComposite == null) {
+		if (sashComposite == null)
 			sashComposite = new Composite((Composite) parent, SWT.NONE);
-		}
 		sashComposite.setLayout(new SashLayout(sashComposite, element));
 
 		return sashComposite;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#childAdded(
+	 * org.eclipse.e4.ui.model.application.MPart,
+	 * org.eclipse.e4.ui.model.application.MPart)
+	 */
 	@Override
-	public void childRendered(MElementContainer<MUIElement> parentElement, MUIElement element) {
+	public void childRendered(MElementContainer<MUIElement> parentElement,
+			MUIElement element) {
 		super.childRendered(parentElement, element);
 
 		// Ensure that the element's 'containerInfo' is initialized
-		ensureLayoutWeight(element);
+		int weight = getWeight(element);
+		if (weight == UNDEFINED_WEIGHT) {
+			element.setContainerData(Integer.toString(DEFAULT_WEIGHT));
+		}
+
 		forceLayout(parentElement);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#processContents
+	 * (org.eclipse.e4.ui.model.application.ui.MElementContainer)
+	 */
 	@Override
 	public void processContents(MElementContainer<MUIElement> container) {
 		try {
@@ -148,43 +191,59 @@ public class SashRenderer extends SWTPartRenderer {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#hideChild
+	 * (org.eclipse.e4.ui.model.application.ui.MElementContainer,
+	 * org.eclipse.e4.ui.model.application.ui.MUIElement)
+	 */
 	@Override
-	public void hideChild(MElementContainer<MUIElement> parentElement, MUIElement child) {
+	public void hideChild(MElementContainer<MUIElement> parentElement,
+			MUIElement child) {
 		super.hideChild(parentElement, child);
 
 		forceLayout(parentElement);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#getUIContainer
+	 * (org.eclipse.e4.ui.model.application.ui.MUIElement)
+	 */
 	@Override
 	public Object getUIContainer(MUIElement element) {
 		// OK, find the 'root' of the sash container
 		MUIElement parentElement = element.getParent();
-		while (parentElement.getRenderer() == this && !(parentElement.getWidget() instanceof Composite)) {
+		while (parentElement.getRenderer() == this
+				&& !(parentElement.getWidget() instanceof Composite))
 			parentElement = parentElement.getParent();
-		}
 
-		if (parentElement.getWidget() instanceof Composite) {
+		if (parentElement.getWidget() instanceof Composite)
 			return parentElement.getWidget();
-		}
+
 		return null;
 	}
 
-	/*
-	 * Container data is used by the SashLayout to determine the size of the
-	 * control
+	/**
+	 * @param element
+	 * @return
 	 */
-	private static void ensureLayoutWeight(MUIElement element) {
-		int weight = DEFAULT_WEIGHT;
-
+	private static int getWeight(MUIElement element) {
 		String info = element.getContainerData();
-		if (info != null && info.length() > 0) {
-			try {
-				int value = Integer.parseInt(info);
-				weight = value;
-			} catch (NumberFormatException e) {
-				// continue to use the default value
-			}
+		if (info == null || info.length() == 0) {
+			element.setContainerData(Integer.toString(10000));
+			info = element.getContainerData();
 		}
-		element.setContainerData(Integer.toString(weight));
+
+		try {
+			int value = Integer.parseInt(info);
+			return value;
+		} catch (NumberFormatException e) {
+			return UNDEFINED_WEIGHT;
+		}
 	}
 }

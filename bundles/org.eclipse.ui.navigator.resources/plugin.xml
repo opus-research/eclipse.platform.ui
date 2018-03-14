@@ -2,16 +2,17 @@
 <?eclipse version="3.0"?>
 <plugin>
 
+ 
    <extension
          point="org.eclipse.ui.views">
       <view
             category="org.eclipse.ui"
             class="org.eclipse.ui.navigator.resources.ProjectExplorer"
-            icon="$nl$/icons/full/eview16/resource_persp.png"
+            icon="$nl$/icons/full/eview16/resource_persp.gif"
             id="org.eclipse.ui.navigator.ProjectExplorer"
             name="%Common_Resource_Navigator"/>
    </extension>
-
+   
    <extension
          point="org.eclipse.ui.navigator.viewer">
        <viewer
@@ -19,34 +20,34 @@
              viewerId="org.eclipse.ui.navigator.ProjectExplorer">
           <popupMenu
                 allowsPlatformContributions="true"
-                id="org.eclipse.ui.navigator.ProjectExplorer#PopupMenu">
+                id="org.eclipse.ui.navigator.ProjectExplorer#PopupMenu">  
              <insertionPoint name="group.new"/>
              <insertionPoint
                    name="group.open"
                    separator="true"/>
-             <insertionPoint name="group.openWith"/>
+             <insertionPoint name="group.openWith"/>   
              <insertionPoint name="group.edit"
-                   separator="true"/>
-             <insertionPoint name="group.reorganize" />
+                   separator="true"/>   
+             <insertionPoint name="group.reorganize" />         
              <insertionPoint
                    name="group.port"
-                   separator="true"/>
+                   separator="true"/>     
              <insertionPoint
                    name="group.build"
-                   separator="true"/>
+                   separator="true"/> 
              <insertionPoint
                    name="group.generate"
-                   separator="true"/>
+                   separator="true"/> 
              <insertionPoint
                    name="group.search"
-                   separator="true"/>
+                   separator="true"/>              
              <insertionPoint
                    name="additions"
-                   separator="true"/>
+                   separator="true"/>              
              <insertionPoint
                    name="group.properties"
                    separator="true"/>
-
+             
           </popupMenu>
           <options>
              <property
@@ -55,10 +56,10 @@
              </property>
           </options>
        </viewer>
-       <viewerContentBinding
+       <viewerContentBinding 
              viewerId="org.eclipse.ui.navigator.ProjectExplorer">
           <includes>
-       	      <contentExtension pattern="org.eclipse.ui.navigator.resourceContent" />
+       	      <contentExtension pattern="org.eclipse.ui.navigator.resourceContent" />		       	      
 	          <contentExtension pattern="org.eclipse.ui.navigator.resources.filters.*"/>
            <contentExtension pattern="org.eclipse.ui.navigator.resources.linkHelper"/>
            <contentExtension pattern="org.eclipse.ui.navigator.resources.workingSets"/>
@@ -73,33 +74,33 @@
        <dragAssistant
              class="org.eclipse.ui.navigator.resources.ResourceDragAdapterAssistant"
              viewerId="org.eclipse.ui.navigator.ProjectExplorer"/>
-
+       
    </extension>
-
+   
 <!-- Resource Content  -->
-   <extension
+   <extension  
          point="org.eclipse.ui.navigator.navigatorContent">
       <navigatorContent
             name="%resource.extension.name"
             priority="low"
-            icon="$nl$/icons/full/eview16/resource_persp.png"
+            icon="$nl$/icons/full/eview16/resource_persp.gif"
             activeByDefault="true"
 			            contentProvider="org.eclipse.ui.internal.navigator.resources.workbench.ResourceExtensionContentProvider"
-            			labelProvider="org.eclipse.ui.internal.navigator.resources.workbench.ResourceExtensionLabelProvider"
-            id="org.eclipse.ui.navigator.resourceContent">
+            			labelProvider="org.eclipse.ui.internal.navigator.resources.workbench.ResourceExtensionLabelProvider"			
+            id="org.eclipse.ui.navigator.resourceContent">         
          <enablement>
-		         <or>
-		            <instanceof
-		                  	value="org.eclipse.core.resources.IResource" />
+		         <or>         
+		            <instanceof 
+		                  	value="org.eclipse.core.resources.IResource" /> 
 		         </or>
          </enablement>
-
+         
         <commonSorter
               class="org.eclipse.ui.internal.navigator.resources.workbench.ResourceExtensionSorter"
               id="org.eclipse.ui.navigator.resources.sorters.defaultSorter">
            <parentExpression>
-           		  <or>
-		            <instanceof value="org.eclipse.core.resources.IResource" />
+           		  <or>           
+		            <instanceof value="org.eclipse.core.resources.IResource" /> 
 		         </or>
 		   </parentExpression>
         </commonSorter>
@@ -113,54 +114,47 @@
                  <adapt type="org.eclipse.core.resources.IFile"/>
               </or>
            </possibleDropTargets>
-        </dropAssistant>
-        <dropAssistant
-              class="org.eclipse.ui.internal.navigator.workingsets.ProjectInWorkingSetDropAdapterAssistant"
-              id="org.eclipse.ui.navigator.resources.projectInWorkingSetDropAdapter">
-           <possibleDropTargets>
-             <adapt type="org.eclipse.ui.IWorkingSet"/>
-           </possibleDropTargets>
-        </dropAssistant>
+        </dropAssistant>        
 
         <actionProvider
               class="org.eclipse.ui.internal.navigator.resources.actions.EditActionProvider"
-              id="org.eclipse.ui.navigator.resources.actions.EditActions"/>
+              id="org.eclipse.ui.navigator.resources.actions.EditActions"/>         
         <actionProvider
               class="org.eclipse.ui.internal.navigator.resources.actions.RefactorActionProvider"
-              id="org.eclipse.ui.navigator.resources.actions.RefactorActions"/>
-
+              id="org.eclipse.ui.navigator.resources.actions.RefactorActions"/>         
+                      
 	      <!-- Menu Shortcut Actions for Wizards -->
 	      <commonWizard
 	        		type="new"
 					wizardId="org.eclipse.ui.wizards.new.folder">
 				<enablement>
 					<or>
-						<adapt type="org.eclipse.core.resources.IFile" />
+						<adapt type="org.eclipse.core.resources.IFile" />	
 						<adapt type="org.eclipse.core.resources.IFolder" />
-	         			<adapt type="org.eclipse.core.resources.IProject" />
-	               		<adapt type="org.eclipse.core.resources.IWorkspaceRoot" />
+	         			<adapt type="org.eclipse.core.resources.IProject" /> 
+	               		<adapt type="org.eclipse.core.resources.IWorkspaceRoot" />	
 					</or>
 		         </enablement>
-			</commonWizard>
+			</commonWizard>   
 	        <commonWizard
 	            type="new"
 	            wizardId="org.eclipse.ui.wizards.new.file">
 				<enablement>
 					<or>
-						<adapt type="org.eclipse.core.resources.IFile" />
+						<adapt type="org.eclipse.core.resources.IFile" />	
 						<adapt type="org.eclipse.core.resources.IFolder" />
-	         			<adapt type="org.eclipse.core.resources.IProject" />
-	               		<adapt type="org.eclipse.core.resources.IWorkspaceRoot" />
+	         			<adapt type="org.eclipse.core.resources.IProject" /> 
+	               		<adapt type="org.eclipse.core.resources.IWorkspaceRoot" />	
 					</or>
 		         </enablement>
-			</commonWizard>
+			</commonWizard>              
       </navigatorContent>
-		      <actionProvider
+		      <actionProvider 
       			id="org.eclipse.ui.navigator.resources.OpenActions"
 				class="org.eclipse.ui.internal.navigator.resources.actions.OpenActionProvider">
 			<enablement>
 				<or>
-					<adapt type="org.eclipse.core.resources.IFile" />
+					<adapt type="org.eclipse.core.resources.IFile" /> 	
 				</or>
 			</enablement>
 		</actionProvider>
@@ -169,8 +163,8 @@
             id="org.eclipse.ui.navigator.resources.GotoActions">
 			<enablement>
 				<or>
-					<adapt type="org.eclipse.core.resources.IResource" />
-					<adapt type="org.eclipse.ui.IWorkingSet" />
+					<adapt type="org.eclipse.core.resources.IResource" /> 	
+					<adapt type="org.eclipse.ui.IWorkingSet" /> 	
 				</or>
 			</enablement>
       </actionProvider>
@@ -186,38 +180,38 @@
 								property="org.eclipse.core.resources.open">
 							</test>
 						</adapt>
-						<adapt type="org.eclipse.core.resources.IFolder" />
-						<adapt type="org.eclipse.ui.IWorkingSet" />
+						<adapt type="org.eclipse.core.resources.IFolder" /> 	
+						<adapt type="org.eclipse.ui.IWorkingSet" /> 	
 					</or>
 				</and>
 			</enablement>
       </actionProvider>
-
-      <!-- Action Providers -->
-		<actionProvider
+      
+      <!-- Action Providers --> 
+		<actionProvider 
         		id="org.eclipse.ui.navigator.resources.PortingActions"
 				class="org.eclipse.ui.internal.navigator.resources.actions.PortingActionProvider">
-			<enablement>
+			<enablement> 
 			    <or>
-					<adapt type="org.eclipse.core.resources.IResource" />
-					<adapt type="java.util.Collection">
+					<adapt type="org.eclipse.core.resources.IResource" />	 
+					<adapt type="java.util.Collection"> 
 						<count value="0" />
 					</adapt>
-				</or>
+				</or>	 
 			</enablement>
 		</actionProvider>
         <actionProvider
             	class="org.eclipse.ui.internal.navigator.resources.actions.NewActionProvider"
-            	id="org.eclipse.ui.navigator.resources.NewActions">
-        	<enablement>
+            	id="org.eclipse.ui.navigator.resources.NewActions"> 
+        	<enablement> 
         			<or>
-						<adapt type="org.eclipse.core.resources.IResource" />
-						<adapt type="java.util.Collection">
+						<adapt type="org.eclipse.core.resources.IResource" />	 
+						<adapt type="java.util.Collection"> 
 							<count value="0" />
 						</adapt>
 					</or>
 	         </enablement>
-		</actionProvider>
+		</actionProvider> 
         <actionProvider
               class="org.eclipse.ui.internal.navigator.resources.actions.PropertiesActionProvider"
               id="org.eclipse.ui.navigator.resources.PropertiesActionProvider">
@@ -232,39 +226,39 @@
               <adapt type="org.eclipse.core.resources.IResource"/>
            </enablement>
         </actionProvider>
-
+        
         <actionProvider
               class="org.eclipse.ui.internal.navigator.resources.actions.ResourceMgmtActionProvider"
               id="org.eclipse.ui.navigator.resources.ResourceMgmtActions">
            <enablement>
                 <or>
-					<adapt type="org.eclipse.core.resources.IResource" />
-					<adapt type="java.util.Collection">
+					<adapt type="org.eclipse.core.resources.IResource" />	 
+					<adapt type="java.util.Collection"> 
 						<count value="0" />
 					</adapt>
 				</or>
            </enablement>
-        </actionProvider>
-
-        <actionProvider
+        </actionProvider> 
+        
+        <actionProvider 
       			id="org.eclipse.ui.navigator.resources.UndoRedoActionProvider"
 				class="org.eclipse.ui.internal.navigator.resources.actions.UndoRedoActionProvider">
-			<enablement>
+			<enablement> 
 				<!-- 'true' -->
    				<or/>
 			</enablement>
 		</actionProvider>
-      <actionProvider
+      <actionProvider 
       			id="org.eclipse.ui.navigator.resources.FoldersAsProjectsActionProvider"
 				class="org.eclipse.ui.internal.navigator.resources.actions.FoldersAsProjectsActionProvider">
 			<enablement>
 				<or>
-					<adapt type="org.eclipse.core.resources.IFolder" />
+					<adapt type="org.eclipse.core.resources.IFolder" /> 	
 				</or>
 			</enablement>
 		</actionProvider>
 
-      <!-- Expression Filters -->
+      <!-- Expression Filters -->  
       <commonFilter
             id="org.eclipse.ui.navigator.resources.filters.startsWithDot"
             name="%filters.startsWithDot.name"
@@ -275,11 +269,11 @@
          	<and>
 	            <adapt type="org.eclipse.core.resources.IResource">
             		<test property="org.eclipse.core.resources.name" value=".*"/>
-            	</adapt>
+            	</adapt>	            
 	        </and>
          </filterExpression>
       </commonFilter>
-      <commonFilter
+      <commonFilter  
             id="org.eclipse.ui.navigator.resources.filters.endsWithClass"
             name="%filters.endsWithClass.name"
             description="%filters.endsWithClass.description"
@@ -288,14 +282,14 @@
          <filterExpression>
          	<and>
 	            <instanceof value="org.eclipse.core.resources.IFile"/>
-            	<test property="org.eclipse.core.resources.name" value="*.class"/>
+            	<test property="org.eclipse.core.resources.name" value="*.class"/>	            
 	        </and>
          </filterExpression>
-      </commonFilter>
+      </commonFilter> 
       <commonFilter
             id="org.eclipse.ui.navigator.resources.filters.closedProject"
             name="%filters.closedProject.name"
-            description="%filters.closedProject.description"
+            description="%filters.closedProject.description" 
             activeByDefault="false"
            >
          <filterExpression>
@@ -311,8 +305,8 @@
       <commonFilter
             id="org.eclipse.ui.navigator.resources.filters.workingSet"
             name="%filters.workingSet.name"
-            description="%filters.workingSet.description"
-            class="org.eclipse.ui.ResourceWorkingSetFilter"
+            description="%filters.workingSet.description" 
+            class="org.eclipse.ui.ResourceWorkingSetFilter" 
             activeByDefault="false"
             visibleInUI="false"
            >
@@ -322,17 +316,17 @@
             id="org.eclipse.ui.navigator.resources.WorkingSetActions">
            <enablement>
                 <or>
-					<adapt type="org.eclipse.core.resources.IResource" />
-					<adapt type="java.util.Collection">
+					<adapt type="org.eclipse.core.resources.IResource" />	 
+					<adapt type="java.util.Collection"> 
 						<count value="0" />
 					</adapt>
 				</or>
-           </enablement>
+           </enablement>            
       </actionProvider>
       <navigatorContent
             activeByDefault="true"
             contentProvider="org.eclipse.ui.internal.navigator.workingsets.WorkingSetsContentProvider"
-            icon="$nl$/icons/full/obj16/workingsets.png"
+            icon="$nl$/icons/full/obj16/workingsets.gif"
             id="org.eclipse.ui.navigator.resources.workingSets"
             labelProvider="org.eclipse.ui.internal.navigator.workingsets.WorkingSetsLabelProvider"
             name="%workingsets.extension.name"
@@ -345,9 +339,9 @@
          </possibleChildren>
          <commonSorter
                class="org.eclipse.ui.internal.navigator.workingsets.WorkingSetSorter"
-               id="org.eclipse.ui.navigator.resources.workingSets.sorter"/>
+               id="org.eclipse.ui.navigator.resources.workingSets.sorter"/>  
       </navigatorContent>
-
+      
    </extension>
     <extension
           point="org.eclipse.core.runtime.adapters">
@@ -408,121 +402,4 @@
 		    <showInPart id = "org.eclipse.ui.navigator.ProjectExplorer"/>
     	</perspectiveExtension>
    	</extension>
-
-   	<!-- Nested Projects -->
-    <extension
-         point="org.eclipse.ui.navigator.navigatorContent">
-      <navigatorContent
-            activeByDefault="false"
-            contentProvider="org.eclipse.ui.internal.navigator.resources.nested.NestedProjectsContentProvider"
-            id="org.eclipse.ui.navigator.resources.nested.nestedProjectContentProvider"
-            labelProvider="org.eclipse.ui.internal.navigator.resources.nested.NestedProjectsLabelProvider"
-            name="%nestedProjects.provider.name"
-            icon="$nl$/icons/full/obj16/nested_projects.png"
-            priority="higher">
-         <enablement>
-            <adapt
-                  type="org.eclipse.core.resources.IContainer">
-            </adapt>
-         </enablement>
-         <possibleChildren>
-            <instanceof
-                  value="org.eclipse.core.resources.IProject">
-            </instanceof>
-         </possibleChildren>
-      </navigatorContent>
-      <commonFilter
-            activeByDefault="false"
-            class="org.eclipse.ui.internal.navigator.resources.nested.HideFolderWhenProjectIsShownAsNested"
-            description="%nestedProjects.filters.HideFolderWhenProjectIsShownAsNested.description"
-            id="org.eclipse.ui.navigator.resources.nested.HideFolderWhenProjectIsShownAsNested"
-            name="%nestedProjects.filters.HideFolderWhenProjectIsShownAsNested.name"
-            visibleInUI="true">
-      </commonFilter>
-      <commonFilter
-            activeByDefault="false"
-            class="org.eclipse.ui.internal.navigator.resources.nested.HideTopLevelProjectIfNested"
-            description="%nestedProjects.filters.HideTopLevelProjectIfNested.description"
-            id="org.eclipse.ui.navigator.resources.nested.HideTopLevelProjectIfNested"
-            name="%nestedProjects.filters.HideTopLevelProjectIfNested.name"
-            visibleInUI="true">
-      </commonFilter>
-   </extension>
-   <extension
-         point="org.eclipse.ui.navigator.viewer">
-      <viewerContentBinding
-            viewerId="org.eclipse.ui.navigator.ProjectExplorer">
-         <includes>
-            <contentExtension pattern="org.eclipse.ui.navigator.resources.nested.*"/>
-         </includes>
-      </viewerContentBinding>
-   </extension>
-   <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            allPopups="false"
-            locationURI="menu:org.eclipse.ui.navigator.ProjectExplorer?before=additions">
-         <menu
-               label="%nestedProjects.menu.projectPresentation">
-            <command
-                  commandId="org.eclipse.ui.navigator.resources.nested.changeProjectPresentation"
-                  label="%nestedProjects.menu.projectPresentation.flat"
-                  style="radio">
-               <parameter
-                     name="org.eclipse.ui.navigator.resources.nested.enabled"
-                     value="false">
-               </parameter>
-               <parameter
-                     name="org.eclipse.ui.commands.radioStateParameter"
-                     value="false">
-               </parameter>
-            </command>
-            <command
-                  commandId="org.eclipse.ui.navigator.resources.nested.changeProjectPresentation"
-                  label="%nestedProjects.menu.projectPresentation.hierarchical"
-                  style="radio">
-               <parameter
-                     name="org.eclipse.ui.navigator.resources.nested.enabled"
-                     value="true">
-               </parameter>
-               <parameter
-                     name="org.eclipse.ui.commands.radioStateParameter"
-                     value="true">
-               </parameter>
-            </command>
-         </menu>
-      </menuContribution>
-   </extension>
-   <extension
-         point="org.eclipse.ui.commands">
-      <command
-            defaultHandler="org.eclipse.ui.internal.navigator.resources.nested.ProjectPresentationHandler"
-            id="org.eclipse.ui.navigator.resources.nested.changeProjectPresentation"
-            name="%nestedProjects.menu.projectPresentation">
-         <commandParameter
-               id="org.eclipse.ui.navigator.resources.nested.enabled"
-               name="%nestedProjects.menu.projectPresentation.hierarchical"
-               optional="true">
-         </commandParameter>
-         <state
-               id="org.eclipse.ui.commands.radioState">
-            <class
-                  class="org.eclipse.ui.handlers.RadioState">
-               <parameter
-                     name="default"
-                     value="false">
-               </parameter>
-               <parameter
-                     name="persisted"
-                     value="true">
-               </parameter>
-            </class>
-         </state>
-         <commandParameter
-               id="org.eclipse.ui.commands.radioStateParameter"
-               name="%nestedProjects.radioStateName"
-               optional="false">
-         </commandParameter>
-      </command>
-   </extension>
-</plugin>
+</plugin> 

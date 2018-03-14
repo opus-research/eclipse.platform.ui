@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,14 +17,15 @@ import org.eclipse.core.databinding.observable.Diffs;
 import org.eclipse.core.databinding.observable.value.AbstractObservableValue;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.IValueChangeListener;
+import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
 
 /**
  * @since 3.2
  *
  */
-public class AggregateObservableValue extends AbstractObservableValue<Object> {
+public class AggregateObservableValue extends AbstractObservableValue {
 
-	private IObservableValue<Object>[] observableValues;
+	private IObservableValue[] observableValues;
 
 	private String delimiter;
 
@@ -32,9 +33,13 @@ public class AggregateObservableValue extends AbstractObservableValue<Object> {
 
 	private String currentValue;
 
-	private IValueChangeListener<Object> listener = event -> {
-		if (!updating) {
-			fireValueChange(Diffs.createValueDiff(currentValue, doGetValue()));
+	private IValueChangeListener listener = new IValueChangeListener() {
+		@Override
+		public void handleValueChange(ValueChangeEvent event) {
+			if (!updating) {
+				fireValueChange(Diffs.createValueDiff(currentValue,
+						doGetValue()));
+			}
 		}
 	};
 
@@ -42,7 +47,7 @@ public class AggregateObservableValue extends AbstractObservableValue<Object> {
 	 * @param observableValues
 	 * @param delimiter
 	 */
-	public AggregateObservableValue(IObservableValue<Object>[] observableValues,
+	public AggregateObservableValue(IObservableValue[] observableValues,
 			String delimiter) {
 		this.observableValues = observableValues;
 		this.delimiter = delimiter;

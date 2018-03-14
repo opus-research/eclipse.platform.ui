@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,7 @@ import org.eclipse.core.databinding.property.value.SimpleValueProperty;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class PojoValueProperty extends SimpleValueProperty {
 	private final PropertyDescriptor propertyDescriptor;
@@ -37,30 +37,25 @@ public class PojoValueProperty extends SimpleValueProperty {
 				.getPropertyType() : valueType;
 	}
 
-	@Override
 	public Object getValueType() {
 		return valueType;
 	}
 
-	@Override
 	protected Object doGetValue(Object source) {
 		if (source == null)
 			return null;
 		return BeanPropertyHelper.readProperty(source, propertyDescriptor);
 	}
 
-	@Override
 	protected void doSetValue(Object source, Object value) {
 		BeanPropertyHelper.writeProperty(source, propertyDescriptor, value);
 	}
 
-	@Override
 	public INativePropertyListener adaptListener(
 			ISimplePropertyListener listener) {
 		return null;
 	}
 
-	@Override
 	public String toString() {
 		String s = BeanPropertyHelper.propertyName(propertyDescriptor);
 		if (valueType != null)

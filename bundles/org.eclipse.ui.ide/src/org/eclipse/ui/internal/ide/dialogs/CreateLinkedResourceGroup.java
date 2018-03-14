@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,6 +33,8 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.util.BidiUtils;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -58,7 +60,7 @@ import org.eclipse.ui.internal.ide.filesystem.FileSystemSupportRegistry;
 
 /**
  * Widget group for specifying a linked file or folder target.
- *
+ * 
  * @since 2.1
  */
 public class CreateLinkedResourceGroup {
@@ -91,13 +93,13 @@ public class CreateLinkedResourceGroup {
 	/**
 	 * Helper interface intended for updating a string value based on the
 	 * currently selected link target.
-	 *
+	 * 
 	 * @since 3.2
 	 */
 	public static interface IStringValue {
 		/**
 		 * Sets the String value.
-		 *
+		 * 
 		 * @param string
 		 *            a non-null String
 		 */
@@ -105,14 +107,14 @@ public class CreateLinkedResourceGroup {
 
 		/**
 		 * Gets the String value.
-		 *
+		 * 
 		 * @return the current value, or <code>null</code>
 		 */
 		String getValue();
 
 		/**
 		 * Gets the resource to which the resource will belong
-		 *
+		 * 
 		 * @return the IResource object, or <code>null</code>
 		 */
 		IResource getResource();
@@ -124,7 +126,7 @@ public class CreateLinkedResourceGroup {
 
 	/**
 	 * Creates a link target group
-	 *
+	 * 
 	 * @param type
 	 *            specifies the type of resource to link to.
 	 *            <code>IResource.FILE</code> or <code>IResource.FOLDER</code>
@@ -149,7 +151,7 @@ public class CreateLinkedResourceGroup {
 
 	/**
 	 * Creates the widgets
-	 *
+	 * 
 	 * @param parent
 	 *            parent composite of the widget group
 	 * @return the widget group
@@ -160,7 +162,7 @@ public class CreateLinkedResourceGroup {
 
 	/**
 	 * Creates the widgets without the checkbox button
-	 *
+	 * 
 	 * @param parent
 	 *            parent composite of the widget group
 	 * @return the widget group
@@ -171,7 +173,7 @@ public class CreateLinkedResourceGroup {
 
 	/**
 	 * Creates the widgets
-	 *
+	 * 
 	 * @param parent
 	 *            parent composite of the widget group
 	 * @return the widget group
@@ -199,7 +201,6 @@ public class CreateLinkedResourceGroup {
 			createLinkButton.setSelection(createLink);
 			createLinkButton.setFont(font);
 			SelectionListener selectionListener = new SelectionAdapter() {
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 					setEnabled(createLinkButton.getSelection());
 				}
@@ -236,10 +237,10 @@ public class CreateLinkedResourceGroup {
 	public boolean isEnabled() {
 		return createLink;
 	}
-
+	
 	/**
 	 * Creates the link target location widgets.
-	 *
+	 * 
 	 * @param locationGroup
 	 *            the parent composite
 	 * @param enabled
@@ -274,26 +275,28 @@ public class CreateLinkedResourceGroup {
 		linkTargetField.setEnabled(enabled);
 		linkTargetField.setFont(locationGroup.getFont());
 		BidiUtils.applyBidiProcessing(linkTargetField, StructuredTextTypeHandlerFactory.FILE);
-		linkTargetField.addModifyListener(e -> {
-			linkTarget = linkTargetField.getText();
-			if (isDefaultConfigurationSelected()) {
-				linkTarget = getPathVariableManager().convertFromUserEditableFormat(linkTarget, true);
-			}
-			resolveVariable();
-			if (updatableResourceName != null) {
-				String value = updatableResourceName.getValue();
-				if (value == null
-						|| value.equals("") || value.equals(lastUpdatedValue)) { //$NON-NLS-1$
-					IPath linkTargetPath = new Path(linkTarget);
-					String lastSegment = linkTargetPath.lastSegment();
-					if (lastSegment != null) {
-						lastUpdatedValue = lastSegment;
-						updatableResourceName.setValue(lastSegment);
+		linkTargetField.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				linkTarget = linkTargetField.getText();
+				if (isDefaultConfigurationSelected()) {
+					linkTarget = getPathVariableManager().convertFromUserEditableFormat(linkTarget, true);
+				}
+				resolveVariable();
+				if (updatableResourceName != null) {
+					String value = updatableResourceName.getValue();
+					if (value == null
+							|| value.equals("") || value.equals(lastUpdatedValue)) { //$NON-NLS-1$
+						IPath linkTargetPath = new Path(linkTarget);
+						String lastSegment = linkTargetPath.lastSegment();
+						if (lastSegment != null) {
+							lastUpdatedValue = lastSegment;
+							updatableResourceName.setValue(lastSegment);
+						}
 					}
 				}
-			}
-			if (listener != null) {
-				listener.handleEvent(new Event());
+				if (listener != null) {
+					listener.handleEvent(new Event());
+				}
 			}
 		});
 
@@ -302,7 +305,6 @@ public class CreateLinkedResourceGroup {
 		browseButton
 				.setText(IDEWorkbenchMessages.CreateLinkedResourceGroup_browseButton);
 		browseButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent event) {
 				handleLinkTargetBrowseButtonPressed();
 			}
@@ -316,7 +318,6 @@ public class CreateLinkedResourceGroup {
 		variablesButton
 				.setText(IDEWorkbenchMessages.CreateLinkedResourceGroup_variablesButton);
 		variablesButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent event) {
 				handleVariablesButtonPressed();
 			}
@@ -336,7 +337,7 @@ public class CreateLinkedResourceGroup {
 
 	/**
 	 * Create the file system selection area.
-	 *
+	 * 
 	 * @param composite
 	 * @param enabled
 	 *            the initial enablement state.
@@ -349,7 +350,7 @@ public class CreateLinkedResourceGroup {
 		}
 
 		fileSystemSelectionArea = new FileSystemSelectionArea();
-
+		
 		Composite parent = new Composite(composite, SWT.NONE);
 		parent.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false, 4, 1));
 		GridLayout layout = new GridLayout(2, false);
@@ -359,13 +360,13 @@ public class CreateLinkedResourceGroup {
 		parent.setFont(composite.getFont());
 
 		fileSystemSelectionArea.createContents(parent);
-
+		
 		fileSystemSelectionArea.setEnabled(enabled);
 	}
 
 	/**
 	 * Create the composite for the resolved path.
-	 *
+	 * 
 	 * @param locationGroup
 	 * @param indent
 	 */
@@ -397,7 +398,7 @@ public class CreateLinkedResourceGroup {
 
 	/**
 	 * Returns a new status object with the given severity and message.
-	 *
+	 * 
 	 * @return a new status object with the given severity and message.
 	 */
 	private IStatus createStatus(int severity, String message) {
@@ -416,7 +417,7 @@ public class CreateLinkedResourceGroup {
 
 	/**
 	 * Returns the link target location entered by the user.
-	 *
+	 * 
 	 * @return the link target location entered by the user. null if the user
 	 *         chose not to create a link.
 	 */
@@ -432,7 +433,7 @@ public class CreateLinkedResourceGroup {
 			IPath path = Path.fromOSString(linkTarget);
 			if (path != null && path.toFile().exists())
 				return URIUtil.toURI(path);
-
+			
 			uri = new URI(linkTarget);
 			URI resolved = getPathVariableManager().resolveURI(uri);
 			try {
@@ -454,7 +455,7 @@ public class CreateLinkedResourceGroup {
 		// validate non-local file system location
 		return configuration.getContributor().getURI(string);
 	}
-
+	
 	/**
 	 * Opens a file or directory browser depending on the link type.
 	 */
@@ -533,7 +534,7 @@ public class CreateLinkedResourceGroup {
 	/**
 	 * Return the selected configuration or <code>null</code> if there is not
 	 * one selected.
-	 *
+	 * 
 	 * @return FileSystemConfiguration or <code>null</code>
 	 */
 	private FileSystemConfiguration getSelectedConfiguration() {
@@ -574,7 +575,7 @@ public class CreateLinkedResourceGroup {
 	 * This method must be called before <code>setButtonLayoutData</code> is
 	 * called.
 	 * </p>
-	 *
+	 * 
 	 * @param control
 	 *            a control from which to obtain the current font
 	 */
@@ -604,10 +605,10 @@ public class CreateLinkedResourceGroup {
 		URI resolvedURI = pathVariableManager.resolveURI(uri);
 		String resolvedString;
 		if (isURL)
-			resolvedString = resolvedURI.toString();
+			resolvedString = resolvedURI.toString(); 
 		else
 			resolvedString = URIUtil.toPath(resolvedURI).toOSString();
-
+		
 		if (linkTarget.equals(resolvedString)) {
 			resolvedPathLabelText.setVisible(false);
 			resolvedPathLabelData.setVisible(false);
@@ -626,14 +627,14 @@ public class CreateLinkedResourceGroup {
 				&& updatableResourceName.getResource() != null)
 			return updatableResourceName.getResource().getPathVariableManager();
 		return ResourcesPlugin.getWorkspace().getPathVariableManager();
-	}
+	}	
 
 	/**
 	 * Sets the <code>GridData</code> on the specified button to be one that
 	 * is spaced for the current dialog page units. The method
 	 * <code>initializeDialogUnits</code> must be called once before calling
 	 * this method for the first time.
-	 *
+	 * 
 	 * @param button
 	 *            the button to set the <code>GridData</code>
 	 * @return the <code>GridData</code> set on the specified button
@@ -650,7 +651,7 @@ public class CreateLinkedResourceGroup {
 
 	/**
 	 * Sets the value of the link target field
-	 *
+	 * 
 	 * @param target
 	 *            the value of the link target field
 	 */
@@ -664,7 +665,7 @@ public class CreateLinkedResourceGroup {
 	/**
 	 * Validates the type of the given file against the link type specified in
 	 * the constructor.
-	 *
+	 * 
 	 * @param linkTargetFile
 	 *            file to validate
 	 * @return IStatus indicating the validation result. IStatus.OK if the given
@@ -685,10 +686,10 @@ public class CreateLinkedResourceGroup {
 
 	/**
 	 * Validates this page's controls.
-	 *
+	 * 
 	 * @param linkHandle
 	 *            The target to check
-	 *
+	 * 
 	 * @return IStatus indicating the validation result. IStatus.OK if the
 	 *         specified link target is valid given the linkHandle.
 	 */

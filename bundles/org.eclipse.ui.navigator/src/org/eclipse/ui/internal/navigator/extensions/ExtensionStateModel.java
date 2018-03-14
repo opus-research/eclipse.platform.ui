@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,8 +19,8 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.navigator.IExtensionStateModel;
 
 /**
- *
- *
+ * 
+ * 
  * @since 3.2
  * @see IExtensionStateModel
  */
@@ -36,7 +36,7 @@ public class ExtensionStateModel extends EventManager implements
 	/**
 	 * Create an extension state model for the given extension (anId) associated
 	 * with the given viewer (aViewerId).
-	 *
+	 * 
 	 * @param anId
 	 *            The id of the extension this state model is used for.
 	 * @param aViewerId
@@ -47,35 +47,29 @@ public class ExtensionStateModel extends EventManager implements
 		viewerId = aViewerId;
 	}
 
-	@Override
 	public String getId() {
 		return id;
 	}
 
-	@Override
 	public String getViewerId() {
 		return viewerId;
 	}
 
-	@Override
 	public String getStringProperty(String aPropertyName) {
 		return (String) values.get(aPropertyName);
 	}
 
-	@Override
 	public boolean getBooleanProperty(String aPropertyName) {
 
 		Boolean b = (Boolean) values.get(aPropertyName);
 		return b != null ? b.booleanValue() : false;
 	}
 
-	@Override
 	public int getIntProperty(String aPropertyName) {
 		Integer i = (Integer) values.get(aPropertyName);
 		return i != null ? i.intValue() : -1;
 	}
 
-	@Override
 	public void setStringProperty(String aPropertyName, String aPropertyValue) {
 		String oldValue = (String) values.get(aPropertyName);
 		String newValue = aPropertyValue;
@@ -86,7 +80,6 @@ public class ExtensionStateModel extends EventManager implements
 		}
 	}
 
-	@Override
 	public void setBooleanProperty(String aPropertyName, boolean aPropertyValue) {
 		Boolean oldValue = (Boolean) values.get(aPropertyName);
 		Boolean newValue = aPropertyValue ? Boolean.TRUE : Boolean.FALSE;
@@ -99,10 +92,9 @@ public class ExtensionStateModel extends EventManager implements
 		}
 	}
 
-	@Override
 	public void setIntProperty(String aPropertyName, int aPropertyValue) {
 		Integer oldValue = (Integer) values.get(aPropertyName);
-		Integer newValue = Integer.valueOf(aPropertyValue);
+		Integer newValue = new Integer(aPropertyValue);
 		if (hasPropertyChanged(oldValue, newValue)) {
 			values.put(aPropertyName, newValue);
 			firePropertyChangeEvent(new PropertyChangeEvent(this,
@@ -110,22 +102,18 @@ public class ExtensionStateModel extends EventManager implements
 		}
 	}
 
-	@Override
 	public void addPropertyChangeListener(IPropertyChangeListener aListener) {
 		addListenerObject(aListener);
 	}
 
-	@Override
 	public void removePropertyChangeListener(IPropertyChangeListener aListener) {
 		removeListenerObject(aListener);
 	}
 
-	@Override
 	public Object getProperty(String aPropertyName) {
 		return values.get(aPropertyName);
 	}
 
-	@Override
 	public void setProperty(String aPropertyName, Object aPropertyValue) {
 
 		Object oldValue = values.get(aPropertyName);
@@ -136,7 +124,7 @@ public class ExtensionStateModel extends EventManager implements
 					aPropertyName, oldValue, newValue));
 		}
 	}
-
+ 
 	private boolean hasPropertyChanged(Object oldValue, Object newValue) {
 		return oldValue == null || !oldValue.equals(newValue);
 	}

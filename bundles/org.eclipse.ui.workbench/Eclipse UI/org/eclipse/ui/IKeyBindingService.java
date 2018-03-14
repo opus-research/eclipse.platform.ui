@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,7 @@ import org.eclipse.jface.action.IAction;
  * <p>
  * This interface is not intended to be implemented or extended by clients.
  * </p>
- *
+ * 
  * @since 2.0
  * @deprecated See IContextService to manage <b>scopes</b> and
  * IHandlerService to manage handlers. IAction can
@@ -37,14 +37,14 @@ public interface IKeyBindingService {
 
     /**
      * Returns the active accelerator scope ids.
-     *
+     * 
      * @return the active accelerator scope ids.
      */
     String[] getScopes();
 
     /**
      * Registers an action with the key binding service.
-     *
+     * 
      * @param action
      *            the action to be registered with the key binding service.
      */
@@ -52,7 +52,7 @@ public interface IKeyBindingService {
 
     /**
      * Sets the active accelerator scope ids.
-     *
+     * 
      * @param scopes
      *            the active accelerator scope ids.
      */
@@ -60,7 +60,7 @@ public interface IKeyBindingService {
 
     /**
      * Unregisters an action with the key binding service.
-     *
+     * 
      * @param action
      *            the action to be unregistered with the key binding service.
      */

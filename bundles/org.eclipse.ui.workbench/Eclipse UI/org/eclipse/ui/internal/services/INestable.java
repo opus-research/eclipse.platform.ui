@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,7 +38,7 @@ package org.eclipse.ui.internal.services;
  * <p>
  * This class should eventually move to <code>org.eclipse.ui.services</code>.
  * </p>
- *
+ * 
  * @since 3.2
  */
 public interface INestable {
@@ -46,7 +46,7 @@ public interface INestable {
 	/**
 	 * Notifies this service that the component within which it exists has
 	 * become active. The service should modify its state as appropriate.
-	 *
+	 * 
 	 */
 	public void activate();
 

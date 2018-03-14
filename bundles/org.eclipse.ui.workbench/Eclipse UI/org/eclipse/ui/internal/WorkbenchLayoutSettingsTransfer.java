@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,9 +25,9 @@ import org.eclipse.ui.internal.preferences.WorkbenchSettingsTransfer;
 /**
  * The WorkbenchSettings handles the recording and restoring of workbench
  * settings.
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 public class WorkbenchLayoutSettingsTransfer extends WorkbenchSettingsTransfer {
 
@@ -38,6 +38,11 @@ public class WorkbenchLayoutSettingsTransfer extends WorkbenchSettingsTransfer {
 		super();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.preferences.SettingsTransfer#transferSettings(org.eclipse.core.runtime.IPath)
+	 */
 	@Override
 	public IStatus transferSettings(IPath newWorkspaceRoot) {
 		try {
@@ -91,7 +96,7 @@ public class WorkbenchLayoutSettingsTransfer extends WorkbenchSettingsTransfer {
 	/**
 	 * Create the parent directories for the workbench layout file and then
 	 * return the File.
-	 *
+	 * 
 	 * @param newWorkspaceRoot
 	 * @return File the new layout file. Return <code>null</code> if the file
 	 *         cannot be created.
@@ -107,6 +112,11 @@ public class WorkbenchLayoutSettingsTransfer extends WorkbenchSettingsTransfer {
 		return workspaceFile;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.preferences.SettingsTransfer#getName()
+	 */
 	@Override
 	public String getName() {
 		return WorkbenchMessages.WorkbenchLayoutSettings_Name;
@@ -114,7 +124,7 @@ public class WorkbenchLayoutSettingsTransfer extends WorkbenchSettingsTransfer {
 
 	/**
 	 * Return the workbench settings location for the new root
-	 *
+	 * 
 	 * @param newWorkspaceRoot
 	 * @return IPath or <code>null</code> if it can't be determined.
 	 */

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,8 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Teddy Walker <teddy.walker@googlemail.com>
  *     	- Bug 188056 [Preferences] PreferencePages have to less indent in PreferenceDialog
- *     Stefan Xenos <sxenos@google.com> - Bug 466793
- *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 475879
  *******************************************************************************/
 package org.eclipse.jface.preference;
 
@@ -32,10 +30,10 @@ import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.PageChangedEvent;
 import org.eclipse.jface.dialogs.TrayDialog;
-import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.Policy;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -50,6 +48,8 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -70,6 +70,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Layout;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
@@ -83,7 +84,7 @@ import org.eclipse.swt.widgets.Tree;
 public class PreferenceDialog extends TrayDialog implements IPreferencePageContainer, IPageChangeProvider {
 	/**
 	 * Layout for the page container.
-	 *
+	 * 
 	 */
 	private class PageLayout extends Layout {
 		@Override
@@ -99,7 +100,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 				x = Math.max(x, size.x);
 				y = Math.max(y, size.y);
 			}
-
+			
 			//As pages can implement thier own computeSize
 			//take it into account
 			if(currentPage != null){
@@ -107,7 +108,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 				x = Math.max(x, size.x);
 				y = Math.max(y, size.y);
 			}
-
+			
 			if (wHint != SWT.DEFAULT) {
 				x = wHint;
 			}
@@ -147,7 +148,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	 * Return code used when dialog failed
 	 */
 	protected static final int FAILED = 2;
-
+	
 	/**
 	 * The current preference page, or <code>null</code> if there is none.
 	 */
@@ -161,7 +162,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 
 	/**
 	 * The minimum page size; 400 by 400 by default.
-	 *
+	 * 
 	 * @see #setMinimumPageSize(Point)
 	 */
 	private Point minimumPageSize = new Point(400, 400);
@@ -188,7 +189,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 
 	/**
 	 * Preference store, initially <code>null</code> meaning none.
-	 *
+	 * 
 	 * @see #setPreferenceStore
 	 */
 	private IPreferenceStore preferenceStore;
@@ -199,8 +200,8 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	 * The tree viewer.
 	 */
 	private TreeViewer treeViewer;
-
-	private ListenerList<IPageChangedListener> pageChangedListeners = new ListenerList<>();
+	
+    private ListenerList pageChangedListeners = new ListenerList();
 
     /**
      *  Composite with a FormLayout to contain the title area
@@ -212,7 +213,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	/**
 	 * Creates a new preference dialog under the control of the given preference
 	 * manager.
-	 *
+	 * 
 	 * @param parentShell
 	 *            the parent shell
 	 * @param manager
@@ -223,6 +224,11 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 		preferenceManager = manager;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#buttonPressed(int)
+	 */
 	@Override
 	protected void buttonPressed(int buttonId) {
 		switch (buttonId) {
@@ -241,11 +247,16 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#cancelPressed()
+	 */
 	@Override
 	protected void cancelPressed() {
 		// Inform all pages that we are cancelling
 		Iterator<IPreferenceNode> nodes = preferenceManager.getElements(PreferenceManager.PRE_ORDER).iterator();
-		final boolean[] cancelOK = new boolean[] { true };
+		final boolean[] cancelOK = new boolean[] { true }; 
 		while (nodes.hasNext()) {
 			final IPreferenceNode node = nodes.next();
 			if (getPage(node) != null) {
@@ -261,7 +272,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 					return;
 			}
 		}
-
+		
 		// Give subclasses the choice to save the state of the preference pages if needed
 		handleSave();
 
@@ -277,11 +288,19 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 		setSelectedNodePreference(null);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.window.Window#close()
+	 */
 	@Override
 	public boolean close() {
-
+		
 		//Do this is in a SafeRunnable as it may run client code
 		SafeRunnable runnable = new SafeRunnable(){
+			/* (non-Javadoc)
+			 * @see org.eclipse.core.runtime.ISafeRunnable#run()
+			 */
 			@Override
 			public void run() throws Exception {
 				List<IPreferenceNode> nodes = preferenceManager.getElements(PreferenceManager.PRE_ORDER);
@@ -289,21 +308,29 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 					IPreferenceNode node = nodes.get(i);
 					node.disposeResources();
 				}
-
+				
 			}
-
+			
+			/* (non-Javadoc)
+			 * @see org.eclipse.jface.util.SafeRunnable#handleException(java.lang.Throwable)
+			 */
 			@Override
 			public void handleException(Throwable e) {
 				super.handleException(e);
 				clearSelectedNode();//Do not cache a node with problems
 			}
 		};
-
+		
 		SafeRunner.run(runnable);
-
+		
 		return super.close();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
+	 */
 	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
@@ -320,6 +347,11 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.window.Window#constrainShellSize()
+	 */
 	@Override
 	protected void constrainShellSize() {
 		super.constrainShellSize();
@@ -329,6 +361,11 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		// create OK and Cancel buttons by default
@@ -337,18 +374,31 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.window.Window#createContents(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	protected Control createContents(final Composite parent) {
 		final Control[] control = new Control[1];
-		BusyIndicator.showWhile(getShell().getDisplay(), () -> {
-			control[0] = PreferenceDialog.super.createContents(parent);
-			// Add the first page
-			selectSavedItem();
+		BusyIndicator.showWhile(getShell().getDisplay(), new Runnable() {
+			@Override
+			public void run() {
+				control[0] = PreferenceDialog.super.createContents(parent);
+				// Add the first page
+				selectSavedItem();
+			}
 		});
 
 		return control[0];
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		final Composite composite = (Composite) super.createDialogArea(parent);
@@ -358,33 +408,36 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 		parentLayout.marginWidth = 0;
 		parentLayout.verticalSpacing = 0;
 		parentLayout.horizontalSpacing = 0;
-
+		
 		composite.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
-
+		
 		Control treeControl = createTreeAreaContents(composite);
 		createSash(composite,treeControl);
-
+		
 		Label versep = new Label(composite, SWT.SEPARATOR | SWT.VERTICAL);
-		GridDataFactory.fillDefaults().grab(false, true).applyTo(versep);
-
+		GridData verGd = new GridData(GridData.FILL_VERTICAL | GridData.GRAB_VERTICAL);
+	
+		versep.setLayoutData(verGd);
+		versep.setLayoutData(new GridData(SWT.LEFT, SWT.FILL, false, true));
+		
 		Composite pageAreaComposite = new Composite(composite, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(pageAreaComposite);
+		pageAreaComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
 		GridLayout layout = new GridLayout(1, true);
 		layout.marginHeight = 0;
 		layout.marginWidth = 0;
 		layout.verticalSpacing = 0;
 		pageAreaComposite.setLayout(layout);
-
+		
 		formTitleComposite = new Composite(pageAreaComposite, SWT.NONE);
 		FormLayout titleLayout = new FormLayout();
 		titleLayout.marginWidth = 0;
 		titleLayout.marginHeight = 0;
 		formTitleComposite.setLayout(titleLayout);
-
+		
 		GridData titleGridData = new GridData(GridData.FILL_HORIZONTAL);
 		titleGridData.horizontalIndent = IDialogConstants.HORIZONTAL_MARGIN;
 		formTitleComposite.setLayoutData(titleGridData);
-
+		
 		// Build the title area and separator line
 		Composite titleComposite = new Composite(formTitleComposite, SWT.NONE);
 		layout = new GridLayout();
@@ -393,21 +446,21 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 		layout.marginWidth = 0;
 		layout.horizontalSpacing = 0;
 		titleComposite.setLayout(layout);
-
+		
 		FormData titleFormData = new FormData();
 	   	titleFormData.top = new FormAttachment(0,0);
     	titleFormData.left = new FormAttachment(0,0);
     	titleFormData.right = new FormAttachment(100,0);
     	titleFormData.bottom = new FormAttachment(100,0);
-
+		
 		titleComposite.setLayoutData(titleFormData);
 		createTitleArea(titleComposite);
-
+		
 		Label separator = new Label(pageAreaComposite, SWT.HORIZONTAL | SWT.SEPARATOR);
 
 		separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
-
-
+		
+		
 		// Build the Page container
 		pageContainer = createPageContainer(pageAreaComposite);
 		GridData pageContainerData = new GridData(GridData.FILL_BOTH);
@@ -426,7 +479,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	 * @param composite
 	 * @param rightControl
 	 * @return Sash
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	protected Sash createSash(final Composite composite, final Control rightControl) {
@@ -435,58 +488,66 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 		sash.setBackground(composite.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		// the following listener resizes the tree control based on sash deltas.
 		// If necessary, it will also grow/shrink the dialog.
-		sash.addListener(SWT.Selection, event -> {
-			if (event.detail == SWT.DRAG) {
-				return;
+		sash.addListener(SWT.Selection, new Listener() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+			 */
+			@Override
+			public void handleEvent(Event event) {
+				if (event.detail == SWT.DRAG) {
+					return;
+				}
+				int shift = event.x - sash.getBounds().x;
+				GridData data = (GridData) rightControl.getLayoutData();
+				int newWidthHint = data.widthHint + shift;
+				if (newWidthHint < 20) {
+					return;
+				}
+				Point computedSize = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
+				Point currentSize = getShell().getSize();
+				// if the dialog wasn't of a custom size we know we can shrink
+				// it if necessary based on sash movement.
+				boolean customSize = !computedSize.equals(currentSize);
+				data.widthHint = newWidthHint;
+				setLastTreeWidth(newWidthHint);
+				composite.layout(true);
+				// recompute based on new widget size
+				computedSize = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
+				// if the dialog was of a custom size then increase it only if
+				// necessary.
+				if (customSize) {
+					computedSize.x = Math.max(computedSize.x, currentSize.x);
+				}
+				computedSize.y = Math.max(computedSize.y, currentSize.y);
+				if (computedSize.equals(currentSize)) {
+					return;
+				}
+				setShellSize(computedSize.x, computedSize.y);
+				lastShellSize = getShell().getSize();
 			}
-			int shift = event.x - sash.getBounds().x;
-			GridData data = (GridData) rightControl.getLayoutData();
-			int newWidthHint = data.widthHint + shift;
-			if (newWidthHint < 20) {
-				return;
-			}
-			Point computedSize = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
-			Point currentSize = getShell().getSize();
-			// if the dialog wasn't of a custom size we know we can shrink
-			// it if necessary based on sash movement.
-			boolean customSize = !computedSize.equals(currentSize);
-			data.widthHint = newWidthHint;
-			setLastTreeWidth(newWidthHint);
-			composite.layout(true);
-			// recompute based on new widget size
-			computedSize = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
-			// if the dialog was of a custom size then increase it only if
-			// necessary.
-			if (customSize) {
-				computedSize.x = Math.max(computedSize.x, currentSize.x);
-			}
-			computedSize.y = Math.max(computedSize.y, currentSize.y);
-			if (computedSize.equals(currentSize)) {
-				return;
-			}
-			setShellSize(computedSize.x, computedSize.y);
-			lastShellSize = getShell().getSize();
 		});
 		return sash;
 	}
 
 	/**
 	 * Creates the inner page container.
-	 *
+	 * 
 	 * @param parent
 	 * @return Composite
 	 */
 	protected Composite createPageContainer(Composite parent) {
-
+	
 		Composite outer = new Composite(parent, SWT.NONE);
-
+		
 		GridData outerData = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL
 				| GridData.GRAB_VERTICAL);
 		outerData.horizontalIndent = IDialogConstants.HORIZONTAL_MARGIN;
-
+				
 		outer.setLayout(new GridLayout());
 		outer.setLayoutData(outerData);
-
+		
 		//Create an outer composite for spacing
 		scrolled = new ScrolledComposite(outer, SWT.V_SCROLL | SWT.H_SCROLL);
 
@@ -494,22 +555,22 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 		scrolled.setShowFocusedControl(true);
 		scrolled.setExpandHorizontal(true);
 		scrolled.setExpandVertical(true);
-
+		
 		GridData scrolledData = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL
 				| GridData.GRAB_VERTICAL);
-
+				
 		scrolled.setLayoutData(scrolledData);
-
+		
 		Composite result = new Composite(scrolled, SWT.NONE);
-
+		
 		GridData resultData = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL
 				| GridData.GRAB_VERTICAL);
-
+				
 		result.setLayout(getPageLayout());
 		result.setLayoutData(resultData);
-
+		
 		scrolled.setContent(result);
-
+		
 		return result;
 	}
 
@@ -517,7 +578,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	 * Return the layout for the composite that contains
 	 * the pages.
 	 * @return PageLayout
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	protected Layout getPageLayout() {
@@ -526,7 +587,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 
 	/**
 	 * Creates the wizard's title area.
-	 *
+	 * 
 	 * @param parent
 	 *            the SWT parent for the title area composite.
 	 * @return the created title area composite.
@@ -541,7 +602,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 		layout.marginWidth = margins;
 		titleArea.setLayout(layout);
 
-
+		
 		GridData layoutData = new GridData(GridData.FILL_HORIZONTAL);
 		layoutData.verticalAlignment = SWT.TOP;
 		titleArea.setLayoutData(layoutData);
@@ -551,28 +612,39 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 		messageArea.createContents(titleArea);
 
 		titleArea.addControlListener(new ControlAdapter() {
+			/* (non-Javadoc)
+			 * @see org.eclipse.swt.events.ControlAdapter#controlResized(org.eclipse.swt.events.ControlEvent)
+			 */
 			@Override
 			public void controlResized(ControlEvent e) {
 				updateMessage();
 			}
 		});
 
-		final IPropertyChangeListener fontListener = event -> {
-			if (JFaceResources.BANNER_FONT.equals(event.getProperty())) {
-				updateMessage();
-			}
-			if (JFaceResources.DIALOG_FONT.equals(event.getProperty())) {
-				updateMessage();
-				Font dialogFont = JFaceResources.getDialogFont();
-				updateTreeFont(dialogFont);
-				Control[] children = ((Composite) buttonBar).getChildren();
-				for (int i = 0; i < children.length; i++) {
-					children[i].setFont(dialogFont);
+		final IPropertyChangeListener fontListener = new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent event) {
+				if (JFaceResources.BANNER_FONT.equals(event.getProperty())) {
+					updateMessage();
+				}
+				if (JFaceResources.DIALOG_FONT.equals(event.getProperty())) {
+					updateMessage();
+					Font dialogFont = JFaceResources.getDialogFont();
+					updateTreeFont(dialogFont);
+					Control[] children = ((Composite) buttonBar).getChildren();
+					for (int i = 0; i < children.length; i++) {
+						children[i].setFont(dialogFont);
+					}
 				}
 			}
 		};
 
-		titleArea.addDisposeListener(event -> JFaceResources.getFontRegistry().removeListener(fontListener));
+		titleArea.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent event) {
+				JFaceResources.getFontRegistry().removeListener(fontListener);
+			}
+		});
 		JFaceResources.getFontRegistry().addListener(fontListener);
 		messageArea.setTitleLayoutData(createMessageAreaData());
 		messageArea.setMessageLayoutData(createMessageAreaData());
@@ -581,7 +653,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 
 	/**
 	 * Create the layout data for the message area.
-	 *
+	 * 
 	 * @return FormData for the message area.
 	 */
 	private FormData createMessageAreaData() {
@@ -610,7 +682,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 
 	/**
 	 * Create a new <code>TreeViewer</code>.
-	 *
+	 * 
 	 * @param parent
 	 *            the parent <code>Composite</code>.
 	 * @return the <code>TreeViewer</code>.
@@ -627,7 +699,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	/**
 	 * Add the listeners to the tree viewer.
 	 * @param viewer
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	protected void addListeners(final TreeViewer viewer) {
@@ -650,15 +722,18 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 			public void selectionChanged(SelectionChangedEvent event) {
 				final Object selection = getSingleSelection(event.getSelection());
 				if (selection instanceof IPreferenceNode) {
-					BusyIndicator.showWhile(getShell().getDisplay(), () -> {
-						if (!isCurrentPageValid()) {
-							handleError();
-						} else if (!showPage((IPreferenceNode) selection)) {
-							// Page flipping wasn't successful
-							handleError();
-						} else {
-							// Everything went well
-							lastSuccessfulNode = (IPreferenceNode) selection;
+					BusyIndicator.showWhile(getShell().getDisplay(), new Runnable(){
+						@Override
+						public void run() {
+							if (!isCurrentPageValid()) {
+								handleError();
+							} else if (!showPage((IPreferenceNode) selection)) {
+								// Page flipping wasn't successful
+								handleError();
+							} else {
+								// Everything went well
+								lastSuccessfulNode = (IPreferenceNode) selection;
+							}
 						}
 					});
 				}
@@ -684,28 +759,28 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 					openDialogHelp();
 					return;
 				}
-				// A) A typical path: the current page has registered its own help link
-				// via WorkbenchHelpSystem#setHelp(). When just call it and let
+				// A) A typical path: the current page has registered its own help link 
+				// via WorkbenchHelpSystem#setHelp(). When just call it and let 
 				// it handle the help request.
 				Control pageControl = currentPage.getControl();
 				if (pageControl != null && pageControl.isListening(SWT.Help)) {
 					currentPage.performHelp();
 					return;
 				}
-
+				
 				// B) Less typical path: no standard listener has been created for the page.
 				// In this case we may or may not have an override of page's #performHelp().
 				// 1) Try to get default help opened for the dialog;
 				openDialogHelp();
-				// 2) Next call currentPage's #performHelp(). If it was overridden, it might switch help
+				// 2) Next call currentPage's #performHelp(). If it was overridden, it might switch help 
 				// to something else.
 				currentPage.performHelp();
 			}
-
+			
 			private void openDialogHelp() {
 				if (pageContainer == null)
 					return;
-		    	for(Control currentControl = pageContainer; currentControl != null; currentControl = currentControl.getParent()) {
+		    	for(Control currentControl = pageContainer; currentControl != null; currentControl = currentControl.getParent()) {  
 		    		if (currentControl.isListening(SWT.Help)) {
 		    			currentControl.notifyListeners(SWT.Help, new Event());
 		    			break;
@@ -718,7 +793,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	/**
 	 * Find the <code>IPreferenceNode</code> that has data the same id as the
 	 * supplied value.
-	 *
+	 * 
 	 * @param nodeId
 	 *            the id to search for.
 	 * @return <code>IPreferenceNode</code> or <code>null</code> if not
@@ -737,7 +812,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 
 	/**
 	 * Get the last known right side width.
-	 *
+	 * 
 	 * @return the width.
 	 */
 	protected int getLastRightWidth() {
@@ -746,13 +821,18 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 
 	/**
 	 * Returns the preference mananger used by this preference dialog.
-	 *
+	 * 
 	 * @return the preference mananger
 	 */
 	public PreferenceManager getPreferenceManager() {
 		return preferenceManager;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.IPreferencePageContainer#getPreferenceStore()
+	 */
 	@Override
 	public IPreferenceStore getPreferenceStore() {
 		return preferenceStore;
@@ -760,7 +840,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 
 	/**
 	 * Get the name of the selected item preference
-	 *
+	 * 
 	 * @return String
 	 */
 	protected String getSelectedNodePreference() {
@@ -814,12 +894,12 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 					try {
 						((IPersistentPreferenceStore) store).save();
 					} catch (IOException e) {
-						String message = JFaceResources.format("PreferenceDialog.saveErrorMessage", page.getTitle(), //$NON-NLS-1$
-								e.getMessage());
+						String message =JFaceResources.format(
+                                "PreferenceDialog.saveErrorMessage", new Object[] { page.getTitle(), e.getMessage() }); //$NON-NLS-1$
 			            Policy.getStatusHandler().show(
 			                    new Status(IStatus.ERROR, Policy.JFACE, message, e),
 			                    JFaceResources.getString("PreferenceDialog.saveErrorTitle")); //$NON-NLS-1$
-
+										
 					}
 				}
 			}
@@ -856,7 +936,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 
 	/**
 	 * Returns whether the current page is valid.
-	 *
+	 * 
 	 * @return <code>false</code> if the current page is not valid, or or
 	 *         <code>true</code> if the current page is valid or there is no
 	 *         current page
@@ -874,8 +954,10 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	 * @since 3.0
 	 */
 	protected void layoutTreeAreaControl(Control control) {
-		GridDataFactory.fillDefaults().hint(getLastRightWidth(), convertVerticalDLUsToPixels(120)).grab(false, true)
-				.applyTo(control);
+		GridData gd = new GridData(GridData.FILL_VERTICAL);
+		gd.widthHint = getLastRightWidth();
+		gd.verticalSpan = 1;
+		control.setLayoutData(gd);
 	}
 
 	/**
@@ -889,6 +971,11 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 		SafeRunnable.run(new SafeRunnable() {
 			private boolean errorOccurred;
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.core.runtime.ISafeRunnable#run()
+			 */
 			@Override
 			public void run() {
 				getButton(IDialogConstants.OK_ID).setEnabled(false);
@@ -917,7 +1004,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 						getButton(IDialogConstants.OK_ID).setEnabled(true);
 						return;
 					}
-
+					
 					if (!errorOccurred) {
 						//Give subclasses the choice to save the state of the
 					    //preference pages.
@@ -928,10 +1015,15 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 				}
 			}
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.core.runtime.ISafeRunnable#handleException(java.lang.Throwable)
+			 */
 			@Override
 			public void handleException(Throwable e) {
 				errorOccurred = true;
-
+				
 				Policy.getLog().log(new Status(IStatus.ERROR, Policy.JFACE, 0, e.toString(), e));
 
 				clearSelectedNode();
@@ -998,7 +1090,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	 * Display the given error message. The currently displayed message is saved
 	 * and will be redisplayed when the error message is set to
 	 * <code>null</code>.
-	 *
+	 * 
 	 * @param newErrorMessage
 	 *            the errorMessage to display or <code>null</code>
 	 */
@@ -1012,7 +1104,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 
 	/**
 	 * Save the last known tree width.
-	 *
+	 * 
 	 * @param width
 	 *            the width.
 	 */
@@ -1026,7 +1118,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	 * <p>
 	 * Shortcut for <code>setMessage(newMessage, NONE)</code>
 	 * </p>
-	 *
+	 * 
 	 * @param newMessage
 	 *            the message, or <code>null</code> to clear the message
 	 */
@@ -1049,7 +1141,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	 * message until the error message is cleared. This method replaces the
 	 * current message and does not affect the error message.
 	 * </p>
-	 *
+	 * 
 	 * @param newMessage
 	 *            the message, or <code>null</code> to clear the message
 	 * @param newType
@@ -1062,7 +1154,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 
 	/**
 	 * Sets the minimum page size.
-	 *
+	 * 
 	 * @param minWidth
 	 *            the minimum page width
 	 * @param minHeight
@@ -1076,7 +1168,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 
 	/**
 	 * Sets the minimum page size.
-	 *
+	 * 
 	 * @param size
 	 *            the page size encoded as <code>new Point(width,height)</code>
 	 * @see #setMinimumPageSize(int,int)
@@ -1088,7 +1180,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 
 	/**
 	 * Sets the preference store for this preference dialog.
-	 *
+	 * 
 	 * @param store
 	 *            the preference store
 	 * @see #getPreferenceStore
@@ -1114,7 +1206,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	/**
 	 * Sets the name of the selected item preference. Public equivalent to
 	 * <code>setSelectedNodePreference</code>.
-	 *
+	 * 
 	 * @param pageId
 	 *            The identifier for the page
 	 * @since 3.0
@@ -1125,7 +1217,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 
 	/**
 	 * Sets the name of the selected item preference.
-	 *
+	 * 
 	 * @param pageId
 	 *            The identifier for the page
 	 */
@@ -1136,7 +1228,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	/**
 	 * Changes the shell size to the given size, ensuring that it is no larger
 	 * than the display bounds.
-	 *
+	 * 
 	 * @param width
 	 *            the shell width
 	 * @param height
@@ -1152,7 +1244,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	/**
 	 * Shows the preference page corresponding to the given preference node.
 	 * Does nothing if that page is already current.
-	 *
+	 * 
 	 * @param node
 	 *            the preference node, or <code>null</code> if none
 	 * @return <code>true</code> if the page flip was successful, and
@@ -1243,12 +1335,12 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 					if (currentPage.getControl().getSize().x == 0) {
 						currentPage.getControl().setSize(containerSize);
 					}
-
+				
 			} else {
 				currentPage.getControl().setSize(containerSize);
 			}
 		}
-
+		
 		scrolled.setMinSize(contentSize);
 		// Ensure that all other pages are invisible
 		// (including ones that triggered an exception during
@@ -1273,7 +1365,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	/**
 	 * Create the page for the node.
 	 * @param node
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	protected void createPage(IPreferenceNode node) {
@@ -1284,7 +1376,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	 * Get the page for the node.
 	 * @param node
 	 * @return IPreferencePage
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	protected IPreferencePage getPage(IPreferenceNode node) {
@@ -1315,11 +1407,21 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 		firePageChanged(new PageChangedEvent(this, getCurrentPage()));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.IPreferencePageContainer#updateButtons()
+	 */
 	@Override
 	public void updateButtons() {
 		okButton.setEnabled(isCurrentPageValid());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.IPreferencePageContainer#updateMessage()
+	 */
 	@Override
 	public void updateMessage() {
 		String message = null;
@@ -1350,6 +1452,11 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 		messageArea.updateText(message,messageType);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.IPreferencePageContainer#updateTitle()
+	 */
 	@Override
 	public void updateTitle() {
 		if(currentPage == null) {
@@ -1360,7 +1467,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 
 	/**
 	 * Update the tree to use the specified <code>Font</code>.
-	 *
+	 * 
 	 * @param dialogFont
 	 *            the <code>Font</code> to use.
 	 * @since 3.0
@@ -1381,7 +1488,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	/**
 	 * Sets the current page.
 	 * @param currentPage
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	protected void setCurrentPage(IPreferencePage currentPage) {
@@ -1391,7 +1498,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	/**
 	 * Set the treeViewer.
 	 * @param treeViewer
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	protected void setTreeViewer(TreeViewer treeViewer) {
@@ -1402,7 +1509,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	 * Get the composite that is showing the page.
 	 *
 	 * @return Composite.
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	protected Composite getPageContainer() {
@@ -1412,7 +1519,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	/**
 	 * Set the composite that is showing the page.
 	 * @param pageContainer Composite
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	protected void setPageContainer(Composite pageContainer) {
@@ -1420,26 +1527,26 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	}
 	/**
 	 * Create the page control for the supplied page.
-	 *
+	 * 
 	 * @param page - the preference page to be shown
 	 * @param parent - the composite to parent the page
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	protected void createPageControl(IPreferencePage page, Composite parent) {
 		page.createControl(parent);
 	}
-
+	
 	/**
 	 * @see org.eclipse.jface.dialogs.IPageChangeProvider#getSelectedPage()
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	@Override
 	public Object getSelectedPage() {
 			return getCurrentPage();
 		}
-
+	
 	/**
 	 * @see org.eclipse.jface.dialogs.IPageChangeProvider#addPageChangedListener(org.eclipse.jface.dialogs.IPageChangedListener)
 	 * @since 3.1
@@ -1448,7 +1555,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	public void addPageChangedListener(IPageChangedListener listener) {
 		pageChangedListeners.add(listener);
 	}
-
+	
 	/**
 	 * @see org.eclipse.jface.dialogs.IPageChangeProvider#removePageChangedListener(org.eclipse.jface.dialogs.IPageChangedListener)
 	 * @since 3.1
@@ -1456,7 +1563,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	@Override
 	public void removePageChangedListener(IPageChangedListener listener) {
 		pageChangedListeners.remove(listener);
-
+		
 	}
 
 	/**
@@ -1467,11 +1574,13 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
      * @param event a selection changed event
      *
      * @see IPageChangedListener#pageChanged
-     *
+     * 
      * @since 3.1
      */
     protected void firePageChanged(final PageChangedEvent event) {
-		for (IPageChangedListener l : pageChangedListeners) {
+        Object[] listeners = pageChangedListeners.getListeners();
+        for (int i = 0; i < listeners.length; i++) {
+            final IPageChangedListener l = (IPageChangedListener) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
                 @Override
 				public void run() {
@@ -1480,7 +1589,11 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
             });
         }
     }
-
+    
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#isResizable()
+     */
     @Override
 	protected boolean isResizable() {
     	return true;

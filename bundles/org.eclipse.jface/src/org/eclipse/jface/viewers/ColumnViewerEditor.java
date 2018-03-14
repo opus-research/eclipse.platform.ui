@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2016 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ package org.eclipse.jface.viewers;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
@@ -51,12 +52,12 @@ public abstract class ColumnViewerEditor {
 
 	private ViewerCell cell;
 
-	private ListenerList<ColumnViewerEditorActivationListener> editorActivationListener;
+	private ListenerList editorActivationListener;
 
 	private ColumnViewerEditorActivationStrategy editorActivationStrategy;
 
 	private boolean inEditorDeactivation;
-
+	
 	private DisposeListener disposeListener;
 
 	/**
@@ -126,10 +127,15 @@ public abstract class ColumnViewerEditor {
 					.setEnableEditorActivationWithKeyboard(true);
 		}
 		this.feature = feature;
-		this.disposeListener = e -> {
-			if( viewer.isCellEditorActive() ) {
-				cancelEditing();
+		this.disposeListener = new DisposeListener() {
+
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				if( viewer.isCellEditorActive() ) {
+					cancelEditing();
+				}
 			}
+			
 		};
 		initCellEditorListener();
 	}
@@ -173,9 +179,12 @@ public abstract class ColumnViewerEditor {
 					activationTime = 0;
 				}
 
-				if (editorActivationListener != null && !editorActivationListener.isEmpty()) {
-					for (ColumnViewerEditorActivationListener ls : editorActivationListener) {
-						ls.beforeEditorActivated(activationEvent);
+				if (editorActivationListener != null
+						&& !editorActivationListener.isEmpty()) {
+					Object[] ls = editorActivationListener.getListeners();
+					for (int i = 0; i < ls.length; i++) {
+						((ColumnViewerEditorActivationListener) ls[i])
+								.beforeEditorActivated(activationEvent);
 
 						// Was the activation canceled ?
 						if (activationEvent.cancel) {
@@ -237,23 +246,30 @@ public abstract class ColumnViewerEditor {
 				}
 
 				if (tabeditingListener == null) {
-					tabeditingListener = e -> {
-						if ((feature & DEFAULT) != DEFAULT) {
-							processTraverseEvent(cell.getColumnIndex(),
-									viewer.getViewerRowFromItem(cell
-											.getItem()), e);
+					tabeditingListener = new TraverseListener() {
+
+						@Override
+						public void keyTraversed(TraverseEvent e) {
+							if ((feature & DEFAULT) != DEFAULT) {
+								processTraverseEvent(cell.getColumnIndex(),
+										viewer.getViewerRowFromItem(cell
+												.getItem()), e);
+							}
 						}
 					};
 				}
 
 				control.addTraverseListener(tabeditingListener);
 
-				if (editorActivationListener != null && !editorActivationListener.isEmpty()) {
-					for (ColumnViewerEditorActivationListener ls : editorActivationListener) {
-						ls.afterEditorActivated(activationEvent);
+				if (editorActivationListener != null
+						&& !editorActivationListener.isEmpty()) {
+					Object[] ls = editorActivationListener.getListeners();
+					for (int i = 0; i < ls.length; i++) {
+						((ColumnViewerEditorActivationListener) ls[i])
+								.afterEditorActivated(activationEvent);
 					}
 				}
-
+				
 				this.cell.getItem().addDisposeListener(disposeListener);
 
 				return true;
@@ -286,9 +302,13 @@ public abstract class ColumnViewerEditor {
 					ColumnViewerEditorDeactivationEvent tmp = new ColumnViewerEditorDeactivationEvent(
 							cell);
 					tmp.eventType = ColumnViewerEditorDeactivationEvent.EDITOR_SAVED;
-					if (editorActivationListener != null && !editorActivationListener.isEmpty()) {
-						for (ColumnViewerEditorActivationListener ls : editorActivationListener) {
-							ls.beforeEditorDeactivated(tmp);
+					if (editorActivationListener != null
+							&& !editorActivationListener.isEmpty()) {
+						Object[] ls = editorActivationListener.getListeners();
+						for (int i = 0; i < ls.length; i++) {
+
+							((ColumnViewerEditorActivationListener) ls[i])
+									.beforeEditorDeactivated(tmp);
 						}
 					}
 
@@ -320,12 +340,15 @@ public abstract class ColumnViewerEditor {
 					}
 					c.deactivate(tmp);
 
-					if (editorActivationListener != null && !editorActivationListener.isEmpty()) {
-						for (ColumnViewerEditorActivationListener ls : editorActivationListener) {
-							ls.afterEditorDeactivated(tmp);
+					if (editorActivationListener != null
+							&& !editorActivationListener.isEmpty()) {
+						Object[] ls = editorActivationListener.getListeners();
+						for (int i = 0; i < ls.length; i++) {
+							((ColumnViewerEditorActivationListener) ls[i])
+									.afterEditorDeactivated(tmp);
 						}
 					}
-
+					
 					if( ! this.cell.getItem().isDisposed() ) {
 						this.cell.getItem().removeDisposeListener(disposeListener);
 					}
@@ -351,9 +374,13 @@ public abstract class ColumnViewerEditor {
 					ColumnViewerEditorDeactivationEvent tmp = new ColumnViewerEditorDeactivationEvent(
 							cell);
 					tmp.eventType = ColumnViewerEditorDeactivationEvent.EDITOR_CANCELED;
-					if (editorActivationListener != null && !editorActivationListener.isEmpty()) {
-						for (ColumnViewerEditorActivationListener ls : editorActivationListener) {
-							ls.beforeEditorDeactivated(tmp);
+					if (editorActivationListener != null
+							&& !editorActivationListener.isEmpty()) {
+						Object[] ls = editorActivationListener.getListeners();
+						for (int i = 0; i < ls.length; i++) {
+
+							((ColumnViewerEditorActivationListener) ls[i])
+									.beforeEditorDeactivated(tmp);
 						}
 					}
 
@@ -382,16 +409,19 @@ public abstract class ColumnViewerEditor {
 					CellEditor oldEditor = cellEditor;
 					oldEditor.deactivate(tmp);
 
-					if (editorActivationListener != null && !editorActivationListener.isEmpty()) {
-						for (ColumnViewerEditorActivationListener ls : editorActivationListener) {
-							ls.afterEditorDeactivated(tmp);
+					if (editorActivationListener != null
+							&& !editorActivationListener.isEmpty()) {
+						Object[] ls = editorActivationListener.getListeners();
+						for (int i = 0; i < ls.length; i++) {
+							((ColumnViewerEditorActivationListener) ls[i])
+									.afterEditorDeactivated(tmp);
 						}
 					}
-
+					
 					if( ! this.cell.getItem().isDisposed() ) {
 						this.cell.getItem().addDisposeListener(disposeListener);
 					}
-
+					
 					this.cellEditor = null;
 					this.cell = null;
 
@@ -460,7 +490,7 @@ public abstract class ColumnViewerEditor {
 	public void addEditorActivationListener(
 			ColumnViewerEditorActivationListener listener) {
 		if (editorActivationListener == null) {
-			editorActivationListener = new ListenerList<>();
+			editorActivationListener = new ListenerList();
 		}
 		editorActivationListener.add(listener);
 	}

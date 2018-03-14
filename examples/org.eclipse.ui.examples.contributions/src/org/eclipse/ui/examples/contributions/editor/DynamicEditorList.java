@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2016 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,7 +39,12 @@ public class DynamicEditorList extends CompoundContributionItem {
 	private static final IContributionItem[] EMPTY = new IContributionItem[0];
 
 	private static class NobodyHereContribution extends ContributionItem {
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets.Menu,
+		 *      int)
+		 */
 		public void fill(Menu menu, int index) {
 			MenuItem item = new MenuItem(menu, SWT.NONE, index);
 			item.setText(ContributionMessages.DynamicEditorList_label);
@@ -47,7 +52,11 @@ public class DynamicEditorList extends CompoundContributionItem {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.actions.CompoundContributionItem#getContributionItems()
+	 */
 	protected IContributionItem[] getContributionItems() {
 		// maybe we can find a better way for contributed IContributionItems
 		IWorkbenchWindow window = PlatformUI.getWorkbench()
@@ -61,7 +70,7 @@ public class DynamicEditorList extends CompoundContributionItem {
 			return EMPTY;
 		}
 		IEditorReference[] editors = page.getEditorReferences();
-		ArrayList<IContributionItem> menuList = new ArrayList<>();
+		ArrayList menuList = new ArrayList();
 
 		int editorNum = 1;
 		for (int i = 0; i < editors.length && editorNum < 10; i++) {
@@ -76,18 +85,19 @@ public class DynamicEditorList extends CompoundContributionItem {
 		if (menuList.isEmpty()) {
 			menuList.add(new NobodyHereContribution());
 		}
-		return menuList.toArray(new IContributionItem[menuList.size()]);
+		return (IContributionItem[]) menuList
+				.toArray(new IContributionItem[menuList.size()]);
 	}
 
-	@SuppressWarnings("unchecked")
 	private IContributionItem createItem(int i, IEditorReference ref)
 			throws PartInitException {
 		CommandContributionItemParameter p = new CommandContributionItemParameter(
 				PlatformUI.getWorkbench(), null, ActivateEditorHandler.ID,
 				CommandContributionItem.STYLE_PUSH);
-		p.parameters = new HashMap<>();
+		p.parameters = new HashMap();
 		PersonInput editorInput = (PersonInput) ref.getEditorInput();
-		p.parameters.put(ActivateEditorHandler.PARM_EDITOR, editorInput.getIndex());
+		p.parameters.put(ActivateEditorHandler.PARM_EDITOR, new Integer(
+				editorInput.getIndex()));
 		String menuNum = Integer.toString(i);
 		p.label = menuNum + " " + ref.getTitle(); //$NON-NLS-1$
 		p.mnemonic = menuNum;

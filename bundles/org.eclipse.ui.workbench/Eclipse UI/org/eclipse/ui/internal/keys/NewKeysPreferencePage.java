@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,6 @@
  *     Remy Chi Jian Suen <remy.suen@gmail.com> -
  *     		Bug 186522 - [KeyBindings] New Keys preference page does not resort by binding with conflicts
  *     		Bug 226342 - [KeyBindings] Keys preference page conflict table is hard to read
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440810, 491393
- *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442215
  *******************************************************************************/
 
 package org.eclipse.ui.internal.keys;
@@ -67,6 +65,7 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -128,10 +127,11 @@ import org.eclipse.ui.keys.IBindingService;
  * Updated in 3.4 to work with a model backed by the real KeyBinding and
  * ParameterizedCommand objects.
  * </p>
- *
+ * 
  * @since 3.2
  */
-public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+public class NewKeysPreferencePage extends PreferencePage implements
+		IWorkbenchPreferencePage {
 
 	private static boolean DEBUG = Policy.DEBUG_KEY_BINDINGS;
 
@@ -174,7 +174,7 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 	private Label commandNameValueLabel;
 
 	private Text fBindingText;
-
+	
 	private Text fDescriptionText;
 
 	private ComboViewer fWhenCombo;
@@ -192,7 +192,7 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 	/**
 	 * A FilteredTree that provides a combo which is used to organize and
 	 * display elements in the tree according to the selected criteria.
-	 *
+	 * 
 	 */
 	protected class CategoryFilterTree extends FilteredTree {
 
@@ -200,12 +200,13 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 
 		/**
 		 * Constructor for PatternFilteredTree.
-		 *
+		 * 
 		 * @param parent
 		 * @param treeStyle
 		 * @param filter
 		 */
-		protected CategoryFilterTree(Composite parent, int treeStyle, CategoryPatternFilter filter) {
+		protected CategoryFilterTree(Composite parent, int treeStyle,
+				CategoryPatternFilter filter) {
 			super(parent, treeStyle, filter, true);
 			this.filter = filter;
 			setQuickSelectionMode(true);
@@ -222,24 +223,24 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 	}
 
 	private final class BindingModelComparator extends ViewerComparator {
-		private LinkedList<Integer> sortColumns = new LinkedList<>();
+		private LinkedList sortColumns = new LinkedList();
 		private boolean ascending = true;
 
 		public BindingModelComparator() {
 			for (int i = 0; i < NUM_OF_COLUMNS; i++) {
-				sortColumns.add(Integer.valueOf(i));
+				sortColumns.add(new Integer(i));
 			}
 		}
 
 		public int getSortColumn() {
-			return sortColumns.getFirst().intValue();
+			return ((Integer) sortColumns.getFirst()).intValue();
 		}
 
 		public void setSortColumn(int column) {
 			if (column == getSortColumn()) {
 				return;
 			}
-			Integer sortColumn = Integer.valueOf(column);
+			Integer sortColumn = new Integer(column);
 			sortColumns.remove(sortColumn);
 			sortColumns.addFirst(sortColumn);
 		}
@@ -263,9 +264,9 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 		public final int compare(final Viewer viewer, final Object a,
 				final Object b) {
 			int result = 0;
-			Iterator<Integer> i = sortColumns.iterator();
+			Iterator i = sortColumns.iterator();
 			while (i.hasNext() && result == 0) {
-				int column = i.next().intValue();
+				int column = ((Integer) i.next()).intValue();
 				result = compareColumn(viewer, a, b, column);
 			}
 			return ascending ? result : (-1) * result;
@@ -276,7 +277,8 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 			if (columnNumber == USER_DELTA_COLUMN) {
 				return sortUser(a, b);
 			}
-			IBaseLabelProvider baseLabel = ((TreeViewer) viewer).getLabelProvider();
+			IBaseLabelProvider baseLabel = ((TreeViewer) viewer)
+					.getLabelProvider();
 			if (baseLabel instanceof ITableLabelProvider) {
 				ITableLabelProvider tableProvider = (ITableLabelProvider) baseLabel;
 				String e1p = tableProvider.getColumnText(a, columnNumber);
@@ -303,7 +305,8 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 		private final TreeViewer viewer;
 		private final int column;
 
-		private ResortColumn(BindingModelComparator comparator, TreeColumn treeColumn, TreeViewer viewer, int column) {
+		private ResortColumn(BindingModelComparator comparator,
+				TreeColumn treeColumn, TreeViewer viewer, int column) {
 			this.comparator = comparator;
 			this.treeColumn = treeColumn;
 			this.viewer = viewer;
@@ -330,13 +333,19 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 	}
 
 	private static class ListLabelProvider extends LabelProvider {
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
+		 */
 		@Override
 		public String getText(Object element) {
 			return ((ModelElement) element).getName();
 		}
 	}
 
-	private class BindingElementLabelProvider extends LabelProvider implements ITableLabelProvider {
+	private class BindingElementLabelProvider extends LabelProvider implements
+			ITableLabelProvider {
 		/**
 		 * A resource manager for this preference page.
 		 */
@@ -349,11 +358,16 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 			localResourceManager.dispose();
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
+		 */
 		@Override
 		public String getText(Object element) {
 			String rc = getColumnText(element, 0);
 			if (rc == null) {
-				rc = super.getText(element);
+				super.getText(element);
 			}
 			StringBuffer buf = new StringBuffer(rc);
 			for (int i = 1; i < USER_DELTA_COLUMN; i++) {
@@ -418,6 +432,17 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 				}
 				return null;
 
+//			case USER_DELTA_COLUMN:
+//				if (be.getUserDelta().intValue() == Binding.USER) {
+//					if (be.getConflict().equals(Boolean.TRUE)) {
+//						return ImageFactory.getImage("plus"); //$NON-NLS-1$
+//					}
+//					return ImageFactory.getImage("change"); //$NON-NLS-1$
+//				}
+//				if (be.getConflict().equals(Boolean.TRUE)) {
+//					return ImageFactory.getImage("minus"); //$NON-NLS-1$
+//				}
+//				return ImageFactory.getImage("blank"); //$NON-NLS-1$
 			}
 
 			return null;
@@ -446,7 +471,8 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 
 		@Override
 		public boolean hasChildren(Object element) {
-			return (element instanceof BindingModel) || (element instanceof ContextModel)
+			return (element instanceof BindingModel)
+					|| (element instanceof ContextModel)
 					|| (element instanceof SchemeModel);
 		}
 
@@ -455,11 +481,25 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 			return getChildren(inputElement);
 		}
 
+		@Override
+		public void dispose() {
+		}
+
+		@Override
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+		}
+
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	protected Control createContents(Composite parent) {
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IWorkbenchHelpContextIds.KEYS_PREFERENCE_PAGE);
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
+				IWorkbenchHelpContextIds.KEYS_PREFERENCE_PAGE);
 		final Composite page = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout(1, false);
 		layout.marginWidth = 0;
@@ -467,9 +507,11 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 
 		IDialogSettings settings = getDialogSettings();
 
-		fPatternFilter = new CategoryPatternFilter(true, commandService.getCategory(null));
+		fPatternFilter = new CategoryPatternFilter(true, commandService
+				.getCategory(null));
 		if (settings.get(TAG_FILTER_UNCAT) != null) {
-			fPatternFilter.filterCategories(settings.getBoolean(TAG_FILTER_UNCAT));
+			fPatternFilter.filterCategories(settings
+					.getBoolean(TAG_FILTER_UNCAT));
 		}
 
 		createSchemeControls(page);
@@ -489,20 +531,20 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 		FontMetrics metrics = gc.getFontMetrics();
 		gc.dispose();
 		int height = metrics.getHeight() * 5 / 2;
-
+		
 		GridData gridData = new GridData();
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.horizontalAlignment = SWT.FILL;
 		gridData.horizontalSpan = 2;
 		gridData.heightHint = height;
 		fDescriptionText.setLayoutData(gridData);
-
+		
 		return page;
 	}
 
 	/**
 	 * Creates the button bar with "Filters..." and "Export CVS..." buttons.
-	 *
+	 * 
 	 * @param parent
 	 *            The composite in which the button bar should be placed; never
 	 *            <code>null</code>.
@@ -531,22 +573,31 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 		gridData.widthHint = Math.max(widthHint, filtersButton.computeSize(
 				SWT.DEFAULT, SWT.DEFAULT, true).x) + 5;
 		filtersButton.setLayoutData(gridData);
-		filtersButton.addSelectionListener(new SelectionAdapter() {
+		filtersButton.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				KeysPreferenceFiltersDialog dialog = new KeysPreferenceFiltersDialog(getShell());
+				KeysPreferenceFiltersDialog dialog = new KeysPreferenceFiltersDialog(
+						getShell());
 				dialog.setFilterActionSet(fFilterActionSetContexts);
 				dialog.setFilterInternal(fFilterInternalContexts);
-				dialog.setFilterUncategorized(fFilteredTree.isFilteringCategories());
+				dialog.setFilterUncategorized(fFilteredTree
+						.isFilteringCategories());
 				if (dialog.open() == Window.OK) {
 					fFilterActionSetContexts = dialog.getFilterActionSet();
 					fFilterInternalContexts = dialog.getFilterInternal();
-					fFilteredTree.filterCategories(dialog.getFilterUncategorized());
+					fFilteredTree.filterCategories(dialog
+							.getFilterUncategorized());
 
 					// Apply context filters
-					keyController.filterContexts(fFilterActionSetContexts, fFilterInternalContexts);
+					keyController.filterContexts(fFilterActionSetContexts,
+							fFilterInternalContexts);
 
-					ISelection currentContextSelection = fWhenCombo.getSelection();
+					ISelection currentContextSelection = fWhenCombo
+							.getSelection();
 					fWhenCombo.setInput(keyController.getContextModel());
 					fWhenCombo.setSelection(currentContextSelection);
 				}
@@ -561,7 +612,12 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 		gridData.widthHint = Math.max(widthHint, exportButton.computeSize(
 				SWT.DEFAULT, SWT.DEFAULT, true).x) + 5;
 		exportButton.setLayoutData(gridData);
-		exportButton.addSelectionListener(new SelectionAdapter() {
+		exportButton.addSelectionListener(new SelectionListener() {
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				keyController.exportCSV(((Button) e.getSource()).getShell());
@@ -609,13 +665,13 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 		gridData.horizontalSpan = 2;
 		gridData.horizontalAlignment = SWT.FILL;
 		commandNameValueLabel.setLayoutData(gridData);
-
+		
 		final Label commandDescriptionlabel = new Label(leftDataArea, SWT.LEAD);
 		commandDescriptionlabel.setText(NewKeysPreferenceMessages.CommandDescriptionLabel_Text);
 		gridData = new GridData();
 		gridData.verticalAlignment = SWT.BEGINNING;
 		commandDescriptionlabel.setLayoutData(gridData);
-
+		
 		fDescriptionText = new Text(leftDataArea, SWT.MULTI | SWT.WRAP
 				| SWT.BORDER | SWT.READ_ONLY);
 
@@ -659,23 +715,26 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 					public final void propertyChange(
 							final PropertyChangeEvent event) {
 						if (!event.getOldValue().equals(event.getNewValue())) {
-							final KeySequence keySequence = fKeySequenceText.getKeySequence();
+							final KeySequence keySequence = fKeySequenceText
+									.getKeySequence();
 							if (!keySequence.isComplete()) {
 								return;
 							}
 
-							BindingElement activeBinding = (BindingElement) keyController.getBindingModel()
-									.getSelectedElement();
+							BindingElement activeBinding = (BindingElement) keyController
+									.getBindingModel().getSelectedElement();
 							if (activeBinding != null) {
 								activeBinding.setTrigger(keySequence);
 							}
-							fBindingText.setSelection(fBindingText.getTextLimit());
+							fBindingText.setSelection(fBindingText
+									.getTextLimit());
 						}
 					}
 				});
 
 		// Button for adding trapped key strokes
-		final Button addKeyButton = new Button(leftDataArea, SWT.LEFT | SWT.ARROW);
+		final Button addKeyButton = new Button(leftDataArea, SWT.LEFT
+				| SWT.ARROW);
 		addKeyButton
 				.setToolTipText(NewKeysPreferenceMessages.AddKeyButton_ToolTipText);
 		gridData = new GridData();
@@ -684,7 +743,7 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 
 		// Arrow buttons aren't normally added to the tab list. Let's fix that.
 		final Control[] tabStops = dataArea.getTabList();
-		final ArrayList<Control> newTabStops = new ArrayList<>();
+		final ArrayList newTabStops = new ArrayList();
 		for (int i = 0; i < tabStops.length; i++) {
 			Control tabStop = tabStops[i];
 			newTabStops.add(tabStop);
@@ -692,7 +751,7 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 				newTabStops.add(addKeyButton);
 			}
 		}
-		final Control[] newTabStopArray = newTabStops
+		final Control[] newTabStopArray = (Control[]) newTabStops
 				.toArray(new Control[newTabStops.size()]);
 		dataArea.setTabList(newTabStopArray);
 
@@ -779,7 +838,7 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 		rightDataArea.setLayoutData(gridData);
 
 		new Label(rightDataArea, SWT.NONE); // filler
-
+		
 		// The description label.
 		final Label descriptionLabel = new Label(rightDataArea, SWT.NONE);
 		descriptionLabel.setText(NewKeysPreferenceMessages.ConflictsLabel_Text);
@@ -815,6 +874,14 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 				return new Object[0];
 			}
 
+			@Override
+			public void dispose() {
+			}
+
+			@Override
+			public void inputChanged(Viewer viewer, Object oldInput,
+					Object newInput) {
+			}
 		});
 		conflictViewer.setLabelProvider(new BindingElementLabelProvider() {
 			@Override
@@ -833,8 +900,8 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 					// model's current selection
 					@Override
 					public void selectionChanged(SelectionChangedEvent event) {
-						ModelElement binding = (ModelElement) ((IStructuredSelection) event.getSelection())
-								.getFirstElement();
+						ModelElement binding = (ModelElement) ((IStructuredSelection) event
+								.getSelection()).getFirstElement();
 						BindingModel bindingModel = keyController
 								.getBindingModel();
 						if (binding != null
@@ -933,7 +1000,8 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 
 		GridData gridData;
 
-		fFilteredTree = new CategoryFilterTree(parent, SWT.SINGLE | SWT.FULL_SELECTION | SWT.BORDER, fPatternFilter);
+		fFilteredTree = new CategoryFilterTree(parent, SWT.SINGLE
+				| SWT.FULL_SELECTION | SWT.BORDER, fPatternFilter);
 		final GridLayout layout = new GridLayout(1, false);
 		layout.marginWidth = 0;
 		fFilteredTree.setLayout(layout);
@@ -960,18 +1028,21 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 		BindingModelComparator comparator = new BindingModelComparator();
 		viewer.setComparator(comparator);
 
-		final TreeColumn commandNameColumn = new TreeColumn(tree, SWT.LEFT, COMMAND_NAME_COLUMN);
-		commandNameColumn.setText(NewKeysPreferenceMessages.CommandNameColumn_Text);
+		final TreeColumn commandNameColumn = new TreeColumn(tree, SWT.LEFT,
+				COMMAND_NAME_COLUMN);
+		commandNameColumn
+				.setText(NewKeysPreferenceMessages.CommandNameColumn_Text);
 		tree.setSortColumn(commandNameColumn);
 		tree.setSortDirection(comparator.isAscending() ? SWT.UP : SWT.DOWN);
-		commandNameColumn
-				.addSelectionListener(new ResortColumn(comparator, commandNameColumn, viewer, COMMAND_NAME_COLUMN));
+		commandNameColumn.addSelectionListener(new ResortColumn(comparator,
+				commandNameColumn, viewer, COMMAND_NAME_COLUMN));
 
-		final TreeColumn triggerSequenceColumn = new TreeColumn(tree, SWT.LEFT, KEY_SEQUENCE_COLUMN);
+		final TreeColumn triggerSequenceColumn = new TreeColumn(tree, SWT.LEFT,
+				KEY_SEQUENCE_COLUMN);
 		triggerSequenceColumn
 				.setText(NewKeysPreferenceMessages.TriggerSequenceColumn_Text);
-		triggerSequenceColumn
-				.addSelectionListener(new ResortColumn(comparator, triggerSequenceColumn, viewer, KEY_SEQUENCE_COLUMN));
+		triggerSequenceColumn.addSelectionListener(new ResortColumn(comparator,
+				triggerSequenceColumn, viewer, KEY_SEQUENCE_COLUMN));
 
 		final TreeColumn whenColumn = new TreeColumn(tree, SWT.LEFT,
 				CONTEXT_COLUMN);
@@ -985,9 +1056,11 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 		categoryColumn.addSelectionListener(new ResortColumn(comparator,
 				categoryColumn, viewer, CATEGORY_COLUMN));
 
-		final TreeColumn userMarker = new TreeColumn(tree, SWT.LEFT, USER_DELTA_COLUMN);
+		final TreeColumn userMarker = new TreeColumn(tree, SWT.LEFT,
+				USER_DELTA_COLUMN);
 		userMarker.setText(NewKeysPreferenceMessages.UserColumn_Text);
-		userMarker.addSelectionListener(new ResortColumn(comparator, userMarker, viewer, USER_DELTA_COLUMN));
+		userMarker.addSelectionListener(new ResortColumn(comparator,
+				userMarker, viewer, USER_DELTA_COLUMN));
 
 		viewer.setContentProvider(new ModelContentProvider());
 		viewer.setLabelProvider(new BindingElementLabelProvider());
@@ -1019,12 +1092,15 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getSource() == keyController.getBindingModel()
-						&& CommonModel.PROP_SELECTED_ELEMENT.equals(event.getProperty())) {
+						&& CommonModel.PROP_SELECTED_ELEMENT.equals(event
+								.getProperty())) {
 					Object newVal = event.getNewValue();
-					StructuredSelection structuredSelection = newVal == null ? null : new StructuredSelection(newVal);
+					StructuredSelection structuredSelection = newVal == null ? null
+							: new StructuredSelection(newVal);
 					viewer.setSelection(structuredSelection, true);
 				} else if (event.getSource() instanceof BindingElement
-						&& ModelElement.PROP_MODEL_OBJECT.equals(event.getProperty())) {
+						&& ModelElement.PROP_MODEL_OBJECT.equals(event
+								.getProperty())) {
 					viewer.update(event.getSource(), null);
 				} else if (BindingElement.PROP_CONFLICT.equals(event
 						.getProperty())) {
@@ -1120,14 +1196,16 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 	}
 
 	/**
-	 *
+	 * 
 	 */
 	private void fill() {
 		fSchemeCombo.setInput(keyController.getSchemeModel());
-		fSchemeCombo.setSelection(new StructuredSelection(keyController.getSchemeModel().getSelectedElement()));
+		fSchemeCombo.setSelection(new StructuredSelection(keyController
+				.getSchemeModel().getSelectedElement()));
 
 		// Apply context filters
-		keyController.filterContexts(fFilterActionSetContexts, fFilterInternalContexts);
+		keyController.filterContexts(fFilterActionSetContexts,
+				fFilterInternalContexts);
 		fWhenCombo.setInput(keyController.getContextModel());
 
 		fFilteredTree.filterCategories(fPatternFilter.isFilteringCategories());
@@ -1150,19 +1228,23 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 		gridData.widthHint = 150;
 		gridData.horizontalAlignment = SWT.FILL;
 		fSchemeCombo.getCombo().setLayoutData(gridData);
-		fSchemeCombo.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public final void selectionChanged(final SelectionChangedEvent event) {
-				BusyIndicator.showWhile(fFilteredTree.getViewer().getTree().getDisplay(), new Runnable() {
+		fSchemeCombo
+				.addSelectionChangedListener(new ISelectionChangedListener() {
 					@Override
-					public void run() {
-						SchemeElement scheme = (SchemeElement) ((IStructuredSelection) event.getSelection())
-								.getFirstElement();
-						keyController.getSchemeModel().setSelectedElement(scheme);
+					public final void selectionChanged(
+							final SelectionChangedEvent event) {
+						BusyIndicator.showWhile(fFilteredTree.getViewer()
+								.getTree().getDisplay(), new Runnable() {
+							@Override
+							public void run() {
+								SchemeElement scheme = (SchemeElement) ((IStructuredSelection) event
+										.getSelection()).getFirstElement();
+								keyController.getSchemeModel()
+										.setSelectedElement(scheme);
+							}
+						});
 					}
 				});
-			}
-		});
 		IPropertyChangeListener listener = new IPropertyChangeListener() {
 
 			@Override
@@ -1181,31 +1263,41 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 		keyController.addPropertyChangeListener(listener);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
+	 */
 	@Override
 	public void init(IWorkbench workbench) {
 		keyController = new KeyController();
 		keyController.init(workbench);
 
-		commandService = workbench.getService(ICommandService.class);
+		commandService = (ICommandService) workbench
+				.getService(ICommandService.class);
 		fDefaultCategory = commandService.getCategory(null);
-		fBindingService = workbench.getService(IBindingService.class);
+		fBindingService = (IBindingService) workbench
+				.getService(IBindingService.class);
 
-		commandImageService = workbench.getService(ICommandImageService.class);
+		commandImageService = (ICommandImageService) workbench
+				.getService(ICommandImageService.class);
 	}
 
 	@Override
 	public void applyData(Object data) {
 		if (data instanceof ModelElement) {
-			keyController.getBindingModel().setSelectedElement((ModelElement) data);
+			keyController.getBindingModel().setSelectedElement(
+					(ModelElement) data);
 		}
 		if (data instanceof Binding && fFilteredTree != null) {
 			BindingElement be = (BindingElement) keyController
 					.getBindingModel().getBindingToElement().get(data);
-			fFilteredTree.getViewer().setSelection(new StructuredSelection(be), true);
+			fFilteredTree.getViewer().setSelection(new StructuredSelection(be),
+					true);
 		}
 		if (data instanceof ParameterizedCommand) {
 			Map commandToElement = keyController.getBindingModel().getCommandToElement();
-
+			
 			BindingElement be = (BindingElement)commandToElement.get(data);
 			if(be != null) {
 				fFilteredTree.getViewer().setSelection(new StructuredSelection(be),
@@ -1214,6 +1306,11 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.PreferencePage#performOk()
+	 */
 	@Override
 	public boolean performOk() {
 		keyController.saveBindings(fBindingService);
@@ -1223,7 +1320,7 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 
 	/**
 	 * Save the state of the receiver.
-	 *
+	 * 
 	 * @param dialogSettings
 	 */
 	public void saveState(IDialogSettings dialogSettings) {
@@ -1232,7 +1329,8 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 		}
 		dialogSettings.put(TAG_FILTER_ACTION_SETS, fFilterActionSetContexts);
 		dialogSettings.put(TAG_FILTER_INTERNAL, fFilterInternalContexts);
-		dialogSettings.put(TAG_FILTER_UNCAT, fFilteredTree.isFilteringCategories());
+		dialogSettings.put(TAG_FILTER_UNCAT, fFilteredTree
+				.isFilteringCategories());
 	}
 
 	protected IDialogSettings getDialogSettings() {
@@ -1264,7 +1362,8 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 			}
 
 			fFilteredTree.setRedraw(false);
-			BusyIndicator.showWhile(fFilteredTree.getViewer().getTree().getDisplay(), new Runnable() {
+			BusyIndicator.showWhile(fFilteredTree.getViewer().getTree()
+					.getDisplay(), new Runnable() {
 				@Override
 				public void run() {
 					keyController.setDefaultBindings(fBindingService);
@@ -1274,8 +1373,8 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 			if (DEBUG) {
 				final long elapsedTime = System.currentTimeMillis() - startTime;
 				Tracing.printTrace(TRACING_COMPONENT,
-						"performDefaults:model in " + elapsedTime + "ms"); //$NON-NLS-1$ //$NON-NLS-2$
-
+						"performDefaults:model in " //$NON-NLS-1$
+								+ elapsedTime + "ms"); //$NON-NLS-1$
 			}
 		}
 

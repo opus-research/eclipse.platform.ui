@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ class TaskPropertiesAction extends TaskAction {
 
     /**
      * Creates the action.
-     *
+     * 
      * @param tasklist the task list
      * @param id the id
      */
@@ -35,8 +35,7 @@ class TaskPropertiesAction extends TaskAction {
     /**
      * Performs this action.
      */
-    @Override
-	public void run() {
+    public void run() {
         IStructuredSelection sel = (IStructuredSelection) getTaskList()
                 .getSelection();
         Object o = sel.getFirstElement();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- * 	   Sebastian Davids <sdavids@gmx.de> - Fix for bug 90273 - [Dialogs]
+ * 	   Sebastian Davids <sdavids@gmx.de> - Fix for bug 90273 - [Dialogs] 
  * 			ListSelectionDialog dialog alignment
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
@@ -98,7 +98,7 @@ public class ListSelectionDialog extends SelectionDialog {
 			setMessage(message);
 		} else {
 			setMessage(WorkbenchMessages.ListSelection_message);
-		}
+		} 
     }
 
     /**
@@ -138,7 +138,7 @@ public class ListSelectionDialog extends SelectionDialog {
     }
 
     /**
-     * Visually checks the previously-specified elements in this dialog's list
+     * Visually checks the previously-specified elements in this dialog's list 
      * viewer.
      */
     private void checkInitialSelections() {
@@ -149,6 +149,10 @@ public class ListSelectionDialog extends SelectionDialog {
 		}
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
+     */
     @Override
 	protected void configureShell(Shell shell) {
         super.configureShell(shell);
@@ -156,13 +160,16 @@ public class ListSelectionDialog extends SelectionDialog {
 				IWorkbenchHelpContextIds.LIST_SELECTION_DIALOG);
     }
 
+    /* (non-Javadoc)
+     * Method declared on Dialog.
+     */
     @Override
 	protected Control createDialogArea(Composite parent) {
         // page group
         Composite composite = (Composite) super.createDialogArea(parent);
-
+        
         initializeDialogUnits(composite);
-
+        
         createMessageArea(composite);
 
         listViewer = CheckboxTableViewer.newCheckList(composite, SWT.BORDER);
@@ -184,13 +191,13 @@ public class ListSelectionDialog extends SelectionDialog {
 		}
 
         Dialog.applyDialogFont(composite);
-
+        
         return composite;
     }
 
     /**
      * Returns the viewer used to show the list.
-     *
+     * 
      * @return the viewer, or <code>null</code> if not yet created
      */
     protected CheckboxTableViewer getViewer() {
@@ -205,7 +212,7 @@ public class ListSelectionDialog extends SelectionDialog {
     }
 
     /**
-     * The <code>ListSelectionDialog</code> implementation of this
+     * The <code>ListSelectionDialog</code> implementation of this 
      * <code>Dialog</code> method builds a list of the selected elements for later
      * retrieval by the client and closes this dialog.
      */

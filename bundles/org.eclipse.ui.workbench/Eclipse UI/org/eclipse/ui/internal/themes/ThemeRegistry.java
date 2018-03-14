@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440136
  *******************************************************************************/
 package org.eclipse.ui.internal.themes;
 
@@ -15,10 +14,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+
 import org.eclipse.ui.themes.IThemeManager;
 
 /**
@@ -72,16 +73,25 @@ public class ThemeRegistry implements IThemeRegistry {
     	addOrReplaceDescriptor(colors, desc);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.themes.IThemeRegistry#findCategory(java.lang.String)
+     */
     @Override
 	public ThemeElementCategory findCategory(String id) {
         return (ThemeElementCategory) findDescriptor(getCategories(), id);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.themes.IThemeRegistry#findColor(java.lang.String)
+     */
     @Override
 	public ColorDefinition findColor(String id) {
         return (ColorDefinition) findDescriptor(getColors(), id);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.registry.IThemeRegistry#find(java.lang.String)
+     */
     @Override
 	public IThemeDescriptor findTheme(String id) {
         return (IThemeDescriptor) findDescriptor(getThemes(), id);
@@ -120,7 +130,10 @@ public class ThemeRegistry implements IThemeRegistry {
     	descriptors.add(newElement);
         return null;
     }
-
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.registry.IThemeRegistry#getLookNFeels()
+     */
     @Override
 	public IThemeDescriptor[] getThemes() {
         int nSize = themes.size();
@@ -130,6 +143,9 @@ public class ThemeRegistry implements IThemeRegistry {
         return retArray;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.registry.IThemeRegistry#getLookNFeels()
+     */
     @Override
 	public ColorDefinition[] getColors() {
         int nSize = colors.size();
@@ -139,6 +155,9 @@ public class ThemeRegistry implements IThemeRegistry {
         return retArray;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.themes.IThemeRegistry#getColorsFor(java.lang.String)
+     */
     @Override
 	public ColorDefinition[] getColorsFor(String themeId) {
         ColorDefinition[] defs = getColors();
@@ -151,6 +170,9 @@ public class ThemeRegistry implements IThemeRegistry {
         return (ColorDefinition[]) overlay(defs, overrides);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.themes.IThemeRegistry#getFontsFor(java.lang.String)
+     */
     @Override
 	public FontDefinition[] getFontsFor(String themeId) {
         FontDefinition[] defs = getFonts();
@@ -165,7 +187,7 @@ public class ThemeRegistry implements IThemeRegistry {
 
     /**
      * Overlay the overrides onto the base definitions.
-     *
+     * 
      * @param defs the base definitions
      * @param overrides the overrides
      * @return the overlayed elements
@@ -184,7 +206,7 @@ public class ThemeRegistry implements IThemeRegistry {
 
     /**
      * Overlay the override onto the base definition.
-     *
+     * 
      * @param defs the base definition
      * @param overrides the override
      * @return the overlayed element
@@ -213,6 +235,9 @@ public class ThemeRegistry implements IThemeRegistry {
         fonts.add(definition);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.themes.IThemeRegistry#getGradients()
+     */
     @Override
 	public FontDefinition[] getFonts() {
         int nSize = fonts.size();
@@ -222,6 +247,9 @@ public class ThemeRegistry implements IThemeRegistry {
         return retArray;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.themes.IThemeRegistry#findFont(java.lang.String)
+     */
     @Override
 	public FontDefinition findFont(String id) {
         return (FontDefinition) findDescriptor(getFonts(), id);
@@ -237,6 +265,9 @@ public class ThemeRegistry implements IThemeRegistry {
         categories.add(definition);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.themes.IThemeRegistry#getCategories()
+     */
     @Override
 	public ThemeElementCategory[] getCategories() {
         int nSize = categories.size();
@@ -254,10 +285,13 @@ public class ThemeRegistry implements IThemeRegistry {
         if (dataMap.containsKey(name)) {
 			return;
 		}
-
+        
         dataMap.put(name, value);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.themes.IThemeRegistry#getData()
+     */
     @Override
 	public Map getData() {
         return Collections.unmodifiableMap(dataMap);
@@ -265,19 +299,39 @@ public class ThemeRegistry implements IThemeRegistry {
 
     /**
      * Add the data from another map to this data
-     *
+     * 
      * @param otherData the other data to add
      */
-    public void addData(Map<?, ?> otherData) {
-		for (Entry<?, ?> entry : otherData.entrySet()) {
-			Object key = entry.getKey();
+    public void addData(Map otherData) {
+        for (Iterator i = otherData.keySet().iterator(); i.hasNext();) {
+            Object key = i.next();
             if (dataMap.containsKey(key)) {
 				continue;
 			}
-			dataMap.put(key, entry.getValue());
+            dataMap.put(key, otherData.get(key));
         }
     }
 
+    /**
+     * Add a category presentation binding.  The given category will only be 
+     * availible if the given presentation is active.
+     * 
+     * @param categoryId the category id
+     * @param presentationId the presentation id
+     */
+    public void addCategoryPresentationBinding(String categoryId,
+            String presentationId) {
+        Set presentations = (Set) categoryBindingMap.get(categoryId);
+        if (presentations == null) {
+            presentations = new HashSet();
+            categoryBindingMap.put(categoryId, presentations);
+        }
+        presentations.add(presentationId);
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.themes.IThemeRegistry#getPresentationsBindingsFor(org.eclipse.ui.internal.themes.ThemeElementCategory)
+     */
     @Override
 	public Set getPresentationsBindingsFor(ThemeElementCategory category) {
         return (Set) categoryBindingMap.get(category.getId());

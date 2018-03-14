@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,21 +31,14 @@ public class ZipFileExporter implements IFileExporter {
 
     private boolean useCompression = true;
 
-    private boolean resolveLinks;
-
     /**
-     * Create an instance of this class.
+     *	Create an instance of this class.
      *
-     * @param filename
-     *            java.lang.String
-     * @param compress
-     *            boolean
-     * @param resolveLinks
-     *            boolean
-     * @exception java.io.IOException
+     *	@param filename java.lang.String
+     *	@param compress boolean
+     *	@exception java.io.IOException
      */
-    public ZipFileExporter(String filename, boolean compress, boolean resolveLinks) throws IOException {
-        this.resolveLinks = resolveLinks;
+    public ZipFileExporter(String filename, boolean compress) throws IOException {
         outputStream = new ZipOutputStream(new FileOutputStream(filename));
         useCompression = compress;
     }
@@ -56,8 +49,7 @@ public class ZipFileExporter implements IFileExporter {
      *
      *	@exception java.io.IOException
      */
-    @Override
-	public void finished() throws IOException {
+    public void finished() throws IOException {
         outputStream.close();
     }
 
@@ -98,7 +90,7 @@ public class ZipFileExporter implements IFileExporter {
         long localTimeStamp = contents.getLocalTimeStamp();
         if(localTimeStamp != IResource.NULL_STAMP)
         	entry.setTime(localTimeStamp);
-
+        
         outputStream.putNextEntry(entry);
     	InputStream contentStream = contents.getContents(false);
         try {
@@ -114,12 +106,8 @@ public class ZipFileExporter implements IFileExporter {
         outputStream.closeEntry();
     }
 
-    @Override
-	public void write(IContainer container, String destinationPath)
+    public void write(IContainer container, String destinationPath)
             throws IOException {
-        if (!resolveLinks && container.isLinked(IResource.DEPTH_INFINITE)) {
-            return;
-        }
         ZipEntry newEntry = new ZipEntry(destinationPath);
         outputStream.putNextEntry(newEntry);
     }
@@ -132,12 +120,8 @@ public class ZipFileExporter implements IFileExporter {
      *  @exception java.io.IOException
      *  @exception org.eclipse.core.runtime.CoreException
      */
-    @Override
-	public void write(IFile resource, String destinationPath)
+    public void write(IFile resource, String destinationPath)
             throws IOException, CoreException {
-        if (!resolveLinks && resource.isLinked(IResource.DEPTH_INFINITE)) {
-            return;
-        }
         ZipEntry newEntry = new ZipEntry(destinationPath);
         write(newEntry, resource);
     }

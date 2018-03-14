@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,22 +19,27 @@ import org.eclipse.ui.model.WorkbenchAdapter;
  * IWorkbenchAdapter adapter for the IWorkspace object.
  */
 public class WorkbenchWorkspace extends WorkbenchAdapter {
-    @Override
-	public Object[] getChildren(Object o) {
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.ui.model.IWorkbenchAdapter#getChildren(java.lang.Object)
+     */
+    public Object[] getChildren(Object o) {
         IWorkspace workspace = (IWorkspace) o;
         return workspace.getRoot().getProjects();
     }
 
-    @Override
-	public ImageDescriptor getImageDescriptor(Object object) {
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.ui.model.IWorkbenchAdapter#getImageDescriptor(java.lang.Object)
+     */
+    public ImageDescriptor getImageDescriptor(Object object) {
         return null;
     }
 
     /**
      * getLabel method comment.
      */
-    @Override
-	public String getLabel(Object o) {
+    public String getLabel(Object o) {
         //workspaces don't have a name
         return IDEWorkbenchMessages.Workspace;
     }
