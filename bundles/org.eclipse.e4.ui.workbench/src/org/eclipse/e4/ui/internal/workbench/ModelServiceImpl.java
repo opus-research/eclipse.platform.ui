@@ -508,39 +508,24 @@ public class ModelServiceImpl implements EModelService {
 
 		MUIElement appElement = refWin == null ? null : refWin.getParent();
 		if (appElement instanceof MApplication) {
-			handleNullRefPlaceHolders(element, refWin, true);
+			// use appContext as MApplication.getContext() is null during the processing of
+			// the model processor classes
+			EPlaceholderResolver resolver = appContext.get(EPlaceholderResolver.class);
+			// Re-resolve any placeholder references
+			List<MPlaceholder> phList = findElements(element, null, MPlaceholder.class, null);
+			List<MPlaceholder> unresolved = new ArrayList<>();
+			for (MPlaceholder ph : phList) {
+				resolver.resolvePlaceholderRef(ph, refWin);
+				if (ph.getRef() == null) {
+					unresolved.add(ph);
+				}
+			}
+			for (MPlaceholder ph : unresolved) {
+				replacePlaceholder(ph);
+			}
 		}
 
 		return element;
-	}
-
-	private void handleNullRefPlaceHolders(MUIElement element, MWindow refWin, boolean resolve) {
-		// use appContext as MApplication.getContext() is null during the processing of
-		// the model processor classes
-		EPlaceholderResolver resolver = appContext.get(EPlaceholderResolver.class);
-		// Re-resolve any placeholder references
-		List<MPlaceholder> phList = findElements(element, null, MPlaceholder.class, null);
-		List<MPlaceholder> nullRefList = new ArrayList<>();
-		for (MPlaceholder ph : phList) {
-			if (resolve) {
-				resolver.resolvePlaceholderRef(ph, refWin);
-			}
-			if (ph.getRef() == null) {
-				nullRefList.add(ph);
-			}
-		}
-		for (MPlaceholder ph : nullRefList) {
-			replacePlaceholder(ph);
-		}
-		return;
-	}
-
-	/**
-	 * @param element
-	 * @param refWin
-	 */
-	public void handleNullRefPlaceHolders(MUIElement element, MWindow refWin) {
-		handleNullRefPlaceHolders(element, refWin, false);
 	}
 
 	private void replacePlaceholder(MPlaceholder ph) {
@@ -715,6 +700,13 @@ public class ModelServiceImpl implements EModelService {
 	private void combine(MPartSashContainerElement toInsert, MPartSashContainerElement relTo,
 			MPartSashContainer newSash, boolean newFirst, float ratio) {
 		MElementContainer<MUIElement> curParent = relTo.getParent();
+		if (curParent == null) {
+			// if relTo is a shared element, use its current placeholder
+			MWindow win = getTopLevelWindowFor(relTo);
+			relTo = findPlaceholderFor(win, relTo);
+			curParent = relTo.getParent();
+		}
+		Assert.isLegal(relTo != null && curParent != null);
 		int index = curParent.getChildren().indexOf(relTo);
 		curParent.getChildren().remove(relTo);
 		if (newFirst) {
@@ -975,8 +967,7 @@ public class ModelServiceImpl implements EModelService {
 	public MPerspective getActivePerspective(MWindow window) {
 		List<MPerspectiveStack> pStacks = findElements(window, null, MPerspectiveStack.class, null);
 		if (pStacks.size() == 1) {
-			MPerspective perspective = pStacks.get(0).getSelectedElement();
-			return perspective;
+			return pStacks.get(0).getSelectedElement();
 		}
 
 		return null;
