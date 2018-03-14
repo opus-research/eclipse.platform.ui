@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 Matthew Hall and others.
+ * Copyright (c) 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 260337)
  *     Matthew Hall - bug 283428
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 481928
  ******************************************************************************/
 
 package org.eclipse.jface.databinding.viewers;
@@ -60,7 +59,8 @@ public class ViewerSupport {
 	 *            the respective properties to use for labels in each of the
 	 *            viewer's columns
 	 */
-	public static void bind(StructuredViewer viewer, IObservableList input, IValueProperty... labelProperties) {
+	public static void bind(StructuredViewer viewer, IObservableList input,
+			IValueProperty[] labelProperties) {
 		ObservableListContentProvider contentProvider = new ObservableListContentProvider();
 		if (viewer.getInput() != null)
 			viewer.setInput(null);
