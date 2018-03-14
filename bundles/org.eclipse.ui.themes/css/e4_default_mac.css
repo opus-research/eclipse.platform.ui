@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 420836
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 497591
  *******************************************************************************/
 
 @import url("platform:/plugin/org.eclipse.ui.themes/css/e4_basestyle.css");
@@ -67,7 +68,7 @@ ColorDefinition#org-eclipse-ui-workbench-ACTIVE_TAB_OUTER_KEYLINE_COLOR {
 
 #PerspectiveSwitcher {
 	background-color: #F0F0F0 #E8E8E8 100%;
-	eclipse-perspective-keyline-color: #ECE9D8 #E8E8E8;
+	eclipse-perspective-keyline-color: #E8E8E8 #E8E8E8;
 	handle-image: url(./macHandle.png);
 }
 
@@ -87,4 +88,38 @@ CTabFolder.MArea .MPartStack, CTabFolder.MArea .MPartStack.active {
 
 CTabFolder Canvas {
 	background-color: #FFFFFF;
+}
+
+
+Form, FormHeading {
+	background-color: #ffffff;
+	background: #ffffff;
+	background-image: #ffffff;
+	color: #505050;
+}
+
+Form {
+	/* Bug 465148: Additional styling for the Form */
+	text-background-color: #ffffff;
+
+	tb-toggle-hover-color: #505050;
+	tb-toggle-color: #505050;
+	h-hover-full-color: #505050;
+	h-hover-light-color: #505050;
+	h-bottom-keyline-2-color: #eaeaea;
+	h-bottom-keyline-1-color: #eaeaea;
+
+	/* We also have to force the background mode (the
+   * Label/ToolBar in the heading should inherit it).
+   */
+	swt-background-mode: 'force';
+}
+
+
+Section {
+	background-color: #ffffff;
+  	color: #505050;
+  	background-color-titlebar: #eaeaea;
+  	background-color-gradient-titlebar: #eaeaea;
+  	border-color-titlebar: #ffffff;
 }
