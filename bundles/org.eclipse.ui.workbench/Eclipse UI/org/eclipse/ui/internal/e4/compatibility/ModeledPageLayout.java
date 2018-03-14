@@ -479,7 +479,7 @@ public class ModeledPageLayout implements IPageLayout {
 	 * containers underneath the current perspective. If this element's parent
 	 * is the perspective itself, the element will be returned. The perspective
 	 * will only be returned if the perspective itself has no children.
-	 * 
+	 *
 	 * @return the parent of the final element in the recursion chain of
 	 *         children, or the element itself if its parent is the perspective,
 	 *         or the perspective if the perspective itself has no children
@@ -679,22 +679,31 @@ public class ModeledPageLayout implements IPageLayout {
 			E4Util.unsupported("stackView: failed to find " + refId + " for " + id); //$NON-NLS-1$//$NON-NLS-2$
 			return;
 		}
-		MStackElement viewModel = createViewModel(application, id, visible, page, partService,
+
+		// Hide views that are filtered by capabilities
+		boolean isFiltered = isViewFiltered(id);
+		boolean toBeRendered = visible && !isFiltered;
+
+		MStackElement viewModel = createViewModel(application, id, toBeRendered, page, partService,
 				createReferences);
 		if (viewModel != null) {
 			MPartStack stack = (MPartStack) refModel;
 			boolean wasEmpty = stack.getChildren().isEmpty();
 			stack.getChildren().add(viewModel);
-			if (wasEmpty && visible) {
+			if (wasEmpty && toBeRendered) {
 				// the stack didn't originally have any children, set this as
 				// the selected element
 				stack.setSelectedElement(viewModel);
 			}
 
-			if (visible || viewModel.isToBeRendered()) {
+			if (viewModel.isToBeRendered()) {
 				// ensure that the parent is being rendered, it may have been a
 				// placeholder folder so its flag may actually be false
 				resetToBeRenderedFlag(viewModel, true);
+			}
+
+			if (isFiltered) {
+				addViewActivator(viewModel);
 			}
 		}
 	}
