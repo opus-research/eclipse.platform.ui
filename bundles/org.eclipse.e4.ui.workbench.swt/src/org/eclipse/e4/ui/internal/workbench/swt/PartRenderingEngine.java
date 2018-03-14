@@ -106,10 +106,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 	private static final String defaultFactoryUrl = "bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/"
 			+ "org.eclipse.e4.ui.workbench.renderers.swt.WorkbenchRendererFactory";
-
-	public static final String DISABLED_THEME_KEY = "themeDisabled";
-
-	private static boolean disableThemePreference;
 	private String factoryUrl;
 
 	IRendererFactory curFactory = null;
@@ -477,9 +473,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 		curFactory = factory;
 		context.set(IRendererFactory.class, curFactory);
-
-		IEclipsePreferences node = InstanceScope.INSTANCE.getNode("org.eclipse.e4.ui.workbench.renderers.swt");
-		disableThemePreference = node.getBoolean(DISABLED_THEME_KEY, false);
 
 		cssThemeChangedHandler = new StylingPreferencesHandler(context.get(Display.class));
 	}
@@ -1233,7 +1226,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 			IEclipseContext appContext) {
 		String cssTheme = (String) appContext.get(E4Application.THEME_ID);
 		String cssURI = (String) appContext.get(IWorkbench.CSS_URI_ARG);
-		if ("none".equals(cssTheme) || (disableThemePreference)) {
+		if ("none".equals(cssTheme)) {
 			appContext.set(IStylingEngine.SERVICE_NAME, new IStylingEngine() {
 				@Override
 				public void setClassname(Object widget, String classname) {
