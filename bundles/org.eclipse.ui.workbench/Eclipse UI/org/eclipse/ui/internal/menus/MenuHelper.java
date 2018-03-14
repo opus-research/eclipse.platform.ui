@@ -587,7 +587,9 @@ public class MenuHelper {
 							if (handlerProxy == null) {
 								handlerProxy = new ActionDelegateHandlerProxy(element,
 										IWorkbenchRegistryConstants.ATT_CLASS, id, parmCmd,
-										getActiveWindow(app), null, null, null);
+										PlatformUI
+										.getWorkbench().getActiveWorkbenchWindow(), null, null,
+ null);
 							}
 							return handlerProxy;
 						}
@@ -600,12 +602,11 @@ public class MenuHelper {
 							if (handlerProxy.getDelegate() == null) {
 								handlerProxy.loadDelegate();
 
-								IWorkbenchWindow window = getActiveWindow(app);
-								if (window != null) {
-									ISelectionService service = window.getSelectionService();
-									IActionDelegate delegate = handlerProxy.getDelegate();
-									delegate.selectionChanged(handlerProxy.getAction(), service.getSelection());
-								}
+								ISelectionService service = PlatformUI.getWorkbench()
+										.getActiveWorkbenchWindow().getSelectionService();
+								IActionDelegate delegate = handlerProxy.getDelegate();
+								delegate.selectionChanged(handlerProxy.getAction(),
+										service.getSelection());
 							}
 							return (IWorkbenchWindowPulldownDelegate) handlerProxy.getDelegate();
 						}
@@ -652,10 +653,6 @@ public class MenuHelper {
 		// if no tooltip defined, use the textual label as the tooltip
 		item.setTooltip(tooltip == null ? text : tooltip);
 		return item;
-	}
-
-	protected static IWorkbenchWindow getActiveWindow(MApplication app) {
-		return PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 	}
 
 	private static int getType(String name) {

@@ -11,7 +11,6 @@
 package org.eclipse.ui;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.DecoratingLabelProvider;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
@@ -67,7 +66,6 @@ public interface IDecoratorManager extends IDelayedLabelDecorator{
      * @param decoratorId the decorator id
      * @return the label decorator
      */
-	@Nullable
     ILabelDecorator getLabelDecorator(String decoratorId);
 
     /**
@@ -81,7 +79,6 @@ public interface IDecoratorManager extends IDelayedLabelDecorator{
      * @return the lightweight label decorator
      * @deprecated use getBaseLabelProvider(String) instead.
      */
-	@Nullable
     @Deprecated
 	ILightweightLabelDecorator getLightweightLabelDecorator(String decoratorId);
 

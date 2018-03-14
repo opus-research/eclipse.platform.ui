@@ -306,9 +306,7 @@ public class ShowInMenu extends ContributionItem implements
 				}
 			}
 		}
-		if (page != null) {
-			page.sortShowInPartIds(targetIds);
-		}
+		page.sortShowInPartIds(targetIds);
 		return targetIds;
 	}
 

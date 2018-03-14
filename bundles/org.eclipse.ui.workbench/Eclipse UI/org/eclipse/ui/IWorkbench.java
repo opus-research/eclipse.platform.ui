@@ -12,7 +12,6 @@ package org.eclipse.ui;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceManager;
@@ -159,7 +158,6 @@ public interface IWorkbench extends IAdaptable, IServiceLocator {
 	 * @return the active workbench window, or <code>null</code> if there is
 	 *         no active workbench window or if called from a non-UI thread
 	 */
-	@Nullable
 	public IWorkbenchWindow getActiveWorkbenchWindow();
 
 	/**
@@ -285,8 +283,8 @@ public interface IWorkbench extends IAdaptable, IServiceLocator {
 	 *
 	 * @see IWorkbench#showPerspective(String, IWorkbenchWindow, IAdaptable)
 	 */
-	public IWorkbenchWindow openWorkbenchWindow(@Nullable String perspectiveId, @Nullable IAdaptable input)
-			throws WorkbenchException;
+	public IWorkbenchWindow openWorkbenchWindow(String perspectiveId,
+			IAdaptable input) throws WorkbenchException;
 
 	/**
 	 * Creates and opens a new workbench window with one page. The perspective
@@ -310,7 +308,7 @@ public interface IWorkbench extends IAdaptable, IServiceLocator {
 	 *
 	 * @see IWorkbench#showPerspective(String, IWorkbenchWindow, IAdaptable)
 	 */
-	public IWorkbenchWindow openWorkbenchWindow(@Nullable IAdaptable input)
+	public IWorkbenchWindow openWorkbenchWindow(IAdaptable input)
 			throws WorkbenchException;
 
 	/**
@@ -435,7 +433,8 @@ public interface IWorkbench extends IAdaptable, IServiceLocator {
 	 *
 	 * @since 2.0
 	 */
-	public IWorkbenchPage showPerspective(String perspectiveId, IWorkbenchWindow window, @Nullable IAdaptable input)
+	public IWorkbenchPage showPerspective(String perspectiveId,
+			IWorkbenchWindow window, IAdaptable input)
 			throws WorkbenchException;
 
 	/**
@@ -484,7 +483,6 @@ public interface IWorkbench extends IAdaptable, IServiceLocator {
 	 * @see IElementFactory
 	 * @since 3.0
 	 */
-	@Nullable
 	public IElementFactory getElementFactory(String factoryId);
 
 	/**
@@ -652,7 +650,7 @@ public interface IWorkbench extends IAdaptable, IServiceLocator {
 	 *         an error occurred while saving
 	 */
 	public boolean saveAll(IShellProvider shellProvider,
-			IRunnableContext runnableContext, @Nullable ISaveableFilter filter,
+			IRunnableContext runnableContext, ISaveableFilter filter,
 			boolean confirm);
 
 	/**

@@ -10,8 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.swt.widgets.Composite;
+
+import org.eclipse.core.runtime.IStatus;
+
 import org.eclipse.ui.internal.part.StatusPart;
 import org.eclipse.ui.part.ViewPart;
 
@@ -44,7 +46,7 @@ public class ErrorViewPart extends ViewPart {
 	public void createPartControl(Composite parent) {
 		parentControl = parent;
 		if (error != null) {
-			new StatusPart(getSite(), parent, error);
+			new StatusPart(parent, error);
 		}
 	}
 

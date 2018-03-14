@@ -11,8 +11,6 @@
 
 package org.eclipse.ui;
 
-import org.eclipse.jdt.annotation.Nullable;
-
 /**
  * Implements a reference to an editor. The IEditorPart will not be instantiated
  * until the editor becomes visible or the API {@link #getEditor(boolean)} is
@@ -25,17 +23,16 @@ import org.eclipse.jdt.annotation.Nullable;
  */
 public interface IEditorReference extends IWorkbenchPartReference {
     /**
-	 * Returns the factory id of the factory used to restore this editor.
-	 * Returns <code>null</code> if the editor is not persistable.
-	 */
-	@Nullable
+     * Returns the factory id of the factory used to
+     * restore this editor. Returns null if the editor
+     * is not persistable.
+     */
     public String getFactoryId();
 
 	/**
-	 * Returns the editor input's name. May return <code>null</code> if the name
-	 * is not available or if the editor failed to be restored.
+	 * Returns the editor input's name. May return null if the name is not
+	 * available or if the editor failed to be restored.
 	 */
-	@Nullable
     public String getName();
 
     /**
@@ -44,7 +41,6 @@ public interface IEditorReference extends IWorkbenchPartReference {
      * it failed to be restored. Tries to restore the editor
      * if <code>restore</code> is true.
      */
-	@Nullable
     public IEditorPart getEditor(boolean restore);
 
 	/**

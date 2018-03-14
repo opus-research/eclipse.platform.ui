@@ -43,9 +43,6 @@ public class PerspectiveElement extends QuickAccessElement {
 		IWorkbench workbench = PlatformUI.getWorkbench();
 		IWorkbenchWindow window = workbench
 				.getActiveWorkbenchWindow();
-		if (window == null) {
-			return; // XXX shouldn't happen
-		}
 		IWorkbenchPage activePage = window.getActivePage();
 		if (activePage != null) {
 			activePage.setPerspective(descriptor);

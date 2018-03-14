@@ -11,7 +11,6 @@
 package org.eclipse.ui;
 
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * A factory for re-creating objects from a previously saved memento.
@@ -48,6 +47,5 @@ public interface IElementFactory {
 	 * @return an object, or <code>null</code> if the element could not be
 	 *         created
 	 */
-	@Nullable
     public IAdaptable createElement(IMemento memento);
 }

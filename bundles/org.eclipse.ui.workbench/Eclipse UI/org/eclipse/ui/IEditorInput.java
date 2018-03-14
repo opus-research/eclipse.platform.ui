@@ -11,7 +11,6 @@
 package org.eclipse.ui;
 
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.resource.ImageDescriptor;
 
 /**
@@ -67,19 +66,18 @@ public interface IEditorInput extends IAdaptable {
 	 * Returns the image descriptor for this input.
 	 *
 	 * <p>
-	 * Note: although a <code>null</code> return value has never been permitted
-	 * from this method, there are many known buggy implementations that return
-	 * null. Clients that need the image for an editor are advised to use
+	 * Note: although a null return value has never been permitted from this
+	 * method, there are many known buggy implementations that return null.
+	 * Clients that need the image for an editor are advised to use
 	 * IWorkbenchPart.getImage() instead of IEditorInput.getImageDescriptor(),
-	 * or to recover from a <code>null</code> return value in a manner that
-	 * records the ID of the problematic editor input. Implementors that have
-	 * been returning <code>null</code> from this method should pick some other
-	 * default return value (such as
-	 * {@link ImageDescriptor.getMissingImageDescriptor()}).
+	 * or to recover from a null return value in a manner that records the ID of
+	 * the problematic editor input. Implementors that have been returning null
+	 * from this method should pick some other default return value (such as
+	 * ImageDescriptor.getMissingImageDescriptor()).
 	 * </p>
 	 *
 	 * @return the image descriptor for this input; may be <code>null</code> if
-	 *         there is no image.
+	 * there is no image.
 	 */
 	public ImageDescriptor getImageDescriptor();
 
@@ -100,7 +98,6 @@ public interface IEditorInput extends IAdaptable {
 	 * @return the persistable element, or <code>null</code> if this editor
 	 *         input cannot be persisted
 	 */
-	@Nullable
 	public IPersistableElement getPersistable();
 
 	/**

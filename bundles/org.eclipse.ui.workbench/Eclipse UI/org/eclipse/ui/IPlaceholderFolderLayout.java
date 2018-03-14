@@ -11,8 +11,6 @@
  *******************************************************************************/
 package org.eclipse.ui;
 
-import org.eclipse.jdt.annotation.Nullable;
-
 /**
  * An <code>IPlaceholderFolderLayout</code> is used to define the initial
  * view placeholders within a folder.
@@ -56,7 +54,6 @@ public interface IPlaceholderFolderLayout {
 	 *         set.
 	 * @since 3.3
 	 */
-	@Nullable
     public String getProperty(String id);
 
     /**
@@ -77,5 +74,5 @@ public interface IPlaceholderFolderLayout {
 	 *            property value. <code>null</code> will clear the property.
 	 * @since 3.3
 	 */
-	public void setProperty(String id, @Nullable String value);
+    public void setProperty(String id, String value);
 }

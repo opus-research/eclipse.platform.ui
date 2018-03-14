@@ -720,12 +720,10 @@ public final class Util {
 	public static Shell getShellToParentOn() {
 		IWorkbench workbench = PlatformUI.getWorkbench();
 		IWorkbenchWindow activeWindow = workbench.getActiveWorkbenchWindow();
-		if (activeWindow != null) {
-			return activeWindow.getShell();
-		} else if (workbench.getWorkbenchWindowCount() > 0) {
-			return workbench.getWorkbenchWindows()[0].getShell();
-		}
-		return null;
+		IWorkbenchWindow windowToParentOn = activeWindow == null ? (workbench
+				.getWorkbenchWindowCount() > 0 ? workbench
+				.getWorkbenchWindows()[0] : null) : activeWindow;
+		return windowToParentOn == null ? null : activeWindow.getShell();
 	}
 
 	/**
