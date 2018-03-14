@@ -362,7 +362,6 @@ public class WorkbenchMessages extends NLS {
 	//--- Coolbar ---
 	public static String WorkbenchWindow_FileToolbar;
 	public static String WorkbenchWindow_NavigateToolbar;
-	public static String WorkbenchWindow_HelpToolbar;
 	public static String WorkbenchWindow_searchCombo_toolTip;
 	public static String WorkbenchWindow_searchCombo_text;
 
