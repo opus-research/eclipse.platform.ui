@@ -44,23 +44,25 @@ public class AddTaskAction extends SelectionListenerAction {
 
     /**
      * Creates a new instance of the receiver.
-     * 
+     *
      * @param shell shell to use to show any dialogs
      * @deprecated See {@link #AddTaskAction(IShellProvider)}
      */
-    public AddTaskAction(final Shell shell) {
+    @Deprecated
+	public AddTaskAction(final Shell shell) {
         super(IDEWorkbenchMessages.AddTaskLabel);
         Assert.isNotNull(shell);
         this.shellProvider = new IShellProvider() {
+			@Override
 			public Shell getShell() {
 				return shell;
 			} };
         initAction();
     }
-    
+
     /**
 	 * Creates a new instance of the receiver.
-	 * 
+	 *
 	 * @param provider
 	 *            the IShellProvider to show any dialogs
 	 * @since 3.4
@@ -93,8 +95,7 @@ public class AddTaskAction extends SelectionListenerAction {
 			resource = (IResource) element;
 		}
         if (element instanceof IAdaptable) {
-			resource = (IResource) ((IAdaptable) element)
-                    .getAdapter(IResource.class);
+			resource = ((IAdaptable) element).getAdapter(IResource.class);
 		}
 
         if (resource != null && resource instanceof IProject) {
@@ -106,10 +107,8 @@ public class AddTaskAction extends SelectionListenerAction {
         return resource;
     }
 
-    /* (non-Javadoc)
-     * Method declared on IAction.
-     */
-    public void run() {
+    @Override
+	public void run() {
         IResource resource = getElement(getStructuredSelection());
         if (resource != null) {
             DialogTaskProperties dialog = new DialogTaskProperties(
@@ -124,10 +123,11 @@ public class AddTaskAction extends SelectionListenerAction {
      * <code>SelectionListenerAction</code> method enables the action only
      * if the selection contains a single resource and the resource is
      * not a closed project.
-     * 
+     *
      * @param selection the selection to update the enabled state for
      */
-    protected boolean updateSelection(IStructuredSelection selection) {
+    @Override
+	protected boolean updateSelection(IStructuredSelection selection) {
         return super.updateSelection(selection)
                 && getElement(selection) != null;
     }

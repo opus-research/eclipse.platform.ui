@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 434611
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -23,6 +24,7 @@ import org.eclipse.e4.ui.model.application.commands.MBindingContext;
 import org.eclipse.e4.ui.model.application.commands.MBindingTable;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MHandler;
+import org.eclipse.e4.ui.model.application.commands.MKeyBinding;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MSnippetContainer;
@@ -160,7 +162,7 @@ public class ModelServiceImpl implements EModelService {
 					children.addAll(app.getCommands());
 				} else if (clazz.equals(MBindingContext.class)) {
 					children.addAll(app.getBindingContexts());
-				} else if (clazz.equals(MBindingTable.class)) {
+				} else if (clazz.equals(MBindingTable.class) || clazz.equals(MKeyBinding.class)) {
 					children.addAll(app.getBindingTables());
 				}
 				// } else { only look for these if specifically asked.
@@ -178,6 +180,13 @@ public class ModelServiceImpl implements EModelService {
 		if (searchRoot instanceof MBindingContext && (searchFlags == ANYWHERE)) {
 			MBindingContext bindingContext = (MBindingContext) searchRoot;
 			for (MBindingContext child : bindingContext.getChildren()) {
+				findElementsRecursive(child, clazz, matcher, elements, searchFlags);
+			}
+		}
+
+		if (searchRoot instanceof MBindingTable) {
+			MBindingTable bindingTable = (MBindingTable) searchRoot;
+			for (MKeyBinding child : bindingTable.getBindings()) {
 				findElementsRecursive(child, clazz, matcher, elements, searchFlags);
 			}
 		}
@@ -399,9 +408,9 @@ public class ModelServiceImpl implements EModelService {
 
 		MUIElement appElement = refWin == null ? null : refWin.getParent();
 		if (appElement instanceof MApplication) {
-			EPlaceholderResolver resolver = ((MApplication) appElement).getContext().get(
-					EPlaceholderResolver.class);
-
+			// use appContext as MApplication.getContext() is null during the processing of
+			// the model processor classes
+			EPlaceholderResolver resolver = appContext.get(EPlaceholderResolver.class);
 			// Re-resolve any placeholder references
 			List<MPlaceholder> phList = findElements(element, null, MPlaceholder.class, null);
 			for (MPlaceholder ph : phList) {

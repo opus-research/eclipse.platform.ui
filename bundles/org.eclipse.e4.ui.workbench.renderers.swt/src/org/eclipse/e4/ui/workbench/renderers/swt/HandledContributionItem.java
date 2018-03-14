@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,8 @@
  *     Snjezana Peco <snjezana.peco@redhat.com> - Memory leaks in Juno when opening and closing XML Editor - http://bugs.eclipse.org/397909
  *     Marco Descher <marco@descher.at> - Bug 397677
  *     Dmitry Spiridenok - Bug 429756
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445723, 450863
+ *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 461026
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -36,7 +38,6 @@ import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.bindings.EBindingService;
 import org.eclipse.e4.ui.internal.workbench.Activator;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
-import org.eclipse.e4.ui.internal.workbench.IHelpService;
 import org.eclipse.e4.ui.internal.workbench.Policy;
 import org.eclipse.e4.ui.internal.workbench.RenderedElementUtil;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.IUpdateService;
@@ -52,6 +53,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolItem;
+import org.eclipse.e4.ui.services.help.EHelpService;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.IResourceUtilities;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -106,7 +108,7 @@ public class HandledContributionItem extends ContributionItem {
 	private static final String DISPOSABLE_CHECK = "IDisposable"; //$NON-NLS-1$
 	private static final String WW_SUPPORT = "org.eclipse.ui.IWorkbenchWindow"; //$NON-NLS-1$
 	private static final String HCI_STATIC_CONTEXT = "HCI-staticContext"; //$NON-NLS-1$
-	MHandledItem model;
+	private MHandledItem model;
 	private Widget widget;
 	private Listener menuItemListener;
 	private LocalResourceManager localResourceManager;
@@ -134,7 +136,7 @@ public class HandledContributionItem extends ContributionItem {
 
 	@Inject
 	@Optional
-	private IHelpService helpService;
+	private EHelpService helpService;
 
 	@Inject
 	@Optional
@@ -153,7 +155,7 @@ public class HandledContributionItem extends ContributionItem {
 	};
 
 	@Inject
-	void setResourceUtils(IResourceUtilities utils) {
+	void setResourceUtils(IResourceUtilities<ImageDescriptor> utils) {
 		resUtils = (ISWTResourceUtilities) utils;
 	}
 
@@ -226,11 +228,16 @@ public class HandledContributionItem extends ContributionItem {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void generateCommand() {
 		if (model.getCommand() != null && model.getWbCommand() == null) {
 			String cmdId = model.getCommand().getElementId();
+			if (cmdId == null) {
+				Activator.log(IStatus.ERROR, "Unable to generate parameterized command for " + model //$NON-NLS-1$
+						+ ". ElementId is not allowed to be null."); //$NON-NLS-1$
+				return;
+			}
 			List<MParameter> modelParms = model.getParameters();
 			Map<String, Object> parameters = new HashMap<String, Object>(4);
 			for (MParameter mParm : modelParms) {
@@ -279,13 +286,6 @@ public class HandledContributionItem extends ContributionItem {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets
-	 * .Menu, int)
-	 */
 	@Override
 	public void fill(Menu menu, int index) {
 		if (model == null) {
@@ -326,13 +326,6 @@ public class HandledContributionItem extends ContributionItem {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets
-	 * .ToolBar, int)
-	 */
 	@Override
 	public void fill(ToolBar parent, int index) {
 		if (model == null) {
@@ -420,21 +413,11 @@ public class HandledContributionItem extends ContributionItem {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.ContributionItem#update()
-	 */
 	@Override
 	public void update() {
 		update(null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.ContributionItem#update(java.lang.String)
-	 */
 	@Override
 	public void update(String id) {
 		updateIcons();
@@ -451,12 +434,8 @@ public class HandledContributionItem extends ContributionItem {
 		ParameterizedCommand parmCmd = model.getWbCommand();
 		String keyBindingText = null;
 		if (parmCmd != null) {
-			if (text == null) {
-				try {
-					text = parmCmd.getName();
-				} catch (NotDefinedException e) {
-					// we'll just ignore a failure
-				}
+			if (text == null || text.isEmpty()) {
+				text = model.getCommand().getLocalizedCommandName();
 			}
 			if (bindingService != null) {
 				TriggerSequence binding = bindingService
@@ -498,7 +477,7 @@ public class HandledContributionItem extends ContributionItem {
 					// Set some text so that the item stays visible in the menu
 					item.setText("UnLabled"); //$NON-NLS-1$
 				} else {
-					item.setText(command.getCommandName());
+					item.setText(command.getLocalizedCommandName());
 				}
 			} else {
 				item.setText(text);
@@ -648,11 +627,6 @@ public class HandledContributionItem extends ContributionItem {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.ContributionItem#dispose()
-	 */
 	@Override
 	public void dispose() {
 		if (widget != null) {
@@ -854,7 +828,7 @@ public class HandledContributionItem extends ContributionItem {
 
 	/**
 	 * Return a parent context for this part.
-	 * 
+	 *
 	 * @param element
 	 *            the part to start searching from
 	 * @return the parent's closest context, or global context if none in the
@@ -866,7 +840,7 @@ public class HandledContributionItem extends ContributionItem {
 
 	/**
 	 * Return a context for this part.
-	 * 
+	 *
 	 * @param part
 	 *            the part to start searching from
 	 * @return the closest context, or global context if none in the hierarchy

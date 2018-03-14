@@ -32,7 +32,7 @@ import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 /**
- * Standard project reference page for a wizard that creates a 
+ * Standard project reference page for a wizard that creates a
  * project resource.
  * <p>
  * This page may be used by clients as-is; it may be also be
@@ -67,7 +67,8 @@ public class WizardNewProjectReferencePage extends WizardPage {
     /** (non-Javadoc)
      * Method declared on IDialogPage.
      */
-    public void createControl(Composite parent) {
+    @Override
+	public void createControl(Composite parent) {
 
         Font font = parent.getFont();
 
@@ -108,7 +109,8 @@ public class WizardNewProjectReferencePage extends WizardPage {
      */
     protected IStructuredContentProvider getContentProvider() {
         return new WorkbenchContentProvider() {
-            public Object[] getChildren(Object element) {
+            @Override
+			public Object[] getChildren(Object element) {
                 if (!(element instanceof IWorkspace)) {
 					return new Object[0];
 				}

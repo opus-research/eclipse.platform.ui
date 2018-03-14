@@ -39,9 +39,6 @@ public class ViewActionBuilder extends PluginActionBuilder {
         contribute(bars.getMenuManager(), bars.getToolBarManager(), true);
     }
 
-    /* (non-Javadoc)
-     * Method declared on PluginActionBuilder.
-     */
     @Override
 	protected ActionDescriptor createActionDescriptor(
             org.eclipse.core.runtime.IConfigurationElement element) {
@@ -78,7 +75,7 @@ public class ViewActionBuilder extends PluginActionBuilder {
                 IWorkbenchRegistryConstants.PL_VIEW_ACTIONS);
         contributeToPart(targetPart);
     }
-    
+
     public void dispose() {
 		if (cache != null) {
 			for (int i = 0; i < cache.size(); i++) {

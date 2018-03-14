@@ -22,30 +22,30 @@ import org.eclipse.core.databinding.observable.IObservableCollection;
 
 /**
  * A list whose changes can be tracked by list change listeners.
- * 
+ *
  * @noimplement This interface is not intended to be implemented by clients.
  *              Clients should instead subclass one of the framework classes
  *              that implement this interface. Note that direct implementers of
  *              this interface outside of the framework will be broken in future
  *              releases when methods are added to this interface.
- * 
+ *
  * @see AbstractObservableList
  * @see ObservableList
- * 
+ *
  * @since 1.0
  */
 public interface IObservableList extends List, IObservableCollection {
-	
+
 	/**
 	 * Adds the given list change listener to the list of list change listeners.
 	 * @param listener
 	 */
 	public void addListChangeListener(IListChangeListener listener);
-	
+
 	/**
 	 * Removes the given list change listener from the list of list change listeners.
 	 * Has no effect if the given listener is not registered as a list change listener.
-	 * 
+	 *
 	 * @param listener
 	 */
 	public void removeListChangeListener(IListChangeListener listener);
@@ -53,87 +53,104 @@ public interface IObservableList extends List, IObservableCollection {
 	/**
 	 * @TrackedGetter
 	 */
-    public int size();
+    @Override
+	public int size();
 
 	/**
 	 * @TrackedGetter
 	 */
-    public boolean isEmpty();
+    @Override
+	public boolean isEmpty();
 
 	/**
 	 * @TrackedGetter
 	 */
-    public boolean contains(Object o);
+    @Override
+	public boolean contains(Object o);
 
 	/**
 	 * @TrackedGetter
 	 */
-    public Iterator iterator();
+    @Override
+	public Iterator iterator();
 
 	/**
 	 * @TrackedGetter
 	 */
-    public Object[] toArray();
+    @Override
+	public Object[] toArray();
 
 	/**
 	 * @TrackedGetter
 	 */
-    public Object[] toArray(Object a[]);
-
-	/**
-	 * 
-	 */
-    public boolean add(Object o);
-
-	/**
-	 * 
-	 */
-    public boolean remove(Object o);
-
-	/**
-	 * @TrackedGetter
-	 */
-    public boolean containsAll(Collection c);
-
-	/**
-	 * 
-	 */
-    public boolean addAll(Collection c);
-
-	/**
-	 * 
-	 */
-    public boolean addAll(int index, Collection c);
-
-	/**
-	 * 
-	 */
-    public boolean removeAll(Collection c);
+    @Override
+	public Object[] toArray(Object a[]);
 
 	/**
 	 *
 	 */
-    public boolean retainAll(Collection c);
+    @Override
+	public boolean add(Object o);
+
+	/**
+	 *
+	 */
+    @Override
+	public boolean remove(Object o);
 
 	/**
 	 * @TrackedGetter
 	 */
-    public boolean equals(Object o);
+    @Override
+	public boolean containsAll(Collection c);
+
+	/**
+	 *
+	 */
+    @Override
+	public boolean addAll(Collection c);
+
+	/**
+	 *
+	 */
+    @Override
+	public boolean addAll(int index, Collection c);
+
+	/**
+	 *
+	 */
+    @Override
+	public boolean removeAll(Collection c);
+
+	/**
+	 *
+	 */
+    @Override
+	public boolean retainAll(Collection c);
 
 	/**
 	 * @TrackedGetter
 	 */
-    public int hashCode();
+    @Override
+	public boolean equals(Object o);
 
 	/**
 	 * @TrackedGetter
 	 */
-    public Object get(int index);
+    @Override
+	public int hashCode();
 
 	/**
-	 * 
+	 * @TrackedGetter
 	 */
-    public Object set(int index, Object element);
+    @Override
+	public Object get(int index);
+
+	/**
+	 *
+	 */
+    @Override
+	public Object set(int index, Object element);
 
 	/**
 	 * Moves the element located at <code>oldIndex</code> to
@@ -144,7 +161,7 @@ public interface IObservableList extends List, IObservableCollection {
 	 * add operations in the same ListChangeEvent, as this allows
 	 * {@link ListDiff#accept(ListDiffVisitor)} to recognize the operation as a
 	 * move.
-	 * 
+	 *
 	 * @param oldIndex
 	 *            the element's position before the move. Must be within the
 	 *            range <code>0 &lt;= oldIndex &lt; size()</code>.
@@ -161,37 +178,44 @@ public interface IObservableList extends List, IObservableCollection {
 	public Object move(int oldIndex, int newIndex);
 
 	/**
-	 * 
+	 *
 	 */
-    public Object remove(int index);
+    @Override
+	public Object remove(int index);
 
 	/**
 	 * @TrackedGetter
 	 */
-    public int indexOf(Object o);
+    @Override
+	public int indexOf(Object o);
 
 	/**
 	 * @TrackedGetter
 	 */
-    public int lastIndexOf(Object o);
+    @Override
+	public int lastIndexOf(Object o);
 
 	/**
 	 * @TrackedGetter
 	 */
-    public ListIterator listIterator();
+    @Override
+	public ListIterator listIterator();
 
 	/**
 	 * @TrackedGetter
 	 */
-    public ListIterator listIterator(int index);
+    @Override
+	public ListIterator listIterator(int index);
 
 	/**
 	 * @TrackedGetter
 	 */
-    public List subList(int fromIndex, int toIndex);
+    @Override
+	public List subList(int fromIndex, int toIndex);
 
 	/**
 	 * @return the type of the elements or <code>null</code> if untyped
 	 */
+	@Override
 	Object getElementType();
 }

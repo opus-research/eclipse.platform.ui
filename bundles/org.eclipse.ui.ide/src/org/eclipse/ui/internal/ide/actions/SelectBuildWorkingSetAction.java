@@ -22,7 +22,7 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 /**
  * This action asks the user to select a working set, and then creates
  * and runs a corresponding BuildSetAction.
- * 
+ *
  * @since 3.0
  */
 public class SelectBuildWorkingSetAction extends Action implements
@@ -52,14 +52,16 @@ public class SelectBuildWorkingSetAction extends Action implements
         return sets[0];
     }
 
-    public void run() {
+    @Override
+	public void run() {
         IWorkingSet set = queryForWorkingSet();
         if (set != null) {
             new BuildSetAction(set, window, actionBars).run();
         }
     }
 
-    public void dispose() {
+    @Override
+	public void dispose() {
     }
 
     public void setActionBars(IActionBarConfigurer actionBars) {

@@ -28,17 +28,12 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
  * Shows a list of open editors in the current or last active workbook.
- * 
+ *
  * @since 3.4
- * 
+ *
  */
 public class WorkbookEditorsHandler extends AbstractHandler {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
-	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		MUIElement uiElement = null;

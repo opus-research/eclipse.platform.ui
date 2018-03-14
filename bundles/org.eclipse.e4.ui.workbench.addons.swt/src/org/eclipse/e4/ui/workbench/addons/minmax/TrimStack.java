@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010, 2014, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars.Vogel@vogella.com - Bug 454712
+ *     dirk.fauth@googlemail.com - Bug 446095
  ******************************************************************************/
-
 package org.eclipse.e4.ui.workbench.addons.minmax;
 
 import java.util.HashMap;
@@ -35,7 +36,6 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MCompositePart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
-import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
@@ -51,6 +51,7 @@ import org.eclipse.e4.ui.workbench.renderers.swt.TrimmedPartLayout;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
@@ -72,6 +73,7 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.osgi.service.event.EventHandler;
 
+
 /**
  * Class for representing window trim containing minimized views and shared areas
  */
@@ -92,7 +94,7 @@ public class TrimStack {
 
 	static final String STATE_YSIZE = "YSize"; //$NON-NLS-1$
 
-	private static final String MINIMIZED_AND_SHOWING = "MinimizzedAndShowing"; //$NON-NLS-1$
+	public static final String MINIMIZED_AND_SHOWING = "MinimizedAndShowing"; //$NON-NLS-1$
 
 	private Image layoutImage;
 
@@ -213,7 +215,7 @@ public class TrimStack {
 	/**
 	 * This is the new way to handle UIEvents (as opposed to subscring and unsubscribing them with
 	 * the event broker.
-	 * 
+	 *
 	 * The method is described in detail at http://wiki.eclipse.org/Eclipse4/RCP/Event_Model
 	 */
 	@SuppressWarnings("unchecked")
@@ -225,7 +227,10 @@ public class TrimStack {
 		if (trimStackTB == null || trimStackTB.isDisposed() || minimizedElement.getWidget() == null)
 			return;
 
-		MUIElement changedElement = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
+		Object changedElement = event.getProperty(UIEvents.EventTags.ELEMENT);
+		if (!(changedElement instanceof MUIElement)) {
+			return;
+		}
 
 		String key;
 		if (UIEvents.isREMOVE(event)) {
@@ -237,11 +242,11 @@ public class TrimStack {
 		}
 
 		if (key.equals(IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY)) {
-			ToolItem toolItem = getChangedToolItem(changedElement);
+			ToolItem toolItem = getChangedToolItem((MUIElement) changedElement);
 			if (toolItem != null)
 				toolItem.setImage(getImage((MUILabel) toolItem.getData()));
 		} else if (key.equals(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY)) {
-			ToolItem toolItem = getChangedToolItem(changedElement);
+			ToolItem toolItem = getChangedToolItem((MUIElement) changedElement);
 			if (toolItem != null)
 				toolItem.setToolTipText(getLabelText((MUILabel) toolItem.getData()));
 		}
@@ -293,7 +298,7 @@ public class TrimStack {
 			showStack(false);
 		}
 	};
-	
+
 	// Close any open stacks before shutting down
 	private EventHandler shutdownHandler = new EventHandler() {
 		@Override
@@ -673,7 +678,7 @@ public class TrimStack {
 	 * layout tags on the {@link #minimizedElement}. The restore item will remove the minimized tag.
 	 * The close item is not available on the editor stack, but will ask the part service to hide
 	 * the part.
-	 * 
+	 *
 	 * @param selectedPart
 	 *            the part from the data of the selected tool item
 	 */
@@ -796,7 +801,14 @@ public class TrimStack {
 			int index = toolControlId.indexOf('(');
 			String stackId = toolControlId.substring(0, index);
 			String perspId = toolControlId.substring(index + 1, toolControlId.length() - 1);
-			MPerspective persp = (MPerspective) modelService.find(perspId, ps.get(0));
+
+			MPerspective persp = null;
+			List<MPerspective> perspectives = modelService.findElements(ps.get(0), perspId,
+					MPerspective.class, null);
+			if (perspectives != null && !perspectives.isEmpty()) {
+				persp = perspectives.get(0);
+			}
+
 			if (persp != null) {
 				result = modelService.find(stackId, persp);
 			} else {
@@ -877,31 +889,37 @@ public class TrimStack {
 			MGenericStack<?> theStack = (MGenericStack<?>) minimizedElement;
 
 			// check to see if this stack has any valid elements
-			boolean check = false;
+			boolean hasRenderedElements = false;
 			for (MUIElement stackElement : theStack.getChildren()) {
 				if (stackElement.isToBeRendered()) {
-					check = true;
+					hasRenderedElements = true;
 					break;
 				}
 			}
 
-			if (!check) {
+			if (hasRenderedElements) {
+				for (MUIElement stackElement : theStack.getChildren()) {
+					if (!stackElement.isToBeRendered()) {
+						continue;
+					}
+
+					MUILabel labelElement = getLabelElement(stackElement);
+					ToolItem newItem = new ToolItem(trimStackTB, SWT.CHECK);
+					newItem.setData(labelElement);
+					newItem.setImage(getImage(labelElement));
+					newItem.setToolTipText(getLabelText(labelElement));
+					newItem.addSelectionListener(toolItemSelectionListener);
+				}
+			} else if (theStack.getTags().contains(IPresentationEngine.NO_AUTO_COLLAPSE)) {
+				// OK to be empty and still minimized
+				ToolItem ti = new ToolItem(trimStackTB, SWT.CHECK);
+				ti.setToolTipText(Messages.TrimStack_EmptyStackTooltip);
+				ti.setImage(getLayoutImage());
+				ti.addSelectionListener(toolItemSelectionListener);
+			} else {
 				// doesn't have any children that's showing, place it back in the presentation
 				restoreStack();
 				return;
-			}
-
-			for (MUIElement stackElement : theStack.getChildren()) {
-				if (!stackElement.isToBeRendered()) {
-					continue;
-				}
-
-				MUILabel labelElement = getLabelElement(stackElement);
-				ToolItem newItem = new ToolItem(trimStackTB, SWT.CHECK);
-				newItem.setData(labelElement);
-				newItem.setImage(getImage(labelElement));
-				newItem.setToolTipText(getLabelText(labelElement));
-				newItem.addSelectionListener(toolItemSelectionListener);
 			}
 		}
 
@@ -914,6 +932,20 @@ public class TrimStack {
 
 		minimizedElement.setVisible(true);
 		minimizedElement.getTags().remove(IPresentationEngine.MINIMIZED);
+
+		// Activate the part that is being brought up...
+		if (minimizedElement instanceof MPartStack) {
+			MPartStack theStack = (MPartStack) minimizedElement;
+			MStackElement curSel = theStack.getSelectedElement();
+			Control ctrl = (Control) minimizedElement.getWidget();
+
+			// Hack for elems that are lazy initialized
+			if (ctrl instanceof CTabFolder && ((CTabFolder) ctrl).getSelection() == null) {
+				theStack.setSelectedElement(null);
+				theStack.setSelectedElement(curSel);
+			}
+		}
+
 		toolControl.setToBeRendered(false);
 
 		if (hostPane != null && !hostPane.isDisposed())
@@ -923,12 +955,13 @@ public class TrimStack {
 
 	/**
 	 * Sets whether this stack should be visible or hidden
-	 * 
+	 *
 	 * @param show
 	 *            whether the stack should be visible
 	 */
 	public void showStack(boolean show) {
 		Control ctrl = (Control) minimizedElement.getWidget();
+		CTabFolder ctf = ctrl instanceof CTabFolder? (CTabFolder) ctrl: null;
 
 		Composite clientAreaComposite = getCAComposite();
 		if (clientAreaComposite == null || clientAreaComposite.isDisposed())
@@ -939,6 +972,14 @@ public class TrimStack {
 				hostPane = getHostPane();
 				originalParent = ctrl.getParent();
 				ctrl.setParent(hostPane);
+
+				// Hack ! Force a resize of the CTF to make sure the hosted
+				// view is the correct size...see bug 434062 for details
+				if (ctf != null) {
+					Rectangle bb = ctf.getBounds();
+					bb.width--;
+					ctf.setBounds(bb);
+				}
 
 				clientAreaComposite.addControlListener(caResizeListener);
 
@@ -970,6 +1011,13 @@ public class TrimStack {
 			if (minimizedElement instanceof MPartStack) {
 				MPartStack theStack = (MPartStack) minimizedElement;
 				MStackElement curSel = theStack.getSelectedElement();
+
+				// Hack for elems that are lazy initialized
+				if (ctf != null && ctf.getSelection() == null) {
+					theStack.setSelectedElement(null);
+					theStack.setSelectedElement(curSel);
+				}
+
 				if (curSel instanceof MPart) {
 					partService.activate((MPart) curSel);
 				} else if (curSel instanceof MPlaceholder) {
@@ -983,18 +1031,20 @@ public class TrimStack {
 
 				// See if we can find an element to activate...
 				MPart partToActivate = null;
-				MElementContainer<MPartSashContainerElement> curContainer = area;
-				while (partToActivate == null && curContainer.getSelectedElement() != null) {
-					if (curContainer.getSelectedElement() instanceof MPart) {
-						partToActivate = (MPart) curContainer.getSelectedElement();
-					} else if (curContainer.getSelectedElement() instanceof MPlaceholder) {
-						MPlaceholder ph = (MPlaceholder) curContainer.getSelectedElement();
+				MUIElement selectedElement = area.getSelectedElement();
+				while (partToActivate == null && selectedElement != null) {
+					if (selectedElement instanceof MPart) {
+						partToActivate = (MPart) selectedElement;
+					} else if (selectedElement instanceof MPlaceholder) {
+						MPlaceholder ph = (MPlaceholder) selectedElement;
 						if (ph.getRef() instanceof MPart) {
 							partToActivate = (MPart) ph.getRef();
+						} else {
+							selectedElement = null;
 						}
-					} else if (curContainer.getSelectedElement() instanceof MElementContainer<?>) {
-						curContainer = (MElementContainer<MPartSashContainerElement>) curContainer
-								.getSelectedElement();
+					} else if (selectedElement instanceof MElementContainer<?>) {
+						MElementContainer<?> container = (MElementContainer<?>) selectedElement;
+						selectedElement = container.getSelectedElement();
 					}
 				}
 

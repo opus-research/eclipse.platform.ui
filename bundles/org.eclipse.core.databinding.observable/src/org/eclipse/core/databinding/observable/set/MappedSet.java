@@ -27,17 +27,18 @@ import org.eclipse.core.databinding.observable.map.MapChangeEvent;
 import org.eclipse.core.databinding.observable.map.MapDiff;
 
 /**
- * 
+ *
  * <p>
  * This class is thread safe. All state accessing methods must be invoked from
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- * 
+ *
  * @since 1.0
- * 
+ *
  * @deprecated This class is deprecated.
  */
+@Deprecated
 public class MappedSet extends ObservableSet {
 
 	private final IObservableMap wrappedMap;
@@ -48,6 +49,7 @@ public class MappedSet extends ObservableSet {
 	private Map valueCounts = new HashMap();
 
 	private ISetChangeListener domainListener = new ISetChangeListener() {
+		@Override
 		public void handleSetChange(SetChangeEvent event) {
 			Set additions = new HashSet();
 			for (Iterator it = event.diff.getAdditions().iterator(); it.hasNext();) {
@@ -70,6 +72,7 @@ public class MappedSet extends ObservableSet {
 	};
 
 	private IMapChangeListener mapChangeListener = new IMapChangeListener() {
+		@Override
 		public void handleMapChange(MapChangeEvent event) {
 			MapDiff diff = event.diff;
 			Set additions = new HashSet();
@@ -151,6 +154,7 @@ public class MappedSet extends ObservableSet {
 		return false;
 	}
 
+	@Override
 	public synchronized void dispose() {
 		wrappedMap.removeMapChangeListener(mapChangeListener);
 		input.removeSetChangeListener(domainListener);

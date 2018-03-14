@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 
 /**
- *  The view provides api to fire a selection event for its workbench page. 
+ *  The view provides api to fire a selection event for its workbench page.
  */
 
 public class SelectionProviderView extends ViewPart implements
@@ -44,47 +44,35 @@ public class SelectionProviderView extends ViewPart implements
         super();
     }
 
-    /**
-     * @see WorkbenchPart#setFocus()
-     */
-    public void setFocus() {
+    @Override
+	public void setFocus() {
         text.setFocus();
     }
 
-    /**
-     * @see WorkbenchPart#createPartControl(Composite)
-     */
-    public void createPartControl(Composite parent) {
+    @Override
+	public void createPartControl(Composite parent) {
         text = new Text(parent, SWT.MULTI | SWT.WRAP);
         text.setLayoutData(new GridData(GridData.FILL_BOTH));
     }
 
-    /* (non-Javadoc)
-     * Method declared on IViewPart.
-     */
-    public void init(IViewSite site) throws PartInitException {
+    @Override
+	public void init(IViewSite site) throws PartInitException {
         site.setSelectionProvider(this);
         super.init(site);
     }
 
-    /**
-     * @see ISelectionProvider#addSelectionChangedListener(ISelectionChangedListener)
-     */
-    public void addSelectionChangedListener(ISelectionChangedListener listener) {
+    @Override
+	public void addSelectionChangedListener(ISelectionChangedListener listener) {
         selectionChangedListeners.add(listener);
     }
 
-    /**
-     * @see ISelectionProvider#getSelection()
-     */
-    public ISelection getSelection() {
+    @Override
+	public ISelection getSelection() {
         return lastSelection;
     }
 
-    /**
-     * @see ISelectionProvider#removeSelectionChangedListener(ISelectionChangedListener)
-     */
-    public void removeSelectionChangedListener(
+    @Override
+	public void removeSelectionChangedListener(
             ISelectionChangedListener listener) {
         selectionChangedListeners.remove(listener);
     }
@@ -96,10 +84,8 @@ public class SelectionProviderView extends ViewPart implements
         setSelection(new StructuredSelection(obj));
     }
 
-    /**
-     * @see ISelectionProvider#setSelection(ISelection)
-     */
-    public void setSelection(ISelection selection) {
+    @Override
+	public void setSelection(ISelection selection) {
         lastSelection = selection;
 
         // create an event
@@ -110,8 +96,8 @@ public class SelectionProviderView extends ViewPart implements
 
         // fire the event
         Object[] listeners = selectionChangedListeners.getListeners();
-        for (int i = 0; i < listeners.length; ++i) {
-            ((ISelectionChangedListener) listeners[i]).selectionChanged(event);
+        for (Object listener : listeners) {
+            ((ISelectionChangedListener) listener).selectionChanged(event);
         }
     }
 }
