@@ -8,7 +8,6 @@
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  *     IBM Corporation - initial API and implementation
- *     Steven Spungin <steven@spungin.tv> - Bug 401439
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.dom;
 
@@ -16,7 +15,6 @@ import org.eclipse.e4.ui.css.core.dom.CSSStylableElement;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.internal.css.swt.ICTabRendering;
 import org.eclipse.swt.custom.CTabFolder;
-import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
@@ -58,7 +56,6 @@ public class CTabFolderElement extends CompositeElement {
 		CTabFolder folder = (CTabFolder) widget;
 		int length = folder.getChildren().length;
 		if (index >= length) {
-			// CTabItem
 			Widget w = folder.getItem(index - length);
 			return getElement(w);
 		} else {
@@ -74,20 +71,11 @@ public class CTabFolderElement extends CompositeElement {
 		int childCount = 0;
 		if (widget instanceof Composite) {
 			childCount = ((Composite) widget).getChildren().length;
+
 			if (widget instanceof CTabFolder) {
 				// if it's a CTabFolder, include the child items in the count
-				//Bug 401439
-				for (CTabItem tabItem : ((CTabFolder) widget).getItems()) {
-					if (tabItem.isDisposed()) {
-						// Do not return disposed items to the css engine
-						System.err.println("CTabItem was disposed");
-						break;
-					} else {
-						childCount++;
-					}
-				}
+				childCount += ((CTabFolder) widget).getItemCount();
 			}
-
 		}
 		return childCount;
 	}
@@ -103,7 +91,8 @@ public class CTabFolderElement extends CompositeElement {
 		resetChildrenBackground(folder);
 
 		if (folder.getRenderer() instanceof ICTabRendering) {
-			ICTabRendering renderer = (ICTabRendering) folder.getRenderer();
+			ICTabRendering renderer = (ICTabRendering) folder
+					.getRenderer();
 			folder.setRenderer(null);
 			renderer.setSelectedTabFill(null);
 			renderer.setTabOutline(null);
@@ -124,7 +113,8 @@ public class CTabFolderElement extends CompositeElement {
 	}
 
 	private void resetChildBackground(Control control) {
-		Color backgroundSetByRenderer = (Color) control.getData(BACKGROUND_SET_BY_TAB_RENDERER);
+		Color backgroundSetByRenderer = (Color) control
+				.getData(BACKGROUND_SET_BY_TAB_RENDERER);
 		if (backgroundSetByRenderer != null) {
 			if (control.getBackground() == backgroundSetByRenderer) {
 				control.setBackground(null);
@@ -133,7 +123,8 @@ public class CTabFolderElement extends CompositeElement {
 		}
 	}
 
-	public static void setBackgroundOverriddenDuringRenderering(Composite composite, Color background) {
+	public static void setBackgroundOverriddenDuringRenderering(
+			Composite composite, Color background) {
 		composite.setBackground(background);
 		composite.setData(BACKGROUND_SET_BY_TAB_RENDERER, background);
 
@@ -145,3 +136,4 @@ public class CTabFolderElement extends CompositeElement {
 		}
 	}
 }
+
