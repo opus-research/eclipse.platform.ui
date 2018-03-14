@@ -42,6 +42,7 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MCompositePart;
 import org.eclipse.e4.ui.model.application.ui.basic.MInputPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
@@ -997,11 +998,13 @@ public class PartServiceImpl implements EPartService {
 		MElementContainer<?> lastContainer = getLastContainer(searchRoot, children);
 		if (lastContainer == null) {
 			MPartStack stack = modelService.createModelElement(MPartStack.class);
-			searchRoot.getChildren().add(stack);
+			modelService.insert(stack, (MPartSashContainerElement) children.get(0),
+					EModelService.RIGHT_OF, 0.5f);
 			return stack;
 		} else if (!(lastContainer instanceof MPartStack)) {
 			MPartStack stack = modelService.createModelElement(MPartStack.class);
-			((List) lastContainer.getChildren()).add(stack);
+			modelService.insert(stack, (MPartSashContainerElement) children.get(0),
+					EModelService.RIGHT_OF, 0.5f);
 			return stack;
 		}
 		return lastContainer;
