@@ -17,7 +17,6 @@ import org.eclipse.swt.events.SelectionEvent;
  * that permit the new selection to be vetoed before widgetSelected or
  * widgetDefaultSelected is called.
  */
-@FunctionalInterface
 public interface VetoableSelectionListener {
    /**
     * Method widgetCanChangeSelection.  Indicates that the selection is
