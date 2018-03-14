@@ -184,7 +184,7 @@ public interface EModelService {
 	 *            stacks.
 	 * @param matcher
 	 *            An implementation of a Selector that will return true for elements that it wants
-	 *            in the returned list. Must not be null
+	 *            in the returned list.
 	 * @return The generically typed list of matching elements.
 	 * 
 	 * @since 1.1

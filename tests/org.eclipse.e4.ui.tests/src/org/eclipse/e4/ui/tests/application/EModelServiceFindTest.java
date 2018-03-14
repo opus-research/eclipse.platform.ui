@@ -240,11 +240,6 @@ public class EModelServiceFindTest extends TestCase {
 				application, MPartSashContainer.class, EModelService.ANYWHERE,
 				getSelector(tags));
 		assertEquals(1, typeAndTag.size());
-		
-		elements = modelService.findElements(application,
-				MPartSashContainer.class, EModelService.ANYWHERE, 
-				getSelector("twoValidIds"));
-		assertEquals(1, elements.size());
 
 		List<MUIElement> idAndTag = modelService.findElements(application,
 				null, EModelService.ANYWHERE,
