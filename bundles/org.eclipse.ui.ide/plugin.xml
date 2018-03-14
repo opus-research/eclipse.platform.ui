@@ -2380,12 +2380,5 @@
              </or>
       </definition>
    </extension>
-   <extension
-         point="org.eclipse.ui.perspectiveExtensions">
-      <perspectiveExtension targetID="*">
-         <hiddenToolBarItem id="print">
-         </hiddenToolBarItem>
-      </perspectiveExtension>
-   </extension>
 
 </plugin>
