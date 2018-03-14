@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  ******************************************************************************/
+
 package org.eclipse.e4.ui.workbench.addons.minmax;
 
 import java.util.HashMap;
@@ -34,6 +35,7 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MCompositePart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
@@ -49,7 +51,6 @@ import org.eclipse.e4.ui.workbench.renderers.swt.TrimmedPartLayout;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
@@ -71,7 +72,6 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.osgi.service.event.EventHandler;
 
-
 /**
  * Class for representing window trim containing minimized views and shared areas
  */
@@ -92,7 +92,7 @@ public class TrimStack {
 
 	static final String STATE_YSIZE = "YSize"; //$NON-NLS-1$
 
-	public static final String MINIMIZED_AND_SHOWING = "MinimizedAndShowing"; //$NON-NLS-1$
+	private static final String MINIMIZED_AND_SHOWING = "MinimizzedAndShowing"; //$NON-NLS-1$
 
 	private Image layoutImage;
 
@@ -225,10 +225,7 @@ public class TrimStack {
 		if (trimStackTB == null || trimStackTB.isDisposed() || minimizedElement.getWidget() == null)
 			return;
 
-		Object changedElement = event.getProperty(UIEvents.EventTags.ELEMENT);
-		if (!(changedElement instanceof MUIElement)) {
-			return;
-		}
+		MUIElement changedElement = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
 
 		String key;
 		if (UIEvents.isREMOVE(event)) {
@@ -240,11 +237,11 @@ public class TrimStack {
 		}
 
 		if (key.equals(IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY)) {
-			ToolItem toolItem = getChangedToolItem((MUIElement) changedElement);
+			ToolItem toolItem = getChangedToolItem(changedElement);
 			if (toolItem != null)
 				toolItem.setImage(getImage((MUILabel) toolItem.getData()));
 		} else if (key.equals(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY)) {
-			ToolItem toolItem = getChangedToolItem((MUIElement) changedElement);
+			ToolItem toolItem = getChangedToolItem(changedElement);
 			if (toolItem != null)
 				toolItem.setToolTipText(getLabelText((MUILabel) toolItem.getData()));
 		}
@@ -943,15 +940,6 @@ public class TrimStack {
 				originalParent = ctrl.getParent();
 				ctrl.setParent(hostPane);
 
-				// Hack ! Force a resize of the CTF to make sure the hosted
-				// view is the correct size...see bug 434062 for details
-				if (ctrl instanceof CTabFolder) {
-					CTabFolder ctf = (CTabFolder) ctrl;
-					Rectangle bb = ctf.getBounds();
-					bb.width--;
-					ctf.setBounds(bb);
-				}
-
 				clientAreaComposite.addControlListener(caResizeListener);
 
 				// Set the initial location
@@ -995,20 +983,18 @@ public class TrimStack {
 
 				// See if we can find an element to activate...
 				MPart partToActivate = null;
-				MUIElement selectedElement = area.getSelectedElement();
-				while (partToActivate == null && selectedElement != null) {
-					if (selectedElement instanceof MPart) {
-						partToActivate = (MPart) selectedElement;
-					} else if (selectedElement instanceof MPlaceholder) {
-						MPlaceholder ph = (MPlaceholder) selectedElement;
+				MElementContainer<MPartSashContainerElement> curContainer = area;
+				while (partToActivate == null && curContainer.getSelectedElement() != null) {
+					if (curContainer.getSelectedElement() instanceof MPart) {
+						partToActivate = (MPart) curContainer.getSelectedElement();
+					} else if (curContainer.getSelectedElement() instanceof MPlaceholder) {
+						MPlaceholder ph = (MPlaceholder) curContainer.getSelectedElement();
 						if (ph.getRef() instanceof MPart) {
 							partToActivate = (MPart) ph.getRef();
-						} else {
-							selectedElement = null;
 						}
-					} else if (selectedElement instanceof MElementContainer<?>) {
-						MElementContainer<?> container = (MElementContainer<?>) selectedElement;
-						selectedElement = (MElementContainer<?>) container.getSelectedElement();
+					} else if (curContainer.getSelectedElement() instanceof MElementContainer<?>) {
+						curContainer = (MElementContainer<MPartSashContainerElement>) curContainer
+								.getSelectedElement();
 					}
 				}
 

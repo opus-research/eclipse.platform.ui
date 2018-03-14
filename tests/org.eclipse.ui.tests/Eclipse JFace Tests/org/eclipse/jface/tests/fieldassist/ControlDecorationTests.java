@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 433608
  ******************************************************************************/
 package org.eclipse.jface.tests.fieldassist;
 
@@ -90,14 +89,15 @@ public class ControlDecorationTests extends AbstractFieldAssistTestCase {
 		decoration.showHoverText("Show me");
 		assertOneShellUp();
 	}
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.tests.fieldassist.AbstractFieldAssistTestCase#createFieldAssistWindow()
+	 */
 	protected AbstractFieldAssistWindow createFieldAssistWindow() {
 		return new TextFieldAssistWindow() {
-			@Override
-			protected void createExtraControls(Composite parent) {
-				anotherControl = new Text(parent, SWT.DEFAULT);
-			}
-		};
+				protected void createExtraControls(Composite parent) {
+					anotherControl = new Text(parent, SWT.DEFAULT);
+				}
+			};
 	}
 }

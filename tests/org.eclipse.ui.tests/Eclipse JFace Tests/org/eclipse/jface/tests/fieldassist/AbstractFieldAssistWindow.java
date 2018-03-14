@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Remy Chi Jian Suen and others.
+ * Copyright (c) 2009 Remy Chi Jian Suen and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     Remy Chi Jian Suen <remy.suen@gmail.com> - initial API and implementation
  *     IBM - ongoing development
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 433608
  ******************************************************************************/
 package org.eclipse.jface.tests.fieldassist;
 
@@ -47,7 +46,6 @@ public abstract class AbstractFieldAssistWindow extends Window {
 		return getShell().getDisplay();
 	}
 
-	@Override
 	protected Control createContents(Composite parent) {
 		Composite content = (Composite) super.createContents(parent);
 		content.setLayout(new FillLayout());
@@ -60,15 +58,16 @@ public abstract class AbstractFieldAssistWindow extends Window {
 		adapter.setFilterStyle(filterStyle);
 		adapter.setPropagateKeys(propagateKeys);
 		adapter.setProposalAcceptanceStyle(acceptance);
-
+		
 		createExtraControls(parent);
 
 		return content;
 	}
-
-	abstract protected void createExtraControls(Composite parent);
-
-	@Override
+	
+	protected void createExtraControls(Composite parent) {
+		// default is to do nothing
+	}
+	
 	protected Layout getLayout() {
 		return new FillLayout();
 	}
@@ -133,7 +132,7 @@ public abstract class AbstractFieldAssistWindow extends Window {
 		}
 		return proposalProvider;
 	}
-
+	
 	protected ContentProposalAdapter getContentProposalAdapter() {
 		return adapter;
 	}
