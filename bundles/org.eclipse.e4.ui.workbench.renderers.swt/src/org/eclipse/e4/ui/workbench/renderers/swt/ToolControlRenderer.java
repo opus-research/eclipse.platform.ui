@@ -9,11 +9,13 @@
  *     IBM Corporation - initial API and implementation
  *     Sopot Cela <sopotcela@gmail.com> - Bug 431868, 472761
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 431868
+ *     Mickael Istria (Red Hat Inc.) - Bug 477670 make toolbar popup menu extensible
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import java.util.List;
 import javax.inject.Inject;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -27,6 +29,7 @@ import org.eclipse.e4.ui.model.application.ui.SideValue;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.menu.MItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
@@ -233,6 +236,22 @@ public class ToolControlRenderer extends SWTPartRenderer {
 			public void handleEvent(org.eclipse.swt.widgets.Event event) {
 				removeHiddenTags(toolControl);
 			}
+		});
+
+		// Support for this menu might be re-implemented to use
+		// MenuManagerRenderer
+		this.application.getMenuContributions().stream()
+				.filter(menuModel -> menuModel.getPositionInParent().startsWith("popup:toolbar")) //$NON-NLS-1$
+				.forEach(menuContribution -> {
+			menuContribution.getChildren().forEach(itemModel -> {
+				if (itemModel instanceof MItem) {
+							final IEclipseContext lclContext = getContext(itemModel);
+							HandledContributionItem itemRenderer = ContextInjectionFactory
+									.make(HandledContributionItem.class, lclContext);
+					itemRenderer.setModel((MItem) itemModel);
+					itemRenderer.fill(toolControlMenu, 0);
+				}
+			});
 		});
 		renderedCtrl.setMenu(toolControlMenu);
 
