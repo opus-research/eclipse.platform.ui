@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.window.WindowManager;
 import org.eclipse.ui.IMemento;
@@ -68,6 +69,8 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
      */
 	private boolean exitOnLastWindowClose = true;
 
+	private IEclipseContext e4Context;
+
     /**
      * Creates a new workbench configurer.
      * <p>
@@ -75,8 +78,9 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
      * only via {@link WorkbenchAdvisor#initialize WorkbenchAdvisor.initialize}
      * </p>
      */
-    /* package */WorkbenchConfigurer() {
+	/* package */ WorkbenchConfigurer(IEclipseContext e4Context) {
         super();
+		this.e4Context = e4Context;
     }
 
     /* (non-javadoc)
@@ -127,8 +131,9 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
 
     @Override
 	public void setSaveAndRestore(boolean enabled) {
-        saveAndRestore = enabled;
-    }
+		saveAndRestore = enabled;
+		e4Context.set(org.eclipse.e4.ui.workbench.IWorkbench.PERSIST_STATE, saveAndRestore);
+	}
 
     @Override
 	public Object getData(String key) {

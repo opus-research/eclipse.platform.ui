@@ -3222,7 +3222,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 	/* package */
 	WorkbenchConfigurer getWorkbenchConfigurer() {
 		if (workbenchConfigurer == null) {
-			workbenchConfigurer = new WorkbenchConfigurer();
+			workbenchConfigurer = new WorkbenchConfigurer(e4Context);
 		}
 		return workbenchConfigurer;
 	}
