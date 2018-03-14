@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -325,32 +325,32 @@ public class WorkbenchPage implements IWorkbenchPage {
 		try {
 			service.deferUpdates(true);
 			if (newPersp != null) {
-				List<IActionSetDescriptor> newAlwaysOn = newPersp.getAlwaysOnActionSets();
-				for (int i = 0; i < newAlwaysOn.size(); i++) {
-					IActionSetDescriptor descriptor = newAlwaysOn.get(i);
+				IActionSetDescriptor[] newAlwaysOn = newPersp.getAlwaysOnActionSets();
+				for (int i = 0; i < newAlwaysOn.length; i++) {
+					IActionSetDescriptor descriptor = newAlwaysOn[i];
 
 					actionSets.showAction(descriptor);
 				}
 
-				List<IActionSetDescriptor> newAlwaysOff = newPersp.getAlwaysOffActionSets();
-				for (int i = 0; i < newAlwaysOff.size(); i++) {
-					IActionSetDescriptor descriptor = newAlwaysOff.get(i);
+				IActionSetDescriptor[] newAlwaysOff = newPersp.getAlwaysOffActionSets();
+				for (int i = 0; i < newAlwaysOff.length; i++) {
+					IActionSetDescriptor descriptor = newAlwaysOff[i];
 
 					actionSets.maskAction(descriptor);
 				}
 			}
 
 			if (oldPersp != null) {
-				List<IActionSetDescriptor> oldAlwaysOn = oldPersp.getAlwaysOnActionSets();
-				for (int i = 0; i < oldAlwaysOn.size(); i++) {
-					IActionSetDescriptor descriptor = oldAlwaysOn.get(i);
+				IActionSetDescriptor[] newAlwaysOn = oldPersp.getAlwaysOnActionSets();
+				for (int i = 0; i < newAlwaysOn.length; i++) {
+					IActionSetDescriptor descriptor = newAlwaysOn[i];
 
 					actionSets.hideAction(descriptor);
 				}
 
-				List<IActionSetDescriptor> oldAlwaysOff = oldPersp.getAlwaysOffActionSets();
-				for (int i = 0; i < oldAlwaysOff.size(); i++) {
-					IActionSetDescriptor descriptor = oldAlwaysOff.get(i);
+				IActionSetDescriptor[] newAlwaysOff = oldPersp.getAlwaysOffActionSets();
+				for (int i = 0; i < newAlwaysOff.length; i++) {
+					IActionSetDescriptor descriptor = newAlwaysOff[i];
 
 					actionSets.unmaskAction(descriptor);
 				}
@@ -3507,18 +3507,11 @@ public class WorkbenchPage implements IWorkbenchPage {
 		}
 
 		// deactivate and activate other action sets as
-		Perspective oldPersp = getPerspective(persp);
-		Perspective dummyPersp = getPerspective(dummyPerspective);
-		updateActionSets(oldPersp, dummyPersp);
-		oldPersp.getAlwaysOnActionSets().clear();
-		oldPersp.getAlwaysOnActionSets().addAll(dummyPersp.getAlwaysOnActionSets());
-		oldPersp.getAlwaysOffActionSets().clear();
-		oldPersp.getAlwaysOffActionSets().addAll(dummyPersp.getAlwaysOffActionSets());
-
+		updateActionSets(getPerspective(persp), getPerspective(dummyPerspective));
 		modelToPerspectiveMapping.remove(dummyPerspective);
 
 		// partly fixing toolbar refresh issue, see bug 383569 comment 10
-		oldPersp.updateActionBars();
+		getPerspective(persp).updateActionBars();
 		legacyWindow.updateActionSets();
 
 		// migrate the tags
@@ -4110,7 +4103,7 @@ public class WorkbenchPage implements IWorkbenchPage {
              
              IActionSetDescriptor desc = reg.findActionSet(actionSetID);
              if (desc != null) {
-				List<IActionSetDescriptor> offActionSets = persp.getAlwaysOffActionSets();
+				IActionSetDescriptor[] offActionSets = persp.getAlwaysOffActionSets();
 				for (IActionSetDescriptor off : offActionSets) {
 					if (off.getId().equals(desc.getId())) {
 						return;

@@ -58,7 +58,7 @@ import org.eclipse.ui.menus.CommandContributionItem;
 
 /**
  * @since 3.5
- * 
+ *
  */
 public class CoolBarToTrimManager extends ContributionManager implements ICoolBarManager2 {
 
