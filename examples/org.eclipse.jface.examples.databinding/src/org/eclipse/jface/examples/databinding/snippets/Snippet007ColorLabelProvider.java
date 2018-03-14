@@ -44,7 +44,7 @@ import org.eclipse.swt.widgets.TableColumn;
 /**
  * An example showing how to create a {@link ILabelProvider label provider} that
  * to provide colors.
- * 
+ *
  * @since 3.2
  */
 public class Snippet007ColorLabelProvider {
@@ -189,7 +189,7 @@ public class Snippet007ColorLabelProvider {
 		/**
 		 * Returns the name. Method declared public to satisfy Java bean
 		 * conventions
-		 * 
+		 *
 		 * @return the name
 		 */
 		public String getName() {
@@ -210,7 +210,7 @@ public class Snippet007ColorLabelProvider {
 		/**
 		 * Returns the gender. Method declared public to satisfy Java bean
 		 * conventions
-		 * 
+		 *
 		 * @return the gender
 		 */
 		public int getGender() {

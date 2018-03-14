@@ -63,7 +63,7 @@ public class Snippet019TreeViewerWithListFactory {
 
 	/**
 	 * Launch the application
-	 * 
+	 *
 	 * @param args
 	 */
 	public static void main(String[] args) {
