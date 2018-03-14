@@ -78,8 +78,7 @@ public class NestedProjectsContentProvider implements ITreeContentProvider, IRes
 		IContainer container = (IContainer)parentElement;
 		Set<IProject> nestedProjects = new HashSet<IProject>();
 		for (IProject project : container.getWorkspace().getRoot().getProjects()) {
-			if (container.getLocation().isPrefixOf(project.getLocation())
-					&& project.getLocation().segmentCount() - container.getLocation().segmentCount() == 1) {
+			if (container.equals(NestedProjectManager.getMostDirectOpenContainer(project))) {
 				nestedProjects.add(project);
 			}
 		}
@@ -90,8 +89,8 @@ public class NestedProjectsContentProvider implements ITreeContentProvider, IRes
 	public IContainer getParent(Object element) {
 		if (element instanceof IProject) {
 			IProject project = (IProject)element;
-			if (NestedProjectManager.getInstance().isShownAsNested(project)) {
-				return NestedProjectManager.getInstance().getMostDirectOpenContainer(project);
+			if (NestedProjectManager.isShownAsNested(project)) {
+				return NestedProjectManager.getMostDirectOpenContainer(project);
 			}
 		}
 		return null;
@@ -110,7 +109,7 @@ public class NestedProjectsContentProvider implements ITreeContentProvider, IRes
 			for (IResourceDelta delta : event.getDelta().getAffectedChildren()) {
 				if (delta.getResource().getType() == IResource.PROJECT && delta.getKind() == IResourceDelta.ADDED) {
 					IProject newProject = (IProject)delta.getResource();
-					if (NestedProjectManager.getInstance().isShownAsNested(newProject)) {
+					if (NestedProjectManager.isShownAsNested(newProject)) {
 						parentsToRefresh.add(getParent(newProject));
 					}
 				}

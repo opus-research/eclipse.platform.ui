@@ -338,7 +338,8 @@ public class ResourceInfoPage extends PropertyPage {
 	}
 
 	protected void editLinkLocation() {
-		IResource resource = getElement().getAdapter(IResource.class);
+		IResource resource = (IResource) getElement().getAdapter(
+				IResource.class);
 		String locationFormat = resource.getPathVariableManager().convertFromUserEditableFormat(locationValue.getText(), true);
 		IPath location = Path.fromOSString(locationFormat);
 
@@ -357,7 +358,8 @@ public class ResourceInfoPage extends PropertyPage {
 	}
 
 	private void refreshLinkLocation() {
-		IResource resource = getElement().getAdapter(IResource.class);
+		IResource resource = (IResource) getElement().getAdapter(
+				IResource.class);
 
 		String userEditableFormat = resource.getPathVariableManager().convertToUserEditableFormat(newResourceLocation.toOSString(), true);
 		locationValue.setText(userEditableFormat);
@@ -393,7 +395,8 @@ public class ResourceInfoPage extends PropertyPage {
 				IIDEHelpContextIds.RESOURCE_INFO_PROPERTY_PAGE);
 
 		// layout the page
-		IResource resource = getElement().getAdapter(IResource.class);
+		IResource resource = (IResource) getElement().getAdapter(
+				IResource.class);
 
 		if (resource == null) {
 			Label label = new Label(parent, SWT.NONE);
@@ -854,7 +857,8 @@ public class ResourceInfoPage extends PropertyPage {
 	@Override
 	protected void performDefaults() {
 
-		IResource resource = getElement().getAdapter(IResource.class);
+		IResource resource = (IResource) getElement().getAdapter(
+				IResource.class);
 
 		if (resource == null)
 			return;
@@ -1096,7 +1100,8 @@ public class ResourceInfoPage extends PropertyPage {
 	@Override
 	public boolean performOk() {
 
-		IResource resource = getElement().getAdapter(IResource.class);
+		IResource resource = (IResource) getElement().getAdapter(
+				IResource.class);
 
 		if (resource == null)
 			return true;

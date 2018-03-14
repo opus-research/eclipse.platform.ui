@@ -132,7 +132,7 @@ public class ResourcePatternFilter extends ViewerFilter {
             resource = (IResource) element;
         } else if (element instanceof IAdaptable) {
             IAdaptable adaptable = (IAdaptable) element;
-            resource = adaptable.getAdapter(IResource.class);
+            resource = (IResource) adaptable.getAdapter(IResource.class);
         }
         if (resource != null) {
             String name = resource.getName();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,7 +29,7 @@ import org.eclipse.ui.views.markers.MarkerItem;
  */
 public class TypeMarkerGroup extends MarkerGroup {
 
-	private Map<String, TypesMarkerGroupingEntry> entries=new HashMap<String, TypesMarkerGroupingEntry>();
+	private Map entries=new HashMap();
 	/**
 	 * TypeMarkerField is the MarkerField used for MarkerGroupungs
 	 *
@@ -46,6 +46,11 @@ public class TypeMarkerGroup extends MarkerGroup {
 			super();
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.ui.internal.provisional.views.markers.api.MarkerField#getValue(org.eclipse.ui.internal.provisional.views.markers.api.MarkerItem)
+		 */
 		@Override
 		public String getValue(MarkerItem item) {
 
@@ -74,6 +79,9 @@ public class TypeMarkerGroup extends MarkerGroup {
 			return Util.EMPTY_STRING;
 		}
 
+		/* (non-Javadoc)
+		 * @see org.eclipse.ui.views.markers.internal.MarkerGroup.GroupMarkerField#compare(org.eclipse.ui.views.markers.MarkerItem, org.eclipse.ui.views.markers.MarkerItem)
+		 */
 		@Override
 		public int compare(MarkerItem item1, MarkerItem item2) {
 			return getValue(item1).compareTo(getValue(item2));
@@ -102,9 +110,16 @@ public class TypeMarkerGroup extends MarkerGroup {
 		markerField = new TypeMarkerField();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.ui.views.markers.internal.MarkerGroup#findGroupValue(java
+	 * .lang.String, org.eclipse.core.resources.IMarker)
+	 */
 	@Override
 	public MarkerGroupingEntry findGroupValue(String typeId, IMarker marker) {
-		TypesMarkerGroupingEntry entry = entries
+		TypesMarkerGroupingEntry entry = (TypesMarkerGroupingEntry) entries
 				.get(typeId);
 		if (entry == null) {
 			String groupName = MarkerSupportRegistry.getInstance().getCategory(
@@ -120,24 +135,33 @@ public class TypeMarkerGroup extends MarkerGroup {
 		}
 		return entry;
 	}
-
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.views.markers.internal.MarkerGroup#getId()
+	 */
 	@Override
 	public String getId() {
 		return Util.TYPE_MARKER_GROUPING_ID;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.views.markers.internal.MarkerGroup#getTitle()
+	 */
 	@Override
 	public String getTitle() {
 		return name;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.views.markers.internal.MarkerGroup#getEntriesComparator()
+	 */
 	@Override
-	public Comparator<MarkerGroupingEntry> getEntriesComparator() {
-		return new Comparator<MarkerGroupingEntry>() {
+	public Comparator getEntriesComparator() {
+		return new Comparator() {
 			@Override
-			public int compare(MarkerGroupingEntry o1, MarkerGroupingEntry o2) {
+			public int compare(Object o1, Object o2) {
 				//TODO: use a collator to compare?
-				return o1.getLabel().compareTo(o2.getLabel());
+				return ((MarkerGroupingEntry) o1).getLabel().compareTo(
+						((MarkerGroupingEntry) o2).getLabel());
 			}
 		};
 	}
