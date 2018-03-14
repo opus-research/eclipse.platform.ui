@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Bachmann electronic GmbH - Bug 447530 - persist the id of active non visible filters
  ******************************************************************************/
 
 package org.eclipse.ui.internal.navigator;
@@ -105,7 +106,8 @@ public class NavigatorFilterService implements INavigatorFilterService {
 
 			for (Iterator<String> activeItr = activeFilters.iterator(); activeItr.hasNext();) {
 				String id = activeItr.next().toString();
-				if (!dm.getFilterById(id).isVisibleInUi())
+				CommonFilterDescriptor filterDescriptor = dm.getFilterById(id);
+				if (!filterDescriptor.isVisibleInUi() && !filterDescriptor.isActiveByDefault())
 					continue;
 				activatedFiltersPreferenceValue.append(id).append(DELIM);
 			}
