@@ -45,15 +45,12 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
-import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
-import org.eclipse.e4.ui.workbench.IResourceUtilities;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.ISaveHandler;
-import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.LegacyActionTools;
 import org.eclipse.jface.action.MenuManager;
@@ -135,16 +132,13 @@ public class StackRenderer extends LazyStackRenderer {
 	// Minimum characters in for stacks inside the shared area
 	private static int MIN_EDITOR_CHARS = 15;
 
-	Image viewMenuImage;
+	private Image viewMenuImage;
 
 	@Inject
-	IStylingEngine stylingEngine;
+	private IEventBroker eventBroker;
 
 	@Inject
-	IEventBroker eventBroker;
-
-	@Inject
-	IPresentationEngine renderer;
+	private IPresentationEngine renderer;
 
 	private EventHandler itemUpdater;
 
@@ -1115,7 +1109,6 @@ public class StackRenderer extends LazyStackRenderer {
 		final BasicPartList editorList = new BasicPartList(ctf.getShell(),
 				SWT.ON_TOP, SWT.V_SCROLL | SWT.H_SCROLL,
 				ctxt.get(EPartService.class), stack, this,
-				(ISWTResourceUtilities) ctxt.get(IResourceUtilities.class),
 				getInitialMRUValue(ctf));
 		editorList.setInput();
 
