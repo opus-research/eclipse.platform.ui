@@ -11,10 +11,15 @@
 
 package org.eclipse.e4.ui.progress.internal;
 
+import javax.inject.Inject;
+
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 
 public class PreferenceStore implements IPreferenceStore {
+	
+	@Inject
+	private Preferences preferences;
 
 	@Override
     public void addPropertyChangeListener(IPropertyChangeListener listener) {
@@ -62,7 +67,7 @@ public class PreferenceStore implements IPreferenceStore {
 
 	@Override
     public String getDefaultString(String name) {
-		return ""; //$NON-NLS-1$
+		return "";
     }
 
 	@Override
@@ -87,7 +92,7 @@ public class PreferenceStore implements IPreferenceStore {
 
 	@Override
     public String getString(String name) {
-		return ""; //$NON-NLS-1$
+		return "";
     }
 
 	@Override
