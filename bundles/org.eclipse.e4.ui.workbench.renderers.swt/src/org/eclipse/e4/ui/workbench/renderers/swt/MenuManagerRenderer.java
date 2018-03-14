@@ -117,8 +117,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 
 			String attName = (String) event
 					.getProperty(UIEvents.EventTags.ATTNAME);
-			if (UIEvents.UILabel.LABEL.equals(attName)
-					|| UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
+			if (UIEvents.UILabel.LABEL.equals(attName)) {
 				ici.update();
 			} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
 				ici.update();
@@ -138,8 +137,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 			MenuManager manager = getManager(model);
 			if ((manager == null))
 				return;
-			if (UIEvents.UILabel.LABEL.equals(attName)
-					|| UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
+			if (UIEvents.UILabel.LABEL.equals(attName)) {
 				manager.setMenuText(getText(model));
 				manager.update(IAction.TEXT);
 			}
