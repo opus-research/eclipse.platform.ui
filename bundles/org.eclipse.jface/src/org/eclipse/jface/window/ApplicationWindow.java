@@ -291,11 +291,17 @@ public class ApplicationWindow extends Window implements IRunnableContext {
         }	
     }
 
+    /* (non-Javadoc)
+     * Method declared on Window.
+     */
     @Override
 	protected boolean canHandleShellCloseEvent() {
         return super.canHandleShellCloseEvent() && !operationInProgress;
     }
 
+    /* (non-Javadoc)
+     * Method declared on Window.
+     */
     @Override
 	public boolean close() {
         if (operationInProgress) {
@@ -367,6 +373,9 @@ public class ApplicationWindow extends Window implements IRunnableContext {
         createStatusLine(shell);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.window.Window#getLayout()
+     */
     @Override
 	protected Layout getLayout() {
         return new ApplicationWindowLayout();
