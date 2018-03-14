@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs.cpd;
 
+import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
@@ -69,19 +70,14 @@ class UnavailableContributionItemCheckListener implements
 		if (isAvailable) {
 			// the case where this item is unavailable because of its
 			// children
-			if (viewer.getExpandedState(item)) {
-				MessageBox mb = new MessageBox(viewer.getControl().getShell(), SWT.OK | SWT.ICON_WARNING | SWT.SHEET);
-				mb.setText(WorkbenchMessages.HideItemsCannotMakeVisible_dialogTitle);
-				mb.setMessage(NLS.bind(WorkbenchMessages.HideItemsCannotMakeVisible_unavailableChildrenText,
-						item.getLabel()));
-				mb.open();
-			} else {
-				MessageBox mb = new MessageBox(viewer.getControl().getShell(), SWT.OK | SWT.ICON_WARNING | SWT.SHEET);
-				mb.setText(WorkbenchMessages.HideItemsCannotMakeVisible_dialogTitle);
-				mb.setMessage(NLS.bind(WorkbenchMessages.HideItemsCannotMakeVisible_unavailableChildrenText,
-						item.getLabel()));
-				mb.open();
+			if (!viewer.getExpandedState(item)) {
+				viewer.expandToLevel(item, AbstractTreeViewer.ALL_LEVELS);
 			}
+			MessageBox mb = new MessageBox(viewer.getControl().getShell(), SWT.OK | SWT.ICON_WARNING | SWT.SHEET);
+			mb.setText(WorkbenchMessages.HideItemsCannotMakeVisible_dialogTitle);
+			mb.setMessage(NLS.bind(WorkbenchMessages.HideItemsCannotMakeVisible_unavailableChildrenText,
+					item.getLabel()));
+			mb.open();
 		} else {
 			// the case where this item is unavailable because it belongs to
 			// an unavailable action set
