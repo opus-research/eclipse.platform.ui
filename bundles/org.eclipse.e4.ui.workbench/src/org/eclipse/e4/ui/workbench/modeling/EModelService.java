@@ -90,7 +90,7 @@ public interface EModelService {
 
 	/** Searches for elements in the UI presentation, including all perspectives */
 	public static final int ANYWHERE = OUTSIDE_PERSPECTIVE | IN_ANY_PERSPECTIVE | IN_SHARED_AREA
-			| IN_TRIM | IN_MAIN_MENU | IN_PART;
+			| IN_TRIM;
 
 	/**
 	 * Searches for elements in the UI that the user is currently seeing that are OUTSIDE the
@@ -184,7 +184,7 @@ public interface EModelService {
 	 *            stacks.
 	 * @param matcher
 	 *            An implementation of a Selector that will return true for elements that it wants
-	 *            in the returned list. Must not be null
+	 *            in the returned list.
 	 * @return The generically typed list of matching elements.
 	 * 
 	 * @since 1.1
