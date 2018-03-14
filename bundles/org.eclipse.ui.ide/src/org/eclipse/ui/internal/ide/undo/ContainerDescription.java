@@ -24,18 +24,18 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.ui.ide.dialogs.UIResourceFilterDescription;
 import org.eclipse.ui.ide.undo.ResourceDescription;
 
 /**
  * ContainerDescription is a lightweight description that describes a container
  * to be created.
- *
+ * 
  * This class is not intended to be instantiated or used by clients.
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 public abstract class ContainerDescription extends AbstractResourceDescription {
 
@@ -44,7 +44,7 @@ public abstract class ContainerDescription extends AbstractResourceDescription {
 	URI location;
 
 	UIResourceFilterDescription[] filters;
-
+	
 	String defaultCharSet;
 
 	AbstractResourceDescription[] members;
@@ -54,7 +54,7 @@ public abstract class ContainerDescription extends AbstractResourceDescription {
 	 * can be used to create the container. The returned ContainerDescription
 	 * should represent any non-existing parents in addition to the specified
 	 * container.
-	 *
+	 * 
 	 * @param container
 	 *            the handle of the container to be described
 	 * @return a container description describing the container and any
@@ -64,13 +64,13 @@ public abstract class ContainerDescription extends AbstractResourceDescription {
 	public static ContainerDescription fromContainer(IContainer container) {
 		return fromContainer(container, false);
 	}
-
+	
 	/**
 	 * Create a group container description from the specified container handle that
 	 * can be used to create the container. The returned ContainerDescription
 	 * should represent any non-existing parents in addition to the specified
 	 * container.
-	 *
+	 * 
 	 * @param container
 	 *            the handle of the container to be described
 	 * @return a container description describing the container and any
@@ -80,7 +80,7 @@ public abstract class ContainerDescription extends AbstractResourceDescription {
 	public static ContainerDescription fromVirtualFolderContainer(IContainer container) {
 		return fromContainer(container, true);
 	}
-
+	
 	protected static ContainerDescription fromContainer(IContainer container, boolean usingVirtualFolder) {
 		IPath fullPath = container.getFullPath();
 		ContainerDescription firstCreatedParent = null;
@@ -141,7 +141,7 @@ public abstract class ContainerDescription extends AbstractResourceDescription {
 	 * Typically used when the container handle represents a resource that
 	 * actually exists, although it will not fail if the resource is
 	 * non-existent.
-	 *
+	 * 
 	 * @param container
 	 *            the container to be described
 	 */
@@ -171,62 +171,72 @@ public abstract class ContainerDescription extends AbstractResourceDescription {
 
 	/**
 	 * Create any child resources known by this container description.
-	 *
+	 * 
 	 * @param parentHandle
 	 *            the handle of the created parent
 	 * @param monitor
 	 *            the progress monitor to be used
+	 * @param ticks
+	 *            the number of ticks allocated for creating children
 	 * @throws CoreException
 	 */
-	protected final void createChildResources(IContainer parentHandle,
-			IProgressMonitor monitor) throws CoreException {
+	protected void createChildResources(IContainer parentHandle,
+			IProgressMonitor monitor, int ticks) throws CoreException {
+
 		// restore any children
 		if (members != null && members.length > 0) {
-			SubMonitor subMonitor = SubMonitor.convert(monitor, members.length);
 			for (int i = 0; i < members.length; i++) {
 				members[i].parent = parentHandle;
-				members[i].createResource(subMonitor.newChild(1));
+				members[i].createResource(new SubProgressMonitor(monitor, ticks
+						/ members.length));
 			}
 		}
 	}
 
-	@Override
-	public void recordStateFromHistory(IResource resource, IProgressMonitor mon) throws CoreException {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.ide.undo.ResourceDescription#recordStateFromHistory(org.eclipse.core.resources.IResource,
+	 *      org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public void recordStateFromHistory(IResource resource,
+			IProgressMonitor monitor) throws CoreException {
+		monitor.beginTask(
+				UndoMessages.FolderDescription_SavingUndoInfoProgress, 100);
 		if (members != null) {
-			SubMonitor subMonitor = SubMonitor.convert(mon, UndoMessages.FolderDescription_SavingUndoInfoProgress,
-					members.length);
 			for (int i = 0; i < members.length; i++) {
-				SubMonitor iterationMonitor = subMonitor.newChild(1);
 				if (members[i] instanceof FileDescription) {
 					IPath path = resource.getFullPath().append(
 							((FileDescription) members[i]).name);
 					IFile fileHandle = resource.getWorkspace().getRoot().getFile(
 							path);
-					members[i].recordStateFromHistory(fileHandle, iterationMonitor);
+					members[i].recordStateFromHistory(fileHandle,
+							new SubProgressMonitor(monitor, 100 / members.length));
 				} else if (members[i] instanceof FolderDescription) {
 					IPath path = resource.getFullPath().append(
 							((FolderDescription) members[i]).name);
 					IFolder folderHandle = resource.getWorkspace().getRoot()
 							.getFolder(path);
-					members[i].recordStateFromHistory(folderHandle, iterationMonitor);
-				}
+					members[i].recordStateFromHistory(folderHandle,
+							new SubProgressMonitor(monitor, 100 / members.length));
+				} 
 			}
 		}
+		monitor.done();
 	}
 
 	/**
 	 * Return the name of the container described by this ContainerDescription.
-	 *
+	 * 
 	 * @return the name of the container.
 	 */
-	@Override
 	public String getName() {
 		return name;
 	}
 
 	/**
 	 * Return the first folder found that has no child folders.
-	 *
+	 * 
 	 * @return the container description for the first child in the receiver
 	 *         that is a leaf, or this container if there are no children.
 	 */
@@ -248,7 +258,7 @@ public abstract class ContainerDescription extends AbstractResourceDescription {
 	/**
 	 * Add the specified resource description as a member of this resource
 	 * description
-	 *
+	 * 
 	 * @param member
 	 *            the resource description considered a member of this
 	 *            container.
@@ -264,7 +274,11 @@ public abstract class ContainerDescription extends AbstractResourceDescription {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.ide.undo.ResourceDescription#restoreResourceAttributes(org.eclipse.core.resources.IResource)
+	 */
 	protected void restoreResourceAttributes(IResource resource)
 			throws CoreException {
 		super.restoreResourceAttributes(resource);
@@ -277,7 +291,7 @@ public abstract class ContainerDescription extends AbstractResourceDescription {
 
 	/**
 	 * Set the location to which this container is linked.
-	 *
+	 * 
 	 * @param location
 	 *            the location URI, or <code>null</code> if there is no link
 	 */
@@ -287,7 +301,7 @@ public abstract class ContainerDescription extends AbstractResourceDescription {
 
 	/**
 	 * Set the filters to which should be created on this container.
-	 *
+	 * 
 	 * @param filters
 	 *            the filters
 	 */
@@ -295,7 +309,11 @@ public abstract class ContainerDescription extends AbstractResourceDescription {
 		this.filters = filters;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.ide.undo.ResourceDescription#verifyExistence(boolean)
+	 */
 	public boolean verifyExistence(boolean checkMembers) {
 		boolean existence = super.verifyExistence(checkMembers);
 		if (existence) {

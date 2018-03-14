@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,24 +14,29 @@ package org.eclipse.ui.internal.navigator.resources.actions;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 
+import org.eclipse.osgi.util.NLS;
+
+import org.eclipse.swt.widgets.Shell;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.ISchedulingRule;
+
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
-import org.eclipse.core.runtime.Adapters;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.ISchedulingRule;
+
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.window.IShellProvider;
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.widgets.Shell;
+
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.actions.ActionFactory;
@@ -51,7 +56,7 @@ import org.eclipse.ui.navigator.ICommonMenuConstants;
 
 /**
  * @since 3.2
- *
+ * 
  */
 public class ResourceMgmtActionProvider extends CommonActionProvider {
 
@@ -67,6 +72,13 @@ public class ResourceMgmtActionProvider extends CommonActionProvider {
 
 	private Shell shell;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.navigator.CommonActionProvider#init(org.eclipse.ui.navigator
+	 * .ICommonActionExtensionSite)
+	 */
 	@Override
 	public void init(ICommonActionExtensionSite aSite) {
 		super.init(aSite);
@@ -100,7 +112,7 @@ public class ResourceMgmtActionProvider extends CommonActionProvider {
 	 * <p>
 	 * No disabled action should be on the context menu.
 	 * </p>
-	 *
+	 * 
 	 * @param menu
 	 *            context menu to add actions to
 	 */
@@ -116,7 +128,13 @@ public class ResourceMgmtActionProvider extends CommonActionProvider {
 
 		while (resources.hasNext() && (!hasOpenProjects || !hasClosedProjects || hasBuilder || isProjectSelection)) {
 			Object next = resources.next();
-			IProject project = Adapters.getAdapter(next, IProject.class, true);
+			IProject project = null;
+
+			if (next instanceof IProject) {
+				project = (IProject) next;
+			} else if (next instanceof IAdaptable) {
+				project = (IProject) ((IAdaptable) next).getAdapter(IProject.class);
+			}
 
 			if (project == null) {
 				isProjectSelection = false;
@@ -157,7 +175,7 @@ public class ResourceMgmtActionProvider extends CommonActionProvider {
 
 	/**
 	 * Returns whether there are builders configured on the given project.
-	 *
+	 * 
 	 * @return <code>true</code> if it has builders, <code>false</code> if not,
 	 *         or if this could not be determined
 	 */

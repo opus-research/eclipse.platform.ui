@@ -16,12 +16,13 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.views.markers.MarkerFieldFilter;
 import org.eclipse.ui.views.markers.MarkerItem;
 import org.eclipse.ui.views.markers.internal.ProblemFilter;
+import org.eclipse.ui.views.markers.internal.TaskFilter;
 
 /**
  * PriorityMarkerFieldFilter is the field filter for priority in markers
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class PriorityMarkerFieldFilter extends CompatibilityFieldFilter {
 
@@ -30,11 +31,6 @@ public class PriorityMarkerFieldFilter extends CompatibilityFieldFilter {
 	final static int PRIORITY_LOW = 1 << IMarker.PRIORITY_LOW;
 
 	private static final String TAG_SELECTED_PRIORITIES = "selectedPriorities"; //$NON-NLS-1$
-
-	/**
-	 * Tag for the priority value.
-	 */
-	private static final String TAG_PRIORITY = "priority"; //$NON-NLS-1$
 
 	int selectedPriorities = PRIORITY_HIGH + PRIORITY_LOW + PRIORITY_NORMAL;
 
@@ -45,18 +41,24 @@ public class PriorityMarkerFieldFilter extends CompatibilityFieldFilter {
 		super();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.provisional.views.markers.api.MarkerFieldFilter#loadSettings(org.eclipse.ui.IMemento)
+	 */
 	public void loadSettings(IMemento memento) {
 		Integer priority = memento.getInteger(TAG_SELECTED_PRIORITIES);
 		if (priority == null)
 			return;
 		selectedPriorities = priority.intValue();
 	}
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.views.markers.CompatibilityFieldFilter#loadLegacySettings(org.eclipse.ui.IMemento, org.eclipse.ui.internal.views.markers.MarkerContentGenerator)
+	 */
 	void loadLegacySettings(IMemento memento, MarkerContentGenerator generator) {
 
-		String setting = memento.getString(TAG_PRIORITY);
+		String setting = memento.getString(TaskFilter.TAG_PRIORITY);
 
 		if (setting != null) {
 			try {
@@ -64,24 +66,30 @@ public class PriorityMarkerFieldFilter extends CompatibilityFieldFilter {
 			} catch (NumberFormatException eNumberFormat) {
 			}
 		}
-
-
-
+		
+	
+		
 	}
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.views.markers.CompatibilityFieldFilter#initialize(org.eclipse.ui.views.markers.internal.ProblemFilter)
+	 */
 	public void initialize(ProblemFilter problemFilter) {
 		//There is no problem filter support for priority
-
+		
 	}
 
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.views.markers.MarkerFieldFilter#saveSettings(org.eclipse.ui.IMemento)
+	 */
 	public void saveSettings(IMemento memento) {
 		memento.putInteger(TAG_SELECTED_PRIORITIES, selectedPriorities);
 
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.views.markers.MarkerFieldFilter#select(org.eclipse.ui.views.markers.MarkerItem)
+	 */
 	public boolean select(MarkerItem item) {
 
 		if (selectedPriorities == 0)
@@ -106,7 +114,9 @@ public class PriorityMarkerFieldFilter extends CompatibilityFieldFilter {
 
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.views.markers.MarkerFieldFilter#populateWorkingCopy(org.eclipse.ui.views.markers.MarkerFieldFilter)
+	 */
 	public void populateWorkingCopy(MarkerFieldFilter copy) {
 		super.populateWorkingCopy(copy);
 		((PriorityMarkerFieldFilter)copy).selectedPriorities = selectedPriorities;

@@ -13,6 +13,8 @@ package org.eclipse.ui.internal.views.markers;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.layout.GridData;
@@ -29,7 +31,7 @@ import org.eclipse.ui.views.markers.internal.MarkerMessages;
 /**
  * DescriptionConfigurationArea is the configuration area for description
  * configuration fields.
- *
+ * 
  */
 public class DescriptionConfigurationArea extends FilterConfigurationArea {
 
@@ -43,7 +45,11 @@ public class DescriptionConfigurationArea extends FilterConfigurationArea {
 		super();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FilterConfigurationArea#apply(org.eclipse.ui.internal.provisional.views.markers.api.MarkerFieldFilter)
+	 */
 	public void apply(MarkerFieldFilter filter) {
 		DescriptionFieldFilter desc = (DescriptionFieldFilter) filter;
 		if (descriptionCombo.getSelectionIndex() == 0)
@@ -55,12 +61,20 @@ public class DescriptionConfigurationArea extends FilterConfigurationArea {
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FilterConfigurationArea#createContents(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createContents(Composite parent) {
 		createDescriptionGroup(parent);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FilterConfigurationArea#initialize(org.eclipse.ui.internal.provisional.views.markers.api.MarkerFieldFilter)
+	 */
 	public void initialize(MarkerFieldFilter filter) {
 		DescriptionFieldFilter desc = (DescriptionFieldFilter) filter;
 		if (desc.getContainsModifier().equals(
@@ -75,7 +89,7 @@ public class DescriptionConfigurationArea extends FilterConfigurationArea {
 
 	/**
 	 * Create the group for the description filter.
-	 *
+	 * 
 	 * @param parent
 	 */
 	private void createDescriptionGroup(Composite parent) {
@@ -94,10 +108,12 @@ public class DescriptionConfigurationArea extends FilterConfigurationArea {
 
 		// Prevent Esc and Return from closing the dialog when the combo is
 		// active.
-		descriptionCombo.addTraverseListener(e -> {
-			if (e.detail == SWT.TRAVERSE_ESCAPE
-					|| e.detail == SWT.TRAVERSE_RETURN) {
-				e.doit = false;
+		descriptionCombo.addTraverseListener(new TraverseListener() {
+			public void keyTraversed(TraverseEvent e) {
+				if (e.detail == SWT.TRAVERSE_ESCAPE
+						|| e.detail == SWT.TRAVERSE_RETURN) {
+					e.doit = false;
+				}
 			}
 		});
 
@@ -114,8 +130,10 @@ public class DescriptionConfigurationArea extends FilterConfigurationArea {
 		descriptionText.setLayoutData(data);
 	}
 
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.views.markers.FilterConfigurationArea#getTitle()
+	 */
 	public String getTitle() {
 		return MarkerMessages.propertiesDialog_description_text;
 	}

@@ -15,7 +15,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -77,15 +76,14 @@ public abstract class BasicNewResourceWizard extends Wizard implements
     }
 
     /**
-     * The <code>BasicNewResourceWizard</code> implementation of this
+     * The <code>BasicNewResourceWizard</code> implementation of this 
      * <code>IWorkbenchWizard</code> method records the given workbench and
      * selection, and initializes the default banner image for the pages
      * by calling <code>initializeDefaultPageImageDescriptor</code>.
      * Subclasses may extend.
      */
-    @Override
-	public void init(IWorkbench theWorkbench, IStructuredSelection currentSelection) {
-        this.workbench = theWorkbench;
+    public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
+        this.workbench = workbench;
         this.selection = currentSelection;
 
         initializeDefaultPageImageDescriptor();
@@ -125,7 +123,7 @@ public abstract class BasicNewResourceWizard extends Wizard implements
      *
      * @param resource the resource to be selected and revealed
      * @param window the workbench window to select and reveal the resource
-     *
+     * 
      * @see ISetSelectionTarget
      */
     public static void selectAndReveal(IResource resource,
@@ -140,7 +138,7 @@ public abstract class BasicNewResourceWizard extends Wizard implements
 		}
 
         // get all the view and editor parts
-		List<IWorkbenchPart> parts = new ArrayList<>();
+        List parts = new ArrayList();
         IWorkbenchPartReference refs[] = page.getViewReferences();
         for (int i = 0; i < refs.length; i++) {
             IWorkbenchPart part = refs[i].getPart(false);
@@ -156,17 +154,27 @@ public abstract class BasicNewResourceWizard extends Wizard implements
         }
 
         final ISelection selection = new StructuredSelection(resource);
-		Iterator<?> itr = parts.iterator();
+        Iterator itr = parts.iterator();
         while (itr.hasNext()) {
             IWorkbenchPart part = (IWorkbenchPart) itr.next();
 
             // get the part's ISetSelectionTarget implementation
-			ISetSelectionTarget target = Adapters.getAdapter(part, ISetSelectionTarget.class, true);
+            ISetSelectionTarget target = null;
+            if (part instanceof ISetSelectionTarget) {
+				target = (ISetSelectionTarget) part;
+			} else {
+				target = (ISetSelectionTarget) part
+                        .getAdapter(ISetSelectionTarget.class);
+			}
 
             if (target != null) {
                 // select and reveal resource
                 final ISetSelectionTarget finalTarget = target;
-                window.getShell().getDisplay().asyncExec(() -> finalTarget.selectReveal(selection));
+                window.getShell().getDisplay().asyncExec(new Runnable() {
+                    public void run() {
+                        finalTarget.selectReveal(selection);
+                    }
+                });
             }
         }
     }

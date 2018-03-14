@@ -660,7 +660,7 @@ import com.ibm.icu.text.NumberFormat;
 	 * Returns {@link Boolean#TRUE} if the from type is assignable to the to
 	 * type, or {@link Boolean#FALSE} if it not, or <code>null</code> if
 	 * unknown.
-	 *
+	 * 
 	 * @param fromType
 	 * @param toType
 	 * @return whether fromType is assignable to toType, or <code>null</code>
@@ -685,7 +685,7 @@ import com.ibm.icu.text.NumberFormat;
 	/*
 	 * Default converter implementation, does not perform any conversion.
 	 */
-	static final class DefaultConverter implements IConverter {
+	protected static final class DefaultConverter implements IConverter {
 
 		private final Object toType;
 
@@ -700,17 +700,14 @@ import com.ibm.icu.text.NumberFormat;
 			this.fromType = fromType;
 		}
 
-		@Override
 		public Object convert(Object fromObject) {
 			return fromObject;
 		}
 
-		@Override
 		public Object getFromType() {
 			return fromType;
 		}
 
-		@Override
 		public Object getToType() {
 			return toType;
 		}

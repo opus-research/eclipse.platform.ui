@@ -53,7 +53,6 @@ public class SWTPartRendererTest extends TestCase {
 				getClass().getClassLoader(),
 				new Class<?>[] { IStylingEngine.class },
 				new InvocationHandler() {
-					@Override
 					public Object invoke(Object proxy, Method method,
 							Object[] args) throws Throwable {
 						stylingEngineExecutedMethods.put(method.getName(), args);

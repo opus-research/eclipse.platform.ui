@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 194734)
  *     Matthew Hall - bugs 265561, 262287, 268688
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.internal.databinding.property.value;
@@ -19,6 +18,7 @@ import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.AbstractObservableValue;
 import org.eclipse.core.databinding.observable.value.ValueDiff;
 import org.eclipse.core.databinding.property.INativePropertyListener;
+import org.eclipse.core.databinding.property.IProperty;
 import org.eclipse.core.databinding.property.IPropertyObservable;
 import org.eclipse.core.databinding.property.ISimplePropertyListener;
 import org.eclipse.core.databinding.property.SimplePropertyEvent;
@@ -26,70 +26,66 @@ import org.eclipse.core.databinding.property.value.SimpleValueProperty;
 import org.eclipse.core.internal.databinding.property.Util;
 
 /**
- * @param <S>
- *            type of the source object
- * @param <T>
- *            type of the value of the property
  * @since 1.2
- *
+ * 
  */
-public class SimplePropertyObservableValue<S, T> extends AbstractObservableValue<T>
-		implements IPropertyObservable<SimpleValueProperty<S, T>> {
-	private S source;
-	private SimpleValueProperty<S, T> property;
+public class SimplePropertyObservableValue extends AbstractObservableValue
+		implements IPropertyObservable {
+	private Object source;
+	private SimpleValueProperty property;
 
 	private boolean updating = false;
-	private T cachedValue;
+	private Object cachedValue;
 	private boolean stale;
 
-	private INativePropertyListener<S> listener;
+	private INativePropertyListener listener;
 
 	/**
 	 * @param realm
 	 * @param source
 	 * @param property
 	 */
-	public SimplePropertyObservableValue(Realm realm, S source,
-			SimpleValueProperty<S, T> property) {
+	public SimplePropertyObservableValue(Realm realm, Object source,
+			SimpleValueProperty property) {
 		super(realm);
 		this.source = source;
 		this.property = property;
 	}
 
-	@Override
 	protected void firstListenerAdded() {
-		if (!isDisposed() && listener == null) {
-			listener = property.adaptListener(new ISimplePropertyListener<S, ValueDiff<? extends T>>() {
-				@Override
-				public void handleEvent(final SimplePropertyEvent<S, ValueDiff<? extends T>> event) {
-					if (!isDisposed() && !updating) {
-						getRealm().exec(new Runnable() {
-							@Override
-							public void run() {
-								if (event.type == SimplePropertyEvent.CHANGE) {
-									notifyIfChanged(event.diff);
-								} else if (event.type == SimplePropertyEvent.STALE && !stale) {
-									stale = true;
-									fireStale();
+		if (!isDisposed()) {
+			if (listener == null) {
+				listener = property
+						.adaptListener(new ISimplePropertyListener() {
+							public void handleEvent(
+									final SimplePropertyEvent event) {
+								if (!isDisposed() && !updating) {
+									getRealm().exec(new Runnable() {
+										public void run() {
+											if (event.type == SimplePropertyEvent.CHANGE) {
+												notifyIfChanged((ValueDiff) event.diff);
+											} else if (event.type == SimplePropertyEvent.STALE
+													&& !stale) {
+												stale = true;
+												fireStale();
+											}
+										}
+									});
 								}
 							}
 						});
-					}
+			}
+			getRealm().exec(new Runnable() {
+				public void run() {
+					cachedValue = property.getValue(source);
+					stale = false;
+					if (listener != null)
+						listener.addTo(source);
 				}
 			});
 		}
-		getRealm().exec(new Runnable() {
-			@Override
-			public void run() {
-				cachedValue = property.getValue(source);
-				stale = false;
-				if (listener != null)
-					listener.addTo(source);
-			}
-		});
 	}
 
-	@Override
 	protected void lastListenerRemoved() {
 		if (listener != null)
 			listener.removeFrom(source);
@@ -97,14 +93,12 @@ public class SimplePropertyObservableValue<S, T> extends AbstractObservableValue
 		stale = false;
 	}
 
-	@Override
-	protected T doGetValue() {
+	protected Object doGetValue() {
 		notifyIfChanged(null);
 		return property.getValue(source);
 	}
 
-	@Override
-	protected void doSetValue(T value) {
+	protected void doSetValue(Object value) {
 		updating = true;
 		try {
 			property.setValue(source, value);
@@ -115,41 +109,36 @@ public class SimplePropertyObservableValue<S, T> extends AbstractObservableValue
 		notifyIfChanged(null);
 	}
 
-	private void notifyIfChanged(ValueDiff<? extends T> diff) {
+	private void notifyIfChanged(ValueDiff diff) {
 		if (hasListeners()) {
-			T oldValue = cachedValue;
-			T newValue = cachedValue = property.getValue(source);
+			Object oldValue = cachedValue;
+			Object newValue = cachedValue = property.getValue(source);
 			if (diff == null)
 				diff = Diffs.createValueDiff(oldValue, newValue);
 			if (!Util.equals(oldValue, newValue) || stale) {
 				stale = false;
-				fireValueChange(Diffs.unmodifiableDiff(diff));
+				fireValueChange(diff);
 			}
 		}
 	}
 
-	@Override
 	public Object getValueType() {
 		return property.getValueType();
 	}
 
-	@Override
 	public Object getObserved() {
 		return source;
 	}
 
-	@Override
-	public SimpleValueProperty<S, T> getProperty() {
+	public IProperty getProperty() {
 		return property;
 	}
 
-	@Override
 	public boolean isStale() {
 		ObservableTracker.getterCalled(this);
 		return stale;
 	}
 
-	@Override
 	public synchronized void dispose() {
 		if (!isDisposed()) {
 			if (listener != null)

@@ -1,14 +1,13 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 426460, 441150
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 466524
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 426460
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -37,8 +36,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Widget;
 
 /**
- * Default SWT renderer responsible for an MPart. See
- * {@link WorkbenchRendererFactory}
+ * Create a contribute part.
  */
 public class ContributedPartRenderer extends SWTPartRenderer {
 
@@ -122,10 +120,10 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 
 		// Create a context for this part
 		IEclipseContext localContext = part.getContext();
-		localContext.set(Composite.class, newComposite);
+		localContext.set(Composite.class.getName(), newComposite);
 
-		IContributionFactory contributionFactory = localContext
-				.get(IContributionFactory.class);
+		IContributionFactory contributionFactory = (IContributionFactory) localContext
+				.get(IContributionFactory.class.getName());
 		Object newPart = contributionFactory.create(part.getContributionURI(),
 				localContext);
 		part.setObject(newPart);
@@ -133,10 +131,6 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 		return newWidget;
 	}
 
-	/**
-	 * @param part
-	 * @param description
-	 */
 	public static void setDescription(MPart part, String description) {
 		if (!(part.getWidget() instanceof Composite))
 			return;
@@ -177,12 +171,12 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 						Label separator = (Label) composite.getChildren()[1];
 						Control partCtrl = composite.getChildren()[2];
 
-						// if the label is empty, give it a zero size
-						int labelHeight = !label.getText().isEmpty() ? label
+						// if the label is not visible, give it a zero size
+						int labelHeight = label.isVisible() ? label
 								.computeSize(bounds.width, SWT.DEFAULT).y : 0;
 						label.setBounds(0, 0, bounds.width, labelHeight);
 
-						int separatorHeight = labelHeight > 0 ? separator
+						int separatorHeight = separator.isVisible() ? separator
 								.computeSize(bounds.width, SWT.DEFAULT).y : 0;
 						separator.setBounds(0, labelHeight, bounds.width,
 								separatorHeight);
@@ -260,21 +254,6 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 				engine.removeGui(menu);
 			}
 		}
-
-		Composite parent = null;
-		if (element.getWidget() instanceof Composite) {
-			parent = ((Composite) element.getWidget()).getParent();
-		}
-
-		if (parent != null) {
-			try {
-				parent.setRedraw(false);
-				super.disposeWidget(element);
-			} finally {
-				parent.setRedraw(true);
-			}
-		} else {
-			super.disposeWidget(element);
-		}
+		super.disposeWidget(element);
 	}
 }

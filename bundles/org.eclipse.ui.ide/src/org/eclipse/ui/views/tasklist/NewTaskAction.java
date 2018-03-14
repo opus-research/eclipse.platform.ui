@@ -38,7 +38,7 @@ class NewTaskAction extends TaskAction {
 
     /**
      * Creates the action.
-     *
+     * 
      * @param tasklist the task list
      * @param id the id
      */
@@ -52,8 +52,7 @@ class NewTaskAction extends TaskAction {
      * Opens the new task dialog and shows the newly created task when done.
      * The new task is created on the currently selected resource.
      */
-    @Override
-	public void run() {
+    public void run() {
         TaskPropertiesDialog dialog = new TaskPropertiesDialog(getShell());
         dialog.setResource(getTaskList().getResource());
         int result = dialog.open();
@@ -73,11 +72,15 @@ class NewTaskAction extends TaskAction {
             // Need to do this in an asyncExec, even though we're in the UI thread here,
             // since the task list updates itself with the addition in an asyncExec,
             // which hasn't been processed yet.
-            getShell().getDisplay().asyncExec(() -> getTaskList().setSelection(new StructuredSelection(marker),
-			        true));
+            getShell().getDisplay().asyncExec(new Runnable() {
+                public void run() {
+                    getTaskList().setSelection(new StructuredSelection(marker),
+                            true);
+                }
+            });
         } else {
-            MessageDialog.openInformation(getShell(), TaskListMessages.NewTask_notShownTitle,
-                    TaskListMessages.NewTask_notShownMsg);
+            MessageDialog.openInformation(getShell(), TaskListMessages.NewTask_notShownTitle, 
+                    TaskListMessages.NewTask_notShownMsg); 
         }
     }
 }

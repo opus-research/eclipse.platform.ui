@@ -32,7 +32,11 @@ public class StringToBooleanConverterTest extends TestCase {
 
 	private List falseValues;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see junit.framework.TestCase#run(junit.framework.TestResult)
+	 */
 	public void run(TestResult result) {
 		trueValues = Collections.unmodifiableList(toValues(BindingMessages
 				.getString("ValueDelimiter"), BindingMessages
@@ -55,7 +59,11 @@ public class StringToBooleanConverterTest extends TestCase {
 		return result;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	protected void setUp() throws Exception {
 		super.setUp();
 

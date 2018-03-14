@@ -33,7 +33,6 @@ import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 public class MultiListTest extends AbstractDefaultRealmTestCase {
 	MultiListStub multiList;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		WritableList[] lists = new WritableList[] { new WritableList(),
@@ -62,7 +61,6 @@ public class MultiListTest extends AbstractDefaultRealmTestCase {
 	public void testStaleEvent_NoFireEventIfAlreadyStale() {
 		multiList.subLists[0].setStale(true);
 		multiList.addStaleListener(new IStaleListener() {
-			@Override
 			public void handleStale(StaleEvent staleEvent) {
 				fail("Should not fire stale when list is already dirty");
 			}
@@ -140,7 +138,6 @@ public class MultiListTest extends AbstractDefaultRealmTestCase {
 	}
 
 	static class Delegate extends AbstractObservableCollectionContractDelegate {
-		@Override
 		public IObservableCollection createObservableCollection(Realm realm,
 				int elementCount) {
 			WritableList[] subLists = new WritableList[] {
@@ -151,13 +148,11 @@ public class MultiListTest extends AbstractDefaultRealmTestCase {
 			return list;
 		}
 
-		@Override
 		public void change(IObservable observable) {
 			MultiListStub list = (MultiListStub) observable;
 			list.subLists[0].add(new Object());
 		}
 
-		@Override
 		public void setStale(IObservable observable, boolean stale) {
 			((MultiListStub) observable).subLists[0].setStale(stale);
 		}

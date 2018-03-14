@@ -30,6 +30,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
@@ -63,7 +64,7 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 	/**
 	 * Create a ProjectLocationSelectionDialog on the supplied project parented
 	 * by the parentShell.
-	 *
+	 * 
 	 * @param parentShell
 	 * @param existingProject
 	 */
@@ -78,7 +79,7 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 	/**
 	 * Check the message. If it is null then continue otherwise inform the user
 	 * via the status value and disable the OK.
-	 *
+	 * 
 	 * @param errorMsg
 	 *            the error message to show if it is not <code>null</code>
 	 */
@@ -140,7 +141,6 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 	 * <code>SelectionStatusDialog</code> method builds a two element list -
 	 * the first element is the project name and the second one is the location.
 	 */
-	@Override
 	protected void computeResult() {
 
 		ArrayList list = new ArrayList();
@@ -149,14 +149,18 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 		setResult(list);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared in Window.
+	 */
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,
 				IIDEHelpContextIds.PROJECT_LOCATION_SELECTION_DIALOG);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on Dialog.
+	 */
 	protected Control createDialogArea(Composite parent) {
 		// page group
 		Composite composite = (Composite) super.createDialogArea(parent);
@@ -176,9 +180,11 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 	 */
 	private void createNameListener() {
 
-		Listener listener = event -> {
-			setLocationForSelection();
-			applyValidationResult(checkValid(), false);
+		Listener listener = new Listener() {
+			public void handleEvent(Event event) {
+				setLocationForSelection();
+				applyValidationResult(checkValid(), false);
+			}
 		};
 
 		this.projectNameField.addListener(SWT.Modify, listener);
@@ -186,7 +192,7 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 
 	/**
 	 * Creates the project name specification controls.
-	 *
+	 * 
 	 * @param parent
 	 *            the parent composite
 	 */
@@ -268,13 +274,20 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 
 	/**
 	 * Get an error reporter for the receiver.
-	 *
+	 * 
 	 * @return IErrorMessageReporter
 	 */
 	private IErrorMessageReporter getErrorReporter() {
-		return (errorMessage, infoOnly) -> {
-			setMessage(errorMessage);
-			applyValidationResult(errorMessage, infoOnly);
+		return new IErrorMessageReporter() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.ui.internal.ide.dialogs.ProjectContentsLocationArea.IErrorMessageReporter#reportError(java.lang.String)
+			 */
+			public void reportError(String errorMessage, boolean infoOnly) {
+				setMessage(errorMessage);
+				applyValidationResult(errorMessage, infoOnly);
+			}
 		};
 	}
 }

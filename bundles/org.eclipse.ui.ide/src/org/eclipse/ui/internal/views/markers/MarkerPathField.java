@@ -18,13 +18,18 @@ import org.eclipse.ui.views.markers.MarkerItem;
 
 /**
  * MarkerPathField is the field for the paths column.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class MarkerPathField extends MarkerField {
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.provisional.views.markers.IMarkerField#compare(org.eclipse.ui.internal.provisional.views.markers.MarkerItem,
+	 *      org.eclipse.ui.internal.provisional.views.markers.MarkerItem)
+	 */
 	public int compare(MarkerItem item1, MarkerItem item2) {
 		if (item1.getMarker() == null || item2.getMarker() == null)
 			return 0;
@@ -32,12 +37,20 @@ public class MarkerPathField extends MarkerField {
 		return item1.getPath().compareTo(item2.getPath());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.provisional.views.markers.api.MarkerField#getDefaultColumnWidth(org.eclipse.swt.widgets.Control)
+	 */
 	public int getDefaultColumnWidth(Control control) {
 		return 20 * MarkerSupportInternalUtilities.getFontWidth(control);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.provisional.views.markers.IMarkerField#getValue(org.eclipse.ui.internal.provisional.views.markers.MarkerItem)
+	 */
 	public String getValue(MarkerItem item) {
 		return TextProcessor.process(item.getPath());
 	}

@@ -15,7 +15,6 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -42,7 +41,7 @@ import org.eclipse.ui.statushandlers.StatusAdapter;
 /**
  * This is an utility class which is responsible for text and icon decorators in
  * the StatusDialog.
- *
+ * 
  * @since 3.6
  */
 public class LabelProviderWrapper extends ViewerComparator implements
@@ -54,22 +53,41 @@ public class LabelProviderWrapper extends ViewerComparator implements
 		ResourceManager manager = new LocalResourceManager(JFaceResources
 				.getResources());
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse
+		 * .jface.viewers.ILabelProviderListener)
+		 */
 		@Override
 		public void addListener(ILabelProviderListener listener) {
 			// Do nothing
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
+		 */
 		@Override
 		public void dispose() {
 			manager.dispose();
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java
+		 * .lang.Object, int)
+		 */
 		@Override
 		public Image getColumnImage(Object element, int columnIndex) {
 			Image result = null;
 			if (element != null) {
 				StatusAdapter statusAdapter = ((StatusAdapter) element);
-				Job job = Adapters.getAdapter(statusAdapter, Job.class, true);
+				Job job = (Job) (statusAdapter.getAdapter(Job.class));
 				if (job != null) {
 					result = getIcon(job);
 				}
@@ -81,19 +99,26 @@ public class LabelProviderWrapper extends ViewerComparator implements
 			return result;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.
+		 * lang.Object, int)
+		 */
 		@Override
 		public String getColumnText(Object element, int columnIndex) {
 			StatusAdapter statusAdapter = (StatusAdapter) element;
 			String text = WorkbenchMessages.WorkbenchStatusDialog_ProblemOccurred;
 			if (!isMulti()) {
-				Job job = Adapters.getAdapter(statusAdapter, Job.class, true);
+				Job job = (Job) (statusAdapter.getAdapter(Job.class));
 				if (job != null) {
 					text = getPrimaryMessage(statusAdapter);
 				} else {
 					text = getSecondaryMessage(statusAdapter);
 				}
 			} else {
-				Job job = Adapters.getAdapter(statusAdapter, Job.class, true);
+				Job job = (Job) (statusAdapter.getAdapter(Job.class));
 				if (job != null) {
 					text = job.getName();
 				} else {
@@ -135,11 +160,25 @@ public class LabelProviderWrapper extends ViewerComparator implements
 			return null;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java
+		 * .lang.Object, java.lang.String)
+		 */
 		@Override
 		public boolean isLabelProperty(Object element, String property) {
 			return false;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse
+		 * .jface.viewers.ILabelProviderListener)
+		 */
 		@Override
 		public void removeListener(ILabelProviderListener listener) {
 			// Do nothing
@@ -163,16 +202,37 @@ public class LabelProviderWrapper extends ViewerComparator implements
 		this.dialogState = dialogState;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang
+	 * .Object, int)
+	 */
 	@Override
 	public Image getColumnImage(Object element, int columnIndex) {
 		return labelProvider.getColumnImage(element, columnIndex);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang
+	 * .Object, int)
+	 */
 	@Override
 	public String getColumnText(Object element, int columnIndex) {
 		return getLabelProvider().getColumnText(element, columnIndex);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.
+	 * jface.viewers.ILabelProviderListener)
+	 */
 	@Override
 	public void addListener(ILabelProviderListener listener) {
 		getLabelProvider().addListener(listener);
@@ -181,7 +241,7 @@ public class LabelProviderWrapper extends ViewerComparator implements
 	/**
 	 * This method disposes the label provider if and only if the dialog is not
 	 * changing its state.
-	 *
+	 * 
 	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
 	 */
 	@Override
@@ -193,11 +253,25 @@ public class LabelProviderWrapper extends ViewerComparator implements
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang
+	 * .Object, java.lang.String)
+	 */
 	@Override
 	public boolean isLabelProperty(Object element, String property) {
 		return getLabelProvider().isLabelProperty(element, property);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse
+	 * .jface.viewers.ILabelProviderListener)
+	 */
 	@Override
 	public void removeListener(ILabelProviderListener listener) {
 		getLabelProvider().removeListener(listener);
@@ -206,9 +280,9 @@ public class LabelProviderWrapper extends ViewerComparator implements
 	/**
 	 * Gets {@link Image} associated with current {@link StatusAdapter}
 	 * severity.
-	 *
+	 * 
 	 * @param statusAdapter
-	 *
+	 * 
 	 * @return {@link Image} associated with current {@link StatusAdapter}
 	 *         severity.
 	 */
@@ -233,7 +307,7 @@ public class LabelProviderWrapper extends ViewerComparator implements
 
 	/**
 	 * Get an <code>Image</code> from the provide SWT image constant.
-	 *
+	 * 
 	 * @param imageID
 	 *            the SWT image constant
 	 * @return image the image
@@ -244,31 +318,31 @@ public class LabelProviderWrapper extends ViewerComparator implements
 
 	/**
 	 * This method computes the dialog main message.
-	 *
+	 * 
 	 * If there is only one reported status adapter, main message should be:
 	 * <ul>
 	 * <li>information about job that reported an error.</li>
 	 * <li>primary message, if the statusAdapter was not reported by job</li>
 	 * </ul>
-	 *
+	 * 
 	 * If there is more reported statusAdapters, main message should be:
 	 * <ul>
 	 * <li>primary message for job reported statusAdapters</li>
 	 * <li>secondary message for statuses not reported by jobs</li>
 	 * </ul>
-	 *
+	 * 
 	 * If nothing can be found, some general information should be displayed.
-	 *
+	 * 
 	 * @param statusAdapter
 	 *            A status adapter which is used as the base for computation.
 	 * @return main message of the dialog.
-	 *
+	 * 
 	 * @see #getPrimaryMessage(StatusAdapter)
 	 * @see #getSecondaryMessage(StatusAdapter)
 	 */
 	public String getMainMessage(StatusAdapter statusAdapter) {
 		if (!isMulti()) {
-			Job job = Adapters.getAdapter(statusAdapter, Job.class, true);
+			Job job = (Job) (statusAdapter.getAdapter(Job.class));
 			// job
 			if (job != null) {
 				return NLS
@@ -283,7 +357,7 @@ public class LabelProviderWrapper extends ViewerComparator implements
 		// with timestamp if available).
 		// we display secondary message or status
 		if (isMulti()) {
-			Job job = Adapters.getAdapter(statusAdapter, Job.class, true);
+			Job job = (Job) (statusAdapter.getAdapter(Job.class));
 			// job
 			if (job != null) {
 				return getPrimaryMessage(statusAdapter);
@@ -306,11 +380,11 @@ public class LabelProviderWrapper extends ViewerComparator implements
 	 * <li>exception class</li>
 	 * <li>general message informing about error (no details at all)</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param statusAdapter
 	 *            an status adapter to retrieve primary message from
 	 * @return String containing primary message
-	 *
+	 * 
 	 * @see #getMainMessage(StatusAdapter)
 	 * @see #getSecondaryMessage(StatusAdapter)
 	 */
@@ -359,11 +433,11 @@ public class LabelProviderWrapper extends ViewerComparator implements
 	 * </ul>
 	 * Secondary message should not be the same as primary one. If no secondary
 	 * message can be extracted, details should be pointed.
-	 *
+	 * 
 	 * @param statusAdapter
 	 *            an status adapter to retrieve secondary message from
 	 * @return String containing secondary message
-	 *
+	 * 
 	 * @see #getMainMessage(StatusAdapter)
 	 * @see #getPrimaryMessage(StatusAdapter)
 	 */
@@ -437,6 +511,13 @@ public class LabelProviderWrapper extends ViewerComparator implements
 		return 0;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.ViewerComparator#compare(org.eclipse.jface.
+	 * viewers.Viewer, java.lang.Object, java.lang.Object)
+	 */
 	@Override
 	public int compare(Viewer testViewer, Object o1, Object o2) {
 		if (o1 instanceof StatusAdapter && o2 instanceof StatusAdapter) {

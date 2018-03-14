@@ -21,14 +21,18 @@ import com.ibm.icu.text.DateFormat;
 
 /**
  * MarkerCreationTimeField is the field that shows the creation time of a field.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class MarkerCreationTimeField extends MarkerField {
 
 	private DateFormat dateFormat=DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.provisional.views.markers.MarkerField#getValue(org.eclipse.ui.internal.provisional.views.markers.MarkerItem)
+	 */
 	public String getValue(MarkerItem item) {
 		long creationTime = ((MarkerSupportItem) item).getCreationTime();
 		if (creationTime < 0)
@@ -37,13 +41,22 @@ public class MarkerCreationTimeField extends MarkerField {
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.provisional.views.markers.MarkerField#compare(org.eclipse.ui.internal.provisional.views.markers.MarkerItem,
+	 *      org.eclipse.ui.internal.provisional.views.markers.MarkerItem)
+	 */
 	public int compare(MarkerItem item1, MarkerItem item2) {
 		return (int) (((MarkerSupportItem) item1).getCreationTime() - ((MarkerSupportItem) item2)
 				.getCreationTime());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.provisional.views.markers.MarkerField#update(org.eclipse.jface.viewers.ViewerCell)
+	 */
 	public void update(ViewerCell cell) {
 		Object element=cell.getElement();
 		String timeStr=MarkerSupportInternalUtilities.EMPTY_STRING;

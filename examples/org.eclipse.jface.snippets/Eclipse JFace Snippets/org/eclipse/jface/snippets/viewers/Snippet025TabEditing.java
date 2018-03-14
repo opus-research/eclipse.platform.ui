@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 Tom Schindl and others.
+ * Copyright (c) 2006, 2014 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,8 +8,6 @@
  * Contributors:
  *     Tom Schindl - initial API and implementation
  *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414565
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 448143
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 475361
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -19,21 +17,19 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
-import org.eclipse.jface.viewers.EditingSupport;
+import org.eclipse.jface.viewers.ICellModifier;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TableViewerEditor;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 
 /**
  * Edit cell values in a table
@@ -59,10 +55,38 @@ public class Snippet025TabEditing {
 	public Snippet025TabEditing(Shell shell) {
 		final TableViewer viewer = new TableViewer(shell, SWT.BORDER
 				| SWT.FULL_SELECTION);
-		viewer.setContentProvider(ArrayContentProvider.getInstance());
 
 		createColumnFor(viewer, "Column 1", 100);
 		createColumnFor(viewer, "Column 2", 200);
+
+		viewer.setLabelProvider(new LabelProvider());
+		viewer.setContentProvider(ArrayContentProvider.getInstance());
+		viewer.setCellModifier(new ICellModifier() {
+
+			@Override
+			public boolean canModify(Object element, String property) {
+				return ((MyModel) element).counter % 2 == 0;
+			}
+
+			@Override
+			public Object getValue(Object element, String property) {
+				return ((MyModel) element).counter + "";
+			}
+
+			@Override
+			public void modify(Object element, String property, Object value) {
+				TableItem item = (TableItem) element;
+				((MyModel) item.getData()).counter = Integer.parseInt(value
+						.toString());
+				viewer.update(item.getData(), null);
+			}
+
+		});
+
+		viewer.setColumnProperties(new String[] { "column1", "column2" });
+		viewer.setCellEditors(new CellEditor[] {
+				new TextCellEditor(viewer.getTable()),
+				new TextCellEditor(viewer.getTable()) });
 
 		TableViewerEditor.create(viewer,
 				new ColumnViewerEditorActivationStrategy(viewer),
@@ -79,13 +103,10 @@ public class Snippet025TabEditing {
 		tc.setWidth(width);
 		tc.setText(label);
 
-		TableViewerColumn viewerColumn = new TableViewerColumn(viewer, tc);
-		viewerColumn.setLabelProvider(new ColumnLabelProvider());
-		viewerColumn.setEditingSupport(new MyEditingSupport(viewer));
 	}
 
 	private List<MyModel> createModel() {
-		List<MyModel> elements = new ArrayList<>();
+		List<MyModel> elements = new ArrayList<MyModel>();
 
 		for (int i = 0; i < 10; i++) {
 			elements.add(new MyModel(i));
@@ -109,35 +130,6 @@ public class Snippet025TabEditing {
 		}
 
 		display.dispose();
-
-	}
-
-	private class MyEditingSupport extends EditingSupport{
-
-		public MyEditingSupport(ColumnViewer viewer) {
-			super(viewer);
-		}
-
-		@Override
-		protected CellEditor getCellEditor(Object element) {
-			return new TextCellEditor((Composite) getViewer().getControl());
-		}
-
-		@Override
-		protected boolean canEdit(Object element) {
-			return ((MyModel) element).counter % 2 == 0;
-		}
-
-		@Override
-		protected Object getValue(Object element) {
-			return ((MyModel) element).counter + "";
-		}
-
-		@Override
-		protected void setValue(Object element, Object value) {
-			((MyModel) element).counter = Integer.parseInt(value.toString());
-			getViewer().update(element, null);
-		}
 
 	}
 

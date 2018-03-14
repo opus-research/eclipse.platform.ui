@@ -22,8 +22,8 @@ import org.eclipse.ui.views.markers.internal.DialogMarkerProperties;
 /**
  * Shows the properties of a new or existing bookmark
  * This class was made public in 3.3.
- *
- * @since 3.3
+ * 
+ * @since 3.3 
  */
 public class BookmarkPropertiesDialog extends DialogMarkerProperties {
 
@@ -31,10 +31,10 @@ public class BookmarkPropertiesDialog extends DialogMarkerProperties {
 
     /**
      * Creates the dialog.  By default this dialog creates a new bookmark.
-     * To set the resource and initial attributes for the new bookmark,
+     * To set the resource and initial attributes for the new bookmark, 
      * use <code>setResource</code> and <code>setInitialAttributes</code>.
      * To show or modify an existing bookmark, use <code>setMarker</code>.
-     *
+     * 
      * @param parentShell the parent shell
      */
     public BookmarkPropertiesDialog(Shell parentShell) {
@@ -43,10 +43,10 @@ public class BookmarkPropertiesDialog extends DialogMarkerProperties {
 
     /**
      * Creates the dialog.  By default this dialog creates a new bookmark.
-     * To set the resource and initial attributes for the new bookmark,
+     * To set the resource and initial attributes for the new bookmark, 
      * use <code>setResource</code> and <code>setInitialAttributes</code>.
      * To show or modify an existing bookmark, use <code>setMarker</code>.
-     *
+     * 
      * @param parentShell the parent shell
      * @param title the title for the dialog
      */
@@ -54,14 +54,13 @@ public class BookmarkPropertiesDialog extends DialogMarkerProperties {
         super(parentShell, title);
     	setType(IMarker.BOOKMARK);
     }
-
+    
     /**
      * Sets the marker to show or modify.
-     *
+     * 
      * @param marker the marker, or <code>null</code> to create a new marker
      */
-    @Override
-	public void setMarker(IMarker marker) {
+    public void setMarker(IMarker marker) {
     	// Method is overridden because API is being inherited from an internal class.
         super.setMarker(marker);
     }
@@ -70,11 +69,10 @@ public class BookmarkPropertiesDialog extends DialogMarkerProperties {
      * Returns the marker being created or modified.
      * For a new marker, this returns <code>null</code> until
      * the dialog returns, but is non-null after.
-     *
+     * 
      * @return the marker
      */
-    @Override
-	public IMarker getMarker() {
+    public IMarker getMarker() {
     	// Method is overridden because API is being inherited from an internal class.
         return super.getMarker();
     }
@@ -82,11 +80,10 @@ public class BookmarkPropertiesDialog extends DialogMarkerProperties {
     /**
      * Sets the resource to use when creating a new bookmark.
      * If not set, the new bookmark is created on the workspace root.
-     *
+     * 
      * @param resource the resource
      */
-    @Override
-	public void setResource(IResource resource) {
+    public void setResource(IResource resource) {
     	// Method is overridden because API is being inherited from an internal class.
         super.setResource(resource);
     }
@@ -95,11 +92,10 @@ public class BookmarkPropertiesDialog extends DialogMarkerProperties {
      * Returns the resource to use when creating a new bookmark,
      * or <code>null</code> if none has been set.
      * If not set, the new bookmark is created on the workspace root.
-     *
+     * 
      * @return the resource
      */
-    @Override
-	public IResource getResource() {
+    public IResource getResource() {
     	// Method is overridden because API is being inherited from an internal class.
         return super.getResource();
     }
@@ -107,11 +103,10 @@ public class BookmarkPropertiesDialog extends DialogMarkerProperties {
     /**
      * Sets initial attributes to use when creating a new bookmark.
      * If not set, the new bookmark is created with default attributes.
-     *
+     * 
      * @param initialAttributes the initial attributes
      */
-    @Override
-	public void setInitialAttributes(Map initialAttributes) {
+    public void setInitialAttributes(Map initialAttributes) {
     	// Method is overridden because API is being inherited from an internal class.
         super.setInitialAttributes(initialAttributes);
     }
@@ -120,23 +115,30 @@ public class BookmarkPropertiesDialog extends DialogMarkerProperties {
      * Returns the initial attributes to use when creating a new bookmark,
      * or <code>null</code> if not set.
      * If not set, the new bookmark is created with default attributes.
-     *
+     * 
      * @return the initial attributes
      */
-    @Override
-	public Map getInitialAttributes() {
+    public Map getInitialAttributes() {
     	// Method is overridden because API is being inherited from an internal class.
         return super.getInitialAttributes();
     }
-
-	@Override
+    
+	/* (non-Javadoc)
+     * @see org.eclipse.ui.views.markers.internal.DialogMarkerProperties.getModifyOperationTitle()
+     * 
+     * @since 3.3
+     */
 	protected String getModifyOperationTitle() {
 		return BookmarkMessages.ModifyBookmark_undoText;
 	}
-
-	@Override
+	
+	/* (non-Javadoc)
+     * @see org.eclipse.ui.views.markers.internal.DialogMarkerProperties.getCreateOperationTitle()
+     * 
+     * @since 3.3
+     */
 	protected String getCreateOperationTitle() {
 		return BookmarkMessages.CreateBookmark_undoText;
-
+		
 	}
 }

@@ -257,7 +257,6 @@ public class TabStateHandlerTest extends TestCase {
 		return (MPlaceholder) Proxy.newProxyInstance(getClass()
 				.getClassLoader(), new Class<?>[] { MPlaceholder.class },
 				new InvocationHandler() {
-					@Override
 					public Object invoke(Object arg0, Method method,
 							Object[] arg2) throws Throwable {
 						if ("getRef".equals(method.getName())) {
@@ -277,17 +276,14 @@ public class TabStateHandlerTest extends TestCase {
 			this.value = value;
 		}
 
-		@Override
 		public String getKey() {
 			return key;
 		}
 
-		@Override
 		public Object getValue() {
 			return value;
 		}
 
-		@Override
 		public Object setValue(Object arg0) {
 			return null;
 		}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
  *     Tristan Hume - <trishume@gmail.com> -
  *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  *     		Implemented workbench auto-save to correctly restore state in case of crash.
- *     Denis Zygann <d.zygann@web.de> - Bug 330453
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -71,6 +70,18 @@ public interface IPreferenceConstants {
     // menu.
     public static final String RECENT_FILES = "RECENT_FILES"; //$NON-NLS-1$
 
+    // (integer) Mode for opening a view.
+    public static final String OPEN_VIEW_MODE = "OPEN_VIEW_MODE"; //$NON-NLS-1$
+
+    public static final int OVM_EMBED = 0;
+
+    public static final int OVM_FAST = 1;
+
+    public static final int OVM_FLOAT = 2;
+
+	// Boolean: true = hide fast view bar, when it is empty
+	public static final String FVB_HIDE = "FVB_HIDE"; //$NON-NLS-1$
+
     // (int) Mode for opening a new perspective
     public static final String OPEN_PERSP_MODE = "OPEN_PERSPECTIVE_MODE"; //$NON-NLS-1$
 
@@ -126,18 +137,18 @@ public interface IPreferenceConstants {
      */
     public static final String EDITORLIST_DISPLAY_FULL_NAME = "EDITORLIST_DISPLAY_FULL_NAME"; //$NON-NLS-1$
 
-
+    
     /**
-     * Workbench preference id for determining whether the user has chosen to
+     * Workbench preference id for determining whether the user has chosen to 
      * override some of the settings in the current presentation.
      * <p>
      * The default value for this preference is: <code>false</code> (prompt)
      * </p>
-     *
+     * 
      * @since 3.2
      */
     public static final String OVERRIDE_PRESENTATION = "overridepresentation"; //$//$NON-NLS-1$
-
+    
     /**
      * <p>
      * The key for the preference indicating which tab is selected in the keys
@@ -148,7 +159,7 @@ public interface IPreferenceConstants {
      * This preference is an <code>int</code> value. The default value is
      * <code>0</code>.
      * </p>
-     *
+     * 
      * @since 3.1
      */
     public static final String KEYS_PREFERENCE_SELECTED_TAB = "KEYS_PREFERENCE_SELECTED_TAB"; //$NON-NLS-1$
@@ -164,7 +175,7 @@ public interface IPreferenceConstants {
      * This preference is a <code>boolean</code> value. The default value is
      * <code>false</code>.
      * </p>
-     *
+     * 
      * @since 3.0
      */
     public static final String MULTI_KEY_ASSIST = "MULTI_KEY_ASSIST"; //$NON-NLS-1$
@@ -180,7 +191,7 @@ public interface IPreferenceConstants {
      * This preference is an <code>int</code> value. The default value is
      * <code>1000</code>.
      * </p>
-     *
+     * 
      * @since 3.0
      */
     public static final String MULTI_KEY_ASSIST_TIME = "MULTI_KEY_ASSIST_TIME"; //$NON-NLS-1$
@@ -188,11 +199,11 @@ public interface IPreferenceConstants {
     /**
      * Workbench preference to use the new IPersistableEditor interface
      * throughout the workbench new editor/open editor calls.
-     *
+     * 
      * @since 3.3
      */
     public static String USE_IPERSISTABLE_EDITORS = "USE_IPERSISTABLE_EDITORS"; //$NON-NLS-1$
-
+    
     /**
      * Preference to show user jobs in a dialog.
      */
@@ -207,21 +218,21 @@ public interface IPreferenceConstants {
      * <p>
      * The default value for this preference is: <code>true</code> (prompt)
      * </p>
-     *
+     * 
      * @since 3.0
      */
     public static final String SHOULD_PROMPT_FOR_ENABLEMENT = "shouldPromptForEnablement"; //$NON-NLS-1$
 
 	/**
 	 * Preference to show/hide the CoolBar.
-	 *
+	 * 
 	 * @since 3.6
 	 */
 	public static final String COOLBAR_VISIBLE = "coolBarVisible"; //$NON-NLS-1$
 
 	/**
 	 * Preference to show/hide the PerspectiveBar.
-	 *
+	 * 
 	 * @since 3.6
 	 */
 	public static final String PERSPECTIVEBAR_VISIBLE = "perspectiveBarVisible"; //$NON-NLS-1$
@@ -229,13 +240,13 @@ public interface IPreferenceConstants {
     /**
 	 * Preference that restores the 3.2 startup threading behavior. This
 	 * essentially means that there will be no restrictions on what runnables
-	 * will be processed via the UI synchronizer.
-	 *
+	 * will be processed via the UI synchronizer.  
+	 * 
 	 * <p>
 	 * This preference will likely disappear in 3.5 in favor of a proper
 	 * solution to bug 219913.
 	 * </p>
-	 *
+	 * 
 	 * @since 3.4
 	 */
 	public static final String USE_32_THREADING = "use32Threading"; //$NON-NLS-1$
@@ -244,24 +255,9 @@ public interface IPreferenceConstants {
 	 * Preference value that specifies the time interval in minutes between
 	 * workbench auto-saves. If the value is zero it disables workbench
 	 * auto-save.
-	 *
+	 * 
 	 * @since 3.105
 	 */
 	public static final String WORKBENCH_SAVE_INTERVAL = "WORKBENCH_SAVE_INTERVAL"; //$NON-NLS-1$
-
-	/**
-	 * This preference is the threshold value to determine whether a document is
-	 * large or not. When the user tries to open a file larger than the
-	 * threshold, then EditorSelectionDialog will be opened, suggesting the user
-	 * to open with an external editor.
-	 * <p>
-	 * This preference is a <code>long</code> value that represents the
-	 * threshold in bytes. The default value is <code>0</code> meaning no
-	 * prompting on editor opening.
-	 * </p>
-	 *
-	 * @since 3.7
-	 */
-	public static final String LARGE_DOC_SIZE_FOR_EDITORS = "LARGE_DOC_SIZE_FOR_EDITORS"; //$NON-NLS-1$
 
 }

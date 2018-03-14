@@ -41,7 +41,7 @@ import org.eclipse.ui.statushandlers.WorkbenchStatusDialogManager;
  * This class will be visible only if it is enabled in
  * {@link WorkbenchStatusDialogManager} and no support provider is passed by
  * {@link Policy}
- *
+ * 
  * @see Policy#setErrorSupportProvider
  * @see Policy#getErrorSupportProvider()
  * @see WorkbenchStatusDialogManager#enableDefaultSupportArea
@@ -55,6 +55,12 @@ public class StackTraceSupportArea extends AbstractStatusAreaProvider {
 	 */
 	private List list;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.statushandlers.AbstractStatusAreaProvider#createSupportArea(org.eclipse.swt.widgets.Composite,
+	 *      org.eclipse.ui.statushandlers.StatusAdapter)
+	 */
 	@Override
 	public Control createSupportArea(final Composite parent,
 			StatusAdapter statusAdapter) {
@@ -69,6 +75,11 @@ public class StackTraceSupportArea extends AbstractStatusAreaProvider {
 		gd.widthHint = 250;
 		list.setLayoutData(gd);
 		list.addSelectionListener(new SelectionAdapter() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+			 */
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				list.selectAll();
@@ -113,6 +124,13 @@ public class StackTraceSupportArea extends AbstractStatusAreaProvider {
 		MenuItem copyAction = new MenuItem(menu, SWT.PUSH);
 		copyAction.setText("&Copy"); //$NON-NLS-1$
 		copyAction.addSelectionListener(new SelectionAdapter() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see
+			 * org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse
+			 * .swt.events.SelectionEvent)
+			 */
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Clipboard clipboard = null;

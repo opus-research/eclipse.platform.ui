@@ -44,7 +44,6 @@ public class EventBrokerTest extends UITest {
 		assertNotNull(eb);
 
 		eb.subscribe(TEST_TOPIC, new EventHandler() {
-			@Override
 			public void handleEvent(Event event) {
 				if (TEST_TOPIC.equals(event.getTopic())) {
 					seen.incrementAndGet();
@@ -67,7 +66,6 @@ public class EventBrokerTest extends UITest {
 		IEventBroker subscriber = child.get(IEventBroker.class);
 		assertNotNull(subscriber);
 		subscriber.subscribe(TEST_TOPIC, new EventHandler() {
-			@Override
 			public void handleEvent(Event event) {
 				if (TEST_TOPIC.equals(event.getTopic())) {
 					seen.incrementAndGet();
@@ -89,7 +87,6 @@ public class EventBrokerTest extends UITest {
 		IEventBroker eb = context.get(IEventBroker.class);
 		assertNotNull(eb);
 		EventHandler handler = new EventHandler() {
-			@Override
 			public void handleEvent(Event event) {
 				if (TEST_TOPIC.equals(event.getTopic())) {
 					seen.incrementAndGet();

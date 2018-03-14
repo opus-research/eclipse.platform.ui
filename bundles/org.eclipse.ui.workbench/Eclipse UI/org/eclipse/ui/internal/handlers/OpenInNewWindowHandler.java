@@ -26,10 +26,15 @@ import org.eclipse.ui.statushandlers.StatusManager;
 
 /**
  * @since 3.4
- *
+ * 
  */
 public class OpenInNewWindowHandler extends AbstractHandler {
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow activeWorkbenchWindow = HandlerUtil
@@ -50,7 +55,7 @@ public class OpenInNewWindowHandler extends AbstractHandler {
 				perspId = activeWorkbenchWindow.getWorkbench()
 						.getPerspectiveRegistry().getDefaultPerspective();
 			}
-
+			
 			activeWorkbenchWindow.getWorkbench().openWorkbenchWindow(perspId,
 					pageInput);
 		} catch (WorkbenchException e) {

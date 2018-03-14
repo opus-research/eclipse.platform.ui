@@ -21,12 +21,14 @@ import org.eclipse.ui.internal.ConfigurationInfo;
 
 /**
  * Copies the configuration data present in the about dialog to the clipboard.
- *
+ * 
  * @since 3.4
  */
 public class CopyConfigToClipboardHandler extends AbstractHandler {
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
 	public Object execute(ExecutionEvent event) {
 		String contents = ConfigurationInfo.getSystemSummary();
 		Clipboard clipboard = null;

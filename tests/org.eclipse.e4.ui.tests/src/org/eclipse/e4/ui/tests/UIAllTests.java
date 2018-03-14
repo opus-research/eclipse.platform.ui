@@ -11,6 +11,8 @@
 
 package org.eclipse.e4.ui.tests;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
 import org.eclipse.e4.ui.tests.application.Bug299755Test;
 import org.eclipse.e4.ui.tests.application.Bug308220Test;
 import org.eclipse.e4.ui.tests.application.Bug320857Test;
@@ -22,8 +24,6 @@ import org.eclipse.e4.ui.tests.application.UIEventTypesTest;
 import org.eclipse.e4.ui.tests.reconciler.ModelReconcilerTestSuite;
 import org.eclipse.e4.ui.tests.workbench.Bug308317Test;
 import org.eclipse.e4.ui.tests.workbench.ContextTest;
-import org.eclipse.e4.ui.tests.workbench.ExtensionsSortTests;
-import org.eclipse.e4.ui.tests.workbench.HandlerActivationTest;
 import org.eclipse.e4.ui.tests.workbench.HandlerTest;
 import org.eclipse.e4.ui.tests.workbench.InjectionEventTest;
 import org.eclipse.e4.ui.tests.workbench.MMenuItemTest;
@@ -40,47 +40,46 @@ import org.eclipse.e4.ui.tests.workbench.TopoSortTests;
 import org.eclipse.e4.ui.workbench.renderers.swt.StackRendererTest;
 import org.eclipse.e4.ui.workbench.renderers.swt.TabStateHandlerTest;
 import org.eclipse.e4.ui.workbench.renderers.swt.ThemeDefinitionChangedHandlerTest;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
 
 //import org.eclipse.e4.ui.workbench.renderers.swt.StackRendererTest;
 
 /**
- * All E4 UI-related tests
+ *
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
+public class UIAllTests extends TestSuite {
+	public static Test suite() {
+		return new UIAllTests();
+	}
+
+	public UIAllTests() {
 		// Hack: bug 422676, run InjectionEventTest first
-		InjectionEventTest.class, 
-		StartupTestSuite.class, 
-		UIEventTypesTest.class, 
-		Bug299755Test.class,
-		Bug308220Test.class, 
-		Bug320857Test.class, 
-		PartRenderingEngineTests.class, 
-		SashRendererTest.class,
-		MMenuItemTest.class, 
-		MPartTest.class, 
-		MPartSashContainerTest.class, 
-		MSaveablePartTest.class,
-		MToolItemTest.class, 
-		MWindowTest.class, 
-		MSashTest.class, 
-		HandlerTest.class, 
-		ContextTest.class,
-		ModelReconcilerTestSuite.class, 
-		Bug308317Test.class, 
-		ModelRobustnessTest.class, 
-		ResourceHandlerTest.class,
-		PartFocusTest.class, 
-		ModelElementTest.class, 
-		StackRendererTest.class, 
-		TabStateHandlerTest.class,
-		ThemeDefinitionChangedHandlerTest.class, 
-		TopoSortTests.class, 
-		ExtensionsSortTests.class,
-		HandlerActivationTest.class,
-		// SWTPartRendererTest.class,
-})
-public class UIAllTests {
+		addTestSuite(InjectionEventTest.class);
+		addTest(StartupTestSuite.suite());
+		addTestSuite(UIEventTypesTest.class);
+		addTestSuite(Bug299755Test.class);
+		addTestSuite(Bug308220Test.class);
+		addTestSuite(Bug320857Test.class);
+		addTestSuite(PartRenderingEngineTests.class);
+		addTestSuite(SashRendererTest.class);
+		addTestSuite(MMenuItemTest.class);
+		addTestSuite(MPartTest.class);
+		addTestSuite(MPartSashContainerTest.class);
+		addTestSuite(MSaveablePartTest.class);
+		addTestSuite(MToolItemTest.class);
+		addTestSuite(MWindowTest.class);
+		addTestSuite(MSashTest.class);
+		addTestSuite(HandlerTest.class);
+		addTestSuite(ContextTest.class);
+		addTest(ModelReconcilerTestSuite.suite());
+		addTestSuite(Bug308317Test.class);
+		addTestSuite(ModelRobustnessTest.class);
+		addTestSuite(ResourceHandlerTest.class);
+		addTestSuite(PartFocusTest.class);
+		addTestSuite(ModelElementTest.class);
+		addTestSuite(StackRendererTest.class);
+		addTestSuite(TabStateHandlerTest.class);
+		addTestSuite(ThemeDefinitionChangedHandlerTest.class);
+		addTestSuite(TopoSortTests.class);
+		// addTestSuite(SWTPartRendererTest.class);
+	}
 }

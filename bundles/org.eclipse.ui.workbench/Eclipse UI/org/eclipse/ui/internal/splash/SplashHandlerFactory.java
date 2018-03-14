@@ -28,7 +28,7 @@ import org.eclipse.ui.splash.AbstractSplashHandler;
 
 /**
  * Simple non-caching access to the splashHandler extension point.
- *
+ * 
  * @since 3.3
  */
 public final class SplashHandlerFactory {
@@ -36,7 +36,7 @@ public final class SplashHandlerFactory {
 	/**
 	 * Find the splash handler for the given product or <code>null</code> if
 	 * it cannot be found.
-	 *
+	 * 
 	 * @param product
 	 *            the product
 	 * @return the splash or <code>null</code>
@@ -71,7 +71,7 @@ public final class SplashHandlerFactory {
 
 	/**
 	 * Process a given element.
-	 *
+	 * 
 	 * @param configurationElement
 	 *            the element to process
 	 * @param idToSplash
@@ -121,7 +121,7 @@ public final class SplashHandlerFactory {
 
 	/**
 	 * Create the splash implementation.
-	 *
+	 * 
 	 * @param splashElement
 	 *            the element to create from
 	 * @return the element or <code>null</code> if it couldn't be created
@@ -131,6 +131,11 @@ public final class SplashHandlerFactory {
 		final AbstractSplashHandler[] handler = new AbstractSplashHandler[1];
 		SafeRunner.run(new SafeRunnable() {
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.core.runtime.ISafeRunnable#run()
+			 */
 			@Override
 			public void run() throws Exception {
 				handler[0] = (AbstractSplashHandler) WorkbenchPlugin
@@ -138,6 +143,11 @@ public final class SplashHandlerFactory {
 								IWorkbenchRegistryConstants.ATT_CLASS);
 			}
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.util.SafeRunnable#handleException(java.lang.Throwable)
+			 */
 			@Override
 			public void handleException(Throwable e) {
 				WorkbenchPlugin

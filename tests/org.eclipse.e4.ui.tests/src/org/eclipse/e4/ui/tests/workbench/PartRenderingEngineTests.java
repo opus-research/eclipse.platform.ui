@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,13 +7,11 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Sopot Cela <scela@redhat.com> - Bug 474183
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.workbench;
 
 import junit.framework.TestCase;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
@@ -58,7 +56,6 @@ public class PartRenderingEngineTests extends TestCase {
 	protected E4Workbench wb;
 
 	private LogListener listener = new LogListener() {
-		@Override
 		public void logged(LogEntry entry) {
 			if (!logged) {
 				logged = entry.getLevel() == LogService.LOG_ERROR;
@@ -66,15 +63,6 @@ public class PartRenderingEngineTests extends TestCase {
 		}
 	};
 	private boolean logged = false;
-
-	private boolean checkMacBug466636() {
-		if (Platform.OS_MACOSX.equals(Platform.getOS())) {
-			System.out.println("skipping " + PartRenderingEngineTests.class.getName() + "#" + getName()
-					+ " on Mac for now, see bug 466636");
-			return true;
-		}
-		return false;
-	}
 
 	@Override
 	protected void setUp() throws Exception {
@@ -937,9 +925,6 @@ public class PartRenderingEngineTests extends TestCase {
 	}
 
 	public void testBug324839() throws Exception {
-		if (checkMacBug466636())
-			return;
-
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		application.setContext(appContext);
@@ -2147,8 +2132,6 @@ public class PartRenderingEngineTests extends TestCase {
 	}
 
 	public void testBug326175_False() {
-		if (checkMacBug466636())
-			return;
 		testBug326175(false);
 	}
 
@@ -3280,10 +3263,6 @@ public class PartRenderingEngineTests extends TestCase {
 		MToolBar toolBar = MenuFactoryImpl.eINSTANCE.createToolBar();
 		trim.getChildren().add(toolBar);
 
-		// dummy control is used to keep the toolbar visible
-		MToolControl dummyToolControl = MenuFactoryImpl.eINSTANCE.createToolControl();
-		toolBar.getChildren().add(dummyToolControl);
-
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		application.getChildren().add(window);
@@ -3412,81 +3391,5 @@ public class PartRenderingEngineTests extends TestCase {
 				view.isStatePersisted());
 		assertNull(part.getObject());
 		assertNull(part.getContext());
-	}
-
-	public void testCurSharedRefBug457939() {
-		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
-		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
-		application.getChildren().add(window);
-		application.setSelectedElement(window);
-
-		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
-		part.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
-
-		window.getSharedElements().add(part);
-
-		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE.createPerspectiveStack();
-		window.getChildren().add(perspectiveStack);
-		window.setSelectedElement(perspectiveStack);
-
-		MPerspective perspectiveA = AdvancedFactoryImpl.eINSTANCE.createPerspective();
-		perspectiveA.setElementId("perspectiveA"); //$NON-NLS-1$
-		perspectiveStack.getChildren().add(perspectiveA);
-		perspectiveStack.setSelectedElement(perspectiveA);
-
-		MPartStack partStackA = BasicFactoryImpl.eINSTANCE.createPartStack();
-		perspectiveA.getChildren().add(partStackA);
-		perspectiveA.setSelectedElement(partStackA);
-
-		assertNull(part.getCurSharedRef());
-
-		MPlaceholder placeholderA = AdvancedFactoryImpl.eINSTANCE.createPlaceholder();
-		placeholderA.setRef(part);
-		part.setCurSharedRef(placeholderA);
-		partStackA.getChildren().add(placeholderA);
-		partStackA.setSelectedElement(placeholderA);
-
-		assertEquals(placeholderA, part.getCurSharedRef());
-
-		MPerspective perspectiveB = AdvancedFactoryImpl.eINSTANCE.createPerspective();
-		perspectiveB.setElementId("perspectiveB"); //$NON-NLS-1$
-		perspectiveStack.getChildren().add(perspectiveB);
-
-		MPartStack partStackB = BasicFactoryImpl.eINSTANCE.createPartStack();
-		perspectiveB.getChildren().add(partStackB);
-		perspectiveB.setSelectedElement(partStackB);
-
-		MPlaceholder placeholderB = AdvancedFactoryImpl.eINSTANCE.createPlaceholder();
-		placeholderB.setRef(part);
-		partStackB.getChildren().add(placeholderB);
-		partStackB.setSelectedElement(placeholderB);
-
-		assertEquals(placeholderA, part.getCurSharedRef());
-
-		application.setContext(appContext);
-		appContext.set(MApplication.class.getName(), application);
-
-		wb = new E4Workbench(application, appContext);
-		wb.createAndRunUI(window);
-
-		Shell limboShell = (Shell) appContext.get("limbo");
-		assertNotNull(limboShell);
-
-		EPartService partService = window.getContext().get(EPartService.class);
-		partService.switchPerspective(perspectiveB);
-		assertEquals(placeholderB, part.getCurSharedRef());
-
-		partService.switchPerspective(perspectiveA);
-		assertEquals(placeholderA, part.getCurSharedRef());
-
-		EModelService modelService = window.getContext().get(EModelService.class);
-
-		modelService.removePerspectiveModel(perspectiveA, window);
-		assertEquals(perspectiveB, modelService.getActivePerspective(window));
-		assertEquals(placeholderB, part.getCurSharedRef());
-
-		partService.switchPerspective(perspectiveB);
-		modelService.removePerspectiveModel(perspectiveB, window);
-		assertNull(part.getCurSharedRef());
 	}
 }

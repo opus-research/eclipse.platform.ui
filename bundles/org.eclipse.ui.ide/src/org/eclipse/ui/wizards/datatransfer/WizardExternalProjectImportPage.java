@@ -26,7 +26,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardPage;
@@ -40,6 +40,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
@@ -66,8 +67,13 @@ import org.eclipse.ui.internal.wizards.datatransfer.DataTransferMessages;
  */
 public class WizardExternalProjectImportPage extends WizardPage {
 
-    private FileFilter projectFilter = pathName -> pathName.getName().equals(
-	        IProjectDescription.DESCRIPTION_FILE_NAME);
+    private FileFilter projectFilter = new FileFilter() {
+        //Only accept those files that are .project
+        public boolean accept(File pathName) {
+            return pathName.getName().equals(
+                    IProjectDescription.DESCRIPTION_FILE_NAME);
+        }
+    };
 
     //Keep track of the directory that we browsed to last time
     //the wizard was invoked.
@@ -82,7 +88,11 @@ public class WizardExternalProjectImportPage extends WizardPage {
 
     private IProjectDescription description;
 
-    private Listener locationModifyListener = e -> setPageComplete(validatePage());
+    private Listener locationModifyListener = new Listener() {
+        public void handleEvent(Event e) {
+            setPageComplete(validatePage());
+        }
+    };
 
     // constants
     private static final int SIZING_TEXT_FIELD_WIDTH = 250;
@@ -99,8 +109,10 @@ public class WizardExternalProjectImportPage extends WizardPage {
 
     }
 
-    @Override
-	public void createControl(Composite parent) {
+    /** (non-Javadoc)
+     * Method declared on IDialogPage.
+     */
+    public void createControl(Composite parent) {
 
         initializeDialogUnits(parent);
 
@@ -200,8 +212,7 @@ public class WizardExternalProjectImportPage extends WizardPage {
         setButtonLayoutData(this.browseButton);
 
         this.browseButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent event) {
+            public void widgetSelected(SelectionEvent event) {
                 handleLocationBrowseButtonPressed();
             }
         });
@@ -210,7 +221,7 @@ public class WizardExternalProjectImportPage extends WizardPage {
     }
 
     /**
-     * Returns the current project location path as entered by
+     * Returns the current project location path as entered by 
      * the user, or its anticipated initial value.
      *
      * @return the project location path, its anticipated initial value, or <code>null</code>
@@ -249,7 +260,7 @@ public class WizardExternalProjectImportPage extends WizardPage {
     /**
      * Returns the value of the project name field
      * with leading and trailing spaces removed.
-     *
+     * 
      * @return the project name in the field
      */
     private String getProjectNameFieldValue() {
@@ -263,7 +274,7 @@ public class WizardExternalProjectImportPage extends WizardPage {
     /**
      * Returns the value of the project location field
      * with leading and trailing spaces removed.
-     *
+     * 
      * @return the project location directory in the field
      */
     private String getProjectLocationFieldValue() {
@@ -302,7 +313,7 @@ public class WizardExternalProjectImportPage extends WizardPage {
     }
 
     /**
-     * Returns whether this page's controls currently all contain valid
+     * Returns whether this page's controls currently all contain valid 
      * values.
      *
      * @return <code>true</code> if all controls are valid, and
@@ -356,7 +367,7 @@ public class WizardExternalProjectImportPage extends WizardPage {
 
     /**
      * Set the project name using either the name of the
-     * parent of the file or the name entry in the xml for
+     * parent of the file or the name entry in the xml for 
      * the file
      */
     private void setProjectName(File projectFile) {
@@ -434,15 +445,16 @@ public class WizardExternalProjectImportPage extends WizardPage {
 
         // create the new project operation
         WorkspaceModifyOperation op = new WorkspaceModifyOperation() {
-            @Override
-			protected void execute(IProgressMonitor monitor)
+            protected void execute(IProgressMonitor monitor)
                     throws CoreException {
-				SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
-				project.create(description, subMonitor.newChild(50));
-				if (subMonitor.isCanceled()) {
+                monitor.beginTask("", 2000); //$NON-NLS-1$
+                project.create(description, new SubProgressMonitor(monitor,
+                        1000));
+                if (monitor.isCanceled()) {
 					throw new OperationCanceledException();
 				}
-				project.open(IResource.BACKGROUND_REFRESH, subMonitor.newChild(50));
+                project.open(IResource.BACKGROUND_REFRESH, new SubProgressMonitor(monitor, 1000));
+
             }
         };
 
@@ -452,7 +464,7 @@ public class WizardExternalProjectImportPage extends WizardPage {
         } catch (InterruptedException e) {
             return null;
         } catch (InvocationTargetException e) {
-            // ie.- one of the steps resulted in a core exception
+            // ie.- one of the steps resulted in a core exception	
             Throwable t = e.getTargetException();
             if (t instanceof CoreException) {
                 if (((CoreException) t).getStatus().getCode() == IResourceStatus.CASE_VARIANT_EXISTS) {
@@ -482,8 +494,7 @@ public class WizardExternalProjectImportPage extends WizardPage {
     /*
      * see @DialogPage.setVisible(boolean)
      */
-    @Override
-	public void setVisible(boolean visible) {
+    public void setVisible(boolean visible) {
         super.setVisible(visible);
         if (visible) {
 			this.locationPathField.setFocus();

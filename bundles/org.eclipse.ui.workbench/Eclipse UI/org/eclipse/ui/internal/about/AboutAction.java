@@ -38,7 +38,7 @@ public class AboutAction extends Action implements
 
     /**
      * Creates a new <code>AboutAction</code>.
-     *
+     * 
      * @param window the window
      */
     public AboutAction(IWorkbenchWindow window) {
@@ -65,6 +65,9 @@ public class AboutAction extends Action implements
 				IWorkbenchHelpContextIds.ABOUT_ACTION);
     }
 
+    /*
+     * (non-Javadoc) Method declared on IAction.
+     */
     @Override
 	public void run() {
         // make sure action is not disposed
@@ -73,6 +76,9 @@ public class AboutAction extends Action implements
 		}
     }
 
+    /*
+     * (non-Javadoc) Method declared on ActionFactory.IWorkbenchAction.
+     */
     @Override
 	public void dispose() {
         workbenchWindow = null;

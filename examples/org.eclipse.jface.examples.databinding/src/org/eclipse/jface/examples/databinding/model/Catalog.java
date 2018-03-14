@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,22 +24,22 @@ public class Catalog extends ModelObject {
 	private Transportation[] transportations = new Transportation[0];
 
 	private Account[] accounts = new Account[0];
-
-	private List<Signon> signons = new ArrayList<>();
-
-	public List<Signon> getSignons() {
+	
+	private List signons = new ArrayList();
+	
+	public List getSignons(){
 		return signons;
 	}
-
+	
 	public void addSignon(Signon aSignon){
 		signons.add(aSignon);
 		firePropertyChange("signons",null,null);
 	}
-
+	
 	public void removeSignon(Signon aSignon){
 		signons.remove(aSignon);
 		firePropertyChange("signons",null,null);
-	}
+	}	
 
 	public Category[] getCategories() {
 		return categories;
@@ -73,16 +73,16 @@ public class Catalog extends ModelObject {
 		lodgings = (Lodging[]) remove(lodgings, lodging);
 		firePropertyChange("lodgings", null, null);
 	}
-
+	
 	public void removeAccount(Account anAccount) {
 		accounts = (Account[]) remove(accounts, anAccount);
 		firePropertyChange("accounts", null, null);
-	}
+	}	
 
 	public Account[] getAccounts() {
 		return accounts;
 	}
-
+	
 	public Transportation[] getTransporations(){
 		return transportations;
 	}

@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Red Hat, Inc - Was TarFileStructureProvider, performed changes from
+ *     Red Hat, Inc - Was TarFileStructureProvider, performed changes from 
  *     IImportStructureProvider to ILeveledImportStructureProvider
  *******************************************************************************/
 package org.eclipse.ui.internal.wizards.datatransfer;
@@ -28,7 +28,7 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 /**
  * This class provides information regarding the context structure and content
  * of specified tar file entry objects.
- *
+ * 
  * @since 3.1
  */
 public class TarLeveledStructureProvider implements
@@ -46,7 +46,7 @@ public class TarLeveledStructureProvider implements
 	/**
 	 * Creates a <code>TarFileStructureProvider</code>, which will operate on
 	 * the passed tar file.
-	 *
+	 * 
 	 * @param sourceFile
 	 *            the source TarFile
 	 */
@@ -57,7 +57,7 @@ public class TarLeveledStructureProvider implements
 	}
 
 	/**
-	 * Creates a new container tar entry with the specified name, iff it has
+	 * Creates a new container tar entry with the specified name, iff it has 
 	 * not already been created. If the parent of the given element does not
 	 * already exist it will be recursively created as well.
 	 * @param pathname The path representing the container
@@ -103,7 +103,9 @@ public class TarLeveledStructureProvider implements
 		childList.add(entry);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IImportStructureProvider
+	 */
 	public List getChildren(Object element) {
 		if (children == null) {
 			initialize();
@@ -112,7 +114,9 @@ public class TarLeveledStructureProvider implements
 		return ((List) children.get(element));
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IImportStructureProvider
+	 */
 	public InputStream getContents(Object element) {
 		try {
 			return tarFile.getInputStream((TarEntry) element);
@@ -127,7 +131,7 @@ public class TarLeveledStructureProvider implements
 
 	/**
 	 * Returns the resource attributes for this file.
-	 *
+	 * 
 	 * @param element
 	 * @return the attributes of the file
 	 */
@@ -139,12 +143,16 @@ public class TarLeveledStructureProvider implements
 		return attributes;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IImportStructureProvider
+	 */
 	public String getFullPath(Object element) {
 		return stripPath(((TarEntry) element).getName());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IImportStructureProvider
+	 */
 	public String getLabel(Object element) {
 		if (element.equals(root)) {
 			return ((TarEntry) element).getName();
@@ -155,24 +163,26 @@ public class TarLeveledStructureProvider implements
 
 	/**
 	 * Returns the entry that this importer uses as the root sentinel.
-	 *
+	 * 
 	 * @return TarEntry entry
 	 */
-	@Override
 	public Object getRoot() {
 		return root;
 	}
 
 	/**
 	 * Returns the tar file that this provider provides structure for.
-	 *
+	 * 
 	 * @return TarFile file
 	 */
 	public TarFile getTarFile() {
 		return tarFile;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.internal.wizards.datatransfer.ILeveledImportStructureProvider#closeArchive()
+	 */
 	public boolean closeArchive(){
 		try {
 			getTarFile().close();
@@ -183,20 +193,20 @@ public class TarLeveledStructureProvider implements
 		}
 		return true;
 	}
-
+	
 	/**
 	 * Initializes this object's children table based on the contents of the
 	 * specified source file.
 	 */
 	protected void initialize() {
 		children = new HashMap(1000);
-
+		
 		children.put(root, new ArrayList());
 		Enumeration entries = tarFile.entries();
 		while (entries.hasMoreElements()) {
 			TarEntry entry = (TarEntry) entries.nextElement();
 			IPath path = new Path(entry.getName()).addTrailingSeparator();
-
+			
 			if (entry.getFileType() == TarEntry.DIRECTORY) {
 				createContainer(path);
 			} else
@@ -211,8 +221,10 @@ public class TarLeveledStructureProvider implements
 			}
 		}
 	}
-
-	@Override
+	
+	/*
+	 * (non-Javadoc) Method declared on IImportStructureProvider
+	 */
 	public boolean isFolder(Object element) {
 		return (((TarEntry) element).getFileType() == TarEntry.DIRECTORY);
 	}
@@ -240,12 +252,10 @@ public class TarLeveledStructureProvider implements
 		return path;
 	}
 
-	@Override
 	public void setStrip(int level) {
 		stripLevel = level;
 	}
 
-	@Override
 	public int getStrip() {
 		return stripLevel;
 	}

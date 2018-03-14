@@ -48,7 +48,7 @@ import org.eclipse.ui.progress.UIJob;
  * including the display and population of the context menu and the registration
  * of extensions for opening content.
  * </p>
- *
+ * 
  * @noinstantiate This class is not intended to be instantiated by clients.
  * @since 3.4
  */
@@ -67,27 +67,24 @@ public final class CommonNavigatorManager implements ISelectionChangedListener {
 	private final ILabelProvider labelProvider;
 
 	private UpdateActionBarsJob updateActionBars;
-
+	
 	private ISelectionChangedListener statusBarListener = new ISelectionChangedListener() {
 
-		@Override
 		public void selectionChanged(SelectionChangedEvent anEvent) {
 			updateStatusBar(anEvent.getSelection());
 		}
-
+		
 	};
+	
 
-
-
+	
 	private class UpdateActionBarsJob extends UIJob {
 		public UpdateActionBarsJob(String label) {
 			super(label);
 		}
-
-		@Override
+		  
 		public IStatus runInUIThread(IProgressMonitor monitor) {
 			SafeRunner.run(new NavigatorSafeRunnable() {
-				@Override
 				public void run() throws Exception {
 					if(commonNavigator.getCommonViewer().getInput() != null) {
 						IStructuredSelection selection = new StructuredSelection(commonNavigator.getCommonViewer().getInput());
@@ -105,7 +102,7 @@ public final class CommonNavigatorManager implements ISelectionChangedListener {
 	 * Adds listeners to aNavigator to listen for selection changes and respond
 	 * to mouse events.
 	 * </p>
-	 *
+	 * 
 	 * @param aNavigator
 	 *            The CommonNavigator managed by this class. Requires a non-null
 	 *            value.
@@ -113,13 +110,13 @@ public final class CommonNavigatorManager implements ISelectionChangedListener {
 	public CommonNavigatorManager(CommonNavigator aNavigator) {
 		this(aNavigator, null);
 	}
-
+	
 	/**
 	 * <p>
 	 * Adds listeners to aNavigator to listen for selection changes and respond
 	 * to mouse events.
 	 * </p>
-	 *
+	 * 
 	 * @param aNavigator
 	 *            The CommonNavigator managed by this class. Requires a non-null
 	 *            value.
@@ -135,15 +132,15 @@ public final class CommonNavigatorManager implements ISelectionChangedListener {
 				.createCommonDescriptionProvider();
 		labelProvider = (ILabelProvider) commonNavigator.getCommonViewer()
 				.getLabelProvider();
-
+	
 		init(aMemento);
 	}
 
 
 	private void init(IMemento memento) {
-
+		
 		updateActionBars = new UpdateActionBarsJob(commonNavigator.getTitle());
-
+		
 		CommonViewer commonViewer = commonNavigator.getCommonViewer();
 		commonViewer.addSelectionChangedListener(this);
 		commonViewer.addPostSelectionChangedListener(statusBarListener);
@@ -161,7 +158,6 @@ public final class CommonNavigatorManager implements ISelectionChangedListener {
 		openAction.setActionDefinitionId(ICommonActionConstants.OPEN);
 
 		new OpenAndLinkWithEditorHelper(commonNavigator.getCommonViewer()) {
-			@Override
 			protected void activate(ISelection selection) {
 				final int currentMode = OpenStrategy.getOpenMethod();
 				try {
@@ -179,23 +175,21 @@ public final class CommonNavigatorManager implements ISelectionChangedListener {
 				}
 			}
 
-			@Override
 			protected void linkToEditor(ISelection selection) {
 				// do nothing: this is handled by org.eclipse.ui.internal.navigator.actions.LinkEditorAction
 			}
 
-			@Override
 			protected void open(ISelection selection, boolean activate) {
 				actionService.setContext(new ActionContext(commonNavigator.getCommonViewer().getSelection()));
 				actionService.fillActionBars(commonNavigator.getViewSite().getActionBars());
 				openAction.run();
 			}
-
+			
 		};
 
 		if(memento != null)
 			restoreState(memento);
-
+		
 		initContextMenu();
 		initViewMenu();
 
@@ -204,7 +198,7 @@ public final class CommonNavigatorManager implements ISelectionChangedListener {
 	/**
 	 * <p>
 	 * Called by {@link CommonNavigator} when the View Part is disposed.
-	 *
+	 * 
 	 */
 	public void dispose() {
 		commonNavigator.getCommonViewer().removeSelectionChangedListener(this);
@@ -213,14 +207,13 @@ public final class CommonNavigatorManager implements ISelectionChangedListener {
 	}
 
 	/**
-	 *
+	 * 
 	 * @param anEvent
 	 *            An event indicating the current selection of the
 	 *            {@link CommonViewer}
-	 *
+	 * 
 	 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
 	 */
-	@Override
 	public void selectionChanged(SelectionChangedEvent anEvent) {
 		if (anEvent.getSelection() instanceof IStructuredSelection) {
 			IStructuredSelection structuredSelection = (IStructuredSelection) anEvent
@@ -238,7 +231,7 @@ public final class CommonNavigatorManager implements ISelectionChangedListener {
 	 */
 	public void restoreState(IMemento aMemento) {
 		actionService.restoreState(aMemento);
-
+		 
 	}
 
 	/**
@@ -255,11 +248,11 @@ public final class CommonNavigatorManager implements ISelectionChangedListener {
 	 * Fills aMenuManager with menu contributions from the
 	 * {@link NavigatorActionService}.
 	 * </p>
-	 *
+	 * 
 	 * @param aMenuManager
 	 *            A popup menu
 	 * @see NavigatorActionService#fillContextMenu(IMenuManager)
-	 *
+	 * 
 	 */
 	protected void fillContextMenu(IMenuManager aMenuManager) {
 		ISelection selection = commonNavigator.getCommonViewer().getSelection();
@@ -278,7 +271,6 @@ public final class CommonNavigatorManager implements ISelectionChangedListener {
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 
-			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				fillContextMenu(manager);
 			}
@@ -299,9 +291,9 @@ public final class CommonNavigatorManager implements ISelectionChangedListener {
 		viewMenu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		viewMenu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS
 				+ "-end"));//$NON-NLS-1$
-
+		
 		updateActionBars.schedule(NavigatorPlugin.ACTION_BAR_DELAY);
-
+		
 	}
 
 	/**
@@ -322,7 +314,7 @@ public final class CommonNavigatorManager implements ISelectionChangedListener {
 	}
 
 	/**
-	 *
+	 * 
 	 * @return The action service used by this manager
 	 */
 	public NavigatorActionService getNavigatorActionService() {

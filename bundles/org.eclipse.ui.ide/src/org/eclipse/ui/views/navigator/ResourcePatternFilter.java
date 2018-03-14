@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.Adapters;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -24,11 +24,10 @@ import org.eclipse.ui.internal.util.PrefUtil;
 
 /**
  * Filter used to determine whether resources are to be shown or not.
- *
+ * 
  * @since 2.0
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
-@Deprecated
 public class ResourcePatternFilter extends ViewerFilter {
     private String[] patterns;
 
@@ -122,9 +121,17 @@ public class ResourcePatternFilter extends ViewerFilter {
 
     }
 
-    @Override
-	public boolean select(Viewer viewer, Object parentElement, Object element) {
-		IResource resource = Adapters.getAdapter(element, IResource.class, true);
+    /* (non-Javadoc)
+     * Method declared on ViewerFilter.
+     */
+    public boolean select(Viewer viewer, Object parentElement, Object element) {
+        IResource resource = null;
+        if (element instanceof IResource) {
+            resource = (IResource) element;
+        } else if (element instanceof IAdaptable) {
+            IAdaptable adaptable = (IAdaptable) element;
+            resource = (IResource) adaptable.getAdapter(IResource.class);
+        }
         if (resource != null) {
             String name = resource.getName();
             StringMatcher[] testMatchers = getMatchers();

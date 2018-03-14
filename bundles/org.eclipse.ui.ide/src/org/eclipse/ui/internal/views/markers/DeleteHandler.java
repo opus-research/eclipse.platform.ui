@@ -28,13 +28,17 @@ import org.eclipse.ui.views.markers.internal.MarkerMessages;
 
 /**
  * DeleteHandler is the handler for the deletion of a marker.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class DeleteHandler extends MarkerViewHandler {
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
 	public Object execute(ExecutionEvent event) {
 
 		final MarkerSupportView view = getView(event);
@@ -42,7 +46,7 @@ public class DeleteHandler extends MarkerViewHandler {
 			return this;
 
 		final IMarker[] selected = getSelectedMarkers(event);
-
+		
 		// Verify.
 		MessageDialog dialog = new MessageDialog(
 				view.getSite().getShell(),
@@ -56,9 +60,8 @@ public class DeleteHandler extends MarkerViewHandler {
 		if (dialog.open() != 0) {
 			return view;
 		}
-
+		
 		WorkspaceJob deleteJob= new WorkspaceJob(IDEWorkbenchMessages.MarkerDeleteHandler_JobTitle) { //See Bug#250807
-			@Override
 			public IStatus runInWorkspace(IProgressMonitor monitor) {
 				monitor.beginTask(IDEWorkbenchMessages.MarkerDeleteHandler_JobMessageLabel, 10 * selected.length);
 				try {

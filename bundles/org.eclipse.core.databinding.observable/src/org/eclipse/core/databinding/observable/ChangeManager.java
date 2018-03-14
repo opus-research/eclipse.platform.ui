@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bugs 118516, 255734
  *     Chris Audley - bug 273265
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable;
@@ -20,9 +19,9 @@ import org.eclipse.core.runtime.ListenerList;
 /**
  * Listener management implementation. Exposed to subclasses in form of
  * {@link AbstractObservable} and {@link ChangeSupport}.
- *
+ * 
  * @since 1.0
- *
+ * 
  */
 /* package */class ChangeManager {
 
@@ -32,7 +31,7 @@ import org.eclipse.core.runtime.ListenerList;
 
 	/**
 	 * @param realm
-	 *
+	 * 
 	 */
 	/* package */ChangeManager(Realm realm) {
 		Assert.isNotNull(realm, "Realm cannot be null"); //$NON-NLS-1$
@@ -56,8 +55,10 @@ import org.eclipse.core.runtime.ListenerList;
 				length = listenerTypes.length;
 				System.arraycopy(listenerTypes, 0,
 						listenerTypes = new Object[length + 1], 0, length);
-				System.arraycopy(listenerLists, 0,
-						listenerLists = new ListenerList[length + 1], 0, length);
+				System
+						.arraycopy(listenerLists, 0,
+								listenerLists = new ListenerList[length + 1],
+								0, length);
 			}
 			listenerTypes[length] = listenerType;
 			listenerLists[length] = new ListenerList();
@@ -121,19 +122,19 @@ import org.eclipse.core.runtime.ListenerList;
 	}
 
 	/**
-	 *
+	 * 
 	 */
 	protected void firstListenerAdded() {
 	}
 
 	/**
-	 *
+	 * 
 	 */
 	protected void lastListenerRemoved() {
 	}
 
 	/**
-	 *
+	 * 
 	 */
 	public void dispose() {
 		listenerLists = null;
@@ -147,7 +148,6 @@ import org.eclipse.core.runtime.ListenerList;
 		return realm;
 	}
 
-	@Override
 	protected Object clone() throws CloneNotSupportedException {
 		ChangeManager duplicate = (ChangeManager) super.clone();
 		duplicate.listenerLists = null;

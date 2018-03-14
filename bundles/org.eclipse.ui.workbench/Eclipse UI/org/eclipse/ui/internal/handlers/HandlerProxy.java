@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 
 package org.eclipse.ui.internal.handlers;
@@ -55,7 +54,7 @@ import org.eclipse.ui.services.IEvaluationService;
  * attributes defined publicly in this class will cause the proxy to instantiate
  * the proxied handler.
  * </p>
- *
+ * 
  * @since 3.0
  */
 public final class HandlerProxy extends AbstractHandlerWithState implements
@@ -64,7 +63,7 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 	private static Map CEToProxyMap = new HashMap();
 
 	/**
-	 *
+	 * 
 	 */
 	private static final String PROP_ENABLED = "enabled"; //$NON-NLS-1$
 
@@ -110,13 +109,13 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 	private IEvaluationReference enablementRef;
 
 	private boolean proxyEnabled;
-
+	
 	private String commandId;
 
 	//
 	// state to support checked or radio commands.
 	private State checkedState;
-
+	
 	private State radioState;
 
 	// Exception that occurs while loading the proxied handler class
@@ -125,7 +124,7 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 	/**
 	 * Constructs a new instance of <code>HandlerProxy</code> with all the
 	 * information it needs to try to avoid loading until it is needed.
-	 *
+	 * 
 	 * @param commandId the id for this handler
 	 * @param configurationElement
 	 *            The configuration element from which the real class can be
@@ -142,7 +141,7 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 	/**
 	 * Constructs a new instance of <code>HandlerProxy</code> with all the
 	 * information it needs to try to avoid loading until it is needed.
-	 *
+	 * 
 	 * @param commandId the id for this handler
 	 * @param configurationElement
 	 *            The configuration element from which the real class can be
@@ -163,7 +162,7 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 	 *            This value may be <code>null</code> only if the
 	 *            <code>enabledWhenExpression</code> is <code>null</code>.
 	 */
-	public HandlerProxy(final String commandId,
+	public HandlerProxy(final String commandId, 
 			final IConfigurationElement configurationElement,
 			final String handlerAttributeName,
 			final Expression enabledWhenExpression,
@@ -208,7 +207,7 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 	}
 
 	/**
-	 *
+	 * 
 	 */
 	private void registerEnablement() {
 		enablementRef = evaluationService.addEvaluationListener(
@@ -294,7 +293,7 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 			}
 			return handler.execute(event);
 		}
-
+		
 		if(loadException !=null)
 			throw new ExecutionException("Exception occured when loading the handler", loadException); //$NON-NLS-1$
 
@@ -341,7 +340,7 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 	/**
 	 * Loads the handler, if possible. If the handler is loaded, then the member
 	 * variables are updated accordingly.
-	 *
+	 * 
 	 * @return <code>true</code> if the handler is now non-null;
 	 *         <code>false</code> otherwise.
 	 */
@@ -414,7 +413,7 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 	/**
 	 * Retrives the ConfigurationElement attribute according to the
 	 * <code>handlerAttributeName</code>.
-	 *
+	 * 
 	 * @return the handlerAttributeName value, may be <code>null</code>.
 	 */
 	private String getConfigurationElementAttribute() {
@@ -446,6 +445,12 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.commands.IElementUpdater#updateElement(org.eclipse.ui.menus.UIElement,
+	 *      java.util.Map)
+	 */
 	@Override
 	public void updateElement(UIElement element, Map parameters) {
 		if (checkedState != null) {
@@ -460,17 +465,20 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 			((IElementUpdater) handler).updateElement(element, parameters);
 		}
 	}
-
+	
 	private void refreshElements() {
 		if (commandId == null || !(handler instanceof IElementUpdater)
 				&& (checkedState == null && radioState == null)) {
 			return;
 		}
-		ICommandService cs = PlatformUI.getWorkbench()
+		ICommandService cs = (ICommandService) PlatformUI.getWorkbench()
 				.getService(ICommandService.class);
 		cs.refreshElements(commandId, null);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.commands.IStateListener#handleStateChange(org.eclipse.core.commands.State, java.lang.Object)
+	 */
 	@Override
 	public void handleStateChange(State state, Object oldValue) {
 		if (state.getId().equals(RegistryToggleState.STATE_ID)) {
@@ -484,14 +492,14 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 			((IStateListener) handler).handleStateChange(state, oldValue);
 		}
 	}
-
+	
 	/**
 	 * @return the config element for use with the PDE framework.
 	 */
 	public IConfigurationElement getConfigurationElement() {
 		return configurationElement;
 	}
-
+	
 	public String getAttributeName() {
 		return handlerAttributeName;
 	}

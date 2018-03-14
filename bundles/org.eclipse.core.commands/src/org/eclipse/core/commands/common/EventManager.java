@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.ListenerList;
  * <p>
  * Clients may extend.
  * </p>
- *
+ * 
  * @since 3.2
  */
 public abstract class EventManager {
@@ -42,7 +42,7 @@ public abstract class EventManager {
 	/**
 	 * Adds a listener to this manager that will be notified when this manager's
 	 * state changes.
-	 *
+	 * 
 	 * @param listener
 	 *            The listener to be added; must not be <code>null</code>.
 	 */
@@ -65,7 +65,7 @@ public abstract class EventManager {
 
 	/**
 	 * Returns the listeners attached to this event manager.
-	 *
+	 * 
 	 * @return The listeners currently attached; may be empty, but never
 	 *         <code>null</code>
 	 */
@@ -80,7 +80,7 @@ public abstract class EventManager {
 
 	/**
 	 * Whether one or more listeners are attached to the manager.
-	 *
+	 * 
 	 * @return <code>true</code> if listeners are attached to the manager;
 	 *         <code>false</code> otherwise.
 	 */
@@ -90,7 +90,7 @@ public abstract class EventManager {
 
 	/**
 	 * Removes a listener from this manager.
-	 *
+	 * 
 	 * @param listener
 	 *            The listener to be removed; must not be <code>null</code>.
 	 */

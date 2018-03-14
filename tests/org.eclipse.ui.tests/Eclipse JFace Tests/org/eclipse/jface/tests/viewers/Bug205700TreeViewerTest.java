@@ -38,7 +38,11 @@ public class Bug205700TreeViewerTest extends TestCase {
 
 	private final TreeNode child10 = new TreeNode("Child10");
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	protected void setUp() throws Exception {
 		shell = new Shell();
 
@@ -52,7 +56,11 @@ public class Bug205700TreeViewerTest extends TestCase {
 		shell.open();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see junit.framework.TestCase#tearDown()
+	 */
 	protected void tearDown() throws Exception {
 		shell.close();
 	}
@@ -165,14 +173,12 @@ public class Bug205700TreeViewerTest extends TestCase {
 			return name;
 		}
 
-		@Override
 		public String toString() {
 			return getName();
 		}
 	}
 
 	private class InternalLabelProvider extends LabelProvider {
-		@Override
 		public String getText(Object element) {
 			if (element instanceof TreeNode) {
 				return ((TreeNode) element).getName();
@@ -182,7 +188,6 @@ public class Bug205700TreeViewerTest extends TestCase {
 	}
 
 	private class InternalContentProvider implements ITreeContentProvider {
-		@Override
 		public Object[] getChildren(Object parentElement) {
 			if (parentElement instanceof TreeNode) {
 				return ((TreeNode) parentElement).getChildren().toArray();
@@ -190,7 +195,6 @@ public class Bug205700TreeViewerTest extends TestCase {
 			return new Object[0];
 		}
 
-		@Override
 		public Object getParent(Object element) {
 			if (element instanceof TreeNode) {
 				return ((TreeNode) element).getParent();
@@ -198,7 +202,6 @@ public class Bug205700TreeViewerTest extends TestCase {
 			return null;
 		}
 
-		@Override
 		public boolean hasChildren(Object element) {
 			if (element instanceof TreeNode) {
 				return !((TreeNode) element).getChildren().isEmpty();
@@ -206,17 +209,14 @@ public class Bug205700TreeViewerTest extends TestCase {
 			return false;
 		}
 
-		@Override
 		public Object[] getElements(Object inputElement) {
 			return getChildren(inputElement);
 		}
 
-		@Override
 		public void dispose() {
 			// nothing
 		}
 
-		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			// nothing
 		}

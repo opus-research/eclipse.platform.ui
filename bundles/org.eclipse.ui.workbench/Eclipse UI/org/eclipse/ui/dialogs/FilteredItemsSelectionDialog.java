@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,6 @@
  *  Peter Friese <peter.friese@gentleware.com>
  *     - Fix for bug 208602 - [Dialogs] Open Type dialog needs accessible labels
  *  Simon Muschel <smuschel@gmx.de> - bug 258493
- *  Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -40,7 +39,7 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.ProgressMonitorWrapper;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -129,7 +128,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
 /**
  * Shows a list of items to the user with a text entry field for a string
  * pattern used to filter the list of items.
- *
+ * 
  * @since 3.3
  */
 public abstract class FilteredItemsSelectionDialog extends
@@ -230,7 +229,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 	/**
 	 * Creates a new instance of the class.
-	 *
+	 * 
 	 * @param shell
 	 *            shell to parent the dialog on
 	 * @param multi
@@ -252,7 +251,7 @@ public abstract class FilteredItemsSelectionDialog extends
 	/**
 	 * Creates a new instance of the class. Created dialog won't allow to select
 	 * more than one item.
-	 *
+	 * 
 	 * @param shell
 	 *            shell to parent the dialog on
 	 */
@@ -262,7 +261,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 	/**
 	 * Adds viewer filter to the dialog items list.
-	 *
+	 * 
 	 * @param filter
 	 *            the new filter
 	 */
@@ -276,9 +275,9 @@ public abstract class FilteredItemsSelectionDialog extends
 	 * org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider
 	 * .IStyledLabelProvider}, the style text labels provided by it will be used
 	 * provided that the corresponding preference is set.
-	 *
+	 * 
 	 * @see IWorkbenchPreferenceConstants#USE_COLORED_LABELS
-	 *
+	 * 
 	 * @param listLabelProvider
 	 * 		the label provider for items in the list
 	 */
@@ -288,7 +287,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 	/**
 	 * Returns the label decorator for selected items in the list.
-	 *
+	 * 
 	 * @return the label decorator for selected items in the list
 	 */
 	private ILabelDecorator getListSelectionLabelDecorator() {
@@ -297,7 +296,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 	/**
 	 * Sets the label decorator for selected items in the list.
-	 *
+	 * 
 	 * @param listSelectionLabelDecorator
 	 *            the label decorator for selected items in the list
 	 */
@@ -309,7 +308,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 	/**
 	 * Returns the item list label provider.
-	 *
+	 * 
 	 * @return the item list label provider
 	 */
 	private ItemsListLabelProvider getItemsListLabelProvider() {
@@ -322,16 +321,16 @@ public abstract class FilteredItemsSelectionDialog extends
 
 	/**
 	 * Sets label provider for the details field.
-	 *
+	 * 
 	 * For a single selection, the element sent to
 	 * {@link ILabelProvider#getImage(Object)} and
 	 * {@link ILabelProvider#getText(Object)} is the selected object, for
 	 * multiple selection a {@link String} with amount of selected items is the
 	 * element.
-	 *
+	 * 
 	 * @see #getSelectedItems() getSelectedItems() can be used to retrieve
 	 *      selected items and get the items count.
-	 *
+	 * 
 	 * @param detailsLabelProvider
 	 *            the label provider for the details field
 	 */
@@ -349,6 +348,11 @@ public abstract class FilteredItemsSelectionDialog extends
 		return detailsLabelProvider;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.window.Window#create()
+	 */
 	@Override
 	public void create() {
 		super.create();
@@ -358,7 +362,7 @@ public abstract class FilteredItemsSelectionDialog extends
 	/**
 	 * Restores dialog using persisted settings. The default implementation
 	 * restores the status of the details line and the selection history.
-	 *
+	 * 
 	 * @param settings
 	 *            settings used to restore dialog
 	 */
@@ -394,13 +398,18 @@ public abstract class FilteredItemsSelectionDialog extends
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.window.Window#close()
+	 */
 	@Override
 	public boolean close() {
 		this.filterJob.cancel();
 		this.refreshCacheJob.cancel();
 		this.refreshProgressMessageJob.cancel();
 		if (showViewHandler != null) {
-			IHandlerService service = PlatformUI
+			IHandlerService service = (IHandlerService) PlatformUI
 					.getWorkbench().getService(IHandlerService.class);
 			service.deactivateHandler(showViewHandler);
 			showViewHandler.getHandler().dispose();
@@ -416,7 +425,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 	/**
 	 * Stores dialog settings.
-	 *
+	 * 
 	 * @param settings
 	 *            settings used to store dialog
 	 */
@@ -445,7 +454,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 	/**
 	 * Create a new header which is labelled by headerLabel.
-	 *
+	 * 
 	 * @param parent
 	 * @return Label the label of the header
 	 */
@@ -482,7 +491,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 	/**
 	 * Create the labels for the list and the progress. Return the list label.
-	 *
+	 * 
 	 * @param parent
 	 * @return Label
 	 */
@@ -549,7 +558,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		fillViewMenu(menuManager);
 
-		IHandlerService service = PlatformUI.getWorkbench()
+		IHandlerService service = (IHandlerService) PlatformUI.getWorkbench()
 				.getService(IHandlerService.class);
 		IHandler handler = new AbstractHandler() {
 			@Override
@@ -565,7 +574,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 	/**
 	 * Fills the menu of the dialog.
-	 *
+	 * 
 	 * @param menuManager
 	 *            the menu manager
 	 */
@@ -587,7 +596,7 @@ public abstract class FilteredItemsSelectionDialog extends
      * Hook that allows to add actions to the context menu.
 	 * <p>
 	 * Subclasses may extend in order to add other actions.</p>
-     *
+     * 
      * @param menuManager the context menu manager
      * @since 3.5
      */
@@ -632,13 +641,18 @@ public abstract class FilteredItemsSelectionDialog extends
 
 	/**
 	 * Creates an extra content area, which will be located above the details.
-	 *
+	 * 
 	 * @param parent
 	 *            parent to create the dialog widgets in
 	 * @return an extra content area
 	 */
 	protected abstract Control createExtendedContentArea(Composite parent);
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite dialogArea = (Composite) super.createDialogArea(parent);
@@ -855,7 +869,7 @@ public abstract class FilteredItemsSelectionDialog extends
 	/**
 	 * Handle selection in the items list by updating labels of selected and
 	 * unselected items and refresh the details field using the selection.
-	 *
+	 * 
 	 * @param selection
 	 *            the new selection
 	 */
@@ -922,6 +936,11 @@ public abstract class FilteredItemsSelectionDialog extends
 		updateStatus(status);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.window.Dialog#getDialogBoundsSettings()
+	 */
 	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
 		IDialogSettings settings = getDialogSettings();
@@ -936,7 +955,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 	/**
 	 * Returns the dialog settings. Returned object can't be null.
-	 *
+	 * 
 	 * @return return dialog settings for this dialog
 	 */
 	protected abstract IDialogSettings getDialogSettings();
@@ -976,7 +995,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 	/**
 	 * Updates the progress label.
-	 *
+	 * 
 	 * @deprecated
 	 */
 	@Deprecated
@@ -990,7 +1009,7 @@ public abstract class FilteredItemsSelectionDialog extends
 	 * matches is added.
 	 * <p>
 	 * This is a long running operation and should be called in a job.
-	 *
+	 * 
 	 * @param checkDuplicates
 	 *            <code>true</code> if data concerning elements duplication
 	 *            should be computed - it takes much more time than the standard
@@ -1023,6 +1042,11 @@ public abstract class FilteredItemsSelectionDialog extends
 			refreshProgressMessageJob.scheduleProgressRefresh(null);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.dialogs.SelectionStatusDialog#computeResult()
+	 */
 	@Override
 	protected void computeResult() {
 
@@ -1069,7 +1093,7 @@ public abstract class FilteredItemsSelectionDialog extends
 	 * Sets the initial pattern used by the filter. This text is copied into the
 	 * selection input on the dialog. A full selection is used in the pattern
 	 * input field.
-	 *
+	 * 
 	 * @param text
 	 *            initial pattern for the filter
 	 * @see FilteredItemsSelectionDialog#FULL_SELECTION
@@ -1082,7 +1106,7 @@ public abstract class FilteredItemsSelectionDialog extends
 	 * Sets the initial pattern used by the filter. This text is copied into the
 	 * selection input on the dialog. The <code>selectionMode</code> is used
 	 * to choose selection type for the input field.
-	 *
+	 * 
 	 * @param text
 	 *            initial pattern for the filter
 	 * @param selectionMode
@@ -1097,7 +1121,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 	/**
 	 * Gets initial pattern.
-	 *
+	 * 
 	 * @return initial pattern, or <code>null</code> if initial pattern is not
 	 *         set
 	 */
@@ -1107,7 +1131,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 	/**
 	 * Returns the current selection.
-	 *
+	 * 
 	 * @return the current selection
 	 */
 	protected StructuredSelection getSelectedItems() {
@@ -1139,7 +1163,7 @@ public abstract class FilteredItemsSelectionDialog extends
 	 * Validates the item. When items on the items list are selected or
 	 * deselected, it validates each item in the selection and the dialog status
 	 * depends on all validations.
-	 *
+	 * 
 	 * @param item
 	 *            an item to be checked
 	 * @return status of the dialog to be set
@@ -1148,7 +1172,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 	/**
 	 * Creates an instance of a filter.
-	 *
+	 * 
 	 * @return a filter for items on the items list. Can be <code>null</code>,
 	 *         no filtering will be applied then, causing no item to be shown in
 	 *         the list.
@@ -1185,14 +1209,14 @@ public abstract class FilteredItemsSelectionDialog extends
 	 * will be probably created as an anonymous class. Parameters passed to the
 	 * <code>compare(java.lang.Object, java.lang.Object)</code> are going to
 	 * be the same type as the one used in the content provider.
-	 *
+	 * 
 	 * @return comparator to sort items content provider
 	 */
 	protected abstract Comparator getItemsComparator();
 
 	/**
 	 * Fills the content provider with matching items.
-	 *
+	 * 
 	 * @param contentProvider
 	 *            collector to add items to.
 	 *            {@link FilteredItemsSelectionDialog.AbstractContentProvider#add(Object, FilteredItemsSelectionDialog.ItemsFilter)}
@@ -1210,7 +1234,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 	/**
 	 * Removes selected items from history.
-	 *
+	 * 
 	 * @param items
 	 *            items to be removed
 	 */
@@ -1225,7 +1249,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 	/**
 	 * Removes an item from history.
-	 *
+	 * 
 	 * @param item
 	 *            an item to remove
 	 * @return removed item
@@ -1236,7 +1260,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 	/**
 	 * Adds item to history.
-	 *
+	 * 
 	 * @param item
 	 *            the item to be added
 	 */
@@ -1246,7 +1270,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 	/**
 	 * Returns a history comparator.
-	 *
+	 * 
 	 * @return decorated comparator
 	 */
 	private Comparator getHistoryComparator() {
@@ -1255,7 +1279,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 	/**
 	 * Returns the history of selected elements.
-	 *
+	 * 
 	 * @return history of selected elements, or <code>null</code> if it is not
 	 *         set
 	 */
@@ -1265,7 +1289,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 	/**
 	 * Sets new history.
-	 *
+	 * 
 	 * @param selectionHistory
 	 *            the history
 	 */
@@ -1276,7 +1300,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 	/**
 	 * Indicates whether the given item is a history item.
-	 *
+	 * 
 	 * @param item
 	 *            the item to be investigated
 	 * @return <code>true</code> if the given item exists in history,
@@ -1288,7 +1312,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 	/**
 	 * Indicates whether the given item is a duplicate.
-	 *
+	 * 
 	 * @param item
 	 *            the item to be investigated
 	 * @return <code>true</code> if the item is duplicate, <code>false</code>
@@ -1300,7 +1324,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 	/**
 	 * Sets separator label
-	 *
+	 * 
 	 * @param separatorLabel
 	 *            the label showed on separator
 	 */
@@ -1310,7 +1334,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 	/**
 	 * Returns name for then given object.
-	 *
+	 * 
 	 * @param item
 	 *            an object from the content provider. Subclasses should pay
 	 *            attention to the passed argument. They should either only pass
@@ -1364,7 +1388,7 @@ public abstract class FilteredItemsSelectionDialog extends
 	 * could be displayed earlier</li>
 	 * <li> refreshing the UI have to be run in a UIJob</li>
 	 * </ul>
-	 *
+	 * 
 	 * @see org.eclipse.ui.dialogs.FilteredItemsSelectionDialog.FilterJob
 	 * @see org.eclipse.ui.dialogs.FilteredItemsSelectionDialog.RefreshJob
 	 * @see org.eclipse.ui.dialogs.FilteredItemsSelectionDialog.RefreshCacheJob
@@ -1381,6 +1405,11 @@ public abstract class FilteredItemsSelectionDialog extends
 			setSystem(true);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
+		 */
 		@Override
 		public IStatus runInUIThread(IProgressMonitor monitor) {
 			if (monitor.isCanceled())
@@ -1418,6 +1447,11 @@ public abstract class FilteredItemsSelectionDialog extends
 			setSystem(true);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
+		 */
 		@Override
 		public IStatus runInUIThread(IProgressMonitor monitor) {
 
@@ -1439,7 +1473,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Schedule progress refresh job.
-		 *
+		 * 
 		 * @param progressMonitor
 		 *            used during refresh progress label
 		 */
@@ -1456,9 +1490,9 @@ public abstract class FilteredItemsSelectionDialog extends
 	/**
 	 * A job responsible for computing filtered items list presented using
 	 * <code>RefreshJob</code>.
-	 *
+	 * 
 	 * @see FilteredItemsSelectionDialog.RefreshJob
-	 *
+	 * 
 	 */
 	private class RefreshCacheJob extends Job {
 
@@ -1481,6 +1515,11 @@ public abstract class FilteredItemsSelectionDialog extends
 			refreshJob.cancel();
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
+		 */
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
 			if (monitor.isCanceled()) {
@@ -1504,6 +1543,11 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.runtime.jobs.Job#canceling()
+		 */
 		@Override
 		protected void canceling() {
 			super.canceling();
@@ -1522,6 +1566,11 @@ public abstract class FilteredItemsSelectionDialog extends
 					WorkbenchMessages.FilteredItemsSelectionDialog_removeItemsFromHistoryAction);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.action.Action#run()
+		 */
 		@Override
 		public void run() {
 			List selectedElements = ((StructuredSelection) list.getSelection())
@@ -1545,7 +1594,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Creates a new instance of the class.
-		 *
+		 * 
 		 * @param provider
 		 *            the label provider for all items, not <code>null</code>
 		 * @param selectionDecorator
@@ -1568,7 +1617,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Sets new selection decorator.
-		 *
+		 * 
 		 * @param newSelectionDecorator
 		 *            new label decorator for selected items in the list
 		 */
@@ -1587,7 +1636,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Gets selection decorator.
-		 *
+		 * 
 		 * @return the label decorator for selected items in the list
 		 */
 		public ILabelDecorator getSelectionDecorator() {
@@ -1596,7 +1645,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Sets new label provider.
-		 *
+		 * 
 		 * @param newProvider
 		 *            new label provider for items in the list, not
 		 *            <code>null</code>
@@ -1634,6 +1683,11 @@ public abstract class FilteredItemsSelectionDialog extends
 			return false;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
+		 */
 		private String getText(Object element) {
 			if (element instanceof ItemsListSeparator) {
 				return getSeparatorLabel(((ItemsListSeparator) element)
@@ -1716,11 +1770,21 @@ public abstract class FilteredItemsSelectionDialog extends
 			return result.toString().trim();
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.jface.viewers.ILabelProviderListener)
+		 */
 		@Override
 		public void addListener(ILabelProviderListener listener) {
 			listeners.add(listener);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
+		 */
 		@Override
 		public void dispose() {
 			provider.removeListener(this);
@@ -1734,6 +1798,12 @@ public abstract class FilteredItemsSelectionDialog extends
 			super.dispose();
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang.Object,
+		 *      java.lang.String)
+		 */
 		@Override
 		public boolean isLabelProperty(Object element, String property) {
 			if (provider.isLabelProperty(element, property)) {
@@ -1746,6 +1816,11 @@ public abstract class FilteredItemsSelectionDialog extends
 			return false;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
+		 */
 		@Override
 		public void removeListener(ILabelProviderListener listener) {
 			listeners.remove(listener);
@@ -1782,6 +1857,11 @@ public abstract class FilteredItemsSelectionDialog extends
 			return null;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ILabelProviderListener#labelProviderChanged(org.eclipse.jface.viewers.LabelProviderChangedEvent)
+		 */
 		@Override
 		public void labelProviderChanged(LabelProviderChangedEvent event) {
 			Object[] l = listeners.getListeners();
@@ -1801,7 +1881,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Creates a new instance of the class.
-		 *
+		 * 
 		 * @param name
 		 *            the name of the separator
 		 */
@@ -1811,7 +1891,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Returns the name of this separator.
-		 *
+		 * 
 		 * @return the name of the separator
 		 */
 		public String getName() {
@@ -1824,7 +1904,7 @@ public abstract class FilteredItemsSelectionDialog extends
 	 * process. It is used by <code>RefreshProgressMessageJob</code> to
 	 * refresh progress message. State of this monitor illustrates state of
 	 * filtering or cache refreshing process.
-	 *
+	 * 
 	 */
 	private class GranualProgressMonitor extends ProgressMonitorWrapper {
 
@@ -1840,7 +1920,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Creates instance of <code>GranualProgressMonitor</code>.
-		 *
+		 * 
 		 * @param monitor
 		 *            progress to be wrapped
 		 */
@@ -1850,13 +1930,18 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Checks if filtering has been done
-		 *
+		 * 
 		 * @return true if filtering work has been done false in other way
 		 */
 		public boolean isDone() {
 			return done;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.runtime.ProgressMonitorWrapper#setTaskName(java.lang.String)
+		 */
 		@Override
 		public void setTaskName(String name) {
 			super.setTaskName(name);
@@ -1864,12 +1949,23 @@ public abstract class FilteredItemsSelectionDialog extends
 			this.subName = null;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.runtime.ProgressMonitorWrapper#subTask(java.lang.String)
+		 */
 		@Override
 		public void subTask(String name) {
 			super.subTask(name);
 			this.subName = name;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.runtime.ProgressMonitorWrapper#beginTask(java.lang.String,
+		 *      int)
+		 */
 		@Override
 		public void beginTask(String name, int totalWork) {
 			super.beginTask(name, totalWork);
@@ -1879,24 +1975,44 @@ public abstract class FilteredItemsSelectionDialog extends
 			refreshProgressMessageJob.scheduleProgressRefresh(this);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.runtime.ProgressMonitorWrapper#worked(int)
+		 */
 		@Override
 		public void worked(int work) {
 			super.worked(work);
 			internalWorked(work);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.runtime.ProgressMonitorWrapper#done()
+		 */
 		@Override
 		public void done() {
 			done = true;
 			super.done();
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.runtime.ProgressMonitorWrapper#setCanceled(boolean)
+		 */
 		@Override
 		public void setCanceled(boolean b) {
 			done = b;
 			super.setCanceled(b);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.runtime.ProgressMonitorWrapper#internalWorked(double)
+		 */
 		@Override
 		public void internalWorked(double work) {
 			worked = worked + work;
@@ -1950,6 +2066,11 @@ public abstract class FilteredItemsSelectionDialog extends
 			setSystem(true);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
+		 */
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
 
@@ -1975,7 +2096,7 @@ public abstract class FilteredItemsSelectionDialog extends
 	/**
 	 * Filters items in indicated set and history. During filtering, it
 	 * refreshes the dialog (progress monitor and elements list).
-	 *
+	 * 
 	 * Depending on the filter, <code>FilterJob</code> decides which kind of
 	 * search will be run inside <code>filterContent</code>. If the last
 	 * filtering is done (last completed filter), is not null, and the new
@@ -1999,6 +2120,11 @@ public abstract class FilteredItemsSelectionDialog extends
 			setSystem(true);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
+		 */
 		@Override
 		protected final IStatus run(IProgressMonitor parent) {
 			GranualProgressMonitor monitor = new GranualProgressMonitor(parent);
@@ -2008,7 +2134,7 @@ public abstract class FilteredItemsSelectionDialog extends
 		/**
 		 * Executes job using the given filtering progress monitor. A hook for
 		 * subclasses.
-		 *
+		 * 
 		 * @param monitor
 		 *            progress monitor
 		 * @return result of the execution
@@ -2030,7 +2156,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Main method for the job.
-		 *
+		 * 
 		 * @param monitor
 		 * @throws CoreException
 		 */
@@ -2057,7 +2183,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Filters items.
-		 *
+		 * 
 		 * @param monitor
 		 *            for monitoring progress
 		 * @throws CoreException
@@ -2091,16 +2217,22 @@ public abstract class FilteredItemsSelectionDialog extends
 				lastCompletedFilter = null;
 				lastCompletedResult = null;
 
-				SubMonitor subMonitor = SubMonitor.convert(monitor,
+				SubProgressMonitor subMonitor = null;
+				if (monitor != null) {
+					monitor
+							.beginTask(
 									WorkbenchMessages.FilteredItemsSelectionDialog_searchJob_taskName,
 									100);
+					subMonitor = new SubProgressMonitor(monitor, 95);
 
-				fillContentProvider(contentProvider, itemsFilter, subMonitor.newChild(95));
+				}
+
+				fillContentProvider(contentProvider, itemsFilter, subMonitor);
 
 				if (monitor != null && !monitor.isCanceled()) {
-					subMonitor.worked(2);
+					monitor.worked(2);
 					contentProvider.rememberResult(itemsFilter);
-					subMonitor.worked(3);
+					monitor.worked(3);
 				}
 			}
 
@@ -2136,6 +2268,11 @@ public abstract class FilteredItemsSelectionDialog extends
 
 				private static final long serialVersionUID = 0L;
 
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see java.util.LinkedList#add(java.lang.Object)
+				 */
 				@Override
 				public boolean add(Object arg0) {
 					if (this.size() >= MAX_HISTORY_SIZE) {
@@ -2161,7 +2298,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Adds object to history.
-		 *
+		 * 
 		 * @param object
 		 *            the item to be added to the history
 		 */
@@ -2172,7 +2309,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Returns <code>true</code> if history contains object.
-		 *
+		 * 
 		 * @param object
 		 *            the item for which check will be executed
 		 * @return <code>true</code> if history contains object
@@ -2184,7 +2321,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Returns <code>true</code> if history is empty.
-		 *
+		 * 
 		 * @return <code>true</code> if history is empty
 		 */
 		public synchronized boolean isEmpty() {
@@ -2193,7 +2330,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Remove element from history.
-		 *
+		 * 
 		 * @param element
 		 *            to remove form the history
 		 * @return <code>true</code> if this list contained the specified
@@ -2205,7 +2342,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Load history elements from memento.
-		 *
+		 * 
 		 * @param memento
 		 *            memento from which the history will be retrieved
 		 */
@@ -2231,7 +2368,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Save history elements to memento.
-		 *
+		 * 
 		 * @param memento
 		 *            memento to which the history will be added
 		 */
@@ -2251,7 +2388,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Gets array of history items.
-		 *
+		 * 
 		 * @return array of history elements
 		 */
 		public synchronized Object[] getHistoryItems() {
@@ -2260,17 +2397,17 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Creates an object using given memento.
-		 *
+		 * 
 		 * @param memento
 		 *            memento used for creating new object
-		 *
+		 * 
 		 * @return the restored object
 		 */
 		protected abstract Object restoreItemFromMemento(IMemento memento);
 
 		/**
 		 * Store object in <code>IMemento</code>.
-		 *
+		 * 
 		 * @param item
 		 *            the item to store
 		 * @param memento
@@ -2297,7 +2434,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Creates new instance of ItemsFilter.
-		 *
+		 * 
 		 * @param searchPattern
 		 *            the pattern to be used when filtering
 		 */
@@ -2320,13 +2457,13 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * <code>b</code> is a sub-filter of <code>a</code>, and not
 		 * vice-versa. </i>
 		 * </p>
-		 *
+		 * 
 		 * @param filter
 		 *            the filter to be checked, or <code>null</code>
 		 * @return <code>true</code> if the given filter is sub-filter of this
 		 *         filter, <code>false</code> if the given filter isn't a
 		 *         sub-filter or is <code>null</code>
-		 *
+		 * 
 		 * @see org.eclipse.ui.dialogs.SearchPattern#isSubPattern(org.eclipse.ui.dialogs.SearchPattern)
 		 */
 		public boolean isSubFilter(ItemsFilter filter) {
@@ -2340,13 +2477,13 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * Checks whether the provided filter is equal to the current filter.
 		 * The default implementation checks if <code>SearchPattern</code>
 		 * from current filter is equal to the one from provided filter.
-		 *
+		 * 
 		 * @param filter
 		 *            filter to be checked, or <code>null</code>
 		 * @return <code>true</code> if the given filter is equal to current
 		 *         filter, <code>false</code> if given filter isn't equal to
 		 *         current one or if it is <code>null</code>
-		 *
+		 * 
 		 * @see org.eclipse.ui.dialogs.SearchPattern#equalsPattern(org.eclipse.ui.dialogs.SearchPattern)
 		 */
 		public boolean equalsFilter(ItemsFilter filter) {
@@ -2359,7 +2496,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Checks whether the pattern's match rule is camel case.
-		 *
+		 * 
 		 * @return <code>true</code> if pattern's match rule is camel case,
 		 *         <code>false</code> otherwise
 		 */
@@ -2369,9 +2506,9 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Returns the pattern string.
-		 *
+		 * 
 		 * @return pattern for this filter
-		 *
+		 * 
 		 * @see SearchPattern#getPattern()
 		 */
 		public String getPattern() {
@@ -2380,9 +2517,9 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Returns the rule to apply for matching keys.
-		 *
+		 * 
 		 * @return an implementation-specific match rule
-		 *
+		 * 
 		 * @see SearchPattern#getMatchRule() for match rules returned by the
 		 *      default implementation
 		 */
@@ -2392,7 +2529,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Matches text with filter.
-		 *
+		 * 
 		 * @param text
 		 *            the text to match with the filter
 		 * @return <code>true</code> if text matches with filter pattern,
@@ -2405,7 +2542,7 @@ public abstract class FilteredItemsSelectionDialog extends
 		/**
 		 * General method for matching raw name pattern. Checks whether current
 		 * pattern is prefix of name provided item.
-		 *
+		 * 
 		 * @param item
 		 *            item to check
 		 * @return <code>true</code> if current pattern is a prefix of name
@@ -2434,7 +2571,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Matches an item against filter conditions.
-		 *
+		 * 
 		 * @param item
 		 * @return <code>true<code> if item matches against filter conditions, <code>false</code>
 		 *         otherwise
@@ -2444,7 +2581,7 @@ public abstract class FilteredItemsSelectionDialog extends
 		/**
 		 * Checks consistency of an item. Item is inconsistent if was changed or
 		 * removed.
-		 *
+		 * 
 		 * @param item
 		 * @return <code>true</code> if item is consistent, <code>false</code>
 		 *         if item is inconsistent
@@ -2461,12 +2598,12 @@ public abstract class FilteredItemsSelectionDialog extends
 		/**
 		 * Adds the item to the content provider iff the filter matches the
 		 * item. Otherwise does nothing.
-		 *
+		 * 
 		 * @param item
 		 *            the item to add
 		 * @param itemsFilter
 		 *            the filter
-		 *
+		 * 
 		 * @see FilteredItemsSelectionDialog.ItemsFilter#matchItem(Object)
 		 */
 		public abstract void add(Object item, ItemsFilter itemsFilter);
@@ -2551,7 +2688,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Sets selection history.
-		 *
+		 * 
 		 * @param selectionHistory
 		 *            The selectionHistory to set.
 		 */
@@ -2585,7 +2722,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Adds filtered item.
-		 *
+		 * 
 		 * @param item
 		 * @param itemsFilter
 		 */
@@ -2604,7 +2741,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Add all history items to <code>contentProvider</code>.
-		 *
+		 * 
 		 * @param itemsFilter
 		 */
 		public void addHistoryItems(ItemsFilter itemsFilter) {
@@ -2636,10 +2773,10 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Removes items from history and refreshes the view.
-		 *
+		 * 
 		 * @param item
 		 *            to remove
-		 *
+		 * 
 		 * @return removed item
 		 */
 		public Object removeHistoryElement(Object item) {
@@ -2659,7 +2796,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Adds item to history and refresh view.
-		 *
+		 * 
 		 * @param item
 		 *            to add
 		 */
@@ -2690,10 +2827,10 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Sets/unsets given item as duplicate.
-		 *
+		 * 
 		 * @param item
 		 *            item to change
-		 *
+		 * 
 		 * @param isDuplicate
 		 *            duplicate flag
 		 */
@@ -2708,7 +2845,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Indicates whether given item is a duplicate.
-		 *
+		 * 
 		 * @param item
 		 *            item to check
 		 * @return <code>true</code> if item is duplicate
@@ -2719,7 +2856,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Load history from memento.
-		 *
+		 * 
 		 * @param memento
 		 *            memento from which the history will be retrieved
 		 */
@@ -2730,7 +2867,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Save history to memento.
-		 *
+		 * 
 		 * @param memento
 		 *            memento to which the history will be added
 		 */
@@ -2741,7 +2878,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Gets sorted items.
-		 *
+		 * 
 		 * @return sorted items
 		 */
 		private Object[] getSortedItems() {
@@ -2757,7 +2894,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Remember result of filtering.
-		 *
+		 * 
 		 * @param itemsFilter
 		 */
 		public void rememberResult(ItemsFilter itemsFilter) {
@@ -2771,6 +2908,11 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+		 */
 		@Override
 		public Object[] getElements(Object inputElement) {
 			return lastFilteredItems.toArray();
@@ -2780,14 +2922,30 @@ public abstract class FilteredItemsSelectionDialog extends
 			return lastFilteredItems.size();
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+		 */
 		@Override
 		public void dispose() {
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
+		 *      java.lang.Object, java.lang.Object)
+		 */
 		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ILazyContentProvider#updateElement(int)
+		 */
 		@Override
 		public void updateElement(int index) {
 
@@ -2801,50 +2959,70 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * Main method responsible for getting the filtered items and checking
 		 * for duplicates. It is based on the
 		 * {@link FilteredItemsSelectionDialog.ContentProvider#getFilteredItems(Object, IProgressMonitor)}.
-		 *
+		 * 
 		 * @param checkDuplicates
 		 *            <code>true</code> if data concerning elements
 		 *            duplication should be computed - it takes much more time
 		 *            than standard filtering
-		 *
+		 * 
 		 * @param monitor
 		 *            progress monitor
 		 */
-		public void reloadCache(boolean checkDuplicates, IProgressMonitor monitor) {
+		public void reloadCache(boolean checkDuplicates,
+				IProgressMonitor monitor) {
+
 			reset = false;
 
-			// the work is divided into two actions of the same length
-			int totalWork = checkDuplicates ? 200 : 100;
+			if (monitor != null) {
+				// the work is divided into two actions of the same length
+				int totalWork = checkDuplicates ? 200 : 100;
 
-			SubMonitor subMonitor = SubMonitor.convert(monitor,
-					WorkbenchMessages.FilteredItemsSelectionDialog_cacheRefreshJob, totalWork);
+				monitor
+						.beginTask(
+								WorkbenchMessages.FilteredItemsSelectionDialog_cacheRefreshJob,
+								totalWork);
+			}
 
 			// the TableViewer's root (the input) is treated as parent
 
-			lastFilteredItems = Arrays.asList(getFilteredItems(list.getInput(), subMonitor.newChild(100)));
+			lastFilteredItems = Arrays.asList(getFilteredItems(list.getInput(),
+					monitor != null ? new SubProgressMonitor(monitor, 100)
+							: null));
 
-			if (reset || subMonitor.isCanceled()) {
+			if (reset || (monitor != null && monitor.isCanceled())) {
+				if (monitor != null)
+					monitor.done();
 				return;
 			}
 
 			if (checkDuplicates) {
-				checkDuplicates(subMonitor.newChild(100));
+				checkDuplicates(monitor);
 			}
+			if (monitor != null)
+				monitor.done();
 		}
 
 		private void checkDuplicates(IProgressMonitor monitor) {
 			synchronized (lastFilteredItems) {
-				SubMonitor subMonitor = SubMonitor.convert(monitor,
-						WorkbenchMessages.FilteredItemsSelectionDialog_cacheRefreshJob_checkDuplicates,
-						lastFilteredItems.size());
-				HashMap<String, Object> helperMap = new HashMap<>();
+				IProgressMonitor subMonitor = null;
+				int reportEvery = lastFilteredItems.size() / 20;
+				if (monitor != null) {
+					subMonitor = new SubProgressMonitor(monitor, 100);
+					subMonitor
+							.beginTask(
+									WorkbenchMessages.FilteredItemsSelectionDialog_cacheRefreshJob_checkDuplicates,
+									5);
+				}
+				HashMap helperMap = new HashMap();
 				for (int i = 0; i < lastFilteredItems.size(); i++) {
-					if (reset || subMonitor.isCanceled())
+					if (reset
+							|| (subMonitor != null && subMonitor.isCanceled()))
 						return;
 					Object item = lastFilteredItems.get(i);
 
 					if (!(item instanceof ItemsListSeparator)) {
-						Object previousItem = helperMap.put(getElementName(item), item);
+						Object previousItem = helperMap.put(
+								getElementName(item), item);
 						if (previousItem != null) {
 							setDuplicateElement(previousItem, true);
 							setDuplicateElement(item, true);
@@ -2853,7 +3031,9 @@ public abstract class FilteredItemsSelectionDialog extends
 						}
 					}
 
-					subMonitor.worked(1);
+					if (subMonitor != null && reportEvery != 0
+							&& (i + 1) % reportEvery == 0)
+						subMonitor.worked(1);
 				}
 				helperMap.clear();
 			}
@@ -2862,7 +3042,7 @@ public abstract class FilteredItemsSelectionDialog extends
 		/**
 		 * Returns an array of items filtered using the provided
 		 * <code>ViewerFilter</code>s with a separator added.
-		 *
+		 * 
 		 * @param parent
 		 *            the parent
 		 * @param monitor
@@ -2941,8 +3121,8 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * Adds a filter to this content provider. For an example usage of such
 		 * filters look at the project <code>org.eclipse.ui.ide</code>, class
 		 * <code>org.eclipse.ui.dialogs.FilteredResourcesSelectionDialog.CustomWorkingSetFilter</code>.
-		 *
-		 *
+		 * 
+		 * 
 		 * @param filter
 		 *            the filter to be added
 		 */
@@ -2963,10 +3143,21 @@ public abstract class FilteredItemsSelectionDialog extends
 	 */
 	private class NullContentProvider implements IContentProvider {
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+		 */
 		@Override
 		public void dispose() {
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
+		 *      java.lang.Object, java.lang.Object)
+		 */
 		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
@@ -2992,7 +3183,7 @@ public abstract class FilteredItemsSelectionDialog extends
 		/**
 		 * Constructs a new instance of this class given its parent and a style
 		 * value describing its behavior and appearance.
-		 *
+		 * 
 		 * @param parent
 		 *            the parent component
 		 * @param style
@@ -3011,7 +3202,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Shows/hides the content viewer.
-		 *
+		 * 
 		 * @param visible
 		 *            if the content viewer should be visible.
 		 */
@@ -3022,6 +3213,12 @@ public abstract class FilteredItemsSelectionDialog extends
 			viewForm.getParent().layout();
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.Viewer#inputChanged(java.lang.Object,
+		 *      java.lang.Object)
+		 */
 		@Override
 		protected void inputChanged(Object input, Object oldInput) {
 			if (oldInput == null) {
@@ -3036,6 +3233,11 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ContentViewer#handleLabelProviderChanged(org.eclipse.jface.viewers.LabelProviderChangedEvent)
+		 */
 		@Override
 		protected void handleLabelProviderChanged(
 				LabelProviderChangedEvent event) {
@@ -3044,17 +3246,32 @@ public abstract class FilteredItemsSelectionDialog extends
 			}
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.Viewer#getControl()
+		 */
 		@Override
 		public Control getControl() {
 			return label;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.Viewer#getSelection()
+		 */
 		@Override
 		public ISelection getSelection() {
 			// not supported
 			return null;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.Viewer#refresh()
+		 */
 		@Override
 		public void refresh() {
 			Object input = this.getInput();
@@ -3069,7 +3286,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Sets the given text and image to the label.
-		 *
+		 * 
 		 * @param text
 		 *            the new text or null
 		 * @param image
@@ -3083,6 +3300,12 @@ public abstract class FilteredItemsSelectionDialog extends
 			label.setImage(image);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.Viewer#setSelection(org.eclipse.jface.viewers.ISelection,
+		 *      boolean)
+		 */
 		@Override
 		public void setSelection(ISelection selection, boolean reveal) {
 			// not supported
@@ -3090,7 +3313,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		/**
 		 * Refreshes the label if currently chosen element is on the list.
-		 *
+		 * 
 		 * @param objs
 		 *            list of changed object
 		 */
@@ -3113,6 +3336,11 @@ public abstract class FilteredItemsSelectionDialog extends
 	 */
 	private class HistoryComparator implements Comparator {
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+		 */
 		@Override
 		public int compare(Object o1, Object o2) {
 			boolean h1 = isHistoryElement(o1);
@@ -3129,14 +3357,14 @@ public abstract class FilteredItemsSelectionDialog extends
 		}
 
 	}
-
+	
 
 	/**
 	 * Get the control where the search pattern is entered. Any filtering should
 	 * be done using an {@link ItemsFilter}. This control should only be
 	 * accessed for listeners that wish to handle events that do not affect
 	 * filtering such as custom traversal.
-	 *
+	 * 
 	 * @return Control or <code>null</code> if the pattern control has not
 	 *         been created.
 	 */

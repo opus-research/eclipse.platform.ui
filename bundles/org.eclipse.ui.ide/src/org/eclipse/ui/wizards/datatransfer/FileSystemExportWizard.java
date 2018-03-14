@@ -13,7 +13,6 @@ package org.eclipse.ui.wizards.datatransfer;
 import java.util.List;
 
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -44,7 +43,7 @@ import org.eclipse.ui.internal.wizards.datatransfer.WizardFileSystemResourceExpo
  * dialog.open();
  * </pre>
  * During the call to <code>open</code>, the wizard dialog is presented to the
- * user. When the user hits Finish, the user-selected workspace resources
+ * user. When the user hits Finish, the user-selected workspace resources 
  * are exported to the user-specified location in the local file system,
  * the dialog closes, and the call to <code>open</code> returns.
  * </p>
@@ -68,18 +67,22 @@ public class FileSystemExportWizard extends Wizard implements IExportWizard {
         setDialogSettings(section);
     }
 
-    @Override
-	public void addPages() {
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
+    public void addPages() {
         super.addPages();
         mainPage = new WizardFileSystemResourceExportPage1(selection);
         addPage(mainPage);
     }
 
 
-    @Override
-	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchWizard.
+     */
+    public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
         this.selection = currentSelection;
-		List<?> selectedResources = IDE.computeSelectedResources(currentSelection);
+        List selectedResources = IDE.computeSelectedResources(currentSelection);
         if (!selectedResources.isEmpty()) {
             this.selection = new StructuredSelection(selectedResources);
         }
@@ -90,13 +93,13 @@ public class FileSystemExportWizard extends Wizard implements IExportWizard {
                     .getActivePage();
             if (page != null) {
                 IEditorPart currentEditor = page.getActiveEditor();
-				if (currentEditor != null) {
-					Object selectedResource = Adapters.getAdapter(currentEditor.getEditorInput(), IResource.class,
-							true);
-					if (selectedResource != null) {
-						selection = new StructuredSelection(selectedResource);
-					}
-				}
+                if (currentEditor != null) {
+                    Object selectedResource = currentEditor.getEditorInput()
+                            .getAdapter(IResource.class);
+                    if (selectedResource != null) {
+                        selection = new StructuredSelection(selectedResource);
+                    }
+                }
             }
         }
 
@@ -105,8 +108,10 @@ public class FileSystemExportWizard extends Wizard implements IExportWizard {
         setNeedsProgressMonitor(true);
     }
 
-    @Override
-	public boolean performFinish() {
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
+    public boolean performFinish() {
         return mainPage.finish();
     }
 }
