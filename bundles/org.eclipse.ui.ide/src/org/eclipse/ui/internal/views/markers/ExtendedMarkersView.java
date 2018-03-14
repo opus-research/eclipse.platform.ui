@@ -10,6 +10,7 @@
  *     Andrew Gvozdev -  Bug 364039 - Add "Delete All Markers"
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442440
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 446864
  *******************************************************************************/
 package org.eclipse.ui.internal.views.markers;
 
@@ -838,8 +839,7 @@ public class ExtendedMarkersView extends ViewPart {
 			public void partVisible(IWorkbenchPartReference partRef) {
 				if (partRef.getId().equals(getSite().getId())) {
 					isViewVisible= true;
-					pageSelectionListener.selectionChanged(null, getSite().getPage().getSelection());
-					setTitleToolTip(null);
+					builder.scheduleUpdate();
 				}
 			}
 		};
@@ -1406,7 +1406,9 @@ public class ExtendedMarkersView extends ViewPart {
 
 		setContentDescription(statusMessage);
 
-		if (!"".equals(getTitleToolTip())) { //$NON-NLS-1$
+		if (isVisible()) {
+			setTitleToolTip(null);
+		} else {
 			setTitleToolTip(statusMessage);
 		}
 		updateTitleImage(counts);
