@@ -96,7 +96,7 @@ public class ViewRegistry implements IViewRegistry {
 				if (element.getName().equals(IWorkbenchRegistryConstants.TAG_VIEW)) {
 					createDescriptor(element, false);
 				}
-				if (element.getName().equals(IWorkbenchRegistryConstants.TAG_E4VIEW)) {
+				if (element.getName().equals("e4view")) { //$NON-NLS-1$
 					createDescriptor(element, true);
 				}
 			}
@@ -130,7 +130,7 @@ public class ViewRegistry implements IViewRegistry {
 		}
 
 		List<String> tags = descriptor.getTags();
-		tags.add("View"); //$NON-NLS-1$
+		tags.add(IWorkbenchRegistryConstants.TAG_E4VIEW);
 
 		descriptor.setCloseable(true);
 		descriptor.setAllowMultiple(Boolean.parseBoolean(element
