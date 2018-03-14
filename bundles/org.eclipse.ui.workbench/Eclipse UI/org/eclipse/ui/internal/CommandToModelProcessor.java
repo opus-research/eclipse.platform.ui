@@ -35,9 +35,9 @@ import org.eclipse.ui.internal.commands.CommandPersistence;
  */
 public class CommandToModelProcessor {
 
-	private Map<String, MCategory> categories = new HashMap<>();
+	private Map<String, MCategory> categories = new HashMap<String, MCategory>();
 
-	private Map<String, MCommand> commands = new HashMap<>();
+	private Map<String, MCommand> commands = new HashMap<String, MCommand>();
 
 	private EModelService modelService;
 

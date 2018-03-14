@@ -35,7 +35,7 @@ public class ViewContentProvider implements ITreeContentProvider {
 	 * Child cache. Map from Object->Object[]. Our hasChildren() method is
 	 * expensive so it's better to cache the results of getChildren().
 	 */
-	private Map<Object, Object[]> childMap = new HashMap<>();
+	private Map<Object, Object[]> childMap = new HashMap<Object, Object[]>();
 
 	private MApplication application;
 	private IViewRegistry viewRegistry;
@@ -107,7 +107,7 @@ public class ViewContentProvider implements ITreeContentProvider {
 	 */
 	private Set<MPartDescriptor> determineViewsInCategory(String categoryDescription) {
 		List<MPartDescriptor> descriptors = application.getDescriptors();
-		Set<MPartDescriptor> categoryDescriptors = new HashSet<>();
+		Set<MPartDescriptor> categoryDescriptors = new HashSet<MPartDescriptor>();
 		for (MPartDescriptor descriptor : descriptors) {
 			if (isFilteredByActivity(descriptor.getElementId()) || isIntroView(descriptor.getElementId())) {
 				continue;
@@ -125,8 +125,8 @@ public class ViewContentProvider implements ITreeContentProvider {
 	 */
 	private Set<Object> determineTopLevelElements(Object element) {
 		List<MPartDescriptor> descriptors = ((MApplication) element).getDescriptors();
-		Set<String> categories = new HashSet<>();
-		Set<MPartDescriptor> visibleViews = new HashSet<>();
+		Set<String> categories = new HashSet<String>();
+		Set<MPartDescriptor> visibleViews = new HashSet<MPartDescriptor>();
 		for (MPartDescriptor descriptor : descriptors) {
 			// only process views and hide views which are filtered by
 			// activities
@@ -146,7 +146,7 @@ public class ViewContentProvider implements ITreeContentProvider {
 			}
 		}
 
-		Set<Object> combinedTopElements = new HashSet<>();
+		Set<Object> combinedTopElements = new HashSet<Object>();
 		combinedTopElements.addAll(categories);
 		combinedTopElements.addAll(visibleViews);
 		return combinedTopElements;

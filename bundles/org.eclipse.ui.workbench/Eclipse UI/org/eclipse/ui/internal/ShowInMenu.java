@@ -212,8 +212,8 @@ public class ShowInMenu extends ContributionItem implements
 					.get(MApplication.class);
 
 			MMenu menuModel = MenuFactoryImpl.eINSTANCE.createMenu();
-			final ArrayList<MMenuContribution> toContribute = new ArrayList<>();
-			final ArrayList<MMenuElement> menuContributionsToRemove = new ArrayList<>();
+			final ArrayList<MMenuContribution> toContribute = new ArrayList<MMenuContribution>();
+			final ArrayList<MMenuElement> menuContributionsToRemove = new ArrayList<MMenuElement>();
 			ExpressionContext eContext = new ExpressionContext(workbenchWindow.getModel()
 					.getContext());
 			ContributionsAnalyzer.gatherMenuContributions(menuModel,
@@ -266,7 +266,7 @@ public class ShowInMenu extends ContributionItem implements
 		CommandContributionItemParameter parm = new CommandContributionItemParameter(
 				locator, viewDescriptor.getId(), IWorkbenchCommandConstants.NAVIGATE_SHOW_IN,
 				CommandContributionItem.STYLE_PUSH);
-		HashMap<String, String> targetId = new HashMap<>();
+		HashMap<String, String> targetId = new HashMap<String, String>();
 		targetId.put(IWorkbenchCommandConstants.NAVIGATE_SHOW_IN_PARM_TARGET,
 				viewDescriptor.getId());
 		parm.parameters = targetId;
@@ -283,7 +283,7 @@ public class ShowInMenu extends ContributionItem implements
 	 * the contributions from the current perspective and the source part.
 	 */
 	private ArrayList<Object> getShowInPartIds(IWorkbenchPart sourcePart) {
-		ArrayList<Object> targetIds = new ArrayList<>();
+		ArrayList<Object> targetIds = new ArrayList<Object>();
 		WorkbenchPage page = (WorkbenchPage) getWindow().getActivePage();
 		if (page != null) {
 			String srcId = sourcePart == null ? null : sourcePart.getSite().getId();
@@ -390,7 +390,7 @@ public class ShowInMenu extends ContributionItem implements
 	 */
 	private IViewDescriptor[] getViewDescriptors(IWorkbenchPart sourcePart) {
 		ArrayList<Object> ids = getShowInPartIds(sourcePart);
-		ArrayList<IViewDescriptor> descs = new ArrayList<>();
+		ArrayList<IViewDescriptor> descs = new ArrayList<IViewDescriptor>();
 		IViewRegistry reg = WorkbenchPlugin.getDefault().getViewRegistry();
 		for (Iterator<Object> i = ids.iterator(); i.hasNext();) {
 			String id = (String) i.next();

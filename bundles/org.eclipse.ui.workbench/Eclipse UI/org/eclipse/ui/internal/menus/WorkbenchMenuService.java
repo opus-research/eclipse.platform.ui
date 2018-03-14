@@ -75,7 +75,7 @@ public class WorkbenchMenuService implements IMenuService {
 	private ServiceLocator serviceLocator;
 	private ExpressionContext legacyContext;
 	private MenuPersistence persistence;
-	private Map<AbstractContributionFactory, Object> factoriesToContributions = new HashMap<>();
+	private Map<AbstractContributionFactory, Object> factoriesToContributions = new HashMap<AbstractContributionFactory, Object>();
 	private EModelService modelService;
 
 	/**
@@ -384,7 +384,7 @@ public class WorkbenchMenuService implements IMenuService {
 		ArrayList<MToolBar> toolbars = (ArrayList<MToolBar>) model.getTransientData().get(
 				POPULATED_TOOL_BARS);
 		if (toolbars == null) {
-			toolbars = new ArrayList<>();
+			toolbars = new ArrayList<MToolBar>();
 			model.getTransientData().put(POPULATED_TOOL_BARS, toolbars);
 		}
 		if (toolbars.contains(tb)) {
@@ -398,7 +398,7 @@ public class WorkbenchMenuService implements IMenuService {
 	private void addMenu(MApplicationElement model, MMenu menu, IEclipseContext ctx) {
 		ArrayList<MMenu> menus = (ArrayList<MMenu>) model.getTransientData().get(POPULATED_MENUS);
 		if (menus == null) {
-			menus = new ArrayList<>();
+			menus = new ArrayList<MMenu>();
 			model.getTransientData().put(POPULATED_MENUS, menus);
 		}
 		if (menus.contains(menu)) {

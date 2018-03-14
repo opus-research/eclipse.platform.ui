@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
  */
 public class ControlContributionRegistry {
 
-	private static Map<String, IConfigurationElement> registry = new HashMap<>();
+	private static Map<String, IConfigurationElement> registry = new HashMap<String, IConfigurationElement>();
 
 	public static void clear() {
 		registry.clear();

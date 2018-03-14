@@ -90,7 +90,7 @@ public class LegacyHandlerService implements IHandlerService {
 		@Override
 		public Object compute(IEclipseContext context, String contextKey) {
 
-			HashSet<HandlerActivation> activationSet = new HashSet<>();
+			HashSet<HandlerActivation> activationSet = new HashSet<HandlerActivation>();
 			IEclipseContext current = context;
 			while (current != null) {
 				List<HandlerActivation> handlerActivations = (List<HandlerActivation>) current

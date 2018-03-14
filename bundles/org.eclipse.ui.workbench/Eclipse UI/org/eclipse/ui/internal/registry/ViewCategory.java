@@ -25,7 +25,7 @@ public class ViewCategory implements IViewCategory {
 	private String id;
 	private String label;
 	private IPath path;
-	private List<IViewDescriptor> descriptors = new ArrayList<>();
+	private List<IViewDescriptor> descriptors = new ArrayList<IViewDescriptor>();
 
 	public ViewCategory(String id, String label) {
 		this.id = id;
@@ -40,7 +40,7 @@ public class ViewCategory implements IViewCategory {
 	@Override
 	public IViewDescriptor[] getViews() {
 		Collection<?> allowedViews = WorkbenchActivityHelper.restrictCollection(descriptors,
-				new ArrayList<>());
+				new ArrayList<Object>());
 		return allowedViews.toArray(new IViewDescriptor[allowedViews.size()]);
 	}
 

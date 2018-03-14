@@ -59,7 +59,7 @@ public class WizardPatternFilter extends PatternFilter {
 
 	@Override
 	public Object[] filter(Viewer viewer, Object parent, Object[] elements) {
-		ArrayList<Object> result = new ArrayList<>();
+		ArrayList<Object> result = new ArrayList<Object>();
 
 		for (Object elem : super.filter(viewer, parent, elements)) {
 			if (elem instanceof WizardCollectionElement) {

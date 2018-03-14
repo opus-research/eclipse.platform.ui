@@ -37,7 +37,7 @@ public class CommandHelpServiceImpl implements ICommandHelpService {
 	@Optional
 	private Logger logger;
 
-	private Map<IHandler, String> helpContextIdsByHandler = new WeakHashMap<>();
+	private Map<IHandler, String> helpContextIdsByHandler = new WeakHashMap<IHandler, String>();
 
 	@Override
 	public String getHelpContextId(String commandId, IEclipseContext context) {

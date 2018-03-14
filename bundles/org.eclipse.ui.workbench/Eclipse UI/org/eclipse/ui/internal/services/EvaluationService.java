@@ -57,11 +57,11 @@ public final class EvaluationService implements IEvaluationService {
 	private int notifying = 0;
 
 	private ListenerList serviceListeners = new ListenerList(ListenerList.IDENTITY);
-	ArrayList<ISourceProvider> sourceProviders = new ArrayList<>();
-	LinkedList<EvaluationReference> refs = new LinkedList<>();
+	ArrayList<ISourceProvider> sourceProviders = new ArrayList<ISourceProvider>();
+	LinkedList<EvaluationReference> refs = new LinkedList<EvaluationReference>();
 	private ISourceProviderListener contextUpdater;
 
-	private HashSet<String> ratVariables = new HashSet<>();
+	private HashSet<String> ratVariables = new HashSet<String>();
 	private RunAndTrack ratUpdater = new RunAndTrack() {
 		@Override
 		public boolean changed(IEclipseContext context) {
@@ -83,7 +83,7 @@ public final class EvaluationService implements IEvaluationService {
 		}
 	};
 
-	private HashSet<String> variableFilter = new HashSet<>();
+	private HashSet<String> variableFilter = new HashSet<String>();
 	private IEventBroker eventBroker;
 
 	public EvaluationService(IEclipseContext c) {

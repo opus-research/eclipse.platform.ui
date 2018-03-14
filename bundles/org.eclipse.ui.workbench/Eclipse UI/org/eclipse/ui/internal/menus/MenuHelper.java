@@ -432,7 +432,7 @@ public class MenuHelper {
 	}
 
 	public static Map<String, String> getParameters(IConfigurationElement element) {
-		HashMap<String, String> map = new HashMap<>();
+		HashMap<String, String> map = new HashMap<String, String>();
 		IConfigurationElement[] parameters = element
 				.getChildren(IWorkbenchRegistryConstants.TAG_PARAMETER);
 		for (int i = 0; i < parameters.length; i++) {

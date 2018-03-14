@@ -52,7 +52,7 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 	@Inject
 	MApplication application;
 
-	private Map<String, PerspectiveDescriptor> descriptors = new HashMap<>();
+	private Map<String, PerspectiveDescriptor> descriptors = new HashMap<String, PerspectiveDescriptor>();
 
 	@PostConstruct
 	void postConstruct(MApplication application) {
@@ -215,7 +215,7 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 	@Override
 	public IPerspectiveDescriptor[] getPerspectives() {
 		Collection<?> descs = WorkbenchActivityHelper.restrictCollection(descriptors.values(),
-				new ArrayList<>());
+				new ArrayList<Object>());
 		return descs.toArray(new IPerspectiveDescriptor[descs.size()]);
 	}
 

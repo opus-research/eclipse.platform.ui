@@ -63,8 +63,8 @@ public class ActionSet {
 
 	protected Expression visibleWhen;
 
-	private HashSet<String> menuContributionGroupIds = new HashSet<>();
-	private HashSet<String> toolbarContributionGroupIds = new HashSet<>();
+	private HashSet<String> menuContributionGroupIds = new HashSet<String>();
+	private HashSet<String> toolbarContributionGroupIds = new HashSet<String>();
 	private String id;
 
 	public String getId() {
@@ -122,7 +122,7 @@ public class ActionSet {
 	}
 
 	private Set<String> actionSetPartAssociations(String actionSetId) {
-		HashSet<String> result = new HashSet<>();
+		HashSet<String> result = new HashSet<String>();
 		final IExtensionRegistry registry = Platform.getExtensionRegistry();
 		final IConfigurationElement[] associations = registry
 				.getConfigurationElementsFor(PlatformUI.PLUGIN_ID + '.'

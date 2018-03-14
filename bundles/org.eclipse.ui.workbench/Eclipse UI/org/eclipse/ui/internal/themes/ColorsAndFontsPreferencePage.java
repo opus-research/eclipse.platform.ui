@@ -593,7 +593,7 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 	 * made by the user. These changes need to be stored into the preference
 	 * store.
 	 */
-	private Map<ColorDefinition, RGB> colorPreferencesToSet = new HashMap<>(7);
+	private Map<ColorDefinition, RGB> colorPreferencesToSet = new HashMap<ColorDefinition, RGB>(7);
 
     private CascadingColorRegistry colorRegistry;
 
@@ -670,7 +670,7 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 	 * explicitly made by the user. These changes need to be stored into the
 	 * preference store.
 	 */
-	private Map<FontDefinition, FontData[]> fontPreferencesToSet = new HashMap<>(
+	private Map<FontDefinition, FontData[]> fontPreferencesToSet = new HashMap<FontDefinition, FontData[]>(
 			7);
 
     private CascadingFontRegistry fontRegistry;

@@ -25,7 +25,7 @@ public class ThemesExtension implements IThemesExtension {
 	public final static String DEFAULT_CATEGORY_ID = "org.eclipse.ui.themes.CssTheme"; //$NON-NLS-1$
 
 
-	private List<IThemeElementDefinitionOverridable<?>> definitions = new ArrayList<>();
+	private List<IThemeElementDefinitionOverridable<?>> definitions = new ArrayList<IThemeElementDefinitionOverridable<?>>();
 
 	@Override
 	public void addFontDefinition(String symbolicName) {

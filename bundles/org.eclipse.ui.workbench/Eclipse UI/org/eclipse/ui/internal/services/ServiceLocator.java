@@ -81,7 +81,7 @@ public final class ServiceLocator implements IDisposable, INestable,
 
 	private IEclipseContext e4Context;
 
-	private Map<Class<?>, Object> servicesToDispose = new HashMap<>();
+	private Map<Class<?>, Object> servicesToDispose = new HashMap<Class<?>, Object>();
 
 	/**
 	 * Constructs a service locator with no parent.
