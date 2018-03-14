@@ -307,11 +307,10 @@ public abstract class UITestCase extends TestCase {
 	 * Close all test windows.
 	 */
     public void closeAllTestWindows() {
-		List<IWorkbenchWindow> testWindowsCopy = new ArrayList<IWorkbenchWindow>(testWindows);
-		for (IWorkbenchWindow testWindow : testWindowsCopy) {
-			testWindow.close();
+		for (IWorkbenchWindow testWindows : testWindows) {
+            testWindows.close();
         }
-		testWindows.clear();
+        testWindows.clear();
     }
 
     /**
