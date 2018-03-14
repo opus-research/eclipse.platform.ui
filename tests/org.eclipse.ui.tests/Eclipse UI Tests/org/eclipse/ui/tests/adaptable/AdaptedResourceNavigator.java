@@ -132,7 +132,7 @@ public class AdaptedResourceNavigator extends ViewPart {
             IStructuredSelection ssel = (IStructuredSelection) selection;
             for (Iterator i = ssel.iterator(); i.hasNext();) {
                 Object o = i.next();
-				IResource resource = Adapters.adapt(o, IResource.class);
+				IResource resource = Adapters.getAdapter(o, IResource.class, true);
                 if (resource != null) {
                     list.add(resource);
                 }
@@ -256,7 +256,7 @@ public class AdaptedResourceNavigator extends ViewPart {
      */
     IContainer getInitialInput() {
         IAdaptable input = getSite().getPage().getInput();
-		IResource resource = Adapters.adapt(input, IResource.class);
+		IResource resource = Adapters.getAdapter(input, IResource.class, true);
         if (resource != null) {
             switch (resource.getType()) {
             case IResource.FILE:

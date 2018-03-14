@@ -52,7 +52,7 @@ public class CommonViewerSiteIViewSiteDelegate implements ICommonViewerWorkbench
 
 	@Override
 	public <T> T getAdapter(Class<T> adapter) {
-		return Adapters.adapt(viewSite, adapter);
+		return Adapters.getAdapter(viewSite, adapter, true);
 	}
 
 	@Override
