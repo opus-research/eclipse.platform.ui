@@ -325,8 +325,7 @@ public class RenderMojo extends AbstractMojo {
 
             // Create the callable and add it to the task pool
             Callable<Object> runnable = new Callable<Object>() {
-                @Override
-				public Object call() throws Exception {
+                public Object call() throws Exception {
                     // The jhlabs filters are not thread safe, so provide one set per thread
                     GrayscaleFilter grayFilter = new GrayscaleFilter();
 
