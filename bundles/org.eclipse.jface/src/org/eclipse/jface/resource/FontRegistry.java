@@ -200,7 +200,7 @@ public class FontRegistry extends ResourceRegistry {
     /**
      * Runnable that cleans up the manager on disposal of the display.
      */
-    protected Runnable displayRunnable = () -> clearCaches();
+	protected Runnable displayRunnable = this::clearCaches;
 
 	private boolean displayDisposeHooked;
 

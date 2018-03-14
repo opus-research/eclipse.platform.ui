@@ -89,7 +89,7 @@ public class ImageAndMessageArea extends Composite {
 
 		messageField.getLayoutControl().setLayoutData(gd);
 
-		addPaintListener(e -> onPaint(e));
+		addPaintListener(this::onPaint);
 
 		// sets the layout and size to account for the BORDER_MARGIN between
 		// the border drawn around the container and the decorated field.

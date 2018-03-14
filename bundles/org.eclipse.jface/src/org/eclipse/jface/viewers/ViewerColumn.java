@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
  * 												  fix for bug 163317, 201905
  *     Ralf Ebert - bug 294738
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 475689
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -53,7 +54,7 @@ public abstract class ViewerColumn {
 	protected ViewerColumn(final ColumnViewer viewer, Widget columnOwner) {
 		this.viewer = viewer;
 		columnOwner.setData(ViewerColumn.COLUMN_VIEWER_KEY, this);
-		this.listener = event -> viewer.handleLabelProviderChanged(event);
+		this.listener = viewer::handleLabelProviderChanged;
 		columnOwner.addDisposeListener(e -> handleDispose(viewer));
 	}
 

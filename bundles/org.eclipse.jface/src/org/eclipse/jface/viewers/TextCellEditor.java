@@ -270,7 +270,7 @@ public class TextCellEditor extends CellEditor {
      */
     private ModifyListener getModifyListener() {
         if (modifyListener == null) {
-            modifyListener = e -> editOccured(e);
+			modifyListener = this::editOccured;
         }
         return modifyListener;
     }

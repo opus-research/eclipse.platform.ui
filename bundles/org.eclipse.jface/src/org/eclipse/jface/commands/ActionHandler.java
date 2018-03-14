@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 475689
  *******************************************************************************/
 package org.eclipse.jface.commands;
 
@@ -74,7 +75,7 @@ public final class ActionHandler extends AbstractHandler {
 		if (propertyChangeListener == null) {
 			propertyChangeListener = propertyChangeEvent -> {
 				final String property = propertyChangeEvent.getProperty();
-				fireHandlerChanged(new HandlerEvent(ActionHandler.this, 
+				fireHandlerChanged(new HandlerEvent(ActionHandler.this,
 						IAction.ENABLED.equals(property),
 						IAction.HANDLED.equals(property)));
 			};
@@ -146,8 +147,7 @@ public final class ActionHandler extends AbstractHandler {
 	}
 
 	@Override
-	public final void removeHandlerListener(
-			final IHandlerListener handlerListener) {
+	public final void removeHandlerListener(final IHandlerListener handlerListener) {
 		super.removeHandlerListener(handlerListener);
 
 		if (!hasListeners()) {

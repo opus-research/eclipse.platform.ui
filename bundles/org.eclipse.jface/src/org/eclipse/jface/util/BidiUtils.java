@@ -334,7 +334,7 @@ public final class BidiUtils {
 	public static void applyBidiProcessing(StyledText field, String handlingType) {
 		final SegmentListener listener = getSegmentListener(handlingType);
 		if (listener != null) {
-			field.addBidiSegmentListener(event -> listener.getSegments(event));
+			field.addBidiSegmentListener(listener::getSegments);
 		}
 	}
 

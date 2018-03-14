@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Tom Schindl - bug 151205
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 402439
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 402439, 475689
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -1268,7 +1268,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 				handlePostSelect(e);
 			}
 		});
-		handler.addOpenListener(e -> StructuredViewer.this.handleOpen(e));
+		handler.addOpenListener(StructuredViewer.this::handleOpen);
 	}
 
 	/**
