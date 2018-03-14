@@ -588,13 +588,7 @@ public class PartServiceImpl implements EPartService {
 				if (activeChild != null) {
 					activeChild.deactivate();
 				}
-				if (target.getContext() != null
-						&& target.getContext().getParent() == perspective.getContext()) {
-					target.getContext().activateBranch();
-				} else {
-					perspective.getContext().activate();
-				}
-
+				perspective.getContext().activate();
 				modelService.bringToTop(target);
 				activate(target, true, false);
 				return;
