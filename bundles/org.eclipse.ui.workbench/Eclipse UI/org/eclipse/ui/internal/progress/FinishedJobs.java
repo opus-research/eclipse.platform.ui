@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,14 +35,14 @@ public class FinishedJobs extends EventManager {
 
 		/**
 		 * A job to be kept has finished
-		 *
+		 * 
 		 * @param jte
 		 */
 		void finished(JobTreeElement jte);
 
 		/**
 		 * A kept job has been removed.
-		 *
+		 * 
 		 * @param jte
 		 */
 		void removed(JobTreeElement jte);
@@ -68,30 +68,24 @@ public class FinishedJobs extends EventManager {
 
 	private FinishedJobs() {
 		listener = new IJobProgressManagerListener() {
-			@Override
 			public void addJob(JobInfo info) {
 				checkForDuplicates(info);
 			}
 
-			@Override
 			public void addGroup(GroupInfo info) {
 				checkForDuplicates(info);
 			}
 
-			@Override
 			public void refreshJobInfo(JobInfo info) {
 				checkTasks(info);
 			}
 
-			@Override
 			public void refreshGroup(GroupInfo info) {
 			}
 
-			@Override
 			public void refreshAll() {
 			}
 
-			@Override
 			public void removeJob(JobInfo info) {
 				if (keep(info)) {
 					checkForDuplicates(info);
@@ -99,11 +93,9 @@ public class FinishedJobs extends EventManager {
 				}
 			}
 
-			@Override
 			public void removeGroup(GroupInfo group) {
 			}
 
-			@Override
 			public boolean showsDebug() {
 				return false;
 			}
@@ -364,13 +356,13 @@ public class FinishedJobs extends EventManager {
 			all = (JobTreeElement[]) keptjobinfos
 					.toArray(new JobTreeElement[keptjobinfos.size()]);
 		}
-
+		
 		return all;
 	}
 
 	/**
 	 * Get the date that indicates the finish time.
-	 *
+	 * 
 	 * @param jte
 	 * @return Date
 	 */
@@ -384,7 +376,7 @@ public class FinishedJobs extends EventManager {
 
 	/**
 	 * Return whether or not the kept infos have the element.
-	 *
+	 * 
 	 * @param element
 	 * @return boolean
 	 */

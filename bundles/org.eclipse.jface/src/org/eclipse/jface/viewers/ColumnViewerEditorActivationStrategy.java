@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -77,7 +77,6 @@ public class ColumnViewerEditorActivationStrategy {
 			if (keyboardActivationListener == null) {
 				keyboardActivationListener = new KeyListener() {
 
-					@Override
 					public void keyPressed(KeyEvent e) {
 						ViewerCell cell = getFocusCell();
 
@@ -88,7 +87,6 @@ public class ColumnViewerEditorActivationStrategy {
 						}
 					}
 
-					@Override
 					public void keyReleased(KeyEvent e) {
 
 					}

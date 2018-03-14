@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 Angelo Zerr and others.
+ * Copyright (c) 2008 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,14 +41,12 @@ public class SWTHTMLElement extends WidgetElement {
 		attributeType = computeAttributeType();
 	}
 
-	@Override
 	public String getAttribute(String attr) {
 		if ("type".equals(attr))
 			return attributeType;
 		return super.getAttribute(attr);
 	}
 
-	@Override
 	protected String computeLocalName() {
 		Widget widget = getWidget();
 		// HTML name

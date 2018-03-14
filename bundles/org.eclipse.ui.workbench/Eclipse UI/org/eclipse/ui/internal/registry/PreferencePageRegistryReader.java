@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,7 +34,7 @@ public class PreferencePageRegistryReader extends CategorizedPageRegistryReader 
 	private List nodes;
 
 	private IWorkbench workbench;
-
+	
 
 	class PreferencesCategoryNode extends CategoryNode {
 
@@ -51,17 +51,23 @@ public class PreferencePageRegistryReader extends CategorizedPageRegistryReader 
 			this.node = nodeToCategorize;
 		}
 
-		@Override
+		/* (non-Javadoc)
+		 * @see org.eclipse.ui.internal.registry.CategorizedPageRegistryReader.CategoryNode#getLabelText()
+		 */
 		String getLabelText() {
 			return node.getLabelText();
 		}
 
-		@Override
+		/* (non-Javadoc)
+		 * @see org.eclipse.ui.internal.registry.CategorizedPageRegistryReader.CategoryNode#getLabelText(java.lang.Object)
+		 */
 		String getLabelText(Object element) {
 			return ((WorkbenchPreferenceNode) element).getLabelText();
 		}
 
-		@Override
+		/* (non-Javadoc)
+		 * @see org.eclipse.ui.internal.registry.CategorizedPageRegistryReader.CategoryNode#getNode()
+		 */
 		Object getNode() {
 			return node;
 		}
@@ -69,14 +75,16 @@ public class PreferencePageRegistryReader extends CategorizedPageRegistryReader 
 
 	/**
 	 * Create a new instance configured with the workbench
-	 *
+	 * 
 	 * @param newWorkbench the workbench
 	 */
 	public PreferencePageRegistryReader(IWorkbench newWorkbench) {
 		workbench = newWorkbench;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.registry.CategorizedPageRegistryReader#findNode(java.lang.String)
+	 */
 	Object findNode(String id) {
 		for (int i = 0; i < nodes.size(); i++) {
 			WorkbenchPreferenceNode node = (WorkbenchPreferenceNode) nodes.get(i);
@@ -87,7 +95,9 @@ public class PreferencePageRegistryReader extends CategorizedPageRegistryReader 
 		return null;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.registry.CategorizedPageRegistryReader#findNode(java.lang.Object, java.lang.String)
+	 */
 	Object findNode(Object parent, String currentToken) {
 		IPreferenceNode[] subNodes = ((WorkbenchPreferenceNode) parent).getSubNodes();
 		for (int i = 0; i < subNodes.length; i++) {
@@ -99,28 +109,44 @@ public class PreferencePageRegistryReader extends CategorizedPageRegistryReader 
 		return null;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.registry.CategorizedPageRegistryReader#add(java.lang.Object, java.lang.Object)
+	 */
 	void add(Object parent, Object node) {
 		((IPreferenceNode) parent).add((IPreferenceNode) node);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.registry.CategorizedPageRegistryReader#createCategoryNode(org.eclipse.ui.internal.registry.CategorizedPageRegistryReader, java.lang.Object)
+	 */
 	CategoryNode createCategoryNode(CategorizedPageRegistryReader reader, Object object) {
 		return new PreferencesCategoryNode(reader, (WorkbenchPreferenceNode) object);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.registry.CategorizedPageRegistryReader#getCategory(java.lang.Object)
+	 */
 	String getCategory(Object node) {
 		return ((WorkbenchPreferenceNode) node).getCategory();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.registry.CategorizedPageRegistryReader#
+	 * invalidCategoryNodeMessage
+	 * (org.eclipse.ui.internal.registry.CategorizedPageRegistryReader
+	 * .CategoryNode)
+	 */
 	@Override
 	protected String invalidCategoryNodeMessage(CategoryNode categoryNode) {
 		WorkbenchPreferenceNode wpn = (WorkbenchPreferenceNode) categoryNode.getNode();
 		return "Invalid preference category path: " + wpn.getCategory() + " (bundle: " + wpn.getPluginId() + ", page: " + wpn.getLocalId() + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.registry.CategorizedPageRegistryReader#getNodes()
+	 */
 	Collection getNodes() {
 		return nodes;
 	}
@@ -133,7 +159,7 @@ public class PreferencePageRegistryReader extends CategorizedPageRegistryReader 
 	 * If no category has been specified or category information
 	 * is incorrect, page will appear at the root level. workbench
 	 * log entry will be created for incorrect category information.
-	 *
+	 * 
 	 * @param registry the extension registry
 	 */
 	public void loadFromRegistry(IExtensionRegistry registry) {
@@ -148,7 +174,6 @@ public class PreferencePageRegistryReader extends CategorizedPageRegistryReader 
 	/**
 	 * Read preference page element.
 	 */
-	@Override
 	protected boolean readElement(IConfigurationElement element) {
 		if (element.getName().equals(TAG_PAGE) == false) {
 			return false;
@@ -172,7 +197,7 @@ public class PreferencePageRegistryReader extends CategorizedPageRegistryReader 
 	 */
 	public static WorkbenchPreferenceNode createNode(IConfigurationElement element) {
 		boolean nameMissing = element.getAttribute(IWorkbenchRegistryConstants.ATT_NAME) == null;
-		String id = element.getAttribute(IWorkbenchRegistryConstants.ATT_ID);
+		String id = element.getAttribute(IWorkbenchRegistryConstants.ATT_ID);		
 		boolean classMissing = getClassValue(element, IWorkbenchRegistryConstants.ATT_CLASS) == null;
 
 		if (nameMissing) {
@@ -184,7 +209,7 @@ public class PreferencePageRegistryReader extends CategorizedPageRegistryReader 
 		if (classMissing) {
 			logMissingAttribute(element, IWorkbenchRegistryConstants.ATT_CLASS);
 		}
-
+		
 		if (nameMissing || id == null || classMissing) {
 			return null;
 		}

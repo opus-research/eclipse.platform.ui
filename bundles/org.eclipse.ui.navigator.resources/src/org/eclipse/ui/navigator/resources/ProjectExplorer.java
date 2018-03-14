@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,59 +7,47 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  ******************************************************************************/
+
 package org.eclipse.ui.navigator.resources;
 
-import org.eclipse.core.commands.Command;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.common.CommandException;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.Adapters;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IAggregateWorkingSet;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.internal.navigator.framelist.Frame;
 import org.eclipse.ui.internal.navigator.framelist.FrameList;
 import org.eclipse.ui.internal.navigator.framelist.TreeFrame;
 import org.eclipse.ui.internal.navigator.resources.ResourceToItemsMapper;
 import org.eclipse.ui.internal.navigator.resources.plugin.WorkbenchNavigatorMessages;
-import org.eclipse.ui.internal.navigator.resources.plugin.WorkbenchNavigatorPlugin;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.INavigatorContentService;
 
-
 /**
- *
+ * 
  * @see CommonNavigator
  * @see INavigatorContentService
  * @since 3.2
- *
+ * 
  */
 public final class ProjectExplorer extends CommonNavigator {
 
 	/**
 	 * Provides a constant for the standard instance of the Common Navigator.
-	 *
+	 * 
 	 * @see PlatformUI#getWorkbench()
 	 * @see IWorkbench#getActiveWorkbenchWindow()
 	 * @see IWorkbenchWindow#getActivePage()
-	 *
+	 * 
 	 * @see IWorkbenchPage#findView(String)
 	 * @see IWorkbenchPage#findViewReference(String)
 	 */
@@ -79,25 +67,23 @@ public final class ProjectExplorer extends CommonNavigator {
 
 	/**
 	 * Used only in the case of top level = PROJECTS and only when some
-	 * working sets are selected.
+	 * working sets are selected. 
 	 */
 	private String workingSetLabel;
 
-	@Override
 	public void createPartControl(Composite aParent) {
 		super.createPartControl(aParent);
-
+		
 		if (!false)
 			getCommonViewer().setMapper(new ResourceToItemsMapper(getCommonViewer()));
-	}
-
+	}	
+	
 	/**
 	 * The superclass does not deal with the content description, handle it
 	 * here.
-	 *
-	 * @noreference This method is not intended to be referenced by clients.
+	 * 
+	 * @noreference
 	 */
-	@Override
 	public void updateTitle() {
 		super.updateTitle();
 		Object input = getCommonViewer().getInput();
@@ -108,15 +94,13 @@ public final class ProjectExplorer extends CommonNavigator {
 		}
 
 		if (!(input instanceof IResource)) {
-			String label = ((ILabelProvider) getCommonViewer().getLabelProvider()).getText(input);
-			if (label != null) {
-				setContentDescription(label);
-				return;
-			}
-			IWorkbenchAdapter wbadapter = Adapters.adapt(input, IWorkbenchAdapter.class);
-			if (wbadapter != null) {
-				setContentDescription(wbadapter.getLabel(input));
-				return;
+			if (input instanceof IAdaptable) {
+				IWorkbenchAdapter wbadapter = (IWorkbenchAdapter) ((IAdaptable) input)
+						.getAdapter(IWorkbenchAdapter.class);
+				if (wbadapter != null) {
+					setContentDescription(wbadapter.getLabel(input));
+					return;
+				}
 			}
 			setContentDescription(input.toString());
 			return;
@@ -128,13 +112,12 @@ public final class ProjectExplorer extends CommonNavigator {
 
 	/**
 	 * Returns the tool tip text for the given element.
-	 *
+	 * 
 	 * @param element
 	 *            the element
 	 * @return the tooltip
-	 * @noreference This method is not intended to be referenced by clients.
+	 * @noreference
 	 */
-	@Override
 	public String getFrameToolTipText(Object element) {
 		String result;
 		if (!(element instanceof IResource)) {
@@ -200,7 +183,6 @@ public final class ProjectExplorer extends CommonNavigator {
 	 * @noreference This method is not intended to be referenced by clients.
 	 * @since 3.4
 	 */
-	@Override
 	public void setRootMode(int mode) {
 		rootMode = mode;
 	}
@@ -210,7 +192,6 @@ public final class ProjectExplorer extends CommonNavigator {
 	 * @noreference This method is not intended to be referenced by clients.
 	 * @since 3.4
 	 */
-	@Override
 	public int getRootMode() {
 		return rootMode;
 	}
@@ -220,7 +201,6 @@ public final class ProjectExplorer extends CommonNavigator {
 	 * @noreference This method is not intended to be referenced by clients.
 	 * @since 3.4
 	 */
-	@Override
 	public void setWorkingSetLabel(String label) {
 		workingSetLabel = label;
 	}
@@ -230,30 +210,9 @@ public final class ProjectExplorer extends CommonNavigator {
 	 * @noreference This method is not intended to be referenced by clients.
 	 * @since 3.4
 	 */
-	@Override
 	public String getWorkingSetLabel() {
 		return workingSetLabel;
 	}
 
-	@Override
-	protected void handleDoubleClick(DoubleClickEvent anEvent) {
-		ICommandService commandService = getViewSite().getService(ICommandService.class);
-		Command openProjectCommand = commandService.getCommand(IWorkbenchCommandConstants.PROJECT_OPEN_PROJECT);
-		if (openProjectCommand != null && openProjectCommand.isHandled()) {
-			IStructuredSelection selection = (IStructuredSelection) anEvent
-					.getSelection();
-			Object element = selection.getFirstElement();
-			if (element instanceof IProject && !((IProject) element).isOpen()) {
-				try {
-					openProjectCommand.executeWithChecks(new ExecutionEvent());
-				} catch (CommandException ex) {
-					IStatus status = WorkbenchNavigatorPlugin.createErrorStatus("'Open Project' failed", ex); //$NON-NLS-1$
-					WorkbenchNavigatorPlugin.getDefault().getLog().log(status);
-				}
-				return;
-			}
-		}
-		super.handleDoubleClick(anEvent);
-	}
-
+	
 }

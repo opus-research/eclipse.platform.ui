@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,8 +21,10 @@ class FullImageDecoratorRunnable extends FullDecoratorRunnable {
 
     Image start;
 
-    @Override
-	public void run() throws Exception {
+    /* (non-Javadoc)
+     * @see org.eclipse.core.runtime.ISafeRunnable#run()
+     */
+    public void run() throws Exception {
         result = decorator.decorateImage(start, element);
     }
 
@@ -56,6 +58,6 @@ class FullImageDecoratorRunnable extends FullDecoratorRunnable {
 	 * @since 3.1
 	 */
 	void clearReferences() {
-		decorator = null;
+		decorator = null;		
 	}
 }

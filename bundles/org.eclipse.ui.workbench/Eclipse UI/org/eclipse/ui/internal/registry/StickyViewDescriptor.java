@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,13 +22,13 @@ import org.eclipse.ui.views.IStickyViewDescriptor;
 /**
  * @since 3.0
  */
-public class StickyViewDescriptor implements IStickyViewDescriptor,
+public class StickyViewDescriptor implements IStickyViewDescriptor, 
 	IPluginContribution {
 
     private IConfigurationElement configurationElement;
 
 	private String id;
-
+	
 	/**
 	 * Folder constant for right sticky views.
 	 */
@@ -46,7 +46,7 @@ public class StickyViewDescriptor implements IStickyViewDescriptor,
 
 	/**
 	 * Folder constant for bottom sticky views.
-	 */
+	 */	
 	public static final String STICKY_FOLDER_BOTTOM = "stickyFolderBottom"; //$NON-NLS-1$
 
     /**
@@ -63,20 +63,22 @@ public class StickyViewDescriptor implements IStickyViewDescriptor,
                     "Invalid extension (missing id) ", null));//$NON-NLS-1$
 		}
     }
-
+    
 	/**
      * Return the configuration element.
-     *
+     * 
 	 * @return the configuration element
 	 */
 	public IConfigurationElement getConfigurationElement() {
 		return configurationElement;
 	}
 
-    @Override
-	public int getLocation() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.views.IStickyViewDescriptor#getLocation()
+     */
+    public int getLocation() {
     	int direction = IPageLayout.RIGHT;
-
+    	
     	String location = configurationElement.getAttribute(IWorkbenchRegistryConstants.ATT_LOCATION);
         if (location != null) {
             if (location.equalsIgnoreCase("left")) { //$NON-NLS-1$
@@ -87,28 +89,30 @@ public class StickyViewDescriptor implements IStickyViewDescriptor,
 				direction = IPageLayout.BOTTOM;
             //no else for right - it is the default value;
 			}
-        }
+        }    	
         return direction;
     }
 
-    @Override
-	public String getId() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.registry.IStickyViewDescriptor#getId()
+     */
+    public String getId() {
         return id;
     }
-
-    @Override
-	public String getLocalId() {
+    
+    public String getLocalId() {
     	return id;
     }
 
-    @Override
-	public String getPluginId() {
+    public String getPluginId() {
     	return configurationElement.getContributor().getName();
     }
+    
 
-
-    @Override
-	public boolean isCloseable() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.registry.IStickyViewDescriptor#isFixed()
+     */
+    public boolean isCloseable() {
     	boolean closeable = true;
     	String closeableString = configurationElement.getAttribute(IWorkbenchRegistryConstants.ATT_CLOSEABLE);
         if (closeableString != null) {
@@ -117,13 +121,15 @@ public class StickyViewDescriptor implements IStickyViewDescriptor,
         return closeable;
     }
 
-    @Override
-	public boolean isMoveable() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.registry.IStickyViewDescriptor#isMoveable()
+     */
+    public boolean isMoveable() {
     	boolean moveable = true;
     	String moveableString = configurationElement.getAttribute(IWorkbenchRegistryConstants.ATT_MOVEABLE);
         if (moveableString != null) {
             moveable = !moveableString.equals("false"); //$NON-NLS-1$
-        }
+        }    	
         return moveable;
     }
 }

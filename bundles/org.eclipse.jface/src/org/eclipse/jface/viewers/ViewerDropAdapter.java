@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,14 +29,14 @@ import org.eclipse.swt.widgets.TreeItem;
  *   <li><code>validateDrop</code> - identifies valid drop targets in viewer</li>
  *   <li><code>performDrop</code> - carries out a drop into a viewer</li>
  * </ul>
- * The <code>setFeedbackEnabled</code> method can be called to turn on and off
+ * The <code>setFeedbackEnabled</code> method can be called to turn on and off 
  * visual insertion feedback (on by default).
  * </p>
  */
 public abstract class ViewerDropAdapter extends DropTargetAdapter {
 
     /**
-     * Constant describing the position of the cursor relative
+     * Constant describing the position of the cursor relative 
      * to the target object.  This means the mouse is positioned
      * slightly before the target.
      * @see #getCurrentLocation()
@@ -44,7 +44,7 @@ public abstract class ViewerDropAdapter extends DropTargetAdapter {
     public static final int LOCATION_BEFORE = 1;
 
     /**
-     * Constant describing the position of the cursor relative
+     * Constant describing the position of the cursor relative 
      * to the target object.  This means the mouse is positioned
      * slightly after the target.
      * @see #getCurrentLocation()
@@ -52,7 +52,7 @@ public abstract class ViewerDropAdapter extends DropTargetAdapter {
     public static final int LOCATION_AFTER = 2;
 
     /**
-     * Constant describing the position of the cursor relative
+     * Constant describing the position of the cursor relative 
      * to the target object.  This means the mouse is positioned
      * directly on the target.
      * @see #getCurrentLocation()
@@ -60,7 +60,7 @@ public abstract class ViewerDropAdapter extends DropTargetAdapter {
     public static final int LOCATION_ON = 3;
 
     /**
-     * Constant describing the position of the cursor relative
+     * Constant describing the position of the cursor relative 
      * to the target object.  This means the mouse is not positioned
      * over or near any valid target.
      * @see #getCurrentLocation()
@@ -80,22 +80,22 @@ public abstract class ViewerDropAdapter extends DropTargetAdapter {
     /**
      * The last valid operation.  We need to remember the last good operation
      * in the case where the current operation temporarily is not valid (drag over
-     * someplace you can't drop).
+     * someplace you can't drop).  
      */
     private int lastValidOperation;
-
+    
     /**
-     * This is used because we allow the operation
+     * This is used because we allow the operation 
      * to be temporarily overridden (for example a move to a copy) for a drop that
      * happens immediately after the operation is overridden.
      */
     private int overrideOperation = -1;
-
+    
     /**
      * The current DropTargetEvent, used only during validateDrop()
      */
     private DropTargetEvent currentEvent;
-
+    
     /**
      * The data item currently under the mouse.
      */
@@ -125,7 +125,7 @@ public abstract class ViewerDropAdapter extends DropTargetAdapter {
      * expanding on or off. Default is <code>true</code>.
      */
     private boolean expandEnabled = true;
-
+    
     /**
      * A flag that allows adapter users to turn selection feedback
      *  on or off. Default is <code>true</code>.
@@ -145,7 +145,7 @@ public abstract class ViewerDropAdapter extends DropTargetAdapter {
 	 * Clears internal state of this drop adapter. This method can be called
 	 * when no DnD operation is underway, to clear internal state from previous
 	 * drop operations.
-	 *
+	 * 
 	 * @since 3.5
 	 */
     protected void clearState() {
@@ -192,12 +192,18 @@ public abstract class ViewerDropAdapter extends DropTargetAdapter {
         return event.item == null ? null : event.item.getData();
     }
 
+    /* (non-Javadoc)
+     * Method declared on DropTargetAdapter.
+     * The mouse has moved over the drop target.  If the
+     * target item has changed, notify the action and check
+     * that it is still enabled.
+     */
     private void doDropValidation(DropTargetEvent event) {
     	//always remember what was previously requested, but not if it
     	//was overridden
     	if (event.detail != DND.DROP_NONE && overrideOperation == -1)
     		lastValidOperation = event.detail;
-
+    	
     	currentOperation = lastValidOperation;
         currentEvent = event;
         overrideOperation = -1;
@@ -213,20 +219,33 @@ public abstract class ViewerDropAdapter extends DropTargetAdapter {
         currentEvent = null;
     }
 
-    @Override
-	public void dragEnter(DropTargetEvent event) {
+    /* (non-Javadoc)
+     * Method declared on DropTargetAdapter.
+     * The drag has entered this widget's region.  See
+     * if the drop should be allowed.
+     */
+    public void dragEnter(DropTargetEvent event) {
         currentTarget = determineTarget(event);
         doDropValidation(event);
     }
 
-    @Override
-	public void dragOperationChanged(DropTargetEvent event) {
+    /* (non-Javadoc)
+     * Method declared on DropTargetAdapter.
+     * The drop operation has changed, see if the action
+     * should still be enabled.
+     */
+    public void dragOperationChanged(DropTargetEvent event) {
         currentTarget = determineTarget(event);
         doDropValidation(event);
     }
 
-    @Override
-	public void dragOver(DropTargetEvent event) {
+    /* (non-Javadoc)
+     * Method declared on DropTargetAdapter.
+     * The mouse has moved over the drop target.  If the
+     * target item has changed, notify the action and check
+     * that it is still enabled.
+     */
+    public void dragOver(DropTargetEvent event) {
     	//use newly revealed item as target if scrolling occurs
         Object target = determineTarget(event);
 
@@ -242,26 +261,32 @@ public abstract class ViewerDropAdapter extends DropTargetAdapter {
         }
     }
 
-    @Override
-	public void drop(DropTargetEvent event) {
+    /* (non-Javadoc)
+     * Method declared on DropTargetAdapter.
+     * The user has dropped something on the desktop viewer.
+     */
+    public void drop(DropTargetEvent event) {
         currentLocation = determineLocation(event);
     	currentEvent = event;
 
     	if (overrideOperation != -1)
     		currentOperation = overrideOperation;
-
+    	
         //perform the drop behavior
         if (!performDrop(event.data)) {
             event.detail = DND.DROP_NONE;
         }
-
+        
         //reset for next time
         currentOperation = DND.DROP_NONE;
         currentEvent = null;
     }
 
-    @Override
-	public void dropAccept(DropTargetEvent event) {
+    /* (non-Javadoc)
+     * Method declared on DropTargetAdapter.
+     * Last chance for the action to disable itself
+     */
+    public void dropAccept(DropTargetEvent event) {
     	currentEvent = event;
     	if (!validateDrop(currentTarget, event.detail, event.currentDataType)) {
             currentOperation = event.detail = DND.DROP_NONE;
@@ -287,7 +312,7 @@ public abstract class ViewerDropAdapter extends DropTargetAdapter {
 
     /**
      * Returns a constant describing the position of the mouse relative to the
-     * target (before, on, or after the target.
+     * target (before, on, or after the target.  
      *
      * @return one of the <code>LOCATION_* </code> constants defined in this type
      */
@@ -320,8 +345,8 @@ public abstract class ViewerDropAdapter extends DropTargetAdapter {
 
     /**
      * Returns the current {@link DropTargetEvent}.
-     *
-     * This may be called only inside of the {@link #validateDrop(Object, int, TransferData)}
+     * 
+     * This may be called only inside of the {@link #validateDrop(Object, int, TransferData)} 
      * or {@link #performDrop(Object)} methods.
      * @return the DropTargetEvent
      * @since 3.5
@@ -330,11 +355,11 @@ public abstract class ViewerDropAdapter extends DropTargetAdapter {
     	Assert.isTrue(currentEvent != null);
     	return currentEvent;
     }
-
+    
     /**
      * Returns whether visible insertion feedback should be presented to the user.
      * <p>
-     * Typical insertion feedback is the horizontal insertion bars that appear
+     * Typical insertion feedback is the horizontal insertion bars that appear 
      * between adjacent items while dragging.
      * </p>
      *
@@ -346,7 +371,7 @@ public abstract class ViewerDropAdapter extends DropTargetAdapter {
 
 	/**
 	 * Returns the object currently selected by the viewer.
-	 *
+	 * 
 	 * @return the selected object or the first element in current selection,
 	 *         and null if no objects are selected
 	 */
@@ -367,9 +392,9 @@ public abstract class ViewerDropAdapter extends DropTargetAdapter {
     }
 
     /**
-     * @deprecated this method should not be used. Exception handling has been
+     * @deprecated this method should not be used. Exception handling has been 
      * 	removed from DropTargetAdapter methods overridden by this class.
-     * Handles any exception that occurs during callback, including
+     * Handles any exception that occurs during callback, including 
      * rethrowing behavior.
      * <p>
      * [Issue: Implementation prints stack trace and eats exception to avoid
@@ -382,8 +407,7 @@ public abstract class ViewerDropAdapter extends DropTargetAdapter {
      * @param exception the exception
      * @param event the event
      */
-    @Deprecated
-	protected void handleException(Throwable exception, DropTargetEvent event) {
+    protected void handleException(Throwable exception, DropTargetEvent event) {
         // Currently we never rethrow because VA/Java crashes if an SWT
         // callback throws anything. Generally catching Throwable is bad, but in
         // this cases it's better than hanging the image.
@@ -398,7 +422,7 @@ public abstract class ViewerDropAdapter extends DropTargetAdapter {
      * </p>
      *
      * @param data the drop data
-     * @return <code>true</code> if the drop was successful, and
+     * @return <code>true</code> if the drop was successful, and 
      *   <code>false</code> otherwise
      */
     public abstract boolean performDrop(Object data);
@@ -406,25 +430,31 @@ public abstract class ViewerDropAdapter extends DropTargetAdapter {
 	/**
 	 * Overrides the current operation for a drop that happens immediately
 	 * after the current validateDrop.
-	 *
+	 * 
 	 * This maybe called only from within a
 	 * {@link #validateDrop(Object, int, TransferData)} method
-	 *
-	 *
+	 * 
+	 * 
 	 * @param operation
 	 *            the operation to be used for the drop.
-	 *
+	 * 
 	 * @see DND#DROP_COPY
 	 * @see DND#DROP_MOVE
 	 * @see DND#DROP_LINK
 	 * @see DND#DROP_NONE
-	 *
+	 * 
 	 * @since 3.5
 	 */
 	protected void overrideOperation(int operation) {
 		overrideOperation = operation;
 	}
-
+	
+    /* (non-Javadoc)
+     * Method declared on DropTargetAdapter.
+     * The mouse has moved over the drop target.  If the
+     * target item has changed, notify the action and check
+     * that it is still enabled.
+     */
     private void setFeedback(DropTargetEvent event, int location) {
         if (feedbackEnabled) {
             switch (location) {
@@ -440,7 +470,7 @@ public abstract class ViewerDropAdapter extends DropTargetAdapter {
                 break;
             }
         }
-
+        
          // Explicitly inhibit SELECT feedback if desired
 		if (!selectFeedbackEnabled) {
 			event.feedback &= ~DND.FEEDBACK_SELECT;
@@ -460,7 +490,7 @@ public abstract class ViewerDropAdapter extends DropTargetAdapter {
 	 * Typical insertion feedback is the horizontal insertion bars that appear
 	 * between adjacent items while dragging.
 	 * </p>
-	 *
+	 * 
 	 * @param value
 	 *            <code>true</code> if visual feedback is desired, and
 	 *            <code>false</code> if not
@@ -474,7 +504,7 @@ public abstract class ViewerDropAdapter extends DropTargetAdapter {
      *
      * @param value <code>true</code> if selection feedback is desired, and
      *   <code>false</code> if not
-     *
+     *   
      * @since 3.2
      */
     public void setSelectionFeedbackEnabled(boolean value) {
@@ -503,7 +533,7 @@ public abstract class ViewerDropAdapter extends DropTargetAdapter {
     public void setExpandEnabled(boolean value) {
         expandEnabled = value;
     }
-
+    
     /**
      * Sets whether auto scrolling should be provided during dragging.
      *
@@ -516,12 +546,12 @@ public abstract class ViewerDropAdapter extends DropTargetAdapter {
     }
 
     /**
-     * Validates dropping on the given object. This method is called whenever some
+     * Validates dropping on the given object. This method is called whenever some 
      * aspect of the drop operation changes.
      * <p>
      * Subclasses must implement this method to define which drops make sense.
      * </p>
-     *
+     * 
      * @param target the object that the mouse is currently hovering over, or
      *   <code>null</code> if the mouse is hovering over empty space
      * @param operation the current drag operation (copy, move, etc.)

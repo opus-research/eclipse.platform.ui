@@ -1,10 +1,10 @@
 /**
- * Copyright (c) 2010, 2015 BestSolution.at and others.
+ * Copyright (c) 2010 BestSolution.at and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *      Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
  *      IBM Corporation - initial API and implementation
@@ -20,6 +20,7 @@ import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
+import org.eclipse.emf.ecore.impl.MinimalEObjectImpl.Container;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
@@ -29,15 +30,15 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
- * </p>
  * <ul>
  *   <li>{@link org.eclipse.e4.ui.model.fragment.impl.ModelFragmentsImpl#getImports <em>Imports</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.fragment.impl.ModelFragmentsImpl#getFragments <em>Fragments</em>}</li>
  * </ul>
+ * </p>
  *
  * @generated
  */
-public class ModelFragmentsImpl extends org.eclipse.emf.ecore.impl.MinimalEObjectImpl.Container implements MModelFragments {
+public class ModelFragmentsImpl extends Container implements MModelFragments {
 	/**
 	 * The cached value of the '{@link #getImports() <em>Imports</em>}' containment reference list.
 	 * <!-- begin-user-doc -->

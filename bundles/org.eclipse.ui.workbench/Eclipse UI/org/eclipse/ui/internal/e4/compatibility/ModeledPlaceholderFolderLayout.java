@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,7 +33,6 @@ public class ModeledPlaceholderFolderLayout implements IPlaceholderFolderLayout 
 		layout = l;
 	}
 
-	@Override
 	public void addPlaceholder(String viewId) {
 		boolean containsWildcards = viewId.indexOf('?') != -1;
 		if (containsWildcards) {
@@ -48,13 +47,11 @@ public class ModeledPlaceholderFolderLayout implements IPlaceholderFolderLayout 
 		}
 	}
 
-	@Override
 	public String getProperty(String id) {
 		Object propVal = null;
 		return propVal == null ? "" : propVal.toString(); //$NON-NLS-1$
 	}
 
-	@Override
 	public void setProperty(String id, String value) {
 		// folderModel.setProperty(id, value);
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,8 +13,8 @@ package org.eclipse.jface.preference;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.graphics.Image;
 
 /**
@@ -31,7 +31,7 @@ public class PreferenceNode implements IPreferenceNode {
      * The list of subnodes (immediate children) of this node (element type:
      * <code>IPreferenceNode</code>).
      */
-    private List<IPreferenceNode> subNodes;
+    private List subNodes;
 
     /**
      * Name of a class that implements <code>IPreferencePage</code>, or
@@ -63,7 +63,7 @@ public class PreferenceNode implements IPreferenceNode {
     /**
      * Creates a new preference node with the given id. The new node has no
      * subnodes.
-     *
+     * 
      * @param id
      *            the node id
      */
@@ -77,7 +77,7 @@ public class PreferenceNode implements IPreferenceNode {
      * lazily-loaded preference page. The preference node assumes (sole)
      * responsibility for disposing of the image; this will happen when the node
      * is disposed.
-     *
+     * 
      * @param id
      *            the node id
      * @param label
@@ -103,7 +103,7 @@ public class PreferenceNode implements IPreferenceNode {
      * Creates a preference node with the given id and preference page. The
      * title of the preference page is used for the node label. The node will
      * not have an image.
-     *
+     * 
      * @param id
      *            the node id
      * @param preferencePage
@@ -115,24 +115,26 @@ public class PreferenceNode implements IPreferenceNode {
         page = preferencePage;
     }
 
-    @Override
-	public void add(IPreferenceNode node) {
+    /*
+     * (non-Javadoc) Method declared on IPreferenceNode.
+     */
+    public void add(IPreferenceNode node) {
         if (subNodes == null) {
-			subNodes = new ArrayList<>();
+			subNodes = new ArrayList();
 		}
         subNodes.add(node);
     }
 
     /**
      * Creates a new instance of the given class <code>className</code>.
-     *
+     * 
      * @param className
      * @return new Object or <code>null</code> in case of failures.
      */
     private Object createObject(String className) {
         Assert.isNotNull(className);
         try {
-            Class<?> cl = Class.forName(className);
+            Class cl = Class.forName(className);
             if (cl != null) {
 				return cl.newInstance();
 			}
@@ -148,8 +150,10 @@ public class PreferenceNode implements IPreferenceNode {
         return null;
     }
 
-    @Override
-	public void createPage() {
+    /*
+     * (non-Javadoc) Method declared on IPreferenceNode.
+     */
+    public void createPage() {
         page = (IPreferencePage) createObject(classname);
         if (getLabelImage() != null) {
 			page.setImageDescriptor(imageDescriptor);
@@ -157,8 +161,10 @@ public class PreferenceNode implements IPreferenceNode {
         page.setTitle(label);
     }
 
-    @Override
-	public void disposeResources() {
+    /**
+     * (non-Javadoc) Method declared on IPreferenceNode.
+     */
+    public void disposeResources() {
         if (image != null) {
             image.dispose();
             image = null;
@@ -169,8 +175,10 @@ public class PreferenceNode implements IPreferenceNode {
         }
     }
 
-    @Override
-	public IPreferenceNode findSubNode(String id) {
+    /*
+     * (non-Javadoc) Method declared on IContributionNode.
+     */
+    public IPreferenceNode findSubNode(String id) {
         Assert.isNotNull(id);
         Assert.isTrue(id.length() > 0);
         if (subNodes == null) {
@@ -178,7 +186,7 @@ public class PreferenceNode implements IPreferenceNode {
 		}
         int size = subNodes.size();
         for (int i = 0; i < size; i++) {
-            IPreferenceNode node = subNodes.get(i);
+            IPreferenceNode node = (IPreferenceNode) subNodes.get(i);
             if (id.equals(node.getId())) {
 				return node;
 			}
@@ -186,52 +194,64 @@ public class PreferenceNode implements IPreferenceNode {
         return null;
     }
 
-    @Override
-	public String getId() {
+    /*
+     * (non-Javadoc) Method declared on IPreferenceNode.
+     */
+    public String getId() {
         return this.id;
     }
 
     /**
      * Returns the image descriptor for this node.
-     *
+     * 
      * @return the image descriptor
      */
     protected ImageDescriptor getImageDescriptor() {
         return imageDescriptor;
     }
 
-    @Override
-	public Image getLabelImage() {
+    /*
+     * (non-Javadoc) Method declared on IPreferenceNode.
+     */
+    public Image getLabelImage() {
         if (image == null && imageDescriptor != null) {
             image = imageDescriptor.createImage();
         }
         return image;
     }
 
-    @Override
-	public String getLabelText() {
+    /*
+     * (non-Javadoc) Method declared on IPreferenceNode.
+     */
+    public String getLabelText() {
         if (page != null) {
 			return page.getTitle();
 		}
         return label;
     }
 
-    @Override
-	public IPreferencePage getPage() {
+    /*
+     * (non-Javadoc) Method declared on IPreferenceNode.
+     */
+    public IPreferencePage getPage() {
         return page;
     }
 
-    @Override
-	public IPreferenceNode[] getSubNodes() {
+    /*
+     * (non-Javadoc) Method declared on IPreferenceNode.
+     */
+    public IPreferenceNode[] getSubNodes() {
         if (subNodes == null) {
 			return new IPreferenceNode[0];
 		}
-        return subNodes
+        return (IPreferenceNode[]) subNodes
                 .toArray(new IPreferenceNode[subNodes.size()]);
     }
 
-    @Override
-	public IPreferenceNode remove(String id) {
+    /*
+     * (non-Javadoc) Method declared on IPreferenceNode.
+     */
+    public IPreferenceNode remove(String id) {
         IPreferenceNode node = findSubNode(id);
         if (node != null) {
 			remove(node);
@@ -239,8 +259,10 @@ public class PreferenceNode implements IPreferenceNode {
         return node;
     }
 
-    @Override
-	public boolean remove(IPreferenceNode node) {
+    /*
+     * (non-Javadoc) Method declared on IPreferenceNode.
+     */
+    public boolean remove(IPreferenceNode node) {
         if (subNodes == null) {
 			return false;
 		}
@@ -249,7 +271,7 @@ public class PreferenceNode implements IPreferenceNode {
 
     /**
      * Set the current page to be newPage.
-     *
+     * 
      * @param newPage
      */
     public void setPage(IPreferencePage newPage) {

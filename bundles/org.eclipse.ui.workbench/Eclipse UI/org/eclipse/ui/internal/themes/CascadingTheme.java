@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,8 +32,7 @@ public class CascadingTheme extends EventManager implements ITheme {
 
     private IPropertyChangeListener listener = new IPropertyChangeListener() {
 
-        @Override
-		public void propertyChange(PropertyChangeEvent event) {
+        public void propertyChange(PropertyChangeEvent event) {
             fire(event);
         }
     };
@@ -63,59 +62,81 @@ public class CascadingTheme extends EventManager implements ITheme {
         }
     }
 
-    @Override
-	public void addPropertyChangeListener(IPropertyChangeListener listener) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.themes.ITheme#addPropertyChangeListener(org.eclipse.jface.util.IPropertyChangeListener)
+     */
+    public void addPropertyChangeListener(IPropertyChangeListener listener) {
         addListenerObject(listener);
     }
 
-    @Override
-	public void removePropertyChangeListener(IPropertyChangeListener listener) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.themes.ITheme#removePropertyChangeListener(org.eclipse.jface.util.IPropertyChangeListener)
+     */
+    public void removePropertyChangeListener(IPropertyChangeListener listener) {
         removeListenerObject(listener);
     }
 
-    @Override
-	public String getId() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.themes.ITheme#getId()
+     */
+    public String getId() {
         return currentTheme.getId();
     }
 
-    @Override
-	public String getLabel() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.themes.ITheme#getLabel()
+     */
+    public String getLabel() {
         return currentTheme.getLabel();
     }
 
-    @Override
-	public ColorRegistry getColorRegistry() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.themes.ITheme#getColorRegistry()
+     */
+    public ColorRegistry getColorRegistry() {
         return colorRegistry;
     }
 
-    @Override
-	public FontRegistry getFontRegistry() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.themes.ITheme#getFontRegistry()
+     */
+    public FontRegistry getFontRegistry() {
         return fontRegistry;
     }
 
-    @Override
-	public void dispose() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.themes.ITheme#dispose()
+     */
+    public void dispose() {
         colorRegistry.removeListener(listener);
         fontRegistry.removeListener(listener);
     }
 
-    @Override
-	public String getString(String key) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.themes.ITheme#getString(java.lang.String)
+     */
+    public String getString(String key) {
         return currentTheme.getString(key);
     }
 
-    @Override
-	public int getInt(String key) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.themes.ITheme#getInt(java.lang.String)
+     */
+    public int getInt(String key) {
         return currentTheme.getInt(key);
     }
 
-    @Override
-	public boolean getBoolean(String key) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.themes.ITheme#getBoolean(java.lang.String)
+     */
+    public boolean getBoolean(String key) {
         return currentTheme.getBoolean(key);
     }
 
-    @Override
-	public Set keySet() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.themes.ITheme#keySet()
+     */
+    public Set keySet() {
         return currentTheme.keySet();
     }
 

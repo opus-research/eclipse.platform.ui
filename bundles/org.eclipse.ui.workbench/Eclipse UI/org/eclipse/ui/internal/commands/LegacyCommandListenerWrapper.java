@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,7 @@ import org.eclipse.ui.commands.ICommand;
 /**
  * Wraps a legacy listener in a new listener interface. This simply forwards
  * incoming events through to the old interface.
- *
+ * 
  * @since 3.1
  */
 final class LegacyCommandListenerWrapper implements ICommandListener {
@@ -37,7 +37,7 @@ final class LegacyCommandListenerWrapper implements ICommandListener {
 	/**
 	 * Constructs a new instance of <code>CommandListenerWrapper</code> around
 	 * a legacy listener.
-	 *
+	 * 
 	 * @param listener
 	 *            The listener to be wrapped; must not be <code>null</code>.
 	 */
@@ -57,7 +57,11 @@ final class LegacyCommandListenerWrapper implements ICommandListener {
 		this.bindingManager = bindingManager;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.commands.ICommandListener#commandChanged(org.eclipse.commands.CommandEvent)
+	 */
 	public final void commandChanged(final CommandEvent commandEvent) {
 		final ICommand command = new CommandLegacyWrapper(commandEvent.getCommand(),
 				bindingManager);
@@ -72,7 +76,6 @@ final class LegacyCommandListenerWrapper implements ICommandListener {
 
 	}
 
-	@Override
 	public final boolean equals(final Object object) {
 		if (object instanceof LegacyCommandListenerWrapper) {
 			final LegacyCommandListenerWrapper wrapper = (LegacyCommandListenerWrapper) object;
@@ -87,7 +90,6 @@ final class LegacyCommandListenerWrapper implements ICommandListener {
 		return false;
 	}
 
-	@Override
 	public final int hashCode() {
 		return listener.hashCode();
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@
 package org.eclipse.ui.dialogs;
 
 import java.util.Arrays;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
@@ -31,7 +32,7 @@ import org.eclipse.ui.internal.MessageLine;
  * The status message must be passed over as StatusInfo object and can be
  * an error, warning or ok. The OK button is enabled or disabled depending
  * on the status.
- *
+ * 
  * @since 2.0
  */
 public abstract class SelectionStatusDialog extends SelectionDialog {
@@ -102,8 +103,10 @@ public abstract class SelectionStatusDialog extends SelectionDialog {
      */
     protected abstract void computeResult();
 
-    @Override
-	protected void configureShell(Shell shell) {
+    /*
+     * @see Window#configureShell(shell)
+     */
+    protected void configureShell(Shell shell) {
         super.configureShell(shell);
         if (fImage != null) {
 			shell.setImage(fImage);
@@ -135,22 +138,28 @@ public abstract class SelectionStatusDialog extends SelectionDialog {
 		}
     }
 
-    @Override
-	protected void okPressed() {
+    /*
+     * @see Dialog#okPressed()
+     */
+    protected void okPressed() {
         computeResult();
         super.okPressed();
     }
 
-    @Override
-	public void create() {
+    /*
+     * @see Window#create()
+     */
+    public void create() {
         super.create();
         if (fLastStatus != null) {
 			updateStatus(fLastStatus);
 		}
     }
 
-    @Override
-	protected Control createButtonBar(Composite parent) {
+    /*
+     * @see Dialog#createButtonBar(Composite)
+     */
+    protected Control createButtonBar(Composite parent) {
         Font font = parent.getFont();
         Composite composite = new Composite(parent, SWT.NULL);
         GridLayout layout = new GridLayout();

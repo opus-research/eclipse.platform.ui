@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,8 +22,10 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -34,16 +36,16 @@ import org.eclipse.swt.widgets.TreeColumn;
 /**
  * Utilities for configuring columns of trees and tables in a
  * keyboard-accessible way.
- *
+ * 
  * @since 3.5
- *
+ * 
  */
 public class ConfigureColumns {
 
 	/**
 	 * Configure the columns of the given tree in a keyboard-accessible way,
 	 * using the given shell provider to parent dialogs.
-	 *
+	 * 
 	 * @param tree the tree
 	 * @param shellProvider a shell provider
 	 * @return <code>false</code> if the user canceled, <code>true</code>
@@ -56,7 +58,7 @@ public class ConfigureColumns {
 	/**
 	 * Configure the columns of the given tree in a keyboard-accessible way,
 	 * using the given shell provider to parent dialogs.
-	 *
+	 * 
 	 * @param table the table
 	 * @param shellProvider a shell provider
 	 * @return <code>false</code> if the user canceled, <code>true</code>
@@ -68,7 +70,7 @@ public class ConfigureColumns {
 
 	/**
 	 * NON-API - This class is internal.
-	 *
+	 * 
 	 */
 	static class ConfigureColumnsDialog extends Dialog {
 
@@ -108,7 +110,7 @@ public class ConfigureColumns {
 		 * in 3.5. Creates a new dialog for configuring columns of the given
 		 * column viewer. The column viewer must have an underlying {@link Tree}
 		 * or {@link Table}, other controls are not supported.
-		 *
+		 * 
 		 * @param shellProvider
 		 * @param table
 		 */
@@ -121,7 +123,7 @@ public class ConfigureColumns {
 		 * in 3.5. Creates a new dialog for configuring columns of the given
 		 * column viewer. The column viewer must have an underlying {@link Tree}
 		 * or {@link Table}, other controls are not supported.
-		 *
+		 * 
 		 * @param shellProvider
 		 * @param tree
 		 */
@@ -139,18 +141,15 @@ public class ConfigureColumns {
 			this.moveableColumnsFound = createColumnObjects();
 		}
 
-		@Override
 		protected boolean isResizable() {
 			return true;
 		}
 
-		@Override
 		public void create() {
 			super.create();
 			getShell().setText(JFaceResources.getString("ConfigureColumnsDialog_Title")); //$NON-NLS-1$
 		}
 
-		@Override
 		protected void initializeBounds() {
 			super.initializeBounds();
 			table.setSelection(0);
@@ -230,7 +229,6 @@ public class ConfigureColumns {
 			return false;
 		}
 
-		@Override
 		protected Control createDialogArea(Composite parent) {
 			Composite composite = (Composite) super.createDialogArea(parent);
 
@@ -251,12 +249,20 @@ public class ConfigureColumns {
 			if (moveableColumnsFound) {
 				upButton = new Button(composite, SWT.PUSH);
 				upButton.setText(JFaceResources.getString("ConfigureColumnsDialog_up")); //$NON-NLS-1$
-				upButton.addListener(SWT.Selection, event -> handleMove(table, true));
+				upButton.addListener(SWT.Selection, new Listener() {
+					public void handleEvent(Event event) {
+						handleMove(table, true);
+					}
+				});
 				setButtonLayoutData(upButton);
 				downButton = new Button(composite, SWT.PUSH);
 				downButton.setText(JFaceResources
 						.getString("ConfigureColumnsDialog_down")); //$NON-NLS-1$
-				downButton.addListener(SWT.Selection, event -> handleMove(table, false));
+				downButton.addListener(SWT.Selection, new Listener() {
+					public void handleEvent(Event event) {
+						handleMove(table, false);
+					}
+				});
 				setButtonLayoutData(downButton);
 
 				// filler label
@@ -280,17 +286,23 @@ public class ConfigureColumns {
 
 			GridLayoutFactory.swtDefaults().numColumns(numColumns).applyTo(composite);
 
-			table.addListener(SWT.Selection, event -> handleSelectionChanged(table.indexOf((TableItem) event.item)));
-			text.addListener(SWT.Modify, event -> {
-				ColumnObject columnObject = columnObjects[table.getSelectionIndex()];
-				if (!columnObject.resizable) {
-					return;
+			table.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event event) {
+					handleSelectionChanged(table.indexOf((TableItem) event.item));
 				}
-				try {
-					int width = Integer.parseInt(text.getText());
-					columnObject.width = width;
-				} catch (NumberFormatException ex) {
-					// ignore for now
+			});
+			text.addListener(SWT.Modify, new Listener() {
+				public void handleEvent(Event event) {
+					ColumnObject columnObject = columnObjects[table.getSelectionIndex()];
+					if (!columnObject.resizable) {
+						return;
+					}
+					try {
+						int width = Integer.parseInt(text.getText());
+						columnObject.width = width;
+					} catch (NumberFormatException ex) {
+						// ignore for now
+					}
 				}
 			});
 
@@ -381,7 +393,6 @@ public class ConfigureColumns {
 			}
 		}
 
-		@Override
 		protected void okPressed() {
 			int[] columnOrder = new int[columnObjects.length];
 			for (int i = 0; i < columnObjects.length; i++) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
  *                                                 refactoring (bug 153993), bug 167323, 191468, 205419
  *     Matthew Hall - bug 221988
  *     Pawel Piech, WindRiver - bug 296573
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430873
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -23,12 +22,16 @@ import java.util.List;
 
 import org.eclipse.jface.util.Policy;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.TreeEvent;
 import org.eclipse.swt.events.TreeListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Item;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
@@ -134,12 +137,18 @@ public class TreeViewer extends AbstractTreeViewer {
 		hookControl(tree);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared in AbstractTreeViewer.
+	 */
 	protected void addTreeListener(Control c, TreeListener listener) {
 		((Tree) c).addTreeListener(listener);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.ColumnViewer#getColumnViewerOwner(int)
+	 */
 	protected Widget getColumnViewerOwner(int columnIndex) {
 		if (columnIndex < 0 || ( columnIndex > 0 && columnIndex >= getTree().getColumnCount() ) ) {
 			return null;
@@ -151,7 +160,9 @@ public class TreeViewer extends AbstractTreeViewer {
 		return getTree().getColumn(columnIndex);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared in AbstractTreeViewer.
+	 */
 	protected Item[] getChildren(Widget o) {
 		if (o instanceof TreeItem) {
 			return ((TreeItem) o).getItems();
@@ -162,17 +173,25 @@ public class TreeViewer extends AbstractTreeViewer {
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared in Viewer.
+	 */
 	public Control getControl() {
 		return tree;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared in AbstractTreeViewer.
+	 */
 	protected boolean getExpanded(Item item) {
 		return ((TreeItem) item).getExpanded();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.ColumnViewer#getItemAt(org.eclipse.swt.graphics.Point)
+	 */
 	protected Item getItemAt(Point p) {
 		TreeItem[] selection = tree.getSelection();
 
@@ -189,17 +208,23 @@ public class TreeViewer extends AbstractTreeViewer {
 		return getTree().getItem(p);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared in AbstractTreeViewer.
+	 */
 	protected int getItemCount(Control widget) {
 		return ((Tree) widget).getItemCount();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared in AbstractTreeViewer.
+	 */
 	protected int getItemCount(Item item) {
 		return ((TreeItem) item).getItemCount();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared in AbstractTreeViewer.
+	 */
 	protected Item[] getItems(Item item) {
 		return ((TreeItem) item).getItems();
 	}
@@ -213,17 +238,20 @@ public class TreeViewer extends AbstractTreeViewer {
 	 * <code>ILabelProvider</code>, then it provides only the label text and
 	 * image for the first column, and any remaining columns are blank.
 	 */
-	@Override
 	public IBaseLabelProvider getLabelProvider() {
 		return super.getLabelProvider();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared in AbstractTreeViewer.
+	 */
 	protected Item getParentItem(Item item) {
 		return ((TreeItem) item).getParentItem();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared in AbstractTreeViewer.
+	 */
 	protected Item[] getSelection(Control widget) {
 		return ((Tree) widget).getSelection();
 	}
@@ -237,35 +265,46 @@ public class TreeViewer extends AbstractTreeViewer {
 		return tree;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.AbstractTreeViewer#hookControl(org.eclipse.swt.widgets.Control)
+	 */
 	protected void hookControl(Control control) {
 		super.hookControl(control);
 		Tree treeControl = (Tree) control;
 
 		if ((treeControl.getStyle() & SWT.VIRTUAL) != 0) {
-			treeControl.addDisposeListener(e -> {
-				treeIsDisposed = true;
-				unmapAllElements();
-			});
-			treeControl.addListener(SWT.SetData, event -> {
-				if (contentProviderIsLazy) {
-					TreeItem item = (TreeItem) event.item;
-					TreeItem parentItem = item.getParentItem();
-					int index = event.index;
-					virtualLazyUpdateWidget(
-							parentItem == null ? (Widget) getTree()
-									: parentItem, index);
+			treeControl.addDisposeListener(new DisposeListener() {
+				public void widgetDisposed(DisposeEvent e) {
+					treeIsDisposed = true;
+					unmapAllElements();
 				}
+			});
+			treeControl.addListener(SWT.SetData, new Listener() {
+
+				public void handleEvent(Event event) {
+					if (contentProviderIsLazy) {
+						TreeItem item = (TreeItem) event.item;
+						TreeItem parentItem = item.getParentItem();
+						int index = event.index;
+						virtualLazyUpdateWidget(
+								parentItem == null ? (Widget) getTree()
+										: parentItem, index);
+					}
+				}
+
 			});
 		}
 	}
 
-	@Override
 	protected ColumnViewerEditor createViewerEditor() {
 		return new TreeViewerEditor(this,null,new ColumnViewerEditorActivationStrategy(this),ColumnViewerEditor.DEFAULT);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared in AbstractTreeViewer.
+	 */
 	protected Item newItem(Widget parent, int flags, int ix) {
 		TreeItem item;
 
@@ -279,12 +318,16 @@ public class TreeViewer extends AbstractTreeViewer {
 		return item;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared in AbstractTreeViewer.
+	 */
 	protected void removeAll(Control widget) {
 		((Tree) widget).removeAll();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared in AbstractTreeViewer.
+	 */
 	protected void setExpanded(Item node, boolean expand) {
 		((TreeItem) node).setExpanded(expand);
 		if (contentProviderIsLazy) {
@@ -293,7 +336,9 @@ public class TreeViewer extends AbstractTreeViewer {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared in AbstractTreeViewer.
+	 */
 	protected void setSelection(List items) {
 
 		Item[] current = getSelection(getTree());
@@ -308,12 +353,19 @@ public class TreeViewer extends AbstractTreeViewer {
 		getTree().setSelection(newItems);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared in AbstractTreeViewer.
+	 */
 	protected void showItem(Item item) {
 		getTree().showItem((TreeItem) item);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.AbstractTreeViewer#getChild(org.eclipse.swt.widgets.Widget,
+	 *      int)
+	 */
 	protected Item getChild(Widget widget, int index) {
 		if (widget instanceof TreeItem) {
 			return ((TreeItem) widget).getItem(index);
@@ -324,7 +376,6 @@ public class TreeViewer extends AbstractTreeViewer {
 		return null;
 	}
 
-	@Override
 	protected void assertContentProviderType(IContentProvider provider) {
 		if (provider instanceof ILazyTreeContentProvider
 				|| provider instanceof ILazyTreePathContentProvider) {
@@ -333,7 +384,6 @@ public class TreeViewer extends AbstractTreeViewer {
 		super.assertContentProviderType(provider);
 	}
 
-	@Override
 	protected Object[] getRawChildren(Object parent) {
 		if (contentProviderIsLazy) {
 			return new Object[0];
@@ -341,7 +391,6 @@ public class TreeViewer extends AbstractTreeViewer {
 		return super.getRawChildren(parent);
 	}
 
-	@Override
 	void preservingSelection(Runnable updateCode, boolean reveal) {
 		if (insidePreservingSelection || !getPreserveSelection()){
 			// avoid preserving the selection if called reentrantly,
@@ -372,15 +421,17 @@ public class TreeViewer extends AbstractTreeViewer {
 	public void setChildCount(final Object elementOrTreePath, final int count) {
 		if (checkBusy())
 			return;
-		preservingSelection(() -> {
-			if (internalIsInputOrEmptyPath(elementOrTreePath)) {
-				getTree().setItemCount(count);
-				return;
-			}
-			Widget[] items = internalFindItems(elementOrTreePath);
-			for (Widget item : items) {
-				TreeItem treeItem = (TreeItem) item;
-				treeItem.setItemCount(count);
+		preservingSelection(new Runnable() {
+			public void run() {
+				if (internalIsInputOrEmptyPath(elementOrTreePath)) {
+					getTree().setItemCount(count);
+					return;
+				}
+				Widget[] items = internalFindItems(elementOrTreePath);
+				for (int i = 0; i < items.length; i++) {
+					TreeItem treeItem = (TreeItem) items[i];
+					treeItem.setItemCount(count);
+				}
 			}
 		});
 	}
@@ -429,9 +480,9 @@ public class TreeViewer extends AbstractTreeViewer {
 				selection = adjustSelectionForReplace(selectedItems, selection, item, element, getRoot());
 				// disassociate any different item that represents the
 				// same element under the same parent (the tree)
-				for (Widget widget : itemsToDisassociate) {
-					if (widget instanceof TreeItem) {
-						TreeItem itemToDisassociate = (TreeItem) widget;
+				for (int i = 0; i < itemsToDisassociate.length; i++) {
+					if (itemsToDisassociate[i] instanceof TreeItem) {
+						TreeItem itemToDisassociate = (TreeItem) itemsToDisassociate[i];
 						if (itemToDisassociate != item
 								&& itemToDisassociate.getParentItem() == null) {
 							int indexToDisassociate = getTree().indexOf(
@@ -449,16 +500,16 @@ public class TreeViewer extends AbstractTreeViewer {
 			}
 		} else {
 			Widget[] parentItems = internalFindItems(parentElementOrTreePath);
-			for (Widget widget : parentItems) {
-				TreeItem parentItem = (TreeItem) widget;
+			for (int i = 0; i < parentItems.length; i++) {
+				TreeItem parentItem = (TreeItem) parentItems[i];
 				if (index < parentItem.getItemCount()) {
 					TreeItem item = parentItem.getItem(index);
 					selection = adjustSelectionForReplace(selectedItems, selection, item, element, parentItem.getData());
 					// disassociate any different item that represents the
 					// same element under the same parent (the tree)
-					for (Widget widgetToDisassociate : itemsToDisassociate) {
-						if (widgetToDisassociate instanceof TreeItem) {
-							TreeItem itemToDisassociate = (TreeItem) widgetToDisassociate;
+					for (int j = 0; j < itemsToDisassociate.length; j++) {
+						if (itemsToDisassociate[j] instanceof TreeItem) {
+							TreeItem itemToDisassociate = (TreeItem) itemsToDisassociate[j];
 							if (itemToDisassociate != item
 									&& itemToDisassociate.getParentItem() == parentItem) {
 								int indexToDisaccociate = parentItem
@@ -496,7 +547,7 @@ public class TreeViewer extends AbstractTreeViewer {
 	 * @param selection
 	 * @param item
 	 * @param element
-	 * @return the adjusted selection
+	 * @return
 	 */
 	private TreeSelection adjustSelectionForReplace(Item[] selectedItems,
 			TreeSelection selection, TreeItem item, Object element, Object parentElement) {
@@ -505,8 +556,8 @@ public class TreeViewer extends AbstractTreeViewer {
 			// Don't do anything - we are not seeing an instance of bug 185673
 			return selection;
 		}
-		for (Item selectedItem : selectedItems) {
-			if (item == selectedItem) {
+		for (int i = 0; i < selectedItems.length; i++) {
+			if (item == selectedItems[i]) {
 				// The current item was selected, but its data is null.
 				// The data will be replaced by the given element, so to keep
 				// it selected, we have to add it to the selection.
@@ -525,7 +576,6 @@ public class TreeViewer extends AbstractTreeViewer {
 		return selection;
 	}
 
-	@Override
 	public boolean isExpandable(Object element) {
 		if (contentProviderIsLazy) {
 			TreeItem treeItem = (TreeItem) internalExpand(element, false);
@@ -538,7 +588,6 @@ public class TreeViewer extends AbstractTreeViewer {
 		return super.isExpandable(element);
 	}
 
-	@Override
 	protected Object getParentElement(Object element) {
 		boolean oldBusy = isBusy();
 		setBusy(true);
@@ -561,7 +610,6 @@ public class TreeViewer extends AbstractTreeViewer {
 		}
 	}
 
-	@Override
 	void createChildren(Widget widget, boolean materialize) {
 		if (contentProviderIsLazy) {
 			Object element = widget.getData();
@@ -596,7 +644,6 @@ public class TreeViewer extends AbstractTreeViewer {
 		super.createChildren(widget, materialize);
 	}
 
-	@Override
 	protected void internalAdd(Widget widget, Object parentElement,
 			Object[] childElements) {
 		if (contentProviderIsLazy) {
@@ -639,7 +686,12 @@ public class TreeViewer extends AbstractTreeViewer {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.AbstractTreeViewer#internalRefreshStruct(org.eclipse.swt.widgets.Widget,
+	 *      java.lang.Object, boolean)
+	 */
 	protected void internalRefreshStruct(Widget widget, Object element,
 			boolean updateLabels) {
 		if (contentProviderIsLazy) {
@@ -704,7 +756,6 @@ public class TreeViewer extends AbstractTreeViewer {
 	 * To unmap elements correctly, we need to register a dispose listener with
 	 * the item if the tree is virtual.
 	 */
-	@Override
 	protected void mapElement(Object element, final Widget item) {
 		super.mapElement(element, item);
 		// make sure to unmap elements if the tree is virtual
@@ -713,11 +764,13 @@ public class TreeViewer extends AbstractTreeViewer {
 			// because it is reused
 			if (item.getData(VIRTUAL_DISPOSE_KEY) == null) {
 				item.setData(VIRTUAL_DISPOSE_KEY, Boolean.TRUE);
-				item.addDisposeListener(e -> {
-					if (!treeIsDisposed) {
-						Object data = item.getData();
-						if (usingElementMap() && data != null) {
-							unmapElement(data, item);
+				item.addDisposeListener(new DisposeListener() {
+					public void widgetDisposed(DisposeEvent e) {
+						if (!treeIsDisposed) {
+							Object data = item.getData();
+							if (usingElementMap() && data != null) {
+								unmapElement(data, item);
+							}
 						}
 					}
 				});
@@ -725,7 +778,11 @@ public class TreeViewer extends AbstractTreeViewer {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.ColumnViewer#getRowPartFromItem(org.eclipse.swt.widgets.Widget)
+	 */
 	protected ViewerRow getViewerRowFromItem(Widget item) {
 		if( cachedRow == null ) {
 			cachedRow = new TreeViewerRow((TreeItem) item);
@@ -761,7 +818,11 @@ public class TreeViewer extends AbstractTreeViewer {
 				SWT.NONE));
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.AbstractTreeViewer#internalInitializeTree(org.eclipse.swt.widgets.Control)
+	 */
 	protected void internalInitializeTree(Control widget) {
 		if (contentProviderIsLazy) {
 			if (widget instanceof Tree && widget.getData() != null) {
@@ -772,7 +833,12 @@ public class TreeViewer extends AbstractTreeViewer {
 		super.internalInitializeTree(tree);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.AbstractTreeViewer#updatePlus(org.eclipse.swt.widgets.Item,
+	 *      java.lang.Object)
+	 */
 	protected void updatePlus(Item item, Object element) {
 		if (contentProviderIsLazy) {
 			Object data = item.getData();
@@ -799,73 +865,77 @@ public class TreeViewer extends AbstractTreeViewer {
 			return;
 		final List oldSelection = new LinkedList(Arrays
 				.asList(((TreeSelection) getSelection()).getPaths()));
-		preservingSelection(() -> {
-			TreePath removedPath = null;
-			if (internalIsInputOrEmptyPath(parentOrTreePath)) {
-				Tree tree = (Tree) getControl();
-				if (index < tree.getItemCount()) {
-					TreeItem item1 = tree.getItem(index);
-					if (item1.getData() != null) {
-						removedPath = getTreePathFromItem(item1);
-						disassociate(item1);
+		preservingSelection(new Runnable() {
+			public void run() {
+				TreePath removedPath = null;
+				if (internalIsInputOrEmptyPath(parentOrTreePath)) {
+					Tree tree = (Tree) getControl();
+					if (index < tree.getItemCount()) {
+						TreeItem item = tree.getItem(index);
+						if (item.getData() != null) {
+							removedPath = getTreePathFromItem(item);
+							disassociate(item);
+						}
+						item.dispose();
 					}
-					item1.dispose();
-				}
-			} else {
-				Widget[] parentItems = internalFindItems(parentOrTreePath);
-				for (Widget parentWidget : parentItems) {
-					TreeItem parentItem = (TreeItem) parentWidget;
-					if (parentItem.isDisposed())
-						continue;
-					if (index < parentItem.getItemCount()) {
-						TreeItem item2 = parentItem.getItem(index);
-
-						if (item2.getData() == null) {
-							// If getData()==null and index == 0, and the
-							// parent item is collapsed, then we are
-							// being asked to remove the dummy node. We'll
-							// just ignore the request to remove the dummy
-							// node (bug 292322 and bug 296573).
-							if (index > 0 || parentItem.getExpanded()) {
-								item2.dispose();
+				} else {
+					Widget[] parentItems = internalFindItems(parentOrTreePath);
+					for (int i = 0; i < parentItems.length; i++) {
+						TreeItem parentItem = (TreeItem) parentItems[i];
+						if (parentItem.isDisposed())
+							continue;
+						if (index < parentItem.getItemCount()) {
+							TreeItem item = parentItem.getItem(index);
+							
+							if (item.getData() == null) {
+								// If getData()==null and index == 0, and the 
+								// parent item is collapsed, then we are
+								// being asked to remove the dummy node. We'll
+								// just ignore the request to remove the dummy
+								// node (bug 292322 and bug 296573).
+								if (index > 0 || parentItem.getExpanded()) {
+									item.dispose();
+								}
+							} else {
+								removedPath = getTreePathFromItem(item);
+								disassociate(item);
+								item.dispose();
 							}
-						} else {
-							removedPath = getTreePathFromItem(item2);
-							disassociate(item2);
-							item2.dispose();
 						}
 					}
 				}
-			}
-			if (removedPath != null) {
-				boolean removed = false;
-				for (Iterator it = oldSelection.iterator(); it
-						.hasNext();) {
-					TreePath path = (TreePath) it.next();
-					if (path.startsWith(removedPath, getComparer())) {
-						it.remove();
-						removed = true;
+				if (removedPath != null) {
+					boolean removed = false;
+					for (Iterator it = oldSelection.iterator(); it
+							.hasNext();) {
+						TreePath path = (TreePath) it.next();
+						if (path.startsWith(removedPath, getComparer())) {
+							it.remove();
+							removed = true;
+						}
 					}
-				}
-				if (removed) {
-					setSelection(new TreeSelection(
-							(TreePath[]) oldSelection
-									.toArray(new TreePath[oldSelection
-											.size()]), getComparer()),
-							false);
-				}
+					if (removed) {
+						setSelection(new TreeSelection(
+								(TreePath[]) oldSelection
+										.toArray(new TreePath[oldSelection
+												.size()]), getComparer()),
+								false);
+					}
 
+				}
 			}
 		});
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.AbstractTreeViewer#handleTreeExpand(org.eclipse.swt.events.TreeEvent)
+	 */
 	protected void handleTreeExpand(TreeEvent event) {
 	    // Fix for Bug 271744 because windows expanding doesn't fire a focus lost
 		if( isCellEditorActive() ) {
 			applyEditorValue();
 		}
-
+		
 		if (contentProviderIsLazy) {
 			if (event.item.getData() != null) {
 				Item[] children = getChildren(event.item);
@@ -881,27 +951,20 @@ public class TreeViewer extends AbstractTreeViewer {
 		}
 		super.handleTreeExpand(event);
 	}
-
-	@Override
+	
 	protected void handleTreeCollapse(TreeEvent event) {
 		// Fix for Bug 271744 because windows is firing collapse before
 		// focus lost event
 		if( isCellEditorActive() ) {
 			applyEditorValue();
 		}
-
+		
 		super.handleTreeCollapse(event);
 	}
 
-	/**
-	 * Sets the content provider used by this <code>TreeViewer</code>.
-	 * <p>
-	 * Content providers for tree viewers must implement either
-	 * {@link ITreeContentProvider}, or {@link ITreePathContentProvider}, or
-	 * {@link ILazyTreeContentProvider}, or
-	 * {@link ILazyTreePathContentProvider}.
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.AbstractTreeViewer#setContentProvider(org.eclipse.jface.viewers.IContentProvider)
 	 */
-	@Override
 	public void setContentProvider(IContentProvider provider) {
 		contentProviderIsLazy = (provider instanceof ILazyTreeContentProvider)
 				|| (provider instanceof ILazyTreePathContentProvider);
@@ -923,32 +986,34 @@ public class TreeViewer extends AbstractTreeViewer {
 	public void setHasChildren(final Object elementOrTreePath, final boolean hasChildren) {
 		if (checkBusy())
 			return;
-		preservingSelection(() -> {
-			if (internalIsInputOrEmptyPath(elementOrTreePath)) {
-				if (hasChildren) {
-					virtualLazyUpdateChildCount(getTree(),
-							getChildren(getTree()).length);
-				} else {
-					setChildCount(elementOrTreePath, 0);
-				}
-				return;
-			}
-			Widget[] items = internalFindItems(elementOrTreePath);
-			for (Widget widget : items) {
-				TreeItem item = (TreeItem) widget;
-				if (!hasChildren) {
-					item.setItemCount(0);
-				} else {
-					if (!item.getExpanded()) {
-						item.setItemCount(1);
-						TreeItem child = item.getItem(0);
-						if (child.getData() != null) {
-							disassociate(child);
-						}
-						item.clear(0, true);
+		preservingSelection(new Runnable() {
+			public void run() {
+				if (internalIsInputOrEmptyPath(elementOrTreePath)) {
+					if (hasChildren) {
+						virtualLazyUpdateChildCount(getTree(),
+								getChildren(getTree()).length);
 					} else {
-		                virtualLazyUpdateChildCount(item, item.getItemCount());
-		            }
+						setChildCount(elementOrTreePath, 0);
+					}
+					return;
+				}
+				Widget[] items = internalFindItems(elementOrTreePath);
+				for (int i = 0; i < items.length; i++) {
+					TreeItem item = (TreeItem) items[i];
+					if (!hasChildren) {
+						item.setItemCount(0);
+					} else {
+						if (!item.getExpanded()) {
+							item.setItemCount(1);
+							TreeItem child = item.getItem(0);
+							if (child.getData() != null) {
+								disassociate(child);
+							}
+							item.clear(0, true);
+						} else {
+                            virtualLazyUpdateChildCount(item, item.getItemCount());
+                        }
+					}
 				}
 			}
 		});
@@ -1044,7 +1109,6 @@ public class TreeViewer extends AbstractTreeViewer {
 		}
 	}
 
-	@Override
 	protected void disassociate(Item item) {
 		if (contentProviderIsLazy) {
 			// avoid causing a callback:
@@ -1053,7 +1117,6 @@ public class TreeViewer extends AbstractTreeViewer {
 		super.disassociate(item);
 	}
 
-	@Override
 	protected int doGetColumnCount() {
 		return tree.getColumnCount();
 	}
@@ -1072,12 +1135,10 @@ public class TreeViewer extends AbstractTreeViewer {
 	 *            <code>true</code> if the selection is to be made visible,
 	 *            and <code>false</code> otherwise
 	 */
-	@Override
 	public void setSelection(ISelection selection, boolean reveal) {
 		super.setSelection(selection, reveal);
 	}
 
-	@Override
 	public void editElement(Object element, int column) {
 		if( element instanceof TreePath ) {
 			try {

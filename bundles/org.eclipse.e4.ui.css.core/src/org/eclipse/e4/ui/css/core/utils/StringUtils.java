@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Angelo Zerr and others.
+ * Copyright (c) 2008 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ public class StringUtils {
 	/**
 	 * Replace <b>oldString</b> occurrences with <b>newString</b> occurrences of
 	 * the String <b>line</b> and return the result.
-	 *
+	 * 
 	 * @param line
 	 * @param oldString
 	 * @param newString
@@ -54,22 +54,22 @@ public class StringUtils {
 	/**
 	 * Split String <b>line</b> with delimiter <b>delim</b> and return result
 	 * inti array of String.
-	 *
+	 * 
 	 * @param line
 	 * @param delim
 	 * @return
 	 */
 	public static String[] split(String line, String delim) {
-		List<String> list = new ArrayList<>();
-		for (StringTokenizer t = new StringTokenizer(line, delim); t.hasMoreTokens(); list.add(t.nextToken())) {
+		List list = new ArrayList();
+		for (StringTokenizer t = new StringTokenizer(line, delim); t
+				.hasMoreTokens(); list.add(t.nextToken()))
 			;
-		}
-		return list.toArray(new String[list.size()]);
+		return (String[]) list.toArray(new String[list.size()]);
 	}
 
 	/**
 	 * Return true if String value is null or empty.
-	 *
+	 * 
 	 * @param value
 	 * @return
 	 */
@@ -85,20 +85,20 @@ public class StringUtils {
 	 * first letter of each word is changed. To convert the rest of each word to
 	 * lowercase at the same time, use {@link #capitalizeFully(String)}.
 	 * </p>
-	 *
+	 * 
 	 * <p>
 	 * Whitespace is defined by {@link Character#isWhitespace(char)}. A
 	 * <code>null</code> input String returns <code>null</code>.
 	 * Capitalization uses the unicode title case, normally equivalent to upper
 	 * case.
 	 * </p>
-	 *
+	 * 
 	 * <pre>
 	 * WordUtils.capitalize(null)        = null
 	 * WordUtils.capitalize(&quot;&quot;)          = &quot;&quot;
 	 * WordUtils.capitalize(&quot;i am FINE&quot;) = &quot;I Am FINE&quot;
 	 * </pre>
-	 *
+	 * 
 	 * @param str
 	 *            the String to capitalize, may be null
 	 * @return capitalized String, <code>null</code> if null String input
@@ -115,19 +115,19 @@ public class StringUtils {
 	 * letter of each word is changed. To convert the rest of each word to
 	 * lowercase at the same time, use {@link #capitalizeFully(String, char[])}.
 	 * </p>
-	 *
+	 * 
 	 * <p>
 	 * The delimiters represent a set of characters understood to separate
 	 * words. The first string character and the first non-delimiter character
 	 * after a delimiter will be capitalized.
 	 * </p>
-	 *
+	 * 
 	 * <p>
 	 * A <code>null</code> input String returns <code>null</code>.
 	 * Capitalization uses the unicode title case, normally equivalent to upper
 	 * case.
 	 * </p>
-	 *
+	 * 
 	 * <pre>
 	 * WordUtils.capitalize(null, *)            = null
 	 * WordUtils.capitalize(&quot;&quot;, *)              = &quot;&quot;
@@ -135,7 +135,7 @@ public class StringUtils {
 	 * WordUtils.capitalize(&quot;i am fine&quot;, null)  = &quot;I Am Fine&quot;
 	 * WordUtils.capitalize(&quot;i aM.fine&quot;, {'.'}) = &quot;I aM.Fine&quot;
 	 * </pre>
-	 *
+	 * 
 	 * @param str
 	 *            the String to capitalize, may be null
 	 * @param delimiters
@@ -172,7 +172,7 @@ public class StringUtils {
 
 	/**
 	 * Is the character a delimiter.
-	 *
+	 * 
 	 * @param ch
 	 *            the character to check
 	 * @param delimiters
@@ -183,8 +183,8 @@ public class StringUtils {
 		if (delimiters == null) {
 			return Character.isWhitespace(ch);
 		}
-		for (char delimiter : delimiters) {
-			if (ch == delimiter) {
+		for (int i = 0, isize = delimiters.length; i < isize; i++) {
+			if (ch == delimiters[i]) {
 				return true;
 			}
 		}

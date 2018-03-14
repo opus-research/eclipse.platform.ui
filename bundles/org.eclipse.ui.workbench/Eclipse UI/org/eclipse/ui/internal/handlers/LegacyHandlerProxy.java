@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,7 +31,7 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
  * attributes defined publicly in this class will cause the proxy to instantiate
  * the proxied handler.
  * </p>
- *
+ * 
  * @since 3.0
  */
 public final class LegacyHandlerProxy extends AbstractHandler {
@@ -59,7 +59,7 @@ public final class LegacyHandlerProxy extends AbstractHandler {
 	/**
 	 * Constructs a new instance of <code>HandlerProxy</code> with all the
 	 * information it needs to try to avoid loading until it is needed.
-	 *
+	 * 
 	 * @param newConfigurationElement
 	 *            The configuration element from which the real class can be
 	 *            loaded at run-time.
@@ -73,7 +73,6 @@ public final class LegacyHandlerProxy extends AbstractHandler {
 	/**
 	 * Passes the dipose on to the proxied handler, if it has been loaded.
 	 */
-	@Override
 	public void dispose() {
 		if (handler != null) {
 			handler.dispose();
@@ -83,7 +82,6 @@ public final class LegacyHandlerProxy extends AbstractHandler {
 	/**
 	 * @see IHandler#execute(Map)
 	 */
-	@Override
 	public Object execute(Map parameters) throws ExecutionException {
 		if (loadHandler()) {
 			return handler.execute(parameters);
@@ -95,7 +93,6 @@ public final class LegacyHandlerProxy extends AbstractHandler {
 	/**
 	 * @see IHandler#getAttributeValuesByName()
 	 */
-	@Override
 	public Map getAttributeValuesByName() {
 		if (loadHandler()) {
 			return handler.getAttributeValuesByName();
@@ -107,7 +104,7 @@ public final class LegacyHandlerProxy extends AbstractHandler {
 	/**
 	 * Loads the handler, if possible. If the handler is loaded, then the member
 	 * variables are updated accordingly.
-	 *
+	 * 
 	 * @return <code>true</code> if the handler is now non-null;
 	 *         <code>false</code> otherwise.
 	 */
@@ -136,7 +133,6 @@ public final class LegacyHandlerProxy extends AbstractHandler {
 		return true;
 	}
 
-	@Override
 	public final String toString() {
 		final StringBuffer buffer = new StringBuffer();
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,9 +13,9 @@ package org.eclipse.jface.preference;
 import org.eclipse.swt.graphics.Image;
 
 /**
- * Interface to a node in a preference dialog.
+ * Interface to a node in a preference dialog. 
  * A preference node maintains a label and image used to display the
- * node in a preference dialog (usually in the form of a tree),
+ * node in a preference dialog (usually in the form of a tree), 
  * as well as the preference page this node stands for.
  *
  * The node may use lazy creation for its page
@@ -41,7 +41,7 @@ public interface IPreferenceNode {
 
     /**
      * Release the page managed by this node, and any SWT resources
-     * held onto by this node (Images, Fonts, etc).
+     * held onto by this node (Images, Fonts, etc).  
      *
      * Note that nodes are reused so this is not a call to dispose the
      * node itself.

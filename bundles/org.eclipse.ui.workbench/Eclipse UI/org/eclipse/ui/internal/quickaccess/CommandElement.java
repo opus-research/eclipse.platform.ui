@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     ARTAL Technologies <simon.chemouil@artal.fr> - Bug 293044 added keybindings display
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
+ *     ARTAL Technologies <simon.chemouil@artal.fr> - Bug 293044 added keybindings display 
  *******************************************************************************/
 
 package org.eclipse.ui.internal.quickaccess;
@@ -30,7 +29,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class CommandElement extends QuickAccessElement {
 
@@ -45,15 +44,13 @@ public class CommandElement extends QuickAccessElement {
 		this.command = command;
 	}
 
-	@Override
 	public void execute() {
 		Object o = getProvider();
 		if (o instanceof CommandProvider) {
 			CommandProvider provider = (CommandProvider) o;
 			if (provider.getHandlerService() != null && provider.getContextSnapshot() != null) {
 				try {
-					provider.getHandlerService().executeCommandInContext(command, null,
-							provider.getContextSnapshot());
+					provider.getHandlerService().executeCommand(command, null);
 				} catch (Exception ex) {
 					StatusUtil.handleStatus(ex, StatusManager.SHOW
 							| StatusManager.LOG);
@@ -61,12 +58,12 @@ public class CommandElement extends QuickAccessElement {
 				return;
 			}
 		}
-
+		
 		// let's try the old fashioned way
 		IWorkbenchWindow window = PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow();
 		if (window != null) {
-			IHandlerService handlerService = window
+			IHandlerService handlerService = (IHandlerService) window
 					.getWorkbench().getService(IHandlerService.class);
 			try {
 				handlerService.executeCommand(command, null);
@@ -77,19 +74,17 @@ public class CommandElement extends QuickAccessElement {
 		}
 	}
 
-	@Override
 	public String getId() {
 		return id;
 	}
 
-	@Override
 	public ImageDescriptor getImageDescriptor() {
 		return null;
 	}
 
 	/**
 	 * Returns a formatted string describes this command.
-	 *
+	 * 
 	 * @return a description of the command of this element
 	 * @since 3.6
 	 */
@@ -110,7 +105,6 @@ public class CommandElement extends QuickAccessElement {
 		return label.toString();
 	}
 
-	@Override
 	public String getLabel() {
 		String command = getCommand();
 		String binding = getBinding();
@@ -123,7 +117,7 @@ public class CommandElement extends QuickAccessElement {
 	/**
 	 * Returns a formatted string that can be used to invoke this element's
 	 * command. <code>null</code> may be returned if a binding cannot be found.
-	 *
+	 * 
 	 * @return the string keybinding for invoking this element's command, may be
 	 *         <code>null</code>
 	 * @since 3.6
@@ -139,16 +133,6 @@ public class CommandElement extends QuickAccessElement {
 		return null;
 	}
 
-	@Override
-	public String getSortLabel() {
-		try {
-			return command.getName();
-		} catch (NotDefinedException e) {
-			return command.toString();
-		}
-	}
-
-	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -156,7 +140,6 @@ public class CommandElement extends QuickAccessElement {
 		return result;
 	}
 
-	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;

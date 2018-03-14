@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 Angelo Zerr and others.
+ * Copyright (c) 2008 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,7 @@ public interface ICSSPropertyHandler {
 	 * Apply CSS Property <code>property</code> (ex : background-color) with
 	 * CSSValue <code>value</code> (ex : red) into the <code>element</code>
 	 * (ex : Swing Component, SWT Widget).
-	 *
+	 * 
 	 * @param element
 	 *            Swing Component, SWT Widget...
 	 * @param property
@@ -47,7 +47,7 @@ public interface ICSSPropertyHandler {
 	 * Retrieve CSS value (ex : red) of CSS Property <code>property</code> (ex :
 	 * background-color) from the <code>element</code> (ex : Swing Component,
 	 * SWT Widget).
-	 *
+	 * 
 	 * @param element
 	 * @param property
 	 *            CSS Property
@@ -56,7 +56,7 @@ public interface ICSSPropertyHandler {
 	 * @return
 	 * @throws Exception
 	 */
-	public String retrieveCSSProperty(Object element, String property,
+	public String retrieveCSSProperty(Object element, String property, 
 			String pseudo, CSSEngine engine) throws Exception;
 
 }

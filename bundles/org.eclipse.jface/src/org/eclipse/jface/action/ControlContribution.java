@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,8 +20,8 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
 /**
- * An abstract contribution item implementation for adding an arbitrary
- * SWT control to a tool bar.
+ * An abstract contribution item implementation for adding an arbitrary 
+ * SWT control to a tool bar. 
  * Note, however, that these items cannot be contributed to menu bars.
  * <p>
  * The <code>createControl</code> framework method must be implemented
@@ -43,7 +43,7 @@ public abstract class ControlContribution extends ContributionItem {
      * to a tool bar.  This is needed to determine the width of the tool bar item
      * containing the given control.
      * <p>
-     * The default implementation of this framework method returns
+     * The default implementation of this framework method returns 
      * <code>control.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x</code>.
      * Subclasses may override if required.
      * </p>
@@ -74,8 +74,7 @@ public abstract class ControlContribution extends ContributionItem {
      * Subclasses must implement <code>createControl</code> rather than
      * overriding this method.
      */
-    @Override
-	public final void fill(Composite parent) {
+    public final void fill(Composite parent) {
         createControl(parent);
     }
 
@@ -83,8 +82,7 @@ public abstract class ControlContribution extends ContributionItem {
      * The control item implementation of this <code>IContributionItem</code>
      * method throws an exception since controls cannot be added to menus.
      */
-    @Override
-	public final void fill(Menu parent, int index) {
+    public final void fill(Menu parent, int index) {
         Assert.isTrue(false, "Can't add a control to a menu");//$NON-NLS-1$
     }
 
@@ -96,8 +94,7 @@ public abstract class ControlContribution extends ContributionItem {
      * Subclasses must implement <code>createControl</code> rather than
      * overriding this method.
      */
-    @Override
-	public final void fill(ToolBar parent, int index) {
+    public final void fill(ToolBar parent, int index) {
         Control control = createControl(parent);
 		if (control == null) {
 			Policy.logException(new IllegalStateException(

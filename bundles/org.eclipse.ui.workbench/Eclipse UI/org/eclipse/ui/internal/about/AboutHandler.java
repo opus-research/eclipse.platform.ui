@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,12 +18,16 @@ import org.eclipse.ui.internal.dialogs.AboutDialog;
 
 /**
  * Creates an About dialog and opens it.
- *
+ * 
  * @since 3.3
  */
 public class AboutHandler extends AbstractHandler {
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		new AboutDialog(HandlerUtil.getActiveShellChecked(event)).open();
 		return null;

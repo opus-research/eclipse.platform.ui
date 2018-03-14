@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,8 +39,10 @@ public class MessagePage extends Page {
         // do nothing
     }
 
-    @Override
-	public void createControl(Composite parent) {
+    /* (non-Javadoc)
+     * Method declared on IPage.
+     */
+    public void createControl(Composite parent) {
         // Message in default page of Outline should have margins
         pgComp = new Composite(parent, SWT.NULL);
         pgComp.setLayout(new FillLayout());
@@ -49,16 +51,17 @@ public class MessagePage extends Page {
         msgLabel.setText(message);
     }
 
-    @Override
-	public Control getControl() {
+    /* (non-Javadoc)
+     * Method declared on IPage.
+     */
+    public Control getControl() {
         return pgComp;
     }
 
     /**
      * Sets focus to a part in the page.
      */
-    @Override
-	public void setFocus() {
+    public void setFocus() {
         // important to give focus to the composite rather than the label
         // as the composite will actually take focus (though hidden),
         // but setFocus on a Label is a no-op

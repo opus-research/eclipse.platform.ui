@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,12 +26,11 @@ import org.eclipse.jface.bindings.keys.KeyLookupFactory;
  * <code>CharacterKey</code> objects are immutable. Clients are not permitted
  * to extend this class.
  * </p>
- *
+ * 
  * @deprecated Please use org.eclipse.jface.bindings.keys.KeyStroke and
  *             org.eclipse.jface.bindings.keys.KeyLookupFactory
  * @since 3.0
  */
-@Deprecated
 public final class CharacterKey extends NaturalKey {
 
 	/**
@@ -105,7 +104,7 @@ public final class CharacterKey extends NaturalKey {
 	 * character. This method determines the correct name for the key based on
 	 * character. Typically, this name is a string of one-character in length
 	 * equal to the character that this instance represents.
-	 *
+	 * 
 	 * @param character
 	 *            the character that the resultant <code>CharacterKey</code>
 	 *            instance is to represent.
@@ -149,7 +148,7 @@ public final class CharacterKey extends NaturalKey {
 	/**
 	 * Constructs an instance of <code>CharacterKey</code> given a unicode
 	 * character and a name.
-	 *
+	 * 
 	 * @param key
 	 *            The key to be wrapped.
 	 */
@@ -159,7 +158,7 @@ public final class CharacterKey extends NaturalKey {
 
 	/**
 	 * Gets the character that this object represents.
-	 *
+	 * 
 	 * @return the character that this object represents.
 	 */
 	public final char getCharacter() {

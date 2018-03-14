@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,9 +12,11 @@
 package org.eclipse.jface.preference;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 
 /**
- * The BooleanPropertyAction is an action that set the values of a
+ * The BooleanPropertyAction is an action that set the values of a 
  * boolean property in the preference store.
  */
 
@@ -46,17 +48,22 @@ public class BooleanPropertyAction extends Action {
         final String finalProprety = property;
 
         preferenceStore
-                .addPropertyChangeListener(event -> {
-				    if (finalProprety.equals(event.getProperty())) {
-						setChecked(Boolean.TRUE.equals(event.getNewValue()));
-					}
-				});
+                .addPropertyChangeListener(new IPropertyChangeListener() {
+                    public void propertyChange(PropertyChangeEvent event) {
+                        if (finalProprety.equals(event.getProperty())) {
+							setChecked(Boolean.TRUE.equals(event.getNewValue()));
+						}
+                    }
+                });
 
         setChecked(preferenceStore.getBoolean(property));
     }
 
-    @Override
-	public void run() {
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.jface.action.IAction#run()
+     */
+    public void run() {
         preferenceStore.setValue(property, isChecked());
     }
 }

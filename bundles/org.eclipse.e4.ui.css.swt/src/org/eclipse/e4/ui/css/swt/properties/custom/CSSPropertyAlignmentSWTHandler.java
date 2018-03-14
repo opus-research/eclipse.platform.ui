@@ -1,10 +1,10 @@
 /*******************************************************************************
- *  Copyright (c) 2009, 2015 IBM Corporation and others.
+ *  Copyright (c) 2009 IBM Corporation and others.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
  *  http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  *  Contributors:
  *      IBM Corporation - initial API and implementation
  *      Remy Chi Jian Suen <remy.suen@gmail.com> - bug 137650
@@ -27,8 +27,7 @@ import org.w3c.dom.css.CSSValue;
 public class CSSPropertyAlignmentSWTHandler extends AbstractCSSPropertySWTHandler{
 
 	public static final ICSSPropertyHandler INSTANCE = new CSSPropertyAlignmentSWTHandler();
-
-	@Override
+	
 	public void applyCSSProperty(Control control, String property,
 		    CSSValue value, String pseudo, CSSEngine engine) throws Exception {
 		if (control instanceof Button) {
@@ -51,7 +50,7 @@ public class CSSPropertyAlignmentSWTHandler extends AbstractCSSPropertySWTHandle
 			} else if ("inherit".equals(stringValue)) {
 				// todo
 			}
-
+			
 		}
 		else if (control instanceof Label) {
 			Label label = (Label)control;
@@ -68,12 +67,11 @@ public class CSSPropertyAlignmentSWTHandler extends AbstractCSSPropertySWTHandle
 				label.setAlignment(SWT.CENTER);
 			} else if ("inherit".equals(stringValue)) {
 				// todo
-			}
+			} 
 		}
-
+	
 	}
 
-	@Override
 	public String retrieveCSSProperty(Control control, String property,
 			String pseudo, CSSEngine engine) throws Exception {
 		if (control instanceof Button) {

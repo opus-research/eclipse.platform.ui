@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,7 +39,7 @@ import org.eclipse.ui.internal.services.SourcePriorityNameMapping;
  * <b>Note:</b> this class has a natural ordering that is inconsistent with
  * equals.
  * </p>
- *
+ * 
  * @since 3.1
  */
 final class HandlerActivation implements IHandlerActivation {
@@ -63,21 +63,43 @@ final class HandlerActivation implements IHandlerActivation {
 		proxy.activation = this;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.services.IEvaluationResultCache#clearResult()
+	 */
 	public void clearResult() {
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.services.IEvaluationResultCache#getExpression()
+	 */
 	public Expression getExpression() {
 		return activeWhen;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.services.IEvaluationResultCache#getSourcePriority
+	 * ()
+	 */
 	public int getSourcePriority() {
 		return sourcePriority;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.services.IEvaluationResultCache#evaluate(org.
+	 * eclipse.core.expressions.IEvaluationContext)
+	 */
 	public boolean evaluate(IEvaluationContext context) {
 		if (activeWhen == null) {
 			active = true;
@@ -99,12 +121,22 @@ final class HandlerActivation implements IHandlerActivation {
 		return active;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.services.IEvaluationResultCache#setResult(boolean
+	 * )
+	 */
 	public void setResult(boolean result) {
 		active = result;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
 	public int compareTo(Object o) {
 		HandlerActivation activation = (HandlerActivation) o;
 		int difference;
@@ -143,37 +175,68 @@ final class HandlerActivation implements IHandlerActivation {
 		return difference;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.handlers.IHandlerActivation#clearActive()
+	 */
 	public void clearActive() {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.handlers.IHandlerActivation#getCommandId()
+	 */
 	public String getCommandId() {
 		return commandId;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.handlers.IHandlerActivation#getDepth()
+	 */
 	public int getDepth() {
 		return 0;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.handlers.IHandlerActivation#getHandler()
+	 */
 	public IHandler getHandler() {
 		return handler;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.handlers.IHandlerActivation#getHandlerService()
+	 */
 	public IHandlerService getHandlerService() {
 		return (IHandlerService) context.get(IHandlerService.class.getName());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.handlers.IHandlerActivation#isActive(org.eclipse.core.
+	 * expressions.IEvaluationContext)
+	 */
 	public boolean isActive(IEvaluationContext context) {
 		return active;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		return "EHA: " + active + ":" + sourcePriority + ":" + commandId + ": " + proxy //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$

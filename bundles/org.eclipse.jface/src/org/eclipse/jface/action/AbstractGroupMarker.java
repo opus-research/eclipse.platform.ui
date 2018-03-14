@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,7 +30,7 @@ public abstract class AbstractGroupMarker extends ContributionItem {
      * Create a new group marker with the given name.
      * The group name must not be <code>null</code> or the empty string.
      * The group name is also used as the item id.
-     *
+     * 
      * @param groupName the name of the group
      */
     protected AbstractGroupMarker(String groupName) {
@@ -51,8 +51,7 @@ public abstract class AbstractGroupMarker extends ContributionItem {
      * The <code>AbstractGroupMarker</code> implementation of this <code>IContributionItem</code>
      * method returns <code>true</code> iff the id is not <code>null</code>. Subclasses may override.
      */
-    @Override
-	public boolean isGroupMarker() {
+    public boolean isGroupMarker() {
         return getId() != null;
     }
 }

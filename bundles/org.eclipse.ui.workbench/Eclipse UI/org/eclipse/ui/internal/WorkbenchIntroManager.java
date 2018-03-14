@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2011, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 463043
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -37,37 +36,41 @@ import org.eclipse.ui.intro.IntroContentDetector;
 
 /**
  * Workbench implementation of the IIntroManager interface.
- *
+ * 
  * @since 3.0
  */
-public class WorkbenchIntroManager implements IIntroManager {
-
+public class WorkbenchIntroManager implements IIntroManager {	
+	
     private final Workbench workbench;
 
     /**
      * Create a new instance of the receiver.
-     *
+     * 
      * @param workbench the workbench instance
      */
     WorkbenchIntroManager(Workbench workbench) {
         this.workbench = workbench;
         workbench.getExtensionTracker().registerHandler(new IExtensionChangeHandler(){
-
-            @Override
-			public void addExtension(IExtensionTracker tracker,IExtension extension) {
+            
+            /* (non-Javadoc)
+             * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker, org.eclipse.core.runtime.IExtension)
+             */
+            public void addExtension(IExtensionTracker tracker,IExtension extension) {
                 //Do nothing
             }
-
-			@Override
+            
+			/* (non-Javadoc)
+			 * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension, java.lang.Object[])
+			 */
 			public void removeExtension(IExtension source, Object[] objects) {
                 for (int i = 0; i < objects.length; i++) {
                     if (objects[i] instanceof IIntroPart) {
                         closeIntro((IIntroPart) objects[i]);
                     }
                 }
-
+				
 			}}, null);
-
+        
     }
 
     /**
@@ -75,8 +78,10 @@ public class WorkbenchIntroManager implements IIntroManager {
      */
     private IIntroPart introPart;
 
-    @Override
-	public boolean closeIntro(IIntroPart part) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbench#closeIntro(org.eclipse.ui.intro.IIntroPart)
+     */
+    public boolean closeIntro(IIntroPart part) {
         if (introPart == null || !introPart.equals(part)) {
 			return false;
 		}
@@ -90,20 +95,22 @@ public class WorkbenchIntroManager implements IIntroManager {
                     .findViewReference(IIntroConstants.INTRO_VIEW_ID);
             page.hideView(introView);
             if (reference == null || reference.getPart(false) == null) {
-                introPart = null;
+                introPart = null;                
                 return true;
             }
             return false;
         }
-
+        
 		// if there is no part then null our reference
 		introPart = null;
-
+        
         return true;
     }
 
-    @Override
-	public IIntroPart showIntro(IWorkbenchWindow preferredWindow,
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbench#showIntro(org.eclipse.ui.IWorkbenchWindow)
+     */
+    public IIntroPart showIntro(IWorkbenchWindow preferredWindow,
             boolean standby) {
         if (preferredWindow == null) {
 			preferredWindow = this.workbench.getActiveWorkbenchWindow();
@@ -135,7 +142,7 @@ public class WorkbenchIntroManager implements IIntroManager {
         return introPart;
     }
 
-    /**
+    /**	 
      * @param testWindow the window to test
      * @return whether the intro exists in the given window
      */
@@ -176,8 +183,10 @@ public class WorkbenchIntroManager implements IIntroManager {
         }
     }
 
-    @Override
-	public void setIntroStandby(IIntroPart part, boolean standby) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbench#setIntroStandby(org.eclipse.ui.intro.IIntroPart, boolean)
+     */
+    public void setIntroStandby(IIntroPart part, boolean standby) {
         if (introPart == null || !introPart.equals(part)) {
 			return;
 		}
@@ -202,12 +211,9 @@ public class WorkbenchIntroManager implements IIntroManager {
 		ViewSite site = (ViewSite) introAdapter.getViewSite();
 
 		MPart introModelPart = site.getModel();
-		if (introModelPart.getCurSharedRef() != null) {
-			MUIElement introPartParent = introModelPart.getCurSharedRef().getParent();
-			if (introPartParent instanceof MPartStack) {
-				return (MPartStack) introPartParent;
-			}
-		}
+		MUIElement introPartParent = introModelPart.getCurSharedRef().getParent();
+		if (introPartParent instanceof MPartStack)
+			return (MPartStack) introPartParent;
 
 		return null;
 	}
@@ -220,8 +226,12 @@ public class WorkbenchIntroManager implements IIntroManager {
 		return introStack.getTags().contains(IPresentationEngine.MAXIMIZED);
     }
 
-    @Override
-	public boolean isIntroStandby(IIntroPart part) {
+    /*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbench#isIntroStandby(org.eclipse.ui.intro.IIntroPart)
+	 */
+    public boolean isIntroStandby(IIntroPart part) {
         if (introPart == null || !introPart.equals(part)) {
 			return false;
 		}
@@ -234,13 +244,15 @@ public class WorkbenchIntroManager implements IIntroManager {
 		return !isIntroMaximized(viewIntroAdapterPart);
     }
 
-    @Override
-	public IIntroPart getIntro() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbench#findIntro()
+     */
+    public IIntroPart getIntro() {
         return introPart;
     }
 
-    /**
-     * @return the <code>ViewIntroAdapterPart</code> for this workbench, <code>null</code> if it
+    /** 
+     * @return the <code>ViewIntroAdapterPart</code> for this workbench, <code>null</code> if it 
      * cannot be found.
      */
     /*package*/ViewIntroAdapterPart getViewIntroAdapterPart() {
@@ -281,13 +293,14 @@ public class WorkbenchIntroManager implements IIntroManager {
     	return introPart;
     }
 
-    @Override
-	public boolean hasIntro() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbench#hasIntro()
+     */
+    public boolean hasIntro() {
         return workbench.getIntroDescriptor() != null;
     }
-
-    @Override
-	public boolean isNewContentAvailable() {
+    
+    public boolean isNewContentAvailable() {
 		IntroDescriptor introDescriptor = workbench.getIntroDescriptor();
 		if (introDescriptor == null) {
 			return false;

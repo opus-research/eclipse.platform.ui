@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,7 +32,7 @@ import org.eclipse.ui.IWorkbenchWindow;
  * This class is not intended for use outside of the
  * <code>org.eclipse.ui.workbench</code> plug-in.
  * </p>
- *
+ * 
  * @see ISources#ACTIVE_MENU_NAME
  * @since 3.2
  */
@@ -59,7 +59,7 @@ public final class LegacyViewerContributionExpression extends
 
 	/**
 	 * Constructs a new {@link LegacyViewerContributionExpression}.
-	 *
+	 * 
 	 * @param targetId
 	 *            The identifier of the menu to which this viewer contribution
 	 *            applies; never <code>null</code>.
@@ -82,7 +82,6 @@ public final class LegacyViewerContributionExpression extends
 		this.expression = childExpression;
 	}
 
-	@Override
 	public final void collectExpressionInfo(final ExpressionInfo info) {
 		super.collectExpressionInfo(info);
 		info.addVariableNameAccess(ISources.ACTIVE_MENU_NAME);
@@ -91,7 +90,6 @@ public final class LegacyViewerContributionExpression extends
 		}
 	}
 
-	@Override
 	protected final int computeHashCode() {
 		int hashCode = HASH_INITIAL * HASH_FACTOR + hashCode(getWindow());
 		hashCode = hashCode * HASH_FACTOR + hashCode(expression);
@@ -99,7 +97,6 @@ public final class LegacyViewerContributionExpression extends
 		return hashCode;
 	}
 
-	@Override
 	public final boolean equals(final Object object) {
 		if (object instanceof LegacyViewerContributionExpression) {
 			final LegacyViewerContributionExpression that = (LegacyViewerContributionExpression) object;
@@ -111,7 +108,6 @@ public final class LegacyViewerContributionExpression extends
 		return false;
 	}
 
-	@Override
 	public final EvaluationResult evaluate(final IEvaluationContext context)
 			throws CoreException {
 		final EvaluationResult result = super.evaluate(context);
@@ -143,7 +139,6 @@ public final class LegacyViewerContributionExpression extends
 		return EvaluationResult.FALSE;
 	}
 
-	@Override
 	public final String toString() {
 		final StringBuffer buffer = new StringBuffer();
 		buffer.append("ViewerContributionExpression("); //$NON-NLS-1$

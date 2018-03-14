@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,20 +27,24 @@ public class SkeletonLinkHelper implements ILinkHelper {
 	 * The singleton instance.
 	 */
 	public static final ILinkHelper INSTANCE = new SkeletonLinkHelper();
-
+	
 	private SkeletonLinkHelper() {
-
+		
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.navigator.ILinkHelper#findSelection(org.eclipse.ui.IEditorInput)
+	 */
 	public IStructuredSelection findSelection(IEditorInput anInput) {
 		return StructuredSelection.EMPTY;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.navigator.ILinkHelper#activateEditor(org.eclipse.ui.IWorkbenchPage, org.eclipse.jface.viewers.IStructuredSelection)
+	 */
 	public void activateEditor(IWorkbenchPage aPage, IStructuredSelection aSelection) {
 		// no-op
-
+		
 	}
 
 }

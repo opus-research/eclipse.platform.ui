@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,7 @@ import org.eclipse.ui.internal.WorkbenchMessages;
  * well as labelling and enabling the undo menu item.  This class may be
  * instantiated by clients.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public final class UndoActionHandler extends OperationHistoryActionHandler {
@@ -36,10 +36,10 @@ public final class UndoActionHandler extends OperationHistoryActionHandler {
 	/**
 	 * Construct an action handler that handles the labelling and enabling of
 	 * the undo action for the specified undo context.
-	 *
-	 * @param site
+	 * 
+	 * @param site 
 	 *            the workbench part site that created the action.
-	 * @param context
+	 * @param context 
 	 *            the undo context to be used for the undo
 	 */
 	public UndoActionHandler(IWorkbenchPartSite site, IUndoContext context) {
@@ -51,43 +51,35 @@ public final class UndoActionHandler extends OperationHistoryActionHandler {
 		setActionDefinitionId(IWorkbenchCommandConstants.EDIT_UNDO);
 	}
 
-	@Override
 	void flush() {
 		getHistory().dispose(getUndoContext(), true, false, false);
 	}
 
-	@Override
 	String getCommandString() {
 		return WorkbenchMessages.Operations_undoCommand;
 	}
-
-	@Override
+	
 	String getTooltipString() {
 		return WorkbenchMessages.Operations_undoTooltipCommand;
 	}
-
-	@Override
+	
 	String getSimpleCommandString() {
 		return WorkbenchMessages.Workbench_undo;
 	}
-
-	@Override
+	
 	String getSimpleTooltipString() {
-		return WorkbenchMessages.Workbench_undoToolTip;
+		return WorkbenchMessages.Workbench_undoToolTip;		
 	}
 
-	@Override
 	IUndoableOperation getOperation() {
 		return getHistory().getUndoOperation(getUndoContext());
 
 	}
 
-	@Override
 	IStatus runCommand(IProgressMonitor pm) throws ExecutionException  {
 		return getHistory().undo(getUndoContext(), pm, this);
 	}
 
-	@Override
 	boolean shouldBeEnabled() {
 		return getHistory().canUndo(getUndoContext());
 	}

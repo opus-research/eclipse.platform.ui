@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,7 +23,7 @@ import org.eclipse.ui.keys.ModifierKey;
 /**
  * A key formatter providing the Emacs-style accelerators using single letters
  * to represent the modifier keys.
- *
+ * 
  * @since 3.0
  */
 public class EmacsKeyFormatter extends AbstractKeyFormatter {
@@ -44,13 +44,12 @@ public class EmacsKeyFormatter extends AbstractKeyFormatter {
     /**
      * Formats an individual key into a human readable format. This converts
      * the key into a format similar to Xemacs.
-     *
+     * 
      * @param key
      *            The key to format; must not be <code>null</code>.
      * @return The key formatted as a string; should not be <code>null</code>.
      */
-    @Override
-	public String format(Key key) {
+    public String format(Key key) {
         if (key instanceof ModifierKey) {
             String formattedName = Util.translateString(RESOURCE_BUNDLE, key
                     .toString(), null, false, false);
@@ -62,20 +61,32 @@ public class EmacsKeyFormatter extends AbstractKeyFormatter {
         return super.format(key).toLowerCase();
     }
 
-    @Override
-	protected String getKeyDelimiter() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.keys.AbstractKeyFormatter#getKeyDelimiter()
+     */
+    protected String getKeyDelimiter() {
         return Util.translateString(RESOURCE_BUNDLE, KEY_DELIMITER_KEY,
                 KeyStroke.KEY_DELIMITER, false, false);
     }
 
-    @Override
-	protected String getKeyStrokeDelimiter() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.keys.AbstractKeyFormatter#getKeyStrokeDelimiter()
+     */
+    protected String getKeyStrokeDelimiter() {
         return Util.translateString(RESOURCE_BUNDLE, KEY_STROKE_DELIMITER_KEY,
                 KeySequence.KEY_STROKE_DELIMITER, false, false);
     }
 
-    @Override
-	protected Comparator getModifierKeyComparator() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.keys.AbstractKeyFormatter#getModifierKeyComparator()
+     */
+    protected Comparator getModifierKeyComparator() {
         return EMACS_MODIFIER_KEY_COMPARATOR;
     }
 

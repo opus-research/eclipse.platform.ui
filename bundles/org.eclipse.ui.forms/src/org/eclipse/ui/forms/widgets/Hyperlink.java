@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,19 +11,11 @@
 package org.eclipse.ui.forms.widgets;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.accessibility.ACC;
-import org.eclipse.swt.accessibility.Accessible;
-import org.eclipse.swt.accessibility.AccessibleAdapter;
-import org.eclipse.swt.accessibility.AccessibleControlAdapter;
-import org.eclipse.swt.accessibility.AccessibleControlEvent;
-import org.eclipse.swt.accessibility.AccessibleEvent;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.accessibility.*;
+import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.FormColors;
-import org.eclipse.ui.internal.forms.widgets.FormUtil;
+import org.eclipse.ui.internal.forms.widgets.*;
 
 /**
  * Hyperlink is a concrete implementation of the abstract base class that draws
@@ -37,24 +29,24 @@ import org.eclipse.ui.internal.forms.widgets.FormUtil;
  * <dt><b>Styles:</b></dt>
  * <dd>SWT.WRAP</dd>
  * </dl>
- *
+ * 
  * @see org.eclipse.ui.forms.HyperlinkGroup
  * @since 3.0
  */
 public class Hyperlink extends AbstractHyperlink {
 	private String text;
-	private static final String ELLIPSIS = "..."; //$NON-NLS-1$
+	private static final String ELLIPSIS = "..."; //$NON-NLS-1$	
 	private boolean underlined;
 	// The tooltip is used for two purposes - the application can set
 	// a tooltip or the tooltip can be used to display the full text when the
 	// the text has been truncated due to the label being too short.
-	// The appToolTip stores the tooltip set by the application.  Control.tooltiptext
+	// The appToolTip stores the tooltip set by the application.  Control.tooltiptext 
 	// contains whatever tooltip is currently being displayed.
-	private String appToolTipText;
+	private String appToolTipText;	
 
 	/**
 	 * Creates a new hyperlink control in the provided parent.
-	 *
+	 * 
 	 * @param parent
 	 *            the control parent
 	 * @param style
@@ -68,27 +60,23 @@ public class Hyperlink extends AbstractHyperlink {
 	protected void initAccessible() {
 		Accessible accessible = getAccessible();
 		accessible.addAccessibleListener(new AccessibleAdapter() {
-			@Override
 			public void getName(AccessibleEvent e) {
 				e.result = getText();
 				if (e.result == null)
 					getHelp(e);
 			}
 
-			@Override
 			public void getHelp(AccessibleEvent e) {
 				e.result = getToolTipText();
 			}
 		});
 		accessible.addAccessibleControlListener(new AccessibleControlAdapter() {
-			@Override
 			public void getChildAtPoint(AccessibleControlEvent e) {
 				Point pt = toControl(new Point(e.x, e.y));
 				e.childID = (getBounds().contains(pt)) ? ACC.CHILDID_SELF
 						: ACC.CHILDID_NONE;
 			}
 
-			@Override
 			public void getLocation(AccessibleControlEvent e) {
 				Rectangle location = getBounds();
 				Point pt = toDisplay(new Point(location.x, location.y));
@@ -98,22 +86,18 @@ public class Hyperlink extends AbstractHyperlink {
 				e.height = location.height;
 			}
 
-			@Override
 			public void getChildCount(AccessibleControlEvent e) {
 				e.detail = 0;
 			}
 
-			@Override
 			public void getRole(AccessibleControlEvent e) {
 				e.detail = ACC.ROLE_LINK;
 			}
-
-			@Override
+						
 			public void getDefaultAction (AccessibleControlEvent e) {
 				e.result = SWT.getMessage ("SWT_Press"); //$NON-NLS-1$
 			}
 
-			@Override
 			public void getState(AccessibleControlEvent e) {
 				int state = ACC.STATE_NORMAL;
 				if (Hyperlink.this.getSelection())
@@ -126,7 +110,7 @@ public class Hyperlink extends AbstractHyperlink {
 	/**
 	 * Sets the underlined state. It is not necessary to call this method when
 	 * in a hyperlink group.
-	 *
+	 * 
 	 * @param underlined
 	 *            if <samp>true </samp>, a line will be drawn below the text for
 	 *            each wrapped line.
@@ -138,7 +122,7 @@ public class Hyperlink extends AbstractHyperlink {
 
 	/**
 	 * Returns the underline state of the hyperlink.
-	 *
+	 * 
 	 * @return <samp>true </samp> if text is underlined, <samp>false </samp>
 	 *         otherwise.
 	 */
@@ -149,7 +133,6 @@ public class Hyperlink extends AbstractHyperlink {
 	/**
 	 * Overrides the parent by incorporating the margin.
 	 */
-	@Override
 	public Point computeSize(int wHint, int hHint, boolean changed) {
 		checkWidget();
 		int innerWidth = wHint;
@@ -163,29 +146,32 @@ public class Hyperlink extends AbstractHyperlink {
 
 	/**
 	 * Returns the current hyperlink text.
-	 *
+	 * 
 	 * @return hyperlink text
 	 */
-	@Override
 	public String getText() {
 		return text;
 	}
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.widgets.Control#getToolTipText()
+	 */
 	public String getToolTipText () {
 		checkWidget();
 		return appToolTipText;
 	}
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.widgets.Control#setToolTipText(java.lang.String)
+	 */
 	public void setToolTipText (String string) {
 		super.setToolTipText (string);
 		appToolTipText = super.getToolTipText();
-	}
+	}	
 
 	/**
 	 * Sets the text of this hyperlink.
-	 *
+	 * 
 	 * @param text
 	 *            the hyperlink text
 	 */
@@ -199,11 +185,10 @@ public class Hyperlink extends AbstractHyperlink {
 
 	/**
 	 * Paints the hyperlink text.
-	 *
+	 * 
 	 * @param gc
 	 *            graphic context
 	 */
-	@Override
 	protected void paintHyperlink(GC gc) {
 		Rectangle carea = getClientArea();
 		Rectangle bounds = new Rectangle(marginWidth, marginHeight, carea.width
@@ -214,7 +199,7 @@ public class Hyperlink extends AbstractHyperlink {
 
 	/**
 	 * Paints the hyperlink text in provided bounding rectangle.
-	 *
+	 * 
 	 * @param gc
 	 *            graphic context
 	 * @param bounds
@@ -258,7 +243,7 @@ public class Hyperlink extends AbstractHyperlink {
 				fg.dispose();
 		}
 	}
-
+	
 	protected String shortenText(GC gc, String t, int width) {
 		if (t == null) return null;
 		int w = gc.textExtent(ELLIPSIS).x;
@@ -274,7 +259,7 @@ public class Hyperlink extends AbstractHyperlink {
 			int l1 = gc.textExtent(s1).x;
 			int l2 = gc.textExtent(s2).x;
 			if (l1+w+l2 > width) {
-				max = mid;
+				max = mid;			
 				mid = (max+min)/2;
 			} else if (l1+w+l2 < width) {
 				min = mid;

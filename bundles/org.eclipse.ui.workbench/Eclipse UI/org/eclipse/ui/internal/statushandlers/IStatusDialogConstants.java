@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,16 +26,16 @@ import org.eclipse.ui.statushandlers.WorkbenchStatusDialogManager;
  * {@link WorkbenchStatusDialogManager} properties. Some properties may be
  * promoted to the API. Some of those properties are used to configure the
  * dialog, while others are used to describe the state of the dialgo.
- *
+ * 
  */
 public interface IStatusDialogConstants {
-
+	
 	/**
 	 * This property can be only read. It will return the current dialog
 	 * {@link Shell}. It may be null.
 	 */
 	public static final Object SHELL = Shell.class;
-
+	
 	/**
 	 * This property indicates if the support area should be opened when the
 	 * dialog appears. The value must be of {@link Boolean} type.
@@ -43,7 +43,7 @@ public interface IStatusDialogConstants {
 	 * {@link Boolean#FALSE} means that it will be in the closed state.
 	 */
 	public static final Object SHOW_SUPPORT = new Object();
-
+	
 	/**
 	 * This property indicates if the dialog should display a link to the Error
 	 * Log if the Error Log view is available. The value must be of

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 462760
  *******************************************************************************/
 package org.eclipse.ui.internal.navigator.resources.actions;
 
@@ -27,15 +26,15 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.CopyFilesAndFoldersOperation;
 import org.eclipse.ui.actions.CopyProjectOperation;
 import org.eclipse.ui.actions.SelectionListenerAction;
-import org.eclipse.ui.internal.navigator.resources.plugin.WorkbenchNavigatorMessages;
 import org.eclipse.ui.part.ResourceTransfer;
+import org.eclipse.ui.internal.navigator.resources.plugin.WorkbenchNavigatorMessages;
 
 /**
  * Standard action for pasting resources on the clipboard to the selected resource's location.
  * <p>
  * This class may be instantiated; it is not intended to be subclassed.
  * </p>
- *
+ * 
  * @since 2.0
  */
 /*package*/class PasteAction extends SelectionListenerAction {
@@ -62,12 +61,12 @@ import org.eclipse.ui.part.ResourceTransfer;
      * @param clipboard the clipboard
      */
     public PasteAction(Shell shell, Clipboard clipboard) {
-        super(WorkbenchNavigatorMessages.PasteAction_Past_);
+        super(WorkbenchNavigatorMessages.PasteAction_Past_); 
         Assert.isNotNull(shell);
         Assert.isNotNull(clipboard);
         this.shell = shell;
         this.clipboard = clipboard;
-        setToolTipText(WorkbenchNavigatorMessages.PasteAction_Paste_selected_resource_s_);
+        setToolTipText(WorkbenchNavigatorMessages.PasteAction_Paste_selected_resource_s_); 
         setId(PasteAction.ID);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(this, "HelpId"); //$NON-NLS-1$
 				// TODO INavigatorHelpContextIds.PASTE_ACTION);
@@ -76,13 +75,15 @@ import org.eclipse.ui.part.ResourceTransfer;
     /**
      * Returns the actual target of the paste action. Returns null
      * if no valid target is selected.
-     *
+     * 
      * @return the actual target of the paste action
      */
     private IResource getTarget() {
-		List<? extends IResource> selectedResources = getSelectedResources();
+        List selectedResources = getSelectedResources();
 
-        for (IResource resource : selectedResources) {
+        for (int i = 0; i < selectedResources.size(); i++) {
+            IResource resource = (IResource) selectedResources.get(i);
+
             if (resource instanceof IProject && !((IProject) resource).isOpen()) {
 				return null;
 			}
@@ -98,9 +99,9 @@ import org.eclipse.ui.part.ResourceTransfer;
 
     /**
      * Returns whether any of the given resources are linked resources.
-     *
+     * 
      * @param resources resource to check for linked type. may be null
-     * @return true=one or more resources are linked. false=none of the
+     * @return true=one or more resources are linked. false=none of the 
      * 	resources are linked
      */
     private boolean isLinked(IResource[] resources) {
@@ -115,23 +116,26 @@ import org.eclipse.ui.part.ResourceTransfer;
     /**
      * Implementation of method defined on <code>IAction</code>.
      */
-    @Override
-	public void run() {
+    public void run() {
         // try a resource transfer
         ResourceTransfer resTransfer = ResourceTransfer.getInstance();
-		IResource[] resourceData = (IResource[]) clipboard.getContents(resTransfer);
+        IResource[] resourceData = (IResource[]) clipboard
+                .getContents(resTransfer);
 
         if (resourceData != null && resourceData.length > 0) {
             if (resourceData[0].getType() == IResource.PROJECT) {
                 // enablement checks for all projects
                 for (int i = 0; i < resourceData.length; i++) {
-					CopyProjectOperation operation = new CopyProjectOperation(shell);
+                    CopyProjectOperation operation = new CopyProjectOperation(
+                            this.shell);
                     operation.copyProject((IProject) resourceData[i]);
                 }
             } else {
                 // enablement should ensure that we always have access to a container
                 IContainer container = getContainer();
-				CopyFilesAndFoldersOperation operation = new CopyFilesAndFoldersOperation(shell);
+
+                CopyFilesAndFoldersOperation operation = new CopyFilesAndFoldersOperation(
+                        this.shell);
                 operation.copyResources(resourceData, container);
             }
             return;
@@ -144,7 +148,9 @@ import org.eclipse.ui.part.ResourceTransfer;
         if (fileData != null) {
             // enablement should ensure that we always have access to a container
             IContainer container = getContainer();
-			CopyFilesAndFoldersOperation operation = new CopyFilesAndFoldersOperation(shell);
+
+            CopyFilesAndFoldersOperation operation = new CopyFilesAndFoldersOperation(
+                    this.shell);
             operation.copyFiles(fileData, container);
         }
     }
@@ -153,7 +159,7 @@ import org.eclipse.ui.part.ResourceTransfer;
      * Returns the container to hold the pasted resources.
      */
     private IContainer getContainer() {
-		List<? extends IResource> selection = getSelectedResources();
+        List selection = getSelectedResources();
         if (selection.get(0) instanceof IFile) {
 			return ((IFile) selection.get(0)).getParent();
 		}
@@ -162,28 +168,27 @@ import org.eclipse.ui.part.ResourceTransfer;
 
     /**
      * The <code>PasteAction</code> implementation of this
-     * <code>SelectionListenerAction</code> method enables this action if
+     * <code>SelectionListenerAction</code> method enables this action if 
      * a resource compatible with what is on the clipboard is selected.
-     *
+     * 
      * -Clipboard must have IResource or java.io.File
      * -Projects can always be pasted if they are open
      * -Workspace folder may not be copied into itself
-     * -Files and folders may be pasted to a single selected folder in open
-     * 	project or multiple selected files in the same folder
+     * -Files and folders may be pasted to a single selected folder in open 
+     * 	project or multiple selected files in the same folder 
      */
-    @Override
-	protected boolean updateSelection(IStructuredSelection selection) {
+    protected boolean updateSelection(IStructuredSelection selection) {
         if (!super.updateSelection(selection)) {
 			return false;
 		}
 
         final IResource[][] clipboardData = new IResource[1][];
         shell.getDisplay().syncExec(new Runnable() {
-            @Override
-			public void run() {
+            public void run() {
                 // clipboard must have resources or files
                 ResourceTransfer resTransfer = ResourceTransfer.getInstance();
-				clipboardData[0] = (IResource[]) clipboard.getContents(resTransfer);
+                clipboardData[0] = (IResource[]) clipboard
+                        .getContents(resTransfer);
             }
         });
         IResource[] resourceData = clipboardData[0];
@@ -207,17 +212,18 @@ import org.eclipse.ui.part.ResourceTransfer;
 		}
 
         IResource targetResource = getTarget();
-        // targetResource is null if no valid target is selected (e.g., open project)
-        // or selection is empty
+        // targetResource is null if no valid target is selected (e.g., open project) 
+        // or selection is empty	
         if (targetResource == null) {
 			return false;
 		}
 
-        // can paste files and folders to a single selection (file, folder,
+        // can paste files and folders to a single selection (file, folder, 
         // open project) or multiple file selection with the same parent
-		List<? extends IResource> selectedResources = getSelectedResources();
+        List selectedResources = getSelectedResources();
         if (selectedResources.size() > 1) {
-            for (IResource resource : selectedResources) {
+            for (int i = 0; i < selectedResources.size(); i++) {
+                IResource resource = (IResource) selectedResources.get(i);
                 if (resource.getType() != IResource.FILE) {
 					return false;
 				}

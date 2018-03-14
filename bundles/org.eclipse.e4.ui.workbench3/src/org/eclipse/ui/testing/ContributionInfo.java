@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 /**
  * Instances of this class describe a contribution of an element of a certain
  * type to the UI.
- *
+ * 
  * @since 3.6
  */
 public class ContributionInfo {
@@ -26,7 +26,7 @@ public class ContributionInfo {
 
 	/**
 	 * Creates a new instance.
-	 *
+	 * 
 	 * @param bundleId
 	 * @param elementType
 	 *            a localized string describing the contribution (e.g., 'view',

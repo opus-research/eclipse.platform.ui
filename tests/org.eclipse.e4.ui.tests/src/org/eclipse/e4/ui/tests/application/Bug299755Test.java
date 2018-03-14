@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,24 +7,20 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440893
  ******************************************************************************/
 package org.eclipse.e4.ui.tests.application;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
 import javax.inject.Inject;
 import javax.inject.Named;
+import junit.framework.TestCase;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.services.IServiceConstants;
-import org.junit.Test;
 
-public class Bug299755Test {
+public class Bug299755Test extends TestCase {
 
 	static class InjectionObject {
 
@@ -63,16 +59,15 @@ public class Bug299755Test {
 		}
 	}
 
-	@Test
 	public void testBug299755() throws Exception {
 		// create a top-level context
 		IEclipseContext windowContext = EclipseContextFactory.create();
-		windowContext.set(Object.class, new Object());
+		windowContext.set(Object.class.getName(), new Object());
 		// put the event broker inside
 		windowContext.set(InjectionObject.class.getName(),
 				new ContextFunction() {
 					@Override
-					public Object compute(IEclipseContext context, String contextKey) {
+					public Object compute(IEclipseContext context) {
 						return ContextInjectionFactory.make(
 								InjectionObject.class, context);
 					}
@@ -85,8 +80,8 @@ public class Bug299755Test {
 		// create an "in" part context
 		IEclipseContext inContext = windowContext.createChild();
 
-		Out out = ContextInjectionFactory.make(Out.class, outContext);
-		In in = ContextInjectionFactory.make(In.class, inContext);
+		Out out = (Out) ContextInjectionFactory.make(Out.class, outContext);
+		In in = (In) ContextInjectionFactory.make(In.class, inContext);
 
 		// no selection in the beginning
 		assertNull(in.getSelection());

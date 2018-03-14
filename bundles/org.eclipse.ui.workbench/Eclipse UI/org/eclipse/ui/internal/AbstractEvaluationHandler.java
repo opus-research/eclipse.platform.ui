@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -22,7 +21,7 @@ import org.eclipse.ui.services.IEvaluationService;
 /**
  * This internal class serves as a foundation for any handler that would like
  * its enabled state controlled by core expressions and the IEvaluationService.
- *
+ * 
  * @since 3.3
  */
 public abstract class AbstractEvaluationHandler extends AbstractEnabledHandler {
@@ -33,7 +32,7 @@ public abstract class AbstractEvaluationHandler extends AbstractEnabledHandler {
 
 	protected IEvaluationService getEvaluationService() {
 		if (evaluationService == null) {
-			evaluationService = PlatformUI.getWorkbench()
+			evaluationService = (IEvaluationService) PlatformUI.getWorkbench()
 					.getService(IEvaluationService.class);
 		}
 		return evaluationService;
@@ -53,7 +52,6 @@ public abstract class AbstractEvaluationHandler extends AbstractEnabledHandler {
 	private IPropertyChangeListener getEnablementListener() {
 		if (enablementListener == null) {
 			enablementListener = new IPropertyChangeListener() {
-				@Override
 				public void propertyChange(PropertyChangeEvent event) {
 					if (event.getProperty() == PROP_ENABLED) {
 						if (event.getNewValue() instanceof Boolean) {
@@ -69,7 +67,11 @@ public abstract class AbstractEvaluationHandler extends AbstractEnabledHandler {
 		return enablementListener;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.AbstractHandler#dispose()
+	 */
 	public void dispose() {
 		if (enablementRef != null) {
 			evaluationService.removeEvaluationListener(enablementRef);

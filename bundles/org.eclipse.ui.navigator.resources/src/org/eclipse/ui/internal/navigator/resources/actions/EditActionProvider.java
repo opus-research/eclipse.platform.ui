@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,40 +22,39 @@ import org.eclipse.ui.navigator.ICommonActionExtensionSite;
  *
  */
 public class EditActionProvider extends CommonActionProvider {
-
+	 
 	private EditActionGroup editGroup;
 
 	private ICommonActionExtensionSite site;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.navigator.CommonActionProvider#init(org.eclipse.ui.navigator.ICommonActionExtensionSite)
+	 */
 	public void init(ICommonActionExtensionSite anActionSite) {
 		site = anActionSite;
 		editGroup = new EditActionGroup(site.getViewSite().getShell());
-
+ 
 	}
 
-	@Override
-	public void dispose() {
+	public void dispose() { 
 		editGroup.dispose();
 	}
 
-	@Override
-	public void fillActionBars(IActionBars actionBars) {
+	public void fillActionBars(IActionBars actionBars) { 
 		editGroup.fillActionBars(actionBars);
 	}
 
-	@Override
-	public void fillContextMenu(IMenuManager menu) {
+	public void fillContextMenu(IMenuManager menu) { 
 		editGroup.fillContextMenu(menu);
 	}
 
-	@Override
-	public void setContext(ActionContext context) {
+	public void setContext(ActionContext context) { 
 		editGroup.setContext(context);
 	}
 
-	@Override
-	public void updateActionBars() {
+	public void updateActionBars() { 
 		editGroup.updateActionBars();
 	}
 }

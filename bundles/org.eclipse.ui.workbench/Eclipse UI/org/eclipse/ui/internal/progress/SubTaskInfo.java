@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,7 @@ class SubTaskInfo extends JobTreeElement {
 
 	/**
 	 * Create a new instance of the receiver.
-	 *
+	 * 
 	 * @param parentJob
 	 * @param name
 	 */
@@ -30,12 +30,20 @@ class SubTaskInfo extends JobTreeElement {
 		jobInfo = parentJob;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.progress.JobTreeElement#getChildren()
+	 */
 	Object[] getChildren() {
 		return ProgressManagerUtil.EMPTY_OBJECT_ARRAY;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.progress.JobTreeElement#getDisplayString()
+	 */
 	String getDisplayString() {
 		if (taskName == null) {
 			return ProgressMessages.SubTaskInfo_UndefinedTaskName;
@@ -43,14 +51,18 @@ class SubTaskInfo extends JobTreeElement {
 		return taskName;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.progress.JobTreeElement#hasChildren()
+	 */
 	boolean hasChildren() {
 		return false;
 	}
 
 	/**
 	 * Set the taskName of the receiver.
-	 *
+	 * 
 	 * @param name
 	 */
 	void setTaskName(String name) {
@@ -67,17 +79,29 @@ class SubTaskInfo extends JobTreeElement {
 		return taskName;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.progress.JobTreeElement#getParent()
+	 */
 	public Object getParent() {
 		return jobInfo;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.progress.JobTreeElement#isJobInfo()
+	 */
 	boolean isJobInfo() {
 		return false;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.progress.JobTreeElement#isActive()
+	 */
 	boolean isActive() {
 		return jobInfo.isActive();
 	}

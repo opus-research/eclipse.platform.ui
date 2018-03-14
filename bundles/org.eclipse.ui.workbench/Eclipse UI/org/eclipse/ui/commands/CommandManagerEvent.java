@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 package org.eclipse.ui.commands;
 
 import java.util.Set;
+
 import org.eclipse.ui.internal.util.Util;
 
 /**
@@ -19,14 +20,12 @@ import org.eclipse.ui.internal.util.Util;
  * <p>
  * This class is not intended to be extended by clients.
  * </p>
- *
+ * 
  * @since 3.0
  * @see ICommandManagerListener#commandManagerChanged(CommandManagerEvent)
  * @see org.eclipse.core.commands.CommandManagerEvent
  * @deprecated Please use the "org.eclipse.core.commands" plug-in instead.
  */
-@Deprecated
-@SuppressWarnings("all")
 public final class CommandManagerEvent {
 
     /**
@@ -59,7 +58,7 @@ public final class CommandManagerEvent {
      */
     private final boolean definedCategoryIdsChanged;
 
-    /**
+    /** 
      * Whether the list of defined commands has changed.
      */
     private final boolean definedCommandIdsChanged;
@@ -89,7 +88,7 @@ public final class CommandManagerEvent {
 
     /**
      * Creates a new instance of this class.
-     *
+     * 
      * @param commandManager
      *            the instance of the interface that changed.
      * @param activeContextIdsChanged
@@ -190,18 +189,17 @@ public final class CommandManagerEvent {
 
     /**
      * Returns the instance of the interface that changed.
-     *
+     * 
      * @return the instance of the interface that changed. Guaranteed not to be
      *         <code>null</code>.
      */
-	@Deprecated
     public ICommandManager getCommandManager() {
         return commandManager;
     }
 
     /**
      * Returns the set of identifiers to previously defined categories.
-     *
+     * 
      * @return the set of identifiers to previously defined categories. This set
      *         may be empty. If this set is not empty, it is guaranteed to only
      *         contain instances of <code>String</code>. This set is
@@ -210,14 +208,13 @@ public final class CommandManagerEvent {
      *         guaranteed to not be null if haveDefinedCategoryIdsChanged() is
      *         <code>true</code>.
      */
-	@Deprecated
     public Set getPreviouslyDefinedCategoryIds() {
         return previouslyDefinedCategoryIds;
     }
 
     /**
      * Returns the set of identifiers to previously defined commands.
-     *
+     * 
      * @return the set of identifiers to previously defined commands. This set
      *         may be empty. If this set is not empty, it is guaranteed to only
      *         contain instances of <code>String</code>. This set is
@@ -226,14 +223,13 @@ public final class CommandManagerEvent {
      *         guaranteed to not be null if haveDefinedCommandIdsChanged() is
      *         <code>true</code>.
      */
-	@Deprecated
     public Set getPreviouslyDefinedCommandIds() {
         return previouslyDefinedCommandIds;
     }
 
     /**
      * Returns the set of identifiers to previously defined key conigurations.
-     *
+     * 
      * @return the set of identifiers to previously defined key configurations.
      *         This set may be empty. If this set is not empty, it is guaranteed
      *         to only contain instances of <code>String</code>. This set is
@@ -242,77 +238,69 @@ public final class CommandManagerEvent {
      *         and is guaranteed to not be null if
      *         haveDefinedKeyConfigurationIdsChanged() is <code>true</code>.
      */
-	@Deprecated
     public Set getPreviouslyDefinedKeyConfigurationIds() {
         return previouslyDefinedKeyConfigurationIds;
     }
 
     /**
      * Returns whether or not the activeKeyConfigurationId property changed.
-     *
+     * 
      * @return true, iff the activeKeyConfigurationId property changed.
      */
-	@Deprecated
     public boolean hasActiveKeyConfigurationIdChanged() {
         return activeKeyConfigurationIdChanged;
     }
 
     /**
      * Returns whether or not the activeLocale property changed.
-     *
+     * 
      * @return true, iff the activeLocale property changed.
      */
-	@Deprecated
     public boolean hasActiveLocaleChanged() {
         return activeLocaleChanged;
     }
 
     /**
      * Returns whether or not the activePlatform property changed.
-     *
+     * 
      * @return true, iff the activePlatform property changed.
      */
-	@Deprecated
     public boolean hasActivePlatformChanged() {
         return activePlatformChanged;
     }
 
     /**
      * Returns whether or not the activeContextIds property changed.
-     *
+     * 
      * @return true, iff the activeContextIds property changed.
      */
-	@Deprecated
     public boolean haveActiveContextIdsChanged() {
         return activeContextIdsChanged;
     }
 
     /**
      * Returns whether or not the definedCategoryIds property changed.
-     *
+     * 
      * @return true, iff the definedCategoryIds property changed.
      */
-	@Deprecated
     public boolean haveDefinedCategoryIdsChanged() {
         return definedCategoryIdsChanged;
     }
 
     /**
      * Returns whether or not the definedCommandIds property changed.
-     *
+     * 
      * @return true, iff the definedCommandIds property changed.
      */
-	@Deprecated
     public boolean haveDefinedCommandIdsChanged() {
         return definedCommandIdsChanged;
     }
 
     /**
      * Returns whether or not the definedKeyConfigurationIds property changed.
-     *
+     * 
      * @return true, iff the definedKeyConfigurationIds property changed.
      */
-	@Deprecated
     public boolean haveDefinedKeyConfigurationIdsChanged() {
         return definedKeyConfigurationIdsChanged;
     }

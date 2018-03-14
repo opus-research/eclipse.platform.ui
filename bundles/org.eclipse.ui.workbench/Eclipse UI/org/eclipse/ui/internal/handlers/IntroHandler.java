@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,11 +21,11 @@ import org.eclipse.ui.internal.intro.IntroDescriptor;
 import org.eclipse.ui.internal.intro.IntroMessages;
 
 /**
- *
+ * 
  * @author Prakash G.R.
- *
+ * 
  * @since 3.7
- *
+ * 
  */
 public class IntroHandler extends AbstractHandler {
 
@@ -36,8 +36,14 @@ public class IntroHandler extends AbstractHandler {
 		workbench = (Workbench) PlatformUI.getWorkbench();
 		introDescriptor = workbench.getIntroDescriptor();
 	}
-
-	@Override
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.
+	 * ExecutionEvent)
+	 */
 	public Object execute(ExecutionEvent event) {
 
 		if (introDescriptor == null) {
@@ -51,7 +57,11 @@ public class IntroHandler extends AbstractHandler {
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.AbstractHandler#isEnabled()
+	 */
 	public boolean isEnabled() {
 
 		boolean enabled = false;

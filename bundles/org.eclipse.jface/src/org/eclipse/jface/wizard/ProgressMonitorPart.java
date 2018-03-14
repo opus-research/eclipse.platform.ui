@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,19 +8,12 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Eugene Ostroukhov <eugeneo@symbian.org> -  Bug 287887 [Wizards] [api] Cancel button has two distinct roles
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440270
- *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 475879
  *******************************************************************************/
 package org.eclipse.jface.wizard;
 
-import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IProgressMonitorWithBlocking;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jface.dialogs.ProgressIndicator;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Cursor;
@@ -32,11 +25,21 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IProgressMonitorWithBlocking;
+import org.eclipse.core.runtime.IStatus;
+
+import org.eclipse.jface.dialogs.ProgressIndicator;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
 
 /**
  * A standard implementation of an IProgressMonitor. It consists
@@ -70,26 +73,28 @@ public class ProgressMonitorPart extends Composite implements
     protected IStatus blockedStatus;
 
     /** the cancel lister attached to the cancel component */
-    protected Listener fCancelListener = e -> {
-	    setCanceled(true);
-	    if (fCancelComponent != null) {
-			fCancelComponent.setEnabled(false);
-		}
-	};
-
+    protected Listener fCancelListener = new Listener() {
+        public void handleEvent(Event e) {
+            setCanceled(true);
+            if (fCancelComponent != null) {
+				fCancelComponent.setEnabled(false);
+			}
+        }
+    };
+    
     /** toolbar for managing stop button **/
     private ToolBar fToolBar;
 
     /** default tool item for canceling tasks **/
 	private ToolItem fStopButton;
-
+	
 	/** <code>true</code> if this monitor part should show stop button **/
 	private boolean fHasStopButton = false;
 
 
 	/**
 	 * Creates a <code>ProgressMonitorPart</code> that does not provide a stop button.
-	 *
+	 * 
 	 * @param parent The SWT parent of the part.
 	 * @param layout The SWT grid layout used by the part. A client can supply the layout to control
 	 *            how the progress monitor part is laid out. If <code>null</code> is passed the part
@@ -101,7 +106,7 @@ public class ProgressMonitorPart extends Composite implements
 
 	/**
 	 * Creates a <code>ProgressMonitorPart</code> that does not provide a stop button.
-	 *
+	 * 
 	 * @param parent The SWT parent of the part.
 	 * @param layout The SWT grid layout used by the part. A client can supply the layout to control
 	 *            how the progress monitor part is laid out. If <code>null</code> is passed the part
@@ -117,7 +122,7 @@ public class ProgressMonitorPart extends Composite implements
 
 	/**
 	 * Creates a <code>ProgressMonitorPart</code>.
-	 *
+	 * 
 	 * @param parent the SWT parent of the part
 	 * @param layout the SWT grid layout used by the part. A client can supply the layout to control
 	 *            how the progress monitor part is laid out. If <code>null</code> is passed the part
@@ -125,7 +130,7 @@ public class ProgressMonitorPart extends Composite implements
 	 * @param createStopButton <code>true</code> if the progress indicator should include a stop
 	 *            button that can be used to cancel any currently running task, and
 	 *            <code>false</code> if no such stop button should be created.
-	 *
+	 * 
 	 * @since 3.6
 	 */
 	public ProgressMonitorPart(Composite parent, Layout layout, boolean createStopButton) {
@@ -136,7 +141,7 @@ public class ProgressMonitorPart extends Composite implements
 
 	/**
 	 * Attaches the progress monitor part to the given cancel component.
-	 *
+	 * 
 	 * @param cancelComponent the control whose selection will trigger a cancel. This parameter will
 	 *            be ignored and hence can be <code>null</code> if a stop button was requested upon
 	 *            construction and instead the stop button will enabled and serve as the cancel
@@ -152,8 +157,11 @@ public class ProgressMonitorPart extends Composite implements
 		}
 	}
 
-    @Override
-	public void beginTask(String name, int totalWork) {
+    /**
+     * Implements <code>IProgressMonitor.beginTask</code>.
+     * @see IProgressMonitor#beginTask(java.lang.String, int)
+     */
+    public void beginTask(String name, int totalWork) {
         fTaskName = name;
         fSubTaskName = ""; //$NON-NLS-1$
         updateLabel();
@@ -168,8 +176,11 @@ public class ProgressMonitorPart extends Composite implements
         }
     }
 
-    @Override
-	public void done() {
+    /**
+     * Implements <code>IProgressMonitor.done</code>.
+     * @see IProgressMonitor#done()
+     */
+    public void done() {
         fLabel.setText("");//$NON-NLS-1$
         fSubTaskName = ""; //$NON-NLS-1$
         fProgressIndicator.sendRemainingWork();
@@ -220,13 +231,13 @@ public class ProgressMonitorPart extends Composite implements
         if (fHasStopButton)
         	numColumns++;
         setLayout(layout);
-
+        
         if (layout instanceof GridLayout)
         	((GridLayout)layout).numColumns = numColumns;
 
         fLabel = new Label(this, SWT.LEFT);
         fLabel.setLayoutData(new GridData(GridData.FILL, GridData.CENTER, true, false, numColumns, 1));
-
+		
         if (progressIndicatorHeight == SWT.DEFAULT) {
             GC gc = new GC(fLabel);
             FontMetrics fm = gc.getFontMetrics();
@@ -255,8 +266,7 @@ public class ProgressMonitorPart extends Composite implements
         	// It would have been nice to use the fCancelListener, but that
         	// listener operates on the fCancelComponent which must be a control.
         	fStopButton.addSelectionListener(new SelectionAdapter() {
-        		@Override
-				public void widgetSelected(SelectionEvent e) {
+        		public void widgetSelected(SelectionEvent e) {
         			setCanceled(true);
         			if (fStopButton != null) {
         				fStopButton.setEnabled(false);
@@ -264,32 +274,40 @@ public class ProgressMonitorPart extends Composite implements
         		}
         	});
         	final Image stopImage = ImageDescriptor.createFromFile(
-        			ProgressMonitorPart.class, "images/stop.png").createImage(getDisplay()); //$NON-NLS-1$
+        			ProgressMonitorPart.class, "images/stop.gif").createImage(getDisplay()); //$NON-NLS-1$
         	final Cursor arrowCursor = new Cursor(this.getDisplay(), SWT.CURSOR_ARROW);
         	fToolBar.setCursor(arrowCursor);
         	fStopButton.setImage(stopImage);
-        	fStopButton.addDisposeListener(e -> {
-				stopImage.dispose();
-				arrowCursor.dispose();
-			});
+        	fStopButton.addDisposeListener(new DisposeListener() {
+        		public void widgetDisposed(DisposeEvent e) {
+        			stopImage.dispose();
+        			arrowCursor.dispose();
+        		}
+        	});
         	fStopButton.setEnabled(false);
 			fStopButton.setToolTipText(JFaceResources.getString("ProgressMonitorPart.cancelToolTip")); //$NON-NLS-1$
         }
     }
 
-    @Override
-	public void internalWorked(double work) {
+    /**
+     * Implements <code>IProgressMonitor.internalWorked</code>.
+     * @see IProgressMonitor#internalWorked(double)
+     */
+    public void internalWorked(double work) {
         fProgressIndicator.worked(work);
     }
 
-    @Override
-	public boolean isCanceled() {
+    /**
+     * Implements <code>IProgressMonitor.isCanceled</code>.
+     * @see IProgressMonitor#isCanceled()
+     */
+    public boolean isCanceled() {
         return fIsCanceled;
     }
 
 	/**
 	 * Detach the progress monitor part from the given cancel component.
-	 *
+	 * 
 	 * @param cancelComponent the control that was previously used as a cancel component. This
 	 *            parameter will be ignored and hence can be <code>null</code> if a stop button was
 	 *            requested upon construction and instead the stop button will be disabled.
@@ -305,26 +323,37 @@ public class ProgressMonitorPart extends Composite implements
 		}
 	}
 
-    @Override
-	public void setCanceled(boolean b) {
+    /**
+     * Implements <code>IProgressMonitor.setCanceled</code>.
+     * @see IProgressMonitor#setCanceled(boolean)
+     */
+    public void setCanceled(boolean b) {
         fIsCanceled = b;
     }
 
-    @Override
-	public void setFont(Font font) {
+    /**
+     * Sets the progress monitor part's font.
+     */
+    public void setFont(Font font) {
         super.setFont(font);
         fLabel.setFont(font);
         fProgressIndicator.setFont(font);
     }
 
-    @Override
-	public void setTaskName(String name) {
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.core.runtime.IProgressMonitor#setTaskName(java.lang.String)
+     */
+    public void setTaskName(String name) {
         fTaskName = name;
         updateLabel();
     }
 
-    @Override
-	public void subTask(String name) {
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.core.runtime.IProgressMonitor#subTask(java.lang.String)
+     */
+    public void subTask(String name) {
         fSubTaskName = name;
         updateLabel();
     }
@@ -351,39 +380,47 @@ public class ProgressMonitorPart extends Composite implements
     private String taskLabel() {
     	boolean hasTask= fTaskName != null && fTaskName.length() > 0;
     	boolean hasSubtask= fSubTaskName != null && fSubTaskName.length() > 0;
-
+    	
 		if (hasTask) {
 			if (hasSubtask)
-				return escapeMetaCharacters(JFaceResources.format("Set_SubTask", fTaskName, fSubTaskName));//$NON-NLS-1$
+				return escapeMetaCharacters(JFaceResources.format(
+    					"Set_SubTask", new Object[] { fTaskName, fSubTaskName }));//$NON-NLS-1$
    			return escapeMetaCharacters(fTaskName);
-
+   			
     	} else if (hasSubtask) {
     		return escapeMetaCharacters(fSubTaskName);
-
+    	
     	} else {
     		return ""; //$NON-NLS-1$
     	}
     }
 
-    @Override
-	public void worked(int work) {
+    /**
+     * Implements <code>IProgressMonitor.worked</code>.
+     * @see IProgressMonitor#worked(int)
+     */
+    public void worked(int work) {
         internalWorked(work);
     }
 
-    @Override
-	public void clearBlocked() {
+    /* (non-Javadoc)
+     * @see org.eclipse.core.runtime.IProgressMonitorWithBlocking#clearBlocked()
+     */
+    public void clearBlocked() {
         blockedStatus = null;
         updateLabel();
 
     }
 
-    @Override
-	public void setBlocked(IStatus reason) {
+    /* (non-Javadoc)
+     * @see org.eclipse.core.runtime.IProgressMonitorWithBlocking#setBlocked(org.eclipse.core.runtime.IStatus)
+     */
+    public void setBlocked(IStatus reason) {
         blockedStatus = reason;
         updateLabel();
 
     }
-
+    
    private void setCancelEnabled(boolean enabled) {
     	if (fStopButton != null && !fStopButton.isDisposed()) {
     		fStopButton.setEnabled(enabled);

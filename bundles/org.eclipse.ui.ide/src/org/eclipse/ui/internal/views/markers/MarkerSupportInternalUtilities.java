@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 20072008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
  ******************************************************************************/
 
 package org.eclipse.ui.internal.views.markers;
@@ -51,9 +50,9 @@ import com.ibm.icu.text.Collator;
 /**
  * MarkerSupportUtilities is the class that maintains constants and
  * functionality used by multiple classes.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class MarkerSupportInternalUtilities {
 
@@ -93,7 +92,7 @@ public class MarkerSupportInternalUtilities {
 	 * A reusable empty {@link String}
 	 */
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
-
+	
 	public static final String UNKNOWN_ATRRIBTE_VALUE_STRING = MarkerMessages.Unknown;
 
 	/**
@@ -104,11 +103,11 @@ public class MarkerSupportInternalUtilities {
 	/**
 	 * The markers help decoration.
 	 */
-	public static final String IMG_MARKERS_HELP_DECORATION_PATH = "markers/help_small.png"; //$NON-NLS-1$
+	public static final String IMG_MARKERS_HELP_DECORATION_PATH = "markers/help_small.gif"; //$NON-NLS-1$
 	/**
 	 * The markers quick fix decoration.
 	 */
-	public static final String IMG_MARKERS_QUICK_FIX_DECORATION_PATH = "markers/contassist_ovr.png"; //$NON-NLS-1$
+	public static final String IMG_MARKERS_QUICK_FIX_DECORATION_PATH = "markers/contassist_ovr.gif"; //$NON-NLS-1$
 
 	/**
 	 * The suffix to the view names for the legacy markers views.
@@ -145,7 +144,7 @@ public class MarkerSupportInternalUtilities {
 
 	/**
 	 * Create the image at the supplied path.
-	 *
+	 * 
 	 * @param completeImagePath
 	 * @param manager the resource manager to allocate the image in
 	 * @return Image or <code>null</code>.
@@ -160,7 +159,7 @@ public class MarkerSupportInternalUtilities {
 
 	/**
 	 * Return a StatusAdapter for the error
-	 *
+	 * 
 	 * @param exception
 	 * @return StatusAdapter
 	 */
@@ -173,7 +172,7 @@ public class MarkerSupportInternalUtilities {
 
 	/**
 	 * Generate the filter for the receiver from the configurationElement.
-	 *
+	 * 
 	 * @param field
 	 *            the field being generated
 	 * @return MarkerFieldFilter or <code>null</code>.
@@ -199,7 +198,7 @@ public class MarkerSupportInternalUtilities {
 
 	/**
 	 * Create a FilterConfigurationArea for the receiver.
-	 *
+	 * 
 	 * @param field
 	 *            the field with the specified area
 	 * @return FilterConfigurationArea or <code>null</code>
@@ -226,7 +225,7 @@ public class MarkerSupportInternalUtilities {
 	/**
 	 * Return the children of the given marker item (may return an array of
 	 * length 0)
-	 *
+	 * 
 	 * @param markerItem
 	 * @return the children
 	 */
@@ -239,7 +238,7 @@ public class MarkerSupportInternalUtilities {
 
 	/**
 	 * Determine the average width of font used by the control.
-	 *
+	 * 
 	 * @param control
 	 * @return int
 	 */
@@ -252,7 +251,7 @@ public class MarkerSupportInternalUtilities {
 
 	/**
 	 * Return the group value of the item in group.
-	 *
+	 * 
 	 * @param group
 	 * @param item
 	 * @return String
@@ -273,7 +272,7 @@ public class MarkerSupportInternalUtilities {
 	/**
 	 * Returns the highest severity of the given marker item and all its
 	 * children.
-	 *
+	 * 
 	 * @param markerItem
 	 * @return the severity
 	 */
@@ -289,7 +288,7 @@ public class MarkerSupportInternalUtilities {
 
 	/**
 	 * Return the id for the field.
-	 *
+	 * 
 	 * @param field
 	 * @return String
 	 */
@@ -300,7 +299,7 @@ public class MarkerSupportInternalUtilities {
 
 	/**
 	 * Get the IDE image at path.
-	 *
+	 * 
 	 * @param constantName
 	 * @return Image
 	 */
@@ -315,7 +314,7 @@ public class MarkerSupportInternalUtilities {
 	/**
 	 * Return the severity value for item. A value of -1 indicates
 	 * that there is no severity value.
-	 *
+	 * 
 	 * @param item
 	 * @return int
 	 */
@@ -325,7 +324,7 @@ public class MarkerSupportInternalUtilities {
 
 	/**
 	 * Get the image for the supplied severity
-	 *
+	 * 
 	 * @param severity
 	 * @return {@link Image}
 	 */
@@ -347,7 +346,7 @@ public class MarkerSupportInternalUtilities {
 
 	/**
 	 * Create the MarkerItem that wraps marker.
-	 *
+	 * 
 	 * @param marker
 	 * @return {@link MarkerItem}
 	 */
@@ -357,7 +356,7 @@ public class MarkerSupportInternalUtilities {
 
 	/**
 	 * Show the marker in view if possible.
-	 *
+	 * 
 	 * @param view
 	 * @param marker
 	 * @return <code>true</code> if the marker is shown
@@ -375,7 +374,7 @@ public class MarkerSupportInternalUtilities {
 
 	/**
 	 * Log an exception from a markers view.
-	 *
+	 * 
 	 * @param exception
 	 */
 	public static void logViewError(Exception exception) {
@@ -384,7 +383,7 @@ public class MarkerSupportInternalUtilities {
 
 	/**
 	 * Show an exception from a markers view.
-	 *
+	 * 
 	 * @param exception
 	 */
 	public static void showViewError(Exception exception) {

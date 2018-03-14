@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,6 @@ import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.navigator.CommonNavigatorMessages;
 import org.eclipse.ui.internal.navigator.NavigatorPlugin;
 import org.eclipse.ui.internal.navigator.NavigatorSafeRunnable;
@@ -42,7 +41,7 @@ import org.eclipse.ui.progress.UIJob;
 
 /**
  * This action links the activate editor with the Navigator selection.
- *
+ * 
  * @since 3.2
  */
 public class LinkEditorAction extends Action implements
@@ -58,10 +57,9 @@ public class LinkEditorAction extends Action implements
 
 	private boolean ignoreSelectionChanged;
 	private boolean ignoreEditorActivation;
-
+	
 	private UIJob activateEditorJob = new UIJob(
 			CommonNavigatorMessages.Link_With_Editor_Job_) {
-		@Override
 		public IStatus runInUIThread(IProgressMonitor monitor) {
 
 			if (!commonViewer.getControl().isDisposed()) {
@@ -76,7 +74,6 @@ public class LinkEditorAction extends Action implements
 						if (helpers.length > 0) {
 							ignoreEditorActivation = true;
 							SafeRunner.run(new NavigatorSafeRunnable() {
-								@Override
 								public void run() throws Exception {
 									helpers[0].activateEditor(commonNavigator.getSite()
 											.getPage(), sSelection);
@@ -93,12 +90,10 @@ public class LinkEditorAction extends Action implements
 
 	private UIJob updateSelectionJob = new UIJob(
 			CommonNavigatorMessages.Link_With_Editor_Job_) {
-		@Override
 		public IStatus runInUIThread(IProgressMonitor monitor) {
 
 			if (!commonNavigator.getCommonViewer().getControl().isDisposed()) {
 				SafeRunner.run(new NavigatorSafeRunnable() {
-					@Override
 					public void run() throws Exception {
 						IWorkbenchPage page = commonNavigator.getSite()
 								.getPage();
@@ -125,7 +120,7 @@ public class LinkEditorAction extends Action implements
 
 	/**
 	 * Create a LinkEditorAction for the given navigator and viewer.
-	 *
+	 * 
 	 * @param aNavigator
 	 *            The navigator which defines whether linking is enabled and
 	 *            implements {@link ISetSelectionTarget}.
@@ -142,8 +137,6 @@ public class LinkEditorAction extends Action implements
 		commonNavigator = aNavigator;
 		commonViewer = aViewer;
 		setActionDefinitionId(IWorkbenchCommandConstants.NAVIGATE_TOGGLE_LINK_WITH_EDITOR);
-		PlatformUI.getWorkbench().getHelpSystem()
-				.setHelp(this, NavigatorPlugin.PLUGIN_ID + ".link_editor_action"); //$NON-NLS-1$
 		init();
 	}
 
@@ -153,30 +146,25 @@ public class LinkEditorAction extends Action implements
 	protected void init() {
 		partListener = new IPartListener() {
 
-			@Override
 			public void partActivated(IWorkbenchPart part) {
 				if (part instanceof IEditorPart && !ignoreEditorActivation) {
 					updateSelectionJob.schedule(NavigatorPlugin.LINK_HELPER_DELAY);
 				}
 			}
 
-			@Override
 			public void partBroughtToTop(IWorkbenchPart part) {
 				if (part instanceof IEditorPart && !ignoreEditorActivation) {
 					updateSelectionJob.schedule(NavigatorPlugin.LINK_HELPER_DELAY);
 				}
 			}
 
-			@Override
 			public void partClosed(IWorkbenchPart part) {
 
 			}
 
-			@Override
 			public void partDeactivated(IWorkbenchPart part) {
 			}
 
-			@Override
 			public void partOpened(IWorkbenchPart part) {
 			}
 		};
@@ -190,7 +178,7 @@ public class LinkEditorAction extends Action implements
 	}
 
 	/**
-	 *
+	 * 
 	 */
 	public void dispose() {
 		commonNavigator.removePropertyListener(this);
@@ -205,12 +193,15 @@ public class LinkEditorAction extends Action implements
 	/**
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
-	@Override
 	public void run() {
 		commonNavigator.setLinkingEnabled(!commonNavigator.isLinkingEnabled());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.ISelectionChangedList
+	 */
 	public void selectionChanged(SelectionChangedEvent event) {
 		if (commonNavigator.isLinkingEnabled() && !ignoreSelectionChanged) {
 			activateEditor();
@@ -232,7 +223,12 @@ public class LinkEditorAction extends Action implements
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IPropertyListener#propertyChanged(java.lang.Object,
+	 *      int)
+	 */
 	public void propertyChanged(Object aSource, int aPropertyId) {
 		switch (aPropertyId) {
 		case CommonNavigator.IS_LINKING_ENABLED_PROPERTY:

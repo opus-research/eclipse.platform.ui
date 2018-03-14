@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,9 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Tristan Hume - <trishume@gmail.com> -
- *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
- *     		Implemented workbench auto-save to correctly restore state in case of crash.
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
@@ -24,22 +21,29 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 
 /**
  * The IDE workbench main preference page.
- *
+ * 
  *Note: want IDE settings to appear in main Workbench preference page (via subclassing),
  *   however the superclass, WorkbenchPreferencePage, is internal
  */
 public class IDEWorkbenchPreferencePage extends WorkbenchPreferencePage
         implements IWorkbenchPreferencePage {
 
-    @Override
-	protected Control createContents(Composite parent) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.preference.PreferencePage
+     */
+    protected Control createContents(Composite parent) {
 
     	PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
 				IWorkbenchHelpContextIds.WORKBENCH_PREFERENCE_PAGE);
 
         Composite composite = createComposite(parent);
 
-        createSettings(composite);
+        createShowUserDialogPref(composite);
+        createStickyCyclePref(composite);
+        createHeapStatusPref(composite);
+        
         createOpenModeGroup(composite);
 
         applyDialogFont(composite);
@@ -58,17 +62,15 @@ public class IDEWorkbenchPreferencePage extends WorkbenchPreferencePage
     /**
      * The default button has been pressed.
      */
-    @Override
-	protected void performDefaults() {
+    protected void performDefaults() {
 		super.performDefaults();
     }
 
     /**
      * The user has pressed Ok. Store/apply this page's values appropriately.
      */
-    @Override
-	public boolean performOk() {
+    public boolean performOk() {
         return super.performOk();
     }
-
+   
 }

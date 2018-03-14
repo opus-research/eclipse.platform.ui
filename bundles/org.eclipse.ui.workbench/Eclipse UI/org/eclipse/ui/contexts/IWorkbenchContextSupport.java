@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,7 +23,7 @@ import org.eclipse.swt.widgets.Shell;
  * <p>
  * This interface is not intended to be extended or implemented by clients.
  * </p>
- *
+ * 
  * @since 3.0
  * @deprecated Please use <code>IBindingService</code> and
  *             <code>IContextService</code> instead.
@@ -31,7 +31,6 @@ import org.eclipse.swt.widgets.Shell;
  * @see org.eclipse.ui.keys.IBindingService
  * @noimplement This interface is not intended to be implemented by clients.
  */
-@Deprecated
 public interface IWorkbenchContextSupport {
 
 	/**
@@ -64,7 +63,7 @@ public interface IWorkbenchContextSupport {
 	 * receive any key bindings be default. When the given shell is active, we
 	 * should not provide any <code>EnabledSubmission</code> instances for the
 	 * "In Dialogs" or "In Windows" contexts.
-	 *
+	 * 
 	 */
 	public static final int TYPE_NONE = IContextService.TYPE_NONE;
 
@@ -89,7 +88,7 @@ public interface IWorkbenchContextSupport {
 	 * request, but other factors (such as conflicts) may prevent the context
 	 * from becoming active.
 	 * </p>
-	 *
+	 * 
 	 * @param enabledSubmission
 	 *            The enabled submission to be considered; must not be
 	 *            <code>null</code>.
@@ -110,7 +109,7 @@ public interface IWorkbenchContextSupport {
 	 * request, but other factors (such as conflicts) may prevent the context
 	 * from becoming active.
 	 * </p>
-	 *
+	 * 
 	 * @param enabledSubmissions
 	 *            The enabled submissions to be considered; must not be
 	 *            <code>null</code>, but may be empty. Every element in the
@@ -121,7 +120,7 @@ public interface IWorkbenchContextSupport {
 
 	/**
 	 * Returns the context manager for the workbench.
-	 *
+	 * 
 	 * @return the context manager for the workbench. Guaranteed not to be
 	 *         <code>null</code>.
 	 */
@@ -129,7 +128,7 @@ public interface IWorkbenchContextSupport {
 
 	/**
 	 * Returns the shell type for the given shell.
-	 *
+	 * 
 	 * @param shell
 	 *            The shell for which the type should be determined. If this
 	 *            value is <code>null</code>, then
@@ -143,7 +142,7 @@ public interface IWorkbenchContextSupport {
 
 	/**
 	 * Tests whether the global key binding architecture is currently active.
-	 *
+	 * 
 	 * @return <code>true</code> if the key bindings are active;
 	 *         <code>false</code> otherwise.
 	 */
@@ -152,7 +151,7 @@ public interface IWorkbenchContextSupport {
 	/**
 	 * Opens the key assistant dialog positioned near the key binding entry in
 	 * the status bar.
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	public void openKeyAssistDialog();
@@ -177,14 +176,14 @@ public interface IWorkbenchContextSupport {
 	 * If the provided shell has already been registered, then this method will
 	 * change the registration.
 	 * </p>
-	 *
+	 * 
 	 * @param shell
 	 *            The shell to register for key bindings; must not be
 	 *            <code>null</code>.
 	 * @param type
 	 *            The type of shell being registered. This value must be one of
 	 *            the constants given in this interface.
-	 *
+	 * 
 	 * @return <code>true</code> if the shell had already been registered
 	 *         (i.e., the registration has changed); <code>false</code>
 	 *         otherwise.
@@ -203,7 +202,7 @@ public interface IWorkbenchContextSupport {
 	 * There is no way to disable a context. It is only possible to not enable
 	 * it.
 	 * </p>
-	 *
+	 * 
 	 * @param enabledSubmission
 	 *            The enabled submission to be removed; must not be
 	 *            <code>null</code>.
@@ -222,7 +221,7 @@ public interface IWorkbenchContextSupport {
 	 * There is no way to disable a context. It is only possible to not enable
 	 * it.
 	 * </p>
-	 *
+	 * 
 	 * @param enabledSubmissions
 	 *            The enabled submissions to be removed; must not be
 	 *            <code>null</code>, but may be empty. The collection must
@@ -233,16 +232,16 @@ public interface IWorkbenchContextSupport {
 	/**
 	 * Enables or disables the global key binding architecture. The architecture
 	 * should be enabled by default.
-	 *
+	 * 
 	 * When enabled, keyboard shortcuts are active, and that key events can
 	 * trigger commands. This also means that widgets may not see all key events
 	 * (as they might be trapped as a keyboard shortcut).
-	 *
+	 * 
 	 * When disabled, no key events will trapped as keyboard shortcuts, and that
 	 * no commands can be triggered by keyboard events. (Exception: it is
 	 * possible that someone listening for key events on a widget could trigger
 	 * a command.)
-	 *
+	 * 
 	 * @param enabled
 	 *            Whether the key filter should be enabled.
 	 */
@@ -259,11 +258,11 @@ public interface IWorkbenchContextSupport {
 	 * <p>
 	 * If the shell was never registered, or if the shell is <code>null</code>,
 	 * then this method returns <code>false</code> and does nothing.
-	 *
+	 * 
 	 * @param shell
 	 *            The shell to be unregistered; does nothing if this value is
 	 *            <code>null</code>.
-	 *
+	 * 
 	 * @return <code>true</code> if the shell had been registered;
 	 *         <code>false</code> otherwise.
 	 */

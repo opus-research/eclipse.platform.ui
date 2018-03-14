@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,10 +15,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.HandlerEvent;
 import org.eclipse.core.commands.IHandlerAttributes;
+import org.eclipse.core.commands.IHandlerListener;
 
 /**
  * This class is a partial implementation of <code>IHandler</code>. This
@@ -29,13 +31,11 @@ import org.eclipse.core.commands.IHandlerAttributes;
  * changes. Subclasses should also override
  * {@link AbstractHandler#getAttributeValuesByName()}if they have any
  * attributes.
- *
+ * 
  * @since 3.0
  * @deprecated Please use the "org.eclipse.core.commands" plug-in instead.
  * @see org.eclipse.core.commands.AbstractHandler
  */
-@Deprecated
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public abstract class AbstractHandler extends
         org.eclipse.core.commands.AbstractHandler implements IHandler {
 
@@ -45,14 +45,13 @@ public abstract class AbstractHandler extends
      * no listeners attached to this handler. (Most handlers don't
      * have any listeners, and this optimization saves some memory.)
      */
-	private List handlerListeners;
+    private List handlerListeners;
 
     /**
      * @see IHandler#addHandlerListener(IHandlerListener)
      */
-	@Override
-	@Deprecated
-	public void addHandlerListener(IHandlerListener handlerListener) {
+    public void addHandlerListener(
+            org.eclipse.ui.commands.IHandlerListener handlerListener) {
         if (handlerListener == null) {
 			throw new NullPointerException();
 		}
@@ -67,17 +66,13 @@ public abstract class AbstractHandler extends
     /**
      * The default implementation does nothing. Subclasses who attach listeners
      * to other objects are encouraged to detach them in this method.
-     *
+     * 
      * @see org.eclipse.ui.commands.IHandler#dispose()
      */
-	@Override
-	@Deprecated
     public void dispose() {
         // Do nothing.
     }
 
-	@Override
-	@Deprecated
     public Object execute(final ExecutionEvent event) throws ExecutionException {
         try {
             return execute(event.getParameters());
@@ -89,16 +84,14 @@ public abstract class AbstractHandler extends
     /**
      * Fires an event to all registered listeners describing changes to this
      * instance.
-     *
+     * 
      * @param handlerEvent
      *            the event describing changes to this instance. Must not be
      *            <code>null</code>.
      */
-	@Override
-	@Deprecated
     protected void fireHandlerChanged(HandlerEvent handlerEvent) {
         super.fireHandlerChanged(handlerEvent);
-
+        
         if (handlerListeners != null) {
             final boolean attributesChanged = handlerEvent.isEnabledChanged()
                     || handlerEvent.isHandledChanged();
@@ -128,8 +121,7 @@ public abstract class AbstractHandler extends
             }
         }
     }
-
-	@Deprecated
+    
     protected void fireHandlerChanged(
             final org.eclipse.ui.commands.HandlerEvent handlerEvent) {
         if (handlerEvent == null) {
@@ -177,31 +169,25 @@ public abstract class AbstractHandler extends
     /**
      * This simply return an empty map. The default implementation has no
      * attributes.
-     *
+     * 
      * @see IHandler#getAttributeValuesByName()
      */
-	@Override
-	@Deprecated
     public Map getAttributeValuesByName() {
         return Collections.EMPTY_MAP;
     }
-
+    
     /**
      * Returns true iff there is one or more IHandlerListeners attached to this
      * AbstractHandler.
-     *
+     * 
      * @return true iff there is one or more IHandlerListeners attached to this
      *         AbstractHandler
      * @since 3.1
      */
-	@Override
-	@Deprecated
     protected final boolean hasListeners() {
         return super.hasListeners() || handlerListeners != null;
     }
-
-	@Override
-	@Deprecated
+    
     public boolean isEnabled() {
         final Object handled = getAttributeValuesByName().get("enabled"); //$NON-NLS-1$
         if (handled instanceof Boolean) {
@@ -210,9 +196,7 @@ public abstract class AbstractHandler extends
 
         return false;
     }
-
-	@Override
-	@Deprecated
+    
     public boolean isHandled() {
         final Object handled = getAttributeValuesByName().get(
                 IHandlerAttributes.ATTRIBUTE_HANDLED);
@@ -226,16 +210,15 @@ public abstract class AbstractHandler extends
     /**
      * @see IHandler#removeHandlerListener(IHandlerListener)
      */
-	@Override
-	@Deprecated
-	public void removeHandlerListener(IHandlerListener handlerListener) {
+    public void removeHandlerListener(
+            org.eclipse.ui.commands.IHandlerListener handlerListener) {
         if (handlerListener == null) {
 			throw new NullPointerException();
 		}
         if (handlerListeners == null) {
             return;
         }
-
+        
         if (handlerListeners != null) {
 			handlerListeners.remove(handlerListener);
 		}

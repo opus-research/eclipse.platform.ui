@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,9 +18,9 @@ import org.eclipse.ui.navigator.ICommonLabelProvider;
 import org.eclipse.ui.navigator.IDescriptionProvider;
 
 /**
- *
+ * 
  * @since 3.2
- *
+ * 
  */
 public final class NavigatorContentServiceDescriptionProvider implements
 		IDescriptionProvider {
@@ -29,7 +29,7 @@ public final class NavigatorContentServiceDescriptionProvider implements
 
 	/**
 	 * Creates a description provider that targets the given service.
-	 *
+	 * 
 	 * @param aContentService
 	 *            The content service associated with this provider.
 	 */
@@ -39,7 +39,6 @@ public final class NavigatorContentServiceDescriptionProvider implements
 		contentService = aContentService;
 	}
 
-	@Override
 	public String getDescription(Object anElement) {
 
 		Object target;
@@ -63,7 +62,7 @@ public final class NavigatorContentServiceDescriptionProvider implements
 		for (int i = 0; i < providers.length && (message == null || message.length() == 0); i++) {
 			if (providers[i] instanceof ICommonLabelProvider) {
 				message = ((ICommonLabelProvider) providers[i])
-						.getDescription(target);
+						.getDescription(target); 
 			}
 		}
 		message = (message != null) ? message : getDefaultStatusBarMessage(1);
@@ -74,12 +73,12 @@ public final class NavigatorContentServiceDescriptionProvider implements
 	/**
 	 * @param aSize
 	 *            The number of items selected.
-	 * @return A string of the form "# item(s) selected"
+	 * @return A string of the form "# items selected"
 	 */
 	protected final String getDefaultStatusBarMessage(int aSize) {
-		return NLS.bind(aSize != 1 ? CommonNavigatorMessages.Navigator_statusLineMultiSelect
-				: CommonNavigatorMessages.Navigator_statusLineSingleSelect,
-				new Object[] { Integer.valueOf(aSize) });
+		return NLS.bind(
+				CommonNavigatorMessages.Navigator_statusLineMultiSelect,
+				new Object[] { new Integer(aSize) });
 
 	}
 

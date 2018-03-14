@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@ package org.eclipse.ui.internal.browser;
 
 import java.io.IOException;
 import java.net.URL;
+
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.util.Util;
 import org.eclipse.swt.program.Program;
@@ -22,11 +23,7 @@ import org.eclipse.ui.internal.WorkbenchMessages;
 
 /**
  * The default implementation of the web browser instance.
- * <p>
- * This class is used when no alternative implementation is plugged in via the
- * 'org.eclipse.ui.browserSupport' extension point.
- * </p>
- *
+ * 
  * @since 3.1
  */
 public class DefaultWebBrowser extends AbstractWebBrowser {
@@ -38,7 +35,7 @@ public class DefaultWebBrowser extends AbstractWebBrowser {
 
 	/**
 	 * Creates the browser instance.
-	 *
+	 * 
 	 * @param support
 	 * @param id
 	 */
@@ -47,7 +44,11 @@ public class DefaultWebBrowser extends AbstractWebBrowser {
 		this.support = support;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.browser.IWebBrowser#openURL(java.net.URL)
+	 */
 	public void openURL(URL url) throws PartInitException {
 		// format the href for an html file (file:///<filename.html>
 		// required for Mac only.
@@ -75,7 +76,6 @@ public class DefaultWebBrowser extends AbstractWebBrowser {
 			}
 		} else {
 			Thread launcher = new Thread("About Link Launcher") {//$NON-NLS-1$
-				@Override
 				public void run() {
 					try {
 						/*
@@ -112,7 +112,11 @@ public class DefaultWebBrowser extends AbstractWebBrowser {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.browser.IWebBrowser#close()
+	 */
 	public boolean close() {
 		support.unregisterBrowser(this);
 		return super.close();
@@ -122,7 +126,7 @@ public class DefaultWebBrowser extends AbstractWebBrowser {
 	 * This method encodes the url, removes the spaces from the url and replaces
 	 * the same with <code>"%20"</code>. This method is required to fix Bug
 	 * 77840.
-	 *
+	 * 
 	 */
 	private String urlEncodeForSpaces(char[] input) {
 		StringBuffer retu = new StringBuffer(input.length);
@@ -157,7 +161,7 @@ public class DefaultWebBrowser extends AbstractWebBrowser {
 				webBrowser = "netscape"; //$NON-NLS-1$
 			}
 		}
-
+		
 		if (p == null) {
 			try {
 				p = Runtime.getRuntime().exec(webBrowser + " " + href); //$NON-NLS-1$;
@@ -166,7 +170,7 @@ public class DefaultWebBrowser extends AbstractWebBrowser {
 				throw e;
 			}
 		}
-
+		
 		return p;
 	}
 
@@ -175,7 +179,6 @@ public class DefaultWebBrowser extends AbstractWebBrowser {
 	 */
 	private void openWebBrowserError(Display display) {
 		display.asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				MessageDialog
 						.openError(

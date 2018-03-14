@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,7 @@ import com.ibm.icu.text.NumberFormat;
  * <p>
  * Class is thread safe.
  * </p>
- *
+ * 
  * @since 1.0
  */
 public class NumberToBigDecimalConverter extends NumberToNumberConverter {
@@ -29,16 +29,18 @@ public class NumberToBigDecimalConverter extends NumberToNumberConverter {
 	 * @param numberFormat
 	 * @param fromType
 	 */
-	public NumberToBigDecimalConverter(NumberFormat numberFormat, Class fromType) {
+	public NumberToBigDecimalConverter(NumberFormat numberFormat, Class fromType) {		
 		super(numberFormat, fromType, BigDecimal.class);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.internal.databinding.conversion.NumberToNumberConverter#doConvert(java.lang.Number)
+	 */
 	protected Number doConvert(Number number) {
 		if (number instanceof BigInteger) {
 			return new BigDecimal((BigInteger) number);
 		}
-
+		
 		return new BigDecimal(number.doubleValue());
 	}
 }

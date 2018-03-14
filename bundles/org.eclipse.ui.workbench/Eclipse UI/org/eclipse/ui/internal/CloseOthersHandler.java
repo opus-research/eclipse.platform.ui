@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,9 +29,9 @@ import org.eclipse.ui.handlers.HandlerUtil;
  * <p>
  * Replacement for CloseOthersHandler
  * </p>
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 public class CloseOthersHandler extends AbstractEvaluationHandler {
 	private Expression enabledWhen;
@@ -40,7 +40,6 @@ public class CloseOthersHandler extends AbstractEvaluationHandler {
 		registerEnablement();
 	}
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil
 				.getActiveWorkbenchWindowChecked(event);
@@ -66,11 +65,14 @@ public class CloseOthersHandler extends AbstractEvaluationHandler {
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.AbstractEvaluationHandler#getEnabledWhenExpression()
+	 */
 	protected Expression getEnabledWhenExpression() {
 		if (enabledWhen == null) {
 			enabledWhen = new Expression() {
-				@Override
 				public EvaluationResult evaluate(IEvaluationContext context)
 						throws CoreException {
 					IWorkbenchWindow window = InternalHandlerUtil
@@ -89,7 +91,11 @@ public class CloseOthersHandler extends AbstractEvaluationHandler {
 					return EvaluationResult.FALSE;
 				}
 
-				@Override
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see org.eclipse.core.expressions.Expression#collectExpressionInfo(org.eclipse.core.expressions.ExpressionInfo)
+				 */
 				public void collectExpressionInfo(ExpressionInfo info) {
 					info
 							.addVariableNameAccess(ISources.ACTIVE_WORKBENCH_WINDOW_NAME);

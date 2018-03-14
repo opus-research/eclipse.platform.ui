@@ -27,9 +27,8 @@ public class ListElementActionFilter implements IActionFilter {
     private static ListElementActionFilter singleton;
 
     public static ListElementActionFilter getSingleton() {
-        if (singleton == null) {
-			singleton = new ListElementActionFilter();
-		}
+        if (singleton == null)
+            singleton = new ListElementActionFilter();
         return singleton;
     }
 
@@ -40,18 +39,17 @@ public class ListElementActionFilter implements IActionFilter {
     /**
      * @see IActionFilter#testAttribute(Object, String, String)
      */
-    @Override
-	public boolean testAttribute(Object target, String name, String value) {
+    public boolean testAttribute(Object target, String name, String value) {
         called = true;
         ListElement le = (ListElement) target;
         if (name.equals(ATTR_NAME)) {
             return value.equals(le.getName());
         } else if (name.equals(ATTR_FLAG)) {
             boolean flag = le.getFlag();
-            if (flag) {
-				return value.equals(VAL_TRUE);
-			}
-			return value.equals(VAL_FALSE);
+            if (flag)
+                return value.equals(VAL_TRUE);
+            else
+                return value.equals(VAL_FALSE);
         }
         return false;
     }

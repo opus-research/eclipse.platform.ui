@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -42,7 +42,7 @@ import org.eclipse.jface.util.Util;
  * <code>KeySequence</code> objects are immutable. Clients are not permitted
  * to extend this class.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public final class KeySequence extends TriggerSequence implements Comparable {
@@ -69,7 +69,7 @@ public final class KeySequence extends TriggerSequence implements Comparable {
 
 	/**
 	 * Gets an instance of <code>KeySequence</code>.
-	 *
+	 * 
 	 * @return a key sequence. This key sequence will have no key strokes.
 	 *         Guaranteed not to be <code>null</code>.
 	 */
@@ -80,7 +80,7 @@ public final class KeySequence extends TriggerSequence implements Comparable {
 	/**
 	 * Creates an instance of <code>KeySequence</code> given a key sequence
 	 * and a key stroke.
-	 *
+	 * 
 	 * @param keySequence
 	 *            a key sequence. Must not be <code>null</code>.
 	 * @param keyStroke
@@ -108,7 +108,7 @@ public final class KeySequence extends TriggerSequence implements Comparable {
 	/**
 	 * Creates an instance of <code>KeySequence</code> given a single key
 	 * stroke.
-	 *
+	 * 
 	 * @param keyStroke
 	 *            a single key stroke. Must not be <code>null</code>.
 	 * @return a key sequence. Guaranteed not to be <code>null</code>.
@@ -120,7 +120,7 @@ public final class KeySequence extends TriggerSequence implements Comparable {
 	/**
 	 * Creates an instance of <code>KeySequence</code> given an array of key
 	 * strokes.
-	 *
+	 * 
 	 * @param keyStrokes
 	 *            the array of key strokes. This array may be empty, but it must
 	 *            not be <code>null</code>. This array must not contain
@@ -134,7 +134,7 @@ public final class KeySequence extends TriggerSequence implements Comparable {
 	/**
 	 * Creates an instance of <code>KeySequence</code> given a list of key
 	 * strokes.
-	 *
+	 * 
 	 * @param keyStrokes
 	 *            the list of key strokes. This list may be empty, but it must
 	 *            not be <code>null</code>. If this list is not empty, it
@@ -149,7 +149,7 @@ public final class KeySequence extends TriggerSequence implements Comparable {
 	/**
 	 * Creates an instance of <code>KeySequence</code> by parsing a given
 	 * formal string representation.
-	 *
+	 * 
 	 * @param string
 	 *            the formal string representation to parse.
 	 * @return a key sequence. Guaranteed not to be <code>null</code>.
@@ -190,7 +190,7 @@ public final class KeySequence extends TriggerSequence implements Comparable {
 	/**
 	 * Constructs an instance of <code>KeySequence</code> given a list of key
 	 * strokes.
-	 *
+	 * 
 	 * @param keyStrokes
 	 *            the list of key strokes. This list may be empty, but it must
 	 *            not be <code>null</code>. If this list is not empty, it
@@ -208,7 +208,11 @@ public final class KeySequence extends TriggerSequence implements Comparable {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#compareTo(java.lang.Object)
+	 */
 	public final int compareTo(final Object object) {
 		final KeySequence castedObject = (KeySequence) object;
 		return Util.compare(triggers, castedObject.triggers);
@@ -216,18 +220,17 @@ public final class KeySequence extends TriggerSequence implements Comparable {
 
 	/**
 	 * Formats this key sequence into the current default look.
-	 *
+	 * 
 	 * @return A string representation for this key sequence using the default
 	 *         look; never <code>null</code>.
 	 */
-	@Override
 	public final String format() {
 		return KeyFormatterFactory.getDefault().format(this);
 	}
 
 	/**
 	 * Returns the list of key strokes for this key sequence.
-	 *
+	 * 
 	 * @return the list of key strokes keys. This list may be empty, but is
 	 *         guaranteed not to be <code>null</code>. If this list is not
 	 *         empty, it is guaranteed to only contain instances of
@@ -240,7 +243,11 @@ public final class KeySequence extends TriggerSequence implements Comparable {
 		return keyStrokes;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.bindings.TriggerSequence#getPrefixes()
+	 */
 	public final TriggerSequence[] getPrefixes() {
 		final int numberOfPrefixes = triggers.length;
 		final TriggerSequence[] prefixes = new TriggerSequence[numberOfPrefixes];
@@ -257,7 +264,7 @@ public final class KeySequence extends TriggerSequence implements Comparable {
 	/**
 	 * Returns whether or not this key sequence is complete. Key sequences are
 	 * complete iff all of their key strokes are complete.
-	 *
+	 * 
 	 * @return <code>true</code>, iff the key sequence is complete.
 	 */
 	public final boolean isComplete() {
@@ -273,12 +280,11 @@ public final class KeySequence extends TriggerSequence implements Comparable {
 
 	/**
 	 * Returns the formal string representation for this key sequence.
-	 *
+	 * 
 	 * @return The formal string representation for this key sequence.
 	 *         Guaranteed not to be <code>null</code>.
 	 * @see java.lang.Object#toString()
 	 */
-	@Override
 	public final String toString() {
 		return KeyFormatterFactory.getFormalKeyFormatter().format(this);
 	}

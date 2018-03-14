@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,45 +19,44 @@ import org.eclipse.ui.internal.WorkbenchImages;
 import org.eclipse.ui.internal.WorkbenchMessages;
 
 /**
- * The import/export wizard allows users to choose whether to
+ * The import/export wizard allows users to choose whether to 
  * show the import wizard or the export wizard.
- *
+ * 
  * @since 3.2
  *
  */
 public class ImportExportWizard extends Wizard {
 	/**
 	 * Constant used to to specify to the import/export wizard
-	 * which page should initially be shown.
+	 * which page should initially be shown. 
 	 */
 	public static final String IMPORT = "import";	//$NON-NLS-1$
 	/**
 	 * Constant used to to specify to the import/export wizard
-	 * which page should initially be shown.
+	 * which page should initially be shown. 
 	 */
 	public static final String EXPORT = "export";	//$NON-NLS-1$
-
+		
     private IWorkbench workbench;
     private IStructuredSelection selection;
     private ImportExportPage importExportPage;
     private String page = null;
-
+    
     /**
-     * Create an import/export wizard and show the page
+     * Create an import/export wizard and show the page 
      * with the given id.
-     *
+     * 
      * @param pageId
      */
     public ImportExportWizard(String pageId){
     	page = pageId;
     }
-
+    
     /**
-     * Subclasses must implement this <code>IWizard</code> method
+     * Subclasses must implement this <code>IWizard</code> method 
      * to perform any special finish processing for their wizard.
      */
-    @Override
-	public boolean performFinish() {
+    public boolean performFinish() {
     	importExportPage.saveWidgetValues();
         return true;
     }
@@ -65,8 +64,7 @@ public class ImportExportWizard extends Wizard {
     /**
      * Creates the wizard's pages lazily.
      */
-    @Override
-	public void addPages() {
+    public void addPages() {
     	if (page.equals(IMPORT)) {
 			importExportPage = new ImportPage(this.workbench, this.selection);
 		} else if (page.equals(EXPORT)) {
@@ -79,7 +77,7 @@ public class ImportExportWizard extends Wizard {
 
     /**
      * Initializes the wizard.
-     *
+     * 
      * @param aWorkbench the workbench
      * @param currentSelection the current selectio
      */

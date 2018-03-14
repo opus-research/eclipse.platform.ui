@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2016 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Oliver Puetter - Bug 423040
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
+ *     Oliver Puetter - activePart set to NULL when all parts are closed (http://bugs.eclipse.org/423040)
  ******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench;
 
@@ -43,22 +42,20 @@ public class SelectionAggregator {
 	static final String OUT_SELECTION = "org.eclipse.ui.output.selection"; //$NON-NLS-1$
 	static final String OUT_POST_SELECTION = "org.eclipse.ui.output.postSelection"; //$NON-NLS-1$
 
-	private ListenerList<ISelectionListener> genericListeners = new ListenerList<>();
-	private ListenerList<ISelectionListener> genericPostListeners = new ListenerList<>();
-	private Map<String, ListenerList<ISelectionListener>> targetedListeners = new HashMap<>();
-	private Map<String, ListenerList<ISelectionListener>> targetedPostListeners = new HashMap<>();
-	private Set<IEclipseContext> tracked = new HashSet<>();
+	private ListenerList genericListeners = new ListenerList();
+	private ListenerList genericPostListeners = new ListenerList();
+	private Map<String, ListenerList> targetedListeners = new HashMap<String, ListenerList>();
+	private Map<String, ListenerList> targetedPostListeners = new HashMap<String, ListenerList>();
+	private Set<IEclipseContext> tracked = new HashSet<IEclipseContext>();
 
 	private EventHandler eventHandler = new EventHandler() {
-		@Override
 		public void handleEvent(Event event) {
 			Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
 			if (element instanceof MPart) {
 				MPart part = (MPart) element;
 
 				String partId = part.getElementId();
-				if (targetedListeners.containsKey(partId)
-						|| targetedPostListeners.containsKey(partId))
+				if (targetedListeners.containsKey(partId))
 					track(part);
 			}
 		}
@@ -119,14 +116,13 @@ public class SelectionAggregator {
 	}
 
 	private void notifyListeners(final MPart part, final Object selection) {
-		for (final ISelectionListener myListener : genericListeners) {
+		for (Object listener : genericListeners.getListeners()) {
+			final ISelectionListener myListener = (ISelectionListener) listener;
 			SafeRunner.run(new ISafeRunnable() {
-				@Override
 				public void run() throws Exception {
 					myListener.selectionChanged(part, selection);
 				}
 
-				@Override
 				public void handleException(Throwable exception) {
 					logger.error(exception);
 				}
@@ -138,17 +134,15 @@ public class SelectionAggregator {
 	private void notifyTargetedListeners(final MPart part, final Object selection) {
 		String id = part.getElementId();
 		if (id != null) {
-			ListenerList<ISelectionListener> listenerList = targetedListeners.get(id);
+			ListenerList listenerList = targetedListeners.get(id);
 			if (listenerList != null) {
-				for (final ISelectionListener listener : listenerList) {
-					final ISelectionListener myListener = listener;
+				for (Object listener : listenerList.getListeners()) {
+					final ISelectionListener myListener = (ISelectionListener) listener;
 					SafeRunner.run(new ISafeRunnable() {
-						@Override
 						public void run() throws Exception {
 							myListener.selectionChanged(part, selection);
 						}
 
-						@Override
 						public void handleException(Throwable exception) {
 							logger.error(exception);
 						}
@@ -159,14 +153,13 @@ public class SelectionAggregator {
 	}
 
 	private void notifyPostListeners(final MPart part, final Object selection) {
-		for (final ISelectionListener myListener : genericPostListeners) {
+		for (Object listener : genericPostListeners.getListeners()) {
+			final ISelectionListener myListener = (ISelectionListener) listener;
 			SafeRunner.run(new ISafeRunnable() {
-				@Override
 				public void run() throws Exception {
 					myListener.selectionChanged(part, selection);
 				}
 
-				@Override
 				public void handleException(Throwable exception) {
 					logger.error(exception);
 				}
@@ -178,16 +171,15 @@ public class SelectionAggregator {
 	private void notifyTargetedPostListeners(final MPart part, final Object selection) {
 		String id = part.getElementId();
 		if (id != null) {
-			ListenerList<ISelectionListener> listenerList = targetedPostListeners.get(id);
+			ListenerList listenerList = targetedPostListeners.get(id);
 			if (listenerList != null) {
-				for (final ISelectionListener myListener : listenerList) {
+				for (Object listener : listenerList.getListeners()) {
+					final ISelectionListener myListener = (ISelectionListener) listener;
 					SafeRunner.run(new ISafeRunnable() {
-						@Override
 						public void run() throws Exception {
 							myListener.selectionChanged(part, selection);
 						}
 
-						@Override
 						public void handleException(Throwable exception) {
 							logger.error(exception);
 						}
@@ -203,7 +195,6 @@ public class SelectionAggregator {
 		if (context != null && tracked.add(context)) {
 			if (context instanceof EclipseContext) {
 				((EclipseContext) context).notifyOnDisposal(new IContextDisposalListener() {
-					@Override
 					public void disposed(IEclipseContext context) {
 						tracked.remove(context);
 					}
@@ -213,7 +204,6 @@ public class SelectionAggregator {
 			context.runAndTrack(new RunAndTrack() {
 				private boolean initial = true;
 
-				@Override
 				public boolean changed(IEclipseContext context) {
 					final Object selection = context.get(OUT_SELECTION);
 					if (initial) {
@@ -226,14 +216,12 @@ public class SelectionAggregator {
 					if (activePart == part) {
 						myContext.set(IServiceConstants.ACTIVE_SELECTION, selection);
 						runExternalCode(new Runnable() {
-							@Override
 							public void run() {
 								notifyListeners(part, selection);
 							}
 						});
 					} else {
 						runExternalCode(new Runnable() {
-							@Override
 							public void run() {
 								notifyTargetedListeners(part, selection);
 							}
@@ -254,7 +242,6 @@ public class SelectionAggregator {
 			context.runAndTrack(new RunAndTrack() {
 				private boolean initial = true;
 
-				@Override
 				public boolean changed(IEclipseContext context) {
 					final Object postSelection = context.get(OUT_POST_SELECTION);
 					if (initial) {
@@ -266,14 +253,12 @@ public class SelectionAggregator {
 
 					if (activePart == part) {
 						runExternalCode(new Runnable() {
-							@Override
 							public void run() {
 								notifyPostListeners(part, postSelection);
 							}
 						});
 					} else {
 						runExternalCode(new Runnable() {
-							@Override
 							public void run() {
 								notifyTargetedPostListeners(part, postSelection);
 							}
@@ -321,9 +306,9 @@ public class SelectionAggregator {
 	}
 
 	public void addSelectionListener(String partId, ISelectionListener listener) {
-		ListenerList<ISelectionListener> listeners = targetedListeners.get(partId);
+		ListenerList listeners = targetedListeners.get(partId);
 		if (listeners == null) {
-			listeners = new ListenerList<>();
+			listeners = new ListenerList();
 			targetedListeners.put(partId, listeners);
 		}
 		listeners.add(listener);
@@ -334,9 +319,9 @@ public class SelectionAggregator {
 	}
 
 	public void addPostSelectionListener(String partId, ISelectionListener listener) {
-		ListenerList<ISelectionListener> listeners = targetedPostListeners.get(partId);
+		ListenerList listeners = targetedPostListeners.get(partId);
 		if (listeners == null) {
-			listeners = new ListenerList<>();
+			listeners = new ListenerList();
 			targetedPostListeners.put(partId, listeners);
 		}
 		listeners.add(listener);
@@ -349,7 +334,7 @@ public class SelectionAggregator {
 	public void removeSelectionListener(String partId, ISelectionListener listener) {
 		// we may have been destroyed already, see bug 310113
 		if (context != null) {
-			ListenerList<ISelectionListener> listeners = targetedListeners.get(partId);
+			ListenerList listeners = targetedListeners.get(partId);
 			if (listeners != null) {
 				listeners.remove(listener);
 			}
@@ -359,7 +344,7 @@ public class SelectionAggregator {
 	public void removePostSelectionListener(String partId, ISelectionListener listener) {
 		// we may have been destroyed already, see bug 310113
 		if (context != null) {
-			ListenerList<ISelectionListener> listeners = targetedPostListeners.get(partId);
+			ListenerList listeners = targetedPostListeners.get(partId);
 			if (listeners != null) {
 				listeners.remove(listener);
 			}

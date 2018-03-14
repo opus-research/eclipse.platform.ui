@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,7 +41,7 @@ public class LightweightActionDescriptor implements IAdaptable,
 
     /**
      * Create a new instance of <code>LightweightActionDescriptor</code>.
-     *
+     * 
      * @param actionElement the configuration element
      */
     public LightweightActionDescriptor(IConfigurationElement actionElement) {
@@ -65,8 +65,7 @@ public class LightweightActionDescriptor implements IAdaptable,
      * associated with this object. Returns <code>null</code> if
      * no such object can be found.
      */
-    @Override
-	public Object getAdapter(Class adapter) {
+    public Object getAdapter(Class adapter) {
         if (adapter == IWorkbenchAdapter.class) {
 			return this;
 		}
@@ -75,7 +74,7 @@ public class LightweightActionDescriptor implements IAdaptable,
 
     /**
      * Returns the action's description.
-     *
+     * 
      * @return the description
      */
     public String getDescription() {
@@ -84,7 +83,7 @@ public class LightweightActionDescriptor implements IAdaptable,
 
     /**
      * Returns the action's id.
-     *
+     * 
      * @return the id
      */
     public String getId() {
@@ -93,15 +92,17 @@ public class LightweightActionDescriptor implements IAdaptable,
 
     /**
      * Returns the action's image descriptor.
-     *
+     * 
      * @return the image descriptor
      */
     public ImageDescriptor getImageDescriptor() {
         return image;
     }
 
-    @Override
-	public ImageDescriptor getImageDescriptor(Object o) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.model.IWorkbenchAdapter#getImageDescriptor(java.lang.Object)
+     */
+    public ImageDescriptor getImageDescriptor(Object o) {
         if (o == this) {
 			return getImageDescriptor();
 		}
@@ -110,15 +111,17 @@ public class LightweightActionDescriptor implements IAdaptable,
 
     /**
      * Returns the action's label.
-     *
+     * 
      * @return the label
      */
     public String getLabel() {
         return label;
     }
 
-    @Override
-	public String getLabel(Object o) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.model.IWorkbenchAdapter#getLabel(java.lang.Object)
+     */
+    public String getLabel(Object o) {
         if (o == this) {
             String text = getLabel();
             int end = text.lastIndexOf('@');
@@ -130,13 +133,17 @@ public class LightweightActionDescriptor implements IAdaptable,
         return o == null ? "" : o.toString();//$NON-NLS-1$
     }
 
-    @Override
-	public Object[] getChildren(Object o) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.model.IWorkbenchAdapter#getChildren(java.lang.Object)
+     */
+    public Object[] getChildren(Object o) {
         return NO_CHILDREN;
     }
 
-    @Override
-	public Object getParent(Object o) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.model.IWorkbenchAdapter#getParent(java.lang.Object)
+     */
+    public Object getParent(Object o) {
         return null;
     }
 }

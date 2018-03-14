@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -89,7 +89,6 @@ public class ColumnViewerToolTipSupport extends DefaultToolTip {
 		new ColumnViewerToolTipSupport(viewer, style, false);
 	}
 
-	@Override
 	protected Object getToolTipArea(Event event) {
 		return viewer.getCell(new Point(event.x, event.y));
 	}
@@ -98,7 +97,6 @@ public class ColumnViewerToolTipSupport extends DefaultToolTip {
 	 * Instead of overwriting this method subclasses should overwrite
 	 * {@link #createViewerToolTipContentArea(Event, ViewerCell, Composite)}
 	 */
-	@Override
 	protected Composite createToolTipContentArea(Event event, Composite parent) {
 		ViewerCell cell = (ViewerCell) getData(VIEWER_CELL_KEY);
 		setData(VIEWER_CELL_KEY, null);
@@ -131,7 +129,6 @@ public class ColumnViewerToolTipSupport extends DefaultToolTip {
 		return super.createToolTipContentArea(event, parent);
 	}
 
-	@Override
 	protected boolean shouldCreateToolTip(Event event) {
 		if (!super.shouldCreateToolTip(event)) {
 			return false;
@@ -148,11 +145,11 @@ public class ColumnViewerToolTipSupport extends DefaultToolTip {
 			Object element = row.getItem().getData();
 
 			ViewerCell cell = row.getCell(point);
-
+			
 			if( cell == null ) {
 				return false;
 			}
-
+			
 			ViewerColumn viewPart = viewer.getViewerColumn(cell
 					.getColumnIndex());
 
@@ -204,7 +201,6 @@ public class ColumnViewerToolTipSupport extends DefaultToolTip {
 		return rv;
 	}
 
-	@Override
 	protected void afterHideToolTip(Event event) {
 		super.afterHideToolTip(event);
 		// Clear the restored value else this could be a source of a leak

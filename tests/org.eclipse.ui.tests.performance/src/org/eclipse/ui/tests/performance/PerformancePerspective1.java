@@ -19,8 +19,10 @@ import org.eclipse.ui.IPerspectiveFactory;
  */
 public class PerformancePerspective1 implements IPerspectiveFactory {
 
-    @Override
-	public void createInitialLayout(IPageLayout layout) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IPerspectiveFactory#createInitialLayout(org.eclipse.ui.IPageLayout)
+     */
+    public void createInitialLayout(IPageLayout layout) {
         layout.addView(IPageLayout.ID_OUTLINE, IPageLayout.RIGHT, .75f, IPageLayout.ID_EDITOR_AREA);
         layout.addView(IPageLayout.ID_PROP_SHEET, IPageLayout.BOTTOM, .75f, IPageLayout.ID_EDITOR_AREA);
     }

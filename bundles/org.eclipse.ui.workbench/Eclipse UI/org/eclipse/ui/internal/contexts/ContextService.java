@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.ui.internal.contexts;
 
@@ -21,10 +20,11 @@ import org.eclipse.core.commands.contexts.IContextManagerListener;
 import org.eclipse.core.expressions.EvaluationResult;
 import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
+import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.services.EContextService;
+import org.eclipse.e4.ui.workbench.modeling.ExpressionContext;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ISourceProvider;
 import org.eclipse.ui.ISources;
@@ -37,12 +37,12 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
  * Provides services related to contexts in the Eclipse workbench. This provides
  * access to contexts.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public final class ContextService implements IContextService {
 
-	private HashMap<IContextActivation, UpdateExpression> activationToRat = new HashMap<>();
+	private HashMap<IContextActivation, UpdateExpression> activationToRat = new HashMap<IContextActivation, ContextService.UpdateExpression>();
 
 	/**
 	 * The central authority for determining which context we should use.
@@ -61,6 +61,9 @@ public final class ContextService implements IContextService {
 	@Inject
 	private IEclipseContext eclipseContext;
 
+	@Inject
+	private UISynchronize synchService;
+
 	/**
 	 * The persistence class for this context service.
 	 */
@@ -69,7 +72,7 @@ public final class ContextService implements IContextService {
 	/**
 	 * Constructs a new instance of <code>ContextService</code> using a
 	 * context manager.
-	 *
+	 * 
 	 * @param contextManager
 	 *            The context manager to use; must not be <code>null</code>.
 	 */
@@ -84,13 +87,19 @@ public final class ContextService implements IContextService {
 		this.contextPersistence = new ContextPersistence(contextManager);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.contexts.IContextService#deferUpdates(boolean)
+	 */
 	public void deferUpdates(boolean defer) {
 		contextManager.deferUpdates(defer);
 		contextService.deferUpdates(defer);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.contexts.IContextService#activateContext(java.lang.String)
+	 */
 	public final IContextActivation activateContext(final String contextId) {
 		return activateContext(contextId, null);
 	}
@@ -101,7 +110,7 @@ public final class ContextService implements IContextService {
 		private String contextId;
 		private Expression expression;
 
-		EvaluationResult cached = null;
+		private EvaluationResult cached = null;
 
 		public UpdateExpression(String contextId, Expression expression) {
 			this.contextId = contextId;
@@ -111,6 +120,13 @@ public final class ContextService implements IContextService {
 		@Override
 		public boolean changed(IEclipseContext context) {
 			if (!updating) {
+				if (cached != null && cached != EvaluationResult.FALSE) {
+					runExternalCode(new Runnable() {
+						public void run() {
+							contextService.deactivateContext(contextId);
+						}
+					});
+				}
 				return false;
 			}
 			ExpressionContext ctx = new ExpressionContext(eclipseContext);
@@ -123,14 +139,12 @@ public final class ContextService implements IContextService {
 					}
 					if (result != EvaluationResult.FALSE) {
 						runExternalCode(new Runnable() {
-							@Override
 							public void run() {
 								contextService.activateContext(contextId);
 							}
 						});
 					} else if (cached != null) {
 						runExternalCode(new Runnable() {
-							@Override
 							public void run() {
 								contextService.deactivateContext(contextId);
 							}
@@ -146,7 +160,12 @@ public final class ContextService implements IContextService {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.contexts.IContextService#activateContext(java.lang.String,
+	 *      org.eclipse.core.expressions.Expression)
+	 */
 	public final IContextActivation activateContext(final String contextId,
 			final Expression expression) {
 
@@ -163,38 +182,57 @@ public final class ContextService implements IContextService {
 		return activation;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.contexts.IContextService#activateContext(java.lang.String,
+	 *      org.eclipse.core.expressions.Expression, boolean)
+	 */
 	public IContextActivation activateContext(String contextId,
 			Expression expression, boolean global) {
 		return activateContext(contextId, expression);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.contexts.IContextService#activateContext(java.lang.String,
+	 *      org.eclipse.core.expressions.Expression, int)
+	 */
 	public final IContextActivation activateContext(final String contextId,
 			final Expression expression, final int sourcePriority) {
 		return activateContext(contextId, expression);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.contexts.IContextService#addContextManagerListener(org.eclipse.core.commands.contexts.IContextManagerListener)
+	 */
 	public final void addContextManagerListener(
 			final IContextManagerListener listener) {
 		contextManager.addContextManagerListener(listener);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.services.IServiceWithSources#addSourceProvider(org.eclipse.ui.ISourceProvider)
+	 */
 	public final void addSourceProvider(final ISourceProvider provider) {
 		contextAuthority.addSourceProvider(provider);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.contexts.IContextService#deactivateContext(org.eclipse.ui.contexts.IContextActivation)
+	 */
 	public final void deactivateContext(final IContextActivation activation) {
 		if (activation != null && activation.getContextService() == this) {
 			final UpdateExpression rat = activationToRat.remove(activation);
 			if (rat != null) {
 				rat.updating = false;
-				if (rat.cached != null && rat.cached != EvaluationResult.FALSE) {
-					contextService.deactivateContext(activation.getContextId());
-				}
 			} else {
 				contextService.deactivateContext(activation.getContextId());
 			}
@@ -202,7 +240,11 @@ public final class ContextService implements IContextService {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.contexts.IContextService#deactivateContexts(java.util.Collection)
+	 */
 	public final void deactivateContexts(final Collection activations) {
 		final Iterator activationItr = activations.iterator();
 		while (activationItr.hasNext()) {
@@ -212,59 +254,104 @@ public final class ContextService implements IContextService {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.services.IDisposable#dispose()
+	 */
 	public final void dispose() {
 		contextPersistence.dispose();
 		contextAuthority.dispose();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.contexts.IContextService#getActiveContextIds()
+	 */
 	public final Collection getActiveContextIds() {
 		return contextService.getActiveContextIds();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.contexts.IContextService#getContext(java.lang.String)
+	 */
 	public final Context getContext(final String contextId) {
 		return contextService.getContext(contextId);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.contexts.IContextService#getDefinedContextIds()
+	 */
 	public final Collection getDefinedContextIds() {
 		return contextManager.getDefinedContextIds();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.contexts.IContextService#getDefinedContexts()
+	 */
 	public final Context[] getDefinedContexts() {
 		return contextManager.getDefinedContexts();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.contexts.IContextService#getShellType(org.eclipse.swt.widgets.Shell)
+	 */
 	public final int getShellType(final Shell shell) {
 		return contextAuthority.getShellType(shell);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.contexts.IContextService#readRegistry()
+	 */
 	public final void readRegistry() {
 		// contextPersistence.read();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.contexts.IContextService#registerShell(org.eclipse.swt.widgets.Shell,
+	 *      int)
+	 */
 	public final boolean registerShell(final Shell shell, final int type) {
 		return contextAuthority.registerShell(shell, type);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.contexts.IContextService#removeContextManagerListener(org.eclipse.core.commands.contexts.IContextManagerListener)
+	 */
 	public final void removeContextManagerListener(
 			final IContextManagerListener listener) {
 		contextManager.removeContextManagerListener(listener);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.services.IServiceWithSources#removeSourceProvider(org.eclipse.ui.ISourceProvider)
+	 */
 	public final void removeSourceProvider(final ISourceProvider provider) {
 		contextAuthority.removeSourceProvider(provider);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.contexts.IContextService#unregisterShell(org.eclipse.swt.widgets.Shell)
+	 */
 	public final boolean unregisterShell(final Shell shell) {
 		return contextAuthority.unregisterShell(shell);
 	}
@@ -292,7 +379,7 @@ public final class ContextService implements IContextService {
 	 * <p>
 	 * DO NOT CALL THIS METHOD.
 	 * </p>
-	 *
+	 * 
 	 * @param shell
 	 *            The shell that should be considered active; must not be
 	 *            <code>null</code>.

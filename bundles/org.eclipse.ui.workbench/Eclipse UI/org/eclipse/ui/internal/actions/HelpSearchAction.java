@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,7 @@ import org.eclipse.ui.internal.util.PrefUtil;
 
 /**
  * Action to open the help search.
- *
+ * 
  * @since 3.1
  */
 public class HelpSearchAction extends Action implements IWorkbenchAction {
@@ -44,7 +44,7 @@ public class HelpSearchAction extends Action implements IWorkbenchAction {
 
     /**
      * Constructor for use by ActionFactory.
-     *
+     * 
      * @param window the window
      */
     public HelpSearchAction(IWorkbenchWindow window) {
@@ -58,7 +58,7 @@ public class HelpSearchAction extends Action implements IWorkbenchAction {
         String overrideText = PrefUtil.getAPIPreferenceStore().getString(
                 IWorkbenchPreferenceConstants.HELP_SEARCH_ACTION_TEXT);
         if ("".equals(overrideText)) { //$NON-NLS-1$
-            setText(WorkbenchMessages.HelpSearchAction_text);
+            setText(WorkbenchMessages.HelpSearchAction_text); 
             setToolTipText(WorkbenchMessages.HelpSearchAction_toolTip);
         } else {
             setText(overrideText);
@@ -70,23 +70,26 @@ public class HelpSearchAction extends Action implements IWorkbenchAction {
 				IWorkbenchHelpContextIds.HELP_SEARCH_ACTION);
     }
 
-    @Override
-	public void run() {
+    /* (non-Javadoc)
+     * Method declared on IAction.
+     */
+    public void run() {
         if (workbenchWindow == null) {
             // action has been disposed
             return;
         }
         //This may take a while, so use the busy indicator
         BusyIndicator.showWhile(null, new Runnable() {
-            @Override
-			public void run() {
+            public void run() {
             	workbenchWindow.getWorkbench().getHelpSystem().displaySearch();
             }
         });
     }
 
-    @Override
-	public void dispose() {
+    /* (non-Javadoc)
+     * Method declared on ActionFactory.IWorkbenchAction.
+     */
+    public void dispose() {
         workbenchWindow = null;
     }
 

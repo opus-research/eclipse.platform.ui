@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,9 +24,9 @@ import org.eclipse.ui.navigator.ICommonActionExtensionSite;
 
 /**
  * Supports Add Task and Add Bookmark actions.
- *
+ * 
  * @since 3.2
- *
+ * 
  */
 public class WorkManagementActionProvider extends CommonActionProvider {
 
@@ -34,11 +34,9 @@ public class WorkManagementActionProvider extends CommonActionProvider {
 
 	private AddBookmarkAction addBookmarkAction;
 
-	@Override
 	public void init(ICommonActionExtensionSite aSite) {
 		final Shell shell = aSite.getViewSite().getShell();
 		IShellProvider sp = new IShellProvider() {
-			@Override
 			public Shell getShell() {
 				return shell;
 			}
@@ -47,14 +45,26 @@ public class WorkManagementActionProvider extends CommonActionProvider {
 		addTaskAction = new AddTaskAction(sp);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.actions.ActionGroup#fillActionBars(org.eclipse.ui.IActionBars
+	 * )
+	 */
 	public void fillActionBars(IActionBars actionBars) {
 		super.fillActionBars(actionBars);
 		actionBars.setGlobalActionHandler(IDEActionFactory.BOOKMARK.getId(), addBookmarkAction);
 		actionBars.setGlobalActionHandler(IDEActionFactory.ADD_TASK.getId(), addTaskAction);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.actions.ActionGroup#setContext(org.eclipse.ui.actions.
+	 * ActionContext)
+	 */
 	public void setContext(ActionContext context) {
 		super.setContext(context);
 		if (context != null && context.getSelection() instanceof IStructuredSelection) {

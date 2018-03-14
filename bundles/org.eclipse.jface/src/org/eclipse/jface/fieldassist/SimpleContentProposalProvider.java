@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,10 +16,10 @@ import java.util.ArrayList;
 /**
  * SimpleContentProposalProvider is a class designed to map a static list of
  * Strings to content proposals.
- *
+ * 
  * @see IContentProposalProvider
  * @since 3.2
- *
+ * 
  */
 public class SimpleContentProposalProvider implements IContentProposalProvider {
 
@@ -42,7 +42,7 @@ public class SimpleContentProposalProvider implements IContentProposalProvider {
 	/**
 	 * Construct a SimpleContentProposalProvider whose content proposals are
 	 * always the specified array of Objects.
-	 *
+	 * 
 	 * @param proposals
 	 *            the array of Strings to be returned whenever proposals are
 	 *            requested.
@@ -54,8 +54,8 @@ public class SimpleContentProposalProvider implements IContentProposalProvider {
 
 	/**
 	 * Return an array of Objects representing the valid content proposals for a
-	 * field.
-	 *
+	 * field. 
+	 * 
 	 * @param contents
 	 *            the current contents of the field (only consulted if filtering
 	 *            is set to <code>true</code>)
@@ -64,10 +64,9 @@ public class SimpleContentProposalProvider implements IContentProposalProvider {
 	 * @return the array of Objects that represent valid proposals for the field
 	 *         given its current content.
 	 */
-	@Override
 	public IContentProposal[] getProposals(String contents, int position) {
 		if (filterProposals) {
-			ArrayList<ContentProposal> list = new ArrayList<>();
+			ArrayList list = new ArrayList();
 			for (int i = 0; i < proposals.length; i++) {
 				if (proposals[i].length() >= contents.length()
 						&& proposals[i].substring(0, contents.length())
@@ -75,7 +74,7 @@ public class SimpleContentProposalProvider implements IContentProposalProvider {
 					list.add(new ContentProposal(proposals[i]));
 				}
 			}
-			return list.toArray(new IContentProposal[list
+			return (IContentProposal[]) list.toArray(new IContentProposal[list
 					.size()]);
 		}
 		if (contentProposals == null) {
@@ -89,7 +88,7 @@ public class SimpleContentProposalProvider implements IContentProposalProvider {
 
 	/**
 	 * Set the Strings to be used as content proposals.
-	 *
+	 * 
 	 * @param items
 	 *            the array of Strings to be used as proposals.
 	 */
@@ -101,7 +100,7 @@ public class SimpleContentProposalProvider implements IContentProposalProvider {
 	/**
 	 * Set the boolean that controls whether proposals are filtered according to
 	 * the current field content.
-	 *
+	 * 
 	 * @param filterProposals
 	 *            <code>true</code> if the proposals should be filtered to
 	 *            show only those that match the current contents of the field,

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,7 @@ import org.eclipse.ui.swt.IFocusService;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class FocusControlSourceProvider extends AbstractSourceProvider
 		implements IFocusService {
@@ -48,7 +48,12 @@ public class FocusControlSourceProvider extends AbstractSourceProvider
 
 	private DisposeListener disposeListener;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.menus.IFocusService#addTrackerFor(org.eclipse.swt.widgets.Control,
+	 *      java.lang.String)
+	 */
 	public void addFocusTracker(Control control, String id) {
 		if (control.isDisposed()) {
 			return;
@@ -61,13 +66,8 @@ public class FocusControlSourceProvider extends AbstractSourceProvider
 	private DisposeListener getDisposeListener() {
 		if (disposeListener == null) {
 			disposeListener = new DisposeListener() {
-				@Override
 				public void widgetDisposed(DisposeEvent e) {
 					controlToId.remove(e.widget);
-					if (currentControl == e.widget) {
-						focusIn(null);
-
-					}
 				}
 			};
 		}
@@ -77,12 +77,10 @@ public class FocusControlSourceProvider extends AbstractSourceProvider
 	private FocusListener getFocusListener() {
 		if (focusListener == null) {
 			focusListener = new FocusListener() {
-				@Override
 				public void focusGained(FocusEvent e) {
 					focusIn(e.widget);
 				}
 
-				@Override
 				public void focusLost(FocusEvent e) {
 					focusIn(null);
 				}
@@ -115,7 +113,11 @@ public class FocusControlSourceProvider extends AbstractSourceProvider
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.menus.IFocusService#removeTrackerFor(org.eclipse.swt.widgets.Control)
+	 */
 	public void removeFocusTracker(Control control) {
 		if (controlToId == null) {
 			// bug 396909: avoid NPEs if the service has already been disposed
@@ -129,7 +131,11 @@ public class FocusControlSourceProvider extends AbstractSourceProvider
 		control.removeDisposeListener(getDisposeListener());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ISourceProvider#dispose()
+	 */
 	public void dispose() {
 		Iterator i = controlToId.keySet().iterator();
 		while (i.hasNext()) {
@@ -145,7 +151,11 @@ public class FocusControlSourceProvider extends AbstractSourceProvider
 		disposeListener = null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ISourceProvider#getCurrentState()
+	 */
 	public Map getCurrentState() {
 		Map m = new HashMap();
 		if (currentId == null) {
@@ -161,7 +171,11 @@ public class FocusControlSourceProvider extends AbstractSourceProvider
 		return m;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ISourceProvider#getProvidedSourceNames()
+	 */
 	public String[] getProvidedSourceNames() {
 		return PROVIDED_SOURCE_NAMES;
 	}

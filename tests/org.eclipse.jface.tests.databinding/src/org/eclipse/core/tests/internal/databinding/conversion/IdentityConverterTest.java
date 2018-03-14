@@ -20,13 +20,17 @@ import org.eclipse.core.internal.databinding.conversion.IdentityConverter;
 
 /**
  * @since 3.2
- *
+ * 
  */
 public class IdentityConverterTest extends TestCase {
 
 	private IdentityConverter c;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	protected void setUp() throws Exception {
 		c = new IdentityConverter(Integer.TYPE, Integer.TYPE);
 	}

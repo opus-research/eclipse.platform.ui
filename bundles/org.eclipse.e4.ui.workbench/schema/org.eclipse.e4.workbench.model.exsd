@@ -3,7 +3,7 @@
 <schema targetNamespace="org.eclipse.e4.ui.workbench" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.eclipse.e4.ui.workbench" id="model" name="Model extensions"/>
+         <meta.schema plugin="org.eclipse.e4.ui.workbench" id="org.eclipse.e4.workbench.model" name="Model extensions"/>
       </appInfo>
       <documentation>
          &lt;strong&gt;This is not an API. The schema for this extension point is not frozen and might change in a non-backward compatible way in the future.&lt;/strong&gt;
@@ -70,28 +70,6 @@ Whenever possible, the model extensions of dependent bundles are processed befor
                </appInfo>
             </annotation>
          </attribute>
-         <attribute name="apply" use="default" value="always">
-            <annotation>
-               <documentation>
-                  This attribute defines in which case a fragment is merged into the model:
-&lt;ul&gt;
-&lt;li&gt;always: each time the application started potentially replacing existing model elements and loosing information stored&lt;/li&gt;
-&lt;li&gt;initial: only when coming from a none persistent state&lt;/li&gt;
-&lt;li&gt;notexists: only if the given element does not exist already in the model&lt;/li&gt;
-&lt;/ul&gt;
-               </documentation>
-            </annotation>
-            <simpleType>
-               <restriction base="string">
-                  <enumeration value="always">
-                  </enumeration>
-                  <enumeration value="initial">
-                  </enumeration>
-                  <enumeration value="notexists">
-                  </enumeration>
-               </restriction>
-            </simpleType>
-         </attribute>
       </complexType>
    </element>
 
@@ -121,25 +99,6 @@ Whenever possible, the model extensions of dependent bundles are processed befor
                   This flag specifies that the processor has to be invoked before model fragments are added.
                </documentation>
             </annotation>
-         </attribute>
-         <attribute name="apply" use="default" value="always">
-            <annotation>
-               <documentation>
-                  This attribute defines in which case a processor is run
-&lt;ul&gt;
-&lt;li&gt;always: each time the application started&lt;/li&gt;
-&lt;li&gt;initial: only when coming from a none persistent state&lt;/li&gt;
-&lt;/ul&gt;
-               </documentation>
-            </annotation>
-            <simpleType>
-               <restriction base="string">
-                  <enumeration value="always">
-                  </enumeration>
-                  <enumeration value="initial">
-                  </enumeration>
-               </restriction>
-            </simpleType>
          </attribute>
       </complexType>
    </element>
@@ -205,6 +164,7 @@ Whenever possible, the model extensions of dependent bundles are processed befor
    &lt;/extension&gt;
 &lt;/pre&gt;
 &lt;/p&gt;
+
       </documentation>
    </annotation>
 
@@ -215,11 +175,12 @@ Whenever possible, the model extensions of dependent bundles are processed befor
          <meta.section type="copyright"/>
       </appInfo>
       <documentation>
-         Copyright (c) 2010, 2014 IBM Corporation and others.&lt;br&gt;
+         Copyright (c) 2010, 2012 IBM Corporation and others.&lt;br&gt;
 All rights reserved. This program and the accompanying materials are made
 available under the terms of the Eclipse Public License v1.0 which accompanies
 this distribution, and is available at &lt;a 
 href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
+
       </documentation>
    </annotation>
 

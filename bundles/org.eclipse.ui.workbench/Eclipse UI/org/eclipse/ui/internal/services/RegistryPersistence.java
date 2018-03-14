@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -51,7 +51,7 @@ import org.eclipse.ui.services.IDisposable;
  * This class is only intended for internal use within the
  * <code>org.eclipse.ui.workbench</code> plug-in.
  * </p>
- *
+ * 
  * @since 3.2
  */
 public abstract class RegistryPersistence implements IDisposable,
@@ -61,7 +61,6 @@ public abstract class RegistryPersistence implements IDisposable,
 	 * The expression to return when there is an error. Never <code>null</code>.
 	 */
 	protected static final Expression ERROR_EXPRESSION = new Expression() {
-		@Override
 		public final EvaluationResult evaluate(final IEvaluationContext context) {
 			return null;
 		}
@@ -70,7 +69,7 @@ public abstract class RegistryPersistence implements IDisposable,
 	/**
 	 * Inserts the given element into the indexed two-dimensional array in the
 	 * array at the index. The array is grown as necessary.
-	 *
+	 * 
 	 * @param elementToAdd
 	 *            The element to add to the indexed array; may be
 	 *            <code>null</code>
@@ -106,7 +105,7 @@ public abstract class RegistryPersistence implements IDisposable,
 
 	/**
 	 * Adds a warning to be logged at some later point in time.
-	 *
+	 * 
 	 * @param warningsToLog
 	 *            The collection of warnings to be logged; must not be
 	 *            <code>null</code>.
@@ -124,7 +123,7 @@ public abstract class RegistryPersistence implements IDisposable,
 	/**
 	 * Adds a warning to be logged at some later point in time. This logs the
 	 * identifier of the item.
-	 *
+	 * 
 	 * @param warningsToLog
 	 *            The collection of warnings to be logged; must not be
 	 *            <code>null</code>.
@@ -146,7 +145,7 @@ public abstract class RegistryPersistence implements IDisposable,
 	/**
 	 * Adds a warning to be logged at some later point in time. This logs the
 	 * identifier of the item, as well as an extra attribute.
-	 *
+	 * 
 	 * @param warningsToLog
 	 *            The collection of warnings to be logged; must not be
 	 *            <code>null</code>.
@@ -200,7 +199,7 @@ public abstract class RegistryPersistence implements IDisposable,
 	/**
 	 * Checks that the class attribute or element exists for this element. This
 	 * is used for executable extensions that are being read in.
-	 *
+	 * 
 	 * @param configurationElement
 	 *            The configuration element which should contain a class
 	 *            attribute or a class child element; must not be
@@ -232,7 +231,7 @@ public abstract class RegistryPersistence implements IDisposable,
 	 * Checks to see whether the configuration element represents a pulldown
 	 * action. This involves reading the <code>style</code> and
 	 * <code>pulldown</code> attributes.
-	 *
+	 * 
 	 * @param element
 	 *            The element to check; must not be <code>null</code>.
 	 * @return <code>true</code> if the element is a pulldown action;
@@ -247,7 +246,7 @@ public abstract class RegistryPersistence implements IDisposable,
 
 	/**
 	 * Logs any warnings in <code>warningsToLog</code>.
-	 *
+	 * 
 	 * @param warningsToLog
 	 *            The warnings to log; may be <code>null</code>.
 	 * @param message
@@ -268,7 +267,7 @@ public abstract class RegistryPersistence implements IDisposable,
 
 	/**
 	 * Reads a boolean attribute from an element.
-	 *
+	 * 
 	 * @param configurationElement
 	 *            The configuration element from which to read the attribute;
 	 *            must not be <code>null</code>.
@@ -296,7 +295,7 @@ public abstract class RegistryPersistence implements IDisposable,
 	/**
 	 * Reads an optional attribute from an element. This converts zero-length
 	 * strings into <code>null</code>.
-	 *
+	 * 
 	 * @param configurationElement
 	 *            The configuration element from which to read the attribute;
 	 *            must not be <code>null</code>.
@@ -322,7 +321,7 @@ public abstract class RegistryPersistence implements IDisposable,
 	 * parameters are found, then a warning status will be appended to the
 	 * <code>warningsToLog</code> list. The command id is required, or a
 	 * warning will be logged.
-	 *
+	 * 
 	 * @param configurationElement
 	 *            The configuration element from which the parameters should be
 	 *            read; must not be <code>null</code>.
@@ -361,7 +360,7 @@ public abstract class RegistryPersistence implements IDisposable,
 	 * read the parameter sub-elements from a key element. Each parameter is
 	 * guaranteed to be valid. If invalid parameters are found, then a warning
 	 * status will be appended to the <code>warningsToLog</code> list.
-	 *
+	 * 
 	 * @param configurationElement
 	 *            The configuration element from which the parameters should be
 	 *            read; must not be <code>null</code>.
@@ -445,7 +444,7 @@ public abstract class RegistryPersistence implements IDisposable,
 
 	/**
 	 * Reads a required attribute from the configuration element.
-	 *
+	 * 
 	 * @param configurationElement
 	 *            The configuration element from which to read; must not be
 	 *            <code>null</code>.
@@ -469,7 +468,7 @@ public abstract class RegistryPersistence implements IDisposable,
 	/**
 	 * Reads a required attribute from the configuration element. This logs the
 	 * identifier of the item if this required element cannot be found.
-	 *
+	 * 
 	 * @param configurationElement
 	 *            The configuration element from which to read; must not be
 	 *            <code>null</code>.
@@ -501,7 +500,7 @@ public abstract class RegistryPersistence implements IDisposable,
 	/**
 	 * Reads a <code>when</code> child element from the given configuration
 	 * element. Warnings will be appended to <code>warningsToLog</code>.
-	 *
+	 * 
 	 * @param parentElement
 	 *            The configuration element which might have a <code>when</code>
 	 *            element as a child; never <code>null</code>.
@@ -592,11 +591,9 @@ public abstract class RegistryPersistence implements IDisposable,
 	 */
 	protected RegistryPersistence() {
 		registryChangeListener = new IRegistryChangeListener() {
-			@Override
 			public final void registryChanged(final IRegistryChangeEvent event) {
 				if (isChangeImportant(event)) {
 					Display.getDefault().asyncExec(new Runnable() {
-						@Override
 						public final void run() {
 							read();
 						}
@@ -609,7 +606,6 @@ public abstract class RegistryPersistence implements IDisposable,
 	/**
 	 * Detaches the registry change listener from the registry.
 	 */
-	@Override
 	public void dispose() {
 		final IExtensionRegistry registry = Platform.getExtensionRegistry();
 		registry.removeRegistryChangeListener(registryChangeListener);
@@ -618,7 +614,7 @@ public abstract class RegistryPersistence implements IDisposable,
 
 	/**
 	 * Checks whether the registry change could affect this persistence class.
-	 *
+	 * 
 	 * @param event
 	 *            The event indicating the registry change; must not be
 	 *            <code>null</code>.

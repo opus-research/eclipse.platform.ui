@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,7 +32,7 @@ public class NullEditorInput implements IEditorInput {
 	/**
 	 * Creates a <code>NullEditorInput</code> for the
 	 * given editor reference.
-	 *
+	 * 
 	 * @param editorReference the editor reference
 	 * @since 3.4
 	 */
@@ -42,18 +42,24 @@ public class NullEditorInput implements IEditorInput {
 
 	}
 
-    @Override
-	public boolean exists() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IEditorInput#exists()
+     */
+    public boolean exists() {
         return false;
     }
 
-    @Override
-	public ImageDescriptor getImageDescriptor() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IEditorInput#getImageDescriptor()
+     */
+    public ImageDescriptor getImageDescriptor() {
         return ImageDescriptor.getMissingImageDescriptor();
     }
 
-    @Override
-	public String getName() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IEditorInput#getName()
+     */
+    public String getName() {
 		String result = null;
 		if (editorReference != null) {
 			result = editorReference.getName();
@@ -64,20 +70,26 @@ public class NullEditorInput implements IEditorInput {
         return ""; //$NON-NLS-1$
     }
 
-    @Override
-	public IPersistableElement getPersistable() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IEditorInput#getPersistable()
+     */
+    public IPersistableElement getPersistable() {
         return null;
     }
 
-    @Override
-	public String getToolTipText() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IEditorInput#getToolTipText()
+     */
+    public String getToolTipText() {
 		if (editorReference != null)
 			return editorReference.getTitleToolTip();
         return ""; //$NON-NLS-1$
     }
 
-    @Override
-	public Object getAdapter(Class adapter) {
+    /* (non-Javadoc)
+     * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+     */
+    public Object getAdapter(Class adapter) {
         return null;
     }
 

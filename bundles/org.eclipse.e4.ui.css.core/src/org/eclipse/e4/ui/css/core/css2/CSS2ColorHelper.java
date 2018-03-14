@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 Angelo Zerr and others.
+ * Copyright (c) 2008 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,8 +11,9 @@
 package org.eclipse.e4.ui.css.core.css2;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
+
 import org.eclipse.e4.ui.css.core.dom.properties.converters.ICSSValueConverterColorConfig;
 import org.eclipse.e4.ui.css.core.dom.properties.converters.ICSSValueConverterConfig;
 import org.w3c.dom.css.CSSPrimitiveValue;
@@ -20,27 +21,27 @@ import org.w3c.dom.css.RGBColor;
 
 /**
  * CSS2 Color Helper.
- *
+ * 
  * @version 1.0.0
  * @author <a href="mailto:angelo.zerr@gmail.com">Angelo ZERR</a>
- *
+ * 
  */
 public class CSS2ColorHelper {
 
 	/**
 	 * Map with key=color name and value=hexadecimal color.
 	 */
-	private static Map<String, String> colorNamesMap = new HashMap<String, String>();
+	private static Map colorNamesMap = new HashMap();;
 
 	/**
 	 * Map with key=hexadecimal color and value=color name.
 	 */
-	private static Map<String, String> colorHexasMap = new HashMap<String, String>();
+	private static Map colorHexasMap = new HashMap();;
 
 	/**
 	 * Return w3c {@link RGBColor} from string value. Format String value is
 	 * hexadecimal like #FFFFFF or color name like white.
-	 *
+	 * 
 	 * @param value
 	 * @return
 	 */
@@ -48,9 +49,12 @@ public class CSS2ColorHelper {
 		if (value.startsWith("#") && value.length() == 7) {
 			// Color is like #FFFFFF
 			try {
-				int redValue = Integer.decode("0x" + value.substring(1, 3)).intValue();
-				int greenValue = Integer.decode("0x" + value.substring(3, 5)).intValue();
-				int blueValue = Integer.decode("0x" + value.substring(5)).intValue();
+				int redValue = Integer.decode("0x" + value.substring(1, 3))
+						.intValue();
+				int greenValue = Integer.decode("0x" + value.substring(3, 5))
+						.intValue();
+				int blueValue = Integer.decode("0x" + value.substring(5))
+						.intValue();
 				return new CSS2RGBColorImpl(redValue, greenValue, blueValue);
 			} catch (Exception e) {
 				return null;
@@ -58,10 +62,9 @@ public class CSS2ColorHelper {
 		}
 		// Search if it's color name
 		value = value.toLowerCase();
-		value = colorNamesMap.get(value);
-		if (value != null) {
+		value = (String) colorNamesMap.get(value);
+		if (value != null)
 			return getRGBColor(value);
-		}
 		return null;
 	}
 
@@ -69,7 +72,7 @@ public class CSS2ColorHelper {
 	 * Return color string form w3c <code>rgbColor</code> instance. The format
 	 * (Hexa, color name or rgb format) of the color string is managed with
 	 * <code>config</code> {@link ICSSValueConverterConfig}.
-	 *
+	 * 
 	 * @param rgbColor
 	 * @param config
 	 * @return
@@ -89,9 +92,8 @@ public class CSS2ColorHelper {
 				if (hexaColor != null) {
 					// Search into hexa map the color name
 					String colorName = getColorNameFromHexaColor(hexaColor);
-					if (colorName != null) {
+					if (colorName != null)
 						return colorName;
-					}
 					// Color name is not found, return the Hexa value
 					return hexaColor;
 
@@ -106,7 +108,7 @@ public class CSS2ColorHelper {
 	/**
 	 * Return rgb (ex : rgb(0,0,0)) color string value from w3c
 	 * <code>rgbColor</code> instance.
-	 *
+	 * 
 	 * @param rgbColor
 	 * @return
 	 */
@@ -130,7 +132,7 @@ public class CSS2ColorHelper {
 	/**
 	 * Return hexadecimal (ex : #FFFFFF) color string value from w3c
 	 * <code>rgbColor</code> instance.
-	 *
+	 * 
 	 * @param rgbColor
 	 * @return
 	 */
@@ -138,39 +140,36 @@ public class CSS2ColorHelper {
 		String result = "#";
 		int red = (int) rgbColor.getRed().getFloatValue(
 				CSSPrimitiveValue.CSS_NUMBER);
-		if (red < 16) {
+		if (red < 16)
 			result += "0";
-		}
 		result += Integer.toHexString(red);
 		int green = (int) rgbColor.getGreen().getFloatValue(
 				CSSPrimitiveValue.CSS_NUMBER);
-		if (green < 16) {
+		if (green < 16)
 			result += "0";
-		}
 		result += Integer.toHexString(green);
 		int blue = (int) rgbColor.getBlue().getFloatValue(
 				CSSPrimitiveValue.CSS_NUMBER);
-		if (blue < 16) {
+		if (blue < 16)
 			result += "0";
-		}
 		result += Integer.toHexString(blue);
 		return result;
 	}
 
 	/**
 	 * Return the Hexa color (ex : #FFFFFF) from color name (ex : white).
-	 *
+	 * 
 	 * @param colorName
 	 * @return
 	 */
 	public static String getHexaColorFromColorName(String colorName) {
-		return colorNamesMap.get(colorName);
+		return (String) colorNamesMap.get(colorName);
 	}
 
 	/**
 	 * Return true if <code>value</code> is color name (ex : white) and false
 	 * otherwise.
-	 *
+	 * 
 	 * @param value
 	 * @return
 	 */
@@ -180,13 +179,13 @@ public class CSS2ColorHelper {
 
 	/**
 	 * Return the color name (ex : white) from Hexa color (ex : #FFFFFF).
-	 *
+	 * 
 	 * @param hexaColor
 	 * @return
 	 */
 	public static String getColorNameFromHexaColor(String hexaColor) {
 		hexaColor = hexaColor.toUpperCase();
-		return colorHexasMap.get(hexaColor);
+		return (String) colorHexasMap.get(hexaColor);
 	}
 
 	static {
@@ -338,7 +337,9 @@ public class CSS2ColorHelper {
 		colorNamesMap.put("yellowgreen", "#9ACD32");
 
 		// Build Map with key=hexadecimal color and value=color name
-		for (Entry<String, String> entry : colorNamesMap.entrySet()) {
+		for (Iterator iterator = colorNamesMap.entrySet().iterator(); iterator
+				.hasNext();) {
+			Map.Entry entry = (Map.Entry) iterator.next();
 			colorHexasMap.put(entry.getValue(), entry.getKey());
 		}
 	}

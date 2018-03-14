@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 - 2015 IBM Corporation and others.
+ * Copyright (c) 2007 - 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,7 +33,7 @@ import org.eclipse.ui.internal.menus.InternalControlContribution;
  * control is being displayed on</li>
  * </ul>
  * </p>
- *
+ * 
  * @since 3.3
  *
  * @see ControlContribution
@@ -45,7 +45,7 @@ public abstract class WorkbenchWindowControlContribution extends InternalControl
 	 * the basis for XML contributions and will be used by the
 	 * workbench implementation. This is public only by necessity
 	 * and should not be used outside of the workbench implemenation
-	 * code.
+	 * code. 
 	 */
 	public WorkbenchWindowControlContribution() {
 		this("unknown ID"); //$NON-NLS-1$
@@ -54,7 +54,7 @@ public abstract class WorkbenchWindowControlContribution extends InternalControl
 	/**
 	 * Constructor for use by clients programmatically creating
 	 * control contributions in the workbench.
-	 *
+	 * 
 	 * @param id The id of this contribution
 	 */
 	public WorkbenchWindowControlContribution(String id) {
@@ -65,7 +65,6 @@ public abstract class WorkbenchWindowControlContribution extends InternalControl
 	 * @return Returns the workbench window currently hosting
 	 * the control.
 	 */
-	@Override
 	public final IWorkbenchWindow getWorkbenchWindow() {
 		return super.getWorkbenchWindow();
 	}
@@ -75,28 +74,26 @@ public abstract class WorkbenchWindowControlContribution extends InternalControl
 	 * control is currently being display on. This allows derivatives
 	 * to tailor their created control based on the orientation...
 	 */
-	@Override
 	public final int getCurSide() {
 		return super.getCurSide();
 	}
-
-	@Override
+	
 	public final int getOrientation() {
 		if (getCurSide() == SWT.LEFT || getCurSide() == SWT.RIGHT)
 			return SWT.VERTICAL;
-
+		
 		return SWT.HORIZONTAL;
 	}
 
 	/**
 	 * Important: This method is *NOT* to be used/extended by clients. This is
 	 * for the internal use inside Workbench
-	 *
+	 * 
 	 * @param parent
 	 *            the parent composite
 	 * @return newly created Control
 	 * @since 3.6
-	 *
+	 * 
 	 * @noreference This method is not intended to be referenced by clients.
 	 * @nooverride This method is not intended to be re-implemented or extended
 	 *             by clients.

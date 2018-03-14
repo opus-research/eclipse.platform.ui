@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
@@ -48,7 +49,7 @@ import org.eclipse.ui.statushandlers.StatusManager.INotificationTypes;
  * <p>
  * Dialog state variables are defined in {@link IStatusDialogConstants}.
  * </p>
- *
+ * 
  * @since 3.6
  * @noextend This class is not intended to be subclassed by clients.
  * @noinstantiate This class is not intended to be instantiated by clients.
@@ -60,7 +61,6 @@ public class WorkbenchStatusDialogManagerImpl {
 
 	private final class StatusDialogDisposeListener implements DisposeListener {
 
-		@Override
 		public void widgetDisposed(org.eclipse.swt.events.DisposeEvent e) {
 			cleanUp();
 		}
@@ -80,7 +80,7 @@ public class WorkbenchStatusDialogManagerImpl {
 
 	/**
 	 * Returns whether the given StatusAdapter object should be displayed.
-	 *
+	 * 
 	 * @param statusAdapter
 	 *            a status object
 	 * @return <code>true</code> if the given status should be displayed, and
@@ -110,7 +110,7 @@ public class WorkbenchStatusDialogManagerImpl {
 
 	/**
 	 * Creates workbench status dialog.
-	 *
+	 * 
 	 * @param displayMask
 	 *            the mask used to filter the handled <code>StatusAdapter</code>
 	 *            objects, the mask is a logical sum of status severities
@@ -128,7 +128,7 @@ public class WorkbenchStatusDialogManagerImpl {
 
 	/**
 	 * This method creates the initial state of the dialog.
-	 *
+	 * 
 	 * @param dialogState
 	 *            - the map to fill in.
 	 * @param displayMask
@@ -138,7 +138,7 @@ public class WorkbenchStatusDialogManagerImpl {
 	 * @return populated dialogState
 	 */
 	public Map initDialogState(Map dialogState, int displayMask, String dialogTitle) {
-		dialogState.put(IStatusDialogConstants.MASK, Integer.valueOf(displayMask));
+		dialogState.put(IStatusDialogConstants.MASK, new Integer(displayMask));
 		dialogState.put(IStatusDialogConstants.TITLE,
 				dialogTitle == null ? JFaceResources
 						.getString("Problem_Occurred") : //$NON-NLS-1$
@@ -181,7 +181,7 @@ public class WorkbenchStatusDialogManagerImpl {
 	 * All not shown status adapters will be displayed as soon as the dialog
 	 * shows up.
 	 * </p>
-	 *
+	 * 
 	 * @param modal
 	 *            <code>true</code> if the dialog should be modal,
 	 *            <code>false</code> otherwise
@@ -223,7 +223,6 @@ public class WorkbenchStatusDialogManagerImpl {
 		dialogState.put(IStatusDialogConstants.DETAILS_OPENED, Boolean.FALSE);
 		dialogState.put(IStatusDialogConstants.TRAY_OPENED, Boolean.FALSE);
 		dialogState.put(IStatusDialogConstants.MODALITY_SWITCH, Boolean.FALSE);
-		dialogState.remove(IStatusDialogConstants.CURRENT_STATUS_ADAPTER);
 	}
 
 	private void doAddStatusAdapter(final StatusAdapter statusAdapter,
@@ -234,7 +233,7 @@ public class WorkbenchStatusDialogManagerImpl {
 			WorkbenchPlugin.log(statusAdapter.getStatus());
 			return;
 		}
-
+		
 		// if statusAdapter does not match the mask, ignore it
 		if (!shouldAccept(statusAdapter)) {
 			return;
@@ -245,7 +244,7 @@ public class WorkbenchStatusDialogManagerImpl {
 		if (isDialogClosed()) {
 
 			getErrors().add(statusAdapter);
-			getModals().put(statusAdapter, Boolean.valueOf(modal));
+			getModals().put(statusAdapter, new Boolean(modal));
 			// Delay prompting if the status adapter property is set
 			if (shouldPrompt(statusAdapter)) {
 				// notify all interested parties that status adapters will be
@@ -254,7 +253,7 @@ public class WorkbenchStatusDialogManagerImpl {
 						INotificationTypes.HANDLED,
 						(StatusAdapter[]) getErrors()
 								.toArray(new StatusAdapter[] {}));
-
+				
 				if (dialog == null) {
 					setSelectedStatusAdapter(statusAdapter);
 					dialog = new InternalDialog(dialogState, shouldBeModal());
@@ -290,7 +289,7 @@ public class WorkbenchStatusDialogManagerImpl {
 
 	/**
 	 * Gets a collection of status adapters that were passed to the dialog.
-	 *
+	 * 
 	 * @return collection of {@link StatusAdapter} objects
 	 */
 	public Collection getStatusAdapters() {
@@ -299,7 +298,7 @@ public class WorkbenchStatusDialogManagerImpl {
 
 	/**
 	 * Opens status dialog with particular statusAdapter selected.
-	 *
+	 * 
 	 * @param modal
 	 *            decides if window is modal or not.
 	 * @param statusAdapter
@@ -308,7 +307,7 @@ public class WorkbenchStatusDialogManagerImpl {
 	private void openStatusDialog(final boolean modal,
 			final StatusAdapter statusAdapter) {
 		getErrors().add(statusAdapter);
-		getModals().put(statusAdapter, Boolean.valueOf(modal));
+		getModals().put(statusAdapter, new Boolean(modal));
 		boolean shouldBeModal = shouldBeModal();
 		if (shouldBeModal ^ dialog.isModal()) {
 			dialog.getShell().removeDisposeListener(disposeListener);
@@ -324,7 +323,7 @@ public class WorkbenchStatusDialogManagerImpl {
 
 	/**
 	 * Sets current status adapter.
-	 *
+	 * 
 	 * @param statusAdapter
 	 *            The statusAdapter to set.
 	 */
@@ -337,18 +336,17 @@ public class WorkbenchStatusDialogManagerImpl {
 	 * Sets new label provider for the status list. This label provider is used
 	 * also to display the second message on the dialog if only one status is
 	 * available.
-	 *
+	 * 
 	 * <p>
 	 * This method is no longer recommended to use as it is impossible to
 	 * achieve consistent behavior after changing only one label provider.
 	 * </p>
-	 *
-	 * @deprecated As of 3.5 {@link #setMessageDecorator} is recommended.
-	 *
+	 * 
+	 * @deprecated As of 3.5 {@link #setMessageDecorator} is recommended. 
+	 * 
 	 * @param labelProvider
 	 *            a label provider to be used when displaying status adapters.
 	 */
-	@Deprecated
 	public void setStatusListLabelProvider(ITableLabelProvider labelProvider) {
 		Assert.isLegal(labelProvider != null, "Label Provider cannot be null"); //$NON-NLS-1$
 		dialogState.put(IStatusDialogConstants.CUSTOM_LABEL_PROVIDER,
@@ -359,13 +357,15 @@ public class WorkbenchStatusDialogManagerImpl {
 	 * Decides if dialog should be modal. Dialog will be modal if any of the
 	 * statuses contained by StatusAdapters had been reported with
 	 * {@link StatusManager#BLOCK} flag.
-	 *
+	 * 
 	 * @return true if any StatusHandler should be displayed in modal window
 	 */
 	public boolean shouldBeModal() {
-		Map<?, ?> modals = (Map<?, ?>) dialogState
+		Map modals = (Map) dialogState
 				.get(IStatusDialogConstants.STATUS_MODALS);
-		for (Object value : modals.values()) {
+		for (Iterator it = modals.keySet().iterator(); it.hasNext();) {
+			Object o = it.next();
+			Object value = modals.get(o);
 			if (value instanceof Boolean) {
 				Boolean b = (Boolean) value;
 				if (b.booleanValue()) {
@@ -379,7 +379,7 @@ public class WorkbenchStatusDialogManagerImpl {
 	/**
 	 * Checks if the user should be prompted immediately about
 	 * {@link StatusAdapter}
-	 *
+	 * 
 	 * @param statusAdapter
 	 *            to be checked.
 	 * @return true if the statusAdapter should be prompted, false otherwise.
@@ -397,9 +397,9 @@ public class WorkbenchStatusDialogManagerImpl {
 
 	/**
 	 * Gets the shell of the managed dialog.
-	 *
+	 * 
 	 * @return Shell or null
-	 *
+	 * 
 	 */
 	public Shell getShell() {
 		if (this.dialog == null)
@@ -425,7 +425,7 @@ public class WorkbenchStatusDialogManagerImpl {
 	 * This method should not be used together with
 	 * {@link #setStatusListLabelProvider(ITableLabelProvider)}.
 	 * </p>
-	 *
+	 * 
 	 * @param decorator
 	 *            - the decorator to be set. Only
 	 *            {@link ILabelDecorator#decorateText(String, Object)} method
@@ -442,7 +442,7 @@ public class WorkbenchStatusDialogManagerImpl {
 
 	/**
 	 * This method sets various properties on the manager.
-	 *
+	 * 
 	 * @param key
 	 *            a key of the property to be set.
 	 * @param value
@@ -457,7 +457,7 @@ public class WorkbenchStatusDialogManagerImpl {
 
 	/**
 	 * This method gets various dialog properties.
-	 *
+	 * 
 	 * @param key
 	 *            a key of the property to be get.
 	 * @return a value of the property. The value will be of type specified by
@@ -479,7 +479,7 @@ public class WorkbenchStatusDialogManagerImpl {
 	 * dialog handles {@link StatusAdapter}s wrapping {@link IStatus} with
 	 * severity {@link IStatus#OK}, does not display the link to the error log,
 	 * does not display the link to the support area but always opens it.
-	 *
+	 * 
 	 * @see ErrorDialog
 	 * @since 3.6
 	 */
@@ -492,7 +492,7 @@ public class WorkbenchStatusDialogManagerImpl {
 
 	/**
 	 * This method is public for testing purposes only.
-	 *
+	 * 
 	 * @return Returns the dialog.
 	 */
 	public InternalDialog getDialog() {
@@ -501,7 +501,7 @@ public class WorkbenchStatusDialogManagerImpl {
 
 	/**
 	 * This method is public for testing purposes only.
-	 *
+	 * 
 	 * @param dialog
 	 *            The dialog to set.
 	 */
@@ -511,7 +511,7 @@ public class WorkbenchStatusDialogManagerImpl {
 
 	/**
 	 * This method is public for testing purposes only.
-	 *
+	 * 
 	 * @return dialog state.
 	 */
 	public Map getDialogState() {
@@ -520,7 +520,7 @@ public class WorkbenchStatusDialogManagerImpl {
 
 	/**
 	 * Utility method to access StatusAdapters
-	 *
+	 * 
 	 * @return Collection of StatusAdapters
 	 */
 	private Collection getErrors() {
@@ -530,7 +530,7 @@ public class WorkbenchStatusDialogManagerImpl {
 
 	/**
 	 * Utility method to access StatusAdapter modal flag.
-	 *
+	 * 
 	 * @return Collection of StatusAdapter modal flag.
 	 */
 	private Map getModals() {

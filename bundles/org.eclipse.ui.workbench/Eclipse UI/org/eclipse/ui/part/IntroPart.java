@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.SafeRunnable;
@@ -78,21 +77,30 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
         super();
     }
 
-    @Override
-	public void addPropertyListener(IPropertyListener l) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.intro.IIntroPart#addPropertyListener(org.eclipse.ui.IPropertyListener)
+     */
+    public void addPropertyListener(IPropertyListener l) {
         addListenerObject(l);
     }
 
-    @Override
-	public abstract void createPartControl(Composite parent);
+    /*
+     * (non-Javadoc) Creates the SWT controls for this intro part. <p>
+     * Subclasses must implement this method. For a detailed description of the
+     * requirements see <code> IIntroPart </code></p>
+     * 
+     * @param parent the parent control
+     * 
+     * @see IIntroPart
+     */
+    public abstract void createPartControl(Composite parent);
 
     /**
      * The <code>IntroPart</code> implementation of this
      * <code>IIntroPart</code> method disposes the title image loaded by
      * <code>setInitializationData</code>. Subclasses may extend.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         if (titleImage != null) {
             JFaceResources.getResources().destroyImage(imageDescriptor);
             titleImage = null;
@@ -106,7 +114,7 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
 
     /**
      * Fires a property changed event.
-     *
+     * 
      * @param propertyId
      *            the id of the property that changed
      */
@@ -114,10 +122,9 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
         Object[] array = getListeners();
         for (int nX = 0; nX < array.length; nX++) {
             final IPropertyListener l = (IPropertyListener) array[nX];
-            SafeRunner.run(new SafeRunnable() {
+            Platform.run(new SafeRunnable() {
 
-                @Override
-				public void run() {
+                public void run() {
                     l.propertyChanged(this, propertyId);
                 }
             });
@@ -132,8 +139,7 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
      * invoke the method on their superclass to ensure that the Platform's
      * adapter manager is consulted).
      */
-    @Override
-	public Object getAdapter(Class adapter) {
+    public Object getAdapter(Class adapter) {
         return Platform.getAdapterManager().getAdapter(this, adapter);
     }
 
@@ -141,7 +147,7 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
      * Returns the configuration element for this part. The configuration
      * element comes from the plug-in registry entry for the extension defining
      * this part.
-     *
+     * 
      * @return the configuration element for this part
      */
     protected IConfigurationElement getConfigurationElement() {
@@ -150,7 +156,7 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
 
     /**
      * Returns the default title image.
-     *
+     * 
      * @return the default image
      */
     protected Image getDefaultImage() {
@@ -158,21 +164,29 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
                 ISharedImages.IMG_DEF_VIEW);
     }
 
-    @Override
-	public final IIntroSite getIntroSite() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.intro.IIntroPart#getIntroSite()
+     */
+    public final IIntroSite getIntroSite() {
         return partSite;
     }
 
-    @Override
-	public Image getTitleImage() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.intro.IIntroPart#getTitleImage()
+     */
+    public Image getTitleImage() {
         if (titleImage != null) {
             return titleImage;
         }
         return getDefaultImage();
     }
-
-    @Override
-	public String getTitle() {
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.intro.IIntroPart#getTitle()
+     */
+    public String getTitle() {
     	if (titleLabel != null) {
     		return titleLabel;
     	}
@@ -181,7 +195,7 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
 
     /**
      * Return the default title string.
-     *
+     * 
 	 * @return the default title string
 	 */
 	private String getDefaultTitle() {
@@ -192,7 +206,7 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
      * The base implementation of this {@link org.eclipse.ui.intro.IIntroPart}method ignores the
      * memento and initializes the part in a fresh state. Subclasses may extend
      * to perform any state restoration, but must call the super method.
-     *
+     * 
      * @param site
      *            the intro site
      * @param memento
@@ -201,8 +215,7 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
      * @exception PartInitException
      *                if this part was not initialized successfully
      */
-    @Override
-	public void init(IIntroSite site, IMemento memento)
+    public void init(IIntroSite site, IMemento memento)
             throws PartInitException {
         setSite(site);
     }
@@ -219,25 +232,34 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
         this.partSite = site;
     }
 
-    @Override
-	public void removePropertyListener(IPropertyListener l) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.intro.IIntroPart#removePropertyListener(org.eclipse.ui.IPropertyListener)
+     */
+    public void removePropertyListener(IPropertyListener l) {
         removeListenerObject(l);
     }
 
     /**
      * The base implementation of this {@link org.eclipse.ui.intro.IIntroPart} method does nothing.
      * Subclasses may override.
-     *
+     * 
      * @param memento
      *            a memento to receive the object state
      */
-    @Override
-	public void saveState(IMemento memento) {
+    public void saveState(IMemento memento) {
         //no-op
     }
 
-    @Override
-	public abstract void setFocus();
+    /*
+     * (non-Javadoc) Asks this part to take focus within the workbench. 
+     * <p>
+     * Subclasses must implement this method. For a detailed description of the
+     * requirements see <code>IIntroPart</code>
+     * </p>
+     * 
+     * @see IIntroPart
+     */
+    public abstract void setFocus();
 
     /**
      * The <code>IntroPart</code> implementation of this
@@ -245,19 +267,18 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
      * and internal state variable (accessible via <code>getConfigElement</code>).
      * It also loads the title image, if one is specified in the configuration
      * element. Subclasses may extend.
-     *
+     * 
      * Should not be called by clients. It is called by the core plugin when
      * creating this executable extension.
      */
-    @Override
-	public void setInitializationData(IConfigurationElement cfig,
+    public void setInitializationData(IConfigurationElement cfig,
             String propertyName, Object data) {
 
         // Save config element.
         configElement = cfig;
 
         titleLabel = cfig.getAttribute(IWorkbenchRegistryConstants.ATT_LABEL);
-
+        
         // Icon.
         String strIcon = cfig.getAttribute(IWorkbenchRegistryConstants.ATT_ICON);
         if (strIcon == null) {
@@ -277,7 +298,7 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
 
     /**
      * Sets or clears the title image of this part.
-     *
+     * 
      * @param titleImage
      *            the title image, or <code>null</code> to clear
      */
@@ -290,10 +311,10 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
         this.titleImage = titleImage;
         firePropertyChange(IIntroPart.PROP_TITLE);
     }
-
+    
     /**
      * Set the title string for this part.
-     *
+     * 
      * @param titleLabel the title string.  Must not be <code>null</code>.
      * @since 3.2
      */

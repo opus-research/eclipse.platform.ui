@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,8 @@ import org.eclipse.jface.window.IShellProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Cursor;
@@ -28,6 +30,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
@@ -46,7 +49,7 @@ import org.eclipse.swt.widgets.ToolItem;
  * Note: Trays are not supported on dialogs that use a custom layout on the <code>
  * Shell</code> by overriding <code>Window#getLayout()</code>.
  * </p>
- *
+ * 
  * @see org.eclipse.jface.dialogs.DialogTray
  * @see org.eclipse.jface.window.Window#getLayout()
  * @since 3.2
@@ -65,10 +68,9 @@ public abstract class TrayDialog extends Dialog {
 			this.shell = shell;
 		}
 
-		@Override
 		public void controlResized (ControlEvent event) {
 				int newWidth = shell.getSize().x;
-				if (newWidth != shellWidth) {
+				if (newWidth != shellWidth) {					
 					int shellWidthIncrease = newWidth - shellWidth;
 					int trayWidthIncreaseTimes100 = (shellWidthIncrease * TRAY_RATIO) + remainder;
 					int trayWidthIncrease = trayWidthIncreaseTimes100/100;
@@ -93,32 +95,32 @@ public abstract class TrayDialog extends Dialog {
 	 * The tray's control (null if none).
 	 */
 	private Control trayControl;
-
+	
 	/**
 	 * The control that had focus before the tray was opened (null if none).
 	 */
 	private Control nonTrayFocusControl;
-
+	
 	/*
 	 * The separator to the left of the sash.
 	 */
 	private Label leftSeparator;
-
+	
 	/*
 	 * The separator to the right of the sash.
 	 */
 	private Label rightSeparator;
-
+	
 	/*
 	 * The sash that allows the user to resize the tray.
 	 */
 	private Sash sash;
-
+	
 	/*
 	 * Whether or not help is available for this dialog.
 	 */
 	private boolean helpAvailable = isDialogHelpAvailable();
-
+	
 	private int shellWidth;
 
 	private ControlAdapter resizeListener;
@@ -131,16 +133,16 @@ public abstract class TrayDialog extends Dialog {
 	/**
 	 * Creates a tray dialog instance. Note that the window will have no visual
 	 * representation (no widgets) until it is told to open.
-	 *
+	 * 
 	 * @param shell the parent shell, or <code>null</code> to create a top-level shell
 	 */
 	protected TrayDialog(Shell shell) {
 		super(shell);
 	}
-
+	
 	/**
 	 * Creates a tray dialog with the given parent.
-	 *
+	 * 
 	 * @param parentShell the object that returns the current parent shell
 	 */
 	protected TrayDialog(IShellProvider parentShell) {
@@ -149,7 +151,7 @@ public abstract class TrayDialog extends Dialog {
 
 	/**
 	 * Closes this dialog's tray, disposing its widgets.
-	 *
+	 * 
 	 * @throws IllegalStateException if the tray was not open
 	 */
 	public void closeTray() throws IllegalStateException {
@@ -184,11 +186,11 @@ public abstract class TrayDialog extends Dialog {
 			fHelpButton.setSelection(false);
 		}
 	}
-
+	
 	/**
 	 * Returns true if the given Control is a direct or indirect child of
 	 * container.
-	 *
+	 * 
 	 * @param container
 	 *            the potential parent
 	 * @param control
@@ -205,7 +207,9 @@ public abstract class TrayDialog extends Dialog {
 		return false;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.window.Window#handleShellCloseEvent()
+	 */
 	protected void handleShellCloseEvent() {
 		/*
 		 * Close the tray to ensure that those dialogs that remember their
@@ -217,8 +221,10 @@ public abstract class TrayDialog extends Dialog {
 
 		super.handleShellCloseEvent();
 	}
-
-	@Override
+	
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#createButtonBar(org.eclipse.swt.widgets.Composite)
+     */
 	protected Control createButtonBar(Composite parent) {
     	Composite composite = new Composite(parent, SWT.NONE);
     	GridLayout layout = new GridLayout();
@@ -248,7 +254,7 @@ public abstract class TrayDialog extends Dialog {
 	 * and the number of columns in this layout is incremented. Subclasses may
 	 * override.
 	 * </p>
-	 *
+	 * 
 	 * @param parent the parent composite
 	 * @return the help control
 	 */
@@ -259,7 +265,7 @@ public abstract class TrayDialog extends Dialog {
 		}
 		return createHelpLink(parent);
     }
-
+    
     /*
      * Creates a button with a help image. This is only used if there
      * is an image available.
@@ -270,13 +276,16 @@ public abstract class TrayDialog extends Dialog {
 		toolBar.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
 		final Cursor cursor = new Cursor(parent.getDisplay(), SWT.CURSOR_HAND);
 		toolBar.setCursor(cursor);
-		toolBar.addDisposeListener(e -> cursor.dispose());
+		toolBar.addDisposeListener(new DisposeListener() {
+			public void widgetDisposed(DisposeEvent e) {
+				cursor.dispose();
+			}
+		});		
         fHelpButton = new ToolItem(toolBar, SWT.CHECK);
 		fHelpButton.setImage(image);
 		fHelpButton.setToolTipText(JFaceResources.getString("helpToolTip")); //$NON-NLS-1$
 		fHelpButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
 				helpPressed();
             }
         });
@@ -294,14 +303,13 @@ public abstract class TrayDialog extends Dialog {
 		link.setText("<a>"+IDialogConstants.HELP_LABEL+"</a>"); //$NON-NLS-1$ //$NON-NLS-2$
 		link.setToolTipText(IDialogConstants.HELP_LABEL);
 		link.addSelectionListener(new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
 				helpPressed();
             }
         });
 		return link;
-	}
-
+	}	
+	
 	/*
 	 * Returns whether or not the given layout can support the addition of a tray.
 	 */
@@ -319,13 +327,13 @@ public abstract class TrayDialog extends Dialog {
 	 * Returns whether or not context help is available for this dialog. This
 	 * can affect whether or not the dialog will display additional help
 	 * mechanisms such as a help control in the button bar.
-	 *
+	 * 
 	 * @return whether or not context help is available for this dialog
 	 */
 	public boolean isHelpAvailable() {
 		return helpAvailable;
 	}
-
+	
 	/**
 	 * The tray dialog's default layout is a modified version of the default
 	 * <code>Window</code> layout that can accomodate a tray, however it still
@@ -335,28 +343,27 @@ public abstract class TrayDialog extends Dialog {
 	 * Shell. To avoid problems, use a single outer <code>Composite</code> for
 	 * your dialog area, and set your custom layout on that <code>Composite</code>.
 	 * </p>
-	 *
+	 * 
 	 * @see org.eclipse.jface.window.Window#getLayout()
 	 * @return a newly created layout or <code>null</code> for no layout
 	 */
-	@Override
 	protected Layout getLayout() {
 		GridLayout layout = (GridLayout)super.getLayout();
 		layout.numColumns = 5;
 		layout.horizontalSpacing = 0;
 		return layout;
 	}
-
+	
 	/**
 	 * Returns the tray currently shown in the dialog, or <code>null</code>
 	 * if there is no tray.
-	 *
+	 * 
 	 * @return the dialog's current tray, or <code>null</code> if there is none
 	 */
 	public DialogTray getTray() {
 		return tray;
 	}
-
+	
 	/*
 	 * Called when the help control is invoked. This emulates the keyboard
 	 * context help behavior (e.g. F1 on Windows). It traverses the widget
@@ -386,11 +393,11 @@ public abstract class TrayDialog extends Dialog {
 			closeTray();
 		}
 	}
-
+	
 	/**
 	 * Constructs the tray's widgets and displays the tray in this dialog. The
 	 * dialog's size will be adjusted to accommodate the tray.
-	 *
+	 * 
 	 * @param tray the tray to show in this dialog
 	 * @throws IllegalStateException if the dialog already has a tray open
 	 * @throws UnsupportedOperationException if the dialog does not support trays,
@@ -425,40 +432,42 @@ public abstract class TrayDialog extends Dialog {
 		int trayWidth = leftSeparator.computeSize(SWT.DEFAULT, clientArea.height).x + sash.computeSize(SWT.DEFAULT, clientArea.height).x + rightSeparator.computeSize(SWT.DEFAULT, clientArea.height).x + data.widthHint;
 		Rectangle bounds = shell.getBounds();
 		shell.setBounds(bounds.x - ((getDefaultOrientation() == SWT.RIGHT_TO_LEFT) ? trayWidth : 0), bounds.y, bounds.width + trayWidth, bounds.height);
-		sash.addListener(SWT.Selection, event -> {
-			if (event.detail != SWT.DRAG) {
-				Rectangle clientArea1 = shell.getClientArea();
-				int newWidth = clientArea1.width - event.x - (sash.getSize().x + rightSeparator.getSize().x);
-				if (newWidth != data.widthHint) {
-					data.widthHint = newWidth;
-					shell.layout();
+		sash.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(Event event) {
+				if (event.detail != SWT.DRAG) {
+					Rectangle clientArea = shell.getClientArea();
+					int newWidth = clientArea.width - event.x - (sash.getSize().x + rightSeparator.getSize().x);
+					if (newWidth != data.widthHint) {
+						data.widthHint = newWidth;
+						shell.layout();
+					}
 				}
 			}
 		});
 		shellWidth = shell.getSize().x;
-
+		
 		resizeListener = new ResizeListener(data, shell);
 		shell.addControlListener (resizeListener);
-
+		   
 		this.tray = tray;
 	}
-
+	
 	/**
 	 * Sets whether or not context help is available for this dialog. This
 	 * can affect whether or not the dialog will display additional help
 	 * mechanisms such as a help control in the button bar.
-	 *
+	 * 
 	 * @param helpAvailable whether or not context help is available for the dialog
 	 */
 	public void setHelpAvailable(boolean helpAvailable) {
 		this.helpAvailable = helpAvailable;
 	}
-
+	
 	/**
 	 * Tests if dialogs that have help control should show it
 	 * all the time or only when explicitly requested for
 	 * each dialog instance.
-	 *
+	 * 
 	 * @return <code>true</code> if dialogs that support help
 	 * control should show it by default, <code>false</code> otherwise.
 	 * @since 3.2
@@ -466,12 +475,12 @@ public abstract class TrayDialog extends Dialog {
 	public static boolean isDialogHelpAvailable() {
 		return dialogHelpAvailable;
 	}
-
+	
 	/**
 	 * Sets whether JFace dialogs that support help control should
-	 * show the control by default. If set to <code>false</code>,
+	 * show the control by default. If set to <code>false</code>, 
 	 * help control can still be shown on a per-dialog basis.
-	 *
+	 * 
 	 * @param helpAvailable <code>true</code> to show the help
 	 * control, <code>false</code> otherwise.
 	 * @since 3.2

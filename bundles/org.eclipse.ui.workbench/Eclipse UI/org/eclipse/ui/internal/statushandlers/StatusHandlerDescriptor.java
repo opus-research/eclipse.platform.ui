@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ import org.eclipse.ui.statushandlers.AbstractStatusHandler;
 
 /**
  * The status handler descriptor.
- *
+ * 
  * @since 3.3
  */
 public class StatusHandlerDescriptor implements IPluginContribution {
@@ -51,7 +51,7 @@ public class StatusHandlerDescriptor implements IPluginContribution {
 
 	/**
 	 * Gets an instance of the status handler defined in the descriptor.
-	 *
+	 * 
 	 * @return the status handler
 	 * @throws CoreException
 	 *             thrown if there is a problem creating the handler
@@ -86,7 +86,7 @@ public class StatusHandlerDescriptor implements IPluginContribution {
 
 	/**
 	 * Gets prefix parameter for the status handler defined in the descriptor.
-	 *
+	 * 
 	 * @return prefix parameter
 	 */
 	public String getPrefix() {
@@ -106,19 +106,27 @@ public class StatusHandlerDescriptor implements IPluginContribution {
 
 	/**
 	 * Returns the id of the status handler.
-	 *
+	 * 
 	 * @return the id
 	 */
 	public String getId() {
 		return id;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IPluginContribution#getLocalId()
+	 */
 	public String getLocalId() {
 		return id;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IPluginContribution#getPluginId()
+	 */
 	public String getPluginId() {
 		return pluginId;
 	}

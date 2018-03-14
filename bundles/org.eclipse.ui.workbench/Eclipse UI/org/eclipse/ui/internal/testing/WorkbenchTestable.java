@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,12 +10,15 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.testing;
 
+import org.eclipse.swt.widgets.Display;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.jobs.Job;
+
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.util.SafeRunnable;
-import org.eclipse.swt.widgets.Display;
+
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.Workbench;
@@ -23,7 +26,7 @@ import org.eclipse.ui.testing.TestableObject;
 
 /**
  * The Workbench's testable object facade to a test harness.
- *
+ * 
  * @since 3.0
  */
 public class WorkbenchTestable extends TestableObject {
@@ -46,7 +49,7 @@ public class WorkbenchTestable extends TestableObject {
     /**
      * Initializes the workbench testable with the display and workbench,
      * and notifies all listeners that the tests can be run.
-     *
+     * 
      * @param display the display
      * @param workbench the workbench
      */
@@ -58,15 +61,7 @@ public class WorkbenchTestable extends TestableObject {
         if (getTestHarness() != null) {
         	// don't use a job, since tests often wait for all jobs to complete before proceeding
             Runnable runnable = new Runnable() {
-                @Override
-				public void run() {
-					// disable workbench auto-save during tests
-					if ("true".equalsIgnoreCase(System.getProperty(PlatformUI.PLUGIN_ID + ".testsDisableWorkbenchAutoSave"))) { //$NON-NLS-1$ //$NON-NLS-2$
-						if (WorkbenchTestable.this.workbench instanceof Workbench) {
-							((Workbench) WorkbenchTestable.this.workbench).setEnableAutoSave(false);
-						}
-						Job.getJobManager().cancel(Workbench.WORKBENCH_AUTO_SAVE_JOB);
-					}
+                public void run() {
                 	// Some tests (notably the startup performance tests) do not want to wait for early startup.
                 	// Allow this to be disabled by specifying the system property: org.eclipse.ui.testsWaitForEarlyStartup=false
                 	// For details, see bug 94129 [Workbench] Performance test regression caused by workbench harness change
@@ -92,14 +87,13 @@ public class WorkbenchTestable extends TestableObject {
 			// ignore
 		}
     }
-
+    
     /**
      * The <code>WorkbenchTestable</code> implementation of this
      * <code>TestableObject</code> method ensures that the workbench
      * has been set.
      */
-    @Override
-	public void testingStarting() {
+    public void testingStarting() {
         Assert.isNotNull(workbench);
         oldAutomatedMode = ErrorDialog.AUTOMATED_MODE;
         ErrorDialog.AUTOMATED_MODE = true;
@@ -113,8 +107,7 @@ public class WorkbenchTestable extends TestableObject {
      * runs the test in a <code>syncExec</code>, then flushes the
      * event queue again.
      */
-    @Override
-	public void runTest(Runnable testRunnable) {
+    public void runTest(Runnable testRunnable) {
         Assert.isNotNull(workbench);
         display.syncExec(testRunnable);
     }
@@ -124,12 +117,10 @@ public class WorkbenchTestable extends TestableObject {
      * <code>TestableObject</code> method flushes the event queue,
      * then closes the workbench.
      */
-    @Override
-	public void testingFinished() {
+    public void testingFinished() {
         // force events to be processed, and ensure the close is done in the UI thread
         display.syncExec(new Runnable() {
-            @Override
-			public void run() {
+            public void run() {
                 Assert.isTrue(workbench.close());
             }
         });

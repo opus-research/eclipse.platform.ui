@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -36,7 +35,7 @@ import org.eclipse.ui.services.IServiceLocator;
  * actions be active and the mask indicates whether or not the set was disabled
  * by the user.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public class ActionSetManager {
@@ -45,11 +44,11 @@ public class ActionSetManager {
         int showCount;
 
         int maskCount;
-
+        
         public boolean isVisible() {
             return maskCount == 0 && showCount > 0;
         }
-
+        
         public boolean isEmpty() {
             return maskCount == 0 && showCount == 0;
         }
@@ -57,31 +56,30 @@ public class ActionSetManager {
 
     private HashMap actionSets = new HashMap();
     private HashSet visibleItems = new HashSet();
-
+    
     public static final int PROP_VISIBLE = 0;
     public static final int PROP_HIDDEN = 1;
     public static final int CHANGE_MASK = 0;
     public static final int CHANGE_UNMASK = 1;
     public static final int CHANGE_SHOW = 2;
     public static final int CHANGE_HIDE = 3;
-
+    
     private ListenerList listeners = new ListenerList();
 	private IPropertyListener contextListener;
 	private Map activationsById = new HashMap();
 	private IContextService contextService;
-
+    
     public ActionSetManager(IServiceLocator locator) {
-    	contextService = locator.getService(IContextService.class);
+    	contextService = (IContextService) locator.getService(IContextService.class);
 		addListener(getContextListener());
     }
-
+    
     /**
 	 * @return
 	 */
 	private IPropertyListener getContextListener() {
 		if (contextListener == null) {
 			contextListener = new IPropertyListener() {
-				@Override
 				public void propertyChanged(Object source, int propId) {
 					if (source instanceof IActionSetDescriptor) {
 						IActionSetDescriptor desc = (IActionSetDescriptor) source;
@@ -110,29 +108,29 @@ public class ActionSetManager {
     public void removeListener(IPropertyListener l) {
         listeners.remove(l);
     }
-
+    
     private void firePropertyChange(IActionSetDescriptor descriptor, int id) {
     	Object[] l = listeners.getListeners();
         for (int i=0; i<l.length; i++) {
             IPropertyListener listener = (IPropertyListener) l[i];
             listener.propertyChanged(descriptor, id);
         }
-    }
-
+    }        
+    
     private ActionSetRec getRec(IActionSetDescriptor descriptor) {
         ActionSetRec rec = (ActionSetRec)actionSets.get(descriptor);
-
+        
         if (rec == null) {
             rec = new ActionSetRec();
             actionSets.put(descriptor, rec);
         }
-
+        
         return rec;
     }
-
+    
     public void showAction(IActionSetDescriptor descriptor) {
         ActionSetRec rec = getRec(descriptor);
-
+        
         boolean wasVisible = rec.isVisible();
         rec.showCount++;
         if (!wasVisible && rec.isVisible()) {
@@ -143,10 +141,10 @@ public class ActionSetManager {
             }
         }
     }
-
+    
     public void hideAction(IActionSetDescriptor descriptor) {
         ActionSetRec rec = getRec(descriptor);
-
+        
         boolean wasVisible = rec.isVisible();
         rec.showCount--;
         if (wasVisible && !rec.isVisible()) {
@@ -157,10 +155,10 @@ public class ActionSetManager {
             }
         }
     }
-
+    
     public void maskAction(IActionSetDescriptor descriptor) {
         ActionSetRec rec = getRec(descriptor);
-
+        
         boolean wasVisible = rec.isVisible();
         rec.maskCount++;
         if (wasVisible && !rec.isVisible()) {
@@ -171,10 +169,10 @@ public class ActionSetManager {
             }
         }
     }
-
+    
     public void unmaskAction(IActionSetDescriptor descriptor) {
         ActionSetRec rec = getRec(descriptor);
-
+        
         boolean wasVisible = rec.isVisible();
         rec.maskCount--;
         if (!wasVisible && rec.isVisible()) {
@@ -185,11 +183,11 @@ public class ActionSetManager {
             }
         }
     }
-
+    
     public Collection getVisibleItems() {
         return visibleItems;
     }
-
+    
     public void change(IActionSetDescriptor descriptor, int changeType) {
         switch(changeType) {
         case CHANGE_SHOW:

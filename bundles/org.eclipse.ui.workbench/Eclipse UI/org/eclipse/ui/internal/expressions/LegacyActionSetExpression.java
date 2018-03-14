@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,7 @@ import org.eclipse.ui.IWorkbenchWindow;
  * This class is not intended for use outside of the
  * <code>org.eclipse.ui.workbench</code> plug-in.
  * </p>
- *
+ * 
  * @since 3.2
  */
 public final class LegacyActionSetExpression extends WorkbenchWindowExpression {
@@ -47,7 +47,7 @@ public final class LegacyActionSetExpression extends WorkbenchWindowExpression {
 
 	/**
 	 * Constructs a new instance of {@link LegacyActionSetExpression}.
-	 *
+	 * 
 	 * @param actionSetId
 	 *            The identifier of the action set that must be active for this
 	 *            expression to evaluate to <code>true</code>; must not be
@@ -67,7 +67,6 @@ public final class LegacyActionSetExpression extends WorkbenchWindowExpression {
 		this.actionSetId = actionSetId;
 	}
 
-	@Override
 	public final void collectExpressionInfo(final ExpressionInfo info) {
 		super.collectExpressionInfo(info);
 		info.addVariableNameAccess(ISources.ACTIVE_CONTEXT_NAME);
@@ -79,7 +78,6 @@ public final class LegacyActionSetExpression extends WorkbenchWindowExpression {
 		return hashCode;
 	}
 
-	@Override
 	public final boolean equals(final Object object) {
 		if (object instanceof LegacyActionSetExpression) {
 			final LegacyActionSetExpression that = (LegacyActionSetExpression) object;
@@ -90,7 +88,6 @@ public final class LegacyActionSetExpression extends WorkbenchWindowExpression {
 		return false;
 	}
 
-	@Override
 	public final EvaluationResult evaluate(final IEvaluationContext context)
 			throws CoreException {
 		final EvaluationResult result = super.evaluate(context);
@@ -105,7 +102,6 @@ public final class LegacyActionSetExpression extends WorkbenchWindowExpression {
 		return EvaluationResult.FALSE;
 	}
 
-	@Override
 	public final String toString() {
 		final StringBuffer buffer = new StringBuffer();
 		buffer.append("ActionSetExpression("); //$NON-NLS-1$

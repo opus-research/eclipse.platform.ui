@@ -73,7 +73,6 @@ public class ExtendedNodeImpl extends NodeImpl implements ExtendedNode {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String getName() {
 		return name;
 	}
@@ -83,7 +82,6 @@ public class ExtendedNodeImpl extends NodeImpl implements ExtendedNode {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void setName(String newName) {
 		String oldName = name;
 		name = newName;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,9 +12,9 @@ package org.eclipse.jface.fieldassist;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.eclipse.jface.resource.JFaceColors;
 import org.eclipse.swt.SWT;
@@ -36,11 +36,10 @@ import org.eclipse.swt.widgets.Display;
  * cases, clients are provided information, such as RGB values, in order to
  * create their own color resources. In these cases, the client should manage
  * the lifecycle of any created resource.
- *
+ * 
  * @since 3.2
  * @deprecated As of 3.3, this class is no longer necessary.
  */
-@Deprecated
 public class FieldAssistColors {
 
 	private static boolean DEBUG = false;
@@ -49,13 +48,13 @@ public class FieldAssistColors {
 	 * Keys are background colors, values are the color with the alpha value
 	 * applied
 	 */
-	private static Map<Color, Color> requiredFieldColorMap = new HashMap<>();
+	private static Map requiredFieldColorMap = new HashMap();
 
 	/*
 	 * Keys are colors we have created, values are the displays on which they
 	 * were created.
 	 */
-	private static Map<Color, Display> displays = new HashMap<>();
+	private static Map displays = new HashMap();
 
 	/**
 	 * Compute the RGB of the color that should be used for the background of a
@@ -68,7 +67,7 @@ public class FieldAssistColors {
 	 * This color is computed dynamically each time that it is queried. Clients
 	 * should typically call this method once, create a color from the RGB
 	 * provided, and dispose of the color when finished using it.
-	 *
+	 * 
 	 * @param control
 	 *            the control for which the background color should be computed.
 	 * @return the RGB value indicating a background color appropriate for
@@ -101,7 +100,7 @@ public class FieldAssistColors {
 	 * <p>
 	 * This color is managed by FieldAssistResources and should never be
 	 * disposed by clients.
-	 *
+	 * 
 	 * @param control
 	 *            the control on which the background color will be used.
 	 * @return the color used to indicate that a field is required.
@@ -142,7 +141,11 @@ public class FieldAssistColors {
 		// If we have never created a color on this display before, install
 		// a dispose exec on the display.
 		if (!displays.containsValue(display)) {
-			display.disposeExec(() -> disposeColors(display));
+			display.disposeExec(new Runnable() {
+				public void run() {
+					disposeColors(display);
+				}
+			});
 		}
 		// Record the color and its display in a map for later disposal.
 		displays.put(color, display);
@@ -153,7 +156,7 @@ public class FieldAssistColors {
 	 * Dispose any colors that were allocated for the given display.
 	 */
 	private static void disposeColors(Display display) {
-		List<Color> toBeRemoved = new ArrayList<>(1);
+		List toBeRemoved = new ArrayList(1);
 
 		if (DEBUG) {
 			System.out.println("Display map is " + displays.toString()); //$NON-NLS-1$
@@ -162,33 +165,36 @@ public class FieldAssistColors {
 		}
 
 		// Look for any stored colors that were created on this display
-		for (Entry<Color, Display> entry : displays.entrySet()) {
-			Color color = entry.getKey();
-			;
-			if (displays.get(color).equals(display)) {
+		for (Iterator i = displays.keySet().iterator(); i.hasNext();) {
+			Color color = (Color) i.next();
+			if (((Display) displays.get(color)).equals(display)) {
 				// The color is on this display. Mark it for removal.
 				toBeRemoved.add(color);
 
 				// Now look for any references to it in the required field color
 				// map
-				List<Color> toBeRemovedFromRequiredMap = new ArrayList<>(1);
-				for (Entry<Color, Color> colorMapEntry : requiredFieldColorMap.entrySet()) {
-					Color bgColor = colorMapEntry.getKey();
-					if (colorMapEntry.getValue().equals(color)) {
+				List toBeRemovedFromRequiredMap = new ArrayList(1);
+				for (Iterator iter = requiredFieldColorMap.keySet().iterator(); iter
+						.hasNext();) {
+					Color bgColor = (Color) iter.next();
+					if (((Color) requiredFieldColorMap.get(bgColor))
+							.equals(color)) {
 						// mark it for removal from the required field color map
 						toBeRemovedFromRequiredMap.add(bgColor);
 					}
 				}
 				// Remove references in the required field map now that
 				// we are done iterating.
-				for (Color toRemove : toBeRemovedFromRequiredMap) {
-					requiredFieldColorMap.remove(toRemove);
+				for (int j = 0; j < toBeRemovedFromRequiredMap.size(); j++) {
+					requiredFieldColorMap.remove(toBeRemovedFromRequiredMap
+							.get(j));
 				}
 			}
 		}
 		// Remove references in the display map now that we are
 		// done iterating
-		for (Color color : toBeRemoved) {
+		for (int i = 0; i < toBeRemoved.size(); i++) {
+			Color color = (Color) toBeRemoved.get(i);
 			// Removing from the display map must be done before disposing the
 			// color or else the comparison between this color and the one
 			// in the map will fail.

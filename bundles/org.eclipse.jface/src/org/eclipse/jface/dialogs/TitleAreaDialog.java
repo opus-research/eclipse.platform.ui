@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,6 +21,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.ACC;
 import org.eclipse.swt.accessibility.AccessibleAttributeAdapter;
 import org.eclipse.swt.accessibility.AccessibleAttributeEvent;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -36,6 +38,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
@@ -59,20 +62,18 @@ public class TitleAreaDialog extends TrayDialog {
 
 	/**
 	 * Message type constant used to display an info icon with the message.
-	 *
+	 * 
 	 * @since 2.0
 	 * @deprecated
 	 */
-	@Deprecated
 	public final static String INFO_MESSAGE = "INFO_MESSAGE"; //$NON-NLS-1$
 
 	/**
 	 * Message type constant used to display a warning icon with the message.
-	 *
+	 * 
 	 * @since 2.0
 	 * @deprecated
 	 */
-	@Deprecated
 	public final static String WARNING_MESSAGE = "WARNING_MESSAGE"; //$NON-NLS-1$
 
 	// Space between an image and a label
@@ -122,7 +123,7 @@ public class TitleAreaDialog extends TrayDialog {
 
 	/**
 	 * Instantiate a new title area dialog.
-	 *
+	 * 
 	 * @param parentShell
 	 *            the parent SWT shell
 	 */
@@ -133,7 +134,6 @@ public class TitleAreaDialog extends TrayDialog {
 	/*
 	 * @see Dialog.createContents(Composite)
 	 */
-	@Override
 	protected Control createContents(Composite parent) {
 		// create the overall composite
 		Composite contents = new Composite(parent, SWT.NONE);
@@ -157,14 +157,18 @@ public class TitleAreaDialog extends TrayDialog {
 		// create the dialog area and button bar
 		dialogArea = createDialogArea(workArea);
 		buttonBar = createButtonBar(workArea);
-
+		
 		// computing trim for later
 		Rectangle rect = messageLabel.computeTrim(0, 0, 100, 100);
 		xTrim = rect.width - 100;
 		yTrim = rect.height - 100;
-
+		
 		// need to react to new size of title area
-		getShell().addListener(SWT.Resize, event -> layoutForNewMessage(true));
+		getShell().addListener(SWT.Resize, new Listener() {
+			public void handleEvent(Event event) {
+				layoutForNewMessage(true);
+			}
+		});
 		return contents;
 	}
 
@@ -176,12 +180,11 @@ public class TitleAreaDialog extends TrayDialog {
 	 * and returns a new <code>Composite</code> with no margins and spacing.
 	 * Subclasses should override.
 	 * </p>
-	 *
+	 * 
 	 * @param parent
 	 *            The parent composite to contain the dialog area
 	 * @return the dialog area control
 	 */
-	@Override
 	protected Control createDialogArea(Composite parent) {
 		// create the top level composite for the dialog area
 		Composite composite = new Composite(parent, SWT.NONE);
@@ -202,7 +205,7 @@ public class TitleAreaDialog extends TrayDialog {
 
 	/**
 	 * Creates the dialog's title area.
-	 *
+	 * 
 	 * @param parent
 	 *            the SWT parent for the title area widgets
 	 * @return Control with the highest x axis value.
@@ -210,9 +213,11 @@ public class TitleAreaDialog extends TrayDialog {
 	private Control createTitleArea(Composite parent) {
 
 		// add a dispose listener
-		parent.addDisposeListener(e -> {
-			if (titleAreaColor != null) {
-				titleAreaColor.dispose();
+		parent.addDisposeListener(new DisposeListener() {
+			public void widgetDisposed(DisposeEvent e) {
+				if (titleAreaColor != null) {
+					titleAreaColor.dispose();
+				}
 			}
 		});
 		// Determine the background color of the title bar
@@ -270,7 +275,6 @@ public class TitleAreaDialog extends TrayDialog {
 		// Bug 248410 -  This snippet will only work with Windows screen readers.
 		messageLabel.getAccessible().addAccessibleAttributeListener(
 				new AccessibleAttributeAdapter() {
-					@Override
 					public void getAttributes(AccessibleAttributeEvent e) {
 						e.attributes = new String[] { "container-live", //$NON-NLS-1$
 								"polite", "live", "polite",   //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
@@ -307,7 +311,7 @@ public class TitleAreaDialog extends TrayDialog {
 	/**
 	 * Set the layout values for the messageLabel, messageImageLabel and
 	 * fillerLabel for the case where there is a normal message.
-	 *
+	 * 
 	 * @param verticalSpacing
 	 *            int The spacing between widgets on the vertical axis.
 	 * @param horizontalSpacing
@@ -346,10 +350,9 @@ public class TitleAreaDialog extends TrayDialog {
 	 * The <code>TitleAreaDialog</code> implementation of this
 	 * <code>Window</code> methods returns an initial size which is at least
 	 * some reasonable minimum.
-	 *
+	 * 
 	 * @return the initial size of the dialog
 	 */
-	@Override
 	protected Point getInitialSize() {
 		Point shellSize = super.getInitialSize();
 		return new Point(Math.max(
@@ -360,21 +363,20 @@ public class TitleAreaDialog extends TrayDialog {
 
 	/**
 	 * Retained for backward compatibility.
-	 *
+	 * 
 	 * Returns the title area composite. There is no composite in this
 	 * implementation so the shell is returned.
-	 *
+	 * 
 	 * @return Composite
 	 * @deprecated
 	 */
-	@Deprecated
 	protected Composite getTitleArea() {
 		return getShell();
 	}
 
 	/**
 	 * Returns the title image label.
-	 *
+	 * 
 	 * @return the title image label
 	 */
 	protected Label getTitleImageLabel() {
@@ -385,7 +387,7 @@ public class TitleAreaDialog extends TrayDialog {
 	 * Display the given error message. The currently displayed message is saved
 	 * and will be redisplayed when the error message is set to
 	 * <code>null</code>.
-	 *
+	 * 
 	 * @param newErrorMessage
 	 *            the newErrorMessage to display or <code>null</code>
 	 */
@@ -430,7 +432,7 @@ public class TitleAreaDialog extends TrayDialog {
 
 	/**
 	 * Re-layout the labels for the new message.
-	 *
+	 * 
 	 * @param forceLayout
 	 *            <code>true</code> to force a layout of the shell
 	 */
@@ -487,7 +489,7 @@ public class TitleAreaDialog extends TrayDialog {
 			if (dialogArea != null)
 				workArea.getParent().layout(true);
 		}
-
+		
 		int messageLabelUnclippedHeight = messageLabel.computeSize(messageLabel.getSize().x - xTrim, SWT.DEFAULT, true).y;
 		boolean messageLabelClipped = messageLabelUnclippedHeight > messageLabel.getSize().y - yTrim;
 		if (messageLabel.getData() instanceof ToolTip) {
@@ -498,8 +500,7 @@ public class TitleAreaDialog extends TrayDialog {
 		}
 		if (messageLabelClipped) {
 			ToolTip tooltip = new ToolTip(messageLabel, ToolTip.NO_RECREATE, false) {
-
-				@Override
+				
 				protected Composite createToolTipContentArea(Event event, Composite parent) {
 					Composite result = new Composite(parent, SWT.NONE);
 					result.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
@@ -514,7 +515,6 @@ public class TitleAreaDialog extends TrayDialog {
 					Dialog.applyDialogFont(result);
 					return result;
 				}
-				@Override
 				public Point getLocation(Point tipSize, Event event) {
 					return messageLabel.getShell().toDisplay(messageLabel.getLocation());
 				}
@@ -534,7 +534,7 @@ public class TitleAreaDialog extends TrayDialog {
 	 * </p>
 	 * This method should be called after the dialog has been opened as it
 	 * updates the message label immediately.
-	 *
+	 * 
 	 * @param newMessage
 	 *            the message, or <code>null</code> to clear the message
 	 */
@@ -557,7 +557,7 @@ public class TitleAreaDialog extends TrayDialog {
 	 * message until the error message is cleared. This method replaces the
 	 * current message and does not affect the error message.
 	 * </p>
-	 *
+	 * 
 	 * @param newMessage
 	 *            the message, or <code>null</code> to clear the message
 	 * @param newType
@@ -586,7 +586,7 @@ public class TitleAreaDialog extends TrayDialog {
 
 	/**
 	 * Show the new message and image.
-	 *
+	 * 
 	 * @param newMessage
 	 * @param newImage
 	 */
@@ -594,16 +594,16 @@ public class TitleAreaDialog extends TrayDialog {
 		// https://bugs.eclipse.org/bugs/show_bug.cgi?id=249915
 		if (newMessage == null)
 			newMessage = ""; //$NON-NLS-1$
-
+		
 		// Any change?
 		if (message.equals(newMessage) && messageImage == newImage) {
 			return;
 		}
 		message = newMessage;
-
+		
 		// Message string to be shown - if there is an image then add in
 		// a space to the message for layout purposes
-		String shownMessage = (newImage == null) ? message : " " + message; //$NON-NLS-1$
+		String shownMessage = (newImage == null) ? message : " " + message; //$NON-NLS-1$  
 		messageImage = newImage;
 		if (!showingError) {
 			// we are not showing an error
@@ -616,7 +616,7 @@ public class TitleAreaDialog extends TrayDialog {
 
 	/**
 	 * Update the contents of the messageLabel.
-	 *
+	 * 
 	 * @param newMessage
 	 *            the message to use
 	 */
@@ -628,17 +628,17 @@ public class TitleAreaDialog extends TrayDialog {
 				null);
 		messageLabel.getAccessible().sendEvent(
 				ACC.EVENT_TEXT_CHANGED,
-				new Object[] { Integer.valueOf(ACC.TEXT_DELETE), Integer.valueOf(0),
-						Integer.valueOf(oldMessage.length()), oldMessage });
+				new Object[] { new Integer(ACC.TEXT_DELETE), new Integer(0),
+						new Integer(oldMessage.length()), oldMessage });
 		messageLabel.getAccessible().sendEvent(
 				ACC.EVENT_TEXT_CHANGED,
-				new Object[] { Integer.valueOf(ACC.TEXT_INSERT), Integer.valueOf(0),
-						Integer.valueOf(newMessage.length()), newMessage });
+				new Object[] { new Integer(ACC.TEXT_INSERT), new Integer(0),
+						new Integer(newMessage.length()), newMessage });
 	}
 
 	/**
 	 * Sets the title to be shown in the title area of this dialog.
-	 *
+	 * 
 	 * @param newTitle
 	 *            the title show
 	 */
@@ -653,7 +653,7 @@ public class TitleAreaDialog extends TrayDialog {
 
 	/**
 	 * Sets the title bar color for this dialog.
-	 *
+	 * 
 	 * @param color
 	 *            the title bar color
 	 */
@@ -663,7 +663,7 @@ public class TitleAreaDialog extends TrayDialog {
 
 	/**
 	 * Sets the title image to be shown in the title area of this dialog.
-	 *
+	 * 
 	 * @param newTitleImage
 	 *            the title image to be shown
 	 */
@@ -685,7 +685,7 @@ public class TitleAreaDialog extends TrayDialog {
 	/**
 	 * Make the label used for displaying error images visible depending on
 	 * boolean.
-	 *
+	 * 
 	 * @param visible
 	 *            If <code>true</code> make the image visible, if not then
 	 *            make it not visible.
@@ -699,7 +699,7 @@ public class TitleAreaDialog extends TrayDialog {
 	/**
 	 * Reset the attachment of the workArea to now attach to top as the top
 	 * control.
-	 *
+	 * 
 	 * @param top
 	 */
 	private void resetWorkAreaAttachments(Control top) {
@@ -710,39 +710,39 @@ public class TitleAreaDialog extends TrayDialog {
 		childData.bottom = new FormAttachment(100, 0);
 		workArea.setLayoutData(childData);
 	}
-
+	
 	/**
-	 * Returns the current message text for this dialog.  This message is
+	 * Returns the current message text for this dialog.  This message is 
 	 * displayed in the message line of the dialog when the error message
 	 * is <code>null</code>.  If there is a non-null error message, this
 	 * message is not shown, but is stored so that it can be shown in
 	 * the message line whenever {@link #setErrorMessage(String)} is called with
 	 * a <code>null</code> parameter.
-	 *
-	 * @return the message text, which is never <code>null</code>.
-	 *
+	 * 
+	 * @return the message text, which is never <code>null</code>. 
+	 * 
 	 * @see #setMessage(String)
 	 * @see #setErrorMessage(String)
-	 *
+	 * 
 	 * @since 3.6
 	 */
-
+	
     public String getMessage() {
     	return message;
     }
-
+    
 	/**
-	 * Returns the current error message being shown in the dialog, or
+	 * Returns the current error message being shown in the dialog, or 
 	 * <code>null</code> if there is no error message being shown.
-	 *
-	 * @return the error message, which may be <code>null</code>.
-	 *
+	 * 
+	 * @return the error message, which may be <code>null</code>. 
+	 * 
 	 * @see #setErrorMessage(String)
 	 * @see #setMessage(String)
-	 *
+	 * 
 	 * @since 3.6
 	 */
-
+	
     public String getErrorMessage() {
     	return errorMessage;
     }

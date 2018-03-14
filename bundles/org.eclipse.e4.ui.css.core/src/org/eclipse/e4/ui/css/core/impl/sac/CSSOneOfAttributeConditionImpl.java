@@ -1,6 +1,6 @@
 /*
 
-   Copyright 2002, 2015  The Apache Software Foundation
+   Copyright 2002  The Apache Software Foundation 
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -16,15 +16,10 @@
 
  */
 
-/*******************************************************************************
- * Contributors:
- *     This class was copied from org.apache.batik.css.engine.sac
- *     Apache Batik project - initial API and implementation
- *     Alain Le Guennec <Alain.LeGuennec@esterel-technologies.com> - Bug 458334
- *******************************************************************************/
+/* This class copied from org.apache.batik.css.engine.sac */
+
 package org.eclipse.e4.ui.css.core.impl.sac;
 
-import java.util.StringTokenizer;
 import org.w3c.dom.Element;
 
 /**
@@ -44,7 +39,6 @@ public class CSSOneOfAttributeConditionImpl extends CSSAttributeConditionImpl {
 	 * <b>SAC</b>: Implements {@link
 	 * org.w3c.css.sac.Condition#getConditionType()}.
 	 */
-	@Override
 	public short getConditionType() {
 		return SAC_ONE_OF_ATTRIBUTE_CONDITION;
 	}
@@ -52,23 +46,24 @@ public class CSSOneOfAttributeConditionImpl extends CSSAttributeConditionImpl {
 	/**
 	 * Tests whether this condition matches the given element.
 	 */
-	@Override
 	public boolean match(Element e, String pseudoE) {
 		String attr = e.getAttribute(getLocalName());
 		String val = getValue();
-		for (StringTokenizer tok = new StringTokenizer(attr); tok.hasMoreElements();) {
-			String candidate = tok.nextToken();
-			if (val.equals(candidate)) {
-				return true;
-			}
+		int i = attr.indexOf(val);
+		if (i == -1) {
+			return false;
 		}
-		return false;
+		if (i != 0 && !Character.isSpaceChar(attr.charAt(i - 1))) {
+			return false;
+		}
+		int j = i + val.length();
+		return (j == attr.length() || (j < attr.length() && Character
+				.isSpaceChar(attr.charAt(j))));
 	}
 
 	/**
 	 * Returns a text representation of this object.
 	 */
-	@Override
 	public String toString() {
 		return "[" + getLocalName() + "~=\"" + getValue() + "\"]";
 	}

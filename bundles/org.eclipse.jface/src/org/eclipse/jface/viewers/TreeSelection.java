@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430873
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -22,18 +21,18 @@ import org.eclipse.core.runtime.Assert;
  * <p>
  * This class is not intended to be subclassed.
  * </p>
- *
+ * 
  * @since 3.2
  */
 public class TreeSelection extends StructuredSelection implements ITreeSelection {
 
 	/* Implementation note.  This class extends StructuredSelection because many pre-existing
-	 * JFace viewer clients assumed that the only implementation of IStructuredSelection
+	 * JFace viewer clients assumed that the only implementation of IStructuredSelection 
 	 * was StructuredSelection.  By extending StructuredSelection rather than implementing
 	 * ITreeSelection directly, we avoid this problem.
-	 * For more details, see Bug 121939 [Viewers] TreeSelection should subclass StructuredSelection.
+	 * For more details, see Bug 121939 [Viewers] TreeSelection should subclass StructuredSelection. 
 	 */
-
+	
 	private TreePath[] paths = null;
 	private CustomHashtable element2TreePaths = null;
 
@@ -42,14 +41,14 @@ public class TreeSelection extends StructuredSelection implements ITreeSelection
 	 * <code>null</code>.
 	 */
 	public static final TreeSelection EMPTY = new TreeSelection();
-
+	
 	private static final TreePath[] EMPTY_TREE_PATHS= new TreePath[0];
-
+	
 	private static class InitializeData {
 		List selection;
 		TreePath[] paths;
 		CustomHashtable element2TreePaths;
-
+		
 		private InitializeData(TreePath[] paths, IElementComparer comparer) {
 			this.paths= new TreePath[paths.length];
 			System.arraycopy(paths, 0, this.paths, 0, paths.length);
@@ -77,7 +76,7 @@ public class TreeSelection extends StructuredSelection implements ITreeSelection
 	/**
 	 * Constructs a selection based on the elements identified by the given tree
 	 * paths.
-	 *
+	 * 
 	 * @param paths
 	 *            tree paths
 	 */
@@ -88,10 +87,10 @@ public class TreeSelection extends StructuredSelection implements ITreeSelection
 	/**
 	 * Constructs a selection based on the elements identified by the given tree
 	 * paths.
-	 *
+	 * 
 	 * @param paths
 	 *            tree paths
-	 * @param comparer
+	 * @param comparer 
 	 *            the comparer, or <code>null</code> if default equals is to be used
 	 */
 	public TreeSelection(TreePath[] paths, IElementComparer comparer) {
@@ -101,7 +100,7 @@ public class TreeSelection extends StructuredSelection implements ITreeSelection
 	/**
 	 * Constructs a selection based on the elements identified by the given tree
 	 * path.
-	 *
+	 * 
 	 * @param treePath
 	 *            tree path, or <code>null</code> for an empty selection
 	 */
@@ -112,19 +111,19 @@ public class TreeSelection extends StructuredSelection implements ITreeSelection
 	/**
 	 * Constructs a selection based on the elements identified by the given tree
 	 * path.
-	 *
+	 * 
 	 * @param treePath
 	 *            tree path, or <code>null</code> for an empty selection
-	 * @param comparer
+	 * @param comparer 
 	 *            the comparer, or <code>null</code> if default equals is to be used
 	 */
 	public TreeSelection(TreePath treePath, IElementComparer comparer) {
 		this(treePath != null ? new TreePath[] { treePath } : EMPTY_TREE_PATHS, comparer);
 	}
-
+	
 	/**
 	 * Creates a new tree selection based on the initialization data.
-	 *
+	 * 
 	 * @param data the data
 	 */
 	private TreeSelection(InitializeData data) {
@@ -136,20 +135,20 @@ public class TreeSelection extends StructuredSelection implements ITreeSelection
 	/**
 	 * Creates a new empty selection. See also the static field
 	 * <code>EMPTY</code> which contains an empty selection singleton.
-	 *
+	 * 
 	 * @see #EMPTY
 	 */
 	public TreeSelection() {
 		super();
 	}
-
+	
 	/**
 	 * Returns the element comparer passed in when the tree selection
 	 * has been created or <code>null</code> if no comparer has been
 	 * provided.
-	 *
+	 * 
 	 * @return the element comparer or <code>null</code>
-	 *
+	 * 
 	 * @since 3.2
 	 */
 	public IElementComparer getElementComparer() {
@@ -157,8 +156,7 @@ public class TreeSelection extends StructuredSelection implements ITreeSelection
 			return null;
 		return element2TreePaths.getComparer();
 	}
-
-	@Override
+	
 	public boolean equals(Object obj) {
 		if (!(obj instanceof TreeSelection)) {
 			// Fall back to super implementation, see bug 135837.
@@ -181,23 +179,20 @@ public class TreeSelection extends StructuredSelection implements ITreeSelection
 		return false;
 	}
 
-	@Override
 	public int hashCode() {
 		int code = getClass().hashCode();
 		if (paths != null) {
-			for (TreePath path : paths) {
-				code = code * 17 + path.hashCode(getElementComparer());
+			for (int i = 0; i < paths.length; i++) {
+				code = code * 17 + paths[i].hashCode(getElementComparer());
 			}
 		}
 		return code;
 	}
 
-	@Override
 	public TreePath[] getPaths() {
 		return paths==null ? EMPTY_TREE_PATHS : (TreePath[]) paths.clone();
 	}
-
-	@Override
+	
 	public TreePath[] getPathsFor(Object element) {
 		Object value= element2TreePaths==null ? null : element2TreePaths.get(element);
 		if (value == null) {

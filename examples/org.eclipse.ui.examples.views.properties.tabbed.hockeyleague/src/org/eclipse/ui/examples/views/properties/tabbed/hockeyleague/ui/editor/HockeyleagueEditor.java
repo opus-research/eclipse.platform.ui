@@ -1323,8 +1323,7 @@ public class HockeyleagueEditor
 	 * @generated NOT
 	 */
 	public TabbedPropertySheetPage getPropertySheetPage() {
-        if (propertySheetPage == null || propertySheetPage.getControl() == null
-                || propertySheetPage.getControl().isDisposed()) {
+		if (propertySheetPage == null || propertySheetPage.getControl() == null) {
 			propertySheetPage = new HockeyleaguePropertySheetPage(this);
 		}
 
@@ -1500,11 +1499,7 @@ public class HockeyleagueEditor
 			getActionBars().getStatusLineManager() != null ?
 				getActionBars().getStatusLineManager().getProgressMonitor() :
 				new NullProgressMonitor();
-		try {
-			doSave(progressMonitor);
-		} finally {
-			progressMonitor.done();
-		}
+		doSave(progressMonitor);
 	}
 
 	/**

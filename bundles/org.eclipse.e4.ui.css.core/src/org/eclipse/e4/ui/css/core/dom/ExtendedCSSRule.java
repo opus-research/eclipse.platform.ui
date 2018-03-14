@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 Angelo Zerr and others.
+ * Copyright (c) 2008 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,14 +21,14 @@ public interface ExtendedCSSRule extends CSSRule {
 
 	/**
 	 * Return the list of {@link CSSProperty} of this {@link CSSRule}.
-	 *
+	 * 
 	 * @return
 	 */
 	public CSSPropertyList getCSSPropertyList();
 
 	/**
 	 * Return the list of {@link Selector} of this {@link CSSRule}.
-	 *
+	 * 
 	 * @return
 	 */
 	public SelectorList getSelectorList();

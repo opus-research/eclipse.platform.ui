@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Matthew Hall and others.
+ * Copyright (c) 2009, 2010 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,12 +31,10 @@ class SelectionChangedListener extends NativePropertyListener implements
 		this.isPostSelection = isPostSelection;
 	}
 
-	@Override
 	public void selectionChanged(SelectionChangedEvent event) {
 		fireChange(event.getSource(), null);
 	}
 
-	@Override
 	public void doAddTo(Object source) {
 		if (isPostSelection) {
 			((IPostSelectionProvider) source)
@@ -46,7 +44,6 @@ class SelectionChangedListener extends NativePropertyListener implements
 		}
 	}
 
-	@Override
 	public void doRemoveFrom(Object source) {
 		if (isPostSelection) {
 			((IPostSelectionProvider) source)

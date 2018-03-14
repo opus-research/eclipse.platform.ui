@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Semion Chichelnitsky (semion@il.ibm.com) - bug 208564
+ *     Semion Chichelnitsky (semion@il.ibm.com) - bug 208564     
  *******************************************************************************/
 
 package org.eclipse.ui.internal.registry;
@@ -29,7 +29,7 @@ import org.eclipse.ui.internal.preferences.PreferenceTransferElement;
 /**
  * Preference Transfer registry reader to read extenders of the
  * preferenceTransfer schema.
- *
+ * 
  * @since 3.1
  */
 public class PreferenceTransferRegistryReader extends RegistryReader {
@@ -39,7 +39,7 @@ public class PreferenceTransferRegistryReader extends RegistryReader {
 
 	/**
 	 * Create an instance of this class.
-	 *
+	 * 
 	 * @param pluginPointId
 	 *            java.lang.String
 	 */
@@ -50,7 +50,7 @@ public class PreferenceTransferRegistryReader extends RegistryReader {
 	/**
 	 * Returns a new PreferenceTransferElement configured according to the
 	 * parameters contained in the passed element.
-	 *
+	 * 
 	 * @param element
 	 *            the configuration element
 	 * @return the preference transfer element or <code>null</code> if there was
@@ -75,7 +75,7 @@ public class PreferenceTransferRegistryReader extends RegistryReader {
 
 	/**
 	 * Returns a sorted list of preference transfers.
-	 *
+	 * 
 	 * @return an array of <code>IPreferenceTransfer</code> objects
 	 */
 	public PreferenceTransferElement[] getPreferenceTransfers() {
@@ -83,7 +83,6 @@ public class PreferenceTransferRegistryReader extends RegistryReader {
 		PreferenceTransferElement[] transfers = new PreferenceTransferElement[preferenceTransfers
 				.size()];
 		Collections.sort(preferenceTransfers, new Comparator() {
-			@Override
 			public int compare(Object o1, Object o2) {
 				String name1 = ((PreferenceTransferElement) o1).getName();
 				String name2 = ((PreferenceTransferElement) o2).getName();
@@ -95,7 +94,11 @@ public class PreferenceTransferRegistryReader extends RegistryReader {
 		return transfers;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.registry.RegistryReader#readElement(org.eclipse.core.runtime.IConfigurationElement)
+	 */
 	protected boolean readElement(IConfigurationElement element) {
 		if (element.getName().equals(IWorkbenchRegistryConstants.TAG_TRANSFER)) {
 
@@ -122,7 +125,7 @@ public class PreferenceTransferRegistryReader extends RegistryReader {
 
 	/**
 	 * Get the preference mappings.
-	 *
+	 * 
 	 * @param configElement
 	 * @return the child configuration elements
 	 */

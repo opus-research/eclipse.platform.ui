@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  ******************************************************************************/
 
 package org.eclipse.ui.internal.statushandlers;
@@ -92,7 +91,14 @@ public class DefaultDetailsArea extends AbstractStatusAreaProvider {
 				.intValue();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.statushandlers.AbstractStatusAreaProvider#createSupportArea
+	 * (org.eclipse.swt.widgets.Composite,
+	 * org.eclipse.ui.statushandlers.StatusAdapter)
+	 */
 	public Control createSupportArea(Composite parent,
 			StatusAdapter statusAdapter) {
 		Composite area = createArea(parent);
@@ -115,7 +121,7 @@ public class DefaultDetailsArea extends AbstractStatusAreaProvider {
 		text.setLayoutData(gd);
 		// There is no support for triggering commands in the dialogs. I am
 		// trying to emulate the workbench behavior as exactly as possible.
-		IBindingService binding = PlatformUI.getWorkbench()
+		IBindingService binding = (IBindingService) PlatformUI.getWorkbench()
 				.getService(IBindingService.class);
 		// find bindings for copy action
 		final TriggerSequence ts[] = binding
@@ -124,7 +130,6 @@ public class DefaultDetailsArea extends AbstractStatusAreaProvider {
 
 			ArrayList keyList = new ArrayList();
 
-			@Override
 			public void keyPressed(KeyEvent e) {
 				// get the character. reverse the ctrl modifier if necessary
 				char character = e.character;
@@ -164,14 +169,12 @@ public class DefaultDetailsArea extends AbstractStatusAreaProvider {
 				}
 			}
 
-			@Override
 			public void keyReleased(KeyEvent e) {
 				// no op
 			}
 		});
 		text.addSelectionListener(new SelectionListener() {
 
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (text.getSelectionText().length() == 0) {
 					if (copyAction != null && !copyAction.isDisposed()) {
@@ -184,7 +187,6 @@ public class DefaultDetailsArea extends AbstractStatusAreaProvider {
 				}
 			}
 
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				widgetSelected(e);
 			}
@@ -248,18 +250,15 @@ public class DefaultDetailsArea extends AbstractStatusAreaProvider {
 		DragSource ds = new DragSource(text, DND.DROP_COPY);
 		ds.setTransfer(new Transfer[] { TextTransfer.getInstance() });
 		ds.addDragListener(new DragSourceListener() {
-			@Override
 			public void dragFinished(DragSourceEvent event) {
 			}
 
-			@Override
 			public void dragSetData(DragSourceEvent event) {
 				if (TextTransfer.getInstance().isSupportedType(event.dataType)) {
 					event.data = text.getSelectionText();
 				}
 			}
 
-			@Override
 			public void dragStart(DragSourceEvent event) {
 			}
 		});
@@ -271,7 +270,13 @@ public class DefaultDetailsArea extends AbstractStatusAreaProvider {
 		copyAction.setText(JFaceResources.getString("copy")); //$NON-NLS-1$
 		copyAction.addSelectionListener(new SelectionAdapter() {
 
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see
+			 * org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse
+			 * .swt.events.SelectionEvent)
+			 */
 			public void widgetSelected(SelectionEvent e) {
 				copyToClipboard();
 				super.widgetSelected(e);
@@ -341,7 +346,7 @@ public class DefaultDetailsArea extends AbstractStatusAreaProvider {
 
 	/**
 	 * This method checks if status dialog holds more than one status.
-	 *
+	 * 
 	 * @return true if the dialog has one more than one status.
 	 */
 	private boolean isMulti() {

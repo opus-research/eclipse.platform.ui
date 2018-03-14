@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 Angelo Zerr and others.
+ * Copyright (c) 2008 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,7 @@ public interface ICSSPropertyHandlerProvider {
 	/**
 	 * Return list of {@link ICSSPropertyHandler} linked to the CSS Property
 	 * <code>property</code>.
-	 *
+	 * 
 	 * @param property
 	 * @return
 	 * @throws Exception
@@ -38,7 +38,7 @@ public interface ICSSPropertyHandlerProvider {
 	/**
 	 * Return the default CSS style declaration of the <code>element</code>
 	 * before apply the <code>newStyle</code> {@link CSSStyleDeclaration}.
-	 *
+	 * 
 	 * @param engine
 	 * @param element
 	 * @param newStyle
@@ -53,7 +53,7 @@ public interface ICSSPropertyHandlerProvider {
 	/**
 	 * Return list of {@link ICSSPropertyHandler} linked to the CSS Property
 	 * <code>property</code> for the provided element.
-	 *
+	 * 
 	 * @param element
 	 *            the DOM element
 	 * @param property
@@ -65,7 +65,7 @@ public interface ICSSPropertyHandlerProvider {
 
 	/**
 	 * Return the list of applicable properties for <code>element</code>
-	 *
+	 * 
 	 * @param element
 	 *            the DOM element
 	 */

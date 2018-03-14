@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 IBM Corporation and others.
+ * Copyright (c) 2010, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
- *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 488978
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -20,7 +18,6 @@ import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.e4.core.commands.EHandlerService;
-import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -29,7 +26,6 @@ import org.eclipse.e4.core.services.contributions.IContributionFactory;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
-import org.eclipse.e4.ui.internal.workbench.swt.MenuService;
 import org.eclipse.e4.ui.internal.workbench.swt.Policy;
 import org.eclipse.e4.ui.internal.workbench.swt.WorkbenchSWTActivator;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
@@ -40,6 +36,9 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MPopupMenu;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.e4.ui.workbench.modeling.ExpressionContext;
+import org.eclipse.e4.ui.workbench.swt.factories.IRendererFactory;
+import org.eclipse.e4.ui.workbench.swt.modeling.MenuService;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Event;
@@ -66,14 +65,16 @@ public class MenuManagerRendererFilter implements Listener {
 	private EModelService modelService;
 
 	@Inject
+	private IRendererFactory rendererFactory;
+
+	@Inject
 	private MenuManagerRenderer renderer;
 
-	private HashMap<Menu, Runnable> pendingCleanup = new HashMap<>();
+	private HashMap<Menu, Runnable> pendingCleanup = new HashMap<Menu, Runnable>();
 
 	private class SafeWrapper implements ISafeRunnable {
 		Event event;
 
-		@Override
 		public void handleException(Throwable e) {
 			if (e instanceof Error) {
 				// errors are deadly, we shouldn't ignore these
@@ -85,7 +86,6 @@ public class MenuManagerRendererFilter implements Listener {
 			}
 		}
 
-		@Override
 		public void run() throws Exception {
 			safeHandleEvent(event);
 		}
@@ -93,7 +93,6 @@ public class MenuManagerRendererFilter implements Listener {
 
 	private SafeWrapper safeWrapper = new SafeWrapper();
 
-	@Override
 	public void handleEvent(final Event event) {
 		// wrap the handling in a SafeRunner so that exceptions do not prevent
 		// the menu from being shown
@@ -120,7 +119,8 @@ public class MenuManagerRendererFilter implements Listener {
 		MenuManager menuManager = null;
 		Object obj = menu.getData(AbstractPartRenderer.OWNING_ME);
 		if (obj == null) {
-			Object tmp = menu.getData(MenuManager.MANAGER_KEY);
+			Object tmp = menu
+					.getData("org.eclipse.jface.action.MenuManager.managerKey"); //$NON-NLS-1$
 			if (tmp instanceof MenuManager) {
 				MenuManager tmpManager = (MenuManager) tmp;
 				menuManager = tmpManager;
@@ -152,7 +152,7 @@ public class MenuManagerRendererFilter implements Listener {
 	public static void collectInfo(ExpressionInfo info, final MMenu menuModel,
 			final MenuManagerRenderer renderer,
 			final IEclipseContext evalContext, boolean recurse) {
-		HashSet<ContributionRecord> records = new HashSet<>();
+		HashSet<ContributionRecord> records = new HashSet<ContributionRecord>();
 		for (MMenuElement element : menuModel.getChildren()) {
 			ContributionRecord record = renderer.getContributionRecord(element);
 			if (record != null) {
@@ -181,7 +181,7 @@ public class MenuManagerRendererFilter implements Listener {
 			final IEclipseContext evalContext, final int recurseLevel,
 			boolean updateEnablement) {
 		final ExpressionContext exprContext = new ExpressionContext(evalContext);
-		HashSet<ContributionRecord> records = new HashSet<>();
+		HashSet<ContributionRecord> records = new HashSet<ContributionRecord>();
 		for (MMenuElement element : menuModel.getChildren()) {
 			ContributionRecord record = renderer.getContributionRecord(element);
 			if (record != null) {
@@ -260,7 +260,8 @@ public class MenuManagerRendererFilter implements Listener {
 		if (cmd == null) {
 			return;
 		}
-		final IEclipseContext lclContext = renderer.getContext(item);
+		final IEclipseContext lclContext = modelService
+				.getContainingContext(item);
 		EHandlerService service = lclContext.get(EHandlerService.class);
 		final IEclipseContext staticContext = EclipseContextFactory
 				.create(MMRF_STATIC_CONTEXT);

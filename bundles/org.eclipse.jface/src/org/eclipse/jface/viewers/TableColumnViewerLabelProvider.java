@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,12 +16,12 @@ package org.eclipse.jface.viewers;
 /**
  * TableColumnViewerLabelProvider is the mapping from the table based providers
  * to the ViewerLabelProvider.
- *
+ * 
  * @since 3.3
  * @see ITableLabelProvider
  * @see ITableColorProvider
  * @see ITableFontProvider
- *
+ * 
  */
 class TableColumnViewerLabelProvider extends WrappedViewerLabelProvider {
 
@@ -33,7 +33,7 @@ class TableColumnViewerLabelProvider extends WrappedViewerLabelProvider {
 
 	/**
 	 * Create a new instance of the receiver.
-	 *
+	 * 
 	 * @param labelProvider
 	 *            instance of a table based label provider
 	 * @see ITableLabelProvider
@@ -53,7 +53,11 @@ class TableColumnViewerLabelProvider extends WrappedViewerLabelProvider {
 			tableFontProvider = (ITableFontProvider) labelProvider;
 	}
 
-	@Override
+
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.WrappedViewerLabelProvider#update(org.eclipse.jface.viewers.ViewerCell)
+	 */
 	public void update(ViewerCell cell) {
 
 		Object element = cell.getElement();

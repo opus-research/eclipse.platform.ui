@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 Angelo Zerr and others.
+ * Copyright (c) 2008 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,14 +16,14 @@ import org.w3c.dom.css.CSSValue;
 
 /**
  * CSS2 Text Property Handler.
- *
+ * 
  * @see http://www.w3schools.com/css/css_reference.asp#text
  */
 public interface ICSSPropertyTextHandler extends ICSSPropertyHandler {
 
 	/**
 	 * Sets the color of a text.
-	 *
+	 * 
 	 * @param element
 	 * @param value
 	 * @param pseudo
@@ -36,7 +36,7 @@ public interface ICSSPropertyTextHandler extends ICSSPropertyHandler {
 	/**
 	 * Controls the letters in an element. Available values are : none
 	 * capitalize uppercase lowercase
-	 *
+	 * 
 	 * @param element
 	 * @param value
 	 * @param pseudo

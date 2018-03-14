@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,9 +18,9 @@ import org.eclipse.ui.navigator.CommonDragAdapterAssistant;
 
 /**
  * A Skeleton implementation of {@link CommonDragAdapterAssistant}.
- *
+ * 
  * @since 3.2
- *
+ * 
  */
 public final class SkeletonCommonDragAssistant extends
 		CommonDragAdapterAssistant {
@@ -35,12 +35,21 @@ public final class SkeletonCommonDragAssistant extends
 	private SkeletonCommonDragAssistant() {
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.navigator.CommonDragAdapterAssistant#getSupportedTransferTypes()
+	 */
 	public Transfer[] getSupportedTransferTypes() {
 		return NO_TRANSFER_TYPES;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.navigator.CommonDragAdapterAssistant#setDragData(org.eclipse.swt.dnd.DragSourceEvent,
+	 *      org.eclipse.jface.viewers.IStructuredSelection)
+	 */
 	public boolean setDragData(DragSourceEvent anEvent,
 			IStructuredSelection aSelection) {
 		return false;

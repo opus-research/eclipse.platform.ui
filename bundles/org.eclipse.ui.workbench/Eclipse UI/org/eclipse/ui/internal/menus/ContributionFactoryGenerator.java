@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2015 IBM Corporation and others.
+ * Copyright (c) 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 
 package org.eclipse.ui.internal.menus;
@@ -21,12 +20,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.model.application.ui.MCoreExpression;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.impl.UiFactoryImpl;
-import org.eclipse.e4.ui.model.application.ui.menu.MMenuItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MToolItem;
+import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuItem;
+import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueToolItem;
+import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.services.ServiceLocator;
@@ -61,18 +60,25 @@ public class ContributionFactoryGenerator extends ContextFunction {
 		return factoryImpl;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.core.contexts.ContextFunction#compute(org.eclipse.e4.core
+	 * .contexts.IEclipseContext)
+	 */
 	@Override
-	public Object compute(IEclipseContext context, String contextKey) {
+	public Object compute(IEclipseContext context) {
 		AbstractContributionFactory factory = getFactory();
 		final IMenuService menuService = context.get(IMenuService.class);
-		final ContributionRoot root = new ContributionRoot(menuService, new HashSet<>(),
+		final ContributionRoot root = new ContributionRoot(menuService, new HashSet<Object>(),
 				null, factory);
 		ServiceLocator sl = new ServiceLocator();
 		sl.setContext(context);
 		factory.createContributionItems(sl, root);
 		final List contributionItems = root.getItems();
 		final Map<IContributionItem, Expression> itemsToExpression = root.getVisibleWhen();
-		List<MUIElement> menuElements = new ArrayList<>();
+		List<MUIElement> menuElements = new ArrayList<MUIElement>();
 		for (Object obj : contributionItems) {
 			if (obj instanceof IContributionItem) {
 				IContributionItem ici = (IContributionItem) obj;
@@ -93,7 +99,6 @@ public class ContributionFactoryGenerator extends ContextFunction {
 
 		// return something disposable
 		return new Runnable() {
-			@Override
 			public void run() {
 				root.release();
 			}
@@ -111,16 +116,16 @@ public class ContributionFactoryGenerator extends ContextFunction {
 	}
 
 	private MUIElement createMenuItem(IContributionItem ici) {
-		MMenuItem opaqueItem = OpaqueElementUtil.createOpaqueMenuItem();
+		MOpaqueMenuItem opaqueItem = MenuFactoryImpl.eINSTANCE.createOpaqueMenuItem();
 		opaqueItem.setElementId(ici.getId());
-		OpaqueElementUtil.setOpaqueItem(opaqueItem, ici);
+		opaqueItem.setOpaqueItem(ici);
 		return opaqueItem;
 	}
 
 	private MUIElement createToolItem(IContributionItem ici) {
-		MToolItem opaqueItem = OpaqueElementUtil.createOpaqueToolItem();
+		MOpaqueToolItem opaqueItem = MenuFactoryImpl.eINSTANCE.createOpaqueToolItem();
 		opaqueItem.setElementId(ici.getId());
-		OpaqueElementUtil.setOpaqueItem(opaqueItem, ici);
+		opaqueItem.setOpaqueItem(ici);
 		return opaqueItem;
 	}
 }

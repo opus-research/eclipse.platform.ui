@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,9 +17,6 @@ import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
-import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.workbench.IPresentationEngine;
-import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
@@ -57,9 +54,6 @@ public class StackDropAgent extends DropAgent {
 
 		MPartStack stack = (MPartStack) info.curElement;
 
-		if (stack.getTags().contains(IPresentationEngine.STANDALONE))
-			return false;
-
 		// We only work for CTabFolders
 		if (!(stack.getWidget() instanceof CTabFolder))
 			return false;
@@ -67,16 +61,6 @@ public class StackDropAgent extends DropAgent {
 		// We can't drop stacks onto itself
 		if (stack == dragElement)
 			return false;
-
-		// You can only drag MParts from window to window
-		// NOTE: Disabled again due to too many issues, see bug 445305 for details
-		// if (!(dragElement instanceof MPart)) {
-			EModelService ms = dndManager.getModelService();
-			MWindow dragElementWin = ms.getTopLevelWindowFor(dragElement);
-			MWindow dropWin = ms.getTopLevelWindowFor(stack);
-			if (dragElementWin != dropWin)
-				return false;
-		// }
 
 		// only allow dropping into the the area
 		Rectangle areaRect = getTabAreaRect((CTabFolder) stack.getWidget());
@@ -144,6 +128,11 @@ public class StackDropAgent extends DropAgent {
 		return -1;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.workbench.addons.dndaddon.DropAgent#dragLeave()
+	 */
 	@Override
 	public void dragLeave(MUIElement dragElement, DnDInfo info) {
 		dndManager.clearOverlay();
@@ -161,6 +150,11 @@ public class StackDropAgent extends DropAgent {
 		super.dragLeave(dragElement, info);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.workbench.addons.dndaddon.DropAgent#dragLeave()
+	 */
 	@Override
 	public boolean track(MUIElement dragElement, DnDInfo info) {
 		if (!tabArea.contains(info.cursorPos) || dropStack == null || !dropStack.isToBeRendered())
@@ -261,33 +255,13 @@ public class StackDropAgent extends DropAgent {
 			MPartStack stack = (MPartStack) dragElement;
 			MStackElement curSel = stack.getSelectedElement();
 			List<MStackElement> kids = stack.getChildren();
-
-			// First move over all *non-selected* elements
-			int selIndex = kids.indexOf(curSel);
-			boolean curSelProcessed = false;
-			while (kids.size() > 1) {
-				// Offset the 'get' to account for skipping 'curSel'
-				MStackElement kid = curSelProcessed ? kids.get(kids.size() - 2) : kids.get(kids
-						.size() - 1);
-				if (kid == curSel) {
-					curSelProcessed = true;
-					continue;
-				}
-
-				kids.remove(kid);
+			while (kids.size() > 0) {
+				MStackElement lastChild = kids.remove(kids.size() - 1);
 				if (dropIndex >= 0 && dropIndex < dropStack.getChildren().size())
-					dropStack.getChildren().add(dropIndex, kid);
+					dropStack.getChildren().add(dropIndex, lastChild);
 				else
-					dropStack.getChildren().add(kid);
+					dropStack.getChildren().add(lastChild);
 			}
-
-			// Finally, move over the selected element
-			kids.remove(curSel);
-			dropIndex = dropIndex + selIndex;
-			if (dropIndex >= 0 && dropIndex < dropStack.getChildren().size())
-				dropStack.getChildren().add(dropIndex, curSel);
-			else
-				dropStack.getChildren().add(curSel);
 
 			// (Re)active the element being dropped
 			dropStack.setSelectedElement(curSel);
@@ -320,12 +294,8 @@ public class StackDropAgent extends DropAgent {
 	public boolean drop(MUIElement dragElement, DnDInfo info) {
 		if (dndManager.getFeedbackStyle() != DnDManager.HOSTED) {
 			int dropIndex = getDropIndex(info);
-			if (dropIndex != -1) {
-				MUIElement toActivate = dragElement instanceof MPartStack ? ((MPartStack) dragElement)
-						.getSelectedElement() : dragElement;
+			if (dropIndex != -1)
 				dock(dragElement, dropIndex);
-				reactivatePart(toActivate);
-			}
 		}
 		return true;
 	}

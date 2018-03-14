@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440136
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -22,33 +21,29 @@ public interface IWorkbenchConstants {
     /**
      * @deprecated
      */
-    @Deprecated
-	public static final String ACCELERATOR_CONFIGURATION_ID = "acceleratorConfigurationId"; //$NON-NLS-1$
+    public static final String ACCELERATOR_CONFIGURATION_ID = "acceleratorConfigurationId"; //$NON-NLS-1$
+
+    public static final String DEFAULT_PRESENTATION_ID = "org.eclipse.ui.presentations.default"; //$NON-NLS-1$
+    
+    /**
+     * @deprecated 
+     */
+    public static final String DEFAULT_ACCELERATOR_CONFIGURATION_ID = "org.eclipse.ui.defaultAcceleratorConfiguration"; //$NON-NLS-1$
 
     /**
-     * @deprecated
+     * @deprecated 
      */
-    @Deprecated
-	public static final String DEFAULT_ACCELERATOR_CONFIGURATION_ID = "org.eclipse.ui.defaultAcceleratorConfiguration"; //$NON-NLS-1$
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
-	public static final String DEFAULT_ACCELERATOR_SCOPE_ID = "org.eclipse.ui.globalScope"; //$NON-NLS-1$
-
-	// ID of the MPerspectiveStack in the IDE e4 model
-	public static final String PERSPECTIVE_STACK_ID = "org.eclipse.ui.ide.perspectivestack"; //$NON-NLS-1$
+    public static final String DEFAULT_ACCELERATOR_SCOPE_ID = "org.eclipse.ui.globalScope"; //$NON-NLS-1$
 
     //mappings for type/extension to an editor - backward compatibility only.
     public final static String EDITOR_FILE_NAME = "editors.xml"; //$NON-NLS-1$
 
     public final static String RESOURCE_TYPE_FILE_NAME = "resourcetypes.xml"; //$NON-NLS-1$
 
-    // Filename containing the workbench's preferences
+    // Filename containing the workbench's preferences 
     public static final String PREFERENCE_BUNDLE_FILE_NAME = "workbench.ini"; //$NON-NLS-1$
 
-    // Identifier for visible view parts.
+    // Identifier for visible view parts. 
     public static final String WORKBENCH_VISIBLE_VIEW_ID = "Workbench.visibleViewID"; //$NON-NLS-1$
 
     // Identifier of workbench info properties page
@@ -66,11 +61,11 @@ public interface IWorkbenchConstants {
     public static final String TRUE = "true"; //$NON-NLS-1$
 
     public static final String FALSE = "false"; //$NON-NLS-1$
-
+	
 	public static final String TAG_WORKBENCH_ADVISOR = "workbenchAdvisor"; //$NON-NLS-1$
-
+	
 	public static final String TAG_WORKBENCH_WINDOW_ADVISOR = "workbenchWindowAdvisor"; //$NON-NLS-1$
-
+	
 	public static final String TAG_ACTION_BAR_ADVISOR = "actionBarAdvisor"; //$NON-NLS-1$
 
     public static final String TAG_ID = "id"; //$NON-NLS-1$
@@ -78,7 +73,7 @@ public interface IWorkbenchConstants {
     public static final String TAG_FOCUS = "focus"; //$NON-NLS-1$
 
     public static final String TAG_EDITOR = "editor"; //$NON-NLS-1$
-
+    
     public static final String TAG_DEFAULT_EDITOR = "defaultEditor"; //$NON-NLS-1$
 
     public static final String TAG_DELETED_EDITOR = "deletedEditor"; //$NON-NLS-1$
@@ -108,7 +103,7 @@ public interface IWorkbenchConstants {
     public static final String TAG_X = "x"; //$NON-NLS-1$
 
     public static final String TAG_Y = "y"; //$NON-NLS-1$
-
+    
     public static final String TAG_FLOAT = "float"; //$NON-NLS-1$
 
     public static final String TAG_ITEM_WRAP_INDEX = "wrapIndex"; //$NON-NLS-1$
@@ -132,7 +127,7 @@ public interface IWorkbenchConstants {
     public static final String TAG_PART_NAME = "partName"; //$NON-NLS-1$
 
 	public static final String TAG_PROPERTIES = "properties"; //$NON-NLS-1$
-
+	
     public static final String TAG_PROPERTY = "property"; //$NON-NLS-1$
 
     public static final String TAG_RELATIVE = "relative"; //$NON-NLS-1$
@@ -176,7 +171,7 @@ public interface IWorkbenchConstants {
     public static final String TAG_WINDOW = "window"; //$NON-NLS-1$
 
     public static final String TAG_VERSION = "version"; //$NON-NLS-1$
-
+    
     public static final String TAG_PROGRESS_COUNT = "progressCount";  //$NON-NLS-1$
 
     public static final String TAG_PERSPECTIVES = "perspectives"; //$NON-NLS-1$
@@ -202,9 +197,9 @@ public interface IWorkbenchConstants {
     public static final String TAG_NEW_WIZARD_ACTION = "new_wizard_action"; //$NON-NLS-1$
 
     public static final String TAG_PERSPECTIVE_ACTION = "perspective_action"; //$NON-NLS-1$
-
+    
     public static final String TAG_HIDE_MENU = "hide_menu_item_id"; //$NON-NLS-1$
-
+    	
     public static final String TAG_HIDE_TOOLBAR = "hide_toolbar_item_id"; //$NON-NLS-1$
 
     public static final String TAG_VIEW = "view"; //$NON-NLS-1$
@@ -263,15 +258,15 @@ public interface IWorkbenchConstants {
 
     public static final String TAG_MRU_LIST = "mruList"; //$NON-NLS-1$
 
-    public static final String TAG_PERSPECTIVE_HISTORY = "perspHistory"; //$NON-NLS-1$
+    public static final String TAG_PERSPECTIVE_HISTORY = "perspHistory"; //$NON-NLS-1$	
 
-    public static final String TAG_WORKING_SET_MANAGER = "workingSetManager"; //$NON-NLS-1$
+    public static final String TAG_WORKING_SET_MANAGER = "workingSetManager"; //$NON-NLS-1$		
 
-    public static final String TAG_WORKING_SETS = "workingSets"; //$NON-NLS-1$
+    public static final String TAG_WORKING_SETS = "workingSets"; //$NON-NLS-1$	
 
-    public static final String TAG_WORKING_SET = "workingSet"; //$NON-NLS-1$
+    public static final String TAG_WORKING_SET = "workingSet"; //$NON-NLS-1$		
 
-    public static final String TAG_ITEM = "item"; //$NON-NLS-1$
+    public static final String TAG_ITEM = "item"; //$NON-NLS-1$			
 
     public static final String TAG_EDIT_PAGE_ID = "editPageId"; //$NON-NLS-1$
 
@@ -308,7 +303,7 @@ public interface IWorkbenchConstants {
     public static final String TAG_POSITION = "position";//$NON-NLS-1$
 
     public static final String TAG_NAVIGATION_HISTORY = "navigationHistory";//$NON-NLS-1$
-
+    
     public static final String TAG_STICKY_STATE = "stickyState"; //$NON-NLS-1$
 
     public static final String TAG_ACTIVE = "active";//$NON-NLS-1$
@@ -333,16 +328,16 @@ public interface IWorkbenchConstants {
 
     public static final String TAG_FAST_VIEW_STYLE = "style"; //$NON-NLS-1$
 
-    public static final String TAG_THEME = "theme";//$NON-NLS-1$
+    public static final String TAG_THEME = "theme";//$NON-NLS-1$	
 
     public static final String TAG_VIEW_LAYOUT_REC = "viewLayoutRec"; //$NON-NLS-1$
 
     public static final String TAG_PERSPECTIVE_BAR = "perspectiveBar"; //$NON-NLS-1$
 
     public static final String TAG_TRIM = "trimLayout"; //$NON-NLS-1$
-
+    
     public static final String TAG_TRIM_AREA = "trimArea"; //$NON-NLS-1$
-
+        
     public static final String TAG_TRIM_ITEM = "trimItem"; //$NON-NLS-1$
 
     //Fonts

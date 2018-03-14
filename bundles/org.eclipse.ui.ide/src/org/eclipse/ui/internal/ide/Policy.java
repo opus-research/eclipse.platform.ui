@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
  *
  */
 public class Policy {
-
+	
 	/**
 	 * The default value
 	 */
@@ -29,12 +29,12 @@ public class Policy {
      * Option for opening an error dialog on internal error.
      */
     public static boolean DEBUG_OPEN_ERROR_DIALOG = DEFAULT;
-
+    
     /**
      * Option for reporting on garbage collection jobs.
      */
     public static boolean DEBUG_GC = DEFAULT;
-
+    
     /**
      * Option for monitoring undo.
      */
@@ -59,7 +59,7 @@ public class Policy {
 
 	/**
 	 * Handle the core exception.
-	 *
+	 * 
 	 * @param exception
 	 */
 	public static void handle(CoreException exception) {
@@ -67,6 +67,6 @@ public class Policy {
 		if (DEBUG_CORE_EXCEPTIONS)
 			StatusManager.getManager().handle(exception,
 					IDEWorkbenchPlugin.IDE_WORKBENCH);
-
+	
 	}
 }

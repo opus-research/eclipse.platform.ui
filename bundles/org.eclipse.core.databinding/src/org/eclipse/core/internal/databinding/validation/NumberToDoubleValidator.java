@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,7 @@ import org.eclipse.core.internal.databinding.conversion.StringToNumberParser;
 public class NumberToDoubleValidator extends NumberToNumberValidator {
 	private static final Double MIN = new Double(Double.MIN_VALUE);
 	private static final Double MAX = new Double(Double.MAX_VALUE);
-
+	
 	/**
 	 * @param converter
 	 */
@@ -32,7 +32,9 @@ public class NumberToDoubleValidator extends NumberToNumberValidator {
 		super(converter, MIN, MAX);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.internal.databinding.validation.NumberToNumberValidator#inRange(java.lang.Number)
+	 */
 	protected boolean inRange(Number number) {
 		return StringToNumberParser.inDoubleRange(number);
 	}

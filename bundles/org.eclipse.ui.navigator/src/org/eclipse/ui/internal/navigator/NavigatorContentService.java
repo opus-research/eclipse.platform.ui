@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,17 +25,22 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.osgi.service.prefs.BackingStoreException;
+
+import org.eclipse.swt.widgets.Shell;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.swt.widgets.Shell;
+
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.internal.navigator.dnd.NavigatorDnDService;
 import org.eclipse.ui.internal.navigator.extensions.ExtensionSequenceNumberComparator;
@@ -44,10 +49,8 @@ import org.eclipse.ui.internal.navigator.extensions.NavigatorContentDescriptorMa
 import org.eclipse.ui.internal.navigator.extensions.NavigatorContentExtension;
 import org.eclipse.ui.internal.navigator.extensions.NavigatorViewerDescriptor;
 import org.eclipse.ui.internal.navigator.extensions.NavigatorViewerDescriptorManager;
-import org.eclipse.ui.internal.navigator.extensions.SafeDelegateTreeContentProvider;
 import org.eclipse.ui.internal.navigator.extensions.StructuredViewerManager;
 import org.eclipse.ui.internal.navigator.sorters.NavigatorSorterService;
-import org.eclipse.ui.navigator.ICommonLabelProvider;
 import org.eclipse.ui.navigator.IDescriptionProvider;
 import org.eclipse.ui.navigator.IExtensionActivationListener;
 import org.eclipse.ui.navigator.IExtensionStateModel;
@@ -63,7 +66,6 @@ import org.eclipse.ui.navigator.INavigatorPipelineService;
 import org.eclipse.ui.navigator.INavigatorSaveablesService;
 import org.eclipse.ui.navigator.INavigatorSorterService;
 import org.eclipse.ui.navigator.INavigatorViewerDescriptor;
-import org.osgi.service.prefs.BackingStoreException;
 
 /**
  * <p>
@@ -74,7 +76,7 @@ import org.osgi.service.prefs.BackingStoreException;
  * Label Providers created by {@link #createCommonContentProvider()}and
  * {@link #createCommonLabelProvider()}respectively.
  * </p>
- *
+ * 
  * <p>
  * The following class is experimental until fully documented.
  * </p>
@@ -83,10 +85,10 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		IMementoAware, INavigatorContentService {
 
 	/**
-	 *
+	 * 
 	 */
 	public static final String WIDGET_KEY = "org.eclipse.ui.navigator"; //$NON-NLS-1$
-
+	
 	private static final NavigatorContentDescriptorManager CONTENT_DESCRIPTOR_REGISTRY = NavigatorContentDescriptorManager
 			.getInstance();
 
@@ -103,13 +105,13 @@ public class NavigatorContentService implements IExtensionActivationListener,
 
 	private final NavigatorViewerDescriptor viewerDescriptor;
 
-	private final List<INavigatorContentServiceListener> listeners = new ArrayList<INavigatorContentServiceListener>();
+	private final List listeners = new ArrayList();
 
 	/*
 	 * A map of (String-based-Navigator-Content-Extension-IDs,
 	 * NavigatorContentExtension-objects)-pairs
 	 */
-	private final Map<INavigatorContentDescriptor, NavigatorContentExtension> contentExtensions = new HashMap<INavigatorContentDescriptor, NavigatorContentExtension>();
+	private final Map contentExtensions = new HashMap();
 
 	private StructuredViewerManager structuredViewerManager;
 
@@ -122,9 +124,9 @@ public class NavigatorContentService implements IExtensionActivationListener,
 	 * to record the object/description associations which are when stored
 	 * in the Tree associated with the viewer.
 	 */
-	private Map<Object, INavigatorContentDescriptor> contributionMemory;
-	private Map<Object, INavigatorContentDescriptor> contributionMemoryFirstClass;
-
+	private Map contributionMemory;
+	private Map contributionMemoryFirstClass;
+	
 	private ILabelProvider labelProvider;
 
 	private final VisibilityAssistant assistant;
@@ -150,7 +152,7 @@ public class NavigatorContentService implements IExtensionActivationListener,
 	private boolean labelProviderInitialized;
 
 	private boolean isDisposed;
-
+	
 	/**
 	 * @param aViewerId
 	 *            The viewer id for this content service; normally from the
@@ -164,8 +166,8 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		assistant = new VisibilityAssistant(viewerDescriptor,
 				getActivationService());
 		getActivationService().addExtensionActivationListener(this);
-		contributionMemory = new HashMap<Object, INavigatorContentDescriptor>();
-		contributionMemoryFirstClass = new HashMap<Object, INavigatorContentDescriptor>();
+		contributionMemory = new HashMap();
+		contributionMemoryFirstClass = new HashMap();
 	}
 
 	/**
@@ -180,10 +182,9 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		structuredViewerManager = new StructuredViewerManager(aViewer, this);
 	}
 
-	@Override
 	public String[] getVisibleExtensionIds() {
 
-		List<String> visibleExtensionIds = new ArrayList<String>();
+		List visibleExtensionIds = new ArrayList();
 
 		NavigatorContentDescriptor[] descriptors = CONTENT_DESCRIPTOR_REGISTRY
 				.getAllContentDescriptors();
@@ -195,14 +196,13 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		if (visibleExtensionIds.isEmpty()) {
 			return NO_EXTENSION_IDS;
 		}
-		return visibleExtensionIds
+		return (String[]) visibleExtensionIds
 				.toArray(new String[visibleExtensionIds.size()]);
 
 	}
 
-	@Override
 	public INavigatorContentDescriptor[] getVisibleExtensions() {
-		List<NavigatorContentDescriptor> visibleDescriptors = new ArrayList<NavigatorContentDescriptor>();
+		List visibleDescriptors = new ArrayList();
 
 		NavigatorContentDescriptor[] descriptors = CONTENT_DESCRIPTOR_REGISTRY
 				.getAllContentDescriptors();
@@ -214,14 +214,14 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		if (visibleDescriptors.isEmpty()) {
 			return NO_DESCRIPTORS;
 		}
-		return visibleDescriptors
+		return (INavigatorContentDescriptor[]) visibleDescriptors
 				.toArray(new INavigatorContentDescriptor[visibleDescriptors
 						.size()]);
 
 	}
 
 	/* package */INavigatorContentDescriptor[] getActiveDescriptorsWithSaveables() {
-		List<NavigatorContentDescriptor> result = new ArrayList<NavigatorContentDescriptor>();
+		List result = new ArrayList();
 
 		NavigatorContentDescriptor[] descriptors = CONTENT_DESCRIPTOR_REGISTRY
 				.getContentDescriptorsWithSaveables();
@@ -234,12 +234,18 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		if (result.isEmpty()) {
 			return NO_DESCRIPTORS;
 		}
-		return result
+		return (INavigatorContentDescriptor[]) result
 				.toArray(new INavigatorContentDescriptor[result.size()]);
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.navigator.INavigatorContentService#bindExtensions(java
+	 * .lang.String[], boolean)
+	 */
 	public INavigatorContentDescriptor[] bindExtensions(String[] extensionIds,
 			boolean isRoot) {
 		if (extensionIds == null || extensionIds.length == 0) {
@@ -249,7 +255,7 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		for (int i = 0; i < extensionIds.length; i++) {
 			assistant.bindExtensions(extensionIds, isRoot);
 		}
-		Set<INavigatorContentDescriptor> boundDescriptors = new HashSet<INavigatorContentDescriptor>();
+		Set boundDescriptors = new HashSet();
 		INavigatorContentDescriptor descriptor;
 		for (int i = 0; i < extensionIds.length; i++) {
 			descriptor = CONTENT_DESCRIPTOR_REGISTRY
@@ -262,18 +268,23 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		if (boundDescriptors.size() == 0) {
 			return NO_DESCRIPTORS;
 		}
-
+		
 		if (Policy.DEBUG_EXTENSION_SETUP) {
 			System.out.println("bindExtensions: " + //$NON-NLS-1$
 					boundDescriptors);
 		}
-		return boundDescriptors
+		return (INavigatorContentDescriptor[]) boundDescriptors
 				.toArray(new INavigatorContentDescriptor[boundDescriptors
 						.size()]);
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.eclipse.ui.internal.navigator.INavigatorContentService#
+	 * createCommonContentProvider()
+	 */
 	public ITreeContentProvider createCommonContentProvider() {
 		if (contentProviderInitialized) {
 			return contentProvider;
@@ -288,7 +299,12 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		return contentProvider;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.eclipse.ui.internal.navigator.INavigatorContentService#
+	 * createCommonLabelProvider()
+	 */
 	public ILabelProvider createCommonLabelProvider() {
 		if (labelProviderInitialized) {
 			return labelProvider;
@@ -302,7 +318,12 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		return labelProvider;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.eclipse.ui.navigator.INavigatorContentService#
+	 * createCommonDescriptionProvider()
+	 */
 	public IDescriptionProvider createCommonDescriptionProvider() {
 		if (descriptionProvider != null) {
 			return descriptionProvider;
@@ -316,7 +337,11 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		return descriptionProvider;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.navigator.INavigatorContentService#dispose()
+	 */
 	public void dispose() {
 		if (navigatorSaveablesService != null) {
 			assistant.removeListener(navigatorSaveablesService);
@@ -325,9 +350,9 @@ public class NavigatorContentService implements IExtensionActivationListener,
 			assistant.removeListener(navigatorSorterService);
 		}
 		synchronized (this) {
-			for (Iterator<NavigatorContentExtension> contentItr = contentExtensions.values().iterator(); contentItr
+			for (Iterator contentItr = contentExtensions.values().iterator(); contentItr
 					.hasNext();) {
-				contentItr.next().dispose();
+				((NavigatorContentExtension) contentItr.next()).dispose();
 			}
 		}
 		getActivationService().removeExtensionActivationListener(this);
@@ -335,24 +360,31 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		isDisposed = true;
 	}
 
-	protected void updateService(Viewer aViewer, Object anOldInput, Object aNewInput) {
+	protected void updateService(Viewer aViewer, Object anOldInput,
+			Object aNewInput) {
+
 		// Prevents the world from being started again once we have been disposed.  In
 		// the dispose process, the ContentViewer will call setInput() on the
 		// NavigatorContentServiceContentProvider, which gets us here
 		if (isDisposed)
 			return;
-		NavigatorContentDescriptorManager.getInstance().clearCache();
 		synchronized (this) {
+
 			if (structuredViewerManager == null) {
 				structuredViewerManager = new StructuredViewerManager((StructuredViewer) aViewer, this);
 				structuredViewerManager.inputChanged(anOldInput, aNewInput);
 			} else {
-				structuredViewerManager.inputChanged(aViewer, anOldInput, aNewInput);
+				structuredViewerManager.inputChanged(aViewer, anOldInput,
+						aNewInput);
 			}
 
-			for (NavigatorContentExtension ext : contentExtensions.values()) {
+			for (Iterator contentItr = contentExtensions.values().iterator(); contentItr
+					.hasNext();) {
+				NavigatorContentExtension ext = (NavigatorContentExtension) contentItr
+						.next();
 				if (ext.isLoaded()) {
-					structuredViewerManager.initialize(ext.internalGetContentProvider());
+					structuredViewerManager
+							.initialize(ext.internalGetContentProvider());
 				}
 			}
 
@@ -360,7 +392,6 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		}
 	}
 
-	@Override
 	public IExtensionStateModel findStateModel(String anExtensionId) {
 		if (anExtensionId == null) {
 			return null;
@@ -388,7 +419,7 @@ public class NavigatorContentService implements IExtensionActivationListener,
 	 * client must call {@link #update() } prior in order to reset the calculated
 	 * root providers.
 	 * </p>
-	 *
+	 * 
 	 * @param anElement
 	 *            An element from the tree (generally the input of the viewer)
 	 * @return The set of content providers that can provide root elements for a
@@ -406,40 +437,40 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		}
 		return rootContentProviders;
 	}
-
+	
 	/**
 	 * Returns the list of extensions that should be considered as possible
 	 * contributors of CNF artifacts (labels, sorters, ...). The algorithm
 	 * first considers the source of contribution and its overrides, and then
 	 * any possibleChildren and their overrides in order.
-	 *
+	 * 
 	 * @param anElement
 	 *            An element from the tree (any element contributed to the
 	 *            tree).
 	 * @return A Collection of NCEs sorted in the correct order for label provider application
 	 */
-	public Collection<NavigatorContentExtension> findPossibleLabelExtensions(Object anElement) {
-		LinkedHashSet<NavigatorContentExtension> contributors = new LinkedHashSet<NavigatorContentExtension>();
+	public Collection findPossibleLabelExtensions(Object anElement) {
+		LinkedHashSet contributors = new LinkedHashSet();
 		INavigatorContentDescriptor sourceDescriptor = getSourceOfContribution(anElement);
-
+		
 		// This is a TreeSet sorted ascending
-		Set<INavigatorContentDescriptor> possibleChildDescriptors = findDescriptorsWithPossibleChild(anElement, false);
+		Set possibleChildDescriptors = findDescriptorsWithPossibleChild(anElement, false);
 
 		// Add the source so that it gets sorted into the right place
 		if (sourceDescriptor != null) {
 			possibleChildDescriptors.add(sourceDescriptor);
 		}
 
-		for (Iterator<INavigatorContentDescriptor> iter = possibleChildDescriptors.iterator(); iter.hasNext();) {
+		for (Iterator iter = possibleChildDescriptors.iterator(); iter.hasNext();) {
 			NavigatorContentDescriptor ncd = (NavigatorContentDescriptor) iter.next();
 			findOverridingLabelExtensions(anElement, ncd, contributors);
 		}
-
+		
 		return contributors;
 	}
 
 	private void findOverridingLabelExtensions(Object anElement,
-			INavigatorContentDescriptor descriptor, LinkedHashSet<NavigatorContentExtension> contributors) {
+			INavigatorContentDescriptor descriptor, LinkedHashSet contributors) {
 		ListIterator iter = ((NavigatorContentDescriptor) descriptor).getOverridingExtensionsListIterator(false);
 		while (iter.hasPrevious()) {
 			INavigatorContentDescriptor child = (INavigatorContentDescriptor) iter.previous();
@@ -449,35 +480,35 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		}
 		contributors.add(getExtension(descriptor));
 	}
-
+	
 	/**
-	 *
+	 * 
 	 * The label provider that is are enabled for the given element.
 	 * A label provider is 'enabled' if its corresponding content provider
 	 * returned the element.
-	 *
+	 * 
 	 * @param anElement
 	 *            An element from the tree (any element contributed to the
 	 *            tree).
 	 * @return The label provider
 	 */
 	public ILabelProvider[] findRelevantLabelProviders(Object anElement) {
-		Collection<NavigatorContentExtension> extensions = findPossibleLabelExtensions(anElement);
-
+		Collection extensions = findPossibleLabelExtensions(anElement);
+		
 		if (extensions.size() == 0) {
 			return NO_LABEL_PROVIDERS;
 		}
-		List<ICommonLabelProvider> resultProvidersList = new ArrayList<ICommonLabelProvider>();
-		for (Iterator<NavigatorContentExtension> itr = extensions.iterator(); itr.hasNext();) {
-			resultProvidersList.add(itr.next().getLabelProvider());
+		List resultProvidersList = new ArrayList();
+		for (Iterator itr = extensions.iterator(); itr.hasNext();) {
+			resultProvidersList.add(((NavigatorContentExtension) itr.next()).getLabelProvider());
 		}
-		return resultProvidersList.toArray(new ILabelProvider[resultProvidersList.size()]);
+		return (ILabelProvider[]) resultProvidersList.toArray(new ILabelProvider[resultProvidersList.size()]);
 	}
 
 	/**
 	 * Search for extensions that declare the given element in their
 	 * <b>triggerPoints</b> expression.
-	 *
+	 * 
 	 * @param anElement
 	 *            The element to use in the query
 	 * @return The set of {@link INavigatorContentExtension}s that are
@@ -487,15 +518,14 @@ public class NavigatorContentService implements IExtensionActivationListener,
 	 *         a root element or have a <b>triggerPoints</b> expression that is
 	 *         <i>enabled</i> for the given element.
 	 */
-	@Override
-	public Set<NavigatorContentExtension> findRootContentExtensions(Object anElement) {
+	public Set findRootContentExtensions(Object anElement) {
 		return findRootContentExtensions(anElement, true);
 	}
 
 	/**
 	 * Search for extensions that declare the given element in their
 	 * <b>triggerPoints</b> expression.
-	 *
+	 * 
 	 * @param anElement
 	 *            The element to use in the query
 	 * @param toRespectViewerRoots
@@ -508,10 +538,10 @@ public class NavigatorContentService implements IExtensionActivationListener,
 	 *         a root element or have a <b>triggerPoints</b> expression that is
 	 *         <i>enabled</i> for the given element.
 	 */
-	public Set<NavigatorContentExtension> findRootContentExtensions(Object anElement,
+	public Set findRootContentExtensions(Object anElement,
 			boolean toRespectViewerRoots) {
 
-		SortedSet<NavigatorContentExtension> rootExtensions = new TreeSet<NavigatorContentExtension>(
+		SortedSet rootExtensions = new TreeSet(
 				ExtensionSequenceNumberComparator.INSTANCE);
 		if (toRespectViewerRoots
 				/*&& viewerDescriptor.hasOverriddenRootExtensions()*/) {
@@ -539,7 +569,7 @@ public class NavigatorContentService implements IExtensionActivationListener,
 	/**
 	 * Search for extensions that declare the given element in their
 	 * <b>possibleChildren</b> expression.
-	 *
+	 * 
 	 * @param anElement
 	 *            The element to use in the query
 	 * @return The set of {@link INavigatorContentExtension}s that are
@@ -547,13 +577,13 @@ public class NavigatorContentService implements IExtensionActivationListener,
 	 *         have a <b>possibleChildren</b> expression that is <i>enabled</i>
 	 *         for the given element.
 	 */
-	public Set<NavigatorContentExtension> findOverrideableContentExtensionsForPossibleChild(
+	public Set findOverrideableContentExtensionsForPossibleChild(
 			Object anElement) {
-		Set<NavigatorContentExtension> overrideableExtensions = new TreeSet<NavigatorContentExtension>(
+		Set overrideableExtensions = new TreeSet(
 				ExtensionSequenceNumberComparator.INSTANCE);
-		Set<INavigatorContentDescriptor> descriptors = findDescriptorsWithPossibleChild(anElement, false);
-		for (Iterator<INavigatorContentDescriptor> iter = descriptors.iterator(); iter.hasNext();) {
-			INavigatorContentDescriptor descriptor = iter
+		Set descriptors = findDescriptorsWithPossibleChild(anElement, false);
+		for (Iterator iter = descriptors.iterator(); iter.hasNext();) {
+			INavigatorContentDescriptor descriptor = (INavigatorContentDescriptor) iter
 					.next();
 			if (descriptor.hasOverridingExtensions()) {
 				overrideableExtensions.add(getExtension(descriptor));
@@ -562,14 +592,18 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		return overrideableExtensions;
 	}
 
-	@Override
+	/*
+	 * (Non-Javadoc)
+	 * 
+	 * @see INavigatorContentService#getContentDescriptorById(String)
+	 */
 	public INavigatorContentDescriptor getContentDescriptorById(
 			String anExtensionId) {
 		return CONTENT_DESCRIPTOR_REGISTRY.getContentDescriptor(anExtensionId);
 	}
 
 	/**
-	 *
+	 * 
 	 * @param anExtensionId
 	 *            The id used to define the
 	 *            <b>org.eclipse.ui.navigator.navigatorContent
@@ -577,7 +611,6 @@ public class NavigatorContentService implements IExtensionActivationListener,
 	 * @return An instance of the content extension for the given extension id.
 	 *         May return <b>null</b> if the id is invalid.
 	 */
-	@Override
 	public INavigatorContentExtension getContentExtensionById(
 			String anExtensionId) {
 		NavigatorContentDescriptor descriptor = CONTENT_DESCRIPTOR_REGISTRY
@@ -590,7 +623,7 @@ public class NavigatorContentService implements IExtensionActivationListener,
 	/**
 	 * Search for extensions that declare the given element in their
 	 * <b>triggerPoints</b> expression.
-	 *
+	 * 
 	 * @param anElement
 	 *            The element to use in the query
 	 * @return The set of {@link INavigatorContentExtension}s that are
@@ -598,15 +631,14 @@ public class NavigatorContentService implements IExtensionActivationListener,
 	 *         have a <b>triggerPoints</b> expression that is <i>enabled</i> for
 	 *         the given element.
 	 */
-	@Override
-	public Set<NavigatorContentExtension> findContentExtensionsByTriggerPoint(Object anElement) {
+	public Set findContentExtensionsByTriggerPoint(Object anElement) {
 		return findContentExtensionsByTriggerPoint(anElement, true, !CONSIDER_OVERRIDES);
 	}
 
 	/**
 	 * Search for extensions that declare the given element in their
 	 * <b>triggerPoints</b> expression.
-	 *
+	 * 
 	 * @param anElement
 	 *            The element to use in the query
 	 * @param toLoadIfNecessary
@@ -617,16 +649,16 @@ public class NavigatorContentService implements IExtensionActivationListener,
 	 *         have a <b>triggerPoints</b> expression that is <i>enabled</i> for
 	 *         the given element.
 	 */
-	public Set<NavigatorContentExtension> findContentExtensionsByTriggerPoint(Object anElement,
+	public Set findContentExtensionsByTriggerPoint(Object anElement,
 			boolean toLoadIfNecessary, boolean computeOverrides) {
-		Set<INavigatorContentDescriptor> enabledDescriptors = findDescriptorsByTriggerPoint(anElement, computeOverrides);
+		Set enabledDescriptors = findDescriptorsByTriggerPoint(anElement, computeOverrides);
 		return extractDescriptorInstances(enabledDescriptors, toLoadIfNecessary);
 	}
 
 	/**
 	 * Search for extensions that declare the given element in their
 	 * <b>possibleChildren</b> expression.
-	 *
+	 * 
 	 * @param anElement
 	 *            The element to use in the query
 	 * @return The set of {@link INavigatorContentExtension}s that are
@@ -634,15 +666,14 @@ public class NavigatorContentService implements IExtensionActivationListener,
 	 *         have a <b>possibleChildren</b> expression that is <i>enabled</i>
 	 *         for the given element.
 	 */
-	@Override
-	public Set<NavigatorContentExtension> findContentExtensionsWithPossibleChild(Object anElement) {
+	public Set findContentExtensionsWithPossibleChild(Object anElement) {
 		return findContentExtensionsWithPossibleChild(anElement, true);
 	}
 
 	/**
 	 * Search for extensions that declare the given element in their
 	 * <b>possibleChildren</b> expression.
-	 *
+	 * 
 	 * @param anElement
 	 *            The element to use in the query
 	 * @param toLoadIfNecessary
@@ -652,15 +683,15 @@ public class NavigatorContentService implements IExtensionActivationListener,
 	 *         have a <b>possibleChildren</b> expression that is <i>enabled</i>
 	 *         for the given element.
 	 */
-	public Set<NavigatorContentExtension> findContentExtensionsWithPossibleChild(Object anElement,
+	public Set findContentExtensionsWithPossibleChild(Object anElement,
 			boolean toLoadIfNecessary) {
-		Set<INavigatorContentDescriptor> enabledDescriptors = findDescriptorsWithPossibleChild(anElement);
+		Set enabledDescriptors = findDescriptorsWithPossibleChild(anElement);
 		return extractDescriptorInstances(enabledDescriptors, toLoadIfNecessary);
 	}
 
 	/**
-	 *
-	 *
+	 * 
+	 * 
 	 * @param firstClassSource
 	 * @param source
 	 * @param element
@@ -689,7 +720,7 @@ public class NavigatorContentService implements IExtensionActivationListener,
 
 	/**
 	 * Forget about the specified element
-	 *
+	 * 
 	 * @param element
 	 *            The element to forget.
 	 */
@@ -712,7 +743,7 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		}
 		return desc;
 	}
-
+	
 	/**
 	 * Used only for the tests
 	 * @return the size of the contribution memory
@@ -722,9 +753,9 @@ public class NavigatorContentService implements IExtensionActivationListener,
 			return contributionMemory.size();
 		}
 	}
-
+	
 	/**
-	 *
+	 * 
 	 * @param element
 	 *            The element contributed by the descriptor to be returned
 	 * @return The descriptor that contributed the element or null.
@@ -745,28 +776,28 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		return (NavigatorContentDescriptor) structuredViewerManager.getData(element);
 	}
 	/**
-	 *
+	 * 
 	 */
 	public static final boolean CONSIDER_OVERRIDES = true;
-
+	
 	/**
 	 * Search for extensions that declare the given element in their
 	 * <b>triggerPoints</b> expression.
-	 *
+	 * 
 	 * @param anElement
 	 *            The element to use in the query
 	 * @param considerOverrides
-	 *
+	 * 
 	 * @return The set of {@link INavigatorContentDescriptor}s that are
 	 *         <i>visible</i> and <i>active</i> for this content service and
 	 *         have a <b>triggerPoints</b> expression that is <i>enabled</i> for
 	 *         the given element.
 	 */
-	public Set<INavigatorContentDescriptor> findDescriptorsByTriggerPoint(Object anElement, boolean considerOverrides) {
+	public Set findDescriptorsByTriggerPoint(Object anElement, boolean considerOverrides) {
 		// Here we use the cache, since objects are inserted into the
 		// cache in response to the trigger point
 		NavigatorContentDescriptor descriptor = getSourceOfContribution(anElement);
-		Set<INavigatorContentDescriptor> result = new TreeSet<INavigatorContentDescriptor>(ExtensionSequenceNumberComparator.INSTANCE);
+		Set result = new TreeSet(ExtensionSequenceNumberComparator.INSTANCE);
 		if (descriptor != null) {
 			result.add(descriptor);
 		}
@@ -778,7 +809,7 @@ public class NavigatorContentService implements IExtensionActivationListener,
 	/**
 	 * Search for extensions that declare the given element in their
 	 * <b>possibleChildren</b> expression.
-	 *
+	 * 
 	 * @param anElement
 	 *            The element to use in the query
 	 * @return The set of {@link INavigatorContentDescriptor}s that are
@@ -786,14 +817,14 @@ public class NavigatorContentService implements IExtensionActivationListener,
 	 *         have a <b>possibleChildren</b> expression that is <i>enabled</i>
 	 *         for the given element.
 	 */
-	public Set<INavigatorContentDescriptor> findDescriptorsWithPossibleChild(Object anElement) {
+	public Set findDescriptorsWithPossibleChild(Object anElement) {
 		return findDescriptorsWithPossibleChild(anElement, true);
 	}
 
 	/**
 	 * Search for extensions that declare the given element in their
 	 * <b>possibleChildren</b> expression.
-	 *
+	 * 
 	 * @param anElement
 	 *            The element to use in the query
 	 * @param toComputeOverrides
@@ -803,31 +834,35 @@ public class NavigatorContentService implements IExtensionActivationListener,
 	 *         have a <b>possibleChildren</b> expression that is <i>enabled</i>
 	 *         for the given element.
 	 */
-	public Set<INavigatorContentDescriptor> findDescriptorsWithPossibleChild(Object anElement,
+	public Set findDescriptorsWithPossibleChild(Object anElement,
 			boolean toComputeOverrides) {
 		// Don't use the cache which is only used for triggerPoints
-		Set<INavigatorContentDescriptor> result = new TreeSet<INavigatorContentDescriptor>(ExtensionSequenceNumberComparator.INSTANCE);
+		Set result = new TreeSet(ExtensionSequenceNumberComparator.INSTANCE);
 		result.addAll(CONTENT_DESCRIPTOR_REGISTRY
 				.findDescriptorsForPossibleChild(anElement, assistant,
 						toComputeOverrides));
 		return result;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.eclipse.ui.internal.navigator.INavigatorContentService#
+	 * onExtensionActivation(java.lang.String, java.lang.String, boolean)
+	 */
 	public void onExtensionActivation(String aViewerId,
 			String[] aNavigatorExtensionId, boolean toEnable) {
 		synchronized (this) {
 			SafeRunner.run(new NavigatorSafeRunnable() {
-				@Override
 				public void run() throws Exception {
 					NavigatorContentDescriptor key;
 					NavigatorContentExtension extension;
-					for (Iterator<INavigatorContentDescriptor> iter = contentExtensions.keySet().iterator(); iter
+					for (Iterator iter = contentExtensions.keySet().iterator(); iter
 							.hasNext();) {
 						key = (NavigatorContentDescriptor) iter.next();
 						INavigatorActivationService activation = getActivationService();
 						if (!activation.isNavigatorExtensionActive(key.getId())) {
-							extension = contentExtensions
+							extension = (NavigatorContentExtension) contentExtensions
 									.get(key);
 							iter.remove();
 							extension.dispose();
@@ -842,16 +877,24 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		update();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.navigator.INavigatorContentService#update()
+	 */
 	public void update() {
 		rootContentProviders = null;
-		NavigatorContentDescriptorManager.getInstance().clearCache();
 		if (structuredViewerManager != null) {
 			structuredViewerManager.safeRefresh();
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.navigator.INavigatorContentService#getViewerId()
+	 */
 	public final String getViewerId() {
 		return viewerDescriptor.getViewerId();
 	}
@@ -868,9 +911,9 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		}
 		return null;
 	}
-
+	
 	/**
-	 *
+	 * 
 	 * @param aDescriptorKey
 	 *            A descriptor
 	 * @return The cached NavigatorContentExtension from the descriptor
@@ -881,7 +924,7 @@ public class NavigatorContentService implements IExtensionActivationListener,
 	}
 
 	/**
-	 *
+	 * 
 	 * @param aDescriptorKey
 	 * @param toLoadIfNecessary
 	 *            True if the extension should be loaded if it is not already.
@@ -891,7 +934,7 @@ public class NavigatorContentService implements IExtensionActivationListener,
 			INavigatorContentDescriptor aDescriptorKey,
 			boolean toLoadIfNecessary) {
 		/* Query and return the relevant descriptor instance */
-		NavigatorContentExtension extension = contentExtensions
+		NavigatorContentExtension extension = (NavigatorContentExtension) contentExtensions
 				.get(aDescriptorKey);
 		if (extension != null || !toLoadIfNecessary) {
 			return extension;
@@ -903,7 +946,7 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		 * the result into the map
 		 */
 		synchronized (this) {
-			extension = contentExtensions
+			extension = (NavigatorContentExtension) contentExtensions
 					.get(aDescriptorKey);
 			if (extension == null) {
 				contentExtensions.put(aDescriptorKey,
@@ -917,12 +960,23 @@ public class NavigatorContentService implements IExtensionActivationListener,
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.eclipse.ui.internal.navigator.INavigatorContentService#
+	 * getViewerDescriptor()
+	 */
 	public INavigatorViewerDescriptor getViewerDescriptor() {
 		return viewerDescriptor;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.navigator.INavigatorContentService#restoreState
+	 * (org.eclipse.ui.IMemento)
+	 */
 	public void restoreState(final IMemento aMemento) {
 		synchronized (this) {
 			for (Iterator extensionItr = getExtensions().iterator(); extensionItr.hasNext();) {
@@ -930,7 +984,6 @@ public class NavigatorContentService implements IExtensionActivationListener,
 						.next();
 				SafeRunner.run(new NavigatorSafeRunnable(((NavigatorContentDescriptor) element
 						.getDescriptor()).getConfigElement()) {
-					@Override
 					public void run() throws Exception {
 						element.restoreState(aMemento);
 					}
@@ -939,7 +992,13 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.navigator.INavigatorContentService#saveState(
+	 * org.eclipse.ui.IMemento)
+	 */
 	public void saveState(final IMemento aMemento) {
 		synchronized (this) {
 			for (Iterator extensionItr = getExtensions().iterator(); extensionItr.hasNext();) {
@@ -947,7 +1006,6 @@ public class NavigatorContentService implements IExtensionActivationListener,
 						.next();
 				SafeRunner.run(new NavigatorSafeRunnable(((NavigatorContentDescriptor) element
 						.getDescriptor()).getConfigElement()) {
-					@Override
 					public void run() throws Exception {
 						element.saveState(aMemento);
 					}
@@ -956,12 +1014,10 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		}
 	}
 
-	@Override
 	public boolean isActive(String anExtensionId) {
 		return assistant.isActive(anExtensionId);
 	}
 
-	@Override
 	public boolean isVisible(String anExtensionId) {
 		return assistant.isVisible(anExtensionId);
 	}
@@ -972,12 +1028,24 @@ public class NavigatorContentService implements IExtensionActivationListener,
 				: Collections.EMPTY_LIST;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.navigator.INavigatorContentService#addListener
+	 * (org
+	 * .eclipse.ui.internal.navigator.extensions.INavigatorContentServiceListener
+	 * )
+	 */
 	public void addListener(INavigatorContentServiceListener aListener) {
 		listeners.add(aListener);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.navigator.INavigatorContentService#getFilterService()
+	 */
 	public INavigatorFilterService getFilterService() {
 		if (navigatorFilterService == null) {
 			navigatorFilterService = new NavigatorFilterService(this);
@@ -985,7 +1053,11 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		return navigatorFilterService;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.navigator.INavigatorContentService#getFilterService()
+	 */
 	public INavigatorSorterService getSorterService() {
 		if (navigatorSorterService == null) {
 			navigatorSorterService = new NavigatorSorterService(this);
@@ -994,7 +1066,11 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		return navigatorSorterService;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.navigator.INavigatorContentService#getFilterService()
+	 */
 	public INavigatorPipelineService getPipelineService() {
 		if (navigatorPipelineService == null) {
 			navigatorPipelineService = new NavigatorPipelineService(this);
@@ -1002,7 +1078,11 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		return navigatorPipelineService;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.navigator.INavigatorContentService#getDnDService()
+	 */
 	public INavigatorDnDService getDnDService() {
 		if (navigatorDnDService == null) {
 			navigatorDnDService = new NavigatorDnDService(this);
@@ -1010,7 +1090,12 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		return navigatorDnDService;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.navigator.INavigatorContentService#getActivationService()
+	 */
 	public INavigatorActivationService getActivationService() {
 
 		if (navigatorActivationService == null) {
@@ -1019,7 +1104,12 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		return navigatorActivationService;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.navigator.INavigatorContentService#getSaveableService()
+	 */
 	public INavigatorSaveablesService getSaveablesService() {
 		synchronized (this) {
 			if (navigatorSaveablesService == null) {
@@ -1032,9 +1122,9 @@ public class NavigatorContentService implements IExtensionActivationListener,
 
 	/**
 	 * Not API as of 3.3.
-	 *
+	 * 
 	 * @return The extension state service for this content service.
-	 *
+	 * 
 	 */
 	public NavigatorExtensionStateService getExtensionStateService() {
 		if (navigatorExtensionStateService == null) {
@@ -1046,7 +1136,7 @@ public class NavigatorContentService implements IExtensionActivationListener,
 
 	/**
 	 * Non-API method to return a shell.
-	 *
+	 * 
 	 * @return A shell associated with the current viewer (if any) or
 	 *         <b>null</b>.
 	 */
@@ -1062,12 +1152,24 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		return assistant.isRootExtension(anExtensionId);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.navigator.INavigatorContentService#removeListener
+	 * (
+	 * org.eclipse.ui.internal.navigator.extensions.INavigatorContentServiceListener
+	 * )
+	 */
 	public void removeListener(INavigatorContentServiceListener aListener) {
 		listeners.remove(aListener);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString() {
 		return "ContentService[" + viewerDescriptor.getViewerId() + "]"; //$NON-NLS-1$//$NON-NLS-2$
 	}
@@ -1078,19 +1180,17 @@ public class NavigatorContentService implements IExtensionActivationListener,
 			return;
 		}
 
-		final List<INavigatorContentServiceListener> failedListeners = new ArrayList<INavigatorContentServiceListener>();
+		final List failedListeners = new ArrayList();
 
-		for (Iterator<INavigatorContentServiceListener> listenersItr = listeners.iterator(); listenersItr.hasNext();) {
-			final INavigatorContentServiceListener listener = listenersItr
+		for (Iterator listenersItr = listeners.iterator(); listenersItr.hasNext();) {
+			final INavigatorContentServiceListener listener = (INavigatorContentServiceListener) listenersItr
 					.next();
 			SafeRunner.run(new NavigatorSafeRunnable() {
 
-				@Override
 				public void run() throws Exception {
 					listener.onLoad(aDescriptorInstance);
 				}
 
-				@Override
 				public void handleException(Throwable e) {
 					super.handleException(e);
 					failedListeners.add(listener);
@@ -1100,33 +1200,33 @@ public class NavigatorContentService implements IExtensionActivationListener,
 
 		if (failedListeners.size() > 0) {
 			listeners.removeAll(failedListeners);
-		}
+		}		
 	}
 
 	private ITreeContentProvider[] extractContentProviders(
-			Set<NavigatorContentExtension> theDescriptorInstances) {
+			Set theDescriptorInstances) {
 		if (theDescriptorInstances.size() == 0) {
 			return NO_CONTENT_PROVIDERS;
 		}
-		List<SafeDelegateTreeContentProvider> resultProvidersList = new ArrayList<SafeDelegateTreeContentProvider>();
-		for (Iterator<NavigatorContentExtension> itr = theDescriptorInstances.iterator(); itr.hasNext();) {
-			resultProvidersList.add(itr.next()
+		List resultProvidersList = new ArrayList();
+		for (Iterator itr = theDescriptorInstances.iterator(); itr.hasNext();) {
+			resultProvidersList.add(((NavigatorContentExtension) itr.next())
 					.internalGetContentProvider());
 		}
-		return resultProvidersList
+		return (ITreeContentProvider[]) resultProvidersList
 				.toArray(new ITreeContentProvider[resultProvidersList.size()]);
 	}
 
-	private Set<NavigatorContentExtension> extractDescriptorInstances(Set<INavigatorContentDescriptor> theDescriptors,
+	private Set extractDescriptorInstances(Set theDescriptors,
 			boolean toLoadAllIfNecessary) {
 		if (theDescriptors.size() == 0) {
 			return Collections.EMPTY_SET;
 		}
-		Set<NavigatorContentExtension> resultInstances = new TreeSet<NavigatorContentExtension>(ExtensionSequenceNumberComparator.INSTANCE);
-		for (Iterator<INavigatorContentDescriptor> descriptorIter = theDescriptors.iterator(); descriptorIter
+		Set resultInstances = new TreeSet(ExtensionSequenceNumberComparator.INSTANCE);
+		for (Iterator descriptorIter = theDescriptors.iterator(); descriptorIter
 				.hasNext();) {
 			NavigatorContentExtension extension = getExtension(
-					descriptorIter.next(),
+					(NavigatorContentDescriptor) descriptorIter.next(),
 					toLoadAllIfNecessary);
 			if (extension != null) {
 				resultInstances.add(extension);
@@ -1143,7 +1243,7 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		return structuredViewerManager.getViewer();
 	}
 
-
+	
 	/**
 	 * Get our preferences
 	 */
@@ -1152,8 +1252,8 @@ public class NavigatorContentService implements IExtensionActivationListener,
 				InstanceScope.SCOPE);
 		return (IEclipsePreferences) root.node(NavigatorPlugin.PLUGIN_ID);
 	}
-
-
+	
+	
 	static void flushPreferences(IEclipsePreferences prefs) {
 		try {
 			prefs.flush();

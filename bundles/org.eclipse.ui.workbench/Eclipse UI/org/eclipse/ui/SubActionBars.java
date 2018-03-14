@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 package org.eclipse.ui;
 
@@ -55,12 +54,10 @@ public class SubActionBars extends EventManager implements IActionBars {
 	 * over handlers contributed to the {@link IHandlerService}.
 	 */
 	private static final Expression EXPRESSION = new Expression() {
-		@Override
 		public final EvaluationResult evaluate(final IEvaluationContext context) {
 			return EvaluationResult.TRUE;
 		}
 
-		@Override
 		public final void collectExpressionInfo(final ExpressionInfo info) {
 			info
 					.addVariableNameAccess(SourcePriorityNameMapping.LEGACY_LEGACY_NAME);
@@ -105,7 +102,7 @@ public class SubActionBars extends EventManager implements IActionBars {
 	/**
 	 * Construct a new <code>SubActionBars</code> object. The service locator
 	 * will simply be the service locator of the parent.
-	 *
+	 * 
 	 * @param parent
 	 *            The parent of this action bar; must not be <code>null</code>.
 	 */
@@ -115,13 +112,13 @@ public class SubActionBars extends EventManager implements IActionBars {
 
 	/**
 	 * Constructs a new instance of <code>SubActionBars</code>.
-	 *
+	 * 
 	 * @param parent
 	 *            The parent of this action bar; must not be <code>null</code>.
 	 * @param serviceLocator
 	 *            The service locator for this action bar; should not be
 	 *            <code>null</code>.
-	 *
+	 *            
 	 * @since 3.2
 	 */
 	public SubActionBars(final IActionBars parent,
@@ -157,7 +154,7 @@ public class SubActionBars extends EventManager implements IActionBars {
 	/**
 	 * Adds a property change listener. Has no effect if an identical listener
 	 * is already registered.
-	 *
+	 * 
 	 * @param listener
 	 *            a property change listener
 	 */
@@ -176,7 +173,6 @@ public class SubActionBars extends EventManager implements IActionBars {
 	/**
 	 * Clear the global action handlers.
 	 */
-	@Override
 	public void clearGlobalActionHandlers() {
 		if (actionHandlers != null) {
 			actionHandlers.clear();
@@ -191,7 +187,7 @@ public class SubActionBars extends EventManager implements IActionBars {
 				final Map.Entry value = (Map.Entry) activationItr.next();
 				final IServiceLocator locator = (IServiceLocator) value
 						.getKey();
-				final IHandlerService service = locator
+				final IHandlerService service = (IHandlerService) locator
 						.getService(IHandlerService.class);
 				final Map activationsByActionId = (Map) value.getValue();
 				Collection activations = activationsByActionId.values();
@@ -209,7 +205,7 @@ public class SubActionBars extends EventManager implements IActionBars {
 
 	/**
 	 * Returns a new sub menu manager.
-	 *
+	 * 
 	 * @param parent
 	 *            the parent menu manager
 	 * @return the menu manager
@@ -220,7 +216,7 @@ public class SubActionBars extends EventManager implements IActionBars {
 
 	/**
 	 * Returns a new sub toolbar manager.
-	 *
+	 * 
 	 * @param parent
 	 *            the parent toolbar manager
 	 * @return the tool bar manager
@@ -283,10 +279,10 @@ public class SubActionBars extends EventManager implements IActionBars {
 	/**
 	 * Notifies any property change listeners that a property has changed. Only
 	 * listeners registered at the time this method is called are notified.
-	 *
+	 * 
 	 * @param event
 	 *            the property change event
-	 *
+	 * 
 	 * @see IPropertyChangeListener#propertyChange
 	 */
 	protected void firePropertyChange(PropertyChangeEvent event) {
@@ -305,13 +301,12 @@ public class SubActionBars extends EventManager implements IActionBars {
 
 	/**
 	 * Get the handler for a window action.
-	 *
+	 * 
 	 * @param actionID
 	 *            an action ID declared in the registry
 	 * @return an action handler which implements the action ID, or
 	 *         <code>null</code> if none is registered.
 	 */
-	@Override
 	public IAction getGlobalActionHandler(String actionID) {
 		if (actionHandlers == null) {
 			return null;
@@ -330,10 +325,9 @@ public class SubActionBars extends EventManager implements IActionBars {
 	/**
 	 * Returns the abstract menu manager. If items are added or removed from the
 	 * manager be sure to call <code>updateActionBars</code>.
-	 *
+	 * 
 	 * @return the menu manager
 	 */
-	@Override
 	public IMenuManager getMenuManager() {
 		if (menuMgr == null) {
 			menuMgr = createSubMenuManager(parent.getMenuManager());
@@ -351,13 +345,12 @@ public class SubActionBars extends EventManager implements IActionBars {
 
 	/**
 	 * Answer the service locator for this action bar.
-	 *
-	 * @return an <code>IServiceLocater</code> or the parents if
+	 * 
+	 * @return an <code>IServiceLocater</code> or the parents if 
 	 *     the receiver does not have one
-	 *
+	 *     
 	 * @since 3.2
 	 */
-	@Override
 	public final IServiceLocator getServiceLocator() {
 		if (serviceLocator != null) {
 			return serviceLocator;
@@ -369,10 +362,9 @@ public class SubActionBars extends EventManager implements IActionBars {
 	/**
 	 * Returns the status line manager. If items are added or removed from the
 	 * manager be sure to call <code>updateActionBars</code>.
-	 *
+	 * 
 	 * @return the status line manager
 	 */
-	@Override
 	public IStatusLineManager getStatusLineManager() {
 		if (statusLineMgr == null) {
 			statusLineMgr = new SubStatusLineManager(parent
@@ -385,10 +377,9 @@ public class SubActionBars extends EventManager implements IActionBars {
 	/**
 	 * Returns the tool bar manager. If items are added or removed from the
 	 * manager be sure to call <code>updateActionBars</code>.
-	 *
+	 * 
 	 * @return the tool bar manager
 	 */
-	@Override
 	public IToolBarManager getToolBarManager() {
 		if (toolBarMgr == null) {
 			toolBarMgr = createSubToolBarManager(parent.getToolBarManager());
@@ -427,7 +418,7 @@ public class SubActionBars extends EventManager implements IActionBars {
 	/**
 	 * Removes the given property change listener. Has no effect if an identical
 	 * listener is not registered.
-	 *
+	 * 
 	 * @param listener
 	 *            a property change listener
 	 */
@@ -455,14 +446,13 @@ public class SubActionBars extends EventManager implements IActionBars {
 
 	/**
 	 * Add a handler for a window action.
-	 *
+	 * 
 	 * @param actionID
 	 *            an action ID declared in the registry
 	 * @param handler
 	 *            an action which implements the action ID. <code>null</code>
 	 *            may be passed to deregister a handler.
 	 */
-	@Override
 	public void setGlobalActionHandler(String actionID, IAction handler) {
 		if (actionID == null) {
 			/*
@@ -474,7 +464,7 @@ public class SubActionBars extends EventManager implements IActionBars {
 					.log("Cannot set the global action handler for a null action id"); //$NON-NLS-1$
 			return;
 		}
-
+		
 		if (handler instanceof CommandLegacyActionWrapper) {
         	// this is a registration of a fake action for an already
 			// registered handler
@@ -482,13 +472,13 @@ public class SubActionBars extends EventManager implements IActionBars {
 					.log("Cannot feed a CommandLegacyActionWrapper back into the system"); //$NON-NLS-1$
 			return;
 		}
-
+		
 		if (handler instanceof CommandAction) {
 			// we unfortunately had to allow these out into the wild, but they
 			// still must not feed back into the system
 			return;
 		}
-
+		
 		if (handler != null) {
 			// Update the action handlers.
 			if (actionHandlers == null) {
@@ -499,7 +489,7 @@ public class SubActionBars extends EventManager implements IActionBars {
 			// Add a mapping from this action id to the command id.
 			if (serviceLocator != null) {
 				String commandId = null;
-				final IActionCommandMappingService mappingService = serviceLocator
+				final IActionCommandMappingService mappingService = (IActionCommandMappingService) serviceLocator
 						.getService(IActionCommandMappingService.class);
 				if (mappingService != null) {
 					commandId = mappingService.getCommandId(actionID);
@@ -509,7 +499,7 @@ public class SubActionBars extends EventManager implements IActionBars {
 				}
 
 				// Update the handler activations.
-				final IHandlerService service = serviceLocator
+				final IHandlerService service = (IHandlerService) serviceLocator
 						.getService(IHandlerService.class);
 				Map activationsByActionId = null;
 				if (activationsByActionIdByServiceLocator == null) {
@@ -576,7 +566,7 @@ public class SubActionBars extends EventManager implements IActionBars {
 
 			// Remove the handler activation.
 			if (serviceLocator != null) {
-				final IHandlerService service = serviceLocator
+				final IHandlerService service = (IHandlerService) serviceLocator
 						.getService(IHandlerService.class);
 				if (activationsByActionIdByServiceLocator != null) {
 					final Map activationsByActionId = (Map) activationsByActionIdByServiceLocator
@@ -600,10 +590,10 @@ public class SubActionBars extends EventManager implements IActionBars {
 
 	/**
 	 * Sets the service locator for this action bar.
-	 *
+	 * 
 	 * @param locator
 	 *            The new locator; must not be <code>null</code>.
-	 *
+	 *            
 	 * @since 3.2
 	 */
 	protected final void setServiceLocator(final IServiceLocator locator) {
@@ -617,7 +607,6 @@ public class SubActionBars extends EventManager implements IActionBars {
 	 * Commits all UI changes. This should be called after additions or
 	 * subtractions have been made to a menu, status line, or toolbar.
 	 */
-	@Override
 	public void updateActionBars() {
 		parent.updateActionBars();
 		fireActionHandlersChanged();

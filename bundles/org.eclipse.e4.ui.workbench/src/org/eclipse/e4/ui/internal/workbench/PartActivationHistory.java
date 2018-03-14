@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -36,7 +35,7 @@ class PartActivationHistory {
 
 	private EModelService modelService;
 
-	private LinkedList<MPart> generalActivationHistory = new LinkedList<>();
+	private LinkedList<MPart> generalActivationHistory = new LinkedList<MPart>();
 
 	PartActivationHistory(PartServiceImpl partService, EModelService modelService) {
 		this.partService = partService;
@@ -66,7 +65,7 @@ class PartActivationHistory {
 	/**
 	 * Places the specified part at the end of the activation history if it is not already in the
 	 * list. If it is already in the activation history, then its position will not change.
-	 *
+	 * 
 	 * @param part
 	 *            the part to possibly add to the end of the activation history
 	 */
@@ -78,7 +77,7 @@ class PartActivationHistory {
 
 	/**
 	 * Adds the specified part to the front of the activation history.
-	 *
+	 * 
 	 * @param part
 	 *            the part to insert into the front of the activation history
 	 */
@@ -212,7 +211,7 @@ class PartActivationHistory {
 
 	MPart getActivationCandidate(Collection<MPart> validParts) {
 		// check activation history, since the history is global, we need to filter it down first
-		Collection<MPart> validCandidates = new ArrayList<>();
+		Collection<MPart> validCandidates = new ArrayList<MPart>();
 		for (MPart validPart : generalActivationHistory) {
 			if (validParts.contains(validPart)) {
 				validCandidates.add(validPart);
@@ -269,7 +268,7 @@ class PartActivationHistory {
 		}
 
 		// check activation history, since the history is global, we need to filter it down first
-		Collection<MPart> validCandidates = new ArrayList<>();
+		Collection<MPart> validCandidates = new ArrayList<MPart>();
 		for (MPart validPart : generalActivationHistory) {
 			if (validParts.contains(validPart)) {
 				validCandidates.add(validPart);
@@ -304,17 +303,13 @@ class PartActivationHistory {
 			}
 		}
 
-		List<String> activeTag = new ArrayList<>();
+		List<String> activeTag = new ArrayList<String>();
 		activeTag.add(EPartService.ACTIVE_ON_CLOSE_TAG);
 		List<MPart> activeCandidates = modelService.findElements(perspective, null, MPart.class,
 				activeTag);
 		if (activeCandidates.size() > 0) {
 			activeCandidates.get(0).getTags().remove(EPartService.ACTIVE_ON_CLOSE_TAG);
-			MPart candidate = activeCandidates.get(0);
-			if (partService.isInContainer(perspective, candidate)
-					&& isValid(perspective, candidate)) {
-				return candidate;
-			}
+			return activeCandidates.get(0);
 		}
 
 		Collection<MPart> candidates = perspective.getContext().get(EPartService.class).getParts();
@@ -337,7 +332,7 @@ class PartActivationHistory {
 	private MUIElement getSiblingSelectionCandidate(MPart part, MUIElement element) {
 		List<MUIElement> siblings = element.getParent().getChildren();
 		for (MPart previouslyActivatedPart : generalActivationHistory) {
-			if (previouslyActivatedPart != part && isValid(previouslyActivatedPart)) {
+			if (previouslyActivatedPart != part && previouslyActivatedPart.isToBeRendered()) {
 				if (siblings.contains(previouslyActivatedPart)) {
 					return previouslyActivatedPart;
 				}

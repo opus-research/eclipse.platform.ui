@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,7 +29,6 @@ import org.eclipse.equinox.app.IApplicationContext;
 
 public class GenTopic implements IApplication {
 
-	@Override
 	public Object start(IApplicationContext context) throws Exception {
 		try {
 			processLiterals(CommandsPackageImpl.Literals.class);
@@ -104,7 +103,6 @@ public class GenTopic implements IApplication {
 		System.out.print("\n\t}"); //$NON-NLS-1$
 	}
 
-	@Override
 	public void stop() {
 		// nothing to do
 	}

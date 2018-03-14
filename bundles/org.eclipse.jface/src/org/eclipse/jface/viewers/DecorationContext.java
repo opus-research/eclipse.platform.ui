@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 IBM Corporation and others.
+ * Copyright (c) 2006, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,13 +22,13 @@ import java.util.Map;
  * @since 3.2
  */
 public class DecorationContext implements IDecorationContext {
-
+	
 	/**
 	 * Constant that defines a default decoration context that has
 	 * no context ids associated with it.
 	 */
 	public static final IDecorationContext DEFAULT_CONTEXT = new DecorationContext();
-
+	
 	private Map properties = new HashMap();
 
 	/**
@@ -36,13 +36,18 @@ public class DecorationContext implements IDecorationContext {
 	 */
 	public DecorationContext() {
 	}
+	
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IDecorationContext#getProperty(java.lang.String)
+	 */
 	public Object getProperty(String property) {
 		return properties.get(property);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IDecorationContext#getProperties()
+	 */
 	public String[] getProperties() {
 		return (String[]) properties.keySet().toArray(new String[properties.size()]);
 	}

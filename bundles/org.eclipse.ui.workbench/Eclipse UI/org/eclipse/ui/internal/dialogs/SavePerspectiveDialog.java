@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,7 +41,7 @@ import org.eclipse.ui.model.PerspectiveLabelProvider;
 /**
  * The SavePerspectiveDialog can be used to get the name of a new
  * perspective or the descriptor of an old perspective.  The results
- * are returned by <code>getNewPerspName</code> and
+ * are returned by <code>getNewPerspName</code> and 
  * <code>getOldPersp</code>.
  */
 public class SavePerspectiveDialog extends org.eclipse.jface.dialogs.Dialog
@@ -79,11 +79,13 @@ public class SavePerspectiveDialog extends org.eclipse.jface.dialogs.Dialog
 		setShellStyle(getShellStyle() | SWT.SHEET);
     }
 
-    @Override
-	protected void configureShell(Shell shell) {
+    /* (non-Javadoc)
+     * Method declared in Window.
+     */
+    protected void configureShell(Shell shell) {
         super.configureShell(shell);
         shell
-                .setText(WorkbenchMessages.SavePerspective_shellTitle);
+                .setText(WorkbenchMessages.SavePerspective_shellTitle); 
         PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,
 				IWorkbenchHelpContextIds.SAVE_PERSPECTIVE_DIALOG);
     }
@@ -93,8 +95,7 @@ public class SavePerspectiveDialog extends org.eclipse.jface.dialogs.Dialog
      *
      * @param parent the button bar composite
      */
-    @Override
-	protected void createButtonsForButtonBar(Composite parent) {
+    protected void createButtonsForButtonBar(Composite parent) {
         okButton = createButton(parent, IDialogConstants.OK_ID,
                 IDialogConstants.OK_LABEL, true);
         createButton(parent, IDialogConstants.CANCEL_ID,
@@ -104,14 +105,13 @@ public class SavePerspectiveDialog extends org.eclipse.jface.dialogs.Dialog
     }
 
     /**
-     * Creates and returns the contents of the upper part
+     * Creates and returns the contents of the upper part 
      * of this dialog (above the button bar).
      *
      * @param parent the parent composite to contain the dialog area
      * @return the dialog area control
      */
-    @Override
-	protected Control createDialogArea(Composite parent) {
+    protected Control createDialogArea(Composite parent) {
         Font font = parent.getFont();
         // Run super.
         Composite composite = (Composite) super.createDialogArea(parent);
@@ -191,7 +191,7 @@ public class SavePerspectiveDialog extends org.eclipse.jface.dialogs.Dialog
 
     /**
      * Returns the target name.
-     *
+     * 
      * @return the target name
      */
     public IPerspectiveDescriptor getPersp() {
@@ -200,7 +200,7 @@ public class SavePerspectiveDialog extends org.eclipse.jface.dialogs.Dialog
 
     /**
      * Returns the target name.
-     *
+     * 
      * @return the target name
      */
     public String getPerspName() {
@@ -210,8 +210,7 @@ public class SavePerspectiveDialog extends org.eclipse.jface.dialogs.Dialog
     /**
      * The user has typed some text.
      */
-    @Override
-	public void modifyText(org.eclipse.swt.events.ModifyEvent e) {
+    public void modifyText(org.eclipse.swt.events.ModifyEvent e) {
         // Get text.
         perspName = text.getText();
 
@@ -238,19 +237,17 @@ public class SavePerspectiveDialog extends org.eclipse.jface.dialogs.Dialog
      * and closes the dialog. Subclasses may override.
      * </p>
      */
-    @Override
-	protected void okPressed() {
+    protected void okPressed() {
         perspName = text.getText();
         persp = perspReg.findPerspectiveWithLabel(perspName);
         if (persp != null) {
             // Confirm ok to overwrite
-            String message = NLS.bind(WorkbenchMessages.SavePerspective_overwriteQuestion,perspName );
+            String message = NLS.bind(WorkbenchMessages.SavePerspective_overwriteQuestion,perspName ); 
             String[] buttons = new String[] { IDialogConstants.YES_LABEL,
                     IDialogConstants.NO_LABEL, IDialogConstants.CANCEL_LABEL };
 			MessageDialog d = new MessageDialog(this.getShell(),
 					WorkbenchMessages.SavePerspective_overwriteTitle, null,
 					message, MessageDialog.QUESTION, buttons, 0) {
-				@Override
 				protected int getShellStyle() {
 					return super.getShellStyle() | SWT.SHEET;
 				}
@@ -277,8 +274,7 @@ public class SavePerspectiveDialog extends org.eclipse.jface.dialogs.Dialog
      *
      * @param event event object describing the change
      */
-    @Override
-	public void selectionChanged(SelectionChangedEvent event) {
+    public void selectionChanged(SelectionChangedEvent event) {
         // If a selection is caused by modifyText ignore it.
         if (ignoreSelection) {
 			return;

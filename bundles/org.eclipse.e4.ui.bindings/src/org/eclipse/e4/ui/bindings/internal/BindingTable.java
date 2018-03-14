@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.contexts.Context;
@@ -31,38 +30,32 @@ import org.eclipse.jface.bindings.keys.KeyStroke;
  * manage tables of bindings that can be used to look up commands from keys.
  */
 public class BindingTable {
-	private static int compareSchemes(String[] activeSchemeIds, final String schemeId1,
-			final String schemeId2) {
-		if (activeSchemeIds == null || activeSchemeIds.length == 0) {
-			return 0;
-		}
-		if (!schemeId2.equals(schemeId1)) {
-			for (int i = 0; i < activeSchemeIds.length; i++) {
-				final String schemePointer = activeSchemeIds[i];
-				if (schemeId2.equals(schemePointer)) {
-					return 1;
-				} else if (schemeId1.equals(schemePointer)) {
-					return -1;
-				}
-			}
-		}
-		return 0;
-	}
-
 	static class BindingComparator implements Comparator<Binding> {
 		private String[] activeSchemeIds;
+
+		private final int compareSchemes(final String schemeId1, final String schemeId2) {
+			if (activeSchemeIds == null || activeSchemeIds.length == 0) {
+				return 0;
+			}
+			if (!schemeId2.equals(schemeId1)) {
+				for (int i = 0; i < activeSchemeIds.length; i++) {
+					final String schemePointer = activeSchemeIds[i];
+					if (schemeId2.equals(schemePointer)) {
+						return 1;
+					} else if (schemeId1.equals(schemePointer)) {
+						return -1;
+					}
+				}
+			}
+			return 0;
+		}
 
 		public void setActiveSchemes(String[] activeSchemeIds) {
 			this.activeSchemeIds = activeSchemeIds;
 		}
 
-		public String[] getActiveSchemes() {
-			return this.activeSchemeIds;
-		}
-
-		@Override
 		public int compare(Binding o1, Binding o2) {
-			int rc = compareSchemes(activeSchemeIds, o1.getSchemeId(), o2.getSchemeId());
+			int rc = compareSchemes(o1.getSchemeId(), o2.getSchemeId());
 			if (rc != 0) {
 				return rc;
 			}
@@ -128,7 +121,6 @@ public class BindingTable {
 	private Map<ParameterizedCommand, ArrayList<Binding>> bindingsByCommand = new HashMap<ParameterizedCommand, ArrayList<Binding>>();
 	private Map<TriggerSequence, ArrayList<Binding>> bindingsByPrefix = new HashMap<TriggerSequence, ArrayList<Binding>>();
 	private Map<TriggerSequence, ArrayList<Binding>> conflicts = new HashMap<TriggerSequence, ArrayList<Binding>>();
-	private Map<TriggerSequence, ArrayList<Binding>> orderedBindingsByTrigger = new HashMap<TriggerSequence, ArrayList<Binding>>();
 
 	/**
 	 * @param context
@@ -147,7 +139,8 @@ public class BindingTable {
 
 	public Collection<Binding> getConflicts() {
 		Collection<Binding> conflictsList = new ArrayList<Binding>();
-		for (ArrayList<Binding> conflictsForTrigger : conflicts.values()) {
+		for (TriggerSequence key : conflicts.keySet()) {
+			ArrayList<Binding> conflictsForTrigger = conflicts.get(key);
 			if (conflictsForTrigger != null) {
 				conflictsList.addAll(conflictsForTrigger);
 			}
@@ -165,68 +158,54 @@ public class BindingTable {
 			throw new IllegalArgumentException("Binding context " + binding.getContextId() //$NON-NLS-1$
 					+ " does not match " + getId()); //$NON-NLS-1$
 		}
-		ArrayList<Binding> bindingList = orderedBindingsByTrigger.get(binding.getTriggerSequence());
-		Binding possibleConflict = bindingsByTrigger.get(binding.getTriggerSequence());
-		if (bindingList == null || bindingList.isEmpty()) {
-			if (possibleConflict != null) {
-				if (bindingList == null) {
-					bindingList = new ArrayList<Binding>();
-					orderedBindingsByTrigger.put(binding.getTriggerSequence(), bindingList);
-				}
-				bindingList.add(binding);
-				bindingList.add(possibleConflict);
-				Collections.sort(bindingList, BEST_SEQUENCE);
+
+		Binding conflict;
+		ArrayList<Binding> conflictsList;
+		boolean isConflict = false;
+
+		// if this binding conflicts with one other active binding
+		if (bindingsByTrigger.containsKey(binding.getTriggerSequence())) {
+			// remove the active binding and put it in the conflicts map
+			conflict = bindingsByTrigger.get(binding.getTriggerSequence());
+			removeBinding(conflict);
+			conflictsList = new ArrayList<Binding>();
+			conflictsList.add(conflict);
+			conflicts.put(binding.getTriggerSequence(), conflictsList);
+			isConflict = true;
+		}
+		// if this trigger is already in the conflicts map
+		if (conflicts.containsKey(binding.getTriggerSequence())
+				&& conflicts.get(binding.getTriggerSequence()).size() > 0) {
+
+			// add this binding to the conflicts map
+			conflictsList = conflicts.get(binding.getTriggerSequence());
+			if (!conflictsList.contains(binding)) {
+				conflictsList.add(binding);
 			}
-		} else {
-			bindingList.add(binding);
-			Collections.sort(bindingList, BEST_SEQUENCE);
+			isConflict = true;
 		}
 
-		if (possibleConflict != null && bindingList != null && !bindingList.isEmpty()
-				&& bindingList.get(0) != possibleConflict) {
-			removeBindingSimple(possibleConflict);
-			possibleConflict = null;
-		}
-
-		evaluateOrderedBindings(binding.getTriggerSequence(), binding);
-	}
-
-	private void addBindingSimple(Binding binding) {
-		bindings.add(binding);
-		bindingsByTrigger.put(binding.getTriggerSequence(), binding);
-
-		ArrayList<Binding> sequences = bindingsByCommand.get(binding.getParameterizedCommand());
-		if (sequences == null) {
-			sequences = new ArrayList<Binding>();
-			bindingsByCommand.put(binding.getParameterizedCommand(), sequences);
-		}
-		sequences.add(binding);
-		Collections.sort(sequences, BEST_SEQUENCE);
-
-		TriggerSequence[] prefs = binding.getTriggerSequence().getPrefixes();
-		for (int i = 1; i < prefs.length; i++) {
-			ArrayList<Binding> bindings = bindingsByPrefix.get(prefs[i]);
-			if (bindings == null) {
-				bindings = new ArrayList<Binding>();
-				bindingsByPrefix.put(prefs[i], bindings);
-			}
+		// if there are no conflicts, then add to the table
+		if (!isConflict) {
 			bindings.add(binding);
-		}
-	}
+			bindingsByTrigger.put(binding.getTriggerSequence(), binding);
 
-	private void removeBindingSimple(Binding binding) {
-		bindings.remove(binding);
-		bindingsByTrigger.remove(binding.getTriggerSequence());
-		ArrayList<Binding> sequences = bindingsByCommand.get(binding.getParameterizedCommand());
+			ArrayList<Binding> sequences = bindingsByCommand.get(binding.getParameterizedCommand());
+			if (sequences == null) {
+				sequences = new ArrayList<Binding>();
+				bindingsByCommand.put(binding.getParameterizedCommand(), sequences);
+			}
+			sequences.add(binding);
+			Collections.sort(sequences, BEST_SEQUENCE);
 
-		if (sequences != null) {
-			sequences.remove(binding);
-		}
-		TriggerSequence[] prefs = binding.getTriggerSequence().getPrefixes();
-		for (int i = 1; i < prefs.length; i++) {
-			ArrayList<Binding> bindings = bindingsByPrefix.get(prefs[i]);
-			if (bindings != null) {
-				bindings.remove(binding);
+			TriggerSequence[] prefs = binding.getTriggerSequence().getPrefixes();
+			for (int i = 1; i < prefs.length; i++) {
+				ArrayList<Binding> bindings = bindingsByPrefix.get(prefs[i]);
+				if (bindings == null) {
+					bindings = new ArrayList<Binding>();
+					bindingsByPrefix.put(prefs[i], bindings);
+				}
+				bindings.add(binding);
 			}
 		}
 	}
@@ -236,79 +215,33 @@ public class BindingTable {
 			throw new IllegalArgumentException("Binding context " + binding.getContextId() //$NON-NLS-1$
 					+ " does not match " + getId()); //$NON-NLS-1$
 		}
-		ArrayList<Binding> bindingList = orderedBindingsByTrigger.get(binding.getTriggerSequence());
-		Binding possibleConflict = bindingsByTrigger.get(binding.getTriggerSequence());
-		if (possibleConflict == binding) {
-			removeBindingSimple(binding);
-			if (bindingList != null) {
-				bindingList.remove(binding);
-				if (bindingList.isEmpty()) {
-					orderedBindingsByTrigger.remove(binding.getTriggerSequence());
-				} else {
-					evaluateOrderedBindings(binding.getTriggerSequence(), null);
-				}
-			}
-		} else if (bindingList != null) {
-			bindingList.remove(binding);
-			if (bindingList.isEmpty()) {
-				orderedBindingsByTrigger.remove(binding.getTriggerSequence());
-			} else {
-				evaluateOrderedBindings(binding.getTriggerSequence(), null);
-			}
-		}
-	}
+		ArrayList<Binding> conflictBindings = conflicts.get(binding.getTriggerSequence());
 
-	/**
-	 * @param binding
-	 */
-	private void evaluateOrderedBindings(TriggerSequence sequence, Binding binding) {
-		ArrayList<Binding> bindingList = orderedBindingsByTrigger.get(sequence);
+		// if this binding is in the conflicts map, then remove it
+		if (!bindingsByTrigger.containsKey(binding.getTriggerSequence())
+				&& conflictBindings != null) {
 
-		// calculate binding to be used or any conflicts
-		if (bindingList != null) {
-			if (bindingList.isEmpty()) {
-				orderedBindingsByTrigger.remove(sequence);
-			} else if (bindingList.size() > 1) {
-				Binding msb = bindingList.get(0);
-				Binding lsb = bindingList.get(1);
-				int rc = compareSchemes(BEST_SEQUENCE.getActiveSchemes(), msb.getSchemeId(),
-						lsb.getSchemeId());
-				if (rc == 0) {
-					ArrayList<Binding> conflictList = conflicts.get(sequence);
-					if (conflictList == null) {
-						conflictList = new ArrayList<Binding>();
-						conflicts.put(sequence, conflictList);
-					} else {
-						conflictList.clear();
-					}
-					Iterator<Binding> i = bindingList.iterator();
-					Binding prev = i.next();
-					conflictList.add(prev);
-					while (i.hasNext() && rc == 0) {
-						Binding next = i.next();
-						rc = compareSchemes(BEST_SEQUENCE.getActiveSchemes(), prev.getSchemeId(),
-								next.getSchemeId());
-						if (rc == 0) {
-							conflictList.add(next);
-						}
-						prev = next;
-					}
-				} else {
-					conflicts.remove(sequence);
-					if (bindingsByTrigger.get(sequence) == null) {
-						addBindingSimple(msb);
-					}
-				}
-			} else {
-				if (bindingsByTrigger.get(sequence) == null) {
-					addBindingSimple(bindingList.get(0));
-				}
-				orderedBindingsByTrigger.remove(sequence);
+			conflictBindings.remove(binding);
+
+			// if there is only one binding left in the list, then it's not really a conflict
+			// binding anymore and can be re-added to the binding table
+			if (conflictBindings.size() == 1) {
+				Binding bindingToReAdd = conflictBindings.remove(0);
+				addBinding(bindingToReAdd);
 			}
-		} else if (binding != null) {
-			conflicts.remove(sequence);
-			if (bindingsByTrigger.get(sequence) == null) {
-				addBindingSimple(binding);
+
+		} else {
+			bindings.remove(binding);
+			bindingsByTrigger.remove(binding.getTriggerSequence());
+			ArrayList<Binding> sequences = bindingsByCommand.get(binding.getParameterizedCommand());
+
+			if (sequences != null) {
+				sequences.remove(binding);
+			}
+			TriggerSequence[] prefs = binding.getTriggerSequence().getPrefixes();
+			for (int i = 1; i < prefs.length; i++) {
+				ArrayList<Binding> bindings = bindingsByPrefix.get(prefs[i]);
+				bindings.remove(binding);
 			}
 		}
 	}
@@ -325,7 +258,6 @@ public class BindingTable {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	public Collection<Binding> getSequencesFor(ParameterizedCommand command) {
 		ArrayList<Binding> triggers = bindingsByCommand.get(command);
 		return (Collection<Binding>) (triggers == null ? Collections.EMPTY_LIST : triggers.clone());

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Angelo Zerr and others.
+ * Copyright (c) 2008, 2009 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,7 +26,6 @@ public class CSSSWTApplyStylesListener {
 	public CSSSWTApplyStylesListener(Display display, final CSSEngine engine) {
 		this.engine = engine;
 		display.addListener(SWT.Skin, new Listener() {
-			@Override
 			public void handleEvent(Event event) {
 				if (engine != null) {
 					engine.applyStyles(event.widget, false);
@@ -34,5 +33,5 @@ public class CSSSWTApplyStylesListener {
 			}
 		});
 	}
-
+	
 }

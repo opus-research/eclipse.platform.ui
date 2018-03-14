@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,7 @@ import org.eclipse.ui.keys.IBindingService;
 /**
  * Provides support for contexts within the workbench -- including key bindings,
  * and some default contexts for shell types.
- *
+ * 
  * @since 3.0
  */
 public class WorkbenchContextSupport implements IWorkbenchContextSupport {
@@ -67,7 +67,7 @@ public class WorkbenchContextSupport implements IWorkbenchContextSupport {
 	 * Constructs a new instance of <code>WorkbenchCommandSupport</code>.
 	 * This attaches the key binding support, and adds a global shell activation
 	 * filter.
-	 *
+	 * 
 	 * @param workbenchToSupport
 	 *            The workbench that needs to be supported by this instance;
 	 *            must not be <code>null</code>.
@@ -84,7 +84,6 @@ public class WorkbenchContextSupport implements IWorkbenchContextSupport {
 				.getContextManagerWrapper(contextManager);
 	}
 
-	@Override
 	public final void addEnabledSubmission(
 			final EnabledSubmission enabledSubmission) {
 		final IContextActivation activation = contextService.activateContext(
@@ -98,7 +97,6 @@ public class WorkbenchContextSupport implements IWorkbenchContextSupport {
 		activationsBySubmission.put(enabledSubmission, activation);
 	}
 
-	@Override
 	public final void addEnabledSubmissions(final Collection enabledSubmissions) {
 		final Iterator submissionItr = enabledSubmissions.iterator();
 		while (submissionItr.hasNext()) {
@@ -106,32 +104,26 @@ public class WorkbenchContextSupport implements IWorkbenchContextSupport {
 		}
 	}
 
-	@Override
 	public final IContextManager getContextManager() {
 		return contextManagerWrapper;
 	}
 
-	@Override
 	public final int getShellType(Shell shell) {
 		return contextService.getShellType(shell);
 	}
 
-	@Override
 	public final boolean isKeyFilterEnabled() {
 		return bindingService.isKeyFilterEnabled();
 	}
 
-	@Override
 	public final void openKeyAssistDialog() {
 		bindingService.openKeyAssistDialog();
 	}
 
-	@Override
 	public final boolean registerShell(final Shell shell, final int type) {
 		return contextService.registerShell(shell, type);
 	}
 
-	@Override
 	public final void removeEnabledSubmission(
 			final EnabledSubmission enabledSubmission) {
 		if (activationsBySubmission == null) {
@@ -145,7 +137,6 @@ public class WorkbenchContextSupport implements IWorkbenchContextSupport {
 		}
 	}
 
-	@Override
 	public final void removeEnabledSubmissions(
 			final Collection enabledSubmissions) {
 		final Iterator submissionItr = enabledSubmissions.iterator();
@@ -154,12 +145,10 @@ public class WorkbenchContextSupport implements IWorkbenchContextSupport {
 		}
 	}
 
-	@Override
 	public final void setKeyFilterEnabled(final boolean enabled) {
 		bindingService.setKeyFilterEnabled(enabled);
 	}
 
-	@Override
 	public final boolean unregisterShell(final Shell shell) {
 		return contextService.unregisterShell(shell);
 	}

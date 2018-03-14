@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440810, 472654
  *******************************************************************************/
 
 package org.eclipse.ui.internal.keys.model;
@@ -17,10 +16,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
 import org.eclipse.core.commands.CommandManager;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.common.NotDefinedException;
@@ -29,7 +26,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.e4.ui.bindings.EBindingService;
 import org.eclipse.jface.bindings.Binding;
 import org.eclipse.jface.bindings.BindingManager;
 import org.eclipse.jface.bindings.Scheme;
@@ -53,7 +49,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
 
 /**
  * @since 3.4
- *
+ * 
  */
 public class KeyController {
 	private static final String DELIMITER = ","; //$NON-NLS-1$
@@ -134,7 +130,7 @@ public class KeyController {
 	}
 
 	private static BindingManager loadModelBackend(IServiceLocator locator) {
-		IBindingService bindingService = locator
+		IBindingService bindingService = (IBindingService) locator
 				.getService(IBindingService.class);
 		BindingManager bindingManager = new BindingManager(
 				new ContextManager(), new CommandManager());
@@ -156,20 +152,10 @@ public class KeyController {
 					new Status(IStatus.WARNING, WorkbenchPlugin.PI_WORKBENCH,
 							"Keys page found an undefined scheme", e)); //$NON-NLS-1$
 		}
-
+		
 		bindingManager.setLocale(bindingService.getLocale());
 		bindingManager.setPlatform(bindingService.getPlatform());
-
-		Set<Binding> bindings = new HashSet<>();
-		EBindingService eBindingService = locator
-				.getService(EBindingService.class);
-		bindings.addAll(eBindingService.getActiveBindings());
-		for (Binding binding : bindingService.getBindings()) {
-			bindings.add(binding);
-		}
-
-		bindingManager.setBindings(bindings.toArray(new Binding[0]));
-
+		bindingManager.setBindings(bindingService.getBindings());
 		return bindingManager;
 	}
 
@@ -191,7 +177,6 @@ public class KeyController {
 
 	private void addSetContextListener() {
 		addPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getSource() == contextModel
 						&& CommonModel.PROP_SELECTED_ELEMENT.equals(event
@@ -204,7 +189,6 @@ public class KeyController {
 
 	private void addSetBindingListener() {
 		addPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getSource() == bindingModel
 						&& CommonModel.PROP_SELECTED_ELEMENT.equals(event
@@ -227,7 +211,6 @@ public class KeyController {
 
 	private void addSetConflictListener() {
 		addPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getSource() == conflictModel
 						&& CommonModel.PROP_SELECTED_ELEMENT.equals(event
@@ -243,7 +226,6 @@ public class KeyController {
 
 	private void addSetKeySequenceListener() {
 		addPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (BindingElement.PROP_TRIGGER.equals(event.getProperty())) {
 					updateTrigger((BindingElement) event.getSource(),
@@ -256,7 +238,6 @@ public class KeyController {
 
 	private void addSetModelObjectListener() {
 		addPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getSource() instanceof BindingElement
 						&& ModelElement.PROP_MODEL_OBJECT.equals(event
@@ -288,7 +269,6 @@ public class KeyController {
 
 	private void addSetSchemeListener() {
 		addPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getSource() == fSchemeModel
 						&& CommonModel.PROP_SELECTED_ELEMENT.equals(event
@@ -437,7 +417,7 @@ public class KeyController {
 	/**
 	 * Replaces all the current bindings with the bindings in the local copy of
 	 * the binding manager.
-	 *
+	 * 
 	 * @param bindingService
 	 *            The binding service that saves the changes made to the local
 	 *            copy of the binding manager
@@ -455,7 +435,7 @@ public class KeyController {
 	 * Logs the given exception, and opens an error dialog saying that something
 	 * went wrong. The exception is assumed to have something to do with the
 	 * preference store.
-	 *
+	 * 
 	 * @param exception
 	 *            The exception to be logged; must not be <code>null</code>.
 	 */
@@ -473,12 +453,12 @@ public class KeyController {
 
 	/**
 	 * Filters contexts for the When Combo.
-	 *
+	 * 
 	 * @param actionSets
 	 *            <code>true</code> to filter action set contexts
 	 * @param internal
 	 *            <code>false</code> to filter internal contexts
-	 *
+	 * 
 	 */
 	public void filterContexts(boolean actionSets, boolean internal) {
 		contextModel.filterContexts(actionSets, internal);
@@ -486,7 +466,7 @@ public class KeyController {
 
 	/**
 	 * Sets the bindings to default.
-	 *
+	 * 
 	 * @param bindingService
 	 */
 	public void setDefaultBindings(IBindingService bindingService) {
@@ -524,7 +504,6 @@ public class KeyController {
 		}
 
 		final SafeRunnable runnable = new SafeRunnable() {
-			@Override
 			public final void run() throws IOException {
 				Writer fileWriter = null;
 				try {

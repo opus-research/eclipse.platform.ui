@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,8 +12,9 @@
 package org.eclipse.ui.internal;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
+
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.ISelectionListener;
@@ -22,14 +23,14 @@ import org.eclipse.ui.services.IDisposable;
 
 /**
  * @since 3.4
- *
+ * 
  */
 public class SlaveSelectionService implements ISelectionService, IDisposable {
 
-	private ListenerList<ISelectionListener> postListeners = new ListenerList<>(ListenerList.IDENTITY);
-	private ListenerList<ISelectionListener> listeners = new ListenerList<>(ListenerList.IDENTITY);
-	private Map<ISelectionListener, String> listenersToPartId = new HashMap<>();
-	private Map<ISelectionListener, String> postListenersToPartId = new HashMap<>();
+	private ListenerList postListeners = new ListenerList(ListenerList.IDENTITY);
+	private ListenerList listeners = new ListenerList(ListenerList.IDENTITY);
+	private Map listenersToPartId = new HashMap();
+	private Map postListenersToPartId = new HashMap();
 
 	private ISelectionService parentSelectionService;
 
@@ -44,68 +45,57 @@ public class SlaveSelectionService implements ISelectionService, IDisposable {
 		this.parentSelectionService = parentSelectionService;
 	}
 
-	@Override
 	public void addPostSelectionListener(ISelectionListener listener) {
 		postListeners.add(listener);
 		parentSelectionService.addPostSelectionListener(listener);
 	}
 
-	@Override
 	public void addPostSelectionListener(String partId,
 			ISelectionListener listener) {
 		listenersToPartId.put(listener, partId);
 		parentSelectionService.addPostSelectionListener(partId, listener);
 	}
 
-	@Override
 	public void addSelectionListener(ISelectionListener listener) {
 		listeners.add(listener);
 		parentSelectionService.addSelectionListener(listener);
 	}
 
-	@Override
 	public void addSelectionListener(String partId, ISelectionListener listener) {
 		postListenersToPartId.put(listener, partId);
 		parentSelectionService.addPostSelectionListener(partId, listener);
 	}
 
-	@Override
 	public ISelection getSelection() {
 		return parentSelectionService.getSelection();
 	}
 
-	@Override
 	public ISelection getSelection(String partId) {
 		return parentSelectionService.getSelection(partId);
 	}
 
-	@Override
 	public void removePostSelectionListener(ISelectionListener listener) {
 		postListeners.remove(listener);
 		parentSelectionService.removePostSelectionListener(listener);
 	}
 
-	@Override
 	public void removePostSelectionListener(String partId,
 			ISelectionListener listener) {
 		postListenersToPartId.remove(listener);
 		parentSelectionService.removePostSelectionListener(partId, listener);
 	}
 
-	@Override
 	public void removeSelectionListener(ISelectionListener listener) {
 		listeners.remove(listener);
 		parentSelectionService.removeSelectionListener(listener);
 	}
 
-	@Override
 	public void removeSelectionListener(String partId,
 			ISelectionListener listener) {
 		listenersToPartId.remove(listener);
 		parentSelectionService.removeSelectionListener(partId, listener);
 	}
 
-	@Override
 	public void dispose() {
 		Object list[] = listeners.getListeners();
 
@@ -122,15 +112,21 @@ public class SlaveSelectionService implements ISelectionService, IDisposable {
 		}
 		postListeners.clear();
 
-		for (Entry<ISelectionListener, String> entry : listenersToPartId.entrySet()) {
+		Iterator i = listenersToPartId.keySet().iterator();
+		while (i.hasNext()) {
+			Object listener = i.next();
 			parentSelectionService.removeSelectionListener(
-					entry.getValue(), entry.getKey());
+					(String) listenersToPartId.get(listener),
+					(ISelectionListener) listener);
 		}
 		listenersToPartId.clear();
 
-		for (Entry<ISelectionListener, String> entry : postListenersToPartId.entrySet()) {
+		i = postListenersToPartId.keySet().iterator();
+		while (i.hasNext()) {
+			Object listener = i.next();
 			parentSelectionService.removePostSelectionListener(
-					entry.getValue(), entry.getKey());
+					(String) postListenersToPartId.get(listener),
+					(ISelectionListener) listener);
 		}
 		postListenersToPartId.clear();
 	}

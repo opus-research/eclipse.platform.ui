@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,9 +22,9 @@ import org.eclipse.ui.internal.registry.WorkingSetDescriptor;
 import org.eclipse.ui.internal.registry.WorkingSetRegistry;
 
 /**
- * A new working set wizard allows the user to create a
+ * A new working set wizard allows the user to create a 
  * new working set using a plugin specified working set page.
- *
+ * 
  * @since 2.0
  * @see org.eclipse.ui.dialog.IWorkingSetPage
  */
@@ -36,13 +36,13 @@ public class WorkingSetNewWizard extends Wizard implements IWorkingSetNewWizard 
     private String editPageId;
 
     private IWorkingSet workingSet;
-
+    
     private WorkingSetDescriptor[] descriptors;
-
+    
     /**
      * Creates a new instance of the receiver.
-     *
-     * @param descriptors the choice of descriptors
+     * 
+     * @param descriptors the choice of descriptors 
      */
     public WorkingSetNewWizard(WorkingSetDescriptor[] descriptors) {
         super();
@@ -54,18 +54,17 @@ public class WorkingSetNewWizard extends Wizard implements IWorkingSetNewWizard 
     /**
      * Overrides method in Wizard.
      * Adds a page listing the available kinds of working sets.
-     * The second wizard page will depend on the selected working set
+     * The second wizard page will depend on the selected working set 
      * type.
-     *
+     * 
      * @see org.eclipse.jface.wizard.Wizard#addPages()
      */
-    @Override
-	public void addPages() {
+    public void addPages() {
         super.addPages();
 
         IWizardPage page;
         WorkingSetRegistry registry = WorkbenchPlugin.getDefault().getWorkingSetRegistry();
-
+        
         if (descriptors.length > 1) {
             page = workingSetTypePage = new WorkingSetTypePage(this.descriptors);
         } else {
@@ -79,11 +78,10 @@ public class WorkingSetNewWizard extends Wizard implements IWorkingSetNewWizard 
 
 	/**
      * Overrides method in Wizard.
-     *
+     * 
      * @see org.eclipse.jface.wizard.Wizard#canFinish()
      */
-    @Override
-	public boolean canFinish() {
+    public boolean canFinish() {
         return (workingSetEditPage != null && workingSetEditPage
                 .isPageComplete());
     }
@@ -93,11 +91,10 @@ public class WorkingSetNewWizard extends Wizard implements IWorkingSetNewWizard 
      * Returns a working set page for creating the new working set.
      * This second page is loaded from the plugin that defined the
      * selected working set type.
-     *
+     * 
      * @see org.eclipse.jface.wizard.Wizard#getNextPage(IWizardPage)
      */
-    @Override
-	public IWizardPage getNextPage(IWizardPage page) {
+    public IWizardPage getNextPage(IWizardPage page) {
         if (workingSetTypePage != null && page == workingSetTypePage) {
             String pageId = workingSetTypePage.getSelection();
             if (pageId != null) {
@@ -115,14 +112,13 @@ public class WorkingSetNewWizard extends Wizard implements IWorkingSetNewWizard 
     }
 
     /**
-     * Returns the new working set. Returns null if the wizard has
+     * Returns the new working set. Returns null if the wizard has 
      * been cancelled.
-     *
-     * @return the new working set or null if the wizard has been
+     * 
+     * @return the new working set or null if the wizard has been 
      * 	cancelled.
      */
-    @Override
-	public IWorkingSet getSelection() {
+    public IWorkingSet getSelection() {
         return workingSet;
     }
 
@@ -130,14 +126,13 @@ public class WorkingSetNewWizard extends Wizard implements IWorkingSetNewWizard 
      * Overrides method in Wizard.
      * Stores the newly created working set and the id of the page
      * used to create it.
-     *
+     * 
      * @see org.eclipse.jface.wizard.Wizard#performFinish()
      */
-    @Override
-	public boolean performFinish() {
+    public boolean performFinish() {
         workingSetEditPage.finish();
         workingSet = workingSetEditPage.getSelection();
         workingSet.setId(editPageId);
         return true;
-    }
+    }    
 }

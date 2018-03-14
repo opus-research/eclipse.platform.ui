@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,21 +38,21 @@ public class AboutTextManager {
 
     /**
      * Scan the contents of the about text
-     * @param s
-     * @return
+     * @param s 
+     * @return 
      */
     public static AboutItem scan(String s) {
         ArrayList linkRanges = new ArrayList();
         ArrayList links = new ArrayList();
-
+        
         // slightly modified version of jface url detection
         // see org.eclipse.jface.text.hyperlink.URLHyperlinkDetector
-
+        
 		int urlSeparatorOffset= s.indexOf("://"); //$NON-NLS-1$
 		while(urlSeparatorOffset >= 0) {
-
+	
 			boolean startDoubleQuote= false;
-
+	
 			// URL protocol (left to "://")
 			int urlOffset= urlSeparatorOffset;
 			char ch;
@@ -64,15 +64,15 @@ public class AboutTextManager {
 				startDoubleQuote= ch == '"';
 			} while (Character.isUnicodeIdentifierStart(ch));
 			urlOffset++;
-
-
+			
+	
 			// Right to "://"
 			StringTokenizer tokenizer= new StringTokenizer(s.substring(urlSeparatorOffset + 3), " \t\n\r\f<>", false); //$NON-NLS-1$
 			if (!tokenizer.hasMoreTokens())
 				return null;
-
+	
 			int urlLength= tokenizer.nextToken().length() + 3 + urlSeparatorOffset - urlOffset;
-
+	
 			if (startDoubleQuote) {
 				int endOffset= -1;
 				int nextDoubleQuote= s.indexOf('"', urlOffset);
@@ -86,10 +86,10 @@ public class AboutTextManager {
 				if (endOffset != -1)
 					urlLength= endOffset - urlOffset;
 			}
-
+			
 			linkRanges.add(new int[] { urlOffset, urlLength });
 			links.add(s.substring(urlOffset, urlOffset+urlLength));
-
+			
 			urlSeparatorOffset= s.indexOf("://", urlOffset+urlLength+1); //$NON-NLS-1$
 		}
         return new AboutItem(s, (int[][]) linkRanges.toArray(new int[linkRanges
@@ -97,7 +97,7 @@ public class AboutTextManager {
                 .toArray(new String[links.size()]));
     }
 	private StyledText styledText;
-
+	
     private Cursor handCursor;
 
     private Cursor busyCursor;
@@ -105,21 +105,20 @@ public class AboutTextManager {
     private boolean mouseDown = false;
 
     private boolean dragEvent = false;
-
+    
     private AboutItem item;
-
+    
     public AboutTextManager(StyledText text) {
     	this.styledText = text;
     	createCursors();
     	addListeners();
     }
-
+    
     private void createCursors() {
         handCursor = new Cursor(styledText.getDisplay(), SWT.CURSOR_HAND);
         busyCursor = new Cursor(styledText.getDisplay(), SWT.CURSOR_WAIT);
         styledText.addDisposeListener(new DisposeListener() {
-            @Override
-			public void widgetDisposed(DisposeEvent e) {
+            public void widgetDisposed(DisposeEvent e) {
                 handCursor.dispose();
                 handCursor = null;
                 busyCursor.dispose();
@@ -128,22 +127,20 @@ public class AboutTextManager {
         });
     }
 
-
+	
     /**
      * Adds listeners to the given styled text
      */
     protected void addListeners() {
         styledText.addMouseListener(new MouseAdapter() {
-            @Override
-			public void mouseDown(MouseEvent e) {
+            public void mouseDown(MouseEvent e) {
                 if (e.button != 1) {
                     return;
                 }
                 mouseDown = true;
             }
 
-            @Override
-			public void mouseUp(MouseEvent e) {
+            public void mouseUp(MouseEvent e) {
                 mouseDown = false;
                 int offset = styledText.getCaretOffset();
                 if (dragEvent) {
@@ -164,8 +161,7 @@ public class AboutTextManager {
         });
 
         styledText.addMouseMoveListener(new MouseMoveListener() {
-            @Override
-			public void mouseMove(MouseEvent e) {
+            public void mouseMove(MouseEvent e) {
                 // Do not change cursor on drag events
                 if (mouseDown) {
                     if (!dragEvent) {
@@ -193,8 +189,7 @@ public class AboutTextManager {
         });
 
         styledText.addTraverseListener(new TraverseListener() {
-            @Override
-			public void keyTraversed(TraverseEvent e) {
+            public void keyTraversed(TraverseEvent e) {
                 switch (e.detail) {
                 case SWT.TRAVERSE_ESCAPE:
                     e.doit = true;
@@ -209,7 +204,7 @@ public class AboutTextManager {
                     }
                     StyleRange nextRange = findNextRange();
                     if (nextRange == null) {
-                        // Next time in start at beginning, also used by
+                        // Next time in start at beginning, also used by 
                         // TRAVERSE_TAB_PREVIOUS to indicate we traversed out
                         // in the forward direction
                     	styledText.setSelection(0);
@@ -230,7 +225,7 @@ public class AboutTextManager {
 					}
                     StyleRange previousRange = findPreviousRange();
                     if (previousRange == null) {
-                        // Next time in start at the end, also used by
+                        // Next time in start at the end, also used by 
                         // TRAVERSE_TAB_NEXT to indicate we traversed out
                         // in the backward direction
                     	styledText.setSelection(styledText.getCharCount());
@@ -250,8 +245,7 @@ public class AboutTextManager {
 
         //Listen for Tab and Space to allow keyboard navigation
         styledText.addKeyListener(new KeyAdapter() {
-            @Override
-			public void keyPressed(KeyEvent event) {
+            public void keyPressed(KeyEvent event) {
                 StyledText text = (StyledText) event.widget;
                 if (event.character == ' ' || event.character == SWT.CR) {
                     if (item != null) {
@@ -289,7 +283,7 @@ public class AboutTextManager {
         this.item = item;
         if (item != null) {
         	styledText.setText(item.getText());
-        	setLinkRanges(item.getLinkRanges());
+        	setLinkRanges(item.getLinkRanges()); 
         }
     }
 
@@ -311,7 +305,7 @@ public class AboutTextManager {
     }
 
     /**
-     * Find the next range after the current
+     * Find the next range after the current 
      * selection.
      */
     private StyleRange findNextRange() {

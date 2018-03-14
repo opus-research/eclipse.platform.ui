@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,8 +12,8 @@
 package org.eclipse.ui;
 
 import java.util.Map;
+
 import org.eclipse.core.commands.util.Tracing;
-import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ui.internal.misc.Policy;
 import org.eclipse.ui.services.IServiceLocator;
 
@@ -23,7 +23,7 @@ import org.eclipse.ui.services.IServiceLocator;
  * support. Subclasses need only call <code>fireSourceChanged</code> whenever
  * appropriate.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public abstract class AbstractSourceProvider implements ISourceProvider {
@@ -31,31 +31,40 @@ public abstract class AbstractSourceProvider implements ISourceProvider {
 	/**
 	 * Whether source providers should print out debugging information to the
 	 * console when events arrive.
-	 *
+	 * 
 	 * @since 3.2
 	 */
 	protected static boolean DEBUG = Policy.DEBUG_SOURCES;
 
 	/**
 	 * The listeners to this source provider. This value is never
-	 * <code>null</code>.
+	 * <code>null</code>. {@link #listenerCount} should be consulted to get
+	 * the real length.
 	 */
-	private final ListenerList listeners = new ListenerList(ListenerList.IDENTITY);
+	private ISourceProviderListener[] listeners = new ISourceProviderListener[7];
 
+	/**
+	 * The number of listeners in the array.
+	 */
+	private int listenerCount = 0;
 
-	@Override
 	public final void addSourceProviderListener(
 			final ISourceProviderListener listener) {
 		if (listener == null) {
 			throw new NullPointerException("The listener cannot be null"); //$NON-NLS-1$
 		}
 
-		listeners.add(listener);
+		if (listenerCount == listeners.length) {
+			final ISourceProviderListener[] growArray = new ISourceProviderListener[listeners.length + 4];
+			System.arraycopy(listeners, 0, growArray, 0, listeners.length);
+			listeners = growArray;
+		}
+		listeners[listenerCount++] = listener;
 	}
 
 	/**
 	 * Notifies all listeners that a single source has changed.
-	 *
+	 * 
 	 * @param sourcePriority
 	 *            The source priority that has changed.
 	 * @param sourceName
@@ -66,15 +75,15 @@ public abstract class AbstractSourceProvider implements ISourceProvider {
 	 */
 	protected final void fireSourceChanged(final int sourcePriority,
 			final String sourceName, final Object sourceValue) {
-		for (Object listener : listeners.getListeners()) {
-			((ISourceProviderListener) listener).sourceChanged(sourcePriority, sourceName,
-					sourceValue);
+		for (int i = 0; i < listenerCount; i++) {
+			final ISourceProviderListener listener = listeners[i];
+			listener.sourceChanged(sourcePriority, sourceName, sourceValue);
 		}
 	}
 
 	/**
 	 * Notifies all listeners that multiple sources have changed.
-	 *
+	 * 
 	 * @param sourcePriority
 	 *            The source priority that has changed.
 	 * @param sourceValuesByName
@@ -85,9 +94,9 @@ public abstract class AbstractSourceProvider implements ISourceProvider {
 	 */
 	protected final void fireSourceChanged(final int sourcePriority,
 			final Map sourceValuesByName) {
-
-		for (Object listener : listeners.getListeners()) {
-			((ISourceProviderListener) listener).sourceChanged(sourcePriority, sourceValuesByName);
+		for (int i = 0; i < listenerCount; i++) {
+			final ISourceProviderListener listener = listeners[i];
+			listener.sourceChanged(sourcePriority, sourceValuesByName);
 		}
 	}
 
@@ -95,7 +104,7 @@ public abstract class AbstractSourceProvider implements ISourceProvider {
 	 * Logs a debugging message in an appropriate manner. If the message is
 	 * <code>null</code> or the <code>DEBUG</code> is <code>false</code>,
 	 * then this method does nothing.
-	 *
+	 * 
 	 * @param message
 	 *            The debugging message to log; if <code>null</code>, then
 	 *            nothing is logged.
@@ -107,21 +116,34 @@ public abstract class AbstractSourceProvider implements ISourceProvider {
 		}
 	}
 
-	@Override
 	public final void removeSourceProviderListener(
 			final ISourceProviderListener listener) {
 		if (listener == null) {
 			throw new NullPointerException("The listener cannot be null"); //$NON-NLS-1$
 		}
 
-		listeners.remove(listener);
+		int emptyIndex = -1;
+		for (int i = 0; i < listenerCount; i++) {
+			if (listeners[i] == listener) {
+				listeners[i] = null;
+				emptyIndex = i;
+			}
+		}
+
+		if (emptyIndex != -1) {
+			// Compact the array.
+			for (int i = emptyIndex + 1; i < listenerCount; i++) {
+				listeners[i - 1] = listeners[i];
+			}
+			listenerCount--;
+		}
 	}
 
 	/**
 	 * This method is called when the source provider is instantiated by
 	 * <code>org.eclipse.ui.services</code>. Clients may override this method
 	 * to perform initialization.
-	 *
+	 * 
 	 * @param locator
 	 *            The global service locator. It can be used to retrieve
 	 *            services like the IContextService

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,21 +28,21 @@ import org.eclipse.ui.internal.services.RegistryPersistence;
  * <p>
  * A static class for accessing the registry.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public final class ContextPersistence extends RegistryPersistence {
 
 	/**
 	 * The index of the context elements in the indexed array.
-	 *
+	 * 
 	 * @see ContextPersistence#read()
 	 */
 	private static final int INDEX_CONTEXT_DEFINITIONS = 0;
 
 	/**
 	 * Reads all of the command definitions from the commands extension point.
-	 *
+	 * 
 	 * @param configurationElements
 	 *            The configuration elements in the commands extension point;
 	 *            must not be <code>null</code>, but may be empty.
@@ -121,7 +121,6 @@ public final class ContextPersistence extends RegistryPersistence {
 		this.contextManager = contextManager;
 	}
 
-	@Override
 	protected final boolean isChangeImportant(final IRegistryChangeEvent event) {
 		final IExtensionDelta[] acceleratorScopeDeltas = event
 				.getExtensionDeltas(PlatformUI.PLUGIN_ID,
@@ -145,12 +144,11 @@ public final class ContextPersistence extends RegistryPersistence {
 
 	/**
 	 * Reads all of the contexts from the registry,
-	 *
+	 * 
 	 * @param contextManager
 	 *            The context manager which should be populated with the values
 	 *            from the registry; must not be <code>null</code>.
 	 */
-	@Override
 	protected final void read() {
 		super.read();
 		reRead();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -44,7 +44,7 @@ public class ReopenEditorMenu extends ContributionItem {
     // the maximum length for a file name; must be >= 4
     private static final int MAX_TEXT_LENGTH = 40;
 
-    // only assign mnemonic to the first nine items
+    // only assign mnemonic to the first nine items 
     private static final int MAX_MNEMONIC_SIZE = 9;
 
     /**
@@ -76,11 +76,11 @@ public class ReopenEditorMenu extends ContributionItem {
 		return calcText(index, item.getName(), item.getToolTipText(), Window
 				.getDefaultOrientation() == SWT.RIGHT_TO_LEFT);
 	}
-
+    
     /**
      * Return a string suitable for a file MRU list.  This should not be called
      * outside the framework.
-     *
+     * 
      * @param index the index in the MRU list
      * @param name the file name
      * @param toolTip potentially the path
@@ -106,7 +106,7 @@ public class ReopenEditorMenu extends ContributionItem {
             pathName = ""; //$NON-NLS-1$
         }
         IPath path = new Path(pathName);
-        // if last segment in path is the fileName, remove it
+        // if last segment in path is the fileName, remove it 
         if (path.segmentCount() > 1
                 && path.segment(path.segmentCount() - 1).equals(fileName)) {
             path = path.removeLastSegments(1);
@@ -191,8 +191,7 @@ public class ReopenEditorMenu extends ContributionItem {
      * Fills the given menu with
      * menu items for all windows.
      */
-    @Override
-	public void fill(final Menu menu, int index) {
+    public void fill(final Menu menu, int index) {
         if (window.getActivePage() == null
                 || window.getActivePage().getPerspective() == null) {
             return;
@@ -223,22 +222,19 @@ public class ReopenEditorMenu extends ContributionItem {
             final EditorHistoryItem item = historyItems[i];
             final int historyIndex = i;
             SafeRunner.run(new SafeRunnable() {
-                @Override
-				public void run() throws Exception {
+                public void run() throws Exception {
                     String text = calcText(historyIndex, item);
                     MenuItem mi = new MenuItem(menu, SWT.PUSH, menuIndex[0]);
                     ++menuIndex[0];
                     mi.setText(text);
                     mi.addSelectionListener(new SelectionAdapter() {
-                        @Override
-						public void widgetSelected(SelectionEvent e) {
+                        public void widgetSelected(SelectionEvent e) {
                             open(item);
                         }
                     });
                 }
 
-                @Override
-				public void handleException(Throwable e) {
+                public void handleException(Throwable e) {
                     // just skip the item if there's an error,
                     // e.g. in the calculation of the shortened name
                     WorkbenchPlugin.log(getClass(), "fill", e); //$NON-NLS-1$
@@ -250,8 +246,7 @@ public class ReopenEditorMenu extends ContributionItem {
     /**
      * Overridden to always return true and force dynamic menu building.
      */
-    @Override
-	public boolean isDynamic() {
+    public boolean isDynamic() {
         return true;
     }
 
@@ -270,7 +265,7 @@ public class ReopenEditorMenu extends ContributionItem {
                 IEditorDescriptor desc = item.getDescriptor();
 				if (input == null || !input.exists() || desc == null) {
                     String title = WorkbenchMessages.OpenRecent_errorTitle;
-                    String msg = NLS.bind(WorkbenchMessages.OpenRecent_unableToOpen,  itemName );
+                    String msg = NLS.bind(WorkbenchMessages.OpenRecent_unableToOpen,  itemName ); 
                     MessageDialog.openWarning(window.getShell(), title, msg);
                     history.remove(item);
                 } else {

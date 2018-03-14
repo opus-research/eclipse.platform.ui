@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,19 +28,17 @@ import org.eclipse.ui.internal.dialogs.PropertyPageManager;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class PropertiesProvider extends QuickAccessProvider {
 
 	private Map idToElement;
 
-	@Override
 	public QuickAccessElement getElementForId(String id) {
 		getElements();
 		return (PropertiesElement) idToElement.get(id);
 	}
 
-	@Override
 	public QuickAccessElement[] getElements() {
 		if (idToElement == null) {
 			idToElement = new HashMap();
@@ -72,23 +70,19 @@ public class PropertiesProvider extends QuickAccessProvider {
 				new QuickAccessElement[idToElement.values().size()]);
 	}
 
-	@Override
 	public String getId() {
 		return "org.eclipse.ui.properties"; //$NON-NLS-1$
 	}
 
-	@Override
 	public ImageDescriptor getImageDescriptor() {
 		return WorkbenchImages
 				.getImageDescriptor(IWorkbenchGraphicConstants.IMG_OBJ_NODE);
 	}
 
-	@Override
 	public String getName() {
 		return QuickAccessMessages.QuickAccess_Properties;
 	}
 
-	@Override
 	protected void doReset() {
 		idToElement = null;
 	}

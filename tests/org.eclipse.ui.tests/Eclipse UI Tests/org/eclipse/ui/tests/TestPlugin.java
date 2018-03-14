@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,8 +38,8 @@ public class TestPlugin extends AbstractUIPlugin implements IStartup {
     // This boolean should only be true if the earlyStartup() method
     // has been called.
     private static boolean earlyStartupCalled = false;
-
-    public static final String PLUGIN_ID = "org.eclipse.ui.tests";
+    
+    public static final String PLUGIN_ID = "org.eclipse.ui.tests"; 
 
     /**
      * The constructor.
@@ -94,7 +94,7 @@ public class TestPlugin extends AbstractUIPlugin implements IStartup {
     public ImageDescriptor getImageDescriptor(String relativePath) {
         String iconPath = "icons/";
         try {
-			URL installURL = getBundle().getEntry("/");
+            URL installURL = getDescriptor().getInstallURL();
             URL url = new URL(installURL, iconPath + relativePath);
             return ImageDescriptor.createFromURL(url);
         } catch (MalformedURLException e) {
@@ -103,8 +103,10 @@ public class TestPlugin extends AbstractUIPlugin implements IStartup {
         }
     }
 
-    @Override
-	public void earlyStartup() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IStartup#earlyStartup()
+     */
+    public void earlyStartup() {
         earlyStartupCalled = true;
     }
 
@@ -116,16 +118,20 @@ public class TestPlugin extends AbstractUIPlugin implements IStartup {
         earlyStartupCalled = false;
     }
 
-    @Override
-	public void start(BundleContext context) throws Exception {
+    /* (non-Javadoc)
+     * @see org.eclipse.core.runtime.Plugin#start(org.osgi.framework.BundleContext)
+     */
+    public void start(BundleContext context) throws Exception {
         TestInstallUtil.setContext(context);
         super.start(context);
         earlyStartup();
         MenuBuilder.addMenuContribution();
     }
 
-    @Override
-	public void stop(BundleContext context) throws Exception {
+    /* (non-Javadoc)
+     * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
+     */
+    public void stop(BundleContext context) throws Exception {
     	MenuBuilder.removeMenuContribution();
         TestInstallUtil.setContext(null);
         super.stop(context);

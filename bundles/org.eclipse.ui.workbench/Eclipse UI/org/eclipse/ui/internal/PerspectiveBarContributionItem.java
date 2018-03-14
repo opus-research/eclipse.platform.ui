@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,7 +46,7 @@ public class PerspectiveBarContributionItem extends ContributionItem {
 
     /**
      * Create a new perspective contribution item
-     *
+     * 
      * @param perspective the descriptor for the perspective
      * @param workbenchPage the page that this perspective is in
      */
@@ -57,8 +57,10 @@ public class PerspectiveBarContributionItem extends ContributionItem {
         this.workbenchPage = workbenchPage;
     }
 
-    @Override
-	public void dispose() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.action.ContributionItem#dispose()
+     */
+    public void dispose() {
         super.dispose();
         if (image != null && !image.isDisposed()) {
             image.dispose();
@@ -70,8 +72,7 @@ public class PerspectiveBarContributionItem extends ContributionItem {
 
     }
 
-    @Override
-	public void fill(ToolBar parent, int index) {
+    public void fill(ToolBar parent, int index) {
         if (toolItem == null && parent != null && !parent.isDisposed()) {
 
             if (index >= 0) {
@@ -88,8 +89,7 @@ public class PerspectiveBarContributionItem extends ContributionItem {
             toolItem.setToolTipText(NLS.bind(WorkbenchMessages.PerspectiveBarContributionItem_toolTip, perspective.getLabel()));
             toolItem.addSelectionListener(new SelectionAdapter() {
 
-                @Override
-				public void widgetSelected(SelectionEvent event) {
+                public void widgetSelected(SelectionEvent event) {
                     select();
                 }
             });
@@ -127,8 +127,7 @@ public class PerspectiveBarContributionItem extends ContributionItem {
 		}
     }
 
-    @Override
-	public void update() {
+    public void update() {
         if (toolItem != null && !toolItem.isDisposed()) {
             toolItem
                     .setSelection(workbenchPage.getPerspective() == perspective);
@@ -181,9 +180,9 @@ public class PerspectiveBarContributionItem extends ContributionItem {
     }
 
     /**
-     * Answer whether the receiver is a match for the provided
+     * Answer whether the receiver is a match for the provided 
      * perspective descriptor
-     *
+     * 
      * @param perspective the perspective descriptor
      * @param workbenchPage the page
      * @return <code>true</code> if it is a match

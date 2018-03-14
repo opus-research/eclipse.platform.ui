@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,11 +24,11 @@ import org.eclipse.ui.internal.ide.undo.UndoMessages;
  * An AbstractCopyOrMoveResourcesOperation represents an undoable operation for
  * moving or copying one or more resources in the workspace. Clients may call
  * the public API from a background thread.
- *
+ * 
  * This class is not intended to be subclassed by clients.
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 abstract class AbstractCopyOrMoveResourcesOperation extends
 		AbstractResourcesOperation {
@@ -49,10 +49,10 @@ abstract class AbstractCopyOrMoveResourcesOperation extends
 	 * Create an AbstractCopyOrMoveResourcesOperation that moves or copies all
 	 * of the specified resources to the specified paths. The destination paths
 	 * must include the names of the resources at their new location.
-	 *
+	 * 
 	 * @param resources
 	 *            the resources to be moved or copied.  May not contain null
-	 *            resources, or resources that are descendants of already
+	 *            resources, or resources that are descendants of already 
 	 *            included resources.
 	 * @param destinationPaths
 	 *            the destination paths for the resources, including the name to
@@ -60,7 +60,7 @@ abstract class AbstractCopyOrMoveResourcesOperation extends
 	 *            null paths, and must be the same length as the resources array.
 	 * @param label
 	 *            the label of the operation
-	 *
+	 *            
 	 */
 	AbstractCopyOrMoveResourcesOperation(IResource[] resources,
 			IPath[] destinationPaths, String label) {
@@ -92,7 +92,7 @@ abstract class AbstractCopyOrMoveResourcesOperation extends
 	 * Create an AbstractCopyOrMoveResourcesOperation that moves or copies all
 	 * of the specified resources to the same target location, using their
 	 * existing names.
-	 *
+	 * 
 	 * @param resources
 	 *            the resources to be moved or copied
 	 * @param destinationPath
@@ -110,7 +110,7 @@ abstract class AbstractCopyOrMoveResourcesOperation extends
 	/**
 	 * Create an AbstractCopyOrMoveResourcesOperation whose destination is not
 	 * yet specified.
-	 *
+	 * 
 	 * @param resources
 	 *            the resources to be modified
 	 * @param label
@@ -127,7 +127,7 @@ abstract class AbstractCopyOrMoveResourcesOperation extends
 	 * successful. A status severity of <code>ERROR</code> indicates that the
 	 * operation is no longer valid. Other status severities are open to
 	 * interpretation by the caller.
-	 *
+	 * 
 	 * Note this method may be called on initial moving or copying of a
 	 * resource, or when a move or copy is undone or redone. Therefore, this
 	 * method should check conditions that can change over the life of the
@@ -136,7 +136,7 @@ abstract class AbstractCopyOrMoveResourcesOperation extends
 	 * typically be done by the caller so that the user is not continually
 	 * prompted or warned about conditions that were acceptable at the time of
 	 * original execution and do not change over time.
-	 *
+	 * 
 	 * @return the status indicating the projected outcome of moving or copying
 	 *         the resources.
 	 */
@@ -176,7 +176,7 @@ abstract class AbstractCopyOrMoveResourcesOperation extends
 	/**
 	 * Return the destination path that should be used to move or copy the
 	 * specified resource. This path is relative to the workspace.
-	 *
+	 * 
 	 * @param resource
 	 *            the resource being moved or copied
 	 * @param index
@@ -191,7 +191,11 @@ abstract class AbstractCopyOrMoveResourcesOperation extends
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#appendDescriptiveText(java.lang.StringBuffer)
+	 */
 	protected void appendDescriptiveText(StringBuffer text) {
 		super.appendDescriptiveText(text);
 		text.append(" destination: "); //$NON-NLS-1$
@@ -204,7 +208,7 @@ abstract class AbstractCopyOrMoveResourcesOperation extends
 	/**
 	 * Return a boolean indicating whether the proposed destination path for a
 	 * resource is valid.
-	 *
+	 * 
 	 * @param resource
 	 *            the resource whose path is to be checked
 	 * @param index
@@ -218,7 +222,7 @@ abstract class AbstractCopyOrMoveResourcesOperation extends
 
 	/**
 	 * Return a string indicating the proposed name for the resource
-	 *
+	 * 
 	 * @param resource
 	 *            the resource whose path is to be checked
 	 * @param index
@@ -230,9 +234,12 @@ abstract class AbstractCopyOrMoveResourcesOperation extends
 	}
 
 	/*
+	 * (non-Javadoc)
+	 * 
 	 * Map execution to move status.
+	 * 
+	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#computeExecutionStatus(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	@Override
 	public IStatus computeExecutionStatus(IProgressMonitor monitor) {
 		IStatus status = super.computeExecutionStatus(monitor);
 		if (status.isOK()) {
@@ -242,9 +249,12 @@ abstract class AbstractCopyOrMoveResourcesOperation extends
 	}
 
 	/*
+	 * (non-Javadoc)
+	 * 
 	 * Map redo to move status.
+	 * 
+	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#computeRedoableStatus(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	@Override
 	public IStatus computeRedoableStatus(IProgressMonitor monitor) {
 		IStatus status = super.computeRedoableStatus(monitor);
 		if (status.isOK()) {

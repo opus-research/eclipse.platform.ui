@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,7 @@ import org.eclipse.ui.services.IDisposable;
 
 /**
  * @since 3.4
- *
+ * 
  */
 public class WorkbenchLocationService implements IWorkbenchLocationService,
 		IDisposable {
@@ -45,37 +45,73 @@ public class WorkbenchLocationService implements IWorkbenchLocationService,
 		this.level = level;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.eclipse.ui.internal.services.IWorkbenchLocationService#
+	 * getMultiPageEditorSite()
+	 */
 	public IEditorSite getMultiPageEditorSite() {
 		return mpepSite;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.services.IWorkbenchLocationService#getPageSite()
+	 */
 	public IPageSite getPageSite() {
 		return pageSite;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.services.IWorkbenchLocationService#getPartSite()
+	 */
 	public IWorkbenchPartSite getPartSite() {
 		return partSite;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.services.IWorkbenchLocationService#getServiceScope
+	 * ()
+	 */
 	public String getServiceScope() {
 		return serviceScope;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.services.IWorkbenchLocationService#getWorkbench()
+	 */
 	public IWorkbench getWorkbench() {
 		return workbench;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.services.IWorkbenchLocationService#getWorkbenchWindow
+	 * ()
+	 */
 	public IWorkbenchWindow getWorkbenchWindow() {
 		return window;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.services.IDisposable#dispose()
+	 */
 	public void dispose() {
 		mpepSite = null;
 		pageSite = null;
@@ -85,7 +121,9 @@ public class WorkbenchLocationService implements IWorkbenchLocationService,
 		window = null;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.services.IWorkbenchLocationService#getServiceLevel()
+	 */
 	public int getServiceLevel() {
 		return level;
 	}

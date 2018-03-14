@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429598
  *******************************************************************************/
 package org.eclipse.jface.wizard;
 
@@ -74,7 +73,7 @@ public abstract class Wizard implements IWizard {
     /**
      * This wizard's list of pages (element type: <code>IWizardPage</code>).
      */
-    private List<IWizardPage> pages = new ArrayList<>();
+    private List pages = new ArrayList();
 
     /**
      * Indicates whether this wizard needs a progress monitor.
@@ -129,7 +128,7 @@ public abstract class Wizard implements IWizard {
     /**
      * Adds a new page to this wizard. The page is inserted at the end of the
      * page list.
-     *
+     * 
      * @param page
      *            the new page
      */
@@ -144,15 +143,16 @@ public abstract class Wizard implements IWizard {
      * added before the wizard opens. New pages should be added by calling
      * <code>addPage</code>.
      */
-    @Override
-	public void addPages() {
+    public void addPages() {
     }
 
-    @Override
-	public boolean canFinish() {
+    /*
+     * (non-Javadoc) Method declared on IWizard.
+     */
+    public boolean canFinish() {
         // Default implementation is to check if all pages are complete.
         for (int i = 0; i < pages.size(); i++) {
-            if (!pages.get(i).isPageComplete()) {
+            if (!((IWizardPage) pages.get(i)).isPageComplete()) {
 				return false;
 			}
         }
@@ -167,18 +167,15 @@ public abstract class Wizard implements IWizard {
      * lazily. The framework ensures that the contents of a page will be created
      * before attempting to show it.
      */
-    @Override
-	public void createPageControls(Composite pageContainer) {
+    public void createPageControls(Composite pageContainer) {
         // the default behavior is to create all the pages controls
         for (int i = 0; i < pages.size(); i++) {
-            IWizardPage page = pages.get(i);
+            IWizardPage page = (IWizardPage) pages.get(i);
             page.createControl(pageContainer);
-			// page is responsible for ensuring the created control is
-			// accessible
+            // page is responsible for ensuring the created control is
+            // accessable
             // via getControl.
-			Assert.isNotNull(
-					page.getControl(),
-					"getControl() of wizard page returns null. Did you call setControl() in your wizard page?"); //$NON-NLS-1$
+            Assert.isNotNull(page.getControl());
         }
     }
 
@@ -189,12 +186,11 @@ public abstract class Wizard implements IWizard {
      * if the wizard instance maintains addition SWT resource that need to be
      * disposed.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         // notify pages
         for (int i = 0; i < pages.size(); i++) {
 			try {
-	            pages.get(i).dispose();
+	            ((IWizardPage) pages.get(i)).dispose();
 			} catch (Exception e) {
 				Status status = new Status(IStatus.ERROR, Policy.JFACE, IStatus.ERROR, e.getMessage(), e);
 				Policy.getLog().log(status);
@@ -207,38 +203,49 @@ public abstract class Wizard implements IWizard {
         }
     }
 
-    @Override
-	public IWizardContainer getContainer() {
+    /*
+     * (non-Javadoc) Method declared on IWizard.
+     */
+    public IWizardContainer getContainer() {
         return container;
     }
 
-    @Override
-	public Image getDefaultPageImage() {
+    /*
+     * (non-Javadoc) Method declared on IWizard.
+     */
+    public Image getDefaultPageImage() {
         if (defaultImage == null) {
             defaultImage = JFaceResources.getResources().createImageWithDefault(defaultImageDescriptor);
         }
         return defaultImage;
     }
 
-    @Override
-	public IDialogSettings getDialogSettings() {
+    /*
+     * (non-Javadoc) Method declared on IWizard.
+     */
+    public IDialogSettings getDialogSettings() {
         return dialogSettings;
     }
 
-    @Override
-	public IWizardPage getNextPage(IWizardPage page) {
+    /*
+     * (non-Javadoc) Method declared on IWizard. The default behavior is to
+     * return the page that was added to this wizard after the given page.
+     */
+    public IWizardPage getNextPage(IWizardPage page) {
         int index = pages.indexOf(page);
         if (index == pages.size() - 1 || index == -1) {
 			// last page or page not found
             return null;
 		}
-        return pages.get(index + 1);
+        return (IWizardPage) pages.get(index + 1);
     }
 
-    @Override
-	public IWizardPage getPage(String name) {
+    /*
+     * (non-Javadoc) Method declared on IWizard.
+     */
+    public IWizardPage getPage(String name) {
         for (int i = 0; i < pages.size(); i++) {
-            IWizardPage page = pages.get(i);
+            IWizardPage page = (IWizardPage) pages.get(i);
             String pageName = page.getName();
             if (pageName.equals(name)) {
 				return page;
@@ -247,30 +254,37 @@ public abstract class Wizard implements IWizard {
         return null;
     }
 
-    @Override
-	public int getPageCount() {
+    /*
+     * (non-Javadoc) Method declared on IWizard.
+     */
+    public int getPageCount() {
         return pages.size();
     }
 
-    @Override
-	public IWizardPage[] getPages() {
-        return pages.toArray(new IWizardPage[pages.size()]);
+    /*
+     * (non-Javadoc) Method declared on IWizard.
+     */
+    public IWizardPage[] getPages() {
+        return (IWizardPage[]) pages.toArray(new IWizardPage[pages.size()]);
     }
 
-    @Override
-	public IWizardPage getPreviousPage(IWizardPage page) {
+    /*
+     * (non-Javadoc) Method declared on IWizard. The default behavior is to
+     * return the page that was added to this wizard before the given page.
+     */
+    public IWizardPage getPreviousPage(IWizardPage page) {
         int index = pages.indexOf(page);
         if (index == 0 || index == -1) {
 			// first page or page not found
             return null;
-		}
-		return pages.get(index - 1);
+		} 
+		return (IWizardPage) pages.get(index - 1);
     }
 
     /**
      * Returns the wizard's shell if the wizard is visible. Otherwise
      * <code>null</code> is returned.
-     *
+     * 
      * @return Shell
      */
     public Shell getShell() {
@@ -280,36 +294,49 @@ public abstract class Wizard implements IWizard {
         return container.getShell();
     }
 
-    @Override
-	public IWizardPage getStartingPage() {
+    /*
+     * (non-Javadoc) Method declared on IWizard. By default this is the first
+     * page inserted into the wizard.
+     */
+    public IWizardPage getStartingPage() {
         if (pages.size() == 0) {
 			return null;
 		}
-        return pages.get(0);
+        return (IWizardPage) pages.get(0);
     }
 
-    @Override
-	public RGB getTitleBarColor() {
+    /*
+     * (non-Javadoc) Method declared on IWizard.
+     */
+    public RGB getTitleBarColor() {
         return titleBarColor;
     }
 
-    @Override
-	public String getWindowTitle() {
+    /*
+     * (non-Javadoc) Method declared on IWizard.
+     */
+    public String getWindowTitle() {
         return windowTitle;
     }
 
-    @Override
-	public boolean isHelpAvailable() {
+    /*
+     * (non-Javadoc) Method declared on IWizard.
+     */
+    public boolean isHelpAvailable() {
         return isHelpAvailable;
     }
 
-    @Override
-	public boolean needsPreviousAndNextButtons() {
+    /*
+     * (non-Javadoc) Method declared on IWizard.
+     */
+    public boolean needsPreviousAndNextButtons() {
         return forcePreviousAndNextButtons || pages.size() > 1;
     }
 
-    @Override
-	public boolean needsProgressMonitor() {
+    /*
+     * (non-Javadoc) Method declared on IWizard.
+     */
+    public boolean needsProgressMonitor() {
         return needsProgressMonitor;
     }
 
@@ -319,8 +346,7 @@ public abstract class Wizard implements IWizard {
      * reimplement this method if they need to perform any special cancel
      * processing for their wizard.
      */
-    @Override
-	public boolean performCancel() {
+    public boolean performCancel() {
         return true;
     }
 
@@ -328,11 +354,12 @@ public abstract class Wizard implements IWizard {
      * Subclasses must implement this <code>IWizard</code> method to perform
      * any special finish processing for their wizard.
      */
-    @Override
-	public abstract boolean performFinish();
+    public abstract boolean performFinish();
 
-    @Override
-	public void setContainer(IWizardContainer wizardContainer) {
+    /*
+     * (non-Javadoc) Method declared on IWizard.
+     */
+    public void setContainer(IWizardContainer wizardContainer) {
         container = wizardContainer;
     }
 
@@ -342,7 +369,7 @@ public abstract class Wizard implements IWizard {
      * This image descriptor will be used to generate an image for a page with
      * no image of its own; the image will be computed once and cached.
      * </p>
-     *
+     * 
      * @param imageDescriptor
      *            the default page image descriptor
      */
@@ -356,11 +383,11 @@ public abstract class Wizard implements IWizard {
      * The dialog settings is used to record state between wizard invocations
      * (for example, radio button selection, last import directory, etc.)
      * </p>
-     *
+     * 
      * @param settings
      *            the dialog settings, or <code>null</code> if none
      * @see #getDialogSettings
-     *
+     *  
      */
     public void setDialogSettings(IDialogSettings settings) {
         dialogSettings = settings;
@@ -373,7 +400,7 @@ public abstract class Wizard implements IWizard {
      * This flag should be set on wizards where the first wizard page adds
      * follow-on wizard pages based on user input.
      * </p>
-     *
+     * 
      * @param b
      *            <code>true</code> to always show Next and Previous buttons,
      *            and <code>false</code> to suppress Next and Previous buttons
@@ -397,7 +424,7 @@ public abstract class Wizard implements IWizard {
 	 * <strong>Note 2:</strong> In the default {@link WizardDialog} implementation, the "Help"
 	 * button only works when {@link org.eclipse.jface.dialogs.IDialogPage#performHelp()} is implemented.
 	 * </p>
-	 *
+	 * 
 	 * @param b <code>true</code> if help is available, <code>false</code> otherwise
 	 * @see #isHelpAvailable()
 	 * @see TrayDialog#isHelpAvailable()
@@ -409,7 +436,7 @@ public abstract class Wizard implements IWizard {
 
     /**
      * Sets whether this wizard needs a progress monitor.
-     *
+     * 
      * @param b
      *            <code>true</code> if a progress monitor is required, and
      *            <code>false</code> if none is needed
@@ -421,7 +448,7 @@ public abstract class Wizard implements IWizard {
 
     /**
      * Sets the title bar color for this wizard.
-     *
+     * 
      * @param color
      *            the title bar color
      */
@@ -432,7 +459,7 @@ public abstract class Wizard implements IWizard {
     /**
      * Sets the window title for the container that hosts this page to the given
      * string.
-     *
+     * 
      * @param newTitle
      *            the window title for the container
      */

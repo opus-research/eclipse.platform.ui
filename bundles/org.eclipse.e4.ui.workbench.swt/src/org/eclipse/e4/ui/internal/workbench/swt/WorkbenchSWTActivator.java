@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,16 +41,15 @@ public class WorkbenchSWTActivator implements BundleActivator { // extends
 	public static final String PI_RENDERERS = "org.eclipse.e4.ui.workbench.swt"; //$NON-NLS-1$
 
 	private BundleContext context;
-	private ServiceTracker<?, PackageAdmin> pkgAdminTracker;
-	private ServiceTracker<?, Location> locationTracker;
+	private ServiceTracker pkgAdminTracker;
+	private ServiceTracker locationTracker;
 	private static WorkbenchSWTActivator activator;
-	private ServiceTracker<?, DebugOptions> debugTracker;
+	private ServiceTracker debugTracker;
 	private DebugTrace trace;
-
 
 	/**
 	 * Get the default activator.
-	 *
+	 * 
 	 * @return a BundleActivator
 	 */
 	public static WorkbenchSWTActivator getDefault() {
@@ -64,13 +63,11 @@ public class WorkbenchSWTActivator implements BundleActivator { // extends
 		return context;
 	}
 
-	@Override
 	public void start(BundleContext context) throws Exception {
 		activator = this;
 		this.context = context;
 	}
 
-	@Override
 	public void stop(BundleContext context) throws Exception {
 		saveDialogSettings();
 		if (pkgAdminTracker != null) {
@@ -80,9 +77,8 @@ public class WorkbenchSWTActivator implements BundleActivator { // extends
 	}
 
 	public Bundle getBundle() {
-		if (context == null) {
+		if (context == null)
 			return null;
-		}
 		return context.getBundle();
 	}
 
@@ -91,13 +87,13 @@ public class WorkbenchSWTActivator implements BundleActivator { // extends
 	 */
 	public PackageAdmin getBundleAdmin() {
 		if (pkgAdminTracker == null) {
-			if (context == null) {
+			if (context == null)
 				return null;
-			}
-			pkgAdminTracker = new ServiceTracker<>(context, PackageAdmin.class, null);
+			pkgAdminTracker = new ServiceTracker(context, PackageAdmin.class
+					.getName(), null);
 			pkgAdminTracker.open();
 		}
-		return pkgAdminTracker.getService();
+		return (PackageAdmin) pkgAdminTracker.getService();
 	}
 
 	/**
@@ -112,10 +108,28 @@ public class WorkbenchSWTActivator implements BundleActivator { // extends
 				// ignore this. It should never happen as we have tested the
 				// above format.
 			}
-			locationTracker = new ServiceTracker<>(context, filter, null);
+			locationTracker = new ServiceTracker(context, filter, null);
 			locationTracker.open();
 		}
-		return locationTracker.getService();
+		return (Location) locationTracker.getService();
+	}
+
+	/**
+	 * @param bundleName
+	 *            the bundle id
+	 * @return A bundle if found, or <code>null</code>
+	 */
+	public Bundle getBundleForName(String bundleName) {
+		Bundle[] bundles = getBundleAdmin().getBundles(bundleName, null);
+		if (bundles == null)
+			return null;
+		// Return the first bundle that is not installed or uninstalled
+		for (int i = 0; i < bundles.length; i++) {
+			if ((bundles[i].getState() & (Bundle.INSTALLED | Bundle.UNINSTALLED)) == 0) {
+				return bundles[i];
+			}
+		}
+		return null;
 	}
 
 	public static void trace(String option, String msg, Throwable error) {
@@ -132,13 +146,13 @@ public class WorkbenchSWTActivator implements BundleActivator { // extends
 
 	public DebugOptions getDebugOptions() {
 		if (debugTracker == null) {
-			if (context == null) {
+			if (context == null)
 				return null;
-			}
-			debugTracker = new ServiceTracker<>(context, DebugOptions.class, null);
+			debugTracker = new ServiceTracker(context, DebugOptions.class
+					.getName(), null);
 			debugTracker.open();
 		}
-		return debugTracker.getService();
+		return (DebugOptions) debugTracker.getService();
 	}
 
 	public DebugTrace getTrace() {
@@ -173,7 +187,7 @@ public class WorkbenchSWTActivator implements BundleActivator { // extends
 	 * <p>
 	 * Subclasses may override this method but are not expected to.
 	 * </p>
-	 *
+	 * 
 	 * @return the dialog settings
 	 */
 	public IDialogSettings getDialogSettings() {
@@ -203,7 +217,8 @@ public class WorkbenchSWTActivator implements BundleActivator { // extends
 		IPath dataLocation = getStateLocationOrNull();
 		if (dataLocation != null) {
 			// try r/w state area in the local file system
-			String readWritePath = dataLocation.append(FN_DIALOG_SETTINGS).toOSString();
+			String readWritePath = dataLocation.append(FN_DIALOG_SETTINGS)
+					.toOSString();
 			File settingsFile = new File(readWritePath);
 			if (settingsFile.exists()) {
 				try {
@@ -219,7 +234,8 @@ public class WorkbenchSWTActivator implements BundleActivator { // extends
 
 		// otherwise look for bundle specific dialog settings
 		Bundle bundle = context.getBundle();
-		URL dsURL = FileLocator.find(bundle, new Path(FN_DIALOG_SETTINGS), null);
+		URL dsURL = FileLocator
+				.find(bundle, new Path(FN_DIALOG_SETTINGS), null);
 		if (dsURL == null) {
 			return;
 		}
@@ -227,7 +243,8 @@ public class WorkbenchSWTActivator implements BundleActivator { // extends
 		InputStream is = null;
 		try {
 			is = dsURL.openStream();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(is, "utf-8")); //$NON-NLS-1$
+			BufferedReader reader = new BufferedReader(new InputStreamReader(
+					is, "utf-8")); //$NON-NLS-1$
 			dialogSettings.load(reader);
 		} catch (IOException e) {
 			// load failed so ensure we have an empty settings
@@ -268,12 +285,12 @@ public class WorkbenchSWTActivator implements BundleActivator { // extends
 
 	/**
 	 * FOR INTERNAL WORKBENCH USE ONLY.
-	 *
+	 * 
 	 * Returns the path to a location in the file system that can be used to
 	 * persist/restore state between workbench invocations. If the location did
 	 * not exist prior to this call it will be created. Returns
 	 * <code>null</code> if no such location is available.
-	 *
+	 * 
 	 * @return path to a location in the file system where this plug-in can
 	 *         persist data between sessions, or <code>null</code> if no such
 	 *         location is available.
@@ -284,7 +301,8 @@ public class WorkbenchSWTActivator implements BundleActivator { // extends
 		// However, using it causes problems in the activation order
 		// So, for now, we get it directly.
 		try {
-			return InternalPlatform.getDefault().getStateLocation(context.getBundle(), true);
+			return InternalPlatform.getDefault().getStateLocation(
+					context.getBundle(), true);
 		} catch (IllegalStateException e) {
 			// This occurs if -data=@none is explicitly specified, so ignore
 			// this silently.

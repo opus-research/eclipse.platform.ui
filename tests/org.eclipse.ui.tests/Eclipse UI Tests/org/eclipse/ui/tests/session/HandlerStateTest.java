@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2012 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,11 +22,11 @@ import org.eclipse.ui.commands.ICommandService;
 
 /**
  * A test to verify the persistence of handler state between sessions.
- *
+ * 
  * @since 3.2
  */
 public class HandlerStateTest extends TestCase {
-
+	
 	public static TestSuite suite() {
 		TestSuite ts = new TestSuite("org.eclipse.ui.tests.session.HandlerStateTest");
 		ts.addTest(new HandlerStateTest("testInitialHandlerState"));
@@ -62,7 +62,7 @@ public class HandlerStateTest extends TestCase {
 
 	/**
 	 * Constructs a new instance of <code>HandlerStateTest</code>.
-	 *
+	 * 
 	 * @param testName
 	 *            The name of the test; may be <code>null</code>.
 	 */
@@ -76,7 +76,7 @@ public class HandlerStateTest extends TestCase {
 	 */
 	public final void testInitialHandlerState() {
 		final IWorkbench workbench = PlatformUI.getWorkbench();
-		final ICommandService service = workbench
+		final ICommandService service = (ICommandService) workbench
 				.getService(ICommandService.class);
 		final Command command = service.getCommand(COMMAND_ID);
 		State state;
@@ -107,7 +107,7 @@ public class HandlerStateTest extends TestCase {
 	 */
 	public final void testModifiedHandlerState() {
 		final IWorkbench workbench = PlatformUI.getWorkbench();
-		final ICommandService service = workbench
+		final ICommandService service = (ICommandService) workbench
 				.getService(ICommandService.class);
 		final Command command = service.getCommand(COMMAND_ID);
 		State state;

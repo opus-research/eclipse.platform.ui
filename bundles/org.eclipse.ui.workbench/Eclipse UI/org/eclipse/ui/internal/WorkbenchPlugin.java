@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,16 +7,15 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 400714, 441267, 441184, 445723, 445724, 472654, 481608
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
 
 import com.ibm.icu.text.MessageFormat;
+import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
 import org.eclipse.core.runtime.CoreException;
@@ -26,16 +25,13 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.e4.core.commands.internal.ICommandHelpService;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.ui.services.help.EHelpService;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
-import org.eclipse.jface.util.BidiUtils;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.service.debug.DebugOptions;
 import org.eclipse.swt.SWT;
@@ -52,8 +48,6 @@ import org.eclipse.ui.IWorkingSetManager;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.decorators.DecoratorManager;
 import org.eclipse.ui.internal.dialogs.WorkbenchPreferenceManager;
-import org.eclipse.ui.internal.help.CommandHelpServiceImpl;
-import org.eclipse.ui.internal.help.HelpServiceImpl;
 import org.eclipse.ui.internal.intro.IIntroRegistry;
 import org.eclipse.ui.internal.intro.IntroRegistry;
 import org.eclipse.ui.internal.misc.StatusUtil;
@@ -70,13 +64,12 @@ import org.eclipse.ui.internal.themes.IThemeRegistry;
 import org.eclipse.ui.internal.themes.ThemeRegistry;
 import org.eclipse.ui.internal.themes.ThemeRegistryReader;
 import org.eclipse.ui.internal.util.BundleUtility;
-import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.internal.wizards.ExportWizardRegistry;
 import org.eclipse.ui.internal.wizards.ImportWizardRegistry;
 import org.eclipse.ui.internal.wizards.NewWizardRegistry;
 import org.eclipse.ui.operations.IWorkbenchOperationSupport;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.eclipse.ui.testing.TestableObject;
+import org.eclipse.ui.presentations.AbstractPresentationFactory;
 import org.eclipse.ui.views.IViewRegistry;
 import org.eclipse.ui.wizards.IWizardRegistry;
 import org.osgi.framework.Bundle;
@@ -84,6 +77,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.BundleListener;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -96,7 +91,7 @@ import org.osgi.util.tracker.ServiceTracker;
  * This class is responsible for tracking various registries
  * font, preference, graphics, dialog store.
  *
- * This class is explicitly referenced by the
+ * This class is explicitly referenced by the 
  * workbench plugin's  "plugin.xml" and places it
  * into the UI start extension point of the main
  * overall application harness
@@ -107,7 +102,7 @@ import org.osgi.util.tracker.ServiceTracker;
  *      instance of our workbench class.
  */
 public class WorkbenchPlugin extends AbstractUIPlugin {
-
+	
 	/**
 	 * Splash shell constant.
 	 */
@@ -115,21 +110,17 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 
 	/**
 	 * The OSGi splash property.
-	 *
+	 * 
 	 * @sicne 3.4
 	 */
 	private static final String PROP_SPLASH_HANDLE = "org.eclipse.equinox.launcher.splash.handle"; //$NON-NLS-1$
-
+	
 	private static final String LEFT_TO_RIGHT = "ltr"; //$NON-NLS-1$
 	private static final String RIGHT_TO_LEFT = "rtl";//$NON-NLS-1$
 	private static final String ORIENTATION_COMMAND_LINE = "-dir";//$NON-NLS-1$
 	private static final String ORIENTATION_PROPERTY = "eclipse.orientation";//$NON-NLS-1$
 	private static final String NL_USER_PROPERTY = "osgi.nl.user"; //$NON-NLS-1$
-	private static final String BIDI_COMMAND_LINE = "-bidi";//$NON-NLS-1$
-	private static final String BIDI_SUPPORT_OPTION = "on";//$NON-NLS-1$
-	private static final String BIDI_TEXTDIR_OPTION = "textDir";//$NON-NLS-1$
-
-
+   
     // Default instance of the receiver
     private static WorkbenchPlugin inst;
 
@@ -152,7 +143,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
     private BundleContext bundleContext;
 
     // The set of currently starting bundles
-	private Collection<Bundle> startingBundles = new HashSet<>();
+    private Collection startingBundles = new HashSet();
 
     /**
      * Global workbench ui plugin flag. Only workbench implementation is allowed to use this flag
@@ -162,7 +153,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 
     /**
      * The workbench plugin ID.
-     *
+     * 
      * @issue we should just drop this constant and use PlatformUI.PLUGIN_ID instead
      */
     public static String PI_WORKBENCH = PlatformUI.PLUGIN_ID;
@@ -191,20 +182,14 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
     private ProductInfo productInfo = null;
 
     private IntroRegistry introRegistry;
-
+    
     private WorkbenchOperationSupport operationSupport;
 	private BundleListener bundleListener;
 
 	private IEclipseContext e4Context;
 
 	private ServiceTracker debugTracker = null;
-
-	private ServiceTracker testableTracker = null;
-
-	private EHelpService helpService;
-
-	private ICommandHelpService commandHelpService;
-
+    
     /**
      * Create an instance of the WorkbenchPlugin. The workbench plugin is
      * effectively the "application" for the workbench UI. The entire UI
@@ -217,13 +202,13 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 
     /**
      * Unload all members.  This can be used to run a second instance of a workbench.
-     * @since 3.0
+     * @since 3.0 
      */
     void reset() {
         editorRegistry = null;
 
         if (decoratorManager != null) {
-			decoratorManager.shutdown();
+            decoratorManager.dispose();
             decoratorManager = null;
         }
 
@@ -238,7 +223,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 
         preferenceManager = null;
         if (viewRegistry != null) {
-			// nothing to dispose for viewRegistry
+            viewRegistry.dispose();
             viewRegistry = null;
         }
         if (perspRegistry != null) {
@@ -250,17 +235,14 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 
         productInfo = null;
         introRegistry = null;
-
-		helpService = null;
-		commandHelpService = null;
-
+        
         if (operationSupport != null) {
         	operationSupport.dispose();
         	operationSupport = null;
         }
 
         DEBUG = false;
-
+         
     }
 
     /**
@@ -278,14 +260,13 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
         try {
             // If plugin has been loaded create extension.
             // Otherwise, show busy cursor then create extension.
-			if (BundleUtility.isActivated(element.getContributor().getName())) {
+		if (BundleUtility.isActivated(element.getContributor().getName())) {
                 return element.createExecutableExtension(classAttribute);
             }
             final Object[] ret = new Object[1];
             final CoreException[] exc = new CoreException[1];
             BusyIndicator.showWhile(null, new Runnable() {
-                @Override
-				public void run() {
+                public void run() {
                     try {
                         ret[0] = element
                                 .createExecutableExtension(classAttribute);
@@ -306,12 +287,12 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
                     IStatus.ERROR, WorkbenchMessages.WorkbenchPlugin_extension,e));
         }
     }
-
+    
     /**
 	 * Answers whether the provided element either has an attribute with the
 	 * given name or a child element with the given name with an attribute
 	 * called class.
-	 *
+	 * 
 	 * @param element
 	 *            the element to test
 	 * @param extensionName
@@ -334,7 +315,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		}
 		return false;
 	}
-
+	
 	/**
 	 * Checks to see if the provided element has the syntax for an executable
 	 * extension with a given name that resides in a bundle that is already
@@ -345,7 +326,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 	 * <li>The element has a child element with the specified name that has a
 	 * <code>plugin</code> attribute</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param element
 	 *            the element to test
 	 * @param extensionName
@@ -363,7 +344,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 			return true;
 		return bundle.getState() == Bundle.ACTIVE;
 	}
-
+	
 	/**
 	 * Returns the bundle that contains the class referenced by an executable
 	 * extension. Determining the bundle happens in one of two ways:<br/>
@@ -373,7 +354,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 	 * <li>The element has a child element with the specified name that has a
 	 * <code>plugin</code> attribute</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param element
 	 *            the element to test
 	 * @param extensionName
@@ -385,7 +366,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 	 */
 	public static Bundle getBundleForExecutableExtension(IConfigurationElement element, String extensionName) {
 		// this code is derived heavily from
-		// ConfigurationElement.createExecutableExtension.
+		// ConfigurationElement.createExecutableExtension.  
 		String prop = null;
 		String executable;
 		String contributorName = null;
@@ -406,12 +387,12 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		if (prop == null) {
 			// property not defined, try as a child element
 			IConfigurationElement[] exec = element.getChildren(extensionName);
-			if (exec.length != 0)
+			if (exec.length != 0) 
 				contributorName = exec[0].getAttribute("plugin"); //$NON-NLS-1$
 		} else {
 			// simple property or element value, parse it into its components
 			i = prop.indexOf(':');
-			if (i != -1)
+			if (i != -1) 
 				executable = prop.substring(0, i).trim();
 			else
 				executable = prop;
@@ -419,30 +400,29 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 			i = executable.indexOf('/');
 			if (i != -1)
 				contributorName = executable.substring(0, i).trim();
-
+				
 		}
-
+		
 		if (contributorName == null)
 			contributorName = element.getContributor().getName();
-
+		
 		return Platform.getBundle(contributorName);
 	}
 
     /**
 	 * Returns the image registry for this plugin.
-	 *
+	 * 
 	 * Where are the images? The images (typically gifs) are found in the same
 	 * plugins directory.
-	 *
+	 * 
 	 * @see ImageRegistry
-	 *
+	 * 
 	 * Note: The workbench uses the standard JFace ImageRegistry to track its
 	 * images. In addition the class WorkbenchGraphicResources provides
 	 * convenience access to the graphics resources and fast field access for
 	 * some of the commonly used graphical images.
 	 */
-    @Override
-	protected ImageRegistry createImageRegistry() {
+    protected ImageRegistry createImageRegistry() {
         return WorkbenchImages.getImageRegistry();
     }
 
@@ -452,7 +432,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * @return the workbench action set registry
      */
     public ActionSetRegistry getActionSetRegistry() {
-		return e4Context.get(ActionSetRegistry.class);
+		return (ActionSetRegistry) e4Context.get(ActionSetRegistry.class.getName());
     }
 
     /**
@@ -465,14 +445,14 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
     }
 
     /**
-     * Answer the manager that maps resource types to a the
+     * Answer the manager that maps resource types to a the 
      * description of the editor to use
      * @return IEditorRegistry the editor registry used
      * by this plug-in.
      */
 
     public IEditorRegistry getEditorRegistry() {
-		return e4Context.get(IEditorRegistry.class);
+		return (IEditorRegistry) e4Context.get(IEditorRegistry.class.getName());
     }
 
     /**
@@ -524,31 +504,102 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
     }
 
     /**
+     * Returns the presentation factory with the given id, or <code>null</code> if not found.
+     * @param targetID The id of the presentation factory to use.
+     * @return AbstractPresentationFactory or <code>null</code>
+     * if not factory matches that id.
+     */
+    public AbstractPresentationFactory getPresentationFactory(String targetID) {
+        Object o = createExtension(
+                IWorkbenchRegistryConstants.PL_PRESENTATION_FACTORIES,
+                "factory", targetID); //$NON-NLS-1$
+        if (o instanceof AbstractPresentationFactory) {
+            return (AbstractPresentationFactory) o;
+        }
+        WorkbenchPlugin
+                .log("Error creating presentation factory: " + targetID + " -- class is not an AbstractPresentationFactory"); //$NON-NLS-1$ //$NON-NLS-2$
+        return null;
+    }
+
+    /**
+     * Looks up the configuration element with the given id on the given extension point
+     * and instantiates the class specified by the class attributes.
+     * 
+     * @param extensionPointId the extension point id (simple id)
+     * @param elementName the name of the configuration element, or <code>null</code>
+     *   to match any element
+     * @param targetID the target id
+     * @return the instantiated extension object, or <code>null</code> if not found
+     */
+    private Object createExtension(String extensionPointId, String elementName,
+            String targetID) {
+        IExtensionPoint extensionPoint = Platform.getExtensionRegistry()
+                .getExtensionPoint(PI_WORKBENCH, extensionPointId);
+        if (extensionPoint == null) {
+            WorkbenchPlugin
+                    .log("Unable to find extension. Extension point: " + extensionPointId + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
+            return null;
+        }
+
+        // Loop through the config elements.
+        IConfigurationElement targetElement = null;
+        IConfigurationElement[] elements = extensionPoint
+                .getConfigurationElements();
+        for (int j = 0; j < elements.length; j++) {
+            IConfigurationElement element = elements[j];
+            if (elementName == null || elementName.equals(element.getName())) {
+                String strID = element.getAttribute("id"); //$NON-NLS-1$
+                if (targetID.equals(strID)) {
+                    targetElement = element;
+                    break;
+                }
+            }
+        }
+        if (targetElement == null) {
+            // log it since we cannot safely display a dialog.
+            WorkbenchPlugin.log("Unable to find extension: " + targetID //$NON-NLS-1$
+                    + " in extension point: " + extensionPointId); //$NON-NLS-1$ 
+            return null;
+        }
+
+        // Create the extension.
+        try {
+            return createExtension(targetElement, "class"); //$NON-NLS-1$
+        } catch (CoreException e) {
+            // log it since we cannot safely display a dialog.
+            WorkbenchPlugin.log("Unable to create extension: " + targetID //$NON-NLS-1$
+                    + " in extension point: " + extensionPointId //$NON-NLS-1$
+                    + ", status: ", e.getStatus()); //$NON-NLS-1$
+        }
+        return null;
+    }
+
+    /**
      * Return the perspective registry.
      * @return IPerspectiveRegistry. The registry for the receiver.
      */
     public IPerspectiveRegistry getPerspectiveRegistry() {
-		return e4Context.get(IPerspectiveRegistry.class);
+		return (IPerspectiveRegistry) e4Context.get(IPerspectiveRegistry.class.getName());
     }
 
     /**
      * Returns the working set manager
-     *
+     * 
      * @return the working set manager
      * @since 2.0
      */
     public IWorkingSetManager getWorkingSetManager() {
-		return e4Context.get(IWorkingSetManager.class);
+		return (IWorkingSetManager) e4Context.get(IWorkingSetManager.class.getName());
     }
 
     /**
      * Returns the working set registry
-     *
+     * 
      * @return the working set registry
      * @since 2.0
      */
     public WorkingSetRegistry getWorkingSetRegistry() {
-		return e4Context.get(WorkingSetRegistry.class);
+		return (WorkingSetRegistry) e4Context.get(WorkingSetRegistry.class.getName());
     }
 
     /**
@@ -558,12 +609,12 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * @since 3.0
      */
     public IIntroRegistry getIntroRegistry() {
-		return e4Context.get(IIntroRegistry.class);
+		return (IIntroRegistry) e4Context.get(IIntroRegistry.class.getName());
     }
-
+    
     /**
 	 * Returns the operation support.
-	 *
+	 * 
 	 * @return the workbench operation support.
 	 * @since 3.1
 	 */
@@ -576,7 +627,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		}
 		return op;
     }
-
+    
 
     /**
      * Get the preference manager.
@@ -584,7 +635,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * the receiver.
      */
     public PreferenceManager getPreferenceManager() {
-		return e4Context.get(PreferenceManager.class);
+		return (PreferenceManager) e4Context.get(PreferenceManager.class.getName());
     }
 
     /**
@@ -599,16 +650,16 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
     	if(e4Context == null) {
     		return sharedImages;
     	}
-		return e4Context.get(ISharedImages.class);
+		return (ISharedImages) e4Context.get(ISharedImages.class.getName());
     }
 
     /**
      * Returns the theme registry for the workbench.
-     *
+     * 
      * @return the theme registry
      */
     public IThemeRegistry getThemeRegistry() {
-		return e4Context.get(IThemeRegistry.class);
+		return (IThemeRegistry) e4Context.get(IThemeRegistry.class.getName());
     }
 
     /**
@@ -617,48 +668,45 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * receiver.
      */
     public IViewRegistry getViewRegistry() {
-		return e4Context.get(IViewRegistry.class);
+		return (IViewRegistry) e4Context.get(IViewRegistry.class.getName());
     }
 
     /**
      * Answer the workbench.
      * @deprecated Use <code>PlatformUI.getWorkbench()</code> instead.
      */
-    @Deprecated
-	@Override
-	public IWorkbench getWorkbench() {
+    public IWorkbench getWorkbench() {
         return PlatformUI.getWorkbench();
     }
 
-    /**
+    /** 
      * Set default preference values.
      * This method must be called whenever the preference store is initially loaded
      * because the default values are not stored in the preference store.
      */
-    @Override
-	protected void initializeDefaultPreferences(IPreferenceStore store) {
+    protected void initializeDefaultPreferences(IPreferenceStore store) {
         // Do nothing.  This should not be called.
         // Prefs are initialized in WorkbenchPreferenceInitializer.
     }
 
     /**
      * Logs the given message to the platform log.
-     *
+     * 
      * If you have an exception in hand, call log(String, Throwable) instead.
-     *
+     * 
      * If you have a status object in hand call log(String, IStatus) instead.
-     *
+     * 
      * This convenience method is for internal use by the Workbench only and
      * must not be called outside the Workbench.
-     *
+     * 
      * @param message
      *            A high level UI message describing when the problem happened.
      */
     public static void log(String message) {
         getDefault().getLog().log(
-                StatusUtil.newStatus(IStatus.ERROR, message, null));
+                StatusUtil.newStatus(IStatus.ERROR, message, null));    
     }
-
+    
     /**
      * Log the throwable.
      * @param t
@@ -700,15 +748,15 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		return new Status(IStatus.ERROR, pluginId, errorCode, message,
 				StatusUtil.getCause(t));
 	}
-
+    
     /**
 	 * Logs the given message and throwable to the platform log.
-	 *
+	 * 
 	 * If you have a status object in hand call log(String, IStatus) instead.
-	 *
+	 * 
 	 * This convenience method is for internal use by the Workbench only and
 	 * must not be called outside the Workbench.
-	 *
+	 * 
 	 * @param message
 	 *            A high level UI message describing when the problem happened.
 	 * @param t
@@ -718,15 +766,15 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
         IStatus status = StatusUtil.newStatus(IStatus.ERROR, message, t);
         log(message, status);
     }
-
+    
     /**
      * Logs the given throwable to the platform log, indicating the class and
      * method from where it is being logged (this is not necessarily where it
      * occurred).
-     *
+     * 
      * This convenience method is for internal use by the Workbench only and
      * must not be called outside the Workbench.
-     *
+     * 
      * @param clazz
      *            The calling class.
      * @param methodName
@@ -739,13 +787,13 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
                 new Object[] { clazz.getName(), methodName, t });
         log(msg, t);
     }
-
+    
     /**
      * Logs the given message and status to the platform log.
-     *
+     * 
      * This convenience method is for internal use by the Workbench only and
      * must not be called outside the Workbench.
-     *
+     * 
      * @param message
      *            A high level UI message describing when the problem happened.
      *            May be <code>null</code>.
@@ -756,13 +804,12 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 
         //1FTUHE0: ITPCORE:ALL - API - Status & logging - loss of semantic info
 
-		// Combine message and status into a MultiStatus to avoid losing
-		// context, but avoid creating the MultiStatus unnecessarily if message
-		// is the same
-		if (message != null && !message.equals(status.getMessage())) {
-			status = StatusUtil.newStatus(Collections.singletonList(status), message, null);
+        if (message != null) {
+            getDefault().getLog().log(
+                    StatusUtil.newStatus(IStatus.ERROR, message, null));
         }
-		getDefault().getLog().log(status);
+
+        getDefault().getLog().log(status);
     }
 
     /**
@@ -772,26 +819,28 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
     public static void log(IStatus status) {
         getDefault().getLog().log(status);
     }
-
+    
     /**
      * Get the decorator manager for the receiver
      * @return DecoratorManager the decorator manager
      * for the receiver.
      */
     public DecoratorManager getDecoratorManager() {
-		return (DecoratorManager) e4Context.get(IDecoratorManager.class);
+		return (DecoratorManager) e4Context.get(IDecoratorManager.class.getName());
     }
 
-    @Override
-	public void start(BundleContext context) throws Exception {
+    /*
+     *  (non-Javadoc)
+     * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
+     */
+    public void start(BundleContext context) throws Exception {
     	context.addBundleListener(getBundleListener());
         super.start(context);
         bundleContext = context;
-
+        
         JFaceUtil.initializeJFace();
-
-		parseBidiArguments();
-		Window.setDefaultOrientation(getDefaultOrientation());
+		
+		 Window.setDefaultOrientation(getDefaultOrientation());
 
         // The UI plugin needs to be initialized so that it can install the callback in PrefUtil,
         // which needs to be done as early as possible, before the workbench
@@ -816,81 +865,26 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
     }
 
 	/**
-	 * Read the -bidi option from the command line arguments. The valid values /
-	 * syntax is as follows:
-	 *
-	 * <pre>
-	 * -bidi "on=[y/n];textDir=[ltr/rtl/auto]"
-	 * </pre>
-	 * <p>
-	 * Important:
-	 * <ul>
-	 * <li>The order of parameters under the <code>-bidi</code> switch is
-	 * arbitrary.</li>
-	 * <li>The presence of any parameter is not mandatory.</li>
-	 * <li>If any of the parameters is not specified, the default value is
-	 * assumed. Defaults:
-	 * <ul>
-	 * <li>on: n</li>
-	 * <li>textDir: no default value</li>
-	 * </ul>
-	 * </li>
-	 * <li>If no value (or an illegal value) is provided for handling of base
-	 * text direction functionality, then bidi support is turned off and no
-	 * handling occurs.</li>
-	 * </ul>
-	 */
-	private void parseBidiArguments() {
-		String[] commandLineArgs = Platform.getCommandLineArgs();
-		String bidiParams = null;
-		// Do not process the last one as it will never have a parameter
-		for (int i = 0; i < commandLineArgs.length - 1; i++) {
-			if (commandLineArgs[i].equals(BIDI_COMMAND_LINE)) {
-				bidiParams = commandLineArgs[i + 1];
-			}
-		}
-		if (bidiParams != null) {
-			String[] bidiProps = Util.getArrayFromList(bidiParams, ";"); //$NON-NLS-1$
-			for (int i = 0; i < bidiProps.length; ++i) {
-				int eqPos = bidiProps[i].indexOf("="); //$NON-NLS-1$
-				if ((eqPos > 0) && (eqPos < bidiProps[i].length() - 1)) {
-					String nameProp = bidiProps[i].substring(0, eqPos);
-					String valProp = bidiProps[i].substring(eqPos + 1);
-					if (nameProp.equals(BIDI_SUPPORT_OPTION)) {
-						BidiUtils.setBidiSupport("y".equals(valProp)); //$NON-NLS-1$
-					} else if (nameProp.equalsIgnoreCase(BIDI_TEXTDIR_OPTION)) {
-						try {
-							BidiUtils.setTextDirection(valProp.intern());
-						} catch (IllegalArgumentException e) {
-							WorkbenchPlugin.log(e);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Get the default orientation from the command line arguments. If there are
-	 * no arguments imply the orientation.
-	 *
+     * Get the default orientation from the command line
+     * arguments. If there are no arguments imply the 
+     * orientation.
 	 * @return int
 	 * @see SWT#NONE
 	 * @see SWT#RIGHT_TO_LEFT
 	 * @see SWT#LEFT_TO_RIGHT
 	 */
     private int getDefaultOrientation() {
-
+		
 		String[] commandLineArgs = Platform.getCommandLineArgs();
-
+		
 		int orientation = getCommandLineOrientation(commandLineArgs);
-
+		
 		if(orientation != SWT.NONE) {
 			return orientation;
 		}
-
+		
 		orientation = getSystemPropertyOrientation();
-
+		
 		if(orientation != SWT.NONE) {
 			return orientation;
 		}
@@ -914,7 +908,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 			// and premature attempt to resolve class reference
 			boolean isBidi = com.ibm.icu.text.Bidi.requiresBidi(message.toCharArray(), 0,
 					message.length());
-			return Boolean.valueOf(isBidi);
+			return new Boolean(isBidi);
 		} catch (NoClassDefFoundError e) {
 			// the ICU Base bundle used in place of ICU?
 			return null;
@@ -923,15 +917,15 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 
 	/**
 	 * Check to see if the command line parameter for -nl
-	 * has been set. If so imply the orientation from this
+	 * has been set. If so imply the orientation from this 
 	 * specified Locale. If it is a bidirectional Locale
 	 * return SWT#RIGHT_TO_LEFT.
-	 * If it has not been set or has been set to
+	 * If it has not been set or has been set to 
 	 * a unidirectional Locale then return SWT#NONE.
-	 *
-	 * Locale is determined differently by different JDKs
+	 * 
+	 * Locale is determined differently by different JDKs 
 	 * and may not be consistent with the users expectations.
-	 *
+	 * 
 
 	 * @return int
 	 * @see SWT#NONE
@@ -960,7 +954,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 
 	/**
 	 * Check to see if the orientation was set in the
-	 * system properties. If there is no orientation
+	 * system properties. If there is no orientation 
 	 * specified return SWT#NONE.
 	 * @return int
 	 * @see SWT#NONE
@@ -1002,13 +996,13 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 				}
 			}
 		}
-
+		
 		return SWT.NONE;
 	}
 
 	/**
      * Return an array of all bundles contained in this workbench.
-     *
+     * 
      * @return an array of bundles in the workbench or an empty array if none
      * @since 3.0
      */
@@ -1016,10 +1010,10 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
         return bundleContext == null ? new Bundle[0] : bundleContext
                 .getBundles();
     }
-
+    
     /**
      * Returns the bundle context associated with the workbench plug-in.
-     *
+     * 
      * @return the bundle context
      * @since 3.1
      */
@@ -1046,7 +1040,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 
     /**
      * Returns the name of the product.
-     *
+     * 
      * @return the product name, or <code>null</code> if none
      * @since 3.0
      */
@@ -1056,7 +1050,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 
     /**
      * Returns the image descriptors for the window image to use for this product.
-     *
+     * 
      * @return an array of the image descriptors for the window image, or
      *         <code>null</code> if none
      * @since 3.0
@@ -1077,8 +1071,10 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
         return productInfo;
     }
 
-    @Override
-	public void stop(BundleContext context) throws Exception {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+     */
+    public void stop(BundleContext context) throws Exception {
     	if (bundleListener!=null) {
     		context.removeBundleListener(bundleListener);
     		bundleListener = null;
@@ -1087,51 +1083,49 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 			debugTracker.close();
 			debugTracker = null;
 		}
-		if (testableTracker != null) {
-			testableTracker.close();
-			testableTracker = null;
-		}
-        super.stop(context);
-    }
-
+    	// TODO normally super.stop(*) would be the last statement in this
+    	// method
+        super.stop(context);     
+    } 
+    
     /**
      * Return the new wizard registry.
-     *
+     * 
      * @return the new wizard registry
      * @since 3.1
      */
     public IWizardRegistry getNewWizardRegistry() {
-		return e4Context.get(NewWizardRegistry.class);
+		return (IWizardRegistry) e4Context.get(NewWizardRegistry.class.getName());
     }
-
+    
     /**
      * Return the import wizard registry.
-     *
+     * 
      * @return the import wizard registry
      * @since 3.1
      */
     public IWizardRegistry getImportWizardRegistry() {
-		return e4Context.get(ImportWizardRegistry.class);
+		return (IWizardRegistry) e4Context.get(ImportWizardRegistry.class.getName());
     }
-
+    
     /**
      * Return the export wizard registry.
-     *
+     * 
      * @return the export wizard registry
      * @since 3.1
      */
     public IWizardRegistry getExportWizardRegistry() {
-		return e4Context.get(ExportWizardRegistry.class);
+		return (IWizardRegistry) e4Context.get(ExportWizardRegistry.class.getName());
     }
-
+    
     /**
-     * FOR INTERNAL WORKBENCH USE ONLY.
-     *
-     * Returns the path to a location in the file system that can be used
+     * FOR INTERNAL WORKBENCH USE ONLY. 
+     * 
+     * Returns the path to a location in the file system that can be used 
      * to persist/restore state between workbench invocations.
      * If the location did not exist prior to this call it will  be created.
      * Returns <code>null</code> if no such location is available.
-     *
+     * 
      * @return path to a location in the file system where this plug-in can
      * persist data between sessions, or <code>null</code> if no such
      * location is available.
@@ -1149,23 +1143,45 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 
 	/* package */ void addBundleListener(BundleListener bundleListener) {
 		bundleContext.addBundleListener(bundleListener);
-	}
+	}    
 
 	/* package */ void removeBundleListener(BundleListener bundleListener) {
 		bundleContext.removeBundleListener(bundleListener);
-	}
-
+	}    
+	
 	/* package */ int getBundleCount() {
 		return bundleContext.getBundles().length;
 	}
+	
+	/* package */ OutputStream getSplashStream() {
+		// assumes the output stream is available as a service
+		// see EclipseStarter.publishSplashScreen
+		ServiceReference[] ref;
+		try {
+			ref = bundleContext.getServiceReferences(OutputStream.class.getName(), null);
+		} catch (InvalidSyntaxException e) {
+			return null;
+		}
+		if(ref==null) {
+			return null;
+		}
+		for (int i = 0; i < ref.length; i++) {
+			String name = (String) ref[i].getProperty("name"); //$NON-NLS-1$
+			if (name != null && name.equals("splashstream")) {  //$NON-NLS-1$
+				Object result = bundleContext.getService(ref[i]);
+				bundleContext.ungetService(ref[i]);
+				return (OutputStream) result;
+			}
+		}
+		return null;
+	}
 
 	/**
-	 * @return the bundle listener for this plug-in
+	 * @return
 	 */
 	private BundleListener getBundleListener() {
 		if (bundleListener == null) {
 			bundleListener = new SynchronousBundleListener() {
-				@Override
 				public void bundleChanged(BundleEvent event) {
 					WorkbenchPlugin.this.bundleChanged(event);
 				}
@@ -1201,23 +1217,23 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 
 	/**
 	 * Return whether or not the OSGi framework has specified the handle of a splash shell.
-	 *
+	 * 
 	 * @return whether or not the OSGi framework has specified the handle of a splash shell
 	 * @since 3.4
 	 */
 	public static boolean isSplashHandleSpecified() {
 		return System.getProperty(PROP_SPLASH_HANDLE) != null;
 	}
-
+	
 	/**
 	 * Get the splash shell for this workbench instance, if any. This will find
 	 * the splash created by the launcher (native) code and wrap it in a SWT
 	 * shell. This may have the side effect of setting data on the provided
 	 * {@link Display}.
-	 *
+	 * 
 	 * @param display
 	 *            the display to parent the shell on
-	 *
+	 * 
 	 * @return the splash shell or <code>null</code>
 	 * @throws InvocationTargetException
 	 * @throws IllegalAccessException
@@ -1229,15 +1245,15 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 	public static Shell getSplashShell(Display display)
 			throws NumberFormatException, IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException {
-		Shell splashShell = (Shell) display.getData(DATA_SPLASH_SHELL);
+		Shell splashShell = (Shell) display.getData(DATA_SPLASH_SHELL); 
 		if (splashShell != null)
 			return splashShell;
-
+		
 		String splashHandle = System.getProperty(PROP_SPLASH_HANDLE);
 		if (splashHandle == null) {
 			return null;
 		}
-
+	
 		// look for the 32 bit internal_new shell method
 		try {
 			Method method = Shell.class.getMethod(
@@ -1245,7 +1261,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 			// we're on a 32 bit platform so invoke it with splash
 			// handle as an int
 			splashShell = (Shell) method.invoke(null, new Object[] { display,
-					Integer.valueOf(splashHandle) });
+					new Integer(splashHandle) });
 		} catch (NoSuchMethodException e) {
 			// look for the 64 bit internal_new shell method
 			try {
@@ -1264,11 +1280,11 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		display.setData(DATA_SPLASH_SHELL, splashShell);
 		return splashShell;
 	}
-
+	
 	/**
 	 * Removes any splash shell data set on the provided display and disposes
 	 * the shell if necessary.
-	 *
+	 * 
 	 * @param display
 	 *            the display to parent the shell on
 	 * @since 3.4
@@ -1284,17 +1300,16 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Initialized the workbench plug-in with the e4 context
-	 * @param context the e4 context
+	 * @param e4Context
 	 */
 	public void initializeContext(IEclipseContext context) {
 		e4Context = context;
 		e4Context.set(IPerspectiveRegistry.class.getName(), new ContextFunction() {
 
 			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
+			public Object compute(IEclipseContext context) {
 				if (perspRegistry == null) {
-					perspRegistry = ContextInjectionFactory.make(
+					perspRegistry = (PerspectiveRegistry) ContextInjectionFactory.make(
 							PerspectiveRegistry.class, e4Context);
 				}
 				return perspRegistry;
@@ -1303,9 +1318,9 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		e4Context.set(IViewRegistry.class.getName(), new ContextFunction() {
 
 			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
+			public Object compute(IEclipseContext context) {
 				if (viewRegistry == null) {
-					viewRegistry = ContextInjectionFactory.make(ViewRegistry.class,
+					viewRegistry = (ViewRegistry) ContextInjectionFactory.make(ViewRegistry.class,
 							e4Context);
 				}
 				return viewRegistry;
@@ -1313,7 +1328,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		});
 		e4Context.set(ActionSetRegistry.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
+			public Object compute(IEclipseContext context) {
 				if (actionSetRegistry == null) {
 					actionSetRegistry = new ActionSetRegistry();
 				}
@@ -1322,7 +1337,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		});
 		context.set(IDecoratorManager.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
+			public Object compute(IEclipseContext context) {
 				if (decoratorManager == null) {
 					decoratorManager = new DecoratorManager();
 				}
@@ -1331,19 +1346,19 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		});
 		context.set(ExportWizardRegistry.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
+			public Object compute(IEclipseContext context) {
 				return ExportWizardRegistry.getInstance();
 			}
 		});
 		context.set(ImportWizardRegistry.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
+			public Object compute(IEclipseContext context) {
 				return ImportWizardRegistry.getInstance();
 			}
 		});
 		context.set(IIntroRegistry.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
+			public Object compute(IEclipseContext context) {
 				if (introRegistry == null) {
 					introRegistry = new IntroRegistry();
 				}
@@ -1352,13 +1367,13 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		});
 		context.set(NewWizardRegistry.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
+			public Object compute(IEclipseContext context) {
 				return NewWizardRegistry.getInstance();
 			}
 		});
 		context.set(IWorkbenchOperationSupport.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
+			public Object compute(IEclipseContext context) {
 				if (operationSupport == null) {
 					operationSupport = new WorkbenchOperationSupport();
 				}
@@ -1367,7 +1382,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		});
 		context.set(PreferenceManager.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
+			public Object compute(IEclipseContext context) {
 				if (preferenceManager == null) {
 					preferenceManager = new WorkbenchPreferenceManager(
 							PREFERENCE_PAGE_CATEGORY_SEPARATOR);
@@ -1384,7 +1399,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		});
 		context.set(ISharedImages.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
+			public Object compute(IEclipseContext context) {
 				if (sharedImages == null) {
 					sharedImages = new SharedImages();
 				}
@@ -1394,7 +1409,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 
 		context.set(IThemeRegistry.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
+			public Object compute(IEclipseContext context) {
 				if (themeRegistry == null) {
 					themeRegistry = new ThemeRegistry();
 					ThemeRegistryReader reader = new ThemeRegistryReader();
@@ -1405,7 +1420,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		});
 		context.set(IWorkingSetManager.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
+			public Object compute(IEclipseContext context) {
 				if (workingSetManager == null) {
 					workingSetManager = new WorkingSetManager(bundleContext);
 					workingSetManager.restoreState();
@@ -1415,7 +1430,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		});
 		context.set(WorkingSetRegistry.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
+			public Object compute(IEclipseContext context) {
 				if (workingSetRegistry == null) {
 					workingSetRegistry = new WorkingSetRegistry();
 					workingSetRegistry.load();
@@ -1425,30 +1440,11 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		});
 		context.set(IEditorRegistry.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
+			public Object compute(IEclipseContext context) {
 				if (editorRegistry == null) {
 					editorRegistry = new EditorRegistry();
 				}
 				return editorRegistry;
-			}
-		});
-		context.set(EHelpService.class.getName(), new ContextFunction() {
-			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
-				if (helpService == null) {
-					helpService = new HelpServiceImpl();
-				}
-				return helpService;
-			}
-		});
-		context.set(ICommandHelpService.class.getName(), new ContextFunction() {
-			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
-				if (commandHelpService == null) {
-					commandHelpService = ContextInjectionFactory.make(CommandHelpServiceImpl.class,
-							e4Context);
-				}
-				return commandHelpService;
 			}
 		});
 	}
@@ -1464,29 +1460,5 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 			debugTracker.open();
 		}
 		return (DebugOptions) debugTracker.getService();
-	}
-
-
-	/**
-	 * Returns a {@link TestableObject} provided by a TestableObject
-	 * service or <code>null</code> if a service implementation cannot
-	 * be found.  The TestableObject is used to hook tests into the
-	 * application lifecycle.
-	 * <p>
-	 * It is recommended the testable object is obtained via service
-	 * over {@link Workbench#getWorkbenchTestable()} to avoid the
-	 * tests having a dependency on the Workbench.
-	 * </p>
-	 * @see PlatformUI#getTestableObject()
-	 * @return TestableObject provided via service or <code>null</code>
-	 */
-	public TestableObject getTestableObject() {
-		if (bundleContext == null)
-			return null;
-		if (testableTracker == null) {
-			testableTracker = new ServiceTracker(bundleContext, TestableObject.class.getName(), null);
-			testableTracker.open();
-		}
-		return (TestableObject) testableTracker.getService();
 	}
 }

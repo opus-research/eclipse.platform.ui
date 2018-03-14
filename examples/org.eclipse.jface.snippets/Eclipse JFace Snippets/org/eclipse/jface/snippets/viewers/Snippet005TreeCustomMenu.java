@@ -1,19 +1,17 @@
 /*******************************************************************************
- * Copyright (c) 2006 - 2015 Tom Schindl and others.
+ * Copyright (c) 2006 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 414565, 442278, 475361
+ *     Tom Schindl - initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
@@ -30,32 +28,41 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * Customized context menu based on TreeItem-Selection
+ * 
+ * @author Tom Schindl <tom.schindl@bestsolution.at>
  *
  */
 public class Snippet005TreeCustomMenu {
 	private class MyContentProvider implements ITreeContentProvider {
 
-		@Override
 		public Object[] getElements(Object inputElement) {
 			return ((MyModel) inputElement).child.toArray();
 		}
 
-		@Override
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+		 */
 		public void dispose() {
 
 		}
 
-		@Override
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+		 */
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 
 		}
 
-		@Override
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
+		 */
 		public Object[] getChildren(Object parentElement) {
 			return getElements(parentElement);
 		}
 
-		@Override
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
+		 */
 		public Object getParent(Object element) {
 			if (element == null) {
 				return null;
@@ -64,7 +71,9 @@ public class Snippet005TreeCustomMenu {
 			return ((MyModel) element).parent;
 		}
 
-		@Override
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
+		 */
 		public boolean hasChildren(Object element) {
 			return ((MyModel) element).child.size() > 0;
 		}
@@ -74,7 +83,7 @@ public class Snippet005TreeCustomMenu {
 	public class MyModel {
 		public MyModel parent;
 
-		public List<MyModel> child = new ArrayList<>();
+		public ArrayList child = new ArrayList();
 
 		public int counter;
 
@@ -83,7 +92,6 @@ public class Snippet005TreeCustomMenu {
 			this.counter = counter;
 		}
 
-		@Override
 		public String toString() {
 			String rv = "Item ";
 			if (parent != null) {
@@ -109,9 +117,12 @@ public class Snippet005TreeCustomMenu {
 
 		mgr.addMenuListener(new IMenuListener() {
 
-			@Override
+			/* (non-Javadoc)
+			 * @see org.eclipse.jface.action.IMenuListener#menuAboutToShow(org.eclipse.jface.action.IMenuManager)
+			 */
 			public void menuAboutToShow(IMenuManager manager) {
-				IStructuredSelection selection = v.getStructuredSelection();
+				IStructuredSelection selection = (IStructuredSelection) v
+						.getSelection();
 				if (!selection.isEmpty()) {
 					a.setText("Action for "
 							+ ((MyModel) selection.getFirstElement())

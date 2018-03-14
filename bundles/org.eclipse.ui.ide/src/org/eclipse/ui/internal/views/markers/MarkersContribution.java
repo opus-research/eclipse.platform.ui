@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,9 +20,9 @@ import org.eclipse.ui.actions.CompoundContributionItem;
 /**
  * MarkersContribution is the abstract superclass of the compound contribution
  * items used in the Markers views.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 abstract class MarkersContribution extends CompoundContributionItem {
 
@@ -35,7 +35,7 @@ abstract class MarkersContribution extends CompoundContributionItem {
 
 	/**
 	 * Create a new instance of the receiver.
-	 *
+	 * 
 	 * @param id
 	 */
 	public MarkersContribution(String id) {
@@ -44,7 +44,7 @@ abstract class MarkersContribution extends CompoundContributionItem {
 
 	/**
 	 * Get the view this contribution is working on.
-	 *
+	 * 
 	 * @return ExtendedMarkersView or <code>null</code> if the active view isn't a marker view
 	 */
 	ExtendedMarkersView getView() {

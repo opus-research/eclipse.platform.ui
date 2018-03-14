@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,14 +14,13 @@ import org.eclipse.osgi.util.NLS;
 
 /**
  * Utility class which helps managing messages
- *
- *
+ * 
+ * 
  * @since 3.2
  */
 public class WorkbenchNavigatorMessages extends NLS {
 	/** The bundle properties file */
 	public static final String BUNDLE_NAME = "org.eclipse.ui.internal.navigator.resources.plugin.messages"; //$NON-NLS-1$
-
 
 	public static String PortingActionProvider_ImportResourcesMenu_label;
 
@@ -42,17 +41,17 @@ public class WorkbenchNavigatorMessages extends NLS {
 
 	public static String MoveResourceAction_title;
 	public static String MoveResourceAction_checkMoveMessage;
-
+	
 	public static String ResourceMgmtActionProvider_logTitle;
 
 	public static String WorkingSetRootModeActionGroup_Top_Level_Element_;
 	public static String WorkingSetRootModeActionGroup_Project_;
 	public static String WorkingSetRootModeActionGroup_Working_Set_;
 	public static String WorkingSetActionProvider_multipleWorkingSets;
-
+	
 	public static String CopyAction_Cop_;
 	public static String CopyAction_Copy_selected_resource_s_;
-
+	
 	public static String PasteAction_Past_;
 	public static String PasteAction_Paste_selected_resource_s_;
 
@@ -61,16 +60,11 @@ public class WorkbenchNavigatorMessages extends NLS {
 	public static String ProjectExplorer_toolTip;
 	public static String ProjectExplorer_toolTip2;
 	public static String ProjectExplorer_toolTip3;
-
+	
 	public static String ProjectExplorerPart_workspace;
 	public static String ProjectExplorerPart_workingSetModel;
-
-	public static String OpenProjectAction_OpenExistingProject;
-	public static String OpenProjectAction_OpenExistingProject_desc;
-
-	public static String SelectProjectForFolderAction_SelectProject;
-
-
+	
+	
 	static {
 		initializeMessages(BUNDLE_NAME, WorkbenchNavigatorMessages.class);
 	}

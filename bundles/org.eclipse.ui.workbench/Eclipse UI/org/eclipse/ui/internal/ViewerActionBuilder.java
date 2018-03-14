@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,7 +30,7 @@ import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
  * elements.
  */
 public class ViewerActionBuilder extends PluginActionBuilder {
-
+    
 
     private ISelectionProvider provider;
 
@@ -42,8 +42,10 @@ public class ViewerActionBuilder extends PluginActionBuilder {
     public ViewerActionBuilder() {
     }
 
-    @Override
-	protected ActionDescriptor createActionDescriptor(
+    /* (non-Javadoc)
+     * Method declared on PluginActionBuilder.
+     */
+    protected ActionDescriptor createActionDescriptor(
             IConfigurationElement element) {
         if (part instanceof IViewPart) {
 			return new ActionDescriptor(element, ActionDescriptor.T_VIEW, part);
@@ -51,8 +53,10 @@ public class ViewerActionBuilder extends PluginActionBuilder {
 		return new ActionDescriptor(element, ActionDescriptor.T_EDITOR, part);
     }
 
-    @Override
-	protected BasicContribution createContribution() {
+    /* (non-Javadoc)
+     * Method declared on PluginActionBuilder.
+     */
+    protected BasicContribution createContribution() {
         return new ViewerContribution(provider);
     }
 
@@ -68,8 +72,10 @@ public class ViewerActionBuilder extends PluginActionBuilder {
         }
     }
 
-    @Override
-	protected boolean readElement(IConfigurationElement element) {
+    /* (non-Javadoc)
+     * Method declared on PluginActionBuilder.
+     */
+    protected boolean readElement(IConfigurationElement element) {
         String tag = element.getName();
 
         // Found visibility sub-element
@@ -90,7 +96,7 @@ public class ViewerActionBuilder extends PluginActionBuilder {
      * @param id the menu id
      * @param prov the selection provider for the control containing the menu
      * @param part the part containing the menu.
-     * @return <code>true</code> if 1 or more items were read.
+     * @return <code>true</code> if 1 or more items were read.  
      */
     public boolean readViewerContributions(String id, ISelectionProvider prov,
             IWorkbenchPart part) {
@@ -113,7 +119,7 @@ public class ViewerActionBuilder extends PluginActionBuilder {
 
         /**
          * Create a new ViewerContribution.
-         *
+         * 
          * @param selProvider the selection provider
          */
         public ViewerContribution(ISelectionProvider selProvider) {
@@ -126,15 +132,17 @@ public class ViewerActionBuilder extends PluginActionBuilder {
 
         /**
          * Set the visibility test.
-         *
+         * 
          * @param element the element
          */
         public void setVisibilityTest(IConfigurationElement element) {
             visibilityTest = new ActionExpression(element);
         }
 
-        @Override
-		public void contribute(IMenuManager menu, boolean menuAppendIfMissing,
+        /* (non-Javadoc)
+         * Method declared on BasicContribution.
+         */
+        public void contribute(IMenuManager menu, boolean menuAppendIfMissing,
                 IToolBarManager toolbar, boolean toolAppendIfMissing) {
             boolean visible = true;
 
@@ -153,8 +161,10 @@ public class ViewerActionBuilder extends PluginActionBuilder {
                         toolAppendIfMissing);
 			}
         }
-
-		@Override
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ui.internal.PluginActionBuilder.BasicContribution#dispose()
+		 */
 		public void dispose() {
 			if (selProvider != null) {
 				selProvider.removeSelectionChangedListener(this);
@@ -168,11 +178,10 @@ public class ViewerActionBuilder extends PluginActionBuilder {
 		 * the contribution itself is added, and propagates
 		 * the selection changed notification to all actions.
 		 * This simplifies cleanup, in addition to potentially reducing the number of listeners.
-		 *
+		 * 
 		 * @see ISelectionChangedListener
 		 * @since 3.1
 		 */
-		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
 			if (actions != null) {
 				if (actions != null) {

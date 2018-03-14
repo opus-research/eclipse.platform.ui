@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,7 @@ import org.eclipse.swt.widgets.Control;
  * of a message in the form. Typically the prefix is computed by looking at the
  * label that preceeds the control, if present. Alternative providers may
  * include other text to further specify the location of the message.
- *
+ * 
  * @see IMessageManager
  * @see IMessage
  * @since 3.3
@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.Control;
 public interface IMessagePrefixProvider {
 	/**
 	 * Returns the computed prefix for the provided control.
-	 *
+	 * 
 	 * @param control
 	 *            the control to provide the prefix for
 	 * @return the computed prefix

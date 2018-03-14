@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,8 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -44,14 +46,14 @@ public abstract class StringButtonFieldEditor extends StringFieldEditor {
     private String changeButtonText;
 
     /**
-     * Creates a new string button field editor
+     * Creates a new string button field editor 
      */
     protected StringButtonFieldEditor() {
     }
 
     /**
      * Creates a string button field editor.
-     *
+     * 
      * @param name the name of the preference this field editor works on
      * @param labelText the label text of the field editor
      * @param parent the parent of the field editor's control
@@ -62,8 +64,10 @@ public abstract class StringButtonFieldEditor extends StringFieldEditor {
         createControl(parent);
     }
 
-    @Override
-	protected void adjustForNumColumns(int numColumns) {
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
+    protected void adjustForNumColumns(int numColumns) {
         ((GridData) getTextControl().getLayoutData()).horizontalSpan = numColumns - 2;
     }
 
@@ -80,8 +84,10 @@ public abstract class StringButtonFieldEditor extends StringFieldEditor {
      */
     protected abstract String changePressed();
 
-    @Override
-	protected void doFillIntoGrid(Composite parent, int numColumns) {
+    /* (non-Javadoc)
+     * Method declared on StringFieldEditor (and FieldEditor).
+     */
+    protected void doFillIntoGrid(Composite parent, int numColumns) {
         super.doFillIntoGrid(parent, numColumns - 1);
         changeButton = getChangeControl(parent);
         GridData gd = new GridData();
@@ -107,23 +113,28 @@ public abstract class StringButtonFieldEditor extends StringFieldEditor {
             changeButton.setText(changeButtonText);
             changeButton.setFont(parent.getFont());
             changeButton.addSelectionListener(new SelectionAdapter() {
-                @Override
-				public void widgetSelected(SelectionEvent evt) {
+                public void widgetSelected(SelectionEvent evt) {
                     String newValue = changePressed();
                     if (newValue != null) {
                         setStringValue(newValue);
                     }
                 }
             });
-            changeButton.addDisposeListener(event -> changeButton = null);
+            changeButton.addDisposeListener(new DisposeListener() {
+                public void widgetDisposed(DisposeEvent event) {
+                    changeButton = null;
+                }
+            });
         } else {
             checkParent(changeButton, parent);
         }
         return changeButton;
     }
 
-    @Override
-	public int getNumberOfControls() {
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
+    public int getNumberOfControls() {
         return 3;
     }
 
@@ -155,8 +166,10 @@ public abstract class StringButtonFieldEditor extends StringFieldEditor {
 		}
     }
 
-    @Override
-	public void setEnabled(boolean enabled, Composite parent) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.preference.FieldEditor#setEnabled(boolean, org.eclipse.swt.widgets.Composite)
+     */
+    public void setEnabled(boolean enabled, Composite parent) {
         super.setEnabled(enabled, parent);
         if (changeButton != null) {
             changeButton.setEnabled(enabled);

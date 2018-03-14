@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@ package org.eclipse.ui.internal.themes;
 
 import java.util.ResourceBundle;
 import java.util.Set;
+
 import org.eclipse.core.commands.common.EventManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
@@ -68,7 +69,7 @@ public class Theme extends EventManager implements ITheme {
         if (descriptor != null) {
         	ITheme defaultTheme = workbench.getThemeManager().getTheme(
                     IThemeManager.DEFAULT_THEME);
-
+        	
             ColorDefinition[] colorDefinitions = this.descriptor.getColors();
             themeColorRegistry = new CascadingColorRegistry(defaultTheme
                     .getColorRegistry());
@@ -98,15 +99,17 @@ public class Theme extends EventManager implements ITheme {
 
     /**
      * Listener that is responsible for responding to preference changes.
-     *
+     * 
      * @return the property change listener
      */
     private IPropertyChangeListener getPropertyListener() {
         if (propertyListener == null) {
             propertyListener = new IPropertyChangeListener() {
 
-                @Override
-				public void propertyChange(PropertyChangeEvent event) {
+                /* (non-Javadoc)
+                 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
+                 */
+                public void propertyChange(PropertyChangeEvent event) {
                     String[] split = ThemeElementHelper.splitPropertyName(
                             Theme.this, event.getProperty());
                     String key = split[1];
@@ -116,27 +119,25 @@ public class Theme extends EventManager implements ITheme {
 					}
                     try {
                     	String thisTheme = getId();
-
+                                          
                         if (Util.equals(thisTheme, theme)) {
 							if (getFontRegistry().hasValueFor(key)) {
-								FontData[] data = event.getNewValue() instanceof String
-										? PreferenceConverter.basicGetFontData((String) event.getNewValue())
-										: (FontData[]) event.getNewValue();
-
+								FontData[] data = PreferenceConverter
+										.basicGetFontData((String) event
+												.getNewValue());
+								
 								getFontRegistry().put(key, data);
 								processDefaultsTo(key, data);
 								return;
 							}
 							else if (getColorRegistry().hasValueFor(key)) {
-								RGB rgb = event.getNewValue() instanceof String
-										? StringConverter.asRGB((String) event.getNewValue())
-										: (RGB) event.getNewValue();
-
+								RGB rgb = StringConverter.asRGB((String) event
+										.getNewValue());
 								getColorRegistry().put(key, rgb);
 								processDefaultsTo(key, rgb);
 								return;
 							}
-						}
+						}                        
                     } catch (DataFormatException e) {
                         //no-op
                     }
@@ -144,7 +145,7 @@ public class Theme extends EventManager implements ITheme {
 
                 /**
                  * Process all fonts that default to the given ID.
-                 *
+                 * 
                  * @param key the font ID
                  * @param fd the new FontData for defaulted fonts
                  */
@@ -168,7 +169,7 @@ public class Theme extends EventManager implements ITheme {
 
                 /**
                  * Process all colors that default to the given ID.
-                 *
+                 * 
                  * @param key the color ID
                  * @param rgb the new RGB value for defaulted colors
                  */
@@ -201,8 +202,10 @@ public class Theme extends EventManager implements ITheme {
         if (themeListener == null) {
             themeListener = new IPropertyChangeListener() {
 
-                @Override
-				public void propertyChange(PropertyChangeEvent event) {
+                /* (non-Javadoc)
+                 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
+                 */
+                public void propertyChange(PropertyChangeEvent event) {
                     firePropertyChange(event);
                 }
             };
@@ -210,8 +213,7 @@ public class Theme extends EventManager implements ITheme {
         return themeListener;
     }
 
-    @Override
-	public ColorRegistry getColorRegistry() {
+    public ColorRegistry getColorRegistry() {
 		if (themeColorRegistry != null) {
 			return themeColorRegistry;
 		}
@@ -220,8 +222,7 @@ public class Theme extends EventManager implements ITheme {
 				.getDefaultThemeColorRegistry();
 	}
 
-    @Override
-	public FontRegistry getFontRegistry() {
+    public FontRegistry getFontRegistry() {
 		if (themeFontRegistry != null) {
 			return themeFontRegistry;
 		}
@@ -230,8 +231,7 @@ public class Theme extends EventManager implements ITheme {
 				.getDefaultThemeFontRegistry();
 	}
 
-    @Override
-	public void dispose() {
+    public void dispose() {
         if (themeColorRegistry != null) {
             themeColorRegistry.removeListener(themeListener);
             themeColorRegistry.dispose();
@@ -244,19 +244,25 @@ public class Theme extends EventManager implements ITheme {
                 .removePropertyChangeListener(getPropertyListener());
     }
 
-    @Override
-	public String getId() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.themes.ITheme#getId()
+     */
+    public String getId() {
         return descriptor == null ? IThemeManager.DEFAULT_THEME : descriptor
                 .getId();
     }
 
-    @Override
-	public void addPropertyChangeListener(IPropertyChangeListener listener) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbench#addPropertyChangeListener(org.eclipse.jface.util.IPropertyChangeListener)
+     */
+    public void addPropertyChangeListener(IPropertyChangeListener listener) {
         addListenerObject(listener);
     }
 
-    @Override
-	public void removePropertyChangeListener(IPropertyChangeListener listener) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbench#removePropertyChangeListener(org.eclipse.jface.util.IPropertyChangeListener)
+     */
+    public void removePropertyChangeListener(IPropertyChangeListener listener) {
         removeListenerObject(listener);
     }
 
@@ -267,22 +273,28 @@ public class Theme extends EventManager implements ITheme {
         }
     }
 
-    @Override
-	public String getLabel() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.themes.ITheme#getLabel()
+     */
+    public String getLabel() {
         return descriptor == null ? RESOURCE_BUNDLE
-                .getString("DefaultTheme.label") : descriptor.getName(); //$NON-NLS-1$
+                .getString("DefaultTheme.label") : descriptor.getName(); //$NON-NLS-1$ 
     }
 
-    @Override
-	public String getString(String key) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.themes.ITheme#getString(java.lang.String)
+     */
+    public String getString(String key) {
         if (dataMap != null) {
 			return (String) dataMap.get(key);
 		}
         return (String) themeRegistry.getData().get(key);
     }
 
-    @Override
-	public Set keySet() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.themes.ITheme#keySet()
+     */
+    public Set keySet() {
         if (dataMap != null) {
 			return dataMap.keySet();
 		}
@@ -290,8 +302,10 @@ public class Theme extends EventManager implements ITheme {
         return themeRegistry.getData().keySet();
     }
 
-    @Override
-	public int getInt(String key) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.themes.ITheme#getInt(java.lang.String)
+     */
+    public int getInt(String key) {
         String string = getString(key);
         if (string == null) {
 			return 0;
@@ -303,8 +317,10 @@ public class Theme extends EventManager implements ITheme {
         }
     }
 
-    @Override
-	public boolean getBoolean(String key) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.themes.ITheme#getBoolean(java.lang.String)
+     */
+    public boolean getBoolean(String key) {
         String string = getString(key);
         if (string == null) {
 			return false;

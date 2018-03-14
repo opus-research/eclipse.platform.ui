@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,7 +37,7 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
  * This class is not intended for use outside of the
  * <code>org.eclipse.ui.workbench</code> plug-in.
  * </p>
- *
+ * 
  * @since 3.2
  */
 public final class CommandStateProxy extends PersistentState {
@@ -75,7 +75,7 @@ public final class CommandStateProxy extends PersistentState {
 	/**
 	 * Constructs a new instance of <code>HandlerState</code> with all the
 	 * information it needs to create the real state later.
-	 *
+	 * 
 	 * @param configurationElement
 	 *            The configuration element from which the real class can be
 	 *            loaded at run-time; must not be <code>null</code>.
@@ -110,7 +110,6 @@ public final class CommandStateProxy extends PersistentState {
 		this.preferenceStore = preferenceStore;
 	}
 
-	@Override
 	public final void addListener(final IStateListener listener) {
 		if (state == null) {
 			addListenerObject(listener);
@@ -119,7 +118,6 @@ public final class CommandStateProxy extends PersistentState {
 		}
 	}
 
-	@Override
 	public final void dispose() {
 		if (state != null) {
 			state.dispose();
@@ -133,7 +131,6 @@ public final class CommandStateProxy extends PersistentState {
 		}
 	}
 
-	@Override
 	public final Object getValue() {
 		if (loadState()) {
 			return state.getValue();
@@ -142,7 +139,6 @@ public final class CommandStateProxy extends PersistentState {
 		return null;
 	}
 
-	@Override
 	public final void load(final IPreferenceStore store,
 			final String preferenceKey) {
 		if (loadState() && state instanceof PersistentState) {
@@ -158,7 +154,7 @@ public final class CommandStateProxy extends PersistentState {
 	 * Loads the state, if possible. If the state is loaded, then the member
 	 * variables are updated accordingly and the state is told to load its value
 	 * from the preference store.
-	 *
+	 * 
 	 * @return <code>true</code> if the state is now non-null;
 	 *         <code>false</code> otherwise.
 	 */
@@ -170,7 +166,7 @@ public final class CommandStateProxy extends PersistentState {
 	 * Loads the state, if possible. If the state is loaded, then the member
 	 * variables are updated accordingly and the state is told to load its value
 	 * from the preference store.
-	 *
+	 * 
 	 * @param readPersistence
 	 *            Whether the persistent state for this object should be read.
 	 * @return <code>true</code> if the state is now non-null;
@@ -220,7 +216,6 @@ public final class CommandStateProxy extends PersistentState {
 		return true;
 	}
 
-	@Override
 	public final void removeListener(final IStateListener listener) {
 		if (state == null) {
 			removeListenerObject(listener);
@@ -229,7 +224,6 @@ public final class CommandStateProxy extends PersistentState {
 		}
 	}
 
-	@Override
 	public final void save(final IPreferenceStore store,
 			final String preferenceKey) {
 		if (loadState() && state instanceof PersistentState) {
@@ -237,7 +231,6 @@ public final class CommandStateProxy extends PersistentState {
 		}
 	}
 
-	@Override
 	public final void setId(final String id) {
 		super.setId(id);
 		if (state != null) {
@@ -245,21 +238,18 @@ public final class CommandStateProxy extends PersistentState {
 		}
 	}
 
-	@Override
 	public final void setShouldPersist(final boolean persisted) {
 		if (loadState(persisted) && state instanceof PersistentState) {
 			((PersistentState) state).setShouldPersist(persisted);
 		}
 	}
 
-	@Override
 	public final void setValue(final Object value) {
 		if (loadState()) {
 			state.setValue(value);
 		}
 	}
 
-	@Override
 	public final boolean shouldPersist() {
 		if (loadState() && state instanceof PersistentState) {
 			return ((PersistentState) state).shouldPersist();
@@ -268,7 +258,6 @@ public final class CommandStateProxy extends PersistentState {
 		return false;
 	}
 
-	@Override
 	public final String toString() {
 		if (state == null) {
 			return configurationElement.getAttribute(stateAttributeName);

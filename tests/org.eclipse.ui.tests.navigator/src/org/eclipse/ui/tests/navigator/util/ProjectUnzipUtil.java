@@ -99,33 +99,29 @@ public class ProjectUnzipUtil {
 		} catch (IOException e1) {
 			throw e1;
 		}
-		try {
-			Enumeration entries = zipFile.entries();
-			while (entries.hasMoreElements()) {
-				ZipEntry entry = (ZipEntry) entries.nextElement();
-				monitor.subTask(entry.getName());
-				File aFile = computeLocation(entry.getName()).toFile();
-				File parentFile = null;
-				try {
-					if (entry.isDirectory()) {
-						aFile.mkdirs();
-					} else {
-						parentFile = aFile.getParentFile();
-						if (!parentFile.exists())
-							parentFile.mkdirs();
-						if (!aFile.exists())
-							aFile.createNewFile();
-						copy(zipFile.getInputStream(entry), new FileOutputStream(aFile));
-						if (entry.getTime() > 0)
-							aFile.setLastModified(entry.getTime());
-					}
-				} catch (IOException e) {
-					throw e;
+		Enumeration entries = zipFile.entries();
+		while (entries.hasMoreElements()) {
+			ZipEntry entry = (ZipEntry) entries.nextElement();
+			monitor.subTask(entry.getName());
+			File aFile = computeLocation(entry.getName()).toFile();
+			File parentFile = null;
+			try {
+				if (entry.isDirectory()) {
+					aFile.mkdirs();
+				} else {
+					parentFile = aFile.getParentFile();
+					if (!parentFile.exists())
+						parentFile.mkdirs();
+					if (!aFile.exists())
+						aFile.createNewFile();
+					copy(zipFile.getInputStream(entry), new FileOutputStream(aFile));
+					if (entry.getTime() > 0)
+						aFile.setLastModified(entry.getTime());
 				}
-				monitor.worked(1);
+			} catch (IOException e) {
+				throw e;
 			}
-		} finally {
-			zipFile.close();
+			monitor.worked(1);
 		}
 	}
 

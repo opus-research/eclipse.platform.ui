@@ -1,6 +1,6 @@
 /*
 
-   Copyright 2002, 2014  The Apache Software Foundation
+   Copyright 2002  The Apache Software Foundation 
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -38,7 +38,6 @@ public class CSSElementSelectorImpl extends AbstractElementSelector {
 	 * <b>SAC</b>: Implements {@link
 	 * org.w3c.css.sac.Selector#getSelectorType()}.
 	 */
-	@Override
 	public short getSelectorType() {
 		return SAC_ELEMENT_NODE_SELECTOR;
 	}
@@ -46,7 +45,6 @@ public class CSSElementSelectorImpl extends AbstractElementSelector {
 	/**
 	 * Tests whether this selector matches the given element.
 	 */
-	@Override
 	public boolean match(Element e, String pseudoE) {
 		String name = getLocalName();
 		if (name == null) {
@@ -76,7 +74,6 @@ public class CSSElementSelectorImpl extends AbstractElementSelector {
 	/**
 	 * Returns the specificity of this selector.
 	 */
-	@Override
 	public int getSpecificity() {
 		return (getLocalName() == null) ? 0 : 1;
 	}
@@ -84,7 +81,6 @@ public class CSSElementSelectorImpl extends AbstractElementSelector {
 	/**
 	 * Returns a representation of the selector.
 	 */
-	@Override
 	public String toString() {
 		String name = getLocalName();
 		if (name == null) {

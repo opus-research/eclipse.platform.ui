@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,12 +27,12 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
  * @since 3.1
  */
 public class ImageBindingRegistry implements IExtensionChangeHandler {
-	private String tag;
+	private String tag; 
 	private ImageRegistry registry = new ImageRegistry();
-
+	
 	/**
-	 * @param tag
-	 *
+	 * @param tag 
+	 * 
 	 */
 	public ImageBindingRegistry(String tag) {
 		super();
@@ -43,7 +43,9 @@ public class ImageBindingRegistry implements IExtensionChangeHandler {
 		}
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker, org.eclipse.core.runtime.IExtension)
+	 */
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
 		IConfigurationElement [] elements = extension.getConfigurationElements();
 		for (int i = 0; i < elements.length; i++) {
@@ -64,12 +66,12 @@ public class ImageBindingRegistry implements IExtensionChangeHandler {
 				}
 			}
 		}
-
+		
 	}
-
+    
     /**
      * Return the activity support extension point that this registry is interested in.
-     *
+     * 
      * @return the extension point
      */
 	public IExtensionPoint getExtensionPointFilter() {
@@ -77,7 +79,9 @@ public class ImageBindingRegistry implements IExtensionChangeHandler {
                 PlatformUI.PLUGIN_ID, IWorkbenchRegistryConstants.PL_ACTIVITYSUPPORT);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension, java.lang.Object[])
+	 */
 	public void removeExtension(IExtension extension, Object[] objects) {
 		for (int i = 0; i < objects.length; i++) {
 			if (objects[i] instanceof String) {
@@ -85,17 +89,17 @@ public class ImageBindingRegistry implements IExtensionChangeHandler {
 			}
 		}
 	}
-
+	
 	/**
 	 * Get the ImageDescriptor for the given id.
-	 *
+	 * 
 	 * @param id the id
 	 * @return the descriptor
 	 */
 	public ImageDescriptor getImageDescriptor(String id) {
 		return registry.getDescriptor(id);
 	}
-
+	
 	/**
 	 * Dispose of this registry.
 	 */

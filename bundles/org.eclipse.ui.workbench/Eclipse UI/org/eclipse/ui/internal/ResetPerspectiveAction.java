@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,13 +40,15 @@ public class ResetPerspectiveAction extends PerspectiveAction {
         setText(WorkbenchMessages.ResetPerspective_text);
         setActionDefinitionId(IWorkbenchCommandConstants.WINDOW_RESET_PERSPECTIVE);
         // @issue missing action id
-        setToolTipText(WorkbenchMessages.ResetPerspective_toolTip);
+        setToolTipText(WorkbenchMessages.ResetPerspective_toolTip); 
         window.getWorkbench().getHelpSystem().setHelp(this,
 				IWorkbenchHelpContextIds.RESET_PERSPECTIVE_ACTION);
     }
 
-    @Override
-	protected void run(IWorkbenchPage page, IPerspectiveDescriptor persp) {
+    /* (non-Javadoc)
+     * Method declared on PerspectiveAction.
+     */
+    protected void run(IWorkbenchPage page, IPerspectiveDescriptor persp) {
         String message = NLS.bind(WorkbenchMessages.ResetPerspective_message, persp.getLabel() );
         String[] buttons = new String[] { IDialogConstants.OK_LABEL,
                 IDialogConstants.CANCEL_LABEL };

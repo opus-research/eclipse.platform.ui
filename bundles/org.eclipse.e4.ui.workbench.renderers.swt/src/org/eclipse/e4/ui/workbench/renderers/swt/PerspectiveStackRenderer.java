@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,16 +33,23 @@ import org.eclipse.swt.widgets.Shell;
 public class PerspectiveStackRenderer extends LazyStackRenderer {
 
 	@Inject
-	private IPresentationEngine renderer;
+	IPresentationEngine renderer;
 
 	@Inject
-	private IEventBroker eventBroker;
+	IEventBroker eventBroker;
 
 	@PostConstruct
 	public void init() {
 		super.init(eventBroker);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#createWidget
+	 * (org.eclipse.e4.ui.model.application.MUIElement, java.lang.Object)
+	 */
 	@Override
 	public Object createWidget(MUIElement element, Object parent) {
 		if (!(element instanceof MPerspectiveStack)
@@ -58,6 +65,13 @@ public class PerspectiveStackRenderer extends LazyStackRenderer {
 		return perspStack;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.renderers.swt.LazyStackRenderer#postProcess
+	 * (org.eclipse.e4.ui.model.application.MUIElement)
+	 */
 	@Override
 	public void postProcess(MUIElement element) {
 		super.postProcess(element);
@@ -73,6 +87,13 @@ public class PerspectiveStackRenderer extends LazyStackRenderer {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.renderers.swt.LazyStackRenderer#showTab(org
+	 * .eclipse.e4.ui.model.application.MUIElement)
+	 */
 	@Override
 	protected void showTab(MUIElement tabElement) {
 		MPerspective persp = (MPerspective) tabElement;
@@ -99,12 +120,8 @@ public class PerspectiveStackRenderer extends LazyStackRenderer {
 
 		// Force a context switch
 		if (tabElement instanceof MPerspective) {
-			MPerspective selected = (MPerspective) tabElement.getParent()
-					.getSelectedElement();
-			if (selected != null) {
-				IEclipseContext context = selected.getContext();
-				context.get(EPartService.class).switchPerspective(selected);
-			}
+			IEclipseContext context = persp.getContext();
+			context.get(EPartService.class).switchPerspective(persp);
 		}
 
 		// Move any other controls to 'limbo'

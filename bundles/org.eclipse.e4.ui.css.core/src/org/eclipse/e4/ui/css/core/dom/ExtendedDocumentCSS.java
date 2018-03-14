@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Angelo Zerr and others.
+ * Copyright (c) 2008 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,19 +22,23 @@ import org.w3c.dom.stylesheets.StyleSheet;
  */
 public interface ExtendedDocumentCSS extends DocumentCSS {
 
-	public static final Integer SAC_ID_CONDITION = Integer.valueOf(Condition.SAC_ID_CONDITION);
-	public static final Integer SAC_CLASS_CONDITION = Integer.valueOf(Condition.SAC_CLASS_CONDITION);
-	public static final Integer SAC_PSEUDO_CLASS_CONDITION = Integer.valueOf(Condition.SAC_PSEUDO_CLASS_CONDITION);
-	public static final Integer OTHER_SAC_CONDITIONAL_SELECTOR = Integer.valueOf(Selector.SAC_CONDITIONAL_SELECTOR);
+	public static final Integer SAC_ID_CONDITION = new Integer(
+			Condition.SAC_ID_CONDITION);
+	public static final Integer SAC_CLASS_CONDITION = new Integer(
+			Condition.SAC_CLASS_CONDITION);
+	public static final Integer SAC_PSEUDO_CLASS_CONDITION = new Integer(
+			Condition.SAC_PSEUDO_CLASS_CONDITION);
+	public static final Integer OTHER_SAC_CONDITIONAL_SELECTOR = new Integer(
+			Selector.SAC_CONDITIONAL_SELECTOR);
 
-	public static final Integer OTHER_SAC_SELECTOR = Integer.valueOf(999);
+	public static final Integer OTHER_SAC_SELECTOR = new Integer(999);
 
 	public void addStyleSheet(StyleSheet styleSheet);
 
 	public void removeAllStyleSheets();
 
-	public List<?> queryConditionSelector(int conditionType);
+	public List queryConditionSelector(int conditionType);
 
-	public List<?> querySelector(int selectorType, int conditionType);
+	public List querySelector(int selectorType, int conditionType);
 
 }

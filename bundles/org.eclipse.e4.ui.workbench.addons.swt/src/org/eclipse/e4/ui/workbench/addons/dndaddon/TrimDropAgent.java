@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 - 2015 IBM Corporation and others.
+ * Copyright (c) 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel (Lars.Vogel@gmail.com) - Bug 420835
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.addons.dndaddon;
@@ -84,7 +83,7 @@ public class TrimDropAgent extends DropAgent {
 
 		TrimBarLayout tbl = (TrimBarLayout) trimComp.getLayout();
 		Point trimPos = trimComp.getDisplay().map(null, trimComp, info.cursorPos);
-		Control trimCtrl = tbl.ctrlFromPoint(trimComp, trimPos);
+		Control trimCtrl = tbl.ctrlFromPoint(trimPos);
 
 		if (trimCtrl == null)
 			return null;
@@ -118,6 +117,12 @@ public class TrimDropAgent extends DropAgent {
 		return after;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.workbench.addons.dndaddon.DropAgent#dragEnter(org.eclipse.e4.ui.model.
+	 * application.ui.MUIElement, org.eclipse.e4.ui.workbench.addons.dndaddon.DnDInfo)
+	 */
 	@Override
 	public void dragEnter(MUIElement dragElement, DnDInfo info) {
 		super.dragEnter(dragElement, info);
@@ -132,6 +137,11 @@ public class TrimDropAgent extends DropAgent {
 		dndManager.setCursor(Display.getCurrent().getSystemCursor(SWT.CURSOR_HAND));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.workbench.addons.dndaddon.DropAgent#dragLeave()
+	 */
 	@Override
 	public void dragLeave(MUIElement dragElement, DnDInfo info) {
 		trimBar = null;
@@ -141,6 +151,11 @@ public class TrimDropAgent extends DropAgent {
 		super.dragLeave(dragElement, info);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.workbench.addons.dndaddon.DropAgent#dragLeave()
+	 */
 	@Override
 	public boolean track(MUIElement dragElement, DnDInfo info) {
 		SideValue curSide = getDropSide(info);
@@ -188,7 +203,7 @@ public class TrimDropAgent extends DropAgent {
 
 		dragElement.setToBeRendered(true);
 		Control trimCtrl = (Control) dragElement.getWidget();
-		trimCtrl.setBackground(trimCtrl.getDisplay().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
+		trimCtrl.setBackground(trimCtrl.getDisplay().getSystemColor(SWT.COLOR_GREEN));
 	}
 
 	@Override

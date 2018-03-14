@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,10 +36,10 @@ public class ThemeElementCategory implements IPluginContribution,
     private String pluginId;
 
     /**
-     *
+     * 
      * @param label
      * @param id
-     * @param parentId
+     * @param parentId 
      * @param description
      * @param pluginId
      * @param element
@@ -72,8 +72,7 @@ public class ThemeElementCategory implements IPluginContribution,
     /**
      * @return Returns the description.
      */
-    @Override
-	public String getDescription() {
+    public String getDescription() {
         return description;
     }
 
@@ -84,23 +83,31 @@ public class ThemeElementCategory implements IPluginContribution,
         return element;
     }
 
-    @Override
-	public String getId() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.themes.IThemeElementDefinition#getId()
+     */
+    public String getId() {
         return id;
     }
 
-    @Override
-	public String getName() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.themes.IThemeElementDefinition#getLabel()
+     */
+    public String getName() {
         return label;
     }
 
-    @Override
-	public String getLocalId() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IPluginContribution#getLocalId()
+     */
+    public String getLocalId() {
         return id;
     }
 
-    @Override
-	public String getPluginId() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IPluginContribution#getPluginId()
+     */
+    public String getPluginId() {
         return pluginId;
     }
 
@@ -110,17 +117,21 @@ public class ThemeElementCategory implements IPluginContribution,
     public String getParentId() {
         return parentId;
     }
-
-    @Override
-	public boolean equals(Object obj) {
+    
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals(Object obj) {
         if (obj instanceof ThemeElementCategory) {
             return getId().equals(((ThemeElementCategory)obj).getId());
         }
         return false;
     }
-
-    @Override
-	public int hashCode() {
+    
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode() {
         return id.hashCode();
-    }
+    }    
 }

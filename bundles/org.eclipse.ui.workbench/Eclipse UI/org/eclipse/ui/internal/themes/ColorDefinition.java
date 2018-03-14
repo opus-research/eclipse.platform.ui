@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
 package org.eclipse.ui.internal.themes;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.e4.ui.internal.css.swt.definition.IColorDefinitionOverridable;
 import org.eclipse.jface.resource.DataFormatException;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.IPluginContribution;
@@ -20,14 +19,15 @@ import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.themes.ColorUtil;
 
 /**
- * A <code>ColorDefiniton </code> is the representation of the extensions
+ * A <code>ColorDefiniton </code> is the representation of the extensions 
  * defined by the <code>org.eclipse.ui.colorDefinitions</code> extension point.
- *
+ * 
  *  @since 3.0
  */
-public class ColorDefinition extends ThemeElementDefinition implements IPluginContribution,
-		IHierarchalThemeElementDefinition, ICategorizedThemeElementDefinition, IEditable,
-		IColorDefinitionOverridable {
+public class ColorDefinition implements IPluginContribution,
+        IHierarchalThemeElementDefinition, ICategorizedThemeElementDefinition,
+        IEditable {
+	
 	/**
 	 * Default color value - black - for colors that cannot be parsed.
 	 */
@@ -35,9 +35,17 @@ public class ColorDefinition extends ThemeElementDefinition implements IPluginCo
 
 	private String defaultsTo;
 
+    private String description;
+
+    private String id;
+
+    private String label;
+
     private String pluginId;
 
     private String rawValue;
+
+    private String categoryId;
 
     boolean isEditable;
 
@@ -45,114 +53,148 @@ public class ColorDefinition extends ThemeElementDefinition implements IPluginCo
 
     /**
      * Create a new instance of the receiver.
-     *
+     * 
      * @param label the label for this definition
      * @param id the identifier for this definition
-     * @param defaultsTo the id of a definition that this definition will
+     * @param defaultsTo the id of a definition that this definition will 
      * 		default to.
-     * @param value the default value of this definition, either in the form
-     * rrr,ggg,bbb or the name of an SWT color constant.
+     * @param value the default value of this definition, either in the form 
+     * rrr,ggg,bbb or the name of an SWT color constant. 
      * @param description the description for this definition.
-     * @param pluginId the identifier of the plugin that contributed this
+     * @param pluginId the identifier of the plugin that contributed this 
      * 		definition.
      */
     public ColorDefinition(String label, String id, String defaultsTo,
             String value, String categoryId, boolean isEditable,
             String description, String pluginId) {
-		super(id, label, description, categoryId);
+
+        this.label = label;
+        this.id = id;
         this.defaultsTo = defaultsTo;
         this.rawValue = value;
+        this.categoryId = categoryId;
+        this.description = description;
         this.isEditable = isEditable;
         this.pluginId = pluginId;
     }
 
     /**
      * Create a new instance of the receiver.
-     *
-     * @param original the original definition.  This will be used to populate
-     * all fields except defaultsTo and value.  defaultsTo will always be
+     * 
+     * @param original the original definition.  This will be used to populate 
+     * all fields except defaultsTo and value.  defaultsTo will always be 
      * <code>null</code>.
      * @param value the RGB value
      */
     public ColorDefinition(ColorDefinition original, RGB value) {
-		super(original.getId(), original.getName(), original.getDescription(), original
-				.getCategoryId());
+
+        this.label = original.getName();
+        this.id = original.getId();
+        this.categoryId = original.getCategoryId();
+        this.description = original.getDescription();
         this.isEditable = original.isEditable();
         this.pluginId = original.getPluginId();
+
         this.parsedValue = value;
+    }
+
+    /**
+     * @return the categoryId, or <code>null</code> if none was supplied.
+     */
+    public String getCategoryId() {
+        return categoryId;
     }
 
     /**
      * @return the defaultsTo value, or <code>null</code> if none was supplied.
      */
-    @Override
-	public String getDefaultsTo() {
+    public String getDefaultsTo() {
         return defaultsTo;
     }
 
-    @Override
-	public String getLocalId() {
+    /**
+     * @return the description text, or <code>null</code> if none was supplied.
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * @return the id of this definition.  Should not be <code>null</code>.
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * @return the label text.  Should not be <code>null</code>.
+     */
+    public String getName() {
+        return label;
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IPluginContribution#getLocalId()
+     */
+    public String getLocalId() {
         return getId();
     }
 
-    @Override
-	public String getPluginId() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IPluginContribution#getPluginId()
+     */
+    public String getPluginId() {
         return pluginId;
     }
 
     /**
-     * @return the value. Any SWT constants  supplied to the constructor will be
+     * @return the value. Any SWT constants  supplied to the constructor will be 
      * evaluated and converted into their RGB value.
      */
-    @Override
-	public RGB getValue() {
+    public RGB getValue() {
         if (parsedValue == null) {
 			try {
 				parsedValue = ColorUtil.getColorValue(rawValue);
 			} catch (DataFormatException e) {
 				parsedValue = DEFAULT_COLOR_VALUE;
 				IStatus status = StatusUtil.newStatus(IStatus.WARNING,
-						"Could not parse value for theme color " + getId(), e); //$NON-NLS-1$
+						"Could not parse value for theme color " + id, e); //$NON-NLS-1$
 				StatusManager.getManager().handle(status, StatusManager.LOG);
 			}
 		}
         return parsedValue;
     }
 
-	@Override
-	public void resetToDefaultValue() {
-		parsedValue = null;
-		super.resetToDefaultValue();
-	}
-
-    @Override
-	public String toString() {
+    /*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+    public String toString() {
         return getId();
     }
 
-    @Override
-	public boolean isEditable() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.themes.IEditable#isEditable()
+     */
+    public boolean isEditable() {
         return isEditable;
     }
-
-    @Override
-	public boolean equals(Object obj) {
+    
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals(Object obj) {
         if (obj instanceof ColorDefinition) {
             return getId().equals(((ColorDefinition)obj).getId());
         }
         return false;
     }
-
-    @Override
-	public int hashCode() {
-		return getId().hashCode();
+    
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode() {
+        return id.hashCode();
     }
-
-	@Override
-	public void setValue(RGB data) {
-		if (data != null) {
-			parsedValue = data;
-			appendState(State.OVERRIDDEN);
-		}
-	}
 }

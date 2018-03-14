@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,8 +34,7 @@ public abstract class ActionDelegate implements IActionDelegate2 {
      * by the default implementation of <code>runWithEvent</code> of this
      * abstract class.
      */
-    @Override
-	public void run(IAction action) {
+    public void run(IAction action) {
     }
 
     /**
@@ -43,8 +42,7 @@ public abstract class ActionDelegate implements IActionDelegate2 {
      * <code>IActionDelegate</code> method does nothing. Subclasses may
      * reimplement.
      */
-    @Override
-	public void selectionChanged(IAction action, ISelection selection) {
+    public void selectionChanged(IAction action, ISelection selection) {
     }
 
     /**
@@ -52,8 +50,7 @@ public abstract class ActionDelegate implements IActionDelegate2 {
      * <code>IActionDelegate2</code> method does nothing. Subclasses may
      * reimplement.
      */
-    @Override
-	public void init(IAction action) {
+    public void init(IAction action) {
     }
 
     /**
@@ -61,8 +58,7 @@ public abstract class ActionDelegate implements IActionDelegate2 {
      * <code>IActionDelegate2</code> method does nothing. Subclasses may
      * reimplement.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
     }
 
     /**
@@ -70,8 +66,7 @@ public abstract class ActionDelegate implements IActionDelegate2 {
      * <code>IActionDelegate2</code> method redirects to the <code>run</code>
      * method. Subclasses may reimplement.
      */
-    @Override
-	public void runWithEvent(IAction action, Event event) {
+    public void runWithEvent(IAction action, Event event) {
         run(action);
     }
 }

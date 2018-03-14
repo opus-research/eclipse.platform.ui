@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -93,8 +93,7 @@ public final class ActivityRequirementBindingDefinition {
         return compareTo;
     }
 
-    @Override
-	public boolean equals(Object object) {
+    public boolean equals(Object object) {
         if (!(object instanceof ActivityRequirementBindingDefinition)) {
 			return false;
 		}
@@ -104,11 +103,11 @@ public final class ActivityRequirementBindingDefinition {
                 castedObject.requiredActivityId)) {
             return false;
         }
-
+        
         if (!Util.equals(activityId, castedObject.activityId)) {
             return false;
         }
-
+        
         return Util.equals(sourceId, castedObject.sourceId);
     }
 
@@ -124,8 +123,7 @@ public final class ActivityRequirementBindingDefinition {
         return sourceId;
     }
 
-    @Override
-	public int hashCode() {
+    public int hashCode() {
         if (hashCode == HASH_INITIAL) {
             hashCode = hashCode * HASH_FACTOR
                     + Util.hashCode(requiredActivityId);
@@ -139,8 +137,7 @@ public final class ActivityRequirementBindingDefinition {
         return hashCode;
     }
 
-    @Override
-	public String toString() {
+    public String toString() {
         if (string == null) {
             final StringBuffer stringBuffer = new StringBuffer();
             stringBuffer.append('[');

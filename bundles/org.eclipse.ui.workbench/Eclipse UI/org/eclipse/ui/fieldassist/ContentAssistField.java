@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 
 package org.eclipse.ui.fieldassist;
@@ -32,13 +31,12 @@ import org.eclipse.ui.keys.IBindingService;
  * specified command.
  * <p>
  * This class is not intended to be subclassed.
- *
+ * 
  * @since 3.2
  * @deprecated As of 3.3, clients should use
  *             {@link org.eclipse.jface.fieldassist.ControlDecoration} and
  *             {@link ContentAssistCommandAdapter} instead of this class.
  */
-@Deprecated
 public class ContentAssistField extends DecoratedField {
 
 	private ContentAssistCommandAdapter adapter;
@@ -48,7 +46,7 @@ public class ContentAssistField extends DecoratedField {
 	/**
 	 * Construct a content assist field that shows a content assist cue and can
 	 * assist the user with choosing content for the field.
-	 *
+	 * 
 	 * @param parent
 	 *            the parent of the decorated field.
 	 * @param style
@@ -92,12 +90,12 @@ public class ContentAssistField extends DecoratedField {
 	/**
 	 * Set the boolean flag that determines whether the content assist is
 	 * enabled.
-	 *
+	 * 
 	 * @param enabled
 	 *            <code>true</code> if content assist is enabled and
 	 *            responding to user input, <code>false</code> if it is
 	 *            ignoring user input.
-	 *
+	 * 
 	 */
 	public void setEnabled(boolean enabled) {
 		adapter.setEnabled(enabled);
@@ -111,7 +109,7 @@ public class ContentAssistField extends DecoratedField {
 	/*
 	 * Get a field decoration appropriate for cueing the user, including a
 	 * description of the active key binding.
-	 *
+	 * 
 	 */
 	private FieldDecoration getFieldDecoration() {
 		FieldDecorationRegistry registry = FieldDecorationRegistry.getDefault();
@@ -130,7 +128,7 @@ public class ContentAssistField extends DecoratedField {
 		}
 		// Always update the decoration text since the key binding may
 		// have changed since it was last retrieved.
-		IBindingService bindingService = PlatformUI
+		IBindingService bindingService = (IBindingService) PlatformUI
 				.getWorkbench().getService(IBindingService.class);
 		dec.setDescription(NLS.bind(
 				WorkbenchMessages.ContentAssist_Cue_Description_Key,
@@ -145,7 +143,7 @@ public class ContentAssistField extends DecoratedField {
 	 * Return the ContentAssistCommandAdapter installed on the receiver. This
 	 * adapter is provided so that clients can configure the adapter if the
 	 * default values are not appropriate.
-	 *
+	 * 
 	 * @return the ContentAssistCommandAdapter installed on the field.
 	 */
 	public ContentAssistCommandAdapter getContentAssistCommandAdapter() {

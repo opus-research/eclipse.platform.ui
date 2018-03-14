@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,8 @@ package org.eclipse.jface.preference;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.KeyAdapter;
@@ -41,7 +43,7 @@ public class StringFieldEditor extends FieldEditor {
 
     /**
      * Validation strategy constant (value <code>1</code>) indicating that
-     * the editor should perform validation only when the text widget
+     * the editor should perform validation only when the text widget 
      * loses focus.
      *
      * @see #setValidateStrategy
@@ -92,13 +94,13 @@ public class StringFieldEditor extends FieldEditor {
     private boolean emptyStringAllowed = true;
 
     /**
-     * The validation strategy;
+     * The validation strategy; 
      * <code>VALIDATE_ON_KEY_STROKE</code> by default.
      */
     private int validateStrategy = VALIDATE_ON_KEY_STROKE;
 
     /**
-     * Creates a new string field editor
+     * Creates a new string field editor 
      */
     protected StringFieldEditor() {
     }
@@ -106,7 +108,7 @@ public class StringFieldEditor extends FieldEditor {
     /**
      * Creates a string field editor.
      * Use the method <code>setTextLimit</code> to limit the text.
-     *
+     * 
      * @param name the name of the preference this field editor works on
      * @param labelText the label text of the field editor
      * @param width the width of the text input field in characters,
@@ -131,7 +133,7 @@ public class StringFieldEditor extends FieldEditor {
     /**
      * Creates a string field editor.
      * Use the method <code>setTextLimit</code> to limit the text.
-     *
+     * 
      * @param name the name of the preference this field editor works on
      * @param labelText the label text of the field editor
      * @param width the width of the text input field in characters,
@@ -146,7 +148,7 @@ public class StringFieldEditor extends FieldEditor {
     /**
      * Creates a string field editor of unlimited width.
      * Use the method <code>setTextLimit</code> to limit the text.
-     *
+     * 
      * @param name the name of the preference this field editor works on
      * @param labelText the label text of the field editor
      * @param parent the parent of the field editor's control
@@ -155,8 +157,10 @@ public class StringFieldEditor extends FieldEditor {
         this(name, labelText, UNLIMITED, parent);
     }
 
-    @Override
-	protected void adjustForNumColumns(int numColumns) {
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
+    protected void adjustForNumColumns(int numColumns) {
         GridData gd = (GridData) textField.getLayoutData();
         gd.horizontalSpan = numColumns - 1;
         // We only grab excess space if we have to
@@ -179,10 +183,11 @@ public class StringFieldEditor extends FieldEditor {
 
         if (textField == null) {
 			result = false;
-		} else {
-			String txt = textField.getText();
-			result = (txt.trim().length() > 0) || emptyStringAllowed;
 		}
+
+        String txt = textField.getText();
+
+        result = (txt.trim().length() > 0) || emptyStringAllowed;
 
         // call hook for subclasses
         result = result && doCheckState();
@@ -200,7 +205,7 @@ public class StringFieldEditor extends FieldEditor {
      * Hook for subclasses to do specific state checks.
      * <p>
      * The default implementation of this framework method does
-     * nothing and returns <code>true</code>.  Subclasses should
+     * nothing and returns <code>true</code>.  Subclasses should 
      * override this method to specific state checks.
      * </p>
      *
@@ -219,8 +224,7 @@ public class StringFieldEditor extends FieldEditor {
      * but must call <code>super.doFillIntoGrid</code>.
      * </p>
      */
-    @Override
-	protected void doFillIntoGrid(Composite parent, int numColumns) {
+    protected void doFillIntoGrid(Composite parent, int numColumns) {
         getLabelControl(parent);
 
         textField = getTextControl(parent);
@@ -241,8 +245,10 @@ public class StringFieldEditor extends FieldEditor {
         textField.setLayoutData(gd);
     }
 
-    @Override
-	protected void doLoad() {
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
+    protected void doLoad() {
         if (textField != null) {
             String value = getPreferenceStore().getString(getPreferenceName());
             textField.setText(value);
@@ -250,8 +256,10 @@ public class StringFieldEditor extends FieldEditor {
         }
     }
 
-    @Override
-	protected void doLoadDefault() {
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
+    protected void doLoadDefault() {
         if (textField != null) {
             String value = getPreferenceStore().getDefaultString(
                     getPreferenceName());
@@ -260,13 +268,15 @@ public class StringFieldEditor extends FieldEditor {
         valueChanged();
     }
 
-    @Override
-	protected void doStore() {
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
+    protected void doStore() {
         getPreferenceStore().setValue(getPreferenceName(), textField.getText());
     }
 
     /**
-     * Returns the error message that will be displayed when and if
+     * Returns the error message that will be displayed when and if 
      * an error occurs.
      *
      * @return the error message, or <code>null</code> if none
@@ -275,8 +285,10 @@ public class StringFieldEditor extends FieldEditor {
         return errorMessage;
     }
 
-    @Override
-	public int getNumberOfControls() {
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
+    public int getNumberOfControls() {
         return 2;
     }
 
@@ -289,7 +301,7 @@ public class StringFieldEditor extends FieldEditor {
         if (textField != null) {
 			return textField.getText();
 		}
-
+        
         return getPreferenceStore().getString(getPreferenceName());
     }
 
@@ -320,8 +332,10 @@ public class StringFieldEditor extends FieldEditor {
             case VALIDATE_ON_KEY_STROKE:
                 textField.addKeyListener(new KeyAdapter() {
 
-                    @Override
-					public void keyReleased(KeyEvent e) {
+                    /* (non-Javadoc)
+                     * @see org.eclipse.swt.events.KeyAdapter#keyReleased(org.eclipse.swt.events.KeyEvent)
+                     */
+                    public void keyReleased(KeyEvent e) {
                         valueChanged();
                     }
                 });
@@ -329,29 +343,25 @@ public class StringFieldEditor extends FieldEditor {
                 	// Ensure that the value is checked on focus loss in case we
                 	// missed a keyRelease or user hasn't released key.
                 	// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=214716
-                    @Override
-					public void focusLost(FocusEvent e) {
+                    public void focusLost(FocusEvent e) {
                         valueChanged();
                     }
                 });
-
+ 
 
                 break;
             case VALIDATE_ON_FOCUS_LOST:
                 textField.addKeyListener(new KeyAdapter() {
-                    @Override
-					public void keyPressed(KeyEvent e) {
+                    public void keyPressed(KeyEvent e) {
                         clearErrorMessage();
                     }
                 });
                 textField.addFocusListener(new FocusAdapter() {
-                    @Override
-					public void focusGained(FocusEvent e) {
+                    public void focusGained(FocusEvent e) {
                         refreshValidState();
                     }
 
-                    @Override
-					public void focusLost(FocusEvent e) {
+                    public void focusLost(FocusEvent e) {
                         valueChanged();
                         clearErrorMessage();
                     }
@@ -360,7 +370,11 @@ public class StringFieldEditor extends FieldEditor {
             default:
                 Assert.isTrue(false, "Unknown validate strategy");//$NON-NLS-1$
             }
-            textField.addDisposeListener(event -> textField = null);
+            textField.addDisposeListener(new DisposeListener() {
+                public void widgetDisposed(DisposeEvent event) {
+                    textField = null;
+                }
+            });
             if (textLimit > 0) {//Only set limits above 0 - see SWT spec
                 textField.setTextLimit(textLimit);
             }
@@ -381,13 +395,17 @@ public class StringFieldEditor extends FieldEditor {
         return emptyStringAllowed;
     }
 
-    @Override
-	public boolean isValid() {
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
+    public boolean isValid() {
         return isValid;
     }
 
-    @Override
-	protected void refreshValidState() {
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
+    protected void refreshValidState() {
         isValid = checkState();
     }
 
@@ -402,7 +420,7 @@ public class StringFieldEditor extends FieldEditor {
     }
 
     /**
-     * Sets the error message that will be displayed when and if
+     * Sets the error message that will be displayed when and if 
      * an error occurs.
      *
      * @param message the error message
@@ -411,8 +429,10 @@ public class StringFieldEditor extends FieldEditor {
         errorMessage = message;
     }
 
-    @Override
-	public void setFocus() {
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
+    public void setFocus() {
         if (textField != null) {
             textField.setFocus();
         }
@@ -455,7 +475,7 @@ public class StringFieldEditor extends FieldEditor {
      * <p>
      * Calling this method has no effect after <code>createPartControl</code>
      * is called. Thus this method is really only useful for subclasses to call
-     * in their constructor. However, it has public visibility for backward
+     * in their constructor. However, it has public visibility for backward 
      * compatibility.
      * </p>
      *
@@ -481,7 +501,7 @@ public class StringFieldEditor extends FieldEditor {
      * to the value (<code>VALUE</code> property) provided that the old and
      * new values are different.
      * <p>
-     * This hook is <em>not</em> called when the text is initialized
+     * This hook is <em>not</em> called when the text is initialized 
      * (or reset to the default value) from the preference store.
      * </p>
      */
@@ -504,8 +524,7 @@ public class StringFieldEditor extends FieldEditor {
     /*
      * @see FieldEditor.setEnabled(boolean,Composite).
      */
-    @Override
-	public void setEnabled(boolean enabled, Composite parent) {
+    public void setEnabled(boolean enabled, Composite parent) {
         super.setEnabled(enabled, parent);
         getTextControl(parent).setEnabled(enabled);
     }

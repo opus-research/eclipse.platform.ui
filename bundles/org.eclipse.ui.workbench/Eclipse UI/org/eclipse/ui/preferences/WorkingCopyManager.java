@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,8 +33,10 @@ public class WorkingCopyManager implements IWorkingCopyManager{
 	// all working copies - maps absolute path to PreferencesWorkingCopy instance
 	private Map workingCopies = new HashMap();
 
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.preferences.IWorkingCopyManager#getWorkingCopy(org.eclipse.core.runtime.preferences.IEclipsePreferences)
+	 */
 	public IEclipsePreferences getWorkingCopy(IEclipsePreferences original) {
 		if (original instanceof WorkingCopyPreferences) {
 			throw new IllegalArgumentException("Trying to get a working copy of a working copy"); //$NON-NLS-1$
@@ -48,14 +50,16 @@ public class WorkingCopyManager implements IWorkingCopyManager{
 		return preferences;
 	}
 
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.preferences.IWorkingCopyManager#applyChanges()
+	 */
 	public void applyChanges() throws BackingStoreException {
 		Collection values = workingCopies.values();
 		WorkingCopyPreferences[] valuesArray = (WorkingCopyPreferences[]) values.toArray(new WorkingCopyPreferences[values.size()]);
 		for (int i = 0; i < valuesArray.length; i++) {
 			WorkingCopyPreferences prefs = valuesArray[i];
-			if (prefs.nodeExists(EMPTY_STRING))
+			if (prefs.nodeExists(EMPTY_STRING)) 
 				prefs.flush();
 		}
 	}

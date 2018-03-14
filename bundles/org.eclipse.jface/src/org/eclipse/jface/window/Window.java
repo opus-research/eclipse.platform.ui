@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,6 +28,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Monitor;
@@ -59,7 +60,7 @@ import org.eclipse.swt.widgets.Shell;
  * subclassed. Clients may define additional window subclasses as required.
  * </p>
  * <p>
- * The <code>Window</code> class provides methods that subclasses may
+ * The <code>Window</code> class provides methods that subclasses may 
  * override to configure the window, including:
  * <ul>
  * <li><code>close</code>- extend to free other SWT resources</li>
@@ -85,7 +86,7 @@ public abstract class Window implements IShellProvider {
 	/**
 	 * Standard return code constant (value 0) indicating that the window was
 	 * opened.
-	 *
+	 * 
 	 * @see #open
 	 */
 	public static final int OK = 0;
@@ -93,7 +94,7 @@ public abstract class Window implements IShellProvider {
 	/**
 	 * Standard return code constant (value 1) indicating that the window was
 	 * canceled.
-	 *
+	 * 
 	 * @see #open
 	 */
 	public static final int CANCEL = 1;
@@ -111,7 +112,7 @@ public abstract class Window implements IShellProvider {
 	public static interface IExceptionHandler {
 		/**
 		 * Handle the exception.
-		 *
+		 * 
 		 * @param t
 		 *            The exception that occured.
 		 */
@@ -122,7 +123,11 @@ public abstract class Window implements IShellProvider {
 	 * Defines a default exception handler.
 	 */
 	private static class DefaultExceptionHandler implements IExceptionHandler {
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.window.Window.IExceptionHandler#handleException(java.lang.Throwable)
+		 */
 		public void handleException(Throwable t) {
 			if (t instanceof ThreadDeath) {
 				// Don't catch ThreadDeath as this is a normal occurrence when
@@ -138,7 +143,7 @@ public abstract class Window implements IShellProvider {
 	 * The exception handler for this application.
 	 */
 	private static IExceptionHandler exceptionHandler = new DefaultExceptionHandler();
-
+	
 	/**
 	 * The default orientation of the window. By default
 	 * it is SWT#NONE but it can also be SWT#LEFT_TO_RIGHT
@@ -149,30 +154,32 @@ public abstract class Window implements IShellProvider {
     /**
      * Object used to locate the default parent for modal shells
      */
-    private static IShellProvider defaultModalParent = () -> {
-	    Display d = Display.getCurrent();
+    private static IShellProvider defaultModalParent = new IShellProvider() {
+        public Shell getShell() {
+            Display d = Display.getCurrent();
+            
+            if (d == null) {
+                return null;
+            }
 
-	    if (d == null) {
-	        return null;
-	    }
-
-	    Shell parent = d.getActiveShell();
-
-	    // Make sure we don't pick a parent that has a modal child (this can lock the app)
-	    if (parent == null) {
-	        // If this is a top-level window, then there must not be any open modal windows.
-	        parent = getModalChild(Display.getCurrent().getShells());
-	    } else {
-	        // If we picked a parent with a modal child, use the modal child instead
-	        Shell modalChild = getModalChild(parent.getShells());
-	        if (modalChild != null) {
-	            parent = modalChild;
-	        }
-	    }
-
-	    return parent;
-	};
-
+            Shell parent = d.getActiveShell();
+            
+            // Make sure we don't pick a parent that has a modal child (this can lock the app)
+            if (parent == null) {
+                // If this is a top-level window, then there must not be any open modal windows.
+                parent = getModalChild(Display.getCurrent().getShells());
+            } else {
+                // If we picked a parent with a modal child, use the modal child instead
+                Shell modalChild = getModalChild(parent.getShells());
+                if (modalChild != null) {
+                    parent = modalChild;
+                }
+            }
+            
+            return parent;
+        }
+    };
+    
 	/**
 	 * Object that returns the parent shell.
 	 */
@@ -180,14 +187,14 @@ public abstract class Window implements IShellProvider {
 
 	/**
 	 * Shell style bits.
-	 *
+	 * 
 	 * @see #setShellStyle
 	 */
 	private int shellStyle = SWT.SHELL_TRIM;
 
 	/**
 	 * Window manager, or <code>null</code> if none.
-	 *
+	 * 
 	 * @see #setWindowManager
 	 */
 	private WindowManager windowManager;
@@ -204,7 +211,7 @@ public abstract class Window implements IShellProvider {
 
 	/**
 	 * Window return code; initially <code>OK</code>.
-	 *
+	 * 
 	 * @see #setReturnCode
 	 */
 	private int returnCode = OK;
@@ -214,7 +221,7 @@ public abstract class Window implements IShellProvider {
 	 * until the window closes, and <code>false</code> if the
 	 * <code>open</code> method should return immediately; initially
 	 * <code>false</code> (non-blocking).
-	 *
+	 * 
 	 * @see #setBlockOnOpen
 	 */
 	private boolean block = false;
@@ -223,7 +230,6 @@ public abstract class Window implements IShellProvider {
 	 * Internal class for informing this window when fonts change.
 	 */
 	private class FontChangeListener implements IPropertyChangeListener {
-		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			handleFontChange(event);
 		}
@@ -236,17 +242,16 @@ public abstract class Window implements IShellProvider {
 
 	/**
 	 * Internal fields to detect if shell size has been set
-	 * @since 3.9
 	 */
-	protected boolean resizeHasOccurred = false;
+	private boolean resizeHasOccurred = false;
 
 	private Listener resizeListener;
-
+ 
 	/**
 	 * Creates a window instance, whose shell will be created under the given
 	 * parent shell. Note that the window will have no visual representation
 	 * until it is told to open. By default, <code>open</code> does not block.
-	 *
+	 * 
 	 * @param parentShell
 	 *            the parent shell, or <code>null</code> to create a top-level
 	 *            shell. Try passing "(Shell)null" to this method instead of "null"
@@ -256,23 +261,23 @@ public abstract class Window implements IShellProvider {
 	 */
 	protected Window(Shell parentShell) {
         this(new SameShellProvider(parentShell));
-
+        
         if(parentShell == null) {
 			setShellStyle(getShellStyle() | getDefaultOrientation());
 		}
 	}
-
+    
     /**
      * Creates a new window which will create its shell as a child of whatever
      * the given shellProvider returns.
-     *
+     * 
      * @param shellProvider object that will return the current parent shell. Not null.
-     *
+     * 
      * @since 3.1
      */
     protected Window(IShellProvider shellProvider) {
         Assert.isNotNull(shellProvider);
-        this.parentShell = shellProvider;
+        this.parentShell = shellProvider;   
     }
 
 	/**
@@ -283,7 +288,7 @@ public abstract class Window implements IShellProvider {
 	 * <code>handleShellCloseEvent</code> method to be called. Subclasses may
 	 * extend or reimplement.
 	 * </p>
-	 *
+	 * 
 	 * @return whether the window should handle the close event.
 	 */
 	protected boolean canHandleShellCloseEvent() {
@@ -298,22 +303,22 @@ public abstract class Window implements IShellProvider {
 	 * be called).
 	 * </p>
 	 * <p>
-	 *  Note that in order to prevent recursive calls to this method
-	 *  it does not call <code>Shell#close()</code>. As a result <code>ShellListener</code>s
+	 *  Note that in order to prevent recursive calls to this method 
+	 *  it does not call <code>Shell#close()</code>. As a result <code>ShellListener</code>s 
 	 *  will not receive a <code>shellClosed</code> event.
 	 *  </p>
-	 *
+	 * 
 	 * @return <code>true</code> if the window is (or was already) closed, and
 	 *         <code>false</code> if it is still open
 	 */
 	public boolean close() {
-
+		
 		// stop listening for font changes
 		if (fontChangeListener != null) {
 			JFaceResources.getFontRegistry().removeListener(fontChangeListener);
 			fontChangeListener = null;
 		}
-
+		
 		// remove this window from a window manager if it has one
 		if (windowManager != null) {
 			windowManager.remove(this);
@@ -340,7 +345,7 @@ public abstract class Window implements IShellProvider {
 	 * The default implementation of this framework method sets the shell's
 	 * image and gives it a grid layout. Subclasses may extend or reimplement.
 	 * </p>
-	 *
+	 * 
 	 * @param newShell
 	 *            the shell
 	 */
@@ -353,7 +358,7 @@ public abstract class Window implements IShellProvider {
 		// The equivalent in the multi-image version seems to be to remove the
 		// disposed images from the array passed to the shell.
 		if (defaultImages != null && defaultImages.length > 0) {
-			ArrayList<Image> nonDisposedImages = new ArrayList<>(defaultImages.length);
+			ArrayList nonDisposedImages = new ArrayList(defaultImages.length);
 			for (int i = 0; i < defaultImages.length; ++i) {
 				if (defaultImages[i] != null && !defaultImages[i].isDisposed()) {
 					nonDisposedImages.add(defaultImages[i]);
@@ -381,13 +386,13 @@ public abstract class Window implements IShellProvider {
 	 * implementation returns a GridLayout with no margins. Subclasses that
 	 * change the layout type by overriding this method should also override
 	 * createContents.
-	 *
+	 * 
 	 * <p>
 	 * A return value of null indicates that no layout should be attached to the
 	 * composite. In this case, the layout may be attached within
 	 * createContents.
 	 * </p>
-	 *
+	 * 
 	 * @return a newly created Layout or null if no layout should be attached.
 	 * @since 3.0
 	 */
@@ -400,7 +405,7 @@ public abstract class Window implements IShellProvider {
 
 	/**
 	 * Constrain the shell size to be no larger than the display bounds.
-	 *
+	 * 
 	 * @since 2.0
 	 */
 	protected void constrainShellSize() {
@@ -436,21 +441,21 @@ public abstract class Window implements IShellProvider {
 	 * this method will be remembered and returned by subsequent calls to
 	 * getContents(). Subclasses may modify the parent's layout if they overload
 	 * getLayout() to return null.
-	 *
+	 * 
 	 * <p>
 	 * It is common practise to create and return a single composite that
 	 * contains the entire window contents.
 	 * </p>
-	 *
+	 * 
 	 * <p>
 	 * The default implementation of this framework method creates an instance
 	 * of <code>Composite</code>. Subclasses may override.
 	 * </p>
-	 *
+	 * 
 	 * @param parent
 	 *            the parent composite for the controls in this window. The type
 	 *            of layout used is determined by getLayout()
-	 *
+	 * 
 	 * @return the control that will be returned by subsequent calls to
 	 *         getContents()
 	 */
@@ -467,7 +472,7 @@ public abstract class Window implements IShellProvider {
 	 * should  override <code>configureShell</code> if the
 	 * shell needs to be customized.
 	 * </p>
-	 *
+	 * 
 	 * @return the shell
 	 */
 	protected final Shell createShell() {
@@ -477,11 +482,15 @@ public abstract class Window implements IShellProvider {
 			parentShell = new SameShellProvider(null);
 			newParent = getParentShell();//Find a better parent
 		}
-
+		
 		//Create the shell
 		Shell newShell = new Shell(newParent, getShellStyle());
 
-		resizeListener = e -> resizeHasOccurred = true;
+		resizeListener = new Listener() {
+			public void handleEvent(Event e) {
+				resizeHasOccurred = true;
+			}
+		};
 
 		newShell.addListener(SWT.Resize, resizeListener);
 		newShell.setData(this);
@@ -504,7 +513,7 @@ public abstract class Window implements IShellProvider {
 	/**
 	 * Returns the top level control for this window. The parent of this control
 	 * is the shell.
-	 *
+	 * 
 	 * @return the top level control, or <code>null</code> if this window's
 	 *         control has not been created yet
 	 */
@@ -516,7 +525,7 @@ public abstract class Window implements IShellProvider {
 	 * Returns the default image. This is the image that will be used for
 	 * windows that have no shell image at the time they are opened. There is no
 	 * default image unless one is installed via <code>setDefaultImage</code>.
-	 *
+	 * 
 	 * @return the default image, or <code>null</code> if none
 	 * @see #setDefaultImage
 	 */
@@ -529,9 +538,9 @@ public abstract class Window implements IShellProvider {
 	 * Returns the array of default images to use for newly opened windows. It
 	 * is expected that the array will contain the same icon rendered at
 	 * different resolutions.
-	 *
+	 * 
 	 * @see org.eclipse.swt.widgets.Decorations#setImages(org.eclipse.swt.graphics.Image[])
-	 *
+	 * 
 	 * @return the array of images to be used when a new window is opened
 	 * @see #setDefaultImages
 	 * @since 3.0
@@ -546,7 +555,7 @@ public abstract class Window implements IShellProvider {
 	 * the left and 1/2 to the right) and vertically (1/3 above and 2/3 below)
 	 * relative to the parent shell, or display bounds if there is no parent
 	 * shell.
-	 *
+	 * 
 	 * @param initialSize
 	 *            the initial size of the shell, as returned by
 	 *            <code>getInitialSize</code>.
@@ -578,7 +587,7 @@ public abstract class Window implements IShellProvider {
 	 * Returns the initial size to use for the shell. The default implementation
 	 * returns the preferred size of the shell, using
 	 * <code>Shell.computeSize(SWT.DEFAULT, SWT.DEFAULT, true)</code>.
-	 *
+	 * 
 	 * @return the initial size of the shell
 	 */
 	protected Point getInitialSize() {
@@ -586,53 +595,53 @@ public abstract class Window implements IShellProvider {
 	}
 
     /**
-     * Returns the most specific modal child from the given list of Shells.
-     *
+     * Returns the most specific modal child from the given list of Shells. 
+     * 
      * @param toSearch shells to search for modal children
      * @return the most specific modal child, or null if none
-     *
+     * 
      * @since 3.1
      */
     private static Shell getModalChild(Shell[] toSearch) {
         int modal = SWT.APPLICATION_MODAL | SWT.SYSTEM_MODAL | SWT.PRIMARY_MODAL;
-
+        
         for (int i = toSearch.length - 1; i >= 0; i--) {
             Shell shell = toSearch[i];
-
+            
             // Check if this shell has a modal child
             Shell[] children = shell.getShells();
             Shell modalChild = getModalChild(children);
             if (modalChild != null) {
                 return modalChild;
             }
-
+            
             // If not, check if this shell is modal itself
             if (shell.isVisible() && (shell.getStyle() & modal) != 0) {
                 return shell;
             }
         }
-
+        
         return null;
     }
-
+    
 	/**
 	 * Returns parent shell, under which this window's shell is created.
-	 *
+	 * 
 	 * @return the parent shell, or <code>null</code> if there is no parent
 	 *         shell
 	 */
 	protected Shell getParentShell() {
         Shell parent = parentShell.getShell();
-
+        
         int modal = SWT.APPLICATION_MODAL | SWT.SYSTEM_MODAL | SWT.PRIMARY_MODAL;
-
+        
         if ((getShellStyle() & modal) != 0) {
             // If this is a modal shell with no parent, pick a shell using defaultModalParent.
             if (parent == null) {
                 parent = defaultModalParent.getShell();
             }
         }
-
+        
         return parent;
 	}
 
@@ -640,7 +649,7 @@ public abstract class Window implements IShellProvider {
 	 * Returns this window's return code. A window's return codes are
 	 * window-specific, although two standard return codes are predefined:
 	 * <code>OK</code> and <code>CANCEL</code>.
-	 *
+	 * 
 	 * @return the return code
 	 */
 	public int getReturnCode() {
@@ -649,11 +658,10 @@ public abstract class Window implements IShellProvider {
 
 	/**
 	 * Returns this window's shell.
-	 *
+	 * 
 	 * @return this window's shell, or <code>null</code> if this window's
 	 *         shell has not been created yet
 	 */
-	@Override
 	public Shell getShell() {
 		return shell;
 	}
@@ -668,12 +676,11 @@ public abstract class Window implements IShellProvider {
 	 * method <code>handleShellCloseEvent</code> when the shell is closed.
 	 * Subclasses may extend or reimplement.
 	 * </p>
-	 *
+	 * 
 	 * @return a shell listener
 	 */
 	protected ShellListener getShellListener() {
 		return new ShellAdapter() {
-			@Override
 			public void shellClosed(ShellEvent event) {
 				event.doit = false; // don't close now
 				if (canHandleShellCloseEvent()) {
@@ -690,7 +697,7 @@ public abstract class Window implements IShellProvider {
 	 * Subclassers should call <code>setShellStyle</code> to change this
 	 * value, rather than overriding this method.
 	 * </p>
-	 *
+	 * 
 	 * @return the shell style bits
 	 */
 	protected int getShellStyle() {
@@ -699,7 +706,7 @@ public abstract class Window implements IShellProvider {
 
 	/**
 	 * Returns the window manager of this window.
-	 *
+	 * 
 	 * @return the WindowManager, or <code>null</code> if none
 	 */
 	public WindowManager getWindowManager() {
@@ -712,7 +719,7 @@ public abstract class Window implements IShellProvider {
 	 * The default implementation of this framework method does nothing.
 	 * Subclasses may reimplement.
 	 * </p>
-	 *
+	 * 
 	 * @param event
 	 *            the property change event detailing what changed
 	 */
@@ -770,13 +777,13 @@ public abstract class Window implements IShellProvider {
 	 * window-specific, although two standard return codes are predefined:
 	 * <code>OK</code> and <code>CANCEL</code>.
 	 * </p>
-	 *
+	 * 
 	 * @return the return code
-	 *
+	 * 
 	 * @see #create()
 	 */
 	public int open() {
-
+        
 		if (shell == null || shell.isDisposed()) {
             shell = null;
 			// create the window
@@ -799,7 +806,7 @@ public abstract class Window implements IShellProvider {
 
 	/**
 	 * Runs the event loop for the given shell.
-	 *
+	 * 
 	 * @param loopShell
 	 *            the shell
 	 */
@@ -828,7 +835,7 @@ public abstract class Window implements IShellProvider {
 	/**
 	 * Sets whether the <code>open</code> method should block until the window
 	 * closes.
-	 *
+	 * 
 	 * @param shouldBlock
 	 *            <code>true</code> if the <code>open</code> method should
 	 *            not return until the window closes, and <code>false</code>
@@ -842,7 +849,7 @@ public abstract class Window implements IShellProvider {
 	 * Sets the default image. This is the image that will be used for windows
 	 * that have no shell image at the time they are opened. There is no default
 	 * image unless one is installed via this method.
-	 *
+	 * 
 	 * @param image
 	 *            the default image, or <code>null</code> if none
 	 */
@@ -854,9 +861,9 @@ public abstract class Window implements IShellProvider {
 	 * Sets the array of default images to use for newly opened windows. It is
 	 * expected that the array will contain the same icon rendered at different
 	 * resolutions.
-	 *
+	 * 
 	 * @see org.eclipse.swt.widgets.Decorations#setImages(org.eclipse.swt.graphics.Image[])
-	 *
+	 * 
 	 * @param images
 	 *            the array of images to be used when this window is opened
 	 * @since 3.0
@@ -866,12 +873,12 @@ public abstract class Window implements IShellProvider {
 		System.arraycopy(images, 0, newArray, 0, newArray.length);
 		defaultImages = newArray;
 	}
-
+	
 	/**
      * Changes the parent shell. This is only safe to use when the shell is not
      * yet realized (i.e., created). Once the shell is created, it must be
      * disposed (i.e., closed) before this method can be called.
-     *
+     * 
      * @param newParentShell
      *            The new parent shell; this value may be <code>null</code> if
      *            there is to be no parent.
@@ -887,7 +894,7 @@ public abstract class Window implements IShellProvider {
 	 * by <code>open</code> if block on open is enabled. For non-blocking
 	 * opens, the return code needs to be retrieved manually using
 	 * <code>getReturnCode</code>.
-	 *
+	 * 
 	 * @param code
 	 *            the return code
 	 */
@@ -900,7 +907,7 @@ public abstract class Window implements IShellProvider {
 	 * monitor contains the point, returns the monitor that is closest to the
 	 * point. If this is ever made public, it should be moved into a separate
 	 * utility class.
-	 *
+	 * 
 	 * @param toSearch
 	 *            point to find (display coordinates)
 	 * @param toFind
@@ -939,12 +946,12 @@ public abstract class Window implements IShellProvider {
 	 * extend beyond the edge of the monitor. This is used for computing the
 	 * initial window position, and subclasses can use this as a utility method
 	 * if they want to limit the region in which the window may be moved.
-	 *
+	 * 
 	 * @param preferredSize
 	 *            the preferred position of the window
 	 * @return a rectangle as close as possible to preferredSize that does not
 	 *         extend outside the monitor
-	 *
+	 * 
 	 * @since 3.0
 	 */
 	protected Rectangle getConstrainedShellBounds(Rectangle preferredSize) {
@@ -979,7 +986,7 @@ public abstract class Window implements IShellProvider {
 	 * The shell style bits are used by the framework method
 	 * <code>createShell</code> when creating this window's shell.
 	 * </p>
-	 *
+	 * 
 	 * @param newShellStyle
 	 *            the new shell style bits
 	 */
@@ -993,7 +1000,7 @@ public abstract class Window implements IShellProvider {
 	 * Note that this method is used by <code>WindowManager</code> to maintain
 	 * a backpointer. Clients must not call the method directly.
 	 * </p>
-	 *
+	 * 
 	 * @param manager
 	 *            the window manager, or <code>null</code> if none
 	 */
@@ -1019,7 +1026,7 @@ public abstract class Window implements IShellProvider {
 	 * Note that the handler may only be set once.  Subsequent calls to this method will be
 	 * ignored.
 	 * <p>
-	 *
+	 * 
 	 * @param handler
 	 *            the exception handler for the application.
 	 */
@@ -1028,11 +1035,11 @@ public abstract class Window implements IShellProvider {
 			exceptionHandler = handler;
 		}
 	}
-
+    
     /**
      * Sets the default parent for modal Windows. This will be used to locate
      * the parent for any modal Window constructed with a null parent.
-     *
+     * 
      * @param provider shell provider that will be used to locate the parent shell
      * whenever a Window is created with a null parent
      * @since 3.1
@@ -1040,12 +1047,12 @@ public abstract class Window implements IShellProvider {
     public static void setDefaultModalParent(IShellProvider provider) {
         defaultModalParent = provider;
     }
-
+    
 	/**
 	 * Gets the default orientation for windows. If it is not
 	 * set the default value will be unspecified (SWT#NONE).
-	 *
-	 *
+	 * 
+	 * 
 	 * @return SWT#NONE, SWT.RIGHT_TO_LEFT or SWT.LEFT_TO_RIGHT
 	 * @see SWT#RIGHT_TO_LEFT
 	 * @see SWT#LEFT_TO_RIGHT
@@ -1059,7 +1066,7 @@ public abstract class Window implements IShellProvider {
 
 	/**
 	 * Sets the default orientation of windows.
-	 * @param defaultOrientation one of
+	 * @param defaultOrientation one of 
 	 * 	SWT#RIGHT_TO_LEFT, SWT#LEFT_TO_RIGHT ,SWT#NONE
 	 * @see SWT#RIGHT_TO_LEFT
 	 * @see SWT#LEFT_TO_RIGHT
@@ -1068,7 +1075,7 @@ public abstract class Window implements IShellProvider {
 	 */
 	public static void setDefaultOrientation(int defaultOrientation) {
 		orientation = defaultOrientation;
-
+		
 	}
 
 }

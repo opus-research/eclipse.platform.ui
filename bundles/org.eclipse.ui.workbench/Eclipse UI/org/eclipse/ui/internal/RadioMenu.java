@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,8 +36,7 @@ public class RadioMenu implements IChangeListener {
     private List items = new ArrayList();
 
     SelectionAdapter selectionAdapter = new SelectionAdapter() {
-        @Override
-		public void widgetSelected(SelectionEvent e) {
+        public void widgetSelected(SelectionEvent e) {
             Object newState = e.widget.getData();
 
             data.setState(newState, RadioMenu.this);
@@ -45,8 +44,8 @@ public class RadioMenu implements IChangeListener {
     };
 
     /**
-     * Creates a set of radio menu items on the given menu.
-     *
+     * Creates a set of radio menu items on the given menu. 
+     * 
      * @param parent menu that will contain the menu items
      * @param newData the model that will store the value of the currently selected item
      */
@@ -59,7 +58,7 @@ public class RadioMenu implements IChangeListener {
 
     /**
      * Returns true iff the given values are considered equal.
-     *
+     * 
      * @param value1
      * @param value2
      * @return
@@ -75,10 +74,10 @@ public class RadioMenu implements IChangeListener {
     }
 
     /**
-     * Creates a new menu item with the given text and value. When
+     * Creates a new menu item with the given text and value. When 
      * the item is selected, the state of the model will change to
      * match the given value.
-     *
+     * 
      * @param text
      * @param value
      */
@@ -124,8 +123,10 @@ public class RadioMenu implements IChangeListener {
         }
     }
 
-    @Override
-	public void update(boolean changed) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.controls.IView#changed()
+     */
+    public void update(boolean changed) {
         refreshSelection();
     }
 

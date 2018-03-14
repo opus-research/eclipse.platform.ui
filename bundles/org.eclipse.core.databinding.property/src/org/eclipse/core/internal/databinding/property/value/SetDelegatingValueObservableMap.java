@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 194734)
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.internal.databinding.property.value;
@@ -29,71 +28,59 @@ import org.eclipse.core.databinding.observable.set.IObservableSet;
 import org.eclipse.core.databinding.observable.set.ISetChangeListener;
 import org.eclipse.core.databinding.observable.set.SetChangeEvent;
 import org.eclipse.core.databinding.observable.set.SetDiff;
+import org.eclipse.core.databinding.property.IProperty;
 import org.eclipse.core.databinding.property.IPropertyObservable;
 import org.eclipse.core.databinding.property.value.DelegatingValueProperty;
 import org.eclipse.core.internal.databinding.property.Util;
 
 /**
- * @param <S>
- *            type of the source object
- * @param <K>
- *            type of the keys to the map
- * @param <V>
- *            type of the values in the map
  * @since 1.2
  */
-public class SetDelegatingValueObservableMap<S, K extends S, V> extends AbstractObservableMap<K, V>
-		implements IPropertyObservable<DelegatingValueProperty<S, V>> {
-	private IObservableSet<K> masterSet;
-	private DelegatingValueProperty<S, V> detailProperty;
-	private DelegatingCache<S, K, V> cache;
+public class SetDelegatingValueObservableMap extends AbstractObservableMap
+		implements IPropertyObservable {
+	private IObservableSet masterSet;
+	private DelegatingValueProperty detailProperty;
+	private DelegatingCache cache;
 
-	private Set<Map.Entry<K, V>> entrySet;
+	private Set entrySet;
 
-	class EntrySet extends AbstractSet<Map.Entry<K, V>> {
-		@Override
-		public Iterator<Map.Entry<K, V>> iterator() {
-			return new Iterator<Map.Entry<K, V>>() {
-				final Iterator<K> it = masterSet.iterator();
+	class EntrySet extends AbstractSet {
+		public Iterator iterator() {
+			return new Iterator() {
+				final Iterator it = masterSet.iterator();
 
-				@Override
 				public boolean hasNext() {
 					return it.hasNext();
 				}
 
-				@Override
-				public Map.Entry<K, V> next() {
+				public Object next() {
 					return new MapEntry(it.next());
 				}
 
-				@Override
 				public void remove() {
 					it.remove();
 				}
 			};
 		}
 
-		@Override
 		public int size() {
 			return masterSet.size();
 		}
 	}
 
-	class MapEntry implements Map.Entry<K, V> {
-		private final K key;
+	class MapEntry implements Map.Entry {
+		private final Object key;
 
-		MapEntry(K key) {
+		MapEntry(Object key) {
 			this.key = key;
 		}
 
-		@Override
-		public K getKey() {
+		public Object getKey() {
 			getterCalled();
 			return key;
 		}
 
-		@Override
-		public V getValue() {
+		public Object getValue() {
 			getterCalled();
 
 			if (!masterSet.contains(key))
@@ -102,8 +89,7 @@ public class SetDelegatingValueObservableMap<S, K extends S, V> extends Abstract
 			return cache.get(key);
 		}
 
-		@Override
-		public V setValue(V value) {
+		public Object setValue(Object value) {
 			checkRealm();
 
 			if (!masterSet.contains(key))
@@ -112,7 +98,6 @@ public class SetDelegatingValueObservableMap<S, K extends S, V> extends Abstract
 			return cache.put(key, value);
 		}
 
-		@Override
 		public boolean equals(Object o) {
 			getterCalled();
 			if (o == this)
@@ -121,12 +106,11 @@ public class SetDelegatingValueObservableMap<S, K extends S, V> extends Abstract
 				return false;
 			if (!(o instanceof Map.Entry))
 				return false;
-			Map.Entry<?, ?> that = (Map.Entry<?, ?>) o;
+			Map.Entry that = (Map.Entry) o;
 			return Util.equals(this.getKey(), that.getKey())
 					&& Util.equals(this.getValue(), that.getValue());
 		}
 
-		@Override
 		public int hashCode() {
 			getterCalled();
 			Object value = getValue();
@@ -135,40 +119,40 @@ public class SetDelegatingValueObservableMap<S, K extends S, V> extends Abstract
 		}
 	}
 
-	private ISetChangeListener<K> masterListener = new ISetChangeListener<K>() {
-		@Override
-		public void handleSetChange(SetChangeEvent<? extends K> event) {
+	private ISetChangeListener masterListener = new ISetChangeListener() {
+		public void handleSetChange(SetChangeEvent event) {
 			if (isDisposed())
 				return;
 
 			cache.addAll(masterSet);
 
 			// Need both obsolete and new elements to convert diff
-			MapDiff<K, V> diff = convertDiff(event.diff);
+			MapDiff diff = convertDiff(event.diff);
 
 			cache.retainAll(masterSet);
 
 			fireMapChange(diff);
 		}
 
-		private MapDiff<K, V> convertDiff(SetDiff<? extends K> diff) {
+		private MapDiff convertDiff(SetDiff diff) {
 			// Convert diff to detail value
-			Map<K, V> oldValues = new HashMap<>();
-			Map<K, V> newValues = new HashMap<>();
+			Map oldValues = new HashMap();
+			Map newValues = new HashMap();
 
-			for (K masterElement : diff.getRemovals()) {
+			for (Iterator it = diff.getRemovals().iterator(); it.hasNext();) {
+				Object masterElement = it.next();
 				oldValues.put(masterElement, cache.get(masterElement));
 			}
-			for (K masterElement : diff.getAdditions()) {
+			for (Iterator it = diff.getAdditions().iterator(); it.hasNext();) {
+				Object masterElement = it.next();
 				newValues.put(masterElement, cache.get(masterElement));
 			}
 			return Diffs.createMapDiff(diff.getAdditions(), diff.getRemovals(),
-					Collections.<K> emptySet(), oldValues, newValues);
+					Collections.EMPTY_SET, oldValues, newValues);
 		}
 	};
 
 	private IStaleListener staleListener = new IStaleListener() {
-		@Override
 		public void handleStale(StaleEvent staleEvent) {
 			fireStale();
 		}
@@ -178,14 +162,14 @@ public class SetDelegatingValueObservableMap<S, K extends S, V> extends Abstract
 	 * @param keySet
 	 * @param valueProperty
 	 */
-	public SetDelegatingValueObservableMap(IObservableSet<K> keySet,
-			DelegatingValueProperty<S, V> valueProperty) {
+	public SetDelegatingValueObservableMap(IObservableSet keySet,
+			DelegatingValueProperty valueProperty) {
 		super(keySet.getRealm());
 		this.masterSet = keySet;
 		this.detailProperty = valueProperty;
-		this.cache = new DelegatingCache<S, K, V>(getRealm(), valueProperty) {
-			@Override
-			void handleValueChange(K masterElement, V oldValue, V newValue) {
+		this.cache = new DelegatingCache(getRealm(), valueProperty) {
+			void handleValueChange(Object masterElement, Object oldValue,
+					Object newValue) {
 				fireMapChange(Diffs.createMapDiffSingleChange(masterElement,
 						oldValue, newValue));
 			}
@@ -196,8 +180,7 @@ public class SetDelegatingValueObservableMap<S, K extends S, V> extends Abstract
 		masterSet.addStaleListener(staleListener);
 	}
 
-	@Override
-	public Set<Map.Entry<K, V>> entrySet() {
+	public Set entrySet() {
 		getterCalled();
 		if (entrySet == null)
 			entrySet = new EntrySet();
@@ -208,44 +191,36 @@ public class SetDelegatingValueObservableMap<S, K extends S, V> extends Abstract
 		ObservableTracker.getterCalled(this);
 	}
 
-	@Override
-	public V get(Object key) {
+	public Object get(Object key) {
 		getterCalled();
 		return cache.get(key);
 	}
 
-	@Override
-	public V put(K key, V value) {
+	public Object put(Object key, Object value) {
 		checkRealm();
 		return cache.put(key, value);
 	}
 
-	@Override
 	public boolean isStale() {
 		return masterSet.isStale();
 	}
 
-	@Override
 	public Object getObserved() {
 		return masterSet;
 	}
 
-	@Override
-	public DelegatingValueProperty<S, V> getProperty() {
+	public IProperty getProperty() {
 		return detailProperty;
 	}
 
-	@Override
 	public Object getKeyType() {
 		return masterSet.getElementType();
 	}
 
-	@Override
 	public Object getValueType() {
 		return detailProperty.getValueType();
 	}
 
-	@Override
 	public synchronized void dispose() {
 		if (masterSet != null) {
 			masterSet.removeSetChangeListener(masterListener);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,40 +18,34 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 /**
  * Provides a text label and icon for Working Sets.
- *
+ * 
  */
 public class WorkingSetsLabelProvider implements ILabelProvider {
 
 	private WorkbenchLabelProvider labelProvider = new WorkbenchLabelProvider();
 
-	@Override
 	public Image getImage(Object element) {
 		if (element instanceof IWorkingSet)
 			return labelProvider.getImage(element);
 		return null;
 	}
 
-	@Override
 	public String getText(Object element) {
 		if (element instanceof IWorkingSet)
 			return ((IWorkingSet) element).getLabel();
 		return null;
 	}
 
-	@Override
 	public void addListener(ILabelProviderListener listener) {
 	}
 
-	@Override
 	public void dispose() {
 	}
 
-	@Override
 	public boolean isLabelProperty(Object element, String property) {
 		return false;
 	}
 
-	@Override
 	public void removeListener(ILabelProviderListener listener) {
 
 	}

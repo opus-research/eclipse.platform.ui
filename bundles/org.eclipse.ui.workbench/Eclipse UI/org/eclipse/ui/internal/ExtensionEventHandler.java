@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,7 +40,7 @@ import org.eclipse.ui.themes.ITheme;
 import org.eclipse.ui.themes.IThemeManager;
 
 class ExtensionEventHandler implements IRegistryChangeListener {
-
+    
     private Workbench workbench;
 
     private List changeList = new ArrayList(10);
@@ -49,8 +49,7 @@ class ExtensionEventHandler implements IRegistryChangeListener {
         this.workbench = workbench;
     }
 
-    @Override
-	public void registryChanged(IRegistryChangeEvent event) {
+    public void registryChanged(IRegistryChangeEvent event) {
         try {
             IExtensionDelta delta[] = event
                     .getExtensionDeltas(WorkbenchPlugin.PI_WORKBENCH);
@@ -71,9 +70,9 @@ class ExtensionEventHandler implements IRegistryChangeListener {
             int numPerspectives = 0;
             int numActionSetPartAssoc = 0;
 
-            // push action sets and perspectives to the top because incoming
-            // actionSetPartAssociations and perspectiveExtensions may depend upon
-            // them for their bindings.
+            // push action sets and perspectives to the top because incoming 
+            // actionSetPartAssociations and perspectiveExtensions may depend upon 
+            // them for their bindings.		
             for (int i = 0; i < delta.length; i++) {
                 id = delta[i].getExtensionPoint().getSimpleIdentifier();
                 if (delta[i].getKind() == IExtensionDelta.ADDED) {
@@ -128,14 +127,13 @@ class ExtensionEventHandler implements IRegistryChangeListener {
     private void asyncAppear(Display display, final IExtensionPoint extpt,
             final IExtension ext) {
         Runnable run = new Runnable() {
-            @Override
-			public void run() {
+            public void run() {
                 appear(extpt, ext);
             }
         };
         display.syncExec(run);
     }
-
+    
     private void appear(IExtensionPoint extPt, IExtension ext) {
         String name = extPt.getSimpleIdentifier();
         if (name.equalsIgnoreCase(IWorkbenchRegistryConstants.PL_FONT_DEFINITIONS)) {
@@ -213,8 +211,7 @@ class ExtensionEventHandler implements IRegistryChangeListener {
         message.append(ExtensionEventHandlerMessages.ExtensionEventHandler_need_to_reset);
 
         display.asyncExec(new Runnable() {
-            @Override
-			public void run() {
+            public void run() {
                 Shell parentShell = null;
                 IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
                 if (window == null) {

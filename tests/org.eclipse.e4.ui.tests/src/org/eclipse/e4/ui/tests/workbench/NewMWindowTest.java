@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,12 +11,7 @@
 
 package org.eclipse.e4.ui.tests.workbench;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
+import junit.framework.TestCase;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
@@ -26,11 +21,11 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
+import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuItem;
+import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.services.IServiceConstants;
-import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.SashForm;
@@ -41,37 +36,41 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.Widget;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 /*
  *
  */
-public class NewMWindowTest {
+public class NewMWindowTest extends TestCase {
 	protected IEclipseContext appContext;
 	protected E4Workbench wb;
-	private EModelService ems;
 
-	@Before
-	public void setUp() throws Exception {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see junit.framework.TestCase#setUp()
+	 */
+	@Override
+	protected void setUp() throws Exception {
 		appContext = E4Application.createDefaultContext();
 		appContext.set(E4Workbench.PRESENTATION_URI_ARG,
 				PartRenderingEngine.engineURI);
-		ems = appContext.get(EModelService.class);
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see junit.framework.TestCase#tearDown()
+	 */
+	@Override
+	protected void tearDown() throws Exception {
 		if (wb != null) {
 			wb.close();
 		}
 		appContext.dispose();
 	}
 
-	@Test
 	public void testCreateWindow() {
-		final MWindow window = ems.createModelElement(MWindow.class);
+		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setLabel("MyWindow");
 		wb = new E4Workbench(window, appContext);
 
@@ -81,7 +80,6 @@ public class NewMWindowTest {
 		assertEquals(topWidget, appContext.get(IServiceConstants.ACTIVE_SHELL));
 	}
 
-	@Test
 	public void testCreateView() {
 		final MWindow window = createWindowWithOneView();
 		wb = new E4Workbench(window, appContext);
@@ -105,7 +103,6 @@ public class NewMWindowTest {
 		assertTrue(viewPart[0] instanceof Tree);
 	}
 
-	@Test
 	public void testContextChildren() {
 		final MWindow window = createWindowWithOneView();
 		wb = new E4Workbench(window, appContext);
@@ -147,7 +144,6 @@ public class NewMWindowTest {
 		assertEquals(window, contextPart.getParent().getParent().getParent());
 	}
 
-	@Test
 	public void testCreateMenu() {
 		final MWindow window = createWindowWithOneViewAndMenu();
 		wb = new E4Workbench(window, appContext);
@@ -190,15 +186,16 @@ public class NewMWindowTest {
 	}
 
 	private MWindow createWindowWithOneView() {
-		final MWindow window = ems.createModelElement(MWindow.class);
+		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setHeight(300);
 		window.setWidth(400);
 		window.setLabel("MyWindow");
-		MPartSashContainer sash = ems.createModelElement(MPartSashContainer.class);
+		MPartSashContainer sash = BasicFactoryImpl.eINSTANCE
+				.createPartSashContainer();
 		window.getChildren().add(sash);
-		MPartStack stack = ems.createModelElement(MPartStack.class);
+		MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		sash.getChildren().add(stack);
-		MPart contributedPart = ems.createModelElement(MPart.class);
+		MPart contributedPart = BasicFactoryImpl.eINSTANCE.createPart();
 		stack.getChildren().add(contributedPart);
 		contributedPart.setLabel("Sample View");
 		contributedPart
@@ -209,18 +206,20 @@ public class NewMWindowTest {
 
 	private MWindow createWindowWithOneViewAndMenu() {
 		final MWindow window = createWindowWithOneView();
-		final MMenu menuBar = ems.createModelElement(MMenu.class);
+		final MMenu menuBar = MenuFactoryImpl.eINSTANCE.createMenu();
 		window.setMainMenu(menuBar);
-		final MMenu fileMenu = ems.createModelElement(MMenu.class);
+		final MMenu fileMenu = MenuFactoryImpl.eINSTANCE.createMenu();
 		fileMenu.setLabel("File");
 		fileMenu.setElementId("file");
 		menuBar.getChildren().add(fileMenu);
 
-		final MMenuItem item1 = ems.createModelElement(MDirectMenuItem.class);
+		final MMenuItem item1 = MenuFactoryImpl.eINSTANCE
+				.createDirectMenuItem();
 		item1.setElementId("item1");
 		item1.setLabel("item1");
 		fileMenu.getChildren().add(item1);
-		final MMenuItem item2 = ems.createModelElement(MDirectMenuItem.class);
+		final MMenuItem item2 = MenuFactoryImpl.eINSTANCE
+				.createDirectMenuItem();
 		item2.setElementId("item2");
 		item2.setLabel("item2");
 		fileMenu.getChildren().add(item2);

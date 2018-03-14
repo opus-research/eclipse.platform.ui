@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,7 @@ public class AggregateHyperlinkSegment extends ParagraphSegment implements
 		IHyperlinkSegment {
 	private String href;
 
-	private Vector<ParagraphSegment> segments = new Vector<>();
+	private Vector segments = new Vector();
 
 	public AggregateHyperlinkSegment() {
 	}
@@ -38,12 +38,18 @@ public class AggregateHyperlinkSegment extends ParagraphSegment implements
 		segments.add(segment);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.forms.widgets.ParagraphSegment#advanceLocator(org.eclipse.swt.graphics.GC,
+	 *      int, org.eclipse.ui.internal.forms.widgets.Locator,
+	 *      java.util.Hashtable, boolean)
+	 */
 	public boolean advanceLocator(GC gc, int wHint, Locator loc,
-			Hashtable<String, Object> objectTable, boolean computeHeightOnly) {
+			Hashtable objectTable, boolean computeHeightOnly) {
 		boolean newLine = false;
 		for (int i = 0; i < segments.size(); i++) {
-			ParagraphSegment segment = segments.get(i);
+			ParagraphSegment segment = (ParagraphSegment) segments.get(i);
 			if (segment.advanceLocator(gc, wHint, loc, objectTable,
 					computeHeightOnly))
 				newLine = true;
@@ -54,7 +60,6 @@ public class AggregateHyperlinkSegment extends ParagraphSegment implements
 	/**
 	 * @return Returns the href.
 	 */
-	@Override
 	public String getHref() {
 		return href;
 	}
@@ -67,17 +72,21 @@ public class AggregateHyperlinkSegment extends ParagraphSegment implements
 		this.href = href;
 	}
 
-	@Override
-	public void paint(GC gc, boolean hover, Hashtable<String, Object> resourceTable,
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.forms.widgets.IHyperlinkSegment#repaint(org.eclipse.swt.graphics.GC,
+	 *      boolean)
+	 */
+	public void paint(GC gc, boolean hover, Hashtable resourceTable,
 			boolean selected, SelectionData selData, Rectangle repaintRegion) {
 		for (int i = 0; i < segments.size(); i++) {
-			ParagraphSegment segment = segments.get(i);
+			ParagraphSegment segment = (ParagraphSegment) segments.get(i);
 			segment.paint(gc, hover, resourceTable, selected, selData,
 					repaintRegion);
 		}
 	}
 
-	@Override
 	public String getText() {
 		StringBuffer buf = new StringBuffer();
 		for (int i = 0; i < segments.size(); i++) {
@@ -87,7 +96,13 @@ public class AggregateHyperlinkSegment extends ParagraphSegment implements
 		return buf.toString();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.forms.widgets.IHyperlinkSegment#paintFocus(org.eclipse.swt.graphics.GC,
+	 *      org.eclipse.swt.graphics.Color, org.eclipse.swt.graphics.Color,
+	 *      boolean)
+	 */
 	public void paintFocus(GC gc, Color bg, Color fg, boolean selected,
 			Rectangle repaintRegion) {
 		for (int i = 0; i < segments.size(); i++) {
@@ -96,11 +111,15 @@ public class AggregateHyperlinkSegment extends ParagraphSegment implements
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.forms.widgets.IHyperlinkSegment#getBounds()
+	 */
 	public Rectangle getBounds() {
 		if (segments.size() == 0)
 			return new Rectangle(Integer.MAX_VALUE, Integer.MAX_VALUE, 0, 0);
-
+			
 		IHyperlinkSegment segment0 = (IHyperlinkSegment) segments.get(0);
 		Rectangle bounds = segment0.getBounds();
 		for (int i = 1; i < segments.size(); i++) {
@@ -111,7 +130,6 @@ public class AggregateHyperlinkSegment extends ParagraphSegment implements
 		return bounds;
 	}
 
-	@Override
 	public boolean contains(int x, int y) {
 		for (int i = 0; i < segments.size(); i++) {
 			IHyperlinkSegment segment = (IHyperlinkSegment) segments.get(i);
@@ -121,7 +139,6 @@ public class AggregateHyperlinkSegment extends ParagraphSegment implements
 		return false;
 	}
 
-	@Override
 	public boolean intersects(Rectangle rect) {
 		for (int i = 0; i < segments.size(); i++) {
 			IHyperlinkSegment segment = (IHyperlinkSegment) segments.get(i);
@@ -131,46 +148,55 @@ public class AggregateHyperlinkSegment extends ParagraphSegment implements
 		return false;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.forms.widgets.ParagraphSegment#layout(org.eclipse.swt.graphics.GC,
+	 *      int, org.eclipse.ui.internal.forms.widgets.Locator,
+	 *      java.util.Hashtable, boolean,
+	 *      org.eclipse.ui.internal.forms.widgets.SelectionData)
+	 */
 	public void layout(GC gc, int width, Locator locator,
-			Hashtable<String, Object> resourceTable, boolean selected) {
+			Hashtable resourceTable, boolean selected) {
 		for (int i = 0; i < segments.size(); i++) {
-			ParagraphSegment segment = segments.get(i);
+			ParagraphSegment segment = (ParagraphSegment) segments.get(i);
 			segment.layout(gc, width, locator, resourceTable, selected);
 		}
 	}
 
-	@Override
-	public void computeSelection(GC gc, Hashtable<String, Object> resourceTable,
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.forms.widgets.ParagraphSegment#computeSelection(org.eclipse.swt.graphics.GC,
+	 *      java.util.Hashtable, boolean,
+	 *      org.eclipse.ui.internal.forms.widgets.SelectionData)
+	 */
+	public void computeSelection(GC gc, Hashtable resourceTable,
 			SelectionData selData) {
 		for (int i = 0; i < segments.size(); i++) {
-			ParagraphSegment segment = segments.get(i);
+			ParagraphSegment segment = (ParagraphSegment) segments.get(i);
 			segment.computeSelection(gc, resourceTable, selData);
 		}
 	}
 
-	@Override
 	public void clearCache(String fontId) {
 		for (int i = 0; i < segments.size(); i++) {
-			ParagraphSegment segment = segments.get(i);
+			ParagraphSegment segment = (ParagraphSegment) segments.get(i);
 			segment.clearCache(fontId);
 		}
 	}
 
-	@Override
 	public String getTooltipText() {
 		if (segments.size() > 0)
-			return segments.get(0).getTooltipText();
+			return ((ParagraphSegment) segments.get(0)).getTooltipText();
 		return super.getTooltipText();
 	}
 
-	@Override
-	public boolean isFocusSelectable(Hashtable<String, Object> resourceTable) {
+	public boolean isFocusSelectable(Hashtable resourceTable) {
 		return true;
 	}
 
-	@Override
-	public boolean setFocus(Hashtable<String, Object> resourceTable, boolean direction) {
+	public boolean setFocus(Hashtable resourceTable, boolean direction) {
 		return true;
 	}
 }

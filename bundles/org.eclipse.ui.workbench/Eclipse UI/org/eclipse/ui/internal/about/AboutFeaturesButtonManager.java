@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,8 +36,7 @@ public class AboutFeaturesButtonManager {
             this.crc = crc;
         }
 
-        @Override
-		public boolean equals(Object o) {
+        public boolean equals(Object o) {
             if (!(o instanceof Key)) {
 				return false;
 			}
@@ -48,8 +47,7 @@ public class AboutFeaturesButtonManager {
             return crc.equals(other.crc);
         }
 
-        @Override
-		public int hashCode() {
+        public int hashCode() {
             return providerName.hashCode();
         }
     }

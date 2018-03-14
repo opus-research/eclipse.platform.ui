@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: TestAdapterFactory.java,v 1.1.2.1 2010, 2015/04/16 12:24:24 tschindl Exp $
+ * $Id: TestAdapterFactory.java,v 1.1.2.1 2010/04/16 12:24:24 tschindl Exp $
  */
 package org.eclipse.e4.ui.tests.model.test.util;
 
@@ -14,7 +14,6 @@ import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MDirtyable;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MInput;
-import org.eclipse.e4.ui.model.application.ui.MLocalizable;
 import org.eclipse.e4.ui.model.application.ui.MSnippetContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
@@ -29,14 +28,14 @@ import org.eclipse.emf.ecore.EObject;
  * <!-- begin-user-doc --> The <b>Adapter Factory</b> for the model. It provides
  * an adapter <code>createXXX</code> method for each class of the model. <!--
  * end-user-doc -->
- *
+ * 
  * @see org.eclipse.e4.ui.tests.model.test.MTestPackage
  * @generated
  */
 public class TestAdapterFactory extends AdapterFactoryImpl {
 	/**
 	 * The cached model package. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 *
+	 * 
 	 * @generated
 	 */
 	protected static MTestPackage modelPackage;
@@ -44,7 +43,7 @@ public class TestAdapterFactory extends AdapterFactoryImpl {
 	/**
 	 * Creates an instance of the adapter factory. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 *
+	 * 
 	 * @generated
 	 */
 	public TestAdapterFactory() {
@@ -58,7 +57,7 @@ public class TestAdapterFactory extends AdapterFactoryImpl {
 	 * <!-- begin-user-doc --> This implementation returns <code>true</code> if
 	 * the object is either the model's package or is an instance object of the
 	 * model. <!-- end-user-doc -->
-	 *
+	 * 
 	 * @return whether this factory is applicable for the type of the object.
 	 * @generated
 	 */
@@ -76,7 +75,7 @@ public class TestAdapterFactory extends AdapterFactoryImpl {
 	/**
 	 * The switch that delegates to the <code>createXXX</code> methods. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
-	 *
+	 * 
 	 * @generated
 	 */
 	protected TestSwitch<Adapter> modelSwitch = new TestSwitch<Adapter>() {
@@ -88,11 +87,6 @@ public class TestAdapterFactory extends AdapterFactoryImpl {
 		@Override
 		public Adapter caseApplicationElement(MApplicationElement object) {
 			return createApplicationElementAdapter();
-		}
-
-		@Override
-		public Adapter caseLocalizable(MLocalizable object) {
-			return createLocalizableAdapter();
 		}
 
 		@Override
@@ -155,7 +149,7 @@ public class TestAdapterFactory extends AdapterFactoryImpl {
 	/**
 	 * Creates an adapter for the <code>target</code>. <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 *
+	 * 
 	 * @param target
 	 *            the object to adapt.
 	 * @return the adapter for the <code>target</code>.
@@ -172,7 +166,7 @@ public class TestAdapterFactory extends AdapterFactoryImpl {
 	 * '. <!-- begin-user-doc --> This default implementation returns null so
 	 * that we can easily ignore cases; it's useful to ignore a case when
 	 * inheritance will catch all the cases anyway. <!-- end-user-doc -->
-	 *
+	 * 
 	 * @return the new adapter.
 	 * @see org.eclipse.e4.ui.tests.model.test.MTestHarness
 	 * @generated
@@ -188,7 +182,7 @@ public class TestAdapterFactory extends AdapterFactoryImpl {
 	 * returns null so that we can easily ignore cases; it's useful to ignore a
 	 * case when inheritance will catch all the cases anyway. <!-- end-user-doc
 	 * -->
-	 *
+	 * 
 	 * @return the new adapter.
 	 * @see org.eclipse.e4.ui.model.application.MApplicationElement
 	 * @generated
@@ -199,28 +193,12 @@ public class TestAdapterFactory extends AdapterFactoryImpl {
 
 	/**
 	 * Creates a new adapter for an object of class '
-	 * {@link org.eclipse.e4.ui.model.application.ui.MLocalizable
-	 * <em>Localizable</em>}'. <!-- begin-user-doc --> This default
-	 * implementation returns null so that we can easily ignore cases; it's
-	 * useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 *
-	 * @return the new adapter.
-	 * @see org.eclipse.e4.ui.model.application.ui.MLocalizable
-	 * @generated
-	 */
-	public Adapter createLocalizableAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '
 	 * {@link org.eclipse.e4.ui.model.application.commands.MCommand
 	 * <em>Command</em>}'. <!-- begin-user-doc --> This default implementation
 	 * returns null so that we can easily ignore cases; it's useful to ignore a
 	 * case when inheritance will catch all the cases anyway. <!-- end-user-doc
 	 * -->
-	 *
+	 * 
 	 * @return the new adapter.
 	 * @see org.eclipse.e4.ui.model.application.commands.MCommand
 	 * @generated
@@ -235,7 +213,7 @@ public class TestAdapterFactory extends AdapterFactoryImpl {
 	 * '. <!-- begin-user-doc --> This default implementation returns null so
 	 * that we can easily ignore cases; it's useful to ignore a case when
 	 * inheritance will catch all the cases anyway. <!-- end-user-doc -->
-	 *
+	 * 
 	 * @return the new adapter.
 	 * @see org.eclipse.e4.ui.model.application.ui.MContext
 	 * @generated
@@ -251,7 +229,7 @@ public class TestAdapterFactory extends AdapterFactoryImpl {
 	 * implementation returns null so that we can easily ignore cases; it's
 	 * useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
-	 *
+	 * 
 	 * @return the new adapter.
 	 * @see org.eclipse.e4.ui.model.application.MContribution
 	 * @generated
@@ -267,7 +245,7 @@ public class TestAdapterFactory extends AdapterFactoryImpl {
 	 * implementation returns null so that we can easily ignore cases; it's
 	 * useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
-	 *
+	 * 
 	 * @return the new adapter.
 	 * @see org.eclipse.e4.ui.model.application.ui.MUIElement
 	 * @generated
@@ -283,7 +261,7 @@ public class TestAdapterFactory extends AdapterFactoryImpl {
 	 * implementation returns null so that we can easily ignore cases; it's
 	 * useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
-	 *
+	 * 
 	 * @return the new adapter.
 	 * @see org.eclipse.e4.ui.model.application.ui.MElementContainer
 	 * @generated
@@ -299,7 +277,7 @@ public class TestAdapterFactory extends AdapterFactoryImpl {
 	 * returns null so that we can easily ignore cases; it's useful to ignore a
 	 * case when inheritance will catch all the cases anyway. <!-- end-user-doc
 	 * -->
-	 *
+	 * 
 	 * @return the new adapter.
 	 * @see org.eclipse.e4.ui.model.application.commands.MParameter
 	 * @generated
@@ -314,7 +292,7 @@ public class TestAdapterFactory extends AdapterFactoryImpl {
 	 * <!-- begin-user-doc --> This default implementation returns null so that
 	 * we can easily ignore cases; it's useful to ignore a case when inheritance
 	 * will catch all the cases anyway. <!-- end-user-doc -->
-	 *
+	 * 
 	 * @return the new adapter.
 	 * @see org.eclipse.e4.ui.model.application.ui.MInput
 	 * @generated
@@ -329,7 +307,7 @@ public class TestAdapterFactory extends AdapterFactoryImpl {
 	 * '. <!-- begin-user-doc --> This default implementation returns null so
 	 * that we can easily ignore cases; it's useful to ignore a case when
 	 * inheritance will catch all the cases anyway. <!-- end-user-doc -->
-	 *
+	 * 
 	 * @return the new adapter.
 	 * @see org.eclipse.e4.ui.model.application.ui.MUILabel
 	 * @generated
@@ -345,7 +323,7 @@ public class TestAdapterFactory extends AdapterFactoryImpl {
 	 * returns null so that we can easily ignore cases; it's useful to ignore a
 	 * case when inheritance will catch all the cases anyway. <!-- end-user-doc
 	 * -->
-	 *
+	 * 
 	 * @return the new adapter.
 	 * @see org.eclipse.e4.ui.model.application.ui.MDirtyable
 	 * @generated
@@ -361,7 +339,7 @@ public class TestAdapterFactory extends AdapterFactoryImpl {
 	 * implementation returns null so that we can easily ignore cases; it's
 	 * useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
-	 *
+	 * 
 	 * @return the new adapter.
 	 * @see org.eclipse.e4.ui.model.application.ui.MSnippetContainer
 	 * @generated
@@ -373,7 +351,7 @@ public class TestAdapterFactory extends AdapterFactoryImpl {
 	/**
 	 * Creates a new adapter for the default case. <!-- begin-user-doc --> This
 	 * default implementation returns null. <!-- end-user-doc -->
-	 *
+	 * 
 	 * @return the new adapter.
 	 * @generated
 	 */

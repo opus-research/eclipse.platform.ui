@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,12 +17,12 @@ import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
 
 /**
  * The status handler product binding descriptor.
- *
+ * 
  * @since 3.3
  */
 class StatusHandlerProductBindingDescriptor implements
 		IPluginContribution {
-
+	
 	/**
 	 * Handler id attribute. Value <code>handlerId</code>.
 	 */
@@ -48,12 +48,20 @@ class StatusHandlerProductBindingDescriptor implements
 		handlerId = configElement.getAttribute(ATT_HANDLER_ID);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IPluginContribution#getLocalId()
+	 */
 	public String getLocalId() {
 		return id;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IPluginContribution#getPluginId()
+	 */
 	public String getPluginId() {
 		return pluginId;
 	}

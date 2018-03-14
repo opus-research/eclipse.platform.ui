@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Red Hat, Inc - changed TarFileStructureProvider to TarLeveledStructureProvider
+ *     Red Hat, Inc - changed TarFileStructureProvider to TarLeveledStructureProvider 
  *******************************************************************************/
 package org.eclipse.ui.wizards.datatransfer;
 
@@ -30,8 +30,8 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -39,7 +39,7 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
@@ -77,6 +77,8 @@ public class ImportOperation extends WorkspaceModifyOperation {
 
     private IImportStructureProvider provider;
 
+    private IProgressMonitor monitor;
+
     protected IOverwriteQuery overwriteCallback;
 
     private Shell context;
@@ -86,7 +88,7 @@ public class ImportOperation extends WorkspaceModifyOperation {
     private boolean createVirtualFolder = false;
 
     private boolean createLinks = false;
-
+    
     private boolean createLinkFilesOnly = false;
 
     private String relativeVariable = null;
@@ -108,7 +110,7 @@ public class ImportOperation extends WorkspaceModifyOperation {
      * Creates a new operation that recursively imports the entire contents of the
      * specified root file system object.
      * <p>
-     * The <code>source</code> parameter represents the root file system object to
+     * The <code>source</code> parameter represents the root file system object to 
      * import. All contents of this object are imported. Valid types for this parameter
      * are determined by the supplied <code>IImportStructureProvider</code>.
      * </p>
@@ -119,11 +121,11 @@ public class ImportOperation extends WorkspaceModifyOperation {
      * </p>
      *  <p>
      * The default import behavior is to recreate the complete container structure
-     * for the contents of the root file system object in their destination.
-     * If <code>setCreateContainerStructure</code> is set to false then the container
+     * for the contents of the root file system object in their destination. 
+     * If <code>setCreateContainerStructure</code> is set to false then the container 
      * structure created is relative to the root file system object.
      * </p>
-     *
+     * 
      * @param containerPath the full path of the destination container within the
      *   workspace
      * @param source the root file system object to import
@@ -146,8 +148,8 @@ public class ImportOperation extends WorkspaceModifyOperation {
      * operation solely to determine the destination container structure of the file system
      * objects being imported.
      * <p>
-     * The <code>source</code> parameter represents the root file system object to
-     * import. Valid types for this parameter are determined by the supplied
+     * The <code>source</code> parameter represents the root file system object to 
+     * import. Valid types for this parameter are determined by the supplied 
      * <code>IImportStructureProvider</code>. The contents of the source which
      * are to be imported are specified in the <code>filesToImport</code>
      * parameter.
@@ -164,7 +166,7 @@ public class ImportOperation extends WorkspaceModifyOperation {
      * <p>
      * The default import behavior is to recreate the complete container structure
      * for the file system objects in their destination. If <code>setCreateContainerStructure</code>
-     * is set to <code>false</code>, then the container structure created for each of
+     * is set to <code>false</code>, then the container structure created for each of 
      * the file system objects is relative to the supplied root file system object.
      * </p>
      *
@@ -191,13 +193,13 @@ public class ImportOperation extends WorkspaceModifyOperation {
      * and the provider in turn calls specific methods on the source object.
      * </p>
      * <p>
-     * The <code>filesToImport</code> parameter specifies what file system objects
+     * The <code>filesToImport</code> parameter specifies what file system objects 
      * are to be imported.
      * </p>
      * <p>
      * The default import behavior is to recreate the complete container structure
      * for the file system objects in their destination. If <code>setCreateContainerStructure</code>
-     * is set to <code>false</code>, then no container structure is created for each of
+     * is set to <code>false</code>, then no container structure is created for each of 
      * the file system objects.
      * </p>
      *
@@ -219,7 +221,7 @@ public class ImportOperation extends WorkspaceModifyOperation {
      * Prompts if existing resources should be overwritten. Recursively collects
      * existing read-only files to overwrite and resources that should not be
      * overwritten.
-     *
+     * 
      * @param sourceStart destination path to check for existing files
      * @param sources file system objects that may exist in the destination
      * @param noOverwrite files that were selected to be skipped (don't overwrite).
@@ -229,10 +231,9 @@ public class ImportOperation extends WorkspaceModifyOperation {
      * @param policy on of the POLICY constants defined in the
      * class.
      */
-	void collectExistingReadonlyFiles(IPath sourceStart, List sources, ArrayList noOverwrite,
-			ArrayList overwriteReadonly, int policy, IProgressMonitor monitor) {
-		SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
-		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+    void collectExistingReadonlyFiles(IPath sourceStart, List sources,
+            ArrayList noOverwrite, ArrayList overwriteReadonly, int policy) {
+        IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
         Iterator sourceIter = sources.iterator();
         IPath sourceRootPath = null;
 
@@ -271,8 +272,9 @@ public class ImportOperation extends WorkspaceModifyOperation {
                     }
                 }
                 if (provider.isFolder(nextSource)) {
-					collectExistingReadonlyFiles(newDestinationPath, provider.getChildren(nextSource), noOverwrite,
-							overwriteReadonly, POLICY_FORCE_OVERWRITE, subMonitor.split(100));
+					collectExistingReadonlyFiles(newDestinationPath, provider
+                            .getChildren(nextSource), noOverwrite,
+                            overwriteReadonly, POLICY_FORCE_OVERWRITE);
 				}
             } else {
                 IFile file = getFile(newDestination);
@@ -341,7 +343,7 @@ public class ImportOperation extends WorkspaceModifyOperation {
 
         int segmentCount = path.segmentCount();
 
-        //Assume the project exists
+        //Assume the project exists 
         IContainer currentFolder = ((IWorkspaceRoot) destinationContainer)
                 .getProject(path.segment(0));
 
@@ -369,26 +371,46 @@ public class ImportOperation extends WorkspaceModifyOperation {
         }
     }
 
-    @Override
-	protected void execute(IProgressMonitor progressMonitor) {
-		SubMonitor subMonitor = SubMonitor.convert(progressMonitor, DataTransferMessages.DataTransfer_importTask, 100);
+    /* (non-Javadoc)
+     * Method declared on WorkbenchModifyOperation.
+     * Imports the specified file system objects from the file system.
+     */
+    protected void execute(IProgressMonitor progressMonitor) {
+
+        monitor = progressMonitor;
+
         try {
             if (selectedFiles == null) {
-				ContainerGenerator generator = new ContainerGenerator(destinationPath);
-				subMonitor.worked(3);
-				validateFiles(Arrays.asList(new Object[] { source }), subMonitor.split(3));
-				destinationContainer = generator.generateContainer(subMonitor.split(4));
-				importRecursivelyFrom(source, POLICY_DEFAULT, subMonitor.split(90));
+                //Set the amount to 1000 as we have no idea of how long this will take
+                monitor.beginTask(DataTransferMessages.DataTransfer_importTask, 1000);
+                ContainerGenerator generator = new ContainerGenerator(
+                        destinationPath);
+                monitor.worked(30);
+                validateFiles(Arrays.asList(new Object[] { source }));
+                monitor.worked(50);
+                destinationContainer = generator
+                        .generateContainer(new SubProgressMonitor(monitor, 50));
+                importRecursivelyFrom(source, POLICY_DEFAULT);
+                //Be sure it finishes
+                monitor.worked(90);
             } else {
                 // Choose twice the selected files size to take folders into account
-				ContainerGenerator generator = new ContainerGenerator(destinationPath);
-				subMonitor.worked(3);
-				validateFiles(selectedFiles, subMonitor.split(3));
-				destinationContainer = generator.generateContainer(subMonitor.split(4));
-				importFileSystemObjects(selectedFiles, subMonitor.split(90));
+                int creationCount = selectedFiles.size();
+                monitor.beginTask(DataTransferMessages.DataTransfer_importTask, creationCount + 100);
+                ContainerGenerator generator = new ContainerGenerator(
+                        destinationPath);
+                monitor.worked(30);
+                validateFiles(selectedFiles);
+                monitor.worked(50);
+                destinationContainer = generator
+                        .generateContainer(new SubProgressMonitor(monitor, 50));
+                importFileSystemObjects(selectedFiles);
+                monitor.done();
             }
         } catch (CoreException e) {
             errorTable.add(e.getStatus());
+        } finally {
+            monitor.done();
         }
     }
 
@@ -416,40 +438,49 @@ public class ImportOperation extends WorkspaceModifyOperation {
         IPath relativePath = destContainerPath.removeFirstSegments(
                 sourcePath.segmentCount()).setDevice(null);
         return createContainersFor(relativePath);
-
+        
     }
 
     /**
-     * Returns the resource either casted to or adapted to an IFile.
-     *
+     * Returns the resource either casted to or adapted to an IFile. 
+     * 
      * @param resource resource to cast/adapt
      * @return the resource either casted to or adapted to an IFile.
-     * 	<code>null</code> if the resource does not adapt to IFile
+     * 	<code>null</code> if the resource does not adapt to IFile 
      */
     IFile getFile(IResource resource) {
-		// TODO: Check if this is necessary. No IResource should
-		// adapt to IFile unless it *is* an IFile. An instanceof check
-		// might be better
-		return Adapters.adapt(resource, IFile.class);
+        if (resource instanceof IFile) {
+            return (IFile) resource;
+        }
+        Object adapted = ((IAdaptable) resource).getAdapter(IFile.class);
+        if(adapted == null) {
+			return null;
+		}
+        return (IFile) adapted;
+      
     }
 
     /**
-     * Returns the resource either casted to or adapted to an IFolder.
-     *
+     * Returns the resource either casted to or adapted to an IFolder. 
+     * 
      * @param resource resource to cast/adapt
      * @return the resource either casted to or adapted to an IFolder.
-     * 	<code>null</code> if the resource does not adapt to IFolder
+     * 	<code>null</code> if the resource does not adapt to IFolder 
      */
     IFolder getFolder(IResource resource) {
-		// TODO: Check if this is necessary. No IResource should
-		// adapt to IFolder unless it *is* an IFolder. An instanceof
-		// check might be better
-		return Adapters.adapt(resource, IFolder.class);
+        if (resource instanceof IFolder) {
+            return (IFolder) resource;
+        }
+        Object adapted = ((IAdaptable) resource).getAdapter(IFolder.class);
+        if(adapted == null) {
+			return null;
+		}
+        return (IFolder) adapted;
     }
 
     /**
      * Returns the rejected files based on the given multi status.
-     *
+     *  
      * @param multiStatus multi status to use to determine file rejection
      * @param files source files
      * @return list of rejected files as absolute paths. Object type IPath.
@@ -491,8 +522,7 @@ public class ImportOperation extends WorkspaceModifyOperation {
      * @param fileObject the file system object to be imported
      * @param policy determines how the file object is imported
      */
-	void importFile(Object fileObject, int policy, IProgressMonitor mon) {
-		SubMonitor subMonitor = SubMonitor.convert(mon, 100);
+    void importFile(Object fileObject, int policy) {
         IContainer containerResource;
         try {
             containerResource = getDestinationContainerFor(fileObject);
@@ -506,9 +536,10 @@ public class ImportOperation extends WorkspaceModifyOperation {
         }
 
         String fileObjectPath = provider.getFullPath(fileObject);
-		subMonitor.subTask(fileObjectPath);
+        monitor.subTask(fileObjectPath);
         IFile targetResource = containerResource.getFile(new Path(provider
                 .getLabel(fileObject)));
+        monitor.worked(1);
 
         if (rejectedFiles.contains(targetResource.getFullPath())) {
 			return;
@@ -536,44 +567,51 @@ public class ImportOperation extends WorkspaceModifyOperation {
             return;
         }
 
-		try {
-			if (createVirtualFolder || createLinks || createLinkFilesOnly) {
-				if (targetResource.exists())
-					targetResource.delete(true, subMonitor.split(50));
-				targetResource.createLink(
-						createRelativePath(new Path(provider.getFullPath(fileObject)), targetResource), 0,
-						subMonitor.split(50));
-			} else {
-				if (targetResource.exists()) {
-					if (targetResource.isLinked()) {
-						targetResource.delete(true, subMonitor.split(50));
-						targetResource.create(contentStream, false, subMonitor.split(50));
-					} else
-						targetResource.setContents(contentStream, IResource.KEEP_HISTORY, subMonitor.split(100));
-				} else
-					targetResource.create(contentStream, false, subMonitor.split(100));
-			}
-			setResourceAttributes(targetResource, fileObject);
+        try {
+            if (createVirtualFolder || createLinks || createLinkFilesOnly) {
+	            if (targetResource.exists())
+	            	targetResource.delete(true, null);
+                targetResource.createLink(createRelativePath(
+                        new Path(provider
+                                .getFullPath(fileObject)), targetResource), 0, null);
+            } else {
+            if (targetResource.exists()) {
+	            	if (targetResource.isLinked()) {
+		            	targetResource.delete(true, null);
+		            	targetResource.create(contentStream, false, null);
+	            	}
+	            	else
+				targetResource.setContents(contentStream,
+                        IResource.KEEP_HISTORY, null);
+	            }
+                else
+                    targetResource.create(contentStream, false, null);
+            }
+            setResourceAttributes(targetResource, fileObject);
 
-			if (provider instanceof TarLeveledStructureProvider) {
-				try {
-					targetResource.setResourceAttributes(
-							((TarLeveledStructureProvider) provider).getResourceAttributes(fileObject));
-				} catch (CoreException e) {
-					errorTable.add(e.getStatus());
-				}
-			}
-		} catch (CoreException e) {
-			errorTable.add(e.getStatus());
-		} finally {
-			try {
-				contentStream.close();
-			} catch (IOException e) {
-				errorTable.add(new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, 0,
-						NLS.bind(DataTransferMessages.ImportOperation_closeStreamError, fileObjectPath), e));
-			}
-		}
-	}
+            if (provider instanceof TarLeveledStructureProvider) {
+            	try {
+            		targetResource.setResourceAttributes(((TarLeveledStructureProvider) provider).getResourceAttributes(fileObject));
+            	} catch (CoreException e) {
+            		errorTable.add(e.getStatus());
+            	}
+            }
+        } catch (CoreException e) {
+            errorTable.add(e.getStatus());
+        } finally {
+            try {
+                contentStream.close();
+            } catch (IOException e) {
+                errorTable
+                        .add(new Status(
+                                IStatus.ERROR,
+                                PlatformUI.PLUGIN_ID,
+                                0,
+                                NLS.bind(DataTransferMessages.ImportOperation_closeStreamError, fileObjectPath),
+                                e));
+            }
+        }
+    }
 
     /**
      * Reuse the file attributes set in the import.
@@ -581,7 +619,7 @@ public class ImportOperation extends WorkspaceModifyOperation {
      * @param fileObject
      */
     private void setResourceAttributes(IFile targetResource, Object fileObject) {
-
+    	
     	long timeStamp = 0;
     	if(fileObject instanceof File) {
 			try {
@@ -602,7 +640,7 @@ public class ImportOperation extends WorkspaceModifyOperation {
 			if(zipTimeStamp != -1)
 				timeStamp = zipTimeStamp;
         }
-
+		
     	if(timeStamp!= 0) {
     		try {
 				targetResource.setLocalTimeStamp(timeStamp);
@@ -619,14 +657,12 @@ public class ImportOperation extends WorkspaceModifyOperation {
      *
      * @param filesToImport the list of file system objects to import
      *   (element type: <code>Object</code>)
-	 * @throws CoreException
+	 * @throws CoreException 
      * @exception OperationCanceledException if canceled
      */
-	void importFileSystemObjects(List filesToImport, IProgressMonitor monitor) throws CoreException {
-		SubMonitor subMonitor = SubMonitor.convert(monitor, filesToImport.size());
+    void importFileSystemObjects(List filesToImport) throws CoreException {
         Iterator filesEnum = filesToImport.iterator();
         while (filesEnum.hasNext()) {
-			SubMonitor iterationMonitor = subMonitor.split(1);
             Object fileSystemObject = filesEnum.next();
             if (source == null) {
                 // We just import what we are given into the destination
@@ -643,7 +679,7 @@ public class ImportOperation extends WorkspaceModifyOperation {
                 }
                 source = sourcePath.toFile();
             }
-			importRecursivelyFrom(fileSystemObject, POLICY_DEFAULT, iterationMonitor);
+            importRecursivelyFrom(fileSystemObject, POLICY_DEFAULT);
         }
     }
 
@@ -655,9 +691,9 @@ public class ImportOperation extends WorkspaceModifyOperation {
      * @param folderObject the file system container object to be imported
      * @param policy determines how the folder object and children are imported
      * @return the policy to use to import the folder's children
-     * @throws CoreException
+     * @throws CoreException 
      */
-	int importFolder(Object folderObject, int policy, IProgressMonitor monitor) throws CoreException {
+    int importFolder(Object folderObject, int policy) throws CoreException {
         IContainer containerResource;
         try {
             containerResource = getDestinationContainerFor(folderObject);
@@ -717,9 +753,9 @@ public class ImportOperation extends WorkspaceModifyOperation {
      * Transform an absolute path URI to a relative path one (i.e. from
      * "C:\foo\bar\file.txt" to "VAR\file.txt" granted that the relativeVariable
      * is "VAR" and points to "C:\foo\bar\").
-     *
+     * 
      * @param location
-     * @param resource
+     * @param resource 
      * @return an URI that was made relative to a variable
      */
     private IPath createRelativePath(IPath location, IResource resource) {
@@ -742,22 +778,25 @@ public class ImportOperation extends WorkspaceModifyOperation {
      *
      * @param fileSystemObject the file system object to be imported
      * @param policy determines how the file system object and children are imported
-	 * @throws CoreException
+	 * @throws CoreException 
      * @exception OperationCanceledException if canceled
      */
-	void importRecursivelyFrom(Object fileSystemObject, int policy, IProgressMonitor mon) throws CoreException {
-		SubMonitor subMonitor = SubMonitor.convert(mon, 100);
+    void importRecursivelyFrom(Object fileSystemObject, int policy) throws CoreException {
+        if (monitor.isCanceled()) {
+			throw new OperationCanceledException();
+		}
+
         if (!provider.isFolder(fileSystemObject)) {
-			importFile(fileSystemObject, policy, subMonitor.split(100));
+            importFile(fileSystemObject, policy);
             return;
         }
 
-		int childPolicy = importFolder(fileSystemObject, policy, subMonitor.split(10));
+        int childPolicy = importFolder(fileSystemObject, policy);
         if (childPolicy != POLICY_SKIP_CHILDREN) {
-			List children = provider.getChildren(fileSystemObject);
-			SubMonitor loopMonitor = subMonitor.split(90).setWorkRemaining(children.size());
-			for (Object child : children) {
-				importRecursivelyFrom(child, childPolicy, loopMonitor.split(1));
+            Iterator children = provider.getChildren(fileSystemObject)
+                    .iterator();
+            while (children.hasNext()) {
+				importRecursivelyFrom(children.next(), childPolicy);
 			}
         }
     }
@@ -765,7 +804,7 @@ public class ImportOperation extends WorkspaceModifyOperation {
     /**
      * Queries the user whether the resource with the specified path should be
      * overwritten by a file system object that is being imported.
-     *
+     * 
      * @param resourcePath the workspace path of the resource that needs to be overwritten
      * @return <code>true</code> to overwrite, <code>false</code> to not overwrite
      * @exception OperationCanceledException if canceled
@@ -798,8 +837,8 @@ public class ImportOperation extends WorkspaceModifyOperation {
     /**
      * Returns whether the given file should be overwritten.
      *
-     * @param targetFile the file to ask to overwrite
-     * @param policy determines if the user is queried for overwrite
+     * @param targetFile the file to ask to overwrite 
+     * @param policy determines if the user is queried for overwrite 
      * @return <code>true</code> if the file should be overwritten, and
      * 	<code>false</code> if not.
      */
@@ -820,7 +859,7 @@ public class ImportOperation extends WorkspaceModifyOperation {
     /**
      * Sets the context for use by the VCM provider to prompt the user
      * for check-out of files.
-     *
+     * 
      * @param shell context for use by the VCM provider to prompt user
      * 	for check-out. The user will not be prompted if set to <code>null</code>.
      * @see IWorkspace#validateEdit(org.eclipse.core.resources.IFile[], java.lang.Object)
@@ -855,7 +894,7 @@ public class ImportOperation extends WorkspaceModifyOperation {
      * Sets whether imported file system objects should automatically overwrite
      * existing workbench resources when a conflict occurs.
      *
-     * @param value <code>true</code> to automatically overwrite, and
+     * @param value <code>true</code> to automatically overwrite, and 
      *   <code>false</code> otherwise
      */
     public void setOverwriteResources(boolean value) {
@@ -865,14 +904,14 @@ public class ImportOperation extends WorkspaceModifyOperation {
     }
 
     /**
-     * Validates that the given source resources can be copied to the
+     * Validates that the given source resources can be copied to the 
      * destination as decided by the VCM provider.
-     *
+     * 
      * @param existingFiles existing files to validate
      * @return list of rejected files as absolute paths. Object type IPath.
      */
     ArrayList validateEdit(List existingFiles) {
-
+       
         if (existingFiles.size() > 0) {
             IFile[] files = (IFile[]) existingFiles
                     .toArray(new IFile[existingFiles.size()]);
@@ -883,7 +922,7 @@ public class ImportOperation extends WorkspaceModifyOperation {
             if (status.isMultiStatus()) {
 				return getRejectedFiles(status, files);
 			}
-
+            
            if(!status.isOK()){
            		//If just a single status reject them all
            		errorTable.add(status);
@@ -894,7 +933,7 @@ public class ImportOperation extends WorkspaceModifyOperation {
            		}
            		return filteredFiles;
            }
-
+            
         }
         return new ArrayList();
     }
@@ -903,22 +942,22 @@ public class ImportOperation extends WorkspaceModifyOperation {
      * Validates the given file system objects.
      * The user is prompted to overwrite existing files.
      * Existing read-only files are validated with the VCM provider.
-     *
+     * 
      * @param sourceFiles files to validate
      */
-	void validateFiles(List sourceFiles, IProgressMonitor monitor) {
+    void validateFiles(List sourceFiles) {
         ArrayList noOverwrite = new ArrayList();
         ArrayList overwriteReadonly = new ArrayList();
 
-		collectExistingReadonlyFiles(destinationPath, sourceFiles, noOverwrite, overwriteReadonly, POLICY_DEFAULT,
-				monitor);
-		rejectedFiles = validateEdit(overwriteReadonly);
-		rejectedFiles.addAll(noOverwrite);
+        collectExistingReadonlyFiles(destinationPath, sourceFiles, noOverwrite,
+                overwriteReadonly, POLICY_DEFAULT);
+        rejectedFiles = validateEdit(overwriteReadonly);
+        rejectedFiles.addAll(noOverwrite);
     }
 
     /**
      * Set Whether groups and links will be created instead of files and folders
-     *
+     * 
      * @param virtualFolders
      * @since 3.6
      */
@@ -928,7 +967,7 @@ public class ImportOperation extends WorkspaceModifyOperation {
 
     /**
      * Set Whether links will be created instead of files and folders
-     *
+     * 
      * @param links
      * @since 3.6
      */
@@ -938,7 +977,7 @@ public class ImportOperation extends WorkspaceModifyOperation {
 
     /**
      * Set a variable relative to which the links are created
-     *
+     * 
      * @param variable
      * @since 3.6
      */

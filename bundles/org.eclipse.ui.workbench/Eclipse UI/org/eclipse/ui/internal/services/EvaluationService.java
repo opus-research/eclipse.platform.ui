@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 
 package org.eclipse.ui.internal.services;
@@ -26,13 +25,11 @@ import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
-import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.services.IServiceConstants;
-import org.eclipse.e4.ui.workbench.UIEvents;
+import org.eclipse.e4.ui.workbench.modeling.ExpressionContext;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
@@ -46,7 +43,7 @@ import org.eclipse.ui.services.IEvaluationService;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public final class EvaluationService implements IEvaluationService {
 	public static final String DEFAULT_VAR = "org.eclipse.ui.internal.services.EvaluationService.default_var"; //$NON-NLS-1$
@@ -58,11 +55,11 @@ public final class EvaluationService implements IEvaluationService {
 	private int notifying = 0;
 
 	private ListenerList serviceListeners = new ListenerList(ListenerList.IDENTITY);
-	ArrayList<ISourceProvider> sourceProviders = new ArrayList<>();
-	LinkedList<EvaluationReference> refs = new LinkedList<>();
+	ArrayList<ISourceProvider> sourceProviders = new ArrayList<ISourceProvider>();
+	LinkedList<EvaluationReference> refs = new LinkedList<EvaluationReference>();
 	private ISourceProviderListener contextUpdater;
 
-	private HashSet<String> ratVariables = new HashSet<>();
+	private HashSet<String> ratVariables = new HashSet<String>();
 	private RunAndTrack ratUpdater = new RunAndTrack() {
 		@Override
 		public boolean changed(IEclipseContext context) {
@@ -76,16 +73,11 @@ public final class EvaluationService implements IEvaluationService {
 					ratContext.set(var, value);
 				}
 			}
-			// This ties tool item enablement to variable changes that can
-			// effect the enablement.
-			getEventBroker()
-					.post(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, UIEvents.ALL_ELEMENT_ID);
 			return true;
 		}
 	};
 
-	private HashSet<String> variableFilter = new HashSet<>();
-	private IEventBroker eventBroker;
+	private HashSet<String> variableFilter = new HashSet<String>();
 
 	public EvaluationService(IEclipseContext c) {
 		context = c;
@@ -93,7 +85,7 @@ public final class EvaluationService implements IEvaluationService {
 		legacyContext = new ExpressionContext(context);
 		ExpressionContext.defaultVariableConverter = new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
+			public Object compute(IEclipseContext context) {
 				Object defaultVariable = context.getLocal(DEFAULT_VAR);
 				if (defaultVariable != null
 						&& defaultVariable != IEvaluationContext.UNDEFINED_VARIABLE) {
@@ -112,12 +104,10 @@ public final class EvaluationService implements IEvaluationService {
 		};
 		contextUpdater = new ISourceProviderListener() {
 
-			@Override
 			public void sourceChanged(int sourcePriority, String sourceName, Object sourceValue) {
 				changeVariable(sourceName, sourceValue);
 			}
 
-			@Override
 			public void sourceChanged(int sourcePriority, Map sourceValuesByName) {
 				Iterator i = sourceValuesByName.entrySet().iterator();
 				while (i.hasNext()) {
@@ -150,7 +140,13 @@ public final class EvaluationService implements IEvaluationService {
 			legacyContext.addVariable(name, value);
 		}
 	}
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.services.IServiceWithSources#addSourceProvider(org.eclipse
+	 * .ui.ISourceProvider)
+	 */
 	public void addSourceProvider(ISourceProvider provider) {
 		sourceProviders.add(provider);
 		provider.addSourceProviderListener(contextUpdater);
@@ -174,7 +170,13 @@ public final class EvaluationService implements IEvaluationService {
 		contextEvaluate();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.services.IServiceWithSources#removeSourceProvider(org.
+	 * eclipse.ui.ISourceProvider)
+	 */
 	public void removeSourceProvider(ISourceProvider provider) {
 		provider.removeSourceProviderListener(contextUpdater);
 		sourceProviders.remove(provider);
@@ -189,7 +191,11 @@ public final class EvaluationService implements IEvaluationService {
 		contextEvaluate();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.services.IDisposable#dispose()
+	 */
 	public void dispose() {
 		for (EvaluationReference ref : refs) {
 			invalidate(ref, false);
@@ -198,17 +204,36 @@ public final class EvaluationService implements IEvaluationService {
 		serviceListeners.clear();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.services.IEvaluationService#addServiceListener(org.eclipse
+	 * .jface.util.IPropertyChangeListener)
+	 */
 	public void addServiceListener(IPropertyChangeListener listener) {
 		serviceListeners.add(listener);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.services.IEvaluationService#removeServiceListener(org.
+	 * eclipse.jface.util.IPropertyChangeListener)
+	 */
 	public void removeServiceListener(IPropertyChangeListener listener) {
 		serviceListeners.remove(listener);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.services.IEvaluationService#addEvaluationListener(org.
+	 * eclipse.core.expressions.Expression,
+	 * org.eclipse.jface.util.IPropertyChangeListener, java.lang.String)
+	 */
 	public IEvaluationReference addEvaluationListener(Expression expression,
 			IPropertyChangeListener listener, String property) {
 		EvaluationReference ref = new EvaluationReference(ratContext, expression, listener,
@@ -217,7 +242,13 @@ public final class EvaluationService implements IEvaluationService {
 		return ref;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.services.IEvaluationService#addEvaluationReference(org
+	 * .eclipse.ui.services.IEvaluationReference)
+	 */
 	public void addEvaluationReference(IEvaluationReference ref) {
 		EvaluationReference eref = (EvaluationReference) ref;
 		refs.add(eref);
@@ -254,17 +285,29 @@ public final class EvaluationService implements IEvaluationService {
 		contextEvaluate();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.services.IEvaluationService#removeEvaluationListener(org
+	 * .eclipse.ui.services.IEvaluationReference)
+	 */
 	public void removeEvaluationListener(IEvaluationReference ref) {
 		invalidate(ref, true);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.services.IEvaluationService#getCurrentState()
+	 */
 	public IEvaluationContext getCurrentState() {
 		return legacyContext;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.services.IEvaluationService#requestEvaluation(java.lang.String)
+	 */
 	public void requestEvaluation(String propertyName) {
 		// Trigger evaluation of properties via context
 		String pokeVar = propertyName + ".evaluationServiceLink"; //$NON-NLS-1$
@@ -299,7 +342,6 @@ public final class EvaluationService implements IEvaluationService {
 			}
 		}
 		endSourceChange(sourceNames);
-		eventBroker.post(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, UIEvents.ALL_ELEMENT_ID);
 	}
 
 	/**
@@ -328,24 +370,15 @@ public final class EvaluationService implements IEvaluationService {
 		for (int i = 0; i < listeners.length; i++) {
 			final IPropertyChangeListener listener = (IPropertyChangeListener) listeners[i];
 			SafeRunner.run(new ISafeRunnable() {
-				@Override
 				public void handleException(Throwable exception) {
 					WorkbenchPlugin.log(exception);
 				}
 
-				@Override
 				public void run() throws Exception {
 					listener.propertyChange(new PropertyChangeEvent(EvaluationService.this,
 							property, oldValue, newValue));
 				}
 			});
 		}
-	}
-
-	IEventBroker getEventBroker() {
-		if (eventBroker == null) {
-			eventBroker = context.get(IEventBroker.class);
-		}
-		return eventBroker;
 	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,24 +24,24 @@ import org.eclipse.ui.SubActionBars;
 import org.eclipse.ui.internal.PartSite;
 
 /**
- * A <code>RetargetAction</code> tracks the active part in the workbench.
- * Each RetargetAction has an ID.  If the active part provides an action
+ * A <code>RetargetAction</code> tracks the active part in the workbench.  
+ * Each RetargetAction has an ID.  If the active part provides an action 
  * handler for the ID the enable and check state of the RetargetAction
- * is determined from the enable and check state of the handler.  If the
- * active part does not provide an action handler then this action is
+ * is determined from the enable and check state of the handler.  If the 
+ * active part does not provide an action handler then this action is 
  * disabled.
  * </p>
  * <p>
  * <b>Note:</b> instances of this class add themselves as listeners to their
  * action handler. It is important for the creator of a retarget action to call
- * dispose when the action is no longer needed. This will ensure that the
+ * dispose when the action is no longer needed. This will ensure that the 
  * listener is removed.
  * </p>
  * <p>
  * This class may be instantiated. It is not intented to be subclassed.
  * </p>
  *
- * @since 2.0
+ * @since 2.0 
  * @noextend This class is not intended to be subclassed by clients.
  */
 public class RetargetAction extends PartEventAction implements
@@ -57,15 +57,14 @@ public class RetargetAction extends PartEventAction implements
     private IAction handler;
 
     private IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
-        @Override
-		public void propertyChange(PropertyChangeEvent event) {
+        public void propertyChange(PropertyChangeEvent event) {
             RetargetAction.this.propagateChange(event);
         }
     };
 
     /**
      * Constructs a RetargetAction with the given action id and text.
-     *
+     * 
      * @param actionID the retargetable action id
      * @param text the action's text, or <code>null</code> if there is no text
      */
@@ -75,7 +74,7 @@ public class RetargetAction extends PartEventAction implements
 
     /**
      * Constructs a RetargetAction with the given action id, text and style.
-     *
+     * 
      * @param actionID the retargetable action id
      * @param text the action's text, or <code>null</code> if there is no text
      * @param style one of <code>AS_PUSH_BUTTON</code>, <code>AS_CHECK_BOX</code>,
@@ -88,8 +87,7 @@ public class RetargetAction extends PartEventAction implements
         setId(actionID);
         setEnabled(false);
         super.setHelpListener(new HelpListener() {
-            @Override
-			public void helpRequested(HelpEvent e) {
+            public void helpRequested(HelpEvent e) {
                 HelpListener listener = null;
                 if (handler != null) {
                     // if we have a handler, see if it has a help listener
@@ -110,8 +108,7 @@ public class RetargetAction extends PartEventAction implements
     /**
      * Disposes of the action and any resources held.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         if (handler != null) {
             handler.removePropertyChangeListener(propertyChangeListener);
             handler = null;
@@ -125,7 +122,7 @@ public class RetargetAction extends PartEventAction implements
     }
 
     /**
-     * Enables the accelerator for this action.
+     * Enables the accelerator for this action. 
      *
      * @param b the new enable state
      */
@@ -133,8 +130,11 @@ public class RetargetAction extends PartEventAction implements
         enableAccelerator = b;
     }
 
-    @Override
-	public int getAccelerator() {
+    /* (non-Javadoc)
+     * Retaget actions do not have accelerators.  It is up to the
+     * part to hook the accelerator.
+     */
+    public int getAccelerator() {
         if (enableAccelerator) {
 			return super.getAccelerator();
 		}
@@ -147,8 +147,7 @@ public class RetargetAction extends PartEventAction implements
      *
      * @param part the workbench part that has been activated
      */
-    @Override
-	public void partActivated(IWorkbenchPart part) {
+    public void partActivated(IWorkbenchPart part) {
         super.partActivated(part);
         IWorkbenchPartSite site = part.getSite();
         SubActionBars bars = (SubActionBars) ((PartSite) site).getActionBars();
@@ -157,15 +156,14 @@ public class RetargetAction extends PartEventAction implements
     }
 
     /**
-     * A workbench part has been closed.
+     * A workbench part has been closed. 
      *
      * @param part the workbench part that has been closed
      */
-    @Override
-	public void partClosed(IWorkbenchPart part) {
+    public void partClosed(IWorkbenchPart part) {
         IWorkbenchPart activePart = part.getSite().getPage().getActivePart();
         if (activePart != null) {
-			// We are going to get a part activated message so don't bother setting the
+			// We are going to get a part activated message so don't bother setting the 
             // action handler to null. This prevents enablement flash in the toolbar
             return;
 		}
@@ -180,8 +178,7 @@ public class RetargetAction extends PartEventAction implements
      *
      * @param part the workbench part that has been deactivated
      */
-    @Override
-	public void partDeactivated(IWorkbenchPart part) {
+    public void partDeactivated(IWorkbenchPart part) {
         super.partDeactivated(part);
         IWorkbenchPartSite site = part.getSite();
         SubActionBars bars = (SubActionBars) ((PartSite) site).getActionBars();
@@ -189,7 +186,7 @@ public class RetargetAction extends PartEventAction implements
 
         IWorkbenchPart activePart = part.getSite().getPage().getActivePart();
         if (activePart != null) {
-			// We are going to get a part activated message so don't bother setting the
+			// We are going to get a part activated message so don't bother setting the 
             // action handler to null. This prevents enablement flash in the toolbar
             return;
 		}
@@ -217,20 +214,18 @@ public class RetargetAction extends PartEventAction implements
     }
 
     /**
-     * Invoked when an action occurs.
+     * Invoked when an action occurs. 
      */
-    @Override
-	public void run() {
+    public void run() {
         if (handler != null) {
 			handler.run();
 		}
     }
 
     /**
-     * Invoked when an action occurs.
+     * Invoked when an action occurs. 
      */
-    @Override
-	public void runWithEvent(Event event) {
+    public void runWithEvent(Event event) {
         if (handler != null) {
 			handler.runWithEvent(event);
 		}
@@ -238,7 +233,7 @@ public class RetargetAction extends PartEventAction implements
 
     /**
      * Returns the action handler. This method was made public in 3.0.
-     *
+     * 
      * @return The current action handling this retargettable action. This
      *         handler will be <code>null</code> if there is no current
      *         handler.
@@ -246,9 +241,8 @@ public class RetargetAction extends PartEventAction implements
     public IAction getActionHandler() {
         return handler;
     }
-
-    @Override
-	public final boolean isHandled() {
+    
+    public final boolean isHandled() {
         return (handler != null);
     }
 
@@ -282,14 +276,16 @@ public class RetargetAction extends PartEventAction implements
             }
             handler.addPropertyChangeListener(propertyChangeListener);
         }
-
+		
 		// Notify listeners that the handler has changed.
         firePropertyChange(IHandlerAttributes.ATTRIBUTE_HANDLED, oldHandler,
                 newHandler);
     }
 
-    @Override
-	public void setChecked(boolean checked) {
+    /* (non-Javadoc)
+     * Method declared on IAction.
+     */
+    public void setChecked(boolean checked) {
         super.setChecked(checked);
         // This call may come from the SWT control event handler
         // itself, so notify the handler action to keep things
@@ -299,24 +295,22 @@ public class RetargetAction extends PartEventAction implements
 		}
     }
 
-    /**
+    /** 
      * The <code>RetargetAction</code> implementation of this method declared on
      * <code>IAction</code> stores the help listener in a local field. The
      * supplied listener is only used if there is no hanlder.
      */
-    @Override
-	public void setHelpListener(HelpListener listener) {
+    public void setHelpListener(HelpListener listener) {
         localHelpListener = listener;
     }
 
 	/**
 	 * Returns a string representation of this action.
-	 *
+	 * 
 	 * @return A string representation of this action.
-	 *
-	 * @since 3.2
+	 * 
+	 * @since 3.2 
 	 */
-	@Override
 	public final String toString() {
 		final StringBuffer buffer = new StringBuffer();
 

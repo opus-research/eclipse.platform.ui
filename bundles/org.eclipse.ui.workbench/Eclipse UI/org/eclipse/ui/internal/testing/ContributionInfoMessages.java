@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,7 @@ import org.eclipse.osgi.util.NLS;
 
 /**
  * @since 3.6
- *
+ * 
  */
 public class ContributionInfoMessages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ui.internal.testing.messages";//$NON-NLS-1$

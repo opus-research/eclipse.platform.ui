@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,8 +22,8 @@ import org.eclipse.ui.internal.AnimationEngine;
 import org.eclipse.ui.internal.AnimationFeedbackBase;
 
 /**
- * RectangleAnimationFeedbackBase is an abstract base class for all the
- * rectangle animations.
+ * RectangleAnimationFeedbackBase is an abstract base class for all the 
+ * rectangle animations. 
  * @since 3.3
  *
  */
@@ -34,7 +34,7 @@ public abstract class RectangleAnimationFeedbackBase extends AnimationFeedbackBa
 
 	/**
 	 * Creates a Rectangle Animation Feedback
-	 *
+	 * 
 	 * @param parentShell specifies the composite where the animation will be drawn
 	 * @param start initial rectangle (display coordinates)
 	 * @param end final rectangle (display coordinates)
@@ -46,11 +46,15 @@ public abstract class RectangleAnimationFeedbackBase extends AnimationFeedbackBa
 		addEndRect(end);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.AnimationFeedbackBase#jobInit(org.eclipse.ui.internal.AnimationEngine)
+	 * 
+	 * Prevent execution if there are no rects to draw or there's a mismatch in the count
+	 */
 	public boolean jobInit(AnimationEngine engine) {
 		if (!super.jobInit(engine))
 			return false;
-
+		
 		return startRects.size() > 0 && startRects.size() == endRects.size();
 	}
 

@@ -1,25 +1,21 @@
 /**
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
 package org.eclipse.e4.ui.model.application.ui.menu.impl;
 
-import java.util.List;
-import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.impl.ElementContainerImpl;
-import org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarContribution;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import org.eclipse.emf.ecore.util.EObjectContainmentWithInverseEList;
 
 /**
  * <!-- begin-user-doc -->
@@ -27,11 +23,11 @@ import org.eclipse.emf.ecore.util.EObjectContainmentWithInverseEList;
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
- * </p>
  * <ul>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.menu.impl.ToolBarContributionImpl#getParentId <em>Parent Id</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.menu.impl.ToolBarContributionImpl#getPositionInParent <em>Position In Parent</em>}</li>
  * </ul>
+ * </p>
  *
  * @generated
  */
@@ -90,31 +86,6 @@ public class ToolBarContributionImpl extends ElementContainerImpl<MToolBarElemen
 	@Override
 	protected EClass eStaticClass() {
 		return MenuPackageImpl.Literals.TOOL_BAR_CONTRIBUTION;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * This is specialized for the more specific element type known in this context.
-	 * @generated
-	 */
-	@Override
-	public List<MToolBarElement> getChildren() {
-		if (children == null) {
-			children = new EObjectContainmentWithInverseEList<MToolBarElement>(MToolBarElement.class, this, MenuPackageImpl.TOOL_BAR_CONTRIBUTION__CHILDREN, UiPackageImpl.UI_ELEMENT__PARENT) { private static final long serialVersionUID = 1L; @Override public Class<?> getInverseFeatureClass() { return MUIElement.class; } };
-		}
-		return children;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * This is specialized for the more specific type known in this context.
-	 * @generated
-	 */
-	@Override
-	public void setSelectedElement(MToolBarElement newSelectedElement) {
-		super.setSelectedElement(newSelectedElement);
 	}
 
 	/**

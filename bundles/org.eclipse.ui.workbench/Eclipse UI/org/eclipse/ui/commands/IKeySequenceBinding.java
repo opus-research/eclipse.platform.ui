@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ import org.eclipse.ui.keys.KeySequence;
  * <p>
  * This interface is not intended to be extended or implemented by clients.
  * </p>
- *
+ * 
  * @since 3.0
  * @see org.eclipse.ui.commands.ICommand
  * @deprecated Please use the bindings support in the "org.eclipse.jface"
@@ -30,15 +30,12 @@ import org.eclipse.ui.keys.KeySequence;
  * @see org.eclipse.jface.bindings.keys.KeyBinding
  * @noimplement This interface is not intended to be implemented by clients.
  */
-@Deprecated
-@SuppressWarnings("all")
 public interface IKeySequenceBinding extends Comparable {
 
     /**
      * Returns the key sequence represented in this binding.
-     *
+     * 
      * @return the key sequence. Guaranteed not to be <code>null</code>.
      */
-	@Deprecated
     KeySequence getKeySequence();
 }

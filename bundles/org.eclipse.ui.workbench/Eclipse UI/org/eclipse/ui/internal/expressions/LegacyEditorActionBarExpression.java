@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,7 @@ import org.eclipse.ui.internal.services.SourcePriorityNameMapping;
  * This class is not intended for use outside of the
  * <code>org.eclipse.ui.workbench</code> plug-in.
  * </p>
- *
+ * 
  * @since 3.2
  */
 public class LegacyEditorActionBarExpression extends Expression {
@@ -45,7 +45,7 @@ public class LegacyEditorActionBarExpression extends Expression {
 
 	/**
 	 * Constructs a new instance of <code>LegacyEditorActionBarExpression</code>
-	 *
+	 * 
 	 * @param editorId
 	 *            The identifier of the editor to match with the active editor;
 	 *            must not be <code>null</code>
@@ -59,20 +59,17 @@ public class LegacyEditorActionBarExpression extends Expression {
 		activeEditorId = editorId;
 	}
 
-	@Override
 	public final void collectExpressionInfo(final ExpressionInfo info) {
 		info.addVariableNameAccess(ISources.ACTIVE_PART_ID_NAME);
 		info
 				.addVariableNameAccess(SourcePriorityNameMapping.LEGACY_LEGACY_NAME);
 	}
 
-	@Override
 	protected final int computeHashCode() {
 		int hashCode = HASH_INITIAL * HASH_FACTOR + hashCode(activeEditorId);
 		return hashCode;
 	}
 
-	@Override
 	public final boolean equals(final Object object) {
 		if (object instanceof LegacyEditorActionBarExpression) {
 			final LegacyEditorActionBarExpression that = (LegacyEditorActionBarExpression) object;
@@ -82,7 +79,11 @@ public class LegacyEditorActionBarExpression extends Expression {
 		return false;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.expressions.Expression#evaluate(org.eclipse.core.expressions.IEvaluationContext)
+	 */
 	public final EvaluationResult evaluate(final IEvaluationContext context) {
 		final Object variable = context
 				.getVariable(ISources.ACTIVE_PART_ID_NAME);
@@ -92,7 +93,6 @@ public class LegacyEditorActionBarExpression extends Expression {
 		return EvaluationResult.FALSE;
 	}
 
-	@Override
 	public final String toString() {
 		final StringBuffer buffer = new StringBuffer();
 		buffer.append("LegacyEditorActionBarExpression("); //$NON-NLS-1$

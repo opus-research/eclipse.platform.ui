@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -101,8 +101,7 @@ public final class ActivityDefinition implements Comparable {
         this.description = description;
     }
 
-    @Override
-	public int compareTo(Object object) {
+    public int compareTo(Object object) {
         ActivityDefinition castedObject = (ActivityDefinition) object;
         int compareTo = Util.compare(id, castedObject.id);
 
@@ -117,8 +116,7 @@ public final class ActivityDefinition implements Comparable {
         return compareTo;
     }
 
-    @Override
-	public boolean equals(Object object) {
+    public boolean equals(Object object) {
         if (!(object instanceof ActivityDefinition)) {
 			return false;
 		}
@@ -147,8 +145,7 @@ public final class ActivityDefinition implements Comparable {
         return sourceId;
     }
 
-    @Override
-	public int hashCode() {
+    public int hashCode() {
         if (hashCode == HASH_INITIAL) {
             hashCode = hashCode * HASH_FACTOR + Util.hashCode(id);
             hashCode = hashCode * HASH_FACTOR + Util.hashCode(name);
@@ -161,8 +158,7 @@ public final class ActivityDefinition implements Comparable {
         return hashCode;
     }
 
-    @Override
-	public String toString() {
+    public String toString() {
         if (string == null) {
             final StringBuffer stringBuffer = new StringBuffer();
             stringBuffer.append('[');
@@ -181,11 +177,11 @@ public final class ActivityDefinition implements Comparable {
     public String getDescription() {
         return description;
     }
-
+    
     void setEnabledWhen(Expression expression) {
     	enabledWhen = expression;
     }
-
+    
     public Expression getEnabledWhen() {
     	return enabledWhen;
     }

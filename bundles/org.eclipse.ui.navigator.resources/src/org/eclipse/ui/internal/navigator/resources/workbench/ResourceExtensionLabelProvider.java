@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,15 +26,13 @@ import org.eclipse.ui.navigator.ICommonLabelProvider;
  * @since 3.2
  */
 public class ResourceExtensionLabelProvider extends WorkbenchLabelProvider implements ICommonLabelProvider {
-
-
-	@Override
+ 
+ 
 	public void init(ICommonContentExtensionSite aConfig) {
 		//init
 	}
 
-
-	@Override
+ 
 	public String getDescription(Object anElement) {
 
 		if (anElement instanceof IResource) {
@@ -43,12 +41,10 @@ public class ResourceExtensionLabelProvider extends WorkbenchLabelProvider imple
 		return null;
 	}
 
-	@Override
-	public void restoreState(IMemento aMemento) {
-
+	public void restoreState(IMemento aMemento) { 
+		
 	}
 
-	@Override
-	public void saveState(IMemento aMemento) {
+	public void saveState(IMemento aMemento) { 
 	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2016 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 package org.eclipse.ui;
 
 import org.eclipse.core.runtime.Assert;
+
 import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -24,7 +25,7 @@ import org.eclipse.jface.viewers.StructuredViewer;
 
 /**
  * Helper for opening editors on the viewer's selection and link the selection with the editor.
- *
+ * 
  * @since 3.5
  */
 public abstract class OpenAndLinkWithEditorHelper {
@@ -39,14 +40,17 @@ public abstract class OpenAndLinkWithEditorHelper {
 
 
 	private final class InternalListener implements IOpenListener, ISelectionChangedListener, IDoubleClickListener {
-
-		@Override
+		/*
+		 * @see org.eclipse.jface.viewers.IOpenListener#open(org.eclipse.jface.viewers.OpenEvent)
+		 */
 		public final void open(OpenEvent event) {
 			lastOpenSelection = event.getSelection();
 			OpenAndLinkWithEditorHelper.this.open(lastOpenSelection, OpenStrategy.activateOnOpen());
 		}
 
-		@Override
+		/*
+		 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
+		 */
 		public void selectionChanged(SelectionChangedEvent event) {
 			final ISelection selection = event.getSelection();
 			if (isLinkingEnabled && !selection.equals(lastOpenSelection) && viewer.getControl().isFocusControl())
@@ -54,7 +58,9 @@ public abstract class OpenAndLinkWithEditorHelper {
 			lastOpenSelection = null;
 		}
 
-		@Override
+		/*
+		 * @see org.eclipse.jface.viewers.IDoubleClickListener#doubleClick(org.eclipse.jface.viewers.DoubleClickEvent)
+		 */
 		public void doubleClick(DoubleClickEvent event) {
 			if (!OpenStrategy.activateOnOpen())
 				activate(event.getSelection());
@@ -65,7 +71,7 @@ public abstract class OpenAndLinkWithEditorHelper {
 
 	/**
 	 * Creates a new helper for the given viewer.
-	 *
+	 * 
 	 * @param viewer the viewer
 	 */
 	public OpenAndLinkWithEditorHelper(StructuredViewer viewer) {
@@ -79,7 +85,7 @@ public abstract class OpenAndLinkWithEditorHelper {
 
 	/**
 	 * Sets whether editor that corresponds to the viewer's selection should be brought to front.
-	 *
+	 * 
 	 * @param enabled <code>true</code> to enable, <code>false</code> to disable
 	 */
 	public void setLinkWithEditor(boolean enabled) {
@@ -104,7 +110,7 @@ public abstract class OpenAndLinkWithEditorHelper {
 	 * <p>
 	 * <strong>Note:</strong> The implementation must not open a new editor.
 	 * </p>
-	 *
+	 * 
 	 * @param selection the viewer's selection
 	 * @since 3.5
 	 */
@@ -112,7 +118,7 @@ public abstract class OpenAndLinkWithEditorHelper {
 
 	/**
 	 * Tells to open an editor for the given selection.
-	 *
+	 * 
 	 * @param selection the viewer's selection
 	 * @param activate <code>true</code> if the editor should be activated, <code>false</code>
 	 *            otherwise
@@ -121,24 +127,19 @@ public abstract class OpenAndLinkWithEditorHelper {
 	protected abstract void open(ISelection selection, boolean activate);
 
 	/**
-	 * Tells to link the given selection to the editor that is open on the given
-	 * selection but does nothing if no matching editor can be found.
+	 * Tells to link the given selection to the editor that is open on the given selection but does
+	 * nothing if no matching editor can be found.
 	 * <p>
-	 * The common implementation brings that editor to front but more advanced
-	 * implementations may also select the given selection inside the editor.
+	 * The common implementation brings that editor to front but more advanced implementations may
+	 * also select the given selection inside the editor.
 	 * </p>
 	 * <p>
 	 * <strong>Note:</strong> The implementation must not open a new editor.
 	 * </p>
-	 * <p>
-	 * The default implementation does nothing i.e. does not implement linking.
-	 * </p>
-	 *
-	 * @param selection
-	 *            the viewer's selection
-	 * @since 3.5, non-abstract since 4.3
+	 * 
+	 * @param selection the viewer's selection
+	 * @since 3.5
 	 */
-	protected void linkToEditor(ISelection selection) {
-	}
+	protected abstract void linkToEditor(ISelection selection);
 
 }

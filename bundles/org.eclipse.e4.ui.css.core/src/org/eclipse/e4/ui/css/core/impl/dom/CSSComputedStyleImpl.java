@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Angelo Zerr and others.
+ * Copyright (c) 2008, 2009 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ package org.eclipse.e4.ui.css.core.impl.dom;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
 import org.eclipse.e4.ui.css.core.dom.CSSProperty;
 import org.eclipse.e4.ui.css.core.dom.CSSPropertyList;
 import org.w3c.dom.css.CSSStyleDeclaration;
@@ -25,7 +26,8 @@ import org.w3c.dom.css.CSSStyleDeclaration;
  * styles coming from Condition Selector (ex : Label#MyId) and other selectors
  * (ex : Label).
  */
-public class CSSComputedStyleImpl extends CSSStyleDeclarationImpl implements CSSStyleDeclaration {
+public class CSSComputedStyleImpl extends CSSStyleDeclarationImpl implements
+		CSSStyleDeclaration {
 
 	private List<StyleWrapper> styleRules;
 
@@ -34,10 +36,10 @@ public class CSSComputedStyleImpl extends CSSStyleDeclarationImpl implements CSS
 		this.styleRules = styleRules;
 		// TODO [rst] Optimize: A list of StyleWrapper instances could be sorted
 		// only once after reading the stylesheet(s).
-		Collections.sort( this.styleRules, StyleWrapper.COMPARATOR );
-		Iterator<StyleWrapper> iterator = this.styleRules.iterator();
-		while (iterator.hasNext()) {
-			StyleWrapper styleWrapper = iterator.next();
+	    Collections.sort( this.styleRules, StyleWrapper.COMPARATOR );
+	    Iterator iterator = this.styleRules.iterator();
+	    while (iterator.hasNext()) {
+			StyleWrapper styleWrapper = (StyleWrapper) iterator.next();
 			addCSSPropertyList(((CSSStyleDeclarationImpl) styleWrapper.style).getCSSPropertyList());
 		}
 	}

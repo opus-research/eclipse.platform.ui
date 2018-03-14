@@ -1,16 +1,23 @@
 /**
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
 package org.eclipse.e4.ui.model.application.ui.basic.impl;
 
-import org.eclipse.e4.ui.model.application.ui.basic.*;
+import org.eclipse.e4.ui.model.application.ui.basic.MBasicFactory;
+import org.eclipse.e4.ui.model.application.ui.basic.MInputPart;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
+import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
+import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
+import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
+import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
@@ -40,7 +47,7 @@ public class BasicFactoryImpl extends EFactoryImpl implements MBasicFactory {
 	 */
 	public static BasicFactoryImpl init() {
 		try {
-			BasicFactoryImpl theBasicFactory = (BasicFactoryImpl)EPackage.Registry.INSTANCE.getEFactory(BasicPackageImpl.eNS_URI);
+			BasicFactoryImpl theBasicFactory = (BasicFactoryImpl)EPackage.Registry.INSTANCE.getEFactory("http://www.eclipse.org/ui/2010/UIModel/application/ui/basic"); //$NON-NLS-1$ 
 			if (theBasicFactory != null) {
 				return theBasicFactory;
 			}
@@ -70,15 +77,12 @@ public class BasicFactoryImpl extends EFactoryImpl implements MBasicFactory {
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
 			case BasicPackageImpl.PART: return (EObject)createPart();
-			case BasicPackageImpl.COMPOSITE_PART: return (EObject)createCompositePart();
 			case BasicPackageImpl.INPUT_PART: return (EObject)createInputPart();
 			case BasicPackageImpl.PART_STACK: return (EObject)createPartStack();
 			case BasicPackageImpl.PART_SASH_CONTAINER: return (EObject)createPartSashContainer();
 			case BasicPackageImpl.WINDOW: return (EObject)createWindow();
 			case BasicPackageImpl.TRIMMED_WINDOW: return (EObject)createTrimmedWindow();
 			case BasicPackageImpl.TRIM_BAR: return (EObject)createTrimBar();
-			case BasicPackageImpl.DIALOG: return (EObject)createDialog();
-			case BasicPackageImpl.WIZARD_DIALOG: return (EObject)createWizardDialog();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -92,16 +96,6 @@ public class BasicFactoryImpl extends EFactoryImpl implements MBasicFactory {
 	public MPart createPart() {
 		PartImpl part = new PartImpl();
 		return part;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public MCompositePart createCompositePart() {
-		CompositePartImpl compositePart = new CompositePartImpl();
-		return compositePart;
 	}
 
 	/**
@@ -162,26 +156,6 @@ public class BasicFactoryImpl extends EFactoryImpl implements MBasicFactory {
 	public MTrimBar createTrimBar() {
 		TrimBarImpl trimBar = new TrimBarImpl();
 		return trimBar;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public MDialog createDialog() {
-		DialogImpl dialog = new DialogImpl();
-		return dialog;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public MWizardDialog createWizardDialog() {
-		WizardDialogImpl wizardDialog = new WizardDialogImpl();
-		return wizardDialog;
 	}
 
 	/**

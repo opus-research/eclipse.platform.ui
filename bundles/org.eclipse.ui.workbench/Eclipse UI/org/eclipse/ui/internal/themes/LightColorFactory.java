@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,24 +23,24 @@ import org.eclipse.ui.themes.IColorFactory;
 /**
  * LightColorFactory returns tab begin and end colours based on taking
  * a system color as input, analyzing it, and lightening it appropriately.
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 public class LightColorFactory implements IColorFactory,
 		IExecutableExtension {
 
 	protected static final RGB white = ColorUtil.getColorValue("COLOR_WHITE"); //$NON-NLS-1$
 	protected static final RGB black = ColorUtil.getColorValue("COLOR_BLACK"); //$NON-NLS-1$
-
+	
 	String baseColorName;
-	String definitionId;
+	String definitionId; 
 
 	/**
 	 * Return the highlight start (top of tab) color as an RGB
 	 * @return the highlight start RGB
 	 */
-
+	
 	public static RGB createHighlightStartColor(RGB tabStartColor) {
 		return ColorUtil.blend(white, tabStartColor);
 	}
@@ -57,7 +57,6 @@ public class LightColorFactory implements IColorFactory,
 	 * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement,
 	 *      java.lang.String, java.lang.Object)
 	 */
-	@Override
 	public void setInitializationData(IConfigurationElement config,
 			String propertyName, Object data) {
 
@@ -68,7 +67,7 @@ public class LightColorFactory implements IColorFactory,
 		}
 	}
 
-	/*
+	/* 
 	 * Return the number of RGB values in test that are
 	 * equal to or between lower and upper.
 	 */
@@ -80,7 +79,7 @@ public class LightColorFactory implements IColorFactory,
 
 		return hits;
 	}
-
+	
 	/*
 	 * Return the RGB value for the bottom tab color
 	 * based on a blend of white and sample color
@@ -89,15 +88,15 @@ public class LightColorFactory implements IColorFactory,
 		//Group 1
 		if(valuesInRange(sample, 180, 255) >= 2)
 			return sample;
-
+		
 		//Group 2
 		if(valuesInRange(sample, 100, 179) >= 2)
 			return ColorUtil.blend(white, sample, 40);
-
+		
 		//Group 3
 		if(valuesInRange(sample, 0, 99) >= 2)
 			return ColorUtil.blend(white, sample, 60);
-
+		
 		//Group 4
 		return ColorUtil.blend(white, sample, 30);
 	}
@@ -119,10 +118,10 @@ public class LightColorFactory implements IColorFactory,
 	private RGB getActiveFocusEndColor() {
 		if (Display.getCurrent().getDepth() < 15)
 			return ColorUtil.getColorValue(baseColorName);
-
+	
 		return getLightenedColor(
 				ColorUtil.getColorValue(baseColorName));
-	}
+	}	
 
 	/*
 	 * Return the active focus tab text color as an RGB
@@ -130,7 +129,7 @@ public class LightColorFactory implements IColorFactory,
 	private RGB getActiveFocusTextColor() {
 		if (Display.getCurrent().getDepth() < 15)
 			return ColorUtil.getColorValue(baseColorName);  //typically TITLE_FOREGROUND
-
+	
 		return ColorUtil.getColorValue("COLOR_BLACK"); //$NON-NLS-1$
 	}
 	/*
@@ -140,14 +139,18 @@ public class LightColorFactory implements IColorFactory,
 		RGB base = ColorUtil.getColorValue(baseColorName);
 		if (Display.getCurrent().getDepth() < 15)
 			return base;
-
+		
 		return ColorUtil.blend(white, base, 40);
 	}
-
-	@Override
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.themes.IColorFactory#createColor()
+	 */
 	public RGB createColor() {
 		//should have base, otherwise error in the xml
-		if (baseColorName == null || definitionId == null)
+		if (baseColorName == null || definitionId == null) 
 			return white;
 
 		if (definitionId.equals("org.eclipse.ui.workbench.ACTIVE_TAB_BG_START")) //$NON-NLS-1$
@@ -158,7 +161,7 @@ public class LightColorFactory implements IColorFactory,
 			return getActiveFocusTextColor();
 		if (definitionId.equals("org.eclipse.ui.workbench.ACTIVE_NOFOCUS_TAB_BG_START")) //$NON-NLS-1$
 			return getActiveNofocusStartColor();
-
+		
 		//should be one of start or end, otherwise error in the xml
 		return white;
 	}

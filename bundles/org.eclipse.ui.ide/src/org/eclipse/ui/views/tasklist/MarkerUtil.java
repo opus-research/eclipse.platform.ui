@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,12 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
- *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 
 package org.eclipse.ui.views.tasklist;
 
+import com.ibm.icu.text.DateFormat;
+import com.ibm.icu.text.MessageFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,14 +27,11 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.views.tasklist.TaskListMessages;
 
-import com.ibm.icu.text.DateFormat;
-import com.ibm.icu.text.MessageFormat;
-
 /**
  * Utility class for accessing marker attributes.
  */
 class MarkerUtil implements IMarkerConstants {
-
+	
    private static Map imageDescriptors;
 
     private static ImageRegistry imageRegistry = new ImageRegistry();
@@ -42,7 +39,7 @@ class MarkerUtil implements IMarkerConstants {
     private static MessageFormat line = new MessageFormat(TaskListMessages.TaskList_line);
 
     private static MessageFormat lineAndLocation = new MessageFormat(
-            TaskListMessages.TaskList_lineAndLocation);
+            TaskListMessages.TaskList_lineAndLocation); 
 
     static {
         createImageDescriptors();
@@ -58,65 +55,66 @@ class MarkerUtil implements IMarkerConstants {
      * Creates the map of image descriptors.
      */
     static void createImageDescriptors() {
+    
 
         imageDescriptors = new HashMap(51);
         imageDescriptors
                 .put(
-                        "header_complete", IDEWorkbenchPlugin.getIDEImageDescriptor("obj16/header_complete.png"));//$NON-NLS-2$//$NON-NLS-1$
+                        "header_complete", IDEWorkbenchPlugin.getIDEImageDescriptor("obj16/header_complete.gif"));//$NON-NLS-2$//$NON-NLS-1$
         imageDescriptors
                 .put(
-                        "header_priority", IDEWorkbenchPlugin.getIDEImageDescriptor("obj16/header_priority.png"));//$NON-NLS-2$//$NON-NLS-1$
+                        "header_priority", IDEWorkbenchPlugin.getIDEImageDescriptor("obj16/header_priority.gif"));//$NON-NLS-2$//$NON-NLS-1$
         imageDescriptors.put(
-                "task", IDEWorkbenchPlugin.getIDEImageDescriptor("obj16/taskmrk_tsk.png"));//$NON-NLS-2$//$NON-NLS-1$
+                "task", IDEWorkbenchPlugin.getIDEImageDescriptor("obj16/taskmrk_tsk.gif"));//$NON-NLS-2$//$NON-NLS-1$
         imageDescriptors.put(
-                "error", IDEWorkbenchPlugin.getIDEImageDescriptor("obj16/error_tsk.png"));//$NON-NLS-2$//$NON-NLS-1$
+                "error", IDEWorkbenchPlugin.getIDEImageDescriptor("obj16/error_tsk.gif"));//$NON-NLS-2$//$NON-NLS-1$
         imageDescriptors.put(
-                "warn", IDEWorkbenchPlugin.getIDEImageDescriptor("obj16/warn_tsk.png"));//$NON-NLS-2$//$NON-NLS-1$
+                "warn", IDEWorkbenchPlugin.getIDEImageDescriptor("obj16/warn_tsk.gif"));//$NON-NLS-2$//$NON-NLS-1$
         imageDescriptors.put(
-                "info", IDEWorkbenchPlugin.getIDEImageDescriptor("obj16/info_tsk.png"));//$NON-NLS-2$//$NON-NLS-1$
+                "info", IDEWorkbenchPlugin.getIDEImageDescriptor("obj16/info_tsk.gif"));//$NON-NLS-2$//$NON-NLS-1$
         imageDescriptors.put(
-                "hprio", IDEWorkbenchPlugin.getIDEImageDescriptor("obj16/hprio_tsk.png"));//$NON-NLS-2$//$NON-NLS-1$
+                "hprio", IDEWorkbenchPlugin.getIDEImageDescriptor("obj16/hprio_tsk.gif"));//$NON-NLS-2$//$NON-NLS-1$
         imageDescriptors.put(
-                "lprio", IDEWorkbenchPlugin.getIDEImageDescriptor("obj16/lprio_tsk.png"));//$NON-NLS-2$//$NON-NLS-1$
+                "lprio", IDEWorkbenchPlugin.getIDEImageDescriptor("obj16/lprio_tsk.gif"));//$NON-NLS-2$//$NON-NLS-1$
         imageDescriptors
                 .put(
-                        "complete_tsk", IDEWorkbenchPlugin.getIDEImageDescriptor("obj16/complete_tsk.png"));//$NON-NLS-2$//$NON-NLS-1$
+                        "complete_tsk", IDEWorkbenchPlugin.getIDEImageDescriptor("obj16/complete_tsk.gif"));//$NON-NLS-2$//$NON-NLS-1$
         imageDescriptors
                 .put(
-                        "incomplete_tsk", IDEWorkbenchPlugin.getIDEImageDescriptor("obj16/incomplete_tsk.png"));//$NON-NLS-2$//$NON-NLS-1$
+                        "incomplete_tsk", IDEWorkbenchPlugin.getIDEImageDescriptor("obj16/incomplete_tsk.gif"));//$NON-NLS-2$//$NON-NLS-1$
         imageDescriptors.put(
-                "gotoobj", IDEWorkbenchPlugin.getIDEImageDescriptor("elcl16/gotoobj_tsk.png"));//$NON-NLS-2$//$NON-NLS-1$
+                "gotoobj", IDEWorkbenchPlugin.getIDEImageDescriptor("elcl16/gotoobj_tsk.gif"));//$NON-NLS-2$//$NON-NLS-1$
         imageDescriptors.put(
-                "addtsk", IDEWorkbenchPlugin.getIDEImageDescriptor("elcl16/addtsk_tsk.png"));//$NON-NLS-2$//$NON-NLS-1$
+                "addtsk", IDEWorkbenchPlugin.getIDEImageDescriptor("elcl16/addtsk_tsk.gif"));//$NON-NLS-2$//$NON-NLS-1$
         imageDescriptors
                 .put(
-                        "addtsk_disabled", IDEWorkbenchPlugin.getIDEImageDescriptor("dlcl16/addtsk_tsk.png"));//$NON-NLS-2$//$NON-NLS-1$
+                        "addtsk_disabled", IDEWorkbenchPlugin.getIDEImageDescriptor("dlcl16/addtsk_tsk.gif"));//$NON-NLS-2$//$NON-NLS-1$
         imageDescriptors
                 .put(
-                        "showcomplete", IDEWorkbenchPlugin.getIDEImageDescriptor("elcl16/showcomplete_tsk.png"));//$NON-NLS-2$//$NON-NLS-1$
+                        "showcomplete", IDEWorkbenchPlugin.getIDEImageDescriptor("elcl16/showcomplete_tsk.gif"));//$NON-NLS-2$//$NON-NLS-1$
         imageDescriptors
                 .put(
-                        "selected_mode", IDEWorkbenchPlugin.getIDEImageDescriptor("elcl16/selected_mode.png"));//$NON-NLS-2$//$NON-NLS-1$
+                        "selected_mode", IDEWorkbenchPlugin.getIDEImageDescriptor("elcl16/selected_mode.gif"));//$NON-NLS-2$//$NON-NLS-1$
         imageDescriptors
                 .put(
-                        "selected_mode_disabled", IDEWorkbenchPlugin.getIDEImageDescriptor("dlcl16/selected_mode.png"));//$NON-NLS-2$//$NON-NLS-1$
+                        "selected_mode_disabled", IDEWorkbenchPlugin.getIDEImageDescriptor("dlcl16/selected_mode.gif"));//$NON-NLS-2$//$NON-NLS-1$
         imageDescriptors
                 .put(
-                        "showchild_mode", IDEWorkbenchPlugin.getIDEImageDescriptor("elcl16/showchild_mode.png"));//$NON-NLS-2$//$NON-NLS-1$
+                        "showchild_mode", IDEWorkbenchPlugin.getIDEImageDescriptor("elcl16/showchild_mode.gif"));//$NON-NLS-2$//$NON-NLS-1$
         imageDescriptors
                 .put(
-                        "showchild_mode_disabled", IDEWorkbenchPlugin.getIDEImageDescriptor("dlcl16/showchild_mode.png"));//$NON-NLS-2$//$NON-NLS-1$
+                        "showchild_mode_disabled", IDEWorkbenchPlugin.getIDEImageDescriptor("dlcl16/showchild_mode.gif"));//$NON-NLS-2$//$NON-NLS-1$
         imageDescriptors
                 .put(
-                        "showerr_disabled", IDEWorkbenchPlugin.getIDEImageDescriptor("dlcl16/showerr_tsk.png"));//$NON-NLS-2$//$NON-NLS-1$
+                        "showerr_disabled", IDEWorkbenchPlugin.getIDEImageDescriptor("dlcl16/showerr_tsk.gif"));//$NON-NLS-2$//$NON-NLS-1$
         imageDescriptors
                 .put(
-                        "showwarn_disabled", IDEWorkbenchPlugin.getIDEImageDescriptor("dlcl16/showwarn_tsk.png"));//$NON-NLS-2$//$NON-NLS-1$
+                        "showwarn_disabled", IDEWorkbenchPlugin.getIDEImageDescriptor("dlcl16/showwarn_tsk.gif"));//$NON-NLS-2$//$NON-NLS-1$
         imageDescriptors
                 .put(
-                        "showtsk_disabled", IDEWorkbenchPlugin.getIDEImageDescriptor("dlcl16/showtsk_tsk.png"));//$NON-NLS-2$//$NON-NLS-1$
+                        "showtsk_disabled", IDEWorkbenchPlugin.getIDEImageDescriptor("dlcl16/showtsk_tsk.gif"));//$NON-NLS-2$//$NON-NLS-1$
         imageDescriptors.put(
-                "filter", IDEWorkbenchPlugin.getIDEImageDescriptor("elcl16/filter_ps.png"));//$NON-NLS-2$//$NON-NLS-1$
+                "filter", IDEWorkbenchPlugin.getIDEImageDescriptor("elcl16/filter_ps.gif"));//$NON-NLS-2$//$NON-NLS-1$
     }
 
     /**
@@ -150,15 +148,16 @@ class MarkerUtil implements IMarkerConstants {
     }
 
     /**
-     * Returns the text to be used for the complete state of a task.
+     * Returns the text to be used for the complete state of a task. 
      * Returns the empty string for markers that are not tasks.
      */
     public static String getCompleteText(IMarker marker) {
         if (isMarkerType(marker, IMarker.TASK)) {
             if (isComplete(marker)) {
 				return TaskListMessages.TaskList_completed;
+			} else {
+				return TaskListMessages.TaskList_notCompleted;
 			}
-			return TaskListMessages.TaskList_notCompleted;
         }
         return ""; //$NON-NLS-1$
     }
@@ -168,15 +167,15 @@ class MarkerUtil implements IMarkerConstants {
      */
     public static String getKindText(IMarker marker) {
         if (isMarkerType(marker, IMarker.TASK)) {
-            return TaskListMessages.TaskList_task;
+            return TaskListMessages.TaskList_task; 
         }
         switch (getSeverity(marker)) {
         case IMarker.SEVERITY_ERROR:
-            return TaskListMessages.TaskList_error;
+            return TaskListMessages.TaskList_error; 
         case IMarker.SEVERITY_WARNING:
-            return TaskListMessages.TaskList_warning;
+            return TaskListMessages.TaskList_warning; 
         case IMarker.SEVERITY_INFO:
-            return TaskListMessages.TaskList_info;
+            return TaskListMessages.TaskList_info; 
         }
         return ""; //$NON-NLS-1$
     }
@@ -274,13 +273,18 @@ class MarkerUtil implements IMarkerConstants {
         if (lineNumber == -1) {
             if (location.equals("")) {//$NON-NLS-1$
                 return "";//$NON-NLS-1$
+            } else {
+                return location;
             }
-			return location;
+        } else {
+            if (location.equals("")) {//$NON-NLS-1$
+                return line
+                        .format(new Object[] { Integer.toString(lineNumber) });
+            } else {
+                return lineAndLocation.format(new Object[] {
+                        Integer.toString(lineNumber), location });
+            }
         }
-		if (location.equals("")) {//$NON-NLS-1$
-			return line.format(new Object[] { Integer.toString(lineNumber) });
-		}
-		return lineAndLocation.format(new Object[] { Integer.toString(lineNumber), location });
     }
 
     /**
@@ -373,13 +377,13 @@ class MarkerUtil implements IMarkerConstants {
 
         switch (getPriority(marker)) {
         case IMarker.PRIORITY_HIGH:
-            return TaskListMessages.TaskList_high;
+            return TaskListMessages.TaskList_high; 
         case IMarker.PRIORITY_NORMAL:
             return TaskListMessages.TaskList_normal;
         case IMarker.PRIORITY_LOW:
             return TaskListMessages.TaskList_low;
         }
-        return ""; //$NON-NLS-1$
+        return ""; //$NON-NLS-1$		
     }
 
     /**
@@ -417,7 +421,7 @@ class MarkerUtil implements IMarkerConstants {
         }
         if (IMarker.PRIORITY == key) {
             // this property is used only by cell editor, where order is High, Normal, Low
-			return IMarker.PRIORITY_HIGH - getPriority(marker);
+            return new Integer(IMarker.PRIORITY_HIGH - getPriority(marker));
         }
         if (IMarker.DONE == key) {
             return isComplete(marker) ? Boolean.TRUE : Boolean.FALSE;

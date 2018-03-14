@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,7 @@ import org.eclipse.ui.internal.dialogs.WorkbenchPreferenceDialog;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class PreferenceElement extends QuickAccessElement {
 
@@ -36,7 +36,6 @@ public class PreferenceElement extends QuickAccessElement {
 		this.prefix = prefix;
 	}
 
-	@Override
 	public void execute() {
 		IWorkbenchWindow window = PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow();
@@ -47,12 +46,10 @@ public class PreferenceElement extends QuickAccessElement {
 		}
 	}
 
-	@Override
 	public String getId() {
 		return preferenceNode.getId();
 	}
 
-	@Override
 	public ImageDescriptor getImageDescriptor() {
 		Image image = preferenceNode.getLabelImage();
 		if (image != null) {
@@ -62,7 +59,6 @@ public class PreferenceElement extends QuickAccessElement {
 		return null;
 	}
 
-	@Override
 	public String getLabel() {
 		if (prefix != null && prefix.length() > 0) {
 			return preferenceNode.getLabelText() + separator
@@ -71,7 +67,6 @@ public class PreferenceElement extends QuickAccessElement {
 		return preferenceNode.getLabelText();
 	}
 
-	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -80,7 +75,6 @@ public class PreferenceElement extends QuickAccessElement {
 		return result;
 	}
 
-	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;

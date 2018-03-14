@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,9 +22,9 @@ import org.eclipse.ui.preferences.SettingsTransfer;
 /**
  * The WorkbenchSettingsTransfer is the abstract superclass of settings
  * transfers in the workbench.
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 public abstract class WorkbenchSettingsTransfer extends SettingsTransfer {
 
@@ -38,20 +38,20 @@ public abstract class WorkbenchSettingsTransfer extends SettingsTransfer {
 	}
 
 	/**
-	 * Return the workbench settings location for the new root
+	 * Return the workbench settings location for the new root 
 	 * @param newWorkspaceRoot
 	 * @return IPath or <code>null</code> if it can't be determined.
 	 */
 	protected IPath getNewWorkbenchStateLocation(IPath newWorkspaceRoot) {
 		IPath currentWorkspaceRoot = Platform.getLocation();
-
+	
 		IPath dataLocation = WorkbenchPlugin.getDefault().getDataLocation();
-
+	
 		if (dataLocation == null)
 			return null;
 		int segmentsToRemove = dataLocation
 				.matchingFirstSegments(currentWorkspaceRoot);
-
+	
 		// Strip it down to the extension
 		dataLocation = dataLocation.removeFirstSegments(segmentsToRemove);
 		// Now add in the

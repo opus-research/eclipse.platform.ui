@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,12 +19,10 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.contributions.IContributionFactory;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.internal.workbench.Activator;
 import org.eclipse.e4.ui.internal.workbench.Policy;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -86,7 +84,6 @@ public class HeadlessContextPresentationEngine implements IPresentationEngine {
 	@PostConstruct
 	void postConstruct() {
 		childHandler = new EventHandler() {
-			@Override
 			public void handleEvent(Event event) {
 				if (UIEvents.isADD(event)) {
 					for (Object element : UIEvents.asIterable(event,
@@ -127,7 +124,6 @@ public class HeadlessContextPresentationEngine implements IPresentationEngine {
 				childHandler);
 
 		activeChildHandler = new EventHandler() {
-			@Override
 			public void handleEvent(Event event) {
 				Object element = event
 						.getProperty(UIEvents.EventTags.NEW_VALUE);
@@ -154,7 +150,6 @@ public class HeadlessContextPresentationEngine implements IPresentationEngine {
 				activeChildHandler);
 
 		toBeRenderedHandler = new EventHandler() {
-			@Override
 			public void handleEvent(Event event) {
 				MUIElement element = (MUIElement) event
 						.getProperty(UIEvents.EventTags.ELEMENT);
@@ -210,7 +205,13 @@ public class HeadlessContextPresentationEngine implements IPresentationEngine {
 		this.createContributions = createContributions;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.IPresentationEngine#createGui(org.eclipse
+	 * .e4.ui.model.application.MUIElement, java.lang.Object)
+	 */
 	public Object createGui(MUIElement element, Object parentWidget,
 			IEclipseContext parentContext) {
 		if (!element.isToBeRendered()) {
@@ -341,7 +342,13 @@ public class HeadlessContextPresentationEngine implements IPresentationEngine {
 		return widget;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.IPresentationEngine#createGui(org.eclipse
+	 * .e4.ui.model.application.MUIElement)
+	 */
 	public Object createGui(MUIElement element) {
 		MUIElement placeholder = element.getCurSharedRef();
 		if (placeholder != null) {
@@ -356,7 +363,6 @@ public class HeadlessContextPresentationEngine implements IPresentationEngine {
 		return createGui(element, parent.getWidget(), getParentContext(element));
 	}
 
-	@Override
 	public void removeGui(MUIElement element) {
 		if (element instanceof MElementContainer<?>) {
 			for (Object child : ((MElementContainer<?>) element).getChildren()) {
@@ -426,34 +432,22 @@ public class HeadlessContextPresentationEngine implements IPresentationEngine {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.IPresentationEngine#run(org.eclipse.e4.ui
+	 * .model.application.MApplicationElement)
+	 */
 	public Object run(MApplicationElement uiRoot, IEclipseContext appContext) {
 		return 0;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.workbench.IPresentationEngine#stop()
+	 */
 	public void stop() {
-	}
-
-	@Override
-	public void focusGui(MUIElement element) {
-		Object implementation = element instanceof MContribution ? ((MContribution) element)
-				.getObject() : null;
-		if (implementation != null) {
-			IEclipseContext context = getContext(element);
-			Object defaultValue = new Object();
-			Object returnValue = ContextInjectionFactory.invoke(implementation,
-					Focus.class, context, defaultValue);
-			if (returnValue == defaultValue) {
-				System.err.println("No @Focus method");
-			}
-		}
-	}
-
-	private IEclipseContext getContext(MUIElement parent) {
-		if (parent instanceof MContext) {
-			return ((MContext) parent).getContext();
-		}
-		return modelService.getContainingContext(parent);
 	}
 }

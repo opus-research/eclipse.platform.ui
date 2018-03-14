@@ -1,26 +1,16 @@
-/*******************************************************************************
- * Copyright (c) 2013, 2015 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
- *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.e4.ui.model.application.ui.MGenericTile;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
-import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -56,35 +46,29 @@ public class SashLayout extends Layout {
 		}
 	}
 
-	List<SashRect> sashes = new ArrayList<>();
+	List<SashRect> sashes = new ArrayList<SashRect>();
 
 	boolean draggingSashes = false;
 	List<SashRect> sashesToDrag;
-
-	public boolean layoutUpdateInProgress = false;
 
 	public SashLayout(final Composite host, MUIElement root) {
 		this.root = root;
 		this.host = host;
 
 		host.addMouseTrackListener(new MouseTrackListener() {
-			@Override
 			public void mouseHover(MouseEvent e) {
 			}
 
-			@Override
 			public void mouseExit(MouseEvent e) {
 				host.setCursor(null);
 			}
 
-			@Override
 			public void mouseEnter(MouseEvent e) {
 			}
 		});
 
 		host.addMouseMoveListener(new MouseMoveListener() {
-			@Override
-			public void mouseMove(final MouseEvent e) {
+			public void mouseMove(MouseEvent e) {
 				if (!draggingSashes) {
 					// Set the cursor feedback
 					List<SashRect> sashList = getSashRects(e.x, e.y);
@@ -103,30 +87,22 @@ public class SashLayout extends Layout {
 								SWT.CURSOR_SIZEALL));
 					}
 				} else {
-					try {
-						layoutUpdateInProgress = true;
-						adjustWeights(sashesToDrag, e.x, e.y);
-						host.layout();
-						host.update();
-					} finally {
-						layoutUpdateInProgress = false;
-					}
+					adjustWeights(sashesToDrag, e.x, e.y);
+					host.layout();
+					host.update();
 				}
 			}
 		});
 
 		host.addMouseListener(new MouseListener() {
-			@Override
 			public void mouseUp(MouseEvent e) {
 				host.setCapture(false);
 				draggingSashes = false;
 			}
 
-			@Override
 			public void mouseDown(MouseEvent e) {
-				if (e.button != 1) {
+				if (e.button != 1)
 					return;
-				}
 
 				sashesToDrag = getSashRects(e.x, e.y);
 				if (sashesToDrag.size() > 0) {
@@ -135,10 +111,29 @@ public class SashLayout extends Layout {
 				}
 			}
 
-			@Override
 			public void mouseDoubleClick(MouseEvent e) {
 			}
 		});
+
+		host.addPaintListener(new PaintListener() {
+			public void paintControl(PaintEvent e) {
+				// for (SashRect sr : sashes) {
+				// Color color;
+				// if (sr.container.isHorizontal())
+				// color = e.display.getSystemColor(SWT.COLOR_MAGENTA);
+				// else
+				// color = e.display.getSystemColor(SWT.COLOR_CYAN);
+				// e.gc.setForeground(color);
+				// e.gc.setBackground(color);
+				// e.gc.fillRectangle(sr.rect);
+				// }
+			}
+		});
+	}
+
+	public void setRootElemenr(MUIElement newRoot) {
+		root = newRoot;
+		host.layout(null, SWT.DEFER);
 	}
 
 	@Override
@@ -216,11 +211,18 @@ public class SashLayout extends Layout {
 	}
 
 	protected List<SashRect> getSashRects(int x, int y) {
-		List<SashRect> srs = new ArrayList<>();
+		List<SashRect> srs = new ArrayList<SashRect>();
+		boolean inSash = false;
+		for (SashRect sr : sashes) {
+			if (sr.rect.contains(x, y))
+				inSash = true;
+		}
+		if (!inSash)
+			return srs;
+
 		Rectangle target = new Rectangle(x - 5, y - 5, 10, 10);
 		for (SashRect sr : sashes) {
-			if (!sr.container.getTags().contains(IPresentationEngine.NO_MOVE)
-					&& sr.rect.intersects(target))
+			if (sr.rect.intersects(target))
 				srs.add(sr);
 		}
 		return srs;
@@ -309,7 +311,7 @@ public class SashLayout extends Layout {
 	}
 
 	private List<MUIElement> getVisibleChildren(MGenericTile<?> sashContainer) {
-		List<MUIElement> visKids = new ArrayList<>();
+		List<MUIElement> visKids = new ArrayList<MUIElement>();
 		for (MUIElement child : sashContainer.getChildren()) {
 			if (child.isToBeRendered() && child.isVisible())
 				visKids.add(child);
@@ -320,14 +322,15 @@ public class SashLayout extends Layout {
 	private static int getWeight(MUIElement element) {
 		String info = element.getContainerData();
 		if (info == null || info.length() == 0) {
-			return 0;
+			element.setContainerData(Integer.toString(100));
+			info = element.getContainerData();
 		}
 
 		try {
 			int value = Integer.parseInt(info);
 			return value;
 		} catch (NumberFormatException e) {
-			return 0;
+			return 500;
 		}
 	}
 }

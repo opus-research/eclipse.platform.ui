@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 Angelo Zerr and others.
+ * Copyright (c) 2008 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,52 +15,45 @@ import org.w3c.dom.css.CSSValue;
 
 public abstract class AbstractCSSPropertyDimensionHandler implements ICSSPropertyDimensionHandler  {
 
-	@Override
 	public void applyCSSPropertyHeight(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
-
+		
 	}
 
-	@Override
 	public void applyCSSPropertyLineHeight(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		// TODO Auto-generated method stub
-
+		
 	}
 
-	@Override
 	public void applyCSSPropertyMaxHeight(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		// TODO Auto-generated method stub
-
+		
 	}
 
-	@Override
 	public void applyCSSPropertyMaxWidth(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		// TODO Auto-generated method stub
-
+		
 	}
 
-	@Override
 	public void applyCSSPropertyMinHeight(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		// TODO Auto-generated method stub
-
+		
 	}
 
-	@Override
 	public void applyCSSPropertyMinWidth(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		// TODO Auto-generated method stub
-
+		
 	}
 
-	@Override
 	public void applyCSSPropertyWidth(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 	public String retrieveCSSPropertyHeight(Object widget, String property,
@@ -87,7 +80,6 @@ public abstract class AbstractCSSPropertyDimensionHandler implements ICSSPropert
 		return null;
 	}
 
-	@Override
 	public boolean applyCSSProperty(Object widget, String property,
 			CSSValue value, String pseudo, CSSEngine engine) throws Exception {
 		// TODO Auto-generated method stub
@@ -100,5 +92,5 @@ public abstract class AbstractCSSPropertyDimensionHandler implements ICSSPropert
 		return null;
 	}
 
-
+	
 }

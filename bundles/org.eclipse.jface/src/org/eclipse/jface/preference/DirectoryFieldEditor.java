@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Baltasar Belyavsky - fix for 300539 - Add ability to specify filter-path
+ *     Baltasar Belyavsky - fix for 300539 - Add ability to specify filter-path     
  *******************************************************************************/
 package org.eclipse.jface.preference;
 
@@ -29,14 +29,14 @@ public class DirectoryFieldEditor extends StringButtonFieldEditor {
     private File filterPath = null;
 
     /**
-     * Creates a new directory field editor
+     * Creates a new directory field editor 
      */
     protected DirectoryFieldEditor() {
     }
 
     /**
      * Creates a directory field editor.
-     *
+     * 
      * @param name the name of the preference this field editor works on
      * @param labelText the label text of the field editor
      * @param parent the parent of the field editor's control
@@ -50,8 +50,11 @@ public class DirectoryFieldEditor extends StringButtonFieldEditor {
         createControl(parent);
     }
 
-    @Override
-	protected String changePressed() {
+    /* (non-Javadoc)
+     * Method declared on StringButtonFieldEditor.
+     * Opens the directory chooser dialog and returns the selected directory.
+     */
+    protected String changePressed() {
         File f = new File(getTextControl().getText());
         if (!f.exists()) {
 			f = null;
@@ -64,8 +67,11 @@ public class DirectoryFieldEditor extends StringButtonFieldEditor {
         return d.getAbsolutePath();
     }
 
-    @Override
-	protected boolean doCheckState() {
+    /* (non-Javadoc)
+     * Method declared on StringFieldEditor.
+     * Checks whether the text input field contains a valid directory.
+     */
+    protected boolean doCheckState() {
         String fileName = getTextControl().getText();
         fileName = fileName.trim();
         if (fileName.length() == 0 && isEmptyStringAllowed()) {
@@ -79,7 +85,7 @@ public class DirectoryFieldEditor extends StringButtonFieldEditor {
      * Helper that opens the directory chooser dialog.
      * @param startingDirectory The directory the dialog will open in.
      * @return File File or <code>null</code>.
-     *
+     * 
      */
     private File getDirectory(File startingDirectory) {
 
@@ -109,5 +115,5 @@ public class DirectoryFieldEditor extends StringButtonFieldEditor {
     public void setFilterPath(File path) {
     	filterPath = path;
     }
-
+    
 }

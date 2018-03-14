@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,12 +25,12 @@ public class ControlEnableState {
      * List of exception controls (element type: <code>Control</code>);
      * <code>null</code> if none.
      */
-    private List<Control> exceptions = null;
+    private List exceptions = null;
 
     /**
      * List of saved states (element type: <code>ItemState</code>).
      */
-    private List<ItemState> states;
+    private List states;
 
     /**
      * Internal class for recording the enable/disable state of a single
@@ -45,7 +45,7 @@ public class ControlEnableState {
 
         /**
          * Create a new instance of the receiver.
-         *
+         * 
          * @param item
          * @param state
          */
@@ -56,7 +56,7 @@ public class ControlEnableState {
 
         /**
          * Restore the enabled state to the original value.
-         *
+         *  
          */
         public void restore() {
             if (item == null || item.isDisposed()) {
@@ -70,7 +70,7 @@ public class ControlEnableState {
      * Creates a new object and saves in it the current enable/disable state of
      * the given control and its descendents; the controls that are saved are
      * also disabled.
-     *
+     * 
      * @param w
      *            the control
      */
@@ -82,16 +82,16 @@ public class ControlEnableState {
      * Creates a new object and saves in it the current enable/disable state of
      * the given control and its descendents except for the given list of
      * exception cases; the controls that are saved are also disabled.
-     *
+     * 
      * @param w
      *            the control
      * @param exceptions
      *            the list of controls to not disable (element type:
      *            <code>Control</code>), or <code>null</code> if none
      */
-    protected ControlEnableState(Control w, List<Control> exceptions) {
+    protected ControlEnableState(Control w, List exceptions) {
         super();
-        states = new ArrayList<>();
+        states = new ArrayList();
         this.exceptions = exceptions;
         readStateForAndDisable(w);
     }
@@ -99,7 +99,7 @@ public class ControlEnableState {
     /**
      * Saves the current enable/disable state of the given control and its
      * descendents in the returned object; the controls are all disabled.
-     *
+     * 
      * @param w
      *            the control
      * @return an object capturing the enable/disable state
@@ -112,7 +112,7 @@ public class ControlEnableState {
      * Saves the current enable/disable state of the given control and its
      * descendents in the returned object except for the given list of exception
      * cases; the controls that are saved are also disabled.
-     *
+     * 
      * @param w
      *            the control
      * @param exceptions
@@ -120,7 +120,7 @@ public class ControlEnableState {
      *            <code>Control</code>)
      * @return an object capturing the enable/disable state
      */
-    public static ControlEnableState disable(Control w, List<Control> exceptions) {
+    public static ControlEnableState disable(Control w, List exceptions) {
         return new ControlEnableState(w, exceptions);
     }
 
@@ -152,7 +152,7 @@ public class ControlEnableState {
     public void restore() {
         int size = states.size();
         for (int i = 0; i < size; i++) {
-            states.get(i).restore();
+            ((ItemState) states.get(i)).restore();
         }
     }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,13 +29,13 @@ import org.eclipse.ui.internal.WorkbenchMessages;
  * the client must call IWorkbenchAction#dispose to give the
  * action an opportunity to deregister its listeners and to perform any other
  * cleanup.
- *
+ * 
  * </p>
  * <p>
  * Note: Despite the name, an import operation can deal with things other than
  * resources; the current name was retained for historical reasons.
  * </p>
- *
+ * 
  * @since 2.0
  * @noextend This class is not intended to be subclassed by clients.
  */
@@ -45,7 +45,7 @@ public class ImportResourcesAction extends BaseSelectionListenerAction
      * Reference to the WorkbenchCommandAction that executes the Import Wizard.
      */
     private ActionFactory.IWorkbenchAction action;
-
+    
     /**
      * The workbench window; or <code>null</code> if this
      * action has been <code>dispose</code>d.
@@ -54,7 +54,7 @@ public class ImportResourcesAction extends BaseSelectionListenerAction
 
     /**
      * Create a new instance of this class.
-     *
+     * 
      * @param window the window
      */
     public ImportResourcesAction(IWorkbenchWindow window) {
@@ -62,11 +62,11 @@ public class ImportResourcesAction extends BaseSelectionListenerAction
         if (window == null) {
             throw new IllegalArgumentException();
         }
-
+        
         this.workbenchWindow = window;
         action = ActionFactory.IMPORT.create(window);
-
-        setText(action.getText());
+        
+        setText(action.getText()); 
         setToolTipText(action.getToolTipText());
         setId(action.getId());
         setActionDefinitionId(action.getActionDefinitionId());
@@ -77,41 +77,41 @@ public class ImportResourcesAction extends BaseSelectionListenerAction
 
     /**
      * Create a new instance of this class
-     *
+     * 
      * @param workbench the workbench
      * @deprecated use the constructor <code>ImportResourcesAction(IWorkbenchWindow)</code>
      */
-    @Deprecated
-	public ImportResourcesAction(IWorkbench workbench) {
+    public ImportResourcesAction(IWorkbench workbench) {
         this(workbench.getActiveWorkbenchWindow());
     }
 
     /**
      * Invoke the Import wizards selection Wizard.
      */
-    @Override
-	public void run() {
+    public void run() {
         if (workbenchWindow == null) {
             // action has been disposed
             return;
         }
-
+        
         action.run();
     }
 
     /**
-     * Sets the current selection.
+     * Sets the current selection. 
      * In for backwards compatability. Use selectionChanged() instead.
      * @param selection the new selection
      * @deprecated
      */
-    @Deprecated
-	public void setSelection(IStructuredSelection selection) {
+    public void setSelection(IStructuredSelection selection) {
         selectionChanged(selection);
     }
 
-    @Override
-	public void dispose() {
+    /* (non-Javadoc)
+     * Method declared on ActionFactory.IWorkbenchAction.
+     * @since 3.0
+     */
+    public void dispose() {
     	workbenchWindow = null;
     	if (action!=null) {
     	action.dispose();

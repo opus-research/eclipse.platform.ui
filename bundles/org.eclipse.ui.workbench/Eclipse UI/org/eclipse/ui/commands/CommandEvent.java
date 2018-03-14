@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@ package org.eclipse.ui.commands;
 
 import java.util.Collections;
 import java.util.Map;
+
 import org.eclipse.ui.internal.util.Util;
 
 /**
@@ -20,14 +21,12 @@ import org.eclipse.ui.internal.util.Util;
  * <p>
  * This class is not intended to be extended by clients.
  * </p>
- *
+ * 
  * @since 3.0
  * @see ICommandListener#commandChanged(CommandEvent)
  * @deprecated Please use the "org.eclipse.core.commands" plug-in instead.
  * @see org.eclipse.core.commands.CommandEvent
  */
-@Deprecated
-@SuppressWarnings("all")
 public final class CommandEvent {
 
     /**
@@ -79,7 +78,7 @@ public final class CommandEvent {
 
     /**
      * Creates a new instance of this class.
-     *
+     * 
      * @param command
      *            the instance of the interface that changed.
      * @param attributeValuesByNameChanged
@@ -140,18 +139,17 @@ public final class CommandEvent {
 
     /**
      * Returns the instance of the interface that changed.
-     *
+     * 
      * @return the instance of the interface that changed. Guaranteed not to be
      *         <code>null</code>.
      */
-	@Deprecated
     public ICommand getCommand() {
         return command;
     }
 
     /**
      * Returns the map of previous attribute values by name.
-     *
+     * 
      * @return the map of previous attribute values by name. This map may be
      *         empty. If this map is not empty, it's collection of keys is
      *         guaranteed to only contain instances of <code>String</code>.
@@ -160,77 +158,69 @@ public final class CommandEvent {
      *         guaranteed to not be null if haveAttributeValuesByNameChanged()
      *         is <code>true</code>.
      */
-	@Deprecated
     public Map getPreviousAttributeValuesByName() {
         return previousAttributeValuesByName;
     }
 
     /**
      * Returns whether or not the categoryId property changed.
-     *
+     * 
      * @return true, iff the categoryId property changed.
      */
-	@Deprecated
     public boolean hasCategoryIdChanged() {
         return categoryIdChanged;
     }
 
     /**
      * Returns whether or not the defined property changed.
-     *
+     * 
      * @return true, iff the defined property changed.
      */
-	@Deprecated
     public boolean hasDefinedChanged() {
         return definedChanged;
     }
 
     /**
      * Returns whether or not the description property changed.
-     *
+     * 
      * @return true, iff the description property changed.
      */
-	@Deprecated
     public boolean hasDescriptionChanged() {
         return descriptionChanged;
     }
 
     /**
      * Returns whether or not the handled property changed.
-     *
+     * 
      * @return true, iff the handled property changed.
      */
-	@Deprecated
     public boolean hasHandledChanged() {
         return handledChanged;
     }
 
     /**
      * Returns whether or not the name property changed.
-     *
+     * 
      * @return true, iff the name property changed.
      */
-	@Deprecated
     public boolean hasNameChanged() {
         return nameChanged;
     }
 
     /**
      * Returns whether or not the attributeValuesByName property changed.
-     *
+     * 
      * @return true, iff the attributeValuesByName property changed.
      */
-	@Deprecated
     public boolean haveAttributeValuesByNameChanged() {
         return attributeValuesByNameChanged;
     }
 
     /**
      * Returns whether or not the keySequenceBindings property changed.
-     *
+     * 
      * @return true, iff the keySequenceBindings property changed.
      */
-	@Deprecated
     public boolean haveKeySequenceBindingsChanged() {
         return keySequenceBindingsChanged;
     }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 474273
  *******************************************************************************/
 
 package org.eclipse.ui.internal.about;
@@ -22,14 +21,14 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.Map.Entry;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.IJobFunction;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.JFaceResources;
@@ -56,7 +55,7 @@ import org.osgi.framework.ServiceReference;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class BundleSigningInfo {
 
@@ -64,6 +63,9 @@ public class BundleSigningInfo {
 	private Text date;
 	private StyledText certificate;
 	private AboutBundleData data;
+
+	public BundleSigningInfo() {
+	}
 
 	public void setData(AboutBundleData data) {
 		this.data = data;
@@ -116,7 +118,7 @@ public class BundleSigningInfo {
 	}
 
 	/**
-	 *
+	 * 
 	 */
 	private void startJobs() {
 		if (!isOpen())
@@ -154,11 +156,11 @@ public class BundleSigningInfo {
 		}
 
 		final AboutBundleData myData = data;
-		final Job signerJob = Job.create(NLS.bind(
+		final Job signerJob = new Job(NLS.bind(
 				WorkbenchMessages.BundleSigningTray_Determine_Signer_For,
-				myData.getId()), new IJobFunction() {
-			@Override
-			public IStatus run(IProgressMonitor monitor) {
+				myData.getId())) {
+
+			protected IStatus run(IProgressMonitor monitor) {
 				try {
 					if (myData != data)
 						return Status.OK_STATUS;
@@ -204,7 +206,6 @@ public class BundleSigningInfo {
 
 					PlatformUI.getWorkbench().getDisplay().asyncExec(
 							new Runnable() {
-								@Override
 								public void run() {
 									// check to see if the tray is still visible
 									// and if
@@ -226,30 +227,31 @@ public class BundleSigningInfo {
 				}
 				return Status.OK_STATUS;
 			}
-		});
+		};
 		signerJob.setSystem(true);
 		signerJob.belongsTo(signerJob);
 		signerJob.schedule();
 
-		Job cleanup = Job.create(WorkbenchMessages.BundleSigningTray_Unget_Signing_Service, new IJobFunction() {
-			@Override
-			public IStatus run(IProgressMonitor monitor) {
+		Job cleanup = new Job(
+				WorkbenchMessages.BundleSigningTray_Unget_Signing_Service) {
+
+			protected IStatus run(IProgressMonitor monitor) {
 				try {
-					Job.getJobManager().join(signerJob, monitor);
+					getJobManager().join(signerJob, monitor);
 				} catch (OperationCanceledException e) {
 				} catch (InterruptedException e) {
 				}
 				bundleContext.ungetService(factoryRef);
 				return Status.OK_STATUS;
 			}
-		});
+		};
 		cleanup.setSystem(true);
 		cleanup.schedule();
 
 	}
 
 	/**
-	 *
+	 * 
 	 */
 	private boolean isOpen() {
 		return certificate != null && !certificate.isDisposed();
