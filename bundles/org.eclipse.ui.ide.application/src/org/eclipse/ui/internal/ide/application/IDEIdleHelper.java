@@ -123,8 +123,8 @@ class IDEIdleHelper {
 			return;
 		}
 		String enabled = System.getProperty(PROP_GC);
-		// since 4.6 gc is turned off by default if property is missing
-		if (enabled == null || enabled.equalsIgnoreCase(Boolean.FALSE.toString())) {
+		//gc is turned on by default if property is missing
+		if (enabled != null && enabled.equalsIgnoreCase(Boolean.FALSE.toString())) {
 			return;
 		}
 		//init gc interval

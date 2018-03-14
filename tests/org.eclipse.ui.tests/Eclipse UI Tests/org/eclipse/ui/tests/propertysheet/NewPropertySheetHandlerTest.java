@@ -22,9 +22,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IViewReference;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
@@ -155,32 +152,12 @@ public class NewPropertySheetHandlerTest extends AbstractPropertySheetTest {
 		assertEquals(selectionProviderView, context.getPart());
 	}
 
-	void hideAndAssertNoParts() {
-		IWorkbenchWindow[] windows = fWorkbench.getWorkbenchWindows();
-		for (IWorkbenchWindow w : windows) {
-			IWorkbenchPage ap = w.getActivePage();
-			hideAndAssertNoParts(ap);
-		}
-	}
-
-	void hideAndAssertNoParts(IWorkbenchPage page) {
-		IViewReference[] viewReferences = page.getViewReferences();
-		for (IViewReference view : viewReferences) {
-			page.hideView(view);
-		}
-		page.closeAllEditors(false);
-		processEvents();
-		assertNull(page.getActivePart());
-	}
-
 	/**
 	 * Test method for
 	 * {@link org.eclipse.ui.tests.propertysheet.TestNewPropertySheetHandler#getShowInContext(org.eclipse.core.commands.ExecutionEvent)}
 	 * .
 	 */
 	public final void testGetShowInContextWithNoActivePart() {
-		hideAndAssertNoParts();
-
 		try {
 			testNewPropertySheetHandler.getShowInContext(getExecutionEvent());
 		} catch (ExecutionException e) {
@@ -199,7 +176,8 @@ public class NewPropertySheetHandlerTest extends AbstractPropertySheetTest {
 	 */
 	public final void testFindPropertySheetWithoutActivePart()
 			throws PartInitException, ExecutionException {
-		hideAndAssertNoParts();
+		assertNull(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+				.getActivePage().getActivePart());
 
 		try {
 			testNewPropertySheetHandler.findPropertySheet(getExecutionEvent(),

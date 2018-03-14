@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 475879
  *******************************************************************************/
 package org.eclipse.jface.action;
 
@@ -781,7 +780,7 @@ public class ActionContributionItem extends ContributionItem {
 								&& acceleratorText.length() != 0) {
 							toolTip = JFaceResources.format(
 									"Toolbar_Tooltip_Accelerator", //$NON-NLS-1$
-									toolTip, acceleratorText);
+									new Object[] { toolTip, acceleratorText });
 						}
 					}
 

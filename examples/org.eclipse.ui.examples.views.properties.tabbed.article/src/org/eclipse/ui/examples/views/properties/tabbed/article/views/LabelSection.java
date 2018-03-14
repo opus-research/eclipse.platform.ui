@@ -43,7 +43,8 @@ public class LabelSection
     private ModifyListener listener = new ModifyListener() {
 
         public void modifyText(ModifyEvent arg0) {
-			ButtonElementProperties properties = (ButtonElementProperties) Adapters.adapt(buttonElement, IPropertySource.class);
+			ButtonElementProperties properties = (ButtonElementProperties) Adapters.getAdapter(buttonElement,
+					IPropertySource.class, true);
 			properties.setPropertyValue(ButtonElementProperties.PROPERTY_TEXT, labelText.getText());
         }
     };
@@ -83,7 +84,8 @@ public class LabelSection
 
     public void refresh() {
 		labelText.removeModifyListener(listener);
-		ButtonElementProperties properties = (ButtonElementProperties) Adapters.adapt(buttonElement, IPropertySource.class);
+		ButtonElementProperties properties = (ButtonElementProperties) Adapters.getAdapter(buttonElement,
+				IPropertySource.class, true);
         labelText.setText(properties.strText);
         labelText.addModifyListener(listener);
     }

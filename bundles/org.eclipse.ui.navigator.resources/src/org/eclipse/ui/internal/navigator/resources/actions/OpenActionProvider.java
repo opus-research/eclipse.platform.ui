@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,6 @@ package org.eclipse.ui.internal.navigator.resources.actions;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.mapping.ResourceMapping;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IMenuManager;
@@ -24,6 +23,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.actions.OpenFileAction;
 import org.eclipse.ui.actions.OpenWithMenu;
+import org.eclipse.ui.internal.navigator.AdaptabilityUtility;
 import org.eclipse.ui.internal.navigator.resources.plugin.WorkbenchNavigatorMessages;
 import org.eclipse.ui.navigator.CommonActionProvider;
 import org.eclipse.ui.navigator.ICommonActionConstants;
@@ -97,10 +97,12 @@ public class OpenActionProvider extends CommonActionProvider {
 		Object o = ss.getFirstElement();
 
 		// first try IResource
-		IAdaptable openable = Adapters.adapt(o, IResource.class);
+		IAdaptable openable = (IAdaptable) AdaptabilityUtility.getAdapter(o,
+				IResource.class);
 		// otherwise try ResourceMapping
 		if (openable == null) {
-			openable = Adapters.adapt(o, ResourceMapping.class);
+			openable = (IAdaptable) AdaptabilityUtility.getAdapter(o,
+					ResourceMapping.class);
 		} else if (((IResource) openable).getType() != IResource.FILE) {
 			openable = null;
 		}

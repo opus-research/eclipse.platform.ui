@@ -24,7 +24,6 @@ import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -503,11 +502,12 @@ public class ExtendedMarkersView extends ViewPart {
 	private void addHelpListener() {
 		// Set help on the view itself
 		viewer.getControl().addHelpListener(e -> {
-			IContextProvider provider = Adapters.adapt(ExtendedMarkersView.this, IContextProvider.class);
+			Object provider = getAdapter(IContextProvider.class);
 			if (provider == null)
 				return;
 
-			IContext context = provider.getContext(viewer.getControl());
+			IContext context = ((IContextProvider) provider)
+					.getContext(viewer.getControl());
 			PlatformUI.getWorkbench().getHelpSystem().displayHelp(context);
 		});
 	}
@@ -1026,9 +1026,9 @@ public class ExtendedMarkersView extends ViewPart {
 
 		builder.restoreState(m);
 
-		IWorkbenchSiteProgressService service = Adapters.adapt(site, IWorkbenchSiteProgressService.class);
+		Object service = site.getAdapter(IWorkbenchSiteProgressService.class);
 		if (service != null) {
-			builder.setProgressService(service);
+			builder.setProgressService((IWorkbenchSiteProgressService) service);
 		}
 		this.memento = m;
 
@@ -1286,7 +1286,7 @@ public class ExtendedMarkersView extends ViewPart {
 	private void setPrimarySortField(MarkerField field, TreeColumn column) {
 		builder.setPrimarySortField(field);
 
-		IWorkbenchSiteProgressService service = Adapters.adapt(getViewSite(), IWorkbenchSiteProgressService.class);
+		IWorkbenchSiteProgressService service = getViewSite().getAdapter(IWorkbenchSiteProgressService.class);
 		builder.refreshContents(service);
 		updateDirectionIndicator(column, field);
 	}
@@ -1707,7 +1707,7 @@ public class ExtendedMarkersView extends ViewPart {
 	 * @since 3.7
 	 */
 	protected IUndoContext getUndoContext() {
-		return Adapters.adapt(ResourcesPlugin.getWorkspace(), IUndoContext.class);
+		return ResourcesPlugin.getWorkspace().getAdapter(IUndoContext.class);
 	}
 
 	/**
