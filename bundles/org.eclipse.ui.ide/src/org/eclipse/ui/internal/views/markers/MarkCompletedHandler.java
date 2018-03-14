@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007,2015 IBM Corporation and others.
+ * Copyright (c) 2007,2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,39 +31,55 @@ import org.eclipse.ui.views.markers.internal.MarkerMessages;
 /**
  * MarkCompletedHandler is the handler for marking the current selection as
  * completed.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class MarkCompletedHandler extends MarkerViewHandler {
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
 	@Override
 	public Object execute(ExecutionEvent event) {
 
 		final ExecutionEvent finalEvent = event;
 		try {
-			PlatformUI.getWorkbench().getProgressService().run(true, true, new IRunnableWithProgress() {
-				@Override
-				public void run(IProgressMonitor monitor) {
-					monitor.beginTask(MarkerMessages.markCompletedHandler_task, 100);
-					IMarker[] markers = getSelectedMarkers(finalEvent);
-					if (markers.length == 0) {
-						return;
-					}
+			PlatformUI.getWorkbench().getProgressService().run(true, true,
+					new IRunnableWithProgress() {
+						/*
+						 * (non-Javadoc)
+						 * 
+						 * @see org.eclipse.jface.operation.IRunnableWithProgress#run(org.eclipse.core.runtime.IProgressMonitor)
+						 */
+						@Override
+						public void run(IProgressMonitor monitor) {
+							monitor.beginTask(
+									MarkerMessages.markCompletedHandler_task,
+									100);
+							IMarker[] markers = getSelectedMarkers(finalEvent);
+							if (markers.length == 0)
+								return;
 
-					Map<String, Boolean> attrs = new HashMap<>();
-					attrs.put(IMarker.DONE, Boolean.TRUE);
-					IUndoableOperation op = new UpdateMarkersOperation(markers, attrs,
-							MarkerMessages.markCompletedAction_title, true);
+							Map attrs = new HashMap();
+							attrs.put(IMarker.DONE, Boolean.TRUE);
+							IUndoableOperation op = new UpdateMarkersOperation(
+									markers, attrs,
+									MarkerMessages.markCompletedAction_title,
+									true);
 
-					monitor.worked(20);
-					if(monitor.isCanceled()) {
-						return;
-					}
-					execute(op, MarkerMessages.markCompletedAction_title, new SubProgressMonitor(monitor, 80), null);
-					monitor.done();
-				}
-			});
+							monitor.worked(20);
+							if(monitor.isCanceled())
+								return;
+							execute(op,
+									MarkerMessages.markCompletedAction_title,
+									new SubProgressMonitor(monitor, 80), null);
+							monitor.done();
+
+						}
+					});
 		} catch (InvocationTargetException e) {
 			StatusManager.getManager().handle(
 					StatusUtil.newStatus(IStatus.ERROR,

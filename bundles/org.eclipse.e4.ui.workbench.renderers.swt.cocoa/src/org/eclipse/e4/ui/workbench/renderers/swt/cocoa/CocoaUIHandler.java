@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Adobe Systems, Inc. and others.
+ * Copyright (c) 2008, 2014 Adobe Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     Adobe Systems, Inc. - initial API and implementation
  *     IBM Corporation - cleanup
  *     Brian de Alwis - adapted to e4
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 462407
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt.cocoa;
 
@@ -18,6 +17,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import org.eclipse.core.commands.ParameterizedCommand;
@@ -33,7 +33,6 @@ import org.eclipse.e4.core.services.contributions.IContributionFactory;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.statusreporter.StatusReporter;
 import org.eclipse.e4.ui.bindings.EBindingService;
-import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.ui.MContext;
@@ -69,7 +68,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
-import org.osgi.service.event.Event;
+import org.osgi.service.event.EventHandler;
 
 /**
  * The {@link CocoaUIHandler} is a port of the Eclipse 3.x
@@ -77,10 +76,10 @@ import org.osgi.service.event.Event;
  * redirects the standard MacOS X "About", "Preferences...", and "Quit" menu
  * items to link them to the corresponding workbench commands, as well as
  * hooking in Close-Dialog behavior.
- *
+ * 
  * This functionality uses Cocoa-specific natives as SWT doesn't provide an
  * abstraction for the application menu.
- *
+ * 
  * @since 1.0
  */
 public class CocoaUIHandler {
@@ -98,7 +97,8 @@ public class CocoaUIHandler {
 	/* This callback is not freed */
 	@SuppressWarnings("restriction")
 	static Callback proc3Args;
-	static final byte[] SWT_OBJECT = { 'S', 'W', 'T', '_', 'O', 'B', 'J', 'E', 'C', 'T', '\0' };
+	static final byte[] SWT_OBJECT = { 'S', 'W', 'T', '_', 'O', 'B', 'J', 'E',
+			'C', 'T', '\0' };
 
 	SWTCocoaEnhancerDelegate delegate;
 	private long delegateJniRef;
@@ -123,8 +123,14 @@ public class CocoaUIHandler {
 	@Optional
 	protected IPresentationEngine engine;
 
+	private EventHandler shellListener;
+	private EventHandler menuListener;
+	private EventHandler menuContributionListener;
+	private EventHandler commandListener;
+	private EventHandler tagListener;
+
 	/**
-	 *
+	 * 
 	 */
 	private void registerSelectors() {
 		try {
@@ -141,8 +147,10 @@ public class CocoaUIHandler {
 	}
 
 	@SuppressWarnings("restriction")
-	private void setupDelegateClass() throws SecurityException, NoSuchMethodException, IllegalArgumentException,
-			IllegalAccessException, InvocationTargetException, NoSuchFieldException {
+	private void setupDelegateClass() throws SecurityException,
+			NoSuchMethodException, IllegalArgumentException,
+			IllegalAccessException, InvocationTargetException,
+			NoSuchFieldException {
 		// TODO: These should either move out of Display or be accessible to
 		// this class.
 		byte[] types = { '*', '\0' };
@@ -152,7 +160,8 @@ public class CocoaUIHandler {
 
 		proc3Args = new Callback(clazz, "actionProc", 3); //$NON-NLS-1$
 		// call getAddress
-		Method getAddress = Callback.class.getMethod("getAddress", new Class[0]); //$NON-NLS-1$
+		Method getAddress = Callback.class
+				.getMethod("getAddress", new Class[0]); //$NON-NLS-1$
 		Object object = getAddress.invoke(proc3Args);
 		long proc3 = convertToLong(object);
 		if (proc3 == 0)
@@ -161,25 +170,30 @@ public class CocoaUIHandler {
 		// call objc_allocateClassPair
 		Field field = OS.class.getField("class_NSObject"); //$NON-NLS-1$
 		Object fieldObj = field.get(OS.class);
-		object = invokeMethod(OS.class, "objc_allocateClassPair", //$NON-NLS-1$
-				new Object[] { fieldObj, "SWTCocoaEnhancerDelegate", wrapPointer(0) }); //$NON-NLS-1$
+		object = invokeMethod(
+				OS.class,
+				"objc_allocateClassPair", new Object[] { fieldObj, "SWTCocoaEnhancerDelegate", wrapPointer(0) }); //$NON-NLS-1$ //$NON-NLS-2$
 		long cls = convertToLong(object);
 
 		invokeMethod(OS.class, "class_addIvar", new Object[] { //$NON-NLS-1$
-				wrapPointer(cls), SWT_OBJECT, wrapPointer(size), new Byte((byte) align), types });
+				wrapPointer(cls), SWT_OBJECT, wrapPointer(size),
+						new Byte((byte) align), types });
 
 		// Add the action callback
-		invokeMethod(OS.class, "class_addMethod", //$NON-NLS-1$
-				new Object[] { wrapPointer(cls), wrapPointer(sel_toolbarButtonClicked_), wrapPointer(proc3), "@:@" }); //$NON-NLS-1$
+		invokeMethod(
+				OS.class,
+				"class_addMethod", new Object[] { wrapPointer(cls), wrapPointer(sel_toolbarButtonClicked_), wrapPointer(proc3), "@:@" }); //$NON-NLS-1$ //$NON-NLS-2$
 		invokeMethod(OS.class, "objc_registerClassPair", //$NON-NLS-1$
 				new Object[] { wrapPointer(cls) });
 	}
 
 	@SuppressWarnings("restriction")
-	private long registerName(String name) throws IllegalArgumentException, SecurityException, IllegalAccessException,
+	private long registerName(String name) throws IllegalArgumentException,
+			SecurityException, IllegalAccessException,
 			InvocationTargetException, NoSuchMethodException {
 		Class<OS> clazz = OS.class;
-		Object object = invokeMethod(clazz, "sel_registerName", new Object[] { name }); //$NON-NLS-1$
+		Object object = invokeMethod(clazz,
+				"sel_registerName", new Object[] { name }); //$NON-NLS-1$
 		return convertToLong(object);
 	}
 
@@ -194,6 +208,7 @@ public class CocoaUIHandler {
 				allocateDelegate(display);
 
 				hookApplicationMenu();
+				hookWorkbenchListeners();
 				processModelMenus();
 
 				// modify all shells opened on startup
@@ -212,8 +227,10 @@ public class CocoaUIHandler {
 			delegate = new SWTCocoaEnhancerDelegate();
 			delegate.alloc().init();
 			// call OS.NewGlobalRef
-			Method method = OS.class.getMethod("NewGlobalRef", new Class[] { Object.class }); //$NON-NLS-1$
-			Object object = method.invoke(OS.class, new Object[] { CocoaUIHandler.this });
+			Method method = OS.class.getMethod(
+					"NewGlobalRef", new Class[] { Object.class }); //$NON-NLS-1$
+			Object object = method.invoke(OS.class,
+					new Object[] { CocoaUIHandler.this });
 			delegateJniRef = convertToLong(object);
 		} catch (Exception e) {
 			// theoretically, one of
@@ -228,13 +245,16 @@ public class CocoaUIHandler {
 			Field idField = SWTCocoaEnhancerDelegate.class.getField("id"); //$NON-NLS-1$
 			Object idValue = idField.get(delegate);
 			invokeMethod(OS.class, "object_setInstanceVariable", //$NON-NLS-1$
-					new Object[] { idValue, SWT_OBJECT, wrapPointer(delegateJniRef) });
+					new Object[] { idValue, SWT_OBJECT,
+							wrapPointer(delegateJniRef) });
 			display.disposeExec(new Runnable() {
 				public void run() {
 					// TODO Auto-generated method stub
 					if (delegateJniRef != 0) {
 						try {
-							invokeMethod(OS.class, "DeleteGlobalRef", new Object[] { wrapPointer(delegateJniRef) }); //$NON-NLS-1$
+							invokeMethod(
+									OS.class,
+									"DeleteGlobalRef", new Object[] { wrapPointer(delegateJniRef) }); //$NON-NLS-1$
 						} catch (Exception e) {
 							// theoretically, one of
 							// SecurityException,Illegal*Exception,InvocationTargetException,NoSuch*Exception
@@ -254,6 +274,26 @@ public class CocoaUIHandler {
 			// SecurityException,Illegal*Exception,InvocationTargetException,NoSuch*Exception
 			// not expected to happen at all.
 			log(e);
+		}
+	}
+
+	/** Unconfigure the handler */
+	@PreDestroy
+	public void dispose() {
+		if (shellListener != null) {
+			eventBroker.unsubscribe(shellListener);
+		}
+		if (menuListener != null) {
+			eventBroker.unsubscribe(menuListener);
+		}
+		if (menuContributionListener != null) {
+			eventBroker.unsubscribe(menuContributionListener);
+		}
+		if (commandListener != null) {
+			eventBroker.unsubscribe(commandListener);
+		}
+		if (tagListener != null) {
+			eventBroker.unsubscribe(tagListener);
 		}
 	}
 
@@ -284,77 +324,97 @@ public class CocoaUIHandler {
 
 	void log(Exception e) {
 		// StatusUtil.handleStatus(e, StatusManager.LOG);
-		statusReporter.get().report(new Status(IStatus.WARNING, CocoaUIProcessor.FRAGMENT_ID,
-				"Exception occurred during CocoaUI processing", e), StatusReporter.LOG); //$NON-NLS-1$
-	}
-
-	/*
-	 * Listeners to tweak newly-opened workbench window shells with the proper
-	 * OS flags.
-	 */
-
-	/** Watch for a window's "widget" attribute being flipped to a shell */
-	@Inject
-	@Optional
-	private void monitorShellTopicChanges(@UIEventTopic(UIEvents.UIElement.TOPIC_WIDGET) Event event) {
-		if (event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MWindow
-				&& event.getProperty(UIEvents.EventTags.NEW_VALUE) != null) {
-			MWindow window = (MWindow) event.getProperty(UIEvents.EventTags.ELEMENT);
-			modifyWindowShell(window);
-			updateFullScreenStatus(window);
-		}
+		statusReporter
+				.get()
+				.report(new Status(IStatus.WARNING,
+						CocoaUIProcessor.FRAGMENT_ID,
+						"Exception occurred during CocoaUI processing", e), StatusReporter.LOG); //$NON-NLS-1$
 	}
 
 	/**
-	 * Handle the Eclipse 4.0 compatibility case, where the window is created
-	 * without a main menu or trim first, and then later when the main menu is
-	 * being set it is time for us to do our work. It also handles dynamically
-	 * created windows too.
+	 * Hooks a listener that tweaks newly opened workbench window shells with
+	 * the proper OS flags.
 	 */
-	@Inject
-	@Optional
-	private void monitorMainMenuTopicChanges(@UIEventTopic(UIEvents.Window.TOPIC_MAINMENU) Event event) {
-		Object newValue = event.getProperty(UIEvents.EventTags.NEW_VALUE);
-		Object oldValue = event.getProperty(UIEvents.EventTags.OLD_VALUE);
-		Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
-		if (element instanceof MWindow && oldValue == null && newValue instanceof MMenu) {
-			modifyWindowShell((MWindow) element);
-		}
-	}
-
-	/** Watch for new menu contributions */
-	@Inject
-	@Optional
-	private void monitorMenuContributionsChanges(
-			@UIEventTopic(UIEvents.MenuContributions.TOPIC_MENUCONTRIBUTIONS) Event event) {
-		if (event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenuContribution
-				&& event.getProperty(UIEvents.EventTags.NEW_VALUE) != null) {
-			MMenuContribution contribution = (MMenuContribution) event.getProperty(UIEvents.EventTags.ELEMENT);
-			processMenuContribution(contribution);
-		}
-	}
-
-	/** Watch for command changes */
-	@Inject
-	@Optional
-	private void monitorCommandChanges(@UIEventTopic(UIEvents.Application.TOPIC_COMMANDS) Event event) {
-		if (event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MCommand) {
-			MCommand cmd = (MCommand) event.getProperty(UIEvents.EventTags.ELEMENT);
-			String id = cmd.getElementId();
-			if (COMMAND_ID_ABOUT.equals(id) || COMMAND_ID_PREFERENCES.equals(id) || COMMAND_ID_QUIT.equals(id)) {
-				hookApplicationMenu();
+	protected void hookWorkbenchListeners() {
+		// watch for a window's "widget" attribute being flipped to a shell
+		shellListener = new EventHandler() {
+			public void handleEvent(org.osgi.service.event.Event event) {
+				if (event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MWindow
+						&& event.getProperty(UIEvents.EventTags.NEW_VALUE) != null) {
+					MWindow window = (MWindow) event
+							.getProperty(UIEvents.EventTags.ELEMENT);
+					modifyWindowShell(window);
+					updateFullScreenStatus(window);
+				}
 			}
-		}
-	}
+		};
+		eventBroker.subscribe(UIEvents.UIElement.TOPIC_WIDGET, shellListener);
 
-	/** Watch for a window's full-screen tag being flipped */
-	@Inject
-	@Optional
-	private void monitorApplicationTagChanges(@UIEventTopic(UIEvents.ApplicationElement.TOPIC_TAGS) Event event) {
-		if (event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MWindow) {
-			MWindow window = (MWindow) event.getProperty(UIEvents.EventTags.ELEMENT);
-			updateFullScreenStatus(window);
-		}
+		// this listener is handling the Eclipse 4.0 compatibility case,
+		// where the window is created without a main menu or trim first,
+		// and then later when the main menu is being set it is time
+		// for us to do our work. It also handles dynamically created
+		// windows too.
+		menuListener = new EventHandler() {
+			public void handleEvent(org.osgi.service.event.Event event) {
+				Object newValue = event
+						.getProperty(UIEvents.EventTags.NEW_VALUE);
+				Object oldValue = event
+						.getProperty(UIEvents.EventTags.OLD_VALUE);
+				Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
+				if (element instanceof MWindow && oldValue == null
+						&& newValue instanceof MMenu) {
+					modifyWindowShell((MWindow) element);
+				}
+			}
+		};
+		eventBroker.subscribe(UIEvents.Window.TOPIC_MAINMENU, menuListener);
+
+		// watch for new menu contributions
+		menuContributionListener = new EventHandler() {
+			public void handleEvent(org.osgi.service.event.Event event) {
+				if (event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenuContribution
+						&& event.getProperty(UIEvents.EventTags.NEW_VALUE) != null) {
+					MMenuContribution contribution = (MMenuContribution) event
+							.getProperty(UIEvents.EventTags.ELEMENT);
+					processMenuContribution(contribution);
+				}
+			}
+		};
+		eventBroker.subscribe(
+				UIEvents.MenuContributions.TOPIC_MENUCONTRIBUTIONS,
+				menuContributionListener);
+
+		// watch for command changes
+		commandListener = new EventHandler() {
+			public void handleEvent(org.osgi.service.event.Event event) {
+				if (event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MCommand) {
+					MCommand cmd = (MCommand) event
+							.getProperty(UIEvents.EventTags.ELEMENT);
+					String id = cmd.getElementId();
+					if (COMMAND_ID_ABOUT.equals(id)
+							|| COMMAND_ID_PREFERENCES.equals(id)
+							|| COMMAND_ID_QUIT.equals(id)) {
+						hookApplicationMenu();
+					}
+				}
+			}
+		};
+		eventBroker.subscribe(UIEvents.Application.TOPIC_COMMANDS,
+				commandListener);
+
+		// watch for a window's full-screen tag being flipped
+		tagListener = new EventHandler() {
+			public void handleEvent(org.osgi.service.event.Event event) {
+				if (event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MWindow) {
+					MWindow window = (MWindow) event
+							.getProperty(UIEvents.EventTags.ELEMENT);
+					updateFullScreenStatus(window);
+				}
+			}
+		};
+		eventBroker.subscribe(UIEvents.ApplicationElement.TOPIC_TAGS,
+				tagListener);
 	}
 
 	/**
@@ -370,7 +430,7 @@ public class CocoaUIHandler {
 	/**
 	 * Modify the given workbench window shell bits to show the tool bar toggle
 	 * button.
-	 *
+	 * 
 	 * @param window
 	 *            the window to modify
 	 * @since 3.2
@@ -394,7 +454,8 @@ public class CocoaUIHandler {
 		// use this fragment without fear that their explicitly invisible bars
 		// can't be shown.
 		boolean trimInitiallyVisible = false;
-		if (window instanceof MTrimmedWindow && !((MTrimmedWindow) window).getTrimBars().isEmpty()) {
+		if (window instanceof MTrimmedWindow
+				&& !((MTrimmedWindow) window).getTrimBars().isEmpty()) {
 			for (MTrimBar tb : ((MTrimmedWindow) window).getTrimBars()) {
 				if (tb.isVisible()) {
 					trimInitiallyVisible = true;
@@ -424,11 +485,15 @@ public class CocoaUIHandler {
 			// control it.
 			try {
 				Object fieldValue = wrapPointer(NSWindowToolbarButton);
-				NSButton toolbarButton = (NSButton) invokeMethod(NSWindow.class, nsWindow, "standardWindowButton", //$NON-NLS-1$
-						new Object[] { fieldValue });
+				NSButton toolbarButton = (NSButton) invokeMethod(
+						NSWindow.class, nsWindow,
+						"standardWindowButton", new Object[] { fieldValue }); //$NON-NLS-1$
 				if (toolbarButton != null) {
 					toolbarButton.setTarget(delegate);
-					invokeMethod(NSControl.class, toolbarButton, "setAction", //$NON-NLS-1$
+					invokeMethod(
+							NSControl.class,
+							toolbarButton,
+							"setAction", //$NON-NLS-1$
 							new Object[] { wrapPointer(sel_toolbarButtonClicked_) });
 				}
 			} catch (Exception e) {
@@ -455,8 +520,10 @@ public class CocoaUIHandler {
 
 	private void redirectHandledMenuItem(MMenuItem item) {
 		String elmtId = item.getElementId();
-		if (elmtId != null && (elmtId.equals(COMMAND_ID_ABOUT) || elmtId.equals(COMMAND_ID_PREFERENCES)
-				|| elmtId.equals(COMMAND_ID_QUIT))) {
+		if (elmtId != null
+				&& (elmtId.equals(COMMAND_ID_ABOUT)
+						|| elmtId.equals(COMMAND_ID_PREFERENCES) || elmtId
+							.equals(COMMAND_ID_QUIT))) {
 			item.setVisible(false);
 			item.setToBeRendered(false);
 			if (engine != null) {
@@ -464,9 +531,12 @@ public class CocoaUIHandler {
 			}
 		} else if (item instanceof MHandledMenuItem) {
 			MHandledMenuItem mhmi = (MHandledMenuItem) item;
-			elmtId = mhmi.getCommand() == null ? null : mhmi.getCommand().getElementId();
-			if (elmtId != null && (elmtId.equals(COMMAND_ID_ABOUT) || elmtId.equals(COMMAND_ID_PREFERENCES)
-					|| elmtId.equals(COMMAND_ID_QUIT))) {
+			elmtId = mhmi.getCommand() == null ? null : mhmi.getCommand()
+					.getElementId();
+			if (elmtId != null
+					&& (elmtId.equals(COMMAND_ID_ABOUT)
+							|| elmtId.equals(COMMAND_ID_PREFERENCES) || elmtId
+								.equals(COMMAND_ID_QUIT))) {
 				item.setVisible(false);
 				item.setToBeRendered(false);
 				if (engine != null) {
@@ -485,7 +555,8 @@ public class CocoaUIHandler {
 
 	private void hookAppMenuItem(int menuItemId, final String commandId) {
 		final Display display = Display.getDefault();
-		Menu[] menusToCheck = new Menu[] { display.getMenuBar(), display.getSystemMenu() };
+		Menu[] menusToCheck = new Menu[] { display.getMenuBar(),
+				display.getSystemMenu() };
 		for (Menu topLevelMenu : menusToCheck) {
 			if (topLevelMenu == null) {
 				continue;
@@ -521,7 +592,7 @@ public class CocoaUIHandler {
 	/**
 	 * Locate an action (a menu item, actually) with the given id in the current
 	 * menu bar and run it.
-	 *
+	 * 
 	 * @param actionId
 	 *            the action to find
 	 * @return true if an action was found, false otherwise
@@ -585,26 +656,33 @@ public class CocoaUIHandler {
 		if (item instanceof MDirectMenuItem) {
 			MDirectMenuItem dmi = (MDirectMenuItem) item;
 			if (dmi.getObject() == null) {
-				IContributionFactory cf = (IContributionFactory) lclContext.get(IContributionFactory.class.getName());
+				IContributionFactory cf = (IContributionFactory) lclContext
+						.get(IContributionFactory.class.getName());
 				dmi.setObject(cf.create(dmi.getContributionURI(), lclContext));
 			}
 			lclContext.set(MItem.class.getName(), item);
-			ContextInjectionFactory.invoke(dmi.getObject(), Execute.class, lclContext);
+			ContextInjectionFactory.invoke(dmi.getObject(), Execute.class,
+					lclContext);
 			lclContext.remove(MItem.class.getName());
 		} else if (item instanceof MHandledMenuItem) {
 			MHandledMenuItem hmi = (MHandledMenuItem) item;
-			EHandlerService service = (EHandlerService) lclContext.get(EHandlerService.class.getName());
+			EHandlerService service = (EHandlerService) lclContext
+					.get(EHandlerService.class.getName());
 			ParameterizedCommand cmd = hmi.getWbCommand();
 			if (cmd == null) {
-				cmd = HandledMenuItemRenderer.generateParameterizedCommand(hmi, lclContext);
+				cmd = HandledMenuItemRenderer.generateParameterizedCommand(hmi,
+						lclContext);
 			}
 			lclContext.set(MItem.class.getName(), item);
 			service.executeHandler(cmd);
 			lclContext.remove(MItem.class.getName());
 		} else {
-			statusReporter.get()
-					.report(new Status(IStatus.WARNING, CocoaUIProcessor.FRAGMENT_ID,
-							"Unhandled menu type: " + item.getClass() + ": " + item), //$NON-NLS-1$ //$NON-NLS-2$
+			statusReporter
+					.get()
+					.report(new Status(
+							IStatus.WARNING,
+							CocoaUIProcessor.FRAGMENT_ID,
+							"Unhandled menu type: " + item.getClass() + ": " + item), //$NON-NLS-1$ //$NON-NLS-2$ $NON-NLS-2$
 					StatusReporter.LOG);
 		}
 	}
@@ -618,7 +696,7 @@ public class CocoaUIHandler {
 
 	/**
 	 * Delegate to the handler for the provided command id.
-	 *
+	 * 
 	 * @param commandId
 	 * @return true if the command was found, false otherwise
 	 */
@@ -626,7 +704,8 @@ public class CocoaUIHandler {
 		if (commandService == null || handlerService == null) {
 			return false;
 		}
-		ParameterizedCommand cmd = commandService.createCommand(commandId, null);
+		ParameterizedCommand cmd = commandService.createCommand(commandId,
+				null);
 		if (cmd == null) {
 			return false;
 		}
@@ -641,7 +720,7 @@ public class CocoaUIHandler {
 	 * Find the action with the given ID by recursively crawling the provided
 	 * menu manager. If the action cannot be found <code>null</code> is
 	 * returned.
-	 *
+	 * 
 	 * @param actionId
 	 *            the id to search for
 	 * @param menu
@@ -655,11 +734,14 @@ public class CocoaUIHandler {
 		for (MMenuElement item : menu.getChildren()) {
 			if (item instanceof MMenuItem) {
 				MMenuItem mmi = (MMenuItem) item;
-				if (mmi.getElementId() != null && mmi.getElementId().equals(actionId))
+				if (mmi.getElementId() != null
+						&& mmi.getElementId().equals(actionId))
 					return mmi;
 				if (mmi instanceof MHandledMenuItem) {
 					MHandledMenuItem mhmi = (MHandledMenuItem) mmi;
-					if (mhmi.getCommand() != null && actionId.equals(mhmi.getCommand().getElementId())) {
+					if (mhmi.getCommand() != null
+							&& actionId
+									.equals(mhmi.getCommand().getElementId())) {
 						return mmi;
 					}
 				}
@@ -683,7 +765,8 @@ public class CocoaUIHandler {
 			Object idValue = idField.get(window);
 
 			Display display = Display.getCurrent();
-			Widget widget = (Widget) invokeMethod(Display.class, display, "findWidget", new Object[] { idValue }); //$NON-NLS-1$
+			Widget widget = (Widget) invokeMethod(Display.class, display,
+					"findWidget", new Object[] { idValue }); //$NON-NLS-1$
 
 			if (!(widget instanceof Shell)) {
 				return;
@@ -715,8 +798,8 @@ public class CocoaUIHandler {
 		if (jniRef[0] == 0)
 			return 0;
 
-		CocoaUIHandler delegate = (CocoaUIHandler) invokeMethod(OS.class, "JNIGetObject", //$NON-NLS-1$
-				new Object[] { wrapPointer(jniRef[0]) });
+		CocoaUIHandler delegate = (CocoaUIHandler) invokeMethod(OS.class,
+				"JNIGetObject", new Object[] { wrapPointer(jniRef[0]) }); //$NON-NLS-1$
 
 		if (sel == sel_toolbarButtonClicked_) {
 			NSControl source = new_NSControl(arg0);
@@ -730,11 +813,14 @@ public class CocoaUIHandler {
 	// class, using ints or longs as required based on platform.
 
 	@SuppressWarnings("restriction")
-	private static NSControl new_NSControl(long arg0) throws NoSuchMethodException, InstantiationException,
-			IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+	private static NSControl new_NSControl(long arg0)
+			throws NoSuchMethodException, InstantiationException,
+			IllegalArgumentException, IllegalAccessException,
+			InvocationTargetException {
 		Class<NSControl> clazz = NSControl.class;
 		Class<?> PTR_CLASS = C.PTR_SIZEOF == 8 ? long.class : int.class;
-		Constructor<NSControl> constructor = clazz.getConstructor(new Class[] { PTR_CLASS });
+		Constructor<NSControl> constructor = clazz
+				.getConstructor(new Class[] { PTR_CLASS });
 		return constructor.newInstance(new Object[] { wrapPointer(arg0) });
 	}
 
@@ -743,8 +829,10 @@ public class CocoaUIHandler {
 	 * the usual invocation that custom code is warranted.
 	 */
 	@SuppressWarnings("restriction")
-	private static long[] OS_object_getInstanceVariable(long delegateId, byte[] name) throws IllegalArgumentException,
-			IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException {
+	private static long[] OS_object_getInstanceVariable(long delegateId,
+			byte[] name) throws IllegalArgumentException,
+			IllegalAccessException, InvocationTargetException,
+			SecurityException, NoSuchMethodException {
 		Class<OS> clazz = OS.class;
 		Method method = null;
 		Class<?> PTR_CLASS = C.PTR_SIZEOF == 8 ? long.class : int.class;
@@ -752,13 +840,15 @@ public class CocoaUIHandler {
 			method = clazz.getMethod("object_getInstanceVariable", new Class[] { //$NON-NLS-1$
 					long.class, byte[].class, long[].class });
 			long[] resultPtr = new long[1];
-			method.invoke(null, new Object[] { new Long(delegateId), name, resultPtr });
+			method.invoke(null, new Object[] { new Long(delegateId), name,
+					resultPtr });
 			return resultPtr;
 		} else {
 			method = clazz.getMethod("object_getInstanceVariable", new Class[] { //$NON-NLS-1$
 					int.class, byte[].class, int[].class });
 			int[] resultPtr = new int[1];
-			method.invoke(null, new Object[] { new Integer((int) delegateId), name, resultPtr });
+			method.invoke(null, new Object[] { new Integer((int) delegateId),
+					name, resultPtr });
 			return new long[] { resultPtr[0] };
 		}
 	}
@@ -775,15 +865,17 @@ public class CocoaUIHandler {
 		return 0;
 	}
 
-	private static Object invokeMethod(Class<?> clazz, String methodName, Object[] args)
-			throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException,
-			NoSuchMethodException {
+	private static Object invokeMethod(Class<?> clazz, String methodName,
+			Object[] args) throws IllegalArgumentException,
+			IllegalAccessException, InvocationTargetException,
+			SecurityException, NoSuchMethodException {
 		return invokeMethod(clazz, null, methodName, args);
 	}
 
-	private static Object invokeMethod(Class<?> clazz, Object target, String methodName, Object[] args)
-			throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException,
-			NoSuchMethodException {
+	private static Object invokeMethod(Class<?> clazz, Object target,
+			String methodName, Object[] args) throws IllegalArgumentException,
+			IllegalAccessException, InvocationTargetException,
+			SecurityException, NoSuchMethodException {
 		Class<?>[] signature = new Class<?>[args.length];
 		for (int i = 0; i < args.length; i++) {
 			Class<?> thisClass = args[i].getClass();

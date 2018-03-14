@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Versant Corp. and others.
+ * Copyright (c) 2008, 2009 Versant Corp. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Markus Alexander Kuppe (Versant Corp.) - https://bugs.eclipse.org/248103
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 460405
  ******************************************************************************/
 
 package org.eclipse.ui.views.properties;
@@ -43,7 +42,7 @@ public class NewPropertySheetHandler extends AbstractHandler {
 	/**
 	 * First tries to find a suitable instance to reuse for the given context,
 	 * then creates a new instance if necessary.
-	 *
+	 * 
 	 * @param event
 	 * @return an instance for the given context
 	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
@@ -84,7 +83,7 @@ public class NewPropertySheetHandler extends AbstractHandler {
 			PropertySheet sheet = (PropertySheet) activePart;
 			return (PropertyShowInContext) sheet.getShowInContext();
 		}
-		IShowInSource adapter = activePart
+		IShowInSource adapter = (IShowInSource) activePart
 				.getAdapter(IShowInSource.class);
 		if (adapter != null) {
 			ShowInContext showInContext = adapter.getShowInContext();
@@ -96,7 +95,7 @@ public class NewPropertySheetHandler extends AbstractHandler {
 
 	/**
 	 * Returns a PropertySheet instance
-	 *
+	 * 
 	 * @param event
 	 * @param context
 	 *            a {@link ShowInContext} to handle
