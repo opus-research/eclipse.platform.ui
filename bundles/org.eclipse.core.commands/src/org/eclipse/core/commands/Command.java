@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2012 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.core.commands;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Arrays;
 
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.commands.util.Tracing;
@@ -47,56 +48,56 @@ import org.eclipse.core.runtime.SafeRunner;
  * <p>
  * Commands are mutable and will change as their definition changes.
  * </p>
- * 
+ *
  * @since 3.1
  */
-public final class Command extends NamedHandleObjectWithState implements
-		Comparable {
+@SuppressWarnings("rawtypes")
+public final class Command extends NamedHandleObjectWithState implements Comparable {
 
 	/**
 	 * This flag can be set to <code>true</code> if commands should print
 	 * information to <code>System.out</code> when executing.
 	 */
-	public static boolean DEBUG_COMMAND_EXECUTION = false;
+	public static boolean DEBUG_COMMAND_EXECUTION;
 
 	/**
 	 * This flag can be set to <code>true</code> if commands should print
 	 * information to <code>System.out</code> when changing handlers.
 	 */
-	public static boolean DEBUG_HANDLERS = false;
+	public static boolean DEBUG_HANDLERS;
 
 	/**
 	 * This flag can be set to a particular command identifier if only that
 	 * command should print information to <code>System.out</code> when
 	 * changing handlers.
 	 */
-	public static String DEBUG_HANDLERS_COMMAND_ID = null;
+	public static String DEBUG_HANDLERS_COMMAND_ID;
 
 	/**
 	 * The category to which this command belongs. This value should not be
 	 * <code>null</code> unless the command is undefined.
 	 */
-	private Category category = null;
+	private Category category;
 
 	/**
 	 * A collection of objects listening to the execution of this command. This
 	 * collection is <code>null</code> if there are no listeners.
 	 */
-	private transient ListenerList executionListeners = null;
-	
+	private transient ListenerList executionListeners;
+
 	boolean shouldFireEvents = true;
 
 	/**
 	 * The handler currently associated with this command. This value may be
 	 * <code>null</code> if there is no handler currently.
 	 */
-	private transient IHandler handler = null;
+	private transient IHandler handler;
 
 	/**
 	 * The help context identifier for this command. This can be
 	 * <code>null</code> if there is no help currently associated with the
 	 * command.
-	 * 
+	 *
 	 * @since 3.2
 	 */
 	private String helpContextId;
@@ -106,20 +107,20 @@ public final class Command extends NamedHandleObjectWithState implements
 	 * may be <code>null</code> if there are no parameters, or if the command
 	 * is undefined. It may also be empty.
 	 */
-	private IParameter[] parameters = null;
+	private IParameter[] parameters;
 
 	/**
 	 * The type of the return value of this command. This value may be
 	 * <code>null</code> if the command does not declare a return type.
-	 * 
+	 *
 	 * @since 3.2
 	 */
-	private ParameterType returnType = null;
+	private ParameterType returnType;
 
 	/**
 	 * Our command will listen to the active handler for enablement changes so
 	 * that they can be fired from the command itself.
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	private IHandlerListener handlerListener;
@@ -129,7 +130,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	 * identifier. When a command is first constructed, it is undefined.
 	 * Commands should only be constructed by the <code>CommandManager</code>
 	 * to ensure that the identifier remains unique.
-	 * 
+	 *
 	 * @param id
 	 *            The identifier for the command. This value must not be
 	 *            <code>null</code>, and must be unique amongst all commands.
@@ -141,7 +142,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	/**
 	 * Adds a listener to this command that will be notified when this command's
 	 * state changes.
-	 * 
+	 *
 	 * @param commandListener
 	 *            The listener to be added; must not be <code>null</code>.
 	 */
@@ -155,15 +156,13 @@ public final class Command extends NamedHandleObjectWithState implements
 	/**
 	 * Adds a listener to this command that will be notified when this command
 	 * is about to execute.
-	 * 
+	 *
 	 * @param executionListener
 	 *            The listener to be added; must not be <code>null</code>.
 	 */
-	public final void addExecutionListener(
-			final IExecutionListener executionListener) {
+	public final void addExecutionListener(final IExecutionListener executionListener) {
 		if (executionListener == null) {
-			throw new NullPointerException(
-					"Cannot add a null execution listener"); //$NON-NLS-1$
+			throw new NullPointerException("Cannot add a null execution listener"); //$NON-NLS-1$
 		}
 
 		if (executionListeners == null) {
@@ -182,7 +181,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	 * A single instance of {@link State} cannot be registered with multiple
 	 * commands. Each command requires its own unique instance.
 	 * </p>
-	 * 
+	 *
 	 * @param id
 	 *            The identifier of the state to add; must not be
 	 *            <code>null</code>.
@@ -190,6 +189,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	 *            The state to add; must not be <code>null</code>.
 	 * @since 3.2
 	 */
+	@Override
 	public void addState(final String id, final State state) {
 		super.addState(id, state);
 		state.setId(id);
@@ -201,13 +201,14 @@ public final class Command extends NamedHandleObjectWithState implements
 	/**
 	 * Compares this command with another command by comparing each of its
 	 * non-transient attributes.
-	 * 
+	 *
 	 * @param object
 	 *            The object with which to compare; must be an instance of
 	 *            <code>Command</code>.
 	 * @return A negative integer, zero or a postivie integer, if the object is
 	 *         greater than, equal to or less than this command.
 	 */
+	@Override
 	public final int compareTo(final Object object) {
 		final Command castedObject = (Command) object;
 		int compareTo = Util.compare(category, castedObject.category);
@@ -222,8 +223,7 @@ public final class Command extends NamedHandleObjectWithState implements
 						if (compareTo == 0) {
 							compareTo = Util.compare(name, castedObject.name);
 							if (compareTo == 0) {
-								compareTo = Util.compare(parameters,
-										castedObject.parameters);
+								compareTo = Util.compare(parameters, castedObject.parameters);
 							}
 						}
 					}
@@ -241,7 +241,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	 * <p>
 	 * Notification is sent to all listeners that something has changed.
 	 * </p>
-	 * 
+	 *
 	 * @param name
 	 *            The name of this command; must not be <code>null</code>.
 	 * @param description
@@ -250,8 +250,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	 *            The category for this command; must not be <code>null</code>.
 	 * @since 3.2
 	 */
-	public final void define(final String name, final String description,
-			final Category category) {
+	public final void define(final String name, final String description, final Category category) {
 		define(name, description, category, null);
 	}
 
@@ -263,7 +262,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	 * <p>
 	 * Notification is sent to all listeners that something has changed.
 	 * </p>
-	 * 
+	 *
 	 * @param name
 	 *            The name of this command; must not be <code>null</code>.
 	 * @param description
@@ -288,7 +287,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	 * <p>
 	 * Notification is sent to all listeners that something has changed.
 	 * </p>
-	 * 
+	 *
 	 * @param name
 	 *            The name of this command; must not be <code>null</code>.
 	 * @param description
@@ -319,7 +318,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	 * <p>
 	 * Notification is sent to all listeners that something has changed.
 	 * </p>
-	 * 
+	 *
 	 * @param name
 	 *            The name of this command; must not be <code>null</code>.
 	 * @param description
@@ -344,13 +343,11 @@ public final class Command extends NamedHandleObjectWithState implements
 			final Category category, final IParameter[] parameters,
 			ParameterType returnType, final String helpContextId) {
 		if (name == null) {
-			throw new NullPointerException(
-					"The name of a command cannot be null"); //$NON-NLS-1$
+			throw new NullPointerException("The name of a command cannot be null"); //$NON-NLS-1$
 		}
 
 		if (category == null) {
-			throw new NullPointerException(
-					"The category of a command cannot be null"); //$NON-NLS-1$
+			throw new NullPointerException("The category of a command cannot be null"); //$NON-NLS-1$
 		}
 
 		final boolean definedChanged = !this.defined;
@@ -389,7 +386,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	 * which handler is selected for performing this command. This method will
 	 * succeed regardless of whether the command is enabled or defined. It is
 	 * generally preferred to call {@link #executeWithChecks(ExecutionEvent)}.
-	 * 
+	 *
 	 * @param event
 	 *            An event containing all the information about the current
 	 *            state of the application; must not be <code>null</code>.
@@ -403,8 +400,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	 * @deprecated Please use {@link #executeWithChecks(ExecutionEvent)}
 	 *             instead.
 	 */
-	public final Object execute(final ExecutionEvent event)
-			throws ExecutionException, NotHandledException {
+	public final Object execute(final ExecutionEvent event) throws ExecutionException, NotHandledException {
 		if (shouldFireEvents) {
 			firePreExecute(event);
 		}
@@ -426,8 +422,7 @@ public final class Command extends NamedHandleObjectWithState implements
 			}
 		}
 
-		final NotHandledException e = new NotHandledException(
-				"There is no handler to execute. " + getId()); //$NON-NLS-1$
+		final NotHandledException e = new NotHandledException("There is no handler to execute. " + getId()); //$NON-NLS-1$
 		if (shouldFireEvents) {
 			fireNotHandled(e);
 		}
@@ -441,7 +436,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	 * to see if the command is enabled and defined. If it is not both enabled
 	 * and defined, then the execution listeners will be notified and an
 	 * exception thrown.
-	 * 
+	 *
 	 * @param event
 	 *            An event containing all the information about the current
 	 *            state of the application; must not be <code>null</code>.
@@ -459,8 +454,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	 * @since 3.2
 	 */
 	public final Object executeWithChecks(final ExecutionEvent event)
-			throws ExecutionException, NotDefinedException,
-			NotEnabledException, NotHandledException {
+			throws ExecutionException, NotDefinedException, NotEnabledException, NotHandledException {
 		if (shouldFireEvents) {
 			firePreExecute(event);
 		}
@@ -509,8 +503,7 @@ public final class Command extends NamedHandleObjectWithState implements
 			}
 		}
 
-		final NotHandledException e = new NotHandledException(
-				"There is no handler to execute for command " + getId()); //$NON-NLS-1$
+		final NotHandledException e = new NotHandledException("There is no handler to execute for command " + getId()); //$NON-NLS-1$
 		if (shouldFireEvents) {
 			fireNotHandled(e);
 		}
@@ -519,7 +512,7 @@ public final class Command extends NamedHandleObjectWithState implements
 
 	/**
 	 * Notifies the listeners for this command that it has changed in some way.
-	 * 
+	 *
 	 * @param commandEvent
 	 *            The event to send to all of the listener; must not be
 	 *            <code>null</code>.
@@ -533,9 +526,11 @@ public final class Command extends NamedHandleObjectWithState implements
 		for (int i = 0; i < listeners.length; i++) {
 			final ICommandListener listener = (ICommandListener) listeners[i];
 			SafeRunner.run(new ISafeRunnable() {
+				@Override
 				public void handleException(Throwable exception) {
 				}
 
+				@Override
 				public void run() throws Exception {
 					listener.commandChanged(commandEvent);
 				}
@@ -546,7 +541,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	/**
 	 * Notifies the execution listeners for this command that an attempt to
 	 * execute has failed because the command is not defined.
-	 * 
+	 *
 	 * @param e
 	 *            The exception that is about to be thrown; never
 	 *            <code>null</code>.
@@ -574,7 +569,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	/**
 	 * Notifies the execution listeners for this command that an attempt to
 	 * execute has failed because there is no handler.
-	 * 
+	 *
 	 * @param e
 	 *            The exception that is about to be thrown; never
 	 *            <code>null</code>.
@@ -602,7 +597,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	/**
 	 * Notifies the execution listeners for this command that an attempt to
 	 * execute has failed because there is no handler.
-	 * 
+	 *
 	 * @param e
 	 *            The exception that is about to be thrown; never
 	 *            <code>null</code>.
@@ -626,7 +621,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	/**
 	 * Notifies the execution listeners for this command that an attempt to
 	 * execute has failed during the execution.
-	 * 
+	 *
 	 * @param e
 	 *            The exception that has been thrown; never <code>null</code>.
 	 *            After this method completes, the exception will be thrown
@@ -651,7 +646,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	/**
 	 * Notifies the execution listeners for this command that an execution has
 	 * completed successfully.
-	 * 
+	 *
 	 * @param returnValue
 	 *            The return value from the command; may be <code>null</code>.
 	 */
@@ -675,7 +670,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	/**
 	 * Notifies the execution listeners for this command that an attempt to
 	 * execute is about to start.
-	 * 
+	 *
 	 * @param event
 	 *            The execution event that will be used; never <code>null</code>.
 	 */
@@ -697,16 +692,15 @@ public final class Command extends NamedHandleObjectWithState implements
 
 	/**
 	 * Returns the category for this command.
-	 * 
+	 *
 	 * @return The category for this command; never <code>null</code>.
 	 * @throws NotDefinedException
 	 *             If the handle is not currently defined.
 	 */
 	public final Category getCategory() throws NotDefinedException {
 		if (!isDefined()) {
-			throw new NotDefinedException(
-					"Cannot get the category from an undefined command. " //$NON-NLS-1$
-							+ id);
+			throw new NotDefinedException("Cannot get the category from an undefined command. " //$NON-NLS-1$
+					+ id);
 		}
 
 		return category;
@@ -719,7 +713,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	 * <p>
 	 * This value can change at any time and should never be cached.
 	 * </p>
-	 * 
+	 *
 	 * @return The current handler for this command; may be <code>null</code>.
 	 * @since 3.3
 	 */
@@ -731,7 +725,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	 * Returns the help context identifier associated with this command. This
 	 * method should not be called by clients. Clients should use
 	 * {@link CommandManager#getHelpContextId(Command)} instead.
-	 * 
+	 *
 	 * @return The help context identifier for this command; may be
 	 *         <code>null</code> if there is none.
 	 * @since 3.2
@@ -743,7 +737,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	/**
 	 * Returns the parameter with the provided id or <code>null</code> if this
 	 * command does not have a parameter with the id.
-	 * 
+	 *
 	 * @param parameterId
 	 *            The id of the parameter to retrieve.
 	 * @return The parameter with the provided id or <code>null</code> if this
@@ -752,12 +746,10 @@ public final class Command extends NamedHandleObjectWithState implements
 	 *             If the handle is not currently defined.
 	 * @since 3.2
 	 */
-	public final IParameter getParameter(final String parameterId)
-			throws NotDefinedException {
+	public final IParameter getParameter(final String parameterId) throws NotDefinedException {
 		if (!isDefined()) {
-			throw new NotDefinedException(
-					"Cannot get a parameter from an undefined command. " //$NON-NLS-1$
-							+ id);
+			throw new NotDefinedException("Cannot get a parameter from an undefined command. " //$NON-NLS-1$
+					+ id);
 		}
 
 		if (parameters == null) {
@@ -777,7 +769,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	/**
 	 * Returns the parameters for this command. This call triggers provides a
 	 * copy of the array, so excessive calls to this method should be avoided.
-	 * 
+	 *
 	 * @return The parameters for this command. This value might be
 	 *         <code>null</code>, if the command has no parameters.
 	 * @throws NotDefinedException
@@ -785,9 +777,8 @@ public final class Command extends NamedHandleObjectWithState implements
 	 */
 	public final IParameter[] getParameters() throws NotDefinedException {
 		if (!isDefined()) {
-			throw new NotDefinedException(
-					"Cannot get the parameters from an undefined command. " //$NON-NLS-1$
-							+ id);
+			throw new NotDefinedException("Cannot get the parameters from an undefined command. " //$NON-NLS-1$
+					+ id);
 		}
 
 		if ((parameters == null) || (parameters.length == 0)) {
@@ -803,7 +794,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	 * Returns the {@link ParameterType} for the parameter with the provided id
 	 * or <code>null</code> if this command does not have a parameter type
 	 * with the id.
-	 * 
+	 *
 	 * @param parameterId
 	 *            The id of the parameter to retrieve the {@link ParameterType}
 	 *            of.
@@ -814,8 +805,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	 *             If the handle is not currently defined.
 	 * @since 3.2
 	 */
-	public final ParameterType getParameterType(final String parameterId)
-			throws NotDefinedException {
+	public final ParameterType getParameterType(final String parameterId) throws NotDefinedException {
 		final IParameter parameter = getParameter(parameterId);
 		if (parameter instanceof ITypedParameter) {
 			final ITypedParameter parameterWithType = (ITypedParameter) parameter;
@@ -828,7 +818,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	 * Returns the {@link ParameterType} for the return value of this command or
 	 * <code>null</code> if this command does not declare a return value
 	 * parameter type.
-	 * 
+	 *
 	 * @return The {@link ParameterType} for the return value of this command or
 	 *         <code>null</code> if this command does not declare a return
 	 *         value parameter type.
@@ -838,9 +828,8 @@ public final class Command extends NamedHandleObjectWithState implements
 	 */
 	public final ParameterType getReturnType() throws NotDefinedException {
 		if (!isDefined()) {
-			throw new NotDefinedException(
-					"Cannot get the return type of an undefined command. " //$NON-NLS-1$
-							+ id);
+			throw new NotDefinedException("Cannot get the return type of an undefined command. " //$NON-NLS-1$
+					+ id);
 		}
 
 		return returnType;
@@ -849,7 +838,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	/**
 	 * Returns whether this command has a handler, and whether this handler is
 	 * also handled and enabled.
-	 * 
+	 *
 	 * @return <code>true</code> if the command is handled; <code>false</code>
 	 *         otherwise.
 	 */
@@ -865,16 +854,16 @@ public final class Command extends NamedHandleObjectWithState implements
 				// since this has the ability to generate megs of logs, only
 				// provide information if tracing
 				Tracing.printTrace("HANDLERS", "Handler " + handler  + " for "  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-						+ id + " threw unexpected exception"); //$NON-NLS-1$ 
+						+ id + " threw unexpected exception"); //$NON-NLS-1$
 				e.printStackTrace(System.out);
 			}
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Called be the framework to allow the handler to update its enabled state.
-	 * 
+	 *
 	 * @param evaluationContext
 	 *            the state to evaluate against. May be <code>null</code>
 	 *            which indicates that the handler can query whatever model that
@@ -890,7 +879,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	/**
 	 * Returns whether this command has a handler, and whether this handler is
 	 * also handled.
-	 * 
+	 *
 	 * @return <code>true</code> if the command is handled; <code>false</code>
 	 *         otherwise.
 	 */
@@ -904,16 +893,14 @@ public final class Command extends NamedHandleObjectWithState implements
 
 	/**
 	 * Removes a listener from this command.
-	 * 
+	 *
 	 * @param commandListener
 	 *            The listener to be removed; must not be <code>null</code>.
-	 * 
+	 *
 	 */
-	public final void removeCommandListener(
-			final ICommandListener commandListener) {
+	public final void removeCommandListener(final ICommandListener commandListener) {
 		if (commandListener == null) {
-			throw new NullPointerException(
-					"Cannot remove a null command listener"); //$NON-NLS-1$
+			throw new NullPointerException("Cannot remove a null command listener"); //$NON-NLS-1$
 		}
 
 		removeListenerObject(commandListener);
@@ -921,16 +908,14 @@ public final class Command extends NamedHandleObjectWithState implements
 
 	/**
 	 * Removes a listener from this command.
-	 * 
+	 *
 	 * @param executionListener
 	 *            The listener to be removed; must not be <code>null</code>.
-	 * 
+	 *
 	 */
-	public final void removeExecutionListener(
-			final IExecutionListener executionListener) {
+	public final void removeExecutionListener(final IExecutionListener executionListener) {
 		if (executionListener == null) {
-			throw new NullPointerException(
-					"Cannot remove a null execution listener"); //$NON-NLS-1$
+			throw new NullPointerException("Cannot remove a null execution listener"); //$NON-NLS-1$
 		}
 
 		if (executionListeners != null) {
@@ -947,12 +932,13 @@ public final class Command extends NamedHandleObjectWithState implements
 	 * active handler, if the active handler is an instance of
 	 * {@link IObjectWithState}.
 	 * </p>
-	 * 
+	 *
 	 * @param stateId
 	 *            The identifier of the state to remove; must not be
 	 *            <code>null</code>.
 	 * @since 3.2
 	 */
+	@Override
 	public void removeState(final String stateId) {
 		if (handler instanceof IObjectWithState) {
 			((IObjectWithState) handler).removeState(stateId);
@@ -965,7 +951,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	 * the currently active handler (if any), and add it to <code>handler</code>.
 	 * If debugging is turned on, then this will also print information about
 	 * the change to <code>System.out</code>.
-	 * 
+	 *
 	 * @param handler
 	 *            The new handler; may be <code>null</code> if none.
 	 * @return <code>true</code> if the handler changed; <code>false</code>
@@ -1004,9 +990,7 @@ public final class Command extends NamedHandleObjectWithState implements
 		string = null;
 
 		// Debugging output
-		if ((DEBUG_HANDLERS)
-				&& ((DEBUG_HANDLERS_COMMAND_ID == null) || (DEBUG_HANDLERS_COMMAND_ID
-						.equals(id)))) {
+		if ((DEBUG_HANDLERS) && ((DEBUG_HANDLERS_COMMAND_ID == null) || (DEBUG_HANDLERS_COMMAND_ID.equals(id)))) {
 			final StringBuffer buffer = new StringBuffer("Command('"); //$NON-NLS-1$
 			buffer.append(id);
 			buffer.append("') has changed to "); //$NON-NLS-1$
@@ -1033,6 +1017,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	private IHandlerListener getHandlerListener() {
 		if (handlerListener == null) {
 			handlerListener = new IHandlerListener() {
+				@Override
 				public void handlerChanged(HandlerEvent handlerEvent) {
 					boolean enabledChanged = handlerEvent.isEnabledChanged();
 					boolean handledChanged = handlerEvent.isHandledChanged();
@@ -1048,9 +1033,10 @@ public final class Command extends NamedHandleObjectWithState implements
 	/**
 	 * The string representation of this command -- for debugging purposes only.
 	 * This string should not be shown to an end user.
-	 * 
+	 *
 	 * @return The string representation; never <code>null</code>.
 	 */
+	@Override
 	public final String toString() {
 		if (string == null) {
 			final StringWriter sw = new StringWriter();
@@ -1075,7 +1061,7 @@ public final class Command extends NamedHandleObjectWithState implements
 				buffer.write(',');
 				buffer.newLine();
 				buffer.write("\t\t"); //$NON-NLS-1$
-				buffer.write(parameters==null?"":parameters.toString()); //$NON-NLS-1$
+				buffer.write(parameters == null ? "" : Arrays.toString(parameters)); //$NON-NLS-1$
 				buffer.write(',');
 				buffer.write(returnType==null?"":returnType.toString()); //$NON-NLS-1$
 				buffer.write(',');
@@ -1095,6 +1081,7 @@ public final class Command extends NamedHandleObjectWithState implements
 	 * the name and description to <code>null</code>. This also removes all
 	 * state and disposes of it. Notification is sent to all listeners.
 	 */
+	@Override
 	public final void undefine() {
 		boolean enabledChanged = isEnabled();
 
