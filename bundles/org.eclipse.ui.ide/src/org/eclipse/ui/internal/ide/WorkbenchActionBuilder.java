@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Andreas Buchen <andreas.buchen@sap.com> - Bug 206584
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810, 440975, 431862
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 445538
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -40,14 +39,11 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.util.Util;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPageListener;
-import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
@@ -223,7 +219,6 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
     private IPropertyChangeListener propPrefListener;
 
     private IPageListener pageListener;
-	private IPartListener partListener;
 
     private IResourceChangeListener resourceListener;
     
@@ -274,37 +269,6 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
             }
         };
         getWindow().addPageListener(pageListener);
-
-		partListener = new IPartListener() {
-
-			@Override
-			public void partOpened(IWorkbenchPart part) {
-			}
-
-			@Override
-			public void partDeactivated(IWorkbenchPart part) {
-			}
-
-			@Override
-			public void partClosed(IWorkbenchPart part) {
-			}
-
-			@Override
-			public void partActivated(IWorkbenchPart part) {
-				if (!(part instanceof IEditorPart)) {
-					return;
-				}
-				// update the "toggled" state based on the current editor
-				ICommandService commandService = window.getService(ICommandService.class);
-				commandService.refreshElements(IWorkbenchCommandConstants.WINDOW_PIN_EDITOR, null);
-			}
-
-			@Override
-			public void partBroughtToTop(IWorkbenchPart part) {
-			}
-
-		};
-		getWindow().getPartService().addPartListener(partListener);
 
         prefListener = new Preferences.IPropertyChangeListener() {
             @Override
@@ -834,10 +798,6 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
             window.removePageListener(pageListener);
             pageListener = null;
         }
-		if (partListener != null) {
-			window.getPartService().removePartListener(partListener);
-			partListener = null;
-		}
         if (prefListener != null) {
             ResourcesPlugin.getPlugin().getPluginPreferences()
                     .removePropertyChangeListener(prefListener);
@@ -1415,13 +1375,7 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
             IDEWorkbenchPlugin.log("Navigate toolbar is missing"); //$NON-NLS-1$
             return;
         }
-		IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
-		boolean reuseEditors = store.getBoolean(IPreferenceConstants.REUSE_EDITORS_BOOLEAN);
-		IContributionItem pinItem = toolBarManager.find(IWorkbenchCommandConstants.WINDOW_PIN_EDITOR);
-		if (pinItem != null) {
-			pinItem.setVisible(reuseEditors);
-		}
-		toolBarManager.markDirty();
+
         toolBarManager.update(false);
         toolBarItem.update(ICoolBarManager.SIZE);
     }

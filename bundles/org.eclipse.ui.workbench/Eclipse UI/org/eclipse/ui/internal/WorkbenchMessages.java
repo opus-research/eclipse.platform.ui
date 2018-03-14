@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -210,7 +210,6 @@ public class WorkbenchMessages extends NLS {
 	
 	public static String HideItems_itemInActionSet; 
 	public static String HideItems_itemInUnavailableActionSet;
-	public static String HideItems_itemInUnavailableCommand;
 	public static String HideItems_unavailableChildCommandGroup;
 	public static String HideItems_unavailableChildCommandGroups;
 	public static String HideItems_keyBindings;
@@ -226,7 +225,6 @@ public class WorkbenchMessages extends NLS {
 
 	public static String HideItemsCannotMakeVisible_dialogTitle;
 	public static String HideItemsCannotMakeVisible_unavailableCommandGroupText;
-	public static String HideItemsCannotMakeVisible_unavailableCommandItemText;
 	public static String HideItemsCannotMakeVisible_switchToCommandGroupTab;
 	public static String HideItemsCannotMakeVisible_unavailableChildrenText;
 	
