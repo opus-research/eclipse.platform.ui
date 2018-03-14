@@ -135,7 +135,7 @@ public class WebBrowserUtil {
 		try {
 			Class.forName(BROWSER_PACKAGE_NAME);
 		} catch (ClassNotFoundException e) {
-			isInternalBrowserOperational = Boolean.FALSE;
+			isInternalBrowserOperational = new Boolean(false);
 			return false;
 		}
 
@@ -144,7 +144,7 @@ public class WebBrowserUtil {
 		try {
 			shell = new Shell(PlatformUI.getWorkbench().getDisplay());
 			new Browser(shell, SWT.NONE);
-			isInternalBrowserOperational = Boolean.TRUE;
+			isInternalBrowserOperational = new Boolean(true);
 			return true;
 		} catch (Throwable t) {
 			StringBuffer message = new StringBuffer("Internal browser is not available"); //$NON-NLS-1$
@@ -152,7 +152,7 @@ public class WebBrowserUtil {
 			WebBrowserUIPlugin.getInstance().getLog().log(
 					new Status(IStatus.WARNING, WebBrowserUIPlugin.PLUGIN_ID,
 							0, message.toString() , null));
-			isInternalBrowserOperational = Boolean.FALSE;
+			isInternalBrowserOperational = new Boolean(false);
 			return false;
 		} finally {
 			if (shell != null)
