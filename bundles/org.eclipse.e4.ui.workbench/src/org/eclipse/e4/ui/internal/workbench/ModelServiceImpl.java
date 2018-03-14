@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     René Brandstetter - Bug 404231 - resetPerspectiveModel() does not reset the perspective
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -53,6 +54,7 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.EPlaceholderResolver;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
@@ -102,6 +104,21 @@ public class ModelServiceImpl implements EModelService {
 	 *             if the given appContext is <code>null</code>
 	 */
 	public ModelServiceImpl(IEclipseContext appContext) {
+		this(appContext, false);
+	}
+
+	/**
+	 * This is a singleton service. One instance is used throughout the running application
+	 * 
+	 * @param appContext
+	 *            The applicationContext to get the eventBroker from
+	 * @param useCustomPerspectiveKeeper
+	 *            set to <code>true</code> if a custom perspective keeper method should be used
+	 * 
+	 * @throws NullPointerException
+	 *             if the given appContext is <code>null</code>
+	 */
+	public ModelServiceImpl(IEclipseContext appContext, boolean useCustomPerspectiveKeeper) {
 		if (appContext == null)
 		 {
 			throw new NullPointerException("No application context given!"); //$NON-NLS-1$
@@ -110,6 +127,10 @@ public class ModelServiceImpl implements EModelService {
 		this.appContext = appContext;
 		IEventBroker eventBroker = appContext.get(IEventBroker.class);
 		eventBroker.subscribe(UIEvents.UIElement.TOPIC_WIDGET, hostedElementHandler);
+		
+		if (!useCustomPerspectiveKeeper) {
+			E4PerspectiveKeeper.registerNewInstance(eventBroker, appContext);
+		}
 
 		mApplicationElementFactory = new GenericMApplicationElementFactoryImpl(
 				appContext.get(IExtensionRegistry.class));
@@ -354,6 +375,18 @@ public class ModelServiceImpl implements EModelService {
 	 * application.ui.MUIElement, java.lang.String)
 	 */
 	public MUIElement cloneElement(MUIElement element, MSnippetContainer snippetContainer) {
+		return cloneElement(element, snippetContainer, true);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.workbench.modeling.EModelService#cloneElement(org.eclipse.e4.ui.model.
+	 * application.ui.MUIElement, org.eclipse.e4.ui.model.application.ui.MSnippetContainer, boolean)
+	 */
+	public MUIElement cloneElement(MUIElement element, MSnippetContainer snippetContainer,
+			boolean cleanPlaceholderRef) {
+
 		EObject eObj = (EObject) element;
 		MUIElement clone = (MUIElement) EcoreUtil.copy(eObj);
 
@@ -366,7 +399,23 @@ public class ModelServiceImpl implements EModelService {
 				continue;
 			}
 
-			ph.setRef(null);
+			if (cleanPlaceholderRef) {
+				ph.setRef(null);
+			} else {
+				/*
+				 * This is needed because setting the reference to null leads to a NPE on restoring
+				 * the perspective. A proxy is used because the EPlaceholderResolver is not able to
+				 * resolve the element. The reason for this lies in the PlaceholderResolver
+				 * implementation which expects MPlaceholder elements to be returned from the
+				 * MWindow#getSharedElements() method, but those aren't returned.
+				 */
+				// -- build a proxy object --
+				EObject refEObj = (EObject) ph.getRef();
+				EObject refEProxy = EcoreUtil.create(refEObj.eClass());
+				((InternalEObject) refEProxy).eSetProxyURI(EcoreUtil.getURI(refEObj));
+				// -- just keep the proxy --
+				ph.setRef((MUIElement) refEProxy);
+			}
 		}
 
 		if (snippetContainer != null) {
@@ -936,6 +985,47 @@ public class ModelServiceImpl implements EModelService {
 
 	public void resetPerspectiveModel(MPerspective persp, MWindow window) {
 		resetPerspectiveModel(persp, window, true);
+
+		/*
+		 * Restore of the state is called only in the public method, because the private
+		 * resetPerspectiveModel() method is also called during removePerspectiveModel() which will
+		 * remove the Perspective anyhow and so a previous reset to the old state isn't necessary.
+		 */
+
+		// restore old state (will only work in new e4 applications not in the IDE legacy one!)
+		MUIElement storedPerspState = cloneSnippet(appContext.get(MApplication.class),
+				persp.getElementId(), window);
+		if (storedPerspState instanceof MPerspective) {
+			MPerspective state = (MPerspective) storedPerspState;
+			boolean wasPerspectiveActive = (persp.getParent().getSelectedElement() == persp);
+			/*
+			 * Un-render the perspective (destroy the parts) must be done before it is replaced,
+			 * because otherwise the @PreDestroy methods on the parts are not invoked! (shared
+			 * elements are excluded if they are already opened in other perspectives)
+			 */
+			persp.setToBeRendered(false);
+
+			// replace the current perspective with the stored state
+			EcoreUtil.replace((EObject) persp, (EObject) state);
+
+			if (wasPerspectiveActive) { // switch to perspective only if it was active
+				/*
+				 * Activate the restored perspective This will re-create the parts based on all the
+				 * model settings which exists before the perspective was changed. (shared elements
+				 * are reused if they are already opened in other perspectives)
+				 */
+				IEclipseContext context = window.getContext();
+				if (context == null) {
+					/*
+					 * sometimes the window doesn't have a context and to prevent a NPE just try our
+					 * luck with the application context
+					 */
+					context = appContext;
+				}
+				EPartService ps = context.get(EPartService.class);
+				ps.switchPerspective(state); // no null-check, because we want to fail early
+			}
+		}
 	}
 
 	private void resetPerspectiveModel(MPerspective persp, MWindow window,

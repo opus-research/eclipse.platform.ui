@@ -11,6 +11,7 @@
  *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  *     		Implemented workbench auto-save to correctly restore state in case of crash.
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 366364
+ *     René Brandstetter - Bug 404231 - resetPerspectiveModel() does not reset the perspective
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench.swt;
@@ -200,7 +201,11 @@ public class E4Application implements IApplication {
 		args = (String[]) applicationContext.getArguments().get(
 				IApplicationContext.APPLICATION_ARGS);
 
-		IEclipseContext appContext = createDefaultContext();
+		boolean useCustomPerspectiveKeeper = Boolean.parseBoolean(getArgValue(
+						org.eclipse.e4.ui.workbench.IWorkbench.USE_CUSTOM_PERSPECTIVE_KEEPER,
+						applicationContext, true));
+
+		IEclipseContext appContext = createDefaultContext(useCustomPerspectiveKeeper);
 		appContext.set(Display.class, display);
 		appContext.set(Realm.class, SWTObservables.getRealm(display));
 		appContext.set(UISynchronize.class, new UISynchronize() {
@@ -472,8 +477,14 @@ public class E4Application implements IApplication {
 		return serviceContext;
 	}
 
-	// TODO This should go into a different bundle
+	// TODO These two createDefaultContext() methods should go into a different
+	// bundle
 	public static IEclipseContext createDefaultContext() {
+		return createDefaultContext(false);
+	}
+
+	public static IEclipseContext createDefaultContext(
+			boolean useCustomPerspectiveKeeper) {
 		IEclipseContext serviceContext = createDefaultHeadlessContext();
 		final IEclipseContext appContext = serviceContext
 				.createChild("WorkbenchContext"); //$NON-NLS-1$
@@ -482,7 +493,8 @@ public class E4Application implements IApplication {
 				.set(Logger.class, ContextInjectionFactory.make(
 						WorkbenchLogger.class, appContext));
 
-		appContext.set(EModelService.class, new ModelServiceImpl(appContext));
+		appContext.set(EModelService.class, new ModelServiceImpl(appContext,
+				useCustomPerspectiveKeeper));
 
 		appContext.set(EPlaceholderResolver.class, new PlaceholderResolver());
 
