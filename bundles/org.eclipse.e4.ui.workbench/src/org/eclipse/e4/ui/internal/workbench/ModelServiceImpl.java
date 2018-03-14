@@ -917,30 +917,52 @@ public class ModelServiceImpl implements EModelService {
 			element = element.getCurSharedRef();
 		}
 
-		int location = NOT_IN_UI;
 		MUIElement curElement = element;
 		while (curElement != null) {
-			Object container = ((EObject) curElement).eContainer();
-			if (!(container instanceof MUIElement))
-				return NOT_IN_UI;
-
-			if (container instanceof MApplication) {
-				if (location != NOT_IN_UI)
-					return location;
+			MUIElement parent = curElement.getParent();
+			if (parent instanceof MPerspective) {
+				MElementContainer<MUIElement> perspectiveParent = parent.getParent();
+				if (perspectiveParent == null) {
+					return NOT_IN_UI;
+				} else if (perspectiveParent.getSelectedElement() == parent) {
+					return IN_ACTIVE_PERSPECTIVE;
+				} else {
+					return IN_ANY_PERSPECTIVE;
+				}
+			} else if (parent instanceof MApplication) {
 				return OUTSIDE_PERSPECTIVE;
-			} else if (container instanceof MPerspective) {
-				location = IN_ANY_PERSPECTIVE;
-				MPerspective perspective = (MPerspective) container;
-				if (perspective.getParent() != null
-						&& perspective.getParent().getSelectedElement() == perspective)
-					location |= IN_ACTIVE_PERSPECTIVE;
-			} else if (container instanceof MTrimBar) {
-				location = IN_TRIM;
-			} else if (container instanceof MArea) {
-				location = IN_SHARED_AREA;
-			}
+			} else if (parent instanceof MTrimBar) {
+				return IN_TRIM;
+			} else if (parent == null) {
+				EObject container = ((EObject) curElement).eContainer();
 
-			curElement = (MUIElement) container;
+				// DW tests
+				if (container instanceof MWindow) {
+					MWindow containerWin = (MWindow) container;
+					if (containerWin.getSharedElements().contains(curElement)) {
+						return IN_SHARED_AREA;
+					}
+
+					EObject containerParent = container.eContainer();
+					if (containerParent instanceof MPerspective) {
+						MElementContainer<MUIElement> perspectiveParent = ((MPerspective) containerParent)
+								.getParent();
+						if (perspectiveParent == null) {
+							return NOT_IN_UI;
+						}
+						int location = IN_ANY_PERSPECTIVE;
+						if (perspectiveParent.getSelectedElement() == containerParent) {
+							location |= IN_ACTIVE_PERSPECTIVE;
+						}
+						return location;
+					} else if (containerParent instanceof MWindow) {
+						return OUTSIDE_PERSPECTIVE;
+					} else {
+						return NOT_IN_UI;
+					}
+				}
+			}
+			curElement = parent;
 		}
 
 		return NOT_IN_UI;
