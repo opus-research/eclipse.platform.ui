@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2006 IBM Corporation and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.jface.tests.viewers;
 
@@ -14,7 +15,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.TreeSet;
 
-import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -211,8 +211,8 @@ public class LazySortedCollectionTest extends TestCase {
 
     private void assertContentsValid() {
         queryRange(0, comparisonCollection.size(), false);
-        Assert.assertEquals(comparisonCollection.size(), collection.size());
-        Assert.assertEquals(comparisonCollection.isEmpty(), collection.isEmpty());
+        assertEquals(comparisonCollection.size(), collection.size());
+        assertEquals(comparisonCollection.isEmpty(), collection.isEmpty());
     }
 
     private void assertIsPermutation(Object[] array1, Object[] array2) {
@@ -242,7 +242,7 @@ public class LazySortedCollectionTest extends TestCase {
 
         int returnValue = collection.getRange(result, start, sorted);
 
-        Assert.assertEquals(returnValue, length);
+        assertEquals(returnValue, length);
 
         Object[] expectedResult = computeExpectedElementsInRange(start, length);
 
@@ -264,16 +264,16 @@ public class LazySortedCollectionTest extends TestCase {
     private void assertArrayEquals(Object[] array1, Object[] array2) {
         for (int i = 0; i < array1.length; i++) {
 
-            Assert.assertEquals(array1[i], array2[i]);
+            assertEquals(array1[i], array2[i]);
         }
     }
 
     public void testComparisonCount() {
-        Assert.assertTrue("additions should not require any comparisons", comparator.comparisons == 0);
+        assertTrue("additions should not require any comparisons", comparator.comparisons == 0);
 
         queryRange(0, elements.length, false);
 
-        Assert.assertTrue("requesting the complete set of unsorted elements should not require any comparisons", comparator.comparisons == 0);
+        assertTrue("requesting the complete set of unsorted elements should not require any comparisons", comparator.comparisons == 0);
     }
 
     /**
@@ -291,7 +291,7 @@ public class LazySortedCollectionTest extends TestCase {
         queryRange(elements.length - 10, 10, true);
         queryRange(0, 10, false);
 
-        Assert.assertEquals("Once the lazy collection is fully sorted, it should not require further comparisons",
+        assertEquals("Once the lazy collection is fully sorted, it should not require further comparisons", 
                 comparisons, comparator.comparisons);
     }
 

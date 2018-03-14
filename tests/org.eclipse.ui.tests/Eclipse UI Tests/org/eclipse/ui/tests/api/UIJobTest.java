@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2006 IBM Corporation and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,10 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.api;
-
-import junit.framework.Assert;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -140,18 +139,18 @@ public class UIJobTest extends UITestCase {
 	        long finalTime = System.currentTimeMillis();
 
 	        // Ensure that we slept for at least 200ms
-	        Assert.assertTrue("We tried to sleep the UI thread, but it woke up too early. ",
+	        assertTrue("We tried to sleep the UI thread, but it woke up too early. ",
 	                finalTime - currentTime >= 200);
 
-	        Assert.assertTrue("Background thread did not start, so there was no possibility "
+	        assertTrue("Background thread did not start, so there was no possibility "
 	                + "of testing whether its behavior was correct. This is not a test failure. "
 	                + "It means we were unable to run the test. ",
 	                backgroundThreadStarted);
 
-	        Assert.assertFalse("A UI job somehow ran to completion while the UI thread was blocked", uiJobFinished);
-	        Assert.assertFalse("Background job managed to run to completion, even though it joined a UI thread that still hasn't finished",
+	        assertFalse("A UI job somehow ran to completion while the UI thread was blocked", uiJobFinished);
+	        assertFalse("Background job managed to run to completion, even though it joined a UI thread that still hasn't finished",
 	                backgroundThreadFinished);
-	        Assert.assertFalse("Background thread was interrupted", backgroundThreadInterrupted);
+	        assertFalse("Background thread was interrupted", backgroundThreadInterrupted);
 
 	        // Now run the event loop. Give the asyncExec a chance to run.
 			//Use the display provided by the shell if possible
@@ -170,20 +169,21 @@ public class UIJobTest extends UITestCase {
 	        }
 
 	        // Now that the event queue is empty, check that our final state is okay.
-	        Assert.assertTrue("Background thread did not finish (possible deadlock)", backgroundThreadFinished);
-	        Assert.assertTrue("Test job did not finish (possible deadlock)", uiJobFinished);
-	        Assert.assertFalse("Background thread was interrupted ", backgroundThreadInterrupted);
-	        Assert.assertFalse("Background thread finished before the UIJob, even though the background thread was supposed to be waiting for the UIJob",
+	        assertTrue("Background thread did not finish (possible deadlock)", backgroundThreadFinished);
+	        assertTrue("Test job did not finish (possible deadlock)", uiJobFinished);
+	        assertFalse("Background thread was interrupted ", backgroundThreadInterrupted);
+	        assertFalse("Background thread finished before the UIJob, even though the background thread was supposed to be waiting for the UIJob",
 	                backgroundThreadFinishedBeforeUIJob);
 
 	        // This is the whole point of the test: ensure that the background job actually waited for the UI job
 	        // to run to completion.
-	        Assert.assertFalse("Background thread finished before the UIJob, even though the background thread was supposed to be waiting for the UIJob",
+			assertFalse(
+					"Background thread finished before the UIJob, even though the background thread was supposed to be waiting for the UIJob",
 	                backgroundThreadFinishedBeforeUIJob);
 
 	        // Paranoia check: this is really the same test as above, but it confirms that both
 	        // threads agreed on the answer.
-	        Assert.assertTrue("Background thread finished before the UIJob, even though the background thread was supposed to be waiting for the UIJob",
+	        assertTrue("Background thread finished before the UIJob, even though the background thread was supposed to be waiting for the UIJob",
 	                uiJobFinishedBeforeBackgroundThread);
         } finally {
 

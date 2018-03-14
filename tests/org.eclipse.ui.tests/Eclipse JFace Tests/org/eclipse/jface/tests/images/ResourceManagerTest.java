@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2007 IBM Corporation and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,10 +7,10 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.jface.tests.images;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.eclipse.jface.resource.ColorDescriptor;
@@ -132,17 +132,16 @@ public class ResourceManagerTest extends TestCase {
 	protected void tearDown() throws Exception {
         super.tearDown();
         globalResourceManager.dispose();
-        Assert.assertEquals("Detected leaks", 0, TestDescriptor.refCount);
+        assertEquals("Detected leaks", 0, TestDescriptor.refCount);
         testImage.dispose();
         testImage2.dispose();
     }
 
     protected void validateResource(Object resource) throws Exception {
-        Assert.assertNotNull("Allocated resource was null", resource);
+        assertNotNull("Allocated resource was null", resource);
         if (resource instanceof Image) {
             Image image = (Image) resource;
-
-            Assert.assertTrue("Image is disposed", !image.isDisposed());
+            assertTrue("Image is disposed", !image.isDisposed());
             return;
         }
     }
@@ -169,8 +168,7 @@ public class ResourceManagerTest extends TestCase {
 
         // Allocating resources without the manager will not reuse duplicates, so we
         // should get exactly one resource per descriptor.
-
-        Assert.assertEquals("Expecting one resource to be allocated per descriptor",
+        assertEquals("Expecting one resource to be allocated per descriptor", 
                 descriptors.length, TestDescriptor.refCount);
 
         // Deallocate resources directly using the descriptors
@@ -194,15 +192,14 @@ public class ResourceManagerTest extends TestCase {
             validateResource(resource);
             resources[i] = resource;
         }
-
-        Assert.assertEquals("Descriptors created from Images should not reallocate Images when the original can be reused",
+        
+        assertEquals("Descriptors created from Images should not reallocate Images when the original can be reused",
                 testImage, resources[9]);
 
         // Allocating resources without the manager will reuse duplicates, so the number
         // of resources should equal the number of unique descriptors.
-
-        Assert.assertEquals("Duplicate descriptors should be reused",
-                descriptors.length - numDupes,
+        assertEquals("Duplicate descriptors should be reused", 
+                descriptors.length - numDupes, 
                 TestDescriptor.refCount);
 
         // Deallocate resources directly using the descriptors
@@ -250,20 +247,19 @@ public class ResourceManagerTest extends TestCase {
         // back down to the count we had after we allocated lm1 resources)
         allocateResources(lm2, lm2Resources);
         deallocateResources(lm2, lm2Resources);
-        Assert.assertEquals(lm1Count, TestDescriptor.refCount);
+        assertEquals(lm1Count, TestDescriptor.refCount);
 
         // Dispose lm2 (shouldn't do anything since we already deallocated all of its resources)
         // Ensure that this doesn't change any refcounts
         lm2.dispose();
-        Assert.assertEquals(lm1Count, TestDescriptor.refCount);
-
+        assertEquals(lm1Count, TestDescriptor.refCount);
+        
         // Dispose lm1 without first deallocating its resources. This should correctly detect
         // what needs to be deallocated from lm1 without affecting any global resources.
         // If everything works, we should be back to the resource count we had after allocating
         // the global resources.
         lm1.dispose();
-        Assert.assertEquals(initialCount, TestDescriptor.refCount);
-
+        assertEquals(initialCount, TestDescriptor.refCount);
     }
 
     /*
