@@ -806,6 +806,8 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 	void populateTopTrimContributions() {
 		getCoolBarManager2().update(true);
+		getCoolBarManager2().add(new GroupMarker(IWorkbenchActionConstants.GROUP_EDITOR));
+		getCoolBarManager2().add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
 
 		final MTrimBar trimBar = getTopTrim();
 		// TODO why aren't these added as trim contributions
