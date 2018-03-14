@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 410426
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 426535
- *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 431778
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -459,19 +458,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	 * @param toolbarModel
 	 * @param elementId
 	 */
-	public void processContribution(final MToolBar toolbarModel,
-			String elementId) {
-
-		ToolBarManager manager = getManager(toolbarModel);
-		if (manager != null && manager.getControl() != null) {
-			manager.getControl().addDisposeListener(new DisposeListener() {
-				@Override
-				public void widgetDisposed(DisposeEvent e) {
-					cleanUp((MToolBar) toolbarModel);
-				}
-			});
-		}
-
+	public void processContribution(MToolBar toolbarModel, String elementId) {
 		final ArrayList<MToolBarContribution> toContribute = new ArrayList<MToolBarContribution>();
 		ContributionsAnalyzer.XXXgatherToolBarContributions(toolbarModel,
 				application.getToolBarContributions(), elementId, toContribute);
@@ -584,6 +571,13 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		bar.setData(manager);
 		bar.setData(AbstractPartRenderer.OWNING_ME, element);
 		bar.getShell().layout(new Control[] { bar }, SWT.DEFER);
+		bar.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				cleanUp((MToolBar) element);
+				toolbarMenu = null;
+			}
+		});
 		return bar;
 	}
 
