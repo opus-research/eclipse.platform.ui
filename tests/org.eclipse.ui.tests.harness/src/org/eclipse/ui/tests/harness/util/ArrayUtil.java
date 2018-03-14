@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,22 +7,21 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.harness.util;
 
 import java.util.Random;
 
 /**
- * <code>ArrayUtil</code> contains methods for array
- * examination.
+ * <code>ArrayUtil</code> contains methods for array 
+ * examination.  
  */
 public class ArrayUtil {
     private static Random randomBox = new Random();
 
     /**
      * Returns a random object chosen from an array.
-     *
+     * 
      * @param array the input array
      * @return a random object in the array
      */
@@ -39,12 +38,14 @@ public class ArrayUtil {
      * @return <code>true or false</code>
      */
     public static boolean checkNotNull(Object[] array) {
-		if (array == null)
-			return false;
-		for (int i = 0; i < array.length; i++)
-			if (array[i] == null)
-				return false;
-		return true;
+        if (array == null)
+            return false;
+        else {
+            for (int i = 0; i < array.length; i++)
+                if (array[i] == null)
+                    return false;
+            return true;
+        }
     }
 
     /**
@@ -56,12 +57,14 @@ public class ArrayUtil {
      * 		<code>false</code> otherwise.
      */
     public static boolean contains(Object[] array, Object element) {
-		if (array == null || element == null)
-			return false;
-		for (int i = 0; i < array.length; i++)
-			if (array[i] == element)
-				return true;
-		return false;
+        if (array == null || element == null)
+            return false;
+        else {
+            for (int i = 0; i < array.length; i++)
+                if (array[i] == element)
+                    return true;
+            return false;
+        }
     }
 
     /**
@@ -74,11 +77,13 @@ public class ArrayUtil {
      * 		<code>false</code> otherwise.
      */
     public static boolean equals(Object[] one, Object[] two) {
-		if (one.length != two.length)
-			return false;
-		for (int i = 0; i < one.length; i++)
-			if (one[i] != two[i])
-				return false;
-		return true;
+        if (one.length != two.length)
+            return false;
+        else {
+            for (int i = 0; i < one.length; i++)
+                if (one[i] != two[i])
+                    return false;
+            return true;
+        }
     }
 }

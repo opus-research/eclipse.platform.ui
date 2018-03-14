@@ -51,7 +51,6 @@ public class IdentityWrapper {
 		return o;
 	}
 
-	@Override
 	public boolean equals(Object obj) {
 		if (obj == null || obj.getClass() != IdentityWrapper.class) {
 			return false;
@@ -59,7 +58,6 @@ public class IdentityWrapper {
 		return o == ((IdentityWrapper) obj).o;
 	}
 
-	@Override
 	public int hashCode() {
 		return System.identityHashCode(o);
 	}

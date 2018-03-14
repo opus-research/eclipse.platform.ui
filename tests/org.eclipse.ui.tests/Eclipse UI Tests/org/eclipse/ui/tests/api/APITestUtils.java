@@ -38,12 +38,11 @@ public class APITestUtils {
 
 	static class TestSaveHandler extends PartServiceSaveHandler {
 		private int response;
-
+		
 		public void setResponse(int response) {
 			this.response = response;
 		}
 
-		@Override
 		public Save promptToSave(MPart dirtyPart) {
 			switch (response) {
 			case 0: return Save.YES;
@@ -55,7 +54,6 @@ public class APITestUtils {
 			throw new RuntimeException();
 		}
 
-		@Override
 		public Save[] promptToSave(Collection<MPart> dirtyParts) {
 			Save save = promptToSave((MPart) null);
 			Save[] prompt = new Save[dirtyParts.size()];
@@ -64,7 +62,7 @@ public class APITestUtils {
 		}
 
 	}
-
+	
 	public static boolean isFastView(IViewReference ref) {
 		MPart part = ((WorkbenchPartReference) ref).getModel();
 		MUIElement parent = part.getParent();
@@ -82,28 +80,24 @@ public class APITestUtils {
 		}
 		return false;
 	}
-
+	
 	public static void saveableHelperSetAutomatedResponse(final int response) {
 		SaveableHelper.testSetAutomatedResponse(response);
 		Workbench workbench = (Workbench) PlatformUI.getWorkbench();
 		MApplication application = workbench.getApplication();
-
+		
 		IEclipseContext context = application.getContext();
 		saveableHelperSetAutomatedResponse(response, context);
-
-		while (workbench.getDisplay().readAndDispatch()) {
-			;
-		}
-
+		
+		while (workbench.getDisplay().readAndDispatch());
+		
 		for (MWindow window : application.getChildren()) {
-			saveableHelperSetAutomatedResponse(response, window.getContext());
+			saveableHelperSetAutomatedResponse(response, window.getContext());	
 		}
-
-		while (workbench.getDisplay().readAndDispatch()) {
-			;
-		}
+		
+		while (workbench.getDisplay().readAndDispatch());
 	}
-
+	
 	private static void saveableHelperSetAutomatedResponse(final int response,
 			IEclipseContext context) {
 		ISaveHandler saveHandler = (ISaveHandler) context.get(ISaveHandler.class.getName());

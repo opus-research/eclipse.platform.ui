@@ -299,7 +299,6 @@ public class UpdateStrategyTest extends AbstractDefaultRealmTestCase {
 	class UpdateStrategyStub extends UpdateValueStrategy {
 		IConverter converter;
 		
-		@Override
 		protected void fillDefaults(IObservableValue source,
 				IObservableValue destination) {
 			super.fillDefaults(source, destination);
@@ -308,7 +307,6 @@ public class UpdateStrategyTest extends AbstractDefaultRealmTestCase {
 		/* (non-Javadoc)
 		 * @see org.eclipse.core.databinding.UpdateValueStrategy#setConverter(org.eclipse.core.databinding.conversion.IConverter)
 		 */
-		@Override
 		public UpdateValueStrategy setConverter(IConverter converter) {
 			this.converter = converter;
 			return super.setConverter(converter);

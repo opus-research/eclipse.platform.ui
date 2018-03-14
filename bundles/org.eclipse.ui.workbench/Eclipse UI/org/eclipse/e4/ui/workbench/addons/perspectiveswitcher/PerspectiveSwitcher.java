@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Sopot Cela <sopotcela@gmail.com> - Bug 391961
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.addons.perspectiveswitcher;
@@ -688,7 +687,7 @@ public class PerspectiveSwitcher {
 		WorkbenchPage page = (WorkbenchPage) win.getContext().get(IWorkbenchPage.class);
 		String perspectiveId = persp.getElementId();
 		IPerspectiveDescriptor desc = getDescriptorFor(perspectiveId);
-		page.closePerspective(desc, perspectiveId, true, true);
+		page.closePerspective(desc, perspectiveId, true, false);
 
 		// removePerspectiveItem(persp);
 	}
@@ -704,7 +703,7 @@ public class PerspectiveSwitcher {
 			public void widgetSelected(SelectionEvent event) {
 				if (psTB.isDisposed())
 					return;
-				IHandlerService handlerService = workbenchWindow
+				IHandlerService handlerService = (IHandlerService) workbenchWindow
 						.getService(IHandlerService.class);
 				IStatus status = Status.OK_STATUS;
 				try {
@@ -736,7 +735,7 @@ public class PerspectiveSwitcher {
 			public void widgetSelected(SelectionEvent event) {
 				if (psTB.isDisposed())
 					return;
-				IHandlerService handlerService = workbenchWindow
+				IHandlerService handlerService = (IHandlerService) workbenchWindow
 						.getService(IHandlerService.class);
 				IStatus status = Status.OK_STATUS;
 				try {

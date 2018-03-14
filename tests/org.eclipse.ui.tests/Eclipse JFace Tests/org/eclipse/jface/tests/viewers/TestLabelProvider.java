@@ -22,10 +22,9 @@ public class TestLabelProvider extends LabelProvider {
      *
      */
     public static Image getImage() {
-        if (fgImage == null) {
-			fgImage = ImageDescriptor.createFromFile(TestLabelProvider.class,
+        if (fgImage == null)
+            fgImage = ImageDescriptor.createFromFile(TestLabelProvider.class,
                     "images/java.gif").createImage();
-		}
         return fgImage;
     }
 
