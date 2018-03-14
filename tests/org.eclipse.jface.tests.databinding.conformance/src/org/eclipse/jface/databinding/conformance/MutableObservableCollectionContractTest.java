@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2014 IBM Corporation and others.
+ * Copyright (c) 2007, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bugs 208858, 213145
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 444829
  *******************************************************************************/
 
 package org.eclipse.jface.databinding.conformance;
@@ -39,8 +38,7 @@ import org.eclipse.jface.databinding.conformance.util.SuiteBuilder;
  * 
  * @since 3.2
  */
-public class MutableObservableCollectionContractTest extends
-		ObservableDelegateTest {
+public class MutableObservableCollectionContractTest extends ObservableDelegateTest {
 	private IObservableCollectionContractDelegate delegate;
 
 	private IObservableCollection collection;
@@ -57,7 +55,6 @@ public class MutableObservableCollectionContractTest extends
 		this.delegate = delegate;
 	}
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -66,16 +63,14 @@ public class MutableObservableCollectionContractTest extends
 
 	public void testAdd_ChangeEvent() throws Exception {
 		assertChangeEventFired(new Runnable() {
-			@Override
 			public void run() {
 				collection.add(delegate.createElement(collection));
 			}
 		}, "Collection.add(Object)", collection);
 	}
-
+	
 	public void testAdd_RealmCheck() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				collection.add(delegate.createElement(collection));
 			}
@@ -86,7 +81,6 @@ public class MutableObservableCollectionContractTest extends
 		final Object element = delegate.createElement(collection);
 
 		assertContainsDuringChangeEvent(new Runnable() {
-			@Override
 			public void run() {
 				collection.add(element);
 			}
@@ -95,17 +89,15 @@ public class MutableObservableCollectionContractTest extends
 
 	public void testAddAll_ChangeEvent() throws Exception {
 		assertChangeEventFired(new Runnable() {
-			@Override
 			public void run() {
 				collection.addAll(Arrays.asList(new Object[] { delegate
 						.createElement(collection) }));
 			}
 		}, "Collection.addAll(Collection)", collection);
 	}
-
+	
 	public void testAddAll_RealmCheck() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				collection.addAll(Arrays.asList(new Object[] { delegate
 						.createElement(collection) }));
@@ -118,7 +110,6 @@ public class MutableObservableCollectionContractTest extends
 		final Object element = delegate.createElement(collection);
 
 		assertContainsDuringChangeEvent(new Runnable() {
-			@Override
 			public void run() {
 				collection.addAll(Arrays.asList(new Object[] { element }));
 			}
@@ -130,16 +121,14 @@ public class MutableObservableCollectionContractTest extends
 		collection.add(element);
 
 		assertChangeEventFired(new Runnable() {
-			@Override
 			public void run() {
 				collection.remove(element);
 			}
 		}, "Collection.remove(Object)", collection);
 	}
-
+	
 	public void testRemove_RealmCheck() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				collection.remove(delegate.createElement(collection));
 			}
@@ -152,7 +141,6 @@ public class MutableObservableCollectionContractTest extends
 		collection.add(element);
 
 		assertDoesNotContainDuringChangeEvent(new Runnable() {
-			@Override
 			public void run() {
 				collection.remove(element);
 			}
@@ -164,19 +152,16 @@ public class MutableObservableCollectionContractTest extends
 		collection.add(element);
 
 		assertChangeEventFired(new Runnable() {
-			@Override
 			public void run() {
 				collection.removeAll(Arrays.asList(new Object[] { element }));
 			}
 		}, "Collection.removeAll(Collection)", collection);
 	}
-
+	
 	public void testRemoveAll_RealmCheck() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
-				collection.removeAll(Arrays.asList(new Object[] { delegate
-						.createElement(collection) }));
+				collection.removeAll(Arrays.asList(new Object[] { delegate.createElement(collection) }));
 			}
 		}, (CurrentRealm) collection.getRealm());
 	}
@@ -187,7 +172,6 @@ public class MutableObservableCollectionContractTest extends
 		collection.add(element);
 
 		assertDoesNotContainDuringChangeEvent(new Runnable() {
-			@Override
 			public void run() {
 				collection.removeAll(Arrays.asList(new Object[] { element }));
 			}
@@ -209,17 +193,15 @@ public class MutableObservableCollectionContractTest extends
 		collection.add(element2);
 
 		assertChangeEventFired(new Runnable() {
-			@Override
 			public void run() {
 				collection.retainAll(Arrays.asList(new Object[] { element1 }));
 			}
 
 		}, "Collection.retainAll(Collection)", collection);
 	}
-
+	
 	public void testRetainAll_RealmCheck() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				collection.retainAll(Collections.EMPTY_LIST);
 			}
@@ -255,19 +237,18 @@ public class MutableObservableCollectionContractTest extends
 				formatFail("When Collection.retainAll(...) fires the change event the element should have been removed from the Collection."),
 				listener2.contains);
 	}
-
+	
 	public void testRetainAll_NoChangeFiresNoChangeEvent() throws Exception {
 		ChangeEventTracker tracker = ChangeEventTracker.observe(collection);
 		collection.retainAll(Collections.EMPTY_LIST);
-		assertEquals("List.retainAll should not have fired a change event:", 0,
-				tracker.count);
+		assertEquals("List.retainAll should not have fired a change event:",
+				0, tracker.count);
 	}
-
+	
 	public void testClear_ChangeEvent() throws Exception {
 		collection.add(delegate.createElement(collection));
 
 		assertChangeEventFired(new Runnable() {
-			@Override
 			public void run() {
 				collection.clear();
 			}
@@ -276,7 +257,6 @@ public class MutableObservableCollectionContractTest extends
 
 	public void testClear_RealmCheck() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				collection.clear();
 			}
@@ -306,12 +286,12 @@ public class MutableObservableCollectionContractTest extends
 	 */
 	/* package */void assertChangeEventFired(Runnable runnable,
 			String methodName, IObservableCollection collection) {
-
+		
 		ChangeEventTracker listener = ChangeEventTracker.observe(collection);
 		runnable.run();
 
-		assertEquals(formatFail(methodName + " should fire one ChangeEvent."),
-				1, listener.count);
+		assertEquals(formatFail(methodName + " should fire one ChangeEvent."), 1,
+				listener.count);
 		assertEquals(
 				formatFail(methodName
 						+ "'s change event observable should be the created Collection."),
@@ -342,7 +322,8 @@ public class MutableObservableCollectionContractTest extends
 		assertFalse(
 				formatFail(new StringBuffer("When ")
 						.append(methodName)
-						.append(" fires a change event the element should have been removed from the Collection.")
+						.append(
+								" fires a change event the element should have been removed from the Collection.")
 						.toString()), listener.contains);
 	}
 
@@ -369,7 +350,8 @@ public class MutableObservableCollectionContractTest extends
 		assertTrue(
 				formatFail(new StringBuffer("When ")
 						.append(methodName)
-						.append(" fires a change event the element should have been added to the Collection.")
+						.append(
+								" fires a change event the element should have been added to the Collection.")
 						.toString()), listener.contains);
 	}
 
@@ -396,9 +378,8 @@ public class MutableObservableCollectionContractTest extends
 	}
 
 	public static Test suite(IObservableCollectionContractDelegate delegate) {
-		return new SuiteBuilder()
-				.addObservableContractTest(
-						MutableObservableCollectionContractTest.class, delegate)
+		return new SuiteBuilder().addObservableContractTest(
+				MutableObservableCollectionContractTest.class, delegate)
 				.addObservableContractTest(
 						ObservableCollectionContractTest.class, delegate)
 				.build();

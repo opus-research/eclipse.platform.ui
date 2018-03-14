@@ -107,6 +107,9 @@ public abstract class ContributionItem implements IContributionItem {
 	public void saveWidgetState() {
     }
 
+    /* (non-Javadoc)
+     * Method declared on IContributionItem.
+     */
     @Override
 	public String getId() {
         return id;
@@ -207,6 +210,9 @@ public abstract class ContributionItem implements IContributionItem {
 	public void update() {
     }
 
+    /* (non-Javadoc)
+     * Method declared on IContributionItem.
+     */
     @Override
 	public void setParent(IContributionManager parent) {
         this.parent = parent;

@@ -7,7 +7,6 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 441150
  *     Fabio Zadrozny (fabiofz@gmail.com) - Bug 436763
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
@@ -70,6 +69,10 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 		}
 	};
 
+	public LazyStackRenderer() {
+		super();
+	}
+
 	public void init(IEventBroker eventBroker) {
 		// Ensure that there only ever *one* listener. Each subclass
 		// will call this method
@@ -88,9 +91,8 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 
 	@Override
 	public void postProcess(MUIElement element) {
-		if (!(element instanceof MGenericStack<?>) || isMinimizedStack(element)) {
+		if (!(element instanceof MGenericStack<?>))
 			return;
-		}
 
 		MGenericStack<MUIElement> stack = (MGenericStack<MUIElement>) element;
 		MUIElement selPart = stack.getSelectedElement();
@@ -288,17 +290,12 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 				}
 			}
 		}
-		
+
 		// i.e.: Bug 436763: after we make items visible, if we made a new
 		// floating shell visible, we have to re-layout it for its contents to
 		// become correct.
 		if (layoutShellLater != null) {
 			layoutShellLater.layout(true, true);
 		}
-	}
-
-	private boolean isMinimizedStack(MUIElement stack) {
-		return stack.getTags().contains(IPresentationEngine.MINIMIZED)
-				&& !stack.getTags().contains(IPresentationEngine.ACTIVE);
 	}
 }

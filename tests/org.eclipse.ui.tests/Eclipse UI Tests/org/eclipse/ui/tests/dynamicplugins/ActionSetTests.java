@@ -149,8 +149,7 @@ public class ActionSetTests extends DynamicTestCase implements
      * 
      * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionId()
      */
-    @Override
-	protected String getExtensionId() {
+    protected String getExtensionId() {
         return "newActionSet1.testDynamicActionSetAddition";
     }
 
@@ -159,8 +158,7 @@ public class ActionSetTests extends DynamicTestCase implements
      * 
      * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionPoint()
      */
-    @Override
-	protected String getExtensionPoint() {
+    protected String getExtensionPoint() {
         return IWorkbenchRegistryConstants.PL_ACTION_SETS;
     }
 
@@ -169,8 +167,7 @@ public class ActionSetTests extends DynamicTestCase implements
      * 
      * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getInstallLocation()
      */
-    @Override
-	protected String getInstallLocation() {
+    protected String getInstallLocation() {
         return "data/org.eclipse.newActionSet1";
     }
 }

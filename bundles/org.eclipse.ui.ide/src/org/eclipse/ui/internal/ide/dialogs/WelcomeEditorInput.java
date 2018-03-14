@@ -39,36 +39,29 @@ public class WelcomeEditorInput implements IEditorInput {
         aboutInfo = info;
     }
 
-    @Override
-	public boolean exists() {
+    public boolean exists() {
         return false;
     }
 
-    @Override
-	public Object getAdapter(Class adapter) {
+    public Object getAdapter(Class adapter) {
         return null;
     }
 
-    @Override
-	public ImageDescriptor getImageDescriptor() {
+    public ImageDescriptor getImageDescriptor() {
         return null;
     }
 
-    @Override
-	public String getName() {
+    public String getName() {
         return IDEWorkbenchMessages.WelcomeEditor_title;
     }
 
-    @Override
-	public IPersistableElement getPersistable() {
+    public IPersistableElement getPersistable() {
         return new IPersistableElement() {
-            @Override
-			public String getFactoryId() {
+            public String getFactoryId() {
                 return FACTORY_ID;
             }
 
-            @Override
-			public void saveState(IMemento memento) {
+            public void saveState(IMemento memento) {
                 memento.putString(FEATURE_ID, aboutInfo.getFeatureId() + ':'
                         + aboutInfo.getVersionId());
             }
@@ -79,8 +72,7 @@ public class WelcomeEditorInput implements IEditorInput {
         return aboutInfo;
     }
 
-    @Override
-	public boolean equals(Object o) {
+    public boolean equals(Object o) {
         if ((o != null) && (o instanceof WelcomeEditorInput)) {
             if (((WelcomeEditorInput) o).aboutInfo.getFeatureId().equals(
                     aboutInfo.getFeatureId())) {
@@ -90,8 +82,7 @@ public class WelcomeEditorInput implements IEditorInput {
         return false;
     }
 
-    @Override
-	public String getToolTipText() {
+    public String getToolTipText() {
         return NLS.bind(IDEWorkbenchMessages.WelcomeEditor_toolTip, aboutInfo.getFeatureLabel());
     }
 }

@@ -384,6 +384,11 @@ public final class ExternalActionManager {
 					// And remember this item so we don't log it again.
 					loggedCommandIds.add(commandId);
 					command.addCommandListener(new ICommandListener() {
+						/*
+						 * (non-Javadoc)
+						 * 
+						 * @see org.eclipse.ui.commands.ICommandListener#commandChanged(org.eclipse.ui.commands.CommandEvent)
+						 */
 						@Override
 						public final void commandChanged(
 								final CommandEvent commandEvent) {

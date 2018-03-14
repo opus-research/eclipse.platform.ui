@@ -38,14 +38,12 @@ public class ObservableCollectionTreeContentProviderTest extends
 	private TreeViewer viewer;
 	ObservableListTreeContentProvider contentProvider;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		shell = new Shell();
 		viewer = new TreeViewer(shell);
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		shell.dispose();
 		shell = null;
@@ -60,7 +58,6 @@ public class ObservableCollectionTreeContentProviderTest extends
 				.asList(rootElements), null);
 		contentProvider = new ObservableListTreeContentProvider(
 				new IObservableFactory() {
-					@Override
 					public IObservable createObservable(Object target) {
 						if (target == input)
 							return rootElementList;
@@ -82,7 +79,6 @@ public class ObservableCollectionTreeContentProviderTest extends
 				.singletonList("element"), null);
 		contentProvider = new ObservableListTreeContentProvider(
 				new IObservableFactory() {
-					@Override
 					public IObservable createObservable(Object target) {
 						if (target == input)
 							return rootElementList;

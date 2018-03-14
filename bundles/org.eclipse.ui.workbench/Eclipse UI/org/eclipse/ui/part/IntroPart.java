@@ -15,7 +15,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.SafeRunnable;
@@ -126,7 +125,7 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
         Object[] array = getListeners();
         for (int nX = 0; nX < array.length; nX++) {
             final IPropertyListener l = (IPropertyListener) array[nX];
-            SafeRunner.run(new SafeRunnable() {
+            Platform.run(new SafeRunnable() {
 
                 @Override
 				public void run() {
