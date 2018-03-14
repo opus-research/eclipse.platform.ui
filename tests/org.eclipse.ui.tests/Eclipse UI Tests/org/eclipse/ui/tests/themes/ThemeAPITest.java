@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2007 IBM Corporation and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -597,7 +597,7 @@ public class ThemeAPITest extends ThemeTest {
         ITheme theme1 = getTheme1();
         assertEquals(theme1, newCurrentTheme);
         List events = listener.getEvents();
-        assertEquals(1, events.size());
+        assertTrue(events.size() > 0);
         PropertyChangeEvent event = ((PropertyChangeEvent) events.get(0));
         assertEquals(IThemeManager.CHANGE_CURRENT_THEME, event.getProperty());
         assertEquals(currentTheme, event.getOldValue());
