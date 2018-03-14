@@ -1770,9 +1770,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 						curPersp.getElementId(),
 						false);
 			}
-			if (closePage) {
-				close();
-			}
 		}
 	}
 
