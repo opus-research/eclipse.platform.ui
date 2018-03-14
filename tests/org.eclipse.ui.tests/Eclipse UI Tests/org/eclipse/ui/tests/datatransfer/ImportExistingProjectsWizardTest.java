@@ -1112,7 +1112,8 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 	}
 
 	private WizardProjectsImportPage getNewWizard() {
-		ImportExportWizard wizard = new ImportExportWizard(ImportExportWizard.IMPORT);
+		ImportExportWizard wizard = new ImportExportWizard(
+				ImportExportWizard.IMPORT);
 		wizard.init(getWorkbench(), null);
 		IDialogSettings workbenchSettings = WorkbenchPlugin.getDefault()
 				.getDialogSettings();
