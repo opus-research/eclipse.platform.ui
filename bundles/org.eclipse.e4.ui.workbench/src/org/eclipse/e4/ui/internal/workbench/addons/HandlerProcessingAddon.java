@@ -14,12 +14,12 @@ package org.eclipse.e4.ui.internal.workbench.addons;
 
 import java.util.List;
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.di.extensions.EventTopic;
 import org.eclipse.e4.core.services.contributions.IContributionFactory;
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MHandler;
@@ -28,18 +28,11 @@ import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.osgi.service.event.Event;
-import org.osgi.service.event.EventHandler;
 
 /**
  * Process the additions and removals of handlers on the model
  */
 public class HandlerProcessingAddon {
-
-	private EventHandler eventHandler;
-	private EventHandler contextHandler;
-
-	@Inject
-	private IEventBroker eventBroker;
 
 	/**
 	 * Registers the listeners
@@ -62,89 +55,80 @@ public class HandlerProcessingAddon {
 				}
 			}
 		}
-
-		registerModelListeners();
-	}
-
-	private void registerModelListeners() {
-		eventHandler = new EventHandler() {
-			public void handleEvent(Event event) {
-				if ((event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MHandlerContainer)
-						&& (event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MContext)) {
-					MHandlerContainer handlerContainer = (MHandlerContainer) event
-							.getProperty(UIEvents.EventTags.ELEMENT);
-					if (UIEvents.EventTypes.ADD.equals(event.getProperty(UIEvents.EventTags.TYPE))) {
-						if (event.getProperty(UIEvents.EventTags.NEW_VALUE) instanceof MHandler) {
-							MHandler handler = (MHandler) event
-									.getProperty(UIEvents.EventTags.NEW_VALUE);
-							MContext mContext = (MContext) handlerContainer;
-							IEclipseContext context = mContext.getContext();
-							if (context != null) {
-								processActiveHandler(handler, context);
-							}
-						}
-					} else if (UIEvents.EventTypes.REMOVE.equals(event
-							.getProperty(UIEvents.EventTags.TYPE))) {
-						if (event.getProperty(UIEvents.EventTags.OLD_VALUE) instanceof MHandler) {
-							MHandler handler = (MHandler) event
-									.getProperty(UIEvents.EventTags.OLD_VALUE);
-							MContext mContext = (MContext) handlerContainer;
-							IEclipseContext context = mContext.getContext();
-							if (context != null) {
-								MCommand command = handler.getCommand();
-								if (command != null) {
-									String commandId = command.getElementId();
-									EHandlerService handlerService = (EHandlerService) context
-											.get(EHandlerService.class.getName());
-									handlerService
-											.deactivateHandler(commandId, handler.getObject());
-								}
-							}
-						}
-
-					}
-
-				}
-
-			}
-		};
-
-		contextHandler = new EventHandler() {
-
-			public void handleEvent(Event event) {
-				Object origin = event.getProperty(UIEvents.EventTags.ELEMENT);
-				Object context = event.getProperty(UIEvents.EventTags.NEW_VALUE);
-				if ((origin instanceof MHandlerContainer)
-						&& (UIEvents.EventTypes.SET.equals(event
-								.getProperty(UIEvents.EventTags.TYPE)) && context instanceof IEclipseContext)) {
-					MHandlerContainer handlerContainer = (MHandlerContainer) origin;
-					IEclipseContext castedContext = (IEclipseContext) context;
-					for (MHandler mHandler : handlerContainer.getHandlers()) {
-						processActiveHandler(mHandler, castedContext);
-					}
-
-				}
-
-			}
-		};
-		eventBroker.subscribe(UIEvents.HandlerContainer.TOPIC_HANDLERS, eventHandler);
-		eventBroker.subscribe(UIEvents.Context.TOPIC_CONTEXT, contextHandler);
 	}
 
 	/**
-	 * Clean up
+	 * Responds to the coming and goings of handlers in the application model by activating and
+	 * deactivating them accordingly.
+	 * 
+	 * @param event
+	 *            The event thrown in the event bus
 	 */
-	@PreDestroy
-	public void preDestroy() {
-		unregisterModelListeners();
+	@Inject
+	public void handleHandlerEvent(
+			@Optional @EventTopic(UIEvents.HandlerContainer.TOPIC_HANDLERS) Event event) {
+		if (event == null)
+			return;
+		if ((event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MHandlerContainer)
+				&& (event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MContext)) {
+			MHandlerContainer handlerContainer = (MHandlerContainer) event
+					.getProperty(UIEvents.EventTags.ELEMENT);
+			if (UIEvents.EventTypes.ADD.equals(event.getProperty(UIEvents.EventTags.TYPE))) {
+				if (event.getProperty(UIEvents.EventTags.NEW_VALUE) instanceof MHandler) {
+					MHandler handler = (MHandler) event.getProperty(UIEvents.EventTags.NEW_VALUE);
+					MContext mContext = (MContext) handlerContainer;
+					IEclipseContext context = mContext.getContext();
+					if (context != null) {
+						processActiveHandler(handler, context);
+					}
+				}
+			} else if (UIEvents.EventTypes.REMOVE
+					.equals(event.getProperty(UIEvents.EventTags.TYPE))) {
+				if (event.getProperty(UIEvents.EventTags.OLD_VALUE) instanceof MHandler) {
+					MHandler handler = (MHandler) event.getProperty(UIEvents.EventTags.OLD_VALUE);
+					MContext mContext = (MContext) handlerContainer;
+					IEclipseContext context = mContext.getContext();
+					if (context != null) {
+						MCommand command = handler.getCommand();
+						if (command != null) {
+							String commandId = command.getElementId();
+							EHandlerService handlerService = (EHandlerService) context
+									.get(EHandlerService.class.getName());
+							handlerService.deactivateHandler(commandId, handler.getObject());
+						}
+					}
+				}
+
+			}
+
+		}
+
 	}
 
 	/**
-	 * Unregisters the listeners
+	 * Responds to the setting of contexts of handlers in the application model and reacts
+	 * accordingly.
+	 * 
+	 * @param event
+	 *            The event which signals the setting of the context.
 	 */
-	private void unregisterModelListeners() {
-		eventBroker.unsubscribe(eventHandler);
-		eventBroker.unsubscribe(contextHandler);
+
+	@Inject
+	public void handleEvent(@Optional @EventTopic(UIEvents.Context.TOPIC_CONTEXT) Event event) {
+		if (event == null)
+			return;
+		System.err.println("in there"); //$NON-NLS-1$
+		Object origin = event.getProperty(UIEvents.EventTags.ELEMENT);
+		Object context = event.getProperty(UIEvents.EventTags.NEW_VALUE);
+		if ((origin instanceof MHandlerContainer)
+				&& (UIEvents.EventTypes.SET.equals(event.getProperty(UIEvents.EventTags.TYPE)) && context instanceof IEclipseContext)) {
+			MHandlerContainer handlerContainer = (MHandlerContainer) origin;
+			IEclipseContext castedContext = (IEclipseContext) context;
+			for (MHandler mHandler : handlerContainer.getHandlers()) {
+				processActiveHandler(mHandler, castedContext);
+			}
+
+		}
 	}
 
 	/**
