@@ -105,12 +105,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 			+ "org.eclipse.e4.ui.workbench.renderers.swt.WorkbenchRendererFactory";
 	private String factoryUrl;
 
-	public static interface Events {
-		public static final String TOPIC = "org/eclipse/e4/ui/internal/workbench/swt/PartRenderingEngine"; //$NON-NLS-1$
-
-		public static final String INITIALIZE_STYLING = TOPIC + "/initializeStyling"; //$NON-NLS-1$
-	}
-
 	IRendererFactory curFactory = null;
 
 	private Map<String, AbstractPartRenderer> customRendererMap = new HashMap<String, AbstractPartRenderer>();
@@ -354,19 +348,8 @@ public class PartRenderingEngine implements IPresentationEngine {
 			childrenHandler.handleEvent(event);
 		}
 	};
-	
-	private EventHandler initializeStylingHandler = new EventHandler() {
-		@Override
-		public void handleEvent(Event event) {
-			if (stylingPreferencesHandler != null) {
-				stylingPreferencesHandler.handleEvent(event);
-			}
-			eventBroker.unsubscribe(this);
-		}
-	};
-	
 
-	private StylingPreferencesHandler stylingPreferencesHandler;
+	private StylingPreferencesHandler cssThemeChangedHandler;
 
 	private IEclipseContext appContext;
 
@@ -499,12 +482,10 @@ public class PartRenderingEngine implements IPresentationEngine {
 			eventBroker.subscribe(UIEvents.TrimmedWindow.TOPIC_TRIMBARS,
 					trimHandler);
 
-			stylingPreferencesHandler = new StylingPreferencesHandler(
+			cssThemeChangedHandler = new StylingPreferencesHandler(
 					context.get(Display.class));
 			eventBroker.subscribe(IThemeEngine.Events.THEME_CHANGED,
-					stylingPreferencesHandler);
-			eventBroker.subscribe(Events.INITIALIZE_STYLING,
-					initializeStylingHandler);
+					cssThemeChangedHandler);
 		}
 	}
 
@@ -516,7 +497,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 		eventBroker.unsubscribe(visibilityHandler);
 		eventBroker.unsubscribe(childrenHandler);
 		eventBroker.unsubscribe(trimHandler);
-		eventBroker.unsubscribe(stylingPreferencesHandler);
+		eventBroker.unsubscribe(cssThemeChangedHandler);
 	}
 
 	private static void populateModelInterfaces(MContext contextModel,
@@ -1438,13 +1419,17 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 		IEventBroker broker = appContext.get(IEventBroker.class);
 		if (broker != null) {
-			broker.send(UIEvents.UILifeCycle.THEME_CHANGED, null);
-
+			Map<String, Object> data = null;
 			if (themeEngineForEvent != null) {
-				Map<String, Object> data = new HashMap<String, Object>();
+				data = new HashMap<String, Object>();
 				data.put(IThemeEngine.Events.THEME_ENGINE, themeEngineForEvent);
-				broker.send(Events.INITIALIZE_STYLING, data);
+				data.put(IThemeEngine.Events.THEME,
+						themeEngineForEvent.getActiveTheme());
+				data.put(IThemeEngine.Events.DEVICE, display);
+				data.put(IThemeEngine.Events.RESTORE, false);
 			}
+			broker.send(IThemeEngine.Events.THEME_CHANGED, data);
+			broker.send(UIEvents.UILifeCycle.THEME_CHANGED, null);
 		}
 	}
 
