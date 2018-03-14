@@ -141,11 +141,6 @@ public class StyledString {
 		return fBuffer.toString();
 	}
 
-	/**
-	 * Returns the string of this {@link StyledString}.
-	 * 
-	 * @return the current string of this {@link StyledString}.
-	 */
 	@Override
 	public String toString() {
 		return getString();
