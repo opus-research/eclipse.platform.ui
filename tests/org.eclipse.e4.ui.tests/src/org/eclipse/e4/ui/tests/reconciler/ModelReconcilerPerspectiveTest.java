@@ -17,7 +17,9 @@ import java.util.Collection;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
+import org.eclipse.e4.ui.model.application.ui.advanced.impl.AdvancedFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
 import org.junit.Test;
@@ -30,10 +32,12 @@ public abstract class ModelReconcilerPerspectiveTest extends
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
 
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
+				.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 
-		MPerspective perspective = ems.createModelElement(MPerspective.class);
+		MPerspective perspective = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveStack.getChildren().add(perspective);
 
 		saveModel();
@@ -41,7 +45,7 @@ public abstract class ModelReconcilerPerspectiveTest extends
 		ModelReconciler reconciler = createModelReconciler();
 		reconciler.recordChanges(application);
 
-		MWindow nestedWindow = ems.createModelElement(MWindow.class);
+		MWindow nestedWindow = BasicFactoryImpl.eINSTANCE.createWindow();
 		nestedWindow.setElementId("nested");
 		perspective.getWindows().add(nestedWindow);
 
@@ -81,13 +85,15 @@ public abstract class ModelReconcilerPerspectiveTest extends
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
 
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
+				.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 
-		MPerspective perspective = ems.createModelElement(MPerspective.class);
+		MPerspective perspective = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveStack.getChildren().add(perspective);
 
-		MWindow nestedWindow = ems.createModelElement(MWindow.class);
+		MWindow nestedWindow = BasicFactoryImpl.eINSTANCE.createWindow();
 		nestedWindow.setElementId("nested");
 		perspective.getWindows().add(nestedWindow);
 
@@ -134,13 +140,15 @@ public abstract class ModelReconcilerPerspectiveTest extends
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
 
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
+				.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 
-		MPerspective perspective = ems.createModelElement(MPerspective.class);
+		MPerspective perspective = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveStack.getChildren().add(perspective);
 
-		MWindow nestedWindow = ems.createModelElement(MWindow.class);
+		MWindow nestedWindow = BasicFactoryImpl.eINSTANCE.createWindow();
 		nestedWindow.setElementId("nested");
 		perspective.getWindows().add(nestedWindow);
 

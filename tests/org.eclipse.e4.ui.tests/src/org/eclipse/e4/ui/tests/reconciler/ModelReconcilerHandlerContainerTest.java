@@ -17,6 +17,7 @@ import java.util.Collection;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MHandler;
+import org.eclipse.e4.ui.model.application.commands.impl.CommandsFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
 import org.junit.Test;
@@ -33,7 +34,7 @@ public abstract class ModelReconcilerHandlerContainerTest extends
 		ModelReconciler reconciler = createModelReconciler();
 		reconciler.recordChanges(application);
 
-		MHandler handler = ems.createModelElement(MHandler.class);
+		MHandler handler = CommandsFactoryImpl.eINSTANCE.createHandler();
 		application.getHandlers().add(handler);
 
 		Object state = reconciler.serialize();
@@ -56,7 +57,7 @@ public abstract class ModelReconcilerHandlerContainerTest extends
 	public void testHandlerContainer_Handlers_Add_BoundHandler() {
 		MApplication application = createApplication();
 
-		MCommand command = ems.createModelElement(MCommand.class);
+		MCommand command = CommandsFactoryImpl.eINSTANCE.createCommand();
 		application.getCommands().add(command);
 
 		saveModel();
@@ -64,7 +65,7 @@ public abstract class ModelReconcilerHandlerContainerTest extends
 		ModelReconciler reconciler = createModelReconciler();
 		reconciler.recordChanges(application);
 
-		MHandler handler = ems.createModelElement(MHandler.class);
+		MHandler handler = CommandsFactoryImpl.eINSTANCE.createHandler();
 		handler.setCommand(command);
 		application.getHandlers().add(handler);
 
@@ -89,7 +90,7 @@ public abstract class ModelReconcilerHandlerContainerTest extends
 	public void testHandlerContainer_Handlers_Remove_UnboundHandler() {
 		MApplication application = createApplication();
 
-		MHandler handler = ems.createModelElement(MHandler.class);
+		MHandler handler = CommandsFactoryImpl.eINSTANCE.createHandler();
 		application.getHandlers().add(handler);
 
 		saveModel();
@@ -119,10 +120,10 @@ public abstract class ModelReconcilerHandlerContainerTest extends
 	public void testHandlerContainer_Handlers_Remove_BoundHandler() {
 		MApplication application = createApplication();
 
-		MCommand command = ems.createModelElement(MCommand.class);
+		MCommand command = CommandsFactoryImpl.eINSTANCE.createCommand();
 		application.getCommands().add(command);
 
-		MHandler handler = ems.createModelElement(MHandler.class);
+		MHandler handler = CommandsFactoryImpl.eINSTANCE.createHandler();
 		handler.setCommand(command);
 		application.getHandlers().add(handler);
 
