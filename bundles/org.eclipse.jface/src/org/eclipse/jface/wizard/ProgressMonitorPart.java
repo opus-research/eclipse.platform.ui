@@ -270,7 +270,7 @@ public class ProgressMonitorPart extends Composite implements
         		}
         	});
         	final Image stopImage = ImageDescriptor.createFromFile(
-        			ProgressMonitorPart.class, "images/stop.png").createImage(getDisplay()); //$NON-NLS-1$
+        			ProgressMonitorPart.class, "images/stop.gif").createImage(getDisplay()); //$NON-NLS-1$
         	final Cursor arrowCursor = new Cursor(this.getDisplay(), SWT.CURSOR_ARROW);
         	fToolBar.setCursor(arrowCursor);
         	fStopButton.setImage(stopImage);
