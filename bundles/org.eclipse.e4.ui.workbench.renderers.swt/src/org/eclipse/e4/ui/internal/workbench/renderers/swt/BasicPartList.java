@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.model.application.ui.MDirtyable;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
@@ -32,8 +31,6 @@ import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CTabFolder;
-import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -55,14 +52,6 @@ public class BasicPartList extends AbstractTableInformationControl {
 		}
 
 		public Image getImage(Object element) {
-			CTabItem cti = findItemForPart((MUIElement) element);
-			if (cti != null) {
-				Image image = cti.getImage();
-				if (image != null && !image.isDisposed()) {
-					return image;
-				}
-			}
-
 			String iconURI = ((MUILabel) element).getIconURI();
 			if (iconURI == null) {
 				return null;
@@ -87,27 +76,17 @@ public class BasicPartList extends AbstractTableInformationControl {
 
 	private EPartService partService;
 
-	private CTabFolder cTabFolder;
-
 	public BasicPartList(Shell parent, int shellStyle, int treeStyler,
 			EPartService partService, MElementContainer<?> input,
-			ISWTResourceUtilities utils, CTabFolder cTabFolder,
-			boolean alphabetical) {
+			ISWTResourceUtilities utils, boolean alphabetical) {
 		super(parent, shellStyle, treeStyler);
 		this.partService = partService;
 		this.input = input;
 		this.utils = utils;
-		this.cTabFolder = cTabFolder;
 		if (alphabetical && getTableViewer() != null) {
 			getTableViewer().setComparator(new ViewerComparator());
 		}
-	}
 
-	public BasicPartList(Shell parent, int shellStyle, int treeStyler,
-			EPartService partService, MElementContainer<?> input,
-			ISWTResourceUtilities utils, boolean alphabetical) {
-		this(parent, shellStyle, treeStyler, partService, input, utils, null,
-				alphabetical);
 	}
 
 	private Image getLabelImage(String iconURI) {
@@ -188,18 +167,5 @@ public class BasicPartList extends AbstractTableInformationControl {
 		}
 		return false;
 
-	}
-
-	private CTabItem findItemForPart(MUIElement element) {
-		if (cTabFolder == null) {
-			return null;
-		}
-		for (CTabItem cTabItem : cTabFolder.getItems()) {
-			Object owningMe = cTabItem.getData(AbstractPartRenderer.OWNING_ME);
-			if (owningMe == element || owningMe == element.getCurSharedRef()) {
-				return cTabItem;
-			}
-		}
-		return null;
 	}
 }

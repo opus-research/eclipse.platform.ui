@@ -976,17 +976,6 @@ public class StackRenderer extends LazyStackRenderer {
 		};
 		ctf.addCTabFolder2Listener(closeListener);
 
-		// Detect activation...picks up cases where the user clicks on the
-		// (already active) tab
-		ctf.addListener(SWT.Activate, new org.eclipse.swt.widgets.Listener() {
-			public void handleEvent(org.eclipse.swt.widgets.Event event) {
-				CTabFolder ctf = (CTabFolder) event.widget;
-				MElementContainer<MUIElement> stack = (MElementContainer<MUIElement>) ctf
-						.getData(OWNING_ME);
-				activateStack(stack);
-			}
-		});
-
 		ctf.addMenuDetectListener(new MenuDetectListener() {
 			public void menuDetected(MenuDetectEvent e) {
 				Point absolutePoint = new Point(e.x, e.y);
@@ -1019,7 +1008,7 @@ public class StackRenderer extends LazyStackRenderer {
 				SWT.ON_TOP, SWT.V_SCROLL | SWT.H_SCROLL,
 				ctxt.get(EPartService.class), stack,
 				(ISWTResourceUtilities) ctxt.get(IResourceUtilities.class),
-				ctf, getInitialMRUValue(ctf));
+				getInitialMRUValue(ctf));
 		editorList.setInput();
 
 		Point size = editorList.computeSizeHint();
