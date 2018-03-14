@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Chris Gross <schtoo@schtoo.com> 
  *     - Fix for 99155 - allow standalone view placeholders
  *     Chris Gross chris.gross@us.ibm.com Bug 107443
- *     Denis Zygann <d.zygann@web.de> - Bug 457390
  *******************************************************************************/
 package org.eclipse.ui;
 
@@ -202,31 +201,27 @@ public interface IPageLayout {
     public void addActionSet(String actionSetId);
 
     /**
-     * Adds the view with the given compound id to the page layout as a fast view.
+     * Adds the view with the given compound id to the page layout as a fast view.  
      * See the {@link IPageLayout} type documentation for more details about compound ids.
      * The primary id must name a view contributed to the workbench's view extension
      * point (named <code>"org.eclipse.ui.views"</code>).
-     *
+     * 
      * @param viewId the compound id of the view to be added
      * @since 2.0
-     * @deprecated discontinued support for fast views
      */
-    @Deprecated
     public void addFastView(String viewId);
 
     /**
      * Adds the view with the given compound id to the page layout as a fast view
-     * with the given width ratio.
+     * with the given width ratio. 
      * See the {@link IPageLayout} type documentation for more details about compound ids.
-     * The primary id must name a view contributed to the workbench's view extension
+     * The primary id must name a view contributed to the workbench's view extension 
      * point (named <code>"org.eclipse.ui.views"</code>).
-     *
+     * 
      * @param viewId the compound id of the view to be added
      * @param ratio the percentage of the workbench the fast view will cover
      * @since 2.0
-     * @deprecated discontinued support for fast views
      */
-    @Deprecated
     public void addFastView(String viewId, float ratio);
 
     /**
