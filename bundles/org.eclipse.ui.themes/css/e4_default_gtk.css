@@ -56,6 +56,10 @@ ColorDefinition#org-eclipse-ui-workbench-ACTIVE_TAB_OUTLINE_COLOR {
 	padding: 0px 5px 7px;
 }
 
+IEclipsePreferences#org-eclipse-ui-workbench {
+	is-dark-theme: false;
+}
+
 CTabFolder.MArea .MPartStack, CTabFolder.MArea .MPartStack.active {
 	swt-shadow-visible: false;
 }

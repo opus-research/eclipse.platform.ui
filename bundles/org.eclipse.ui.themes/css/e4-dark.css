@@ -65,6 +65,10 @@
     font-weight: bold;
 }
 
+IEclipsePreferences#org-eclipse-ui-workbench {
+	is-dark-theme: true;
+}
+
 CTabItem,
 CTabItem CLabel {
     background-color: '#org-eclipse-ui-workbench-INACTIVE_TAB_BG_END'; /* HACK for background of CTabFolder inner Toolbars */

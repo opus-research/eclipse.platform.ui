@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<fragment>
+   <extension
+         point="org.eclipse.e4.ui.css.core.propertyHandler">
+      <handler
+            adapter="org.eclipse.e4.ui.css.swt.dom.preference.EclipsePreferencesElement"
+            handler="org.eclipse.ui.gtk.ThemeChangeHanlder">
+         <property-name
+               name="is-dark-theme">
+         </property-name>
+      </handler>
+   </extension>
+
+</fragment>
