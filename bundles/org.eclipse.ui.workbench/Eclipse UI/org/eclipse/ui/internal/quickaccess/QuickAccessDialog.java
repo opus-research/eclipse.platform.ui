@@ -327,7 +327,7 @@ public class QuickAccessDialog extends PopupDialog {
 
 	@Override
 	protected Point getDefaultSize() {
-		return new Point(600, 420);
+		return new Point(350, 420);
 	}
 
 	@Override
