@@ -7,7 +7,7 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728, 430166, 400771
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728, 430166
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -765,7 +765,7 @@ public class StackRenderer extends LazyStackRenderer {
 			}
 
 			ToolBar newViewTB = null;
-			if (needsTB) {
+			if (needsTB && part != null && part.getObject() != null) {
 				part.getToolbar().setVisible(true);
 				newViewTB = (ToolBar) renderer.createGui(part.getToolbar(),
 						ctf.getTopRight(), part.getContext());
@@ -1333,12 +1333,8 @@ public class StackRenderer extends LazyStackRenderer {
 	private boolean isClosable(MPart part) {
 		// if it's a shared part check its current ref
 		if (part.getCurSharedRef() != null) {
-			if (part.getCurSharedRef().getTags()
-					.contains(IPresentationEngine.NO_CLOSE)) {
-				return false;
-			}
-			// tag not present, return status from the shared element
-			return part.isCloseable();
+			return !(part.getCurSharedRef().getTags()
+					.contains(IPresentationEngine.NO_CLOSE));
 		}
 
 		return part.isCloseable();

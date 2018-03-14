@@ -2759,8 +2759,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		// 3.3 end
 
 		// Populate the action bars with the action sets' data
-		for (Iterator<ActionSet> i = actionSets.iterator(); i.hasNext();) {
-			ActionSet actionSet = i.next();
+		for (ActionSet actionSet : actionSets) {
 			ActionSetDescriptor descriptor = actionSet.descriptor;
 			PluginActionSet pluginActionSet = buildMenusAndToolbarsFor(
 					customizeActionBars, descriptor);
@@ -2789,7 +2788,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		customizeActionBars.coolBarManager.update(true);
 
 		shortcuts = new Category(""); //$NON-NLS-1$
-		toolBarItems = createToolBarStructure(window.getTopTrim());
+		toolBarItems = createTrimBarEntries(window.getTopTrim());
 		menuItems = createMenuStructure(window.getModel().getMainMenu());
 	}
 
@@ -3218,13 +3217,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		}
 	}
 
-	private DisplayItem createToolBarStructure(MTrimBar toolbar) {
-		DisplayItem root = new DisplayItem(null, null); // Create a
-		// root
-		createToolbarEntries(toolbar, root);
-		return root;
-	}
-
 	private boolean hasVisibleItems(MToolBar toolBar) {
 		for (MToolBarElement e : toolBar.getChildren()) {
 			if (!(e instanceof MToolBarSeparator)) {
@@ -3234,9 +3226,11 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		return false;
 	}
 
-	private void createToolbarEntries(MTrimBar toolbar, DisplayItem parent) {
+	private DisplayItem createTrimBarEntries(MTrimBar toolbar) {
+		// create a root element
+		DisplayItem root = new DisplayItem(null, null);
 		if (toolbar == null) {
-			return;
+			return root;
 		}
 		for (MTrimElement trimElement : toolbar.getChildren()) {
 			if (trimElement instanceof MToolBar) {
@@ -3244,24 +3238,24 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 				String text;
 				ToolBarManager manager = toolbarMngrRenderer.getManager(toolBar);
 				if (manager != null && hasVisibleItems(toolBar)) {
-					IContributionItem contributionItem = (IContributionItem) trimElement
+					IContributionItem contributionItem = (IContributionItem) toolBar
 							.getTransientData().get("coolbar.object"); //$NON-NLS-1$
-					Object name = trimElement.getTransientData().get("Name"); //$NON-NLS-1$
+					Object name = toolBar.getTransientData().get("Name"); //$NON-NLS-1$
 					if (name != null) {// && ((String) name).length() != 0
 						text = (String) name;
 					} else {
-						text = getToolbarLabel(trimElement.getElementId());
+						text = getToolbarLabel(toolBar.getElementId());
 					}
 					DisplayItem toolBarEntry = new DisplayItem(text, contributionItem);
 					toolBarEntry.setImageDescriptor(toolbarImageDescriptor);
-					toolBarEntry.setActionSet(idToActionSet
-							.get(getActionSetID(trimElement)));
-					parent.addChild(toolBarEntry);
+					toolBarEntry.setActionSet(idToActionSet.get(getActionSetID(toolBar)));
+					root.addChild(toolBarEntry);
 					toolBarEntry.setCheckState(getToolbarItemIsVisible(toolBarEntry));
-					createToolbarEntries((MToolBar) trimElement, toolBarEntry);
+					createToolbarEntries(toolBar, toolBarEntry);
 				}
 			}
 		}
+		return root;
 	}
 
 	private void createToolbarEntries(MToolBar toolbar, DisplayItem parent) {
