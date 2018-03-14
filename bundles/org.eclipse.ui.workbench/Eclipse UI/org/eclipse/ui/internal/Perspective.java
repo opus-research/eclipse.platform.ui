@@ -59,7 +59,7 @@ public class Perspective {
 
 	/**
 	 * Create the initial list of action sets.
-	 * 
+	 *
 	 * @return action set descriptors created from given descriptor id's, can be
 	 *         empty but never null.
 	 */
