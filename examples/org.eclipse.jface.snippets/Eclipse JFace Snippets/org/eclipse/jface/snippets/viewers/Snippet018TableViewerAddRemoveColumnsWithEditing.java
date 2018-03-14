@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 Tom Schindl and others.
+ * Copyright (c) 2006 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414565
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -15,7 +14,6 @@ package org.eclipse.jface.snippets.viewers;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
@@ -41,7 +39,7 @@ import org.eclipse.swt.widgets.TableColumn;
 
 /**
  * Example of adding and removing columns in conjunction with JFace-Viewers
- *
+ * 
  * @author Tom Schindl <tom.schindl@bestsolution.at>
  * @since 3.2
  */
@@ -142,8 +140,8 @@ public class Snippet018TableViewerAddRemoveColumnsWithEditing {
 
 		@Override
 		public void modify(Object element, String property, Object value) {
-			((Person) ((Item) element).getData()).setValue(property,
-					value.toString());
+			((Person) ((Item) element).getData()).setValue(property, value
+					.toString());
 			viewer.update(((Item) element).getData(), null);
 		}
 
@@ -250,14 +248,13 @@ public class Snippet018TableViewerAddRemoveColumnsWithEditing {
 			}
 		}
 
-		List<?> list = new ArrayList<CellEditor>(Arrays.asList(v
-				.getCellEditors()));
+		ArrayList list = new ArrayList(Arrays.asList(v.getCellEditors()));
 		list.remove(emailIndex);
 		CellEditor[] editors = new CellEditor[list.size()];
 		list.toArray(editors);
 		v.setCellEditors(editors);
 
-		list = new ArrayList<Object>(Arrays.asList(v.getColumnProperties()));
+		list = new ArrayList(Arrays.asList(v.getColumnProperties()));
 		list.remove(emailIndex);
 		String[] columnProperties = new String[list.size()];
 		list.toArray(columnProperties);
@@ -269,20 +266,16 @@ public class Snippet018TableViewerAddRemoveColumnsWithEditing {
 	}
 
 	private void addEmailColumn(TableViewer v, int columnIndex) {
-		List<CellEditor> list = new ArrayList<CellEditor>(Arrays.asList(v
-				.getCellEditors()));
+		ArrayList list = new ArrayList(Arrays.asList(v.getCellEditors()));
 		list.add(columnIndex, new TextCellEditor(v.getTable()));
-
 		CellEditor[] editors = new CellEditor[list.size()];
 		list.toArray(editors);
 		v.setCellEditors(editors);
 
-		List<Object> list2 = new ArrayList<Object>(Arrays.asList(v
-				.getColumnProperties()));
-		list2.add(columnIndex, "email");
-
-		String[] columnProperties = new String[list2.size()];
-		list2.toArray(columnProperties);
+		list = new ArrayList(Arrays.asList(v.getColumnProperties()));
+		list.add(columnIndex, "email");
+		String[] columnProperties = new String[list.size()];
+		list.toArray(columnProperties);
 		v.setColumnProperties(columnProperties);
 
 		// 1. Add new column
@@ -298,13 +291,13 @@ public class Snippet018TableViewerAddRemoveColumnsWithEditing {
 	}
 
 	private Person[] createModel() {
-		return new Person[] {
-				new Person("Tom", "Schindl", "tom.schindl@bestsolution.at"),
-				new Person("Boris", "Bokowski", "boris_bokowski@ca.ibm.com"),
-				new Person("Tod", "Creasey", "tod_creasey@ca.ibm.com"),
-				new Person("Jeanderson", "Candido", "jeandersonbc@gmail.com"),
-				new Person("Lars", "Vogel", "Lars.Vogel@gmail.com"),
-				new Person("Hendrik", "Still", "hendrik.still@vogella.com") };
+		Person[] persons = new Person[3];
+		persons[0] = new Person("Tom", "Schindl", "tom.schindl@bestsolution.at");
+		persons[1] = new Person("Boris", "Bokowski",
+				"boris_bokowski@ca.ibm.com");
+		persons[2] = new Person("Tod", "Creasey", "tod_creasey@ca.ibm.com");
+
+		return persons;
 	}
 
 	/**
