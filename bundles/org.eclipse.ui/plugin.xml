@@ -1384,6 +1384,12 @@
             id="org.eclipse.ui.activeContextInfo"
             name="%activeContextInfo.name">
       </command>
+      <command
+            categoryId="org.eclipse.ui.category.window"
+            description="%command.resetCoolbar.description"
+            id="org.eclipse.ui.resetCoolbarAction"
+            name="%command.resetCoolbar.name">
+      </command>
    </extension>
    
    <extension
@@ -2334,6 +2340,18 @@
                   </instanceof>
                </with>
             </or>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="org.eclipse.ui.internal.handlers.ResetToolbarVisibilityHandler"
+            commandId="org.eclipse.ui.resetCoolbarAction">
+         <enabledWhen>
+            <with
+                  variable="activeWorkbenchWindow">
+               <instanceof
+                     value="org.eclipse.ui.IWorkbenchWindow">
+               </instanceof>
+            </with>
          </enabledWhen>
       </handler>
    </extension>
