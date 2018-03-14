@@ -26,18 +26,22 @@ import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
 import org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
+import org.eclipse.e4.ui.model.application.impl.ApplicationFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
+import org.eclipse.e4.ui.model.application.ui.advanced.impl.AdvancedFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
+import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.addons.cleanupaddon.CleanupAddon;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -71,7 +75,6 @@ public class PartRenderingEngineTests {
 		}
 	};
 	private boolean logged = false;
-	private EModelService ems;
 
 	private boolean checkMacBug466636() {
 		if (Platform.OS_MACOSX.equals(Platform.getOS())) {
@@ -92,7 +95,6 @@ public class PartRenderingEngineTests {
 		LogReaderService logReaderService = appContext
 				.get(LogReaderService.class);
 		logReaderService.addLogListener(listener);
-		ems = appContext.get(EModelService.class);
 	}
 
 	@After
@@ -125,7 +127,8 @@ public class PartRenderingEngineTests {
 	@Test
 	public void testCreateViewBug298415() {
 		final MWindow window = createWindowWithOneView("Part Name");
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class, application);
@@ -150,10 +153,11 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testAddWindowBug299219() throws Exception {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.setContext(appContext);
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 
 		appContext.set(MApplication.class, application);
@@ -163,7 +167,7 @@ public class PartRenderingEngineTests {
 
 		assertNotNull(window.getWidget());
 
-		MWindow window2 = ems.createModelElement(MWindow.class);
+		MWindow window2 = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window2);
 
 		assertNotNull(window2.getWidget());
@@ -171,21 +175,22 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testPartStack_SetActiveChildBug299379() throws Exception {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.setContext(appContext);
 		appContext.set(MApplication.class, application);
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 
-		MPartStack stack = ems.createModelElement(MPartStack.class);
+		MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(stack);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setElementId("partA");
 		partA.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setElementId("partB");
 		partB.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
@@ -198,7 +203,7 @@ public class PartRenderingEngineTests {
 		CTabFolder tabFolder = (CTabFolder) stack.getWidget();
 		assertEquals(0, tabFolder.getSelectionIndex());
 
-		EPartService service = window.getContext().get(
+		EPartService service = (EPartService) window.getContext().get(
 				EPartService.class);
 		service.activate(partB);
 		assertEquals(
@@ -208,21 +213,22 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testPartStack_SetActiveChild2Bug299379() throws Exception {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.setContext(appContext);
 		appContext.set(MApplication.class, application);
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 
-		MPartStack stack = ems.createModelElement(MPartStack.class);
+		MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(stack);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setElementId("partA");
 		partA.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setElementId("partB");
 		partB.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
@@ -236,7 +242,7 @@ public class PartRenderingEngineTests {
 		CTabFolder tabFolder = (CTabFolder) stack.getWidget();
 		assertEquals(0, tabFolder.getSelectionIndex());
 
-		EPartService service = window.getContext().get(
+		EPartService service = (EPartService) window.getContext().get(
 				EPartService.class);
 		service.showPart(partB.getElementId(), PartState.ACTIVATE);
 		assertEquals("Showing a part should alter the tab folder's selection",
@@ -245,21 +251,23 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testPartStack_SetActiveChild3Bug299379() throws Exception {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.setContext(appContext);
 		appContext.set(MApplication.class, application);
 
-		MPartDescriptor descriptor = ems.createModelElement(MPartDescriptor.class);
+		MPartDescriptor descriptor = org.eclipse.e4.ui.model.application.descriptor.basic.impl.BasicFactoryImpl.eINSTANCE
+				.createPartDescriptor();
 		descriptor
 				.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		descriptor.setElementId("part");
 		descriptor.setCategory("aStack");
 		application.getDescriptors().add(descriptor);
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 
-		MPartStack stack = ems.createModelElement(MPartStack.class);
+		MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		stack.getTags().add("aStack");
 		window.getChildren().add(stack);
 
@@ -269,7 +277,7 @@ public class PartRenderingEngineTests {
 		CTabFolder tabFolder = (CTabFolder) stack.getWidget();
 		assertEquals(0, tabFolder.getItemCount());
 
-		EPartService service = window.getContext().get(
+		EPartService service = (EPartService) window.getContext().get(
 				EPartService.class);
 		MPart shownPart = service.showPart("part", PartState.ACTIVATE);
 
@@ -281,21 +289,22 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testPartStack_SetActiveChild4Bug299379() throws Exception {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.setContext(appContext);
 		appContext.set(MApplication.class, application);
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 
-		MPartStack stack = ems.createModelElement(MPartStack.class);
+		MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(stack);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setElementId("partA");
 		partA.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setElementId("partB");
 		partB.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
@@ -316,17 +325,18 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testPartStack_SetActiveChild5Bug295250() throws Exception {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.setContext(appContext);
 		appContext.set(MApplication.class, application);
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 
-		MPartStack stack = ems.createModelElement(MPartStack.class);
+		MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(stack);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		stack.getChildren().add(partA);
 
@@ -335,7 +345,7 @@ public class PartRenderingEngineTests {
 
 		assertEquals(partA, stack.getSelectedElement());
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		stack.getChildren().add(partB);
 
@@ -348,17 +358,18 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testPartStack_SetActiveChild6Bug298797() throws Exception {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.setContext(appContext);
 		appContext.set(MApplication.class, application);
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 
-		MPartStack stack = ems.createModelElement(MPartStack.class);
+		MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(stack);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		stack.getChildren().add(partA);
 
@@ -369,7 +380,7 @@ public class PartRenderingEngineTests {
 		assertEquals(0, tabFolder.getSelectionIndex());
 		assertEquals(partA, stack.getSelectedElement());
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		stack.getChildren().add(partB);
 
@@ -383,19 +394,22 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testCreateGuiBug301021() throws Exception {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.setContext(appContext);
 		appContext.set(MApplication.class, application);
 
 		// create two descriptors
-		MPartDescriptor descriptor = ems.createModelElement(MPartDescriptor.class);
+		MPartDescriptor descriptor = org.eclipse.e4.ui.model.application.descriptor.basic.impl.BasicFactoryImpl.eINSTANCE
+				.createPartDescriptor();
 		descriptor
 				.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		descriptor.setElementId("part");
 		descriptor.setCategory("aStack");
 		application.getDescriptors().add(descriptor);
 
-		MPartDescriptor descriptor2 = ems.createModelElement(MPartDescriptor.class);
+		MPartDescriptor descriptor2 = org.eclipse.e4.ui.model.application.descriptor.basic.impl.BasicFactoryImpl.eINSTANCE
+				.createPartDescriptor();
 		descriptor2
 				.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		descriptor2.setElementId("part2");
@@ -404,9 +418,10 @@ public class PartRenderingEngineTests {
 
 		// make a window with a sash container and a stack inside, this will
 		// force the stack to have SashFormData
-		MWindow window = ems.createModelElement(MWindow.class);
-		MPartSashContainer partSashContainer = ems.createModelElement(MPartSashContainer.class);
-		MPartStack stack = ems.createModelElement(MPartStack.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
+		MPartSashContainer partSashContainer = BasicFactoryImpl.eINSTANCE
+				.createPartSashContainer();
+		MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		// assign the stack with the category id of the descriptors above
 		stack.setElementId("aStack");
 		partSashContainer.getChildren().add(stack);
@@ -414,7 +429,7 @@ public class PartRenderingEngineTests {
 		application.getChildren().add(window);
 
 		// make a new window with nothing
-		MWindow window2 = ems.createModelElement(MWindow.class);
+		MWindow window2 = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window2);
 
 		wb = new E4Workbench(application, appContext);
@@ -425,7 +440,7 @@ public class PartRenderingEngineTests {
 		// try to show the parts in the second window, a new stack should be
 		// created in the second window instead of trying to reuse the one in
 		// the first window
-		EPartService service = window2.getContext().get(
+		EPartService service = (EPartService) window2.getContext().get(
 				EPartService.class);
 		service.showPart("part", EPartService.PartState.VISIBLE);
 		service.showPart("part", EPartService.PartState.CREATE);
@@ -438,21 +453,22 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testPart_ToBeRendered() {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.setContext(appContext);
 		appContext.set(MApplication.class, application);
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 
-		MPartStack stack = ems.createModelElement(MPartStack.class);
+		MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(stack);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setElementId("partA");
 		partA.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setElementId("partB");
 		partB.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
@@ -465,7 +481,7 @@ public class PartRenderingEngineTests {
 		CTabFolder tabFolder = (CTabFolder) stack.getWidget();
 		assertEquals(0, tabFolder.getSelectionIndex());
 
-		EPartService service = window.getContext().get(
+		EPartService service = (EPartService) window.getContext().get(
 				EPartService.class);
 		service.activate(partB);
 		assertEquals(1, tabFolder.getSelectionIndex());
@@ -479,21 +495,22 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testPart_ToBeRendered2() throws Exception {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.setContext(appContext);
 		appContext.set(MApplication.class, application);
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 
-		MPartStack stack = ems.createModelElement(MPartStack.class);
+		MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(stack);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setElementId("partA");
 		partA.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setElementId("partB");
 		partB.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		partB.setToBeRendered(false);
@@ -521,7 +538,8 @@ public class PartRenderingEngineTests {
 	@Test
 	public void testClientObjectUnsetWhenNotRenderedBug301439() {
 		final MWindow window = createWindowWithOneView("");
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class, application);
@@ -550,17 +568,18 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testCTabItem_SetControl_Bug304211() {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.setContext(appContext);
 		appContext.set(MApplication.class, application);
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 
-		MPartStack stack = ems.createModelElement(MPartStack.class);
+		MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(stack);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setElementId("partA");
 		partA.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
@@ -578,7 +597,7 @@ public class PartRenderingEngineTests {
 				"The presentation engine should have created the part and set it",
 				partA.getWidget(), itemA.getControl());
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setElementId("partB");
 		partB.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
@@ -606,21 +625,22 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testToBeRenderedCausesSelectionChanges() {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.setContext(appContext);
 		appContext.set(MApplication.class, application);
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 
-		MPartStack stack = ems.createModelElement(MPartStack.class);
+		MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(stack);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setElementId("partA");
 		partA.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setElementId("partB");
 		partB.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
@@ -633,7 +653,7 @@ public class PartRenderingEngineTests {
 		CTabFolder tabFolder = (CTabFolder) stack.getWidget();
 		assertEquals(0, tabFolder.getSelectionIndex());
 
-		EPartService service = window.getContext().get(
+		EPartService service = (EPartService) window.getContext().get(
 				EPartService.class);
 		service.activate(partB);
 		assertEquals(1, tabFolder.getSelectionIndex());
@@ -648,20 +668,20 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testSetSelectedElement() {
-		MPartStack stack = ems.createModelElement(MPartStack.class);
+		MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setElementId("partA");
 		partA.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setElementId("partB");
 		partB.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
 		stack.getChildren().add(partA);
 		stack.getChildren().add(partB);
 
-		MPart partC = ems.createModelElement(MPart.class);
+		MPart partC = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setElementId("partB");
 		partB.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
@@ -686,25 +706,27 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testSelectedElementNullingTBR() {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.setContext(appContext);
 		appContext.set(MApplication.class, application);
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 
-		MPartSashContainer container = ems.createModelElement(MPartSashContainer.class);
+		MPartSashContainer container = BasicFactoryImpl.eINSTANCE
+				.createPartSashContainer();
 		window.getChildren().add(container);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setElementId("partA");
 		partA.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setElementId("partB");
 		partB.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
-		MPart partC = ems.createModelElement(MPart.class);
+		MPart partC = BasicFactoryImpl.eINSTANCE.createPart();
 		partC.setElementId("partC");
 		partC.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
@@ -734,25 +756,27 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testSelectedElementNullingParentChange() {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.setContext(appContext);
 		appContext.set(MApplication.class, application);
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 
-		MPartSashContainer container = ems.createModelElement(MPartSashContainer.class);
+		MPartSashContainer container = BasicFactoryImpl.eINSTANCE
+				.createPartSashContainer();
 		window.getChildren().add(container);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setElementId("partA");
 		partA.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setElementId("partB");
 		partB.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
-		MPart partC = ems.createModelElement(MPart.class);
+		MPart partC = BasicFactoryImpl.eINSTANCE.createPart();
 		partC.setElementId("partC");
 		partC.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
@@ -782,8 +806,9 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testCreateGuiBug301950() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		final MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 
 		application.setContext(appContext);
@@ -792,7 +817,7 @@ public class PartRenderingEngineTests {
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		window.getChildren().add(part);
 
@@ -808,23 +833,24 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testRemoveGuiBug307578() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		final MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
 		// create a stack
-		MPartStack stack = ems.createModelElement(MPartStack.class);
+		MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(stack);
 		window.setSelectedElement(stack);
 
 		// put two parts in it
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		stack.getChildren().add(partA);
 		stack.setSelectedElement(partA);
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		stack.getChildren().add(partB);
 
@@ -855,29 +881,30 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testRemoveGuiBug324033() throws Exception {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.setContext(appContext);
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPartStack partStack = ems.createModelElement(MPartStack.class);
+		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(partStack);
 		window.setSelectedElement(partStack);
 
 		// put two parts in it
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		partStack.getChildren().add(partA);
 		partStack.setSelectedElement(partA);
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		partStack.getChildren().add(partB);
 
 		// make a third random part that's not in the UI
-		MPart partC = ems.createModelElement(MPart.class);
+		MPart partC = BasicFactoryImpl.eINSTANCE.createPart();
 		partC.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
 		appContext.set(MApplication.class, application);
@@ -900,24 +927,28 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testRemoveGuiBug323496() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		window.getSharedElements().add(part);
 
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
+				.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 		window.setSelectedElement(perspectiveStack);
 
-		MPerspective perspective = ems.createModelElement(MPerspective.class);
+		MPerspective perspective = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveStack.getChildren().add(perspective);
 		perspectiveStack.setSelectedElement(perspective);
 
-		MPlaceholder placeholder = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder placeholder = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 		placeholder.setRef(part);
 		part.setCurSharedRef(placeholder);
 		perspective.getChildren().add(placeholder);
@@ -941,24 +972,25 @@ public class PartRenderingEngineTests {
 		if (checkMacBug466636())
 			return;
 
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.setContext(appContext);
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPartStack partStack = ems.createModelElement(MPartStack.class);
+		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(partStack);
 		window.setSelectedElement(partStack);
 
 		// put two parts in it
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		partStack.getChildren().add(partA);
 		partStack.setSelectedElement(partA);
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		partStack.getChildren().add(partB);
 
@@ -979,16 +1011,17 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug317591_NonSharedPart() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		final MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPartStack stack = ems.createModelElement(MPartStack.class);
+		MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(stack);
 		window.setSelectedElement(stack);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		stack.getChildren().add(partA);
 		stack.setSelectedElement(partA);
@@ -1008,23 +1041,26 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug317591_SharedPart() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MPartDescriptor descriptorA = ems.createModelElement(MPartDescriptor.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MPartDescriptor descriptorA = org.eclipse.e4.ui.model.application.descriptor.basic.impl.BasicFactoryImpl.eINSTANCE
+				.createPartDescriptor();
 		descriptorA.setElementId("sharedA");
 		descriptorA
 				.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		application.getDescriptors().add(descriptorA);
-		MPartDescriptor descriptorB = ems.createModelElement(MPartDescriptor.class);
+		MPartDescriptor descriptorB = org.eclipse.e4.ui.model.application.descriptor.basic.impl.BasicFactoryImpl.eINSTANCE
+				.createPartDescriptor();
 		descriptorB.setElementId("sharedB");
 		descriptorB
 				.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		application.getDescriptors().add(descriptorB);
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPartStack stack = ems.createModelElement(MPartStack.class);
+		MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(stack);
 		window.setSelectedElement(stack);
 
@@ -1051,35 +1087,41 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testRemoveGuiBug324228_1() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		window.getSharedElements().add(part);
 
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
+				.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 		window.setSelectedElement(perspectiveStack);
 
-		MPerspective perspectiveA = ems.createModelElement(MPerspective.class);
+		MPerspective perspectiveA = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveA.setElementId("perspectiveA"); //$NON-NLS-1$
 		perspectiveStack.getChildren().add(perspectiveA);
 		perspectiveStack.setSelectedElement(perspectiveA);
 
-		MPlaceholder placeholderA = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder placeholderA = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 		placeholderA.setRef(part);
 		part.setCurSharedRef(placeholderA);
 		perspectiveA.getChildren().add(placeholderA);
 		perspectiveA.setSelectedElement(placeholderA);
 
-		MPerspective perspectiveB = ems.createModelElement(MPerspective.class);
+		MPerspective perspectiveB = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveB.setElementId("perspectiveB"); //$NON-NLS-1$
 		perspectiveStack.getChildren().add(perspectiveB);
 
-		MPlaceholder placeholderB = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder placeholderB = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 		placeholderB.setRef(part);
 		perspectiveB.getChildren().add(placeholderB);
 		perspectiveB.setSelectedElement(placeholderB);
@@ -1103,35 +1145,41 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testRemoveGuiBug324228_2() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		window.getSharedElements().add(part);
 
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
+				.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 		window.setSelectedElement(perspectiveStack);
 
-		MPerspective perspectiveA = ems.createModelElement(MPerspective.class);
+		MPerspective perspectiveA = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveA.setElementId("perspectiveA"); //$NON-NLS-1$
 		perspectiveStack.getChildren().add(perspectiveA);
 		perspectiveStack.setSelectedElement(perspectiveA);
 
-		MPlaceholder placeholderA = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder placeholderA = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 		placeholderA.setRef(part);
 		part.setCurSharedRef(placeholderA);
 		perspectiveA.getChildren().add(placeholderA);
 		perspectiveA.setSelectedElement(placeholderA);
 
-		MPerspective perspectiveB = ems.createModelElement(MPerspective.class);
+		MPerspective perspectiveB = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveB.setElementId("perspectiveB"); //$NON-NLS-1$
 		perspectiveStack.getChildren().add(perspectiveB);
 
-		MPlaceholder placeholderB = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder placeholderB = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 		placeholderB.setRef(part);
 		perspectiveB.getChildren().add(placeholderB);
 		perspectiveB.setSelectedElement(placeholderB);
@@ -1154,38 +1202,44 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testRemoveGuiBug324228_3() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPartStack partStack = ems.createModelElement(MPartStack.class);
+		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getSharedElements().add(partStack);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		partStack.getChildren().add(part);
 
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
+				.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 		window.setSelectedElement(perspectiveStack);
 
-		MPerspective perspectiveA = ems.createModelElement(MPerspective.class);
+		MPerspective perspectiveA = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveA.setElementId("perspectiveA"); //$NON-NLS-1$
 		perspectiveStack.getChildren().add(perspectiveA);
 		perspectiveStack.setSelectedElement(perspectiveA);
 
-		MPlaceholder placeholderA = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder placeholderA = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 		placeholderA.setRef(partStack);
 		partStack.setCurSharedRef(placeholderA);
 		perspectiveA.getChildren().add(placeholderA);
 		perspectiveA.setSelectedElement(placeholderA);
 
-		MPerspective perspectiveB = ems.createModelElement(MPerspective.class);
+		MPerspective perspectiveB = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveB.setElementId("perspectiveB"); //$NON-NLS-1$
 		perspectiveStack.getChildren().add(perspectiveB);
 
-		MPlaceholder placeholderB = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder placeholderB = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 		placeholderB.setRef(partStack);
 		perspectiveB.getChildren().add(placeholderB);
 		perspectiveB.setSelectedElement(placeholderB);
@@ -1208,38 +1262,44 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testRemoveGuiBug324228_4() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPartStack partStack = ems.createModelElement(MPartStack.class);
+		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getSharedElements().add(partStack);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		partStack.getChildren().add(part);
 
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
+				.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 		window.setSelectedElement(perspectiveStack);
 
-		MPerspective perspectiveA = ems.createModelElement(MPerspective.class);
+		MPerspective perspectiveA = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveA.setElementId("perspectiveA"); //$NON-NLS-1$
 		perspectiveStack.getChildren().add(perspectiveA);
 		perspectiveStack.setSelectedElement(perspectiveA);
 
-		MPlaceholder placeholderA = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder placeholderA = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 		placeholderA.setRef(partStack);
 		partStack.setCurSharedRef(placeholderA);
 		perspectiveA.getChildren().add(placeholderA);
 		perspectiveA.setSelectedElement(placeholderA);
 
-		MPerspective perspectiveB = ems.createModelElement(MPerspective.class);
+		MPerspective perspectiveB = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveB.setElementId("perspectiveB"); //$NON-NLS-1$
 		perspectiveStack.getChildren().add(perspectiveB);
 
-		MPlaceholder placeholderB = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder placeholderB = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 		placeholderB.setRef(partStack);
 		perspectiveB.getChildren().add(placeholderB);
 		perspectiveB.setSelectedElement(placeholderB);
@@ -1263,16 +1323,18 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testRemoveGuiBug324230() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPartSashContainer sashContainer = ems.createModelElement(MPartSashContainer.class);
+		MPartSashContainer sashContainer = BasicFactoryImpl.eINSTANCE
+				.createPartSashContainer();
 		window.getChildren().add(sashContainer);
 		window.setSelectedElement(sashContainer);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setToBeRendered(false);
 		// add an element into the container that's not being rendered
 		sashContainer.getChildren().add(part);
@@ -1292,25 +1354,29 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug317849() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPartSashContainer sashContainer = ems.createModelElement(MPartSashContainer.class);
+		MPartSashContainer sashContainer = BasicFactoryImpl.eINSTANCE
+				.createPartSashContainer();
 		window.getChildren().add(sashContainer);
 		window.setSelectedElement(sashContainer);
 
-		MPlaceholder sharedAreaPlaceholder = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder sharedAreaPlaceholder = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 		sashContainer.getChildren().add(sharedAreaPlaceholder);
 		sashContainer.setSelectedElement(sharedAreaPlaceholder);
 
-		MPartSashContainer sharedSashContainer = ems.createModelElement(MPartSashContainer.class);
+		MPartSashContainer sharedSashContainer = BasicFactoryImpl.eINSTANCE
+				.createPartSashContainer();
 		window.getSharedElements().add(sharedSashContainer);
 		sharedAreaPlaceholder.setRef(sharedSashContainer);
 		sharedSashContainer.setCurSharedRef(sharedAreaPlaceholder);
 
-		MPartStack partStack = ems.createModelElement(MPartStack.class);
+		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		sharedSashContainer.getChildren().add(partStack);
 		sharedSashContainer.setSelectedElement(partStack);
 
@@ -1327,24 +1393,26 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug326087() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPartSashContainer sashContainer = ems.createModelElement(MPartSashContainer.class);
+		MPartSashContainer sashContainer = BasicFactoryImpl.eINSTANCE
+				.createPartSashContainer();
 		window.getChildren().add(sashContainer);
 		window.setSelectedElement(sashContainer);
 
-		MPartStack partStack = ems.createModelElement(MPartStack.class);
+		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		sashContainer.getChildren().add(partStack);
 		sashContainer.setSelectedElement(partStack);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partStack.getChildren().add(partA);
 		partStack.setSelectedElement(partA);
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partStack.getChildren().add(partB);
 
 		application.setContext(appContext);
@@ -1368,39 +1436,45 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug327701() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPartStack partStack = ems.createModelElement(MPartStack.class);
+		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getSharedElements().add(partStack);
 
-		MPart part1 = ems.createModelElement(MPart.class);
+		MPart part1 = BasicFactoryImpl.eINSTANCE.createPart();
 		partStack.getChildren().add(part1);
 
-		MPart part2 = ems.createModelElement(MPart.class);
+		MPart part2 = BasicFactoryImpl.eINSTANCE.createPart();
 		partStack.getChildren().add(part2);
 		partStack.setSelectedElement(part2);
 
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
+				.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 		window.setSelectedElement(perspectiveStack);
 
-		MPerspective perspectiveA = ems.createModelElement(MPerspective.class);
+		MPerspective perspectiveA = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveStack.getChildren().add(perspectiveA);
 		perspectiveStack.setSelectedElement(perspectiveA);
 
-		MPlaceholder placeholderA = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder placeholderA = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 		placeholderA.setRef(partStack);
 		partStack.setCurSharedRef(placeholderA);
 		perspectiveA.getChildren().add(placeholderA);
 		perspectiveA.setSelectedElement(placeholderA);
 
-		MPerspective perspectiveB = ems.createModelElement(MPerspective.class);
+		MPerspective perspectiveB = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveStack.getChildren().add(perspectiveB);
 
-		MPlaceholder placeholderB = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder placeholderB = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 		placeholderB.setRef(partStack);
 		perspectiveB.getChildren().add(placeholderB);
 		perspectiveB.setSelectedElement(placeholderB);
@@ -1425,42 +1499,48 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug326699() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPartStack partStack = ems.createModelElement(MPartStack.class);
+		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getSharedElements().add(partStack);
 
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
+				.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 		window.setSelectedElement(perspectiveStack);
 
-		MPerspective perspectiveA = ems.createModelElement(MPerspective.class);
+		MPerspective perspectiveA = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveStack.getChildren().add(perspectiveA);
 		perspectiveStack.setSelectedElement(perspectiveA);
 
-		MPlaceholder partStackPlaceholderA = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder partStackPlaceholderA = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 		partStack.setCurSharedRef(partStackPlaceholderA);
 		partStackPlaceholderA.setRef(partStack);
 		perspectiveA.getChildren().add(partStackPlaceholderA);
 		perspectiveA.setSelectedElement(partStackPlaceholderA);
 
-		MPerspective perspectiveB = ems.createModelElement(MPerspective.class);
+		MPerspective perspectiveB = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveStack.getChildren().add(perspectiveB);
 
-		MPlaceholder partStackPlaceholderB = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder partStackPlaceholderB = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 		partStackPlaceholderB.setRef(partStack);
 		perspectiveB.getChildren().add(partStackPlaceholderB);
 		perspectiveB.setSelectedElement(partStackPlaceholderB);
 
-		MPart part1 = ems.createModelElement(MPart.class);
+		MPart part1 = BasicFactoryImpl.eINSTANCE.createPart();
 		part1.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		partStack.getChildren().add(part1);
 		partStack.setSelectedElement(part1);
 
-		MPart part2 = ems.createModelElement(MPart.class);
+		MPart part2 = BasicFactoryImpl.eINSTANCE.createPart();
 		part2.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		partStack.getChildren().add(part2);
 
@@ -1487,20 +1567,21 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug327807() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPartStack partStack = ems.createModelElement(MPartStack.class);
+		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(partStack);
 		window.setSelectedElement(partStack);
 
-		MPart part1 = ems.createModelElement(MPart.class);
+		MPart part1 = BasicFactoryImpl.eINSTANCE.createPart();
 		partStack.getChildren().add(part1);
 		partStack.setSelectedElement(part1);
 
-		MPart part2 = ems.createModelElement(MPart.class);
+		MPart part2 = BasicFactoryImpl.eINSTANCE.createPart();
 		partStack.getChildren().add(part2);
 
 		application.setContext(appContext);
@@ -1517,12 +1598,14 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug328629() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPartSashContainer partSashContainer = ems.createModelElement(MPartSashContainer.class);
+		MPartSashContainer partSashContainer = BasicFactoryImpl.eINSTANCE
+				.createPartSashContainer();
 		partSashContainer.setToBeRendered(false);
 		window.getChildren().add(partSashContainer);
 
@@ -1537,12 +1620,13 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void test331685() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		window.getChildren().add(part);
 		window.setSelectedElement(part);
 
@@ -1562,12 +1646,13 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug331795_1() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		window.getChildren().add(part);
 		window.setSelectedElement(part);
@@ -1592,12 +1677,13 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug331795_2() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		window.getChildren().add(part);
 		window.setSelectedElement(part);
@@ -1622,12 +1708,13 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug329079() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setVisible(false);
 		window.getChildren().add(part);
 
@@ -1640,33 +1727,39 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testRemoveGui_Bug332163() {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		window.getSharedElements().add(part);
 
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
+				.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 		window.setSelectedElement(perspectiveStack);
 
-		MPerspective perspective1 = ems.createModelElement(MPerspective.class);
+		MPerspective perspective1 = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveStack.getChildren().add(perspective1);
 		perspectiveStack.setSelectedElement(perspective1);
 
-		MPlaceholder partPlaceholderA1 = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder partPlaceholderA1 = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 		partPlaceholderA1.setRef(part);
 		part.setCurSharedRef(partPlaceholderA1);
 		perspective1.getChildren().add(partPlaceholderA1);
 		perspective1.setSelectedElement(partPlaceholderA1);
 
-		MPerspective perspective2 = ems.createModelElement(MPerspective.class);
+		MPerspective perspective2 = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveStack.getChildren().add(perspective2);
 
-		MPlaceholder partPlaceholder2 = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder partPlaceholder2 = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 		partPlaceholder2.setRef(part);
 		perspective2.getChildren().add(partPlaceholder2);
 		perspective2.setSelectedElement(partPlaceholder2);
@@ -1703,9 +1796,10 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug334644_01() {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
@@ -1730,9 +1824,10 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug334644_02() {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
@@ -1757,21 +1852,24 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testRemoveGui_Bug334577_01() {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
+				.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 		window.setSelectedElement(perspectiveStack);
 
-		MPerspective perspective = ems.createModelElement(MPerspective.class);
+		MPerspective perspective = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveStack.getChildren().add(perspective);
 		perspectiveStack.setSelectedElement(perspective);
 
-		MWindow detachedWindow = ems.createModelElement(MWindow.class);
+		MWindow detachedWindow = BasicFactoryImpl.eINSTANCE.createWindow();
 		perspective.getWindows().add(detachedWindow);
 
 		application.setContext(appContext);
@@ -1791,13 +1889,14 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testRemoveGui_Bug334577_02() {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MWindow detachedWindow = ems.createModelElement(MWindow.class);
+		MWindow detachedWindow = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.getWindows().add(detachedWindow);
 
 		application.setContext(appContext);
@@ -1821,16 +1920,19 @@ public class PartRenderingEngineTests {
 	 */
 	@Test
 	public void testBug336139() {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 
-		MTrimmedWindow window = ems.createModelElement(MTrimmedWindow.class);
+		MTrimmedWindow window = BasicFactoryImpl.eINSTANCE
+				.createTrimmedWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MTrimBar trimBar = ems.createModelElement(MTrimBar.class);
+		MTrimBar trimBar = BasicFactoryImpl.eINSTANCE.createTrimBar();
 		window.getTrimBars().add(trimBar);
 
-		MToolControl toolControl = ems.createModelElement(MToolControl.class);
+		MToolControl toolControl = MenuFactoryImpl.eINSTANCE
+				.createToolControl();
 		trimBar.getChildren().add(toolControl);
 
 		application.setContext(appContext);
@@ -1842,16 +1944,19 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBut336225() {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 
-		MTrimmedWindow window = ems.createModelElement(MTrimmedWindow.class);
+		MTrimmedWindow window = BasicFactoryImpl.eINSTANCE
+				.createTrimmedWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MTrimBar trimBar = ems.createModelElement(MTrimBar.class);
+		MTrimBar trimBar = BasicFactoryImpl.eINSTANCE.createTrimBar();
 		window.getTrimBars().add(trimBar);
 
-		MToolControl toolControl = ems.createModelElement(MToolControl.class);
+		MToolControl toolControl = MenuFactoryImpl.eINSTANCE
+				.createToolControl();
 		toolControl.setContributionURI(SampleToolControl.CONTRIBUTION_URI);
 		trimBar.getChildren().add(toolControl);
 
@@ -1870,45 +1975,51 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug330662() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MArea area = ems.createModelElement(MArea.class);
+		MArea area = AdvancedFactoryImpl.eINSTANCE.createArea();
 		window.getSharedElements().add(area);
 
-		MPartStack partStack = ems.createModelElement(MPartStack.class);
+		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		area.getChildren().add(partStack);
 		area.setSelectedElement(partStack);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partStack.getChildren().add(partA);
 		partStack.setSelectedElement(partA);
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partStack.getChildren().add(partB);
 
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
+				.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 		window.setSelectedElement(perspectiveStack);
 
-		MPerspective perspectiveA = ems.createModelElement(MPerspective.class);
+		MPerspective perspectiveA = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveA.setElementId("perspectiveA"); //$NON-NLS-1$
 		perspectiveStack.getChildren().add(perspectiveA);
 		perspectiveStack.setSelectedElement(perspectiveA);
 
-		MPlaceholder placeholderA = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder placeholderA = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 		placeholderA.setRef(area);
 		area.setCurSharedRef(placeholderA);
 		perspectiveA.getChildren().add(placeholderA);
 		perspectiveA.setSelectedElement(placeholderA);
 
-		MPerspective perspectiveB = ems.createModelElement(MPerspective.class);
+		MPerspective perspectiveB = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveB.setElementId("perspectiveB"); //$NON-NLS-1$
 		perspectiveStack.getChildren().add(perspectiveB);
 
-		MPlaceholder placeholderB = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder placeholderB = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 		placeholderB.setRef(area);
 		perspectiveB.getChildren().add(placeholderB);
 		perspectiveB.setSelectedElement(placeholderB);
@@ -1937,8 +2048,9 @@ public class PartRenderingEngineTests {
 	 */
 	@Test
 	public void testBug335444_A() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
@@ -1948,7 +2060,7 @@ public class PartRenderingEngineTests {
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
 
-		MWindow detachedWindow = ems.createModelElement(MWindow.class);
+		MWindow detachedWindow = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.getWindows().add(detachedWindow);
 
 		assertNotNull(detachedWindow.getContext());
@@ -1962,16 +2074,19 @@ public class PartRenderingEngineTests {
 	 */
 	@Test
 	public void testBug335444_B() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
+				.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 		window.setSelectedElement(perspectiveStack);
 
-		MPerspective perspective = ems.createModelElement(MPerspective.class);
+		MPerspective perspective = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveStack.getChildren().add(perspective);
 		perspectiveStack.setSelectedElement(perspective);
 
@@ -1981,7 +2096,7 @@ public class PartRenderingEngineTests {
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
 
-		MWindow detachedWindow = ems.createModelElement(MWindow.class);
+		MWindow detachedWindow = BasicFactoryImpl.eINSTANCE.createWindow();
 		perspective.getWindows().add(detachedWindow);
 
 		assertNotNull(detachedWindow.getContext());
@@ -1995,12 +2110,13 @@ public class PartRenderingEngineTests {
 	 */
 	@Test
 	public void testBug335444_C() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MWindow detachedWindow = ems.createModelElement(MWindow.class);
+		MWindow detachedWindow = BasicFactoryImpl.eINSTANCE.createWindow();
 		detachedWindow.setToBeRendered(false);
 		window.getWindows().add(detachedWindow);
 
@@ -2023,20 +2139,23 @@ public class PartRenderingEngineTests {
 	 */
 	@Test
 	public void testBug335444_D() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
+				.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 		window.setSelectedElement(perspectiveStack);
 
-		MPerspective perspective = ems.createModelElement(MPerspective.class);
+		MPerspective perspective = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveStack.getChildren().add(perspective);
 		perspectiveStack.setSelectedElement(perspective);
 
-		MWindow detachedWindow = ems.createModelElement(MWindow.class);
+		MWindow detachedWindow = BasicFactoryImpl.eINSTANCE.createWindow();
 		detachedWindow.setToBeRendered(false);
 		perspective.getWindows().add(detachedWindow);
 
@@ -2054,12 +2173,13 @@ public class PartRenderingEngineTests {
 	}
 
 	private void testBug326175(boolean visible) {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		window.getChildren().add(part);
 		window.setSelectedElement(part);
 
@@ -2069,7 +2189,7 @@ public class PartRenderingEngineTests {
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
 
-		MWindow detachedWindow = ems.createModelElement(MWindow.class);
+		MWindow detachedWindow = BasicFactoryImpl.eINSTANCE.createWindow();
 		detachedWindow.setVisible(visible);
 		window.getWindows().add(detachedWindow);
 		appContext.get(IPresentationEngine.class).createGui(detachedWindow);
@@ -2098,12 +2218,13 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testCreateGui_Bug319004() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		final MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		window.getChildren().add(part);
 		window.setSelectedElement(part);
 
@@ -2113,7 +2234,7 @@ public class PartRenderingEngineTests {
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
 
-		MToolBar toolBar = ems.createModelElement(MToolBar.class);
+		MToolBar toolBar = MenuFactoryImpl.eINSTANCE.createToolBar();
 		part.setToolbar(toolBar);
 
 		IPresentationEngine engine = appContext.get(IPresentationEngine.class);
@@ -2122,30 +2243,31 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug339286() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPartStack partStack = ems.createModelElement(MPartStack.class);
+		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(partStack);
 		window.setSelectedElement(partStack);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
 		partStack.getChildren().add(partA);
 		partStack.setSelectedElement(partA);
 
-		MToolBar toolBarA = ems.createModelElement(MToolBar.class);
+		MToolBar toolBarA = MenuFactoryImpl.eINSTANCE.createToolBar();
 		partA.setToolbar(toolBarA);
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
 		partStack.getChildren().add(partB);
 
-		MToolBar toolBarB = ems.createModelElement(MToolBar.class);
+		MToolBar toolBarB = MenuFactoryImpl.eINSTANCE.createToolBar();
 		partB.setToolbar(toolBarB);
 
 		application.setContext(appContext);
@@ -2173,47 +2295,53 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug334580_01() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
 		window.getSharedElements().add(part);
 
-		MToolBar toolBar = ems.createModelElement(MToolBar.class);
+		MToolBar toolBar = MenuFactoryImpl.eINSTANCE.createToolBar();
 		part.setToolbar(toolBar);
 
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
+				.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 		window.setSelectedElement(perspectiveStack);
 
-		MPerspective perspectiveA = ems.createModelElement(MPerspective.class);
+		MPerspective perspectiveA = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveA.setElementId("perspectiveA"); //$NON-NLS-1$
 		perspectiveStack.getChildren().add(perspectiveA);
 		perspectiveStack.setSelectedElement(perspectiveA);
 
-		MPartStack partStackA = ems.createModelElement(MPartStack.class);
+		MPartStack partStackA = BasicFactoryImpl.eINSTANCE.createPartStack();
 		perspectiveA.getChildren().add(partStackA);
 		perspectiveA.setSelectedElement(partStackA);
 
-		MPlaceholder placeholderA = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder placeholderA = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 		placeholderA.setRef(part);
 		part.setCurSharedRef(placeholderA);
 		partStackA.getChildren().add(placeholderA);
 		partStackA.setSelectedElement(placeholderA);
 
-		MPerspective perspectiveB = ems.createModelElement(MPerspective.class);
+		MPerspective perspectiveB = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveB.setElementId("perspectiveB"); //$NON-NLS-1$
 		perspectiveStack.getChildren().add(perspectiveB);
 
-		MPartStack partStackB = ems.createModelElement(MPartStack.class);
+		MPartStack partStackB = BasicFactoryImpl.eINSTANCE.createPartStack();
 		perspectiveB.getChildren().add(partStackB);
 		perspectiveB.setSelectedElement(partStackB);
 
-		MPlaceholder placeholderB = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder placeholderB = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 		placeholderB.setRef(part);
 		partStackB.getChildren().add(placeholderB);
 		partStackB.setSelectedElement(placeholderB);
@@ -2249,30 +2377,31 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug334580_02() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPartStack partStack = ems.createModelElement(MPartStack.class);
+		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(partStack);
 		window.setSelectedElement(partStack);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
 		partStack.getChildren().add(partA);
 		partStack.setSelectedElement(partA);
 
-		MToolBar toolBarA = ems.createModelElement(MToolBar.class);
+		MToolBar toolBarA = MenuFactoryImpl.eINSTANCE.createToolBar();
 		partA.setToolbar(toolBarA);
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
 		partStack.getChildren().add(partB);
 
-		MToolBar toolBarB = ems.createModelElement(MToolBar.class);
+		MToolBar toolBarB = MenuFactoryImpl.eINSTANCE.createToolBar();
 		partB.setToolbar(toolBarB);
 
 		application.setContext(appContext);
@@ -2310,20 +2439,21 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug334580_03() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPartStack partStack = ems.createModelElement(MPartStack.class);
+		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(partStack);
 		window.setSelectedElement(partStack);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partStack.getChildren().add(partA);
 		partStack.setSelectedElement(partA);
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partStack.getChildren().add(partB);
 
 		application.setContext(appContext);
@@ -2345,20 +2475,21 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug342439_01() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPartStack partStack = ems.createModelElement(MPartStack.class);
+		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(partStack);
 		window.setSelectedElement(partStack);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setVisible(false);
 		partStack.getChildren().add(partA);
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partStack.getChildren().add(partB);
 		partStack.setSelectedElement(partB);
 
@@ -2385,20 +2516,21 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug342439_02() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPartStack partStack = ems.createModelElement(MPartStack.class);
+		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(partStack);
 		window.setSelectedElement(partStack);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setVisible(false);
 		partStack.getChildren().add(partA);
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partStack.getChildren().add(partB);
 		partStack.setSelectedElement(partB);
 
@@ -2423,19 +2555,20 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug342366() throws Exception {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPartStack partStack = ems.createModelElement(MPartStack.class);
+		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(partStack);
 		window.setSelectedElement(partStack);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partStack.getChildren().add(partA);
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partStack.getChildren().add(partB);
 		partStack.setSelectedElement(partB);
 
@@ -2451,7 +2584,7 @@ public class PartRenderingEngineTests {
 		partA.setVisible(false);
 		assertEquals(1, folder.getItemCount());
 
-		MPart partC = ems.createModelElement(MPart.class);
+		MPart partC = BasicFactoryImpl.eINSTANCE.createPart();
 		partStack.getChildren().add(partC);
 
 		checkLog();
@@ -2459,45 +2592,51 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug343305() {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		window.getSharedElements().add(part);
 
-		MToolBar toolBar = ems.createModelElement(MToolBar.class);
+		MToolBar toolBar = MenuFactoryImpl.eINSTANCE.createToolBar();
 		part.setToolbar(toolBar);
 
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
+				.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 		window.setSelectedElement(perspectiveStack);
 
-		MPerspective perspectiveA = ems.createModelElement(MPerspective.class);
+		MPerspective perspectiveA = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveStack.getChildren().add(perspectiveA);
 		perspectiveStack.setSelectedElement(perspectiveA);
 
-		MPartStack partStackA = ems.createModelElement(MPartStack.class);
+		MPartStack partStackA = BasicFactoryImpl.eINSTANCE.createPartStack();
 		perspectiveA.getChildren().add(partStackA);
 		perspectiveA.setSelectedElement(partStackA);
 
-		MPlaceholder placeholderA = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder placeholderA = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 		placeholderA.setRef(part);
 		part.setCurSharedRef(placeholderA);
 		partStackA.getChildren().add(placeholderA);
 		partStackA.setSelectedElement(placeholderA);
 
-		MPerspective perspectiveB = ems.createModelElement(MPerspective.class);
+		MPerspective perspectiveB = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveStack.getChildren().add(perspectiveB);
 
-		MPartStack partStackB = ems.createModelElement(MPartStack.class);
+		MPartStack partStackB = BasicFactoryImpl.eINSTANCE.createPartStack();
 		perspectiveB.getChildren().add(partStackB);
 		perspectiveB.setSelectedElement(partStackB);
 
-		MPlaceholder placeholderB = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder placeholderB = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 		placeholderB.setToBeRendered(false);
 		placeholderB.setRef(part);
 		partStackB.getChildren().add(placeholderB);
@@ -2524,32 +2663,36 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug343442() {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		window.getSharedElements().add(part);
 
-		MToolBar toolBar = ems.createModelElement(MToolBar.class);
+		MToolBar toolBar = MenuFactoryImpl.eINSTANCE.createToolBar();
 		part.setToolbar(toolBar);
 
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
+				.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 		window.setSelectedElement(perspectiveStack);
 
-		MPerspective perspective = ems.createModelElement(MPerspective.class);
+		MPerspective perspective = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveStack.getChildren().add(perspective);
 		perspectiveStack.setSelectedElement(perspective);
 
-		MPartStack partStack = ems.createModelElement(MPartStack.class);
+		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		perspective.getChildren().add(partStack);
 		perspective.setSelectedElement(partStack);
 
-		MPlaceholder placeholder = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder placeholder = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 		placeholder.setRef(part);
 		part.setCurSharedRef(placeholder);
 		partStack.getChildren().add(placeholder);
@@ -2572,13 +2715,15 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug343524() {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 
-		MTrimmedWindow window = ems.createModelElement(MTrimmedWindow.class);
+		MTrimmedWindow window = BasicFactoryImpl.eINSTANCE
+				.createTrimmedWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MTrimBar trimBar = ems.createModelElement(MTrimBar.class);
+		MTrimBar trimBar = BasicFactoryImpl.eINSTANCE.createTrimBar();
 		window.getTrimBars().add(trimBar);
 
 		application.setContext(appContext);
@@ -2598,37 +2743,39 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug332463() {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MArea area = ems.createModelElement(MArea.class);
+		MArea area = AdvancedFactoryImpl.eINSTANCE.createArea();
 		window.getChildren().add(area);
 		window.setSelectedElement(area);
 
-		MPartSashContainer sashContainer = ems.createModelElement(MPartSashContainer.class);
+		MPartSashContainer sashContainer = BasicFactoryImpl.eINSTANCE
+				.createPartSashContainer();
 		area.getChildren().add(sashContainer);
 		area.setSelectedElement(sashContainer);
 
-		MPartStack partStackA = ems.createModelElement(MPartStack.class);
+		MPartStack partStackA = BasicFactoryImpl.eINSTANCE.createPartStack();
 		sashContainer.getChildren().add(partStackA);
 		sashContainer.setSelectedElement(partStackA);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partStackA.getChildren().add(partA);
 		partStackA.setSelectedElement(partA);
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partStackA.getChildren().add(partB);
 		partStackA.setSelectedElement(partB);
 
-		MPartStack partStackB = ems.createModelElement(MPartStack.class);
+		MPartStack partStackB = BasicFactoryImpl.eINSTANCE.createPartStack();
 		sashContainer.getChildren().add(partStackB);
 		sashContainer.setSelectedElement(partStackB);
 
-		MPart partC = ems.createModelElement(MPart.class);
+		MPart partC = BasicFactoryImpl.eINSTANCE.createPart();
 		partStackB.getChildren().add(partC);
 		partStackB.setSelectedElement(partC);
 
@@ -2656,16 +2803,17 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug348215_PartOnlyContextReparent() {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MWindow detachedWindow = ems.createModelElement(MWindow.class);
+		MWindow detachedWindow = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.getWindows().add(detachedWindow);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		detachedWindow.getChildren().add(part);
 		detachedWindow.setSelectedElement(part);
@@ -2688,20 +2836,21 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug348215_PartContextReparent() {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MWindow detachedWindow = ems.createModelElement(MWindow.class);
+		MWindow detachedWindow = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.getWindows().add(detachedWindow);
 
-		MPartStack stack = ems.createModelElement(MPartStack.class);
+		MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		detachedWindow.getChildren().add(stack);
 		detachedWindow.setSelectedElement(stack);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		stack.getChildren().add(part);
 		stack.setSelectedElement(part);
@@ -2724,24 +2873,25 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug348215_PartPlaceholderContextReparent() {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		window.getSharedElements().add(part);
 
-		MWindow detachedWindow = ems.createModelElement(MWindow.class);
+		MWindow detachedWindow = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.getWindows().add(detachedWindow);
 
-		MPartStack stack = ems.createModelElement(MPartStack.class);
+		MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		detachedWindow.getChildren().add(stack);
 		detachedWindow.setSelectedElement(stack);
 
-		MPlaceholder ph = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder ph = AdvancedFactoryImpl.eINSTANCE.createPlaceholder();
 		ph.setRef(part);
 		stack.getChildren().add(ph);
 		stack.setSelectedElement(ph);
@@ -2764,30 +2914,31 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug349076() {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		window.getSharedElements().add(part);
 
-		MPartStack stack = ems.createModelElement(MPartStack.class);
+		MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(stack);
 		window.setSelectedElement(stack);
 
-		MPlaceholder ph = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder ph = AdvancedFactoryImpl.eINSTANCE.createPlaceholder();
 		ph.setRef(part);
 		part.setCurSharedRef(ph);
 		stack.getChildren().add(ph);
 		stack.setSelectedElement(ph);
 
-		MWindow detachedWindow = ems.createModelElement(MWindow.class);
+		MWindow detachedWindow = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.getWindows().add(detachedWindow);
 
-		MPartStack detachedStack = ems.createModelElement(MPartStack.class);
+		MPartStack detachedStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		detachedWindow.getChildren().add(detachedStack);
 		detachedWindow.setSelectedElement(detachedStack);
 
@@ -2809,26 +2960,30 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug369229() {
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 
-		MPartSashContainer container = ems.createModelElement(MPartSashContainer.class);
+		MPartSashContainer container = BasicFactoryImpl.eINSTANCE
+				.createPartSashContainer();
 		window.getChildren().add(container);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setContributionURI(LayoutView.CONTRIBUTION_URI);
 		container.getChildren().add(partA);
 
-		MPartSashContainer innerContainer = ems.createModelElement(MPartSashContainer.class);
+		MPartSashContainer innerContainer = BasicFactoryImpl.eINSTANCE
+				.createPartSashContainer();
 		container.getChildren().add(innerContainer);
 
-		MPartSashContainer innerContainer2 = ems.createModelElement(MPartSashContainer.class);
+		MPartSashContainer innerContainer2 = BasicFactoryImpl.eINSTANCE
+				.createPartSashContainer();
 		innerContainer.getChildren().add(innerContainer2);
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setContributionURI(LayoutView.CONTRIBUTION_URI);
 		innerContainer.getChildren().add(partB);
 
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class, application);
@@ -2842,13 +2997,14 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug348069_01() {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setContributionURI("platform:/plugin/org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		window.getChildren().add(part);
 		window.setSelectedElement(part);
@@ -2869,21 +3025,22 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug348069_02() {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 
-		MWindow windowA = ems.createModelElement(MWindow.class);
+		MWindow windowA = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(windowA);
 		application.setSelectedElement(windowA);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setContributionURI("platform:/plugin/org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		windowA.getChildren().add(partA);
 		windowA.setSelectedElement(partA);
 
-		MWindow windowB = ems.createModelElement(MWindow.class);
+		MWindow windowB = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(windowB);
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setContributionURI("platform:/plugin/org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		windowB.getChildren().add(partB);
 		windowB.setSelectedElement(partB);
@@ -2913,16 +3070,17 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug348069_DetachedWindow_01() {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MWindow detachedWindow = ems.createModelElement(MWindow.class);
+		MWindow detachedWindow = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.getWindows().add(detachedWindow);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setContributionURI("platform:/plugin/org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		detachedWindow.getChildren().add(part);
 		detachedWindow.setSelectedElement(part);
@@ -2943,16 +3101,17 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug348069_DetachedWindow_02() {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MWindow detachedWindow = ems.createModelElement(MWindow.class);
+		MWindow detachedWindow = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.getWindows().add(detachedWindow);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setContributionURI("platform:/plugin/org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		detachedWindow.getChildren().add(part);
 		detachedWindow.setSelectedElement(part);
@@ -2977,16 +3136,17 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug348069_DetachedWindow_03() {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MWindow detachedWindow = ems.createModelElement(MWindow.class);
+		MWindow detachedWindow = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.getWindows().add(detachedWindow);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setContributionURI("platform:/plugin/org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		detachedWindow.getChildren().add(part);
 		detachedWindow.setSelectedElement(part);
@@ -3007,34 +3167,38 @@ public class PartRenderingEngineTests {
 
 	private void testBug348069_DetachedPerspectiveWindow_01(
 			boolean createPlaceholder) {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
+				.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 		window.setSelectedElement(perspectiveStack);
 
-		MPerspective perspective = ems.createModelElement(MPerspective.class);
+		MPerspective perspective = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveStack.getChildren().add(perspective);
 		perspectiveStack.setSelectedElement(perspective);
 
-		MWindow detachedWindow = ems.createModelElement(MWindow.class);
+		MWindow detachedWindow = BasicFactoryImpl.eINSTANCE.createWindow();
 		perspective.getWindows().add(detachedWindow);
 
-		MPartStack partStack = ems.createModelElement(MPartStack.class);
+		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		detachedWindow.getChildren().add(partStack);
 		detachedWindow.setSelectedElement(partStack);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setContributionURI("platform:/plugin/org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
 		if (createPlaceholder) {
 			window.getSharedElements().add(part);
 
-			MPlaceholder placeholder = ems.createModelElement(MPlaceholder.class);
+			MPlaceholder placeholder = AdvancedFactoryImpl.eINSTANCE
+					.createPlaceholder();
 			placeholder.setRef(part);
 			part.setCurSharedRef(placeholder);
 
@@ -3071,35 +3235,38 @@ public class PartRenderingEngineTests {
 
 	private void testBug348069_DetachedPerspectiveWindow_02(
 			boolean createPlaceholder) {
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
+				.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 		window.setSelectedElement(perspectiveStack);
 
-		MPerspective perspective = ems.createModelElement(MPerspective.class);
+		MPerspective perspective = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveStack.getChildren().add(perspective);
 		perspectiveStack.setSelectedElement(perspective);
 
-		MWindow detachedWindow = ems.createModelElement(MWindow.class);
+		MWindow detachedWindow = BasicFactoryImpl.eINSTANCE.createWindow();
 		perspective.getWindows().add(detachedWindow);
 
-		MPartStack partStack = ems.createModelElement(MPartStack.class);
+		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		detachedWindow.getChildren().add(partStack);
 		detachedWindow.setSelectedElement(partStack);
 
 		MPlaceholder placeholder = null;
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setContributionURI("platform:/plugin/org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
 		if (createPlaceholder) {
 			window.getSharedElements().add(part);
 
-			placeholder = ems.createModelElement(MPlaceholder.class);
+			placeholder = AdvancedFactoryImpl.eINSTANCE.createPlaceholder();
 			placeholder.setRef(part);
 			part.setCurSharedRef(placeholder);
 
@@ -3146,17 +3313,18 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug371100() {
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 
-		MPartStack stack = ems.createModelElement(MPartStack.class);
+		MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(stack);
 		window.setSelectedElement(stack);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setVisible(false);
 		stack.getChildren().add(part);
 
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class, application);
@@ -3170,9 +3338,10 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug372226() {
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class, application);
@@ -3182,7 +3351,7 @@ public class PartRenderingEngineTests {
 
 		Shell subShell = new Shell((Shell) window.getWidget());
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		window.getSharedElements().add(part);
 
 		appContext.get(EModelService.class).hostElement(part, window, subShell,
@@ -3196,18 +3365,20 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testBug374326() {
-		MTrimmedWindow window = ems.createModelElement(MTrimmedWindow.class);
-		MTrimBar trim = ems.createModelElement(MTrimBar.class);
+		MTrimmedWindow window = BasicFactoryImpl.eINSTANCE
+				.createTrimmedWindow();
+		MTrimBar trim = BasicFactoryImpl.eINSTANCE.createTrimBar();
 		window.getTrimBars().add(trim);
 
-		MToolBar toolBar = ems.createModelElement(MToolBar.class);
+		MToolBar toolBar = MenuFactoryImpl.eINSTANCE.createToolBar();
 		trim.getChildren().add(toolBar);
 
 		// dummy control is used to keep the toolbar visible
-		MToolControl dummyToolControl = ems.createModelElement(MToolControl.class);
+		MToolControl dummyToolControl = MenuFactoryImpl.eINSTANCE.createToolControl();
 		toolBar.getChildren().add(dummyToolControl);
 
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class, application);
@@ -3215,7 +3386,8 @@ public class PartRenderingEngineTests {
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
 
-		MToolControl toolControl = ems.createModelElement(MToolControl.class);
+		MToolControl toolControl = MenuFactoryImpl.eINSTANCE
+				.createToolControl();
 		toolControl.setVisible(false);
 		toolControl
 				.setContributionURI("platform:/plugin/org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.Bug374326");
@@ -3230,15 +3402,16 @@ public class PartRenderingEngineTests {
 	}
 
 	private MWindow createWindowWithOneView(String partName) {
-		final MWindow window = ems.createModelElement(MWindow.class);
+		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setHeight(300);
 		window.setWidth(400);
 		window.setLabel("MyWindow");
-		MPartSashContainer sash = ems.createModelElement(MPartSashContainer.class);
+		MPartSashContainer sash = BasicFactoryImpl.eINSTANCE
+				.createPartSashContainer();
 		window.getChildren().add(sash);
-		MPartStack stack = ems.createModelElement(MPartStack.class);
+		MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		sash.getChildren().add(stack);
-		MPart contributedPart = ems.createModelElement(MPart.class);
+		MPart contributedPart = BasicFactoryImpl.eINSTANCE.createPart();
 		stack.getChildren().add(contributedPart);
 		contributedPart.setLabel(partName);
 		contributedPart
@@ -3249,17 +3422,20 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void test369434() {
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
+				.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 
-		MPerspective perspective = ems.createModelElement(MPerspective.class);
+		MPerspective perspective = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspective.setVisible(false);
 		perspectiveStack.getChildren().add(perspective);
 		perspectiveStack.setSelectedElement(perspective);
 
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class, application);
@@ -3272,12 +3448,13 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void test_persistState_371087() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		window.getChildren().add(part);
 		window.setSelectedElement(part);
@@ -3303,12 +3480,13 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void test_persistState_371087_1() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		window.getChildren().add(part);
 		window.setSelectedElement(part);
@@ -3334,32 +3512,32 @@ public class PartRenderingEngineTests {
 
 	@Test
 	public void testCurSharedRefBug457939() {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
 		window.getSharedElements().add(part);
 
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 		window.setSelectedElement(perspectiveStack);
 
-		MPerspective perspectiveA = ems.createModelElement(MPerspective.class);
+		MPerspective perspectiveA = AdvancedFactoryImpl.eINSTANCE.createPerspective();
 		perspectiveA.setElementId("perspectiveA"); //$NON-NLS-1$
 		perspectiveStack.getChildren().add(perspectiveA);
 		perspectiveStack.setSelectedElement(perspectiveA);
 
-		MPartStack partStackA = ems.createModelElement(MPartStack.class);
+		MPartStack partStackA = BasicFactoryImpl.eINSTANCE.createPartStack();
 		perspectiveA.getChildren().add(partStackA);
 		perspectiveA.setSelectedElement(partStackA);
 
 		assertNull(part.getCurSharedRef());
 
-		MPlaceholder placeholderA = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder placeholderA = AdvancedFactoryImpl.eINSTANCE.createPlaceholder();
 		placeholderA.setRef(part);
 		part.setCurSharedRef(placeholderA);
 		partStackA.getChildren().add(placeholderA);
@@ -3367,15 +3545,15 @@ public class PartRenderingEngineTests {
 
 		assertEquals(placeholderA, part.getCurSharedRef());
 
-		MPerspective perspectiveB = ems.createModelElement(MPerspective.class);
+		MPerspective perspectiveB = AdvancedFactoryImpl.eINSTANCE.createPerspective();
 		perspectiveB.setElementId("perspectiveB"); //$NON-NLS-1$
 		perspectiveStack.getChildren().add(perspectiveB);
 
-		MPartStack partStackB = ems.createModelElement(MPartStack.class);
+		MPartStack partStackB = BasicFactoryImpl.eINSTANCE.createPartStack();
 		perspectiveB.getChildren().add(partStackB);
 		perspectiveB.setSelectedElement(partStackB);
 
-		MPlaceholder placeholderB = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder placeholderB = AdvancedFactoryImpl.eINSTANCE.createPlaceholder();
 		placeholderB.setRef(part);
 		partStackB.getChildren().add(placeholderB);
 		partStackB.setSelectedElement(placeholderB);

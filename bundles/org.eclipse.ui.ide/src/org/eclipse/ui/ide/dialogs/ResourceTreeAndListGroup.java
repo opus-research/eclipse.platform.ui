@@ -934,8 +934,6 @@ public class ResourceTreeAndListGroup extends EventManager {
     public void setListProviders(IStructuredContentProvider contentProvider, ILabelProvider labelProvider) {
         listViewer.setContentProvider(contentProvider);
         listViewer.setLabelProvider(labelProvider);
-        listContentProvider = contentProvider;
-        listLabelProvider = labelProvider;
     }
 
     /**
@@ -991,27 +989,8 @@ public class ResourceTreeAndListGroup extends EventManager {
      *	@param labelProvider ILabelProvider
      */
     public void setTreeProviders(ITreeContentProvider contentProvider, ILabelProvider labelProvider) {
-        List<?> items;
-        if (root == null) {
-            items = Collections.emptyList();
-        } else {
-            // remember checked elements
-            items = getAllWhiteCheckedItems();
-            // reset all caches
-            for (Object object : items) {
-                setTreeChecked(object, false);
-            }
-        }
-
         treeViewer.setContentProvider(contentProvider);
         treeViewer.setLabelProvider(labelProvider);
-        treeContentProvider = contentProvider;
-        treeLabelProvider = labelProvider;
-
-        // select (if any) previously checked elements again in the new model
-        for (Object object : items) {
-            setTreeChecked(object, true);
-        }
     }
 
     /**
