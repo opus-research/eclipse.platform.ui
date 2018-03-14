@@ -46,7 +46,6 @@ public class ObservableMapLabelProvider extends LabelProvider implements
 	protected IObservableMap[] attributeMaps;
 
 	private IMapChangeListener mapChangeListener = new IMapChangeListener() {
-		@Override
 		public void handleMapChange(MapChangeEvent event) {
 			Set affectedElements = event.diff.getChangedKeys();
 			LabelProviderChangedEvent newEvent = new LabelProviderChangedEvent(
@@ -74,7 +73,6 @@ public class ObservableMapLabelProvider extends LabelProvider implements
 		}
 	}
 
-	@Override
 	public void dispose() {
 		for (int i = 0; i < attributeMaps.length; i++) {
 			attributeMaps[i].removeMapChangeListener(mapChangeListener);
@@ -84,22 +82,18 @@ public class ObservableMapLabelProvider extends LabelProvider implements
 		this.mapChangeListener = null;
 	}
 
-	@Override
 	public Image getImage(Object element) {
 		return getColumnImage(element, 0);
 	}
 
-	@Override
 	public String getText(Object element) {
 		return getColumnText(element, 0);
 	}
 
-	@Override
 	public Image getColumnImage(Object element, int columnIndex) {
 		return null;
 	}
 
-	@Override
 	public String getColumnText(Object element, int columnIndex) {
 		if (columnIndex < attributeMaps.length) {
 			Object result = attributeMaps[columnIndex].get(element);
