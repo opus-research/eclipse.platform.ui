@@ -35,56 +35,49 @@ import org.eclipse.jface.databinding.conformance.util.RealmTester;
 public class AbstractObservableMapTest extends TestCase {
 	private AbstractObservableMapStub map;
 
-	@Override
 	protected void setUp() throws Exception {
 		RealmTester.setDefault(new CurrentRealm(true));
 		map = new AbstractObservableMapStub();
 	}
-
-	@Override
+	
 	protected void tearDown() throws Exception {
 		RealmTester.setDefault(null);
 	}
-
+	
 	public void testIsStaleRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				map.isStale();
-			}
+			}			
 		});
 	}
-
+	
 	public void testSetStaleRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				map.setStale(true);
 			}
 		});
 	}
-
+	
 	public void testFireStaleRealmChecks() throws Exception {
-		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
+		RealmTester.exerciseCurrent(new Runnable() { 
 			public void run() {
 				map.fireStale();
 			}
 		});
 	}
-
+	
 	public void testFireChangeRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				map.fireChange();
 			}
 		});
 	}
-
+	
 	public void testFireMapChangeRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				map.fireMapChange(null);
 			}
@@ -94,7 +87,6 @@ public class AbstractObservableMapTest extends TestCase {
 	public void testAddListChangeListener_AfterDispose() {
 		map.dispose();
 		map.addMapChangeListener(new IMapChangeListener() {
-			@Override
 			public void handleMapChange(MapChangeEvent event) {
 				// do nothing
 			}
@@ -104,7 +96,6 @@ public class AbstractObservableMapTest extends TestCase {
 	public void testRemoveListChangeListener_AfterDispose() {
 		map.dispose();
 		map.removeMapChangeListener(new IMapChangeListener() {
-			@Override
 			public void handleMapChange(MapChangeEvent event) {
 				// do nothing
 			}
@@ -114,7 +105,6 @@ public class AbstractObservableMapTest extends TestCase {
 	public void testAddChangeListener_AfterDispose() {
 		map.dispose();
 		map.addChangeListener(new IChangeListener() {
-			@Override
 			public void handleChange(ChangeEvent event) {
 				// do nothing
 			}
@@ -124,7 +114,6 @@ public class AbstractObservableMapTest extends TestCase {
 	public void testRemoveChangeListener_AfterDispose() {
 		map.dispose();
 		map.removeChangeListener(new IChangeListener() {
-			@Override
 			public void handleChange(ChangeEvent event) {
 				// do nothing
 			}
@@ -134,7 +123,6 @@ public class AbstractObservableMapTest extends TestCase {
 	public void testAddStaleListener_AfterDispose() {
 		map.dispose();
 		map.addStaleListener(new IStaleListener() {
-			@Override
 			public void handleStale(StaleEvent staleEvent) {
 				// do nothing
 			}
@@ -144,7 +132,6 @@ public class AbstractObservableMapTest extends TestCase {
 	public void testRemoveStaleListener_AfterDispose() {
 		map.dispose();
 		map.removeStaleListener(new IStaleListener() {
-			@Override
 			public void handleStale(StaleEvent staleEvent) {
 				// do nothing
 			}
@@ -154,7 +141,6 @@ public class AbstractObservableMapTest extends TestCase {
 	public void testAddDisposeListener_AfterDispose() {
 		map.dispose();
 		map.addDisposeListener(new IDisposeListener() {
-			@Override
 			public void handleDispose(DisposeEvent event) {
 				// do nothing
 			}
@@ -164,7 +150,6 @@ public class AbstractObservableMapTest extends TestCase {
 	public void testRemoveDisposeListener_AfterDispose() {
 		map.dispose();
 		map.removeDisposeListener(new IDisposeListener() {
-			@Override
 			public void handleDispose(DisposeEvent event) {
 				// do nothing
 			}
@@ -177,27 +162,22 @@ public class AbstractObservableMapTest extends TestCase {
 	}
 
 	static class AbstractObservableMapStub extends AbstractObservableMap {
-		@Override
 		public Set entrySet() {
 			return null;
 		}
-
-		@Override
+		
 		protected void fireChange() {
 			super.fireChange();
 		}
-
-		@Override
+		
 		protected void fireMapChange(MapDiff diff) {
 			super.fireMapChange(diff);
 		}
-
-		@Override
+		
 		protected void fireStale() {
 			super.fireStale();
 		}
 
-		@Override
 		protected synchronized boolean hasListeners() {
 			return super.hasListeners();
 		}

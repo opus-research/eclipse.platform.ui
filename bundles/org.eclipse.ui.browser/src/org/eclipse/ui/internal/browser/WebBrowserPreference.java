@@ -1,10 +1,10 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - Initial API and implementation
  *******************************************************************************/
@@ -51,7 +51,7 @@ public class WebBrowserPreference {
 
 	/**
 	 * Returns the preference store.
-	 *
+	 * 
 	 * @return the preference store
 	 */
 	protected static IPreferenceStore getPreferenceStore() {
@@ -60,14 +60,14 @@ public class WebBrowserPreference {
 
 	/**
 	 * Returns the Web browser history list.
-	 *
+	 * 
 	 * @return java.util.List
 	 */
 	public static List<String> getInternalWebBrowserHistory() {
 		String temp = getPreferenceStore().getString(
 				PREF_INTERNAL_WEB_BROWSER_HISTORY);
 		StringTokenizer st = new StringTokenizer(temp, "|*|"); //$NON-NLS-1$
-		List<String> l = new ArrayList<>();
+		List<String> l = new ArrayList<String>();
 		while (st.hasMoreTokens()) {
 			String s = st.nextToken();
 			l.add(s);
@@ -77,7 +77,7 @@ public class WebBrowserPreference {
 
 	/**
 	 * Sets the Web browser history.
-	 *
+	 * 
 	 * @param list
 	 *            the history
 	 */
@@ -104,7 +104,7 @@ public class WebBrowserPreference {
 
 	/**
 	 * Returns whether the internal browser is used by default
-	 *
+	 * 
 	 * @return true if the internal browser is used by default
 	 */
 	public static boolean isDefaultUseInternalBrowser() {
@@ -113,7 +113,7 @@ public class WebBrowserPreference {
 
 	/**
 	 * Returns whether the system browser is used by default
-	 *
+	 * 
 	 * @return true if the system browser is used by default
 	 */
 	public static boolean isDefaultUseSystemBrowser() {
@@ -122,7 +122,7 @@ public class WebBrowserPreference {
 
 	/**
 	 * Returns whether the internal or external browser is being used
-	 *
+	 * 
 	 * @return one of <code>INTERNAL</code> or <code>EXTERNAL</code>.
 	 */
 	public static int getBrowserChoice() {
@@ -136,7 +136,7 @@ public class WebBrowserPreference {
 
 	/**
 	 * Sets whether the internal, system and external browser is used
-	 *
+	 * 
 	 * @param choice
 	 *            </code>INTERNAL</code>, <code>SYSTEM</code> and <code>EXTERNAL</code>
 	 */

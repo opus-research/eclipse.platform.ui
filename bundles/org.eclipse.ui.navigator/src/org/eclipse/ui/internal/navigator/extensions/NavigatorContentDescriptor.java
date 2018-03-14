@@ -49,7 +49,7 @@ import org.eclipse.ui.navigator.Priority;
 /**
  * Encapsulates the <code>org.eclipse.ui.navigator.navigatorContent</code>
  * extension point.
- *
+ * 
  * @since 3.2
  */
 public final class NavigatorContentDescriptor implements
@@ -69,7 +69,7 @@ public final class NavigatorContentDescriptor implements
 	 * are first loaded. This is what's used to sort on after that.
 	 */
 	private int sequenceNumber;
-
+	
 	private String appearsBeforeId;
 
 	private Expression enablement;
@@ -77,7 +77,7 @@ public final class NavigatorContentDescriptor implements
 	private Expression possibleChildren;
 
 	private Expression initialActivation;
-
+	
 	private String icon;
 
 	private boolean activeByDefault;
@@ -85,7 +85,7 @@ public final class NavigatorContentDescriptor implements
 	private IPluginContribution contribution;
 
 	private boolean sortOnly;
-
+	
 	private Set overridingExtensions;
 	private List overridingExtensionsList; // FIXME: will replace 'overridingExtensions' in 3.6
 
@@ -101,10 +101,10 @@ public final class NavigatorContentDescriptor implements
 
 	/**
 	 * Creates a new content descriptor from a configuration element.
-	 *
+	 * 
 	 * @param configElement
 	 *            configuration element to create a descriptor from
-	 *
+	 * 
 	 * @throws WorkbenchException
 	 *             if the configuration element could not be parsed. Reasons
 	 *             include:
@@ -120,17 +120,29 @@ public final class NavigatorContentDescriptor implements
 		init();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.navigator.extensions.INavigatorContentDescriptor#getId()
+	 */
 	public String getId() {
 		return id;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.navigator.extensions.INavigatorContentDescriptor#getName()
+	 */
 	public String getName() {
 		return name;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.navigator.extensions.INavigatorContentDescriptor#getPriority()
+	 */
 	public int getPriority() {
 		return priority;
 	}
@@ -138,7 +150,6 @@ public final class NavigatorContentDescriptor implements
 	/**
 	 * @return the sequence number
 	 */
-	@Override
 	public int getSequenceNumber() {
 		return sequenceNumber;
 	}
@@ -146,25 +157,23 @@ public final class NavigatorContentDescriptor implements
 	void setSequenceNumber(int num) {
 		sequenceNumber = num;
 	}
-
+	
 	/**
-	 *
+	 * 
 	 * @return The value specified by the <i>appearsBefore</i> attribute of the
 	 *         &lt;navigatorContent/&gt; element.
 	 */
-	@Override
 	public String getAppearsBeforeId() {
 		return appearsBeforeId;
 	}
 
-	@Override
 	public boolean isSortOnly() {
 		return sortOnly;
 	}
-
+	
 	/**
 	 * Parses the configuration element.
-	 *
+	 * 
 	 * @throws WorkbenchException
 	 *             if the configuration element could not be parsed. Reasons
 	 *             include:
@@ -201,15 +210,15 @@ public final class NavigatorContentDescriptor implements
 				priority = Priority.NORMAL_PRIORITY_VALUE;
 			}
 		}
-
-		// We start with this because the sort ExtensionPriorityComparator works
+		
+		// We start with this because the sort ExtensionPriorityComparator works 
 		// from the sequenceNumber
 		sequenceNumber = priority;
 
 		String sortOnlyString = configElement.getAttribute(ATT_SORT_ONLY);
 		sortOnly = (sortOnlyString != null && sortOnlyString.length() > 0) ? Boolean.valueOf(
 				sortOnlyString).booleanValue() : false;
-
+		
 		if (id == null) {
 			throw new WorkbenchException(NLS.bind(
 					CommonNavigatorMessages.Attribute_Missing_Warning,
@@ -222,12 +231,10 @@ public final class NavigatorContentDescriptor implements
 
 		contribution = new IPluginContribution() {
 
-			@Override
 			public String getLocalId() {
 				return getId();
 			}
 
-			@Override
 			public String getPluginId() {
 				return configElement.getDeclaringExtension().getNamespaceIdentifier();
 			}
@@ -235,7 +242,7 @@ public final class NavigatorContentDescriptor implements
 		};
 
 		IConfigurationElement[] children;
-
+		
 		children = configElement.getChildren(TAG_INITIAL_ACTIVATION);
 		if (children.length > 0) {
 			if (children.length == 1) {
@@ -325,7 +332,6 @@ public final class NavigatorContentDescriptor implements
 	/**
 	 * @return Returns the suppressedExtensionId or null if none specified.
 	 */
-	@Override
 	public String getSuppressedExtensionId() {
 		return suppressedExtensionId;
 	}
@@ -334,7 +340,6 @@ public final class NavigatorContentDescriptor implements
 	 * @return Returns the overridePolicy or null if this extension does not
 	 *         override another extension.
 	 */
-	@Override
 	public OverridePolicy getOverridePolicy() {
 		return overridePolicy;
 	}
@@ -352,18 +357,18 @@ public final class NavigatorContentDescriptor implements
 	public IConfigurationElement getConfigElement() {
 		return configElement;
 	}
-
+	
 	/**
 	 * The content provider could be an instance of
 	 * {@link ICommonContentProvider}, but only {@link ITreeContentProvider} is
 	 * required.
-	 *
-	 *
+	 * 
+	 * 
 	 * @return An instance of the Content provider defined for this extension.
 	 * @throws CoreException
 	 *             if an instance of the executable extension could not be
 	 *             created for any reason
-	 *
+	 * 
 	 */
 	public ITreeContentProvider createContentProvider() throws CoreException {
 		if (Policy.DEBUG_EXTENSION_SETUP)
@@ -373,10 +378,10 @@ public final class NavigatorContentDescriptor implements
 	}
 
 	/**
-	 *
+	 * 
 	 * The content provider could be an instance of {@link ICommonLabelProvider},
 	 * but only {@link ILabelProvider} is required.
-	 *
+	 * 
 	 * @return An instance of the Label provider defined for this extension
 	 * @throws CoreException
 	 *             if an instance of the executable extension could not be
@@ -389,7 +394,11 @@ public final class NavigatorContentDescriptor implements
 				.createExecutableExtension(ATT_LABEL_PROVIDER);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.navigator.extensions.INavigatorContentDescriptor#isActiveByDefault()
+	 */
 	public boolean isActiveByDefault() {
 		if (activeByDefault)
 			return true;
@@ -402,12 +411,11 @@ public final class NavigatorContentDescriptor implements
 	/**
 	 * Determine if this content extension would be able to provide children for
 	 * the given element.
-	 *
+	 * 
 	 * @param anElement
 	 *            The element that should be used for the evaluation.
 	 * @return True if and only if the extension is enabled for the element.
 	 */
-	@Override
 	public boolean isTriggerPoint(Object anElement) {
 
 		if (enablement == null || anElement == null) {
@@ -421,18 +429,17 @@ public final class NavigatorContentDescriptor implements
 	/**
 	 * Determine if this content extension could provide the given element as a
 	 * child.
-	 *
+	 * 
 	 * <p>
 	 * This method is used to determine what the parent of an element could be
 	 * for Link with Editor support.
 	 * </p>
-	 *
+	 * 
 	 * @param anElement
 	 *            The element that should be used for the evaluation.
 	 * @return True if and only if the extension might provide an object of this
 	 *         type as a child.
 	 */
-	@Override
 	public boolean isPossibleChild(Object anElement) {
 
 		if ((enablement == null && possibleChildren == null)
@@ -450,14 +457,13 @@ public final class NavigatorContentDescriptor implements
 		}
 		return false;
 	}
-
+	
 	/**
 	 * A convenience method to check all elements in a selection.
-	 *
+	 * 
 	 * @param aSelection A non-null selection
 	 * @return True if and only if every element in the selection is a possible child.
 	 */
-	@Override
 	public boolean arePossibleChildren(IStructuredSelection aSelection) {
 		if(aSelection.isEmpty()) {
 			return false;
@@ -472,12 +478,11 @@ public final class NavigatorContentDescriptor implements
 	}
 
 	/**
-	 *
+	 * 
 	 * Does not force the creation of the set of overriding extensions.
-	 *
+	 * 
 	 * @return True if this extension has overriding extensions.
 	 */
-	@Override
 	public boolean hasOverridingExtensions() {
 		return overridingExtensions != null && overridingExtensions.size() > 0;
 	}
@@ -486,7 +491,6 @@ public final class NavigatorContentDescriptor implements
 	 * @return The set of overriding extensions (of type
 	 *         {@link INavigatorContentDescriptor}
 	 */
-	@Override
 	public Set getOverriddingExtensions() {
 		if (overridingExtensions == null) {
 			overridingExtensions = new TreeSet(ExtensionSequenceNumberComparator.DESCENDING);
@@ -496,7 +500,7 @@ public final class NavigatorContentDescriptor implements
 
 	/**
 	 *  Returns a list iterator over the overriding extensions.
-	 *
+	 * 
 	 * @param fromStart
 	 *            <code>true</code> if list iterator starts at the beginning and
 	 *            <code>false</code> if it starts at the end of the list
@@ -513,12 +517,18 @@ public final class NavigatorContentDescriptor implements
 		return overridingExtensionsList.listIterator(fromStart ? 0 : overridingExtensionsList.size());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString() {
 		return "Content[" + id  + "(" + sequenceNumber + ") " + ", \"" + name + "\"]"; //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 	}
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	public int hashCode() {
 		if (hashCode == HASH_CODE_NOT_COMPUTED) {
 			String hashCodeString = configElement.getNamespaceIdentifier() + getId();
@@ -533,7 +543,6 @@ public final class NavigatorContentDescriptor implements
 	 * @return The descriptor of the <code>suppressedExtensionId</code> if
 	 *         non-null.
 	 */
-	@Override
 	public INavigatorContentDescriptor getOverriddenDescriptor() {
 		return overriddenDescriptor;
 	}
@@ -547,7 +556,9 @@ public final class NavigatorContentDescriptor implements
 		overriddenDescriptor = theOverriddenDescriptor;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.navigator.INavigatorContentDescriptor#hasSaveablesProvider()
+	 */
 	public boolean hasSaveablesProvider() {
 		return providesSaveables;
 	}

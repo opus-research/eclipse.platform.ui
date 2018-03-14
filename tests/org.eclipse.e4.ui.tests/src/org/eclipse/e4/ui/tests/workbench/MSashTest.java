@@ -48,12 +48,17 @@ import org.eclipse.swt.widgets.Widget;
  * simple example of setting the weights to 50,50 may not end up with the child
  * controls not being equally sized because the available area may not be
  * equally divisible amongst its children.
- *
+ * 
  */
 public class MSashTest extends TestCase {
 	protected IEclipseContext appContext;
 	protected E4Workbench wb;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	@Override
 	protected void setUp() throws Exception {
 		appContext = E4Application.createDefaultContext();
@@ -61,6 +66,11 @@ public class MSashTest extends TestCase {
 				PartRenderingEngine.engineURI);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see junit.framework.TestCase#tearDown()
+	 */
 	@Override
 	protected void tearDown() throws Exception {
 		if (wb != null) {

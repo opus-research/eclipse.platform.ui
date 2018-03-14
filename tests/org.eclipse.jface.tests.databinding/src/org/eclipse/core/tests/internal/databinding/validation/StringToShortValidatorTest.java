@@ -23,27 +23,37 @@ import com.ibm.icu.text.NumberFormat;
 public class StringToShortValidatorTest extends
 		StringToNumberValidatorTestHarness {
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#getInRangeNumber()
+	 */
 	protected Number getInRangeNumber() {
 		return new Short(Short.MAX_VALUE);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#getInvalidString()
+	 */
 	protected String getInvalidString() {
 		return "1.1";
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#getOutOfRangeNumber()
+	 */
 	protected Number getOutOfRangeNumber() {
 		return new Integer(Short.MAX_VALUE + 1);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#setupNumberFormat()
+	 */
 	protected NumberFormat setupNumberFormat() {
 		return NumberFormat.getIntegerInstance();
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#setupValidator(com.ibm.icu.text.NumberFormat)
+	 */
 	protected IValidator setupValidator(NumberFormat numberFormat) {
 		StringToShortConverter converter = StringToShortConverter.toShort(numberFormat, false);
 		return new StringToShortValidator(converter);

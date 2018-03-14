@@ -16,31 +16,51 @@ import org.eclipse.ui.internal.ide.Policy;
 
 /**
  * FieldCategory is the field for showing categories of markers.
- *
+ * 
  */
 public class FieldCategory extends AbstractField {
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.views.markers.internal.IField#getDescription()
+	 */
 	public String getDescription() {
 		return MarkerMessages.description_type;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.views.markers.internal.IField#getDescriptionImage()
+	 */
 	public Image getDescriptionImage() {
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.views.markers.internal.IField#getColumnHeaderText()
+	 */
 	public String getColumnHeaderText() {
 		return getDescription();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.views.markers.internal.IField#getColumnHeaderImage()
+	 */
 	public Image getColumnHeaderImage() {
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.views.markers.internal.IField#getValue(java.lang.Object)
+	 */
 	public String getValue(Object obj) {
 
 		if (obj instanceof ConcreteMarker) {
@@ -73,22 +93,39 @@ public class FieldCategory extends AbstractField {
 		return Util.EMPTY_STRING;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.views.markers.internal.IField#getImage(java.lang.Object)
+	 */
 	public Image getImage(Object obj) {
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.views.markers.internal.IField#compare(java.lang.Object,
+	 *      java.lang.Object)
+	 */
 	public int compare(Object obj1, Object obj2) {
 		return getValue(obj1).compareTo(getValue(obj2));
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.views.markers.internal.IField#getDefaultDirection()
+	 */
 	public int getDefaultDirection() {
 		return TableComparator.ASCENDING;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.views.markers.internal.IField#getPreferredWidth()
+	 */
 	public int getPreferredWidth() {
 		return 200;
 	}

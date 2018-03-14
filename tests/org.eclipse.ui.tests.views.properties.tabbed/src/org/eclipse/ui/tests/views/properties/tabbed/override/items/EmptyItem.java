@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -19,7 +19,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 /**
  * An item for the emply selection when there is no selected element in the
  * override tests view.
- *
+ * 
  * @author Anthony Hunter
  * @since 3.4
  */
@@ -27,7 +27,11 @@ public class EmptyItem implements IOverrideTestsItem {
 
 	private Composite composite;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.views.properties.tabbed.override.items.IOverrideTestsItem#createControls(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createControls(Composite parent) {
 		TabbedPropertySheetWidgetFactory factory = new TabbedPropertySheetWidgetFactory();
 		composite = factory.createFlatFormComposite(parent);
@@ -36,7 +40,11 @@ public class EmptyItem implements IOverrideTestsItem {
 		label.setLayoutData(new FormData());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.views.properties.tabbed.override.items.IOverrideTestsItem#dispose()
+	 */
 	public void dispose() {
 		if (composite != null && !composite.isDisposed()) {
 			composite.dispose();
@@ -44,22 +52,38 @@ public class EmptyItem implements IOverrideTestsItem {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.views.properties.tabbed.override.items.IOverrideTestsItem#getComposite()
+	 */
 	public Composite getComposite() {
 		return composite;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.views.properties.tabbed.override.items.IOverrideTestsItem#getElement()
+	 */
 	public Class getElement() {
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.views.properties.tabbed.override.items.IOverrideTestsItem#getImage()
+	 */
 	public Image getImage() {
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.views.properties.tabbed.override.items.IOverrideTestsItem#getText()
+	 */
 	public String getText() {
 		return "Empty Item"; //$NON-NLS-1$
 	}

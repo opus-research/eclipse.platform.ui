@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,20 +34,20 @@ import org.eclipse.ui.part.Page;
  * This class should be subclassed.
  * </p>
  * <p>
- * Internally, each content outline page consists of a standard tree viewer;
- * selections made in the tree viewer are reported as selection change events
- * by the page (which is a selection provider). The tree viewer is not created
+ * Internally, each content outline page consists of a standard tree viewer; 
+ * selections made in the tree viewer are reported as selection change events 
+ * by the page (which is a selection provider). The tree viewer is not created 
  * until <code>createPage</code> is called; consequently, subclasses must extend
- * <code>createControl</code> to configure the tree viewer with a proper content
+ * <code>createControl</code> to configure the tree viewer with a proper content 
  * provider, label provider, and input element.
  * </p>
  * <p>Subclasses may provide a hint for constructing the tree viewer
  * using {@link #getTreeStyle()}.</p>
  * <p>
  * Note that those wanting to use a control other than internally created
- * <code>TreeViewer</code> will need to implement
+ * <code>TreeViewer</code> will need to implement 
  * <code>IContentOutlinePage</code> directly rather than subclassing this class.
- * </p>
+ * </p> 
  */
 public abstract class ContentOutlinePage extends Page implements
         IContentOutlinePage, ISelectionChangedListener {
@@ -62,28 +62,29 @@ public abstract class ContentOutlinePage extends Page implements
         super();
     }
 
-    @Override
-	public void addSelectionChangedListener(ISelectionChangedListener listener) {
+    /* (non-Javadoc)
+     * Method declared on ISelectionProvider.
+     */
+    public void addSelectionChangedListener(ISelectionChangedListener listener) {
         selectionChangedListeners.add(listener);
     }
 
     /**
-     * The <code>ContentOutlinePage</code> implementation of this
+     * The <code>ContentOutlinePage</code> implementation of this 
      * <code>IContentOutlinePage</code> method creates a tree viewer. Subclasses
-     * must extend this method configure the tree viewer with a proper content
+     * must extend this method configure the tree viewer with a proper content 
      * provider, label provider, and input element.
      * @param parent
      */
-    @Override
-	public void createControl(Composite parent) {
+    public void createControl(Composite parent) {
         treeViewer = new TreeViewer(parent, getTreeStyle());
         treeViewer.addSelectionChangedListener(this);
     }
-
+    
 	/**
 	 * A hint for the styles to use while constructing the TreeViewer.
 	 * <p>Subclasses may override.</p>
-	 *
+	 * 
 	 * @return the tree styles to use. By default, SWT.MULTI | SWT.H_SCROLL |
 	 *         SWT.V_SCROLL
 	 * @since 3.6
@@ -107,24 +108,27 @@ public abstract class ContentOutlinePage extends Page implements
         for (int i = 0; i < listeners.length; ++i) {
             final ISelectionChangedListener l = (ISelectionChangedListener) listeners[i];
             SafeRunner.run(new SafeRunnable() {
-                @Override
-				public void run() {
+                public void run() {
                     l.selectionChanged(event);
                 }
             });
         }
     }
 
-    @Override
-	public Control getControl() {
+    /* (non-Javadoc)
+     * Method declared on IPage (and Page).
+     */
+    public Control getControl() {
         if (treeViewer == null) {
 			return null;
 		}
         return treeViewer.getControl();
     }
 
-    @Override
-	public ISelection getSelection() {
+    /* (non-Javadoc)
+     * Method declared on ISelectionProvider.
+     */
+    public ISelection getSelection() {
         if (treeViewer == null) {
 			return StructuredSelection.EMPTY;
 		}
@@ -134,40 +138,49 @@ public abstract class ContentOutlinePage extends Page implements
     /**
      * Returns this page's tree viewer.
      *
-     * @return this page's tree viewer, or <code>null</code> if
+     * @return this page's tree viewer, or <code>null</code> if 
      *   <code>createControl</code> has not been called yet
      */
     protected TreeViewer getTreeViewer() {
         return treeViewer;
     }
 
-    @Override
-	public void init(IPageSite pageSite) {
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.ui.part.IPageBookViewPage#init(org.eclipse.ui.part.IPageSite)
+     */
+    public void init(IPageSite pageSite) {
         super.init(pageSite);
         pageSite.setSelectionProvider(this);
     }
 
-    @Override
-	public void removeSelectionChangedListener(
+    /* (non-Javadoc)
+     * Method declared on ISelectionProvider.
+     */
+    public void removeSelectionChangedListener(
             ISelectionChangedListener listener) {
         selectionChangedListeners.remove(listener);
     }
 
-    @Override
-	public void selectionChanged(SelectionChangedEvent event) {
+    /* (non-Javadoc)
+     * Method declared on ISelectionChangeListener.
+     * Gives notification that the tree selection has changed.
+     */
+    public void selectionChanged(SelectionChangedEvent event) {
         fireSelectionChanged(event.getSelection());
     }
 
     /**
      * Sets focus to a part in the page.
      */
-    @Override
-	public void setFocus() {
+    public void setFocus() {
         treeViewer.getControl().setFocus();
     }
 
-    @Override
-	public void setSelection(ISelection selection) {
+    /* (non-Javadoc)
+     * Method declared on ISelectionProvider.
+     */
+    public void setSelection(ISelection selection) {
         if (treeViewer != null) {
 			treeViewer.setSelection(selection);
 		}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Remy Chi Jian Suen <remy.suen@gmail.com> - Bug 175069 [Preferences] ResourceInfoPage is not setting dialog font on all widgets
  *     Serge Beauchamp (Freescale Semiconductor) - [229633] Project Path Variable Support
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 474273
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
@@ -29,16 +28,18 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceProxy;
+import org.eclipse.core.resources.IResourceProxyVisitor;
 import org.eclipse.core.resources.ResourceAttributes;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.Dialog;
@@ -46,6 +47,8 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.FieldEditor;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.osgi.util.TextProcessor;
@@ -151,7 +154,7 @@ public class ResourceInfoPage extends PropertyPage {
 
 	/**
 	 * Create the group that shows the name, location, size and type.
-	 *
+	 * 
 	 * @param parent
 	 *            the composite the group will be created in
 	 * @param resource
@@ -160,7 +163,7 @@ public class ResourceInfoPage extends PropertyPage {
 	 */
 	private Composite createBasicInfoGroup(Composite parent, IResource resource) {
 		initializeDialogUnits(parent);
-
+		
 		Composite basicInfoComposite = new Composite(parent, SWT.NULL);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 2;
@@ -249,12 +252,10 @@ public class ResourceInfoPage extends PropertyPage {
 			((GridData) locationTitle.getLayoutData()).verticalIndent = verticalIndent;
 			((GridData) locationValue.getLayoutData()).verticalIndent = verticalIndent;
 			editButton.addSelectionListener(new SelectionListener() {
-				@Override
 				public void widgetDefaultSelected(SelectionEvent e) {
 					editLinkLocation();
 				}
 
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 					editLinkLocation();
 				}
@@ -335,7 +336,8 @@ public class ResourceInfoPage extends PropertyPage {
 	}
 
 	protected void editLinkLocation() {
-		IResource resource = Adapters.adapt(getElement(), IResource.class);
+		IResource resource = (IResource) getElement().getAdapter(
+				IResource.class);
 		String locationFormat = resource.getPathVariableManager().convertFromUserEditableFormat(locationValue.getText(), true);
 		IPath location = Path.fromOSString(locationFormat);
 
@@ -354,7 +356,8 @@ public class ResourceInfoPage extends PropertyPage {
 	}
 
 	private void refreshLinkLocation() {
-		IResource resource = Adapters.adapt(getElement(), IResource.class);
+		IResource resource = (IResource) getElement().getAdapter(
+				IResource.class);
 
 		String userEditableFormat = resource.getPathVariableManager().convertToUserEditableFormat(newResourceLocation.toOSString(), true);
 		locationValue.setText(userEditableFormat);
@@ -383,21 +386,21 @@ public class ResourceInfoPage extends PropertyPage {
 		}
 	}
 
-	@Override
 	protected Control createContents(Composite parent) {
 
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(getControl(),
 				IIDEHelpContextIds.RESOURCE_INFO_PROPERTY_PAGE);
 
 		// layout the page
-		IResource resource = Adapters.adapt(getElement(), IResource.class);
-
+		IResource resource = (IResource) getElement().getAdapter(
+				IResource.class);
+		
 		if (resource == null) {
 			Label label = new Label(parent, SWT.NONE);
 			label.setText(IDEWorkbenchMessages.ResourceInfoPage_noResource);
 			return label;
 		}
-
+		
 		if (resource.getType() != IResource.PROJECT) {
 			ResourceAttributes attrs = resource.getResourceAttributes();
 			if (attrs != null) {
@@ -441,9 +444,16 @@ public class ResourceInfoPage extends PropertyPage {
 			encodingEditor.setPage(this);
 			encodingEditor.load();
 
-			encodingEditor.setPropertyChangeListener(event -> {
-				if (event.getProperty().equals(FieldEditor.IS_VALID)) {
-					setValid(encodingEditor.isValid());
+			encodingEditor.setPropertyChangeListener(new IPropertyChangeListener() {
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
+				 */
+				public void propertyChange(PropertyChangeEvent event) {
+					if (event.getProperty().equals(FieldEditor.IS_VALID)) {
+						setValid(encodingEditor.isValid());
+					}
 				}
 			});
 
@@ -453,7 +463,7 @@ public class ResourceInfoPage extends PropertyPage {
 				lineDelimiterEditor.doLoad();
 			}
 		}
-
+		
 		Dialog.applyDialogFont(composite);
 
 		return composite;
@@ -563,7 +573,7 @@ public class ResourceInfoPage extends PropertyPage {
 
 	/**
 	 * Return the label for the encoding field editor for the resource.
-	 *
+	 * 
 	 * @param resource -
 	 *            the resource to edit.
 	 * @return String
@@ -579,7 +589,7 @@ public class ResourceInfoPage extends PropertyPage {
 	 * Create the isEditable button and it's associated label as a child of
 	 * parent using the editableValue of the receiver. The Composite will be the
 	 * parent of the button.
-	 *
+	 * 
 	 * @param composite
 	 *            the parent of the button
 	 */
@@ -595,7 +605,7 @@ public class ResourceInfoPage extends PropertyPage {
 	 * Create the isExecutable button and it's associated label as a child of
 	 * parent using the editableValue of the receiver. The Composite will be the
 	 * parent of the button.
-	 *
+	 * 
 	 * @param composite
 	 *            the parent of the button
 	 */
@@ -611,7 +621,7 @@ public class ResourceInfoPage extends PropertyPage {
 	 * Create the isLocked button and it's associated label as a child of
 	 * parent using the editableValue of the receiver. The Composite will be the
 	 * parent of the button.
-	 *
+	 * 
 	 * @param composite
 	 *            the parent of the button
 	 */
@@ -626,7 +636,7 @@ public class ResourceInfoPage extends PropertyPage {
 	 * Create the isArchive button and it's associated label as a child of
 	 * parent using the editableValue of the receiver. The Composite will be the
 	 * parent of the button.
-	 *
+	 * 
 	 * @param composite
 	 *            the parent of the button
 	 */
@@ -642,7 +652,7 @@ public class ResourceInfoPage extends PropertyPage {
 	 * Create the derived button and it's associated label as a child of parent
 	 * using the derived of the receiver. The Composite will be the parent of
 	 * the button.
-	 *
+	 * 
 	 * @param composite
 	 *            the parent of the button
 	 * @param resource
@@ -661,7 +671,7 @@ public class ResourceInfoPage extends PropertyPage {
 
 	/**
 	 * Create a separator that goes across the entire page
-	 *
+	 * 
 	 * @param composite
 	 *            The parent of the seperator
 	 */
@@ -676,7 +686,7 @@ public class ResourceInfoPage extends PropertyPage {
 
 	/**
 	 * Create the group that shows the read only state and the timestamp.
-	 *
+	 * 
 	 * @param parent
 	 *            the composite the group will be created in
 	 * @param resource
@@ -845,11 +855,11 @@ public class ResourceInfoPage extends PropertyPage {
 	/*
 	 * @see PreferencePage#performDefaults()
 	 */
-	@Override
 	protected void performDefaults() {
 
-		IResource resource = Adapters.adapt(getElement(), IResource.class);
-
+		IResource resource = (IResource) getElement().getAdapter(
+				IResource.class);
+		
 		if (resource == null)
 			return;
 
@@ -876,7 +886,7 @@ public class ResourceInfoPage extends PropertyPage {
 		if (this.executableBox != null) {
 			this.executableBox.setSelection(false);
 		}
-
+		
 		// Nothing to update if we never made the box
 		if (this.archiveBox != null) {
 			this.archiveBox.setSelection(true);
@@ -918,7 +928,6 @@ public class ResourceInfoPage extends PropertyPage {
 	private IResourceChange getAttributesChange(final boolean changedAttrs[],
 			final boolean finalAttrs[]) {
 		return new IResourceChange() {
-			@Override
 			public String getMessage() {
 				String message = ""; //$NON-NLS-1$
 				if (changedAttrs[0])
@@ -933,7 +942,6 @@ public class ResourceInfoPage extends PropertyPage {
 				return message;
 			}
 
-			@Override
 			public void performChange(IResource resource) throws CoreException {
 				ResourceAttributes attrs = resource.getResourceAttributes();
 				if (attrs != null) {
@@ -952,7 +960,6 @@ public class ResourceInfoPage extends PropertyPage {
 	private IResourceChange getPermissionsChange(final int changedPermissions,
 			final int finalPermissions) {
 		return new IResourceChange() {
-			@Override
 			public String getMessage() {
 				// iterated with [j][i]
 				int permissionMasks[][] = new int[][] {
@@ -990,7 +997,6 @@ public class ResourceInfoPage extends PropertyPage {
 				return message;
 			}
 
-			@Override
 			public void performChange(IResource resource) {
 				int permissions = fetchPermissions(resource);
 				// add permissions
@@ -1008,14 +1014,16 @@ public class ResourceInfoPage extends PropertyPage {
 		// use list to preserve the order of visited resources
 		final List/*<IResource>*/ toVisit = new ArrayList/*<IResource>*/();
 		visited.add(resource.getLocationURI());
-		resource.accept(proxy -> {
-			IResource childResource = proxy.requestResource();
-			URI uri = childResource.getLocationURI();
-			if (!visited.contains(uri)) {
-				visited.add(uri);
-				toVisit.add(childResource);
+		resource.accept(new IResourceProxyVisitor() {
+			public boolean visit(IResourceProxy proxy) {
+				IResource childResource = proxy.requestResource();
+				URI uri = childResource.getLocationURI();
+				if (!visited.contains(uri)) {
+					visited.add(uri);
+					toVisit.add(childResource);
+				}
+				return true;
 			}
-			return true;
 		}, IResource.NONE);
 		return toVisit;
 	}
@@ -1041,48 +1049,53 @@ public class ResourceInfoPage extends PropertyPage {
 	}
 
 	private void scheduleRecursiveChangesJob(final IResource resource, final List/*<IResourceChange>*/ changes) {
-		Job.create(IDEWorkbenchMessages.ResourceInfo_recursiveChangesJobName, monitor -> {
-			try {
-				List/*<IResource>*/ toVisit = getResourcesToVisit(resource);
+		new Job(IDEWorkbenchMessages.ResourceInfo_recursiveChangesJobName) {
+			protected IStatus run(final IProgressMonitor monitor) {
+				try {
+					List/*<IResource>*/ toVisit = getResourcesToVisit(resource);
 
-				// Prepare the monitor for the given amount of work
-				SubMonitor subMonitor = SubMonitor.convert(monitor,
-						IDEWorkbenchMessages.ResourceInfo_recursiveChangesJobName,
-						toVisit.size());
+					// Prepare the monitor for the given amount of work
+					monitor.beginTask(
+							IDEWorkbenchMessages.ResourceInfo_recursiveChangesJobName,
+							toVisit.size());
 
-				// Apply changes recursively
-				for (Iterator/*<IResource>*/ it = toVisit.iterator(); it.hasNext();) {
-					SubMonitor iterationMonitor = subMonitor.split(1).setWorkRemaining(changes.size());
-					IResource childResource = (IResource) it.next();
-					iterationMonitor.subTask(NLS
-							.bind(IDEWorkbenchMessages.ResourceInfo_recursiveChangesSubTaskName,
-									childResource.getFullPath()));
-					for (int i = 0; i < changes.size(); i++) {
-						iterationMonitor.split(1);
-						((IResourceChange) changes.get(i))
-								.performChange(childResource);
+					// Apply changes recursively
+					for (Iterator/*<IResource>*/ it = toVisit.iterator(); it.hasNext();) {
+						if (monitor.isCanceled())
+							throw new OperationCanceledException();
+						IResource childResource = (IResource) it.next();
+						monitor.subTask(NLS
+								.bind(IDEWorkbenchMessages.ResourceInfo_recursiveChangesSubTaskName,
+										childResource.getFullPath()));
+						for (int i = 0; i < changes.size(); i++) {
+							((IResourceChange) changes.get(i))
+									.performChange(childResource);
+						}
+						monitor.worked(1);
 					}
+				} catch (CoreException e) {
+					IDEWorkbenchPlugin
+							.log(IDEWorkbenchMessages.ResourceInfo_recursiveChangesError,
+									e.getStatus());
+					return e.getStatus();
+				} catch (OperationCanceledException e) {
+					return Status.CANCEL_STATUS;
+				} finally {
+					monitor.done();
 				}
-			} catch (CoreException e1) {
-				IDEWorkbenchPlugin
-						.log(IDEWorkbenchMessages.ResourceInfo_recursiveChangesError,
-								e1.getStatus());
-				return e1.getStatus();
-			} catch (OperationCanceledException e2) {
-				return Status.CANCEL_STATUS;
+				return Status.OK_STATUS;
 			}
-			return Status.OK_STATUS;
-		}).schedule();
+		}.schedule();
 	}
 
 	/**
 	 * Apply the read only state and the encoding to the resource.
 	 */
-	@Override
 	public boolean performOk() {
 
-		IResource resource = Adapters.adapt(getElement(), IResource.class);
-
+		IResource resource = (IResource) getElement().getAdapter(
+				IResource.class);
+		
 		if (resource == null)
 			return true;
 

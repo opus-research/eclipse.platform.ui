@@ -17,7 +17,7 @@ import org.eclipse.jface.action.SubMenuManager;
 
 /**
  * An <code>EditorMenuManager</code> is used to sort the contributions
- * made by an editor so that they always appear after the action sets.
+ * made by an editor so that they always appear after the action sets.  
  */
 public class ActionSetMenuManager extends SubMenuManager {
     private String actionSetId;
@@ -30,10 +30,13 @@ public class ActionSetMenuManager extends SubMenuManager {
         this.actionSetId = actionSetId;
     }
 
-	/**
-	 * Returns the item passed to us, not the wrapper. In the case of menu's not
-	 * added by this manager, ensure that we return a wrapper for the menu.
-	 */
+    /* (non-Javadoc)
+     * Method declared on IContributionManager.
+     *
+     * Returns the item passed to us, not the wrapper.
+     * In the case of menu's not added by this manager,
+     * ensure that we return a wrapper for the menu.
+     */
     @Override
 	public IContributionItem find(String id) {
         IContributionItem item = getParentMenuManager().find(id);
@@ -46,7 +49,7 @@ public class ActionSetMenuManager extends SubMenuManager {
             // if it is a menu manager wrap it before returning
             IMenuManager menu = (IMenuManager) item;
             if (menu instanceof SubMenuManager) {
-				// it it is already wrapped then remover the wrapper and
+				// it it is already wrapped then remover the wrapper and 
                 // rewrap. We have a table of wrappers so we reuse wrappers
                 // we create.
                 menu = (IMenuManager) ((SubMenuManager) menu).getParent();
@@ -57,30 +60,27 @@ public class ActionSetMenuManager extends SubMenuManager {
         return item;
     }
 
-	/**
-	 * @return Returns the actionSetId.
-	 */
-	public String getActionSetId() {
-		return actionSetId;
-	}
-
+    /* (non-Javadoc)
+     * Method declared on IContributionManager.
+     */
     @Override
 	public IContributionItem[] getItems() {
         return getParentMenuManager().getItems();
     }
 
+    /* (non-Javadoc)
+     * Method declared on SubContributionManager.
+     */
     @Override
 	protected SubContributionItem wrap(IContributionItem item) {
         return new ActionSetContributionItem(item, actionSetId);
     }
 
+    /* (non-Javadoc)
+     * Method declared on SubMenuManager.
+     */
     @Override
 	protected SubMenuManager wrapMenu(IMenuManager menu) {
         return new ActionSetMenuManager(menu, actionSetId);
     }
-
-	@Override
-	public String toString() {
-		return "ActionSetMenuManager [id=" + actionSetId + "]"; //$NON-NLS-1$ //$NON-NLS-2$
-	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Oliver Puetter - Bug 423040
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
+ *     Oliver Puetter - activePart set to NULL when all parts are closed (http://bugs.eclipse.org/423040)
  ******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench;
 
@@ -45,9 +44,9 @@ public class SelectionAggregator {
 
 	private ListenerList genericListeners = new ListenerList();
 	private ListenerList genericPostListeners = new ListenerList();
-	private Map<String, ListenerList> targetedListeners = new HashMap<>();
-	private Map<String, ListenerList> targetedPostListeners = new HashMap<>();
-	private Set<IEclipseContext> tracked = new HashSet<>();
+	private Map<String, ListenerList> targetedListeners = new HashMap<String, ListenerList>();
+	private Map<String, ListenerList> targetedPostListeners = new HashMap<String, ListenerList>();
+	private Set<IEclipseContext> tracked = new HashSet<IEclipseContext>();
 
 	private EventHandler eventHandler = new EventHandler() {
 		@Override
@@ -57,8 +56,7 @@ public class SelectionAggregator {
 				MPart part = (MPart) element;
 
 				String partId = part.getElementId();
-				if (targetedListeners.containsKey(partId)
-						|| targetedPostListeners.containsKey(partId))
+				if (targetedListeners.containsKey(partId))
 					track(part);
 			}
 		}

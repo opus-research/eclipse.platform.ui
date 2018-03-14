@@ -23,10 +23,10 @@ import org.eclipse.ui.statushandlers.StatusManager;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class Tweaklets {
-
+	
 	public static class TweakKey {
 		Class tweakClass;
 
@@ -37,6 +37,9 @@ public class Tweaklets {
 			this.tweakClass = tweakClass;
 		}
 
+		/* (non-Javadoc)
+		 * @see java.lang.Object#hashCode()
+		 */
 		@Override
 		public int hashCode() {
 			final int prime = 31;
@@ -46,6 +49,9 @@ public class Tweaklets {
 			return result;
 		}
 
+		/* (non-Javadoc)
+		 * @see java.lang.Object#equals(java.lang.Object)
+		 */
 		@Override
 		public boolean equals(Object obj) {
 			if (this == obj)
@@ -70,7 +76,7 @@ public class Tweaklets {
 	public static void setDefault(TweakKey definition, Object implementation) {
 		defaults.put(definition, implementation);
 	}
-
+	
 	public static Object get(TweakKey definition) {
 		Object result = tweaklets.get(definition);
 		if (result == null) {

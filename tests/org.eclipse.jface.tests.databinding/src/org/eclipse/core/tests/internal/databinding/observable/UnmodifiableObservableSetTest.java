@@ -41,7 +41,6 @@ public class UnmodifiableObservableSetTest extends AbstractDefaultRealmTestCase 
 	UnmodifiableObservableSet unmodifiable;
 	MutableObservableSet mutable;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -132,7 +131,11 @@ public class UnmodifiableObservableSetTest extends AbstractDefaultRealmTestCase 
 			super(wrappedSet, elementType);
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.internal.databinding.provisional.observable.list.ObservableList#add(java.lang.Object)
+		 */
 		public boolean add(Object o) {
 			boolean result = wrappedSet.add(o);
 			if (result)
@@ -153,7 +156,6 @@ public class UnmodifiableObservableSetTest extends AbstractDefaultRealmTestCase 
 			AbstractObservableCollectionContractDelegate {
 		private Object elementType = new Object();
 
-		@Override
 		public IObservableCollection createObservableCollection(Realm realm,
 				int elementCount) {
 			IObservableSet backingList = new WritableSet(realm, new HashSet(),
@@ -165,17 +167,14 @@ public class UnmodifiableObservableSetTest extends AbstractDefaultRealmTestCase 
 			return result;
 		}
 
-		@Override
 		public Object createElement(IObservableCollection collection) {
 			return new Object();
 		}
 
-		@Override
 		public Object getElementType(IObservableCollection collection) {
 			return elementType;
 		}
 
-		@Override
 		public void change(IObservable observable) {
 			UnmodifiableObservableSetStub unmodifiableList = (UnmodifiableObservableSetStub) observable;
 			IObservableSet wrappedList = unmodifiableList.wrappedSet;

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -20,7 +20,7 @@ import org.eclipse.ui.tests.views.properties.tabbed.model.Element;
 
 /**
  * Label provider for the title bar for the tabbed property sheet page.
- *
+ * 
  * @author Anthony Hunter
  */
 public class LabelProvider
@@ -29,8 +29,7 @@ public class LabelProvider
     /**
      * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
      */
-    @Override
-	public Image getImage(Object obj) {
+    public Image getImage(Object obj) {
         if (obj == null || obj.equals(StructuredSelection.EMPTY)) {
             return null;
         }
@@ -48,8 +47,7 @@ public class LabelProvider
     /**
      * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
      */
-    @Override
-	public String getText(Object obj) {
+    public String getText(Object obj) {
         if (obj == null || obj.equals(StructuredSelection.EMPTY)) {
             return null;
         }
@@ -83,7 +81,7 @@ public class LabelProvider
     /**
      * Determine there are objects in the structured selection of different
      * types.
-     *
+     * 
      * @param structuredSelection
      *            the structured selection.
      * @return true if there are objects of different types in the selection.

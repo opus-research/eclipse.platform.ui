@@ -27,7 +27,7 @@ import org.eclipse.ui.internal.services.SourcePriorityNameMapping;
  * This class is not intended for use outside of the
  * <code>org.eclipse.ui.workbench</code> plug-in.
  * </p>
- *
+ * 
  * @since 3.2
  */
 public class LegacyEditorActionBarExpression extends Expression {
@@ -45,7 +45,7 @@ public class LegacyEditorActionBarExpression extends Expression {
 
 	/**
 	 * Constructs a new instance of <code>LegacyEditorActionBarExpression</code>
-	 *
+	 * 
 	 * @param editorId
 	 *            The identifier of the editor to match with the active editor;
 	 *            must not be <code>null</code>
@@ -82,6 +82,11 @@ public class LegacyEditorActionBarExpression extends Expression {
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.expressions.Expression#evaluate(org.eclipse.core.expressions.IEvaluationContext)
+	 */
 	@Override
 	public final EvaluationResult evaluate(final IEvaluationContext context) {
 		final Object variable = context

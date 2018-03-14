@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,8 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Markus Schorn (Wind River Systems) -  bug 284447
- *     Christian Georgi (SAP)             -  bug 432480
- *     Denis Zygann <d.zygann@web.de>      - bug 457390
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.application;
 
@@ -102,7 +100,6 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	private String lastEditorTitleTooltip = ""; //$NON-NLS-1$
 
 	private IPropertyListener editorPropertyListener = new IPropertyListener() {
-		@Override
 		public void propertyChanged(Object source, int propId) {
 			if (propId == IWorkbenchPartConstants.PROP_TITLE) {
 				if (lastActiveEditor != null) {
@@ -128,7 +125,7 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	/**
 	 * Crates a new IDE workbench window advisor.
-	 *
+	 * 
 	 * @param wbAdvisor
 	 *            the workbench advisor
 	 * @param configurer
@@ -141,7 +138,11 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		titlePathUpdater = (TitlePathUpdater) Tweaklets.get(TitlePathUpdater.KEY);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchWindowAdvisor#createActionBarAdvisor(org.eclipse.ui.application.IActionBarConfigurer)
+	 */
 	public ActionBarAdvisor createActionBarAdvisor(
 			IActionBarConfigurer configurer) {
 		return new WorkbenchActionBuilder(configurer);
@@ -149,14 +150,18 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	/**
 	 * Returns the workbench.
-	 *
+	 * 
 	 * @return the workbench
 	 */
 	private IWorkbench getWorkbench() {
 		return getWindowConfigurer().getWorkbenchConfigurer().getWorkbench();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#preWindowShellClose
+	 */
 	public boolean preWindowShellClose() {
 		if (getWorkbench().getWorkbenchWindowCount() > 1) {
 			return true;
@@ -169,7 +174,7 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	/**
 	 * Asks the user whether the workbench should really be closed. Only asks if
 	 * the preference is enabled.
-	 *
+	 * 
 	 * @param parentShell
 	 *            the parent shell to use for the confirmation dialog
 	 * @return <code>true</code> if OK to exit, <code>false</code> if the user
@@ -193,7 +198,7 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 				parentShell.setMinimized(false);
 				parentShell.forceActive();
 			}
-
+			
 			String message;
 
 			String productName = null;
@@ -230,13 +235,18 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		return true;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#preWindowOpen
+	 */
 	public void preWindowOpen() {
 		IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
 
 		// show the shortcut bar and progress indicator, which are hidden by
 		// default
 		configurer.setShowPerspectiveBar(true);
+		configurer.setShowFastViewBars(true);
 		configurer.setShowProgressIndicator(true);
 
 		// add the drag and drop support for the editor area
@@ -249,45 +259,39 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 		hookTitleUpdateListeners(configurer);
 	}
-
+	
 	/**
 	 * Hooks the listeners needed on the window
-	 *
+	 * 
 	 * @param configurer
 	 */
 	private void hookTitleUpdateListeners(IWorkbenchWindowConfigurer configurer) {
 		// hook up the listeners to update the window title
 		configurer.getWindow().addPageListener(new IPageListener() {
-			@Override
 			public void pageActivated(IWorkbenchPage page) {
 				updateTitle(false);
 			}
 
-			@Override
 			public void pageClosed(IWorkbenchPage page) {
 				updateTitle(false);
 			}
 
-			@Override
 			public void pageOpened(IWorkbenchPage page) {
 				// do nothing
 			}
 		});
 		configurer.getWindow().addPerspectiveListener(new PerspectiveAdapter() {
-			@Override
 			public void perspectiveActivated(IWorkbenchPage page,
 					IPerspectiveDescriptor perspective) {
 				updateTitle(false);
 			}
 
-			@Override
 			public void perspectiveSavedAs(IWorkbenchPage page,
 					IPerspectiveDescriptor oldPerspective,
 					IPerspectiveDescriptor newPerspective) {
 				updateTitle(false);
 			}
 
-			@Override
 			public void perspectiveDeactivated(IWorkbenchPage page,
 					IPerspectiveDescriptor perspective) {
 				updateTitle(false);
@@ -295,36 +299,30 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		});
 		configurer.getWindow().getPartService().addPartListener(
 				new IPartListener2() {
-					@Override
 					public void partActivated(IWorkbenchPartReference ref) {
 						if (ref instanceof IEditorReference) {
 							updateTitle(false);
 						}
 					}
 
-					@Override
 					public void partBroughtToTop(IWorkbenchPartReference ref) {
 						if (ref instanceof IEditorReference) {
 							updateTitle(false);
 						}
 					}
 
-					@Override
 					public void partClosed(IWorkbenchPartReference ref) {
 						updateTitle(false);
 					}
 
-					@Override
 					public void partDeactivated(IWorkbenchPartReference ref) {
 						// do nothing
 					}
 
-					@Override
 					public void partOpened(IWorkbenchPartReference ref) {
 						// do nothing
 					}
 
-					@Override
 					public void partHidden(IWorkbenchPartReference ref) {
 						if (ref.getPart(false) == lastActiveEditor
 								&& lastActiveEditor != null) {
@@ -332,7 +330,6 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 						}
 					}
 
-					@Override
 					public void partVisible(IWorkbenchPartReference ref) {
 						if (ref.getPart(false) == lastActiveEditor
 								&& lastActiveEditor != null) {
@@ -340,19 +337,16 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 						}
 					}
 
-					@Override
 					public void partInputChanged(IWorkbenchPartReference ref) {
 						// do nothing
 					}
 				});
-
+		
 		// Listen for changes of the workspace name.
 		propertyChangeListener = new IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
-				String property = event.getProperty();
-				if (IDEInternalPreferences.WORKSPACE_NAME.equals(property)
-						|| IDEInternalPreferences.SHOW_LOCATION.equals(property)) {
+				if (IDEInternalPreferences.WORKSPACE_NAME.equals(event
+						.getProperty())) {
 					// Make sure the title is actually updated by
 					// setting last active page.
 					lastActivePage = null;
@@ -409,7 +403,7 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			title = NLS.bind(IDEWorkbenchMessages.WorkbenchWindow_shellTitle,
 					title, workspaceLocation);
 		}
-
+		
 		// Bug 284447: Prepend workspace name to the title
 		String workspaceName = IDEWorkbenchPlugin.getDefault()
 				.getPreferenceStore().getString(
@@ -477,7 +471,7 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			persp = currentPage.getPerspective();
 			input = currentPage.getInput();
 		}
-
+		
 		if (editorHidden) {
 			activeEditor = null;
 		}
@@ -504,7 +498,11 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		recomputeTitle();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#postWindowRestore
+	 */
 	public void postWindowRestore() throws WorkbenchException {
 		IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
 		IWorkbenchWindow window = configurer.getWindow();
@@ -551,10 +549,9 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	/**
 	 * Tries to open the intro, if one exists and otherwise will open the legacy
 	 * Welcome pages.
-	 *
+	 * 
 	 * @see org.eclipse.ui.application.WorkbenchWindowAdvisor#openIntro()
 	 */
-	@Override
 	public void openIntro() {
 		if (editorsAndIntrosOpened) {
 			return;
@@ -576,7 +573,6 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	 * Open the welcome editor for the primary feature and for any newly
 	 * installed features.
 	 */
-	@SuppressWarnings("rawtypes")
 	private void openWelcomeEditors(IWorkbenchWindow window) {
 		if (IDEWorkbenchPlugin.getDefault().getPreferenceStore().getBoolean(
 				IDEInternalPreferences.WELCOME_DIALOG)) {
@@ -598,7 +594,7 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			openWelcomeEditor(window, new WelcomeEditorInput(productInfo), null);
 		} else {
 			// Show the welcome page for any newly installed features
-			List<AboutInfo> welcomeFeatures = new ArrayList<AboutInfo>();
+			List welcomeFeatures = new ArrayList();
 			for (Iterator it = wbAdvisor.getNewlyAddedBundleGroups().entrySet()
 					.iterator(); it.hasNext();) {
 				Map.Entry entry = (Map.Entry) it.next();
@@ -631,7 +627,7 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 			int wCount = getWorkbench().getWorkbenchWindowCount();
 			for (int i = 0; i < welcomeFeatures.size(); i++) {
-				AboutInfo newInfo = welcomeFeatures.get(i);
+				AboutInfo newInfo = (AboutInfo) welcomeFeatures.get(i);
 				String id = newInfo.getWelcomePerspectiveId();
 				// Other editors were already opened in postWindowRestore(..)
 				if (id == null || i >= wCount) {
@@ -729,7 +725,12 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		return;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#createEmptyWindowContents(org.eclipse.ui.application.IWorkbenchWindowConfigurer,
+	 *      org.eclipse.swt.widgets.Composite)
+	 */
 	public Control createEmptyWindowContents(Composite parent) {
 		final IWorkbenchWindow window = getWindowConfigurer().getWindow();
 		Composite composite = new Composite(parent, SWT.NONE);
@@ -755,7 +756,9 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		toolBar.setBackground(bgCol);
 		return composite;
 	}
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.application.WorkbenchWindowAdvisor#dispose()
+	 */
 	public void dispose() {
 		if (propertyChangeListener != null) {
 			IDEWorkbenchPlugin.getDefault().getPreferenceStore().removePropertyChangeListener(propertyChangeListener);

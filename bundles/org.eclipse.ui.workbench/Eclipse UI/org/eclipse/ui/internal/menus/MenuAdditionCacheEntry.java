@@ -55,7 +55,7 @@ import org.eclipse.ui.menus.CommandContributionItem;
 public class MenuAdditionCacheEntry {
 	private static final String AFTER_ADDITIONS = "after=additions"; //$NON-NLS-1$
 
-	final static String MAIN_TOOLBAR = ActionSet.MAIN_TOOLBAR;
+	final static String MAIN_TOOLBAR = "org.eclipse.ui.main.toolbar"; //$NON-NLS-1$
 
 	final static String TRIM_COMMAND1 = "org.eclipse.ui.trim.command1"; //$NON-NLS-1$
 
@@ -70,7 +70,7 @@ public class MenuAdditionCacheEntry {
 	/**
 	 * Test whether the location URI is in one of the pre-defined workbench trim
 	 * areas.
-	 *
+	 * 
 	 * @param location
 	 * @return true if the URI is in workbench trim area.
 	 */
@@ -539,11 +539,4 @@ public class MenuAdditionCacheEntry {
 		createIdentifierTracker(item);
 		return item;
 	}
-
-	@Override
-	public String toString() {
-		return "MenuAdditionCacheEntry [id=" + MenuHelper.getId(configElement) //$NON-NLS-1$
-				+ ", namespaceId=" + namespaceIdentifier + ", location=" + location + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	}
-
 }

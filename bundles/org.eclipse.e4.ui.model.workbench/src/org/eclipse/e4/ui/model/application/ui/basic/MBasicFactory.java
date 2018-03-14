@@ -4,11 +4,12 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
 package org.eclipse.e4.ui.model.application.ui.basic;
+
 
 /**
  * <!-- begin-user-doc -->
@@ -102,24 +103,6 @@ public interface MBasicFactory {
 	MTrimBar createTrimBar();
 
 	/**
-	 * Returns a new object of class '<em>Frame</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Frame</em>'.
-	 * @generated
-	 */
-	MFrame createFrame();
-
-	/**
-	 * Returns a new object of class '<em>Frame Element</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Frame Element</em>'.
-	 * @generated
-	 */
-	MFrameElement createFrameElement();
-
-	/**
 	 * Returns a new object of class '<em>Dialog</em>'.
 	 * <!-- begin-user-doc -->
 	 * @since 1.1
@@ -130,12 +113,13 @@ public interface MBasicFactory {
 	MDialog createDialog();
 
 	/**
-	 * Returns a new object of class '<em>Wizard</em>'.
+	 * Returns a new object of class '<em>Wizard Dialog</em>'.
 	 * <!-- begin-user-doc -->
+	 * @since 1.1
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Wizard</em>'.
+	 * @return a new object of class '<em>Wizard Dialog</em>'.
 	 * @generated
 	 */
-	MWizard createWizard();
+	MWizardDialog createWizardDialog();
 
 } //MBasicFactory

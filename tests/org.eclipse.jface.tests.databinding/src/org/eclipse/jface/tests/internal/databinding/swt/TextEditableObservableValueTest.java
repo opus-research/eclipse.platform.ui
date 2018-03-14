@@ -43,7 +43,12 @@ public class TextEditableObservableValueTest extends ObservableDelegateTest {
 		super(testName, new Delegate());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.conformance.databinding.ObservableDelegateTest#setUp()
+	 */
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -52,7 +57,6 @@ public class TextEditableObservableValueTest extends ObservableDelegateTest {
 		text = delegate.text;
 	}
 
-	@Override
 	protected IObservable doCreateObservable() {
 		return super.doCreateObservable();
 	}
@@ -88,34 +92,28 @@ public class TextEditableObservableValueTest extends ObservableDelegateTest {
 		private Shell shell;
 		Text text;
 
-		@Override
 		public void setUp() {
 			shell = new Shell();
 			text = new Text(shell, SWT.NONE);
 		}
 
-		@Override
 		public void tearDown() {
 			shell.dispose();
 		}
 
-		@Override
 		public IObservableValue createObservableValue(Realm realm) {
 			return WidgetProperties.editable().observe(realm, text);
 		}
 
-		@Override
 		public Object getValueType(IObservableValue observable) {
 			return Boolean.TYPE;
 		}
 
-		@Override
 		public void change(IObservable observable) {
 			IObservableValue observableValue = (IObservableValue) observable;
 			observableValue.setValue(createValue(observableValue));
 		}
 
-		@Override
 		public Object createValue(IObservableValue observable) {
 			return (Boolean.TRUE.equals(observable.getValue()) ? Boolean.FALSE
 					: Boolean.TRUE);

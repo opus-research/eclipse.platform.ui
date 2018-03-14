@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.jface.examples.databinding.mask.internal;
 
-import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -25,16 +24,16 @@ import org.eclipse.swt.widgets.Listener;
  *
  */
 public class WorkQueue {
-
+	
     private boolean updateScheduled = false;
 
     private boolean paintListenerAttached = false;
 
-	private Deque<Runnable> pendingWork = new LinkedList<>();
+    private LinkedList pendingWork = new LinkedList();
 
     private Display d;
 
-	private Set<Runnable> pendingWorkSet = new HashSet<>();
+    private Set pendingWorkSet = new HashSet();
 
     private Runnable updateJob = new Runnable() {
         @Override
@@ -67,13 +66,13 @@ public class WorkQueue {
                 if (pendingWork.isEmpty()) {
                     break;
                 }
-				next = pendingWork.removeFirst();
+                next = (Runnable) pendingWork.removeFirst();
                 pendingWorkSet.remove(next);
             }
 
             next.run();
         }
-
+        
     }
 
     /**
@@ -81,7 +80,7 @@ public class WorkQueue {
      * possible, the work will happen before the next control redraws. The given
      * runnable will only be run once. Has no effect if this runnable has
      * already been queued for execution.
-     *
+     * 
      * @param work
      *            runnable to execute
      */
@@ -102,7 +101,7 @@ public class WorkQueue {
      * possible, the work will happen before the next control redraws. Unlike
      * runOnce, calling asyncExec twice with the same runnable will cause that
      * runnable to run twice.
-     *
+     * 
      * @param work
      *            runnable to execute
      */
@@ -128,7 +127,7 @@ public class WorkQueue {
     /**
      * Cancels a previously-scheduled runnable. Has no effect if the given
      * runnable was not previously scheduled or has already executed.
-     *
+     * 
      * @param toCancel
      *            runnable to cancel
      */

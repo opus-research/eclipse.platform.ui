@@ -18,9 +18,9 @@ import org.eclipse.core.expressions.IEvaluationContext;
 /**
  * An expression that simply returns <code>true</code> at all times. A shared
  * instance of this expression is provided.
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 public final class AlwaysEnabledExpression extends Expression {
 
@@ -33,6 +33,11 @@ public final class AlwaysEnabledExpression extends Expression {
 	private AlwaysEnabledExpression() {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.expressions.Expression#evaluate(org.eclipse.core.expressions.IEvaluationContext)
+	 */
 	@Override
 	public EvaluationResult evaluate(IEvaluationContext context) {
 		return EvaluationResult.TRUE;

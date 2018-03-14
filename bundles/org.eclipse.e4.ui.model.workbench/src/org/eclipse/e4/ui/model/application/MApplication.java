@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
@@ -20,7 +20,7 @@ import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptorConta
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MSnippetContainer;
-import org.eclipse.e4.ui.model.application.ui.basic.MFrame;
+import org.eclipse.e4.ui.model.application.ui.basic.MDialog;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuContributions;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarContributions;
@@ -53,13 +53,13 @@ import org.eclipse.e4.ui.model.application.ui.menu.MTrimContributions;
  *
  * <p>
  * The following features are supported:
- * </p>
  * <ul>
  *   <li>{@link org.eclipse.e4.ui.model.application.MApplication#getCommands <em>Commands</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.MApplication#getAddons <em>Addons</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.MApplication#getCategories <em>Categories</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.MApplication#getDialogs <em>Dialogs</em>}</li>
  * </ul>
+ * </p>
  *
  * @model
  * @generated
@@ -123,7 +123,7 @@ public interface MApplication extends MElementContainer<MWindow>, MContext, MHan
 
 	/**
 	 * Returns the value of the '<em><b>Dialogs</b></em>' reference list.
-	 * The list contents are of type {@link org.eclipse.e4.ui.model.application.ui.basic.MFrame}.
+	 * The list contents are of type {@link org.eclipse.e4.ui.model.application.ui.basic.MDialog}.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
@@ -136,6 +136,6 @@ public interface MApplication extends MElementContainer<MWindow>, MContext, MHan
 	 * @model
 	 * @generated
 	 */
-	List<MFrame> getDialogs();
+	List<MDialog> getDialogs();
 
 } // MApplication

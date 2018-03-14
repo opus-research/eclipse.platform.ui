@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,7 @@ import org.eclipse.core.databinding.observable.masterdetail.IObservableFactory;
 import org.eclipse.core.databinding.observable.set.IObservableSet;
 import org.eclipse.core.databinding.observable.set.UnionSet;
 import org.eclipse.core.databinding.observable.set.WritableSet;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.viewers.ObservableSetTreeContentProvider;
 import org.eclipse.jface.internal.databinding.provisional.viewers.ViewerLabelProvider;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.Shell;
  * Tests UpdatableTreeContentProvider and DirtyIndicationLabelProvider. Creates
  * a tree containing three randomly-generated sets of integers, and one node
  * that contains the union of the other sets.
- *
+ * 
  * @since 3.2
  */
 public class TreeContentProviderTest {
@@ -55,7 +55,7 @@ public class TreeContentProviderTest {
 	private AsynchronousTestSet set3;
 
 	// The union of the above three sets
-	private UnionSet<Object> union;
+	private UnionSet union;
 	private Button randomize;
 
 	public TreeContentProviderTest() {
@@ -66,7 +66,7 @@ public class TreeContentProviderTest {
 		set3 = new AsynchronousTestSet();
 
 		// A union of the above sets
-		union = new UnionSet<>(new IObservableSet[] { set1, set2, set3 });
+		union = new UnionSet(new IObservableSet[] { set1, set2, set3 });
 
 		// Create shell
 		shell = new Shell(Display.getCurrent());
@@ -93,6 +93,11 @@ public class TreeContentProviderTest {
 				.generateLayout(shell);
 
 		shell.addDisposeListener(new DisposeListener() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
+			 */
 			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				dispose();
@@ -101,7 +106,7 @@ public class TreeContentProviderTest {
 	}
 
 	/**
-	 *
+	 * 
 	 */
 	protected void dispose() {
 		set1.dispose();
@@ -118,15 +123,15 @@ public class TreeContentProviderTest {
 		// SimpleNodes as top-level nodes, and sets of randomly generated
 		// Doubles below each
 		// SimpleNode.
-		IObservableFactory<SimpleNode, IObservable> childrenFactory = new IObservableFactory<SimpleNode, IObservable>() {
+		IObservableFactory childrenFactory = new IObservableFactory() {
 			@Override
-			public IObservable createObservable(SimpleNode element) {
+			public IObservable createObservable(Object element) {
 				// If the parent is the root node, return the union of some
 				// randomly-generated
 				// nodes and some hardcoded nodes
 				if (element == tree.getInput()) {
 					// Set of hardcoded nodes
-					WritableSet<SimpleNode> topElements = new WritableSet<>();
+					WritableSet topElements = new WritableSet();
 					topElements.add(new SimpleNode("Random Set 1", set1));
 					topElements.add(new SimpleNode("Random Set 2", set2));
 					topElements.add(new SimpleNode("Random Set 3", set3));
@@ -135,10 +140,20 @@ public class TreeContentProviderTest {
 					return topElements;
 				}
 
-				// We return a new DelegatingObservableSet in order to
-				// prevent the
-				// original from being disposed.
-				return Observables.proxyObservableSet(element.getChildren());
+				// If the parent is a RandomChildrenNode, return a
+				// randomly-generated
+				// set of Doubles for its children
+				if (element instanceof SimpleNode) {
+					// We return a new DelegatingObservableSet in order to
+					// prevent the
+					// original from being disposed.
+					return Observables
+							.proxyObservableSet(((SimpleNode) element)
+									.getChildren());
+				}
+
+				// Otherwise the node is a Double, which will have no children
+				return null;
 			}
 		};
 
@@ -181,7 +196,7 @@ public class TreeContentProviderTest {
 	 */
 	public static void main(String[] args) {
 		final Display display = Display.getDefault();
-		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
+		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
 			@Override
 			public void run() {
 				TreeContentProviderTest test = new TreeContentProviderTest();

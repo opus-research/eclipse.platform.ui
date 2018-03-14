@@ -20,7 +20,7 @@ import org.eclipse.swt.widgets.Menu;
 /**
  * A compound contribution is a contribution item consisting of a
  * dynamic list of contribution items.
- *
+ * 
  * @since 3.1
  */
 public abstract class CompoundContributionItem extends ContributionItem {
@@ -31,9 +31,9 @@ public abstract class CompoundContributionItem extends ContributionItem {
             manager.markDirty();
         }
     };
-
+    
     private IContributionItem[] oldItems;
-
+    
     /**
      * Creates a compound contribution item with a <code>null</code> id.
      */
@@ -49,13 +49,16 @@ public abstract class CompoundContributionItem extends ContributionItem {
     protected CompoundContributionItem(String id) {
         super(id);
     }
-
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets.Menu, int)
+     */
     @Override
 	public void fill(Menu menu, int index) {
         if (index == -1) {
 			index = menu.getItemCount();
 		}
-
+        
         IContributionItem[] items = getContributionItemsToFill();
 		if (index > menu.getItemCount()) {
 			index = menu.getItemCount();
@@ -71,16 +74,16 @@ public abstract class CompoundContributionItem extends ContributionItem {
             index += numAdded;
         }
     }
-
+    
     /**
 	 * Return a list of contributions items that will replace this item in the
 	 * parent manager. The list must contain new contribution items every call
 	 * since the old ones will be disposed.
-	 *
+	 * 
 	 * @return an array list of items to display. Must not be <code>null</code>.
 	 */
     protected abstract IContributionItem[] getContributionItems();
-
+    
     private IContributionItem[] getContributionItemsToFill() {
 		disposeOldItems();
 		oldItems = getContributionItems();
@@ -96,18 +99,27 @@ public abstract class CompoundContributionItem extends ContributionItem {
             oldItems = null;
         }
     }
-
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.action.ContributionItem#isDirty()
+     */
     @Override
 	public boolean isDirty() {
 		return true;
     }
-
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.action.ContributionItem#isDynamic()
+     */
     @Override
 	public boolean isDynamic() {
         return true;
     }
-
-
+    
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.action.ContributionItem#setParent(org.eclipse.jface.action.IContributionManager)
+     */
     @Override
 	public void setParent(IContributionManager parent) {
         if (getParent() instanceof IMenuManager) {
@@ -121,6 +133,11 @@ public abstract class CompoundContributionItem extends ContributionItem {
         super.setParent(parent);
     }
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.ContributionItem#dispose()
+	 */
 	@Override
 	public void dispose() {
 		disposeOldItems();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 Matthew Hall and others.
+ * Copyright (c) 2008, 2010 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,7 +33,7 @@ import org.eclipse.core.databinding.property.NativePropertyListener;
 import org.eclipse.core.databinding.property.set.DelegatingSetProperty;
 import org.eclipse.core.databinding.property.set.ISetProperty;
 import org.eclipse.core.databinding.property.set.SimpleSetProperty;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.ViewerProperties;
 import org.eclipse.jface.databinding.viewers.ViewerSupport;
@@ -53,7 +53,7 @@ import org.eclipse.swt.widgets.TreeColumn;
 
 /**
  * @since 3.2
- *
+ * 
  */
 public class Snippet026AnonymousBeanProperties {
 	private ComboViewer statusViewer;
@@ -63,7 +63,7 @@ public class Snippet026AnonymousBeanProperties {
 
 	public static void main(String[] args) {
 		Display display = new Display();
-		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
+		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
 			@Override
 			public void run() {
 				try {

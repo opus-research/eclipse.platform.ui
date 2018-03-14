@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Marc R. Hoffmann <hoffmann@mountainminds.com> - Bug 284265 [JFace]
+ *     Marc R. Hoffmann <hoffmann@mountainminds.com> - Bug 284265 [JFace] 
  *                  DialogSettings.save() silently ignores IOException
  *     Ruediger Herrmann <ruediger.herrmann@gmx.de> - bug 92518
  *******************************************************************************/
@@ -107,11 +107,14 @@ public class DialogSettings implements IDialogSettings {
      */
     public DialogSettings(String sectionName) {
         name = sectionName;
-        items = new HashMap<>();
-        arrayItems = new HashMap<>();
-        sections = new HashMap<>();
+        items = new HashMap<String, String>();
+        arrayItems = new HashMap<String, String[]>();
+        sections = new HashMap<String, IDialogSettings>();
     }
 
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
     @Override
 	public IDialogSettings addNewSection(String sectionName) {
         DialogSettings section = new DialogSettings(sectionName);
@@ -119,6 +122,9 @@ public class DialogSettings implements IDialogSettings {
         return section;
     }
 
+	/* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
     @Override
 	public void addSection(IDialogSettings section) {
         sections.put(section.getName(), section);
@@ -127,7 +133,7 @@ public class DialogSettings implements IDialogSettings {
     /**
 	 * Remove a section in the receiver. If the given section does not exist,
 	 * nothing is done.
-	 *
+	 * 
 	 * @param section
 	 *            the section to be removed. Must not be <code>null</code>.
 	 * @since 3.9
@@ -141,7 +147,7 @@ public class DialogSettings implements IDialogSettings {
     /**
 	 * Remove a section by name in the receiver. If the given section does not
 	 * exist, nothing is done.
-	 *
+	 * 
 	 * @param sectionName
 	 *            the name of the section to be removed.  Must not be <code>null</code>.
      * @return The dialog section removed, or <code>null</code> if it wasn't there.
@@ -151,21 +157,33 @@ public class DialogSettings implements IDialogSettings {
 		return sections.remove(sectionName);
 	}
 
+	/* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
     @Override
 	public String get(String key) {
         return items.get(key);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
     @Override
 	public String[] getArray(String key) {
         return arrayItems.get(key);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
     @Override
 	public boolean getBoolean(String key) {
         return Boolean.valueOf(items.get(key)).booleanValue();
     }
 
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
     @Override
 	public double getDouble(String key) throws NumberFormatException {
         String setting = items.get(key);
@@ -177,6 +195,9 @@ public class DialogSettings implements IDialogSettings {
         return new Double(setting).doubleValue();
     }
 
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
     @Override
 	public float getFloat(String key) throws NumberFormatException {
         String setting = items.get(key);
@@ -188,6 +209,9 @@ public class DialogSettings implements IDialogSettings {
         return new Float(setting).floatValue();
     }
 
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
     @Override
 	public int getInt(String key) throws NumberFormatException {
         String setting = items.get(key);
@@ -201,6 +225,9 @@ public class DialogSettings implements IDialogSettings {
         return new Integer(setting).intValue();
     }
 
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
     @Override
 	public long getLong(String key) throws NumberFormatException {
         String setting = items.get(key);
@@ -214,21 +241,24 @@ public class DialogSettings implements IDialogSettings {
         return new Long(setting).longValue();
     }
 
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
     @Override
 	public String getName() {
         return name;
     }
-
+    
 	/**
 	 * Returns a section with the given name in the given dialog settings. If
 	 * the section doesn't exist yet, then it is first created.
-	 *
+	 * 
 	 * @param settings
 	 *            the parent settings
 	 * @param sectionName
 	 *            the name of the section
 	 * @return the section
-	 *
+	 * 
 	 * @since 3.7
 	 */
 	public static IDialogSettings getOrCreateSection(IDialogSettings settings,
@@ -240,11 +270,17 @@ public class DialogSettings implements IDialogSettings {
 		return section;
 	}
 
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
     @Override
 	public IDialogSettings getSection(String sectionName) {
         return sections.get(sectionName);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
     @Override
 	public IDialogSettings[] getSections() {
         Collection<IDialogSettings> values = sections.values();
@@ -253,6 +289,9 @@ public class DialogSettings implements IDialogSettings {
         return result;
     }
 
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
     @Override
 	public void load(Reader r) {
         Document document = null;
@@ -278,6 +317,9 @@ public class DialogSettings implements IDialogSettings {
         }
     }
 
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
     @Override
 	public void load(String fileName) throws IOException {
         FileInputStream stream = new FileInputStream(fileName);
@@ -287,6 +329,9 @@ public class DialogSettings implements IDialogSettings {
         reader.close();
     }
 
+    /* (non-Javadoc)
+     * Load the setting from the <code>document</code>
+     */
     private void load(Document document, Element root) {
         name = root.getAttribute(TAG_NAME);
         NodeList l = root.getElementsByTagName(TAG_ITEM);
@@ -305,7 +350,7 @@ public class DialogSettings implements IDialogSettings {
                 Element child = (Element) l.item(i);
                 String key = child.getAttribute(TAG_KEY);
                 NodeList list = child.getElementsByTagName(TAG_ITEM);
-                List<String> valueList = new ArrayList<>();
+                List<String> valueList = new ArrayList<String>();
                 for (int j = 0; j < list.getLength(); j++) {
                     Element node = (Element) list.item(j);
                     if (child == node.getParentNode()) {
@@ -328,41 +373,65 @@ public class DialogSettings implements IDialogSettings {
         }
     }
 
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
     @Override
 	public void put(String key, String[] value) {
         arrayItems.put(key, value);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
     @Override
 	public void put(String key, double value) {
         put(key, String.valueOf(value));
     }
 
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
     @Override
 	public void put(String key, float value) {
         put(key, String.valueOf(value));
     }
 
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
     @Override
 	public void put(String key, int value) {
         put(key, String.valueOf(value));
     }
 
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
     @Override
 	public void put(String key, long value) {
         put(key, String.valueOf(value));
     }
 
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
     @Override
 	public void put(String key, String value) {
         items.put(key, value);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
     @Override
 	public void put(String key, boolean value) {
         put(key, String.valueOf(value));
     }
 
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
 	@Override
 	public void save(Writer writer) throws IOException {
     	final XMLWriter xmlWriter = new XMLWriter(writer);
@@ -370,6 +439,9 @@ public class DialogSettings implements IDialogSettings {
     	xmlWriter.flush();
     }
 
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
     @Override
 	public void save(String fileName) throws IOException {
         FileOutputStream stream = new FileOutputStream(fileName);
@@ -378,8 +450,11 @@ public class DialogSettings implements IDialogSettings {
         writer.close();
     }
 
+    /* (non-Javadoc)
+     * Save the settings in the <code>document</code>.
+     */
     private void save(XMLWriter out) throws IOException {
-    	HashMap<String, String> attributes = new HashMap<>(2);
+    	HashMap<String, String> attributes = new HashMap<String, String>(2);
     	attributes.put(TAG_NAME, name == null ? "" : name); //$NON-NLS-1$
         out.startTag(TAG_SECTION, attributes);
         attributes.clear();
@@ -414,13 +489,13 @@ public class DialogSettings implements IDialogSettings {
         }
         out.endTag(TAG_SECTION);
     }
-
+    
     /**
      * A simple XML writer.  Using this instead of the javax.xml.transform classes allows
      * compilation against JCL Foundation (bug 80059).
      */
     private static class XMLWriter extends BufferedWriter {
-
+    	
     	/** current number of tabs to use for indent */
     	protected int tab;
 
@@ -430,7 +505,7 @@ public class DialogSettings implements IDialogSettings {
     	/**
     	 * Create a new XMLWriter
     	 * @param output the stream to write the output to
-    	 * @throws IOException
+    	 * @throws IOException 
     	 */
     	public XMLWriter(OutputStream output) throws IOException {
     		this(new OutputStreamWriter(output, "UTF8")); //$NON-NLS-1$
@@ -439,7 +514,7 @@ public class DialogSettings implements IDialogSettings {
     	/**
     	 * Create a new XMLWriter
     	 * @param output the write to used when writing to
-    	 * @throws IOException
+    	 * @throws IOException 
     	 */
     	public XMLWriter(Writer output) throws IOException {
     		super(output);
@@ -455,7 +530,7 @@ public class DialogSettings implements IDialogSettings {
     	/**
     	 * write the intended end tag
     	 * @param name the name of the tag to end
-    	 * @throws IOException
+    	 * @throws IOException 
     	 */
     	public void endTag(String name) throws IOException {
     		tab--;
@@ -473,7 +548,7 @@ public class DialogSettings implements IDialogSettings {
     	 * @param name the name of the tag
     	 * @param parameters map of parameters
     	 * @param close should the tag be ended automatically (=> empty tag)
-    	 * @throws IOException
+    	 * @throws IOException 
     	 */
     	public void printTag(String name, HashMap<String, String> parameters, boolean close) throws IOException {
     		printTag(name, parameters, true, true, close);
@@ -511,7 +586,7 @@ public class DialogSettings implements IDialogSettings {
     	 * start the tag
     	 * @param name the name of the tag
     	 * @param parameters map of parameters
-    	 * @throws IOException
+    	 * @throws IOException 
     	 */
     	public void startTag(String name, HashMap<String, String> parameters) throws IOException {
     		startTag(name, parameters, true);

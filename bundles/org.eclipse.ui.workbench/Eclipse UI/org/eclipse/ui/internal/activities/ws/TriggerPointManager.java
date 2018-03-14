@@ -28,7 +28,7 @@ import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
 
 /**
  * Workbench implementation of the trigger point manager.
- *
+ * 
  * @since 3.1
  */
 public class TriggerPointManager implements ITriggerPointManager, IExtensionChangeHandler {
@@ -36,18 +36,28 @@ public class TriggerPointManager implements ITriggerPointManager, IExtensionChan
     private HashMap triggerMap = new HashMap();
 
     /**
-     *
+     * 
      */
     public TriggerPointManager() {
         super();
         triggerMap.put(ITriggerPointManager.UNKNOWN_TRIGGER_POINT_ID,
                 new AbstractTriggerPoint() {
 
+                    /*
+                     * (non-Javadoc)
+                     * 
+                     * @see org.eclipse.ui.activities.ITriggerPoint#getId()
+                     */
                     @Override
 					public String getId() {
                         return ITriggerPointManager.UNKNOWN_TRIGGER_POINT_ID;
                     }
 
+                    /*
+                     * (non-Javadoc)
+                     * 
+                     * @see org.eclipse.ui.activities.ITriggerPoint#getStringHint(java.lang.String)
+                     */
                     @Override
 					public String getStringHint(String key) {
                         if (ITriggerPoint.HINT_INTERACTIVE.equals(key)) {
@@ -58,6 +68,11 @@ public class TriggerPointManager implements ITriggerPointManager, IExtensionChan
                         return null;
                     }
 
+                    /*
+                     * (non-Javadoc)
+                     * 
+                     * @see org.eclipse.ui.activities.ITriggerPoint#getBooleanHint(java.lang.String)
+                     */
                     @Override
 					public boolean getBooleanHint(String key) {
                         if (ITriggerPoint.HINT_INTERACTIVE.equals(key)) {
@@ -79,16 +94,32 @@ public class TriggerPointManager implements ITriggerPointManager, IExtensionChan
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.activities.ITriggerPointManager#getTriggerPoint(java.lang.String)
+     */
     @Override
 	public ITriggerPoint getTriggerPoint(String id) {
         return (ITriggerPoint) triggerMap.get(id);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.activities.ITriggerPointManager#getDefinedTriggerPointIds()
+     */
     @Override
 	public Set getDefinedTriggerPointIds() {
         return triggerMap.entrySet();
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionRemovalHandler#removeInstance(org.eclipse.core.runtime.IExtension,
+     *      java.lang.Object[])
+     */
     @Override
 	public void removeExtension(IExtension extension, Object[] objects) {
         for (int i = 0; i < objects.length; i++) {
@@ -99,6 +130,12 @@ public class TriggerPointManager implements ITriggerPointManager, IExtensionChan
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionAdditionHandler#addInstance(org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker,
+     *      org.eclipse.core.runtime.IExtension)
+     */
     @Override
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
         IConfigurationElement[] elements = extension.getConfigurationElements();

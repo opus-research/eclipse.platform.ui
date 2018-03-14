@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
@@ -26,7 +26,6 @@ import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MSnippetContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
-import org.eclipse.e4.ui.model.application.ui.basic.MFrame;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindowElement;
 import org.eclipse.e4.ui.model.application.ui.impl.ElementContainerImpl;
@@ -53,7 +52,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
- * </p>
  * <ul>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.impl.WindowImpl#getLabel <em>Label</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.impl.WindowImpl#getIconURI <em>Icon URI</em>}</li>
@@ -73,8 +71,8 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.impl.WindowImpl#getHeight <em>Height</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.impl.WindowImpl#getWindows <em>Windows</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.impl.WindowImpl#getSharedElements <em>Shared Elements</em>}</li>
- *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.impl.WindowImpl#getDialogs <em>Dialogs</em>}</li>
  * </ul>
+ * </p>
  *
  * @generated
  */
@@ -338,16 +336,6 @@ public class WindowImpl extends ElementContainerImpl<MWindowElement> implements 
 	 * @ordered
 	 */
 	protected EList<MUIElement> sharedElements;
-
-	/**
-	 * The cached value of the '{@link #getDialogs() <em>Dialogs</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getDialogs()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<MFrame> dialogs;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -691,20 +679,7 @@ public class WindowImpl extends ElementContainerImpl<MWindowElement> implements 
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
 	 */
-	public List<MFrame> getDialogs() {
-		if (dialogs == null) {
-			dialogs = new EObjectContainmentEList<MFrame>(MFrame.class, this, BasicPackageImpl.WINDOW__DIALOGS);
-		}
-		return dialogs;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 */
-	@Override
 	public void updateLocalization() {
 		if (eNotificationRequired()) {
 			eNotify(new ENotificationImpl(
@@ -720,7 +695,7 @@ public class WindowImpl extends ElementContainerImpl<MWindowElement> implements 
 	 * <!-- end-user-doc -->
 	 */
 	public String getLocalizedLabel() {
-		return LocalizationHelper.getLocalizedLabel(this);
+		return LocalizationHelper.getLocalizedLabel(this);		
 	}
 
 	/**
@@ -751,8 +726,6 @@ public class WindowImpl extends ElementContainerImpl<MWindowElement> implements 
 				return ((InternalEList<?>)getWindows()).basicRemove(otherEnd, msgs);
 			case BasicPackageImpl.WINDOW__SHARED_ELEMENTS:
 				return ((InternalEList<?>)getSharedElements()).basicRemove(otherEnd, msgs);
-			case BasicPackageImpl.WINDOW__DIALOGS:
-				return ((InternalEList<?>)getDialogs()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -802,8 +775,6 @@ public class WindowImpl extends ElementContainerImpl<MWindowElement> implements 
 				return getWindows();
 			case BasicPackageImpl.WINDOW__SHARED_ELEMENTS:
 				return getSharedElements();
-			case BasicPackageImpl.WINDOW__DIALOGS:
-				return getDialogs();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -871,10 +842,6 @@ public class WindowImpl extends ElementContainerImpl<MWindowElement> implements 
 				getSharedElements().clear();
 				getSharedElements().addAll((Collection<? extends MUIElement>)newValue);
 				return;
-			case BasicPackageImpl.WINDOW__DIALOGS:
-				getDialogs().clear();
-				getDialogs().addAll((Collection<? extends MFrame>)newValue);
-				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -935,9 +902,6 @@ public class WindowImpl extends ElementContainerImpl<MWindowElement> implements 
 			case BasicPackageImpl.WINDOW__SHARED_ELEMENTS:
 				getSharedElements().clear();
 				return;
-			case BasicPackageImpl.WINDOW__DIALOGS:
-				getDialogs().clear();
-				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -986,8 +950,6 @@ public class WindowImpl extends ElementContainerImpl<MWindowElement> implements 
 				return windows != null && !windows.isEmpty();
 			case BasicPackageImpl.WINDOW__SHARED_ELEMENTS:
 				return sharedElements != null && !sharedElements.isEmpty();
-			case BasicPackageImpl.WINDOW__DIALOGS:
-				return dialogs != null && !dialogs.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

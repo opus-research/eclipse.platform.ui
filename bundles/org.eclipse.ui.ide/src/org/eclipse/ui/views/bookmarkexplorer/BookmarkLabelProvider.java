@@ -47,21 +47,24 @@ class BookmarkLabelProvider extends LabelProvider implements
         image = JFaceResources.getResources().createImageWithDefault(desc);
     }
 
-    @Override
-	public void dispose() {
+    /* (non-Javadoc)
+     * Method declared on LabelProvider.
+     */
+    public void dispose() {
         if (image != null) {
             JFaceResources.getResources().destroyImage(desc);
             image = null;
         }
     }
 
-    @Override
-	public Image getImage(Object element) {
+    /* (non-Javadoc)
+     * Method declared on LabelProvider.
+     */
+    public Image getImage(Object element) {
         return image;
     }
 
-    @Override
-	public String getColumnText(Object element, int columnIndex) {
+    public String getColumnText(Object element, int columnIndex) {
         if (!(element instanceof IMarker)) {
 			return ""; //$NON-NLS-1$
 		}
@@ -82,11 +85,10 @@ class BookmarkLabelProvider extends LabelProvider implements
             return NLS.bind(BookmarkMessages.LineIndicator_text, String.valueOf(line));
         }
         }
-        return ""; //$NON-NLS-1$
+        return ""; //$NON-NLS-1$ 
     }
 
-    @Override
-	public Image getColumnImage(Object element, int index) {
+    public Image getColumnImage(Object element, int index) {
         if (index == COLUMN_ICON) {
 			return image;
 		}

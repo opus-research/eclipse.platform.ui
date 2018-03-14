@@ -22,29 +22,49 @@ import com.ibm.icu.text.NumberFormat;
  */
 public class StringToIntegerValidatorTest extends
 		StringToNumberValidatorTestHarness {
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#setupNumberFormat()
+	 */
 	protected NumberFormat setupNumberFormat() {
 		return NumberFormat.getIntegerInstance();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#setupValidator(com.ibm.icu.text.NumberFormat)
+	 */
 	protected IValidator setupValidator(NumberFormat numberFormat) {
 		StringToNumberConverter converter = StringToNumberConverter.toInteger(
 				numberFormat, false);
 		return new StringToIntegerValidator(converter);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#getInRangeNumber()
+	 */
 	protected Number getInRangeNumber() {
 		return new Integer(1);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#getInvalidString()
+	 */
 	protected String getInvalidString() {
 		return "1.1";
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#getOutOfRangeNumber()
+	 */
 	protected Number getOutOfRangeNumber() {
 		return new Double(Double.MAX_VALUE);
 	}

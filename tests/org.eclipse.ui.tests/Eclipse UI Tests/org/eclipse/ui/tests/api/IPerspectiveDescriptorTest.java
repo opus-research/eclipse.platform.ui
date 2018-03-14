@@ -24,8 +24,7 @@ public class IPerspectiveDescriptorTest extends TestCase {
         super(testName);
     }
 
-    @Override
-	public void setUp() {
+    public void setUp() {
         fPerspectives = PlatformUI
                 .getWorkbench().getPerspectiveRegistry().getPerspectives();
     }
@@ -34,8 +33,8 @@ public class IPerspectiveDescriptorTest extends TestCase {
      * Tests that the ids for all perspective descriptors are non-null and non-empty.
      */
     public void testGetId() {
-        for (IPerspectiveDescriptor fPerspective : fPerspectives) {
-            String id = fPerspective.getId();
+        for (int i = 0; i < fPerspectives.length; i++) {
+            String id = fPerspectives[i].getId();
             assertNotNull(id);
             assertTrue(id.length() > 0);
         }
@@ -45,8 +44,8 @@ public class IPerspectiveDescriptorTest extends TestCase {
      * Tests that the labels for all perspective descriptors are non-null and non-empty.
      */
     public void testGetLabel() {
-        for (IPerspectiveDescriptor fPerspective : fPerspectives) {
-            String label = fPerspective.getLabel();
+        for (int i = 0; i < fPerspectives.length; i++) {
+            String label = fPerspectives[i].getLabel();
             assertNotNull(label);
             assertTrue(label.length() > 0);
         }
@@ -61,11 +60,11 @@ public class IPerspectiveDescriptorTest extends TestCase {
      * </p>
      */
     public void testGetImageDescriptor() {
-        for (IPerspectiveDescriptor fPerspective : fPerspectives) {
-            ImageDescriptor image = fPerspective.getImageDescriptor();
+        for (int i = 0; i < fPerspectives.length; i++) {
+            ImageDescriptor image = fPerspectives[i].getImageDescriptor();
             assertNotNull(image);
         }
     }
-
+    
 }
 

@@ -25,10 +25,10 @@ import org.eclipse.ui.internal.registry.RegistryReader;
  * The SettingsTransferRegistryReader is the class that supplies all of the
  * transfer settings used by the settingsTransfer in the preferencesTransfer
  * extension point.
- *
- *
+ * 
+ * 
  * @since 3.3
- *
+ * 
  */
 public class SettingsTransferRegistryReader extends RegistryReader {
 
@@ -43,7 +43,7 @@ public class SettingsTransferRegistryReader extends RegistryReader {
 
 	/**
 	 * Get all of the currently registered settings transfers.
-	 *
+	 * 
 	 * @return IConfigurationElement[]
 	 */
 	public IConfigurationElement[] getSettingTransfers() {
@@ -60,6 +60,11 @@ public class SettingsTransferRegistryReader extends RegistryReader {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.registry.RegistryReader#readElement(org.eclipse.core.runtime.IConfigurationElement)
+	 */
 	@Override
 	protected boolean readElement(IConfigurationElement element) {
 		if (element.getName().equals(

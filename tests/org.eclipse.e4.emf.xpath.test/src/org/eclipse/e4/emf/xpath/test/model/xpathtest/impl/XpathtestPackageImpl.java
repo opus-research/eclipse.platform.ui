@@ -107,7 +107,7 @@ public class XpathtestPackageImpl extends EPackageImpl implements XpathtestPacka
 
 	/**
 	 * Creates, registers, and initializes the <b>Package</b> for this model, and for any others upon which it depends.
-	 *
+	 * 
 	 * <p>This method is used to initialize {@link XpathtestPackage#eINSTANCE} when that field is accessed.
 	 * Clients should not invoke it directly. Instead, they should simply access that field to obtain the package.
 	 * <!-- begin-user-doc -->
@@ -134,7 +134,7 @@ public class XpathtestPackageImpl extends EPackageImpl implements XpathtestPacka
 		// Mark meta-data to indicate it can't be changed
 		theXpathtestPackage.freeze();
 
-
+  
 		// Update the registry and return the package
 		EPackage.Registry.INSTANCE.put(XpathtestPackage.eNS_URI, theXpathtestPackage);
 		return theXpathtestPackage;
@@ -145,7 +145,6 @@ public class XpathtestPackageImpl extends EPackageImpl implements XpathtestPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public EClass getRoot() {
 		return rootEClass;
 	}
@@ -155,7 +154,6 @@ public class XpathtestPackageImpl extends EPackageImpl implements XpathtestPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public EReference getRoot_Nodes() {
 		return (EReference)rootEClass.getEStructuralFeatures().get(0);
 	}
@@ -165,7 +163,6 @@ public class XpathtestPackageImpl extends EPackageImpl implements XpathtestPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public EAttribute getRoot_Id() {
 		return (EAttribute)rootEClass.getEStructuralFeatures().get(1);
 	}
@@ -175,7 +172,6 @@ public class XpathtestPackageImpl extends EPackageImpl implements XpathtestPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public EClass getNode() {
 		return nodeEClass;
 	}
@@ -185,7 +181,6 @@ public class XpathtestPackageImpl extends EPackageImpl implements XpathtestPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public EReference getNode_Parent() {
 		return (EReference)nodeEClass.getEStructuralFeatures().get(0);
 	}
@@ -195,7 +190,6 @@ public class XpathtestPackageImpl extends EPackageImpl implements XpathtestPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public EReference getNode_Children() {
 		return (EReference)nodeEClass.getEStructuralFeatures().get(1);
 	}
@@ -205,7 +199,6 @@ public class XpathtestPackageImpl extends EPackageImpl implements XpathtestPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public EReference getNode_Root() {
 		return (EReference)nodeEClass.getEStructuralFeatures().get(2);
 	}
@@ -215,7 +208,6 @@ public class XpathtestPackageImpl extends EPackageImpl implements XpathtestPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public EAttribute getNode_Cat() {
 		return (EAttribute)nodeEClass.getEStructuralFeatures().get(3);
 	}
@@ -225,7 +217,6 @@ public class XpathtestPackageImpl extends EPackageImpl implements XpathtestPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public EAttribute getNode_Value() {
 		return (EAttribute)nodeEClass.getEStructuralFeatures().get(4);
 	}
@@ -235,7 +226,6 @@ public class XpathtestPackageImpl extends EPackageImpl implements XpathtestPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public EAttribute getNode_Id() {
 		return (EAttribute)nodeEClass.getEStructuralFeatures().get(5);
 	}
@@ -245,7 +235,6 @@ public class XpathtestPackageImpl extends EPackageImpl implements XpathtestPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public EReference getNode_Inrefs() {
 		return (EReference)nodeEClass.getEStructuralFeatures().get(6);
 	}
@@ -255,7 +244,6 @@ public class XpathtestPackageImpl extends EPackageImpl implements XpathtestPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public EReference getNode_Outrefs() {
 		return (EReference)nodeEClass.getEStructuralFeatures().get(7);
 	}
@@ -265,7 +253,6 @@ public class XpathtestPackageImpl extends EPackageImpl implements XpathtestPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public EClass getExtendedNode() {
 		return extendedNodeEClass;
 	}
@@ -275,7 +262,6 @@ public class XpathtestPackageImpl extends EPackageImpl implements XpathtestPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public EAttribute getExtendedNode_Name() {
 		return (EAttribute)extendedNodeEClass.getEStructuralFeatures().get(0);
 	}
@@ -285,7 +271,6 @@ public class XpathtestPackageImpl extends EPackageImpl implements XpathtestPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public EClass getMenu() {
 		return menuEClass;
 	}
@@ -295,7 +280,6 @@ public class XpathtestPackageImpl extends EPackageImpl implements XpathtestPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public EReference getMenu_Children() {
 		return (EReference)menuEClass.getEStructuralFeatures().get(0);
 	}
@@ -305,7 +289,6 @@ public class XpathtestPackageImpl extends EPackageImpl implements XpathtestPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public EClass getMenuItem() {
 		return menuItemEClass;
 	}
@@ -315,7 +298,6 @@ public class XpathtestPackageImpl extends EPackageImpl implements XpathtestPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public EAttribute getMenuItem_Mnemonic() {
 		return (EAttribute)menuItemEClass.getEStructuralFeatures().get(0);
 	}
@@ -325,7 +307,6 @@ public class XpathtestPackageImpl extends EPackageImpl implements XpathtestPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public EClass getMenuElement() {
 		return menuElementEClass;
 	}
@@ -335,7 +316,6 @@ public class XpathtestPackageImpl extends EPackageImpl implements XpathtestPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public EAttribute getMenuElement_Id() {
 		return (EAttribute)menuElementEClass.getEStructuralFeatures().get(0);
 	}
@@ -345,7 +325,6 @@ public class XpathtestPackageImpl extends EPackageImpl implements XpathtestPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public EAttribute getMenuElement_Label() {
 		return (EAttribute)menuElementEClass.getEStructuralFeatures().get(1);
 	}
@@ -355,7 +334,6 @@ public class XpathtestPackageImpl extends EPackageImpl implements XpathtestPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public EClass getMenuContainer() {
 		return menuContainerEClass;
 	}
@@ -365,7 +343,6 @@ public class XpathtestPackageImpl extends EPackageImpl implements XpathtestPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public EReference getMenuContainer_Menus() {
 		return (EReference)menuContainerEClass.getEStructuralFeatures().get(0);
 	}
@@ -375,7 +352,6 @@ public class XpathtestPackageImpl extends EPackageImpl implements XpathtestPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public XpathtestFactory getXpathtestFactory() {
 		return (XpathtestFactory)getEFactoryInstance();
 	}

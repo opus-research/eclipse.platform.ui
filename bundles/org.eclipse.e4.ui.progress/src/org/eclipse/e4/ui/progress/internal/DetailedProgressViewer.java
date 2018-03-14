@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,9 +36,9 @@ import org.eclipse.swt.widgets.Widget;
 /**
  * The DetailedProgressViewer is a viewer that shows the details of all in
  * progress job or jobs that are finished awaiting user input.
- *
+ * 
  * @since 3.2
- *
+ * 
  */
 public class DetailedProgressViewer extends AbstractProgressViewer {
 
@@ -50,15 +50,15 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 	private ScrolledComposite scrolled;
 
 	private Composite noEntryArea;
-
+	
 	private IProgressService progressService;
-
+	
 	private FinishedJobs finishedJobs;
 
 	/**
 	 * Create a new instance of the receiver with a control that is a child of
 	 * parent with style style.
-	 *
+	 * 
 	 * @param parent
 	 * @param style
 	 */
@@ -66,7 +66,7 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 	        IProgressService progressService, FinishedJobs finishedJobs) {
 		this.progressService = progressService;
 		this.finishedJobs = finishedJobs;
-
+		
 		scrolled = new ScrolledComposite(parent, SWT.V_SCROLL | style);
 		int height = JFaceResources.getDefaultFont().getFontData()[0]
 				.getHeight();
@@ -86,7 +86,11 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 
 			private boolean settingFocus = false;
 
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.FocusAdapter#focusGained(org.eclipse.swt.events.FocusEvent)
+			 */
 			public void focusGained(FocusEvent e) {
 				if (!settingFocus) {
 					// Prevent new focus events as a result this update
@@ -99,13 +103,21 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 		});
 
 		control.addControlListener(new ControlListener() {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.ControlListener#controlMoved(org.eclipse.swt.events.ControlEvent)
+			 */
 			public void controlMoved(ControlEvent e) {
 				updateVisibleItems();
 
 			}
 
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.ControlListener#controlResized(org.eclipse.swt.events.ControlEvent)
+			 */
 			public void controlResized(ControlEvent e) {
 				updateVisibleItems();
 			}
@@ -137,12 +149,16 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.progress.AbstractProgressViewer#add(java.lang.Object[])
+	 */
 	public void add(Object[] elements) {
 		ViewerComparator sorter = getComparator();
 
 		// Use a Set in case we are getting something added that exists
-		Set<Object> newItems = new HashSet<>(elements.length);
+		Set<Object> newItems = new HashSet<Object>(elements.length);
 
 		Control[] existingChildren = control.getChildren();
 		for (int i = 0; i < existingChildren.length; i++) {
@@ -191,7 +207,7 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 
 	/**
 	 * Create a new item for info.
-	 *
+	 * 
 	 * @param info
 	 * @return ProgressInfoItem
 	 */
@@ -200,19 +216,31 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 				info, progressService, finishedJobs);
 
 		item.setIndexListener(new ProgressInfoItem.IndexListener() {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.ui.internal.progress.ProgressInfoItem.IndexListener#selectNext()
+			 */
 			public void selectNext() {
 				DetailedProgressViewer.this.selectNext(item);
 
 			}
 
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.ui.internal.progress.ProgressInfoItem.IndexListener#selectPrevious()
+			 */
 			public void selectPrevious() {
 				DetailedProgressViewer.this.selectPrevious(item);
 
 			}
 
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.ui.internal.progress.ProgressInfoItem.IndexListener#select()
+			 */
 			public void select() {
 
 				Control[] children = control.getChildren();
@@ -234,7 +262,7 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 
 	/**
 	 * Select the previous item in the receiver.
-	 *
+	 * 
 	 * @param item
 	 */
 	protected void selectPrevious(ProgressInfoItem item) {
@@ -258,7 +286,7 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 
 	/**
 	 * Select the next item in the receiver.
-	 *
+	 * 
 	 * @param item
 	 */
 	protected void selectNext(ProgressInfoItem item) {
@@ -281,12 +309,20 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.StructuredViewer#doFindInputItem(java.lang.Object)
+	 */
 	protected Widget doFindInputItem(Object element) {
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.StructuredViewer#doFindItem(java.lang.Object)
+	 */
 	protected Widget doFindItem(Object element) {
 		Control[] existingChildren = control.getChildren();
 		for (int i = 0; i < existingChildren.length; i++) {
@@ -301,7 +337,12 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.StructuredViewer#doUpdateItem(org.eclipse.swt.widgets.Widget,
+	 *      java.lang.Object, boolean)
+	 */
 	protected void doUpdateItem(Widget item, Object element, boolean fullMap) {
 		if (usingElementMap()) {
 			unmapElement(item);
@@ -310,24 +351,41 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 		add(new Object[] { element });
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.Viewer#getControl()
+	 */
 	public Control getControl() {
 		return scrolled;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.StructuredViewer#getSelectionFromWidget()
+	 */
 	protected List<Object> getSelectionFromWidget() {
-		return new ArrayList<>(0);
+		return new ArrayList<Object>(0);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.Viewer#inputChanged(java.lang.Object,
+	 *      java.lang.Object)
+	 */
 	protected void inputChanged(Object input, Object oldInput) {
 		super.inputChanged(input, oldInput);
 		refreshAll();
 		updateForShowingProgress();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.StructuredViewer#internalRefresh(java.lang.Object)
+	 */
 	protected void internalRefresh(Object element) {
 		if (element == null) {
 			return;
@@ -352,7 +410,11 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 		scrolled.setMinSize(size);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.progress.AbstractProgressViewer#remove(java.lang.Object[])
+	 */
 	public void remove(Object[] elements) {
 
 		for (int i = 0; i < elements.length; i++) {
@@ -388,19 +450,28 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 		updateForShowingProgress();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.StructuredViewer#reveal(java.lang.Object)
+	 */
 	public void reveal(Object element) {
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.StructuredViewer#setSelectionToWidget(java.util.List,
+	 *      boolean)
+	 */
 	protected void setSelectionToWidget(@SuppressWarnings("rawtypes") List l, boolean reveal) {
 
 	}
 
 	/**
 	 * Cancel the current selection
-	 *
+	 * 
 	 */
 	public void cancelSelection() {
 
@@ -408,7 +479,7 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 
 	/**
 	 * Set focus on the current selection.
-	 *
+	 * 
 	 */
 	public void setFocus() {
 		Control[] children = control.getChildren();
@@ -431,7 +502,7 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 			existingChildren[i].dispose();
 
 		}
-
+		
 		int maxLength = Math.min(infos.length,MAX_DISPLAYED);
 		// Create new ones if required
 		for (int i = 0; i < maxLength; i++) {

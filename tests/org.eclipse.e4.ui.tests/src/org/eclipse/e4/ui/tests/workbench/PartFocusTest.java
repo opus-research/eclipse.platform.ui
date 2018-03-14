@@ -55,7 +55,6 @@ public class PartFocusTest extends TestCase {
 
 	protected MPart otherPart;
 
-	@Override
 	protected void setUp() throws Exception {
 		appContext = E4Application.createDefaultContext();
 		appContext.set(E4Workbench.PRESENTATION_URI_ARG,
@@ -135,7 +134,7 @@ public class PartFocusTest extends TestCase {
 	}
 
 	/**
-	 *
+	 * 
 	 */
 	private void processEvents() {
 		// renderer.run(window, appContext);
@@ -174,27 +173,22 @@ public class PartFocusTest extends TestCase {
 
 		final boolean[] changed = new boolean[] { false };
 		eps.addPartListener(new IPartListener() {
-			@Override
 			public void partVisible(MPart part) {
 				changed[0] = true;
 			}
 
-			@Override
 			public void partHidden(MPart part) {
 				changed[0] = true;
 			}
 
-			@Override
 			public void partDeactivated(MPart part) {
 				changed[0] = true;
 			}
 
-			@Override
 			public void partBroughtToTop(MPart part) {
 				changed[0] = true;
 			}
 
-			@Override
 			public void partActivated(MPart part) {
 				changed[0] = true;
 			}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 
 package org.eclipse.ui.internal.handlers;
@@ -66,7 +65,7 @@ import org.eclipse.ui.services.ISourceProviderService;
 
 /**
  * @since 3.5
- *
+ * 
  */
 public class LegacyHandlerService implements IHandlerService {
 
@@ -82,7 +81,7 @@ public class LegacyHandlerService implements IHandlerService {
 		private final String commandId;
 
 		/**
-		 *
+		 * 
 		 */
 		public HandlerSelectionFunction(String commandId) {
 			this.commandId = commandId;
@@ -91,7 +90,7 @@ public class LegacyHandlerService implements IHandlerService {
 		@Override
 		public Object compute(IEclipseContext context, String contextKey) {
 
-			HashSet<HandlerActivation> activationSet = new HashSet<>();
+			HashSet<HandlerActivation> activationSet = new HashSet<HandlerActivation>();
 			IEclipseContext current = context;
 			while (current != null) {
 				List<HandlerActivation> handlerActivations = (List<HandlerActivation>) current

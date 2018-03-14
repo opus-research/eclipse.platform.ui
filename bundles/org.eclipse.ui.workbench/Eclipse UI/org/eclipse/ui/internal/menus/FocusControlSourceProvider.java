@@ -27,7 +27,7 @@ import org.eclipse.ui.swt.IFocusService;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class FocusControlSourceProvider extends AbstractSourceProvider
 		implements IFocusService {
@@ -48,6 +48,12 @@ public class FocusControlSourceProvider extends AbstractSourceProvider
 
 	private DisposeListener disposeListener;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.menus.IFocusService#addTrackerFor(org.eclipse.swt.widgets.Control,
+	 *      java.lang.String)
+	 */
 	@Override
 	public void addFocusTracker(Control control, String id) {
 		if (control.isDisposed()) {
@@ -115,6 +121,11 @@ public class FocusControlSourceProvider extends AbstractSourceProvider
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.menus.IFocusService#removeTrackerFor(org.eclipse.swt.widgets.Control)
+	 */
 	@Override
 	public void removeFocusTracker(Control control) {
 		if (controlToId == null) {
@@ -129,6 +140,11 @@ public class FocusControlSourceProvider extends AbstractSourceProvider
 		control.removeDisposeListener(getDisposeListener());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ISourceProvider#dispose()
+	 */
 	@Override
 	public void dispose() {
 		Iterator i = controlToId.keySet().iterator();
@@ -145,6 +161,11 @@ public class FocusControlSourceProvider extends AbstractSourceProvider
 		disposeListener = null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ISourceProvider#getCurrentState()
+	 */
 	@Override
 	public Map getCurrentState() {
 		Map m = new HashMap();
@@ -161,6 +182,11 @@ public class FocusControlSourceProvider extends AbstractSourceProvider
 		return m;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ISourceProvider#getProvidedSourceNames()
+	 */
 	@Override
 	public String[] getProvidedSourceNames() {
 		return PROVIDED_SOURCE_NAMES;

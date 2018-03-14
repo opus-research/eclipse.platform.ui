@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
@@ -77,10 +77,8 @@ public class BasicFactoryImpl extends EFactoryImpl implements MBasicFactory {
 			case BasicPackageImpl.WINDOW: return (EObject)createWindow();
 			case BasicPackageImpl.TRIMMED_WINDOW: return (EObject)createTrimmedWindow();
 			case BasicPackageImpl.TRIM_BAR: return (EObject)createTrimBar();
-			case BasicPackageImpl.FRAME: return (EObject)createFrame();
-			case BasicPackageImpl.FRAME_ELEMENT: return (EObject)createFrameElement();
 			case BasicPackageImpl.DIALOG: return (EObject)createDialog();
-			case BasicPackageImpl.WIZARD: return (EObject)createWizard();
+			case BasicPackageImpl.WIZARD_DIALOG: return (EObject)createWizardDialog();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -171,26 +169,6 @@ public class BasicFactoryImpl extends EFactoryImpl implements MBasicFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public MFrame createFrame() {
-		FrameImpl frame = new FrameImpl();
-		return frame;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public MFrameElement createFrameElement() {
-		FrameElementImpl frameElement = new FrameElementImpl();
-		return frameElement;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public MDialog createDialog() {
 		DialogImpl dialog = new DialogImpl();
 		return dialog;
@@ -201,9 +179,9 @@ public class BasicFactoryImpl extends EFactoryImpl implements MBasicFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public MWizard createWizard() {
-		WizardImpl wizard = new WizardImpl();
-		return wizard;
+	public MWizardDialog createWizardDialog() {
+		WizardDialogImpl wizardDialog = new WizardDialogImpl();
+		return wizardDialog;
 	}
 
 	/**

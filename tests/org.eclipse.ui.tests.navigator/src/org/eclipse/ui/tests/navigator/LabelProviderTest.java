@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Oakland Software Incorporated and others.
+ * Copyright (c) 2008, 2013 Oakland Software Incorporated and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,18 +8,13 @@
  * Contributors:
  *     Oakland Software Incorporated - initial API and implementation
  *.....IBM Corporation - fixed dead code warning
- *     Fair Issac Corp - bug 287103 - NCSLabelProvider does not properly handle overrides
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 457870
+ *     Fair Issac Corp - bug 287103 - NCSLabelProvider does not properly handle overrides 
  *******************************************************************************/
 package org.eclipse.ui.tests.navigator;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.internal.navigator.extensions.NavigatorContentExtension;
 import org.eclipse.ui.tests.harness.util.DisplayHelper;
 import org.eclipse.ui.tests.navigator.extension.TestEmptyContentProvider;
@@ -28,7 +23,6 @@ import org.eclipse.ui.tests.navigator.extension.TestLabelProviderBlank;
 import org.eclipse.ui.tests.navigator.extension.TestLabelProviderCyan;
 import org.eclipse.ui.tests.navigator.extension.TestLabelProviderStyledGreen;
 import org.eclipse.ui.tests.navigator.extension.TrackingLabelProvider;
-import org.junit.Test;
 
 public class LabelProviderTest extends NavigatorTestBase {
 
@@ -118,88 +112,71 @@ public class LabelProviderTest extends NavigatorTestBase {
 		}
 	}
 
-	@Test
 	public void testBlankLabelProviderOverrideNone() throws Exception {
 		blankLabelProviderOverride(NONE, BLANK, "");
 	}
 
-	@Test
 	public void testNullLabelProviderOverrideNone() throws Exception {
 		blankLabelProviderOverride(NONE, NULL, "");
 	}
 
-	@Test
 	public void testPlainBlankLabelProviderOverrideNone() throws Exception {
 		blankLabelProviderOverride(NONE, BLANK, PLAIN);
 	}
 
-	@Test
 	public void testPlainNullLabelProviderOverrideNone() throws Exception {
 		blankLabelProviderOverride(NONE, NULL, PLAIN);
 	}
 
-	@Test
 	public void testBlankLabelProviderOverride1() throws Exception {
 		blankLabelProviderOverride(OVERRIDDEN, BLANK, "");
 	}
 
-	@Test
 	public void testNullLabelProviderOverride1() throws Exception {
 		blankLabelProviderOverride(OVERRIDDEN, NULL, "");
 	}
 
-	@Test
 	public void testPlainBlankLabelProviderOverride1() throws Exception {
 		blankLabelProviderOverride(OVERRIDDEN, BLANK, PLAIN);
 	}
 
-	@Test
 	public void testPlainNullLabelProviderOverride1() throws Exception {
 		blankLabelProviderOverride(OVERRIDDEN, NULL, PLAIN);
 	}
 
-	@Test
 	public void testBlankLabelProviderOverride2() throws Exception {
 		blankLabelProviderOverride(OVERRIDING, BLANK, "");
 	}
 
-	@Test
 	public void testNullLabelProviderOverride2() throws Exception {
 		blankLabelProviderOverride(OVERRIDING, NULL, "");
 	}
 
-	@Test
 	public void testPlainBlankLabelProviderOverride2() throws Exception {
 		blankLabelProviderOverride(OVERRIDING, BLANK, PLAIN);
 	}
 
-	@Test
 	public void testPlainNullLabelProviderOverride2() throws Exception {
 		blankLabelProviderOverride(OVERRIDING, NULL, PLAIN);
 	}
 
-	@Test
 	public void testBlankLabelProviderBoth() throws Exception {
 		blankLabelProviderOverride(BOTH, BLANK, "");
 	}
 
-	@Test
 	public void testNullLabelProviderBoth() throws Exception {
 		blankLabelProviderOverride(BOTH, NULL, "");
 	}
 
-	@Test
 	public void testPlainBlankLabelProviderBoth() throws Exception {
 		blankLabelProviderOverride(BOTH, BLANK, PLAIN);
 	}
 
-	@Test
 	public void testPlainNullLabelProviderBoth() throws Exception {
 		blankLabelProviderOverride(BOTH, NULL, PLAIN);
 	}
 
 	// bug 252293 [CommonNavigator] LabelProviders do not obey override rules
-	@Test
 	public void testSimpleResFirst() throws Exception {
 
 		_contentService.bindExtensions(new String[] { TEST_CONTENT_OVERRIDDEN1,
@@ -216,12 +193,11 @@ public class LabelProviderTest extends NavigatorTestBase {
 	/**
 	 * E{low} overrides D{low} overrides B{normal} overrides A F{high} overrides
 	 * C{low} overrides A G{normal} overrides C{low}.
-	 *
+	 * 
 	 * F is the highest priority and not overridden, so it's first.
 	 * B is next, but is overridden by E and D. So we have FEDB. Then A is processed
 	 * which is overridden by B and C which is overridden by B, so we have FEDBGCA.
 	 */
-	@Test
 	public void testOverrideChain() throws Exception {
 		final String[] EXTENSIONS = new String[] { TEST_CONTENT_TRACKING_LABEL + ".A",
 				TEST_CONTENT_TRACKING_LABEL + ".B", TEST_CONTENT_TRACKING_LABEL + ".C",
@@ -282,7 +258,6 @@ public class LabelProviderTest extends NavigatorTestBase {
 	}
 
 	// bug 252293 [CommonNavigator] LabelProviders do not obey override rules
-	@Test
 	public void testSimpleResLast() throws Exception {
 		_contentService.bindExtensions(new String[] { TEST_CONTENT_OVERRIDDEN2,
 				TEST_CONTENT_OVERRIDE2 }, false);
@@ -298,7 +273,6 @@ public class LabelProviderTest extends NavigatorTestBase {
 		checkItems(rootItems, TestLabelProviderCyan.instance);
 	}
 
-	@Test
 	public void testOverrideAdd() throws Exception {
 		_contentService.bindExtensions(new String[] { TEST_CONTENT_OVERRIDDEN2,
 				TEST_CONTENT_OVERRIDE2 }, false);
@@ -320,7 +294,6 @@ public class LabelProviderTest extends NavigatorTestBase {
 	}
 
 	// Bug 299438 activating extensions does not properly refresh
-	@Test
 	public void testChangeActivation() throws Exception {
 		TreeItem[] rootItems = _viewer.getTree().getItems();
 		checkItems(rootItems, TestLabelProviderStyledGreen.instance);
@@ -331,9 +304,9 @@ public class LabelProviderTest extends NavigatorTestBase {
 				new String[] { TEST_CONTENT_OVERRIDDEN2, TEST_CONTENT_OVERRIDE2 }, true);
 
 		_viewer.expandAll();
-
+		
 		//System.out.println(System.currentTimeMillis() + " after expand");
-
+		
 		// Let the label provider refresh - wait up to 60 seconds
 		for (int i = 0; i < 1200; i++) {
 			rootItems = _viewer.getTree().getItems();
@@ -348,10 +321,10 @@ public class LabelProviderTest extends NavigatorTestBase {
 
 		if (SLEEP_LONG)
 			DisplayHelper.sleep(10000000);
-
+		
 		// Wait a little bit still to give the rest of the tree time to refresh
 		DisplayHelper.sleep(500);
-
+		
 		rootItems = _viewer.getTree().getItems();
 		checkItems(rootItems, TestLabelProviderCyan.instance);
 	}
@@ -360,7 +333,6 @@ public class LabelProviderTest extends NavigatorTestBase {
 	// extensions
 	// if none of the label providers from the desired content extensions return
 	// anything
-	@Test
 	public void testUsingOverriddenLabelProvider() throws Exception {
 
 		_contentService.bindExtensions(new String[] { TEST_CONTENT_OVERRIDDEN2,
@@ -384,9 +356,8 @@ public class LabelProviderTest extends NavigatorTestBase {
 	}
 
 	// Bug 295803 Source of contribution set to lowest priority NCE
-	@Test
 	public void testMultiNceSameObject() throws Exception {
-
+		
 		_contentService.bindExtensions(new String[] { TEST_CONTENT_OVERRIDDEN1, COMMON_NAVIGATOR_RESOURCE_EXT }, true);
 		// Just two different ones, they don't override, the label provider
 		// should be associated with the higher priority extension that
@@ -406,9 +377,8 @@ public class LabelProviderTest extends NavigatorTestBase {
 	}
 
 	// Bug 307132 label provider priority not respected
-	@Test
 	public void testLabelProviderPriority() throws Exception {
-
+		
 		_contentService.bindExtensions(new String[] { TEST_CONTENT_EMPTY, COMMON_NAVIGATOR_RESOURCE_EXT }, true);
 		// Just two different ones, they don't override, the label provider
 		// should be associated with the higher priority extension that
@@ -428,16 +398,15 @@ public class LabelProviderTest extends NavigatorTestBase {
 	}
 
 	// Bug 189986 add SafeRunner for everything
-	@Test
 	public void testLabelProviderThrow() throws Exception {
-
+		
 		_contentService.bindExtensions(new String[] { TEST_CONTENT_EMPTY, COMMON_NAVIGATOR_RESOURCE_EXT }, true);
 		_contentService.getActivationService().activateExtensions(
 				new String[] { TEST_CONTENT_EMPTY, COMMON_NAVIGATOR_RESOURCE_EXT }, true);
 
 		TestLabelProvider._throw = true;
 		TestEmptyContentProvider._throw = true;
-
+		
 		refreshViewer();
 		// Have to look at the log to see a bunch of stuff thrown
 	}

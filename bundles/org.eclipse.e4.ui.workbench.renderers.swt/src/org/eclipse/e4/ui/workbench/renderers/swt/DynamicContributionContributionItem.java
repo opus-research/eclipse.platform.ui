@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 MEDEVIT, FHV and others.
+ * Copyright (c) 2013 MEDEVIT, FHV and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,7 +33,7 @@ class DynamicContributionContributionItem extends ContributionItem {
 
 	/**
 	 * Create the item and associated model;
-	 *
+	 * 
 	 * @param item
 	 */
 	public DynamicContributionContributionItem(MDynamicMenuContribution item) {
@@ -41,11 +41,21 @@ class DynamicContributionContributionItem extends ContributionItem {
 		model = item;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.ContributionItem#isDirty()
+	 */
 	@Override
 	public boolean isDirty() {
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.ContributionItem#isDynamic()
+	 */
 	@Override
 	public boolean isDynamic() {
 		return true;
@@ -58,6 +68,13 @@ class DynamicContributionContributionItem extends ContributionItem {
 		return model;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.action.ContributionItem#setParent(org.eclipse.jface
+	 * .action.IContributionManager)
+	 */
 	@Override
 	public void setParent(IContributionManager parent) {
 		if (getParent() instanceof IMenuManager) {

@@ -63,7 +63,6 @@ public class JobsView extends ViewPart {
 			final boolean shouldLock = lockField.getSelection();
 			PlatformUI.getWorkbench().getProgressService().busyCursorWhile(
 					new IRunnableWithProgress() {
-						@Override
 						public void run(IProgressMonitor monitor) {
 							if (shouldLock)
 								doRunInWorkspace(duration, monitor);
@@ -130,7 +129,6 @@ public class JobsView extends ViewPart {
 			if (gotoAction)
 				result.setProperty(IProgressConstants.ACTION_PROPERTY,
 						new Action("Pop up a dialog") { //$NON-NLS-1$
-							@Override
 							public void run() {
 								MessageDialog
 										.openInformation(
@@ -152,7 +150,6 @@ public class JobsView extends ViewPart {
 	/**
 	 * @see ViewPart#createPartControl(Composite)
 	 */
-	@Override
 	public void createPartControl(Composite parent) {
 		Composite body = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
@@ -167,7 +164,7 @@ public class JobsView extends ViewPart {
 
 	/**
 	 * Create all push button parts for the jobs view.
-	 *
+	 * 
 	 * @param parent
 	 */
 	private void createPushButtonGroup(Composite parent) {
@@ -184,7 +181,6 @@ public class JobsView extends ViewPart {
 				.setToolTipText("Creates and schedules jobs according to above parameters"); //$NON-NLS-1$
 		create.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		create.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				createJobs();
 			}
@@ -196,7 +192,6 @@ public class JobsView extends ViewPart {
 		touch.setToolTipText("Modifies the workspace in the UI thread"); //$NON-NLS-1$
 		touch.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		touch.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				touchWorkspace();
 			}
@@ -207,7 +202,6 @@ public class JobsView extends ViewPart {
 		busyWhile.setToolTipText("Uses IProgressService.busyCursorWhile"); //$NON-NLS-1$
 		busyWhile.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		busyWhile.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				busyCursorWhile();
 			}
@@ -218,7 +212,6 @@ public class JobsView extends ViewPart {
 		noFork.setToolTipText("Uses IProgressService.runInUI"); //$NON-NLS-1$
 		noFork.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		noFork.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				progressNoFork();
 			}
@@ -230,7 +223,6 @@ public class JobsView extends ViewPart {
 		exception.setToolTipText("NullPointerException when running"); //$NON-NLS-1$
 		exception.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		exception.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				jobWithRuntimeException();
 			}
@@ -242,7 +234,6 @@ public class JobsView extends ViewPart {
 		join.setToolTipText("IJobManager.join() on test jobs"); //$NON-NLS-1$
 		join.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		join.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				joinTestJobs();
 			}
@@ -255,7 +246,6 @@ public class JobsView extends ViewPart {
 				.setToolTipText("Using a runnable context in the workbench window"); //$NON-NLS-1$
 		window.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		window.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				runnableInWindow();
 			}
@@ -267,7 +257,6 @@ public class JobsView extends ViewPart {
 		sleep.setToolTipText("Calls sleep() on all TestJobs"); //$NON-NLS-1$
 		sleep.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		sleep.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				doSleep();
 			}
@@ -280,7 +269,6 @@ public class JobsView extends ViewPart {
 		wake.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		wake.addSelectionListener(new SelectionAdapter() {
 
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				doWakeUp();
 			}
@@ -292,7 +280,6 @@ public class JobsView extends ViewPart {
 		showInDialog.setToolTipText("Uses IProgressService.showInDialog"); //$NON-NLS-1$
 		showInDialog.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		showInDialog.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				showInDialog();
 			}
@@ -302,12 +289,11 @@ public class JobsView extends ViewPart {
 
 	/**
 	 * Test the showInDialog API
-	 *
+	 * 
 	 */
 	protected void showInDialog() {
 
 		Job showJob = new Job("Show In Dialog") {//$NON-NLS-1$
-			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				monitor.beginTask("Run in dialog", 100);//$NON-NLS-1$
 
@@ -505,7 +491,6 @@ public class JobsView extends ViewPart {
 			IProgressMonitor monitor) {
 		try {
 			ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
-				@Override
 				public void run(IProgressMonitor monitor) throws CoreException {
 					doRun(duration, monitor);
 				}
@@ -535,7 +520,11 @@ public class JobsView extends ViewPart {
 
 	protected void jobWithRuntimeException() {
 		Job runtimeExceptionJob = new Job("Job with Runtime exception") { //$NON-NLS-1$
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
+			 */
 			protected IStatus run(IProgressMonitor monitor) {
 				throw new NullPointerException();
 			}
@@ -553,7 +542,6 @@ public class JobsView extends ViewPart {
 			// that reports progress in a modal dialog with details area
 			PlatformUI.getWorkbench().getProgressService().busyCursorWhile(
 					new IRunnableWithProgress() {
-						@Override
 						public void run(IProgressMonitor monitor)
 								throws InterruptedException {
 							Job.getJobManager().join(TestJob.FAMILY_TEST_JOB,
@@ -584,7 +572,6 @@ public class JobsView extends ViewPart {
 					.getProgressService();
 			progressService.runInUI(progressService,
 					new IRunnableWithProgress() {
-						@Override
 						public void run(IProgressMonitor monitor)
 								throws InterruptedException {
 							if (shouldLock)
@@ -603,7 +590,6 @@ public class JobsView extends ViewPart {
 	/**
 	 * @see ViewPart#setFocus()
 	 */
-	@Override
 	public void setFocus() {
 		if (durationField != null && !durationField.isDisposed())
 			durationField.setFocus();
@@ -615,12 +601,10 @@ public class JobsView extends ViewPart {
 		int jobCount = Integer.parseInt(quantityField.getText());
 		for (int i = 0; i < jobCount; i++) {
 			getSite().getShell().getDisplay().asyncExec(new Runnable() {
-				@Override
 				public void run() {
 					try {
 						ResourcesPlugin.getWorkspace().run(
 								new IWorkspaceRunnable() {
-									@Override
 									public void run(IProgressMonitor monitor) {
 										// no-op
 									}
@@ -637,7 +621,7 @@ public class JobsView extends ViewPart {
 
 	/**
 	 * Run a workspace runnable in the application window.
-	 *
+	 * 
 	 */
 
 	public void runnableInWindow() {
@@ -646,7 +630,11 @@ public class JobsView extends ViewPart {
 		final long sleep = 10;
 		IRunnableWithProgress runnableTest = new WorkspaceModifyOperation() {
 
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.ui.actions.WorkspaceModifyOperation#execute(org.eclipse.core.runtime.IProgressMonitor)
+			 */
 			protected void execute(IProgressMonitor monitor)
 					throws CoreException, InvocationTargetException,
 					InterruptedException {

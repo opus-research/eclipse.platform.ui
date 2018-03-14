@@ -15,7 +15,7 @@ import org.eclipse.jface.viewers.CheckboxTreeViewer;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class CheckboxTreeViewerUpdater extends TreeViewerUpdater {
 	private final CheckboxTreeViewer checkboxViewer;
@@ -25,7 +25,6 @@ public class CheckboxTreeViewerUpdater extends TreeViewerUpdater {
 		checkboxViewer = viewer;
 	}
 
-	@Override
 	public void move(Object parent, Object element, int oldPosition,
 			int newPosition) {
 		if (isElementOrderPreserved()) {

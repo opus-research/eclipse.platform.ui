@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
@@ -24,11 +24,11 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
- * </p>
  * <ul>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.menu.impl.ToolControlImpl#getContributionURI <em>Contribution URI</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.menu.impl.ToolControlImpl#getObject <em>Object</em>}</li>
  * </ul>
+ * </p>
  *
  * @generated
  */

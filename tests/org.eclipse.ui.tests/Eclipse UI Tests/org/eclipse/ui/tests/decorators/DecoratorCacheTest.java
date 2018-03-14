@@ -26,7 +26,7 @@ import org.eclipse.ui.tests.navigator.AbstractNavigatorTest;
 
 /**
  * @since 3.4
- *
+ * 
  */
 public class DecoratorCacheTest extends AbstractNavigatorTest {
 
@@ -36,6 +36,11 @@ public class DecoratorCacheTest extends AbstractNavigatorTest {
 		super(name);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.tests.viewers.ViewerTestCase#createViewer(org.eclipse.swt.widgets.Composite)
+	 */
 	protected StructuredViewer createViewer(Composite parent) {
 		dlp = new DecoratingLabelProvider(new LabelProvider(), PlatformUI
 				.getWorkbench().getDecoratorManager());
