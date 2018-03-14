@@ -309,11 +309,13 @@ public class SplitDropAgent2 extends DropAgent {
 				if (dragElementLocation == EModelService.IN_SHARED_AREA) {
 					MArea area = (MArea) relToElement;
 					relToElement = area.getChildren().get(0);
-				} else if (dragElementLocation == EModelService.IN_ACTIVE_PERSPECTIVE) {
+				} else if (dragElementLocation == EModelService.IN_ACTIVE_PERSPECTIVE
+						|| dragElementLocation == EModelService.OUTSIDE_PERSPECTIVE) {
 					relToElement = relToElement.getCurSharedRef();
 				}
 			} else {
-				if (dragElementLocation == EModelService.IN_SHARED_AREA) {
+				if (dragElementLocation == EModelService.IN_SHARED_AREA
+						|| dragElementLocation == EModelService.OUTSIDE_PERSPECTIVE) {
 					relToElement = relToElement.getCurSharedRef();
 				} else if (dragElementLocation == EModelService.IN_ACTIVE_PERSPECTIVE) {
 					MArea area = (MArea) relToElement;
