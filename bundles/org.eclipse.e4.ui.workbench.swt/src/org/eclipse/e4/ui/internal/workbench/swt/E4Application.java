@@ -302,12 +302,11 @@ public class E4Application implements IApplication {
 		}
 		appContext.set(E4Application.THEME_ID, themeId);
 
-		// Temporary to support old property as well
+		// validate static CSS URI
 		if (cssURI != null && !cssURI.startsWith("platform:")) {
 			System.err
-					.println("Warning "
-							+ cssURI
-							+ " changed its meaning it is used now to run without theme support");
+					.println("Warning. Use the platform: URI for the  parameter:   "
+							+ IWorkbench.CSS_URI_ARG); //$NON-NLS-1$
 			appContext.set(E4Application.THEME_ID, cssURI);
 		}
 
