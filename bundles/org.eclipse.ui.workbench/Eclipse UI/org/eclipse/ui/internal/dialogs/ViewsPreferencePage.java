@@ -90,6 +90,7 @@ public class ViewsPreferencePage extends PreferencePage implements
 	private ControlDecoration colorFontsDecorator;
 	private ColorsAndFontsTheme currentColorsAndFontsTheme;
 	private Map<String, String> themeAssociations;
+	private boolean highContrastMode;
 
 	@Override
 	protected Control createContents(Composite parent) {
@@ -100,6 +101,7 @@ public class ViewsPreferencePage extends PreferencePage implements
 		layout.horizontalSpacing = 10;
 		comp.setLayout(layout);
 		new Label(comp, SWT.NONE).setText(WorkbenchMessages.ViewsPreferencePage_Theme);
+		highContrastMode = parent.getDisplay().getHighContrast();
 
 		themeIdCombo = new ComboViewer(comp, SWT.READ_ONLY);
 		themeIdCombo.setLabelProvider(new LabelProvider() {
@@ -109,7 +111,8 @@ public class ViewsPreferencePage extends PreferencePage implements
 			}
 		});
 		themeIdCombo.setContentProvider(new ArrayContentProvider());
-		themeIdCombo.setInput(engine.getThemes());
+		themeIdCombo.setInput(getCSSThemes(highContrastMode));
+		themeIdCombo.getCombo().setEnabled(!highContrastMode);
 		themeIdCombo.getControl().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		this.currentTheme = engine.getActiveTheme();
 		if (this.currentTheme != null) {
@@ -164,6 +167,19 @@ public class ViewsPreferencePage extends PreferencePage implements
 		return comp;
 	}
 
+	private List<ITheme> getCSSThemes(boolean highContrastMode) {
+		List<ITheme> themes = new ArrayList<ITheme>();
+		for (ITheme theme : engine.getThemes()) {
+			// we don't display the 'high-contrast' special theme when mode is
+			// not enabled
+			if (!highContrastMode && theme.getId().equals(E4Application.HIGH_CONTRAST_THEME_ID)) {
+				continue;
+			}
+			themes.add(theme);
+		}
+		return themes;
+	}
+
 	private void createColoredLabelsPref(Composite composite) {
 		IPreferenceStore apiStore = PrefUtil.getAPIPreferenceStore();
 
@@ -206,7 +222,7 @@ public class ViewsPreferencePage extends PreferencePage implements
 	public boolean performOk() {
 		ITheme theme = getSelectedTheme();
 		if (theme != null) {
-			engine.setTheme(getSelectedTheme(), true);
+			engine.setTheme(getSelectedTheme(), !highContrastMode);
 		}
 
 		IPreferenceStore apiStore = PrefUtil.getAPIPreferenceStore();
