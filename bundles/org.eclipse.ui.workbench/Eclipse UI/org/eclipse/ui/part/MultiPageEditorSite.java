@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -129,7 +129,7 @@ public class MultiPageEditorSite implements IEditorSite, INestable {
 
 		PartSite site = (PartSite) multiPageEditor.getSite();
 
-		IServiceLocatorCreator slc = (IServiceLocatorCreator) site
+		IServiceLocatorCreator slc = site
 				.getService(IServiceLocatorCreator.class);
 		context = site.getModel().getContext().createChild("MultiPageEditorSite"); //$NON-NLS-1$
 		serviceLocator = (ServiceLocator) slc.createServiceLocator(
@@ -272,7 +272,7 @@ public class MultiPageEditorSite implements IEditorSite, INestable {
 	}
 
 	@Override
-	public Object getAdapter(Class adapter) {
+	public <T> T getAdapter(Class<T> adapter) {
 		return null;
 	}
 
@@ -432,8 +432,8 @@ public class MultiPageEditorSite implements IEditorSite, INestable {
 	}
 
 	@Override
-	public final Object getService(final Class key) {
-		Object service = serviceLocator.getService(key);
+	public final <T> T getService(final Class<T> key) {
+		T service = serviceLocator.getService(key);
 		if (active && service instanceof INestable) {
 			// services need to know that it is currently in an active state
 			((INestable) service).activate();

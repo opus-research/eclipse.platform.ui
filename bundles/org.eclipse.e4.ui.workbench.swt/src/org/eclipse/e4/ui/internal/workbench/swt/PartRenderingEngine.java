@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,8 @@
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 462056
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 457939
  *     Alexander Baranov <achilles-86@mail.ru> - Bug 458460
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 483842
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 487621
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench.swt;
 
@@ -22,6 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -114,7 +117,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 	IRendererFactory curFactory = null;
 
-	private Map<String, AbstractPartRenderer> customRendererMap = new HashMap<String, AbstractPartRenderer>();
+	private Map<String, AbstractPartRenderer> customRendererMap = new HashMap<>();
 
 	org.eclipse.swt.widgets.Listener keyListener;
 
@@ -212,11 +215,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 			// Put the control under the 'limbo' shell
 			if (changedElement.getWidget() instanceof Control) {
 				Control ctrl = (Control) changedElement.getWidget();
-
-				if (!(ctrl instanceof Shell)) {
-					ctrl.getShell().layout(new Control[] { ctrl }, SWT.DEFER);
-				}
-
+				ctrl.requestLayout();
 				ctrl.setParent(getLimboShell());
 			}
 
@@ -299,7 +298,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 						final Control ctrl = (Control) w;
 						fixZOrder(added);
 						if (!ctrl.isDisposed()) {
-							ctrl.getShell().layout(new Control[] { ctrl }, SWT.DEFER);
+							ctrl.requestLayout();
 						}
 					}
 				} else {
@@ -331,6 +330,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				if (removed.getWidget() instanceof Control) {
 					Control ctrl = (Control) removed.getWidget();
 					ctrl.setLayoutData(null);
+					// bug 487621
 					ctrl.getParent().layout(new Control[] { ctrl }, SWT.CHANGED | SWT.DEFER);
 				}
 
@@ -437,7 +437,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 					}
 					temp = temp.getParent();
 				}
-
 				composite.layout(true, true);
 			}
 		}
@@ -636,8 +635,8 @@ public class PartRenderingEngine implements IPresentationEngine {
 				}
 
 				Map<String, String> props = ctxt.getProperties();
-				for (String key : props.keySet()) {
-					lclContext.set(key, props.get(key));
+				for (Entry<String, String> entry : props.entrySet()) {
+					lclContext.set(entry.getKey(), entry.getValue());
 				}
 			}
 		}
@@ -868,7 +867,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				MUIElement selectedElement = container.getSelectedElement();
 				List<MUIElement> children = container.getChildren();
 				// Bug 458460: Operate on a copy in case child nulls out parent
-				for (MUIElement child : new ArrayList<MUIElement>(children)) {
+				for (MUIElement child : new ArrayList<>(children)) {
 					// remove stuff in the "back" first
 					if (child != selectedElement) {
 						removeGui(child);
@@ -1056,20 +1055,10 @@ public class PartRenderingEngine implements IPresentationEngine {
 					spinOnce = false; // loop until the app closes
 					theApp = (MApplication) uiRoot;
 					// long startTime = System.currentTimeMillis();
-					MWindow selected = theApp.getSelectedElement();
-					if (selected == null) {
-						for (MWindow window : theApp.getChildren()) {
-							createGui(window);
-						}
-					} else {
-						// render the selected one first
-						createGui(selected);
-						for (MWindow window : theApp.getChildren()) {
-							if (selected != window) {
-								createGui(window);
-							}
-						}
+					for (MWindow window : theApp.getChildren()) {
+						createGui(window);
 					}
+
 					// long endTime = System.currentTimeMillis();
 					// System.out.println("Render: " + (endTime - startTime));
 					// tell the app context we are starting so the splash is
@@ -1458,7 +1447,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 		protected Set<IEclipsePreferences> getPreferences() {
 			if (prefs == null) {
-				prefs = new HashSet<IEclipsePreferences>();
+				prefs = new HashSet<>();
 				BundleContext context = WorkbenchSWTActivator.getDefault().getContext();
 				for (Bundle bundle : context.getBundles()) {
 					if (bundle.getSymbolicName() != null) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2013 IBM Corporation and others.
+ * Copyright (c) 2011, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,11 +7,13 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 483842, 488537
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.addons.cleanupaddon;
 
 import javax.inject.Inject;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -34,7 +36,6 @@ import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.renderers.swt.SashLayout;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -54,90 +55,95 @@ public class CleanupAddon {
 
 	@Inject
 	@Optional
-	private void subscribeTopicChildren(
-			@UIEventTopic(UIEvents.ElementContainer.TOPIC_CHILDREN) Event event) {
+	private void subscribeTopicChildren(@UIEventTopic(UIEvents.ElementContainer.TOPIC_CHILDREN) Event event) {
+
+		Display display = Display.getCurrent();
+		Assert.isNotNull(display);
+
 		Object changedObj = event.getProperty(UIEvents.EventTags.ELEMENT);
-		if (UIEvents.isREMOVE(event)) {
-			final MElementContainer<?> container = (MElementContainer<?>) changedObj;
-			MUIElement containerParent = container.getParent();
 
-			// Determine the elements that should *not* ever be auto-destroyed
-			if (container instanceof MApplication || container instanceof MPerspectiveStack
-					|| container instanceof MMenuElement || container instanceof MTrimBar
-					|| container instanceof MToolBar || container instanceof MArea
-					|| container.getTags().contains(IPresentationEngine.NO_AUTO_COLLAPSE)) {
-				return;
-			}
+		// cleanup add-on only cares about removals and if display is not null
+		if (!UIEvents.isREMOVE(event)) {
+			return;
+		}
 
-			if (container instanceof MWindow && containerParent instanceof MApplication) {
-				return;
-			}
+		final MElementContainer<?> container = (MElementContainer<?>) changedObj;
+		MUIElement containerParent = container.getParent();
 
-			Display display = Display.getCurrent();
+		// Determine the elements that should *not* ever be auto-destroyed
+		if (container instanceof MApplication || container instanceof MPerspectiveStack
+				|| container instanceof MMenuElement || container instanceof MTrimBar || container instanceof MToolBar
+				|| container instanceof MArea || container.getTags().contains(IPresentationEngine.NO_AUTO_COLLAPSE)) {
+			return;
+		}
 
-			// Stall the removal to handle cases where the container is only transiently empty
-			if (display != null) {
-				Display.getCurrent().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						// Remove it from the display if no visible children
-						int tbrCount = modelService.toBeRenderedCount(container);
+		if (container instanceof MWindow && containerParent instanceof MApplication) {
+			return;
+		}
 
-						// Cache the value since setting the TBR may change the result
-						boolean lastStack = isLastEditorStack(container);
-						if (tbrCount == 0 && !lastStack) {
-							container.setToBeRendered(false);
-						}
 
-						// Remove it from the model if it has no children at all
-						MElementContainer<?> lclContainer = container;
-						if (lclContainer.getChildren().size() == 0) {
-							MElementContainer<MUIElement> parent = container.getParent();
-							if (parent != null && !lastStack) {
-								container.setToBeRendered(false);
-								parent.getChildren().remove(container);
-							} else if (container instanceof MWindow) {
-								// Must be a Detached Window
-								MUIElement eParent = (MUIElement) ((EObject) container)
-										.eContainer();
-								if (eParent instanceof MPerspective) {
-									((MPerspective) eParent).getWindows().remove(container);
-								} else if (eParent instanceof MWindow) {
-									((MWindow) eParent).getWindows().remove(container);
-								}
-							}
-						} else if (container.getChildren().size() == 1
-								&& container instanceof MPartSashContainer) {
-							// if a sash container has only one element then remove it and move
-							// its child up to where it used to be
-							MUIElement theChild = container.getChildren().get(0);
-							MElementContainer<MUIElement> parentContainer = container.getParent();
-							if (parentContainer != null) {
-								int index = parentContainer.getChildren().indexOf(container);
 
-								// Magic check, are we unwrapping a sash container
-								if (theChild instanceof MPartSashContainer) {
-									if (container.getWidget() instanceof Composite) {
-										Composite theComp = (Composite) container.getWidget();
-										Object tmp = theChild.getWidget();
-										theChild.setWidget(theComp);
-										theComp.setLayout(new SashLayout(theComp, theChild));
-										theComp.setData(AbstractPartRenderer.OWNING_ME, theChild);
-										container.setWidget(tmp);
-									}
-								}
+		// Stall the removal to handle cases where the container is only
+		// transiently empty
+		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				// Remove it from the display if no visible children
+				int tbrCount = modelService.toBeRenderedCount(container);
 
-								theChild.setContainerData(container.getContainerData());
-								container.getChildren().remove(theChild);
-								parentContainer.getChildren().add(index, theChild);
-								container.setToBeRendered(false);
-								parentContainer.getChildren().remove(container);
-							}
+				// Cache the value since setting the TBR may change the
+				// result
+				boolean lastStack = isLastEditorStack(container);
+				if (tbrCount == 0 && !lastStack) {
+					container.setToBeRendered(false);
+				}
+
+				// Remove it from the model if it has no children at all
+				MElementContainer<?> lclContainer = container;
+				if (lclContainer.getChildren().size() == 0) {
+					MElementContainer<MUIElement> parent = container.getParent();
+					if (parent != null && !lastStack) {
+						container.setToBeRendered(false);
+						parent.getChildren().remove(container);
+					} else if (container instanceof MWindow) {
+						// Must be a Detached Window
+						MUIElement eParent = (MUIElement) ((EObject) container).eContainer();
+						if (eParent instanceof MPerspective) {
+							((MPerspective) eParent).getWindows().remove(container);
+						} else if (eParent instanceof MWindow) {
+							((MWindow) eParent).getWindows().remove(container);
 						}
 					}
-				});
+				} else if (container.getChildren().size() == 1 && container instanceof MPartSashContainer) {
+					// if a sash container has only one element then remove
+					// it and move
+					// its child up to where it used to be
+					MUIElement theChild = container.getChildren().get(0);
+					MElementContainer<MUIElement> parentContainer = container.getParent();
+					if (parentContainer != null) {
+						int index = parentContainer.getChildren().indexOf(container);
+
+						// Magic check, are we unwrapping a sash container
+						if (theChild instanceof MPartSashContainer) {
+							if (container.getWidget() instanceof Composite) {
+								Composite theComp = (Composite) container.getWidget();
+								Object tmp = theChild.getWidget();
+								theChild.setWidget(theComp);
+								theComp.setLayout(new SashLayout(theComp, theChild));
+								theComp.setData(AbstractPartRenderer.OWNING_ME, theChild);
+								container.setWidget(tmp);
+							}
+						}
+
+						theChild.setContainerData(container.getContainerData());
+						container.getChildren().remove(theChild);
+						parentContainer.getChildren().add(index, theChild);
+						container.setToBeRendered(false);
+						parentContainer.getChildren().remove(container);
+					}
+				}
 			}
-		}
+		});
 	}
 
 	/**
@@ -162,8 +168,9 @@ public class CleanupAddon {
 	private void subscribeVisibilityChanged(
 			@UIEventTopic(UIEvents.UIElement.TOPIC_VISIBLE) Event event) {
 		MUIElement changedObj = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
-		if (changedObj instanceof MTrimBar || ((Object) changedObj.getParent()) instanceof MToolBar)
+		if (changedObj instanceof MTrimBar || ((Object) changedObj.getParent()) instanceof MToolBar) {
 			return;
+		}
 
 		if (changedObj.getWidget() instanceof Shell) {
 			((Shell) changedObj.getWidget()).setVisible(changedObj.isVisible());
@@ -175,8 +182,9 @@ public class CleanupAddon {
 
 			if (changedObj.isVisible()) {
 				// Make all the parents visible
-				if (!parent.isVisible())
+				if (!parent.isVisible()) {
 					parent.setVisible(true);
+				}
 			} else {
 				// If there are no more 'visible' children then make the parent go away too
 				boolean makeInvisible = true;
@@ -186,8 +194,9 @@ public class CleanupAddon {
 						break;
 					}
 				}
-				if (makeInvisible)
+				if (makeInvisible) {
 					parent.setVisible(false);
+				}
 			}
 		} else if (changedObj.getWidget() instanceof Control) {
 			Control ctrl = (Control) changedObj.getWidget();
@@ -206,17 +215,19 @@ public class CleanupAddon {
 
 						Control prevControl = null;
 						for (MUIElement childME : parent.getChildren()) {
-							if (childME == changedObj)
+							if (childME == changedObj) {
 								break;
+							}
 							if (childME.getWidget() instanceof Control && childME.isVisible()) {
 								prevControl = (Control) childME.getWidget();
 							}
 						}
-						if (prevControl != null)
+						if (prevControl != null) {
 							ctrl.moveBelow(prevControl);
-						else
+						} else {
 							ctrl.moveAbove(null);
-						ctrl.getShell().layout(new Control[] { ctrl }, SWT.DEFER);
+						}
+						ctrl.requestLayout();
 					}
 
 					if (!shouldReactToChildVisibilityChanges(parent)) {
@@ -224,8 +235,9 @@ public class CleanupAddon {
 					}
 
 					// Check if the parent is visible
-					if (!parent.isVisible())
+					if (!parent.isVisible()) {
 						parent.setVisible(true);
+					}
 				}
 			} else {
 				Shell limbo = (Shell) app.getContext().get("limbo");
@@ -233,13 +245,12 @@ public class CleanupAddon {
 				// Reparent the control to 'limbo'
 				Composite curParent = ctrl.getParent();
 				ctrl.setParent(limbo);
-				curParent.layout(true);
-				if (curParent.getShell() != curParent)
-					curParent.getShell().layout(new Control[] { curParent }, SWT.DEFER);
+				curParent.requestLayout();
 
 				// Always leave Window's in the presentation
-				if ((Object) parent instanceof MWindow)
+				if ((Object) parent instanceof MWindow) {
 					return;
+				}
 
 				// If there are no more 'visible' children then make the parent go away too
 				boolean makeParentInvisible = true;
@@ -250,14 +261,19 @@ public class CleanupAddon {
 					}
 				}
 
+				if (isLastEditorStack(parent) && makeParentInvisible) {
+					return;
+				}
+
 				if (!shouldReactToChildVisibilityChanges(parent)) {
 					return;
 				}
 
 				// Special check: If a perspective goes invisibe we need to make its
 				// PerspectiveStack invisible as well...see bug 369528
-				if (makeParentInvisible)
+				if (makeParentInvisible) {
 					parent.setVisible(false);
+				}
 			}
 		}
 	}
@@ -268,10 +284,11 @@ public class CleanupAddon {
 			@UIEventTopic(UIEvents.UIElement.TOPIC_TOBERENDERED) Event event) {
 			MUIElement changedObj = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
 			MElementContainer<MUIElement> container = null;
-			if (changedObj.getCurSharedRef() != null)
+			if (changedObj.getCurSharedRef() != null) {
 				container = changedObj.getCurSharedRef().getParent();
-			else
+			} else {
 				container = changedObj.getParent();
+			}
 
 			// this can happen for shared parts that aren't attached to any placeholders
 			if (container == null) {
@@ -286,17 +303,20 @@ public class CleanupAddon {
 
 			// These elements should neither be shown nor hidden based on their containment state
 			if (isLastEditorStack(containerElement) || containerElement instanceof MPerspective
-					|| containerElement instanceof MPerspectiveStack)
+					|| containerElement instanceof MPerspectiveStack) {
 				return;
+			}
 
 			Boolean toBeRendered = (Boolean) event.getProperty(UIEvents.EventTags.NEW_VALUE);
 			if (toBeRendered) {
 				// Bring the container back if one of its children goes visible
-				if (!container.isToBeRendered())
+				if (!container.isToBeRendered()) {
 					container.setToBeRendered(true);
+				}
 				if (!container.isVisible()
-						&& !container.getTags().contains(IPresentationEngine.MINIMIZED))
+						&& !container.getTags().contains(IPresentationEngine.MINIMIZED)) {
 					container.setVisible(true);
+				}
 			} else {
 				// Never hide the container marked as no_close
 				if (container.getTags().contains(IPresentationEngine.NO_AUTO_COLLAPSE)) {
@@ -313,8 +333,9 @@ public class CleanupAddon {
 						@Override
 						public void run() {
 							int visCount = modelService.countRenderableChildren(theContainer);
-							if (!isLastEditorStack(theContainer) && visCount == 0)
+							if (!isLastEditorStack(theContainer) && visCount == 0) {
 								theContainer.setToBeRendered(false);
+							}
 						}
 					});
 				} else {
@@ -324,8 +345,9 @@ public class CleanupAddon {
 
 					// OK, we have rendered children, are they 'visible' ?
 					for (MUIElement kid : container.getChildren()) {
-						if (!kid.isToBeRendered())
+						if (!kid.isToBeRendered()) {
 							continue;
+						}
 						if (kid.isVisible()) {
 							makeInvisible = false;
 							break;

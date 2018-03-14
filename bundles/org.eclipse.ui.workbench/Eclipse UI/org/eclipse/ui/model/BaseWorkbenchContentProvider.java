@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ui.model;
 
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ui.internal.util.Util;
 
 /**
  * Tree content provider for objects that can be adapted to the interface
@@ -50,7 +50,7 @@ public class BaseWorkbenchContentProvider implements ITreeContentProvider {
      * @return the corresponding workbench adapter object
      */
     protected IWorkbenchAdapter getAdapter(Object element) {
-        return Util.getAdapter(element, IWorkbenchAdapter.class);
+        return Adapters.adapt(element, IWorkbenchAdapter.class);
     }
 
     @Override

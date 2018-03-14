@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,11 +10,11 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.browser;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IAction;
@@ -85,12 +85,9 @@ public class WebBrowserEditor extends EditorPart implements IBrowserViewerContai
 		}
 
 		if (!lockName) {
-			PropertyChangeListener propertyChangeListener = new PropertyChangeListener() {
-				@Override
-				public void propertyChange(PropertyChangeEvent event) {
-					if (BrowserViewer.PROPERTY_TITLE.equals(event.getPropertyName())) {
-						setPartName((String) event.getNewValue());
-					}
+			PropertyChangeListener propertyChangeListener = event -> {
+				if (BrowserViewer.PROPERTY_TITLE.equals(event.getPropertyName())) {
+					setPartName((String) event.getNewValue());
 				}
 			};
 			webBrowser.addPropertyChangeListener(propertyChangeListener);
@@ -218,7 +215,7 @@ public class WebBrowserEditor extends EditorPart implements IBrowserViewerContai
 			if (oldImage != null && !oldImage.isDisposed())
 				oldImage.dispose();
 		} else {
-			IPathEditorInput pinput = input.getAdapter(IPathEditorInput.class);
+			IPathEditorInput pinput = Adapters.adapt(input, IPathEditorInput.class);
 			if (pinput != null) {
 				init(site, pinput);
 			} else {
@@ -285,12 +282,8 @@ public class WebBrowserEditor extends EditorPart implements IBrowserViewerContai
 	@Override
 	public boolean close() {
         final boolean [] result = new boolean[1];
-		Display.getDefault().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				result[0] = getEditorSite().getPage().closeEditor(WebBrowserEditor.this, false);
-			}
-		});
+		Display.getDefault()
+				.asyncExec(() -> result[0] = getEditorSite().getPage().closeEditor(WebBrowserEditor.this, false));
         return result[0];
 	}
 
@@ -303,12 +296,7 @@ public class WebBrowserEditor extends EditorPart implements IBrowserViewerContai
 	public void openInExternalBrowser(String url) {
         final IEditorInput input = getEditorInput();
         final String id = getEditorSite().getId();
-        Runnable runnable = new Runnable() {
-            @Override
-			public void run() {
-                doOpenExternalEditor(id, input);
-            }
-        };
+		Runnable runnable = () -> doOpenExternalEditor(id, input);
         Display display = getSite().getShell().getDisplay();
         close();
         display.asyncExec(runnable);

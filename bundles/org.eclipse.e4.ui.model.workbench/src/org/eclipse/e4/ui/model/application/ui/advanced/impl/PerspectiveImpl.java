@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008, 2013 IBM Corporation and others.
+ * Copyright (c) 2008, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.LocalizationHelper;
+import org.eclipse.e4.ui.model.application.commands.MBindingContext;
+import org.eclipse.e4.ui.model.application.commands.MBindings;
 import org.eclipse.e4.ui.model.application.commands.MHandler;
 import org.eclipse.e4.ui.model.application.commands.MHandlerContainer;
 import org.eclipse.e4.ui.model.application.commands.impl.CommandsPackageImpl;
@@ -25,6 +27,7 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
+import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.impl.ElementContainerImpl;
 import org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl;
@@ -39,6 +42,7 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EDataTypeUniqueEList;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.EObjectContainmentWithInverseEList;
+import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 import org.eclipse.emf.ecore.util.EcoreEMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
@@ -59,7 +63,9 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.impl.PerspectiveImpl#getVariables <em>Variables</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.impl.PerspectiveImpl#getProperties <em>Properties</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.impl.PerspectiveImpl#getHandlers <em>Handlers</em>}</li>
+ *   <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.impl.PerspectiveImpl#getBindingContexts <em>Binding Contexts</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.impl.PerspectiveImpl#getWindows <em>Windows</em>}</li>
+ *   <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.impl.PerspectiveImpl#getTrimBars <em>Trim Bars</em>}</li>
  * </ul>
  *
  * @generated
@@ -196,6 +202,16 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 	protected EList<MHandler> handlers;
 
 	/**
+	 * The cached value of the '{@link #getBindingContexts() <em>Binding Contexts</em>}' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getBindingContexts()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<MBindingContext> bindingContexts;
+
+	/**
 	 * The cached value of the '{@link #getWindows() <em>Windows</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -204,6 +220,16 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 	 * @ordered
 	 */
 	protected EList<MWindow> windows;
+
+	/**
+	 * The cached value of the '{@link #getTrimBars() <em>Trim Bars</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getTrimBars()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<MTrimBar> trimBars;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -374,11 +400,35 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public List<MBindingContext> getBindingContexts() {
+		if (bindingContexts == null) {
+			bindingContexts = new EObjectResolvingEList<MBindingContext>(MBindingContext.class, this, AdvancedPackageImpl.PERSPECTIVE__BINDING_CONTEXTS);
+		}
+		return bindingContexts;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public List<MWindow> getWindows() {
 		if (windows == null) {
 			windows = new EObjectContainmentEList<MWindow>(MWindow.class, this, AdvancedPackageImpl.PERSPECTIVE__WINDOWS);
 		}
 		return windows;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public List<MTrimBar> getTrimBars() {
+		if (trimBars == null) {
+			trimBars = new EObjectContainmentEList<MTrimBar>(MTrimBar.class, this, AdvancedPackageImpl.PERSPECTIVE__TRIM_BARS);
+		}
+		return trimBars;
 	}
 
 	/**
@@ -425,6 +475,8 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 				return ((InternalEList<?>)getHandlers()).basicRemove(otherEnd, msgs);
 			case AdvancedPackageImpl.PERSPECTIVE__WINDOWS:
 				return ((InternalEList<?>)getWindows()).basicRemove(otherEnd, msgs);
+			case AdvancedPackageImpl.PERSPECTIVE__TRIM_BARS:
+				return ((InternalEList<?>)getTrimBars()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -456,8 +508,12 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 				else return getProperties();
 			case AdvancedPackageImpl.PERSPECTIVE__HANDLERS:
 				return getHandlers();
+			case AdvancedPackageImpl.PERSPECTIVE__BINDING_CONTEXTS:
+				return getBindingContexts();
 			case AdvancedPackageImpl.PERSPECTIVE__WINDOWS:
 				return getWindows();
+			case AdvancedPackageImpl.PERSPECTIVE__TRIM_BARS:
+				return getTrimBars();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -494,9 +550,17 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 				getHandlers().clear();
 				getHandlers().addAll((Collection<? extends MHandler>)newValue);
 				return;
+			case AdvancedPackageImpl.PERSPECTIVE__BINDING_CONTEXTS:
+				getBindingContexts().clear();
+				getBindingContexts().addAll((Collection<? extends MBindingContext>)newValue);
+				return;
 			case AdvancedPackageImpl.PERSPECTIVE__WINDOWS:
 				getWindows().clear();
 				getWindows().addAll((Collection<? extends MWindow>)newValue);
+				return;
+			case AdvancedPackageImpl.PERSPECTIVE__TRIM_BARS:
+				getTrimBars().clear();
+				getTrimBars().addAll((Collection<? extends MTrimBar>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -531,8 +595,14 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 			case AdvancedPackageImpl.PERSPECTIVE__HANDLERS:
 				getHandlers().clear();
 				return;
+			case AdvancedPackageImpl.PERSPECTIVE__BINDING_CONTEXTS:
+				getBindingContexts().clear();
+				return;
 			case AdvancedPackageImpl.PERSPECTIVE__WINDOWS:
 				getWindows().clear();
+				return;
+			case AdvancedPackageImpl.PERSPECTIVE__TRIM_BARS:
+				getTrimBars().clear();
 				return;
 		}
 		super.eUnset(featureID);
@@ -564,8 +634,12 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 				return properties != null && !properties.isEmpty();
 			case AdvancedPackageImpl.PERSPECTIVE__HANDLERS:
 				return handlers != null && !handlers.isEmpty();
+			case AdvancedPackageImpl.PERSPECTIVE__BINDING_CONTEXTS:
+				return bindingContexts != null && !bindingContexts.isEmpty();
 			case AdvancedPackageImpl.PERSPECTIVE__WINDOWS:
 				return windows != null && !windows.isEmpty();
+			case AdvancedPackageImpl.PERSPECTIVE__TRIM_BARS:
+				return trimBars != null && !trimBars.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -601,6 +675,12 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 				default: return -1;
 			}
 		}
+		if (baseClass == MBindings.class) {
+			switch (derivedFeatureID) {
+				case AdvancedPackageImpl.PERSPECTIVE__BINDING_CONTEXTS: return CommandsPackageImpl.BINDINGS__BINDING_CONTEXTS;
+				default: return -1;
+			}
+		}
 		return super.eBaseStructuralFeatureID(derivedFeatureID, baseClass);
 	}
 
@@ -632,6 +712,12 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 		if (baseClass == MHandlerContainer.class) {
 			switch (baseFeatureID) {
 				case CommandsPackageImpl.HANDLER_CONTAINER__HANDLERS: return AdvancedPackageImpl.PERSPECTIVE__HANDLERS;
+				default: return -1;
+			}
+		}
+		if (baseClass == MBindings.class) {
+			switch (baseFeatureID) {
+				case CommandsPackageImpl.BINDINGS__BINDING_CONTEXTS: return AdvancedPackageImpl.PERSPECTIVE__BINDING_CONTEXTS;
 				default: return -1;
 			}
 		}

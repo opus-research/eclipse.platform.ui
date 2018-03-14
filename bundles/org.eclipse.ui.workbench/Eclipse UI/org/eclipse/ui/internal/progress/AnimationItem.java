@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2009 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,13 +19,13 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.internal.WorkbenchWindow;
+import org.eclipse.ui.IWorkbenchWindow;
 
 /**
  * The AnimationItem is the class that manages the animation for the progress.
  */
 public abstract class AnimationItem {
-    WorkbenchWindow window;
+	IWorkbenchWindow window;
 
     interface IAnimationContainer {
         /**
@@ -58,7 +58,7 @@ public abstract class AnimationItem {
      * @param workbenchWindow
      *            the window being created
      */
-    public AnimationItem(WorkbenchWindow workbenchWindow) {
+	public AnimationItem(IWorkbenchWindow workbenchWindow) {
         this.window = workbenchWindow;
     }
 
@@ -158,7 +158,7 @@ public abstract class AnimationItem {
 	/**
 	 * @return Returns the window.
 	 */
-	public WorkbenchWindow getWindow() {
+	public IWorkbenchWindow getWindow() {
 		return window;
 	}
 }

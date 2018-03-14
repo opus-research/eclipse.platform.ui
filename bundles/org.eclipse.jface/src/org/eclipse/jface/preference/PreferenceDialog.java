@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *     Teddy Walker <teddy.walker@googlemail.com>
  *     	- Bug 188056 [Preferences] PreferencePages have to less indent in PreferenceDialog
  *     Stefan Xenos <sxenos@google.com> - Bug 466793
+ *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 475879
  *******************************************************************************/
 package org.eclipse.jface.preference;
 
@@ -199,7 +200,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	 */
 	private TreeViewer treeViewer;
 
-    private ListenerList pageChangedListeners = new ListenerList();
+	private ListenerList<IPageChangedListener> pageChangedListeners = new ListenerList<>();
 
     /**
      *  Composite with a FormLayout to contain the title area
@@ -813,8 +814,8 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 					try {
 						((IPersistentPreferenceStore) store).save();
 					} catch (IOException e) {
-						String message =JFaceResources.format(
-                                "PreferenceDialog.saveErrorMessage", new Object[] { page.getTitle(), e.getMessage() }); //$NON-NLS-1$
+						String message = JFaceResources.format("PreferenceDialog.saveErrorMessage", page.getTitle(), //$NON-NLS-1$
+								e.getMessage());
 			            Policy.getStatusHandler().show(
 			                    new Status(IStatus.ERROR, Policy.JFACE, message, e),
 			                    JFaceResources.getString("PreferenceDialog.saveErrorTitle")); //$NON-NLS-1$
@@ -1470,9 +1471,7 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
      * @since 3.1
      */
     protected void firePageChanged(final PageChangedEvent event) {
-        Object[] listeners = pageChangedListeners.getListeners();
-        for (int i = 0; i < listeners.length; i++) {
-            final IPageChangedListener l = (IPageChangedListener) listeners[i];
+		for (IPageChangedListener l : pageChangedListeners) {
             SafeRunnable.run(new SafeRunnable() {
                 @Override
 				public void run() {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 IBM Corporation and others.
+ * Copyright (c) 2006, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,8 +26,10 @@ import org.eclipse.ui.application.WorkbenchAdvisor;
 import org.eclipse.ui.internal.WorkbenchErrorHandlerProxy;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.misc.StatusUtil;
+import org.eclipse.ui.internal.statushandlers.StatusHandlerDescriptor;
 import org.eclipse.ui.internal.statushandlers.StatusHandlerRegistry;
 import org.eclipse.ui.progress.IProgressConstants;
+import org.osgi.framework.BundleContext;
 
 /**
  * <p>
@@ -107,13 +109,13 @@ public class StatusManager {
 	 */
 	public static final int BLOCK = 0x04;
 
-	private static StatusManager MANAGER;
+	private static volatile StatusManager MANAGER;
 
-	private AbstractStatusHandler statusHandler;
+	private volatile AbstractStatusHandler statusHandler;
 
 	private List loggedStatuses = new ArrayList();
 
-	private ListenerList listeners = new ListenerList();
+	private ListenerList<INotificationListener> listeners = new ListenerList<>();
 
 	/**
 	 * Returns StatusManager singleton instance.
@@ -121,8 +123,13 @@ public class StatusManager {
 	 * @return the manager instance
 	 */
 	public static StatusManager getManager() {
-		if (MANAGER == null) {
-			MANAGER = new StatusManager();
+		if (MANAGER != null) {
+			return MANAGER;
+		}
+		synchronized (StatusManager.class) {
+			if (MANAGER == null) {
+				MANAGER = new StatusManager();
+			}
 		}
 		return MANAGER;
 	}
@@ -132,17 +139,32 @@ public class StatusManager {
 	}
 
 	private AbstractStatusHandler getStatusHandler(){
-		if(statusHandler == null && StatusHandlerRegistry.getDefault()
-					.getDefaultHandlerDescriptor() != null){
-			try {
-				statusHandler = StatusHandlerRegistry.getDefault()
-						.getDefaultHandlerDescriptor().getStatusHandler();
-			} catch (CoreException ex) {
-				logError("Errors during the default handler creating", ex); //$NON-NLS-1$
-			}
+		if (statusHandler != null) {
+			return statusHandler;
 		}
-		if(statusHandler == null){
-			statusHandler = new WorkbenchErrorHandlerProxy();
+		BundleContext bundleContext = WorkbenchPlugin.getDefault().getBundle().getBundleContext();
+		if (bundleContext == null) {
+			// bundle is not in the STARTING, ACTIVE, or STOPPING state: we
+			// should not do anything, most likely we are going to shut down
+			return null;
+		}
+
+		StatusHandlerDescriptor defaultHandlerDescriptor = StatusHandlerRegistry.getDefault()
+				.getDefaultHandlerDescriptor();
+
+		synchronized (this) {
+			if (statusHandler == null) {
+				if (defaultHandlerDescriptor != null) {
+					try {
+						statusHandler = defaultHandlerDescriptor.getStatusHandler();
+					} catch (CoreException ex) {
+						logError("Errors during the default handler creating", ex); //$NON-NLS-1$
+					}
+				}
+				if (statusHandler == null) {
+					statusHandler = new WorkbenchErrorHandlerProxy();
+				}
+			}
 		}
 		return statusHandler;
 	}
@@ -186,18 +208,25 @@ public class StatusManager {
 			}
 
 			// delegates the problem to workbench handler
-			getStatusHandler().handle(statusAdapter, style);
+			AbstractStatusHandler handler = getStatusHandler();
+			if (handler != null) {
+				handler.handle(statusAdapter, style);
+			} else if (style != StatusManager.NONE) {
+				logError(statusAdapter.getStatus());
+			}
 
 			// if attached status handler is not able to notify StatusManager
 			// about particular event, use the default policy and fake the
 			// notification
-			if (!getStatusHandler().supportsNotification(
+			if (handler == null || !handler.supportsNotification(
 					INotificationTypes.HANDLED)) {
 				generateFakeNotification(statusAdapter, style);
 			}
 		} catch (Throwable ex) {
 			// The used status handler failed
-			logError(statusAdapter.getStatus());
+			if (statusAdapter != null) {
+				logError(statusAdapter.getStatus());
+			}
 			logError("Error occurred during status handling", ex); //$NON-NLS-1$
 		}
 	}
@@ -320,18 +349,15 @@ public class StatusManager {
 	 * @since 3.5
 	 */
 	public void fireNotification(int type, StatusAdapter[] adapters){
-		if(getStatusHandler().supportsNotification(type)){
+		AbstractStatusHandler handler = getStatusHandler();
+		if (handler != null && handler.supportsNotification(type)) {
 			doFireNotification(type, adapters);
 		}
 	}
 
 	private void doFireNotification(int type, StatusAdapter[] adapters) {
-		Object[] oListeners = listeners.getListeners();
-		for (int i = 0; i < oListeners.length; i++) {
-			if (oListeners[i] instanceof INotificationListener) {
-				((INotificationListener) oListeners[i])
-						.statusManagerNotified(type, adapters);
-			}
+		for (INotificationListener listener : listeners) {
+			listener.statusManagerNotified(type, adapters);
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *     Kiryl Kazakevich, Intel - bug 88359
  *     Tonny Madsen, RCP Company - bug 201055
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440136
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 485313
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -44,7 +45,7 @@ public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 	public void initializeDefaultPreferences() {
 
 
-		IScopeContext context = new DefaultScope();
+		IScopeContext context = DefaultScope.INSTANCE;
 		IEclipsePreferences node = context.getNode(UIPlugin.getDefault()
 				.getBundle().getSymbolicName());
 		node.put(IWorkbenchPreferenceConstants.OPEN_NEW_PERSPECTIVE,
@@ -76,7 +77,7 @@ public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 				IWorkbenchPreferenceConstants.TOP_LEFT);
 		node.putBoolean(
 				IWorkbenchPreferenceConstants.SHOW_TEXT_ON_PERSPECTIVE_BAR,
-				true);
+				false);
 		node.putBoolean(
 				IWorkbenchPreferenceConstants.SHOW_OTHER_IN_PERSPECTIVE_MENU,
 				true);

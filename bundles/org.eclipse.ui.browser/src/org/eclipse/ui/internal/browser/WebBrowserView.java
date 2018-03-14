@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -25,7 +25,6 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
@@ -103,13 +102,7 @@ public class WebBrowserView extends ViewPart implements
 		if (listener != null)
 			return;
 
-		listener = new ISelectionListener() {
-			@Override
-			public void selectionChanged(IWorkbenchPart part,
-					ISelection selection) {
-				onSelectionChange(selection);
-			}
-		};
+		listener = (part, selection) -> onSelectionChange(selection);
 		getSite().getWorkbenchWindow().getSelectionService()
 				.addPostSelectionListener(listener);
 	}
@@ -119,17 +112,14 @@ public class WebBrowserView extends ViewPart implements
 			return;
 		IStructuredSelection sel = (IStructuredSelection) selection;
 		Object obj = sel.getFirstElement();
-		if (obj instanceof IAdaptable) {
-			IAdaptable adapt = (IAdaptable) obj;
-			URL url = getURLFromAdaptable(adapt);
-			if (url!=null)
-				setURL(url.toExternalForm());
-		}
+		URL url = getURLFrom(obj);
+		if (url != null)
+			setURL(url.toExternalForm());
 	}
 
-	private URL getURLFromAdaptable(IAdaptable adapt) {
+	private URL getURLFrom(Object adapt) {
 		// test for path
-		IPath path= adapt.getAdapter(IPath.class);
+		IPath path = Adapters.adapt(adapt, IPath.class);
 		if (path != null) {
 			File file = path.toFile();
 			if (file.exists() && isWebFile(file.getName()))
@@ -139,7 +129,7 @@ public class WebBrowserView extends ViewPart implements
 					return null;
 				}
 		}
-		return adapt.getAdapter(URL.class);
+		return Adapters.adapt(adapt, URL.class);
 	}
 
 	public void removeSelectionListener() {

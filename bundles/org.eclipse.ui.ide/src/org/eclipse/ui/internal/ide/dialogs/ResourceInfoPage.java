@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,16 +10,21 @@
  *     Remy Chi Jian Suen <remy.suen@gmail.com> - Bug 175069 [Preferences] ResourceInfoPage is not setting dialog font on all widgets
  *     Serge Beauchamp (Freescale Semiconductor) - [229633] Project Path Variable Support
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 474273
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 486777
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
@@ -30,25 +35,36 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourceAttributes;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.e4.core.commands.ECommandService;
+import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.FieldEditor;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.jface.resource.ResourceManager;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.osgi.util.TextProcessor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TableEditor;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Font;
@@ -69,6 +85,9 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.ide.IIDEHelpContextIds;
 import org.eclipse.ui.internal.ide.LineDelimiterEditor;
+import org.eclipse.ui.internal.ide.handlers.ShowInSystemExplorerHandler;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 /**
  * The ResourceInfoPage is the page that shows the basic info about the
@@ -125,6 +144,8 @@ public class ResourceInfoPage extends PropertyPage {
 
 	private static String LOCATION_TITLE = IDEWorkbenchMessages.ResourceInfo_location;
 
+	private static String LOCATION_BUTTON_TOOLTIP = IDEWorkbenchMessages.ResourceInfo_location_button_tooltip;
+
 	private static String RESOLVED_LOCATION_TITLE = IDEWorkbenchMessages.ResourceInfo_resolvedLocation;
 
 	private static String SIZE_TITLE = IDEWorkbenchMessages.ResourceInfo_size;
@@ -161,7 +182,7 @@ public class ResourceInfoPage extends PropertyPage {
 
 		Composite basicInfoComposite = new Composite(parent, SWT.NULL);
 		GridLayout layout = new GridLayout();
-		layout.numColumns = 2;
+		layout.numColumns = 3;
 		layout.marginWidth = 0;
 		layout.marginHeight = 0;
 		basicInfoComposite.setLayout(layout);
@@ -187,6 +208,7 @@ public class ResourceInfoPage extends PropertyPage {
 		gd.widthHint = convertWidthInCharsToPixels(MAX_VALUE_WIDTH);
 		gd.grabExcessHorizontalSpace = true;
 		gd.horizontalAlignment = GridData.FILL;
+		gd.horizontalSpan = 2;
 		pathValueText.setLayoutData(gd);
 		pathValueText.setBackground(pathValueText.getDisplay().getSystemColor(
 				SWT.COLOR_WIDGET_BACKGROUND));
@@ -196,6 +218,7 @@ public class ResourceInfoPage extends PropertyPage {
 		typeTitle.setText(TYPE_TITLE);
 
 		Text typeValue = new Text(basicInfoComposite, SWT.LEFT | SWT.READ_ONLY);
+		GridDataFactory.swtDefaults().span(2, SWT.DEFAULT).applyTo(typeValue);
 		typeValue.setText(IDEResourceInfoUtils.getTypeString(resource,
 				getContentDescription(resource)));
 		typeValue.setBackground(typeValue.getDisplay().getSystemColor(
@@ -221,6 +244,7 @@ public class ResourceInfoPage extends PropertyPage {
 			gd.grabExcessHorizontalSpace = true;
 			gd.verticalAlignment = SWT.TOP;
 			gd.horizontalAlignment = GridData.FILL;
+			gd.horizontalSpan = 2;
 			locationComposite.setLayoutData(gd);
 
 			locationValue = new Text(locationComposite, SWT.WRAP
@@ -274,6 +298,7 @@ public class ResourceInfoPage extends PropertyPage {
 			gd.widthHint = convertWidthInCharsToPixels(MAX_VALUE_WIDTH);
 			gd.grabExcessHorizontalSpace = true;
 			gd.horizontalAlignment = GridData.FILL;
+			gd.horizontalSpan = 2;
 			resolvedLocationValue.setLayoutData(gd);
 			resolvedLocationValue.setBackground(resolvedLocationValue
 					.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
@@ -283,21 +308,49 @@ public class ResourceInfoPage extends PropertyPage {
 				Label locationTitle = new Label(basicInfoComposite, SWT.LEFT);
 				locationTitle.setText(LOCATION_TITLE);
 				gd = new GridData();
-				gd.verticalAlignment = SWT.TOP;
 				locationTitle.setLayoutData(gd);
 
 				Text locationValue = new Text(basicInfoComposite, SWT.WRAP
 						| SWT.READ_ONLY);
-				String locationStr = TextProcessor.process(IDEResourceInfoUtils
+				final String locationStr = TextProcessor.process(IDEResourceInfoUtils
 						.getLocationText(resource));
 				locationValue.setText(locationStr);
 				gd = new GridData();
-				gd.widthHint = convertWidthInCharsToPixels(MAX_VALUE_WIDTH);
-				gd.grabExcessHorizontalSpace = true;
 				gd.horizontalAlignment = GridData.FILL;
 				locationValue.setLayoutData(gd);
 				locationValue.setBackground(locationValue.getDisplay()
 						.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+
+				Button goToLocationButton = new Button(basicInfoComposite, SWT.PUSH);
+				gd = new GridData();
+				gd.verticalAlignment = SWT.TOP;
+				goToLocationButton.setLayoutData(gd);
+				ResourceManager resourceManager = new LocalResourceManager(JFaceResources.getResources(),
+						goToLocationButton);
+				Bundle bundle = FrameworkUtil.getBundle(getClass());
+				URL goToFolderUrl = FileLocator.find(bundle, new Path("icons/full/obj16/goto_input.png"), //$NON-NLS-1$
+						null);
+				goToLocationButton.setImage(resourceManager.createImage(ImageDescriptor.createFromURL(goToFolderUrl)));
+				goToLocationButton.setToolTipText(LOCATION_BUTTON_TOOLTIP);
+				goToLocationButton.addSelectionListener(new SelectionAdapter() {
+
+					@SuppressWarnings("restriction")
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						ECommandService commandService = PlatformUI.getWorkbench().getService(ECommandService.class);
+						EHandlerService handlerService = PlatformUI.getWorkbench().getService(EHandlerService.class);
+
+						Command command = commandService.getCommand(ShowInSystemExplorerHandler.ID);
+						if (command.isDefined()) {
+							ParameterizedCommand parameterizedCommand = commandService
+									.createCommand(ShowInSystemExplorerHandler.ID, Collections.singletonMap(
+											ShowInSystemExplorerHandler.RESOURCE_PATH_PARAMETER, locationStr));
+							if (handlerService.canExecute(parameterizedCommand)) {
+								handlerService.executeHandler(parameterizedCommand);
+							}
+						}
+					}
+				});
 			}
 		}
 		if (resource.getType() == IResource.FILE) {
@@ -312,6 +365,7 @@ public class ResourceInfoPage extends PropertyPage {
 			gd.widthHint = convertWidthInCharsToPixels(MAX_VALUE_WIDTH);
 			gd.grabExcessHorizontalSpace = true;
 			gd.horizontalAlignment = GridData.FILL;
+			gd.horizontalSpan = 2;
 			sizeValue.setLayoutData(gd);
 			sizeValue.setBackground(sizeValue.getDisplay().getSystemColor(
 					SWT.COLOR_WIDGET_BACKGROUND));
@@ -326,14 +380,15 @@ public class ResourceInfoPage extends PropertyPage {
 				.getDateStringValue(resource));
 		timeStampValue.setBackground(timeStampValue.getDisplay()
 				.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-		timeStampValue.setLayoutData(new GridData(GridData.FILL_HORIZONTAL
-				| GridData.GRAB_HORIZONTAL));
+		GridData gridData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
+		gridData.horizontalSpan = 2;
+		timeStampValue.setLayoutData(gridData);
 
 		return basicInfoComposite;
 	}
 
 	protected void editLinkLocation() {
-		IResource resource = getElement().getAdapter(IResource.class);
+		IResource resource = Adapters.adapt(getElement(), IResource.class);
 		String locationFormat = resource.getPathVariableManager().convertFromUserEditableFormat(locationValue.getText(), true);
 		IPath location = Path.fromOSString(locationFormat);
 
@@ -352,7 +407,7 @@ public class ResourceInfoPage extends PropertyPage {
 	}
 
 	private void refreshLinkLocation() {
-		IResource resource = getElement().getAdapter(IResource.class);
+		IResource resource = Adapters.adapt(getElement(), IResource.class);
 
 		String userEditableFormat = resource.getPathVariableManager().convertToUserEditableFormat(newResourceLocation.toOSString(), true);
 		locationValue.setText(userEditableFormat);
@@ -388,7 +443,7 @@ public class ResourceInfoPage extends PropertyPage {
 				IIDEHelpContextIds.RESOURCE_INFO_PROPERTY_PAGE);
 
 		// layout the page
-		IResource resource = getElement().getAdapter(IResource.class);
+		IResource resource = Adapters.adapt(getElement(), IResource.class);
 
 		if (resource == null) {
 			Label label = new Label(parent, SWT.NONE);
@@ -846,7 +901,7 @@ public class ResourceInfoPage extends PropertyPage {
 	@Override
 	protected void performDefaults() {
 
-		IResource resource = getElement().getAdapter(IResource.class);
+		IResource resource = Adapters.adapt(getElement(), IResource.class);
 
 		if (resource == null)
 			return;
@@ -1029,9 +1084,9 @@ public class ResourceInfoPage extends PropertyPage {
 
 			MessageDialog dialog = new MessageDialog(getShell(),
 					IDEWorkbenchMessages.ResourceInfo_recursiveChangesTitle,
-					null, message, MessageDialog.QUESTION, new String[] {
-							IDialogConstants.YES_LABEL,
-							IDialogConstants.NO_LABEL }, 1);
+					null, message, MessageDialog.QUESTION, 1,
+					IDialogConstants.YES_LABEL,
+					IDialogConstants.NO_LABEL);
 
 			return dialog.open() == 0;
 		}
@@ -1044,23 +1099,22 @@ public class ResourceInfoPage extends PropertyPage {
 				List/*<IResource>*/ toVisit = getResourcesToVisit(resource);
 
 				// Prepare the monitor for the given amount of work
-				monitor.beginTask(
+				SubMonitor subMonitor = SubMonitor.convert(monitor,
 						IDEWorkbenchMessages.ResourceInfo_recursiveChangesJobName,
 						toVisit.size());
 
 				// Apply changes recursively
 				for (Iterator/*<IResource>*/ it = toVisit.iterator(); it.hasNext();) {
-					if (monitor.isCanceled())
-						throw new OperationCanceledException();
+					SubMonitor iterationMonitor = subMonitor.split(1).setWorkRemaining(changes.size());
 					IResource childResource = (IResource) it.next();
-					monitor.subTask(NLS
+					iterationMonitor.subTask(NLS
 							.bind(IDEWorkbenchMessages.ResourceInfo_recursiveChangesSubTaskName,
 									childResource.getFullPath()));
 					for (int i = 0; i < changes.size(); i++) {
+						iterationMonitor.split(1);
 						((IResourceChange) changes.get(i))
 								.performChange(childResource);
 					}
-					monitor.worked(1);
 				}
 			} catch (CoreException e1) {
 				IDEWorkbenchPlugin
@@ -1069,8 +1123,6 @@ public class ResourceInfoPage extends PropertyPage {
 				return e1.getStatus();
 			} catch (OperationCanceledException e2) {
 				return Status.CANCEL_STATUS;
-			} finally {
-				monitor.done();
 			}
 			return Status.OK_STATUS;
 		}).schedule();
@@ -1082,7 +1134,7 @@ public class ResourceInfoPage extends PropertyPage {
 	@Override
 	public boolean performOk() {
 
-		IResource resource = getElement().getAdapter(IResource.class);
+		IResource resource = Adapters.adapt(getElement(), IResource.class);
 
 		if (resource == null)
 			return true;

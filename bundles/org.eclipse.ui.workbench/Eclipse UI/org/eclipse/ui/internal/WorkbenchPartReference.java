@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ package org.eclipse.ui.internal;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -128,15 +129,15 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
     /**
      * API listener list
      */
-    private ListenerList propChangeListeners = new ListenerList();
+	private ListenerList<IPropertyListener> propChangeListeners = new ListenerList<>();
 
     /**
      * Internal listener list. Listens to the INTERNAL_PROPERTY_* property change events that are not yet API.
      * TODO: Make these properties API in 3.2
      */
-    private ListenerList internalPropChangeListeners = new ListenerList();
+	private ListenerList<IPropertyListener> internalPropChangeListeners = new ListenerList<>();
 
-    private ListenerList partChangeListeners = new ListenerList();
+	private ListenerList<IPropertyChangeListener> partChangeListeners = new ListenerList<>();
 
     protected Map propertyCache = new HashMap();
 
@@ -255,9 +256,8 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
     }
 
     protected void fireInternalPropertyChange(int id) {
-        Object listeners[] = internalPropChangeListeners.getListeners();
-        for (int i = 0; i < listeners.length; i++) {
-            ((IPropertyListener) listeners[i]).propertyChanged(this, id);
+		for (IPropertyListener listener : internalPropChangeListeners) {
+			listener.propertyChanged(this, id);
         }
     }
 
@@ -361,9 +361,8 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
 
     private void immediateFirePropertyChange(int id) {
         UIListenerLogging.logPartReferencePropertyChange(this, id);
-        Object listeners[] = propChangeListeners.getListeners();
-        for (int i = 0; i < listeners.length; i++) {
-			((IPropertyListener) listeners[i]).propertyChanged(legacyPart, id);
+		for (IPropertyListener listener : propChangeListeners) {
+			listener.propertyChanged(legacyPart, id);
         }
 
         fireInternalPropertyChange(id);
@@ -503,9 +502,8 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
     }
 
     protected void firePartPropertyChange(PropertyChangeEvent event) {
-		Object[] l = partChangeListeners.getListeners();
-		for (int i = 0; i < l.length; i++) {
-			((IPropertyChangeListener) l[i]).propertyChange(event);
+		for (IPropertyChangeListener l : partChangeListeners) {
+			l.propertyChange(event);
 		}
 	}
 
@@ -521,7 +519,7 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
 	public int computePreferredSize(boolean width, int availableParallel,
             int availablePerpendicular, int preferredResult) {
 
-		ISizeProvider sizeProvider = Util.getAdapter(legacyPart, ISizeProvider.class);
+		ISizeProvider sizeProvider = Adapters.adapt(legacyPart, ISizeProvider.class);
         if (sizeProvider != null) {
             return sizeProvider.computePreferredSize(width, availableParallel, availablePerpendicular, preferredResult);
         }
@@ -531,7 +529,7 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
 
     @Override
 	public int getSizeFlags(boolean width) {
-		ISizeProvider sizeProvider = Util.getAdapter(legacyPart, ISizeProvider.class);
+		ISizeProvider sizeProvider = Adapters.adapt(legacyPart, ISizeProvider.class);
         if (sizeProvider != null) {
             return sizeProvider.getSizeFlags(width);
         }

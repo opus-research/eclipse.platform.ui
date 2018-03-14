@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2010 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -335,31 +335,24 @@ public class NavigatorContentService implements IExtensionActivationListener,
 		isDisposed = true;
 	}
 
-	protected void updateService(Viewer aViewer, Object anOldInput,
-			Object aNewInput) {
-
+	protected void updateService(Viewer aViewer, Object anOldInput, Object aNewInput) {
 		// Prevents the world from being started again once we have been disposed.  In
 		// the dispose process, the ContentViewer will call setInput() on the
 		// NavigatorContentServiceContentProvider, which gets us here
 		if (isDisposed)
 			return;
+		NavigatorContentDescriptorManager.getInstance().clearCache();
 		synchronized (this) {
-
 			if (structuredViewerManager == null) {
 				structuredViewerManager = new StructuredViewerManager((StructuredViewer) aViewer, this);
 				structuredViewerManager.inputChanged(anOldInput, aNewInput);
 			} else {
-				structuredViewerManager.inputChanged(aViewer, anOldInput,
-						aNewInput);
+				structuredViewerManager.inputChanged(aViewer, anOldInput, aNewInput);
 			}
 
-			for (Iterator<NavigatorContentExtension> contentItr = contentExtensions.values().iterator(); contentItr
-					.hasNext();) {
-				NavigatorContentExtension ext = contentItr
-						.next();
+			for (NavigatorContentExtension ext : contentExtensions.values()) {
 				if (ext.isLoaded()) {
-					structuredViewerManager
-							.initialize(ext.internalGetContentProvider());
+					structuredViewerManager.initialize(ext.internalGetContentProvider());
 				}
 			}
 
@@ -852,6 +845,7 @@ public class NavigatorContentService implements IExtensionActivationListener,
 	@Override
 	public void update() {
 		rootContentProviders = null;
+		NavigatorContentDescriptorManager.getInstance().clearCache();
 		if (structuredViewerManager != null) {
 			structuredViewerManager.safeRefresh();
 		}

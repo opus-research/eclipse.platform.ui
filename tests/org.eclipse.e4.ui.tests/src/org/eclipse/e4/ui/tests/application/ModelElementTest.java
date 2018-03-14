@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2011 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,19 +11,20 @@
 
 package org.eclipse.e4.ui.tests.application;
 
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.List;
-import junit.framework.TestCase;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.impl.ApplicationPackageImpl;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EPackage;
+import org.junit.Test;
 
-/**
- *
- */
-public class ModelElementTest extends TestCase {
+public class ModelElementTest {
+
+	@Test
 	public void testForMApplicationInterface() {
 		List<EClass> failedClasses = new ArrayList<EClass>();
 		checkPackageForMApplicationInterface(failedClasses,
@@ -59,6 +60,7 @@ public class ModelElementTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testForOptimalBaseClass() {
 		List<EClass> failedClasses = new ArrayList<EClass>();
 		checkPackageForOptimalBaseClass(failedClasses,

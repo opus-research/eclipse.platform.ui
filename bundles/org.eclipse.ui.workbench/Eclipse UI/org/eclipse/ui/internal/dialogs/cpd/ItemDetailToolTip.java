@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 445538
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs.cpd;
 
@@ -168,8 +169,7 @@ class ItemDetailToolTip extends NameAndDescriptionToolTip {
 							// the href to its id
 							String commandGroupLink = MessageFormat.format(
 									"<a href=\"{0}\">{1}</a>", //$NON-NLS-1$
-									new Object[] { actionSet.descriptor.getId(),
-											actionSet.descriptor.getLabel() });
+									actionSet.descriptor.getId(), actionSet.descriptor.getLabel());
 
 							if (commandGroupList == null) {
 								commandGroupList = commandGroupLink;
@@ -214,7 +214,7 @@ class ItemDetailToolTip extends NameAndDescriptionToolTip {
 		// Show key binding info
 		if (showKeyBindings && CustomizePerspectiveDialog.getCommandID(item) != null) {
 			// See if there is a command associated with the command id
-			ICommandService commandService = (ICommandService) dialog.window
+			ICommandService commandService = dialog.window
 					.getService(ICommandService.class);
 			Command command = commandService.getCommand(CustomizePerspectiveDialog.getCommandID(item));
 
@@ -287,7 +287,7 @@ class ItemDetailToolTip extends NameAndDescriptionToolTip {
 				bindingLink.addSelectionListener(new SelectionListener() {
 					@Override
 					public void widgetDefaultSelected(SelectionEvent e) {
-						widgetDefaultSelected(e);
+						widgetSelected(e);
 					}
 
 					@Override
@@ -389,8 +389,7 @@ class ItemDetailToolTip extends NameAndDescriptionToolTip {
 	 * Gets the keybindings associated with a ContributionItem.
 	 */
 	static Binding[] getKeyBindings(WorkbenchWindow window, DisplayItem item) {
-		IBindingService bindingService = (IBindingService) window
-				.getService(IBindingService.class);
+		IBindingService bindingService = window.getService(IBindingService.class);
 
 		if (!(bindingService instanceof BindingService)) {
 			return new Binding[0];

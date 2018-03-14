@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 IBM Corporation and others.
+ * Copyright (c) 2007, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -49,18 +49,14 @@ public class InfoEditor extends EditorPart {
 	private boolean dirty = false;
 	private IHandler resetHandler;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.IProgressMonitor)
-	 */
+	@Override
 	public void doSave(IProgressMonitor monitor) {
 		monitor.beginTask(getPartName(), 3);
 		person.setSurname(surnameText.getText());
 		monitor.worked(1);
 		person.setGivenname(givennameText.getText());
 		monitor.worked(1);
-		IPersonService service = (IPersonService) getSite().getService(
+		IPersonService service = getSite().getService(
 				IPersonService.class);
 		service.updatePerson(person);
 		monitor.worked(1);
@@ -68,21 +64,12 @@ public class InfoEditor extends EditorPart {
 		setDirty(false);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.part.EditorPart#doSaveAs()
-	 */
+	@Override
 	public void doSaveAs() {
 		// nothing
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.part.EditorPart#init(org.eclipse.ui.IEditorSite,
-	 *      org.eclipse.ui.IEditorInput)
-	 */
+	@Override
 	public void init(IEditorSite site, IEditorInput input)
 			throws PartInitException {
 		setSite(site);
@@ -91,7 +78,7 @@ public class InfoEditor extends EditorPart {
 			throw new PartInitException("Not a person"); //$NON-NLS-1$
 		}
 		PersonInput pinput = (PersonInput) input;
-		IPersonService service = (IPersonService) getSite().getService(
+		IPersonService service = getSite().getService(
 				IPersonService.class);
 		person = service.getPerson(pinput.getIndex());
 		if (person == null) {
@@ -100,11 +87,7 @@ public class InfoEditor extends EditorPart {
 		setPartName("Person - " + pinput.getIndex()); //$NON-NLS-1$
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.part.EditorPart#isDirty()
-	 */
+	@Override
 	public boolean isDirty() {
 		return dirty;
 	}
@@ -114,28 +97,22 @@ public class InfoEditor extends EditorPart {
 		firePropertyChange(ISaveablePart.PROP_DIRTY);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.part.EditorPart#isSaveAsAllowed()
-	 */
+	@Override
 	public boolean isSaveAsAllowed() {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
-	 */
+	@Override
 	public void createPartControl(Composite parent) {
 		KeyListener keyListener = new KeyListener() {
+			@Override
 			public void keyPressed(KeyEvent e) {
 				if ((e.keyCode & SWT.MODIFIER_MASK) == 0) {
 					setDirty(true);
 				}
 			}
 
+			@Override
 			public void keyReleased(KeyEvent e) {
 				// nothing
 			}
@@ -178,9 +155,9 @@ public class InfoEditor extends EditorPart {
 	 * Instantiate any handlers specific to this view and activate them.
 	 */
 	private void createHandlers() {
-		IHandlerService handlerService = (IHandlerService) getSite()
-				.getService(IHandlerService.class);
+		IHandlerService handlerService = getSite().getService(IHandlerService.class);
 		resetHandler = new AbstractHandler() {
+			@Override
 			public Object execute(ExecutionEvent event) {
 				updateText();
 				setDirty(false);
@@ -190,11 +167,7 @@ public class InfoEditor extends EditorPart {
 		handlerService.activateHandler(EDITOR_RESET_ID, resetHandler);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-	 */
+	@Override
 	public void setFocus() {
 		surnameText.setFocus();
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -61,6 +61,10 @@ import org.eclipse.swt.widgets.Widget;
  * interfaces <code>ITreeContentProvider</code> or (as of 3.2, to support
  * multiple equal elements) <code>ITreePathContentProvider</code>.
  * </p>
+ * <p>
+ * <strong> This class is not intended to be subclassed outside of the JFace
+ * viewers framework.</strong>
+ * <p>
  *
  * @see TreeViewer
  */
@@ -79,7 +83,7 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	 * List of registered tree listeners (element type:
 	 * <code>TreeListener</code>).
 	 */
-	private ListenerList treeListeners = new ListenerList();
+	private ListenerList<ITreeViewerListener> treeListeners = new ListenerList<>();
 
 	/**
 	 * The level to which the tree is automatically expanded each time the
@@ -1077,12 +1081,10 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	 * @see ITreeViewerListener#treeCollapsed
 	 */
 	protected void fireTreeCollapsed(final TreeExpansionEvent event) {
-		Object[] listeners = treeListeners.getListeners();
 		boolean oldBusy = isBusy();
 		setBusy(true);
 		try {
-			for (int i = 0; i < listeners.length; ++i) {
-				final ITreeViewerListener l = (ITreeViewerListener) listeners[i];
+			for (ITreeViewerListener l : treeListeners) {
 				SafeRunnable.run(new SafeRunnable() {
 					@Override
 					public void run() {
@@ -1104,12 +1106,10 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	 * @see ITreeViewerListener#treeExpanded
 	 */
 	protected void fireTreeExpanded(final TreeExpansionEvent event) {
-		Object[] listeners = treeListeners.getListeners();
 		boolean oldBusy = isBusy();
 		setBusy(true);
 		try {
-			for (int i = 0; i < listeners.length; ++i) {
-				final ITreeViewerListener l = (ITreeViewerListener) listeners[i];
+			for (ITreeViewerListener l : treeListeners) {
 				SafeRunnable.run(new SafeRunnable() {
 					@Override
 					public void run() {
@@ -2351,9 +2351,10 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	}
 
 	/**
-	 * The <code>AbstractTreeViewer</code> implementation of this method
-	 * checks to ensure that the content provider is an
-	 * <code>ITreeContentProvider</code>.
+	 * Sets the content provider used by this <code>AbstractTreeViewer</code>.
+	 * <p>
+	 * Content providers for abstract tree viewers must implement either
+	 * {@link ITreeContentProvider} or {@link ITreePathContentProvider}.
 	 */
 	@Override
 	public void setContentProvider(IContentProvider provider) {
@@ -2364,7 +2365,9 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	@Override
 	protected void assertContentProviderType(IContentProvider provider) {
 		Assert.isTrue(provider instanceof ITreeContentProvider
-				|| provider instanceof ITreePathContentProvider);
+				|| provider instanceof ITreePathContentProvider,
+				"Instances of AbstractTreeViewer must have a content provider " //$NON-NLS-1$
+						+ "of type ITreeContentProvider or ITreePathContentProvider"); //$NON-NLS-1$
 	}
 
 	/**

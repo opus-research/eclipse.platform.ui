@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -64,7 +65,7 @@ public class KeyController {
 	 */
 	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
 			.getBundle(KeysPreferencePage.class.getName());
-	private ListenerList eventManager = null;
+	private ListenerList<IPropertyChangeListener> eventManager = null;
 	private BindingManager fBindingManager;
 	private ContextModel contextModel;
 	private SchemeModel fSchemeModel;
@@ -73,9 +74,9 @@ public class KeyController {
 	private ConflictModel conflictModel;
 	private IServiceLocator serviceLocator;
 
-	private ListenerList getEventManager() {
+	private ListenerList<IPropertyChangeListener> getEventManager() {
 		if (eventManager == null) {
-			eventManager = new ListenerList(ListenerList.IDENTITY);
+			eventManager = new ListenerList<>(ListenerList.IDENTITY);
 		}
 		return eventManager;
 	}
@@ -97,11 +98,10 @@ public class KeyController {
 			return;
 		}
 
-		Object[] listeners = getEventManager().getListeners();
 		PropertyChangeEvent event = new PropertyChangeEvent(source, propId,
 				oldVal, newVal);
-		for (int i = 0; i < listeners.length; i++) {
-			((IPropertyChangeListener) listeners[i]).propertyChange(event);
+		for (IPropertyChangeListener listener : getEventManager()) {
+			listener.propertyChange(event);
 		}
 	}
 
@@ -529,7 +529,7 @@ public class KeyController {
 				Writer fileWriter = null;
 				try {
 					fileWriter = new BufferedWriter(new OutputStreamWriter(
-							new FileOutputStream(filePath), "UTF-8")); //$NON-NLS-1$
+							new FileOutputStream(filePath), StandardCharsets.UTF_8));
 					final Object[] bindingElements = bindingModel.getBindings()
 							.toArray();
 					for (int i = 0; i < bindingElements.length; i++) {

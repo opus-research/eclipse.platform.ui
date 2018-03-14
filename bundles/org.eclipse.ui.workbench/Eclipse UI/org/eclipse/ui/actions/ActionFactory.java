@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2014 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -615,9 +615,15 @@ public abstract class ActionFactory {
     };
 
 	/**
-	 * Workbench action (id: "maximize", commandId: "org.eclipse.ui.window.maximizePart"):
-	 * Maximize/restore the active part. This action maintains its enablement state.
+	 * Workbench action (id: "maximize", commandId:
+	 * "org.eclipse.ui.window.maximizePart"): Maximize/restore the active part.
+	 * This action maintains its enablement state.
+	 *
+	 * @deprecated you should not use this field, kept for compatibility
+	 *             reasons. use instead the command
+	 *             {@code org.eclipse.ui.window.maximizePart}.
 	 */
+	@Deprecated
     public static final ActionFactory MAXIMIZE = new ActionFactory("maximize", //$NON-NLS-1$
     		IWorkbenchCommandConstants.WINDOW_MAXIMIZE_ACTIVE_VIEW_OR_EDITOR) {
 
@@ -638,11 +644,16 @@ public abstract class ActionFactory {
     };
 
 	/**
-	 * Workbench action (id: "minimize", commandId: "org.eclipse.ui.window.minimizePart"): Minimizes
-	 * the active part. This action maintains its enablement state.
+	 * Workbench action (id: "minimize", commandId:
+	 * "org.eclipse.ui.window.minimizePart"): Minimizes the active part. This
+	 * action maintains its enablement state.
 	 *
 	 * @since 3.1
+	 * @deprecated you should not use this field, that is kept for compatibility
+	 *             reasons. use instead the command
+	 *             {@code org.eclipse.ui.window.minimizePart}.
 	 */
+	@Deprecated
     public static final ActionFactory MINIMIZE = new ActionFactory("minimize", //$NON-NLS-1$
     		IWorkbenchCommandConstants.WINDOW_MINIMIZE_ACTIVE_VIEW_OR_EDITOR) {
 

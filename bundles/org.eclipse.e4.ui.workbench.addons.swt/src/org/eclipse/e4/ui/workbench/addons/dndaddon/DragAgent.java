@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2012 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -85,12 +85,13 @@ abstract class DragAgent {
 		// cache a placeholder where the element started (NOTE: this also prevents the parent from
 		// being auto-removed by going 'empty'
 		if (dragElement.getParent() != null) {
-			if (dragElement instanceof MStackElement)
+			if (dragElement instanceof MStackElement) {
 				dragPH = AdvancedFactoryImpl.eINSTANCE.createPlaceholder();
-			else if (dragElement instanceof MPartStack)
+			} else if (dragElement instanceof MPartStack) {
 				dragPH = BasicFactoryImpl.eINSTANCE.createPartSashContainer();
-			else if (dragElement instanceof MTrimElement)
+			} else if (dragElement instanceof MTrimElement) {
 				dragPH = MenuFactoryImpl.eINSTANCE.createToolControl();
+			}
 
 			dragPH.setElementId(DRAG_PLACEHOLDER_ID);
 			dragPH.setToBeRendered(false);
@@ -100,27 +101,25 @@ abstract class DragAgent {
 		}
 
 		dropAgent = dndManager.getDropAgent(dragElement, info);
-		if (dropAgent != null)
+		if (dropAgent != null) {
 			dropAgent.dragEnter(dragElement, info);
+		}
 	}
 
 	public void track(DnDInfo info) {
-		DropAgent curAgent = dropAgent;
-
-		// Re-use the same dropAgent until it returns 'false' from track
-		if (dropAgent != null)
-			dropAgent = dropAgent.track(dragElement, info) ? dropAgent : null;
-
-		// If we don't have a drop agent currently try to get one
-		if (dropAgent == null) {
-			if (curAgent != null)
-				curAgent.dragLeave(dragElement, info);
-
-			dropAgent = dndManager.getDropAgent(dragElement, info);
-
-			if (dropAgent != null)
+		DropAgent newDropAgent = dndManager.getDropAgent(dragElement, info);
+		if (newDropAgent == dropAgent) {
+			if (dropAgent != null) {
+				dropAgent.track(dragElement, info);
+			}
+		} else {
+			if (dropAgent != null) {
+				dropAgent.dragLeave(dragElement, info);
+			}
+			dropAgent = newDropAgent;
+			if (dropAgent != null) {
 				dropAgent.dragEnter(dragElement, info);
-			else {
+			} else {
 				dndManager.setCursor(Display.getCurrent().getSystemCursor(SWT.CURSOR_NO));
 			}
 		}
@@ -131,15 +130,17 @@ abstract class DragAgent {
 	 * original location in the model.
 	 */
 	public void cancelDrag() {
-		if (dragPH == null)
+		if (dragPH == null) {
 			return;
+		}
 
 		// if the dragElement is *not* directly after the placeholder we have to return it there
 		List<MUIElement> phParentsKids = dragPH.getParent().getChildren();
 		if (phParentsKids.indexOf(dragElement) != phParentsKids.indexOf(dragPH) + 1) {
 			dragElement.setToBeRendered(false);
-			if (dragElement.getParent() != null)
+			if (dragElement.getParent() != null) {
 				dragElement.getParent().getChildren().remove(dragElement);
+			}
 			phParentsKids.add(phParentsKids.indexOf(dragPH) + 1, dragElement);
 			dragElement.setVisible(true);
 			dragElement.setToBeRendered(true);
@@ -161,11 +162,13 @@ abstract class DragAgent {
 			cancelDrag();
 		}
 
-		if (dropAgent != null)
+		if (dropAgent != null) {
 			dropAgent.dragLeave(dragElement, info);
+		}
 
-		if (dragPH == null)
+		if (dragPH == null) {
 			return;
+		}
 
 		if (dragPH != null) {
 			dragPH.getParent().getChildren().remove(dragPH);

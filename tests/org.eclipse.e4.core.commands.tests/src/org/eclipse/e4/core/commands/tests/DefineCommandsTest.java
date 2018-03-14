@@ -16,8 +16,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.core.commands.Category;
 import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.IParameter;
+import org.eclipse.core.commands.IParameterValues;
+import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.e4.core.commands.CommandServiceAddon;
 import org.eclipse.e4.core.commands.ECommandService;
@@ -31,6 +37,7 @@ public class DefineCommandsTest {
 
 	private static final String TEST_ID2 = "test.id2";
 	private static final String TEST_ID1 = "test.id1";
+	private static final String TEST_ID1_WITH_PARAMETERS = "test.id1.with.parameters";
 	private static final String TEST_CAT1 = "test.cat1";
 
 	private IEclipseContext workbenchContext;
@@ -68,6 +75,47 @@ public class DefineCommandsTest {
 	}
 
 	@Test
+	public void testParamizedCommandsSimple() {
+		ECommandService cs = workbenchContext.get(ECommandService.class);
+		IParameter[] parms = new IParameter[1];
+		 parms[0] = new IParameter() {
+			@Override
+			public String getId() {
+				return "viewId";
+			}
+
+			@Override
+			public String getName() {
+				return "View Id";
+			}
+
+			@Override
+			public IParameterValues getValues() {
+				return null;
+			}
+
+			@Override
+			public boolean isOptional() {
+				return false;
+			}
+		};
+		// command needs to be defined
+		Category defineCategory = cs.defineCategory(TEST_CAT1, "CAT1", null);
+		Command command = cs.defineCommand(TEST_ID1_WITH_PARAMETERS, "TEST_ID1_WITH_PARAMETERS", null, defineCategory, parms);
+		Map<String, Object> parameters = new HashMap<>();
+		parameters.put("viewId", "Testing");
+		// afterwards it is possible to create a ParameterizedCommand
+		ParameterizedCommand createdParamizedCommand = cs.createCommand(TEST_ID1_WITH_PARAMETERS, parameters);
+		assertNotNull(command);
+		assertNotNull(createdParamizedCommand);
+		Command cmd1 = cs.getCommand(TEST_ID1_WITH_PARAMETERS);
+		assertNotNull("get command1", cmd1);
+	}
+
+
+
+
+	@Test
 	public void testCreateWithSecondContexts() {
 		IEclipseContext localContext = workbenchContext.createChild();
 		ECommandService cs = localContext.get(ECommandService.class);
@@ -99,7 +147,7 @@ public class DefineCommandsTest {
 		assertNotNull("command1", cs.defineCommand(TEST_ID1, "ID1", null, category, null));
 		assertNotNull("command2", cs.defineCommand(TEST_ID2, "ID2", null, category, null));
 
-		cs = (ECommandService) workbenchContext.get(ECommandService.class.getName());
+		cs = workbenchContext.get(ECommandService.class);
 		Command cmd1 = cs.getCommand(TEST_ID1);
 		assertNotNull("get command1", cmd1);
 		try {

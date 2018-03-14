@@ -21,7 +21,9 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -43,7 +45,6 @@ import org.eclipse.ui.internal.WorkbenchPage;
 import org.eclipse.ui.internal.ide.DialogUtil;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
-import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.part.FileEditorInput;
 
 import com.ibm.icu.text.Collator;
@@ -283,11 +284,11 @@ public class OpenWithMenu extends ContributionItem {
      * Converts the IAdaptable file to IFile or null.
      */
     private IFile getFileResource() {
-		IFile file = Util.getAdapter(adaptable, IFile.class);
+		IFile file = Adapters.adapt(adaptable, IFile.class);
 		if (file != null) {
 			return file;
         }
-		IResource resource = Util.getAdapter(adaptable, IResource.class);
+		IResource resource = Adapters.adapt(adaptable, IResource.class);
         if (resource instanceof IFile) {
             return (IFile) resource;
         }
@@ -343,17 +344,20 @@ public class OpenWithMenu extends ContributionItem {
 		menuItem.setSelection(markAsSelected);
         menuItem.setText(IDEWorkbenchMessages.DefaultEditorDescription_name);
 
+
         Listener listener = event -> {
 		    switch (event.type) {
 		    case SWT.Selection:
 		        if (menuItem.getSelection()) {
 		            IDE.setDefaultEditor(file, null);
 		            try {
-		                openEditor(IDE.getEditorDescriptor(file), false);
+						openEditor(IDE.getEditorDescriptor(file, true, true), false);
 		            } catch (PartInitException e) {
 		                DialogUtil.openError(page.getWorkbenchWindow()
 		                        .getShell(), IDEWorkbenchMessages.OpenWithMenu_dialogTitle,
 		                        e.getMessage(), e);
+					} catch (OperationCanceledException ex) {
+
 		            }
 		        }
 		        break;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2013 IBM Corporation and others.
+ * Copyright (c) 2011, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,8 +48,9 @@ public class SplitterAddon {
 			@UIEventTopic(UIEvents.ApplicationElement.TOPIC_TAGS) Event event) {
 		Object changedObj = event.getProperty(EventTags.ELEMENT);
 
-		if (!(changedObj instanceof MPart))
+		if (!(changedObj instanceof MPart)) {
 			return;
+		}
 
 		MPart part = (MPart) changedObj;
 
@@ -80,23 +81,27 @@ public class SplitterAddon {
 	 * @return The MCompositePart or 'null' if none is found
 	 */
 	public static MCompositePart findContainingCompositePart(MPart part) {
-		if (part == null)
+		if (part == null) {
 			return null;
+		}
 
 		MUIElement curParent = part.getParent();
-		while (curParent != null && !(curParent instanceof MCompositePart))
+		while (curParent != null && !(curParent instanceof MCompositePart)) {
 			curParent = curParent.getParent();
+		}
 
 		return (MCompositePart) curParent;
 	}
 
 	private void unsplitPart(MCompositePart compositePart) {
-		if (compositePart == null)
+		if (compositePart == null) {
 			return;
+		}
 
 		List<MPart> innerElements = ms.findElements(compositePart, null, MPart.class, null);
-		if (innerElements.size() < 3)
+		if (innerElements.size() < 3) {
 			return;
+		}
 
 		MPart originalEditor = innerElements.get(1); // '0' is the composite part
 
@@ -110,8 +115,9 @@ public class SplitterAddon {
 		originalEditor.getParent().getChildren().remove(originalEditor);
 		compParent.getChildren().add(index, originalEditor);
 
-		if (ps.getActivePart() == originalEditor)
+		if (ps.getActivePart() == originalEditor) {
 			ps.activate(null);
+		}
 		ps.activate(originalEditor);
 	}
 

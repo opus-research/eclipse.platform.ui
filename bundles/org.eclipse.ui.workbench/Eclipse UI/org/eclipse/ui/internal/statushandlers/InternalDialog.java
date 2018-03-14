@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * Copyright (c) 2009, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,15 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 473973
+ *     Friederike Schertel <friederike@schertel.org> - Bug 478336
  ******************************************************************************/
 package org.eclipse.ui.internal.statushandlers;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
@@ -368,6 +371,9 @@ public class InternalDialog extends TrayDialog {
 	}
 
 	void refreshDialogSize() {
+		if (dialogArea == null || dialogArea.isDisposed()) {
+			return;
+		}
 		Point newSize = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		getShell().setSize(newSize);
 	}
@@ -463,7 +469,6 @@ public class InternalDialog extends TrayDialog {
 
 	@Override
 	public Point getInitialLocation(Point initialSize) {
-		// TODO Auto-generated method stub
 		return super.getInitialLocation(initialSize);
 	}
 
@@ -973,7 +978,7 @@ public class InternalDialog extends TrayDialog {
 	private IAction getGotoAction() {
 		Object property = null;
 
-		Job job = (Job) (getCurrentStatusAdapter().getAdapter(Job.class));
+		Job job = Adapters.adapt(getCurrentStatusAdapter(), Job.class);
 		if (job != null) {
 			property = job.getProperty(IProgressConstants.ACTION_PROPERTY);
 		}
