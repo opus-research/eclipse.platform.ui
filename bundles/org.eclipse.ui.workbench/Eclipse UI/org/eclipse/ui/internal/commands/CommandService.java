@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.WeakHashMap;
 import org.eclipse.core.commands.Category;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.CommandManager;
@@ -30,7 +29,6 @@ import org.eclipse.core.commands.State;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.SafeRunner;
-import org.eclipse.e4.core.commands.internal.HandlerServiceHandler;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.IUpdateService;
 import org.eclipse.e4.ui.model.application.ui.menu.MItem;
@@ -88,8 +86,6 @@ public final class CommandService implements ICommandService, IUpdateService {
 	 * The persistence class for this command service.
 	 */
 	private final CommandPersistence commandPersistence;
-	
-	private final Map<IHandler, String> helpContextIdsByHandler = new WeakHashMap<IHandler, String>();
 
 	private IEclipseContext context;
 
@@ -186,22 +182,13 @@ public final class CommandService implements ICommandService, IUpdateService {
 
 	public final String getHelpContextId(final Command command)
 			throws NotDefinedException {
-		String helpContextId = null;
-		IHandler handler = command.getHandler();
-		if (handler instanceof HandlerServiceHandler) {
-			handler = ((HandlerServiceHandler) handler).getDirectHandler();
-		}
-		helpContextId = helpContextIdsByHandler.get(handler);
-		if (helpContextId == null) {
-			helpContextId = commandManager.getHelpContextId(command);
-		}
-		return helpContextId;
+		return commandManager.getHelpContextId(command);
 	}
 
 	public final String getHelpContextId(final String commandId)
 			throws NotDefinedException {
 		final Command command = getCommand(commandId);
-		return getHelpContextId(command);
+		return commandManager.getHelpContextId(command);
 	}
 
 	public ParameterType getParameterType(final String parameterTypeId) {
@@ -218,7 +205,7 @@ public final class CommandService implements ICommandService, IUpdateService {
 
 	public final void setHelpContextId(final IHandler handler,
 			final String helpContextId) {
-		helpContextIdsByHandler.put(handler, helpContextId);
+		commandManager.setHelpContextId(handler, helpContextId);
 	}
 
 	/**
