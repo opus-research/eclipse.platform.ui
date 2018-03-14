@@ -15,6 +15,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * RelaxedDuckType. Implements Duck Typing for Java.  ("If it walks like a duck,
@@ -29,12 +30,12 @@ import java.util.HashMap;
  */
 public class RelaxedDuckType extends DuckType implements InvocationHandler {
 
-	public static Object implement(Class interfaceToImplement, Object object) {
+	public static Object implement(Class<?> interfaceToImplement, Object object) {
 		return Proxy.newProxyInstance(interfaceToImplement.getClassLoader(),
 				new Class[] {interfaceToImplement}, new RelaxedDuckType(object));
 	}
 
-    public static boolean includes(Object object, String method, Class[] args) {
+	public static boolean includes(Object object, String method, Class<?>[] args) {
         try {
             object.getClass().getMethod(method, args);
         } catch (NoSuchMethodException e) {
@@ -43,7 +44,9 @@ public class RelaxedDuckType extends DuckType implements InvocationHandler {
         return true;
     }
 
-    private static final HashMap NULL_VALUES = new HashMap(); {
+	private static final Map<Class<?>, Object> NULL_VALUES = new HashMap<Class<?>, Object>();
+
+	{
         NULL_VALUES.put(Boolean.TYPE, Boolean.FALSE);
         NULL_VALUES.put(Integer.TYPE, new Integer(0));
         NULL_VALUES.put(Float.TYPE, new Float(0));

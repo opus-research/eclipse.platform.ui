@@ -23,9 +23,9 @@ import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
  * @since 3.2
  *
  */
-public class AggregateObservableValue extends AbstractObservableValue {
+public class AggregateObservableValue extends AbstractObservableValue<Object> {
 
-	private IObservableValue[] observableValues;
+	private IObservableValue<Object>[] observableValues;
 
 	private String delimiter;
 
@@ -33,9 +33,9 @@ public class AggregateObservableValue extends AbstractObservableValue {
 
 	private String currentValue;
 
-	private IValueChangeListener listener = new IValueChangeListener() {
+	private IValueChangeListener<Object> listener = new IValueChangeListener<Object>() {
 		@Override
-		public void handleValueChange(ValueChangeEvent event) {
+		public void handleValueChange(ValueChangeEvent<? extends Object> event) {
 			if (!updating) {
 				fireValueChange(Diffs.createValueDiff(currentValue,
 						doGetValue()));
@@ -47,7 +47,7 @@ public class AggregateObservableValue extends AbstractObservableValue {
 	 * @param observableValues
 	 * @param delimiter
 	 */
-	public AggregateObservableValue(IObservableValue[] observableValues,
+	public AggregateObservableValue(IObservableValue<Object>[] observableValues,
 			String delimiter) {
 		this.observableValues = observableValues;
 		this.delimiter = delimiter;

@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.jface.examples.databinding.mask.internal;
 
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -29,11 +30,11 @@ public class WorkQueue {
 
     private boolean paintListenerAttached = false;
 
-    private LinkedList pendingWork = new LinkedList();
+	private Deque<Runnable> pendingWork = new LinkedList<Runnable>();
 
     private Display d;
 
-    private Set pendingWorkSet = new HashSet();
+	private Set<Runnable> pendingWorkSet = new HashSet<Runnable>();
 
     private Runnable updateJob = new Runnable() {
         @Override
@@ -66,7 +67,7 @@ public class WorkQueue {
                 if (pendingWork.isEmpty()) {
                     break;
                 }
-                next = (Runnable) pendingWork.removeFirst();
+				next = pendingWork.removeFirst();
                 pendingWorkSet.remove(next);
             }
 
