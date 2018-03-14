@@ -30,13 +30,17 @@ public class WindowActionDelegate implements IWorkbenchWindowActionDelegate {
 
     private ISelection selection;
 
-    @Override
-	public void dispose() {
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchActionDelegate
+     */
+    public void dispose() {
         // do nothing
     }
 
-    @Override
-	public void init(IWorkbenchWindow window) {
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchActionDelegate
+     */
+    public void init(IWorkbenchWindow window) {
         this.window = window;
     }
 
@@ -46,8 +50,7 @@ public class WindowActionDelegate implements IWorkbenchWindowActionDelegate {
      * launches a stand-alone dialog that contains a list of sections for
      * the selected readme file in the navigator.
      */
-    @Override
-	public void run(IAction action) {
+    public void run(IAction action) {
         SectionsDialog dialog = new SectionsDialog(window.getShell(),
                 ReadmeModelFactory.getInstance().getSections(selection));
         dialog.open();
@@ -59,8 +62,7 @@ public class WindowActionDelegate implements IWorkbenchWindowActionDelegate {
      * does nothing - we will let simple rules in the XML
      * config file react to selections.
      */
-    @Override
-	public void selectionChanged(IAction action, ISelection selection) {
+    public void selectionChanged(IAction action, ISelection selection) {
         this.selection = selection;
     }
 }
