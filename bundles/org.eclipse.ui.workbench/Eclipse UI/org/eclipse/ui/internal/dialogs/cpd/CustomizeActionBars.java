@@ -148,13 +148,13 @@ public class CustomizeActionBars implements IActionBarConfigurer2, IActionBars2 
 	 * Clean up the action bars.
 	 */
 	public void dispose() {
-		app.getChildren().remove(windowModel);
 		coolBarManager.dispose();
 		menuManager.dispose();
 		statusLineManager.dispose();
 		windowModel.getContext().deactivate();
 		windowModel.getContext().dispose();
 		((Shell) windowModel.getWidget()).dispose();
+		app.getChildren().remove(windowModel);
 	}
 
 	@Override
