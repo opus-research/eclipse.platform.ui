@@ -15,8 +15,7 @@ import org.eclipse.jface.viewers.ViewerSorter;
 
 public class Sorter extends ViewerSorter {
 
-	@Override
-	public boolean isSorterProperty(Object element, String property) {
-		return IBasicPropertyConstants.P_TEXT.equals(property);
-	}
+    public boolean isSorterProperty(Object element, String property) {
+        return IBasicPropertyConstants.P_TEXT.equals(property);
+    }
 }

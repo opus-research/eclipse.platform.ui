@@ -41,33 +41,39 @@ public class VirtualTableView extends ViewPart {
 		super();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createPartControl(Composite parent) {
 
 		viewer = new TableViewer(parent, SWT.VIRTUAL);
 		viewer.setContentProvider(getContentProvider());
 		viewer.setInput(this);
 		viewer.setItemCount(itemCount);
-
-		Composite buttonComposite = new Composite(parent, SWT.NONE);
+		
+		Composite buttonComposite = new Composite(parent,SWT.NONE);
 		buttonComposite.setLayout(new GridLayout());
 
-		Button resetInput = new Button(buttonComposite, SWT.PUSH);
+		Button resetInput = new Button(buttonComposite,SWT.PUSH);
 		resetInput.setText("Reset input");
-		resetInput.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
+		resetInput.addSelectionListener(new SelectionAdapter(){
+			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e){
 				resetInput();
 			}
 		});
-
+		
 		Button delete = new Button(buttonComposite, SWT.PUSH);
 		delete.setText("Delete selection");
 		delete.addSelectionListener(new SelectionAdapter() {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+			 */
 			public void widgetSelected(SelectionEvent e) {
-				Object[] selection = ((IStructuredSelection) viewer
-						.getSelection()).toArray();
+				Object[] selection = ((IStructuredSelection) viewer.getSelection()).toArray();
 				doRemove(selection, viewer.getTable().getSelectionIndices());
 			}
 		});
@@ -85,13 +91,21 @@ public class VirtualTableView extends ViewPart {
 	 */
 	protected IContentProvider getContentProvider() {
 		return new IStructuredContentProvider() {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+			 */
 			public void dispose() {
 				// Nothing to do here.
 
 			}
 
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+			 */
 			public Object[] getElements(Object inputElement) {
 				String[] elements = new String[itemCount];
 				for (int i = 0; i < itemCount; i++) {
@@ -100,7 +114,12 @@ public class VirtualTableView extends ViewPart {
 				return elements;
 			}
 
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
+			 *      java.lang.Object, java.lang.Object)
+			 */
 			public void inputChanged(Viewer viewer, Object oldInput,
 					Object newInput) {
 				// Nothing to do here.
@@ -109,7 +128,11 @@ public class VirtualTableView extends ViewPart {
 		};
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPart#setFocus()
+	 */
 	public void setFocus() {
 		viewer.getTable().setFocus();
 

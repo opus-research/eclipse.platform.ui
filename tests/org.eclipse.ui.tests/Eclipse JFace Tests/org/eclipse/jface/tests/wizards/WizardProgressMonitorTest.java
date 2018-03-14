@@ -27,7 +27,6 @@ public class WizardProgressMonitorTest extends TestCase {
 
 	private ProgressMonitoringWizardDialog dialog;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		// initialize a display
@@ -36,7 +35,6 @@ public class WizardProgressMonitorTest extends TestCase {
 		dialog.setBlockOnOpen(false);
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		if (dialog != null) {
 			dialog.close();
@@ -89,7 +87,6 @@ public class WizardProgressMonitorTest extends TestCase {
 	
 	protected IRunnableWithProgress getRunnable(final String taskName) {
 		return new IRunnableWithProgress() {
-			@Override
 			public void run(IProgressMonitor monitor) {
 				
 				// check that the label is empty
@@ -120,7 +117,6 @@ public class WizardProgressMonitorTest extends TestCase {
 			super(null, newWizard);
 		}
 
-		@Override
 		protected ProgressMonitorPart createProgressMonitorPart(
 				Composite composite, GridLayout pmlayout) {
 			return new ProgressMonitorPartSubclass(composite, pmlayout, useStopButton);
