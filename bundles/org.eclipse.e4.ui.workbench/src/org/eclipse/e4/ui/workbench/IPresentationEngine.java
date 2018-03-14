@@ -182,15 +182,7 @@ public interface IPresentationEngine {
 	 * This is a persistedState 'key' whose value is expected to be the URI of a subclass of
 	 * ABstractPartRenderer that is to be used to render the element
 	 */
-	static final String CUSTOM_RENDERER_KEY = "Custom Renderer"; //$NON-NLS-1$	
-
-	/**
-	 * This is a persistedState 'key' which can be used by the renderer implementation to decide
-	 * that a user interface element has been hidden by the user
-	 * 
-	 * @since 1.1
-	 */
-	public static final String HIDDEN_BY_USER = "HIDDEN_BY_USER"; //$NON-NLS-1$	
+	public static final String CUSTOM_RENDERER_KEY = "Custom Renderer"; //$NON-NLS-1$	
 
 	/**
 	 * Creates and returns the UI element for the given model element.

@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 410426
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 426535 
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -49,7 +48,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.services.IServiceConstants;
-import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.Selector;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.ElementContainer;
@@ -68,9 +66,6 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
@@ -104,11 +99,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	private Map<MToolBarElement, ArrayList<ToolBarContributionRecord>> sharedElementToRecord = new HashMap<MToolBarElement, ArrayList<ToolBarContributionRecord>>();
 
 	private ToolItemUpdater enablementUpdater = new ToolItemUpdater();
-
-	/**
-	 * The context menu for this trim stack's items.
-	 */
-	private Menu toolbarMenu;
 
 	// @Inject
 	// private Logger logger;
@@ -362,30 +352,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			}
 		}
 
-		createToolbarMenu(toolbarModel, renderedCtrl);
-
 		return renderedCtrl;
-	}
-
-	private void createToolbarMenu(final MToolBar toolbarModel,
-			Control renderedCtrl) {
-		toolbarMenu = new Menu(renderedCtrl);
-		MenuItem closeItem = new MenuItem(toolbarMenu, SWT.NONE);
-		closeItem.setText(Messages.ToolBarManagerRenderer_MenuCloseText);
-		closeItem.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(org.eclipse.swt.widgets.Event event) {
-				toolbarModel.getTags().add(IPresentationEngine.HIDDEN_BY_USER);
-			}
-		});
-
-		MenuItem restoreItem = new MenuItem(toolbarMenu, SWT.NONE);
-		restoreItem.setText(Messages.ToolBarManagerRenderer_MenuRestoreText);
-		closeItem.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(org.eclipse.swt.widgets.Event event) {
-				// TODO remove all tags from toolbar entries
-			}
-		});
-		renderedCtrl.setMenu(toolbarMenu);
 	}
 
 	/**
@@ -507,7 +474,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		bar.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
 				cleanUp((MToolBar) element);
-				toolbarMenu = null;
 			}
 		});
 		return bar;
@@ -968,5 +934,4 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	ToolItemUpdater getUpdater() {
 		return enablementUpdater;
 	}
-
 }
