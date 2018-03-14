@@ -17,10 +17,12 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.IWorkingSetManager;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.dialogs.IWorkingSetSelectionDialog;
 import org.eclipse.ui.dialogs.WorkingSetConfigurationBlock;
@@ -110,16 +112,19 @@ public class IWorkingSetManagerTest extends UITestCase {
 
         resetChangeData();
         fWorkingSetManager.removeWorkingSet(fWorkingSet);
+		processEvents();
         assertEquals("", fChangeProperty);
 
         resetChangeData();
         fWorkingSetManager.addWorkingSet(fWorkingSet);
+		processEvents();
         assertEquals(IWorkingSetManager.CHANGE_WORKING_SET_ADD, fChangeProperty);
         assertEquals(null, fChangeOldValue);
         assertEquals(fWorkingSet, fChangeNewValue);
 
         resetChangeData();
         fWorkingSetManager.removeWorkingSet(fWorkingSet);
+		processEvents();
         assertEquals(IWorkingSetManager.CHANGE_WORKING_SET_REMOVE,
                 fChangeProperty);
         assertEquals(fWorkingSet, fChangeOldValue);
@@ -130,11 +135,13 @@ public class IWorkingSetManagerTest extends UITestCase {
 		// This will allow us to test for the name property apart from the label
 		// property
 		fWorkingSet.setLabel(WORKING_SET_NAME_3);
+		processEvents();
 		assertEquals(IWorkingSetManager.CHANGE_WORKING_SET_LABEL_CHANGE,
 				fChangeProperty);
 		assertEquals(WORKING_SET_NAME_1, fChangeOldValue.getLabel());
 		assertEquals(fWorkingSet, fChangeNewValue);
 		fWorkingSet.setName(WORKING_SET_NAME_2);
+		processEvents();
 		assertEquals(IWorkingSetManager.CHANGE_WORKING_SET_NAME_CHANGE,
 				fChangeProperty);
 		assertEquals(WORKING_SET_NAME_1, fChangeOldValue.getName());
@@ -142,6 +149,7 @@ public class IWorkingSetManagerTest extends UITestCase {
 
         resetChangeData();
         fWorkingSet.setElements(new IAdaptable[] {});
+		processEvents();
         assertEquals(IWorkingSetManager.CHANGE_WORKING_SET_CONTENT_CHANGE,
                 fChangeProperty);
 		assertEquals(1, fChangeOldValue.getElements().length);
@@ -421,6 +429,7 @@ public class IWorkingSetManagerTest extends UITestCase {
 					new IAdaptable[0]);
 			fWorkingSetManager.addWorkingSet(set);
 
+			processEvents();
 			assertTrue("Good listener wasn't invoked", result[0]);
 		} finally {
 			fWorkingSetManager.removePropertyChangeListener(badListener);
@@ -532,5 +541,13 @@ public class IWorkingSetManagerTest extends UITestCase {
 			}
 		};
 
+	}
+
+	public static void processEvents() {
+		Display display = PlatformUI.getWorkbench().getDisplay();
+		if (display != null) {
+			while (display.readAndDispatch()) {
+			}
+		}
 	}
 }
