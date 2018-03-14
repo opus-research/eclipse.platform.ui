@@ -746,7 +746,6 @@ public class WBWRenderer extends SWTPartRenderer {
 			shell.setMinimized(true);
 
 		shell.layout(true);
-		forceLayout(shell);
 		if (shellME.isVisible()) {
 			shell.open();
 		} else {
@@ -891,18 +890,6 @@ public class WBWRenderer extends SWTPartRenderer {
 					&& !((Resource) resource).isDisposed()) {
 				((Resource) resource).dispose();
 			}
-		}
-	}
-
-	private static void forceLayout(Shell shell) {
-		int i = 0;
-		while(shell.isLayoutDeferred()) {
-			shell.setLayoutDeferred(false);
-			i++;
-		}
-		while(i > 0) {
-			shell.setLayoutDeferred(true);
-			i--;
 		}
 	}
 }
