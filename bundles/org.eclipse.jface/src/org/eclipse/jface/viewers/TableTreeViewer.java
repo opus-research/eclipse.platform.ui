@@ -49,13 +49,14 @@ import org.eclipse.swt.widgets.Widget;
  * </p>
  * <p>
  * Label providers for table tree viewers must implement either the
- * <code>ITableLabelProvider</code> or the <code>ILabelProvider</code>
- * interface (see <code>TableTreeViewer.setLabelProvider</code> for more
- * details).
+ * <code>ITableLabelProvider</code> or the <code>ILabelProvider</code> interface
+ * (see <code>TableTreeViewer.setLabelProvider</code> for more details).
  * </p>
  *
  * @deprecated As of 3.1 use {@link TreeViewer} instead
  * @noextend This class is not intended to be subclassed by clients.
+ *
+ * @noreference This class is planned to be deleted, see Bug 436505.
  */
 @Deprecated
 public class TableTreeViewer extends AbstractTreeViewer {
