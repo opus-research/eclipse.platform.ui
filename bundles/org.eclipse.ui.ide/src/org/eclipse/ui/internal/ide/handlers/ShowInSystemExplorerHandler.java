@@ -116,7 +116,7 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 		}
 		return resource;
 	}
-	
+
 	private IResource getSelectionResource(ExecutionEvent event) {
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
 		if ((selection == null) || (selection.isEmpty())
@@ -126,7 +126,7 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 
 		Object selectedObject = ((IStructuredSelection) selection)
 				.getFirstElement();
-		IResource item = (IResource) org.eclipse.ui.internal.util.Util
+		IResource item = org.eclipse.ui.internal.util.Util
 				.getAdapter(selectedObject, IResource.class);
 		return item;
 	}
@@ -140,12 +140,12 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 		if (input instanceof IFileEditorInput) {
 			return ((IFileEditorInput)input).getFile();
 		}
-		return (IResource) input.getAdapter(IResource.class);
+		return input.getAdapter(IResource.class);
 	}
 
 	/**
 	 * Prepare command for launching system explorer to show a path
-	 * 
+	 *
 	 * @param path
 	 *            the path to show
 	 * @return the command that shows the path
@@ -153,7 +153,7 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 	private String formShowInSytemExplorerCommand(File path) throws IOException {
 		String command = IDEWorkbenchPlugin.getDefault().getPreferenceStore()
 				.getString(IDEInternalPreferences.WORKBENCH_SYSTEM_EXPLORER);
-		
+
 		command = Util.replaceAll(command, VARIABLE_RESOURCE, quotePath(path.getCanonicalPath()));
 		command = Util.replaceAll(command, VARIABLE_RESOURCE_URI, path.getCanonicalFile().toURI().toString());
 		File parent = path.getParentFile();
@@ -175,7 +175,7 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 	/**
 	 * Returns the path used for a resource when showing it in the system
 	 * explorer
-	 * 
+	 *
 	 * @see File#getCanonicalPath()
 	 * @param resource
 	 *            the {@link IResource} object to be used
@@ -193,12 +193,12 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 
 	/**
 	 * The default command for launching the system explorer on this platform.
-	 * 
+	 *
 	 * @return The default command which launches the system explorer on this system, or an empty
 	 *         string if no default exists
 	 */
 	public static String getDefaultCommand() {
-		// See https://bugs.eclipse.org/419940 why it is implemented in IDEPreferenceInitializer 
+		// See https://bugs.eclipse.org/419940 why it is implemented in IDEPreferenceInitializer
 		return IDEPreferenceInitializer.getShowInSystemExplorerCommand();
 	}
 }

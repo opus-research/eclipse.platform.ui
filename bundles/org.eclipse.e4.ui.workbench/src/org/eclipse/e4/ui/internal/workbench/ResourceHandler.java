@@ -83,7 +83,7 @@ public class ResourceHandler implements IModelResourceHandler {
 	/**
 	 * Dictates whether the model should be stored using EMF or with the merging algorithm.
 	 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=295524
-	 * 
+	 *
 	 */
 	final private boolean deltaRestore;
 	final private boolean saveAndRestore;
@@ -91,7 +91,7 @@ public class ResourceHandler implements IModelResourceHandler {
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param saveAndRestore
 	 * @param clearPersistedState
 	 * @param deltaRestore
@@ -241,12 +241,6 @@ public class ResourceHandler implements IModelResourceHandler {
 		}
 		if (resource == null) {
 			Resource applicationResource = loadResource(applicationDefinitionInstance);
-			if (!hasTopLevelWindows(applicationResource) && logger != null) {
-				logger.error(
-						new Exception(), // log a stack trace to help debug the corruption
-						"Initializing from the application definition instance yields no top-level windows! " //$NON-NLS-1$
-								+ "Continuing execution, but the missing windows may cause other initialization failures."); //$NON-NLS-1$
-			}
 			MApplication theApp = (MApplication) applicationResource.getContents().get(0);
 			resource = createResourceWithApp(theApp);
 			context.set(E4Workbench.NO_SAVED_MODEL_FOUND, Boolean.TRUE);
@@ -263,6 +257,13 @@ public class ResourceHandler implements IModelResourceHandler {
 		ModelAssembler contribProcessor = ContextInjectionFactory.make(ModelAssembler.class,
 				context);
 		contribProcessor.processModel(initialModel);
+
+		if (!hasTopLevelWindows(resource) && logger != null) {
+			logger.error(new Exception(), // log a stack trace to help debug the
+											// corruption
+					"Initializing from the application definition instance yields no top-level windows! " //$NON-NLS-1$
+							+ "Continuing execution, but the missing windows may cause other initialization failures."); //$NON-NLS-1$
+		}
 
 		if (!clearPersistedState) {
 			CommandLineOptionModelProcessor processor = ContextInjectionFactory.make(
@@ -281,7 +282,7 @@ public class ResourceHandler implements IModelResourceHandler {
 
 	/**
 	 * Creates a resource with an app Model, used for saving copies of the main app model.
-	 * 
+	 *
 	 * @param theApp
 	 *            the application model to add to the resource
 	 * @return a resource with a proper save path with the model as contents
