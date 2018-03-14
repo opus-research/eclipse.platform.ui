@@ -14,11 +14,12 @@ import org.eclipse.swt.graphics.Font;
 
 /**
  * Interface to provide font representation for a given element.
+ * @param <E> Type of an element of the model
  * @see org.eclipse.jface.viewers.IFontDecorator
  *
  * @since 3.0
  */
-public interface IFontProvider {
+public interface IFontProvider<E> {
 
     /**
      * Provides a font for the given element.
@@ -27,5 +28,5 @@ public interface IFontProvider {
      * @return the font for the element, or <code>null</code>
      *   to use the default font
      */
-    public Font getFont(Object element);
+    public Font getFont(E element);
 }

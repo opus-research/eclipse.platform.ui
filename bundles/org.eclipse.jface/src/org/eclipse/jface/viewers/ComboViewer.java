@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Sebastian Davids - bug 69254
+ *     Hendrik Still <hendrik.still@gammas.de> - bug 412273
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430873
  *******************************************************************************/
 
@@ -21,20 +22,27 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 /**
- * A concrete viewer based either on an SWT <code>Combo</code> control or <code>CCombo</code>
- * control. This class is intended as an alternative to the JFace <code>ListViewer</code>, which displays
- * its content in a combo box rather than a list. Wherever possible, this class attempts to behave
- * like ListViewer. <p>
+ * A concrete viewer based either on an SWT <code>Combo</code> control or
+ * <code>CCombo</code> control. This class is intended as an alternative to the
+ * JFace <code>ListViewer</code>, which displays its content in a combo box
+ * rather than a list. Wherever possible, this class attempts to behave like
+ * ListViewer.
+ * <p>
  *
- * This class is designed to be instantiated with a pre-existing SWT combo control
- * and configured with a domain-specific content provider, label provider, element
- * filter (optional), and element sorter (optional).
+ * This class is designed to be instantiated with a pre-existing SWT combo
+ * control and configured with a domain-specific content provider, label
+ * provider, element filter (optional), and element sorter (optional).
  * </p>
- *
+ * 
+ * @param <E>
+ *            Type of an element of the model
+ * @param <I>
+ *            Type of the input
+ * 
  * @see org.eclipse.jface.viewers.ListViewer
  * @since 3.0 (made non-final in 3.4)
  */
-public class ComboViewer extends AbstractListViewer {
+public class ComboViewer<E,I>  extends AbstractListViewer<E,I> {
 
     /**
      * This viewer's list control if this viewer is instantiated with a combo control; otherwise
