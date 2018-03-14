@@ -336,8 +336,10 @@ public abstract class ActionFactory {
 					.setHelp(action, IWorkbenchHelpContextIds.INTRO_ACTION);
 			IntroDescriptor introDescriptor = ((Workbench) window.getWorkbench())
 					.getIntroDescriptor();
-			if (introDescriptor != null)
+			if (introDescriptor != null) {
 				action.setImageDescriptor(introDescriptor.getImageDescriptor());
+				action.setText(introDescriptor.getLabelOverride());
+			}
 
 			return action;
         }
