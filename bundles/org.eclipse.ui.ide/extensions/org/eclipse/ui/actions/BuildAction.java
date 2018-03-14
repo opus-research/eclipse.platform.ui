@@ -288,9 +288,10 @@ public class BuildAction extends WorkspaceAction {
 				} catch (CoreException e) {
 					status = e.getStatus();
 				}
-				if (progress.isCanceled()) {
+				if (monitor.isCanceled()) {
 					throw new OperationCanceledException();
 				}
+				monitor.done();
 				return status == null ? Status.OK_STATUS : status;
 			}
 		};
