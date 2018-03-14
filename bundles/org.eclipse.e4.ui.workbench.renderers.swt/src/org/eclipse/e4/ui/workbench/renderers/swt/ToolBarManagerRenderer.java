@@ -49,7 +49,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.ElementContainer;
-import org.eclipse.e4.ui.workbench.UIEvents.Selector;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.action.AbstractGroupMarker;
 import org.eclipse.jface.action.ContributionItem;
@@ -237,35 +236,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	void dirtyChanged(
 			@UIEventTopic(UIEvents.Dirtyable.TOPIC_DIRTY) Event eventData) {
 		updateEnablement();
-	}
-
-	@Inject
-	@Optional
-	void updateRequest(
-			@UIEventTopic(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC) Event eventData) {
-		final Object v = eventData.getProperty(IEventBroker.DATA);
-		Selector s;
-		if (v instanceof Selector) {
-			s = (Selector) v;
-		} else {
-			if (v == null || UIEvents.ALL_ELEMENT_ID.equals(v)) {
-				s = new Selector() {
-
-					public boolean select(MApplicationElement element) {
-						return true;
-					}
-				};
-			} else {
-				s = new Selector() {
-
-					public boolean select(MApplicationElement element) {
-						return v.equals(element.getElementId());
-					}
-				};
-			}
-		}
-
-		getUpdater().updateContributionItems(s);
 	}
 
 	@PostConstruct
