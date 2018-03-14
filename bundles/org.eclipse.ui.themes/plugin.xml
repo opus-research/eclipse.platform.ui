@@ -15,23 +15,10 @@
             label="%theme.classic">
       </theme>
     <theme
-        basestylesheeturi="css/e4-dark.css"
-        id="org.eclipse.e4.ui.css.theme.e4_dark"
-        label="%theme.dark"
-        os="linux">
-    </theme>
-    <theme
-        basestylesheeturi="css/e4-dark_win.css"
-        id="org.eclipse.e4.ui.css.theme.e4_dark"
-        label="%theme.dark"
-        os="win32">
-    </theme>
-    <theme
-        basestylesheeturi="css/e4-dark_mac.css"
-        id="org.eclipse.e4.ui.css.theme.e4_dark"
-        label="%theme.dark"
-        os="macosx">
-    </theme>
+            basestylesheeturi="css/e4-dark.css"
+            id="org.eclipse.ui.theme.e4_dark"
+            label="%theme.dark">
+      </theme>
       <theme
             basestylesheeturi="css/e4_default_gtk.css"
             id="org.eclipse.e4.ui.css.theme.e4_default"
@@ -65,7 +52,7 @@
       </theme>
       <theme
             basestylesheeturi="css/e4_default_winxp_blu.css"
-            id="org.eclipse.e4.ui.css.theme.e4_default.xpblu"
+            id="org.eclipse.e4.ui.css.theme.e4_default"
             label="%theme.winxpBlue"
             os="win32">
       </theme>
@@ -82,12 +69,12 @@
          os="win32"
          os_version="6.1">
    </theme>
-
-   <themeAssociation
+      
+   <themeAssociation 
 		themeId="org.eclipse.e4.ui.css.theme.e4_classic"
 		colorAndFontId="org.eclipse.ui.defaultTheme">
-   </themeAssociation>
-
+   </themeAssociation>   
+   
    </extension>
 
 </plugin>
