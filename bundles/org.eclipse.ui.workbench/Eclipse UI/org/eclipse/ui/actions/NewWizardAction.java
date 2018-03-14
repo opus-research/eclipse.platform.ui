@@ -112,8 +112,7 @@ public class NewWizardAction extends Action implements
      * 
      * @deprecated use the constructor <code>NewWizardAction(IWorkbenchWindow)</code>
      */
-    @Deprecated
-	public NewWizardAction() {
+    public NewWizardAction() {
         this(PlatformUI.getWorkbench().getActiveWorkbenchWindow());
     }
 
@@ -158,8 +157,7 @@ public class NewWizardAction extends Action implements
     /* (non-Javadoc)
      * Method declared on IAction.
      */
-    @Override
-	public void run() {
+    public void run() {
         if (workbenchWindow == null) {
             // action has been disposed
             return;
@@ -217,8 +215,7 @@ public class NewWizardAction extends Action implements
      * Method declared on ActionFactory.IWorkbenchAction.
      * @since 3.0
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         if (workbenchWindow == null) {
             // action has already been disposed
             return;

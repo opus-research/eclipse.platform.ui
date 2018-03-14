@@ -129,7 +129,6 @@ public final class HandlerSubmission implements Comparable {
     /**
      * @see Comparable#compareTo(java.lang.Object)
      */
-	@Override
 	@Deprecated
     public int compareTo(Object object) {
         HandlerSubmission castedObject = (HandlerSubmission) object;
@@ -230,8 +229,7 @@ public final class HandlerSubmission implements Comparable {
     /**
      * @see Object#toString()
      */
-    @Override
-	public String toString() {
+    public String toString() {
         if (string == null) {
             final StringBuffer stringBuffer = new StringBuffer();
             stringBuffer.append("[activePartId="); //$NON-NLS-1$

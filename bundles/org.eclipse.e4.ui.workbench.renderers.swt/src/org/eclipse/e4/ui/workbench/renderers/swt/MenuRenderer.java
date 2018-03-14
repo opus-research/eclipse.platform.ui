@@ -48,7 +48,6 @@ public class MenuRenderer extends SWTPartRenderer {
 		application = context.get(MApplication.class);
 	}
 
-	@Override
 	public Object createWidget(final MUIElement element, Object parent) {
 		if (!(element instanceof MMenu))
 			return null;
@@ -62,7 +61,6 @@ public class MenuRenderer extends SWTPartRenderer {
 			if (container instanceof MWindow) {
 				newMenu = new Menu((Decorations) parent, SWT.BAR);
 				newMenu.addDisposeListener(new DisposeListener() {
-					@Override
 					public void widgetDisposed(DisposeEvent e) {
 						cleanUp(menuModel);
 					}

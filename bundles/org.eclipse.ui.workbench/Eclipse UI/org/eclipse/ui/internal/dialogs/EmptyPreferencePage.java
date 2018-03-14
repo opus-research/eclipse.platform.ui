@@ -25,8 +25,7 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
  */
 public class EmptyPreferencePage extends PreferencePage implements
         IWorkbenchPreferencePage {
-    @Override
-	protected Control createContents(Composite parent) {
+    protected Control createContents(Composite parent) {
         return new Composite(parent, SWT.NULL);
     }
 
@@ -34,15 +33,13 @@ public class EmptyPreferencePage extends PreferencePage implements
      * Hook method to get a page specific preference store. Reimplement this
      * method if a page don't want to use its parent's preference store.
      */
-    @Override
-	protected IPreferenceStore doGetPreferenceStore() {
+    protected IPreferenceStore doGetPreferenceStore() {
         return WorkbenchPlugin.getDefault().getPreferenceStore();
     }
 
     /**
      * @see IWorkbenchPreferencePage
      */
-    @Override
-	public void init(IWorkbench workbench) {
+    public void init(IWorkbench workbench) {
     }
 }

@@ -64,7 +64,7 @@ import org.eclipse.ui.internal.util.BundleUtility;
  */
 public/*final*/class WorkbenchImages {
 
-	private static Map<String, ImageDescriptor> descriptors;
+    private static Map descriptors;
 
     private static ImageRegistry imageRegistry;
 
@@ -453,8 +453,7 @@ public/*final*/class WorkbenchImages {
      * 
      * @deprecated As of 3.0, since the workbench itself no longer uses the hover image variants
      */
-    @Deprecated
-	private final static void declareHoverImages() {
+    private final static void declareHoverImages() {
         declareImage(ISharedImages.IMG_TOOL_UNDO_HOVER, PATH_ETOOL
         		+ "undo_edit.png", true); //$NON-NLS-1$
         declareImage(ISharedImages.IMG_TOOL_REDO_HOVER, PATH_ETOOL
@@ -525,7 +524,7 @@ public/*final*/class WorkbenchImages {
      * 
      * @return the map from symbolic name to ImageDescriptor.
      */
-	public static Map<String, ImageDescriptor> getDescriptors() {
+    public static Map getDescriptors() {
         if (descriptors == null) {
             initializeImageRegistry();
         }
@@ -563,7 +562,7 @@ public/*final*/class WorkbenchImages {
      * @return the image descriptor 
      */
     public static ImageDescriptor getImageDescriptor(String symbolicName) {
-		return getDescriptors().get(symbolicName);
+        return (ImageDescriptor) getDescriptors().get(symbolicName);
     }
 
     /**
@@ -631,7 +630,7 @@ public/*final*/class WorkbenchImages {
 	 */
     private static void initializeImageRegistry() {
         imageRegistry = new ImageRegistry();
-		descriptors = new HashMap<String, ImageDescriptor>();
+        descriptors = new HashMap();
         declareImages();
     }
     

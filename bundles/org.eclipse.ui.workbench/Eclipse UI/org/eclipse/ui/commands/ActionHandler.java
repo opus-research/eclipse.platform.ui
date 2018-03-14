@@ -107,7 +107,6 @@ public final class ActionHandler extends AbstractHandler {
      * @see org.eclipse.ui.commands.IHandler#addHandlerListener(org.eclipse.ui.commands.IHandlerListener)
      * @since 3.1
      */
-	@Override
 	@Deprecated
     public void addHandlerListener(IHandlerListener handlerListener) {
         if (!hasListeners()) {
@@ -128,8 +127,7 @@ public final class ActionHandler extends AbstractHandler {
             attributeValuesByName = getAttributeValuesByNameFromAction();
 
             propertyChangeListener = new IPropertyChangeListener() {
-                @Override
-				public void propertyChange(
+                public void propertyChange(
                         PropertyChangeEvent propertyChangeEvent) {
                     String property = propertyChangeEvent.getProperty();
                     if (IAction.ENABLED.equals(property)
@@ -171,7 +169,6 @@ public final class ActionHandler extends AbstractHandler {
      * 
      * @see org.eclipse.ui.commands.IHandler#dispose()
      */
-	@Override
 	@Deprecated
     public void dispose() {
         if (hasListeners()) {
@@ -183,7 +180,6 @@ public final class ActionHandler extends AbstractHandler {
     /* (non-Javadoc)
      * @see org.eclipse.ui.commands.IHandler#execute(java.util.Map)
      */
-	@Override
 	@Deprecated
     public Object execute(Map parameterValuesByName) throws ExecutionException {
         if ((action.getStyle() == IAction.AS_CHECK_BOX)
@@ -213,7 +209,6 @@ public final class ActionHandler extends AbstractHandler {
     /* (non-Javadoc)
      * @see org.eclipse.ui.commands.IHandler#getAttributeValuesByName()
      */
-	@Override
 	@Deprecated
     public Map getAttributeValuesByName() {
         if (attributeValuesByName == null) {
@@ -252,7 +247,6 @@ public final class ActionHandler extends AbstractHandler {
      * @see org.eclipse.ui.commands.IHandler#removeHandlerListener(org.eclipse.ui.commands.IHandlerListener)
      * @since 3.1
      */
-	@Override
 	@Deprecated
     public void removeHandlerListener(IHandlerListener handlerListener) {
         super.removeHandlerListener(handlerListener);
@@ -265,7 +259,6 @@ public final class ActionHandler extends AbstractHandler {
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
-	@Override
 	@Deprecated
 	public final String toString() {
 		final StringBuffer buffer = new StringBuffer();
