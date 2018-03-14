@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -104,7 +104,7 @@ public class ColumnViewerEditorActivationEvent extends EventObject {
 	 * @param cell
 	 *            the cell
 	 */
-	public ColumnViewerEditorActivationEvent(ViewerCell cell) {
+	public ColumnViewerEditorActivationEvent(ViewerCell<?> cell) {
 		super(cell);
 		eventType = PROGRAMMATIC;
 	}
@@ -119,7 +119,7 @@ public class ColumnViewerEditorActivationEvent extends EventObject {
 	 * @param event
 	 *            the event
 	 */
-	public ColumnViewerEditorActivationEvent(ViewerCell cell, MouseEvent event) {
+	public ColumnViewerEditorActivationEvent(ViewerCell<?> cell, MouseEvent event) {
 		super(cell);
 
 		if (event.count >= 2) {
@@ -138,7 +138,7 @@ public class ColumnViewerEditorActivationEvent extends EventObject {
 	 * @param event
 	 *            the event
 	 */
-	public ColumnViewerEditorActivationEvent(ViewerCell cell, KeyEvent event) {
+	public ColumnViewerEditorActivationEvent(ViewerCell<?> cell, KeyEvent event) {
 		super(cell);
 		this.eventType = KEY_PRESSED;
 		this.sourceEvent = event;
@@ -156,7 +156,7 @@ public class ColumnViewerEditorActivationEvent extends EventObject {
 	 * @param event
 	 *            the event
 	 */
-	public ColumnViewerEditorActivationEvent(ViewerCell cell, TraverseEvent event) {
+	public ColumnViewerEditorActivationEvent(ViewerCell<?> cell, TraverseEvent event) {
 		super(cell);
 		this.eventType = TRAVERSAL;
 		this.sourceEvent = event;
