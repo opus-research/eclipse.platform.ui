@@ -157,11 +157,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	private DelayedEventsProcessor delayedEventsProcessor;
 
 	/**
-	 * Indicates that the workbench has reached a steady state after startup.
-	 */
-	private boolean fullyStartedUp;
-
-	/**
 	 * Creates a new workbench advisor instance.
 	 */
 	public IDEWorkbenchAdvisor() {
@@ -272,6 +267,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	 */
 	public void postStartup() {
 		try {
+			refreshFromLocal();
 			activateProxyService();
 			((Workbench) PlatformUI.getWorkbench()).registerService(
 					ISelectionConversionService.class,
@@ -919,12 +915,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	public void eventLoopIdle(Display display) {
 		if (delayedEventsProcessor != null)
 			delayedEventsProcessor.catchUp(display);
-		if (!fullyStartedUp) {
-			fullyStartedUp = true;
-			// Workbench refresh has to be done pretty late to avoid blocking of the initial window
-			// rendering. See http://bugs.eclipse.org/438324
-			refreshFromLocal();
-		}
 		super.eventLoopIdle(display);
 	}
 }
