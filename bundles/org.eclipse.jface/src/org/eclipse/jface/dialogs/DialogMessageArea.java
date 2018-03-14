@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2006 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Robert Roth <robert.roth.off@gmail.com> - Bug 242803
  *******************************************************************************/
 package org.eclipse.jface.dialogs;
 
@@ -18,7 +19,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 
 /**
  * The DialogMessageArea is a resusable component for adding an accessible
@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.Text;
  * @since 3.0
  */
 public class DialogMessageArea extends Object {
-    private Text messageText;
+    private Label messageTextLabel;
 
     private Label messageImageLabel;
 
@@ -74,12 +74,11 @@ public class DialogMessageArea extends Object {
         messageImageLabel.setLayoutData(new GridData(
                 GridData.VERTICAL_ALIGN_CENTER));
 
-        messageText = new Text(messageComposite, SWT.NONE);
-        messageText.setEditable(false);
+        messageTextLabel = new Label(messageComposite, SWT.NONE);
 
         GridData textData = new GridData(GridData.GRAB_HORIZONTAL
                 | GridData.FILL_HORIZONTAL | GridData.VERTICAL_ALIGN_CENTER);
-        messageText.setLayoutData(textData);
+        messageTextLabel.setLayoutData(textData);
 
     }
 
@@ -148,10 +147,10 @@ public class DialogMessageArea extends Object {
         switch (newType) {
         case IMessageProvider.NONE:
             if (newMessage == null) {
-				restoreTitle();
-			} else {
-				showTitle(newMessage, null);
-			}
+                restoreTitle();
+            } else {
+                showTitle(newMessage, null);
+            }
             return;
         case IMessageProvider.INFORMATION:
             newImage = JFaceResources.getImage(Dialog.DLG_IMG_MESSAGE_INFO);
@@ -170,15 +169,15 @@ public class DialogMessageArea extends Object {
         // If the message text equals the tooltip (i.e. non-shortened text is the same)
         // and shortened text is the same (i.e. not a resize)
         // and the image is the same then nothing to do
-        String shortText = Dialog.shortenText(newMessage,messageText);
-        if (newMessage.equals(messageText.getToolTipText())
+        String shortText = Dialog.shortenText(newMessage, messageTextLabel);
+        if (newMessage.equals(messageTextLabel.getToolTipText())
                 && newImage == messageImageLabel.getImage()
-                	&& shortText.equals(messageText.getText())) {
-			return;
-		}
+                && shortText.equals(messageTextLabel.getText())) {
+            return;
+        }
         messageImageLabel.setImage(newImage);
-        messageText.setText(Dialog.shortenText(newMessage,messageText));
-        messageText.setToolTipText(newMessage);
+        messageTextLabel.setText(Dialog.shortenText(newMessage, messageTextLabel));
+        messageTextLabel.setToolTipText(newMessage);
         lastMessageText = newMessage;
 
     }
@@ -191,9 +190,9 @@ public class DialogMessageArea extends Object {
      */
     public void clearErrorMessage() {
         if (lastMessageText == null) {
-			restoreTitle();
-		} else {
-			updateText(lastMessageText, lastMessageType);
-		}
+            restoreTitle();
+        } else {
+            updateText(lastMessageText, lastMessageType);
+        }
     }
 }
