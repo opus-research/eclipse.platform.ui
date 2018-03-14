@@ -17,7 +17,6 @@ import org.eclipse.core.commands.HandlerEvent;
 import org.eclipse.core.commands.IHandlerListener;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Event;
 
 /**
@@ -73,16 +72,12 @@ public final class ActionHandler extends AbstractHandler {
 	 */
 	private final void attachListener() {
 		if (propertyChangeListener == null) {
-			propertyChangeListener = new IPropertyChangeListener() {
-				@Override
-				public final void propertyChange(
-						final PropertyChangeEvent propertyChangeEvent) {
-					final String property = propertyChangeEvent.getProperty();
-					fireHandlerChanged(new HandlerEvent(ActionHandler.this,
-							IAction.ENABLED.equals(property),
-							IAction.HANDLED.equals(property)));
-				}
-			};
+			propertyChangeListener = propertyChangeEvent -> {
+final String property = propertyChangeEvent.getProperty();
+fireHandlerChanged(new HandlerEvent(ActionHandler.this,
+				IAction.ENABLED.equals(property),
+				IAction.HANDLED.equals(property)));
+};
 		}
 
 		this.action.addPropertyChangeListener(propertyChangeListener);

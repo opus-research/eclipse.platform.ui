@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.internal.InternalPolicy;
 import org.eclipse.jface.util.Policy;
 import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Control;
 
 /**
@@ -219,12 +218,7 @@ public abstract class ContentViewer extends Viewer {
      * @param control the control
      */
     protected void hookControl(Control control) {
-        control.addDisposeListener(new DisposeListener() {
-            @Override
-			public void widgetDisposed(DisposeEvent event) {
-                handleDispose(event);
-            }
-        });
+        control.addDisposeListener(event -> handleDispose(event));
     }
 
     /**

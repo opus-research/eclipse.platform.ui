@@ -112,12 +112,7 @@ public abstract class Viewer implements IInputSelectionProvider {
             Control control = getControl();
             if (control != null && !control.isDisposed()) {
                 if (this.helpListener == null) {
-                    this.helpListener = new HelpListener() {
-                        @Override
-						public void helpRequested(HelpEvent event) {
-                            handleHelpRequest(event);
-                        }
-                    };
+                    this.helpListener = event -> handleHelpRequest(event);
                 }
                 control.addHelpListener(this.helpListener);
                 helpHooked = true;

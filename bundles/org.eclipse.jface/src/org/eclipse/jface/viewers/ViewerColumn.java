@@ -16,8 +16,6 @@ package org.eclipse.jface.viewers;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.util.Policy;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Widget;
 
 /**
@@ -55,20 +53,8 @@ public abstract class ViewerColumn {
 	protected ViewerColumn(final ColumnViewer viewer, Widget columnOwner) {
 		this.viewer = viewer;
 		columnOwner.setData(ViewerColumn.COLUMN_VIEWER_KEY, this);
-		this.listener = new ILabelProviderListener() {
-
-			@Override
-			public void labelProviderChanged(LabelProviderChangedEvent event) {
-				viewer.handleLabelProviderChanged(event);
-			}
-
-		};
-		columnOwner.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(DisposeEvent e) {
-				handleDispose(viewer);
-			}
-		});
+		this.listener = event -> viewer.handleLabelProviderChanged(event);
+		columnOwner.addDisposeListener(e -> handleDispose(viewer));
 	}
 
 	/**
