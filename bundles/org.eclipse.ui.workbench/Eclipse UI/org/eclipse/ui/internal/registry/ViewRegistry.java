@@ -196,8 +196,8 @@ public class ViewRegistry implements IViewRegistry {
 	}
 
 	/**
-	 * Method does nothing, should not be called anymore
-	 *
+	 * Does nothing anymore
+	 * 
 	 * @deprecated
 	 */
 	@Deprecated

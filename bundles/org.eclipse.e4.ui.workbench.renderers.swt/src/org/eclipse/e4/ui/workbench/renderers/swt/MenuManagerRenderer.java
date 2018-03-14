@@ -385,10 +385,6 @@ MenuManagerEventHelper.getInstance()
 				@Override
 				public void widgetDisposed(DisposeEvent e) {
 					cleanUp(menuModel);
-					MenuManager manager = getManager(menuModel);
-					if (manager != null) {
-						manager.markDirty();
-					}
 				}
 			});
 		}
@@ -425,6 +421,11 @@ MenuManagerEventHelper.getInstance()
 			ContributionRecord record = entry.getValue();
 			if (disposedRecords.contains(record))
 				iterator.remove();
+		}
+
+		MenuManager manager = getManager(menuModel);
+		if (manager != null) {
+			manager.markDirty();
 		}
 	}
 
