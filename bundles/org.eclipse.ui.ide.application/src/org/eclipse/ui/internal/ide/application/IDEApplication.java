@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2014 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *     Helmut J. Haigermoser -  Bug 359838 - The "Workspace Unavailable" error
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422954
  *     Christian Georgi (SAP) - Bug 423882 - Warn user if workspace is newer than IDE
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 427393, 455162
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.application;
 
@@ -309,17 +310,24 @@ public class IDEApplication implements IApplication, IExecutableExtension {
      * @return An URL storing the selected workspace or null if the user has
      *         canceled the launch operation.
      */
-    private URL promptForWorkspace(Shell shell, ChooseWorkspaceData launchData,
+	private URL promptForWorkspace(Shell shell, ChooseWorkspaceData launchData,
 			boolean force) {
         URL url = null;
         do {
-        	// okay to use the shell now - this is the splash shell
-			new ChooseWorkspaceDialog(shell, launchData, false, true) {
-				@Override
-				protected Shell getParentShell() {
-					return null;
-				}
-			}.prompt(force);
+			// workaround for bug 455162 and bug 427393 (on Linux splash is
+			// still visible *over* the prompt)
+			shell.setAlpha(0);
+			try {
+				// okay to use the shell now - this is the splash shell
+				new ChooseWorkspaceDialog(shell, launchData, false, true) {
+					@Override
+					protected Shell getParentShell() {
+						return null;
+					}
+				}.prompt(force);
+			} finally {
+				shell.setAlpha(255);
+			}
             String instancePath = launchData.getSelection();
             if (instancePath == null) {
 				return null;
