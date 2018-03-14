@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 430116
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 457237
  *     Andrey Loskutov <loskutov@gmx.de> - Bugs 383569, 420956, 457198
  ******************************************************************************/
 
@@ -29,7 +30,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MTrimContribution;
-import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.renderers.swt.HandledContributionItem;
 import org.eclipse.e4.ui.workbench.renderers.swt.ToolBarManagerRenderer;
@@ -110,9 +110,8 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			topTrim.setElementId(MAIN_TOOLBAR_ID);
 		}
 		topTrim.setToBeRendered(false);
-
-		renderer = (ToolBarManagerRenderer) rendererFactory.getRenderer(
-				MenuFactoryImpl.eINSTANCE.createToolBar(), null);
+		MToolBar mToolBar = modelService.createModelElement(MToolBar.class);
+		renderer = (ToolBarManagerRenderer) rendererFactory.getRenderer(mToolBar, null);
 	}
 
 	@Override
@@ -149,7 +148,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			MToolBar toolBar = (MToolBar) modelService.find(item.getId(), window);
 			boolean tbFound = toolBar != null;
 			if (!tbFound) {
-				toolBar = MenuFactoryImpl.eINSTANCE.createToolBar();
+				toolBar = modelService.createModelElement(MToolBar.class);
 			} else {
 				toolBar.getChildren().clear();
 			}
@@ -183,7 +182,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 					return;
 				}
 			}
-			MToolBarSeparator separator = MenuFactoryImpl.eINSTANCE.createToolBarSeparator();
+			MToolBarSeparator separator = modelService.createModelElement(MToolBarSeparator.class);
 			separator.setToBeRendered(false);
 			separator.setElementId(item.getId());
 
@@ -191,7 +190,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			MToolBar toolBar = toolbars.isEmpty() ? null : toolbars.get(0);
 			boolean tbFound = toolBar != null;
 			if (!tbFound) {
-				toolBar = MenuFactoryImpl.eINSTANCE.createToolBar();
+				toolBar = modelService.createModelElement(MToolBar.class);
 			} else {
 				toolBar.getChildren().clear();
 			}
@@ -561,7 +560,14 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 		}
 		// and now add it to the model, start the rendering
 		if (!trimBarsAdded) {
+			boolean hidden = !topTrim.isVisible();
+			if (hidden) {
+				topTrim.setVisible(true);
+			}
 			topTrim.setToBeRendered(true);
+			if (hidden) {
+				topTrim.setVisible(false);
+			}
 			trimBarsAdded = true;
 		}
 	}
