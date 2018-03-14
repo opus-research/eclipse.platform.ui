@@ -11,7 +11,8 @@
 package org.eclipse.ui.examples.jobs.actions;
 
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.jobs.IJobManager;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -27,10 +28,12 @@ public class SuspendJobManagerAction implements IWorkbenchWindowActionDelegate {
 	 */
 	public void run(IAction action) {
 		try {
-			if (action.isChecked())
-				Platform.getJobManager().suspend();
-			else
-				Platform.getJobManager().resume();
+			IJobManager jobManager = Job.getJobManager();
+			if (action.isChecked()) {
+				jobManager.suspend();
+			} else {
+				jobManager.resume();
+			}
 		} catch (OperationCanceledException e) {
 			//thrown if the user cancels the attempt to suspend
 			e.printStackTrace();

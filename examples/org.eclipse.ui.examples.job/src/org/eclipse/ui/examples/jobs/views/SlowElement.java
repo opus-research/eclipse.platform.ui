@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ui.examples.jobs.views;
 
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.Random;
 import org.eclipse.core.runtime.PlatformObject;
 
 public class SlowElement extends PlatformObject {
@@ -19,14 +19,10 @@ public class SlowElement extends PlatformObject {
 	private SlowElement parent;
 
 	SlowElement(String name) {
-		this(null, name, null);
+		this(null, name);
 	}
 
-	SlowElement(String name, SlowElement[] children) {
-		this(null, name, children);
-	}
-
-	SlowElement(SlowElement parent, String name, SlowElement[] children) {
+	SlowElement(SlowElement parent, String name) {
 		this.name = name;
 		this.parent = parent;
 	}
@@ -42,10 +38,10 @@ public class SlowElement extends PlatformObject {
 	public SlowElement[] getChildren() {
 		Random r = new Random();
 		int random = r.nextInt(15);
-		List children = new ArrayList();
-		for(int i = 0; i < random; i++) {
+		ArrayList<SlowElement> children = new ArrayList<SlowElement>();
+		for (int i = 0; i < random; i++) {
 			children.add(new SlowElement("child" + i)); //$NON-NLS-1$
 		}
-		return (SlowElement[]) children.toArray(new SlowElement[children.size()]);
+		return children.toArray(new SlowElement[children.size()]);
 	}
 }
