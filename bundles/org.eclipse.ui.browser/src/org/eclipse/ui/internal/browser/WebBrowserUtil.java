@@ -81,15 +81,13 @@ public class WebBrowserUtil {
 	 * @param message
 	 *            java.lang.String
 	 */
-	public static void openError(final String message) {
+	public static void openError(String message) {
 		Display d = Display.getCurrent();
 		if (d == null)
 			d = Display.getDefault();
-		d.asyncExec(new Runnable() {
-			public void run() {
-				MessageDialog.openError(null, Messages.errorDialogTitle, message);
-			}
-		});
+
+		Shell shell = d.getActiveShell();
+		MessageDialog.openError(shell, Messages.errorDialogTitle, message);
 	}
 
 	/**
@@ -98,16 +96,14 @@ public class WebBrowserUtil {
 	 * @param message
 	 *            java.lang.String
 	 */
-	public static void openMessage(final String message) {
+	public static void openMessage(String message) {
 		Display d = Display.getCurrent();
 		if (d == null)
 			d = Display.getDefault();
 
-		d.asyncExec(new Runnable() {
-			public void run() {
-				MessageDialog.openInformation(null, Messages.searchingTaskName, message);
-			}
-		});
+		Shell shell = d.getActiveShell();
+		MessageDialog.openInformation(shell, Messages.searchingTaskName,
+				message);
 	}
 
 	/**
@@ -359,11 +355,7 @@ public class WebBrowserUtil {
 		return encodedId;
 	}
 
-	/**
-	 * @deprecated Please use {@link #createParameterArray(String, String)}
-	 *             instead.
-	 */
-	public static String createParameterString(String parameters, String urlText) {
+	public static String[] createParameterArray(String parameters, String urlText) {
 		String params = parameters;
 		String url = urlText;
 		if (url == null) {
@@ -373,19 +365,14 @@ public class WebBrowserUtil {
 			params = ""; //$NON-NLS-1$
 
 		int urlIndex = params.indexOf(IBrowserDescriptor.URL_PARAMETER);
-		if (urlIndex >= 0) {
-			params = params.substring(0, urlIndex) + url
-					+ params.substring(urlIndex + IBrowserDescriptor.URL_PARAMETER.length());
-		} else {
+		if (urlIndex >= 0)
+			params = params.replaceAll(IBrowserDescriptor.URL_PARAMETER, url);
+		else {
 			if (params.length() != 0 && !params.endsWith(" ")) //$NON-NLS-1$
 				params += " "; //$NON-NLS-1$
 			params += url;
 		}
-		return params;
-	}
-
-	public static String[] createParameterArray(String parameters, String urlText) {
-		return tokenize(createParameterString(parameters, urlText));
+		return tokenize(params);
 	}
 
 	private static String[] tokenize(String string) {
