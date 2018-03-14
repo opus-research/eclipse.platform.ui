@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,6 +34,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.CommandManager;
 import org.eclipse.core.commands.ExecutionException;
@@ -93,6 +94,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
+import org.eclipse.e4.ui.model.application.ui.menu.MTrimContribution;
 import org.eclipse.e4.ui.services.EContextService;
 import org.eclipse.e4.ui.workbench.IModelResourceHandler;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
@@ -269,7 +271,8 @@ import org.osgi.util.tracker.ServiceTracker;
  * rewritten to use the new workbench advisor API.
  * </p>
  */
-public final class Workbench extends EventManager implements IWorkbench {
+public final class Workbench extends EventManager implements IWorkbench,
+		org.eclipse.e4.ui.workbench.IWorkbench {
 
 	public static String WORKBENCH_AUTO_SAVE_JOB = "Workbench Auto-Save Job"; //$NON-NLS-1$
 
@@ -451,6 +454,9 @@ public final class Workbench extends EventManager implements IWorkbench {
 
 	private Job autoSaveJob;
 
+	private String id;
+	private ServiceRegistration<?> e4WorkbenchService;
+
 	/**
 	 * Creates a new workbench.
 	 * 
@@ -465,6 +471,7 @@ public final class Workbench extends EventManager implements IWorkbench {
 	private Workbench(Display display, final WorkbenchAdvisor advisor, MApplication app,
 			IEclipseContext appContext) {
 		super();
+		this.id = createId();
 		StartupThreading.setWorkbench(this);
 		if (instance != null && instance.isRunning()) {
 			throw new IllegalStateException(WorkbenchMessages.Workbench_CreatingWorkbenchTwice);
@@ -522,7 +529,6 @@ public final class Workbench extends EventManager implements IWorkbench {
 		serviceLocator.registerService(IWorkbenchLocationService.class,
 				new WorkbenchLocationService(IServiceScopes.WORKBENCH_SCOPE, this, null, null,
 						null, null, 0));
-
 	}
 
 	/**
@@ -605,6 +611,8 @@ public final class Workbench extends EventManager implements IWorkbench {
 							WorkbenchPlugin.getDefault().addBundleListener(bundleListener);
 						}
 					}
+					MApplication appModel = e4Workbench.getApplication();
+					setSearchContribution(appModel, true);
 					// run the legacy workbench once
 					returnCode[0] = workbench.runUI();
 					if (returnCode[0] == PlatformUI.RETURN_OK) {
@@ -615,6 +623,7 @@ public final class Workbench extends EventManager implements IWorkbench {
 						wms.dispose();
 					}
 					if (returnCode[0] != PlatformUI.RETURN_UNSTARTABLE) {
+						setSearchContribution(appModel, false);
 						e4app.saveModel();
 					}
 					e4Workbench.close();
@@ -623,6 +632,17 @@ public final class Workbench extends EventManager implements IWorkbench {
 			}
 		});
 		return returnCode[0];
+	}
+
+	private static void setSearchContribution(MApplication app, boolean enabled) {
+		for (MTrimContribution contribution : app.getTrimContributions()) {
+			if ("org.eclipse.ui.ide.application.trimcontribution.QuickAccess".contains(contribution //$NON-NLS-1$
+					.getElementId())) {
+				// allows us to handle the case where someone opens a workspace
+				// with Luna and then with Kepler
+				contribution.setToBeRendered(enabled);
+			}
+		}
 	}
 
 	private static ServiceTracker instanceAppContext;
@@ -1027,6 +1047,8 @@ public final class Workbench extends EventManager implements IWorkbench {
 	 * @return true if the close succeeded, and false otherwise
 	 */
 	private boolean busyClose(final boolean force) {
+		// Fire an E4 lifecycle notification
+		UIEvents.publishEvent(UIEvents.UILifeCycle.APP_SHUTDOWN_STARTED, application);
 
 		// notify the advisor of preShutdown and allow it to veto if not forced
 		isClosing = advisor.preShutdown();
@@ -1238,6 +1260,7 @@ public final class Workbench extends EventManager implements IWorkbench {
 	private static void cleanUpCopy(MApplication appCopy, IEclipseContext context) {
 		// clean up all trim bars that come from trim bar contributions
 		// the trim elements that need to be removed are stored in the trimBar.
+		setSearchContribution(appCopy, false);
 		EModelService modelService = context.get(EModelService.class);
 		List<MWindow> windows = modelService.findElements(appCopy, null, MWindow.class, null);
 		for (MWindow window : windows) {
@@ -1672,7 +1695,7 @@ public final class Workbench extends EventManager implements IWorkbench {
 		});
 	}
 
-	private void initializeSingleClickOption() {
+	void initializeSingleClickOption() {
 		IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
 		boolean openOnSingleClick = store.getBoolean(IPreferenceConstants.OPEN_ON_SINGLE_CLICK);
 		boolean selectOnHover = store.getBoolean(IPreferenceConstants.SELECT_ON_HOVER);
@@ -2736,8 +2759,17 @@ UIEvents.Context.TOPIC_CONTEXT,
 			}
 
 			if (initOK[0] && runEventLoop) {
-				workbenchService = WorkbenchPlugin.getDefault().getBundleContext().registerService(
-						IWorkbench.class.getName(), this, null);
+				// Same registration as in E4Workbench
+				Hashtable<String, Object> properties = new Hashtable<String, Object>();
+				properties.put("id", getId()); //$NON-NLS-1$
+
+				workbenchService = WorkbenchPlugin.getDefault().getBundleContext()
+						.registerService(IWorkbench.class.getName(), this, properties);
+
+				e4WorkbenchService = WorkbenchPlugin.getDefault().getBundleContext()
+						.registerService(org.eclipse.e4.ui.workbench.IWorkbench.class.getName(),
+								this, properties);
+
 				Runnable earlyStartup = new Runnable() {
 					public void run() {
 						// start eager plug-ins
@@ -2924,6 +2956,10 @@ UIEvents.Context.TOPIC_CONTEXT,
 		if (workbenchService != null)
 			workbenchService.unregister();
 		workbenchService = null;
+
+		if (e4WorkbenchService != null)
+			e4WorkbenchService.unregister();
+		e4WorkbenchService = null;
 
 		// for dynamic UI
 		Platform.getExtensionRegistry().removeRegistryChangeListener(extensionEventHandler);
@@ -3656,5 +3692,13 @@ UIEvents.Context.TOPIC_CONTEXT,
 			UIStats.end(UIStats.RESTORE_WORKBENCH, this, "MRUList"); //$NON-NLS-1$
 		}
 		return result;
+	}
+
+	public final String getId() {
+		return id;
+	}
+
+	protected String createId() {
+		return UUID.randomUUID().toString();
 	}
 }

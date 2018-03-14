@@ -7,13 +7,11 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     René Brandstetter - Bug 404231 - resetPerspectiveModel() does not reset
- *                         the perspective
+ *     René Brandstetter - Bug 411821 - [QuickAccess] Contribute SearchField
+ *                                      through a fragment or other means 
  *******************************************************************************/
 package org.eclipse.e4.ui.model.internal;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,11 +28,8 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.EStructuralFeature.Setting;
 import org.eclipse.emf.ecore.ETypeParameter;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.impl.BinaryResourceImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.util.EcoreUtil.UsageCrossReferencer;
-import org.eclipse.emf.ecore.xml.type.internal.DataValue.Base64;
 
 public class ModelUtils {
 	//public static final String CONTAINING_CONTEXT = "ModelUtils.containingContext";
@@ -90,38 +85,46 @@ public class ModelUtils {
 			boolean flag = true;
 			if( positionInList != null && positionInList.trim().length() != 0 ) {
 				int index = -1;
-				if( positionInList.startsWith("first") ) {
-					index = 0;
-				} else if( positionInList.startsWith("index:") ) {
-					index = Integer.parseInt(positionInList.substring("index:".length()));	
-				} else if( positionInList.startsWith("before:") || positionInList.startsWith("after:") ) {
-					String elementId;
-					boolean before;
-					if( positionInList.startsWith("before:") ) {
-						elementId = positionInList.substring("before:".length());
-						before = true;
-					} else {
-						elementId = positionInList.substring("after:".length());
-						before = false;
-					}
-					
-					int tmpIndex = -1;
-					for( int i = 0; i < list.size(); i++ ) {
-						if( elementId.equals(((MApplicationElement)list.get(i)).getElementId()) ) {
-							tmpIndex = i;
-							break;
-						}
-					}
-					
-					if( tmpIndex != -1 ) {
-						if( before ) {
-							index = tmpIndex;
-						} else {
-							index = tmpIndex + 1;
-						}
-					} else {
-						System.err.println("Could not find element with Id '"+elementId+"'");
-					}
+				
+				PositionInfo posInfo = PositionInfo.parse(positionInList);
+				
+				if( posInfo != null ){
+				  switch (posInfo.getPosition()){
+				    case FIRST:
+				      index = 0;
+				      break;
+				      
+				    case INDEX:
+				      index = posInfo.getPositionReferenceAsInteger();
+				      break;
+				      
+				    case BEFORE:
+				    case AFTER:
+				      int tmpIndex = -1;
+				      String elementId = posInfo.getPositionReference();
+				      
+				      for( int i = 0; i < list.size(); i++ ) {
+		            if( elementId.equals(((MApplicationElement)list.get(i)).getElementId()) ) {
+		              tmpIndex = i;
+		              break;
+		            }
+		          }
+				      
+				      if( tmpIndex != -1 ) {
+		            if( posInfo.getPosition() == Position.BEFORE ) {
+		              index = tmpIndex;
+		            } else {
+		              index = tmpIndex + 1;
+		            }
+		          } else {
+		            System.err.println("Could not find element with Id '"+elementId+"'");
+		          }
+				      
+				    case LAST:
+				      default:
+				        // both no special operation, because the default is adding it at the last position
+				        break;
+				  }
 				} else {
 					System.err.println("Not a valid list position.");
 				}
@@ -215,76 +218,4 @@ public class ModelUtils {
 
 		return null;
 	}
-	
-	/**
-	 * Helper method which transforms the given {@link MApplicationElement} into a Base64 encoded string.
-	 * 
-	 * <p>
-	 * This Base64 encoded string contains all the persistable data from the {@link MApplicationElement} and
-	 * the element can later be restored via {@link #base64StringToModelElement(String)}.
-	 * </p>
-	 * 
-	 * @param element the element to convert to a Base64 encoded string
-	 * @return a Base64 encoded string containing the {@link MApplicationElement}, or <code>null</code> if
-	 *         the given element is 
-	 *         <ul>
-	 *           <li><code>null</code> or</li>
-	 *           <li>the given element is not an instance of {@link EObject} or</li>
-	 *           <li>an error happened during the conversion</li>
-	 *         </ul>
-	 */
-	public static String modelElementToBase64String(MApplicationElement element){
-	  if( element instanceof EObject){
-	    try {
-	      // make a copy of the element so we can put it into a new resource,
-	      // without removing it from the original one (which may cause some UIEvents
-	      // to be fired)
-	      EObject copy = EcoreUtil.copy((EObject) element);
-	      
-	      // BinaryResource because a XMI or XML one would be to chatty
-	      Resource binaryResource = new BinaryResourceImpl();
-	      binaryResource.getContents().add(copy);
-	      
-	      // keep the serialized from in memory
-	      ByteArrayOutputStream data = new ByteArrayOutputStream(1024);
-	      binaryResource.save(data, null);
-	      data.close();  // just for safety
-	      
-	      String back = Base64.encode(data.toByteArray());
-	      return back;
-	    } catch (Exception e) {
-	      // TODO: There is no Logger in this bundle, once there is one log this error via the Logger,
-	      //       or maybe we a RuntimeException should be thrown!
-	      e.printStackTrace();
-	    }
-	  }
-	    
-	  return null;
-	}
-	
-	/**
-	 * Takes a previously, with {@link #modelElementToBase64String(MApplicationElement)}, created Base64 string
-	 * and recreates the {@link MApplicationElement} out of it.
-	 * 
-	 * @param base64encodedModelElement a Base64 representation of a {@link MApplicationElement}
-	 * @return the {@link MApplicationElement} which was held in the Base64 string, or <code>null</code> if it couldn't be converted back
-	 */
-	public static MApplicationElement base64StringToModelElement(String base64encodedModelElement) {
-	  if( base64encodedModelElement == null ) return null;
-	  
-    try {
-      ByteArrayInputStream data = new ByteArrayInputStream(Base64.decode(base64encodedModelElement));
-      Resource binaryResource = new BinaryResourceImpl();
-      binaryResource.load(data, null);
-      data.close();
-      return (MApplicationElement) binaryResource.getContents().get(0);
-    } catch (Exception e) {
-      // TODO: There is no Logger in this bundle, once there is one log this error via the Logger,
-      //       or maybe we a RuntimeException should be thrown!
-      e.printStackTrace();
-    }
-
-    return null;
-  }
-
 }
