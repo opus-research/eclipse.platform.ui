@@ -69,7 +69,7 @@ public final class UnionSet<E> extends ObservableSet<E> {
 
 	/**
 	 * @param childSets
-	 * @since 1.7
+	 * @since 1.6
 	 */
 	public UnionSet(Set<IObservableSet<? extends E>> childSets) {
 		this(childSets, childSets.iterator().next().getElementType());
@@ -87,7 +87,7 @@ public final class UnionSet<E> extends ObservableSet<E> {
 	/**
 	 * @param childSets
 	 * @param elementType
-	 * @since 1.7
+	 * @since 1.6
 	 */
 	public UnionSet(Set<IObservableSet<? extends E>> childSets, Object elementType) {
 		super(childSets.iterator().next().getRealm(), null, elementType);

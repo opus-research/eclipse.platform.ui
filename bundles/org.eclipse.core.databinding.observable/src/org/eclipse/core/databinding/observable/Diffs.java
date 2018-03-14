@@ -135,7 +135,7 @@ public class Diffs {
 	 * @param diff
 	 *            the diff to convert
 	 * @return an unmodifiable wrapper on top of the given diff
-	 * @since 1.7
+	 * @since 1.6
 	 */
 	@SuppressWarnings("unchecked")
 	public static <E> ListDiff<E> unmodifiableDiff(ListDiff<? extends E> diff) {
@@ -179,7 +179,7 @@ public class Diffs {
 	 * @param diff
 	 *            the diff to convert
 	 * @return an unmodifiable wrapper on top of the given diff
-	 * @since 1.7
+	 * @since 1.6
 	 */
 	@SuppressWarnings("unchecked")
 	public static <K, V> MapDiff<K, V> unmodifiableDiff(MapDiff<? extends K, ? extends V> diff) {
@@ -201,7 +201,7 @@ public class Diffs {
 	 * @param diff
 	 *            the diff to convert
 	 * @return an unmodifiable wrapper on top of the given diff
-	 * @since 1.7
+	 * @since 1.6
 	 */
 	@SuppressWarnings("unchecked")
 	public static <V> ValueDiff<V> unmodifiableDiff(ValueDiff<? extends V> diff) {
@@ -669,7 +669,7 @@ public class Diffs {
 	 *            the list element type
 	 * @param differences
 	 * @return a list diff with the given entries
-	 * @since 1.7
+	 * @since 1.6
 	 */
 	public static <E> ListDiff<E> createListDiff(final List<ListDiffEntry<E>> differences) {
 		final ListDiffEntry<E>[] differencesArray = differences.toArray(new ListDiffEntry[differences.size()]);
