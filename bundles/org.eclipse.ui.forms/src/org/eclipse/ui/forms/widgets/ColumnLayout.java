@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -77,7 +77,6 @@ public final class ColumnLayout extends Layout implements ILayoutExtension {
 	public ColumnLayout() {
 	}
 
-	@Override
 	protected Point computeSize(Composite composite, int wHint, int hHint, boolean flushCache) {
 		if (wHint == 0)
 			return computeSize(composite, wHint, hHint, minNumColumns);
@@ -169,7 +168,12 @@ public final class ColumnLayout extends Layout implements ILayoutExtension {
 		return result;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.swt.widgets.Layout#layout(org.eclipse.swt.widgets.Composite,
+	 *      boolean)
+	 */
 	protected void layout(Composite parent, boolean flushCache) {
 		Control[] children = parent.getChildren();
 		Rectangle carea = parent.getClientArea();
@@ -245,12 +249,22 @@ public final class ColumnLayout extends Layout implements ILayoutExtension {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.forms.widgets.ILayoutExtension#computeMaximumWidth(org.eclipse.swt.widgets.Composite,
+	 *      boolean)
+	 */
 	public int computeMaximumWidth(Composite parent, boolean changed) {
 		return computeSize(parent, SWT.DEFAULT, SWT.DEFAULT, changed).x;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.forms.widgets.ILayoutExtension#computeMinimumWidth(org.eclipse.swt.widgets.Composite,
+	 *      boolean)
+	 */
 	public int computeMinimumWidth(Composite parent, boolean changed) {
 		return computeSize(parent, 0, SWT.DEFAULT, changed).x;
 	}

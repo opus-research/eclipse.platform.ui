@@ -581,8 +581,6 @@ public class TrimStack {
 			MTrimBar bar = (MTrimBar) meParent;
 			if (bar.getSide() == SideValue.RIGHT || bar.getSide() == SideValue.LEFT)
 				orientation = SWT.VERTICAL;
-			// TrimStacks are draggable by default
-			 me.getTags().add(IPresentationEngine.DRAGGABLE);
 		}
 		trimStackTB = new ToolBar(parent, orientation | SWT.FLAT | SWT.WRAP);
 		trimStackTB.addDisposeListener(new DisposeListener() {
@@ -1053,12 +1051,8 @@ public class TrimStack {
 				// If we haven't found one then use the first
 				if (partToActivate == null) {
 					List<MPart> parts = modelService.findElements(area, null, MPart.class, null);
-					for (MPart part : parts) {
-						if (partService.isPartVisible(part)) {
-							partToActivate = part;
-							break;
-						}
-					}
+					if (parts.size() > 0)
+						partToActivate = parts.get(0);
 				}
 
 				if (partToActivate != null) {
