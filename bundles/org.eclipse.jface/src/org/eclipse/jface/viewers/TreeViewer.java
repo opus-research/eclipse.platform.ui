@@ -12,6 +12,7 @@
  *     Matthew Hall - bug 221988
  *     Pawel Piech, WindRiver - bug 296573
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430873
+ *     Hendrik Still <hendrik.still@gammas.de> - bug 413973
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -65,9 +66,11 @@ import org.eclipse.swt.widgets.Widget;
  * Users setting up an editable tree with more than 1 column <b>have</b> to pass the
  * SWT.FULL_SELECTION style bit
  * </p>
+ * @param <E> Type of an single element of the model
+ * @param <I> Type of the input
  * @noextend This class is not intended to be subclassed by clients.
  */
-public class TreeViewer extends AbstractTreeViewer {
+public class TreeViewer<E,I> extends AbstractTreeViewer<E, I> {
 
 	private static final String VIRTUAL_DISPOSE_KEY = Policy.JFACE
 			+ ".DISPOSE_LISTENER"; //$NON-NLS-1$
@@ -89,7 +92,7 @@ public class TreeViewer extends AbstractTreeViewer {
 	/**
 	 * The row object reused
 	 */
-	private TreeViewerRow cachedRow;
+	private TreeViewerRow<E> cachedRow;
 
 	/**
 	 * true if we are inside a preservingSelection() call
@@ -218,7 +221,7 @@ public class TreeViewer extends AbstractTreeViewer {
 	 * image for the first column, and any remaining columns are blank.
 	 */
 	@Override
-	public IBaseLabelProvider getLabelProvider() {
+	public IBaseLabelProvider<E> getLabelProvider() {
 		return super.getLabelProvider();
 	}
 
@@ -273,8 +276,8 @@ public class TreeViewer extends AbstractTreeViewer {
 	}
 
 	@Override
-	protected ColumnViewerEditor createViewerEditor() {
-		return new TreeViewerEditor(this,null,new ColumnViewerEditorActivationStrategy(this),ColumnViewerEditor.DEFAULT);
+	protected ColumnViewerEditor<E,I> createViewerEditor() {
+		return new TreeViewerEditor<>(this,null,new ColumnViewerEditorActivationStrategy<>(this),ColumnViewerEditor.DEFAULT);
 	}
 
 	@Override
@@ -306,7 +309,7 @@ public class TreeViewer extends AbstractTreeViewer {
 	}
 
 	@Override
-	protected void setSelection(List items) {
+	protected void setSelection(List<Item> items) {
 
 		Item[] current = getSelection(getTree());
 
@@ -337,7 +340,7 @@ public class TreeViewer extends AbstractTreeViewer {
 	}
 
 	@Override
-	protected void assertContentProviderType(IContentProvider provider) {
+	protected void assertContentProviderType(IContentProvider<? super I> provider) {
 		if (provider instanceof ILazyTreeContentProvider
 				|| provider instanceof ILazyTreePathContentProvider) {
 			return;
@@ -346,9 +349,11 @@ public class TreeViewer extends AbstractTreeViewer {
 	}
 
 	@Override
-	protected Object[] getRawChildren(Object parent) {
+	protected E[] getRawChildren(Object parent) {
 		if (contentProviderIsLazy) {
-			return new Object[0];
+			@SuppressWarnings("unchecked")
+			E[] elements = (E[]) new Object[0];
+			return elements;
 		}
 		return super.getRawChildren(parent);
 	}
@@ -425,14 +430,15 @@ public class TreeViewer extends AbstractTreeViewer {
 	 * @since 3.2
 	 */
 	public void replace(final Object parentElementOrTreePath, final int index,
-			final Object element) {
+			final E element) {
 		if (checkBusy())
 			return;
 		Item[] selectedItems = getSelection(getControl());
 		TreeSelection selection = (TreeSelection) getSelection();
 		Widget[] itemsToDisassociate;
 		if (parentElementOrTreePath instanceof TreePath) {
-			TreePath elementPath = ((TreePath) parentElementOrTreePath)
+			@SuppressWarnings("unchecked")
+			TreePath<E> elementPath = ((TreePath<E>) parentElementOrTreePath)
 					.createChildPath(element);
 			itemsToDisassociate = internalFindItems(elementPath);
 		} else {
@@ -525,9 +531,11 @@ public class TreeViewer extends AbstractTreeViewer {
 				// The current item was selected, but its data is null.
 				// The data will be replaced by the given element, so to keep
 				// it selected, we have to add it to the selection.
-				TreePath[] originalPaths = selection.getPaths();
+				@SuppressWarnings({ "unchecked" })
+				TreePath<E>[] originalPaths = selection.getPaths();
 				int length = originalPaths.length;
-				TreePath[] paths = new TreePath[length + 1];
+				@SuppressWarnings({ "unchecked" })
+				TreePath<E>[] paths = new TreePath[length + 1];
 				System.arraycopy(originalPaths, 0, paths, 0, length);
 				// set the element temporarily so that we can call getTreePathFromItem
 				item.setData(element);
@@ -559,13 +567,19 @@ public class TreeViewer extends AbstractTreeViewer {
 		setBusy(true);
 		try {
 			if (contentProviderIsLazy && !contentProviderIsTreeBased && !(element instanceof TreePath)) {
-				ILazyTreeContentProvider lazyTreeContentProvider = (ILazyTreeContentProvider) getContentProvider();
-				return lazyTreeContentProvider.getParent(element);
+				@SuppressWarnings("unchecked")
+				ILazyTreeContentProvider<E,I> lazyTreeContentProvider = (ILazyTreeContentProvider<E,I>) getContentProvider();
+				@SuppressWarnings("unchecked")
+				E currentElement = (E)element;
+				return lazyTreeContentProvider.getParent(currentElement);
 			}
 			if (contentProviderIsLazy && contentProviderIsTreeBased && !(element instanceof TreePath)) {
-				ILazyTreePathContentProvider lazyTreePathContentProvider = (ILazyTreePathContentProvider) getContentProvider();
-				TreePath[] parents = lazyTreePathContentProvider
-				.getParents(element);
+				@SuppressWarnings("unchecked")
+				ILazyTreePathContentProvider<E, I> lazyTreePathContentProvider = (ILazyTreePathContentProvider<E, I>) getContentProvider();
+				@SuppressWarnings("unchecked")
+				E currentElement = (E) element;
+				TreePath<E>[] parents = lazyTreePathContentProvider
+						.getParents(currentElement);
 				if (parents != null && parents.length > 0) {
 					return parents[0];
 				}
@@ -613,7 +627,7 @@ public class TreeViewer extends AbstractTreeViewer {
 
 	@Override
 	protected void internalAdd(Widget widget, Object parentElement,
-			Object[] childElements) {
+			E[] childElements) {
 		if (contentProviderIsLazy) {
 			if (widget instanceof TreeItem) {
 				TreeItem ti = (TreeItem) widget;
@@ -720,7 +734,7 @@ public class TreeViewer extends AbstractTreeViewer {
 	 * the item if the tree is virtual.
 	 */
 	@Override
-	protected void mapElement(Object element, final Widget item) {
+	protected void mapElement(E element, final Widget item) {
 		super.mapElement(element, item);
 		// make sure to unmap elements if the tree is virtual
 		if ((getTree().getStyle() & SWT.VIRTUAL) != 0) {
@@ -732,7 +746,8 @@ public class TreeViewer extends AbstractTreeViewer {
 					@Override
 					public void widgetDisposed(DisposeEvent e) {
 						if (!treeIsDisposed) {
-							Object data = item.getData();
+							@SuppressWarnings("unchecked")
+							E data = (E) item.getData();
 							if (usingElementMap() && data != null) {
 								unmapElement(data, item);
 							}
@@ -744,9 +759,9 @@ public class TreeViewer extends AbstractTreeViewer {
 	}
 
 	@Override
-	protected ViewerRow getViewerRowFromItem(Widget item) {
+	protected ViewerRow<E> getViewerRowFromItem(Widget item) {
 		if( cachedRow == null ) {
-			cachedRow = new TreeViewerRow((TreeItem) item);
+			cachedRow = new TreeViewerRow<>((TreeItem) item);
 		} else {
 			cachedRow.setItem((TreeItem) item);
 		}
@@ -762,7 +777,7 @@ public class TreeViewer extends AbstractTreeViewer {
 	 * @param rowIndex
 	 * @return ViewerRow
 	 */
-	private ViewerRow createNewRowPart(ViewerRow parent, int style, int rowIndex) {
+	private ViewerRow<E> createNewRowPart(ViewerRow<E> parent, int style, int rowIndex) {
 		if (parent == null) {
 			if (rowIndex >= 0) {
 				return getViewerRowFromItem(new TreeItem(tree, style, rowIndex));
@@ -791,7 +806,7 @@ public class TreeViewer extends AbstractTreeViewer {
 	}
 
 	@Override
-	protected void updatePlus(Item item, Object element) {
+	protected void updatePlus(Item item, E element) {
 		if (contentProviderIsLazy) {
 			Object data = item.getData();
 			int itemCount = 0;
@@ -815,12 +830,13 @@ public class TreeViewer extends AbstractTreeViewer {
 	public void remove(final Object parentOrTreePath, final int index) {
 		if (checkBusy())
 			return;
-		final List oldSelection = new LinkedList(Arrays
+		@SuppressWarnings("rawtypes")
+		final List<TreePath> oldSelection = new LinkedList<>(Arrays
 				.asList(((TreeSelection) getSelection()).getPaths()));
 		preservingSelection(new Runnable() {
 			@Override
 			public void run() {
-				TreePath removedPath = null;
+				TreePath<E> removedPath = null;
 				if (internalIsInputOrEmptyPath(parentOrTreePath)) {
 					Tree tree = (Tree) getControl();
 					if (index < tree.getItemCount()) {
@@ -859,20 +875,23 @@ public class TreeViewer extends AbstractTreeViewer {
 				}
 				if (removedPath != null) {
 					boolean removed = false;
-					for (Iterator it = oldSelection.iterator(); it
+					for (@SuppressWarnings("rawtypes")
+					Iterator<TreePath> it = oldSelection.iterator(); it
 							.hasNext();) {
-						TreePath path = (TreePath) it.next();
+						@SuppressWarnings({ "unchecked" })
+						TreePath<E> path = it.next();
 						if (path.startsWith(removedPath, getComparer())) {
 							it.remove();
 							removed = true;
 						}
 					}
 					if (removed) {
-						setSelection(new TreeSelection(
-								(TreePath[]) oldSelection
-										.toArray(new TreePath[oldSelection
-												.size()]), getComparer()),
-								false);
+						@SuppressWarnings({ "unchecked" })
+						TreePath<E>[] oldTreePathSelection = oldSelection
+								.toArray(new TreePath[oldSelection.size()]);
+
+						setSelection(new TreeSelection(oldTreePathSelection,
+								getComparer()), false);
 					}
 
 				}
@@ -895,8 +914,9 @@ public class TreeViewer extends AbstractTreeViewer {
 					// count
 					virtualLazyUpdateChildCount(event.item, children.length);
 				}
-				fireTreeExpanded(new TreeExpansionEvent(this, event.item
-						.getData()));
+				@SuppressWarnings("unchecked")
+				E element = (E) event.item.getData();
+				fireTreeExpanded(new TreeExpansionEvent<>(this, element));
 			}
 			return;
 		}
@@ -915,7 +935,7 @@ public class TreeViewer extends AbstractTreeViewer {
 	}
 
 	@Override
-	public void setContentProvider(IContentProvider provider) {
+	public void setContentProvider(IContentProvider<? super I> provider) {
 		contentProviderIsLazy = (provider instanceof ILazyTreeContentProvider)
 				|| (provider instanceof ILazyTreePathContentProvider);
 		contentProviderIsTreeBased = provider instanceof ILazyTreePathContentProvider;
@@ -980,7 +1000,9 @@ public class TreeViewer extends AbstractTreeViewer {
 		setBusy(false);
 		try {
 			if (contentProviderIsTreeBased) {
-				TreePath treePath;
+				TreePath<E> treePath;
+				@SuppressWarnings("unchecked")
+				ILazyTreePathContentProvider<E, I> lazyTreePathContentProvider = (ILazyTreePathContentProvider<E, I>) getContentProvider();
 				if (widget instanceof Item) {
 					if (widget.getData() == null) {
 						// we need to materialize the parent first
@@ -993,13 +1015,17 @@ public class TreeViewer extends AbstractTreeViewer {
 					}
 					treePath = getTreePathFromItem((Item) widget);
 				} else {
-					treePath = TreePath.EMPTY;
+					@SuppressWarnings({ "unchecked" })
+					TreePath<E> emptyTreePath = TreePath.EMPTY;
+					treePath = emptyTreePath;
 				}
-				((ILazyTreePathContentProvider) getContentProvider())
-						.updateElement(treePath, index);
+				lazyTreePathContentProvider.updateElement(treePath, index);
 			} else {
-				((ILazyTreeContentProvider) getContentProvider()).updateElement(
-						widget.getData(), index);
+				@SuppressWarnings("unchecked")
+				ILazyTreeContentProvider<E, I> lazyTreeContentProvider = (ILazyTreeContentProvider<E, I>) getContentProvider();
+				@SuppressWarnings("unchecked")
+				E element = (E) widget.getData();
+				lazyTreeContentProvider.updateElement(element, index);
 			}
 		} finally {
 			setBusy(oldBusy);
@@ -1016,16 +1042,23 @@ public class TreeViewer extends AbstractTreeViewer {
 		setBusy(false);
 		try {
 			if (contentProviderIsTreeBased) {
-				TreePath treePath;
+				TreePath<E> treePath;
+				@SuppressWarnings("unchecked")
+				ILazyTreePathContentProvider<E,I> lazyTreePathContentProvider = (ILazyTreePathContentProvider<E,I>) getContentProvider();
 				if (widget instanceof Item) {
 					treePath = getTreePathFromItem((Item) widget);
 				} else {
-					treePath = TreePath.EMPTY;
+					@SuppressWarnings({ "unchecked" })
+					TreePath<E> emptyTreePath = TreePath.EMPTY;
+					treePath = emptyTreePath;
 				}
-				((ILazyTreePathContentProvider) getContentProvider())
-				.updateChildCount(treePath, currentChildCount);
+				lazyTreePathContentProvider.updateChildCount(treePath, currentChildCount);
 			} else {
-				((ILazyTreeContentProvider) getContentProvider()).updateChildCount(widget.getData(), currentChildCount);
+				@SuppressWarnings("unchecked")
+				E element = (E)widget.getData();
+				@SuppressWarnings("unchecked")
+				ILazyTreeContentProvider<E,I> lazyTreeContentProvider = (ILazyTreeContentProvider<E,I>) getContentProvider();
+				lazyTreeContentProvider.updateChildCount(element, currentChildCount);
 			}
 		} finally {
 			setBusy(oldBusy);
@@ -1042,18 +1075,22 @@ public class TreeViewer extends AbstractTreeViewer {
 		setBusy(false);
 		try {
 			if (contentProviderIsTreeBased) {
-				TreePath treePath;
+				TreePath<E> treePath;
 				treePath = getTreePathFromItem(item);
+				@SuppressWarnings("unchecked")
+				ILazyTreePathContentProvider<E,I> lazyTreePathContentProvider = (ILazyTreePathContentProvider<E,I>) getContentProvider();
 				if (currentChildCount == 0 || !((TreeItem)item).getExpanded()) {
 					// item is not expanded (but may have a plus currently)
-					((ILazyTreePathContentProvider) getContentProvider())
-					.updateHasChildren(treePath);
+					lazyTreePathContentProvider.updateHasChildren(treePath);
 				} else {
-					((ILazyTreePathContentProvider) getContentProvider())
-					.updateChildCount(treePath, currentChildCount);
+					lazyTreePathContentProvider.updateChildCount(treePath, currentChildCount);
 				}
 			} else {
-				((ILazyTreeContentProvider) getContentProvider()).updateChildCount(item.getData(), currentChildCount);
+				@SuppressWarnings("unchecked")
+				E element = (E)item.getData();
+				@SuppressWarnings("unchecked")
+				ILazyTreeContentProvider<E,I> lazyTreeContentProvider = (ILazyTreeContentProvider<E,I>) getContentProvider();
+				lazyTreeContentProvider.updateChildCount(element, currentChildCount);
 			}
 		} finally {
 			setBusy(oldBusy);
@@ -1098,14 +1135,16 @@ public class TreeViewer extends AbstractTreeViewer {
 		if( element instanceof TreePath ) {
 			try {
 				getControl().setRedraw(false);
-				setSelection(new TreeSelection((TreePath) element));
+				@SuppressWarnings("unchecked")
+				TreePath<E> treePath = (TreePath<E>) element;
+				setSelection(new TreeSelection(treePath));
 				TreeItem[] items = tree.getSelection();
 
 				if( items.length == 1 ) {
-					ViewerRow row = getViewerRowFromItem(items[0]);
+					ViewerRow<E> row = getViewerRowFromItem(items[0]);
 
 					if (row != null) {
-						ViewerCell cell = row.getCell(column);
+						ViewerCell<E> cell = row.getCell(column);
 						if (cell != null) {
 							triggerEditorActivationEvent(new ColumnViewerEditorActivationEvent(cell));
 						}
@@ -1115,7 +1154,9 @@ public class TreeViewer extends AbstractTreeViewer {
 				getControl().setRedraw(true);
 			}
 		} else {
-			super.editElement(element, column);
+			@SuppressWarnings("unchecked")
+			E singleElement = (E) element;
+			super.editElement(singleElement, column);
 		}
 	}
 
