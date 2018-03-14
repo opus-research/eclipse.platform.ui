@@ -7,18 +7,15 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Steven Spungin <steven@spungin.tv> - Bug 361731
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.addons.dndaddon;
 
 import java.util.List;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
-import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
-import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
@@ -208,11 +205,13 @@ public class SplitDropAgent2 extends DropAgent {
 				// onEdge = true;
 			} else if ((bb.x + bb.width) - p.x < TOLERANCE) {
 				where = EModelService.RIGHT_OF;
-				trackRect = new Rectangle(bb.x + (bb.width - TOLERANCE), bb.y, TOLERANCE, bb.height);
+				trackRect = new Rectangle(bb.x + (bb.width - TOLERANCE), bb.y, TOLERANCE,
+						bb.height);
 				onEdge = true;
 			} else if ((bb.y + bb.height) - p.y < TOLERANCE) {
 				where = EModelService.BELOW;
-				trackRect = new Rectangle(bb.x, bb.y + (bb.height - TOLERANCE), bb.width, TOLERANCE);
+				trackRect = new Rectangle(bb.x, bb.y + (bb.height - TOLERANCE), bb.width,
+						TOLERANCE);
 				onEdge = true;
 			}
 		}
@@ -279,9 +278,6 @@ public class SplitDropAgent2 extends DropAgent {
 
 	@Override
 	public boolean drop(MUIElement dragElement, DnDInfo info) {
-
-		MElementContainer<MUIElement> originalParent = dragElement.getParent();
-
 		MPartSashContainerElement toInsert = (MPartSashContainerElement) dragElement;
 		if (dragElement instanceof MPartStack) {
 			// Ensure we restore the stack to the presentation first
@@ -333,22 +329,8 @@ public class SplitDropAgent2 extends DropAgent {
 			}
 		}
 
-		MUIElement hasContainerData = dragElement;
-		while (hasContainerData != null
-				&& (MUIElement) hasContainerData.getParent() instanceof MPartSashContainer == false) {
-			hasContainerData = hasContainerData.getParent();
-		}
-
-		if (hasContainerData != null) {
-			toInsert.setContainerData(hasContainerData.getContainerData());
-			dndManager.getModelService().insert(toInsert, (MPartSashContainerElement) relToElement,
-					where, ratio);
-		} else {
-			toInsert.setContainerData(originalParent.getContainerData());
-		}
 		dndManager.getModelService().insert(toInsert, (MPartSashContainerElement) relToElement,
 				where, ratio);
-
 		// reactivatePart(dragElement);
 
 		return true;
