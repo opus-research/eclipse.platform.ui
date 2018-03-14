@@ -172,7 +172,7 @@ public final class BindingPersistenceTest extends UITestCase {
 		}
 	}
 
-	public final void TODOtestBindingTransform() throws Exception {
+	public final void testBindingTransform() throws Exception {
 		ICommandService commandService = (ICommandService) fWorkbench
 				.getAdapter(ICommandService.class);
 		IBindingService bindingService = (IBindingService) fWorkbench
@@ -304,9 +304,6 @@ public final class BindingPersistenceTest extends UITestCase {
 	}
 
 	public void testAboutBinding() throws Exception {
-		if (Util.isMac()) {
-			return;
-		}
 		ICommandService commandService = (ICommandService) fWorkbench
 				.getAdapter(ICommandService.class);
 		IBindingService bindingService = (IBindingService) fWorkbench
@@ -381,10 +378,6 @@ public final class BindingPersistenceTest extends UITestCase {
 	}
 
 	public void testAboutBindingIn3x() throws Exception {
-		if (Util.isMac()) {
-			// TODO investigate on Mac
-			return;
-		}
 		ICommandService commandService = (ICommandService) fWorkbench
 				.getAdapter(ICommandService.class);
 		IBindingService bindingService = (IBindingService) fWorkbench
@@ -428,9 +421,6 @@ public final class BindingPersistenceTest extends UITestCase {
 	}
 
 	public void testAboutBindingEmacs() throws Exception {
-		if (Util.isMac()) {
-			return;
-		}
 
 		ICommandService commandService = (ICommandService) fWorkbench
 				.getAdapter(ICommandService.class);
@@ -518,10 +508,6 @@ public final class BindingPersistenceTest extends UITestCase {
 	// the 'paste' key binding overrides the 'redo' key binding on Windows
 	// platforms
 	public void testPasteAndRedoBindingEmacs() throws Exception {
-		if (Util.isMac()) {
-			// TODO investigate on Mac
-			return;
-		}
 		ICommandService commandService = (ICommandService) fWorkbench
 				.getAdapter(ICommandService.class);
 		IBindingService bindingService = (IBindingService) fWorkbench

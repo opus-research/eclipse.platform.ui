@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
- *     René Brandstetter - Bug 433778
  *******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 
@@ -18,7 +17,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.jface.bindings.TriggerSequence;
@@ -85,24 +83,19 @@ public class QuickAccessDialog extends PopupDialog {
 		BusyIndicator.showWhile(window.getShell() == null ? null : window.getShell().getDisplay(),
 				new Runnable() {
 
-					@Override
 					public void run() {
-						final CommandProvider commandProvider = new CommandProvider();
-						commandProvider.setSnapshot(new ExpressionContext(model.getContext()
-								.getActiveLeaf()));
 						QuickAccessProvider[] providers = new QuickAccessProvider[] {
 								new PreviousPicksProvider(previousPicksList),
 								new EditorProvider(),
 								new ViewProvider(model.getContext().get(MApplication.class), model),
-								new PerspectiveProvider(), commandProvider, new ActionProvider(),
-								new WizardProvider(), new PreferenceProvider(),
-								new PropertiesProvider() };
+								new PerspectiveProvider(),
+								new CommandProvider(), new ActionProvider(), new WizardProvider(),
+								new PreferenceProvider(), new PropertiesProvider() };
 						providerMap = new HashMap();
 						for (int i = 0; i < providers.length; i++) {
 							providerMap.put(providers[i].getId(), providers[i]);
 						}
 						QuickAccessDialog.this.contents = new QuickAccessContents(providers) {
-							@Override
 							protected void updateFeedback(boolean filterTextEmpty,
 									boolean showAllMatches) {
 								if (filterTextEmpty) {
@@ -205,19 +198,8 @@ public class QuickAccessDialog extends PopupDialog {
 								if (selectedElement instanceof QuickAccessElement) {
 									addPreviousPick(text, selectedElement);
 									storeDialog(getDialogSettings());
-
-									/*
-									 * Execute after the dialog has been fully
-									 * closed/disposed and the correct
-									 * EclipseContext is in place.
-									 */
-									final QuickAccessElement element = (QuickAccessElement) selectedElement;
-									window.getShell().getDisplay().asyncExec(new Runnable() {
-										@Override
-										public void run() {
-											element.execute();
-										}
-									});
+									QuickAccessElement element = (QuickAccessElement) selectedElement;
+									element.execute();
 								}
 							}
 						};
@@ -239,7 +221,6 @@ public class QuickAccessDialog extends PopupDialog {
 		// Ugly hack to avoid bug 184045. If this gets fixed, replace the
 		// following code with a call to refresh("").
 		getShell().getDisplay().asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				final Shell shell = getShell();
 				if (shell != null && !shell.isDisposed()) {
@@ -250,7 +231,6 @@ public class QuickAccessDialog extends PopupDialog {
 		});
 	}
 
-	@Override
 	protected Control createTitleControl(Composite parent) {
 		filterText = new Text(parent, SWT.NONE);
 
@@ -258,7 +238,6 @@ public class QuickAccessDialog extends PopupDialog {
 				.applyTo(filterText);
 
 		contents.hookFilterText(filterText);
-		filterText.addKeyListener(getKeyAdapter());
 
 		return filterText;
 	}
@@ -270,7 +249,6 @@ public class QuickAccessDialog extends PopupDialog {
 	 * org.eclipse.jface.dialogs.PopupDialog#createDialogArea(org.eclipse.swt
 	 * .widgets.Composite)
 	 */
-	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite composite = (Composite) super.createDialogArea(parent);
 		boolean isWin32 = Util.isWindows();
@@ -298,7 +276,6 @@ public class QuickAccessDialog extends PopupDialog {
 	private KeyAdapter getKeyAdapter() {
 		if (keyAdapter == null) {
 			keyAdapter = new KeyAdapter() {
-				@Override
 				public void keyPressed(KeyEvent e) {
 					int accelerator = SWTKeySupport.convertEventToUnmodifiedAccelerator(e);
 					KeySequence keySequence = KeySequence.getInstance(SWTKeySupport
@@ -319,23 +296,19 @@ public class QuickAccessDialog extends PopupDialog {
 		return keyAdapter;
 	}
 
-	@Override
 	protected Control getFocusControl() {
 		return filterText;
 	}
 
-	@Override
 	public boolean close() {
 		storeDialog(getDialogSettings());
 		return super.close();
 	}
 
-	@Override
 	protected Point getDefaultSize() {
 		return new Point(350, 420);
 	}
 
-	@Override
 	protected Point getDefaultLocation(Point initialSize) {
 		Point size = new Point(400, 400);
 		Rectangle parentBounds = getParentShell().getBounds();
@@ -344,7 +317,6 @@ public class QuickAccessDialog extends PopupDialog {
 		return new Point(x, y);
 	}
 
-	@Override
 	protected IDialogSettings getDialogSettings() {
 		final IDialogSettings workbenchDialogSettings = WorkbenchPlugin.getDefault()
 				.getDialogSettings();

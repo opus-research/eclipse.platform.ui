@@ -38,7 +38,6 @@ public class EclipseSplashHandler extends BasicSplashHandler {
 	 * @param splash
 	 *            the shell that contains the splash screen
 	 */
-	@Override
 	public void init(Shell splash) {
 		super.init(splash);
 		String progressRectString = null;

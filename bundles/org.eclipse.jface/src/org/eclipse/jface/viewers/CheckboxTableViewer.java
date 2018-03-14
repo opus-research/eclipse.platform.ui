@@ -143,6 +143,9 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
         super(table);
     }
 
+    /* (non-Javadoc)
+     * Method declared on ICheckable.
+     */
     @Override
 	public void addCheckStateListener(ICheckStateListener listener) {
         checkStateListeners.add(listener);
@@ -217,6 +220,9 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
         }
     }
 
+    /* (non-Javadoc)
+     * Method declared on ICheckable.
+     */
     @Override
 	public boolean getChecked(Object element) {
         Widget widget = findItem(element);
@@ -293,6 +299,9 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
 		return v.toArray();
 	}
 
+    /* (non-Javadoc)
+     * Method declared on StructuredViewer.
+     */
     @Override
 	public void handleSelect(SelectionEvent event) {
         if (event.detail == SWT.CHECK) {
@@ -309,6 +318,9 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
 		}
     }
 
+    /* (non-Javadoc)
+     * Method declared on Viewer.
+     */
     @Override
 	protected void preservingSelection(Runnable updateCode) {
 		if (!getPreserveSelection()) {
@@ -354,6 +366,9 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
         }
     }
 
+    /* (non-Javadoc)
+     * Method declared on ICheckable.
+     */
     @Override
 	public void removeCheckStateListener(ICheckStateListener listener) {
         checkStateListeners.remove(listener);
@@ -394,6 +409,9 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
         }
     }
 
+    /* (non-Javadoc)
+     * Method declared on ICheckable.
+     */
     @Override
 	public boolean setChecked(Object element, boolean state) {
         Assert.isNotNull(element);

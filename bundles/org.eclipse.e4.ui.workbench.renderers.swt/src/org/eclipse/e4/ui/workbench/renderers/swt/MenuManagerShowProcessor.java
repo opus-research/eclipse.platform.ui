@@ -78,7 +78,6 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 	 * org.eclipse.jface.action.IMenuListener#menuAboutToShow(org.eclipse.jface
 	 * .action.IMenuManager)
 	 */
-	@Override
 	public void menuAboutToShow(IMenuManager manager) {
 		if (!(manager instanceof MenuManager)) {
 			return;
@@ -114,7 +113,6 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 	 * 
 	 * SWT.Show post processing method for MenuManager
 	 */
-	@Override
 	public void menuAboutToHide(IMenuManager manager) {
 		if (!(manager instanceof MenuManager)) {
 			return;

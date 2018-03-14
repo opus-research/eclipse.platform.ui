@@ -52,7 +52,6 @@ public class ProgressView extends ViewPart implements IViewPart {
 	 * 
 	 * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
-	@Override
 	public void createPartControl(Composite parent) {
 		viewer = new DetailedProgressViewer(parent, SWT.MULTI | SWT.H_SCROLL);
 		viewer.setComparator(ProgressManagerUtil.getProgressViewerComparator());
@@ -77,7 +76,6 @@ public class ProgressView extends ViewPart implements IViewPart {
 	 * 
 	 * @see org.eclipse.ui.IWorkbenchPart#setFocus()
 	 */
-	@Override
 	public void setFocus() {
 		if (viewer != null) {
 			viewer.setFocus();
@@ -101,7 +99,6 @@ public class ProgressView extends ViewPart implements IViewPart {
 		Menu menu = menuMgr.createContextMenu(viewer.getControl());
 		menuMgr.add(cancelAction);
 		menuMgr.addMenuListener(new IMenuListener() {
-			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				JobInfo info = getSelectedInfo();
 				if (info == null) {
@@ -123,7 +120,6 @@ public class ProgressView extends ViewPart implements IViewPart {
 			 * 
 			 * @see org.eclipse.ui.internal.preferences.ViewPreferencesAction#openViewPreferencesDialog()
 			 */
-			@Override
 			public void openViewPreferencesDialog() {
 				new JobsViewPreferenceDialog(viewer.getControl().getShell())
 						.open();
@@ -186,7 +182,6 @@ public class ProgressView extends ViewPart implements IViewPart {
 			 * 
 			 * @see org.eclipse.jface.action.Action#run()
 			 */
-			@Override
 			public void run() {
 				viewer.cancelSelection();
 			}
@@ -205,7 +200,6 @@ public class ProgressView extends ViewPart implements IViewPart {
 			 * 
 			 * @see org.eclipse.jface.action.Action#run()
 			 */
-			@Override
 			public void run() {
 				FinishedJobs.getInstance().clearAll();
 			}

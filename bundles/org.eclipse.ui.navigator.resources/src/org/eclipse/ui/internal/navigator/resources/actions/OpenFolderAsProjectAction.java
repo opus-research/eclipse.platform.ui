@@ -50,7 +50,6 @@ public class OpenFolderAsProjectAction extends Action {
 		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(SharedImages.IMG_OBJ_PROJECT));
 	}
 
-	@Override
 	public void run() {
 		try {
 			IProjectDescription desc = new ProjectDescriptionReader().read(folder.getLocation().append(IProjectDescription.DESCRIPTION_FILE_NAME));

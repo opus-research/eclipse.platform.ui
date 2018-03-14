@@ -124,8 +124,7 @@ public class TableColorProviderTest extends StructuredViewerTest {
     /* (non-Javadoc)
      * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#tearDown()
      */
-    @Override
-	public void tearDown() {
+    public void tearDown() {
         super.tearDown();
         red.dispose();
         green.dispose();
@@ -134,8 +133,7 @@ public class TableColorProviderTest extends StructuredViewerTest {
     /* (non-Javadoc)
      * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#setUp()
      */
-    @Override
-	public void setUp() {
+    public void setUp() {
         super.setUp();
         red = new Color(Display.getCurrent(), 255, 0, 0);
         green = new Color(Display.getCurrent(), 0, 255, 0);
@@ -152,8 +150,7 @@ public class TableColorProviderTest extends StructuredViewerTest {
     /* (non-Javadoc)
      * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#createViewer(org.eclipse.swt.widgets.Composite)
      */
-    @Override
-	protected StructuredViewer createViewer(Composite parent) {
+    protected StructuredViewer createViewer(Composite parent) {
         TableViewer viewer = new TableViewer(parent);
         viewer.setContentProvider(new TestModelContentProvider());
         
@@ -179,16 +176,14 @@ public class TableColorProviderTest extends StructuredViewerTest {
         return viewer;
     }
 
-    @Override
-	protected int getItemCount() {
+    protected int getItemCount() {
         TestElement first = fRootElement.getFirstChild();
         TableItem ti = (TableItem) fViewer.testFindItem(first);
         Table table = ti.getParent();
         return table.getItemCount();
     }
 
-    @Override
-	protected String getItemText(int at) {
+    protected String getItemText(int at) {
         Table table = (Table) fViewer.getControl();
         return table.getItem(at).getText();
     }
@@ -196,16 +191,14 @@ public class TableColorProviderTest extends StructuredViewerTest {
     class TableColorViewLabelProvider extends TableTestLabelProvider implements
             ITableColorProvider {
 
-        @Override
-		public Image getColumnImage(Object obj, int index) {
+        public Image getColumnImage(Object obj, int index) {
             return null;
         }
 
         /* (non-Javadoc)
          * @see org.eclipse.jface.viewers.ITableColorProvider#getForeground(java.lang.Object, int)
          */
-        @Override
-		public Color getForeground(Object element, int columnIndex) {
+        public Color getForeground(Object element, int columnIndex) {
             switch (columnIndex) {
             case 0:
                 return green;
@@ -220,8 +213,7 @@ public class TableColorProviderTest extends StructuredViewerTest {
         /* (non-Javadoc)
          * @see org.eclipse.jface.viewers.ITableColorProvider#getBackground(java.lang.Object, int)
          */
-        @Override
-		public Color getBackground(Object element, int columnIndex) {
+        public Color getBackground(Object element, int columnIndex) {
             switch (columnIndex) {
             case 0:
                 return red;
@@ -239,7 +231,6 @@ public class TableColorProviderTest extends StructuredViewerTest {
     	/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.IColorProvider#getBackground(java.lang.Object)
 		 */
-		@Override
 		public Color getBackground(Object element) {
 			return red;
 		}
@@ -247,7 +238,6 @@ public class TableColorProviderTest extends StructuredViewerTest {
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
 		 */
-		@Override
 		public Color getForeground(Object element) {
 			return green;
 		}
