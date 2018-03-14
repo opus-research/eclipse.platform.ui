@@ -65,11 +65,7 @@ public abstract class AbstractFieldAssistWindow extends Window {
 		return content;
 	}
 	
-	/**
-	 * @param parent
-	 *            the SWT composite
-	 */
-	protected void createExtraControls(Composite parent) {
+	protected void createExtraControls(@SuppressWarnings("unused") Composite parent) {
 		// default is to do nothing
 	}
 
