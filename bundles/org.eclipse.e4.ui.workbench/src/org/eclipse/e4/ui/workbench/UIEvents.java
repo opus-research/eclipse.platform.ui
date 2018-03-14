@@ -68,7 +68,7 @@ public class UIEvents {
 	/**
 	 * Event sent when a enabled update is requested for tool-items.
 	 * <p>
-	 * As a value you can pass:
+	 * As a value you can pass in to the {@link IEventBroker}:
 	 * <ul>
 	 * <li>the {@link MApplicationElement#getElementId()} of the element to check</li>
 	 * <li>the special value {@link #ALL_ELEMENT_ID}</li>
@@ -80,22 +80,6 @@ public class UIEvents {
 	 */
 	public static final String REQUEST_ENABLEMENT_UPDATE_TOPIC = UIRendererTopicBase
 			+ "/requestEnablementUpdate"; //$NON-NLS-1$
-
-	/**
-	 * Selector to find element
-	 * 
-	 * @since 1.1
-	 */
-	public interface Selector {
-		/**
-		 * Call for each element to find matching elements
-		 * 
-		 * @param element
-		 *            the element
-		 * @return <code>true</code> if matches else <code>false</code>
-		 */
-		public boolean select(MApplicationElement element);
-	}
 
 	/**
 	 * Special id passed to force all elements to be checked

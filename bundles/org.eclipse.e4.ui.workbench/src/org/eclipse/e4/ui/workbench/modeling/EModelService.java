@@ -219,8 +219,9 @@ public interface EModelService {
 	 * @param element
 	 *            the element to locate parent context for
 	 * @return the containing context for this element
+	 * @since 1.1
 	 */
-	public IEclipseContext getContainingContext(MUIElement element);
+	public IEclipseContext getContainingContext(MApplicationElement element);
 
 	/**
 	 * Brings the specified element to the top of its containment structure. If the specified
@@ -240,11 +241,6 @@ public interface EModelService {
 	 * the CLONED_FROM_KEY key. This is useful in cases where there may be other information the
 	 * newly cloned element needs from the original.
 	 * 
-	 * <p>
-	 * <b>Caution: </b> This will also clean all {@link MPlaceholder#setRef(MUIElement)}s in the
-	 * cloned object.
-	 * </p>
-	 * 
 	 * @param element
 	 *            The element to clone
 	 * @param snippetContainer
@@ -253,27 +249,6 @@ public interface EModelService {
 	 * @return The newly cloned element
 	 */
 	public MUIElement cloneElement(MUIElement element, MSnippetContainer snippetContainer);
-
-	/**
-	 * Clones the element, creating a deep copy of its structure.
-	 * 
-	 * NOTE: The cloned element gets the original element added into its 'transientData' map using
-	 * the CLONED_FROM_KEY key. This is useful in cases where there may be other information the
-	 * newly cloned element needs from the original.
-	 * 
-	 * @param element
-	 *            The element to clone
-	 * @param snippetContainer
-	 *            An optional MUIElement where the cloned snippet is to be saved. null if the clone
-	 *            need not be saved
-	 * @param cleanPlaceholderRef
-	 *            setting it to <code>true</code> will set all the
-	 *            {@link MPlaceholder#setRef(MUIElement)}'s to <code>null</code> in the cloned
-	 *            object, otherwise they will be replaced with a proxy object
-	 * @return The newly cloned element
-	 */
-	public MUIElement cloneElement(MUIElement element, MSnippetContainer snippetContainer,
-			boolean cleanPlaceholderRef);
 
 	/**
 	 * If a snippet with the given id exists a clone is created and returned. returns
