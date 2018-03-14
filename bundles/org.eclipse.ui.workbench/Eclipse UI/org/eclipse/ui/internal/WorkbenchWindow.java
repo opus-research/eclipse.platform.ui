@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import org.eclipse.core.commands.IHandler;
@@ -2742,90 +2741,44 @@ STATUS_LINE_ID, model);
 			// to prevent an NPE when using Intro's 'Go to Workbench' handling
 			// See Bug 365625 for details...
 			trimManager = new ITrimManager() {
-				private Map<IWindowTrim, MToolControl> created = new HashMap<>();
+				@Override
+				public void addTrim(int areaId, IWindowTrim trim) {
+				}
 
 				@Override
 				public void addTrim(int areaId, IWindowTrim trim, IWindowTrim beforeMe) {
-					MTrimBar trimBar = findBar(areaId);
-					int index = -1;
-					MToolControl beforeControl = created.get(beforeMe);
-					if (beforeMe != null && beforeControl != null) {
-						index = trimBar.getChildren().indexOf(beforeControl);
-					}
-					// Must handle case where trim already present: move into
-					// new position
-					MToolControl trimControl = created.get(trim);
-					if (trimControl == null) {
-						trimControl = modelService.createModelElement(MToolControl.class);
-						trimControl.setElementId(trim.getId());
-						trimControl.setObject(trim);
-						trimControl.setWidget(trim.getControl());
-						created.put(trim, trimControl);
-					}
-					if (index > 0) {
-						trimBar.getChildren().add(index, trimControl);
-					} else {
-						trimBar.getChildren().add(trimControl);
-					}
-				}
-
-				private MTrimBar findBar(int areaId) {
-					switch (areaId) {
-					case ITrimManager.TOP:
-						return getTopTrim();
-					case ITrimManager.LEFT:
-						return modelService.getTrim(model, SideValue.LEFT);
-					case ITrimManager.RIGHT:
-						return modelService.getTrim(model, SideValue.RIGHT);
-					case ITrimManager.BOTTOM:
-					default:
-						return modelService.getTrim(model, SideValue.BOTTOM);
-					}
 				}
 
 				@Override
 				public void removeTrim(IWindowTrim toRemove) {
-					MToolControl trimControl = created.remove(toRemove);
-					if (trimControl != null && trimControl.getParent() != null) {
-						trimControl.getParent().getChildren().remove(trimControl);
-					}
 				}
 
 				@Override
 				public IWindowTrim getTrim(String id) {
-					return created.keySet().stream().filter(t -> id.equals(t.getId())).findFirst().orElse(null);
+					return null;
 				}
 
 				@Override
-				public List<IWindowTrim> getAreaTrim(int areaId) {
-					return findBar(areaId).getChildren().stream()
-							.filter(c -> c instanceof MToolControl
-									&& ((MToolControl) c).getObject() instanceof IWindowTrim)
-							.map(c -> (IWindowTrim) ((MToolControl) c).getObject()).collect(Collectors.toList());
+				public int[] getAreaIds() {
+					return null;
 				}
 
 				@Override
-				public void updateAreaTrim(int areaId, List<? extends IWindowTrim> trim, boolean removeExtra) {
-					if (removeExtra) {
-						List<IWindowTrim> existingTrim = getAreaTrim(areaId);
-						for (IWindowTrim t : existingTrim) {
-							if (!existingTrim.contains(t)) {
-								removeTrim(t);
-							}
-						}
-					}
-					addTrim(areaId, trim.get(0));
-					for (int i = 1; i < trim.size(); i++) {
-						addTrim(areaId, trim.get(i), trim.get(i - 1));
-					}
+				public List getAreaTrim(int areaId) {
+					return null;
+				}
+
+				@Override
+				public void updateAreaTrim(int id, List trim, boolean removeExtra) {
+				}
+
+				@Override
+				public List getAllTrim() {
+					return null;
 				}
 
 				@Override
 				public void setTrimVisible(IWindowTrim trim, boolean visible) {
-					MToolControl trimControl = created.get(trim);
-					if (trimControl != null) {
-						trimControl.setVisible(visible);
-					}
 				}
 
 				@Override
