@@ -18,6 +18,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 
 /**
@@ -91,6 +92,9 @@ public class ProjectDescription extends ContainerDescription {
 			projectHandle.create(projectDescription, subMonitor.split(100));
 		}
 
+		if (subMonitor.isCanceled()) {
+			throw new OperationCanceledException();
+		}
 		if (openOnCreate) {
 			projectHandle.open(IResource.NONE, subMonitor.split(100));
 		}
