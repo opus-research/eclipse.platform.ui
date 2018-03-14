@@ -13,7 +13,6 @@
 package org.eclipse.e4.ui.workbench.addons.minmax;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import javax.inject.Inject;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -465,10 +464,19 @@ public class MinMaxAddon {
 		final MPerspective openedPersp = (MPerspective) event.getProperty(EventTags.ELEMENT);
 
 		// Find any minimized stacks and show their trim
-		List<MUIElement> minimizedElements = modelService.findElements(openedPersp, null,
-				MUIElement.class, Arrays.asList(IPresentationEngine.MINIMIZED));
-		for (MUIElement element : minimizedElements) {
-			createTrim(element);
+		MWindow topWin = modelService.getTopLevelWindowFor(openedPersp);
+		showMinimizedTrim(topWin);
+		for (MWindow dw : openedPersp.getWindows()) {
+			showMinimizedTrim(dw);
+		}
+	}
+
+	private void showMinimizedTrim(MWindow win) {
+		List<MPartStack> stackList = modelService.findElements(win, null, MPartStack.class, null);
+		for (MPartStack stack : stackList) {
+			if (stack.getTags().contains(IPresentationEngine.MINIMIZED)) {
+				createTrim(stack);
+			}
 		}
 	}
 
@@ -778,9 +786,6 @@ public class MinMaxAddon {
 		}
 
 		adjustCTFButtons(element);
-
-		// There are more views available to be active...
-		partService.requestActivation();
 	}
 
 	/**

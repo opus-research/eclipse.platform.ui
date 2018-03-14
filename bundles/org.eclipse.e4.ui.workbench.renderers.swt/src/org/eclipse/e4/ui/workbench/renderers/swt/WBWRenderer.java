@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -130,7 +129,7 @@ public class WBWRenderer extends SWTPartRenderer {
 	private EventHandler shellUpdater;
 	private EventHandler visibilityHandler;
 	private EventHandler sizeHandler;
-	private ThemeDefinitionChangedHandler themeDefinitionChanged;
+	private EventHandler themeDefinitionChanged;
 
 	@Inject
 	private EModelService modelService;
@@ -325,8 +324,21 @@ public class WBWRenderer extends SWTPartRenderer {
 		eventBroker.unsubscribe(visibilityHandler);
 		eventBroker.unsubscribe(sizeHandler);
 		eventBroker.unsubscribe(themeDefinitionChanged);
+	}
 
-		themeDefinitionChanged.dispose();
+	/**
+	 * @param wbwModel
+	 * @return Returns the style override bits or -1 if there is no override
+	 */
+	private int getStyleOverride(MWindow wbwModel) {
+		String overrideStr = wbwModel.getPersistedState().get(
+				IPresentationEngine.STYLE_OVERRIDE_KEY);
+		if (overrideStr == null || overrideStr.length() == 0)
+			return -1;
+
+		int val = -1;
+		val = Integer.parseInt(overrideStr);
+		return val;
 	}
 
 	public Object createWidget(MUIElement element, Object parent) {
@@ -677,6 +689,13 @@ public class WBWRenderer extends SWTPartRenderer {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#getUIContainer
+	 * (org.eclipse.e4.ui.model.application.MUIElement)
+	 */
 	@Override
 	public Object getUIContainer(MUIElement element) {
 		MUIElement parent = element.getParent();
@@ -691,6 +710,13 @@ public class WBWRenderer extends SWTPartRenderer {
 		return tpl.clientArea;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.renderers.PartFactory#postProcess(org.eclipse
+	 * .e4.ui.model.application.MPart)
+	 */
 	@Override
 	public void postProcess(MUIElement shellME) {
 		super.postProcess(shellME);
@@ -816,8 +842,6 @@ public class WBWRenderer extends SWTPartRenderer {
 	@SuppressWarnings("restriction")
 	protected static class ThemeDefinitionChangedHandler implements
 			EventHandler {
-		protected Set<Resource> unusedResources = new HashSet<Resource>();
-
 		public void handleEvent(Event event) {
 			Object element = event.getProperty(IEventBroker.DATA);
 
@@ -825,6 +849,7 @@ public class WBWRenderer extends SWTPartRenderer {
 				return;
 			}
 
+			List<Object> unusedResources = new ArrayList<Object>();
 			Set<CSSEngine> engines = new HashSet<CSSEngine>();
 
 			// In theory we can have multiple engines since API allows it.
@@ -837,14 +862,13 @@ public class WBWRenderer extends SWTPartRenderer {
 			}
 
 			for (CSSEngine engine : engines) {
-				for (Object resource : removeResources(engine
-						.getResourcesRegistry())) {
-					if (resource instanceof Resource
-							&& !((Resource) resource).isDisposed()) {
-						unusedResources.add((Resource) resource);
-					}
-				}
+				unusedResources.addAll(removeResources(engine
+						.getResourcesRegistry()));
 				engine.reapply();
+			}
+
+			for (Object resource : unusedResources) {
+				disposeResource(resource);
 			}
 		}
 
@@ -862,13 +886,11 @@ public class WBWRenderer extends SWTPartRenderer {
 			return Collections.emptyList();
 		}
 
-		public void dispose() {
-			for (Resource resource : unusedResources) {
-				if (!resource.isDisposed()) {
-					resource.dispose();
-				}
+		protected void disposeResource(Object resource) {
+			if (resource instanceof Resource
+					&& !((Resource) resource).isDisposed()) {
+				((Resource) resource).dispose();
 			}
-			unusedResources.clear();
 		}
 	}
 
