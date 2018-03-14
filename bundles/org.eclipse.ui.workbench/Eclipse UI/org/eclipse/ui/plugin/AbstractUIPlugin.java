@@ -16,11 +16,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IPluginDescriptor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -692,21 +695,37 @@ public abstract class AbstractUIPlugin extends Plugin {
 			return null;
 		}
 
-        // look for the image (this will check both the plugin and fragment folders
-        URL fullPathString = BundleUtility.find(bundle, imageFilePath);
-        if (fullPathString == null) {
-            try {
-                fullPathString = new URL(imageFilePath);
-            } catch (MalformedURLException e) {
-                return null;
-            }
+		// Don't resolve the URL here, but create a URL using the
+		// "platform:/plugin" protocol, which also supports fragments.
+		// Caveat: The resulting URL may contain $nl$ etc., which is not
+		// directly supported by PlatformURLConnection and needs to go through
+		// FileLocator#find(URL), see bug 250432.
+		IPath uriPath = new Path("/plugin").append(pluginId).append(imageFilePath); //$NON-NLS-1$
+		URL url;
+		try {
+			URI uri = new URI("platform", null, uriPath.toString(), null); //$NON-NLS-1$
+			url = uri.toURL();
+		} catch (MalformedURLException | URISyntaxException e) {
+			return null;
+		}
+
+		// look for the image
+		URL fullPathString = FileLocator.find(url);
+		if (fullPathString == null) {
+			// If not found, reinterpret imageFilePath as full URL.
+			// This is unspecified, but apparently widely-used, see bug 395126.
+			try {
+				fullPathString = new URL(imageFilePath);
+			} catch (MalformedURLException e) {
+				return null;
+			}
 			URL platformURL = FileLocator.find(fullPathString);
 			if (platformURL != null) {
-				fullPathString = platformURL;
+				url = fullPathString;
 			}
-        }
-
-        return ImageDescriptor.createFromURL(fullPathString);
+		}
+		// create image descriptor with the platform:/ URL
+		return ImageDescriptor.createFromURL(url);
     }
 
     /**

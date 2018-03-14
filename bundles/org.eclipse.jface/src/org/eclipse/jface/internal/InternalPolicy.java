@@ -54,6 +54,44 @@ public class InternalPolicy {
 	public static boolean DEBUG_BIDI_UTILS = false;
 
 	/**
+	 * (NON-API) Trace time spent creating URLImageDescriptor images.
+	 *
+	 * @since 3.11
+	 */
+	public static boolean DEBUG_TRACE_URL_IMAGE_DESCRIPTOR = false;
+
+	/**
+	 * (NON-API) Log cases where an "@2x" image could not be found.
+	 *
+	 * @since 3.11
+	 */
+	public static boolean DEBUG_LOG_URL_IMAGE_DESCRIPTOR_MISSING_2x = false;
+
+	/**
+	 * (NON-API) If true, URLImageDescriptor loads images directly via
+	 * URL#openStream(). If false, URLImageDescriptor first tries to use
+	 * FileLocator#toFileURL(URL) and the Image(Device, String) constructor.
+	 *
+	 * @since 3.11
+	 */
+	public static boolean DEBUG_LOAD_URL_IMAGE_DESCRIPTOR_DIRECTLY = false;
+
+	/**
+	 * (NON-API) Enable high-dpi images via "@2x" filename convention.
+	 *
+	 * @since 3.11
+	 */
+	public static boolean DEBUG_LOAD_URL_IMAGE_DESCRIPTOR_2x = false;
+
+	/**
+	 * (NON-API) Always load the .png image of the "@2x" version, even if the
+	 * original image was a .gif.
+	 *
+	 * @since 3.11
+	 */
+	public static boolean DEBUG_LOAD_URL_IMAGE_DESCRIPTOR_2x_PNG_FOR_GIF = false;
+
+	/**
 	 * (NON-API) A flag to indicate whether the JFace bundle is running inside
 	 * an OSGi container
 	 *
