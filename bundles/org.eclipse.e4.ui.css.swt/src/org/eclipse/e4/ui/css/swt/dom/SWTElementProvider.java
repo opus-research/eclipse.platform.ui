@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.dom;
 
-import org.eclipse.e4.ui.css.core.dom.CSSStylableElement;
 import org.eclipse.e4.ui.css.core.dom.IElementProvider;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.swt.custom.CTabFolder;
@@ -42,17 +41,6 @@ public class SWTElementProvider implements IElementProvider {
 
 	@Override
 	public Element getElement(Object element, CSSEngine engine) {
-		return createElement(element, engine);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.eclipse.e4.ui.core.css.dom.IElementProvider#getElement(java.lang.
-	 * Object)
-	 */
-	public CSSStylableElement createElement(Object element, CSSEngine engine) {
 		if (element instanceof Text) {
 			return new TextElement((Text) element, engine);
 		}
