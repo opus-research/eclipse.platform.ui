@@ -8,14 +8,9 @@
  * Contributors:
  *      Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
  *      IBM Corporation - initial API and implementation
- *      Steven Spungin <steven@spungin.tv> - Bug 437958
  */
 package org.eclipse.e4.ui.model.fragment.impl;
 
-import java.util.regex.Pattern;
-
-import org.eclipse.emf.ecore.util.EcoreUtil;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -284,32 +279,18 @@ public class StringModelFragmentImpl extends ModelFragmentImpl implements MStrin
 		return result.toString();
 	}
 	
-	static final Pattern patternCSV = Pattern.compile("[,\\s]*,[,\\s]*");
-	
 	@Override
 	public List<MApplicationElement> merge(MApplication application) {
-		ArrayList<MApplicationElement> ret = new ArrayList<MApplicationElement>();
-		String[] parentIds = patternCSV.split(getParentElementId());
-		for (String parentId : parentIds){
-			MApplicationElement o =  ModelUtils.findElementById(application, parentId);
-			if( o != null ) {
-				EStructuralFeature feature = ((EObject)o).eClass().getEStructuralFeature(getFeaturename());
-				if( feature != null ) {
-					List<MApplicationElement> elements;
-					if (parentIds.length > 1){
-						elements = new ArrayList<MApplicationElement>();
-						for (MApplicationElement element : getElements()){
-							elements.add((MApplicationElement) EcoreUtil.copy((EObject) element));
-						}
-					}else{
-						elements = getElements();
-					}
-					ret.addAll(ModelUtils.merge(o, feature, elements, getPositionInList()));	
-				}		
+		MApplicationElement o =  ModelUtils.findElementById(application, getParentElementId());
+		if( o != null ) {
+			EStructuralFeature feature = ((EObject)o).eClass().getEStructuralFeature(getFeaturename());
+			if( feature != null ) {
+				return ModelUtils.merge(o, feature, getElements(), getPositionInList());	
 			}
+			
 		}
 		
-		return ret;
+		return Collections.emptyList();
 	}
 
 } //StringModelFragmentImpl
