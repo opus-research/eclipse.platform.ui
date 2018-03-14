@@ -100,7 +100,6 @@ public class MenuManagerHideProcessor implements IMenuListener2 {
 							ContextInjectionFactory.invoke(contribution,
 									AboutToHide.class, parentContext,
 									dynamicMenuContext, null);
-							dynamicMenuContext.dispose();
 						}
 
 					}
