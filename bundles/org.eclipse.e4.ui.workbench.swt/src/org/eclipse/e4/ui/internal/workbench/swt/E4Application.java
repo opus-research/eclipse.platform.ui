@@ -206,11 +206,15 @@ public class E4Application implements IApplication {
 		appContext.set(UISynchronize.class, new UISynchronize() {
 
 			public void syncExec(Runnable runnable) {
-				display.syncExec(runnable);
+				if (display != null && !display.isDisposed()) {
+					display.syncExec(runnable);
+				}
 			}
 
 			public void asyncExec(Runnable runnable) {
-				display.asyncExec(runnable);
+				if (display != null && !display.isDisposed()) {
+					display.asyncExec(runnable);
+				}
 			}
 		});
 		appContext.set(IApplicationContext.class, applicationContext);
@@ -302,11 +306,12 @@ public class E4Application implements IApplication {
 		}
 		appContext.set(E4Application.THEME_ID, themeId);
 
-		// validate static CSS URI
+		// Temporary to support old property as well
 		if (cssURI != null && !cssURI.startsWith("platform:")) {
 			System.err
-					.println("Warning. Use the platform: URI for the  parameter:   "
-							+ IWorkbench.CSS_URI_ARG); //$NON-NLS-1$
+					.println("Warning "
+							+ cssURI
+							+ " changed its meaning it is used now to run without theme support");
 			appContext.set(E4Application.THEME_ID, cssURI);
 		}
 
