@@ -435,10 +435,10 @@ public final class EditorDescriptor implements IEditorDescriptor, Serializable,
             openMode = openModeInt.intValue();
         } else {
             // legacy: handle the older attribute names, needed to allow reading of pre-3.0-RCP workspaces
-            boolean internal = new Boolean(memento
+            boolean internal = Boolean.valueOf(memento
                     .getString(IWorkbenchConstants.TAG_INTERNAL))
                     .booleanValue();
-            boolean openInPlace = new Boolean(memento
+            boolean openInPlace = Boolean.valueOf(memento
                     .getString(IWorkbenchConstants.TAG_OPEN_IN_PLACE))
                     .booleanValue();
             if (internal) {
