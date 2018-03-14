@@ -51,7 +51,6 @@ public class TypeMarkerGroup extends MarkerGroup {
 		 * 
 		 * @see org.eclipse.ui.internal.provisional.views.markers.api.MarkerField#getValue(org.eclipse.ui.internal.provisional.views.markers.api.MarkerItem)
 		 */
-		@Override
 		public String getValue(MarkerItem item) {
 
 			if (item.getMarker() != null) {
@@ -82,7 +81,6 @@ public class TypeMarkerGroup extends MarkerGroup {
 		/* (non-Javadoc)
 		 * @see org.eclipse.ui.views.markers.internal.MarkerGroup.GroupMarkerField#compare(org.eclipse.ui.views.markers.MarkerItem, org.eclipse.ui.views.markers.MarkerItem)
 		 */
-		@Override
 		public int compare(MarkerItem item1, MarkerItem item2) {
 			return getValue(item1).compareTo(getValue(item2));
 		}
@@ -104,7 +102,6 @@ public class TypeMarkerGroup extends MarkerGroup {
 	/**
 	 * Create the fields for the marker views.
 	 */
-	@Override
 	protected void createFields() {
 		field = new FieldCategory();
 		markerField = new TypeMarkerField();
@@ -117,7 +114,6 @@ public class TypeMarkerGroup extends MarkerGroup {
 	 * org.eclipse.ui.views.markers.internal.MarkerGroup#findGroupValue(java
 	 * .lang.String, org.eclipse.core.resources.IMarker)
 	 */
-	@Override
 	public MarkerGroupingEntry findGroupValue(String typeId, IMarker marker) {
 		TypesMarkerGroupingEntry entry = (TypesMarkerGroupingEntry) entries
 				.get(typeId);
@@ -138,7 +134,6 @@ public class TypeMarkerGroup extends MarkerGroup {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.internal.MarkerGroup#getId()
 	 */
-	@Override
 	public String getId() {
 		return Util.TYPE_MARKER_GROUPING_ID;
 	}
@@ -146,7 +141,6 @@ public class TypeMarkerGroup extends MarkerGroup {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.internal.MarkerGroup#getTitle()
 	 */
-	@Override
 	public String getTitle() {
 		return name;
 	}
@@ -154,10 +148,8 @@ public class TypeMarkerGroup extends MarkerGroup {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.internal.MarkerGroup#getEntriesComparator()
 	 */
-	@Override
 	public Comparator getEntriesComparator() {
 		return new Comparator() {
-			@Override
 			public int compare(Object o1, Object o2) {
 				//TODO: use a collator to compare?
 				return ((MarkerGroupingEntry) o1).getLabel().compareTo(

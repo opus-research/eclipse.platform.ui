@@ -130,8 +130,7 @@ public class TwoPaneElementSelector extends AbstractElementListSelectionDialog {
     /*
      * @see Dialog#createDialogArea(Composite)
      */
-    @Override
-	public Control createDialogArea(Composite parent) {
+    public Control createDialogArea(Composite parent) {
         Composite contents = (Composite) super.createDialogArea(parent);
         createMessageArea(contents);
         createFilterText(contents);
@@ -179,20 +178,17 @@ public class TwoPaneElementSelector extends AbstractElementListSelectionDialog {
     protected Table createLowerList(Composite parent) {
         Table list = new Table(parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
         list.addListener(SWT.Selection, new Listener() {
-            @Override
-			public void handleEvent(Event evt) {
+            public void handleEvent(Event evt) {
                 handleLowerSelectionChanged();
             }
         });
         list.addListener(SWT.MouseDoubleClick, new Listener() {
-            @Override
-			public void handleEvent(Event evt) {
+            public void handleEvent(Event evt) {
                 handleDefaultSelected();
             }
         });
         list.addDisposeListener(new DisposeListener() {
-            @Override
-			public void widgetDisposed(DisposeEvent e) {
+            public void widgetDisposed(DisposeEvent e) {
                 fQualifierRenderer.dispose();
             }
         });
@@ -212,8 +208,7 @@ public class TwoPaneElementSelector extends AbstractElementListSelectionDialog {
     /**
      * @see SelectionStatusDialog#computeResult()
      */
-    @Override
-	protected void computeResult() {
+    protected void computeResult() {
         Object[] results = new Object[] { getLowerSelectedElement() };
         setResult(Arrays.asList(results));
     }
@@ -221,8 +216,7 @@ public class TwoPaneElementSelector extends AbstractElementListSelectionDialog {
     /**
      * @see AbstractElementListSelectionDialog#handleDefaultSelected()
      */
-    @Override
-	protected void handleDefaultSelected() {
+    protected void handleDefaultSelected() {
         if (validateCurrentSelection() && (getLowerSelectedElement() != null)) {
 			buttonPressed(IDialogConstants.OK_ID);
 		}
@@ -231,8 +225,7 @@ public class TwoPaneElementSelector extends AbstractElementListSelectionDialog {
     /**
      * @see AbstractElementListSelectionDialog#handleSelectionChanged()
      */
-    @Override
-	protected void handleSelectionChanged() {
+    protected void handleSelectionChanged() {
         handleUpperSelectionChanged();
     }
 
@@ -335,8 +328,7 @@ public class TwoPaneElementSelector extends AbstractElementListSelectionDialog {
     /*
      * @see AbstractElementListSelectionDialog#handleEmptyList()
      */
-    @Override
-	protected void handleEmptyList() {
+    protected void handleEmptyList() {
         super.handleEmptyList();
         fLowerList.setEnabled(false);
     }
@@ -345,8 +337,7 @@ public class TwoPaneElementSelector extends AbstractElementListSelectionDialog {
      * @see AbstractElementListSelectionDialog#validateCurrentSelection()
      * @since 3.5
      */
-    @Override
-	protected boolean validateCurrentSelection() {
+    protected boolean validateCurrentSelection() {
     	ISelectionStatusValidator validator = getValidator();
     	Object lowerSelection = getLowerSelectedElement();
     	

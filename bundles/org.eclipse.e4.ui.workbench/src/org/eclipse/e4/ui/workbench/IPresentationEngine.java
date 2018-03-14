@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 BestSolution.at and others.
+ * Copyright (c) 2009, 2013 BestSolution.at and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -64,14 +64,6 @@ public interface IPresentationEngine {
 	public static final String NO_MOVE = "NoMove"; //$NON-NLS-1$
 
 	/**
-	 * This tag can be used by the renderer implementation to decide that the user interface element
-	 * has been hidden.
-	 *
-	 * @since 1.1
-	 */
-	public static final String HIDDEN_EXPLICITLY = "HIDDEN_EXPLICITLY"; //$NON-NLS-1$
-
-	/**
 	 * This key is used to store information in the 'persistentData' map which will be used to
 	 * override the initial style of an element at rendering time. For example the SWT renderer will
 	 * expect to see an integer (as a string) which defines the initial SWT style bits.
@@ -93,14 +85,6 @@ public interface IPresentationEngine {
 	 * @since 1.1
 	 */
 	public static String WINDOW_MAXIMIZED_TAG = "shellMaximized"; //$NON-NLS-1$
-
-	/**
-	 * When applied to an MWindow causes the renderer to render the resulting control as a top level
-	 * window
-	 *
-	 * @since 1.3
-	 */
-	public static String WINDOW_TOP_LEVEL = "shellTopLevel"; //$NON-NLS-1$
 
 	/**
 	 * When added to an element's 'tags' this should cause the presentation to move that element to
@@ -199,21 +183,6 @@ public interface IPresentationEngine {
 	 * ABstractPartRenderer that is to be used to render the element
 	 */
 	public static final String CUSTOM_RENDERER_KEY = "Custom Renderer"; //$NON-NLS-1$	
-
-	/**
-	 * This is the tag name that enables the DND support for the element. The element's tags list
-	 * has to be updated with the tag in order to enable the DND processing.
-	 *
-	 * @since 1.1
-	 */
-	public static final String DRAGGABLE = "Draggable"; //$NON-NLS-1$
-
-	/**
-	 * This is the tag name that indicates that the model element is active.
-	 *
-	 * @since 1.3
-	 */
-	public static final String ACTIVE = "active"; //$NON-NLS-1$
 
 	/**
 	 * Creates and returns the UI element for the given model element.

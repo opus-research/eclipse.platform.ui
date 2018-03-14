@@ -25,25 +25,39 @@ public class TestResourceMapping extends ResourceMapping {
 		element = resource;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.resources.mapping.ResourceMapping#getModelObject()
+	 */
 	public Object getModelObject() {
 		return element;
 	}
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.resources.mapping.ResourceMapping#getModelProviderId()
+	 */
 	public String getModelProviderId() {
 		return ModelProvider.RESOURCE_MODEL_PROVIDER_ID;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.resources.mapping.ResourceMapping#getProjects()
+	 */
 	public IProject[] getProjects() {
-		if (element.getType() == IResource.ROOT) {
+		if (element.getType() == IResource.ROOT)
 			return ((IWorkspaceRoot) element).getProjects();
-		}
 		return new IProject[] { element.getProject() };
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.resources.mapping.ResourceMapping#getTraversals(org.eclipse.core.resources.mapping.ResourceMappingContext,
+	 *      org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	public ResourceTraversal[] getTraversals(ResourceMappingContext context,
 			IProgressMonitor monitor) {
 		ResourceTraversal traversal = new ResourceTraversal(
@@ -58,13 +72,12 @@ public class TestResourceMapping extends ResourceMapping {
 
 	/**
 	 * Return the children of the receiver.
-	 *
+	 * 
 	 * @return TestResourceMapping []
 	 */
 	public TestResourceMapping[] getChildren() {
-		if (element.getType() == IResource.FILE) {
+		if (element.getType() == IResource.FILE)
 			return new TestResourceMapping[0];
-		}
 		IResource[] children;
 		try {
 			children = ((IContainer) element).members();
@@ -85,7 +98,7 @@ public class TestResourceMapping extends ResourceMapping {
 
 	public void setParent(TestResourceMapping mapping) {
 		parent = mapping;
-
+		
 	}
 
 	public TestResourceMapping getParent() {

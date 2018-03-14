@@ -44,13 +44,19 @@ public abstract class NavigationLocation implements INavigationLocation {
         return page.findEditor(input);
     }
 
-    @Override
-	public Object getInput() {
+    /*
+     * (non-Javadoc)
+     * Method declared on INavigationLocation.
+     */
+    public Object getInput() {
         return input;
     }
 
-    @Override
-	public String getText() {
+    /*
+     * (non-Javadoc)
+     * Method declared on INavigationLocation.
+     */
+    public String getText() {
         IEditorPart part = getEditorPart();
         if (part == null) {
 			return new String();
@@ -58,8 +64,11 @@ public abstract class NavigationLocation implements INavigationLocation {
         return part.getTitle();
     }
 
-    @Override
-	public void setInput(Object input) {
+    /*
+     * (non-Javadoc)
+     * Method declared on INavigationLocation.
+     */
+    public void setInput(Object input) {
         this.input = (IEditorInput) input;
     }
 
@@ -68,8 +77,7 @@ public abstract class NavigationLocation implements INavigationLocation {
      *
      * @see org.eclipse.ui.INavigationLocation#dispose()
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         releaseState();
     }
 
@@ -78,8 +86,7 @@ public abstract class NavigationLocation implements INavigationLocation {
      * 
      * @see org.eclipse.ui.INavigationLocation#releaseState()
      */
-    @Override
-	public void releaseState() {
+    public void releaseState() {
         input = null;
     }
 }

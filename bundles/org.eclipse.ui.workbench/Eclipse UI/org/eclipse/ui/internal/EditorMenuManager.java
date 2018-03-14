@@ -53,8 +53,7 @@ public class EditorMenuManager extends SubMenuManager {
             }
         }
 
-        @Override
-		public Boolean getEnabled(IContributionItem item) {
+        public Boolean getEnabled(IContributionItem item) {
             if (((item instanceof ActionContributionItem) && (((ActionContributionItem) item)
                     .getAction() instanceof RetargetAction))
                     || enabledAllowed) {
@@ -64,8 +63,7 @@ public class EditorMenuManager extends SubMenuManager {
 			}
         }
 
-        @Override
-		public Integer getAccelerator(IContributionItem item) {
+        public Integer getAccelerator(IContributionItem item) {
             if (getEnabled(item) == null) {
 				return getParentMenuManager().getOverrides().getAccelerator(
                         item);
@@ -75,19 +73,19 @@ public class EditorMenuManager extends SubMenuManager {
 			}
         }
 
-        @Override
-		public String getAcceleratorText(IContributionItem item) {
+        public String getAcceleratorText(IContributionItem item) {
             return getParentMenuManager().getOverrides().getAcceleratorText(
                     item);
         }
 
-        @Override
-		public String getText(IContributionItem item) {
+        public String getText(IContributionItem item) {
             return getParentMenuManager().getOverrides().getText(item);
         }
         
-        @Override
-		public Boolean getVisible(IContributionItem item) {
+        /* (non-Javadoc)
+         * @see org.eclipse.jface.action.IContributionManagerOverrides#getVisible(org.eclipse.jface.action.IContributionItem)
+         */
+        public Boolean getVisible(IContributionItem item) {
         	return getParentMenuManager().getOverrides().getVisible(item);
         }
     }
@@ -101,25 +99,36 @@ public class EditorMenuManager extends SubMenuManager {
         super(mgr);
     }
 
-    @Override
-	public IContributionItem[] getItems() {
+    /* (non-Javadoc)
+     * Method declared on IContributionManager.
+     */
+    public IContributionItem[] getItems() {
         return getParentMenuManager().getItems();
     }
 
-    @Override
-	public IContributionManagerOverrides getOverrides() {
+    /* (non-Javadoc)
+     * Method declared on IContributionManager.
+     */
+    public IContributionManagerOverrides getOverrides() {
         return overrides;
     }
 
-	/*
-	 * Inserts the new item after any action set contributions which may exist
-	 * within the toolbar to ensure a consistent order for actions.
-	 */
-    @Override
-	public void prependToGroup(String groupName, IContributionItem item) {
+    /* (non-Javadoc)
+     * Method declared on IContributionManager.
+     * Inserts the new item after any action set contributions which may
+     * exist within the toolbar to ensure a consistent order for actions.
+     */
+    public void prependToGroup(String groupName, IContributionItem item) {
         insertAfter(groupName, item);
     }
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.action.SubContributionManager#appendToGroup(java.lang
+	 * .String, org.eclipse.jface.action.IContributionItem)
+	 */
 	@Override
 	public void appendToGroup(String groupName, IContributionItem item) {
 		try {
@@ -184,8 +193,10 @@ public class EditorMenuManager extends SubMenuManager {
         overrides.updateEnabledAllowed();
     }
 
-    @Override
-	protected SubMenuManager wrapMenu(IMenuManager menu) {
+    /* (non-Javadoc)
+     * Method declared on SubMenuManager.
+     */
+    protected SubMenuManager wrapMenu(IMenuManager menu) {
         if (wrappers == null) {
 			wrappers = new ArrayList();
 		}

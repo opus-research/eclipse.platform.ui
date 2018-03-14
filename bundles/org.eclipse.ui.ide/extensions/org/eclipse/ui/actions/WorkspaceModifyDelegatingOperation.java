@@ -63,8 +63,7 @@ public class WorkspaceModifyDelegatingOperation extends
     /*
      * (non-Javadoc) Method declared on WorkbenchModifyOperation.
      */
-    @Override
-	protected void execute(IProgressMonitor monitor) throws CoreException,
+    protected void execute(IProgressMonitor monitor) throws CoreException,
             InterruptedException {
         try {
             content.run(monitor);

@@ -57,12 +57,10 @@ public class MapChangeEvent extends ObservableEvent {
 		return (IObservableMap) getSource();
 	}
 
-	@Override
 	protected void dispatch(IObservablesListener listener) {
 		((IMapChangeListener) listener).handleMapChange(this);
 	}
 
-	@Override
 	protected Object getListenerType() {
 		return TYPE;
 	}

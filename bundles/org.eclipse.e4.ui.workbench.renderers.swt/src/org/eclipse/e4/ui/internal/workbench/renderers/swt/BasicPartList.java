@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,9 @@
 package org.eclipse.e4.ui.internal.workbench.renderers.swt;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.eclipse.e4.ui.model.application.ui.MDirtyable;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
@@ -21,6 +23,9 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.renderers.swt.StackRenderer;
+import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
@@ -34,6 +39,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 
@@ -64,7 +71,6 @@ public class BasicPartList extends AbstractTableInformationControl {
 			return super.getFont(element);
 		}
 
-		@Override
 		public String getText(Object element) {
 			if (element instanceof MDirtyable
 					&& ((MDirtyable) element).isDirty()) {
@@ -73,17 +79,18 @@ public class BasicPartList extends AbstractTableInformationControl {
 			return ((MUILabel) element).getLocalizedLabel();
 		}
 
-		@Override
 		public Image getImage(Object element) {
-			return renderer.getImage((MUILabel) element);
+			String iconURI = ((MUILabel) element).getIconURI();
+			if (iconURI == null) {
+				return null;
+			}
+			return getLabelImage(iconURI);
 		}
 
-		@Override
 		public String getToolTipText(Object element) {
 			return ((MUILabel) element).getLocalizedTooltip();
 		}
 
-		@Override
 		public boolean useNativeToolTip(Object object) {
 			return true;
 		}
@@ -93,6 +100,10 @@ public class BasicPartList extends AbstractTableInformationControl {
 			boldFont.dispose();
 		}
 	}
+
+	private Map<String, Image> images = new HashMap<String, Image>();
+
+	private ISWTResourceUtilities utils;
 
 	private MElementContainer<?> input;
 
@@ -104,18 +115,30 @@ public class BasicPartList extends AbstractTableInformationControl {
 
 	public BasicPartList(Shell parent, int shellStyle, int treeStyler,
 			EPartService partService, MElementContainer<?> input,
-			StackRenderer renderer, boolean alphabetical) {
+			StackRenderer renderer, ISWTResourceUtilities utils,
+			boolean alphabetical) {
 		super(parent, shellStyle, treeStyler);
 		this.partService = partService;
 		this.input = input;
 		this.renderer = renderer;
+		this.utils = utils;
 		// this.saveHandler = saveHandler;
 		if (alphabetical && getTableViewer() != null) {
 			getTableViewer().setComparator(new ViewerComparator());
 		}
 	}
 
-	@Override
+	private Image getLabelImage(String iconURI) {
+		Image image = images.get(iconURI);
+		if (image == null) {
+			ImageDescriptor descriptor = utils.imageDescriptorFromURI(URI
+					.createURI(iconURI));
+			image = descriptor.createImage();
+			images.put(iconURI, image);
+		}
+		return image;
+	}
+
 	protected TableViewer createTableViewer(Composite parent, int style) {
 		Table table = new Table(parent, SWT.SINGLE | (style & ~SWT.MULTI));
 		table.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false,
@@ -126,6 +149,13 @@ public class BasicPartList extends AbstractTableInformationControl {
 		tableViewer.setLabelProvider(new BasicStackListLabelProvider());
 
 		ColumnViewerToolTipSupport.enableFor(tableViewer);
+		table.addListener(SWT.Dispose, new Listener() {
+			public void handleEvent(Event event) {
+				for (Image image : images.values()) {
+					image.dispose();
+				}
+			}
+		});
 		return tableViewer;
 	}
 
@@ -153,7 +183,6 @@ public class BasicPartList extends AbstractTableInformationControl {
 		selectFirstMatch();
 	}
 
-	@Override
 	protected void gotoSelectedElement() {
 		Object selectedElement = getSelectedElement();
 
@@ -165,7 +194,6 @@ public class BasicPartList extends AbstractTableInformationControl {
 		}
 	}
 
-	@Override
 	protected boolean deleteSelectedElements() {
 		Object selectedElement = getSelectedElement();
 		if (selectedElement != null) {

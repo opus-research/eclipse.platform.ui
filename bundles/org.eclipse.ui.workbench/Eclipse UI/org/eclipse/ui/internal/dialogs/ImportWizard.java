@@ -42,8 +42,7 @@ public class ImportWizard extends Wizard {
             super(w, ss, e, s, WorkbenchTriggerPoints.IMPORT_WIZARDS);
         }
 
-        @Override
-		public void createControl(Composite parent) {
+        public void createControl(Composite parent) {
             super.createControl(parent);
             getWorkbench()
 					.getHelpSystem()
@@ -52,11 +51,9 @@ public class ImportWizard extends Wizard {
 							IWorkbenchHelpContextIds.IMPORT_WIZARD_SELECTION_WIZARD_PAGE);
         }
 
-        @Override
-		public IWizardNode createWizardNode(WorkbenchWizardElement element) {
+        public IWizardNode createWizardNode(WorkbenchWizardElement element) {
             return new WorkbenchWizardNode(this, element) {
-                @Override
-				public IWorkbenchWizard createWizard() throws CoreException {
+                public IWorkbenchWizard createWizard() throws CoreException {
                     return wizardElement.createWizard();
                 }
             };
@@ -72,8 +69,7 @@ public class ImportWizard extends Wizard {
     /**
      * Creates the wizard's pages lazily.
      */
-    @Override
-	public void addPages() {
+    public void addPages() {
         addPage(new SelectionPage(this.workbench, this.selection,
                 getAvailableImportWizards(), WorkbenchMessages.ImportWizard_selectSource)); 
     }
@@ -112,8 +108,10 @@ public class ImportWizard extends Wizard {
         setNeedsProgressMonitor(true);
     }
 
-    @Override
-	public boolean performFinish() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.wizard.IWizard#performFinish()
+     */
+    public boolean performFinish() {
         ((SelectionPage) getPages()[0]).saveWidgetValues();
         return true;
     }

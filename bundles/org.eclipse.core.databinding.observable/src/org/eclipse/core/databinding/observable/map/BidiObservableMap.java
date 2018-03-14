@@ -50,7 +50,6 @@ public class BidiObservableMap extends DecoratingObservableMap {
 		super(wrappedMap, false);
 	}
 
-	@Override
 	protected void firstListenerAdded() {
 		valuesToKeys = new HashMap();
 		for (Iterator it = entrySet().iterator(); it.hasNext();) {
@@ -60,14 +59,12 @@ public class BidiObservableMap extends DecoratingObservableMap {
 		super.firstListenerAdded();
 	}
 
-	@Override
 	protected void lastListenerRemoved() {
 		super.lastListenerRemoved();
 		valuesToKeys.clear();
 		valuesToKeys = null;
 	}
 
-	@Override
 	protected void handleMapChange(MapChangeEvent event) {
 		MapDiff diff = event.diff;
 		for (Iterator it = diff.getAddedKeys().iterator(); it.hasNext();) {
@@ -86,7 +83,6 @@ public class BidiObservableMap extends DecoratingObservableMap {
 		super.handleMapChange(event);
 	}
 
-	@Override
 	public boolean containsValue(Object value) {
 		getterCalled();
 		// Faster lookup
@@ -184,7 +180,6 @@ public class BidiObservableMap extends DecoratingObservableMap {
 		return keys;
 	}
 
-	@Override
 	public synchronized void dispose() {
 		if (valuesToKeys != null) {
 			valuesToKeys.clear();

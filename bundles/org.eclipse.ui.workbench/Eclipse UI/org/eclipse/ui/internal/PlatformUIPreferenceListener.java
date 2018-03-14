@@ -49,7 +49,11 @@ public class PlatformUIPreferenceListener implements
 	    return singleton;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener#preferenceChange(org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent)
+	 */
 	public void preferenceChange(PreferenceChangeEvent event) {
 
 		String propertyName = event.getKey();

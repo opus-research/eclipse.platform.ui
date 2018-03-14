@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 
 package org.eclipse.ui.internal.contexts;
@@ -46,7 +45,6 @@ public final class ActiveContextSourceProvider extends AbstractSourceProvider
 	 */
 	private IContextService contextService;
 
-	@Override
 	public final void contextManagerChanged(final ContextManagerEvent event) {
 		if (event.isActiveContextsChanged()) {
 			final Map currentState = getCurrentState();
@@ -60,12 +58,10 @@ public final class ActiveContextSourceProvider extends AbstractSourceProvider
 		}
 	}
 
-	@Override
 	public final void dispose() {
 		contextService.removeContextManagerListener(this);
 	}
 
-	@Override
 	public final Map getCurrentState() {
 		final Map currentState = new TreeMap();
 		final Collection activeContextIds = contextService
@@ -74,7 +70,6 @@ public final class ActiveContextSourceProvider extends AbstractSourceProvider
 		return currentState;
 	}
 
-	@Override
 	public final String[] getProvidedSourceNames() {
 		return PROVIDED_SOURCE_NAMES;
 	}
@@ -84,9 +79,8 @@ public final class ActiveContextSourceProvider extends AbstractSourceProvider
 	 * 
 	 * @see org.eclipse.ui.AbstractSourceProvider#initialize(org.eclipse.ui.services.IServiceLocator)
 	 */
-	@Override
 	public void initialize(IServiceLocator locator) {
-		contextService = locator
+		contextService = (IContextService) locator
 				.getService(IContextService.class);
 		contextService.addContextManagerListener(this);
 	}

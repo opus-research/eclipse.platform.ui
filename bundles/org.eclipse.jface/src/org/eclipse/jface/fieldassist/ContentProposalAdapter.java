@@ -506,12 +506,20 @@ public class ContentProposalAdapter {
 				getShell().setBounds(proposedBounds);
 			}
 			
+			/*
+			 * (non-Javadoc)
+			 * @see org.eclipse.jface.dialogs.PopupDialog#getForeground()
+			 */
 			@Override
 			protected Color getForeground() {
 				return control.getDisplay().
 						getSystemColor(SWT.COLOR_INFO_FOREGROUND);
 			}
 			
+			/*
+			 * (non-Javadoc)
+			 * @see org.eclipse.jface.dialogs.PopupDialog#getBackground()
+			 */
 			@Override
 			protected Color getBackground() {
 				return control.getDisplay().
@@ -602,12 +610,20 @@ public class ContentProposalAdapter {
 			this.proposals = proposals;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.jface.dialogs.PopupDialog#getForeground()
+		 */
 		@Override
 		protected Color getForeground() {
 			return JFaceResources.getColorRegistry().get(
 					JFacePreferences.CONTENT_ASSIST_FOREGROUND_COLOR);
 		}
 		
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.jface.dialogs.PopupDialog#getBackground()
+		 */
 		@Override
 		protected Color getBackground() {
 			return JFaceResources.getColorRegistry().get(
@@ -668,6 +684,11 @@ public class ContentProposalAdapter {
 			return proposalTable;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.dialogs.PopupDialog.adjustBounds()
+		 */
 		@Override
 		protected void adjustBounds() {
 			// Get our control's location in display coordinates.

@@ -76,7 +76,6 @@ public class WorkingSetRootModeActionGroup extends ActionGroup {
 		/*
 		 * @see org.eclipse.jface.action.IAction#run()
 		 */
-		@Override
 		public void run() {
 			if (stateModel
 					.getBooleanProperty(WorkingSetsContentProvider.SHOW_TOP_LEVEL_WORKING_SETS) != groupWorkingSets) {
@@ -108,7 +107,11 @@ public class WorkingSetRootModeActionGroup extends ActionGroup {
 		stateModel = aStateModel;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ActionGroup#fillActionBars(IActionBars)
+	 */
 	public void fillActionBars(IActionBars actionBars) {
 		if (hasContributedToViewMenu)
 			return;
@@ -134,7 +137,6 @@ public class WorkingSetRootModeActionGroup extends ActionGroup {
 
 			viewMenu.add(new ContributionItem() {
 
-				@Override
 				public void fill(Menu menu, int index) {
 
 					int style = SWT.CHECK;
@@ -147,7 +149,6 @@ public class WorkingSetRootModeActionGroup extends ActionGroup {
 					mi.setSelection(currentSelection == j);
 					mi.addSelectionListener(new SelectionAdapter() {
 
-						@Override
 						public void widgetSelected(SelectionEvent e) {
 							if (currentSelection == j) {
 								items[currentSelection].setSelection(true);
@@ -165,7 +166,6 @@ public class WorkingSetRootModeActionGroup extends ActionGroup {
 
 				}
 
-				@Override
 				public boolean isDynamic() {
 					return false;
 				}

@@ -94,8 +94,7 @@ public class WizardCollectionElement extends AdaptableList implements IPluginCon
 	/**
      * Adds a wizard collection to this collection.
      */
-    @Override
-	public AdaptableList add(IAdaptable a) {
+    public AdaptableList add(IAdaptable a) {
         if (a instanceof WorkbenchWizardElement) {
             wizards.add(a);
         } else {
@@ -108,8 +107,7 @@ public class WizardCollectionElement extends AdaptableList implements IPluginCon
     /**
      * Remove a wizard from this collection.
      */
-    @Override
-	public void remove(IAdaptable a) {
+    public void remove(IAdaptable a) {
         if (a instanceof WorkbenchWizardElement) {
             wizards.remove(a);
         } else {
@@ -203,8 +201,7 @@ public class WizardCollectionElement extends AdaptableList implements IPluginCon
      * with this object. Returns <code>null</code> if no such object can be
      * found.
      */
-    @Override
-	public Object getAdapter(Class adapter) {
+    public Object getAdapter(Class adapter) {
         if (adapter == IWorkbenchAdapter.class) {
             return this;
         }
@@ -214,16 +211,14 @@ public class WizardCollectionElement extends AdaptableList implements IPluginCon
     /**
      * Returns the unique ID of this element.
      */
-    @Override
-	public String getId() {
+    public String getId() {
         return id;
     }
 
     /**
      * Returns the label for this collection.
      */
-    @Override
-	public String getLabel(Object o) {
+    public String getLabel(Object o) {
     	return configElement != null ? configElement
 				.getAttribute(IWorkbenchRegistryConstants.ATT_NAME) : name;
     }
@@ -231,13 +226,14 @@ public class WizardCollectionElement extends AdaptableList implements IPluginCon
     /**
      * Returns the logical parent of the given object in its tree.
      */
-    @Override
-	public Object getParent(Object o) {
+    public Object getParent(Object o) {
         return parent;
     }
 
-    @Override
-	public IPath getPath() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.wizards.IWizardCategory#getPath()
+     */
+    public IPath getPath() {
         if (parent == null) {
 			return new Path(""); //$NON-NLS-1$
 		}
@@ -246,8 +242,10 @@ public class WizardCollectionElement extends AdaptableList implements IPluginCon
     }
 
 
-    @Override
-	public IWizardDescriptor [] getWizards() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.wizards.IWizardCategory#getWizards()
+     */
+    public IWizardDescriptor [] getWizards() {
 		return getWizardsExpression((IWizardDescriptor[]) wizards
 				.getTypedChildren(IWizardDescriptor.class));
 	}
@@ -315,8 +313,7 @@ public class WizardCollectionElement extends AdaptableList implements IPluginCon
     /**
      * For debugging purposes.
      */
-    @Override
-	public String toString() {
+    public String toString() {
         StringBuffer buf = new StringBuffer("WizardCollection, "); //$NON-NLS-1$
         buf.append(children.size());
         buf.append(" children, "); //$NON-NLS-1$
@@ -325,29 +322,45 @@ public class WizardCollectionElement extends AdaptableList implements IPluginCon
         return buf.toString();
     }
 
-    @Override
-	public ImageDescriptor getImageDescriptor(Object object) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.model.IWorkbenchAdapter#getImageDescriptor(java.lang.Object)
+     */
+    public ImageDescriptor getImageDescriptor(Object object) {
         return WorkbenchImages.getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER);
     }
 
-    @Override
-	public String getLocalId() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.activities.support.IPluginContribution#getLocalId()
+     */
+    public String getLocalId() {
         return getId();
     }
 
-    @Override
-	public String getPluginId() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.activities.support.IPluginContribution#getPluginId()
+     */
+    public String getPluginId() {
         return configElement != null ? configElement.getNamespace() : pluginId;
     }
     
     
-    @Override
-	public IWizardCategory getParent() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.wizards.IWizardCategory#getParent()
+     */
+    public IWizardCategory getParent() {
 		return parent;
 	}
     
-    @Override
-	public IWizardCategory[] getCategories() {		
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.wizards.IWizardCategory#getCategories()
+     */
+    public IWizardCategory[] getCategories() {		
 		return (IWizardCategory []) getTypedChildren(IWizardCategory.class);
 	}
     
@@ -371,8 +384,10 @@ public class WizardCollectionElement extends AdaptableList implements IPluginCon
     	return wizards;
     }
     
-    @Override
-	public String getLabel() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.wizards.IWizardCategory#getLabel()
+     */
+    public String getLabel() {
 		return getLabel(this);
 	}
     
@@ -396,12 +411,16 @@ public class WizardCollectionElement extends AdaptableList implements IPluginCon
 		return parent;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.wizards.IWizardCategory#findWizard(java.lang.String)
+	 */
 	public IWizardDescriptor findWizard(String id) {
 		return findWizard(id, true);
 	}
 	
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.wizards.IWizardCategory#findCategory(org.eclipse.core.runtime.IPath)
+	 */
 	public IWizardCategory findCategory(IPath path) {
 		return findChildCollection(path);
 	}

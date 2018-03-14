@@ -62,7 +62,6 @@ public class MarkersPropertyPage extends PropertyPage {
 		super();
 	}
 
-	@Override
 	protected Control createContents(Composite parent) {
 		// initialize resources/properties
 
@@ -297,7 +296,6 @@ public class MarkersPropertyPage extends PropertyPage {
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.preference.PreferencePage#performOk()
 	 */
-	@Override
 	public boolean performOk() {
 		if (marker == null || Util.isEditable(marker)) {
 			saveChanges();

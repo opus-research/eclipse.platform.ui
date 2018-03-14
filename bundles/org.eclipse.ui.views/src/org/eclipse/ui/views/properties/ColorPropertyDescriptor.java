@@ -47,8 +47,7 @@ public class ColorPropertyDescriptor extends PropertyDescriptor {
      * The editor is configured with the current validator if there is one.
      * </p>
      */
-    @Override
-	public CellEditor createPropertyEditor(Composite parent) {
+    public CellEditor createPropertyEditor(Composite parent) {
         CellEditor editor = new ColorCellEditor(parent);
         if (getValidator() != null) {
 			editor.setValidator(getValidator());

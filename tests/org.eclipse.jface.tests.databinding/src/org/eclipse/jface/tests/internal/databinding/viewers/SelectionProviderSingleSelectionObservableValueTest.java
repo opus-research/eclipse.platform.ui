@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * Tests for SelectionProviderSingleSelectionObservableValue.
- *
+ * 
  * @since 1.1
  */
 public class SelectionProviderSingleSelectionObservableValueTest extends
@@ -43,10 +43,9 @@ public class SelectionProviderSingleSelectionObservableValueTest extends
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	@Override
 	protected void setUp() throws Exception {
 		Shell shell = new Shell();
 		viewer = new TableViewer(shell, SWT.NONE);
@@ -57,10 +56,9 @@ public class SelectionProviderSingleSelectionObservableValueTest extends
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	@Override
 	protected void tearDown() throws Exception {
 		Shell shell = viewer.getTable().getShell();
 		if (!shell.isDisposed())
@@ -113,7 +111,7 @@ public class SelectionProviderSingleSelectionObservableValueTest extends
 	 * <li>the selection is available in the observable</li>
 	 * <li>Value change events are fired with appropriate diff values</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param postSelection
 	 *            <code>true</code> for observing the post selection,
 	 *            <code>false</code> for observing the normal selection.

@@ -75,6 +75,10 @@ public class IntegerFieldEditor extends StringFieldEditor {
         		new Object[] { new Integer(min), new Integer(max) }));
     }
 
+    /* (non-Javadoc)
+     * Method declared on StringFieldEditor.
+     * Checks whether the entered String is a valid integer or not.
+     */
     @Override
 	protected boolean checkState() {
 
@@ -102,6 +106,9 @@ public class IntegerFieldEditor extends StringFieldEditor {
         return false;
     }
 
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
     @Override
 	protected void doLoad() {
         Text text = getTextControl();
@@ -113,6 +120,9 @@ public class IntegerFieldEditor extends StringFieldEditor {
 
     }
 
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
     @Override
 	protected void doLoadDefault() {
         Text text = getTextControl();
@@ -123,6 +133,9 @@ public class IntegerFieldEditor extends StringFieldEditor {
         valueChanged();
     }
 
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
     @Override
 	protected void doStore() {
         Text text = getTextControl();

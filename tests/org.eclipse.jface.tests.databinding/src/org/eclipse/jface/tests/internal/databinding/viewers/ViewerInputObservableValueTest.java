@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * Tests for ViewerInputObservableValue.
- *
+ * 
  * @since 1.2
  */
 public class ViewerInputObservableValueTest extends
@@ -40,7 +40,6 @@ public class ViewerInputObservableValueTest extends
 	private TableViewer viewer;
 	private static String[] model = new String[] { "0", "1" };
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		Shell shell = new Shell();
@@ -48,7 +47,6 @@ public class ViewerInputObservableValueTest extends
 		viewer.setContentProvider(new ContentProvider());
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		Shell shell = viewer.getTable().getShell();
 		if (!shell.isDisposed())
@@ -133,15 +131,12 @@ public class ViewerInputObservableValueTest extends
 	}
 
 	static class ContentProvider implements IStructuredContentProvider {
-		@Override
 		public void dispose() {
 		}
 
-		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 
-		@Override
 		public Object[] getElements(Object inputElement) {
 			return (String[]) inputElement;
 		}
@@ -158,7 +153,6 @@ public class ViewerInputObservableValueTest extends
 	static class Delegate extends AbstractObservableValueContractDelegate {
 		TableViewer viewer;
 
-		@Override
 		public void setUp() {
 			super.setUp();
 			Shell shell = new Shell();
@@ -166,7 +160,6 @@ public class ViewerInputObservableValueTest extends
 			viewer.setContentProvider(new ContentProvider());
 		}
 
-		@Override
 		public void tearDown() {
 			Shell shell = viewer.getTable().getShell();
 			if (!shell.isDisposed())
@@ -174,23 +167,19 @@ public class ViewerInputObservableValueTest extends
 			super.tearDown();
 		}
 
-		@Override
 		public IObservableValue createObservableValue(Realm realm) {
 			return ViewerProperties.input().observe(realm, viewer);
 		}
 
-		@Override
 		public void change(IObservable observable) {
 			IObservableValue value = (IObservableValue) observable;
 			value.setValue(createValue(value));
 		}
 
-		@Override
 		public Object createValue(IObservableValue observable) {
 			return new String[] { "one", "two" };
 		}
 
-		@Override
 		public Object getValueType(IObservableValue observable) {
 			return null;
 		}

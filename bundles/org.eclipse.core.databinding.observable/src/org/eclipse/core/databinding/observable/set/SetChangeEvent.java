@@ -57,12 +57,10 @@ public class SetChangeEvent extends ObservableEvent {
 		return (IObservableSet) getSource();
 	}
 
-	@Override
 	protected void dispatch(IObservablesListener listener) {
 		((ISetChangeListener) listener).handleSetChange(this);
 	}
 
-	@Override
 	protected Object getListenerType() {
 		return TYPE;
 	}

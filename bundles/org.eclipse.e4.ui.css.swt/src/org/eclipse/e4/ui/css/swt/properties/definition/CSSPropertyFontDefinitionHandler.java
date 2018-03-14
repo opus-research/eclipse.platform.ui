@@ -21,7 +21,6 @@ import org.eclipse.swt.graphics.FontData;
 import org.w3c.dom.css.CSSValue;
 
 public class CSSPropertyFontDefinitionHandler extends AbstractCSSPropertyFontHandler {
-	@Override
 	public boolean applyCSSProperty(Object element, String property,
 			CSSValue value, String pseudo, CSSEngine engine) throws Exception {
 		if (element instanceof FontDefinitionElement) {
@@ -34,7 +33,6 @@ public class CSSPropertyFontDefinitionHandler extends AbstractCSSPropertyFontHan
 		return false;
 	}
 
-	@Override
 	public String retrieveCSSProperty(Object element, String property,
 			String pseudo, CSSEngine engine) throws Exception {
 		return null;
@@ -45,43 +43,36 @@ public class CSSPropertyFontDefinitionHandler extends AbstractCSSPropertyFontHan
 		definition.setValue(new FontData[]{CSSSWTFontHelper.getFontData(properties, fontData)});
 	}
 	
-	@Override
 	public String retrieveCSSPropertyFontFamily(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		return null;
 	}
 
-	@Override
 	public String retrieveCSSPropertyFontSize(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		return null;
 	}
 
-	@Override
 	public String retrieveCSSPropertyFontAdjust(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		return null;
 	}
 
-	@Override
 	public String retrieveCSSPropertyFontStretch(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		return null;
 	}
 
-	@Override
 	public String retrieveCSSPropertyFontStyle(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		return null;
 	}
 
-	@Override
 	public String retrieveCSSPropertyFontVariant(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		return null;
 	}
 
-	@Override
 	public String retrieveCSSPropertyFontWeight(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		return null;

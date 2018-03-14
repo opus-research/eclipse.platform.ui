@@ -28,9 +28,9 @@ import org.eclipse.jface.viewers.StructuredSelection;
  * </p>
  */
 public class ResourceSelectionUtil {
-	/*
-	 * Private constructor to block instantiation.
-	 */
+    /* (non-Javadoc)
+     * Private constructor to block instantiation.
+     */
     private ResourceSelectionUtil() {
     }
 

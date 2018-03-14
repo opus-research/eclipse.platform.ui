@@ -103,22 +103,28 @@ public abstract class ActiveEditorAction extends PageEventAction {
         return activeEditor;
     }
 
-    @Override
-	public void pageActivated(IWorkbenchPage page) {
+    /* (non-Javadoc)
+     * Method declared on PageEventAction.
+     */
+    public void pageActivated(IWorkbenchPage page) {
         super.pageActivated(page);
         updateActiveEditor();
         updateState();
     }
 
-    @Override
-	public void pageClosed(IWorkbenchPage page) {
+    /* (non-Javadoc)
+     * Method declared on PageEventAction.
+     */
+    public void pageClosed(IWorkbenchPage page) {
         super.pageClosed(page);
         updateActiveEditor();
         updateState();
     }
 
-    @Override
-	public void partActivated(IWorkbenchPart part) {
+    /* (non-Javadoc)
+     * Method declared on PartEventAction.
+     */
+    public void partActivated(IWorkbenchPart part) {
         super.partActivated(part);
         if (part instanceof IEditorPart) {
             updateActiveEditor();
@@ -126,8 +132,10 @@ public abstract class ActiveEditorAction extends PageEventAction {
         }
     }
 
-    @Override
-	public void partBroughtToTop(IWorkbenchPart part) {
+    /* (non-Javadoc)
+     * Method declared on PartEventAction.
+     */
+    public void partBroughtToTop(IWorkbenchPart part) {
         super.partBroughtToTop(part);
         if (part instanceof IEditorPart) {
             updateActiveEditor();
@@ -135,8 +143,10 @@ public abstract class ActiveEditorAction extends PageEventAction {
         }
     }
 
-    @Override
-	public void partClosed(IWorkbenchPart part) {
+    /* (non-Javadoc)
+     * Method declared on PartEventAction.
+     */
+    public void partClosed(IWorkbenchPart part) {
         super.partClosed(part);
         if (part instanceof IEditorPart) {
             updateActiveEditor();
@@ -144,8 +154,10 @@ public abstract class ActiveEditorAction extends PageEventAction {
         }
     }
 
-    @Override
-	public void partDeactivated(IWorkbenchPart part) {
+    /* (non-Javadoc)
+     * Method declared on PartEventAction.
+     */
+    public void partDeactivated(IWorkbenchPart part) {
         super.partDeactivated(part);
         if (part instanceof IEditorPart) {
             updateActiveEditor();

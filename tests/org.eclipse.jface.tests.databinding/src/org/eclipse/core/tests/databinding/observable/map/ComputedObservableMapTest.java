@@ -26,7 +26,7 @@ import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 
 /**
  * @since 3.2
- *
+ * 
  */
 public class ComputedObservableMapTest extends AbstractDefaultRealmTestCase {
 	private IObservableSet keySet;
@@ -34,7 +34,6 @@ public class ComputedObservableMapTest extends AbstractDefaultRealmTestCase {
 	private String propertyName;
 	private Bean bean;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		keySet = new WritableSet();
@@ -86,7 +85,6 @@ public class ComputedObservableMapTest extends AbstractDefaultRealmTestCase {
 
 	public void testRemoveLastListener_DoNotDiscardKeySet() {
 		IChangeListener listener = new IChangeListener() {
-			@Override
 			public void handleChange(ChangeEvent event) {
 				// do nothing
 			}
@@ -121,7 +119,6 @@ public class ComputedObservableMapTest extends AbstractDefaultRealmTestCase {
 
 	static class ComputedObservableMapStub extends ComputedObservableMap {
 		private PropertyChangeListener listener = new PropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				fireSingleChange(evt.getSource(), evt.getOldValue(), evt
 						.getNewValue());
@@ -132,24 +129,20 @@ public class ComputedObservableMapTest extends AbstractDefaultRealmTestCase {
 			super(keySet);
 		}
 
-		@Override
 		protected Object doGet(Object key) {
 			return ((Bean) key).getValue();
 		}
 
-		@Override
 		protected Object doPut(Object key, Object value) {
 			Object result = doGet(key);
 			((Bean) key).setValue((String) value);
 			return result;
 		}
 
-		@Override
 		protected void hookListener(Object addedKey) {
 			((Bean) addedKey).addPropertyChangeListener(listener);
 		}
 
-		@Override
 		protected void unhookListener(Object removedKey) {
 			((Bean) removedKey).removePropertyChangeListener(listener);
 		}

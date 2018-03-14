@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -36,10 +35,10 @@ public class LinkedResourceDecorator implements ILightweightLabelDecorator {
     static {
         LINK = AbstractUIPlugin.imageDescriptorFromPlugin(
                 IDEWorkbenchPlugin.IDE_WORKBENCH,
-                "$nl$/icons/full/ovr16/link_ovr.png"); //$NON-NLS-1$
+                "$nl$/icons/full/ovr16/link_ovr.gif"); //$NON-NLS-1$
         LINK_WARNING = AbstractUIPlugin.imageDescriptorFromPlugin(
                 IDEWorkbenchPlugin.IDE_WORKBENCH,
-                "$nl$/icons/full/ovr16/linkwarn_ovr.png"); //$NON-NLS-1$
+                "$nl$/icons/full/ovr16/linkwarn_ovr.gif"); //$NON-NLS-1$
     }
 
     /**
@@ -51,31 +50,27 @@ public class LinkedResourceDecorator implements ILightweightLabelDecorator {
     /**
      * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(ILabelProviderListener)
      */
-    @Override
-	public void addListener(ILabelProviderListener listener) {
+    public void addListener(ILabelProviderListener listener) {
     }
 
     /**
      * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         // no resources to dispose
     }
 
     /**
      * @see org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang.Object, java.lang.String)
      */
-    @Override
-	public boolean isLabelProperty(Object element, String property) {
+    public boolean isLabelProperty(Object element, String property) {
         return false;
     }
 
     /**
      * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(ILabelProviderListener)
      */
-    @Override
-	public void removeListener(ILabelProviderListener listener) {
+    public void removeListener(ILabelProviderListener listener) {
     }
 
     /**
@@ -86,8 +81,7 @@ public class LinkedResourceDecorator implements ILightweightLabelDecorator {
      * @param decoration  The decoration we are adding to
      * @see org.eclipse.jface.viewers.ILightweightLabelDecorator#decorate(Object, IDecoration)
      */
-    @Override
-	public void decorate(Object element, IDecoration decoration) {
+    public void decorate(Object element, IDecoration decoration) {
 
         if (element instanceof IResource == false) {
 			return;

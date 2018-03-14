@@ -55,7 +55,6 @@ public class ProjectLinkedResourcePage extends PropertyPage implements
 		 this.noDefaultAndApplyButton();
 	 }
 
-	@Override
 	protected Control createContents(Composite parent) {
 
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
@@ -87,11 +86,9 @@ public class ProjectLinkedResourcePage extends PropertyPage implements
 
         TabFolder tabFolder = new TabFolder(pageComponent, SWT.TOP);
         tabFolder.addSelectionListener(new SelectionListener() {
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				
 			}
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				TabFolder source = (TabFolder) e.getSource();
 				if (source.getSelectionIndex() == 1)
@@ -172,8 +169,7 @@ public class ProjectLinkedResourcePage extends PropertyPage implements
      * Disposes the path variables group.
      * @see org.eclipse.jface.dialogs.IDialogPage#dispose()
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         pathVariablesGroup.dispose();
         linkedResourceEditor.dispose();
         super.dispose();
@@ -195,8 +191,7 @@ public class ProjectLinkedResourcePage extends PropertyPage implements
      * @see PreferencePage#performOk()
      * @see PathVariablesGroup#performOk()
      */
-    @Override
-	public boolean performOk() {
+    public boolean performOk() {
         return pathVariablesGroup.performOk() && linkedResourceEditor.performOk();
     }
 

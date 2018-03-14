@@ -191,7 +191,6 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 		return descriptorId;
 	}
 
-	@Override
 	public String getFactoryId() {
 		IEditorPart editor = getEditor(false);
 		if (editor == null) {
@@ -220,7 +219,6 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 		return persistable == null ? null : persistable.getFactoryId();
 	}
 
-	@Override
 	public String getName() {
 		IEditorPart editor = getEditor(false);
 		if (input == null) {
@@ -230,7 +228,6 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 		return editor == null ? input.getName() : editor.getEditorInput().getName();
 	}
 
-	@Override
 	public String getTitle() {
 		String label = Util.safeString(getModel().getLocalizedLabel());
 		if (label.length() == 0) {
@@ -288,12 +285,20 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 		return (IEditorInput) input;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IEditorReference#getEditor(boolean)
+	 */
 	public IEditorPart getEditor(boolean restore) {
 		return (IEditorPart) getPart(restore);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IEditorReference#getEditorInput()
+	 */
 	public IEditorInput getEditorInput() throws PartInitException {
 		IEditorPart editor = getEditor(false);
 		if (editor != null) {
@@ -317,6 +322,13 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 		return input;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.e4.compatibility.WorkbenchPartReference#createPart
+	 * ()
+	 */
 	@Override
 	public IWorkbenchPart createPart() throws PartInitException {
 		try {
@@ -352,6 +364,13 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 		return new ErrorEditorPart(status);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.e4.compatibility.WorkbenchPartReference#initialize
+	 * (org.eclipse.ui.IWorkbenchPart)
+	 */
 	@Override
 	public void initialize(IWorkbenchPart part) throws PartInitException {
 		IConfigurationElement element = descriptor.getConfigurationElement();

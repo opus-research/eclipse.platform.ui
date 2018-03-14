@@ -36,16 +36,14 @@ public class PropertyMapUnion implements IPropertyMap {
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.preferences.IPropertyMap#keySet()
      */
-    @Override
-	public Set keySet() {
+    public Set keySet() {
         return values.keySet();
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.preferences.IPropertyMap#getValue(java.lang.String, java.lang.Class)
      */
-    @Override
-	public Object getValue(String propertyId, Class propertyType) {
+    public Object getValue(String propertyId, Class propertyType) {
         PropertyInfo info = (PropertyInfo)values.get(propertyId);
         
         if (info == null) {
@@ -64,8 +62,7 @@ public class PropertyMapUnion implements IPropertyMap {
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.preferences.IPropertyMap#isCommonProperty(java.lang.String)
      */
-    @Override
-	public boolean isCommonProperty(String propertyId) {
+    public boolean isCommonProperty(String propertyId) {
         PropertyInfo info = (PropertyInfo)values.get(propertyId);
         
         if (info == null) {
@@ -78,16 +75,14 @@ public class PropertyMapUnion implements IPropertyMap {
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.preferences.IPropertyMap#propertyExists(java.lang.String)
      */
-    @Override
-	public boolean propertyExists(String propertyId) {
+    public boolean propertyExists(String propertyId) {
         return values.get(propertyId) != null;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.preferences.IPropertyMap#setValue(java.lang.String, java.lang.Object)
      */
-    @Override
-	public void setValue(String propertyId, Object newValue) {
+    public void setValue(String propertyId, Object newValue) {
         PropertyInfo info = new PropertyInfo(newValue, true);
         
         values.put(propertyId, info);

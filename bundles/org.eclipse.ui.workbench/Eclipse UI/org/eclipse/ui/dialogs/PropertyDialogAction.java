@@ -70,7 +70,6 @@ public class PropertyDialogAction extends SelectionProviderAction {
 	 *            describe
      * @deprecated use PropertyDialogAction(IShellProvider, ISelectionProvider)
 	 */
-	@Deprecated
 	public PropertyDialogAction(Shell shell, ISelectionProvider provider) {
         this(new SameShellProvider(shell), provider);
 	}
@@ -149,7 +148,9 @@ public class PropertyDialogAction extends SelectionProviderAction {
 	}
 
 	
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.IAction#run()
+	 */
 	public void run() {
 
 		PreferenceDialog dialog = createDialog();
@@ -175,7 +176,9 @@ public class PropertyDialogAction extends SelectionProviderAction {
 	}
 
 	
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.actions.SelectionProviderAction#selectionChanged(org.eclipse.jface.viewers.IStructuredSelection)
+	 */
 	public void selectionChanged(IStructuredSelection selection) {
 		setEnabled(!selection.isEmpty());
 	}

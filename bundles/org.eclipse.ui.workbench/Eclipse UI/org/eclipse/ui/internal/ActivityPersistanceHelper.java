@@ -49,8 +49,12 @@ final class ActivityPersistanceHelper {
      */
     private final IActivityManagerListener activityManagerListener = new IActivityManagerListener() {
 
-        @Override
-		public void activityManagerChanged(
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.eclipse.ui.activities.IActivityManagerListener#activityManagerChanged(org.eclipse.ui.activities.ActivityManagerEvent)
+         */
+        public void activityManagerChanged(
                 ActivityManagerEvent activityManagerEvent) {
             //process newly defined activities.
             if (activityManagerEvent.haveDefinedActivityIdsChanged()) {
@@ -74,8 +78,12 @@ final class ActivityPersistanceHelper {
      */
     private final IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
 
-        @Override
-		public void propertyChange(PropertyChangeEvent event) {
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
+         */
+        public void propertyChange(PropertyChangeEvent event) {
             // dont process property events if we're in the process of
             // serializing state.
             if (!saving && event.getProperty().startsWith(PREFIX)) {

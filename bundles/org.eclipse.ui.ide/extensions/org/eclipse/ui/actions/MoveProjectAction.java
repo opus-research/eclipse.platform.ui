@@ -56,7 +56,6 @@ public class MoveProjectAction extends CopyProjectAction {
 	 *  
 	 * @deprecated {@link #MoveProjectAction(IShellProvider)}
 	 */
-	@Deprecated
 	public MoveProjectAction(Shell shell) {
 		super(shell, MOVE_TITLE);
 		initAction();
@@ -87,8 +86,6 @@ public class MoveProjectAction extends CopyProjectAction {
 	 * @deprecated As of 3.3, the error handling is performed by the undoable 
 	 * operation which handles the move.
 	 */
-	@Deprecated
-	@Override
 	protected String getErrorsTitle() {
 		return PROBLEMS_TITLE;
 	}
@@ -107,8 +104,7 @@ public class MoveProjectAction extends CopyProjectAction {
 			final URI newLocation) {
 		
 		IRunnableWithProgress op =  new IRunnableWithProgress() {
-    		@Override
-			public void run(IProgressMonitor monitor) {
+    		public void run(IProgressMonitor monitor) {
     			MoveProjectOperation op = new MoveProjectOperation(project, newLocation, IDEWorkbenchMessages.MoveProjectAction_moveTitle);
     			op.setModelProviderIds(getModelProviderIds());
     			try {
@@ -150,7 +146,6 @@ public class MoveProjectAction extends CopyProjectAction {
 	 * @param project
 	 *            the project we are going to move.
 	 */
-	@Override
 	protected Object[] queryDestinationParameters(IProject project) {
 		ProjectLocationMoveDialog dialog = new ProjectLocationMoveDialog(shellProvider.getShell(),
 				project);
@@ -162,7 +157,6 @@ public class MoveProjectAction extends CopyProjectAction {
 	/**
 	 * Implementation of method defined on <code>IAction</code>.
 	 */
-	@Override
 	public void run() {
 
 		errorStatus = null;
