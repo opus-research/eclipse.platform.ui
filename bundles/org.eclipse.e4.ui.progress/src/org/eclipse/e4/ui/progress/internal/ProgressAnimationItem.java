@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Philipp Bumann <bumannp@gmail.com> - Bug 477602
  *******************************************************************************/
 package org.eclipse.e4.ui.progress.internal;
 
@@ -159,7 +158,7 @@ public class ProgressAnimationItem extends AnimationItem implements
 	 * @param ji
 	 */
 	private void removeTopElement(JobInfo ji) {
-		JobTreeElement topElement = ji.getParent();
+		JobTreeElement topElement = (JobTreeElement) ji.getParent();
 		if (topElement == null) {
 			topElement = ji;
 		}
