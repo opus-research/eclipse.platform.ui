@@ -33,9 +33,6 @@
             <children xsi:type="basic:Part" xmi:id="_Rz5LkLrHEeODX5-c16SbUg" elementId="org.eclipse.e4.ui.tests.part.3">
               <handlers xmi:id="_SQscULrHEeODX5-c16SbUg" elementId="org.eclipse.e4.ui.tests.handler.6"/>
               <menus xmi:id="_Sr5xoLrHEeODX5-c16SbUg" elementId="org.eclipse.e4.ui.tests.menu.2"/>
-              <toolbar xmi:id="_WWJ0IMqREeOEFtvZU2BlxA" elementId="org.eclipse.e4.ui.tests.toolbar.0">
-                <children xsi:type="menu:HandledToolItem" xmi:id="_EVjDgMqTEeOEFtvZU2BlxA" elementId="org.eclipse.e4.ui.tests.handledtoolitem.0"/>
-              </toolbar>
             </children>
           </children>
         </children>
