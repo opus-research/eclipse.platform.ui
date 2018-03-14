@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,12 +9,14 @@
  *     IBM Corporation - initial API and implementation
  *     Sebastian Davids <sdavids@gmx.de> - Fix for bug 19346 - Dialog
  *     font should be activated and used by other components.
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 448260
  *******************************************************************************/
 
 package org.eclipse.ui.dialogs;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -479,7 +481,7 @@ public class NewFolderDialog extends SelectionStatusDialog {
 			return;
 		}
 
-		setSelectionResult(new IFolder[] { folder });
+		setSelectionResult(folder);
 
 		super.okPressed();
 	}
