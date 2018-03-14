@@ -16,12 +16,11 @@ import java.util.ArrayList;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.EditingSupport;
+import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
@@ -45,7 +44,6 @@ public class Bug203657TreeViewerTest extends ViewerTestCase {
 			this.counter = counter;
 		}
 
-		@Override
 		public String toString() {
 			String rv = "Item ";
 			if (parent != null) {
@@ -65,34 +63,28 @@ public class Bug203657TreeViewerTest extends ViewerTestCase {
 		// TODO Auto-generated constructor stub
 	}
 
-	@Override
 	protected StructuredViewer createViewer(Composite parent) {
 		final TreeViewer treeViewer = new TreeViewer(parent, SWT.FULL_SELECTION);
 
 		treeViewer.setContentProvider(new ITreeContentProvider() {
 
-			@Override
 			public Object[] getElements(Object inputElement) {
 				return ((MyModel) inputElement).child.toArray();
 			}
 
-			@Override
 			public void dispose() {
 
 			}
 
-			@Override
 			public void inputChanged(Viewer viewer, Object oldInput,
 					Object newInput) {
 
 			}
 
-			@Override
 			public Object[] getChildren(Object parentElement) {
 				return getElements(parentElement);
 			}
 
-			@Override
 			public Object getParent(Object element) {
 				if (element == null) {
 					return null;
@@ -101,47 +93,38 @@ public class Bug203657TreeViewerTest extends ViewerTestCase {
 				return ((MyModel) element).parent;
 			}
 
-			@Override
 			public boolean hasChildren(Object element) {
 				return ((MyModel) element).child.size() > 0;
 			}
 		});
 
-		TreeColumn column = new TreeColumn(treeViewer.getTree(), SWT.NONE);
-		column.setWidth(200);
-
-		TreeViewerColumn viewerColumn = new TreeViewerColumn(treeViewer, column);
-		viewerColumn.setEditingSupport(new EditingSupport(treeViewer) {
-
-			@Override
-			protected void setValue(Object element, Object value) {
+		treeViewer.setCellEditors(new CellEditor[] { new TextCellEditor(
+				treeViewer.getTree()) });
+		treeViewer.setColumnProperties(new String[] { "0" });
+		treeViewer.setCellModifier(new ICellModifier() {
+			public boolean canModify(Object element, String property) {
+				return true;
 			}
 
-			@Override
-			protected Object getValue(Object element) {
+			public Object getValue(Object element, String property) {
 				return "";
 			}
 
-			@Override
-			protected CellEditor getCellEditor(Object element) {
-				return new TextCellEditor(treeViewer.getTree());
+			public void modify(Object element, String property, Object value) {
 			}
 
-			@Override
-			protected boolean canEdit(Object element) {
-				return true;
-			}
 		});
+
+		new TreeColumn(treeViewer.getTree(), SWT.NONE).setWidth(200);
+
 		return treeViewer;
 	}
 
-	@Override
 	protected void setUpModel() {
 		// don't do anything here - we are not using the normal fModel and
 		// fRootElement
 	}
 
-	@Override
 	protected void setInput() {
 		MyModel root = new MyModel(0, null);
 		root.counter = 0;

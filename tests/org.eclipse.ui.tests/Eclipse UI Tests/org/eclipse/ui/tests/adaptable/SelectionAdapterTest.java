@@ -23,14 +23,13 @@ import org.eclipse.jface.viewers.StructuredSelection;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class SelectionAdapterTest extends TestCase {
 
 	public void testBasicSelectionEmpty() {
 		ISelection empty = new ISelection() {
 
-			@Override
 			public boolean isEmpty() {
 				return true;
 			}
@@ -47,7 +46,6 @@ public class SelectionAdapterTest extends TestCase {
 	public void testBasicSelection() {
 		ISelection selection = new ISelection() {
 
-			@Override
 			public boolean isEmpty() {
 				return false;
 			}

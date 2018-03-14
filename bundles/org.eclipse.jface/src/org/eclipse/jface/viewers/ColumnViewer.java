@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation; bug 153993
  *												   fix in bug 163317, 151295, 167323, 167858, 184346, 187826, 201905
- *     Stefan Winkler <stefan@winklerweb.net> - Bug 242231
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -345,10 +344,10 @@ public abstract class ColumnViewer extends StructuredViewer {
 				|| labelProvider instanceof CellLabelProvider);
 		updateColumnParts(labelProvider);// Reset the label providers in the
 		// columns
+		super.setLabelProvider(labelProvider);
 		if (labelProvider instanceof CellLabelProvider) {
 			((CellLabelProvider) labelProvider).initialize(this, null);
 		}
-		super.setLabelProvider(labelProvider);
 	}
 
 	@Override
@@ -387,10 +386,10 @@ public abstract class ColumnViewer extends StructuredViewer {
 
 	/**
 	 * Apply the value of the active cell editor if one is active.
-	 *
-	 * @since 3.11 (public - protected since 3.3)
+	 * 
+	 * @since 3.3
 	 */
-	public void applyEditorValue() {
+	protected void applyEditorValue() {
 		if (viewerEditor != null) {
 			viewerEditor.applyEditorValue();
 		}
