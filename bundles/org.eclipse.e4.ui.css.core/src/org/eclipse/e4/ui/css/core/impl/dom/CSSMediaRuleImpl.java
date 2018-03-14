@@ -27,31 +27,32 @@ public class CSSMediaRuleImpl extends CSSRuleImpl implements CSSMediaRule {
 		// TODO Auto-generated constructor stub
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.w3c.dom.css.CSSRule#getType()
-	 */
+	@Override
 	public short getType() {
 		return CSSRule.MEDIA_RULE;
 	}
 
 	// W3C CSSMediaRule API methods
 
+	@Override
 	public void deleteRule(int index) throws DOMException {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
 	}
 
+	@Override
 	public CSSRuleList getCssRules() {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
 	}
 
+	@Override
 	public MediaList getMedia() {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
 	}
 
+	@Override
 	public int insertRule(String rule, int index) throws DOMException {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");

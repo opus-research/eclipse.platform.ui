@@ -16,85 +16,93 @@ import java.util.Collections;
 import java.util.List;
 
 public abstract class AbstractActivityRegistry implements IActivityRegistry {
-    protected List activityRequirementBindingDefinitions = Collections.EMPTY_LIST;
+	protected List<ActivityRequirementBindingDefinition> activityRequirementBindingDefinitions = Collections
+			.emptyList();
 
-    protected List activityDefinitions = Collections.EMPTY_LIST;
+	protected List<ActivityDefinition> activityDefinitions = Collections.emptyList();
 
-    protected List activityPatternBindingDefinitions = Collections.EMPTY_LIST;
+	protected List<ActivityPatternBindingDefinition> activityPatternBindingDefinitions = Collections
+			.emptyList();
 
-    private ActivityRegistryEvent activityRegistryEvent;
+	private ActivityRegistryEvent activityRegistryEvent;
 
-    private List activityRegistryListeners;
+	private List<IActivityRegistryListener> activityRegistryListeners;
 
-    protected List categoryActivityBindingDefinitions = Collections.EMPTY_LIST;
+	protected List<CategoryActivityBindingDefinition> categoryActivityBindingDefinitions = Collections
+			.emptyList();
 
-    protected List categoryDefinitions = Collections.EMPTY_LIST;
+	protected List<CategoryDefinition> categoryDefinitions = Collections.emptyList();
 
-    protected List defaultEnabledActivities = Collections.EMPTY_LIST;
+	protected List<String> defaultEnabledActivities = Collections.emptyList();
 
-    protected AbstractActivityRegistry() {
-    }
+	protected AbstractActivityRegistry() {
+	}
 
-    public void addActivityRegistryListener(
-            IActivityRegistryListener activityRegistryListener) {
-        if (activityRegistryListener == null) {
+	@Override
+	public void addActivityRegistryListener(IActivityRegistryListener activityRegistryListener) {
+		if (activityRegistryListener == null) {
 			throw new NullPointerException();
 		}
 
-        if (activityRegistryListeners == null) {
-			activityRegistryListeners = new ArrayList();
+		if (activityRegistryListeners == null) {
+			activityRegistryListeners = new ArrayList<IActivityRegistryListener>();
 		}
 
-        if (!activityRegistryListeners.contains(activityRegistryListener)) {
+		if (!activityRegistryListeners.contains(activityRegistryListener)) {
 			activityRegistryListeners.add(activityRegistryListener);
 		}
-    }
+	}
 
-    protected void fireActivityRegistryChanged() {
-        if (activityRegistryListeners != null) {
-            for (int i = 0; i < activityRegistryListeners.size(); i++) {
-                if (activityRegistryEvent == null) {
+	protected void fireActivityRegistryChanged() {
+		if (activityRegistryListeners != null) {
+			for (int i = 0; i < activityRegistryListeners.size(); i++) {
+				if (activityRegistryEvent == null) {
 					activityRegistryEvent = new ActivityRegistryEvent(this);
 				}
 
-                ((IActivityRegistryListener) activityRegistryListeners.get(i))
-                        .activityRegistryChanged(activityRegistryEvent);
-            }
-        }
-    }
+				activityRegistryListeners.get(i).activityRegistryChanged(activityRegistryEvent);
+			}
+		}
+	}
 
-    public List getActivityRequirementBindingDefinitions() {
-        return activityRequirementBindingDefinitions;
-    }
+	@Override
+	public List<ActivityRequirementBindingDefinition> getActivityRequirementBindingDefinitions() {
+		return activityRequirementBindingDefinitions;
+	}
 
-    public List getActivityDefinitions() {
-        return activityDefinitions;
-    }
+	@Override
+	public List<ActivityDefinition> getActivityDefinitions() {
+		return activityDefinitions;
+	}
 
-    public List getActivityPatternBindingDefinitions() {
-        return activityPatternBindingDefinitions;
-    }
+	@Override
+	public List<ActivityPatternBindingDefinition> getActivityPatternBindingDefinitions() {
+		return activityPatternBindingDefinitions;
+	}
 
-    public List getCategoryActivityBindingDefinitions() {
-        return categoryActivityBindingDefinitions;
-    }
+	@Override
+	public List<CategoryActivityBindingDefinition> getCategoryActivityBindingDefinitions() {
+		return categoryActivityBindingDefinitions;
+	}
 
-    public List getCategoryDefinitions() {
-        return categoryDefinitions;
-    }
+	@Override
+	public List<CategoryDefinition> getCategoryDefinitions() {
+		return categoryDefinitions;
+	}
 
-    public void removeActivityRegistryListener(
-            IActivityRegistryListener activityRegistryListener) {
-        if (activityRegistryListener == null) {
+	@Override
+	public void removeActivityRegistryListener(IActivityRegistryListener activityRegistryListener) {
+		if (activityRegistryListener == null) {
 			throw new NullPointerException();
 		}
 
-        if (activityRegistryListeners != null) {
+		if (activityRegistryListeners != null) {
 			activityRegistryListeners.remove(activityRegistryListener);
 		}
-    }
+	}
 
-    public List getDefaultEnabledActivities() {
-        return defaultEnabledActivities;
-    }
+	@Override
+	public List<String> getDefaultEnabledActivities() {
+		return defaultEnabledActivities;
+	}
 }

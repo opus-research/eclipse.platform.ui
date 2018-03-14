@@ -15,8 +15,6 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.about;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -84,12 +82,11 @@ public class AboutFeaturesPage extends ProductInfoPage {
 
 	private Composite infoArea;
 
-	private Map cachedImages = new HashMap();
+	private Map<ImageDescriptor, Image> cachedImages = new HashMap<ImageDescriptor, Image>();
 
 	private AboutBundleGroupData[] bundleGroupInfos;
 
-	private String columnTitles[] = {
-			WorkbenchMessages.AboutFeaturesDialog_provider,
+	private String columnTitles[] = { WorkbenchMessages.AboutFeaturesDialog_provider,
 			WorkbenchMessages.AboutFeaturesDialog_featureName,
 			WorkbenchMessages.AboutFeaturesDialog_version,
 			WorkbenchMessages.AboutFeaturesDialog_featureId, };
@@ -102,41 +99,38 @@ public class AboutFeaturesPage extends ProductInfoPage {
 
 	private Button pluginsButton, moreButton;
 
-	private static Map featuresMap;
+	private static Map<?, ?> featuresMap;
 
 	public void setBundleGroupInfos(AboutBundleGroupData[] bundleGroupInfos) {
 		this.bundleGroupInfos = bundleGroupInfos;
 	}
 
+	@Override
 	String getId() {
 		return ID;
 	}
 
 	private void initializeBundleGroupInfos() {
 		if (bundleGroupInfos == null) {
-			IBundleGroupProvider[] providers = Platform
-					.getBundleGroupProviders();
+			IBundleGroupProvider[] providers = Platform.getBundleGroupProviders();
 
 			// create a descriptive object for each BundleGroup
-			LinkedList groups = new LinkedList();
+			LinkedList<AboutBundleGroupData> groups = new LinkedList<AboutBundleGroupData>();
 			if (providers != null) {
 				for (int i = 0; i < providers.length; ++i) {
-					IBundleGroup[] bundleGroups = providers[i]
-							.getBundleGroups();
+					IBundleGroup[] bundleGroups = providers[i].getBundleGroups();
 					for (int j = 0; j < bundleGroups.length; ++j) {
 						groups.add(new AboutBundleGroupData(bundleGroups[j]));
 					}
 				}
 			}
-			bundleGroupInfos = (AboutBundleGroupData[]) groups
-					.toArray(new AboutBundleGroupData[0]);
+			bundleGroupInfos = groups.toArray(new AboutBundleGroupData[0]);
 		} else {
 			// the order of the array may be changed due to sorting, so create a
 			// copy, since the client set this value.
 			AboutBundleGroupData[] clientArray = bundleGroupInfos;
 			bundleGroupInfos = new AboutBundleGroupData[clientArray.length];
-			System.arraycopy(clientArray, 0, bundleGroupInfos, 0,
-					clientArray.length);
+			System.arraycopy(clientArray, 0, bundleGroupInfos, 0, clientArray.length);
 		}
 		AboutData.sortByProvider(reverseSort, bundleGroupInfos);
 	}
@@ -153,44 +147,39 @@ public class AboutFeaturesPage extends ProductInfoPage {
 
 		AboutBundleGroupData info = (AboutBundleGroupData) items[0].getData();
 		IBundleGroup bundleGroup = info.getBundleGroup();
-		Bundle[] bundles = bundleGroup == null ? new Bundle[0] : bundleGroup
-				.getBundles();
+		Bundle[] bundles = bundleGroup == null ? new Bundle[0] : bundleGroup.getBundles();
 
-		AboutPluginsDialog d = new AboutPluginsDialog(
-				getShell(),
-				getProductName(),
-				bundles,
-				WorkbenchMessages.AboutFeaturesDialog_pluginInfoTitle,
-				NLS
-						.bind(
-								WorkbenchMessages.AboutFeaturesDialog_pluginInfoMessage,
-								bundleGroup.getIdentifier()),
+		AboutPluginsDialog d = new AboutPluginsDialog(getShell(), getProductName(), bundles,
+				WorkbenchMessages.AboutFeaturesDialog_pluginInfoTitle, NLS.bind(
+						WorkbenchMessages.AboutFeaturesDialog_pluginInfoMessage,
+						bundleGroup.getIdentifier()),
 				IWorkbenchHelpContextIds.ABOUT_FEATURES_PLUGINS_DIALOG);
 		d.open();
 	}
 
+	@Override
 	public void createPageButtons(Composite parent) {
-		moreButton = createButton(parent, MORE_ID,
-				WorkbenchMessages.AboutFeaturesDialog_moreInfo);
+		moreButton = createButton(parent, MORE_ID, WorkbenchMessages.AboutFeaturesDialog_moreInfo);
 		pluginsButton = createButton(parent, PLUGINS_ID,
 				WorkbenchMessages.AboutFeaturesDialog_pluginsInfo);
-		createButton(parent, COLUMNS_ID,
-				WorkbenchMessages.AboutFeaturesDialog_columns);
+		createButton(parent, COLUMNS_ID, WorkbenchMessages.AboutFeaturesDialog_columns);
 		TableItem[] items = table.getSelection();
 		if (items.length > 0) {
 			updateButtons((AboutBundleGroupData) items[0].getData());
 		}
 	}
 
+	@Override
 	public void createControl(Composite parent) {
 		initializeDialogUnits(parent);
 		parent.getShell().addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(DisposeEvent arg0) {
 				disposeImages();
 			}
 		});
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
-				IWorkbenchHelpContextIds.ABOUT_FEATURES_DIALOG);
+		PlatformUI.getWorkbench().getHelpSystem()
+				.setHelp(parent, IWorkbenchHelpContextIds.ABOUT_FEATURES_DIALOG);
 
 		Composite outer = createOuterComposite(parent);
 
@@ -206,8 +195,7 @@ public class AboutFeaturesPage extends ProductInfoPage {
 		Font font = parent.getFont();
 
 		infoArea = new Composite(parent, SWT.BORDER);
-		infoArea.setBackground(infoArea.getDisplay().getSystemColor(
-				SWT.COLOR_LIST_BACKGROUND));
+		infoArea.setBackground(infoArea.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		infoArea.setBackgroundMode(SWT.INHERIT_FORCE);
 		GridData data = new GridData(GridData.FILL, GridData.FILL, true, false);
 		// need to provide space for arbitrary feature infos, not just the
@@ -229,9 +217,10 @@ public class AboutFeaturesPage extends ProductInfoPage {
 		// text on the right
 		text = new StyledText(infoArea, SWT.MULTI | SWT.WRAP | SWT.READ_ONLY | SWT.V_SCROLL);
 		text.setAlwaysShowScrollBars(false);
-		
-		// Don't set caret to 'null' as this causes https://bugs.eclipse.org/293263.
-//		text.setCaret(null);
+
+		// Don't set caret to 'null' as this causes
+		// https://bugs.eclipse.org/293263.
+		// text.setCaret(null);
 
 		text.setFont(parent.getFont());
 		data = new GridData(GridData.FILL, GridData.FILL, true, true);
@@ -257,11 +246,10 @@ public class AboutFeaturesPage extends ProductInfoPage {
 
 		initializeBundleGroupInfos();
 
-		table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.SINGLE
-				| SWT.FULL_SELECTION | SWT.BORDER);
+		table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.SINGLE | SWT.FULL_SELECTION
+				| SWT.BORDER);
 
-		GridData gridData = new GridData(GridData.FILL, GridData.FILL, true,
-				true);
+		GridData gridData = new GridData(GridData.FILL, GridData.FILL, true, true);
 		gridData.heightHint = convertVerticalDLUsToPixels(TABLE_HEIGHT);
 		table.setLayoutData(gridData);
 		table.setHeaderVisible(true);
@@ -274,16 +262,14 @@ public class AboutFeaturesPage extends ProductInfoPage {
 				// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=266177
 				if (e.item == null)
 					return;
-				AboutBundleGroupData info = (AboutBundleGroupData) e.item
-						.getData();
+				AboutBundleGroupData info = (AboutBundleGroupData) e.item.getData();
 				updateInfoArea(info);
 				updateButtons(info);
 			}
 		});
 
 		int[] columnWidths = { convertHorizontalDLUsToPixels(120),
-				convertHorizontalDLUsToPixels(120),
-				convertHorizontalDLUsToPixels(70),
+				convertHorizontalDLUsToPixels(120), convertHorizontalDLUsToPixels(70),
 				convertHorizontalDLUsToPixels(130) };
 
 		for (int i = 0; i < columnTitles.length; i++) {
@@ -320,9 +306,9 @@ public class AboutFeaturesPage extends ProductInfoPage {
 	}
 
 	private void disposeImages() {
-		Iterator iter = cachedImages.values().iterator();
+		Iterator<Image> iter = cachedImages.values().iterator();
 		while (iter.hasNext()) {
-			Image image = (Image) iter.next();
+			Image image = iter.next();
 			image.dispose();
 		}
 	}
@@ -364,7 +350,7 @@ public class AboutFeaturesPage extends ProductInfoPage {
 		}
 
 		ImageDescriptor desc = info.getFeatureImage();
-		Image image = (Image) cachedImages.get(desc);
+		Image image = cachedImages.get(desc);
 		if (image == null && desc != null) {
 			image = desc.createImage();
 			cachedImages.put(desc, image);
@@ -475,25 +461,8 @@ public class AboutFeaturesPage extends ProductInfoPage {
 	 *            the source information for the new row, must not be null
 	 */
 	private static String[] createRow(AboutBundleGroupData info) {
-		return new String[] { info.getProviderName(), info.getName(),
-				info.getVersion(), info.getId() };
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.about.TableListPage#getSelectionValue()
-	 */
-	protected Collection getSelectionValue() {
-		if (table == null || table.isDisposed())
-			return null;
-		TableItem[] items = table.getSelection();
-		if (items.length <= 0) {
-			return null;
-		}
-		ArrayList list = new ArrayList(1);
-		list.add(items[0].getData());
-		return list;
+		return new String[] { info.getProviderName(), info.getName(), info.getVersion(),
+				info.getId() };
 	}
 
 	private void handleColumnsPressed() {
@@ -512,17 +481,14 @@ public class AboutFeaturesPage extends ProductInfoPage {
 		}
 
 		AboutBundleGroupData info = (AboutBundleGroupData) items[0].getData();
-		if (info == null
-				|| !AboutUtils.openBrowser(getShell(), info.getLicenseUrl())) {
+		if (info == null || !AboutUtils.openBrowser(getShell(), info.getLicenseUrl())) {
 			MessageDialog.openInformation(getShell(),
 					WorkbenchMessages.AboutFeaturesDialog_noInfoTitle,
 					WorkbenchMessages.AboutFeaturesDialog_noInformation);
 		}
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on Dialog.
-	 */
+	@Override
 	protected void buttonPressed(int buttonId) {
 		switch (buttonId) {
 		case MORE_ID:

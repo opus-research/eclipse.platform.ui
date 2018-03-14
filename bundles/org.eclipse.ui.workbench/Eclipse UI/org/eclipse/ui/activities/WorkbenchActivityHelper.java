@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
 import org.eclipse.ui.IPluginContribution;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.activities.ws.WorkbenchActivitySupport;
@@ -36,10 +35,10 @@ public final class WorkbenchActivityHelper {
 	 * @since 3.4
 	 */
 	public static final String TRIGGER_PRE_UI_POINT = "org.eclipse.ui.workbenchModel"; //$NON-NLS-1$
-	
+
 	private static ITriggerPoint getTriggerPoint(String id) {
-		return PlatformUI.getWorkbench().getActivitySupport()
-				.getTriggerPointManager().getTriggerPoint(id);
+		return PlatformUI.getWorkbench().getActivitySupport().getTriggerPointManager()
+				.getTriggerPoint(id);
 	}
 
 	/**
@@ -51,10 +50,10 @@ public final class WorkbenchActivityHelper {
 	 * @since 3.1
 	 */
 	public static IIdentifier getIdentifier(IPluginContribution contribution) {
-		IWorkbenchActivitySupport workbenchActivitySupport = PlatformUI
-				.getWorkbench().getActivitySupport();
-		IIdentifier identifier = workbenchActivitySupport.getActivityManager()
-				.getIdentifier(createUnifiedId(contribution));
+		IWorkbenchActivitySupport workbenchActivitySupport = PlatformUI.getWorkbench()
+				.getActivitySupport();
+		IIdentifier identifier = workbenchActivitySupport.getActivityManager().getIdentifier(
+				createUnifiedId(contribution));
 		return identifier;
 	}
 
@@ -73,9 +72,8 @@ public final class WorkbenchActivityHelper {
 	 * @see #allowUseOf(ITriggerPoint, Object)
 	 */
 	public static boolean allowUseOf(Object object) {
-		return allowUseOf(PlatformUI.getWorkbench().getActivitySupport()
-				.getTriggerPointManager().getTriggerPoint(
-						ITriggerPointManager.UNKNOWN_TRIGGER_POINT_ID), object);
+		return allowUseOf(PlatformUI.getWorkbench().getActivitySupport().getTriggerPointManager()
+				.getTriggerPoint(ITriggerPointManager.UNKNOWN_TRIGGER_POINT_ID), object);
 	}
 
 	/**
@@ -106,7 +104,7 @@ public final class WorkbenchActivityHelper {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Restrict the use of the object only if it is matched by an activity with
 	 * a core expression. A normal disabled activity will not restrict the use
@@ -133,20 +131,19 @@ public final class WorkbenchActivityHelper {
 	 *            the identifier to test.
 	 * @return whether the identifier is enabled.
 	 */
-	private static boolean allow(ITriggerPoint triggerPoint,
-			IIdentifier identifier) {
+	private static boolean allow(ITriggerPoint triggerPoint, IIdentifier identifier) {
 		if (identifier.isEnabled()) {
 			return true;
 		}
 
-		ITriggerPointAdvisor advisor = ((WorkbenchActivitySupport) PlatformUI
-				.getWorkbench().getActivitySupport()).getTriggerPointAdvisor();
-		Set<?> activitiesToEnable = advisor.allow(triggerPoint, identifier);
-		
+		ITriggerPointAdvisor advisor = ((WorkbenchActivitySupport) PlatformUI.getWorkbench()
+				.getActivitySupport()).getTriggerPointAdvisor();
+		Set<String> activitiesToEnable = advisor.allow(triggerPoint, identifier);
+
 		if (activitiesToEnable == null) {
 			return false;
 		}
-		
+
 		if (activitiesToEnable.isEmpty()) {
 			// no activities required to be enabled for this trigger point -
 			// allow use unconditionally.
@@ -164,12 +161,14 @@ public final class WorkbenchActivityHelper {
 	}
 
 	/**
-	 * Utility method to create a <code>String</code> containing the plugin
-	 * and extension ids of a contribution. This will have the form
+	 * Utility method to create a <code>String</code> containing the plugin and
+	 * extension ids of a contribution. This will have the form
 	 * 
 	 * <pre>
 	 * pluginId / extensionId
-	 * </pre>. If the IPluginContribution does not define a plugin id then the
+	 * </pre>
+	 * 
+	 * . If the IPluginContribution does not define a plugin id then the
 	 * extension id alone is returned.
 	 * 
 	 * @param contribution
@@ -190,10 +189,10 @@ public final class WorkbenchActivityHelper {
 	 * @param activities
 	 *            the activities to enable
 	 */
-	private static void enableActivities(Collection activities) {
-		IWorkbenchActivitySupport activitySupport = PlatformUI.getWorkbench()
-				.getActivitySupport();
-		Set<?> newSet = new HashSet(activitySupport.getActivityManager().getEnabledActivityIds());
+	private static void enableActivities(Collection<String> activities) {
+		IWorkbenchActivitySupport activitySupport = PlatformUI.getWorkbench().getActivitySupport();
+		Set<String> newSet = new HashSet<String>(activitySupport.getActivityManager()
+				.getEnabledActivityIds());
 		newSet.addAll(activities);
 		activitySupport.setEnabledActivityIds(newSet);
 	}
@@ -212,11 +211,10 @@ public final class WorkbenchActivityHelper {
 	public static final boolean filterItem(Object object) {
 		if (object instanceof IPluginContribution) {
 			IPluginContribution contribution = (IPluginContribution) object;
-			IWorkbenchActivitySupport workbenchActivitySupport = PlatformUI
-					.getWorkbench().getActivitySupport();
-			IIdentifier identifier = workbenchActivitySupport
-					.getActivityManager().getIdentifier(
-							createUnifiedId(contribution));
+			IWorkbenchActivitySupport workbenchActivitySupport = PlatformUI.getWorkbench()
+					.getActivitySupport();
+			IIdentifier identifier = workbenchActivitySupport.getActivityManager().getIdentifier(
+					createUnifiedId(contribution));
 			if (!identifier.isEnabled()) {
 				return true;
 			}
@@ -231,8 +229,8 @@ public final class WorkbenchActivityHelper {
 	 * @return whether the UI is set up to filter contributions
 	 */
 	public static final boolean isFiltering() {
-		return !PlatformUI.getWorkbench().getActivitySupport()
-				.getActivityManager().getDefinedActivityIds().isEmpty();
+		return !PlatformUI.getWorkbench().getActivitySupport().getActivityManager()
+				.getDefinedActivityIds().isEmpty();
 	}
 
 	/**
@@ -249,11 +247,11 @@ public final class WorkbenchActivityHelper {
 	 *         given category becomes enabled
 	 * @since 3.1
 	 */
-	public static Set getEnabledCategories(IActivityManager activityManager,
+	public static Set<String> getEnabledCategories(IActivityManager activityManager,
 			String categoryId) {
 		ICategory category = activityManager.getCategory(categoryId);
 		if (!category.isDefined()) {
-			return Collections.EMPTY_SET;
+			return Collections.emptySet();
 		}
 
 		Set<?> activities = expandActivityDependencies(getActivityIdsForCategory(category));
@@ -264,11 +262,9 @@ public final class WorkbenchActivityHelper {
 			if (otherCategoryId.equals(categoryId)) {
 				continue;
 			}
-			ICategory otherCategory = activityManager
-					.getCategory(otherCategoryId);
+			ICategory otherCategory = activityManager.getCategory(otherCategoryId);
 			Set<?> otherCategoryActivityIds = expandActivityDependencies(getActivityIdsForCategory(otherCategory));
-			if (activityManager.getEnabledActivityIds().containsAll(
-					otherCategoryActivityIds)) {
+			if (activityManager.getEnabledActivityIds().containsAll(otherCategoryActivityIds)) {
 				continue;
 			}
 			if (activities.containsAll(otherCategoryActivityIds)) {
@@ -288,11 +284,11 @@ public final class WorkbenchActivityHelper {
 	 * @return the expanded activities
 	 * @since 3.1
 	 */
-	public static Set expandActivityDependencies(Set baseActivities) {
-		Set<Object> extendedActivities = new HashSet<Object>();
-		for (Iterator<?> i = baseActivities.iterator(); i.hasNext();) {
-			String activityId = (String) i.next();
-			Set<?> requiredActivities = getRequiredActivityIds(activityId);
+	public static Set<String> expandActivityDependencies(Set<String> baseActivities) {
+		Set<String> extendedActivities = new HashSet<String>();
+		for (Iterator<String> i = baseActivities.iterator(); i.hasNext();) {
+			String activityId = i.next();
+			Set<String> requiredActivities = getRequiredActivityIds(activityId);
 			extendedActivities.addAll(requiredActivities);
 		}
 		extendedActivities.addAll(baseActivities);
@@ -307,22 +303,22 @@ public final class WorkbenchActivityHelper {
 	 * @return the activities required for this activity
 	 * @since 3.1
 	 */
-	public static Set getRequiredActivityIds(String activityId) {
-		IActivityManager manager = PlatformUI.getWorkbench()
-				.getActivitySupport().getActivityManager();
+	public static Set<String> getRequiredActivityIds(String activityId) {
+		IActivityManager manager = PlatformUI.getWorkbench().getActivitySupport()
+				.getActivityManager();
 		IActivity activity = manager.getActivity(activityId);
 		if (!activity.isDefined()) {
-			return Collections.EMPTY_SET;
+			return Collections.emptySet();
 		}
-		Set<?> requirementBindings = activity.getActivityRequirementBindings();
+		Set<IActivityRequirementBinding> requirementBindings = activity
+				.getActivityRequirementBindings();
 		if (requirementBindings.isEmpty()) {
-			return Collections.EMPTY_SET;
+			return Collections.emptySet();
 		}
 
-		Set<Object> requiredActivities = new HashSet<Object>(3);
+		Set<String> requiredActivities = new HashSet<String>(3);
 		for (Iterator<?> i = requirementBindings.iterator(); i.hasNext();) {
-			IActivityRequirementBinding binding = (IActivityRequirementBinding) i
-					.next();
+			IActivityRequirementBinding binding = (IActivityRequirementBinding) i.next();
 			requiredActivities.add(binding.getRequiredActivityId());
 			requiredActivities.addAll(getRequiredActivityIds(binding.getRequiredActivityId()));
 		}
@@ -337,12 +333,11 @@ public final class WorkbenchActivityHelper {
 	 * @return the activities directly required by a given category
 	 * @since 3.1
 	 */
-	public static Set getActivityIdsForCategory(ICategory category) {
-		Set<?> bindings = category.getCategoryActivityBindings();
+	public static Set<String> getActivityIdsForCategory(ICategory category) {
+		Set<ICategoryActivityBinding> bindings = category.getCategoryActivityBindings();
 		Set<String> activityIds = new HashSet<String>();
-		for (Iterator<?> i = bindings.iterator(); i.hasNext();) {
-			ICategoryActivityBinding binding = (ICategoryActivityBinding) i
-					.next();
+		for (Iterator<ICategoryActivityBinding> i = bindings.iterator(); i.hasNext();) {
+			ICategoryActivityBinding binding = i.next();
 			activityIds.add(binding.getActivityId());
 		}
 		return activityIds;
@@ -362,11 +357,11 @@ public final class WorkbenchActivityHelper {
 	 *         given category becomes enabled
 	 * @since 3.1
 	 */
-	public static Set getDisabledCategories(IActivityManager activityManager,
+	public static Set<String> getDisabledCategories(IActivityManager activityManager,
 			String categoryId) {
 		ICategory category = activityManager.getCategory(categoryId);
 		if (!category.isDefined()) {
-			return Collections.EMPTY_SET;
+			return Collections.emptySet();
 		}
 
 		Set<?> activities = expandActivityDependencies(getActivityIdsForCategory(category));
@@ -377,8 +372,7 @@ public final class WorkbenchActivityHelper {
 			if (otherCategoryId.equals(categoryId)) {
 				continue;
 			}
-			ICategory otherCategory = activityManager
-					.getCategory(otherCategoryId);
+			ICategory otherCategory = activityManager.getCategory(otherCategoryId);
 			Set<?> otherCategoryActivityIds = expandActivityDependencies(getActivityIdsForCategory(otherCategory));
 
 			if (otherCategoryActivityIds.isEmpty()) {
@@ -389,8 +383,7 @@ public final class WorkbenchActivityHelper {
 				continue;
 			}
 
-			if (activityManager.getEnabledActivityIds().containsAll(
-					otherCategoryActivityIds)) {
+			if (activityManager.getEnabledActivityIds().containsAll(otherCategoryActivityIds)) {
 				otherDisabledCategories.add(otherCategoryId);
 			}
 
@@ -410,8 +403,8 @@ public final class WorkbenchActivityHelper {
 	 *         given category becomes enabled
 	 * @since 3.1
 	 */
-	public static final Set getContainedCategories(
-			IActivityManager activityManager, String categoryId) {
+	public static final Set getContainedCategories(IActivityManager activityManager,
+			String categoryId) {
 		ICategory category = activityManager.getCategory(categoryId);
 		if (!category.isDefined()) {
 			return Collections.EMPTY_SET;
@@ -425,8 +418,7 @@ public final class WorkbenchActivityHelper {
 			if (otherCategoryId.equals(categoryId)) {
 				continue;
 			}
-			ICategory otherCategory = activityManager
-					.getCategory(otherCategoryId);
+			ICategory otherCategory = activityManager.getCategory(otherCategoryId);
 			Set<?> otherCategoryActivityIds = expandActivityDependencies(getActivityIdsForCategory(otherCategory));
 
 			if (otherCategoryActivityIds.isEmpty()) {
@@ -463,7 +455,7 @@ public final class WorkbenchActivityHelper {
 		}
 		return enabledCategories;
 	}
-	
+
 	/**
 	 * Return the set of partially enabled categories.
 	 * 
@@ -472,8 +464,7 @@ public final class WorkbenchActivityHelper {
 	 * @return the set of partially enabled categories
 	 * @since 3.2
 	 */
-	public static Set getPartiallyEnabledCategories(
-			IActivityManager activityManager) {
+	public static Set getPartiallyEnabledCategories(IActivityManager activityManager) {
 		Set<?> definedCategoryIds = activityManager.getDefinedCategoryIds();
 		Set<String> partialCategories = new HashSet<String>();
 		for (Iterator<?> i = definedCategoryIds.iterator(); i.hasNext();) {
@@ -498,8 +489,7 @@ public final class WorkbenchActivityHelper {
 	 * @return whether the category is enabled
 	 * @since 3.2
 	 */
-	public static boolean isPartiallyEnabled(IActivityManager activityManager,
-			String categoryId) {
+	public static boolean isPartiallyEnabled(IActivityManager activityManager, String categoryId) {
 		Set<?> activityIds = getActivityIdsForCategory(activityManager.getCategory(categoryId));
 		int foundCount = 0;
 		for (Iterator<?> i = activityIds.iterator(); i.hasNext();) {
@@ -522,14 +512,13 @@ public final class WorkbenchActivityHelper {
 	 * @return the set of enabled category ids that this activity belongs to
 	 * @since 3.1
 	 */
-	public static Set getEnabledCategoriesForActivity(
-			IActivityManager activityManager, String activityId) {
+	public static Set getEnabledCategoriesForActivity(IActivityManager activityManager,
+			String activityId) {
 		Set<String> enabledCategoriesForActivity = new HashSet<String>();
 		Set<?> enabledCategories = getEnabledCategories(activityManager);
 		for (Iterator<?> i = enabledCategories.iterator(); i.hasNext();) {
 			String categoryId = (String) i.next();
-			if (getActivityIdsForCategory(
-					activityManager.getCategory(categoryId)).contains(
+			if (getActivityIdsForCategory(activityManager.getCategory(categoryId)).contains(
 					activityId)) {
 				enabledCategoriesForActivity.add(categoryId);
 			}
@@ -548,8 +537,7 @@ public final class WorkbenchActivityHelper {
 	 * @return whether the category is enabled
 	 * @since 3.1
 	 */
-	public static boolean isEnabled(IActivityManager activityManager,
-			String categoryId) {
+	public static boolean isEnabled(IActivityManager activityManager, String categoryId) {
 
 		ICategory category = activityManager.getCategory(categoryId);
 		if (category.isDefined()) {
@@ -574,8 +562,8 @@ public final class WorkbenchActivityHelper {
 	 *         objects
 	 * @since 3.1
 	 */
-	public static ICategory[] resolveCategories(
-			IMutableActivityManager activityManager, Set categoryIds) {
+	public static ICategory[] resolveCategories(IMutableActivityManager activityManager,
+			Set categoryIds) {
 		ICategory[] categories = new ICategory[categoryIds.size()];
 		String[] categoryIdArray = (String[]) categoryIds.toArray(new String[categoryIds.size()]);
 		for (int i = 0; i < categoryIdArray.length; i++) {
@@ -583,13 +571,16 @@ public final class WorkbenchActivityHelper {
 		}
 		return categories;
 	}
-	
+
 	/**
 	 * Fills and returns the second argument with those objects of the first
 	 * argument that pass the {@link #restrictUseOf(Object)} test.
 	 * 
-	 * @param toBeFiltered the input collection
-	 * @param result the collection to which objects passing the test should be added
+	 * @param toBeFiltered
+	 *            the input collection
+	 * @param result
+	 *            the collection to which objects passing the test should be
+	 *            added
 	 * @return the <code>result</code> collection for convenience
 	 * 
 	 * @since 3.4
@@ -603,7 +594,7 @@ public final class WorkbenchActivityHelper {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Returns an array with those objects of the argument array that pass the
 	 * {@link #restrictUseOf(Object)} test.
@@ -612,7 +603,7 @@ public final class WorkbenchActivityHelper {
 	 *            the input array
 	 * @return a new array of the same type as the argument array, containing
 	 *         objects that pass the test
-	 *         
+	 * 
 	 * @since 3.4
 	 */
 	public static Object[] restrictArray(Object[] array) {
@@ -622,16 +613,19 @@ public final class WorkbenchActivityHelper {
 				list.add(array[i]);
 			}
 		}
-		return list.toArray((Object[]) Array.newInstance(array.getClass()
-				.getComponentType(), list.size()));
+		return list.toArray((Object[]) Array.newInstance(array.getClass().getComponentType(),
+				list.size()));
 	}
-	
+
 	/**
 	 * Fills and returns the second argument with those objects of the first
 	 * argument that pass the {@link #filterItem(Object)} test.
 	 * 
-	 * @param toBeFiltered the input collection
-	 * @param result the collection to which objects passing the test should be added
+	 * @param toBeFiltered
+	 *            the input collection
+	 * @param result
+	 *            the collection to which objects passing the test should be
+	 *            added
 	 * @return the <code>result</code> collection for convenience
 	 * 
 	 * @since 3.4
@@ -645,7 +639,7 @@ public final class WorkbenchActivityHelper {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Returns an array with those objects of the argument array that pass the
 	 * {@link #filterItem(Object)} test.
@@ -654,7 +648,7 @@ public final class WorkbenchActivityHelper {
 	 *            the input array
 	 * @return a new array of the same type as the argument array, containing
 	 *         objects that pass the test
-	 *         
+	 * 
 	 * @since 3.4
 	 */
 	public static Object[] filterArray(Object[] array) {
@@ -664,8 +658,8 @@ public final class WorkbenchActivityHelper {
 				list.add(array[i]);
 			}
 		}
-		return list.toArray((Object[]) Array.newInstance(array.getClass()
-				.getComponentType(), list.size()));
+		return list.toArray((Object[]) Array.newInstance(array.getClass().getComponentType(),
+				list.size()));
 	}
 
 	/**
