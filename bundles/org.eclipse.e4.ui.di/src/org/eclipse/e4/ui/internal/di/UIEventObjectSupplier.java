@@ -36,11 +36,6 @@ public class UIEventObjectSupplier extends EventObjectSupplier {
 		}
 
 		public void handleEvent(org.osgi.service.event.Event event) {
-			if (!requestor.isValid()) {
-				unsubscribe(requestor);
-				return;
-			}
-
 			addCurrentEvent(topic, event);
 			requestor.resolveArguments(false);
 			removeCurrentEvent(topic);
