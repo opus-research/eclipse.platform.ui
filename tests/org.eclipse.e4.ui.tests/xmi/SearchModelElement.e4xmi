@@ -13,6 +13,9 @@
                 <children xsi:type="menu:HandledMenuItem" xmi:id="_ESaHELrIEeODX5-c16SbUg" elementId="menuItem1Id"/>
                 <children xsi:type="menu:HandledMenuItem" xmi:id="_HdgKELrIEeODX5-c16SbUg" elementId="menuItem2Id"/>
               </menus>
+              <menus xsi:type="menu:PopupMenu" xmi:id="_nled8MowEeOeqKGMg6DLQg" elementId="org.eclipse.e4.ui.tests.popupmenu.0" label="Popup">
+                <children xsi:type="menu:HandledMenuItem" xmi:id="_plgcAMowEeOeqKGMg6DLQg" elementId="org.eclipse.e4.ui.tests.handledmenuitem.0" label="Popup menu entry 1" command="_flFgALrGEeODX5-c16SbUg"/>
+              </menus>
             </children>
             <children xsi:type="basic:Part" xmi:id="_4BMNELrHEeODX5-c16SbUg" elementId="org.eclipse.e4.ui.tests.part.1">
               <tags>twoValidTags</tags>
