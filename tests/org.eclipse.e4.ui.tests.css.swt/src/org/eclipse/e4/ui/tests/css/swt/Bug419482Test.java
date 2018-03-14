@@ -7,11 +7,8 @@
  *
  * Contributors:
  *     Stefan Winkler <stefan@winklerweb.net> - initial contribution
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 443094
  *******************************************************************************/
 package org.eclipse.e4.ui.tests.css.swt;
-
-import static org.junit.Assert.assertEquals;
 
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.swt.SWT;
@@ -23,7 +20,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
-import org.junit.Test;
 
 public class Bug419482Test extends CSSSWTTestCase {
 
@@ -35,8 +31,7 @@ public class Bug419482Test extends CSSSWTTestCase {
 	private ToolBar toolbar2;
 	private ToolBar toolbar3;
 
-	@Test
-	public void testTwoLevelsWildcard() {
+	public void testTwoLevelsWildcard() throws Exception {
 		String cssString = "Shell > * > * { color: red; } \n"
 				+ "Label { color: blue; }";
 
@@ -46,8 +41,7 @@ public class Bug419482Test extends CSSSWTTestCase {
 		assertEquals(RGB_BLUE, rgb);
 	}
 
-	@Test
-	public void testOneLevelWildcardOneSpecific() {
+	public void testOneLevelWildcardOneSpecific() throws Exception {
 		String cssString = "Shell > * > Label { color: red; } \n"
 				+ "Label { color: blue; }";
 
@@ -57,8 +51,7 @@ public class Bug419482Test extends CSSSWTTestCase {
 		assertEquals(RGB_RED, rgb);
 	}
 
-	@Test
-	public void testDescendentsWildcard() {
+	public void testDescendentsWildcard() throws Exception {
 		String cssString = "Shell * { color: red; } \n"
 				+ "Label { color: blue; }";
 
@@ -68,8 +61,7 @@ public class Bug419482Test extends CSSSWTTestCase {
 		assertEquals(RGB_BLUE, rgb);
 	}
 
-	@Test
-	public void testDescendentsSpecific() {
+	public void testDescendentsSpecific() throws Exception {
 		String cssString = "Shell Label { color: red; } \n"
 				+ "Label { color: blue; }";
 
@@ -100,7 +92,6 @@ public class Bug419482Test extends CSSSWTTestCase {
 		return labelToTest;
 	}
 
-	@Test
 	public void testOriginalBugReport() {
 		String css = "Shell, Shell > *, Shell > * > * {\n" +
 				"    background-color: red;\n" +
@@ -122,7 +113,6 @@ public class Bug419482Test extends CSSSWTTestCase {
 		assertEquals(RGB_BLUE, toolbar3.getBackground().getRGB());
 	}
 
-	@Test
 	public void testOriginalBugReportDifferentOrder() {
 		String css = "ToolBar {\n" + "    background-color: blue;\n" + "}"
 				+ "Shell, Shell > *, Shell > * > * {\n"

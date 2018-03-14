@@ -1,17 +1,13 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2012, 2014 IBM Corporation and others. All rights reserved. This
+ * Copyright (c) 2008, 2012 IBM Corporation and others. All rights reserved. This
  * program and the accompanying materials are made available under the terms of
  * the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 443094
  *******************************************************************************/
 package org.eclipse.e4.ui.tests.css.swt;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
 
 import java.util.HashSet;
 
@@ -24,18 +20,17 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.junit.Test;
 
 public class ShellTest extends CSSSWTTestCase {
 
 	static final RGB RED = new RGB(255, 0, 0);
 	static final RGB GREEN = new RGB(0, 255, 0);
 	static final RGB BLUE = new RGB(0, 0, 255);
-
+		
 	protected Shell createTestShell(String styleSheet) {
 		Display display = Display.getDefault();
 		CSSEngine engine = createEngine(styleSheet, display);
-
+		
 		// Create widgets
 		Shell shell = new Shell(display, SWT.SHELL_TRIM);
 		FillLayout layout = new FillLayout();
@@ -50,95 +45,88 @@ public class ShellTest extends CSSSWTTestCase {
 		shell.pack();
 		return shell;
 	}
-
-
-	@Test
-	public void testColor() {
+	
+	
+	public void testColor() throws Exception {
 		Shell shellToTest = createTestShell("Shell { background-color: #FF0000; color: #0000FF }");
 		assertEquals(RED, shellToTest.getBackground().getRGB());
 		assertEquals(BLUE, shellToTest.getForeground().getRGB());
 	}
 
-	@Test
-	public void testFontRegular() {
+	public void testFontRegular() throws Exception {
 		Shell shellToTest = createTestShell("Shell { font: Verdana 16px }");
 		assertEquals(1, shellToTest.getFont().getFontData().length);
 		FontData fontData = shellToTest.getFont().getFontData()[0];
 		assertEquals("Verdana", fontData.getName());
 		assertEquals(16, fontData.getHeight());
-		assertEquals(SWT.NORMAL, fontData.getStyle());
+		assertEquals(SWT.NORMAL, fontData.getStyle());		
 	}
 
-	@Test
-	public void testFontBold() {
+	public void testFontBold() throws Exception {
 		Shell shellToTest = createTestShell("Shell { font: Arial 12px; font-weight: bold }");
 		assertEquals(1, shellToTest.getFont().getFontData().length);
 		FontData fontData = shellToTest.getFont().getFontData()[0];
 		assertEquals("Arial", fontData.getName());
 		assertEquals(12, fontData.getHeight());
-		assertEquals(SWT.BOLD, fontData.getStyle());
+		assertEquals(SWT.BOLD, fontData.getStyle());		
 	}
 
-	@Test
-	public void testFontItalic() {
+	public void testFontItalic() throws Exception {
 		Shell shellToTest = createTestShell("Shell { font-style: italic }");
 		assertEquals(1, shellToTest.getFont().getFontData().length);
 		FontData fontData = shellToTest.getFont().getFontData()[0];
-		assertEquals(SWT.ITALIC, fontData.getStyle());
+		assertEquals(SWT.ITALIC, fontData.getStyle());		
 	}
 
-	// bug 375069: ensure children aren't caught up in parent
-	@Test
-	public void test375069ChildShellDifferentiation() {
-		Display display = Display.getDefault();
-		CSSEngine engine = createEngine("Shell.parent { font-style: italic; }", display);
+    // bug 375069: ensure children aren't caught up in parent
+    public void test375069ChildShellDifferentiation() throws Exception {
+        Display display = Display.getDefault();
+        CSSEngine engine = createEngine("Shell.parent { font-style: italic; }", display);
 
-		Shell parent = new Shell(display, SWT.NONE);
-		WidgetElement.setCSSClass(parent, "parent");
-		Shell child = new Shell(parent, SWT.NONE);
+        Shell parent = new Shell(display, SWT.NONE);
+        WidgetElement.setCSSClass(parent, "parent");
+        Shell child = new Shell(parent, SWT.NONE);
+        WidgetElement.setCSSClass(child, "child");
+        parent.open();
+        child.open();
+        engine.applyStyles(parent, true);
+        engine.applyStyles(child, true);
+
+
+        assertEquals(1, parent.getFont().getFontData().length);
+        FontData fontData = parent.getFont().getFontData()[0];
+        assertEquals(SWT.ITALIC, fontData.getStyle());
+
+        assertEquals(1, child.getFont().getFontData().length);
+        fontData = child.getFont().getFontData()[0];
+        assertNotSame(SWT.ITALIC, fontData.getStyle());
+    }
+
+    // bug 375069: ensure children shells are still captured by Shell
+    public void test375069AllShell() throws Exception {
+        Display display = Display.getDefault();
+        CSSEngine engine = createEngine("Shell { font-style: italic; }", display);
+
+        Shell parent = new Shell(display, SWT.NONE);
+        WidgetElement.setCSSClass(parent, "parent");
+        Shell child = new Shell(parent, SWT.NONE);
 		WidgetElement.setCSSClass(child, "child");
-		parent.open();
-		child.open();
-		engine.applyStyles(parent, true);
-		engine.applyStyles(child, true);
+        parent.open();
+        child.open();
+        engine.applyStyles(parent, true);
+        engine.applyStyles(child, true);
 
+        assertEquals(1, parent.getFont().getFontData().length);
+        FontData fontData = parent.getFont().getFontData()[0];
+        assertEquals(SWT.ITALIC, fontData.getStyle());
 
-		assertEquals(1, parent.getFont().getFontData().length);
-		FontData fontData = parent.getFont().getFontData()[0];
-		assertEquals(SWT.ITALIC, fontData.getStyle());
-
-		assertEquals(1, child.getFont().getFontData().length);
-		fontData = child.getFont().getFontData()[0];
-		assertNotSame(SWT.ITALIC, fontData.getStyle());
-	}
+        assertEquals(1, child.getFont().getFontData().length);
+        fontData = child.getFont().getFontData()[0];
+        assertEquals(SWT.ITALIC, fontData.getStyle());
+    }
 
 	// bug 375069: ensure children shells are still captured by Shell
-	@Test
-	public void test375069AllShell() {
-		Display display = Display.getDefault();
-		CSSEngine engine = createEngine("Shell { font-style: italic; }", display);
-
-		Shell parent = new Shell(display, SWT.NONE);
-		WidgetElement.setCSSClass(parent, "parent");
-		Shell child = new Shell(parent, SWT.NONE);
-		WidgetElement.setCSSClass(child, "child");
-		parent.open();
-		child.open();
-		engine.applyStyles(parent, true);
-		engine.applyStyles(child, true);
-
-		assertEquals(1, parent.getFont().getFontData().length);
-		FontData fontData = parent.getFont().getFontData()[0];
-		assertEquals(SWT.ITALIC, fontData.getStyle());
-
-		assertEquals(1, child.getFont().getFontData().length);
-		fontData = child.getFont().getFontData()[0];
-		assertEquals(SWT.ITALIC, fontData.getStyle());
-	}
-
-	// bug 375069: ensure children shells are still captured by Shell
-	@Test
-	public void testShellParentage() {
+	public void testShellParentage() throws Exception {
 		Display display = Display.getDefault();
 		CSSEngine engine = createEngine(
 				"Shell[parentage='parent'] { font-style: italic; }", display);
@@ -161,8 +149,7 @@ public class ShellTest extends CSSSWTTestCase {
 		assertEquals(SWT.ITALIC, fontData.getStyle());
 	}
 
-	@Test
-	public void testShellUnparentedPseudoelement() {
+	public void testShellUnparentedPseudoelement() throws Exception {
 		Display display = Display.getDefault();
 		CSSEngine engine = createEngine(
 				"Shell:swt-unparented { font-style: italic; }", display);
@@ -185,8 +172,7 @@ public class ShellTest extends CSSSWTTestCase {
 		assertNotSame(SWT.ITALIC, fontData.getStyle());
 	}
 
-	@Test
-	public void testShellParentedPseudoelement() {
+	public void testShellParentedPseudoelement() throws Exception {
 		Display display = Display.getDefault();
 		CSSEngine engine = createEngine(
 				"Shell:swt-parented { font-style: italic; }", display);
@@ -209,8 +195,7 @@ public class ShellTest extends CSSSWTTestCase {
 		assertEquals(SWT.ITALIC, fontData.getStyle());
 	}
 
-	@Test
-	public void testSwtDataClassAttribute() {
+	public void testSwtDataClassAttribute() throws Exception {
 		Display display = Display.getDefault();
 		CSSEngine engine = createEngine(
 				"Shell[swt-data-class ~= 'java.util.HashSet'] { font-style: italic; }",
@@ -226,8 +211,7 @@ public class ShellTest extends CSSSWTTestCase {
 		assertEquals(SWT.ITALIC, fontData.getStyle());
 	}
 
-	@Test
-	public void testBackgroundMode() {
+	public void testBackgroundMode() throws Exception {
 		Shell shellToTest = createTestShell("Shell { swt-background-mode: force; }");
 		assertEquals(SWT.INHERIT_FORCE, shellToTest.getBackgroundMode());
 	}
