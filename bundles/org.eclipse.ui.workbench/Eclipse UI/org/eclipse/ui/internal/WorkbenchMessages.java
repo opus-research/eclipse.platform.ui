@@ -13,7 +13,6 @@
  * 		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  * 		Implemented workbench auto-save to correctly restore state in case of crash.
  * Andrey Loskutov <loskutov@gmx.de> - Bug 388476, 445538, 463262
- * Alain Bernard <alain.bernard1224@gmail.com> - Bug 281490
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -430,16 +429,16 @@ public class WorkbenchMessages extends NLS {
 	public static String TypesFiltering_typeDelimiter;
 
 	// --- Import/Export ---
-	public static String ImportExportPage_chooseImportWizard;
-	public static String ImportExportPage_chooseExportWizard;
+	public static String ImportExportPage_chooseImportSource;
+	public static String ImportExportPage_chooseExportDestination;
 
 	// --- Import ---
 	public static String ImportWizard_title;
-	public static String ImportWizard_selectWizard;
+	public static String ImportWizard_selectSource;
 
 	// --- Export ---
 	public static String ExportWizard_title;
-	public static String ExportWizard_selectWizard;
+	public static String ExportWizard_selectDestination;
 	// --- New Project ---
 	public static String NewProject_title;
 
