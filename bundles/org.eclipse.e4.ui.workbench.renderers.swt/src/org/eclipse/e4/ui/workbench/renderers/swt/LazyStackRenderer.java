@@ -4,9 +4,10 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 441150
  *     Fabio Zadrozny (fabiofz@gmail.com) - Bug 436763
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
@@ -41,7 +42,7 @@ import org.osgi.service.event.EventHandler;
  * from being rendered, calling 'childAdded' instead. This not only saves time
  * and SWT resources but is necessary in an IDE world where we must not
  * arbitrarily cause plug-in loading.
- * 
+ *
  */
 public abstract class LazyStackRenderer extends SWTPartRenderer {
 	private EventHandler lazyLoader = new EventHandler() {
@@ -69,10 +70,6 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 		}
 	};
 
-	public LazyStackRenderer() {
-		super();
-	}
-
 	public void init(IEventBroker eventBroker) {
 		// Ensure that there only ever *one* listener. Each subclass
 		// will call this method
@@ -91,8 +88,9 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 
 	@Override
 	public void postProcess(MUIElement element) {
-		if (!(element instanceof MGenericStack<?>))
+		if (!(element instanceof MGenericStack<?>) || isMinimizedStack(element)) {
 			return;
+		}
 
 		MGenericStack<MUIElement> stack = (MGenericStack<MUIElement>) element;
 		MUIElement selPart = stack.getSelectedElement();
@@ -143,7 +141,7 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 	/**
 	 * This method is necessary to allow the parent container to show affordance
 	 * (i.e. tabs) for child elements -without- creating the actual part
-	 * 
+	 *
 	 * @param me
 	 *            The parent model element
 	 * @param part
@@ -297,5 +295,10 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 		if (layoutShellLater != null) {
 			layoutShellLater.layout(true, true);
 		}
+	}
+
+	private boolean isMinimizedStack(MUIElement stack) {
+		return stack.getTags().contains(IPresentationEngine.MINIMIZED)
+				&& !stack.getTags().contains(IPresentationEngine.ACTIVE);
 	}
 }
