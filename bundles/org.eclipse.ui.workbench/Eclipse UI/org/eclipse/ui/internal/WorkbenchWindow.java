@@ -14,7 +14,6 @@
  *                                      through a fragment or other means
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 431446, 433979, 440810, 441184
  *     Denis Zygann <d.zygann@web.de> - Bug 457390
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -528,11 +527,9 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 					Object object = dirtyPart.getObject();
 					if (object instanceof CompatibilityPart) {
 						IWorkbenchPart part = ((CompatibilityPart) object).getPart();
-						ISaveablePart saveable = SaveableHelper.getSaveable(part);
-						if (saveable != null) {
-							if (!saveable.isSaveOnCloseNeeded()) {
+						if (part instanceof ISaveablePart) {
+							if (!((ISaveablePart) part).isSaveOnCloseNeeded())
 								return Save.NO;
-							}
 							return SaveableHelper.savePart((ISaveablePart) part, part,
 									WorkbenchWindow.this, true) ? Save.NO : Save.CANCEL;
 						}
@@ -2863,7 +2860,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			setPerspectiveBarVisible(!perspectivebarVisible);
 		}
 		ICommandService commandService = (ICommandService) getService(ICommandService.class);
-		Map<String, WorkbenchWindow> filter = new HashMap<String, WorkbenchWindow>();
+		Map filter = new HashMap();
 		filter.put(IServiceScopes.WINDOW_SCOPE, this);
 		commandService.refreshElements(COMMAND_ID_TOGGLE_COOLBAR, filter);
 	}
