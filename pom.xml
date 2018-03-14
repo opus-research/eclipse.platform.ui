@@ -82,6 +82,7 @@
     <module>bundles/org.eclipse.e4.emf.xpath</module>
     <module>bundles/org.eclipse.e4.ui.bindings</module>
     <module>bundles/org.eclipse.e4.ui.css.core</module>
+    <module>org.eclipse.e4.ui.css.forms</module>
     <module>bundles/org.eclipse.e4.ui.css.swt</module>
     <module>bundles/org.eclipse.e4.ui.css.swt.theme</module>
     <module>bundles/org.eclipse.e4.ui.di</module>
