@@ -443,7 +443,7 @@ public class JFaceResources {
 		declareImage(
 				bundle,
 				PopupDialog.POPUP_IMG_MENU_DISABLED,
-				ICONS_PATH + "popup_menu_disabled.png", PopupDialog.class, "images/popup_menu_disabled.png");//$NON-NLS-1$ //$NON-NLS-2$
+				ICONS_PATH + "popup_menu_disabled.gif", PopupDialog.class, "images/popup_menu_disabled.gif");//$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
