@@ -78,7 +78,7 @@ public class MarkerCompletionField extends MarkerField {
 		 */
 		@Override
 		protected Object getValue(Object element) {
-			return Boolean.valueOf(((MarkerEntry) element).getAttributeValue(
+			return new Boolean(((MarkerEntry) element).getAttributeValue(
 					IMarker.DONE, false));
 		}
 
