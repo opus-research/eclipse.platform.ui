@@ -71,6 +71,7 @@ AbstractCSSPropertyBackgroundHandler {
 			String pseudo, CSSEngine engine) throws Exception {
 		Widget widget = (Widget) ((WidgetElement) element).getNativeWidget();
 		if (value.getCssValueType() == CSSValue.CSS_PRIMITIVE_VALUE) {
+
 			// allow "inherit" by setting background to null
 			Color newColor;
 			if ("inherit".equals(value.getCssText())) {
@@ -79,6 +80,7 @@ AbstractCSSPropertyBackgroundHandler {
 				newColor = (Color) engine.convert(value, Color.class, widget
 						.getDisplay());
 			}
+
 			if (widget instanceof CTabItem) {
 				CTabFolder folder = ((CTabItem) widget).getParent();
 				if ("selected".equals(pseudo)) {

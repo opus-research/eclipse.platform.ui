@@ -11,7 +11,6 @@
 package org.eclipse.ui.splash;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
 import org.eclipse.jface.dialogs.ProgressIndicator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.ProgressMonitorPart;
@@ -35,11 +34,6 @@ import org.eclipse.ui.internal.StartupThreading.StartupRunnable;
  */
 public abstract class BasicSplashHandler extends AbstractSplashHandler {
 
-	private static final String CSS_ID_KEY = CSSSWTConstants.CSS_ID_KEY;
-	private static final String SPLASH_PROGRESS_PART_ID = "org-eclipse-ui-splash-progressPart"; //$NON-NLS-1$
-	private static final String SPLASH_PROGRESS_INDICATOR_ID = "org-eclipse-ui-splash-progressIndicator"; //$NON-NLS-1$
-	private static final String SPLASH_PROGRESS_TEXT_ID = "org-eclipse-ui-splash-progressText"; //$NON-NLS-1$
-
 	/**
 	 * Hacks the progress monitor to have absolute positioning for its controls.
 	 * In addition, all methods that access the controls will be wrapped in an
@@ -49,10 +43,6 @@ public abstract class BasicSplashHandler extends AbstractSplashHandler {
 		public AbsolutePositionProgressMonitorPart(Composite parent) {
 			super(parent, null);
 			setLayout(null);
-
-			this.setData(CSS_ID_KEY, SPLASH_PROGRESS_PART_ID);
-			fProgressIndicator.setData(CSS_ID_KEY, SPLASH_PROGRESS_INDICATOR_ID);
-			fLabel.setData(CSS_ID_KEY, SPLASH_PROGRESS_TEXT_ID);
 		}
 
 		public ProgressIndicator getProgressIndicator() {

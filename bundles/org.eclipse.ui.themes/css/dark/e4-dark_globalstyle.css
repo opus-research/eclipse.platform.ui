@@ -414,16 +414,3 @@ FlyoutControlComposite, FlyoutControlComposite ToolBar, FlyoutControlComposite C
     background-color: #3f4447;
     color: #EEEEEE;
 }
-
-/* See Bug 430848: We need to override the theme of the Eclipse splash screen, because
- * otherwise the splash screen would be partly switched to the dark theme during startup,
- * which does not look very nice.
- */
-Label#org-eclipse-ui-splash-progressText {
-	background-color: inherit; /* transparent/no background */ 
-	color: #9c9696; /* see property startupForegroundColor in the product */
-}
-
-ProgressIndicator#org-eclipse-ui-splash-progressIndicator {
-	background-color: inherit; /* default background */
-}
