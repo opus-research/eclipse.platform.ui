@@ -140,7 +140,7 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 		if (input instanceof IFileEditorInput) {
 			return ((IFileEditorInput)input).getFile();
 		}
-		return input.getAdapter(IResource.class);
+		return (IResource) input.getAdapter(IResource.class);
 	}
 
 	/**
