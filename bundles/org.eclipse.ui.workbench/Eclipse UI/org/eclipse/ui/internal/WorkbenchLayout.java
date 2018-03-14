@@ -88,7 +88,12 @@ public class WorkbenchLayout extends Layout {
 	 */
 	private class LeftBannerLayout extends Layout {
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.swt.widgets.Layout#computeSize(org.eclipse.swt.widgets.Composite,
+		 *      int, int, boolean)
+		 */
 		protected Point computeSize(Composite composite, int wHint, int hHint,
 				boolean flushCache) {
 			// 'topMax' is the maximum height of both the left and
@@ -96,7 +101,12 @@ public class WorkbenchLayout extends Layout {
 			return new Point(wHint, WorkbenchLayout.this.topMax);
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.swt.widgets.Layout#layout(org.eclipse.swt.widgets.Composite,
+		 *      boolean)
+		 */
 		protected void layout(Composite composite, boolean flushCache) {
 		}
 
@@ -185,7 +195,12 @@ public class WorkbenchLayout extends Layout {
 		// Create the left composite and override its 'computeSize'
 		// to delegate to the 'primary' command trim area
 		Composite bannerLeft = new Composite(banner, SWT.NONE) {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.widgets.Composite#computeSize(int, int,
+			 *      boolean)
+			 */
 			public Point computeSize(int wHint, int hHint, boolean changed) {
 				// If we're doing a 'real' workbench layout then delegate to the
 				// appropriate trim area
@@ -204,7 +219,12 @@ public class WorkbenchLayout extends Layout {
 
 		// Create the right hand part of the CBanner
 		Composite bannerRight = new Composite(banner, SWT.NONE) {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.widgets.Composite#computeSize(int, int,
+			 *      boolean)
+			 */
 			public Point computeSize(int wHint, int hHint, boolean changed) {
 				// If we're doing a 'real' workbench layout then delegate to the
 				// appropriate trim area
@@ -223,11 +243,9 @@ public class WorkbenchLayout extends Layout {
 		// If the right banner control changes size it's because
 		// the 'swoop' moved.
 		bannerRight.addControlListener(new ControlListener() {
-			@Override
 			public void controlMoved(ControlEvent e) {
 			}
 
-			@Override
 			public void controlResized(ControlEvent e) {
 				Composite leftComp = (Composite) e.widget;
 				leftComp.getShell().layout(true);
@@ -238,7 +256,15 @@ public class WorkbenchLayout extends Layout {
 		banner.moveBelow(null);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.widgets.Layout#computeSize(org.eclipse.swt.widgets.Composite,
+	 *      int, int, boolean)
+	 * 
+	 * Note that this is arbitrary since the we're a top level shell (so
+	 * computeSize won't be called.
+	 */
 	protected Point computeSize(Composite composite, int wHint, int hHint,
 			boolean flushCache) {
 		Point size = new Point(wHint, hHint);
@@ -251,7 +277,14 @@ public class WorkbenchLayout extends Layout {
 		return size;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.widgets.Layout#layout(org.eclipse.swt.widgets.Composite,
+	 *      boolean)
+	 * 
+	 * TODO: Supply a full description of the layout mechanicsS
+	 */
 	protected void layout(Composite composite, boolean flushCache) {
 		layoutComposite = composite;
 		clientRect = composite.getClientArea();

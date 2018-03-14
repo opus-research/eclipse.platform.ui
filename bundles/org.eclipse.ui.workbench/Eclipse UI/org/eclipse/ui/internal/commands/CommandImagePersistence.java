@@ -11,23 +11,19 @@
 
 package org.eclipse.ui.internal.commands;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionDelta;
 import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.IRegistryChangeEvent;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
 import org.eclipse.ui.internal.services.RegistryPersistence;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.osgi.framework.Bundle;
 
 /**
  * <p>
@@ -167,7 +163,6 @@ public final class CommandImagePersistence extends RegistryPersistence {
 		this.commandService = commandService;
 	}
 
-	@Override
 	protected final boolean isChangeImportant(final IRegistryChangeEvent event) {
 		final IExtensionDelta[] imageDeltas = event.getExtensionDeltas(
 				PlatformUI.PLUGIN_ID,
@@ -182,7 +177,6 @@ public final class CommandImagePersistence extends RegistryPersistence {
 	/**
 	 * Reads all of the command images from the registry.
 	 */
-	@Override
 	protected final void read() {
 		super.read();
 
@@ -208,27 +202,5 @@ public final class CommandImagePersistence extends RegistryPersistence {
 
 		readImagesFromRegistry(indexedConfigurationElements[INDEX_IMAGES],
 				imageCount, commandImageManager, commandService);
-		// Associate product icon to About command
-		IProduct product = Platform.getProduct();
-		if (product != null) {
-			Bundle productBundle = product.getDefiningBundle();
-			if (productBundle != null) {
-				String imageList = product.getProperty("windowImages"); //$NON-NLS-1$
-				if (imageList != null) {
-					String iconPath = imageList.split(",")[0]; //$NON-NLS-1$
-					URL iconUrl = productBundle.getEntry(iconPath);
-					ImageDescriptor icon = ImageDescriptor.createFromURL(iconUrl);
-					if (icon != null) {
-						commandImageManager.bind(IWorkbenchCommandConstants.HELP_ABOUT,
-								CommandImageManager.TYPE_DEFAULT, null, icon);
-						commandImageManager.bind(IWorkbenchCommandConstants.HELP_ABOUT,
-								CommandImageManager.TYPE_DISABLED, null, icon);
-						commandImageManager.bind(IWorkbenchCommandConstants.HELP_ABOUT,
-								CommandImageManager.TYPE_HOVER, null, icon);
-					}
-
-				}
-			}
-		}
 	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -55,8 +55,12 @@ public class PathEditor extends ListEditor {
         createControl(parent);
     }
 
-    @Override
-	protected String createList(String[] items) {
+    /* (non-Javadoc)
+     * Method declared on ListEditor.
+     * Creates a single string from the given array by separating each
+     * string with the appropriate OS-specific path separator.
+     */
+    protected String createList(String[] items) {
         StringBuffer path = new StringBuffer("");//$NON-NLS-1$
 
         for (int i = 0; i < items.length; i++) {
@@ -66,8 +70,11 @@ public class PathEditor extends ListEditor {
         return path.toString();
     }
 
-    @Override
-	protected String getNewInputObject() {
+    /* (non-Javadoc)
+     * Method declared on ListEditor.
+     * Creates a new path element by means of a directory dialog.
+     */
+    protected String getNewInputObject() {
 
         DirectoryDialog dialog = new DirectoryDialog(getShell(), SWT.SHEET);
         if (dirChooserLabelText != null) {
@@ -89,14 +96,16 @@ public class PathEditor extends ListEditor {
         return dir;
     }
 
-    @Override
-	protected String[] parseString(String stringList) {
+    /* (non-Javadoc)
+     * Method declared on ListEditor.
+     */
+    protected String[] parseString(String stringList) {
         StringTokenizer st = new StringTokenizer(stringList, File.pathSeparator
                 + "\n\r");//$NON-NLS-1$
-        ArrayList<Object> v = new ArrayList<Object>();
+        ArrayList v = new ArrayList();
         while (st.hasMoreElements()) {
             v.add(st.nextElement());
         }
-        return v.toArray(new String[v.size()]);
+        return (String[]) v.toArray(new String[v.size()]);
     }
 }

@@ -7,11 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     René Brandstetter - Bug 419749 - [Workbench] [e4 Workbench] - Remove the deprecated PackageAdmin
  ******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench;
 
-import java.util.List;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.osgi.service.debug.DebugOptions;
 import org.eclipse.osgi.service.debug.DebugTrace;
@@ -22,12 +20,9 @@ import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
-import org.osgi.util.tracker.BundleTracker;
+import org.osgi.service.packageadmin.PackageAdmin;
 import org.osgi.util.tracker.ServiceTracker;
 
-/**
- * BundleActivator to access the required OSGi services.
- */
 public class Activator implements BundleActivator {
 	/**
 	 * The bundle symbolic name.
@@ -37,16 +32,11 @@ public class Activator implements BundleActivator {
 	private static Activator activator;
 
 	private BundleContext context;
-	private ServiceTracker<Location, Location> locationTracker;
+	private ServiceTracker locationTracker;
+	private ServiceTracker pkgAdminTracker;
 
-	private ServiceTracker<DebugOptions, DebugOptions> debugTracker;
-	private ServiceTracker<LogService, LogService> logTracker;
-
-	/** Tracks all bundles which are in the state: RESOLVED, STARTING, ACTIVE or STOPPING. */
-	private BundleTracker<List<Bundle>> resolvedBundles;
-
-	/** A BundleTrackerCustomizer which is able to resolve a bundle to the a symbolic name. */
-	private final BundleFinder bundleFinder = new BundleFinder();
+	private ServiceTracker debugTracker;
+	private ServiceTracker logTracker;
 
 	private DebugTrace trace;
 
@@ -67,12 +57,34 @@ public class Activator implements BundleActivator {
 	}
 
 	/**
+	 * @return the PackageAdmin service from this bundle
+	 */
+	public PackageAdmin getBundleAdmin() {
+		if (pkgAdminTracker == null) {
+			if (context == null)
+				return null;
+			pkgAdminTracker = new ServiceTracker(context, PackageAdmin.class.getName(), null);
+			pkgAdminTracker.open();
+		}
+		return (PackageAdmin) pkgAdminTracker.getService();
+	}
+
+	/**
 	 * @param bundleName
-	 *            the bundle symbolic name
+	 *            the bundle id
 	 * @return A bundle if found, or <code>null</code>
 	 */
 	public Bundle getBundleForName(String bundleName) {
-		return bundleFinder.findBundle(bundleName);
+		Bundle[] bundles = getBundleAdmin().getBundles(bundleName, null);
+		if (bundles == null)
+			return null;
+		// Return the first bundle that is not installed or uninstalled
+		for (int i = 0; i < bundles.length; i++) {
+			if ((bundles[i].getState() & (Bundle.INSTALLED | Bundle.UNINSTALLED)) == 0) {
+				return bundles[i];
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -94,25 +106,22 @@ public class Activator implements BundleActivator {
 				// ignore this. It should never happen as we have tested the
 				// above format.
 			}
-			locationTracker = new ServiceTracker<Location, Location>(context, filter, null);
+			locationTracker = new ServiceTracker(context, filter, null);
 			locationTracker.open();
 		}
-		return locationTracker.getService();
+		return (Location) locationTracker.getService();
 	}
 
-	@Override
 	public void start(BundleContext context) throws Exception {
 		activator = this;
 		this.context = context;
-
-		// track required bundles
-		resolvedBundles = new BundleTracker<List<Bundle>>(context, Bundle.RESOLVED
-				| Bundle.STARTING | Bundle.ACTIVE | Bundle.STOPPING, bundleFinder);
-		resolvedBundles.open();
 	}
 
-	@Override
 	public void stop(BundleContext context) throws Exception {
+		if (pkgAdminTracker != null) {
+			pkgAdminTracker.close();
+			pkgAdminTracker = null;
+		}
 		if (locationTracker != null) {
 			locationTracker.close();
 			locationTracker = null;
@@ -126,22 +135,16 @@ public class Activator implements BundleActivator {
 			logTracker.close();
 			logTracker = null;
 		}
-		if (resolvedBundles != null) {
-			// the close of the BundleTracker will also remove all entries form the BundleFinder
-			resolvedBundles.close();
-			resolvedBundles = null;
-		}
 	}
 
 	public DebugOptions getDebugOptions() {
 		if (debugTracker == null) {
 			if (context == null)
 				return null;
-			debugTracker = new ServiceTracker<DebugOptions, DebugOptions>(context,
-					DebugOptions.class.getName(), null);
+			debugTracker = new ServiceTracker(context, DebugOptions.class.getName(), null);
 			debugTracker.open();
 		}
-		return debugTracker.getService();
+		return (DebugOptions) debugTracker.getService();
 	}
 
 	public DebugTrace getTrace() {
@@ -166,33 +169,28 @@ public class Activator implements BundleActivator {
 	public LogService getLogService() {
 		LogService logService = null;
 		if (logTracker != null) {
-			logService = logTracker.getService();
+			logService = (LogService) logTracker.getService();
 		} else {
 			if (context != null) {
-				logTracker = new ServiceTracker<LogService, LogService>(context,
-						LogService.class.getName(), null);
+				logTracker = new ServiceTracker(context, LogService.class.getName(), null);
 				logTracker.open();
-				logService = logTracker.getService();
+				logService = (LogService) logTracker.getService();
 			}
 		}
 		if (logService == null) {
 			logService = new LogService() {
-				@Override
 				public void log(int level, String message) {
 					log(null, level, message, null);
 				}
 
-				@Override
 				public void log(int level, String message, Throwable exception) {
 					log(null, level, message, exception);
 				}
 
-				@Override
 				public void log(ServiceReference sr, int level, String message) {
 					log(sr, level, message, null);
 				}
 
-				@Override
 				public void log(ServiceReference sr, int level, String message, Throwable exception) {
 					if (level == LogService.LOG_ERROR) {
 						System.err.print("ERROR: "); //$NON-NLS-1$

@@ -84,7 +84,6 @@ public class NavigatorSiteEditor implements INavigatorSiteEditor {
 		textEditorParent = createParent();
 		textEditorParent.setVisible(false);
 		textEditorParent.addListener(SWT.Paint, new Listener() {
-			@Override
 			public void handleEvent(Event e) {
 				Point textSize = textEditor.getSize();
 				Point parentSize = textEditorParent.getSize();
@@ -96,7 +95,6 @@ public class NavigatorSiteEditor implements INavigatorSiteEditor {
 		textEditor = new Text(textEditorParent, SWT.NONE);
 		textEditorParent.setBackground(textEditor.getBackground());
 		textEditor.addListener(SWT.Modify, new Listener() {
-			@Override
 			public void handleEvent(Event e) {
 				Point textSize = textEditor.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 				textSize.x += textSize.y; // Add extra space for new characters.
@@ -106,7 +104,6 @@ public class NavigatorSiteEditor implements INavigatorSiteEditor {
 			}
 		});
 		textEditor.addListener(SWT.Traverse, new Listener() {
-			@Override
 			public void handleEvent(Event event) {
 				//Workaround for Bug 20214 due to extra
 				//traverse events
@@ -126,7 +123,6 @@ public class NavigatorSiteEditor implements INavigatorSiteEditor {
 			}
 		});
 		textEditor.addFocusListener(new FocusAdapter() {
-			@Override
 			public void focusLost(FocusEvent fe) {
 				saveChangesAndDispose(runnable);
 			}
@@ -159,7 +155,6 @@ public class NavigatorSiteEditor implements INavigatorSiteEditor {
 	 *            Runnable to execute when editing ends either by the user pressing enter or
 	 *            clicking outside the editor box.
 	 */
-	@Override
 	public void edit(Runnable runnable) {
 		IStructuredSelection selection = (IStructuredSelection) commonViewer.getSelection();
 
@@ -199,7 +194,6 @@ public class NavigatorSiteEditor implements INavigatorSiteEditor {
 	}
 
  
-	@Override
 	public String getText() {
 		return text;
 	}
@@ -217,7 +211,6 @@ public class NavigatorSiteEditor implements INavigatorSiteEditor {
 		// icon of the item being renamed is clicked (i.e., which causes the rename
 		// text widget to lose focus and trigger this method).
 		Runnable editRunnable = new Runnable() {
-			@Override
 			public void run() {
 				disposeTextWidget();
 				if (newText.length() > 0 && newText.equals(text) == false) {
@@ -231,7 +224,6 @@ public class NavigatorSiteEditor implements INavigatorSiteEditor {
 	}
 
  
-	@Override
 	public void setTextActionHandler(TextActionHandler actionHandler) {
 		textActionHandler = actionHandler;
 	}

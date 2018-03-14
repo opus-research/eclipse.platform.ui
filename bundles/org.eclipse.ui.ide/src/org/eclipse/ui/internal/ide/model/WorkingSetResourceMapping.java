@@ -47,7 +47,6 @@ public class WorkingSetResourceMapping extends ResourceMapping {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.resources.mapping.ResourceMapping#getModelObject()
 	 */
-	@Override
 	public Object getModelObject() {
 		return set;
 	}
@@ -55,7 +54,6 @@ public class WorkingSetResourceMapping extends ResourceMapping {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.resources.mapping.ResourceMapping#getModelProviderId()
 	 */
-	@Override
 	public String getModelProviderId() {
 		return ModelProvider.RESOURCE_MODEL_PROVIDER_ID;
 	}
@@ -63,7 +61,6 @@ public class WorkingSetResourceMapping extends ResourceMapping {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.resources.mapping.ResourceMapping#getProjects()
 	 */
-	@Override
 	public IProject[] getProjects() {
 		Set result = new HashSet();
 		ResourceMapping[] mappings = getMappings();
@@ -81,7 +78,6 @@ public class WorkingSetResourceMapping extends ResourceMapping {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.resources.mapping.ResourceMapping#getTraversals(org.eclipse.core.resources.mapping.ResourceMappingContext, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	@Override
 	public ResourceTraversal[] getTraversals(ResourceMappingContext context, IProgressMonitor monitor) throws CoreException {
 		if (monitor == null)
 			monitor = new NullProgressMonitor();
@@ -122,7 +118,6 @@ public class WorkingSetResourceMapping extends ResourceMapping {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.resources.mapping.ResourceMapping#contains(org.eclipse.core.resources.mapping.ResourceMapping)
 	 */
-	@Override
 	public boolean contains(ResourceMapping mapping) {
 		ResourceMapping[] mappings = getMappings();
 		for (int i = 0; i < mappings.length; i++) {

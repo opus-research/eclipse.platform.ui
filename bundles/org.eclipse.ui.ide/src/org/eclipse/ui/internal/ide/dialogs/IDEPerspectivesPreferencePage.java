@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Denis Zygann <d.zygann@web.de> - Bug 330453
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
@@ -44,8 +43,7 @@ public class IDEPerspectivesPreferencePage extends PerspectivesPreferencePage {
     /**
      * Creates the page's UI content.
      */
-    @Override
-	protected Control createContents(Composite parent) {
+    protected Control createContents(Composite parent) {
         // @issue if the product subclasses this page, then it should provide
         // the help content
     	PlatformUI
@@ -58,6 +56,7 @@ public class IDEPerspectivesPreferencePage extends PerspectivesPreferencePage {
         Composite composite = createComposite(parent);
 
         createOpenPerspButtonGroup(composite);
+        createOpenViewButtonGroup(composite);
         createProjectPerspectiveGroup(composite);
         createCustomizePerspective(composite);
 
@@ -94,14 +93,22 @@ public class IDEPerspectivesPreferencePage extends PerspectivesPreferencePage {
         return IDEWorkbenchPlugin.getDefault().getPreferenceStore();
     }
 
-    @Override
-	protected void performDefaults() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.internal.dialogs.PerspectivesPreferencePage#performDefaults()
+     */
+    protected void performDefaults() {
         projectSwitchField.loadDefault();
         super.performDefaults();
     }
 
-    @Override
-	public boolean performOk() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.internal.dialogs.PerspectivesPreferencePage#performOk()
+     */
+    public boolean performOk() {
         projectSwitchField.store();
         IDEWorkbenchPlugin.getDefault().savePluginPreferences();
         return super.performOk();

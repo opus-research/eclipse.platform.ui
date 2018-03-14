@@ -1,14 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     René Brandstetter - Bug 411821 - [QuickAccess] Contribute SearchField
- *                                      through a fragment or other means
  *******************************************************************************/
 package org.eclipse.e4.ui.model.internal;
 
@@ -34,7 +32,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil.UsageCrossReferencer;
 public class ModelUtils {
 	//public static final String CONTAINING_CONTEXT = "ModelUtils.containingContext";
 	public static final String CONTAINING_PARENT = "ModelUtils.containingParent";
-
+	
 	public static EClassifier getTypeArgument(EClass eClass,
 			EGenericType eGenericType) {
 		ETypeParameter eTypeParameter = eGenericType.getETypeParameter();
@@ -57,94 +55,82 @@ public class ModelUtils {
 	}
 
 	public static MApplicationElement findElementById(MApplicationElement element, String id) {
-		if (id == null || id.length() == 0) {
+		if (id == null || id.length() == 0)
 			return null;
-		}
 		// is it me?
-		if (id.equals(element.getElementId())) {
+		if (id.equals(element.getElementId()))
 			return element;
-		}
 		// Recurse if this is a container
 		EList<EObject> elements = ((EObject) element).eContents();
 		for (EObject childElement : elements) {
-			if (!(childElement instanceof MApplicationElement)) {
+			if (!(childElement instanceof MApplicationElement))
 				continue;
-			}
 			MApplicationElement result = findElementById((MApplicationElement) childElement, id);
-			if (result != null) {
+			if (result != null)
 				return result;
-			}
 		}
 		return null;
 	}
-
+	
+	@SuppressWarnings("unchecked")
 	public static List<MApplicationElement> merge(MApplicationElement container, EStructuralFeature feature, List<MApplicationElement> elements, String positionInList) {
 		EObject eContainer = (EObject) container;
-
+		
 		if( feature.isMany() ) {
 			List<MApplicationElement> copy = new ArrayList<MApplicationElement>(elements);
-
-			@SuppressWarnings("unchecked")
-			List<MApplicationElement> list= (List<MApplicationElement>)eContainer.eGet(feature);
+			
+			List list = (List)eContainer.eGet(feature);
 			boolean flag = true;
 			if( positionInList != null && positionInList.trim().length() != 0 ) {
 				int index = -1;
-
-				PositionInfo posInfo = PositionInfo.parse(positionInList);
-
-				if( posInfo != null ){
-				  switch (posInfo.getPosition()){
-				    case FIRST:
-				      index = 0;
-				      break;
-
-				    case INDEX:
-				      index = posInfo.getPositionReferenceAsInteger();
-				      break;
-
-				    case BEFORE:
-				    case AFTER:
-				      int tmpIndex = -1;
-				      String elementId = posInfo.getPositionReference();
-
-				      for( int i = 0; i < list.size(); i++ ) {
-		            if( elementId.equals(((MApplicationElement)list.get(i)).getElementId()) ) {
-		              tmpIndex = i;
-		              break;
-		            }
-		          }
-
-				      if( tmpIndex != -1 ) {
-		            if( posInfo.getPosition() == Position.BEFORE ) {
-		              index = tmpIndex;
-		            } else {
-		              index = tmpIndex + 1;
-		            }
-		          } else {
-		            System.err.println("Could not find element with Id '"+elementId+"'");
-		          }
-
-				    case LAST:
-				      default:
-				        // both no special operation, because the default is adding it at the last position
-				        break;
-				  }
+				if( positionInList.startsWith("first") ) {
+					index = 0;
+				} else if( positionInList.startsWith("index:") ) {
+					index = Integer.parseInt(positionInList.substring("index:".length()));	
+				} else if( positionInList.startsWith("before:") || positionInList.startsWith("after:") ) {
+					String elementId;
+					boolean before;
+					if( positionInList.startsWith("before:") ) {
+						elementId = positionInList.substring("before:".length());
+						before = true;
+					} else {
+						elementId = positionInList.substring("after:".length());
+						before = false;
+					}
+					
+					int tmpIndex = -1;
+					for( int i = 0; i < list.size(); i++ ) {
+						if( elementId.equals(((MApplicationElement)list.get(i)).getElementId()) ) {
+							tmpIndex = i;
+							break;
+						}
+					}
+					
+					if( tmpIndex != -1 ) {
+						if( before ) {
+							index = tmpIndex;
+						} else {
+							index = tmpIndex + 1;
+						}
+					} else {
+						System.err.println("Could not find element with Id '"+elementId+"'");
+					}
 				} else {
 					System.err.println("Not a valid list position.");
 				}
-
-
+				
+				
 				if( index >= 0 && list.size() > index ) {
 					flag = false;
 					mergeList(list,  elements, index);
 				}
 			}
-
+			
 			// If there was no match append it to the list
 			if( flag ) {
 				mergeList(list,  elements, -1);
 			}
-
+			
 			return copy;
 		} else {
 			if( elements.size() >= 1 ) {
@@ -157,11 +143,11 @@ public class ModelUtils {
 				return Collections.singletonList(e);
 			}
 		}
-
+		
 		return Collections.emptyList();
 	}
-
-	private static void mergeList(List<MApplicationElement> list, List<MApplicationElement> elements, int index) {
+	
+	private static void mergeList(List list,  List<MApplicationElement> elements, int index) {
 		MApplicationElement[] tmp = new MApplicationElement[elements.size()];
 		elements.toArray(tmp);
 		for(MApplicationElement element : tmp) {
@@ -169,15 +155,13 @@ public class ModelUtils {
 			boolean found = false;
 			if ((elementID != null) && (elementID.length() != 0)) {
 				for(Object existingObject : list) {
-					if (!(existingObject instanceof MApplicationElement)) {
+					if (!(existingObject instanceof MApplicationElement))
 						continue;
-					}
 					MApplicationElement existingEObject = (MApplicationElement) existingObject;
-					if (!elementID.equals(existingEObject.getElementId())) {
+					if (!elementID.equals(existingEObject.getElementId()))
 						continue;
-					}
 					if (EcoreUtil.equals((EObject)existingEObject, (EObject)element)) {
-						found = true; // skip
+						found = true; // skip 
 						break;
 					} else { // replace
 						EObject root = EcoreUtil.getRootContainer((EObject) existingEObject);
@@ -188,16 +172,15 @@ public class ModelUtils {
 						for (Setting setting : settings) {
 							setting.set(element);
 						}
-						found = true;
+						found = true; 
 					}
 				}
 			}
 			if (!found) {
-				if (index == -1) {
+				if (index == -1)
 					list.add(element);
-				} else {
+				else
 					list.add(index, element);
-				}
 			}
 		}
 	}
@@ -212,7 +195,7 @@ public class ModelUtils {
 		}
 		return null;
 	}
-
+	
 	public static IEclipseContext getContainingContext(MApplicationElement element) {
 		MApplicationElement curParent = getParent(element);
 
@@ -225,4 +208,5 @@ public class ModelUtils {
 
 		return null;
 	}
+
 }

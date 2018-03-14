@@ -1,19 +1,20 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
+import org.eclipse.e4.core.commands.ExpressionContext;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
@@ -39,20 +40,26 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
 
 /**
- * Create a toolbar
+ * Create a contribute part.
  */
 public class ToolBarRenderer extends SWTPartRenderer {
 	private MApplication application;
 
-	private HashMap<MToolBar, ArrayList<ArrayList<MToolBarElement>>> pendingCleanup = new HashMap<MToolBar, ArrayList<ArrayList<MToolBarElement>>>();
+	HashMap<MToolBar, ArrayList<ArrayList<MToolBarElement>>> pendingCleanup = new HashMap<MToolBar, ArrayList<ArrayList<MToolBarElement>>>();
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#init(org.eclipse
+	 * .e4.core.contexts.IEclipseContext)
+	 */
 	@Override
 	public void init(IEclipseContext context) {
 		super.init(context);
 		application = context.get(MApplication.class);
 	}
 
-	@Override
 	public Object createWidget(final MUIElement element, Object parent) {
 		if (!(element instanceof MToolBar) || !(parent instanceof Composite))
 			return null;
@@ -61,7 +68,6 @@ public class ToolBarRenderer extends SWTPartRenderer {
 		Composite intermediate = new Composite((Composite) parent, SWT.NONE);
 		createToolbar(element, intermediate);
 		intermediate.addDisposeListener(new DisposeListener() {
-			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				cleanUp((MToolBar) element);
 			}
@@ -77,6 +83,8 @@ public class ToolBarRenderer extends SWTPartRenderer {
 		layout.marginLeft = 3;
 		layout.center = true;
 		intermediate.setLayout(layout);
+		// new Label(intermediate, (orientation == SWT.HORIZONTAL ? SWT.VERTICAL
+		// : SWT.HORIZONTAL) | SWT.SEPARATOR);
 		ToolBar separatorToolBar = new ToolBar(intermediate, orientation
 				| SWT.WRAP | SWT.FLAT | SWT.RIGHT);
 		new ToolItem(separatorToolBar, SWT.SEPARATOR);
@@ -96,7 +104,6 @@ public class ToolBarRenderer extends SWTPartRenderer {
 		return SWT.HORIZONTAL;
 	}
 
-	@Override
 	public Object getUIContainer(MUIElement childElement) {
 		Composite intermediate = (Composite) super.getUIContainer(childElement);
 		if (intermediate == null || intermediate.isDisposed()) {

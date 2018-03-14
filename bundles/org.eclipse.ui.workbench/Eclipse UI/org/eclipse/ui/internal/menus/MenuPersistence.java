@@ -51,7 +51,6 @@ final public class MenuPersistence extends RegistryPersistence {
 	private ArrayList<MTrimContribution> trimContributions = new ArrayList<MTrimContribution>();
 
 	private final Comparator<IConfigurationElement> comparer = new Comparator<IConfigurationElement>() {
-		@Override
 		public int compare(IConfigurationElement c1, IConfigurationElement c2) {
 			return c1.getContributor().getName().compareToIgnoreCase(c2.getContributor().getName());
 		}
@@ -104,7 +103,6 @@ final public class MenuPersistence extends RegistryPersistence {
 		read();
 	}
 
-	@Override
 	protected final void read() {
 		super.read();
 

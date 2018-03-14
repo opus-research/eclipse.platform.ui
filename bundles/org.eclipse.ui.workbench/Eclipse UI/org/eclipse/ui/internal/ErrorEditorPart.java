@@ -43,15 +43,27 @@ public class ErrorEditorPart extends EditorPart {
 		this.error = error;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	public void doSave(IProgressMonitor monitor) {
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.EditorPart#doSaveAs()
+	 */
 	public void doSaveAs() {
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createPartControl(Composite parent) {
 		this.parentControl = parent;
 		if (error != null) {
@@ -59,34 +71,59 @@ public class ErrorEditorPart extends EditorPart {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.EditorPart#init(org.eclipse.ui.IEditorSite,
+	 *      org.eclipse.ui.IEditorInput)
+	 */
 	public void init(IEditorSite site, IEditorInput input) {
 		setSite(site);
 		setInput(input);
 		setPartName(input.getName());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.EditorPart#isDirty()
+	 */
 	public boolean isDirty() {
 		return false;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.EditorPart#isSaveAsAllowed()
+	 */
 	public boolean isSaveAsAllowed() {
 		return false;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+	 */
 	public void setFocus() {
 		parentControl.setFocus();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.EditorPart#setPartName(java.lang.String)
+	 */
 	public void setPartName(String newName) {
 		super.setPartName(newName);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
+	 */
 	public void dispose() {
 		super.dispose();
 		parentControl = null;

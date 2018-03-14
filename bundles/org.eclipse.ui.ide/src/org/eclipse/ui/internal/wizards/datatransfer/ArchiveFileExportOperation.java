@@ -173,7 +173,8 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
         if (createLeadupStructure) {
         	return fullPath.makeRelative().toString();
         }
-		return fullPath.removeFirstSegments(fullPath.segmentCount() - leadupDepth).makeRelative().toString();
+		return fullPath.removeFirstSegments(
+                fullPath.segmentCount() - leadupDepth).toString();
     }
 
     /**
@@ -299,8 +300,7 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
      *	Export the resources that were previously specified for export
      *	(or if a single resource was specified then export it recursively)
      */
-    @Override
-	public void run(IProgressMonitor progressMonitor)
+    public void run(IProgressMonitor progressMonitor)
             throws InvocationTargetException, InterruptedException {
         this.monitor = progressMonitor;
 

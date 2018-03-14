@@ -54,7 +54,6 @@ public class MoveFilesAndFoldersOperation extends CopyFilesAndFoldersOperation {
 	 * @return <code>true</code> if auto-rename is supported, and
 	 *         <code>false</code> otherwise
 	 */
-	@Override
 	protected boolean canPerformAutoRename() {
 		return false;
 	}
@@ -74,8 +73,6 @@ public class MoveFilesAndFoldersOperation extends CopyFilesAndFoldersOperation {
 	 *             created in
 	 *             {@link #getUndoableCopyOrMoveOperation(IResource[], IPath)}
 	 */
-	@Deprecated
-	@Override
 	protected void copy(IResource[] resources, IPath destination,
 			IProgressMonitor subMonitor) throws CoreException {
 		for (int i = 0; i < resources.length; i++) {
@@ -133,7 +130,6 @@ public class MoveFilesAndFoldersOperation extends CopyFilesAndFoldersOperation {
 	 *            resource the query is made for
 	 * @return the deep query message
 	 */
-	@Override
 	protected String getDeepCheckQuestion(IResource source) {
 		return NLS
 				.bind(
@@ -146,7 +142,6 @@ public class MoveFilesAndFoldersOperation extends CopyFilesAndFoldersOperation {
 	 * 
 	 * @return the task title
 	 */
-	@Override
 	protected String getOperationTitle() {
 		return IDEWorkbenchMessages.MoveFilesAndFoldersOperation_operationTitle;
 	}
@@ -156,7 +151,6 @@ public class MoveFilesAndFoldersOperation extends CopyFilesAndFoldersOperation {
 	 * 
 	 * @return the problems message
 	 */
-	@Override
 	protected String getProblemsMessage() {
 		return IDEWorkbenchMessages.MoveFilesAndFoldersOperation_problemMessage;
 	}
@@ -166,7 +160,6 @@ public class MoveFilesAndFoldersOperation extends CopyFilesAndFoldersOperation {
 	 * 
 	 * @return the problems dialog title
 	 */
-	@Override
 	protected String getProblemsTitle() {
 		return IDEWorkbenchMessages.MoveFilesAndFoldersOperation_moveFailedTitle;
 	}
@@ -178,7 +171,6 @@ public class MoveFilesAndFoldersOperation extends CopyFilesAndFoldersOperation {
 	 * @return boolean <code>true</code>, the source file in a destination
 	 *         collision should be validateEdited.
 	 */
-	@Override
 	protected boolean getValidateConflictSource() {
 		return true;
 	}
@@ -197,7 +189,6 @@ public class MoveFilesAndFoldersOperation extends CopyFilesAndFoldersOperation {
 	 *             setContents failed
 	 * @deprecated As of 3.3, this method is not called.
 	 */
-	@Deprecated
 	private void moveExisting(IResource source, IResource existing,
 			IProgressMonitor subMonitor) throws CoreException {
 		IFile existingFile = getFile(existing);
@@ -220,7 +211,6 @@ public class MoveFilesAndFoldersOperation extends CopyFilesAndFoldersOperation {
 	 * Note this method is for internal use only. It is not API.
 	 * 
 	 */
-	@Override
 	public String validateDestination(IContainer destination,
 			IResource[] sourceResources) {
 		IPath destinationLocation = destination.getLocation();
@@ -257,7 +247,6 @@ public class MoveFilesAndFoldersOperation extends CopyFilesAndFoldersOperation {
 	 * 
 	 * @see org.eclipse.ui.actions.CopyFilesAndFoldersOperation#isMove()
 	 */
-	@Override
 	protected boolean isMove() {
 		return true;
 	}
@@ -274,7 +263,6 @@ public class MoveFilesAndFoldersOperation extends CopyFilesAndFoldersOperation {
 	 * @return the operation that should be used to perform the move or copy
 	 * @since 3.3
 	 */
-	@Override
 	protected AbstractWorkspaceOperation getUndoableCopyOrMoveOperation(
 			IResource[] resources, IPath destinationPath) {
 		return new MoveResourcesOperation(resources, destinationPath,

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -152,13 +152,12 @@ public class ErrorDialog extends IconAndMessageDialog {
 	}
 
 	/*
-	 * Handles the pressing of the Ok or Details button in this dialog. If the
-	 * Ok button was pressed then close this dialog. If the Details button was
-	 * pressed then toggle the displaying of the error details area. Note that
-	 * the Details button will only be visible if the error being displayed
-	 * specifies child details.
+	 * (non-Javadoc) Method declared on Dialog. Handles the pressing of the Ok
+	 * or Details button in this dialog. If the Ok button was pressed then close
+	 * this dialog. If the Details button was pressed then toggle the displaying
+	 * of the error details area. Note that the Details button will only be
+	 * visible if the error being displayed specifies child details.
 	 */
-	@Override
 	protected void buttonPressed(int id) {
 		if (id == IDialogConstants.DETAILS_ID) {
 			// was the details button pressed?
@@ -168,13 +167,19 @@ public class ErrorDialog extends IconAndMessageDialog {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared in Window.
+	 */
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		shell.setText(title);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
+	 */
 	protected void createButtonsForButtonBar(Composite parent) {
 		// create OK and Details buttons
 		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL,
@@ -239,7 +244,6 @@ public class ErrorDialog extends IconAndMessageDialog {
 	 * If the old behavior is desired by subclasses, get the returned composite's
 	 * layout data and set grabExcessVerticalSpace to true.
 	 */
-	@Override
 	protected Control createDialogArea(Composite parent) {
 		// Create a composite with standard margins and spacing
 		// Add the messageArea to this composite so that as subclasses add widgets to the messageArea
@@ -264,7 +268,9 @@ public class ErrorDialog extends IconAndMessageDialog {
 		return composite;
 	}
 
-	@Override
+	/*
+	 * @see IconAndMessageDialog#createDialogAndButtonArea(Composite)
+	 */
 	protected void createDialogAndButtonArea(Composite parent) {
 		super.createDialogAndButtonArea(parent);
 		if (this.dialogArea instanceof Composite) {
@@ -276,7 +282,11 @@ public class ErrorDialog extends IconAndMessageDialog {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.IconAndMessageDialog#getImage()
+	 */
 	protected Image getImage() {
 		if (status != null) {
 			if (status.getSeverity() == IStatus.WARNING) {
@@ -319,12 +329,16 @@ public class ErrorDialog extends IconAndMessageDialog {
 		Menu copyMenu = new Menu(list);
 		MenuItem copyItem = new MenuItem(copyMenu, SWT.NONE);
 		copyItem.addSelectionListener(new SelectionListener() {
-			@Override
+			/*
+			 * @see SelectionListener.widgetSelected (SelectionEvent)
+			 */
 			public void widgetSelected(SelectionEvent e) {
 				copyToClipboard();
 			}
 
-			@Override
+			/*
+			 * @see SelectionListener.widgetDefaultSelected(SelectionEvent)
+			 */
 			public void widgetDefaultSelected(SelectionEvent e) {
 				copyToClipboard();
 			}
@@ -335,13 +349,15 @@ public class ErrorDialog extends IconAndMessageDialog {
 		return list;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on Window.
+	 */
 	/**
 	 * Extends <code>Window.open()</code>. Opens an error dialog to display
 	 * the error. If you specified a mask to filter the displaying of these
 	 * children, the error dialog will only be displayed if there is at least
 	 * one child status matching the mask.
 	 */
-	@Override
 	public int open() {
 		if (!AUTOMATED_MODE && shouldDisplay(status, displayMask)) {
 			return super.open();
@@ -472,9 +488,9 @@ public class ErrorDialog extends IconAndMessageDialog {
 			}
 			String message = buildingStatus.getMessage();
 			sb.append(message);
-			java.util.List<String> lines = readLines(sb.toString());
-			for (Iterator<String> iterator = lines.iterator(); iterator.hasNext();) {
-				String line = iterator.next();
+			java.util.List lines = readLines(sb.toString());
+			for (Iterator iterator = lines.iterator(); iterator.hasNext();) {
+				String line = (String) iterator.next();
 				listToPopulate.add(line);
 			}
 			incrementNesting = true;
@@ -518,8 +534,8 @@ public class ErrorDialog extends IconAndMessageDialog {
 		}
 	}
 	
-	private static java.util.List<String> readLines(final String s) {
-		java.util.List<String> lines = new ArrayList<String>();
+	private static java.util.List readLines(final String s) {
+		java.util.List lines = new ArrayList();
 		BufferedReader reader = new BufferedReader(new StringReader(s));
 		String line;
 		try {
@@ -690,7 +706,11 @@ public class ErrorDialog extends IconAndMessageDialog {
 				new Transfer[] { TextTransfer.getInstance() });
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.window.Window#close()
+	 */
 	public boolean close() {
 		if (clipboard != null) {
 			clipboard.dispose();
@@ -760,15 +780,20 @@ public class ErrorDialog extends IconAndMessageDialog {
 		}
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.IconAndMessageDialog#getColumnCount()
+	 */
 	int getColumnCount() {
 		if (Policy.getErrorSupportProvider() == null)
 			return 2;
 		return 3;
 	}
-
-    @Override
-	protected boolean isResizable() {
+	
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#isResizable()
+     */
+    protected boolean isResizable() {
     	return true;
     }
 

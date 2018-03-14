@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -55,8 +54,10 @@ public class ChangeToPerspectiveMenu extends PerspectiveMenu {
         showActive(true);
     }
 
-    @Override
-	protected void run(IPerspectiveDescriptor desc) {
+    /* (non-Javadoc)
+     * @see PerspectiveMenu#run(IPerspectiveDescriptor)
+     */
+    protected void run(IPerspectiveDescriptor desc) {
 		IPreferenceStore store = PrefUtil.getInternalPreferenceStore();
 		int mode = store.getInt(IPreferenceConstants.OPEN_PERSP_MODE);
 		IWorkbenchPage page = getWindow().getActivePage();
@@ -65,9 +66,9 @@ public class ChangeToPerspectiveMenu extends PerspectiveMenu {
 			persp = page.getPerspective();
 		}
 
-		IHandlerService handlerService = getWindow()
+		IHandlerService handlerService = (IHandlerService) getWindow()
 				.getService(IHandlerService.class);
-		ICommandService commandService = getWindow()
+		ICommandService commandService = (ICommandService) getWindow()
 				.getService(ICommandService.class);
 
 		Command command = commandService

@@ -53,7 +53,9 @@ public class OpenPreferencesAction extends Action implements ActionFactory.IWork
 				IWorkbenchHelpContextIds.OPEN_PREFERENCES_ACTION);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * Method declared on Action.
+	 */
 	public void run() {
 		if (workbenchWindow == null) {
 			// action has been dispose
@@ -63,7 +65,9 @@ public class OpenPreferencesAction extends Action implements ActionFactory.IWork
 		dialog.open();
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * Method declared on ActionFactory.IWorkbenchAction.
+	 */
 	public void dispose() {
 		workbenchWindow = null;
 	}

@@ -152,8 +152,10 @@ public abstract class StyledCellLabelProvider extends OwnerDrawLabelProvider {
 	protected final ViewerColumn getColumn() {
 		return this.column;
 	}
-
-	@Override
+		
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.OwnerDrawLabelProvider#initialize(org.eclipse.jface.viewers.ColumnViewer, org.eclipse.jface.viewers.ViewerColumn)
+	 */
 	public void initialize(ColumnViewer viewer, ViewerColumn column) {
 		Assert.isTrue(this.viewer == null && this.column == null, "Label provider instance already in use"); //$NON-NLS-1$
 		
@@ -161,8 +163,12 @@ public abstract class StyledCellLabelProvider extends OwnerDrawLabelProvider {
 		this.column= column;
 		super.initialize(viewer, column, isOwnerDrawEnabled());
 	}
-
-	@Override
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.BaseLabelProvider#dispose()
+	 */
 	public void dispose() {
 		if (this.cachedTextLayout != null) {
 			cachedTextLayout.dispose();
@@ -175,7 +181,11 @@ public abstract class StyledCellLabelProvider extends OwnerDrawLabelProvider {
 		super.dispose();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.OwnerDrawLabelProvider#update(org.eclipse.jface.viewers.ViewerCell)
+	 */
 	public void update(ViewerCell cell) {
 		// clients must override and configure the cell and call super
 		super.update(cell); // calls 'repaint' to trigger the paint listener
@@ -241,7 +251,6 @@ public abstract class StyledCellLabelProvider extends OwnerDrawLabelProvider {
 	 *            the model object
 	 * @see SWT#EraseItem
 	 */
-	@Override
 	protected void erase(Event event, Object element) {
 		// use native erase
 		if (isOwnerDrawEnabled()) {
@@ -250,7 +259,12 @@ public abstract class StyledCellLabelProvider extends OwnerDrawLabelProvider {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.OwnerDrawLabelProvider#measure(org.eclipse.swt.widgets.Event,
+	 *      java.lang.Object)
+	 */
 	protected void measure(Event event, Object element) {
 		if (!isOwnerDrawEnabled())
 			return;
@@ -298,7 +312,12 @@ public abstract class StyledCellLabelProvider extends OwnerDrawLabelProvider {
 		return textWidthDelta;
 	}
 	
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.OwnerDrawLabelProvider#paint(org.eclipse.swt.widgets.Event,
+	 *      java.lang.Object)
+	 */
 	protected void paint(Event event, Object element) {
 		if (!isOwnerDrawEnabled())
 			return;

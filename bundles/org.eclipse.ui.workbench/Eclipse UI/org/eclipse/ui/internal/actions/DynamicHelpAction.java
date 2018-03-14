@@ -82,7 +82,6 @@ public class DynamicHelpAction extends Action implements IWorkbenchAction {
 	/*
 	 * (non-Javadoc) Method declared on IAction.
 	 */
-	@Override
 	public void run() {
 		if (workbenchWindow == null) {
 			// action has been disposed
@@ -90,7 +89,6 @@ public class DynamicHelpAction extends Action implements IWorkbenchAction {
 		}
 		// This may take a while, so use the busy indicator
 		BusyIndicator.showWhile(null, new Runnable() {
-			@Override
 			public void run() {
 				workbenchWindow.getWorkbench().getHelpSystem()
 						.displayDynamicHelp();
@@ -101,7 +99,6 @@ public class DynamicHelpAction extends Action implements IWorkbenchAction {
 	/*
 	 * (non-Javadoc) Method declared on ActionFactory.IWorkbenchAction.
 	 */
-	@Override
 	public void dispose() {
 		workbenchWindow = null;
 	}

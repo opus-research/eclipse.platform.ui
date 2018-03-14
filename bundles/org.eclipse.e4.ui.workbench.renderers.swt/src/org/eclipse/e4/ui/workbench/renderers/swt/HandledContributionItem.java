@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,11 +10,10 @@
  *     Joseph Carroll <jdsalingerjr@gmail.com> - Bug 385414 Contributing wizards to toolbar always displays icon and text
  *     Snjezana Peco <snjezana.peco@redhat.com> - Memory leaks in Juno when opening and closing XML Editor - http://bugs.eclipse.org/397909
  *     Marco Descher <marco@descher.at> - Bug 397677
- *     Dmitry Spiridenok - Bug 429756
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445723, 450863
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +27,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
-import org.eclipse.e4.core.commands.internal.ICommandHelpService;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -37,12 +35,9 @@ import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.bindings.EBindingService;
 import org.eclipse.e4.ui.internal.workbench.Activator;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
-import org.eclipse.e4.ui.internal.workbench.EHelpService;
 import org.eclipse.e4.ui.internal.workbench.Policy;
-import org.eclipse.e4.ui.internal.workbench.RenderedElementUtil;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.IUpdateService;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
-import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MParameter;
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
@@ -52,6 +47,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MHandledItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
+import org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolItem;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.IResourceUtilities;
@@ -101,6 +97,86 @@ public class HandledContributionItem extends ContributionItem {
 	 */
 	private static final String ORG_ECLIPSE_UI_COMMANDS_TOGGLE_STATE = "org.eclipse.ui.commands.toggleState"; //$NON-NLS-1$
 
+	static class RunnableRunner implements ISafeRunnable {
+		private Runnable runnable;
+
+		public void setRunnable(Runnable r) {
+			runnable = r;
+		}
+
+		public void handleException(Throwable exception) {
+			// Do not report these exceptions ATM
+		}
+
+		public void run() throws Exception {
+			runnable.run();
+		}
+
+	}
+
+	public static class ToolItemUpdateTimer implements Runnable {
+		Display display = Display.getCurrent();
+		RunnableRunner runner = new RunnableRunner();
+
+		List<HandledContributionItem> itemsToCheck = new ArrayList<HandledContributionItem>();
+		List<Runnable> windowRunnables = new ArrayList<Runnable>();
+		final List<HandledContributionItem> orphanedToolItems = new ArrayList<HandledContributionItem>();
+
+		public void addWindowRunnable(Runnable r) {
+			windowRunnables.add(r);
+		}
+
+		public void removeWindowRunnable(Runnable r) {
+			windowRunnables.remove(r);
+		}
+
+		void registerItem(HandledContributionItem item) {
+			if (!itemsToCheck.contains(item)) {
+				itemsToCheck.add(item);
+
+				// Start the timer on the first item registered
+				if (itemsToCheck.size() == 1)
+					display.timerExec(400, this);
+			}
+		}
+
+		void removeItem(HandledContributionItem item) {
+			itemsToCheck.remove(item);
+		}
+
+		public void run() {
+
+			for (final HandledContributionItem hci : itemsToCheck) {
+				// HACK. Remove orphaned entries. See bug 388516.
+				if (hci.model != null && hci.model.getParent() != null) {
+					hci.updateItemEnablement();
+				} else {
+					orphanedToolItems.add(hci);
+				}
+			}
+			if (!orphanedToolItems.isEmpty()) {
+				itemsToCheck.removeAll(orphanedToolItems);
+				orphanedToolItems.clear();
+			}
+
+			if (windowRunnables.size() > 0) {
+				Runnable[] array = new Runnable[windowRunnables.size()];
+				windowRunnables.toArray(array);
+				for (Runnable r : array) {
+					runner.setRunnable(r);
+					SafeRunner.run(runner);
+				}
+			}
+
+			// repeat until the list goes empty
+			if (itemsToCheck.size() > 0)
+				display.timerExec(400, this);
+		}
+	}
+
+	// HACK!! local 'static' timerExec...should move out of this class post 4.1
+	public static ToolItemUpdateTimer toolItemUpdater = new ToolItemUpdateTimer();
+
 	private static final String FORCE_TEXT = "FORCE_TEXT"; //$NON-NLS-1$
 	private static final String ICON_URI = "iconURI"; //$NON-NLS-1$
 	private static final String DISABLED_URI = "disabledURI"; //$NON-NLS-1$
@@ -133,35 +209,24 @@ public class HandledContributionItem extends ContributionItem {
 	@Optional
 	private IUpdateService updateService;
 
-	@Inject
-	@Optional
-	private EHelpService helpService;
-
-	@Inject
-	@Optional
-	@SuppressWarnings("restriction")
-	private ICommandHelpService commandHelpService;
-
 	private Runnable unreferenceRunnable;
 
 	private ISWTResourceUtilities resUtils = null;
 
 	private IStateListener stateListener = new IStateListener() {
-		@Override
 		public void handleStateChange(State state, Object oldValue) {
 			updateState();
 		}
 	};
 
 	@Inject
-	void setResourceUtils(IResourceUtilities<ImageDescriptor> utils) {
+	void setResourceUtils(IResourceUtilities utils) {
 		resUtils = (ISWTResourceUtilities) utils;
 	}
 
 	private ISafeRunnable getUpdateRunner() {
 		if (updateRunner == null) {
 			updateRunner = new ISafeRunnable() {
-				@Override
 				public void run() throws Exception {
 					boolean shouldEnable = canExecuteItem(null);
 					if (shouldEnable != model.isEnabled()) {
@@ -170,7 +235,6 @@ public class HandledContributionItem extends ContributionItem {
 					}
 				}
 
-				@Override
 				public void handleException(Throwable exception) {
 					if (!logged) {
 						logged = true;
@@ -198,7 +262,6 @@ public class HandledContributionItem extends ContributionItem {
 	}
 
 	private IMenuListener menuListener = new IMenuListener() {
-		@Override
 		public void menuAboutToShow(IMenuManager manager) {
 			update(null);
 		}
@@ -227,18 +290,13 @@ public class HandledContributionItem extends ContributionItem {
 	}
 
 	/**
-	 *
+	 * 
 	 */
 	private void generateCommand() {
 		if (model.getCommand() != null && model.getWbCommand() == null) {
 			String cmdId = model.getCommand().getElementId();
-			if (cmdId == null) {
-				Activator.log(IStatus.ERROR, "Unable to generate parameterized command for " + model //$NON-NLS-1$
-						+ ". ElementId is not allowed to be null."); //$NON-NLS-1$
-				return;
-			}
 			List<MParameter> modelParms = model.getParameters();
-			Map<String, Object> parameters = new HashMap<String, Object>(4);
+			Map<String, String> parameters = new HashMap<String, String>(4);
 			for (MParameter mParm : modelParms) {
 				parameters.put(mParm.getName(), mParm.getValue());
 			}
@@ -285,6 +343,13 @@ public class HandledContributionItem extends ContributionItem {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets
+	 * .Menu, int)
+	 */
 	@Override
 	public void fill(Menu menu, int index) {
 		if (model == null) {
@@ -311,7 +376,6 @@ public class HandledContributionItem extends ContributionItem {
 		item.addListener(SWT.Dispose, getItemListener());
 		item.addListener(SWT.Selection, getItemListener());
 		item.addListener(SWT.DefaultSelection, getItemListener());
-		item.addListener(SWT.Help, getItemListener());
 
 		widget = item;
 		model.setWidget(widget);
@@ -325,6 +389,13 @@ public class HandledContributionItem extends ContributionItem {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets
+	 * .ToolBar, int)
+	 */
 	@Override
 	public void fill(ToolBar parent, int index) {
 		if (model == null) {
@@ -360,10 +431,7 @@ public class HandledContributionItem extends ContributionItem {
 		widget = item;
 		model.setWidget(widget);
 		widget.setData(AbstractPartRenderer.OWNING_ME, model);
-		ToolItemUpdater updater = getUpdater();
-		if (updater != null) {
-			updater.registerItem(this);
-		}
+		toolItemUpdater.registerItem(this);
 
 		update(null);
 		hookCheckListener();
@@ -412,11 +480,21 @@ public class HandledContributionItem extends ContributionItem {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.ContributionItem#update()
+	 */
 	@Override
 	public void update() {
 		update(null);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.ContributionItem#update(java.lang.String)
+	 */
 	@Override
 	public void update(String id) {
 		updateIcons();
@@ -471,24 +549,14 @@ public class HandledContributionItem extends ContributionItem {
 
 	private void updateToolItem() {
 		ToolItem item = (ToolItem) widget;
-
-		if (item.getImage() == null || model.getTags().contains(FORCE_TEXT)) {
-			final String text = model.getLocalizedLabel();
-			if (text == null || text.length() == 0) {
-				final MCommand command = model.getCommand();
-				if (command == null) {
-					// Set some text so that the item stays visible in the menu
-					item.setText("UnLabled"); //$NON-NLS-1$
-				} else {
-					item.setText(command.getCommandName());
-				}
-			} else {
-				item.setText(text);
-			}
+		final String text = model.getLocalizedLabel();
+		Image icon = item.getImage();
+		boolean mode = model.getTags().contains(FORCE_TEXT);
+		if ((icon == null || mode) && text != null) {
+			item.setText(text);
 		} else {
 			item.setText(""); //$NON-NLS-1$
 		}
-
 		final String tooltip = getToolTipText();
 		item.setToolTipText(tooltip);
 		item.setSelection(model.isSelected());
@@ -583,7 +651,6 @@ public class HandledContributionItem extends ContributionItem {
 	private Listener getItemListener() {
 		if (menuItemListener == null) {
 			menuItemListener = new Listener() {
-				@Override
 				public void handleEvent(Event event) {
 					switch (event.type) {
 					case SWT.Dispose:
@@ -594,9 +661,6 @@ public class HandledContributionItem extends ContributionItem {
 						if (event.widget != null) {
 							handleWidgetSelection(event);
 						}
-						break;
-					case SWT.Help:
-						handleHelpRequest();
 						break;
 					}
 				}
@@ -612,10 +676,7 @@ public class HandledContributionItem extends ContributionItem {
 				unreferenceRunnable = null;
 			}
 			unhookCheckListener();
-			ToolItemUpdater updater = getUpdater();
-			if (updater != null) {
-				updater.removeItem(this);
-			}
+			toolItemUpdater.removeItem(this);
 			if (infoContext != null) {
 				infoContext.dispose();
 				infoContext = null;
@@ -623,13 +684,17 @@ public class HandledContributionItem extends ContributionItem {
 			widget.removeListener(SWT.Selection, getItemListener());
 			widget.removeListener(SWT.Dispose, getItemListener());
 			widget.removeListener(SWT.DefaultSelection, getItemListener());
-			widget.removeListener(SWT.Help, getItemListener());
 			widget = null;
 			model.setWidget(null);
 			disposeOldImages();
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.ContributionItem#dispose()
+	 */
 	@Override
 	public void dispose() {
 		if (widget != null) {
@@ -680,21 +745,6 @@ public class HandledContributionItem extends ContributionItem {
 		}
 	}
 
-	@SuppressWarnings("restriction")
-	private void handleHelpRequest() {
-		MCommand command = model.getCommand();
-		if (command == null || helpService == null
-				|| commandHelpService == null) {
-			return;
-		}
-
-		String contextHelpId = commandHelpService.getHelpContextId(
-				command.getElementId(), getContext(model));
-		if (contextHelpId != null) {
-			helpService.displayHelp(contextHelpId);
-		}
-	}
-
 	/**
 	 * @param event
 	 * @return
@@ -733,12 +783,12 @@ public class HandledContributionItem extends ContributionItem {
 			return (Menu) obj;
 		}
 		// this is a temporary passthrough of the IMenuCreator
-		if (RenderedElementUtil.isRenderedMenu(mmenu)) {
-			obj = RenderedElementUtil.getContributionManager(mmenu);
+		if (mmenu instanceof MRenderedMenu) {
+			obj = ((MRenderedMenu) mmenu).getContributionManager();
 			if (obj instanceof IContextFunction) {
 				final IEclipseContext lclContext = getContext(mmenu);
 				obj = ((IContextFunction) obj).compute(lclContext, null);
-				RenderedElementUtil.setContributionManager(mmenu, obj);
+				((MRenderedMenu) mmenu).setContributionManager(obj);
 			}
 			if (obj instanceof IMenuCreator) {
 				final IMenuCreator creator = (IMenuCreator) obj;
@@ -746,11 +796,10 @@ public class HandledContributionItem extends ContributionItem {
 						.getShell());
 				if (menu != null) {
 					toolItem.addDisposeListener(new DisposeListener() {
-						@Override
 						public void widgetDisposed(DisposeEvent e) {
 							if (menu != null && !menu.isDisposed()) {
 								creator.dispose();
-								mmenu.setWidget(null);
+								((MRenderedMenu) mmenu).setWidget(null);
 							}
 						}
 					});
@@ -768,9 +817,8 @@ public class HandledContributionItem extends ContributionItem {
 				Menu menu = (Menu) obj;
 				// menu.setData(AbstractPartRenderer.OWNING_ME, menu);
 				return menu;
-			}
-			if (logger != null) {
-				logger.debug("Rendering returned " + obj); //$NON-NLS-1$
+			} else {
+				System.err.println("Rendering returned " + obj); //$NON-NLS-1$
 			}
 		}
 		return null;
@@ -816,7 +864,6 @@ public class HandledContributionItem extends ContributionItem {
 		return service.canExecute(cmd, staticContext);
 	}
 
-	@Override
 	public void setParent(IContributionManager parent) {
 		if (getParent() instanceof IMenuManager) {
 			IMenuManager menuMgr = (IMenuManager) getParent();
@@ -831,7 +878,7 @@ public class HandledContributionItem extends ContributionItem {
 
 	/**
 	 * Return a parent context for this part.
-	 *
+	 * 
 	 * @param element
 	 *            the part to start searching from
 	 * @return the parent's closest context, or global context if none in the
@@ -843,7 +890,7 @@ public class HandledContributionItem extends ContributionItem {
 
 	/**
 	 * Return a context for this part.
-	 *
+	 * 
 	 * @param part
 	 *            the part to start searching from
 	 * @return the closest context, or global context if none in the hierarchy
@@ -864,15 +911,5 @@ public class HandledContributionItem extends ContributionItem {
 	 */
 	public MHandledItem getModel() {
 		return model;
-	}
-
-	private ToolItemUpdater getUpdater() {
-		if (model != null) {
-			Object obj = model.getRenderer();
-			if (obj instanceof ToolBarManagerRenderer) {
-				return ((ToolBarManagerRenderer) obj).getUpdater();
-			}
-		}
-		return null;
 	}
 }

@@ -60,11 +60,10 @@ public class EnableTestPreferencePage extends FieldEditorPreferencePage
     }
 
     public void flipState() {
-        if (enabledState) {
-			enabledState = false;
-		} else {
-			enabledState = true;
-		}
+        if (enabledState)
+            enabledState = false;
+        else
+            enabledState = true;
 
         be.setEnabled(enabledState, beParent);
         ce.setEnabled(enabledState, ceParent);
@@ -78,8 +77,7 @@ public class EnableTestPreferencePage extends FieldEditorPreferencePage
     /**
      * @see org.eclipse.jface.preference.FieldEditorPreferencePage#createFieldEditors()
      */
-    @Override
-	protected void createFieldEditors() {
+    protected void createFieldEditors() {
 
         String[][] labelsAndValues = new String[][] { { "Label 1", "Value 1" },
                 { "Label 2", "Value 2" } };
@@ -111,20 +109,20 @@ public class EnableTestPreferencePage extends FieldEditorPreferencePage
 
     }
 
-    @Override
-	protected Control createContents(Composite parent) {
+    /* (non-Javadoc)
+     * Method declared on PreferencePage.
+     */
+    protected Control createContents(Composite parent) {
         Composite composite = (Composite) super.createContents(parent);
         Button enabledButton = new Button(parent, SWT.PUSH);
         enabledButton.setText("Switch Enabled State");
 
         enabledButton.addSelectionListener(new SelectionListener() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 flipState();
             }
 
-            @Override
-			public void widgetDefaultSelected(SelectionEvent e) {
+            public void widgetDefaultSelected(SelectionEvent e) {
                 flipState();
             }
         });
@@ -134,8 +132,7 @@ public class EnableTestPreferencePage extends FieldEditorPreferencePage
     /**
      * @see org.eclipse.ui.IWorkbenchPreferencePage#init(IWorkbench)
      */
-    @Override
-	public void init(IWorkbench workbench) {
+    public void init(IWorkbench workbench) {
     }
 
 }

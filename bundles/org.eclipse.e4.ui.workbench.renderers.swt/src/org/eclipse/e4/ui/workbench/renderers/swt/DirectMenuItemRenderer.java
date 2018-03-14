@@ -4,15 +4,17 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
+import javax.inject.Inject;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.menu.ItemType;
 import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
@@ -29,8 +31,9 @@ import org.eclipse.swt.widgets.MenuItem;
  */
 public class DirectMenuItemRenderer extends MenuItemRenderer {
 
+	@Inject
+	Logger logger;
 
-	@Override
 	public Object createWidget(final MUIElement element, Object parent) {
 		if (!(element instanceof MDirectMenuItem) || !(parent instanceof Menu))
 			return null;
@@ -70,6 +73,13 @@ public class DirectMenuItemRenderer extends MenuItemRenderer {
 		// TODO direct query to @CanExecute goes here
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#hookControllerLogic
+	 * (org.eclipse.e4.ui.model.application.MUIElement)
+	 */
 	@Override
 	public void hookControllerLogic(MUIElement me) {
 		super.hookControllerLogic(me);
@@ -82,7 +92,6 @@ public class DirectMenuItemRenderer extends MenuItemRenderer {
 			final IEclipseContext lclContext = getContext(me);
 			MenuItem mi = (MenuItem) me.getWidget();
 			mi.addSelectionListener(new SelectionListener() {
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 					lclContext.set(MItem.class.getName(), item);
 					ContextInjectionFactory.invoke(contrib.getObject(),
@@ -90,7 +99,6 @@ public class DirectMenuItemRenderer extends MenuItemRenderer {
 					lclContext.remove(MItem.class.getName());
 				}
 
-				@Override
 				public void widgetDefaultSelected(SelectionEvent e) {
 				}
 			});

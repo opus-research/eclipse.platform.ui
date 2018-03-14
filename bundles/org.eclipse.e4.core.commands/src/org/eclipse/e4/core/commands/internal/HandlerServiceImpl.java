@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,7 +26,6 @@ import org.eclipse.core.commands.ParameterValueConversionException;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.e4.core.commands.EHandlerService;
-import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -37,14 +36,6 @@ import org.eclipse.e4.core.services.log.Logger;
  *
  */
 public class HandlerServiceImpl implements EHandlerService {
-	/**
-	 * The static context key under which a command 'trigger' from legacy code is stored during
-	 * calls to {@link #executeHandler(ParameterizedCommand, IEclipseContext)}
-	 * 
-	 * @see IEclipseContext
-	 * @see HandlerServiceImpl#executeHandler(ParameterizedCommand, IEclipseContext)
-	 */
-	private static final String SWT_TRIGGER = "org.eclipse.swt.widgets.Event"; //$NON-NLS-1$
 	static final String TMP_STATIC_CONTEXT = "tmp-staticContext"; //$NON-NLS-1$
 	public final static String H_ID = "handler::"; //$NON-NLS-1$
 	public final static String PARM_MAP = "parmMap::"; //$NON-NLS-1$
@@ -104,8 +95,8 @@ public class HandlerServiceImpl implements EHandlerService {
 	 * Fill in a temporary static context for execution.
 	 * 
 	 * @param command
+	 * @return a context not part of the normal hierarchy
 	 */
-	@SuppressWarnings("rawtypes")
 	private void addParms(ParameterizedCommand command, IEclipseContext staticContext) {
 		final Map parms = command.getParameterMap();
 		Iterator i = parms.entrySet().iterator();
@@ -152,13 +143,17 @@ public class HandlerServiceImpl implements EHandlerService {
 	@Optional
 	Logger logger;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.core.commands.EHandlerService#activateHandler(java.lang.String,
+	 * java.lang.Object)
+	 */
 	public void activateHandler(String commandId, Object handler) {
 		String handlerId = H_ID + commandId;
 		context.set(handlerId, handler);
 	}
 
-	@Override
 	public boolean canExecute(ParameterizedCommand command) {
 		final IEclipseContext staticContext = EclipseContextFactory.create(TMP_STATIC_CONTEXT);
 		try {
@@ -168,7 +163,6 @@ public class HandlerServiceImpl implements EHandlerService {
 		}
 	}
 
-	@Override
 	public boolean canExecute(ParameterizedCommand command, IEclipseContext staticContext) {
 		final IEclipseContext executionContext = getExecutionContext();
 		addParms(command, staticContext);
@@ -176,7 +170,7 @@ public class HandlerServiceImpl implements EHandlerService {
 		push(executionContext, staticContext);
 		try {
 			Command cmd = command.getCommand();
-			cmd.setEnabled(new ExpressionContext(peek().context));
+			cmd.setEnabled(peek());
 			return cmd.isEnabled();
 		} finally {
 			pop();
@@ -184,12 +178,22 @@ public class HandlerServiceImpl implements EHandlerService {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.core.commands.EHandlerService#deactivateHandler(java.lang.String,
+	 * java.lang.Object)
+	 */
 	public void deactivateHandler(String commandId, Object handler) {
 		context.remove(H_ID + commandId);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.eclipse.e4.core.commands.EHandlerService#executeHandler(org.eclipse.core.commands.
+	 * ParameterizedCommand)
+	 */
 	public Object executeHandler(ParameterizedCommand command) {
 		final IEclipseContext staticContext = EclipseContextFactory.create(TMP_STATIC_CONTEXT);
 		try {
@@ -199,7 +203,6 @@ public class HandlerServiceImpl implements EHandlerService {
 		}
 	}
 
-	@Override
 	public Object executeHandler(ParameterizedCommand command, IEclipseContext staticContext) {
 		final IEclipseContext executionContext = getExecutionContext();
 		addParms(command, staticContext);
@@ -207,8 +210,7 @@ public class HandlerServiceImpl implements EHandlerService {
 		push(executionContext, staticContext);
 		try {
 			// Command cmd = command.getCommand();
-			return command.executeWithChecks(staticContext.get(SWT_TRIGGER), new ExpressionContext(
-					peek().context));
+			return command.executeWithChecks(null, peek());
 		} catch (ExecutionException e) {
 			staticContext.set(HANDLER_EXCEPTION, e);
 		} catch (NotDefinedException e) {

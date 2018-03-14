@@ -66,8 +66,7 @@ public class WizardNewProjectCreationPage extends WizardPage {
     Text projectNameField;
 
     private Listener nameModifyListener = new Listener() {
-        @Override
-		public void handleEvent(Event e) {
+        public void handleEvent(Event e) {
         	setLocationForSelection();
             boolean valid = validatePage();
             setPageComplete(valid);
@@ -106,7 +105,6 @@ public class WizardNewProjectCreationPage extends WizardPage {
 	 *             implementation.
 	 * @since 3.4
 	 */
-	@Deprecated
 	public WizardNewProjectCreationPage(String pageName,
 			IStructuredSelection selection, String[] workingSetTypes) {
 		this(pageName);
@@ -115,8 +113,7 @@ public class WizardNewProjectCreationPage extends WizardPage {
 	/** (non-Javadoc)
      * Method declared on IDialogPage.
      */
-    @Override
-	public void createControl(Composite parent) {
+    public void createControl(Composite parent) {
         Composite composite = new Composite(parent, SWT.NULL);
     
 
@@ -175,7 +172,9 @@ public class WizardNewProjectCreationPage extends WizardPage {
 	 */
 	private IErrorMessageReporter getErrorReporter() {
 		return new IErrorMessageReporter(){
-			@Override
+			/* (non-Javadoc)
+			 * @see org.eclipse.ui.internal.ide.dialogs.ProjectContentsLocationArea.IErrorMessageReporter#reportError(java.lang.String)
+			 */
 			public void reportError(String errorMessage, boolean infoOnly) {
 				if (infoOnly) {
 					setMessage(errorMessage, IStatus.INFO);
@@ -381,8 +380,7 @@ public class WizardNewProjectCreationPage extends WizardPage {
     /*
      * see @DialogPage.setVisible(boolean)
      */
-    @Override
-	public void setVisible(boolean visible) {
+    public void setVisible(boolean visible) {
         super.setVisible(visible);
         if (visible) {
 			projectNameField.setFocus();

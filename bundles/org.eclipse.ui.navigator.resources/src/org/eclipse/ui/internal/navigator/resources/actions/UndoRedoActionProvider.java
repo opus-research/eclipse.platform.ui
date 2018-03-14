@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,35 +32,34 @@ public class UndoRedoActionProvider extends CommonActionProvider {
 
 	private UndoRedoActionGroup undoRedoGroup;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.navigator.CommonActionProvider#init(org.eclipse.ui.navigator.ICommonActionExtensionSite)
+	 */
 	public void init(ICommonActionExtensionSite anActionSite) {
-		IUndoContext workspaceContext = ResourcesPlugin
+		IUndoContext workspaceContext = (IUndoContext) ResourcesPlugin
 				.getWorkspace().getAdapter(IUndoContext.class);
 		undoRedoGroup = new UndoRedoActionGroup(((ICommonViewerWorkbenchSite) anActionSite.getViewSite()).getSite(),
 				workspaceContext, true);
 	}
 
-	@Override
 	public void dispose() {
 		undoRedoGroup.dispose();
 	}
 
-	@Override
 	public void fillActionBars(IActionBars actionBars) {
 		undoRedoGroup.fillActionBars(actionBars);
 	}
 
-	@Override
 	public void fillContextMenu(IMenuManager menu) {
 		undoRedoGroup.fillContextMenu(menu);
 	}
 
-	@Override
 	public void setContext(ActionContext context) {
 		undoRedoGroup.setContext(context);
 	}
 
-	@Override
 	public void updateActionBars() {
 		undoRedoGroup.updateActionBars();
 	}

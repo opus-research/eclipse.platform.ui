@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,12 +39,13 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
  * </p>
  * @noextend This class is not intended to be subclassed by clients.
  */
-public abstract class WizardDataTransferPage extends WizardPage implements Listener, IOverwriteQuery {
+public abstract class WizardDataTransferPage extends WizardPage implements
+        Listener, IOverwriteQuery {
 
     // constants
     protected static final int SIZING_TEXT_FIELD_WIDTH = 250;
 
-	protected static final int COMBO_HISTORY_LENGTH = 20;
+    protected static final int COMBO_HISTORY_LENGTH = 5;
 
     /**
      * Creates a new wizard page.
@@ -244,8 +245,7 @@ public abstract class WizardDataTransferPage extends WizardPage implements Liste
      * @return the user's reply: one of <code>"YES"</code>, <code>"NO"</code>, <code>"ALL"</code>, 
      *   or <code>"CANCEL"</code>
      */
-    @Override
-	public String queryOverwrite(String pathString) {
+    public String queryOverwrite(String pathString) {
 
         Path path = new Path(pathString);
 
@@ -267,8 +267,7 @@ public abstract class WizardDataTransferPage extends WizardPage implements Liste
                         IDialogConstants.NO_LABEL,
                         IDialogConstants.NO_TO_ALL_LABEL,
                         IDialogConstants.CANCEL_LABEL }, 0) {
-        	@Override
-			protected int getShellStyle() {
+        	protected int getShellStyle() {
         		return super.getShellStyle() | SWT.SHEET;
         	}
         };
@@ -276,8 +275,7 @@ public abstract class WizardDataTransferPage extends WizardPage implements Liste
         //run in syncExec because callback is from an operation,
         //which is probably not running in the UI thread.
         getControl().getDisplay().syncExec(new Runnable() {
-            @Override
-			public void run() {
+            public void run() {
                 dialog.open();
             }
         });
@@ -298,8 +296,7 @@ public abstract class WizardDataTransferPage extends WizardPage implements Liste
                 (Image) null, message, MessageDialog.NONE,
                 new String[] { IDialogConstants.YES_LABEL,
                         IDialogConstants.NO_LABEL }, 0) {
-        	@Override
-			protected int getShellStyle() {
+        	protected int getShellStyle() {
         		return super.getShellStyle() | SWT.SHEET;
         	}
         };

@@ -92,8 +92,7 @@ public final class CategoryActivityBindingDefinition {
         return compareTo;
     }
 
-    @Override
-	public boolean equals(Object object) {
+    public boolean equals(Object object) {
         if (!(object instanceof CategoryActivityBindingDefinition)) {
 			return false;
 		}
@@ -122,8 +121,7 @@ public final class CategoryActivityBindingDefinition {
         return sourceId;
     }
 
-    @Override
-	public int hashCode() {
+    public int hashCode() {
         if (hashCode == HASH_INITIAL) {
             hashCode = hashCode * HASH_FACTOR + Util.hashCode(activityId);
             hashCode = hashCode * HASH_FACTOR + Util.hashCode(categoryId);
@@ -136,8 +134,7 @@ public final class CategoryActivityBindingDefinition {
         return hashCode;
     }
 
-    @Override
-	public String toString() {
+    public String toString() {
         if (string == null) {
             final StringBuffer stringBuffer = new StringBuffer();
             stringBuffer.append('[');

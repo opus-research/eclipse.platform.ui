@@ -102,8 +102,7 @@ public class StatusPart {
         
         detailsButton = new Button(buttonParent, SWT.PUSH);
         detailsButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 showDetails(!showingDetails);
             }
         });
@@ -198,7 +197,6 @@ public class StatusPart {
 		}
 		Button button = new Button(parent, SWT.PUSH);
 		button.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				try {
 					PlatformUI.getWorkbench().getActiveWorkbenchWindow()
@@ -213,7 +211,6 @@ public class StatusPart {
 		button.setImage(image);
 		button.setToolTipText(WorkbenchMessages.ErrorLogUtil_ShowErrorLogTooltip);
 		button.addDisposeListener(new DisposeListener() {
-			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				image.dispose();
 			}

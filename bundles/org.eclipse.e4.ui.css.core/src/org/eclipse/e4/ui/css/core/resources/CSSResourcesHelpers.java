@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Angelo Zerr and others.
+ * Copyright (c) 2008 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,6 @@
  *
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
- *     Stefan Weiser <stefanfranz.weiser@gmail.com> - Bug 459983 - getCSSFontPropertiesKey
- *     IBM Corporation
  *******************************************************************************/
 package org.eclipse.e4.ui.css.core.resources;
 
@@ -20,27 +18,25 @@ import org.w3c.dom.css.RGBColor;
 
 /**
  * CSS Resources Helper to manage {@link IResourcesRegistry}.
- *
+ * 
  * @version 1.0.0
  * @author <a href="mailto:angelo.zerr@gmail.com">Angelo ZERR</a>
- *
+ * 
  */
 public class CSSResourcesHelpers {
 
 	public static String getCSSValueKey(CSSValue value) {
-		if (value instanceof CSS2FontProperties) {
+		if (value instanceof CSS2FontProperties)
 			return getCSSFontPropertiesKey((CSS2FontProperties) value);
-		}
-		if (value.getCssValueType() == CSSValue.CSS_PRIMITIVE_VALUE) {
+		if (value.getCssValueType() == CSSValue.CSS_PRIMITIVE_VALUE)
 			return getCSSPrimitiveValueKey((CSSPrimitiveValue) value);
-		}
 		return null;
 	}
 
 	/**
 	 * Return the key of the CSSPrimitiveValue <code>value</code> which is
 	 * used to cache Resource into {@link IResourcesRegistry}.
-	 *
+	 * 
 	 * @param value
 	 * @return
 	 */
@@ -60,16 +56,13 @@ public class CSSResourcesHelpers {
 		case CSSPrimitiveValue.CSS_RGBCOLOR:
 			RGBColor rgbColor = value.getRGBColorValue();
 			return getCSSRGBColorKey(rgbColor);
-		case CSSPrimitiveValue.CSS_STRING:
-			return value.getCssText();
 		}
 		return null;
 	}
 
 	public static String getCSSRGBColorKey(RGBColor rgbColor) {
-		if (rgbColor == null) {
+		if (rgbColor == null)
 			return null;
-		}
 		String rgb = ((int) rgbColor.getGreen().getFloatValue(
 				CSSPrimitiveValue.CSS_NUMBER))
 				+ "_";
@@ -84,17 +77,16 @@ public class CSSResourcesHelpers {
 
 	public static String getCSSFontPropertiesKey(
 			CSS2FontProperties fontProperties) {
-		return fontProperties.getFamily().getCssText() + "_"
-				+ fontProperties.getSize().getCssText() + "_"
-				+ fontProperties.getStyle().getCssText() + "_"
-				+ fontProperties.getWeight().getCssText();
+		return fontProperties.getFamily() + "_" + fontProperties.getSize()
+				+ "_" + fontProperties.getStyle() + "_"
+				+ fontProperties.getWeight();
 	}
 
 	/**
 	 * Return the resource type of <code>type</code> cached into
 	 * <code>resourcesRegistry</code> with CSSPrimitiveValue
 	 * <code>value</code> key.
-	 *
+	 * 
 	 * @param resourcesRegistry
 	 * @param type
 	 * @param value
@@ -109,7 +101,7 @@ public class CSSResourcesHelpers {
 	/**
 	 * Return the resource type of <code>type</code> cached into
 	 * <code>resourcesRegistry</code> with key <code>key</code>.
-	 *
+	 * 
 	 * @param resourcesRegistry
 	 * @param type
 	 * @param key
@@ -117,12 +109,10 @@ public class CSSResourcesHelpers {
 	 */
 	public static Object getResource(IResourcesRegistry resourcesRegistry,
 			Object type, String key) {
-		if (key == null) {
+		if (key == null)
 			return null;
-		}
-		if (resourcesRegistry != null) {
+		if (resourcesRegistry != null)
 			return resourcesRegistry.getResource(type, key);
-		}
 		return null;
 	}
 
@@ -130,7 +120,7 @@ public class CSSResourcesHelpers {
 	 * Register the <code>resource</code> type of <code>type</code> into
 	 * <code>resourcesRegistry</code> with CSSPrimitiveValue
 	 * <code>value</code> key.
-	 *
+	 * 
 	 * @param resourcesRegistry
 	 * @param type
 	 * @param value
@@ -140,16 +130,15 @@ public class CSSResourcesHelpers {
 			Object type, CSSPrimitiveValue value, Object resource) {
 		if (resourcesRegistry != null) {
 			String key = getCSSPrimitiveValueKey(value);
-			if (key != null) {
+			if (key != null)
 				resourcesRegistry.registerResource(type, key, resource);
-			}
 		}
 	}
 
 	/**
 	 * Register the <code>resource</code> type of <code>type</code> into
 	 * <code>resourcesRegistry</code> with <code>key</code>.
-	 *
+	 * 
 	 * @param resourcesRegistry
 	 * @param type
 	 * @param key
@@ -157,9 +146,8 @@ public class CSSResourcesHelpers {
 	 */
 	public static void registerResource(IResourcesRegistry resourcesRegistry,
 			Object type, String key, Object resource) {
-		if (key == null) {
+		if (key == null)
 			return;
-		}
 		if (resourcesRegistry != null) {
 			resourcesRegistry.registerResource(type, key, resource);
 		}

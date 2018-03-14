@@ -24,12 +24,20 @@ public class Activator implements BundleActivator {
 	// The shared instance
 	private static Activator plugin;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
+	 */
 	public void start(BundleContext context) throws Exception {
 		plugin = this;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
+	 */
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 	}

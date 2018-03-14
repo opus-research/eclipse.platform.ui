@@ -33,7 +33,6 @@ public class PropertyObservableUtil {
 	public static void cascadeDispose(IObservable source,
 			final IObservable target) {
 		source.addDisposeListener(new IDisposeListener() {
-			@Override
 			public void handleDispose(DisposeEvent staleEvent) {
 				target.dispose();
 			}

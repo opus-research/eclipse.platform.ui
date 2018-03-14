@@ -53,8 +53,7 @@ public abstract class ExecutableExtensionHandler extends AbstractHandler
      * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement,
      *      java.lang.String, java.lang.Object)
      */
-    @Override
-	public void setInitializationData(final IConfigurationElement config,
+    public void setInitializationData(final IConfigurationElement config,
             final String propertyName, final Object data) throws CoreException {
         // Do nothing, by default
     }

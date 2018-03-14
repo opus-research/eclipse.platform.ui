@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -50,14 +50,23 @@ public class ResourceDragAdapterAssistant extends
 			ResourceTransfer.getInstance(),
 			FileTransfer.getInstance() };
 
-	private static final Class<IResource> IRESOURCE_TYPE = IResource.class;
+	private static final Class IRESOURCE_TYPE = IResource.class;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.navigator.CommonDragAdapterAssistant#getSupportedTransferTypes()
+	 */
 	public Transfer[] getSupportedTransferTypes() {
 		return SUPPORTED_TRANSFERS;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.navigator.CommonDragAdapterAssistant#setDragData(org.eclipse.swt.dnd.DragSourceEvent,
+	 *      org.eclipse.jface.viewers.IStructuredSelection)
+	 */
 	public boolean setDragData(DragSourceEvent anEvent,
 			IStructuredSelection aSelection) {
 
@@ -106,16 +115,16 @@ public class ResourceDragAdapterAssistant extends
 	}
 
 	private IResource[] getSelectedResources(IStructuredSelection aSelection) {
-		Set<IResource> resources = new LinkedHashSet<IResource>();
+		Set resources = new LinkedHashSet();
 		IResource resource = null;
-		for (Iterator<?> iter = aSelection.iterator(); iter.hasNext();) {
+		for (Iterator iter = aSelection.iterator(); iter.hasNext();) {
 			Object selected = iter.next();
 			resource = adaptToResource(selected);
 			if (resource != null) {
 				resources.add(resource);
 		}
 		}
-		return resources.toArray(new IResource[resources.size()]);
+		return (IResource[]) resources.toArray(new IResource[resources.size()]);
 	}
 
 	private IResource adaptToResource(Object selected) {
@@ -123,10 +132,10 @@ public class ResourceDragAdapterAssistant extends
 		if (selected instanceof IResource) {
 			resource = (IResource) selected;
 		} else if (selected instanceof IAdaptable) {
-			resource = ((IAdaptable) selected)
+			resource = (IResource) ((IAdaptable) selected)
 					.getAdapter(IRESOURCE_TYPE);
 		} else {
-			resource = Platform.getAdapterManager().getAdapter(
+			resource = (IResource) Platform.getAdapterManager().getAdapter(
 					selected, IRESOURCE_TYPE);
 		}
 		return resource;
