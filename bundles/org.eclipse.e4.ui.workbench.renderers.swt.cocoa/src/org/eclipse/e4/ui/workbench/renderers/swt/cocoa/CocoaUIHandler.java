@@ -706,7 +706,7 @@ public class CocoaUIHandler {
 			return false;
 		}
 		ParameterizedCommand cmd = commandService.createCommand(commandId,
-				null);
+				Collections.emptyMap());
 		if (cmd == null) {
 			return false;
 		}
