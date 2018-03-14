@@ -32,7 +32,7 @@ echo "Overview page of the planning bugs for the Eclipse 4.5 release"
 echo ""
 echo "'''This list is genereated automatically, please do not update manually'''"
 echo ""
-echo "A detailed planning of the work planned for Eclipse 4.5 can be found on [[https://wiki.eclipse.org/Platform_UI/Plan/4.5/Milestones]]."
+echo "A detailed planning of the work planned for Eclipse 4.5 can be found on [https://wiki.eclipse.org/Platform_UI/Plan/4.5/Milestones Eclipse 4.5 milestone wiki]."
 }
 
 gen_bugs_table () {
@@ -106,7 +106,7 @@ gen_wiki () {
 	echo "[https://bugs.eclipse.org/bugs/buglist.cgi?quicksearch=${BUGS}&bug_id_type=anyexact&list_id=9354617&query_format=advanced&columnlist=bug_id%2Ctarget_milestone%2Cassigned_to%2Cbug_status%2Cresolution%2Cshort_desc%2Cbug_severity%2Cqa_contact&human=1 Display bugs in Bugzilla]"
 
 	echo ""
-	echo '{| class="wikitable" border="1"'
+	echo '{|  class="wikitable sortable" border="1"'
 	echo '|-'
 	echo '! !! Bug !! TM !! Sev !! Assign !! Status !! Title'
 
@@ -125,7 +125,7 @@ gen_other_wiki () {
 	echo "[https://bugs.eclipse.org/bugs/buglist.cgi?quicksearch=${BUGS}&bug_id_type=nowords&classification=Eclipse&columnlist=bug_id%2Ctarget_milestone%2Cassigned_to%2Cbug_status%2Cresolution%2Cshort_desc%2Cbug_severity%2Cqa_contact&component=IDE&component=UI&list_id=9455933&product=Platform&query_format=advanced&target_milestone=4.4.1&target_milestone=4.4.2&target_milestone=4.5&target_milestone=4.5%20M1&target_milestone=4.5%20M2&target_milestone=4.5%20M3&target_milestone=4.5%20M4&target_milestone=4.5%20M5&target_milestone=4.5%20M6&target_milestone=4.5%20M7&human=1 Display bugs in Bugzilla]"
 
 	echo ""
-	echo '{| class="wikitable" border="1"'
+	echo '{|  class="wikitable sortable" border="1"'
 	echo '|-'
 	echo '! !! Bug !! TM !! Sev !! Assign !! Status !! Title'
 
