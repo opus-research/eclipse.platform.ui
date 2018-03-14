@@ -169,8 +169,6 @@ public class EditorSelectionDialog extends Dialog {
 	static {
 		if (Util.isWindows()) {
 			Executable_Filters = new String[] { "*.exe", "*.bat", "*.*" };//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		} else if (Util.isMac()) {
-			Executable_Filters = new String[] { "*.app", "*" }; //$NON-NLS-1$ //$NON-NLS-2$
 		} else {
 			Executable_Filters = new String[] { "*" }; //$NON-NLS-1$
 		}
@@ -310,7 +308,7 @@ public class EditorSelectionDialog extends Dialog {
 		if (fileName != null) {
 
 			rememberEditorButton = new Button(contents, SWT.CHECK | SWT.LEFT);
-			rememberEditorButton.setText(NLS.bind(WorkbenchMessages.EditorSelection_rememberEditor, fileName));
+			rememberEditorButton.setText(WorkbenchMessages.EditorSelection_rememberEditor);
 			rememberEditorButton.addListener(SWT.Selection, listener);
 			data = new GridData();
 			data.horizontalSpan = 2;
@@ -327,7 +325,6 @@ public class EditorSelectionDialog extends Dialog {
 				data.horizontalIndent = 15;
 				rememberTypeButton.setLayoutData(data);
 				rememberTypeButton.setFont(font);
-				rememberTypeButton.setEnabled(false);
 			}
 		}
 
@@ -562,17 +559,19 @@ public class EditorSelectionDialog extends Dialog {
 		settings.put(STORE_ID_DESCR, selectedEditor.getId());
 		String editorId = selectedEditor.getId();
 		settings.put(STORE_ID_DESCR, editorId);
-		if (rememberEditorButton == null || !rememberEditorButton.getSelection()) {
+		EditorRegistry reg = (EditorRegistry) WorkbenchPlugin.getDefault().getEditorRegistry();
+		if (rememberEditorButton == null) {
 			return;
 		}
-		EditorRegistry reg = (EditorRegistry) WorkbenchPlugin.getDefault().getEditorRegistry();
-		if (rememberTypeButton == null || !rememberTypeButton.getSelection()) {
+		if (rememberEditorButton.getSelection()) {
 			updateFileMappings(reg, true);
 			reg.setDefaultEditor(fileName, editorId);
-		} else {
-			updateFileMappings(reg, false);
-			reg.setDefaultEditor("*." + getFileType(), editorId); //$NON-NLS-1$
 		}
+		if (rememberTypeButton == null || !rememberTypeButton.getSelection()) {
+			return;
+		}
+		updateFileMappings(reg, false);
+		reg.setDefaultEditor("*." + getFileType(), editorId); //$NON-NLS-1$
 		reg.saveAssociations();
 	}
 
@@ -651,9 +650,6 @@ public class EditorSelectionDialog extends Dialog {
 	protected void updateEnableState() {
 		boolean enableExternal = externalButton.getSelection();
 		browseExternalEditorsButton.setEnabled(enableExternal);
-		if (rememberEditorButton != null && rememberTypeButton != null) {
-			rememberTypeButton.setEnabled(rememberEditorButton.getSelection());
-		}
 		updateOkButton();
 	}
 

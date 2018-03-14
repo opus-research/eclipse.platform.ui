@@ -10,7 +10,6 @@
  *     Andrew Gvozdev -  Bug 364039 - Add "Delete All Markers"
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442440
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 446864, 466927
  *******************************************************************************/
 package org.eclipse.ui.internal.views.markers;
 
@@ -838,30 +837,10 @@ public class ExtendedMarkersView extends ViewPart {
 			@Override
 			public void partVisible(IWorkbenchPartReference partRef) {
 				if (partRef.getId().equals(getSite().getId())) {
-					isViewVisible = true;
-					boolean needUpdate = hasPendingChanges();
-					if (needUpdate) {
-						// trigger UI update, the data is changed meanwhile
-						builder.getUpdateScheduler().scheduleUIUpdate(MarkerUpdateScheduler.SHORT_DELAY);
-					} else {
-						// data is same as before, only clear tooltip
-						setTitleToolTip(null);
-					}
+					isViewVisible= true;
+					pageSelectionListener.selectionChanged(null, getSite().getPage().getSelection());
+					setTitleToolTip(null);
 				}
-			}
-
-			/**
-			 * @return true if the builder noticed that marker updates were made
-			 *         but UI is not updated yet
-			 */
-			private boolean hasPendingChanges() {
-				boolean[] changeFlags = builder.readChangeFlags();
-				for (boolean b : changeFlags) {
-					if (b) {
-						return true;
-					}
-				}
-				return false;
 			}
 		};
 	}
@@ -1427,9 +1406,7 @@ public class ExtendedMarkersView extends ViewPart {
 
 		setContentDescription(statusMessage);
 
-		if (isVisible()) {
-			setTitleToolTip(null);
-		} else {
+		if (!"".equals(getTitleToolTip())) { //$NON-NLS-1$
 			setTitleToolTip(statusMessage);
 		}
 		updateTitleImage(counts);
