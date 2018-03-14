@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
 
-public class TreeElement extends ControlElement {
+public class TreeElement extends AbstractControlSelectionBackgroundCustomizationElement {
 	private static boolean showedUnsupportedWarning = false;
 
 	private final static String TREE_ARROWS_FOREGROUND_COLOR = "org.eclipse.e4.ui.css.swt.treeArrowsForegroundColor"; //$NON-NLS-1$
@@ -53,7 +53,18 @@ public class TreeElement extends ControlElement {
 			}
 
 			Color foreground = (Color) data;
-			Color background = parent.getBackground();
+			Color background = null;
+			// The arrow drawing needs to consider the selected/hot background.
+			if ((event.detail & SWT.SELECTED) != 0) {
+				background = getSelectionBackgroundColor(parent);
+
+			} else if ((event.detail & SWT.HOT) != 0) {
+				background = getHotBackgroundColor(parent);
+
+			}
+			if(background == null){
+				background = parent.getBackground();
+			}
 
 			GC gc = event.gc;
 
