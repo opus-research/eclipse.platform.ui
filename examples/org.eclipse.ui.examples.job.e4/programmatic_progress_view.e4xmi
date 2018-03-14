@@ -11,8 +11,8 @@
     </elements>
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_8jAhoG_4EeO3G4cNJzljEA" featurename="trimBars" parentElementId="org.eclipse.e4.demo.contacts.main" positionInList="">
-    <elements xsi:type="basic:TrimBar" xmi:id="_lcYOoIfxEeOFHvFErFdA4A" elementId="org.eclipse.e4.ui.examples.job.trimbar.0" side="Bottom">
-      <children xsi:type="menu:ToolControl" xmi:id="_peGXoIfxEeOFHvFErFdA4A" elementId="org.eclipse.e4.ui.examples.job.toolcontrol.0" contributionURI="bundleclass://org.eclipse.e4.ui.progress/org.eclipse.e4.ui.progress.internal.ProgressRegion"/>
+    <elements xsi:type="basic:TrimBar" xmi:id="_lcYOoIfxEeOFHvFErFdA4A" elementId="org.eclipse.ui.examples.job.e4.trimbar.0" side="Bottom">
+      <children xsi:type="menu:ToolControl" xmi:id="_peGXoIfxEeOFHvFErFdA4A" elementId="org.eclipse.ui.examples.job.e4.toolcontrol.0" contributionURI="bundleclass://org.eclipse.e4.ui.progress/org.eclipse.e4.ui.progress.internal.ProgressRegion"/>
     </elements>
   </fragments>
 </fragment:ModelFragments>

@@ -3,7 +3,7 @@
 <plugin>
 
      <extension
-           id="org.eclipse.e4.ui.examples.job.model"
+           id="org.eclipse.ui.examples.job.e4.model"
            point="org.eclipse.e4.workbench.model">
         <fragment
               uri="progress_view.e4xmi">

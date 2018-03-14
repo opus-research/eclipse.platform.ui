@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.e4.ui.examples.jobs;
+package org.eclipse.ui.examples.job.e4;
 
 import java.net.URL;
 
@@ -134,7 +134,7 @@ public class TestJob extends Job {
 	private static ImageDescriptor getImageDescriptor(
 	        String relativePath) {
 		URL url = FileLocator.find(Platform
-		        .getBundle("org.eclipse.e4.ui.examples.job"), new Path(
+		        .getBundle("org.eclipse.ui.examples.job.e4"), new Path(
 		        relativePath), null);
 		return ImageDescriptor.createFromURL(url);
 	}
