@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Dina Sayed, dsayed@eg.ibm.com, IBM -  bug 269844
+ *     Christian Georgi (SAP)             -  bug 432480
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -113,4 +114,5 @@ public class IDEPreferenceInitializer extends AbstractPreferenceInitializer {
 	private String getHelpSeparatorKey(String groupId) {
 		return "useSeparator." + IWorkbenchActionConstants.M_HELP + "." + groupId; //$NON-NLS-1$ //$NON-NLS-2$
 	}
+
 }
