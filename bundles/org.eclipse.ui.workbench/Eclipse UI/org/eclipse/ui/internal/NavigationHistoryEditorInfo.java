@@ -16,7 +16,6 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IElementFactory;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPersistableElement;
-import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.XMLMemento;
 
@@ -34,12 +33,9 @@ public class NavigationHistoryEditorInfo {
 
     IMemento memento;
 
-	public IPerspectiveDescriptor persp;
-
     NavigationHistoryEditorInfo(IEditorPart part) {
         editorID = part.getSite().getId();
         editorInput = part.getEditorInput();
-		persp = part.getSite().getPage().getPerspective();
     }
 
     NavigationHistoryEditorInfo(IMemento memento) {
