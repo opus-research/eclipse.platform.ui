@@ -27,7 +27,6 @@ import org.eclipse.swt.widgets.Event;
  * @since 2.0
  * @deprecated Use org.eclipse.ui.IActionDelegate2 instead.
  */
-@Deprecated
 public interface IActionDelegateWithEvent {
 
     /**
@@ -44,7 +43,6 @@ public interface IActionDelegateWithEvent {
      * @since  2.0
      * @deprecated Use org.eclipse.ui.IActionDelegate2 instead.
      */
-    @Deprecated
-	public void runWithEvent(IAction action, Event event);
+    public void runWithEvent(IAction action, Event event);
 
 }

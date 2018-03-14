@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -64,32 +64,25 @@ public class NavigationHistory implements INavigationHistory {
     public NavigationHistory(final IWorkbenchPage page) {
         this.page = page;
         page.addPartListener(new IPartListener2() {
-            @Override
-			public void partActivated(IWorkbenchPartReference partRef) {
+            public void partActivated(IWorkbenchPartReference partRef) {
             }
 
-            @Override
-			public void partBroughtToTop(IWorkbenchPartReference partRef) {
+            public void partBroughtToTop(IWorkbenchPartReference partRef) {
             }
 
-            @Override
-			public void partDeactivated(IWorkbenchPartReference partRef) {
+            public void partDeactivated(IWorkbenchPartReference partRef) {
             }
 
-            @Override
-			public void partOpened(IWorkbenchPartReference partRef) {
+            public void partOpened(IWorkbenchPartReference partRef) {
             }
 			
-            @Override
-			public void partHidden(IWorkbenchPartReference partRef) {
+            public void partHidden(IWorkbenchPartReference partRef) {
             }
 			
-            @Override
-			public void partVisible(IWorkbenchPartReference partRef) {
+            public void partVisible(IWorkbenchPartReference partRef) {
             }
 
-            @Override
-			public void partClosed(IWorkbenchPartReference partRef) {
+            public void partClosed(IWorkbenchPartReference partRef) {
             	if (isPerTabHistoryEnabled() && partRef instanceof EditorReference) {
             		if (!((EditorReference)partRef).isDisposed()) {
 						Object editorTabCookie = ((EditorReference) partRef).getModel().getWidget();
@@ -100,7 +93,6 @@ public class NavigationHistory implements INavigationHistory {
 				updateNavigationHistory(partRef, true);
             }
 			
-			@Override
 			public void partInputChanged(IWorkbenchPartReference partRef) {
 				updateNavigationHistory(partRef, false);
 			}
@@ -191,8 +183,7 @@ public class NavigationHistory implements INavigationHistory {
          * extra entry when using Open Declaration (F3) that opens another editor. */
         ignoreEntries++;
         getDisplay().asyncExec(new Runnable() {
-            @Override
-			public void run() {
+            public void run() {
                 if (--ignoreEntries == 0) {
 	                if (part.getEditorSite() instanceof EditorSite) {
 						EditorSite site = (EditorSite) part.getEditorSite();
@@ -216,8 +207,7 @@ public class NavigationHistory implements INavigationHistory {
      * (non-Javadoc)
      * Method declared on INavigationHistory.
      */
-    @Override
-	public void markLocation(IEditorPart part) {
+    public void markLocation(IEditorPart part) {
         addEntry(part);
     }
 
@@ -266,8 +256,7 @@ public class NavigationHistory implements INavigationHistory {
      * (non-Javadoc)
      * Method declared on INavigationHistory.
      */
-    @Override
-	public INavigationLocation[] getLocations() {
+    public INavigationLocation[] getLocations() {
         INavigationLocation result[] = new INavigationLocation[history.size()];
         for (int i = 0; i < result.length; i++) {
             NavigationHistoryEntry e = (NavigationHistoryEntry) history.get(i);
@@ -280,8 +269,7 @@ public class NavigationHistory implements INavigationHistory {
      * (non-Javadoc)
      * Method declared on INavigationHistory.
      */
-    @Override
-	public INavigationLocation getCurrentLocation() {
+    public INavigationLocation getCurrentLocation() {
         NavigationHistoryEntry entry = getEntry(activeEntry);
         return entry == null ? null : entry.location;
     }
@@ -637,7 +625,6 @@ public class NavigationHistory implements INavigationHistory {
                     .findEditor(entry.editorInfo.editorInput)) {
             	StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
-					@Override
 					public void runWithException() throws Throwable {
 						gotoEntry(entry);
 					}});

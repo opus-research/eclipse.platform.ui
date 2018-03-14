@@ -288,7 +288,6 @@ public class DecorationScheduler {
 			 * 
 			 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
 			 */
-			@Override
 			public IStatus run(IProgressMonitor monitor) {
 
 				synchronized (DecorationScheduler.this) {
@@ -405,7 +404,6 @@ public class DecorationScheduler {
 			 * 
 			 * @see org.eclipse.core.runtime.jobs.Job#belongsTo(java.lang.Object)
 			 */
-			@Override
 			public boolean belongsTo(Object family) {
 				return DecoratorManager.FAMILY_DECORATE == family;
 			}
@@ -415,7 +413,6 @@ public class DecorationScheduler {
 			 * 
 			 * @see org.eclipse.core.runtime.jobs.Job#shouldRun()
 			 */
-			@Override
 			public boolean shouldRun() {
 				return PlatformUI.isWorkbenchRunning();
 			}
@@ -461,7 +458,6 @@ public class DecorationScheduler {
 			 * 
 			 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
 			 */
-			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				resultCache.clear();
 				return Status.OK_STATUS;
@@ -472,7 +468,6 @@ public class DecorationScheduler {
 			 * 
 			 * @see org.eclipse.core.runtime.jobs.Job#shouldRun()
 			 */
-			@Override
 			public boolean shouldRun() {
 				return PlatformUI.isWorkbenchRunning();
 			}
@@ -498,7 +493,6 @@ public class DecorationScheduler {
 
 			ILabelProviderListener[] listeners;
 
-			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 
 				synchronized (DecorationScheduler.this) {
@@ -594,7 +588,6 @@ public class DecorationScheduler {
 			 * 
 			 * @see org.eclipse.core.runtime.jobs.Job#belongsTo(java.lang.Object)
 			 */
-			@Override
 			public boolean belongsTo(Object family) {
 				return DecoratorManager.FAMILY_DECORATE == family;
 			}
@@ -604,7 +597,6 @@ public class DecorationScheduler {
 			 * 
 			 * @see org.eclipse.core.runtime.jobs.Job#shouldRun()
 			 */
-			@Override
 			public boolean shouldRun() {
 				return PlatformUI.isWorkbenchRunning();
 			}

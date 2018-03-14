@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008, 2013 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,9 +12,19 @@ package org.eclipse.e4.ui.model.application.commands.util;
 
 import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.MContribution;
-import org.eclipse.e4.ui.model.application.commands.*;
+import org.eclipse.e4.ui.model.application.commands.MBindingContext;
+import org.eclipse.e4.ui.model.application.commands.MBindingTable;
+import org.eclipse.e4.ui.model.application.commands.MBindingTableContainer;
+import org.eclipse.e4.ui.model.application.commands.MBindings;
+import org.eclipse.e4.ui.model.application.commands.MCategory;
+import org.eclipse.e4.ui.model.application.commands.MCommand;
+import org.eclipse.e4.ui.model.application.commands.MCommandParameter;
+import org.eclipse.e4.ui.model.application.commands.MHandler;
+import org.eclipse.e4.ui.model.application.commands.MHandlerContainer;
+import org.eclipse.e4.ui.model.application.commands.MKeyBinding;
+import org.eclipse.e4.ui.model.application.commands.MKeySequence;
+import org.eclipse.e4.ui.model.application.commands.MParameter;
 import org.eclipse.e4.ui.model.application.commands.impl.CommandsPackageImpl;
-import org.eclipse.e4.ui.model.application.ui.MLocalizable;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.common.notify.impl.AdapterFactoryImpl;
@@ -127,10 +137,6 @@ public class CommandsAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseApplicationElement(MApplicationElement object) {
 				return createApplicationElementAdapter();
-			}
-			@Override
-			public Adapter caseLocalizable(MLocalizable object) {
-				return createLocalizableAdapter();
 			}
 			@Override
 			public Adapter caseContribution(MContribution object) {
@@ -335,20 +341,6 @@ public class CommandsAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createApplicationElementAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link org.eclipse.e4.ui.model.application.ui.MLocalizable <em>Localizable</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see org.eclipse.e4.ui.model.application.ui.MLocalizable
-	 * @generated
-	 */
-	public Adapter createLocalizableAdapter() {
 		return null;
 	}
 

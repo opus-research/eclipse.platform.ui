@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2012 IBM Corporation and others.
+ * Copyright (c) 2007, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,7 +32,13 @@ import org.eclipse.ui.menus.UIElement;
 public class ToggleCoolbarHandler extends AbstractHandler implements
 		IElementUpdater {
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.
+	 * ExecutionEvent)
+	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		final IWorkbenchWindow activeWorkbenchWindow = HandlerUtil
 				.getActiveWorkbenchWindowChecked(event);
@@ -44,7 +50,13 @@ public class ToggleCoolbarHandler extends AbstractHandler implements
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.commands.IElementUpdater#updateElement(org.eclipse.ui.
+	 * menus.UIElement, java.util.Map)
+	 */
 	public void updateElement(UIElement element, Map parameters) {
 		IWorkbenchLocationService wls = (IWorkbenchLocationService) element
 				.getServiceLocator()

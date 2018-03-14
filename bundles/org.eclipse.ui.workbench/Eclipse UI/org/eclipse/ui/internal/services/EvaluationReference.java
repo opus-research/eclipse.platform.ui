@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2013 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,16 +11,17 @@
 
 package org.eclipse.ui.internal.services;
 
-import org.eclipse.e4.core.commands.ExpressionContext;
-
 import org.eclipse.core.expressions.EvaluationResult;
 import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
 import org.eclipse.e4.ui.internal.workbench.Activator;
 import org.eclipse.e4.ui.internal.workbench.Policy;
+import org.eclipse.e4.ui.workbench.modeling.ExpressionContext;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.services.IEvaluationReference;
@@ -39,6 +40,7 @@ public class EvaluationReference extends RunAndTrack implements IEvaluationRefer
 	boolean participating = true;
 	boolean postingChanges = true;
 	boolean hasRun = false;
+	Runner runner = new Runner();
 
 	public EvaluationReference(IEclipseContext context, Expression expression,
 			IPropertyChangeListener listener, String property) {
@@ -55,7 +57,6 @@ public class EvaluationReference extends RunAndTrack implements IEvaluationRefer
 	 * @see
 	 * org.eclipse.ui.internal.services.IEvaluationResultCache#clearResult()
 	 */
-	@Override
 	public void clearResult() {
 	}
 
@@ -65,7 +66,6 @@ public class EvaluationReference extends RunAndTrack implements IEvaluationRefer
 	 * @see
 	 * org.eclipse.ui.internal.services.IEvaluationResultCache#getExpression()
 	 */
-	@Override
 	public Expression getExpression() {
 		return expression;
 	}
@@ -77,9 +77,28 @@ public class EvaluationReference extends RunAndTrack implements IEvaluationRefer
 	 * org.eclipse.ui.internal.services.IEvaluationResultCache#getSourcePriority
 	 * ()
 	 */
-	@Override
 	public int getSourcePriority() {
 		return sourcePriority;
+	}
+
+	class Runner implements ISafeRunnable {
+		public IEvaluationContext localContext;
+
+		public void run() throws Exception {
+			try {
+				cache = expression.evaluate(localContext) != EvaluationResult.FALSE;
+			} catch (CoreException e) {
+				Activator.trace(Policy.DEBUG_CMDS, "Failed to calculate active", e); //$NON-NLS-1$
+			}
+		}
+
+		public void handleException(Throwable exception) {
+			if (exception instanceof Error) {
+				// errors are deadly, we shouldn't ignore these
+				throw (Error) exception;
+			}
+			Activator.trace(Policy.DEBUG_CMDS, "Failed with throwable: " + expression, exception); //$NON-NLS-1$
+		}
 	}
 
 	/*
@@ -89,16 +108,13 @@ public class EvaluationReference extends RunAndTrack implements IEvaluationRefer
 	 * org.eclipse.ui.internal.services.IEvaluationResultCache#evaluate(org.
 	 * eclipse.core.expressions.IEvaluationContext)
 	 */
-	@Override
-	public boolean evaluate(IEvaluationContext context) {
+	public boolean evaluate(final IEvaluationContext context) {
 		if (expression == null) {
 			cache = true;
 		} else {
-			try {
-				cache = expression.evaluate(context) != EvaluationResult.FALSE;
-			} catch (CoreException e) {
-				Activator.trace(Policy.DEBUG_CMDS, "Failed to calculate active", e); //$NON-NLS-1$
-			}
+			runner.localContext = context;
+			SafeRunner.run(runner);
+
 		}
 		return cache;
 	}
@@ -110,7 +126,6 @@ public class EvaluationReference extends RunAndTrack implements IEvaluationRefer
 	 * org.eclipse.ui.internal.services.IEvaluationResultCache#setResult(boolean
 	 * )
 	 */
-	@Override
 	public void setResult(boolean result) {
 		cache = result;
 	}
@@ -122,7 +137,6 @@ public class EvaluationReference extends RunAndTrack implements IEvaluationRefer
 	 * org.eclipse.e4.core.services.context.IRunAndTrack#notify(org.eclipse.
 	 * e4.core.services.context.ContextChangeEvent)
 	 */
-	@Override
 	public boolean changed(IEclipseContext context) {
 		if (!participating) {
 			return false;
@@ -158,7 +172,6 @@ public class EvaluationReference extends RunAndTrack implements IEvaluationRefer
 	 * 
 	 * @see org.eclipse.ui.services.IEvaluationReference#getListener()
 	 */
-	@Override
 	public IPropertyChangeListener getListener() {
 		return listener;
 	}
@@ -168,7 +181,6 @@ public class EvaluationReference extends RunAndTrack implements IEvaluationRefer
 	 * 
 	 * @see org.eclipse.ui.services.IEvaluationReference#getProperty()
 	 */
-	@Override
 	public String getProperty() {
 		return property;
 	}

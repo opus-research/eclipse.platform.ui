@@ -50,14 +50,13 @@ public class ResourceDragAdapterAssistant extends
 			ResourceTransfer.getInstance(),
 			FileTransfer.getInstance() };
 
-	private static final Class<IResource> IRESOURCE_TYPE = IResource.class;
+	private static final Class IRESOURCE_TYPE = IResource.class;
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ui.navigator.CommonDragAdapterAssistant#getSupportedTransferTypes()
 	 */
-	@Override
 	public Transfer[] getSupportedTransferTypes() {
 		return SUPPORTED_TRANSFERS;
 	}
@@ -68,7 +67,6 @@ public class ResourceDragAdapterAssistant extends
 	 * @see org.eclipse.ui.navigator.CommonDragAdapterAssistant#setDragData(org.eclipse.swt.dnd.DragSourceEvent,
 	 *      org.eclipse.jface.viewers.IStructuredSelection)
 	 */
-	@Override
 	public boolean setDragData(DragSourceEvent anEvent,
 			IStructuredSelection aSelection) {
 
@@ -117,16 +115,16 @@ public class ResourceDragAdapterAssistant extends
 	}
 
 	private IResource[] getSelectedResources(IStructuredSelection aSelection) {
-		Set<IResource> resources = new LinkedHashSet<IResource>();
+		Set resources = new LinkedHashSet();
 		IResource resource = null;
-		for (Iterator<?> iter = aSelection.iterator(); iter.hasNext();) {
+		for (Iterator iter = aSelection.iterator(); iter.hasNext();) {
 			Object selected = iter.next();
 			resource = adaptToResource(selected);
 			if (resource != null) {
 				resources.add(resource);
 		}
 		}
-		return resources.toArray(new IResource[resources.size()]);
+		return (IResource[]) resources.toArray(new IResource[resources.size()]);
 	}
 
 	private IResource adaptToResource(Object selected) {

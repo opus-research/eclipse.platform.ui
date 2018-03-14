@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2012 Angelo Zerr and others.
+ * Copyright (c) 2008 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,19 +23,31 @@ import org.eclipse.e4.ui.css.core.util.resources.IResourceLocator;
 public class FileResourcesLocatorImpl implements IResourceLocator {
 	private static final String FILE_SCHEME = "file:";
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.css.core.util.resources.IURIResolver#resolve(java.lang.String)
+	 */
 	public String resolve(String uri) {
 		File file = toFile(uri);
 		return file.exists() ? uri : null;
 	}
 
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.css.core.util.resources.IResourceLocator#getInputStream(java.lang.String)
+	 */
 	public InputStream getInputStream(String uri) throws Exception {
 		return new FileInputStream(toFile(uri));
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.css.core.util.resources.IResourceLocator#getReader(java.lang.String)
+	 */
 	public Reader getReader(String uri) throws Exception {
 		return new FileReader(toFile(uri));
 	}
