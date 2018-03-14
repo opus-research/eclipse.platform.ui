@@ -18,7 +18,6 @@ import org.eclipse.ui.handlers.CollapseAllHandler;
  * Collapse all project nodes.
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
-@Deprecated
 public class CollapseAllAction extends ResourceNavigatorAction {
 
     /**
@@ -38,8 +37,7 @@ public class CollapseAllAction extends ResourceNavigatorAction {
     /*
      * Implementation of method defined on <code>IAction</code>.
      */
-    @Override
-	public void run() {
+    public void run() {
         getNavigator().getViewer().collapseAll();
     }
 }

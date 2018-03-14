@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2011 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,18 +24,24 @@ public class ZoomedEditorCloseTest extends CloseTest {
         super(name);
     }
 
-    @Override
-	public IWorkbenchPart getStackedPart1() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.zoom.CloseTest#getStackedPart1()
+     */
+    public IWorkbenchPart getStackedPart1() {
         return editor1;
     }
 
-    @Override
-	public IWorkbenchPart getStackedPart2() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.zoom.CloseTest#getStackedPart2()
+     */
+    public IWorkbenchPart getStackedPart2() {
         return editor2;
     }
 
-    @Override
-	public IWorkbenchPart getUnstackedPart() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.zoom.CloseTest#getUnstackedPart()
+     */
+    public IWorkbenchPart getUnstackedPart() {
         return editor3;
     }
     

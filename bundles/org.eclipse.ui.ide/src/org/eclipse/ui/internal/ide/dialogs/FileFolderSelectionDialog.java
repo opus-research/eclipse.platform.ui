@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,7 +46,11 @@ public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
 		private static final Image IMG_FILE = PlatformUI.getWorkbench()
 				.getSharedImages().getImage(ISharedImages.IMG_OBJ_FILE);
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.LabelProvider#getImage(java.lang.Object)
+		 */
 		public Image getImage(Object element) {
 			if (element instanceof IFileStore) {
 				IFileStore curr = (IFileStore) element;
@@ -58,7 +62,11 @@ public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
 			return null;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
+		 */
 		public String getText(Object element) {
 			if (element instanceof IFileStore) {
 				return ((IFileStore) element).getName();
@@ -85,7 +93,11 @@ public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
 		public FileContentProvider(final boolean showFiles) {
 			fileFilter = new IFileStoreFilter() {
 
-				@Override
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see org.eclipse.ui.internal.ide.dialogs.IFileStoreFilter#accept(org.eclipse.core.filesystem.IFileStore)
+				 */
 				public boolean accept(IFileStore file) {
 					if (!file.fetchInfo().isDirectory() && showFiles == false) {
 						return false;
@@ -95,7 +107,6 @@ public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
 			};
 		}
 
-		@Override
 		public Object[] getChildren(Object parentElement) {
 			if (parentElement instanceof IFileStore) {
 				IFileStore[] children = IDEResourceInfoUtils.listFileStores(
@@ -108,7 +119,11 @@ public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
 			return EMPTY;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
+		 */
 		public Object getParent(Object element) {
 			if (element instanceof IFileStore) {
 				return ((IFileStore) element).getParent();
@@ -116,21 +131,17 @@ public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
 			return null;
 		}
 
-		@Override
 		public boolean hasChildren(Object element) {
 			return getChildren(element).length > 0;
 		}
 
-		@Override
 		public Object[] getElements(Object element) {
 			return getChildren(element);
 		}
 
-		@Override
 		public void dispose() {
 		}
 
-		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 	}
@@ -139,7 +150,11 @@ public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
 	 * Viewer sorter that places folders first, then files.
 	 */
 	private static class FileViewerSorter extends ViewerComparator {
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ViewerSorter#category(java.lang.Object)
+		 */
 		public int category(Object element) {
 			if (element instanceof IFileStore
 					&& !((IFileStore) element).fetchInfo().isDirectory()) {
@@ -173,7 +188,11 @@ public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
 			this.acceptFolders = acceptFolders;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.dialogs.ISelectionStatusValidator#validate(java.lang.Object[])
+		 */
 		public IStatus validate(Object[] selection) {
 			int nSelected = selection.length;
 			String pluginId = IDEWorkbenchPlugin.IDE_WORKBENCH;
@@ -195,9 +214,7 @@ public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
 
 				}
 			}
-			
-			// Return an ok status with no message as SelectionStatusDialog will display default ok message
-			return new Status(IStatus.OK, pluginId, IDEResourceInfoUtils.EMPTY_STRING);
+			return Status.OK_STATUS;
 		}
 	}
 

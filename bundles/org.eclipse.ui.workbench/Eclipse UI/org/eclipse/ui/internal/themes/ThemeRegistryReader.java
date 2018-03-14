@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2011 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.ResourceBundle;
+
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
@@ -232,8 +233,7 @@ public class ThemeRegistryReader extends RegistryReader {
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.registry.RegistryReader#readElement(org.eclipse.core.runtime.IConfigurationElement)
      */
-    @Override
-	public boolean readElement(IConfigurationElement element) {
+    public boolean readElement(IConfigurationElement element) {
         String elementName = element.getName();
         if (themeDescriptor == null && elementName.equals(IWorkbenchRegistryConstants.TAG_COLORDEFINITION)) {
             ColorDefinition definition = readColor(element);
@@ -310,7 +310,13 @@ public class ThemeRegistryReader extends RegistryReader {
                 }
             }
             return true;
-		}
+        } else if (elementName.equals(IWorkbenchRegistryConstants.TAG_CATEGORYPRESENTATIONBINDING)) {
+            String categoryId = element.getAttribute(IWorkbenchRegistryConstants.ATT_CATEGORY_ID);
+            String presentationId = element.getAttribute(IWorkbenchRegistryConstants.ATT_PRESENTATIONID);
+            themeRegistry.addCategoryPresentationBinding(categoryId,
+                    presentationId);
+            return true;
+        }
 
         return false;
     }

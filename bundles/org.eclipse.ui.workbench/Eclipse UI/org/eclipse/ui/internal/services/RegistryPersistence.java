@@ -61,7 +61,6 @@ public abstract class RegistryPersistence implements IDisposable,
 	 * The expression to return when there is an error. Never <code>null</code>.
 	 */
 	protected static final Expression ERROR_EXPRESSION = new Expression() {
-		@Override
 		public final EvaluationResult evaluate(final IEvaluationContext context) {
 			return null;
 		}
@@ -592,11 +591,9 @@ public abstract class RegistryPersistence implements IDisposable,
 	 */
 	protected RegistryPersistence() {
 		registryChangeListener = new IRegistryChangeListener() {
-			@Override
 			public final void registryChanged(final IRegistryChangeEvent event) {
 				if (isChangeImportant(event)) {
 					Display.getDefault().asyncExec(new Runnable() {
-						@Override
 						public final void run() {
 							read();
 						}
@@ -609,7 +606,6 @@ public abstract class RegistryPersistence implements IDisposable,
 	/**
 	 * Detaches the registry change listener from the registry.
 	 */
-	@Override
 	public void dispose() {
 		final IExtensionRegistry registry = Platform.getExtensionRegistry();
 		registry.removeRegistryChangeListener(registryChangeListener);

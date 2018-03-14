@@ -28,8 +28,12 @@ public class PerspectiveWithFastView implements IPerspectiveFactory {
         super();
     }
 
-    @Override
-	public void createInitialLayout(IPageLayout layout) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.IPerspectiveFactory#createInitialLayout(org.eclipse.ui.IPageLayout)
+     */
+    public void createInitialLayout(IPageLayout layout) {
         defineLayout(layout);
     }
 

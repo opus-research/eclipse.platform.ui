@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2011 Matthew Hall and others.
+ * Copyright (c) 2008, 2010 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -50,7 +50,6 @@ public abstract class ValueProperty implements IValueProperty {
 	 * 
 	 * @since 1.3
 	 */
-	@Override
 	public Object getValue(Object source) {
 		if (source == null) {
 			return null;
@@ -79,7 +78,6 @@ public abstract class ValueProperty implements IValueProperty {
 	/**
 	 * @since 1.3
 	 */
-	@Override
 	public final void setValue(Object source, Object value) {
 		if (source != null) {
 			doSetValue(source, value);
@@ -105,32 +103,26 @@ public abstract class ValueProperty implements IValueProperty {
 		}
 	}
 
-	@Override
 	public IObservableValue observe(Object source) {
 		return observe(Realm.getDefault(), source);
 	}
 
-	@Override
 	public IObservableFactory valueFactory() {
 		return new IObservableFactory() {
-			@Override
 			public IObservable createObservable(Object target) {
 				return observe(target);
 			}
 		};
 	}
 
-	@Override
 	public IObservableFactory valueFactory(final Realm realm) {
 		return new IObservableFactory() {
-			@Override
 			public IObservable createObservable(Object target) {
 				return observe(realm, target);
 			}
 		};
 	}
 
-	@Override
 	public IObservableValue observeDetail(IObservableValue master) {
 		return MasterDetailObservables.detailValue(master,
 				valueFactory(master.getRealm()), getValueType());
@@ -139,7 +131,6 @@ public abstract class ValueProperty implements IValueProperty {
 	/**
 	 * @since 1.4
 	 */
-	@Override
 	public IObservableList observeDetail(IObservableList master) {
 		return MasterDetailObservables.detailValues(master,
 				valueFactory(master.getRealm()), getValueType());
@@ -148,7 +139,6 @@ public abstract class ValueProperty implements IValueProperty {
 	/**
 	 * @since 1.4
 	 */
-	@Override
 	public IObservableMap observeDetail(IObservableSet master) {
 		return MasterDetailObservables.detailValues(master,
 				valueFactory(master.getRealm()), getValueType());
@@ -157,28 +147,23 @@ public abstract class ValueProperty implements IValueProperty {
 	/**
 	 * @since 1.4
 	 */
-	@Override
 	public IObservableMap observeDetail(IObservableMap master) {
 		return MasterDetailObservables.detailValues(master,
 				valueFactory(master.getRealm()), getValueType());
 	}
 
-	@Override
 	public final IValueProperty value(IValueProperty detailValue) {
 		return new ValuePropertyDetailValue(this, detailValue);
 	}
 
-	@Override
 	public final IListProperty list(IListProperty detailList) {
 		return new ValuePropertyDetailList(this, detailList);
 	}
 
-	@Override
 	public final ISetProperty set(ISetProperty detailSet) {
 		return new ValuePropertyDetailSet(this, detailSet);
 	}
 
-	@Override
 	public final IMapProperty map(IMapProperty detailMap) {
 		return new ValuePropertyDetailMap(this, detailMap);
 	}

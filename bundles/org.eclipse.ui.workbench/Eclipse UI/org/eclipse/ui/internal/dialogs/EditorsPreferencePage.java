@@ -70,8 +70,7 @@ public class EditorsPreferencePage extends PreferencePage implements
     private IntegerFieldEditor recentFilesEditor;
 
     private IPropertyChangeListener validityChangeListener = new IPropertyChangeListener() {
-        @Override
-		public void propertyChange(PropertyChangeEvent event) {
+        public void propertyChange(PropertyChangeEvent event) {
             if (event.getProperty().equals(FieldEditor.IS_VALID)) {
 				updateValidState();
 			}
@@ -82,7 +81,6 @@ public class EditorsPreferencePage extends PreferencePage implements
 
 	private Button allowInplaceEditor;
 
-	@Override
 	protected Control createContents(Composite parent) {
         Composite composite = createComposite(parent);
 
@@ -158,13 +156,11 @@ public class EditorsPreferencePage extends PreferencePage implements
         return composite;
     }
 
-    @Override
-	public void init(IWorkbench workbench) {
+    public void init(IWorkbench workbench) {
         // do nothing
     }
 
-    @Override
-	protected void performDefaults() {
+    protected void performDefaults() {
         IPreferenceStore store = getPreferenceStore();
         showMultipleEditorTabs
 				.setSelection(getAPIPreferenceStore()
@@ -195,8 +191,7 @@ public class EditorsPreferencePage extends PreferencePage implements
         recentFilesEditor.loadDefault();
     }
 
-    @Override
-	public boolean performOk() {
+    public boolean performOk() {
         IPreferenceStore store = getPreferenceStore();
         getAPIPreferenceStore().setValue(IWorkbenchPreferenceConstants.SHOW_MULTIPLE_EDITOR_TABS,
                 showMultipleEditorTabs.getSelection());
@@ -226,8 +221,7 @@ public class EditorsPreferencePage extends PreferencePage implements
      *
      * @return the preference store for this plugin
      */
-    @Override
-	protected IPreferenceStore doGetPreferenceStore() {
+    protected IPreferenceStore doGetPreferenceStore() {
         return WorkbenchPlugin.getDefault().getPreferenceStore();
     }
 
@@ -270,8 +264,7 @@ public class EditorsPreferencePage extends PreferencePage implements
         reuseEditors.setSelection(store
                 .getBoolean(IPreferenceConstants.REUSE_EDITORS_BOOLEAN));
         reuseEditors.addSelectionListener(new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 reuseEditorsThreshold
                         .getLabelControl(editorReuseThresholdGroup).setEnabled(
                                 reuseEditors.getSelection());

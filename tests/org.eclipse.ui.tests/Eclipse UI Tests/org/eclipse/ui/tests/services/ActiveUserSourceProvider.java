@@ -28,11 +28,19 @@ public class ActiveUserSourceProvider extends AbstractSourceProvider {
 
 	private String username = "guest";
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ISourceProvider#dispose()
+	 */
 	public void dispose() {
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ISourceProvider#getCurrentState()
+	 */
 	public Map getCurrentState() {
 		Map map = new HashMap();
 		map.put(PROVIDED_SOURCE_NAMES[0], username);
@@ -45,7 +53,11 @@ public class ActiveUserSourceProvider extends AbstractSourceProvider {
 				PROVIDED_SOURCE_NAMES[0], name);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ISourceProvider#getProvidedSourceNames()
+	 */
 	public String[] getProvidedSourceNames() {
 		return PROVIDED_SOURCE_NAMES;
 	}

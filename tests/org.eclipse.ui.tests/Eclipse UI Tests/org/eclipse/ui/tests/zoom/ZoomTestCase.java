@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -65,8 +65,10 @@ public class ZoomTestCase extends UITestCase {
         super(name);
     }
 
-    @Override
-	protected void doTearDown() throws Exception {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.util.UITestCase#doTearDown()
+     */
+    protected void doTearDown() throws Exception {
     	// Ensure that the model is sane
         // page.testInvariants();
         
@@ -76,8 +78,7 @@ public class ZoomTestCase extends UITestCase {
         apiStore.setValue(IWorkbenchPreferenceConstants.ENABLE_NEW_MIN_MAX, oldMinMaxState);
     }
     
-    @Override
-	protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
 		// These tests are hard-wired to the pre-3.3 zoom behaviour
 		// Run them anyway to ensure that we preserve the 3.0 mechanism
         IPreferenceStore apiStore = PrefUtil.getAPIPreferenceStore();

@@ -149,8 +149,11 @@ public class NavigationHistoryEntry {
         locationMemento = mem.getChild(IWorkbenchConstants.TAG_POSITION);
     }
 
-    @Override
-	public String toString() {
+    /*
+     * (non-Javadoc)
+     * Method declared on Object.
+     */
+    public String toString() {
         return "Input<" + editorInfo.editorInput + "> Details<" + location + ">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 

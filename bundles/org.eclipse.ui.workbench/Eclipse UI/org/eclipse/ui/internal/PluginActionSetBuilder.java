@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -55,7 +55,11 @@ public class PluginActionSetBuilder extends PluginActionBuilder {
         IWorkbenchWindow window;
 		IExtensionTracker tracker;
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.services.IDisposable#dispose()
+		 */
 		public void dispose() {
 			if (tracker != null) {
 				tracker.unregisterObject(set.getConfigElement()
@@ -113,8 +117,10 @@ public class PluginActionSetBuilder extends PluginActionBuilder {
         registerBinding(set);
     }
 
-    @Override
-	protected ActionDescriptor createActionDescriptor(
+    /* (non-Javadoc)
+     * Method declared on PluginActionBuilder.
+     */
+    protected ActionDescriptor createActionDescriptor(
             IConfigurationElement element) {
         // As of 2.1, the "pulldown" attribute was deprecated and replaced by
         // the attribute "style". See doc for more details.
@@ -141,8 +147,10 @@ public class PluginActionSetBuilder extends PluginActionBuilder {
         return desc;
     }
 
-    @Override
-	protected BasicContribution createContribution() {
+    /* (non-Javadoc)
+     * Method declared on PluginActionBuilder.
+     */
+    protected BasicContribution createContribution() {
         return new ActionSetContribution(actionSet.getDesc().getId(), window);
     }
 
@@ -323,8 +331,7 @@ public class PluginActionSetBuilder extends PluginActionBuilder {
         /**
          * This implementation inserts the group into the action set additions group.  
          */
-        @Override
-		protected void addGroup(IContributionManager mgr, String name) {
+        protected void addGroup(IContributionManager mgr, String name) {
             IContributionItem refItem = findInsertionPoint(
                     IWorkbenchActionConstants.MB_ADDITIONS, actionSetId, mgr,
                     true);
@@ -483,8 +490,10 @@ public class PluginActionSetBuilder extends PluginActionBuilder {
             return false;
         }
 
-        @Override
-		protected void insertMenuGroup(IMenuManager menu,
+        /* (non-Javadoc)
+         * Method declared on Basic Contribution.
+         */
+        protected void insertMenuGroup(IMenuManager menu,
                 AbstractGroupMarker marker) {
             if (actionSetId != null) {
                 IContributionItem[] items = menu.getItems();
@@ -561,8 +570,10 @@ public class PluginActionSetBuilder extends PluginActionBuilder {
             return adjunctActions.size() > 0;
         }
 
-        @Override
-		protected void insertAfter(IContributionManager mgr, String refId,
+        /* (non-Javadoc)
+         * Method declared on Basic Contribution.
+         */
+        protected void insertAfter(IContributionManager mgr, String refId,
                 IContributionItem item) {
             IContributionItem refItem = findInsertionPoint(refId, actionSetId,
                     mgr, true);

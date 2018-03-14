@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -82,8 +82,7 @@ public class IWorkbenchWindowActionDelegateTest extends IActionDelegateTest {
     /**
      * @see IActionDelegateTest#createActionWidget()
      */
-    @Override
-	protected Object createActionWidget() throws Throwable {
+    protected Object createActionWidget() throws Throwable {
         fPage.showActionSet("org.eclipse.ui.tests.api.MockActionSet");
         return null;
     }
@@ -91,16 +90,14 @@ public class IWorkbenchWindowActionDelegateTest extends IActionDelegateTest {
     /**
      * @see IActionDelegateTest#runAction()
      */
-    @Override
-	protected void runAction(Object widget) throws Throwable {
+    protected void runAction(Object widget) throws Throwable {
         ActionUtil.runActionWithLabel(this, fWindow, "Mock Action");
     }
 
     /**
      * @see IActionDelegateTest#fireSelection()
      */
-    @Override
-	protected void fireSelection(Object widget) throws Throwable {
+    protected void fireSelection(Object widget) throws Throwable {
         MockViewPart view = (MockViewPart) fPage.showView(MockViewPart.ID);
         view.fireSelection();
     }

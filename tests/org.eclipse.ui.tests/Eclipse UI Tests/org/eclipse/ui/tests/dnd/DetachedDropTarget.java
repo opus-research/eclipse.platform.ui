@@ -16,18 +16,21 @@ import org.eclipse.ui.internal.dnd.TestDropLocation;
 
 public class DetachedDropTarget implements TestDropLocation {
 
-    @Override
-	public String toString() {
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
         return "out of the window";
     }
 
-    @Override
-	public Point getLocation() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.dnd.TestDropLocation#getLocation()
+     */
+    public Point getLocation() {
         return new Point(0,0);
     }
 
-    @Override
-	public Shell[] getShells() {
+    public Shell[] getShells() {
         return new Shell[0];
     }
 }

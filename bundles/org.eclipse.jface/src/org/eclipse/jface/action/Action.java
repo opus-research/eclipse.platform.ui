@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,21 +23,18 @@ import org.eclipse.swt.widgets.Menu;
  * the action's semantics.
  * </p>
  */
-public abstract class Action extends AbstractAction {
+public abstract class Action extends AbstractAction implements IAction {
 
 	private static final IMenuCreator VAL_DROP_DOWN_MENU = new IMenuCreator() {
-		@Override
 		public void dispose() {
 			// do nothing
 		}
 
-		@Override
 		public Menu getMenu(Control parent) {
 			// do nothing
 			return null;
 		}
 
-		@Override
 		public Menu getMenu(Menu parent) {
 			// do nothing
 			return null;
@@ -167,8 +164,7 @@ public abstract class Action extends AbstractAction {
 	/**
 	 * Convenience method for removing any optional accelerator text from the
 	 * given string. The accelerator text appears at the end of the text, and is
-	 * separated from the main part by the last tab character <code>'\t'</code>
-	 * (or the last <code>'@'</code> if there is no tab).
+	 * separated from the main part by a single tab character <code>'\t'</code>.
 	 * 
 	 * @param text
 	 *            the text
@@ -329,17 +325,24 @@ public abstract class Action extends AbstractAction {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	public int getAccelerator() {
 		return accelerator;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 * 
+	 */
 	public String getActionDefinitionId() {
 		return actionDefinitionId;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	public String getDescription() {
 		if (description != null) {
 			return description;
@@ -347,32 +350,44 @@ public abstract class Action extends AbstractAction {
 		return getToolTipText();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	public ImageDescriptor getDisabledImageDescriptor() {
 		return disabledImage;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	public HelpListener getHelpListener() {
 		return helpListener;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	public ImageDescriptor getHoverImageDescriptor() {
 		return hoverImage;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	public String getId() {
 		return id;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	public ImageDescriptor getImageDescriptor() {
 		return image;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	public IMenuCreator getMenuCreator() {
 		// The default drop down menu value is only used
 		// to mark this action requested style. So do not
@@ -386,7 +401,9 @@ public abstract class Action extends AbstractAction {
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	public int getStyle() {
 		// Infer the style from the value field.
 		if (value == VAL_PUSH_BTN || value == null) {
@@ -406,27 +423,37 @@ public abstract class Action extends AbstractAction {
 		return AS_PUSH_BUTTON;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	public String getText() {
 		return text;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	public String getToolTipText() {
 		return toolTipText;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	public boolean isChecked() {
 		return value == VAL_TOGGLE_BTN_ON || value == VAL_RADIO_BTN_ON;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	public boolean isEnabled() {
 		return enabled;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	public boolean isHandled() {
 		return true;
 	}
@@ -453,7 +480,6 @@ public abstract class Action extends AbstractAction {
 	 * information from the triggering event, or override
 	 * <code>runWithEvent(Event)</code> if they do.
 	 */
-	@Override
 	public void run() {
 		// do nothing
 	}
@@ -468,22 +494,27 @@ public abstract class Action extends AbstractAction {
 	 *            the SWT event which triggered this action being run
 	 * @since 2.0
 	 */
-	@Override
 	public void runWithEvent(Event event) {
 		run();
 	}
 
-	@Override
+	/*
+	 * @see IAction#setAccelerator(int)
+	 */
 	public void setAccelerator(int keycode) {
 		this.accelerator = keycode;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	public void setActionDefinitionId(String id) {
 		actionDefinitionId = id;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	public void setChecked(boolean checked) {
 		Object newValue = null;
 
@@ -509,7 +540,9 @@ public abstract class Action extends AbstractAction {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	public void setDescription(String text) {
 
 		if ((description == null && text != null)
@@ -522,7 +555,9 @@ public abstract class Action extends AbstractAction {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	public void setDisabledImageDescriptor(ImageDescriptor newImage) {
 		if (disabledImage != newImage) {
 			ImageDescriptor oldImage = disabledImage;
@@ -531,7 +566,9 @@ public abstract class Action extends AbstractAction {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	public void setEnabled(boolean enabled) {
 		if (enabled != this.enabled) {
 			Boolean oldVal = this.enabled ? Boolean.TRUE : Boolean.FALSE;
@@ -541,12 +578,16 @@ public abstract class Action extends AbstractAction {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	public void setHelpListener(HelpListener listener) {
 		helpListener = listener;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	public void setHoverImageDescriptor(ImageDescriptor newImage) {
 		if (hoverImage != newImage) {
 			ImageDescriptor oldImage = hoverImage;
@@ -555,12 +596,16 @@ public abstract class Action extends AbstractAction {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	public void setId(String id) {
 		this.id = id;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	public void setImageDescriptor(ImageDescriptor newImage) {
 		if (image != newImage) {
 			ImageDescriptor oldImage = image;
@@ -578,7 +623,6 @@ public abstract class Action extends AbstractAction {
 	 * @param creator
 	 *            the menu creator, or <code>null</code> if none
 	 */
-	@Override
 	public void setMenuCreator(IMenuCreator creator) {
 		// For backward compatibility, if the style is not
 		// set yet, then convert it to a drop down menu.
@@ -592,7 +636,23 @@ public abstract class Action extends AbstractAction {
 		}
 	}
 
-	@Override
+	/**
+	 * Sets the text for this action.
+	 * <p>
+	 * Fires a property change event for the <code>TEXT</code> property if the
+	 * text actually changes as a consequence.
+	 * </p>
+	 * <p>
+	 * The accelerator is identified by the last index of a tab character. If
+	 * there are no tab characters, then it is identified by the last index of a
+	 * '@' character. If neither, then there is no accelerator text. Note that
+	 * if you want to insert a '@' character into the text (but no accelerator,
+	 * you can simply insert a '@' or a tab at the end of the text.
+	 * </p>
+	 * 
+	 * @param text
+	 *            the text, or <code>null</code> if none
+	 */
 	public void setText(String text) {
 		String oldText = this.text;
 		int oldAccel = this.accelerator;
@@ -625,7 +685,6 @@ public abstract class Action extends AbstractAction {
 	 * @param toolTipText
 	 *            the tool tip text, or <code>null</code> if none
 	 */
-	@Override
 	public void setToolTipText(String toolTipText) {
 		String oldToolTipText = this.toolTipText;
 		if (!(oldToolTipText == null ? toolTipText == null : oldToolTipText

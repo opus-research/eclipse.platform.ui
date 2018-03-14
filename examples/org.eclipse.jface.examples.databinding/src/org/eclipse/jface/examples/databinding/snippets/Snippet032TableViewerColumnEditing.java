@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 The Pampered Chef, Inc. and others.
+ * Copyright (c) 2006, 2009 The Pampered Chef, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Tom Schindl - cell editing
  *     Matthew Hall - bugs 260329, 260337
  *     Heiko Ahlig - bug 267712
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 434283
  *******************************************************************************/
 
 package org.eclipse.jface.examples.databinding.snippets;
@@ -22,6 +21,7 @@ import java.util.List;
 
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.beans.BeanProperties;
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.beans.IBeanValueProperty;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.list.WritableList;
@@ -54,7 +54,6 @@ public class Snippet032TableViewerColumnEditing {
 	public static void main(String[] args) {
 		final Display display = new Display();
 		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
-			@Override
 			public void run() {
 				ViewModel viewModel = new ViewModel();
 				Shell shell = new View(viewModel).createShell();
@@ -245,14 +244,12 @@ public class Snippet032TableViewerColumnEditing {
 			// current selection
 			IObservableValue selection = ViewersObservables
 					.observeSingleSelection(peopleViewer);
-			bindingContext.bindValue(
-					WidgetProperties.text().observe(selectedCommitterName),
-					BeanProperties.value((Class) selection.getValueType(), "name", String.class)
-					.observeDetail(selection));
-			bindingContext.bindValue(
-					WidgetProperties.text().observe(selectedCommitterFirstName),
-					BeanProperties.value((Class) selection.getValueType(), "firstName", String.class)
-					.observeDetail(selection));
+			bindingContext.bindValue(SWTObservables
+					.observeText(selectedCommitterName), BeansObservables
+					.observeDetailValue(selection, "name", String.class));
+			bindingContext.bindValue(SWTObservables
+					.observeText(selectedCommitterFirstName), BeansObservables
+					.observeDetailValue(selection, "firstName", String.class));
 		}
 	}
 }

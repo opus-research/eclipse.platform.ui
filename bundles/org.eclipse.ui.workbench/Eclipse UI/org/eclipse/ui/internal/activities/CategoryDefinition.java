@@ -98,8 +98,7 @@ public final class CategoryDefinition implements Comparable {
         this.description = description;
     }
 
-    @Override
-	public int compareTo(Object object) {
+    public int compareTo(Object object) {
         CategoryDefinition castedObject = (CategoryDefinition) object;
         int compareTo = Util.compare(id, castedObject.id);
 
@@ -114,8 +113,7 @@ public final class CategoryDefinition implements Comparable {
         return compareTo;
     }
 
-    @Override
-	public boolean equals(Object object) {
+    public boolean equals(Object object) {
         if (!(object instanceof CategoryDefinition)) {
 			return false;
 		}
@@ -144,8 +142,7 @@ public final class CategoryDefinition implements Comparable {
         return sourceId;
     }
 
-    @Override
-	public int hashCode() {
+    public int hashCode() {
         if (hashCode == HASH_INITIAL) {
             hashCode = hashCode * HASH_FACTOR + Util.hashCode(id);
             hashCode = hashCode * HASH_FACTOR + Util.hashCode(name);
@@ -158,8 +155,7 @@ public final class CategoryDefinition implements Comparable {
         return hashCode;
     }
 
-    @Override
-	public String toString() {
+    public String toString() {
         if (string == null) {
             final StringBuffer stringBuffer = new StringBuffer();
             stringBuffer.append('[');

@@ -35,7 +35,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * @since 3.2
- *
+ * 
  */
 public class Snippet033CrossValidationControlDecoration {
 	protected Shell shell;
@@ -44,7 +44,7 @@ public class Snippet033CrossValidationControlDecoration {
 
 	/**
 	 * Launch the application
-	 *
+	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -62,7 +62,6 @@ public class Snippet033CrossValidationControlDecoration {
 	public void open() {
 		final Display display = Display.getDefault();
 		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
-			@Override
 			public void run() {
 				createContents();
 				shell.pack();
@@ -114,12 +113,10 @@ public class Snippet033CrossValidationControlDecoration {
 
 		// Customize the decoration's description text and image
 		ControlDecorationUpdater decorationUpdater = new ControlDecorationUpdater() {
-			@Override
 			protected String getDescriptionText(IStatus status) {
 				return "ERROR: " + super.getDescriptionText(status);
 			}
 
-			@Override
 			protected Image getImage(IStatus status) {
 				return status.isOK() ? null : Display.getCurrent()
 						.getSystemImage(SWT.ICON_ERROR);
@@ -143,7 +140,6 @@ public class Snippet033CrossValidationControlDecoration {
 			this.errorMessage = errorMessage;
 		}
 
-		@Override
 		protected IStatus validate() {
 			Date startDate = (Date) start.getValue();
 			Date endDate = (Date) end.getValue();

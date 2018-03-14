@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2010 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,13 +32,11 @@ public class HeavyResourceView extends ViewPart {
     private Shell tempShell;
     private Composite control;
     
-    @Override
-	public void createPartControl(Composite parent) {
+    public void createPartControl(Composite parent) {
         control = parent;
         
         SelectionListener listener = new SelectionAdapter() {
-          @Override
-		public void widgetSelected(SelectionEvent e) {
+          public void widgetSelected(SelectionEvent e) {
                 super.widgetSelected(e);
                 
                 if (e.widget == useAllComposites) {
@@ -64,8 +62,7 @@ public class HeavyResourceView extends ViewPart {
            
     }
 
-    @Override
-	public void setFocus() {
+    public void setFocus() {
         control.setFocus();
     }
     
@@ -88,8 +85,7 @@ public class HeavyResourceView extends ViewPart {
         }
     }
     
-    @Override
-	public void dispose() {
+    public void dispose() {
         releaseAll();
         super.dispose();
     }

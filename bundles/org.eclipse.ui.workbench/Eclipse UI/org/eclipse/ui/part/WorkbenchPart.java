@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -61,7 +61,7 @@ public abstract class WorkbenchPart extends EventManager implements
 
     private Image titleImage;
 
-	private String toolTip = ""; //$NON-NLS-1$
+    private String toolTip = ""; //$NON-NLS-1$
 
     private IConfigurationElement configElement;
 
@@ -83,8 +83,7 @@ public abstract class WorkbenchPart extends EventManager implements
     /* (non-Javadoc)
      * Method declared on IWorkbenchPart.
      */
-    @Override
-	public void addPropertyListener(IPropertyListener l) {
+    public void addPropertyListener(IPropertyListener l) {
         addListenerObject(l);
     }
 
@@ -98,16 +97,14 @@ public abstract class WorkbenchPart extends EventManager implements
      * @param parent the parent control
      * @see IWorkbenchPart
      */
-    @Override
-	public abstract void createPartControl(Composite parent);
+    public abstract void createPartControl(Composite parent);
 
     /**
      * The <code>WorkbenchPart</code> implementation of this 
      * <code>IWorkbenchPart</code> method disposes the title image
      * loaded by <code>setInitializationData</code>. Subclasses may extend.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         if (imageDescriptor != null) {
             JFaceResources.getResources().destroyImage(imageDescriptor);
         }
@@ -143,8 +140,7 @@ public abstract class WorkbenchPart extends EventManager implements
      * should invoke the method on their superclass to ensure that the
      * Platform's adapter manager is consulted).
      */
-    @Override
-	public Object getAdapter(Class adapter) {
+    public Object getAdapter(Class adapter) {
 
         /**
          * This implementation of the method declared by <code>IAdaptable</code>
@@ -178,8 +174,7 @@ public abstract class WorkbenchPart extends EventManager implements
     /* (non-Javadoc)
      * Method declared on IWorkbenchPart.
      */
-    @Override
-	public IWorkbenchPartSite getSite() {
+    public IWorkbenchPartSite getSite() {
         return partSite;
     }
 
@@ -190,16 +185,14 @@ public abstract class WorkbenchPart extends EventManager implements
      * Parts should set their title by calling setPartName and/or setContentDescription.
      * </p>
      */
-    @Override
-	public String getTitle() {
+    public String getTitle() {
         return title;
     }
 
     /* (non-Javadoc)
      * Method declared on IWorkbenchPart.
      */
-    @Override
-	public Image getTitleImage() {
+    public Image getTitleImage() {
         if (titleImage != null) {
             return titleImage;
         }
@@ -211,16 +204,14 @@ public abstract class WorkbenchPart extends EventManager implements
      *
      * @return the tool tip text
      */
-    @Override
-	public String getTitleToolTip() {
+    public String getTitleToolTip() {
         return toolTip;
     }
 
     /* (non-Javadoc)
      * Method declared on IWorkbenchPart.
      */
-    @Override
-	public void removePropertyListener(IPropertyListener l) {
+    public void removePropertyListener(IPropertyListener l) {
         removeListenerObject(l);
     }
 
@@ -235,8 +226,7 @@ public abstract class WorkbenchPart extends EventManager implements
      *
      * @see IWorkbenchPart
      */
-    @Override
-	public abstract void setFocus();
+    public abstract void setFocus();
 
     /**
      * {@inheritDoc}
@@ -249,8 +239,7 @@ public abstract class WorkbenchPart extends EventManager implements
      * Should not be called by clients. It is called by the core plugin when creating
      * this executable extension.
      */
-    @Override
-	public void setInitializationData(IConfigurationElement cfig,
+    public void setInitializationData(IConfigurationElement cfig,
             String propertyName, Object data) {
 
         // Save config element.
@@ -311,8 +300,7 @@ public abstract class WorkbenchPart extends EventManager implements
      *
      * @param title the title, or <code>null</code> to clear
      */
-    @Deprecated
-	protected void setTitle(String title) {
+    protected void setTitle(String title) {
         title = Util.safeString(title);
 
         //Do not send changes if they are the same
@@ -377,8 +365,7 @@ public abstract class WorkbenchPart extends EventManager implements
      * Parts should call setPartName to change their part name. 
      * </p>
      */
-    @Override
-	public String getPartName() {
+    public String getPartName() {
         return partName;
     }
 
@@ -411,7 +398,7 @@ public abstract class WorkbenchPart extends EventManager implements
         if (!Util.equals(description, "")) { //$NON-NLS-1$
             newTitle = MessageFormat
                     .format(
-                            WorkbenchMessages.WorkbenchPart_AutoTitleFormat, name, description);
+                            WorkbenchMessages.WorkbenchPart_AutoTitleFormat, new String[] { name, description });
         }
 
         setTitle(newTitle);
@@ -424,8 +411,7 @@ public abstract class WorkbenchPart extends EventManager implements
      * Parts should call setContentDescription to change their content description. 
      * </p>
      */
-    @Override
-	public String getContentDescription() {
+    public String getContentDescription() {
         return contentDescription;
     }
 
@@ -488,8 +474,7 @@ public abstract class WorkbenchPart extends EventManager implements
     /* (non-Javadoc)
      * @see org.eclipse.ui.part.IWorkbenchPartOrientation#getOrientation()
      */
-    @Override
-	public int getOrientation(){
+    public int getOrientation(){
 		//By default use the orientation in Window
     	return Window.getDefaultOrientation();
     }
@@ -497,16 +482,14 @@ public abstract class WorkbenchPart extends EventManager implements
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchPart3#addPartPropertyListener(org.eclipse.jface.util.IPropertyChangeListener)
      */
-    @Override
-	public void addPartPropertyListener(IPropertyChangeListener listener) {
+    public void addPartPropertyListener(IPropertyChangeListener listener) {
     	partChangeListeners.add(listener);
     }
     
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchPart3#removePartPropertyListener(org.eclipse.jface.util.IPropertyChangeListener)
      */
-    @Override
-	public void removePartPropertyListener(IPropertyChangeListener listener) {
+    public void removePartPropertyListener(IPropertyChangeListener listener) {
     	partChangeListeners.remove(listener);
     }
     
@@ -530,8 +513,7 @@ public abstract class WorkbenchPart extends EventManager implements
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchPart3#setPartProperty(java.lang.String, java.lang.String)
      */
-    @Override
-	public void setPartProperty(String key, String value) {
+    public void setPartProperty(String key, String value) {
     	String oldValue = (String) partProperties.get(key);
     	if (value==null) {
     		partProperties.remove(key);
@@ -544,16 +526,14 @@ public abstract class WorkbenchPart extends EventManager implements
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchPart3#getPartProperty(java.lang.String)
      */
-    @Override
-	public String getPartProperty(String key) {
+    public String getPartProperty(String key) {
     	return (String)partProperties.get(key);
     }
     
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchPart3#getPartProperties()
      */
-    @Override
-	public Map getPartProperties() {
+    public Map getPartProperties() {
     	return Collections.unmodifiableMap(partProperties);
     }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Sebastian Davids <sdavids@gmx.de> - Images for menu items (27481)
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
  *******************************************************************************/
 package org.eclipse.ui.views.navigator;
 
@@ -21,7 +20,6 @@ import org.eclipse.ui.internal.views.navigator.ResourceNavigatorMessages;
  * This is the action group for the sort and filter actions.
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
-@Deprecated
 public class SortAndFilterActionGroup extends ResourceNavigatorActionGroup {
 
     private SortViewAction sortByTypeAction;
@@ -39,21 +37,19 @@ public class SortAndFilterActionGroup extends ResourceNavigatorActionGroup {
         super(navigator);
     }
 
-    @Override
-	protected void makeActions() {
+    protected void makeActions() {
         sortByNameAction = new SortViewAction(navigator, false);
         sortByTypeAction = new SortViewAction(navigator, true);
 
         filterAction = new FilterSelectionAction(navigator,
                 ResourceNavigatorMessages.ResourceNavigator_filterText);
         filterAction
-                .setDisabledImageDescriptor(getImageDescriptor("dlcl16/filter_ps.png"));//$NON-NLS-1$
+                .setDisabledImageDescriptor(getImageDescriptor("dlcl16/filter_ps.gif"));//$NON-NLS-1$
         filterAction
-                .setImageDescriptor(getImageDescriptor("elcl16/filter_ps.png"));//$NON-NLS-1$
+                .setImageDescriptor(getImageDescriptor("elcl16/filter_ps.gif"));//$NON-NLS-1$
     }
 
-    @Override
-	public void fillActionBars(IActionBars actionBars) {
+    public void fillActionBars(IActionBars actionBars) {
         IMenuManager menu = actionBars.getMenuManager();
         IMenuManager submenu = new MenuManager(ResourceNavigatorMessages.ResourceNavigator_sort);
         menu.add(submenu);
@@ -62,8 +58,7 @@ public class SortAndFilterActionGroup extends ResourceNavigatorActionGroup {
         menu.add(filterAction);
     }
 
-    @Override
-	public void updateActionBars() {
+    public void updateActionBars() {
         int criteria = navigator.getComparator().getCriteria();
         sortByNameAction.setChecked(criteria == ResourceComparator.NAME);
         sortByTypeAction.setChecked(criteria == ResourceComparator.TYPE);

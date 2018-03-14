@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2013 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -51,7 +51,6 @@ public class MenusTest extends UITestCase {
 			super(location, namespace);
 		}
 
-		@Override
 		public void createContributionItems(IServiceLocator serviceLocator,
 				IContributionRoot additions) {
 			fooItemWithNoVisibilityClause = new CommandContributionItem(
@@ -87,17 +86,25 @@ public class MenusTest extends UITestCase {
 		super(testName);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
+	 */
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		window = openTestWindow();
 		enabledActivities = window.getWorkbench().getActivitySupport()
 				.getActivityManager().getEnabledActivityIds();
-		service = window.getService(IMenuService.class);
+		service = (IMenuService) window.getService(IMenuService.class);
 		assertNotNull(service);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doTearDown()
+	 */
 	protected void doTearDown() throws Exception {
 		window.getWorkbench().getActivitySupport().setEnabledActivityIds(
 				enabledActivities);
@@ -131,7 +138,7 @@ public class MenusTest extends UITestCase {
 		
 	}
 
-	public void XXXtestMenuVisibilityWithCustomFactory() {
+	public void testMenuVisibilityWithCustomFactory() {
 		window.getWorkbench().getActivitySupport().setEnabledActivityIds(
 				Collections.singleton("menuTest1")); // enable the foo
 														// activity		

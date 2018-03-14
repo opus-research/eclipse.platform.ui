@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,9 +7,10 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 433603
  *******************************************************************************/
 package org.eclipse.ui.tests.dialogs;
+
+import java.io.IOException;
 
 import junit.framework.TestCase;
 
@@ -157,7 +158,7 @@ public class UIDialogs extends TestCase {
     }
     
     // see bug 211350
-	public void testLoadNotExistingPerspective() {
+    public void testLoadNotExistingPerspective() throws IOException{
     	fail("PerspectiveRegistry.getCustomPersp not implemented");
 //    	final String fakePerspectivID = "fakeperspetive";
 //		PerspectiveRegistry reg = (PerspectiveRegistry) WorkbenchPlugin

@@ -1,14 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2013, 2014 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431667, 440893
- *******************************************************************************/
 package org.eclipse.e4.core.commands.tests;
 
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
@@ -38,7 +27,7 @@ public class TestActivator implements BundleActivator {
 	}
 
 	private void addLogService(IEclipseContext context) {
-		context.set(LogService.class, new LogService() {
+		context.set(LogService.class.getName(), new LogService() {
 
 			public void log(int level, String message) {
 				System.out.println(level + ": " + message);
@@ -74,7 +63,7 @@ public class TestActivator implements BundleActivator {
 	}
 
 	public PackageAdmin getBundleAdmin() {
-		return serviceContext.get(PackageAdmin.class);
+		return (PackageAdmin) serviceContext.get(PackageAdmin.class.getName());
 	}
 
 	public Bundle getBundleForName(String bundleName) {

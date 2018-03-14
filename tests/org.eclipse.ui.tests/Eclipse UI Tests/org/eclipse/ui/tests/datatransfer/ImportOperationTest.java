@@ -65,15 +65,13 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
     /*
      * @see IOverwriteQuery#queryOverwrite(String)
      */
-    @Override
-	public String queryOverwrite(String pathString) {
+    public String queryOverwrite(String pathString) {
         //Always return an empty String - we aren't
         //doing anything interesting
         return "";
     }
 
-    @Override
-	protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         super.doSetUp();
         Class testClass = Class
                 .forName("org.eclipse.ui.tests.datatransfer.ImportOperationTest");
@@ -101,8 +99,7 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
      * Tear down. Delete the project we created and all of the
      * files on the file system.
      */
-    @Override
-	protected void doTearDown() throws Exception {
+    protected void doTearDown() throws Exception {
         super.doTearDown();
         try {
             project.delete(true, true, null);

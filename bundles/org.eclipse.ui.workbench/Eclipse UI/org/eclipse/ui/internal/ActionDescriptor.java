@@ -337,8 +337,7 @@ public class ActionDescriptor implements IPluginContribution {
     /**
      * For debugging only.
      */
-    @Override
-	public String toString() {
+    public String toString() {
         return "ActionDescriptor(" + id + ")";//$NON-NLS-2$//$NON-NLS-1$
     }
 
@@ -366,13 +365,17 @@ public class ActionDescriptor implements IPluginContribution {
 		}
     }
 
-    @Override
-	public String getLocalId() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IPluginContribution#getLocalId()
+     */
+    public String getLocalId() {
         return getId();
     }
 
-    @Override
-	public String getPluginId() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IPluginContribution#getPluginId()
+     */
+    public String getPluginId() {
         return pluginId;
     }
     

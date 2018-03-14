@@ -117,8 +117,10 @@ public class LazySortedCollectionTest extends TestCase {
         }
     }
     
-    @Override
-	protected void setUp() throws Exception {
+    /* (non-Javadoc)
+     * @see junit.framework.TestCase#setUp()
+     */
+    protected void setUp() throws Exception {
         System.out.println("--- " + getName());
         
         comparator = new TestComparator();
@@ -134,8 +136,10 @@ public class LazySortedCollectionTest extends TestCase {
         super.setUp();
     }
     
-    @Override
-	protected void tearDown() throws Exception {
+    /* (non-Javadoc)
+     * @see junit.framework.TestCase#tearDown()
+     */
+    protected void tearDown() throws Exception {
         System.out.println("Comparisons required by lazy collection: " + comparator.comparisons);
         System.out.println("Comparisons required by reference implementation: " + comparisonComparator.comparisons);
         System.out.println("");

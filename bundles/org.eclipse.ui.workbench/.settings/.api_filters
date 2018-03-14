@@ -1,114 +1,203 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<component id="org.eclipse.ui.workbench" version="2">
-    <resource path="Eclipse UI/org/eclipse/ui/IWorkbenchPreferenceConstants.java" type="org.eclipse.ui.IWorkbenchPreferenceConstants">
-        <filter id="405864542">
+<?xml version="1.0" encoding="UTF-8"?><component id="org.eclipse.ui.workbench" version="2">
+    <resource path="Eclipse UI/org/eclipse/ui/IMemento.java" type="org.eclipse.ui.IMemento">
+        <filter id="1209008130">
             <message_arguments>
-                <message_argument value="org.eclipse.ui.IWorkbenchPreferenceConstants"/>
-                <message_argument value="PRESENTATION_FACTORY_ID"/>
+                <message_argument value="3.8"/>
+                <message_argument value="3.103"/>
+                <message_argument value="getChildren()"/>
             </message_arguments>
         </filter>
     </resource>
-    <resource path="Eclipse UI/org/eclipse/ui/application/IWorkbenchWindowConfigurer.java" type="org.eclipse.ui.application.IWorkbenchWindowConfigurer">
-        <filter id="405901410">
+    <resource path="Eclipse UI/org/eclipse/ui/IWorkbenchPage.java" type="org.eclipse.ui.IWorkbenchPage">
+        <filter id="1210056707">
             <message_arguments>
-                <message_argument value="org.eclipse.ui.application.IWorkbenchWindowConfigurer"/>
-                <message_argument value="getPresentationFactory()"/>
+                <message_argument value="3.8.2"/>
+                <message_argument value="getEditorState(IEditorReference[])"/>
             </message_arguments>
         </filter>
-        <filter id="405901410">
+        <filter comment="Packported API to 3.8.2 from 4.2.2" id="1210056707">
             <message_arguments>
-                <message_argument value="org.eclipse.ui.application.IWorkbenchWindowConfigurer"/>
-                <message_argument value="setPresentationFactory(AbstractPresentationFactory)"/>
+                <message_argument value="3.8.2"/>
+                <message_argument value="getEditorState(IEditorReference[], boolean)"/>
+            </message_arguments>
+        </filter>
+        <filter id="1210056707">
+            <message_arguments>
+                <message_argument value="3.8.2"/>
+                <message_argument value="openEditors(IEditorInput[], String[], IMemento[], int)"/>
+            </message_arguments>
+        </filter>
+        <filter comment="Packported API to 3.8.2 from 4.2.2" id="1210056707">
+            <message_arguments>
+                <message_argument value="3.8.2"/>
+                <message_argument value="openEditors(IEditorInput[], String[], IMemento[], int, int)"/>
             </message_arguments>
         </filter>
     </resource>
-    <resource path="Eclipse UI/org/eclipse/ui/dialogs/EditorSelectionDialog.java" type="org.eclipse.ui.dialogs.EditorSelectionDialog">
-        <filter id="1192230914">
+    <resource path="Eclipse UI/org/eclipse/ui/IWorkingSetManager.java" type="org.eclipse.ui.IWorkingSetManager">
+        <filter id="1209008130">
             <message_arguments>
                 <message_argument value="3.7"/>
-                <message_argument value="3.107"/>
-                <message_argument value="STORE_ID_INTERNAL_EXTERNAL"/>
+                <message_argument value="3.103"/>
+                <message_argument value="getRecentWorkingSetsLength()"/>
+            </message_arguments>
+        </filter>
+        <filter id="1209008130">
+            <message_arguments>
+                <message_argument value="3.7"/>
+                <message_argument value="3.103"/>
+                <message_argument value="setRecentWorkingSetsLength(int)"/>
             </message_arguments>
         </filter>
     </resource>
-    <resource path="Eclipse UI/org/eclipse/ui/internal/themes/WorkbenchThemeManager.java" type="org.eclipse.ui.internal.themes.WorkbenchThemeManager">
-        <filter id="640712815">
+    <resource path="Eclipse UI/org/eclipse/ui/XMLMemento.java" type="org.eclipse.ui.XMLMemento">
+        <filter id="1143996420">
             <message_arguments>
-                <message_argument value="IStylingEngine"/>
-                <message_argument value="WorkbenchThemeManager"/>
-                <message_argument value="style(Object)"/>
+                <message_argument value="getChildren()"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="Eclipse UI/org/eclipse/ui/branding/IBundleGroupConstants.java" type="org.eclipse.ui.branding.IBundleGroupConstants">
+        <filter id="403767336">
+            <message_arguments>
+                <message_argument value="org.eclipse.ui.branding.IBundleGroupConstants"/>
+                <message_argument value="BRANDING_BUNDLE_ID"/>
+            </message_arguments>
+        </filter>
+        <filter id="403767336">
+            <message_arguments>
+                <message_argument value="org.eclipse.ui.branding.IBundleGroupConstants"/>
+                <message_argument value="BRANDING_BUNDLE_VERSION"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="Eclipse UI/org/eclipse/ui/dialogs/AbstractElementListSelectionDialog.java" type="org.eclipse.ui.dialogs.AbstractElementListSelectionDialog">
+        <filter id="1141899266">
+            <message_arguments>
+                <message_argument value="3.8"/>
+                <message_argument value="3.103"/>
+                <message_argument value="handleElementsChanged()"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="Eclipse UI/org/eclipse/ui/dialogs/PatternFilter.java" type="org.eclipse.ui.dialogs.PatternFilter">
+        <filter comment="Reverting temporary change for bug 186404" id="338792546">
+            <message_arguments>
+                <message_argument value="org.eclipse.ui.dialogs.PatternFilter"/>
+                <message_argument value="doFilter(Viewer, Object, Object[])"/>
+            </message_arguments>
+        </filter>
+        <filter comment="Reverting temporary change for bug 186404" id="388018290">
+            <message_arguments>
+                <message_argument value="org.eclipse.ui.dialogs.PatternFilter"/>
+                <message_argument value="foundAnyCache"/>
+            </message_arguments>
+        </filter>
+        <filter comment="Reverting temporary change for bug 186404" id="388018290">
+            <message_arguments>
+                <message_argument value="org.eclipse.ui.dialogs.PatternFilter"/>
+                <message_argument value="useCache"/>
+            </message_arguments>
+        </filter>
+        <filter comment="Reverting temporary change for bug 186404" id="421654647">
+            <message_arguments>
+                <message_argument value="org.eclipse.ui.dialogs.PatternFilter"/>
+                <message_argument value="select(Viewer, Object, Object)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="Eclipse UI/org/eclipse/ui/menus/CommandContributionItemParameter.java" type="org.eclipse.ui.menus.CommandContributionItemParameter">
+        <filter id="338948223">
+            <message_arguments>
+                <message_argument value="org.eclipse.ui.menus.CommandContributionItemParameter"/>
+                <message_argument value="CommandContributionItemParameter(IServiceLocator, String, String, Map, ImageDescriptor, ImageDescriptor, ImageDescriptor, String, String, String, int, String, boolean)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="Eclipse UI/org/eclipse/ui/menus/MenuUtil.java" type="org.eclipse.ui.menus.MenuUtil">
+        <filter id="336744520">
+            <message_arguments>
+                <message_argument value="org.eclipse.ui.menus.MenuUtil"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="Eclipse UI/org/eclipse/ui/part/AbstractMultiEditor.java" type="org.eclipse.ui.part.AbstractMultiEditor">
+        <filter id="338944126">
+            <message_arguments>
+                <message_argument value="org.eclipse.ui.part.AbstractMultiEditor"/>
+                <message_argument value="setChildren(IEditorPart[])"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="Eclipse UI/org/eclipse/ui/part/MultiPageEditorPart.java" type="org.eclipse.ui.part.MultiPageEditorPart">
+        <filter id="420630660">
+            <message_arguments>
+                <message_argument value="org.eclipse.ui.part.MultiPageEditorPart"/>
+                <message_argument value="getActiveEditor()"/>
+            </message_arguments>
+        </filter>
+        <filter id="420630660">
+            <message_arguments>
+                <message_argument value="org.eclipse.ui.part.MultiPageEditorPart"/>
+                <message_argument value="getActivePage()"/>
+            </message_arguments>
+        </filter>
+        <filter id="421679236">
+            <message_arguments>
+                <message_argument value="org.eclipse.ui.part.MultiPageEditorPart"/>
+                <message_argument value="getActiveEditor()"/>
+            </message_arguments>
+        </filter>
+        <filter id="421679236">
+            <message_arguments>
+                <message_argument value="org.eclipse.ui.part.MultiPageEditorPart"/>
+                <message_argument value="getActivePage()"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="Eclipse UI/org/eclipse/ui/presentations/PresentationUtil.java" type="org.eclipse.ui.presentations.PresentationUtil">
+        <filter id="1108344834">
+            <message_arguments>
+                <message_argument value="3.0"/>
+                <message_argument value="3.103"/>
+                <message_argument value="org.eclipse.ui.presentations.PresentationUtil"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="Eclipse UI/org/eclipse/ui/progress/IProgressConstants.java" type="org.eclipse.ui.progress.IProgressConstants">
+        <filter id="403767336">
+            <message_arguments>
+                <message_argument value="org.eclipse.ui.progress.IProgressConstants"/>
+                <message_argument value="COMMAND_PROPERTY"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="Eclipse UI/org/eclipse/ui/services/IEvaluationReference.java" type="org.eclipse.ui.services.IEvaluationReference">
+        <filter id="403853384">
+            <message_arguments>
+                <message_argument value="org.eclipse.ui.services.IEvaluationReference"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="Eclipse UI/org/eclipse/ui/services/IServiceScopes.java" type="org.eclipse.ui.services.IServiceScopes">
+        <filter id="403853384">
+            <message_arguments>
+                <message_argument value="org.eclipse.ui.services.IServiceScopes"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="Eclipse UI/org/eclipse/ui/statushandlers/WorkbenchStatusDialogManager.java" type="org.eclipse.ui.statushandlers.WorkbenchStatusDialogManager">
+        <filter id="336744520">
+            <message_arguments>
+                <message_argument value="org.eclipse.ui.statushandlers.WorkbenchStatusDialogManager"/>
             </message_arguments>
         </filter>
     </resource>
     <resource path="META-INF/MANIFEST.MF">
         <filter id="923795461">
             <message_arguments>
-                <message_argument value="3.107.0"/>
-                <message_argument value="3.106.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="META-INF/MANIFEST.MF" type="org.eclipse.ui.presentations.AbstractPresentationFactory">
-        <filter id="305324134">
-            <message_arguments>
-                <message_argument value="org.eclipse.ui.presentations.AbstractPresentationFactory"/>
-                <message_argument value="org.eclipse.ui.workbench_3.107.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="META-INF/MANIFEST.MF" type="org.eclipse.ui.presentations.IPartMenu">
-        <filter id="305324134">
-            <message_arguments>
-                <message_argument value="org.eclipse.ui.presentations.IPartMenu"/>
-                <message_argument value="org.eclipse.ui.workbench_3.107.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="META-INF/MANIFEST.MF" type="org.eclipse.ui.presentations.IPresentablePart">
-        <filter id="305324134">
-            <message_arguments>
-                <message_argument value="org.eclipse.ui.presentations.IPresentablePart"/>
-                <message_argument value="org.eclipse.ui.workbench_3.107.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="META-INF/MANIFEST.MF" type="org.eclipse.ui.presentations.IPresentationSerializer">
-        <filter id="305324134">
-            <message_arguments>
-                <message_argument value="org.eclipse.ui.presentations.IPresentationSerializer"/>
-                <message_argument value="org.eclipse.ui.workbench_3.107.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="META-INF/MANIFEST.MF" type="org.eclipse.ui.presentations.IStackPresentationSite">
-        <filter id="305324134">
-            <message_arguments>
-                <message_argument value="org.eclipse.ui.presentations.IStackPresentationSite"/>
-                <message_argument value="org.eclipse.ui.workbench_3.107.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="META-INF/MANIFEST.MF" type="org.eclipse.ui.presentations.PresentationUtil">
-        <filter id="305324134">
-            <message_arguments>
-                <message_argument value="org.eclipse.ui.presentations.PresentationUtil"/>
-                <message_argument value="org.eclipse.ui.workbench_3.107.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="META-INF/MANIFEST.MF" type="org.eclipse.ui.presentations.StackDropResult">
-        <filter id="305324134">
-            <message_arguments>
-                <message_argument value="org.eclipse.ui.presentations.StackDropResult"/>
-                <message_argument value="org.eclipse.ui.workbench_3.107.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="META-INF/MANIFEST.MF" type="org.eclipse.ui.presentations.StackPresentation">
-        <filter id="305324134">
-            <message_arguments>
-                <message_argument value="org.eclipse.ui.presentations.StackPresentation"/>
-                <message_argument value="org.eclipse.ui.workbench_3.107.0"/>
+                <message_argument value="3.6.0.qualifier"/>
+                <message_argument value="3.5.0.I20090603-2000"/>
             </message_arguments>
         </filter>
     </resource>

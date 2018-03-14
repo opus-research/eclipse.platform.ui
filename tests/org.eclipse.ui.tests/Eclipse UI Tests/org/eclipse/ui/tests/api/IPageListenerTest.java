@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,15 +35,13 @@ public class IPageListenerTest extends UITestCase implements IPageListener {
         super(testName);
     }
 
-    @Override
-	protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         super.doSetUp();
         fWindow = openTestWindow();
         fWindow.addPageListener(this);
     }
 
-    @Override
-	protected void doTearDown() throws Exception {
+    protected void doTearDown() throws Exception {
         fWindow.removePageListener(this);
         super.doTearDown();
     }
@@ -128,8 +126,7 @@ public class IPageListenerTest extends UITestCase implements IPageListener {
     /**
      * @see IPageListener#pageActivated(IWorkbenchPage)
      */
-    @Override
-	public void pageActivated(IWorkbenchPage page) {
+    public void pageActivated(IWorkbenchPage page) {
         if (pageMask == null || page == pageMask)
             eventsReceived = eventsReceived | ACTIVATE;
     }
@@ -137,8 +134,7 @@ public class IPageListenerTest extends UITestCase implements IPageListener {
     /**
      * @see IPageListener#pageClosed(IWorkbenchPage)
      */
-    @Override
-	public void pageClosed(IWorkbenchPage page) {
+    public void pageClosed(IWorkbenchPage page) {
         if (pageMask == null || page == pageMask)
         	eventsReceived = eventsReceived | CLOSE;
     }
@@ -146,8 +142,7 @@ public class IPageListenerTest extends UITestCase implements IPageListener {
     /**
      * @see IPageListener#pageOpened(IWorkbenchPage)
      */
-    @Override
-	public void pageOpened(IWorkbenchPage page) {
+    public void pageOpened(IWorkbenchPage page) {
         if (pageMask == null || page == pageMask)
             eventsReceived |= OPEN;
     }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Martin Boyle <martingboyle@gmail.com> - Fix for 
  *     		Bug 183013 [Wizards] Error importing into linked EFS folder - "undefined path variable"
- *     Marc-Andre Laperle (Ericsson) - Bug 279902 - [Import/Export] WizardResourceImportPage.createDestinationGroup is final
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -25,9 +24,6 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.equinox.bidi.StructuredTextTypeHandlerFactory;
-import org.eclipse.jface.util.BidiUtils;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -42,11 +38,11 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
-import org.eclipse.ui.ide.dialogs.IElementFilter;
-import org.eclipse.ui.ide.dialogs.ResourceTreeAndListGroup;
 import org.eclipse.ui.internal.ide.DialogUtil;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
+import org.eclipse.ui.internal.ide.dialogs.IElementFilter;
+import org.eclipse.ui.internal.ide.dialogs.ResourceTreeAndListGroup;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.model.WorkbenchViewerComparator;
 
@@ -91,8 +87,6 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
     /**
 	 * The <code>selectionGroup</code> field should have been created with a
 	 * private modifier. Subclasses should not access this field directly.
-	 * 
-	 * @noreference This field is not intended to be referenced by clients.
 	 */
     protected ResourceTreeAndListGroup selectionGroup;
 
@@ -145,16 +139,14 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
      * <code>WizardDataTransferPage</code> method returns <code>true</code>. 
      * Subclasses may override this method.
      */
-    @Override
-	protected boolean allowNewContainerName() {
+    protected boolean allowNewContainerName() {
         return true;
     }
 
     /** (non-Javadoc)
      * Method declared on IDialogPage.
      */
-    @Override
-	public void createControl(Composite parent) {
+    public void createControl(Composite parent) {
 
         initializeDialogUnits(parent);
 
@@ -184,7 +176,7 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
      *
      * @param parent the parent control
      */
-    protected void createDestinationGroup(Composite parent) {
+    protected final void createDestinationGroup(Composite parent) {
         // container specification group
         Composite containerGroup = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout();
@@ -201,8 +193,6 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
 
         // container name entry field
         containerNameField = new Text(containerGroup, SWT.SINGLE | SWT.BORDER);
-        BidiUtils.applyBidiProcessing(containerNameField, StructuredTextTypeHandlerFactory.FILE);
-
         containerNameField.addListener(SWT.Modify, this);
         GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL
                 | GridData.GRAB_HORIZONTAL);
@@ -235,8 +225,7 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
                 DialogUtil.inRegularFontMode(parent));
 
         ICheckStateListener listener = new ICheckStateListener() {
-            @Override
-			public void checkStateChanged(CheckStateChangedEvent event) {
+            public void checkStateChanged(CheckStateChangedEvent event) {
                 updateWidgetEnablements();
             }
         };
@@ -261,8 +250,7 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
     /*
      * @see WizardDataTransferPage.getErrorDialogTitle()
      */
-    @Override
-	protected String getErrorDialogTitle() {
+    protected String getErrorDialogTitle() {
         return IDEWorkbenchMessages.WizardImportPage_errorDialogTitle;
     }
 
@@ -313,15 +301,7 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
      * @return IPath
      */
     protected IPath getResourcePath() {
-        if (this.containerNameField != null) {
-            return getPathFromText(this.containerNameField);
-        }
-
-        if (this.initialContainerFieldValue != null && this.initialContainerFieldValue.length() > 0) {
-            return new Path(this.initialContainerFieldValue).makeAbsolute();
-        }
-
-        return Path.EMPTY;
+        return getPathFromText(this.containerNameField);
     }
 
     /**
@@ -339,20 +319,10 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
     /**
      * Returns this page's list of currently-specified resources to be 
      * imported filtered by the IElementFilter.
-     * @since 3.10
+     *
      */
-    protected void getSelectedResources(IElementFilter filter, IProgressMonitor monitor) throws InterruptedException {
-        this.selectionGroup.getAllCheckedListItems(filter, monitor);
-    }
-
-    /**
-     * <bold>DO NOT USE THIS METHOD</bold>
-     * Returns this page's list of currently-specified resources to be 
-     * imported filtered by the IElementFilter.
-     * @deprecated Should use the API {@link IElementFilter}
-     */
-    @Deprecated
-	protected void getSelectedResources(org.eclipse.ui.internal.ide.dialogs.IElementFilter filter, IProgressMonitor monitor) throws InterruptedException {
+    protected void getSelectedResources(IElementFilter filter,
+            IProgressMonitor monitor) throws InterruptedException {
         this.selectionGroup.getAllCheckedListItems(filter, monitor);
     }
 
@@ -411,8 +381,7 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
      * on this page. Subclasses may extend.
      * @param event Event
      */
-    @Override
-	public void handleEvent(Event event) {
+    public void handleEvent(Event event) {
         Widget source = event.widget;
 
         if (source == containerBrowseButton) {
@@ -493,8 +462,7 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
     protected void updateSelections(final Map map) {
 
         Runnable runnable = new Runnable() {
-            @Override
-			public void run() {
+            public void run() {
                 selectionGroup.updateSelections(map);
             }
         };
@@ -505,8 +473,7 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
     /**
      * Check if widgets are enabled or disabled by a change in the dialog.
      */
-    @Override
-	protected void updateWidgetEnablements() {
+    protected void updateWidgetEnablements() {
 
         boolean pageComplete = determinePageCompletion();
         setPageComplete(pageComplete);
@@ -519,8 +486,7 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
     /* (non-Javadoc)
      * Method declared on WizardDataTransferPage.
      */
-    @Override
-	protected final boolean validateDestinationGroup() {
+    protected final boolean validateDestinationGroup() {
 
         IPath containerPath = getContainerFullPath();
         if (containerPath == null) {
@@ -598,8 +564,7 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
     /*
      * @see WizardDataTransferPage.determinePageCompletion.
      */
-    @Override
-	protected boolean determinePageCompletion() {
+    protected boolean determinePageCompletion() {
         //Check for valid projects before making the user do anything 
         if (noOpenProjects()) {
             setErrorMessage(IDEWorkbenchMessages.WizardImportPage_noOpenProjects);

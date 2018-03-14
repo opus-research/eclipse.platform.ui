@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 Angelo Zerr and others.
+ * Copyright (c) 2008, 2010 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -47,9 +47,8 @@ public class GradientBackgroundListener implements Listener {
 	private final Control control;
 	private boolean radialGradient;
 	Image gradientImage;
-
+	
 	private DisposeListener disposeListener = new DisposeListener() {
-		@Override
 		public void widgetDisposed(DisposeEvent e) {
 			dispose();
 		}
@@ -60,11 +59,12 @@ public class GradientBackgroundListener implements Listener {
 		// java.awt.RadialGradientPaint that is only available in Java 6 and
 		// higher. Since the BREE is set to J2SE-1.5, reflection is used.
 		try {
-			Class.forName("java.awt.RadialGradientPaint"); //$NON-NLS-1$
+			Class<?> radialGradientPaintClass = Class
+					.forName("java.awt.RadialGradientPaint"); //$NON-NLS-1$
 			isRadialSupported = true;
 		} catch (Exception e) {
-			//			System.err
-			//					.println("Warning - radial gradients are only supported in Java 6 and higher, using linear gradient instead"); //$NON-NLS-1$
+//			System.err
+//					.println("Warning - radial gradients are only supported in Java 6 and higher, using linear gradient instead"); //$NON-NLS-1$
 			isRadialSupported = false;
 		}
 
@@ -111,30 +111,29 @@ public class GradientBackgroundListener implements Listener {
 		}
 	}
 
-	@Override
 	public void handleEvent(Event event) {
 		Point size = control.getSize();
 		if (size.x <= 0 || size.y <= 0) {
 			return;
 		}
-
+		
 		// hold onto our old image for disposal, if necessary
 		Image oldImage = control.getBackgroundImage();
 		if(oldImage != gradientImage) {
 			oldImage = null;
 		}
-
+		
 		/*
 		 * Draw the new background.  Radial backgrounds have to be generated
 		 * for the full size of the control's size; linear backgrounds are
-		 * just a slice for the control's height that is then repeated.
+		 * just a slice for the control's height that is then repeated. 
 		 */
 
 		// If Java 5 or lower is used, radial gradients are not supported yet
 		// and they will be replaced by linear gradients
 		if (grad.isRadial() && isRadialSupported) {
 			List<java.awt.Color> colors = new ArrayList<java.awt.Color>();
-			for (Iterator<?> iterator = grad.getRGBs().iterator(); iterator
+			for (Iterator iterator = grad.getRGBs().iterator(); iterator
 					.hasNext();) {
 				RGB rgb = (RGB) iterator.next();
 				java.awt.Color color = new java.awt.Color(rgb.red, rgb.green,
@@ -160,7 +159,7 @@ public class GradientBackgroundListener implements Listener {
 			gradientImage = new Image(control.getDisplay(), x, y);
 			GC gc = new GC(gradientImage);
 			List<Color> colors = new ArrayList<Color>();
-			for (Iterator<?> iterator = grad.getRGBs().iterator(); iterator
+			for (Iterator iterator = grad.getRGBs().iterator(); iterator
 					.hasNext();) {
 				RGB rgb = (RGB) iterator.next();
 				Color color = new Color(control.getDisplay(), rgb.red,
@@ -170,7 +169,9 @@ public class GradientBackgroundListener implements Listener {
 			fillGradient(gc, new Rectangle(0, 0, x, y), colors,
 					CSSSWTColorHelper.getPercents(grad), grad.getVerticalGradient());
 			gc.dispose();
-			for (Color c : colors) {
+			for (Iterator<Color> iterator = colors.iterator(); iterator
+					.hasNext();) {
+				Color c = iterator.next();
 				c.dispose(); // Dispose colors too.
 			}
 		}
@@ -185,9 +186,9 @@ public class GradientBackgroundListener implements Listener {
 	/*
 	 * Fills a gradient rectangle in the specified gc with the specified colors
 	 * and percentages.
-	 *
+	 * 
 	 * @param gc @param rect @param gradientColors @param gradientPercents
-	 *
+	 * 
 	 * @param gradientVertical
 	 */
 	private static void fillGradient(GC gc, Rectangle rect,
@@ -240,7 +241,7 @@ public class GradientBackgroundListener implements Listener {
 	/**
 	 * Returns a BufferedImage that renders a radial gradient. This is a
 	 * workaround since SWT does not support radial gradients yet.
-	 *
+	 * 
 	 * @param width
 	 *            image width
 	 * @param height
@@ -276,7 +277,7 @@ public class GradientBackgroundListener implements Listener {
 			int i;
 			for (i = 0; i < classes.length; i++) {
 				if ("java.awt.MultipleGradientPaint.CycleMethod" //$NON-NLS-1$
-						.equals(classes[i].getCanonicalName())) {
+				.equals(classes[i].getCanonicalName())) {
 					break;
 				}
 			}
@@ -292,7 +293,7 @@ public class GradientBackgroundListener implements Listener {
 			g2.setPaint((java.awt.Paint) radialGradientPaint);
 		} catch (Exception e) {
 			System.err
-			.println("Warning - radial gradients are only supported in Java 6 and higher, using flat background color instead"); //$NON-NLS-1$
+					.println("Warning - radial gradients are only supported in Java 6 and higher, using flat background color instead"); //$NON-NLS-1$
 			g2.setColor(colorArray[0]);
 		}
 
@@ -303,7 +304,7 @@ public class GradientBackgroundListener implements Listener {
 	/**
 	 * Converts a AWT BufferedImage to an SWT ImageData. This is a workaround
 	 * since SWT does not support radial gradients yet.
-	 *
+	 * 
 	 * @param bufferedImage
 	 *            the source AWT BufferedImage
 	 * @return the converted SWT ImageData

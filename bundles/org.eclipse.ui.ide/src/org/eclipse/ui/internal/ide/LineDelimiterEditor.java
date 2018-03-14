@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2012 IBM Corporation and others.
+ * Copyright (c) 2005, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,6 @@ import java.util.Set;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -98,7 +97,6 @@ public class LineDelimiterEditor {
 		group.setFont(font);
 
 		SelectionAdapter buttonListener = new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (e.widget.equals(defaultButton)) {
 					updateState(true);
@@ -159,9 +157,6 @@ public class LineDelimiterEditor {
 		String value = null;
 		if (project != null) {
 			value = getStoredValue(getPreferences(null));
-		}
-		if (value == null) {
-			value = getStoredValue(Platform.getPreferencesService().getRootNode().node(DefaultScope.SCOPE));
 		}
 		return value != null ? value : System.getProperty(Platform.PREF_LINE_SEPARATOR);
 	}

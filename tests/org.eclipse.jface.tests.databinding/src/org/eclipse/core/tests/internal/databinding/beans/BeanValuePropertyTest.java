@@ -34,7 +34,6 @@ public class BeanValuePropertyTest extends AbstractDefaultRealmTestCase {
 		class Listener implements IValueChangeListener {
 			private int count = 0;
 
-			@Override
 			public void handleValueChange(ValueChangeEvent event) {
 				count++;
 			}

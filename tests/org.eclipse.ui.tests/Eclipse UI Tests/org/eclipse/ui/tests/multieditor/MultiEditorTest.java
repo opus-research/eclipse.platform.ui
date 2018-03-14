@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -559,7 +559,6 @@ public class MultiEditorTest extends UITestCase {
 	/**
 	 * Close any editors at the beginner of a test, so the test can be clean.
 	 */
-	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		IWorkbenchPage page = fWorkbench.getActiveWorkbenchWindow()
@@ -580,7 +579,6 @@ public class MultiEditorTest extends UITestCase {
 
 		public ArrayList messages = new ArrayList();
 
-		@Override
 		public void logging(IStatus status, String plugin) {
 			String msg = status.getMessage();
 			Throwable ex = status.getException();

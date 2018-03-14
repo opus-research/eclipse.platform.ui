@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Gunnar Wagenknecht - fix for bug 21756 [PropertiesView] property view sorting
- *     Kevin Milburn - [Bug 423214] [PropertiesView] add support for IColorProvider and IFontProvider
  *******************************************************************************/
 
 package org.eclipse.ui.views.properties;
@@ -22,11 +21,7 @@ import java.util.Map;
 import org.eclipse.core.commands.common.EventManager;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ICellEditorListener;
-import org.eclipse.jface.viewers.IColorProvider;
-import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.internal.views.ViewsPlugin;
@@ -89,7 +84,6 @@ public class PropertySheetEntry extends EventManager implements
 	 * changes in the CellEditor, and cancel and finish requests.
 	 */
 	private ICellEditorListener cellEditorListener = new ICellEditorListener() {
-		@Override
 		public void editorValueChanged(boolean oldValidState,
 				boolean newValidState) {
 			if (!newValidState) {
@@ -101,24 +95,26 @@ public class PropertySheetEntry extends EventManager implements
 			}
 		}
 
-		@Override
 		public void cancelEditor() {
 			setErrorText(null);
 		}
 
-		@Override
 		public void applyEditorValue() {
 			PropertySheetEntry.this.applyEditorValue();
 		}
 	};
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public void addPropertySheetEntryListener(
 			IPropertySheetEntryListener listener) {
 		addListenerObject(listener);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public void applyEditorValue() {
 		if (editor == null) {
 			return;
@@ -271,7 +267,9 @@ public class PropertySheetEntry extends EventManager implements
 		return new PropertySheetEntry();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public void dispose() {
 		if (editor != null) {
 			editor.dispose();
@@ -328,12 +326,16 @@ public class PropertySheetEntry extends EventManager implements
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public String getCategory() {
 		return descriptor.getCategory();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public IPropertySheetEntry[] getChildEntries() {
 		if (childEntries == null) {
 			createChildEntries();
@@ -341,7 +343,9 @@ public class PropertySheetEntry extends EventManager implements
 		return childEntries;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public String getDescription() {
 		return descriptor.getDescription();
 	}
@@ -356,12 +360,18 @@ public class PropertySheetEntry extends EventManager implements
 		return descriptor;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public String getDisplayName() {
 		return descriptor.getDisplayName();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.views.properties.IPropertySheetEntry#getEditor(org.eclipse.swt.widgets.Composite)
+	 */
 	public CellEditor getEditor(Composite parent) {
 
 		if (editor == null) {
@@ -393,22 +403,30 @@ public class PropertySheetEntry extends EventManager implements
 		return value;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public String getErrorText() {
 		return errorText;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public String getFilters()[] {
 		return descriptor.getFilterFlags();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public Object getHelpContextIds() {
 		return descriptor.getHelpContextIds();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public Image getImage() {
 		ILabelProvider provider = descriptor.getLabelProvider();
 		if (provider == null) {
@@ -458,7 +476,9 @@ public class PropertySheetEntry extends EventManager implements
 		return result;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public String getValueAsString() {
 		if (editValue == null) {
 			return "";//$NON-NLS-1$
@@ -484,7 +504,9 @@ public class PropertySheetEntry extends EventManager implements
 		return values;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public boolean hasChildEntries() {
 		if (childEntries != null && childEntries.length > 0) {
 			return true;
@@ -593,13 +615,17 @@ public class PropertySheetEntry extends EventManager implements
 		setValues(newValues);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public void removePropertySheetEntryListener(
 			IPropertySheetEntryListener listener) {
 		removeListenerObject(listener);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public void resetPropertyValue() {
 		if (parent == null) {
 			// root does not have a default value
@@ -712,7 +738,6 @@ public class PropertySheetEntry extends EventManager implements
 	 * @param objects
 	 *            the new values for this entry
 	 */
-	@Override
 	public void setValues(Object[] objects) {
 		values = objects;
 		sources = new HashMap(values.length * 2 + 1);
@@ -762,49 +787,5 @@ public class PropertySheetEntry extends EventManager implements
 		if (parent != null) {
 			parent.valueChanged(this);
 		}
-	}
-
-	/**
-	 * Returns the foreground color for the entry.
-	 * 
-	 * @return the foreground color for the entry, or <code>null</code> to use the default
-	 *         foreground color
-	 * @since 3.7
-	 */
-	protected Color getForeground() {
-		ILabelProvider provider = descriptor.getLabelProvider();
-		if (provider instanceof IColorProvider) {
-			return ((IColorProvider) provider).getForeground(this);
-		}
-		return null;
-	}
-
-	/**
-	 * Returns the background color for the entry.
-	 * 
-	 * @return the background color for the entry, or <code>null</code> to use the default
-	 *         background color
-	 * @since 3.7
-	 */
-	protected Color getBackground() {
-		ILabelProvider provider = descriptor.getLabelProvider();
-		if (provider instanceof IColorProvider) {
-			return ((IColorProvider) provider).getBackground(this);
-		}
-		return null;
-	}
-
-	/**
-	 * Returns the font for the entry.
-	 * 
-	 * @return the font for the entry, or <code>null</code> to use the default font
-	 * @since 3.7
-	 */
-	protected Font getFont() {
-		ILabelProvider provider = descriptor.getLabelProvider();
-		if (provider instanceof IFontProvider) {
-			return ((IFontProvider) provider).getFont(this);
-		}
-		return null;
 	}
 }

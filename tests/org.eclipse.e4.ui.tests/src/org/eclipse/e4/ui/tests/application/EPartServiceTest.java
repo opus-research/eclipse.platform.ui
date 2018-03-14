@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ import java.util.List;
 import org.eclipse.core.runtime.AssertionFailedException;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.di.Focus;
+import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.PartServiceSaveHandler;
 import org.eclipse.e4.ui.internal.workbench.UIEventPublisher;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
@@ -7440,13 +7441,11 @@ public class EPartServiceTest extends UITest {
 
 		EPartService partService = window.getContext().get(EPartService.class);
 		partService.activate(partB);
-		assertEquals("partB should be the active part", partB,
-				partService.getActivePart());
 
 		partService.switchPerspective(perspectiveB);
-		// assertEquals(
-		// "partB is in both perspectives, but since partB is obscured by partA, partA should be the active part",
-		// partA, partService.getActivePart());
+		assertEquals(
+				"partB is in both perspectives, but since partB is obscured by partA, partA should be the active part",
+				partA, partService.getActivePart());
 
 		partService.hidePart(partB);
 		assertEquals("partA should still be the active part", partA,
@@ -9644,13 +9643,13 @@ public class EPartServiceTest extends UITest {
 		EPartService windowPartServiceB = windowB.getContext().get(
 				EPartService.class);
 
-		assertEquals(windowB.getContext(), application.getContext()
+		assertEquals(windowA.getContext(), application.getContext()
 				.getActiveChild());
 		assertEquals(perspectiveB1.getContext(), windowB.getContext()
 				.getActiveChild());
 
 		windowPartServiceB.switchPerspective(perspectiveB2);
-		assertEquals(windowB.getContext(), application.getContext()
+		assertEquals(windowA.getContext(), application.getContext()
 				.getActiveChild());
 		assertEquals(perspectiveB2.getContext(), windowB.getContext()
 				.getActiveChild());
@@ -9712,7 +9711,7 @@ public class EPartServiceTest extends UITest {
 		getEngine().createGui(window1);
 		getEngine().createGui(window2);
 
-		assertEquals(window2.getContext(), application.getContext()
+		assertEquals(window1.getContext(), application.getContext()
 				.getActiveChild());
 		assertEquals(perspectiveA.getContext(), window2.getContext()
 				.getActiveChild());
@@ -9720,7 +9719,7 @@ public class EPartServiceTest extends UITest {
 		EPartService partService = window2.getContext().get(EPartService.class);
 		partService.switchPerspective(perspectiveB);
 
-		assertEquals(window2.getContext(), application.getContext()
+		assertEquals(window1.getContext(), application.getContext()
 				.getActiveChild());
 		assertEquals(perspectiveB.getContext(), window2.getContext()
 				.getActiveChild());
@@ -9798,6 +9797,8 @@ public class EPartServiceTest extends UITest {
 
 		partService.switchPerspective(perspectiveA);
 
+		assertEquals(window1.getContext(), application.getContext()
+				.getActiveChild());
 		assertEquals(perspectiveA.getContext(), window2.getContext()
 				.getActiveChild());
 	}
@@ -10155,9 +10156,9 @@ public class EPartServiceTest extends UITest {
 	}
 
 	private void initialize() {
-		final UIEventPublisher ep = new UIEventPublisher(applicationContext);
-		((Notifier) application).eAdapters().add(ep);
-		applicationContext.set(UIEventPublisher.class, ep);
+		E4Workbench.processHierarchy(application);
+		((Notifier) application).eAdapters().add(
+				new UIEventPublisher(applicationContext));
 
 		applicationContext.set(ISaveHandler.class.getName(),
 				new PartServiceSaveHandler() {

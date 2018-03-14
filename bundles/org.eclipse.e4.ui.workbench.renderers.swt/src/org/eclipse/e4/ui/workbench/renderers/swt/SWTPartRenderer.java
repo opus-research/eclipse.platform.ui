@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Ragnar Nevries <r.eclipse@nevri.es> - Bug 443514
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -16,10 +15,7 @@ import java.util.List;
 import java.util.Map;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.log.Logger;
-import org.eclipse.e4.ui.css.core.engine.CSSEngine;
-import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
-import org.eclipse.e4.ui.internal.workbench.swt.CSSConstants;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
@@ -43,12 +39,6 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 
 	Map<String, Image> imageMap = new HashMap<String, Image>();
 
-	String pinURI = "platform:/plugin/org.eclipse.e4.ui.workbench.renderers.swt/icons/full/ovr16/pinned_ovr.gif"; //$NON-NLS-1$
-	Image pinImage;
-
-	private ISWTResourceUtilities resUtils;
-
-	@Override
 	public void processContents(MElementContainer<MUIElement> container) {
 		// EMF gives us null lists if empty
 		if (container == null)
@@ -71,29 +61,13 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 		}
 	}
 
-	public void styleElement(MUIElement element, boolean active) {
-		if (!active)
-			element.getTags().remove(CSSConstants.CSS_ACTIVE_CLASS);
-		else
-			element.getTags().add(CSSConstants.CSS_ACTIVE_CLASS);
-
-		if (element.getWidget() != null)
-			setCSSInfo(element, element.getWidget());
-	}
-
 	public void setCSSInfo(MUIElement me, Object widget) {
-		// No SWT widget, nothing to style...
-		if (widget == null)
-			return;
-
 		// Set up the CSS Styling parameters; id & class
 		IEclipseContext ctxt = getContext(me);
-		if (ctxt == null) {
-			return;
-		}
-
-		final IStylingEngine engine = (IStylingEngine) ctxt
-				.get(IStylingEngine.SERVICE_NAME);
+		if (ctxt == null)
+			ctxt = getContext(me);
+		final IStylingEngine engine = (IStylingEngine) getContext(me).get(
+				IStylingEngine.SERVICE_NAME);
 		if (engine == null)
 			return;
 
@@ -111,15 +85,6 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 		engine.setClassnameAndId(widget, cssClassStr, id);
 	}
 
-	@SuppressWarnings("restriction")
-	protected void reapplyStyles(Widget widget) {
-		CSSEngine engine = WidgetElement.getEngine(widget);
-		if (engine != null) {
-			engine.applyStyles(widget, false);
-		}
-	}
-
-	@Override
 	public void bindWidget(MUIElement me, Object widget) {
 		if (widget instanceof Widget) {
 			((Widget) widget).setData(OWNING_ME, me);
@@ -130,7 +95,6 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 			// Ensure that disposed widgets are unbound form the model
 			Widget swtWidget = (Widget) widget;
 			swtWidget.addDisposeListener(new DisposeListener() {
-				@Override
 				public void widgetDisposed(DisposeEvent e) {
 					MUIElement element = (MUIElement) e.widget
 							.getData(OWNING_ME);
@@ -158,12 +122,10 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 		return widget;
 	}
 
-	@Override
 	protected Widget getParentWidget(MUIElement element) {
 		return (Widget) element.getParent().getWidget();
 	}
 
-	@Override
 	public void disposeWidget(MUIElement element) {
 
 		if (element.getWidget() instanceof Widget) {
@@ -189,7 +151,6 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 		element.setWidget(null);
 	}
 
-	@Override
 	public void hookControllerLogic(final MUIElement me) {
 		Object widget = me.getWidget();
 
@@ -198,7 +159,6 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 		if (widget instanceof Control && me instanceof MUILabel) {
 			((Control) widget).getAccessible().addAccessibleListener(
 					new AccessibleAdapter() {
-						@Override
 						public void getName(AccessibleEvent e) {
 							e.result = ((MUILabel) me).getLocalizedLabel();
 						}
@@ -206,65 +166,21 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 		}
 	}
 
-	protected String getToolTip(MUILabel element) {
-		String overrideTip = (String) ((MUIElement) element).getTransientData()
-				.get(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY);
-		return overrideTip == null ? element.getLocalizedTooltip()
-				: overrideTip;
-	}
-
-	protected Image getImageFromURI(String iconURI) {
-		if (iconURI == null || iconURI.length() == 0)
-			return null;
-
-		Image image = imageMap.get(iconURI);
-		if (image == null) {
-			image = resUtils.imageDescriptorFromURI(URI.createURI(iconURI))
-					.createImage();
-			imageMap.put(iconURI, image);
+	protected Image getImage(MUILabel element) {
+		IEclipseContext localContext = context;
+		String iconURI = element.getIconURI();
+		if (iconURI != null && iconURI.length() > 0) {
+			Image image = imageMap.get(iconURI);
+			if (image == null) {
+				ISWTResourceUtilities resUtils = (ISWTResourceUtilities) localContext
+						.get(IResourceUtilities.class.getName());
+				image = resUtils.imageDescriptorFromURI(URI.createURI(iconURI))
+						.createImage();
+				imageMap.put(iconURI, image);
+			}
+			return image;
 		}
-		return image;
-	}
-
-	@Override
-	public Image getImage(MUILabel element) {
-		Image image = (Image) ((MUIElement) element).getTransientData().get(
-				IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY);
-		if (image == null || image.isDisposed()) {
-			String iconURI = element.getIconURI();
-			image = getImageFromURI(iconURI);
-		}
-
-		if (image != null) {
-			image = adornImage((MUIElement) element, image);
-		}
-
-		return image;
-	}
-
-	/**
-	 * @param element
-	 * @param image
-	 * @return
-	 */
-	private Image adornImage(MUIElement element, Image image) {
-		// Remove and dispose any previous adorned image
-		Image previouslyAdornedImage = (Image) element.getTransientData().get(
-				"previouslyAdorned"); //$NON-NLS-1$
-		if (previouslyAdornedImage != null
-				&& !previouslyAdornedImage.isDisposed())
-			previouslyAdornedImage.dispose();
-		element.getTransientData().remove(IPresentationEngine.ADORNMENT_PIN);
-
-		Image adornedImage = image;
-		if (element.getTags().contains(IPresentationEngine.ADORNMENT_PIN)) {
-			adornedImage = resUtils.adornImage(image, pinImage);
-			if (adornedImage != image)
-				element.getTransientData().put(
-						"previouslyAdorned", adornedImage); //$NON-NLS-1$
-		}
-
-		return adornedImage;
+		return null;
 	}
 
 	/**
@@ -320,13 +236,7 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 	@Override
 	public void init(IEclipseContext context) {
 		super.init(context);
-
-		resUtils = (ISWTResourceUtilities) context.get(IResourceUtilities.class
-				.getName());
-		pinImage = getImageFromURI(pinURI);
-
 		Display.getCurrent().disposeExec(new Runnable() {
-			@Override
 			public void run() {
 				for (Image image : imageMap.values()) {
 					image.dispose();
@@ -372,20 +282,4 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 		return getModelElement(ctrl.getParent());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#forceFocus
-	 * (org.eclipse.e4.ui.model.application.ui.MUIElement)
-	 */
-	@Override
-	public void forceFocus(MUIElement element) {
-		if (element.getWidget() instanceof Control) {
-			// Have SWT set the focus
-			Control ctrl = (Control) element.getWidget();
-			if (!ctrl.isDisposed())
-				ctrl.forceFocus();
-		}
-	}
 }

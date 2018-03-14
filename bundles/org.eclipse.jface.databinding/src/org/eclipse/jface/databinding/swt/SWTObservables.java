@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2009, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,13 +14,11 @@
  *     Michael Krauter - bug 180223
  *     Boris Bokowski - bug 245647
  *     Tom Schindl - bug 246462
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 327086
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 413611
  *******************************************************************************/
 package org.eclipse.jface.databinding.swt;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator;
 
 import org.eclipse.core.databinding.observable.Observables;
 import org.eclipse.core.databinding.observable.Realm;
@@ -41,7 +39,7 @@ import org.eclipse.swt.widgets.Widget;
  */
 public class SWTObservables {
 
-	private static List<DisplayRealm> realms = new ArrayList<DisplayRealm>();
+	private static java.util.List realms = new ArrayList();
 
 	/**
 	 * Returns the realm representing the UI thread for the given display.
@@ -51,9 +49,10 @@ public class SWTObservables {
 	 */
 	public static Realm getRealm(final Display display) {
 		synchronized (realms) {
-			for (DisplayRealm element : realms) {
-				if (element.display == display) {
-					return element;
+			for (Iterator it = realms.iterator(); it.hasNext();) {
+				DisplayRealm displayRealm = (DisplayRealm) it.next();
+				if (displayRealm.display == display) {
+					return displayRealm;
 				}
 			}
 			DisplayRealm result = new DisplayRealm(display);
@@ -92,9 +91,7 @@ public class SWTObservables {
 	 *         milliseconds have elapsed since the last change event.
 	 * 
 	 * @since 1.2
-	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeDelayedValue(int delay,
 			ISWTObservableValue observable) {
 		return new SWTDelayedObservableValueDecorator(
@@ -117,9 +114,7 @@ public class SWTObservables {
 	 * @return an observable value tracking the enabled state of the given
 	 *         widget.
 	 * @since 1.5
-	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeEnabled(Widget widget) {
 		return WidgetProperties.enabled().observe(widget);
 	}
@@ -132,9 +127,7 @@ public class SWTObservables {
 	 *            the control to observe
 	 * @return an observable value tracking the enabled state of the given
 	 *         control
-	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeEnabled(Control control) {
 		return observeEnabled((Widget) control);
 	}
@@ -147,9 +140,7 @@ public class SWTObservables {
 	 *            the control to observe
 	 * @return an observable value tracking the visible state of the given
 	 *         control
-	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeVisible(Control control) {
 		return WidgetProperties.visible().observe(control);
 	}
@@ -171,9 +162,7 @@ public class SWTObservables {
 	 * @return an observable value tracking the tooltip text of the given item
 	 * 
 	 * @since 1.3
-	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeTooltipText(Widget widget) {
 		return WidgetProperties.tooltipText().observe(widget);
 	}
@@ -186,9 +175,7 @@ public class SWTObservables {
 	 *            the control to observe
 	 * @return an observable value tracking the tooltip text of the given
 	 *         control
-	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeTooltipText(Control control) {
 		return observeTooltipText((Widget) control);
 	}
@@ -211,9 +198,7 @@ public class SWTObservables {
 	 * @throws IllegalArgumentException
 	 *             if <code>control</code> type is unsupported
 	 * @since 1.5
-	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeSelection(Widget widget) {
 		return WidgetProperties.selection().observe(widget);
 	}
@@ -235,9 +220,7 @@ public class SWTObservables {
 	 * @return observable value
 	 * @throws IllegalArgumentException
 	 *             if <code>control</code> type is unsupported
-	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeSelection(Control control) {
 		return observeSelection((Widget) control);
 	}
@@ -255,9 +238,7 @@ public class SWTObservables {
 	 * @return observable value
 	 * @throws IllegalArgumentException
 	 *             if <code>control</code> type is unsupported
-	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeMin(Control control) {
 		return WidgetProperties.minimum().observe(control);
 	}
@@ -275,9 +256,7 @@ public class SWTObservables {
 	 * @return observable value
 	 * @throws IllegalArgumentException
 	 *             if <code>control</code> type is unsupported
-	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeMax(Control control) {
 		return WidgetProperties.maximum().observe(control);
 	}
@@ -299,9 +278,7 @@ public class SWTObservables {
 	 * @throws IllegalArgumentException
 	 *             if <code>control</code> type is unsupported
 	 * @since 1.3
-	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeText(Control control, int[] events) {
 		return WidgetProperties.text(events).observe(control);
 	}
@@ -320,9 +297,7 @@ public class SWTObservables {
 	 * @return observable value
 	 * @throws IllegalArgumentException
 	 *             if <code>control</code> type is unsupported
-	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeText(Control control, int event) {
 		return WidgetProperties.text(event).observe(control);
 	}
@@ -349,9 +324,7 @@ public class SWTObservables {
 	 *             if the type of <code>widget</code> is unsupported
 	 * 
 	 * @since 1.3
-	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeText(Widget widget) {
 		return WidgetProperties.text().observe(widget);
 	}
@@ -375,9 +348,7 @@ public class SWTObservables {
 	 * @return observable value
 	 * @throws IllegalArgumentException
 	 *             if <code>control</code> type is unsupported
-	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeText(Control control) {
 		return observeText((Widget) control);
 	}
@@ -394,9 +365,7 @@ public class SWTObservables {
 	 * @return an observable observing the message attribute of the provided
 	 *         <code>widget</code>.
 	 * @since 1.3
-	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeMessage(Widget widget) {
 		return WidgetProperties.message().observe(widget);
 	}
@@ -416,9 +385,7 @@ public class SWTObservables {
 	 * @throws IllegalArgumentException
 	 *             if <code>widget</code> type is unsupported
 	 * @since 1.3
-	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeImage(Widget widget) {
 		return WidgetProperties.image().observe(widget);
 	}
@@ -436,9 +403,7 @@ public class SWTObservables {
 	 * @return observable list
 	 * @throws IllegalArgumentException
 	 *             if <code>control</code> type is unsupported
-	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static IObservableList observeItems(Control control) {
 		return WidgetProperties.items().observe(control);
 	}
@@ -457,9 +422,7 @@ public class SWTObservables {
 	 * @return observable value
 	 * @throws IllegalArgumentException
 	 *             if <code>control</code> type is unsupported
-	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeSingleSelectionIndex(
 			Control control) {
 		return WidgetProperties.singleSelectionIndex().observe(control);
@@ -473,9 +436,7 @@ public class SWTObservables {
 	 *            the control to observe
 	 * @return an observable value tracking the foreground color of the given
 	 *         control
-	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeForeground(Control control) {
 		return WidgetProperties.foreground().observe(control);
 	}
@@ -488,9 +449,7 @@ public class SWTObservables {
 	 *            the control to observe
 	 * @return an observable value tracking the background color of the given
 	 *         control
-	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeBackground(Control control) {
 		return WidgetProperties.background().observe(control);
 	}
@@ -501,9 +460,7 @@ public class SWTObservables {
 	 * @param control
 	 *            the control to observe
 	 * @return an observable value tracking the font of the given control
-	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeFont(Control control) {
 		return WidgetProperties.font().observe(control);
 	}
@@ -515,9 +472,7 @@ public class SWTObservables {
 	 *            the control to observe
 	 * @return an observable value tracking the size of the given control
 	 * @since 1.3
-	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeSize(Control control) {
 		return WidgetProperties.size().observe(control);
 	}
@@ -541,9 +496,7 @@ public class SWTObservables {
 	 *            the control to observe
 	 * @return an observable value tracking the focus of the given control
 	 * @since 1.3
-	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeFocus(Control control) {
 		return WidgetProperties.focused().observe(control);
 	}
@@ -555,9 +508,7 @@ public class SWTObservables {
 	 *            the control to observe
 	 * @return an observable value tracking the bounds of the given control
 	 * @since 1.3
-	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeBounds(Control control) {
 		return WidgetProperties.bounds().observe(control);
 	}
@@ -575,9 +526,7 @@ public class SWTObservables {
 	 * @return observable value
 	 * @throws IllegalArgumentException
 	 *             if <code>control</code> type is unsupported
-	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeEditable(Control control) {
 		return WidgetProperties.editable().observe(control);
 	}
@@ -592,15 +541,12 @@ public class SWTObservables {
 			this.display = display;
 		}
 
-		@Override
 		public boolean isCurrent() {
 			return Display.getCurrent() == display;
 		}
 
-		@Override
 		public void asyncExec(final Runnable runnable) {
 			Runnable safeRunnable = new Runnable() {
-				@Override
 				public void run() {
 					safeRun(runnable);
 				}
@@ -610,11 +556,9 @@ public class SWTObservables {
 			}
 		}
 
-		@Override
 		public void timerExec(int milliseconds, final Runnable runnable) {
 			if (!display.isDisposed()) {
 				Runnable safeRunnable = new Runnable() {
-					@Override
 					public void run() {
 						safeRun(runnable);
 					}
@@ -623,12 +567,10 @@ public class SWTObservables {
 			}
 		}
 
-		@Override
 		public int hashCode() {
 			return (display == null) ? 0 : display.hashCode();
 		}
 
-		@Override
 		public boolean equals(Object obj) {
 			if (this == obj)
 				return true;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2013 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,7 +33,6 @@ public class MarkerCreationTimeField extends MarkerField {
 	 * 
 	 * @see org.eclipse.ui.internal.provisional.views.markers.MarkerField#getValue(org.eclipse.ui.internal.provisional.views.markers.MarkerItem)
 	 */
-	@Override
 	public String getValue(MarkerItem item) {
 		long creationTime = ((MarkerSupportItem) item).getCreationTime();
 		if (creationTime < 0)
@@ -48,7 +47,6 @@ public class MarkerCreationTimeField extends MarkerField {
 	 * @see org.eclipse.ui.internal.provisional.views.markers.MarkerField#compare(org.eclipse.ui.internal.provisional.views.markers.MarkerItem,
 	 *      org.eclipse.ui.internal.provisional.views.markers.MarkerItem)
 	 */
-	@Override
 	public int compare(MarkerItem item1, MarkerItem item2) {
 		return (int) (((MarkerSupportItem) item1).getCreationTime() - ((MarkerSupportItem) item2)
 				.getCreationTime());
@@ -59,10 +57,9 @@ public class MarkerCreationTimeField extends MarkerField {
 	 * 
 	 * @see org.eclipse.ui.internal.provisional.views.markers.MarkerField#update(org.eclipse.jface.viewers.ViewerCell)
 	 */
-	@Override
 	public void update(ViewerCell cell) {
 		Object element=cell.getElement();
-		String timeStr=MarkerSupportInternalUtilities.EMPTY_STRING;
+		String timeStr=MarkerSupportInternalUtilities.EMPTY_STRING;;
 		if(element instanceof MarkerEntry){
 			long creationTime=((MarkerEntry)element).getCreationTime();
 			if (creationTime > 0){

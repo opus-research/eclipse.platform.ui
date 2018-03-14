@@ -88,8 +88,7 @@ public class SaveAsDialog extends TitleAreaDialog {
     /* (non-Javadoc)
      * Method declared in Window.
      */
-    @Override
-	protected void configureShell(Shell shell) {
+    protected void configureShell(Shell shell) {
         super.configureShell(shell);
         shell.setText(IDEWorkbenchMessages.SaveAsDialog_text);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,
@@ -99,8 +98,7 @@ public class SaveAsDialog extends TitleAreaDialog {
     /* (non-Javadoc)
      * Method declared in Window.
      */
-    @Override
-	protected Control createContents(Composite parent) {
+    protected Control createContents(Composite parent) {
 
         Control contents = super.createContents(parent);
 
@@ -123,8 +121,7 @@ public class SaveAsDialog extends TitleAreaDialog {
      * The <code>SaveAsDialog</code> implementation of this <code>Window</code>
      * method disposes of the banner image when the dialog is closed.
      */
-    @Override
-	public boolean close() {
+    public boolean close() {
         if (dlgTitleImage != null) {
 			dlgTitleImage.dispose();
 		}
@@ -134,8 +131,7 @@ public class SaveAsDialog extends TitleAreaDialog {
     /* (non-Javadoc)
      * Method declared on Dialog.
      */
-    @Override
-	protected void createButtonsForButtonBar(Composite parent) {
+    protected void createButtonsForButtonBar(Composite parent) {
         okButton = createButton(parent, IDialogConstants.OK_ID,
                 IDialogConstants.OK_LABEL, true);
         createButton(parent, IDialogConstants.CANCEL_ID,
@@ -145,8 +141,7 @@ public class SaveAsDialog extends TitleAreaDialog {
     /* (non-Javadoc)
      * Method declared on Dialog.
      */
-    @Override
-	protected Control createDialogArea(Composite parent) {
+    protected Control createDialogArea(Composite parent) {
         // top level composite
         Composite parentComposite = (Composite) super.createDialogArea(parent);
 
@@ -162,8 +157,7 @@ public class SaveAsDialog extends TitleAreaDialog {
         composite.setFont(parentComposite.getFont());
 
         Listener listener = new Listener() {
-            @Override
-			public void handleEvent(Event event) {
+            public void handleEvent(Event event) {
                 setDialogComplete(validatePage());
             }
         };
@@ -208,8 +202,7 @@ public class SaveAsDialog extends TitleAreaDialog {
     /* (non-Javadoc)
      * Method declared on Dialog.
      */
-    @Override
-	protected void okPressed() {
+    protected void okPressed() {
         // Get new path.
         IPath path = resourceGroup.getContainerFullPath().append(
                 resourceGroup.getResource());
@@ -239,7 +232,6 @@ public class SaveAsDialog extends TitleAreaDialog {
 			MessageDialog d = new MessageDialog(getShell(),
                     IDEWorkbenchMessages.Question,
                     null, question, MessageDialog.QUESTION, buttons, 0) {
-				@Override
 				protected int getShellStyle() {
 					return super.getShellStyle() | SWT.SHEET;
 				}
@@ -340,7 +332,6 @@ public class SaveAsDialog extends TitleAreaDialog {
      * 
      * @since 3.2
      */
-	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
         IDialogSettings settings = IDEWorkbenchPlugin.getDefault().getDialogSettings();
         IDialogSettings section = settings.getSection(DIALOG_SETTINGS_SECTION);
@@ -354,8 +345,7 @@ public class SaveAsDialog extends TitleAreaDialog {
      * (non-Javadoc)
      * @see org.eclipse.jface.dialogs.Dialog#isResizable()
      */
-    @Override
-	protected boolean isResizable() {
+    protected boolean isResizable() {
     	return true;
     }
 }
