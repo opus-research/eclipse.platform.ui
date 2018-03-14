@@ -15,10 +15,16 @@ import org.eclipse.core.databinding.observable.IObservable;
 
 /**
  * Generates an {@link IObservable} when passed a target instance.
- *
+ * 
+ * @param <T>
+ *            type of the target
+ * @param <E>
+ *            type of the observable constructed by this factory; this type must
+ *            extend or implement IObservable
+ * 
  * @since 1.0
  */
-public interface IObservableFactory {
+public interface IObservableFactory<T, E extends IObservable> {
 
 	/**
 	 * Creates an observable for the given target object.
@@ -26,6 +32,6 @@ public interface IObservableFactory {
 	 * @param target
 	 * @return the new observable
 	 */
-	public IObservable createObservable(Object target);
+	public E createObservable(T target);
 
 }

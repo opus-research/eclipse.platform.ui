@@ -15,11 +15,13 @@ import org.eclipse.core.databinding.observable.IObservablesListener;
 
 /**
  * Listener for changes to observable values.
- *
+ * 
+ * @param <T>
+ * 
  * @since 1.0
  *
  */
-public interface IValueChangeListener extends IObservablesListener {
+public interface IValueChangeListener<T> extends IObservablesListener {
 
 	/**
 	 * Handles a change to an observable value. The given event object must only
@@ -30,6 +32,6 @@ public interface IValueChangeListener extends IObservablesListener {
 	 * @param event
 	 *            the event
 	 */
-	void handleValueChange(ValueChangeEvent event);
+	void handleValueChange(ValueChangeEvent<T> event);
 
 }

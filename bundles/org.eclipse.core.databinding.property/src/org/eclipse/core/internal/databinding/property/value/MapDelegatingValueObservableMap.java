@@ -28,27 +28,35 @@ import org.eclipse.core.databinding.observable.map.IMapChangeListener;
 import org.eclipse.core.databinding.observable.map.IObservableMap;
 import org.eclipse.core.databinding.observable.map.MapChangeEvent;
 import org.eclipse.core.databinding.observable.map.MapDiff;
-import org.eclipse.core.databinding.property.IProperty;
 import org.eclipse.core.databinding.property.IPropertyObservable;
 import org.eclipse.core.databinding.property.value.DelegatingValueProperty;
 import org.eclipse.core.internal.databinding.property.Util;
 
 /**
+ * @param <S>
+ *            type of the source object
+ * @param <I>
+ *            type of the intermediate values
+ * @param <K>
+ *            type of the keys to the map
+ * @param <V>
+ *            type of the values in the map
  * @since 1.2
  */
-public class MapDelegatingValueObservableMap extends AbstractObservableMap
-		implements IPropertyObservable {
-	private IObservableMap masterMap;
-	private DelegatingValueProperty detailProperty;
-	private DelegatingCache cache;
+public class MapDelegatingValueObservableMap<S, K, I extends S, V> extends
+		AbstractObservableMap<K, V> implements
+		IPropertyObservable<DelegatingValueProperty<S, V>> {
+	private IObservableMap<K, I> masterMap;
+	private DelegatingValueProperty<S, V> detailProperty;
+	private DelegatingCache<S, I, V> cache;
 
-	private Set entrySet;
+	private Set<Map.Entry<K, V>> entrySet;
 
-	class EntrySet extends AbstractSet {
+	class EntrySet extends AbstractSet<Map.Entry<K, V>> {
 		@Override
-		public Iterator iterator() {
-			return new Iterator() {
-				Iterator it = masterMap.entrySet().iterator();
+		public Iterator<Map.Entry<K, V>> iterator() {
+			return new Iterator<Map.Entry<K, V>>() {
+				Iterator<Map.Entry<K, I>> it = masterMap.entrySet().iterator();
 
 				@Override
 				public boolean hasNext() {
@@ -57,9 +65,9 @@ public class MapDelegatingValueObservableMap extends AbstractObservableMap
 				}
 
 				@Override
-				public Object next() {
+				public Map.Entry<K, V> next() {
 					getterCalled();
-					Map.Entry next = (Map.Entry) it.next();
+					Map.Entry<K, I> next = it.next();
 					return new MapEntry(next.getKey());
 				}
 
@@ -76,38 +84,38 @@ public class MapDelegatingValueObservableMap extends AbstractObservableMap
 		}
 	}
 
-	class MapEntry implements Map.Entry {
-		private Object key;
+	class MapEntry implements Map.Entry<K, V> {
+		private K key;
 
-		MapEntry(Object key) {
+		MapEntry(K key) {
 			this.key = key;
 		}
 
 		@Override
-		public Object getKey() {
+		public K getKey() {
 			getterCalled();
 			return key;
 		}
 
 		@Override
-		public Object getValue() {
+		public V getValue() {
 			getterCalled();
 
 			if (!masterMap.containsKey(key))
 				return null;
 
-			Object masterValue = masterMap.get(key);
+			I masterValue = masterMap.get(key);
 			return cache.get(masterValue);
 		}
 
 		@Override
-		public Object setValue(Object value) {
+		public V setValue(V value) {
 			checkRealm();
 
 			if (!masterMap.containsKey(key))
 				return null;
 
-			Object masterValue = masterMap.get(key);
+			I masterValue = masterMap.get(key);
 			return cache.put(masterValue, value);
 		}
 
@@ -120,7 +128,7 @@ public class MapDelegatingValueObservableMap extends AbstractObservableMap
 				return false;
 			if (!(o instanceof Map.Entry))
 				return false;
-			Map.Entry that = (Map.Entry) o;
+			Map.Entry<?, ?> that = (Map.Entry<?, ?>) o;
 			return Util.equals(this.getKey(), that.getKey())
 					&& Util.equals(this.getValue(), that.getValue());
 		}
@@ -134,51 +142,51 @@ public class MapDelegatingValueObservableMap extends AbstractObservableMap
 		}
 	}
 
-	private IMapChangeListener masterListener = new IMapChangeListener() {
+	private IMapChangeListener<K, I> masterListener = new IMapChangeListener<K, I>() {
 		@Override
-		public void handleMapChange(final MapChangeEvent event) {
+		public void handleMapChange(final MapChangeEvent<K, I> event) {
 			if (isDisposed())
 				return;
 
 			cache.addAll(masterMap.values());
 
 			// Need both obsolete and new master values to convert diff
-			MapDiff diff = convertDiff(event.diff);
+			MapDiff<K, V> diff = convertDiff(event.diff);
 
 			cache.retainAll(masterMap.values());
 
 			fireMapChange(diff);
 		}
 
-		private MapDiff convertDiff(MapDiff diff) {
-			Map oldValues = new HashMap();
-			Map newValues = new HashMap();
+		private MapDiff<K, V> convertDiff(MapDiff<K, I> diff) {
+			Map<K, V> oldValues = new HashMap<K, V>();
+			Map<K, V> newValues = new HashMap<K, V>();
 
-			Set addedKeys = diff.getAddedKeys();
-			for (Iterator it = addedKeys.iterator(); it.hasNext();) {
-				Object key = it.next();
-				Object masterValue = diff.getNewValue(key);
-				Object newValue = cache.get(masterValue);
+			Set<K> addedKeys = diff.getAddedKeys();
+			for (Iterator<K> it = addedKeys.iterator(); it.hasNext();) {
+				K key = it.next();
+				I masterValue = diff.getNewValue(key);
+				V newValue = cache.get(masterValue);
 				newValues.put(key, newValue);
 			}
 
-			Set removedKeys = diff.getRemovedKeys();
-			for (Iterator it = removedKeys.iterator(); it.hasNext();) {
-				Object key = it.next();
-				Object masterValue = diff.getOldValue(key);
-				Object oldValue = cache.get(masterValue);
+			Set<K> removedKeys = diff.getRemovedKeys();
+			for (Iterator<K> it = removedKeys.iterator(); it.hasNext();) {
+				K key = it.next();
+				I masterValue = diff.getOldValue(key);
+				V oldValue = cache.get(masterValue);
 				oldValues.put(key, oldValue);
 			}
 
-			Set changedKeys = new HashSet(diff.getChangedKeys());
-			for (Iterator it = changedKeys.iterator(); it.hasNext();) {
-				Object key = it.next();
+			Set<K> changedKeys = new HashSet<K>(diff.getChangedKeys());
+			for (Iterator<K> it = changedKeys.iterator(); it.hasNext();) {
+				K key = it.next();
 
-				Object oldMasterValue = diff.getOldValue(key);
-				Object newMasterValue = diff.getNewValue(key);
+				I oldMasterValue = diff.getOldValue(key);
+				I newMasterValue = diff.getNewValue(key);
 
-				Object oldValue = cache.get(oldMasterValue);
-				Object newValue = cache.get(newMasterValue);
+				V oldValue = cache.get(oldMasterValue);
+				V newValue = cache.get(newMasterValue);
 
 				if (Util.equals(oldValue, newValue)) {
 					it.remove();
@@ -204,15 +212,14 @@ public class MapDelegatingValueObservableMap extends AbstractObservableMap
 	 * @param map
 	 * @param valueProperty
 	 */
-	public MapDelegatingValueObservableMap(IObservableMap map,
-			DelegatingValueProperty valueProperty) {
+	public MapDelegatingValueObservableMap(IObservableMap<K, I> map,
+			DelegatingValueProperty<S, V> valueProperty) {
 		super(map.getRealm());
 		this.masterMap = map;
 		this.detailProperty = valueProperty;
-		this.cache = new DelegatingCache(getRealm(), valueProperty) {
+		this.cache = new DelegatingCache<S, I, V>(getRealm(), valueProperty) {
 			@Override
-			void handleValueChange(Object masterElement, Object oldValue,
-					Object newValue) {
+			void handleValueChange(I masterElement, V oldValue, V newValue) {
 				fireMapChange(keysFor(masterElement), oldValue, newValue);
 			}
 		};
@@ -223,7 +230,7 @@ public class MapDelegatingValueObservableMap extends AbstractObservableMap
 	}
 
 	@Override
-	public Set entrySet() {
+	public Set<Map.Entry<K, V>> entrySet() {
 		getterCalled();
 		if (entrySet == null)
 			entrySet = new EntrySet();
@@ -235,17 +242,17 @@ public class MapDelegatingValueObservableMap extends AbstractObservableMap
 	}
 
 	@Override
-	public Object get(Object key) {
+	public V get(Object key) {
 		getterCalled();
 		Object masterValue = masterMap.get(key);
 		return cache.get(masterValue);
 	}
 
 	@Override
-	public Object put(Object key, Object value) {
+	public V put(K key, V value) {
 		if (!masterMap.containsKey(key))
 			return null;
-		Object masterValue = masterMap.get(key);
+		I masterValue = masterMap.get(key);
 		return cache.put(masterValue, value);
 	}
 
@@ -261,7 +268,7 @@ public class MapDelegatingValueObservableMap extends AbstractObservableMap
 	}
 
 	@Override
-	public IProperty getProperty() {
+	public DelegatingValueProperty<S, V> getProperty() {
 		return detailProperty;
 	}
 
@@ -275,11 +282,10 @@ public class MapDelegatingValueObservableMap extends AbstractObservableMap
 		return detailProperty.getValueType();
 	}
 
-	private Set keysFor(Object masterValue) {
-		Set keys = new HashSet();
+	private Set<K> keysFor(I masterValue) {
+		Set<K> keys = new HashSet<K>();
 
-		for (Iterator it = masterMap.entrySet().iterator(); it.hasNext();) {
-			Map.Entry entry = (Entry) it.next();
+		for (Map.Entry<K, I> entry : masterMap.entrySet()) {
 			if (entry.getValue() == masterValue) {
 				keys.add(entry.getKey());
 			}
@@ -288,33 +294,33 @@ public class MapDelegatingValueObservableMap extends AbstractObservableMap
 		return keys;
 	}
 
-	private void fireMapChange(final Set changedKeys, final Object oldValue,
-			final Object newValue) {
-		fireMapChange(new MapDiff() {
+	private void fireMapChange(final Set<K> changedKeys, final V oldValue,
+			final V newValue) {
+		fireMapChange(new MapDiff<K, V>() {
 			@Override
-			public Set getAddedKeys() {
-				return Collections.EMPTY_SET;
+			public Set<K> getAddedKeys() {
+				return Collections.emptySet();
 			}
 
 			@Override
-			public Set getRemovedKeys() {
-				return Collections.EMPTY_SET;
+			public Set<K> getRemovedKeys() {
+				return Collections.emptySet();
 			}
 
 			@Override
-			public Set getChangedKeys() {
+			public Set<K> getChangedKeys() {
 				return Collections.unmodifiableSet(changedKeys);
 			}
 
 			@Override
-			public Object getOldValue(Object key) {
+			public V getOldValue(Object key) {
 				if (changedKeys.contains(key))
 					return oldValue;
 				return null;
 			}
 
 			@Override
-			public Object getNewValue(Object key) {
+			public V getNewValue(Object key) {
 				if (changedKeys.contains(key))
 					return newValue;
 				return null;

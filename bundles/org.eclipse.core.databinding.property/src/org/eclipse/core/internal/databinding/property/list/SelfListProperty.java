@@ -20,10 +20,12 @@ import org.eclipse.core.databinding.property.ISimplePropertyListener;
 import org.eclipse.core.databinding.property.list.SimpleListProperty;
 
 /**
+ * @param <E>
+ *            type of the elements in the list
  * @since 3.3
  *
  */
-public class SelfListProperty extends SimpleListProperty {
+public class SelfListProperty<E> extends SimpleListProperty<List<E>, E> {
 	private final Object elementType;
 
 	/**
@@ -39,30 +41,31 @@ public class SelfListProperty extends SimpleListProperty {
 	}
 
 	@Override
-	protected List doGetList(Object source) {
-		return (List) source;
+	protected List<E> doGetList(List<E> source) {
+		return source;
 	}
 
 	@Override
-	protected void doSetList(Object source, List list, ListDiff diff) {
+	protected void doSetList(List<E> source, List<E> list, ListDiff<E> diff) {
 		doUpdateList(source, diff);
 	}
 
 	@Override
-	protected void doUpdateList(Object source, ListDiff diff) {
-		diff.applyTo((List) source);
+	protected void doUpdateList(List<E> source, ListDiff<E> diff) {
+		diff.applyTo(source);
 	}
 
 	@Override
-	public INativePropertyListener adaptListener(
-			ISimplePropertyListener listener) {
+	public INativePropertyListener<List<E>> adaptListener(
+			ISimplePropertyListener<ListDiff<E>> listener) {
 		return null; // no listener API
 	}
 
-	protected void doAddListener(Object source, INativePropertyListener listener) {
+	protected void doAddListener(Object source,
+			INativePropertyListener<List<E>> listener) {
 	}
 
 	protected void doRemoveListener(Object source,
-			INativePropertyListener listener) {
+			INativePropertyListener<List<E>> listener) {
 	}
 }
