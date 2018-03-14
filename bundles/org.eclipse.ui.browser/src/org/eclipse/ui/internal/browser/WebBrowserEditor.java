@@ -20,8 +20,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.browser.ProgressEvent;
-import org.eclipse.swt.browser.ProgressListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -79,20 +77,6 @@ public class WebBrowserEditor extends EditorPart implements IBrowserViewerContai
 		}
 		webBrowser = new BrowserViewer(parent, style);
 		
-		webBrowser.getBrowser().addProgressListener(new ProgressListener() {
-			
-			public void completed(ProgressEvent event) {
-				webBrowser.getBrowser().removeProgressListener(this);
-				String url = webBrowser.getURL();
-				if (url != null && url.startsWith("http")) { //$NON-NLS-1$
-					webBrowser.refresh();
-				}
-			}
-			
-			public void changed(ProgressEvent event) {
-			}
-		});
-
 		webBrowser.setURL(initialURL);
 		webBrowser.setContainer(this);
 		
