@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 429728, 430166, 441150, 442285
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 337588, 388476
+ *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 442285
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -185,26 +186,12 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 	@Inject
 	private IPresentationEngine renderer;
 
-	private EventHandler itemUpdater;
-
-	private EventHandler dirtyUpdater;
-
-	/**
-	 * An event handler for listening to changes to the state of view menus and
-	 * its child menu items. Depending on what state these items are in, the
-	 * view menu should or should not be rendered in the tab folder.
-	 */
-	private EventHandler viewMenuUpdater;
-
 	/**
 	 * An event handler for listening to changes to the children of an element
 	 * container. The tab folder may need to layout itself again if a part's
 	 * toolbar has been changed.
 	 */
 	private EventHandler tabStateHandler;
-
-	// Manages CSS styling based on active part changes
-	private EventHandler stylingHandler;
 
 	private boolean ignoreTabSelChanges;
 
@@ -330,6 +317,194 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		}
 	}
 
+	// Manages CSS styling based on active part changes
+	@Inject
+	@Optional
+	private void handleTabActivation(@UIEventTopic(UIEvents.UILifeCycle.ACTIVATE) Event event) {
+		MUIElement changed = (MUIElement) event
+				.getProperty(UIEvents.EventTags.ELEMENT);
+		if (!(changed instanceof MPart))
+			return;
+
+		MPart newActivePart = (MPart) changed;
+		MUIElement partParent = newActivePart.getParent();
+		if (partParent == null
+				&& newActivePart.getCurSharedRef() != null)
+			partParent = newActivePart.getCurSharedRef().getParent();
+
+		// Skip sash containers
+		while (partParent != null
+				&& partParent instanceof MPartSashContainer)
+			partParent = partParent.getParent();
+
+		// Ensure the stack of a split part gets updated when one
+		// of its internal parts gets activated
+		if (partParent instanceof MCompositePart) {
+			partParent = partParent.getParent();
+		}
+
+		MPartStack pStack = (MPartStack) (partParent instanceof MPartStack ? partParent
+				: null);
+
+		List<String> tags = new ArrayList<String>();
+		tags.add(CSSConstants.CSS_ACTIVE_CLASS);
+		List<MUIElement> activeElements = modelService.findElements(
+				modelService.getTopLevelWindowFor(newActivePart), null,
+				MUIElement.class, tags);
+		for (MUIElement element : activeElements) {
+			if (element instanceof MPartStack && element != pStack) {
+				styleElement(element, false);
+			} else if (element instanceof MPart
+					&& element != newActivePart) {
+				styleElement(element, false);
+			}
+		}
+
+		if (pStack != null)
+			styleElement(pStack, true);
+		styleElement(newActivePart, true);
+	}
+
+	@Inject
+	@Optional
+	private void handleTitleChange(@UIEventTopic(UIEvents.UILabel.TOPIC_ALL) Event event) {
+		// TODO: Refactor using findItemForPart(MPart) method
+
+		MUIElement element = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
+		if (!(element instanceof MPart))
+			return;
+
+		MPart part = (MPart) element;
+
+		String attName = (String) event.getProperty(UIEvents.EventTags.ATTNAME);
+		Object newValue = event.getProperty(UIEvents.EventTags.NEW_VALUE);
+
+		// is this a direct child of the stack?
+		if (element.getParent() != null && element.getParent().getRenderer() == StackRenderer.this) {
+			CTabItem cti = findItemForPart(element, element.getParent());
+			if (cti != null) {
+				updateTab(cti, part, attName, newValue);
+			}
+			return;
+		}
+
+		// Do we have any stacks with place holders for the element
+		// that's changed?
+		MWindow win = modelService.getTopLevelWindowFor(part);
+		List<MPlaceholder> refs = modelService.findElements(win, null, MPlaceholder.class, null);
+		if (refs != null) {
+			for (MPlaceholder ref : refs) {
+				if (ref.getRef() != part)
+					continue;
+
+				MElementContainer<MUIElement> refParent = ref.getParent();
+				// can be null, see bug 328296
+				if (refParent != null && refParent.getRenderer() instanceof StackRenderer) {
+					CTabItem cti = findItemForPart(ref, refParent);
+					if (cti != null) {
+						updateTab(cti, part, attName, newValue);
+					}
+				}
+			}
+		}
+	}
+
+	@Inject
+	@Optional
+	protected void handleDirtyFlagChange(@UIEventTopic(UIEvents.Dirtyable.TOPIC_ALL) Event event) {
+		// TODO: Refactor using findItemForPart(MPart) method
+		Object objElement = event.getProperty(UIEvents.EventTags.ELEMENT);
+
+		// Ensure that this event is for a MMenuItem
+		if (!(objElement instanceof MPart)) {
+			return;
+		}
+
+		// Extract the data bits
+		MPart part = (MPart) objElement;
+
+		String attName = (String) event
+				.getProperty(UIEvents.EventTags.ATTNAME);
+		Object newValue = event
+				.getProperty(UIEvents.EventTags.NEW_VALUE);
+
+		// Is the part directly under the stack?
+		MElementContainer<MUIElement> parent = part.getParent();
+		if (parent != null
+				&& parent.getRenderer() == StackRenderer.this) {
+			CTabItem cti = findItemForPart(part, parent);
+			if (cti != null) {
+				updateTab(cti, part, attName, newValue);
+			}
+			return;
+		}
+
+		// Do we have any stacks with place holders for the element
+		// that's changed?
+		Set<MPlaceholder> refs = renderedMap.get(part);
+		if (refs != null) {
+			for (MPlaceholder ref : refs) {
+				MElementContainer<MUIElement> refParent = ref
+						.getParent();
+				if (refParent.getRenderer() instanceof StackRenderer) {
+					CTabItem cti = findItemForPart(ref, refParent);
+					if (cti != null) {
+						updateTab(cti, part, attName, newValue);
+					}
+				}
+			}
+		}
+	}
+
+	@Inject
+	@Optional
+	private void handleViewMenyVisibilityChange(@UIEventTopic(UIEvents.UIElement.TOPIC_VISIBLE) Event event) {
+		updatePotentialViewMenu(event);
+	}
+
+	@Inject
+	@Optional
+	private void handleMenuToBeRenderedChange(@UIEventTopic(UIEvents.UIElement.TOPIC_TOBERENDERED) Event event) {
+		updatePotentialViewMenu(event);
+	}
+
+	/**
+	 * An event handler for listening to changes to the state of view menus and
+	 * its child menu items. Depending on what state these items are in, the
+	 * view menu should or should not be rendered in the tab folder.
+	 */
+	private void updatePotentialViewMenu(Event event) {
+
+		Object objElement = event.getProperty(UIEvents.EventTags.ELEMENT);
+		// Ensure that this event is for a MMenuItem
+		if (!(objElement instanceof MMenuElement)) {
+			return;
+		}
+		// Ensure that it's a View part's menu
+		MMenuElement menuModel = (MMenuElement) objElement;
+		MUIElement menuParent = modelService.getContainer(menuModel);
+		if (!(menuParent instanceof MPart))
+			return;
+
+		MPart element = (MPart) menuParent;
+		MUIElement parentElement = element.getParent();
+		if (parentElement == null) {
+			MPlaceholder placeholder = element.getCurSharedRef();
+			if (placeholder == null) {
+				return;
+			}
+
+			parentElement = placeholder.getParent();
+			if (parentElement == null) {
+				return;
+			}
+		}
+
+		Object widget = parentElement.getWidget();
+		if (widget instanceof CTabFolder) {
+			adjustTopRight((CTabFolder) widget);
+		}
+	}
 
 	@Override
 	protected boolean requiresFocus(MPart element) {
@@ -351,203 +526,6 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 
 		preferences.addPreferenceChangeListener(this);
 		preferenceChange(null);
-
-		// TODO: Refactor using findItemForPart(MPart) method
-		itemUpdater = new EventHandler() {
-			@Override
-			public void handleEvent(Event event) {
-				MUIElement element = (MUIElement) event
-						.getProperty(UIEvents.EventTags.ELEMENT);
-				if (!(element instanceof MPart))
-					return;
-
-				MPart part = (MPart) element;
-
-				String attName = (String) event
-						.getProperty(UIEvents.EventTags.ATTNAME);
-				Object newValue = event
-						.getProperty(UIEvents.EventTags.NEW_VALUE);
-
-				// is this a direct child of the stack?
-				if (element.getParent() != null
-						&& element.getParent().getRenderer() == StackRenderer.this) {
-					CTabItem cti = findItemForPart(element, element.getParent());
-					if (cti != null) {
-						updateTab(cti, part, attName, newValue);
-					}
-					return;
-				}
-
-				// Do we have any stacks with place holders for the element
-				// that's changed?
-				MWindow win = modelService.getTopLevelWindowFor(part);
-				List<MPlaceholder> refs = modelService.findElements(win, null,
-						MPlaceholder.class, null);
-				if (refs != null) {
-					for (MPlaceholder ref : refs) {
-						if (ref.getRef() != part)
-							continue;
-
-						MElementContainer<MUIElement> refParent = ref
-								.getParent();
-						// can be null, see bug 328296
-						if (refParent != null
-								&& refParent.getRenderer() instanceof StackRenderer) {
-							CTabItem cti = findItemForPart(ref, refParent);
-							if (cti != null) {
-								updateTab(cti, part, attName, newValue);
-							}
-						}
-					}
-				}
-			}
-		};
-
-		eventBroker.subscribe(UIEvents.UILabel.TOPIC_ALL, itemUpdater);
-
-		// TODO: Refactor using findItemForPart(MPart) method
-		dirtyUpdater = new EventHandler() {
-			@Override
-			public void handleEvent(Event event) {
-				Object objElement = event
-						.getProperty(UIEvents.EventTags.ELEMENT);
-
-				// Ensure that this event is for a MMenuItem
-				if (!(objElement instanceof MPart)) {
-					return;
-				}
-
-				// Extract the data bits
-				MPart part = (MPart) objElement;
-
-				String attName = (String) event
-						.getProperty(UIEvents.EventTags.ATTNAME);
-				Object newValue = event
-						.getProperty(UIEvents.EventTags.NEW_VALUE);
-
-				// Is the part directly under the stack?
-				MElementContainer<MUIElement> parent = part.getParent();
-				if (parent != null
-						&& parent.getRenderer() == StackRenderer.this) {
-					CTabItem cti = findItemForPart(part, parent);
-					if (cti != null) {
-						updateTab(cti, part, attName, newValue);
-					}
-					return;
-				}
-
-				// Do we have any stacks with place holders for the element
-				// that's changed?
-				Set<MPlaceholder> refs = renderedMap.get(part);
-				if (refs != null) {
-					for (MPlaceholder ref : refs) {
-						MElementContainer<MUIElement> refParent = ref
-								.getParent();
-						if (refParent.getRenderer() instanceof StackRenderer) {
-							CTabItem cti = findItemForPart(ref, refParent);
-							if (cti != null) {
-								updateTab(cti, part, attName, newValue);
-							}
-						}
-					}
-				}
-			}
-		};
-
-		eventBroker.subscribe(UIEvents.buildTopic(UIEvents.Dirtyable.TOPIC,
-				UIEvents.Dirtyable.DIRTY), dirtyUpdater);
-
-		viewMenuUpdater = new EventHandler() {
-			@Override
-			public void handleEvent(Event event) {
-				Object objElement = event
-						.getProperty(UIEvents.EventTags.ELEMENT);
-
-				// Ensure that this event is for a MMenuItem
-				if (!(objElement instanceof MMenuElement)) {
-					return;
-				}
-
-				// Ensure that it's a View part's menu
-				MMenuElement menuModel = (MMenuElement) objElement;
-				MUIElement menuParent = modelService.getContainer(menuModel);
-				if (!(menuParent instanceof MPart))
-					return;
-
-				MPart element = (MPart) menuParent;
-				MUIElement parentElement = element.getParent();
-				if (parentElement == null) {
-					MPlaceholder placeholder = element.getCurSharedRef();
-					if (placeholder == null) {
-						return;
-					}
-
-					parentElement = placeholder.getParent();
-					if (parentElement == null) {
-						return;
-					}
-				}
-
-				Object widget = parentElement.getWidget();
-				if (widget instanceof CTabFolder) {
-					adjustTopRight((CTabFolder) widget);
-				}
-			}
-		};
-		eventBroker
-				.subscribe(UIEvents.UIElement.TOPIC_VISIBLE, viewMenuUpdater);
-		eventBroker.subscribe(UIEvents.UIElement.TOPIC_TOBERENDERED,
-				viewMenuUpdater);
-
-
-		stylingHandler = new EventHandler() {
-			@Override
-			public void handleEvent(Event event) {
-				MUIElement changed = (MUIElement) event
-						.getProperty(UIEvents.EventTags.ELEMENT);
-				if (!(changed instanceof MPart))
-					return;
-
-				MPart newActivePart = (MPart) changed;
-				MUIElement partParent = newActivePart.getParent();
-				if (partParent == null
-						&& newActivePart.getCurSharedRef() != null)
-					partParent = newActivePart.getCurSharedRef().getParent();
-
-				// Skip sash containers
-				while (partParent != null
-						&& partParent instanceof MPartSashContainer)
-					partParent = partParent.getParent();
-
-				// Ensure the stack of a split part gets updated when one
-				// of its internal parts gets activated
-				if (partParent instanceof MCompositePart) {
-					partParent = partParent.getParent();
-				}
-
-				MPartStack pStack = (MPartStack) (partParent instanceof MPartStack ? partParent
-						: null);
-
-				List<String> tags = new ArrayList<String>();
-				tags.add(CSSConstants.CSS_ACTIVE_CLASS);
-				List<MUIElement> activeElements = modelService.findElements(
-						modelService.getTopLevelWindowFor(newActivePart), null,
-						MUIElement.class, tags);
-				for (MUIElement element : activeElements) {
-					if (element instanceof MPartStack && element != pStack) {
-						styleElement(element, false);
-					} else if (element instanceof MPart
-							&& element != newActivePart) {
-						styleElement(element, false);
-					}
-				}
-
-				if (pStack != null)
-					styleElement(pStack, true);
-				styleElement(newActivePart, true);
-			}
-		};
-		eventBroker.subscribe(UIEvents.UILifeCycle.ACTIVATE, stylingHandler);
 
 		tabStateHandler = new TabStateHandler();
 		eventBroker.subscribe(UIEvents.ApplicationElement.TOPIC_TAGS,
@@ -585,11 +563,6 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 	@PreDestroy
 	public void contextDisposed() {
 		super.contextDisposed(eventBroker);
-
-		eventBroker.unsubscribe(itemUpdater);
-		eventBroker.unsubscribe(dirtyUpdater);
-		eventBroker.unsubscribe(viewMenuUpdater);
-		eventBroker.unsubscribe(stylingHandler);
 		eventBroker.unsubscribe(tabStateHandler);
 	}
 
