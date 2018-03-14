@@ -14,6 +14,8 @@ package org.eclipse.e4.ui.workbench.modeling;
 import java.util.List;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
+import org.eclipse.e4.ui.model.application.commands.MHandler;
+import org.eclipse.e4.ui.model.application.commands.MHandlerContainer;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MSnippetContainer;
@@ -67,19 +69,33 @@ public interface EModelService {
 	/** Returned Location if the element is in an MTrimBar */
 	public static final int IN_TRIM = 0x10;
 
+	/**
+	 * Returned Location if the element is in a main menu of an MWindow
+	 * 
+	 * @since 1.1
+	 */
+	public static final int IN_MAIN_MENU = 0x20;
+
+	/**
+	 * Returned Location if the element is in a menu or a tool bar of an MPart
+	 * 
+	 * @since 1.1
+	 */
+	public static final int IN_PART = 0x40;
+
 	// 'Standard' searches
 
 	/** Searches for elements in the UI that the user is currently seeing (excluding trim) */
 	public static final int PRESENTATION = OUTSIDE_PERSPECTIVE | IN_ACTIVE_PERSPECTIVE
 			| IN_SHARED_AREA;
 
-	/** Searches for elements in the UI that the user is currently seeing */
+	/** Searches for elements in the UI presentation, including all perspectives */
 	public static final int ANYWHERE = OUTSIDE_PERSPECTIVE | IN_ANY_PERSPECTIVE | IN_SHARED_AREA
 			| IN_TRIM;
 
 	/**
 	 * Searches for elements in the UI that the user is currently seeing that are OUTSIDE the
-	 * perspective
+	 * perspective (i.e. visible regardless of the current perspective)
 	 */
 	public static final int GLOBAL = OUTSIDE_PERSPECTIVE | IN_SHARED_AREA;
 
@@ -253,6 +269,18 @@ public interface EModelService {
 	 * @return The root element of the snippet or <code>null</code> if none is found
 	 */
 	public MUIElement findSnippet(MSnippetContainer snippetContainer, String id);
+
+	/**
+	 * Finds a handler by ID in a particular container
+	 * 
+	 * @param handlerContainer
+	 *            The container to look in
+	 * @param id
+	 *            The ID of the handler
+	 * @return The handler or <code>null</code> if none is found
+	 * @since 1.1
+	 */
+	public MHandler findHandler(MHandlerContainer handlerContainer, String id);
 
 	/**
 	 * Return the count of the children whose 'toBeRendered' flag is true
