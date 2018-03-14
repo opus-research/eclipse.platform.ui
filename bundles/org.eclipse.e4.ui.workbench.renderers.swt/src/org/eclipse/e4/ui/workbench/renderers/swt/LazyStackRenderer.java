@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 441150
  *     Fabio Zadrozny (fabiofz@gmail.com) - Bug 436763
- *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 457939
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -170,9 +169,6 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 		if (element instanceof MPlaceholder) {
 			MPlaceholder ph = (MPlaceholder) element;
 			element = ph.getRef();
-			if (element != null && element.getCurSharedRef() == ph) {
-				element.setCurSharedRef(null);
-			}
 		}
 
 		// Hide any floating windows
