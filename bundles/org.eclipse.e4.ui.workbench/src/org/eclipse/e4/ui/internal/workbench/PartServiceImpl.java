@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel (Lars.Vogel@gmail.com) - Bug 416082
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 450411
+ *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 463962
  ******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench;
 
@@ -75,9 +76,12 @@ public class PartServiceImpl implements EPartService {
 				if (oldSelected instanceof MPlaceholder) {
 					oldSelected = ((MPlaceholder) oldSelected).getRef();
 				}
+
+				MPlaceholder placeholder = null;
 				Object selected = event.getProperty(UIEvents.EventTags.NEW_VALUE);
 				if (selected instanceof MPlaceholder) {
-					selected = ((MPlaceholder) selected).getRef();
+					placeholder = (MPlaceholder) selected;
+					selected = placeholder.getRef();
 				}
 
 				MPart oldSelectedPart = oldSelected instanceof MPart ? (MPart) oldSelected : null;
@@ -89,7 +93,6 @@ public class PartServiceImpl implements EPartService {
 
 				if (selectedPart != null && selectedPart.isToBeRendered()
 						&& getParts().contains(selectedPart)) {
-					MPlaceholder placeholder = selectedPart.getCurSharedRef();
 					// ask the renderer to create this part
 					if (placeholder == null) {
 						if (selectedPart.getParent().getRenderer() != null) {
@@ -588,7 +591,13 @@ public class PartServiceImpl implements EPartService {
 				if (activeChild != null) {
 					activeChild.deactivate();
 				}
-				perspective.getContext().activate();
+				if (target.getContext() != null && target.getContext().get(MPerspective.class) != null
+						&& target.getContext().get(MPerspective.class).getContext() == perspective.getContext()) {
+					target.getContext().activateBranch();
+				} else {
+					perspective.getContext().activate();
+				}
+
 				modelService.bringToTop(target);
 				activate(target, true, false);
 				return;
@@ -719,7 +728,7 @@ public class PartServiceImpl implements EPartService {
 	/**
 	 * Records the specified parent part's selected element in the activation history if the parent
 	 * is a stack.
-	 * 
+	 *
 	 * @param part
 	 *            the part whose parent's selected element should be checked for activation history
 	 *            recording
@@ -741,7 +750,7 @@ public class PartServiceImpl implements EPartService {
 
 	/**
 	 * Records the specified parent 's selected element in the activation history.
-	 * 
+	 *
 	 * @param parent
 	 *            the element whose selected element should be checked for activation history
 	 *            recording
@@ -841,7 +850,7 @@ public class PartServiceImpl implements EPartService {
 	 * Adds a part to the current container if it isn't already in the container. The part may still
 	 * be added to the container if the part supports having multiple copies of itself in a given
 	 * container.
-	 * 
+	 *
 	 * @param providedPart
 	 *            the part to add
 	 * @param localPart
@@ -881,7 +890,7 @@ public class PartServiceImpl implements EPartService {
 				addToLastContainer(null, providedPart);
 			} else {
 				if ("org.eclipse.e4.primaryDataStack".equals(category)) { //$NON-NLS-1$
-					MElementContainer<MUIElement> container = getContainer();
+					MElementContainer<? extends MUIElement> container = getContainer();
 					MUIElement area = modelService.find("org.eclipse.ui.editorss", container); //$NON-NLS-1$
 
 					MPartStack activeStack = null;
@@ -918,6 +927,7 @@ public class PartServiceImpl implements EPartService {
 						}
 					}
 				} else {
+					@SuppressWarnings("rawtypes")
 					List<MElementContainer> containers = modelService.findElements(getContainer(),
 							null, MElementContainer.class, Collections.singletonList(category),
 							EModelService.PRESENTATION);
@@ -927,7 +937,7 @@ public class PartServiceImpl implements EPartService {
 						addToLastContainer(category, providedPart);
 					} else {
 						// add the part to the container
-						MElementContainer container = containers.get(0);
+						MElementContainer<MPartSashContainerElement> container = containers.get(0);
 						MPlaceholder placeholder = providedPart.getCurSharedRef();
 						if (placeholder == null) {
 							container.getChildren().add(providedPart);
@@ -987,12 +997,13 @@ public class PartServiceImpl implements EPartService {
 			}
 		}
 
-		MElementContainer<?> lastContainer = getLastContainer();
+		@SuppressWarnings("unchecked")
+		MElementContainer<MUIElement> lastContainer = (MElementContainer<MUIElement>) getLastContainer();
 		MPlaceholder placeholder = part.getCurSharedRef();
 		if (placeholder == null) {
-			((List) lastContainer.getChildren()).add(part);
+			lastContainer.getChildren().add(part);
 		} else {
-			((List) lastContainer.getChildren()).add(placeholder);
+			lastContainer.getChildren().add(placeholder);
 		}
 
 		if (category != null) {
@@ -1000,12 +1011,13 @@ public class PartServiceImpl implements EPartService {
 		}
 	}
 
-	private MElementContainer<?> getLastContainer() {
-		MElementContainer<MUIElement> searchRoot = getContainer();
-		List<MUIElement> children = searchRoot.getChildren();
+	private MElementContainer<? extends MUIElement> getLastContainer() {
+		MElementContainer<? extends MUIElement> searchRoot = getContainer();
+		@SuppressWarnings("unchecked")
+		List<MUIElement> children = (List<MUIElement>) searchRoot.getChildren();
 		if (children.size() == 0) {
 			MPartStack stack = modelService.createModelElement(MPartStack.class);
-			searchRoot.getChildren().add(stack);
+			children.add(stack);
 			return stack;
 		}
 
@@ -1028,7 +1040,7 @@ public class PartServiceImpl implements EPartService {
 		return stack;
 	}
 
-	private MElementContainer<?> getLastContainer(MElementContainer<?> container, List<?> children) {
+	private MElementContainer<? extends MUIElement> getLastContainer(MElementContainer<?> container, List<?> children) {
 		if (children.isEmpty()) {
 			return null;
 		}
@@ -1051,7 +1063,7 @@ public class PartServiceImpl implements EPartService {
 	 * Returns the parent container of the specified element. If one cannot be found, a check will
 	 * be performed to see whether the element is being represented by a placeholder, if it is, the
 	 * placeholder's parent will be returned, if any.
-	 * 
+	 *
 	 * @param element
 	 *            the element to query
 	 * @return the element's parent container, or the parent container of the specified element's
@@ -1062,7 +1074,8 @@ public class PartServiceImpl implements EPartService {
 		if (parent == null) {
 			MPlaceholder placeholder = element.getCurSharedRef();
 			if (placeholder == null) {
-				MElementContainer<MUIElement> container = getContainer();
+				@SuppressWarnings("unchecked")
+				MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) getContainer();
 				return findContainer(container, element);
 			}
 			return placeholder.getParent();
@@ -1070,26 +1083,28 @@ public class PartServiceImpl implements EPartService {
 		return parent;
 	}
 
-	private MElementContainer<MUIElement> findContainer(MElementContainer<?> container,
+	private MElementContainer<MUIElement> findContainer(MElementContainer<MUIElement> container,
 			MUIElement element) {
-		for (Object child : container.getChildren()) {
+		for (MUIElement child : container.getChildren()) {
 			if (child == element) {
-				return (MElementContainer<MUIElement>) container;
+				return container;
 			} else if (child instanceof MPlaceholder) {
 				MPlaceholder placeholder = (MPlaceholder) child;
 				MUIElement ref = placeholder.getRef();
 				if (ref == element) {
-					return (MElementContainer<MUIElement>) container;
+					return container;
 				} else if (ref instanceof MElementContainer<?>) {
-					MElementContainer<MUIElement> match = findContainer((MElementContainer<?>) ref,
-							element);
+					@SuppressWarnings("unchecked")
+					MElementContainer<MUIElement> ref2 = (MElementContainer<MUIElement>) ref;
+					MElementContainer<MUIElement> match = findContainer(ref2, element);
 					if (match != null) {
 						return match;
 					}
 				}
 			} else if (child instanceof MElementContainer<?>) {
-				MElementContainer<MUIElement> match = findContainer((MElementContainer<?>) child,
-						element);
+				@SuppressWarnings("unchecked")
+				MElementContainer<MUIElement> child2 = (MElementContainer<MUIElement>) child;
+				MElementContainer<MUIElement> match = findContainer(child2, element);
 				if (match != null) {
 					return match;
 				}
@@ -1379,22 +1394,25 @@ public class PartServiceImpl implements EPartService {
 	 * "Container" here is: 1) a selected MPerspective, or, if none available 2) the MWindow for
 	 * which this part service is created, or, if not available, 3) the MApplication.
 	 */
-	private MElementContainer<MUIElement> getContainer() {
+	private MElementContainer<? extends MUIElement> getContainer() {
 		MElementContainer<? extends MUIElement> outerContainer = (workbenchWindow != null) ? workbenchWindow
 				: application;
 
 		// see if we can narrow it down to the active perspective
-		for (MElementContainer<?> container = outerContainer; container != null;) {
-			if (container instanceof MPerspective)
-				return (MElementContainer<MUIElement>) container;
+		for (MElementContainer<? extends MUIElement> container = outerContainer; container != null;) {
+			if (container instanceof MPerspective) {
+				return container;
+			}
 			Object child = container.getSelectedElement();
-			if (child == null)
+			if (child == null) {
 				break;
-			if (child instanceof MElementContainer<?>)
+			}
+			if (child instanceof MElementContainer<?>) {
 				container = (MElementContainer<?>) child;
-			else
+			} else {
 				break;
+			}
 		}
-		return (MElementContainer<MUIElement>) outerContainer;
+		return outerContainer;
 	}
 }

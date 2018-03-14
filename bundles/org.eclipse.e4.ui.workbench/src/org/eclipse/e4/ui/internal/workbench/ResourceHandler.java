@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
  *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  *     		Implemented workbench auto-save to correctly restore state in case of crash.
  *     Terry Parker <tparker@google.com> - Bug 416673
- *     Bartosz Popiela <bartoszpop@gmail.com> - Bug 434108
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -84,7 +83,7 @@ public class ResourceHandler implements IModelResourceHandler {
 	/**
 	 * Dictates whether the model should be stored using EMF or with the merging algorithm.
 	 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=295524
-	 * 
+	 *
 	 */
 	final private boolean deltaRestore;
 	final private boolean saveAndRestore;
@@ -92,7 +91,7 @@ public class ResourceHandler implements IModelResourceHandler {
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param saveAndRestore
 	 * @param clearPersistedState
 	 * @param deltaRestore
@@ -242,12 +241,6 @@ public class ResourceHandler implements IModelResourceHandler {
 		}
 		if (resource == null) {
 			Resource applicationResource = loadResource(applicationDefinitionInstance);
-			if (!hasTopLevelWindows(applicationResource) && logger != null) {
-				logger.error(
-						new Exception(), // log a stack trace to help debug the corruption
-						"Initializing from the application definition instance yields no top-level windows! " //$NON-NLS-1$
-								+ "Continuing execution, but the missing windows may cause other initialization failures."); //$NON-NLS-1$
-			}
 			MApplication theApp = (MApplication) applicationResource.getContents().get(0);
 			resource = createResourceWithApp(theApp);
 			context.set(E4Workbench.NO_SAVED_MODEL_FOUND, Boolean.TRUE);
@@ -265,6 +258,13 @@ public class ResourceHandler implements IModelResourceHandler {
 				context);
 		contribProcessor.processModel(initialModel);
 
+		if (!hasTopLevelWindows(resource) && logger != null) {
+			logger.error(new Exception(), // log a stack trace to help debug the
+											// corruption
+					"Initializing from the application definition instance yields no top-level windows! " //$NON-NLS-1$
+							+ "Continuing execution, but the missing windows may cause other initialization failures."); //$NON-NLS-1$
+		}
+
 		if (!clearPersistedState) {
 			CommandLineOptionModelProcessor processor = ContextInjectionFactory.make(
 					CommandLineOptionModelProcessor.class, context);
@@ -274,26 +274,15 @@ public class ResourceHandler implements IModelResourceHandler {
 		return resource;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.e4.ui.workbench.IModelResourceHandler#isSaveAllowed()
-	 */
-	@Override
-	public boolean isSaveAllowed() {
-		return saveAndRestore && hasTopLevelWindows();
-	}
-
 	@Override
 	public void save() throws IOException {
-		if (saveAndRestore) {
+		if (saveAndRestore)
 			resource.save(null);
-		}
 	}
 
 	/**
 	 * Creates a resource with an app Model, used for saving copies of the main app model.
-	 * 
+	 *
 	 * @param theApp
 	 *            the application model to add to the resource
 	 * @return a resource with a proper save path with the model as contents

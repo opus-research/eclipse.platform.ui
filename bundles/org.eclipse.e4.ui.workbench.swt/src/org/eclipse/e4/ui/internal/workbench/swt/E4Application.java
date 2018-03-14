@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,6 @@
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 366364, 445724, 446088
  *     Terry Parker <tparker@google.com> - Bug 416673
  *     Christian Georgi (SAP)            - Bug 432480
- *     Bartosz Popiela <bartoszpop@gmail.com> - Bug 434108
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench.swt;
@@ -23,7 +22,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.annotation.Annotation;
 import java.net.URL;
 import java.util.List;
 import java.util.Locale;
@@ -70,7 +68,6 @@ import org.eclipse.e4.ui.workbench.IExceptionHandler;
 import org.eclipse.e4.ui.workbench.IModelResourceHandler;
 import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.e4.ui.workbench.lifecycle.PostContextCreate;
-import org.eclipse.e4.ui.workbench.lifecycle.PostSave;
 import org.eclipse.e4.ui.workbench.lifecycle.PreSave;
 import org.eclipse.e4.ui.workbench.lifecycle.ProcessAdditions;
 import org.eclipse.e4.ui.workbench.lifecycle.ProcessRemovals;
@@ -158,9 +155,15 @@ public class E4Application implements IApplication {
 					workbench.getContext()))
 				return EXIT_OK;
 
+			IEclipseContext workbenchContext = workbench.getContext();
+
 			// Create and run the UI (if any)
 			workbench.createAndRunUI(workbench.getApplication());
 
+			// Save the model into the targetURI
+			if (lcManager != null) {
+				ContextInjectionFactory.invoke(lcManager, PreSave.class, workbenchContext, null);
+			}
 			saveModel();
 			workbench.close();
 
@@ -179,10 +182,8 @@ public class E4Application implements IApplication {
 
 	public void saveModel() {
 		try {
-			if (handler.isSaveAllowed()) {
-				notifyPreSave();
+			if (!(handler instanceof ResourceHandler) || ((ResourceHandler) handler).hasTopLevelWindows()) {
 				handler.save();
-				notifyPostSave();
 			} else {
 				Logger logger = new WorkbenchLogger(PLUGIN_ID);
 				logger.error(
@@ -193,31 +194,6 @@ public class E4Application implements IApplication {
 		} catch (IOException e) {
 			Logger logger = new WorkbenchLogger(PLUGIN_ID);
 			logger.error(e, "Error saving the workbench model"); //$NON-NLS-1$
-		}
-	}
-
-	private void notifyPreSave() {
-		notifyLifeCycleManager(PreSave.class);
-		notifyWorkbenchListeners(PreSave.class);
-	}
-
-
-	private void notifyPostSave() {
-		notifyLifeCycleManager(PostSave.class);
-		notifyWorkbenchListeners(PostSave.class);
-	}
-
-	private void notifyLifeCycleManager(Class<? extends Annotation> qualifier) {
-		if (lcManager != null) {
-			IEclipseContext workbenchContext = workbench.getContext();
-			ContextInjectionFactory.invoke(lcManager, PreSave.class, workbenchContext, null);
-		}
-	}
-
-	private void notifyWorkbenchListeners(Class<? extends Annotation> qualifier) {
-		IEclipseContext workbenchContext = workbench.getContext();
-		for (Object listener : workbench.getWorkbenchListeners()) {
-			ContextInjectionFactory.invoke(listener, qualifier, workbenchContext, null);
 		}
 	}
 
@@ -678,14 +654,14 @@ IWorkbench.CSS_URI_ARG, applicationContext, false);
 		 * // -data @noDefault or -data not specified, prompt and set
 		 * ChooseWorkspaceData launchData = new ChooseWorkspaceData(instanceLoc
 		 * .getDefault());
-		 * 
+		 *
 		 * boolean force = false; while (true) { URL workspaceUrl =
 		 * promptForWorkspace(shell, launchData, force); if (workspaceUrl ==
 		 * null) { return false; }
-		 * 
+		 *
 		 * // if there is an error with the first selection, then force the //
 		 * dialog to open to give the user a chance to correct force = true;
-		 * 
+		 *
 		 * try { // the operation will fail if the url is not a valid //
 		 * instance data area, so other checking is unneeded if
 		 * (instanceLocation.setURL(workspaceUrl, true)) {
@@ -694,7 +670,7 @@ IWorkbench.CSS_URI_ARG, applicationContext, false);
 		 * shell, IDEWorkbenchMessages.IDEApplication_workspaceCannotBeSetTitle,
 		 * IDEWorkbenchMessages.IDEApplication_workspaceCannotBeSetMessage);
 		 * return false; }
-		 * 
+		 *
 		 * // by this point it has been determined that the workspace is //
 		 * already in use -- force the user to choose again
 		 * MessageDialog.openError(shell,
@@ -709,7 +685,7 @@ IWorkbench.CSS_URI_ARG, applicationContext, false);
 	 * false otherwise. A version check will be performed, and a confirmation
 	 * box may be displayed on the argument shell if an older version is
 	 * detected.
-	 * 
+	 *
 	 * @return true if the argument URL is ok to use as a workspace and false
 	 *         otherwise.
 	 */
@@ -823,7 +799,7 @@ IWorkbench.CSS_URI_ARG, applicationContext, false);
 	 * The version file is stored in the metadata area of the workspace. This
 	 * method returns an URL to the file or null if the directory or file does
 	 * not exist (and the create parameter is false).
-	 * 
+	 *
 	 * @param create
 	 *            If the directory and file does not exist this parameter
 	 *            controls whether it will be created.
