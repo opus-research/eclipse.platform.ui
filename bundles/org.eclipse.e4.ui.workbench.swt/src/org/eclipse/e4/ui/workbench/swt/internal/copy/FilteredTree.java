@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Jacek Pospychala - bug 187762
  *     Mohamed Tarief - tarief@eg.ibm.com - IBM - Bug 174481
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440381
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.swt.internal.copy;
 
@@ -21,6 +20,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
@@ -152,6 +153,13 @@ public class FilteredTree extends Composite {
 	protected Composite treeComposite;
 
 	/**
+	 * Tells whether to use the pre 3.5 or the new look.
+	 * 
+	 * @since 3.5
+	 */
+	private boolean useNewLook = false;
+
+	/**
 	 * Image descriptor for enabled clear button.
 	 */
 	private static final String CLEAR_ICON = "org.eclipse.ui.internal.dialogs.CLEAR_ICON"; //$NON-NLS-1$
@@ -198,13 +206,36 @@ public class FilteredTree extends Composite {
 	 *            the style bits for the <code>Tree</code>
 	 * @param filter
 	 *            the filter to be used
+	 * 
+	 * @deprecated As of 3.5, replaced by
+	 *             {@link #FilteredTree(Composite, int, PatternFilter, boolean)}
+	 *             where using the new look is encouraged
+	 */
+	@Deprecated
+	public FilteredTree(Composite parent, int treeStyle, PatternFilter filter) {
+		super(parent, SWT.NONE);
+		this.parent = parent;
+		init(treeStyle, filter);
+	}
+
+	/**
+	 * Create a new instance of the receiver.
+	 * 
+	 * @param parent
+	 *            the parent <code>Composite</code>
+	 * @param treeStyle
+	 *            the style bits for the <code>Tree</code>
+	 * @param filter
+	 *            the filter to be used
 	 * @param useNewLook
 	 *            <code>true</code> if the new 3.5 look should be used
 	 * @since 3.5
 	 */
-	public FilteredTree(Composite parent, int treeStyle, PatternFilter filter) {
+	public FilteredTree(Composite parent, int treeStyle, PatternFilter filter,
+			boolean useNewLook) {
 		super(parent, SWT.NONE);
 		this.parent = parent;
+		this.useNewLook = useNewLook;
 		init(treeStyle, filter);
 	}
 
@@ -218,11 +249,35 @@ public class FilteredTree extends Composite {
 	 *            the parent <code>Composite</code>
 	 * @see #init(int, PatternFilter)
 	 * 
-	 * @since 3.5
+	 * @since 3.3
+	 * @deprecated As of 3.5, replaced by
+	 *             {@link #FilteredTree(Composite, boolean)} where using the
+	 *             look is encouraged
 	 */
+	@Deprecated
 	protected FilteredTree(Composite parent) {
 		super(parent, SWT.NONE);
 		this.parent = parent;
+	}
+
+	/**
+	 * Create a new instance of the receiver. Subclasses that wish to override
+	 * the default creation behavior may use this constructor, but must ensure
+	 * that the <code>init(composite, int, PatternFilter)</code> method is
+	 * called in the overriding constructor.
+	 * 
+	 * @param parent
+	 *            the parent <code>Composite</code>
+	 * @param useNewLook
+	 *            <code>true</code> if the new 3.5 look should be used
+	 * @see #init(int, PatternFilter)
+	 * 
+	 * @since 3.5
+	 */
+	protected FilteredTree(Composite parent, boolean useNewLook) {
+		super(parent, SWT.NONE);
+		this.parent = parent;
+		this.useNewLook = useNewLook;
 	}
 
 	/**
@@ -259,7 +314,7 @@ public class FilteredTree extends Composite {
 		setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		if (showFilterControls) {
-			if (useNativeSearchField(parent)) {
+			if (!useNewLook || useNativeSearchField(parent)) {
 				filterComposite = new Composite(this, SWT.NONE);
 			} else {
 				filterComposite = new Composite(this, SWT.BORDER);
@@ -318,7 +373,10 @@ public class FilteredTree extends Composite {
 	 */
 	protected Composite createFilterControls(Composite parent) {
 		createFilterText(parent);
-		createClearTextNew(parent);
+		if (useNewLook)
+			createClearTextNew(parent);
+		else
+			createClearTextOld(parent);
 		if (clearButtonControl != null) {
 			// initially there is no text to clear
 			clearButtonControl.setVisible(false);
@@ -613,9 +671,34 @@ public class FilteredTree extends Composite {
 				});
 
 		filterText.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				if (!useNewLook) {
+					/*
+					 * Running in an asyncExec because the selectAll() does not
+					 * appear to work when using mouse to give focus to text.
+					 */
+					Display display = filterText.getDisplay();
+					display.asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							if (!filterText.isDisposed()) {
+								if (getInitialText().equals(
+										filterText.getText().trim())) {
+									filterText.selectAll();
+								}
+							}
+						}
+					});
+					return;
+				}
+			}
 
 			@Override
 			public void focusLost(FocusEvent e) {
+				if (!useNewLook) {
+					return;
+				}
 				if (filterText.getText().equals(initialText)) {
 					setFilterText(""); //$NON-NLS-1$
 					textChanged();
@@ -623,7 +706,7 @@ public class FilteredTree extends Composite {
 			}
 		});
 
-		if (true) {
+		if (useNewLook) {
 			filterText.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseDown(MouseEvent e) {
@@ -721,7 +804,7 @@ public class FilteredTree extends Composite {
 	 * @since 3.3
 	 */
 	protected Text doCreateFilterText(Composite parent) {
-		if (useNativeSearchField(parent)) {
+		if (!useNewLook || useNativeSearchField(parent)) {
 			return new Text(parent, SWT.SINGLE | SWT.BORDER | SWT.SEARCH
 					| SWT.ICON_CANCEL);
 		}
@@ -767,7 +850,8 @@ public class FilteredTree extends Composite {
 	@Override
 	public void setBackground(Color background) {
 		super.setBackground(background);
-		if (filterComposite != null && (useNativeSearchField(filterComposite))) {
+		if (filterComposite != null
+				&& (!useNewLook || useNativeSearchField(filterComposite))) {
 			filterComposite.setBackground(background);
 		}
 		if (filterToolBar != null && filterToolBar.getControl() != null) {
@@ -775,6 +859,36 @@ public class FilteredTree extends Composite {
 		}
 	}
 
+	/**
+	 * Create the button that clears the text.
+	 * 
+	 * @param parent
+	 *            parent <code>Composite</code> of toolbar button
+	 */
+	private void createClearTextOld(Composite parent) {
+		// only create the button if the text widget doesn't support one
+		// natively
+		if ((filterText.getStyle() & SWT.ICON_CANCEL) == 0) {
+			filterToolBar = new ToolBarManager(SWT.FLAT | SWT.HORIZONTAL);
+			filterToolBar.createControl(parent);
+
+			IAction clearTextAction = new Action("", IAction.AS_PUSH_BUTTON) {//$NON-NLS-1$
+				@Override
+				public void run() {
+					clearText();
+				}
+			};
+
+			clearTextAction
+					.setToolTipText(WorkbenchSWTMessages.FilteredTree_ClearToolTip);
+			clearTextAction.setImageDescriptor(JFaceResources
+					.getImageRegistry().getDescriptor(CLEAR_ICON));
+			clearTextAction.setDisabledImageDescriptor(JFaceResources
+					.getImageRegistry().getDescriptor(DISABLED_CLEAR_ICON));
+
+			filterToolBar.add(clearTextAction);
+		}
+	}
 
 	/**
 	 * Create the button that clears the text.
@@ -954,7 +1068,7 @@ public class FilteredTree extends Composite {
 	 */
 	public void setInitialText(String text) {
 		initialText = text;
-		if (true && filterText != null) {
+		if (useNewLook && filterText != null) {
 			filterText.setMessage(text);
 			if (filterText.isFocusControl()) {
 				setFilterText(initialText);
