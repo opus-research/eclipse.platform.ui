@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 434611
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -408,9 +407,9 @@ public class ModelServiceImpl implements EModelService {
 
 		MUIElement appElement = refWin == null ? null : refWin.getParent();
 		if (appElement instanceof MApplication) {
-			// use appContext as MApplication.getContext() is null during the processing of
-			// the model processor classes
-			EPlaceholderResolver resolver = appContext.get(EPlaceholderResolver.class);
+			EPlaceholderResolver resolver = ((MApplication) appElement).getContext().get(
+					EPlaceholderResolver.class);
+
 			// Re-resolve any placeholder references
 			List<MPlaceholder> phList = findElements(element, null, MPlaceholder.class, null);
 			for (MPlaceholder ph : phList) {

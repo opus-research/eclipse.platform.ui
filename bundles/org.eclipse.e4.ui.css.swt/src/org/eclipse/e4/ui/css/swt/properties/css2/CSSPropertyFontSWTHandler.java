@@ -53,8 +53,13 @@ implements ICSSPropertyHandler2 {
 			CSSSWTFontHelper.setFont(item, font);
 		} else if (widget instanceof CTabFolder) {
 			CTabFolder folder = (CTabFolder) widget;
-			CSSSWTFontHelper.setFont(folder, font);
-			updateChildrenFonts(folder, font);
+			try {
+				folder.setRedraw(false);
+				CSSSWTFontHelper.setFont(folder, font);
+				updateChildrenFonts(folder, font);
+			} finally {
+				folder.setRedraw(true);
+			}
 		} else if (widget instanceof Control) {
 			Control control = (Control) widget;
 			CSSSWTFontHelper.setFont(control, font);
