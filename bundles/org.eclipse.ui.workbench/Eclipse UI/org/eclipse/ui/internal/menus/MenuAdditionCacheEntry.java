@@ -26,12 +26,12 @@ import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MParameter;
 import org.eclipse.e4.ui.model.application.commands.impl.CommandsFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
+import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuContribution;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
-import org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarContribution;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
@@ -220,9 +220,10 @@ public class MenuAdditionCacheEntry {
 					}
 				};
 
-				MRenderedMenuItem menuItem = MenuFactoryImpl.eINSTANCE.createRenderedMenuItem();
+				MDirectMenuItem menuItem = MenuFactoryImpl.eINSTANCE.createDirectMenuItem();
+				menuItem.getTags().add("Rendered"); //$NON-NLS-1$
 				menuItem.setElementId(id);
-				menuItem.setContributionItem(generator);
+				menuItem.getTransientData().put("ContributionItem", generator); //$NON-NLS-1$
 				menuItem.setVisibleWhen(MenuHelper.getVisibleWhen(child));
 				container.getChildren().add(menuItem);
 			}

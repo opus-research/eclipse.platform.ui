@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,14 +11,26 @@
 
 package org.eclipse.e4.ui.internal.workbench;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.WeakHashMap;
+import org.eclipse.e4.ui.model.application.MApplicationElement;
+import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
+import org.eclipse.e4.ui.model.application.ui.menu.MDirectToolItem;
+import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
+import org.eclipse.e4.ui.model.application.ui.menu.MMenuFactory;
+import org.eclipse.e4.ui.model.application.ui.menu.MMenuSeparator;
+import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EClassifier;
+import org.eclipse.emf.ecore.EFactory;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.emf.ecore.xmi.XMLHelper;
+import org.eclipse.emf.ecore.xmi.impl.XMIHelperImpl;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
 
 public class E4XMIResource extends XMIResourceImpl {
@@ -91,5 +103,103 @@ public class E4XMIResource extends XMIResourceImpl {
 		id = getUniqueId();
 		setID(eObject, id);
 		return id;
+	}
+
+	/**
+	 * Functional interface for creating objects
+	 */
+	private interface ObjectCreator {
+		MApplicationElement create();
+	}
+
+	static final Map<String, ObjectCreator> deprecatedTypeMappings = new HashMap<String, ObjectCreator>();
+	static {
+		deprecatedTypeMappings.put("OpaqueMenu", new ObjectCreator() { //$NON-NLS-1$
+
+					public MApplicationElement create() {
+						final MMenu object = MMenuFactory.INSTANCE.createMenu();
+						object.getTags().add("Opaque"); //$NON-NLS-1$
+						return object;
+					}
+				});
+		deprecatedTypeMappings.put("OpaqueMenuItem", new ObjectCreator() { //$NON-NLS-1$
+
+					public MApplicationElement create() {
+						final MDirectMenuItem object = MMenuFactory.INSTANCE.createDirectMenuItem();
+						object.getTags().add("Opaque"); //$NON-NLS-1$
+						return object;
+					}
+				});
+		deprecatedTypeMappings.put("OpaqueMenuSeparator", new ObjectCreator() { //$NON-NLS-1$
+
+					public MApplicationElement create() {
+						final MMenuSeparator object = MMenuFactory.INSTANCE.createMenuSeparator();
+						object.getTags().add("Opaque"); //$NON-NLS-1$
+						return object;
+					}
+				});
+		deprecatedTypeMappings.put("OpaqueToolItem", new ObjectCreator() { //$NON-NLS-1$
+
+					public MApplicationElement create() {
+						final MDirectToolItem object = MMenuFactory.INSTANCE.createDirectToolItem();
+						object.getTags().add("Opaque"); //$NON-NLS-1$
+						return object;
+					}
+				});
+		deprecatedTypeMappings.put("RenderedMenu", new ObjectCreator() { //$NON-NLS-1$
+
+					public MApplicationElement create() {
+						final MMenu object = MMenuFactory.INSTANCE.createMenu();
+						object.getTags().add("Rendered"); //$NON-NLS-1$
+						return object;
+					}
+				});
+		deprecatedTypeMappings.put("RenderedMenuItem", new ObjectCreator() { //$NON-NLS-1$
+
+					public MApplicationElement create() {
+						final MDirectMenuItem object = MMenuFactory.INSTANCE.createDirectMenuItem();
+						object.getTags().add("Rendered"); //$NON-NLS-1$
+						return object;
+					}
+				});
+		deprecatedTypeMappings.put("RenderedToolBar", new ObjectCreator() { //$NON-NLS-1$
+
+					public MApplicationElement create() {
+						final MToolBar object = MMenuFactory.INSTANCE.createToolBar();
+						object.getTags().add("Rendered"); //$NON-NLS-1$
+						return object;
+					}
+				});
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl#createXMLHelper()
+	 */
+	@Override
+	protected XMLHelper createXMLHelper() {
+		// Handle mapping of deprecated types
+		return new XMIHelperImpl(this) {
+
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see
+			 * org.eclipse.emf.ecore.xmi.impl.XMLHelperImpl#createObject(org.eclipse.emf.ecore.EFactory
+			 * , org.eclipse.emf.ecore.EClassifier)
+			 */
+			@Override
+			public EObject createObject(EFactory eFactory, EClassifier type) {
+				if (MMenuFactory.INSTANCE == eFactory) {
+					final ObjectCreator objectCreator = deprecatedTypeMappings.get(type.getName());
+					if (objectCreator != null) {
+						return (EObject) objectCreator.create();
+					}
+				}
+				return super.createObject(eFactory, type);
+			}
+
+		};
 	}
 }

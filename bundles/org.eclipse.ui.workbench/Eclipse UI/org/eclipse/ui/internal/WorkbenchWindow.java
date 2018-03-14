@@ -67,10 +67,10 @@ import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuSeparator;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.model.internal.Position;
@@ -1188,7 +1188,8 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 				menu.getChildren().add(separator);
 				manager.remove(item);
 			} else {
-				MOpaqueMenuItem menuItem = MenuFactoryImpl.eINSTANCE.createOpaqueMenuItem();
+				MDirectMenuItem menuItem = MenuFactoryImpl.eINSTANCE.createDirectMenuItem();
+				menuItem.getTags().add("Opaque"); //$NON-NLS-1$
 				menuItem.setElementId(item.getId());
 				menuItem.setVisible(item.isVisible());
 				menu.getChildren().add(menuItem);

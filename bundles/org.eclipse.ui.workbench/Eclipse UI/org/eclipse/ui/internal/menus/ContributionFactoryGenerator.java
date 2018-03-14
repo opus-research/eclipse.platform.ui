@@ -23,8 +23,8 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.ui.MCoreExpression;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.impl.UiFactoryImpl;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueToolItem;
+import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
+import org.eclipse.e4.ui.model.application.ui.menu.MDirectToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.ui.internal.WorkbenchPlugin;
@@ -116,16 +116,18 @@ public class ContributionFactoryGenerator extends ContextFunction {
 	}
 
 	private MUIElement createMenuItem(IContributionItem ici) {
-		MOpaqueMenuItem opaqueItem = MenuFactoryImpl.eINSTANCE.createOpaqueMenuItem();
+		MDirectMenuItem opaqueItem = MenuFactoryImpl.eINSTANCE.createDirectMenuItem();
+		opaqueItem.getTags().add("Opaque"); //$NON-NLS-1$
 		opaqueItem.setElementId(ici.getId());
-		opaqueItem.setOpaqueItem(ici);
+		opaqueItem.getTransientData().put("OpaqueItem", ici); //$NON-NLS-1$
 		return opaqueItem;
 	}
 
 	private MUIElement createToolItem(IContributionItem ici) {
-		MOpaqueToolItem opaqueItem = MenuFactoryImpl.eINSTANCE.createOpaqueToolItem();
+		MDirectToolItem opaqueItem = MenuFactoryImpl.eINSTANCE.createDirectToolItem();
+		opaqueItem.getTags().add("Opaque"); //$NON-NLS-1$
 		opaqueItem.setElementId(ici.getId());
-		opaqueItem.setOpaqueItem(ici);
+		opaqueItem.getTransientData().put("OpaqueItem", ici); //$NON-NLS-1$
 		return opaqueItem;
 	}
 }
