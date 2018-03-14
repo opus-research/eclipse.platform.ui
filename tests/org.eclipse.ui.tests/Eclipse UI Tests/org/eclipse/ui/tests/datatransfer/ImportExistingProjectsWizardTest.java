@@ -64,6 +64,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 	private static final String ARCHIVE_HELLOWORLD = "helloworld";
 	private static final String ARCHIVE_FILE_WITH_EMPTY_FOLDER = "EmptyFolderInArchive";
 	private static final String PROJECTS_ARCHIVE = "ProjectsArchive";
+	private static final String CORRUPT_PROJECTS_ARCHIVE = "CorruptProjectsArchive";
 
 	private static final String[] FILE_LIST = new String[] { "test-file-1.txt",
 			"test-file-2.doc", ".project" };
@@ -94,6 +95,8 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 		ts.addTest(new ImportExistingProjectsWizardTest("testInitialValue"));
 		ts.addTest(new ImportExistingProjectsWizardTest("testImportArchiveMultiProject"));
 		ts.addTest(new ImportExistingProjectsWizardTest("testGetProjectRecords"));
+		ts.addTest(new ImportExistingProjectsWizardTest(
+				"testGetProjectRecordsShouldIgnoreCorruptArchives"));
 		return ts;
 	}
 	
@@ -105,6 +108,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 		return DialogCheck.getShell();
 	}
 
+	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		originalRefreshSetting = ResourcesPlugin.getPlugin()
@@ -114,6 +118,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 				ResourcesPlugin.PREF_AUTO_REFRESH, true);
 	}
 
+	@Override
 	protected void doTearDown() throws Exception {
 		super.doTearDown();
 		IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
@@ -149,6 +154,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 		try {
 			PlatformUI.getWorkbench().getProgressService().busyCursorWhile(
 					new IRunnableWithProgress() {
+						@Override
 						public void run(IProgressMonitor monitor)
 								throws InterruptedException {
 							Job.getJobManager().join(
@@ -1131,6 +1137,26 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 		}
 		return projectNames;
 	}
+
+	public void testGetProjectRecordsShouldIgnoreCorruptArchives()
+			throws Exception {
+
+		URL projectsArchive = Platform.asLocalURL(Platform.find(TestPlugin
+				.getDefault().getBundle(), new Path(DATA_PATH_PREFIX
+				+ CORRUPT_PROJECTS_ARCHIVE + ".zip")));
+
+		WizardProjectsImportPage newWizard = getNewWizard();
+		newWizard.getProjectFromDirectoryRadio().setSelection(false);
+		newWizard.updateProjectsList(projectsArchive.getPath());
+
+		ProjectRecord[] projectRecords = newWizard.getProjectRecords();
+
+		assertEquals("Should only find the valid project and ignore the corrupt ones", 1, projectRecords.length);
+		assertTrue("Expected to find the valid project",
+				"Project1".equals(projectRecords[0].getProjectName()));
+
+	}
+
 	
 	private WizardProjectsImportPage getExternalImportWizard(String initialPath) {
 
