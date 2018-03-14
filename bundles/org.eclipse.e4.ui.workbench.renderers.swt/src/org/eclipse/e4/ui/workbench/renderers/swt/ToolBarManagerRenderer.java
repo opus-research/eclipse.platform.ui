@@ -105,6 +105,9 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	 * the user
 	 * 
 	 */
+	// TODO migrate to IPresentationEngine after the Luna release
+	public static final String HIDDEN_BY_USER = "HIDDEN_BY_USER"; //$NON-NLS-1$
+
 	private Map<MToolBar, ToolBarManager> modelToManager = new HashMap<MToolBar, ToolBarManager>();
 	private Map<ToolBarManager, MToolBar> managerToModel = new HashMap<ToolBarManager, MToolBar>();
 
@@ -324,13 +327,13 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 		if (UIEvents.isADD(event)) {
 			if (UIEvents.contains(event, UIEvents.EventTags.NEW_VALUE,
-					IPresentationEngine.HIDDEN_EXPLICITLY)) {
+					HIDDEN_BY_USER)) {
 				changedElement.setVisible(false);
 				changedElement.setToBeRendered(false);
 			}
 		} else if (UIEvents.isREMOVE(event)) {
 			if (UIEvents.contains(event, UIEvents.EventTags.OLD_VALUE,
-					IPresentationEngine.HIDDEN_EXPLICITLY)) {
+					HIDDEN_BY_USER)) {
 				changedElement.setVisible(true);
 				changedElement.setToBeRendered(true);
 			}
@@ -344,8 +347,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		List<MToolBar> toolBars = modelService.findElements(application, null,
 				MToolBar.class, null);
 		for (MToolBar mToolBar : toolBars) {
-			if (mToolBar.getTags().contains(
-					IPresentationEngine.HIDDEN_EXPLICITLY)) {
+			if (mToolBar.getTags().contains(HIDDEN_BY_USER)) {
 				mToolBar.setVisible(false);
 				mToolBar.setToBeRendered(false);
 			}
@@ -437,8 +439,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		hideItem.setText(Messages.ToolBarManagerRenderer_MenuCloseText);
 		hideItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(org.eclipse.swt.widgets.Event event) {
-				toolbarModel.getTags().add(
-						IPresentationEngine.HIDDEN_EXPLICITLY);
+				toolbarModel.getTags().add(HIDDEN_BY_USER);
 			}
 		});
 
@@ -1068,7 +1069,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		List<MToolBar> toolBars = modelService.findElements(mWindow, null,
 				MToolBar.class, null);
 		for (MToolBar mToolBar : toolBars) {
-			mToolBar.getTags().remove(IPresentationEngine.HIDDEN_EXPLICITLY);
+			mToolBar.getTags().remove(HIDDEN_BY_USER);
 		}
 	}
 

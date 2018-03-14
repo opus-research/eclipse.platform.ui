@@ -3375,10 +3375,13 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		tags.clear();
 		tags.addAll(dummyPerspective.getTags());
 
-		// remove HIDDEN_EXPLICITLY tag from toolbar
+		// remove HIDDEN_BY_USER tags from toolbar
+		// need to reset all window / perspective relevant elements if
+		// HIDDEN_BY_USER
+		// get implemented by more renderer
 		List<MToolBar> toolBars = modelService.findElements(window, null, MToolBar.class, null);
 		for (MToolBar mToolBar : toolBars) {
-			mToolBar.getTags().remove(IPresentationEngine.HIDDEN_EXPLICITLY);
+			mToolBar.getTags().remove("HIDDEN_BY_USER"); //$NON-NLS-1$
 		}
 
 		partService.requestActivation();
