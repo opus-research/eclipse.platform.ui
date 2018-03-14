@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2006 IBM Corporation and others.
+ * Copyright (c) 2004, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -103,7 +103,7 @@ public class PerspectiveTests extends DynamicTestCase {
 	}
 	
 	private MPerspective findPerspective(IWorkbenchWindow window, String id) {
-		EModelService modelService = (EModelService) window
+		EModelService modelService = window
 				.getService(EModelService.class);
 		return (MPerspective) modelService.find(id,
 				((WorkbenchWindow) window).getModel());

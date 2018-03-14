@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2012 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,7 @@ import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.e4.core.commands.EHandlerService;
+import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -26,6 +27,7 @@ import org.eclipse.e4.core.services.contributions.IContributionFactory;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
+import org.eclipse.e4.ui.internal.workbench.swt.MenuService;
 import org.eclipse.e4.ui.internal.workbench.swt.Policy;
 import org.eclipse.e4.ui.internal.workbench.swt.WorkbenchSWTActivator;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
@@ -36,9 +38,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MPopupMenu;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
-import org.eclipse.e4.ui.workbench.modeling.ExpressionContext;
-import org.eclipse.e4.ui.workbench.swt.factories.IRendererFactory;
-import org.eclipse.e4.ui.workbench.swt.modeling.MenuService;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Event;
@@ -65,9 +64,6 @@ public class MenuManagerRendererFilter implements Listener {
 	private EModelService modelService;
 
 	@Inject
-	private IRendererFactory rendererFactory;
-
-	@Inject
 	private MenuManagerRenderer renderer;
 
 	private HashMap<Menu, Runnable> pendingCleanup = new HashMap<Menu, Runnable>();
@@ -75,6 +71,7 @@ public class MenuManagerRendererFilter implements Listener {
 	private class SafeWrapper implements ISafeRunnable {
 		Event event;
 
+		@Override
 		public void handleException(Throwable e) {
 			if (e instanceof Error) {
 				// errors are deadly, we shouldn't ignore these
@@ -86,6 +83,7 @@ public class MenuManagerRendererFilter implements Listener {
 			}
 		}
 
+		@Override
 		public void run() throws Exception {
 			safeHandleEvent(event);
 		}
@@ -93,6 +91,7 @@ public class MenuManagerRendererFilter implements Listener {
 
 	private SafeWrapper safeWrapper = new SafeWrapper();
 
+	@Override
 	public void handleEvent(final Event event) {
 		// wrap the handling in a SafeRunner so that exceptions do not prevent
 		// the menu from being shown
@@ -260,8 +259,7 @@ public class MenuManagerRendererFilter implements Listener {
 		if (cmd == null) {
 			return;
 		}
-		final IEclipseContext lclContext = modelService
-				.getContainingContext(item);
+		final IEclipseContext lclContext = renderer.getContext(item);
 		EHandlerService service = lclContext.get(EHandlerService.class);
 		final IEclipseContext staticContext = EclipseContextFactory
 				.create(MMRF_STATIC_CONTEXT);

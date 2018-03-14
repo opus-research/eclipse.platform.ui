@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2012 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,8 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
+ *     René Brandstetter - Bug 433778
  *******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 
@@ -16,22 +18,25 @@ import java.util.LinkedList;
 import java.util.Map;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.bindings.keys.SWTKeySupport;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.Util;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.graphics.FontMetrics;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -40,8 +45,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.internal.IWorkbenchGraphicConstants;
-import org.eclipse.ui.internal.WorkbenchImages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.internal.progress.ProgressManagerUtil;
@@ -85,19 +88,26 @@ public class QuickAccessDialog extends PopupDialog {
 		BusyIndicator.showWhile(window.getShell() == null ? null : window.getShell().getDisplay(),
 				new Runnable() {
 
+					@Override
 					public void run() {
+						final CommandProvider commandProvider = new CommandProvider();
+						commandProvider.setSnapshot(new ExpressionContext(model.getContext()
+								.getActiveLeaf()));
 						QuickAccessProvider[] providers = new QuickAccessProvider[] {
-								new PreviousPicksProvider(), new EditorProvider(),
+								new PreviousPicksProvider(previousPicksList),
+								new EditorProvider(),
 								new ViewProvider(model.getContext().get(MApplication.class), model),
-								new PerspectiveProvider(),
-								new CommandProvider(), new ActionProvider(), new WizardProvider(),
-								new PreferenceProvider(), new PropertiesProvider() };
+								new PerspectiveProvider(), commandProvider, new ActionProvider(),
+								new WizardProvider(), new PreferenceProvider(),
+								new PropertiesProvider() };
 						providerMap = new HashMap();
 						for (int i = 0; i < providers.length; i++) {
 							providerMap.put(providers[i].getId(), providers[i]);
 						}
 						QuickAccessDialog.this.contents = new QuickAccessContents(providers) {
-							void updateFeedback(boolean filterTextEmpty, boolean showAllMatches) {
+							@Override
+							protected void updateFeedback(boolean filterTextEmpty,
+									boolean showAllMatches) {
 								if (filterTextEmpty) {
 									setInfoText(QuickAccessMessages.QuickAccess_StartTypingToFindMatches);
 								} else {
@@ -114,7 +124,7 @@ public class QuickAccessDialog extends PopupDialog {
 							}
 
 							@Override
-							void doClose() {
+							protected void doClose() {
 								QuickAccessDialog.this.close();
 							}
 
@@ -187,19 +197,30 @@ public class QuickAccessDialog extends PopupDialog {
 							}
 
 							@Override
-							QuickAccessElement getPerfectMatch(String filter) {
+							protected QuickAccessElement getPerfectMatch(String filter) {
 								QuickAccessElement perfectMatch = (QuickAccessElement) elementMap
 										.get(filter);
 								return perfectMatch;
 							}
 
 							@Override
-							void handleElementSelected(String text, Object selectedElement) {
+							protected void handleElementSelected(String text, Object selectedElement) {
 								if (selectedElement instanceof QuickAccessElement) {
 									addPreviousPick(text, selectedElement);
 									storeDialog(getDialogSettings());
-									QuickAccessElement element = (QuickAccessElement) selectedElement;
-									element.execute();
+
+									/*
+									 * Execute after the dialog has been fully
+									 * closed/disposed and the correct
+									 * EclipseContext is in place.
+									 */
+									final QuickAccessElement element = (QuickAccessElement) selectedElement;
+									window.getShell().getDisplay().asyncExec(new Runnable() {
+										@Override
+										public void run() {
+											element.execute();
+										}
+									});
 								}
 							}
 						};
@@ -221,6 +242,7 @@ public class QuickAccessDialog extends PopupDialog {
 		// Ugly hack to avoid bug 184045. If this gets fixed, replace the
 		// following code with a call to refresh("").
 		getShell().getDisplay().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				final Shell shell = getShell();
 				if (shell != null && !shell.isDisposed()) {
@@ -231,6 +253,7 @@ public class QuickAccessDialog extends PopupDialog {
 		});
 	}
 
+	@Override
 	protected Control createTitleControl(Composite parent) {
 		filterText = new Text(parent, SWT.NONE);
 
@@ -238,6 +261,7 @@ public class QuickAccessDialog extends PopupDialog {
 				.applyTo(filterText);
 
 		contents.hookFilterText(filterText);
+		filterText.addKeyListener(getKeyAdapter());
 
 		return filterText;
 	}
@@ -249,6 +273,7 @@ public class QuickAccessDialog extends PopupDialog {
 	 * org.eclipse.jface.dialogs.PopupDialog#createDialogArea(org.eclipse.swt
 	 * .widgets.Composite)
 	 */
+	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite composite = (Composite) super.createDialogArea(parent);
 		boolean isWin32 = Util.isWindows();
@@ -276,6 +301,7 @@ public class QuickAccessDialog extends PopupDialog {
 	private KeyAdapter getKeyAdapter() {
 		if (keyAdapter == null) {
 			keyAdapter = new KeyAdapter() {
+				@Override
 				public void keyPressed(KeyEvent e) {
 					int accelerator = SWTKeySupport.convertEventToUnmodifiedAccelerator(e);
 					KeySequence keySequence = KeySequence.getInstance(SWTKeySupport
@@ -286,7 +312,7 @@ public class QuickAccessDialog extends PopupDialog {
 					for (int i = 0; i < sequences.length; i++) {
 						if (sequences[i].equals(keySequence)) {
 							e.doit = false;
-							contents.toggleShowAllMatches();
+							contents.setShowAllMatches(!contents.getShowAllMatches());
 							return;
 						}
 					}
@@ -296,19 +322,34 @@ public class QuickAccessDialog extends PopupDialog {
 		return keyAdapter;
 	}
 
+	@Override
 	protected Control getFocusControl() {
 		return filterText;
 	}
 
+	@Override
 	public boolean close() {
 		storeDialog(getDialogSettings());
 		return super.close();
 	}
 
+	@Override
 	protected Point getDefaultSize() {
-		return new Point(350, 420);
+		GC gc = new GC(getContents());
+		FontMetrics fontMetrics = gc.getFontMetrics();
+		gc.dispose();
+		int x = Dialog.convertHorizontalDLUsToPixels(fontMetrics, 300);
+		if (x < 350) {
+			x = 350;
+		}
+		int y = Dialog.convertVerticalDLUsToPixels(fontMetrics, 270);
+		if (y < 420) {
+			y = 420;
+		}
+		return new Point(x, y);
 	}
 
+	@Override
 	protected Point getDefaultLocation(Point initialSize) {
 		Point size = new Point(400, 400);
 		Rectangle parentBounds = getParentShell().getBounds();
@@ -317,6 +358,7 @@ public class QuickAccessDialog extends PopupDialog {
 		return new Point(x, y);
 	}
 
+	@Override
 	protected IDialogSettings getDialogSettings() {
 		final IDialogSettings workbenchDialogSettings = WorkbenchPlugin.getDefault()
 				.getDialogSettings();
@@ -390,42 +432,6 @@ public class QuickAccessDialog extends PopupDialog {
 					arrayIndex += numTexts;
 				}
 			}
-		}
-	}
-
-	private class PreviousPicksProvider extends QuickAccessProvider {
-
-		public QuickAccessElement getElementForId(String id) {
-			return null;
-		}
-
-		public QuickAccessElement[] getElements() {
-			return (QuickAccessElement[]) previousPicksList
-					.toArray(new QuickAccessElement[previousPicksList.size()]);
-		}
-
-		public QuickAccessElement[] getElementsSorted() {
-			return getElements();
-		}
-
-		public String getId() {
-			return "org.eclipse.ui.previousPicks"; //$NON-NLS-1$
-		}
-
-		public ImageDescriptor getImageDescriptor() {
-			return WorkbenchImages.getImageDescriptor(IWorkbenchGraphicConstants.IMG_OBJ_NODE);
-		}
-
-		public String getName() {
-			return QuickAccessMessages.QuickAccess_Previous;
-		}
-
-		public boolean isAlwaysPresent() {
-			// TODO Auto-generated method stub
-			return true;
-		}
-
-		protected void doReset() {
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,10 +11,12 @@
 
 package org.eclipse.e4.ui.workbench.addons.dndaddon;
 
+import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
+import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.swt.custom.CTabFolder;
@@ -42,12 +44,23 @@ public class PartDragAgent extends DragAgent {
 
 		MPartStack stack = (MPartStack) info.curElement;
 
+		if (stack.getChildren().size() == 1 && stack.getParent().getChildren().size() == 1
+				&& getParentWindow(stack) == info.topLevelWindow) {
+			return null; // prevent dragging the last part of the last part stack of the host window
+		}
+
 		// Drag a part that is in a stack
 		if (info.itemElement instanceof MStackElement) {
 			// Prevent dragging 'No Move' parts
 			if (info.itemElement.getTags().contains(IPresentationEngine.NO_MOVE))
 				return null;
 
+			// If it's an MPart only drag the part itself
+			if (info.itemElement instanceof MPart) {
+				return info.itemElement;
+			}
+
+			// check if we want to drag the placeholder or default to dragging the whole stack
 			int tbrCount = dndManager.getModelService().countRenderableChildren(stack);
 			if (tbrCount > 1 || dndManager.getModelService().isLastEditorStack(stack)) {
 				dragElement = info.itemElement;
@@ -103,5 +116,13 @@ public class PartDragAgent extends DragAgent {
 			ps.activate((MPart) dragElement);
 		}
 		super.dragFinished(performDrop, info);
+	}
+
+	private MWindow getParentWindow(MPartStack stack) {
+		MElementContainer<?> parent = stack.getParent();
+		while (parent != null && !(parent instanceof MWindow)) {
+			parent = parent.getParent();
+		}
+		return parent instanceof MWindow ? ((MWindow) parent) : null;
 	}
 }
