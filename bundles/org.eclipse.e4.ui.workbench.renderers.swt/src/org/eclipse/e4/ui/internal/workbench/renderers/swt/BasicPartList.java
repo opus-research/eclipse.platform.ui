@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,6 +24,8 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.renderers.swt.StackRenderer;
 import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
@@ -80,7 +82,11 @@ public class BasicPartList extends AbstractTableInformationControl {
 
 		@Override
 		public Image getImage(Object element) {
-			return renderer.getImage((MUILabel) element);
+			String iconURI = ((MUILabel) element).getIconURI();
+			if (iconURI == null) {
+				return null;
+			}
+			return getLabelImage(iconURI);
 		}
 
 		@Override
@@ -101,6 +107,8 @@ public class BasicPartList extends AbstractTableInformationControl {
 
 	private Map<String, Image> images = new HashMap<String, Image>();
 
+	private ISWTResourceUtilities utils;
+
 	private MElementContainer<?> input;
 
 	private EPartService partService;
@@ -117,10 +125,22 @@ public class BasicPartList extends AbstractTableInformationControl {
 		this.partService = partService;
 		this.input = input;
 		this.renderer = renderer;
+		this.utils = utils;
 		// this.saveHandler = saveHandler;
 		if (alphabetical && getTableViewer() != null) {
 			getTableViewer().setComparator(new ViewerComparator());
 		}
+	}
+
+	private Image getLabelImage(String iconURI) {
+		Image image = images.get(iconURI);
+		if (image == null) {
+			ImageDescriptor descriptor = utils.imageDescriptorFromURI(URI
+					.createURI(iconURI));
+			image = descriptor.createImage();
+			images.put(iconURI, image);
+		}
+		return image;
 	}
 
 	@Override
