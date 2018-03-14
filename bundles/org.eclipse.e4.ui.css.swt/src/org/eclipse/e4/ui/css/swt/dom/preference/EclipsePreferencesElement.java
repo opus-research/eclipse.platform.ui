@@ -82,8 +82,7 @@ public class EclipsePreferencesElement extends ElementAdapter {
 
 	@Override
 	public String getAttribute(String arg0) {
-		// TODO Auto-generated method stub
-		return null;
+		return "";
 	}
 
 }
