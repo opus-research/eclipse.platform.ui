@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 462056
+ *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 457939
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench.swt;
 
@@ -829,6 +830,11 @@ public class PartRenderingEngine implements IPresentationEngine {
 				: null;
 		if (parentRenderer != null) {
 			parentRenderer.hideChild(element.getParent(), element);
+		}
+
+		if (element instanceof MPlaceholder) {
+			MPlaceholder ph = (MPlaceholder) element;
+			ph.getRef().setCurSharedRef(null);
 		}
 
 		AbstractPartRenderer renderer = getRendererFor(element);
