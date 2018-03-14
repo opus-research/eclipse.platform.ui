@@ -478,9 +478,16 @@
                name="swt-background-mode">
          </property-name>
       </handler>
-      
-      
-      <!-- Theme element definitions -->            
+      <handler
+            adapter="org.eclipse.e4.ui.css.swt.dom.WidgetElement"
+            handler="org.eclipse.e4.ui.css.swt.properties.custom.CSSPropertyTreeArrowsSWTHandler">
+         <property-name
+               name="swt-tree-arrows">
+         </property-name>
+      </handler>
+
+
+      <!-- Theme element definitions -->
       <handler
             adapter="org.eclipse.e4.ui.css.swt.dom.definition.ThemeDefinitionElement"
             handler="org.eclipse.e4.ui.css.swt.properties.definition.CSSPropertyThemeElementDefinitionHandler">
