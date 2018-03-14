@@ -11,14 +11,12 @@
 
 package org.eclipse.ui.part;
 
-import org.eclipse.ui.internal.testing.ContributionInfoMessages;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import org.eclipse.core.commands.common.EventManager;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
@@ -48,7 +46,6 @@ import org.eclipse.ui.SubActionBars;
 import org.eclipse.ui.internal.WorkbenchPage;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.util.Util;
-import org.eclipse.ui.testing.ContributionInfo;
 
 /**
  * Abstract superclass of all multi-page workbench views.
@@ -260,7 +257,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 			Object[] listeners = getListeners();
 			for (int i = 0; i < listeners.length; ++i) {
 				final ISelectionChangedListener l = (ISelectionChangedListener) listeners[i];
-				Platform.run(new SafeRunnable() {
+				SafeRunner.run(new SafeRunnable() {
 					@Override
 					public void run() {
 						l.selectionChanged(event);
@@ -425,9 +422,6 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 		PageRec rec = doCreatePage(part);
 		if (rec != null) {
 			mapPartToRec.put(part, rec);
-			rec.page.getControl().setData(
-					new ContributionInfo(part.getSite().getPluginId(),
-							ContributionInfoMessages.ContributionInfo_ViewContent, null));
 			preparePage(rec);
 		}
 		return rec;

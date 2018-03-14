@@ -36,14 +36,14 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
  * </p>
  * <p>
  * Example:
- * 
+ *
  * <pre>
  * IWizard wizard = new ZipFileImportWizard();
  * wizard.init(workbench, selection);
  * WizardDialog dialog = new WizardDialog(shell, wizard);
  * dialog.open();
  * </pre>
- * 
+ *
  * During the call to <code>open</code>, the wizard dialog is presented to
  * the user. When the user hits Finish, the user-selected zip file is imported
  * into the workspace, the dialog closes, and the call to <code>open</code>
@@ -76,6 +76,7 @@ public class ZipFileImportWizard extends Wizard implements IImportWizard {
 	/*
 	 * (non-Javadoc) Method declared on IWizard.
 	 */
+	@Override
 	public void addPages() {
 		super.addPages();
 		mainPage = new WizardArchiveFileResourceImportPage1(workbench,
@@ -86,7 +87,7 @@ public class ZipFileImportWizard extends Wizard implements IImportWizard {
 	/**
 	 * Get the file import mask used by the receiver. By default use null so
 	 * that there is no mask.
-	 * 
+	 *
 	 * @return String[] or <code>null</code>
 	 * @since 3.4
 	 */
@@ -97,6 +98,7 @@ public class ZipFileImportWizard extends Wizard implements IImportWizard {
 	/*
 	 * (non-Javadoc) Method declared on IWorkbenchWizard.
 	 */
+	@Override
 	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
 		this.workbench = workbench;
 		this.selection = currentSelection;
@@ -114,6 +116,7 @@ public class ZipFileImportWizard extends Wizard implements IImportWizard {
 	/*
 	 * (non-Javadoc) Method declared on IWizard.
 	 */
+	@Override
 	public boolean performCancel() {
 		return mainPage.cancel();
 	}
@@ -121,6 +124,7 @@ public class ZipFileImportWizard extends Wizard implements IImportWizard {
 	/*
 	 * (non-Javadoc) Method declared on IWizard.
 	 */
+	@Override
 	public boolean performFinish() {
 		return mainPage.finish();
 	}

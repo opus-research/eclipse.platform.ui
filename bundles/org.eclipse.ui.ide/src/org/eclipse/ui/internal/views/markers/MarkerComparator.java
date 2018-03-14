@@ -22,9 +22,9 @@ import org.eclipse.ui.views.markers.MarkerItem;
 /**
  * The MarkerComparator is the class that handles the comparison of markers for
  * a specific content provider.
- * 
+ *
  * @since 3.4
- * 
+ *
  */
 class MarkerComparator implements Comparator {
 
@@ -49,7 +49,7 @@ class MarkerComparator implements Comparator {
 
 	/**
 	 * Create a new instance of the receiver categorised by categoryField
-	 * 
+	 *
 	 * @param categoryField
 	 *            May be <code>null/<code>
 	 * @param mainFields in order of compare significance
@@ -61,7 +61,7 @@ class MarkerComparator implements Comparator {
 
 	/**
 	 * Compare the two objects to see if they have the same category value
-	 * 
+	 *
 	 * @param object1
 	 * @param object2
 	 * @return int
@@ -72,26 +72,28 @@ class MarkerComparator implements Comparator {
 			return 0;
 		return category.compare((MarkerItem) object1, (MarkerItem) object2);
 	}
-	
+
 	/**
 	 * Comparator to compare the two MarkerEntry(s) to see if they have the same
 	 * category value
-	 * 
+	 *
 	 * @return Comparator
 	 */
 	Comparator getCategoryComparator(){
 		return new Comparator(){
+			@Override
 			public int compare(Object o1, Object o2) {
 				return compareCategory(o1, o2);
-			}			
+			}
 		};
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 	 */
+	@Override
 	public int compare(Object arg0, Object arg1) {
 
 		// Sort by category first
@@ -104,7 +106,7 @@ class MarkerComparator implements Comparator {
 
 	/**
 	 * Compare the two objects by various fields
-	 * 
+	 *
 	 * @param item0
 	 * @param item1
 	 * @return int
@@ -124,21 +126,22 @@ class MarkerComparator implements Comparator {
 	}
 	/**
 	 * Comparator to compare the two MarkerEntry(s) by various fields
-	 * 
+	 *
 	 * @return Comparator
 	 */
 	Comparator getFieldsComparator(){
 		return new Comparator(){
+			@Override
 			public int compare(Object o1, Object o2) {
 				return compareFields(o1, o2);
-			}			
+			}
 		};
 	}
 
 	/**
 	 * Switch the priority of the field from ascending to descending or vice
 	 * versa.
-	 * 
+	 *
 	 * @param field
 	 */
 	public void reversePriority(MarkerField field) {
@@ -150,7 +153,7 @@ class MarkerComparator implements Comparator {
 
 	/**
 	 * Set field to be the first sort field.
-	 * 
+	 *
 	 * @param field
 	 */
 	void setPrimarySortField(MarkerField field) {
@@ -175,7 +178,7 @@ class MarkerComparator implements Comparator {
 
 	/**
 	 * Restore the receiver's state from memento.
-	 * 
+	 *
 	 * @param memento
 	 */
 	void restore(IMemento memento) {
@@ -211,7 +214,7 @@ class MarkerComparator implements Comparator {
 
 	/**
 	 * Save the current sort field in the memento.
-	 * 
+	 *
 	 * @param memento
 	 */
 	void saveState(IMemento memento) {
@@ -228,7 +231,7 @@ class MarkerComparator implements Comparator {
 
 	/**
 	 * Get the field that is the main sort field
-	 * 
+	 *
 	 * @return MarkerField
 	 */
 	MarkerField getPrimarySortField() {

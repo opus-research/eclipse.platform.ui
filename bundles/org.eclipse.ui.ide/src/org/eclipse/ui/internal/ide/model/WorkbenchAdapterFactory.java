@@ -75,12 +75,13 @@ public class WorkbenchAdapterFactory implements IAdapterFactory {
      * @param o the adaptable object being queried
      *   (usually an instance of <code>IAdaptable</code>)
      * @param adapterType the type of adapter to look up
-     * @return a object castable to the given adapter type, 
-     *    or <code>null</code> if this adapter provider 
+     * @return a object castable to the given adapter type,
+     *    or <code>null</code> if this adapter provider
      *    does not have an adapter of the given type for the
      *    given object
      */
-    public Object getAdapter(Object o, Class adapterType) {
+    @Override
+	public Object getAdapter(Object o, Class adapterType) {
         if (adapterType.isInstance(o)) {
             return o;
         }
@@ -115,7 +116,8 @@ public class WorkbenchAdapterFactory implements IAdapterFactory {
      *
      * @return the collection of adapter types
      */
-    public Class[] getAdapterList() {
+    @Override
+	public Class[] getAdapterList() {
         return new Class[] { IWorkbenchAdapter.class, IWorkbenchAdapter2.class,
                 IWorkbenchAdapter3.class, IElementFactory.class,
                 IPersistableElement.class, IActionFilter.class,
@@ -179,7 +181,7 @@ public class WorkbenchAdapterFactory implements IAdapterFactory {
         }
         return null;
     }
-    
+
     /**
      * Returns the IUndoContext for an object.
      */

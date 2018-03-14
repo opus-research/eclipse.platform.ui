@@ -21,9 +21,9 @@ import org.eclipse.core.resources.IMarker;
 /**
  * EditablePropertyTester is a property tester for the editable property of the
  * selected marker.
- * 
+ *
  * @since 3.4
- * 
+ *
  */
 public class EditablePropertyTester extends PropertyTester {
 
@@ -39,6 +39,7 @@ public class EditablePropertyTester extends PropertyTester {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.expressions.IPropertyTester#test(java.lang.Object, java.lang.String, java.lang.Object[], java.lang.Object)
 	 */
+	@Override
 	public boolean test(Object receiver, String property, Object[] args,
 			Object expectedValue) {
 		if (property.equals(EDITABLE)) {

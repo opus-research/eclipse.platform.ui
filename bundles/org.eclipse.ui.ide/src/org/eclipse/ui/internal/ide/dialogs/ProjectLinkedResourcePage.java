@@ -45,9 +45,9 @@ public class ProjectLinkedResourcePage extends PropertyPage implements
 
 	 private PathVariablesGroup pathVariablesGroup;
 	 private LinkedResourceEditor linkedResourceEditor;
-	 
+
 	 /**
-	 * 
+	 *
 	 */
 	public ProjectLinkedResourcePage() {
 		 pathVariablesGroup = new PathVariablesGroup(true, IResource.FILE | IResource.FOLDER);
@@ -55,6 +55,7 @@ public class ProjectLinkedResourcePage extends PropertyPage implements
 		 this.noDefaultAndApplyButton();
 	 }
 
+	@Override
 	protected Control createContents(Composite parent) {
 
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
@@ -86,9 +87,11 @@ public class ProjectLinkedResourcePage extends PropertyPage implements
 
         TabFolder tabFolder = new TabFolder(pageComponent, SWT.TOP);
         tabFolder.addSelectionListener(new SelectionListener() {
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
-				
+
 			}
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				TabFolder source = (TabFolder) e.getSource();
 				if (source.getSelectionIndex() == 1)
@@ -97,7 +100,7 @@ public class ProjectLinkedResourcePage extends PropertyPage implements
 					switchToPathVariables();
 			}
         });
-        
+
         pageComponent.setLayout(layout);
         data = new GridData();
         data.verticalAlignment = GridData.FILL;
@@ -108,7 +111,7 @@ public class ProjectLinkedResourcePage extends PropertyPage implements
         tabFolder.setFont(font);
 
         TabItem variableItem = new TabItem(tabFolder, SWT.BORDER);
-        
+
         Composite variableComposite = new Composite(tabFolder, 0);
         variableComposite.setLayout(new GridLayout());
         variableComposite.setFont(font);
@@ -169,7 +172,8 @@ public class ProjectLinkedResourcePage extends PropertyPage implements
      * Disposes the path variables group.
      * @see org.eclipse.jface.dialogs.IDialogPage#dispose()
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
         pathVariablesGroup.dispose();
         linkedResourceEditor.dispose();
         super.dispose();
@@ -177,8 +181,8 @@ public class ProjectLinkedResourcePage extends PropertyPage implements
 
     /**
      * Empty implementation. This page does not use the workbench.
-     * @param workbench 
-     * 
+     * @param workbench
+     *
      * @see IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
      */
     public void init(IWorkbench workbench) {
@@ -187,17 +191,18 @@ public class ProjectLinkedResourcePage extends PropertyPage implements
     /**
      * Commits the temporary state to the path variable manager in response to user
      * confirmation.
-     * 
+     *
      * @see PreferencePage#performOk()
      * @see PathVariablesGroup#performOk()
      */
-    public boolean performOk() {
+    @Override
+	public boolean performOk() {
         return pathVariablesGroup.performOk() && linkedResourceEditor.performOk();
     }
 
     /**
      * Set the widget enabled state
-     * 
+     *
      * @param enableLinking the new widget enabled state
      */
     protected void updateWidgetState(boolean enableLinking) {

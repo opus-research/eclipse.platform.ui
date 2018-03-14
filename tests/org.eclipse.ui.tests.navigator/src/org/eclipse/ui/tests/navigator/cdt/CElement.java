@@ -30,7 +30,7 @@ public class CElement implements IAdaptable {
 	protected List _children;
 
 	protected CNavigatorContentProvider _cp;
-	
+
 	public CElement(CNavigatorContentProvider cp, IResource resource, CElement parent) {
 		_cp = cp;
 		_resource = resource;
@@ -85,12 +85,14 @@ public class CElement implements IAdaptable {
 			_children.add(child);
 	}
 
+	@Override
 	public Object getAdapter(Class adapter) {
 		if (adapter == IResource.class)
 			return _resource;
 		return null;
 	}
 
+	@Override
 	public String toString() {
 		return getClass().getName() + ": " + _resource;
 	}

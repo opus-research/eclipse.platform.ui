@@ -46,9 +46,9 @@ import org.eclipse.swt.widgets.Text;
 
 /**
  * DialogProblemFilter is the dialog class for problem filters.
- * 
+ *
  * @since 3.2
- * 
+ *
  */
 public class DialogProblemFilter extends DialogMarkerFilter {
 
@@ -75,7 +75,7 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 		/**
 		 * Create a descriptor group.
-		 * 
+		 *
 		 * @param parent
 		 */
 		public DescriptionGroup(Composite parent) {
@@ -97,9 +97,10 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 			combo.addSelectionListener(new SelectionAdapter() {
 				/*
 				 * (non-Javadoc)
-				 * 
+				 *
 				 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
 				 */
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					updateForSelection();
 				}
@@ -107,6 +108,7 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 			// Prevent Esc and Return from closing the dialog when the combo is
 			// active.
 			combo.addTraverseListener(new TraverseListener() {
+				@Override
 				public void keyTraversed(TraverseEvent e) {
 					if (e.detail == SWT.TRAVERSE_ESCAPE
 							|| e.detail == SWT.TRAVERSE_RETURN) {
@@ -123,6 +125,7 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 			description.setLayoutData(data);
 			description.addModifyListener(new ModifyListener() {
+				@Override
 				public void modifyText(ModifyEvent e) {
 					DialogProblemFilter.this.markDirty();
 				}
@@ -131,7 +134,7 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 		/**
 		 * Get the contains value.
-		 * 
+		 *
 		 * @return boolean
 		 */
 		public boolean getContains() {
@@ -140,7 +143,7 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 		/**
 		 * Return whether or not the contains value is of use.
-		 * 
+		 *
 		 * @param value
 		 */
 		public void setContains(boolean value) {
@@ -153,12 +156,12 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 		/**
 		 * Set the description field.
-		 * 
+		 *
 		 * @param text
 		 */
 		public void setDescription(String text) {
 			if (text == null) {
-				description.setText(""); //$NON-NLS-1$ 
+				description.setText(""); //$NON-NLS-1$
 			} else {
 				description.setText(text);
 			}
@@ -166,7 +169,7 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 		/**
 		 * Return the text for the description.
-		 * 
+		 *
 		 * @return String
 		 */
 		public String getDescription() {
@@ -176,7 +179,7 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 		/**
 		 * Update the enablement state based on whether or not the receiver is
 		 * enabled.
-		 * 
+		 *
 		 * @param enabled
 		 */
 		public void updateEnablement(boolean enabled) {
@@ -197,7 +200,7 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 		/**
 		 * Create a group for severity.
-		 * 
+		 *
 		 * @param parent
 		 */
 		public SeverityGroup(Composite parent) {
@@ -210,9 +213,10 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 			SelectionListener listener = new SelectionAdapter() {
 				/*
 				 * (non-Javadoc)
-				 * 
+				 *
 				 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
 				 */
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					updateEnablement(true);
 					DialogProblemFilter.this.markDirty();
@@ -234,9 +238,10 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 			errorButton.addSelectionListener(new SelectionAdapter() {
 				/*
 				 * (non-Javadoc)
-				 * 
+				 *
 				 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
 				 */
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					updateForSelection();
 				}
@@ -249,9 +254,10 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 			warningButton.addSelectionListener(new SelectionAdapter() {
 				/*
 				 * (non-Javadoc)
-				 * 
+				 *
 				 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
 				 */
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					updateForSelection();
 				}
@@ -264,9 +270,10 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 			infoButton.addSelectionListener(new SelectionAdapter() {
 				/*
 				 * (non-Javadoc)
-				 * 
+				 *
 				 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
 				 */
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					updateForSelection();
 				}
@@ -275,7 +282,7 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 		/**
 		 * Return whether or not sort by severity is selected.
-		 * 
+		 *
 		 * @return boolean
 		 */
 		public boolean isSeveritySelected() {
@@ -284,7 +291,7 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 		/**
 		 * Set whether or not the enabled button is selected.
-		 * 
+		 *
 		 * @param enabled
 		 */
 		public void setEnabled(boolean enabled) {
@@ -293,7 +300,7 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 		/**
 		 * Return whether or not the error button is selected.
-		 * 
+		 *
 		 * @return boolean
 		 */
 		public boolean isErrorSelected() {
@@ -302,7 +309,7 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 		/**
 		 * Set whether or not the error button is selected.
-		 * 
+		 *
 		 * @param selected
 		 */
 		public void setErrorSelected(boolean selected) {
@@ -311,7 +318,7 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 		/**
 		 * Return whether or not the warning button is selected.
-		 * 
+		 *
 		 * @return boolean
 		 */
 		public boolean isWarningSelected() {
@@ -320,7 +327,7 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 		/**
 		 * Set whether or not the warning button is selected.
-		 * 
+		 *
 		 * @param selected
 		 */
 		public void setWarningSelected(boolean selected) {
@@ -329,7 +336,7 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 		/**
 		 * Return whether or not the info button is selected.
-		 * 
+		 *
 		 * @return boolean
 		 */
 		public boolean isInfoSelected() {
@@ -338,7 +345,7 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 		/**
 		 * Set whether or not the erinforor button is selected.
-		 * 
+		 *
 		 * @param selected
 		 */
 		public void setInfoSelected(boolean selected) {
@@ -347,7 +354,7 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 		/**
 		 * Update enablement based on the enabled flag.
-		 * 
+		 *
 		 * @param enabled
 		 */
 		public void updateEnablement(boolean enabled) {
@@ -363,7 +370,7 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 	/**
 	 * Create a new instance of the receiver.
-	 * 
+	 *
 	 * @param parentShell
 	 * @param filters
 	 */
@@ -373,9 +380,10 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.DialogMarkerFilter#createAttributesArea(org.eclipse.swt.widgets.Composite)
 	 */
+	@Override
 	protected void createAttributesArea(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setFont(parent.getFont());
@@ -389,9 +397,10 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.DialogMarkerFilter#updateFilterFromUI(org.eclipse.ui.views.markers.internal.MarkerFilter)
 	 */
+	@Override
 	protected void updateFilterFromUI(MarkerFilter filter) {
 		super.updateFilterFromUI(filter);
 
@@ -416,9 +425,10 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.DialogMarkerFilter#updateUIWithFilter(org.eclipse.ui.views.markers.internal.MarkerFilter)
 	 */
+	@Override
 	protected void updateUIWithFilter(MarkerFilter filter) {
 
 		ProblemFilter problemFilter = (ProblemFilter) filter;
@@ -441,9 +451,10 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.DialogMarkerFilter#updateEnabledState(boolean)
 	 */
+	@Override
 	protected void updateEnabledState(boolean enabled) {
 		super.updateEnabledState(enabled);
 		descriptionGroup.updateEnablement(enabled);
@@ -452,9 +463,10 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markerview.FiltersDialog#resetPressed()
 	 */
+	@Override
 	protected void resetPressed() {
 		descriptionGroup.setContains(ProblemFilter.DEFAULT_CONTAINS);
 		descriptionGroup.setDescription(ProblemFilter.DEFAULT_DESCRIPTION);
@@ -470,15 +482,17 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 		super.resetPressed();
 	}
 
+	@Override
 	protected MarkerFilter newFilter(String newName) {
 		return new ProblemFilter(newName);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.DialogMarkerFilter#createFiltersArea(org.eclipse.swt.widgets.Composite)
 	 */
+	@Override
 	void createFiltersArea(Composite dialogArea) {
 
 		if (MarkerSupportRegistry.getInstance().getRegisteredFilters().size() == 0) {
@@ -521,7 +535,7 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 	/**
 	 * Create a composite for the registered filters.
-	 * 
+	 *
 	 * @param bottomComposite
 	 */
 	private void createRegisteredFilters(Composite bottomComposite) {
@@ -536,9 +550,10 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 		definedList.setContentProvider(new IStructuredContentProvider() {
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 			 */
+			@Override
 			public Object[] getElements(Object inputElement) {
 				return MarkerSupportRegistry.getInstance()
 						.getRegisteredFilters().toArray();
@@ -546,19 +561,21 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
 			 */
+			@Override
 			public void dispose() {
 				// Do nothing
 			}
 
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 			 *      java.lang.Object, java.lang.Object)
 			 */
+			@Override
 			public void inputChanged(Viewer viewer, Object oldInput,
 					Object newInput) {
 				// Do nothing
@@ -568,9 +585,10 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 		definedList.setLabelProvider(new LabelProvider() {
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
 			 */
+			@Override
 			public String getText(Object element) {
 				return ((MarkerFilter) element).getName();
 			}
@@ -581,9 +599,10 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 					/*
 					 * (non-Javadoc)
-					 * 
+					 *
 					 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
 					 */
+					@Override
 					public void selectionChanged(SelectionChangedEvent event) {
 
 						ISelection selection = event.getSelection();
@@ -619,7 +638,7 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 	/**
 	 * Return the string with the details of filter.
-	 * 
+	 *
 	 * @param filter
 	 * @return String
 	 */
@@ -652,7 +671,7 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 	/**
 	 * Get the problem types String for filter.
-	 * 
+	 *
 	 * @param filter
 	 * @return String
 	 */
@@ -676,7 +695,7 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 	/**
 	 * Return the string for severity if there is one. Otherwise return
 	 * <code>null</code>.
-	 * 
+	 *
 	 * @param filter
 	 * @return String
 	 */
@@ -699,7 +718,7 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 	/**
 	 * Return the string for the description if there is one. If not return
 	 * <code>null</code>.
-	 * 
+	 *
 	 * @param filter
 	 * @return String or <code>null</code>.
 	 */
@@ -721,7 +740,7 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 	/**
 	 * Return the string that describes the scope.
-	 * 
+	 *
 	 * @param filter
 	 * @return String or <code>null</code> if the severity does not match.
 	 */
@@ -748,9 +767,10 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.DialogMarkerFilter#setSelectedFilter(org.eclipse.jface.viewers.SelectionChangedEvent)
 	 */
+	@Override
 	protected void setSelectedFilter(SelectionChangedEvent event) {
 		showSystemLabel(false);
 		super.setSelectedFilter(event);
@@ -758,7 +778,7 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 	/**
 	 * Show or hide the system label.
-	 * 
+	 *
 	 * @param systemLabelShowing
 	 */
 	protected void showSystemLabel(boolean systemLabelShowing) {
@@ -770,9 +790,10 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.DialogMarkerFilter#createSelectedFilterArea(org.eclipse.swt.widgets.Composite)
 	 */
+	@Override
 	Composite createSelectedFilterArea(Composite composite) {
 
 		Composite wrapper = new Composite(composite, SWT.NONE);
@@ -810,7 +831,7 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 	/**
 	 * Create the label for system filters.
-	 * 
+	 *
 	 * @param wrapper
 	 * @return Label
 	 */
@@ -821,9 +842,10 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.DialogMarkerFilter#buttonPressed(int)
 	 */
+	@Override
 	protected void buttonPressed(int buttonId) {
 		if (definedList != null) {
 			if (buttonId == SELECT_ALL_FILTERS_ID) {
@@ -838,9 +860,10 @@ public class DialogProblemFilter extends DialogMarkerFilter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.DialogMarkerFilter#okPressed()
 	 */
+	@Override
 	protected void okPressed() {
 
 		Iterator registered = MarkerSupportRegistry.getInstance()

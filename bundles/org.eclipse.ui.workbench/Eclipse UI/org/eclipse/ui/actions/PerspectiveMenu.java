@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Tonny Madsen, RCP Company - bug 201055
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -150,9 +151,6 @@ public abstract class PerspectiveMenu extends ContributionItem {
 				.setActionDefinitionId(IWorkbenchCommandConstants.PERSPECTIVES_SHOW_PERSPECTIVE);
     }
 
-    /*
-     * (non-Javadoc) Fills the menu with perspective items.
-     */
     @Override
 	public void fill(Menu menu, int index) {
         if (getParent() instanceof MenuManager) {
@@ -255,7 +253,7 @@ public abstract class PerspectiveMenu extends ContributionItem {
         return action;
     }
 
-    /* (non-Javadoc)
+    /*
      * Returns the perspective shortcut items for the active perspective.
      * 
      * @return a list of <code>IPerspectiveDescriptor</code> items
@@ -330,17 +328,11 @@ public abstract class PerspectiveMenu extends ContributionItem {
         return window;
     }
 
-    /* (non-Javadoc)
-     * Returns whether this menu is dynamic.
-     */
     @Override
 	public boolean isDirty() {
         return dirty;
     }
 
-    /* (non-Javadoc)
-     * Returns whether this menu is dynamic.
-     */
     @Override
 	public boolean isDynamic() {
         return true;
@@ -377,7 +369,7 @@ public abstract class PerspectiveMenu extends ContributionItem {
 	 * @param event the selection event
 	 */
     void runOther(SelectionEvent event) {
-		IHandlerService handlerService = (IHandlerService) window
+		IHandlerService handlerService = window
 				.getService(IHandlerService.class);
 		try {
 			handlerService.executeCommand(IWorkbenchCommandConstants.PERSPECTIVES_SHOW_PERSPECTIVE, null);

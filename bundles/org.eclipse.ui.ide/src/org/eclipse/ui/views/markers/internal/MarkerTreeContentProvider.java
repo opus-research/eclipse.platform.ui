@@ -17,9 +17,9 @@ import org.eclipse.jface.viewers.Viewer;
 
 /**
  * The MarkerTreeContentProvider is the content provider for the marker trees.
- * 
+ *
  * @since 3.2
- * 
+ *
  */
 public class MarkerTreeContentProvider implements ITreeContentProvider {
 
@@ -37,9 +37,10 @@ public class MarkerTreeContentProvider implements ITreeContentProvider {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
 	 */
+	@Override
 	public Object[] getChildren(Object parentElement) {
 		if (parentElement instanceof MarkerNode) {
 			return ((MarkerNode) parentElement).getChildren();
@@ -49,9 +50,10 @@ public class MarkerTreeContentProvider implements ITreeContentProvider {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
 	 */
+	@Override
 	public Object getParent(Object element) {
 		if (element instanceof MarkerNode) {
 			return ((MarkerNode) element).getParent();
@@ -61,9 +63,10 @@ public class MarkerTreeContentProvider implements ITreeContentProvider {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
 	 */
+	@Override
 	public boolean hasChildren(Object element) {
 		if (element instanceof MarkerNode) {
 			return ((MarkerNode) element).getChildren().length > 0;
@@ -73,28 +76,31 @@ public class MarkerTreeContentProvider implements ITreeContentProvider {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 	 */
+	@Override
 	public Object[] getElements(Object inputElement) {
 		return adapter.getElements();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
 	 */
+	@Override
 	public void dispose() {
 		// Nothing to do here.
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 	 *      java.lang.Object, java.lang.Object)
 	 */
+	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		this.viewer = (TreeViewer) viewer;
 		adapter = (MarkerAdapter) newInput;

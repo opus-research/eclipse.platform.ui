@@ -74,7 +74,8 @@ class TaskSorter extends ViewerComparator {
      * Compares two markers, sorting first by the main column of this sorter,
      * then by subsequent columns, depending on the column sort order.
      */
-    public int compare(Viewer viewer, Object e1, Object e2) {
+    @Override
+	public int compare(Viewer viewer, Object e1, Object e2) {
         IMarker m1 = (IMarker) e1;
         IMarker m2 = (IMarker) e2;
         return compareColumnValue(m1, m2, 0);
@@ -249,7 +250,7 @@ class TaskSorter extends ViewerComparator {
 
     /**
      * Compares the line number and location of the two markers.
-     * If line number is specified for both, this sorts first by line number (numerically), 
+     * If line number is specified for both, this sorts first by line number (numerically),
      * then by start offset (numerically), then by location (textually).
      * If line number is not specified for either, this sorts by location.
      * Otherwise, if only one has a line number, this sorts by the combined text for line number and location.

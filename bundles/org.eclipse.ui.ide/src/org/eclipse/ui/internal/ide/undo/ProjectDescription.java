@@ -24,11 +24,11 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 /**
  * ProjectDescription is a lightweight description that describes a project to
  * be created.
- * 
+ *
  * This class is not intended to be instantiated or used by clients.
- * 
+ *
  * @since 3.3
- * 
+ *
  */
 public class ProjectDescription extends ContainerDescription {
 
@@ -37,7 +37,7 @@ public class ProjectDescription extends ContainerDescription {
 
 	/**
 	 * Create a project description from a specified project.
-	 * 
+	 *
 	 * @param project
 	 *            The project to be described. The project must exist.
 	 */
@@ -62,7 +62,7 @@ public class ProjectDescription extends ContainerDescription {
 	/**
 	 * Create a project description from a specified IProjectDescription. Used
 	 * when the project does not yet exist.
-	 * 
+	 *
 	 * @param projectDescription
 	 *            the project description for the future project
 	 */
@@ -73,19 +73,21 @@ public class ProjectDescription extends ContainerDescription {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.ide.undo.ContainerDescription#createResourceHandle()
 	 */
+	@Override
 	public IResource createResourceHandle() {
 		return ResourcesPlugin.getWorkspace().getRoot().getProject(getName());
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.ide.undo.ResourceDescription#createExistentResourceFromHandle(org.eclipse.core.resources.IResource,
 	 *      org.eclipse.core.runtime.IProgressMonitor)
 	 */
+	@Override
 	public void createExistentResourceFromHandle(IResource resource,
 			IProgressMonitor monitor) throws CoreException {
 		Assert.isLegal(resource instanceof IProject);
@@ -114,9 +116,10 @@ public class ProjectDescription extends ContainerDescription {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.ide.undo.ContainerDescription#getName()
 	 */
+	@Override
 	public String getName() {
 		if (projectDescription != null) {
 			return projectDescription.getName();
@@ -126,9 +129,10 @@ public class ProjectDescription extends ContainerDescription {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.ide.undo.ResourceDescription#verifyExistence(boolean)
 	 */
+	@Override
 	public boolean verifyExistence(boolean checkMembers) {
 		// We can only check members if the project is open.
 		IProject projectHandle = (IProject) createResourceHandle();

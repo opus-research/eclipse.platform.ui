@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -52,22 +52,11 @@ public class ResourceDragAdapterAssistant extends
 
 	private static final Class<IResource> IRESOURCE_TYPE = IResource.class;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.navigator.CommonDragAdapterAssistant#getSupportedTransferTypes()
-	 */
 	@Override
 	public Transfer[] getSupportedTransferTypes() {
 		return SUPPORTED_TRANSFERS;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.navigator.CommonDragAdapterAssistant#setDragData(org.eclipse.swt.dnd.DragSourceEvent,
-	 *      org.eclipse.jface.viewers.IStructuredSelection)
-	 */
 	@Override
 	public boolean setDragData(DragSourceEvent anEvent,
 			IStructuredSelection aSelection) {
@@ -134,10 +123,10 @@ public class ResourceDragAdapterAssistant extends
 		if (selected instanceof IResource) {
 			resource = (IResource) selected;
 		} else if (selected instanceof IAdaptable) {
-			resource = (IResource) ((IAdaptable) selected)
+			resource = ((IAdaptable) selected)
 					.getAdapter(IRESOURCE_TYPE);
 		} else {
-			resource = (IResource) Platform.getAdapterManager().getAdapter(
+			resource = Platform.getAdapterManager().getAdapter(
 					selected, IRESOURCE_TYPE);
 		}
 		return resource;

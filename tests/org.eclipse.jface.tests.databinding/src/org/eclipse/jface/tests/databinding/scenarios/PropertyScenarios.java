@@ -58,13 +58,15 @@ public class PropertyScenarios extends ScenariosTestCase {
 
     private Adventure adventure;
 
-    protected void setUp() throws Exception {
+    @Override
+	protected void setUp() throws Exception {
         super.setUp();
         // do any setup work here
         adventure = SampleData.WINTER_HOLIDAY;
     }
 
-    protected void tearDown() throws Exception {
+    @Override
+	protected void tearDown() throws Exception {
         // do any teardown work here
         super.tearDown();
     }
@@ -75,11 +77,13 @@ public class PropertyScenarios extends ScenariosTestCase {
         final boolean[] focusLostHolder = { false };
         text.addFocusListener(new FocusListener() {
 
-            public void focusGained(FocusEvent e) {
+            @Override
+			public void focusGained(FocusEvent e) {
                 // only interested in focus lost events
             }
 
-            public void focusLost(FocusEvent e) {
+            @Override
+			public void focusLost(FocusEvent e) {
                 focusLostHolder[0] = true;
             }
         });
@@ -148,7 +152,7 @@ public class PropertyScenarios extends ScenariosTestCase {
 
         IObservableValue defaultLodging = BeansObservables.observeDetailValue(
         		BeansObservables.observeValue(adventure, "defaultLodging"),
-        		"description", String.class); 
+        		"description", String.class);
 
         getDbc().bindValue(SWTObservables.observeText(text, SWT.Modify), defaultLodging);
 
@@ -185,15 +189,18 @@ public class PropertyScenarios extends ScenariosTestCase {
         adventure.setName("UPPERCASE");
 
         IConverter converter1 = new IConverter() {
-            public Object getFromType() {
+            @Override
+			public Object getFromType() {
                 return String.class;
             }
 
-            public Object getToType() {
+            @Override
+			public Object getToType() {
                 return String.class;
             }
 
-            public Object convert(Object toObject) {
+            @Override
+			public Object convert(Object toObject) {
                 String modelValue = (String) toObject;
                 if (modelValue == null || modelValue.equals("")) {
                     return modelValue;
@@ -204,15 +211,18 @@ public class PropertyScenarios extends ScenariosTestCase {
             }
         };
         IConverter converter2 = new IConverter() {
-            public Object getFromType() {
+            @Override
+			public Object getFromType() {
                 return String.class;
             }
 
-            public Object getToType() {
+            @Override
+			public Object getToType() {
                 return String.class;
             }
 
-            public Object convert(Object fromObject) {
+            @Override
+			public Object convert(Object fromObject) {
                 return ((String) fromObject).toUpperCase();
             }
         };
@@ -240,7 +250,8 @@ public class PropertyScenarios extends ScenariosTestCase {
         adventure.setName("ValidValue");
 
         IValidator validator = new IValidator() {
-            public IStatus validate(Object value) {
+            @Override
+			public IStatus validate(Object value) {
                 String stringValue = (String) value;
                 if (stringValue.length() > 15) {
                     return ValidationStatus.error(max15CharactersMessage);
@@ -288,7 +299,8 @@ public class PropertyScenarios extends ScenariosTestCase {
         final String mustBeCurrencyMessage = "Price must be a currency.";
 
         IValidator validator = new IValidator() {
-            public IStatus validate(Object value) {
+            @Override
+			public IStatus validate(Object value) {
                 String stringValue = (String) value;
                 try {
                     double doubleValue = new Double(stringValue).doubleValue();
@@ -301,7 +313,7 @@ public class PropertyScenarios extends ScenariosTestCase {
                 }
             }
         };
-        
+
         //Create a number formatter that will display one decimal position.
 		NumberFormat numberFormat = NumberFormat.getInstance();
 		numberFormat.setMinimumFractionDigits(1);
@@ -321,25 +333,25 @@ public class PropertyScenarios extends ScenariosTestCase {
 		String expected = numberFormat.format(adventure.getPrice());
         assertEquals(expected, text.getText());
         assertTrue(AggregateValidationStatus.getStatusMaxSeverity(getDbc().getBindings()).isOK());
-        
+
         String toEnter = numberFormat.format(0.65);
         enterText(text, toEnter);
         assertTrue(AggregateValidationStatus.getStatusMaxSeverity(getDbc().getBindings()).isOK());
         assertEquals(0.65, adventure.getPrice(), 0.0001);
-        
+
         adventure.setPrice(42.24);
         expected = numberFormat.format(adventure.getPrice());
         assertEquals(expected, text.getText());
         assertTrue(AggregateValidationStatus.getStatusMaxSeverity(getDbc().getBindings()).isOK());
-        
+
         enterText(text, "jygt");
         assertEquals(mustBeCurrencyMessage, AggregateValidationStatus.getStatusMaxSeverity(getDbc().getBindings()).getMessage());
-        
+
         toEnter = numberFormat.format(-23.9);
         enterText(text, toEnter);
         assertEquals(cannotBeNegativeMessage, AggregateValidationStatus.getStatusMaxSeverity(getDbc().getBindings()).getMessage());
         assertEquals(42.24, adventure.getPrice(), 0.0001);
-        
+
         adventure.setPrice(0.0);
         assertTrue(AggregateValidationStatus.getStatusMaxSeverity(getDbc().getBindings()).isOK());
     }
@@ -356,13 +368,15 @@ public class PropertyScenarios extends ScenariosTestCase {
         final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.CANADA);
 
         IConverter toCurrency = new Converter(double.class, String.class) {
-            public Object convert(Object toObject) {
+            @Override
+			public Object convert(Object toObject) {
                 return currencyFormat.format(((Double) toObject).doubleValue());
             }
         };
 
         IConverter toDouble = new Converter(String.class, double.class) {
-            public Object convert(Object fromObject) {
+            @Override
+			public Object convert(Object fromObject) {
                 try {
                     return new Double(currencyFormat.parse((String) fromObject).doubleValue());
                 } catch (ParseException e) {
@@ -374,7 +388,8 @@ public class PropertyScenarios extends ScenariosTestCase {
         };
 
         IValidator validator = new IValidator() {
-            public IStatus validate(Object value) {
+            @Override
+			public IStatus validate(Object value) {
                 String stringValue = (String) value;
                 try {
                     double doubleValue = currencyFormat.parse(stringValue).doubleValue();
@@ -395,23 +410,23 @@ new UpdateValueStrategy().setConverter(toDouble).setAfterGetValidator(validator)
         String expected = currencyFormat.format(5);
         assertEquals(expected, text.getText());
         assertTrue(AggregateValidationStatus.getStatusMaxSeverity(getDbc().getBindings()).isOK());
-        
+
         String toEnter = currencyFormat.format(0.65);
         enterText(text, toEnter);
         assertTrue(AggregateValidationStatus.getStatusMaxSeverity(getDbc().getBindings()).isOK());
         assertEquals(0.65, adventure.getPrice(), 0.0001);
-        
+
         adventure.setPrice(42.24);
         expected = currencyFormat.format(adventure.getPrice());
         assertEquals(expected, text.getText());
-        
+
         assertTrue(AggregateValidationStatus.getStatusMaxSeverity(getDbc().getBindings()).isOK());
         enterText(text, "jygt");
         assertEquals(mustBeCurrencyMessage, AggregateValidationStatus.getStatusMaxSeverity(getDbc().getBindings()).getMessage());
-        
+
         toEnter = currencyFormat.format(-23.9);
         enterText(text, toEnter);
-        
+
         assertEquals(cannotBeNegativeMessage, AggregateValidationStatus.getStatusMaxSeverity(getDbc().getBindings()).getMessage());
         assertEquals(42.24, adventure.getPrice(), 0.0001);
         adventure.setPrice(0.0);
@@ -482,7 +497,8 @@ new UpdateValueStrategy().setConverter(toDouble).setAfterGetValidator(validator)
                 return new Boolean(!booleanObject.booleanValue());
             }
 
-            public Object convert(Object targetObject) {
+            @Override
+			public Object convert(Object targetObject) {
                 return negated((Boolean) targetObject);
             }
         };
@@ -490,13 +506,13 @@ new UpdateValueStrategy().setConverter(toDouble).setAfterGetValidator(validator)
         getDbc().bindValue(checkbox1Selected,
                 checkbox2Selected,new UpdateValueStrategy().setConverter(negatingConverter),
                 new UpdateValueStrategy().setConverter(negatingConverter));
-        
+
         // bind the enabled state of the two text widgets to one of the
         // checkboxes each.
-        
+
         getDbc().bindValue(SWTObservables.observeEnabled(text1), checkbox1Selected);
         getDbc().bindValue(SWTObservables.observeEnabled(text2), checkbox2Selected);
-                
+
         assertEquals(true, text1.getEnabled());
         assertEquals(false, text2.getEnabled());
         assertEquals(true, checkbox1.getSelection());
@@ -512,7 +528,7 @@ new UpdateValueStrategy().setConverter(toDouble).setAfterGetValidator(validator)
 
     public void testScenario13() {
         Text text = new Text(getComposite(), SWT.BORDER);
-        
+
         getDbc().bindValue(SWTObservables.observeText(text, SWT.FocusOut), BeansObservables.observeValue(adventure, "name"));
 
         // uncomment the following line to see what's happening
@@ -533,16 +549,17 @@ new UpdateValueStrategy().setConverter(toDouble).setAfterGetValidator(validator)
     public void testScenario14() {
         Text t1 = new Text(getComposite(), SWT.BORDER);
         Text t2 = new Text(getComposite(), SWT.BORDER);
-  
+
         getDbc().bindValue(SWTObservables.observeText(t1, SWT.Modify), BeansObservables.observeValue(adventure, "name"));
         getDbc().bindValue(SWTObservables.observeText(t2, SWT.Modify), BeansObservables.observeValue(adventure, "name"));
-        
+
         final int[] counter = { 0 };
-        
+
         IObservableValue uv = BeansObservables.observeValue(adventure, "name");
-        
+
         uv.addChangeListener(new IChangeListener() {
-            public void handleChange(ChangeEvent event) {
+            @Override
+			public void handleChange(ChangeEvent event) {
                 // Count how many times adventure has changed
                 counter[0]++;
             }
@@ -565,10 +582,10 @@ new UpdateValueStrategy().setConverter(toDouble).setAfterGetValidator(validator)
         Text text = new Text(getComposite(), SWT.NONE);
         Account account = new Account();
         account.setExpiryDate(new Date());
-        
+
         Binding b = getDbc().bindValue(SWTObservables.observeText(text, SWT.Modify), BeansObservables.observeValue(account, "expiryDate"));
         Text errorText = new Text(getComposite(), SWT.NONE);
-        
+
         getDbc().bindValue(SWTObservables.observeText(errorText, SWT.Modify), b.getValidationStatus(), new UpdateValueStrategy(false, UpdateValueStrategy.POLICY_NEVER), null);
         assertTrue(((IStatus)b.getValidationStatus().getValue()).isOK());
         enterText(text, "foo");

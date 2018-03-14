@@ -36,7 +36,7 @@ public class WorkspaceModifyDelegatingOperation extends
     /**
      * Creates a new operation which will delegate its work to the given
      * runnable using the provided scheduling rule.
-     * 
+     *
      * @param content
      *            the runnable to delegate to when this operation is executed
      * @param rule
@@ -51,7 +51,7 @@ public class WorkspaceModifyDelegatingOperation extends
     /**
      * Creates a new operation which will delegate its work to the given
      * runnable. Schedule using the supplied s
-     * 
+     *
      * @param content
      *            the runnable to delegate to when this operation is executed
      */
@@ -63,7 +63,8 @@ public class WorkspaceModifyDelegatingOperation extends
     /*
      * (non-Javadoc) Method declared on WorkbenchModifyOperation.
      */
-    protected void execute(IProgressMonitor monitor) throws CoreException,
+    @Override
+	protected void execute(IProgressMonitor monitor) throws CoreException,
             InterruptedException {
         try {
             content.run(monitor);

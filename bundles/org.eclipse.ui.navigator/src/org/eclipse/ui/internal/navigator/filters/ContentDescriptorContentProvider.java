@@ -26,6 +26,7 @@ class ContentDescriptorContentProvider implements ITreeContentProvider {
 
 	private CheckboxTableViewer talbleViewer;
 
+	@Override
 	public void inputChanged(Viewer aViewer, Object anOldInput, Object aNewInput) {
 
 		if (aNewInput != null) {
@@ -46,48 +47,28 @@ class ContentDescriptorContentProvider implements ITreeContentProvider {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
-	 */
+	@Override
 	public Object[] getChildren(Object aParentElement) {
 		return NO_CHILDREN;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
-	 */
+	@Override
 	public Object getParent(Object anElement) {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
-	 */
+	@Override
 	public boolean hasChildren(Object anElement) {
 		return getChildren(anElement).length != 0;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
-	 */
+	@Override
 	public Object[] getElements(Object anInputElement) {
 		return contentService != null ? contentService.getVisibleExtensions()
 				: NO_CHILDREN;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
-	 */
+	@Override
 	public void dispose() {
 
 	}

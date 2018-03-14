@@ -26,7 +26,7 @@ import org.eclipse.ui.views.markers.internal.MarkerAdapter.MarkerCategory;
 
 /**
  * The ActionSelectAll is the action for selecting all of the entries.
- * 
+ *
  */
 public class ActionSelectAll extends MarkerSelectionProviderAction {
 
@@ -34,7 +34,7 @@ public class ActionSelectAll extends MarkerSelectionProviderAction {
 
 	/**
 	 * Create a new instance of the receiver with the supplied
-	 * 
+	 *
 	 * @param markerView
 	 */
 	public ActionSelectAll(MarkerView markerView) {
@@ -45,9 +45,10 @@ public class ActionSelectAll extends MarkerSelectionProviderAction {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.jface.action.Action#run()
 	 */
+	@Override
 	public void run() {
 
 		if (view.getMarkerAdapter().isBuilding())
@@ -56,9 +57,10 @@ public class ActionSelectAll extends MarkerSelectionProviderAction {
 		IRunnableWithProgress selectionRunnableWithProgress = new IRunnableWithProgress() {
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.jface.operation.IRunnableWithProgress#run(org.eclipse.core.runtime.IProgressMonitor)
 			 */
+			@Override
 			public void run(IProgressMonitor monitor) {
 
 				try {
@@ -138,9 +140,10 @@ public class ActionSelectAll extends MarkerSelectionProviderAction {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.actions.SelectionProviderAction#selectionChanged(org.eclipse.jface.viewers.IStructuredSelection)
 	 */
+	@Override
 	public void selectionChanged(IStructuredSelection selection) {
 		setEnabled(!selection.isEmpty());
 	}

@@ -57,13 +57,13 @@ import org.eclipse.ui.views.markers.internal.MarkerMessages;
  * combine the columns and preference dialogs into one. It should be noted that
  * the class can be re-used or turned into a tool for column viewers in general,
  * but with some modifications. See example attached at the end of this class
- * 
+ *
  * @since 3.7
- * 
+ *
  * @author Hitesh Soliwal
- * 
+ *
  * @noextend This class is not intended to be subclassed by clients.
- * 
+ *
  */
 abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 
@@ -86,7 +86,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 
 	/**
 	 * Create a new instance of the receiver.
-	 * 
+	 *
 	 * @param parentShell
 	 */
 	ViewerColumnsDialog(Shell parentShell) {
@@ -95,7 +95,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 
 	/**
 	 * Initialize visible /non-visible columns.
-	 * 
+	 *
 	 * @param columnObjs
 	 */
 	void setColumnsObjs(Object[] columnObjs) {
@@ -122,10 +122,11 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.views.markers.ViewerSettingsAndStatusDialog#
 	 * createDialogContentArea(org.eclipse.swt.widgets.Composite)
 	 */
+	@Override
 	protected Control createDialogContentArea(Composite dialogArea) {
 		Composite composite = new Composite(dialogArea, SWT.NONE);
 		GridLayout gridLayout = new GridLayout(4, false);
@@ -147,7 +148,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 
 	/**
 	 * The Up and Down button to change column ordering.
-	 * 
+	 *
 	 * @param parent
 	 */
 	Control createUpDownBtt(Composite parent) {
@@ -157,7 +158,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 		compositeLayout.marginWidth = 0;
 		composite.setLayout(compositeLayout);
 		composite.setLayoutData(new GridData(SWT.NONE, SWT.FILL, false, true));
-		
+
 		Composite bttArea = new Composite(composite, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		layout.marginHeight = 0;
@@ -166,6 +167,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 		upButton = new Button(bttArea, SWT.PUSH);
 		upButton.setText(JFaceResources.getString("ConfigureColumnsDialog_up")); //$NON-NLS-1$
 		upButton.addListener(SWT.Selection, new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				handleUpButton(event);
 			}
@@ -178,6 +180,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 		downButton.setText(JFaceResources
 				.getString("ConfigureColumnsDialog_down")); //$NON-NLS-1$
 		downButton.addListener(SWT.Selection, new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				handleDownButton(event);
 			}
@@ -189,7 +192,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 
 	/**
 	 * Create the controls responsible to display/edit column widths.
-	 * 
+	 *
 	 * @param parent
 	 * @return {@link Control}
 	 */
@@ -197,13 +200,13 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 
 		Label dummy = new Label(parent, SWT.NONE);
 		dummy.setLayoutData(new GridData(SWT.NONE, SWT.NONE, false, false, 2, 1));
-		
+
 		Composite widthComposite = new Composite(parent, SWT.NONE);
 		GridLayout gridLayout = new GridLayout(2, false);
 		gridLayout.marginHeight = 0;
 		widthComposite.setLayout(gridLayout);
 		widthComposite.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false, 2, 1));
-		
+
 		widthLabel = new Label(widthComposite, SWT.NONE);
 		widthLabel.setText(MarkerMessages.MarkerPreferences_WidthOfShownColumn);
 		GridData gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
@@ -212,6 +215,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 		widthText = new Text(widthComposite, SWT.BORDER);
 		widthText.addVerifyListener(new VerifyListener() {
 
+			@Override
 			public void verifyText(VerifyEvent e) {
 				if (e.character != 0 && e.keyCode != SWT.BS
 						&& e.keyCode != SWT.DEL
@@ -226,6 +230,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 		widthText.setLayoutData(gridData);
 		widthText.addModifyListener(new ModifyListener() {
 
+			@Override
 			public void modifyText(ModifyEvent e) {
 				updateWidth();
 			}
@@ -241,7 +246,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 
 	/**
 	 * Creates the table that lists out visible columns in the viewer
-	 * 
+	 *
 	 * @param parent
 	 * @return {@link Control}
 	 */
@@ -265,6 +270,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 		final TableColumn column = new TableColumn(table, SWT.NONE);
 		column.setText(MarkerMessages.MarkerPreferences_VisibleColumnsTitle);
 		Listener columnResize = new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				column.setWidth(table.getClientArea().width);
 			}
@@ -276,11 +282,13 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 		visibleViewer.setContentProvider(ArrayContentProvider.getInstance());
 		visibleViewer
 				.addSelectionChangedListener(new ISelectionChangedListener() {
+					@Override
 					public void selectionChanged(SelectionChangedEvent event) {
 						handleVisibleSelection(event.getSelection());
 					}
 				});
 		table.addListener(SWT.MouseDoubleClick, new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				handleToNonVisibleButton(event);
 			}
@@ -291,7 +299,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 
 	/**
 	 * Creates the table that lists out non-visible columns in the viewer
-	 * 
+	 *
 	 * @param parent
 	 * @return {@link Control}
 	 */
@@ -318,6 +326,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 		final TableColumn column = new TableColumn(table, SWT.NONE);
 		column.setText(MarkerMessages.MarkerPreferences_HiddenColumnsTitle);
 		Listener columnResize = new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				column.setWidth(table.getClientArea().width);
 			}
@@ -329,11 +338,13 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 		nonVisibleViewer.setContentProvider(ArrayContentProvider.getInstance());
 		nonVisibleViewer
 				.addSelectionChangedListener(new ISelectionChangedListener() {
+					@Override
 					public void selectionChanged(SelectionChangedEvent event) {
 						handleNonVisibleSelection(event.getSelection());
 					}
 				});
 		table.addListener(SWT.MouseDoubleClick, new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				handleToVisibleButton(event);
 			}
@@ -345,7 +356,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 	/**
 	 * Creates buttons for moving columns from non-visible to visible and
 	 * vice-versa
-	 * 
+	 *
 	 * @param parent
 	 * @return {@link Control}
 	 */
@@ -368,6 +379,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 		setButtonLayoutData(toVisibleBtt);
 		((GridData)toVisibleBtt.getLayoutData()).verticalIndent = tableLabelSize.y;
 		toVisibleBtt.addListener(SWT.Selection, new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				handleToVisibleButton(event);
 			}
@@ -379,6 +391,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 		setButtonLayoutData(toNonVisibleBtt);
 
 		toNonVisibleBtt.addListener(SWT.Selection, new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				handleToNonVisibleButton(event);
 			}
@@ -391,7 +404,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 	/**
 	 * Handles a selection change in the viewer that lists out the non-visible
 	 * columns
-	 * 
+	 *
 	 * @param selection
 	 */
 	void handleNonVisibleSelection(ISelection selection) {
@@ -409,7 +422,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 	/**
 	 * Handles a selection change in the viewer that lists out the visible
 	 * columns. Takes care of various enablements.
-	 * 
+	 *
 	 * @param selection
 	 */
 	void handleVisibleSelection(ISelection selection) {
@@ -459,7 +472,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 	/**
 	 * Applies to visible columns, and handles the changes in the order of
 	 * columns
-	 * 
+	 *
 	 * @param e
 	 *            event from the button click
 	 */
@@ -483,7 +496,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 	/**
 	 * Applies to visible columns, and handles the changes in the order of
 	 * columns
-	 * 
+	 *
 	 * @param e
 	 *            event from the button click
 	 */
@@ -506,7 +519,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 
 	/**
 	 * Moves selected columns from non-visible to visible state
-	 * 
+	 *
 	 * @param e
 	 *            event from the button click
 	 */
@@ -534,7 +547,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 
 	/**
 	 * Moves selected columns from visible to non-visible state
-	 * 
+	 *
 	 * @param e
 	 *            event from the button click
 	 */
@@ -577,7 +590,8 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 			updater.setColumnVisible(iterator.next(), visibility);
 		}
 	}
-	
+
+	@Override
 	protected void performDefaults() {
 		refreshViewers();
 		super.performDefaults();
@@ -617,14 +631,16 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 
 	/**
 	 * An adapter class to {@link ITableLabelProvider}
-	 * 
+	 *
 	 */
 	class TableLabelProvider extends LabelProvider implements
 			ITableLabelProvider {
+		@Override
 		public Image getColumnImage(Object element, int columnIndex) {
 			return null;
 		}
 
+		@Override
 		public String getColumnText(Object element, int columnIndex) {
 			return getText(element);
 		}
@@ -672,7 +688,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 	protected abstract IColumnUpdater getColumnUpdater();
 
 	/**
-	 * 
+	 *
 	 */
 	private void updateWidth() {
 		try {
@@ -696,14 +712,14 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 
 		/**
 		 * Get corresponding index for the column
-		 * 
+		 *
 		 * @param columnObj
 		 */
 		public int getColumnIndex(Object columnObj);
 
 		/**
 		 * Get the width of the column
-		 * 
+		 *
 		 * @param columnObj
 		 */
 		public int getColumnWidth(Object columnObj);
@@ -711,7 +727,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 		/**
 		 * Returns true if the column represented by parameters is showing in
 		 * the viewer
-		 * 
+		 *
 		 * @param columnObj
 		 */
 		public boolean isColumnVisible(Object columnObj);
@@ -719,7 +735,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 		/**
 		 * Returns true if the column represented by parameters is configured as
 		 * movable
-		 * 
+		 *
 		 * @param columnObj
 		 */
 		public boolean isColumnMovable(Object columnObj);
@@ -727,7 +743,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 		/**
 		 * Returns true if the column represented by parameters is configured as
 		 * resizable
-		 * 
+		 *
 		 * @param columnObj
 		 */
 		public boolean isColumnResizable(Object columnObj);
@@ -742,7 +758,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 
 		/**
 		 * Set the column represented by parameters as visible
-		 * 
+		 *
 		 * @param columnObj
 		 * @param visible
 		 */
@@ -750,7 +766,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 
 		/**
 		 * Dummy method - more a result of symmetry
-		 * 
+		 *
 		 * @param columnObj
 		 * @param movable
 		 */
@@ -759,7 +775,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 		/**
 		 * Call back to notify change in the index of the column represented by
 		 * columnObj
-		 * 
+		 *
 		 * @param columnObj
 		 * @param index
 		 */
@@ -767,7 +783,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 
 		/**
 		 * Dummy method - more a result of symmetry
-		 * 
+		 *
 		 * @param columnObj
 		 * @param resizable
 		 */
@@ -776,7 +792,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 		/**
 		 * Call back to notify change in the width of the column represented by
 		 * columnObj
-		 * 
+		 *
 		 * @param columnObj
 		 * @param newWidth
 		 */
@@ -804,6 +820,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 			this.keyIndex = currIndex;
 		}
 
+		@Override
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
@@ -812,6 +829,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 			return result;
 		}
 
+		@Override
 		public boolean equals(Object obj) {
 			if (this == obj) {
 				return true;
@@ -836,6 +854,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 			return true;
 		}
 
+		@Override
 		public String toString() {
 			return key.toString();
 		}
@@ -844,14 +863,17 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 				final TestData[] colums) {
 			ViewerColumnsDialog dialog = new ViewerColumnsDialog(shell) {
 
+				@Override
 				protected IColumnInfoProvider getColumnInfoProvider() {
 					return getInfoProvider(colums);
 				}
 
+				@Override
 				protected ITableLabelProvider getLabelProvider() {
 					return new TableLabelProvider();
 				}
 
+				@Override
 				protected IColumnUpdater getColumnUpdater() {
 					return getUpdater(colums);
 				}
@@ -863,24 +885,29 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 		private static IColumnUpdater getUpdater(final TestData[] data) {
 			return new IColumnUpdater() {
 
+				@Override
 				public void setColumnWidth(Object columnObj, int newWidth) {
 					((TestData) columnObj).width = newWidth;
 				}
 
+				@Override
 				public void setColumnVisible(Object columnObj, boolean visible) {
 					((TestData) columnObj).visibility = visible;
 				}
 
+				@Override
 				public void setColumnResizable(Object columnObj,
 						boolean resizable) {
 
 				}
 
+				@Override
 				public void setColumnMovable(Object columnObj, boolean movable) {
 					((TestData) columnObj).movable = movable;
 
 				}
 
+				@Override
 				public void setColumnIndex(Object columnObj, int index) {
 					((TestData) columnObj).newIndex = index;
 				}
@@ -891,22 +918,27 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 				final TestData[] colData) {
 			return new IColumnInfoProvider() {
 
+				@Override
 				public boolean isColumnVisible(Object columnObj) {
 					return ((TestData) columnObj).visibility;
 				}
 
+				@Override
 				public boolean isColumnResizable(Object columnObj) {
 					return ((TestData) columnObj).resizable;
 				}
 
+				@Override
 				public boolean isColumnMovable(Object columnObj) {
 					return ((TestData) columnObj).movable;
 				}
 
+				@Override
 				public int getColumnWidth(Object columnObj) {
 					return ((TestData) columnObj).width;
 				}
 
+				@Override
 				public int getColumnIndex(Object columnObj) {
 					return ((TestData) columnObj).newIndex;
 				}
@@ -970,7 +1002,7 @@ abstract class ViewerColumnsDialog extends ViewerSettingsAndStatusDialog {
 
 		/**
 		 * Demo
-		 * 
+		 *
 		 * @param args
 		 */
 		public static void main(String[] args) {

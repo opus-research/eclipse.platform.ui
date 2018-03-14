@@ -62,9 +62,10 @@ public class ActionOpenMarker extends MarkerSelectionProviderAction {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.jface.action.Action#run()
 	 */
+	@Override
 	public void run() {
 		IMarker[] markers = getSelectedMarkers();
 		for (int i = 0; i < markers.length; i++) {
@@ -122,7 +123,7 @@ public class ActionOpenMarker extends MarkerSelectionProviderAction {
 
 	/**
 	 * Report an error message
-	 * 
+	 *
 	 * @param message
 	 */
 	private void reportError(String message) {
@@ -133,7 +134,7 @@ public class ActionOpenMarker extends MarkerSelectionProviderAction {
 
 	/**
 	 * Report the status
-	 * 
+	 *
 	 * @param status
 	 */
 	private void reportStatus(IStatus status) {
@@ -145,9 +146,10 @@ public class ActionOpenMarker extends MarkerSelectionProviderAction {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.actions.SelectionProviderAction#selectionChanged(org.eclipse.jface.viewers.IStructuredSelection)
 	 */
+	@Override
 	public void selectionChanged(IStructuredSelection selection) {
 		if (Util.allConcreteSelection(selection)) {
 			Iterator nodes = selection.iterator();

@@ -12,6 +12,7 @@
 package org.eclipse.ui.internal.e4.compatibility;
 
 import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.inject.Inject;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.IContextFunction;
@@ -63,12 +64,6 @@ public class CompatibilityView extends CompatibilityPart {
 		return (IViewPart) getPart();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.internal.e4.compatibility.CompatibilityPart#getReference()
-	 */
 	@Override
 	public WorkbenchPartReference getReference() {
 		return reference;
@@ -83,13 +78,6 @@ public class CompatibilityView extends CompatibilityPart {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.internal.e4.compatibility.CompatibilityPart#createPartControl
-	 * (org.eclipse.ui.IWorkbenchPart, org.eclipse.swt.widgets.Composite)
-	 */
 	@Override
 	protected boolean createPartControl(IWorkbenchPart legacyPart, Composite parent) {
 		clearMenuItems();
@@ -177,10 +165,15 @@ public class CompatibilityView extends CompatibilityPart {
 			// directly to the manager
 			((ToolBarManagerRenderer) apr).reconcileManagerToModel(tbm, toolbar);
 		}
-
+		final AtomicBoolean toolbarContributed = new AtomicBoolean();
 		final IContextFunction func = new ContextFunction() {
 			@Override
 			public Object compute(IEclipseContext context, String contextKey) {
+				if (toolbarContributed.get()) {
+					// fix for bug 448873: don't contribute to the toolbar twice
+					return null;
+				}
+				toolbarContributed.set(true);
 				final ViewActionBuilder actionBuilder = new ViewActionBuilder();
 				actionBuilder.readActionExtensions(getView());
 				ActionDescriptor[] actionDescriptors = actionBuilder.getExtendedActions();
