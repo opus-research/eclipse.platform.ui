@@ -15,7 +15,6 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
-import org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenu;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.IMenuManager;
@@ -33,11 +32,13 @@ import org.eclipse.swt.widgets.Widget;
 public class RenderedMenuRenderer extends SWTPartRenderer {
 
 	public Object createWidget(final MUIElement element, Object parent) {
-		if (!(element instanceof MRenderedMenu))
+		if (!(element instanceof MMenu)
+				|| !element.getTags().contains("Rendered")) //$NON-NLS-1$
 			return null;
 
-		MRenderedMenu menuModel = (MRenderedMenu) element;
-		Object contributionManager = menuModel.getContributionManager();
+		MMenu menuModel = (MMenu) element;
+		Object contributionManager = menuModel.getTransientData().get(
+				"ContributionManager"); //$NON-NLS-1$
 		if (contributionManager instanceof MenuManager) {
 			Menu newMenu = null;
 			MenuManager mm = (MenuManager) contributionManager;
@@ -104,8 +105,8 @@ public class RenderedMenuRenderer extends SWTPartRenderer {
 
 	@Override
 	public Object unbindWidget(MUIElement me) {
-		MRenderedMenu menuModel = (MRenderedMenu) me;
-		Object contributionManager = menuModel.getContributionManager();
+		Object contributionManager = me.getTransientData().get(
+				"ContributionManager"); //$NON-NLS-1$
 		if (contributionManager instanceof IMenuManager) {
 			((IMenuManager) contributionManager).dispose();
 		}

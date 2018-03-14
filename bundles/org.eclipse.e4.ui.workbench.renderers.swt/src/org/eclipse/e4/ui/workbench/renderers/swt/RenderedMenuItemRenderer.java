@@ -19,8 +19,8 @@ import java.util.WeakHashMap;
 import org.eclipse.e4.ui.internal.workbench.ExtensionPointProxy;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
+import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
-import org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenuItem;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
@@ -55,13 +55,15 @@ public class RenderedMenuItemRenderer extends SWTPartRenderer {
 	private Map<IContributionItem, List<MenuRecord>> map = new WeakHashMap<IContributionItem, List<MenuRecord>>();
 
 	public Object createWidget(final MUIElement element, Object parent) {
-		if (!(element instanceof MRenderedMenuItem)
+		if (!(element instanceof MDirectMenuItem)
+				|| !element.getTags().contains("Rendered") //$NON-NLS-1$
 				|| !(parent instanceof Menu)) {
 			return null;
 		}
 
-		MRenderedMenuItem menuModel = (MRenderedMenuItem) element;
-		Object contribution = menuModel.getContributionItem();
+		MDirectMenuItem menuModel = (MDirectMenuItem) element;
+		Object contribution = menuModel.getTransientData().get(
+				"ContributionItem"); //$NON-NLS-1$
 		if (contribution instanceof ExtensionPointProxy) {
 			ExtensionPointProxy proxy = (ExtensionPointProxy) contribution;
 			Object delegate = proxy.createDelegate(menuModel);
@@ -162,8 +164,7 @@ public class RenderedMenuItemRenderer extends SWTPartRenderer {
 	 */
 	@Override
 	public Object unbindWidget(MUIElement me) {
-		MRenderedMenuItem item = (MRenderedMenuItem) me;
-		Object contributionItem = item.getContributionItem();
+		Object contributionItem = me.getTransientData().get("ContributionItem"); //$NON-NLS-1$
 		if (contributionItem instanceof ExtensionPointProxy) {
 			ExtensionPointProxy proxy = (ExtensionPointProxy) contributionItem;
 			Object delegate = proxy.getDelegate();

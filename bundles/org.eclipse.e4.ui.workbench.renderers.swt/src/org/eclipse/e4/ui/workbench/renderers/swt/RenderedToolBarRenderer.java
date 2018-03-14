@@ -10,11 +10,10 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
-import org.eclipse.e4.core.commands.ExpressionContext;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.inject.Inject;
+import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
@@ -23,7 +22,6 @@ import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
-import org.eclipse.e4.ui.model.application.ui.menu.MRenderedToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarContribution;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
@@ -79,16 +77,18 @@ public class RenderedToolBarRenderer extends SWTPartRenderer {
 	}
 
 	public Object createWidget(final MUIElement element, Object parent) {
-		if (!(element instanceof MRenderedToolBar)
+		if (!(element instanceof MToolBar || !element.getTags().contains(
+				"Rendered")) //$NON-NLS-1$
 				|| !(parent instanceof Composite))
 			return null;
 
-		final MRenderedToolBar toolBar = (MRenderedToolBar) element;
-		if (!(toolBar.getContributionManager() instanceof ToolBarManager)) {
+		final MToolBar toolBar = (MToolBar) element;
+		Object obj = toolBar.getTransientData().get("ContributionManager"); //$NON-NLS-1$
+		if (!(obj instanceof ToolBarManager)) {
 			return null;
 		}
 
-		ToolBarManager tbm = (ToolBarManager) toolBar.getContributionManager();
+		ToolBarManager tbm = (ToolBarManager) obj;
 		ToolBar tb = tbm.createControl((Composite) parent);
 		if (tb.getParent() != parent) {
 			tb.setParent((Composite) parent);
@@ -111,7 +111,7 @@ public class RenderedToolBarRenderer extends SWTPartRenderer {
 	/**
 	 * @param toolBar
 	 */
-	protected void cleanUp(MRenderedToolBar element) {
+	protected void cleanUp(MToolBar element) {
 		ArrayList<ArrayList<MToolBarElement>> lists = pendingCleanup
 				.remove(element);
 		if (lists == null) {
