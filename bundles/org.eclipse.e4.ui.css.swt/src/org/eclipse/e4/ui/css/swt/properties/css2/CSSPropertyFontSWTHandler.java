@@ -47,22 +47,19 @@ implements ICSSPropertyHandler2 {
 	private static final String CSS_CTABITEM_SELECTED_FONT_LISTENER_KEY = "CSS_CTABFOLDER_SELECTED_FONT_LISTENER_KEY"; //$NON-NLS-1$
 
 	private static void setFont(Widget widget, Font font) {
-
 		if (widget instanceof CTabItem) {
-			CTabItem item = (CTabItem) widget;
-			CSSSWTFontHelper.setFont(item, font);
-		} else if (widget instanceof CTabFolder) {
-			CTabFolder folder = (CTabFolder) widget;
-			try {
-				folder.setRedraw(false);
-				CSSSWTFontHelper.setFont(folder, font);
-				updateChildrenFonts(folder, font);
-			} finally {
-				folder.setRedraw(true);
-			}
+			CSSSWTFontHelper.setFont((CTabItem) widget, font);
 		} else if (widget instanceof Control) {
 			Control control = (Control) widget;
-			CSSSWTFontHelper.setFont(control, font);
+			try {
+				control.setRedraw(false);
+				CSSSWTFontHelper.setFont(control, font);
+				if (control instanceof CTabFolder) {
+					updateChildrenFonts((CTabFolder) widget, font);
+				}
+			} finally {
+				control.setRedraw(true);
+			}
 		}
 	}
 
