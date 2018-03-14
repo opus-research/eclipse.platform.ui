@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010 BestSolution.at and others.
+ * Copyright (c) 2015 BestSolution.at and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,11 +8,17 @@
  * Contributors:
  *      Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
  *      IBM Corporation - initial API and implementation
+ *      Steven Spungin <steven@spungin.tv> - Bug 437958
  */
 package org.eclipse.e4.ui.model.fragment.impl;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
+import org.eclipse.e4.emf.xpath.EcoreXPathContextFactory;
+import org.eclipse.e4.emf.xpath.XPathContext;
+import org.eclipse.e4.emf.xpath.XPathContextFactory;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.fragment.MStringModelFragment;
@@ -22,6 +28,7 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * <!-- begin-user-doc -->
@@ -189,12 +196,12 @@ public class StringModelFragmentImpl extends ModelFragmentImpl implements MStrin
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case FragmentPackageImpl.STRING_MODEL_FRAGMENT__FEATURENAME:
-				return getFeaturename();
-			case FragmentPackageImpl.STRING_MODEL_FRAGMENT__PARENT_ELEMENT_ID:
-				return getParentElementId();
-			case FragmentPackageImpl.STRING_MODEL_FRAGMENT__POSITION_IN_LIST:
-				return getPositionInList();
+		case FragmentPackageImpl.STRING_MODEL_FRAGMENT__FEATURENAME:
+			return getFeaturename();
+		case FragmentPackageImpl.STRING_MODEL_FRAGMENT__PARENT_ELEMENT_ID:
+			return getParentElementId();
+		case FragmentPackageImpl.STRING_MODEL_FRAGMENT__POSITION_IN_LIST:
+			return getPositionInList();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -207,15 +214,15 @@ public class StringModelFragmentImpl extends ModelFragmentImpl implements MStrin
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case FragmentPackageImpl.STRING_MODEL_FRAGMENT__FEATURENAME:
-				setFeaturename((String)newValue);
-				return;
-			case FragmentPackageImpl.STRING_MODEL_FRAGMENT__PARENT_ELEMENT_ID:
-				setParentElementId((String)newValue);
-				return;
-			case FragmentPackageImpl.STRING_MODEL_FRAGMENT__POSITION_IN_LIST:
-				setPositionInList((String)newValue);
-				return;
+		case FragmentPackageImpl.STRING_MODEL_FRAGMENT__FEATURENAME:
+			setFeaturename((String)newValue);
+			return;
+		case FragmentPackageImpl.STRING_MODEL_FRAGMENT__PARENT_ELEMENT_ID:
+			setParentElementId((String)newValue);
+			return;
+		case FragmentPackageImpl.STRING_MODEL_FRAGMENT__POSITION_IN_LIST:
+			setPositionInList((String)newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -228,15 +235,15 @@ public class StringModelFragmentImpl extends ModelFragmentImpl implements MStrin
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case FragmentPackageImpl.STRING_MODEL_FRAGMENT__FEATURENAME:
-				setFeaturename(FEATURENAME_EDEFAULT);
-				return;
-			case FragmentPackageImpl.STRING_MODEL_FRAGMENT__PARENT_ELEMENT_ID:
-				setParentElementId(PARENT_ELEMENT_ID_EDEFAULT);
-				return;
-			case FragmentPackageImpl.STRING_MODEL_FRAGMENT__POSITION_IN_LIST:
-				setPositionInList(POSITION_IN_LIST_EDEFAULT);
-				return;
+		case FragmentPackageImpl.STRING_MODEL_FRAGMENT__FEATURENAME:
+			setFeaturename(FEATURENAME_EDEFAULT);
+			return;
+		case FragmentPackageImpl.STRING_MODEL_FRAGMENT__PARENT_ELEMENT_ID:
+			setParentElementId(PARENT_ELEMENT_ID_EDEFAULT);
+			return;
+		case FragmentPackageImpl.STRING_MODEL_FRAGMENT__POSITION_IN_LIST:
+			setPositionInList(POSITION_IN_LIST_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -249,12 +256,12 @@ public class StringModelFragmentImpl extends ModelFragmentImpl implements MStrin
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case FragmentPackageImpl.STRING_MODEL_FRAGMENT__FEATURENAME:
-				return FEATURENAME_EDEFAULT == null ? featurename != null : !FEATURENAME_EDEFAULT.equals(featurename);
-			case FragmentPackageImpl.STRING_MODEL_FRAGMENT__PARENT_ELEMENT_ID:
-				return PARENT_ELEMENT_ID_EDEFAULT == null ? parentElementId != null : !PARENT_ELEMENT_ID_EDEFAULT.equals(parentElementId);
-			case FragmentPackageImpl.STRING_MODEL_FRAGMENT__POSITION_IN_LIST:
-				return POSITION_IN_LIST_EDEFAULT == null ? positionInList != null : !POSITION_IN_LIST_EDEFAULT.equals(positionInList);
+		case FragmentPackageImpl.STRING_MODEL_FRAGMENT__FEATURENAME:
+			return FEATURENAME_EDEFAULT == null ? featurename != null : !FEATURENAME_EDEFAULT.equals(featurename);
+		case FragmentPackageImpl.STRING_MODEL_FRAGMENT__PARENT_ELEMENT_ID:
+			return PARENT_ELEMENT_ID_EDEFAULT == null ? parentElementId != null : !PARENT_ELEMENT_ID_EDEFAULT.equals(parentElementId);
+		case FragmentPackageImpl.STRING_MODEL_FRAGMENT__POSITION_IN_LIST:
+			return POSITION_IN_LIST_EDEFAULT == null ? positionInList != null : !POSITION_IN_LIST_EDEFAULT.equals(positionInList);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -279,18 +286,83 @@ public class StringModelFragmentImpl extends ModelFragmentImpl implements MStrin
 		return result.toString();
 	}
 
+	static final Pattern patternCSV = Pattern.compile("[,\\s]*,[,\\s]*");
+
+	/**
+	 * Allowed targetId syntax <br />
+	 * 1. elementId1 <br />
+	 * 2. elementId1,elementId2,elementId3 <br />
+	 * 3. xpath:[xpath goes here]
+	 */
+
 	@Override
 	public List<MApplicationElement> merge(MApplication application) {
-		MApplicationElement o =  ModelUtils.findElementById(application, getParentElementId());
-		if( o != null ) {
-			EStructuralFeature feature = ((EObject)o).eClass().getEStructuralFeature(getFeaturename());
-			if( feature != null ) {
-				return ModelUtils.merge(o, feature, getElements(), getPositionInList());
-			}
+		ArrayList<MApplicationElement> ret = new ArrayList<MApplicationElement>();
 
+		String idsOrXPath = getParentElementId();
+		if (idsOrXPath.startsWith("xpath:")) {
+			String xPath = idsOrXPath.substring(6);
+			mergeXPath(application, ret, xPath);
+		} else {
+			mergeIdList(application, ret, idsOrXPath);
 		}
 
-		return Collections.emptyList();
+		return ret;
 	}
+
+	private void mergeIdList(MApplication application, ArrayList<MApplicationElement> ret, String ids) {
+		String[] parentIds = patternCSV.split(ids);
+		for (String parentId : parentIds) {
+			MApplicationElement o = ModelUtils.findElementById(application, parentId);
+			if (o != null) {
+				EStructuralFeature feature = ((EObject) o).eClass().getEStructuralFeature(getFeaturename());
+				if (feature != null) {
+					List<MApplicationElement> elements;
+					if (parentIds.length > 1) {
+						elements = new ArrayList<MApplicationElement>();
+						for (MApplicationElement element : getElements()) {
+							elements.add((MApplicationElement) EcoreUtil.copy((EObject) element));
+						}
+					} else {
+						elements = getElements();
+					}
+					ret.addAll(ModelUtils.merge(o, feature, elements, getPositionInList()));
+				}
+			}
+		}
+	}
+
+	private void mergeXPath(MApplication application, ArrayList<MApplicationElement> ret, String xPath) {
+
+		XPathContextFactory<EObject> f = EcoreXPathContextFactory.newInstance();
+		XPathContext xpathContext = f.newContext((EObject) application);
+		Iterator<Object> i = xpathContext.iterate(xPath);
+
+		List<MApplicationElement> targetElements = new ArrayList<MApplicationElement>();
+		try {
+			while (i.hasNext()) {
+				Object obj = i.next();
+				if (obj instanceof MApplicationElement) {
+					MApplicationElement o = (MApplicationElement) obj;
+					targetElements.add(o);
+				}
+			}
+		} catch (Exception ex) {
+			// custom xpath functions will throw exceptions
+			ex.printStackTrace();
+		}
+		for (MApplicationElement targetElement : targetElements) {
+			EStructuralFeature feature = ((EObject) targetElement).eClass().getEStructuralFeature(getFeaturename());
+			List<MApplicationElement> elements;
+			elements = new ArrayList<MApplicationElement>();
+			for (MApplicationElement element : getElements()) {
+				elements.add((MApplicationElement) EcoreUtil.copy((EObject) element));
+			}
+			if (elements.isEmpty() == false) {
+				ret.addAll(ModelUtils.merge(targetElement, feature, elements, getPositionInList()));
+			}
+		}
+	}
+
 
 } //StringModelFragmentImpl
