@@ -16,4 +16,7 @@
 @import url("platform:/plugin/org.eclipse.ui.themes/css/dark/e4-dark_globalstyle.css");
 @import url("platform:/plugin/org.eclipse.ui.themes/css/dark/e4-dark_partstyle.css");
 
-Tree {swt-tree-arrows-fg-color:#cccccc;}
+Tree {
+	swt-tree-arrows-fg-color:#cccccc;
+	swt-tree-arrows-mode: triangle; /* triangle or square */
+}

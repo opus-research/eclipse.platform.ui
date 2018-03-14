@@ -22,16 +22,25 @@ import org.w3c.dom.css.CSSValue;
  */
 public class CSSPropertyTreeArrowsSWTHandler implements ICSSPropertyHandler {
 
+	private static final String SWT_TREE_ARROWS_FG_COLOR = "swt-tree-arrows-fg-color"; //$NON-NLS-1$
+	private static final String SWT_TREE_ARROWS_MODE = "swt-tree-arrows-mode"; //$NON-NLS-1$
+
 	@Override
 	public boolean applyCSSProperty(Object element, String property, CSSValue value, String pseudo, CSSEngine engine)
 			throws Exception {
 		if (element instanceof TreeElement) {
 			TreeElement treeElement = (TreeElement) element;
 			Tree tree = treeElement.getTree();
-			if (value.getCssValueType() == CSSValue.CSS_PRIMITIVE_VALUE) {
-				Color newColor = (Color) engine.convert(value, Color.class, tree.getDisplay());
+			if (SWT_TREE_ARROWS_FG_COLOR.equals(property)) {
+				if (value.getCssValueType() == CSSValue.CSS_PRIMITIVE_VALUE) {
+					Color newColor = (Color) engine.convert(value, Color.class, tree.getDisplay());
+					// Note: windows-only
+					treeElement.setTreeArrowsForegroundColor(newColor);
+				}
+			} else if (SWT_TREE_ARROWS_MODE.equals(property)) {
 				// Note: windows-only
-				treeElement.setTreeArrowsForegroundColor(newColor);
+				treeElement.setTreeArrowsMode(value.getCssText());
+
 			}
 
 		}

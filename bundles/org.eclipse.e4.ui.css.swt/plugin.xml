@@ -484,6 +484,9 @@
          <property-name
                name="swt-tree-arrows-fg-color"> <!--note: windows-only -->
          </property-name>
+         <property-name
+               name="swt-tree-arrows-mode"> <!--triangle/square -->
+         </property-name>
       </handler>
 
 
