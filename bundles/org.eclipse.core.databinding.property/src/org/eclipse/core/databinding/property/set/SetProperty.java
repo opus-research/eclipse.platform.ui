@@ -30,7 +30,7 @@ import org.eclipse.core.internal.databinding.property.SetPropertyDetailValuesMap
 
 /**
  * Abstract implementation of ISetProperty
- * 
+ *
  * @param <S>
  *            type of the source object
  * @param <E>
@@ -54,7 +54,7 @@ public abstract class SetProperty<S, E> implements ISetProperty<S, E> {
 	 * @since 1.3
 	 */
 	@Override
-	public final Set<E> getSet(S source) {
+	public Set<E> getSet(S source) {
 		if (source == null) {
 			return Collections.emptySet();
 		}
@@ -67,7 +67,7 @@ public abstract class SetProperty<S, E> implements ISetProperty<S, E> {
 	 * @param source
 	 *            the property source
 	 * @return a Set with the current contents of the source's set property
-	 * @since 1.5
+	 * @since 1.6
 	 * @noreference This method is not intended to be referenced by clients.
 	 */
 	protected Set<E> doGetSet(S source) {
@@ -96,7 +96,7 @@ public abstract class SetProperty<S, E> implements ISetProperty<S, E> {
 	 *            the property source
 	 * @param set
 	 *            the new set
-	 * @since 1.5
+	 * @since 1.6
 	 * @noreference This method is not intended to be referenced by clients.
 	 */
 	protected void doSetSet(S source, Set<E> set) {
@@ -120,7 +120,7 @@ public abstract class SetProperty<S, E> implements ISetProperty<S, E> {
 	 *            the property source
 	 * @param diff
 	 *            a diff describing the change
-	 * @since 1.5
+	 * @since 1.6
 	 * @noreference This method is not intended to be referenced by clients.
 	 */
 	protected void doUpdateSet(S source, SetDiff<E> diff) {
@@ -140,6 +140,7 @@ public abstract class SetProperty<S, E> implements ISetProperty<S, E> {
 	@Override
 	public IObservableFactory<S, IObservableSet<E>> setFactory() {
 		return new IObservableFactory<S, IObservableSet<E>>() {
+			@Override
 			public IObservableSet<E> createObservable(S target) {
 				return observe(target);
 			}
@@ -149,6 +150,7 @@ public abstract class SetProperty<S, E> implements ISetProperty<S, E> {
 	@Override
 	public IObservableFactory<S, IObservableSet<E>> setFactory(final Realm realm) {
 		return new IObservableFactory<S, IObservableSet<E>>() {
+			@Override
 			public IObservableSet<E> createObservable(S target) {
 				return observe(realm, target);
 			}

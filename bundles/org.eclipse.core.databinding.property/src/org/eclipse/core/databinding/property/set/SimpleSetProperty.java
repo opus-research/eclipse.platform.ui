@@ -39,7 +39,7 @@ import org.eclipse.core.internal.databinding.property.set.SimplePropertyObservab
  * <p>
  * In addition, we recommended overriding {@link #toString()} to return a
  * description suitable for debugging purposes.
- * 
+ *
  * @param <S>
  *            type of the source object
  * @param <E>
@@ -69,6 +69,7 @@ public abstract class SimpleSetProperty<S, E> extends SetProperty<S, E> {
 	 * @param diff
 	 *            a diff describing the change
 	 * @noreference This method is not intended to be referenced by clients.
+	 * @since 1.6
 	 */
 	public final void setSet(S source, Set<E> set, SetDiff<E> diff) {
 		if (source != null && !diff.isEmpty())

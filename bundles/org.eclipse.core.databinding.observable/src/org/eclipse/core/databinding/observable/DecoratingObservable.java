@@ -46,7 +46,7 @@ public class DecoratingObservable extends AbstractObservable implements
 		this.disposedDecoratedOnDispose = disposeDecoratedOnDispose;
 		decorated.addDisposeListener(new IDisposeListener() {
 			@Override
-			public void handleDispose(DisposeEvent disposeEvent) {
+			public void handleDispose(DisposeEvent staleEvent) {
 				dispose();
 			}
 		});

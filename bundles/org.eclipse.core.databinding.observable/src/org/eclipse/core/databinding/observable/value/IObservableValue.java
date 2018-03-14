@@ -19,6 +19,7 @@ import org.eclipse.core.databinding.observable.Realm;
  * A value whose changes can be tracked by value change listeners.
  * 
  * @param <T>
+ *            type of the value of the property
  * 
  * @noimplement This interface is not intended to be implemented by clients.
  *              Clients should instead subclass one of the classes that

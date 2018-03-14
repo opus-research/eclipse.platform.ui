@@ -61,7 +61,7 @@ public abstract class ListDiff<E> implements IDiff {
 	 * @return a ListDiffEntry array representing the differences in the list,
 	 *         in the order they are to be processed, may be an empty list but
 	 *         never null
-	 * @since 1.5
+	 * @since 1.6
 	 */
 	@SuppressWarnings("unchecked")
 	public final List<ListDiffEntry<E>> getDifferencesAsList() {
@@ -69,7 +69,6 @@ public abstract class ListDiff<E> implements IDiff {
 		List<ListDiffEntry<E>> result = new ArrayList<ListDiffEntry<E>>();
 		if (getDifferences() != null) {
 			for (ListDiffEntry<?> entry : getDifferences()) {
-
 				result.add((ListDiffEntry<E>) entry);
 			}
 		}

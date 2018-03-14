@@ -14,7 +14,7 @@ package org.eclipse.core.databinding.observable;
 
 /**
  * @since 1.0
- * 
+ *
  */
 public abstract class ChangeSupport extends ChangeManager {
 
@@ -25,7 +25,9 @@ public abstract class ChangeSupport extends ChangeManager {
 		super(realm);
 	}
 
-	public void addListener(Object listenerType, IObservablesListener listener) {
+	@Override
+	public void addListener(Object listenerType,
+			IObservablesListener listener) {
 		super.addListener(listenerType, listener);
 	}
 
@@ -36,7 +38,7 @@ public abstract class ChangeSupport extends ChangeManager {
 	}
 
 	@Override
-	public void fireEvent(ObservableEvent<?> event) {
+	public void fireEvent(ObservableEvent event) {
 		super.fireEvent(event);
 	}
 
@@ -56,14 +58,14 @@ public abstract class ChangeSupport extends ChangeManager {
 	 * @param listener
 	 */
 	public void addChangeListener(IChangeListener listener) {
-		addListener(AbstractChangeEvent.TYPE, listener);
+		addListener(ChangeEvent.TYPE, listener);
 	}
 
 	/**
 	 * @param listener
 	 */
 	public void removeChangeListener(IChangeListener listener) {
-		removeListener(AbstractChangeEvent.TYPE, listener);
+		removeListener(ChangeEvent.TYPE, listener);
 	}
 
 	/**

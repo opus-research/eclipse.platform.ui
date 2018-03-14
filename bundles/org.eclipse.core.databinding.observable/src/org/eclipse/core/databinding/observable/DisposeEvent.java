@@ -16,7 +16,7 @@ package org.eclipse.core.databinding.observable;
  *
  * @since 1.2
  */
-public class DisposeEvent extends ObservableEvent<DisposeEvent> {
+public class DisposeEvent extends ObservableEvent {
 	/**
 	 *
 	 */

@@ -40,7 +40,7 @@ import org.eclipse.core.internal.databinding.property.map.SimplePropertyObservab
  * <p>
  * In addition, we recommended overriding {@link #toString()} to return a
  * description suitable for debugging purposes.
- * 
+ *
  * @param <S>
  *            type of the source object
  * @param <K>
@@ -72,7 +72,7 @@ public abstract class SimpleMapProperty<S, K, V> extends MapProperty<S, K, V> {
 	 * @param diff
 	 *            a diff describing the change
 	 * @noreference This method is not intended to be referenced by clients.
-	 * @since 1.5
+	 * @since 1.6
 	 */
 	public final void setMap(S source, Map<K, V> map, MapDiff<K, V> diff) {
 		if (source != null && !diff.isEmpty())

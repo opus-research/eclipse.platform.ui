@@ -38,9 +38,9 @@ public class Diffs {
 	/**
 	 * Returns a {@link ListDiff} describing the change between the specified
 	 * old and new list states.
-	 * 
+	 *
 	 * @param <E>
-	 * 
+	 *
 	 * @param oldList
 	 *            the old list state
 	 * @param newList
@@ -58,9 +58,9 @@ public class Diffs {
 	/**
 	 * Returns a lazily computed {@link ListDiff} describing the change between
 	 * the specified old and new list states.
-	 * 
+	 *
 	 * @param <E>
-	 * 
+	 *
 	 * @param oldList
 	 *            the old list state
 	 * @param newList
@@ -196,9 +196,9 @@ public class Diffs {
 	/**
 	 * Returns a {@link SetDiff} describing the change between the specified old
 	 * and new set states.
-	 * 
+	 *
 	 * @param <E>
-	 * 
+	 *
 	 * @param oldSet
 	 *            the old set state
 	 * @param newSet
@@ -217,9 +217,9 @@ public class Diffs {
 	/**
 	 * Returns a lazily computed {@link SetDiff} describing the change between
 	 * the specified old and new set states.
-	 * 
+	 *
 	 * @param <E>
-	 * 
+	 *
 	 * @param oldSet
 	 *            the old set state
 	 * @param newSet
@@ -257,7 +257,7 @@ public class Diffs {
 	/**
 	 * Returns a {@link MapDiff} describing the change between the specified old
 	 * and new map states.
-	 * 
+	 *
 	 * @param <K>
 	 *            the type of keys maintained by this map
 	 * @param <V>
@@ -331,7 +331,7 @@ public class Diffs {
 	/**
 	 * Returns a lazily computed {@link MapDiff} describing the change between
 	 * the specified old and new map states.
-	 * 
+	 *
 	 * @param <K>
 	 *            the type of keys maintained by this map
 	 * @param <V>
@@ -459,7 +459,7 @@ public class Diffs {
 	 * This form cannot be used in a type-safe manner because it is not possible
 	 * to construct an array of generic types in a type-safe manner. The form
 	 * below which takes a properly parameterized List is recommended.
-	 * 
+	 *
 	 * @param <E>
 	 * @param differences
 	 * @return a list diff with the given entries
@@ -478,7 +478,7 @@ public class Diffs {
 	 * @param <E>
 	 * @param differences
 	 * @return a list diff with the given entries
-	 * @since 1.5
+	 * @since 1.6
 	 */
 	public static <E> ListDiff<E> createListDiff(
 			final List<ListDiffEntry<E>> differences) {
