@@ -36,7 +36,6 @@ public final class AcceptAllFilter implements IFilter {
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.deferred.IFilter#select(java.lang.Object)
 	 */
-	@Override
 	public boolean select(Object toTest) {
 		return true;
 	}
