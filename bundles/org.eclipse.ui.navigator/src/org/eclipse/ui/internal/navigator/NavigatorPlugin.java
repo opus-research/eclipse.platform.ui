@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2014 IBM Corporation and others.
+ * Copyright (c) 2003, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  * IBM Corporation - initial API and implementation
- * Mickael Istria (Red Hat Inc.) - 226046 Add filter for user-spec'd patterns
  *******************************************************************************/
 package org.eclipse.ui.internal.navigator;
 
@@ -28,8 +27,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.navigator.filters.UserFilter;
-import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.services.IEvaluationService;
 import org.osgi.framework.BundleContext;
@@ -115,14 +112,6 @@ public class NavigatorPlugin extends AbstractUIPlugin {
 			NavigatorSaveablesService.bundleChanged(event);
 		}
 	};
-
-	/**
-	 * This constant can be used via {@link CommonViewer#setData(String, Object)} to set/get the lisst
-	 * of available regexps to filter out  resource from the viewer based on resource name.
-	 * The expected type for this data is a Collection of {@link UserFilter}.
-	 * @since 3.5.400
-	 */
-	public static final String RESOURCE_REGEXP_FILTER_DATA = "resourceRegexpFilters"; //$NON-NLS-1$
 
 	/**
 	 * Creates a new instance of the receiver
