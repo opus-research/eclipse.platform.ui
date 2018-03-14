@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 448260
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -591,7 +590,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 						stillOpenElsewhere ? WorkbenchMessages.EditorManager_saveResourcesOptionallyMessage
 								: WorkbenchMessages.EditorManager_saveResourcesMessage,
 						canCancel, stillOpenElsewhere);
-				dlg.setInitialSelections(modelsToSave);
+				dlg.setInitialSelections(modelsToSave.toArray());
 				dlg.setTitle(WorkbenchMessages.EditorManager_saveResourcesTitle);
 
 				// this "if" statement aids in testing.
