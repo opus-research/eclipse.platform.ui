@@ -28,13 +28,10 @@ import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.MessageDialogWithToggle;
-import org.eclipse.jface.preference.IPersistentPreferenceStore;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.osgi.util.NLS;
@@ -45,11 +42,9 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.ide.ChooseWorkspaceData;
 import org.eclipse.ui.internal.ide.ChooseWorkspaceDialog;
-import org.eclipse.ui.internal.ide.IDEInternalPreferences;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.ide.StatusUtil;
-import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
@@ -186,7 +181,8 @@ public class IDEApplication implements IApplication, IExecutableExtension {
      * @return <code>null</code> if a valid instance location has been set and an exit code
      *         otherwise
      */
-    private Object checkInstanceLocation(Shell shell, Map applicationArguments) {
+    @SuppressWarnings("rawtypes")
+	private Object checkInstanceLocation(Shell shell, Map applicationArguments) {
         // -data @none was specified but an ide requires workspace
         Location instanceLoc = Platform.getInstanceLocation();
         if (instanceLoc == null) {
@@ -290,7 +286,8 @@ public class IDEApplication implements IApplication, IExecutableExtension {
         }
     }
 
-	private static boolean isDevLaunchMode(Map args) {
+    @SuppressWarnings("rawtypes")
+    private static boolean isDevLaunchMode(Map args) {
 		// see org.eclipse.pde.internal.core.PluginPathFinder.isDevLaunchMode()
 		if (Boolean.getBoolean("eclipse.pde.launch")) //$NON-NLS-1$
 			return true;
@@ -406,43 +403,24 @@ public class IDEApplication implements IApplication, IExecutableExtension {
 		int severity;
 		String title;
 		String message;
-		String keepOnWarningKey;
 		if (versionCompareResult < 0) {
 			// Workspace < IDE. Update must be possible without issues,
 			// so only inform user about it.
 			severity = MessageDialog.INFORMATION;
 			title = IDEWorkbenchMessages.IDEApplication_versionTitle_olderWorkspace;
 			message = NLS.bind(IDEWorkbenchMessages.IDEApplication_versionMessage_olderWorkspace, url.getFile());
-			keepOnWarningKey = IDEInternalPreferences.WARN_ABOUT_WORKSPACE_UPGRADE;
 		} else {
 			// Workspace > IDE. It must have been opened with a newer IDE version.
 			// Downgrade might be problematic, so warn user about it.
 			severity = MessageDialog.WARNING;
 			title = IDEWorkbenchMessages.IDEApplication_versionTitle_newerWorkspace;
 			message = NLS.bind(IDEWorkbenchMessages.IDEApplication_versionMessage_newerWorkspace, url.getFile());
-			keepOnWarningKey = IDEInternalPreferences.WARN_ABOUT_NEWER_WORKSPACE;
 		}
 
-		IPersistentPreferenceStore prefStore = new ScopedPreferenceStore(ConfigurationScope.INSTANCE, IDEWorkbenchPlugin.IDE_WORKBENCH);
-		boolean keepOnWarning = prefStore.getBoolean(keepOnWarningKey);
-		if (keepOnWarning) {
-			MessageDialogWithToggle dialog = new MessageDialogWithToggle(shell, title, null, message, severity,
-					new String[] {IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL}, 0,
-					IDEWorkbenchMessages.IDEApplication_version_doNotShowAgain, false);
-			if (dialog.open() != Window.OK) {
-				return false;
-			}
-			keepOnWarning = !dialog.getToggleState();
-			try {
-				prefStore.setValue(keepOnWarningKey, keepOnWarning);
-				prefStore.save();
-			} catch (IOException e) {
-				IDEWorkbenchPlugin.log("Error writing to configuration preferences", //$NON-NLS-1$
-					new Status(IStatus.ERROR, IDEWorkbenchPlugin.IDE_WORKBENCH, e.getMessage(), e));
-			}
-		}
-		return true;
-	}
+		MessageDialog dialog = new MessageDialog(shell, title, null, message, severity,
+				new String[] {IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL}, 0);
+		return dialog.open() == Window.OK;
+    }
 
     /**
      * Look at the argument URL for the workspace's version information. Return

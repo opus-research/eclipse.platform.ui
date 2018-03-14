@@ -125,14 +125,5 @@ public interface IDEInternalPreferences {
      */
     public static final String WORKBENCH_SYSTEM_EXPLORER = "SYSTEM_EXPLORER"; //$NON-NLS-1$
     
-    /**
-     * Warn the user that the workspace is newer than the IDE
-     */
-    public static final String WARN_ABOUT_NEWER_WORKSPACE = "WARN_ABOUT_NEWER_WORKSPACE"; //$NON-NLS-1$
-
-    /**
-     * Warn the user that the workspace is going to be upgraded because the IDE is newer
-     */
-    public static final String WARN_ABOUT_WORKSPACE_UPGRADE = "WARN_ABOUT_WORKSPACE_UPGRADE"; //$NON-NLS-1$
     
 }
