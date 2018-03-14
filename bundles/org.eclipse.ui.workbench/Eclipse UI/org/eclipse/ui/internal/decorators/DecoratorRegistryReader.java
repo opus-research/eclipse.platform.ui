@@ -41,8 +41,7 @@ public class DecoratorRegistryReader extends RegistryReader {
     /*
      * @see RegistryReader#readElement(IConfigurationElement)
      */
-    @Override
-	public boolean readElement(IConfigurationElement element) {
+    public boolean readElement(IConfigurationElement element) {
 
     	DecoratorDefinition desc = getDecoratorDefinition(element);
     	

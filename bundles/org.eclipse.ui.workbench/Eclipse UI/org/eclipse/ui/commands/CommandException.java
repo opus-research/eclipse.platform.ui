@@ -69,7 +69,6 @@ public abstract class CommandException extends Exception {
      * @return the cause or <code>null</code>
      * @since 3.1
      */
-	@Override
 	@Deprecated
     public Throwable getCause() {
         return cause;

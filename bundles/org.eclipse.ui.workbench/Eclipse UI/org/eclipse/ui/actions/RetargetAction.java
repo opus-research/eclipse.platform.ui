@@ -57,8 +57,7 @@ public class RetargetAction extends PartEventAction implements
     private IAction handler;
 
     private IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
-        @Override
-		public void propertyChange(PropertyChangeEvent event) {
+        public void propertyChange(PropertyChangeEvent event) {
             RetargetAction.this.propagateChange(event);
         }
     };
@@ -88,8 +87,7 @@ public class RetargetAction extends PartEventAction implements
         setId(actionID);
         setEnabled(false);
         super.setHelpListener(new HelpListener() {
-            @Override
-			public void helpRequested(HelpEvent e) {
+            public void helpRequested(HelpEvent e) {
                 HelpListener listener = null;
                 if (handler != null) {
                     // if we have a handler, see if it has a help listener
@@ -110,8 +108,7 @@ public class RetargetAction extends PartEventAction implements
     /**
      * Disposes of the action and any resources held.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         if (handler != null) {
             handler.removePropertyChangeListener(propertyChangeListener);
             handler = null;
@@ -137,8 +134,7 @@ public class RetargetAction extends PartEventAction implements
      * Retaget actions do not have accelerators.  It is up to the
      * part to hook the accelerator.
      */
-    @Override
-	public int getAccelerator() {
+    public int getAccelerator() {
         if (enableAccelerator) {
 			return super.getAccelerator();
 		}
@@ -151,8 +147,7 @@ public class RetargetAction extends PartEventAction implements
      *
      * @param part the workbench part that has been activated
      */
-    @Override
-	public void partActivated(IWorkbenchPart part) {
+    public void partActivated(IWorkbenchPart part) {
         super.partActivated(part);
         IWorkbenchPartSite site = part.getSite();
         SubActionBars bars = (SubActionBars) ((PartSite) site).getActionBars();
@@ -165,8 +160,7 @@ public class RetargetAction extends PartEventAction implements
      *
      * @param part the workbench part that has been closed
      */
-    @Override
-	public void partClosed(IWorkbenchPart part) {
+    public void partClosed(IWorkbenchPart part) {
         IWorkbenchPart activePart = part.getSite().getPage().getActivePart();
         if (activePart != null) {
 			// We are going to get a part activated message so don't bother setting the 
@@ -184,8 +178,7 @@ public class RetargetAction extends PartEventAction implements
      *
      * @param part the workbench part that has been deactivated
      */
-    @Override
-	public void partDeactivated(IWorkbenchPart part) {
+    public void partDeactivated(IWorkbenchPart part) {
         super.partDeactivated(part);
         IWorkbenchPartSite site = part.getSite();
         SubActionBars bars = (SubActionBars) ((PartSite) site).getActionBars();
@@ -223,8 +216,7 @@ public class RetargetAction extends PartEventAction implements
     /**
      * Invoked when an action occurs. 
      */
-    @Override
-	public void run() {
+    public void run() {
         if (handler != null) {
 			handler.run();
 		}
@@ -233,8 +225,7 @@ public class RetargetAction extends PartEventAction implements
     /**
      * Invoked when an action occurs. 
      */
-    @Override
-	public void runWithEvent(Event event) {
+    public void runWithEvent(Event event) {
         if (handler != null) {
 			handler.runWithEvent(event);
 		}
@@ -251,8 +242,7 @@ public class RetargetAction extends PartEventAction implements
         return handler;
     }
     
-    @Override
-	public final boolean isHandled() {
+    public final boolean isHandled() {
         return (handler != null);
     }
 
@@ -295,8 +285,7 @@ public class RetargetAction extends PartEventAction implements
     /* (non-Javadoc)
      * Method declared on IAction.
      */
-    @Override
-	public void setChecked(boolean checked) {
+    public void setChecked(boolean checked) {
         super.setChecked(checked);
         // This call may come from the SWT control event handler
         // itself, so notify the handler action to keep things
@@ -311,8 +300,7 @@ public class RetargetAction extends PartEventAction implements
      * <code>IAction</code> stores the help listener in a local field. The
      * supplied listener is only used if there is no hanlder.
      */
-    @Override
-	public void setHelpListener(HelpListener listener) {
+    public void setHelpListener(HelpListener listener) {
         localHelpListener = listener;
     }
 
@@ -323,7 +311,6 @@ public class RetargetAction extends PartEventAction implements
 	 * 
 	 * @since 3.2 
 	 */
-	@Override
 	public final String toString() {
 		final StringBuffer buffer = new StringBuffer();
 

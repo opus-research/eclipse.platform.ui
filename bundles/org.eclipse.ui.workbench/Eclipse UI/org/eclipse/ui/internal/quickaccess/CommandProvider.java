@@ -45,18 +45,15 @@ public class CommandProvider extends QuickAccessProvider {
 	public CommandProvider() {
 	}
 
-	@Override
 	public String getId() {
 		return "org.eclipse.ui.commands"; //$NON-NLS-1$
 	}
 
-	@Override
 	public QuickAccessElement getElementForId(String id) {
 		getElements();
 		return (CommandElement) idToElement.get(id);
 	}
 
-	@Override
 	public QuickAccessElement[] getElements() {
 		if (idToElement == null) {
 			idToElement = new HashMap();
@@ -90,13 +87,11 @@ public class CommandProvider extends QuickAccessProvider {
 				new QuickAccessElement[idToElement.values().size()]);
 	}
 
-	@Override
 	public ImageDescriptor getImageDescriptor() {
 		return WorkbenchImages
 				.getImageDescriptor(IWorkbenchGraphicConstants.IMG_OBJ_NODE);
 	}
 
-	@Override
 	public String getName() {
 		return QuickAccessMessages.QuickAccess_Commands;
 	}
@@ -113,7 +108,6 @@ public class CommandProvider extends QuickAccessProvider {
 		return currentSnapshot;
 	}
 
-	@Override
 	protected void doReset() {
 		idToElement = null;
 		if (currentSnapshot instanceof ExpressionContext) {
