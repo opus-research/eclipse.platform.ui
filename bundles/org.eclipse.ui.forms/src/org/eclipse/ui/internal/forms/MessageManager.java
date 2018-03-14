@@ -540,7 +540,8 @@ public class MessageManager implements IMessageManager {
 	@Override
 	public void setMessagePrefixProvider(IMessagePrefixProvider provider) {
 		this.prefixProvider = provider;
-		for (ControlDecorator dec : decorators.values()) {
+		for (Iterator<ControlDecorator> iter = decorators.values().iterator(); iter.hasNext();) {
+			ControlDecorator dec = iter.next();
 			dec.updatePrefix();
 		}
 	}
@@ -553,7 +554,8 @@ public class MessageManager implements IMessageManager {
 	@Override
 	public void setDecorationPosition(int position) {
 		this.decorationPosition = position;
-		for (ControlDecorator dec : decorators.values()) {
+		for (Iterator<ControlDecorator> iter = decorators.values().iterator(); iter.hasNext();) {
+			ControlDecorator dec = iter.next();
 			dec.updatePosition();
 		}
 	}
@@ -572,8 +574,8 @@ public class MessageManager implements IMessageManager {
 			update();
 		if (needsCaching) {
 			oldMessages = new ArrayList<>();
-			for (Message message : messages)
-				oldMessages.add(new Message(message));
+			for (Iterator<Message> i = messages.iterator(); i.hasNext();)
+				oldMessages.add(new Message(i.next()));
 			oldDecorators = new Hashtable<>();
 			for (Enumeration<Control> e = decorators.keys(); e.hasMoreElements();) {
 				Object key = e.nextElement();

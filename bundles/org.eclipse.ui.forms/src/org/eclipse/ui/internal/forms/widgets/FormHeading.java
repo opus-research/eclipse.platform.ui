@@ -507,9 +507,9 @@ public class FormHeading extends Canvas {
 					messageHyperlink.setText(message);
 					messageHyperlink.setHref(messages);
 					Object[] llist = listeners.getListeners();
-					for (Object element : llist)
+					for (int i = 0; i < llist.length; i++)
 						messageHyperlink
-								.addHyperlinkListener((IHyperlinkListener) element);
+								.addHyperlinkListener((IHyperlinkListener) llist[i]);
 					if (messageToolTipManager != null)
 						messageToolTipManager.createToolTip(messageHyperlink, false);
 				} else if (!messageHyperlink.getVisible()) {
