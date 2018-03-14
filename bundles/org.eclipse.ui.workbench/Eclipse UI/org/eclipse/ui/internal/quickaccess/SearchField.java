@@ -44,8 +44,6 @@ import org.eclipse.swt.accessibility.AccessibleAdapter;
 import org.eclipse.swt.accessibility.AccessibleEvent;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -207,22 +205,7 @@ public class SearchField {
 			@Override
 			public void shellClosed(ShellEvent e) {
 				quickAccessContents.doClose();
-				e.doit = false; // that would prevent shell from being disposed
-								// when closing
-			}
-		});
-		text.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(DisposeEvent e) {
-				if (!shell.isDisposed()) {
-					storeShellSize();
-					// parent control is about to be destroyed, time to
-					// get rid of invisible shell attached to this text control
-					shell.close();
-					// because of our shell close listener it won't
-					// be disposed so we dispose it manually now
-					shell.dispose();
-				}
+				e.doit = false;
 			}
 		});
 		GridLayoutFactory.fillDefaults().applyTo(shell);
@@ -249,7 +232,7 @@ public class SearchField {
 
 				previousFocusControl = (Control) e.getSource();
 			}
-			
+
 		});
 		table.addFocusListener(new FocusAdapter() {
 			@Override
@@ -430,14 +413,14 @@ public class SearchField {
 		int preferredWidth = dialogWidth == -1 ? 350 : dialogWidth;
 		int width = Math.max(preferredWidth, compBounds.width);
 		int height = dialogHeight == -1 ? 250 : dialogHeight;
-		
+
 		// If size would extend past the right edge of the shell, try to move it
 		// to the left of the text
 		Rectangle shellBounds = text.getShell().getBounds();
 		if (compBounds.x + width > shellBounds.x + shellBounds.width){
 			compBounds.x = Math.max(shellBounds.x, (compBounds.x + compBounds.width - width));
 		}
-		
+
 		shell.setBounds(getConstrainedShellBounds(display, new Rectangle(compBounds.x, compBounds.y
 				+ compBounds.height, width, height)));
 		shell.layout();
@@ -458,7 +441,7 @@ public class SearchField {
 
 	/**
 	 * Checks if the text or shell has focus. If not, closes the shell.
-	 * 
+	 *
 	 * @param table
 	 *            the shell's table
 	 * @param text
@@ -594,15 +577,8 @@ public class SearchField {
 		dialogSettings.put(ORDERED_PROVIDERS, orderedProviders);
 		dialogSettings.put(TEXT_ENTRIES, textEntries);
 		dialogSettings.put(TEXT_ARRAY, textArray);
-		storeShellSize();
-	}
-
-	private void storeShellSize() {
-		if (!shell.isDisposed()) {
-			IDialogSettings dialogSettings = getDialogSettings();
-			dialogSettings.put(DIALOG_HEIGHT, shell.getSize().y);
-			dialogSettings.put(DIALOG_WIDTH, shell.getSize().x);
-		}
+		dialogSettings.put(DIALOG_HEIGHT, shell.getSize().y);
+		dialogSettings.put(DIALOG_WIDTH, shell.getSize().x);
 	}
 
 	private IDialogSettings getDialogSettings() {
@@ -682,7 +658,7 @@ public class SearchField {
 	/**
 	 * Returns the quick access shell for testing. Should not be referenced
 	 * outside of the tests.
-	 * 
+	 *
 	 * @return the current quick access shell or <code>null</code>
 	 */
 	public Shell getQuickAccessShell() {
@@ -692,7 +668,7 @@ public class SearchField {
 	/**
 	 * Returns the quick access search text for testing. Should not be
 	 * referenced outside of the tests.
-	 * 
+	 *
 	 * @return the search text in the workbench window or <code>null</code>
 	 */
 	public Text getQuickAccessSearchText() {
@@ -702,7 +678,7 @@ public class SearchField {
 	/**
 	 * Returns the table in the shell for testing. Should not be referenced
 	 * outside of the tests.
-	 * 
+	 *
 	 * @return the table created in the shell or <code>null</code>
 	 */
 	public Table getQuickAccessTable(){
