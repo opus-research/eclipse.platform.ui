@@ -20,7 +20,6 @@
 
 package org.eclipse.e4.ui.css.core.impl.sac;
 
-import java.util.StringTokenizer;
 import org.w3c.dom.Element;
 
 /**
@@ -52,14 +51,16 @@ public class CSSOneOfAttributeConditionImpl extends CSSAttributeConditionImpl {
 	public boolean match(Element e, String pseudoE) {
 		String attr = e.getAttribute(getLocalName());
 		String val = getValue();
-		for (StringTokenizer tok = new StringTokenizer(attr); tok
-				.hasMoreElements();) {
-			String candidate = tok.nextToken();
-			if (val.equals(candidate)) {
-				return true;
-			}
+		int i = attr.indexOf(val);
+		if (i == -1) {
+			return false;
 		}
-		return false;
+		if (i != 0 && !Character.isSpaceChar(attr.charAt(i - 1))) {
+			return false;
+		}
+		int j = i + val.length();
+		return (j == attr.length() || (j < attr.length() && Character
+				.isSpaceChar(attr.charAt(j))));
 	}
 
 	/**
