@@ -23,8 +23,10 @@ import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.ui.MContext;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.IWorkbench;
+import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.osgi.framework.ServiceRegistration;
@@ -175,6 +177,21 @@ public class E4Workbench implements IWorkbench {
 		if (context != null) {
 			context.set(ExpressionContext.ALLOW_ACTIVATION, Boolean.TRUE);
 		}
+
+		/*
+		 * Remember the perspective-states only for new e4-style workbenches, not for legacy ones.
+		 * This is required because the legacy application model doesn't use the
+		 * ApplicationModel-File (e4xmi-File) to define Perspectives it still uses the Eclipse
+		 * ExtensionRegistry and it also uses this to restore a perspective!
+		 */
+		if (!"org.eclipse.e4.legacy.ide.application".equals(appElement.getElementId())) { //$NON-NLS-1$
+			/*
+			 * TODO: Consider to also add a listener (either UIEventHandler or EAdapter) whenever a
+			 * new Perspective is added to the application model by some other code. This listener
+			 * should also do the "remember perspective state" stuff.
+			 */
+			rememberPerspectiveState(appElement, appContext);
+		}
 	}
 
 	/*
@@ -256,4 +273,38 @@ public class E4Workbench implements IWorkbench {
 		return context;
 	}
 
+	/**
+	 * Iterates through all {@link MPerspective}s of the given {@link MApplication} model and
+	 * remembers a snapshot of them.
+	 * 
+	 * <p>
+	 * The snapshot is remembered inside of the persisted state of the perspective. This causes the
+	 * snapshots to be remembered after an application restart. The use of the persisted state map
+	 * also makes the snapshots refreshable if the application is started with the
+	 * <code>-clearPersistedState</code> argument or somebody clears the instance data.
+	 * </p>
+	 * 
+	 * @param appModel
+	 *            the application model to search for perspectives
+	 * @param appContext
+	 *            the context to retrieve the {@link EModelService} from
+	 */
+	private static void rememberPerspectiveState(MApplication appModel, IEclipseContext appContext) {
+		if (appModel == null || appContext == null)
+			return;
+
+		EModelService modelService = appContext.get(EModelService.class);
+		if (modelService == null)
+			return;
+
+		List<MPerspective> allPerspectives = modelService.findElements(appModel, null,
+				MPerspective.class, null);
+
+		for (MPerspective perspective : allPerspectives) {
+			// prevent overwriting of already created snapshots
+			if (modelService.findSnippet(appModel, perspective.getElementId()) == null) {
+				modelService.cloneElement(perspective, appModel, false);
+			}
+		}
+	}
 }
