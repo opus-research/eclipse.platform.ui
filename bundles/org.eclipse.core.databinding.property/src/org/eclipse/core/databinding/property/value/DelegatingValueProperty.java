@@ -17,6 +17,7 @@ import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.map.IObservableMap;
 import org.eclipse.core.databinding.observable.set.IObservableSet;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.databinding.observable.value.ValueDiff;
 import org.eclipse.core.databinding.property.INativePropertyListener;
 import org.eclipse.core.databinding.property.ISimplePropertyListener;
 import org.eclipse.core.internal.databinding.property.value.ListDelegatingValueObservableList;
@@ -24,12 +25,16 @@ import org.eclipse.core.internal.databinding.property.value.MapDelegatingValueOb
 import org.eclipse.core.internal.databinding.property.value.SetDelegatingValueObservableMap;
 
 /**
+ * @param <S>
+ *            type of the source object
+ * @param <T>
+ *            type of the value of the property
  * @since 1.2
  *
  */
-public abstract class DelegatingValueProperty extends ValueProperty {
+public abstract class DelegatingValueProperty<S, T> extends ValueProperty<S, T> {
 	private final Object valueType;
-	private final IValueProperty nullProperty = new NullValueProperty();
+	private final IValueProperty<S, T> nullProperty = new NullValueProperty();
 
 	protected DelegatingValueProperty() {
 		this(null);
@@ -48,10 +53,10 @@ public abstract class DelegatingValueProperty extends ValueProperty {
 	 *            the property source (may be null)
 	 * @return the property to delegate to for the specified source object.
 	 */
-	public final IValueProperty getDelegate(Object source) {
+	public final IValueProperty<S, T> getDelegate(S source) {
 		if (source == null)
 			return nullProperty;
-		IValueProperty delegate = doGetDelegate(source);
+		IValueProperty<S, T> delegate = doGetDelegate(source);
 		if (delegate == null)
 			delegate = nullProperty;
 		return delegate;
@@ -66,15 +71,15 @@ public abstract class DelegatingValueProperty extends ValueProperty {
 	 *            the property source
 	 * @return the property to delegate to for the specified source object.
 	 */
-	protected abstract IValueProperty doGetDelegate(Object source);
+	protected abstract IValueProperty<S, T> doGetDelegate(S source);
 
 	@Override
-	protected Object doGetValue(Object source) {
+	protected T doGetValue(S source) {
 		return getDelegate(source).getValue(source);
 	}
 
 	@Override
-	protected void doSetValue(Object source, Object value) {
+	protected void doSetValue(S source, T value) {
 		getDelegate(source).setValue(source, value);
 	}
 
@@ -84,48 +89,51 @@ public abstract class DelegatingValueProperty extends ValueProperty {
 	}
 
 	@Override
-	public IObservableValue observe(Object source) {
+	public IObservableValue<T> observe(S source) {
 		return getDelegate(source).observe(source);
 	}
 
 	@Override
-	public IObservableValue observe(Realm realm, Object source) {
+	public IObservableValue<T> observe(Realm realm, S source) {
 		return getDelegate(source).observe(realm, source);
 	}
 
 	@Override
-	public IObservableList observeDetail(IObservableList master) {
-		return new ListDelegatingValueObservableList(master, this);
+	public <U extends S> IObservableList<T> observeDetail(
+			IObservableList<U> master) {
+		return new ListDelegatingValueObservableList<S, U, T>(master, this);
 	}
 
 	@Override
-	public IObservableMap observeDetail(IObservableSet master) {
-		return new SetDelegatingValueObservableMap(master, this);
+	public <U extends S> IObservableMap<U, T> observeDetail(
+			IObservableSet<U> master) {
+		return new SetDelegatingValueObservableMap<S, U, T>(master, this);
 	}
 
 	@Override
-	public IObservableMap observeDetail(IObservableMap master) {
-		return new MapDelegatingValueObservableMap(master, this);
+	public <K, V extends S> IObservableMap<K, T> observeDetail(
+			IObservableMap<K, V> master) {
+		return new MapDelegatingValueObservableMap<S, K, V, T>(master, this);
 	}
 
-	private class NullValueProperty extends SimpleValueProperty {
+	private class NullValueProperty extends SimpleValueProperty<S, T> {
 		@Override
 		public Object getValueType() {
 			return valueType;
 		}
 
 		@Override
-		protected Object doGetValue(Object source) {
+		protected T doGetValue(S source) {
 			return null;
 		}
 
 		@Override
-		protected void doSetValue(Object source, Object value) {
+		protected void doSetValue(S source, T value) {
 		}
 
 		@Override
-		public INativePropertyListener adaptListener(
-				ISimplePropertyListener listener) {
+		public INativePropertyListener<S> adaptListener(
+				ISimplePropertyListener<ValueDiff<T>> listener) {
 			return null;
 		}
 	}

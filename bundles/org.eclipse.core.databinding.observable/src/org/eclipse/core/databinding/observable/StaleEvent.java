@@ -24,7 +24,7 @@ package org.eclipse.core.databinding.observable;
  * @since 1.0
  *
  */
-public class StaleEvent extends ObservableEvent {
+public class StaleEvent extends ObservableEvent<StaleEvent> {
 
 	/**
 	 * Creates a new stale event.

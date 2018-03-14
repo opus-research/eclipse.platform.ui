@@ -12,11 +12,14 @@
 package org.eclipse.core.databinding.observable.list;
 
 /**
- * A single addition of an element to a list or removal of an element from a list.
- *
+ * A single addition of an element to a list or removal of an element from a
+ * list.
+ * 
+ * @param <E>
+ * 
  * @since 1.0
  */
-public abstract class ListDiffEntry {
+public abstract class ListDiffEntry<E> {
 
 	/**
 	 * @return the 0-based position of the addition or removal
@@ -24,14 +27,15 @@ public abstract class ListDiffEntry {
 	public abstract int getPosition();
 
 	/**
-	 * @return true if this represents an addition, false if this represents a removal
+	 * @return true if this represents an addition, false if this represents a
+	 *         removal
 	 */
 	public abstract boolean isAddition();
 
 	/**
 	 * @return the element that was added or removed
 	 */
-	public abstract Object getElement();
+	public abstract E getElement();
 
 	/**
 	 * @see java.lang.Object#toString()

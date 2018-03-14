@@ -27,21 +27,25 @@ import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
 import org.eclipse.core.internal.databinding.identity.IdentitySet;
 
 /**
+ * @param <M>
+ *            type of the master observables in the master set
+ * @param <E>
+ *            type of the detail elements
  * @since 1.4
  */
-public class SetDetailValueObservableMap extends ComputedObservableMap
-		implements IObserving {
+public class SetDetailValueObservableMap<M, E> extends
+		ComputedObservableMap<M, E> implements IObserving {
 
-	private IObservableFactory observableValueFactory;
+	private IObservableFactory<? super M, IObservableValue<E>> observableValueFactory;
 
-	private Map detailObservableValueMap = new HashMap();
+	private Map<M, IObservableValue<E>> detailObservableValueMap = new HashMap<M, IObservableValue<E>>();
 
-	private IdentitySet staleDetailObservables = new IdentitySet();
+	private IdentitySet<IObservableValue<?>> staleDetailObservables = new IdentitySet<IObservableValue<?>>();
 
 	private IStaleListener detailStaleListener = new IStaleListener() {
 		@Override
 		public void handleStale(StaleEvent staleEvent) {
-			addStaleDetailObservable((IObservableValue) staleEvent
+			addStaleDetailObservable((IObservableValue<?>) staleEvent
 					.getObservable());
 		}
 	};
@@ -51,19 +55,21 @@ public class SetDetailValueObservableMap extends ComputedObservableMap
 	 * @param observableValueFactory
 	 * @param detailValueType
 	 */
-	public SetDetailValueObservableMap(IObservableSet masterKeySet,
-			IObservableFactory observableValueFactory, Object detailValueType) {
+	public SetDetailValueObservableMap(
+			IObservableSet<M> masterKeySet,
+			IObservableFactory<? super M, IObservableValue<E>> observableValueFactory,
+			Object detailValueType) {
 		super(masterKeySet, detailValueType);
 		this.observableValueFactory = observableValueFactory;
 	}
 
 	@Override
-	protected void hookListener(final Object addedKey) {
-		final IObservableValue detailValue = getDetailObservableValue(addedKey);
+	protected void hookListener(final M addedKey) {
+		final IObservableValue<E> detailValue = getDetailObservableValue(addedKey);
 
-		detailValue.addValueChangeListener(new IValueChangeListener() {
+		detailValue.addValueChangeListener(new IValueChangeListener<E>() {
 			@Override
-			public void handleValueChange(ValueChangeEvent event) {
+			public void handleValueChange(ValueChangeEvent<E> event) {
 				if (!event.getObservableValue().isStale()) {
 					staleDetailObservables.remove(detailValue);
 				}
@@ -82,36 +88,36 @@ public class SetDetailValueObservableMap extends ComputedObservableMap
 			return;
 		}
 
-		IObservableValue detailValue = (IObservableValue) detailObservableValueMap
+		IObservableValue<E> detailValue = detailObservableValueMap
 				.remove(removedKey);
 		staleDetailObservables.remove(detailValue);
 		detailValue.dispose();
 	}
 
-	private IObservableValue getDetailObservableValue(Object masterKey) {
-		IObservableValue detailValue = (IObservableValue) detailObservableValueMap
+	private IObservableValue<E> getDetailObservableValue(M masterKey) {
+		IObservableValue<E> detailValue = detailObservableValueMap
 				.get(masterKey);
 
 		if (detailValue == null) {
 			ObservableTracker.setIgnore(true);
 			try {
-				detailValue = (IObservableValue) observableValueFactory
+				detailValue = observableValueFactory
 						.createObservable(masterKey);
+
+				detailObservableValueMap.put(masterKey, detailValue);
+
+				if (detailValue.isStale()) {
+					addStaleDetailObservable(detailValue);
+				}
 			} finally {
 				ObservableTracker.setIgnore(false);
-			}
-
-			detailObservableValueMap.put(masterKey, detailValue);
-
-			if (detailValue.isStale()) {
-				addStaleDetailObservable(detailValue);
 			}
 		}
 
 		return detailValue;
 	}
 
-	private void addStaleDetailObservable(IObservableValue detailObservable) {
+	private void addStaleDetailObservable(IObservableValue<?> detailObservable) {
 		boolean wasStale = isStale();
 		staleDetailObservables.add(detailObservable);
 		if (!wasStale) {
@@ -120,15 +126,15 @@ public class SetDetailValueObservableMap extends ComputedObservableMap
 	}
 
 	@Override
-	protected Object doGet(Object key) {
-		IObservableValue detailValue = getDetailObservableValue(key);
+	protected E doGet(M key) {
+		IObservableValue<E> detailValue = getDetailObservableValue(key);
 		return detailValue.getValue();
 	}
 
 	@Override
-	protected Object doPut(Object key, Object value) {
-		IObservableValue detailValue = getDetailObservableValue(key);
-		Object oldValue = detailValue.getValue();
+	protected E doPut(M key, E value) {
+		IObservableValue<E> detailValue = getDetailObservableValue(key);
+		E oldValue = detailValue.getValue();
 		detailValue.setValue(value);
 		return oldValue;
 	}
@@ -141,15 +147,15 @@ public class SetDetailValueObservableMap extends ComputedObservableMap
 	}
 
 	@Override
-	public Object remove(Object key) {
+	public E remove(Object key) {
 		checkRealm();
 
 		if (!containsKey(key)) {
 			return null;
 		}
 
-		IObservableValue detailValue = getDetailObservableValue(key);
-		Object oldValue = detailValue.getValue();
+		IObservableValue<E> detailValue = getDetailObservableValue((M) key);
+		E oldValue = detailValue.getValue();
 
 		keySet().remove(key);
 
