@@ -84,8 +84,7 @@ public abstract class EditorPart extends WorkbenchPart implements IEditorPart {
         /* (non-Javadoc)
          * @see org.eclipse.ui.IPropertyListener#propertyChanged(java.lang.Object, int)
          */
-        @Override
-		public void propertyChanged(Object source, int propId) {
+        public void propertyChanged(Object source, int propId) {
             if (propId == IWorkbenchPartConstants.PROP_TITLE) {
                 setDefaultPartName();
             }
@@ -110,8 +109,7 @@ public abstract class EditorPart extends WorkbenchPart implements IEditorPart {
      *
      * @see IEditorPart
      */
-    @Override
-	public abstract void doSave(IProgressMonitor monitor);
+    public abstract void doSave(IProgressMonitor monitor);
 
     /* (non-Javadoc)
      * Saves the contents of this editor to another object.
@@ -122,22 +120,19 @@ public abstract class EditorPart extends WorkbenchPart implements IEditorPart {
      *
      * @see IEditorPart
      */
-    @Override
-	public abstract void doSaveAs();
+    public abstract void doSaveAs();
 
     /* (non-Javadoc)
      * Method declared on IEditorPart.
      */
-    @Override
-	public IEditorInput getEditorInput() {
+    public IEditorInput getEditorInput() {
         return editorInput;
     }
 
     /* (non-Javadoc)
      * Method declared on IEditorPart.
      */
-    @Override
-	public IEditorSite getEditorSite() {
+    public IEditorSite getEditorSite() {
         return (IEditorSite) getSite();
     }
 
@@ -146,8 +141,7 @@ public abstract class EditorPart extends WorkbenchPart implements IEditorPart {
      *
      * @return the tool tip text
      */
-    @Override
-	public String getTitleToolTip() {
+    public String getTitleToolTip() {
         if (editorInput == null) {
 			return super.getTitleToolTip();
 		}
@@ -168,8 +162,7 @@ public abstract class EditorPart extends WorkbenchPart implements IEditorPart {
      *		setInput(input);
      * </pre>
      */
-    @Override
-	public abstract void init(IEditorSite site, IEditorInput input)
+    public abstract void init(IEditorSite site, IEditorInput input)
             throws PartInitException;
 
     /* (non-Javadoc)
@@ -182,8 +175,7 @@ public abstract class EditorPart extends WorkbenchPart implements IEditorPart {
      *
      * @see IEditorPart
      */
-    @Override
-	public abstract boolean isDirty();
+    public abstract boolean isDirty();
 
     /* (non-Javadoc)
      * Returns whether the "save as" operation is supported by this editor.
@@ -194,8 +186,7 @@ public abstract class EditorPart extends WorkbenchPart implements IEditorPart {
      *
      * @see IEditorPart
      */
-    @Override
-	public abstract boolean isSaveAsAllowed();
+    public abstract boolean isSaveAsAllowed();
 
     /* (non-Javadoc)
      * Returns whether the contents of this editor should be saved when the editor
@@ -205,8 +196,7 @@ public abstract class EditorPart extends WorkbenchPart implements IEditorPart {
      * (<code>isDirty</code>).
      * </p>
      */
-    @Override
-	public boolean isSaveOnCloseNeeded() {
+    public boolean isSaveOnCloseNeeded() {
         return isDirty();
     }
 
@@ -257,8 +247,7 @@ public abstract class EditorPart extends WorkbenchPart implements IEditorPart {
     /* (non-Javadoc)
      * @see org.eclipse.ui.part.WorkbenchPart#setContentDescription(java.lang.String)
      */
-    @Override
-	protected void setContentDescription(String description) {
+    protected void setContentDescription(String description) {
         if (compatibilityTitleListener != null) {
             removePropertyListener(compatibilityTitleListener);
             compatibilityTitleListener = null;
@@ -270,8 +259,7 @@ public abstract class EditorPart extends WorkbenchPart implements IEditorPart {
     /* (non-Javadoc)
      * @see org.eclipse.ui.part.WorkbenchPart#setPartName(java.lang.String)
      */
-    @Override
-	protected void setPartName(String partName) {
+    protected void setPartName(String partName) {
         if (compatibilityTitleListener != null) {
             removePropertyListener(compatibilityTitleListener);
             compatibilityTitleListener = null;
@@ -283,8 +271,7 @@ public abstract class EditorPart extends WorkbenchPart implements IEditorPart {
     /* (non-Javadoc)
      * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
      */
-    @Override
-	public void setInitializationData(IConfigurationElement cfig,
+    public void setInitializationData(IConfigurationElement cfig,
             String propertyName, Object data) {
         super.setInitializationData(cfig, propertyName, data);
 
@@ -303,8 +290,7 @@ public abstract class EditorPart extends WorkbenchPart implements IEditorPart {
     /**
      * Set the default title for the receiver.
      */
-    @Override
-	void setDefaultTitle() {
+    void setDefaultTitle() {
         setTitle(getPartName());
     }
 
@@ -315,8 +301,7 @@ public abstract class EditorPart extends WorkbenchPart implements IEditorPart {
      * @param site the site to check
      * @since 3.1
      */
-    @Override
-	protected final void checkSite(IWorkbenchPartSite site) {
+    protected final void checkSite(IWorkbenchPartSite site) {
         super.checkSite(site);
         Assert.isTrue(site instanceof IEditorSite, "The site for an editor must be an IEditorSite"); //$NON-NLS-1$
     }    

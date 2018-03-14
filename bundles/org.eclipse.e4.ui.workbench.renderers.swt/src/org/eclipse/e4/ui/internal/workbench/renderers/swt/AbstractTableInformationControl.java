@@ -65,7 +65,6 @@ public abstract class AbstractTableInformationControl {
 		/*
 		 * (non-Javadoc) Method declared on ViewerFilter.
 		 */
-		@Override
 		public boolean select(Viewer viewer, Object parentElement,
 				Object element) {
 			StringMatcher matcher = getMatcher();
@@ -130,7 +129,6 @@ public abstract class AbstractTableInformationControl {
 
 		final Table table = fTableViewer.getTable();
 		table.addKeyListener(new KeyListener() {
-			@Override
 			public void keyPressed(KeyEvent e) {
 				switch (e.keyCode) {
 				case SWT.ESC:
@@ -158,19 +156,16 @@ public abstract class AbstractTableInformationControl {
 				}
 			}
 
-			@Override
 			public void keyReleased(KeyEvent e) {
 				// do nothing
 			}
 		});
 
 		table.addSelectionListener(new SelectionListener() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				// do nothing;
 			}
 
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				gotoSelectedElement();
 			}
@@ -196,7 +191,6 @@ public abstract class AbstractTableInformationControl {
 			Point tableLoc = table.toDisplay(0, 0);
 			int divCount = 0;
 
-			@Override
 			public void mouseMove(MouseEvent e) {
 				if (divCount == ignoreEventCount) {
 					divCount = 0;
@@ -238,7 +232,6 @@ public abstract class AbstractTableInformationControl {
 		});
 
 		table.addMouseListener(new MouseAdapter() {
-			@Override
 			public void mouseUp(MouseEvent e) {
 				if (table.getSelectionCount() < 1) {
 					return;
@@ -261,7 +254,6 @@ public abstract class AbstractTableInformationControl {
 						MenuItem mItem = new MenuItem(menu, SWT.NONE);
 						mItem.setText(SWTRenderersMessages.menuClose);
 						mItem.addSelectionListener(new SelectionAdapter() {
-							@Override
 							public void widgetSelected(
 									SelectionEvent selectionEvent) {
 								removeSelectedItems();
@@ -274,7 +266,6 @@ public abstract class AbstractTableInformationControl {
 		});
 
 		fShell.addTraverseListener(new TraverseListener() {
-			@Override
 			public void keyTraversed(TraverseEvent e) {
 				switch (e.detail) {
 				case SWT.TRAVERSE_PAGE_NEXT:
@@ -355,7 +346,6 @@ public abstract class AbstractTableInformationControl {
 		fFilterText.setLayoutData(data);
 
 		fFilterText.addKeyListener(new KeyListener() {
-			@Override
 			public void keyPressed(KeyEvent e) {
 				switch (e.keyCode) {
 				case SWT.CR:
@@ -377,7 +367,6 @@ public abstract class AbstractTableInformationControl {
 				}
 			}
 
-			@Override
 			public void keyReleased(KeyEvent e) {
 				// do nothing
 			}
@@ -401,7 +390,6 @@ public abstract class AbstractTableInformationControl {
 		fFilterText.setText(""); //$NON-NLS-1$
 
 		fFilterText.addModifyListener(new ModifyListener() {
-			@Override
 			public void modifyText(ModifyEvent e) {
 				String text = ((Text) e.widget).getText();
 				int length = text.length();

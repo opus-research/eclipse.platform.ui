@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -129,8 +130,7 @@ public class WorkingSetSelectionDialog extends AbstractWorkingSetDialog {
      * 
      * @see org.eclipse.jface.dialogs.Dialog#cancelPressed()
      */
-    @Override
-	protected void cancelPressed() {
+    protected void cancelPressed() {
         restoreAddedWorkingSets();
         restoreChangedWorkingSets();
         restoreRemovedWorkingSets();
@@ -143,8 +143,7 @@ public class WorkingSetSelectionDialog extends AbstractWorkingSetDialog {
      * 
      * @see org.eclipse.jface.window.Window#configureShell(Shell)
      */
-    @Override
-	protected void configureShell(Shell shell) {
+    protected void configureShell(Shell shell) {
         super.configureShell(shell);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,
 				IWorkbenchHelpContextIds.WORKING_SET_SELECTION_DIALOG);
@@ -156,8 +155,7 @@ public class WorkingSetSelectionDialog extends AbstractWorkingSetDialog {
      * 
      * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(Composite)
      */
-    @Override
-	protected Control createDialogArea(Composite parent) {
+    protected Control createDialogArea(Composite parent) {
     	initializeDialogUnits(parent);
     	
         Composite composite = (Composite) super.createDialogArea(parent);
@@ -165,7 +163,6 @@ public class WorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 		createMessageArea(composite);
 
 		SelectionListener listener = new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updateButtonAvailability();
 			}
@@ -225,14 +222,12 @@ public class WorkingSetSelectionDialog extends AbstractWorkingSetDialog {
         listViewer.addFilter(new WorkingSetFilter(getSupportedWorkingSetIds()));
         
         listViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-            @Override
-			public void selectionChanged(SelectionChangedEvent event) {
+            public void selectionChanged(SelectionChangedEvent event) {
                 handleSelectionChanged();
             }
         });
         listViewer.addDoubleClickListener(new IDoubleClickListener() {
-            @Override
-			public void doubleClick(DoubleClickEvent event) {
+            public void doubleClick(DoubleClickEvent event) {
             	Object obj = ((IStructuredSelection) listViewer.getSelection())
 						.getFirstElement();
 				listViewer.setCheckedElements(new Object[] {obj});
@@ -243,7 +238,6 @@ public class WorkingSetSelectionDialog extends AbstractWorkingSetDialog {
             }
         });
         listViewer.addCheckStateListener(new ICheckStateListener() {
-			@Override
 			public void checkStateChanged(CheckStateChangedEvent event) {
 				// implicitly select the third radio button
 				buttonWindowSet.setSelection(false);
@@ -304,8 +298,7 @@ public class WorkingSetSelectionDialog extends AbstractWorkingSetDialog {
      * 
      * @see org.eclipse.jface.dialogs.Dialog#createContents(Composite)
      */
-    @Override
-	protected Control createContents(Composite parent) {
+    protected Control createContents(Composite parent) {
         Control control = super.createContents(parent);
         List selections = getInitialElementSelections();
         if (!selections.isEmpty()) {
@@ -320,8 +313,7 @@ public class WorkingSetSelectionDialog extends AbstractWorkingSetDialog {
      * 
      * @return the selected working sets
      */
-    @Override
-	protected List getSelectedWorkingSets() {
+    protected List getSelectedWorkingSets() {
         ISelection selection = listViewer.getSelection();
         if (selection instanceof IStructuredSelection) {
 			return ((IStructuredSelection) selection).toList();
@@ -342,8 +334,7 @@ public class WorkingSetSelectionDialog extends AbstractWorkingSetDialog {
      * 
      * @see org.eclipse.jface.dialogs.Dialog#okPressed()
      */
-    @Override
-	protected void okPressed() {
+    protected void okPressed() {
     		if (buttonWindowSet.getSelection()) {
     			IWorkingSet [] windowSet = new IWorkingSet[] {workbenchWindow.getActivePage().getAggregateWorkingSet()};
     			setSelection(windowSet);
@@ -363,18 +354,22 @@ public class WorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 			if (multiSelect || typedResult.length <= 1) {
 				setSelection(typedResult);
 				setResult(Arrays.asList(typedResult));
-			} else {
+			}
+			else {
 				String setId = getAggregateIdForSets(typedResult);
-				IWorkingSetManager workingSetManager = workbenchWindow.getWorkbench()
-						.getWorkingSetManager();
-				IWorkingSet aggregate = workingSetManager.getWorkingSet(setId);
-				if (aggregate != null) {
-					workingSetManager.removeWorkingSet(aggregate);
+				IWorkingSetManager workingSetManager = workbenchWindow
+						.getWorkbench().getWorkingSetManager();
+				IWorkingSet aggregate = workingSetManager
+						.getWorkingSet(setId);
+				if (aggregate == null) {
+					aggregate = workingSetManager
+							.createAggregateWorkingSet(
+									setId,
+									WorkbenchMessages.WorkbenchPage_workingSet_multi_label,
+									typedResult);
+					workingSetManager.addWorkingSet(aggregate);
 				}
-				aggregate = workingSetManager.createAggregateWorkingSet(setId,
-						WorkbenchMessages.WorkbenchPage_workingSet_multi_label, typedResult);
-				workingSetManager.addWorkingSet(aggregate);
-				setSelection(new IWorkingSet[] { aggregate });
+				setSelection(new IWorkingSet[] {aggregate});
 				setResult(Collections.singletonList(aggregate));
 			}
     		}
@@ -454,19 +449,16 @@ public class WorkingSetSelectionDialog extends AbstractWorkingSetDialog {
      *
      * @see org.eclipse.ui.dialogs.IWorkingSetSelectionDialog#setSelection(IWorkingSet[])
      */
-    @Override
-	public void setSelection(IWorkingSet[] workingSets) {
+    public void setSelection(IWorkingSet[] workingSets) {
         super.setSelection(workingSets);
         setInitialSelections(workingSets == null ? new Object[0] : workingSets);
     }
 
-	@Override
 	protected void availableWorkingSetsChanged() {
 		listViewer.setInput(PlatformUI.getWorkbench().getWorkingSetManager().getWorkingSets());
 		super.availableWorkingSetsChanged();
 	}
 
-	@Override
 	protected void selectAllSets() {
 		listViewer.setCheckedElements(PlatformUI.getWorkbench().getWorkingSetManager().getWorkingSets());
 		// implicitly select the third radio button
@@ -476,7 +468,6 @@ public class WorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 		updateButtonAvailability();
 	}
 
-	@Override
 	protected void deselectAllSets() {
 		listViewer.setCheckedElements(new Object[0]);
 		// implicitly select the third radio button

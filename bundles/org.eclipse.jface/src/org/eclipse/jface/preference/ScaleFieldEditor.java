@@ -246,8 +246,7 @@ public class ScaleFieldEditor extends FieldEditor {
                 }
             });
             scale.addDisposeListener(new DisposeListener() {
-                @Override
-				public void widgetDisposed(DisposeEvent event) {
+                public void widgetDisposed(DisposeEvent event) {
                     scale = null;
                 }
             });

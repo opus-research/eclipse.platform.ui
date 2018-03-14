@@ -78,7 +78,6 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 	 * org.eclipse.jface.action.IMenuListener#menuAboutToShow(org.eclipse.jface
 	 * .action.IMenuManager)
 	 */
-	@Override
 	public void menuAboutToShow(IMenuManager manager) {
 		if (!(manager instanceof MenuManager)) {
 			return;
@@ -114,7 +113,6 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 	 * 
 	 * SWT.Show post processing method for MenuManager
 	 */
-	@Override
 	public void menuAboutToHide(IMenuManager manager) {
 		if (!(manager instanceof MenuManager)) {
 			return;
@@ -168,11 +166,9 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 				dynamicMenuContext.set(List.class, mel);
 				IEclipseContext parentContext = modelService
 						.getContainingContext(currentMenuElement);
-				Object rc = ContextInjectionFactory.invoke(contribution,
+				if (ContextInjectionFactory.invoke(contribution,
 						AboutToShow.class, parentContext, dynamicMenuContext,
-						this);
-				dynamicMenuContext.dispose();
-				if (rc == this) {
+						this) == this) {
 					if (logger != null) {
 						logger.error("Missing @AboutToShow method in " + contribution); //$NON-NLS-1$
 					}

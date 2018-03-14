@@ -21,32 +21,50 @@ package org.eclipse.jface.viewers;
 public class TreeColumnViewerLabelProvider extends
 		TableColumnViewerLabelProvider {
 	private ITreePathLabelProvider treePathProvider = new ITreePathLabelProvider() {
-
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ITreePathLabelProvider#updateLabel(org.eclipse.jface.viewers.ViewerLabel,
+		 *      org.eclipse.jface.viewers.TreePath)
+		 */
 		public void updateLabel(ViewerLabel label, TreePath elementPath) {
 			// Do nothing by default
 
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
+		 */
 		public void dispose() {
 			// Do nothing by default
 
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.jface.viewers.ILabelProviderListener)
+		 */
 		public void addListener(ILabelProviderListener listener) {
 			// Do nothing by default
 
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
+		 */
 		public void removeListener(ILabelProviderListener listener) {
 			// Do nothing by default
 
 		}
-
-		@Override
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang.Object, java.lang.String)
+		 */
 		public boolean isLabelProperty(Object element, String property) {
 			return false;
 		}
@@ -73,6 +91,11 @@ public class TreeColumnViewerLabelProvider extends
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.ViewerLabelProvider#setProviders(java.lang.Object)
+	 */
 	@Override
 	public void setProviders(Object provider) {
 		super.setProviders(provider);
