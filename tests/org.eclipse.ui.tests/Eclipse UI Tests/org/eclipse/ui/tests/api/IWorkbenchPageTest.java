@@ -1943,7 +1943,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		
 		IPerspectiveDescriptor persp = fActivePage.getPerspective();
 		
-		ICommandService commandService = fWorkbench.getService(ICommandService.class);
+		ICommandService commandService = (ICommandService) fWorkbench.getService(ICommandService.class);
 		Command command = commandService.getCommand("org.eclipse.ui.window.closePerspective");
 		
 		HashMap<String, String> parameters = new HashMap<String, String>();
@@ -1951,7 +1951,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		
 		ParameterizedCommand pCommand = ParameterizedCommand.generateCommand(command, parameters);
 		
-		IHandlerService handlerService = fWorkbench
+		IHandlerService handlerService = (IHandlerService) fWorkbench
 				.getService(IHandlerService.class);
 		try {
 			handlerService.executeCommand(pCommand, null);
@@ -2878,7 +2878,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		fActivePage.activate(editor);
 
 		processEvents();
-		ICommandService cs = fActivePage.getWorkbenchWindow()
+		ICommandService cs = (ICommandService) fActivePage.getWorkbenchWindow()
 				.getService(ICommandService.class);
 		Command undo = cs.getCommand("org.eclipse.ui.edit.undo");
 		assertTrue(undo.isDefined());
