@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -42,6 +42,7 @@ public class AreaRenderer extends SWTPartRenderer {
 	IEventBroker eventBroker;
 
 	private EventHandler itemUpdater = new EventHandler() {
+		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MArea
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MArea))
@@ -71,6 +72,7 @@ public class AreaRenderer extends SWTPartRenderer {
 	};
 
 	private EventHandler widgetListener = new EventHandler() {
+		@Override
 		public void handleEvent(Event event) {
 			final MUIElement changedElement = (MUIElement) event
 					.getProperty(EventTags.ELEMENT);
@@ -105,6 +107,7 @@ public class AreaRenderer extends SWTPartRenderer {
 		eventBroker.unsubscribe(widgetListener);
 	}
 
+	@Override
 	public Object createWidget(final MUIElement element, Object parent) {
 		if (!(element instanceof MArea) || !(parent instanceof Composite))
 			return null;
@@ -218,13 +221,6 @@ public class AreaRenderer extends SWTPartRenderer {
 			ensureComposite(areaModel);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#getUIContainer
-	 * (org.eclipse.e4.ui.model.application.ui.MUIElement)
-	 */
 	@Override
 	public Object getUIContainer(MUIElement element) {
 		MUIElement parentElement = element.getParent();

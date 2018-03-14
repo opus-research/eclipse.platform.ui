@@ -90,10 +90,8 @@ public abstract class WorkbenchWizardSelectionPage extends WizardSelectionPage {
         setSelectedNode(node);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.wizard.IWizardPage#getNextPage()
-     */
-    public IWizardPage getNextPage() { 
+    @Override
+	public IWizardPage getNextPage() { 
         ITriggerPoint triggerPoint = getWorkbench().getActivitySupport()
         .getTriggerPointManager().getTriggerPoint(triggerPointId);
         if (triggerPoint == null || WorkbenchActivityHelper.allowUseOf(triggerPoint, getSelectedNode())) {

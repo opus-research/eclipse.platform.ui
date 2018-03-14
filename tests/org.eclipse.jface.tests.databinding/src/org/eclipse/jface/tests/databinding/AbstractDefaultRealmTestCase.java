@@ -15,7 +15,7 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.jface.databinding.conformance.util.RealmTester;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -31,6 +31,7 @@ public class AbstractDefaultRealmTestCase extends TestCase {
 	 * 
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -39,12 +40,13 @@ public class AbstractDefaultRealmTestCase extends TestCase {
 		Display display = Display.getCurrent() != null
 				&& !Display.getCurrent().isDisposed() ? Display.getCurrent()
 				: Display.getDefault();
-		RealmTester.setDefault(SWTObservables.getRealm(display));
+		RealmTester.setDefault(DisplayRealm.getRealm(display));
 	}
 
 	/**
 	 * Removes the default realm.
 	 */
+	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 

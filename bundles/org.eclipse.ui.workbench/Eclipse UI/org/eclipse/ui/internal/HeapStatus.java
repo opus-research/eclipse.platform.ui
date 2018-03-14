@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,6 +38,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * The Heap Status control, which shows the heap usage statistics in the window trim.
@@ -71,7 +72,8 @@ public class HeapStatus extends Composite {
 	protected volatile boolean isInGC = false;
 
     private final Runnable timer = new Runnable() {
-        public void run() {
+        @Override
+		public void run() {
             if (!isDisposed()) {
                 updateStats();
                 if (hasChanged) {
@@ -87,6 +89,7 @@ public class HeapStatus extends Composite {
     };
     
     private final IPropertyChangeListener prefListener = new IPropertyChangeListener() {
+		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			if (IHeapStatusConstants.PREF_UPDATE_INTERVAL.equals(event.getProperty())) {
 				setUpdateIntervalInMS(prefStore.getInt(IHeapStatusConstants.PREF_UPDATE_INTERVAL));
@@ -139,7 +142,8 @@ public class HeapStatus extends Composite {
 		
         Listener listener = new Listener() {
 
-            public void handleEvent(Event event) {
+            @Override
+			public void handleEvent(Event event) {
                 switch (event.type) {
                 case SWT.Dispose:
                 	doDispose();
@@ -204,6 +208,7 @@ public class HeapStatus extends Composite {
 		updateStats();
 
         getDisplay().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				if (!isDisposed()) {
 					getDisplay().timerExec(updateInterval, timer);
@@ -252,9 +257,7 @@ public class HeapStatus extends Composite {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.swt.widgets.Composite#computeSize(int, int, boolean)
-	 */
+	@Override
 	public Point computeSize(int wHint, int hHint, boolean changed) {
         GC gc = new GC(this);
         Point p = gc.textExtent(WorkbenchMessages.HeapStatus_widthStr);
@@ -294,6 +297,7 @@ public class HeapStatus extends Composite {
         MenuManager menuMgr = new MenuManager();
         menuMgr.setRemoveAllWhenShown(true);
         menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(IMenuManager menuMgr) {
 				fillMenu(menuMgr);
 			}
@@ -334,9 +338,11 @@ public class HeapStatus extends Composite {
     private void gc() {
 		gcRunning(true);
 		Thread t = new Thread() {
+			@Override
 			public void run() {
 				busyGC();
 				getDisplay().asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						if (!isDisposed()) {
 							gcRunning(false);
@@ -537,7 +543,8 @@ public class HeapStatus extends Composite {
             super(WorkbenchMessages.SetMarkAction_text);
         }
         
-        public void run() {
+        @Override
+		public void run() {
             setMark();
         }
     }
@@ -547,7 +554,8 @@ public class HeapStatus extends Composite {
             super(WorkbenchMessages.ClearMarkAction_text);
         }
         
-        public void run() {
+        @Override
+		public void run() {
             clearMark();
         }
     }
@@ -559,7 +567,8 @@ public class HeapStatus extends Composite {
             setChecked(showMax);
         }
         
-        public void run() {
+        @Override
+		public void run() {
             prefStore.setValue(IHeapStatusConstants.PREF_SHOW_MAX, isChecked());
             redraw();
         }
@@ -571,49 +580,15 @@ public class HeapStatus extends Composite {
     		super(WorkbenchMessages.WorkbenchWindow_close );
     	}
     	
-    	/* (non-Javadoc)
-    	 * @see org.eclipse.jface.action.IAction#run()
-    	 */
-    	public void run(){
-    		dispose();
+    	@Override
+		public void run(){
+			WorkbenchWindow wbw = (WorkbenchWindow) PlatformUI.getWorkbench()
+					.getActiveWorkbenchWindow();
+			if (wbw != null) {
+				wbw.showHeapStatus(false);
+			}
     	}
     }
-
-//    /**
-//     * Returns whether the Kyrsoft memory monitor view is available.
-//     * 
-//     * @return <code>true</code> if available, <code>false</code> otherwise
-//     */
-//    private boolean isKyrsoftViewAvailable() {
-//        return (Platform.getBundle(IHeapStatusConstants.KYRSOFT_PLUGIN_ID) != null) && PlatformUI.getWorkbench().getViewRegistry().find(IHeapStatusConstants.KYRSOFT_VIEW_ID) != null; 
-//    }
-//    
-//    class ShowKyrsoftViewAction extends Action {
-//        ShowKyrsoftViewAction() {
-//            super(WorkbenchMessages.ShowKyrsoftViewAction_text);
-//        }
-//        public void run() {
-//            if (!isKyrsoftViewAvailable()) { 
-//                MessageDialog.openError(getShell(), WorkbenchMessages.HeapStatus_Error, WorkbenchMessages.ShowKyrsoftViewAction_KyrsoftNotInstalled);
-//                return;
-//            }
-//			IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-//            IWorkbenchPage page = window == null ? null : window.getActivePage();
-//            if (page == null) {
-//                MessageDialog.openError(getShell(), WorkbenchMessages.HeapStatus_Error, WorkbenchMessages.ShowKyrsoftViewAction_OpenPerspectiveFirst);
-//                return;
-//            }
-//            try {
-//                page.showView(IHeapStatusConstants.KYRSOFT_VIEW_ID);
-//            }
-//            catch (PartInitException e) {
-//                String msg = WorkbenchMessages.ShowKyrsoftViewAction_ErrorShowingKyrsoftView;
-//                IStatus status = new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, 0, msg, e);
-//                ErrorDialog.openError(getShell(), WorkbenchMessages.HeapStatus_Error, msg, status);
-//            }
-//            
-//        }
-//    }
 
 }
 

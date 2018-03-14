@@ -88,11 +88,7 @@ public class CreateFileOperation extends AbstractCreateResourcesOperation {
 	private IFileContentDescription createFileContentDescription(
 			final IFile file, final InputStream contents) {
 		return new IFileContentDescription() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.ui.internal.ide.undo.IFileContentDescription#getContents()
-			 */
+			@Override
 			public InputStream getContents() {
 				if (contents != null) {
 					return contents;
@@ -100,11 +96,7 @@ public class CreateFileOperation extends AbstractCreateResourcesOperation {
 				return new ByteArrayInputStream(new byte[0]);
 			}
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.ui.internal.ide.undo.IFileContentDescription#getCharset()
-			 */
+			@Override
 			public String getCharset() {
 				try {
 					return file.getCharset(false);
@@ -113,21 +105,14 @@ public class CreateFileOperation extends AbstractCreateResourcesOperation {
 				}
 			}
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.ui.internal.ide.undo.IFileContentDescription#exists()
-			 */
+			@Override
 			public boolean exists() {
 				return true;
 			}
 		};
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.ide.undo.AbstractCreateResourcesOperation#computeExecutionStatus(org.eclipse.core.runtime.IProgressMonitor)
-	 */
+	@Override
 	public IStatus computeExecutionStatus(IProgressMonitor monitor) {
 		IStatus status = super.computeExecutionStatus(monitor);
 		if (status.isOK()) {

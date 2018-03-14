@@ -84,10 +84,8 @@ public class WizardNewLinkPage extends WizardPage {
         setPageComplete(true);
     }
 
-    /* (non-Javadoc)
-     * Method declared on IDialogPage.
-     */
-    public void createControl(Composite parent) {
+    @Override
+	public void createControl(Composite parent) {
         Font font = parent.getFont();
         initializeDialogUnits(parent);
         // top level group
@@ -113,7 +111,8 @@ public class WizardNewLinkPage extends WizardPage {
         createLinkButton.setLayoutData(data);
         createLinkButton.setFont(font);
         SelectionListener listener = new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 createLink = createLinkButton.getSelection();
                 browseButton.setEnabled(createLink);
                 variablesButton.setEnabled(createLink);
@@ -154,7 +153,8 @@ public class WizardNewLinkPage extends WizardPage {
         linkTargetField.setFont(font);
         linkTargetField.setEnabled(enabled);
         linkTargetField.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent e) {
+            @Override
+			public void modifyText(ModifyEvent e) {
                 setPageComplete(validatePage());
             }
         });
@@ -168,7 +168,8 @@ public class WizardNewLinkPage extends WizardPage {
         browseButton.setFont(font);
         browseButton.setText(IDEWorkbenchMessages.WizardNewLinkPage_browseButton);
         browseButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
+            @Override
+			public void widgetSelected(SelectionEvent event) {
                 handleLinkTargetBrowseButtonPressed();
             }
         });
@@ -185,7 +186,8 @@ public class WizardNewLinkPage extends WizardPage {
         variablesButton.setFont(font);
         variablesButton.setText(IDEWorkbenchMessages.WizardNewLinkPage_variablesButton);
         variablesButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
+            @Override
+			public void widgetSelected(SelectionEvent event) {
                 handleVariablesButtonPressed();
             }
         });

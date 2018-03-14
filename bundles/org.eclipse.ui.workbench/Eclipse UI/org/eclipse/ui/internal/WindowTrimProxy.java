@@ -74,20 +74,12 @@ public class WindowTrimProxy implements IWindowTrim {
 		fIsResizeable = resizeable;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.IWindowTrim#getControl()
-	 */
+	@Override
 	public Control getControl() {
 		return fTrimControl;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.IWindowTrim#getValidSides()
-	 */
+	@Override
 	public int getValidSides() {
 		return fValidSides;
 	}
@@ -98,50 +90,31 @@ public class WindowTrimProxy implements IWindowTrim {
 	 * 
 	 * @see org.eclipse.ui.internal.layout.IWindowTrim#dock(int)
 	 */
+	@Override
 	public void dock(int dropSide) {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.IWindowTrim#getId()
-	 */
+	@Override
 	public String getId() {
 		return fId;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.IWindowTrim#getDisplayName()
-	 */
+	@Override
 	public String getDisplayName() {
 		return fDisplayName;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.IWindowTrim#isCloseable()
-	 */
+	@Override
 	public boolean isCloseable() {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.IWindowTrim#handleClose()
-	 */
+	@Override
 	public void handleClose() {
 		// nothing to do...
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IWindowTrim#getWidthHint()
-	 */
+	@Override
 	public int getWidthHint() {
 		return fWidthHint;
 	}
@@ -154,11 +127,7 @@ public class WindowTrimProxy implements IWindowTrim {
 		fWidthHint = w;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IWindowTrim#getHeightHint()
-	 */
+	@Override
 	public int getHeightHint() {
 		return fHeightHint;
 	}
@@ -171,11 +140,7 @@ public class WindowTrimProxy implements IWindowTrim {
 		fHeightHint = h;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IWindowTrim#isResizeable()
-	 */
+	@Override
 	public boolean isResizeable() {
 		return fIsResizeable;
 	}

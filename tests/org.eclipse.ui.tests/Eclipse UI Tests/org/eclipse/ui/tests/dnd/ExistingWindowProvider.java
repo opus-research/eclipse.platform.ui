@@ -15,12 +15,13 @@ import org.eclipse.ui.IWorkbenchWindow;
 public class ExistingWindowProvider implements IWorkbenchWindowProvider {
 
     private IWorkbenchWindow window;
-    
+
     public ExistingWindowProvider(IWorkbenchWindow window) {
         this.window = window;
     }
-    
-    public IWorkbenchWindow getWorkbenchWindow() {
+
+    @Override
+	public IWorkbenchWindow getWorkbenchWindow() {
         return window;
     }
 

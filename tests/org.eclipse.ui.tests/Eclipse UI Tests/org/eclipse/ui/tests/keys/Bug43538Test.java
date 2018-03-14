@@ -23,14 +23,14 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
  * Test for Bug 43538.
- * 
+ *
  * @since 3.0
  */
 public class Bug43538Test extends UITestCase {
 
 	/**
 	 * Constructs a new instance of this test case.
-	 * 
+	 *
 	 * @param testName
 	 *            The name of the test
 	 */
@@ -52,6 +52,7 @@ public class Bug43538Test extends UITestCase {
 		Listener listener = new Listener() {
 			int count = 0;
 
+			@Override
 			public void handleEvent(Event event) {
 				if (event.stateMask == SWT.CTRL) {
 					assertEquals(
@@ -67,8 +68,9 @@ public class Bug43538Test extends UITestCase {
 			AutomationUtil.performKeyCodeEvent(display, SWT.KeyUp, Action.findKeyCode("SPACE")); //$NON-NLS-1$
 			AutomationUtil.performKeyCodeEvent(display, SWT.KeyUp, SWT.CONTROL);
 
-			while (display.readAndDispatch())
+			while (display.readAndDispatch()) {
 				;
+			}
 
 		} finally {
 			// Clean up the working environment.

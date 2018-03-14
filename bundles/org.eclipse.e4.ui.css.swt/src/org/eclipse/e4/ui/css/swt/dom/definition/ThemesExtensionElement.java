@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 IBM Corporation and others.
+ * Copyright (c) 2013, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Timo Kinnunen <timo.kinnunen@gmail.com> - bug 450727
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.dom.definition;
 
@@ -27,10 +28,12 @@ public class ThemesExtensionElement extends ElementAdapter {
 		super(themesExtension, engine);
 	}
 	
+	@Override
 	public NodeList getChildNodes() {
 		return null;
 	}
 
+	@Override
 	public String getNamespaceURI() {
 		if (namespaceURI == null) {
 			namespaceURI = ClassUtils.getPackageName(getNativeWidget().getClass());
@@ -38,18 +41,22 @@ public class ThemesExtensionElement extends ElementAdapter {
 		return namespaceURI;
 	}
 
+	@Override
 	public Node getParentNode() {
 		return null;
 	}
 
+	@Override
 	public String getCSSId() {
 		return null;
 	}
 
+	@Override
 	public String getCSSClass() {
 		return null;
 	}
 
+	@Override
 	public String getCSSStyle() {
 		return null;
 	}
@@ -64,7 +71,7 @@ public class ThemesExtensionElement extends ElementAdapter {
 
 	@Override
 	public String getAttribute(String arg0) {
-		return null;
+		return "";
 	}
 
 }

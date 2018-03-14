@@ -10,6 +10,7 @@
  *     Kiryl Kazakevich, Intel - bug 88359
  *     Tonny Madsen, RCP Company - bug 201055
  *     Mark Hoffmann <mark.hoffmann@web.de> - Fix for bug 84603
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440136
  *******************************************************************************/
 package org.eclipse.ui;
 
@@ -105,6 +106,7 @@ public interface IWorkbenchPreferenceConstants {
 	 *             <code>org.eclipse.ui.ide.IDE.Preferences.PROJECT_OPEN_NEW_PERSPECTIVE</code>
 	 *             instead.
 	 */
+	@Deprecated
 	public static final String PROJECT_OPEN_NEW_PERSPECTIVE = "PROJECT_OPEN_NEW_PERSPECTIVE"; //$NON-NLS-1$
 
 	/**
@@ -123,6 +125,7 @@ public interface IWorkbenchPreferenceConstants {
 	 * @deprecated Opening a Perspective in a new page is no longer supported
 	 *             functionality as of 2.0.
 	 */
+	@Deprecated
 	public static final String OPEN_PERSPECTIVE_PAGE = "OPEN_PERSPECTIVE_PAGE"; //$NON-NLS-1$
 
 	/**
@@ -145,17 +148,6 @@ public interface IWorkbenchPreferenceConstants {
 	 * A named preference indicating the default workbench perspective.
 	 */
 	public static final String DEFAULT_PERSPECTIVE_ID = "defaultPerspectiveId"; //$NON-NLS-1$
-
-	/**
-	 * A named preference indicating the presentation factory to use for the
-	 * workbench look and feel.
-	 * 
-	 * @since 3.0
-	 * @deprecated The presentation API is no longer used and has no effect.
-	 *             Refer to the platform porting guide for further details.
-	 */
-	@Deprecated
-	public static final String PRESENTATION_FACTORY_ID = "presentationFactoryId"; //$NON-NLS-1$
 
 	/**
 	 * A named preference indicating where the perspective bar should be docked.

@@ -27,9 +27,7 @@ import org.eclipse.ui.statushandlers.StatusManager.INotificationTypes;
  */
 public class WorkbenchErrorHandler extends AbstractStatusHandler {
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.statushandlers.AbstractStatusHandler#supportsNotification(int)
-	 */
+	@Override
 	public boolean supportsNotification(int type) {
 		if (type == INotificationTypes.HANDLED) {
 			return true;
@@ -39,12 +37,7 @@ public class WorkbenchErrorHandler extends AbstractStatusHandler {
 
 	private WorkbenchStatusDialogManager statusDialogManager;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.statushandlers.AbstractStatusHandler#handle(org.eclipse.ui.statushandlers.StatusAdapter,
-	 *      int)
-	 */
+	@Override
 	public void handle(final StatusAdapter statusAdapter, int style) {
 		statusAdapter.setProperty(WorkbenchStatusDialogManager.HINT,
 				new Integer(style));
@@ -58,6 +51,7 @@ public class WorkbenchErrorHandler extends AbstractStatusHandler {
 			} else {
 				if (block) {
 					Display.getDefault().syncExec(new Runnable() {
+						@Override
 						public void run() {
 							showStatusAdapter(statusAdapter, true);
 						}
@@ -65,6 +59,7 @@ public class WorkbenchErrorHandler extends AbstractStatusHandler {
 
 				} else {
 					Display.getDefault().asyncExec(new Runnable() {
+						@Override
 						public void run() {
 							showStatusAdapter(statusAdapter, false);
 						}
