@@ -6,7 +6,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Stefan Winkler <stefan@winklerweb.net> - Bug 419482
  *******************************************************************************/
 package org.eclipse.e4.ui.tests.css.swt;
 
@@ -62,6 +61,5 @@ public class CssSwtTestSuite extends TestSuite {
 		addTestSuite(DescendentTest.class);
 
 		addTestSuite(ThemeTest.class);
-		addTestSuite(Bug419482Test.class);
 	}
 }
