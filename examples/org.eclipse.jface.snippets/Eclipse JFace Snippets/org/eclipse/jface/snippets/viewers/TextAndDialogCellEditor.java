@@ -51,20 +51,17 @@ public class TextAndDialogCellEditor extends DialogCellEditor {
 	}
 
 
-	@Override
 	protected Control createContents(Composite cell) {
 		textField = new Text(cell, SWT.NONE);
 		textField.setFont(cell.getFont());
 		textField.setBackground(cell.getBackground());
 		textField.addFocusListener(new FocusAdapter() {
-				@Override
 				public void focusLost(FocusEvent event) {
 					 setValueToModel();
 				}
 			});
 
 		textField.addKeyListener(new KeyAdapter() {
-				@Override
 				public void keyPressed(KeyEvent event) {
 					keyReleaseOccured(event);
 				}
@@ -73,7 +70,6 @@ public class TextAndDialogCellEditor extends DialogCellEditor {
 		return textField;
 	}
 
-	@Override
 	protected void keyReleaseOccured(KeyEvent keyEvent) {
 		if (keyEvent.keyCode == SWT.CR || keyEvent.keyCode == SWT.KEYPAD_CR) { // Enter key
 			setValueToModel();
@@ -93,7 +89,6 @@ public class TextAndDialogCellEditor extends DialogCellEditor {
         }
 	}
 
-	@Override
 	protected void updateContents(Object value) {
 		if (textField == null) {
 			return;
@@ -107,7 +102,6 @@ public class TextAndDialogCellEditor extends DialogCellEditor {
 		
 	}
 
-	@Override
 	protected void doSetFocus() {
 		// Overridden to set focus to the Text widget instead of the Button.
 		textField.setFocus();
@@ -115,7 +109,6 @@ public class TextAndDialogCellEditor extends DialogCellEditor {
 	}
 
 
-	@Override
 	protected Object openDialogBox(Control cellEditorWindow) {
 		InputDialog dialog = new InputDialog(cellEditorWindow.getShell(), dialogTitle, dialogMessage, getDialogInitialValue(), null);
 		if (dialog.open() == Window.OK) {

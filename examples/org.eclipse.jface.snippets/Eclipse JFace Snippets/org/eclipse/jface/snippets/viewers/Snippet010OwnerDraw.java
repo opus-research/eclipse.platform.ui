@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 IBM Corporation and others.
+ * Copyright (c) 2006, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,8 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     oliver.schaefer@mbtech-services.com - Fix for Bug 225051 [Snippets] Snippet010OwnerDraw - Wrong german flag
- * 	   Lars Vogel <lars.vogel@gmail.com >- Bug 387367
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 414565
+ * 	   Lars Vogel <lars.vogel@gmail.com >- Fix for Bug 387367 - JFace Snippet Snippet010OwnerDraw rework 
  *******************************************************************************/
 package org.eclipse.jface.snippets.viewers;
 
@@ -64,7 +63,7 @@ public class Snippet010OwnerDraw {
 
 		/**
 		 * Create a new instance of the receiver.
-		 *
+		 * 
 		 * @param countryName
 		 * @param worldCupYear
 		 */
@@ -114,7 +113,7 @@ public class Snippet010OwnerDraw {
 
 		/**
 		 * Draw the flag in bounds.
-		 *
+		 * 
 		 * @param event
 		 */
 		protected void drawFlag(Event event) {
@@ -128,7 +127,7 @@ public class Snippet010OwnerDraw {
 
 		/**
 		 * Draw the cup year
-		 *
+		 * 
 		 * @param event
 		 */
 		private void drawCupYear(Event event) {
@@ -138,7 +137,7 @@ public class Snippet010OwnerDraw {
 
 		/**
 		 * Draw the name of the receiver.
-		 *
+		 * 
 		 * @param event
 		 */
 		protected void drawName(Event event) {
@@ -209,10 +208,9 @@ public class Snippet010OwnerDraw {
 
 		/*
 		 * (non-Javadoc)
-		 *
+		 * 
 		 * @see org.eclipse.jface.tests.viewers.OwnerDrawExample.CountryEntry#drawFlag(org.eclipse.swt.widgets.Event)
 		 */
-		@Override
 		protected void drawFlag(Event event) {
 
 			Rectangle bounds = event.getBounds();
@@ -249,10 +247,9 @@ public class Snippet010OwnerDraw {
 
 		/*
 		 * (non-Javadoc)
-		 *
+		 * 
 		 * @see org.eclipse.jface.tests.viewers.OwnerDrawExample.CountryEntry#drawFlag(org.eclipse.swt.widgets.Event)
 		 */
-		@Override
 		protected void drawFlag(Event event) {
 
 			Rectangle bounds = event.getBounds();
@@ -287,10 +284,9 @@ public class Snippet010OwnerDraw {
 
 		/*
 		 * (non-Javadoc)
-		 *
+		 * 
 		 * @see org.eclipse.jface.tests.viewers.OwnerDrawExample.CountryEntry#drawFlag(org.eclipse.swt.widgets.Event)
 		 */
-		@Override
 		protected void drawFlag(Event event) {
 
 			Rectangle bounds = event.getBounds();
@@ -319,17 +315,16 @@ public class Snippet010OwnerDraw {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
 	public void createPartControl(Composite parent) {
 		viewer = new TableViewer(parent, SWT.FULL_SELECTION);
 		viewer.setContentProvider(ArrayContentProvider.getInstance());
-
+		
 		createColumns();
 
 		viewer.setLabelProvider(new OwnerDrawLabelProvider() {
-			@Override
 			protected void measure(Event event, Object element) {
 				CountryEntry country = (CountryEntry) element;
 				event.setBounds(new Rectangle(event.x, event.y, country.getWidth(event),
@@ -338,18 +333,17 @@ public class Snippet010OwnerDraw {
 
 			/*
 			 * (non-Javadoc)
-			 *
+			 * 
 			 * @see org.eclipse.jface.viewers.OwnerDrawLabelProvider#paint(org.eclipse.swt.widgets.Event,
 			 *      java.lang.Object)
 			 */
-			@Override
 			protected void paint(Event event, Object element) {
 				CountryEntry entry = (CountryEntry) element;
 				entry.draw(event);
 
 			}
 		});
-
+		
 		GridData data = new GridData(GridData.GRAB_HORIZONTAL
 				| GridData.GRAB_VERTICAL | GridData.FILL_BOTH);
 
