@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Brad Reynolds - bug 141435
  *     Tom Schindl <tom.schindl@bestsolution.at> - bug 157309, 177619
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 402445
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -34,7 +33,7 @@ import org.eclipse.swt.widgets.Control;
  * strings, not icons. If you need to show icons for items, use
  * <code>TableViewer</code> instead.
  * </p>
- *
+ * 
  * @param <E>
  *            Type of an element of the model
  * @param <I>

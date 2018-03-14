@@ -38,12 +38,16 @@ import org.eclipse.swt.graphics.Image;
  * and {@link IFontDecorator} to provide foreground and background color and
  * font decoration.
  * </p>
+<<<<<<< localmast
  *
+=======
  * @param <E> Type of an element of the model
- *
+ * 
+>>>>>>> 92419b3 Bug 402445 - [Viewers] Add generics to the JFace Viewer framework 
  * @since 3.4
  */
-public class DecoratingStyledCellLabelProvider<E> extends DelegatingStyledCellLabelProvider<E> {
+public class DecoratingStyledCellLabelProvider<E> extends
+		DelegatingStyledCellLabelProvider<E> {
 
 	private ILabelDecorator<E> decorator;
 	private IDecorationContext decorationContext= DecorationContext.DEFAULT_CONTEXT;
@@ -70,9 +74,15 @@ public class DecoratingStyledCellLabelProvider<E> extends DelegatingStyledCellLa
 		super(labelProvider);
 
 		this.decorator = decorator;
-		this.decorationContext = decorationContext != null ? decorationContext : DecorationContext.DEFAULT_CONTEXT;
+		this.decorationContext = decorationContext != null ? decorationContext
+				: DecorationContext.DEFAULT_CONTEXT;
+<<<<<<< localmast
 
+		this.labelProviderListener = new ILabelProviderListener() {
+=======
+		
 		this.labelProviderListener = new ILabelProviderListener<E>() {
+>>>>>>> 92419b3 Bug 402445 - [Viewers] Add generics to the JFace Viewer framework 
 			@Override
 			public void labelProviderChanged(LabelProviderChangedEvent<E> event) {
 				fireLabelProviderChanged(event);
@@ -268,7 +278,7 @@ public class DecoratingStyledCellLabelProvider<E> extends DelegatingStyledCellLa
 				newDecorator.addListener(this.labelProviderListener);
 			}
 		}
-		fireLabelProviderChanged(new LabelProviderChangedEvent<>(this));
+		fireLabelProviderChanged(new LabelProviderChangedEvent<E>(this));
 	}
 
 	@Override

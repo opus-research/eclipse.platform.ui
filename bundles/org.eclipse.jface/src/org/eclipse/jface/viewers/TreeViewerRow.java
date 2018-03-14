@@ -144,10 +144,10 @@ public class TreeViewerRow<E> extends ViewerRow<E> {
 				int index = tree.indexOf(item) + 1;
 
 				if (index < tree.getItemCount()) {
-					return new TreeViewerRow<>(tree.getItem(index));
+					return new TreeViewerRow<E>(tree.getItem(index));
 				}
 			} else if (item.getExpanded() && item.getItemCount() > 0) {
-				return new TreeViewerRow<>(item.getItem(0));
+				return new TreeViewerRow<E>(item.getItem(0));
 			}
 		} else {
 			if (sameLevel || !item.getExpanded()) {
@@ -166,11 +166,11 @@ public class TreeViewerRow<E> extends ViewerRow<E> {
 				}
 
 				if (itemAfter != null) {
-					return new TreeViewerRow<>(itemAfter);
+					return new TreeViewerRow<E>(itemAfter);
 				}
 
 			} else if (item.getExpanded() && item.getItemCount() > 0) {
-				return new TreeViewerRow<>(item.getItem(0));
+				return new TreeViewerRow<E>(item.getItem(0));
 			}
 		}
 
@@ -191,10 +191,10 @@ public class TreeViewerRow<E> extends ViewerRow<E> {
 
 			if (nextTopItem != null) {
 				if (sameLevel) {
-					return new TreeViewerRow<>(nextTopItem);
+					return new TreeViewerRow<E>(nextTopItem);
 				}
 
-				return new TreeViewerRow<>(findLastVisibleItem(nextTopItem));
+				return new TreeViewerRow<E>(findLastVisibleItem(nextTopItem));
 			}
 		} else {
 			TreeItem parentItem = item.getParentItem();
@@ -213,7 +213,7 @@ public class TreeViewerRow<E> extends ViewerRow<E> {
 			}
 
 			if (itemBefore != null) {
-				return new TreeViewerRow<>(itemBefore);
+				return new TreeViewerRow<E>(itemBefore);
 			}
 		}
 
@@ -266,7 +266,7 @@ public class TreeViewerRow<E> extends ViewerRow<E> {
 	@Override
 	public TreePath<E> getTreePath() {
 		TreeItem tItem = item;
-		LinkedList<E> segments = new LinkedList<>();
+		LinkedList<E> segments = new LinkedList<E>();
 		while (tItem != null) {
 			@SuppressWarnings("unchecked")
 			E segment = (E) tItem.getData();
@@ -276,7 +276,7 @@ public class TreeViewerRow<E> extends ViewerRow<E> {
 		}
 		@SuppressWarnings("unchecked")
 		E[] segmentsArray = (E[]) segments.toArray();
-		return new TreePath<>(segmentsArray);
+		return new TreePath<E>(segmentsArray);
 	}
 
 	void setItem(TreeItem item) {

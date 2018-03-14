@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.Listener;
  * This class is responsible to provide cell management base features for the
  * SWT-Controls {@link org.eclipse.swt.widgets.Table} and
  * {@link org.eclipse.swt.widgets.Tree}.
- *
+ * 
  * @param <E>
  *            Type of an single element of the model
  * @param <I>

@@ -8,8 +8,11 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Tom Schindl - bug 151205
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 402439, 402445
+<<<<<<< localmast
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 402439
+=======
  *     Hendrik Still <hendrik.still@gammas.de> - bug 412273, bug 413973
+>>>>>>> 92419b3 Bug 402445 - [Viewers] Add generics to the JFace Viewer framework 
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -56,7 +59,7 @@ import org.eclipse.swt.widgets.Widget;
  * </p>
  * @param <E> Type of an single element of the model
  * @param <I> Type of the input
- *
+ * 
  * @see ViewerFilter
  * @see ViewerComparator
  */
@@ -169,7 +172,7 @@ public abstract class StructuredViewer<E,I> extends ContentViewer<E,I> implement
 		IColorProvider<E> colorProvider;
 
 		IFontProvider<E> fontProvider;
-
+		
 		/**
 		 * Create a new instance of the receiver using the supplied
 		 * label provider. If it is an IColorProvider or IFontProvider
@@ -194,7 +197,7 @@ public abstract class StructuredViewer<E,I> extends ContentViewer<E,I> implement
 
 		@Override
 		public void setFontsAndColors(E element){
-
+			
 			if(fontProvider != null){
 				if(font == null) {
 					font = fontProvider.getFont(element);
@@ -575,7 +578,7 @@ public abstract class StructuredViewer<E,I> extends ContentViewer<E,I> implement
 	 */
 	public void addFilter(ViewerFilter<E,I> filter) {
 		if (filters == null) {
-			filters = new ArrayList<>();
+			filters = new ArrayList<ViewerFilter<E,I>>();
 		}
 		filters.add(filter);
 		refresh();
@@ -735,7 +738,7 @@ public abstract class StructuredViewer<E,I> extends ContentViewer<E,I> implement
 	 */
 	protected E[] filter(E[] elements) {
 		if (filters != null) {
-			ArrayList<E> filtered = new ArrayList<>(elements.length);
+			ArrayList<E> filtered = new ArrayList<E>(elements.length);
 			I root = getRoot();
 			for (int i = 0; i < elements.length; i++) {
 				boolean add = true;
@@ -1016,13 +1019,13 @@ public abstract class StructuredViewer<E,I> extends ContentViewer<E,I> implement
 				assertElementsNotNull(result);
 			}
 		}
-
+		
 		if(result == null){
 			@SuppressWarnings("unchecked")
 			E[] emptyResult = (E[]) new Object[0];
 			result = emptyResult;
 		}
-
+		
 		return result;
 	}
 
@@ -1226,7 +1229,7 @@ public abstract class StructuredViewer<E,I> extends ContentViewer<E,I> implement
 	@Override
 	protected void handleLabelProviderChanged(LabelProviderChangedEvent<E> event) {
 		@SuppressWarnings("unchecked")
-		E[] elements = event.getElements();
+		E[] elements = (E[])event.getElements();
 		if (elements != null) {
 			update(elements, null);
 		} else {
@@ -1417,7 +1420,7 @@ public abstract class StructuredViewer<E,I> extends ContentViewer<E,I> implement
 	 * @since 3.0
 	 */
 	<K,V> CustomHashtable<K,V> newHashtable(int capacity) {
-		return new CustomHashtable<>(capacity, getComparer());
+		return new CustomHashtable<K,V>(capacity, getComparer());
 	}
 
 	/**
@@ -1668,7 +1671,7 @@ public abstract class StructuredViewer<E,I> extends ContentViewer<E,I> implement
 		if (filters.length == 0) {
 			resetFilters();
 		} else {
-			this.filters = new ArrayList<>(Arrays.asList(filters));
+			this.filters = new ArrayList<ViewerFilter<E,I>>(Arrays.asList(filters));
 			refresh();
 		}
 	}
@@ -1874,7 +1877,7 @@ public abstract class StructuredViewer<E,I> extends ContentViewer<E,I> implement
 	public void setComparer(IElementComparer comparer) {
 		this.comparer = comparer;
 		if (elementMap != null) {
-			elementMap = new CustomHashtable<>(elementMap, comparer);
+			elementMap = new CustomHashtable<Object,Object>(elementMap, comparer);
 		}
 	}
 

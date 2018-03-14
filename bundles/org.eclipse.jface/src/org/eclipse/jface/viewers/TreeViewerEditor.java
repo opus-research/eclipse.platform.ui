@@ -80,7 +80,7 @@ public class TreeViewerEditor<E,I> extends ColumnViewerEditor<E,I> {
 			SWTFocusCellManager<E,I> focusCellManager,
 			ColumnViewerEditorActivationStrategy<E,I> editorActivationStrategy,
 			int feature) {
-		TreeViewerEditor<E,I> editor = new TreeViewerEditor<>(viewer,
+		TreeViewerEditor<E,I> editor = new TreeViewerEditor<E,I>(viewer,
 				focusCellManager, editorActivationStrategy, feature);
 		viewer.setColumnViewerEditor(editor);
 		if (focusCellManager != null) {

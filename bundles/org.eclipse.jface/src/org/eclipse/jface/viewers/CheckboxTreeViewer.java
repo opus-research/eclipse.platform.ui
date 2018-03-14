@@ -240,7 +240,7 @@ public class CheckboxTreeViewer<E, I> extends TreeViewer<E, I> implements
 	 * @see #setCheckedElements
 	 */
 	public Object[] getCheckedElements() {
-		List<Object> v = new ArrayList<>();
+		List<Object> v = new ArrayList<Object>();
 		Control tree = getControl();
 		internalCollectChecked(v, tree);
 		return v.toArray();
@@ -276,7 +276,7 @@ public class CheckboxTreeViewer<E, I> extends TreeViewer<E, I> implements
 	 * @see #setGrayedElements
 	 */
 	public Object[] getGrayedElements() {
-		List<Object> result = new ArrayList<>();
+		List<Object> result = new ArrayList<Object>();
 		internalCollectGrayed(result, getControl());
 		return result.toArray();
 	}

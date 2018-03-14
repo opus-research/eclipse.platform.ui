@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 402445
+ *     Tom Shindl <tom.schindl@bestsolution.at> - initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -17,7 +16,7 @@ package org.eclipse.jface.viewers;
 /**
  * TableColumnViewerLabelProvider is the mapping from the table based providers
  * to the ViewerLabelProvider.
- *
+ * 
  * @param <E>
  *            Type of an element of the model
  * @param <I>
@@ -31,11 +30,11 @@ package org.eclipse.jface.viewers;
  */
 class TableColumnViewerLabelProvider<E> extends WrappedViewerLabelProvider<E> {
 
-	private ITableLabelProvider<E> tableLabelProvider;
+	private ITableLabelProvider tableLabelProvider;
 
-	private ITableColorProvider<E> tableColorProvider;
+	private ITableColorProvider tableColorProvider;
 
-	private ITableFontProvider<E> tableFontProvider;
+	private ITableFontProvider tableFontProvider;
 
 	/**
 	 * Create a new instance of the receiver.
@@ -46,19 +45,17 @@ class TableColumnViewerLabelProvider<E> extends WrappedViewerLabelProvider<E> {
 	 * @see ITableColorProvider
 	 * @see ITableFontProvider
 	 */
-
-	@SuppressWarnings("unchecked")
 	public TableColumnViewerLabelProvider(IBaseLabelProvider<E> labelProvider) {
 		super(labelProvider);
 
 		if (labelProvider instanceof ITableLabelProvider)
-			tableLabelProvider = (ITableLabelProvider<E>) labelProvider;
+			tableLabelProvider = (ITableLabelProvider) labelProvider;
 
 		if (labelProvider instanceof ITableColorProvider)
-			tableColorProvider = (ITableColorProvider<E>) labelProvider;
+			tableColorProvider = (ITableColorProvider) labelProvider;
 
 		if (labelProvider instanceof ITableFontProvider)
-			tableFontProvider = (ITableFontProvider<E>) labelProvider;
+			tableFontProvider = (ITableFontProvider) labelProvider;
 	}
 
 	@Override
