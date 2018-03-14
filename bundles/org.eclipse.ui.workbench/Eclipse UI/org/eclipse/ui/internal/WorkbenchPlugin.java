@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -647,17 +647,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * the receiver.
      */
     public PreferenceManager getPreferenceManager() {
-		if (preferenceManager == null) {
-			preferenceManager = new WorkbenchPreferenceManager(PREFERENCE_PAGE_CATEGORY_SEPARATOR);
-
-			// Get the pages from the registry
-			PreferencePageRegistryReader registryReader = new PreferencePageRegistryReader(
-					getWorkbench());
-			registryReader.loadFromRegistry(Platform.getExtensionRegistry());
-			preferenceManager.addPages(registryReader.getTopLevelNodes());
-
-		}
-		return preferenceManager;
+		return (PreferenceManager) e4Context.get(PreferenceManager.class.getName());
     }
 
     /**
@@ -1467,9 +1457,23 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 				return operationSupport;
 			}
 		});
+		context.set(PreferenceManager.class.getName(), new ContextFunction() {
+			@Override
+			public Object compute(IEclipseContext context, String contextKey) {
+				if (preferenceManager == null) {
+					preferenceManager = new WorkbenchPreferenceManager(
+							PREFERENCE_PAGE_CATEGORY_SEPARATOR);
 
-		context.set(PreferenceManager.class.getName(), getPreferenceManager());
+					// Get the pages from the registry
+					PreferencePageRegistryReader registryReader = new PreferencePageRegistryReader(
+							getWorkbench());
+					registryReader.loadFromRegistry(Platform.getExtensionRegistry());
+					preferenceManager.addPages(registryReader.getTopLevelNodes());
 
+				}
+				return preferenceManager;
+			}
+		});
 		context.set(ISharedImages.class.getName(), new ContextFunction() {
 			@Override
 			public Object compute(IEclipseContext context, String contextKey) {
