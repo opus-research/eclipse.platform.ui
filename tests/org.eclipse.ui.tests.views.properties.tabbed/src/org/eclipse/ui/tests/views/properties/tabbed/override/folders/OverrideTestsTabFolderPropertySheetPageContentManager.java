@@ -51,7 +51,11 @@ public class OverrideTestsTabFolderPropertySheetPageContentManager implements
 		this.emptyFolder = new EmptyTabFolder();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see asd.views.folders.ISampleViewItemSelectionListener#selectionChanged(java.lang.String)
+	 */
 	public void itemSelected(IOverrideTestsItem item) {
 		overrideTestsView.setSelection(item.getElement());
 	}
