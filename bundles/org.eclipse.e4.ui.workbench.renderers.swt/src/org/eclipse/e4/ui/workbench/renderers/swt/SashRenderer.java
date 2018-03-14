@@ -38,7 +38,6 @@ public class SashRenderer extends SWTPartRenderer {
 
 	private EventHandler sashOrientationHandler;
 	private EventHandler sashWeightHandler;
-	private int processedContent = 0;
 
 	public SashRenderer() {
 		super();
@@ -47,6 +46,7 @@ public class SashRenderer extends SWTPartRenderer {
 	@PostConstruct
 	void postConstruct() {
 		sashOrientationHandler = new EventHandler() {
+			@Override
 			public void handleEvent(Event event) {
 				// Ensure that this event is for a MPartSashContainer
 				MUIElement element = (MUIElement) event
@@ -62,6 +62,7 @@ public class SashRenderer extends SWTPartRenderer {
 				sashOrientationHandler);
 
 		sashWeightHandler = new EventHandler() {
+			@Override
 			public void handleEvent(Event event) {
 				// Ensure that this event is for a MPartSashContainer
 				MUIElement element = (MUIElement) event
@@ -82,9 +83,6 @@ public class SashRenderer extends SWTPartRenderer {
 	 * @param pscModel
 	 */
 	protected void forceLayout(MElementContainer<MUIElement> pscModel) {
-		if (processedContent != 0) {
-			return;
-		}
 		// layout the containing Composite
 		while (!(pscModel.getWidget() instanceof Composite))
 			pscModel = pscModel.getParent();
@@ -105,6 +103,7 @@ public class SashRenderer extends SWTPartRenderer {
 		eventBroker.unsubscribe(sashWeightHandler);
 	}
 
+	@Override
 	public Object createWidget(final MUIElement element, Object parent) {
 		MUIElement elementParent = element.getParent();
 		if (elementParent == null && element.getCurSharedRef() != null)
@@ -116,6 +115,7 @@ public class SashRenderer extends SWTPartRenderer {
 			// If my layout's container gets disposed 'unbind' the sash elements
 			if (parent instanceof Composite) {
 				((Composite) parent).addDisposeListener(new DisposeListener() {
+					@Override
 					public void widgetDisposed(DisposeEvent e) {
 						element.setWidget(null);
 						element.setRenderer(null);
@@ -165,26 +165,6 @@ public class SashRenderer extends SWTPartRenderer {
 		}
 
 		forceLayout(parentElement);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#processContents
-	 * (org.eclipse.e4.ui.model.application.ui.MElementContainer)
-	 */
-	@Override
-	public void processContents(MElementContainer<MUIElement> container) {
-		try {
-			processedContent++;
-			super.processContents(container);
-		} finally {
-			processedContent--;
-			if (processedContent == 0) {
-				forceLayout(container);
-			}
-		}
 	}
 
 	/*

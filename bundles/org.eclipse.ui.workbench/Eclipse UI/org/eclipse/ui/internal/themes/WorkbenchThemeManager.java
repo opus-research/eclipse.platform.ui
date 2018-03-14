@@ -23,6 +23,7 @@ import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.resource.JFaceResources;
@@ -54,7 +55,7 @@ public class WorkbenchThemeManager extends EventManager implements
 		IThemeManager {
 	public static RGB EMPTY_COLOR_VALUE = new RGB(0, 1, 2);
 
-	public static FontData[] EMPRY_FONT_DATA_VALUE = new FontData[0];
+	public static FontData[] EMPRY_FONT_DATA_VALUE = PreferenceConverter.FONTDATA_ARRAY_DEFAULT_DEFAULT;
 
 	private static final String SYSTEM_DEFAULT_THEME = "org.eclipse.ui.ide.systemDefault";//$NON-NLS-1$
 
@@ -81,6 +82,7 @@ public class WorkbenchThemeManager extends EventManager implements
 		if (instance == null) {
 			if (PlatformUI.getWorkbench().getDisplay() != null) {
 				PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
+					@Override
 					public void run() {
 						getInternalInstance();
 					}
@@ -107,6 +109,7 @@ public class WorkbenchThemeManager extends EventManager implements
 
 	private IPropertyChangeListener currentThemeListener = new IPropertyChangeListener() {
 
+		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			firePropertyChange(event);
 			if (event.getSource() instanceof FontRegistry) {
@@ -163,6 +166,7 @@ public class WorkbenchThemeManager extends EventManager implements
 		final boolean highContrast = Display.getCurrent().getHighContrast();
 
 		Display.getCurrent().addListener(SWT.Settings, new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				updateThemes();
 			}
@@ -217,6 +221,7 @@ public class WorkbenchThemeManager extends EventManager implements
 	 * 
 	 * @see org.eclipse.ui.themes.IThemeManager#addPropertyChangeListener(org.eclipse.jface.util.IPropertyChangeListener)
 	 */
+	@Override
 	public void addPropertyChangeListener(IPropertyChangeListener listener) {
 		addListenerObject(listener);
 	}
@@ -270,6 +275,7 @@ public class WorkbenchThemeManager extends EventManager implements
 	 * 
 	 * @see org.eclipse.ui.themes.IThemeManager#getCurrentTheme()
 	 */
+	@Override
 	public ITheme getCurrentTheme() {
 		if (currentTheme == null) {
 			String themeId = PrefUtil.getAPIPreferenceStore().getString(
@@ -327,6 +333,7 @@ public class WorkbenchThemeManager extends EventManager implements
 	 * 
 	 * @see org.eclipse.ui.themes.IThemeManager#getTheme(java.lang.String)
 	 */
+	@Override
 	public ITheme getTheme(String id) {
 		if (id.equals(IThemeManager.DEFAULT_THEME)) {
 			return getTheme((IThemeDescriptor) null);
@@ -354,6 +361,7 @@ public class WorkbenchThemeManager extends EventManager implements
 	 * 
 	 * @see org.eclipse.ui.themes.IThemeManager#removePropertyChangeListener(org.eclipse.jface.util.IPropertyChangeListener)
 	 */
+	@Override
 	public void removePropertyChangeListener(IPropertyChangeListener listener) {
 		removeListenerObject(listener);
 	}
@@ -363,6 +371,7 @@ public class WorkbenchThemeManager extends EventManager implements
 	 * 
 	 * @see org.eclipse.ui.themes.IThemeManager#setCurrentTheme(java.lang.String)
 	 */
+	@Override
 	public void setCurrentTheme(String id) {
 		ITheme oldTheme = currentTheme;
 		if (WorkbenchThemeManager.getInstance().doSetCurrentTheme(id)) {
@@ -411,6 +420,7 @@ public class WorkbenchThemeManager extends EventManager implements
 	}
 	
 	public static class WorkbenchThemeChangedHandler implements EventHandler {
+		@Override
 		public void handleEvent(org.osgi.service.event.Event event) {
 			IStylingEngine engine = getStylingEngine();
 			ThemeRegistry themeRegistry = getThemeRegistry();
@@ -538,7 +548,7 @@ public class WorkbenchThemeManager extends EventManager implements
 
 		private void addFontDefinition(FontDefinition definition, ThemeRegistry themeRegistry,
 				FontRegistry fontRegistry) {
-			if (fontRegistry.get(definition.getId()) == null) {
+			if (themeRegistry.findFont(definition.getId()) == null) {
 				themeRegistry.add(definition);
 				fontRegistry.put(definition.getId(), definition.getValue());
 			}
@@ -546,7 +556,7 @@ public class WorkbenchThemeManager extends EventManager implements
 
 		private void addColorDefinition(ColorDefinition definition, ThemeRegistry themeRegistry,
 				ColorRegistry colorRegistry) {
-			if (colorRegistry.get(definition.getId()) == null) {
+			if (themeRegistry.findColor(definition.getId()) == null) {
 				themeRegistry.add(definition);
 				colorRegistry.put(definition.getId(), definition.getValue());
 			}

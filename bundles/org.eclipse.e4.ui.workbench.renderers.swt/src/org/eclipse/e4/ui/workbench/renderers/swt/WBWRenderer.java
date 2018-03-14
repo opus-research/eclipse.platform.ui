@@ -4,9 +4,11 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728
+ *     Simon Scholz <scholzsimon@arcor.de - Bug 429729
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -94,6 +96,7 @@ public class WBWRenderer extends SWTPartRenderer {
 	private class WindowSizeUpdateJob implements Runnable {
 		public List<MWindow> windowsToUpdate = new ArrayList<MWindow>();
 
+		@Override
 		public void run() {
 			clearSizeUpdate();
 			while (!windowsToUpdate.isEmpty()) {
@@ -172,6 +175,7 @@ public class WBWRenderer extends SWTPartRenderer {
 
 		topWindowHandler = new EventHandler() {
 
+			@Override
 			public void handleEvent(Event event) {
 				// Ensure that this event is for a MApplication
 				if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MApplication))
@@ -197,6 +201,7 @@ public class WBWRenderer extends SWTPartRenderer {
 				topWindowHandler);
 
 		shellUpdater = new EventHandler() {
+			@Override
 			public void handleEvent(Event event) {
 				// Ensure that this event is for a MMenuItem
 				Object objElement = event
@@ -236,6 +241,7 @@ public class WBWRenderer extends SWTPartRenderer {
 		eventBroker.subscribe(UIEvents.UILabel.TOPIC_ALL, shellUpdater);
 
 		visibilityHandler = new EventHandler() {
+			@Override
 			public void handleEvent(Event event) {
 				// Ensure that this event is for a MMenuItem
 				Object objElement = event
@@ -268,6 +274,7 @@ public class WBWRenderer extends SWTPartRenderer {
 				visibilityHandler);
 
 		sizeHandler = new EventHandler() {
+			@Override
 			public void handleEvent(Event event) {
 				if (ignoreSizeChanges)
 					return;
@@ -328,21 +335,7 @@ public class WBWRenderer extends SWTPartRenderer {
 		themeDefinitionChanged.dispose();
 	}
 
-	/**
-	 * @param wbwModel
-	 * @return Returns the style override bits or -1 if there is no override
-	 */
-	private int getStyleOverride(MWindow wbwModel) {
-		String overrideStr = wbwModel.getPersistedState().get(
-				IPresentationEngine.STYLE_OVERRIDE_KEY);
-		if (overrideStr == null || overrideStr.length() == 0)
-			return -1;
-
-		int val = -1;
-		val = Integer.parseInt(overrideStr);
-		return val;
-	}
-
+	@Override
 	public Object createWidget(MUIElement element, Object parent) {
 		final Widget newWidget;
 
@@ -376,6 +369,7 @@ public class WBWRenderer extends SWTPartRenderer {
 
 			// Prevent ESC from closing the DW
 			wbwShell.addTraverseListener(new TraverseListener() {
+				@Override
 				public void keyTraversed(TraverseEvent e) {
 					if (e.detail == SWT.TRAVERSE_ESCAPE) {
 						e.doit = false;
@@ -435,11 +429,13 @@ public class WBWRenderer extends SWTPartRenderer {
 		localContext.set(E4Workbench.LOCAL_ACTIVE_SHELL, wbwShell);
 		setCloseHandler(wbwModel);
 		localContext.set(IShellProvider.class.getName(), new IShellProvider() {
+			@Override
 			public Shell getShell() {
 				return wbwShell;
 			}
 		});
 		final PartServiceSaveHandler saveHandler = new PartServiceSaveHandler() {
+			@Override
 			public Save promptToSave(MPart dirtyPart) {
 				Shell shell = (Shell) context
 						.get(IServiceConstants.ACTIVE_SHELL);
@@ -451,6 +447,7 @@ public class WBWRenderer extends SWTPartRenderer {
 				return elements.length == 0 ? Save.NO : Save.YES;
 			}
 
+			@Override
 			public Save[] promptToSave(Collection<MPart> dirtyParts) {
 				List<MPart> parts = new ArrayList<MPart>(dirtyParts);
 				Shell shell = (Shell) context
@@ -492,6 +489,7 @@ public class WBWRenderer extends SWTPartRenderer {
 		if (window.getParent() == null) {
 			context.set(IWindowCloseHandler.class.getName(),
 					new IWindowCloseHandler() {
+						@Override
 						public boolean close(MWindow window) {
 							return closeDetachedWindow(window);
 						}
@@ -499,6 +497,7 @@ public class WBWRenderer extends SWTPartRenderer {
 		} else {
 			context.set(IWindowCloseHandler.class.getName(),
 					new IWindowCloseHandler() {
+						@Override
 						public boolean close(MWindow window) {
 							EPartService partService = (EPartService) window
 									.getContext().get(
@@ -519,6 +518,7 @@ public class WBWRenderer extends SWTPartRenderer {
 			final Shell shell = (Shell) widget;
 			final MWindow w = (MWindow) me;
 			shell.addControlListener(new ControlListener() {
+				@Override
 				public void controlResized(ControlEvent e) {
 					// Don't store the maximized size in the model
 					if (shell.getMaximized())
@@ -533,6 +533,7 @@ public class WBWRenderer extends SWTPartRenderer {
 					}
 				}
 
+				@Override
 				public void controlMoved(ControlEvent e) {
 					// Don't store the maximized size in the model
 					if (shell.getMaximized())
@@ -549,6 +550,7 @@ public class WBWRenderer extends SWTPartRenderer {
 			});
 
 			shell.addShellListener(new ShellAdapter() {
+				@Override
 				public void shellClosed(ShellEvent e) {
 					// override the shell close event
 					e.doit = false;
@@ -564,6 +566,7 @@ public class WBWRenderer extends SWTPartRenderer {
 				}
 			});
 			shell.addListener(SWT.Activate, new Listener() {
+				@Override
 				public void handleEvent(org.eclipse.swt.widgets.Event event) {
 					MUIElement parentME = w.getParent();
 					if (parentME instanceof MApplication) {
@@ -581,6 +584,7 @@ public class WBWRenderer extends SWTPartRenderer {
 			});
 
 			shell.addListener(SWT.Deactivate, new Listener() {
+				@Override
 				public void handleEvent(org.eclipse.swt.widgets.Event event) {
 					updateNonFocusState(SWT.Deactivate, w);
 				}
@@ -691,13 +695,6 @@ public class WBWRenderer extends SWTPartRenderer {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#getUIContainer
-	 * (org.eclipse.e4.ui.model.application.MUIElement)
-	 */
 	@Override
 	public Object getUIContainer(MUIElement element) {
 		MUIElement parent = element.getParent();
@@ -712,13 +709,6 @@ public class WBWRenderer extends SWTPartRenderer {
 		return tpl.clientArea;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.renderers.PartFactory#postProcess(org.eclipse
-	 * .e4.ui.model.application.MPart)
-	 */
 	@Override
 	public void postProcess(MUIElement shellME) {
 		super.postProcess(shellME);
@@ -728,6 +718,7 @@ public class WBWRenderer extends SWTPartRenderer {
 		// Capture the max/min state
 		final MUIElement disposeME = shellME;
 		shell.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				Shell shell = (Shell) e.widget;
 				if (disposeME != null) {
@@ -797,6 +788,13 @@ public class WBWRenderer extends SWTPartRenderer {
 		}
 
 		@Override
+		protected void configureShell(Shell newShell) {
+			super.configureShell(newShell);
+			newShell.setText(SWTRenderersMessages.choosePartsToSaveTitle);
+		}
+
+
+		@Override
 		protected Control createDialogArea(Composite parent) {
 			parent = (Composite) super.createDialogArea(parent);
 
@@ -839,6 +837,11 @@ public class WBWRenderer extends SWTPartRenderer {
 			return checkedElements;
 		}
 
+		@Override
+		protected boolean isResizable() {
+			return true;
+		}
+
 	}
 
 	@SuppressWarnings("restriction")
@@ -846,6 +849,7 @@ public class WBWRenderer extends SWTPartRenderer {
 			EventHandler {
 		protected Set<Resource> unusedResources = new HashSet<Resource>();
 
+		@Override
 		public void handleEvent(Event event) {
 			Object element = event.getProperty(IEventBroker.DATA);
 

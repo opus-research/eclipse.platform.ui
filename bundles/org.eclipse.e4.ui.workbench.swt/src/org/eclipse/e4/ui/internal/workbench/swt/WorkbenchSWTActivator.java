@@ -25,6 +25,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.osgi.service.debug.DebugOptions;
 import org.eclipse.osgi.service.debug.DebugTrace;
+import org.eclipse.osgi.service.resolver.PlatformAdmin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -47,6 +48,8 @@ public class WorkbenchSWTActivator implements BundleActivator { // extends
 	private ServiceTracker debugTracker;
 	private DebugTrace trace;
 
+	private ServiceTracker<PlatformAdmin, PlatformAdmin> platformAdminTracker;
+
 	/**
 	 * Get the default activator.
 	 * 
@@ -63,16 +66,22 @@ public class WorkbenchSWTActivator implements BundleActivator { // extends
 		return context;
 	}
 
+	@Override
 	public void start(BundleContext context) throws Exception {
 		activator = this;
 		this.context = context;
 	}
 
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		saveDialogSettings();
 		if (pkgAdminTracker != null) {
 			pkgAdminTracker.close();
 			pkgAdminTracker = null;
+		}
+		if (platformAdminTracker != null) {
+			platformAdminTracker.close();
+			platformAdminTracker = null;
 		}
 	}
 
@@ -94,6 +103,17 @@ public class WorkbenchSWTActivator implements BundleActivator { // extends
 			pkgAdminTracker.open();
 		}
 		return (PackageAdmin) pkgAdminTracker.getService();
+	}
+
+	public PlatformAdmin getPlatformAdmin() {
+		if (platformAdminTracker == null) {
+			if (context == null)
+				return null;
+			platformAdminTracker = new ServiceTracker<PlatformAdmin, PlatformAdmin>(
+					context, PlatformAdmin.class, null);
+			platformAdminTracker.open();
+		}
+		return platformAdminTracker.getService();
 	}
 
 	/**

@@ -128,6 +128,7 @@ public class E4Workbench implements IWorkbench {
 				.registerService(IWorkbench.class.getName(), this, properties);
 	}
 
+	@Override
 	public final String getId() {
 		return id;
 	}
@@ -177,11 +178,7 @@ public class E4Workbench implements IWorkbench {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.e4.ui.workbench.IWorkbench#close()
-	 */
+	@Override
 	public boolean close() {
 		if (renderer != null) {
 			renderer.stop();
@@ -197,6 +194,7 @@ public class E4Workbench implements IWorkbench {
 		return true;
 	}
 
+	@Override
 	public boolean restart() {
 		this.restart = true;
 		return close();
@@ -216,6 +214,7 @@ public class E4Workbench implements IWorkbench {
 		return EclipseContextFactory.getServiceContext(Activator.getDefault().getContext());
 	}
 
+	@Override
 	public MApplication getApplication() {
 		return appModel;
 	}
