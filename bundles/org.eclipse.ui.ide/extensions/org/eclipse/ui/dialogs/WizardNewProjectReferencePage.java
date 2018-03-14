@@ -67,8 +67,7 @@ public class WizardNewProjectReferencePage extends WizardPage {
     /** (non-Javadoc)
      * Method declared on IDialogPage.
      */
-    @Override
-	public void createControl(Composite parent) {
+    public void createControl(Composite parent) {
 
         Font font = parent.getFont();
 
@@ -109,8 +108,7 @@ public class WizardNewProjectReferencePage extends WizardPage {
      */
     protected IStructuredContentProvider getContentProvider() {
         return new WorkbenchContentProvider() {
-            @Override
-			public Object[] getChildren(Object element) {
+            public Object[] getChildren(Object element) {
                 if (!(element instanceof IWorkspace)) {
 					return new Object[0];
 				}

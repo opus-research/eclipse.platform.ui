@@ -1,13 +1,13 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 429728, 430166, 441150, 442285
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728, 430166
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -23,7 +23,6 @@ import javax.inject.Named;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.BasicPartList;
@@ -45,12 +44,16 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
+import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
+import org.eclipse.e4.ui.workbench.IResourceUtilities;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.ISaveHandler;
+import org.eclipse.e4.ui.workbench.modeling.ISaveHandler.Save;
+import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.LegacyActionTools;
 import org.eclipse.jface.action.MenuManager;
@@ -107,7 +110,7 @@ import org.w3c.dom.css.CSSValue;
  */
 public class StackRenderer extends LazyStackRenderer {
 	/**
-	 *
+	 * 
 	 */
 	private static final String THE_PART_KEY = "thePart"; //$NON-NLS-1$
 
@@ -132,13 +135,16 @@ public class StackRenderer extends LazyStackRenderer {
 	// Minimum characters in for stacks inside the shared area
 	private static int MIN_EDITOR_CHARS = 15;
 
-	private Image viewMenuImage;
+	Image viewMenuImage;
 
 	@Inject
-	private IEventBroker eventBroker;
+	IStylingEngine stylingEngine;
 
 	@Inject
-	private IPresentationEngine renderer;
+	IEventBroker eventBroker;
+
+	@Inject
+	IPresentationEngine renderer;
 
 	private EventHandler itemUpdater;
 
@@ -156,6 +162,7 @@ public class StackRenderer extends LazyStackRenderer {
 	 * container. The tab folder may need to layout itself again if a part's
 	 * toolbar has been changed.
 	 */
+	private EventHandler childrenHandler;
 	private EventHandler tabStateHandler;
 
 	// Manages CSS styling based on active part changes
@@ -187,13 +194,20 @@ public class StackRenderer extends LazyStackRenderer {
 		return itemsToSet;
 	}
 
-
+	/**
+	 * This is the new way to handle UIEvents (as opposed to subscring and
+	 * unsubscribing them with the event broker.
+	 * 
+	 * The method is described in detail at
+	 * http://wiki.eclipse.org/Eclipse4/RCP/Event_Model
+	 */
 	@SuppressWarnings("unchecked")
 	@Inject
 	@Optional
-	private void subscribeTopicTransientDataChanged(
+	private void handleTransientDataEvents(
 			@UIEventTopic(UIEvents.ApplicationElement.TOPIC_TRANSIENTDATA) org.osgi.service.event.Event event) {
-		Object changedElement = event.getProperty(UIEvents.EventTags.ELEMENT);
+		MUIElement changedElement = (MUIElement) event
+				.getProperty(UIEvents.EventTags.ELEMENT);
 
 		if (!(changedElement instanceof MPart))
 			return;
@@ -224,9 +238,14 @@ public class StackRenderer extends LazyStackRenderer {
 		}
 	}
 
+	// private ToolBar menuTB;
+	// private boolean menuButtonShowing = false;
+
+	// private Control partTB;
+
 	/**
 	 * Handles changes in tags
-	 *
+	 * 
 	 * @param event
 	 */
 	@Inject
@@ -256,36 +275,6 @@ public class StackRenderer extends LazyStackRenderer {
 		}
 	}
 
-	@Inject
-	@Optional
-	private void subscribeTopicChildrenChanged(
-			@UIEventTopic(UIEvents.ElementContainer.TOPIC_CHILDREN) Event event) {
-
-		Object changedObj = event.getProperty(UIEvents.EventTags.ELEMENT);
-		// only interested in changes to toolbars
-		if (!(changedObj instanceof MToolBar)) {
-			return;
-		}
-
-		MUIElement container = modelService
-				.getContainer((MUIElement) changedObj);
-		// check if this is a part's toolbar
-		if (container instanceof MPart) {
-			MElementContainer<?> parent = ((MPart) container).getParent();
-			// only relayout if this part is the selected element and we
-			// actually rendered this element
-			if (parent instanceof MPartStack
-					&& parent.getSelectedElement() == container
-					&& parent.getRenderer() == StackRenderer.this) {
-				Object widget = parent.getWidget();
-				if (widget instanceof CTabFolder) {
-					adjustTopRight((CTabFolder) widget);
-				}
-			}
-		}
-	}
-
-
 	@Override
 	protected boolean requiresFocus(MPart element) {
 		MUIElement inStack = element.getCurSharedRef() != null ? element
@@ -298,6 +287,10 @@ public class StackRenderer extends LazyStackRenderer {
 		}
 
 		return super.requiresFocus(element);
+	}
+
+	public StackRenderer() {
+		super();
 	}
 
 	@PostConstruct
@@ -451,6 +444,37 @@ public class StackRenderer extends LazyStackRenderer {
 		eventBroker.subscribe(UIEvents.UIElement.TOPIC_TOBERENDERED,
 				viewMenuUpdater);
 
+		childrenHandler = new EventHandler() {
+			@Override
+			public void handleEvent(Event event) {
+				Object changedObj = event
+						.getProperty(UIEvents.EventTags.ELEMENT);
+				// only interested in changes to toolbars
+				if (!(changedObj instanceof MToolBar)) {
+					return;
+				}
+
+				MUIElement container = modelService
+						.getContainer((MUIElement) changedObj);
+				// check if this is a part's toolbar
+				if (container instanceof MPart) {
+					MElementContainer<?> parent = ((MPart) container)
+							.getParent();
+					// only relayout if this part is the selected element and we
+					// actually rendered this element
+					if (parent instanceof MPartStack
+							&& parent.getSelectedElement() == container
+							&& parent.getRenderer() == StackRenderer.this) {
+						Object widget = parent.getWidget();
+						if (widget instanceof CTabFolder) {
+							adjustTopRight((CTabFolder) widget);
+						}
+					}
+				}
+			}
+		};
+		eventBroker.subscribe(UIEvents.ElementContainer.TOPIC_CHILDREN,
+				childrenHandler);
 
 		stylingHandler = new EventHandler() {
 			@Override
@@ -480,10 +504,12 @@ public class StackRenderer extends LazyStackRenderer {
 				MPartStack pStack = (MPartStack) (partParent instanceof MPartStack ? partParent
 						: null);
 
+				EModelService ms = newActivePart.getContext().get(
+						EModelService.class);
 				List<String> tags = new ArrayList<String>();
 				tags.add(CSSConstants.CSS_ACTIVE_CLASS);
-				List<MUIElement> activeElements = modelService.findElements(
-						modelService.getTopLevelWindowFor(newActivePart), null,
+				List<MUIElement> activeElements = ms.findElements(
+						ms.getTopLevelWindowFor(newActivePart), null,
 						MUIElement.class, tags);
 				for (MUIElement element : activeElements) {
 					if (element instanceof MPartStack && element != pStack) {
@@ -541,6 +567,7 @@ public class StackRenderer extends LazyStackRenderer {
 		eventBroker.unsubscribe(itemUpdater);
 		eventBroker.unsubscribe(dirtyUpdater);
 		eventBroker.unsubscribe(viewMenuUpdater);
+		eventBroker.unsubscribe(childrenHandler);
 		eventBroker.unsubscribe(stylingHandler);
 		eventBroker.unsubscribe(tabStateHandler);
 	}
@@ -933,7 +960,6 @@ public class StackRenderer extends LazyStackRenderer {
 		if (!(me instanceof MElementContainer<?>))
 			return;
 
-		@SuppressWarnings("unchecked")
 		final MElementContainer<MUIElement> stack = (MElementContainer<MUIElement>) me;
 
 		// Match the selected TabItem to its Part
@@ -1110,6 +1136,7 @@ public class StackRenderer extends LazyStackRenderer {
 		final BasicPartList editorList = new BasicPartList(ctf.getShell(),
 				SWT.ON_TOP, SWT.V_SCROLL | SWT.H_SCROLL,
 				ctxt.get(EPartService.class), stack, this,
+				(ISWTResourceUtilities) ctxt.get(IResourceUtilities.class),
 				getInitialMRUValue(ctf));
 		editorList.setInput();
 
@@ -1166,7 +1193,7 @@ public class StackRenderer extends LazyStackRenderer {
 
 	/**
 	 * Closes the part that's backed by the given widget.
-	 *
+	 * 
 	 * @param widget
 	 *            the part that owns this widget
 	 * @param check
@@ -1229,10 +1256,7 @@ public class StackRenderer extends LazyStackRenderer {
 		// Ensure that the newly selected control is correctly sized
 		if (cti.getControl() instanceof Composite) {
 			Composite ctiComp = (Composite) cti.getControl();
-			// Do not call layout(true, true) because it forces all
-			// subcomponents to relayout as well
-			// ctiComp.layout(true, true);
-			ctiComp.setBounds(ctf.getClientArea());
+			ctiComp.layout(true, true);
 		}
 		ctf.setSelection(cti);
 		ignoreTabSelChanges = false;
@@ -1483,15 +1507,26 @@ public class StackRenderer extends LazyStackRenderer {
 			final List<MPart> toPrompt = new ArrayList<MPart>(others);
 			toPrompt.retainAll(partService.getDirtyParts());
 
-			boolean cancel = false;
+			final Save[] response;
 			if (toPrompt.size() > 1) {
-				cancel = !saveHandler.saveParts(toPrompt, true);
+				response = saveHandler.promptToSave(toPrompt);
 			} else if (toPrompt.size() == 1) {
-				cancel = !saveHandler.save(toPrompt.get(0), true);
+				response = new Save[] { saveHandler.promptToSave(toPrompt
+						.get(0)) };
+			} else {
+				response = new Save[] {};
 			}
-			if (cancel) {
-				return;
+			final List<MPart> toSave = new ArrayList<MPart>(toPrompt.size());
+			for (int i = 0; i < response.length; i++) {
+				final Save save = response[i];
+				final MPart mPart = toPrompt.get(i);
+				if (save == Save.CANCEL) {
+					return;
+				} else if (save == Save.YES) {
+					toSave.add(mPart);
+				}
 			}
+			saveHandler.saveParts(toSave, false);
 
 			for (MPart other : others) {
 				partService.hidePart(other);
@@ -1520,7 +1555,7 @@ public class StackRenderer extends LazyStackRenderer {
 
 	/**
 	 * Determine whether the given view menu has any visible menu items.
-	 *
+	 * 
 	 * @param viewMenu
 	 *            the view menu to check
 	 * @param part
@@ -1611,13 +1646,8 @@ public class StackRenderer extends LazyStackRenderer {
 				part.getTags().remove(CSSConstants.CSS_HIGHLIGHTED_CLASS);
 			}
 
-			String prevCssCls = WidgetElement.getCSSClass(cti);
 			setCSSInfo(part, cti);
-
-			if (prevCssCls == null
-					|| !prevCssCls.equals(WidgetElement.getCSSClass(cti))) {
-				reapplyStyles(cti.getParent());
-			}
+			reapplyStyles(cti.getParent());
 		}
 
 		public boolean validateElement(Object element) {

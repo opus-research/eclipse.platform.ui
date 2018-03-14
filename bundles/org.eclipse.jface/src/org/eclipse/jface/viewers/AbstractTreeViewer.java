@@ -1442,7 +1442,9 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 
 	/*
 	 * Overridden in AbstractTreeViewer to fix bug 108102 (code copied from
-	 * StructuredViewer to avoid introducing new API)
+	 * StructuredViewer to avoid introducing new API) (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.StructuredViewer#handleDoubleSelect(org.eclipse.swt.events.SelectionEvent)
 	 */
 	@Override
 	protected void handleDoubleSelect(SelectionEvent event) {
@@ -1639,22 +1641,21 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 					createChildren(pw);
 					Object element = internalToElement(elementOrPath);
 					w = internalFindChild(pw, element);
+					if (expand && pw instanceof Item) {
+						// expand parent items top-down
+						Item item = (Item) pw;
+						LinkedList toExpandList = new LinkedList();
+						while (item != null && !getExpanded(item)) {
+							toExpandList.addFirst(item);
+							item = getParentItem(item);
+						}
+						for (Iterator it = toExpandList.iterator(); it
+								.hasNext();) {
+							Item toExpand = (Item) it.next();
+							setExpanded(toExpand, true);
+						}
+					}
 				}
-			}
-		}
-		if (expand && w instanceof Item) {
-			// expand parent items top-down
-			Item item = getParentItem((Item) w);
-			LinkedList toExpandList = new LinkedList();
-			while (item != null) {
-				if (!getExpanded(item)) {
-					toExpandList.addFirst(item);
-				}
-				item = getParentItem(item);
-			}
-			for (Iterator it = toExpandList.iterator(); it.hasNext();) {
-				Item toExpand = (Item) it.next();
-				setExpanded(toExpand, true);
 			}
 		}
 		return w;
@@ -2943,15 +2944,8 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	}
 
 	/**
-	 * The <code>AbstractTreeViewer</code> implementation of this method returns
-	 * the result as an <code>ITreeSelection</code>.
-	 * <p>
-	 * Call {@link #getStructuredSelection()} instead to get an instance of
-	 * <code>ITreeSelection</code> directly.
-	 * </p>
-	 * Subclasses do not typically override this method, but implement
-	 * <code>getSelectionFromWidget(List)</code> instead. If they override this
-	 * method, they should return an <code>ITreeSelection</code> as well.
+	 * This implementation of getSelection() returns an instance of
+	 * ITreeSelection.
 	 *
 	 * @since 3.2
 	 */
@@ -2971,28 +2965,6 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 		}
 		return new TreeSelection((TreePath[]) list.toArray(new TreePath[list
 				.size()]), getComparer());
-	}
-
-	/**
-	 * Returns the <code>ITreeSelection</code> of this viewer.
-	 * <p>
-	 * Subclasses whose {@link #getSelection()} specifies to return a more
-	 * specific type should also override this method and return that type.
-	 * </p>
-	 *
-	 * @return ITreeSelection
-	 * @throws ClassCastException
-	 *             if the selection of the viewer is not an instance of
-	 *             ITreeSelection
-	 * @since 3.11
-	 */
-	@Override
-	public ITreeSelection getStructuredSelection() throws ClassCastException {
-		ISelection selection = getSelection();
-		if (selection instanceof ITreeSelection) {
-			return (ITreeSelection) selection;
-		}
-		throw new ClassCastException("AbstractTreeViewer should return an instance of ITreeSelection from its getSelection() method."); //$NON-NLS-1$
 	}
 
 	@Override

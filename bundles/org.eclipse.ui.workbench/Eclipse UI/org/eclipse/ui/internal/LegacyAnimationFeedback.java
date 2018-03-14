@@ -61,6 +61,9 @@ public class LegacyAnimationFeedback extends RectangleAnimationFeedbackBase {
 		getAnimationShell().getDisplay().update();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.AnimationFeedbackBase#initialize(org.eclipse.ui.internal.AnimationEngine)
+	 */
 	@Override
 	public void initialize(AnimationEngine engine) {
 		Color color = getAnimationShell().getDisplay().getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW);
@@ -71,6 +74,9 @@ public class LegacyAnimationFeedback extends RectangleAnimationFeedbackBase {
 		getAnimationShell().setRegion(shellRegion);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.AnimationFeedbackBase#dispose()
+	 */
 	@Override
 	public void dispose() {
 		super.dispose();

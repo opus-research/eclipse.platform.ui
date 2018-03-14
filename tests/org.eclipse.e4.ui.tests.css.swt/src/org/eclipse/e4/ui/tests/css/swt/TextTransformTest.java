@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Remy Chi Jian Suen and others.
+ * Copyright (c) 2009 Remy Chi Jian Suen and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,18 +7,16 @@
  *
  * Contributors:
  *     Remy Chi Jian Suen <remy.suen@gmail.com> - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 443094
  ******************************************************************************/
 package org.eclipse.e4.ui.tests.css.swt;
 
-import static org.junit.Assert.assertEquals;
-
+import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.junit.Test;
 
 /**
  * Tests the <code>text-transform</code> property.
@@ -37,11 +35,12 @@ import org.junit.Test;
  */
 public abstract class TextTransformTest extends CSSSWTTestCase {
 
+	private CSSEngine engine;
 
 	/**
 	 * Retrieves the name of the widget that is being tested, must not be
 	 * <code>null</code>.
-	 *
+	 * 
 	 * @return the name of the widget for identification by the style sheet
 	 */
 	protected abstract String getWidgetName();
@@ -50,7 +49,7 @@ public abstract class TextTransformTest extends CSSSWTTestCase {
 	 * Creates and returns the control that will be tested for verifying that
 	 * the <code>text-transform</code> property works, must not be
 	 * <code>null</code>.
-	 *
+	 * 
 	 * @param parent
 	 *            the parent composite to house the control
 	 * @return the created control, must not be <code>null</code>
@@ -59,7 +58,7 @@ public abstract class TextTransformTest extends CSSSWTTestCase {
 
 	/**
 	 * Retrieves the text set to the specified control.
-	 *
+	 * 
 	 * @param control
 	 *            the control to retrieve text from
 	 * @return the text that's set on the underlying control
@@ -68,7 +67,7 @@ public abstract class TextTransformTest extends CSSSWTTestCase {
 
 	/**
 	 * Sets the specified string to the control.
-	 *
+	 * 
 	 * @param control
 	 *            the control to set the string to
 	 * @param string
@@ -77,6 +76,7 @@ public abstract class TextTransformTest extends CSSSWTTestCase {
 	protected abstract void setText(Control control, String string);
 
 	private Control createTestControl(String styleSheet) {
+		Display display = Display.getDefault();
 		engine = createEngine(styleSheet, display);
 
 		// Create widgets
@@ -97,7 +97,6 @@ public abstract class TextTransformTest extends CSSSWTTestCase {
 	/**
 	 * Tests the <code>capitalize</code> attribute value.
 	 */
-	@Test
 	public void testTextTransformCapitalize() {
 		Control controlToTest = createTestControl(getWidgetName()
 				+ " { text-transform: capitalize; }");
@@ -107,7 +106,6 @@ public abstract class TextTransformTest extends CSSSWTTestCase {
 	/**
 	 * Tests the <code>uppercase</code> attribute value.
 	 */
-	@Test
 	public void testTextTransformUpperCase() {
 		Control controlToTest = createTestControl(getWidgetName()
 				+ " { text-transform: uppercase; }");
@@ -117,11 +115,9 @@ public abstract class TextTransformTest extends CSSSWTTestCase {
 	/**
 	 * Tests the <code>lowercase</code> attribute value.
 	 */
-	@Test
 	public void testTextTransformLowerCase() {
 		Control controlToTest = createTestControl(getWidgetName()
 				+ " { text-transform: lowercase; }");
 		assertEquals("some label text", getText(controlToTest));
 	}
-
 }

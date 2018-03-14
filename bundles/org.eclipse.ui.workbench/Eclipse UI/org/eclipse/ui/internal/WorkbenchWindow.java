@@ -12,7 +12,7 @@
  *     								 removes a menu from multiple perspectives
  *     René Brandstetter - Bug 411821 - [QuickAccess] Contribute SearchField
  *                                      through a fragment or other means
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 431446, 433979, 440810, 441184
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431446, 433979
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -136,7 +136,6 @@ import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveRegistry;
 import org.eclipse.ui.ISaveablePart;
-import org.eclipse.ui.ISaveablesLifecycleListener;
 import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbench;
@@ -160,8 +159,9 @@ import org.eclipse.ui.internal.StartupThreading.StartupRunnable;
 import org.eclipse.ui.internal.actions.CommandAction;
 import org.eclipse.ui.internal.commands.SlaveCommandService;
 import org.eclipse.ui.internal.contexts.ContextService;
-import org.eclipse.ui.internal.dialogs.cpd.CustomizePerspectiveDialog;
+import org.eclipse.ui.internal.dialogs.CustomizePerspectiveDialog;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityPart;
+import org.eclipse.ui.internal.e4.compatibility.E4Util;
 import org.eclipse.ui.internal.e4.compatibility.ModeledPageLayout;
 import org.eclipse.ui.internal.e4.compatibility.SelectionService;
 import org.eclipse.ui.internal.handlers.ActionCommandMappingService;
@@ -169,7 +169,6 @@ import org.eclipse.ui.internal.handlers.IActionCommandMappingService;
 import org.eclipse.ui.internal.handlers.LegacyHandlerService;
 import org.eclipse.ui.internal.layout.ITrimManager;
 import org.eclipse.ui.internal.layout.IWindowTrim;
-import org.eclipse.ui.internal.menus.ActionSet;
 import org.eclipse.ui.internal.menus.IActionSetsListener;
 import org.eclipse.ui.internal.menus.LegacyActionPersistence;
 import org.eclipse.ui.internal.menus.MenuHelper;
@@ -178,6 +177,7 @@ import org.eclipse.ui.internal.menus.WorkbenchMenuService;
 import org.eclipse.ui.internal.misc.UIListenerLogging;
 import org.eclipse.ui.internal.progress.ProgressRegion;
 import org.eclipse.ui.internal.provisional.application.IActionBarConfigurer2;
+import org.eclipse.ui.internal.provisional.presentations.IActionBarPresentationFactory;
 import org.eclipse.ui.internal.registry.IActionSetDescriptor;
 import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
 import org.eclipse.ui.internal.registry.UIExtensionTracker;
@@ -190,12 +190,14 @@ import org.eclipse.ui.internal.util.PrefUtil;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.IMenuService;
+import org.eclipse.ui.presentations.AbstractPresentationFactory;
 import org.eclipse.ui.services.IDisposable;
 import org.eclipse.ui.services.IEvaluationService;
 import org.eclipse.ui.services.IServiceScopes;
 import org.eclipse.ui.views.IViewDescriptor;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
+
 /**
  * A window within the workbench.
  */
@@ -206,7 +208,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	 */
 	public static final String PERSPECTIVE_SPACER_ID = "PerspectiveSpacer"; //$NON-NLS-1$
 
-	private static final String MAIN_TOOLBAR_ID = ActionSet.MAIN_TOOLBAR;
+	private static final String MAIN_TOOLBAR_ID = "org.eclipse.ui.main.toolbar"; //$NON-NLS-1$
 	private static final String COMMAND_ID_TOGGLE_COOLBAR = "org.eclipse.ui.ToggleCoolbarAction"; //$NON-NLS-1$
 
 	public static final String ACTION_SET_CMD_PREFIX = "AS::"; //$NON-NLS-1$
@@ -247,7 +249,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 	private PerspectiveListenerList perspectiveListeners = new PerspectiveListenerList();
 
-	private PartService partService = new WWinPartService();
+	private PartService partService = new PartService();
 
 	private WWinActionBars actionBars;
 
@@ -489,7 +491,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 						Boolean.toString(this.perspectiveBarVisible));
 			}
 
-			IServiceLocatorCreator slc = workbench
+			IServiceLocatorCreator slc = (IServiceLocatorCreator) workbench
 					.getService(IServiceLocatorCreator.class);
 			this.serviceLocator = (ServiceLocator) slc.createServiceLocator(workbench, null,
 					new IDisposable() {
@@ -575,12 +577,8 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 					if (object instanceof CompatibilityPart) {
 						IWorkbenchPart workbenchPart = ((CompatibilityPart) object).getPart();
 						if (workbenchPart instanceof ISaveablePart) {
-							SaveablesList saveablesList = (SaveablesList) PlatformUI.getWorkbench()
-									.getService(ISaveablesLifecycleListener.class);
-							Object saveResult = saveablesList.preCloseParts(
-									Collections.singletonList((ISaveablePart) workbenchPart), true,
-									WorkbenchWindow.this);
-							return saveResult != null;
+							ISaveablePart saveablePart = (ISaveablePart) workbenchPart;
+							return page.saveSaveable(saveablePart, workbenchPart, confirm, true);
 						}
 					}
 					return super.save(dirtyPart, confirm);
@@ -601,12 +599,8 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 					if (saveables.isEmpty()) {
 						return super.saveParts(dirtyParts, confirm);
 					}
-
-					SaveablesList saveablesList = (SaveablesList) PlatformUI.getWorkbench()
-							.getService(ISaveablesLifecycleListener.class);
-					Object saveResult = saveablesList.preCloseParts(saveables, true,
-							WorkbenchWindow.this);
-					return saveResult != null;
+					return WorkbenchPage.saveAll(saveables, confirm, false, true,
+							WorkbenchWindow.this, WorkbenchWindow.this);
 				}
 			};
 			localSaveHandler.logger = logger;
@@ -674,7 +668,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			Shell shell = (Shell) model.getWidget();
 			if (model.getMainMenu() == null) {
 				final MMenu mainMenu = modelService.createModelElement(MMenu.class);
-				mainMenu.setElementId(ActionSet.MAIN_MENU);
+				mainMenu.setElementId("org.eclipse.ui.main.menu"); //$NON-NLS-1$
 
 				final MenuManagerRenderer renderer = (MenuManagerRenderer) rendererFactory
 						.getRenderer(mainMenu, null);
@@ -955,10 +949,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		}
 		MToolControl control = (MToolControl) origin;
 		if (!QUICK_ACCESS_ID.equals(control.getElementId())) {
-			return;
-		}
-		MWindow myWindow = modelService.getTopLevelWindowFor(control);
-		if (myWindow != model) {
 			return;
 		}
 		if (UIEvents.isADD(event)) {
@@ -1247,7 +1237,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		return null;
 	}
 
-	public void fill(MenuManagerRenderer renderer, MMenu menu, IMenuManager manager) {
+	private void fill(MenuManagerRenderer renderer, MMenu menu, IMenuManager manager) {
 		for (IContributionItem item : manager.getItems()) {
 			if (item instanceof MenuManager) {
 				MenuManager menuManager = (MenuManager) item;
@@ -1562,7 +1552,11 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 				// Reset the internal flags if window was not closed.
 				closing = false;
 				updateDisabled = false;
+			} else {
+				firePageClosed();
+				fireWindowClosed();
 			}
+
 		}
 
 		if (windowClosed && tracker != null) {
@@ -1891,7 +1885,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			// clear some lables
 			// Remove the handler submissions. Bug 64024.
 			final IWorkbench workbench = getWorkbench();
-			final IHandlerService handlerService = workbench
+			final IHandlerService handlerService = (IHandlerService) workbench
 					.getService(IHandlerService.class);
 			handlerService.deactivateHandlers(handlerActivations);
 			final Iterator<IHandlerActivation> activationItr = handlerActivations.iterator();
@@ -1903,7 +1897,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			globalActionHandlersByCommandId.clear();
 
 			// Remove the enabled submissions. Bug 64024.
-			final IContextService contextService = workbench
+			final IContextService contextService = (IContextService) workbench
 					.getService(IContextService.class);
 			contextService.unregisterShell(getShell());
 
@@ -1939,10 +1933,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 					}
 				}
 			}
-			if (getActivePage() != null) {
-				firePageClosed();
-			}
-			fireWindowClosed();
 		} finally {
 
 			try {
@@ -1983,6 +1973,12 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchWindow#openPage(java.lang.String,
+	 * org.eclipse.core.runtime.IAdaptable)
+	 */
 	@Override
 	public IWorkbenchPage openPage(final String perspectiveId, final IAdaptable input)
 			throws WorkbenchException {
@@ -2041,6 +2037,13 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		return page;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.IWorkbenchWindow#openPage(org.eclipse.core.runtime.IAdaptable
+	 * )
+	 */
 	@Override
 	public IWorkbenchPage openPage(IAdaptable input) throws WorkbenchException {
 		return openPage(workbench.getPerspectiveRegistry().getDefaultPerspective(), input);
@@ -2069,6 +2072,9 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IRunnableContext.
+	 */
 	@Override
 	public void run(final boolean fork, boolean cancelable, final IRunnableWithProgress runnable)
 			throws InvocationTargetException, InterruptedException {
@@ -2237,7 +2243,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			}
 		}
 		if (changeDetected) {
-			IMenuService ms = getWorkbench().getService(IMenuService.class);
+			IMenuService ms = (IMenuService) getWorkbench().getService(IMenuService.class);
 			if (ms instanceof WorkbenchMenuService) {
 				((WorkbenchMenuService) ms).updateManagers();
 			}
@@ -2390,7 +2396,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 	private ListenerList backgroundSaveListeners = new ListenerList(ListenerList.IDENTITY);
 
-	private SelectionService selectionService;
+	private ISelectionService selectionService;
 
 	private ITrimManager trimManager;
 
@@ -2707,6 +2713,30 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		return getWindowConfigurer().getShowFastViewBars();
 	}
 
+	/**
+	 * Return the action bar presentation used for creating toolbars. This is
+	 * for internal use only, used for consistency with the window.
+	 * 
+	 * @return the presentation used.
+	 */
+	public IActionBarPresentationFactory getActionBarPresentationFactory() {
+		E4Util.unsupported("getActionBarPresentationFactory: doesn't do anything useful, should cause NPE"); //$NON-NLS-1$
+		// allow replacement of the actionbar presentation
+		IActionBarPresentationFactory actionBarPresentation = null;
+		AbstractPresentationFactory presentationFactory = getWindowConfigurer()
+				.getPresentationFactory();
+		if (presentationFactory instanceof IActionBarPresentationFactory) {
+			actionBarPresentation = ((IActionBarPresentationFactory) presentationFactory);
+		}
+
+		return actionBarPresentation;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.window.ApplicationWindow#showTopSeperator()
+	 */
 	protected boolean showTopSeperator() {
 		return false;
 	}
@@ -2718,6 +2748,11 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		return progressRegion;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchWindow#getExtensionTracker()
+	 */
 	@Override
 	public IExtensionTracker getExtensionTracker() {
 		return (IExtensionTracker) model.getContext().get(IExtensionTracker.class.getName());
@@ -2733,6 +2768,11 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		return getWorkbenchImpl().getDefaultPageInput();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchWindow#getTrimManager()
+	 */
 	public ITrimManager getTrimManager() {
 		if (trimManager == null) {
 			// HACK !! Add a 'null' trim manager...this is specifically in place
@@ -2812,7 +2852,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		serviceLocator.registerService(LegacyActionPersistence.class, actionPersistence);
 		actionPersistence.read();
 
-		ICommandService cmdService = workbench.getService(ICommandService.class);
+		ICommandService cmdService = (ICommandService) workbench.getService(ICommandService.class);
 		SlaveCommandService slaveCmdService = new SlaveCommandService(cmdService,
 				IServiceScopes.WINDOW_SCOPE, this, model.getContext());
 		serviceLocator.registerService(ICommandService.class, slaveCmdService);
@@ -2822,7 +2862,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 				.make(ContextService.class, model.getContext());
 		serviceLocator.registerService(IContextService.class, cxs);
 
-		IMenuService parent = getWorkbench().getService(IMenuService.class);
+		IMenuService parent = (IMenuService) getWorkbench().getService(IMenuService.class);
 		IMenuService msvs = new SlaveMenuService(parent, model);
 		serviceLocator.registerService(IMenuService.class, msvs);
 	}
@@ -2971,7 +3011,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		}
 	};
 
-	MenuManager menuManager = new MenuManager("MenuBar", ActionSet.MAIN_MENU); //$NON-NLS-1$
+	MenuManager menuManager = new MenuManager("MenuBar", "org.eclipse.ui.main.menu"); //$NON-NLS-1$//$NON-NLS-2$
 
 	public MenuManager getMenuManager() {
 		return menuManager;
@@ -3044,15 +3084,5 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	public CustomizePerspectiveDialog createCustomizePerspectiveDialog(Perspective persp,
 			IEclipseContext context) {
 		return new CustomizePerspectiveDialog(getWindowConfigurer(), persp, context);
-	}
-
-	private class WWinPartService extends PartService {
-
-		@Override
-		public void partActivated(IWorkbenchPart part) {
-			super.partActivated(part);
-			selectionService.notifyListeners(part);
-		}
-
 	}
 }

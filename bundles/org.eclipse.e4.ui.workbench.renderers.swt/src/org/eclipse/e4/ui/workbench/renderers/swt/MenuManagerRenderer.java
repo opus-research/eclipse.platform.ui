@@ -4,16 +4,11 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866, Bug 405471
  *     Sopot Cela <sopotcela@gmail.com>
- *     Steven Spungin <steven@spungin.tv> - Bug 437747
- *     Alan Staves <alan.staves@microfocus.com> - Bug 435274
- *     Patrick Naish <patrick.naish@microfocus.com> - Bug 435274
- *     René Brandstetter <Rene.Brandstetter@gmx.net> - Bug 378849
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 378849
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -66,7 +61,6 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.action.SubContributionItem;
 import org.eclipse.jface.internal.MenuManagerEventHelper;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
@@ -320,6 +314,13 @@ MenuManagerEventHelper.getInstance()
 		context.remove(MenuManagerRenderer.class);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#createWidget
+	 * (org.eclipse.e4.ui.model.application.ui.MUIElement, java.lang.Object)
+	 */
 	@Override
 	public Object createWidget(MUIElement element, Object parent) {
 		if (!(element instanceof MMenu))
@@ -383,10 +384,6 @@ MenuManagerEventHelper.getInstance()
 				@Override
 				public void widgetDisposed(DisposeEvent e) {
 					cleanUp(menuModel);
-					MenuManager manager = getManager(menuModel);
-					if (manager != null) {
-						manager.markDirty();
-					}
 				}
 			});
 		}
@@ -397,11 +394,6 @@ MenuManagerEventHelper.getInstance()
 	 * @param menuModel
 	 */
 	public void cleanUp(MMenu menuModel) {
-		for (MMenuElement childElement : menuModel.getChildren()) {
-			if (childElement instanceof MMenu) {
-				cleanUp((MMenu) childElement);
-			}
-		}
 		Collection<ContributionRecord> vals = modelContributionToRecord
 				.values();
 		List<ContributionRecord> disposedRecords = new ArrayList<ContributionRecord>();
@@ -409,14 +401,14 @@ MenuManagerEventHelper.getInstance()
 				.toArray(new ContributionRecord[vals.size()])) {
 			if (record.menuModel == menuModel) {
 				record.dispose();
-				for (MMenuElement copy : record.getGeneratedElements()) {
+				for (MMenuElement copy : record.generatedElements) {
 					cleanUpCopy(record, copy);
 				}
-				for (MMenuElement copy : record.getSharedElements()) {
+				for (MMenuElement copy : record.sharedElements) {
 					cleanUpCopy(record, copy);
 				}
-				record.getGeneratedElements().clear();
-				record.getSharedElements().clear();
+				record.generatedElements.clear();
+				record.sharedElements.clear();
 				disposedRecords.add(record);
 			}
 		}
@@ -585,6 +577,13 @@ MenuManagerEventHelper.getInstance()
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#processContents
+	 * (org.eclipse.e4.ui.model.application.ui.MElementContainer)
+	 */
 	@Override
 	public void processContents(MElementContainer<MUIElement> container) {
 		// I can either simply stop processing, or we can walk the model
@@ -855,10 +854,6 @@ MenuManagerEventHelper.getInstance()
 	}
 
 	public void clearModelToManager(MMenu model, MenuManager manager) {
-		for (MMenuElement element : model.getChildren()) {
-			IContributionItem ici = getContribution(element);
-			clearModelToContribution(element, ici);
-		}
 		modelToManager.remove(model);
 		managerToModel.remove(manager);
 	}
@@ -894,7 +889,7 @@ MenuManagerEventHelper.getInstance()
 
 	/**
 	 * Search the records for testing. Look, but don't touch!
-	 *
+	 * 
 	 * @return the array of active ContributionRecords.
 	 */
 	public ContributionRecord[] getContributionRecords() {
@@ -931,12 +926,6 @@ MenuManagerEventHelper.getInstance()
 		IContributionItem[] items = menuManager.getItems();
 		for (int src = 0, dest = 0; src < items.length; src++, dest++) {
 			IContributionItem item = items[src];
-
-			if (item instanceof SubContributionItem) {
-				// get the wrapped contribution item
-				item = ((SubContributionItem) item).getInnerItem();
-			}
-
 			if (item instanceof MenuManager) {
 				MenuManager childManager = (MenuManager) item;
 				MMenu childModel = getMenuModel(childManager);
@@ -944,8 +933,6 @@ MenuManagerEventHelper.getInstance()
 					MMenu legacyModel = OpaqueElementUtil.createOpaqueMenu();
 					legacyModel.setElementId(childManager.getId());
 					legacyModel.setVisible(childManager.isVisible());
-					legacyModel.setLabel(childManager.getMenuText());
-
 					linkModelToManager(legacyModel, childManager);
 					OpaqueElementUtil.setOpaqueItem(legacyModel, childManager);
 					if (modelChildren.size() > dest) {
@@ -976,10 +963,6 @@ MenuManagerEventHelper.getInstance()
 														.getElementId()));
 							}
 						}
-					}
-
-					if (childModel.getChildren().size() != childManager.getSize()) {
-						reconcileManagerToModel(childManager, childModel);
 					}
 				}
 			} else if (item.isSeparator() || item.isGroupMarker()) {
@@ -1094,7 +1077,7 @@ MenuManagerEventHelper.getInstance()
 	/**
 	 * Clean dynamic menu contributions provided by
 	 * {@link MDynamicMenuContribution} application model elements
-	 *
+	 * 
 	 * @param menuManager
 	 * @param menuModel
 	 * @param dump

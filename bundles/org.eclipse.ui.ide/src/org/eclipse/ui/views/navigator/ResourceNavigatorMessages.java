@@ -19,7 +19,6 @@ package org.eclipse.ui.views.navigator;
  * @noextend This class is not intended to be subclassed by clients.
  * @noinstantiate This class is not intended to be instantiated by clients. 
  */
-@Deprecated
 public class ResourceNavigatorMessages {
     
 	private ResourceNavigatorMessages() {
