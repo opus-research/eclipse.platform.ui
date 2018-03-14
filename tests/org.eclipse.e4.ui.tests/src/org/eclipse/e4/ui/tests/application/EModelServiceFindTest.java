@@ -305,7 +305,7 @@ public class EModelServiceFindTest extends TestCase {
 		List<MToolBarElement> toolBarElements = modelService.findElements(
 				application, null, MToolBarElement.class, null,
 				EModelService.IN_ANY_PERSPECTIVE);
-		assertEquals(0, toolBarElements.size());
+		assertEquals(2, toolBarElements.size());
 
 		toolBarElements = modelService.findElements(application, null,
 				MToolBarElement.class, null, EModelService.IN_ANY_PERSPECTIVE
@@ -315,7 +315,7 @@ public class EModelServiceFindTest extends TestCase {
 		List<MMenuElement> menuElements = modelService.findElements(
 				application, null, MMenuElement.class, null,
 				EModelService.IN_ANY_PERSPECTIVE);
-		assertEquals(0, menuElements.size());
+		assertEquals(3, menuElements.size());
 
 		menuElements = modelService.findElements(application, null,
 				MMenuElement.class, null, EModelService.IN_ANY_PERSPECTIVE
@@ -325,6 +325,10 @@ public class EModelServiceFindTest extends TestCase {
 		menuElements = modelService.findElements(application, null,
 				MMenuElement.class, null, EModelService.IN_ANY_PERSPECTIVE
 						| EModelService.IN_MAIN_MENU);
+		assertEquals(5, menuElements.size());
+
+		menuElements = modelService.findElements(application, null,
+				MMenuElement.class, null, EModelService.IN_MAIN_MENU);
 		assertEquals(2, menuElements.size());
 	}
 
@@ -343,23 +347,25 @@ public class EModelServiceFindTest extends TestCase {
 		handler2.setElementId("handler2");
 		application.getHandlers().add(handler2);
 
-		MHandler foundHandler = null;
+		List<MHandler> foundHandlers = null;
 
-		foundHandler = modelService.findHandler(application, "handler1");
-		assertNotNull(foundHandler);
-		assertSame(handler1, foundHandler);
+		foundHandlers = modelService.findElements(application, "handler1",
+				MHandler.class, null);
+		assertNotNull(foundHandlers);
+		assertSame(handler1, foundHandlers.get(0));
 
-		foundHandler = modelService.findHandler(application, "invalidId");
-		assertNull(foundHandler);
+		foundHandlers = modelService.findElements(application, "invalidId",
+				MHandler.class, null);
+		assertTrue(foundHandlers.isEmpty());
 
-		foundHandler = modelService.findHandler(null, "handler1");
-		assertNull(foundHandler);
+		foundHandlers = modelService.findElements(application, "",
+				MHandler.class, null);
+		assertTrue(foundHandlers.isEmpty());
 
-		foundHandler = modelService.findHandler(application, "");
-		assertNull(foundHandler);
-
-		foundHandler = modelService.findHandler(application, null);
-		assertNull(foundHandler);
+		foundHandlers = modelService.findElements(application, null,
+				MHandler.class, null);
+		assertNotNull(foundHandlers);
+		assertTrue(!foundHandlers.isEmpty());
 	}
 
 	public void testBug314685() {
