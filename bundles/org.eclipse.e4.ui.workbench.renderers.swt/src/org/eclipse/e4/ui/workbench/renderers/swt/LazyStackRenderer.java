@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 IBM Corporation and others.
+ * Copyright (c) 2008, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,13 +9,17 @@
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 441150
  *     Fabio Zadrozny (fabiofz@gmail.com) - Bug 436763
+ *     Michael Braun <eclipse@myink.de> - Bug 458203
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MGenericStack;
@@ -32,7 +36,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.osgi.service.event.Event;
-import org.osgi.service.event.EventHandler;
 
 /**
  * This class encapsulates the functionality necessary to manage stacks of parts
@@ -45,45 +48,41 @@ import org.osgi.service.event.EventHandler;
  *
  */
 public abstract class LazyStackRenderer extends SWTPartRenderer {
-	private EventHandler lazyLoader = new EventHandler() {
-		@Override
-		public void handleEvent(Event event) {
-			Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
 
-			if (!(element instanceof MGenericStack<?>))
-				return;
+	@Inject
+	@Optional
+	private void subscribeTopicElement(@UIEventTopic(UIEvents.EventTags.ELEMENT) Event event) {
+		Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
 
-			MGenericStack<MUIElement> stack = (MGenericStack<MUIElement>) element;
-			if (stack.getRenderer() != LazyStackRenderer.this)
-				return;
-			LazyStackRenderer lsr = (LazyStackRenderer) stack.getRenderer();
+		if (!(element instanceof MGenericStack<?>))
+			return;
 
-			// Gather up the elements that are being 'hidden' by this change
-			MUIElement oldSel = (MUIElement) event
-					.getProperty(UIEvents.EventTags.OLD_VALUE);
-			if (oldSel != null) {
-				hideElementRecursive(oldSel);
-			}
+		MGenericStack<MUIElement> stack = (MGenericStack<MUIElement>) element;
+		if (stack.getRenderer() != LazyStackRenderer.this)
+			return;
+		LazyStackRenderer lsr = (LazyStackRenderer) stack.getRenderer();
 
-			if (stack.getSelectedElement() != null)
-				lsr.showTab(stack.getSelectedElement());
+		// Gather up the elements that are being 'hidden' by this change
+		MUIElement oldSel = (MUIElement) event.getProperty(UIEvents.EventTags.OLD_VALUE);
+		if (oldSel != null) {
+			hideElementRecursive(oldSel);
 		}
-	};
 
+		if (stack.getSelectedElement() != null)
+			lsr.showTab(stack.getSelectedElement());
+	}
+
+	/**
+	 *
+	 * @param eventBroker
+	 */
 	public void init(IEventBroker eventBroker) {
-		// Ensure that there only ever *one* listener. Each subclass
-		// will call this method
-		eventBroker.unsubscribe(lazyLoader);
-
-		eventBroker.subscribe(UIEvents.ElementContainer.TOPIC_SELECTEDELEMENT,
-				lazyLoader);
 	}
 
 	/**
 	 * @param eventBroker
 	 */
 	public void contextDisposed(IEventBroker eventBroker) {
-		eventBroker.unsubscribe(lazyLoader);
 	}
 
 	@Override
