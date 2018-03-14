@@ -21,7 +21,6 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -76,6 +75,9 @@ public class OleEditor extends EditorPart {
      */
     private IResourceChangeListener resourceListener = new IResourceChangeListener() {
 
+        /*
+         * @see IResourceChangeListener#resourceChanged(IResourceChangeEvent)
+         */
         @Override
 		public void resourceChanged(IResourceChangeEvent event) {
             IResourceDelta mainDelta = event.getDelta();
@@ -220,6 +222,9 @@ public class OleEditor extends EditorPart {
         }
     }
 
+    /**
+     * createPartControl method comment.
+     */
     @Override
 	public void createPartControl(Composite parent) {
 
@@ -327,6 +332,10 @@ public class OleEditor extends EditorPart {
             return;
         BusyIndicator.showWhile(clientSite.getDisplay(), new Runnable() {
 
+            /*
+             *  (non-Javadoc)
+             * @see java.lang.Runnable#run()
+             */
             @Override
 			public void run() {
 
@@ -424,6 +433,19 @@ public class OleEditor extends EditorPart {
         dispInterface.dispose();
     }
 
+    /* (non-Javadoc)
+     * Initializes the editor when created from scratch.
+     *
+     * This method is called soon after part construction and marks
+     * the start of the extension lifecycle.  At the end of the
+     * extension lifecycle <code>shutdown</code> will be invoked
+     * to terminate the lifecycle.
+     *
+     * @param container an interface for communication with the part container
+     * @param input The initial input element for the editor.  In most cases
+     *    it is an <code>IFile</code> but other types are acceptable.
+     * @see IWorkbenchPart#shutdown
+     */
     @Override
 	public void init(IEditorSite site, IEditorInput input)
             throws PartInitException {
@@ -456,7 +478,7 @@ public class OleEditor extends EditorPart {
      */
     private boolean validatePathEditorInput(IEditorInput input) throws PartInitException {
         // Check input type.
-		IPathEditorInput pathEditorInput = Adapters.adapt(input, IPathEditorInput.class);
+		IPathEditorInput pathEditorInput = input.getAdapter(IPathEditorInput.class);
         if (pathEditorInput == null)
             throw new PartInitException(OleMessages.format(
                     "OleEditor.invalidInput", new Object[] { input })); //$NON-NLS-1$
@@ -517,6 +539,10 @@ public class OleEditor extends EditorPart {
         clientFrame.setWindowMenus(windowMenu);
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.ui.ISaveablePart#isDirty()
+     */
     @Override
 	public boolean isDirty() {
         /*Return only if we have a clientSite which is dirty
@@ -524,6 +550,10 @@ public class OleEditor extends EditorPart {
         return clientSite != null && clientSite.isDirty();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.ISaveablePart#isSaveAsAllowed()
+     */
     @Override
 	public boolean isSaveAsAllowed() {
         return true;
@@ -611,6 +641,10 @@ public class OleEditor extends EditorPart {
 
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbenchPart#setFocus()
+     */
     @Override
 	public void setFocus() {
         //Do not take focus
@@ -635,9 +669,12 @@ public class OleEditor extends EditorPart {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.part.EditorPart#setInputWithNotify(org.eclipse.ui.IEditorInput)
+     */
     @Override
 	protected void setInputWithNotify(IEditorInput input) {
-		IPathEditorInput pathEditorInput = Adapters.adapt(input, IPathEditorInput.class);
+		IPathEditorInput pathEditorInput = input.getAdapter(IPathEditorInput.class);
     	if (pathEditorInput != null)
     		source = new File(pathEditorInput.getPath().toOSString());
 
@@ -679,6 +716,9 @@ public class OleEditor extends EditorPart {
 
     }
 
+    /*
+     * See IEditorPart.isSaveOnCloseNeeded()
+     */
     @Override
 	public boolean isSaveOnCloseNeeded() {
         return !sourceDeleted && super.isSaveOnCloseNeeded();

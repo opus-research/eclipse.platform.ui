@@ -61,10 +61,6 @@ import org.eclipse.swt.widgets.Widget;
  * interfaces <code>ITreeContentProvider</code> or (as of 3.2, to support
  * multiple equal elements) <code>ITreePathContentProvider</code>.
  * </p>
- * <p>
- * <strong> This class is not intended to be subclassed outside of the JFace
- * viewers framework.</strong>
- * <p>
  *
  * @see TreeViewer
  */
@@ -2355,10 +2351,9 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	}
 
 	/**
-	 * Sets the content provider used by this <code>AbstractTreeViewer</code>.
-	 * <p>
-	 * Content providers for abstract tree viewers must implement either
-	 * {@link ITreeContentProvider} or {@link ITreePathContentProvider}.
+	 * The <code>AbstractTreeViewer</code> implementation of this method
+	 * checks to ensure that the content provider is an
+	 * <code>ITreeContentProvider</code>.
 	 */
 	@Override
 	public void setContentProvider(IContentProvider provider) {

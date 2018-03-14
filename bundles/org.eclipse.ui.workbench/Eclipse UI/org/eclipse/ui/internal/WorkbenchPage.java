@@ -40,7 +40,6 @@ import java.util.WeakHashMap;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -56,7 +55,6 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
-import org.eclipse.e4.ui.internal.workbench.ModelServiceImpl;
 import org.eclipse.e4.ui.internal.workbench.PartServiceImpl;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
@@ -422,7 +420,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 	}
 
 	private IShowInSource getShowInSource(IWorkbenchPart sourcePart) {
-		return Adapters.adapt(sourcePart, IShowInSource.class);
+		return Util.getAdapter(sourcePart, IShowInSource.class);
 	}
 
 	private ShowInContext getContext(IWorkbenchPart sourcePart) {
@@ -2415,7 +2413,7 @@ public class WorkbenchPage implements IWorkbenchPage {
     @Override
 	public String getLabel() {
         String label = WorkbenchMessages.WorkbenchPage_UnknownLabel;
-        IWorkbenchAdapter adapter = Adapters.adapt(input, IWorkbenchAdapter.class);
+        IWorkbenchAdapter adapter = Util.getAdapter(input, IWorkbenchAdapter.class);
         if (adapter != null) {
 			label = adapter.getLabel(input);
 		}
@@ -4012,12 +4010,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 		IPerspectiveDescriptor lastPerspective = getPerspective();
 		if (lastPerspective != null && lastPerspective.getId().equals(perspective.getId())) {
 			// no change
-			MPerspectiveStack perspectives = getPerspectiveStack();
-			for (MPerspective mperspective : perspectives.getChildren()) {
-				if (mperspective.getElementId().equals(perspective.getId())) {
-					((ModelServiceImpl) modelService).handleNullRefPlaceHolders(mperspective, window);
-				}
-			}
 			return;
 		}
 
@@ -4031,7 +4023,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 				// this perspective already exists, switch to this one
 				perspectives.setSelectedElement(mperspective);
 				mperspective.getContext().activate();
-				((ModelServiceImpl) modelService).handleNullRefPlaceHolders(mperspective, window);
 				return;
 			}
 		}
@@ -4047,7 +4038,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 			// tag it with the same id
 			modelPerspective.setElementId(perspective.getId());
 
-
 			// instantiate the perspective
 			IPerspectiveFactory factory = ((PerspectiveDescriptor) perspective).createFactory();
 			ModeledPageLayout modelLayout = new ModeledPageLayout(window, modelService,
@@ -4057,8 +4047,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 			PerspectiveExtensionReader reader = new PerspectiveExtensionReader();
 			reader.extendLayout(getExtensionTracker(), perspective.getId(), modelLayout);
 		}
-
-		((ModelServiceImpl) modelService).handleNullRefPlaceHolders(modelPerspective, window);
 
 		modelPerspective.setLabel(perspective.getLabel());
 
@@ -5293,7 +5281,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 	private IPathEditorInput getPathEditorInput(IEditorInput input) {
 		if (input instanceof IPathEditorInput)
 			return (IPathEditorInput) input;
-		return Adapters.adapt(input, IPathEditorInput.class);
+		return Util.getAdapter(input, IPathEditorInput.class);
 	}
 
 	/**
@@ -5385,6 +5373,13 @@ public class WorkbenchPage implements IWorkbenchPage {
 			}
 		}
 	};
+
+	/**
+	 * this should work with hide and show editors.
+	 */
+	public void resetHiddenEditors() {
+		E4Util.unsupported("resetHiddenEditors not supported yet"); //$NON-NLS-1$
+	}
 
 	public String getHiddenItems() {
 		MPerspective perspective = getCurrentPerspective();

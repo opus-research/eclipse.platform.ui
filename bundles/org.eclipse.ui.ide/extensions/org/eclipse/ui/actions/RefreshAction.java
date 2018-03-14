@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
@@ -228,9 +229,12 @@ public class RefreshAction extends WorkspaceAction {
 				while (resourcesEnum.hasNext()) {
 					try {
 						IResource resource = resourcesEnum.next();
-						refreshResource(resource, subMonitor.split(1));
+						refreshResource(resource, subMonitor.newChild(1));
 					} catch (CoreException e) {
 						errors = recordError(errors, e);
+					}
+					if (subMonitor.isCanceled()) {
+						throw new OperationCanceledException();
 					}
 				}
 				if (errors != null) {

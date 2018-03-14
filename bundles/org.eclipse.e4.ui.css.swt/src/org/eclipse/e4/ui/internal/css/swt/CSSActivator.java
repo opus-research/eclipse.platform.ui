@@ -31,6 +31,10 @@ public class CSSActivator implements BundleActivator {
 		return activator;
 	}
 
+	public Bundle getBundle() {
+		return context.getBundle();
+	}
+
 	public PackageAdmin getBundleAdmin() {
 		if (pkgAdminTracker == null) {
 			if (context == null) {
@@ -60,6 +64,10 @@ public class CSSActivator implements BundleActivator {
 			}
 		}
 		return null;
+	}
+
+	public BundleContext getContext() {
+		return context;
 	}
 
 	@Override

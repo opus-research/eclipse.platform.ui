@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,6 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -69,7 +68,7 @@ public class LabelProviderWrapper extends ViewerComparator implements
 			Image result = null;
 			if (element != null) {
 				StatusAdapter statusAdapter = ((StatusAdapter) element);
-				Job job = Adapters.adapt(statusAdapter, Job.class);
+				Job job = (Job) (statusAdapter.getAdapter(Job.class));
 				if (job != null) {
 					result = getIcon(job);
 				}
@@ -86,14 +85,14 @@ public class LabelProviderWrapper extends ViewerComparator implements
 			StatusAdapter statusAdapter = (StatusAdapter) element;
 			String text = WorkbenchMessages.WorkbenchStatusDialog_ProblemOccurred;
 			if (!isMulti()) {
-				Job job = Adapters.adapt(statusAdapter, Job.class);
+				Job job = (Job) (statusAdapter.getAdapter(Job.class));
 				if (job != null) {
 					text = getPrimaryMessage(statusAdapter);
 				} else {
 					text = getSecondaryMessage(statusAdapter);
 				}
 			} else {
-				Job job = Adapters.adapt(statusAdapter, Job.class);
+				Job job = (Job) (statusAdapter.getAdapter(Job.class));
 				if (job != null) {
 					text = job.getName();
 				} else {
@@ -268,7 +267,7 @@ public class LabelProviderWrapper extends ViewerComparator implements
 	 */
 	public String getMainMessage(StatusAdapter statusAdapter) {
 		if (!isMulti()) {
-			Job job = Adapters.adapt(statusAdapter, Job.class);
+			Job job = (Job) (statusAdapter.getAdapter(Job.class));
 			// job
 			if (job != null) {
 				return NLS
@@ -283,7 +282,7 @@ public class LabelProviderWrapper extends ViewerComparator implements
 		// with timestamp if available).
 		// we display secondary message or status
 		if (isMulti()) {
-			Job job = Adapters.adapt(statusAdapter, Job.class);
+			Job job = (Job) (statusAdapter.getAdapter(Job.class));
 			// job
 			if (job != null) {
 				return getPrimaryMessage(statusAdapter);

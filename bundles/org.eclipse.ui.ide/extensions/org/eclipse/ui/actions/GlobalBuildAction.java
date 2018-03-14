@@ -174,9 +174,11 @@ public class GlobalBuildAction extends Action implements
 			protected IStatus run(IProgressMonitor monitor) {
 				SubMonitor subMonitor = SubMonitor.convert(monitor, getOperationMessage(), 100);
                 try {
-					ResourcesPlugin.getWorkspace().build(buildType, subMonitor.split(100));
+					ResourcesPlugin.getWorkspace().build(buildType, subMonitor.newChild(100));
                 } catch (CoreException e) {
                     return e.getStatus();
+                } finally {
+                    monitor.done();
                 }
                 return Status.OK_STATUS;
             }

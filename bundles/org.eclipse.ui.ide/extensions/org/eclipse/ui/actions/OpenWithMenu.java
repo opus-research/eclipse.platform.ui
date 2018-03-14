@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.action.ContributionItem;
@@ -44,6 +43,7 @@ import org.eclipse.ui.internal.WorkbenchPage;
 import org.eclipse.ui.internal.ide.DialogUtil;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
+import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.part.FileEditorInput;
 
 import com.ibm.icu.text.Collator;
@@ -283,11 +283,11 @@ public class OpenWithMenu extends ContributionItem {
      * Converts the IAdaptable file to IFile or null.
      */
     private IFile getFileResource() {
-		IFile file = Adapters.adapt(adaptable, IFile.class);
+		IFile file = Util.getAdapter(adaptable, IFile.class);
 		if (file != null) {
 			return file;
         }
-		IResource resource = Adapters.adapt(adaptable, IResource.class);
+		IResource resource = Util.getAdapter(adaptable, IResource.class);
         if (resource instanceof IFile) {
             return (IFile) resource;
         }
