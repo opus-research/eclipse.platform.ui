@@ -8,9 +8,12 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 434611
+ *     Steven Spungin <steven@spungin.tv> - Bug 361731, 401043
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
+
+import org.eclipse.e4.ui.workbench.PartSizeInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -568,13 +571,22 @@ public class ModelServiceImpl implements EModelService {
 			newSash.getChildren().add(toInsert);
 		}
 
-		// Set up the container data before adding the new sash to the model
-		// To raise the granularity assume 100% == 10,000
-		int adjustedPct = (int) (ratio * 10000);
-		toInsert.setContainerData(Integer.toString(adjustedPct));
-		relTo.setContainerData(Integer.toString(10000 - adjustedPct));
+		// Maintain the ratio in the new sash, but preserve resize mode.
+		PartSizeInfo infoSrc = PartSizeInfo.get(relTo);
+		PartSizeInfo infoDst = PartSizeInfo.get(toInsert);
+		infoDst.setDefaultValue(10000.0 * ratio);
+		infoSrc.setDefaultValue(10000.0 * (1.0 - ratio));
+		infoDst.setDefaultAbsolute(false);
+		infoSrc.setDefaultAbsolute(false);
+		infoDst.storeInfo();
+		infoSrc.storeInfo();
+		infoSrc.notifyChanged();
+		infoDst.notifyChanged();
 
 		// add the new sash at the same location
+		if (index > curParent.getChildren().size()) {
+			index = curParent.getChildren().size();
+		}
 		curParent.getChildren().add(index, newSash);
 	}
 
@@ -592,7 +604,7 @@ public class ModelServiceImpl implements EModelService {
 		newSash.setHorizontal(horizontal);
 
 		// Maintain the existing weight in the new sash
-		newSash.setContainerData(relTo.getContainerData());
+		PartSizeInfo.copy(newSash, relTo);
 
 		combine(toInsert, relTo, newSash, insertBefore, ratio);
 	}

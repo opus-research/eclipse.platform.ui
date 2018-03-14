@@ -7,15 +7,20 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Steven Spungin <steven@spungin.tv> - Bug 361731, 401043
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.addons.dndaddon;
 
+import org.eclipse.e4.ui.workbench.PartSizeInfo;
+
 import java.util.List;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
+import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
@@ -278,6 +283,16 @@ public class SplitDropAgent2 extends DropAgent {
 
 	@Override
 	public boolean drop(MUIElement dragElement, DnDInfo info) {
+
+		// Do this before removing dragElement from parent
+		MUIElement hasSizeData = dragElement;
+		while (hasSizeData != null
+				&& (MUIElement) hasSizeData.getParent() instanceof MPartSashContainer == false) {
+			hasSizeData = hasSizeData.getParent();
+		}
+
+		MElementContainer<MUIElement> originalParent = dragElement.getParent();
+
 		MPartSashContainerElement toInsert = (MPartSashContainerElement) dragElement;
 		if (dragElement instanceof MPartStack) {
 			// Ensure we restore the stack to the presentation first
@@ -329,6 +344,18 @@ public class SplitDropAgent2 extends DropAgent {
 			}
 		}
 
+		// Preserve the resize mode
+		if (hasSizeData != null) {
+			PartSizeInfo newSizeInfo = PartSizeInfo.get(toInsert);
+			newSizeInfo.setResizeMode(PartSizeInfo.get(hasSizeData).getResizeMode());
+			newSizeInfo.storeInfo();
+			newSizeInfo.notifyChanged();
+		} else {
+			PartSizeInfo newSizeInfo = PartSizeInfo.get(toInsert);
+			newSizeInfo.setResizeMode(PartSizeInfo.get(originalParent).getResizeMode());
+			newSizeInfo.storeInfo();
+			newSizeInfo.notifyChanged();
+		}
 		dndManager.getModelService().insert(toInsert, (MPartSashContainerElement) relToElement,
 				where, ratio);
 		// reactivatePart(dragElement);
