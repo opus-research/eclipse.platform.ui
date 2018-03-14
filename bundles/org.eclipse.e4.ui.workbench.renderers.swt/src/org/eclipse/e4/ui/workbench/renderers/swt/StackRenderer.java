@@ -1172,7 +1172,7 @@ public class StackRenderer extends LazyStackRenderer {
 				.getData(AbstractPartRenderer.OWNING_ME);
 		MPart part = (MPart) ((uiElement instanceof MPart) ? uiElement
 				: ((MPlaceholder) uiElement).getRef());
-		if (!check && !isClosable(part)) {
+		if (check && !isClosable(part)) {
 			return false;
 		}
 
