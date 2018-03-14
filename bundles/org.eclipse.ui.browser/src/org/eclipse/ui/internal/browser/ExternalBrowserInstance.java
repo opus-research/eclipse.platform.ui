@@ -8,11 +8,9 @@
  * Contributors:
  *     IBM Corporation - Initial API and implementation
  *     Wind River - Fix the issue that failing to launch browser with space in its path
- *     Tomasz Zarna (Tasktop Technologies) - [429546] External Browser with parameters
  *******************************************************************************/
 package org.eclipse.ui.internal.browser;
 
-import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -20,7 +18,6 @@ import org.eclipse.jface.util.Util;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.browser.AbstractWebBrowser;
-import org.eclipse.ui.internal.browser.browsers.StreamConsumer;
 
 /**
  * An instance of a running Web browser. rundll32.exe
@@ -37,40 +34,32 @@ public class ExternalBrowserInstance extends AbstractWebBrowser {
 	}
 
 	public void openURL(URL url) throws PartInitException {
-		final String urlText = url == null ? null : url.toExternalForm();
+		String urlText = url.toExternalForm();
 
 		ArrayList<String> cmdOptions = new ArrayList<String>();
 		String location = browser.getLocation();
 		cmdOptions.add(location);
-		String parameters = browser.getParameters();
+		String parameters = browser.getParameters();		
 		Trace
 		.trace(
 				Trace.FINEST,
 				"Launching external Web browser: " + location + " - " + parameters + " - " + urlText); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-		String[] params = WebBrowserUtil.createParameterArray(parameters, urlText);
+		String params = WebBrowserUtil.createParameterString(parameters, urlText);
 
 		try {
-			if (Util.isMac() && isMacAppBundle(location)) {
+			if ( Util.isMac()) {
 				cmdOptions.add(0, "-a"); //$NON-NLS-1$
 				cmdOptions.add(0, "open"); //$NON-NLS-1$
-				// --args supported in 10.6 and later
-				cmdOptions.add("--args");//$NON-NLS-1$
 			}
 
-			for (String param : params) {
-				cmdOptions.add(param);
-			}
+			if (!(params == null || params.length() == 0))
+				cmdOptions.add(params);
+
 			String[] cmd = cmdOptions.toArray(new String[cmdOptions.size()]);
 			Trace.trace(Trace.FINEST, "Launching " + join(" ", cmd)); //$NON-NLS-1$//$NON-NLS-2$
 
 			process = Runtime.getRuntime().exec(cmd);
-			Thread outConsumer = new StreamConsumer(process.getInputStream());
-			outConsumer.setName("External browser output reader"); //$NON-NLS-1$
-			outConsumer.start();
-			Thread errConsumer = new StreamConsumer(process.getErrorStream());
-			errConsumer.setName("External browser  error reader"); //$NON-NLS-1$
-			errConsumer.start();
 		} catch (Exception e) {
 			Trace.trace(Trace.SEVERE, "Could not launch external browser", e); //$NON-NLS-1$
 			WebBrowserUtil.openError(NLS.bind(
@@ -80,10 +69,6 @@ public class ExternalBrowserInstance extends AbstractWebBrowser {
 			public void run() {
 				try {
 					process.waitFor();
-					if (process.exitValue() != 0) {
-						Trace.trace(Trace.SEVERE, "Could not launch external browser"); //$NON-NLS-1$
-						WebBrowserUtil.openError(NLS.bind(Messages.errorCouldNotLaunchWebBrowser, urlText));
-					}
 					DefaultBrowserSupport.getInstance().removeBrowser(
 							ExternalBrowserInstance.this);
 				} catch (Exception e) {
@@ -93,19 +78,6 @@ public class ExternalBrowserInstance extends AbstractWebBrowser {
 		};
 		thread.setDaemon(true);
 		thread.start();
-	}
-
-	/**
-	 * @return true if the location appears to be a Mac Application bundle
-	 *         (.app)
-	 */
-	private boolean isMacAppBundle(String location) {
-		// A very quick heuristic based on Apple's Bundle Programming Guide
-		// https://developer.apple.com/library/mac/documentation/CoreFoundation/Conceptual/CFBundles/BundleTypes/BundleTypes.html#//apple_ref/doc/uid/10000123i-CH101-SW19
-		File bundleLoc = new File(location);
-		File macosDir = new File(new File(bundleLoc, "Contents"), "MacOS"); //$NON-NLS-1$ //$NON-NLS-2$
-		File plist = new File(new File(bundleLoc, "Contents"), "Info.plist"); //$NON-NLS-1$ //$NON-NLS-2$
-		return bundleLoc.isDirectory() && macosDir.isDirectory() && plist.isFile();
 	}
 
 	private String join (String delim, String ... data) {

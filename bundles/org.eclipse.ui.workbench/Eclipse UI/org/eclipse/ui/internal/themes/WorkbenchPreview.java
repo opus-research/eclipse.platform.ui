@@ -65,6 +65,9 @@ public class WorkbenchPreview implements IThemePreview {
         }
     };
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IPresentationPreview#createControl(org.eclipse.swt.widgets.Composite, org.eclipse.ui.themes.ITheme)
+     */
     @Override
 	public void createControl(Composite parent, ITheme currentTheme) {
         this.theme = currentTheme;
@@ -158,6 +161,9 @@ public class WorkbenchPreview implements IThemePreview {
                 IWorkbenchThemeConstants.TAB_TEXT_FONT));
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IPresentationPreview#dispose()
+     */
     @Override
 	public void dispose() {
         disposed = true;
