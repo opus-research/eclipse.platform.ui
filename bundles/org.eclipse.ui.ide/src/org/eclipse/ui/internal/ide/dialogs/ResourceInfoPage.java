@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Remy Chi Jian Suen <remy.suen@gmail.com> - Bug 175069 [Preferences] ResourceInfoPage is not setting dialog font on all widgets
  *     Serge Beauchamp (Freescale Semiconductor) - [229633] Project Path Variable Support
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 474273
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
@@ -28,13 +29,9 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceProxy;
-import org.eclipse.core.resources.IResourceProxyVisitor;
 import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
@@ -47,8 +44,6 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.FieldEditor;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.osgi.util.TextProcessor;
@@ -444,12 +439,9 @@ public class ResourceInfoPage extends PropertyPage {
 			encodingEditor.setPage(this);
 			encodingEditor.load();
 
-			encodingEditor.setPropertyChangeListener(new IPropertyChangeListener() {
-				@Override
-				public void propertyChange(PropertyChangeEvent event) {
-					if (event.getProperty().equals(FieldEditor.IS_VALID)) {
-						setValid(encodingEditor.isValid());
-					}
+			encodingEditor.setPropertyChangeListener(event -> {
+				if (event.getProperty().equals(FieldEditor.IS_VALID)) {
+					setValid(encodingEditor.isValid());
 				}
 			});
 
@@ -1014,17 +1006,14 @@ public class ResourceInfoPage extends PropertyPage {
 		// use list to preserve the order of visited resources
 		final List/*<IResource>*/ toVisit = new ArrayList/*<IResource>*/();
 		visited.add(resource.getLocationURI());
-		resource.accept(new IResourceProxyVisitor() {
-			@Override
-			public boolean visit(IResourceProxy proxy) {
-				IResource childResource = proxy.requestResource();
-				URI uri = childResource.getLocationURI();
-				if (!visited.contains(uri)) {
-					visited.add(uri);
-					toVisit.add(childResource);
-				}
-				return true;
+		resource.accept(proxy -> {
+			IResource childResource = proxy.requestResource();
+			URI uri = childResource.getLocationURI();
+			if (!visited.contains(uri)) {
+				visited.add(uri);
+				toVisit.add(childResource);
 			}
+			return true;
 		}, IResource.NONE);
 		return toVisit;
 	}
@@ -1050,44 +1039,41 @@ public class ResourceInfoPage extends PropertyPage {
 	}
 
 	private void scheduleRecursiveChangesJob(final IResource resource, final List/*<IResourceChange>*/ changes) {
-		new Job(IDEWorkbenchMessages.ResourceInfo_recursiveChangesJobName) {
-			@Override
-			protected IStatus run(final IProgressMonitor monitor) {
-				try {
-					List/*<IResource>*/ toVisit = getResourcesToVisit(resource);
+		Job.create(IDEWorkbenchMessages.ResourceInfo_recursiveChangesJobName, monitor -> {
+			try {
+				List/*<IResource>*/ toVisit = getResourcesToVisit(resource);
 
-					// Prepare the monitor for the given amount of work
-					monitor.beginTask(
-							IDEWorkbenchMessages.ResourceInfo_recursiveChangesJobName,
-							toVisit.size());
+				// Prepare the monitor for the given amount of work
+				monitor.beginTask(
+						IDEWorkbenchMessages.ResourceInfo_recursiveChangesJobName,
+						toVisit.size());
 
-					// Apply changes recursively
-					for (Iterator/*<IResource>*/ it = toVisit.iterator(); it.hasNext();) {
-						if (monitor.isCanceled())
-							throw new OperationCanceledException();
-						IResource childResource = (IResource) it.next();
-						monitor.subTask(NLS
-								.bind(IDEWorkbenchMessages.ResourceInfo_recursiveChangesSubTaskName,
-										childResource.getFullPath()));
-						for (int i = 0; i < changes.size(); i++) {
-							((IResourceChange) changes.get(i))
-									.performChange(childResource);
-						}
-						monitor.worked(1);
+				// Apply changes recursively
+				for (Iterator/*<IResource>*/ it = toVisit.iterator(); it.hasNext();) {
+					if (monitor.isCanceled())
+						throw new OperationCanceledException();
+					IResource childResource = (IResource) it.next();
+					monitor.subTask(NLS
+							.bind(IDEWorkbenchMessages.ResourceInfo_recursiveChangesSubTaskName,
+									childResource.getFullPath()));
+					for (int i = 0; i < changes.size(); i++) {
+						((IResourceChange) changes.get(i))
+								.performChange(childResource);
 					}
-				} catch (CoreException e) {
-					IDEWorkbenchPlugin
-							.log(IDEWorkbenchMessages.ResourceInfo_recursiveChangesError,
-									e.getStatus());
-					return e.getStatus();
-				} catch (OperationCanceledException e) {
-					return Status.CANCEL_STATUS;
-				} finally {
-					monitor.done();
+					monitor.worked(1);
 				}
-				return Status.OK_STATUS;
+			} catch (CoreException e1) {
+				IDEWorkbenchPlugin
+						.log(IDEWorkbenchMessages.ResourceInfo_recursiveChangesError,
+								e1.getStatus());
+				return e1.getStatus();
+			} catch (OperationCanceledException e2) {
+				return Status.CANCEL_STATUS;
+			} finally {
+				monitor.done();
 			}
-		}.schedule();
+			return Status.OK_STATUS;
+		}).schedule();
 	}
 
 	/**
