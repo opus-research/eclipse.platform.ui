@@ -71,7 +71,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 /**
  * Activities preference page that primarily shows categories and can optionally
- * show an advanced dialog that allows fine-tune adjustment of activities. This
+ * show an advanced dialog that allows fine-tune adjustmenet of activities. This
  * page may be used by product developers to provide basic ability to tweak the
  * enabled activity set. You may provide certain strings to this class via
  * method #2 of {@link org.eclipse.core.runtime.IExecutableExtension}.
@@ -572,8 +572,8 @@ public final class ActivityCategoryPreferencePage extends PreferencePage impleme
         descriptionText.setText(""); //$NON-NLS-1$
     }
 
-    @Override
-	public void init(IWorkbench workbench) {
+	@Override
+    public void init(IWorkbench workbench) {
         this.workbench = workbench;
         workingCopy = workbench.getActivitySupport().createWorkingCopy();
         setPreferenceStore(WorkbenchPlugin.getDefault().getPreferenceStore());
@@ -624,9 +624,9 @@ public final class ActivityCategoryPreferencePage extends PreferencePage impleme
         
         workingCopy.setEnabledActivityIds(defaultEnabled);
     }
-
-    @Override
-	public void setInitializationData(IConfigurationElement config,
+    
+	@Override
+    public void setInitializationData(IConfigurationElement config,
             String propertyName, Object data) {
         if (data instanceof Hashtable) {
             Hashtable table = (Hashtable)data;
