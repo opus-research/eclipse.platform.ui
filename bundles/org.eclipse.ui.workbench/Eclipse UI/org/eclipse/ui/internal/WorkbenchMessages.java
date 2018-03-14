@@ -12,12 +12,7 @@
  * Tristan Hume - <trishume@gmail.com> -
  * 		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  * 		Implemented workbench auto-save to correctly restore state in case of crash.
-<<<<<<< Upstream, based on origin/master
  * Andrey Loskutov <loskutov@gmx.de> - Bug 388476, 445538, 463262
-=======
- * Andrey Loskutov <loskutov@gmx.de> - Bug 388476, 445538
- * Bartosz Popiela <bartoszpop@gmail.com> - Bug 434108
->>>>>>> 461ce37 Bug 434108 - [Perspectives] Copy Worbench Layout option does not work in Eclipse 4.x
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -1121,6 +1116,7 @@ public class WorkbenchMessages extends NLS {
 
 	//Settings transfer
 	public static String WorkbenchLayoutSettings_Name;
+	public static String WorkbenchSettings_CouldNotCreateDirectories;
 	public static String WorkbenchSettings_CouldNotFindLocation;
 	public static String WorkingSets_Name;
 	public static String WorkingSets_CannotSave;
