@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.eclipse.jface.resource;
 
+import java.net.URL;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +19,8 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
@@ -461,7 +464,17 @@ public class JFaceResources {
 	private static final void declareImage(Object bundle, String key, String path, Class<?> fallback,
 			String fallbackPath) {
 
-		ImageDescriptor descriptor = LazyImageDescriptor.initFromFileName((Bundle) bundle, path, fallback, fallbackPath);
+		ImageDescriptor descriptor = null;
+
+		if (bundle != null) {
+			URL url = FileLocator.find((Bundle) bundle, new Path(path), null);
+			if (url != null)
+				descriptor = ImageDescriptor.createFromURL(url);
+		}
+
+		// If we failed then load from the backup file
+		if (descriptor == null)
+			descriptor = ImageDescriptor.createFromFile(fallback, fallbackPath);
 
 		imageRegistry.put(key, descriptor);
 	}
