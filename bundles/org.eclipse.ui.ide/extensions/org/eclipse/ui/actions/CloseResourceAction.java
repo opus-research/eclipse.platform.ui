@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 41431, 462760, 461786
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 41431, 462760
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -40,7 +40,6 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
@@ -302,7 +301,7 @@ public class CloseResourceAction extends WorkspaceAction implements IResourceCha
 			public void run() {
 				SafeRunner.run(new SafeRunnable(IDEWorkbenchMessages.ErrorOnCloseEditors) {
 					@Override
-					public void run() {
+					public void run() throws CoreException {
 						IWorkbenchWindow w = getActiveWindow();
 						if (w != null) {
 							List<IEditorReference> toClose = getMatchingEditors(resourceRoots, w, deletedOnly);
@@ -330,7 +329,7 @@ public class CloseResourceAction extends WorkspaceAction implements IResourceCha
 	}
 
 	private static List<IEditorReference> getMatchingEditors(final List<? extends IResource> resourceRoots,
-			IWorkbenchWindow w, boolean deletedOnly) {
+			IWorkbenchWindow w, boolean deletedOnly) throws CoreException {
 		List<IEditorReference> toClose = new ArrayList<>();
 		IEditorReference[] editors = getEditors(w);
 		for (IEditorReference ref : editors) {
@@ -356,14 +355,8 @@ public class CloseResourceAction extends WorkspaceAction implements IResourceCha
 		return new IEditorReference[0];
 	}
 
-	private static IResource getAdapter(IEditorReference ref) {
-		IEditorInput input;
-		try {
-			input = ref.getEditorInput();
-		} catch (PartInitException e) {
-			// ignore if factory can't restore input, see bug 461786
-			return null;
-		}
+	private static IResource getAdapter(IEditorReference ref) throws CoreException {
+		IEditorInput input = ref.getEditorInput();
 		if (input instanceof FileEditorInput) {
 			FileEditorInput fi = (FileEditorInput) input;
 			IFile file = fi.getFile();
@@ -372,6 +365,7 @@ public class CloseResourceAction extends WorkspaceAction implements IResourceCha
 			}
 		}
 		// here we can only guess how the input might be related to a resource
+
 		IFile adapter = Util.getAdapter(input, IFile.class);
 		if (adapter != null) {
 			return adapter;
