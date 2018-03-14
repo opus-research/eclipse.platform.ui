@@ -47,13 +47,13 @@ public class NavigatorFilterService implements INavigatorFilterService {
 	private final NavigatorContentService contentService;
 
 	/* Map of (ICommonFilterDescriptor, ViewerFilter)-pairs */
-	private final Map declaredViewerFilters = new HashMap();
+	private final Map<ICommonFilterDescriptor, ViewerFilter> declaredViewerFilters = new HashMap<ICommonFilterDescriptor, ViewerFilter>();
 
 	/* Set of ViewerFilters enforced from visible/active content extensions */
 	private final Set enforcedViewerFilters = new HashSet();
 
 	/* A set of active filter String ids */
-	private final Set activeFilters = new HashSet();
+	private final Set<String> activeFilters = new HashSet<String>();
 
 	/**
 	 * @param aContentService
@@ -66,6 +66,7 @@ public class NavigatorFilterService implements INavigatorFilterService {
 
 	private synchronized void restoreFilterActivation() {
 		SafeRunner.run(new NavigatorSafeRunnable() {
+			@Override
 			public void run() throws Exception {
 				IEclipsePreferences prefs = NavigatorContentService.getPreferencesRoot();
 
@@ -89,11 +90,7 @@ public class NavigatorFilterService implements INavigatorFilterService {
 		});
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.navigator.INavigatorFilterService#persistFilterActivationState()
-	 */
+	@Override
 	public void persistFilterActivationState() {
 
 		synchronized (activeFilters) {
@@ -106,7 +103,7 @@ public class NavigatorFilterService implements INavigatorFilterService {
 			 */
 			StringBuffer activatedFiltersPreferenceValue = new StringBuffer(DELIM);
 
-			for (Iterator activeItr = activeFilters.iterator(); activeItr.hasNext();) {
+			for (Iterator<String> activeItr = activeFilters.iterator(); activeItr.hasNext();) {
 				String id = activeItr.next().toString();
 				if (!dm.getFilterById(id).isVisibleInUi())
 					continue;
@@ -136,16 +133,12 @@ public class NavigatorFilterService implements INavigatorFilterService {
 		return contentService.getViewerId() + ACTIVATION_KEY;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.navigator.INavigatorFilterService#getVisibleFilters(boolean)
-	 */
+	@Override
 	public ViewerFilter[] getVisibleFilters(boolean toReturnOnlyActiveFilters) {
 		CommonFilterDescriptor[] descriptors = CommonFilterDescriptorManager
 				.getInstance().findVisibleFilters(contentService);
 
-		List filters = new ArrayList();
+		List<ViewerFilter> filters = new ArrayList<ViewerFilter>();
 
 		ViewerFilter instance;
 		for (int i = 0; i < descriptors.length; i++) {
@@ -163,7 +156,7 @@ public class NavigatorFilterService implements INavigatorFilterService {
 		if (filters.size() == 0) {
 			return NO_FILTERS;
 		}
-		return (ViewerFilter[]) filters
+		return filters
 				.toArray(new ViewerFilter[filters.size()]);
 	}
 
@@ -173,10 +166,11 @@ public class NavigatorFilterService implements INavigatorFilterService {
 	 * @return A non-null ViewerFilter from the extension (or
 	 *         {@link SkeletonViewerFilter#INSTANCE}).
 	 */
+	@Override
 	public ViewerFilter getViewerFilter(ICommonFilterDescriptor descriptor) {
 		ViewerFilter filter = null;
 		synchronized (declaredViewerFilters) {
-			filter = (ViewerFilter) declaredViewerFilters.get(descriptor);
+			filter = declaredViewerFilters.get(descriptor);
 			if (filter == null) {
 				declaredViewerFilters.put(descriptor,
 						(filter = ((CommonFilterDescriptor) descriptor)
@@ -186,11 +180,7 @@ public class NavigatorFilterService implements INavigatorFilterService {
 		return filter;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.navigator.INavigatorFilterService#getVisibleFilterIds()
-	 */
+	@Override
 	public ICommonFilterDescriptor[] getVisibleFilterDescriptors() {
 		return CommonFilterDescriptorManager.getInstance().findVisibleFilters(
 				contentService);
@@ -204,22 +194,14 @@ public class NavigatorFilterService implements INavigatorFilterService {
 				contentService, CommonFilterDescriptorManager.FOR_UI);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.navigator.INavigatorFilterService#isActive(java.lang.String)
-	 */
+	@Override
 	public boolean isActive(String aFilterId) {
 		synchronized (activeFilters) {
 			return activeFilters.contains(aFilterId);
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.navigator.INavigatorFilterService#activateFilters(java.lang.String[])
-	 */
+	@Override
 	public void setActiveFilterIds(String[] theFilterIds) {
 		Assert.isNotNull(theFilterIds);
 		synchronized (activeFilters) {
@@ -228,6 +210,7 @@ public class NavigatorFilterService implements INavigatorFilterService {
 		}
 	}
 	
+	@Override
 	public void activateFilterIdsAndUpdateViewer(String[] filterIdsToActivate) {
 		boolean updateFilterActivation = false;
 
@@ -237,7 +220,7 @@ public class NavigatorFilterService implements INavigatorFilterService {
 
 		int indexofFilterIdToBeActivated;
 
-		List nonUiVisible = null;
+		List<String> nonUiVisible = null;
 		
 		/* is there a delta? */
 		for (int i = 0; i < visibleFilterDescriptors.length; i++) {
@@ -254,7 +237,7 @@ public class NavigatorFilterService implements INavigatorFilterService {
 			// We don't turn of non-UI visible filters here, they have to be manipulated explicitly
 			if (!visibleFilterDescriptors[i].isVisibleInUi()) {
 				if (nonUiVisible == null)
-					nonUiVisible = new ArrayList();
+					nonUiVisible = new ArrayList<String>();
 				nonUiVisible.add(visibleFilterDescriptors[i].getId());
 			}
 		}
@@ -264,7 +247,7 @@ public class NavigatorFilterService implements INavigatorFilterService {
 			if (nonUiVisible != null) {
 				for (int i = 0; i < filterIdsToActivate.length; i++)
 					nonUiVisible.add(filterIdsToActivate[i]);
-				filterIdsToActivate = (String[]) nonUiVisible.toArray(new String[]{});
+				filterIdsToActivate = nonUiVisible.toArray(new String[]{});
 			}
 			
 			setActiveFilterIds(filterIdsToActivate);

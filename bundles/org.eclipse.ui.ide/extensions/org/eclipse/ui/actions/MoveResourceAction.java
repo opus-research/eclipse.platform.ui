@@ -51,7 +51,8 @@ public class MoveResourceAction extends CopyResourceAction {
      * 
      * @deprecated {@link #MoveResourceAction(IShellProvider)}
      */
-    public MoveResourceAction(Shell shell) {
+    @Deprecated
+	public MoveResourceAction(Shell shell) {
         super(shell, IDEWorkbenchMessages.MoveResourceAction_text);
         initAction();
     }
@@ -77,10 +78,8 @@ public class MoveResourceAction extends CopyResourceAction {
 				IIDEHelpContextIds.MOVE_RESOURCE_ACTION);
     }
     
-    /* (non-Javadoc)
-     * Overrides method in CopyResourceAction
-     */
-    protected CopyFilesAndFoldersOperation createOperation() {
+    @Override
+	protected CopyFilesAndFoldersOperation createOperation() {
         return new MoveFilesAndFoldersOperation(getShell());
     }
 
@@ -93,20 +92,16 @@ public class MoveResourceAction extends CopyResourceAction {
         return destinations;
     }
 
-    /* (non-Javadoc)
-     * Overrides method in CopyResourceAction
-     */
-    protected IResource[] getResources(List resourceList) {
+    @Override
+	protected IResource[] getResources(List resourceList) {
         ReadOnlyStateChecker checker = new ReadOnlyStateChecker(getShell(),
                 IDEWorkbenchMessages.MoveResourceAction_title,
                 IDEWorkbenchMessages.MoveResourceAction_checkMoveMessage);
         return checker.checkReadOnlyResources(super.getResources(resourceList));
     }
 
-    /* (non-Javadoc)
-     * Overrides method in CopyResourceAction
-     */
-    protected void runOperation(IResource[] resources, IContainer destination) {
+    @Override
+	protected void runOperation(IResource[] resources, IContainer destination) {
         //Initialize the destinations
         destinations = new ArrayList();
         IResource[] copiedResources = operation.copyResources(resources,
@@ -118,10 +113,8 @@ public class MoveResourceAction extends CopyResourceAction {
         }
     }
     
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.actions.CopyResourceAction#run()
-     */
-    public void run() {
+    @Override
+	public void run() {
 		if (LTKLauncher.openMoveWizard(getStructuredSelection())) {
 			return;
 		}
