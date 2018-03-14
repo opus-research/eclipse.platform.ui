@@ -366,7 +366,11 @@ public class WBWRenderer extends SWTPartRenderer {
 		} else {
 			int style = SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.CLOSE | rtlStyle;
 			style = styleOverride == -1 ? style : styleOverride;
-			wbwShell = new Shell(parentShell, style);
+			if (wbwModel.getTags().contains(
+					IPresentationEngine.WINDOW_TOP_LEVEL))
+				wbwShell = new Shell(Display.getCurrent(), style);
+			else
+				wbwShell = new Shell(parentShell, style);
 
 			// Prevent ESC from closing the DW
 			wbwShell.addTraverseListener(new TraverseListener() {
