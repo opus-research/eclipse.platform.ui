@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,14 +10,15 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.about;
 
-import com.ibm.icu.text.Collator;
 import java.io.IOException;
 import java.net.URL;
+import com.ibm.icu.text.Collator;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+
 import org.eclipse.jface.resource.ImageDescriptor;
 
 /**
@@ -72,10 +73,10 @@ public abstract class AboutData {
      * @param infos
      */
     private static void reverse(AboutData[] infos) {
-		List<AboutData> infoList = Arrays.asList(infos);
+        List infoList = Arrays.asList(infos);
         Collections.reverse(infoList);
         for (int i = 0; i < infos.length; ++i) {
-			infos[i] = infoList.get(i);
+			infos[i] = (AboutData) infoList.get(i);
 		}
     }
 
@@ -97,12 +98,12 @@ public abstract class AboutData {
             return;
         }
 
-		Arrays.sort(infos, new Comparator<AboutData>() {
+        Arrays.sort(infos, new Comparator() {
             Collator collator = Collator.getInstance(Locale.getDefault());
 
-			public int compare(AboutData a, AboutData b) {
-				AboutData info1 = a;
-				AboutData info2 = b;
+            public int compare(Object a, Object b) {
+                AboutData info1 = (AboutData) a;
+                AboutData info2 = (AboutData) b;
 
                 String provider1 = info1.getProviderName();
                 String provider2 = info2.getProviderName();
@@ -133,12 +134,12 @@ public abstract class AboutData {
             return;
         }
 
-		Arrays.sort(infos, new Comparator<AboutData>() {
+        Arrays.sort(infos, new Comparator() {
             Collator collator = Collator.getInstance(Locale.getDefault());
 
-			public int compare(AboutData a, AboutData b) {
-				AboutData info1 = a;
-				AboutData info2 = b;
+            public int compare(Object a, Object b) {
+                AboutData info1 = (AboutData) a;
+                AboutData info2 = (AboutData) b;
                 return collator.compare(info1.getName(), info2.getName());
             }
         });
@@ -162,12 +163,12 @@ public abstract class AboutData {
             return;
         }
 
-		Arrays.sort(infos, new Comparator<AboutData>() {
+        Arrays.sort(infos, new Comparator() {
             Collator collator = Collator.getInstance(Locale.getDefault());
 
-			public int compare(AboutData a, AboutData b) {
-				AboutData info1 = a;
-				AboutData info2 = b;
+            public int compare(Object a, Object b) {
+                AboutData info1 = (AboutData) a;
+                AboutData info2 = (AboutData) b;
 
                 String version1 = info1.getVersion();
                 String version2 = info2.getVersion();
@@ -199,12 +200,12 @@ public abstract class AboutData {
             return;
         }
 
-		Arrays.sort(infos, new Comparator<AboutData>() {
+        Arrays.sort(infos, new Comparator() {
             Collator collator = Collator.getInstance(Locale.getDefault());
 
-			public int compare(AboutData a, AboutData b) {
-				AboutData info1 = a;
-				AboutData info2 = b;
+            public int compare(Object a, Object b) {
+                AboutData info1 = (AboutData) a;
+                AboutData info2 = (AboutData) b;
 
                 String id1 = info1.getId();
                 String id2 = info2.getId();
