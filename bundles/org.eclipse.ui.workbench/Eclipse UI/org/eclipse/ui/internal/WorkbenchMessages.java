@@ -12,6 +12,7 @@
  * Tristan Hume - <trishume@gmail.com> -
  * 		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  * 		Implemented workbench auto-save to correctly restore state in case of crash.
+ * Andrey Loskutov <loskutov@gmx.de> - Bug 388476
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -480,6 +481,7 @@ public class WorkbenchMessages extends NLS {
 	public static String ViewsPreference_currentThemeDescription;
 	public static String ViewsPreference_currentThemeFormat;
 	public static String ViewsPreference_enableAnimations;
+	public static String ViewsPreference_enableMRU;
 	public static String ViewsPreference_useColoredLabels;
 	// public static String ViewsPreference_override;
 	// public static String ViewsPreference_restartRequestJobName;
@@ -516,7 +518,6 @@ public class WorkbenchMessages extends NLS {
 	public static String EditorSelection_chooseAnEditor;
 	public static String EditorSelection_internal;
 	public static String EditorSelection_external;
-	public static String EditorSelection_rememberEditor;
 	public static String EditorSelection_browse;
 	public static String EditorSelection_title;
 

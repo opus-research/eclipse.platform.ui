@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Benjamin Muskalla -	Bug 29633 [EditorMgmt] "Open" menu should
  *     						have Open With-->Other
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 378485 
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -77,7 +76,7 @@ public class OpenWithMenu extends ContributionItem {
      * Match both the input and id, so that different types of editor can be opened on the same input.
      */
     private static final int MATCH_BOTH = IWorkbenchPage.MATCH_INPUT | IWorkbenchPage.MATCH_ID;
-    
+
     /*
      * Compares the labels from two IEditorDescriptor objects
      */
@@ -210,9 +209,11 @@ public class OpenWithMenu extends ContributionItem {
                 case SWT.Selection:
                    	EditorSelectionDialog dialog = new EditorSelectionDialog(
 							menu.getShell());
-					String fileName = fileResource.getName();
-					dialog.setFileName(fileName);
-					dialog.setMessage(NLS.bind(IDEWorkbenchMessages.OpenWithMenu_OtherDialogDescription, fileName));
+					dialog
+							.setMessage(NLS
+									.bind(
+											IDEWorkbenchMessages.OpenWithMenu_OtherDialogDescription,
+											fileResource.getName()));
 					if (dialog.open() == Window.OK) {
 						IEditorDescriptor editor = dialog.getSelectedEditor();
 						if (editor != null) {
@@ -289,11 +290,11 @@ public class OpenWithMenu extends ContributionItem {
             createMenuItem(menu, descriptor, preferredEditor);
         }
 		createDefaultMenuItem(menu, file, preferredEditor == null);
-        
+
         // add Other... menu item
         createOtherMenuItem(menu);
     }
-	
+
 
     /**
      * Converts the IAdaptable file to IFile or null.
@@ -302,12 +303,12 @@ public class OpenWithMenu extends ContributionItem {
         if (this.file instanceof IFile) {
             return (IFile) this.file;
         }
-        IResource resource = this.file
+        IResource resource = (IResource) this.file
                 .getAdapter(IResource.class);
         if (resource instanceof IFile) {
             return (IFile) resource;
         }
-       
+
         return null;
     }
 
@@ -339,7 +340,7 @@ public class OpenWithMenu extends ContributionItem {
         	} else {
 	            String editorId = editorDescriptor == null ? IEditorRegistry.SYSTEM_EXTERNAL_EDITOR_ID
 	                    : editorDescriptor.getId();
-	            
+
 	            page.openEditor(new FileEditorInput(file), editorId, true, MATCH_BOTH);
 	            // only remember the default editor if the open succeeds
 	            IDE.setDefaultEditor(file, editorId);
@@ -353,7 +354,7 @@ public class OpenWithMenu extends ContributionItem {
 
     /**
 	 * Creates the menu item for clearing the current selection.
-	 * 
+	 *
 	 * @param menu the menu to add the item to
 	 * @param file the file being edited
 	 * @param markAsSelected <code>true</code> if the item should marked as selected
