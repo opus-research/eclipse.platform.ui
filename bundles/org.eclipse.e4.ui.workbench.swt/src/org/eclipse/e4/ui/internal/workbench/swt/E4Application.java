@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import org.eclipse.core.databinding.observable.Realm;
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
@@ -359,8 +358,6 @@ public class E4Application implements IApplication {
 				appModelPath = brandingBundle.getSymbolicName() + "/"
 						+ E4Application.APPLICATION_MODEL_PATH_DEFAULT;
 		}
-		Assert.isNotNull(appModelPath, IWorkbench.XMI_URI_ARG
-				+ " argument missing"); //$NON-NLS-1$
 
 		URI initialWorkbenchDefinitionInstance;
 
