@@ -686,7 +686,8 @@ public class PerspectiveSwitcher {
 	}
 
 	private void closePerspective(MPerspective persp) {
-		WorkbenchPage page = (WorkbenchPage) window.getContext().get(IWorkbenchPage.class);
+		MWindow win = modelService.getTopLevelWindowFor(persp);
+		WorkbenchPage page = (WorkbenchPage) win.getContext().get(IWorkbenchPage.class);
 		String perspectiveId = persp.getElementId();
 		IPerspectiveDescriptor desc = getDescriptorFor(perspectiveId);
 		page.closePerspective(desc, perspectiveId, true, true);
