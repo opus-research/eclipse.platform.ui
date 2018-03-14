@@ -37,6 +37,7 @@
 				<configuration>
 					<includes>
 						<include>${testSuiteJFace}</include>
+						<include>${testSuiteUITests}</include>
 					</includes>
 					<useUIHarness>true</useUIHarness>
 					<useUIThread>true</useUIThread>
