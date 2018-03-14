@@ -7,8 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 420956
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 420956 - Fix perspective customization on 4.x
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs.cpd;
 
