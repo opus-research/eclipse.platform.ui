@@ -26,23 +26,17 @@ import org.eclipse.swt.widgets.Control;
  * <p>
  * This class is not intended to be subclassed. It is designed to be
  * instantiated with a pre-existing SWT <code>List</code> control and configured
- * with a domain-specific content provider, label provider, element filter
- * (optional), and element sorter (optional).
+ * with a domain-specific content provider, label provider, element filter (optional),
+ * and element sorter (optional).
  * <p>
- * Note that the SWT <code>List</code> control only supports the display of
- * strings, not icons. If you need to show icons for items, use
- * <code>TableViewer</code> instead.
+ * Note that the SWT <code>List</code> control only supports the display of strings, not icons.
+ * If you need to show icons for items, use <code>TableViewer</code> instead.
  * </p>
- * 
- * @param <E>
- *            Type of an element of the model
- * @param <I>
- *            Type of the input
  *
  * @see TableViewer
  * @noextend This class is not intended to be subclassed by clients.
  */
-public class ListViewer<E,I> extends AbstractListViewer<E,I> {
+public class ListViewer extends AbstractListViewer {
 
     /**
      * This viewer's list control.
@@ -101,7 +95,7 @@ public class ListViewer<E,I> extends AbstractListViewer<E,I> {
     }
 
     @Override
-	public void reveal(E element) {
+	public void reveal(Object element) {
         Assert.isNotNull(element);
         int index = getElementIndex(element);
         if (index == -1) {
@@ -186,7 +180,7 @@ public class ListViewer<E,I> extends AbstractListViewer<E,I> {
     }
 
 	@Override
-	protected void setSelectionToWidget(List<E> in, boolean reveal) {
+	protected void setSelectionToWidget(List in, boolean reveal) {
 		if( reveal ) {
 			super.setSelectionToWidget(in, reveal);
 		} else {
@@ -197,7 +191,7 @@ public class ListViewer<E,I> extends AbstractListViewer<E,I> {
 	            int[] ixs = new int[n];
 	            int count = 0;
 	            for (int i = 0; i < n; ++i) {
-	                E el = in.get(i);
+	                Object el = in.get(i);
 	                int ix = getElementIndex(el);
 	                if (ix >= 0) {
 						ixs[count++] = ix;

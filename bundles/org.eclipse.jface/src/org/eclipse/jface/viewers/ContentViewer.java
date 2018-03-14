@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Hendrik Still <hendrik.still@gammas.de> - bug 412273
  *     Steven Spungin <steven@spungin.tv> - Bug 401439
  *******************************************************************************/
 package org.eclipse.jface.viewers;
@@ -49,27 +48,25 @@ import org.eclipse.swt.widgets.Control;
  * support selections (<code>setSelection</code>, <code>getSelection</code>)
  * </ul>
  * </p>
- * @param <E> Type of an element of the model
- * @param <I> Type of the input
  */
-public abstract class ContentViewer<E,I> extends Viewer<I>{
+public abstract class ContentViewer extends Viewer {
 
     /**
      * This viewer's content provider, or <code>null</code> if none.
      */
-    private IContentProvider<? super I> contentProvider = null;
+    private IContentProvider contentProvider = null;
 
     /**
      * This viewer's input, or <code>null</code> if none.
      * The viewer's input provides the "model" for the viewer's content.
      */
-    private I input = null;
+    private Object input = null;
 
     /**
      * This viewer's label provider. Initially <code>null</code>, but
      * lazily initialized (to a <code>SimpleLabelProvider</code>).
      */
-    private IBaseLabelProvider<E> labelProvider = null;
+    private IBaseLabelProvider labelProvider = null;
 
     /**
      * This viewer's label provider listener.
@@ -77,11 +74,11 @@ public abstract class ContentViewer<E,I> extends Viewer<I>{
      * a label provider avoids having to define public methods
      * for internal events.
      */
-    private final ILabelProviderListener<E> labelProviderListener = new ILabelProviderListener<E>() {
+    private final ILabelProviderListener labelProviderListener = new ILabelProviderListener() {
     	private boolean logWhenDisposed = true; // initially true, set to false
-        
-		@Override
-        public void labelProviderChanged(LabelProviderChangedEvent<E> event) {
+
+        @Override
+		public void labelProviderChanged(LabelProviderChangedEvent event) {
         	Control control = getControl();
         	if (control == null || control.isDisposed()) {
     			if (logWhenDisposed) {
@@ -124,7 +121,7 @@ public abstract class ContentViewer<E,I> extends Viewer<I>{
      *
      * @return the content provider, or <code>null</code> if none
      */
-    public IContentProvider<? super I> getContentProvider() {
+    public IContentProvider getContentProvider() {
         return contentProvider;
     }
 
@@ -135,7 +132,7 @@ public abstract class ContentViewer<E,I> extends Viewer<I>{
      * content.
      */
     @Override
-	public I getInput() {
+	public Object getInput() {
         return input;
     }
 
@@ -153,9 +150,9 @@ public abstract class ContentViewer<E,I> extends Viewer<I>{
      *
      * @return a label provider
      */
-    public IBaseLabelProvider<E> getLabelProvider() {
+    public IBaseLabelProvider getLabelProvider() {
         if (labelProvider == null) {
-			labelProvider = new LabelProvider<>();
+			labelProvider = new LabelProvider();
 		}
         return labelProvider;
     }
@@ -202,7 +199,7 @@ public abstract class ContentViewer<E,I> extends Viewer<I>{
      * </p>
      * @param event the change event
      */
-    protected void handleLabelProviderChanged(LabelProviderChangedEvent<E> event) {
+    protected void handleLabelProviderChanged(LabelProviderChangedEvent event) {
         labelProviderChanged();
     }
 
@@ -223,7 +220,7 @@ public abstract class ContentViewer<E,I> extends Viewer<I>{
      */
     protected void hookControl(Control control) {
         control.addDisposeListener(new DisposeListener() {
-			@Override
+            @Override
 			public void widgetDisposed(DisposeEvent event) {
                 handleDispose(event);
             }
@@ -254,12 +251,12 @@ public abstract class ContentViewer<E,I> extends Viewer<I>{
      * @param contentProvider the content provider
      * @see #getContentProvider
      */
-    public void setContentProvider(IContentProvider<? super I> contentProvider) {
+    public void setContentProvider(IContentProvider contentProvider) {
         Assert.isNotNull(contentProvider);
-        IContentProvider<? super I> oldContentProvider = this.contentProvider;
+        IContentProvider oldContentProvider = this.contentProvider;
         this.contentProvider = contentProvider;
         if (oldContentProvider != null) {
-            I currentInput = getInput();
+            Object currentInput = getInput();
             oldContentProvider.inputChanged(this, currentInput, null);
             oldContentProvider.dispose();
             contentProvider.inputChanged(this, null, currentInput);
@@ -276,7 +273,7 @@ public abstract class ContentViewer<E,I> extends Viewer<I>{
      * if required.
      */
     @Override
-	public void setInput(I input) {
+	public void setInput(Object input) {
     	Control control = getControl();
 		if (control == null || control.isDisposed()) {
 			throw new IllegalStateException(
@@ -287,7 +284,7 @@ public abstract class ContentViewer<E,I> extends Viewer<I>{
                 .isTrue(getContentProvider() != null,
                         "ContentViewer must have a content provider when input is set."); //$NON-NLS-1$
 
-        I oldInput = getInput();
+        Object oldInput = getInput();
         contentProvider.inputChanged(this, oldInput, input);
         this.input = input;
 
@@ -308,8 +305,8 @@ public abstract class ContentViewer<E,I> extends Viewer<I>{
      *
      * @param labelProvider the label provider, or <code>null</code> if none
      */
-    public void setLabelProvider(IBaseLabelProvider<E> labelProvider) {
-        IBaseLabelProvider<E> oldProvider = this.labelProvider;
+    public void setLabelProvider(IBaseLabelProvider labelProvider) {
+        IBaseLabelProvider oldProvider = this.labelProvider;
         // If it hasn't changed, do nothing.
         // This also ensures that the provider is not disposed
         // if set a second time.
@@ -336,7 +333,7 @@ public abstract class ContentViewer<E,I> extends Viewer<I>{
 	 *
 	 * @since 3.4
 	 */
-	void internalDisposeLabelProvider(IBaseLabelProvider<E> oldProvider) {
+	void internalDisposeLabelProvider(IBaseLabelProvider oldProvider) {
 		oldProvider.dispose();
 	}
 }

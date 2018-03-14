@@ -17,13 +17,10 @@ import org.eclipse.core.commands.common.NotDefinedException;
 /**
  * A label provider for instances of <code>NamedHandlerObject</code>, which
  * exposes the name as the label.
- * 
- * @param <E>
- *            Type of an element of the model
  *
  * @since 3.2
  */
-public final class NamedHandleObjectLabelProvider<E> extends LabelProvider<E> {
+public final class NamedHandleObjectLabelProvider extends LabelProvider {
 
 	/**
 	 * The text of the element is simply the name of the element if its a
@@ -37,7 +34,7 @@ public final class NamedHandleObjectLabelProvider<E> extends LabelProvider<E> {
 	 *         name or if the element is not a named handle object.
 	 */
 	@Override
-	public final String getText(final E element) {
+	public final String getText(final Object element) {
 		if (element instanceof NamedHandleObject) {
 			try {
 				return ((NamedHandleObject) element).getName();
