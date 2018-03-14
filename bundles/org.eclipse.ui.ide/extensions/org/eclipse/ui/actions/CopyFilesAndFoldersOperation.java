@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Serge Beauchamp (Freescale Semiconductor) - Bug 229633
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472784
+ *     Serge Beauchamp (Freescale Semiconductor) - [229633] Group Support
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -342,7 +341,7 @@ public class CopyFilesAndFoldersOperation {
 				MessageDialog dialog = new MessageDialog(
 						messageShell,
 						IDEWorkbenchMessages.CopyFilesAndFoldersOperation_resourceExists,
-						null, message, MessageDialog.QUESTION, 0, labels) {
+						null, message, MessageDialog.QUESTION, labels, 0) {
 					@Override
 					protected int getShellStyle() {
 						return super.getShellStyle() | SWT.SHEET;
@@ -1422,7 +1421,7 @@ public class CopyFilesAndFoldersOperation {
 						MessageDialog dialog = new MessageDialog(
 								messageShell,
 								IDEWorkbenchMessages.CopyFilesAndFoldersOperation_question,
-								null, msg, MessageDialog.QUESTION, 0, options) {
+								null, msg, MessageDialog.QUESTION, options, 0) {
 							@Override
 							protected int getShellStyle() {
 								return super.getShellStyle() | SWT.SHEET;

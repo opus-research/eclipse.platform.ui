@@ -77,6 +77,13 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 	private IWorkbenchWindow lastWindow;
 //	private IServiceLocator locator;
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.ui.AbstractSourceProvider#initialize(org.eclipse.ui.services
+	 * .IServiceLocator)
+	 */
 	@Override
 	public void initialize(IServiceLocator locator) {
 //		this.locator = locator;
@@ -90,6 +97,11 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 		display.addFilter(SWT.Activate, listener);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.ISourceProvider#dispose()
+	 */
 	@Override
 	public void dispose() {
 		if (lastWindow != null)
@@ -103,11 +115,21 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 		lastWindow = null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.ISourceProvider#getProvidedSourceNames()
+	 */
 	@Override
 	public String[] getProvidedSourceNames() {
 		return PROVIDED_SOURCE_NAMES;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.ISourceProvider#getCurrentState()
+	 */
 	@Override
 	public Map getCurrentState() {
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472784
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -233,11 +232,11 @@ public class ReadOnlyStateChecker {
         final MessageDialog dialog = new MessageDialog(this.shell,
                 this.titleMessage, null, MessageFormat.format(this.mainMessage,
                         new Object[] { resource.getName() }),
-                		MessageDialog.QUESTION, 0,
+                MessageDialog.QUESTION, new String[] {
                         IDialogConstants.YES_LABEL,
                         IDialogConstants.YES_TO_ALL_LABEL,
                         IDialogConstants.NO_LABEL,
-                        IDialogConstants.CANCEL_LABEL) {
+                        IDialogConstants.CANCEL_LABEL }, 0) {
         	@Override
 			protected int getShellStyle() {
         		return super.getShellStyle() | SWT.SHEET;

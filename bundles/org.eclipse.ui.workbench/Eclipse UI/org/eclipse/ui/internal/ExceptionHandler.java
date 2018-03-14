@@ -37,6 +37,9 @@ public final class ExceptionHandler implements Window.IExceptionHandler {
         // prevents instantiation
     }
 
+    /* (non-javadoc)
+     * @see org.eclipse.jface.window.Window.IExceptionHandler#handleException
+     */
     @Override
 	public void handleException(Throwable t) {
         try {
