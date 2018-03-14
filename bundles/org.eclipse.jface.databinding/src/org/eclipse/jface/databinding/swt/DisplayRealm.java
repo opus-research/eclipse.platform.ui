@@ -1,12 +1,22 @@
 /*******************************************************************************
- * Copyright (c) 2014 vogella GmbH and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Simon Scholz <simon.scholz@vogella.com> - initial API and implementation based on SWTObservable.getRealm
+ *     IBM Corporation - initial API and implementation
+ *     Matt Carter - bug 170668
+ *     Brad Reynolds - bug 170848
+ *     Matthew Hall - bugs 180746, 207844, 245647, 248621, 232917, 194734,
+ *                    195222, 256543, 213893, 262320, 264286, 266563, 306203
+ *     Michael Krauter - bug 180223
+ *     Boris Bokowski - bug 245647
+ *     Tom Schindl - bug 246462
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 327086
+ *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 413611
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 449022
  *******************************************************************************/
 package org.eclipse.jface.databinding.swt;
 
@@ -19,7 +29,7 @@ import org.eclipse.swt.widgets.Display;
 /**
  * This class is used to get a {@link Realm} for a certain {@link Display}.
  *
- * @since 1.7
+ * @since 1.6
  *
  */
 public class DisplayRealm extends Realm {

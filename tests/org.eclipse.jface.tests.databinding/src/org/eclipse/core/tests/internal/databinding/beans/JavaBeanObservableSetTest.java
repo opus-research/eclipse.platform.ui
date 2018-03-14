@@ -62,9 +62,9 @@ public class JavaBeanObservableSetTest extends AbstractDefaultRealmTestCase {
 		propertyDescriptor = ((IBeanProperty) BeanProperties.set(Bean.class,
 				propertyName)).getPropertyDescriptor();
 
-		observableSet = BeansObservables
-				.observeSet(DisplayRealm.getRealm(Display.getDefault()),
-						bean, propertyName, Bean.class);
+		observableSet = BeansObservables.observeSet(
+				DisplayRealm.getRealm(Display.getDefault()), bean,
+				propertyName, Bean.class);
 		beanObservable = (IBeanObservable) observableSet;
 		listener = new SetChangeEventTracker();
 	}
@@ -139,10 +139,10 @@ public class JavaBeanObservableSetTest extends AbstractDefaultRealmTestCase {
 				.observe(observable);
 		bean.setSet(Collections.singleton("new"));
 		assertEquals(1, tracker.count);
-		assertEquals(Collections.singleton("old"), tracker.event.diff
-				.getRemovals());
-		assertEquals(Collections.singleton("new"), tracker.event.diff
-				.getAdditions());
+		assertEquals(Collections.singleton("old"),
+				tracker.event.diff.getRemovals());
+		assertEquals(Collections.singleton("new"),
+				tracker.event.diff.getAdditions());
 	}
 
 	public void testModifyObservableSet_FiresSetChange() {
@@ -155,8 +155,8 @@ public class JavaBeanObservableSetTest extends AbstractDefaultRealmTestCase {
 		observable.add(element);
 
 		assertEquals(1, tracker.count);
-		assertDiff(tracker.event.diff, Collections.EMPTY_SET, Collections
-				.singleton(element));
+		assertDiff(tracker.event.diff, Collections.EMPTY_SET,
+				Collections.singleton(element));
 	}
 
 	public void testSetBeanPropertyOutsideRealm_FiresEventInsideRealm() {
@@ -173,8 +173,8 @@ public class JavaBeanObservableSetTest extends AbstractDefaultRealmTestCase {
 
 		realm.setCurrent(true);
 		assertEquals(1, tracker.count);
-		assertDiff(tracker.event.diff, Collections.EMPTY_SET, Collections
-				.singleton("element"));
+		assertDiff(tracker.event.diff, Collections.EMPTY_SET,
+				Collections.singleton("element"));
 	}
 
 	/**
@@ -210,8 +210,8 @@ public class JavaBeanObservableSetTest extends AbstractDefaultRealmTestCase {
 	}
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite(JavaBeanObservableSetTest.class
-				.getName());
+		TestSuite suite = new TestSuite(
+				JavaBeanObservableSetTest.class.getName());
 		suite.addTestSuite(JavaBeanObservableSetTest.class);
 		suite.addTest(MutableObservableSetContractTest.suite(new Delegate()));
 		return suite;
