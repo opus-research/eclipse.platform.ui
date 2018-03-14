@@ -12,7 +12,6 @@
  *     Tristan Hume - <trishume@gmail.com> -
  *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  *     		Implemented workbench auto-save to correctly restore state in case of crash.
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422533
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -141,7 +140,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IDecoratorManager;
-import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IElementFactory;
@@ -164,7 +162,6 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkingSetManager;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.Saveable;
 import org.eclipse.ui.WorkbenchException;
@@ -316,10 +313,15 @@ public final class Workbench extends EventManager implements IWorkbench {
 				}
 			}
 
-			if (bundleName != null) {
-				String taskName = NLS.bind(WorkbenchMessages.Startup_Loading, bundleName);
-				progressMonitor.subTask(taskName);
+			String taskName;
+
+			if (bundleName == null) {
+				taskName = WorkbenchMessages.Startup_Loading_Workbench;
+			} else {
+				taskName = NLS.bind(WorkbenchMessages.Startup_Loading, bundleName);
 			}
+
+			progressMonitor.subTask(taskName);
 		}
 	}
 
@@ -589,11 +591,8 @@ public final class Workbench extends EventManager implements IWorkbench {
 
 					AbstractSplashHandler handler = getSplash();
 
-					boolean showProgress = PrefUtil.getAPIPreferenceStore().getBoolean(
-									IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP);
-
 					IProgressMonitor progressMonitor = null;
-					if (handler != null && showProgress) {
+					if (handler != null) {
 						progressMonitor = handler.getBundleProgressMonitor();
 						if (progressMonitor != null) {
 							double cutoff = 0.95;
@@ -1913,43 +1912,20 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 */
 	private void setReference(MPart part, IEclipseContext context) {
 		String uri = part.getContributionURI();
-		if (CompatibilityPart.COMPATIBILITY_EDITOR_URI.equals(uri)) {
-			WorkbenchPage page = getWorkbenchPage(part);
-			EditorReference ref = page.getEditorReference(part);
-			if (ref == null) {
-				// If this editor was cloned from an existing editor (as
-				// part of a split...) then re-create a valid EditorReference
-				// from the existing editor's ref.
-				MPart clonedFrom = (MPart) part.getTransientData().get(
-						EModelService.CLONED_FROM_KEY);
-				if (clonedFrom != null && clonedFrom.getContext() != null) {
-					EditorReference originalRef = page.getEditorReference(clonedFrom);
-					if (originalRef != null) {
-						IEditorInput partInput = null;
-						String editorId = originalRef.getDescriptor().getId();
-						try {
-							partInput = originalRef.getEditorInput();
-						} catch (PartInitException e) {
-							System.out.println("Ooops !!!"); //$NON-NLS-1$
-						}
-						ref = page.createEditorReferenceForPart(part, partInput, editorId, null);
-					}
-				}
-
-				// Fallback code
-				if (ref == null) {
-					ref = createEditorReference(part, page);
-				}
-			}
-			context.set(EditorReference.class.getName(), ref);
-		} else {
-			// Create View References for 'e4' parts as well
+		if (CompatibilityPart.COMPATIBILITY_VIEW_URI.equals(uri)) {
 			WorkbenchPage page = getWorkbenchPage(part);
 			ViewReference ref = page.getViewReference(part);
 			if (ref == null) {
 				ref = createViewReference(part, page);
 			}
 			context.set(ViewReference.class.getName(), ref);
+		} else if (CompatibilityPart.COMPATIBILITY_EDITOR_URI.equals(uri)) {
+			WorkbenchPage page = getWorkbenchPage(part);
+			EditorReference ref = page.getEditorReference(part);
+			if (ref == null) {
+				ref = createEditorReference(part, page);
+			}
+			context.set(EditorReference.class.getName(), ref);
 		}
 	}
 
@@ -2836,18 +2812,18 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 */
 	public IWorkbenchPage showPerspective(String perspectiveId, IWorkbenchWindow window)
 			throws WorkbenchException {
-		return showPerspective(perspectiveId, window, advisor.getDefaultPageInput());
+		return showPerspective(perspectiveId, window, null);
 	}
 
-	private boolean activate(String perspectiveId, IWorkbenchPage page, IAdaptable input) {
+	private boolean activate(String perspectiveId, IWorkbenchPage page, IAdaptable input,
+			boolean checkPerspective) {
 		if (page != null) {
 			for (IPerspectiveDescriptor openedPerspective : page.getOpenPerspectives()) {
-				if (openedPerspective.getId().equals(perspectiveId)) {
+				if (!checkPerspective || openedPerspective.getId().equals(perspectiveId)) {
 					if (page.getInput() == input) {
 						WorkbenchWindow wwindow = (WorkbenchWindow) page.getWorkbenchWindow();
 						MWindow model = wwindow.getModel();
 						application.setSelectedElement(model);
-						page.setPerspective(openedPerspective);
 						return true;
 					}
 				}
@@ -2871,20 +2847,23 @@ UIEvents.Context.TOPIC_CONTEXT,
 
 		if (targetWindow != null) {
 			IWorkbenchPage page = targetWindow.getActivePage();
-			if (activate(perspectiveId, page, input)) {
+			if (activate(perspectiveId, page, input, true)) {
 				return page;
 			}
 		}
 
 		for (IWorkbenchWindow window : getWorkbenchWindows()) {
 			IWorkbenchPage page = window.getActivePage();
-			if (activate(perspectiveId, page, input)) {
+			if (activate(perspectiveId, page, input, true)) {
 				return page;
 			}
 		}
 
 		if (targetWindow != null) {
 			IWorkbenchPage page = targetWindow.getActivePage();
+			if (activate(perspectiveId, page, input, false)) {
+				return page;
+			}
 			IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
 			int mode = store.getInt(IPreferenceConstants.OPEN_PERSP_MODE);
 

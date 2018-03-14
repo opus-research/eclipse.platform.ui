@@ -65,7 +65,6 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
@@ -287,25 +286,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		}
 	}
 
-	/**
-	 * A filter to remove conflicting projects
-	 */
-	class ConflictingProjectFilter extends ViewerFilter {
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers
-		 * .Viewer, java.lang.Object, java.lang.Object)
-		 */
-		public boolean select(Viewer viewer, Object parentElement,
-				Object element) {
-			return !((ProjectRecord) element).hasConflicts;
-		}
-
-	}
-
 	// dialog store id constants
     private final static String STORE_DIRECTORIES = "WizardProjectsImportPage.STORE_DIRECTORIES";//$NON-NLS-1$
     private final static String STORE_ARCHIVES = "WizardProjectsImportPage.STORE_ARCHIVES";//$NON-NLS-1$
@@ -370,10 +350,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 	private WorkingSetGroup workingSetGroup;
 
 	private IStructuredSelection currentSelection;
-
-	private Button hideConflictingProjects;
-
-	private ConflictingProjectFilter conflictingProjectsFilter = new ConflictingProjectFilter();
 
 	/**
 	 * Creates a new project creation wizard page.
@@ -471,21 +447,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 				copyFiles = copyCheckbox.getSelection();
 			}
 		});
-
-		hideConflictingProjects = new Button(optionsGroup, SWT.CHECK);
-		hideConflictingProjects
-				.setText(DataTransferMessages.WizardProjectsImportPage_hideExistingProjects);
-		hideConflictingProjects.setLayoutData(new GridData(
-				GridData.FILL_HORIZONTAL));
-		hideConflictingProjects.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				projectsList.removeFilter(conflictingProjectsFilter);
-				if (hideConflictingProjects.getSelection()) {
-					projectsList.addFilter(conflictingProjectsFilter);
-				}
-			}
-		});
-		Dialog.applyDialogFont(hideConflictingProjects);
 	}
 
 	/**
@@ -1409,9 +1370,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 					structureProvider, this, fileSystemObjects);
 			operation.setContext(getShell());
 			operation.run(monitor);
-			IStatus status = operation.getStatus();
-			if (!status.isOK())
-				throw new InvocationTargetException(new CoreException(status));
 			return true;
 		}
 		// import from file system
@@ -1471,9 +1429,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 			// files
 			operation.setCreateContainerStructure(false);
 			operation.run(monitor);
-			IStatus status = operation.getStatus();
-			if (!status.isOK())
-				throw new InvocationTargetException(new CoreException(status));
 		}
 
 		return true;
