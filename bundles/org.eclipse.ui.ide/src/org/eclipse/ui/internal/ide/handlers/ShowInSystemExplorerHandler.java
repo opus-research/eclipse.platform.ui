@@ -21,7 +21,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.IJobFunction;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.services.statusreporter.StatusReporter;
 import org.eclipse.jface.util.Util;
@@ -63,9 +62,10 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 		final StatusReporter statusReporter = HandlerUtil.getActiveWorkbenchWindow(event).getService(
 				StatusReporter.class);
 
-		Job job = Job.create(IDEWorkbenchMessages.ShowInSystemExplorerHandler_jobTitle, new IJobFunction() {
+		Job job = new Job(IDEWorkbenchMessages.ShowInSystemExplorerHandler_jobTitle) {
+
 			@Override
-			public IStatus run(IProgressMonitor monitor) {
+			protected IStatus run(IProgressMonitor monitor) {
 				String logMsgPrefix;
 				try {
 					logMsgPrefix = event.getCommand().getName() + ": "; //$NON-NLS-1$
@@ -104,7 +104,7 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 				}
 				return Status.OK_STATUS;
 			}
-		});
+		};
 		job.schedule();
 		return null;
 	}
