@@ -208,10 +208,7 @@ public class ModelUtils {
 		} else if (element.getTransientData().get(CONTAINING_PARENT) instanceof MApplicationElement) {
 			return (MApplicationElement) element.getTransientData().get(CONTAINING_PARENT);
 		} else if (element instanceof EObject) {
-			EObject eContainer = ((EObject) element).eContainer();
-			if (eContainer instanceof MApplicationElement) {
-				return (MApplicationElement) eContainer;
-			}
+			return (MApplicationElement) ((EObject) element).eContainer();
 		}
 		return null;
 	}
