@@ -45,7 +45,6 @@ import org.eclipse.ui.internal.ide.dialogs.WelcomeEditorInput;
  * 
  * @deprecated the IDE now uses the new intro mechanism
  */
-@Deprecated
 public class QuickStartAction extends Action implements
         ActionFactory.IWorkbenchAction {
 
@@ -88,8 +87,7 @@ public class QuickStartAction extends Action implements
      * The user has invoked this action.  Prompts for a feature with a welcome page,
      * then opens the corresponding welcome page.
      */
-    @Override
-	public void run() {
+    public void run() {
         if (workbenchWindow == null) {
             // action has been disposed
             return;
@@ -258,8 +256,11 @@ public class QuickStartAction extends Action implements
         return true;
     }
 
-    @Override
-	public void dispose() {
+    /* (non-Javadoc)
+     * Method declared on ActionFactory.IWorkbenchAction.
+     * @since 3.0
+     */
+    public void dispose() {
         if (workbenchWindow == null) {
             // action has already been disposed
             return;

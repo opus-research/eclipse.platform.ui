@@ -28,7 +28,11 @@ public class DeclaredProgrammaticFactory extends ExtensionContributionFactory {
 		 */
 		public MyItem() {
 			super(new Action("MyItem") {
-				@Override
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see org.eclipse.jface.action.Action#getId()
+				 */
 				public String getId() {
 					return "myitem";
 				}
@@ -37,7 +41,6 @@ public class DeclaredProgrammaticFactory extends ExtensionContributionFactory {
 		}
 	}
 
-	@Override
 	public void createContributionItems(IServiceLocator serviceLocator,
 			IContributionRoot additions) {
 		additions.addContributionItem(new MyItem(), null);

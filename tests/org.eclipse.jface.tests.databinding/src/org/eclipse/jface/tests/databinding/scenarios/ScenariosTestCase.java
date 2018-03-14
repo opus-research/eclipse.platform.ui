@@ -18,7 +18,7 @@ import junit.framework.TestCase;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.jface.databinding.conformance.util.RealmTester;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.examples.databinding.model.SampleData;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
@@ -106,9 +106,8 @@ abstract public class ScenariosTestCase extends TestCase {
 		button.notifyListeners(SWT.Selection, null);
 	}
 
-	@Override
 	protected void setUp() throws Exception {
-		realm = DisplayRealm.getRealm(Display.getDefault());
+		realm = SWTObservables.getRealm(Display.getDefault());
 		RealmTester.setDefault(realm);
 
 		composite = new Composite(getShell(), SWT.NONE);
@@ -120,7 +119,6 @@ abstract public class ScenariosTestCase extends TestCase {
 		dummyText.setText("dummy");
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		realm = null;
 		getShell().setVisible(false); // same Shell may be reUsed across tests

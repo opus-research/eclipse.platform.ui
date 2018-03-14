@@ -103,8 +103,7 @@ public class WizardArchiveFileResourceImportPage1 extends
     /** (non-Javadoc)
      * Method declared on IDialogPage.
      */
-    @Override
-	public void createControl(Composite parent) {
+    public void createControl(Composite parent) {
         super.createControl(parent);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(getControl(),
                 IDataTransferHelpContextIds.ZIP_FILE_IMPORT_WIZARD_PAGE);
@@ -116,8 +115,7 @@ public class WizardArchiveFileResourceImportPage1 extends
      *
      *	@param parent org.eclipse.swt.widgets.Composite
      */
-    @Override
-	protected void createOptionsGroup(Composite parent) {
+    protected void createOptionsGroup(Composite parent) {
 
         // overwrite... checkbox
         overwriteExistingResourcesCheckbox = new Button(parent, SWT.CHECK);
@@ -168,8 +166,7 @@ public class WizardArchiveFileResourceImportPage1 extends
      *	Answer a boolean indicating whether the specified source currently exists
      *	and is valid (ie.- proper format)
      */
-    @Override
-	protected boolean ensureSourceIsValid() {
+    protected boolean ensureSourceIsValid() {
     	if (ArchiveFileManipulations.isTarFile(sourceNameField.getText())) {
     		return ensureTarSourceIsValid();
     	}
@@ -183,8 +180,7 @@ public class WizardArchiveFileResourceImportPage1 extends
      *
      * @return boolean
      */
-    @Override
-	public boolean finish() {
+    public boolean finish() {
         if (!super.finish()) {
 			return false;
 		}
@@ -208,11 +204,9 @@ public class WizardArchiveFileResourceImportPage1 extends
      * Returns a content provider for <code>FileSystemElement</code>s that returns
      * only files as children.
      */
-    @Override
-	protected ITreeContentProvider getFileProvider() {
+    protected ITreeContentProvider getFileProvider() {
         return new WorkbenchContentProvider() {
-            @Override
-			public Object[] getChildren(Object o) {
+            public Object[] getChildren(Object o) {
                 if (o instanceof MinimizedFileSystemElement) {
                     MinimizedFileSystemElement element = (MinimizedFileSystemElement) o;
                     AdaptableList l = element.getFiles(structureProvider);
@@ -228,8 +222,7 @@ public class WizardArchiveFileResourceImportPage1 extends
      *	currently-specified .zip file.  If this FileSystemElement is not
      *	currently defined then create and return it.
      */
-    @Override
-	protected MinimizedFileSystemElement getFileSystemTree() {
+    protected MinimizedFileSystemElement getFileSystemTree() {
 		disposeStructureProvider();
 
     	if(ArchiveFileManipulations.isTarFile(sourceNameField.getText())) {
@@ -254,11 +247,9 @@ public class WizardArchiveFileResourceImportPage1 extends
      * Returns a content provider for <code>FileSystemElement</code>s that returns
      * only folders as children.
      */
-    @Override
-	protected ITreeContentProvider getFolderProvider() {
+    protected ITreeContentProvider getFolderProvider() {
         return new WorkbenchContentProvider() {
-            @Override
-			public Object[] getChildren(Object o) {
+            public Object[] getChildren(Object o) {
                 if (o instanceof MinimizedFileSystemElement) {
                     MinimizedFileSystemElement element = (MinimizedFileSystemElement) o;
                     AdaptableList l = element.getFolders(structureProvider);
@@ -267,8 +258,7 @@ public class WizardArchiveFileResourceImportPage1 extends
                 return new Object[0];
             }
 
-            @Override
-			public boolean hasChildren(Object o) {
+            public boolean hasChildren(Object o) {
                 if (o instanceof MinimizedFileSystemElement) {
                     MinimizedFileSystemElement element = (MinimizedFileSystemElement) o;
                     if (element.isPopulated()) {
@@ -286,8 +276,7 @@ public class WizardArchiveFileResourceImportPage1 extends
     /**
      *	Answer the string to display as the label for the source specification field
      */
-    @Override
-	protected String getSourceLabel() {
+    protected String getSourceLabel() {
         return DataTransferMessages.ArchiveImport_fromFile;
     }
 
@@ -353,8 +342,7 @@ public class WizardArchiveFileResourceImportPage1 extends
      *	Open a FileDialog so that the user can specify the source
      *	file to import from
      */
-    @Override
-	protected void handleSourceBrowseButtonPressed() {
+    protected void handleSourceBrowseButtonPressed() {
         String selectedFile = queryZipFileToImport();
 
         if (selectedFile != null) {
@@ -370,8 +358,7 @@ public class WizardArchiveFileResourceImportPage1 extends
     /**
      *  Import the resources with extensions as specified by the user
      */
-    @Override
-	protected boolean importResources(List fileSystemObjects) {
+    protected boolean importResources(List fileSystemObjects) {
     	ILeveledImportStructureProvider importStructureProvider = null;
 		if (ArchiveFileManipulations.isTarFile(sourceNameField.getText())) {
     		if( ensureTarSourceIsValid()) {
@@ -402,8 +389,7 @@ public class WizardArchiveFileResourceImportPage1 extends
     /**
      * Initializes the specified operation appropriately.
      */
-    @Override
-	protected void initializeOperation(ImportOperation op) {
+    protected void initializeOperation(ImportOperation op) {
         op.setOverwriteResources(overwriteExistingResourcesCheckbox
                 .getSelection());
     }
@@ -431,8 +417,7 @@ public class WizardArchiveFileResourceImportPage1 extends
     /**
      *	Repopulate the view based on the currently entered directory.
      */
-    @Override
-	protected void resetSelection() {
+    protected void resetSelection() {
 
         super.resetSelection();
         setAllSelections(true);
@@ -442,8 +427,7 @@ public class WizardArchiveFileResourceImportPage1 extends
      *	Use the dialog store to restore widget values to the values that they held
      *	last time this wizard was used to completion
      */
-    @Override
-	protected void restoreWidgetValues() {
+    protected void restoreWidgetValues() {
         IDialogSettings settings = getDialogSettings();
         if (settings != null) {
             String[] sourceNames = settings.getArray(STORE_SOURCE_NAMES_ID);
@@ -469,8 +453,7 @@ public class WizardArchiveFileResourceImportPage1 extends
      *	Note that this method is identical to the one that appears in the superclass.
      *	This is necessary because proper overriding of instance variables is not occurring.
      */
-    @Override
-	protected void saveWidgetValues() {
+    protected void saveWidgetValues() {
         IDialogSettings settings = getDialogSettings();
         if (settings != null) {
             // update source names history
@@ -498,8 +481,7 @@ public class WizardArchiveFileResourceImportPage1 extends
      *	Answer a boolean indicating whether self's source specification
      *	widgets currently all contain valid values.
      */
-    @Override
-	protected boolean validateSourceGroup() {
+    protected boolean validateSourceGroup() {
 
         //If there is nothing being provided to the input then there is a problem
 		if (structureProvider == null) {

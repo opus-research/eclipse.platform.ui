@@ -26,7 +26,11 @@ import org.eclipse.ui.part.PageBookView;
  */
 public class MockPageView extends PageBookView {
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.PageBookView#createDefaultPage(org.eclipse.ui.part.PageBook)
+	 */
 	protected IPage createDefaultPage(PageBook book) {
 		MessagePage page = new MessagePage();
 		initPage(page);
@@ -35,7 +39,11 @@ public class MockPageView extends PageBookView {
 		return page;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.PageBookView#doCreatePage(org.eclipse.ui.IWorkbenchPart)
+	 */
 	protected PageRec doCreatePage(IWorkbenchPart part) {
 		if (part instanceof IEditorPart) {
 			IEditorPart editor = (IEditorPart) part;
@@ -56,18 +64,31 @@ public class MockPageView extends PageBookView {
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.PageBookView#doDestroyPage(org.eclipse.ui.IWorkbenchPart,
+	 *      org.eclipse.ui.part.PageBookView.PageRec)
+	 */
 	protected void doDestroyPage(IWorkbenchPart part, PageRec pageRecord) {
 		pageRecord.page.dispose();
 		pageRecord.dispose();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.PageBookView#getBootstrapPart()
+	 */
 	protected IWorkbenchPart getBootstrapPart() {
 		return getSite().getPage().getActiveEditor();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.PageBookView#isImportant(org.eclipse.ui.IWorkbenchPart)
+	 */
 	protected boolean isImportant(IWorkbenchPart part) {
 		return part instanceof IEditorPart;
 	}

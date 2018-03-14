@@ -39,12 +39,13 @@ public class BuildCleanAction extends Action implements ActionFactory.IWorkbench
 		this.window = window;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.actions.ActionFactory.IWorkbenchAction#dispose()
+	 */
 	public void dispose() {
 		//nothing to dispose
 	}
 
-	@Override
 	public void run() {
 		IProject[] selected = BuildUtilities.findSelectedProjects(window);
 		new CleanDialog(window, selected).open();

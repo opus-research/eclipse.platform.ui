@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Sebastian Davids - bug 128526, bug 128529
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430988
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430988
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
@@ -55,12 +55,13 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.dialogs.PatternFilter;
-import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 import org.eclipse.ui.internal.WorkbenchMessages;
 
+/**
+ * Based on org.eclipse.ui.internal.dialogs.ShowViewDialog.
+ */
 public class ShowViewDialog extends Dialog implements ISelectionChangedListener,
 		IDoubleClickListener {
 
@@ -136,12 +137,21 @@ public class ShowViewDialog extends Dialog implements ISelectionChangedListener,
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		shell.setText(WorkbenchMessages.ShowView_shellTitle);
-		// TODO change to context access once
-		// https://bugs.eclipse.org/bugs/show_bug.cgi?id=445600
-		// is solved
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(shell, IWorkbenchHelpContextIds.SHOW_VIEW_DIALOG);
+		// PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,
+		// IWorkbenchHelpContextIds.SHOW_VIEW_DIALOG);
 	}
 
+	/**
+	 * Adds buttons to this dialog's button bar.
+	 * <p>
+	 * The default implementation of this framework method adds standard ok and
+	 * cancel buttons using the <code>createButton</code> framework method.
+	 * Subclasses may override.
+	 * </p>
+	 *
+	 * @param parent
+	 *            the button bar composite
+	 */
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		okButton = createButton(parent, IDialogConstants.OK_ID,
@@ -151,6 +161,14 @@ public class ShowViewDialog extends Dialog implements ISelectionChangedListener,
 		updateButtons();
 	}
 
+	/**
+	 * Creates and returns the contents of the upper part of this dialog (above
+	 * the button bar).
+	 *
+	 * @param parent
+	 *            the parent composite to contain the dialog area
+	 * @return the dialog area control
+	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		// Run super.
@@ -186,7 +204,7 @@ public class ShowViewDialog extends Dialog implements ISelectionChangedListener,
 	 * @param ratio
 	 *            percentage of the first color in the blend (0-100)
 	 * @return the RGB value of the blended color
-	 *
+	 * 
 	 *         copied from FormColors.java
 	 */
 	private static RGB blend(RGB c1, RGB c2, int ratio) {
@@ -203,15 +221,14 @@ public class ShowViewDialog extends Dialog implements ISelectionChangedListener,
 
 	/**
 	 * Create a new filtered tree viewer in the parent.
-	 *
+	 * 
 	 * @param parent
 	 *            the parent <code>Composite</code>.
 	 */
 	private void createFilteredTreeViewer(Composite parent) {
-		PatternFilter filter = new ViewPatternFilter();
+		PatternFilter filter = new ViewPatternFilter(context);
 		int styleBits = SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER;
 		filteredTree = new FilteredTree(parent, styleBits, filter, true);
-		filteredTree.setQuickSelectionMode(true);
 		filteredTree.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
 		TreeViewer treeViewer = filteredTree.getViewer();
@@ -306,7 +323,7 @@ public class ShowViewDialog extends Dialog implements ISelectionChangedListener,
 
 	/**
 	 * Layout the top control.
-	 *
+	 * 
 	 * @param control
 	 *            the control.
 	 */
@@ -388,8 +405,7 @@ public class ShowViewDialog extends Dialog implements ISelectionChangedListener,
 			tooltip = viewDescs[0].getTooltip();
 			tooltip = LocalizationHelper.getLocalized(tooltip, viewDescs[0], context);
 		}
-
-		boolean hasTooltip = tooltip != null && tooltip.length() > 0;
+		boolean hasTooltip = (tooltip == null) ? false : tooltip.length() > 0;
 		descriptionHint.setVisible(viewDescs.length == 1 && hasTooltip);
 	}
 
@@ -427,7 +443,7 @@ public class ShowViewDialog extends Dialog implements ISelectionChangedListener,
 	void handleTreeViewerKeyPressed(KeyEvent event) {
 		// popup the description for the selected view
 		if (descriptionHint.isVisible() && event.keyCode == SWT.F2 && event.stateMask == 0) {
-			ITreeSelection selection = filteredTree.getViewer().getStructuredSelection();
+			ITreeSelection selection = (ITreeSelection) filteredTree.getViewer().getSelection();
 			// only show description if one view is selected
 			if (selection.size() == 1) {
 				Object o = selection.getFirstElement();

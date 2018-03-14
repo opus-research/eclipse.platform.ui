@@ -55,8 +55,7 @@ public class TestInstallUtil extends TestCase {
 
         final boolean[] flag = new boolean[] { false };
         FrameworkListener listener = new FrameworkListener() {
-            @Override
-			public void frameworkEvent(FrameworkEvent event) {
+            public void frameworkEvent(FrameworkEvent event) {
                 if (event.getType() == FrameworkEvent.PACKAGES_REFRESHED)
                     synchronized (flag) {
                         flag[0] = true;

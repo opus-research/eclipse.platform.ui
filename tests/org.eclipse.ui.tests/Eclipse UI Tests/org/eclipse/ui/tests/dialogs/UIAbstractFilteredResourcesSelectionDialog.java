@@ -114,7 +114,11 @@ public class UIAbstractFilteredResourcesSelectionDialog extends TestCase {
 		return NONHISTORY_FILES;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -152,7 +156,11 @@ public class UIAbstractFilteredResourcesSelectionDialog extends TestCase {
 		settings.put(HISTORY_SETTINGS, writer.getBuffer().toString());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see junit.framework.TestCase#tearDown()
+	 */
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		finalizeProject();

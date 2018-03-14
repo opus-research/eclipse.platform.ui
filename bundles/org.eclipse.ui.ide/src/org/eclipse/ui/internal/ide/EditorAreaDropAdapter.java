@@ -54,35 +54,30 @@ public class EditorAreaDropAdapter extends DropTargetAdapter {
         this.window = window;
     }
 
-    @Override
-	public void dragEnter(DropTargetEvent event) {
+    public void dragEnter(DropTargetEvent event) {
         // always indicate a copy
         event.detail = DND.DROP_COPY;
         event.feedback = DND.FEEDBACK_NONE;
     }
 
-    @Override
-	public void dragOver(DropTargetEvent event) {
+    public void dragOver(DropTargetEvent event) {
         // always indicate a copy
         event.detail = DND.DROP_COPY;
         event.feedback = DND.FEEDBACK_NONE;
     }
 
-    @Override
-	public void dragOperationChanged(DropTargetEvent event) {
+    public void dragOperationChanged(DropTargetEvent event) {
         // always indicate a copy
         event.detail = DND.DROP_COPY;
         event.feedback = DND.FEEDBACK_NONE;
     }
 
-    @Override
-	public void drop(final DropTargetEvent event) {
+    public void drop(final DropTargetEvent event) {
         Display d = window.getShell().getDisplay();
         final IWorkbenchPage page = window.getActivePage();
         if (page != null) {
             d.asyncExec(new Runnable() {
-                @Override
-				public void run() {
+                public void run() {
                     asyncDrop(event, page);
                 }
             });

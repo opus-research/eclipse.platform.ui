@@ -44,8 +44,7 @@ class OpenBookmarkAction extends BookmarkAction {
         setEnabled(false);
     }
 
-    @Override
-	public void run() {
+    public void run() {
         IWorkbenchPage page = getView().getSite().getPage();
         for (Iterator i = getStructuredSelection().iterator(); i.hasNext();) {
             IMarker marker = (IMarker) i.next();
@@ -81,8 +80,7 @@ class OpenBookmarkAction extends BookmarkAction {
         }
     }
 
-    @Override
-	public void selectionChanged(IStructuredSelection sel) {
+    public void selectionChanged(IStructuredSelection sel) {
         setEnabled(!sel.isEmpty());
     }
 }

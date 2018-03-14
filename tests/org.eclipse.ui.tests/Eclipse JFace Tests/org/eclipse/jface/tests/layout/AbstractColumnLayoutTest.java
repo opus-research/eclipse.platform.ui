@@ -33,7 +33,11 @@ public final class AbstractColumnLayoutTest extends TestCase {
 	Display display;
 	Shell shell;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	protected void setUp() throws Exception {
 		display = Display.getCurrent();
 		if (display == null) {
@@ -45,7 +49,11 @@ public final class AbstractColumnLayoutTest extends TestCase {
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see junit.framework.TestCase#tearDown()
+	 */
 	protected void tearDown() throws Exception {
 		shell.dispose();
 	}

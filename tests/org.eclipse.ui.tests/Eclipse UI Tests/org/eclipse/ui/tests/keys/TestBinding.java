@@ -41,12 +41,15 @@ final class TestBinding extends Binding {
 			super(new Trigger[0]);
 		}
 
-		@Override
 		public final String format() {
 			return toString();
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.bindings.TriggerSequence#getPrefixes()
+		 */
 		public TriggerSequence[] getPrefixes() {
 			return new TriggerSequence[0];
 		}
@@ -89,12 +92,15 @@ final class TestBinding extends Binding {
 				schemeId, contextId, locale, platform, null, type);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.bindings.Binding#getTriggerSequence()
+	 */
 	public final TriggerSequence getTriggerSequence() {
 		return TRIGGER_SEQUENCE;
 	}
 
-	@Override
 	public final String toString() {
 		return Util.ZERO_LENGTH_STRING;
 	}

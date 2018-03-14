@@ -52,7 +52,6 @@ public class FilteredTreeTests extends UITestCase {
 			super(shell);
 			style = treeStyle;
 		}
-		@Override
 		protected Control createContents(Composite parent) {
 			Composite c = new Composite(parent, SWT.NONE);
 			c.setLayout(new GridLayout());
@@ -92,7 +91,6 @@ public class FilteredTreeTests extends UITestCase {
 		final int treeStyle = SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL |SWT.FLAT;
 		
 		Dialog dialog = new FilteredTreeDialog((Shell)null, treeStyle){
-			@Override
 			protected FilteredTree doCreateFilteredTree(Composite comp, int style) {
 				return createMyFilteredTree(comp, treeStyle);
 			}
@@ -110,7 +108,6 @@ public class FilteredTreeTests extends UITestCase {
 		fRootElement = TestElement.createModel(DEPTH, NUM_ITEMS);	
 		
 		Dialog dialog = new FilteredTreeDialog((Shell)null, treeStyle){
-			@Override
 			protected FilteredTree doCreateFilteredTree(Composite comp, int style) {
 				return createFilteredTree(comp, treeStyle);
 			}
@@ -156,7 +153,6 @@ public class FilteredTreeTests extends UITestCase {
 		fTreeViewer.getViewer().setInput(fRootElement);
 	}
 
-	@Override
 	protected void doTearDown() throws Exception {
 		super.doTearDown();
 		fTreeViewer = null;

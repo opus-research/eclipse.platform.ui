@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Benjamin Muskalla  - bug 77710
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430603
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430603
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
@@ -50,8 +50,6 @@ public class ViewLabelProvider extends ColumnLabelProvider {
 	private MWindow window;
 
 	/**
-	 * @param context
-	 * @param modelService
 	 * @param window
 	 *            the workbench window
 	 * @param dimmedForeground
@@ -112,19 +110,13 @@ public class ViewLabelProvider extends ColumnLabelProvider {
 		return label;
 	}
 
-	@Override
 	public Color getForeground(Object element) {
 		if (element instanceof MPartDescriptor) {
 			String elementId = ((MPartDescriptor) element).getElementId();
-			List<MPart> findElements = modelService.findElements(
-					modelService.getActivePerspective(window), elementId, MPart.class, null);
-
-			if (findElements.size() > 0) {
-				MPart mPart = findElements.get(0);
-				if (mPart.isVisible() && mPart.isToBeRendered()) {
+			List<MPart> findElements = modelService.findElements(window, elementId, MPart.class, null);
+			if (findElements.size() > 0 && findElements.get(0).isVisible() == true) {
 					return dimmedForeground;
 				}
-			}
 		}
 		return null;
 	}

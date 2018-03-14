@@ -37,7 +37,12 @@ public class NavigatorPluginDropAction implements IDropActionDelegate {
 		super();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.IDropActionDelegate#run(java.lang.Object,
+	 *      java.lang.Object)
+	 */
 	public boolean run(Object sourceData, Object target) {
 
 		if (Policy.DEBUG_DND) {

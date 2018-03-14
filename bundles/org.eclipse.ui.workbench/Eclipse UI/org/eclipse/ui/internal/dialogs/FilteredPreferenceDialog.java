@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2014 IBM Corporation and others.
+ * Copyright (c) 2003, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Oakland Software (Francis Upton) <francisu@ieee.org> - bug 219273
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
@@ -145,12 +144,20 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 							cachedTitle));
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.dialogs.FilteredTree#updateToolbar(boolean)
+		 */
 		protected void updateToolbar(boolean visible) {
 			super.updateToolbar(viewerFilter != null || visible);
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.dialogs.FilteredTree#clearText()
+		 */
 		protected void clearText() {
 			setFilterText(""); //$NON-NLS-1$
 			// remove the filter if text is cleared
@@ -206,7 +213,6 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 	 * 
 	 * @see org.eclipse.jface.preference.PreferenceDialog#findNodeMatching(java.lang.String)
 	 */
-	@Override
 	protected IPreferenceNode findNodeMatching(String nodeId) {
 		IPreferenceNode node = super.findNodeMatching(nodeId);
 		if (WorkbenchActivityHelper.filterItem(node)) {
@@ -215,7 +221,11 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 		return node;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.PreferenceDialog#createTreeViewer(org.eclipse.swt.widgets.Composite)
+	 */
 	protected TreeViewer createTreeViewer(Composite parent) {
 		int styleBits = SWT.SINGLE;
 		TreeViewer tree;
@@ -236,7 +246,11 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 		tree.addFilter(new CapabilityFilter());
 
 		tree.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
+			 */
 			public void selectionChanged(SelectionChangedEvent event) {
 				handleTreeSelectionChanged(event);
 			}
@@ -272,7 +286,7 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 		} else {
 			treeViewer.setLabelProvider(new PreferenceBoldLabelProvider(filteredTree));
 		}
-		IContributionService cs = PlatformUI
+		IContributionService cs = (IContributionService) PlatformUI
 				.getWorkbench().getActiveWorkbenchWindow().getService(
 						IContributionService.class);
 		treeViewer.setComparator(cs.getComparatorFor(getContributionType()));
@@ -300,7 +314,11 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 		// Do nothing by default
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.PreferenceDialog#createTreeAreaContents(org.eclipse.swt.widgets.Composite)
+	 */
 	protected Control createTreeAreaContents(Composite parent) {
 		Composite leftArea = new Composite(parent, SWT.NONE);
 		leftArea.setBackground(parent.getDisplay().getSystemColor(
@@ -350,7 +368,11 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 		this.pageData = pageData;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.PreferenceDialog#createPage(org.eclipse.jface.preference.IPreferenceNode)
+	 */
 	protected void createPage(IPreferenceNode node) {
 
 		super.createPage(node);
@@ -365,12 +387,21 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.PreferenceDialog#getCurrentPage()
+	 */
 	public IPreferencePage getCurrentPage() {
 		return super.getCurrentPage();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.preferences.IWorkbenchPreferenceContainer#openPage(java.lang.String,
+	 *      java.lang.Object)
+	 */
 	public boolean openPage(String pageId, Object data) {
 		setPageData(data);
 		setCurrentPageId(pageId);
@@ -397,7 +428,11 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.preferences.IWorkbenchPreferenceContainer#getWorkingCopyManager()
+	 */
 	public IWorkingCopyManager getWorkingCopyManager() {
 		if (workingCopyManager == null) {
 			workingCopyManager = new WorkingCopyManager();
@@ -405,7 +440,11 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 		return workingCopyManager;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
+	 */
 	protected void okPressed() {
 		super.okPressed();
 
@@ -436,7 +475,11 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.preferences.IWorkbenchPreferenceContainer#registerUpdateJob(org.eclipse.core.runtime.jobs.Job)
+	 */
 	public void registerUpdateJob(Job job) {
 		updateJobs.add(job);
 	}
@@ -456,28 +499,38 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 				historyManager);
 
 		Action popupMenuAction = new Action() {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.action.Action#getImageDescriptor()
+			 */
 			public ImageDescriptor getImageDescriptor() {
 				return WorkbenchImages
 						.getImageDescriptor(IWorkbenchGraphicConstants.IMG_LCL_VIEW_MENU);
 			}
 
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.action.Action#run()
+			 */
 			public void run() {
 				MenuManager manager = new MenuManager();
 				manager.add(new Action() {
-					@Override
+					/*
+					 * (non-Javadoc)
+					 * 
+					 * @see org.eclipse.jface.action.Action#run()
+					 */
 					public void run() {
 						
 						sash.addFocusListener(new FocusAdapter() {
-							@Override
 							public void focusGained(FocusEvent e) {
 								sash.setBackground(sash.getDisplay()
 										.getSystemColor(
 												SWT.COLOR_LIST_SELECTION));
 							}
 
-							@Override
 							public void focusLost(FocusEvent e) {
 								sash.setBackground(sash.getDisplay()
 										.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
@@ -486,18 +539,30 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 						sash.setFocus();
 					}
 
-					@Override
+					/*
+					 * (non-Javadoc)
+					 * 
+					 * @see org.eclipse.jface.action.Action#getText()
+					 */
 					public String getText() {
 						return WorkbenchMessages.FilteredPreferenceDialog_Resize;
 					}
 				});
 				manager.add(new Action() {
-					@Override
+					/*
+					 * (non-Javadoc)
+					 * 
+					 * @see org.eclipse.jface.action.Action#run()
+					 */
 					public void run() {
 						activeKeyScrolling();
 					}
 
-					@Override
+					/*
+					 * (non-Javadoc)
+					 * 
+					 * @see org.eclipse.jface.action.Action#getText()
+					 */
 					public String getText() {
 						return WorkbenchMessages.FilteredPreferenceDialog_Key_Scrolling;
 					}
@@ -512,7 +577,7 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 		};
 		popupMenuAction.setToolTipText(WorkbenchMessages.FilteredPreferenceDialog_FilterToolTip);
 		historyManager.add(popupMenuAction);
-		IHandlerService service = PlatformUI.getWorkbench()
+		IHandlerService service = (IHandlerService) PlatformUI.getWorkbench()
 				.getService(IHandlerService.class);
 		showViewHandler = service
 				.activateHandler(
@@ -536,7 +601,6 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 			}
 			final ScrolledComposite sc = (ScrolledComposite) pageParent;
 			keyScrollingFilter = new Listener() {
-				@Override
 				public void handleEvent(Event event) {
 					if (!keyScrollingEnabled || sc.isDisposed()) {
 						return;
@@ -583,7 +647,6 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 			display.addFilter(SWT.KeyDown, keyScrollingFilter);
 			display.addFilter(SWT.Traverse, keyScrollingFilter);
 			sc.addDisposeListener(new DisposeListener() {
-				@Override
 				public void widgetDisposed(DisposeEvent e) {
 					removeKeyScrolling();
 				}
@@ -604,7 +667,11 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.PreferenceDialog#showPage(org.eclipse.jface.preference.IPreferenceNode)
+	 */
 	protected boolean showPage(IPreferenceNode node) {
 		final boolean success = super.showPage(node);
 		if (success) {
@@ -614,10 +681,14 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 		return success;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.window.Window#close()
+	 */
 	public boolean close() {
 		if (showViewHandler != null) {
-			IHandlerService service = PlatformUI
+			IHandlerService service = (IHandlerService) PlatformUI
 					.getWorkbench().getService(IHandlerService.class);
 			service.deactivateHandler(showViewHandler);
 			showViewHandler.getHandler().dispose();
@@ -628,7 +699,11 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 		return super.close();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.PreferenceDialog#createTitleArea(org.eclipse.swt.widgets.Composite)
+	 */
 	protected Composite createTitleArea(Composite parent) {
 
 		GridLayout parentLayout = (GridLayout) parent.getLayout();
@@ -651,7 +726,6 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 		return titleComposite;
 	}
 
-	@Override
 	protected void selectSavedItem() {
 		getTreeViewer().setInput(getPreferenceManager());
 		super.selectSavedItem();
@@ -665,7 +739,11 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.PreferenceDialog#updateTreeFont(org.eclipse.swt.graphics.Font)
+	 */
 	protected void updateTreeFont(Font dialogFont) {
 		if (hasAtMostOnePage()) {
 			Composite composite= getTreeViewer().getTree();
@@ -693,7 +771,9 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 		}
 	}
 	
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.PreferenceDialog#createSash(org.eclipse.swt.widgets.Composite, org.eclipse.swt.widgets.Control)
+	 */
 	protected Sash createSash(Composite composite, Control rightControl) {
 		sash = super.createSash(composite, rightControl);
 		return sash;

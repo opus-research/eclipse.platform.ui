@@ -79,7 +79,6 @@ public class WritableValue extends AbstractObservableValue {
 
 	private Object value = null;
 
-	@Override
 	public Object doGetValue() {
 		return value;
 	}
@@ -88,14 +87,12 @@ public class WritableValue extends AbstractObservableValue {
 	 * @param value
 	 *            The value to set.
 	 */
-	@Override
 	public void doSetValue(Object value) {
         if (this.value != value) {
             fireValueChange(Diffs.createValueDiff(this.value, this.value = value));
         }
 	}
 
-	@Override
 	public Object getValueType() {
 		return valueType;
 	}

@@ -64,12 +64,16 @@ public class ActionSetActionBars extends SubActionBars2 {
 		adjunctContributions.add(item);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Inherited from SubActionBars.
+	 */
 	protected SubMenuManager createSubMenuManager(IMenuManager parent) {
 		return new ActionSetMenuManager(parent, actionSetId);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Inherited from SubActionBars.
+	 */
 	protected SubToolBarManager createSubToolBarManager(IToolBarManager parent) {
 		// return null, action sets are managed by CoolItemToolBarManagers
 		return null;
@@ -78,7 +82,6 @@ public class ActionSetActionBars extends SubActionBars2 {
 	/**
 	 * Dispose the contributions.
 	 */
-	@Override
 	public void dispose() {
 		super.dispose();
 		if (coolItemToolBarMgr == null) {
@@ -179,7 +182,6 @@ public class ActionSetActionBars extends SubActionBars2 {
 	 * 
 	 * @return the tool bar manager
 	 */
-	@Override
 	public IToolBarManager getToolBarManager() {
 		ICoolBarManager coolBarManager = getCastedParent().getCoolBarManager();
 		if (coolBarManager == null) {
@@ -273,7 +275,6 @@ public class ActionSetActionBars extends SubActionBars2 {
 	/**
 	 * Activate / Deactivate the contributions.
 	 */
-	@Override
 	protected void setActive(boolean set) {
 		super.setActive(set);
 

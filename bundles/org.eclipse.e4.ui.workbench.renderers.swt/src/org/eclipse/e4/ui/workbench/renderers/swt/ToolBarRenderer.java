@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -52,7 +52,6 @@ public class ToolBarRenderer extends SWTPartRenderer {
 		application = context.get(MApplication.class);
 	}
 
-	@Override
 	public Object createWidget(final MUIElement element, Object parent) {
 		if (!(element instanceof MToolBar) || !(parent instanceof Composite))
 			return null;
@@ -61,7 +60,6 @@ public class ToolBarRenderer extends SWTPartRenderer {
 		Composite intermediate = new Composite((Composite) parent, SWT.NONE);
 		createToolbar(element, intermediate);
 		intermediate.addDisposeListener(new DisposeListener() {
-			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				cleanUp((MToolBar) element);
 			}
@@ -96,7 +94,6 @@ public class ToolBarRenderer extends SWTPartRenderer {
 		return SWT.HORIZONTAL;
 	}
 
-	@Override
 	public Object getUIContainer(MUIElement childElement) {
 		Composite intermediate = (Composite) super.getUIContainer(childElement);
 		if (intermediate == null || intermediate.isDisposed()) {

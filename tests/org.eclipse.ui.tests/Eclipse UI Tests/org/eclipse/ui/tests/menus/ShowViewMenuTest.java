@@ -26,7 +26,6 @@ public class ShowViewMenuTest extends UITestCase {
 		super(testName);
 	}
 
-	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		// open a workbench window with the empty perspective, since it defines

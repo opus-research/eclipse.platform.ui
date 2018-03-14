@@ -1,18 +1,17 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 EclipseSource and others. All rights reserved.
+ * Copyright (c) 2009 EclipseSource and others. All rights reserved.
  * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution, 
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *   EclipseSource - initial API and implementation
- *   Lars Vogel <Lars.Vogel@gmail.com> - Bug 430468
  ******************************************************************************/
 package org.eclipse.e4.ui.tests.css.core.parser;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.IOException;
+
+import junit.framework.TestCase;
 
 import org.eclipse.e4.ui.css.core.impl.dom.DocumentCSSImpl;
 import org.eclipse.e4.ui.css.core.impl.dom.ViewCSSImpl;
@@ -20,30 +19,26 @@ import org.eclipse.e4.ui.css.swt.engine.CSSSWTEngineImpl;
 import org.eclipse.e4.ui.tests.css.core.util.ParserTestUtil;
 import org.eclipse.e4.ui.tests.css.core.util.TestElement;
 import org.eclipse.swt.widgets.Display;
-import org.junit.Before;
-import org.junit.Test;
 import org.w3c.dom.css.CSSStyleDeclaration;
 import org.w3c.dom.css.CSSStyleSheet;
 import org.w3c.dom.css.ViewCSS;
 
 
-public class CascadeTest {
+public class CascadeTest extends TestCase {
 
 	private Display display;
 	private CSSSWTEngineImpl engine;
 
-	@Before
-	public void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		display = Display.getDefault();
 		engine = new CSSSWTEngineImpl(display);
 	}
 
-	@Test
 	public void testPosition() throws Exception {
 		// Two rules with the same specificity, the second rule should take
 		// precedence because of its position in the stylesheet
 		String css = "Button { color: blue; font-weight: bold; }\n"
-				+ "Button { color: black }\n";
+			+ "Button { color: black }\n";
 		ViewCSS viewCSS = createViewCss(css);
 
 		TestElement button = new TestElement("Button", engine);
@@ -53,7 +48,6 @@ public class CascadeTest {
 				.getCssText());
 	}
 
-	@Test
 	public void testSpecificity() throws Exception {
 		// Two rules with different specificity, the first should take
 		// precedence because of its higher specificity
@@ -72,14 +66,13 @@ public class CascadeTest {
 				.getCssText());
 	}
 
-	@Test
 	public void testSpecificities() throws Exception {
 		// Different specificities
 		String css = "* { color: black; }\n"
-				+ "Button { color: blue; }\n"
-				+ "Button[BORDER] { color: gray; }\n"
-				+ "Button.special { color: green; }\n"
-				+ "Button#myid { color: red; }\n";
+			+ "Button { color: blue; }\n"
+			+ "Button[BORDER] { color: gray; }\n"
+			+ "Button.special { color: green; }\n"
+			+ "Button#myid { color: red; }\n";
 		ViewCSS viewCSS = createViewCss(css);
 
 		TestElement label = new TestElement("Label", engine);
@@ -109,28 +102,27 @@ public class CascadeTest {
 		docCss.addStyleSheet(styleSheet);
 		return new ViewCSSImpl(docCss);
 	}
-
-	//	public void testImportantRule() throws Exception {
-	//		//Several rules for the same class, if one rule has ! important
-	//		//it takes precedence over all other, if more than one
-	//		//last one gets precedence
-	//
-	//		String css = "Button{color:red ! important;}\n"
-	//			+"Button{ color: blue ! important;}\n"
-	//			+ "Button { color: black }\n";
-	//		ViewCSS viewCSS = createViewCss(css);
-	//
-	//		TestElement button = new TestElement("Button", engine);
-	//		CSSStyleDeclaration style = viewCSS.getComputedStyle(button, null);
-	//		assertEquals("blue", style.getPropertyCSSValue("color").getCssText());
-	//	}
-
-	@Test
+	
+//	public void testImportantRule() throws Exception {
+//		//Several rules for the same class, if one rule has ! important 
+//		//it takes precedence over all other, if more than one 
+//		//last one gets precedence
+//	
+//		String css = "Button{color:red ! important;}\n" 
+//			+"Button{ color: blue ! important;}\n"
+//			+ "Button { color: black }\n";
+//		ViewCSS viewCSS = createViewCss(css);
+//
+//		TestElement button = new TestElement("Button", engine);
+//		CSSStyleDeclaration style = viewCSS.getComputedStyle(button, null);
+//		assertEquals("blue", style.getPropertyCSSValue("color").getCssText());
+//	}
+	
 	public void testBug261081() throws Exception{
 		// Two rules with the same specificity, the second rule should take
 		// precedence because of its position in the stylesheet
 		String css = "Button, Label { color: blue; font-weight: bold; }\n"
-				+ "Button { color: black }\n";
+			+ "Button { color: black }\n";
 		ViewCSS viewCSS = createViewCss(css);
 
 		TestElement button = new TestElement("Button", engine);

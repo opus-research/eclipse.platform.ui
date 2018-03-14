@@ -11,6 +11,7 @@
 package org.eclipse.jface.action;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.ACC;
@@ -171,8 +172,8 @@ public class ToolBarManager extends ContributionManager implements
 		toolBar = null;
 
 		IContributionItem[] items = getItems();
-		for (IContributionItem item : items) {
-			item.dispose();
+		for (int i = 0; i < items.length; i++) {
+			items[i].dispose();
 		}
 
 		if (getContextMenuManager() != null) {
@@ -221,11 +222,11 @@ public class ToolBarManager extends ContributionManager implements
 			if (layoutBar.getParent() instanceof CoolBar) {
 				CoolBar cb = (CoolBar) layoutBar.getParent();
 				CoolItem[] items = cb.getItems();
-				for (CoolItem item : items) {
-					if (item.getControl() == layoutBar) {
-						Point curSize = item.getSize();
-						item.setSize(curSize.x + (afterPack.x - beforePack.x),
-								curSize.y + (afterPack.y - beforePack.y));
+				for (int i = 0; i < items.length; i++) {
+					if (items[i].getControl() == layoutBar) {
+						Point curSize = items[i].getSize();
+						items[i].setSize(curSize.x+ (afterPack.x - beforePack.x),
+									curSize.y+ (afterPack.y - beforePack.y));
 						return;
 					}
 				}
@@ -243,6 +244,9 @@ public class ToolBarManager extends ContributionManager implements
 		return toolBar != null && !toolBar.isDisposed();
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IContributionManager.
+	 */
 	@Override
 	public void update(boolean force) {
 
@@ -266,7 +270,8 @@ public class ToolBarManager extends ContributionManager implements
 				//			if (DEBUG) {
 				//				cleanStartTime= (new Date()).getTime();
 				//			}
-				for (IContributionItem ci : items) {
+				for (int i = 0; i < items.length; ++i) {
+					IContributionItem ci = items[i];
 					if (!isChildVisible(ci)) {
 						continue;
 					}
@@ -293,17 +298,17 @@ public class ToolBarManager extends ContributionManager implements
 				// determine obsolete items (removed or non active)
 				ToolItem[] mi = toolBar.getItems();
 				ArrayList<ToolItem> toRemove = new ArrayList<ToolItem>(mi.length);
-				for (ToolItem item : mi) {
+				for (int i = 0; i < mi.length; i++) {
 					// there may be null items in a toolbar
-					if (item == null)
+					if (mi[i] == null)
 						continue;
 					
-					Object data = item.getData();
+					Object data = mi[i].getData();
 					if (data == null
 							|| !clean.contains(data)
 							|| (data instanceof IContributionItem && ((IContributionItem) data)
 									.isDynamic())) {
-						toRemove.add(item);
+						toRemove.add(mi[i]);
 					}
 				}
 
@@ -315,82 +320,83 @@ public class ToolBarManager extends ContributionManager implements
 				// toolbar item.
 				boolean useRedraw = (clean.size() - (mi.length - toRemove
 						.size())) >= 3;
-				try {
-					if (useRedraw) {
-						toolBar.setRedraw(false);
-					}
+                try {
+                    if (useRedraw) {
+                        toolBar.setRedraw(false);
+                    }
 
-					// remove obsolete items
-					for (int i = toRemove.size(); --i >= 0;) {
-						ToolItem item = toRemove.get(i);
-						if (!item.isDisposed()) {
-							Control ctrl = item.getControl();
-							if (ctrl != null) {
-								item.setControl(null);
-								ctrl.dispose();
-							}
-							item.dispose();
-						}
-					}
+                    // remove obsolete items
+                    for (int i = toRemove.size(); --i >= 0;) {
+                        ToolItem item = toRemove.get(i);
+                        if (!item.isDisposed()) {
+                            Control ctrl = item.getControl();
+                            if (ctrl != null) {
+                                item.setControl(null);
+                                ctrl.dispose();
+                            }
+                            item.dispose();
+                        }
+                    }
 
-					// add new items
-					IContributionItem dest;
-					mi = toolBar.getItems();
-					int srcIx = 0;
-					int destIx = 0;
-					for (IContributionItem src : clean) {
+                    // add new items
+                    IContributionItem src, dest;
+                    mi = toolBar.getItems();
+                    int srcIx = 0;
+                    int destIx = 0;
+                    for (Iterator<IContributionItem> e = clean.iterator(); e.hasNext();) {
+                        src = e.next();
 
-						// get corresponding item in SWT widget
-						if (srcIx < mi.length) {
+                        // get corresponding item in SWT widget
+                        if (srcIx < mi.length) {
 							dest = (IContributionItem) mi[srcIx].getData();
 						} else {
 							dest = null;
 						}
 
-						if (dest != null && src.equals(dest)) {
-							srcIx++;
-							destIx++;
-							continue;
-						}
+                        if (dest != null && src.equals(dest)) {
+                            srcIx++;
+                            destIx++;
+                            continue;
+                        }
 
-						if (dest != null && dest.isSeparator()
-								&& src.isSeparator()) {
-							mi[srcIx].setData(src);
-							srcIx++;
-							destIx++;
-							continue;
-						}
+                        if (dest != null && dest.isSeparator()
+                                && src.isSeparator()) {
+                            mi[srcIx].setData(src);
+                            srcIx++;
+                            destIx++;
+                            continue;
+                        }
 
-						int start = toolBar.getItemCount();
-						src.fill(toolBar, destIx);
-						int newItems = toolBar.getItemCount() - start;
-						for (int i = 0; i < newItems; i++) {
-							ToolItem item = toolBar.getItem(destIx++);
-							item.setData(src);
-						}
-					}
+                        int start = toolBar.getItemCount();
+                        src.fill(toolBar, destIx);
+                        int newItems = toolBar.getItemCount() - start;
+                        for (int i = 0; i < newItems; i++) {
+                            ToolItem item = toolBar.getItem(destIx++);
+                            item.setData(src);
+                        }
+                    }
 
-					// remove any old tool items not accounted for
-					for (int i = mi.length; --i >= srcIx;) {
-						ToolItem item = mi[i];
-						if (!item.isDisposed()) {
-							Control ctrl = item.getControl();
-							if (ctrl != null) {
-								item.setControl(null);
-								ctrl.dispose();
-							}
-							item.dispose();
-						}
-					}
+                    // remove any old tool items not accounted for
+                    for (int i = mi.length; --i >= srcIx;) {
+                        ToolItem item = mi[i];
+                        if (!item.isDisposed()) {
+                            Control ctrl = item.getControl();
+                            if (ctrl != null) {
+                                item.setControl(null);
+                                ctrl.dispose();
+                            }
+                            item.dispose();
+                        }
+                    }
 
-					setDirty(false);
+                    setDirty(false);
 
-					// turn redraw back on if we turned it off above
-				} finally {
-					if (useRedraw) {
-						toolBar.setRedraw(true);
-					}
-				}
+                    // turn redraw back on if we turned it off above
+                } finally {
+                    if (useRedraw) {
+                        toolBar.setRedraw(true);
+                    }
+                }
 
 				int newCount = toolBar.getItemCount();
 				

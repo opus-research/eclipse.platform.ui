@@ -42,17 +42,23 @@ public class EditorTests extends DynamicTestCase {
 		super(testName);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionId()
+	 */
 	protected String getExtensionId() {
 		return "newEditor1.testDynamicEditorAddition";
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionPoint()
+	 */
 	protected String getExtensionPoint() {
 		return IWorkbenchRegistryConstants.PL_EDITOR;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getInstallLocation()
+	 */
 	protected String getInstallLocation() {
 		return "data/org.eclipse.newEditor1";
 	}
@@ -133,7 +139,6 @@ public class EditorTests extends DynamicTestCase {
 	}	
 	
 	
-	@Override
 	protected String getMarkerClass() {
 		return "org.eclipse.ui.dynamic.DynamicEditor";
 	}

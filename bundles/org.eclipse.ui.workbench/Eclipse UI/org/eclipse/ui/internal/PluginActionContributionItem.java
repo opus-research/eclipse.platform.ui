@@ -75,8 +75,10 @@ public class PluginActionContributionItem extends ActionContributionItem
 		}
     }
     
-    @Override
-	public void setParent(IContributionManager parent) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.action.IContributionItem#setParent(org.eclipse.jface.action.IContributionManager)
+     */
+    public void setParent(IContributionManager parent) {
         IContributionManager oldParent = getParent();
         super.setParent(parent);
         if (oldParent == parent) {
@@ -128,22 +130,27 @@ public class PluginActionContributionItem extends ActionContributionItem
      * method notifies the delegate if loaded and implements the <code>IActionDelegate2</code>
      * interface.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         unhookListeners();
         disposeIdentifier();
     }
 
-    @Override
-	public boolean isVisible() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.action.ActionContributionItem#isVisible()
+     */
+    public boolean isVisible() {
         if (identifier != null && !identifier.isEnabled()) {
 			return false;
 		}
         return super.isVisible();
     }
 
-    @Override
-	public void identifierChanged(IdentifierEvent identifierEvent) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.activities.IIdentifierListener#identifierChanged(org.eclipse.ui.activities.IdentifierEvent)
+     */
+    public void identifierChanged(IdentifierEvent identifierEvent) {
         invalidateParent();
     }
 
@@ -159,8 +166,10 @@ public class PluginActionContributionItem extends ActionContributionItem
 		}
     }
 
-    @Override
-	public void activityManagerChanged(ActivityManagerEvent activityManagerEvent) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.activities.IActivityManagerListener#activityManagerChanged(org.eclipse.ui.activities.ActivityManagerEvent)
+     */
+    public void activityManagerChanged(ActivityManagerEvent activityManagerEvent) {
         // ensure that if we're going from a non-filtering state that we get an identifier
         // and vice versa.
         if (WorkbenchActivityHelper.isFiltering() && identifier == null) {

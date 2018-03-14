@@ -46,25 +46,45 @@ public class PathVariableEditDialog extends SelectionDialog {
 		setShellStyle(getShellStyle() | SWT.RESIZE);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#buttonPressed(int)
+	 */
 	protected void buttonPressed(int buttonId) {
 		super.buttonPressed(buttonId);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.window.Window#close()
+	 */
 	public boolean close() {
 		pathVariablesGroup.dispose();
 		return super.close();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets
+	 * .Shell)
+	 */
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,
 				IIDEHelpContextIds.PATH_VARIABLE_SELECTION_DIALOG);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse
+	 * .swt.widgets.Composite)
+	 */
 	protected void createButtonsForButtonBar(Composite parent) {
 		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL,
 				true);
@@ -72,7 +92,13 @@ public class PathVariableEditDialog extends SelectionDialog {
 				IDialogConstants.CANCEL_LABEL, false);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets
+	 * .Composite)
+	 */
 	protected Control createDialogArea(Composite parent) {
 		// create composite
 		Composite dialogArea = (Composite) super.createDialogArea(parent);
@@ -81,7 +107,11 @@ public class PathVariableEditDialog extends SelectionDialog {
 		return dialogArea;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
+	 */
 	protected void okPressed() {
 		// Sets the dialog result to the selected path variable name(s).
 		try {

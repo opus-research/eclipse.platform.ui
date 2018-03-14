@@ -25,28 +25,38 @@ public class EmptyView extends ViewPart {
         super();
     }
 
-    @Override
-	public void createPartControl(Composite parent) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+     */
+    public void createPartControl(Composite parent) {
 
     }
 
-    @Override
-	public void setFocus() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbenchPart#setFocus()
+     */
+    public void setFocus() {
 
     }
 
-    @Override
-	public void setContentDescription(String description) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.part.WorkbenchPart#setContentDescription(java.lang.String)
+     */
+    public void setContentDescription(String description) {
         super.setContentDescription(description);
     }
 
-    @Override
-	public void setPartName(String partName) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.part.WorkbenchPart#setPartName(java.lang.String)
+     */
+    public void setPartName(String partName) {
         super.setPartName(partName);
     }
 
-    @Override
-	public void setTitle(String title) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.part.WorkbenchPart#setTitle(java.lang.String)
+     */
+    public void setTitle(String title) {
         super.setTitle(title);
     }
 }

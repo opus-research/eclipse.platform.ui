@@ -23,16 +23,13 @@ import org.eclipse.ui.part.EditorPart;
 
 public class EditorWithDisposeException extends EditorPart {
 
-    @Override
-	public void doSave(IProgressMonitor monitor) {
+    public void doSave(IProgressMonitor monitor) {
     }
 
-    @Override
-	public void doSaveAs() {
+    public void doSaveAs() {
     }
 
-    @Override
-	public void init(IEditorSite site, IEditorInput input)
+    public void init(IEditorSite site, IEditorInput input)
             throws PartInitException {
         
         if (!(input instanceof IFileEditorInput))
@@ -41,18 +38,15 @@ public class EditorWithDisposeException extends EditorPart {
         setInput(input);
     }
 
-    @Override
-	public boolean isDirty() {
+    public boolean isDirty() {
         return false;
     }
 
-    @Override
-	public boolean isSaveAsAllowed() {
+    public boolean isSaveAsAllowed() {
         return false;
     }
 
-    @Override
-	public void createPartControl(Composite parent) {
+    public void createPartControl(Composite parent) {
         parent.setLayout(new FillLayout());
         
         Label testLabel = new Label(parent, SWT.NONE);
@@ -60,13 +54,11 @@ public class EditorWithDisposeException extends EditorPart {
         testLabel.setText("This editor is supposed to throw an exception when closed");
     }
 
-    @Override
-	public void setFocus() {
+    public void setFocus() {
 
     }
     
-    @Override
-	public void dispose() {
+    public void dispose() {
         throw new RuntimeException("This exception was thrown intentionally as part of an error handling test");
     }
 

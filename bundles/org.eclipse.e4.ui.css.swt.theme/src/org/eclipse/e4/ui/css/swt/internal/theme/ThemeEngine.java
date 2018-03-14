@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +43,6 @@ import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.core.util.impl.resources.FileResourcesLocatorImpl;
 import org.eclipse.e4.ui.css.core.util.impl.resources.OSGiResourceLocator;
 import org.eclipse.e4.ui.css.core.util.resources.IResourceLocator;
-import org.eclipse.e4.ui.css.swt.helpers.EclipsePreferencesHelper;
 import org.eclipse.e4.ui.css.swt.theme.ITheme;
 import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.osgi.service.datalocation.Location;
@@ -251,7 +249,7 @@ public class ThemeEngine implements IThemeEngine {
 	public synchronized void registerStylesheet(String uri, String... themes) {
 		Bundle bundle = FrameworkUtil.getBundle(ThemeEngine.class);
 		String osname = bundle.getBundleContext().getProperty("osgi.os");
-		String wsname = bundle.getBundleContext().getProperty("osgi.ws");
+		String wsname = bundle.getBundleContext().getProperty("ogsi.ws");
 
 		uri = uri.replaceAll("\\$os\\$", osname).replaceAll("\\$ws\\$", wsname);
 
@@ -454,9 +452,6 @@ public class ThemeEngine implements IThemeEngine {
 
 		if (restore) {
 			IEclipsePreferences pref = getPreferences();
-			EclipsePreferencesHelper.setPreviousThemeId(pref.get(THEMEID_KEY, null));
-			EclipsePreferencesHelper.setCurrentThemeId(theme.getId());
-
 			pref.put(THEMEID_KEY, theme.getId());
 			try {
 				pref.flush();
@@ -618,10 +613,6 @@ public class ThemeEngine implements IThemeEngine {
 	public void addCSSEngine(CSSEngine cssEngine) {
 		cssEngines.add(cssEngine);
 		resetCurrentTheme();
-	}
-
-	public Collection<CSSEngine> getCSSEngines() {
-		return cssEngines;
 	}
 
 	@Override

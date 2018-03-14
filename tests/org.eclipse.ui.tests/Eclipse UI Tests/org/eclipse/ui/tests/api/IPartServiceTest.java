@@ -45,82 +45,69 @@ public class IPartServiceTest extends UITestCase {
     private IWorkbenchPartReference eventPartRef;
 
     class TestPartListener implements IPartListener {
-        @Override
-		public void partActivated(IWorkbenchPart part) {
+        public void partActivated(IWorkbenchPart part) {
             history.add("partActivated");
             eventPart = part;
         }
 
-        @Override
-		public void partBroughtToTop(IWorkbenchPart part) {
+        public void partBroughtToTop(IWorkbenchPart part) {
             history.add("partBroughtToTop");
             eventPart = part;
         }
 
-        @Override
-		public void partClosed(IWorkbenchPart part) {
+        public void partClosed(IWorkbenchPart part) {
             history.add("partClosed");
             eventPart = part;
         }
 
-        @Override
-		public void partDeactivated(IWorkbenchPart part) {
+        public void partDeactivated(IWorkbenchPart part) {
             history.add("partDeactivated");
             eventPart = part;
         }
 
-        @Override
-		public void partOpened(IWorkbenchPart part) {
+        public void partOpened(IWorkbenchPart part) {
             history.add("partOpened");
             eventPart = part;
         }
     }
 
     class TestPartListener2 implements IPartListener2 {
-        @Override
-		public void partActivated(IWorkbenchPartReference ref) {
+        public void partActivated(IWorkbenchPartReference ref) {
             history2.add("partActivated");
             eventPartRef = ref;
         }
 
-        @Override
-		public void partBroughtToTop(IWorkbenchPartReference ref) {
+        public void partBroughtToTop(IWorkbenchPartReference ref) {
             history2.add("partBroughtToTop");
             eventPartRef = ref;
         }
 
-        @Override
-		public void partClosed(IWorkbenchPartReference ref) {
+        public void partClosed(IWorkbenchPartReference ref) {
             history2.add("partClosed");
             eventPartRef = ref;
         }
 
-        @Override
-		public void partDeactivated(IWorkbenchPartReference ref) {
+        public void partDeactivated(IWorkbenchPartReference ref) {
             history2.add("partDeactivated");
             eventPartRef = ref;
         }
 
-        @Override
-		public void partOpened(IWorkbenchPartReference ref) {
+        public void partOpened(IWorkbenchPartReference ref) {
             history2.add("partOpened");
             eventPartRef = ref;
         }
 
-        @Override
-		public void partHidden(IWorkbenchPartReference ref) {
+        public void partHidden(IWorkbenchPartReference ref) {
             history2.add("partHidden");
             eventPartRef = ref;
         }
 
-        @Override
-		public void partVisible(IWorkbenchPartReference ref) {
+        public void partVisible(IWorkbenchPartReference ref) {
             history2.add("partVisible");
             eventPartRef = ref;
         }
 
-        @Override
-		public void partInputChanged(IWorkbenchPartReference ref) {
+        public void partInputChanged(IWorkbenchPartReference ref) {
             history2.add("partInputChanged");
             eventPartRef = ref;
         }
@@ -148,8 +135,7 @@ public class IPartServiceTest extends UITestCase {
         history2.clear();
     }
 
-    @Override
-	protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         super.doSetUp();
         fWindow = openTestWindow();
         fPage = fWindow.getActivePage();
@@ -195,13 +181,13 @@ public class IPartServiceTest extends UITestCase {
     }
     
     public void testLocalPartService() throws Throwable {
-    	IPartService service = fWindow
+    	IPartService service = (IPartService) fWindow
 				.getService(IPartService.class);
 
 		MockViewPart view = (MockViewPart) fPage.showView(MockViewPart.ID);
 		MockViewPart view2 = (MockViewPart) fPage.showView(MockViewPart.ID2);
 
-		IPartService slaveService = view.getSite()
+		IPartService slaveService = (IPartService) view.getSite()
 				.getService(IPartService.class);
 
 		assertTrue(service != slaveService);
@@ -242,7 +228,7 @@ public class IPartServiceTest extends UITestCase {
     public void testAddPartListenerToWindow() throws Throwable {
         // From Javadoc: "Adds the given listener for part lifecycle events.
 		// Has no effect if an identical listener is already registered."
-		IPartService service = fWindow
+		IPartService service = (IPartService) fWindow
 				.getService(IPartService.class);
 		service.addPartListener(partListener);
 		service.addPartListener(partListener2);
@@ -302,7 +288,7 @@ public class IPartServiceTest extends UITestCase {
 		// Has no affect if an identical listener is not registered."
 
 		// Add and remove listener.
-		IPartService service = fWindow
+		IPartService service = (IPartService) fWindow
 				.getService(IPartService.class);
 		service.addPartListener(partListener);
 		service.addPartListener(partListener2);
@@ -325,8 +311,7 @@ public class IPartServiceTest extends UITestCase {
 	 */
     public void testPartHiddenWhenClosedAndUnshared() throws Throwable {
         IPartListener2 listener = new TestPartListener2() {
-            @Override
-			public void partHidden(IWorkbenchPartReference ref) {
+            public void partHidden(IWorkbenchPartReference ref) {
                 super.partHidden(ref);
                 // ensure that the notification is for the view we closed
                 assertEquals(MockViewPart.ID, ref.getId());
@@ -350,8 +335,7 @@ public class IPartServiceTest extends UITestCase {
      */
     public void XXXtestPartHiddenWhenClosedAndShared() throws Throwable {
         IPartListener2 listener = new TestPartListener2() {
-            @Override
-			public void partHidden(IWorkbenchPartReference ref) {
+            public void partHidden(IWorkbenchPartReference ref) {
                 super.partHidden(ref);
                 // ensure that the notification is for the view we closed
                 assertEquals(MockViewPart.ID, ref.getId());
@@ -380,8 +364,7 @@ public class IPartServiceTest extends UITestCase {
     public void testPartHiddenWhenObscured() throws Throwable {
         final boolean[] eventReceived = { false };
         IPartListener2 listener = new TestPartListener2() {
-            @Override
-			public void partHidden(IWorkbenchPartReference ref) {
+            public void partHidden(IWorkbenchPartReference ref) {
                 super.partHidden(ref);
                 // ensure that the notification is for the view that was obscured
                 assertEquals(MockViewPart.ID, ref.getId());
@@ -407,8 +390,7 @@ public class IPartServiceTest extends UITestCase {
     public void testPartVisibleWhenOpenedUnshared() throws Throwable {
         final boolean[] eventReceived = { false };
         IPartListener2 listener = new TestPartListener2() {
-            @Override
-			public void partVisible(IWorkbenchPartReference ref) {
+            public void partVisible(IWorkbenchPartReference ref) {
                 super.partVisible(ref);
                 // ensure that the notification is for the view we opened
                 assertEquals(MockViewPart.ID, ref.getId());
@@ -432,8 +414,7 @@ public class IPartServiceTest extends UITestCase {
     public void testPartVisibleWhenOpenedShared() throws Throwable {
         final boolean[] eventReceived = { false };
         IPartListener2 listener = new TestPartListener2() {
-            @Override
-			public void partVisible(IWorkbenchPartReference ref) {
+            public void partVisible(IWorkbenchPartReference ref) {
                 super.partVisible(ref);
                 // ensure that the notification is for the view we opened
                 assertEquals(MockViewPart.ID, ref.getId());
@@ -466,8 +447,7 @@ public class IPartServiceTest extends UITestCase {
         
         final boolean[] eventReceived = {false, false};
         IPartListener2 listener = new TestPartListener2() {
-            @Override
-			public void partHidden(IWorkbenchPartReference ref) {
+            public void partHidden(IWorkbenchPartReference ref) {
                 super.partHidden(ref);
                 // ensure that the notification is for the view we revealed
                 assertEquals(MockViewPart.ID, ref.getId());
@@ -477,8 +457,7 @@ public class IPartServiceTest extends UITestCase {
                 eventReceived[0] = true;
                 assertFalse(eventReceived[1]);
             }
-            @Override
-			public void partClosed(IWorkbenchPartReference ref) {
+            public void partClosed(IWorkbenchPartReference ref) {
                 super.partClosed(ref);
                 // ensure that the notification is for the view we revealed
                 assertEquals(MockViewPart.ID, ref.getId());
@@ -508,8 +487,7 @@ public class IPartServiceTest extends UITestCase {
     public void testPartVisibleWhenObscured() throws Throwable {
         final boolean[] eventReceived = { false };
         IPartListener2 listener = new TestPartListener2() {
-            @Override
-			public void partVisible(IWorkbenchPartReference ref) {
+            public void partVisible(IWorkbenchPartReference ref) {
                 super.partVisible(ref);
                 // ensure that the notification is for the view we revealed
                 assertEquals(MockViewPart.ID, ref.getId());
@@ -588,8 +566,7 @@ public class IPartServiceTest extends UITestCase {
     	
         final boolean[] eventReceived = { false, false };
         IPartListener listener = new TestPartListener() {
-            @Override
-			public void partOpened(IWorkbenchPart part) {
+            public void partOpened(IWorkbenchPart part) {
                 super.partOpened(part);
                 // ensure that the notification is for the editor we opened
                 assertEquals(editorId, part.getSite().getId());
@@ -602,8 +579,7 @@ public class IPartServiceTest extends UITestCase {
             }
         };
         IPartListener2 listener2 = new TestPartListener2() {
-            @Override
-			public void partOpened(IWorkbenchPartReference ref) {
+            public void partOpened(IWorkbenchPartReference ref) {
                 super.partOpened(ref);
                 // ensure that the notification is for the editor we opened
                 assertEquals(editorId, ref.getId());

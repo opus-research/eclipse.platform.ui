@@ -51,7 +51,6 @@ AbstractCSSPropertyPaddingHandler {
 	 * If three values then assigned top=v1, left=v2, right=v2, bottom=v3
 	 * If two values then assigned top/bottom=v1, left/right=v2
 	 */
-	@Override
 	public void applyCSSPropertyPadding(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 
@@ -100,7 +99,6 @@ AbstractCSSPropertyPaddingHandler {
 		}
 	}
 
-	@Override
 	public void applyCSSPropertyPaddingTop(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		CSS2PaddingPropertiesImpl padding = new CSS2PaddingPropertiesImpl();
@@ -110,7 +108,6 @@ AbstractCSSPropertyPaddingHandler {
 		}
 	}
 
-	@Override
 	public void applyCSSPropertyPaddingRight(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		CSS2PaddingPropertiesImpl padding = new CSS2PaddingPropertiesImpl();
@@ -120,7 +117,6 @@ AbstractCSSPropertyPaddingHandler {
 		}
 	}
 
-	@Override
 	public void applyCSSPropertyPaddingBottom(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		CSS2PaddingPropertiesImpl padding = new CSS2PaddingPropertiesImpl();
@@ -130,7 +126,6 @@ AbstractCSSPropertyPaddingHandler {
 		}
 	}
 
-	@Override
 	public void applyCSSPropertyPaddingLeft(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		CSS2PaddingPropertiesImpl padding = new CSS2PaddingPropertiesImpl();
@@ -140,35 +135,30 @@ AbstractCSSPropertyPaddingHandler {
 		}
 	}
 
-	@Override
 	public String retrieveCSSPropertyPadding(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public String retrieveCSSPropertyPaddingTop(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public String retrieveCSSPropertyPaddingRight(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public String retrieveCSSPropertyPaddingBottom(Object element,
 			String pseudo, CSSEngine engine) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public String retrieveCSSPropertyPaddingLeft(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		// TODO Auto-generated method stub
@@ -214,14 +204,8 @@ AbstractCSSPropertyPaddingHandler {
 					left = (int) ((CSSPrimitiveValue) vLeft).getFloatValue(CSSPrimitiveValue.CSS_PX);
 				}
 
-				if (top != pad.x || right != pad.y || bottom != pad.width
-						|| left != pad.height) {
-					Method m2 = renderer.getClass().getMethod(
-							"setPadding",
-							new Class[] { int.class, int.class, int.class,
-									int.class });
-					m2.invoke(renderer, left, right, top, bottom);
-				}
+				Method m2 = renderer.getClass().getMethod("setPadding", new Class[]{int.class, int.class, int.class, int.class});
+				m2.invoke(renderer, left, right, top, bottom);
 			} catch (Exception e) {
 
 			}

@@ -38,7 +38,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * The Heap Status control, which shows the heap usage statistics in the window trim.
@@ -72,8 +71,7 @@ public class HeapStatus extends Composite {
 	protected volatile boolean isInGC = false;
 
     private final Runnable timer = new Runnable() {
-        @Override
-		public void run() {
+        public void run() {
             if (!isDisposed()) {
                 updateStats();
                 if (hasChanged) {
@@ -89,7 +87,6 @@ public class HeapStatus extends Composite {
     };
     
     private final IPropertyChangeListener prefListener = new IPropertyChangeListener() {
-		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			if (IHeapStatusConstants.PREF_UPDATE_INTERVAL.equals(event.getProperty())) {
 				setUpdateIntervalInMS(prefStore.getInt(IHeapStatusConstants.PREF_UPDATE_INTERVAL));
@@ -142,8 +139,7 @@ public class HeapStatus extends Composite {
 		
         Listener listener = new Listener() {
 
-            @Override
-			public void handleEvent(Event event) {
+            public void handleEvent(Event event) {
                 switch (event.type) {
                 case SWT.Dispose:
                 	doDispose();
@@ -208,7 +204,6 @@ public class HeapStatus extends Composite {
 		updateStats();
 
         getDisplay().asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				if (!isDisposed()) {
 					getDisplay().timerExec(updateInterval, timer);
@@ -257,7 +252,9 @@ public class HeapStatus extends Composite {
 		}
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.widgets.Composite#computeSize(int, int, boolean)
+	 */
 	public Point computeSize(int wHint, int hHint, boolean changed) {
         GC gc = new GC(this);
         Point p = gc.textExtent(WorkbenchMessages.HeapStatus_widthStr);
@@ -297,7 +294,6 @@ public class HeapStatus extends Composite {
         MenuManager menuMgr = new MenuManager();
         menuMgr.setRemoveAllWhenShown(true);
         menuMgr.addMenuListener(new IMenuListener() {
-			@Override
 			public void menuAboutToShow(IMenuManager menuMgr) {
 				fillMenu(menuMgr);
 			}
@@ -338,11 +334,9 @@ public class HeapStatus extends Composite {
     private void gc() {
 		gcRunning(true);
 		Thread t = new Thread() {
-			@Override
 			public void run() {
 				busyGC();
 				getDisplay().asyncExec(new Runnable() {
-					@Override
 					public void run() {
 						if (!isDisposed()) {
 							gcRunning(false);
@@ -543,8 +537,7 @@ public class HeapStatus extends Composite {
             super(WorkbenchMessages.SetMarkAction_text);
         }
         
-        @Override
-		public void run() {
+        public void run() {
             setMark();
         }
     }
@@ -554,8 +547,7 @@ public class HeapStatus extends Composite {
             super(WorkbenchMessages.ClearMarkAction_text);
         }
         
-        @Override
-		public void run() {
+        public void run() {
             clearMark();
         }
     }
@@ -567,8 +559,7 @@ public class HeapStatus extends Composite {
             setChecked(showMax);
         }
         
-        @Override
-		public void run() {
+        public void run() {
             prefStore.setValue(IHeapStatusConstants.PREF_SHOW_MAX, isChecked());
             redraw();
         }
@@ -580,13 +571,11 @@ public class HeapStatus extends Composite {
     		super(WorkbenchMessages.WorkbenchWindow_close );
     	}
     	
-    	@Override
-		public void run(){
-			WorkbenchWindow wbw = (WorkbenchWindow) PlatformUI.getWorkbench()
-					.getActiveWorkbenchWindow();
-			if (wbw != null) {
-				wbw.showHeapStatus(false);
-			}
+    	/* (non-Javadoc)
+    	 * @see org.eclipse.jface.action.IAction#run()
+    	 */
+    	public void run(){
+    		dispose();
     	}
     }
 

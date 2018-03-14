@@ -34,7 +34,6 @@ public class IdentityMapTest extends TestCase {
 	Object key;
 	Object value;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		map = new IdentityMap();
@@ -497,27 +496,22 @@ public class IdentityMapTest extends TestCase {
 			this.value = value;
 		}
 
-		@Override
 		public Object getKey() {
 			return key;
 		}
 
-		@Override
 		public Object getValue() {
 			return value;
 		}
 
-		@Override
 		public Object setValue(Object value) {
 			throw new UnsupportedOperationException();
 		}
 
-		@Override
 		public boolean equals(Object obj) {
 			throw new UnsupportedOperationException();
 		}
 
-		@Override
 		public int hashCode() {
 			throw new UnsupportedOperationException();
 		}

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -46,7 +46,6 @@ public class HandledMenuItemRenderer extends MenuItemRenderer {
 	@Inject
 	Logger logger;
 
-	@Override
 	public Object createWidget(final MUIElement element, Object parent) {
 		if (!(element instanceof MHandledMenuItem) || !(parent instanceof Menu))
 			return null;
@@ -106,7 +105,6 @@ public class HandledMenuItemRenderer extends MenuItemRenderer {
 		newItem.setEnabled(itemModel.isEnabled());
 	}
 
-	@Override
 	protected void setItemText(MMenuItem model, MenuItem item) {
 		String text = model.getLocalizedLabel();
 		if (model instanceof MHandledItem) {
@@ -135,6 +133,13 @@ public class HandledMenuItemRenderer extends MenuItemRenderer {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#hookControllerLogic
+	 * (org.eclipse.e4.ui.model.application.MUIElement)
+	 */
 	@Override
 	public void hookControllerLogic(MUIElement me) {
 		// If the item is a CHECK or RADIO update the model's state to match
@@ -146,7 +151,6 @@ public class HandledMenuItemRenderer extends MenuItemRenderer {
 			final IEclipseContext lclContext = getContext(me);
 			MenuItem mi = (MenuItem) me.getWidget();
 			mi.addListener(SWT.Selection, new Listener() {
-				@Override
 				public void handleEvent(Event e) {
 					EHandlerService service = (EHandlerService) lclContext
 							.get(EHandlerService.class.getName());

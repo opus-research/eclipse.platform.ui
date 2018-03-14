@@ -34,17 +34,14 @@ public class KeywordTests extends DynamicTestCase {
 		assertNull(registry.getKeywordLabel(ID_KEYWORD));
 	}
 
-	@Override
 	protected String getExtensionId() {
 		return "newKeyword1.testDynamicKeywordAddition";
 	}
 
-	@Override
 	protected String getExtensionPoint() {
 		return IWorkbenchRegistryConstants.PL_KEYWORDS;
 	}
 
-	@Override
 	protected String getInstallLocation() {
 		return "data/org.eclipse.newKeyword1";
 	}

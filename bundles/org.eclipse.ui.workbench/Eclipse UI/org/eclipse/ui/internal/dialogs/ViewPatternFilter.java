@@ -7,10 +7,10 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430603
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.LocalizationHelper;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
 import org.eclipse.jface.viewers.Viewer;
@@ -25,6 +25,14 @@ import org.eclipse.ui.dialogs.PatternFilter;
  */
 public class ViewPatternFilter extends PatternFilter {
 
+	private IEclipseContext context;
+
+	/**
+	 * Create a new instance of a ViewPatternFilter
+	 */
+	public ViewPatternFilter(IEclipseContext context) {
+		this.context = context;
+	}
 
 	@Override
 	public boolean isElementSelectable(Object element) {
@@ -40,7 +48,7 @@ public class ViewPatternFilter extends PatternFilter {
 		String text = null;
 		if (element instanceof MPartDescriptor) {
 			MPartDescriptor desc = (MPartDescriptor) element;
-			text = LocalizationHelper.getLocalized(desc.getLabel(), desc);
+			text = LocalizationHelper.getLocalized(desc.getLabel(), desc, context);
 			if (wordMatches(text)) {
 				return true;
 			}

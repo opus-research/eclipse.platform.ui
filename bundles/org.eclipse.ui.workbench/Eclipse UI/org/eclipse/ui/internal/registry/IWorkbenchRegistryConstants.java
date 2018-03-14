@@ -11,7 +11,6 @@
  *     - Fix for bug 11490 - define hidden view (placeholder for view) in plugin.xml    
  *     Markus Alexander Kuppe, Versant Corporation - bug #215797
  *     Semion Chichelnitsky (semion@il.ibm.com) - bug 208564
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 441184
  *******************************************************************************/
 package org.eclipse.ui.internal.registry;
 
@@ -695,6 +694,8 @@ public interface IWorkbenchRegistryConstants {
 
 	public static String PL_PREFERENCES = "preferencePages"; //$NON-NLS-1$
 
+	public static String PL_PRESENTATION_FACTORIES = "presentationFactories"; //$NON-NLS-1$
+
 	public static String PL_PROPERTY_PAGES = "propertyPages"; //$NON-NLS-1$
 
 	public static String PL_STARTUP = "startup"; //$NON-NLS-1$
@@ -919,12 +920,8 @@ public interface IWorkbenchRegistryConstants {
 	public static String TAG_CATEGORYDEFINITION = "themeElementCategory"; //$NON-NLS-1$
 
 	/**
-	 * Category presentation tag. Value <code>categoryPresentationBinding</code>
-	 * .
-	 * 
-	 * @deprecated used by the removal presentation API
+	 * Category presentation tag. Value <code>categoryPresentationBinding</code>.
 	 */
-	@Deprecated
 	public static String TAG_CATEGORYPRESENTATIONBINDING = "categoryPresentationBinding"; //$NON-NLS-1$
 
 	/**

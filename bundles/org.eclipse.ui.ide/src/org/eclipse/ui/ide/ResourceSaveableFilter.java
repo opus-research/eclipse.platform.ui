@@ -44,7 +44,8 @@ public class ResourceSaveableFilter implements ISaveableFilter {
 		this.roots = roots;
 	}
 
-	@Override
+	/* (non-Javadoc) @see org.eclipse.ui.ISaveableFilter#select(org.eclipse.ui.Saveable, org.eclipse.ui.IWorkbenchPart[])
+	 */
 	public boolean select(Saveable saveable, IWorkbenchPart[] containingParts) {
 		if (isDescendantOfRoots(saveable)) {
 			return true;

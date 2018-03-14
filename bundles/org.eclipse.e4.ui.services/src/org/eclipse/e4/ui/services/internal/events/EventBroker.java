@@ -7,7 +7,6 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Steven Spungin - Bug 441874
  *******************************************************************************/
 package org.eclipse.e4.ui.services.internal.events;
 
@@ -41,7 +40,6 @@ public class EventBroker implements IEventBroker {
 	private Map<EventHandler, Collection<ServiceRegistration<?>>> registrations = new HashMap<EventHandler, Collection<ServiceRegistration<?>>>();
 
 	@Inject
-	@Optional
 	Logger logger;
 	
 	@Inject
@@ -72,28 +70,22 @@ public class EventBroker implements IEventBroker {
 		// placeholder
 	}
 
-	@Override
 	public boolean send(String topic, Object data) {
 		Event event = constructEvent(topic, data);
 		EventAdmin eventAdmin = Activator.getDefault().getEventAdmin();
 		if (eventAdmin == null) {
-			if (logger != null) {
-				logger.error(NLS.bind(ServiceMessages.NO_EVENT_ADMIN, event.toString()));
-			}
+			logger.error(NLS.bind(ServiceMessages.NO_EVENT_ADMIN, event.toString()));
 			return false;
 		}
 		eventAdmin.sendEvent(event);
 		return true;
 	}
 
-	@Override
 	public boolean post(String topic, Object data) {
 		Event event = constructEvent(topic, data);
 		EventAdmin eventAdmin = Activator.getDefault().getEventAdmin();
 		if (eventAdmin == null) {
-			if (logger != null) {
-				logger.error(NLS.bind(ServiceMessages.NO_EVENT_ADMIN, event.toString()));
-			}
+			logger.error(NLS.bind(ServiceMessages.NO_EVENT_ADMIN, event.toString()));
 			return false;
 		}
 		eventAdmin.postEvent(event);
@@ -117,18 +109,14 @@ public class EventBroker implements IEventBroker {
 		return event;
 	}
 
-	@Override
 	public boolean subscribe(String topic, EventHandler eventHandler) {
 		return subscribe(topic, null, eventHandler, false);
 	}
-
-	@Override
+	
 	public boolean subscribe(String topic, String filter, EventHandler eventHandler, boolean headless) {
 		BundleContext bundleContext = Activator.getDefault().getBundleContext();
 		if (bundleContext == null) {
-			if (logger != null) {
-				logger.error(NLS.bind(ServiceMessages.NO_BUNDLE_CONTEXT, topic));
-			}
+			logger.error(NLS.bind(ServiceMessages.NO_BUNDLE_CONTEXT, topic));
 			return false;
 		}
 		String[] topics = new String[] {topic};
@@ -149,7 +137,6 @@ public class EventBroker implements IEventBroker {
 		return true;
 	}
 
-	@Override
 	public boolean unsubscribe(EventHandler eventHandler) {
 		Collection<ServiceRegistration<?>> handled = registrations
 				.remove(eventHandler);

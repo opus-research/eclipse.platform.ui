@@ -25,8 +25,13 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 public class TabbedPropertySheetAdapterFactory
     implements IAdapterFactory {
 
-    @Override
-	public Object getAdapter(Object adaptableObject, Class adapterType) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object,
+     *      java.lang.Class)
+     */
+    public Object getAdapter(Object adaptableObject, Class adapterType) {
         if (adaptableObject instanceof ProjectExplorer) {
         	if (IPropertySheetPage.class == adapterType)
                 return new TabbedPropertySheetPage(
@@ -36,8 +41,12 @@ public class TabbedPropertySheetAdapterFactory
         return null;
     }
 
-    @Override
-	public Class[] getAdapterList() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
+     */
+    public Class[] getAdapterList() {
         return new Class[] {IPropertySheetPage.class};
     }
 

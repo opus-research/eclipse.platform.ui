@@ -50,7 +50,11 @@ public abstract class DynamicTestCase extends UITestCase implements
 		super(testName);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.util.UITestCase#doTearDown()
+	 */
 	protected void doTearDown() throws Exception {
 		super.doTearDown();
 		try {
@@ -201,7 +205,6 @@ public abstract class DynamicTestCase extends UITestCase implements
 	 * @see DynamicTestCase#setAddedEventPropagated(boolean)
 	 * @see DynamicTestCase#setRemovedEventPropagated(boolean)
 	 */
-	@Override
 	public void registryChanged(IRegistryChangeEvent event) {
 		IExtensionDelta delta = event.getExtensionDelta(
 				getDeclaringNamespace(), getExtensionPoint(), getExtensionId());

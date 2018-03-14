@@ -186,7 +186,10 @@ public abstract class ImportExportPage extends WorkbenchWizardSelectionPage{
 		setTitle(WorkbenchMessages.Select);
 	}
 	
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createControl(Composite parent) {
 	    Font font = parent.getFont();
 	
@@ -294,8 +297,7 @@ public abstract class ImportExportPage extends WorkbenchWizardSelectionPage{
      */
 	private IWizardNode createWizardNode(IWizardDescriptor element) {
         return new WorkbenchWizardNode(this, element) {
-            @Override
-			public IWorkbenchWizard createWizard() throws CoreException {
+            public IWorkbenchWizard createWizard() throws CoreException {
                 return wizardElement.createWizard();
             }
         };
@@ -419,8 +421,11 @@ public abstract class ImportExportPage extends WorkbenchWizardSelectionPage{
     	// do nothing by default - subclasses should override
     }
     
-    @Override
-	public IWizardPage getNextPage() { 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.wizard.IWizardPage#getNextPage()
+     */
+    public IWizardPage getNextPage() { 
     	ITriggerPoint triggerPoint = getTriggerPoint();
         
         if (triggerPoint == null || WorkbenchActivityHelper.allowUseOf(triggerPoint, getSelectedNode())) {

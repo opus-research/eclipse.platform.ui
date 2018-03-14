@@ -63,8 +63,10 @@ public class ObjectActionContributor extends PluginActionBuilder implements
         this.objectClass = config.getAttribute(IWorkbenchRegistryConstants.ATT_OBJECTCLASS);
     }
 
-    @Override
-	public boolean canAdapt() {
+    /* (non-Javadoc)
+     * Method declared on IObjectContributor.
+     */
+    public boolean canAdapt() {
         return adaptable;
     }
     
@@ -77,8 +79,10 @@ public class ObjectActionContributor extends PluginActionBuilder implements
 		return objectClass;
 	}
 
-    @Override
-	public void contributeObjectActionIdOverrides(List actionIdOverrides) {
+    /* (non-Javadoc)
+     * Method declared on IObjectActionContributor.
+     */
+    public void contributeObjectActionIdOverrides(List actionIdOverrides) {
         if (!configRead) {
 			readConfigElement();
 		}
@@ -99,8 +103,7 @@ public class ObjectActionContributor extends PluginActionBuilder implements
     /**
      * Contributes actions applicable for the current selection.
      */
-    @Override
-	public boolean contributeObjectActions(final IWorkbenchPart part,
+    public boolean contributeObjectActions(final IWorkbenchPart part,
             IMenuManager menu, ISelectionProvider selProv,
             List actionIdOverrides) {
         if (!configRead) {
@@ -144,13 +147,11 @@ public class ObjectActionContributor extends PluginActionBuilder implements
                     final ObjectPluginAction action = (ObjectPluginAction) ad
                             .getAction();
                     ISafeRunnable runnable = new ISafeRunnable() {
-						@Override
 						public void handleException(Throwable exception) {
 							WorkbenchPlugin.log("Failed to update action "  //$NON-NLS-1$
 									+ action.getId(), exception);
 						}
 
-						@Override
 						public void run() throws Exception {
 		                    action.setActivePart(part);
 		                    action.selectionChanged(selection);
@@ -166,8 +167,7 @@ public class ObjectActionContributor extends PluginActionBuilder implements
     /**
 	 * Contributes menus applicable for the current selection.
 	 */
-    @Override
-	public boolean contributeObjectMenus(IMenuManager menu,
+    public boolean contributeObjectMenus(IMenuManager menu,
             ISelectionProvider selProv) {
         if (!configRead) {
 			readConfigElement();
@@ -193,14 +193,18 @@ public class ObjectActionContributor extends PluginActionBuilder implements
         return true;
     }
 
-    @Override
-	protected ActionDescriptor createActionDescriptor(
+    /* (non-Javadoc)
+     * Method declared on PluginActionBuilder.
+     */
+    protected ActionDescriptor createActionDescriptor(
             IConfigurationElement element) {
         return new ActionDescriptor(element, ActionDescriptor.T_POPUP);
     }
 
-    @Override
-	protected BasicContribution createContribution() {
+    /* (non-Javadoc)
+     * Method declared on PluginActionBuilder.
+     */
+    protected BasicContribution createContribution() {
         return new ObjectContribution();
     }
 
@@ -208,8 +212,7 @@ public class ObjectActionContributor extends PluginActionBuilder implements
      * Returns true if name filter is not specified for the contribution
      * or the current selection matches the filter.
      */
-    @Override
-	public boolean isApplicableTo(Object object) {
+    public boolean isApplicableTo(Object object) {
         if (!configRead) {
 			readConfigElement();
 		}
@@ -249,8 +252,10 @@ public class ObjectActionContributor extends PluginActionBuilder implements
         configRead = true;
     }
 
-    @Override
-	protected boolean readElement(IConfigurationElement element) {
+    /* (non-Javadoc)
+     * Method declared on PluginActionBuilder.
+     */
+    protected boolean readElement(IConfigurationElement element) {
         String tag = element.getName();
 
         // Found visibility sub-element
@@ -384,8 +389,7 @@ public class ObjectActionContributor extends PluginActionBuilder implements
      * Debugging helper that will print out the contribution names for this
      * contributor.
      */
-    @Override
-	public String toString() {
+    public String toString() {
     	StringBuffer buffer = new StringBuffer();
     	IConfigurationElement[] children = config.getChildren();
     	for (int i = 0; i < children.length; i++) {
@@ -399,7 +403,9 @@ public class ObjectActionContributor extends PluginActionBuilder implements
     	return buffer.toString();
     }
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+	 */
 	public Object getAdapter(Class adapter) {
 		if (adapter.equals(IConfigurationElement.class)) {
 			return config;

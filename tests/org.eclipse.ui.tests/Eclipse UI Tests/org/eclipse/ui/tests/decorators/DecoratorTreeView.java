@@ -30,10 +30,14 @@ public class DecoratorTreeView extends DecoratorTestPart {
 		// XXX Auto-generated constructor stub
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createPartControl(Composite parent) {
 		 viewer = new TreeViewer(parent){
-			@Override
+		 	/* (non-Javadoc)
+			 * @see org.eclipse.jface.viewers.AbstractTreeViewer#labelProviderChanged()
+			 */
 			protected void labelProviderChanged() {
 				super.labelProviderChanged();
 			}
@@ -52,7 +56,9 @@ public class DecoratorTreeView extends DecoratorTestPart {
 	}
 
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkbenchPart#setFocus()
+	 */
 	public void setFocus() {
 		// XXX Auto-generated method stub
 

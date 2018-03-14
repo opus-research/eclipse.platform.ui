@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430988
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430988
  *******************************************************************************/
 package org.eclipse.ui.handlers;
 
@@ -32,40 +32,41 @@ import org.eclipse.ui.internal.dialogs.ShowViewDialog;
 /**
  * Shows the given view. If no view is specified in the parameters, then this
  * opens the view selection dialog.
- *
+ * 
  * @since 3.1
  */
 public final class ShowViewHandler extends AbstractHandler {
 
+	/**
+	 * Creates a new ShowViewHandler that will open the view in its default
+	 * location.
+	 */
+	public ShowViewHandler() {
+	}
 
-    /**
-     * Creates a new ShowViewHandler that will open the view in its default location.
-     */
-    public ShowViewHandler() {
-    }
+	/**
+	 * Creates a new ShowViewHandler that will optionally force the view to
+	 * become a fast view.
+	 *
+	 * @param makeFast
+	 *            if true, the view will be moved to the fast view bar (even if
+	 *            it already exists elsewhere). If false, the view will be shown
+	 *            in its default location. Calling with false is equivalent to
+	 *            using the default constructor.
+	 */
+	public ShowViewHandler(boolean makeFast) {
+		// fast views are not supported in Eclipse 4
+	}
 
-    /**
-     * Creates a new ShowViewHandler that will optionally force the view to become
-     * a fast view.
-     *
-     * @param makeFast if true, the view will be moved to the fast view bar (even if it already
-     * exists elsewhere). If false, the view will be shown in its default location. Calling with
-     * false is equivalent to using the default constructor.
-     */
-    public ShowViewHandler(boolean makeFast) {
-
-    }
-
-	@Override
 	public final Object execute(final ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow workbenchWindow = HandlerUtil.getActiveWorkbenchWindowChecked(event);
 		Shell shell = HandlerUtil.getActiveShell(event);
 		// Get the view identifier, if any.
-		IEclipseContext ctx = workbenchWindow.getService(IEclipseContext.class);
-		EModelService modelService = workbenchWindow.getService(EModelService.class);
-		EPartService partService = workbenchWindow.getService(EPartService.class);
-		MApplication app = workbenchWindow.getService(MApplication.class);
-		MWindow window = workbenchWindow.getService(MWindow.class);
+		IEclipseContext ctx = (IEclipseContext) workbenchWindow.getService(IEclipseContext.class);
+		EModelService modelService = (EModelService) workbenchWindow.getService(EModelService.class);
+		EPartService partService = (EPartService) workbenchWindow.getService(EPartService.class);
+		MApplication app = (MApplication) workbenchWindow.getService(MApplication.class);
+		MWindow window = (MWindow) workbenchWindow.getService(MWindow.class);
 
 		final Map parameters = event.getParameters();
 		final Object value = parameters.get(IWorkbenchCommandConstants.VIEWS_SHOW_VIEW_PARM_ID);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2014 IBM Corporation and others.
+ * Copyright (c) 2007, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 
 package org.eclipse.ui.internal.actions;
@@ -90,7 +89,6 @@ public class CommandAction extends Action {
 	protected ICommandListener getCommandListener() {
 		if (commandListener == null) {
 			commandListener = new ICommandListener() {
-				@Override
 				public void commandChanged(CommandEvent commandEvent) {
 					if (commandEvent.isHandledChanged()
 							|| commandEvent.isEnabledChanged()) {
@@ -146,7 +144,6 @@ public class CommandAction extends Action {
 	 * 
 	 * @see org.eclipse.jface.action.Action#runWithEvent(org.eclipse.swt.widgets.Event)
 	 */
-	@Override
 	public void runWithEvent(Event event) {
 		if (handlerService == null) {
 			String commandId = (parameterizedCommand == null ? "unknownCommand" //$NON-NLS-1$
@@ -169,7 +166,6 @@ public class CommandAction extends Action {
 	 * 
 	 * @see org.eclipse.jface.action.Action#run()
 	 */
-	@Override
 	public void run() {
 		// hopefully this is never called
 		runWithEvent(null);
@@ -181,11 +177,11 @@ public class CommandAction extends Action {
 			// already initialized
 			return;
 		}
-		handlerService = serviceLocator
+		handlerService = (IHandlerService) serviceLocator
 				.getService(IHandlerService.class);
-		ICommandService commandService = serviceLocator
+		ICommandService commandService = (ICommandService) serviceLocator
 				.getService(ICommandService.class);
-		ICommandImageService commandImageService = serviceLocator
+		ICommandImageService commandImageService = (ICommandImageService) serviceLocator
 				.getService(ICommandImageService.class);
 
 		createCommand(commandService, commandIdIn, parameterMap);
@@ -215,7 +211,6 @@ public class CommandAction extends Action {
 		return parameterizedCommand;
 	}
 
-	@Override
 	public String getActionDefinitionId() {
 		return super.getActionDefinitionId();
 	}

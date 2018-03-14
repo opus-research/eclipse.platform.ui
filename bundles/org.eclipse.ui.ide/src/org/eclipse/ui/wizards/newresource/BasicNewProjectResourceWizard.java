@@ -149,7 +149,6 @@ public class BasicNewProjectResourceWizard extends BasicNewResourceWizard
 	/*
 	 * (non-Javadoc) Method declared on IWizard.
 	 */
-	@Override
 	public void addPages() {
 		super.addPages();
 
@@ -159,7 +158,6 @@ public class BasicNewProjectResourceWizard extends BasicNewResourceWizard
 			 * 
 			 * @see org.eclipse.ui.dialogs.WizardNewProjectCreationPage#createControl(org.eclipse.swt.widgets.Composite)
 			 */
-			@Override
 			public void createControl(Composite parent) {
 				super.createControl(parent);
 				createWorkingSetGroup(
@@ -229,7 +227,6 @@ public class BasicNewProjectResourceWizard extends BasicNewResourceWizard
 
 		// create the new project operation
 		IRunnableWithProgress op = new IRunnableWithProgress() {
-			@Override
 			public void run(IProgressMonitor monitor)
 					throws InvocationTargetException {
 				CreateProjectOperation op = new CreateProjectOperation(
@@ -308,7 +305,6 @@ public class BasicNewProjectResourceWizard extends BasicNewResourceWizard
 	/*
 	 * (non-Javadoc) Method declared on IWorkbenchWizard.
 	 */
-	@Override
 	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
 		super.init(workbench, currentSelection);
 		setNeedsProgressMonitor(true);
@@ -318,7 +314,6 @@ public class BasicNewProjectResourceWizard extends BasicNewResourceWizard
 	/*
 	 * (non-Javadoc) Method declared on BasicNewResourceWizard.
 	 */
-	@Override
 	protected void initializeDefaultPageImageDescriptor() {
 		ImageDescriptor desc = IDEWorkbenchPlugin
 				.getIDEImageDescriptor("wizban/newprj_wiz.png");//$NON-NLS-1$
@@ -347,7 +342,6 @@ public class BasicNewProjectResourceWizard extends BasicNewResourceWizard
 	/*
 	 * (non-Javadoc) Method declared on IWizard.
 	 */
-	@Override
 	public boolean performFinish() {
 		createNewProject();
 
@@ -389,7 +383,6 @@ public class BasicNewProjectResourceWizard extends BasicNewResourceWizard
 	 * Stores the configuration element for the wizard. The config element will
 	 * be used in <code>performFinish</code> to set the result perspective.
 	 */
-	@Override
 	public void setInitializationData(IConfigurationElement cfig,
 			String propertyName, Object data) {
 		configElement = cfig;

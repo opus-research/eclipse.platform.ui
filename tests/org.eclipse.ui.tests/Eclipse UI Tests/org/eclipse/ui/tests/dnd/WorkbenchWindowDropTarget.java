@@ -23,11 +23,9 @@ public abstract class WorkbenchWindowDropTarget implements TestDropLocation {
 
     private IWorkbenchWindowProvider window;
     
-    @Override
-	public abstract String toString();
+    public abstract String toString();
 
-    @Override
-	public abstract Point getLocation();
+    public abstract Point getLocation();
 
     public WorkbenchWindowDropTarget(IWorkbenchWindowProvider window) {
         this.window = window;
@@ -45,8 +43,7 @@ public abstract class WorkbenchWindowDropTarget implements TestDropLocation {
         return (WorkbenchPage)getWindow().getActivePage();
     }
     
-    @Override
-	public Shell[] getShells() {
+    public Shell[] getShells() {
         return new Shell[] {getShell()};
     }
 

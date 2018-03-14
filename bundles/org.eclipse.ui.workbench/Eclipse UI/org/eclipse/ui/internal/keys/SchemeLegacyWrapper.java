@@ -59,19 +59,31 @@ public final class SchemeLegacyWrapper implements IKeyConfiguration {
 		this.bindingManager = bindingManager;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.commands.IKeyConfiguration#addKeyConfigurationListener(org.eclipse.ui.commands.IKeyConfigurationListener)
+	 */
 	public void addKeyConfigurationListener(
 			IKeyConfigurationListener keyConfigurationListener) {
 		scheme.addSchemeListener(new LegacySchemeListenerWrapper(
 				keyConfigurationListener, bindingManager));
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
 	public int compareTo(Object o) {
 		return scheme.compareTo(o);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.commands.IKeyConfiguration#getDescription()
+	 */
 	public String getDescription() throws NotDefinedException {
 		try {
 			return scheme.getDescription();
@@ -80,12 +92,20 @@ public final class SchemeLegacyWrapper implements IKeyConfiguration {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.commands.IKeyConfiguration#getId()
+	 */
 	public String getId() {
 		return scheme.getId();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.commands.IKeyConfiguration#getName()
+	 */
 	public String getName() throws NotDefinedException {
 		try {
 			return scheme.getName();
@@ -94,7 +114,11 @@ public final class SchemeLegacyWrapper implements IKeyConfiguration {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.commands.IKeyConfiguration#getParentId()
+	 */
 	public String getParentId() throws NotDefinedException {
 		try {
 			return scheme.getParentId();
@@ -103,17 +127,29 @@ public final class SchemeLegacyWrapper implements IKeyConfiguration {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.commands.IKeyConfiguration#isActive()
+	 */
 	public boolean isActive() {
 		return scheme.getId().equals(bindingManager.getActiveScheme().getId());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.commands.IKeyConfiguration#isDefined()
+	 */
 	public boolean isDefined() {
 		return scheme.isDefined();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.commands.IKeyConfiguration#removeKeyConfigurationListener(org.eclipse.ui.commands.IKeyConfigurationListener)
+	 */
 	public void removeKeyConfigurationListener(
 			IKeyConfigurationListener keyConfigurationListener) {
 		scheme.removeSchemeListener(new LegacySchemeListenerWrapper(

@@ -37,7 +37,11 @@ public class ViewSite extends PartSite implements IViewSite {
 		serviceLocator.registerService(IViewPart.class, (IViewPart) getPart());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IViewSite#getSecondaryId()
+	 */
 	public String getSecondaryId() {
 		MPart part = getModel();
 

@@ -33,7 +33,6 @@ public class ObservableTrackerTest extends AbstractDefaultRealmTestCase {
 	public void testRunAndMonitor_GetterCalled() throws Exception {
 		final IObservable observable = new ObservableStub();
 		IObservable[] result = ObservableTracker.runAndMonitor(new Runnable() {
-			@Override
 			public void run() {
 				ObservableTracker.getterCalled(observable);
 			}
@@ -69,7 +68,6 @@ public class ObservableTrackerTest extends AbstractDefaultRealmTestCase {
 		final IObservable[] created = new IObservable[1];
 		IObservable[] collected = ObservableTracker
 				.runAndCollect(new Runnable() {
-					@Override
 					public void run() {
 						created[0] = new ObservableStub();
 					}
@@ -81,10 +79,8 @@ public class ObservableTrackerTest extends AbstractDefaultRealmTestCase {
 	public void testRunAndIgnore_RunAndMonitor() throws Exception {
 		final IObservable observable = new ObservableStub();
 		IObservable[] result = ObservableTracker.runAndMonitor(new Runnable() {
-			@Override
 			public void run() {
 				ObservableTracker.runAndIgnore(new Runnable() {
-					@Override
 					public void run() {
 						ObservableTracker.getterCalled(observable);
 					}
@@ -96,10 +92,8 @@ public class ObservableTrackerTest extends AbstractDefaultRealmTestCase {
 
 	public void testRunAndIgnore_RunAndCollect() throws Exception {
 		IObservable[] result = ObservableTracker.runAndCollect(new Runnable() {
-			@Override
 			public void run() {
 				ObservableTracker.runAndIgnore(new Runnable() {
-					@Override
 					public void run() {
 						new ObservableStub();
 					}
@@ -112,7 +106,6 @@ public class ObservableTrackerTest extends AbstractDefaultRealmTestCase {
 	public void testSetIgnore_RunAndMonitor() throws Exception {
 		final IObservable observable = new ObservableStub();
 		IObservable[] result = ObservableTracker.runAndMonitor(new Runnable() {
-			@Override
 			public void run() {
 				ObservableTracker.setIgnore(true);
 				ObservableTracker.getterCalled(observable);
@@ -124,7 +117,6 @@ public class ObservableTrackerTest extends AbstractDefaultRealmTestCase {
 
 	public void testSetIgnore_RunAndCollect() throws Exception {
 		IObservable[] result = ObservableTracker.runAndCollect(new Runnable() {
-			@Override
 			public void run() {
 				ObservableTracker.setIgnore(true);
 				new ObservableStub();
@@ -139,7 +131,6 @@ public class ObservableTrackerTest extends AbstractDefaultRealmTestCase {
 
 		Set collected = new IdentitySet(Arrays.asList(ObservableTracker
 				.runAndCollect(new Runnable() {
-					@Override
 					public void run() {
 						list.add(new ObservableStub()); // list[0] collected
 						ObservableTracker.setIgnore(true);
@@ -168,7 +159,6 @@ public class ObservableTrackerTest extends AbstractDefaultRealmTestCase {
 
 		Set result = new IdentitySet(Arrays.asList(ObservableTracker
 				.runAndMonitor(new Runnable() {
-					@Override
 					public void run() {
 						ObservableTracker.getterCalled(observables[0]); // monitored
 						ObservableTracker.setIgnore(true);
@@ -193,14 +183,12 @@ public class ObservableTrackerTest extends AbstractDefaultRealmTestCase {
 	public void testSetIgnore_RunAndMonitor_UnmatchedIgnore_LogsError() {
 		final List log = new ArrayList();
 		Policy.setLog(new ILogger() {
-			@Override
 			public void log(IStatus status) {
 				log.add(status);
 			}
 		});
 
 		ObservableTracker.runAndMonitor(new Runnable() {
-			@Override
 			public void run() {
 				ObservableTracker.setIgnore(true);
 				// do not call call setIgnore(false)
@@ -216,14 +204,12 @@ public class ObservableTrackerTest extends AbstractDefaultRealmTestCase {
 	public void testSetIgnore_RunAndCollect_UnmatchedIgnore_LogsError() {
 		final List log = new ArrayList();
 		Policy.setLog(new ILogger() {
-			@Override
 			public void log(IStatus status) {
 				log.add(status);
 			}
 		});
 
 		ObservableTracker.runAndCollect(new Runnable() {
-			@Override
 			public void run() {
 				ObservableTracker.setIgnore(true);
 				// do not call call setIgnore(false)
@@ -253,7 +239,6 @@ public class ObservableTrackerTest extends AbstractDefaultRealmTestCase {
 			super(realm);
 		}
 
-		@Override
 		public boolean isStale() {
 			return false;
 		}

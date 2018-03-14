@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
 import org.eclipse.core.commands.Command;
@@ -282,7 +281,7 @@ public class BindingPersistence extends PreferencePersistence {
 		if (size % 2 == 1) {
 			String token = tokens[size - 1];
 			final Integer integer = (Integer) r2_1KeysByName.get(token
-					.toUpperCase(Locale.ENGLISH));
+					.toUpperCase());
 
 			if (integer != null) {
 				value = integer.intValue();
@@ -708,7 +707,7 @@ public class BindingPersistence extends PreferencePersistence {
 
 		logWarnings(
 				warningsToLog,
-				"Warnings while parsing the key bindings from the 'org.eclipse.ui.commands' and 'org.eclipse.ui.bindings' extension point"); //$NON-NLS-1$
+				"Warnings while parsing the key bindings from the 'org.eclipse.ui.commands' extension point"); //$NON-NLS-1$
 	}
 	
 	private static List applyModifiers(KeySequence keySequence, String keySequenceText,
@@ -1222,7 +1221,6 @@ public class BindingPersistence extends PreferencePersistence {
 		super.read();
 	}
 
-	@Override
 	protected final boolean isChangeImportant(final IRegistryChangeEvent event) {
 		return false;
 	}
@@ -1266,7 +1264,6 @@ public class BindingPersistence extends PreferencePersistence {
 		return true;
 	}
 	
-	@Override
 	protected final boolean isChangeImportant(final PropertyChangeEvent event) {
 		return EXTENSION_COMMANDS.equals(event.getProperty());
 	}
@@ -1275,7 +1272,6 @@ public class BindingPersistence extends PreferencePersistence {
 	 * Reads all of the binding information from the registry and from the
 	 * preference store.
 	 */
-	@Override
 	public final void read() {
 		super.read();
 		reRead();

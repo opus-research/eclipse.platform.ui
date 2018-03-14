@@ -46,7 +46,6 @@ public class WizardPageSupportTest extends AbstractSWTTestCase {
 	 */
 	public void testPageComplete() {
 		IWizardPage page = new WizardPage("Page") {
-			@Override
 			public void createControl(Composite parent) {
 				setControl(parent);
 
@@ -81,7 +80,6 @@ public class WizardPageSupportTest extends AbstractSWTTestCase {
 
 	public void testPageCompleteOnValidationStaleness() {
 		IWizardPage page = new WizardPage("Page") {
-			@Override
 			public void createControl(Composite parent) {
 				setControl(parent);
 
@@ -108,7 +106,6 @@ public class WizardPageSupportTest extends AbstractSWTTestCase {
 
 	public void testValidationMessageProvider() {
 		IWizardPage page = new WizardPage("Page") {
-			@Override
 			public void createControl(Composite parent) {
 				setControl(parent);
 
@@ -173,7 +170,6 @@ public class WizardPageSupportTest extends AbstractSWTTestCase {
 
 	private void loadWizardPage(IWizardPage page) {
 		Wizard wizard = new Wizard() {
-			@Override
 			public boolean performFinish() {
 				return true;
 			}
@@ -194,12 +190,10 @@ public class WizardPageSupportTest extends AbstractSWTTestCase {
 			super(Realm.getDefault());
 		}
 
-		@Override
 		protected Object doGetValue() {
 			return value;
 		}
 
-		@Override
 		protected void doSetValue(Object value) {
 			Object oldValue = this.value;
 			this.value = value;
@@ -208,7 +202,6 @@ public class WizardPageSupportTest extends AbstractSWTTestCase {
 			}
 		}
 
-		@Override
 		public boolean isStale() {
 			ObservableTracker.getterCalled(this);
 			return stale;
@@ -225,7 +218,6 @@ public class WizardPageSupportTest extends AbstractSWTTestCase {
 			}
 		}
 
-		@Override
 		public Object getValueType() {
 			return IStatus.class;
 		}
@@ -239,19 +231,16 @@ public class WizardPageSupportTest extends AbstractSWTTestCase {
 			this.validation = validation;
 		}
 
-		@Override
 		public IObservableValue getValidationStatus() {
 			return validation;
 		}
 
-		@Override
 		public IObservableList getTargets() {
 			WritableList targets = new WritableList();
 			targets.add(validation);
 			return targets;
 		}
 
-		@Override
 		public IObservableList getModels() {
 			return Observables.emptyObservableList();
 		}
@@ -264,12 +253,10 @@ public class WizardPageSupportTest extends AbstractSWTTestCase {
 
 		public int messageType;
 
-		@Override
 		public String getMessage(ValidationStatusProvider statusProvider) {
 			return message;
 		}
 
-		@Override
 		public int getMessageType(ValidationStatusProvider statusProvider) {
 			return messageType;
 		}

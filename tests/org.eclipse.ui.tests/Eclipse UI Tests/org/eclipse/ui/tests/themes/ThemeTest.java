@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.themes;
 
@@ -61,8 +60,12 @@ public abstract class ThemeTest extends UITestCase {
         // TODO Auto-generated constructor stub
     }
 
-    @Override
-	protected void doSetUp() throws Exception {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.tests.util.UITestCase#doSetUp()
+     */
+    protected void doSetUp() throws Exception {
         super.doSetUp();
         fManager = fWorkbench.getThemeManager();
         fManager.setCurrentTheme(IThemeManager.DEFAULT_THEME);
@@ -71,7 +74,7 @@ public abstract class ThemeTest extends UITestCase {
     }
 
     private void mockCSSTheme() {
-		IThemeEngine themeEngine = fWorkbench.getService(IThemeEngine.class);
+    	IThemeEngine themeEngine = (IThemeEngine) fWorkbench.getService(IThemeEngine.class);
         org.eclipse.e4.ui.css.swt.theme.ITheme currentTheme = themeEngine.getActiveTheme(); 
         if (currentTheme != null && !MOCK_CSS_THEME.equals(currentTheme.getId())) {
         	themeEngine.setTheme(MOCK_CSS_THEME, false);

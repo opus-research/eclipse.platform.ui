@@ -37,14 +37,12 @@ public abstract class AbstractPropertySheetTest extends UITestCase {
 		super(testName);
 	}
 
-	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		IWorkbenchWindow workbenchWindow = openTestWindow();
 		activePage = workbenchWindow.getActivePage();
 	}
 	
-	@Override
 	protected void doTearDown() throws Exception {
 		super.doTearDown();
 		activePage = null;

@@ -1091,6 +1091,11 @@ public abstract class Dialog extends Window {
 		return Arrays.equals(dialogFontData, defaultFontData);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.window.Window#create()
+	 */
 	@Override
 	public void create() {
 		super.create();

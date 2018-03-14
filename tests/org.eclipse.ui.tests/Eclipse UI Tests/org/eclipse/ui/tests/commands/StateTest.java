@@ -45,13 +45,11 @@ public class StateTest extends UITestCase {
 		Object currentValue;
 		String textValue;
 
-		@Override
 		public final Object execute(final ExecutionEvent event) {
 			getState(OBJECT_STATE_ID).setValue(OBJECT_CHANGED);
 			return OBJECT_CHANGED;
 		}
 
-		@Override
 		public final void handleStateChange(final State state,
 				final Object oldValue) {
 			if (OBJECT_STATE_ID.equals(state.getId())) {
@@ -66,7 +64,6 @@ public class StateTest extends UITestCase {
 		Object currentValue;
 		String textValue;
 
-		@Override
 		public final void handleStateChange(final State state,
 				final Object oldValue) {
 
@@ -123,10 +120,9 @@ public class StateTest extends UITestCase {
 		super(name);
 	}
 
-	@Override
 	protected final void doSetUp() {
 		// Reset the object state to the initial object.
-		final ICommandService commandService = fWorkbench
+		final ICommandService commandService = (ICommandService) fWorkbench
 				.getService(ICommandService.class);
 		final Command command = commandService.getCommand(COMMAND_ID);
 		command.getState(OBJECT_STATE_ID).setValue(OBJECT_INITIAL);
@@ -134,15 +130,14 @@ public class StateTest extends UITestCase {
 
 		// Register the object state handler.
 		handler = new ObjectStateHandler();
-		final IHandlerService handlerService = fWorkbench
+		final IHandlerService handlerService = (IHandlerService) fWorkbench
 				.getService(IHandlerService.class);
 		handlerActivation = handlerService.activateHandler(COMMAND_ID, handler);
 	}
 
-	@Override
 	protected final void doTearDown() {
 		// Unregister the object state handler.
-		final IHandlerService handlerService = fWorkbench
+		final IHandlerService handlerService = (IHandlerService) fWorkbench
 				.getService(IHandlerService.class);
 		handlerService.deactivateHandler(handlerActivation);
 		handlerActivation = null;
@@ -160,7 +155,7 @@ public class StateTest extends UITestCase {
 	public final void testCommandNotifiedOfStateChange()
 			throws CommandException {
 		// Attach a listener to the state on the command.
-		final ICommandService commandService = fWorkbench
+		final ICommandService commandService = (ICommandService) fWorkbench
 				.getService(ICommandService.class);
 		final Command command = commandService.getCommand(COMMAND_ID);
 		final State state = command.getState(OBJECT_STATE_ID);
@@ -173,7 +168,7 @@ public class StateTest extends UITestCase {
 				listener.currentValue);
 
 		// Run the handler.
-		final IHandlerService handlerService = fWorkbench
+		final IHandlerService handlerService = (IHandlerService) fWorkbench
 				.getService(IHandlerService.class);
 		handlerService.executeCommand(COMMAND_ID, null);
 
@@ -196,7 +191,7 @@ public class StateTest extends UITestCase {
 	public final void testStateChangeReflectedInCommand()
 			throws CommandException {
 		// Get the command.
-		final ICommandService commandService = fWorkbench
+		final ICommandService commandService = (ICommandService) fWorkbench
 				.getService(ICommandService.class);
 		final Command command = commandService.getCommand(COMMAND_ID);
 
@@ -205,7 +200,7 @@ public class StateTest extends UITestCase {
 				.getState(OBJECT_STATE_ID).getValue());
 
 		// Run the handler.
-		final IHandlerService handlerService = fWorkbench
+		final IHandlerService handlerService = (IHandlerService) fWorkbench
 				.getService(IHandlerService.class);
 		handlerService.executeCommand(COMMAND_ID, null);
 
@@ -225,7 +220,7 @@ public class StateTest extends UITestCase {
 				handler.currentValue);
 
 		// Change the state on the command.
-		final ICommandService commandService = fWorkbench
+		final ICommandService commandService = (ICommandService) fWorkbench
 				.getService(ICommandService.class);
 		final Command command = commandService.getCommand(COMMAND_ID);
 		command.getState(OBJECT_STATE_ID).setValue(OBJECT_CHANGED);
@@ -238,7 +233,7 @@ public class StateTest extends UITestCase {
 	
 	public final void testTextState() {
 		assertNull(handler.textValue);
-		final ICommandService commandService = fWorkbench
+		final ICommandService commandService = (ICommandService) fWorkbench
 				.getService(ICommandService.class);
 		final Command command = commandService.getCommand(COMMAND_ID);
 		command.getState(TEXT_STATE_ID).setValue(TEXT_HELLO);
@@ -247,7 +242,7 @@ public class StateTest extends UITestCase {
 	
 	public final void testTextStateListener() {
 		assertNull(handler.textValue);
-		final ICommandService commandService = fWorkbench
+		final ICommandService commandService = (ICommandService) fWorkbench
 				.getService(ICommandService.class);
 		final Command command = commandService.getCommand(COMMAND_ID);
 		State state = command.getState(TEXT_STATE_ID);
@@ -263,7 +258,7 @@ public class StateTest extends UITestCase {
 	}
 	
 	public final void testTextPreference() {
-		final ICommandService commandService = fWorkbench
+		final ICommandService commandService = (ICommandService) fWorkbench
 				.getService(ICommandService.class);
 		final Command command = commandService.getCommand(COMMAND_ID);
 		State state = command.getState(TEXT_STATE_ID);

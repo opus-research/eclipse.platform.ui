@@ -41,7 +41,7 @@ import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableColl
 import org.eclipse.jface.databinding.conformance.util.ChangeEventTracker;
 import org.eclipse.jface.databinding.conformance.util.CurrentRealm;
 import org.eclipse.jface.databinding.conformance.util.ListChangeEventTracker;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 import org.eclipse.swt.widgets.Display;
 
@@ -63,7 +63,6 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 	 * 
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -72,7 +71,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 				propertyName)).getPropertyDescriptor();
 		bean = new Bean(new ArrayList());
 
-		list = BeansObservables.observeList(DisplayRealm.getRealm(Display
+		list = BeansObservables.observeList(SWTObservables.getRealm(Display
 				.getDefault()), bean, propertyName);
 		beanObservable = (IBeanObservable) list;
 	}
@@ -140,7 +139,6 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 
 	public void testAddFiresPropertyChangeEvent() throws Exception {
 		assertPropertyChangeEvent(bean, new Runnable() {
-			@Override
 			public void run() {
 				list.add("0");
 			}
@@ -171,7 +169,6 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 
 	public void testAddAtIndexPropertyChangeEvent() throws Exception {
 		assertPropertyChangeEvent(bean, new Runnable() {
-			@Override
 			public void run() {
 				list.add(0, "0");
 			}
@@ -184,7 +181,6 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 
 		assertEquals(1, bean.getList().size());
 		assertPropertyChangeEvent(bean, new Runnable() {
-			@Override
 			public void run() {
 				list.clear();
 			}
@@ -223,7 +219,6 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		list.add("0");
 
 		assertPropertyChangeEvent(bean, new Runnable() {
-			@Override
 			public void run() {
 				list.remove("0");
 			}
@@ -261,7 +256,6 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 	public void testRemoveAtIndexPropertyChangeEvent() throws Exception {
 		list.add("0");
 		assertPropertyChangeEvent(bean, new Runnable() {
-			@Override
 			public void run() {
 				list.remove(0);
 			}
@@ -297,7 +291,6 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 
 	public void testAddAllPropertyChangeEvent() throws Exception {
 		assertPropertyChangeEvent(bean, new Runnable() {
-			@Override
 			public void run() {
 				list.addAll(Arrays.asList(new String[] { "0", "1" }));
 			}
@@ -338,7 +331,6 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 
 	public void testAddAllAtIndexPropertyChangeEvent() throws Exception {
 		assertPropertyChangeEvent(bean, new Runnable() {
-			@Override
 			public void run() {
 				list.addAll(0, Arrays.asList(new String[] { "1", "2" }));
 			}
@@ -379,7 +371,6 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 	public void testRemoveAllPropertyChangeEvent() throws Exception {
 		list.add("0");
 		assertPropertyChangeEvent(bean, new Runnable() {
-			@Override
 			public void run() {
 				list.removeAll(Arrays.asList(new String[] { "0" }));
 			}
@@ -422,7 +413,6 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		list.addAll(Arrays.asList(new String[] { "0", "1" }));
 
 		assertPropertyChangeEvent(bean, new Runnable() {
-			@Override
 			public void run() {
 				list.retainAll(Arrays.asList(new String[] { "0" }));
 			}
@@ -478,7 +468,6 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 	public void testSetPropertyChangeEvent() throws Exception {
 		list.add("0");
 		assertPropertyChangeEvent(bean, new Runnable() {
-			@Override
 			public void run() {
 				list.set(0, "1");
 			}
@@ -627,7 +616,6 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 
 		PropertyChangeEvent evt;
 
-		@Override
 		public void propertyChange(PropertyChangeEvent evt) {
 			count++;
 			this.evt = evt;
@@ -643,7 +631,6 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 	}
 
 	static class Delegate extends AbstractObservableCollectionContractDelegate {
-		@Override
 		public IObservableCollection createObservableCollection(Realm realm,
 				int elementCount) {
 			String propertyName = "list";
@@ -656,17 +643,14 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 			return list;
 		}
 
-		@Override
 		public Object createElement(IObservableCollection collection) {
 			return new Object().toString();
 		}
 
-		@Override
 		public Object getElementType(IObservableCollection collection) {
 			return String.class;
 		}
 
-		@Override
 		public void change(IObservable observable) {
 			IObservableList list = (IObservableList) observable;
 			list.add(createElement(list));
