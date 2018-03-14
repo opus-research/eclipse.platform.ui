@@ -12,7 +12,6 @@ package org.eclipse.ui.examples.jobs;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
-import org.junit.Test;
 
 /**
  * TestJobRule is a scheduling rules that makes all jobs sequential.
@@ -21,19 +20,22 @@ import org.junit.Test;
 public class TestJobRule implements ISchedulingRule {
 	private int jobOrder;
 
-	@Test
 	public TestJobRule(int order) {
 		jobOrder = order;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.jobs.ISchedulingRule#contains(org.eclipse.core.runtime.jobs.ISchedulingRule)
+	 */
 	public boolean contains(ISchedulingRule rule) {
 		if (rule instanceof IResource || rule instanceof TestJobRule)
 			return true;
 		return false;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.jobs.ISchedulingRule#isConflicting(org.eclipse.core.runtime.jobs.ISchedulingRule)
+	 */
 	public boolean isConflicting(ISchedulingRule rule) {
 		if (!(rule instanceof TestJobRule))
 			return false;
