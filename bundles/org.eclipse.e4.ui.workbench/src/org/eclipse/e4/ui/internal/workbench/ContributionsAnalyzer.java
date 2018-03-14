@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *      Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 435949
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -145,13 +144,11 @@ public final class ContributionsAnalyzer {
 			if (!filtered && menuContribution.isToBeRendered() && popupAny) {
 				// process POPUP_ANY first
 				toContribute.add(menuContribution);
-			} else {
-				if (filtered || (!popupTarget && !parentID.equals(id))
-				|| !menuContribution.isToBeRendered()) {
-					continue;
-				}
-				includedPopups.add(menuContribution);
+			} else if (filtered || (!popupTarget && !parentID.equals(id))
+					|| !menuContribution.isToBeRendered()) {
+				continue;
 			}
+			includedPopups.add(menuContribution);
 		}
 		toContribute.addAll(includedPopups);
 	}
@@ -641,10 +638,7 @@ public final class ContributionsAnalyzer {
 					continue;
 				}
 				Object[] array = item.getChildren().toArray();
-				int idx = getIndex(toContribute, item.getPositionInParent());
-				if (idx == -1) {
-					idx = 0;
-				}
+				int idx = 0;
 				for (int c = 0; c < array.length; c++) {
 					MMenuElement me = (MMenuElement) array[c];
 					if (!containsMatching(toContribute.getChildren(), me)) {
