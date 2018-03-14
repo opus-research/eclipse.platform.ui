@@ -21,7 +21,7 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
  * Tests the Operations Framework API.
- * 
+ *
  * @since 3.1
  */
 public class WorkbenchOperationHistoryTests extends UITestCase {
@@ -38,6 +38,7 @@ public class WorkbenchOperationHistoryTests extends UITestCase {
 		super(name);
 	}
 
+	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		history = PlatformUI.getWorkbench().getOperationSupport().getOperationHistory();
@@ -67,19 +68,22 @@ public class WorkbenchOperationHistoryTests extends UITestCase {
 
 	}
 
+	@Override
 	protected void doTearDown() throws Exception {
 		history.dispose(IOperationHistory.GLOBAL_UNDO_CONTEXT, true, true, true);
 		super.doTearDown();
 	}
-	
+
 	public void testWorkspaceAdapter() {
 		IUndoContext workspaceContext = (IUndoContext)ResourcesPlugin.getWorkspace().getAdapter(IUndoContext.class);
 		assertTrue("Should have context registered on workspace", workspaceContext == context);
 	}
-	
+
 	public void testMatchingContext() {
 		IUndoContext newContext = new IUndoContext() {
+			@Override
 			public String getLabel() { return "Matching Test Context"; }
+			@Override
 			public boolean matches(IUndoContext otherContext) { return false; }
 		};
 		assertFalse(newContext.matches(context));
