@@ -120,15 +120,9 @@ public class WBWRenderer extends SWTPartRenderer {
 	Logger logger;
 
 	@Inject
-	private IEclipseContext context;
-
-	@Inject
 	private IPresentationEngine engine;
 
 	private ThemeDefinitionChangedHandler themeDefinitionChanged;
-
-	@Inject
-	private EModelService modelService;
 
 	@Inject
 	private Display display;
@@ -286,8 +280,14 @@ public class WBWRenderer extends SWTPartRenderer {
 	}
 
 	@PostConstruct
-	protected void init() {
+	protected void init(MApplication application) {
 		themeDefinitionChanged = new ThemeDefinitionChangedHandler();
+
+		// install the application global handler (can be overruled in a child
+		// context if needed, or globally changed via the UI event
+		// UILifeCycle.APP_STARTUP_COMPLETE)
+		installSaveHandler(application);
+		installCloseHandler(application);
 	}
 
 	@Override
@@ -386,46 +386,12 @@ public class WBWRenderer extends SWTPartRenderer {
 		// Add the shell into the WBW's context
 		localContext.set(Shell.class, wbwShell);
 		localContext.set(E4Workbench.LOCAL_ACTIVE_SHELL, wbwShell);
-		setCloseHandler(wbwModel);
 		localContext.set(IShellProvider.class, new IShellProvider() {
 			@Override
 			public Shell getShell() {
 				return wbwShell;
 			}
 		});
-		final PartServiceSaveHandler saveHandler = new PartServiceSaveHandler() {
-			@Override
-			public Save promptToSave(MPart dirtyPart) {
-				Shell shell = (Shell) context
-						.get(IServiceConstants.ACTIVE_SHELL);
-				Object[] elements = promptForSave(shell,
-						Collections.singleton(dirtyPart));
-				if (elements == null) {
-					return Save.CANCEL;
-				}
-				return elements.length == 0 ? Save.NO : Save.YES;
-			}
-
-			@Override
-			public Save[] promptToSave(Collection<MPart> dirtyParts) {
-				List<MPart> parts = new ArrayList<>(dirtyParts);
-				Shell shell = (Shell) context
-						.get(IServiceConstants.ACTIVE_SHELL);
-				Save[] response = new Save[dirtyParts.size()];
-				Object[] elements = promptForSave(shell, parts);
-				if (elements == null) {
-					Arrays.fill(response, Save.CANCEL);
-				} else {
-					Arrays.fill(response, Save.NO);
-					for (int i = 0; i < elements.length; i++) {
-						response[parts.indexOf(elements[i])] = Save.YES;
-					}
-				}
-				return response;
-			}
-		};
-		saveHandler.logger = logger;
-		localContext.set(ISaveHandler.class, saveHandler);
 
 		if (wbwModel.getLabel() != null)
 			wbwShell.setText(wbwModel.getLocalizedLabel());
@@ -442,27 +408,54 @@ public class WBWRenderer extends SWTPartRenderer {
 		return newWidget;
 	}
 
-	private void setCloseHandler(MWindow window) {
-		IEclipseContext context = window.getContext();
-		// no direct model parent, must be a detached window
-		if (window.getParent() == null) {
-			context.set(IWindowCloseHandler.class,
-					new IWindowCloseHandler() {
-						@Override
-						public boolean close(MWindow window) {
-							return closeDetachedWindow(window);
-						}
-					});
-		} else {
-			context.set(IWindowCloseHandler.class,
-					new IWindowCloseHandler() {
-						@Override
-						public boolean close(MWindow window) {
-							EPartService partService = window.getContext().get(EPartService.class);
-							return partService.saveAll(true);
-						}
-					});
-		}
+	void installSaveHandler(final MApplication application) {
+		final PartServiceSaveHandler saveHandler = new PartServiceSaveHandler() {
+			@Override
+			public Save promptToSave(MPart dirtyPart) {
+				Shell shell = (Shell) dirtyPart.getContext().get(IServiceConstants.ACTIVE_SHELL);
+				Object[] elements = promptForSave(shell, Collections.singleton(dirtyPart));
+				if (elements == null) {
+					return Save.CANCEL;
+				}
+				return elements.length == 0 ? Save.NO : Save.YES;
+			}
+
+			@Override
+			public Save[] promptToSave(Collection<MPart> dirtyParts) {
+				List<MPart> parts = new ArrayList<>(dirtyParts);
+				Shell shell = (Shell) application.getContext().get(IServiceConstants.ACTIVE_SHELL);
+				Save[] response = new Save[dirtyParts.size()];
+				Object[] elements = promptForSave(shell, parts);
+				if (elements == null) {
+					Arrays.fill(response, Save.CANCEL);
+				} else {
+					Arrays.fill(response, Save.NO);
+					for (int i = 0; i < elements.length; i++) {
+						response[parts.indexOf(elements[i])] = Save.YES;
+					}
+				}
+				return response;
+			}
+		};
+		saveHandler.logger = logger;
+		application.getContext().set(ISaveHandler.class, saveHandler);
+	}
+
+	void installCloseHandler(MApplication application) {
+		IEclipseContext context = application.getContext();
+		context.set(IWindowCloseHandler.class, new IWindowCloseHandler() {
+
+			@Override
+			public boolean close(MWindow window) {
+				if (window.getParent() == null) {
+					// no direct model parent, must be a detached window
+					return closeDetachedWindow(window);
+				}
+
+				EPartService partService = window.getContext().get(EPartService.class);
+				return partService.saveAll(true);
+			}
+		});
 	}
 
 	@Override
