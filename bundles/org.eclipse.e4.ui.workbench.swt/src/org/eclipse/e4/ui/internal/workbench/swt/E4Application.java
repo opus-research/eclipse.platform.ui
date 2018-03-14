@@ -36,6 +36,7 @@ import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
 import org.eclipse.e4.core.internal.services.EclipseAdapter;
+import org.eclipse.e4.core.internal.services.ResourceBundleHelper;
 import org.eclipse.e4.core.services.adapter.Adapter;
 import org.eclipse.e4.core.services.contributions.IContributionFactory;
 import org.eclipse.e4.core.services.log.ILoggerProvider;
@@ -527,7 +528,13 @@ public class E4Application implements IApplication {
 		});
 
 		// translation
-		appContext.set(TranslationService.LOCALE, Locale.getDefault());
+		String defaultLocaleString = Locale.getDefault().toString();
+
+		// ensure the default Locale value is correct
+		Locale transformedLocale = ResourceBundleHelper.toLocale(
+				defaultLocaleString, Locale.ENGLISH);
+
+		appContext.set(TranslationService.LOCALE, transformedLocale);
 		TranslationService bundleTranslationProvider = TranslationProviderFactory
 				.bundleTranslationService(appContext);
 		appContext.set(TranslationService.class, bundleTranslationProvider);
