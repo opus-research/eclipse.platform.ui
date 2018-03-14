@@ -23,7 +23,7 @@ import org.junit.Test;
 
 /**
  * Tests for the Mocks class.
- * 
+ *
  * @since 1.1
  */
 public class MocksTest  {
@@ -37,7 +37,7 @@ public class MocksTest  {
 	private static long unitializedLong;
 	private static float unitializedFloat;
 	private static double unitializedDouble;
-	
+
 	@Before
 	public void setUp()  {
 		primitiveMock = (IPrimitive) Mocks.createRelaxedMock(IPrimitive.class);
@@ -52,17 +52,17 @@ public class MocksTest  {
 			fail("exception should not have been thrown");
 		}
 	}
-	
+
 	@Test
 	public void testPrimitiveBooleanSetLastReturnValue() {
 		Boolean value = Boolean.TRUE;
 		primitiveMock.getBoolean();
 		Mocks.setLastReturnValue(primitiveMock, value);
 		Mocks.startChecking(primitiveMock);
-		
-		assertEquals(value.booleanValue(), primitiveMock.getBoolean());		
+
+		assertEquals(value.booleanValue(), primitiveMock.getBoolean());
 	}
-	
+
 	@Test
 	public void testPrimitiveByteReturnType() {
 		try {
@@ -72,17 +72,17 @@ public class MocksTest  {
 			fail("exception should not have been thrown");
 		}
 	}
-	
+
 	@Test
 	public void testPrimitiveByteSetLastReturnValue() {
 		Byte value = new Byte((byte) 1);
 		primitiveMock.getByte();
 		Mocks.setLastReturnValue(primitiveMock, value);
 		Mocks.startChecking(primitiveMock);
-		
+
 		assertEquals(value.byteValue(), primitiveMock.getByte());
 	}
-	
+
 	@Test
 	public void testPrimitiveCharReturnType() {
 		try {
@@ -92,17 +92,17 @@ public class MocksTest  {
 			fail("exception should not have been thrown");
 		}
 	}
-	
+
 	@Test
 	public void testPrimitiveCharSetLastReturnValue() {
 		Character value = new Character('a');
 		primitiveMock.getChar();
 		Mocks.setLastReturnValue(primitiveMock, value);
 		Mocks.startChecking(primitiveMock);
-		
+
 		assertEquals(value.charValue(), primitiveMock.getChar());
 	}
-	
+
 	@Test
 	public void testPrimitiveShortReturnType() {
 		try {
@@ -119,10 +119,10 @@ public class MocksTest  {
 		primitiveMock.getShort();
 		Mocks.setLastReturnValue(primitiveMock, value);
 		Mocks.startChecking(primitiveMock);
-		
+
 		assertEquals(value.shortValue(), primitiveMock.getShort());
 	}
-	
+
 	@Test
 	public void testPrimitiveIntReturnType() {
 		try {
@@ -132,17 +132,17 @@ public class MocksTest  {
 			fail("exception should not have been thrown");
 		}
 	}
-	
+
 	@Test
 	public void testPrimitiveIntSetLastReturnValue() {
 		Integer value = new Integer(1);
 		primitiveMock.getInt();
 		Mocks.setLastReturnValue(primitiveMock, value);
 		Mocks.startChecking(primitiveMock);
-		
+
 		assertEquals(value.intValue(), primitiveMock.getInt());
 	}
-	
+
 	@Test
 	public void testPrimitiveLongReturnType() {
 		try {
@@ -152,17 +152,17 @@ public class MocksTest  {
 			fail("exception should not have been thrown");
 		}
 	}
-	
+
 	@Test
 	public void testPrimitiveLongSetLastReturnValue() {
 		Long value = new Long(1);
 		primitiveMock.getLong();
 		Mocks.setLastReturnValue(primitiveMock, value);
 		Mocks.startChecking(primitiveMock);
-		
+
 		assertEquals(value.longValue(), primitiveMock.getLong());
 	}
-	
+
 	public void testPrimitiveFloatReturnType() throws Exception {
 		try {
 			float value = primitiveMock.getFloat();
@@ -171,17 +171,17 @@ public class MocksTest  {
 			fail("exception should not have been thrown");
 		}
 	}
-	
+
 	@Test
 	public void testPrimitiveFloatSetLastReturnValue()  {
 		Float value = new Float(1);
 		primitiveMock.getFloat();
 		Mocks.setLastReturnValue(primitiveMock, value);
 		Mocks.startChecking(primitiveMock);
-		
+
 		assertEquals(value.floatValue(), primitiveMock.getFloat(), 0);
 	}
-	
+
 	@Test
 	public void testPrimitiveDoubleReturnType() {
 		try {
@@ -191,14 +191,14 @@ public class MocksTest  {
 			fail("exception should not have been thrown");
 		}
 	}
-	
+
 	@Test
 	public void testPrimitiveDoubleSetLastReturnValue() {
 		Double value = new Double(1);
 		primitiveMock.getDouble();
 		Mocks.setLastReturnValue(primitiveMock, value);
 		Mocks.startChecking(primitiveMock);
-		
+
 		assertEquals(value.doubleValue(), primitiveMock.getDouble(), 0);
 	}
 

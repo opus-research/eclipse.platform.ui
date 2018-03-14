@@ -9,22 +9,30 @@
  *	   Steve Foreman (Google) - initial API and implementation
  *	   Marcus Eng (Google)
  *	   Sergey Prigogin (Google)
+ *	   Simon Scholz <simon.scholz@vogella.com> - Bug 443391
  *******************************************************************************/
 package org.eclipse.ui.internal.monitoring;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.internal.monitoring.EventLoopMonitorThread.Parameters;
 import org.eclipse.ui.monitoring.PreferenceConstants;
 import org.eclipse.ui.monitoring.UiFreezeEvent;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Tests for {@link EventLoopMonitorThread} class.
  */
-public class EventLoopMonitorThreadTests extends TestCase {
+public class EventLoopMonitorThreadTests {
 	/**
 	 * A mock event loop monitor thread used for JUnit tests.
 	 */
@@ -74,7 +82,7 @@ public class EventLoopMonitorThreadTests extends TestCase {
 	private static long numSleeps;
 	private static volatile long timestamp;
 
-	@Override
+	@Before
 	public void setUp() {
 		getPreferences().setValue(PreferenceConstants.MONITORING_ENABLED, false);
 		logger = new MockUiFreezeEventLogger();
@@ -84,7 +92,7 @@ public class EventLoopMonitorThreadTests extends TestCase {
 		timestamp = 1;
 	}
 
-	@Override
+	@After
 	public void tearDown() throws Exception {
 		if (monitoringThread != null) {
 			shutdownMonitoringThread();
@@ -119,8 +127,8 @@ public class EventLoopMonitorThreadTests extends TestCase {
 	 * Shuts down the event monitoring thread.
 	 */
 	private void shutdownMonitoringThread() throws Exception {
-		monitoringThread.endSleep();
-		monitoringThread.endEvent();
+		sendEvent(SWT.Wakeup);
+		sendEvent(SWT.PostEvent);
 		monitoringThread.shutdown();
 		monitoringThread.join();
 	}
@@ -159,28 +167,35 @@ public class EventLoopMonitorThreadTests extends TestCase {
 		return Math.min((int) (runningTimeMs / POLLING_RATE_MS), MIN_STACK_TRACES);
 	}
 
+	private void sendEvent(int eventType) {
+		Event event = new Event();
+		event.type = eventType;
+		monitoringThread.handleEvent(event);
+	}
+
+	@Test
 	public void testStackDecimation() throws Exception {
 		UiFreezeEvent event;
 
 		monitoringThread = createTestThread(THRESHOLD_MS * 2);
 		monitoringThread.start();
-		monitoringThread.beginEvent();
+		sendEvent(SWT.PreEvent);
 
 		// Cycle a few events
 		synchronized (sleepLock) {
 			for (int i = 0; i < 3; ++i) {
-				monitoringThread.beginEvent();
+				sendEvent(SWT.PreEvent);
 				runForCycles(1);
-				monitoringThread.endEvent();
+				sendEvent(SWT.PostEvent);
 			}
 		}
 
 		// Test going one beyond the MAX_STACK_TRACES count to see that the count is decimated.
 		int eventLength = MAX_STACK_TRACES + 2;
 		synchronized (sleepLock) {
-			monitoringThread.beginEvent();
+			sendEvent(SWT.PreEvent);
 			runForCycles(eventLength);
-			monitoringThread.endEvent();
+			sendEvent(SWT.PostEvent);
 			runForCycles(3);
 		}
 
@@ -192,9 +207,9 @@ public class EventLoopMonitorThreadTests extends TestCase {
 		// Decimation slows down the sampling rate by a factor of 2, so test the resampling reduction.
 		eventLength = MAX_STACK_TRACES + (MIN_MAX_STACK_TRACE_DELTA - 1) * 2;
 		synchronized (sleepLock) {
-			monitoringThread.beginEvent();
+			sendEvent(SWT.PreEvent);
 			runForCycles(eventLength);
-			monitoringThread.endEvent();
+			sendEvent(SWT.PostEvent);
 			runForCycles(3);
 		}
 
@@ -207,9 +222,9 @@ public class EventLoopMonitorThreadTests extends TestCase {
 		eventLength =
 				MAX_STACK_TRACES + (MIN_MAX_STACK_TRACE_DELTA) * 2 + (MIN_MAX_STACK_TRACE_DELTA - 2) * 4;
 		synchronized (sleepLock) {
-			monitoringThread.beginEvent();
+			sendEvent(SWT.PreEvent);
 			runForCycles(eventLength);
-			monitoringThread.endEvent();
+			sendEvent(SWT.PostEvent);
 			runForCycles(3);
 		}
 
@@ -219,18 +234,19 @@ public class EventLoopMonitorThreadTests extends TestCase {
 				event.getStackTraceSamples().length);
 	}
 
+	@Test
 	public void testPublishPossibleDeadlock() throws Exception {
 		monitoringThread = createTestThread(POLLING_RATE_MS * 4);
 		monitoringThread.start();
 		long maxDeadlock = FORCE_DEADLOCK_LOG_TIME_MILLIS;
-		monitoringThread.beginEvent();
+		sendEvent(SWT.PreEvent);
 
 		synchronized (sleepLock) {
 			// Cycle a few events to make sure the monitoring event thread is running.
 			for (int i = 0; i < 3; ++i) {
-				monitoringThread.beginEvent();
+				sendEvent(SWT.PreEvent);
 				runForCycles(1);
-				monitoringThread.endEvent();
+				sendEvent(SWT.PostEvent);
 			}
 			long startTime = timestamp;
 
@@ -257,19 +273,20 @@ public class EventLoopMonitorThreadTests extends TestCase {
 		assertEquals("No more deadlock events should get logged", 1, loggedEvents.size());
 	}
 
+	@Test
 	public void testPublishNoDeadlocksWhenSleeping() throws Exception {
 		monitoringThread = createTestThread(THRESHOLD_MS);
 		monitoringThread.start();
-		monitoringThread.beginEvent();
+		sendEvent(SWT.PreEvent);
 
 		synchronized (sleepLock) {
 			// Cycle a few events to make sure the monitoring event thread is running.
 			for (int i = 0; i < 3; ++i) {
-				monitoringThread.beginEvent();
+				sendEvent(SWT.PreEvent);
 				runForCycles(1);
-				monitoringThread.endEvent();
+				sendEvent(SWT.PostEvent);
 			}
-			monitoringThread.beginSleep();
+			sendEvent(SWT.Sleep);
 
 			// Wait for the end of the event to propagate to the deadlock tracker.
 			runForTime(FORCE_DEADLOCK_LOG_TIME_MILLIS * 2);
@@ -279,6 +296,7 @@ public class EventLoopMonitorThreadTests extends TestCase {
 		assertTrue("No deadlock events should get logged", loggedEvents.isEmpty());
 	}
 
+	@Test
 	public void testNoLoggingForSleep() throws Exception {
 		int eventFactor = 5;
 		monitoringThread = createTestThread(THRESHOLD_MS);
@@ -286,15 +304,16 @@ public class EventLoopMonitorThreadTests extends TestCase {
 
 		// One level deep
 		synchronized (sleepLock) {
-			monitoringThread.beginSleep();
+			sendEvent(SWT.Sleep);
 			runForTime(eventFactor * POLLING_RATE_MS);
-			monitoringThread.endSleep();
+			sendEvent(SWT.Wakeup);
 			runForCycles(3);
 		}
 
 		assertTrue("Sleeping should not trigger a long running event", loggedEvents.isEmpty());
 	}
 
+	@Test
 	public void testEventLogging() throws Exception {
 		int eventFactor = 5;
 		long eventStartTime = 0;
@@ -305,11 +324,11 @@ public class EventLoopMonitorThreadTests extends TestCase {
 
 		// One level deep
 		synchronized (sleepLock) {
-			monitoringThread.beginEvent(); // level 1
+			sendEvent(SWT.PreEvent); // level 1
 			eventStartTime = timestamp;
 			runForTime(eventFactor * THRESHOLD_MS);
 			eventStallDuration = timestamp - eventStartTime;
-			monitoringThread.endEvent();
+			sendEvent(SWT.PostEvent);
 			runForCycles(3);
 		}
 
@@ -323,6 +342,7 @@ public class EventLoopMonitorThreadTests extends TestCase {
 				expectedStackCount(eventStallDuration), event.getStackTraceSamples().length);
 	}
 
+	@Test
 	public void testNestedEventLogging() throws Exception {
 		int eventFactor = 6;
 
@@ -333,14 +353,14 @@ public class EventLoopMonitorThreadTests extends TestCase {
 
 		// Two levels deep
 		synchronized (sleepLock) {
-			monitoringThread.beginEvent(); // level 1
+			sendEvent(SWT.PreEvent); // level 1
 			runForCycles(1);
-			monitoringThread.beginEvent(); // level 2
+			sendEvent(SWT.PreEvent); // level 2
 			eventStartTime = timestamp;
 			runForTime(eventFactor * THRESHOLD_MS);
 			eventStallDuration = timestamp - eventStartTime;
-			monitoringThread.endEvent();
-			monitoringThread.endEvent();
+			sendEvent(SWT.PostEvent);
+			sendEvent(SWT.PostEvent);
 			runForCycles(3);
 		}
 
@@ -354,6 +374,7 @@ public class EventLoopMonitorThreadTests extends TestCase {
 				expectedStackCount(eventStallDuration), event.getStackTraceSamples().length);
 	}
 
+	@Test
 	public void testDoublyNestedEventLogging() throws Exception {
 		int eventFactor = 7;
 
@@ -364,17 +385,17 @@ public class EventLoopMonitorThreadTests extends TestCase {
 
 		// Three levels deep
 		synchronized (sleepLock) {
-			monitoringThread.beginEvent(); // level 1
+			sendEvent(SWT.PreEvent); // level 1
 			runForCycles(1);
-			monitoringThread.beginEvent(); // level 2
+			sendEvent(SWT.PreEvent); // level 2
 			runForCycles(1);
-			monitoringThread.beginEvent(); // level 3
+			sendEvent(SWT.PreEvent); // level 3
 			eventStartTime = timestamp;
 			runForTime(eventFactor * THRESHOLD_MS);
 			eventStallDuration = timestamp - eventStartTime;
-			monitoringThread.endEvent();
-			monitoringThread.endEvent();
-			monitoringThread.endEvent();
+			sendEvent(SWT.PostEvent);
+			sendEvent(SWT.PostEvent);
+			sendEvent(SWT.PostEvent);
 			runForCycles(3);
 		}
 
@@ -388,6 +409,7 @@ public class EventLoopMonitorThreadTests extends TestCase {
 				expectedStackCount(eventStallDuration), event.getStackTraceSamples().length);
 	}
 
+	@Test
 	public void testSeeLongEventInContinuationAfterNestedCall() throws Exception {
 		int eventFactor = 4;
 
@@ -399,31 +421,32 @@ public class EventLoopMonitorThreadTests extends TestCase {
 		// Exceed the threshold after the thread is started in the middle of an event, then end the
 		// event and validate that no long event was logged.
 		synchronized (sleepLock) {
-			monitoringThread.beginEvent();
+			sendEvent(SWT.PreEvent);
 			// Initially the outer thread is invoking nested events that are responsive.
 			for (int i = 0; i < 4; i++) {
 				runForCycles(1);
-				monitoringThread.beginEvent();
-				monitoringThread.endEvent();
+				sendEvent(SWT.PreEvent);
+				sendEvent(SWT.PostEvent);
 			}
 
 			eventResumeTime = timestamp;
 			runForTime(eventFactor * THRESHOLD_MS);
-			monitoringThread.endEvent();
+			sendEvent(SWT.PostEvent);
 			eventStallDuration = timestamp - eventResumeTime;
 			runForCycles(3);
 		}
 
 		assertEquals("Incorrect number of long events was logged", 1, loggedEvents.size());
 		UiFreezeEvent event = loggedEvents.get(0);
-		assertEquals("A long running event didn't start from the nested return point", eventResumeTime,
-				event.getStartTimestamp());
+		assertEquals("A long running event didn't start from the nested return point",
+				eventResumeTime, event.getStartTimestamp());
 		assertEquals("A long running event's duration was incorrect", eventStallDuration,
 				event.getTotalDuration());
 		assertEquals("A long running event didn't capture a good range of stack traces",
 				expectedStackCount(eventStallDuration), event.getStackTraceSamples().length);
 	}
 
+	@Test
 	public void testSeeLongEventInTheMiddleOfNestedCalls() throws Exception {
 		int eventFactor = 4;
 		monitoringThread = createTestThread(THRESHOLD_MS);
@@ -434,12 +457,12 @@ public class EventLoopMonitorThreadTests extends TestCase {
 		// Exceed the threshold after the thread is started in the middle of an event, then end the
 		// event and validate that no long event was logged.
 		synchronized (sleepLock) {
-			monitoringThread.beginEvent();
+			sendEvent(SWT.PreEvent);
 			// Initially the outer thread is invoking nested events that are responsive.
 			for (int i = 0; i < 3; i++) {
 				runForCycles(1);
-				monitoringThread.beginEvent();
-				monitoringThread.endEvent();
+				sendEvent(SWT.PreEvent);
+				sendEvent(SWT.PostEvent);
 			}
 
 			// This is the nested event UI freeze
@@ -449,55 +472,56 @@ public class EventLoopMonitorThreadTests extends TestCase {
 
 			// Before exiting the outer thread is invoking nested events that are responsive.
 			for (int i = 0; i < 3; i++) {
-				monitoringThread.beginEvent();
-				monitoringThread.endEvent();
+				sendEvent(SWT.PreEvent);
+				sendEvent(SWT.PostEvent);
 				runForCycles(1);
 			}
 
-			monitoringThread.endEvent();
+			sendEvent(SWT.PostEvent);
 			runForCycles(3);
 		}
 
 		assertEquals("Incorrect number of long events was logged", 1, loggedEvents.size());
 		UiFreezeEvent event = loggedEvents.get(0);
-		assertEquals("A long running event didn't start from the nested return point", eventResumeTime,
-				event.getStartTimestamp());
+		assertEquals("A long running event didn't start from the nested return point",
+				eventResumeTime, event.getStartTimestamp());
 		assertEquals("A long running event's duration was incorrect", eventStallDuration,
 				event.getTotalDuration());
 		assertEquals("A long running event didn't capture a good range of stack traces",
 				expectedStackCount(eventStallDuration), event.getStackTraceSamples().length);
 	}
 
+	@Test
 	public void testSeeSleepInTheMiddleOfNestedCalls() throws Exception {
 		int eventFactor = 4;
 		monitoringThread = createTestThread(THRESHOLD_MS);
 		monitoringThread.start();
 
-		// Exceed the threshold after the thread is started in the middle of an event, then end the
-		// event and validate that no long event was logged.
+		// Exceed the threshold after the thread is started in the middle of an event, then end
+		// the event and validate that no long event was logged.
 		synchronized (sleepLock) {
-			monitoringThread.beginEvent();
+			sendEvent(SWT.PreEvent);
 			// Initially the outer thread is invoking nested events that are responsive.
 			for (int i = 0; i < 3; i++) {
 				runForCycles(1);
-				monitoringThread.beginEvent();
-				monitoringThread.endEvent();
+				sendEvent(SWT.PreEvent);
+				sendEvent(SWT.PostEvent);
 			}
 
 			// Nested events
 			for (int i = 0; i < eventFactor; ++i) {
 				runForCycles(1);
-				monitoringThread.beginSleep();
-				monitoringThread.endSleep();
+				sendEvent(SWT.Sleep);
+				sendEvent(SWT.Wakeup);
 			}
 
 			// Before exiting the outer thread is invoking nested events that are responsive.
 			for (int i = 0; i < 3; i++) {
-				monitoringThread.beginEvent();
-				monitoringThread.endEvent();
+				sendEvent(SWT.PreEvent);
+				sendEvent(SWT.PostEvent);
 				runForCycles(1);
 			}
-			monitoringThread.endEvent();
+			sendEvent(SWT.PostEvent);
 			runForCycles(3);
 		}
 
@@ -505,6 +529,7 @@ public class EventLoopMonitorThreadTests extends TestCase {
 				loggedEvents.isEmpty());
 	}
 
+	@Test
 	public void testConsecutiveSleeps() throws Exception {
 		int eventFactor = 5;
 		long eventStartTime = 0;
@@ -514,9 +539,10 @@ public class EventLoopMonitorThreadTests extends TestCase {
 		monitoringThread.start();
 
 		synchronized (sleepLock) {
-			monitoringThread.beginSleep();
+			sendEvent(SWT.PreEvent);
+			sendEvent(SWT.Sleep);
 			runForTime(THRESHOLD_MS);
-			monitoringThread.endSleep();
+			sendEvent(SWT.Wakeup);
 			eventStartTime = timestamp;
 			runForCycles(3);
 		}
@@ -524,12 +550,13 @@ public class EventLoopMonitorThreadTests extends TestCase {
 		assertTrue("A long running event shold not be published during a sleep",
 				loggedEvents.isEmpty());
 
-		// Let a long time elapse between the last endSleep() and the next beginSleep().
+		// Let a long time elapse between the last Wakeup and the next Sleep.
 		synchronized (sleepLock) {
 			runForTime(THRESHOLD_MS * eventFactor);
 			eventDuration = timestamp - eventStartTime;
-			monitoringThread.beginSleep();
-			monitoringThread.endSleep();
+			sendEvent(SWT.Sleep);
+			sendEvent(SWT.Wakeup);
+			sendEvent(SWT.PostEvent);
 			runForCycles(3);
 		}
 

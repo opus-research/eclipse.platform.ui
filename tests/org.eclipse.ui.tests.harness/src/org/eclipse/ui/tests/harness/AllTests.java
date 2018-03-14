@@ -16,12 +16,12 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 /**
- * Test the test harness 
- * 
+ * Test the test harness
+ *
  * @since 3.3
  *
  */
-	
+
 @RunWith(Suite.class)
 @SuiteClasses(MocksTest.class)
 public class AllTests {
