@@ -15,11 +15,13 @@ import org.eclipse.core.databinding.observable.IObservablesListener;
 
 /**
  * Listener for changes to observable sets.
- *
+ * 
+ * @param <E>
+ * 
  * @since 1.0
  *
  */
-public interface ISetChangeListener extends IObservablesListener {
+public interface ISetChangeListener<E> extends IObservablesListener {
 
 	/**
 	 * Handle a change to an observable set. The given event object must only be
@@ -30,6 +32,6 @@ public interface ISetChangeListener extends IObservablesListener {
 	 * @param event
 	 *            the event
 	 */
-	void handleSetChange(SetChangeEvent event);
+	void handleSetChange(SetChangeEvent<E> event);
 
 }

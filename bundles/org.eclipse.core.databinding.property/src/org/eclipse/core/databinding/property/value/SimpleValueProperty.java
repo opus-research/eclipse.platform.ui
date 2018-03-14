@@ -17,6 +17,7 @@ import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.map.IObservableMap;
 import org.eclipse.core.databinding.observable.set.IObservableSet;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.databinding.observable.value.ValueDiff;
 import org.eclipse.core.databinding.property.INativePropertyListener;
 import org.eclipse.core.databinding.property.ISimplePropertyListener;
 import org.eclipse.core.internal.databinding.property.value.ListSimpleValueObservableList;
@@ -39,15 +40,19 @@ import org.eclipse.core.internal.databinding.property.value.SimplePropertyObserv
  * <p>
  * In addition, we recommended overriding {@link #toString()} to return a
  * description suitable for debugging purposes.
- *
+ * 
+ * @param <S>
+ *            type of the source object
+ * @param <T>
+ *            type of the value of the property
  * @since 1.2
  */
-public abstract class SimpleValueProperty extends ValueProperty {
+public abstract class SimpleValueProperty<S, T> extends ValueProperty<S, T> {
 	@Override
-	protected abstract Object doGetValue(Object source);
+	protected abstract T doGetValue(S source);
 
 	@Override
-	protected abstract void doSetValue(Object source, Object value);
+	protected abstract void doSetValue(S source, T value);
 
 	/**
 	 * Returns a listener capable of adding or removing itself as a listener on
@@ -65,26 +70,29 @@ public abstract class SimpleValueProperty extends ValueProperty {
 	 *         APIs for this property.
 	 * @noreference This method is not intended to be referenced by clients.
 	 */
-	public abstract INativePropertyListener adaptListener(
-			ISimplePropertyListener listener);
+	public abstract INativePropertyListener<S> adaptListener(
+			ISimplePropertyListener<ValueDiff<T>> listener);
 
 	@Override
-	public IObservableValue observe(Realm realm, Object source) {
-		return new SimplePropertyObservableValue(realm, source, this);
+	public IObservableValue<T> observe(Realm realm, S source) {
+		return new SimplePropertyObservableValue<S, T>(realm, source, this);
 	}
 
 	@Override
-	public IObservableList observeDetail(IObservableList master) {
-		return new ListSimpleValueObservableList(master, this);
+	public <U extends S> IObservableList<T> observeDetail(
+			IObservableList<U> master) {
+		return new ListSimpleValueObservableList<S, U, T>(master, this);
 	}
 
 	@Override
-	public IObservableMap observeDetail(IObservableSet master) {
-		return new SetSimpleValueObservableMap(master, this);
+	public <U extends S> IObservableMap<U, T> observeDetail(
+			IObservableSet<U> master) {
+		return new SetSimpleValueObservableMap<S, U, T>(master, this);
 	}
 
 	@Override
-	public IObservableMap observeDetail(IObservableMap master) {
-		return new MapSimpleValueObservableMap(master, this);
+	public <K, V extends S> IObservableMap<K, T> observeDetail(
+			IObservableMap<K, V> master) {
+		return new MapSimpleValueObservableMap<S, K, V, T>(master, this);
 	}
 }

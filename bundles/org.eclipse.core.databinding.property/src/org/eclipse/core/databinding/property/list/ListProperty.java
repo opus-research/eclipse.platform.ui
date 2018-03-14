@@ -18,7 +18,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.databinding.observable.Diffs;
-import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.list.ListDiff;
@@ -30,10 +29,14 @@ import org.eclipse.core.internal.databinding.property.ListPropertyDetailValuesLi
 
 /**
  * Abstract implementation of IListProperty.
- *
+ * 
+ * @param <S>
+ *            type of the source object
+ * @param <E>
+ *            type of the elements in the list
  * @since 1.2
  */
-public abstract class ListProperty implements IListProperty {
+public abstract class ListProperty<S, E> implements IListProperty<S, E> {
 
 	/**
 	 * By default, this method returns <code>Collections.EMPTY_LIST</code> in
@@ -50,9 +53,9 @@ public abstract class ListProperty implements IListProperty {
 	 * @since 1.3
 	 */
 	@Override
-	public List getList(Object source) {
+	public List<E> getList(S source) {
 		if (source == null) {
-			return Collections.EMPTY_LIST;
+			return Collections.emptyList();
 		}
 		return Collections.unmodifiableList(doGetList(source));
 	}
@@ -64,12 +67,12 @@ public abstract class ListProperty implements IListProperty {
 	 *            the property source
 	 * @return a List with the current contents of the source's list property
 	 * @noreference This method is not intended to be referenced by clients.
-	 * @since 1.3
+	 * @since 1.5
 	 */
-	protected List doGetList(Object source) {
-		IObservableList observable = observe(source);
+	protected List<E> doGetList(S source) {
+		IObservableList<E> observable = observe(source);
 		try {
-			return new ArrayList(observable);
+			return new ArrayList<E>(observable);
 		} finally {
 			observable.dispose();
 		}
@@ -79,7 +82,7 @@ public abstract class ListProperty implements IListProperty {
 	 * @since 1.3
 	 */
 	@Override
-	public final void setList(Object source, List list) {
+	public final void setList(S source, List<E> list) {
 		if (source != null) {
 			doSetList(source, list);
 		}
@@ -92,10 +95,10 @@ public abstract class ListProperty implements IListProperty {
 	 *            the property source
 	 * @param list
 	 *            the new list
-	 * @since 1.3
+	 * @since 1.5
 	 * @noreference This method is not intended to be referenced by clients.
 	 */
-	protected void doSetList(Object source, List list) {
+	protected void doSetList(S source, List<E> list) {
 		doUpdateList(source, Diffs.computeListDiff(doGetList(source), list));
 	}
 
@@ -103,7 +106,7 @@ public abstract class ListProperty implements IListProperty {
 	 * @since 1.3
 	 */
 	@Override
-	public final void updateList(Object source, ListDiff diff) {
+	public final void updateList(S source, ListDiff<E> diff) {
 		if (source != null) {
 			doUpdateList(source, diff);
 		}
@@ -118,8 +121,8 @@ public abstract class ListProperty implements IListProperty {
 	 *            a diff describing the change
 	 * @since 1.3
 	 */
-	protected void doUpdateList(Object source, ListDiff diff) {
-		IObservableList observable = observe(source);
+	protected void doUpdateList(S source, ListDiff<E> diff) {
+		IObservableList<E> observable = observe(source);
 		try {
 			diff.applyTo(observable);
 		} finally {
@@ -128,38 +131,39 @@ public abstract class ListProperty implements IListProperty {
 	}
 
 	@Override
-	public IObservableList observe(Object source) {
+	public IObservableList<E> observe(S source) {
 		return observe(Realm.getDefault(), source);
 	}
 
 	@Override
-	public IObservableFactory listFactory() {
-		return new IObservableFactory() {
-			@Override
-			public IObservable createObservable(Object target) {
+	public IObservableFactory<S, IObservableList<E>> listFactory() {
+		return new IObservableFactory<S, IObservableList<E>>() {
+			public IObservableList<E> createObservable(S target) {
 				return observe(target);
 			}
 		};
 	}
 
 	@Override
-	public IObservableFactory listFactory(final Realm realm) {
-		return new IObservableFactory() {
-			@Override
-			public IObservable createObservable(Object target) {
+	public IObservableFactory<S, IObservableList<E>> listFactory(
+			final Realm realm) {
+		return new IObservableFactory<S, IObservableList<E>>() {
+			public IObservableList<E> createObservable(S target) {
 				return observe(realm, target);
 			}
 		};
 	}
 
 	@Override
-	public IObservableList observeDetail(IObservableValue master) {
+	public <U extends S> IObservableList<E> observeDetail(
+			IObservableValue<U> master) {
 		return MasterDetailObservables.detailList(master,
 				listFactory(master.getRealm()), getElementType());
 	}
 
 	@Override
-	public final IListProperty values(IValueProperty detailValue) {
-		return new ListPropertyDetailValuesList(this, detailValue);
+	public final <T> IListProperty<S, T> values(
+			IValueProperty<? super E, T> detailValue) {
+		return new ListPropertyDetailValuesList<S, E, T>(this, detailValue);
 	}
 }

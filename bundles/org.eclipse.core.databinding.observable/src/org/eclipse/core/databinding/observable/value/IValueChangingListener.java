@@ -14,11 +14,13 @@ import org.eclipse.core.databinding.observable.IObservablesListener;
 
 /**
  * Listener for pre-change events for observable values.
- *
+ * 
+ * @param <T>
+ * 
  * @since 1.0
  *
  */
-public interface IValueChangingListener extends IObservablesListener {
+public interface IValueChangingListener<T> extends IObservablesListener {
 
 	/**
 	 * This method is called when the value is about to change and provides an
@@ -29,6 +31,6 @@ public interface IValueChangingListener extends IObservablesListener {
 	 *
 	 * @param event
 	 */
-	public void handleValueChanging(ValueChangingEvent event);
+	public void handleValueChanging(ValueChangingEvent<T> event);
 
 }

@@ -32,11 +32,13 @@ import org.eclipse.core.databinding.observable.set.IObservableSet;
  * This class is <i>not</i> a strict implementation the {@link IObservableSet}
  * interface. It intentionally violates the {@link Set} contract, which requires
  * the use of {@link #equals(Object)} when comparing elements.
- *
+ * 
+ * @param <E>
+ * 
  * @since 1.2
  */
-public class IdentityObservableSet extends AbstractObservableSet {
-	private Set wrappedSet;
+public class IdentityObservableSet<E> extends AbstractObservableSet<E> {
+	private Set<E> wrappedSet;
 	private Object elementType;
 
 	/**
@@ -50,12 +52,12 @@ public class IdentityObservableSet extends AbstractObservableSet {
 	public IdentityObservableSet(Realm realm, Object elementType) {
 		super(realm);
 
-		this.wrappedSet = new IdentitySet();
+		this.wrappedSet = new IdentitySet<E>();
 		this.elementType = elementType;
 	}
 
 	@Override
-	protected Set getWrappedSet() {
+	protected Set<E> getWrappedSet() {
 		return wrappedSet;
 	}
 
@@ -65,11 +67,11 @@ public class IdentityObservableSet extends AbstractObservableSet {
 	}
 
 	@Override
-	public Iterator iterator() {
+	public Iterator<E> iterator() {
 		getterCalled();
-		final Iterator wrappedIterator = wrappedSet.iterator();
-		return new Iterator() {
-			Object last;
+		final Iterator<E> wrappedIterator = wrappedSet.iterator();
+		return new Iterator<E>() {
+			E last;
 
 			@Override
 			public boolean hasNext() {
@@ -78,7 +80,7 @@ public class IdentityObservableSet extends AbstractObservableSet {
 			}
 
 			@Override
-			public Object next() {
+			public E next() {
 				getterCalled();
 				return last = wrappedIterator.next();
 			}
@@ -87,34 +89,39 @@ public class IdentityObservableSet extends AbstractObservableSet {
 			public void remove() {
 				getterCalled();
 				wrappedIterator.remove();
-				fireSetChange(Diffs.createSetDiff(Collections.EMPTY_SET,
+				Set<E> emptySet = Collections.emptySet();
+				fireSetChange(Diffs.createSetDiff(emptySet,
 						Collections.singleton(last)));
 			}
 		};
 	}
 
 	@Override
-	public boolean add(Object o) {
+	public boolean add(E o) {
 		getterCalled();
 		boolean changed = wrappedSet.add(o);
-		if (changed)
+		if (changed) {
+			Set<E> emptySet = Collections.emptySet();
 			fireSetChange(Diffs.createSetDiff(Collections.singleton(o),
-					Collections.EMPTY_SET));
+					emptySet));
+		}
 		return changed;
 	}
 
 	@Override
-	public boolean addAll(Collection c) {
+	public boolean addAll(Collection<? extends E> c) {
 		getterCalled();
-		Set additions = new IdentitySet();
-		for (Iterator iterator = c.iterator(); iterator.hasNext();) {
-			Object element = iterator.next();
+		Set<E> additions = new IdentitySet<E>();
+		for (Iterator<? extends E> iterator = c.iterator(); iterator.hasNext();) {
+			E element = iterator.next();
 			if (wrappedSet.add(element))
 				additions.add(element);
 		}
 		boolean changed = !additions.isEmpty();
-		if (changed)
-			fireSetChange(Diffs.createSetDiff(additions, Collections.EMPTY_SET));
+		if (changed) {
+			Set<E> emptySet = Collections.emptySet();
+			fireSetChange(Diffs.createSetDiff(additions, emptySet));
+		}
 		return changed;
 	}
 
@@ -122,35 +129,40 @@ public class IdentityObservableSet extends AbstractObservableSet {
 	public boolean remove(Object o) {
 		getterCalled();
 		boolean changed = wrappedSet.remove(o);
-		if (changed)
-			fireSetChange(Diffs.createSetDiff(Collections.EMPTY_SET,
-					Collections.singleton(o)));
+		if (changed) {
+			Set<E> additions = Collections.emptySet();
+			fireSetChange(Diffs.createSetDiff(additions,
+					Collections.singleton((E) o)));
+		}
 		return changed;
 	}
 
 	@Override
-	public boolean removeAll(Collection c) {
+	public boolean removeAll(Collection<?> c) {
 		getterCalled();
-		Set removals = new IdentitySet();
-		for (Iterator iterator = c.iterator(); iterator.hasNext();) {
+		Set<E> removals = new IdentitySet<E>();
+		for (Iterator<?> iterator = c.iterator(); iterator.hasNext();) {
 			Object element = iterator.next();
-			if (wrappedSet.remove(element))
-				removals.add(element);
+			if (wrappedSet.remove(element)) {
+				removals.add((E) element);
+			}
 		}
 		boolean changed = !removals.isEmpty();
-		if (changed)
-			fireSetChange(Diffs.createSetDiff(Collections.EMPTY_SET, removals));
+		if (changed) {
+			Set<E> additions = Collections.emptySet();
+			fireSetChange(Diffs.createSetDiff(additions, removals));
+		}
 		return changed;
 	}
 
 	@Override
-	public boolean retainAll(Collection c) {
+	public boolean retainAll(Collection<?> c) {
 		getterCalled();
-		Set removals = new IdentitySet();
+		Set<E> removals = new IdentitySet<E>();
 		Object[] toRetain = c.toArray();
-		outer: for (Iterator iterator = wrappedSet.iterator(); iterator
+		outer: for (Iterator<E> iterator = wrappedSet.iterator(); iterator
 				.hasNext();) {
-			Object element = iterator.next();
+			E element = iterator.next();
 			// Cannot rely on c.contains(element) because we must compare
 			// elements using IElementComparer.
 			for (int i = 0; i < toRetain.length; i++) {
@@ -161,8 +173,10 @@ public class IdentityObservableSet extends AbstractObservableSet {
 			removals.add(element);
 		}
 		boolean changed = !removals.isEmpty();
-		if (changed)
-			fireSetChange(Diffs.createSetDiff(Collections.EMPTY_SET, removals));
+		if (changed) {
+			Set<E> additions = Collections.emptySet();
+			fireSetChange(Diffs.createSetDiff(additions, removals));
+		}
 		return changed;
 	}
 
@@ -170,9 +184,10 @@ public class IdentityObservableSet extends AbstractObservableSet {
 	public void clear() {
 		getterCalled();
 		if (!wrappedSet.isEmpty()) {
-			Set removals = wrappedSet;
-			wrappedSet = new IdentitySet();
-			fireSetChange(Diffs.createSetDiff(Collections.EMPTY_SET, removals));
+			Set<E> removals = wrappedSet;
+			wrappedSet = new IdentitySet<E>();
+			Set<E> additions = Collections.emptySet();
+			fireSetChange(Diffs.createSetDiff(additions, removals));
 		}
 	}
 }
