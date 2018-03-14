@@ -44,13 +44,12 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MPart#isCloseable <em>Closeable</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MPart#getDescription <em>Description</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MPart#getLocalizedDescription <em>Localized Description</em>}</li>
- *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MPart#getDialogs <em>Dialogs</em>}</li>
  * </ul>
  *
  * @model
  * @generated
  */
-public interface MPart extends MUIElement, MPartSashContainerElement, MStackElement, MContribution, MContext, MUILabel, MHandlerContainer, MDirtyable, MBindings, MWindowElement, MDialogElement, MWizardElement {
+public interface MPart extends MUIElement, MPartSashContainerElement, MStackElement, MContribution, MContext, MUILabel, MHandlerContainer, MDirtyable, MBindings, MWindowElement {
 	/**
 	 * Returns the value of the '<em><b>Menus</b></em>' containment reference list.
 	 * The list contents are of type {@link org.eclipse.e4.ui.model.application.ui.menu.MMenu}.
@@ -164,22 +163,5 @@ public interface MPart extends MUIElement, MPartSashContainerElement, MStackElem
 	 * @generated
 	 */
 	String getLocalizedDescription();
-
-	/**
-	 * Returns the value of the '<em><b>Dialogs</b></em>' reference list.
-	 * The list contents are of type {@link org.eclipse.e4.ui.model.application.ui.basic.MDialog}.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
-	 * <p>
-	 * This is the ordered list of MDialogs for this model.
-	 * </p>
-	 * @since 1.1
-	 * <!-- end-model-doc -->
-	 * @return the value of the '<em>Dialogs</em>' reference list.
-	 * @model
-	 * @generated
-	 */
-	List<MDialog> getDialogs();
 
 } // MPart

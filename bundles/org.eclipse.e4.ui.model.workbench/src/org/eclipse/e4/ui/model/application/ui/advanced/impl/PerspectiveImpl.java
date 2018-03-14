@@ -21,7 +21,6 @@ import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
-import org.eclipse.e4.ui.model.application.ui.basic.MDialog;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.impl.ElementContainerImpl;
@@ -37,7 +36,6 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EDataTypeUniqueEList;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.EObjectContainmentWithInverseEList;
-import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 import org.eclipse.emf.ecore.util.EcoreEMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
@@ -58,7 +56,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.impl.PerspectiveImpl#getVariables <em>Variables</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.impl.PerspectiveImpl#getProperties <em>Properties</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.impl.PerspectiveImpl#getWindows <em>Windows</em>}</li>
- *   <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.impl.PerspectiveImpl#getDialogs <em>Dialogs</em>}</li>
  * </ul>
  *
  * @generated
@@ -193,16 +190,6 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 	 * @ordered
 	 */
 	protected EList<MWindow> windows;
-
-	/**
-	 * The cached value of the '{@link #getDialogs() <em>Dialogs</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getDialogs()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<MDialog> dialogs;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -371,18 +358,6 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public List<MDialog> getDialogs() {
-		if (dialogs == null) {
-			dialogs = new EObjectResolvingEList<MDialog>(MDialog.class, this, AdvancedPackageImpl.PERSPECTIVE__DIALOGS);
-		}
-		return dialogs;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
 	 */
 	public void updateLocalization() {
 		if (eNotificationRequired()) {
@@ -452,8 +427,6 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 				else return getProperties();
 			case AdvancedPackageImpl.PERSPECTIVE__WINDOWS:
 				return getWindows();
-			case AdvancedPackageImpl.PERSPECTIVE__DIALOGS:
-				return getDialogs();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -490,10 +463,6 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 				getWindows().clear();
 				getWindows().addAll((Collection<? extends MWindow>)newValue);
 				return;
-			case AdvancedPackageImpl.PERSPECTIVE__DIALOGS:
-				getDialogs().clear();
-				getDialogs().addAll((Collection<? extends MDialog>)newValue);
-				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -527,9 +496,6 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 			case AdvancedPackageImpl.PERSPECTIVE__WINDOWS:
 				getWindows().clear();
 				return;
-			case AdvancedPackageImpl.PERSPECTIVE__DIALOGS:
-				getDialogs().clear();
-				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -560,8 +526,6 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 				return properties != null && !properties.isEmpty();
 			case AdvancedPackageImpl.PERSPECTIVE__WINDOWS:
 				return windows != null && !windows.isEmpty();
-			case AdvancedPackageImpl.PERSPECTIVE__DIALOGS:
-				return dialogs != null && !dialogs.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

@@ -78,9 +78,7 @@ public class BasicFactoryImpl extends EFactoryImpl implements MBasicFactory {
 			case BasicPackageImpl.TRIMMED_WINDOW: return (EObject)createTrimmedWindow();
 			case BasicPackageImpl.TRIM_BAR: return (EObject)createTrimBar();
 			case BasicPackageImpl.DIALOG: return (EObject)createDialog();
-			case BasicPackageImpl.WIZARD: return (EObject)createWizard();
-			case BasicPackageImpl.DIALOG_ELEMENT: return (EObject)createDialogElement();
-			case BasicPackageImpl.WIZARD_ELEMENT: return (EObject)createWizardElement();
+			case BasicPackageImpl.WIZARD_DIALOG: return (EObject)createWizardDialog();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -181,29 +179,9 @@ public class BasicFactoryImpl extends EFactoryImpl implements MBasicFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public MWizard createWizard() {
-		WizardImpl wizard = new WizardImpl();
-		return wizard;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public MDialogElement createDialogElement() {
-		DialogElementImpl dialogElement = new DialogElementImpl();
-		return dialogElement;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public MWizardElement createWizardElement() {
-		WizardElementImpl wizardElement = new WizardElementImpl();
-		return wizardElement;
+	public MWizardDialog createWizardDialog() {
+		WizardDialogImpl wizardDialog = new WizardDialogImpl();
+		return wizardDialog;
 	}
 
 	/**
