@@ -2516,14 +2516,16 @@ public class WorkbenchPage implements IWorkbenchPage {
 		MPerspective perspective = getCurrentPerspective();
 		if (perspective != null) {
 			int scope = allPerspectives ? WINDOW_SCOPE : EModelService.PRESENTATION;
-			Set<MUIElement> parts = new HashSet<MUIElement>();
-			parts.addAll(modelService.findElements(window, null, MPlaceholder.class, null, scope));
-			parts.addAll(modelService.findElements(window, null, MPart.class, null, scope));
+			List<MPlaceholder> placeholders = modelService.findElements(window, null,
+					MPlaceholder.class, null, scope);
 			List<IViewReference> visibleReferences = new ArrayList<IViewReference>();
 			for (ViewReference reference : viewReferences) {
-				if (parts.contains(reference.getModel()) && reference.getModel().isToBeRendered()) {
-					// only rendered placeholders are valid view references
-					visibleReferences.add(reference);
+				for (MPlaceholder placeholder : placeholders) {
+					if (reference.getModel() == placeholder.getRef()
+							&& placeholder.isToBeRendered()) {
+						// only rendered placeholders are valid view references
+						visibleReferences.add(reference);
+					}
 				}
 			}
 			return visibleReferences.toArray(new IViewReference[visibleReferences.size()]);
