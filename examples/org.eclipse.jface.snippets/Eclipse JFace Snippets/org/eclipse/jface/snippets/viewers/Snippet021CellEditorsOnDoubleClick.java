@@ -10,6 +10,7 @@
  *     Dinko Ivanov - bug 164365
  *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414565
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 448143
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 475361
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -141,7 +142,7 @@ public class Snippet021CellEditorsOnDoubleClick {
 	}
 
 	private List<MyModel> createModel() {
-		List<MyModel> elements = new ArrayList<MyModel>();
+		List<MyModel> elements = new ArrayList<>();
 
 		for (int i = 0; i < 10; i++) {
 			elements.add(new MyModel(i));
