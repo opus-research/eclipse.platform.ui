@@ -32,6 +32,8 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
+import org.eclipse.e4.ui.css.swt.theme.ITheme;
+import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -39,6 +41,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.resource.ResourceManager;
+import org.eclipse.jface.util.Util;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
@@ -47,16 +50,15 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -85,6 +87,10 @@ public class ProgressInfoItem extends Composite {
 	static String DISABLED_CLEAR_FINISHED_JOB_KEY = "org.eclipse.ui.internal.progress.DISABLED_CLEAR_FINISHED_JOB"; //$NON-NLS-1$
 
 	static String DEFAULT_JOB_KEY = "org.eclipse.ui.internal.progress.PROGRESS_DEFAULT"; //$NON-NLS-1$
+
+	static String DARK_COLOR_KEY = "org.eclipse.ui.internal.progress.PROGRESS_DARK_COLOR"; //$NON-NLS-1$
+
+	static String DEFAULT_THEME = "org.eclipse.e4.ui.css.theme.e4_default"; //$NON-NLS-1$
 
 	JobTreeElement info;
 
@@ -127,6 +133,8 @@ public class ProgressInfoItem extends Composite {
 
 	IndexListener indexListener;
 
+	private int currentIndex;
+
 	private boolean selected;
 
 	private MouseAdapter mouseListener;
@@ -138,6 +146,8 @@ public class ProgressInfoItem extends Composite {
 	private Link link;
 
 	private HandlerChangeTracker tracker;
+
+	private boolean isThemed;
 
 	static {
 		JFaceResources
@@ -174,6 +184,19 @@ public class ProgressInfoItem extends Composite {
 						DISABLED_CLEAR_FINISHED_JOB_KEY,
 						WorkbenchImages
 								.getWorkbenchImageDescriptor("dlcl16/progress_rem.png")); //$NON-NLS-1$
+
+		// Mac has different Gamma value
+		int shift = Util.isMac() ? -25 : -10;
+
+		Color lightColor = PlatformUI.getWorkbench().getDisplay()
+				.getSystemColor(SWT.COLOR_LIST_BACKGROUND);
+
+		// Determine a dark color by shifting the list color
+		RGB darkRGB = new RGB(Math.max(0, lightColor.getRed() + shift), Math
+				.max(0, lightColor.getGreen() + shift), Math.max(0, lightColor
+				.getBlue()
+				+ shift));
+		JFaceResources.getColorRegistry().put(DARK_COLOR_KEY, darkRGB);
 	}
 
 	/**
@@ -188,6 +211,7 @@ public class ProgressInfoItem extends Composite {
 			JobTreeElement progressInfo) {
 		super(parent, style);
 		info = progressInfo;
+		isThemed = getCustomThemeFlag();
 		setData(info);
 		setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
 		createChildren();
@@ -235,21 +259,18 @@ public class ProgressInfoItem extends Composite {
 				cancelOrRemove();
 			}
 		});
-		actionBar.addListener(SWT.Traverse, new Listener() {
-			@Override
-			public void handleEvent(Event event) {
-				if (indexListener == null) {
-					return;
-				}
-				int detail = event.detail;
-				if (detail == SWT.TRAVERSE_ARROW_NEXT) {
-					indexListener.selectNext();
-				}
-				if (detail == SWT.TRAVERSE_ARROW_PREVIOUS) {
-					indexListener.selectPrevious();
-				}
-
+		actionBar.addListener(SWT.Traverse, event -> {
+			if (indexListener == null) {
+				return;
 			}
+			int detail = event.detail;
+			if (detail == SWT.TRAVERSE_ARROW_NEXT) {
+				indexListener.selectNext();
+			}
+			if (detail == SWT.TRAVERSE_ARROW_PREVIOUS) {
+				indexListener.selectPrevious();
+			}
+
 		});
 		updateToolBarValues();
 
@@ -557,7 +578,7 @@ public class ProgressInfoItem extends Composite {
 				}
 
 			}
-			setColor();
+			setColor(currentIndex);
 		}
 
 		// Remove completed tasks
@@ -760,17 +781,14 @@ public class ProgressInfoItem extends Composite {
 				}
 			});
 
-			link.addListener(SWT.Resize, new Listener() {
-				@Override
-				public void handleEvent(Event event) {
+			link.addListener(SWT.Resize, event -> {
 
-					Object text = link.getData(TEXT_KEY);
-					if (text == null)
-						return;
+				Object text = link.getData(TEXT_KEY);
+				if (text == null)
+					return;
 
-					updateText((String) text, link);
+				updateText((String) text, link);
 
-				}
 			});
 			taskEntries.add(link);
 		} else {
@@ -890,9 +908,13 @@ public class ProgressInfoItem extends Composite {
 	}
 
 	/**
-	 * Set color if item is selected
+	 * Set the color base on the index
+	 *
+	 * @param i
 	 */
-	public void setColor() {
+	public void setColor(int i) {
+		currentIndex = i;
+
 		if (selected) {
 			setAllBackgrounds(getDisplay().getSystemColor(
 					SWT.COLOR_LIST_SELECTION));
@@ -900,10 +922,20 @@ public class ProgressInfoItem extends Composite {
 					SWT.COLOR_LIST_SELECTION_TEXT));
 			return;
 		}
+
+		if (!isThemed) {
+			if (i % 2 == 0) {
+				setAllBackgrounds(JFaceResources.getColorRegistry().get(DARK_COLOR_KEY));
+			} else {
+				setAllBackgrounds(getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+			}
+			setAllForegrounds(getDisplay().getSystemColor(SWT.COLOR_LIST_FOREGROUND));
+		}
+
 	}
 
 	/**
-	 * Set the foreground of all widgets to the supplied color. e
+	 * Set the foreground of all widgets to the supplied color.
 	 *
 	 * @param color
 	 */
@@ -955,7 +987,7 @@ public class ProgressInfoItem extends Composite {
 			setButtonFocus();
 		}
 		selected = select;
-		setColor();
+		setColor(currentIndex);
 	}
 
 	/**
@@ -1071,5 +1103,20 @@ public class ProgressInfoItem extends Composite {
 			link.setEnabled(service != null && service.canExecute(parmCommand));
 			return true;
 		}
+	}
+	/*
+	 * Check if workspace is using a theme. If it is, confirm it is not the
+	 * default theme.
+	 */
+
+	private boolean getCustomThemeFlag() {
+		IThemeEngine engine = PlatformUI.getWorkbench().getService(IThemeEngine.class);
+		if (engine != null) {
+			ITheme activeTheme = engine.getActiveTheme();
+			if (activeTheme != null) {
+				return !DEFAULT_THEME.equals(activeTheme.getId());
+			}
+		}
+		return false;
 	}
 }
