@@ -49,6 +49,15 @@ import org.osgi.service.event.Event;
  */
 public class ToolControlRenderer extends SWTPartRenderer {
 
+	/**
+	 * Will be published or removed in 4.5.
+	 */
+	private static final String HIDEABLE = "HIDEABLE"; //$NON-NLS-1$
+	/**
+	 * Will be published or removed in 4.5.
+	 */
+	private static final String SHOW_RESTORE_MENU = "SHOW_RESTORE_MENU"; //$NON-NLS-1$
+	
 	@Inject
 	private MApplication application;
 	/**
@@ -127,8 +136,22 @@ public class ToolControlRenderer extends SWTPartRenderer {
 		}
 		CSSRenderingUtils cssUtils = parentContext.get(CSSRenderingUtils.class);
 		newCtrl = cssUtils.frameMeIfPossible(newCtrl, null, vertical, true);
-		createToolControlMenu(toolControl, newCtrl);
+
+		boolean hideable = isHideable(toolControl);
+		boolean showRestoreMenu = isRestoreMenuShowable(toolControl);
+		if (showRestoreMenu || hideable) {
+			createToolControlMenu(toolControl, newCtrl, hideable);
+		}
+
 		return newCtrl;
+	}
+
+	private boolean isRestoreMenuShowable(MToolControl toolControl) {
+		return toolControl.getTags().contains(SHOW_RESTORE_MENU);
+	}
+
+	private boolean isHideable(MToolControl toolControl) {
+		return toolControl.getTags().contains(HIDEABLE);
 	}
 
 	@Inject
@@ -141,12 +164,25 @@ public class ToolControlRenderer extends SWTPartRenderer {
 		if (!(changedObj instanceof MToolControl))
 			return;
 
-		final MUIElement changedElement = (MUIElement) changedObj;
+		final MToolControl changedElement = (MToolControl) changedObj;
 
 		if (UIEvents.isADD(event)) {
 			if (UIEvents.contains(event, UIEvents.EventTags.NEW_VALUE,
 					IPresentationEngine.HIDDEN_EXPLICITLY)) {
 				changedElement.setVisible(false);
+			} else {
+				boolean hideable = UIEvents.contains(event,
+						UIEvents.EventTags.NEW_VALUE, HIDEABLE);
+				if (UIEvents.contains(event, UIEvents.EventTags.NEW_VALUE,
+						SHOW_RESTORE_MENU) || hideable) {
+					Object obj = changedElement.getWidget();
+					if (obj instanceof Control) {
+						if (((Control) obj).getMenu() == null) {
+							createToolControlMenu(changedElement,
+									(Control) obj, hideable);
+						}
+					}
+				}
 			}
 		} else if (UIEvents.isREMOVE(event)) {
 			if (UIEvents.contains(event, UIEvents.EventTags.OLD_VALUE,
@@ -171,18 +207,21 @@ public class ToolControlRenderer extends SWTPartRenderer {
 	}
 
 	private void createToolControlMenu(final MToolControl toolControl,
-			Control renderedCtrl) {
+			Control renderedCtrl, boolean hideable) {
 		toolControlMenu = new Menu(renderedCtrl);
-		MenuItem hideItem = new MenuItem(toolControlMenu, SWT.NONE);
-		hideItem.setText(Messages.ToolBarManagerRenderer_MenuCloseText);
-		hideItem.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(org.eclipse.swt.widgets.Event event) {
-				toolControl.getTags()
-						.add(IPresentationEngine.HIDDEN_EXPLICITLY);
-			}
-		});
 
-		new MenuItem(toolControlMenu, SWT.SEPARATOR);
+		if (hideable) {
+			MenuItem hideItem = new MenuItem(toolControlMenu, SWT.NONE);
+			hideItem.setText(Messages.ToolBarManagerRenderer_MenuCloseText);
+			hideItem.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(org.eclipse.swt.widgets.Event event) {
+					toolControl.getTags().add(
+							IPresentationEngine.HIDDEN_EXPLICITLY);
+				}
+			});
+
+			new MenuItem(toolControlMenu, SWT.SEPARATOR);
+		}
 
 		MenuItem restoreHiddenItems = new MenuItem(toolControlMenu, SWT.NONE);
 		restoreHiddenItems

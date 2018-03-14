@@ -49,6 +49,7 @@ import org.eclipse.e4.ui.workbench.renderers.swt.TrimmedPartLayout;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
@@ -91,7 +92,7 @@ public class TrimStack {
 
 	static final String STATE_YSIZE = "YSize"; //$NON-NLS-1$
 
-	private static final String MINIMIZED_AND_SHOWING = "MinimizzedAndShowing"; //$NON-NLS-1$
+	public static final String MINIMIZED_AND_SHOWING = "MinimizedAndShowing"; //$NON-NLS-1$
 
 	private Image layoutImage;
 
@@ -938,6 +939,15 @@ public class TrimStack {
 				hostPane = getHostPane();
 				originalParent = ctrl.getParent();
 				ctrl.setParent(hostPane);
+
+				// Hack ! Force a resize of the CTF to make sure the hosted
+				// view is the correct size...see bug 434062 for details
+				if (ctrl instanceof CTabFolder) {
+					CTabFolder ctf = (CTabFolder) ctrl;
+					Rectangle bb = ctf.getBounds();
+					bb.width--;
+					ctf.setBounds(bb);
+				}
 
 				clientAreaComposite.addControlListener(caResizeListener);
 
