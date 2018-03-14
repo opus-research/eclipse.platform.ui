@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Michael Krkoska - initial API and implementation (bug 188333)
  *     Pawel Piech - Bug 291245 - [Viewers] StyledCellLabelProvider.paint(...) does not respect column alignment
+ *     Fabio Zadrozny - Bug 414080
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -246,7 +247,12 @@ public abstract class StyledCellLabelProvider extends OwnerDrawLabelProvider {
 		// use native erase
 		if (isOwnerDrawEnabled()) {
 			// info has been set by 'update': announce that we paint ourselves
-			event.detail &= ~SWT.FOREGROUND;
+			// -- that is, unless this is a selection: in this case we don't
+			// paint ourselves and use the selection foreground, not our own
+			// (Bug 414080).
+			if ((event.detail & SWT.SELECTED) == 0) {
+				event.detail &= ~SWT.FOREGROUND;
+			}
 		}
 	}
 
