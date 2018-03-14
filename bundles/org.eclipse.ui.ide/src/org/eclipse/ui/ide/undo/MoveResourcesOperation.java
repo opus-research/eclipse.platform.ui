@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -131,7 +131,7 @@ public class MoveResourcesOperation extends
 			// be restored if this operation were reversed
 			ResourceDescription[] overwrites;
 			overwrites = WorkspaceUndoUtil.move(new IResource[] { resources[i] }, getDestinationPath(resources[i], i),
-					resourcesAtDestination, undoDestinationPaths, subMonitor.newChild(1), uiInfo, true);
+					resourcesAtDestination, undoDestinationPaths, subMonitor.split(1), uiInfo, true);
 
 			// Accumulate the overwrites into the full list
 			for (int j = 0; j < overwrites.length; j++) {
@@ -143,7 +143,7 @@ public class MoveResourcesOperation extends
 		if (resourceDescriptions != null) {
 			for (int i = 0; i < resourceDescriptions.length; i++) {
 				if (resourceDescriptions[i] != null) {
-					resourceDescriptions[i].createResource(subMonitor.newChild(1));
+					resourceDescriptions[i].createResource(subMonitor.split(1));
 				}
 			}
 		}

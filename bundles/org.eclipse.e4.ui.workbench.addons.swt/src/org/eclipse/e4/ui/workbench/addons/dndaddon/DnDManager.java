@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2012 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,6 +23,7 @@ import org.eclipse.e4.ui.widgets.ImageBasedFrame;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.jface.util.Geometry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
@@ -208,7 +209,7 @@ class DnDManager {
 
 	protected void startDrag() {
 		// Create a new tracker for this drag instance
-		tracker = new Tracker(Display.getCurrent(), SWT.NULL);
+		tracker = new Tracker(Display.getCurrent().getActiveShell(), SWT.NULL);
 		tracker.setStippled(true);
 		setRectangle(offScreenRect);
 
@@ -295,7 +296,7 @@ class DnDManager {
 		if (tracker == null)
 			return;
 
-		Rectangle[] rectArray = { newRect };
+		Rectangle[] rectArray = { Geometry.copy(newRect) };
 		tracker.setRectangles(rectArray);
 	}
 
@@ -401,7 +402,7 @@ class DnDManager {
 		}
 
 		if (overlayFrame == null) {
-			overlayFrame = new Shell(getDragShell(), SWT.NO_TRIM);
+			overlayFrame = new Shell(getDragShell(), SWT.NO_TRIM | SWT.ON_TOP);
 			overlayFrame.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN));
 			overlayFrame.setAlpha(150);
 
