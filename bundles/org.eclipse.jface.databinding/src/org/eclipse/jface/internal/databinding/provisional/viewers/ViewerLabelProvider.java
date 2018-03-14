@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bug 223123
  *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 413611
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472784
  *******************************************************************************/
 package org.eclipse.jface.internal.databinding.provisional.viewers;
 
@@ -34,7 +35,7 @@ import org.eclipse.swt.graphics.Image;
 public class ViewerLabelProvider implements IViewerLabelProvider,
 		ILabelProvider {
 
-	private List<ILabelProviderListener> listeners = new ArrayList<ILabelProviderListener>();
+	private List<ILabelProviderListener> listeners = new ArrayList<>();
 
 	/**
 	 * Subclasses should override this method. They should not call the base
