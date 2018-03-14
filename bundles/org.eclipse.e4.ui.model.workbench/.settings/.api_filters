@@ -468,50 +468,6 @@
             </message_arguments>
         </filter>
     </resource>
-    <resource path="src/org/eclipse/e4/ui/model/application/ui/menu/MMenuFactory.java" type="org.eclipse.e4.ui.model.application.ui.menu.MMenuFactory">
-        <filter comment="MOpaque* and MRendered* classes removed, see bug 402764." id="405901410">
-            <message_arguments>
-                <message_argument value="org.eclipse.e4.ui.model.application.ui.menu.MMenuFactory"/>
-                <message_argument value="createOpaqueMenu()"/>
-            </message_arguments>
-        </filter>
-        <filter comment="MOpaque* and MRendered* classes removed, see bug 402764." id="405901410">
-            <message_arguments>
-                <message_argument value="org.eclipse.e4.ui.model.application.ui.menu.MMenuFactory"/>
-                <message_argument value="createOpaqueMenuItem()"/>
-            </message_arguments>
-        </filter>
-        <filter comment="MOpaque* and MRendered* classes removed, see bug 402764." id="405901410">
-            <message_arguments>
-                <message_argument value="org.eclipse.e4.ui.model.application.ui.menu.MMenuFactory"/>
-                <message_argument value="createOpaqueMenuSeparator()"/>
-            </message_arguments>
-        </filter>
-        <filter comment="MOpaque* and MRendered* classes removed, see bug 402764." id="405901410">
-            <message_arguments>
-                <message_argument value="org.eclipse.e4.ui.model.application.ui.menu.MMenuFactory"/>
-                <message_argument value="createOpaqueToolItem()"/>
-            </message_arguments>
-        </filter>
-        <filter comment="MOpaque* and MRendered* classes removed, see bug 402764." id="405901410">
-            <message_arguments>
-                <message_argument value="org.eclipse.e4.ui.model.application.ui.menu.MMenuFactory"/>
-                <message_argument value="createRenderedMenu()"/>
-            </message_arguments>
-        </filter>
-        <filter comment="MOpaque* and MRendered* classes removed, see bug 402764." id="405901410">
-            <message_arguments>
-                <message_argument value="org.eclipse.e4.ui.model.application.ui.menu.MMenuFactory"/>
-                <message_argument value="createRenderedMenuItem()"/>
-            </message_arguments>
-        </filter>
-        <filter comment="MOpaque* and MRendered* classes removed, see bug 402764." id="405901410">
-            <message_arguments>
-                <message_argument value="org.eclipse.e4.ui.model.application.ui.menu.MMenuFactory"/>
-                <message_argument value="createRenderedToolBar()"/>
-            </message_arguments>
-        </filter>
-    </resource>
     <resource path="src/org/eclipse/e4/ui/model/application/ui/menu/MMenuItem.java" type="org.eclipse.e4.ui.model.application.ui.menu.MMenuItem">
         <filter comment="Forgot to add @noimplement in 1.0" id="403853384">
             <message_arguments>
