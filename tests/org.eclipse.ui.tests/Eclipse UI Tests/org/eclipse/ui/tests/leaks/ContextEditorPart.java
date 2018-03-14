@@ -39,7 +39,6 @@ public class ContextEditorPart extends EditorPart {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	@Override
 	public void doSave(IProgressMonitor arg0) {
 		// TODO Auto-generated method stub
 
@@ -48,7 +47,6 @@ public class ContextEditorPart extends EditorPart {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.EditorPart#doSaveAs()
 	 */
-	@Override
 	public void doSaveAs() {
 		// TODO Auto-generated method stub
 
@@ -57,28 +55,23 @@ public class ContextEditorPart extends EditorPart {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.EditorPart#init(org.eclipse.ui.IEditorSite, org.eclipse.ui.IEditorInput)
 	 */
-	@Override
 	public void init(IEditorSite arg0, IEditorInput arg1)
 			throws PartInitException {
 		setSite(arg0);
 		setInput(arg1);
 		selectionProvider = new ISelectionProvider() {
-			@Override
 			public void addSelectionChangedListener(
 					ISelectionChangedListener listener) {
 			}
 
-			@Override
 			public ISelection getSelection() {
 				return new StructuredSelection("Hi there");
 			}
 
-			@Override
 			public void removeSelectionChangedListener(
 					ISelectionChangedListener listener) {
 			}
 
-			@Override
 			public void setSelection(ISelection selection) {
 			}
 		};
@@ -88,7 +81,6 @@ public class ContextEditorPart extends EditorPart {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.EditorPart#isDirty()
 	 */
-	@Override
 	public boolean isDirty() {
 		// TODO Auto-generated method stub
 		return false;
@@ -97,7 +89,6 @@ public class ContextEditorPart extends EditorPart {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.EditorPart#isSaveAsAllowed()
 	 */
-	@Override
 	public boolean isSaveAsAllowed() {
 		// TODO Auto-generated method stub
 		return false;
@@ -106,7 +97,6 @@ public class ContextEditorPart extends EditorPart {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
-	@Override
 	public void createPartControl(Composite parent) {
 		text = new Text(parent, SWT.MULTI|SWT.WRAP);
 		text.setText("Hi there");
@@ -121,7 +111,6 @@ public class ContextEditorPart extends EditorPart {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
 	 */
-	@Override
 	public void setFocus() {
 		text.setFocus();
 	}

@@ -68,8 +68,7 @@ public class DecoratorAdaptableTests extends UITestCase {
         
     }
 
-    @Override
-	protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         PlatformUI.getWorkbench().getDecoratorManager().setEnabled(TestAdaptableDecoratorContributor.ID, true);
         PlatformUI.getWorkbench().getDecoratorManager().setEnabled(TestUnadaptableDecoratorContributor.ID, true);
         PlatformUI.getWorkbench().getDecoratorManager().setEnabled(TestResourceDecoratorContributor.ID, true);
@@ -77,8 +76,7 @@ public class DecoratorAdaptableTests extends UITestCase {
         super.doSetUp();
     }
     
-    @Override
-	protected void doTearDown() throws Exception {
+    protected void doTearDown() throws Exception {
         PlatformUI.getWorkbench().getDecoratorManager().setEnabled(TestAdaptableDecoratorContributor.ID, false);
         PlatformUI.getWorkbench().getDecoratorManager().setEnabled(TestUnadaptableDecoratorContributor.ID, false);
         PlatformUI.getWorkbench().getDecoratorManager().setEnabled(TestResourceDecoratorContributor.ID, false);

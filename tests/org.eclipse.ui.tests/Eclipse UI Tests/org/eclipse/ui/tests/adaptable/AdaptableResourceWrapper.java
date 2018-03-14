@@ -23,8 +23,7 @@ public class AdaptableResourceWrapper implements IAdaptable {
     /*
      * @see IAdaptable#getAdapter(Class)
      */
-    @Override
-	public Object getAdapter(Class adapter) {
+    public Object getAdapter(Class adapter) {
         if (adapter == IResource.class)
             return resource;
         if (adapter == IWorkbenchAdapter.class)

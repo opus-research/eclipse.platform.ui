@@ -56,7 +56,6 @@ public class StartupTests extends DynamicTestCase {
 	 * 
 	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionId()
 	 */
-	@Override
 	protected String getExtensionId() {
 		return "newStartup1.testDynamicStartupAddition";
 	}
@@ -66,7 +65,6 @@ public class StartupTests extends DynamicTestCase {
 	 * 
 	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionPoint()
 	 */
-	@Override
 	protected String getExtensionPoint() {
 		return IWorkbenchRegistryConstants.PL_STARTUP;
 	}
@@ -76,7 +74,6 @@ public class StartupTests extends DynamicTestCase {
 	 * 
 	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getInstallLocation()
 	 */
-	@Override
 	protected String getInstallLocation() {
 		return "data/org.eclipse.newStartup1";
 	}
@@ -86,7 +83,6 @@ public class StartupTests extends DynamicTestCase {
 	 * 
 	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getMarkerClass()
 	 */
-	@Override
 	protected String getMarkerClass() {
 		return "org.eclipse.ui.dynamic.DynamicStartup";
 	}

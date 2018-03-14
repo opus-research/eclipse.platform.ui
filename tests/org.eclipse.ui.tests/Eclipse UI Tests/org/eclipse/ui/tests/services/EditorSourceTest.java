@@ -51,7 +51,6 @@ public class EditorSourceTest extends UITestCase {
 		 * org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org
 		 * .eclipse.jface.util.PropertyChangeEvent)
 		 */
-		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			count++;
 			if (event.getProperty() == IEvaluationService.RESULT
@@ -76,7 +75,6 @@ public class EditorSourceTest extends UITestCase {
 		 * org.eclipse.core.expressions.Expression#collectExpressionInfo(org
 		 * .eclipse.core.expressions.ExpressionInfo)
 		 */
-		@Override
 		public void collectExpressionInfo(ExpressionInfo info) {
 			info.addVariableNameAccess(ISources.ACTIVE_EDITOR_INPUT_NAME);
 		}
@@ -88,7 +86,6 @@ public class EditorSourceTest extends UITestCase {
 		 * org.eclipse.core.expressions.Expression#evaluate(org.eclipse.core
 		 * .expressions.IEvaluationContext)
 		 */
-		@Override
 		public EvaluationResult evaluate(IEvaluationContext context)
 				throws CoreException {
 			stateInput = context.getVariable(ISources.ACTIVE_EDITOR_INPUT_NAME);
@@ -111,7 +108,6 @@ public class EditorSourceTest extends UITestCase {
 	 * 
 	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
 	 */
-	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		project = FileUtil.createProject("testActiveEditor");

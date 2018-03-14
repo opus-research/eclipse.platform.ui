@@ -32,13 +32,11 @@ public class ForcedException extends RuntimeException {
 		 super(message);
 	 }
 	 
-	 @Override
-	public void printStackTrace(PrintStream s) {
+	 public void printStackTrace(PrintStream s) {
 	 		 s.println("!FORCED BY TEST: this entry is intentional: " + getMessage());
 	 }
 	 		 		 
-	 @Override
-	public void printStackTrace(PrintWriter s) {
+	 public void printStackTrace(PrintWriter s) {
 	 		 s.println("!FORCED BY TEST: this entry is intentional:" + getMessage());
 	 }
 }
