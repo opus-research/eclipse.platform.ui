@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2013 IBM Corporation and others.
+ * Copyright (c) 2003, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,8 @@
  *     Teddy Walker <teddy.walker@googlemail.com>
  *     		- Fix for Bug 151204 [Progress] Blocked status of jobs are not applied/reported
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422040
+ *     Terry Parker <tparker@google.com>
+ *      	- Bug 454633 - Suppress progress manager error reports for jobs that run as part of a Job Group
  *******************************************************************************/
 package org.eclipse.ui.internal.progress;
 
@@ -461,8 +463,18 @@ public class ProgressManager extends ProgressProvider implements
 				final JobInfo info = getJobInfo(event.getJob());
 				removeJobInfo(info);
 
+				/*
+				 * Only report severe errors to the StatusManager if the error is not part of a
+				 * job group. Job groups accumulate the status of the jobs belonging to the group,
+				 * suppressing the status reporting of the individual jobs and providing a single
+				 * MultiStatus for the group. Avoid the double notification that the StatusManager
+				 * provides, since the single MultiStatus reported when the group finishes is
+				 * sufficient and provides a cleaner display than the way the StatusManager
+				 * aggregates the individual status values.
+				 */
 				if (event.getResult() != null
-						&& event.getResult().getSeverity() == IStatus.ERROR) {
+						&& event.getResult().getSeverity() == IStatus.ERROR
+						&& (event.getJob() == null || event.getJob().getJobGroup() == null)) {
 					StatusAdapter statusAdapter = new StatusAdapter(event
 							.getResult());
 					statusAdapter.addAdapter(Job.class, event.getJob());
