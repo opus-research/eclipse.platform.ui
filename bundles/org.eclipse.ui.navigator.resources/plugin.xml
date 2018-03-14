@@ -2,6 +2,7 @@
 <?eclipse version="3.0"?>
 <plugin>
 
+ 
    <extension
          point="org.eclipse.ui.views">
       <view
@@ -401,121 +402,4 @@
 		    <showInPart id = "org.eclipse.ui.navigator.ProjectExplorer"/>
     	</perspectiveExtension>
    	</extension>
-   	
-   	<!-- Projects nesting -->
-    <extension
-         point="org.eclipse.ui.navigator.navigatorContent">
-      <navigatorContent
-            activeByDefault="false"
-            contentProvider="org.eclipse.ui.internal.navigator.resources.nesting.NestedProjectsContentProvider"
-            id="org.eclipse.ui.navigator.resources.nesting.nestedProjectContentProvider"
-            labelProvider="org.eclipse.ui.internal.navigator.resources.nesting.NestedProjectsLabelProvider"
-            name="%nestedProjects.provider.name"
-            icon="$nl$/icons/full/obj16/nested_projects.png"
-            priority="higher">
-         <enablement>
-            <adapt
-                  type="org.eclipse.core.resources.IContainer">
-            </adapt>
-         </enablement>
-         <possibleChildren>
-            <instanceof
-                  value="org.eclipse.core.resources.IProject">
-            </instanceof>
-         </possibleChildren>
-      </navigatorContent>
-      <commonFilter
-            activeByDefault="false"
-            class="org.eclipse.ui.internal.navigator.resources.nesting.HideFolderWhenProjectIsShownAsNested"
-            description="%nestedProjects.filters.HideFolderWhenProjectIsShownAsNested.description"
-            id="org.eclipse.ui.navigator.resources.nesting.HideFolderWhenProjectIsShownAsNested"
-            name="%nestedProjects.filters.HideFolderWhenProjectIsShownAsNested.name"
-            visibleInUI="true">
-      </commonFilter>
-      <commonFilter
-            activeByDefault="false"
-            class="org.eclipse.ui.internal.navigator.resources.nesting.HideTopLevelProjectIfNested"
-            description="%nestedProjects.filters.HideTopLevelProjectIfNested.description"
-            id="org.eclipse.ui.navigator.resources.nesting.HideTopLevelProjectIfNested"
-            name="%nestedProjects.filters.HideTopLevelProjectIfNested.name"
-            visibleInUI="true">
-      </commonFilter>
-   </extension>
-   <extension
-         point="org.eclipse.ui.navigator.viewer">
-      <viewerContentBinding
-            viewerId="org.eclipse.ui.navigator.ProjectExplorer">
-         <includes>
-            <contentExtension pattern="org.eclipse.ui.navigator.resources.nesting.*"/>
-         </includes>
-      </viewerContentBinding>
-   </extension>
-   <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            allPopups="false"
-            locationURI="menu:org.eclipse.ui.navigator.ProjectExplorer">
-         <menu
-               label="%nestedProjects.menu.projectPresentation">
-            <command
-                  commandId="org.eclipse.ui.navigator.resources.nesting.changeProjectPresentation"
-                  label="%nestedProjects.menu.projectPresentation.flat"
-                  style="radio">
-               <parameter
-                     name="org.eclipse.ui.navigator.resources.nesting.enabled"
-                     value="false">
-               </parameter>
-               <parameter
-                     name="org.eclipse.ui.commands.radioStateParameter"
-                     value="false">
-               </parameter>
-            </command>
-            <command
-                  commandId="org.eclipse.ui.navigator.resources.nesting.changeProjectPresentation"
-                  label="%nestedProjects.menu.projectPresentation.hierarchical"
-                  style="radio">
-               <parameter
-                     name="org.eclipse.ui.navigator.resources.nesting.enabled"
-                     value="true">
-               </parameter>
-               <parameter
-                     name="org.eclipse.ui.commands.radioStateParameter"
-                     value="true">
-               </parameter>
-            </command>
-         </menu>
-      </menuContribution>
-   </extension>
-   <extension
-         point="org.eclipse.ui.commands">
-      <command
-            defaultHandler="org.eclipse.ui.internal.navigator.resources.nesting.ProjectPresentationHandler"
-            id="org.eclipse.ui.navigator.resources.nesting.changeProjectPresentation"
-            name="%nestedProjects.menu.projectPresentation">
-         <commandParameter
-               id="org.eclipse.ui.navigator.resources.nesting.enabled"
-               name="%nestedProjects.menu.projectPresentation.hierarchical"
-               optional="true">
-         </commandParameter>
-         <state
-               id="org.eclipse.ui.commands.radioState">
-            <class
-                  class="org.eclipse.ui.handlers.RadioState">
-               <parameter
-                     name="default"
-                     value="false">
-               </parameter>
-               <parameter
-                     name="persisted"
-                     value="true">
-               </parameter>
-            </class>
-         </state>
-         <commandParameter
-               id="org.eclipse.ui.commands.radioStateParameter"
-               name="%nestedProjects.radioStateName"
-               optional="false">
-         </commandParameter>
-      </command>
-   </extension>
 </plugin> 
