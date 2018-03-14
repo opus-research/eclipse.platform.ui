@@ -70,6 +70,9 @@ public class HelpContentsAction extends Action implements IWorkbenchAction {
 				IWorkbenchHelpContextIds.HELP_CONTENTS_ACTION);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IAction.
+     */
     @Override
 	public void run() {
         if (workbenchWindow == null) {
@@ -85,6 +88,9 @@ public class HelpContentsAction extends Action implements IWorkbenchAction {
         });
     }
 
+    /* (non-Javadoc)
+     * Method declared on ActionFactory.IWorkbenchAction.
+     */
     @Override
 	public void dispose() {
         workbenchWindow = null;
