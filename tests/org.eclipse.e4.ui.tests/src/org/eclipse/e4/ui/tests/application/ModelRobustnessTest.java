@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,16 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.application;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.util.List;
-import junit.framework.TestCase;
 import org.eclipse.e4.ui.internal.workbench.E4XMIResource;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationFactory;
@@ -23,9 +27,11 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.junit.Test;
 
-public class ModelRobustnessTest extends TestCase {
+public class ModelRobustnessTest {
 
+	@Test
 	public void testLoadingInvalidContainments() {
 		// E4XMIResourceFactory factory = new E4XMIResourceFactory();
 		URI uri = URI.createPlatformPluginURI(
@@ -63,6 +69,7 @@ public class ModelRobustnessTest extends TestCase {
 				.getElementId());
 	}
 
+	@Test
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void testAddingInvalidElements() {
 		MApplication app = MApplicationFactory.INSTANCE.createApplication();

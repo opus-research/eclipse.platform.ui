@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 IBM Corporation and others.
+ * Copyright (c) 2012, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,9 +7,14 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.application;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -19,6 +24,8 @@ import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.MApplicationFactory;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.emf.common.util.EList;
+import org.junit.Before;
+import org.junit.Test;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
@@ -38,19 +45,22 @@ public class UIEventTypesTest extends HeadlessApplicationElementTest {
 	 */
 	@Override
 	protected MApplicationElement createApplicationElement(
-			IEclipseContext appContext) throws Exception {
+			IEclipseContext appContext) {
 		MApplication application = MApplicationFactory.INSTANCE
 				.createApplication();
 		return application;
 	}
 
-	public void setUp() throws Exception {
+	@Override
+	@Before
+	public void setUp() {
 		super.setUp();
 		IEventBroker appEB = applicationContext.get(IEventBroker.class);
 
 		eventCount = 0;
 		appEB.subscribe(UIEvents.ApplicationElement.TOPIC_TAGS,
 				new EventHandler() {
+					@Override
 					public void handleEvent(Event event) {
 						eventCount++;
 						UIEventTypesTest.this.event = event;
@@ -58,6 +68,7 @@ public class UIEventTypesTest extends HeadlessApplicationElementTest {
 				});
 		appEB.subscribe(UIEvents.ApplicationElement.TOPIC_ELEMENTID,
 				new EventHandler() {
+					@Override
 					public void handleEvent(Event event) {
 						eventCount++;
 						UIEventTypesTest.this.event = event;
@@ -66,6 +77,7 @@ public class UIEventTypesTest extends HeadlessApplicationElementTest {
 
 	}
 
+	@Test
 	public void testAdd() {
 		applicationElement.getTags().add("0");
 		assertEquals(1, eventCount);
@@ -81,6 +93,7 @@ public class UIEventTypesTest extends HeadlessApplicationElementTest {
 		assertEquals("0", event.getProperty(UIEvents.EventTags.NEW_VALUE));
 	}
 
+	@Test
 	public void testAddMany() {
 		applicationElement.getTags().addAll(Arrays.asList("0", "1", "2"));
 		assertEquals(1, eventCount);
@@ -97,6 +110,7 @@ public class UIEventTypesTest extends HeadlessApplicationElementTest {
 				event.getProperty(UIEvents.EventTags.NEW_VALUE));
 	}
 
+	@Test
 	public void testRemove() {
 		applicationElement.getTags().addAll(Arrays.asList("0", "1", "2"));
 		assertEquals(1, eventCount);
@@ -117,6 +131,7 @@ public class UIEventTypesTest extends HeadlessApplicationElementTest {
 		assertEquals(null, event.getProperty(UIEvents.EventTags.NEW_VALUE));
 	}
 
+	@Test
 	public void testRemoveMany() {
 		applicationElement.getTags().addAll(Arrays.asList("0", "1", "2"));
 		assertEquals(1, eventCount);
@@ -141,6 +156,7 @@ public class UIEventTypesTest extends HeadlessApplicationElementTest {
 		assertEquals(2, removedPositions[1]);
 	}
 
+	@Test
 	public void testRetain() {
 		applicationElement.getTags().addAll(Arrays.asList("0", "1", "2"));
 		assertEquals(1, eventCount);
@@ -160,6 +176,7 @@ public class UIEventTypesTest extends HeadlessApplicationElementTest {
 				event.getProperty(UIEvents.EventTags.TYPE));
 	}
 
+	@Test
 	public void testClear() {
 		applicationElement.getTags().addAll(Arrays.asList("0", "1", "2"));
 		assertEquals(1, eventCount);
@@ -181,6 +198,7 @@ public class UIEventTypesTest extends HeadlessApplicationElementTest {
 		assertEquals(null, event.getProperty(UIEvents.EventTags.POSITION));
 	}
 
+	@Test
 	public void testMove() {
 		applicationElement.getTags().addAll(Arrays.asList("0", "1", "2"));
 		assertEquals(1, eventCount);
@@ -203,6 +221,7 @@ public class UIEventTypesTest extends HeadlessApplicationElementTest {
 				event.getProperty(UIEvents.EventTags.POSITION));
 	}
 
+	@Test
 	public void testSet() {
 		// set the elementId to "aaa" and then to null
 		applicationElement.setElementId("aaa");
