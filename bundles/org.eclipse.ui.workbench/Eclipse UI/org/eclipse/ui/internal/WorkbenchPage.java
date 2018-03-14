@@ -12,7 +12,7 @@
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431340, 431348, 426535, 433234
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431868
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442214
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 411639, 372799, 466230
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 411639, 372799
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -1437,7 +1437,7 @@ public class WorkbenchPage implements IWorkbenchPage {
         }
 
 		// notify the model manager before the close
-		List<IWorkbenchPart> partsToClose = new ArrayList<>();
+		List<IEditorPart> partsToClose = new ArrayList<IEditorPart>();
 		for (IEditorReference ref : editorRefs) {
 			IEditorPart refPart = ref.getEditor(false);
 			if (refPart != null) {
@@ -2517,18 +2517,11 @@ public class WorkbenchPage implements IWorkbenchPage {
 		if (perspective != null) {
 			int scope = allPerspectives ? WINDOW_SCOPE : EModelService.PRESENTATION;
 			Set<MUIElement> parts = new HashSet<MUIElement>();
-			List<MPlaceholder> placeholders = modelService.findElements(window, null, MPlaceholder.class, null, scope);
-			parts.addAll(placeholders);
+			parts.addAll(modelService.findElements(window, null, MPlaceholder.class, null, scope));
 			parts.addAll(modelService.findElements(window, null, MPart.class, null, scope));
 			List<IViewReference> visibleReferences = new ArrayList<IViewReference>();
 			for (ViewReference reference : viewReferences) {
-				MPart model = reference.getModel();
-				// The part may be linked in either directly or via a
-				// placeholder. In the latter case we can look directly
-				// at the part's curSharedRef since we're only considering
-				// parts visible in the current perspective
-				if (parts.contains(model) && model.isToBeRendered()
-						&& (model.getCurSharedRef() == null || model.getCurSharedRef().isToBeRendered())) {
+				if (parts.contains(reference.getModel()) && reference.getModel().isToBeRendered()) {
 					// only rendered placeholders are valid view references
 					visibleReferences.add(reference);
 				}
