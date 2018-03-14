@@ -1561,7 +1561,11 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 				// Reset the internal flags if window was not closed.
 				closing = false;
 				updateDisabled = false;
+			} else {
+				firePageClosed();
+				fireWindowClosed();
 			}
+
 		}
 
 		if (windowClosed && tracker != null) {
@@ -1938,10 +1942,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 					}
 				}
 			}
-			if (getActivePage() != null) {
-				firePageClosed();
-			}
-			fireWindowClosed();
 		} finally {
 
 			try {
@@ -1982,12 +1982,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IWorkbenchWindow#openPage(java.lang.String,
-	 * org.eclipse.core.runtime.IAdaptable)
-	 */
 	@Override
 	public IWorkbenchPage openPage(final String perspectiveId, final IAdaptable input)
 			throws WorkbenchException {
@@ -2046,13 +2040,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		return page;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.IWorkbenchWindow#openPage(org.eclipse.core.runtime.IAdaptable
-	 * )
-	 */
 	@Override
 	public IWorkbenchPage openPage(IAdaptable input) throws WorkbenchException {
 		return openPage(workbench.getPerspectiveRegistry().getDefaultPerspective(), input);
@@ -2081,9 +2068,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		}
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IRunnableContext.
-	 */
 	@Override
 	public void run(final boolean fork, boolean cancelable, final IRunnableWithProgress runnable)
 			throws InvocationTargetException, InterruptedException {
@@ -2722,11 +2706,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		return getWindowConfigurer().getShowFastViewBars();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.window.ApplicationWindow#showTopSeperator()
-	 */
 	protected boolean showTopSeperator() {
 		return false;
 	}
@@ -2738,11 +2717,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		return progressRegion;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IWorkbenchWindow#getExtensionTracker()
-	 */
 	@Override
 	public IExtensionTracker getExtensionTracker() {
 		return (IExtensionTracker) model.getContext().get(IExtensionTracker.class.getName());
@@ -2758,11 +2732,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		return getWorkbenchImpl().getDefaultPageInput();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IWorkbenchWindow#getTrimManager()
-	 */
 	public ITrimManager getTrimManager() {
 		if (trimManager == null) {
 			// HACK !! Add a 'null' trim manager...this is specifically in place
