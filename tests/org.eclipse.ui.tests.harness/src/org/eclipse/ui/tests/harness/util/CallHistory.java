@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.harness.util;
 
@@ -36,9 +35,9 @@ import java.util.ArrayList;
  * </p>
  */
 public class CallHistory {
-    private ArrayList<String> methodList;
+    private ArrayList methodList;
 
-    private Class<? extends Object> classType;
+    private Class classType;
 
     /**
      * Creates a new call history for an object.
@@ -46,7 +45,7 @@ public class CallHistory {
      * @param target the call history target.
      */
     public CallHistory(Object target) {
-        methodList = new ArrayList<String>();
+        methodList = new ArrayList();
         classType = target.getClass();
     }
 
@@ -95,7 +94,7 @@ public class CallHistory {
         if (testLength == 0)
             return true;
         for (int nX = 0; nX < methodList.size(); nX++) {
-            String methodName = methodList.get(nX);
+            String methodName = (String) methodList.get(nX);
             String testName = testNames[testIndex];
             testMethodName(testName);
             if (testName.equals(methodName))
