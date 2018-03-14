@@ -57,6 +57,8 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 	@Inject
 	IEclipseContext context;
 
+	private IEclipseContext impExpHandlerContext;
+
 	private Map<String, PerspectiveDescriptor> descriptors = new HashMap<String, PerspectiveDescriptor>();
 
 	@PostConstruct
@@ -86,9 +88,9 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 			}
 		}
 
-		IEclipseContext childContext = context.createChild();
-		childContext.set(PerspectiveRegistry.class, this);
-		ContextInjectionFactory.make(ImportExportPespectiveHandler.class, childContext);
+		impExpHandlerContext = context.createChild();
+		impExpHandlerContext.set(PerspectiveRegistry.class, this);
+		ContextInjectionFactory.make(ImportExportPespectiveHandler.class, impExpHandlerContext);
 	}
 
 	public void addPerspective(MPerspective perspective) {
@@ -288,6 +290,9 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 	 * Dispose the receiver.
 	 */
 	public void dispose() {
+		if (impExpHandlerContext != null) {
+			impExpHandlerContext.dispose();
+		}
 		PlatformUI.getWorkbench().getExtensionTracker().unregisterHandler(this);
 		// FIXME: what was this listener for?
 		// WorkbenchPlugin.getDefault().getPreferenceStore().removePropertyChangeListener(

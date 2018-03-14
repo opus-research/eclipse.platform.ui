@@ -46,7 +46,7 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
  */
 public class PreferencesExportWizard extends Wizard implements IExportWizard {
 
-	private static final String EVENT_TOPIC_BASE = "org/eclipse/ui/workbench/preferences/export/"; //$NON-NLS-1$
+	private static final String EVENT_TOPIC_BASE = "org/eclipse/ui/internal/wizards/preferences/export/"; //$NON-NLS-1$
 
 	public static final String EVENT_EXPORT_BEGIN = EVENT_TOPIC_BASE + "begin"; //$NON-NLS-1$
 

@@ -47,7 +47,7 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
  */
 public class PreferencesImportWizard extends Wizard implements IImportWizard {
 
-	public static final String EVENT_IMPORT_END = "org/eclipse/ui/workbench/preferences/import/end"; //$NON-NLS-1$
+	public static final String EVENT_IMPORT_END = "org/eclipse/ui/internal/wizards/preferences/import/end"; //$NON-NLS-1$
 
     private WizardPreferencesImportPage1 mainPage;
 
