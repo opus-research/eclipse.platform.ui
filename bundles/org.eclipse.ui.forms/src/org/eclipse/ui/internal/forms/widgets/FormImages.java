@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Wang Yizhuo (wangyizhuo@gmail.com) - patch (see Bugzilla #239178)
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 430205, 458055
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 430205
  *******************************************************************************/
 package org.eclipse.ui.internal.forms.widgets;
 
@@ -281,7 +281,6 @@ public class FormImages {
 			gc.fillRectangle(0, fTheight - fMarginHeight - 4, 1, 4);
 			gc.dispose();
 			color1.dispose();
-			originalBgColor.dispose();
 			return image;
 		}
 	}
@@ -306,6 +305,8 @@ public class FormImages {
 			gc.setForeground(color2);
 			gc.setBackground(color1);
 			gc.fillGradientRectangle(0, fMarginHeight + 2, 1, fTheight - 2, true);
+			gc.setBackground(originalBgColor);
+			gc.fillRectangle(0, fTheight - fMarginHeight - 4, 1, 4);
 			gc.dispose();
 			color1.dispose();
 			color2.dispose();
