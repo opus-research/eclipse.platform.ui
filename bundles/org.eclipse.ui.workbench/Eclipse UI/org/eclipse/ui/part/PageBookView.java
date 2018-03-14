@@ -16,7 +16,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import org.eclipse.core.commands.common.EventManager;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
@@ -46,6 +45,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.SubActionBars;
 import org.eclipse.ui.internal.WorkbenchPage;
 import org.eclipse.ui.internal.WorkbenchPlugin;
+import org.eclipse.ui.internal.util.Util;
 
 /**
  * Abstract superclass of all multi-page workbench views.
@@ -569,7 +569,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	public <T> T getAdapter(Class<T> key) {
 		// delegate to the current page, if supported
 		IPage page = getCurrentPage();
-		T adapter = Adapters.getAdapter(page, key, true);
+		T adapter = Util.getAdapter(page, key);
 		if (adapter != null) {
 			return adapter;
 		}
