@@ -56,12 +56,10 @@ public abstract class BasicSplashHandler extends AbstractSplashHandler {
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.wizard.ProgressMonitorPart#beginTask(java.lang.String, int)
 		 */
-		@Override
 		public void beginTask(final String name, final int totalWork) {
 
 			updateUI(new Runnable() {
 
-				@Override
 				public void run() {
 					if (isDisposed())
 						return;
@@ -77,12 +75,10 @@ public abstract class BasicSplashHandler extends AbstractSplashHandler {
 		 * 
 		 * @see org.eclipse.jface.wizard.ProgressMonitorPart#done()
 		 */
-		@Override
 		public void done() {
 
 			updateUI(new Runnable() {
 
-				@Override
 				public void run() {
 					if (isDisposed())
 						return;
@@ -97,12 +93,10 @@ public abstract class BasicSplashHandler extends AbstractSplashHandler {
 		 * 
 		 * @see org.eclipse.jface.wizard.ProgressMonitorPart#internalWorked(double)
 		 */
-		@Override
 		public void internalWorked(final double work) {
 
 			updateUI(new Runnable() {
 
-				@Override
 				public void run() {
 					if (isDisposed())
 						return;
@@ -118,12 +112,10 @@ public abstract class BasicSplashHandler extends AbstractSplashHandler {
 		 * 
 		 * @see org.eclipse.jface.wizard.ProgressMonitorPart#setFont(org.eclipse.swt.graphics.Font)
 		 */
-		@Override
 		public void setFont(final Font font) {
 
 			updateUI(new Runnable() {
 
-				@Override
 				public void run() {
 					if (isDisposed())
 						return;
@@ -138,12 +130,10 @@ public abstract class BasicSplashHandler extends AbstractSplashHandler {
 		 * 
 		 * @see org.eclipse.jface.wizard.ProgressMonitorPart#updateLabel()
 		 */
-		@Override
 		protected void updateLabel() {
 
 			updateUI(new Runnable() {
 
-				@Override
 				public void run() {
 					if (isDisposed())
 						return;
@@ -164,7 +154,6 @@ public abstract class BasicSplashHandler extends AbstractSplashHandler {
 	 * 
 	 * @see org.eclipse.ui.splash.AbstractSplashHandler#getBundleProgressMonitor()
 	 */
-	@Override
 	public IProgressMonitor getBundleProgressMonitor() {
 		if (monitor == null) {
 			Composite parent = new Composite(getSplash(), Window.getDefaultOrientation());
@@ -196,7 +185,6 @@ public abstract class BasicSplashHandler extends AbstractSplashHandler {
 	 * 
 	 * @see org.eclipse.ui.splash.AbstractSplashHandler#dispose()
 	 */
-	@Override
 	public void dispose() {
 		if (foreground != null)
 			foreground.dispose();
@@ -300,7 +288,6 @@ public abstract class BasicSplashHandler extends AbstractSplashHandler {
 			// the UI is fully initialized
 			StartupRunnable startupRunnable = new StartupRunnable() {
 
-				@Override
 				public void runWithException() throws Throwable {
 					r.run();
 				}

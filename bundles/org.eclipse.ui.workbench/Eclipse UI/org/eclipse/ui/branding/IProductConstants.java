@@ -85,8 +85,7 @@ public interface IProductConstants {
      * </p>
      * @deprecated use WINDOW_IMAGES instead (see recommendations there)
      */
-    @Deprecated
-	public static final String WINDOW_IMAGE = "windowImage"; //$NON-NLS-1$
+    public static final String WINDOW_IMAGE = "windowImage"; //$NON-NLS-1$
 
     /**
      * An array of one or more images to be used for this product.  The

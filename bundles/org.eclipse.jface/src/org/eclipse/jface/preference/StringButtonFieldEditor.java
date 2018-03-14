@@ -124,8 +124,7 @@ public abstract class StringButtonFieldEditor extends StringFieldEditor {
                 }
             });
             changeButton.addDisposeListener(new DisposeListener() {
-                @Override
-				public void widgetDisposed(DisposeEvent event) {
+                public void widgetDisposed(DisposeEvent event) {
                     changeButton = null;
                 }
             });

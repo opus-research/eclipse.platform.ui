@@ -33,12 +33,10 @@ public class Snippet047VirtualLazyTreeViewer {
 			this.viewer = viewer;
 		}
 
-		@Override
 		public void dispose() {
 
 		}
 
-		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			this.elements = (IntermediateNode[]) newInput;
 		}
@@ -48,7 +46,6 @@ public class Snippet047VirtualLazyTreeViewer {
 		 * 
 		 * @see org.eclipse.jface.viewers.ILazyTreeContentProvider#getParent(java.lang.Object)
 		 */
-		@Override
 		public Object getParent(Object element) {
 			if (element instanceof LeafNode)
 				return ((LeafNode) element).parent;
@@ -61,7 +58,6 @@ public class Snippet047VirtualLazyTreeViewer {
 		 * @see org.eclipse.jface.viewers.ILazyTreeContentProvider#updateChildCount(java.lang.Object,
 		 *      int)
 		 */
-		@Override
 		public void updateChildCount(Object element, int currentChildCount) {
 			
 			int length = 0;
@@ -82,7 +78,6 @@ public class Snippet047VirtualLazyTreeViewer {
 		 * @see org.eclipse.jface.viewers.ILazyTreeContentProvider#updateElement(java.lang.Object,
 		 *      int)
 		 */
-		@Override
 		public void updateElement(Object parent, int index) {
 			
 			Object element;
@@ -107,7 +102,6 @@ public class Snippet047VirtualLazyTreeViewer {
 			this.parent = parent;
 		}
 
-		@Override
 		public String toString() {
 			return "Leaf " + this.counter;
 		}
@@ -121,7 +115,6 @@ public class Snippet047VirtualLazyTreeViewer {
 			this.counter = counter;
 		}
 
-		@Override
 		public String toString() {
 			return "Node " + this.counter;
 		}

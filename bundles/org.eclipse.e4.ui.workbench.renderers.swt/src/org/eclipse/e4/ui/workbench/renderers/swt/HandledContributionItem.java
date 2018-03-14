@@ -10,7 +10,6 @@
  *     Joseph Carroll <jdsalingerjr@gmail.com> - Bug 385414 Contributing wizards to toolbar always displays icon and text
  *     Snjezana Peco <snjezana.peco@redhat.com> - Memory leaks in Juno when opening and closing XML Editor - http://bugs.eclipse.org/397909
  *     Marco Descher <marco@descher.at> - Bug 397677
- *     Dmitry Spiridenok - Bug 429756
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -36,10 +35,8 @@ import org.eclipse.e4.ui.bindings.EBindingService;
 import org.eclipse.e4.ui.internal.workbench.Activator;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.internal.workbench.Policy;
-import org.eclipse.e4.ui.internal.workbench.RenderedElementUtil;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.IUpdateService;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
-import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MParameter;
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
@@ -49,6 +46,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MHandledItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
+import org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolItem;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.IResourceUtilities;
@@ -135,7 +133,6 @@ public class HandledContributionItem extends ContributionItem {
 	private ISWTResourceUtilities resUtils = null;
 
 	private IStateListener stateListener = new IStateListener() {
-		@Override
 		public void handleStateChange(State state, Object oldValue) {
 			updateState();
 		}
@@ -149,7 +146,6 @@ public class HandledContributionItem extends ContributionItem {
 	private ISafeRunnable getUpdateRunner() {
 		if (updateRunner == null) {
 			updateRunner = new ISafeRunnable() {
-				@Override
 				public void run() throws Exception {
 					boolean shouldEnable = canExecuteItem(null);
 					if (shouldEnable != model.isEnabled()) {
@@ -158,7 +154,6 @@ public class HandledContributionItem extends ContributionItem {
 					}
 				}
 
-				@Override
 				public void handleException(Throwable exception) {
 					if (!logged) {
 						logged = true;
@@ -186,7 +181,6 @@ public class HandledContributionItem extends ContributionItem {
 	}
 
 	private IMenuListener menuListener = new IMenuListener() {
-		@Override
 		public void menuAboutToShow(IMenuManager manager) {
 			update(null);
 		}
@@ -477,24 +471,14 @@ public class HandledContributionItem extends ContributionItem {
 
 	private void updateToolItem() {
 		ToolItem item = (ToolItem) widget;
-
-		if (item.getImage() == null || model.getTags().contains(FORCE_TEXT)) {
-			final String text = model.getLocalizedLabel();
-			if (text == null || text.length() == 0) {
-				final MCommand command = model.getCommand();
-				if (command == null) {
-					// Set some text so that the item stays visible in the menu
-					item.setText("UnLabled"); //$NON-NLS-1$
-				} else {
-					item.setText(command.getCommandName());
-				}
-			} else {
-				item.setText(text);
-			}
+		final String text = model.getLocalizedLabel();
+		Image icon = item.getImage();
+		boolean mode = model.getTags().contains(FORCE_TEXT);
+		if ((icon == null || mode) && text != null) {
+			item.setText(text);
 		} else {
 			item.setText(""); //$NON-NLS-1$
 		}
-
 		final String tooltip = getToolTipText();
 		item.setToolTipText(tooltip);
 		item.setSelection(model.isSelected());
@@ -589,7 +573,6 @@ public class HandledContributionItem extends ContributionItem {
 	private Listener getItemListener() {
 		if (menuItemListener == null) {
 			menuItemListener = new Listener() {
-				@Override
 				public void handleEvent(Event event) {
 					switch (event.type) {
 					case SWT.Dispose:
@@ -725,12 +708,12 @@ public class HandledContributionItem extends ContributionItem {
 			return (Menu) obj;
 		}
 		// this is a temporary passthrough of the IMenuCreator
-		if (RenderedElementUtil.isRenderedMenu(mmenu)) {
-			obj = RenderedElementUtil.getContributionManager(mmenu);
+		if (mmenu instanceof MRenderedMenu) {
+			obj = ((MRenderedMenu) mmenu).getContributionManager();
 			if (obj instanceof IContextFunction) {
 				final IEclipseContext lclContext = getContext(mmenu);
 				obj = ((IContextFunction) obj).compute(lclContext, null);
-				RenderedElementUtil.setContributionManager(mmenu, obj);
+				((MRenderedMenu) mmenu).setContributionManager(obj);
 			}
 			if (obj instanceof IMenuCreator) {
 				final IMenuCreator creator = (IMenuCreator) obj;
@@ -738,11 +721,10 @@ public class HandledContributionItem extends ContributionItem {
 						.getShell());
 				if (menu != null) {
 					toolItem.addDisposeListener(new DisposeListener() {
-						@Override
 						public void widgetDisposed(DisposeEvent e) {
 							if (menu != null && !menu.isDisposed()) {
 								creator.dispose();
-								mmenu.setWidget(null);
+								((MRenderedMenu) mmenu).setWidget(null);
 							}
 						}
 					});
@@ -808,7 +790,6 @@ public class HandledContributionItem extends ContributionItem {
 		return service.canExecute(cmd, staticContext);
 	}
 
-	@Override
 	public void setParent(IContributionManager parent) {
 		if (getParent() instanceof IMenuManager) {
 			IMenuManager menuMgr = (IMenuManager) getParent();

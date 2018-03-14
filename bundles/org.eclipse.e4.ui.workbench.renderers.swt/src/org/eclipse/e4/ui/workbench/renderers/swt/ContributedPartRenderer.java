@@ -50,7 +50,6 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 	private MPart partToActivate;
 
 	private Listener activationListener = new Listener() {
-		@Override
 		public void handleEvent(Event event) {
 			// we only want to activate the part if the activated widget is
 			// actually bound to a model element
@@ -66,7 +65,6 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 		}
 	};
 
-	@Override
 	public Object createWidget(final MUIElement element, Object parent) {
 		if (!(element instanceof MPart) || !(parent instanceof Composite))
 			return null;

@@ -35,6 +35,7 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.resource.ResourceManager;
 import org.eclipse.jface.util.Util;
+import org.eclipse.jface.viewers.ILabelDecorator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
@@ -61,6 +62,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.internal.WorkbenchImages;
+import org.eclipse.ui.internal.decorators.ContributingPluginDecorator;
 import org.eclipse.ui.progress.IProgressConstants;
 import org.eclipse.ui.progress.IProgressConstants2;
 import org.eclipse.ui.statushandlers.StatusManager;
@@ -203,6 +205,11 @@ public class ProgressInfoItem extends Composite {
 		setData(info);
 		setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
 		createChildren();
+		ILabelDecorator labelDecorator = PlatformUI.getWorkbench().getDecoratorManager()
+				.getLabelDecorator(ContributingPluginDecorator.ID);
+		if (labelDecorator != null && info.isJobInfo()) {
+			setToolTipText(labelDecorator.decorateText(getMainTitle(), ((JobInfo) info).getJob()));
+		}
 	}
 
 	/**
@@ -241,7 +248,6 @@ public class ProgressInfoItem extends Composite {
 		actionButton
 				.setToolTipText(ProgressMessages.NewProgressView_CancelJobToolTip);
 		actionButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				actionButton.setEnabled(false);
 				cancelOrRemove();
@@ -253,7 +259,6 @@ public class ProgressInfoItem extends Composite {
 			 * 
 			 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
 			 */
-			@Override
 			public void handleEvent(Event event) {
 				if (indexListener == null) {
 					return;
@@ -285,7 +290,6 @@ public class ProgressInfoItem extends Composite {
 			 * 
 			 * @see org.eclipse.swt.events.MouseListener#mouseDown(org.eclipse.swt.events.MouseEvent)
 			 */
-			@Override
 			public void mouseDown(MouseEvent e) {
 				if (indexListener != null) {
 					indexListener.select();
@@ -783,7 +787,6 @@ public class ProgressInfoItem extends Composite {
 				 * 
 				 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
 				 */
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 					executeTrigger();
 				}
@@ -795,7 +798,6 @@ public class ProgressInfoItem extends Composite {
 				 * 
 				 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
 				 */
-				@Override
 				public void handleEvent(Event event) {
 
 					Object text = link.getData(TEXT_KEY);
@@ -1056,7 +1058,6 @@ public class ProgressInfoItem extends Composite {
 	/* (non-Javadoc)
 	 * @see org.eclipse.swt.widgets.Widget#dispose()
 	 */
-	@Override
 	public void dispose() {
 		super.dispose();
 		if(resourceManager != null)

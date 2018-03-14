@@ -52,7 +52,6 @@ public abstract class AbstractEvaluationHandler extends AbstractEnabledHandler {
 	private IPropertyChangeListener getEnablementListener() {
 		if (enablementListener == null) {
 			enablementListener = new IPropertyChangeListener() {
-				@Override
 				public void propertyChange(PropertyChangeEvent event) {
 					if (event.getProperty() == PROP_ENABLED) {
 						if (event.getNewValue() instanceof Boolean) {
@@ -73,7 +72,6 @@ public abstract class AbstractEvaluationHandler extends AbstractEnabledHandler {
 	 * 
 	 * @see org.eclipse.core.commands.AbstractHandler#dispose()
 	 */
-	@Override
 	public void dispose() {
 		if (enablementRef != null) {
 			evaluationService.removeEvaluationListener(enablementRef);

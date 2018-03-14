@@ -202,6 +202,9 @@ public abstract class DialogCellEditor extends CellEditor {
         return defaultLabel;
     }
 
+    /* (non-Javadoc)
+     * Method declared on CellEditor.
+     */
     @Override
 	protected Control createControl(Composite parent) {
 
@@ -220,8 +223,10 @@ public abstract class DialogCellEditor extends CellEditor {
         button.setFont(font);
 
         button.addKeyListener(new KeyAdapter() {
-
-			@Override
+            /* (non-Javadoc)
+             * @see org.eclipse.swt.events.KeyListener#keyReleased(org.eclipse.swt.events.KeyEvent)
+             */
+            @Override
 			public void keyReleased(KeyEvent e) {
                 if (e.character == '\u001b') { // Escape
                     fireCancelEditor();
@@ -232,8 +237,10 @@ public abstract class DialogCellEditor extends CellEditor {
         button.addFocusListener(getButtonFocusListener());
         
         button.addSelectionListener(new SelectionAdapter() {
-
-			@Override
+            /* (non-Javadoc)
+             * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+             */
+            @Override
 			public void widgetSelected(SelectionEvent event) {
             	// Remove the button's focus listener since it's guaranteed
             	// to lose focus when the dialog opens
@@ -264,6 +271,13 @@ public abstract class DialogCellEditor extends CellEditor {
         return editor;
     }
 
+    /* (non-Javadoc)
+     * 
+     * Override in order to remove the button's focus listener if the celleditor
+     * is deactivating.
+     * 
+     * @see org.eclipse.jface.viewers.CellEditor#deactivate()
+     */
     @Override
 	public void deactivate() {
     	if (button != null && !button.isDisposed()) {
@@ -273,11 +287,18 @@ public abstract class DialogCellEditor extends CellEditor {
 		super.deactivate();
 	}
 
+	/* (non-Javadoc)
+     * Method declared on CellEditor.
+     */
     @Override
 	protected Object doGetValue() {
         return value;
     }
 
+    /* (non-Javadoc)
+     * Method declared on CellEditor.
+     * The focus is set to the cell editor's button. 
+     */
     @Override
 	protected void doSetFocus() {
         button.setFocus();
@@ -294,12 +315,16 @@ public abstract class DialogCellEditor extends CellEditor {
     	if (buttonFocusListener == null) {
     		buttonFocusListener = new FocusListener() {
 
-				@Override
+				/* (non-Javadoc)
+				 * @see org.eclipse.swt.events.FocusListener#focusGained(org.eclipse.swt.events.FocusEvent)
+				 */
 				public void focusGained(FocusEvent e) {
 					// Do nothing
 				}
 
-				@Override
+				/* (non-Javadoc)
+				 * @see org.eclipse.swt.events.FocusListener#focusLost(org.eclipse.swt.events.FocusEvent)
+				 */
 				public void focusLost(FocusEvent e) {
 					DialogCellEditor.this.focusLost();
 				}
@@ -309,6 +334,9 @@ public abstract class DialogCellEditor extends CellEditor {
     	return buttonFocusListener;
 	}
 
+	/* (non-Javadoc)
+     * Method declared on CellEditor.
+     */
     @Override
 	protected void doSetValue(Object value) {
         this.value = value;
