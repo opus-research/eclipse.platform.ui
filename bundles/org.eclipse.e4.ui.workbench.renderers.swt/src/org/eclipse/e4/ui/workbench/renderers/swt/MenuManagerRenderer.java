@@ -222,7 +222,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					item.setVisible(itemModel.isVisible());
 					if (item.getParent() != null) {
 						item.getParent().markDirty();
-						item.getParent().update(true);
 					}
 				}
 			}
