@@ -348,12 +348,9 @@ public class ExpandableComposite extends Canvas {
 				}
 				textClientCache.setBounds(tcx, y, tcsize.x, tcsize.y);
 			}
-			int tbarHeight = 0;
-			if (size.y > 0)
-				tbarHeight = size.y;
-			if (tcsize.y > 0)
-				tbarHeight = Math.max(tbarHeight, tcsize.y);
-			y += tbarHeight;
+			int height = Math.max(tcsize.y, size.y); // max of label/text client
+			height = Math.max(height, tsize.y); // or max of toggle
+			y += height;
 			if (hasTitleBar())
 				y += tvmargin;
 			if (getSeparatorControl() != null) {
@@ -362,7 +359,7 @@ public class ExpandableComposite extends Canvas {
 						clientArea.width - marginWidth - marginWidth,
 						SEPARATOR_HEIGHT);
 				y += SEPARATOR_HEIGHT;
-				if (expanded)
+				if (expanded && client!=null)
 					y += VSPACE;
 			}
 			if (expanded) {
@@ -399,7 +396,7 @@ public class ExpandableComposite extends Canvas {
 				boolean changed) {
 			initCache(changed);
 
-			int width = 0, height = 0;
+			int width = 0;
 			Point tsize = NULL_SIZE;
 			int twidth = 0;
 			if (toggle != null) {
@@ -459,7 +456,10 @@ public class ExpandableComposite extends Canvas {
 				width += IGAP + tcsize.x;
 			if (toggle != null)
 				width += twidth;
-			height = tcsize.y > 0 ? Math.max(tcsize.y, size.y) : size.y;
+
+			int height = Math.max(tcsize.y, size.y); // max of label/text client
+			height = Math.max(height, tsize.y); // or max of toggle
+
 			if (getSeparatorControl() != null) {
 				height += VSPACE + SEPARATOR_HEIGHT;
 				if (expanded && client != null)
@@ -505,8 +505,6 @@ public class ExpandableComposite extends Canvas {
 				if (expanded)
 					height += csize.y;
 			}
-			if (toggle != null)
-				height = height - size.y + Math.max(size.y, tsize.y);
 
 			Point result = new Point(width + marginWidth + marginWidth
 					+ thmargin + thmargin, height + marginHeight + marginHeight
