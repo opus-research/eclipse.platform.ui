@@ -22,7 +22,8 @@ import org.eclipse.ui.internal.dnd.TestDropLocation;
 public abstract class TestDragSource implements IWorkbenchWindowProvider {
     private WorkbenchPage page;
 
-    public abstract String toString();
+    @Override
+	public abstract String toString();
 
     public abstract void drag(TestDropLocation target);
 
@@ -30,10 +31,11 @@ public abstract class TestDragSource implements IWorkbenchWindowProvider {
         this.page = page;
     }
 
-    public IWorkbenchWindow getWorkbenchWindow() {
+    @Override
+	public IWorkbenchWindow getWorkbenchWindow() {
         return getPage().getWorkbenchWindow();
     }
-    
+
     public WorkbenchPage getPage() {
         if (page == null) {
             page = (WorkbenchPage) ((WorkbenchWindow) PlatformUI
@@ -41,6 +43,6 @@ public abstract class TestDragSource implements IWorkbenchWindowProvider {
         }
         return page;
     }
-    
-    
+
+
 }

@@ -11,7 +11,7 @@
  *     - Fix for bug 11490 - define hidden view (placeholder for view) in plugin.xml    
  *     Markus Alexander Kuppe, Versant Corporation - bug #215797
  *     Semion Chichelnitsky (semion@il.ibm.com) - bug 208564
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug XXXXXX
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 441184
  *******************************************************************************/
 package org.eclipse.ui.internal.registry;
 
@@ -50,11 +50,10 @@ public interface IWorkbenchRegistryConstants {
 	public static String ATT_ALLOW_MULTIPLE = "allowMultiple"; //$NON-NLS-1$
 
 	/**
-	 * Attribute that specifies whether a view gets restored upon workbench
-	 * restart. Value <code>restorable</code>.
+	 * Attribute that specifies whether a view gets restored upon workbench restart. Value <code>restorable</code>.
 	 */
 	public static String ATT_RESTORABLE = "restorable"; //$NON-NLS-1$
-
+	
 	/**
 	 * Attribute that specifies whether a wizard is immediately capable of
 	 * finishing. Value <code>canFinishEarly</code>.
@@ -71,7 +70,7 @@ public interface IWorkbenchRegistryConstants {
 	 * Category id attribute. Value <code>categoryId</code>.
 	 */
 	public static String ATT_CATEGORY_ID = "categoryId"; //$NON-NLS-1$
-
+	
 	/**
 	 * The name of the attribute storing checkEnabled for the visibleWhen
 	 * element. Value <code>checkEnabled</code>.
@@ -110,11 +109,10 @@ public interface IWorkbenchRegistryConstants {
 	public static String ATT_CONFIGURATION = "configuration"; //$NON-NLS-1$
 
 	/**
-	 * Intro content detector class attribute (optional). Value
-	 * <code>contentDetector</code>.
+	 * Intro content detector class attribute (optional). Value <code>contentDetector</code>.
 	 */
 	public static String ATT_CONTENT_DETECTOR = "contentDetector"; //$NON-NLS-1$
-
+	
 	/**
 	 * Editor content type id binding attribute. Value
 	 * <code>contentTypeId</code>.
@@ -301,8 +299,7 @@ public interface IWorkbenchRegistryConstants {
 	public static String ATT_LOCATION = "location"; //$NON-NLS-1$
 
 	/**
-	 * Editor management strategy attribute. Value <code>matchingStrategy</code>
-	 * .
+	 * Editor management strategy attribute. Value <code>matchingStrategy</code>.
 	 */
 	public static String ATT_MATCHING_STRATEGY = "matchingStrategy"; //$NON-NLS-1$
 
@@ -322,8 +319,8 @@ public interface IWorkbenchRegistryConstants {
 	public static String ATT_MNEMONIC = "mnemonic"; //$NON-NLS-1$
 
 	/**
-	 * The name of the minimized attribute, which appears when adding a view in
-	 * a perspectiveExtension.
+	 * The name of the minimized attribute, which appears
+	 * when adding a view in a perspectiveExtension.
 	 */
 	public static String ATT_MINIMIZED = "minimized"; //$NON-NLS-1$
 
@@ -489,9 +486,9 @@ public interface IWorkbenchRegistryConstants {
 	 * Perspective singleton attribute. Value <code>singleton</code>.
 	 */
 	public static String ATT_SINGLETON = "singleton";//$NON-NLS-1$
-
+	
 	/**
-	 * Splash id attribute. Value <code>splashId</code>.
+	 * Splash id attribute.  Value <code>splashId</code>.
 	 * 
 	 * @since 3.3
 	 */
@@ -698,12 +695,10 @@ public interface IWorkbenchRegistryConstants {
 
 	public static String PL_PREFERENCES = "preferencePages"; //$NON-NLS-1$
 
-	public static String PL_PRESENTATION_FACTORIES = "presentationFactories"; //$NON-NLS-1$
-
 	public static String PL_PROPERTY_PAGES = "propertyPages"; //$NON-NLS-1$
 
 	public static String PL_STARTUP = "startup"; //$NON-NLS-1$
-
+	
 	/**
 	 * @since 3.3
 	 */
@@ -722,78 +717,89 @@ public interface IWorkbenchRegistryConstants {
 	/**
 	 * The name of the deprecated accelerator configurations extension point.
 	 */
-	public static String EXTENSION_ACCELERATOR_CONFIGURATIONS = PlatformUI.PLUGIN_ID + '.'
-			+ PL_ACCELERATOR_CONFIGURATIONS;
+	public static String EXTENSION_ACCELERATOR_CONFIGURATIONS = PlatformUI.PLUGIN_ID
+			+ '.' + PL_ACCELERATOR_CONFIGURATIONS;
 
 	/**
 	 * The name of the accelerator scopes extension point.
 	 */
-	public static String EXTENSION_ACCELERATOR_SCOPES = PlatformUI.PLUGIN_ID + '.'
-			+ PL_ACCELERATOR_SCOPES;
+	public static String EXTENSION_ACCELERATOR_SCOPES = PlatformUI.PLUGIN_ID
+			+ '.' + PL_ACCELERATOR_SCOPES;
 
 	/**
 	 * The name of the action definitions extension point.
 	 */
-	public static String EXTENSION_ACTION_DEFINITIONS = PlatformUI.PLUGIN_ID + '.'
-			+ PL_ACTION_DEFINITIONS;
+	public static String EXTENSION_ACTION_DEFINITIONS = PlatformUI.PLUGIN_ID
+			+ '.' + PL_ACTION_DEFINITIONS;
 
 	/**
 	 * The name of the <code>org.eclipse.ui.actionSets</code> extension point.
 	 */
-	public static String EXTENSION_ACTION_SETS = PlatformUI.PLUGIN_ID + '.'
-			+ IWorkbenchRegistryConstants.PL_ACTION_SETS;
+	public static String EXTENSION_ACTION_SETS = PlatformUI.PLUGIN_ID
+			+ '.' + IWorkbenchRegistryConstants.PL_ACTION_SETS;
 
 	/**
 	 * The name of the bindings extension point.
 	 */
-	public static String EXTENSION_BINDINGS = PlatformUI.PLUGIN_ID + '.' + PL_BINDINGS;
+	public static String EXTENSION_BINDINGS = PlatformUI.PLUGIN_ID + '.'
+			+ PL_BINDINGS;
 
 	/**
 	 * The name of the commands extension point.
 	 */
-	public static String EXTENSION_COMMAND_IMAGES = PlatformUI.PLUGIN_ID + '.' + PL_COMMAND_IMAGES;
+	public static String EXTENSION_COMMAND_IMAGES = PlatformUI.PLUGIN_ID
+			+ '.' + PL_COMMAND_IMAGES;
 
 	/**
 	 * The name of the commands extension point, and the name of the key for the
 	 * commands preferences.
 	 */
-	public static String EXTENSION_COMMANDS = PlatformUI.PLUGIN_ID + '.' + PL_COMMANDS;
+	public static String EXTENSION_COMMANDS = PlatformUI.PLUGIN_ID + '.'
+			+ PL_COMMANDS;
 
 	/**
 	 * The name of the contexts extension point.
 	 */
-	public static String EXTENSION_CONTEXTS = PlatformUI.PLUGIN_ID + '.' + PL_CONTEXTS;
+	public static String EXTENSION_CONTEXTS = PlatformUI.PLUGIN_ID + '.'
+			+ PL_CONTEXTS;
 
 	/**
 	 * The name of the <code>org.eclipse.ui.editorActions</code> extension
 	 * point.
 	 */
-	public static String EXTENSION_EDITOR_ACTIONS = PlatformUI.PLUGIN_ID + '.' + PL_EDITOR_ACTIONS;
+	public static String EXTENSION_EDITOR_ACTIONS = PlatformUI.PLUGIN_ID
+			+ '.' + PL_EDITOR_ACTIONS;
 
 	/**
 	 * The name of the commands extension point.
 	 */
-	public static String EXTENSION_HANDLERS = PlatformUI.PLUGIN_ID + '.' + PL_HANDLERS;
+	public static String EXTENSION_HANDLERS = PlatformUI.PLUGIN_ID + '.'
+			+ PL_HANDLERS;
 
 	/**
 	 * The name of the <code>org.eclipse.ui.menus</code> extension point.
 	 */
-	public static String EXTENSION_MENUS = PlatformUI.PLUGIN_ID + '.' + PL_MENUS;
+	public static String EXTENSION_MENUS = PlatformUI.PLUGIN_ID + '.'
+			+ PL_MENUS;
 
 	/**
 	 * The name of the <code>org.eclipse.ui.menus2</code> extension point.
 	 */
-	public static String COMMON_MENU_ADDITIONS = PlatformUI.PLUGIN_ID + '.' + PL_MENUS + '2';
+	public static String COMMON_MENU_ADDITIONS = PlatformUI.PLUGIN_ID + '.'
+			+ PL_MENUS + '2';
 
 	/**
 	 * The name of the <code>org.eclipse.ui.popupMenus</code> extension point.
 	 */
-	public static String EXTENSION_POPUP_MENUS = PlatformUI.PLUGIN_ID + '.' + PL_POPUP_MENU;
+	public static String EXTENSION_POPUP_MENUS = PlatformUI.PLUGIN_ID
+			+ '.' + PL_POPUP_MENU;
 
 	/**
-	 * The name of the <code>org.eclipse.ui.viewActions</code> extension point.
+	 * The name of the <code>org.eclipse.ui.viewActions</code> extension
+	 * point.
 	 */
-	public static String EXTENSION_VIEW_ACTIONS = PlatformUI.PLUGIN_ID + '.' + PL_VIEW_ACTIONS;
+	public static String EXTENSION_VIEW_ACTIONS = PlatformUI.PLUGIN_ID
+			+ '.' + PL_VIEW_ACTIONS;
 
 	/**
 	 * The constant for the position attribute corresponding to
@@ -915,7 +921,10 @@ public interface IWorkbenchRegistryConstants {
 	/**
 	 * Category presentation tag. Value <code>categoryPresentationBinding</code>
 	 * .
+	 * 
+	 * @deprecated used by the removal presentation API
 	 */
+	@Deprecated
 	public static String TAG_CATEGORYPRESENTATIONBINDING = "categoryPresentationBinding"; //$NON-NLS-1$
 
 	/**
@@ -1096,7 +1105,8 @@ public interface IWorkbenchRegistryConstants {
 	public static String TAG_LOCATION = "location"; //$NON-NLS-1$
 
 	/**
-	 * The name of the element defining the insertion point for menu additions.
+	 * The name of the element defining the insertion point for menu
+	 * additions.
 	 * 
 	 * @since 3.3
 	 */
@@ -1186,7 +1196,8 @@ public interface IWorkbenchRegistryConstants {
 	 * Separator tag. Value <code>separator</code>.
 	 */
 	public static String TAG_SEPARATOR = "separator"; //$NON-NLS-1$
-
+	
+	
 	/**
 	 * Tag for the settings transfer entry.
 	 */
@@ -1201,23 +1212,23 @@ public interface IWorkbenchRegistryConstants {
 	 * The name of the element storing some state.
 	 */
 	public static String TAG_STATE = "state"; //$NON-NLS-1$
-
+	
+	
 	/**
 	 * The name of the element describing splash handlers. Value
 	 * <code>splashHandler</code>.
-	 * 
 	 * @since 3.3
 	 */
 	public static String TAG_SPLASH_HANDLER = "splashHandler"; //$NON-NLS-1$
+	
 
 	/**
 	 * The name of the element describing splash handler product bindings. Value
 	 * <code>splashHandlerProductBinding</code>.
-	 * 
 	 * @since 3.3
 	 */
 	public static String TAG_SPLASH_HANDLER_PRODUCT_BINDING = "splashHandlerProductBinding"; //$NON-NLS-1$
-
+	
 	/**
 	 * Sticky view tag. Value <code>stickyView</code>.
 	 */
@@ -1252,12 +1263,6 @@ public interface IWorkbenchRegistryConstants {
 	 * View tag. Value <code>view</code>.
 	 */
 	public static String TAG_VIEW = "view";//$NON-NLS-1$
-
-	/**
-	 * E4 view tag, used in the <code>org.eclipse.ui.view</code> extension point
-	 * to point to a POJO class. Value <code>e4view</code>.
-	 */
-	public static String TAG_E4VIEW = "e4view";//$NON-NLS-1$
 
 	/**
 	 * View shortcut tag. Value <code>viewShortcut</code>.
@@ -1325,15 +1330,15 @@ public interface IWorkbenchRegistryConstants {
 	public static String TYPE_WIDGET = "widget"; //$NON-NLS-1$
 
 	public static String TAG_TOOLBAR = "toolbar"; //$NON-NLS-1$
-
+	
 	public static String TAG_SERVICE_FACTORY = "serviceFactory"; //$NON-NLS-1$
-
+	
 	public static String TAG_SERVICE = "service"; //$NON-NLS-1$
 
 	public static final String ATTR_FACTORY_CLASS = "factoryClass"; //$NON-NLS-1$
 
 	public static final String ATTR_SERVICE_CLASS = "serviceClass"; //$NON-NLS-1$
-
+	
 	public static final String TAG_SOURCE_PROVIDER = "sourceProvider"; //$NON-NLS-1$
 
 	public static final String ATTR_PROVIDER = "provider"; //$NON-NLS-1$
@@ -1341,7 +1346,7 @@ public interface IWorkbenchRegistryConstants {
 	public static final String TAG_VARIABLE = "variable"; //$NON-NLS-1$
 
 	public static final String ATT_PRIORITY_LEVEL = "priorityLevel"; //$NON-NLS-1$
-
+	
 	public static final String ATT_MODE = "mode"; //$NON-NLS-1$
 
 	public static final String ATT_PLATFORMS = "platforms"; //$NON-NLS-1$
