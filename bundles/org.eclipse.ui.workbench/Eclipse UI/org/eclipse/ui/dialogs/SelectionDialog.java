@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,12 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 448260
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -163,7 +163,7 @@ public abstract class SelectionDialog extends TrayDialog {
 	 * @param selectedElements
 	 *            the array of elements to select
 	 */
-	public void setInitialSelections(Object... selectedElements) {
+	public void setInitialSelections(Object[] selectedElements) {
 		initialSelections = new ArrayList(selectedElements.length);
 		for (int i = 0; i < selectedElements.length; i++) {
 			initialSelections.add(selectedElements[i]);
@@ -219,7 +219,7 @@ public abstract class SelectionDialog extends TrayDialog {
 	 *            the new values
 	 * @since 2.0
 	 */
-	protected void setSelectionResult(Object... newResult) {
+	protected void setSelectionResult(Object[] newResult) {
 		result = newResult;
 	}
 

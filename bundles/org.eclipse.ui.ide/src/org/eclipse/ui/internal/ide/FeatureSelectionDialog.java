@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,11 +7,11 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 448260
  *******************************************************************************/
 
 package org.eclipse.ui.internal.ide;
 
+import com.ibm.icu.text.Collator;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Locale;
@@ -32,8 +32,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.SelectionDialog;
 import org.eclipse.ui.internal.ide.dialogs.SimpleListContentProvider;
-
-import com.ibm.icu.text.Collator;
 
 /**
  * Dialog to allow the user to select a feature from a list.
@@ -116,7 +114,7 @@ public class FeatureSelectionDialog extends SelectionDialog {
         // Find primary feature
         for (int i = 0; i < features.length; i++) {
             if (features[i].getFeatureId().equals(primaryFeatureId)) {
-				setInitialSelections(features[i]);
+                setInitialSelections(new Object[] { features[i] });
                 return;
             }
         }
