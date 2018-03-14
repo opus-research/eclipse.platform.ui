@@ -50,7 +50,7 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class MenuVisibilityTest extends UITestCase {
 
@@ -94,7 +94,7 @@ public class MenuVisibilityTest extends UITestCase {
 
 		menuService.addContributionFactory(factory);
 		menuService.populateContributionManager(manager, LOCATION);
-
+		
 		Shell shell = window.getShell();
 
 		// Test the initial menu creation
@@ -103,7 +103,7 @@ public class MenuVisibilityTest extends UITestCase {
 		e.type = SWT.Show;
 		e.widget = menuBar;
 		menuBar.notifyListeners(SWT.Show, e);
-
+		
 		assertFalse("starting state", item.isVisible());
 
 		activeContext = contextService
@@ -117,7 +117,7 @@ public class MenuVisibilityTest extends UITestCase {
 		menuBar.notifyListeners(SWT.Show, e);
 
 		assertFalse("after deactivation", item.isVisible());
-
+		
 		menuService.releaseContributions(manager);
 		menuService.removeContributionFactory(factory);
 		manager.dispose();
@@ -140,9 +140,11 @@ public class MenuVisibilityTest extends UITestCase {
 
 		IConfigurationElement[] mas = extension.getConfigurationElements();
 		final Expression activeContextExpr[] = new Expression[1];
-		for (IConfigurationElement ma : mas) {
+		for (int i = 0; i < mas.length; i++) {
+			IConfigurationElement ma = mas[i];
 			IConfigurationElement[] items = ma.getChildren();
-			for (IConfigurationElement item : items) {
+			for (int j = 0; j < items.length; j++) {
+				IConfigurationElement item = items[j];
 				String id = item.getAttribute("id");
 				if (id != null
 						&& id.equals("org.eclipse.ui.tests.menus.itemX1")) {
@@ -175,7 +177,7 @@ public class MenuVisibilityTest extends UITestCase {
 		assertTrue("active context", aci.isVisible());
 		menu.notifyListeners(SWT.Hide, new Event());
 
-
+		
 		contextService.deactivateContext(activeContext);
 		activeContext = null;
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars.Vogel@vogella.com - Bug 454712
- *     dirk.fauth@googlemail.com - Bug 446095
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench.addons.minmax;
 
@@ -801,14 +799,7 @@ public class TrimStack {
 			int index = toolControlId.indexOf('(');
 			String stackId = toolControlId.substring(0, index);
 			String perspId = toolControlId.substring(index + 1, toolControlId.length() - 1);
-
-			MPerspective persp = null;
-			List<MPerspective> perspectives = modelService.findElements(ps.get(0), perspId,
-					MPerspective.class, null);
-			if (perspectives != null && !perspectives.isEmpty()) {
-				persp = perspectives.get(0);
-			}
-
+			MPerspective persp = (MPerspective) modelService.find(perspId, ps.get(0));
 			if (persp != null) {
 				result = modelService.find(stackId, persp);
 			} else {
@@ -932,20 +923,6 @@ public class TrimStack {
 
 		minimizedElement.setVisible(true);
 		minimizedElement.getTags().remove(IPresentationEngine.MINIMIZED);
-
-		// Activate the part that is being brought up...
-		if (minimizedElement instanceof MPartStack) {
-			MPartStack theStack = (MPartStack) minimizedElement;
-			MStackElement curSel = theStack.getSelectedElement();
-			Control ctrl = (Control) minimizedElement.getWidget();
-
-			// Hack for elems that are lazy initialized
-			if (ctrl instanceof CTabFolder && ((CTabFolder) ctrl).getSelection() == null) {
-				theStack.setSelectedElement(null);
-				theStack.setSelectedElement(curSel);
-			}
-		}
-
 		toolControl.setToBeRendered(false);
 
 		if (hostPane != null && !hostPane.isDisposed())
@@ -975,7 +952,7 @@ public class TrimStack {
 
 				// Hack ! Force a resize of the CTF to make sure the hosted
 				// view is the correct size...see bug 434062 for details
-				if (ctf != null) {
+				if (ctrl != null) {
 					Rectangle bb = ctf.getBounds();
 					bb.width--;
 					ctf.setBounds(bb);
@@ -1044,7 +1021,7 @@ public class TrimStack {
 						}
 					} else if (selectedElement instanceof MElementContainer<?>) {
 						MElementContainer<?> container = (MElementContainer<?>) selectedElement;
-						selectedElement = container.getSelectedElement();
+						selectedElement = (MElementContainer<?>) container.getSelectedElement();
 					}
 				}
 

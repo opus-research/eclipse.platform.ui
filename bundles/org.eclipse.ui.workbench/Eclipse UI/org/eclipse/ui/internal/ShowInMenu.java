@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810, 444070
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 451214
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -243,11 +242,7 @@ public class ShowInMenu extends ContributionItem implements
 					}
 					String iconURI = menuElement.getIconURI();
 					try {
-						if (iconURI != null && !iconURI.isEmpty()) {
-							ccip.icon = ImageDescriptor.createFromURL(new URL(iconURI));
-						} else {
-							ccip.icon = imgService.getImageDescriptor(commandId);
-						}
+						ccip.icon = ImageDescriptor.createFromURL(new URL(iconURI));
 					} catch (MalformedURLException e) {
 						ccip.icon = imgService.getImageDescriptor(commandId);
 					}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014, 2015 Google Inc and others.
+ * Copyright (C) 2014, Google Inc and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,6 @@ package org.eclipse.ui.monitoring;
 /**
  * Responsible for holding the stack traces for a UI event.
  *
- * @noextend This class is not intended to be subclassed by clients.
  * @since 1.0
  */
 public class UiFreezeEvent {
@@ -63,7 +62,7 @@ public class UiFreezeEvent {
 	}
 
 	/**
-	 * Returns {@code true} if this event was still ongoing at the time the event was logged,
+	 * Returns {@code true} if this event was still running at the time the event was logged,
 	 * which can happen for deadlocks.
 	 */
 	public boolean isStillRunning() {
@@ -74,17 +73,17 @@ public class UiFreezeEvent {
 	@Override
 	public String toString() {
 		StringBuilder buf = new StringBuilder();
-		buf.append("Freeze started at "); //$NON-NLS-1$
+		buf.append("Freeze started at ");
 		buf.append(startTimestamp);
 		if (isStillRunning) {
-			buf.append(" still ongoing after "); //$NON-NLS-1$
+			buf.append(" still ongoing after ");
 		} else {
-			buf.append(" lasted "); //$NON-NLS-1$
+			buf.append(" lasted ");
 		}
 		buf.append(totalDuration);
-		buf.append("ms"); //$NON-NLS-1$
+		buf.append("ms");
 		if (stackTraceSamples.length != 0) {
-			buf.append("\nStack trace samples:"); //$NON-NLS-1$
+			buf.append("\nStack trace samples:");
 			for (StackSample stackTraceSample : stackTraceSamples) {
 				buf.append('\n');
 				buf.append(stackTraceSample.toString());

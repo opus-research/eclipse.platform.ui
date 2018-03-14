@@ -160,7 +160,7 @@ import org.eclipse.ui.internal.StartupThreading.StartupRunnable;
 import org.eclipse.ui.internal.actions.CommandAction;
 import org.eclipse.ui.internal.commands.SlaveCommandService;
 import org.eclipse.ui.internal.contexts.ContextService;
-import org.eclipse.ui.internal.dialogs.cpd.CustomizePerspectiveDialog;
+import org.eclipse.ui.internal.dialogs.CustomizePerspectiveDialog;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityPart;
 import org.eclipse.ui.internal.e4.compatibility.ModeledPageLayout;
 import org.eclipse.ui.internal.e4.compatibility.SelectionService;
@@ -169,7 +169,6 @@ import org.eclipse.ui.internal.handlers.IActionCommandMappingService;
 import org.eclipse.ui.internal.handlers.LegacyHandlerService;
 import org.eclipse.ui.internal.layout.ITrimManager;
 import org.eclipse.ui.internal.layout.IWindowTrim;
-import org.eclipse.ui.internal.menus.ActionSet;
 import org.eclipse.ui.internal.menus.IActionSetsListener;
 import org.eclipse.ui.internal.menus.LegacyActionPersistence;
 import org.eclipse.ui.internal.menus.MenuHelper;
@@ -206,7 +205,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	 */
 	public static final String PERSPECTIVE_SPACER_ID = "PerspectiveSpacer"; //$NON-NLS-1$
 
-	private static final String MAIN_TOOLBAR_ID = ActionSet.MAIN_TOOLBAR;
+	private static final String MAIN_TOOLBAR_ID = "org.eclipse.ui.main.toolbar"; //$NON-NLS-1$
 	private static final String COMMAND_ID_TOGGLE_COOLBAR = "org.eclipse.ui.ToggleCoolbarAction"; //$NON-NLS-1$
 
 	public static final String ACTION_SET_CMD_PREFIX = "AS::"; //$NON-NLS-1$
@@ -247,7 +246,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 	private PerspectiveListenerList perspectiveListeners = new PerspectiveListenerList();
 
-	private PartService partService = new WWinPartService();
+	private PartService partService = new PartService();
 
 	private WWinActionBars actionBars;
 
@@ -674,7 +673,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			Shell shell = (Shell) model.getWidget();
 			if (model.getMainMenu() == null) {
 				final MMenu mainMenu = modelService.createModelElement(MMenu.class);
-				mainMenu.setElementId(ActionSet.MAIN_MENU);
+				mainMenu.setElementId("org.eclipse.ui.main.menu"); //$NON-NLS-1$
 
 				final MenuManagerRenderer renderer = (MenuManagerRenderer) rendererFactory
 						.getRenderer(mainMenu, null);
@@ -1247,7 +1246,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		return null;
 	}
 
-	public void fill(MenuManagerRenderer renderer, MMenu menu, IMenuManager manager) {
+	private void fill(MenuManagerRenderer renderer, MMenu menu, IMenuManager manager) {
 		for (IContributionItem item : manager.getItems()) {
 			if (item instanceof MenuManager) {
 				MenuManager menuManager = (MenuManager) item;
@@ -1562,7 +1561,11 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 				// Reset the internal flags if window was not closed.
 				closing = false;
 				updateDisabled = false;
+			} else {
+				firePageClosed();
+				fireWindowClosed();
 			}
+
 		}
 
 		if (windowClosed && tracker != null) {
@@ -1939,10 +1942,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 					}
 				}
 			}
-			if (getActivePage() != null) {
-				firePageClosed();
-			}
-			fireWindowClosed();
 		} finally {
 
 			try {
@@ -2390,7 +2389,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 	private ListenerList backgroundSaveListeners = new ListenerList(ListenerList.IDENTITY);
 
-	private SelectionService selectionService;
+	private ISelectionService selectionService;
 
 	private ITrimManager trimManager;
 
@@ -2971,7 +2970,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		}
 	};
 
-	MenuManager menuManager = new MenuManager("MenuBar", ActionSet.MAIN_MENU); //$NON-NLS-1$
+	MenuManager menuManager = new MenuManager("MenuBar", "org.eclipse.ui.main.menu"); //$NON-NLS-1$//$NON-NLS-2$
 
 	public MenuManager getMenuManager() {
 		return menuManager;
@@ -3044,15 +3043,5 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	public CustomizePerspectiveDialog createCustomizePerspectiveDialog(Perspective persp,
 			IEclipseContext context) {
 		return new CustomizePerspectiveDialog(getWindowConfigurer(), persp, context);
-	}
-
-	private class WWinPartService extends PartService {
-
-		@Override
-		public void partActivated(IWorkbenchPart part) {
-			super.partActivated(part);
-			selectionService.notifyListeners(part);
-		}
-
 	}
 }

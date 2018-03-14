@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,16 +7,15 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 448060
  *******************************************************************************/
 
 package org.eclipse.ui.internal.ide;
 
+import com.ibm.icu.text.Collator;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Locale;
 
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -32,8 +31,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.SelectionDialog;
-
-import com.ibm.icu.text.Collator;
+import org.eclipse.ui.internal.ide.dialogs.SimpleListContentProvider;
 
 /**
  * Dialog to allow the user to select a feature from a list.
@@ -125,6 +123,9 @@ public class FeatureSelectionDialog extends SelectionDialog {
         setInitialSelections(new Object[0]);
     }
 
+    /* (non-Javadoc)
+     * Method declared on Window.
+     */
     @Override
 	protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
@@ -132,6 +133,9 @@ public class FeatureSelectionDialog extends SelectionDialog {
 				helpContextId);
     }
 
+    /* (non-Javadoc)
+     * Method declared on Dialog.
+     */
     @Override
 	protected Control createDialogArea(Composite parent) {
         Composite composite = (Composite) super.createDialogArea(parent);
@@ -156,8 +160,11 @@ public class FeatureSelectionDialog extends SelectionDialog {
         });
 
         // Set the content provider
-		listViewer.setContentProvider(ArrayContentProvider.getInstance());
-		listViewer.setInput(features);
+        SimpleListContentProvider cp = new SimpleListContentProvider();
+        cp.setElements(features);
+        listViewer.setContentProvider(cp);
+        listViewer.setInput(new Object());
+        // it is ignored but must be non-null
 
         // Set the initial selection
         listViewer.setSelection(new StructuredSelection(
@@ -182,6 +189,9 @@ public class FeatureSelectionDialog extends SelectionDialog {
         return composite;
     }
 
+    /* (non-Javadoc)
+     * Method declared on Dialog.
+     */
     @Override
 	protected void okPressed() {
         IStructuredSelection selection = (IStructuredSelection) listViewer

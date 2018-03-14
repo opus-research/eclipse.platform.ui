@@ -14,7 +14,6 @@ import java.io.StringWriter;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.resources.IMarker;
@@ -108,8 +107,7 @@ public class MultiPageEditorExample extends MultiPageEditorPart implements
         fontButton.setText(MessageUtil.getString("ChangeFont")); //$NON-NLS-1$
 
         fontButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent event) {
+            public void widgetSelected(SelectionEvent event) {
                 setFont();
             }
         });
@@ -136,8 +134,7 @@ public class MultiPageEditorExample extends MultiPageEditorPart implements
     /**
      * Creates the pages of the multi-page editor.
      */
-    @Override
-	protected void createPages() {
+    protected void createPages() {
         createPage0();
         createPage1();
         createPage2();
@@ -146,8 +143,7 @@ public class MultiPageEditorExample extends MultiPageEditorPart implements
     /**
      * Saves the multi-page editor's document.
      */
-    @Override
-	public void doSave(IProgressMonitor monitor) {
+    public void doSave(IProgressMonitor monitor) {
         getEditor(0).doSave(monitor);
     }
 
@@ -156,8 +152,7 @@ public class MultiPageEditorExample extends MultiPageEditorPart implements
      * Also updates the text for page 0's tab, and updates this multi-page editor's input
      * to correspond to the nested editor's.
      */
-    @Override
-	public void doSaveAs() {
+    public void doSaveAs() {
         IEditorPart editor = getEditor(0);
         editor.doSaveAs();
         setPageText(0, editor.getTitle());
@@ -168,24 +163,24 @@ public class MultiPageEditorExample extends MultiPageEditorPart implements
      * The <code>MultiPageEditorExample</code> implementation of this method
      * checks that the input is an instance of <code>IFileEditorInput</code>.
      */
-    @Override
-	public void init(IEditorSite site, IEditorInput editorInput)
+    public void init(IEditorSite site, IEditorInput editorInput)
             throws PartInitException {
         if (!(editorInput instanceof IFileEditorInput))
             throw new PartInitException(MessageUtil.getString("InvalidInput")); //$NON-NLS-1$
         super.init(site, editorInput);
     }
 
-    @Override
-	public boolean isSaveAsAllowed() {
+    /* (non-Javadoc)
+     * Method declared on IEditorPart.
+     */
+    public boolean isSaveAsAllowed() {
         return true;
     }
 
     /**
      * Calculates the contents of page 2 when the it is activated.
      */
-    @Override
-	protected void pageChange(int newPageIndex) {
+    protected void pageChange(int newPageIndex) {
         super.pageChange(newPageIndex);
         if (newPageIndex == 2) {
             sortWords();
@@ -217,7 +212,7 @@ public class MultiPageEditorExample extends MultiPageEditorPart implements
 
         StringTokenizer tokenizer = new StringTokenizer(editorText,
                 " \t\n\r\f!@#$%^&*()-_=+`~[]{};:'\",.<>/?|\\"); //$NON-NLS-1$
-        List<String> editorWords = new ArrayList<>();
+        ArrayList editorWords = new ArrayList();
         while (tokenizer.hasMoreTokens()) {
             editorWords.add(tokenizer.nextToken());
         }
@@ -225,14 +220,16 @@ public class MultiPageEditorExample extends MultiPageEditorPart implements
         Collections.sort(editorWords, Collator.getInstance());
         StringWriter displayText = new StringWriter();
         for (int i = 0; i < editorWords.size(); i++) {
-            displayText.write((editorWords.get(i)));
+            displayText.write(((String) editorWords.get(i)));
             displayText.write("\n"); //$NON-NLS-1$
         }
         text.setText(displayText.toString());
     }
 
-    @Override
-	public void gotoMarker(IMarker marker) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.ide.IGotoMarker
+     */
+    public void gotoMarker(IMarker marker) {
         setActivePage(editorIndex);
         IDE.gotoMarker(editor, marker);
     }

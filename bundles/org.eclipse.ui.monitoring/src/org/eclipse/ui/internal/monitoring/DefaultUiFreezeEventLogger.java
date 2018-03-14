@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014, 2015 Google Inc and others.
+ * Copyright (C) 2014, Google Inc and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Marcus Eng (Google) - initial API and implementation
- *     Sergey Prigogin (Google)
  *******************************************************************************/
 package org.eclipse.ui.internal.monitoring;
 
@@ -30,17 +29,12 @@ import org.eclipse.ui.monitoring.UiFreezeEvent;
  */
 public class DefaultUiFreezeEventLogger implements IUiFreezeEventLogger {
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss.SSS"); //$NON-NLS-1$
-	private final long longEventErrorThresholdMillis;
 
 	private static class SeverityMultiStatus extends MultiStatus {
 		public SeverityMultiStatus(int severity, String pluginId, String message, Throwable exception) {
 			super(pluginId, OK, message, exception);
 			setSeverity(severity);
 		}
-	}
-
-	public DefaultUiFreezeEventLogger(long longEventErrorThresholdMillis) {
-		this.longEventErrorThresholdMillis = longEventErrorThresholdMillis;
 	}
 
 	/**
@@ -54,16 +48,13 @@ public class DefaultUiFreezeEventLogger implements IUiFreezeEventLogger {
 		String startTime = dateFormat.format(new Date(lastTimestamp));
 
 		String pattern = event.isStillRunning()
-				? Messages.DefaultUiFreezeEventLogger_ui_freeze_ongoing_header_2
-				: Messages.DefaultUiFreezeEventLogger_ui_freeze_finished_header_2;
-		long duration = event.getTotalDuration();
-		String format = duration >= 100000 ? "%.0f" : duration >= 10 ? "%.2g" : "%.1g"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		String header = NLS.bind(pattern, String.format(format, duration / 1000.0), startTime);
+				? Messages.DefaultUiFreezeEventLogger_ui_delay_header_running_2
+				: Messages.DefaultUiFreezeEventLogger_ui_delay_header_non_running_2;
+		String header = NLS.bind(pattern,
+				String.format("%.2f", event.getTotalDuration() / 1000.0), startTime); //$NON-NLS-1$
 
-		int severity = duration >= longEventErrorThresholdMillis ?
-				IStatus.ERROR : IStatus.WARNING;
 		MultiStatus loggedEvent =
-				new SeverityMultiStatus(severity, PreferenceConstants.PLUGIN_ID, header, null);
+				new SeverityMultiStatus(IStatus.WARNING, PreferenceConstants.PLUGIN_ID, header, null);
 
 		StackSample[] stackTraceSamples = event.getStackTraceSamples();
 		for (StackSample sample : stackTraceSamples) {
@@ -103,22 +94,21 @@ public class DefaultUiFreezeEventLogger implements IUiFreezeEventLogger {
 		String lockName = thread.getLockName();
 		if (lockName != null && !lockName.isEmpty()) {
 			LockInfo lock = thread.getLockInfo();
+			threadText.append(NLS.bind(
+					Messages.DefaultUiFreezeEventLogger_waiting_for_1,
+					getClassAndHashCode(lock)));
 			String lockOwnerName = thread.getLockOwnerName();
-			if (lockOwnerName == null) {
+			if (lockOwnerName != null && !lockOwnerName.isEmpty()) {
 				threadText.append(NLS.bind(
-						Messages.DefaultUiFreezeEventLogger_waiting_for_1,
-						getClassAndHashCode(lock)));
-			} else {
-				threadText.append(NLS.bind(
-						Messages.DefaultUiFreezeEventLogger_waiting_for_with_lock_owner_3,
-						new Object[] { getClassAndHashCode(lock), lockOwnerName,
-								thread.getLockOwnerId() }));
+						Messages.DefaultUiFreezeEventLogger_lock_owner_2,
+						lockOwnerName, thread.getLockOwnerId()));
 			}
 		}
 
 		for (LockInfo lockInfo : thread.getLockedSynchronizers()) {
 			threadText.append(NLS.bind(
-					Messages.DefaultUiFreezeEventLogger_holding_1, getClassAndHashCode(lockInfo)));
+					Messages.DefaultUiFreezeEventLogger_holding_1,
+					getClassAndHashCode(lockInfo)));
 		}
 
 		return new Status(IStatus.INFO, PreferenceConstants.PLUGIN_ID, threadText.toString(),
