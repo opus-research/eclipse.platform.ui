@@ -847,9 +847,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 			part = (MPart) element;
 		else if (element instanceof MPlaceholder) {
 			part = (MPart) ((MPlaceholder) element).getRef();
-			if (part != null) {
-				part.setCurSharedRef((MPlaceholder) element);
-			}
+			part.setCurSharedRef((MPlaceholder) element);
 		}
 
 		CTabFolder ctf = (CTabFolder) stack.getWidget();
