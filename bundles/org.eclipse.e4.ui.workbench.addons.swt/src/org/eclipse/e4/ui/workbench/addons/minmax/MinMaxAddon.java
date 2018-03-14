@@ -183,7 +183,6 @@ public class MinMaxAddon {
 	};
 
 	private void setState(MUIElement element, String state) {
-		element.getTags().remove(MINIMIZED_BY_ZOOM);
 		if (MINIMIZED.equals(state)) {
 			element.getTags().remove(MAXIMIZED);
 			element.getTags().add(MINIMIZED);
@@ -595,7 +594,6 @@ public class MinMaxAddon {
 		ts.restoreStack();
 
 		adjustCTFButtons(element);
-		element.getTags().remove(MINIMIZED_BY_ZOOM);
 
 		List<String> maximizeTag = new ArrayList<String>();
 		maximizeTag.add(IPresentationEngine.MAXIMIZED);
@@ -704,11 +702,13 @@ public class MinMaxAddon {
 			}
 
 			// Find the editor 'area'
-			MPlaceholder eaPlaceholder = (MPlaceholder) modelService.find(ID_EDITOR_AREA,
-					persp == null ? win : persp);
-			if (element != eaPlaceholder && eaPlaceholder != null
-					&& eaPlaceholder.getWidget() != null && eaPlaceholder.isVisible()) {
-				elementsToMinimize.add(eaPlaceholder);
+			if (persp != null) {
+				MPlaceholder eaPlaceholder = (MPlaceholder) modelService
+						.find(ID_EDITOR_AREA, persp);
+				if (element != eaPlaceholder && eaPlaceholder != null
+						&& eaPlaceholder.getWidget() != null && eaPlaceholder.isVisible()) {
+					elementsToMinimize.add(eaPlaceholder);
+				}
 			}
 		}
 
@@ -779,6 +779,7 @@ public class MinMaxAddon {
 
 		List<MUIElement> elementsToRestore = getElementsToRestore(element);
 		for (MUIElement toRestore : elementsToRestore) {
+			toRestore.getTags().remove(IPresentationEngine.MINIMIZED_BY_ZOOM);
 			toRestore.getTags().remove(IPresentationEngine.MINIMIZED);
 		}
 
@@ -965,9 +966,8 @@ public class MinMaxAddon {
 	private String getMinimizedElementSuffix(MUIElement element) {
 		String id = ID_SUFFIX;
 		MPerspective persp = modelService.getPerspectiveFor(element);
-		MWindow window = getWindowFor(element);
 		if (persp != null) {
-			id = '(' + window.getElementId() + '.' + persp.getElementId() + ')';
+			id = '(' + persp.getElementId() + ')';
 		}
 		return id;
 	}
