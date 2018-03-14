@@ -179,12 +179,16 @@ public class ViewContentProvider implements ITreeContentProvider {
 	 * @return result of the check
 	 */
 	private boolean isFilteredByActivity(String elementId) {
+		// this list of views has already been filtered by the registry
 		IViewDescriptor[] views = viewRegistry.getViews();
+
 		for (IViewDescriptor descriptor : views) {
-			if (descriptor.getId().equals(elementId) && WorkbenchActivityHelper.filterItem(descriptor)) {
-				return true;
+			if (descriptor.getId().equals(elementId)) {
+				return WorkbenchActivityHelper.filterItem(descriptor);
 			}
 		}
-		return false;
+
+		// if we can't find a matching view, consider the element filtered out
+		return true;
 	}
 }
