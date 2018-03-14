@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,11 +7,12 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.navigator;
 
 import java.util.HashSet;
+
+import junit.framework.Assert;
 
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -52,7 +53,7 @@ public class DuplicateMenuItemTest extends AbstractNavigatorTest {
         for (int i = 0; i < items.length; i++) {
             String label = items[i].getText();
             System.out.println(label);
-            assertTrue("Duplicate menu entry in: " + menuName + " "
+            Assert.assertTrue("Duplicate menu entry in: " + menuName + " "
                     + label, !labels.contains(label));
             if (items[i].getMenu() != null)
                 checkMenu(items[i].getMenu(), label);
