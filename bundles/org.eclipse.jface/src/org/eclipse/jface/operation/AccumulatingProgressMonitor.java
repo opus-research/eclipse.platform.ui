@@ -10,32 +10,30 @@
  *******************************************************************************/
 package org.eclipse.jface.operation;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IProgressMonitorWithBlocking;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ProgressMonitorWrapper;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Display;
 
 /**
- * A progress monitor that accumulates <code>setTaskName</code>,
- * <code>worked</code> and <code>subtask</code> calls in the following way by
- * wrapping a standard progress monitor:
+ * A progress monitor that accumulates <code>worked</code> and <code>subtask</code> 
+ * calls in the following way by wrapping a standard progress monitor:
  * <ul>
- * <li>When a <code>setTaskName</code>, <code>worked</code> or
- * <code>subtask</code> call occurs the first time, the progress monitor posts a
- * runnable into the asynchronous SWT event queue.</li>
- * <li>Subsequent calls to <code>setTaskName</code>, <code>worked</code> or
- * <code>subtask</code> do not post a new runnable as long as a previous
- * runnable still exists in the SWT event queue. In this case, the progress
- * monitor just updates the internal state of the runnable that waits in the SWT
- * event queue for its execution. If no runnable exists, a new one is created
- * and posted into the event queue.
+ * <li> When a <code>worked</code> or <code>subtask</code> call occurs the first time,
+ *		the progress monitor posts a runnable into the asynchronous SWT event queue.
+ * </li>
+ * <li> Subsequent calls to <code>worked</code> or <code>subtask</code> do not post
+ *		a new runnable as long as a previous runnable still exists in the SWT event
+ *		queue. In this case, the progress monitor just updates the internal state of
+ *		the runnable that waits in the SWT event queue for its execution. If no runnable
+ *		exists, a new one is created and posted into the event queue.
  * </ul>
  * <p>
- * This class is internal to the framework; clients outside JFace should not use
- * this class.
+ * This class is internal to the framework; clients outside JFace should not
+ * use this class.
  * </p>
  */
 /* package */class AccumulatingProgressMonitor extends ProgressMonitorWrapper {
@@ -53,38 +51,23 @@ import org.eclipse.swt.widgets.Display;
     private String currentTask = ""; //$NON-NLS-1$
 
     private class Collector implements Runnable {
-		private String taskName;
-
         private String subTask;
 
         private double worked;
 
         private IProgressMonitor monitor;
 
-		/**
-		 * Create a new collector.
-		 * 
-		 * @param taskName
-		 * @param subTask
-		 * @param work
-		 * @param monitor
-		 */
-		public Collector(String taskName, String subTask, double work,
-				IProgressMonitor monitor) {
-			this.taskName = taskName;
-			this.subTask = subTask;
-			this.worked = work;
-			this.monitor = monitor;
-		}
-
-		/**
-		 * Set the task name
-		 * 
-		 * @param name
-		 */
-		public void setTaskName(String name) {
-			this.taskName = name;
-		}
+        /**
+         * Create a new collector.
+         * @param subTask
+         * @param work
+         * @param monitor
+         */
+        public Collector(String subTask, double work, IProgressMonitor monitor) {
+            this.subTask = subTask;
+            this.worked = work;
+            this.monitor = monitor;
+        }
 
         /**
          * Add worked to the work.
@@ -108,9 +91,6 @@ import org.eclipse.swt.widgets.Display;
         @Override
 		public void run() {
             clearCollector(this);
-			if (taskName != null) {
-				monitor.setTaskName(taskName);
-			}
             if (subTask != null) {
 				monitor.subTask(subTask);
 			}
@@ -169,9 +149,8 @@ import org.eclipse.swt.widgets.Display;
      * @param subTask
      * @param work
      */
-	private void createCollector(String taskName, String subTask, double work) {
-		collector = new Collector(taskName, subTask, work,
-				getWrappedProgressMonitor());
+    private void createCollector(String subTask, double work) {
+        collector = new Collector(subTask, work, getWrappedProgressMonitor());
         display.asyncExec(collector);
     }
 
@@ -197,7 +176,7 @@ import org.eclipse.swt.widgets.Display;
     @Override
 	public synchronized void internalWorked(final double work) {
         if (collector == null) {
-			createCollector(null, null, work);
+            createCollector(null, work);
         } else {
             collector.worked(work);
         }
@@ -208,11 +187,16 @@ import org.eclipse.swt.widgets.Display;
      */
     @Override
 	public void setTaskName(final String name) {
-		if (collector == null) {
-			createCollector(name, null, 0);
-		} else {
-			collector.setTaskName(name);
+        synchronized (this) {
+            collector = null;
         }
+        display.asyncExec(new Runnable() {
+            @Override
+			public void run() {
+                currentTask = name;
+                getWrappedProgressMonitor().setTaskName(name);
+            }
+        });
     }
 
     /* (non-Javadoc)
@@ -221,7 +205,7 @@ import org.eclipse.swt.widgets.Display;
     @Override
 	public synchronized void subTask(final String name) {
         if (collector == null) {
-			createCollector(null, name, 0);
+            createCollector(name, 0);
         } else {
             collector.subTask(name);
         }
