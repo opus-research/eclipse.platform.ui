@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Rüdiger Herrmann - fix for bug 418420
+ *     R�diger Herrmann - fix for bug 418420
  *******************************************************************************/
 package org.eclipse.jface.fieldassist;
 
@@ -362,9 +362,8 @@ public class ControlDecoration {
 			int y = -extent.y - hah + 1;
 			int x = arrowOnLeft ? -hao + haw / 2 : -extent.x + hao + haw / 2;
 
-			Point hoverSize = hoverShell.getSize();
-			Rectangle hoverBounds = control.getDisplay().map(control.getParent(), null, decorationRectangle.x + x, decorationRectangle.y + y, hoverSize.x, hoverSize.y);
-			hoverShell.setLocation(hoverBounds.x, hoverBounds.y);
+			hoverShell.setLocation(control.getParent().toDisplay(
+					decorationRectangle.x + x, decorationRectangle.y + y));
 		}
 
 		/*
