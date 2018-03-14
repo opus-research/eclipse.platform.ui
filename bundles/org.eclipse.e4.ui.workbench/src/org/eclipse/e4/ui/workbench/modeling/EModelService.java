@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Manumitting Technologies Inc - Bug 380609
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.modeling;
@@ -298,7 +297,7 @@ public interface EModelService {
 	 * @param newParent
 	 *            The new parent for the element.
 	 */
-	public <T extends MUIElement> void move(T element, MElementContainer<? super T> newParent);
+	public void move(MUIElement element, MElementContainer<MUIElement> newParent);
 
 	/**
 	 * Move the element to a new location. The element will be placed at the end of the new parent's
@@ -312,7 +311,7 @@ public interface EModelService {
 	 * @param leavePlaceholder
 	 *            true if a placeholder for the element should be added
 	 */
-	public <T extends MUIElement> void move(T element, MElementContainer<? super T> newParent,
+	public void move(MUIElement element, MElementContainer<MUIElement> newParent,
 			boolean leavePlaceholder);
 
 	/**
@@ -326,7 +325,7 @@ public interface EModelService {
 	 * @param index
 	 *            The index to insert the element at; -1 means at the end
 	 */
-	public <T extends MUIElement> void move(T element, MElementContainer<? super T> newParent, int index);
+	public void move(MUIElement element, MElementContainer<MUIElement> newParent, int index);
 
 	/**
 	 * Move the element to a new location. The element will be placed at the end of the new parent's
@@ -341,24 +340,21 @@ public interface EModelService {
 	 * @param leavePlaceholder
 	 *            true if a placeholder for the element should be added
 	 */
-	public <T extends MUIElement> void move(T element, MElementContainer<? super T> newParent, int index,
+	public void move(MUIElement element, MElementContainer<MUIElement> newParent, int index,
 			boolean leavePlaceholder);
 
 	/**
-	 * Inserts the given element into the UI Model by either creating a new sash
-	 * or augmenting an existing sash if the orientation permits.
+	 * Inserts the given element into the UI Model by either creating a new sash or augmenting an
+	 * existing sash if the orientation permits.
 	 *
 	 * @param toInsert
 	 *            The element to insert
 	 * @param relTo
 	 *            The element that the new one is to be relative to
 	 * @param where
-	 *            Indication of where the inserted element should be placed:
-	 *            {@link #LEFT_OF}, {@link #RIGHT_OF}, {@link #ABOVE},
-	 *            {@link #BELOW}.
+	 *            An SWT constant indicating where the inserted element should be placed
 	 * @param ratio
-	 *            The percentage of the area to be occupied by the inserted
-	 *            element; should be a number greater than 0 and less than 1
+	 *            The percentage of the area to be occupied by the inserted element
 	 */
 	public void insert(MPartSashContainerElement toInsert, MPartSashContainerElement relTo,
 			int where, float ratio);
@@ -377,7 +373,8 @@ public interface EModelService {
 	 * @param height
 	 *            The Height of the new window
 	 */
-	public void detach(MPartSashContainerElement mPartSashContainerElement, int x, int y, int width, int height);
+	public void detach(MPartSashContainerElement mPartSashContainerElement, int x, int y,
+			int width, int height);
 
 	/**
 	 * Get the top-level window containing this UI element. A <code>null</code> return value

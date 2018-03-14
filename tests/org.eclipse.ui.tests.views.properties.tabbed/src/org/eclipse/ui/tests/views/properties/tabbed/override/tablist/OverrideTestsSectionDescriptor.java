@@ -37,17 +37,30 @@ public class OverrideTestsSectionDescriptor extends AbstractSectionDescriptor {
 
 	private ISection section;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.views.properties.tabbed.AbstractSectionDescriptor#appliesTo(org.eclipse.ui.IWorkbenchPart,
+	 *      org.eclipse.jface.viewers.ISelection)
+	 */
 	public boolean appliesTo(IWorkbenchPart part, ISelection selection) {
 		return true;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.views.properties.tabbed.ISectionDescriptor#getId()
+	 */
 	public String getId() {
 		return "org.eclipse.ui.tests.views.properties.tabbed.override"; //$NON-NLS-1$
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.views.properties.tabbed.ISectionDescriptor#getSectionClass()
+	 */
 	public ISection getSectionClass() {
 		if (section == null) {
 			this.section = new OverrideTestsSection();
@@ -55,7 +68,11 @@ public class OverrideTestsSectionDescriptor extends AbstractSectionDescriptor {
 		return section;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.views.properties.tabbed.ISectionDescriptor#getTargetTab()
+	 */
 	public String getTargetTab() {
 		return "org.eclipse.ui.tests.views.properties.tabbed.override"; //$NON-NLS-1$
 	}

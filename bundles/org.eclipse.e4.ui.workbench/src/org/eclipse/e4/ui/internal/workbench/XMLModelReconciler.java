@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -141,7 +140,7 @@ public class XMLModelReconciler extends ModelReconciler {
 	/**
 	 * A map of all the objects that were originally defined in the model.
 	 */
-	private WeakHashMap<EObject, EObject> originalObjects = new WeakHashMap<>();
+	private WeakHashMap<EObject, EObject> originalObjects = new WeakHashMap<EObject, EObject>();
 
 	/**
 	 * Records all of the objects in the original model so that we can determine whether an element
@@ -180,7 +179,7 @@ public class XMLModelReconciler extends ModelReconciler {
 
 	static List<Object> getReferences(Object object) {
 		Iterator<EObject> it = ((EObject) object).eAllContents();
-		List<Object> references = new LinkedList<>();
+		List<Object> references = new LinkedList<Object>();
 		while (it.hasNext()) {
 			Object reference = it.next();
 			references.add(reference);
@@ -195,7 +194,7 @@ public class XMLModelReconciler extends ModelReconciler {
 
 		Document document = (Document) serializedState;
 
-		Collection<ModelDelta> deltas = new LinkedList<>();
+		Collection<ModelDelta> deltas = new LinkedList<ModelDelta>();
 
 		Element rootElement = document.getDocumentElement();
 		String version = rootElement.getAttribute(VERSION_ATTNAME);
@@ -514,7 +513,7 @@ public class XMLModelReconciler extends ModelReconciler {
 
 	private ModelDelta createMapDelta(EObject object, Element innerElement,
 			EStructuralFeature feature) {
-		Map<String, String> deltaMap = new HashMap<>();
+		Map<String, String> deltaMap = new HashMap<String, String>();
 		NodeList attributes = (NodeList) innerElement;
 		for (int j = 0; j < attributes.getLength(); j++) {
 			Node entry = attributes.item(j);
@@ -541,11 +540,11 @@ public class XMLModelReconciler extends ModelReconciler {
 
 		if (userSize == 0) {
 			// the user removed all the original parts
-			List<Object> collectedReferences = new ArrayList<>(currentReferences);
+			List<Object> collectedReferences = new ArrayList<Object>(currentReferences);
 			collectedReferences.removeAll(originalReferences);
 			return collectedReferences;
 		} else if (originalSize == 0) {
-			List<Object> collectedReferences = new ArrayList<>(userReferences);
+			List<Object> collectedReferences = new ArrayList<Object>(userReferences);
 			collectedReferences.addAll(currentReferences);
 			return collectedReferences;
 		} else if (currentReferences.isEmpty()) {
@@ -559,16 +558,16 @@ public class XMLModelReconciler extends ModelReconciler {
 
 		if (originalReferences.containsAll(userReferences)
 				&& !userReferences.containsAll(originalReferences)) {
-			List<Object> collectedReferences2 = new ArrayList<>(originalReferences);
+			List<Object> collectedReferences2 = new ArrayList<Object>(originalReferences);
 			collectedReferences2.removeAll(userReferences);
 
-			List<Object> collectedReferences = new ArrayList<>(currentReferences);
+			List<Object> collectedReferences = new ArrayList<Object>(currentReferences);
 			collectedReferences.removeAll(collectedReferences2);
 
 			return collectedReferences;
 		}
 
-		List<Position> positions = new ArrayList<>();
+		List<Position> positions = new ArrayList<Position>();
 
 		for (int i = 0; i < userReferences.size(); i++) {
 			Object user = userReferences.get(i);
@@ -579,7 +578,7 @@ public class XMLModelReconciler extends ModelReconciler {
 			}
 		}
 
-		List<Object> collectedRefs = new ArrayList<>(currentReferences);
+		List<Object> collectedRefs = new ArrayList<Object>(currentReferences);
 
 		for (Position position : positions) {
 			Object after = position.getAfter();
@@ -656,8 +655,8 @@ public class XMLModelReconciler extends ModelReconciler {
 	private ModelDelta createMultiReferenceDelta(Collection<ModelDelta> deltas,
 			List<Object> references, EObject eObject, EStructuralFeature feature, Element node) {
 		NodeList referencedIds = (NodeList) node;
-		List<Object> originalReferences = new ArrayList<>();
-		List<Object> userReferences = new ArrayList<>();
+		List<Object> originalReferences = new ArrayList<Object>();
+		List<Object> userReferences = new ArrayList<Object>();
 		List<?> currentReferences = (List<?>) eObject.eGet(feature);
 
 		for (int i = 0; i < referencedIds.getLength(); i++) {
@@ -758,7 +757,7 @@ public class XMLModelReconciler extends ModelReconciler {
 								compositeDelta.add(delta);
 							}
 						} else if (isChainedReference(attributeName)) {
-							List<Object> objectReferences = new ArrayList<>();
+							List<Object> objectReferences = new ArrayList<Object>();
 							NodeList objectReferenceNodes = (NodeList) item;
 
 							for (int j = 0; j < objectReferenceNodes.getLength(); j++) {
@@ -811,7 +810,7 @@ public class XMLModelReconciler extends ModelReconciler {
 
 	private ModelDelta createUnorderedChainedAttributeDelta(EObject object,
 			EStructuralFeature feature, Element node, String featureName) {
-		Set<Object> values = new HashSet<>();
+		Set<Object> values = new HashSet<Object>();
 		NodeList attributes = (NodeList) node;
 		for (int j = 0; j < attributes.getLength(); j++) {
 			Node item = attributes.item(j);
@@ -825,7 +824,7 @@ public class XMLModelReconciler extends ModelReconciler {
 		List<?> currentValues = (List<?>) object.eGet(feature);
 		values.addAll(currentValues);
 
-		return new EMFModelDeltaSet(object, feature, new ArrayList<>(values));
+		return new EMFModelDeltaSet(object, feature, new ArrayList<Object>(values));
 	}
 
 	private ModelDelta createAttributeDelta(EObject eObject, EStructuralFeature feature,

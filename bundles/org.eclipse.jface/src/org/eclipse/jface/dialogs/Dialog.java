@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -213,7 +213,7 @@ public abstract class Dialog extends Window {
 	/**
 	 * Collection of buttons created by the <code>createButton</code> method.
 	 */
-	private HashMap<Integer, Button> buttons = new HashMap<>();
+	private HashMap<Integer, Button> buttons = new HashMap<Integer, Button>();
 
 	/**
 	 * Font metrics to use for determining pixel sizes.
@@ -605,7 +605,8 @@ public abstract class Dialog extends Window {
 	 * @see #getCancelButton
 	 * @see #getOKButton()
 	 */
-	protected Button createButton(Composite parent, int id, String label, boolean defaultButton) {
+	protected Button createButton(Composite parent, int id, String label,
+			boolean defaultButton) {
 		// increment the number of columns in the button bar
 		((GridLayout) parent.getLayout()).numColumns++;
 		Button button = new Button(parent, SWT.PUSH);
@@ -988,7 +989,7 @@ public abstract class Dialog extends Window {
 
 		boolean returnValue = super.close();
 		if (returnValue) {
-			buttons = new HashMap<>();
+			buttons = new HashMap<Integer, Button>();
 			buttonBar = null;
 			dialogArea = null;
 		}

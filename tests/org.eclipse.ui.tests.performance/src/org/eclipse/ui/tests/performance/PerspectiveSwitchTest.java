@@ -45,8 +45,7 @@ public class PerspectiveSwitchTest extends BasicPerformanceTest {
     /**
      * Test perspective switching performance.
      */
-    @Override
-	protected void runTest() throws CoreException, WorkbenchException {
+    protected void runTest() throws CoreException, WorkbenchException {
         // Get the two perspectives to switch between.
         final IPerspectiveRegistry registry = WorkbenchPlugin.getDefault()
                 .getPerspectiveRegistry();
@@ -85,8 +84,7 @@ public class PerspectiveSwitchTest extends BasicPerformanceTest {
        	tagIfNecessary("UI - Perspective Switch", Dimension.ELAPSED_PROCESS);
 
         exercise(new TestRunnable() {
-            @Override
-			public void run() throws Exception {
+            public void run() throws Exception {
                 processEvents();
 
                 startMeasuring();

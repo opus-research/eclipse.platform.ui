@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.actions;
 
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.bindings.TriggerSequence;
@@ -78,7 +77,7 @@ public abstract class QuickMenuAction extends Action {
      */
     public String getShortCutString() {
 		final IWorkbench workbench = PlatformUI.getWorkbench();
-		final IBindingService bindingService = Adapters.adapt(workbench, IBindingService.class);
+		final IBindingService bindingService = workbench.getAdapter(IBindingService.class);
 		final TriggerSequence[] activeBindings = bindingService
 				.getActiveBindingsFor(getActionDefinitionId());
 		if (activeBindings.length > 0) {

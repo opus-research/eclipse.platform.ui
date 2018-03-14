@@ -11,7 +11,6 @@
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -165,7 +164,7 @@ public final class ViewIntroAdapterPart extends ViewPart {
 
     @Override
 	public <T> T getAdapter(Class<T> adapter) {
-		return Adapters.adapt(introPart, adapter);
+        return introPart.getAdapter(adapter);
     }
 
     @Override

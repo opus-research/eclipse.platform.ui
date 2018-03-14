@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -87,7 +87,7 @@ public class ProgressInfoItem extends Composite {
 
 	ToolItem actionButton;
 
-	List<Link> taskEntries = new ArrayList<>(0);
+	List<Link> taskEntries = new ArrayList<Link>(0);
 
 	private ProgressBar progressBar;
 
@@ -221,14 +221,17 @@ public class ProgressInfoItem extends Composite {
 		actionButton
 				.setToolTipText(ProgressMessages.NewProgressView_CancelJobToolTip);
 		actionButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				actionButton.setEnabled(false);
 				cancelOrRemove();
 			}
 		});
 		actionBar.addListener(SWT.Traverse, new Listener() {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+			 */
 			public void handleEvent(Event event) {
 				if (indexListener == null) {
 					return;
@@ -255,7 +258,11 @@ public class ProgressInfoItem extends Composite {
 		progressLabel.setLayoutData(progressData);
 
 		mouseListener = new MouseAdapter() {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.swt.events.MouseListener#mouseDown(org.eclipse.swt.events.MouseEvent)
+			 */
 			public void mouseDown(MouseEvent e) {
 				if (indexListener != null) {
 					indexListener.select();
@@ -748,14 +755,22 @@ public class ProgressInfoItem extends Composite {
 			link.setLayoutData(linkData);
 
 			link.addSelectionListener(new SelectionAdapter() {
-				@Override
+				/*
+				 * (non-Javadoc)
+				 *
+				 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+				 */
 				public void widgetSelected(SelectionEvent e) {
 					executeTrigger();
 				}
 			});
 
 			link.addListener(SWT.Resize, new Listener() {
-				@Override
+				/*
+				 * (non-Javadoc)
+				 *
+				 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+				 */
 				public void handleEvent(Event event) {
 
 					Object text = link.getData(TEXT_KEY);
@@ -987,7 +1002,9 @@ public class ProgressInfoItem extends Composite {
 			refresh();
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.widgets.Widget#dispose()
+	 */
 	public void dispose() {
 		super.dispose();
 		if(resourceManager != null)
