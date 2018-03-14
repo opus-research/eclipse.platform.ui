@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.internal.util;
 
@@ -42,18 +41,12 @@ public class FailureDialog extends Dialog {
         super(parentShell);
     }
 
-    /* (non-Javadoc)
-     * Method declared on Window.
-     */
     @Override
 	protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
         newShell.setText("Dialog Test Failed");
     }
 
-    /* (non-Javadoc)
-     * Method declared on Dialog.
-     */
     @Override
 	protected void createButtonsForButtonBar(Composite parent) {
         createButton(parent, IDialogConstants.OK_ID, "&OK", true);
@@ -61,9 +54,6 @@ public class FailureDialog extends Dialog {
                 IDialogConstants.CANCEL_LABEL, false);
     }
 
-    /* (non-Javadoc)
-     * Method declared on Dialog.
-     */
     @Override
 	protected Control createDialogArea(Composite parent) {
         // page group
@@ -85,9 +75,6 @@ public class FailureDialog extends Dialog {
         return composite;
     }
 
-    /* (non-Javadoc)
-     * Method declared on Dialog.
-     */
     @Override
 	protected void okPressed() {
         _log = _text.getText();
@@ -99,7 +86,11 @@ public class FailureDialog extends Dialog {
      * the dialog.
      */
     String getText() {
-		return (_log == null) ? "Empty entry." : _log;
+        if (_log == null) {
+            return "Empty entry.";
+        } else {
+            return _log;
+        }
     }
 
     /*
