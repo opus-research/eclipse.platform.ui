@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,10 +7,12 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Sergey Prigogin (Google) - Bug 234331 - IStructuredSelection should be Iterable
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -79,7 +81,7 @@ public class StructuredSelection implements IStructuredSelection {
      * Creates a structured selection from the given <code>List</code>. 
      * @param elements list of selected elements
      */
-    public StructuredSelection(List elements) {
+	public StructuredSelection(List<?> elements) {
     	this(elements, null);
     }
 
@@ -95,7 +97,7 @@ public class StructuredSelection implements IStructuredSelection {
 	 *            the comparer, or null
 	 * @since 3.4
 	 */
-	public StructuredSelection(List elements, IElementComparer comparer) {
+	public StructuredSelection(List<?> elements, IElementComparer comparer) {
         Assert.isNotNull(elements);
         this.elements = elements.toArray();
         this.comparer = comparer;
@@ -161,9 +163,8 @@ public class StructuredSelection implements IStructuredSelection {
     }
 
     @Override
-	public Iterator iterator() {
-        return Arrays.asList(elements == null ? new Object[0] : elements)
-                .iterator();
+	public Iterator<Object> iterator() {
+		return (elements == null ? Collections.emptyList() : Arrays.asList(elements)).iterator();
     }
 
     @Override
@@ -176,9 +177,10 @@ public class StructuredSelection implements IStructuredSelection {
         return elements == null ? new Object[0] : (Object[]) elements.clone();
     }
 
-    @Override
-	public List toList() {
-        return Arrays.asList(elements == null ? new Object[0] : elements);
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> List<T> toList() {
+		return (List<T>) (elements == null ? Collections.emptyList() : Arrays.asList(elements));
     }
 
     /**
