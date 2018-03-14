@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 410426
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 426535, 433234
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 426535, 433234, 431868
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 431778
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
@@ -41,6 +41,7 @@ import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.SideValue;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
+import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MDirectToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
@@ -473,13 +474,15 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	private void addCleanupDisposeListener(final MToolBar toolbarModel,
 			ToolBar control) {
 
-		if (!toolbarModel.getTags().contains(DISPOSE_ADDED)) {
-			toolbarModel.getTags().add(DISPOSE_ADDED);
+		final Map<String, Object> transientData = toolbarModel
+				.getTransientData();
+		if (!transientData.containsKey(DISPOSE_ADDED)) {
+			transientData.put(DISPOSE_ADDED, Boolean.TRUE);
 			control.addDisposeListener(new DisposeListener() {
 				@Override
 				public void widgetDisposed(DisposeEvent e) {
 					cleanUp(toolbarModel);
-					toolbarModel.getTags().remove(DISPOSE_ADDED);
+					transientData.remove(DISPOSE_ADDED);
 				}
 			});
 		}
@@ -1053,16 +1056,18 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	}
 
 	/**
-	 * Removes the IPresentationEngine.HIDDEN_EXPLICITLY from the toolbar entres
+	 * Removes the IPresentationEngine.HIDDEN_EXPLICITLY from the trimbar
+	 * entries. Having a separate logic for toolbars and toolcontrols would be
+	 * confusing for the user, hence we remove this tag for both these types
 	 *
 	 * @param toolbarModel
 	 */
 	private void removeHiddenTags(MToolBar toolbarModel) {
 		MWindow mWindow = modelService.getTopLevelWindowFor(toolbarModel);
-		List<MToolBar> toolBars = modelService.findElements(mWindow, null,
-				MToolBar.class, null);
-		for (MToolBar mToolBar : toolBars) {
-			mToolBar.getTags().remove(IPresentationEngine.HIDDEN_EXPLICITLY);
+		List<MTrimElement> trimElements = modelService.findElements(mWindow,
+				null, MTrimElement.class, null);
+		for (MTrimElement trimElement : trimElements) {
+			trimElement.getTags().remove(IPresentationEngine.HIDDEN_EXPLICITLY);
 		}
 	}
 

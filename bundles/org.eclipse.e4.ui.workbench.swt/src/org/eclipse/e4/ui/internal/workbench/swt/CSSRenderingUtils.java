@@ -17,6 +17,8 @@ import org.eclipse.e4.ui.css.swt.dom.ControlElement;
 import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
 import org.eclipse.e4.ui.widgets.ImageBasedFrame;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -61,13 +63,13 @@ public class CSSRenderingUtils {
 			ImageBasedFrame frame = new ImageBasedFrame(toFrame.getParent(),
 					toFrame, vertical, draggable);
 			frame.setImages(frameImage, frameInts, handleImage);
-			addFrameImageDisposedListener(toFrame, classId, vertical);
+			addFrameImageDisposedListener(frame, toFrame, classId, vertical);
 			return frame;
 		} else if (handleImage != null) {
 			ImageBasedFrame frame = new ImageBasedFrame(toFrame.getParent(),
 					toFrame, vertical, draggable);
 			frame.setImages(null, null, handleImage);
-			addHandleImageDisposedListener(toFrame, classId, vertical);
+			addHandleImageDisposedListener(frame, toFrame, classId, vertical);
 			return frame;
 		}
 
@@ -219,12 +221,18 @@ public class CSSRenderingUtils {
 		return image;
 	}
 
-	private void addHandleImageDisposedListener(final Control toFrame,
+	private void addHandleImageDisposedListener(
+			ImageBasedFrame imageBasedFrame, final Control toFrame,
 			final String classId, final boolean vertical) {
-		toFrame.getDisplay().addListener(SWT.Skin, new Listener() {
+		final Listener listener = new Listener() {
 			@Override
 			public void handleEvent(Event event) {
 				if (!(event.widget instanceof ImageBasedFrame)) {
+					return;
+				}
+
+				ImageBasedFrame frame = (ImageBasedFrame) event.widget;
+				if (!isImagesRefreshRequired(frame)) {
 					return;
 				}
 
@@ -235,16 +243,24 @@ public class CSSRenderingUtils {
 							handleImage, null);
 				}
 				if (handleImage != null) {
-					((ImageBasedFrame) event.widget).setImages(null, null,
-							handleImage);
+					frame.setImages(null, null, handleImage);
 				}
+			}
+		};
+
+		toFrame.getDisplay().addListener(SWT.Skin, listener);
+
+		imageBasedFrame.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				e.widget.getDisplay().removeListener(SWT.Skin, listener);
 			}
 		});
 	}
 
-	private void addFrameImageDisposedListener(final Control toFrame,
-			final String classId, final boolean vertical) {
-		toFrame.getDisplay().addListener(SWT.Skin, new Listener() {
+	private void addFrameImageDisposedListener(ImageBasedFrame imageBasedFrame,
+			final Control toFrame, final String classId, final boolean vertical) {
+		final Listener listener = new Listener() {
 			@Override
 			public void handleEvent(Event event) {
 				if (!(event.widget instanceof ImageBasedFrame)) {
@@ -252,6 +268,10 @@ public class CSSRenderingUtils {
 				}
 
 				ImageBasedFrame frame = (ImageBasedFrame) event.widget;
+				if (!isImagesRefreshRequired(frame)) {
+					return;
+				}
+
 				Integer[] frameInts = new Integer[4];
 				Image frameImage = createImage(toFrame, classId,
 						FRAME_IMAGE_PROP, frameInts);
@@ -269,7 +289,30 @@ public class CSSRenderingUtils {
 				if (frameImage != null) {
 					frame.setImages(frameImage, frameInts, handleImage);
 				}
+			 }
+		};
+			
+		toFrame.getDisplay().addListener(SWT.Skin, listener);
+
+		imageBasedFrame.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				e.widget.getDisplay().removeListener(SWT.Skin, listener);
 			}
 		});
+	}
+
+	private boolean isImagesRefreshRequired(ImageBasedFrame frame) {
+		Object handleImage = frame.getData("handleImage");
+		if (handleImage instanceof Image && ((Image) handleImage).isDisposed()) {
+			return true;
+		}
+
+		Object frameImage = frame.getData("frameImage");
+		if (frameImage instanceof Image && ((Image) frameImage).isDisposed()) {
+			return true;
+		}
+
+		return false;
 	}
 }
