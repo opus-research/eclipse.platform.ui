@@ -12,45 +12,43 @@ package org.eclipse.jface.viewers.deferred;
 
 import java.util.Comparator;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.AcceptAllFilter;
 import org.eclipse.jface.viewers.IFilter;
 import org.eclipse.jface.viewers.deferred.ConcurrentTableUpdator.Range;
 
 /**
- * Contains the algorithm for performing background sorting and filtering in a
- * virtual table. This is the real implementation for
- * <code>DeferredContentProvider</code>. However, this class will work with
- * anything that implements <code>AbstractVirtualTable</code> rather than being
- * tied to a <code>TableViewer</code>.
+ * Contains the algorithm for performing background sorting and filtering in a virtual
+ * table. This is the real implementation for <code>DeferredContentProvider</code>.
+ * However, this class will work with anything that implements <code>AbstractVirtualTable</code>
+ * rather than being tied to a <code>TableViewer</code>.
  * 
  * <p>
- * This is package visibility since it currently only needs to be used in one
- * place, but it could potentially be made public if there was a need to use the
- * same background sorting algorithm for something other than a TableViewer.
+ * This is package visiblity since it currently only needs to be used in one place,
+ * but it could potentially be made public if there was a need to use the same background
+ * sorting algorithm for something other than a TableViewer. 
  * </p>
  * 
  * <p>
  * Information flow is like this:
  * </p>
  * <ol>
- * <li>IConcurrentModel sends unordered elements to BackgroundContentProvider
- * (in a background thread)</li>
- * <li>BackgroundContentProvider sorts, filters, and sends element/index pairs
- * to ConcurrentTableUpdator (in a background thread)</li>
- * <li>ConcurrentTableUpdator batches the updates and sends them to an
- * AbstractVirtualTable (in the UI thread)</li>
+ * <li>IConcurrentModel sends unordered elements to BackgroundContentProvider (in a background thread)</li>
+ * <li>BackgroundContentProvider sorts, filters, and sends element/index pairs to
+ *     ConcurrentTableUpdator (in a background thread)</li>
+ * <li>ConcurrentTableUpdator batches the updates and sends them to an AbstractVirtualTable 
+ *     (in the UI thread)</li>  
  * </ol>
  * 
  * <p>
- * Internally, sorting is done using a <code>LazySortedCollection</code>. This
- * data structure allows the content provider to locate and sort the visible
- * range without fully sorting all elements in the table. It also supports fast
- * cancellation, allowing the visible range to change in the middle of a sort
- * without discarding partially-sorted information from the previous range.
+ * Internally, sorting is done using a <code>LazySortedCollection</code>. This data structure
+ * allows the content provider to locate and sort the visible range without fully sorting
+ * all elements in the table. It also supports fast cancellation, allowing the visible range
+ * to change in the middle of a sort without discarding partially-sorted information from
+ * the previous range.
  * </p>
  * 
  * @since 3.1
@@ -91,22 +89,33 @@ import org.eclipse.jface.viewers.deferred.ConcurrentTableUpdator.Range;
      * Listener that gets callbacks from the model
      */
     private IConcurrentModelListener listener = new IConcurrentModelListener() {
-
+    	/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.deferred.IConcurrentModelListener#add(java.lang.Object[])
+		 */
 		@Override
 		public void add(Object[] added) {
 			BackgroundContentProvider.this.add(added);
 		}
 		
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.deferred.IConcurrentModelListener#remove(java.lang.Object[])
+		 */
 		@Override
 		public void remove(Object[] removed) {
 			BackgroundContentProvider.this.remove(removed);
 		}
 		
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.deferred.IConcurrentModelListener#setContents(java.lang.Object[])
+		 */
 		@Override
 		public void setContents(Object[] newContents) {
 			BackgroundContentProvider.this.setContents(newContents);
 		}
 		
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.deferred.IConcurrentModelListener#update(java.lang.Object[])
+		 */
 		@Override
 		public void update(Object[] changed) {
 			BackgroundContentProvider.this.update(changed);
@@ -499,7 +508,7 @@ import org.eclipse.jface.viewers.deferred.ConcurrentTableUpdator.Range;
     /**
 	 * Cancels any sort in progress. Note that we try to use the
 	 * FastProgresReporter if possible since this is more responsive than
-	 * canceling the sort job. However, it is not a problem to cancel in both
+	 * cancelling the sort job. However, it is not a problem to cancel in both
 	 * ways.
 	 */
     private void cancelSortJob() {
