@@ -9,7 +9,6 @@
  *     Matthew Hall - initial API and implementation (bug 194734)
  *     Matthew Hall - bugs 256543, 213893, 262320, 262946, 264286, 266563,
  *                    169876, 306203
- *     Eugen Neufeld - bug 461560
  ******************************************************************************/
 
 package org.eclipse.jface.databinding.swt;
@@ -43,7 +42,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DateTime;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
@@ -248,13 +246,13 @@ public class WidgetProperties {
 	/**
 	 * Returns a value property for observing the text of a {@link Button},
 	 * {@link CCombo}, {@link CLabel}, {@link Combo}, {@link Item},
-	 * {@link Label}, {@link Link}, {@link Shell}, {@link Group},
-	 * {@link StyledText} or {@link Text}.
+	 * {@link Label}, {@link Link}, {@link Shell}, {@link StyledText} or
+	 * {@link Text}.
 	 * 
 	 * @return a value property for observing the text of a {@link Button},
-	 *         {@link CCombo}, {@link CLabel}, {@link Combo}, {@link Group},
-	 *         {@link Item}, {@link Label}, {@link Link}, {@link Shell}, link
-	 *         StyledText} or {@link Text}.
+	 *         {@link CCombo}, {@link CLabel}, {@link Combo}, {@link Item},
+	 *         {@link Label}, {@link Link}, {@link Shell}, {@link StyledText} or
+	 *         {@link Text}.
 	 */
 	public static IWidgetValueProperty text() {
 		return new WidgetTextProperty();
@@ -289,7 +287,7 @@ public class WidgetProperties {
 	 *         or {@link Text}.
 	 */
 	public static IWidgetValueProperty text(int[] events) {
-		return new WidgetTextWithEventsProperty(events.clone());
+		return new WidgetTextWithEventsProperty((int[]) events.clone());
 	}
 
 	/**
