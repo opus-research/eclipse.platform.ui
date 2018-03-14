@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Simon Scholz <scholzsimon@vogella.com> - Bug 445663, 473845
+ *     Simon Scholz <scholzsimon@vogella.com> - Bug 445663
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445663
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.application.addons;
@@ -50,8 +50,13 @@ import org.osgi.service.event.Event;
  * Currently it only covered part descriptors but it is planned to extend this
  * addon to also remove other broken model contributions
  */
+@SuppressWarnings("restriction")
 public class ModelCleanupAddon {
 
+	/**
+	 * See URIHelper#BUNDLECLASS_SCHEMA constant.
+	 */
+	private static final int BUNDLECLASS_SCHEMA_LENGTH = 14;
 	private static String COMPATIBILITY_EDITOR_URI = "bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor"; //$NON-NLS-1$
 	private static String COMPATIBILITY_VIEW_URI = "bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView"; //$NON-NLS-1$
 
@@ -104,7 +109,7 @@ public class ModelCleanupAddon {
 					originalCompatibilityViewClass);
 		} else if (!COMPATIBILITY_EDITOR_URI.equals(contributionURI)) {
 			// check for e4views and usual MPartDescriptors
-			String[] bundleClass = contributionURI.substring(14).split("/"); //$NON-NLS-1$
+			String[] bundleClass = contributionURI.substring(BUNDLECLASS_SCHEMA_LENGTH).split("/"); //$NON-NLS-1$
 			String bundleSymbolicName = bundleClass[0];
 			String className = bundleClass[1];
 			return checkPartDescriptorByBundleSymbolicNameAndClass(bundle, bundleSymbolicName, className);
@@ -130,10 +135,18 @@ public class ModelCleanupAddon {
 			return false;
 		}
 
+		String classPackageName;
+		String classResourceName;
+		int indexLastDot = className.lastIndexOf('.');
+		if (indexLastDot < 0) {
+			classPackageName = "/"; //$NON-NLS-1$
+			classResourceName = className;
+		} else {
+			classPackageName = '/' + className.substring(0, indexLastDot).replace('.', '/');
+			classResourceName = className.substring(indexLastDot + 1) + ".class"; //$NON-NLS-1$
+		}
 		for (BundleWiring bundleWiring : wirings) {
-			Class<?> partsClass = findClass(className, bundleWiring);
-			if (null == partsClass) {
-				// class for PartDescriptor cannot be found
+			if (!checkClassResource(classPackageName, classResourceName, bundleWiring)) {
 				return false;
 			}
 		}
@@ -184,18 +197,15 @@ public class ModelCleanupAddon {
 		return result;
 	}
 
-	private Class<?> findClass(String className, BundleWiring wiring) {
+	private boolean checkClassResource(String classPackageName, String classFileName, BundleWiring wiring) {
 		if (wiring == null) {
-			return null;
+			return false;
 		}
 		if ((wiring.getRevision().getTypes() & BundleRevision.TYPE_FRAGMENT) != 0) {
 			// fragment case; need to get the host wiring
 			wiring = wiring.getRequiredWires(HostNamespace.HOST_NAMESPACE).get(0).getProviderWiring();
 		}
-		try {
-			return wiring.getClassLoader().loadClass(className);
-		} catch (ClassNotFoundException e) {
-			return null;
-		}
+		Collection<String> classResourcePaths = wiring.listResources(classPackageName, classFileName, 0);
+		return classResourcePaths != null && !classResourcePaths.isEmpty();
 	}
 }
