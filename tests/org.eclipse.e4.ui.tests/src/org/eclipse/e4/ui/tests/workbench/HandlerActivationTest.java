@@ -12,9 +12,7 @@
 
 package org.eclipse.e4.ui.tests.workbench;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
+import junit.framework.TestCase;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.e4.core.commands.CommandServiceAddon;
 import org.eclipse.e4.core.commands.ECommandService;
@@ -45,15 +43,12 @@ import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.services.ContextServiceAddon;
 import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * Tests the activation of Handlers based on their Handler Container, e.g.
  * MWindow, MPerspective or MPart
  */
-public class HandlerActivationTest {
+public class HandlerActivationTest extends TestCase {
 
 	/**
 	 * The ID for the test command
@@ -80,8 +75,8 @@ public class HandlerActivationTest {
 	private EPartService partService;
 	private MPart partB1;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		appContext = E4Application.createDefaultContext();
 		ContextInjectionFactory.make(CommandServiceAddon.class, appContext);
 		ContextInjectionFactory.make(ContextServiceAddon.class, appContext);
@@ -90,8 +85,8 @@ public class HandlerActivationTest {
 		createLayoutWithThreeContextLayers();
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@Override
+	protected void tearDown() throws Exception {
 		if (wb != null) {
 			wb.close();
 		}
@@ -135,7 +130,7 @@ public class HandlerActivationTest {
 		application.getCommands().add(command);
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		ContextInjectionFactory.make(CommandProcessingAddon.class, appContext);
 		ContextInjectionFactory.make(HandlerProcessingAddon.class, appContext);
@@ -151,42 +146,36 @@ public class HandlerActivationTest {
 
 	}
 
-	@Test
 	public void testHandlerInWindowOnly() {
 		TestHandler testHandler = createTestHandlerInHandlerContainer(window);
 		executeCommand();
 		assertTrue(testHandler.isExecuted());
 	}
 
-	@Test
 	public void testHandlerInActivePerspectiveOnly() {
 		TestHandler testHandler = createTestHandlerInHandlerContainer(perspectiveA);
 		executeCommand();
 		assertTrue(testHandler.isExecuted());
 	}
 
-	@Test
 	public void testHandlerInActivePartOnly() {
 		TestHandler testHandler = createTestHandlerInHandlerContainer(partA1);
 		executeCommand();
 		assertTrue(testHandler.isExecuted());
 	}
 
-	@Test
 	public void testHandlerInInactivePerspectiveOnly() {
 		TestHandler testHandler = createTestHandlerInHandlerContainer(perspectiveB);
 		executeCommand();
 		assertFalse(testHandler.isExecuted());
 	}
 
-	@Test
 	public void testHandlerInInactivePartOnly() {
 		TestHandler testHandler = createTestHandlerInHandlerContainer(partA2);
 		executeCommand();
 		assertFalse(testHandler.isExecuted());
 	}
 
-	@Test
 	public void testHandlerInActivePartAndPerspective() {
 		TestHandler testHandler = createTestHandlerInHandlerContainer(partA1);
 		TestHandler testHandler2 = createTestHandlerInHandlerContainer(perspectiveA);
@@ -195,7 +184,6 @@ public class HandlerActivationTest {
 		assertFalse(testHandler2.isExecuted());
 	}
 
-	@Test
 	public void testHandlerInActivePartAndWindow() {
 		TestHandler testHandler = createTestHandlerInHandlerContainer(partA1);
 		TestHandler testHandler2 = createTestHandlerInHandlerContainer(window);
@@ -204,7 +192,6 @@ public class HandlerActivationTest {
 		assertFalse(testHandler2.isExecuted());
 	}
 
-	@Test
 	public void testHandlerInActivePerspectiveAndWindow() {
 		TestHandler testHandler = createTestHandlerInHandlerContainer(perspectiveA);
 		TestHandler testHandler2 = createTestHandlerInHandlerContainer(window);
@@ -213,7 +200,6 @@ public class HandlerActivationTest {
 		assertFalse(testHandler2.isExecuted());
 	}
 
-	@Test
 	public void testHandlerInActivePartAndPerspectiveAndWindow() {
 		TestHandler testHandler = createTestHandlerInHandlerContainer(partA1);
 		TestHandler testHandler2 = createTestHandlerInHandlerContainer(perspectiveA);
@@ -224,7 +210,6 @@ public class HandlerActivationTest {
 		assertFalse(testHandler3.isExecuted());
 	}
 
-	@Test
 	public void testHandlerSwitchToInactivePart() {
 		TestHandler testHandler = createTestHandlerInHandlerContainer(partA2);
 		executeCommand();
@@ -234,7 +219,6 @@ public class HandlerActivationTest {
 		assertTrue(testHandler.isExecuted());
 	}
 
-	@Test
 	public void testHandlerSwitchToInactivePerspective() {
 		TestHandler testHandlerA = createTestHandlerInHandlerContainer(perspectiveA);
 		TestHandler testHandlerB = createTestHandlerInHandlerContainer(perspectiveB);
@@ -244,7 +228,6 @@ public class HandlerActivationTest {
 		assertTrue(testHandlerB.isExecuted());
 	}
 
-	@Test
 	public void testHandlerSwitchToInactivePartInOtherPerspectiveWithPerspectiveHandlers() {
 		TestHandler testHandlerA = createTestHandlerInHandlerContainer(perspectiveA);
 		TestHandler testHandlerB = createTestHandlerInHandlerContainer(perspectiveB);
@@ -255,7 +238,6 @@ public class HandlerActivationTest {
 		assertTrue(testHandlerB.isExecuted());
 	}
 
-	@Test
 	public void testHandlerSwitchToInactivePartInOtherPerspectiveWithPartHandlers() {
 		TestHandler testHandlerA = createTestHandlerInHandlerContainer(partA1);
 		TestHandler testHandlerB = createTestHandlerInHandlerContainer(partB1);
@@ -291,6 +273,9 @@ public class HandlerActivationTest {
 		return testHandler;
 	}
 
+	/**
+	 *
+	 */
 	private void executeCommand() {
 		handlerService.executeHandler(parameterizedCommand);
 
