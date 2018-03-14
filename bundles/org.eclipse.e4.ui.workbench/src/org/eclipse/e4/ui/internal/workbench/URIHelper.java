@@ -123,7 +123,17 @@ public class URIHelper {
 	 *         {@value #PLATFORM_SCHEMA}; false otherwise
 	 */
 	public static boolean isBundleClassUri(String uri) {
-		return uri != null && uri.startsWith(BUNDLECLASS_SCHEMA);
+		if (uri != null && uri.startsWith(BUNDLECLASS_SCHEMA)) {
+			String[] split = uri.substring(14).split("/"); //$NON-NLS-1$
+			// valid bundleclass uri should have two segments:
+			// first one for the bundle-symbolic-name
+			// second one for the full qualified classname
+			if (split.length == 2) {
+				return true;
+			}
+			;
+		}
+		return false;
 	}
 
 }
