@@ -244,7 +244,12 @@ public class DeleteResourceAction extends SelectionListenerAction {
 		super(IDEWorkbenchMessages.DeleteResourceAction_text);
 		Assert.isNotNull(shell);
 		initAction();
-		setShellProvider(() -> shell);
+		setShellProvider(new IShellProvider() {
+			@Override
+			public Shell getShell() {
+				return shell;
+			}
+		});
 	}
 
 	/**

@@ -14,7 +14,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.eclipse.core.runtime.Adapters;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -49,6 +49,14 @@ public class WebBrowserView extends ViewPart implements
 		viewer = new BrowserViewer(parent, style);
 		viewer.setContainer(this);
 
+		/*
+		 * PropertyChangeListener propertyChangeListener = new
+		 * PropertyChangeListener() { public void
+		 * propertyChange(PropertyChangeEvent event) { if
+		 * (BrowserViewer.PROPERTY_TITLE.equals(event.getPropertyName())) {
+		 * setPartName((String) event.getNewValue()); } } };
+		 * viewer.addPropertyChangeListener(propertyChangeListener);
+		 */
 		initDragAndDrop();
 	}
 
@@ -119,14 +127,17 @@ public class WebBrowserView extends ViewPart implements
 			return;
 		IStructuredSelection sel = (IStructuredSelection) selection;
 		Object obj = sel.getFirstElement();
-		URL url = getURLFrom(obj);
-		if (url != null)
-			setURL(url.toExternalForm());
+		if (obj instanceof IAdaptable) {
+			IAdaptable adapt = (IAdaptable) obj;
+			URL url = getURLFromAdaptable(adapt);
+			if (url!=null)
+				setURL(url.toExternalForm());
+		}
 	}
 
-	private URL getURLFrom(Object adapt) {
+	private URL getURLFromAdaptable(IAdaptable adapt) {
 		// test for path
-		IPath path = Adapters.getAdapter(adapt, IPath.class, true);
+		IPath path= adapt.getAdapter(IPath.class);
 		if (path != null) {
 			File file = path.toFile();
 			if (file.exists() && isWebFile(file.getName()))
@@ -136,7 +147,7 @@ public class WebBrowserView extends ViewPart implements
 					return null;
 				}
 		}
-		return Adapters.getAdapter(adapt, URL.class, true);
+		return adapt.getAdapter(URL.class);
 	}
 
 	public void removeSelectionListener() {
@@ -162,9 +173,13 @@ public class WebBrowserView extends ViewPart implements
 	 * Adds drag and drop support to the view.
 	 */
 	protected void initDragAndDrop() {
-		Transfer[] transfers = new Transfer[] { FileTransfer.getInstance() };
+		Transfer[] transfers = new Transfer[] {
+		// LocalSelectionTransfer.getInstance(),
+		// ResourceTransfer.getInstance(),
+		FileTransfer.getInstance() };
 
-		DropTarget dropTarget = new DropTarget(viewer, DND.DROP_COPY | DND.DROP_DEFAULT);
+		DropTarget dropTarget = new DropTarget(viewer, DND.DROP_COPY
+				| DND.DROP_DEFAULT);
 		dropTarget.setTransfer(transfers);
 		dropTarget.addDropListener(new WebBrowserViewDropAdapter(viewer));
 	}

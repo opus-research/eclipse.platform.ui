@@ -19,13 +19,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
@@ -47,6 +47,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.Saveable;
 import org.eclipse.ui.internal.dialogs.EventLoopProgressMonitor;
 import org.eclipse.ui.internal.misc.StatusUtil;
+import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.progress.IJobRunnable;
 import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
 import org.eclipse.ui.statushandlers.StatusManager;
@@ -188,18 +189,18 @@ public class SaveableHelper {
 			@Override
 			public void run(IProgressMonitor monitor) {
 				IProgressMonitor monitorWrap = new EventLoopProgressMonitor(monitor);
-				SubMonitor subMonitor = SubMonitor.convert(monitorWrap, WorkbenchMessages.Save, dirtyModels.size());
+				monitorWrap.beginTask(WorkbenchMessages.Save, dirtyModels.size());
 				try {
 					for (Iterator<Saveable> i = dirtyModels.iterator(); i.hasNext();) {
 						Saveable model = i.next();
 						// handle case where this model got saved as a result of
 						// saving another
 						if (!model.isDirty()) {
-							subMonitor.worked(1);
+							monitor.worked(1);
 							continue;
 						}
-						doSaveModel(model, subMonitor.newChild(1), window, confirm);
-						if (subMonitor.isCanceled()) {
+						doSaveModel(model, new SubProgressMonitor(monitorWrap, 1), window, confirm);
+						if (monitor.isCanceled()) {
 							break;
 						}
 					}
@@ -396,8 +397,8 @@ public class SaveableHelper {
 				// this will cause the parts tabs to show the ongoing background operation
 				for (int i = 0; i < parts.length; i++) {
 					IWorkbenchPart workbenchPart = parts[i];
-					IWorkbenchSiteProgressService progressService = Adapters.getAdapter(workbenchPart.getSite(),
-							IWorkbenchSiteProgressService.class, true);
+					IWorkbenchSiteProgressService progressService = workbenchPart.getSite().getAdapter(
+									IWorkbenchSiteProgressService.class);
 					progressService.showBusyForFamily(model);
 				}
 				model.disableUI(parts, blockUntilSaved);
@@ -497,7 +498,10 @@ public class SaveableHelper {
 	}
 
 	public static ISaveablePart getSaveable(Object o) {
-		return Adapters.getAdapter(o, ISaveablePart.class, true);
+		if (o instanceof ISaveablePart) {
+			return (ISaveablePart) o;
+		}
+		return Util.getAdapter(o, ISaveablePart.class);
 	}
 
 	public static boolean isSaveable(Object o) {
@@ -509,7 +513,7 @@ public class SaveableHelper {
 		if (saveable instanceof ISaveablePart2) {
 			return (ISaveablePart2) saveable;
 		}
-		return Adapters.getAdapter(o, ISaveablePart2.class, true);
+		return Util.getAdapter(o, ISaveablePart2.class);
 	}
 
 	public static boolean isSaveable2(Object o) {

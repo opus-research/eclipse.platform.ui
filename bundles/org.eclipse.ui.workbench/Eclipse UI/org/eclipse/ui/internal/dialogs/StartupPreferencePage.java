@@ -142,7 +142,8 @@ public class StartupPreferencePage extends PreferencePage implements
         }
         String pref = preference.toString();
         IPreferenceStore store = PrefUtil.getInternalPreferenceStore();
-		store.setValue(IPreferenceConstants.PLUGINS_NOT_ACTIVATED_ON_STARTUP, pref);
+        store.putValue(IPreferenceConstants.PLUGINS_NOT_ACTIVATED_ON_STARTUP,
+                pref);
         PrefUtil.savePrefs();
         return true;
     }

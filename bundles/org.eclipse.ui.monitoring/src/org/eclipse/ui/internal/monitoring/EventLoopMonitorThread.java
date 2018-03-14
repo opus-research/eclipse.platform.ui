@@ -486,7 +486,12 @@ public class EventLoopMonitorThread extends Thread {
 		boolean dumpAllThreads = false;
 
 		// Register for events
-		display.asyncExec(() -> registerDisplayListeners());
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				registerDisplayListeners();
+			}
+		});
 
 		long currTime = getTimestamp();
 

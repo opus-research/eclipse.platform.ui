@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.action.ContributionItem;
@@ -30,6 +29,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -44,6 +44,7 @@ import org.eclipse.ui.internal.WorkbenchPage;
 import org.eclipse.ui.internal.ide.DialogUtil;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
+import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.part.FileEditorInput;
 
 import com.ibm.icu.text.Collator;
@@ -172,15 +173,18 @@ public class OpenWithMenu extends ContributionItem {
         if (image != null) {
             menuItem.setImage(image);
         }
-        Listener listener = event -> {
-		    switch (event.type) {
-		    case SWT.Selection:
-		        if (menuItem.getSelection()) {
-					openEditor(descriptor, false);
-				}
-		        break;
-		    }
-		};
+        Listener listener = new Listener() {
+            @Override
+			public void handleEvent(Event event) {
+                switch (event.type) {
+                case SWT.Selection:
+                    if (menuItem.getSelection()) {
+						openEditor(descriptor, false);
+					}
+                    break;
+                }
+            }
+        };
         menuItem.addListener(SWT.Selection, listener);
     }
 
@@ -197,22 +201,25 @@ public class OpenWithMenu extends ContributionItem {
         new MenuItem(menu, SWT.SEPARATOR);
         final MenuItem menuItem = new MenuItem(menu, SWT.PUSH);
         menuItem.setText(IDEWorkbenchMessages.OpenWithMenu_Other);
-        Listener listener = event -> {
-		    switch (event.type) {
-		    case SWT.Selection:
-				EditorSelectionDialog dialog = new EditorSelectionDialog(menu.getShell());
-				String fileName = fileResource.getName();
-				dialog.setFileName(fileName);
-				dialog.setMessage(NLS.bind(IDEWorkbenchMessages.OpenWithMenu_OtherDialogDescription, fileName));
-				if (dialog.open() == Window.OK) {
-					IEditorDescriptor editor = dialog.getSelectedEditor();
-					if (editor != null) {
-						openEditor(editor, editor.isOpenExternal());
+        Listener listener = new Listener() {
+            @Override
+			public void handleEvent(Event event) {
+                switch (event.type) {
+                case SWT.Selection:
+					EditorSelectionDialog dialog = new EditorSelectionDialog(menu.getShell());
+					String fileName = fileResource.getName();
+					dialog.setFileName(fileName);
+					dialog.setMessage(NLS.bind(IDEWorkbenchMessages.OpenWithMenu_OtherDialogDescription, fileName));
+					if (dialog.open() == Window.OK) {
+						IEditorDescriptor editor = dialog.getSelectedEditor();
+						if (editor != null) {
+							openEditor(editor, editor.isOpenExternal());
+						}
 					}
-				}
-		        break;
-		    }
-		};
+                    break;
+                }
+            }
+        };
         menuItem.addListener(SWT.Selection, listener);
     }
 
@@ -283,11 +290,11 @@ public class OpenWithMenu extends ContributionItem {
      * Converts the IAdaptable file to IFile or null.
      */
     private IFile getFileResource() {
-		IFile file = Adapters.getAdapter(adaptable, IFile.class, true);
+		IFile file = Util.getAdapter(adaptable, IFile.class);
 		if (file != null) {
 			return file;
         }
-		IResource resource = Adapters.getAdapter(adaptable, IResource.class, true);
+		IResource resource = Util.getAdapter(adaptable, IResource.class);
         if (resource instanceof IFile) {
             return (IFile) resource;
         }
@@ -343,22 +350,25 @@ public class OpenWithMenu extends ContributionItem {
 		menuItem.setSelection(markAsSelected);
         menuItem.setText(IDEWorkbenchMessages.DefaultEditorDescription_name);
 
-        Listener listener = event -> {
-		    switch (event.type) {
-		    case SWT.Selection:
-		        if (menuItem.getSelection()) {
-		            IDE.setDefaultEditor(file, null);
-		            try {
-		                openEditor(IDE.getEditorDescriptor(file), false);
-		            } catch (PartInitException e) {
-		                DialogUtil.openError(page.getWorkbenchWindow()
-		                        .getShell(), IDEWorkbenchMessages.OpenWithMenu_dialogTitle,
-		                        e.getMessage(), e);
-		            }
-		        }
-		        break;
-		    }
-		};
+        Listener listener = new Listener() {
+            @Override
+			public void handleEvent(Event event) {
+                switch (event.type) {
+                case SWT.Selection:
+                    if (menuItem.getSelection()) {
+                        IDE.setDefaultEditor(file, null);
+                        try {
+                            openEditor(IDE.getEditorDescriptor(file), false);
+                        } catch (PartInitException e) {
+                            DialogUtil.openError(page.getWorkbenchWindow()
+                                    .getShell(), IDEWorkbenchMessages.OpenWithMenu_dialogTitle,
+                                    e.getMessage(), e);
+                        }
+                    }
+                    break;
+                }
+            }
+        };
 
         menuItem.addListener(SWT.Selection, listener);
     }
