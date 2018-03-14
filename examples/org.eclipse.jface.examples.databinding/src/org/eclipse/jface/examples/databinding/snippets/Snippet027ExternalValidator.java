@@ -17,7 +17,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
 import org.eclipse.core.databinding.DataBindingContext;
-import org.eclipse.core.databinding.beans.BeansObservables;
+import org.eclipse.core.databinding.beans.BeanProperties;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.validation.MultiValidator;
@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.Text;
 
 /**
  * This snippet demonstrates how to integrate an external validator
- * 
+ *
  * @since 3.5
  */
 public class Snippet027ExternalValidator extends WizardPage {
@@ -154,7 +154,7 @@ public class Snippet027ExternalValidator extends WizardPage {
 
 	/**
 	 * Create contents of the wizard
-	 * 
+	 *
 	 * @param parent
 	 */
 	@Override
@@ -193,18 +193,18 @@ public class Snippet027ExternalValidator extends WizardPage {
 	private void bindUI() {
 		DataBindingContext dbc = new DataBindingContext();
 
-		final IObservableValue name = BeansObservables.observeValue(contact,
-				"name");
+		final IObservableValue name = BeanProperties.value(contact.getClass(), "name").observe(contact);
+
 		dbc.bindValue(WidgetProperties.text(SWT.Modify).observe(nameValue), name,
 				null, null);
 
-		final IObservableValue email = BeansObservables.observeValue(contact,
-				"email");
+		final IObservableValue email = BeanProperties.value(contact.getClass(), "email").observe(contact);
+
 		dbc.bindValue(WidgetProperties.text(SWT.Modify).observe(emailValue),
 				email, null, null);
 
-		final IObservableValue phone = BeansObservables.observeValue(contact,
-				"phoneNumber");
+		final IObservableValue phone = BeanProperties.value(contact.getClass(), "phoneNumber").observe(contact);
+
 		dbc.bindValue(WidgetProperties.text(SWT.Modify).observe(phoneNumberValue),
 				phone, null, null);
 
