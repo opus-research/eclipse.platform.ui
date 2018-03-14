@@ -18,7 +18,8 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
 public class TestList extends TestBrowser {
-    public Viewer createViewer(Composite parent) {
+    @Override
+	public Viewer createViewer(Composite parent) {
         ListViewer viewer = new ListViewer(parent);
         viewer.setUseHashlookup(true);
         viewer.setContentProvider(new TestModelContentProvider());
@@ -32,8 +33,9 @@ public class TestList extends TestBrowser {
     }
 
     /**
-     * 
+     *
      */
-    protected void viewerFillMenuBar(MenuManager mgr) {
+    @Override
+	protected void viewerFillMenuBar(MenuManager mgr) {
     }
 }

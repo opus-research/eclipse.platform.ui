@@ -11,6 +11,7 @@
  *     Snjezana Peco <snjezana.peco@redhat.com> - Memory leaks in Juno when opening and closing XML Editor - http://bugs.eclipse.org/397909
  *     Marco Descher <marco@descher.at> - Bug 397677
  *     Dmitry Spiridenok - Bug 429756
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445723
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -27,6 +28,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
+import org.eclipse.e4.core.commands.internal.ICommandHelpService;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -35,6 +37,7 @@ import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.bindings.EBindingService;
 import org.eclipse.e4.ui.internal.workbench.Activator;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
+import org.eclipse.e4.ui.internal.workbench.EHelpService;
 import org.eclipse.e4.ui.internal.workbench.Policy;
 import org.eclipse.e4.ui.internal.workbench.RenderedElementUtil;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.IUpdateService;
@@ -130,6 +133,15 @@ public class HandledContributionItem extends ContributionItem {
 	@Optional
 	private IUpdateService updateService;
 
+	@Inject
+	@Optional
+	private EHelpService helpService;
+
+	@Inject
+	@Optional
+	@SuppressWarnings("restriction")
+	private ICommandHelpService commandHelpService;
+
 	private Runnable unreferenceRunnable;
 
 	private ISWTResourceUtilities resUtils = null;
@@ -215,13 +227,13 @@ public class HandledContributionItem extends ContributionItem {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void generateCommand() {
 		if (model.getCommand() != null && model.getWbCommand() == null) {
 			String cmdId = model.getCommand().getElementId();
 			List<MParameter> modelParms = model.getParameters();
-			Map<String, String> parameters = new HashMap<String, String>(4);
+			Map<String, Object> parameters = new HashMap<String, Object>(4);
 			for (MParameter mParm : modelParms) {
 				parameters.put(mParm.getName(), mParm.getValue());
 			}
@@ -268,13 +280,6 @@ public class HandledContributionItem extends ContributionItem {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets
-	 * .Menu, int)
-	 */
 	@Override
 	public void fill(Menu menu, int index) {
 		if (model == null) {
@@ -301,6 +306,7 @@ public class HandledContributionItem extends ContributionItem {
 		item.addListener(SWT.Dispose, getItemListener());
 		item.addListener(SWT.Selection, getItemListener());
 		item.addListener(SWT.DefaultSelection, getItemListener());
+		item.addListener(SWT.Help, getItemListener());
 
 		widget = item;
 		model.setWidget(widget);
@@ -314,13 +320,6 @@ public class HandledContributionItem extends ContributionItem {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets
-	 * .ToolBar, int)
-	 */
 	@Override
 	public void fill(ToolBar parent, int index) {
 		if (model == null) {
@@ -408,21 +407,11 @@ public class HandledContributionItem extends ContributionItem {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.ContributionItem#update()
-	 */
 	@Override
 	public void update() {
 		update(null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.ContributionItem#update(java.lang.String)
-	 */
 	@Override
 	public void update(String id) {
 		updateIcons();
@@ -601,6 +590,9 @@ public class HandledContributionItem extends ContributionItem {
 							handleWidgetSelection(event);
 						}
 						break;
+					case SWT.Help:
+						handleHelpRequest();
+						break;
 					}
 				}
 			};
@@ -626,17 +618,13 @@ public class HandledContributionItem extends ContributionItem {
 			widget.removeListener(SWT.Selection, getItemListener());
 			widget.removeListener(SWT.Dispose, getItemListener());
 			widget.removeListener(SWT.DefaultSelection, getItemListener());
+			widget.removeListener(SWT.Help, getItemListener());
 			widget = null;
 			model.setWidget(null);
 			disposeOldImages();
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.ContributionItem#dispose()
-	 */
 	@Override
 	public void dispose() {
 		if (widget != null) {
@@ -684,6 +672,21 @@ public class HandledContributionItem extends ContributionItem {
 			if (canExecuteItem(event)) {
 				executeItem(event);
 			}
+		}
+	}
+
+	@SuppressWarnings("restriction")
+	private void handleHelpRequest() {
+		MCommand command = model.getCommand();
+		if (command == null || helpService == null
+				|| commandHelpService == null) {
+			return;
+		}
+
+		String contextHelpId = commandHelpService.getHelpContextId(
+				command.getElementId(), getContext(model));
+		if (contextHelpId != null) {
+			helpService.displayHelp(contextHelpId);
 		}
 	}
 
@@ -823,7 +826,7 @@ public class HandledContributionItem extends ContributionItem {
 
 	/**
 	 * Return a parent context for this part.
-	 * 
+	 *
 	 * @param element
 	 *            the part to start searching from
 	 * @return the parent's closest context, or global context if none in the
@@ -835,7 +838,7 @@ public class HandledContributionItem extends ContributionItem {
 
 	/**
 	 * Return a context for this part.
-	 * 
+	 *
 	 * @param part
 	 *            the part to start searching from
 	 * @return the closest context, or global context if none in the hierarchy

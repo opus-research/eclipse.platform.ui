@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -60,9 +60,9 @@ public class ElementReferenceRenderer extends SWTPartRenderer {
 		// if the placeholder is *not* in the currently active perspective
 		// then don't re-parent the current view
 		int phLoc = modelService.getElementLocation(ph);
-		boolean isOutsidePerspective = (phLoc & EModelService.OUTSIDE_PERSPECTIVE) != 0;
-		boolean isInActivePerspective = (phLoc & EModelService.IN_ACTIVE_PERSPECTIVE) != 0;
-		if (isOutsidePerspective || isInActivePerspective) {
+		if (phLoc == EModelService.IN_ACTIVE_PERSPECTIVE
+				|| phLoc == EModelService.IN_SHARED_AREA
+				|| phLoc == EModelService.OUTSIDE_PERSPECTIVE) {
 			Control refWidget = (Control) ref.getWidget();
 			if (refWidget == null) {
 				ref.setToBeRendered(true);
@@ -86,13 +86,6 @@ public class ElementReferenceRenderer extends SWTPartRenderer {
 		return newComp;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#disposeWidget
-	 * (org.eclipse.e4.ui.model.application.ui.MUIElement)
-	 */
 	@Override
 	public void disposeWidget(MUIElement element) {
 		MPlaceholder ph = (MPlaceholder) element;

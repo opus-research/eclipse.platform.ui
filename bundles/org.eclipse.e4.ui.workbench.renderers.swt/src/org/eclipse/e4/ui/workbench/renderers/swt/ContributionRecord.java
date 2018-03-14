@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 IBM Corporation and others.
+ * Copyright (c) 2011, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -67,7 +67,7 @@ public class ContributionRecord {
 
 	/**
 	 * Access to analyze for tests. For Looking, not touching!
-	 * 
+	 *
 	 * @return the shared elements collection
 	 */
 	public Collection<MMenuElement> getSharedElements() {
@@ -76,7 +76,7 @@ public class ContributionRecord {
 
 	/**
 	 * Access to analyze for tests. For Looking, not touching!
-	 * 
+	 *
 	 * @return the generated elements collection
 	 */
 	public Collection<MMenuElement> getGeneratedElements() {
@@ -138,7 +138,7 @@ public class ContributionRecord {
 			ExpressionContext exprContext) {
 		boolean currentVisibility = isVisible;
 		if (item instanceof MMenu || item instanceof MMenuSeparator) {
-			List<ContributionRecord> list = renderer.getList(item);
+			ArrayList<ContributionRecord> list = renderer.getList(item);
 			if (list != null) {
 				Iterator<ContributionRecord> cr = list.iterator();
 				while (!currentVisibility && cr.hasNext()) {
@@ -317,7 +317,7 @@ public class ContributionRecord {
 		}
 		for (MMenuElement shared : sharedElements) {
 			renderer.removeRecord(shared, this);
-			List<ContributionRecord> array = renderer.getList(shared);
+			ArrayList<ContributionRecord> array = renderer.getList(shared);
 			if (array.isEmpty()) {
 				menuModel.getChildren().remove(shared);
 			}

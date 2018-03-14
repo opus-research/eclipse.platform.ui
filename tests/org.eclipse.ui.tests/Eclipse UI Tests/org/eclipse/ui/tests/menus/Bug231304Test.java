@@ -21,10 +21,10 @@ import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
- * 
+ *
  * @since 3.5
  * @author Prakash G.R.
- * 
+ *
  */
 public class Bug231304Test extends UITestCase {
 
@@ -34,7 +34,7 @@ public class Bug231304Test extends UITestCase {
 
 	public void testToolTip() throws Exception {
 		IWorkbenchWindow window = openTestWindow();
-		IMenuService menus = (IMenuService) window
+		IMenuService menus = window
 				.getService(IMenuService.class);
 		ToolBarManager manager = new ToolBarManager();
 		try {
