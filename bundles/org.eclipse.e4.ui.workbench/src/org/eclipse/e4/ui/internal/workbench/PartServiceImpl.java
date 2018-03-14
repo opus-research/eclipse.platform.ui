@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2016 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,8 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel (Lars.Vogel@vogella.com) - Bug 416082,  472654, 395825
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 450411, 486876, 461063
+ *     Lars Vogel (Lars.Vogel@gmail.com) - Bug 416082
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 450411
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 463962
  ******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench;
@@ -66,11 +66,6 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
 public class PartServiceImpl implements EPartService {
-
-	/**
-	 * The part activation time of a part is stored in it's transient data.
-	 */
-	public static final String PART_ACTIVATION_TIME = "partActivationTime"; //$NON-NLS-1$
 
 	private EventHandler selectedHandler = new EventHandler() {
 		@Override
@@ -188,7 +183,7 @@ public class PartServiceImpl implements EPartService {
 
 	private MPart activePart;
 
-	private ListenerList<IPartListener> listeners = new ListenerList<>();
+	private ListenerList listeners = new ListenerList();
 
 	private boolean constructed = false;
 
@@ -243,11 +238,11 @@ public class PartServiceImpl implements EPartService {
 	}
 
 	private void firePartActivated(final MPart part) {
-		for (final IPartListener listener : listeners) {
+		for (final Object listener : listeners.getListeners()) {
 			SafeRunner.run(new ISafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					listener.partActivated(part);
+					((IPartListener) listener).partActivated(part);
 				}
 
 				@Override
@@ -259,11 +254,11 @@ public class PartServiceImpl implements EPartService {
 	}
 
 	private void firePartDeactivated(final MPart part) {
-		for (final IPartListener listener : listeners) {
+		for (final Object listener : listeners.getListeners()) {
 			SafeRunner.run(new ISafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					listener.partDeactivated(part);
+					((IPartListener) listener).partDeactivated(part);
 				}
 
 				@Override
@@ -275,11 +270,11 @@ public class PartServiceImpl implements EPartService {
 	}
 
 	private void firePartHidden(final MPart part) {
-		for (final IPartListener listener : listeners) {
+		for (final Object listener : listeners.getListeners()) {
 			SafeRunner.run(new ISafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					listener.partHidden(part);
+					((IPartListener) listener).partHidden(part);
 				}
 
 				@Override
@@ -291,11 +286,11 @@ public class PartServiceImpl implements EPartService {
 	}
 
 	private void firePartVisible(final MPart part) {
-		for (final IPartListener listener : listeners) {
+		for (final Object listener : listeners.getListeners()) {
 			SafeRunner.run(new ISafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					listener.partVisible(part);
+					((IPartListener) listener).partVisible(part);
 				}
 
 				@Override
@@ -307,11 +302,11 @@ public class PartServiceImpl implements EPartService {
 	}
 
 	private void firePartBroughtToTop(final MPart part) {
-		for (final IPartListener listener : listeners) {
+		for (final Object listener : listeners.getListeners()) {
 			SafeRunner.run(new ISafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					listener.partBroughtToTop(part);
+					((IPartListener) listener).partBroughtToTop(part);
 				}
 
 				@Override
@@ -469,7 +464,7 @@ public class PartServiceImpl implements EPartService {
 
 	@Override
 	public boolean isPartVisible(MPart part) {
-		if (isInActivePerspective(part)) {
+		if (isInContainer(part)) {
 			MUIElement element = part;
 			MElementContainer<?> parent = part.getParent();
 			if (parent == null) {
@@ -485,38 +480,13 @@ public class PartServiceImpl implements EPartService {
 				}
 			}
 
-			if (parent instanceof MPartStack && parent.getSelectedElement() != element) {
-				return false;
+			if (parent instanceof MPartStack) {
+				return parent.getSelectedElement() == element;
 			}
-			if (!element.isVisible()) {
-				return false;
-			}
-			if (isMinimized(parent) || isMinimized(element)) {
-				return false;
-			}
-			return true;
+
+			return element.isVisible();
 		}
 		return false;
-	}
-
-	private boolean isMinimized(MUIElement elt) {
-		List<String> tags = elt.getTags();
-		return (tags.contains(IPresentationEngine.MINIMIZED)
-				|| tags.contains(IPresentationEngine.MINIMIZED_BY_ZOOM))
-				&& !tags.contains(IPresentationEngine.ACTIVE);
-	}
-
-	private boolean isInActivePerspective(MUIElement element) {
-		if (modelService.isHostedElement(element, getWindow()))
-			return true;
-		MPerspective persp = modelService.getPerspectiveFor(element);
-		if (persp == null) {
-			List<MUIElement> allPerspectiveElements = modelService.findElements(workbenchWindow, null, MUIElement.class,
-					null, EModelService.PRESENTATION);
-			return allPerspectiveElements.contains(element);
-		}
-		boolean inCurrentPerspective = persp == persp.getParent().getSelectedElement();
-		return inCurrentPerspective;
 	}
 
 	private boolean isInContainer(MUIElement element) {
@@ -660,19 +630,6 @@ public class PartServiceImpl implements EPartService {
 	}
 
 	@Override
-	public java.util.Optional<MPerspective> switchPerspective(String perspectiveId) {
-		List<MPerspective> result = modelService.findElements(getWindow(), perspectiveId, MPerspective.class, null);
-		if (!result.isEmpty()) {
-			MPerspective perspective = result.get(0);
-			switchPerspective(perspective);
-			return java.util.Optional.of(perspective);
-		}
-		logger.error("Perspective with ID " + perspectiveId + " not found in the current window."); //$NON-NLS-1$ //$NON-NLS-2$
-
-		return java.util.Optional.empty();
-	}
-
-	@Override
 	public void activate(MPart part) {
 		activate(part, true);
 	}
@@ -750,9 +707,6 @@ public class PartServiceImpl implements EPartService {
 				IPresentationEngine pe = part.getContext().get(IPresentationEngine.class);
 				pe.focusGui(part);
 			}
-
-			// store the activation time to sort the parts in MRU order
-			part.getTransientData().put(PART_ACTIVATION_TIME, Long.valueOf(System.currentTimeMillis()));
 
 			firePartActivated(part);
 			UIEvents.publishEvent(UIEvents.UILifeCycle.ACTIVATE, part);
@@ -836,8 +790,6 @@ public class PartServiceImpl implements EPartService {
 		part.setTooltip(descriptor.getTooltip());
 		part.getHandlers().addAll(EcoreUtil.copyAll(descriptor.getHandlers()));
 		part.getTags().addAll(descriptor.getTags());
-		part.getVariables().addAll(descriptor.getVariables());
-		part.getProperties().putAll(descriptor.getProperties());
 		part.getPersistedState().putAll(descriptor.getPersistedState());
 		part.getBindingContexts().addAll(descriptor.getBindingContexts());
 		return part;
@@ -1185,7 +1137,7 @@ public class PartServiceImpl implements EPartService {
 				return null;
 			}
 		}
-		return showPart(part, partState);
+		return showPart(addPart(part), partState);
 	}
 
 	@Override
@@ -1371,7 +1323,7 @@ public class PartServiceImpl implements EPartService {
 
 	@Override
 	public Collection<MPart> getDirtyParts() {
-		List<MPart> dirtyParts = new ArrayList<>();
+		List<MPart> dirtyParts = new ArrayList<MPart>();
 		for (MPart part : getParts()) {
 			if (part.isDirty()) {
 				dirtyParts.add(part);
@@ -1427,7 +1379,7 @@ public class PartServiceImpl implements EPartService {
 	public Collection<MInputPart> getInputParts(String inputUri) {
 		Assert.isNotNull(inputUri, "Input uri must not be null"); //$NON-NLS-1$
 
-		Collection<MInputPart> rv = new ArrayList<>();
+		Collection<MInputPart> rv = new ArrayList<MInputPart>();
 
 		for (MInputPart p : getParts(MInputPart.class, null)) {
 			if (inputUri.equals(p.getInputURI())) {

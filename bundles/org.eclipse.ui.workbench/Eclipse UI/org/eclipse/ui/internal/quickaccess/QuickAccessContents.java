@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,16 +8,12 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654, 491272, 491398
- *     Leung Wang Hei <gemaspecial@yahoo.com.hk> - Bug 483343
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 491291, Bug 491529
  *******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -136,16 +132,14 @@ public abstract class QuickAccessContents {
 				table.setSelection(selectionIndex);
 			} else if (filterTextEmpty) {
 				TableItem item = new TableItem(table, SWT.NONE);
-				item.setText(0, QuickAccessMessages.QuickAccess_StartTypingToFindMatches);
-				item.setForeground(0, grayColor);
+				item.setText(0, QuickAccessMessages.QuickAccessContents_QuickAccess);
+				item.setText(1, QuickAccessMessages.QuickAccess_StartTypingToFindMatches);
+				item.setForeground(1, grayColor);
 			} else {
 				TableItem item = new TableItem(table, SWT.NONE);
 				item.setText(0, QuickAccessMessages.QuickAccessContents_NoMatchingResults);
 				item.setForeground(0, grayColor);
 			}
-
-			// update info as-you-type
-			updateInfoLabel();
 
 			updateFeedback(filterTextEmpty, showAllMatches);
 		}
@@ -191,16 +185,17 @@ public abstract class QuickAccessContents {
 	private void updateInfoLabel() {
 		if (infoLabel != null) {
 			TriggerSequence sequence = getTriggerSequence();
-			boolean forceHide = (getNumberOfFilteredResults() == 0)
-					|| (showAllMatches && (table.getItemCount() <= computeNumberOfItems()));
-			if (sequence == null || forceHide) {
+			if (sequence == null) {
 				infoLabel.setText(""); //$NON-NLS-1$
 			} else if (showAllMatches) {
-				infoLabel.setText(
-						NLS.bind(QuickAccessMessages.QuickAccessContents_PressKeyToLimitResults, sequence.format()));
-			} else {
 				infoLabel
-						.setText(NLS.bind(QuickAccessMessages.QuickAccess_PressKeyToShowAllMatches, sequence.format()));
+.setText(NLS.bind(
+						QuickAccessMessages.QuickAccessContents_PressKeyToLimitResults,
+						sequence.format()));
+			} else {
+				infoLabel.setText(NLS.bind(
+						QuickAccessMessages.QuickAccess_PressKeyToShowAllMatches,
+								sequence.format()));
 			}
 			infoLabel.getParent().layout(true);
 		}
@@ -216,8 +211,7 @@ public abstract class QuickAccessContents {
 	 */
 	public TriggerSequence getTriggerSequence() {
 		if (keySequence == null) {
-			IBindingService bindingService =
-					Adapters.adapt(PlatformUI.getWorkbench(), IBindingService.class);
+			IBindingService bindingService = PlatformUI.getWorkbench().getAdapter(IBindingService.class);
 			keySequence = bindingService.getBestActiveBindingFor(QUICK_ACCESS_COMMAND_ID);
 		}
 		return keySequence;
@@ -281,19 +275,6 @@ public abstract class QuickAccessContents {
 		return selectionIndex;
 	}
 
-	int numberOfFilteredResults;
-
-	/**
-	 * Compute how many items are effectively filtered at a specific point in
-	 * time. So doing, the quick access content can perform operations that
-	 * depends on this number, i.e. hide the info label.
-	 *
-	 * @return number number of elements filtered
-	 */
-	protected int getNumberOfFilteredResults() {
-		return numberOfFilteredResults;
-	}
-
 	/**
 	 * Returns a list per provider containing matching {@link QuickAccessEntry}
 	 * that should be displayed in the table given a text filter and a perfect
@@ -317,8 +298,8 @@ public abstract class QuickAccessContents {
 
 		int maxCount = computeNumberOfItems();
 		int[] indexPerProvider = new int[providers.length];
-		int countPerProvider = INITIAL_COUNT_PER_PROVIDER;
-		int prevPick = 0;
+		int countPerProvider = Math.min(maxCount / 4,
+				INITIAL_COUNT_PER_PROVIDER);
 		int countTotal = 0;
 		boolean perfectMatchAdded = true;
 		if (perfectMatch != null) {
@@ -334,19 +315,14 @@ public abstract class QuickAccessContents {
 			for (int i = 0; i < providers.length
 					&& (showAllMatches || countTotal < maxCount); i++) {
 				if (entries[i] == null) {
-					entries[i] = new ArrayList<>();
+					entries[i] = new ArrayList<QuickAccessEntry>();
 					indexPerProvider[i] = 0;
 				}
 				int count = 0;
 				QuickAccessProvider provider = providers[i];
 				if (filter.length() > 0 || provider.isAlwaysPresent() || showAllMatches) {
 					QuickAccessElement[] sortedElements = provider.getElementsSorted();
-					List<QuickAccessEntry> poorFilterMatches = new ArrayList<>();
-
-					// count number or previous picks
-					if ((provider instanceof PreviousPicksProvider)) {
-						prevPick = sortedElements.length;
-					}
+					List<QuickAccessEntry> poorFilterMatches = new ArrayList<QuickAccessEntry>();
 
 					int j = indexPerProvider[i];
 					while (j < sortedElements.length
@@ -413,14 +389,12 @@ public abstract class QuickAccessContents {
 			QuickAccessEntry entry = perfectMatch.match(filter, providers[0]);
 			if (entryEnabled(providers[0], entry)) {
 				if (entries[0] == null) {
-					entries[0] = new ArrayList<>();
+					entries[0] = new ArrayList<QuickAccessEntry>();
 					indexPerProvider[0] = 0;
 				}
 				entries[0].add(entry);
 			}
 		}
-		// number of items matching the filtered search
-		numberOfFilteredResults = countTotal - prevPick;
 		return entries;
 	}
 
@@ -577,18 +551,20 @@ public abstract class QuickAccessContents {
 				JFaceResources.getDialogFont()).setStyle(SWT.BOLD));
 		textLayout.setFont(table.getFont());
 		textLayout.setText(QuickAccessMessages.QuickAccess_AvailableCategories);
-		int maxProviderWidth = (textLayout.getBounds().width);
+		int maxProviderWidth = (int) (textLayout.getBounds().width * 1.1);
 		textLayout.setFont(boldFont);
 		for (int i = 0; i < providers.length; i++) {
 			QuickAccessProvider provider = providers[i];
 			textLayout.setText(provider.getName());
-			int width = (textLayout.getBounds().width);
+			int width = (int) (textLayout.getBounds().width * 1.1);
 			if (width > maxProviderWidth) {
 				maxProviderWidth = width;
 			}
 		}
-		tableColumnLayout.setColumnData(new TableColumn(table, SWT.NONE), new ColumnWeightData(0, maxProviderWidth));
-		tableColumnLayout.setColumnData(new TableColumn(table, SWT.NONE), new ColumnWeightData(100, 100));
+		tableColumnLayout.setColumnData(new TableColumn(table, SWT.NONE), new ColumnWeightData(0,
+				maxProviderWidth));
+		tableColumnLayout.setColumnData(new TableColumn(table, SWT.NONE), new ColumnWeightData(100,
+				100));
 		table.getShell().addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(ControlEvent e) {
@@ -598,7 +574,7 @@ public abstract class QuickAccessContents {
 						e.display.timerExec(100, new Runnable() {
 							@Override
 							public void run() {
-								if (table != null && !table.isDisposed() && filterText !=null && !filterText.isDisposed()) {
+								if (table != null && !table.isDisposed()) {
 									refresh(filterText.getText().toLowerCase());
 								}
 								resized = false;

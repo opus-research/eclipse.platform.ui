@@ -22,8 +22,10 @@ import org.w3c.dom.stylesheets.StyleSheet;
 
 public final class ParserTestUtil {
 
-	private static final CSSErrorHandler ERROR_HANDLER = e -> {
-		throw new RuntimeException(e);
+	private static final CSSErrorHandler ERROR_HANDLER = new CSSErrorHandler() {
+		public void error(Exception e) {
+			throw new RuntimeException(e);
+		}
 	};
 
 	private ParserTestUtil() {

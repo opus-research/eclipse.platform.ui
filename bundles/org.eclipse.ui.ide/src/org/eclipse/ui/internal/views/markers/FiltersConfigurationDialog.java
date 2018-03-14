@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2016 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,8 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Remy Chi Jian Suen <remy.suen@gmail.com>
  * 			- Fix for Bug 214443 Problem view filter created even if I hit Cancel
- *     Robert Roth <robert.roth.off@gmail.com>
- *          - Fix for Bug 364736 Setting limit to 0 has no effect
  ******************************************************************************/
 
 package org.eclipse.ui.internal.views.markers;
@@ -26,16 +24,26 @@ import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -95,7 +103,6 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 	private Label limitsLabel;
 
 	private Object[] previouslyChecked = new Object[0];
-	private Group configComposite;
 
 	/**
 	 * Create a new instance of the receiver on builder.
@@ -146,7 +153,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 		createAndOrButtons(composite);
 
-		configComposite = new Group(composite, SWT.NONE);
+		Group configComposite = new Group(composite, SWT.NONE);
 		configComposite.setText(MarkerMessages.MarkerConfigurationsLabel);
 
 		configComposite.setLayout(new GridLayout(3, false));
@@ -203,39 +210,12 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		allButton.setSelection(showAll);
 		andButton.setEnabled(!showAll);
 		orButton.setEnabled(!showAll);
-		updateConfigComposite(!showAll);
-	}
-
-	private void updateConfigComposite(boolean enabled) {
-		recursivelySetEnabled(configComposite, enabled);
-		if (enabled)
-			updateButtonEnablement(getSelectionFromTable());
-	}
-
-	/**
-	 * Recursively walk through the tree of components and set enabled state of
-	 * each control.
-	 *
-	 * @param control
-	 *            The root control
-	 * @param enabled
-	 *            Whether or not we're enabled.
-	 */
-	private void recursivelySetEnabled(Control control, boolean enabled) {
-		if (control instanceof Composite) {
-			for (Control child : ((Composite) control).getChildren()) {
-				recursivelySetEnabled(child, enabled);
-			}
-		}
-		control.setEnabled(enabled);
 	}
 
 	private void updateShowAll(boolean showAll) {
 		allButton.setSelection(showAll);
 		andButton.setEnabled(!showAll);
 		orButton.setEnabled(!showAll);
-		updateConfigComposite(!showAll);
-
 		if (showAll) {
 			previouslyChecked = configsTable.getCheckedElements();
 			configsTable.setAllChecked(false);
@@ -291,26 +271,27 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		GridData textData = new GridData();
 		textData.widthHint = convertWidthInCharsToPixels(10);
 		limitText.setLayoutData(textData);
-		limitText.addVerifyListener(e -> {
-			if (e.character != 0 && e.keyCode != SWT.BS
-					&& e.keyCode != SWT.DEL
-					&& !Character.isDigit(e.character)) {
-				e.doit = false;
+		limitText.addVerifyListener(new VerifyListener() {
+
+			@Override
+			public void verifyText(VerifyEvent e) {
+				if (e.character != 0 && e.keyCode != SWT.BS
+						&& e.keyCode != SWT.DEL
+						&& !Character.isDigit(e.character)) {
+					e.doit = false;
+				}
 			}
 		});
 
-		limitText.addModifyListener(e -> {
-			boolean isInvalid = false;
-			try {
-				int value = Integer.parseInt(limitText.getText());
-				if (value <= 0) {
-					isInvalid = true;
+		limitText.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				try {
+					Integer.parseInt(limitText.getText());
+				} catch (NumberFormatException ex) {
+					limitText.setText(Integer.toString(generator.getMarkerLimits()));
 				}
-			} catch (NumberFormatException ex) {
-				isInvalid = true;
-			}
-			if (isInvalid) {
-				limitText.setText(Integer.toString(generator.getMarkerLimits()));
 			}
 		});
 	}
@@ -337,22 +318,28 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 			}
 		});
 
-		configsTable.addCheckStateListener(event -> {
-			configsTable.setSelection(new StructuredSelection(event.getElement()));
-			updateRadioButtonsFromTable();
+		configsTable.addCheckStateListener(new ICheckStateListener() {
+			@Override
+			public void checkStateChanged(CheckStateChangedEvent event) {
+				configsTable.setSelection(new StructuredSelection(event.getElement()));
+				updateRadioButtonsFromTable();
+			}
 		});
 
-		configsTable.addSelectionChangedListener(event -> {
-			storeConfiguration();
-			MarkerFieldFilterGroup group = getSelectionFromTable();
-			if (group == null) {
-				setFieldsEnabled(false);
-			} else {
-				setFieldsEnabled(true);
+		configsTable.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				storeConfiguration();
+				MarkerFieldFilterGroup group = getSelectionFromTable();
+				if (group == null) {
+					setFieldsEnabled(false);
+				} else {
+					setFieldsEnabled(true);
+				}
+				updateButtonEnablement(group);
+				updateConfigDesc(group);
+				selectedFilterGroup = group;
 			}
-			updateButtonEnablement(group);
-			updateConfigDesc(group);
-			selectedFilterGroup = group;
 		});
 
 		createButtons(composite);
@@ -403,7 +390,12 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		descComposite.setBackground(parent.getBackground());
 
 		final FormToolkit toolkit = new FormToolkit(parent.getDisplay());
-		parent.addDisposeListener(e -> toolkit.dispose());
+		parent.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				toolkit.dispose();
+			}
+		});
 
 		form = toolkit.createScrolledForm(descComposite);
 		form.setBackground(parent.getBackground());
@@ -514,15 +506,19 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 	}
 
 	private IInputValidator getNameValidator(final String currentName, final Collection<String> existingNames) {
-		return newText -> {
-			newText = newText.trim();
-			if (newText.length() == 0) {
-				return MarkerMessages.MarkerFilterDialog_emptyMessage;
+		return new IInputValidator() {
+
+			@Override
+			public String isValid(String newText) {
+				newText = newText.trim();
+				if (newText.length() == 0) {
+					return MarkerMessages.MarkerFilterDialog_emptyMessage;
+				}
+				if(existingNames.contains(newText) && !currentName.equals(newText)) {
+					return NLS.bind(MarkerMessages.filtersDialog_conflictingName, newText);
+				}
+				return null;
 			}
-			if(existingNames.contains(newText) && !currentName.equals(newText)) {
-				return NLS.bind(MarkerMessages.filtersDialog_conflictingName, newText);
-			}
-			return null;
 		};
 	}
 
