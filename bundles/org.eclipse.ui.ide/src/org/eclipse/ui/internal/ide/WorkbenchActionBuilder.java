@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Andreas Buchen <andreas.buchen@sap.com> - Bug 206584
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810, 440975, 431862
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440810, 440975, 431862, 180308
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -356,22 +356,19 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
             fileToolBar.add(new Separator(IWorkbenchActionConstants.NEW_GROUP));
             fileToolBar.add(newWizardDropDownAction);
             fileToolBar.add(new GroupMarker(IWorkbenchActionConstants.NEW_EXT));
-            fileToolBar.add(new GroupMarker(
-                    IWorkbenchActionConstants.SAVE_GROUP));
+			fileToolBar.add(new GroupMarker(IWorkbenchActionConstants.SAVE_GROUP));
             fileToolBar.add(saveAction);
             fileToolBar.add(saveAllAction);
-            fileToolBar
-                    .add(new GroupMarker(IWorkbenchActionConstants.SAVE_EXT));
-            fileToolBar.add(getPrintItem());
-            fileToolBar
-                    .add(new GroupMarker(IWorkbenchActionConstants.PRINT_EXT));
+			fileToolBar.add(new GroupMarker(IWorkbenchActionConstants.SAVE_EXT));
 
-            fileToolBar
-                    .add(new Separator(IWorkbenchActionConstants.BUILD_GROUP));
-            fileToolBar
-                    .add(new GroupMarker(IWorkbenchActionConstants.BUILD_EXT));
-            fileToolBar.add(new Separator(
-                    IWorkbenchActionConstants.MB_ADDITIONS));
+			IContributionItem printItem = getPrintItem();
+			fileToolBar.add(printItem);
+			printItem.setVisible(false);
+			fileToolBar.add(new GroupMarker(IWorkbenchActionConstants.PRINT_EXT));
+
+			fileToolBar.add(new Separator(IWorkbenchActionConstants.BUILD_GROUP));
+			fileToolBar.add(new GroupMarker(IWorkbenchActionConstants.BUILD_EXT));
+			fileToolBar.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
             // Add to the cool bar manager
             coolBar.add(actionBarConfigurer.createToolBarContributionItem(fileToolBar,
