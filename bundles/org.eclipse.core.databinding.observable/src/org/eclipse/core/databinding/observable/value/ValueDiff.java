@@ -16,12 +16,10 @@ import org.eclipse.core.databinding.observable.Diffs;
 import org.eclipse.core.databinding.observable.IDiff;
 
 /**
- * @param <T>
- *            the type of value being observed
  * @since 1.0
  *
  */
-public abstract class ValueDiff<T> implements IDiff {
+public abstract class ValueDiff implements IDiff {
 	/**
 	 * Creates a value diff.
 	 */
@@ -31,17 +29,17 @@ public abstract class ValueDiff<T> implements IDiff {
 	/**
 	 * @return the old value
 	 */
-	public abstract T getOldValue();
+	public abstract Object getOldValue();
 
 	/**
 	 * @return the new value
 	 */
-	public abstract T getNewValue();
+	public abstract Object getNewValue();
 
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof ValueDiff) {
-			ValueDiff<?> val = (ValueDiff<?>) obj;
+			ValueDiff val = (ValueDiff) obj;
 
 			return Diffs.equals(val.getNewValue(), getNewValue())
 					&& Diffs.equals(val.getOldValue(), getOldValue());
@@ -74,6 +72,7 @@ public abstract class ValueDiff<T> implements IDiff {
 			.append("], newValue [") //$NON-NLS-1$
 			.append(getNewValue() != null ? getNewValue().toString() : "null") //$NON-NLS-1$
 			.append("]}"); //$NON-NLS-1$
+
 		return buffer.toString();
 	}
 }

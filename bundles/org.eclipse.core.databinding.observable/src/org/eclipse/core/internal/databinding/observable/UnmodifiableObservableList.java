@@ -24,20 +24,17 @@ import org.eclipse.core.databinding.observable.list.IObservableList;
 /**
  * ObservableList implementation that prevents modification by consumers. Events
  * in the originating wrapped list are propagated and thrown from this instance
- * when appropriate. All mutators throw an UnsupportedOperationException.
- *
- * @param <E>
- *            the type of the elements in this list
+ * when appropriate.  All mutators throw an UnsupportedOperationException.
  *
  * @since 1.0
  */
-public class UnmodifiableObservableList<E> extends DecoratingObservableList<E> {
-	private List<E> unmodifiableList;
+public class UnmodifiableObservableList extends DecoratingObservableList {
+	private List unmodifiableList;
 
 	/**
 	 * @param decorated
 	 */
-	public UnmodifiableObservableList(IObservableList<E> decorated) {
+	public UnmodifiableObservableList(IObservableList decorated) {
 		super(decorated, false);
 		this.unmodifiableList = Collections.unmodifiableList(decorated);
 	}
@@ -48,17 +45,17 @@ public class UnmodifiableObservableList<E> extends DecoratingObservableList<E> {
 	}
 
 	@Override
-	public boolean add(E o) {
+	public boolean add(Object o) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public boolean addAll(Collection<? extends E> c) {
+	public boolean addAll(Collection c) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public boolean addAll(int index, Collection<? extends E> c) {
+	public boolean addAll(int index, Collection c) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -74,23 +71,23 @@ public class UnmodifiableObservableList<E> extends DecoratingObservableList<E> {
 	}
 
 	@Override
-	public ListIterator<E> listIterator() {
+	public ListIterator listIterator() {
 		return listIterator(0);
 	}
 
 	@Override
-	public ListIterator<E> listIterator(int index) {
+	public ListIterator listIterator(int index) {
 		getterCalled();
 		return unmodifiableList.listIterator(index);
 	}
 
 	@Override
-	public E move(int oldIndex, int newIndex) {
+	public Object move(int oldIndex, int newIndex) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public E remove(int index) {
+	public Object remove(int index) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -100,22 +97,22 @@ public class UnmodifiableObservableList<E> extends DecoratingObservableList<E> {
 	}
 
 	@Override
-	public boolean removeAll(Collection<?> c) {
+	public boolean removeAll(Collection c) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public boolean retainAll(Collection<?> c) {
+	public boolean retainAll(Collection c) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public E set(int index, E element) {
+	public Object set(int index, Object element) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public List<E> subList(int fromIndex, int toIndex) {
+	public List subList(int fromIndex, int toIndex) {
 		getterCalled();
 		return unmodifiableList.subList(fromIndex, toIndex);
 	}
