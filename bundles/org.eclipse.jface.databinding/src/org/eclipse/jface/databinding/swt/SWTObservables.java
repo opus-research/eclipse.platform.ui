@@ -16,6 +16,7 @@
  *     Tom Schindl - bug 246462
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 327086
  *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 413611
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 449022
  *******************************************************************************/
 package org.eclipse.jface.databinding.swt;
 
@@ -35,8 +36,7 @@ import org.eclipse.swt.widgets.Widget;
  * A factory for creating observables for SWT widgets
  * 
  * @since 1.1
- * @deprecated see @deprecated comments in the JavaDoc of the methods in order
- *             to find the API, which should be used.
+ * @deprecated
  */
 @Deprecated
 public class SWTObservables {
