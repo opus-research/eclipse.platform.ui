@@ -670,6 +670,7 @@ public class StackRenderer extends LazyStackRenderer {
 		}
 
 		trComp.pack();
+		ctf.layout(true, true);
 	}
 
 	private MToolBar getViewTB(CTabFolder ctf) {
