@@ -12,15 +12,6 @@
 
 package org.eclipse.ui.internal.dialogs;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.RegistryFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.css.swt.theme.ITheme;
 import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
@@ -39,10 +30,14 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTException;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -73,10 +68,8 @@ public class ViewsPreferencePage extends PreferencePage implements
 	private Button enableAnimations;
 	private Button useColoredLabels;
 	
-	private Text colorsAndFontsThemeDescriptionText;
-	private ComboViewer colorsAndFontsThemeCombo;
-	private ColorsAndFontsTheme currentColorsAndFontsTheme;
-	private Map<String, String> themeAssociations;
+	private Text themeDescriptionText;
+	private Combo themeCombo;
 
 	@Override
 	protected Control createContents(Composite parent) {
@@ -101,18 +94,21 @@ public class ViewsPreferencePage extends PreferencePage implements
 			themeIdCombo.setSelection(new StructuredSelection(currentTheme));
 		}
 		themeIdCombo.addSelectionChangedListener(new ISelectionChangedListener() {
+
 			public void selectionChanged(SelectionChangedEvent event) {
-				ITheme selection = getSelectedTheme();
+				ITheme selection = getSelection();
 				engine.setTheme(selection, false);
-				((PreferencePageEnhancer) Tweaklets.get(PreferencePageEnhancer.KEY))
-						.setSelection(selection);
-				selectColorsAndFontsTheme(getColorAndFontThemeIdByThemeId(selection.getId()));
+				try {
+					((PreferencePageEnhancer) Tweaklets.get(PreferencePageEnhancer.KEY))
+							.setSelection(selection);
+				} catch (SWTException e) {
+					WorkbenchPlugin.log("Failed to set CSS preferences", e); //$NON-NLS-1$
+				}
 			}
 		});
 
-		currentColorsAndFontsTheme = getCurrentColorsAndFontsTheme();
-		createColorsAndFontsThemeCombo(comp);
-		createColorsAndFontsThemeDescriptionText(comp);
+		createThemeCombo(comp);
+		createThemeDescriptionText(comp);
 		createEnableAnimationsPref(comp);
 		createColoredLabelsPref(comp);
 
@@ -120,15 +116,6 @@ public class ViewsPreferencePage extends PreferencePage implements
 				.setSelection(currentTheme);
 		((PreferencePageEnhancer) Tweaklets.get(PreferencePageEnhancer.KEY)).createContents(comp);
 
-		if (currentTheme != null) {
-			String colorsAndFontsThemeId = getColorAndFontThemeIdByThemeId(currentTheme
-					.getId());
-			if (colorsAndFontsThemeId != null
-					&& !currentColorsAndFontsTheme.getId().equals(colorsAndFontsThemeId)) {
-				colorsAndFontsThemeId = currentColorsAndFontsTheme.getId();
-			}
-			selectColorsAndFontsTheme(colorsAndFontsThemeId);
-		}
 
 		return comp;
 	}
@@ -159,7 +146,7 @@ public class ViewsPreferencePage extends PreferencePage implements
 	}
 
 	/** @return the currently selected theme or null if there are no themes */
-	private ITheme getSelectedTheme() {
+	private ITheme getSelection() {
 		return (ITheme) ((IStructuredSelection) themeIdCombo.getSelection()).getFirstElement();
 	}
 
@@ -172,23 +159,26 @@ public class ViewsPreferencePage extends PreferencePage implements
 
 	@Override
 	public boolean performOk() {
-		setColorsAndFontsTheme(getSelectedColorsAndFontsTheme());
-
-		ITheme theme = getSelectedTheme();
-		if (theme != null) {
-			engine.setTheme(getSelectedTheme(), true);
+		if (getSelection() != null) {
+			if (!getSelection().equals(currentTheme)) {
+				MessageDialog.openWarning(getShell(), WorkbenchMessages.ThemeChangeWarningTitle,
+						WorkbenchMessages.ThemeChangeWarningText);
+			}
+			engine.setTheme(getSelection(), true);
 		}
-
-		boolean themeChanged = theme != null && !theme.equals(currentTheme);
-		boolean colorsAndFontsThemeChanged = !PlatformUI.getWorkbench().getThemeManager()
-				.getCurrentTheme().getId().equals(currentColorsAndFontsTheme.getId());
-
-		if (themeChanged || colorsAndFontsThemeChanged) {
-			MessageDialog.openWarning(getShell(), WorkbenchMessages.ThemeChangeWarningTitle,
-					WorkbenchMessages.ThemeChangeWarningText);
-		}
-
 		IPreferenceStore apiStore = PrefUtil.getAPIPreferenceStore();
+		int idx = themeCombo.getSelectionIndex();
+		if (idx <= 0) {
+			PlatformUI.getWorkbench().getThemeManager()
+					.setCurrentTheme(IThemeManager.DEFAULT_THEME);
+			refreshThemeCombo(IThemeManager.DEFAULT_THEME);
+		} else {
+			IThemeDescriptor applyTheme = WorkbenchPlugin.getDefault().getThemeRegistry()
+					.getThemes()[idx - 1];
+			PlatformUI.getWorkbench().getThemeManager().setCurrentTheme(applyTheme.getId());
+			refreshThemeCombo(applyTheme.getId());
+		}
+		refreshThemeDescriptionText();
 		apiStore.setValue(IWorkbenchPreferenceConstants.ENABLE_ANIMATIONS,
 				enableAnimations.getSelection());
 		apiStore.setValue(IWorkbenchPreferenceConstants.USE_COLORED_LABELS,
@@ -197,18 +187,8 @@ public class ViewsPreferencePage extends PreferencePage implements
 		return super.performOk();
 	}
 
-	private void setColorsAndFontsTheme(ColorsAndFontsTheme theme) {
-		org.eclipse.ui.themes.ITheme currentTheme = PlatformUI.getWorkbench().getThemeManager()
-				.getCurrentTheme();
-		if (theme != null && !currentTheme.getId().equals(theme.getId())) {
-			PlatformUI.getWorkbench().getThemeManager().setCurrentTheme(theme.getId());
-		}
-	}
-
 	@Override
 	protected void performDefaults() {
-		setColorsAndFontsTheme(currentColorsAndFontsTheme);
-
 		((PreferencePageEnhancer) Tweaklets.get(PreferencePageEnhancer.KEY)).performDefaults();
 		engine.setTheme(defaultTheme, true);
 		if (engine.getActiveTheme() != null) {
@@ -224,35 +204,22 @@ public class ViewsPreferencePage extends PreferencePage implements
 
 	@Override
 	public boolean performCancel() {
-		setColorsAndFontsTheme(currentColorsAndFontsTheme);
-
 		if (currentTheme != null) {
 			engine.setTheme(currentTheme, false);
 		}
 		return super.performCancel();
 	}
 
-	private void createColorsAndFontsThemeCombo(Composite composite) {
+	private void createThemeCombo(Composite composite) {
 		new Label(composite, SWT.NONE).setText(WorkbenchMessages.ViewsPreference_currentTheme);
-		colorsAndFontsThemeCombo = new ComboViewer(composite, SWT.READ_ONLY);
-		colorsAndFontsThemeCombo.getControl().setLayoutData(
-				new GridData(SWT.FILL, SWT.CENTER, true, false));
-		colorsAndFontsThemeCombo.setLabelProvider(new LabelProvider() {
-			@Override
-			public String getText(Object element) {
-				return ((ColorsAndFontsTheme) element).getLabel();
+		themeCombo = new Combo(composite, SWT.READ_ONLY);
+		themeCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		themeCombo.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				refreshThemeDescriptionText();
 			}
 		});
-		colorsAndFontsThemeCombo.setContentProvider(new ArrayContentProvider());
-		colorsAndFontsThemeCombo.setInput(getColorsAndFontsThemes());
-		colorsAndFontsThemeCombo.getControl().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		colorsAndFontsThemeCombo.addSelectionChangedListener(new ISelectionChangedListener() {
-			public void selectionChanged(SelectionChangedEvent event) {
-				ColorsAndFontsTheme colorsAndFontsTheme = getSelectedColorsAndFontsTheme();
-				refreshColorsAndFontsThemeDescriptionText(colorsAndFontsTheme);
-				setColorsAndFontsTheme(colorsAndFontsTheme);
-			}
-		});		
+		refreshThemeCombo(PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getId());
 	}
 
 	/**
@@ -262,12 +229,11 @@ public class ViewsPreferencePage extends PreferencePage implements
 	 * @param parent
 	 *            the parent <code>Composite</code>.
 	 */
-	private void createColorsAndFontsThemeDescriptionText(Composite parent) {
+	private void createThemeDescriptionText(Composite parent) {
 		new Label(parent, SWT.NONE)
 				.setText(WorkbenchMessages.ViewsPreference_currentThemeDescription);
 
-		colorsAndFontsThemeDescriptionText = new Text(parent, SWT.H_SCROLL | SWT.V_SCROLL
-				| SWT.READ_ONLY
+		themeDescriptionText = new Text(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.READ_ONLY
 				| SWT.BORDER | SWT.WRAP);
 		GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
 		// give a height hint that'll show at least two lines (and let the
@@ -275,66 +241,31 @@ public class ViewsPreferencePage extends PreferencePage implements
 		GC gc = new GC(parent);
 		layoutData.heightHint = Dialog.convertHeightInCharsToPixels(gc.getFontMetrics(), 2);
 		gc.dispose();
-		colorsAndFontsThemeDescriptionText.setLayoutData(layoutData);
+		themeDescriptionText.setLayoutData(layoutData);
+
+		refreshThemeDescriptionText();
 	}
 
-	@SuppressWarnings("unchecked")
-	private void selectColorsAndFontsTheme(String colorAndFontThemeId) {
-		colorsAndFontsThemeCombo.getCombo().setEnabled(colorAndFontThemeId != null);
-		if (colorAndFontThemeId == null) {
-			colorAndFontThemeId = currentColorsAndFontsTheme.getId();
+	private void refreshThemeDescriptionText() {
+		String description = null;
+		int idx = themeCombo.getSelectionIndex();
+		// idx == 0 is "Default" which has no description
+		if (idx > 0) {
+			IThemeDescriptor theme = WorkbenchPlugin.getDefault().getThemeRegistry().getThemes()[idx - 1];
+			description = theme.getDescription();
 		}
-
-		List<ColorsAndFontsTheme> colorsAndFontsThemes = (List<ColorsAndFontsTheme>) colorsAndFontsThemeCombo
-				.getInput();
-
-		for (int i = 0; i < colorsAndFontsThemes.size(); i++) {
-			if (colorsAndFontsThemes.get(i).getId().equals(colorAndFontThemeId)) {
-				colorsAndFontsThemeCombo.getCombo().select(i);
-				break;
-			}
+		if (description == null) {
+			description = ""; //$NON-NLS-1$
 		}
+		themeDescriptionText.setText(description);
 	}
 
-	private String getColorAndFontThemeIdByThemeId(String themeId) {
-		if (themeAssociations == null) {
-			themeAssociations = createThemeAssociations();
-		}
-
-		// first get by exact matching (together with os_version)
-		String result = themeAssociations.get(themeId);
-
-		if (result == null) {
-			for (Map.Entry<String, String> entry : themeAssociations.entrySet()) {
-				if (themeId.startsWith(entry.getKey())) {
-					return entry.getValue();
-				}
-			}
-		}
-
-		return result;
-	}
-
-	private Map<String, String> createThemeAssociations() {
-		Map<String, String> result = new HashMap<String, String>();
-		IExtensionRegistry registry = RegistryFactory.getRegistry();
-		IExtensionPoint extPoint = registry.getExtensionPoint("org.eclipse.e4.ui.css.swt.theme"); //$NON-NLS-1$
-
-		for (IExtension e : extPoint.getExtensions()) {
-			for (IConfigurationElement ce : e.getConfigurationElements()) {
-				if (ce.getName().equals("themeassociation")) { //$NON-NLS-1$
-					String themeId = ce.getAttribute("themeid"); //$NON-NLS-1$
-					String osVersion = ce.getAttribute("os_version"); //$NON-NLS-1$
-					result.put(osVersion != null ? themeId + osVersion : themeId,
-							ce.getAttribute("colorsandfonts")); //$NON-NLS-1$						
-				}
-			}
-		}
-		return result;
-	}
-
-	private List<ColorsAndFontsTheme> getColorsAndFontsThemes() {
-		List<ColorsAndFontsTheme> result = new ArrayList<ColorsAndFontsTheme>();
+	/**
+	 * @param themeToSelect
+	 *            the id of the theme to be selected
+	 */
+	private void refreshThemeCombo(String themeToSelect) {
+		themeCombo.removeAll();
 		org.eclipse.ui.themes.ITheme currentTheme = PlatformUI.getWorkbench().getThemeManager()
 				.getCurrentTheme();
 
@@ -345,60 +276,21 @@ public class ViewsPreferencePage extends PreferencePage implements
 			defaultThemeString = NLS.bind(WorkbenchMessages.ViewsPreference_currentThemeFormat,
 					new Object[] { defaultThemeString });
 		}
-		result.add(new ColorsAndFontsTheme(IThemeManager.DEFAULT_THEME, defaultThemeString));
+		themeCombo.add(defaultThemeString);
 
 		String themeString;
+		int selection = 0;
 		for (int i = 0; i < descs.length; i++) {
 			themeString = descs[i].getName();
 			if (descs[i].getId().equals(currentTheme.getId())) {
 				themeString = NLS.bind(WorkbenchMessages.ViewsPreference_currentThemeFormat,
 						new Object[] { themeString });
 			}
-			result.add(new ColorsAndFontsTheme(descs[i].getId(), themeString));
-		}
-		return result;
-	}
-
-	private void refreshColorsAndFontsThemeDescriptionText(ColorsAndFontsTheme theme) {
-		String description = ""; //$NON-NLS-1$
-		IThemeDescriptor[] descs = WorkbenchPlugin.getDefault().getThemeRegistry().getThemes();
-		
-		for (int i = 0; theme != null && description == null && i < descs.length; i++) {
-			if (descs[i].getId().equals(theme.getId())) {
-				description = descs[i].getDescription();
+			if (themeToSelect.equals(descs[i].getId())) {
+				selection = i + 1;
 			}
+			themeCombo.add(themeString);
 		}
-		colorsAndFontsThemeDescriptionText.setText(description);
-	}
-
-	private ColorsAndFontsTheme getSelectedColorsAndFontsTheme() {
-		return (ColorsAndFontsTheme) ((IStructuredSelection) colorsAndFontsThemeCombo
-				.getSelection()).getFirstElement();
-	}
-
-	private ColorsAndFontsTheme getCurrentColorsAndFontsTheme() {
-		org.eclipse.ui.themes.ITheme theme = PlatformUI.getWorkbench().getThemeManager()
-				.getCurrentTheme();
-
-		return new ColorsAndFontsTheme(theme.getId(), theme.getLabel());
-	}
-
-
-	private static class ColorsAndFontsTheme {
-		private String label;
-		private String id;
-
-		public ColorsAndFontsTheme(String id, String label) {
-			this.id = id;
-			this.label = label;
-		}
-
-		public String getId() {
-			return id;
-		}
-
-		public String getLabel() {
-			return label;
-		}
+		themeCombo.select(selection);
 	}
 }

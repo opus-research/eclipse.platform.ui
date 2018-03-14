@@ -20,7 +20,6 @@
          <sequence>
             <element ref="stylesheet" minOccurs="0" maxOccurs="unbounded"/>
             <element ref="theme" minOccurs="0" maxOccurs="unbounded"/>
-            <element ref="themeassociation" minOccurs="0" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -164,33 +163,6 @@
       </complexType>
    </element>
 
-   <element name="themeassociation">
-      <complexType>
-         <attribute name="themeid" type="string" use="required">
-            <annotation>
-               <documentation>
-                  an Eclipse CSS theme id (extension/theme/@id)
-               </documentation>
-            </annotation>
-         </attribute>
-         <attribute name="colorsandfonts" type="string" use="required">
-            <annotation>
-               <documentation>
-                  an Eclipse legacy Color and Font theme id
-               </documentation>
-            </annotation>
-         </attribute>
-         <attribute name="os_version" type="string">
-            <annotation>
-               <documentation>
-                  an optional attribute used to better match the themes 
-                  (the attr's value is the same as the 'extension/theme/@os_version' one)                                   
-               </documentation>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
    <annotation>
       <appinfo>
          <meta.section type="since"/>
@@ -226,14 +198,10 @@ A stylesheet contributed to all Systems:
 &lt;/stylesheet&gt;
 &lt;/pre&gt;
 &lt;/p&gt;
-
-The CSS theme and the legacy Colors and Fonts one association:
-&lt;themeassociation
- themeid=&quot;org.eclipse.e4.ui.css.theme.e4_classic&quot;
- colorsandfonts=&quot;org.eclipse.ui.defaultTheme&quot;&gt; 
-&lt;/themeassociation&gt;
       </documentation>
    </annotation>
+
+
 
    <annotation>
       <appinfo>

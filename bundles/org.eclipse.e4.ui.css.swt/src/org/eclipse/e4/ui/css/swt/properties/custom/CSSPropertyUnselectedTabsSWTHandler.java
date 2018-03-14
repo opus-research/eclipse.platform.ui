@@ -3,7 +3,7 @@
  * program and the accompanying materials are made available under the terms of
  * the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors: IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.properties.custom;
@@ -34,10 +34,6 @@ public class CSSPropertyUnselectedTabsSWTHandler extends AbstractCSSPropertySWTH
 		if (value.getCssValueType() == CSSValue.CSS_VALUE_LIST) {
 			Gradient grad = (Gradient) engine.convert(value, Gradient.class, control.getDisplay());
 			CTabFolder folder = ((CTabFolder) control);
-			if (grad.getValues().isEmpty()) {
-				folder.setBackground(null, null, true);
-				return;
-			}
 			Color[] colors = CSSSWTColorHelper.getSWTColors(grad, folder.getDisplay(), engine);
 			int[] percents = CSSSWTColorHelper.getPercents(grad);
 			folder.setBackground(colors, percents, true);
