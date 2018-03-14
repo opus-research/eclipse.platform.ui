@@ -57,7 +57,6 @@ public class AbstractCSSParser implements CSSParser {
 	 *
 	 * @see org.eclipse.e4.ui.css.core.dom.parsers.CSSParser#parseStyleSheet(org.w3c.css.sac.InputSource)
 	 */
-	@Override
 	public CSSStyleSheet parseStyleSheet(InputSource source) throws IOException {
 		ExtendedDocumentHandler documentHandler = getDocumentHandlerFactory()
 				.makeDocumentHandler();
@@ -72,7 +71,6 @@ public class AbstractCSSParser implements CSSParser {
 	 *
 	 * @see org.eclipse.e4.ui.css.core.dom.parsers.CSSParser#parseStyleDeclaration(org.w3c.css.sac.InputSource)
 	 */
-	@Override
 	public CSSStyleDeclaration parseStyleDeclaration(InputSource source)
 			throws IOException {
 		CSSStyleDeclarationImpl styleDeclaration = new CSSStyleDeclarationImpl(
@@ -88,7 +86,6 @@ public class AbstractCSSParser implements CSSParser {
 	 * @see org.eclipse.e4.ui.css.core.dom.parsers.CSSParser#parseStyleDeclaration(org.w3c.dom.css.CSSStyleDeclaration,
 	 *      org.w3c.css.sac.InputSource)
 	 */
-	@Override
 	public void parseStyleDeclaration(CSSStyleDeclaration styleDeclaration,
 			InputSource source) throws IOException {
 		Stack stack = new Stack();
@@ -106,7 +103,6 @@ public class AbstractCSSParser implements CSSParser {
 	 *
 	 * @see org.eclipse.e4.ui.css.core.dom.parsers.CSSParser#parsePropertyValue(org.w3c.css.sac.InputSource)
 	 */
-	@Override
 	public CSSValue parsePropertyValue(InputSource source) throws IOException {
 		Parser parser = getParser();
 		ExtendedDocumentHandler documentHandler = getDocumentHandlerFactory()
@@ -120,7 +116,6 @@ public class AbstractCSSParser implements CSSParser {
 	 *
 	 * @see org.eclipse.e4.ui.css.core.dom.parsers.CSSParser#parseRule(org.w3c.css.sac.InputSource)
 	 */
-	@Override
 	public CSSRule parseRule(InputSource source) throws IOException {
 		// TODO Auto-generated method stub
 		return null;
@@ -133,7 +128,6 @@ public class AbstractCSSParser implements CSSParser {
 	 * org.eclipse.e4.ui.css.core.dom.parsers.CSSParser#parseSelectors(org.w3c
 	 * .css.sac.InputSource)
 	 */
-	@Override
 	public SelectorList parseSelectors(InputSource source) throws IOException {
 		ExtendedDocumentHandler documentHandler = getDocumentHandlerFactory()
 				.makeDocumentHandler();
@@ -147,7 +141,6 @@ public class AbstractCSSParser implements CSSParser {
 	 *
 	 * @see org.eclipse.e4.ui.css.core.dom.parsers.CSSParser#setParentStyleSheet(org.w3c.dom.css.CSSStyleSheet)
 	 */
-	@Override
 	public void setParentStyleSheet(CSSStyleSheet parentStyleSheet) {
 
 	}
@@ -169,7 +162,6 @@ public class AbstractCSSParser implements CSSParser {
 	 *
 	 * @param documentHandlerFactory
 	 */
-	@Override
 	public void setDocumentHandlerFactory(
 			DocumentHandlerFactory documentHandlerFactory) {
 		this.documentHandlerFactory = documentHandlerFactory;
@@ -234,7 +226,6 @@ public class AbstractCSSParser implements CSSParser {
 	 *
 	 * @see org.eclipse.e4.ui.css.core.dom.parsers.CSSParser#getConditionFactory()
 	 */
-	@Override
 	public ConditionFactory getConditionFactory() {
 		return conditionFactory;
 	}
@@ -244,7 +235,6 @@ public class AbstractCSSParser implements CSSParser {
 	 *
 	 * @see org.eclipse.e4.ui.css.core.dom.parsers.CSSParser#setConditionFactory(org.w3c.css.sac.ConditionFactory)
 	 */
-	@Override
 	public void setConditionFactory(ConditionFactory conditionFactory) {
 		this.conditionFactory = conditionFactory;
 	}
@@ -254,7 +244,6 @@ public class AbstractCSSParser implements CSSParser {
 	 *
 	 * @see org.eclipse.e4.ui.css.core.dom.parsers.CSSParser#getSelectorFactory()
 	 */
-	@Override
 	public SelectorFactory getSelectorFactory() {
 		return selectorFactory;
 	}
@@ -264,7 +253,6 @@ public class AbstractCSSParser implements CSSParser {
 	 *
 	 * @see org.eclipse.e4.ui.css.core.dom.parsers.CSSParser#setSelectorFactory(org.w3c.css.sac.SelectorFactory)
 	 */
-	@Override
 	public void setSelectorFactory(SelectorFactory selectorFactory) {
 		this.selectorFactory = selectorFactory;
 	}
