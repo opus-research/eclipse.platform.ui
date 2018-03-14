@@ -20,9 +20,10 @@ import java.util.Collection;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
+import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuItem;
+import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
 import org.junit.Test;
@@ -152,7 +153,7 @@ public abstract class ModelReconcilerWindowTest extends ModelReconcilerTest {
 		ModelReconciler reconciler = createModelReconciler();
 		reconciler.recordChanges(application);
 
-		MMenu menu = ems.createModelElement(MMenu.class);
+		MMenu menu = MenuFactoryImpl.eINSTANCE.createMenu();
 		window.setMainMenu(menu);
 
 		Object state = reconciler.serialize();
@@ -176,7 +177,7 @@ public abstract class ModelReconcilerWindowTest extends ModelReconcilerTest {
 
 		MWindow window = createWindow(application);
 
-		MMenu menu = ems.createModelElement(MMenu.class);
+		MMenu menu = MenuFactoryImpl.eINSTANCE.createMenu();
 		window.setMainMenu(menu);
 
 		saveModel();
@@ -206,7 +207,7 @@ public abstract class ModelReconcilerWindowTest extends ModelReconcilerTest {
 
 		MWindow window = createWindow(application);
 
-		MMenu menu = ems.createModelElement(MMenu.class);
+		MMenu menu = MenuFactoryImpl.eINSTANCE.createMenu();
 		menu.setToBeRendered(before);
 		window.setMainMenu(menu);
 
@@ -236,7 +237,7 @@ public abstract class ModelReconcilerWindowTest extends ModelReconcilerTest {
 	public void testWindow_Menu_Children_Add() {
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
-		MMenu menu = ems.createModelElement(MMenu.class);
+		MMenu menu = MenuFactoryImpl.eINSTANCE.createMenu();
 		window.setMainMenu(menu);
 
 		saveModel();
@@ -244,7 +245,7 @@ public abstract class ModelReconcilerWindowTest extends ModelReconcilerTest {
 		ModelReconciler reconciler = createModelReconciler();
 		reconciler.recordChanges(application);
 
-		MMenuItem menuItem = ems.createModelElement(MDirectMenuItem.class);
+		MMenuItem menuItem = MenuFactoryImpl.eINSTANCE.createDirectMenuItem();
 		menuItem.setLabel("File");
 		menu.getChildren().add(menuItem);
 
@@ -277,10 +278,10 @@ public abstract class ModelReconcilerWindowTest extends ModelReconcilerTest {
 	public void testWindow_Menu_Children_Remove() {
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
-		MMenu menu = ems.createModelElement(MMenu.class);
+		MMenu menu = MenuFactoryImpl.eINSTANCE.createMenu();
 		window.setMainMenu(menu);
 
-		MMenuItem menuItem = ems.createModelElement(MDirectMenuItem.class);
+		MMenuItem menuItem = MenuFactoryImpl.eINSTANCE.createDirectMenuItem();
 		menuItem.setLabel("File");
 		menu.getChildren().add(menuItem);
 
@@ -344,7 +345,7 @@ public abstract class ModelReconcilerWindowTest extends ModelReconcilerTest {
 	public void testWindow_NestedMenu() {
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
-		MMenu menu = ems.createModelElement(MMenu.class);
+		MMenu menu = MenuFactoryImpl.eINSTANCE.createMenu();
 		window.setMainMenu(menu);
 
 		saveModel();
@@ -354,7 +355,7 @@ public abstract class ModelReconcilerWindowTest extends ModelReconcilerTest {
 
 		menu.setLabel("menuLabel");
 
-		MMenu item = ems.createModelElement(MMenu.class);
+		MMenu item = MenuFactoryImpl.eINSTANCE.createMenu();
 		item.setLabel("itemLabel");
 		menu.getChildren().add(item);
 
@@ -392,7 +393,7 @@ public abstract class ModelReconcilerWindowTest extends ModelReconcilerTest {
 		ModelReconciler reconciler = createModelReconciler();
 		reconciler.recordChanges(application);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		window.getSharedElements().add(part);
 
 		Object state = reconciler.serialize();
@@ -419,7 +420,7 @@ public abstract class ModelReconcilerWindowTest extends ModelReconcilerTest {
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		window.getSharedElements().add(part);
 
 		saveModel();
