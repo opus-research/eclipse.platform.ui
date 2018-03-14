@@ -578,21 +578,18 @@ public class PopupDialog extends Window {
 	protected void configureShell(Shell shell) {
 		GridLayoutFactory.fillDefaults().margins(0, 0).spacing(5, 5).applyTo(
 				shell);
+
 		shell.addListener(SWT.Deactivate, event -> {
 			/*
 			 * Close if we are deactivating and have no child shells. If we
 			 * have child shells, we are deactivating due to their opening.
-			 * 
-			 * Feature in GTK: this causes the Quick Outline/Type Hierarchy
-			 * Shell to close on re-size/movement on Gtk3. For this reason,
-			 * the asyncClose() call is disabled in GTK. See Eclipse Bugs
-			 * 466500 and 113577 for more information.
+			 * On X, we receive this when a menu child (such as the system
+			 * menu) of the shell opens, but I have not found a way to
+			 * distinguish that case here. Hence bug #113577 still exists.
 			 */
 			if (listenToDeactivate && event.widget == getShell()
 					&& getShell().getShells().length == 0) {
-				if (!Util.isGtk()) {
-					asyncClose();
-				}
+				asyncClose();
 			} else {
 				/*
 				 * We typically ignore deactivates to work around

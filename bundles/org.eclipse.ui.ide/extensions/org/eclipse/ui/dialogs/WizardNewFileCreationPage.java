@@ -32,8 +32,8 @@ import org.eclipse.core.resources.IResourceStatus;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -41,7 +41,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -191,9 +190,12 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 			});
 		}
 		linkedResourceGroup = new CreateLinkedResourceGroup(IResource.FILE,
-				e -> {
-					setPageComplete(validatePage());
-					firstLinkCheck = false;
+				new Listener() {
+					@Override
+					public void handleEvent(Event e) {
+						setPageComplete(validatePage());
+						firstLinkCheck = false;
+					}
 				}, new CreateLinkedResourceGroup.IStringValue() {
 					@Override
 					public void setValue(String string) {
@@ -284,7 +286,6 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 	@Deprecated
 	protected void createFile(IFile fileHandle, InputStream contents,
 			IProgressMonitor monitor) throws CoreException {
-		SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
 		if (contents == null) {
 			contents = new ByteArrayInputStream(new byte[0]);
 		}
@@ -292,26 +293,26 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 		try {
 			// Create a new file resource in the workspace
 			if (linkTargetPath != null) {
-				fileHandle.createLink(linkTargetPath, IResource.ALLOW_MISSING_LOCAL, subMonitor.split(100));
+				fileHandle.createLink(linkTargetPath,
+						IResource.ALLOW_MISSING_LOCAL, monitor);
 			} else {
 				IPath path = fileHandle.getFullPath();
 				IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 				int numSegments = path.segmentCount();
-				if (numSegments > 2 && !root.getFolder(path.removeLastSegments(1)).exists()) {
+				if (numSegments > 2
+						&& !root.getFolder(path.removeLastSegments(1)).exists()) {
 					// If the direct parent of the path doesn't exist, try to
-					// create the necessary directories.
-					SubMonitor loopMonitor = subMonitor.split(30);
+					// create the
+					// necessary directories.
 					for (int i = numSegments - 2; i > 0; i--) {
-						loopMonitor.setWorkRemaining(i);
 						IFolder folder = root.getFolder(path
 								.removeLastSegments(i));
 						if (!folder.exists()) {
-							folder.create(false, true, loopMonitor.split(1));
+							folder.create(false, true, monitor);
 						}
 					}
 				}
-				subMonitor.setWorkRemaining(100);
-				fileHandle.create(contents, false, subMonitor.split(100));
+				fileHandle.create(contents, false, monitor);
 			}
 		} catch (CoreException e) {
 			// If the file already existed locally, just refresh to get contents
@@ -320,6 +321,10 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 			} else {
 				throw e;
 			}
+		}
+
+		if (monitor.isCanceled()) {
+			throw new OperationCanceledException();
 		}
 	}
 
@@ -429,50 +434,56 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 			}
 		}
 
-		IRunnableWithProgress op = monitor -> {
-			CreateFileOperation op1 = new CreateFileOperation(newFileHandle,
-					linkTargetPath, initialContents,
-					IDEWorkbenchMessages.WizardNewFileCreationPage_title);
-			try {
-				// see bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=219901
-				// directly execute the operation so that the undo state is
-				// not preserved.  Making this undoable resulted in too many
-				// accidental file deletions.
-				op1.execute(monitor, WorkspaceUndoUtil
-						.getUIInfoAdapter(getShell()));
-			} catch (final ExecutionException e) {
-				getContainer().getShell().getDisplay().syncExec(
-						() -> {
-							if (e.getCause() instanceof CoreException) {
-								ErrorDialog
-										.openError(
-												getContainer()
-														.getShell(), // Was
-												// Utilities.getFocusShell()
-												IDEWorkbenchMessages.WizardNewFileCreationPage_errorTitle,
-												null, // no special
-												// message
-												((CoreException) e
-														.getCause())
-														.getStatus());
-							} else {
-								IDEWorkbenchPlugin
-										.log(
-												getClass(),
-												"createNewFile()", e.getCause()); //$NON-NLS-1$
-								MessageDialog
-										.openError(
-												getContainer()
-														.getShell(),
-												IDEWorkbenchMessages.WizardNewFileCreationPage_internalErrorTitle,
-												NLS
-														.bind(
-																IDEWorkbenchMessages.WizardNewFileCreationPage_internalErrorMessage,
-																e
-																		.getCause()
-																		.getMessage()));
-							}
-						});
+		IRunnableWithProgress op = new IRunnableWithProgress() {
+			@Override
+			public void run(IProgressMonitor monitor) {
+				CreateFileOperation op = new CreateFileOperation(newFileHandle,
+						linkTargetPath, initialContents,
+						IDEWorkbenchMessages.WizardNewFileCreationPage_title);
+				try {
+					// see bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=219901
+					// directly execute the operation so that the undo state is
+					// not preserved.  Making this undoable resulted in too many
+					// accidental file deletions.
+					op.execute(monitor, WorkspaceUndoUtil
+							.getUIInfoAdapter(getShell()));
+				} catch (final ExecutionException e) {
+					getContainer().getShell().getDisplay().syncExec(
+							new Runnable() {
+								@Override
+								public void run() {
+									if (e.getCause() instanceof CoreException) {
+										ErrorDialog
+												.openError(
+														getContainer()
+																.getShell(), // Was
+														// Utilities.getFocusShell()
+														IDEWorkbenchMessages.WizardNewFileCreationPage_errorTitle,
+														null, // no special
+														// message
+														((CoreException) e
+																.getCause())
+																.getStatus());
+									} else {
+										IDEWorkbenchPlugin
+												.log(
+														getClass(),
+														"createNewFile()", e.getCause()); //$NON-NLS-1$
+										MessageDialog
+												.openError(
+														getContainer()
+																.getShell(),
+														IDEWorkbenchMessages.WizardNewFileCreationPage_internalErrorTitle,
+														NLS
+																.bind(
+																		IDEWorkbenchMessages.WizardNewFileCreationPage_internalErrorMessage,
+																		e
+																				.getCause()
+																				.getMessage()));
+									}
+								}
+							});
+				}
 			}
 		};
 		try {
@@ -683,7 +694,12 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 			Iterator it = currentSelection.iterator();
 			if (it.hasNext()) {
 				Object object = it.next();
-				IResource selectedResource = Adapters.adapt(object, IResource.class);
+				IResource selectedResource = null;
+				if (object instanceof IResource) {
+					selectedResource = (IResource) object;
+				} else if (object instanceof IAdaptable) {
+					selectedResource = ((IAdaptable) object).getAdapter(IResource.class);
+				}
 				if (selectedResource != null) {
 					if (selectedResource.getType() == IResource.FILE) {
 						selectedResource = selectedResource.getParent();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -346,7 +346,12 @@ class FiltersDialog extends TrayDialog {
         }
     };
 
-    private ICheckStateListener checkStateListener = event -> FiltersDialog.this.checkStateChanged(event);
+    private ICheckStateListener checkStateListener = new ICheckStateListener() {
+        @Override
+		public void checkStateChanged(CheckStateChangedEvent event) {
+            FiltersDialog.this.checkStateChanged(event);
+        }
+    };
 
     /**
      * Creates a new filters dialog.

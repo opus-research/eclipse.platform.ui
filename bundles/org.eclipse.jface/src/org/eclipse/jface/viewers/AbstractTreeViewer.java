@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -61,10 +61,6 @@ import org.eclipse.swt.widgets.Widget;
  * interfaces <code>ITreeContentProvider</code> or (as of 3.2, to support
  * multiple equal elements) <code>ITreePathContentProvider</code>.
  * </p>
- * <p>
- * <strong> This class is not intended to be subclassed outside of the JFace
- * viewers framework.</strong>
- * <p>
  *
  * @see TreeViewer
  */
@@ -2355,10 +2351,9 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	}
 
 	/**
-	 * Sets the content provider used by this <code>AbstractTreeViewer</code>.
-	 * <p>
-	 * Content providers for abstract tree viewers must implement either
-	 * {@link ITreeContentProvider} or {@link ITreePathContentProvider}.
+	 * The <code>AbstractTreeViewer</code> implementation of this method
+	 * checks to ensure that the content provider is an
+	 * <code>ITreeContentProvider</code>.
 	 */
 	@Override
 	public void setContentProvider(IContentProvider provider) {

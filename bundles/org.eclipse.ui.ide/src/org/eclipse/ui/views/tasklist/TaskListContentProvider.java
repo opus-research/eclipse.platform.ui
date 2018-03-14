@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -407,7 +407,12 @@ class TaskListContentProvider implements IStructuredContentProvider,
                 if (!isMarkerLimitExceeded()) {
                     setMarkerLimitExceeded(true);
 
-                    viewer.getControl().getDisplay().syncExec(() -> viewer.refresh());
+                    viewer.getControl().getDisplay().syncExec(new Runnable() {
+                        @Override
+						public void run() {
+                            viewer.refresh();
+                        }
+                    });
                 }
 
                 return new IMarker[0];
@@ -415,7 +420,12 @@ class TaskListContentProvider implements IStructuredContentProvider,
 			if (isMarkerLimitExceeded()) {
 				setMarkerLimitExceeded(false);
 
-				viewer.getControl().getDisplay().syncExec(() -> viewer.refresh());
+				viewer.getControl().getDisplay().syncExec(new Runnable() {
+					@Override
+					public void run() {
+						viewer.refresh();
+					}
+				});
 			}
 
 			return markers;
@@ -533,28 +543,31 @@ class TaskListContentProvider implements IStructuredContentProvider,
          * see 1G95PU8: ITPUI:WIN2000 - Changing task description flashes old
          * description
          */
-        viewer.getControl().getDisplay().syncExec(() -> {
-		    if (getFilterOnMarkerLimit()
-		            && sum(visibleMarkerCounts) > getMarkerLimit()) {
-		        if (!isMarkerLimitExceeded()) {
-		            setMarkerLimitExceeded(true);
-		            viewer.refresh();
-		        }
-		    } else if (taskList.isMarkerLimitExceeded()) {
-		        setMarkerLimitExceeded(false);
-		        viewer.refresh();
-		    } else {
-		        updateViewer(additions, removals, changes);
-		    }
+        viewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+			public void run() {
+                if (getFilterOnMarkerLimit()
+                        && sum(visibleMarkerCounts) > getMarkerLimit()) {
+                    if (!isMarkerLimitExceeded()) {
+                        setMarkerLimitExceeded(true);
+                        viewer.refresh();
+                    }
+                } else if (taskList.isMarkerLimitExceeded()) {
+                    setMarkerLimitExceeded(false);
+                    viewer.refresh();
+                } else {
+                    updateViewer(additions, removals, changes);
+                }
 
-		    /* Update the task list's status message.
-		     * XXX: Quick and dirty solution here.
-		     * Would be better to have a separate model for the tasks and
-		     * have both the content provider and the task list register for
-		     * updates. XXX: Do this inside the syncExec, since we're
-		     * talking to status line widget.
-		     */
-		    taskList.markersChanged();
-		});
+                /* Update the task list's status message.
+                 * XXX: Quick and dirty solution here.
+                 * Would be better to have a separate model for the tasks and
+                 * have both the content provider and the task list register for
+                 * updates. XXX: Do this inside the syncExec, since we're
+                 * talking to status line widget.
+                 */
+                taskList.markersChanged();
+            }
+        });
     }
 }

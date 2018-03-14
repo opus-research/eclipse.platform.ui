@@ -123,11 +123,11 @@ public class PartRenderingEngine implements IPresentationEngine {
 	private void subscribeTopicToBeRendered(@EventTopic(UIEvents.UIElement.TOPIC_TOBERENDERED) Event event) {
 
 		MUIElement changedElement = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
-		MUIElement parent = changedElement.getParent();
+		MElementContainer<?> parent = changedElement.getParent();
 
 		// Handle Detached Windows
 		if (parent == null) {
-			parent = (MUIElement) ((EObject) changedElement).eContainer();
+			parent = (MElementContainer<?>) ((EObject) changedElement).eContainer();
 		}
 
 		// menus are not handled here... ??
@@ -152,13 +152,8 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 			// Ensure that the element about to be removed is not the
 			// selected element
-			if (parent instanceof MElementContainer<?>) {
-				@SuppressWarnings("unchecked")
-				MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) parent;
-				if (container.getSelectedElement() == changedElement) {
-					container.setSelectedElement(null);
-				}
-			}
+			if (parent.getSelectedElement() == changedElement)
+				parent.setSelectedElement(null);
 
 			if (okToRender) {
 				// Un-maximize the element before tearing it down
@@ -1056,10 +1051,20 @@ public class PartRenderingEngine implements IPresentationEngine {
 					spinOnce = false; // loop until the app closes
 					theApp = (MApplication) uiRoot;
 					// long startTime = System.currentTimeMillis();
-					for (MWindow window : theApp.getChildren()) {
-						createGui(window);
+					MWindow selected = theApp.getSelectedElement();
+					if (selected == null) {
+						for (MWindow window : theApp.getChildren()) {
+							createGui(window);
+						}
+					} else {
+						// render the selected one first
+						createGui(selected);
+						for (MWindow window : theApp.getChildren()) {
+							if (selected != window) {
+								createGui(window);
+							}
+						}
 					}
-
 					// long endTime = System.currentTimeMillis();
 					// System.out.println("Render: " + (endTime - startTime));
 					// tell the app context we are starting so the splash is

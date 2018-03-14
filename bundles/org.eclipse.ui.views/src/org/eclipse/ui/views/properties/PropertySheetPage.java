@@ -21,7 +21,6 @@ import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.ConfigureColumns;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ISelection;
@@ -52,12 +51,10 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.help.IContextComputer;
 import org.eclipse.ui.help.IWorkbenchHelpSystem;
+import org.eclipse.ui.internal.views.ViewsPlugin;
 import org.eclipse.ui.internal.views.properties.PropertiesMessages;
 import org.eclipse.ui.part.CellEditorActionHandler;
 import org.eclipse.ui.part.Page;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
 
 /**
  * The standard implementation of property sheet page which presents
@@ -430,22 +427,26 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
         defaultsAction = new DefaultsAction(viewer, "defaults"); //$NON-NLS-1$
         defaultsAction.setText(PropertiesMessages.Defaults_text);
         defaultsAction.setToolTipText(PropertiesMessages.Defaults_toolTip);
-        defaultsAction.setImageDescriptor(createImageDescriptor("elcl16/defaults_ps.png")); //$NON-NLS-1$
-		defaultsAction.setDisabledImageDescriptor(createImageDescriptor("dlcl16/defaults_ps.png")); //$NON-NLS-1$
+        defaultsAction
+                .setImageDescriptor(ViewsPlugin.getViewImageDescriptor("elcl16/defaults_ps.png")); //$NON-NLS-1$
+        defaultsAction
+                .setDisabledImageDescriptor(ViewsPlugin.getViewImageDescriptor("dlcl16/defaults_ps.png")); //$NON-NLS-1$
         defaultsAction.setEnabled(false);
 
         // Show Advanced Properties
         filterAction = new FilterAction(viewer, "filter"); //$NON-NLS-1$
         filterAction.setText(PropertiesMessages.Filter_text);
         filterAction.setToolTipText(PropertiesMessages.Filter_toolTip);
-		filterAction.setImageDescriptor(createImageDescriptor("elcl16/filter_ps.png")); //$NON-NLS-1$
+        filterAction
+                .setImageDescriptor(ViewsPlugin.getViewImageDescriptor("elcl16/filter_ps.png")); //$NON-NLS-1$
         filterAction.setChecked(false);
 
         // Show Categories
         categoriesAction = new CategoriesAction(viewer, "categories"); //$NON-NLS-1$
         categoriesAction.setText(PropertiesMessages.Categories_text);
         categoriesAction.setToolTipText(PropertiesMessages.Categories_toolTip);
-		categoriesAction.setImageDescriptor(createImageDescriptor("elcl16/tree_mode.png")); //$NON-NLS-1$
+        categoriesAction
+                .setImageDescriptor(ViewsPlugin.getViewImageDescriptor("elcl16/tree_mode.png")); //$NON-NLS-1$
         categoriesAction.setChecked(true);
 
         // Columns...
@@ -463,16 +464,8 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
         clipboard = new Clipboard(shell.getDisplay());
         copyAction = new CopyPropertyAction(viewer, "copy", clipboard); //$NON-NLS-1$
         copyAction.setText(PropertiesMessages.CopyProperty_text);
-		copyAction.setImageDescriptor(sharedImages.getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
-    }
-
-	// Replacement for the bundle activator, see Bug 481956
-	private ImageDescriptor createImageDescriptor(String relativeIconPath) {
-		String ICONS_PATH = "$nl$/icons/full/";//$NON-NLS-1$
-		Bundle bundle = FrameworkUtil.getBundle(this.getClass());
-		ImageDescriptor imageDescriptor = AbstractUIPlugin
-				.imageDescriptorFromPlugin(String.valueOf(bundle.getBundleId()), ICONS_PATH + relativeIconPath);
-		return imageDescriptor;
+        copyAction.setImageDescriptor(sharedImages
+                .getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
     }
 
     @Override
