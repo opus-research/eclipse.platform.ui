@@ -10,6 +10,10 @@
  ******************************************************************************/
 package org.eclipse.e4.ui.tests.application;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -38,9 +42,11 @@ import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.e4.ui.workbench.modeling.ISelectionListener;
 import org.eclipse.emf.common.notify.Notifier;
+import org.junit.Test;
 
 public class ESelectionServiceTest extends UITest {
 
+	@Test
 	public void testGetSelection() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -93,6 +99,7 @@ public class ESelectionServiceTest extends UITest {
 		assertEquals(selection2, serviceB.getSelection());
 	}
 
+	@Test
 	public void testGetSelection_Id() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -143,6 +150,7 @@ public class ESelectionServiceTest extends UITest {
 		assertEquals(selection2, serviceB.getSelection("partB")); //$NON-NLS-1$
 	}
 
+	@Test
 	public void testSelectionListener() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -198,6 +206,7 @@ public class ESelectionServiceTest extends UITest {
 		assertNull(listener.getSelection());
 	}
 
+	@Test
 	public void testSelectionListener2() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -272,6 +281,7 @@ public class ESelectionServiceTest extends UITest {
 		assertNull(listener.getSelection());
 	}
 
+	@Test
 	public void testSelectionListener3() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -329,6 +339,7 @@ public class ESelectionServiceTest extends UITest {
 		assertNull(listener.getSelection());
 	}
 
+	@Test
 	public void testBug314538() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -395,6 +406,7 @@ public class ESelectionServiceTest extends UITest {
 		assertNull(listener.getSelection());
 	}
 
+	@Test
 	public void testSelectionListener_Id() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -462,6 +474,7 @@ public class ESelectionServiceTest extends UITest {
 		assertNull(listener.getSelection());
 	}
 
+	@Test
 	public void testSelectionListener_Id2() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -506,6 +519,7 @@ public class ESelectionServiceTest extends UITest {
 		assertEquals(selectionB, listener.getSelection());
 	}
 
+	@Test
 	public void testSelectionListener_Id3() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -599,6 +613,7 @@ public class ESelectionServiceTest extends UITest {
 		}
 	}
 
+	@Test
 	public void testOnePartSelection() throws Exception {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -624,6 +639,7 @@ public class ESelectionServiceTest extends UITest {
 		assertNull(p.input);
 	}
 
+	@Test
 	public void testTwoPartHandlerExecute() throws Exception {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -701,6 +717,7 @@ public class ESelectionServiceTest extends UITest {
 		// assertNull(handler.selection); // incorrect; should be selection
 	}
 
+	@Test
 	public void testThreePartSelection() throws Exception {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -771,6 +788,7 @@ public class ESelectionServiceTest extends UITest {
 		assertEquals(selection2, partThreeImpl.input);
 	}
 
+	@Test
 	public void testPartOneTracksPartThree() throws Exception {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -814,6 +832,7 @@ public class ESelectionServiceTest extends UITest {
 		// part one tracks down part three. this could just as easily be
 		// fronted by the mediator.addSelectionListener(*)
 		partContextC.runAndTrack(new RunAndTrack() {
+			@Override
 			public boolean changed(IEclipseContext context) {
 				ESelectionService s = (ESelectionService) partContextA
 						.get(ESelectionService.class.getName());
@@ -840,6 +859,7 @@ public class ESelectionServiceTest extends UITest {
 		// assertNull(partThreeImpl.input); // incorrect
 	}
 
+	@Test
 	public void testPartOneTracksPartThree2() throws Exception {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -885,6 +905,7 @@ public class ESelectionServiceTest extends UITest {
 				.get(ESelectionService.class.getName());
 		selectionService.addSelectionListener(partC.getElementId(),
 				new ISelectionListener() {
+					@Override
 					public void selectionChanged(MPart part, Object selection) {
 						partOneImpl.setOtherSelection(selection);
 					}
@@ -927,6 +948,7 @@ public class ESelectionServiceTest extends UITest {
 		}
 	}
 
+	@Test
 	public void testInjection() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -980,6 +1002,7 @@ public class ESelectionServiceTest extends UITest {
 		assertEquals(o, injectPart.selection);
 	}
 
+	@Test
 	public void testBug343003() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -1028,6 +1051,7 @@ public class ESelectionServiceTest extends UITest {
 		assertEquals(o, listener.getSelection());
 	}
 
+	@Test
 	public void testBug343984() throws Exception {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -1058,6 +1082,7 @@ public class ESelectionServiceTest extends UITest {
 		assertTrue(listener.success);
 	}
 
+	@Test
 	public void testBug393137() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -1124,6 +1149,7 @@ public class ESelectionServiceTest extends UITest {
 			count = 0;
 		}
 
+		@Override
 		public void selectionChanged(MPart part, Object selection) {
 			this.part = part;
 			this.selection = selection;
@@ -1154,6 +1180,7 @@ public class ESelectionServiceTest extends UITest {
 			success = false;
 		}
 
+		@Override
 		public void selectionChanged(MPart part, Object selection) {
 			if (count > 0) {
 				success = false;
