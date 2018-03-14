@@ -336,7 +336,10 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
 	 * @see org.eclipse.ui.IWorkbenchPartReference#getTitleToolTip()
 	 */
 	public String getTitleToolTip() {
-		String toolTip = part.getLocalizedTooltip();
+		String toolTip = (String) part.getTransientData().get(
+				IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY);
+		if (toolTip == null || toolTip.length() == 0)
+			toolTip = part.getLocalizedTooltip();
 		return Util.safeString(toolTip);
 	}
 
@@ -375,13 +378,15 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
 		if (isDisposed()) {
 			return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEF_VIEW);
 		}
-	 
-		if (part != null && part.getRenderer() instanceof SWTPartRenderer) {
-			SWTPartRenderer r = (SWTPartRenderer) part.getRenderer();
+
+		WorkbenchWindow wbw = (WorkbenchWindow) PlatformUI.getWorkbench()
+				.getActiveWorkbenchWindow();
+		if (part != null && wbw.getModel().getRenderer() instanceof SWTPartRenderer) {
+			SWTPartRenderer r = (SWTPartRenderer) wbw.getModel().getRenderer();
 			return r.getImage(part);
 		}
 
-		return null;
+		return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEF_VIEW);
 	}
     
     /* package */ void fireVisibilityChange() {
