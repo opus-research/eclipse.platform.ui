@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?pde version="3.5"?>
+<?pde version="3.1"?>
 
-<product name="%info.product.name" id="org.eclipse.ui.examples.contributions.product" application="org.eclipse.ui.examples.contributions.application" useFeatures="false" includeLaunchers="true">
+<product name="%info.product.name" id="org.eclipse.ui.examples.contributions.product" application="org.eclipse.ui.examples.contributions.application" useFeatures="false">
 
    <aboutInfo>
       <image path="product_lg.gif"/>
@@ -10,15 +10,14 @@
       </text>
    </aboutInfo>
 
-   <configIni use="default">
-   </configIni>
+   <configIni use="default"/>
 
    <launcherArgs>
-      <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts
-      </vmArgsMac>
+      <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 
    <windowImages i16="icons/sample2.gif"/>
+
 
    <launcher>
       <solaris/>
@@ -26,6 +25,7 @@
          <bmp/>
       </win>
    </launcher>
+
 
    <vm>
    </vm>
@@ -38,6 +38,7 @@
       <plugin id="org.eclipse.core.expressions"/>
       <plugin id="org.eclipse.core.jobs"/>
       <plugin id="org.eclipse.core.runtime"/>
+      <plugin id="org.eclipse.core.runtime.compatibility.registry" fragment="true"/>
       <plugin id="org.eclipse.equinox.app"/>
       <plugin id="org.eclipse.equinox.common"/>
       <plugin id="org.eclipse.equinox.preferences"/>
@@ -52,6 +53,5 @@
       <plugin id="org.eclipse.ui.examples.contributions"/>
       <plugin id="org.eclipse.ui.workbench"/>
    </plugins>
-
 
 </product>

@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ide.undo.AbstractWorkspaceOperation;
@@ -67,7 +67,7 @@ public class MoveFilesAndFoldersOperation extends CopyFilesAndFoldersOperation {
 	 *            the resources to move
 	 * @param destination
 	 *            destination to which resources will be moved
-	 * @param monitor
+	 * @param subMonitor
 	 *            a progress monitor for showing progress and for cancelation
 	 *
 	 * @deprecated As of 3.3, the work is performed in the undoable operation
@@ -76,10 +76,9 @@ public class MoveFilesAndFoldersOperation extends CopyFilesAndFoldersOperation {
 	 */
 	@Deprecated
 	@Override
-	protected void copy(IResource[] resources, IPath destination, IProgressMonitor monitor) throws CoreException {
-		SubMonitor subMonitor = SubMonitor.convert(monitor, resources.length);
+	protected void copy(IResource[] resources, IPath destination,
+			IProgressMonitor subMonitor) throws CoreException {
 		for (int i = 0; i < resources.length; i++) {
-			SubMonitor iterationMonitor = subMonitor.split(1).setWorkRemaining(100);
 			IResource source = resources[i];
 			IPath destinationPath = destination.append(source.getName());
 			IWorkspace workspace = source.getWorkspace();
@@ -90,32 +89,36 @@ public class MoveFilesAndFoldersOperation extends CopyFilesAndFoldersOperation {
 				// move the children of the folder.
 				if (homogenousResources(source, existing)) {
 					IResource[] children = ((IContainer) source).members();
-					copy(children, destinationPath, iterationMonitor.split(100));
+					copy(children, destinationPath, subMonitor);
 					delete(source, subMonitor);
 				} else {
 					// delete the destination folder, moving a linked folder
 					// over an unlinked one or vice versa. Fixes bug 28772.
-					delete(existing, iterationMonitor.split(50));
-					source.move(destinationPath, IResource.SHALLOW | IResource.KEEP_HISTORY,
-							iterationMonitor.split(50));
+					delete(existing, new SubProgressMonitor(subMonitor, 0));
+					source.move(destinationPath, IResource.SHALLOW
+							| IResource.KEEP_HISTORY, new SubProgressMonitor(
+							subMonitor, 0));
 				}
 			} else {
 				// if we're merging folders, we could be overwriting an existing
 				// file
 				if (existing != null) {
 					if (homogenousResources(source, existing)) {
-						moveExisting(source, existing, iterationMonitor.split(100));
+						moveExisting(source, existing, subMonitor);
 					} else {
 						// Moving a linked resource over unlinked or vice versa.
 						// Can't use setContents here. Fixes bug 28772.
-						delete(existing, iterationMonitor.split(50));
-						source.move(destinationPath, IResource.SHALLOW | IResource.KEEP_HISTORY,
-								iterationMonitor.split(50));
+						delete(existing, new SubProgressMonitor(subMonitor, 0));
+						source.move(destinationPath, IResource.SHALLOW
+								| IResource.KEEP_HISTORY,
+								new SubProgressMonitor(subMonitor, 0));
 					}
 				} else {
-					source.move(destinationPath, IResource.SHALLOW | IResource.KEEP_HISTORY,
-							iterationMonitor.split(100));
+					source.move(destinationPath, IResource.SHALLOW
+							| IResource.KEEP_HISTORY, new SubProgressMonitor(
+							subMonitor, 0));
 				}
+				subMonitor.worked(1);
 				if (subMonitor.isCanceled()) {
 					throw new OperationCanceledException();
 				}
@@ -188,27 +191,35 @@ public class MoveFilesAndFoldersOperation extends CopyFilesAndFoldersOperation {
 	 *            source file to move
 	 * @param existing
 	 *            existing file to set the source content in
-	 * @param monitor
+	 * @param subMonitor
 	 *            a progress monitor for showing progress and for cancelation
 	 * @throws CoreException
 	 *             setContents failed
 	 * @deprecated As of 3.3, this method is not called.
 	 */
 	@Deprecated
-	private void moveExisting(IResource source, IResource existing, IProgressMonitor monitor) throws CoreException {
-		SubMonitor subMonitor = SubMonitor.convert(monitor, 2);
+	private void moveExisting(IResource source, IResource existing,
+			IProgressMonitor subMonitor) throws CoreException {
 		IFile existingFile = getFile(existing);
 
 		if (existingFile != null) {
 			IFile sourceFile = getFile(source);
 
 			if (sourceFile != null) {
-				existingFile.setContents(sourceFile.getContents(), IResource.KEEP_HISTORY, subMonitor.split(1));
-				delete(sourceFile, subMonitor.split(1));
+				existingFile.setContents(sourceFile.getContents(),
+						IResource.KEEP_HISTORY, new SubProgressMonitor(
+								subMonitor, 0));
+				delete(sourceFile, subMonitor);
 			}
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Overrides method in CopyFilesAndFoldersOperation
+	 *
+	 * Note this method is for internal use only. It is not API.
+	 *
+	 */
 	@Override
 	public String validateDestination(IContainer destination,
 			IResource[] sourceResources) {
@@ -241,6 +252,11 @@ public class MoveFilesAndFoldersOperation extends CopyFilesAndFoldersOperation {
 		return super.validateDestination(destination, sourceResources);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.actions.CopyFilesAndFoldersOperation#isMove()
+	 */
 	@Override
 	protected boolean isMove() {
 		return true;

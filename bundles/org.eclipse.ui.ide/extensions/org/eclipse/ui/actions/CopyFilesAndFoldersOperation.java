@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Serge Beauchamp (Freescale Semiconductor) - Bug 229633
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472784
+ *     Serge Beauchamp (Freescale Semiconductor) - [229633] Group Support
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -35,8 +34,8 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -44,7 +43,7 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IInputValidator;
@@ -342,7 +341,7 @@ public class CopyFilesAndFoldersOperation {
 				MessageDialog dialog = new MessageDialog(
 						messageShell,
 						IDEWorkbenchMessages.CopyFilesAndFoldersOperation_resourceExists,
-						null, message, MessageDialog.QUESTION, 0, labels) {
+						null, message, MessageDialog.QUESTION, labels, 0) {
 					@Override
 					protected int getShellStyle() {
 						return super.getShellStyle() | SWT.SHEET;
@@ -424,7 +423,7 @@ public class CopyFilesAndFoldersOperation {
 	 *            the resources to copy
 	 * @param destination
 	 *            destination to which resources will be copied
-	 * @param monitor
+	 * @param subMonitor
 	 *            a progress monitor for showing progress and for cancelation
 	 *
 	 * @deprecated As of 3.3, the work is performed in the undoable operation
@@ -432,12 +431,15 @@ public class CopyFilesAndFoldersOperation {
 	 *             {@link #getUndoableCopyOrMoveOperation(IResource[], IPath)}
 	 */
 	@Deprecated
-	protected void copy(IResource[] resources, IPath destination, IProgressMonitor monitor) throws CoreException {
-		SubMonitor subMonitor = SubMonitor.convert(monitor,
-				IDEWorkbenchMessages.CopyFilesAndFoldersOperation_CopyResourcesTask, resources.length);
+	protected void copy(IResource[] resources, IPath destination,
+			IProgressMonitor subMonitor) throws CoreException {
+
+		subMonitor
+				.beginTask(
+						IDEWorkbenchMessages.CopyFilesAndFoldersOperation_CopyResourcesTask,
+						resources.length);
 
 		for (int i = 0; i < resources.length; i++) {
-			SubMonitor iterationProgress = subMonitor.split(1).setWorkRemaining(100);
 			IResource source = resources[i];
 			IPath destinationPath = destination.append(source.getName());
 			IWorkspace workspace = source.getWorkspace();
@@ -449,45 +451,55 @@ public class CopyFilesAndFoldersOperation {
 				// children of the folder.
 				if (homogenousResources(source, existing)) {
 					IResource[] children = ((IContainer) source).members();
-					copy(children, destinationPath, iterationProgress.split(100));
+					copy(children, destinationPath, new SubProgressMonitor(
+							subMonitor, 1));
 				} else {
 					// delete the destination folder, copying a linked folder
 					// over an unlinked one or vice versa. Fixes bug 28772.
-					delete(existing, iterationProgress.split(10));
-					source.copy(destinationPath, IResource.SHALLOW, iterationProgress.split(90));
+					delete(existing, new SubProgressMonitor(subMonitor, 0));
+					source.copy(destinationPath, IResource.SHALLOW,
+							new SubProgressMonitor(subMonitor, 1));
 				}
 			} else {
 				if (existing != null) {
 					if (homogenousResources(source, existing)) {
-						copyExisting(source, existing, iterationProgress.split(100));
+						copyExisting(source, existing, new SubProgressMonitor(
+								subMonitor, 1));
 					} else {
-						if (existing != null) {
-							// Copying a linked resource over unlinked or vice
-							// versa.
-							// Can't use setContents here. Fixes bug 28772.
-							delete(existing, iterationProgress.split(10));
-						}
-						iterationProgress.setWorkRemaining(100);
+					if (existing != null) {
+						// Copying a linked resource over unlinked or vice
+						// versa.
+						// Can't use setContents here. Fixes bug 28772.
+						delete(existing, new SubProgressMonitor(subMonitor, 0));
+					}
 
-						if ((createLinks || createVirtualFoldersAndLinks) && (source.isLinked() == false)
-								&& (source.isVirtual() == false)) {
-							if (source.getType() == IResource.FILE) {
-								IFile file = workspaceRoot.getFile(destinationPath);
-								file.createLink(createRelativePath(source.getLocationURI(), file), 0,
-										iterationProgress.split(100));
-							} else {
-								IFolder folder = workspaceRoot.getFolder(destinationPath);
-								if (createVirtualFoldersAndLinks) {
-									folder.create(IResource.VIRTUAL, true, subMonitor.split(1));
-									IResource[] members = ((IContainer) source).members();
-									if (members.length > 0)
-										copy(members, destinationPath, iterationProgress.split(100));
-								} else
-									folder.createLink(createRelativePath(source.getLocationURI(), folder), 0,
-											iterationProgress.split(100));
-							}
-						} else
-							source.copy(destinationPath, IResource.SHALLOW, iterationProgress.split(100));
+					if ((createLinks || createVirtualFoldersAndLinks)
+							&& (source.isLinked() == false)
+							&& (source.isVirtual() == false)) {
+						if (source.getType() == IResource.FILE) {
+							IFile file = workspaceRoot.getFile(destinationPath);
+							file.createLink(createRelativePath(source.getLocationURI(), file), 0,
+									new SubProgressMonitor(subMonitor, 1));
+						} else {
+							IFolder folder = workspaceRoot
+									.getFolder(destinationPath);
+							if (createVirtualFoldersAndLinks) {
+									folder.create(IResource.VIRTUAL, true,
+											new SubProgressMonitor(subMonitor,
+													1));
+								IResource[] members = ((IContainer) source)
+										.members();
+								if (members.length > 0)
+									copy(members, destinationPath,
+											new SubProgressMonitor(subMonitor,
+													1));
+							} else
+								folder.createLink(createRelativePath(source.getLocationURI(), folder), 0,
+								new SubProgressMonitor(subMonitor, 1));
+						}
+					} else
+						source.copy(destinationPath, IResource.SHALLOW,
+							new SubProgressMonitor(subMonitor, 1));
 					}
 
 					if (subMonitor.isCanceled()) {
@@ -531,15 +543,17 @@ public class CopyFilesAndFoldersOperation {
 	 * @throws CoreException
 	 *             setContents failed
 	 */
-	private void copyExisting(IResource source, IResource existing, IProgressMonitor monitor) throws CoreException {
-		SubMonitor subMonitor = SubMonitor.convert(monitor, 1);
+	private void copyExisting(IResource source, IResource existing,
+			IProgressMonitor subMonitor) throws CoreException {
 		IFile existingFile = getFile(existing);
 
 		if (existingFile != null) {
 			IFile sourceFile = getFile(source);
 
 			if (sourceFile != null) {
-				existingFile.setContents(sourceFile.getContents(), IResource.KEEP_HISTORY, subMonitor.split(1));
+				existingFile.setContents(sourceFile.getContents(),
+						IResource.KEEP_HISTORY, new SubProgressMonitor(
+								subMonitor, 0));
 			}
 		}
 	}
@@ -1048,7 +1062,10 @@ public class CopyFilesAndFoldersOperation {
 	 *         <code>null</code> if the resource does not adapt to IFile
 	 */
 	protected IFile getFile(IResource resource) {
-		return Adapters.adapt(resource, IFile.class);
+		if (resource instanceof IFile) {
+			return (IFile) resource;
+		}
+		return ((IAdaptable) resource).getAdapter(IFile.class);
 	}
 
 	/**
@@ -1080,7 +1097,10 @@ public class CopyFilesAndFoldersOperation {
 	 *         <code>null</code> if the resource does not adapt to IFolder
 	 */
 	protected IFolder getFolder(IResource resource) {
-		return Adapters.adapt(resource, IFolder.class);
+		if (resource instanceof IFolder) {
+			return (IFolder) resource;
+		}
+		return ((IAdaptable) resource).getAdapter(IFolder.class);
 	}
 
 	/**
@@ -1401,7 +1421,7 @@ public class CopyFilesAndFoldersOperation {
 						MessageDialog dialog = new MessageDialog(
 								messageShell,
 								IDEWorkbenchMessages.CopyFilesAndFoldersOperation_question,
-								null, msg, MessageDialog.QUESTION, 0, options) {
+								null, msg, MessageDialog.QUESTION, options, 0) {
 							@Override
 							protected int getShellStyle() {
 								return super.getShellStyle() | SWT.SHEET;
@@ -1781,15 +1801,16 @@ public class CopyFilesAndFoldersOperation {
 		return (IResource[]) copyItems.toArray(new IResource[copyItems.size()]);
 	}
 
-	private void copyResources(final IResource[] resources, final IPath destinationPath,
-			final IResource[][] copiedResources, IProgressMonitor mon) {
+	private void copyResources(final IResource[] resources,
+			final IPath destinationPath, final IResource[][] copiedResources,
+			IProgressMonitor monitor) {
 		IResource[] copyResources = resources;
 
 		// Fix for bug 31116. Do not provide a task name when
 		// creating the task.
-		SubMonitor subMonitor = SubMonitor.convert(mon, 100);
-		subMonitor.setTaskName(getOperationTitle());
-		subMonitor.worked(10); // show some initial progress
+		monitor.beginTask("", 100); //$NON-NLS-1$
+		monitor.setTaskName(getOperationTitle());
+		monitor.worked(10); // show some initial progress
 
 		// Checks only required if this is an exisiting container path.
 		boolean copyWithAutoRename = false;
@@ -1823,11 +1844,13 @@ public class CopyFilesAndFoldersOperation {
 		errorStatus = null;
 		if (copyResources.length > 0) {
 			if (copyWithAutoRename) {
-				performCopyWithAutoRename(copyResources, destinationPath, subMonitor.split(90));
+				performCopyWithAutoRename(copyResources, destinationPath,
+						new SubProgressMonitor(monitor, 90));
 			} else {
-				performCopy(copyResources, destinationPath, subMonitor.split(90));
+				performCopy(copyResources, destinationPath, new SubProgressMonitor(monitor, 90));
 			}
 		}
+		monitor.done();
 		copiedResources[0] = copyResources;
 	}
 
