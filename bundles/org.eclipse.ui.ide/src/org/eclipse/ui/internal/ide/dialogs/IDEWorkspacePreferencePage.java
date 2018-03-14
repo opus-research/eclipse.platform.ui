@@ -1,5 +1,5 @@
  /****************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -62,13 +62,12 @@ import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
  *Note:This class extends from PreferencePage,and there's no WorkspacePreferencePage class.
  *Hence when the IDE settings doesn't appear in this preference page, this page will be empty.
  */
-public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
-
-	private Button autoSaveButton;
+public class IDEWorkspacePreferencePage extends PreferencePage
+        implements IWorkbenchPreferencePage{
 
 	private Button autoBuildButton;
 
-    private Button autoSaveAllBeforeBuildButton;
+    private Button autoSaveAllButton;
 
     private IntegerFieldEditor saveInterval;
 
@@ -94,7 +93,9 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 
     @Override
 	protected Control createContents(Composite parent) {
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IIDEHelpContextIds.WORKSPACE_PREFERENCE_PAGE);
+
+    	PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
+				IIDEHelpContextIds.WORKSPACE_PREFERENCE_PAGE);
 
         Composite composite = createComposite(parent);
 
@@ -106,7 +107,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 		area.getControl().setLayoutData(data);
 
 		createSpace(composite);
-		createAutoSavePref(composite);
         createAutoBuildPref(composite);
         createAutoRefreshControls(composite);
         createSaveAllBeforeBuildPref(composite);
@@ -144,22 +144,9 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
     }
 
     /**
-	 * @param composite
-	 */
-	private void createAutoSavePref(Composite composite) {
-		autoSaveButton = new Button(composite, SWT.CHECK);
-		autoSaveButton.setText(IDEWorkbenchMessages.IDEWorkspacePreference_autobuild);
-		autoSaveButton.setToolTipText(IDEWorkbenchMessages.IDEWorkspacePreference_autobuildToolTip);
-		autoSaveButton.setSelection(ResourcesPlugin.getWorkspace().isAutoBuilding());
-
-	}
-
-	/**
-	 * Creates controls for the preference to open required projects when
-	 * opening a project.
-	 * 
-	 * @param parent
-	 *            The parent control
+     * Creates controls for the preference to open required projects when
+     * opening a project.
+	 * @param parent The parent control
 	 */
 	private void createOpenPrefControls(Composite parent) {
 		String name = IDEInternalPreferences.OPEN_REQUIRED_PROJECTS;
@@ -185,10 +172,10 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 	}
 
 	protected void createSaveAllBeforeBuildPref(Composite composite) {
-        autoSaveAllBeforeBuildButton = new Button(composite, SWT.CHECK);
-        autoSaveAllBeforeBuildButton.setText(IDEWorkbenchMessages.IDEWorkspacePreference_savePriorToBuilding);
-        autoSaveAllBeforeBuildButton.setToolTipText(IDEWorkbenchMessages.IDEWorkspacePreference_savePriorToBuildingToolTip);
-        autoSaveAllBeforeBuildButton.setSelection(getIDEPreferenceStore().getBoolean(
+        autoSaveAllButton = new Button(composite, SWT.CHECK);
+        autoSaveAllButton.setText(IDEWorkbenchMessages.IDEWorkspacePreference_savePriorToBuilding);
+        autoSaveAllButton.setToolTipText(IDEWorkbenchMessages.IDEWorkspacePreference_savePriorToBuildingToolTip);
+        autoSaveAllButton.setSelection(getIDEPreferenceStore().getBoolean(
                 IDEInternalPreferences.SAVE_ALL_BEFORE_BUILD));
     }
 
@@ -323,10 +310,12 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
         this.lightweightRefreshButton.setText(IDEWorkbenchMessages.IDEWorkspacePreference_RefreshLightweightButtonText);
         this.lightweightRefreshButton.setToolTipText(IDEWorkbenchMessages.IDEWorkspacePreference_RefreshLightweightButtonToolTip);
 
-        boolean lightweightRefresh = Platform.getPreferencesService().getBoolean(ResourcesPlugin.PI_RESOURCES,
-				ResourcesPlugin.PREF_LIGHTWEIGHT_AUTO_REFRESH, false, null);
-		boolean autoRefresh = Platform.getPreferencesService().getBoolean(ResourcesPlugin.PI_RESOURCES,
-				ResourcesPlugin.PREF_AUTO_REFRESH, false, null);
+        boolean lightweightRefresh = ResourcesPlugin.getPlugin()
+                .getPluginPreferences().getBoolean(
+                		ResourcesPlugin.PREF_LIGHTWEIGHT_AUTO_REFRESH);
+        boolean autoRefresh = ResourcesPlugin.getPlugin()
+		        .getPluginPreferences().getBoolean(
+		                ResourcesPlugin.PREF_AUTO_REFRESH);
         
         this.autoRefreshButton.setSelection(autoRefresh);
         this.lightweightRefreshButton.setSelection(lightweightRefresh);
@@ -470,14 +459,12 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 	protected void performDefaults() {
 
         // core holds onto this preference.
-
-		boolean autoBuild = Platform.getPreferencesService().getBoolean(ResourcesPlugin.PI_RESOURCES,
-				ResourcesPlugin.PREF_AUTO_BUILDING, false, null);
-
+        boolean autoBuild = ResourcesPlugin.getPlugin().getPluginPreferences()
+                .getDefaultBoolean(ResourcesPlugin.PREF_AUTO_BUILDING);
         autoBuildButton.setSelection(autoBuild);
 
         IPreferenceStore store = getIDEPreferenceStore();
-        autoSaveAllBeforeBuildButton
+        autoSaveAllButton
                 .setSelection(store
                         .getDefaultBoolean(IDEInternalPreferences.SAVE_ALL_BEFORE_BUILD));
         saveInterval.loadDefault();
@@ -487,11 +474,12 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
         boolean closeUnrelatedProj = store.getDefaultBoolean(IDEInternalPreferences.CLOSE_UNRELATED_PROJECTS);
         closeUnrelatedProjectButton.setSelection(closeUnrelatedProj);
 
-		boolean lightweightRefresh = Platform.getPreferencesService().getBoolean(ResourcesPlugin.PI_RESOURCES,
-				ResourcesPlugin.PREF_LIGHTWEIGHT_AUTO_REFRESH, false, null);
-		boolean autoRefresh = Platform.getPreferencesService().getBoolean(ResourcesPlugin.PI_RESOURCES,
-				ResourcesPlugin.PREF_AUTO_REFRESH, false, null);
-
+        boolean lightweightRefresh = ResourcesPlugin.getPlugin()
+                .getPluginPreferences().getDefaultBoolean(
+                		ResourcesPlugin.PREF_LIGHTWEIGHT_AUTO_REFRESH);
+        boolean autoRefresh = ResourcesPlugin.getPlugin()
+		        .getPluginPreferences().getDefaultBoolean(
+		                ResourcesPlugin.PREF_AUTO_REFRESH);
         autoRefreshButton.setSelection(autoRefresh);
         lightweightRefreshButton.setSelection(lightweightRefresh);
 
@@ -532,7 +520,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 
         // store the save all prior to build setting
         store.setValue(IDEInternalPreferences.SAVE_ALL_BEFORE_BUILD,
-                autoSaveAllBeforeBuildButton.getSelection());
+                autoSaveAllButton.getSelection());
 
         // store the workspace save interval
         // @issue we should drop our preference constant and let clients use
@@ -561,7 +549,8 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 
 		systemExplorer.store();
 
-		Preferences preferences = ResourcesPlugin.getPlugin().getPluginPreferences();
+        Preferences preferences = ResourcesPlugin.getPlugin()
+                .getPluginPreferences();
 
         boolean autoRefresh = autoRefreshButton.getSelection();
         preferences.setValue(ResourcesPlugin.PREF_AUTO_REFRESH, autoRefresh);
