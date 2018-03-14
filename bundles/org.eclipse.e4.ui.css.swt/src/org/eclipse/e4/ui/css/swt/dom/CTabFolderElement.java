@@ -7,63 +7,30 @@
  *
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
- *     Brian de Alwis (MTI) - Performance tweaks (Bug 430829)
+ *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.dom;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import org.eclipse.e4.ui.css.core.dom.ArrayNodeList;
 import org.eclipse.e4.ui.css.core.dom.CSSStylableElement;
-import org.eclipse.e4.ui.css.core.dom.ChildVisibilityAwareElement;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
-import org.eclipse.e4.ui.css.swt.helpers.CSSSWTColorHelper;
 import org.eclipse.e4.ui.internal.css.swt.ICTabRendering;
 import org.eclipse.swt.custom.CTabFolder;
-import org.eclipse.swt.custom.CTabItem;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Widget;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * {@link CSSStylableElement} implementation which wrap SWT {@link CTabFolder}.
  *
  */
-public class CTabFolderElement extends CompositeElement implements ChildVisibilityAwareElement {
+public class CTabFolderElement extends CompositeElement {
 	private final static String BACKGROUND_SET_BY_TAB_RENDERER = "bgSetByTabRenderer"; //$NON-NLS-1$
-
-	private SelectionListener selectionListener = new SelectionAdapter() {
-		@Override
-		public void widgetSelected(SelectionEvent e) {
-			applyStyles(getWidget(), true);
-		}
-
-	};
 
 	public CTabFolderElement(CTabFolder tabFolder, CSSEngine engine) {
 		super(tabFolder, engine);
-	}
-
-	@Override
-	public void initialize() {
-		super.initialize();
-		((CTabFolder) getControl()).addSelectionListener(selectionListener);
-	}
-
-	@Override
-	public void dispose() {
-		CTabFolder ctf = (CTabFolder) getControl();
-		if (ctf != null && !ctf.isDisposed()) {
-			ctf.removeSelectionListener(selectionListener);
-		}
-		super.dispose();
 	}
 
 	/**
@@ -119,6 +86,7 @@ public class CTabFolderElement extends CompositeElement implements ChildVisibili
 		folder.setSelectionBackground((Color) null);
 		folder.setSelectionForeground((Color) null);
 		folder.setSelectionBackground((Image) null);
+
 		folder.setBackground(null, null);
 		resetChildrenBackground(folder);
 
@@ -133,33 +101,6 @@ public class CTabFolderElement extends CompositeElement implements ChildVisibili
 			renderer.setShadowColor(null);
 		}
 		super.reset();
-	}
-
-	@Override
-	public NodeList getVisibleChildNodes() {
-		// CTabFolder#getChildren() exposes the "tab controls" (the toolbars and
-		// the top-right area), as well as the composites used to host the
-		// CTabItem contents. We need to expose both the CTabItems but
-		// just the composite of the active CTabItem
-		CTabFolder folder = (CTabFolder) getWidget();
-		ArrayList<Widget> visible = new ArrayList<Widget>();
-
-		if (folder.getTopRight() != null) {
-			visible.add(folder.getTopRight());
-		}
-		Collections.addAll(visible, folder.getItems());
-		int selected = folder.getSelectionIndex();
-		// if (selected < 0 && folder.getItemCount() > 0) {
-		// selected = 0;
-		// }
-		if (selected >= 0) {
-			CTabItem item = folder.getItem(selected);
-			// If item.getControl() is not yet set, we pretend it doesn't exist
-			if (item.getControl() != null) {
-				visible.add(item.getControl());
-			}
-		}
-		return new ArrayNodeList(visible, engine);
 	}
 
 	private void resetChildrenBackground(Composite composite) {
@@ -184,12 +125,12 @@ public class CTabFolderElement extends CompositeElement implements ChildVisibili
 
 	public static void setBackgroundOverriddenDuringRenderering(
 			Composite composite, Color background) {
-		CSSSWTColorHelper.setBackground(composite, background);
+		composite.setBackground(background);
 		composite.setData(BACKGROUND_SET_BY_TAB_RENDERER, background);
 
 		for (Control control : composite.getChildren()) {
 			if (!CompositeElement.hasBackgroundOverriddenByCSS(control)) {
-				CSSSWTColorHelper.setBackground(control, background);
+				control.setBackground(background);
 				control.setData(BACKGROUND_SET_BY_TAB_RENDERER, background);
 			}
 		}

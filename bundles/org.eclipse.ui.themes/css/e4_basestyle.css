@@ -192,14 +192,4 @@ CTabItem:selected {
 	background-color: #A0A000;
 }
 
-.MPartStack > Composite {
-	background-color: '#org-eclipse-ui-workbench-INACTIVE_TAB_BG_END';
-}
 
-.MPartStack.active > Composite {
-	background-color: '#org-eclipse-ui-workbench-ACTIVE_TAB_BG_END';
-}
-
-.MPartStack.active.noFocus > Composite {
-	background-color: '#org-eclipse-ui-workbench-ACTIVE_NOFOCUS_TAB_BG_END';
-}

@@ -250,7 +250,7 @@ public class ThemeEngine implements IThemeEngine {
 	public synchronized void registerStylesheet(String uri, String... themes) {
 		Bundle bundle = FrameworkUtil.getBundle(ThemeEngine.class);
 		String osname = bundle.getBundleContext().getProperty("osgi.os");
-		String wsname = bundle.getBundleContext().getProperty("osgi.ws");
+		String wsname = bundle.getBundleContext().getProperty("ogsi.ws");
 
 		uri = uri.replaceAll("\\$os\\$", osname).replaceAll("\\$ws\\$", wsname);
 
