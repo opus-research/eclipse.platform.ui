@@ -10,9 +10,13 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.tests.css.swt;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.internal.css.swt.CSSActivator;
 import org.eclipse.e4.ui.internal.css.swt.definition.IColorAndFontProvider;
@@ -23,16 +27,19 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.internal.themes.FontDefinition;
+import org.junit.Before;
+import org.junit.Test;
 
 @SuppressWarnings("restriction")
 public class FontDefinitionTest extends CSSSWTTestCase {
 	private Display display;
 
-	@Override
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		display = Display.getDefault();
 	}
 
+	@Test
 	public void testFontDefinition() throws Exception {
 		//given
 		CSSEngine engine = createEngine("FontDefinition#org-eclipse-jface-bannerfont {font-family: 'Times';font-size: 12;font-style: italic;}", display);
@@ -55,6 +62,7 @@ public class FontDefinitionTest extends CSSSWTTestCase {
 		assertTrue(definition.isOverridden());
 	}
 
+	@Test
 	public void testFontDefinitionWhenNameCategoryIdAndDescriptionOverridden()
 			throws Exception {
 		// given
@@ -79,6 +87,7 @@ public class FontDefinitionTest extends CSSSWTTestCase {
 		assertTrue(definition.isOverridden());
 	}
 
+	@Test
 	public void testFontDefinitionWhenDefinitionStylesheetNotFound() throws Exception{
 		//given
 		CSSEngine engine = createEngine("FontDefinition#org-eclipse-jface-bannerfont {font-family: 'Times';font-size: 12;font-style: italic;}", display);
@@ -95,6 +104,7 @@ public class FontDefinitionTest extends CSSSWTTestCase {
 		assertFalse(definition.isOverridden());
 	}
 
+	@Test
 	public void testWidgetWithFontDefinitionAsFontFamily() throws Exception {
 		//given
 		registerFontProviderWith("org.eclipse.jface.bannerfont", new FontData("Times", 12, SWT.ITALIC));

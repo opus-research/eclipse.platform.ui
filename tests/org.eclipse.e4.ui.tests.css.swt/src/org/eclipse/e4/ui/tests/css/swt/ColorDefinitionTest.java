@@ -7,9 +7,14 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 443094
  *******************************************************************************/
 package org.eclipse.e4.ui.tests.css.swt;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
@@ -22,17 +27,20 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.internal.themes.ColorDefinition;
+import org.junit.Before;
+import org.junit.Test;
 
 @SuppressWarnings("restriction")
 public class ColorDefinitionTest extends CSSSWTTestCase {
 	private Display display;
 
-	@Override
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() {
 		display = Display.getDefault();
 	}
 
-	public void testColorDefinition() throws Exception {
+	@Test
+	public void testColorDefinition() {
 		//given
 		CSSEngine engine = createEngine("ColorDefinition#ACTIVE_HYPERLINK_COLOR{color: green}", display);
 		ColorDefinition definition = colorDefinition("ACTIVE_HYPERLINK_COLOR", "name", "categoryId", "description");
@@ -51,8 +59,8 @@ public class ColorDefinitionTest extends CSSSWTTestCase {
 		assertTrue(definition.isOverridden());
 	}
 
-	public void testColorDefinitionWhenNameCategoryIdAndDescriptionOverridden()
-			throws Exception {
+	@Test
+	public void testColorDefinitionWhenNameCategoryIdAndDescriptionOverridden() {
 		// given
 		CSSEngine engine = createEngine("ColorDefinition#ACTIVE_HYPERLINK_COLOR{color: green;" +
 				"label:'nameOverridden'; category:'#categoryIdOverridden'; description: 'descriptionOverridden'}", display);
@@ -72,7 +80,8 @@ public class ColorDefinitionTest extends CSSSWTTestCase {
 		assertTrue(definition.isOverridden());
 	}
 
-	public void testColorDefinitionWhenDefinitionStylesheetNotFound() throws Exception{
+	@Test
+	public void testColorDefinitionWhenDefinitionStylesheetNotFound() {
 		//given
 		CSSEngine engine = createEngine("ColorDefinition#ACTIVE_HYPERLINK_COLOR{color: green}", display);
 		ColorDefinition definition = colorDefinition("color definition uniqueId without matching stylesheet",
@@ -89,7 +98,8 @@ public class ColorDefinitionTest extends CSSSWTTestCase {
 		assertFalse(definition.isOverridden());
 	}
 
-	public void testWidgetWithColorDefinitionAsBackgroundColor() throws Exception {
+	@Test
+	public void testWidgetWithColorDefinitionAsBackgroundColor() {
 		//given
 		registerColorProviderWith("ACTIVE_HYPERLINK_COLOR", new RGB(255, 0, 0));
 
@@ -114,14 +124,18 @@ public class ColorDefinitionTest extends CSSSWTTestCase {
 				categoryId, true, description, "pluginId");
 	}
 
-	private void registerColorProviderWith(final String symbolicName, final RGB rgb) throws Exception {
-		new CSSActivator() {
-			@Override
-			public IColorAndFontProvider getColorAndFontProvider() {
-				IColorAndFontProvider provider = mock(IColorAndFontProvider.class);
-				doReturn(rgb).when(provider).getColor(symbolicName);
-				return provider;
-			};
-		}.start(null);
+	private void registerColorProviderWith(final String symbolicName, final RGB rgb) {
+		try {
+			new CSSActivator() {
+				@Override
+				public IColorAndFontProvider getColorAndFontProvider() {
+					IColorAndFontProvider provider = mock(IColorAndFontProvider.class);
+					doReturn(rgb).when(provider).getColor(symbolicName);
+					return provider;
+				};
+			}.start(null);
+		} catch (Exception e) {
+			fail("Register color provider should not fail");
+		}
 	}
 }

@@ -7,23 +7,29 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 443094
  *******************************************************************************/
 package org.eclipse.e4.ui.tests.css.swt;
+
+import static org.junit.Assert.assertEquals;
 
 import org.eclipse.core.internal.preferences.EclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.swt.widgets.Display;
+import org.junit.Before;
+import org.junit.Test;
 
 public class IEclipsePreferencesTest extends CSSSWTTestCase {
 	private Display display;
 
-	@Override
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() {
 		display = Display.getDefault();
 	}
 
-	public void testIEclipsePreferences() throws Exception {
+	@Test
+	public void testIEclipsePreferences() {
 		// given
 		IEclipsePreferences preferences = new EclipsePreferences(null, "org.eclipse.jdt.ui") {};
 
