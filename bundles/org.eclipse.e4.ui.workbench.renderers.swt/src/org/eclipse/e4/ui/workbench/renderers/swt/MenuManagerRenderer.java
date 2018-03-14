@@ -403,7 +403,7 @@ MenuManagerEventHelper.getInstance()
 			// ((Control) parent).setMenu(newMenu);
 			newMenu.setData(menuManager);
 		}
-		if (menuManager != null && !menuManager.getRemoveAllWhenShown()) {
+		if (!menuManager.getRemoveAllWhenShown()) {
 			processContributions(menuModel, menuModel.getElementId(), menuBar,
 					menuModel instanceof MPopupMenu);
 		}

@@ -55,9 +55,8 @@ public class MenuService implements EMenuService {
 		// MenuManager correctly
 		IRendererFactory rendererFactory = context.get(IRendererFactory.class);
 		AbstractPartRenderer renderer = rendererFactory.getRenderer(mmenu, parentControl);
-		mmenu.setRenderer(renderer);
+
 		IEclipseContext popupContext = context.createChild("popup:" + mmenu.getElementId());
-		mmenu.getTransientData().put(PartRenderingEngine.RENDER_PARENT, parentControl);
 		mmenu.setContext(popupContext);
 		Object widget = renderer.createWidget(mmenu, parentControl);
 		if (!(widget instanceof Menu)) {
