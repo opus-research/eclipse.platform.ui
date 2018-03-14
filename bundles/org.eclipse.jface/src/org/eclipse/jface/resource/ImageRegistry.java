@@ -108,6 +108,9 @@ public class ImageRegistry {
             }
         }
 
+        /* (non-Javadoc)
+         * @see org.eclipse.jface.resource.ImageDescriptor#getImageData()
+         */
         @Override
 		public ImageData getImageData() {
             return original.getImageData();

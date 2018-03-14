@@ -98,7 +98,6 @@ public class LineDelimiterEditor {
 		group.setFont(font);
 
 		SelectionAdapter buttonListener = new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (e.widget.equals(defaultButton)) {
 					updateState(true);

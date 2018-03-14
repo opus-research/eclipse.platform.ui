@@ -41,7 +41,6 @@ public class WidgetListener extends NativePropertyListener implements Listener {
 		this.staleEvents = staleEvents;
 	}
 
-	@Override
 	public void handleEvent(Event event) {
 		if (staleEvents != null)
 			for (int i = 0; i < staleEvents.length; i++)
@@ -58,7 +57,6 @@ public class WidgetListener extends NativePropertyListener implements Listener {
 				}
 	}
 
-	@Override
 	protected void doAddTo(Object source) {
 		Widget widget = (Widget) source;
 		if (changeEvents != null) {
@@ -79,7 +77,6 @@ public class WidgetListener extends NativePropertyListener implements Listener {
 		}
 	}
 
-	@Override
 	protected void doRemoveFrom(Object source) {
 		Widget widget = (Widget) source;
 		if (!widget.isDisposed()) {

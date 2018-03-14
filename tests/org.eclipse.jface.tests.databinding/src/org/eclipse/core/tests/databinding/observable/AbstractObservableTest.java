@@ -42,7 +42,6 @@ import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 public class AbstractObservableTest extends AbstractDefaultRealmTestCase {
 	private ObservableStub observable;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		observable = new ObservableStub(Realm.getDefault());
@@ -179,7 +178,6 @@ public class AbstractObservableTest extends AbstractDefaultRealmTestCase {
 		RealmTester.setDefault(new CurrentRealm(true));
 
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				observable = new ObservableStub();
 				observable.fireStale();
@@ -191,7 +189,6 @@ public class AbstractObservableTest extends AbstractDefaultRealmTestCase {
 		RealmTester.setDefault(new CurrentRealm(true));
 
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				observable = new ObservableStub();
 				observable.fireChange();
@@ -201,12 +198,10 @@ public class AbstractObservableTest extends AbstractDefaultRealmTestCase {
 
 	public void testAddDisposeListener_HasListenersFalse() {
 		IDisposeListener disposeListener = new IDisposeListener() {
-			@Override
 			public void handleDispose(DisposeEvent staleEvent) {
 			}
 		};
 		IStaleListener staleListener = new IStaleListener() {
-			@Override
 			public void handleStale(StaleEvent staleEvent) {
 			}
 		};
@@ -246,17 +241,14 @@ public class AbstractObservableTest extends AbstractDefaultRealmTestCase {
 	/* package */static class Delegate extends
 			AbstractObservableContractDelegate {
 
-		@Override
 		public void change(IObservable observable) {
 			((ObservableStub) observable).fireChange();
 		}
 
-		@Override
 		public void setStale(IObservable observable, boolean stale) {
 			((ObservableStub) observable).setStale(stale);
 		}
 
-		@Override
 		public IObservable createObservable(Realm realm) {
 			return new ObservableStub(realm);
 		}
@@ -280,17 +272,14 @@ public class AbstractObservableTest extends AbstractDefaultRealmTestCase {
 
 		private boolean lastListenerRemoved;
 
-		@Override
 		protected void fireStale() {
 			super.fireStale();
 		}
 
-		@Override
 		protected void fireChange() {
 			super.fireChange();
 		}
 
-		@Override
 		public boolean isStale() {
 			getterCalled();
 			return stale;
@@ -309,17 +298,14 @@ public class AbstractObservableTest extends AbstractDefaultRealmTestCase {
 			}
 		}
 
-		@Override
 		protected boolean hasListeners() {
 			return super.hasListeners();
 		}
 
-		@Override
 		protected void firstListenerAdded() {
 			firstListenerAdded = true;
 		}
 
-		@Override
 		protected void lastListenerRemoved() {
 			lastListenerRemoved = true;
 		}

@@ -1245,7 +1245,6 @@ public final class IDE {
 
 		final boolean[] result = new boolean[] { true };
 		SafeRunner.run(new SafeRunnable(IDEWorkbenchMessages.ErrorOnSaveAll) {
-			@Override
 			public void run() {
 				IWorkbenchWindow w = PlatformUI.getWorkbench()
 						.getActiveWorkbenchWindow();
@@ -1509,12 +1508,10 @@ public final class IDE {
 
 		final boolean[] result = new boolean[] { false };
 		Runnable runnable = new Runnable() {
-			@Override
 			public void run() {
 				ErrorDialog dialog = new ErrorDialog(shell, title,
 						dialogMessage, displayStatus, IStatus.ERROR
 								| IStatus.WARNING | IStatus.INFO) {
-					@Override
 					protected void createButtonsForButtonBar(Composite parent) {
 						createButton(parent, IDialogConstants.YES_ID,
 								IDialogConstants.YES_LABEL, false);
@@ -1523,7 +1520,11 @@ public final class IDE {
 						createDetailsButton(parent);
 					}
 
-					@Override
+					/*
+					 * (non-Javadoc)
+					 * 
+					 * @see org.eclipse.jface.dialogs.ErrorDialog#buttonPressed(int)
+					 */
 					protected void buttonPressed(int id) {
 						if (id == IDialogConstants.YES_ID) {
 							super.buttonPressed(IDialogConstants.OK_ID);
@@ -1532,7 +1533,6 @@ public final class IDE {
 						}
 						super.buttonPressed(id);
 					}
-					@Override
 					protected int getShellStyle() {
 						return super.getShellStyle() | SWT.SHEET;
 					}

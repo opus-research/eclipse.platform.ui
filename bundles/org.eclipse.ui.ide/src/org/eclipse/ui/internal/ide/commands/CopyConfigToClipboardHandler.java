@@ -26,7 +26,9 @@ import org.eclipse.ui.internal.ConfigurationInfo;
  */
 public class CopyConfigToClipboardHandler extends AbstractHandler {
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
 	public Object execute(ExecutionEvent event) {
 		String contents = ConfigurationInfo.getSystemSummary();
 		Clipboard clipboard = null;

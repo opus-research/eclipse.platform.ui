@@ -30,7 +30,7 @@ import org.eclipse.core.databinding.observable.set.IObservableSet;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.viewers.TreeStructureAdvisor;
 import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
@@ -107,12 +107,11 @@ public abstract class ObservableCollectionTreeContentProvider implements
 			TreeStructureAdvisor structureAdvisor) {
 		this.structureAdvisor = structureAdvisor;
 		display = Display.getDefault();
-		realm = DisplayRealm.getRealm(display);
+		realm = SWTObservables.getRealm(display);
 		viewerObservable = new WritableValue(realm);
 		viewerUpdater = null;
 
 		elementSetFactory = new IObservableFactory() {
-			@Override
 			public IObservable createObservable(Object target) {
 				return ObservableViewerElementSet.withComparer(realm, null,
 						getElementComparer((Viewer) target));
@@ -129,7 +128,6 @@ public abstract class ObservableCollectionTreeContentProvider implements
 		this.collectionFactory = collectionFactory;
 	}
 
-	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		if (elementNodes != null && !elementNodes.isEmpty()) {
 			// Ensure we flush any observable collection listeners
@@ -170,7 +168,6 @@ public abstract class ObservableCollectionTreeContentProvider implements
 				"This content provider only works with AbstractTreeViewer"); //$NON-NLS-1$
 	}
 
-	@Override
 	public Object getParent(Object element) {
 		if (structureAdvisor != null) {
 			Object parentFromAdvisor = structureAdvisor.getParent(element);
@@ -184,12 +181,10 @@ public abstract class ObservableCollectionTreeContentProvider implements
 		return null;
 	}
 
-	@Override
 	public Object[] getElements(Object input) {
 		return getChildren(input, true);
 	}
 
-	@Override
 	public Object[] getChildren(Object element) {
 		return getChildren(element, false);
 	}
@@ -215,7 +210,6 @@ public abstract class ObservableCollectionTreeContentProvider implements
 		if (!realizedElements.equals(knownElements)) {
 			if (asyncUpdateRunnable == null) {
 				asyncUpdateRunnable = new Runnable() {
-					@Override
 					public void run() {
 						asyncUpdatePending = false;
 						if (realizedElements != null) {
@@ -229,7 +223,6 @@ public abstract class ObservableCollectionTreeContentProvider implements
 		}
 	}
 
-	@Override
 	public boolean hasChildren(Object element) {
 		if (structureAdvisor != null) {
 			Boolean hasChildren = structureAdvisor.hasChildren(element);
@@ -267,7 +260,6 @@ public abstract class ObservableCollectionTreeContentProvider implements
 				|| viewer.getControl().isDisposed();
 	}
 
-	@Override
 	public void dispose() {
 		if (elementNodes != null) {
 			if (!elementNodes.isEmpty()) {

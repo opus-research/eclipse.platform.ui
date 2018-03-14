@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Sebastian Davids - bug 128526, bug 128529
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440381
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.swt.internal.copy;
 
@@ -186,7 +185,7 @@ public class ShowViewDialog extends Dialog implements
 	private void createFilteredTreeViewer(Composite parent) {
 		PatternFilter filter = new ViewPatternFilter(context);
 		int styleBits = SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER;
-		filteredTree = new FilteredTree(parent, styleBits, filter);
+		filteredTree = new FilteredTree(parent, styleBits, filter, true);
 		filteredTree.setBackground(parent.getDisplay().getSystemColor(
 				SWT.COLOR_WIDGET_BACKGROUND));
 
@@ -400,8 +399,8 @@ public class ShowViewDialog extends Dialog implements
 		// popup the description for the selected view
 		if (descriptionHint.isVisible() && event.keyCode == SWT.F2
 				&& event.stateMask == 0) {
-			ITreeSelection selection = filteredTree.getViewer()
-					.getStructuredSelection();
+			ITreeSelection selection = (ITreeSelection) filteredTree
+					.getViewer().getSelection();
 			// only show description if one view is selected
 			if (selection.size() == 1) {
 				Object o = selection.getFirstElement();
