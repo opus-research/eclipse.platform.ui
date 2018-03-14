@@ -992,20 +992,18 @@ public class TrimStack {
 
 				// See if we can find an element to activate...
 				MPart partToActivate = null;
-				MUIElement selectedElement = area.getSelectedElement();
+				MElementContainer<?> curContainer = area;
+				MUIElement selectedElement = curContainer.getSelectedElement();
 				while (partToActivate == null && selectedElement != null) {
-					if (selectedElement instanceof MPart) {
-						partToActivate = (MPart) selectedElement;
-					} else if (selectedElement instanceof MPlaceholder) {
-						MPlaceholder ph = (MPlaceholder) selectedElement;
+					if (curContainer.getSelectedElement() instanceof MPart) {
+						partToActivate = (MPart) curContainer.getSelectedElement();
+					} else if (curContainer.getSelectedElement() instanceof MPlaceholder) {
+						MPlaceholder ph = (MPlaceholder) curContainer.getSelectedElement();
 						if (ph.getRef() instanceof MPart) {
 							partToActivate = (MPart) ph.getRef();
-						} else {
-							selectedElement = null;
 						}
-					} else if (selectedElement instanceof MElementContainer<?>) {
-						MElementContainer<?> container = (MElementContainer<?>) selectedElement;
-						selectedElement = (MElementContainer<?>) container.getSelectedElement();
+					} else if (curContainer.getSelectedElement() instanceof MElementContainer<?>) {
+						curContainer = (MElementContainer<?>) curContainer.getSelectedElement();
 					}
 				}
 
