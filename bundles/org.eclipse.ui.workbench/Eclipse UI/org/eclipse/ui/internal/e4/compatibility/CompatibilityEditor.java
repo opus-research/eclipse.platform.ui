@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,9 +37,11 @@ import org.eclipse.ui.internal.testing.ContributionInfoMessages;
 import org.eclipse.ui.part.AbstractMultiEditor;
 import org.eclipse.ui.part.MultiEditor;
 import org.eclipse.ui.part.MultiEditorInput;
+import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.testing.ContributionInfo;
 
 public class CompatibilityEditor extends CompatibilityPart {
+	private static final String MULTI_PAGE_EDITOR_TAG = "MPE"; //$NON-NLS-1$
 
 	public static final String MODEL_ELEMENT_ID = "org.eclipse.e4.ui.compatibility.editor"; //$NON-NLS-1$
 
@@ -64,6 +66,9 @@ public class CompatibilityEditor extends CompatibilityPart {
 		IEditorInput input = ((EditorReference) reference).getEditorInput();
 		if (input instanceof MultiEditorInput && part instanceof MultiEditor) {
 			createMultiEditorChildren(part, input);
+		}
+		if (part instanceof MultiPageEditorPart) {
+			getModel().getTags().add(MULTI_PAGE_EDITOR_TAG);
 		}
 		return part;
 	}

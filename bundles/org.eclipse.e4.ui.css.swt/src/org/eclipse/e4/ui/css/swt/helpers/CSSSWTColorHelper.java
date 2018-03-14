@@ -341,7 +341,12 @@ public class CSSSWTColorHelper {
 
 	/** Helper function to avoid setting colors unnecessarily */
 	public static void setBackground(Control control, Color newColor) {
-		if (!equals(control.getBackground(), newColor)) {
+		// TODO: Because of the refreshing issue of the MPE it has been
+		// temporarily disabled. After fixing the Bug 435384 it will be enabled
+		// again.
+
+		// if (!equals(control.getBackground(), newColor))
+		{
 			control.setBackground(newColor);
 		}
 	}
