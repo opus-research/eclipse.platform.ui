@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -118,13 +118,7 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
         currentResourceSelection = null;
         if (selection.size() == 1) {
             Object firstElement = selection.getFirstElement();
-            if (firstElement instanceof IAdaptable) {
-                Object resource = ((IAdaptable) firstElement)
-                        .getAdapter(IResource.class);
-                if (resource != null) {
-					currentResourceSelection = (IResource) resource;
-				}
-            }
+			currentResourceSelection = Adapters.adapt(firstElement, IResource.class);
         }
 
         if (currentResourceSelection != null) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ui.internal.ide.undo.ProjectDescription;
 import org.eclipse.ui.internal.ide.undo.UndoMessages;
 
@@ -130,9 +130,9 @@ public class CopyProjectOperation extends AbstractCopyOrMoveResourcesOperation {
 	@Override
 	protected void doUndo(IProgressMonitor monitor, IAdaptable uiInfo)
 			throws CoreException {
+		SubMonitor subMonitor = SubMonitor.convert(monitor, 1);
 		// Delete the project that was copied
-		WorkspaceUndoUtil.delete(resources, new SubProgressMonitor(monitor, 1),
-				uiInfo, true);
+		WorkspaceUndoUtil.delete(resources, subMonitor.split(1), uiInfo, true);
 		// Set the target resource to the original
 		setTargetResources(new IResource[] { originalProject });
 		setResourceDescriptions(new ResourceDescription[0]);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,7 +32,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -545,30 +545,22 @@ return true;
 				IDEWorkbenchMessages.LinkedResourceEditor_removeTitle,
 				IDEWorkbenchMessages.LinkedResourceEditor_removeMessage)) {
 			final IResource[] selectedResources = getSelectedResource();
-			final ArrayList/*<IResource>*/ removedResources = new ArrayList();
+			final ArrayList<IResource> removedResources = new ArrayList<>();
 
 			IRunnableWithProgress op = monitor -> {
-				try {
-					monitor.beginTask(
-							IDEWorkbenchMessages.LinkedResourceEditor_removingMessage,
-							selectedResources.length);
-					for (int i = 0; i < selectedResources.length; i++) {
-						if (monitor.isCanceled())
-							break;
-						String fullPath = selectedResources[i]
-								.getFullPath().toPortableString();
-						try {
-							selectedResources[i].delete(true, new SubProgressMonitor(monitor, 1));
-							removedResources.add(selectedResources[i]);
-							fBrokenResources.remove(fullPath);
-							fFixedResources.remove(fullPath);
-							fAbsoluteResources.remove(fullPath);
-						} catch (CoreException e) {
-							e.printStackTrace();
-						}
+				SubMonitor subMonitor = SubMonitor.convert(monitor,
+						IDEWorkbenchMessages.LinkedResourceEditor_removingMessage, selectedResources.length);
+				for (int i = 0; i < selectedResources.length; i++) {
+					String fullPath = selectedResources[i].getFullPath().toPortableString();
+					try {
+						selectedResources[i].delete(true, subMonitor.split(1));
+						removedResources.add(selectedResources[i]);
+						fBrokenResources.remove(fullPath);
+						fFixedResources.remove(fullPath);
+						fAbsoluteResources.remove(fullPath);
+					} catch (CoreException e) {
+						e.printStackTrace();
 					}
-				} finally {
-					monitor.done();
 				}
 			};
 			try {

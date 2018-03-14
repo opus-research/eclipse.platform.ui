@@ -40,6 +40,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
@@ -578,18 +579,21 @@ public class PopupDialog extends Window {
 	protected void configureShell(Shell shell) {
 		GridLayoutFactory.fillDefaults().margins(0, 0).spacing(5, 5).applyTo(
 				shell);
-
 		shell.addListener(SWT.Deactivate, event -> {
 			/*
 			 * Close if we are deactivating and have no child shells. If we
 			 * have child shells, we are deactivating due to their opening.
-			 * On X, we receive this when a menu child (such as the system
-			 * menu) of the shell opens, but I have not found a way to
-			 * distinguish that case here. Hence bug #113577 still exists.
+			 *
+			 * Feature in GTK: this causes the Quick Outline/Type Hierarchy
+			 * Shell to close on re-size/movement on Gtk3. For this reason,
+			 * the asyncClose() call is disabled in GTK. See Eclipse Bugs
+			 * 466500 and 113577 for more information.
 			 */
 			if (listenToDeactivate && event.widget == getShell()
 					&& getShell().getShells().length == 0) {
-				asyncClose();
+				if (!Util.isGtk()) {
+					asyncClose();
+				}
 			} else {
 				/*
 				 * We typically ignore deactivates to work around
@@ -616,17 +620,45 @@ public class PopupDialog extends Window {
 			}
 		});
 
-		if ((getShellStyle() & SWT.ON_TOP) != 0 && shell.getParent() != null) {
-			parentDeactivateListener = event -> {
-				if (listenToParentDeactivate) {
-					asyncClose();
-				} else {
-					// Our first deactivate, now start listening on the Mac.
-					listenToParentDeactivate = listenToDeactivate;
-				}
-			};
-			shell.getParent().addListener(SWT.Deactivate,
-					parentDeactivateListener);
+		final Composite parent = shell.getParent();
+		if (parent != null) {
+			if ((getShellStyle() & SWT.ON_TOP) != 0) {
+				parentDeactivateListener = event -> {
+					if (listenToParentDeactivate) {
+						asyncClose();
+					} else {
+						// Our first deactivate, now start listening on the Mac.
+						listenToParentDeactivate = listenToDeactivate;
+					}
+				};
+				parent.addListener(SWT.Deactivate, parentDeactivateListener);
+			} else if (Util.isGtk()) {
+				/*
+				 * Fix for bug 485745 on GTK: popup does not close on parent
+				 * shell activation.
+				 */
+				parent.addListener(SWT.Activate, new Listener() {
+					@Override
+					public void handleEvent(Event event) {
+						/*
+						 * NB: we must wait with closing until
+						 * listenToDeactivate is set to true, otherwise it may
+						 * happen that the popup closes immediately after
+						 * showing up (seem to be timing issue with shell
+						 * creation).
+						 *
+						 * E.g. "Display" popup does not need this, but
+						 * "Show all Instances" and "Show all References" do.
+						 * They all are InspectPopupDialog instances...
+						 */
+						if (event.widget != parent || !listenToDeactivate || parent.isDisposed()) {
+							return;
+						}
+						parent.removeListener(SWT.Activate, this);
+						asyncClose();
+					}
+				});
+			}
 		}
 
 		shell.addDisposeListener(event -> handleDispose());
@@ -634,7 +666,10 @@ public class PopupDialog extends Window {
 
 	private void asyncClose() {
 		// workaround for https://bugs.eclipse.org/bugs/show_bug.cgi?id=152010
-		getShell().getDisplay().asyncExec(() -> close());
+		Shell shell = getShell();
+		if (shell != null && !shell.isDisposed()) {
+			shell.getDisplay().asyncExec(() -> close());
+		}
 	}
 
 	/**

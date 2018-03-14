@@ -9,12 +9,14 @@
  *     IBM Corporation - initial API and implementation
  *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
+ *     Leung Wang Hei <gemaspecial@yahoo.com.hk> - Bug 483343
  *******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -212,7 +214,8 @@ public abstract class QuickAccessContents {
 	 */
 	public TriggerSequence getTriggerSequence() {
 		if (keySequence == null) {
-			IBindingService bindingService = PlatformUI.getWorkbench().getAdapter(IBindingService.class);
+			IBindingService bindingService =
+					Adapters.adapt(PlatformUI.getWorkbench(), IBindingService.class);
 			keySequence = bindingService.getBestActiveBindingFor(QUICK_ACCESS_COMMAND_ID);
 		}
 		return keySequence;
@@ -575,7 +578,7 @@ public abstract class QuickAccessContents {
 						e.display.timerExec(100, new Runnable() {
 							@Override
 							public void run() {
-								if (table != null && !table.isDisposed()) {
+								if (table != null && !table.isDisposed() && filterText !=null && !filterText.isDisposed()) {
 									refresh(filterText.getText().toLowerCase());
 								}
 								resized = false;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2007 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,8 +24,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 
 /**
  * FileDescription is a lightweight description that describes a file to be
@@ -132,23 +131,18 @@ public class FileDescription extends AbstractResourceDescription {
 	}
 
 	@Override
-	public void createExistentResourceFromHandle(IResource resource,
-			IProgressMonitor monitor) throws CoreException {
+	public void createExistentResourceFromHandle(IResource resource, IProgressMonitor mon) throws CoreException {
 
 		Assert.isLegal(resource instanceof IFile);
 		if (resource.exists()) {
 			return;
 		}
 		IFile fileHandle = (IFile) resource;
-		monitor.beginTask("", 200); //$NON-NLS-1$
-		monitor.setTaskName(UndoMessages.FileDescription_NewFileProgress);
+		SubMonitor subMonitor = SubMonitor.convert(mon, 200);
+		subMonitor.setTaskName(UndoMessages.FileDescription_NewFileProgress);
 		try {
-			if (monitor.isCanceled()) {
-				throw new OperationCanceledException();
-			}
 			if (location != null) {
-				fileHandle.createLink(location, IResource.ALLOW_MISSING_LOCAL,
-						new SubProgressMonitor(monitor, 200));
+				fileHandle.createLink(location, IResource.ALLOW_MISSING_LOCAL, subMonitor.split(200));
 			} else {
 				InputStream contents = new ByteArrayInputStream(
 						UndoMessages.FileDescription_ContentsCouldNotBeRestored
@@ -161,13 +155,8 @@ public class FileDescription extends AbstractResourceDescription {
 						&& fileContentDescription.exists()) {
 					contents = fileContentDescription.getContents();
 				}
-				fileHandle.create(contents, false, new SubProgressMonitor(
-						monitor, 100));
-				fileHandle.setCharset(charset, new SubProgressMonitor(monitor,
-						100));
-			}
-			if (monitor.isCanceled()) {
-				throw new OperationCanceledException();
+				fileHandle.create(contents, false, subMonitor.split(100));
+				fileHandle.setCharset(charset, subMonitor.split(100));
 			}
 		} catch (CoreException e) {
 			if (e.getStatus().getCode() == IResourceStatus.PATH_OCCUPIED) {
@@ -175,8 +164,6 @@ public class FileDescription extends AbstractResourceDescription {
 			} else {
 				throw e;
 			}
-		} finally {
-			monitor.done();
 		}
 	}
 
