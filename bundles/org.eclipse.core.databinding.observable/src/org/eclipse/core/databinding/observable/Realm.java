@@ -79,16 +79,16 @@ import org.eclipse.core.runtime.Status;
  */
 public abstract class Realm {
 
-	private static ThreadLocal<Realm> defaultRealm = new ThreadLocal<>();
+	private static ThreadLocal defaultRealm = new ThreadLocal();
 
 	/**
-	 * Returns the default realm for the calling thread, or <code>null</code> if
-	 * no default realm has been set.
+	 * Returns the default realm for the calling thread, or <code>null</code>
+	 * if no default realm has been set.
 	 *
 	 * @return the default realm, or <code>null</code>
 	 */
 	public static Realm getDefault() {
-		return defaultRealm.get();
+		return (Realm) defaultRealm.get();
 	}
 
 	/**
@@ -136,12 +136,14 @@ public abstract class Realm {
 			safeRunnable = new ISafeRunnable() {
 				@Override
 				public void handleException(Throwable exception) {
-					Policy.getLog()
-							.log(new Status(
-									IStatus.ERROR,
-									Policy.JFACE_DATABINDING,
-									IStatus.OK,
-									"Unhandled exception: " + exception.getMessage(), exception)); //$NON-NLS-1$
+					Policy
+							.getLog()
+							.log(
+									new Status(
+											IStatus.ERROR,
+											Policy.JFACE_DATABINDING,
+											IStatus.OK,
+											"Unhandled exception: " + exception.getMessage(), exception)); //$NON-NLS-1$
 				}
 				@Override
 				public void run() throws Exception {

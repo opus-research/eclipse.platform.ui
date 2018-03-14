@@ -67,12 +67,10 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
  * System.out.println(primes); // =&gt; &quot;[2, 3, 5, 7, 11, 13, 17, 19]&quot;
  * </pre>
  *
- * @param <E>
- *
  * @since 1.2
  */
-public abstract class ComputedSet<E> extends AbstractObservableSet<E> {
-	private Set<E> cachedSet = new HashSet<E>();
+public abstract class ComputedSet extends AbstractObservableSet {
+	private Set cachedSet = new HashSet();
 
 	private boolean dirty = true;
 	private boolean stale = false;
@@ -176,24 +174,24 @@ public abstract class ComputedSet<E> extends AbstractObservableSet<E> {
 		return doGetSet().size();
 	}
 
-	private final Set<E> getSet() {
+	private final Set getSet() {
 		getterCalled();
 		return doGetSet();
 	}
 
 	@Override
-	protected Set<E> getWrappedSet() {
+	protected Set getWrappedSet() {
 		return doGetSet();
 	}
 
-	final Set<E> doGetSet() {
+	final Set doGetSet() {
 		if (dirty) {
 			// This line will do the following:
 			// - Run the calculate method
 			// - While doing so, add any observable that is touched to the
 			// dependencies list
 			IObservable[] newDependencies = ObservableTracker.runAndMonitor(
-privateInterface, privateInterface, null);
+					privateInterface, privateInterface, null);
 
 			// If any dependencies are stale, a stale event will be fired here
 			// even if we were already stale before recomputing. This is in case
@@ -228,7 +226,7 @@ privateInterface, privateInterface, null);
 	 *
 	 * @return the object's set.
 	 */
-	protected abstract Set<E> calculate();
+	protected abstract Set calculate();
 
 	private void makeDirty() {
 		if (!dirty) {
@@ -245,22 +243,22 @@ privateInterface, privateInterface, null);
 
 			// Fire the "dirty" event. This implementation recomputes the new
 			// set lazily.
-			fireSetChange(new SetDiff<E>() {
-				SetDiff<E> delegate;
+			fireSetChange(new SetDiff() {
+				SetDiff delegate;
 
-				private SetDiff<E> getDelegate() {
+				private SetDiff getDelegate() {
 					if (delegate == null)
 						delegate = Diffs.computeSetDiff(oldSet, getSet());
 					return delegate;
 				}
 
 				@Override
-				public Set<E> getAdditions() {
+				public Set getAdditions() {
 					return getDelegate().getAdditions();
 				}
 
 				@Override
-				public Set<E> getRemovals() {
+				public Set getRemovals() {
 					return getDelegate().getRemovals();
 				}
 			});
@@ -307,8 +305,7 @@ privateInterface, privateInterface, null);
 	}
 
 	@Override
-	public synchronized void addSetChangeListener(
-			ISetChangeListener<? super E> listener) {
+	public synchronized void addSetChangeListener(ISetChangeListener listener) {
 		super.addSetChangeListener(listener);
 		// If somebody is listening, we need to make sure we attach our own
 		// listeners
