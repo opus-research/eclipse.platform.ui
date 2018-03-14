@@ -31,7 +31,7 @@ import org.eclipse.ui.internal.AnimationEngine;
  * Creates an animation effect where the interpolated rectangles are displayed using Canvas
  * controls that show an image of the bits that were originally occupied by the various
  * 'start' rectangles.
- * 
+ *
  * @since 3.3
  *
  */
@@ -49,6 +49,7 @@ public class RectangleAnimationImageFeedback extends
 			this.image = image;
 
 			addPaintListener(new PaintListener() {
+				@Override
 				public void paintControl(PaintEvent e) {
 					paintImage(e.gc);
 				}
@@ -64,9 +65,7 @@ public class RectangleAnimationImageFeedback extends
 					getBounds().height);
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.swt.widgets.Widget#dispose()
-		 */
+		@Override
 		public void dispose() {
 			super.dispose();
 			image.dispose();
@@ -84,6 +83,7 @@ public class RectangleAnimationImageFeedback extends
 		super(parentShell, start, end);
 	}
 
+	@Override
 	public void dispose() {
 		backingStore.dispose();
 		for (Iterator ctrlIter = controls.iterator(); ctrlIter.hasNext();) {
@@ -95,6 +95,7 @@ public class RectangleAnimationImageFeedback extends
 		theShell.dispose();
 	}
 
+	@Override
 	public void initialize(AnimationEngine engine) {
 		display = getAnimationShell().getDisplay();
 
@@ -102,7 +103,7 @@ public class RectangleAnimationImageFeedback extends
 		theShell = new Shell(getAnimationShell(), SWT.NO_TRIM | SWT.ON_TOP);
 		theShell.setBounds(getAnimationShell().getBounds());
 
-		// Capture the background image		
+		// Capture the background image
 		backingStore = new Image(theShell.getDisplay(), psRect);
 		GC gc = new GC(display);
 		gc.copyArea(backingStore, psRect.x, psRect.y);
@@ -114,16 +115,15 @@ public class RectangleAnimationImageFeedback extends
 		display.update();
 
 	}
-		
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.RectangleAnimationFeedbackBase#jobInit(org.eclipse.ui.internal.AnimationEngine)
-	 */
+
+	@Override
 	public boolean jobInit(AnimationEngine engine) {
 		changeCoordinates();
 		captureImages();
 		return super.jobInit(engine);
 	}
-	
+
+	@Override
 	public void addStartRect(Rectangle rect) {
 		if (rect == null)
 			return;
@@ -133,6 +133,7 @@ public class RectangleAnimationImageFeedback extends
 
 	}
 
+	@Override
 	public void addEndRect(Rectangle rect) {
 		if (rect != null) {
 			//	Rectangle end = Geometry.toControl(getAnimationShell(), rect);
@@ -140,6 +141,7 @@ public class RectangleAnimationImageFeedback extends
 		}
 	}
 
+	@Override
 	public void renderStep(AnimationEngine engine) {
 		Iterator ctrlIter = controls.iterator();
 		Iterator currentRects = getCurrentRects(engine.amount()).iterator();

@@ -24,12 +24,12 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
  * entries) on the local file system. They do not represent resources within the
  * workbench. This distinction is made because the representation of a file
  * system resource is significantly different from that of a workbench resource.
- * 
+ *
  * If self represents a collection (eg.- file system directory, zip directory)
  * then its icon will be the folderIcon static field. Otherwise (ie.- self
  * represents a file system file) self's icon is stored in field "icon", and is
  * determined by the extension of the file that self represents.
- * 
+ *
  * This class is adaptable, and implements one adapter itself, namely the
  * IWorkbenchAdapter adapter used for navigation and display in the workbench.
  */
@@ -55,28 +55,32 @@ public class FileSystemElement implements IAdaptable {
         /**
          * Answer the children property of this element
          */
-        public Object[] getChildren(Object o) {
+        @Override
+		public Object[] getChildren(Object o) {
             return getFolders().getChildren(o);
         }
 
         /**
          * Returns the parent of this element
          */
-        public Object getParent(Object o) {
+        @Override
+		public Object getParent(Object o) {
             return parent;
         }
 
         /**
          * Returns an appropriate label for this file system element.
          */
-        public String getLabel(Object o) {
+        @Override
+		public String getLabel(Object o) {
             return name;
         }
 
         /**
          * Returns an image descriptor for this file system element
          */
-        public ImageDescriptor getImageDescriptor(Object object) {
+        @Override
+		public ImageDescriptor getImageDescriptor(Object object) {
             if (isDirectory()) {
                 return WorkbenchImages
                         .getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER);
@@ -91,7 +95,7 @@ public class FileSystemElement implements IAdaptable {
     /**
      * Creates a new <code>FileSystemElement</code> and initializes it and its
      * parent if applicable.
-     * 
+     *
      * @param name
      *            The name of the element
      * @param parent
@@ -112,7 +116,7 @@ public class FileSystemElement implements IAdaptable {
 
     /**
      * Adds the passed child to this object's collection of children.
-     * 
+     *
      * @param child
      *            FileSystemElement
      */
@@ -133,7 +137,8 @@ public class FileSystemElement implements IAdaptable {
     /**
      * Returns the adapter
      */
-    public Object getAdapter(Class adapter) {
+    @Override
+	public Object getAdapter(Class adapter) {
         if (adapter == IWorkbenchAdapter.class) {
             return workbenchAdapter;
         }
@@ -143,7 +148,7 @@ public class FileSystemElement implements IAdaptable {
 
     /**
      * Returns the extension of this element's filename.
-     * 
+     *
      * @return The extension or an empty string if there is no extension.
      */
     public String getFileNameExtension() {
@@ -155,7 +160,7 @@ public class FileSystemElement implements IAdaptable {
      * Answer the files property of this element. Answer an empty list if the
      * files property is null. This method should not be used to add children to
      * the receiver. Use addChild(FileSystemElement) instead.
-     * 
+     *
      * @return AdaptableList The list of files parented by the receiver.
      */
     public AdaptableList getFiles() {
@@ -168,7 +173,7 @@ public class FileSystemElement implements IAdaptable {
 
     /**
      * Returns the file system object property of this element
-     * 
+     *
      * @return the file system object
      */
     public Object getFileSystemObject() {
@@ -180,7 +185,7 @@ public class FileSystemElement implements IAdaptable {
      * Answer an empty list if the folders property is null. This method should
      * not be used to add children to the receiver. Use
      * addChild(FileSystemElement) instead.
-     * 
+     *
      * @return AdapatableList The list of folders parented by the receiver.
      */
     public AdaptableList getFolders() {
@@ -193,7 +198,7 @@ public class FileSystemElement implements IAdaptable {
 
     /**
      * Return the parent of this element.
-     * 
+     *
      * @return the parent file system element, or <code>null</code> if this is
      *         the root
      */
@@ -223,7 +228,7 @@ public class FileSystemElement implements IAdaptable {
 
     /**
      * Set the file system object property of this element
-     * 
+     *
      * @param value
      *            the file system object
      */
@@ -242,7 +247,8 @@ public class FileSystemElement implements IAdaptable {
     /**
      * For debugging purposes only.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         StringBuffer buf = new StringBuffer();
         if (isDirectory()) {
             buf.append("Folder(");//$NON-NLS-1$

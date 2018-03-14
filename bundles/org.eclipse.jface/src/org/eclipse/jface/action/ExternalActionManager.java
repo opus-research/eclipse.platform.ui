@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.Set;
 
@@ -64,7 +65,7 @@ import org.eclipse.swt.widgets.Event;
  * <p>
  * This class is not intended to be called or extended by any external clients.
  * </p>
- * 
+ *
  * @since 3.0
  */
 public final class ExternalActionManager {
@@ -76,7 +77,7 @@ public final class ExternalActionManager {
 	 * <p>
 	 * <b>Note:</b> this class is not intended to be subclassed by clients.
 	 * </p>
-	 * 
+	 *
 	 * @since 3.1
 	 */
 	public static class CommandCallback implements
@@ -92,7 +93,7 @@ public final class ExternalActionManager {
 		 * The callback capable of responding to whether a command is active.
 		 */
 		private final IActiveChecker activeChecker;
-		
+
 		/**
 		 * Check the applicability of firing an execution event for an action.
 		 */
@@ -122,7 +123,7 @@ public final class ExternalActionManager {
 		 * will be removed from this set and the listener removed. This value
 		 * may be empty, but never <code>null</code>.
 		 */
-		private final Set loggedCommandIds = new HashSet();
+		private final Set<String> loggedCommandIds = new HashSet<String>();
 
 		/**
 		 * The list of listeners that have registered for property change
@@ -130,29 +131,31 @@ public final class ExternalActionManager {
 		 * to listeners (<code>IPropertyChangeListener</code> or
 		 * <code>ListenerList</code> of <code>IPropertyChangeListener</code>).
 		 */
-		private final Map registeredListeners = new HashMap();
+		private final Map<String, Object> registeredListeners = new HashMap<String, Object>();
 
 		/**
 		 * Constructs a new instance of <code>CommandCallback</code> with the
 		 * workbench it should be using. All commands will be considered active.
-		 * 
+		 *
 		 * @param bindingManager
 		 *            The binding manager which will provide the callback; must
 		 *            not be <code>null</code>.
 		 * @param commandManager
 		 *            The command manager which will provide the callback; must
 		 *            not be <code>null</code>.
-		 * 
+		 *
 		 * @since 3.1
 		 */
 		public CommandCallback(final BindingManager bindingManager,
 				final CommandManager commandManager) {
 			this(bindingManager, commandManager, new IActiveChecker() {
+				@Override
 				public boolean isActive(String commandId) {
 					return true;
 				}
 
 			}, new IExecuteApplicable() {
+				@Override
 				public boolean isApplicable(IAction action) {
 					return true;
 				}
@@ -161,7 +164,7 @@ public final class ExternalActionManager {
 		/**
 		 * Constructs a new instance of <code>CommandCallback</code> with the
 		 * workbench it should be using.
-		 * 
+		 *
 		 * @param bindingManager
 		 *            The binding manager which will provide the callback; must
 		 *            not be <code>null</code>.
@@ -171,7 +174,7 @@ public final class ExternalActionManager {
 		 * @param activeChecker
 		 *            The callback mechanism for checking whether a command is
 		 *            active; must not be <code>null</code>.
-		 * 
+		 *
 		 * @since 3.1
 		 */
 		public CommandCallback(final BindingManager bindingManager,
@@ -179,6 +182,7 @@ public final class ExternalActionManager {
 				final IActiveChecker activeChecker) {
 			this(bindingManager, commandManager, activeChecker,
 					new IExecuteApplicable() {
+				@Override
 				public boolean isApplicable(IAction action) {
 					return true;
 				}
@@ -187,7 +191,7 @@ public final class ExternalActionManager {
 		/**
 		 * Constructs a new instance of <code>CommandCallback</code> with the
 		 * workbench it should be using.
-		 * 
+		 *
 		 * @param bindingManager
 		 *            The binding manager which will provide the callback; must
 		 *            not be <code>null</code>.
@@ -200,7 +204,7 @@ public final class ExternalActionManager {
 		 * @param checker
 		 *            The callback to check if an IAction should fire execution
 		 *            events.
-		 * 
+		 *
 		 * @since 3.4
 		 */
 		public CommandCallback(final BindingManager bindingManager,
@@ -236,6 +240,7 @@ public final class ExternalActionManager {
 		 * @see org.eclipse.jface.action.ExternalActionManager.ICallback#addPropertyChangeListener(String,
 		 *      IPropertyChangeListener)
 		 */
+		@Override
 		public final void addPropertyChangeListener(final String commandId,
 				final IPropertyChangeListener listener) {
 			Object existing = registeredListeners.get(commandId);
@@ -255,13 +260,14 @@ public final class ExternalActionManager {
 			}
 		}
 
+		@Override
 		public final void bindingManagerChanged(final BindingManagerEvent event) {
 			if (event.isActiveBindingsChanged()) {
-				final Iterator listenerItr = registeredListeners.entrySet()
+				final Iterator<Entry<String, Object>> listenerItr = registeredListeners.entrySet()
 						.iterator();
 				while (listenerItr.hasNext()) {
-					final Map.Entry entry = (Map.Entry) listenerItr.next();
-					final String commandId = (String) entry.getKey();
+					final Entry<String, Object> entry = listenerItr.next();
+					final String commandId = entry.getKey();
 					final Command command = commandManager
 							.getCommand(commandId);
 					final ParameterizedCommand parameterizedCommand = new ParameterizedCommand(
@@ -288,6 +294,7 @@ public final class ExternalActionManager {
 		/**
 		 * @see org.eclipse.jface.action.ExternalActionManager.ICallback#getAccelerator(String)
 		 */
+		@Override
 		public final Integer getAccelerator(final String commandId) {
 			final TriggerSequence triggerSequence = bindingManager
 					.getBestActiveBindingFor(commandId);
@@ -310,6 +317,7 @@ public final class ExternalActionManager {
 		/**
 		 * @see org.eclipse.jface.action.ExternalActionManager.ICallback#getAcceleratorText(String)
 		 */
+		@Override
 		public final String getAcceleratorText(final String commandId) {
 			final TriggerSequence triggerSequence = bindingManager
 					.getBestActiveBindingFor(commandId);
@@ -322,7 +330,7 @@ public final class ExternalActionManager {
 
 		/**
 		 * Returns the active bindings for a particular command identifier.
-		 * 
+		 *
 		 * @param commandId
 		 *            The identifier of the command whose bindings are
 		 *            requested. This argument may be <code>null</code>. It
@@ -332,6 +340,7 @@ public final class ExternalActionManager {
 		 *         not to be <code>null</code>, but it may be empty.
 		 * @since 3.2
 		 */
+		@Override
 		public final TriggerSequence[] getActiveBindingsFor(
 				final String commandId) {
 			return bindingManager.getActiveBindingsFor(commandId);
@@ -340,6 +349,7 @@ public final class ExternalActionManager {
 		/**
 		 * @see org.eclipse.jface.action.ExternalActionManager.ICallback#isAcceleratorInUse(int)
 		 */
+		@Override
 		public final boolean isAcceleratorInUse(final int accelerator) {
 			final KeySequence keySequence = KeySequence
 					.getInstance(SWTKeySupport
@@ -350,10 +360,11 @@ public final class ExternalActionManager {
 
 		/**
 		 * {@inheritDoc}
-		 * 
+		 *
 		 * Calling this method with an undefined command id will generate a log
 		 * message.
 		 */
+		@Override
 		public final boolean isActive(final String commandId) {
 			if (commandId != null) {
 				final Command command = commandManager.getCommand(commandId);
@@ -364,7 +375,7 @@ public final class ExternalActionManager {
 					final String message = MessageFormat.format(Util
 							.translateString(RESOURCE_BUNDLE,
 									"undefinedCommand.WarningMessage", null), //$NON-NLS-1$
-							new String[] { command.getId() });
+							command.getId());
 					IStatus status = new Status(IStatus.ERROR,
 							"org.eclipse.jface", //$NON-NLS-1$
 							0, message, new Exception());
@@ -373,11 +384,7 @@ public final class ExternalActionManager {
 					// And remember this item so we don't log it again.
 					loggedCommandIds.add(commandId);
 					command.addCommandListener(new ICommandListener() {
-						/*
-						 * (non-Javadoc)
-						 * 
-						 * @see org.eclipse.ui.commands.ICommandListener#commandChanged(org.eclipse.ui.commands.CommandEvent)
-						 */
+						@Override
 						public final void commandChanged(
 								final CommandEvent commandEvent) {
 							if (command.isDefined()) {
@@ -400,6 +407,7 @@ public final class ExternalActionManager {
 		 * @see org.eclipse.jface.action.ExternalActionManager.ICallback#removePropertyChangeListener(String,
 		 *      IPropertyChangeListener)
 		 */
+		@Override
 		public final void removePropertyChangeListener(final String commandId,
 				final IPropertyChangeListener listener) {
 			Object existing= registeredListeners.get(commandId);
@@ -421,9 +429,10 @@ public final class ExternalActionManager {
 		/**
 		 * @since 3.4
 		 */
+		@Override
 		public void preExecute(IAction action, Event event) {
 			String actionDefinitionId = action.getActionDefinitionId();
-			if (actionDefinitionId==null 
+			if (actionDefinitionId==null
 					|| !applicabilityChecker.isApplicable(action)) {
 				return;
 			}
@@ -437,9 +446,10 @@ public final class ExternalActionManager {
 		/**
 		 * @since 3.4
 		 */
+		@Override
 		public void postExecuteSuccess(IAction action, Object returnValue) {
 			String actionDefinitionId = action.getActionDefinitionId();
-			if (actionDefinitionId==null 
+			if (actionDefinitionId==null
 					|| !applicabilityChecker.isApplicable(action)) {
 				return;
 			}
@@ -449,10 +459,11 @@ public final class ExternalActionManager {
 		/**
 		 * @since 3.4
 		 */
+		@Override
 		public void postExecuteFailure(IAction action,
 				ExecutionException exception) {
 			String actionDefinitionId = action.getActionDefinitionId();
-			if (actionDefinitionId==null 
+			if (actionDefinitionId==null
 					|| !applicabilityChecker.isApplicable(action)) {
 				return;
 			}
@@ -462,9 +473,10 @@ public final class ExternalActionManager {
 		/**
 		 * @since 3.4
 		 */
+		@Override
 		public void notDefined(IAction action, NotDefinedException exception) {
 			String actionDefinitionId = action.getActionDefinitionId();
-			if (actionDefinitionId==null 
+			if (actionDefinitionId==null
 					|| !applicabilityChecker.isApplicable(action)) {
 				return;
 			}
@@ -474,9 +486,10 @@ public final class ExternalActionManager {
 		/**
 		 * @since 3.4
 		 */
+		@Override
 		public void notEnabled(IAction action, NotEnabledException exception) {
 			String actionDefinitionId = action.getActionDefinitionId();
-			if (actionDefinitionId==null 
+			if (actionDefinitionId==null
 					|| !applicabilityChecker.isApplicable(action)) {
 				return;
 			}
@@ -487,7 +500,7 @@ public final class ExternalActionManager {
 	/**
 	 * Defines a callback mechanism for developer who wish to further control
 	 * the visibility of legacy action-based contribution items.
-	 * 
+	 *
 	 * @since 3.1
 	 */
 	public static interface IActiveChecker {
@@ -495,7 +508,7 @@ public final class ExternalActionManager {
 		 * Checks whether the command with the given identifier should be
 		 * considered active. This can be used in systems using some kind of
 		 * user interface filtering (e.g., activities in the Eclipse workbench).
-		 * 
+		 *
 		 * @param commandId
 		 *            The identifier for the command; must not be
 		 *            <code>null</code>
@@ -515,7 +528,7 @@ public final class ExternalActionManager {
 	 * <p>
 	 * Clients may implement this interface, but must not extend.
 	 * </p>
-	 * 
+	 *
 	 * @since 3.2
 	 */
 	public static interface IBindingManagerCallback extends ICallback {
@@ -524,7 +537,7 @@ public final class ExternalActionManager {
 		 * <p>
 		 * Returns the active bindings for a particular command identifier.
 		 * </p>
-		 * 
+		 *
 		 * @param commandId
 		 *            The identifier of the command whose bindings are
 		 *            requested. This argument may be <code>null</code>. It
@@ -535,25 +548,25 @@ public final class ExternalActionManager {
 		 */
 		public TriggerSequence[] getActiveBindingsFor(String commandId);
 	}
-	
+
 	/**
 	 * An overridable mechanism to filter certain IActions from the execution
 	 * bridge.
-	 * 
+	 *
 	 * @since 3.4
 	 */
 	public static interface IExecuteApplicable {
 		/**
 		 * Allow the callback to filter out actions that should not fire
 		 * execution events.
-		 * 
+		 *
 		 * @param action
 		 *            The action with an actionDefinitionId
 		 * @return true if this action should be considered.
 		 */
 		public boolean isApplicable(IAction action);
 	}
-	
+
 	/**
 	 * <p>
 	 * A callback for executing execution events. Allows
@@ -562,16 +575,16 @@ public final class ExternalActionManager {
 	 * <p>
 	 * Clients must not implement this interface and must not extend.
 	 * </p>
-	 * 
+	 *
 	 * @since 3.4
-	 * 
+	 *
 	 */
 	public static interface IExecuteCallback {
-		
+
 		/**
 		 * Fires a <code>NotEnabledException</code> because the action was not
 		 * enabled.
-		 * 
+		 *
 		 * @param action
 		 * 			The action contribution that caused the exception,
 		 * 			never <code>null</code>.
@@ -583,7 +596,7 @@ public final class ExternalActionManager {
 		/**
 		 * Fires a <code>NotDefinedException</code> because the action was not
 		 * defined.
-		 * 
+		 *
 		 * @param action
 		 * 			The action contribution that caused the exception,
 		 * 			never <code>null</code>.
@@ -591,37 +604,37 @@ public final class ExternalActionManager {
 		 * 			The <code>NotDefinedException</code>, never <code>null</code>.
 		 */
 		public void notDefined(IAction action, NotDefinedException exception);
-		
+
 		/**
 		 * Fires an execution event before an action is run.
-		 * 
+		 *
 		 * @param action
 		 *            The action contribution that requires an
 		 *            execution event to be fired. Cannot be <code>null</code>.
 		 * @param e
 		 *            The SWT Event, may be <code>null</code>.
-		 * 
+		 *
 		 */
 		public void preExecute(IAction action,
 				Event e);
-		
+
 		/**
 		 * Fires an execution event when the action returned a success.
-		 * 
+		 *
 		 * @param action
 		 *            The action contribution that requires an
 		 *            execution event to be fired. Cannot be <code>null</code>.
 		 * @param returnValue
 		 *            The command's result, may be <code>null</code>.
-		 * 
+		 *
 		 */
 		public void postExecuteSuccess(IAction action,
 				Object returnValue);
-		
+
 		/**
 		 * Creates an <code>ExecutionException</code> when the action returned
 		 * a failure.
-		 * 
+		 *
 		 * @param action
 		 * 			The action contribution that caused the exception,
 		 * 			never <code>null</code>.
@@ -635,7 +648,7 @@ public final class ExternalActionManager {
 	/**
 	 * A callback mechanism for some external tool to communicate extra
 	 * information to actions and action contribution items.
-	 * 
+	 *
 	 * @since 3.0
 	 */
 	public static interface ICallback {
@@ -651,7 +664,7 @@ public final class ExternalActionManager {
 		 * Has no effect if an identical listener has already been added for
 		 * the <code>identifier</code>.
 		 * </p>
-		 * 
+		 *
 		 * @param identifier
 		 *            The identifier of the item to which the listener should be
 		 *            attached; must not be <code>null</code>.
@@ -665,7 +678,7 @@ public final class ExternalActionManager {
 		 * An accessor for the accelerator associated with the item indicated by
 		 * the identifier. This identifier is specific to mechanism being used.
 		 * In the case of the Eclipse workbench, this is the command identifier.
-		 * 
+		 *
 		 * @param identifier
 		 *            The identifier of the item from which the accelerator
 		 *            should be obtained ; must not be <code>null</code>.
@@ -679,7 +692,7 @@ public final class ExternalActionManager {
 		 * indicated by the identifier. This identifier is specific to mechanism
 		 * being used. In the case of the Eclipse workbench, this is the command
 		 * identifier.
-		 * 
+		 *
 		 * @param identifier
 		 *            The identifier of the item from which the accelerator text
 		 *            should be obtained ; must not be <code>null</code>.
@@ -693,7 +706,7 @@ public final class ExternalActionManager {
 		 * other mechanism (outside of the menus controlled by JFace). This is
 		 * used to keep JFace from trying to grab accelerators away from someone
 		 * else.
-		 * 
+		 *
 		 * @param accelerator
 		 *            The accelerator to check -- in SWT's internal accelerator
 		 *            format.
@@ -706,7 +719,7 @@ public final class ExternalActionManager {
 		 * Checks whether the item matching this identifier is active. This is
 		 * used to decide whether a contribution item with this identifier
 		 * should be made visible. An inactive item is not visible.
-		 * 
+		 *
 		 * @param identifier
 		 *            The identifier of the item from which the active state
 		 *            should be retrieved; must not be <code>null</code>.
@@ -720,7 +733,7 @@ public final class ExternalActionManager {
 		 * <code>identifier</code>. This identifier is specific to mechanism
 		 * being used. In the case of the Eclipse workbench, this is the command
 		 * identifier.
-		 * 
+		 *
 		 * @param identifier
 		 *            The identifier of the item to from the listener should be
 		 *            removed; must not be <code>null</code>.
@@ -740,7 +753,7 @@ public final class ExternalActionManager {
 
 	/**
 	 * Retrieves the current singleton instance of this class.
-	 * 
+	 *
 	 * @return The singleton instance; this value is never <code>null</code>.
 	 */
 	public static ExternalActionManager getInstance() {
@@ -765,7 +778,7 @@ public final class ExternalActionManager {
 
 	/**
 	 * An accessor for the current call back.
-	 * 
+	 *
 	 * @return The current callback mechanism being used. This is the callback
 	 *         that should be queried for extra information about actions and
 	 *         action contribution items. This value may be <code>null</code>
@@ -777,7 +790,7 @@ public final class ExternalActionManager {
 
 	/**
 	 * A mutator for the current call back
-	 * 
+	 *
 	 * @param callbackToUse
 	 *            The new callback mechanism to use; this value may be
 	 *            <code>null</code> if the default is acceptable (i.e., no

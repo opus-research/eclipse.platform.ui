@@ -24,7 +24,8 @@ class FullImageDecoratorRunnable extends FullDecoratorRunnable {
     /* (non-Javadoc)
      * @see org.eclipse.core.runtime.ISafeRunnable#run()
      */
-    public void run() throws Exception {
+    @Override
+	public void run() throws Exception {
         result = decorator.decorateImage(start, element);
     }
 
@@ -58,6 +59,6 @@ class FullImageDecoratorRunnable extends FullDecoratorRunnable {
 	 * @since 3.1
 	 */
 	void clearReferences() {
-		decorator = null;		
+		decorator = null;
 	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 IBM Corporation and others.
+ * Copyright (c) 2010,2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -47,9 +47,10 @@ public class WorkbenchSWTActivator implements BundleActivator { // extends
 	private ServiceTracker debugTracker;
 	private DebugTrace trace;
 
+
 	/**
 	 * Get the default activator.
-	 * 
+	 *
 	 * @return a BundleActivator
 	 */
 	public static WorkbenchSWTActivator getDefault() {
@@ -63,11 +64,13 @@ public class WorkbenchSWTActivator implements BundleActivator { // extends
 		return context;
 	}
 
+	@Override
 	public void start(BundleContext context) throws Exception {
 		activator = this;
 		this.context = context;
 	}
 
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		saveDialogSettings();
 		if (pkgAdminTracker != null) {
@@ -187,7 +190,7 @@ public class WorkbenchSWTActivator implements BundleActivator { // extends
 	 * <p>
 	 * Subclasses may override this method but are not expected to.
 	 * </p>
-	 * 
+	 *
 	 * @return the dialog settings
 	 */
 	public IDialogSettings getDialogSettings() {
@@ -285,12 +288,12 @@ public class WorkbenchSWTActivator implements BundleActivator { // extends
 
 	/**
 	 * FOR INTERNAL WORKBENCH USE ONLY.
-	 * 
+	 *
 	 * Returns the path to a location in the file system that can be used to
 	 * persist/restore state between workbench invocations. If the location did
 	 * not exist prior to this call it will be created. Returns
 	 * <code>null</code> if no such location is available.
-	 * 
+	 *
 	 * @return path to a location in the file system where this plug-in can
 	 *         persist data between sessions, or <code>null</code> if no such
 	 *         location is available.

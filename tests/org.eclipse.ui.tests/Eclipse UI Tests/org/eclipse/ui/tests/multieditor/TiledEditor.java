@@ -55,10 +55,12 @@ public class TiledEditor extends MultiEditor {
 	/*
 	 * @see IWorkbenchPart#createPartControl(Composite)
 	 */
+	@Override
 	public void createPartControl(Composite parent) {
 		callHistory.add("createPartControl");
 
 		parent.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				widgetsDisposed();
 			}
@@ -85,12 +87,15 @@ public class TiledEditor extends MultiEditor {
 
 			final int index = i;
 			e.addPropertyListener(new IPropertyListener() {
+				@Override
 				public void propertyChanged(Object source, int property) {
 					if (property == IEditorPart.PROP_DIRTY
-							|| property == IWorkbenchPart.PROP_TITLE)
-						if (source instanceof IEditorPart)
+							|| property == IWorkbenchPart.PROP_TITLE) {
+						if (source instanceof IEditorPart) {
 							updateInnerEditorTitle((IEditorPart) source,
 									innerEditorTitle[index]);
+						}
+					}
 				}
 			});
 		}
@@ -99,10 +104,12 @@ public class TiledEditor extends MultiEditor {
 	/**
 	 * Draw the gradient for the specified editor.
 	 */
+	@Override
 	protected void drawGradient(IEditorPart innerEditor, Gradient g) {
 		CLabel label = innerEditorTitle[getIndex(innerEditor)];
-		if ((label == null) || label.isDisposed())
+		if ((label == null) || label.isDisposed()) {
 			return;
+		}
 
 		label.setForeground(g.fgColor);
 		label.setBackground(g.bgColors, g.bgPercents);
@@ -118,8 +125,9 @@ public class TiledEditor extends MultiEditor {
 		titleLabel.setAlignment(SWT.LEFT);
 		titleLabel.setBackground(null, null);
 		parent.setTopLeft(titleLabel);
-		if (innerEditorTitle == null)
+		if (innerEditorTitle == null) {
 			innerEditorTitle = new CLabel[getInnerEditors().length];
+		}
 		innerEditorTitle[index] = titleLabel;
 	}
 
@@ -129,27 +137,34 @@ public class TiledEditor extends MultiEditor {
 	 */
 	public void updateInnerEditorTitle(IEditorPart editor, CLabel label) {
 
-		if ((label == null) || label.isDisposed())
+		if ((label == null) || label.isDisposed()) {
 			return;
+		}
 		String title = editor.getTitle();
 		if (editor.isDirty())
+		 {
 			title = "*" + title; //$NON-NLS-1$
+		}
 		label.setText(title);
 		Image image = editor.getTitleImage();
-		if (image != null)
-			if (!image.equals(label.getImage()))
+		if (image != null) {
+			if (!image.equals(label.getImage())) {
 				label.setImage(image);
+			}
+		}
 		label.setToolTipText(editor.getTitleToolTip());
 	}
 
 	/*
-	 * 
+	 *
 	 */
+	@Override
 	protected int getIndex(IEditorPart editor) {
 		IEditorPart innerEditors[] = getInnerEditors();
 		for (int i = 0; i < innerEditors.length; i++) {
-			if (innerEditors[i] == editor)
+			if (innerEditors[i] == editor) {
 				return i;
+			}
 		}
 		return -1;
 	}
@@ -159,33 +174,39 @@ public class TiledEditor extends MultiEditor {
 	// add them to the call history.
 	//
 
+	@Override
 	public Composite createInnerPartControl(Composite parent, IEditorPart e) {
 		callHistory.add("createInnerPartControl");
 		return super.createInnerPartControl(parent, e);
 	}
 
+	@Override
 	public void init(IEditorSite site, IEditorInput input)
 			throws PartInitException {
 		callHistory.add("init");
 		super.init(site, input);
 	}
 
+	@Override
 	public void setFocus() {
 		callHistory.add("setFocus");
 		super.setFocus();
 	}
 
+	@Override
 	public void updateGradient(IEditorPart editor) {
 		callHistory.add("updateGradient");
 		super.updateGradient(editor);
 	}
 
+	@Override
 	public void setInitializationData(IConfigurationElement cfig,
 			String propertyName, Object data) {
 		callHistory.add("setInitializationData");
 		super.setInitializationData(cfig, propertyName, data);
 	}
 
+	@Override
 	public void dispose() {
 		callHistory.add("dispose");
 		super.dispose();

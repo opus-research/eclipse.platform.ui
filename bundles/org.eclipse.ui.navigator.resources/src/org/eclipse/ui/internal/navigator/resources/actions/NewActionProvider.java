@@ -30,11 +30,11 @@ import org.eclipse.ui.wizards.IWizardRegistry;
 
 /**
  * Provides the new (artifact creation) menu options for a context menu.
- * 
+ *
  * <p>
  * The added submenu has the following structure
  * </p>
- * 
+ *
  * <ul>
  * <li>a new generic project wizard shortcut action, </li>
  * <li>a separator, </li>
@@ -44,9 +44,9 @@ import org.eclipse.ui.wizards.IWizardRegistry;
  * <li>a generic examples wizard shortcut action, and finally </li>
  * <li>a generic "Other" new wizard shortcut action</li>
  * </ul>
- * 
+ *
  * @since 3.2
- * 
+ *
  */
 public class NewActionProvider extends CommonActionProvider {
 
@@ -64,6 +64,7 @@ public class NewActionProvider extends CommonActionProvider {
 
 	private boolean contribute = false;
 
+	@Override
 	public void init(ICommonActionExtensionSite anExtensionSite) {
 
 		if (anExtensionSite.getViewSite() instanceof ICommonViewerWorkbenchSite) {
@@ -81,7 +82,7 @@ public class NewActionProvider extends CommonActionProvider {
 	/**
 	 * Adds a submenu to the given menu with the name "group.new" see
 	 * {@link ICommonMenuConstants#GROUP_NEW}). The submenu contains the following structure:
-	 * 
+	 *
 	 * <ul>
 	 * <li>a new generic project wizard shortcut action, </li>
 	 * <li>a separator, </li>
@@ -92,6 +93,7 @@ public class NewActionProvider extends CommonActionProvider {
 	 * <li>a generic "Other" new wizard shortcut action</li>
 	 * </ul>
 	 */
+	@Override
 	public void fillContextMenu(IMenuManager menu) {
 		IMenuManager submenu = new MenuManager(
 				WorkbenchNavigatorMessages.NewActionProvider_NewMenu_label,
@@ -125,7 +127,7 @@ public class NewActionProvider extends CommonActionProvider {
 
 	/**
 	 * Return whether or not any examples are in the current install.
-	 * 
+	 *
 	 * @return True if there exists a full examples wizard category.
 	 */
 	private boolean hasExamples() {
@@ -135,9 +137,7 @@ public class NewActionProvider extends CommonActionProvider {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.actions.ActionGroup#dispose()
-	 */
+	@Override
 	public void dispose() {
 		if (showDlgAction!=null) {
 			showDlgAction.dispose();

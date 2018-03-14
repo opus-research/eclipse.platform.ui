@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   IBM Corporation - initial API and implementation 
+ *   IBM Corporation - initial API and implementation
  *   Sebastian Davids <sdavids@gmx.de> - Fix for bug 19346 - Dialog
  *      font should be activated and used by other components.
  *******************************************************************************/
@@ -46,7 +46,7 @@ import org.eclipse.ui.model.WorkbenchViewerComparator;
  * <p>
  * Example:
  * <pre>
- *	FileSelectionDialog dialog = 
+ *	FileSelectionDialog dialog =
  *		new FileSelectionDialog(getShell(), rootElement, msg);
  *	dialog.setInitialSelections(selectedResources);
  *	dialog.open();
@@ -56,6 +56,7 @@ import org.eclipse.ui.model.WorkbenchViewerComparator;
  * @deprecated Use org.eclipse.swt.widgets.FileDialog,
  * @noextend This class is not intended to be subclassed by clients.
  */
+@Deprecated
 public class FileSelectionDialog extends SelectionDialog {
     // the root file representative to populate the viewer with
     private FileSystemElement root;
@@ -107,7 +108,8 @@ public class FileSelectionDialog extends SelectionDialog {
         Button selectButton = new Button(buttonComposite, SWT.PUSH);
         selectButton.setText(SELECT_ALL_TITLE);
         SelectionListener listener = new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 selectionGroup.setAllSelections(true);
             }
         };
@@ -116,7 +118,8 @@ public class FileSelectionDialog extends SelectionDialog {
         Button deselectButton = new Button(buttonComposite, SWT.PUSH);
         deselectButton.setText(DESELECT_ALL_TITLE);
         listener = new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 selectionGroup.setAllSelections(false);
 
             }
@@ -144,24 +147,21 @@ public class FileSelectionDialog extends SelectionDialog {
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared in Window.
-     */
-    protected void configureShell(Shell shell) {
+    @Override
+	protected void configureShell(Shell shell) {
         super.configureShell(shell);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,
 				IIDEHelpContextIds.FILE_SELECTION_DIALOG);
     }
 
-    public void create() {
+    @Override
+	public void create() {
         super.create();
         initializeDialog();
     }
 
-    /* (non-Javadoc)
-     * Method declared on Dialog.
-     */
-    protected Control createDialogArea(Composite parent) {
+    @Override
+	protected Control createDialogArea(Composite parent) {
         // page group
         Composite composite = (Composite) super.createDialogArea(parent);
 
@@ -182,7 +182,8 @@ public class FileSelectionDialog extends SelectionDialog {
         // size, otherwise it will open too small
 
         ICheckStateListener listener = new ICheckStateListener() {
-            public void checkStateChanged(CheckStateChangedEvent event) {
+            @Override
+			public void checkStateChanged(CheckStateChangedEvent event) {
                 getOkButton().setEnabled(
                         selectionGroup.getCheckedElementCount() > 0);
             }
@@ -209,12 +210,13 @@ public class FileSelectionDialog extends SelectionDialog {
     }
 
     /**
-     * Returns a content provider for <code>FileSystemElement</code>s that returns 
+     * Returns a content provider for <code>FileSystemElement</code>s that returns
      * only files as children.
      */
     private ITreeContentProvider getFileProvider() {
         return new WorkbenchContentProvider() {
-            public Object[] getChildren(Object o) {
+            @Override
+			public Object[] getChildren(Object o) {
                 if (o instanceof FileSystemElement) {
                     return ((FileSystemElement) o).getFiles().getChildren(o);
                 }
@@ -224,12 +226,13 @@ public class FileSelectionDialog extends SelectionDialog {
     }
 
     /**
-     * Returns a content provider for <code>FileSystemElement</code>s that returns 
+     * Returns a content provider for <code>FileSystemElement</code>s that returns
      * only folders as children.
      */
     private ITreeContentProvider getFolderProvider() {
         return new WorkbenchContentProvider() {
-            public Object[] getChildren(Object o) {
+            @Override
+			public Object[] getChildren(Object o) {
                 if (o instanceof FileSystemElement) {
                     return ((FileSystemElement) o).getFolders().getChildren(o);
                 }
@@ -242,7 +245,7 @@ public class FileSelectionDialog extends SelectionDialog {
      * Initializes this dialog's controls.
      */
     private void initializeDialog() {
-        // initialize page	
+        // initialize page
         if (getInitialElementSelections().isEmpty()) {
 			getOkButton().setEnabled(false);
 		} else {
@@ -256,10 +259,11 @@ public class FileSelectionDialog extends SelectionDialog {
 
     /**
      * The <code>FileSelectionDialog</code> implementation of this
-     * <code>Dialog</code> method builds a list of the selected files for later 
+     * <code>Dialog</code> method builds a list of the selected files for later
      * retrieval by the client and closes this dialog.
      */
-    protected void okPressed() {
+    @Override
+	protected void okPressed() {
         Iterator resultEnum = selectionGroup.getAllCheckedListItems();
         ArrayList list = new ArrayList();
         while (resultEnum.hasNext()) {

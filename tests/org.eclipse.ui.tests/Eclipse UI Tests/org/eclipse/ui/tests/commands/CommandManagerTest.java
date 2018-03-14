@@ -22,7 +22,7 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
  * Tests some of the API on command manager.
- * 
+ *
  * @since 3.1
  */
 public final class CommandManagerTest extends UITestCase {
@@ -30,7 +30,7 @@ public final class CommandManagerTest extends UITestCase {
 	/**
 	 * An execution listener that can be attached to the command manager. It
 	 * will track which events it last heard.
-	 * 
+	 *
 	 * @since 3.1
 	 */
 	private final class ExecutionListener implements IExecutionListener {
@@ -57,22 +57,26 @@ public final class CommandManagerTest extends UITestCase {
 		 */
 		private ExecutionEvent preExecuteEvent = null;
 
+		@Override
 		public final void notHandled(final String commandId,
 				final NotHandledException exception) {
 			notHandledId = commandId;
 			notHandledException = exception;
 		}
 
+		@Override
 		public final void postExecuteFailure(final String commandId,
 				final ExecutionException exception) {
 			// Do nothing.
 		}
 
+		@Override
 		public final void postExecuteSuccess(final String commandId,
 				final Object returnValue) {
 			// Do nothing
 		}
 
+		@Override
 		public final void preExecute(final String commandId,
 				final ExecutionEvent event) {
 			preExecuteId = commandId;
@@ -83,7 +87,7 @@ public final class CommandManagerTest extends UITestCase {
 
 	/**
 	 * Constructs a new instance of <code>CommandManagerTest</code>.
-	 * 
+	 *
 	 * @param name
 	 *            The name of the test
 	 */

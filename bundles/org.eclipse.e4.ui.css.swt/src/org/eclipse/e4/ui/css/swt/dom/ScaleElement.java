@@ -19,11 +19,12 @@ import org.eclipse.swt.widgets.Scale;
 
 /**
  * {@link CSSStylableElement} implementation which wrap SWT {@link Scale}.
- * 
+ *
  */
 public class ScaleElement extends ControlElement {
-	
+
 	private SelectionListener selectionListener = new SelectionAdapter() {
+		@Override
 		public void widgetSelected(SelectionEvent e) {
 			doApplyStyles();
 		}
@@ -33,26 +34,29 @@ public class ScaleElement extends ControlElement {
 		super(scale, engine);
 	}
 
+	@Override
 	public void initialize() {
 		super.initialize();
 
-		if (!dynamicEnabled) return; 
-		
+		if (!dynamicEnabled) return;
+
 		Scale scale = getScale();
 		scale.addSelectionListener(selectionListener);
 	}
-		
-	public void dispose() {	
+
+	@Override
+	public void dispose() {
 		super.dispose();
-		
-		if (!dynamicEnabled) return; 
-		
+
+		if (!dynamicEnabled) return;
+
 		Scale scale = getScale();
 		if (!scale.isDisposed()) {
 			scale.removeSelectionListener(selectionListener);
 		}
 	}
 
+	@Override
 	public String getAttribute(String attr) {
 		return super.getAttribute(attr);
 	}

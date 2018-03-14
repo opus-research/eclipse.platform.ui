@@ -39,7 +39,7 @@ public class PropertyDialog extends FilteredPreferenceDialog {
 
 	/**
 	 * Create a new property dialog.
-	 * 
+	 *
 	 * @param shell
 	 *            the parent shell
 	 * @param propertyPageId
@@ -93,7 +93,7 @@ public class PropertyDialog extends FilteredPreferenceDialog {
 
 	/**
 	 * Returns the name of the given element(s). Prints at most 3 names.
-	 * 
+	 *
 	 * @param element
 	 *            the element / IStructuredSelection
 	 * @return the name of the element
@@ -112,8 +112,7 @@ public class PropertyDialog extends FilteredPreferenceDialog {
 				sb.append(" ..."); //$NON-NLS-1$
 				break;
 			}
-			IWorkbenchAdapter adapter = (IWorkbenchAdapter) Util.getAdapter(element,
-					IWorkbenchAdapter.class);
+			IWorkbenchAdapter adapter = Util.getAdapter(element, IWorkbenchAdapter.class);
 			if (adapter != null) {
 				if (sb.length() > 0)
 					sb.append(", "); //$NON-NLS-1$
@@ -125,7 +124,7 @@ public class PropertyDialog extends FilteredPreferenceDialog {
 
 	/**
 	 * Create an instance of the receiver.
-	 * 
+	 *
 	 * @param parentShell
 	 * @param mng
 	 * @param selection
@@ -138,7 +137,7 @@ public class PropertyDialog extends FilteredPreferenceDialog {
 
 	/**
 	 * Returns selection in the "Properties" action context.
-	 * 
+	 *
 	 * @return the selection
 	 */
 	public ISelection getSelection() {
@@ -147,7 +146,7 @@ public class PropertyDialog extends FilteredPreferenceDialog {
 
 	/**
 	 * Sets the selection that will be used to determine target object.
-	 * 
+	 *
 	 * @param newSelection
 	 *            the new selection
 	 */
@@ -158,6 +157,7 @@ public class PropertyDialog extends FilteredPreferenceDialog {
 	/**
 	 * Get the name of the selected item preference
 	 */
+	@Override
 	protected String getSelectedNodePreference() {
 		return lastPropertyId;
 	}
@@ -165,21 +165,23 @@ public class PropertyDialog extends FilteredPreferenceDialog {
 	/**
 	 * Get the name of the selected item preference
 	 */
+	@Override
 	protected void setSelectedNodePreference(String pageId) {
 		lastPropertyId = pageId;
 	}
 
 	/**
 	 * Return the contributionType (used by the IContributionService).
-	 * 
+	 *
 	 * Override this with a more specific contribution type as required.
-	 * 
+	 *
 	 * @return a string, the contributionType
 	 */
+	@Override
 	protected String getContributionType() {
 		return IContributionService.TYPE_PROPERTY;
 	}
 
-	
-	
+
+
 }

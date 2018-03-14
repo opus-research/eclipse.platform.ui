@@ -12,7 +12,7 @@ package org.eclipse.ui.internal;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.ISafeRunnable;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IObjectActionDelegate;
@@ -37,13 +37,16 @@ public class ObjectPluginAction extends PluginAction implements IPartListener2 {
     private String overrideActionId;
 
     private IWorkbenchPart activePart;
-    
+
+	@Override
 	public void partActivated(IWorkbenchPartReference partRef) {
 	}
 
+	@Override
 	public void partBroughtToTop(IWorkbenchPartReference partRef) {
 	}
 
+	@Override
 	public void partClosed(IWorkbenchPartReference partRef) {
 		if (activePart != null && partRef.getPart(false) == activePart) {
 			selectionChanged(StructuredSelection.EMPTY);
@@ -52,24 +55,29 @@ public class ObjectPluginAction extends PluginAction implements IPartListener2 {
 		}
 	}
 
+	@Override
 	public void partDeactivated(IWorkbenchPartReference partRef) {
 	}
 
+	@Override
 	public void partHidden(IWorkbenchPartReference partRef) {
 	}
 
+	@Override
 	public void partInputChanged(IWorkbenchPartReference partRef) {
 	}
 
+	@Override
 	public void partOpened(IWorkbenchPartReference partRef) {
 	}
 
+	@Override
 	public void partVisible(IWorkbenchPartReference partRef) {
 	}
 
     /**
 	 * Constructs a new ObjectPluginAction.
-	 * 
+	 *
 	 * @param actionElement
 	 *            The configuration element used to construct this action; must
 	 *            not be <code>null</code>.
@@ -84,26 +92,26 @@ public class ObjectPluginAction extends PluginAction implements IPartListener2 {
         overrideActionId = actionElement.getAttribute(ATT_OVERRIDE_ACTION_ID);
     }
 
-    /* (non-Javadoc)
-     * Method declared on PluginAction.
-     */
-    protected void initDelegate() {
+    @Override
+	protected void initDelegate() {
         super.initDelegate();
 		final IActionDelegate actionDelegate = getDelegate();
 		if (actionDelegate instanceof IObjectActionDelegate
 				&& activePart != null) {
 			final IObjectActionDelegate objectActionDelegate = (IObjectActionDelegate) actionDelegate;
 			final ISafeRunnable runnable = new ISafeRunnable() {
+				@Override
 				public void run() throws Exception {
 					objectActionDelegate.setActivePart(ObjectPluginAction.this,
 							activePart);
 				}
 
+				@Override
 				public void handleException(Throwable exception) {
 					// Do nothing.
 				}
 			};
-			Platform.run(runnable);
+			SafeRunner.run(runnable);
 		}
 	}
 
@@ -113,7 +121,7 @@ public class ObjectPluginAction extends PluginAction implements IPartListener2 {
 	 * This method will be called every time the action appears in a popup menu.
 	 * The targetPart may change with each invocation.
 	 * </p>
-	 * 
+	 *
 	 * @param targetPart
 	 *            the new part target
 	 */
@@ -131,32 +139,33 @@ public class ObjectPluginAction extends PluginAction implements IPartListener2 {
         if (delegate instanceof IObjectActionDelegate && activePart != null) {
 			final IObjectActionDelegate objectActionDelegate = (IObjectActionDelegate) delegate;
 			final ISafeRunnable runnable = new ISafeRunnable() {
+				@Override
 				public void run() throws Exception {
 					objectActionDelegate.setActivePart(ObjectPluginAction.this,
 							activePart);
 				}
 
+				@Override
 				public void handleException(Throwable exception) {
 					// Do nothing.
 				}
 			};
-			Platform.run(runnable);
+			SafeRunner.run(runnable);
 		}
 	}
 
     /**
      * Returns the action identifier this action overrides.
-     * 
+     *
      * @return the action identifier to override or <code>null</code>
      */
-    public String getOverrideActionId() {
+    @Override
+	public String getOverrideActionId() {
         return overrideActionId;
     }
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.PluginAction#dispose()
-     */
-    public void dispose() {
+
+    @Override
+	public void dispose() {
     	if (activePart!=null) {
     		activePart.getSite().getPage().removePartListener(this);
     		activePart = null;

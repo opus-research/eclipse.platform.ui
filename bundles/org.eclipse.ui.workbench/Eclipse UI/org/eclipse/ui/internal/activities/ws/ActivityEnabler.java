@@ -54,7 +54,7 @@ import org.eclipse.ui.internal.activities.InternalActivityHelper;
 /**
  * A simple control provider that will allow the user to toggle on/off the
  * activities bound to categories.
- * 
+ *
  * @since 3.0
  */
 public class ActivityEnabler {
@@ -69,9 +69,10 @@ public class ActivityEnabler {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
 		 */
+		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
 			Object element = ((IStructuredSelection) event.getSelection())
 					.getFirstElement();
@@ -96,9 +97,10 @@ public class ActivityEnabler {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.jface.viewers.ICheckStateListener#checkStateChanged(org.eclipse.jface.viewers.CheckStateChangedEvent)
 		 */
+		@Override
 		public void checkStateChanged(CheckStateChangedEvent event) {
 			Set checked = new HashSet(Arrays.asList(dualViewer
 					.getCheckedElements()));
@@ -127,7 +129,7 @@ public class ActivityEnabler {
 
 		/**
 		 * Handle duplicate activities.
-		 * 
+		 *
 		 * @param checkedState
 		 *            Checked state of the element.
 		 * @param element
@@ -154,7 +156,7 @@ public class ActivityEnabler {
 		/**
 		 * Handle the checking of an activity and update its category's checked
 		 * state.
-		 * 
+		 *
 		 * @param checked
 		 *            The set of checked elements in the viewer.
 		 * @param element
@@ -194,12 +196,12 @@ public class ActivityEnabler {
 
 		/**
 		 * Handle the activity's required activities (parent and child).
-		 * 
+		 *
 		 * @param checked
 		 *            The set of checked elements in the viewer.
 		 * @param element
 		 *            The checked element.
-		 *  
+		 *
 		 */
 		private void handleRequiredActivities(Set checked, Object element) {
 			Object[] requiredActivities = null;
@@ -262,7 +264,7 @@ public class ActivityEnabler {
 
 	/**
 	 * Create a new instance.
-	 * 
+	 *
 	 * @param activitySupport
 	 *            the <code>IMutableActivityMananger</code> to use.
 	 * @param strings
@@ -277,7 +279,7 @@ public class ActivityEnabler {
 
 	/**
 	 * Create the controls.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent in which to create the controls.
 	 * @return the composite in which the controls exist.
@@ -287,7 +289,7 @@ public class ActivityEnabler {
         gc.setFont(JFaceResources.getDialogFont());
         FontMetrics fontMetrics = gc.getFontMetrics();
         gc.dispose();
-        
+
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(createGridLayoutWithoutMargins(1, fontMetrics));
 
@@ -309,9 +311,10 @@ public class ActivityEnabler {
 		selectAllButton.addSelectionListener(new SelectionAdapter() {
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
 			 */
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				toggleTreeEnablement(true);
 			}
@@ -319,13 +322,14 @@ public class ActivityEnabler {
 		setButtonLayoutData(selectAllButton, fontMetrics);
 
 		Button deselectAllButton = new Button(buttonComposite, SWT.PUSH);
-		deselectAllButton.setText(ActivityMessages.ActivityEnabler_deselectAll); 
+		deselectAllButton.setText(ActivityMessages.ActivityEnabler_deselectAll);
 		deselectAllButton.addSelectionListener(new SelectionAdapter() {
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
 			 */
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				toggleTreeEnablement(false);
 			}
@@ -347,7 +351,7 @@ public class ActivityEnabler {
 		dualViewer.setSelection(new StructuredSelection());
 
         Dialog.applyDialogFont(composite);
-        
+
 		return composite;
 	}
 
@@ -389,7 +393,7 @@ public class ActivityEnabler {
 					.getCategory(categoryId);
 
 			int state = NONE;
-			
+
 			Collection activities = InternalActivityHelper
 					.getActivityIdsForCategory(activitySupport, category);
 			int foundCount = 0;
@@ -465,22 +469,22 @@ public class ActivityEnabler {
                 // this can't happen - we're iterating over defined activities.
             }
         }
-	    
+
 		setEnabledStates(defaultEnabled);
 	}
 
 	/**
 	 * Toggles the enablement state of all activities.
-	 * 
+	 *
 	 * @param enabled
 	 *            whether the tree should be enabled
 	 */
 	protected void toggleTreeEnablement(boolean enabled) {
 		Object[] elements = provider.getElements(activitySupport);
-		
+
 		//reset grey state to null
 		dualViewer.setGrayedElements(new Object[0]);
-		
+
 		//enable all categories
 		for (int i = 0; i < elements.length; i++) {
 			dualViewer

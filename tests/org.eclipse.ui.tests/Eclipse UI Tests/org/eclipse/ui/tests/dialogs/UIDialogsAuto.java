@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 448060
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430988
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 455527
  *******************************************************************************/
 package org.eclipse.ui.tests.dialogs;
 
@@ -14,8 +17,14 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IPerspectiveDescriptor;
@@ -36,7 +45,6 @@ import org.eclipse.ui.internal.dialogs.FileExtensionDialog;
 import org.eclipse.ui.internal.dialogs.SavePerspectiveDialog;
 import org.eclipse.ui.internal.dialogs.SelectPerspectiveDialog;
 import org.eclipse.ui.internal.dialogs.ShowViewDialog;
-import org.eclipse.ui.internal.ide.dialogs.SimpleListContentProvider;
 import org.eclipse.ui.internal.registry.PerspectiveRegistry;
 import org.eclipse.ui.internal.views.navigator.ResourceNavigatorMessages;
 import org.eclipse.ui.tests.harness.util.DialogCheck;
@@ -64,7 +72,7 @@ public class UIDialogsAuto extends TestCase {
         dialog = new AboutDialog(getShell());
         DialogCheck.assertDialogTexts(dialog, this);
     }
-    
+
      public void testAboutPlugins() {
         Dialog dialog = null;
         dialog = new AboutPluginsDialog(
@@ -78,9 +86,8 @@ public class UIDialogsAuto extends TestCase {
     }
 
     public void testAddProjects() {
-        Dialog dialog = new ListSelectionDialog(getShell(), null,
-                new SimpleListContentProvider(), new LabelProvider(),
-                PROJECT_SELECTION_MESSAGE);
+		Dialog dialog = new ListSelectionDialog(getShell(), null, ArrayContentProvider.getInstance(),
+				new LabelProvider(), PROJECT_SELECTION_MESSAGE);
         DialogCheck.assertDialogTexts(dialog, this);
     }
 
@@ -129,9 +136,8 @@ public class UIDialogsAuto extends TestCase {
      * DialogCheck.assertDialogTexts(dialog, this); }
      */
     public void testNavigatorFilter() {
-        Dialog dialog = new ListSelectionDialog(getShell(), null,
-                new SimpleListContentProvider(), new LabelProvider(),
-                FILTER_SELECTION_MESSAGE);
+		Dialog dialog = new ListSelectionDialog(getShell(), null, ArrayContentProvider.getInstance(),
+				new LabelProvider(), FILTER_SELECTION_MESSAGE);
         DialogCheck.assertDialogTexts(dialog, this);
     }
 
@@ -177,8 +183,16 @@ public class UIDialogsAuto extends TestCase {
     }
 
     public void testShowView() {
-        Dialog dialog = new ShowViewDialog(getWorkbench().getActiveWorkbenchWindow(), WorkbenchPlugin
-                .getDefault().getViewRegistry());
+    	IWorkbench workbench = getWorkbench();
+
+    	Shell shell = workbench.getActiveWorkbenchWindow().getShell();
+		// Get the view identifier, if any.
+		IEclipseContext ctx = workbench.getService(IEclipseContext.class);
+		EModelService modelService = workbench.getService(EModelService.class);
+		EPartService partService = workbench.getService(EPartService.class);
+		MApplication app = workbench.getService(MApplication.class);
+		MWindow window = workbench.getService(MWindow.class);
+		Dialog dialog = new ShowViewDialog(shell, app, window, modelService, partService, ctx);
         DialogCheck.assertDialogTexts(dialog, this);
     }
     /**

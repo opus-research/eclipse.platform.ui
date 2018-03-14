@@ -55,7 +55,7 @@ import org.osgi.framework.ServiceReference;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public class BundleSigningInfo {
 
@@ -118,7 +118,7 @@ public class BundleSigningInfo {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void startJobs() {
 		if (!isOpen())
@@ -160,6 +160,7 @@ public class BundleSigningInfo {
 				WorkbenchMessages.BundleSigningTray_Determine_Signer_For,
 				myData.getId())) {
 
+			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
 					if (myData != data)
@@ -206,6 +207,7 @@ public class BundleSigningInfo {
 
 					PlatformUI.getWorkbench().getDisplay().asyncExec(
 							new Runnable() {
+								@Override
 								public void run() {
 									// check to see if the tray is still visible
 									// and if
@@ -235,6 +237,7 @@ public class BundleSigningInfo {
 		Job cleanup = new Job(
 				WorkbenchMessages.BundleSigningTray_Unget_Signing_Service) {
 
+			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
 					getJobManager().join(signerJob, monitor);
@@ -251,7 +254,7 @@ public class BundleSigningInfo {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private boolean isOpen() {
 		return certificate != null && !certificate.isDisposed();

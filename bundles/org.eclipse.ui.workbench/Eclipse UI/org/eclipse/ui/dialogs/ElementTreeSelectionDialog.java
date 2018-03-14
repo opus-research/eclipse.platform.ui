@@ -1,27 +1,27 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2007 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   IBM Corporation - initial API and implementation 
+ *   IBM Corporation - initial API and implementation
  *   Sebastian Davids <sdavids@gmx.de> - Fix for bug 19346 - Dialog
  *     font should be activated and used by other components.
- *   Carsten Pfeiffer <carsten.pfeiffer@gebit.de> - Fix for bug 182354 - 
- *     [Dialogs] API - make ElementTreeSelectionDialog usable with a 
+ *   Carsten Pfeiffer <carsten.pfeiffer@gebit.de> - Fix for bug 182354 -
+ *     [Dialogs] API - make ElementTreeSelectionDialog usable with a
  *     FilteredTree
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
@@ -49,14 +49,14 @@ import org.eclipse.ui.internal.WorkbenchMessages;
 
 /**
  * A class to select elements out of a tree structure.
- * 
+ *
  * @since 2.0
  */
 public class ElementTreeSelectionDialog extends SelectionStatusDialog {
 
     private TreeViewer fViewer;
 
-    private ILabelProvider fLabelProvider;
+	private IBaseLabelProvider fLabelProvider;
 
     private ITreeContentProvider fContentProvider;
 
@@ -91,6 +91,24 @@ public class ElementTreeSelectionDialog extends SelectionStatusDialog {
      */
     public ElementTreeSelectionDialog(Shell parent,
             ILabelProvider labelProvider, ITreeContentProvider contentProvider) {
+		this(parent, (IBaseLabelProvider) labelProvider, contentProvider);
+	}
+
+	/**
+	 * Constructs an instance of <code>ElementTreeSelectionDialog</code>.
+	 *
+	 * @param parent
+	 *            The parent shell for the dialog
+	 * @param labelProvider
+	 *            the label provider to render the entries. It must be
+	 *            compatible with the Viewerreturned from
+	 *            {@link #doCreateTreeViewer(Composite, int)}
+	 * @param contentProvider
+	 *            the content provider to evaluate the tree structure
+	 * @since 3.106
+	 */
+	public ElementTreeSelectionDialog(Shell parent, IBaseLabelProvider labelProvider,
+			ITreeContentProvider contentProvider) {
         super(parent);
 
         fLabelProvider = labelProvider;
@@ -138,10 +156,11 @@ public class ElementTreeSelectionDialog extends SelectionStatusDialog {
      * @param sorter
      * @deprecated as of 3.3, use {@link ElementTreeSelectionDialog#setComparator(ViewerComparator)} instead
      */
-    public void setSorter(ViewerSorter sorter) {
+    @Deprecated
+	public void setSorter(ViewerSorter sorter) {
         fComparator = sorter;
     }
-    
+
     /**
      * Sets the comparator used by the tree viewer.
      * @param comparator
@@ -211,11 +230,8 @@ public class ElementTreeSelectionDialog extends SelectionStatusDialog {
         updateStatus(fCurrStatus);
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see org.eclipse.jface.window.Window#open()
-     */
-    public int open() {
+    @Override
+	public int open() {
         fIsEmpty = evaluateIfTreeEmpty(fInput);
         super.open();
         return getReturnCode();
@@ -228,25 +244,22 @@ public class ElementTreeSelectionDialog extends SelectionStatusDialog {
     /**
      * Handles cancel button pressed event.
      */
-    protected void cancelPressed() {
+    @Override
+	protected void cancelPressed() {
         setResult(null);
         super.cancelPressed();
     }
 
-    /*
-     * @see SelectionStatusDialog#computeResult()
-     */
-    protected void computeResult() {
+    @Override
+	protected void computeResult() {
         setResult(((IStructuredSelection) fViewer.getSelection()).toList());
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see org.eclipse.jface.window.Window#create()
-     */
-    public void create() {
+    @Override
+	public void create() {
         BusyIndicator.showWhile(null, new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 access$superCreate();
                 fViewer.setSelection(new StructuredSelection(
                         getInitialElementSelections()), true);
@@ -255,10 +268,8 @@ public class ElementTreeSelectionDialog extends SelectionStatusDialog {
         });
     }
 
-    /*
-     * @see Dialog#createDialogArea(Composite)
-     */
-    protected Control createDialogArea(Composite parent) {
+    @Override
+	protected Control createDialogArea(Composite parent) {
         Composite composite = (Composite) super.createDialogArea(parent);
 
         Label messageLabel = createMessageArea(composite);
@@ -294,7 +305,8 @@ public class ElementTreeSelectionDialog extends SelectionStatusDialog {
         fViewer.setContentProvider(fContentProvider);
         fViewer.setLabelProvider(fLabelProvider);
         fViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-            public void selectionChanged(SelectionChangedEvent event) {
+            @Override
+			public void selectionChanged(SelectionChangedEvent event) {
                 access$setResult(((IStructuredSelection) event.getSelection())
                         .toList());
                 updateOKStatus();
@@ -311,7 +323,8 @@ public class ElementTreeSelectionDialog extends SelectionStatusDialog {
         if (fDoubleClickSelects) {
             Tree tree = fViewer.getTree();
             tree.addSelectionListener(new SelectionAdapter() {
-                public void widgetDefaultSelected(SelectionEvent e) {
+                @Override
+				public void widgetDefaultSelected(SelectionEvent e) {
                     updateOKStatus();
                     if (fCurrStatus.isOK()) {
 						access$superButtonPressed(IDialogConstants.OK_ID);
@@ -320,7 +333,8 @@ public class ElementTreeSelectionDialog extends SelectionStatusDialog {
             });
         }
         fViewer.addDoubleClickListener(new IDoubleClickListener() {
-            public void doubleClick(DoubleClickEvent event) {
+            @Override
+			public void doubleClick(DoubleClickEvent event) {
                 updateOKStatus();
 
                 //If it is not OK or if double click does not
@@ -399,10 +413,8 @@ public class ElementTreeSelectionDialog extends SelectionStatusDialog {
         super.setResult(result);
     }
 
-    /**
-     * @see org.eclipse.jface.window.Window#handleShellCloseEvent()
-     */
-    protected void handleShellCloseEvent() {
+    @Override
+	protected void handleShellCloseEvent() {
         super.handleShellCloseEvent();
 
         //Handle the closing of the shell by selecting the close icon

@@ -33,13 +33,15 @@ import org.eclipse.ui.internal.util.Util;
  * <p>
  * Note: this class has a natural ordering that is inconsistent with equals.
  * </p>
- * 
+ *
  * @since 3.0
  * @see org.eclipse.ui.commands.IWorkbenchCommandSupport
  * @deprecated Please use <code>IHandlerService.activateHandler</code>
  *             instead.
  * @see org.eclipse.ui.handlers.IHandlerService
  */
+@Deprecated
+@SuppressWarnings("all")
 public final class HandlerSubmission implements Comparable {
 
     /**
@@ -70,7 +72,7 @@ public final class HandlerSubmission implements Comparable {
     private final String commandId;
 
     /**
-     * The handler being submitted.  This value cannot be <code>null</code>.  
+     * The handler being submitted.  This value cannot be <code>null</code>.
      */
     private final IHandler handler;
 
@@ -90,7 +92,7 @@ public final class HandlerSubmission implements Comparable {
 
     /**
      * Creates a new instance of this class.
-     * 
+     *
      * @param activePartId
      *            the identifier of the part that must be active for this
      *            request to be considered. May be <code>null</code>.
@@ -108,6 +110,7 @@ public final class HandlerSubmission implements Comparable {
      * @param priority
      *            the priority. Must not be <code>null</code>.
      */
+	@Deprecated
     public HandlerSubmission(String activePartId, Shell activeShell,
             IWorkbenchPartSite activeWorkbenchPartSite, String commandId,
             IHandler handler, Priority priority) {
@@ -126,6 +129,8 @@ public final class HandlerSubmission implements Comparable {
     /**
      * @see Comparable#compareTo(java.lang.Object)
      */
+	@Override
+	@Deprecated
     public int compareTo(Object object) {
         HandlerSubmission castedObject = (HandlerSubmission) object;
         int compareTo = Util.compare(activeWorkbenchPartSite,
@@ -159,20 +164,22 @@ public final class HandlerSubmission implements Comparable {
     /**
      * Returns the identifier of the part that must be active for this request
      * to be considered.
-     * 
+     *
      * @return the identifier of the part that must be active for this request
      *         to be considered. May be <code>null</code>.
      */
+	@Deprecated
     public String getActivePartId() {
         return activePartId;
     }
 
     /**
      * Returns the shell that must be active for this request to be considered.
-     * 
+     *
      * @return the shell that must be active for this request to be considered.
      *         May be <code>null</code>.
      */
+	@Deprecated
     public Shell getActiveShell() {
         return activeShell;
     }
@@ -180,38 +187,42 @@ public final class HandlerSubmission implements Comparable {
     /**
      * Returns the workbench part site of the part that must be active for this
      * request to be considered.
-     * 
+     *
      * @return the workbench part site of the part that must be active for this
      *         request to be considered. May be <code>null</code>.
      */
+	@Deprecated
     public IWorkbenchPartSite getActiveWorkbenchPartSite() {
         return activeWorkbenchPartSite;
     }
 
     /**
      * Returns the identifier of the command to be handled.
-     * 
+     *
      * @return the identifier of the command to be handled. Guaranteed not to be
      *         <code>null</code>.
      */
+	@Deprecated
     public String getCommandId() {
         return commandId;
     }
 
     /**
      * Returns the handler.
-     * 
+     *
      * @return the handler. Guaranteed not to be <code>null</code>.
      */
+	@Deprecated
     public IHandler getHandler() {
         return handler;
     }
 
     /**
      * Returns the priority.
-     * 
+     *
      * @return the priority. Guaranteed not to be <code>null</code>.
      */
+	@Deprecated
     public Priority getPriority() {
         return priority;
     }
@@ -219,7 +230,8 @@ public final class HandlerSubmission implements Comparable {
     /**
      * @see Object#toString()
      */
-    public String toString() {
+    @Override
+	public String toString() {
         if (string == null) {
             final StringBuffer stringBuffer = new StringBuffer();
             stringBuffer.append("[activePartId="); //$NON-NLS-1$

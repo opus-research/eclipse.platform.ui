@@ -17,12 +17,13 @@ package org.eclipse.ui.contexts;
  * <p>
  * This class is not intended to be extended by clients.
  * </p>
- * 
+ *
  * @since 3.0
  * @see IContextListener#contextChanged(ContextEvent)
  * @deprecated Please use the "org.eclipse.core.commands" plug-in instead.
  * @see org.eclipse.core.commands.contexts.ContextEvent
  */
+@Deprecated
 public final class ContextEvent {
 
     /**
@@ -52,7 +53,7 @@ public final class ContextEvent {
 
     /**
      * Creates a new instance of this class.
-     * 
+     *
      * @param context
      *            the instance of the interface that changed.
      * @param definedChanged
@@ -79,7 +80,7 @@ public final class ContextEvent {
 
     /**
      * Returns the instance of the interface that changed.
-     * 
+     *
      * @return the instance of the interface that changed. Guaranteed not to be
      *         <code>null</code>.
      */
@@ -89,7 +90,7 @@ public final class ContextEvent {
 
     /**
      * Returns whether or not the defined property changed.
-     * 
+     *
      * @return true, iff the defined property changed.
      */
     public boolean hasDefinedChanged() {
@@ -98,7 +99,7 @@ public final class ContextEvent {
 
     /**
      * Returns whether or not the enabled property changed.
-     * 
+     *
      * @return true, iff the enabled property changed.
      */
     public boolean hasEnabledChanged() {
@@ -107,7 +108,7 @@ public final class ContextEvent {
 
     /**
      * Returns whether or not the name property changed.
-     * 
+     *
      * @return true, iff the name property changed.
      */
     public boolean hasNameChanged() {
@@ -116,7 +117,7 @@ public final class ContextEvent {
 
     /**
      * Returns whether or not the parentId property changed.
-     * 
+     *
      * @return true, iff the parentId property changed.
      */
     public boolean hasParentIdChanged() {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2011 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -57,7 +57,7 @@ public abstract class ColumnViewerEditor {
 	private ColumnViewerEditorActivationStrategy editorActivationStrategy;
 
 	private boolean inEditorDeactivation;
-	
+
 	private DisposeListener disposeListener;
 
 	/**
@@ -129,27 +129,31 @@ public abstract class ColumnViewerEditor {
 		this.feature = feature;
 		this.disposeListener = new DisposeListener() {
 
+			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				if( viewer.isCellEditorActive() ) {
 					cancelEditing();
 				}
 			}
-			
+
 		};
 		initCellEditorListener();
 	}
 
 	private void initCellEditorListener() {
 		cellEditorListener = new ICellEditorListener() {
+			@Override
 			public void editorValueChanged(boolean oldValidState,
 					boolean newValidState) {
 				// Ignore.
 			}
 
+			@Override
 			public void cancelEditor() {
 				ColumnViewerEditor.this.cancelEditing();
 			}
 
+			@Override
 			public void applyEditorValue() {
 				ColumnViewerEditor.this.applyEditorValue();
 			}
@@ -212,6 +216,7 @@ public abstract class ColumnViewerEditor {
 				if (cellEditor.dependsOnExternalFocusListener()) {
 					if (focusListener == null) {
 						focusListener = new FocusAdapter() {
+							@Override
 							public void focusLost(FocusEvent e) {
 								applyEditorValue();
 							}
@@ -221,6 +226,7 @@ public abstract class ColumnViewerEditor {
 				}
 
 				mouseListener = new MouseAdapter() {
+					@Override
 					public void mouseDown(MouseEvent e) {
 						// time wrap?
 						// check for expiration of doubleClickTime
@@ -242,6 +248,7 @@ public abstract class ColumnViewerEditor {
 				if (tabeditingListener == null) {
 					tabeditingListener = new TraverseListener() {
 
+						@Override
 						public void keyTraversed(TraverseEvent e) {
 							if ((feature & DEFAULT) != DEFAULT) {
 								processTraverseEvent(cell.getColumnIndex(),
@@ -262,7 +269,7 @@ public abstract class ColumnViewerEditor {
 								.afterEditorActivated(activationEvent);
 					}
 				}
-				
+
 				this.cell.getItem().addDisposeListener(disposeListener);
 
 				return true;
@@ -341,7 +348,7 @@ public abstract class ColumnViewerEditor {
 									.afterEditorDeactivated(tmp);
 						}
 					}
-					
+
 					if( ! this.cell.getItem().isDisposed() ) {
 						this.cell.getItem().removeDisposeListener(disposeListener);
 					}
@@ -410,11 +417,11 @@ public abstract class ColumnViewerEditor {
 									.afterEditorDeactivated(tmp);
 						}
 					}
-					
+
 					if( ! this.cell.getItem().isDisposed() ) {
 						this.cell.getItem().addDisposeListener(disposeListener);
 					}
-					
+
 					this.cellEditor = null;
 					this.cell = null;
 

@@ -19,12 +19,13 @@ import org.eclipse.ui.IWorkingSet;
 
 public class WorkingSetFilter extends ViewerFilter {
 		Set workingSetIds;
-		
+
 		public WorkingSetFilter(Set workingSetIds) {
 			this.workingSetIds = workingSetIds;
 		}
-		
-    public boolean select(Viewer viewer, Object parentElement, Object element) {
+
+    @Override
+	public boolean select(Viewer viewer, Object parentElement, Object element) {
         if (element instanceof IWorkingSet) {
             IWorkingSet workingSet = (IWorkingSet) element;
 			String id = workingSet.getId();

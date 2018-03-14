@@ -17,7 +17,7 @@ import org.eclipse.ui.internal.misc.StatusUtil;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public final class StartupThreading {
 
@@ -26,6 +26,7 @@ public final class StartupThreading {
 	public static abstract class StartupRunnable implements Runnable {
 		private Throwable throwable;
 
+		@Override
 		public final void run() {
 			try {
 				runWithException();

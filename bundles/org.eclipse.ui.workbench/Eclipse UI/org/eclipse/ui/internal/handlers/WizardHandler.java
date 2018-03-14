@@ -49,7 +49,7 @@ import org.eclipse.ui.wizards.IWizardRegistry;
  * This class is only intended to be extended by the three inner classes (<code>Export</code>,
  * <code>Import</code> and <code>New</code>) defined here.
  * </p>
- * 
+ *
  * @since 3.2
  */
 public abstract class WizardHandler extends AbstractHandler implements IElementUpdater {
@@ -61,14 +61,17 @@ public abstract class WizardHandler extends AbstractHandler implements IElementU
 	    private static final int SIZING_WIZARD_WIDTH = 470;
 	    private static final int SIZING_WIZARD_HEIGHT = 550;
 
+		@Override
 		protected String getWizardIdParameterId() {
 			return IWorkbenchCommandConstants.FILE_EXPORT_PARM_WIZARDID;
 		}
 
+		@Override
 		protected IWizardRegistry getWizardRegistry() {
 			return PlatformUI.getWorkbench().getExportWizardRegistry();
 		}
 
+		@Override
 		protected void executeHandler(ExecutionEvent event) {
 			IWorkbenchWindow activeWorkbenchWindow = HandlerUtil
 					.getActiveWorkbenchWindow(event);
@@ -112,14 +115,17 @@ public abstract class WizardHandler extends AbstractHandler implements IElementU
 	    private static final int SIZING_WIZARD_WIDTH = 470;
 	    private static final int SIZING_WIZARD_HEIGHT = 550;
 
+		@Override
 		protected String getWizardIdParameterId() {
 			return IWorkbenchCommandConstants.FILE_IMPORT_PARM_WIZARDID;
 		}
 
+		@Override
 		protected IWizardRegistry getWizardRegistry() {
 			return PlatformUI.getWorkbench().getImportWizardRegistry();
 		}
 
+		@Override
 		protected void executeHandler(ExecutionEvent event) {
 			IWorkbenchWindow activeWorkbenchWindow = HandlerUtil.getActiveWorkbenchWindow(event);
 	        if (activeWorkbenchWindow == null) {
@@ -158,7 +164,7 @@ public abstract class WizardHandler extends AbstractHandler implements IElementU
 	 * Default handler for launching new wizards.
 	 */
 	public static final class New extends WizardHandler {
-	    
+
 		/**
 	     * The wizard dialog width
 	     */
@@ -168,21 +174,23 @@ public abstract class WizardHandler extends AbstractHandler implements IElementU
 	     * The wizard dialog height
 	     */
 	    private static final int SIZING_WIZARD_HEIGHT = 500;
-	    
+
 	    /**
 	     * The id of the category to show or <code>null</code> to
 	     * show all the categories.
 	     */
 	    private String categoryId = null;
 
+		@Override
 		protected String getWizardIdParameterId() {
 			return IWorkbenchCommandConstants.FILE_NEW_PARM_WIZARDID;
 		}
 
+		@Override
 		protected IWizardRegistry getWizardRegistry() {
 			return PlatformUI.getWorkbench().getNewWizardRegistry();
 		}
-		
+
 	    /**
 	     * Returns the id of the category of wizards to show
 	     * or <code>null</code> to show all categories.
@@ -200,8 +208,9 @@ public abstract class WizardHandler extends AbstractHandler implements IElementU
 	    public void setCategoryId(String id) {
 	        categoryId = id;
 	    }
-	    
-	    protected IStructuredSelection getSelectionToUse(ExecutionEvent event) {
+
+	    @Override
+		protected IStructuredSelection getSelectionToUse(ExecutionEvent event) {
 	        ISelection selection = HandlerUtil.getCurrentSelection(event);
 	        IStructuredSelection selectionToPass = StructuredSelection.EMPTY;
 	        if (selection instanceof IStructuredSelection) {
@@ -225,7 +234,8 @@ public abstract class WizardHandler extends AbstractHandler implements IElementU
 	        }
 	        return selectionToPass;
 	    }
-	    
+
+		@Override
 		protected void executeHandler(ExecutionEvent event) {
 			IWorkbenchWindow activeWorkbenchWindow = HandlerUtil.getActiveWorkbenchWindow(event);
 	        if (activeWorkbenchWindow == null) {
@@ -237,7 +247,7 @@ public abstract class WizardHandler extends AbstractHandler implements IElementU
 
 			IStructuredSelection selectionToPass = getSelectionToUse(event);
 	        wizard.init(activeWorkbenchWindow.getWorkbench(), selectionToPass);
-	        
+
 	        IDialogSettings workbenchSettings = WorkbenchPlugin.getDefault()
 	                .getDialogSettings();
 	        IDialogSettings wizardSettings = workbenchSettings
@@ -268,6 +278,7 @@ public abstract class WizardHandler extends AbstractHandler implements IElementU
 	 */
 	protected abstract void executeHandler(ExecutionEvent event);
 
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		String wizardId = event.getParameter(getWizardIdParameterId());
@@ -289,12 +300,12 @@ public abstract class WizardHandler extends AbstractHandler implements IElementU
 			try {
 				IWorkbenchWizard wizard = wizardDescriptor.createWizard();
 				wizard.init(PlatformUI.getWorkbench(), getSelectionToUse(event));
-				
+
 				if (wizardDescriptor.canFinishEarly() && !wizardDescriptor.hasPages()) {
 					wizard.performFinish();
 					return null;
 				}
-				
+
 				Shell parent = activeWindow.getShell();
 				WizardDialog dialog = new WizardDialog(parent, wizard);
 				dialog.create();
@@ -308,7 +319,7 @@ public abstract class WizardHandler extends AbstractHandler implements IElementU
 
 		return null;
 	}
-	
+
 	/**
 	 * Returns a structured selection based on the event to initialize the
 	 * wizard with.
@@ -323,6 +334,7 @@ public abstract class WizardHandler extends AbstractHandler implements IElementU
 		return StructuredSelection.EMPTY;
 	}
 
+	@Override
 	public void updateElement(UIElement element, Map parameters) {
 
 		String wizardId = (String) parameters.get(getWizardIdParameterId());
@@ -339,7 +351,7 @@ public abstract class WizardHandler extends AbstractHandler implements IElementU
 	/**
 	 * Returns the id of the parameter used to indicate which wizard this
 	 * command should launch.
-	 * 
+	 *
 	 * @return The id of the parameter used to indicate which wizard this
 	 *         command should launch.
 	 */
@@ -348,7 +360,7 @@ public abstract class WizardHandler extends AbstractHandler implements IElementU
 	/**
 	 * Returns the wizard registry for the concrete <code>WizardHandler</code>
 	 * implementation class.
-	 * 
+	 *
 	 * @return The wizard registry for the concrete <code>WizardHandler</code>
 	 *         implementation class.
 	 */

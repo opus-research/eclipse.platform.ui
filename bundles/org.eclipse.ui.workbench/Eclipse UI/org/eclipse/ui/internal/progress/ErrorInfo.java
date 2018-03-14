@@ -31,7 +31,7 @@ public class ErrorInfo extends JobTreeElement {
 
 	/**
 	 * Create a new instance of the receiver.
-	 * 
+	 *
 	 * @param status
 	 * @param job
 	 *            The Job to create
@@ -44,27 +44,30 @@ public class ErrorInfo extends JobTreeElement {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.progress.JobTreeElement#hasChildren()
 	 */
+	@Override
 	boolean hasChildren() {
 		return false;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.progress.JobTreeElement#getChildren()
 	 */
+	@Override
 	Object[] getChildren() {
 		return ProgressManagerUtil.EMPTY_OBJECT_ARRAY;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.progress.JobTreeElement#getDisplayString()
 	 */
+	@Override
 	String getDisplayString() {
 		return NLS.bind(ProgressMessages.JobInfo_Error, (new Object[] {
 				job.getName(),
@@ -73,7 +76,7 @@ public class ErrorInfo extends JobTreeElement {
 
 	/**
 	 * Return the image for the receiver.
-	 * 
+	 *
 	 * @return Image
 	 */
 	Image getImage() {
@@ -82,16 +85,17 @@ public class ErrorInfo extends JobTreeElement {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.progress.JobTreeElement#isJobInfo()
 	 */
+	@Override
 	boolean isJobInfo() {
 		return false;
 	}
 
 	/**
 	 * Return the current status of the receiver.
-	 * 
+	 *
 	 * @return IStatus
 	 */
 	IStatus getErrorStatus() {
@@ -100,16 +104,17 @@ public class ErrorInfo extends JobTreeElement {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.progress.JobTreeElement#isActive()
 	 */
+	@Override
 	boolean isActive() {
 		return true;
 	}
 
 	/**
 	 * Return the job that generated the error.
-	 * 
+	 *
 	 * @return the job that generated the error
 	 */
 	public Job getJob() {
@@ -118,7 +123,7 @@ public class ErrorInfo extends JobTreeElement {
 
 	/**
 	 * Return the timestamp for the job.
-	 * 
+	 *
 	 * @return long
 	 */
 	public long getTimestamp() {
@@ -127,9 +132,10 @@ public class ErrorInfo extends JobTreeElement {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.progress.JobTreeElement#compareTo(java.lang.Object)
 	 */
+	@Override
 	public int compareTo(Object arg0) {
 		if (arg0 instanceof ErrorInfo) {
 			// Order ErrorInfo by time received

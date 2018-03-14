@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,9 +33,11 @@ import org.eclipse.ui.internal.WorkbenchPartReference;
 import org.eclipse.ui.internal.menus.MenuHelper;
 import org.eclipse.ui.internal.registry.EditorDescriptor;
 import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
+import org.eclipse.ui.internal.testing.ContributionInfoMessages;
 import org.eclipse.ui.part.AbstractMultiEditor;
 import org.eclipse.ui.part.MultiEditor;
 import org.eclipse.ui.part.MultiEditorInput;
+import org.eclipse.ui.testing.ContributionInfo;
 
 public class CompatibilityEditor extends CompatibilityPart {
 
@@ -92,6 +94,7 @@ public class CompatibilityEditor extends CompatibilityPart {
 		((AbstractMultiEditor) part).setChildren(editors);
 	}
 
+	@Override
 	protected boolean createPartControl(final IWorkbenchPart legacyPart, Composite parent) {
 		super.createPartControl(legacyPart, parent);
 
@@ -106,6 +109,10 @@ public class CompatibilityEditor extends CompatibilityPart {
 				String iconURI = MenuHelper.getIconURI(element,
 						IWorkbenchRegistryConstants.ATT_ICON);
 				part.setIconURI(iconURI);
+			}
+			if (descriptor.getPluginId() != null) {
+				parent.setData(new ContributionInfo(descriptor.getPluginId(),
+						ContributionInfoMessages.ContributionInfo_Editor, null));
 			}
 		}
 
@@ -125,20 +132,9 @@ public class CompatibilityEditor extends CompatibilityPart {
 		return (IEditorPart) getPart();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.internal.e4.compatibility.CompatibilityPart#getReference()
-	 */
 	@Override
 	public WorkbenchPartReference getReference() {
 		return reference;
-	}
-
-	@Override
-	void updateImages(MPart part) {
-		updateTabImages(part);
 	}
 
 	@Override

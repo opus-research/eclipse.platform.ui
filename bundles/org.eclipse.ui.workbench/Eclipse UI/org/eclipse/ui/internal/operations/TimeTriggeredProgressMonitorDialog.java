@@ -24,7 +24,7 @@ import org.eclipse.ui.PlatformUI;
 /**
  * The TimeTriggeredProgressMonitorDialog is a progress monitor dialog that only
  * opens if the runnable provided exceeds the specified long operation time.
- * 
+ *
  * @since 3.1
  */
 public class TimeTriggeredProgressMonitorDialog extends ProgressMonitorDialog {
@@ -43,7 +43,7 @@ public class TimeTriggeredProgressMonitorDialog extends ProgressMonitorDialog {
 	 * Whether or not we've already opened a dialog.
 	 */
 	private boolean dialogOpened = false;
-	
+
 	/**
 	 * Wrappered monitor so we can check ticks and open the dialog when
 	 * appropriate
@@ -52,7 +52,7 @@ public class TimeTriggeredProgressMonitorDialog extends ProgressMonitorDialog {
 
 	/**
 	 * Create a new instance of the receiver.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent of the dialog
 	 * @param longOperationTime
@@ -68,7 +68,7 @@ public class TimeTriggeredProgressMonitorDialog extends ProgressMonitorDialog {
 
    /**
 	 * Create a monitor for the receiver that wrappers the superclasses monitor.
-	 * 
+	 *
 	 */
     public void createWrapperedMonitor() {
         wrapperedMonitor = new IProgressMonitor() {
@@ -78,11 +78,12 @@ public class TimeTriggeredProgressMonitorDialog extends ProgressMonitorDialog {
 
             /*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.core.runtime.IProgressMonitor#beginTask(java.lang.String,
 			 *      int)
 			 */
-            public void beginTask(String name, int totalWork) {
+            @Override
+			public void beginTask(String name, int totalWork) {
                 superMonitor.beginTask(name, totalWork);
                 checkTicking();
             }
@@ -104,49 +105,54 @@ public class TimeTriggeredProgressMonitorDialog extends ProgressMonitorDialog {
 
             /*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.core.runtime.IProgressMonitor#done()
 			 */
-            public void done() {
+            @Override
+			public void done() {
                 superMonitor.done();
                 checkTicking();
             }
 
             /*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.core.runtime.IProgressMonitor#internalWorked(double)
 			 */
-            public void internalWorked(double work) {
+            @Override
+			public void internalWorked(double work) {
                 superMonitor.internalWorked(work);
                 checkTicking();
             }
 
             /*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.core.runtime.IProgressMonitor#isCanceled()
 			 */
-            public boolean isCanceled() {
+            @Override
+			public boolean isCanceled() {
                 return superMonitor.isCanceled();
             }
 
             /*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.core.runtime.IProgressMonitor#setCanceled(boolean)
 			 */
-            public void setCanceled(boolean value) {
+            @Override
+			public void setCanceled(boolean value) {
                 superMonitor.setCanceled(value);
 
             }
 
             /*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.core.runtime.IProgressMonitor#setTaskName(java.lang.String)
 			 */
-            public void setTaskName(String name) {
+            @Override
+			public void setTaskName(String name) {
                 superMonitor.setTaskName(name);
                 checkTicking();
 
@@ -154,20 +160,22 @@ public class TimeTriggeredProgressMonitorDialog extends ProgressMonitorDialog {
 
             /*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.core.runtime.IProgressMonitor#subTask(java.lang.String)
 			 */
-            public void subTask(String name) {
+            @Override
+			public void subTask(String name) {
                 superMonitor.subTask(name);
                 checkTicking();
             }
 
             /*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.core.runtime.IProgressMonitor#worked(int)
 			 */
-            public void worked(int work) {
+            @Override
+			public void worked(int work) {
                 superMonitor.worked(work);
                 checkTicking();
 
@@ -177,28 +185,31 @@ public class TimeTriggeredProgressMonitorDialog extends ProgressMonitorDialog {
 
     /*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.jface.dialogs.ProgressMonitorDialog#getProgressMonitor()
 	 */
-    public IProgressMonitor getProgressMonitor() {
+    @Override
+	public IProgressMonitor getProgressMonitor() {
         if (wrapperedMonitor == null) {
 			createWrapperedMonitor();
 		}
         return wrapperedMonitor;
     }
-    
+
    /*
-    * (non-Javadoc) 
-    * 
+    * (non-Javadoc)
+    *
     * @see org.eclipse.jface.operations.IRunnableContext#run(boolean, boolean, IRunnableWithProgress)
     */
-    public void run(final boolean fork, final boolean cancelable,
+    @Override
+	public void run(final boolean fork, final boolean cancelable,
             final IRunnableWithProgress runnable) throws InvocationTargetException,
             InterruptedException {
     	final InvocationTargetException[] invokes = new InvocationTargetException[1];
         final InterruptedException[] interrupt = new InterruptedException[1];
         Runnable dialogWaitRunnable = new Runnable() {
-    		public void run() {
+    		@Override
+			public void run() {
     			try {
     				TimeTriggeredProgressMonitorDialog.super.run(fork, cancelable, runnable);
     			} catch (InvocationTargetException e) {

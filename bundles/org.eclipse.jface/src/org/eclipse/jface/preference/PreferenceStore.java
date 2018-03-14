@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Pawel Pogorzelski - <Pawel.Pogorzelski@pl.ibm.com> - fix for bug 289599  
+ *     Pawel Pogorzelski - <Pawel.Pogorzelski@pl.ibm.com> - fix for bug 289599
  *******************************************************************************/
 package org.eclipse.jface.preference;
 
@@ -18,13 +18,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Properties;
+import java.util.Set;
 
 import org.eclipse.core.commands.common.EventManager;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.util.SafeRunnable;
@@ -36,7 +35,7 @@ import org.eclipse.jface.util.SafeRunnable;
  * <p>
  * This class was not designed to be subclassed.
  * </p>
- * 
+ *
  * @see IPreferenceStore
  * @noextend This class is not intended to be subclassed by clients.
  */
@@ -74,7 +73,7 @@ public class PreferenceStore extends EventManager implements
 	 * Use the methods <code>load(InputStream)</code> and
 	 * <code>save(InputStream)</code> to load and store this preference store.
 	 * </p>
-	 * 
+	 *
 	 * @see #load(InputStream)
 	 * @see #save(OutputStream, String)
 	 */
@@ -90,7 +89,7 @@ public class PreferenceStore extends EventManager implements
 	 * Use the methods <code>load()</code> and <code>save()</code> to load
 	 * and store this preference store.
 	 * </p>
-	 * 
+	 *
 	 * @param filename
 	 *            the file name
 	 * @see #load()
@@ -102,24 +101,18 @@ public class PreferenceStore extends EventManager implements
 		this.filename = filename;
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public void addPropertyChangeListener(IPropertyChangeListener listener) {
 		addListenerObject(listener);
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public boolean contains(String name) {
 		return (properties.containsKey(name) || defaultProperties
 				.containsKey(name));
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public void firePropertyChangeEvent(String name, Object oldValue,
 			Object newValue) {
 		final Object[] finalListeners = getListeners();
@@ -132,6 +125,7 @@ public class PreferenceStore extends EventManager implements
 				final IPropertyChangeListener l = (IPropertyChangeListener) finalListeners[i];
 				SafeRunnable.run(new SafeRunnable(JFaceResources
 						.getString("PreferenceStore.changeError")) { //$NON-NLS-1$
+							@Override
 							public void run() {
 								l.propertyChange(pe);
 							}
@@ -140,16 +134,14 @@ public class PreferenceStore extends EventManager implements
 		}
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public boolean getBoolean(String name) {
 		return getBoolean(properties, name);
 	}
 
 	/**
 	 * Helper function: gets boolean for a given name.
-	 * 
+	 *
 	 * @param p
 	 * @param name
 	 * @return boolean
@@ -165,58 +157,44 @@ public class PreferenceStore extends EventManager implements
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public boolean getDefaultBoolean(String name) {
 		return getBoolean(defaultProperties, name);
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public double getDefaultDouble(String name) {
 		return getDouble(defaultProperties, name);
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public float getDefaultFloat(String name) {
 		return getFloat(defaultProperties, name);
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public int getDefaultInt(String name) {
 		return getInt(defaultProperties, name);
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public long getDefaultLong(String name) {
 		return getLong(defaultProperties, name);
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public String getDefaultString(String name) {
 		return getString(defaultProperties, name);
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public double getDouble(String name) {
 		return getDouble(properties, name);
 	}
 
 	/**
 	 * Helper function: gets double for a given name.
-	 * 
+	 *
 	 * @param p
 	 * @param name
 	 * @return double
@@ -234,16 +212,14 @@ public class PreferenceStore extends EventManager implements
 		return ival;
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public float getFloat(String name) {
 		return getFloat(properties, name);
 	}
 
 	/**
 	 * Helper function: gets float for a given name.
-	 * 
+	 *
 	 * @param p
 	 * @param name
 	 * @return float
@@ -261,16 +237,14 @@ public class PreferenceStore extends EventManager implements
 		return ival;
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public int getInt(String name) {
 		return getInt(properties, name);
 	}
 
 	/**
 	 * Helper function: gets int for a given name.
-	 * 
+	 *
 	 * @param p
 	 * @param name
 	 * @return int
@@ -288,16 +262,14 @@ public class PreferenceStore extends EventManager implements
 		return ival;
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public long getLong(String name) {
 		return getLong(properties, name);
 	}
 
 	/**
 	 * Helper function: gets long for a given name.
-	 * 
+	 *
 	 * @param p
 	 *            the properties storage (may be <code>null</code>)
 	 * @param name
@@ -323,16 +295,14 @@ public class PreferenceStore extends EventManager implements
 		return ival;
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public String getString(String name) {
 		return getString(properties, name);
 	}
 
 	/**
 	 * Helper function: gets string for a given name.
-	 * 
+	 *
 	 * @param p
 	 *            the properties storage (may be <code>null</code>)
 	 * @param name
@@ -353,9 +323,7 @@ public class PreferenceStore extends EventManager implements
 		return value;
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public boolean isDefault(String name) {
 		return (!properties.containsKey(name) && defaultProperties
 				.containsKey(name));
@@ -363,7 +331,7 @@ public class PreferenceStore extends EventManager implements
 
 	/**
 	 * Prints the contents of this preference store to the given print stream.
-	 * 
+	 *
 	 * @param out
 	 *            the print stream
 	 */
@@ -373,7 +341,7 @@ public class PreferenceStore extends EventManager implements
 
 	/**
 	 * Prints the contents of this preference store to the given print writer.
-	 * 
+	 *
 	 * @param out
 	 *            the print writer
 	 */
@@ -385,7 +353,7 @@ public class PreferenceStore extends EventManager implements
 	 * Loads this preference store from the file established in the constructor
 	 * <code>PreferenceStore(java.lang.String)</code> (or by
 	 * <code>setFileName</code>). Default preference values are not affected.
-	 * 
+	 *
 	 * @exception java.io.IOException
 	 *                if there is a problem loading this store
 	 */
@@ -401,7 +369,7 @@ public class PreferenceStore extends EventManager implements
 	/**
 	 * Loads this preference store from the given input stream. Default
 	 * preference values are not affected.
-	 * 
+	 *
 	 * @param in
 	 *            the input stream
 	 * @exception java.io.IOException
@@ -412,9 +380,7 @@ public class PreferenceStore extends EventManager implements
 		dirty = false;
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public boolean needsSaving() {
 		return dirty;
 	}
@@ -422,21 +388,15 @@ public class PreferenceStore extends EventManager implements
 	/**
 	 * Returns an enumeration of all preferences known to this store which have
 	 * current values other than their default value.
-	 * 
+	 *
 	 * @return an array of preference names
 	 */
 	public String[] preferenceNames() {
-		ArrayList list = new ArrayList();
-		Enumeration it = properties.propertyNames();
-		while (it.hasMoreElements()) {
-			list.add(it.nextElement());
-		}
-		return (String[]) list.toArray(new String[list.size()]);
+		Set<String> set = properties.stringPropertyNames();
+		return set.toArray(new String[set.size()]);
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public void putValue(String name, String value) {
 		String oldValue = getString(name);
 		if (oldValue == null || !oldValue.equals(value)) {
@@ -445,9 +405,7 @@ public class PreferenceStore extends EventManager implements
 		}
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public void removePropertyChangeListener(IPropertyChangeListener listener) {
 		removeListenerObject(listener);
 	}
@@ -455,10 +413,11 @@ public class PreferenceStore extends EventManager implements
 	/**
 	 * Saves the non-default-valued preferences known to this preference store
 	 * to the file from which they were originally loaded.
-	 * 
+	 *
 	 * @exception java.io.IOException
 	 *                if there is a problem saving this store
 	 */
+	@Override
 	public void save() throws IOException {
 		if (filename == null) {
 			throw new IOException("File name not specified");//$NON-NLS-1$
@@ -477,7 +436,7 @@ public class PreferenceStore extends EventManager implements
 	/**
 	 * Saves this preference store to the given output stream. The given string
 	 * is inserted as header information.
-	 * 
+	 *
 	 * @param out
 	 *            the output stream
 	 * @param header
@@ -490,44 +449,32 @@ public class PreferenceStore extends EventManager implements
 		dirty = false;
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public void setDefault(String name, double value) {
 		setValue(defaultProperties, name, value);
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public void setDefault(String name, float value) {
 		setValue(defaultProperties, name, value);
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public void setDefault(String name, int value) {
 		setValue(defaultProperties, name, value);
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public void setDefault(String name, long value) {
 		setValue(defaultProperties, name, value);
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public void setDefault(String name, String value) {
 		setValue(defaultProperties, name, value);
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public void setDefault(String name, boolean value) {
 		setValue(defaultProperties, name, value);
 	}
@@ -539,7 +486,7 @@ public class PreferenceStore extends EventManager implements
 	 * Afterward, the methods <code>load()</code> and <code>save()</code>
 	 * can be used to load and store this preference store.
 	 * </p>
-	 * 
+	 *
 	 * @param name
 	 *            the file name
 	 * @see #load()
@@ -549,9 +496,7 @@ public class PreferenceStore extends EventManager implements
 		filename = name;
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public void setToDefault(String name) {
 		if (!properties.containsKey(name))
 			return;
@@ -565,9 +510,7 @@ public class PreferenceStore extends EventManager implements
 		firePropertyChangeEvent(name, oldValue, newValue);
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public void setValue(String name, double value) {
 		double oldValue = getDouble(name);
 		if (oldValue != value) {
@@ -578,9 +521,7 @@ public class PreferenceStore extends EventManager implements
 		}
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public void setValue(String name, float value) {
 		float oldValue = getFloat(name);
 		if (oldValue != value) {
@@ -590,9 +531,7 @@ public class PreferenceStore extends EventManager implements
 		}
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public void setValue(String name, int value) {
 		int oldValue = getInt(name);
 		if (oldValue != value) {
@@ -603,9 +542,7 @@ public class PreferenceStore extends EventManager implements
 		}
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public void setValue(String name, long value) {
 		long oldValue = getLong(name);
 		if (oldValue != value) {
@@ -615,9 +552,7 @@ public class PreferenceStore extends EventManager implements
 		}
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public void setValue(String name, String value) {
 		String oldValue = getString(name);
 		if (oldValue == null || !oldValue.equals(value)) {
@@ -627,9 +562,7 @@ public class PreferenceStore extends EventManager implements
 		}
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPreferenceStore.
-	 */
+	@Override
 	public void setValue(String name, boolean value) {
 		boolean oldValue = getBoolean(name);
 		if (oldValue != value) {
@@ -642,7 +575,7 @@ public class PreferenceStore extends EventManager implements
 
 	/**
 	 * Helper method: sets value for a given name.
-	 * 
+	 *
 	 * @param p
 	 * @param name
 	 * @param value
@@ -654,7 +587,7 @@ public class PreferenceStore extends EventManager implements
 
 	/**
 	 * Helper method: sets value for a given name.
-	 * 
+	 *
 	 * @param p
 	 * @param name
 	 * @param value
@@ -666,7 +599,7 @@ public class PreferenceStore extends EventManager implements
 
 	/**
 	 * Helper method: sets value for a given name.
-	 * 
+	 *
 	 * @param p
 	 * @param name
 	 * @param value
@@ -678,7 +611,7 @@ public class PreferenceStore extends EventManager implements
 
 	/**
 	 * Helper method: sets the value for a given name.
-	 * 
+	 *
 	 * @param p
 	 * @param name
 	 * @param value
@@ -690,7 +623,7 @@ public class PreferenceStore extends EventManager implements
 
 	/**
 	 * Helper method: sets the value for a given name.
-	 * 
+	 *
 	 * @param p
 	 * @param name
 	 * @param value
@@ -702,7 +635,7 @@ public class PreferenceStore extends EventManager implements
 
 	/**
 	 * Helper method: sets the value for a given name.
-	 * 
+	 *
 	 * @param p
 	 * @param name
 	 * @param value

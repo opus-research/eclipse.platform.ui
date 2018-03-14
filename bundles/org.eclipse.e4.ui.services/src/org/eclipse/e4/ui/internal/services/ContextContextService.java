@@ -1,10 +1,10 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -27,7 +27,7 @@ public class ContextContextService implements EContextService {
 
 	private IEclipseContext eclipseContext;
 	private ContextManager contextManager;
-	
+
 	private boolean deferUpdates = false;
 
 	private int cachingRef = 0;
@@ -38,13 +38,7 @@ public class ContextContextService implements EContextService {
 				.getName());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.services.EContextService#activateContext(java.lang.
-	 * String)
-	 */
+	@Override
 	public void activateContext(String id) {
 		if (deferUpdates) {
 			deferActivateContext(id);
@@ -64,7 +58,7 @@ public class ContextContextService implements EContextService {
 			}
 		}
 	}
-	
+
 	/**
 	 * Informs the manager that a batch operation has started.
 	 * <p>
@@ -72,13 +66,14 @@ public class ContextContextService implements EContextService {
 	 * <code>deferUpdates(true)</code> that nothing in your batched operation
 	 * will prevent the matching call to <code>deferUpdates(false)</code>.
 	 * </p>
-	 * 
+	 *
 	 * @param defer
 	 *            true when starting a batch operation false when ending the
 	 *            operation
-	 * 
+	 *
 	 * @since 4.2.2
 	 */
+	@Override
 	public void deferUpdates(boolean defer) {
 		if(defer) {
 			cachingRef ++;
@@ -133,14 +128,8 @@ public class ContextContextService implements EContextService {
 		}
 		eclipseContext.set(LOCAL_CONTEXTS, locals.clone());
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.services.EContextService#deactivateContext(java.lang
-	 * .String)
-	 */
+
+	@Override
 	public void deactivateContext(String id) {
 		if (deferUpdates) {
 			deferDeactivateContext(id);
@@ -167,11 +156,7 @@ public class ContextContextService implements EContextService {
 		locals.add(id);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.e4.ui.services.EContextService#getActiveContextIds()
-	 */
+	@Override
 	public Collection<String> getActiveContextIds() {
 		Set<String> set = (Set<String>) eclipseContext
 				.get(IServiceConstants.ACTIVE_CONTEXTS);
@@ -181,12 +166,7 @@ public class ContextContextService implements EContextService {
 		return set;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.services.EContextService#getContext(java.lang.String)
-	 */
+	@Override
 	public Context getContext(String id) {
 		Context ctx = contextManager.getContext(id);
 		return ctx;

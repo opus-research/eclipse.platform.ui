@@ -22,37 +22,33 @@ import org.eclipse.ui.IWorkbenchWindow;
 public class ToggleEditorsVisibilityAction extends PerspectiveAction implements
         IPerspectiveListener {
 
-    /* (non-Javadoc)
-     * Method declared on IPerspectiveListener
-     */
-    public void perspectiveActivated(IWorkbenchPage page,
+    @Override
+	public void perspectiveActivated(IWorkbenchPage page,
             IPerspectiveDescriptor perspective) {
         if (page.isEditorAreaVisible()) {
-            setText(WorkbenchMessages.ToggleEditor_hideEditors); 
+            setText(WorkbenchMessages.ToggleEditor_hideEditors);
         } else {
             setText(WorkbenchMessages.ToggleEditor_showEditors);
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on IPerspectiveListener
-     */
-    public void perspectiveChanged(IWorkbenchPage page,
+    @Override
+	public void perspectiveChanged(IWorkbenchPage page,
             IPerspectiveDescriptor perspective, String changeId) {
         if (changeId == IWorkbenchPage.CHANGE_RESET
                 || changeId == IWorkbenchPage.CHANGE_EDITOR_AREA_HIDE
                 || changeId == IWorkbenchPage.CHANGE_EDITOR_AREA_SHOW) {
             if (page.isEditorAreaVisible()) {
-                setText(WorkbenchMessages.ToggleEditor_hideEditors); 
+                setText(WorkbenchMessages.ToggleEditor_hideEditors);
             } else {
-                setText(WorkbenchMessages.ToggleEditor_showEditors); 
+                setText(WorkbenchMessages.ToggleEditor_showEditors);
             }
         }
     }
 
     /**
      * Creates a new <code>ToggleEditorsVisibilityAction</code>
-     * 
+     *
      * @param window the window
      */
     public ToggleEditorsVisibilityAction(IWorkbenchWindow window) {
@@ -66,24 +62,20 @@ public class ToggleEditorsVisibilityAction extends PerspectiveAction implements
         window.addPerspectiveListener(this);
     }
 
-    /* (non-Javadoc)
-     * Method declared on PerspectiveAction.
-     */
-    protected void run(IWorkbenchPage page, IPerspectiveDescriptor persp) {
+    @Override
+	protected void run(IWorkbenchPage page, IPerspectiveDescriptor persp) {
         boolean visible = page.isEditorAreaVisible();
         if (visible) {
             page.setEditorAreaVisible(false);
-            setText(WorkbenchMessages.ToggleEditor_showEditors); 
+            setText(WorkbenchMessages.ToggleEditor_showEditors);
         } else {
             page.setEditorAreaVisible(true);
             setText(WorkbenchMessages.ToggleEditor_hideEditors);
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on ActionFactory.IWorkbenchAction.
-     */
-    public void dispose() {
+    @Override
+	public void dispose() {
         if (getWindow() != null) {
             getWindow().removePerspectiveListener(this);
         }

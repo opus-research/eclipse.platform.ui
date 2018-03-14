@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -56,7 +56,7 @@ import org.eclipse.ui.navigator.ICommonMenuConstants;
 
 /**
  * @since 3.2
- * 
+ *
  */
 public class ResourceMgmtActionProvider extends CommonActionProvider {
 
@@ -72,19 +72,14 @@ public class ResourceMgmtActionProvider extends CommonActionProvider {
 
 	private Shell shell;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.navigator.CommonActionProvider#init(org.eclipse.ui.navigator
-	 * .ICommonActionExtensionSite)
-	 */
+	@Override
 	public void init(ICommonActionExtensionSite aSite) {
 		super.init(aSite);
 		shell = aSite.getViewSite().getShell();
 		makeActions();
 	}
 
+	@Override
 	public void fillActionBars(IActionBars actionBars) {
 		actionBars.setGlobalActionHandler(ActionFactory.REFRESH.getId(), refreshAction);
 		actionBars.setGlobalActionHandler(IDEActionFactory.BUILD_PROJECT.getId(), buildAction);
@@ -110,10 +105,11 @@ public class ResourceMgmtActionProvider extends CommonActionProvider {
 	 * <p>
 	 * No disabled action should be on the context menu.
 	 * </p>
-	 * 
+	 *
 	 * @param menu
 	 *            context menu to add actions to
 	 */
+	@Override
 	public void fillContextMenu(IMenuManager menu) {
 		IStructuredSelection selection = (IStructuredSelection) getContext().getSelection();
 		boolean isProjectSelection = true;
@@ -121,7 +117,7 @@ public class ResourceMgmtActionProvider extends CommonActionProvider {
 		boolean hasClosedProjects = false;
 		boolean hasBuilder = true; // false if any project is closed or does not
 									// have builder
-		Iterator resources = selection.iterator();
+		Iterator<Object> resources = selection.iterator();
 
 		while (resources.hasNext() && (!hasOpenProjects || !hasClosedProjects || hasBuilder || isProjectSelection)) {
 			Object next = resources.next();
@@ -130,7 +126,7 @@ public class ResourceMgmtActionProvider extends CommonActionProvider {
 			if (next instanceof IProject) {
 				project = (IProject) next;
 			} else if (next instanceof IAdaptable) {
-				project = (IProject) ((IAdaptable) next).getAdapter(IProject.class);
+				project = ((IAdaptable) next).getAdapter(IProject.class);
 			}
 
 			if (project == null) {
@@ -172,7 +168,7 @@ public class ResourceMgmtActionProvider extends CommonActionProvider {
 
 	/**
 	 * Returns whether there are builders configured on the given project.
-	 * 
+	 *
 	 * @return <code>true</code> if it has builders, <code>false</code> if not,
 	 *         or if this could not be determined
 	 */
@@ -191,6 +187,7 @@ public class ResourceMgmtActionProvider extends CommonActionProvider {
 
 	protected void makeActions() {
 		IShellProvider sp = new IShellProvider() {
+			@Override
 			public Shell getShell() {
 				return shell;
 			}
@@ -203,17 +200,20 @@ public class ResourceMgmtActionProvider extends CommonActionProvider {
 		closeUnrelatedProjectsAction = new CloseUnrelatedProjectsAction(sp);
 
 		refreshAction = new RefreshAction(sp) {
+			@Override
 			public void run() {
 				final IStatus[] errorStatus = new IStatus[1];
 				errorStatus[0] = Status.OK_STATUS;
 				final WorkspaceModifyOperation op = (WorkspaceModifyOperation) createOperation(errorStatus);
 				WorkspaceJob job = new WorkspaceJob("refresh") { //$NON-NLS-1$
 
+					@Override
 					public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
 						try {
 							op.run(monitor);
 							if (shell != null && !shell.isDisposed()) {
 								shell.getDisplay().asyncExec(new Runnable() {
+									@Override
 									public void run() {
 										StructuredViewer viewer = getActionSite().getStructuredViewer();
 										if (viewer != null && viewer.getControl() != null && !viewer.getControl().isDisposed()) {
@@ -256,6 +256,7 @@ public class ResourceMgmtActionProvider extends CommonActionProvider {
 
 	}
 
+	@Override
 	public void updateActionBars() {
 		IStructuredSelection selection = (IStructuredSelection) getContext().getSelection();
 		refreshAction.selectionChanged(selection);

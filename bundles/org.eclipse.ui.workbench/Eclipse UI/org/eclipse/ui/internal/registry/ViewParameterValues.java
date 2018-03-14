@@ -20,11 +20,12 @@ import org.eclipse.ui.views.IViewDescriptor;
 
 /**
  * Provides the parameter values for the show view command.
- * 
+ *
  * @since 3.1
  */
 public final class ViewParameterValues implements IParameterValues {
 
+	@Override
 	public final Map getParameterValues() {
 		final Map values = new HashMap();
 

@@ -31,7 +31,7 @@ import org.eclipse.ui.navigator.ICommonMenuConstants;
 /**
  * This is the action group for refactor actions, including global action
  * handlers for copy, paste and delete.
- * 
+ *
  * @since 2.0
  */
 public class RefactorActionGroup extends ActionGroup {
@@ -45,7 +45,7 @@ public class RefactorActionGroup extends ActionGroup {
 	private Tree tree;
 
 	/**
-	 * 
+	 *
 	 * @param aShell
 	 * @param aTree
 	 */
@@ -55,6 +55,7 @@ public class RefactorActionGroup extends ActionGroup {
 		makeActions();
 	}
 
+	@Override
 	public void fillContextMenu(IMenuManager menu) {
 		IStructuredSelection selection = (IStructuredSelection) getContext().getSelection();
 
@@ -69,6 +70,7 @@ public class RefactorActionGroup extends ActionGroup {
 		}
 	}
 
+	@Override
 	public void fillActionBars(IActionBars actionBars) {
 
 		// renameAction.setTextActionHandler(textActionHandler);
@@ -80,7 +82,7 @@ public class RefactorActionGroup extends ActionGroup {
 
 	/**
 	 * Handles a key pressed event by invoking the appropriate action.
-	 * 
+	 *
 	 * @param event
 	 *            The Key Event
 	 */
@@ -98,6 +100,7 @@ public class RefactorActionGroup extends ActionGroup {
 
 	protected void makeActions() {
 		IShellProvider sp = new IShellProvider() {
+			@Override
 			public Shell getShell() {
 				return shell;
 			}
@@ -110,6 +113,7 @@ public class RefactorActionGroup extends ActionGroup {
 		renameAction.setActionDefinitionId(IWorkbenchCommandConstants.FILE_RENAME);
 	}
 
+	@Override
 	public void updateActionBars() {
 		IStructuredSelection selection = (IStructuredSelection) getContext().getSelection();
 

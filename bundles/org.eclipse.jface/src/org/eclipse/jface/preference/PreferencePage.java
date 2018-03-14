@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,12 @@
  *******************************************************************************/
 package org.eclipse.jface.preference;
 
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.DialogPage;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogPage;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -25,13 +31,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.DialogPage;
-import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.IDialogPage;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.resource.JFaceResources;
-
 /**
  * Abstract base implementation for all preference page implementations.
  * <p>
@@ -43,7 +42,7 @@ import org.eclipse.jface.resource.JFaceResources;
  * method to compute the size of the page's control.
  * </p>
  * <p>
- * Subclasses may override the <code>performOk</code>, <code>performApply</code>, 
+ * Subclasses may override the <code>performOk</code>, <code>performApply</code>,
  * <code>performDefaults</code>, <code>performCancel</code>, and <code>performHelp</code>
  * framework methods to react to the standard button events.
  * </p>
@@ -74,12 +73,20 @@ public abstract class PreferencePage extends DialogPage implements
     private Control body;
 
     /**
-     * Whether this page has the standard Apply and Defaults buttons; 
-     * <code>true</code> by default.
-     *
-     * @see #noDefaultAndApplyButton
-     */
-    private boolean createDefaultAndApplyButton = true;
+	 * Whether this page has the standard Apply button; <code>true</code> by
+	 * default.
+	 *
+	 * @see #noDefaultAndApplyButton
+	 */
+	private boolean createApplyButton = true;
+
+	/**
+	 * Whether this page has the standard Default button; <code>true</code> by
+	 * default.
+	 *
+	 * @see #noDefaultButton
+	 */
+	private boolean createDefaultButton = true;
 
     /**
      * Standard Defaults button, or <code>null</code> if none.
@@ -101,7 +108,7 @@ public abstract class PreferencePage extends DialogPage implements
 
     /**
      * Description label.
-     * 
+     *
      * @see #createDescriptionLabel(Composite)
      */
     private Label descriptionLabel;
@@ -111,7 +118,7 @@ public abstract class PreferencePage extends DialogPage implements
      */
     private Point size = null;
 
-   
+
     /**
      * Creates a new preference page with an empty title and no image.
      */
@@ -149,10 +156,11 @@ public abstract class PreferencePage extends DialogPage implements
      * </p>
      *
      * @return the size of the preference page encoded as
-     *   <code>new Point(width,height)</code>, or 
+     *   <code>new Point(width,height)</code>, or
      *   <code>(0,0)</code> if the page doesn't currently have any UI component
      */
-    public Point computeSize() {
+    @Override
+	public Point computeSize() {
         if (size != null) {
 			return size;
 		}
@@ -168,7 +176,7 @@ public abstract class PreferencePage extends DialogPage implements
      * Contributes additional buttons to the given composite.
      * <p>
      * The default implementation of this framework hook method does
-     * nothing. Subclasses should override this method to contribute buttons 
+     * nothing. Subclasses should override this method to contribute buttons
      * to this page's button bar. For each button a subclass contributes,
      * it must also increase the parent's grid layout number of columns
      * by one; that is,
@@ -183,13 +191,13 @@ public abstract class PreferencePage extends DialogPage implements
     }
 
     /**
-     * Creates and returns the SWT control for the customized body 
+     * Creates and returns the SWT control for the customized body
      * of this preference page under the given parent composite.
      * <p>
      * This framework method must be implemented by concrete subclasses. Any
      * subclass returning a <code>Composite</code> object whose <code>Layout</code>
      * has default margins (for example, a <code>GridLayout</code>) are expected to
-     * set the margins of this <code>Layout</code> to 0 pixels. 
+     * set the margins of this <code>Layout</code> to 0 pixels.
      * </p>
      *
      * @param parent the parent composite
@@ -198,7 +206,7 @@ public abstract class PreferencePage extends DialogPage implements
     protected abstract Control createContents(Composite parent);
 
     /**
-     * The <code>PreferencePage</code> implementation of this 
+     * The <code>PreferencePage</code> implementation of this
      * <code>IDialogPage</code> method creates a description label
      * and button bar for the page. It calls <code>createContents</code>
      * to create the custom contents of the page.
@@ -208,7 +216,8 @@ public abstract class PreferencePage extends DialogPage implements
      * it is expected to set the margins of this <code>Layout</code> to 0 pixels.
      * @see IDialogPage#createControl(Composite)
      */
-    public void createControl(Composite parent){
+    @Override
+	public void createControl(Composite parent){
 
         GridData gd;
         Composite content = new Composite(parent, SWT.NONE);
@@ -242,48 +251,53 @@ public abstract class PreferencePage extends DialogPage implements
         layout.marginWidth = 0;
         layout.makeColumnsEqualWidth = false;
         buttonBar.setLayout(layout);
-        
+
         gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
-        
+
         buttonBar.setLayoutData(gd);
 
         contributeButtons(buttonBar);
-        
-        if (createDefaultAndApplyButton) {
-            layout.numColumns = layout.numColumns + 2;
-			String[] labels = JFaceResources.getStrings(new String[] {
-					"defaults", "apply" }); //$NON-NLS-2$//$NON-NLS-1$
-			int widthHint = convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH);
-			defaultsButton = new Button(buttonBar, SWT.PUSH);
-			defaultsButton.setText(labels[0]);
-			Dialog.applyDialogFont(defaultsButton);
-			GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
-			Point minButtonSize = defaultsButton.computeSize(SWT.DEFAULT,
-					SWT.DEFAULT, true);
-			data.widthHint = Math.max(widthHint, minButtonSize.x);
-			defaultsButton.setLayoutData(data);
-			defaultsButton.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					performDefaults();
-				}
-			});
 
-            applyButton = new Button(buttonBar, SWT.PUSH);
-			applyButton.setText(labels[1]);
-			Dialog.applyDialogFont(applyButton);
-			data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
-			minButtonSize = applyButton.computeSize(SWT.DEFAULT, SWT.DEFAULT,
-					true);
-			data.widthHint = Math.max(widthHint, minButtonSize.x);
-			applyButton.setLayoutData(data);
-			applyButton.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					performApply();
-				}
-			});
-            applyButton.setEnabled(isValid());
-            applyDialogFont(buttonBar);
-        } else {
+		if (createApplyButton || createDefaultButton) {
+			layout.numColumns = 1 + (createApplyButton && createDefaultButton ? 1 : 0);
+			int widthHint = convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH);
+
+			if (createDefaultButton) {
+				String label = JFaceResources.getString("defaults"); //$NON-NLS-1$
+				defaultsButton = new Button(buttonBar, SWT.PUSH);
+				defaultsButton.setText(label);
+				Dialog.applyDialogFont(defaultsButton);
+				Point minButtonSize = defaultsButton.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+				GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
+				data.widthHint = Math.max(widthHint, minButtonSize.x);
+				defaultsButton.setLayoutData(data);
+				defaultsButton.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						performDefaults();
+					}
+				});
+			}
+			if (createApplyButton) {
+				String label = JFaceResources.getString("apply"); //$NON-NLS-1$
+
+				applyButton = new Button(buttonBar, SWT.PUSH);
+				applyButton.setText(label);
+				Dialog.applyDialogFont(applyButton);
+				Point minButtonSize = applyButton.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+				GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
+				data.widthHint = Math.max(widthHint, minButtonSize.x);
+				applyButton.setLayoutData(data);
+				applyButton.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						performApply();
+					}
+				});
+				applyButton.setEnabled(isValid());
+			}
+			applyDialogFont(buttonBar);
+		} else {
             /* Check if there are any other buttons on the button bar.
              * If not, throw away the button bar composite.  Otherwise
              * there is an unusually large button bar.
@@ -294,7 +308,7 @@ public abstract class PreferencePage extends DialogPage implements
         }
     }
 
-	
+
 
 	/**
      * Apply the dialog font to the composite and it's children
@@ -383,14 +397,15 @@ public abstract class PreferencePage extends DialogPage implements
         return null;
     }
 
-    /**	
+    /**
      * The preference page implementation of an <code>IPreferencePage</code>
      * method returns whether this preference page is valid. Preference
      * pages are considered valid by default; call <code>setValid(false)</code>
      * to make a page invalid.
      * @see IPreferencePage#isValid()
      */
-    public boolean isValid() {
+    @Override
+	public boolean isValid() {
         return isValid;
     }
 
@@ -404,35 +419,52 @@ public abstract class PreferencePage extends DialogPage implements
      * </p>
      */
     protected void noDefaultAndApplyButton() {
-        createDefaultAndApplyButton = false;
+		createApplyButton = false;
+		createDefaultButton = false;
     }
 
     /**
-     * The <code>PreferencePage</code> implementation of this 
-     * <code>IPreferencePage</code> method returns <code>true</code>
-     * if the page is valid.
-     * @see IPreferencePage#okToLeave()
-     */
-    public boolean okToLeave() {
+	 * Suppress creation of the standard Default button for this page.
+	 * <p>
+	 * Subclasses wishing a preference page with this button should call this
+	 * framework method before the page's control has been created.
+	 * </p>
+	 *
+	 * @since 3.11
+	 */
+	protected void noDefaultButton() {
+		createDefaultButton = false;
+	}
+
+	/**
+	 * The <code>PreferencePage</code> implementation of this
+	 * <code>IPreferencePage</code> method returns <code>true</code> if the page
+	 * is valid.
+	 *
+	 * @see IPreferencePage#okToLeave()
+	 */
+    @Override
+	public boolean okToLeave() {
         return isValid();
     }
 
     /**
      * Performs special processing when this page's Apply button has been pressed.
      * <p>
-     * This is a framework hook method for sublcasses to do special things when
+     * This is a framework hook method for subclasses to do special things when
      * the Apply button has been pressed.
      * The default implementation of this framework method simply calls
      * <code>performOk</code> to simulate the pressing of the page's OK button.
      * </p>
-     * 
-     * @see #performOk
+     *
+     * @see #performOk()
+     * @see #performCancel()
      */
     protected void performApply() {
         performOk();
     }
 
-    /**	
+    /**
      * The preference page implementation of an <code>IPreferencePage</code>
      * method performs special processing when this page's Cancel button has
      * been pressed.
@@ -440,9 +472,21 @@ public abstract class PreferencePage extends DialogPage implements
      * This is a framework hook method for subclasses to do special things when
      * the Cancel button has been pressed. The default implementation of this
      * framework method does nothing and returns <code>true</code>.
+     * </p>
+     * <p>
+     * Note that UI guidelines on different platforms disagree on whether Cancel
+     * should revert changes that have been applied with the Apply button.
+     * <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/aa511266.aspx#commitButtons">Windows</a>
+     * wants applied changes to persist on Cancel, whereas
+     * <a href="http://developer.apple.com/library/mac/#documentation/UserExperience/Conceptual/AppleHIGuidelines/Windows/Windows.html#//apple_ref/doc/uid/20000961-TPXREF58">Mac</a> and
+     * <a href="https://developer.gnome.org/hig-book/stable/windows-utility.html.en#windows-explicit-apply">GTK</a>
+     * consider Apply a preview that should not be saved on Cancel. Eclipse applications
+     * typically adhere to the Windows guidelines and just override {@link #performOk()} and save preferences there.
+     * </p>
      * @see IPreferencePage#performCancel()
      */
-    public boolean performCancel() {
+    @Override
+	public boolean performCancel() {
         return true;
     }
 
@@ -458,19 +502,15 @@ public abstract class PreferencePage extends DialogPage implements
         updateApplyButton();
     }
 
-   
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.preference.IPreferencePage#performOk()
-     */
-    public boolean performOk() {
+
+    @Override
+	public boolean performOk() {
         return true;
     }
 
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.preference.IPreferencePage#setContainer(org.eclipse.jface.preference.IPreferencePageContainer)
-     */
-    public void setContainer(IPreferencePageContainer container) {
+
+    @Override
+	public void setContainer(IPreferencePageContainer container) {
         this.container = container;
     }
 
@@ -488,11 +528,9 @@ public abstract class PreferencePage extends DialogPage implements
         preferenceStore = store;
     }
 
-   
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.preference.IPreferencePage#setSize(org.eclipse.swt.graphics.Point)
-     */
-    public void setSize(Point uiSize) {
+
+    @Override
+	public void setSize(Point uiSize) {
         Control control = getControl();
         if (control != null) {
             control.setSize(uiSize);
@@ -506,7 +544,8 @@ public abstract class PreferencePage extends DialogPage implements
      * the preference page container title. Subclasses may extend.
      * @see IDialogPage#setTitle(String)
      */
-    public void setTitle(String title) {
+    @Override
+	public void setTitle(String title) {
         super.setTitle(title);
         if (getContainer() != null) {
 			getContainer().updateTitle();
@@ -516,7 +555,7 @@ public abstract class PreferencePage extends DialogPage implements
     /**
      * Sets whether this page is valid.
      * The enable state of the container buttons and the
-     * apply button is updated when a page's valid state 
+     * apply button is updated when a page's valid state
      * changes.
      * <p>
      *
@@ -535,16 +574,14 @@ public abstract class PreferencePage extends DialogPage implements
         }
     }
 
-   
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    public String toString() {
+
+    @Override
+	public String toString() {
         return getTitle();
     }
 
     /**
-     * Updates the enabled state of the Apply button to reflect whether 
+     * Updates the enabled state of the Apply button to reflect whether
      * this page is valid.
      */
     protected void updateApplyButton() {
@@ -556,7 +593,7 @@ public abstract class PreferencePage extends DialogPage implements
     /**
      * Creates a composite with a highlighted Note entry and a message text.
      * This is designed to take up the full width of the page.
-     * 
+     *
      * @param font the font to use
      * @param composite the parent composite
      * @param title the title of the note
@@ -590,7 +627,7 @@ public abstract class PreferencePage extends DialogPage implements
 
     /**
      * Returns the Apply button.
-     * 
+     *
      * @return the Apply button
      */
     protected Button getApplyButton() {
@@ -599,17 +636,15 @@ public abstract class PreferencePage extends DialogPage implements
 
     /**
      * Returns the Restore Defaults button.
-     * 
+     *
      * @return the Restore Defaults button
      */
     protected Button getDefaultsButton() {
         return defaultsButton;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.IDialogPage#performHelp()
-     */
-    public void performHelp() {
+    @Override
+	public void performHelp() {
         getControl().notifyListeners(SWT.Help, new Event());
     }
 
@@ -625,32 +660,28 @@ public abstract class PreferencePage extends DialogPage implements
 	 * <p>
 	 * The default implementation does nothing.
 	 * </p>
-	 * 
+	 *
 	 * @param data the data as specified by the subclass
 	 * @since 3.1
 	 */
 	public void applyData(Object data) {
-		
+
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.dialogs.DialogPage#setErrorMessage(java.lang.String)
-	 */
+
+	@Override
 	public void setErrorMessage(String newMessage) {
 		super.setErrorMessage(newMessage);
 		if (getContainer() != null) {
 			getContainer().updateMessage();
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.dialogs.DialogPage#setMessage(java.lang.String, int)
-	 */
+
+	@Override
 	public void setMessage(String newMessage, int newType) {
 		super.setMessage(newMessage, newType);
 		if (getContainer() != null) {
 			getContainer().updateMessage();
 		}
-	}	
+	}
 
 }

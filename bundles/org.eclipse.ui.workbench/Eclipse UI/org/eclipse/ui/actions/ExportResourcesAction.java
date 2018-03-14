@@ -34,7 +34,7 @@ import org.eclipse.ui.internal.WorkbenchMessages;
  * Note: Despite the name, an export operation can deal with things other than
  * resources; the current name was retained for historical reasons.
  * </p>
- * 
+ *
  * @since 2.0
  * @noextend This class is not intended to be subclassed by clients.
  */
@@ -53,7 +53,7 @@ public class ExportResourcesAction extends BaseSelectionListenerAction
 
     /**
      * Create a new instance of this class.
-     * 
+     *
      * @param window the window
      */
     public ExportResourcesAction(IWorkbenchWindow window) {
@@ -62,20 +62,20 @@ public class ExportResourcesAction extends BaseSelectionListenerAction
 
     /**
      * Create a new instance of this class.
-     * 
+     *
      * @param window the window
-     * @param label the label 
+     * @param label the label
      */
     public ExportResourcesAction(IWorkbenchWindow window, String label) {
         super(label);
         if (window == null) {
             throw new IllegalArgumentException();
         }
-        
+
         this.workbenchWindow = window;
         action = ActionFactory.EXPORT.create(window);
-        
-        setText(action.getText()); 
+
+        setText(action.getText());
         setToolTipText(action.getToolTipText());
         setId(action.getId());
         setActionDefinitionId(action.getActionDefinitionId());
@@ -86,29 +86,32 @@ public class ExportResourcesAction extends BaseSelectionListenerAction
 
     /**
      * Create a new instance of this class
-     * 
+     *
      * @param workbench the workbench
      * @deprecated use the constructor <code>ExportResourcesAction(IWorkbenchWindow)</code>
      */
-    public ExportResourcesAction(IWorkbench workbench) {
+    @Deprecated
+	public ExportResourcesAction(IWorkbench workbench) {
         this(workbench.getActiveWorkbenchWindow());
     }
 
     /**
      * Create a new instance of this class.
-     * 
-     * @param workbench the workbench 
+     *
+     * @param workbench the workbench
      * @param label the label
      * @deprecated use the constructor <code>ExportResourcesAction(IWorkbenchWindow, String)</code>
      */
-    public ExportResourcesAction(IWorkbench workbench, String label) {
+    @Deprecated
+	public ExportResourcesAction(IWorkbench workbench, String label) {
         this(workbench.getActiveWorkbenchWindow(), label);
     }
 
     /**
      * Invoke the Export wizards selection Wizard.
      */
-    public void run() {
+    @Override
+	public void run() {
         if (workbenchWindow == null) {
             // action has been disposed
             return;
@@ -117,18 +120,17 @@ public class ExportResourcesAction extends BaseSelectionListenerAction
     }
 
     /**
-     * Sets the current selection. 
+     * Sets the current selection.
      * In for backwards compatability. Use selectionChanged() instead.
      * @param selection the new selection
      * @deprecated
      */
-    public void setSelection(IStructuredSelection selection) {
+    @Deprecated
+	public void setSelection(IStructuredSelection selection) {
         selectionChanged(selection);
     }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.actions.ActionFactory.IWorkbenchAction#dispose()
-	 */
+	@Override
 	public void dispose() {
 		workbenchWindow = null;
 		if (action!=null) {

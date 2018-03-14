@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.ToolBar;
  * contribution item that has been disposed. This is to ensure that tool bar
  * contribution items are disposed (freeing their resources), but that layout
  * information about the item is not lost.
- * 
+ *
  * @since 3.0
  */
 final class PlaceholderContributionItem implements IContributionItem {
@@ -60,7 +60,7 @@ final class PlaceholderContributionItem implements IContributionItem {
     /**
      * Constructs a new instance of <code>PlaceholderContributionItem</code>
      * from the item it is intended to replace.
-     * 
+     *
      * @param item
      *            The item to be replaced; must not be <code>null</code>.
      */
@@ -73,87 +73,60 @@ final class PlaceholderContributionItem implements IContributionItem {
         storedUseChevron = item.getUseChevron();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.action.IContributionItem#dispose()
-     */
-    public void dispose() {
+    @Override
+	public void dispose() {
         // Do nothing
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.action.IContributionItem#fill(org.eclipse.swt.widgets.Composite)
-     */
-    public void fill(Composite parent) {
+    @Override
+	public void fill(Composite parent) {
         throw new UnsupportedOperationException();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.action.IContributionItem#fill(org.eclipse.swt.widgets.CoolBar,
-     *      int)
-     */
-    public void fill(CoolBar parent, int index) {
+    @Override
+	public void fill(CoolBar parent, int index) {
         throw new UnsupportedOperationException();
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.action.IContributionItem#fill(org.eclipse.swt.widgets.Menu,
-     *      int)
-     */
-    public void fill(Menu parent, int index) {
+    @Override
+	public void fill(Menu parent, int index) {
         throw new UnsupportedOperationException();
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.action.IContributionItem#fill(org.eclipse.swt.widgets.ToolBar,
-     *      int)
-     */
-    public void fill(ToolBar parent, int index) {
+    @Override
+	public void fill(ToolBar parent, int index) {
         throw new UnsupportedOperationException();
 
     }
 
     /**
      * The height of the replaced contribution item.
-     * 
+     *
      * @return The height.
      */
     int getHeight() {
         return storedHeight;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.action.IContributionItem#getId()
-     */
-    public String getId() {
+    @Override
+	public String getId() {
         return id;
     }
 
     /**
      * The width of the replaced contribution item.
-     * 
+     *
      * @return The width.
      */
     int getWidth() {
         return storedWidth;
     }
-    
+
     /**
      * Returns the minimum number of tool items to show in the cool item.
-     * 
+     *
      * @return the minimum number of tool items to show, or <code>SHOW_ALL_ITEMS</code>
      *         if a value was not set
      * @see #setMinimumItemsToShow(int)
@@ -162,10 +135,10 @@ final class PlaceholderContributionItem implements IContributionItem {
     int getMinimumItemsToShow() {
     	return storedMinimumItems;
     }
-    
+
     /**
      * Returns whether chevron support is enabled.
-     * 
+     *
      * @return <code>true</code> if chevron support is enabled, <code>false</code>
      *         otherwise
 	 * @since 3.2
@@ -174,87 +147,51 @@ final class PlaceholderContributionItem implements IContributionItem {
         return storedUseChevron;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.action.IContributionItem#isDirty()
-     */
-    public boolean isDirty() {
+    @Override
+	public boolean isDirty() {
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.action.IContributionItem#isDynamic()
-     */
-    public boolean isDynamic() {
+    @Override
+	public boolean isDynamic() {
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.action.IContributionItem#isEnabled()
-     */
-    public boolean isEnabled() {
+    @Override
+	public boolean isEnabled() {
         // XXX Auto-generated method stub
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.action.IContributionItem#isGroupMarker()
-     */
-    public boolean isGroupMarker() {
+    @Override
+	public boolean isGroupMarker() {
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.action.IContributionItem#isSeparator()
-     */
-    public boolean isSeparator() {
+    @Override
+	public boolean isSeparator() {
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.action.IContributionItem#isVisible()
-     */
-    public boolean isVisible() {
+    @Override
+	public boolean isVisible() {
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.action.IContributionItem#saveWidgetState()
-     */
-    public void saveWidgetState() {
+    @Override
+	public void saveWidgetState() {
         // Do nothing.
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.action.IContributionItem#setParent(org.eclipse.jface.action.IContributionManager)
-     */
-    public void setParent(IContributionManager parent) {
+    @Override
+	public void setParent(IContributionManager parent) {
         // Do nothing
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.action.IContributionItem#setVisible(boolean)
-     */
-    public void setVisible(boolean visible) {
+    @Override
+	public void setVisible(boolean visible) {
         // Do nothing.
     }
 
@@ -262,26 +199,19 @@ final class PlaceholderContributionItem implements IContributionItem {
      * Displays a string representation of this contribution item, which is
      * really just a function of its identifier.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return "PlaceholderContributionItem(" + id + ")"; //$NON-NLS-1$//$NON-NLS-2$
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.action.IContributionItem#update()
-     */
-    public void update() {
+    @Override
+	public void update() {
         update(null);
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.action.IContributionItem#update(java.lang.String)
-     */
-    public void update(String identifier) {
+    @Override
+	public void update(String identifier) {
         // Do nothing
     }
 }

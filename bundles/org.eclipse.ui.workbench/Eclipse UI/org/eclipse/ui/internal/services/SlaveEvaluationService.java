@@ -23,7 +23,7 @@ import org.eclipse.ui.services.IEvaluationService;
 
 /**
  * @since 3.4
- * 
+ *
  */
 public class SlaveEvaluationService implements IEvaluationService {
 
@@ -46,6 +46,7 @@ public class SlaveEvaluationService implements IEvaluationService {
 	 * @see org.eclipse.ui.services.IEvaluationService#addEvaluationListener(org.eclipse.core.expressions.Expression,
 	 *      org.eclipse.jface.util.IPropertyChangeListener, java.lang.String)
 	 */
+	@Override
 	public IEvaluationReference addEvaluationListener(Expression expression,
 			IPropertyChangeListener listener, String property) {
 		IEvaluationReference ref = parentService.addEvaluationListener(
@@ -55,10 +56,11 @@ public class SlaveEvaluationService implements IEvaluationService {
 		}
 		return ref;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.services.IEvaluationService#addEvaluationReference(org.eclipse.ui.services.IEvaluationReference)
 	 */
+	@Override
 	public void addEvaluationReference(IEvaluationReference ref) {
 		if (!evaluationReferences.contains(ref)) {
 			evaluationReferences.add(ref);
@@ -69,6 +71,7 @@ public class SlaveEvaluationService implements IEvaluationService {
 	/**
 	 * @see org.eclipse.ui.services.IEvaluationService#addServiceListener(org.eclipse.jface.util.IPropertyChangeListener)
 	 */
+	@Override
 	public void addServiceListener(IPropertyChangeListener listener) {
 		if (!serviceListeners.contains(listener)) {
 			serviceListeners.add(listener);
@@ -79,6 +82,7 @@ public class SlaveEvaluationService implements IEvaluationService {
 	/**
 	 * @see org.eclipse.ui.services.IServiceWithSources#addSourceProvider(org.eclipse.ui.ISourceProvider)
 	 */
+	@Override
 	public void addSourceProvider(ISourceProvider provider) {
 		if (!sourceProviders.contains(provider)) {
 			sourceProviders.add(provider);
@@ -89,6 +93,7 @@ public class SlaveEvaluationService implements IEvaluationService {
 	/**
 	 * @see org.eclipse.ui.services.IEvaluationService#getCurrentState()
 	 */
+	@Override
 	public IEvaluationContext getCurrentState() {
 		return parentService.getCurrentState();
 	}
@@ -96,6 +101,7 @@ public class SlaveEvaluationService implements IEvaluationService {
 	/**
 	 * @see org.eclipse.ui.services.IEvaluationService#removeEvaluationListener(org.eclipse.ui.services.IEvaluationReference)
 	 */
+	@Override
 	public void removeEvaluationListener(IEvaluationReference ref) {
 		evaluationReferences.remove(ref);
 		parentService.removeEvaluationListener(ref);
@@ -104,6 +110,7 @@ public class SlaveEvaluationService implements IEvaluationService {
 	/**
 	 * @see org.eclipse.ui.services.IEvaluationService#removeServiceListener(org.eclipse.jface.util.IPropertyChangeListener)
 	 */
+	@Override
 	public void removeServiceListener(IPropertyChangeListener listener) {
 		serviceListeners.remove(listener);
 		parentService.removeServiceListener(listener);
@@ -112,6 +119,7 @@ public class SlaveEvaluationService implements IEvaluationService {
 	/**
 	 * @see org.eclipse.ui.services.IServiceWithSources#removeSourceProvider(org.eclipse.ui.ISourceProvider)
 	 */
+	@Override
 	public void removeSourceProvider(ISourceProvider provider) {
 		sourceProviders.remove(provider);
 		parentService.removeSourceProvider(provider);
@@ -119,9 +127,10 @@ public class SlaveEvaluationService implements IEvaluationService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.services.IDisposable#dispose()
 	 */
+	@Override
 	public void dispose() {
 		if (!evaluationReferences.isEmpty()) {
 			Object[] array = evaluationReferences.toArray();
@@ -152,6 +161,7 @@ public class SlaveEvaluationService implements IEvaluationService {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.services.IEvaluationService#requestEvaluation(java.lang.String)
 	 */
+	@Override
 	public void requestEvaluation(String propertyName) {
 		parentService.requestEvaluation(propertyName);
 	}

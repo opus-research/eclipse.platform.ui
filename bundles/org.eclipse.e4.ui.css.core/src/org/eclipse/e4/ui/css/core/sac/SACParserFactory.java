@@ -28,6 +28,7 @@ public abstract class SACParserFactory extends ParserFactory implements
 	 * this method search teh SAC Parser class name to instanciate into System
 	 * property with key org.w3c.css.sac.parser.
 	 */
+	@Override
 	public Parser makeParser() throws ClassNotFoundException,
 			IllegalAccessException, InstantiationException,
 			NullPointerException, ClassCastException {
@@ -38,7 +39,7 @@ public abstract class SACParserFactory extends ParserFactory implements
 
 	/**
 	 * Return preferred SAC parser name if it is filled and null otherwise.
-	 * 
+	 *
 	 * @return
 	 */
 	public String getPreferredParserName() {
@@ -47,7 +48,7 @@ public abstract class SACParserFactory extends ParserFactory implements
 
 	/**
 	 * Set the preferred SAC parser name to use when makeParser is called.
-	 * 
+	 *
 	 * @param preferredParserName
 	 */
 	public void setPreferredParserName(String preferredParserName) {
@@ -56,7 +57,7 @@ public abstract class SACParserFactory extends ParserFactory implements
 
 	/**
 	 * Return instance of SACParserFactory
-	 * 
+	 *
 	 * @return
 	 */
 	public static ISACParserFactory newInstance() {
@@ -68,7 +69,7 @@ public abstract class SACParserFactory extends ParserFactory implements
 	/**
 	 * Return instance of SAC Parser registered into the factory with name
 	 * <code>name</code>.
-	 * 
+	 *
 	 * @param name
 	 * @return
 	 * @throws ClassNotFoundException
@@ -77,6 +78,7 @@ public abstract class SACParserFactory extends ParserFactory implements
 	 * @throws NullPointerException
 	 * @throws ClassCastException
 	 */
+	@Override
 	public abstract Parser makeParser(String name)
 			throws ClassNotFoundException, IllegalAccessException,
 			InstantiationException, NullPointerException, ClassCastException;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2010 IBM Corporation and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -53,13 +53,7 @@ public class PatternFilter extends ViewerFilter {
 
 	private static Object[] EMPTY = new Object[0];
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.ViewerFilter#filter(org.eclipse.jface.viewers
-	 * .Viewer, java.lang.Object, java.lang.Object[])
-	 */
+	@Override
 	public final Object[] filter(Viewer viewer, Object parent, Object[] elements) {
 		// we don't want to optimize if we've extended the filter ... this
 		// needs to be addressed in 3.4
@@ -89,7 +83,7 @@ public class PatternFilter extends ViewerFilter {
 	 * Returns true if any of the elements makes it through the filter. This
 	 * method uses caching if enabled; the computation is done in
 	 * computeAnyVisible.
-	 * 
+	 *
 	 * @param viewer
 	 * @param parent
 	 * @param elements
@@ -120,7 +114,7 @@ public class PatternFilter extends ViewerFilter {
 
 	/**
 	 * Returns true if any of the elements makes it through the filter.
-	 * 
+	 *
 	 * @param viewer
 	 *            the viewer
 	 * @param elements
@@ -137,13 +131,7 @@ public class PatternFilter extends ViewerFilter {
 		return elementFound;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers
-	 * .Viewer, java.lang.Object, java.lang.Object)
-	 */
+	@Override
 	public final boolean select(Viewer viewer, Object parentElement,
 			Object element) {
 		return isElementVisible(viewer, element);
@@ -152,7 +140,7 @@ public class PatternFilter extends ViewerFilter {
 	/**
 	 * Sets whether a leading wildcard should be attached to each pattern
 	 * string.
-	 * 
+	 *
 	 * @param includeLeadingWildcard
 	 *            Whether a leading wildcard should be added.
 	 */
@@ -164,7 +152,7 @@ public class PatternFilter extends ViewerFilter {
 	/**
 	 * The pattern string for which this filter should select elements in the
 	 * viewer.
-	 * 
+	 *
 	 * @param patternString
 	 */
 	public void setPattern(String patternString) {
@@ -200,10 +188,10 @@ public class PatternFilter extends ViewerFilter {
 
 	/**
 	 * Answers whether the given String matches the pattern.
-	 * 
+	 *
 	 * @param string
 	 *            the String to test
-	 * 
+	 *
 	 * @return whether the string matches the pattern
 	 */
 	private boolean match(String string) {
@@ -218,7 +206,7 @@ public class PatternFilter extends ViewerFilter {
 	 * tree. For example, if a tree has items that are categorized, the category
 	 * itself may not be a valid selection since it is used merely to organize
 	 * the elements.
-	 * 
+	 *
 	 * @param element
 	 * @return true if this element is eligible for automatic selection
 	 */
@@ -232,14 +220,14 @@ public class PatternFilter extends ViewerFilter {
 	 * in the tree based on whether the provided filter text matches the text of
 	 * the given element's text, or that of it's children (if the element has
 	 * any).
-	 * 
+	 *
 	 * Subclasses may override this method.
-	 * 
+	 *
 	 * @param viewer
 	 *            the tree viewer in which the element resides
 	 * @param element
 	 *            the element in the tree to check for a match
-	 * 
+	 *
 	 * @return true if the element matches the filter pattern
 	 */
 	public boolean isElementVisible(Viewer viewer, Object element) {
@@ -250,9 +238,9 @@ public class PatternFilter extends ViewerFilter {
 	 * Check if the parent (category) is a match to the filter text. The default
 	 * behavior returns true if the element has at least one child element that
 	 * is a match with the filter text.
-	 * 
+	 *
 	 * Subclasses may override this method.
-	 * 
+	 *
 	 * @param viewer
 	 *            the viewer that contains the element
 	 * @param element
@@ -273,9 +261,9 @@ public class PatternFilter extends ViewerFilter {
 	/**
 	 * Check if the current (leaf) element is a match with the filter text. The
 	 * default behavior checks that the label of the element is a match.
-	 * 
+	 *
 	 * Subclasses should override this method.
-	 * 
+	 *
 	 * @param viewer
 	 *            the viewer that contains the element
 	 * @param element
@@ -295,7 +283,7 @@ public class PatternFilter extends ViewerFilter {
 	/**
 	 * Take the given filter text and break it down into words using a
 	 * BreakIterator.
-	 * 
+	 *
 	 * @param text
 	 * @return an array of words
 	 */
@@ -330,7 +318,7 @@ public class PatternFilter extends ViewerFilter {
 	/**
 	 * Return whether or not if any of the words in text satisfy the match
 	 * critera.
-	 * 
+	 *
 	 * @param text
 	 *            the text to match
 	 * @return boolean <code>true</code> if one of the words in text satisifes
@@ -360,7 +348,7 @@ public class PatternFilter extends ViewerFilter {
 
 	/**
 	 * Can be called by the filtered tree to turn on caching.
-	 * 
+	 *
 	 * @param useCache
 	 *            The useCache to set.
 	 */

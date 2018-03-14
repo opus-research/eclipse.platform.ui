@@ -13,7 +13,7 @@ package org.eclipse.ui.internal.decorators;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.ISafeRunnable;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
@@ -66,9 +66,9 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 	 * Position <code>REPLACE</code>. Value <code>5</code>
 	 */
 	public static final int REPLACE = 5;
-	
+
 	private static final String REPLACE_STRING = "REPLACE"; //$NON-NLS-1$
-	
+
 	private static final String ATT_QUADRANT = "quadrant"; //$NON-NLS-1$
 
 	// Constants for quadrants
@@ -99,7 +99,7 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 	 * Gets the decorator and creates it if it does not exist yet. Throws a
 	 * CoreException if there is a problem creating the decorator. This method
 	 * should not be called unless a check for enabled to be true is done first.
-	 * 
+	 *
 	 * @return Returns a ILabelDecorator
 	 */
 	protected ILightweightLabelDecorator internalGetDecorator()
@@ -117,7 +117,8 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 						getIconLocation());
 			} else {
 
-				Platform.run(new ISafeRunnable() {
+				SafeRunner.run(new ISafeRunnable() {
+					@Override
 					public void run() {
 						try {
 							decorator = (ILightweightLabelDecorator) WorkbenchPlugin
@@ -133,6 +134,7 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 					/*
 					 * (non-Javadoc) Method declared on ISafeRunnable.
 					 */
+					@Override
 					public void handleException(Throwable e) {
 						// Do nothing as Core will handle the logging
 					}
@@ -156,7 +158,7 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 
 	/**
 	 * Return whether or not this represents a declarative decorator.
-	 * 
+	 *
 	 * @return boolean <code>true</code> if this is declarative
 	 */
 	private boolean isDeclarative() {
@@ -165,7 +167,7 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 
 	/**
 	 * Return the icon location.
-	 * 
+	 *
 	 * @return the icon location
 	 */
 	private String getIconLocation() {
@@ -174,9 +176,10 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.decorators.DecoratorDefinition#internalGetLabelProvider()
 	 */
+	@Override
 	protected IBaseLabelProvider internalGetLabelProvider()
 			throws CoreException {
 		return internalGetDecorator();
@@ -184,9 +187,10 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.decorators.DecoratorDefinition#isFull()
 	 */
+	@Override
 	public boolean isFull() {
 		return false;
 	}
@@ -195,7 +199,7 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 	 * Returns the quadrant.One of the following constants in
 	 * DecoratorRegistryReader: TOP_LEFT TOP_RIGHT BOTTOM_LEFT BOTTOM_RIGHT
 	 * UNDERLAY REPLACE
-	 * 
+	 *
 	 * @return int
 	 */
 	public int getQuadrant() {
@@ -210,7 +214,7 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 	/**
 	 * Get the constant value based on the location supplied. Default to bottom
 	 * right.
-	 * 
+	 *
 	 * @since 3.1
 	 */
 	private int getLocationConstant(String locationDefinition,
@@ -252,7 +256,7 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 			if(currentDecorator == null) {
 				return;
 			}
-			
+
 			if (isAdaptable()) {
 				String[] classes = getObjectClasses();
 				for (int i = 0; i < classes.length; i++) {
@@ -261,8 +265,8 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 							className);
 					if (adapted != null) {
 						currentDecorator.decorate(adapted, decoration);
-					}					
-				}				
+					}
+				}
 			}
 			else{
 				if (currentDecorator != null && element != null) {
@@ -277,7 +281,7 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 
 	/**
 	 * Returns the lightweight decorator, or <code>null</code> if not enabled.
-	 * 
+	 *
 	 * @return the lightweight decorator, or <code>null</code> if not enabled
 	 */
 	public ILightweightLabelDecorator getDecorator() {
@@ -286,9 +290,10 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.decorators.DecoratorDefinition#refreshDecorator()
 	 */
+	@Override
 	protected void refreshDecorator() {
 		// Only do something if disabled so as to prevent
 		// gratutitous activation
@@ -301,25 +306,27 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.IObjectContributor#isApplicableTo(java.lang.Object)
 	 */
+	@Override
 	public boolean isApplicableTo(Object object) {
 		return isEnabledFor(object);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.IObjectContributor#canAdapt()
 	 */
+	@Override
 	public boolean canAdapt() {
 		return isAdaptable();
 	}
 
 	/**
 	 * Get the object classes to which this decorator is registered.
-	 * 
+	 *
 	 * @return String [] the object classes to which this decorator is
 	 *         registered
 	 */
@@ -332,9 +339,10 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.decorators.DecoratorDefinition#initializeEnablement()
 	 */
+	@Override
 	protected void initializeEnablement() {
 		super.initializeEnablement();
 		ActionExpression expression = getEnablement();

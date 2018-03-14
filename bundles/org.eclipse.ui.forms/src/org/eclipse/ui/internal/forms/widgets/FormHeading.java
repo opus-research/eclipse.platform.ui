@@ -4,7 +4,7 @@
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
  *  http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  *  Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -194,7 +194,7 @@ public class FormHeading extends Canvas {
 			 * titleRegion.computeSize(flexWidth, SWT.DEFAULT); if (flexWidth !=
 			 * SWT.DEFAULT && tsize.x < flexWidth) flexWidth += flexWidth -
 			 * tsize.x;
-			 * 
+			 *
 			 * if (hasMessageRegion()) {
 			 * messageCache.setControl(messageRegion.getMessageControl()); msize =
 			 * messageCache.computeSize(flexWidth, SWT.DEFAULT); int maxWidth =
@@ -499,6 +499,7 @@ public class FormHeading extends Canvas {
 				if (messageHyperlink == null) {
 					messageHyperlink = new Hyperlink(FormHeading.this, SWT.NULL);
 					messageHyperlink.setUnderlined(true);
+					messageHyperlink.setBackground(getBackground());
 					messageHyperlink.setText(message);
 					messageHyperlink.setHref(messages);
 					Object[] llist = listeners.getListeners();
@@ -518,6 +519,7 @@ public class FormHeading extends Canvas {
 					messageHyperlink.setVisible(false);
 				if (messageLabel == null) {
 					messageLabel = new CLabel(FormHeading.this, SWT.NULL);
+					messageLabel.setBackground(getBackground());
 					messageLabel.setText(message);
 					if (messageToolTipManager != null)
 						messageToolTipManager.createToolTip(messageLabel, false);
@@ -526,6 +528,7 @@ public class FormHeading extends Canvas {
 					messageLabel.setVisible(true);
 				}
 			}
+			updateForeground();
 			layout(true);
 		}
 
@@ -542,6 +545,7 @@ public class FormHeading extends Canvas {
 
 		public void setForeground(Color fg) {
 			this.fg = fg;
+			updateForeground();
 		}
 
 		private void updateForeground() {
@@ -563,7 +567,7 @@ public class FormHeading extends Canvas {
 
 	/**
 	 * Creates the form content control as a child of the provided parent.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent widget
 	 */
@@ -627,7 +631,7 @@ public class FormHeading extends Canvas {
 
 	/**
 	 * Returns the title text that will be rendered at the top of the form.
-	 * 
+	 *
 	 * @return the title text
 	 */
 	public String getText() {
@@ -636,7 +640,7 @@ public class FormHeading extends Canvas {
 
 	/**
 	 * Returns the title image that will be rendered to the left of the title.
-	 * 
+	 *
 	 * @return the title image
 	 * @since 3.2
 	 */
@@ -674,7 +678,7 @@ public class FormHeading extends Canvas {
 	/**
 	 * Sets the text to be rendered at the top of the form above the body as a
 	 * title.
-	 * 
+	 *
 	 * @param text
 	 *            the title text
 	 */
@@ -689,7 +693,7 @@ public class FormHeading extends Canvas {
 
 	/**
 	 * Sets the image to be rendered to the left of the title.
-	 * 
+	 *
 	 * @param image
 	 *            the title image or <code>null</code> to show no image.
 	 * @since 3.2
@@ -758,7 +762,7 @@ public class FormHeading extends Canvas {
 	/**
 	 * Returns the tool bar manager that is used to manage tool items in the
 	 * form's title area.
-	 * 
+	 *
 	 * @return form tool bar manager
 	 */
 	public IToolBarManager getToolBarManager() {
@@ -783,7 +787,7 @@ public class FormHeading extends Canvas {
 	/**
 	 * Returns the menu manager that is used to manage tool items in the form's
 	 * title area.
-	 * 
+	 *
 	 * @return form drop-down menu manager
 	 * @since 3.3
 	 */
@@ -804,6 +808,9 @@ public class FormHeading extends Canvas {
 		if (!isSeparatorVisible() && getBackgroundImage() == null)
 			return;
 		Rectangle carea = getClientArea();
+		if (carea.width == 0 || carea.height == 0) {
+			return;
+		}
 		Image buffer = new Image(getDisplay(), carea.width, carea.height);
 		buffer.setBackground(getBackground());
 		GC igc = new GC(buffer);
@@ -941,7 +948,7 @@ public class FormHeading extends Canvas {
 
 	/**
 	 * Tests if the form is in the 'busy' state.
-	 * 
+	 *
 	 * @return <code>true</code> if busy, <code>false</code> otherwise.
 	 */
 
@@ -952,7 +959,7 @@ public class FormHeading extends Canvas {
 	/**
 	 * Sets the form's busy state. Busy form will display 'busy' animation in
 	 * the area of the title image.
-	 * 
+	 *
 	 * @param busy
 	 *            the form's busy state
 	 */

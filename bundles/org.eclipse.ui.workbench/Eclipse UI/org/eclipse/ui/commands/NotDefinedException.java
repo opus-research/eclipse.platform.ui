@@ -16,26 +16,29 @@ package org.eclipse.ui.commands;
  * <p>
  * This class is not intended to be extended by clients.
  * </p>
- * 
+ *
  * @since 3.0
  * @deprecated Please use the "org.eclipse.core.commands" plug-in instead.
  * @see org.eclipse.core.commands.common.NotDefinedException
  */
+@Deprecated
+@SuppressWarnings("all")
 public final class NotDefinedException extends CommandException {
 
     /**
      * Generated serial version UID for this class.
-     * 
+     *
      * @since 3.1
      */
     private static final long serialVersionUID = 3257572788998124596L;
 
     /**
      * Creates a new instance of this class with the specified detail message.
-     * 
+     *
      * @param s
      *            the detail message.
      */
+	@Deprecated
     public NotDefinedException(String s) {
         super(s);
     }
@@ -43,12 +46,13 @@ public final class NotDefinedException extends CommandException {
     /**
      * Constructs a legacy <code>NotDefinedException</code> based on the new
      * <code>NotDefinedException</code>.
-     * 
+     *
      * @param e
      *            The exception from which this exception should be created;
      *            must not be <code>null</code>.
      * @since 3.1
      */
+	@Deprecated
     public NotDefinedException(
             final org.eclipse.core.commands.common.NotDefinedException e) {
         super(e.getMessage(), e);

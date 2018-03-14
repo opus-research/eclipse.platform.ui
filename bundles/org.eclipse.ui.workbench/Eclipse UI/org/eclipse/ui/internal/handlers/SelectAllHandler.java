@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2009 IBM Corporation and others.
+ * Copyright (c) 2004, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,7 +29,7 @@ import org.eclipse.ui.internal.ExceptionHandler;
  * all to work even in some cases where the "selectAll" method does not exist.
  * This handler attempts to use "getTextLimit" and "setSelection" to do select
  * all. If this doesn't work, then it finally fails.
- * 
+ *
  * @since 3.0
  */
 public class SelectAllHandler extends WidgetMethodHandler {
@@ -39,6 +39,7 @@ public class SelectAllHandler extends WidgetMethodHandler {
 	 */
 	private static final Class[] METHOD_PARAMETERS = { Point.class };
 
+	@Override
 	public final Object execute(final ExecutionEvent event)
 			throws ExecutionException {
 		final Method methodToExecute = getMethodToExecute();
@@ -46,12 +47,12 @@ public class SelectAllHandler extends WidgetMethodHandler {
 			try {
 				final Control focusControl = Display.getCurrent()
 						.getFocusControl();
-				
+
 				final int numParams = methodToExecute.getParameterTypes().length;
 
 				if ((focusControl instanceof Composite)
                         && ((((Composite) focusControl).getStyle() & SWT.EMBEDDED) != 0)) {
-					
+
 					// we only support selectAll for swing components
 					if (numParams != 0) {
 						return null;
@@ -74,13 +75,14 @@ public class SelectAllHandler extends WidgetMethodHandler {
 						final Object focusComponent = getFocusComponent();
 						if (focusComponent != null) {
 							Runnable methodRunnable = new Runnable() {
+								@Override
 								public void run() {
 									try {
-										methodToExecute.invoke(focusComponent,
-												null);
+										methodToExecute.invoke(focusComponent);
 										// and back to the UI thread :-)
 										focusControl.getDisplay().asyncExec(
 												new Runnable() {
+													@Override
 													public void run() {
 														if (!focusControl
 																.isDisposed()) {
@@ -104,6 +106,7 @@ public class SelectAllHandler extends WidgetMethodHandler {
 										 */
 										focusControl.getDisplay().asyncExec(
 												new Runnable() {
+													@Override
 													public void run() {
 														ExceptionHandler
 																.getInstance()
@@ -131,7 +134,7 @@ public class SelectAllHandler extends WidgetMethodHandler {
 					}
 				} else if (numParams == 0) {
 					// This is a no-argument selectAll method.
-					methodToExecute.invoke(focusControl, null);
+					methodToExecute.invoke(focusControl);
 					focusControl.notifyListeners(SWT.Selection, null);
 
 				} else if (numParams == 1) {
@@ -139,7 +142,7 @@ public class SelectAllHandler extends WidgetMethodHandler {
 					final Method textLimitAccessor = focusControl.getClass()
 							.getMethod("getTextLimit", NO_PARAMETERS); //$NON-NLS-1$
 					final Integer textLimit = (Integer) textLimitAccessor
-							.invoke(focusControl, null);
+							.invoke(focusControl);
 					final Object[] parameters = { new Point(0, textLimit
 							.intValue()) };
 					methodToExecute.invoke(focusControl, parameters);
@@ -176,9 +179,10 @@ public class SelectAllHandler extends WidgetMethodHandler {
 
 	/**
 	 * Looks up the select all method on the given focus control.
-	 * 
+	 *
 	 * @return The method on the focus control; <code>null</code> if none.
 	 */
+	@Override
 	protected Method getMethodToExecute() {
 		Method method = super.getMethodToExecute();
 
@@ -202,6 +206,7 @@ public class SelectAllHandler extends WidgetMethodHandler {
 	 * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement,
 	 *      java.lang.String, java.lang.Object)
 	 */
+	@Override
 	public void setInitializationData(IConfigurationElement config,
 			String propertyName, Object data) {
 		// The name is always "selectAll".

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
@@ -25,6 +25,7 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
  * the concrete element and the UI 'widget' representing it in the UI.
  * </p>
  * @since 1.0
+ * @noimplement This interface is not intended to be implemented by clients.
  * <!-- end-model-doc -->
  *
  * <p>
@@ -40,13 +41,14 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.MUIElement#getCurSharedRef <em>Cur Shared Ref</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.MUIElement#getVisibleWhen <em>Visible When</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.MUIElement#getAccessibilityPhrase <em>Accessibility Phrase</em>}</li>
+ *   <li>{@link org.eclipse.e4.ui.model.application.ui.MUIElement#getLocalizedAccessibilityPhrase <em>Localized Accessibility Phrase</em>}</li>
  * </ul>
  * </p>
  *
  * @model abstract="true"
  * @generated
  */
-public interface MUIElement extends MApplicationElement {
+public interface MUIElement extends MApplicationElement, MLocalizable {
 	/**
 	 * Returns the value of the '<em><b>Widget</b></em>' attribute.
 	 * <!-- begin-user-doc -->
@@ -138,8 +140,8 @@ public interface MUIElement extends MApplicationElement {
 	 * <!-- begin-model-doc -->
 	 * <p>
 	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * Add more detailed documentation by editing this comment in
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore.
 	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
@@ -203,7 +205,7 @@ public interface MUIElement extends MApplicationElement {
 	 * <p>
 	 * This field is a reference to this element's container. Note that while this field is valid
 	 * for most UIElements there are a few (such as TrimBars and the Windows associated
-	 * with top level windows and perspectives) where this will return 'null' 
+	 * with top level windows and perspectives) where this will return 'null'
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Parent</em>' container reference.
@@ -290,8 +292,8 @@ public interface MUIElement extends MApplicationElement {
 	 * <!-- begin-model-doc -->
 	 * <p>
 	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * Add more detailed documentation by editing this comment in
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore.
 	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
@@ -341,17 +343,11 @@ public interface MUIElement extends MApplicationElement {
 	void setAccessibilityPhrase(String value);
 
 	/**
+	 * Returns the value of the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
-	 * <p>
-	 * This field is intended to allow enhanced support for accessibility by providing the 
-	 * ability to have a screen reader 'say' this phrase along with its normal output.
-	 * This is currently unused in teh base SWT renderer but is available for use by
-	 * other rendering platforms...
-	 * </p>
-	 * <!-- end-model-doc -->
-	 * @model kind="operation"
+	 * @return the value of the '<em>Localized Accessibility Phrase</em>' attribute.
+	 * @model transient="true" changeable="false" volatile="true" derived="true"
 	 * @generated
 	 */
 	String getLocalizedAccessibilityPhrase();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 Adobe Systems, Inc. and others.
+ * Copyright (c) 2008, 2014 Adobe Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collections;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -77,10 +76,10 @@ import org.osgi.service.event.EventHandler;
  * redirects the standard MacOS X "About", "Preferences...", and "Quit" menu
  * items to link them to the corresponding workbench commands, as well as
  * hooking in Close-Dialog behavior.
- * 
+ *
  * This functionality uses Cocoa-specific natives as SWT doesn't provide an
  * abstraction for the application menu.
- * 
+ *
  * @since 1.0
  */
 public class CocoaUIHandler {
@@ -131,7 +130,7 @@ public class CocoaUIHandler {
 	private EventHandler tagListener;
 
 	/**
-	 * 
+	 *
 	 */
 	private void registerSelectors() {
 		try {
@@ -163,7 +162,7 @@ public class CocoaUIHandler {
 		// call getAddress
 		Method getAddress = Callback.class
 				.getMethod("getAddress", new Class[0]); //$NON-NLS-1$
-		Object object = getAddress.invoke(proc3Args, null);
+		Object object = getAddress.invoke(proc3Args);
 		long proc3 = convertToLong(object);
 		if (proc3 == 0)
 			SWT.error(SWT.ERROR_NO_MORE_CALLBACKS);
@@ -431,7 +430,7 @@ public class CocoaUIHandler {
 	/**
 	 * Modify the given workbench window shell bits to show the tool bar toggle
 	 * button.
-	 * 
+	 *
 	 * @param window
 	 *            the window to modify
 	 * @since 3.2
@@ -593,7 +592,7 @@ public class CocoaUIHandler {
 	/**
 	 * Locate an action (a menu item, actually) with the given id in the current
 	 * menu bar and run it.
-	 * 
+	 *
 	 * @param actionId
 	 *            the action to find
 	 * @return true if an action was found, false otherwise
@@ -697,7 +696,7 @@ public class CocoaUIHandler {
 
 	/**
 	 * Delegate to the handler for the provided command id.
-	 * 
+	 *
 	 * @param commandId
 	 * @return true if the command was found, false otherwise
 	 */
@@ -706,7 +705,7 @@ public class CocoaUIHandler {
 			return false;
 		}
 		ParameterizedCommand cmd = commandService.createCommand(commandId,
-				Collections.emptyMap());
+				null);
 		if (cmd == null) {
 			return false;
 		}
@@ -721,7 +720,7 @@ public class CocoaUIHandler {
 	 * Find the action with the given ID by recursively crawling the provided
 	 * menu manager. If the action cannot be found <code>null</code> is
 	 * returned.
-	 * 
+	 *
 	 * @param actionId
 	 *            the id to search for
 	 * @param menu

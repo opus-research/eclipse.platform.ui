@@ -28,11 +28,7 @@ public class DecoratorTableView extends DecoratorTestPart {
 		super();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
-	 */
+	@Override
 	public void createPartControl(Composite parent) {
 		viewer = new TableViewer(parent);
 
@@ -48,16 +44,12 @@ public class DecoratorTableView extends DecoratorTestPart {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IWorkbenchPart#setFocus()
-	 */
+	@Override
 	public void setFocus() {
 		// XXX Auto-generated method stub
 
 	}
 
-	
+
 
 }

@@ -65,7 +65,7 @@ import org.eclipse.ui.menus.IMenuService;
 
 /**
  * @since 3.5
- * 
+ *
  */
 public class WorkbenchMenuService implements IMenuService {
 
@@ -92,11 +92,12 @@ public class WorkbenchMenuService implements IMenuService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.services.IServiceWithSources#addSourceProvider(org.eclipse
 	 * .ui.ISourceProvider)
 	 */
+	@Override
 	public void addSourceProvider(ISourceProvider provider) {
 		// TODO Auto-generated method stub
 
@@ -104,11 +105,12 @@ public class WorkbenchMenuService implements IMenuService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.services.IServiceWithSources#removeSourceProvider(org.
 	 * eclipse.ui.ISourceProvider)
 	 */
+	@Override
 	public void removeSourceProvider(ISourceProvider provider) {
 		// TODO Auto-generated method stub
 
@@ -116,9 +118,10 @@ public class WorkbenchMenuService implements IMenuService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.services.IDisposable#dispose()
 	 */
+	@Override
 	public void dispose() {
 		persistence.dispose();
 	}
@@ -129,11 +132,12 @@ public class WorkbenchMenuService implements IMenuService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.menus.IMenuService#addContributionFactory(org.eclipse.
 	 * ui.menus.AbstractContributionFactory)
 	 */
+	@Override
 	public void addContributionFactory(final AbstractContributionFactory factory) {
 		MenuLocationURI location = new MenuLocationURI(factory.getLocation());
 		if (location.getPath() == null || location.getPath().length() == 0) {
@@ -211,11 +215,12 @@ public class WorkbenchMenuService implements IMenuService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.menus.IMenuService#removeContributionFactory(org.eclipse
 	 * .ui.menus.AbstractContributionFactory)
 	 */
+	@Override
 	public void removeContributionFactory(AbstractContributionFactory factory) {
 		Object contribution;
 		if ((contribution = factoriesToContributions.remove(factory)) != null) {
@@ -273,11 +278,12 @@ public class WorkbenchMenuService implements IMenuService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.menus.IMenuService#populateContributionManager(org.eclipse
 	 * .jface.action.ContributionManager, java.lang.String)
 	 */
+	@Override
 	public void populateContributionManager(ContributionManager mgr, String location) {
 		MApplicationElement model = getPartToExtend();
 		if (model == null) {
@@ -458,11 +464,12 @@ public class WorkbenchMenuService implements IMenuService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.menus.IMenuService#releaseContributions(org.eclipse.jface
 	 * .action.ContributionManager)
 	 */
+	@Override
 	public void releaseContributions(ContributionManager mgr) {
 		if (mgr instanceof MenuManager) {
 			MenuManager menu = (MenuManager) mgr;
@@ -547,9 +554,10 @@ public class WorkbenchMenuService implements IMenuService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.menus.IMenuService#getCurrentState()
 	 */
+	@Override
 	public IEvaluationContext getCurrentState() {
 		if (legacyContext == null) {
 			legacyContext = new ExpressionContext(e4Context);

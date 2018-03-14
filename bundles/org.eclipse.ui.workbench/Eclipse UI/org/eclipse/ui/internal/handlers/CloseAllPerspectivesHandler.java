@@ -19,11 +19,12 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
  * Closes all the perspectives.
- * 
+ *
  * @since 3.4
  */
 public class CloseAllPerspectivesHandler extends AbstractHandler {
 
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
 		if (window != null) {

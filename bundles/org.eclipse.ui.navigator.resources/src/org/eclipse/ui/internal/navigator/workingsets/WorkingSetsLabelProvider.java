@@ -18,34 +18,40 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 /**
  * Provides a text label and icon for Working Sets.
- * 
+ *
  */
 public class WorkingSetsLabelProvider implements ILabelProvider {
 
 	private WorkbenchLabelProvider labelProvider = new WorkbenchLabelProvider();
 
+	@Override
 	public Image getImage(Object element) {
 		if (element instanceof IWorkingSet)
 			return labelProvider.getImage(element);
 		return null;
 	}
 
+	@Override
 	public String getText(Object element) {
 		if (element instanceof IWorkingSet)
 			return ((IWorkingSet) element).getLabel();
 		return null;
 	}
 
+	@Override
 	public void addListener(ILabelProviderListener listener) {
 	}
 
+	@Override
 	public void dispose() {
 	}
 
+	@Override
 	public boolean isLabelProperty(Object element, String property) {
 		return false;
 	}
 
+	@Override
 	public void removeListener(ILabelProviderListener listener) {
 
 	}

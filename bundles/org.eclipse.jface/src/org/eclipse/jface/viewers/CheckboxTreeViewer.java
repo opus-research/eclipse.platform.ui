@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 460380
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -28,11 +29,11 @@ import org.eclipse.swt.widgets.Widget;
 /**
  * A concrete tree-structured viewer based on an SWT <code>Tree</code>
  * control with checkboxes on each node.
- * <p>This class supports setting an {@link ICheckStateProvider} to 
+ * <p>This class supports setting an {@link ICheckStateProvider} to
  * set the checkbox states. To see standard SWT behavior, view
  * SWT Snippet274.</p>
  * <p>
- * This class is not intended to be subclassed outside the viewer framework. 
+ * This class is not intended to be subclassed outside the viewer framework.
  * It is designed to be instantiated with a pre-existing SWT tree control and configured
  * with a domain-specific content provider, label provider, element filter (optional),
  * and element sorter (optional).
@@ -45,7 +46,7 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
      * List of check state listeners (element type: <code>ICheckStateListener</code>).
      */
     private ListenerList checkStateListeners = new ListenerList();
-    
+
     /**
      * Provides the desired state of the check boxes.
      */
@@ -59,7 +60,7 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
     /**
      * Creates a tree viewer on a newly-created tree control under the given parent.
      * The tree control is created using the SWT style bits: <code>CHECK</code> and <code>BORDER</code>.
-     * The viewer has no input, no content provider, a default label provider, 
+     * The viewer has no input, no content provider, a default label provider,
      * no sorter, and no filters.
      *
      * @param parent the parent control
@@ -71,7 +72,7 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
     /**
      * Creates a tree viewer on a newly-created tree control under the given parent.
      * The tree control is created using the given SWT style bits, plus the <code>CHECK</code> style bit.
-     * The viewer has no input, no content provider, a default label provider, 
+     * The viewer has no input, no content provider, a default label provider,
      * no sorter, and no filters.
      *
      * @param parent the parent control
@@ -84,7 +85,7 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
     /**
      * Creates a tree viewer on the given tree control.
      * The <code>SWT.CHECK</code> style bit must be set on the given tree control.
-     * The viewer has no input, no content provider, a default label provider, 
+     * The viewer has no input, no content provider, a default label provider,
      * no sorter, and no filters.
      *
      * @param tree the tree control
@@ -93,18 +94,16 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
         super(tree);
     }
 
-    /* (non-Javadoc)
-     * Method declared on ICheckable.
-     */
-    public void addCheckStateListener(ICheckStateListener listener) {
+    @Override
+	public void addCheckStateListener(ICheckStateListener listener) {
         checkStateListeners.add(listener);
     }
-    
+
     /**
      * Sets the {@link ICheckStateProvider} for this {@link CheckboxTreeViewer}.
      * The check state provider will supply the logic for deciding whether the
-     * check box associated with each item should be checked, grayed or 
-     * unchecked. 
+     * check box associated with each item should be checked, grayed or
+     * unchecked.
      * @param checkStateProvider	The provider.
      * @since 3.5
      */
@@ -112,11 +111,12 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
     	this.checkStateProvider = checkStateProvider;
     	refresh();
     }
-    
+
     /*
      * Extends this method to update check box states.
      */
-    protected void doUpdateItem(Item item, Object element) {
+    @Override
+	protected void doUpdateItem(Item item, Object element) {
     	super.doUpdateItem(item, element);
     	if(!item.isDisposed() && checkStateProvider != null) {
 			setChecked(element, checkStateProvider.isChecked(element));
@@ -128,8 +128,8 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
      * Applies the checked and grayed states of the given widget and its
      * descendents.
      *
-     * @param checked a set of elements (element type: <code>Object</code>) 
-     * @param grayed a set of elements (element type: <code>Object</code>) 
+     * @param checked a set of elements (element type: <code>Object</code>)
+     * @param grayed a set of elements (element type: <code>Object</code>)
      * @param widget the widget
      */
     private void applyState(CustomHashtable checked, CustomHashtable grayed,
@@ -162,7 +162,8 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
         for (int i = 0; i < array.length; i++) {
             final ICheckStateListener l = (ICheckStateListener) array[i];
             SafeRunnable.run(new SafeRunnable() {
-                public void run() {
+                @Override
+				public void run() {
                     l.checkStateChanged(event);
                 }
             });
@@ -174,8 +175,8 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
      * Gathers the checked and grayed states of the given widget and its
      * descendents.
      *
-     * @param checked a writable set of elements (element type: <code>Object</code>) 
-     * @param grayed a writable set of elements (element type: <code>Object</code>) 
+     * @param checked a writable set of elements (element type: <code>Object</code>)
+     * @param grayed a writable set of elements (element type: <code>Object</code>)
      * @param widget the widget
      */
     private void gatherState(CustomHashtable checked, CustomHashtable grayed,
@@ -199,10 +200,8 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on ICheckable.
-     */
-    public boolean getChecked(Object element) {
+    @Override
+	public boolean getChecked(Object element) {
         Widget widget = findItem(element);
         if (widget instanceof TreeItem) {
 			return ((TreeItem) widget).getChecked();
@@ -211,7 +210,7 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
     }
 
     /**
-     * Returns a list of checked elements in this viewer's tree, 
+     * Returns a list of checked elements in this viewer's tree,
      * including currently hidden ones that are marked as
      * checked but are under a collapsed ancestor.
      * <p>
@@ -246,7 +245,7 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
     }
 
     /**
-     * Returns a list of grayed elements in this viewer's tree, 
+     * Returns a list of grayed elements in this viewer's tree,
      * including currently hidden ones that are marked as
      * grayed but are under a collapsed ancestor.
      * <p>
@@ -264,10 +263,8 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
         return result.toArray();
     }
 
-    /* (non-Javadoc)
-     * Method declared on StructuredViewer.
-     */
-    protected void handleDoubleSelect(SelectionEvent event) {
+    @Override
+	protected void handleDoubleSelect(SelectionEvent event) {
 
         if (lastClickedItem != null) {
             TreeItem item = lastClickedItem;
@@ -284,10 +281,8 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
 		}
     }
 
-    /* (non-Javadoc)
-     * Method declared on StructuredViewer.
-     */
-    protected void handleSelect(SelectionEvent event) {
+    @Override
+	protected void handleSelect(SelectionEvent event) {
 
         lastClickedItem = null;
         if (event.detail == SWT.CHECK) {
@@ -390,22 +385,20 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on Viewer.
-     */
-    protected void preservingSelection(Runnable updateCode) {
+    @Override
+	protected void preservingSelection(Runnable updateCode) {
     	if (!getPreserveSelection()) {
     		return;
     	}
     	//If a check provider is present, it determines the state across input
     	//changes.
     	if(checkStateProvider != null) {
-    		//Try to preserve the selection, let the ICheckProvider manage 
+    		//Try to preserve the selection, let the ICheckProvider manage
     		//the check states
     		super.preservingSelection(updateCode);
     		return;
     	}
-    	
+
     	//Preserve checked items
         int n = getItemCount(getControl());
         CustomHashtable checkedNodes = newHashtable(n * 2 + 1);
@@ -418,34 +411,33 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
         applyState(checkedNodes, grayedNodes, getControl());
     }
 
-    /* (non-Javadoc)
-     * Method declared on ICheckable.
-     */
-    public void removeCheckStateListener(ICheckStateListener listener) {
+    @Override
+	public void removeCheckStateListener(ICheckStateListener listener) {
         checkStateListeners.remove(listener);
     }
 
-    /* (non-Javadoc)
-     * Method declared on ICheckable.
-     */
-    public boolean setChecked(Object element, boolean state) {
+    @Override
+	public boolean setChecked(Object element, boolean state) {
         Assert.isNotNull(element);
         Widget widget = internalExpand(element, false);
         if (widget instanceof TreeItem) {
             ((TreeItem) widget).setChecked(state);
             return true;
-        }
+		}
         return false;
     }
 
     /**
-     * Sets the checked state for the children of the given item.
-     *
-     * @param item the item
-     * @param state <code>true</code> if the item should be checked,
-     *  and <code>false</code> if it should be unchecked
-     */
-    private void setCheckedChildren(Item item, boolean state) {
+	 * Sets the checked state for the children of the given item.
+	 *
+	 * @param item
+	 *            the item
+	 * @param state
+	 *            <code>true</code> if the item should be checked, and
+	 *            <code>false</code> if it should be unchecked
+	 * @since 3.11
+	 */
+	protected void setCheckedChildren(Item item, boolean state) {
         createChildren(item);
         Item[] items = getChildren(item);
         if (items != null) {
@@ -494,7 +486,7 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
      * @param element the element
      * @param state <code>true</code> if the item should be grayed,
      *  and <code>false</code> if it should be ungrayed
-     * @return <code>true</code> if the gray state could be set, 
+     * @return <code>true</code> if the gray state could be set,
      *  and <code>false</code> otherwise
      */
     public boolean setGrayed(Object element, boolean state) {
@@ -593,7 +585,7 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
      * @param element the element
      * @param state <code>true</code> if the item should be checked,
      *  and <code>false</code> if it should be unchecked
-     * @return <code>true</code> if the checked state could be set, 
+     * @return <code>true</code> if the checked state could be set,
      *  and <code>false</code> otherwise
      */
     public boolean setSubtreeChecked(Object element, boolean state) {
@@ -619,13 +611,14 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
      * @deprecated as this method only checks or unchecks visible items
      * is is recommended that {@link #setSubtreeChecked(Object, boolean)}
      * is used instead.
-     * @see #setSubtreeChecked(Object, boolean) 
-     *  
+     * @see #setSubtreeChecked(Object, boolean)
+     *
      *  @since 3.2
      */
+	@Deprecated
 	public void setAllChecked(boolean state) {
 		setAllChecked(state,  getTree().getItems());
-		
+
 	}
 
 	/**
@@ -635,14 +628,16 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
 	 * @deprecated
 	 * @see #setAllChecked(boolean)
 	 */
+	@Deprecated
 	private void setAllChecked(boolean state, TreeItem[] items) {
 		for (int i = 0; i < items.length; i++) {
-			items[i].setChecked(state);			
+			items[i].setChecked(state);
 			TreeItem[] children = items[i].getItems();
 			setAllChecked(state, children);
 		}
 	}
-	
+
+	@Override
 	boolean optionallyPruneChildren(Item item, Object element) {
 		return false;
 	}

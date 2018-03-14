@@ -22,15 +22,16 @@ import org.eclipse.ui.contexts.IContextService;
 
 public class ContextIdValues implements IParameterValues {
 
+	@Override
 	public Map getParameterValues() {
 		Map values = new HashMap();
 
-		IContextService contextService = (IContextService) PlatformUI
+		IContextService contextService = PlatformUI
 				.getWorkbench().getService(IContextService.class);
 		Context[] definedContexts = contextService.getDefinedContexts();
 		try {
-			for (int i = 0; i < definedContexts.length; i++) {
-				values.put(definedContexts[i].getName(), definedContexts[i]
+			for (Context definedContext : definedContexts) {
+				values.put(definedContext.getName(), definedContext
 						.getId());
 			}
 		} catch (NotDefinedException e) {

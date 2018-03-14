@@ -28,7 +28,7 @@ import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
 
 /**
  * Workbench implementation of the trigger point manager.
- * 
+ *
  * @since 3.1
  */
 public class TriggerPointManager implements ITriggerPointManager, IExtensionChangeHandler {
@@ -36,7 +36,7 @@ public class TriggerPointManager implements ITriggerPointManager, IExtensionChan
     private HashMap triggerMap = new HashMap();
 
     /**
-     * 
+     *
      */
     public TriggerPointManager() {
         super();
@@ -45,19 +45,21 @@ public class TriggerPointManager implements ITriggerPointManager, IExtensionChan
 
                     /*
                      * (non-Javadoc)
-                     * 
+                     *
                      * @see org.eclipse.ui.activities.ITriggerPoint#getId()
                      */
-                    public String getId() {
+                    @Override
+					public String getId() {
                         return ITriggerPointManager.UNKNOWN_TRIGGER_POINT_ID;
                     }
 
                     /*
                      * (non-Javadoc)
-                     * 
+                     *
                      * @see org.eclipse.ui.activities.ITriggerPoint#getStringHint(java.lang.String)
                      */
-                    public String getStringHint(String key) {
+                    @Override
+					public String getStringHint(String key) {
                         if (ITriggerPoint.HINT_INTERACTIVE.equals(key)) {
                             // TODO: change to false when we have mapped our
                             // trigger points
@@ -68,10 +70,11 @@ public class TriggerPointManager implements ITriggerPointManager, IExtensionChan
 
                     /*
                      * (non-Javadoc)
-                     * 
+                     *
                      * @see org.eclipse.ui.activities.ITriggerPoint#getBooleanHint(java.lang.String)
                      */
-                    public boolean getBooleanHint(String key) {
+                    @Override
+					public boolean getBooleanHint(String key) {
                         if (ITriggerPoint.HINT_INTERACTIVE.equals(key)) {
                             // TODO: change to false when we have mapped our
                             // trigger points
@@ -93,29 +96,32 @@ public class TriggerPointManager implements ITriggerPointManager, IExtensionChan
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ui.activities.ITriggerPointManager#getTriggerPoint(java.lang.String)
      */
-    public ITriggerPoint getTriggerPoint(String id) {
+    @Override
+	public ITriggerPoint getTriggerPoint(String id) {
         return (ITriggerPoint) triggerMap.get(id);
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ui.activities.ITriggerPointManager#getDefinedTriggerPointIds()
      */
-    public Set getDefinedTriggerPointIds() {
+    @Override
+	public Set getDefinedTriggerPointIds() {
         return triggerMap.entrySet();
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionRemovalHandler#removeInstance(org.eclipse.core.runtime.IExtension,
      *      java.lang.Object[])
      */
-    public void removeExtension(IExtension extension, Object[] objects) {
+    @Override
+	public void removeExtension(IExtension extension, Object[] objects) {
         for (int i = 0; i < objects.length; i++) {
             Object object = objects[i];
             if (object instanceof RegistryTriggerPoint) {
@@ -126,11 +132,12 @@ public class TriggerPointManager implements ITriggerPointManager, IExtensionChan
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionAdditionHandler#addInstance(org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker,
      *      org.eclipse.core.runtime.IExtension)
      */
-    public void addExtension(IExtensionTracker tracker, IExtension extension) {
+    @Override
+	public void addExtension(IExtensionTracker tracker, IExtension extension) {
         IConfigurationElement[] elements = extension.getConfigurationElements();
         for (int i = 0; i < elements.length; i++) {
             IConfigurationElement element = elements[i];
