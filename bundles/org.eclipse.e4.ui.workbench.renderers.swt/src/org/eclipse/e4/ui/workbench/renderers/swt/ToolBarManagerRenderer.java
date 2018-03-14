@@ -100,7 +100,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	IEventBroker eventBroker;
 	private EventHandler itemUpdater = new EventHandler() {
 		public void handleEvent(Event event) {
-			// Ensure that this event is for a MToolBarElement
+			// Ensure that this event is for a MMenuItem
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBarElement))
 				return;
 
@@ -114,13 +114,11 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 			String attName = (String) event
 					.getProperty(UIEvents.EventTags.ATTNAME);
-			if (UIEvents.UILabel.LABEL.equals(attName)
-					|| UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
+			if (UIEvents.UILabel.LABEL.equals(attName)) {
 				ici.update();
 			} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
 				ici.update();
-			} else if (UIEvents.UILabel.TOOLTIP.equals(attName)
-					|| UIEvents.UILabel.LOCALIZED_TOOLTIP.equals(attName)) {
+			} else if (UIEvents.UILabel.TOOLTIP.equals(attName)) {
 				ici.update();
 			}
 		}
@@ -188,7 +186,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 	private EventHandler selectionUpdater = new EventHandler() {
 		public void handleEvent(Event event) {
-			// Ensure that this event is for a MToolBarElement
+			// Ensure that this event is for a MToolItem
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBarElement))
 				return;
 
@@ -281,6 +279,13 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		eventBroker.unsubscribe(childAdditionUpdater);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#createWidget
+	 * (org.eclipse.e4.ui.model.application.ui.MUIElement, java.lang.Object)
+	 */
 	@Override
 	public Object createWidget(final MUIElement element, Object parent) {
 		if (!(element instanceof MToolBar) || !(parent instanceof Composite))
@@ -315,8 +320,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	}
 
 	/**
-	 * @param toolbarModel
-	 * @param elementId
+	 * @param element
 	 */
 	public void processContribution(MToolBar toolbarModel, String elementId) {
 		final ArrayList<MToolBarContribution> toContribute = new ArrayList<MToolBarContribution>();
@@ -400,6 +404,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	private ToolBar createToolbar(final MUIElement element, Composite parent) {
 		int orientation = getOrientation(element);
 		int style = orientation | SWT.WRAP | SWT.FLAT | SWT.RIGHT;
+
 		ToolBarManager manager = getManager((MToolBar) element);
 		if (manager == null) {
 			manager = new ToolBarManager(style);
@@ -482,6 +487,13 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		return SWT.HORIZONTAL;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#processContents
+	 * (org.eclipse.e4.ui.model.application.ui.MElementContainer)
+	 */
 	@Override
 	public void processContents(MElementContainer<MUIElement> container) {
 		// I can either simply stop processing, or we can walk the model
