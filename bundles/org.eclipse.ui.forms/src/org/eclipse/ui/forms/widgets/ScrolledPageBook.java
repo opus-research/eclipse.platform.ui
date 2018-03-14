@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2007 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,10 +10,13 @@
  *******************************************************************************/
 package org.eclipse.ui.forms.widgets;
 import java.util.Hashtable;
+
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.internal.forms.widgets.WrappedPageBook;
 /**
  * ScrolledPageBook is a class that is capable of stacking several composites
@@ -24,7 +27,7 @@ import org.eclipse.ui.internal.forms.widgets.WrappedPageBook;
  */
 public class ScrolledPageBook extends SharedScrolledComposite {
 	private WrappedPageBook pageBook;
-	private Hashtable pages;
+	private Hashtable<Object, Control> pages;
 	private Composite emptyPage;
 	private Control currentPage;
 	/**
@@ -48,19 +51,17 @@ public class ScrolledPageBook extends SharedScrolledComposite {
 		super(parent, style);
 		pageBook = new WrappedPageBook(this, SWT.NULL);
 		setContent(pageBook);
-		pages = new Hashtable();
+		pages = new Hashtable<>();
 		setExpandHorizontal(true);
 		setExpandVertical(true);
-		this.addListener(SWT.Traverse, new Listener() {
-			public void handleEvent(Event e) {
-				switch (e.detail) {
-					case SWT.TRAVERSE_ESCAPE :
-					case SWT.TRAVERSE_RETURN :
-					case SWT.TRAVERSE_TAB_NEXT :
-					case SWT.TRAVERSE_TAB_PREVIOUS :
-						e.doit = true;
-						break;
-				}
+		this.addListener(SWT.Traverse, e -> {
+			switch (e.detail) {
+			case SWT.TRAVERSE_ESCAPE:
+			case SWT.TRAVERSE_RETURN:
+			case SWT.TRAVERSE_TAB_NEXT:
+			case SWT.TRAVERSE_TAB_PREVIOUS:
+				e.doit = true;
+				break;
 			}
 		});
 	}
@@ -75,6 +76,7 @@ public class ScrolledPageBook extends SharedScrolledComposite {
 	 * @param changed
 	 *            if <code>true</code>, do not use cached values
 	 */
+	@Override
 	public Point computeSize(int wHint, int hHint, boolean changed) {
 		Rectangle trim = computeTrim(0, 0, 10, 10);
 		return new Point(trim.width, trim.height);
@@ -146,7 +148,7 @@ public class ScrolledPageBook extends SharedScrolledComposite {
 	 *            after page removal.
 	 */
 	public void removePage(Object key, boolean showEmptyPage) {
-		Control page = (Control) pages.get(key);
+		Control page = pages.get(key);
 		if (page != null) {
 			pages.remove(key);
 			page.dispose();
@@ -162,7 +164,7 @@ public class ScrolledPageBook extends SharedScrolledComposite {
 	 *            the page key
 	 */
 	public void showPage(Object key) {
-		Control page = (Control) pages.get(key);
+		Control page = pages.get(key);
 		if (page != null) {
 			pageBook.showPage(page);
 			if (currentPage != null && currentPage != page) {
@@ -192,6 +194,7 @@ public class ScrolledPageBook extends SharedScrolledComposite {
 	/**
 	 * Sets focus on the current page if shown.
 	 */
+	@Override
 	public boolean setFocus() {
 		if (currentPage != null)
 			return currentPage.setFocus();

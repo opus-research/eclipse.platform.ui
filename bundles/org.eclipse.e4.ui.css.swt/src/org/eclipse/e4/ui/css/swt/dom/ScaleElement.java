@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 Angelo Zerr and others.
+ * Copyright (c) 2009, 2015 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,7 +38,9 @@ public class ScaleElement extends ControlElement {
 	public void initialize() {
 		super.initialize();
 
-		if (!dynamicEnabled) return;
+		if (!dynamicEnabled) {
+			return;
+		}
 
 		Scale scale = getScale();
 		scale.addSelectionListener(selectionListener);
@@ -48,7 +50,9 @@ public class ScaleElement extends ControlElement {
 	public void dispose() {
 		super.dispose();
 
-		if (!dynamicEnabled) return;
+		if (!dynamicEnabled) {
+			return;
+		}
 
 		Scale scale = getScale();
 		if (!scale.isDisposed()) {
@@ -56,10 +60,6 @@ public class ScaleElement extends ControlElement {
 		}
 	}
 
-	@Override
-	public String getAttribute(String attr) {
-		return super.getAttribute(attr);
-	}
 
 	protected Scale getScale() {
 		return (Scale) getNativeWidget();

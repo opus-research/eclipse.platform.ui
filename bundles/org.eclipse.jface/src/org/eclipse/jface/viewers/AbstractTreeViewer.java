@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -61,6 +61,10 @@ import org.eclipse.swt.widgets.Widget;
  * interfaces <code>ITreeContentProvider</code> or (as of 3.2, to support
  * multiple equal elements) <code>ITreePathContentProvider</code>.
  * </p>
+ * <p>
+ * <strong> This class is not intended to be subclassed outside of the JFace
+ * viewers framework.</strong>
+ * <p>
  *
  * @see TreeViewer
  */
@@ -79,7 +83,7 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	 * List of registered tree listeners (element type:
 	 * <code>TreeListener</code>).
 	 */
-	private ListenerList treeListeners = new ListenerList();
+	private ListenerList<ITreeViewerListener> treeListeners = new ListenerList<>();
 
 	/**
 	 * The level to which the tree is automatically expanded each time the
@@ -788,38 +792,34 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 				}
 			}
 
-			BusyIndicator.showWhile(widget.getDisplay(), new Runnable() {
-				@Override
-				public void run() {
-					// fix for PR 1FW89L7:
-					// don't complain and remove all "dummies" ...
-					if (tis != null) {
-						for (int i = 0; i < tis.length; i++) {
-							if (tis[i].getData() != null) {
-								disassociate(tis[i]);
-								Assert.isTrue(tis[i].getData() == null,
-										"Second or later child is non -null");//$NON-NLS-1$
+			BusyIndicator.showWhile(widget.getDisplay(), () -> {
+				// fix for PR 1FW89L7:
+				// don't complain and remove all "dummies" ...
+				if (tis != null) {
+					for (int i1 = 0; i1 < tis.length; i1++) {
+						if (tis[i1].getData() != null) {
+							disassociate(tis[i1]);
+							Assert.isTrue(tis[i1].getData() == null,
+									"Second or later child is non -null");//$NON-NLS-1$
 
-							}
-							tis[i].dispose();
 						}
-					}
-					Object d = widget.getData();
-					if (d != null) {
-						Object parentElement = d;
-						Object[] children;
-						if (isTreePathContentProvider() && widget instanceof Item) {
-							TreePath path = getTreePathFromItem((Item) widget);
-							children = getSortedChildren(path);
-						} else {
-							children = getSortedChildren(parentElement);
-						}
-						for (int i = 0; i < children.length; i++) {
-							createTreeItem(widget, children[i], -1);
-						}
+						tis[i1].dispose();
 					}
 				}
-
+				Object d = widget.getData();
+				if (d != null) {
+					Object parentElement = d;
+					Object[] children;
+					if (isTreePathContentProvider() && widget instanceof Item) {
+						TreePath path = getTreePathFromItem((Item) widget);
+						children = getSortedChildren(path);
+					} else {
+						children = getSortedChildren(parentElement);
+					}
+					for (int i2 = 0; i2 < children.length; i2++) {
+						createTreeItem(widget, children[i2], -1);
+					}
+				}
 			});
 		} finally {
 			setBusy(oldBusy);
@@ -1081,12 +1081,10 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	 * @see ITreeViewerListener#treeCollapsed
 	 */
 	protected void fireTreeCollapsed(final TreeExpansionEvent event) {
-		Object[] listeners = treeListeners.getListeners();
 		boolean oldBusy = isBusy();
 		setBusy(true);
 		try {
-			for (int i = 0; i < listeners.length; ++i) {
-				final ITreeViewerListener l = (ITreeViewerListener) listeners[i];
+			for (ITreeViewerListener l : treeListeners) {
 				SafeRunnable.run(new SafeRunnable() {
 					@Override
 					public void run() {
@@ -1108,12 +1106,10 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	 * @see ITreeViewerListener#treeExpanded
 	 */
 	protected void fireTreeExpanded(final TreeExpansionEvent event) {
-		Object[] listeners = treeListeners.getListeners();
 		boolean oldBusy = isBusy();
 		setBusy(true);
 		try {
-			for (int i = 0; i < listeners.length; ++i) {
-				final ITreeViewerListener l = (ITreeViewerListener) listeners[i];
+			for (ITreeViewerListener l : treeListeners) {
 				SafeRunnable.run(new SafeRunnable() {
 					@Override
 					public void run() {
@@ -1514,19 +1510,16 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 
 	@Override
 	protected void inputChanged(Object input, Object oldInput) {
-		preservingSelection(new Runnable() {
-			@Override
-			public void run() {
-	            Control tree = getControl();
-	            tree.setRedraw(false);
-	            try {
-	                removeAll(tree);
-	                tree.setData(getRoot());
-	                internalInitializeTree(tree);
-	            } finally {
-	                tree.setRedraw(true);
-	            }
-			}
+		preservingSelection(() -> {
+		    Control tree = getControl();
+		    tree.setRedraw(false);
+		    try {
+		        removeAll(tree);
+		        tree.setData(getRoot());
+		        internalInitializeTree(tree);
+		    } finally {
+		        tree.setRedraw(true);
+		    }
 		});
 	}
 
@@ -2212,12 +2205,7 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 		}
 		if (checkBusy())
 			return;
-		preservingSelection(new Runnable() {
-			@Override
-			public void run() {
-				internalRemove(elementsOrTreePaths);
-			}
-		});
+		preservingSelection(() -> internalRemove(elementsOrTreePaths));
 	}
 
 	/**
@@ -2245,12 +2233,7 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 		}
 		if (checkBusy())
 			return;
-		preservingSelection(new Runnable() {
-			@Override
-			public void run() {
-				internalRemove(parent, elements);
-			}
-		});
+		preservingSelection(() -> internalRemove(parent, elements));
 	}
 
 	/**
@@ -2368,9 +2351,10 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	}
 
 	/**
-	 * The <code>AbstractTreeViewer</code> implementation of this method
-	 * checks to ensure that the content provider is an
-	 * <code>ITreeContentProvider</code>.
+	 * Sets the content provider used by this <code>AbstractTreeViewer</code>.
+	 * <p>
+	 * Content providers for abstract tree viewers must implement either
+	 * {@link ITreeContentProvider} or {@link ITreePathContentProvider}.
 	 */
 	@Override
 	public void setContentProvider(IContentProvider provider) {
@@ -2381,7 +2365,9 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	@Override
 	protected void assertContentProviderType(IContentProvider provider) {
 		Assert.isTrue(provider instanceof ITreeContentProvider
-				|| provider instanceof ITreePathContentProvider);
+				|| provider instanceof ITreePathContentProvider,
+				"Instances of AbstractTreeViewer must have a content provider " //$NON-NLS-1$
+						+ "of type ITreeContentProvider or ITreePathContentProvider"); //$NON-NLS-1$
 	}
 
 	/**

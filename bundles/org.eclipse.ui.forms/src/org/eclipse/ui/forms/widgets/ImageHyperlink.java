@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,8 +12,6 @@
 package org.eclipse.ui.forms.widgets;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -76,19 +74,13 @@ public class ImageHyperlink extends Hyperlink {
 	public ImageHyperlink(Composite parent, int style) {
 		super(parent, removeAlignment(style));
 		extractAlignment(style);
-		addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(DisposeEvent e) {
-				if (disabledImage != null)
-					disabledImage.dispose();
-			}
+		addDisposeListener(e -> {
+			if (disabledImage != null)
+				disabledImage.dispose();
 		});
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.forms.widgets.AbstractHyperlink#paintHyperlink(org.eclipse.swt.events.PaintEvent)
-	 */
+	@Override
 	protected void paintHyperlink(GC gc) {
 		paintHyperlink(gc, getClientArea());
 	}
@@ -161,6 +153,7 @@ public class ImageHyperlink extends Hyperlink {
 	 *            if <code>true</code>, any cached layout data should be
 	 *            computed anew
 	 */
+	@Override
 	public Point computeSize(int wHint, int hHint, boolean changed) {
 		checkWidget();
 		Point isize = computeMaxImageSize();
@@ -185,16 +178,19 @@ public class ImageHyperlink extends Hyperlink {
 		return new Point(width, height);
 	}
 
+	@Override
 	protected void handleEnter(Event e) {
 		state = HOVER;
 		super.handleEnter(e);
 	}
 
+	@Override
 	protected void handleExit(Event e) {
 		state = 0;
 		super.handleExit(e);
 	}
 
+	@Override
 	protected void handleActivate(Event e) {
 		state &= ACTIVE;
 		redraw();
@@ -322,6 +318,7 @@ public class ImageHyperlink extends Hyperlink {
 		}
 	}
 
+	@Override
 	public void setEnabled(boolean enabled) {
 		if (!enabled && (disabledImage == null || disabledImage.isDisposed()) && image != null && !image.isDisposed()) {
 			disabledImage = new Image(image.getDevice(), image, SWT.IMAGE_DISABLE);

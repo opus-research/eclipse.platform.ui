@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2005 IBM Corporation and others.
+ * Copyright (c) 2003, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
 package org.eclipse.ui.internal.browser;
 
 import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -39,15 +38,12 @@ public class BusyIndicator extends Canvas {
 
 		images = ImageResource.getBusyImages();
 
-		addPaintListener(new PaintListener() {
-			public void paintControl(PaintEvent event) {
-				onPaint(event);
-			}
-		});
+		addPaintListener(event -> onPaint(event));
 
 		image = images[0];
 	}
 
+	@Override
 	public Point computeSize(int wHint, int hHint, boolean changed) {
 		return new Point(25, 25);
 	}
@@ -62,19 +58,18 @@ public class BusyIndicator extends Canvas {
 		stop = false;
 		busyThread = new Thread() {
 			protected int count;
+			@Override
 			public void run() {
 				try {
 					count = 1;
 					while (!stop) {
-						Display.getDefault().syncExec(new Runnable() {
-							public void run() {
-								if (!stop) {
-									if (count < 13)
-										setImage(images[count]);
-									count++;
-									if (count > 12)
-										count = 1;
-								}
+						Display.getDefault().syncExec(() -> {
+							if (!stop) {
+								if (count < 13)
+									setImage(images[count]);
+								count++;
+								if (count > 12)
+									count = 1;
 							}
 						});
 						try {
@@ -85,6 +80,7 @@ public class BusyIndicator extends Canvas {
 					}
 					if (busyThread == null)
 						Display.getDefault().syncExec(new Thread() {
+							@Override
 							public void run() {
 								setImage(images[0]);
 							}
@@ -100,6 +96,7 @@ public class BusyIndicator extends Canvas {
 		busyThread.start();
 	}
 
+	@Override
 	public void dispose() {
 		stop = true;
 		busyThread = null;

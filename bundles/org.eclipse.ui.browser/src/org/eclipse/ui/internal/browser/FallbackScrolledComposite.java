@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2005 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,8 +18,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ScrollBar;
 
 public abstract class FallbackScrolledComposite extends ScrolledComposite {
@@ -37,11 +35,7 @@ public abstract class FallbackScrolledComposite extends ScrolledComposite {
      */
     public FallbackScrolledComposite(Composite parent, int style) {
         super(parent, style);
-        addListener(SWT.Resize, new Listener() {
-            public void handleEvent(Event e) {
-                reflow(true);
-            }
-        });
+		addListener(SWT.Resize, e -> reflow(true));
         setExpandVertical(true);
         setExpandHorizontal(true);
         initializeScrollBars();
@@ -53,7 +47,8 @@ public abstract class FallbackScrolledComposite extends ScrolledComposite {
      * @param fg
      *            the new foreground color
      */
-    public void setForeground(Color fg) {
+    @Override
+	public void setForeground(Color fg) {
         super.setForeground(fg);
         if (getContent() != null)
             getContent().setForeground(fg);
@@ -65,7 +60,8 @@ public abstract class FallbackScrolledComposite extends ScrolledComposite {
      * @param bg
      *            the new background color
      */
-    public void setBackground(Color bg) {
+    @Override
+	public void setBackground(Color bg) {
         super.setBackground(bg);
         if (getContent() != null)
             getContent().setBackground(bg);
@@ -75,7 +71,8 @@ public abstract class FallbackScrolledComposite extends ScrolledComposite {
      * Sets the font of the form. This font will be used to render the title
      * text. It will not affect the body.
      */
-    public void setFont(Font font) {
+    @Override
+	public void setFont(Font font) {
         super.setFont(font);
         if (getContent() != null)
             getContent().setFont(font);
@@ -84,7 +81,8 @@ public abstract class FallbackScrolledComposite extends ScrolledComposite {
     /**
      * Overrides 'super' to pass the proper colors and font
      */
-    public void setContent(Control content) {
+    @Override
+	public void setContent(Control content) {
         super.setContent(content);
         if (content != null) {
             content.setForeground(getForeground());
@@ -96,7 +94,8 @@ public abstract class FallbackScrolledComposite extends ScrolledComposite {
     /**
      * If content is set, transfers focus to the content.
      */
-    public boolean setFocus() {
+    @Override
+	public boolean setFocus() {
         if (getContent() != null)
             return getContent().setFocus();
         return super.setFocus();

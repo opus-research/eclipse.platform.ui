@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: TestFactoryImpl.java,v 1.3 2010/06/04 20:22:20 johna Exp $
+ * $Id: TestFactoryImpl.java,v 1.3 2010, 2015/06/04 20:22:20 johna Exp $
  */
 package org.eclipse.e4.ui.tests.model.test.impl;
 
@@ -72,6 +72,7 @@ public class TestFactoryImpl extends EFactoryImpl implements MTestFactory {
 	 *
 	 * @generated
 	 */
+	@Override
 	public MTestHarness createTestHarness() {
 		TestHarnessImpl testHarness = new TestHarnessImpl();
 		return testHarness;
@@ -82,6 +83,7 @@ public class TestFactoryImpl extends EFactoryImpl implements MTestFactory {
 	 *
 	 * @generated
 	 */
+	@Override
 	public MTestPackage getTestPackage() {
 		return (MTestPackage) getEPackage();
 	}

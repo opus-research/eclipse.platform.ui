@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@ package org.eclipse.ui.internal.forms.widgets;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -38,12 +38,15 @@ public class FormTextModel {
 	 */
 	public class ParseErrorHandler implements ErrorHandler {
 
+		@Override
 		public void error(SAXParseException arg0) throws SAXException {
 		}
 
+		@Override
 		public void fatalError(SAXParseException arg0) throws SAXException {
 		}
 
+		@Override
 		public void warning(SAXParseException arg0) throws SAXException {
 		}
 	}
@@ -53,7 +56,7 @@ public class FormTextModel {
 
 	private boolean whitespaceNormalized = true;
 
-	private Vector paragraphs;
+	private Vector<Paragraph> paragraphs;
 
 	private IFocusSelectable[] selectableSegments;
 
@@ -81,7 +84,7 @@ public class FormTextModel {
 	public Paragraph[] getParagraphs() {
 		if (paragraphs == null)
 			return new Paragraph[0];
-		return (Paragraph[]) paragraphs
+		return paragraphs
 				.toArray(new Paragraph[paragraphs.size()]);
 	}
 
@@ -90,7 +93,7 @@ public class FormTextModel {
 			return ""; //$NON-NLS-1$
 		StringBuffer sbuf = new StringBuffer();
 		for (int i = 0; i < paragraphs.size(); i++) {
-			Paragraph paragraph = (Paragraph) paragraphs.get(i);
+			Paragraph paragraph = paragraphs.get(i);
 			String text = paragraph.getAccessibleText();
 			sbuf.append(text);
 		}
@@ -105,13 +108,8 @@ public class FormTextModel {
 			reset();
 			return;
 		}
-		try {
-			InputStream stream = new ByteArrayInputStream(taggedText
-					.getBytes("UTF8")); //$NON-NLS-1$
-			parseInputStream(stream, expandURLs);
-		} catch (UnsupportedEncodingException e) {
-			SWT.error(SWT.ERROR_UNSUPPORTED_FORMAT, e);
-		}
+		InputStream stream = new ByteArrayInputStream(taggedText.getBytes(StandardCharsets.UTF_8));
+		parseInputStream(stream, expandURLs);
 	}
 
 	public void parseInputStream(InputStream is, boolean expandURLs) {
@@ -142,7 +140,7 @@ public class FormTextModel {
 		processSubnodes(paragraphs, children, expandURLs);
 	}
 
-	private void processSubnodes(Vector plist, NodeList children, boolean expandURLs) {
+	private void processSubnodes(Vector<Paragraph> plist, NodeList children, boolean expandURLs) {
 		for (int i = 0; i < children.getLength(); i++) {
 			Node child = children.item(i);
 			if (child.getNodeType() == Node.TEXT_NODE) {
@@ -343,11 +341,11 @@ public class FormTextModel {
 		if (align != null) {
 			String value = align.getNodeValue().toLowerCase();
 			if (value.equals("top")) //$NON-NLS-1$
-				segment.setVerticalAlignment(ImageSegment.TOP);
+				segment.setVerticalAlignment(ObjectSegment.TOP);
 			else if (value.equals("middle")) //$NON-NLS-1$
-				segment.setVerticalAlignment(ImageSegment.MIDDLE);
+				segment.setVerticalAlignment(ObjectSegment.MIDDLE);
 			else if (value.equals("bottom")) //$NON-NLS-1$
-				segment.setVerticalAlignment(ImageSegment.BOTTOM);
+				segment.setVerticalAlignment(ObjectSegment.BOTTOM);
 		}
 	}
 
@@ -577,7 +575,7 @@ public class FormTextModel {
 
 	private void reset() {
 		if (paragraphs == null)
-			paragraphs = new Vector();
+			paragraphs = new Vector<>();
 		paragraphs.clear();
 		selectedSegmentIndex = -1;
 		savedSelectedLinkIndex = -1;
@@ -587,16 +585,16 @@ public class FormTextModel {
 	IFocusSelectable[] getFocusSelectableSegments() {
 		if (selectableSegments != null || paragraphs == null)
 			return selectableSegments;
-		Vector result = new Vector();
+		Vector<ParagraphSegment> result = new Vector<>();
 		for (int i = 0; i < paragraphs.size(); i++) {
-			Paragraph p = (Paragraph) paragraphs.get(i);
+			Paragraph p = paragraphs.get(i);
 			ParagraphSegment[] segments = p.getSegments();
-			for (int j = 0; j < segments.length; j++) {
-				if (segments[j] instanceof IFocusSelectable)
-					result.add(segments[j]);
+			for (ParagraphSegment segment : segments) {
+				if (segment instanceof IFocusSelectable)
+					result.add(segment);
 			}
 		}
-		selectableSegments = (IFocusSelectable[]) result
+		selectableSegments = result
 				.toArray(new IFocusSelectable[result.size()]);
 		return selectableSegments;
 	}
@@ -613,8 +611,7 @@ public class FormTextModel {
 
 	public IHyperlinkSegment findHyperlinkAt(int x, int y) {
 		IFocusSelectable[] selectables = getFocusSelectableSegments();
-		for (int i = 0; i < selectables.length; i++) {
-			IFocusSelectable segment = selectables[i];
+		for (IFocusSelectable segment : selectables) {
 			if (segment instanceof IHyperlinkSegment) {
 				IHyperlinkSegment link = (IHyperlinkSegment)segment;
 				if (link.contains(x, y))
@@ -643,7 +640,7 @@ public class FormTextModel {
 
 	public ParagraphSegment findSegmentAt(int x, int y) {
 		for (int i = 0; i < paragraphs.size(); i++) {
-			Paragraph p = (Paragraph) paragraphs.get(i);
+			Paragraph p = paragraphs.get(i);
 			ParagraphSegment segment = p.findSegmentAt(x, y);
 			if (segment != null)
 				return segment;
@@ -653,7 +650,7 @@ public class FormTextModel {
 
 	public void clearCache(String fontId) {
 		for (int i = 0; i < paragraphs.size(); i++) {
-			Paragraph p = (Paragraph) paragraphs.get(i);
+			Paragraph p = paragraphs.get(i);
 			p.clearCache(fontId);
 		}
 	}
@@ -671,8 +668,8 @@ public class FormTextModel {
 	public boolean linkExists(IHyperlinkSegment link) {
 		if (selectableSegments==null)
 			return false;
-		for (int i=0; i<selectableSegments.length; i++) {
-			if (selectableSegments[i]==link)
+		for (IFocusSelectable selectableSegment : selectableSegments) {
+			if (selectableSegment==link)
 				return true;
 		}
 		return false;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,6 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 
 import org.eclipse.core.runtime.ListenerList;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.accessibility.ACC;
@@ -30,18 +29,14 @@ import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -61,7 +56,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.TypedListener;
-
 import org.eclipse.ui.forms.HyperlinkSettings;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.events.IHyperlinkListener;
@@ -202,9 +196,9 @@ public class FormText extends Canvas {
 
 	private FormTextModel model;
 
-	private ListenerList listeners;
+	private ListenerList<IHyperlinkListener> listeners;
 
-	private Hashtable resourceTable = new Hashtable();
+	private Hashtable<String, Object> resourceTable = new Hashtable<>();
 
 	private IHyperlinkSegment entered;
 
@@ -226,17 +220,17 @@ public class FormText extends Canvas {
 		public FormTextLayout() {
 		}
 
+		@Override
 		public int computeMaximumWidth(Composite parent, boolean changed) {
 			return computeSize(parent, SWT.DEFAULT, SWT.DEFAULT, changed).x;
 		}
 
+		@Override
 		public int computeMinimumWidth(Composite parent, boolean changed) {
 			return computeSize(parent, 5, SWT.DEFAULT, true).x;
 		}
 
-		/*
-		 * @see Layout#computeSize(Composite, int, int, boolean)
-		 */
+		@Override
 		public Point computeSize(Composite composite, int wHint, int hHint,
 				boolean changed) {
 			long start = 0;
@@ -282,8 +276,7 @@ public class FormText extends Canvas {
 				if (segments.length > 0) {
 					selectableInTheLastRow = false;
 					int pwidth = 0;
-					for (int j = 0; j < segments.length; j++) {
-						ParagraphSegment segment = segments[j];
+					for (ParagraphSegment segment : segments) {
 						segment.advanceLocator(gc, wHint, loc, resourceTable, false);
 						if (wHint != SWT.DEFAULT) {
 							width = Math.max(width, loc.width);
@@ -307,6 +300,7 @@ public class FormText extends Canvas {
 			return new Point(width, loc.y);
 		}
 
+		@Override
 		protected void layout(Composite composite, boolean flushCache) {
 			long start = 0;
 
@@ -367,50 +361,41 @@ public class FormText extends Canvas {
 		super(parent, SWT.NO_BACKGROUND | SWT.WRAP | style);
 		setLayout(new FormTextLayout());
 		model = new FormTextModel();
-		addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(DisposeEvent e) {
-				model.dispose();
-				disposeResourceTable(true);
+		addDisposeListener(e -> {
+			model.dispose();
+			disposeResourceTable(true);
+		});
+		addPaintListener(e -> paint(e));
+		addListener(SWT.KeyDown, e -> {
+			if (e.character == '\r') {
+				activateSelectedLink();
+				return;
 			}
 		});
-		addPaintListener(new PaintListener() {
-			public void paintControl(PaintEvent e) {
-				paint(e);
+		addListener(SWT.Traverse, e -> {
+			if (DEBUG_FOCUS)
+				System.out.println("Traversal: " + e); //$NON-NLS-1$
+			switch (e.detail) {
+			case SWT.TRAVERSE_PAGE_NEXT:
+			case SWT.TRAVERSE_PAGE_PREVIOUS:
+			case SWT.TRAVERSE_ARROW_NEXT:
+			case SWT.TRAVERSE_ARROW_PREVIOUS:
+				e.doit = false;
+				return;
 			}
-		});
-		addListener(SWT.KeyDown, new Listener() {
-			public void handleEvent(Event e) {
-				if (e.character == '\r') {
-					activateSelectedLink();
-					return;
-				}
+			if (!model.hasFocusSegments()) {
+				e.doit = true;
+				return;
 			}
-		});
-		addListener(SWT.Traverse, new Listener() {
-			public void handleEvent(Event e) {
-				if (DEBUG_FOCUS)
-					System.out.println("Traversal: " + e); //$NON-NLS-1$
-				switch (e.detail) {
-				case SWT.TRAVERSE_PAGE_NEXT:
-				case SWT.TRAVERSE_PAGE_PREVIOUS:
-				case SWT.TRAVERSE_ARROW_NEXT:
-				case SWT.TRAVERSE_ARROW_PREVIOUS:
-					e.doit = false;
-					return;
-				}
-				if (!model.hasFocusSegments()) {
-					e.doit = true;
-					return;
-				}
-				if (e.detail == SWT.TRAVERSE_TAB_NEXT)
-					e.doit = advance(true);
-				else if (e.detail == SWT.TRAVERSE_TAB_PREVIOUS)
-					e.doit = advance(false);
-				else if (e.detail != SWT.TRAVERSE_RETURN)
-					e.doit = true;
-			}
+			if (e.detail == SWT.TRAVERSE_TAB_NEXT)
+				e.doit = advance(true);
+			else if (e.detail == SWT.TRAVERSE_TAB_PREVIOUS)
+				e.doit = advance(false);
+			else if (e.detail != SWT.TRAVERSE_RETURN)
+				e.doit = true;
 		});
 		addFocusListener(new FocusListener() {
+			@Override
 			public void focusGained(FocusEvent e) {
 				if (!hasFocus) {
 					hasFocus = true;
@@ -423,6 +408,7 @@ public class FormText extends Canvas {
 				}
 			}
 
+			@Override
 			public void focusLost(FocusEvent e) {
 				if (DEBUG_FOCUS) {
 					System.out.println("FormText: focus lost"); //$NON-NLS-1$
@@ -435,24 +421,29 @@ public class FormText extends Canvas {
 			}
 		});
 		addMouseListener(new MouseListener() {
+			@Override
 			public void mouseDoubleClick(MouseEvent e) {
 			}
 
+			@Override
 			public void mouseDown(MouseEvent e) {
 				// select a link
 				handleMouseClick(e, true);
 			}
 
+			@Override
 			public void mouseUp(MouseEvent e) {
 				// activate a link
 				handleMouseClick(e, false);
 			}
 		});
 		addMouseTrackListener(new MouseTrackListener() {
+			@Override
 			public void mouseEnter(MouseEvent e) {
 				handleMouseMove(e);
 			}
 
+			@Override
 			public void mouseExit(MouseEvent e) {
 				if (entered != null) {
 					exitLink(entered, e.stateMask);
@@ -462,15 +453,12 @@ public class FormText extends Canvas {
 				}
 			}
 
+			@Override
 			public void mouseHover(MouseEvent e) {
 				handleMouseHover(e);
 			}
 		});
-		addMouseMoveListener(new MouseMoveListener() {
-			public void mouseMove(MouseEvent e) {
-				handleMouseMove(e);
-			}
-		});
+		addMouseMoveListener(e -> handleMouseMove(e));
 		initAccessible();
 		ensureBoldFontPresent(getFont());
 		createMenu();
@@ -495,6 +483,7 @@ public class FormText extends Canvas {
 	 *         <samp>false </samp> otherwise.
 	 * @deprecated not used any more - returns <code>false</code>
 	 */
+	@Deprecated
 	public boolean isLoading() {
 		return false;
 	}
@@ -506,6 +495,7 @@ public class FormText extends Canvas {
 	 * @return loading text message
 	 * @deprecated loading text is not used since 3.1
 	 */
+	@Deprecated
 	public String getLoadingText() {
 		return null;
 	}
@@ -520,6 +510,7 @@ public class FormText extends Canvas {
 	 *            loading text message
 	 * @deprecated use setText(loadingText, false, false);
 	 */
+	@Deprecated
 	public void setLoadingText(String loadingText) {
 		setText(loadingText, false, false);
 	}
@@ -641,6 +632,7 @@ public class FormText extends Canvas {
 	 * @param font
 	 *            the default font to use
 	 */
+	@Override
 	public void setFont(Font font) {
 		super.setFont(font);
 		model.clearCache(null);
@@ -702,43 +694,39 @@ public class FormText extends Canvas {
 		Paragraph[] paragraphs = model.getParagraphs();
 		if (paragraphs == null)
 			return;
-		Listener listener = new Listener() {
-			public void handleEvent(Event e) {
-				switch (e.type) {
-				case SWT.FocusIn:
-					if (!controlFocusTransfer)
-						syncControlSegmentFocus((Control) e.widget);
-					break;
-				case SWT.Traverse:
-					if (DEBUG_FOCUS)
-						System.out.println("Control traversal: " + e); //$NON-NLS-1$
-					switch (e.detail) {
-					case SWT.TRAVERSE_PAGE_NEXT:
-					case SWT.TRAVERSE_PAGE_PREVIOUS:
-					case SWT.TRAVERSE_ARROW_NEXT:
-					case SWT.TRAVERSE_ARROW_PREVIOUS:
-						e.doit = false;
-						return;
-					}
-					Control c = (Control) e.widget;
-					ControlSegment segment = (ControlSegment) c
-							.getData(CONTROL_KEY);
-					if (e.detail == SWT.TRAVERSE_TAB_NEXT)
-						e.doit = advanceControl(c, segment, true);
-					else if (e.detail == SWT.TRAVERSE_TAB_PREVIOUS)
-						e.doit = advanceControl(c, segment, false);
-					if (!e.doit)
-						e.detail = SWT.TRAVERSE_NONE;
-					break;
+		Listener listener = e -> {
+			switch (e.type) {
+			case SWT.FocusIn:
+				if (!controlFocusTransfer)
+					syncControlSegmentFocus((Control) e.widget);
+				break;
+			case SWT.Traverse:
+				if (DEBUG_FOCUS)
+					System.out.println("Control traversal: " + e); //$NON-NLS-1$
+				switch (e.detail) {
+				case SWT.TRAVERSE_PAGE_NEXT:
+				case SWT.TRAVERSE_PAGE_PREVIOUS:
+				case SWT.TRAVERSE_ARROW_NEXT:
+				case SWT.TRAVERSE_ARROW_PREVIOUS:
+					e.doit = false;
+					return;
 				}
+				Control c = (Control) e.widget;
+				ControlSegment segment = (ControlSegment) c.getData(CONTROL_KEY);
+				if (e.detail == SWT.TRAVERSE_TAB_NEXT)
+					e.doit = advanceControl(c, segment, true);
+				else if (e.detail == SWT.TRAVERSE_TAB_PREVIOUS)
+					e.doit = advanceControl(c, segment, false);
+				if (!e.doit)
+					e.detail = SWT.TRAVERSE_NONE;
+				break;
 			}
 		};
-		for (int i = 0; i < paragraphs.length; i++) {
-			Paragraph p = paragraphs[i];
+		for (Paragraph p : paragraphs) {
 			ParagraphSegment[] segments = p.getSegments();
-			for (int j = 0; j < segments.length; j++) {
-				if (segments[j] instanceof ControlSegment) {
-					ControlSegment cs = (ControlSegment) segments[j];
+			for (ParagraphSegment segment : segments) {
+				if (segment instanceof ControlSegment) {
+					ControlSegment cs = (ControlSegment) segment;
 					Control c = cs.getControl(resourceTable);
 					if (c != null) {
 						if (c.getData(CONTROL_KEY) == null) {
@@ -756,8 +744,8 @@ public class FormText extends Canvas {
 		if (c instanceof Composite) {
 			Composite parent = (Composite) c;
 			Control[] children = parent.getChildren();
-			for (int i = 0; i < children.length; i++) {
-				attachTraverseListener(children[i], listener);
+			for (Control element : children) {
+				attachTraverseListener(element, listener);
 			}
 			if (c instanceof Canvas) {
 				// If Canvas, the control iteself can accept
@@ -897,6 +885,7 @@ public class FormText extends Canvas {
 	 * @param menu
 	 *            the menu to associate with this text control
 	 */
+	@Override
 	public void setMenu(Menu menu) {
 		Menu currentMenu = super.getMenu();
 		if (currentMenu != null && INTERNAL_MENU.equals(currentMenu.getData())) {
@@ -915,6 +904,7 @@ public class FormText extends Canvas {
 		copyItem.setText(Messages.FormText_copy);
 
 		SelectionListener listener = new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (e.widget == copyItem) {
 					copy();
@@ -923,10 +913,12 @@ public class FormText extends Canvas {
 		};
 		copyItem.addSelectionListener(listener);
 		menu.addMenuListener(new MenuListener() {
+			@Override
 			public void menuShown(MenuEvent e) {
 				copyItem.setEnabled(canCopy());
 			}
 
+			@Override
 			public void menuHidden(MenuEvent e) {
 			}
 		});
@@ -962,7 +954,7 @@ public class FormText extends Canvas {
 	 */
 	public void addHyperlinkListener(IHyperlinkListener listener) {
 		if (listeners == null)
-			listeners = new ListenerList();
+			listeners = new ListenerList<>();
 		listeners.add(listener);
 	}
 
@@ -1124,6 +1116,7 @@ public class FormText extends Canvas {
 	private void initAccessible() {
 		Accessible accessible = getAccessible();
 		accessible.addAccessibleListener(new AccessibleAdapter() {
+			@Override
 			public void getName(AccessibleEvent e) {
 				if (e.childID == ACC.CHILDID_SELF)
 					e.result = model.getAccessibleText();
@@ -1136,6 +1129,7 @@ public class FormText extends Canvas {
 				}
 			}
 
+			@Override
 			public void getHelp(AccessibleEvent e) {
 				e.result = getToolTipText();
 				int linkCount = model.getHyperlinkCount();
@@ -1146,6 +1140,7 @@ public class FormText extends Canvas {
 			}
 		});
 		accessible.addAccessibleControlListener(new AccessibleControlAdapter() {
+			@Override
 			public void getChildAtPoint(AccessibleControlEvent e) {
 				Point pt = toControl(new Point(e.x, e.y));
 				IHyperlinkSegment link = model.findHyperlinkAt(pt.x, pt.y);
@@ -1155,6 +1150,7 @@ public class FormText extends Canvas {
 					e.childID = ACC.CHILDID_SELF;
 			}
 
+			@Override
 			public void getLocation(AccessibleControlEvent e) {
 				Rectangle location = null;
 				if (e.childID != ACC.CHILDID_SELF
@@ -1175,6 +1171,7 @@ public class FormText extends Canvas {
 				e.height = location.height;
 			}
 
+			@Override
 			public void getFocus(AccessibleControlEvent e) {
 				int childID = ACC.CHILDID_NONE;
 
@@ -1187,16 +1184,19 @@ public class FormText extends Canvas {
 				e.childID = childID;
 			}
 
+			@Override
 			public void getDefaultAction (AccessibleControlEvent e) {
 				if (model.getHyperlinkCount() > 0) {
 				    e.result = SWT.getMessage ("SWT_Press"); //$NON-NLS-1$
 				}
 			}
 
+			@Override
 			public void getChildCount(AccessibleControlEvent e) {
 				e.detail = model.getHyperlinkCount();
 			}
 
+			@Override
 			public void getRole(AccessibleControlEvent e) {
 				int role = 0;
 				int childID = e.childID;
@@ -1213,12 +1213,14 @@ public class FormText extends Canvas {
 				e.detail = role;
 			}
 
+			@Override
 			public void getSelection(AccessibleControlEvent e) {
 				int selectedIndex = model.getSelectedSegmentIndex();
 				e.childID = (selectedIndex == -1) ? ACC.CHILDID_NONE
 						: selectedIndex;
 			}
 
+			@Override
 			public void getState(AccessibleControlEvent e) {
 				int linkCount = model.getHyperlinkCount();
 				int selectedIndex = model.getSelectedSegmentIndex();
@@ -1242,15 +1244,17 @@ public class FormText extends Canvas {
 				e.detail = state;
 			}
 
+			@Override
 			public void getChildren(AccessibleControlEvent e) {
 				int linkCount = model.getHyperlinkCount();
 				Object[] children = new Object[linkCount];
 				for (int i = 0; i < linkCount; i++) {
-					children[i] = new Integer(i);
+					children[i] = Integer.valueOf(i);
 				}
 				e.children = children;
 			}
 
+			@Override
 			public void getValue(AccessibleControlEvent e) {
 				// e.result = model.getAccessibleText();
 			}
@@ -1496,12 +1500,9 @@ public class FormText extends Canvas {
 	private void enterLink(IHyperlinkSegment link, int stateMask) {
 		if (link == null || listeners == null)
 			return;
-		int size = listeners.size();
 		HyperlinkEvent he = new HyperlinkEvent(this, link.getHref(), link
 				.getText(), stateMask);
-		Object [] listenerList = listeners.getListeners();
-		for (int i = 0; i < size; i++) {
-			IHyperlinkListener listener = (IHyperlinkListener) listenerList[i];
+		for (IHyperlinkListener listener : listeners) {
 			listener.linkEntered(he);
 		}
 	}
@@ -1509,12 +1510,9 @@ public class FormText extends Canvas {
 	private void exitLink(IHyperlinkSegment link, int stateMask) {
 		if (link == null || listeners == null)
 			return;
-		int size = listeners.size();
 		HyperlinkEvent he = new HyperlinkEvent(this, link.getHref(), link
 				.getText(), stateMask);
-		Object [] listenerList = listeners.getListeners();
-		for (int i = 0; i < size; i++) {
-			IHyperlinkListener listener = (IHyperlinkListener) listenerList[i];
+		for (IHyperlinkListener listener : listeners) {
 			listener.linkExited(he);
 		}
 	}
@@ -1593,8 +1591,7 @@ public class FormText extends Canvas {
 		IHyperlinkSegment selectedLink = getSelectedLink();
 		if (getDisplay().getFocusControl() != this)
 			selectedLink = null;
-		for (int i = 0; i < paragraphs.length; i++) {
-			Paragraph p = paragraphs[i];
+		for (Paragraph p : paragraphs) {
 			p
 					.paint(textGC, repaintRegion, resourceTable, selectedLink,
 							selData);
@@ -1655,6 +1652,7 @@ public class FormText extends Canvas {
 	 *
 	 * @see org.eclipse.swt.widgets.Composite#computeSize(int, int, boolean)
 	 */
+	@Override
 	public Point computeSize(int wHint, int hHint, boolean changed) {
 		checkWidget();
 		Point size;
@@ -1679,9 +1677,9 @@ public class FormText extends Canvas {
 				resourceTable.remove(FormTextModel.BOLD_FONT_ID);
 			}
 		}
-		ArrayList imagesToRemove = new ArrayList();
-		for (Enumeration enm = resourceTable.keys(); enm.hasMoreElements();) {
-			String key = (String) enm.nextElement();
+		ArrayList<String> imagesToRemove = new ArrayList<>();
+		for (Enumeration<String> enm = resourceTable.keys(); enm.hasMoreElements();) {
+			String key = enm.nextElement();
 			if (key.startsWith(ImageSegment.SEL_IMAGE_PREFIX)) {
 				Object obj = resourceTable.get(key);
 				if (obj instanceof Image) {
@@ -1698,19 +1696,13 @@ public class FormText extends Canvas {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.swt.widgets.Control#setEnabled(boolean)
-	 */
+	@Override
 	public void setEnabled(boolean enabled) {
 		super.setEnabled(enabled);
 		redraw();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.swt.widgets.Control#setFocus()
-	 */
+	@Override
 	public boolean setFocus() {
 		mouseFocus = true;
 		FormUtil.setFocusScrollingEnabled(this, false);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,7 +43,7 @@ public class SubMenuManager extends SubContributionManager implements
     /**
      * List of registered menu listeners (element type: <code>IMenuListener</code>).
      */
-    private ListenerList menuListeners = new ListenerList();
+	private ListenerList<IMenuListener> menuListeners = new ListenerList<>();
 
     /**
      * The menu listener added to the parent.  Lazily initialized
@@ -66,16 +66,11 @@ public class SubMenuManager extends SubContributionManager implements
 	public void addMenuListener(IMenuListener listener) {
         menuListeners.add(listener);
         if (menuListener == null) {
-            menuListener = new IMenuListener() {
-                @Override
-				public void menuAboutToShow(IMenuManager manager) {
-                    Object[] listeners = menuListeners.getListeners();
-                    for (int i = 0; i < listeners.length; ++i) {
-                        ((IMenuListener) listeners[i])
-                                .menuAboutToShow(SubMenuManager.this);
-                    }
-                }
-            };
+            menuListener = manager -> {
+				for (IMenuListener localListener : menuListeners) {
+					localListener.menuAboutToShow(SubMenuManager.this);
+			    }
+			};
         }
         getParentMenuManager().addMenuListener(menuListener);
     }
@@ -242,7 +237,7 @@ public class SubMenuManager extends SubContributionManager implements
      */
     protected IMenuManager getWrapper(IMenuManager mgr) {
         if (mapMenuToWrapper == null) {
-            mapMenuToWrapper = new HashMap<IMenuManager, SubMenuManager>(4);
+            mapMenuToWrapper = new HashMap<>(4);
         }
         SubMenuManager wrapper = mapMenuToWrapper.get(mgr);
         if (wrapper == null) {

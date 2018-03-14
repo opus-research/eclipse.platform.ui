@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -174,13 +174,13 @@ public class FilteredTree extends Composite {
 	static {
 		Bundle bundle = org.eclipse.e4.ui.internal.workbench.swt.WorkbenchSWTActivator
 				.getDefault().getBundle();
-		IPath enabledPath = new Path("$nl$/icons/full/etool16/clear_co.gif");
+		IPath enabledPath = new Path("$nl$/icons/full/etool16/clear_co.png");
 		URL enabledURL = FileLocator.find(bundle, enabledPath, null);
 		ImageDescriptor enabledDesc = ImageDescriptor.createFromURL(enabledURL);
 		if (enabledDesc != null)
 			JFaceResources.getImageRegistry().put(CLEAR_ICON, enabledDesc);
 
-		IPath disabledPath = new Path("$nl$/icons/full/etool16/clear_co.gif");
+		IPath disabledPath = new Path("$nl$/icons/full/etool16/clear_co.png");
 		URL disabledURL = FileLocator.find(bundle, disabledPath, null);
 		ImageDescriptor disabledDesc = ImageDescriptor
 				.createFromURL(disabledURL);
@@ -336,7 +336,7 @@ public class FilteredTree extends Composite {
 			Text testText = null;
 			try {
 				testText = new Text(composite, SWT.SEARCH | SWT.ICON_CANCEL);
-				useNativeSearchField = new Boolean(
+				useNativeSearchField = Boolean.valueOf(
 						(testText.getStyle() & SWT.ICON_CANCEL) != 0);
 			} finally {
 				if (testText != null) {
