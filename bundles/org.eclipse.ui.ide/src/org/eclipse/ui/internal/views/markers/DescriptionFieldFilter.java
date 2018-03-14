@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2014 IBM Corporation and others.
+ * Copyright (c) 2007, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
 package org.eclipse.ui.internal.views.markers;
 
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.views.markers.MarkerFieldFilter;
@@ -29,11 +28,9 @@ public class DescriptionFieldFilter extends CompatibilityFieldFilter {
 
 	static final String TAG_CONTAINS_MODIFIER = "containsModifier"; //$NON-NLS-1$
 	static final String TAG_CONTAINS_TEXT = "containsText"; //$NON-NLS-1$
-	static final String TAG_USE_REGEX = "useRegex"; //$NON-NLS-1$
 
 	String containsModifier = MarkerSupportConstants.CONTAINS_KEY;
 	String containsText = MarkerSupportInternalUtilities.EMPTY_STRING;
-	boolean useRegex = false;
 
 	/**
 	 * Create a new instance of the receiver.
@@ -54,12 +51,9 @@ public class DescriptionFieldFilter extends CompatibilityFieldFilter {
 		String contains = memento.getString(TAG_CONTAINS_TEXT);
 		if (contains == null)
 			return;
-		Boolean regex = memento.getBoolean(TAG_USE_REGEX);
-		if (regex == null) 
-			regex = Boolean.FALSE;
 		containsText = contains;
 		containsModifier = modifier;
-		useRegex = regex.booleanValue();
+
 	}
 
 	/* (non-Javadoc)
@@ -89,7 +83,6 @@ public class DescriptionFieldFilter extends CompatibilityFieldFilter {
 	public void saveSettings(IMemento memento) {
 		memento.putString(TAG_CONTAINS_MODIFIER, containsModifier);
 		memento.putString(TAG_CONTAINS_TEXT, containsText);
-		memento.putBoolean(TAG_USE_REGEX, useRegex);
 	}
 
 
@@ -101,12 +94,6 @@ public class DescriptionFieldFilter extends CompatibilityFieldFilter {
 			return true;
 
 		String value = getField().getValue(item);
-
-		if (useRegex) {
-			if (containsModifier.equals(MarkerSupportConstants.CONTAINS_KEY))
-				return Pattern.matches(containsText, value);
-			return !Pattern.matches(containsText, value);
-		}
 		if (containsModifier.equals(MarkerSupportConstants.CONTAINS_KEY))
 			return value.indexOf(containsText) >= 0;
 		return value.indexOf(containsText) < 0;
@@ -122,7 +109,6 @@ public class DescriptionFieldFilter extends CompatibilityFieldFilter {
 		DescriptionFieldFilter clone = (DescriptionFieldFilter) copy;
 		clone.containsModifier = this.containsModifier;
 		clone.containsText = this.containsText;
-		clone.useRegex = this.useRegex;
 	}
 
 	/**
@@ -163,24 +149,6 @@ public class DescriptionFieldFilter extends CompatibilityFieldFilter {
 	 */
 	void setContainsText(String containsText) {
 		this.containsText = containsText;
-	}
-	
-	/**
-	 * Get the value that indicates whether the filter should
-	 * use regular expressions.
-	 * @return Returns the value of useRegex.
-	 */
-	boolean isUseRegex() {
-		return useRegex;
-	}
-
-	/**
-	 * Set the value that indicates whether the filter should
-	 * use regular expressions.
-	 * @param useRegex The useRegex value to set.
-	 */
-	void setUseRegex(boolean useRegex) {
-		this.useRegex = useRegex;
 	}
 
 
