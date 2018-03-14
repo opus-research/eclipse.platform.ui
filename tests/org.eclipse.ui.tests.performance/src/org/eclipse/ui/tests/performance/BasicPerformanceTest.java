@@ -98,7 +98,11 @@ public abstract class BasicPerformanceTest extends UITestCase {
 		return tagAsSummary;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.tests.util.UITestCase#doSetUp()
+	 */
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		if (interactive) {
@@ -107,7 +111,11 @@ public abstract class BasicPerformanceTest extends UITestCase {
 		tester = new PerformanceTester(this);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.tests.util.UITestCase#doTearDown()
+	 */
 	protected void doTearDown() throws Exception {
 		super.doTearDown();
 		if (interactive) {
@@ -233,7 +241,6 @@ public abstract class BasicPerformanceTest extends UITestCase {
 
 		Job backgroundJob = new Job(
 				"This is a test job which sits around being low priority until everything else finishes") {
-			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				return Status.OK_STATUS;
 			}

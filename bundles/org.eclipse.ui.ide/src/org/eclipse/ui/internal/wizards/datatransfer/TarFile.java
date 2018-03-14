@@ -156,6 +156,10 @@ public class TarFile {
 		return file.getPath();
 	}
 
+	/* (non-Javadoc)
+	 * @see java.util.zip.ZipFile#finalize()
+	 *
+	 */
 	@Override
 	protected void finalize() throws Throwable {
 		close();

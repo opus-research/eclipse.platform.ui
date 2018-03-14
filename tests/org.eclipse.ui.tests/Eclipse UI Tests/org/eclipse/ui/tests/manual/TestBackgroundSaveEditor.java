@@ -56,7 +56,8 @@ import org.eclipse.ui.progress.IJobRunnable;
  * @since 3.3
  *
  */
-public class TestBackgroundSaveEditor extends EditorPart implements ISaveablesSource {
+public class TestBackgroundSaveEditor extends EditorPart implements
+		ISaveablesSource {
 
 	public class MySaveable extends Saveable {
 
@@ -67,10 +68,11 @@ public class TestBackgroundSaveEditor extends EditorPart implements ISaveablesSo
 		@Override
 		public void doSave(IProgressMonitor monitor) throws CoreException {
 			SubMonitor subMonitor = SubMonitor.convert(monitor, 2);
-			IJobRunnable runnable = doSave(subMonitor.split(1), getSite());
-			if (runnable != null) {
-				runnable.run(subMonitor.split(1));
+			IJobRunnable runnable = doSave(subMonitor.newChild(1), getSite());
+			if (runnable!=null) {
+				runnable.run(subMonitor.newChild(1));
 			}
+			monitor.done();
 		}
 
 		@Override
@@ -168,7 +170,7 @@ public class TestBackgroundSaveEditor extends EditorPart implements ISaveablesSo
 		}
 
 		public void setDirty(boolean dirty) {
-			firePropertyChange("dirty", Boolean.valueOf(this.dirty), Boolean.valueOf(
+			firePropertyChange("dirty", new Boolean(this.dirty), new Boolean(
 					this.dirty = dirty));
 			getSite().getShell().getDisplay().syncExec(new Runnable(){
 				@Override
@@ -252,7 +254,7 @@ public class TestBackgroundSaveEditor extends EditorPart implements ISaveablesSo
 				dirtyObservable, null, null);
 		// IObservableValue inputAndOutputDiffer = new ComputedValue(realm) {
 		// protected Object calculate() {
-		// return Boolean.valueOf(!Util.equals(inputObservable.getValue(),
+		// return new Boolean(!Util.equals(inputObservable.getValue(),
 		// outputObservable.getValue()));
 		// }
 		// };

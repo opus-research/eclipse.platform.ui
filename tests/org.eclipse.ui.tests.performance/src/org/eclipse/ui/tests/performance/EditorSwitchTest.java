@@ -40,7 +40,6 @@ public class EditorSwitchTest extends BasicPerformanceTest {
 	/**
 	 * Test editor opening performance. This test always fails.
 	 */
-	@Override
 	protected void runTest() throws CoreException {
 
 		// Open both files outside the loop so as not to include

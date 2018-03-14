@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@
 package org.eclipse.ui.forms.widgets;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.eclipse.jface.resource.JFaceResources;
@@ -107,12 +108,11 @@ public class FormToolkit {
 	KeyboardHandler keyboardHandler;
 
 	private class BorderPainter implements PaintListener {
-		@Override
 		public void paintControl(PaintEvent event) {
 			Composite composite = (Composite) event.widget;
 			Control[] children = composite.getChildren();
-			for (Control element : children) {
-				Control c = element;
+			for (int i = 0; i < children.length; i++) {
+				Control c = children[i];
 				boolean inactiveBorder = false;
 				boolean textBorder = false;
 				if (!c.isVisible())
@@ -171,7 +171,6 @@ public class FormToolkit {
 	private static class VisibilityHandler extends FocusAdapter {
 		private boolean handleNextFocusGained = true;
 
-		@Override
 		public void focusGained(FocusEvent e) {
 			if (!handleNextFocusGained) {
 				handleNextFocusGained = true;
@@ -183,7 +182,6 @@ public class FormToolkit {
 			}
 		}
 
-		@Override
 		public void focusLost(FocusEvent e) {
 			Widget w = e.widget;
 			if (w instanceof Control) {
@@ -193,7 +191,6 @@ public class FormToolkit {
 	}
 
 	private static class KeyboardHandler extends KeyAdapter {
-		@Override
 		public void keyPressed(KeyEvent e) {
 			Widget w = e.widget;
 			if (w instanceof Control) {
@@ -204,7 +201,7 @@ public class FormToolkit {
 	}
 
 	private class BoldFontHolder {
-		private Map<Font, Font> fontMap;
+		private Map fontMap;
 
 		public BoldFontHolder() {
 		}
@@ -215,11 +212,11 @@ public class FormToolkit {
 			}
 
 			if (fontMap == null) {
-				fontMap = new HashMap<>();
+				fontMap = new HashMap();
 			}
 
 			if (fontMap.containsKey(font)) {
-				return fontMap.get(font);
+				return (Font) fontMap.get(font);
 			}
 
 			Font boldFont = FormFonts.getInstance().getBoldFont(colors.getDisplay(),
@@ -233,7 +230,8 @@ public class FormToolkit {
 			if (fontMap == null) {
 				return;
 			}
-			for (Font boldFont : fontMap.values()) {
+			for (Iterator iter = fontMap.values().iterator(); iter.hasNext();) {
+				Font boldFont = (Font) iter.next();
 				if (boldFont != null && colors.getDisplay() != null) {
 					FormFonts.getInstance().markFinished(boldFont,
 							colors.getDisplay());
@@ -327,7 +325,6 @@ public class FormToolkit {
 	public Composite createCompositeSeparator(Composite parent) {
 		final Composite composite = new Composite(parent, orientation);
 		composite.addListener(SWT.Paint, new Listener() {
-			@Override
 			public void handleEvent(Event e) {
 				if (composite.isDisposed())
 					return;
@@ -494,7 +491,6 @@ public class FormToolkit {
 	public void adapt(Composite composite) {
 		composite.setBackground(colors.getBackground());
 		composite.addMouseListener(new MouseAdapter() {
-			@Override
 			public void mouseDown(MouseEvent e) {
 				((Control) e.widget).setFocus();
 			}
@@ -536,8 +532,8 @@ public class FormToolkit {
 					.getColor(IFormColors.TB_TOGGLE));
 		}
 		section.setFont(boldFontHolder.getBoldFont(parent.getFont()));
-		if ((sectionStyle & ExpandableComposite.TITLE_BAR) != 0
-				|| (sectionStyle & ExpandableComposite.SHORT_TITLE_BAR) != 0) {
+		if ((sectionStyle & Section.TITLE_BAR) != 0
+				|| (sectionStyle & Section.SHORT_TITLE_BAR) != 0) {
 			colors.initializeSectionToolBarColors();
 			section.setTitleBarBackground(colors.getColor(IFormColors.TB_BG));
 			section.setTitleBarBorderColor(colors

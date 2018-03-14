@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  * IBM Corporation - initial API and implementation
  * Bug 349224 Navigator content provider "appearsBefore" creates hard reference to named id - paul.fullbright@oracle.com
  * C. Sean Young <csyoung@google.com> - Bug 436645
- * Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 436645
  *******************************************************************************/
 package org.eclipse.ui.internal.navigator.extensions;
 
@@ -22,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.WeakHashMap;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IStatus;
@@ -45,23 +43,19 @@ public class NavigatorContentDescriptorManager {
 
 	private static final NavigatorContentDescriptorManager INSTANCE = new NavigatorContentDescriptorManager();
 
-	private final Map<String, NavigatorContentDescriptor> firstClassDescriptorsMap = new HashMap<>();
+	private final Map<String, NavigatorContentDescriptor> firstClassDescriptorsMap = new HashMap<String, NavigatorContentDescriptor>();
 
-	private final Map<String, NavigatorContentDescriptor> allDescriptors = new HashMap<>();
-
-	private final Map<VisibilityAssistant, EvaluationCache> cachedTriggerPointEvaluations = new WeakHashMap<>();
-
-	private final Map<VisibilityAssistant, EvaluationCache> cachedPossibleChildrenEvaluations = new WeakHashMap<>();
+	private final Map<String, NavigatorContentDescriptor> allDescriptors = new HashMap<String, NavigatorContentDescriptor>();
 
 	private ImageRegistry imageRegistry;
 
-	private final Set<NavigatorContentDescriptor> overridingDescriptors = new HashSet<>();
+	private final Set<NavigatorContentDescriptor> overridingDescriptors = new HashSet<NavigatorContentDescriptor>();
 
-	private final Set<NavigatorContentDescriptor> saveablesProviderDescriptors = new HashSet<>();
+	private final Set<NavigatorContentDescriptor> saveablesProviderDescriptors = new HashSet<NavigatorContentDescriptor>();
 
-	private final Set<NavigatorContentDescriptor> sortOnlyDescriptors = new HashSet<>();
+	private final Set<NavigatorContentDescriptor> sortOnlyDescriptors = new HashSet<NavigatorContentDescriptor>();
 
-	private final Set<NavigatorContentDescriptor> firstClassDescriptorsSet = new HashSet<>();
+	private final Set<NavigatorContentDescriptor> firstClassDescriptorsSet = new HashSet<NavigatorContentDescriptor>();
 
 	/**
 	 * @return the singleton instance of the manager
@@ -126,7 +120,7 @@ public class NavigatorContentDescriptorManager {
 	 */
 	public Set<NavigatorContentDescriptor> findDescriptorsForTriggerPoint(Object anElement,
 			VisibilityAssistant aVisibilityAssistant, boolean considerOverrides) {
-		return findDescriptors(anElement, cachedTriggerPointEvaluations, aVisibilityAssistant, considerOverrides, !POSSIBLE_CHILD);
+		return findDescriptors(anElement, aVisibilityAssistant, considerOverrides, !POSSIBLE_CHILD);
 	}
 
 
@@ -145,30 +139,25 @@ public class NavigatorContentDescriptorManager {
 	 */
 	public Set<NavigatorContentDescriptor> findDescriptorsForPossibleChild(Object anElement,
 			VisibilityAssistant aVisibilityAssistant, boolean toComputeOverrides) {
-		return findDescriptors(anElement, cachedPossibleChildrenEvaluations, aVisibilityAssistant, toComputeOverrides, POSSIBLE_CHILD);
+		return findDescriptors(anElement, aVisibilityAssistant, toComputeOverrides, POSSIBLE_CHILD);
 	}
 
 	private static final boolean POSSIBLE_CHILD = true;
 
-	private Set<NavigatorContentDescriptor> findDescriptors(Object anElement,
-			Map<VisibilityAssistant, EvaluationCache> cachedEvaluations,
-			VisibilityAssistant aVisibilityAssistant, boolean considerOverrides, boolean possibleChild) {
-		EvaluationCache cache = getEvaluationCache(cachedEvaluations, aVisibilityAssistant);
-		Set<NavigatorContentDescriptor> descriptors = new TreeSet<NavigatorContentDescriptor>(ExtensionSequenceNumberComparator.INSTANCE);
 
-		NavigatorContentDescriptor[] cachedDescriptors = null;
-		if ((cachedDescriptors = cache.getDescriptors(anElement, considerOverrides)) != null) {
-			descriptors.addAll(Arrays.asList(cachedDescriptors));
-			if (Policy.DEBUG_RESOLUTION) {
-				System.out.println("Find descriptors for : " + Policy.getObjectString(anElement) + //$NON-NLS-1$
-						(considerOverrides ? " (with overrides)" : "") + " (cached): " + descriptors); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			}
-			return descriptors;
-		}
+	private Set<NavigatorContentDescriptor> findDescriptors(Object anElement,
+			VisibilityAssistant aVisibilityAssistant, boolean considerOverrides, boolean possibleChild) {
+
+		Set<NavigatorContentDescriptor> descriptors = new TreeSet<NavigatorContentDescriptor>(ExtensionSequenceNumberComparator.INSTANCE);
 
 		if (considerOverrides) {
 			addDescriptorsConsideringOverrides(anElement, firstClassDescriptorsSet, aVisibilityAssistant, descriptors, possibleChild);
+			if (Policy.DEBUG_RESOLUTION) {
+				System.out.println("Find descriptors for: " + Policy.getObjectString(anElement) + //$NON-NLS-1$
+						": " + descriptors); //$NON-NLS-1$
+			}
 		} else {
+
 			/* Find other ContentProviders which enable for this object */
 			for (Iterator<NavigatorContentDescriptor> contentDescriptorsItr = firstClassDescriptorsSet.iterator(); contentDescriptorsItr.hasNext();) {
 				NavigatorContentDescriptor descriptor = contentDescriptorsItr.next();
@@ -180,34 +169,7 @@ public class NavigatorContentDescriptorManager {
 			}
 		}
 
-		if (Policy.DEBUG_RESOLUTION) {
-			System.out.println("Find descriptors for: " + Policy.getObjectString(anElement) + //$NON-NLS-1$
-					(considerOverrides ? " (with overrides)" : "") + ": " + descriptors); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		}
-		if (canStoreInEvaluationCache(descriptors, possibleChild)) {
-			cache.setDescriptors(anElement, descriptors.toArray(new NavigatorContentDescriptor[descriptors.size()]), considerOverrides);
-		}
 		return descriptors;
-	}
-
-	private boolean canStoreInEvaluationCache(Set<NavigatorContentDescriptor> descriptors, boolean possibleChild) {
-		boolean storeInEvaluationCache = true;
-		for (NavigatorContentDescriptor descriptor : descriptors) {
-			if (possibleChild ? descriptor.canCachePossibleChildren() : descriptor.canCacheTriggerPoint()) {
-				storeInEvaluationCache = false;
-				break;
-			}
-		}
-		return storeInEvaluationCache;
-	}
-
-	private EvaluationCache getEvaluationCache(Map<VisibilityAssistant, EvaluationCache> anEvaluationMap,
-			VisibilityAssistant aVisibilityAssistant) {
-		EvaluationCache c = anEvaluationMap.get(aVisibilityAssistant);
-		if (c == null) {
-			anEvaluationMap.put(aVisibilityAssistant, c = new EvaluationCache(aVisibilityAssistant));
-		}
-		return c;
 	}
 
 	private boolean addDescriptorsConsideringOverrides(Object anElement,
