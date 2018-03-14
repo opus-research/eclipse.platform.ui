@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.osgi.util.TextProcessor;
@@ -797,7 +798,13 @@ public class WorkbenchEditorsDialog extends SelectionDialog {
 				}
                 s.moveAbove(null);
                 p.getWorkbenchWindow().setActivePage(p);
-                p.activate(editor);
+				if (p.canActivate(editor)) {
+					p.activate(editor);
+				} else {
+					MessageDialog.open(MessageDialog.INFORMATION, getShell(),
+							WorkbenchMessages.CannotActivateEditor_title,
+							WorkbenchMessages.CannotActivateEditor_message, SWT.DIALOG_TRIM);
+				}
             } else {
                 IWorkbenchPage p = window.getActivePage();
                 if (p != null) {

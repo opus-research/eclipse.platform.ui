@@ -287,6 +287,8 @@ public class WorkbenchMessages extends NLS {
 	public static String CyclePerspectiveAction_header;
 	public static String ActivateEditorAction_text;
 	public static String ActivateEditorAction_toolTip;
+	public static String CannotActivateEditor_title;
+	public static String CannotActivateEditor_message;
 	public static String MaximizePartAction_text;
 	public static String MaximizePartAction_toolTip;
 	public static String MinimizePartAction_text;
