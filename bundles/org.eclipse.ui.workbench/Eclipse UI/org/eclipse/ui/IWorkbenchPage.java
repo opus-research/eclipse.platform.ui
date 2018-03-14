@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,13 +7,13 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431178 
  *******************************************************************************/
 package org.eclipse.ui;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.ui.internal.ICompatibleWorkbenchPage;
 
 /**
  * A workbench page consists of an arrangement of views and editors intended to
@@ -42,8 +42,7 @@ import org.eclipse.ui.internal.ICompatibleWorkbenchPage;
  * @see IViewPart
  * @noimplement This interface is not intended to be implemented by clients.
  */
-public interface IWorkbenchPage extends IPartService, ISelectionService,
-		ICompatibleWorkbenchPage {
+public interface IWorkbenchPage extends IPartService, ISelectionService {
 	/**
 	 * An optional attribute within a workspace marker (<code>IMarker</code>)
 	 * which identifies the preferred editor type to be opened when
@@ -55,6 +54,7 @@ public interface IWorkbenchPage extends IPartService, ISelectionService,
 	 *             applicable. Use the IDE-specific constant
 	 *             <code>IDE.EDITOR_ID_ATTR</code>.
 	 */
+	@Deprecated
 	public static final String EDITOR_ID_ATTR = "org.eclipse.ui.editorID"; //$NON-NLS-1$
 
 	/**
@@ -253,6 +253,7 @@ public interface IWorkbenchPage extends IPartService, ISelectionService,
 	 *             {@link org.eclipse.ui.IWorkbench#getWorkingSetManager()}
 	 *             instead.
 	 */
+	@Deprecated
 	public void addPropertyChangeListener(IPropertyChangeListener listener);
 
 	/**
@@ -424,6 +425,7 @@ public interface IWorkbenchPage extends IPartService, ISelectionService,
 	 *             all the editors in the page which can cause plug-in
 	 *             activation.
 	 */
+	@Deprecated
 	public IEditorPart[] getEditors();
 
 	/**
@@ -493,6 +495,7 @@ public interface IWorkbenchPage extends IPartService, ISelectionService,
 	 *             instead. Calling this method has the side effect of restoring
 	 *             all the views in the page which can cause plug-in activation.
 	 */
+	@Deprecated
 	public IViewPart[] getViews();
 
 	/**
@@ -509,6 +512,7 @@ public interface IWorkbenchPage extends IPartService, ISelectionService,
 	 * @since 2.0
 	 * @deprecated individual views should store a working set if needed
 	 */
+	@Deprecated
 	public IWorkingSet getWorkingSet();
 
 	/**
@@ -869,6 +873,7 @@ public interface IWorkbenchPage extends IPartService, ISelectionService,
 	 * 
 	 * @deprecated
 	 */
+	@Deprecated
 	public int getEditorReuseThreshold();
 
 	/**
@@ -880,6 +885,7 @@ public interface IWorkbenchPage extends IPartService, ISelectionService,
 	 * @deprecated use IPageLayout.setEditorReuseThreshold(int openEditors)
 	 *             instead.
 	 */
+	@Deprecated
 	public void setEditorReuseThreshold(int openEditors);
 
 	/**
