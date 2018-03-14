@@ -91,7 +91,7 @@ public class TrimStack {
 
 	static final String STATE_YSIZE = "YSize"; //$NON-NLS-1$
 
-	private static final String MINIMIZED_AND_SHOWING = "MinimizzedAndShowing"; //$NON-NLS-1$
+	public static final String MINIMIZED_AND_SHOWING = "MinimizzedAndShowing"; //$NON-NLS-1$
 
 	private Image layoutImage;
 
@@ -106,7 +106,7 @@ public class TrimStack {
 
 	private boolean cachedUseOverlays = true;
 	private boolean isShowing = false;
-	private MUIElement minimizedElement;
+	public MUIElement minimizedElement;
 	// private Composite clientAreaComposite;
 	private Composite hostPane;
 
