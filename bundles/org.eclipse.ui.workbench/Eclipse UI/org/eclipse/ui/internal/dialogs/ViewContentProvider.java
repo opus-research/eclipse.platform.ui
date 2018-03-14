@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430603
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430603, 450817
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
@@ -125,7 +125,7 @@ public class ViewContentProvider implements ITreeContentProvider {
 	 */
 	private Set<Object> determineTopLevelElements(Object element) {
 		List<MPartDescriptor> descriptors = ((MApplication) element).getDescriptors();
-		Set<String> categoryTags = new HashSet<String>();
+		Set<String> categories = new HashSet<String>();
 		Set<MPartDescriptor> visibleViews = new HashSet<MPartDescriptor>();
 		for (MPartDescriptor descriptor : descriptors) {
 			// only process views and hide views which are filtered by
@@ -142,12 +142,12 @@ public class ViewContentProvider implements ITreeContentProvider {
 				visibleViews.add(descriptor);
 				// otherwise just show the category
 			} else {
-				categoryTags.add(category);
+				categories.add(category);
 			}
 		}
 
 		Set<Object> combinedTopElements = new HashSet<Object>();
-		combinedTopElements.addAll(categoryTags);
+		combinedTopElements.addAll(categories);
 		combinedTopElements.addAll(visibleViews);
 		return combinedTopElements;
 	}
