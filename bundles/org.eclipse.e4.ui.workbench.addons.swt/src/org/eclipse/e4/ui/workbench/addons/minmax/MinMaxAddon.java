@@ -103,28 +103,23 @@ public class MinMaxAddon {
 			return parentElement != null ? parentElement.getCurSharedRef() : element;
 		}
 
-		@Override
 		public void maximize(CTabFolderEvent event) {
 			setState(getElementToChange(event), MAXIMIZED);
 		}
 
-		@Override
 		public void minimize(CTabFolderEvent event) {
 			setState(getElementToChange(event), MINIMIZED);
 		}
 
-		@Override
 		public void restore(CTabFolderEvent event) {
 			setState(getElementToChange(event), null);
 		}
 	};
 
 	private MouseListener CTFDblClickListener = new MouseListener() {
-		@Override
 		public void mouseUp(MouseEvent e) {
 		}
 
-		@Override
 		public void mouseDown(MouseEvent e) {
 			// HACK! If this is an empty stack treat it as though it was the editor area
 			// and tear down any open trim stacks (see bug 384814)
@@ -160,7 +155,6 @@ public class MinMaxAddon {
 			return parentElement != null ? parentElement.getCurSharedRef() : element;
 		}
 
-		@Override
 		public void mouseDoubleClick(MouseEvent e) {
 			// only maximize if the primary mouse button was used
 			if (e.button == 1) {
@@ -183,6 +177,7 @@ public class MinMaxAddon {
 	};
 
 	private void setState(MUIElement element, String state) {
+		element.getTags().remove(MINIMIZED_BY_ZOOM);
 		if (MINIMIZED.equals(state)) {
 			element.getTags().remove(MAXIMIZED);
 			element.getTags().add(MINIMIZED);
@@ -323,7 +318,6 @@ public class MinMaxAddon {
 
 		final Shell winShell = (Shell) window.getWidget();
 		winShell.getDisplay().asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				if (!winShell.isDisposed()) {
 					winShell.layout(true, true);
@@ -457,25 +451,6 @@ public class MinMaxAddon {
 		int sideVal = bar.getSide().getValue();
 		int index = bar.getChildren().indexOf(tcElement);
 		return stack.getElementId() + ' ' + sideVal + ' ' + index + "#"; //$NON-NLS-1$
-	}
-
-	/**
-	 * Handles the event that the perspective is reset
-	 * 
-	 * @param event
-	 */
-	@Inject
-	@Optional
-	private void subscribeTopicPerspReset(
-			@UIEventTopic(UIEvents.UILifeCycle.PERSPECTIVE_RESET) Event event) {
-		final MPerspective resetPersp = (MPerspective) event.getProperty(EventTags.ELEMENT);
-
-		// Find any minimized stacks and show their trim
-		List<MUIElement> minimizedElements = modelService.findElements(resetPersp, null,
-				MUIElement.class, Arrays.asList(IPresentationEngine.MINIMIZED));
-		for (MUIElement element : minimizedElements) {
-			createTrim(element);
-		}
 	}
 
 	/**
@@ -613,6 +588,7 @@ public class MinMaxAddon {
 		ts.restoreStack();
 
 		adjustCTFButtons(element);
+		element.getTags().remove(MINIMIZED_BY_ZOOM);
 
 		List<String> maximizeTag = new ArrayList<String>();
 		maximizeTag.add(IPresentationEngine.MAXIMIZED);
@@ -621,14 +597,7 @@ public class MinMaxAddon {
 		if (curMax.size() > 0) {
 			MUIElement maxElement = curMax.get(0);
 			List<MUIElement> elementsLeftToRestore = getElementsToRestore(maxElement);
-
-			// Are any stacks still minimized ?
-			boolean unMax = true;
-			for (MUIElement toRestore : elementsLeftToRestore) {
-				if (!toRestore.isVisible())
-					unMax = false;
-			}
-			if (unMax) {
+			if (elementsLeftToRestore.size() == 0) {
 				maxElement.getTags().remove(IPresentationEngine.MAXIMIZED);
 			}
 		}
@@ -805,7 +774,6 @@ public class MinMaxAddon {
 
 		List<MUIElement> elementsToRestore = getElementsToRestore(element);
 		for (MUIElement toRestore : elementsToRestore) {
-			toRestore.getTags().remove(IPresentationEngine.MINIMIZED_BY_ZOOM);
 			toRestore.getTags().remove(IPresentationEngine.MINIMIZED);
 		}
 

@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866, Bug 405471
  *     Sopot Cela <sopotcela@gmail.com>
- *     Steven Spungin <steven@spungin.tv> - Bug 437747
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -100,7 +99,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	@Inject
 	IEventBroker eventBroker;
 	private EventHandler itemUpdater = new EventHandler() {
-		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MMenuItem
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenuItem))
@@ -126,7 +124,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	};
 
 	private EventHandler labelUpdater = new EventHandler() {
-		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MMenu
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenu))
@@ -151,7 +148,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	};
 
 	private EventHandler toBeRenderedUpdater = new EventHandler() {
-		@Override
 		public void handleEvent(Event event) {
 			Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
 			String attName = (String) event
@@ -224,7 +220,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	};
 
 	private EventHandler selectionUpdater = new EventHandler() {
-		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MToolItem
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenuItem))
@@ -240,7 +235,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	};
 
 	private EventHandler enabledUpdater = new EventHandler() {
-		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MMenuItem
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenuItem))
@@ -382,7 +376,6 @@ MenuManagerEventHelper.getInstance()
 		}
 		if (newMenu != null) {
 			newMenu.addDisposeListener(new DisposeListener() {
-				@Override
 				public void widgetDisposed(DisposeEvent e) {
 					cleanUp(menuModel);
 				}
@@ -421,11 +414,6 @@ MenuManagerEventHelper.getInstance()
 			ContributionRecord record = entry.getValue();
 			if (disposedRecords.contains(record))
 				iterator.remove();
-		}
-
-		MenuManager manager = getManager(menuModel);
-		if (manager != null) {
-			manager.markDirty();
 		}
 	}
 
@@ -904,7 +892,6 @@ MenuManagerEventHelper.getInstance()
 		return records.toArray(new ContributionRecord[records.size()]);
 	}
 
-	@Override
 	public IEclipseContext getContext(MUIElement el) {
 		return super.getContext(el);
 	}

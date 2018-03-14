@@ -30,7 +30,6 @@ public class ContextSet {
 			this.manager = manager;
 		}
 
-		@Override
 		public int compare(Context o1, Context o2) {
 			if (o1.equals(o2)) {
 				return 0;

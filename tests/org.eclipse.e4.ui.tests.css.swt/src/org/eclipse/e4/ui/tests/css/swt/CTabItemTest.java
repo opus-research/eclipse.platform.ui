@@ -31,7 +31,6 @@ public class CTabItemTest extends CSSSWTTestCase {
 
 	private Shell shell;
 
-	@Override
 	protected void tearDown() throws Exception {
 		if (shell != null) {
 			shell.dispose();
@@ -45,9 +44,8 @@ public class CTabItemTest extends CSSSWTTestCase {
 		// Add some delay to allow asynchronous events to come in, but don't get trapped in an endless Display#sleep().
 		Display display = shell.getDisplay();
 		for (int i = 0; i < 3; i++) {
-			while (display.readAndDispatch()) {
+			while (display.readAndDispatch())
 				;
-			}
 			try {
 				Thread.sleep(10);
 			} catch (InterruptedException e) {
@@ -64,7 +62,6 @@ public class CTabItemTest extends CSSSWTTestCase {
 			Button control = new Button(folderToTest, SWT.PUSH);
 			item.setControl(control);
 		}
-		folderToTest.setSelection(0);
 		return folderToTest;
 	}
 
@@ -108,22 +105,20 @@ public class CTabItemTest extends CSSSWTTestCase {
 				+ "CTabItem { font-family: Verdana; font-size: 16 }");
 		spinEventLoop();
 		CTabItem[] items = folder.getItems();
-		assertEquals(0, folder.getSelectionIndex());
-		CTabItem item = folder.getItem(0);
-		{
-			FontData fontData = item.getFont().getFontData()[0];
+		for (int i = 0; i < items.length; i++) {
+			FontData fontData = items[i].getFont().getFontData()[0];
 			assertEquals("Verdana", fontData.getName());
 			assertEquals(16, fontData.getHeight());
 			assertEquals(SWT.NORMAL, fontData.getStyle());
 
 			// verify retrieval
-			assertEquals("Verdana", engine.retrieveCSSProperty(item,
+			assertEquals("Verdana", engine.retrieveCSSProperty(items[i],
 					"font-family", null));
-			assertEquals("16", engine.retrieveCSSProperty(item,
+			assertEquals("16", engine.retrieveCSSProperty(items[i],
 					"font-size", null));
 
 			// make sure child controls are styled
-			Control button = item.getControl();
+			Control button = items[i].getControl();
 			fontData = button.getFont().getFontData()[0];
 			assertEquals("Verdana", fontData.getName());
 			assertEquals(12, fontData.getHeight());
@@ -136,19 +131,17 @@ public class CTabItemTest extends CSSSWTTestCase {
 				+ "CTabItem { font-weight: bold }");
 		spinEventLoop();
 
-		assertEquals(0, folder.getSelectionIndex());
-		CTabItem item = folder.getItem(0);
-		{
-			FontData fontData = item.getFont().getFontData()[0];
+		CTabItem[] items = folder.getItems();
+		for (int i = 0; i < items.length; i++) {
+			FontData fontData = items[i].getFont().getFontData()[0];
 			assertEquals(SWT.BOLD, fontData.getStyle());
 
 			// verify retrieval
-			assertEquals("bold",
-					engine.retrieveCSSProperty(item,
+			assertEquals("bold", engine.retrieveCSSProperty(items[i],
 					"font-weight", null));
 
 			// make sure child controls are styled
-			Control button = item.getControl();
+			Control button = items[i].getControl();
 			fontData = button.getFont().getFontData()[0];
 			assertEquals(SWT.BOLD, fontData.getStyle());
 		}
@@ -159,18 +152,17 @@ public class CTabItemTest extends CSSSWTTestCase {
 				+ "CTabItem { font-style: italic }");
 		spinEventLoop();
 
-		assertEquals(0, folder.getSelectionIndex());
-		CTabItem item = folder.getItem(0);
-		{
-			FontData fontData = item.getFont().getFontData()[0];
+		CTabItem[] items = folder.getItems();
+		for (int i = 0; i < items.length; i++) {
+			FontData fontData = items[i].getFont().getFontData()[0];
 			assertEquals(SWT.ITALIC, fontData.getStyle());
 
 			// verify retrieval
-			assertEquals("italic", engine.retrieveCSSProperty(item,
+			assertEquals("italic", engine.retrieveCSSProperty(items[i],
 					"font-style", null));
 
 			// make sure child controls are styled
-			Control button = item.getControl();
+			Control button = items[i].getControl();
 			fontData = button.getFont().getFontData()[0];
 			assertEquals(SWT.BOLD, fontData.getStyle());
 		}
@@ -249,10 +241,10 @@ public class CTabItemTest extends CSSSWTTestCase {
 		CTabFolder folder = createTestTabFolder("CTabItem { show-close: "
 				+ Boolean.toString(showClose) + " }");
 		CTabItem[] items = folder.getItems();
-		for (CTabItem item : items) {
-			assertEquals(showClose, item.getShowClose());
+		for (int i = 0; i < items.length; i++) {
+			assertEquals(showClose, items[i].getShowClose());
 			assertEquals(Boolean.toString(showClose), engine
-					.retrieveCSSProperty(item, "show-close", null));
+					.retrieveCSSProperty(items[i], "show-close", null));
 		}
 	}
 

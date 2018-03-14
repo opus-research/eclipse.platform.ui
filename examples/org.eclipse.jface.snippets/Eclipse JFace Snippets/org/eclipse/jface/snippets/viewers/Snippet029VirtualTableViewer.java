@@ -8,13 +8,9 @@
  * Contributors:
  *     Tom Schindl - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 414565
- *     Jeanderson Candido <http://jeandersonbc.github.io> - 414565
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -50,16 +46,19 @@ public class Snippet029VirtualTableViewer {
 		v.setLabelProvider(new LabelProvider());
 		v.setContentProvider(ArrayContentProvider.getInstance());
 		v.setUseHashlookup(true);
-		v.setInput(createModel());
+		MyModel[] model = createModel();
+		v.setInput(model);
+
 		v.getTable().setLinesVisible(true);
 	}
 
-	private List<MyModel> createModel() {
-		List<MyModel> elements = new ArrayList<MyModel>();
+	private MyModel[] createModel() {
+		MyModel[] elements = new MyModel[10000];
 
 		for (int i = 0; i < 10000; i++) {
-			elements.add(new MyModel(i));
+			elements[i] = new MyModel(i);
 		}
+
 		return elements;
 	}
 

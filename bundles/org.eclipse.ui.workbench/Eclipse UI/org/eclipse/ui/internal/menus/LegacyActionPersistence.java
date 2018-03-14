@@ -381,7 +381,6 @@ public final class LegacyActionPersistence extends RegistryPersistence {
 
 
 
-	@Override
 	public final void dispose() {
 		super.dispose();
 		clear();
@@ -393,7 +392,6 @@ public final class LegacyActionPersistence extends RegistryPersistence {
 		clearMenus();
 	}
 
-	@Override
 	protected final boolean isChangeImportant(final IRegistryChangeEvent event) {
 		return !((event.getExtensionDeltas(PlatformUI.PLUGIN_ID,
 				IWorkbenchRegistryConstants.PL_ACTION_SETS).length == 0)
@@ -416,7 +414,6 @@ public final class LegacyActionPersistence extends RegistryPersistence {
 	 * cleared.
 	 * </p>
 	 */
-	@Override
 	public final void read() {
 		clear();
 		LegacyActionPersistence.super.read();

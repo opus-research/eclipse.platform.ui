@@ -103,15 +103,12 @@ public abstract class ViewerTestCase extends TestCase {
 	    }
 	}
 
-	@Override
 	public void setUp() {
 		Policy.setLog(new ILogger(){
-			@Override
 			public void log(IStatus status) {
 				fail(status.getMessage());
 			}});
 		SafeRunnable.setRunner(new ISafeRunnableRunner(){
-			@Override
 			public void run(ISafeRunnable code) {
 				try {
 					code.run();
@@ -137,7 +134,6 @@ public abstract class ViewerTestCase extends TestCase {
 		}
 	}
 
-	@Override
 	public void tearDown() {
 	    processEvents();
 	    fViewer = null;

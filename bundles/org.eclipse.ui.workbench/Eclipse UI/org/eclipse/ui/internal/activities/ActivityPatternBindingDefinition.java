@@ -105,8 +105,7 @@ public final class ActivityPatternBindingDefinition {
         return compareTo;
     }
 
-    @Override
-	public boolean equals(Object object) {
+    public boolean equals(Object object) {
         if (!(object instanceof ActivityPatternBindingDefinition)) {
 			return false;
 		}
@@ -143,8 +142,7 @@ public final class ActivityPatternBindingDefinition {
     	return isEqualityPattern;
     }
 
-    @Override
-	public int hashCode() {
+    public int hashCode() {
         if (hashCode == HASH_INITIAL) {
             hashCode = hashCode * HASH_FACTOR + Util.hashCode(activityId);
             hashCode = hashCode * HASH_FACTOR + Util.hashCode(pattern);
@@ -157,8 +155,7 @@ public final class ActivityPatternBindingDefinition {
         return hashCode;
     }
 
-    @Override
-	public String toString() {
+    public String toString() {
         if (string == null) {
             final StringBuffer stringBuffer = new StringBuffer();
             stringBuffer.append('[');

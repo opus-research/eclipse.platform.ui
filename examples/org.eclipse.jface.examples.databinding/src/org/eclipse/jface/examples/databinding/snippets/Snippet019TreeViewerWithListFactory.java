@@ -67,7 +67,6 @@ public class Snippet019TreeViewerWithListFactory {
 	public static void main(String[] args) {
 		Display display = Display.getDefault();
 		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
-			@Override
 			public void run() {
 				try {
 					Snippet019TreeViewerWithListFactory window = new Snippet019TreeViewerWithListFactory();
@@ -118,7 +117,6 @@ public class Snippet019TreeViewerWithListFactory {
 
 		final Button addRootButton = new Button(group, SWT.NONE);
 		addRootButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				List list = input.getList();
 				Bean root = createBean("root");
@@ -134,7 +132,6 @@ public class Snippet019TreeViewerWithListFactory {
 
 		addChildBeanButton = new Button(group, SWT.NONE);
 		addChildBeanButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				Bean parent = getSelectedBean();
 				List list = new ArrayList(parent.getList());
@@ -151,7 +148,6 @@ public class Snippet019TreeViewerWithListFactory {
 
 		removeBeanButton = new Button(group, SWT.NONE);
 		removeBeanButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				TreeItem selectedItem = beanViewer.getTree().getSelection()[0];
 				TreeItem parentItem = selectedItem.getParentItem();
@@ -174,7 +170,6 @@ public class Snippet019TreeViewerWithListFactory {
 
 		copyButton = new Button(group, SWT.NONE);
 		copyButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				clipboard.setValue(getSelectedBean());
 			}
@@ -183,7 +178,6 @@ public class Snippet019TreeViewerWithListFactory {
 
 		pasteButton = new Button(group, SWT.NONE);
 		pasteButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				Bean copy = (Bean) clipboard.getValue();
 				if (copy == null)
@@ -205,7 +199,6 @@ public class Snippet019TreeViewerWithListFactory {
 
 		final Button refreshButton = new Button(group, SWT.NONE);
 		refreshButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				beanViewer.refresh();
 			}
@@ -263,7 +256,6 @@ public class Snippet019TreeViewerWithListFactory {
 		final IObservableValue beanViewerSelection = ViewersObservables
 				.observeSingleSelection(beanViewer);
 		IObservableValue beanSelected = new ComputedValue(Boolean.TYPE) {
-			@Override
 			protected Object calculate() {
 				return Boolean.valueOf(beanViewerSelection.getValue() != null);
 			}
@@ -277,7 +269,6 @@ public class Snippet019TreeViewerWithListFactory {
 		dbc.bindValue(SWTObservables.observeEnabled(copyButton), beanSelected);
 		dbc.bindValue(SWTObservables.observeEnabled(pasteButton),
 				new ComputedValue(Boolean.TYPE) {
-					@Override
 					protected Object calculate() {
 						return Boolean.valueOf(clipboard.getValue() != null);
 					}

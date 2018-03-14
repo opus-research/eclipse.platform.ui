@@ -36,7 +36,6 @@ public abstract class CSSRuleImpl extends AbstractCSSNode implements CSSRule {
 	 * (non-Javadoc)
 	 * @see org.w3c.dom.css.CSSRule#getCssText()
 	 */
-	@Override
 	public String getCssText() {
 		// TODO Auto-generated constructor stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
@@ -46,7 +45,6 @@ public abstract class CSSRuleImpl extends AbstractCSSNode implements CSSRule {
 	 * (non-Javadoc)
 	 * @see org.w3c.dom.css.CSSRule#getParentStyleSheet()
 	 */
-	@Override
 	public CSSStyleSheet getParentStyleSheet() {
 		return parentStyleSheet;
 	}
@@ -55,7 +53,6 @@ public abstract class CSSRuleImpl extends AbstractCSSNode implements CSSRule {
 	 * (non-Javadoc)
 	 * @see org.w3c.dom.css.CSSRule#getParentRule()
 	 */
-	@Override
 	public CSSRule getParentRule() {
 		return parentRule;
 	}
@@ -64,14 +61,12 @@ public abstract class CSSRuleImpl extends AbstractCSSNode implements CSSRule {
 	 * (non-Javadoc)
 	 * @see org.w3c.dom.css.CSSRule#getType()
 	 */
-	@Override
 	abstract public short getType();
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.w3c.dom.css.CSSRule#setCssText(java.lang.String)
 	 */
-	@Override
 	public void setCssText(String cssText) throws DOMException {
 		if(readOnly)
 			throw new DOMExceptionImpl(DOMException.NO_MODIFICATION_ALLOWED_ERR, DOMExceptionImpl.NO_MODIFICATION_ALLOWED_ERROR);
