@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 vogella GmbH and others.
+ * Copyright (c) 2014 vogella GmbH and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Simon Scholz <simon.scholz@vogella.com> - initial API and implementation based on SWTObservable.getRealm
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472784
  *******************************************************************************/
 package org.eclipse.jface.databinding.swt;
 
@@ -25,7 +24,7 @@ import org.eclipse.swt.widgets.Display;
  */
 public class DisplayRealm extends Realm {
 
-	private static List<DisplayRealm> realms = new ArrayList<>();
+	private static List<DisplayRealm> realms = new ArrayList<DisplayRealm>();
 
 	/**
 	 * Returns the realm representing the UI thread for the given display.
