@@ -29,7 +29,7 @@ public class DecorationContext implements IDecorationContext {
 	 */
 	public static final IDecorationContext DEFAULT_CONTEXT = new DecorationContext();
 
-	private Map<String,Object> properties = new HashMap<>();
+	private Map properties = new HashMap();
 
 	/**
 	 * Create a decoration context.
@@ -44,7 +44,7 @@ public class DecorationContext implements IDecorationContext {
 
 	@Override
 	public String[] getProperties() {
-		return properties.keySet().toArray(new String[properties.size()]);
+		return (String[]) properties.keySet().toArray(new String[properties.size()]);
 	}
 
 	/**

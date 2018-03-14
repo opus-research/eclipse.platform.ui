@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 402445
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -22,17 +21,16 @@ import org.eclipse.swt.graphics.Image;
  * {@link TableViewer}
  *
  * <p><b>This classes is intended to be subclassed</b></p>
- * @param <E> Type of an element of the model
  *
  * @since 3.3
  *
  */
-public class ColumnLabelProvider<E> extends CellLabelProvider<E>
-		implements IFontProvider<E>, IColorProvider<E>, ILabelProvider<E> {
+public class ColumnLabelProvider extends CellLabelProvider implements
+		IFontProvider, IColorProvider, ILabelProvider {
 
 	@Override
-	public void update(ViewerCell<E> cell) {
-		E element = cell.getElement();
+	public void update(ViewerCell cell) {
+		Object element = cell.getElement();
 		cell.setText(getText(element));
 		Image image = getImage(element);
 		cell.setImage(image);
@@ -43,28 +41,27 @@ public class ColumnLabelProvider<E> extends CellLabelProvider<E>
 	}
 
 	@Override
-	public Font getFont(E element) {
+	public Font getFont(Object element) {
 		return null;
 	}
 
 	@Override
-	public Color getBackground(E element) {
+	public Color getBackground(Object element) {
 		return null;
 	}
 
 	@Override
-	public Color getForeground(E element) {
-		return null;
-	}
-
-
-	@Override
-	public Image getImage(E element) {
+	public Color getForeground(Object element) {
 		return null;
 	}
 
 	@Override
-	public String getText(E element) {
+	public Image getImage(Object element) {
+		return null;
+	}
+
+	@Override
+	public String getText(Object element) {
 		return element == null ? "" : element.toString();//$NON-NLS-1$
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Hendrik Still <hendrik.still@gammas.de> - bug 415561
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -17,11 +16,10 @@ import org.eclipse.swt.graphics.Image;
  * Extends <code>IBaseLabelProvider</code> with the methods
  * to provide the text and/or image for each column of a given element.
  * Used by table viewers.
- * @param <E> Type of an single element of the model
  *
  * @see TableViewer
  */
-public interface ITableLabelProvider<E> extends IBaseLabelProvider<E> {
+public interface ITableLabelProvider extends IBaseLabelProvider {
     /**
      * Returns the label image for the given column of the given element.
      *
@@ -33,7 +31,7 @@ public interface ITableLabelProvider<E> extends IBaseLabelProvider<E> {
      * @return Image or <code>null</code> if there is no image for the
      *  given object at columnIndex
      */
-    public Image getColumnImage(E element, int columnIndex);
+    public Image getColumnImage(Object element, int columnIndex);
 
     /**
      * Returns the label text for the given column of the given element.
@@ -45,5 +43,5 @@ public interface ITableLabelProvider<E> extends IBaseLabelProvider<E> {
      * @return String or or <code>null</code> if there is no text for the
      *  given object at columnIndex
      */
-    public String getColumnText(E element, int columnIndex);
+    public String getColumnText(Object element, int columnIndex);
 }
