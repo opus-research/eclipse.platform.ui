@@ -28,9 +28,7 @@ public class StatusToStringConverter extends Converter implements IConverter {
 		super(IStatus.class, String.class);
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.databinding.conversion.IConverter#convert(java.lang.Object)
-	 */
+
 	@Override
 	public Object convert(Object fromObject) {
 		if (fromObject == null) {
