@@ -90,6 +90,9 @@ public class TreeViewerFrameSource implements IFrameSource {
         return frame;
     }
 
+    /* (non-Javadoc)
+     * Method declared on IFrameSource.
+     */
     @Override
 	public Frame getFrame(int whichFrame, int flags) {
         switch (whichFrame) {
