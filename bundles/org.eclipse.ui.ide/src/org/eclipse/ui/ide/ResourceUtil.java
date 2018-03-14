@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 461762
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 478686
  *******************************************************************************/
 package org.eclipse.ui.ide;
 
@@ -56,7 +55,7 @@ public final class ResourceUtil {
 		}
         // Note: do not treat IFileEditorInput as a special case.  Use the adapter mechanism instead.
         // See Bug 87288 [IDE] [EditorMgmt] Should avoid explicit checks for [I]FileEditorInput
-		return Adapters.adapt(editorInput, IFile.class);
+		return Adapters.getAdapter(editorInput, IFile.class, true);
     }
 
     /**
@@ -73,7 +72,7 @@ public final class ResourceUtil {
 		}
         // Note: do not treat IFileEditorInput as a special case.  Use the adapter mechanism instead.
         // See Bug 87288 [IDE] [EditorMgmt] Should avoid explicit checks for [I]FileEditorInput
-		IResource resource = Adapters.adapt(editorInput, IResource.class);
+		IResource resource = Adapters.getAdapter(editorInput, IResource.class, true);
 		if (resource != null) {
 			return resource;
 		}
@@ -238,16 +237,18 @@ public final class ResourceUtil {
 
 
 	/**
-	 * See Javadoc of {@link Adapters#adapt(Object, Class, boolean)}.
-	 *
-	 * @since 3.2
-	 *
-	 * @deprecated Use {@link Adapters#adapt(Object, Class, boolean)}
-	 *             instead
-	 */
-	@Deprecated
+     * Returns the specified adapter for the given element, or <code>null</code>
+     * if no such adapter was found.
+     *
+     * @param element the model element
+	 * @param adapterType the type of adapter to look up
+	 * @param forceLoad <code>true</code> to force loading of the plug-in providing the adapter,
+	 *   <code>false</code> otherwise
+     * @return the adapter
+     * @since 3.2
+     */
 	public static <T> T getAdapter(Object element, Class<T> adapterType, boolean forceLoad) {
-		return Adapters.adapt(element, adapterType, forceLoad);
+		return Adapters.getAdapter(element, adapterType, forceLoad);
 	}
 
 }

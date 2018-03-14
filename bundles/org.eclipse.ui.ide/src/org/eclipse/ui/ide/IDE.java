@@ -288,7 +288,7 @@ public final class IDE {
 	 *            the marker
 	 */
 	public static void gotoMarker(IEditorPart editor, IMarker marker) {
-		IGotoMarker gotoMarker = Adapters.adapt(editor, IGotoMarker.class);
+		IGotoMarker gotoMarker = Adapters.getAdapter(editor, IGotoMarker.class, true);
 		if (gotoMarker != null) {
 			gotoMarker.gotoMarker(marker);
 		}
@@ -1381,7 +1381,7 @@ public final class IDE {
 		List resources = null;
 		for (Iterator e = originalSelection.iterator(); e.hasNext();) {
 			Object next = e.next();
-			Object resource = Adapters.adapt(next, IResource.class);
+			Object resource = Adapters.getAdapter(next, IResource.class, true);
 			if (resource != null) {
 				if (resources == null) {
 					// lazy init to avoid creating empty lists

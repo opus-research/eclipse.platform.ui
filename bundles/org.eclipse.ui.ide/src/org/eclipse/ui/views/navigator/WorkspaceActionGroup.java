@@ -116,7 +116,7 @@ public class WorkspaceActionGroup extends ResourceNavigatorActionGroup {
         while (resources.hasNext()
                 && (!hasOpenProjects || !hasClosedProjects || hasBuilder || isProjectSelection)) {
             Object next = resources.next();
-			IProject project = Adapters.adapt(next, IProject.class);
+			IProject project = Adapters.getAdapter(next, IProject.class, true);
 
             if (project == null) {
                 isProjectSelection = false;

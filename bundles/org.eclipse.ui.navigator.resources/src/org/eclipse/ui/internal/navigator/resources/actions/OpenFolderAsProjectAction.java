@@ -65,7 +65,7 @@ public class OpenFolderAsProjectAction extends Action {
 			IWorkingSetManager workingSetManager = PlatformUI.getWorkbench().getWorkingSetManager();
 			for (IWorkingSet workingSet : workingSetManager.getWorkingSets()) {
 				for (IAdaptable element : workingSet.getElements()) {
-					if (parentProject.equals(Adapters.adapt(element, IProject.class))) {
+					if (parentProject.equals(Adapters.getAdapter(element, IProject.class, true))) {
 						parentWorkingSets.add(workingSet);
 						break;
 					}
