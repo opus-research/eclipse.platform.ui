@@ -54,6 +54,24 @@ import org.osgi.service.packageadmin.RequiredBundle;
  *
  */
 public class ModelAssembler {
+
+	/**
+	 * 
+	 */
+	private static final String POST_MODEL_CREATION = "postmodelcreation"; //$NON-NLS-1$
+
+	/**
+	 * This field, used in the {@link #processModel(int)} method, indicates that the legacy
+	 * workbench model is not yet created.
+	 */
+	public static final int DURING_MODEL_CREATION = 0;
+
+	/**
+	 * This field, used in the {@link #processModel(int)} method, indicates that the workbench model
+	 * has been created.
+	 */
+	public static final int AFTER_MODEL_CREATION = 1;
+
 	@Inject
 	private Logger logger;
 
@@ -66,9 +84,16 @@ public class ModelAssembler {
 	final private static String extensionPointID = "org.eclipse.e4.workbench.model"; //$NON-NLS-1$
 
 	/**
-	 * Process the model
+	 * Process the model based on the step field which can be {@link #PURE_E4},
+	 * {@link #LEGACY_E4STEP} or {@link #LEGACY_E3STEP}.
+	 * 
+	 * @param step
+	 * @see #PURE_E4
+	 * @see #LEGACY_E4STEP
+	 * @see #LEGACY_E3STEP
 	 */
-	public void processModel() {
+	public void processModel(int step) {
+
 		IExtensionRegistry registry = RegistryFactory.getRegistry();
 		IExtensionPoint extPoint = registry.getExtensionPoint(extensionPointID);
 		IExtension[] extensions = topoSort(extPoint.getExtensions());
@@ -85,6 +110,9 @@ public class ModelAssembler {
 				if (!"processor".equals(ce.getName()) || !Boolean.parseBoolean(ce.getAttribute("beforefragment"))) { //$NON-NLS-1$ //$NON-NLS-2$
 					continue;
 				}
+				if (!postModelCreationCheck(step, ce)) {
+					continue;
+				}
 				runProcessor(ce);
 			}
 		}
@@ -93,6 +121,9 @@ public class ModelAssembler {
 			IConfigurationElement[] ces = extension.getConfigurationElements();
 			for (IConfigurationElement ce : ces) {
 				if (!"fragment".equals(ce.getName())) { //$NON-NLS-1$
+					continue;
+				}
+				if (!postModelCreationCheck(step, ce)) {
 					continue;
 				}
 				IContributor contributor = ce.getContributor();
@@ -195,12 +226,44 @@ public class ModelAssembler {
 				if (!"processor".equals(ce.getName()) || Boolean.parseBoolean(ce.getAttribute("beforefragment"))) { //$NON-NLS-1$ //$NON-NLS-2$
 					continue;
 				}
+				if (!postModelCreationCheck(step, ce)) {
+					continue;
+				}
 
 				runProcessor(ce);
 			}
 		}
 
 		resolveImports(imports, addedElements);
+	}
+
+	/**
+	 * Check if this configuration element must be run now based on the <code>step</code> parameter
+	 * which can be any of {@link #BEFORE_FULL_MODEL_CREATIO}, {@link #AFTER_MODEL_CREATION}.
+	 * 
+	 * @param step
+	 * @param ce
+	 * @return true if the element must be processed now.
+	 */
+	private boolean postModelCreationCheck(int step, IConfigurationElement ce) {
+
+		// Running before the workbench model is created
+		if (step == DURING_MODEL_CREATION) {
+			if (ce.getAttribute(POST_MODEL_CREATION) == null) {
+				return true;
+			}
+			return Boolean.FALSE.toString().equals(ce.getAttribute(POST_MODEL_CREATION));
+		}
+
+		// Running after the workbench model has been created
+		else if (step == AFTER_MODEL_CREATION) {
+			if (ce.getAttribute(POST_MODEL_CREATION) == null) {
+				return false;
+			}
+			return Boolean.TRUE.toString().equals(ce.getAttribute(POST_MODEL_CREATION));
+		}
+
+		return false;
 	}
 
 	private void runProcessor(IConfigurationElement ce) {
