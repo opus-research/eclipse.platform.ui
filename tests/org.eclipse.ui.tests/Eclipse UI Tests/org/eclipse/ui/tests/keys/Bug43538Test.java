@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,8 +16,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.intro.IIntroManager;
 import org.eclipse.ui.tests.harness.util.AutomationUtil;
 import org.eclipse.ui.tests.harness.util.UITestCase;
 
@@ -28,51 +26,44 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
  */
 public class Bug43538Test extends UITestCase {
 
-	/**
-	 * Constructs a new instance of this test case.
-	 * 
-	 * @param testName
-	 *            The name of the test
-	 */
-	public Bug43538Test(String testName) {
-		super(testName);
-	}
+    /**
+     * Constructs a new instance of this test case.
+     * 
+     * @param testName
+     *            The name of the test
+     */
+    public Bug43538Test(String testName) {
+        super(testName);
+    }
 
-	/**
-	 * Tests that if "Ctrl+Space" is pressed only one key down event with the
-	 * "CTRL" mask is received.
-	 */
-	public void testCtrlSpace() {
-		// Close Welcome: workaround for https://bugs.eclipse.org/429592 / https://bugs.eclipse.org/366608#c12
-		IIntroManager introManager= PlatformUI.getWorkbench().getIntroManager();
-		introManager.closeIntro(introManager.getIntro());
+    /**
+     * Tests that if "Ctrl+Space" is pressed only one key down event with the
+     * "CTRL" mask is received.
+     */
+    public void testCtrlSpace() {
+        // Set up a working environment.
+        Display display = Display.getCurrent();
+        Listener listener = new Listener() {
+            int count = 0;
 
-		// Set up a working environment.
-		Display display = Display.getCurrent();
-		Listener listener = new Listener() {
-			int count = 0;
+            public void handleEvent(Event event) {
+                if (event.stateMask == SWT.CTRL) {
+                    assertEquals(
+                            "Multiple key down events for 'Ctrl+Space'", 0, count++); //$NON-NLS-1$
+                }
+            }
+        };
+        display.addFilter(SWT.KeyDown, listener);
 
-			public void handleEvent(Event event) {
-				if (event.stateMask == SWT.CTRL) {
-					assertEquals(
-							"Multiple key down events for 'Ctrl+Space'", 0, count++); //$NON-NLS-1$
-				}
-			}
-		};
-		display.addFilter(SWT.KeyDown, listener);
-		try {
+        AutomationUtil.performKeyCodeEvent(display, SWT.KeyDown, SWT.CONTROL);
+        AutomationUtil.performKeyCodeEvent(display, SWT.KeyDown, Action.findKeyCode("SPACE")); //$NON-NLS-1$
+        AutomationUtil.performKeyCodeEvent(display, SWT.KeyUp, Action.findKeyCode("SPACE")); //$NON-NLS-1$
+        AutomationUtil.performKeyCodeEvent(display, SWT.KeyUp, SWT.CONTROL);
+        
+        while (display.readAndDispatch())
+            ;
 
-			AutomationUtil.performKeyCodeEvent(display, SWT.KeyDown, SWT.CONTROL);
-			AutomationUtil.performKeyCodeEvent(display, SWT.KeyDown, Action.findKeyCode("SPACE")); //$NON-NLS-1$
-			AutomationUtil.performKeyCodeEvent(display, SWT.KeyUp, Action.findKeyCode("SPACE")); //$NON-NLS-1$
-			AutomationUtil.performKeyCodeEvent(display, SWT.KeyUp, SWT.CONTROL);
-
-			while (display.readAndDispatch())
-				;
-
-		} finally {
-			// Clean up the working environment.
-			display.removeFilter(SWT.KeyDown, listener);
-		}
-	}
+        // Clean up the working environment.
+        display.removeFilter(SWT.KeyDown, listener);
+    }
 }
