@@ -356,8 +356,7 @@ public abstract class FieldEditorPreferencePage extends PreferencePage
      * (and <code>IPropertyChangeListener</code>) method intercepts <code>IS_VALID</code> 
      * events but passes other events on to its superclass.
      */
-    @Override
-	public void propertyChange(PropertyChangeEvent event) {
+    public void propertyChange(PropertyChangeEvent event) {
 
         if (event.getProperty().equals(FieldEditor.IS_VALID)) {
             boolean newValue = ((Boolean) event.getNewValue()).booleanValue();

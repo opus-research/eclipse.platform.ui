@@ -172,8 +172,7 @@ public class InputDialog extends Dialog {
         text.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL
                 | GridData.HORIZONTAL_ALIGN_FILL));
         text.addModifyListener(new ModifyListener() {
-            @Override
-			public void modifyText(ModifyEvent e) {
+            public void modifyText(ModifyEvent e) {
                 validateInput();
             }
         });
