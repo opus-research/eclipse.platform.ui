@@ -27,6 +27,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -69,6 +72,7 @@ import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.jface.action.IContributionManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.SubContributionItem;
@@ -100,6 +104,9 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 
 	private Map<MMenuElement, ContributionRecord> modelContributionToRecord = new HashMap<MMenuElement, ContributionRecord>();
 	private Map<MMenuElement, ArrayList<ContributionRecord>> sharedElementToRecord = new HashMap<MMenuElement, ArrayList<ContributionRecord>>();
+
+	private ScheduledExecutorService mgrUpdateExecutor = Executors.newScheduledThreadPool(1);
+	private Collection<IContributionManager> mgrToUpdate = new HashSet<>();
 
 	@Inject
 	private Logger logger;
@@ -216,7 +223,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					manager.setVisible(menuModel.isVisible());
 					if (manager.getParent() != null) {
 						manager.getParent().markDirty();
-						manager.getParent().update(false);
+						addManagerToUpdate(manager.getParent());
 					}
 				} else if (element instanceof MMenuElement) {
 					MMenuElement itemModel = (MMenuElement) element;
@@ -228,7 +235,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					item.setVisible(itemModel.isVisible());
 					if (item.getParent() != null) {
 						item.getParent().markDirty();
-						item.getParent().update(false);
+						addManagerToUpdate(item.getParent());
 					}
 				}
 			}
@@ -340,6 +347,8 @@ MenuManagerEventHelper.getInstance()
 			rendererFilter = null;
 		}
 		context.remove(MenuManagerRenderer.class);
+
+		mgrUpdateExecutor.shutdownNow();
 	}
 
 	@Override
@@ -556,7 +565,7 @@ MenuManagerEventHelper.getInstance()
 				@Override
 				public boolean changed(IEclipseContext context) {
 					record.updateVisibility(parentContext.getActiveLeaf());
-					manager.update(false);
+					addManagerToUpdate(manager);
 					return true;
 				}
 			});
@@ -629,7 +638,7 @@ MenuManagerEventHelper.getInstance()
 				modelProcessSwitch(parentManager, (MMenuElement) childME);
 			}
 		}
-		parentManager.update(false);
+		addManagerToUpdate(parentManager);
 	}
 
 	private void addToManager(MenuManager parentManager, MMenuElement model,
@@ -1151,4 +1160,23 @@ MenuManagerEventHelper.getInstance()
 		MenuManager mm = getManager(menu);
 		clearModelToManager(menu, mm);
 	}
+
+	private void addManagerToUpdate(IContributionManager mgr) {
+		if (this.mgrToUpdate.isEmpty()) {
+			// schedule conflated update task
+			mgrUpdateExecutor.schedule(new Runnable() {
+
+				@Override
+				public void run() {
+					Collection<IContributionManager> toUpdate = new HashSet<>(mgrToUpdate);
+					mgrToUpdate.clear();
+					for (IContributionManager mgr : toUpdate) {
+						mgr.update(false);
+					}
+				}
+			}, 100, TimeUnit.MILLISECONDS);
+		}
+		this.mgrToUpdate.add(mgr);
+	}
+
 }
