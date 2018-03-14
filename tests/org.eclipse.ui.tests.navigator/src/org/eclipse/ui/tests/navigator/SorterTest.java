@@ -25,8 +25,8 @@ import org.eclipse.ui.internal.navigator.NavigatorPlugin;
 import org.eclipse.ui.navigator.INavigatorContentDescriptor;
 import org.eclipse.ui.tests.harness.util.DisplayHelper;
 import org.eclipse.ui.tests.navigator.extension.TestContentProvider;
-import org.eclipse.ui.tests.navigator.extension.TestContentProviderResource;
 import org.eclipse.ui.tests.navigator.extension.TestExtensionTreeData;
+import org.eclipse.ui.tests.navigator.extension.TestContentProviderResource;
 import org.eclipse.ui.tests.navigator.extension.TestSorterDataAndResource;
 import org.eclipse.ui.tests.navigator.extension.TestSorterResource;
 
@@ -299,41 +299,17 @@ public class SorterTest extends NavigatorTestBase {
 
 		TreeItem addedParent;
 		
-		addedParent = items[_projectInd].getItem(2);
+		addedParent = items[_projectInd].getItem(3);
 		assertEquals("BlueParent", addedParent.getText());
-		addedParent = items[_projectInd].getItem(1);
+		addedParent = items[_projectInd].getItem(2);
 		assertEquals("BlueAddedParent", addedParent.getText());
 		
 		// The sorter for TEST_CONTENT_SORTER_MODEL_OVERRIDE sorts the model
 		// using a sorter that is by name
 		assertEquals("BlueAddedChild1", addedParent.getItem(0).getText());
-		assertEquals("BlueChild1", addedParent.getItem(1).getText());
-		assertEquals("BlueAddedFile1.txt", addedParent.getItem(2).getText());
-		assertEquals("BlueAddedFile2.txt", addedParent.getItem(3).getText());
-
-	}
-
-	public void testSorterSortOnlyMultiContent() throws Exception {
-
-		waitForModelObjects();
-
-		_contentService.bindExtensions(new String[] { TEST_CONTENT_SORTER_BASIC_SORTONLY_SORTER }, false);
-		_contentService.getActivationService().activateExtensions(
-				new String[] { TEST_CONTENT_SORTER_BASIC_SORTONLY_SORTER }, false);
-		_contentService.bindExtensions(new String[] { TEST_CONTENT_SORTER_BASIC_A }, false);
-		_contentService.getActivationService().activateExtensions(new String[] { TEST_CONTENT_SORTER_BASIC_A }, false);
-		_contentService.bindExtensions(new String[] { TEST_CONTENT_SORTER_BASIC_B }, false);
-		_contentService.getActivationService().activateExtensions(new String[] { TEST_CONTENT_SORTER_BASIC_B }, false);
-
-
-		TreeItem[] items = _viewer.getTree().getItems();
-
-		// the test content enables on the input of the viewer thus it is on
-		// top level
-		assertEquals("child1", items[0].getText());
-		assertEquals("child2", items[1].getText());
-		assertEquals("child3", items[2].getText());
-		assertEquals("child4", items[3].getText());
+		assertEquals("BlueAddedFile1.txt", addedParent.getItem(1).getText());
+		assertEquals("BlueAddedFile2.txt", addedParent.getItem(2).getText());
+		assertEquals("BlueChild1", addedParent.getItem(3).getText());
 
 	}
 
