@@ -108,8 +108,7 @@ public class IDEApplication implements IApplication, IExecutableExtension {
     /* (non-Javadoc)
      * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.IApplicationContext context)
      */
-    @Override
-	public Object start(IApplicationContext appContext) throws Exception {
+    public Object start(IApplicationContext appContext) throws Exception {
         Display display = createDisplay();
         // processor must be created before we start event loop
         DelayedEventsProcessor processor = new DelayedEventsProcessor(display);
@@ -174,8 +173,7 @@ public class IDEApplication implements IApplication, IExecutableExtension {
     /* (non-Javadoc)
      * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
      */
-    @Override
-	public void setInitializationData(IConfigurationElement config,
+    public void setInitializationData(IConfigurationElement config,
             String propertyName, Object data) {
         // There is nothing to do for IDEApplication
     }
@@ -588,14 +586,12 @@ public class IDEApplication implements IApplication, IExecutableExtension {
     /* (non-Javadoc)
      * @see org.eclipse.equinox.app.IApplication#stop()
      */
-	@Override
 	public void stop() {
 		final IWorkbench workbench = PlatformUI.getWorkbench();
 		if (workbench == null)
 			return;
 		final Display display = workbench.getDisplay();
 		display.syncExec(new Runnable() {
-			@Override
 			public void run() {
 				if (!display.isDisposed())
 					workbench.close();
