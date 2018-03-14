@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -135,11 +135,17 @@ public class ResourcePropertySource implements IPropertySource {
         this.element = res;
     }
 
+    /* (non-Javadoc)
+     * Method declared on IPropertySource.
+     */
     @Override
 	public Object getEditableValue() {
         return this;
     }
 
+    /* (non-Javadoc)
+     * Method declared on IPropertySource.
+     */
     @Override
 	public IPropertyDescriptor[] getPropertyDescriptors() {
         if (isPathVariable(element)) {
@@ -148,6 +154,9 @@ public class ResourcePropertySource implements IPropertySource {
 		return propertyDescriptors;
     }
 
+    /* (non-Javadoc)
+     * Method declared on IPropertySource.
+     */
     @Override
 	public Object getPropertyValue(Object name) {
         if (name.equals(IBasicPropertyConstants.P_TEXT)) {
@@ -213,6 +222,9 @@ public class ResourcePropertySource implements IPropertySource {
         return true;
     }
 
+    /* (non-Javadoc)
+     * Method declared on IPropertySource.
+     */
     @Override
 	public boolean isPropertySet(Object property) {
         return false;

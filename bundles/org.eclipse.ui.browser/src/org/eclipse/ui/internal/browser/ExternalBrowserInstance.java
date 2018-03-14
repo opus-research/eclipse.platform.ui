@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,54 +36,26 @@ public class ExternalBrowserInstance extends AbstractWebBrowser {
 		this.browser = browser;
 	}
 
-	@Override
 	public void openURL(URL url) throws PartInitException {
 		final String urlText = url == null ? null : url.toExternalForm();
 
-		ArrayList<String> cmdOptions = new ArrayList<>();
+		ArrayList<String> cmdOptions = new ArrayList<String>();
 		String location = browser.getLocation();
 		cmdOptions.add(location);
 		String parameters = browser.getParameters();
-
-		/**
-		 * If true, then report non-zero exit values. Primarily useful when
-		 * using a launcher, like OS X's open(1), as some browsers (like IE)
-		 * routinely return non-zero values (bug 475775).
-		 */
-		final boolean reportNonZeroExitValue[] = new boolean[] { false };
-
 		Trace
 		.trace(
 				Trace.FINEST,
 				"Launching external Web browser: " + location + " - " + parameters + " - " + urlText); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-		// For MacOS X .app, we use open(1) to launch the app for the given URL
-		// The order of the arguments is specific:
-		//
-		// open -a APP URL --args PARAMETERS
-		//
-		// As #createParameterArray() will append the URL to the end if %URL%
-		// isn't found, we only include urlText if the parameters makes
-		// reference to %URL%. This could mean that %URL% is specified
-		// twice on the command line (e.g., "open -a XXX URL --args XXX URL
-		// %%%") but presumably the user means to do that.
-		boolean isMacBundle = Util.isMac() && isMacAppBundle(location);
-		boolean includeUrlInParams = !isMacBundle
-				|| (parameters != null && parameters.contains(IBrowserDescriptor.URL_PARAMETER));
-		String[] params = WebBrowserUtil.createParameterArray(parameters, includeUrlInParams ? urlText : null);
+		String[] params = WebBrowserUtil.createParameterArray(parameters, urlText);
 
 		try {
-			if (isMacBundle) {
+			if (Util.isMac() && isMacAppBundle(location)) {
 				cmdOptions.add(0, "-a"); //$NON-NLS-1$
 				cmdOptions.add(0, "open"); //$NON-NLS-1$
-				if (urlText != null) {
-					cmdOptions.add(urlText);
-				}
 				// --args supported in 10.6 and later
-				if (params.length > 0) {
-					cmdOptions.add("--args");//$NON-NLS-1$
-				}
-				reportNonZeroExitValue[0] = true;
+				cmdOptions.add("--args");//$NON-NLS-1$
 			}
 
 			for (String param : params) {
@@ -99,50 +71,41 @@ public class ExternalBrowserInstance extends AbstractWebBrowser {
 			Thread errConsumer = new StreamConsumer(process.getErrorStream());
 			errConsumer.setName("External browser  error reader"); //$NON-NLS-1$
 			errConsumer.start();
-
-			Thread thread = new Thread() {
-				@Override
-				public void run() {
-					try {
-						process.waitFor();
-						if (reportNonZeroExitValue[0] && process.exitValue() != 0) {
-							Trace.trace(Trace.SEVERE,
-									"External browser returned non-zero status: " + process.exitValue()); //$NON-NLS-1$
-							WebBrowserUtil.openError(NLS.bind(Messages.errorCouldNotLaunchExternalWebBrowser, urlText));
-						}
-						DefaultBrowserSupport.getInstance().removeBrowser(ExternalBrowserInstance.this);
-					} catch (Exception e) {
-						// ignore
-					}
-				}
-			};
-			thread.setDaemon(true);
-			thread.start();
 		} catch (Exception e) {
 			Trace.trace(Trace.SEVERE, "Could not launch external browser", e); //$NON-NLS-1$
 			WebBrowserUtil.openError(NLS.bind(
-					Messages.errorCouldNotLaunchExternalWebBrowser, urlText));
+					Messages.errorCouldNotLaunchWebBrowser, urlText));
 		}
+		Thread thread = new Thread() {
+			public void run() {
+				try {
+					process.waitFor();
+					if (process.exitValue() != 0) {
+						Trace.trace(Trace.SEVERE, "Could not launch external browser"); //$NON-NLS-1$
+						WebBrowserUtil.openError(NLS.bind(Messages.errorCouldNotLaunchWebBrowser, urlText));
+					}
+					DefaultBrowserSupport.getInstance().removeBrowser(
+							ExternalBrowserInstance.this);
+				} catch (Exception e) {
+					// ignore
+				}
+			}
+		};
+		thread.setDaemon(true);
+		thread.start();
 	}
 
 	/**
 	 * @return true if the location appears to be a Mac Application bundle
 	 *         (.app)
 	 */
-	public static boolean isMacAppBundle(String location) {
-		return isMacAppBundle(new File(location));
-	}
-
-	/**
-	 * @return true if the location appears to be a Mac Application bundle
-	 *         (.app)
-	 */
-	public static boolean isMacAppBundle(File location) {
+	private boolean isMacAppBundle(String location) {
 		// A very quick heuristic based on Apple's Bundle Programming Guide
 		// https://developer.apple.com/library/mac/documentation/CoreFoundation/Conceptual/CFBundles/BundleTypes/BundleTypes.html#//apple_ref/doc/uid/10000123i-CH101-SW19
-		File macosDir = new File(new File(location, "Contents"), "MacOS"); //$NON-NLS-1$ //$NON-NLS-2$
-		File plist = new File(new File(location, "Contents"), "Info.plist"); //$NON-NLS-1$ //$NON-NLS-2$
-		return location.isDirectory() && macosDir.isDirectory() && plist.isFile();
+		File bundleLoc = new File(location);
+		File macosDir = new File(new File(bundleLoc, "Contents"), "MacOS"); //$NON-NLS-1$ //$NON-NLS-2$
+		File plist = new File(new File(bundleLoc, "Contents"), "Info.plist"); //$NON-NLS-1$ //$NON-NLS-2$
+		return bundleLoc.isDirectory() && macosDir.isDirectory() && plist.isFile();
 	}
 
 	private String join (String delim, String ... data) {
@@ -156,7 +119,6 @@ public class ExternalBrowserInstance extends AbstractWebBrowser {
 	}
 
 
-	@Override
 	public boolean close() {
 		try {
 			process.destroy();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Matt Carter - bug 182822
  *     Boris Bokowski - bug 218269
  *     Matthew Hall - bugs 218269, 146397, 249526, 267451
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 489098
  *******************************************************************************/
 package org.eclipse.core.databinding;
 
@@ -37,7 +36,7 @@ import org.eclipse.core.runtime.Status;
  * @since 1.0
  *
  */
-public final class AggregateValidationStatus extends ComputedValue<IStatus> {
+public final class AggregateValidationStatus extends ComputedValue {
 	/**
 	 * Constant denoting an aggregation strategy that merges multiple non-OK
 	 * status objects in a {@link MultiStatus}. Returns an OK status result if
@@ -111,7 +110,7 @@ public final class AggregateValidationStatus extends ComputedValue<IStatus> {
 	}
 
 	@Override
-	protected IStatus calculate() {
+	protected Object calculate() {
 		IStatus result;
 		if (strategy == MERGED) {
 			result = getStatusMerged(validationStatusProviders);

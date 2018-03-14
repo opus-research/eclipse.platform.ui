@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel - <Lars.Vogel@vogella.com> - Bug 402464
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -30,12 +29,11 @@ import java.text.Collator; // can't use ICU - Collator used in public API
  * to provide a totally different way of sorting elements.
  * </p>
  * <p>
- * @deprecated use <code>ViewerComparator</code> instead.
+ * It is recommended to use <code>ViewerComparator</code> instead.
  * </p>
  * @see IStructuredContentProvider
  * @see StructuredViewer
  */
-@Deprecated
 public class ViewerSorter extends ViewerComparator {
     /**
      * The collator used to sort strings.

@@ -46,7 +46,11 @@ public class OverrideTestsTabItem implements ITabItem {
 		this.item = anItem;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.views.properties.tabbed.ITabItem#getImage()
+	 */
 	public Image getImage() {
 		return item.getImage();
 	}
@@ -60,17 +64,29 @@ public class OverrideTestsTabItem implements ITabItem {
 		return item;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.views.properties.tabbed.ITabItem#getText()
+	 */
 	public String getText() {
 		return item.getText();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.views.properties.tabbed.ITabItem#isIndented()
+	 */
 	public boolean isIndented() {
 		return false;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.views.properties.tabbed.ITabItem#isSelected()
+	 */
 	public boolean isSelected() {
 		return selected;
 	}
