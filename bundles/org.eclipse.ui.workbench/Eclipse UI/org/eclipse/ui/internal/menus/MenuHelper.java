@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,7 +39,6 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
-import org.eclipse.e4.ui.internal.workbench.RenderedElementUtil;
 import org.eclipse.e4.ui.internal.workbench.swt.Policy;
 import org.eclipse.e4.ui.internal.workbench.swt.WorkbenchSWTActivator;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -58,6 +57,8 @@ import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuItem;
+import org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenu;
+import org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
@@ -497,7 +498,7 @@ public class MenuHelper {
 		String pulldown = element.getAttribute("pulldown"); //$NON-NLS-1$
 		if (IWorkbenchRegistryConstants.STYLE_PULLDOWN.equals(style)
 				|| (pulldown != null && pulldown.equals("true"))) { //$NON-NLS-1$
-			MMenuItem item = RenderedElementUtil.createRenderedMenuItem();
+			MRenderedMenuItem item = MenuFactoryImpl.eINSTANCE.createRenderedMenuItem();
 			item.setLabel(text);
 			if (iconUri != null) {
 				item.setIconURI(iconUri);
@@ -521,7 +522,7 @@ public class MenuHelper {
 					};
 				}
 			};
-			RenderedElementUtil.setContributionManager(item, generator);
+			item.setContributionItem(generator);
 			return item;
 		}
 
@@ -594,7 +595,7 @@ public class MenuHelper {
 
 		if (IWorkbenchRegistryConstants.STYLE_PULLDOWN.equals(style)
 				|| (pulldown != null && pulldown.equals("true"))) { //$NON-NLS-1$
-			MMenu menu = RenderedElementUtil.createRenderedMenu();
+			MRenderedMenu menu = MenuFactoryImpl.eINSTANCE.createRenderedMenu();
 			ECommandService cs = app.getContext().get(ECommandService.class);
 			final ParameterizedCommand parmCmd = cs.createCommand(cmdId, null);
 			IContextFunction generator = new ContextFunction() {
@@ -652,7 +653,7 @@ public class MenuHelper {
 					};
 				}
 			};
-			RenderedElementUtil.setContributionManager(menu, generator);
+			menu.setContributionManager(generator);
 			item.setMenu(menu);
 		}
 		

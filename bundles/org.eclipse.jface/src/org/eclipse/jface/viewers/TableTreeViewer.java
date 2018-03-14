@@ -338,18 +338,15 @@ public class TableTreeViewer extends AbstractTreeViewer {
 
 		private void initCellEditorListener() {
 			cellEditorListener = new ICellEditorListener() {
-				@Override
 				public void editorValueChanged(boolean oldValidState,
 						boolean newValidState) {
 					// Ignore.
 				}
 
-				@Override
 				public void cancelEditor() {
 					TableTreeEditorImpl.this.cancelEditing();
 				}
 
-				@Override
 				public void applyEditorValue() {
 					TableTreeEditorImpl.this.applyEditorValue();
 				}

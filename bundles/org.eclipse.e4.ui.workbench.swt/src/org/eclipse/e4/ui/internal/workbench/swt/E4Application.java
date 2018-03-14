@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Tristan Hume - <trishume@gmail.com> -
  *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  *     		Implemented workbench auto-save to correctly restore state in case of crash.
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 366364
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench.swt;
@@ -206,15 +205,11 @@ public class E4Application implements IApplication {
 		appContext.set(UISynchronize.class, new UISynchronize() {
 
 			public void syncExec(Runnable runnable) {
-				if (display != null && !display.isDisposed()) {
-					display.syncExec(runnable);
-				}
+				display.syncExec(runnable);
 			}
 
 			public void asyncExec(Runnable runnable) {
-				if (display != null && !display.isDisposed()) {
-					display.asyncExec(runnable);
-				}
+				display.asyncExec(runnable);
 			}
 		});
 		appContext.set(IApplicationContext.class, applicationContext);
@@ -222,6 +217,13 @@ public class E4Application implements IApplication {
 		// This context will be used by the injector for its
 		// extended data suppliers
 		ContextInjectionFactory.setDefault(appContext);
+
+		// Check if DS is running
+		if (!appContext
+				.containsKey("org.eclipse.e4.ui.workbench.modeling.EPartService")) {
+			throw new IllegalStateException(
+					"Core services not available. Please make sure that a declarative service implementation (such as the bundle 'org.eclipse.equinox.ds') is available!");
+		}
 
 		// Get the factory to create DI instances with
 		IContributionFactory factory = (IContributionFactory) appContext
@@ -292,19 +294,13 @@ public class E4Application implements IApplication {
 		String xmiURI = getArgValue(IWorkbench.XMI_URI_ARG, applicationContext,
 				false);
 		appContext.set(IWorkbench.XMI_URI_ARG, xmiURI);
+		appContext.set(E4Application.THEME_ID, getThemeId(applicationContext));
 
 		String cssURI = getArgValue(IWorkbench.CSS_URI_ARG, applicationContext,
 				false);
 		if (cssURI != null) {
 			appContext.set(IWorkbench.CSS_URI_ARG, cssURI);
 		}
-
-		String themeId = getArgValue(E4Application.THEME_ID,
-				applicationContext, false);
-		if (themeId == null && cssURI == null) {
-			themeId = DEFAULT_THEME_ID;
-		}
-		appContext.set(E4Application.THEME_ID, themeId);
 
 		// Temporary to support old property as well
 		if (cssURI != null && !cssURI.startsWith("platform:")) {
@@ -666,6 +662,11 @@ public class E4Application implements IApplication {
 		mbox.setText(title);
 		mbox.setMessage(message);
 		return mbox.open() == SWT.OK;
+	}
+
+	private String getThemeId(IApplicationContext appContext) {
+		String themeId = getArgValue(E4Application.THEME_ID, appContext, false);
+		return themeId != null ? themeId : DEFAULT_THEME_ID;
 	}
 
 	/**

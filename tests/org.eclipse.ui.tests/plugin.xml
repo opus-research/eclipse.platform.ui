@@ -625,7 +625,7 @@
  
 	   <editor
             class="org.eclipse.ui.tests.api.MockEditorPart"
-            icon="platform:/plugin/org.eclipse.ui/icons/full/obj16/font.png"
+            icon="platform:/plugin/org.eclipse.ui/icons/full/obj16/font.gif"
             default="true"
             name="Plugin Icon Test 1"
             id="org.eclipse.ui.tests.IconTestEditor1"
@@ -4186,11 +4186,6 @@
                label="Testing Tooltip"
                style="push">
          </command>
-      </menuContribution>
-      <menuContribution
-            allPopups="false"
-            class="org.eclipse.ui.tests.menus.DeclaredProgrammaticFactoryForToolbarVisibilityTest"
-            locationURI="toolbar:org.eclipse.ui.tests.toolbarContributionFromFactoryVisibilityTest">
       </menuContribution>
       <menuContribution
             locationURI="popup:org.eclipse.ui.tests.Bug264804?after=additions">
