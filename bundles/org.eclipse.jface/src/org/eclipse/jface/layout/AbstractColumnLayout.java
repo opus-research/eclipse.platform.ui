@@ -24,6 +24,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scrollable;
@@ -65,10 +66,15 @@ public abstract class AbstractColumnLayout extends Layout {
 
 	private boolean relayout = true;
 
-	private Listener resizeListener = event -> {
-		if (!inupdateMode) {
-			updateColumnData(event.widget);
+	private Listener resizeListener = new Listener() {
+
+		@Override
+		public void handleEvent(Event event) {
+			if (!inupdateMode) {
+				updateColumnData(event.widget);
+			}
 		}
+
 	};
 
 	/**
