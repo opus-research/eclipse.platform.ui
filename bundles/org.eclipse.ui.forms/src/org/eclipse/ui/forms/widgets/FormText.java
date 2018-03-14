@@ -84,12 +84,13 @@ import org.eclipse.ui.internal.forms.widgets.TextSegment;
  * on the fly.
  * <p>
  * When configured to use formatting XML, the control requires the root element
- * <code>form</code> to be used and requires any ampersand (&amp;) characters in
- * the text to be replaced by the entity <b>&amp;amp;</b>. The following tags
- * can be children of the <code>form</code> element:
+ * <code>form</code> to be used and requires any ampersand (&amp;) characters in the text to
+ * be replaced by the entity <b>&amp;amp;</b>. The following tags can be children of the
+ * <code>form</code> element:
  * </p>
  * <ul>
- * <li><b>p </b>- for defining paragraphs. The following attributes are allowed:
+ * <li><b>p </b>- for defining paragraphs. The following attributes are
+ * allowed:
  * <ul>
  * <li><b>vspace </b>- if set to 'false', no vertical space will be added
  * (default is 'true')</li>
@@ -114,11 +115,11 @@ import org.eclipse.ui.internal.forms.widgets.TextSegment;
  * the control. The following tags can appear as children of either <b>p </b> or
  * <b>li </b> elements:
  * <ul>
- * <li><b>img </b>- to render an image. Element accepts attribute 'href' that is
- * a key to the <code>Image</code> set using 'setImage' method. Vertical
+ * <li><b>img </b>- to render an image. Element accepts attribute 'href' that
+ * is a key to the <code>Image</code> set using 'setImage' method. Vertical
  * position of image relative to surrounding text is optionally controlled by
- * the attribute <b>align</b> that can have values <b>top</b>, <b>middle</b> and
- * <b>bottom</b></li>
+ * the attribute <b>align</b> that can have values <b>top</b>, <b>middle</b>
+ * and <b>bottom</b></li>
  * <li><b>a </b>- to render a hyperlink. Element accepts attribute 'href' that
  * will be provided to the hyperlink listeners via HyperlinkEvent object. The
  * element also accepts 'nowrap' attribute (default is false). When set to
@@ -126,30 +127,31 @@ import org.eclipse.ui.internal.forms.widgets.TextSegment;
  * when 'http://' is encountered in text are not wrapped.</li>
  * <li><b>b </b>- the enclosed text will use bold font.</li>
  * <li><b>br </b>- forced line break (no attributes).</li>
- * <li><b>span </b>- the enclosed text will have the color and font specified in
- * the element attributes. Color is provided using 'color' attribute and is a
+ * <li><b>span </b>- the enclosed text will have the color and font specified
+ * in the element attributes. Color is provided using 'color' attribute and is a
  * key to the Color object set by 'setColor' method. Font is provided using
- * 'font' attribute and is a key to the Font object set by 'setFont' method. As
- * with hyperlinks, it is possible to block wrapping by setting 'nowrap' to true
- * (false by default).</li>
+ * 'font' attribute and is a key to the Font object set by 'setFont' method. As with
+ * hyperlinks, it is possible to block wrapping by setting 'nowrap' to true
+ * (false by default).
+ * </li>
  * <li><b>control (new in 3.1)</b> - to place a control that is a child of the
  * text control. Element accepts attribute 'href' that is a key to the Control
  * object set using 'setControl' method. Optionally, attribute 'fill' can be set
  * to <code>true</code> to make the control fill the entire width of the text.
  * Form text is not responsible for creating or disposing controls, it only
- * places them relative to the surrounding text. Similar to <b>img</b>, vertical
- * position of the control can be set using the <b>align</b> attribute. In
- * addition, <b>width</b> and <b>height</b> attributes can be used to force the
- * dimensions of the control. If not used, the preferred control size will be
- * used.
+ * places them relative to the surrounding text. Similar to <b>img</b>,
+ * vertical position of the control can be set using the <b>align</b>
+ * attribute. In addition, <b>width</b> and <b>height</b> attributes can
+ * be used to force the dimensions of the control. If not used,
+ * the preferred control size will be used.
  * </ul>
  * <p>
  * None of the elements can nest. For example, you cannot have <b>b </b> inside
  * a <b>span </b>. This was done to keep everything simple and transparent.
  * Since 3.1, an exception to this rule has been added to support nesting images
- * and text inside the hyperlink tag (<b>a</b>). Image enclosed in the hyperlink
- * tag acts as a hyperlink, can be clicked on and can accept and render
- * selection focus. When both text and image is enclosed, selection and
+ * and text inside the hyperlink tag (<b>a</b>). Image enclosed in the
+ * hyperlink tag acts as a hyperlink, can be clicked on and can accept and
+ * render selection focus. When both text and image is enclosed, selection and
  * rendering will affect both as a single hyperlink.
  * </p>
  * <p>
@@ -187,10 +189,10 @@ public class FormText extends Canvas {
 	public int marginHeight = 1;
 
 	// private fields
-	private static final boolean DEBUG_TEXT = false;// "true".equalsIgnoreCase(Platform.getDebugOption(FormUtil.DEBUG_TEXT));
-	private static final boolean DEBUG_TEXTSIZE = false;// "true".equalsIgnoreCase(Platform.getDebugOption(FormUtil.DEBUG_TEXTSIZE));
+	private static final boolean DEBUG_TEXT = false;//"true".equalsIgnoreCase(Platform.getDebugOption(FormUtil.DEBUG_TEXT));
+	private static final boolean DEBUG_TEXTSIZE = false;//"true".equalsIgnoreCase(Platform.getDebugOption(FormUtil.DEBUG_TEXTSIZE));
 
-	private static final boolean DEBUG_FOCUS = false;// "true".equalsIgnoreCase(Platform.getDebugOption(FormUtil.DEBUG_FOCUS));
+	private static final boolean DEBUG_FOCUS = false;//"true".equalsIgnoreCase(Platform.getDebugOption(FormUtil.DEBUG_FOCUS));
 
 	private boolean hasFocus;
 
@@ -233,7 +235,8 @@ public class FormText extends Canvas {
 		}
 
 		@Override
-		public Point computeSize(Composite composite, int wHint, int hHint, boolean changed) {
+		public Point computeSize(Composite composite, int wHint, int hHint,
+				boolean changed) {
 			long start = 0;
 
 			if (DEBUG_TEXT)
@@ -251,8 +254,7 @@ public class FormText extends Canvas {
 						+ "ms"); //$NON-NLS-1$
 			}
 			if (DEBUG_TEXTSIZE) {
-				System.out.println("FormText (" + model.getAccessibleText() + "), computeSize: wHint=" + wHint //$NON-NLS-1$ //$NON-NLS-2$
-						+ ", result=" + result); //$NON-NLS-1$
+				System.out.println("FormText ("+model.getAccessibleText()+"), computeSize: wHint="+wHint+", result="+result); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 			return result;
 		}
@@ -268,7 +270,8 @@ public class FormText extends Canvas {
 			boolean selectableInTheLastRow = false;
 			for (int i = 0; i < paragraphs.length; i++) {
 				Paragraph p = paragraphs[i];
-				if (i > 0 && getParagraphsSeparated() && p.getAddVerticalSpace())
+				if (i > 0 && getParagraphsSeparated()
+						&& p.getAddVerticalSpace())
 					loc.y += getParagraphSpacing(lineHeight);
 				loc.rowHeight = 0;
 				loc.indent = p.getIndent();
@@ -311,7 +314,7 @@ public class FormText extends Canvas {
 			selData = null;
 			Rectangle carea = composite.getClientArea();
 			if (DEBUG_TEXTSIZE) {
-				System.out.println("FormText layout (" + model.getAccessibleText() + "), carea=" + carea); //$NON-NLS-1$ //$NON-NLS-2$
+				System.out.println("FormText layout ("+model.getAccessibleText()+"), carea="+carea); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			GC gc = new GC(composite);
 			gc.setFont(getFont());
@@ -335,7 +338,8 @@ public class FormText extends Canvas {
 				loc.indent = p.getIndent();
 				loc.resetCaret();
 				loc.rowHeight = 0;
-				p.layout(gc, carea.width, loc, lineHeight, resourceTable, selectedLink);
+				p.layout(gc, carea.width, loc, lineHeight, resourceTable,
+						selectedLink);
 			}
 			gc.dispose();
 			if (DEBUG_TEXT) {
@@ -349,9 +353,8 @@ public class FormText extends Canvas {
 	 * Contructs a new form text widget in the provided parent and using the
 	 * styles.
 	 * <p>
-	 * The only valid style bit for <code>FormText</code> is
-	 * <code>SWT.NO_FOCUS</code>. This will cause the widget to always refuse
-	 * focus.
+	 * The only valid style bit for <code>FormText</code> is <code>SWT.NO_FOCUS</code>.
+	 * This will cause the widget to always refuse focus.
 	 *
 	 * @param parent
 	 *            form text parent control
@@ -631,9 +634,9 @@ public class FormText extends Canvas {
 	 *            unique key that matches the value of the <samp>control</samp>
 	 *            attribute.
 	 * @param control
-	 *            an object of the type <samp>Control</samp> or
-	 *            <samp>null</samp> if the existing control at the specified key
-	 *            needs to be removed.
+	 *            an object of the type <samp>Control</samp> or <samp>null</samp>
+	 *            if the existing control at the specified key needs to be
+	 *            removed.
 	 * @since 3.1
 	 */
 	public void setControl(String key, Control control) {
@@ -734,7 +737,8 @@ public class FormText extends Canvas {
 						return;
 					}
 					Control c = (Control) e.widget;
-					ControlSegment segment = (ControlSegment) c.getData(CONTROL_KEY);
+					ControlSegment segment = (ControlSegment) c
+							.getData(CONTROL_KEY);
 					if (e.detail == SWT.TRAVERSE_TAB_NEXT)
 						e.doit = advanceControl(c, segment, true);
 					else if (e.detail == SWT.TRAVERSE_TAB_PREVIOUS)
@@ -819,7 +823,8 @@ public class FormText extends Canvas {
 		// getAccessible().setFocus(model.getSelectedSegmentIndex());
 	}
 
-	private boolean advanceControl(Control c, ControlSegment segment, boolean next) {
+	private boolean advanceControl(Control c, ControlSegment segment,
+			boolean next) {
 		Composite parent = c.getParent();
 		if (parent == this) {
 			// segment-level control
@@ -876,8 +881,8 @@ public class FormText extends Canvas {
 	 * <ul>
 	 * <li>all white space characters will be condensed into at most one when
 	 * between words.</li>
-	 * <li>new line characters will be ignored and replaced with one white space
-	 * character</li>
+	 * <li>new line characters will be ignored and replaced with one white
+	 * space character</li>
 	 * <li>white space characters after the opening tags and before the closing
 	 * tags will be trimmed</li>
 	 *
@@ -893,8 +898,8 @@ public class FormText extends Canvas {
 	 * Tests whether whitespace inside paragraph and list item is normalized.
 	 *
 	 * @see #setWhitespaceNormalized(boolean)
-	 * @return <code>true</code> if whitespace is normalized, <code>false</code>
-	 *         otherwise.
+	 * @return <code>true</code> if whitespace is normalized,
+	 *         <code>false</code> otherwise.
 	 */
 	public boolean isWhitespaceNormalized() {
 		return model.isWhitespaceNormalized();
@@ -1073,26 +1078,6 @@ public class FormText extends Canvas {
 	}
 
 	/**
-	 * Clears the selection of text.
-	 * <p>
-	 *
-	 * @exception SWTException
-	 *                <ul>
-	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been
-	 *                disposed</li>
-	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the
-	 *                thread that created the receiver</li>
-	 *                </ul>
-	 * @since 3.7
-	 */
-	public void clearSelectionText() {
-		checkWidget();
-		if (selData != null) {
-			this.clearSelection();
-		}
-	}
-
-	/**
 	 * Tests if the text is selected and can be copied into the clipboard.
 	 *
 	 * @return <code>true</code> if the selected text can be copied into the
@@ -1195,7 +1180,8 @@ public class FormText extends Canvas {
 			@Override
 			public void getLocation(AccessibleControlEvent e) {
 				Rectangle location = null;
-				if (e.childID != ACC.CHILDID_SELF && e.childID != ACC.CHILDID_NONE) {
+				if (e.childID != ACC.CHILDID_SELF
+						&& e.childID != ACC.CHILDID_NONE) {
 					int index = e.childID;
 					IHyperlinkSegment link = model.getHyperlink(index);
 					if (link != null) {
@@ -1226,9 +1212,9 @@ public class FormText extends Canvas {
 			}
 
 			@Override
-			public void getDefaultAction(AccessibleControlEvent e) {
+			public void getDefaultAction (AccessibleControlEvent e) {
 				if (model.getHyperlinkCount() > 0) {
-					e.result = SWT.getMessage("SWT_Press"); //$NON-NLS-1$
+				    e.result = SWT.getMessage ("SWT_Press"); //$NON-NLS-1$
 				}
 			}
 
@@ -1244,7 +1230,7 @@ public class FormText extends Canvas {
 				int linkCount = model.getHyperlinkCount();
 				if (childID == ACC.CHILDID_SELF) {
 					if (linkCount > 0) {
-						role = ACC.ROLE_LINK;
+					    role = ACC.ROLE_LINK;
 					} else {
 						role = ACC.ROLE_TEXT;
 					}
@@ -1257,7 +1243,8 @@ public class FormText extends Canvas {
 			@Override
 			public void getSelection(AccessibleControlEvent e) {
 				int selectedIndex = model.getSelectedSegmentIndex();
-				e.childID = (selectedIndex == -1) ? ACC.CHILDID_NONE : selectedIndex;
+				e.childID = (selectedIndex == -1) ? ACC.CHILDID_NONE
+						: selectedIndex;
 			}
 
 			@Override
@@ -1352,7 +1339,7 @@ public class FormText extends Canvas {
 		notifyListeners(SWT.Selection, event);
 		// A listener could have caused the widget to be disposed
 		if (!isDisposed()) {
-			getAccessible().selectionChanged();
+		    getAccessible().selectionChanged();
 		}
 	}
 
@@ -1386,14 +1373,15 @@ public class FormText extends Canvas {
 			if (e.button == 1) {
 				startSelection(e);
 				armed = segmentUnder;
-			} else {
+			}
+			else {
 			}
 		} else {
 			if (e.button == 1) {
 				endSelection(e);
-				if (isDisposed())
-					return;
-				IHyperlinkSegment segmentUnder = model.findHyperlinkAt(e.x, e.y);
+				if (isDisposed()) return;
+				IHyperlinkSegment segmentUnder = model
+						.findHyperlinkAt(e.x, e.y);
 				if (segmentUnder != null && armed == segmentUnder && selData == null) {
 					activateLink(segmentUnder, e.stateMask);
 					armed = null;
@@ -1413,7 +1401,8 @@ public class FormText extends Canvas {
 		}
 		String currentTooltipText = getToolTipText();
 
-		if ((currentTooltipText != null && tooltipText == null) || (currentTooltipText == null && tooltipText != null))
+		if ((currentTooltipText != null && tooltipText == null)
+				|| (currentTooltipText == null && tooltipText != null))
 			setToolTipText(tooltipText);
 	}
 
@@ -1434,9 +1423,8 @@ public class FormText extends Canvas {
 		} else {
 			if (segmentUnder instanceof IHyperlinkSegment) {
 				IHyperlinkSegment linkUnder = (IHyperlinkSegment) segmentUnder;
-				if (entered != null && linkUnder != entered) {
-					// Special case: links are so close that there are 0 pixels
-					// between.
+				if (entered!=null && linkUnder!=entered) {
+					// Special case: links are so close that there are 0 pixels between.
 					// Must exit the link before entering the next one.
 					exitLink(entered, e.stateMask);
 					paintLinkHover(entered, false);
@@ -1480,10 +1468,12 @@ public class FormText extends Canvas {
 				break;
 			valid = setControlFocus(next, newSegment);
 		}
-		IHyperlinkSegment newLink = newSegment instanceof IHyperlinkSegment ? (IHyperlinkSegment) newSegment : null;
+		IHyperlinkSegment newLink = newSegment instanceof IHyperlinkSegment ? (IHyperlinkSegment) newSegment
+				: null;
 		if (valid)
 			enterLink(newLink, SWT.NULL);
-		IHyperlinkSegment oldLink = current instanceof IHyperlinkSegment ? (IHyperlinkSegment) current : null;
+		IHyperlinkSegment oldLink = current instanceof IHyperlinkSegment ? (IHyperlinkSegment) current
+				: null;
 		if (oldLink != null || newLink != null)
 			paintFocusTransfer(oldLink, newLink);
 		if (newLink != null)
@@ -1538,8 +1528,9 @@ public class FormText extends Canvas {
 		if (link == null || listeners == null)
 			return;
 		int size = listeners.size();
-		HyperlinkEvent he = new HyperlinkEvent(this, link.getHref(), link.getText(), stateMask);
-		Object[] listenerList = listeners.getListeners();
+		HyperlinkEvent he = new HyperlinkEvent(this, link.getHref(), link
+				.getText(), stateMask);
+		Object [] listenerList = listeners.getListeners();
 		for (int i = 0; i < size; i++) {
 			IHyperlinkListener listener = (IHyperlinkListener) listenerList[i];
 			listener.linkEntered(he);
@@ -1550,8 +1541,9 @@ public class FormText extends Canvas {
 		if (link == null || listeners == null)
 			return;
 		int size = listeners.size();
-		HyperlinkEvent he = new HyperlinkEvent(this, link.getHref(), link.getText(), stateMask);
-		Object[] listenerList = listeners.getListeners();
+		HyperlinkEvent he = new HyperlinkEvent(this, link.getHref(), link
+				.getText(), stateMask);
+		Object [] listenerList = listeners.getListeners();
 		for (int i = 0; i < size; i++) {
 			IHyperlinkListener listener = (IHyperlinkListener) listenerList[i];
 			listener.linkExited(he);
@@ -1561,13 +1553,15 @@ public class FormText extends Canvas {
 	private void paintLinkHover(IHyperlinkSegment link, boolean hover) {
 		GC gc = new GC(this);
 		HyperlinkSettings settings = getHyperlinkSettings();
-		Color newFg = hover ? settings.getActiveForeground() : settings.getForeground();
+		Color newFg = hover ? settings.getActiveForeground() : settings
+				.getForeground();
 		if (newFg != null)
 			gc.setForeground(newFg);
 		gc.setBackground(getBackground());
 		gc.setFont(getFont());
 		boolean selected = (link == getSelectedLink());
-		((ParagraphSegment) link).paint(gc, hover, resourceTable, selected, selData, null);
+		((ParagraphSegment) link).paint(gc, hover, resourceTable, selected,
+				selData, null);
 		gc.dispose();
 	}
 
@@ -1581,8 +1575,9 @@ public class FormText extends Canvas {
 		setCursor(model.getHyperlinkSettings().getBusyCursor());
 		if (listeners != null) {
 			int size = listeners.size();
-			HyperlinkEvent e = new HyperlinkEvent(this, link.getHref(), link.getText(), stateMask);
-			Object[] listenerList = listeners.getListeners();
+			HyperlinkEvent e = new HyperlinkEvent(this, link.getHref(), link
+					.getText(), stateMask);
+			Object [] listenerList = listeners.getListeners();
 			for (int i = 0; i < size; i++) {
 				IHyperlinkListener listener = (IHyperlinkListener) listenerList[i];
 				listener.linkActivated(e);
@@ -1630,7 +1625,9 @@ public class FormText extends Canvas {
 		if (getDisplay().getFocusControl() != this)
 			selectedLink = null;
 		for (Paragraph p : paragraphs) {
-			p.paint(textGC, repaintRegion, resourceTable, selectedLink, selData);
+			p
+					.paint(textGC, repaintRegion, resourceTable, selectedLink,
+							selData);
 		}
 		if (hasFocus && !model.hasFocusSegments())
 			textGC.drawFocus(x, y, width, height);
@@ -1643,7 +1640,8 @@ public class FormText extends Canvas {
 		return lineHeight / 2;
 	}
 
-	private void paintFocusTransfer(IHyperlinkSegment oldLink, IHyperlinkSegment newLink) {
+	private void paintFocusTransfer(IHyperlinkSegment oldLink,
+			IHyperlinkSegment newLink) {
 		if (oldLink != null) {
 			Rectangle r = oldLink.getBounds();
 			redraw(r.x, r.y, r.width, r.height, true);
@@ -1675,7 +1673,8 @@ public class FormText extends Canvas {
 		Point origin = FormUtil.getControlLocation(scomp, this);
 		origin.x += bounds.x;
 		origin.y += bounds.y;
-		FormUtil.ensureVisible(scomp, origin, new Point(bounds.width, bounds.height));
+		FormUtil.ensureVisible(scomp, origin, new Point(bounds.width,
+				bounds.height));
 	}
 
 	/**
@@ -1698,13 +1697,14 @@ public class FormText extends Canvas {
 		}
 		Rectangle trim = computeTrim(0, 0, size.x, size.y);
 		if (DEBUG_TEXTSIZE)
-			System.out.println("FormText Computed size: " + trim); //$NON-NLS-1$
+			System.out.println("FormText Computed size: "+trim); //$NON-NLS-1$
 		return new Point(trim.width, trim.height);
 	}
 
 	private void disposeResourceTable(boolean disposeBoldFont) {
 		if (disposeBoldFont) {
-			Font boldFont = (Font) resourceTable.get(FormTextModel.BOLD_FONT_ID);
+			Font boldFont = (Font) resourceTable
+					.get(FormTextModel.BOLD_FONT_ID);
 			if (boldFont != null) {
 				FormFonts.getInstance().markFinished(boldFont, getDisplay());
 				resourceTable.remove(FormTextModel.BOLD_FONT_ID);
