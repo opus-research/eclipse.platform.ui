@@ -68,7 +68,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
-import org.eclipse.e4.ui.model.application.ui.menu.MTrimContribution;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.services.EContextService;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
@@ -731,10 +730,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	void populateTopTrimContributions() {
 		getCoolBarManager2().update(true);
 
-		// to establish backward compatibility form 4.4 back to 4.3
-		establishBackwardCompatibility();
-		int insertQuickAccessIndex = -1;
-
 		final MTrimBar trimBar = getTopTrim();
 		// TODO why aren't these added as trim contributions
 		// that would remove everything from this method except the fill(*)
@@ -746,10 +741,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 					.setContributionURI("bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/org.eclipse.e4.ui.workbench.renderers.swt.LayoutModifierToolControl"); //$NON-NLS-1$
 			spacerControl.getTags().add(TrimBarLayout.SPACER);
 			trimBar.getChildren().add(spacerControl);
-		} else {
-			// for restoring the original MToolControl order after a switch back
-			// from 4.4 to 4.3
-			insertQuickAccessIndex = trimBar.getChildren().indexOf(spacerControl);
 		}
 
 		MToolControl spacerGlueControl = (MToolControl) modelService.find("Spacer Glue", model); //$NON-NLS-1$
@@ -759,11 +750,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			spacerGlueControl
 					.setContributionURI("bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/org.eclipse.e4.ui.workbench.renderers.swt.LayoutModifierToolControl"); //$NON-NLS-1$
 			spacerGlueControl.getTags().add(TrimBarLayout.GLUE);
-			if (insertQuickAccessIndex < 0) {
-				trimBar.getChildren().add(spacerGlueControl);
-			} else {
-				trimBar.getChildren().add(++insertQuickAccessIndex, spacerGlueControl);
-			}
+			trimBar.getChildren().add(spacerGlueControl);
 		}
 
 		MToolControl searchControl = (MToolControl) modelService.find("SearchField", model); //$NON-NLS-1$
@@ -772,11 +759,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			searchControl.setElementId("SearchField"); //$NON-NLS-1$
 			searchControl
 					.setContributionURI("bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.quickaccess.SearchField"); //$NON-NLS-1$
-			if (insertQuickAccessIndex < 0) {
-				trimBar.getChildren().add(searchControl);
-			} else {
-				trimBar.getChildren().add(++insertQuickAccessIndex, searchControl);
-			}
+			trimBar.getChildren().add(searchControl);
 		}
 
 		MToolControl glueControl = (MToolControl) modelService.find("Search-PS Glue", model); //$NON-NLS-1$
@@ -786,11 +769,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			glueControl
 					.setContributionURI("bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/org.eclipse.e4.ui.workbench.renderers.swt.LayoutModifierToolControl"); //$NON-NLS-1$
 			glueControl.getTags().add(TrimBarLayout.GLUE);
-			if (insertQuickAccessIndex < 0) {
-				trimBar.getChildren().add(glueControl);
-			} else {
-				trimBar.getChildren().add(++insertQuickAccessIndex, glueControl);
-			}
+			trimBar.getChildren().add(glueControl);
 		}
 
 		MToolControl switcherControl = (MToolControl) modelService.find(
@@ -808,24 +787,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		// render now after everything has been added so contributions can be
 		// inserted in the right place
 		updateLayoutDataForContents();
-	}
-
-	/**
-	 * Iterates through the {@link MTrimContribution}s of the application to
-	 * remove the new
-	 * <code>org.eclipse.ui.ide.application.trimcontribution.QuickAccess</code>
-	 * contribution provided by 4.4.
-	 * <p>
-	 * The 4.4 release will add it again.
-	 * </p>
-	 */
-	private void establishBackwardCompatibility(){
-		for( Iterator<MTrimContribution> iter = application.getTrimContributions().iterator(); iter.hasNext(); ){
-			MTrimContribution contribution = iter.next();
-			if ("org.eclipse.ui.ide.application.trimcontribution.QuickAccess".contains(contribution.getElementId())) { //$NON-NLS-1$
-				iter.remove();
-			}
-		}
 	}
 
 	private void populateStandardTrim(MTrimBar bottomTrim) {
