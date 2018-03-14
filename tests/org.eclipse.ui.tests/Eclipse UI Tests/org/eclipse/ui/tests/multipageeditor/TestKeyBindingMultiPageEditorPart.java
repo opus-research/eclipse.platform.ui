@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 433603
  *******************************************************************************/
 package org.eclipse.ui.tests.multipageeditor;
 
@@ -20,11 +19,12 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IKeyBindingService;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
 /**
- * A multi-page editor for testing key bindings while switching pages. This is
- * one of two pages -- each with a different context. The first context binds
+ * A multi-page editor for testing key bindings while switching pages. This
+ * is one of two pages -- each with a different context. The first context binds
  * "Ctrl+Shift+4" -- the second binds "Ctrl+Shift+5" -- to the command
  * "org.eclipse.ui.tests.TestCommand". Which context to use is determined by a
  * page number, which is passed as a parameter.
@@ -40,9 +40,8 @@ public final class TestKeyBindingMultiPageEditorPart extends EditorPart {
     private final int number;
 
     /**
-	 * Constructs a new instance of
-	 * <code>TestKeyBindingMultiPageEditorPart</code> with the page number of
-	 * this page.
+     * Constructs a new instance of <code>TestKeyBindingMultiPageEditorPart</code>
+     * with the page number of this page.
      * 
      * @param number
      *            The page number for this part.
@@ -52,7 +51,12 @@ public final class TestKeyBindingMultiPageEditorPart extends EditorPart {
         this.number = number;
     }
 
-	@Override
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+     */
+    @Override
 	public void createPartControl(Composite parent) {
         Composite composite = new Composite(parent, SWT.NONE);
         composite.setLayout(new RowLayout());
@@ -62,23 +66,45 @@ public final class TestKeyBindingMultiPageEditorPart extends EditorPart {
         text2.setText("Red"); //$NON-NLS-1$
     }
 
-	@Override
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.IProgressMonitor)
+     */
+    @Override
 	public void doSave(IProgressMonitor monitor) {
         // Do nothing.
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.part.EditorPart#doSaveAs()
+     */
     @Override
 	public void doSaveAs() {
         throw new UnsupportedOperationException("Not implemented in this test."); //$NON-NLS-1$
 
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.part.EditorPart#gotoMarker(org.eclipse.core.resources.IMarker)
+     */
     public void gotoMarker(IMarker marker) {
         // Do nothing.
     }
 
-	@Override
-	public void init(IEditorSite site, IEditorInput input) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.part.EditorPart#init(org.eclipse.ui.IEditorSite,
+     *      org.eclipse.ui.IEditorInput)
+     */
+    @Override
+	public void init(IEditorSite site, IEditorInput input)
+            throws PartInitException {
         setInput(input);
         setSite(site);
         setPartName("Editor"); //$NON-NLS-1$
@@ -86,17 +112,32 @@ public final class TestKeyBindingMultiPageEditorPart extends EditorPart {
         setTitleToolTip("Moooooo"); //$NON-NLS-1$
     }
 
-	@Override
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.part.EditorPart#isDirty()
+     */
+    @Override
 	public boolean isDirty() {
         return false;
     }
 
-	@Override
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.part.EditorPart#isSaveAsAllowed()
+     */
+    @Override
 	public boolean isSaveAsAllowed() {
         return false;
     }
 
-	@Override
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+     */
+    @Override
 	public void setFocus() {
         final boolean odds = (number % 2) > 0;
         final String scope1 = "org.eclipse.ui.tests.scope1"; //$NON-NLS-1$

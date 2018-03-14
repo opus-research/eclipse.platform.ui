@@ -94,16 +94,12 @@ public class ThemeElementDefinition {
 	}
 
 	private String formatDescription() {
-		String description = this.description != null && this.description.trim().length() != 0 ? this.description
-				: label;
+		String description = this.description != null ? this.description : label;
 		if (isAddedByCss() && isModifiedByUser()) {
-			return MessageFormat.format(
-					RESOURCE_BUNDLE.getString("Added.by.css.and.modified.by.user.label"), //$NON-NLS-1$
-					new Object[] { description }).trim();
+			return RESOURCE_BUNDLE.getString("Added.by.css.and.modified.by.user.label").trim(); //$NON-NLS-1$
 		}
 		if (isAddedByCss()) {
-			return MessageFormat.format(RESOURCE_BUNDLE.getString("Added.by.css.label"), //$NON-NLS-1$
-					new Object[] { description }).trim();
+			return RESOURCE_BUNDLE.getString("Added.by.css.label").trim(); //$NON-NLS-1$
 		}
 		if (isOverridden() && isModifiedByUser()) {
 			return MessageFormat.format(

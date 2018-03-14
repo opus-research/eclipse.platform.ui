@@ -61,8 +61,7 @@ public class ComboBoxLabelProvider extends LabelProvider {
      * empty <code>String</code> 
      * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
      */
-    @Override
-	public String getText(Object element) {
+    public String getText(Object element) {
         if (element == null) {
             return ""; //$NON-NLS-1$
         }
