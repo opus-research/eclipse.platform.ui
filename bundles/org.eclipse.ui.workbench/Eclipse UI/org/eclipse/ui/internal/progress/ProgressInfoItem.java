@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422040, 440810
+ *     G.R.Prakash <me@grprakash.com> - Bug 394036
  *******************************************************************************/
 
 package org.eclipse.ui.internal.progress;
@@ -18,7 +19,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.CommandEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.ICommandListener;
 import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.commands.ParameterizedCommand;
@@ -137,6 +141,8 @@ public class ProgressInfoItem extends Composite {
 	private ResourceManager resourceManager;
 
 	private Link link;
+
+	private ICommandListener commandListener;
 
 	static {
 		JFaceResources
@@ -824,6 +830,9 @@ public class ProgressInfoItem extends Composite {
 			Object property = actionProperty != null ? actionProperty
 					: commandProperty;
 			updateTrigger(property, link);
+
+			hookCommandListener();
+
 		}
 
 		if (link.getData(TRIGGER_KEY) == null
@@ -905,6 +914,7 @@ public class ProgressInfoItem extends Composite {
 			link.setData(TRIGGER_KEY, trigger);
 		} else if (trigger instanceof ParameterizedCommand) {
 			link.setData(TRIGGER_KEY, trigger);
+			link.setEnabled(((ParameterizedCommand) trigger).getCommand().isEnabled());
 		} else {
 			link.setData(TRIGGER_KEY, null);
 		}
@@ -1058,6 +1068,7 @@ public class ProgressInfoItem extends Composite {
 	 */
 	@Override
 	public void dispose() {
+		removeCommandListener();
 		super.dispose();
 		if(resourceManager != null)
 			resourceManager.dispose();
@@ -1069,4 +1080,36 @@ public class ProgressInfoItem extends Composite {
 	public JobTreeElement getInfo() {
 		return info;
 	}
+
+	private void hookCommandListener() {
+
+		Object data = link.getData(TRIGGER_KEY);
+		if (!(data instanceof ParameterizedCommand))
+			return;
+
+		Command command = ((ParameterizedCommand) data).getCommand();
+		commandListener = new ICommandListener() {
+
+			@Override
+			public void commandChanged(CommandEvent commandEvent) {
+				if (link == null || link.isDisposed())
+					return;
+				boolean enabled = commandEvent.getCommand().isEnabled();
+				link.setEnabled(enabled);
+			}
+		};
+
+		command.addCommandListener(commandListener);
+	}
+
+	private void removeCommandListener() {
+
+		if (commandListener == null)
+			return;
+
+		Object data = link.getData(TRIGGER_KEY);
+		if (data instanceof ParameterizedCommand)
+			((ParameterizedCommand) data).getCommand().removeCommandListener(commandListener);
+	}
+
 }
