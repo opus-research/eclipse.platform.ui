@@ -611,20 +611,4 @@ public interface IWorkbenchCommandConstants {
 	 */
 	public static final String PERSPECTIVES_SHOW_PERSPECTIVE_PARM_NEWWINDOW = "org.eclipse.ui.perspectives.showPerspective.newWindow"; //$NON-NLS-1$
 
-	// Zoom
-
-	/**
-	 * Id for command "Zoom In".
-	 * 
-	 * @since 3.108
-	 */
-	public static final String ZOOM_IN = "org.eclipse.ui.zoomIn"; //$NON-NLS-1$
-
-	/**
-	 * Id for command "Zoom Out".
-	 * 
-	 * @since 3.108
-	 */
-	public static final String ZOOM_OUT = "org.eclipse.ui.zoomOut"; //$NON-NLS-1$
-
 }
