@@ -58,9 +58,9 @@ public class FinishedJobs extends EventManager {
 
 	private IJobProgressManagerListener listener;
 
-	private HashSet<JobTreeElement> keptjobinfos = new HashSet<>();
+	private HashSet<JobTreeElement> keptjobinfos = new HashSet<JobTreeElement>();
 
-	private HashMap<Object, Long> finishedTime = new HashMap<>();
+	private HashMap<Object, Long> finishedTime = new HashMap<Object, Long>();
 
 	private static JobTreeElement[] EMPTY_INFOS;
 
@@ -77,30 +77,24 @@ public class FinishedJobs extends EventManager {
 
 	public FinishedJobs() {
 		listener = new IJobProgressManagerListener() {
-			@Override
 			public void addJob(JobInfo info) {
 				checkForDuplicates(info);
 			}
 
-			@Override
 			public void addGroup(GroupInfo info) {
 				checkForDuplicates(info);
 			}
 
-			@Override
 			public void refreshJobInfo(JobInfo info) {
 				checkTasks(info);
 			}
 
-			@Override
 			public void refreshGroup(GroupInfo info) {
 			}
 
-			@Override
 			public void refreshAll() {
 			}
 
-			@Override
 			public void removeJob(JobInfo info) {
 				if (keep(info)) {
 					checkForDuplicates(info);
@@ -108,11 +102,9 @@ public class FinishedJobs extends EventManager {
 				}
 			}
 
-			@Override
 			public void removeGroup(GroupInfo group) {
 			}
 
-			@Override
 			public boolean showsDebug() {
 				return false;
 			}
@@ -248,7 +240,7 @@ public class FinishedJobs extends EventManager {
 							if (job != null && job != myJob
 									&& job.belongsTo(myJob)) {
 								if (found == null) {
-									found = new ArrayList<>();
+									found = new ArrayList<JobTreeElement>();
 								}
 								found.add(jte);
 							}
