@@ -65,7 +65,6 @@ public class SettingsTransferRegistryReader extends RegistryReader {
 	 * 
 	 * @see org.eclipse.ui.internal.registry.RegistryReader#readElement(org.eclipse.core.runtime.IConfigurationElement)
 	 */
-	@Override
 	protected boolean readElement(IConfigurationElement element) {
 		if (element.getName().equals(
 				IWorkbenchRegistryConstants.TAG_SETTINGS_TRANSFER)) {

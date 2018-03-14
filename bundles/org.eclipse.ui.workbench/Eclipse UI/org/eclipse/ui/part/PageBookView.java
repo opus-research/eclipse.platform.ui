@@ -153,7 +153,6 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	 * The action bar property listener.
 	 */
 	private IPropertyChangeListener actionBarPropListener = new IPropertyChangeListener() {
-		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			if (event.getProperty().equals(SubActionBars.P_ACTION_HANDLERS)
 					&& activeRec != null
@@ -167,7 +166,6 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	 * Selection change listener to listen for page selection changes
 	 */
 	private ISelectionChangedListener selectionChangedListener = new ISelectionChangedListener() {
-		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
 			pageSelectionChanged(event);
 		}
@@ -177,7 +175,6 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	 * Selection change listener to listen for page selection changes
 	 */
 	private ISelectionChangedListener postSelectionListener = new ISelectionChangedListener() {
-		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
 			postSelectionChanged(event);
 		}
@@ -261,7 +258,6 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 			for (int i = 0; i < listeners.length; ++i) {
 				final ISelectionChangedListener l = (ISelectionChangedListener) listeners[i];
 				Platform.run(new SafeRunnable() {
-					@Override
 					public void run() {
 						l.selectionChanged(event);
 					}
@@ -284,7 +280,6 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 		/*
 		 * (non-Javadoc) Method declared on ISelectionProvider.
 		 */
-		@Override
 		public void addSelectionChangedListener(
 				ISelectionChangedListener listener) {
 			fSelectionListener.addSelectionChangedListener(listener);
@@ -293,7 +288,6 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 		/*
 		 * (non-Javadoc) Method declared on ISelectionProvider.
 		 */
-		@Override
 		public ISelection getSelection() {
 			// get the selection provider from the current page
 			IPage currentPage = getCurrentPage();
@@ -316,7 +310,6 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 		/*
 		 * (non-Javadoc) Method declared on ISelectionProvider.
 		 */
-		@Override
 		public void removeSelectionChangedListener(
 				ISelectionChangedListener listener) {
 			fSelectionListener.removeSelectionChangedListener(listener);
@@ -346,7 +339,6 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 		/*
 		 * (non-Javadoc) Method declared on ISelectionProvider.
 		 */
-		@Override
 		public void setSelection(ISelection selection) {
 			// get the selection provider from the current page
 			IPage currentPage = getCurrentPage();
@@ -371,7 +363,6 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 		 * 
 		 * @see org.eclipse.jface.viewers.IPostSelectionProvider#addPostSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
 		 */
-		@Override
 		public void addPostSelectionChangedListener(
 				ISelectionChangedListener listener) {
 			fPostSelectionListeners.addSelectionChangedListener(listener);
@@ -382,7 +373,6 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 		 * 
 		 * @see org.eclipse.jface.viewers.IPostSelectionProvider#removePostSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
 		 */
-		@Override
 		public void removePostSelectionChangedListener(
 				ISelectionChangedListener listener) {
 			fPostSelectionListeners.removeSelectionChangedListener(listener);
@@ -493,7 +483,6 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	 * <code>IWorkbenchPart</code> method creates a <code>PageBook</code>
 	 * control with its default page showing. Subclasses may extend.
 	 */
-	@Override
 	public void createPartControl(Composite parent) {
 
 		// Create the page book.
@@ -517,7 +506,6 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	 * <code>IWorkbenchPart</code> method cleans up all the pages. Subclasses
 	 * may extend.
 	 */
-	@Override
 	public void dispose() {
 		// stop listening to part activation
 		getSite().getPage().removePartListener(partListener);
@@ -593,7 +581,6 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	 * <code>IAdaptable</code> method delegates to the current page, if it
 	 * implements <code>IAdaptable</code>.
 	 */
-	@Override
 	public Object getAdapter(Class key) {
 		// delegate to the current page, if supported
 		IPage page = getCurrentPage();
@@ -751,7 +738,6 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	/*
 	 * (non-Javadoc) Method declared on IViewPart.
 	 */
-	@Override
 	public void init(IViewSite site) throws PartInitException {
 		site.setSelectionProvider(selectionProvider);
 		super.init(site);
@@ -762,7 +748,6 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	 * <code>IPartListener</code> method shows the page when the given part is
 	 * activated. Subclasses may extend.
 	 */
-	@Override
 	public void partActivated(IWorkbenchPart part) {
 		// Is this an important part? If not just return.
 		if (isImportant(part)) {
@@ -798,7 +783,6 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	 * The <code>PageBookView</code> implementation of this
 	 * <code>IPartListener</code> method does nothing. Subclasses may extend.
 	 */
-	@Override
 	public void partBroughtToTop(IWorkbenchPart part) {
 		// Do nothing by default
 	}
@@ -808,7 +792,6 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	 * <code>IPartListener</code> method deal with the closing of the active
 	 * part. Subclasses may extend.
 	 */
-	@Override
 	public void partClosed(IWorkbenchPart part) {
 		// Update the active part.
 		if (activeRec != null && activeRec.part == part) {
@@ -829,7 +812,6 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	 * The <code>PageBookView</code> implementation of this
 	 * <code>IPartListener</code> method does nothing. Subclasses may extend.
 	 */
-	@Override
 	public void partDeactivated(IWorkbenchPart part) {
 		// Do nothing.
 	}
@@ -839,7 +821,6 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	 * 
 	 * @see org.eclipse.ui.IPartListener#partOpened(org.eclipse.ui.IWorkbenchPart)
 	 */
-	@Override
 	public void partOpened(IWorkbenchPart part) {
 		// Do nothing by default.
 	}
@@ -915,7 +896,6 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	/*
 	 * (non-Javadoc) Method declared on IWorkbenchPart.
 	 */
-	@Override
 	public void setFocus() {
 		// first set focus on the page book, in case the page
 		// doesn't properly handle setFocus
@@ -1072,7 +1052,6 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	}
 	
 	private IPartListener2 partListener = new IPartListener2() {
-		@Override
 		public void partActivated(IWorkbenchPartReference partRef) {
 			if (partRef == null) {
 				WorkbenchPlugin.log("partRef is null in PageBookView partActivated"); //$NON-NLS-1$
@@ -1082,36 +1061,29 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 			PageBookView.this.partActivated(part);
 		}
 
-		@Override
 		public void partBroughtToTop(IWorkbenchPartReference partRef) {
 			PageBookView.this.partBroughtToTop(partRef.getPart(false));
 		}
 
-		@Override
 		public void partClosed(IWorkbenchPartReference partRef) {
 			PageBookView.this.partClosed(partRef.getPart(false));
 		}
 
-		@Override
 		public void partDeactivated(IWorkbenchPartReference partRef) {
 			PageBookView.this.partDeactivated(partRef.getPart(false));
 		}
 
-		@Override
 		public void partHidden(IWorkbenchPartReference partRef) {
 			PageBookView.this.partHidden(partRef.getPart(false));
 		}
 
-		@Override
 		public void partInputChanged(IWorkbenchPartReference partRef) {
 		}
 
-		@Override
 		public void partOpened(IWorkbenchPartReference partRef) {
 			PageBookView.this.partOpened(partRef.getPart(false));
 		}
 
-		@Override
 		public void partVisible(IWorkbenchPartReference partRef) {
 			PageBookView.this.partVisible(partRef.getPart(false));
 		}

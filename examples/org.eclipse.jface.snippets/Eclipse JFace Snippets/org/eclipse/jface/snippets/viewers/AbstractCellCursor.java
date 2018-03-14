@@ -55,7 +55,7 @@ public abstract class AbstractCellCursor extends Canvas {
 					break;
 				case SWT.KeyDown:
 					getParent().notifyListeners(SWT.KeyDown, event);
-					ArrayList<Object> list = new ArrayList<Object>();
+					ArrayList list = new ArrayList();
 					for( int i = 0; i < cells.length; i++ ) {
 						list.add(cells[i].getElement());
 					}

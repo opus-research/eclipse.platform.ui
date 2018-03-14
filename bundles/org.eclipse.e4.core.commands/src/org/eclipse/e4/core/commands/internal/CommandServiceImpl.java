@@ -70,4 +70,5 @@ public class CommandServiceImpl implements ECommandService {
 	public Command getCommand(String commandId) {
 		return commandManager.getCommand(commandId);
 	}
+
 }

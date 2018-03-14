@@ -63,7 +63,6 @@ public class GlobalizationPreferencePage extends PreferencePage implements IWork
 	 * 
 	 * @see org.eclipse.jface.preference.PreferencePage
 	 */
-	@Override
 	protected Control createContents(Composite parent) {
 		PlatformUI.getWorkbench().getHelpSystem()
 				.setHelp(parent, IWorkbenchHelpContextIds.GLOBALIZATION_PREFERENCE_PAGE);
@@ -113,7 +112,6 @@ public class GlobalizationPreferencePage extends PreferencePage implements IWork
 		layoutDirectionCombo.setItems(new String[] { DEFAULT_DIR, LTR_DIR, RTL_DIR });
 		layoutDirectionCombo.select(getLayoutDirectionIndex(layoutDirection));
 		layoutDirectionCombo.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				layoutDirection = getLayoutDirectionInteger(layoutDirectionCombo
 						.getSelectionIndex());
@@ -127,7 +125,6 @@ public class GlobalizationPreferencePage extends PreferencePage implements IWork
 		bidiSupportClickButton.setText(WorkbenchMessages.GlobalizationPreference_bidiSupport);
 		bidiSupportClickButton.setSelection(bidiSupport);
 		bidiSupportClickButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				selectClickMode(bidiSupportClickButton.getSelection());
 			}
@@ -140,7 +137,6 @@ public class GlobalizationPreferencePage extends PreferencePage implements IWork
 		textDirectionCombo.setEnabled(bidiSupport);
 		textDirectionCombo.select(getTextDirectionIndex(textDirection));
 		textDirectionCombo.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				textDirection = getTextDirectionString(textDirectionCombo.getSelectionIndex());
 			}
@@ -234,7 +230,6 @@ public class GlobalizationPreferencePage extends PreferencePage implements IWork
 		vfiller.setLayoutData(gridData);
 	}
 
-	@Override
 	protected IPreferenceStore doGetPreferenceStore() {
 		return WorkbenchPlugin.getDefault().getPreferenceStore();
 	}
@@ -242,7 +237,6 @@ public class GlobalizationPreferencePage extends PreferencePage implements IWork
 	/**
 	 * @see IWorkbenchPreferencePage
 	 */
-	@Override
 	public void init(IWorkbench aWorkbench) {
 		IPreferenceStore store = getPreferenceStore();
 		layoutDirection = store.getInt(IPreferenceConstants.LAYOUT_DIRECTION);
@@ -253,7 +247,6 @@ public class GlobalizationPreferencePage extends PreferencePage implements IWork
 	/**
 	 * The default button has been pressed.
 	 */
-	@Override
 	protected void performDefaults() {
 		IPreferenceStore store = getPreferenceStore();
 		nlExtensionsField
@@ -272,7 +265,6 @@ public class GlobalizationPreferencePage extends PreferencePage implements IWork
 	/**
 	 * The user has pressed Ok. Store/apply this page's values appropriately.
 	 */
-	@Override
 	public boolean performOk() {
 		IPreferenceStore store = getPreferenceStore();
 

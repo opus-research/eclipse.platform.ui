@@ -39,7 +39,6 @@ public class CSSValueSWTColorConverterImpl extends AbstractCSSValueConverter {
 		super(Color.class);
 	}
 
-	@Override
 	public Color convert(CSSValue value, CSSEngine engine, Object context)
 			throws DOMException {
 		Display display = (Display) context;
@@ -51,7 +50,6 @@ public class CSSValueSWTColorConverterImpl extends AbstractCSSValueConverter {
 		return color;
 	}
 
-	@Override
 	public String convert(Object value, CSSEngine engine, Object context,
 			ICSSValueConverterConfig config) throws Exception {
 		Color color = (Color) value;
