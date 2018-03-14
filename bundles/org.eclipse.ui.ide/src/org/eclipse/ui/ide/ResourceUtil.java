@@ -11,13 +11,10 @@
  *******************************************************************************/
 package org.eclipse.ui.ide;
 
-import javax.jws.soap.SOAPBinding.Use;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.mapping.ResourceMapping;
 import org.eclipse.core.resources.mapping.ResourceTraversal;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
@@ -254,12 +251,9 @@ public final class ResourceUtil {
 	 *   <code>false</code> otherwise
      * @return the adapter
      * @since 3.2
-     *
-     * @deprecated Use {@link Adapters#getAdapter(Object, Class, boolean)} instead
      */
-	@Deprecated
 	public static <T> T getAdapter(Object element, Class<T> adapterType, boolean forceLoad) {
-		if (element instanceof IAdaptable) {{
+		if (element instanceof IAdaptable) {
 			IAdaptable adaptable = (IAdaptable) element;
 			T o = adaptable.getAdapter(adapterType);
 	        if (o != null) {
