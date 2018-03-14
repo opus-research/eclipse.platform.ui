@@ -87,8 +87,6 @@ public class IDEPreferenceInitializer extends AbstractPreferenceInitializer {
 		node.put(IDEInternalPreferences.IMPORT_FILES_AND_FOLDERS_VIRTUAL_FOLDER_MODE, IDEInternalPreferences.IMPORT_FILES_AND_FOLDERS_MODE_PROMPT);
 
 		node.put(IDEInternalPreferences.WORKBENCH_SYSTEM_EXPLORER, getShowInSystemExplorerCommand());
-
-		node.put(IDE.UNKNOWN_EDITOR_STRATEGY_PREFERENCE_KEY, SystemEditorOrTextEditor.EXTENSION_ID);
 	}
 
 	/**

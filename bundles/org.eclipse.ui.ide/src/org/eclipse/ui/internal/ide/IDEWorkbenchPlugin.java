@@ -362,5 +362,4 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
 		else
 			Display.getDefault().asyncExec(r);
 	}
-
 }
