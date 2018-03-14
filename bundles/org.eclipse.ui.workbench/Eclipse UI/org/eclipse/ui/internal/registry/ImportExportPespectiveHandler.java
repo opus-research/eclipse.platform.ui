@@ -14,21 +14,20 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
-import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.internal.workbench.E4XMIResourceFactory;
+import org.eclipse.e4.ui.model.application.MAddon;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
@@ -36,10 +35,6 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.ui.IPerspectiveDescriptor;
-import org.eclipse.ui.WorkbenchException;
-import org.eclipse.ui.XMLMemento;
-import org.eclipse.ui.internal.e4.migration.PerspectiveBuilder;
-import org.eclipse.ui.internal.e4.migration.PerspectiveReader;
 import org.eclipse.ui.internal.wizards.preferences.PreferencesExportWizard;
 import org.eclipse.ui.internal.wizards.preferences.PreferencesImportWizard;
 import org.osgi.service.event.Event;
@@ -50,9 +45,9 @@ public class ImportExportPespectiveHandler {
 
 	private static final String PERSPECTIVE_SUFFIX_4X = "_e4persp"; //$NON-NLS-1$
 
-	private static final String PERSPECTIVE_SUFFIX_3X = "_persp"; //$NON-NLS-1$
-
 	private static final String ASCII_ENCODING = "ASCII"; //$NON-NLS-1$
+
+	private static final String TRIMS_KEY = "trims"; //$NON-NLS-1$
 
 	@Inject
 	private EModelService modelService;
@@ -70,9 +65,6 @@ public class ImportExportPespectiveHandler {
 	private IEclipsePreferences preferences;
 
 	@Inject
-	private IEclipseContext context;
-
-	@Inject
 	private PerspectiveRegistry perspectiveRegistry;
 
 	private EventHandler importPreferencesEnd;
@@ -83,7 +75,7 @@ public class ImportExportPespectiveHandler {
 
 	private List<MPerspective> exportedPersps = new ArrayList<>();
 	private List<String> importedPersps = new ArrayList<String>();
-
+	private Map<String, String> minMaxPersistedState;
 
 	@PostConstruct
 	private void init() {
@@ -115,27 +107,7 @@ public class ImportExportPespectiveHandler {
 		}
 
 		addPerspectiveToRegistry(perspective);
-	}
-
-	private void importPerspective3x(PreferenceChangeEvent event) {
-		importedPersps.add(event.getKey());
-		StringReader reader = new StringReader((String) event.getNewValue());
-		MPerspective perspective = null;
-		IEclipseContext childContext = context.createChild();
-		try {
-			childContext.set(PerspectiveReader.class, new PerspectiveReader(XMLMemento.createReadRoot(reader)));
-			perspective = ContextInjectionFactory.make(PerspectiveBuilder.class, childContext).createPerspective();
-		} catch (WorkbenchException e) {
-			logError(event, e);
-		} finally {
-			reader.close();
-			childContext.dispose();
-		}
-		if (perspective == null) {
-			return;
-		}
-
-		addPerspectiveToRegistry(perspective);
+		importToolbarsLocation(perspective);
 	}
 
 	private void addPerspectiveToRegistry(MPerspective perspective) {
@@ -147,17 +119,19 @@ public class ImportExportPespectiveHandler {
 			return;
 		}
 
-		if (isOpen(perspToOverwrite)) {
-			logger.warn(String.format("Cannot import perspective \"%s\" because a perspective" //$NON-NLS-1$
-					+ " with the same label is open", perspective.getElementId())); //$NON-NLS-1$
+		// a perspective with the same label exists, but has different ID
+		String perspToOverwriteId = perspToOverwrite.getId();
+		if (!perspective.getElementId().equals(perspToOverwriteId)) {
+			perspective.setElementId(perspToOverwriteId);
+			MUIElement oldPersp = modelService.findSnippet(application, perspToOverwriteId);
+			if (oldPersp instanceof MPerspective) {
+				application.getSnippets().remove(oldPersp);
+			}
+			application.getSnippets().add(perspective);
 		} else {
 			perspectiveRegistry.deletePerspective(perspToOverwrite);
 			perspectiveRegistry.addPerspective(perspective);
 		}
-	}
-
-	private boolean isOpen(IPerspectiveDescriptor perspToOverwrite) {
-		return !modelService.findElements(application, perspToOverwrite.getId(), MPerspective.class, null).isEmpty();
 	}
 
 	private void logError(PreferenceChangeEvent event, Exception e) {
@@ -165,13 +139,50 @@ public class ImportExportPespectiveHandler {
 	}
 
 	private void copyPerspToPreferences(MPerspective persp) throws IOException {
-		String perspAsString = perspToString(persp);
-		preferences.put(persp.getLabel() + PERSPECTIVE_SUFFIX_4X, perspAsString);
+		MPerspective perspClone = (MPerspective) modelService.cloneElement(persp, null);
+		exportToolbarsLocation(perspClone);
+		String perspAsString = perspToString(perspClone);
+		preferences.put(perspClone.getLabel() + PERSPECTIVE_SUFFIX_4X, perspAsString);
+	}
+
+	private void exportToolbarsLocation(MPerspective persp) {
+		Map<String, String> minMaxPersState = getMinMaxPersistedState();
+		if (minMaxPersState == null) {
+			return;
+		}
+		String trimsData = minMaxPersState.get(persp.getElementId());
+		persp.getPersistedState().put(TRIMS_KEY, trimsData);
+	}
+
+	private void importToolbarsLocation(MPerspective persp) {
+		String trimsData = persp.getPersistedState().get(TRIMS_KEY);
+		if (trimsData == null || trimsData.trim().isEmpty()) {
+			return;
+		}
+		persp.getPersistedState().remove(TRIMS_KEY);
+		Map<String, String> minMaxPersState = getMinMaxPersistedState();
+		if (minMaxPersState == null) {
+			return;
+		}
+		minMaxPersState.put(persp.getElementId(), trimsData);
+	}
+
+	private Map<String, String> getMinMaxPersistedState() {
+		if (minMaxPersistedState != null) {
+			return minMaxPersistedState;
+		}
+		for (MAddon addon : application.getAddons()) {
+			if ("MinMax Addon".equals(addon.getElementId())) { //$NON-NLS-1$
+				minMaxPersistedState = addon.getPersistedState();
+				break;
+			}
+		}
+		return minMaxPersistedState;
 	}
 
 	private String perspToString(MPerspective persp) throws IOException {
 		Resource resource = new E4XMIResourceFactory().createResource(null);
-		resource.getContents().add((EObject) modelService.cloneElement(persp, null));
+		resource.getContents().add((EObject) persp);
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		try {
 			resource.save(output, null);
@@ -237,9 +248,6 @@ public class ImportExportPespectiveHandler {
 		}
 		ignoreEvents = false;
 		importedPersps.clear();
-
-		// remove unused preference imported from Eclipse 3.x
-		preferences.remove("perspectives"); //$NON-NLS-1$
 	}
 
 	private void initializeEventHandlers() {
@@ -274,8 +282,6 @@ public class ImportExportPespectiveHandler {
 
 				if (event.getKey().endsWith(PERSPECTIVE_SUFFIX_4X)) {
 					importPerspective4x(event);
-				} else if (event.getKey().endsWith(PERSPECTIVE_SUFFIX_3X)) {
-					importPerspective3x(event);
 				}
 			}
 		};
