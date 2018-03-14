@@ -23,6 +23,8 @@ import org.eclipse.e4.ui.css.core.css2.CSS2ColorHelper;
 import org.eclipse.e4.ui.css.core.css2.CSS2RGBColorImpl;
 import org.eclipse.e4.ui.css.core.dom.properties.Gradient;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
+import org.eclipse.e4.ui.css.core.resources.CSSResourcesHelpers;
+import org.eclipse.e4.ui.css.core.resources.IResourcesRegistry;
 import org.eclipse.e4.ui.internal.css.swt.CSSActivator;
 import org.eclipse.e4.ui.internal.css.swt.definition.IColorAndFontProvider;
 import org.eclipse.swt.SWT;
@@ -234,17 +236,16 @@ public class CSSSWTColorHelper {
 		return gradient;
 	}
 
-	@SuppressWarnings("rawtypes")
-	public static Color[] getSWTColors(Gradient grad, Display display,
-			CSSEngine engine) throws Exception {
+	public static Color[] getSWTColors(Gradient grad, Display display, CSSEngine engine) {
 		List values = grad.getValues();
+		IResourcesRegistry registry = engine.getResourcesRegistry();
 		Color[] colors = new Color[values.size()];
 
 		for (int i = 0; i < values.size(); i++) {
 			CSSPrimitiveValue value = (CSSPrimitiveValue) values.get(i);
 			//We rely on the fact that when a gradient is created, it's colors are converted and in the registry
 			//TODO see bug #278077
-			Color color = (Color) engine.convert(value, Color.class, display);
+			Color color = (Color) registry.getResource(Color.class, CSSResourcesHelpers.getCSSPrimitiveValueKey(value));
 			colors[i] = color;
 		}
 		return colors;
