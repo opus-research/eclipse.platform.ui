@@ -7,6 +7,7 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 441150
  *     Fabio Zadrozny (fabiofz@gmail.com) - Bug 436763
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
@@ -68,10 +69,6 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 				lsr.showTab(stack.getSelectedElement());
 		}
 	};
-
-	public LazyStackRenderer() {
-		super();
-	}
 
 	public void init(IEventBroker eventBroker) {
 		// Ensure that there only ever *one* listener. Each subclass
@@ -290,7 +287,7 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 				}
 			}
 		}
-
+		
 		// i.e.: Bug 436763: after we make items visible, if we made a new
 		// floating shell visible, we have to re-layout it for its contents to
 		// become correct.
