@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.ui.internal.progress;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -75,6 +76,7 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 						return !progressViewer.getControl().isDisposed();
 					}
 
+
 					@Override
 					public boolean shouldRun() {
 						return !progressViewer.getControl().isDisposed();
@@ -94,7 +96,8 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 						if (element == null) {
 							refresh();
 						} else {
-							ProgressViewerContentProvider.this.remove(new Object[] { element });
+							ProgressViewerContentProvider.this
+									.remove(new Object[] { element });
 						}
 						return Status.OK_STATUS;
 					}

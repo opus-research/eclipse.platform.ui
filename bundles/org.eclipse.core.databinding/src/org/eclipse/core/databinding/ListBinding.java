@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -73,6 +73,16 @@ public class ListBinding extends Binding {
 		super(target, model);
 		this.targetToModel = targetToModelStrategy;
 		this.modelToTarget = modelToTargetStrategy;
+		if ((targetToModel.getUpdatePolicy() & UpdateListStrategy.POLICY_UPDATE) != 0) {
+			target.addListChangeListener(targetChangeListener);
+		} else {
+			targetChangeListener = null;
+		}
+		if ((modelToTarget.getUpdatePolicy() & UpdateListStrategy.POLICY_UPDATE) != 0) {
+			model.addListChangeListener(modelChangeListener);
+		} else {
+			modelChangeListener = null;
+		}
 	}
 
 	@Override
@@ -94,34 +104,10 @@ public class ListBinding extends Binding {
 	@Override
 	protected void postInit() {
 		if (modelToTarget.getUpdatePolicy() == UpdateListStrategy.POLICY_UPDATE) {
-			getModel().getRealm().exec(new Runnable() {
-				@Override
-				public void run() {
-					((IObservableList) getModel()).addListChangeListener(modelChangeListener);
-					updateModelToTarget();
-				}
-			});
-		} else {
-			modelChangeListener = null;
+			updateModelToTarget();
 		}
-
 		if (targetToModel.getUpdatePolicy() == UpdateListStrategy.POLICY_UPDATE) {
-			getTarget().getRealm().exec(new Runnable() {
-				@Override
-				public void run() {
-					((IObservableList) getTarget()).addListChangeListener(targetChangeListener);
-					if (modelToTarget.getUpdatePolicy() == UpdateListStrategy.POLICY_NEVER) {
-						// we have to sync from target to model, if the other
-						// way round (model to target) is forbidden
-						// (POLICY_NEVER)
-						updateTargetToModel();
-					} else {
-						validateTargetToModel();
-					}
-				}
-			});
-		} else {
-			targetChangeListener = null;
+			validateTargetToModel();
 		}
 	}
 
@@ -245,7 +231,7 @@ public class ListBinding extends Binding {
 							// TODO - at this point, the two lists will be out
 							// of sync if an error occurred...
 						} finally {
-							setValidationStatus(multiStatus);
+							validationStatusObservable.setValue(multiStatus);
 
 							if (destination == getTarget()) {
 								updatingTarget = false;
@@ -257,15 +243,6 @@ public class ListBinding extends Binding {
 				});
 			}
 		}
-	}
-
-	private void setValidationStatus(final IStatus status) {
-		validationStatusObservable.getRealm().exec(new Runnable() {
-			@Override
-			public void run() {
-				validationStatusObservable.setValue(status);
-			}
-		});
 	}
 
 	/**

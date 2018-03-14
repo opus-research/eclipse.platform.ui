@@ -16,6 +16,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -82,7 +84,12 @@ public class AnimationEngine extends Job {
 		display = feedbackRenderer.getAnimationShell().getDisplay();
 
 		animationFeedback.getAnimationShell().addDisposeListener(
-				e -> cancelAnimation());
+				new DisposeListener() {
+					@Override
+					public void widgetDisposed(DisposeEvent e) {
+						cancelAnimation();
+					}
+				});
 
 		// Don't show the job in monitors
 		setSystem(true);
@@ -102,18 +109,23 @@ public class AnimationEngine extends Job {
 		return feedbackRenderer;
 	}
 
-	private Runnable animationStep = () -> {
-		if (animationCanceled)
-			return;
+	private Runnable animationStep = new Runnable() {
 
-		// Capture time
-		prevTime = curTime;
-		curTime = System.currentTimeMillis();
+		@Override
+		public void run() {
+			if (animationCanceled)
+				return;
 
-		if (isUpdateStep()) {
-			updateDisplay();
-			frameCount++;
+			// Capture time
+			prevTime = curTime;
+			curTime = System.currentTimeMillis();
+
+			if (isUpdateStep()) {
+				updateDisplay();
+				frameCount++;
+			}
 		}
+
 	};
 
 	protected void updateDisplay() {
@@ -166,11 +178,14 @@ public class AnimationEngine extends Job {
 		}
 
 		// We're starting, initialize
-		display.syncExec(() -> {
-			// 'jobInit' returns 'false' if it doesn't want to run...
-			if (!animationCanceled)
-				animationCanceled = !feedbackRenderer
-						.jobInit(AnimationEngine.this);
+		display.syncExec(new Runnable() {
+			@Override
+			public void run() {
+				// 'jobInit' returns 'false' if it doesn't want to run...
+				if (!animationCanceled)
+					animationCanceled = !feedbackRenderer
+							.jobInit(AnimationEngine.this);
+			}
 		});
 
 		if (animationCanceled)
@@ -193,7 +208,12 @@ public class AnimationEngine extends Job {
 			return Status.CANCEL_STATUS;
 
 		// We're done, clean up
-		display.syncExec(feedbackRenderer::dispose);
+		display.syncExec(new Runnable() {
+			@Override
+			public void run() {
+				feedbackRenderer.dispose();
+			}
+		});
 
 		return Status.OK_STATUS;
 	}

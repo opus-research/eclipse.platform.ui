@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -75,6 +75,16 @@ public class SetBinding extends Binding {
 		super(target, model);
 		this.targetToModel = targetToModelStrategy;
 		this.modelToTarget = modelToTargetStrategy;
+		if ((targetToModel.getUpdatePolicy() & UpdateSetStrategy.POLICY_UPDATE) != 0) {
+			target.addSetChangeListener(targetChangeListener);
+		} else {
+			targetChangeListener = null;
+		}
+		if ((modelToTarget.getUpdatePolicy() & UpdateSetStrategy.POLICY_UPDATE) != 0) {
+			model.addSetChangeListener(modelChangeListener);
+		} else {
+			modelChangeListener = null;
+		}
 	}
 
 	@Override
@@ -96,33 +106,10 @@ public class SetBinding extends Binding {
 	@Override
 	protected void postInit() {
 		if (modelToTarget.getUpdatePolicy() == UpdateSetStrategy.POLICY_UPDATE) {
-			getModel().getRealm().exec(new Runnable() {
-				@Override
-				public void run() {
-					((IObservableSet) getModel()).addSetChangeListener(modelChangeListener);
-					updateModelToTarget();
-				}
-			});
-		} else {
-			modelChangeListener = null;
+			updateModelToTarget();
 		}
-
 		if (targetToModel.getUpdatePolicy() == UpdateSetStrategy.POLICY_UPDATE) {
-			getTarget().getRealm().exec(new Runnable() {
-				@Override
-				public void run() {
-					((IObservableSet) getTarget()).addSetChangeListener(targetChangeListener);
-					if (modelToTarget.getUpdatePolicy() == UpdateSetStrategy.POLICY_NEVER) {
-						// we have to sync from target to model, if the other
-						// way round (model to target) is forbidden (POLICY_NEVER)
-						updateTargetToModel();
-					} else {
-						validateTargetToModel();
-					}
-				}
-			});
-		} else {
-			targetChangeListener = null;
+			validateTargetToModel();
 		}
 	}
 
@@ -195,8 +182,8 @@ public class SetBinding extends Binding {
 					for (Iterator iterator = diff.getRemovals().iterator(); iterator
 							.hasNext();) {
 						IStatus setterStatus = updateSetStrategy.doRemove(
-								destination,
-								updateSetStrategy.convert(iterator.next()));
+								destination, updateSetStrategy.convert(iterator
+										.next()));
 
 						mergeStatus(multiStatus, setterStatus);
 						// TODO - at this point, the two sets
@@ -207,8 +194,8 @@ public class SetBinding extends Binding {
 					for (Iterator iterator = diff.getAdditions().iterator(); iterator
 							.hasNext();) {
 						IStatus setterStatus = updateSetStrategy.doAdd(
-								destination,
-								updateSetStrategy.convert(iterator.next()));
+								destination, updateSetStrategy.convert(iterator
+										.next()));
 
 						mergeStatus(multiStatus, setterStatus);
 						// TODO - at this point, the two sets
@@ -216,7 +203,7 @@ public class SetBinding extends Binding {
 						// occurred...
 					}
 				} finally {
-					setValidationStatus(multiStatus);
+					validationStatusObservable.setValue(multiStatus);
 
 					if (destination == getTarget()) {
 						updatingTarget = false;
@@ -224,15 +211,6 @@ public class SetBinding extends Binding {
 						updatingModel = false;
 					}
 				}
-			}
-		});
-	}
-
-	private void setValidationStatus(final IStatus status) {
-		validationStatusObservable.getRealm().exec(new Runnable() {
-			@Override
-			public void run() {
-				validationStatusObservable.setValue(status);
 			}
 		});
 	}

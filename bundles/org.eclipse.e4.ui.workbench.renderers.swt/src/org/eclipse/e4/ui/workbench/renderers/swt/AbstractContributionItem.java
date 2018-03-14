@@ -28,7 +28,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.ItemType;
 import org.eclipse.e4.ui.model.application.ui.menu.MItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolItem;
-import org.eclipse.e4.ui.services.help.EHelpService;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.IResourceUtilities;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -44,6 +43,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -77,10 +78,6 @@ public abstract class AbstractContributionItem extends ContributionItem {
 	@Inject
 	private EModelService modelService;
 
-	@Inject
-	@Optional
-	protected EHelpService helpService;
-
 	protected Widget widget;
 	protected Listener menuItemListener;
 	protected LocalResourceManager localResourceManager;
@@ -91,7 +88,12 @@ public abstract class AbstractContributionItem extends ContributionItem {
 
 	private ISWTResourceUtilities resUtils = null;
 
-	protected IMenuListener menuListener = manager -> update(null);
+	protected IMenuListener menuListener = new IMenuListener() {
+		@Override
+		public void menuAboutToShow(IMenuManager manager) {
+			update(null);
+		}
+	};
 
 	/**
 	 * Flag to ensure that an error during updates are only logged once to
@@ -371,10 +373,13 @@ public abstract class AbstractContributionItem extends ContributionItem {
 				final IMenuCreator creator = (IMenuCreator) obj;
 				final Menu menu = creator.getMenu(toolItem.getParent().getShell());
 				if (menu != null) {
-					toolItem.addDisposeListener(e -> {
-						if (menu != null && !menu.isDisposed()) {
-							creator.dispose();
-							mmenu.setWidget(null);
+					toolItem.addDisposeListener(new DisposeListener() {
+						@Override
+						public void widgetDisposed(DisposeEvent e) {
+							if (menu != null && !menu.isDisposed()) {
+								creator.dispose();
+								mmenu.setWidget(null);
+							}
 						}
 					});
 					menu.setData(AbstractPartRenderer.OWNING_ME, menu);
@@ -459,20 +464,23 @@ public abstract class AbstractContributionItem extends ContributionItem {
 
 	protected Listener getItemListener() {
 		if (menuItemListener == null) {
-			menuItemListener = event -> {
-				switch (event.type) {
-				case SWT.Dispose:
-					handleWidgetDispose(event);
-					break;
-				case SWT.DefaultSelection:
-				case SWT.Selection:
-					if (event.widget != null) {
-						handleWidgetSelection(event);
+			menuItemListener = new Listener() {
+				@Override
+				public void handleEvent(Event event) {
+					switch (event.type) {
+					case SWT.Dispose:
+						handleWidgetDispose(event);
+						break;
+					case SWT.DefaultSelection:
+					case SWT.Selection:
+						if (event.widget != null) {
+							handleWidgetSelection(event);
+						}
+						break;
+					case SWT.Help:
+						handleHelpRequest();
+						break;
 					}
-					break;
-				case SWT.Help:
-					handleHelpRequest();
-					break;
 				}
 			};
 		}
@@ -482,13 +490,7 @@ public abstract class AbstractContributionItem extends ContributionItem {
 	/**
 	 *
 	 */
-	protected void handleHelpRequest() {
-		if (helpService == null)
-			return;
-		String helpContextId = getModel().getPersistedState().get(EHelpService.HELP_CONTEXT_ID);
-		if (helpContextId != null)
-			helpService.displayHelp(helpContextId);
-	}
+	protected abstract void handleHelpRequest();
 
 	/**
 	 * @param event

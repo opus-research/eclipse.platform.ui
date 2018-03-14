@@ -228,8 +228,7 @@ public class CommandProcessingAddon {
 		if (cmdModel.getCategory() != null) {
 			cat = commandService.getCategory(cmdModel.getCategory().getElementId());
 		}
-		commandService.defineCommand(id, name, desc, cat, parms,
-				cmdModel.getPersistedState().get("HelpContextId")); //$NON-NLS-1$
+		commandService.defineCommand(id, name, desc, cat, parms);
 	}
 
 	private void createCategories() {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -93,7 +93,7 @@ public class MarkerImageProviderRegistry {
     public void addProvider(IConfigurationElement element) {
         Descriptor desc = new Descriptor();
         desc.element = element;
-		desc.pluginBundle = Platform.getBundle(element.getNamespaceIdentifier());
+        desc.pluginBundle = Platform.getBundle(element.getNamespace());
         desc.id = element.getAttribute(ATT_ID);
         desc.markerType = element.getAttribute(ATT_MARKER_TYPE);
         desc.imagePath = element.getAttribute(ATT_ICON);

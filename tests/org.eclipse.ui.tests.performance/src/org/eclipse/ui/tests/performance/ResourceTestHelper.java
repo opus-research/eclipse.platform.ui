@@ -115,7 +115,7 @@ public class ResourceTestHelper {
 				continue;
 			if (i < buffer.length() - 1 && Character.isJavaIdentifierPart(buffer.charAt(i + identifier.length())))
 				continue;
-			positions.add(Integer.valueOf(i));
+			positions.add(new Integer(i));
 		}
 		return positions;
 	}

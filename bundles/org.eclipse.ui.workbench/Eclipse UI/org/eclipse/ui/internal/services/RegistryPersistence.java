@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@ package org.eclipse.ui.internal.services;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.IParameter;
 import org.eclipse.core.commands.Parameterization;
@@ -171,7 +172,7 @@ public abstract class RegistryPersistence implements IDisposable,
 		String statusMessage = message;
 		if (element != null) {
 			statusMessage = statusMessage
-					+ ": plug-in='" + element.getNamespaceIdentifier() + '\''; //$NON-NLS-1$
+					+ ": plug-in='" + element.getNamespace() + '\''; //$NON-NLS-1$
 		}
 		if (id != null) {
 			if (element != null) {

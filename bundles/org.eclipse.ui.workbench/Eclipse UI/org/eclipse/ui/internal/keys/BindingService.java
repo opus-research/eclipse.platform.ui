@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 479181
  *******************************************************************************/
 package org.eclipse.ui.internal.keys;
 
@@ -595,7 +594,13 @@ public final class BindingService implements IBindingService {
 		ParameterizedCommand parmCmd = binding.getParameterizedCommand();
 
 		String id = parmCmd.getId();
-		MCommand cmd = application.getCommand(id);
+		MCommand cmd = null;
+		for (MCommand appCommand : application.getCommands()) {
+			if (id.equals(appCommand.getElementId())) {
+				cmd = appCommand;
+				break;
+			}
+		}
 		if (cmd == null) {
 			return null;
 		}

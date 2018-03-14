@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2016 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,9 +35,14 @@ import org.eclipse.ui.services.IEvaluationService;
 public class AdminHandler extends AbstractHandler implements IElementUpdater {
 	private static final String ID = "org.eclipse.ui.examples.contributions.view.adminRights"; //$NON-NLS-1$
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.commands.IElementUpdater#updateElement(org.eclipse.ui.menus.UIElement,
+	 *      java.util.Map)
+	 */
 	public void updateElement(UIElement element, Map parameters) {
-		IEvaluationService service = PlatformUI
+		IEvaluationService service = (IEvaluationService) PlatformUI
 				.getWorkbench().getService(IEvaluationService.class);
 		if (service == null) {
 			return;
@@ -58,7 +63,11 @@ public class AdminHandler extends AbstractHandler implements IElementUpdater {
 		element.setChecked(((Person) o).hasAdminRights());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
 	public Object execute(ExecutionEvent event) {
 		ISelection sel = HandlerUtil.getActiveMenuSelection(event);
 		if (!(sel instanceof IStructuredSelection)) {
@@ -74,10 +83,10 @@ public class AdminHandler extends AbstractHandler implements IElementUpdater {
 		}
 		Person p = (Person) o;
 		p.setAdminRights(!p.hasAdminRights());
-		IPersonService service = PlatformUI.getWorkbench()
+		IPersonService service = (IPersonService) PlatformUI.getWorkbench()
 				.getService(IPersonService.class);
 		service.updatePerson(p);
-		ICommandService commands = PlatformUI.getWorkbench()
+		ICommandService commands = (ICommandService) PlatformUI.getWorkbench()
 				.getService(ICommandService.class);
 		commands.refreshElements(ID, null);
 		return null;

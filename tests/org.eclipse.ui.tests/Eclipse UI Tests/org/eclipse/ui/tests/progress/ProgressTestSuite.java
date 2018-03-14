@@ -28,8 +28,7 @@ import org.junit.runners.Suite;
 	ProgressViewTests.class,
 	JobInfoTest.class,
 	JobInfoTestOrdering.class,
-	ProgressAnimationItemTest.class,
-	AccumulatingProgressMonitorTest.class
+	ProgressAnimationItemTest.class
 })
 public class ProgressTestSuite {
 
