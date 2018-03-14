@@ -44,8 +44,8 @@ public class TestJobRule implements ISchedulingRule {
 
 	/**
 	 * Return the order of this rule.
-	 * 
-	 * @return
+	 *
+	 * @return the job order.
 	 */
 	public int getJobOrder() {
 		return jobOrder;

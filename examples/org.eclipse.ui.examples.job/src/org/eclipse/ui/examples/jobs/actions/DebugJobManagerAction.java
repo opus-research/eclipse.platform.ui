@@ -36,7 +36,6 @@ public class DebugJobManagerAction implements IWorkbenchWindowActionDelegate {
 
 	public void run(IAction action) {
 		System.out.println("**** BEGIN DUMP JOB MANAGER INFORMATION ****"); //$NON-NLS-1$
-
 		Job[] jobs = Job.getJobManager().find(null);
 		for (int i = 0; i < jobs.length; i++) {
 			System.out.println("" + jobs[i].getClass().getName() + " state: " + JobManager.printState(jobs[i].getState())); //$NON-NLS-1$ //$NON-NLS-2$
