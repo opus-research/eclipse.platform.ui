@@ -39,11 +39,10 @@ import org.eclipse.swt.widgets.Event;
  * {@link ViewerCell#setStyleRanges(StyleRange[])} to set style ranges
  * on the label.
  * </p>
- * @param <E> Type of an element of the model
- * 
+ *
  * @since 3.4
  */
-public abstract class StyledCellLabelProvider<E> extends OwnerDrawLabelProvider<E> {
+public abstract class StyledCellLabelProvider extends OwnerDrawLabelProvider {
 
 	/**
 	 * Style constant for indicating that the styled colors are to be applied
@@ -67,10 +66,10 @@ public abstract class StyledCellLabelProvider<E> extends OwnerDrawLabelProvider<
 
 	// reused text layout
 	private TextLayout cachedTextLayout;
-	
-	private ColumnViewer<E,?> viewer;
-	private ViewerColumn<E,?> column;
-	
+
+	private ColumnViewer viewer;
+	private ViewerColumn column;
+
 	private int deltaOfLastMeasure;
 
 	/**
@@ -139,7 +138,7 @@ public abstract class StyledCellLabelProvider<E> extends OwnerDrawLabelProvider<
 	 * @return the viewer on which this label provider is installed on or <code>null</code> if the
 	 * label provider is not installed.
 	 */
-	protected final ColumnViewer<E,?> getViewer() {
+	protected final ColumnViewer getViewer() {
 		return this.viewer;
 	}
 
@@ -150,12 +149,12 @@ public abstract class StyledCellLabelProvider<E> extends OwnerDrawLabelProvider<
 	 * @return the column on which this label provider is installed on or <code>null</code> if the
 	 * label provider is not installed.
 	 */
-	protected final ViewerColumn<E,?> getColumn() {
+	protected final ViewerColumn getColumn() {
 		return this.column;
 	}
 
 	@Override
-	public void initialize(ColumnViewer<E,?> viewer, ViewerColumn<E,?> column) {
+	public void initialize(ColumnViewer viewer, ViewerColumn column) {
 		Assert.isTrue(this.viewer == null && this.column == null, "Label provider instance already in use"); //$NON-NLS-1$
 
 		this.viewer= viewer;
@@ -177,7 +176,7 @@ public abstract class StyledCellLabelProvider<E> extends OwnerDrawLabelProvider<
 	}
 
 	@Override
-	public void update(ViewerCell<E> cell) {
+	public void update(ViewerCell cell) {
 		// clients must override and configure the cell and call super
 		super.update(cell); // calls 'repaint' to trigger the paint listener
 	}
@@ -227,9 +226,9 @@ public abstract class StyledCellLabelProvider<E> extends OwnerDrawLabelProvider<
 		return styleRange;
 	}
 
-	private ViewerCell<E> getViewerCell(Event event, E element) {
-		ViewerRow<E> row= viewer.getViewerRowFromItem(event.item);
-		return new ViewerCell<>(row, event.index, element);
+	private ViewerCell getViewerCell(Event event, Object element) {
+		ViewerRow row= viewer.getViewerRowFromItem(event.item);
+		return new ViewerCell(row, event.index, element);
 	}
 
 	/**
@@ -243,7 +242,7 @@ public abstract class StyledCellLabelProvider<E> extends OwnerDrawLabelProvider<
 	 * @see SWT#EraseItem
 	 */
 	@Override
-	protected void erase(Event event, E element) {
+	protected void erase(Event event, Object element) {
 		// use native erase
 		if (isOwnerDrawEnabled()) {
 			// info has been set by 'update': announce that we paint ourselves
@@ -252,11 +251,11 @@ public abstract class StyledCellLabelProvider<E> extends OwnerDrawLabelProvider<
 	}
 
 	@Override
-	protected void measure(Event event, E element) {
+	protected void measure(Event event, Object element) {
 		if (!isOwnerDrawEnabled())
 			return;
-		
-		ViewerCell<E> cell= getViewerCell(event, element);
+
+		ViewerCell cell= getViewerCell(event, element);
 		boolean applyColors = useColors(event);
 
 		TextLayout layout = getSharedTextLayout(event.display);
@@ -272,7 +271,7 @@ public abstract class StyledCellLabelProvider<E> extends OwnerDrawLabelProvider<
 	 * @param applyColors
 	 * @return the text width delta (0 if the text layout contains no other font)
 	 */
-	private int updateTextLayout(TextLayout layout, ViewerCell<E> cell,
+	private int updateTextLayout(TextLayout layout, ViewerCell cell,
 			boolean applyColors) {
 		layout.setStyle(null, 0, Integer.MAX_VALUE); // clear old styles
 
@@ -300,11 +299,11 @@ public abstract class StyledCellLabelProvider<E> extends OwnerDrawLabelProvider<
 	}
 
 	@Override
-	protected void paint(Event event, E element) {
+	protected void paint(Event event, Object element) {
 		if (!isOwnerDrawEnabled())
 			return;
-		
-		ViewerCell<E> cell= getViewerCell(event, element);
+
+		ViewerCell cell= getViewerCell(event, element);
 
 		boolean applyColors= useColors(event);
 

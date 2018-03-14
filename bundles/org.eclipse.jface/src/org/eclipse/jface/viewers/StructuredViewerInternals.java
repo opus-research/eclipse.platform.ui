@@ -66,7 +66,7 @@ public class StructuredViewerInternals {
 	 *            the {@link AssociateListener}
 	 * @noreference This method is not intended to be referenced by clients.
 	 */
-	protected static <E,I> void setAssociateListener(StructuredViewer<E,I> viewer,
+	protected static void setAssociateListener(StructuredViewer viewer,
 			AssociateListener listener) {
 		viewer.setAssociateListener(listener);
 	}
@@ -79,9 +79,8 @@ public class StructuredViewerInternals {
 	 * @return the Widgets corresponding to the element
 	 *
 	 * @noreference This method is not intended to be referenced by clients.
-	 * @since 3.12
 	 */
-	protected static <E,I> Widget[] getItems(StructuredViewer<E,I> viewer, E element) {
+	protected static Widget[] getItems(StructuredViewer viewer, Object element) {
 		return viewer.findItems(element);
 	}
 
