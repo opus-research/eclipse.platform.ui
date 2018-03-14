@@ -8,21 +8,17 @@
  * Contributors:
  *     Tom Schindl - initial API and implementation
  *     Lars Vogel (lars.vogel@gmail.com) - Bug 413427
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414565
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.jface.resource.FontRegistry;
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
 import org.eclipse.jface.viewers.ICellModifier;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableColorProvider;
 import org.eclipse.jface.viewers.ITableFontProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -31,6 +27,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerEditor;
 import org.eclipse.jface.viewers.TableViewerFocusCellManager;
 import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -45,6 +42,41 @@ import org.eclipse.swt.widgets.TableColumn;
  *
  */
 public class Snippet036FocusBorderCellHighlighter {
+
+	private class MyContentProvider implements IStructuredContentProvider {
+
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+		 */
+		@Override
+		public Object[] getElements(Object inputElement) {
+			return (MyModel[]) inputElement;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+		 */
+		@Override
+		public void dispose() {
+
+		}
+
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
+		 *      java.lang.Object, java.lang.Object)
+		 */
+		@Override
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+
+		}
+
+	}
 
 	public static boolean flag = true;
 
@@ -93,14 +125,11 @@ public class Snippet036FocusBorderCellHighlighter {
 	}
 
 	public Snippet036FocusBorderCellHighlighter(Shell shell) {
-		final TableViewer v = new TableViewer(shell, SWT.BORDER
-				| SWT.FULL_SELECTION);
+		final TableViewer v = new TableViewer(shell, SWT.BORDER|SWT.FULL_SELECTION);
 		v.setLabelProvider(new MyLabelProvider());
-		v.setContentProvider(ArrayContentProvider.getInstance());
+		v.setContentProvider(new MyContentProvider());
 
-		v.setCellEditors(new CellEditor[] { new TextCellEditor(v.getTable()),
-				new TextCellEditor(v.getTable()),
-				new TextCellEditor(v.getTable()) });
+		v.setCellEditors(new CellEditor[] { new TextCellEditor(v.getTable()), new TextCellEditor(v.getTable()), new TextCellEditor(v.getTable()) });
 		v.setCellModifier(new ICellModifier() {
 
 			@Override
@@ -120,12 +149,10 @@ public class Snippet036FocusBorderCellHighlighter {
 
 		});
 
-		v.setColumnProperties(new String[] { "1", "2", "3" });
+		v.setColumnProperties(new String[] {"1","2","3"});
 
-		TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(
-				v, new FocusBorderCellHighlighter(v));
-		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(
-				v) {
+		TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(v,new FocusBorderCellHighlighter(v));
+		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(v) {
 			@Override
 			protected boolean isEditorActivationEvent(
 					ColumnViewerEditorActivationEvent event) {
@@ -136,35 +163,40 @@ public class Snippet036FocusBorderCellHighlighter {
 			}
 		};
 
-		int feature = ColumnViewerEditor.TABBING_HORIZONTAL
+		TableViewerEditor.create(v, focusCellManager, actSupport, ColumnViewerEditor.TABBING_HORIZONTAL
 				| ColumnViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR
-				| ColumnViewerEditor.TABBING_VERTICAL
-				| ColumnViewerEditor.KEYBOARD_ACTIVATION;
+				| ColumnViewerEditor.TABBING_VERTICAL | ColumnViewerEditor.KEYBOARD_ACTIVATION);
 
-		TableViewerEditor.create(v, focusCellManager, actSupport, feature);
 
-		String[] columLabels = { "Column 1", "Column 2", "Column 3" };
-		for (String label : columLabels) {
-			createColumnFor(v, label);
-		}
-		v.setInput(createModel());
+		TableColumn column = new TableColumn(v.getTable(), SWT.NONE);
+		column.setWidth(200);
+		column.setMoveable(true);
+		column.setText("Column 1");
+
+		column = new TableColumn(v.getTable(), SWT.NONE);
+		column.setWidth(200);
+		column.setMoveable(true);
+		column.setText("Column 2");
+
+		column = new TableColumn(v.getTable(), SWT.NONE);
+		column.setWidth(200);
+		column.setMoveable(true);
+		column.setText("Column 3");
+
+
+		MyModel[] model = createModel();
+		v.setInput(model);
 		v.getTable().setLinesVisible(true);
 		v.getTable().setHeaderVisible(true);
 	}
 
-	private void createColumnFor(TableViewer v, String label) {
-		TableColumn column = new TableColumn(v.getTable(), SWT.NONE);
-		column.setWidth(200);
-		column.setMoveable(true);
-		column.setText(label);
-	}
-
-	private List<MyModel> createModel() {
-		List<MyModel> elements = new ArrayList<MyModel>();
+	private MyModel[] createModel() {
+		MyModel[] elements = new MyModel[10];
 
 		for (int i = 0; i < 10; i++) {
-			elements.add(new MyModel(i));
+			elements[i] = new MyModel(i);
 		}
+
 		return elements;
 	}
 
@@ -183,7 +215,9 @@ public class Snippet036FocusBorderCellHighlighter {
 			if (!display.readAndDispatch())
 				display.sleep();
 		}
+
 		display.dispose();
+
 	}
 
 }

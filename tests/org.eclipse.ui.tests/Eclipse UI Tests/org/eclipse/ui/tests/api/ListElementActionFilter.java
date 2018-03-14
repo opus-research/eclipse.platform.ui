@@ -48,7 +48,8 @@ public class ListElementActionFilter implements IActionFilter {
             boolean flag = le.getFlag();
             if (flag)
                 return value.equals(VAL_TRUE);
-			return value.equals(VAL_FALSE);
+            else
+                return value.equals(VAL_FALSE);
         }
         return false;
     }
