@@ -34,6 +34,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil.UsageCrossReferencer;
 public class ModelUtils {
 	//public static final String CONTAINING_CONTEXT = "ModelUtils.containingContext";
 	public static final String CONTAINING_PARENT = "ModelUtils.containingParent";
+	public static final String DYNAMIC_MENU_CONTEXT = "ModelUtils.dynamicMenuContext";
 
 	public static EClassifier getTypeArgument(EClass eClass,
 			EGenericType eGenericType) {
@@ -207,6 +208,8 @@ public class ModelUtils {
 			return ((MUIElement)element).getCurSharedRef().getParent();
 		} else if (element.getTransientData().get(CONTAINING_PARENT) instanceof MApplicationElement) {
 			return (MApplicationElement) element.getTransientData().get(CONTAINING_PARENT);
+		} else if (element.getTransientData().get(DYNAMIC_MENU_CONTEXT) instanceof MApplicationElement) {
+			return (MApplicationElement) element.getTransientData().get(DYNAMIC_MENU_CONTEXT);
 		} else if (element instanceof EObject) {
 			return (MApplicationElement) ((EObject) element).eContainer();
 		}
