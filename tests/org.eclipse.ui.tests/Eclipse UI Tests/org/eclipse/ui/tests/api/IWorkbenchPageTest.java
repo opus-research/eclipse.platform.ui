@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Christian Janz  - <christian.janz@gmail.com> Fix for Bug 385592
+ *     Denis Zygann <d.zygann@web.de> - Bug 457390
  *******************************************************************************/
 package org.eclipse.ui.tests.api;
 
@@ -1989,7 +1990,6 @@ public class IWorkbenchPageTest extends UITestCase {
 //		assertEquals(fastViews[0].getId(),
 //				"org.eclipse.ui.views.ResourceNavigator");
 		assertEquals(fActivePage.getViewReferences().length, 1);
-		assertTrue(fActivePage.getViewReferences()[0].isFastView());
 
 		IPerspectiveDescriptor persp = fActivePage.getPerspective();
 
@@ -3137,13 +3137,8 @@ public class IWorkbenchPageTest extends UITestCase {
 				.getReference(view);
 		fActivePage.setPartState(reference, IWorkbenchPage.STATE_MINIMIZED);
 
-		// since it's minimized, it should be a fast view
-		assertTrue("A minimized view should be a fast view", APITestUtils.isFastView(reference));
-
 		// try to restore it
 		fActivePage.setPartState(reference, IWorkbenchPage.STATE_RESTORED);
-		// since it's maximized, it should not be a fast view
-		assertFalse("A restored view should not be a fast view", APITestUtils.isFastView(reference));
 	}
 
 	/**
