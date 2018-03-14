@@ -26,9 +26,7 @@ public class IntegerFieldEditorTest extends TestCase {
 	private Shell shell;
 	private IntegerFieldEditor integerFieldEditor;
 	
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		
@@ -104,9 +102,7 @@ public class IntegerFieldEditorTest extends TestCase {
 		assertFalse(integerFieldEditor.isValid());
 	}
 	
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
+	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 	}

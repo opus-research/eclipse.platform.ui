@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.Shell;
  * Tests UpdatableTreeContentProvider and DirtyIndicationLabelProvider. Creates
  * a tree containing three randomly-generated sets of integers, and one node
  * that contains the union of the other sets.
- * 
+ *
  * @since 3.2
  */
 public class TreeContentProviderTest {
@@ -79,6 +79,7 @@ public class TreeContentProviderTest {
 			randomize = new Button(buttonBar, SWT.PUSH);
 			randomize.setText("Randomize");
 			randomize.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					AsynchronousTestSet.recomputeAll();
 					super.widgetSelected(e);
@@ -92,11 +93,7 @@ public class TreeContentProviderTest {
 				.generateLayout(shell);
 
 		shell.addDisposeListener(new DisposeListener() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
-			 */
+			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				dispose();
 			}
@@ -104,7 +101,7 @@ public class TreeContentProviderTest {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	protected void dispose() {
 		set1.dispose();
@@ -122,6 +119,7 @@ public class TreeContentProviderTest {
 		// Doubles below each
 		// SimpleNode.
 		IObservableFactory childrenFactory = new IObservableFactory() {
+			@Override
 			public IObservable createObservable(Object element) {
 				// If the parent is the root node, return the union of some
 				// randomly-generated
@@ -156,6 +154,7 @@ public class TreeContentProviderTest {
 
 		// Label provider for the tree
 		IViewerLabelProvider labelProvider = new ViewerLabelProvider() {
+			@Override
 			public void updateLabel(ViewerLabel label, Object element) {
 				if (element instanceof SimpleNode) {
 					SimpleNode node = (SimpleNode) element;
@@ -193,6 +192,7 @@ public class TreeContentProviderTest {
 	public static void main(String[] args) {
 		final Display display = Display.getDefault();
 		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
+			@Override
 			public void run() {
 				TreeContentProviderTest test = new TreeContentProviderTest();
 				Shell s = test.getShell();
