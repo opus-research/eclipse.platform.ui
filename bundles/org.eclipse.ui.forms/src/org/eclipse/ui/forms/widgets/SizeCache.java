@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -185,32 +185,28 @@ public class SizeCache {
             return new Point(0, 0);
         }
 
-		// if this not wrap control by this definition it still can wrap
-		// but heuristics below won't work since minimum size won't be a minimum
-		// we will ask control for its size later with proper hint
-		if (FormUtil.isWrapControl(control)) {
-			// If we're asking for a result smaller than the minimum width
-			int minWidth = computeMinimumWidth();
+        // If we're asking for a result smaller than the minimum width
+        int minWidth = computeMinimumWidth();
 
-			if (widthHint != SWT.DEFAULT && widthHint + widthAdjustment < minWidth) {
-				if (heightHint == SWT.DEFAULT) {
-					return new Point(minWidth, computeHeightAtMinimumWidth());
-				}
+        if (widthHint != SWT.DEFAULT && widthHint + widthAdjustment < minWidth) {
+            if (heightHint == SWT.DEFAULT) {
+                return new Point(minWidth, computeHeightAtMinimumWidth());
+            }
 
-				widthHint = minWidth - widthAdjustment;
-			}
+            widthHint = minWidth - widthAdjustment;
+        }
 
-			// If we're asking for a result smaller than the minimum height
-			int minHeight = computeMinimumHeight();
+        // If we're asking for a result smaller than the minimum height
+        int minHeight = computeMinimumHeight();
 
-			if (heightHint != SWT.DEFAULT && heightHint + heightAdjustment < minHeight) {
-				if (widthHint == SWT.DEFAULT) {
-					return new Point(computeWidthAtMinimumHeight(), minHeight);
-				}
+        if (heightHint != SWT.DEFAULT && heightHint + heightAdjustment < minHeight) {
+            if (widthHint == SWT.DEFAULT) {
+                return new Point(computeWidthAtMinimumHeight(), minHeight);
+            }
 
-				heightHint = minHeight - heightAdjustment;
-			}
-		}
+            heightHint = minHeight - heightAdjustment;
+        }
+
         // If both dimensions were supplied in the input, compute the trivial result
         if (widthHint != SWT.DEFAULT && heightHint != SWT.DEFAULT) {
             return new Point(widthHint + widthAdjustment, heightHint + heightAdjustment);
@@ -431,7 +427,7 @@ public class SizeCache {
         }
 
         if (minimumWidth == -1) {
-			Point minWidth = controlComputeSize(FormUtil.getWidthHint(5, control), SWT.DEFAULT);
+            Point minWidth = controlComputeSize(FormUtil.getWidthHint(5, control), SWT.DEFAULT);
             minimumWidth = minWidth.x;
             heightAtMinimumWidth = minWidth.y;
         }
