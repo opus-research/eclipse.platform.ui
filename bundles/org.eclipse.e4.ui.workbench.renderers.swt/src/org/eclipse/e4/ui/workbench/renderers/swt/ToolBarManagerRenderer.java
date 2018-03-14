@@ -519,11 +519,11 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			}
 			manager.setStyle(style);
 		}
-		ToolBar bar = manager.createControl(parent);
-		bar.setData(manager);
-		bar.setData(AbstractPartRenderer.OWNING_ME, element);
-		bar.requestLayout();
-		return bar;
+		ToolBar btoolbar = manager.createControl(parent);
+		btoolbar.setData(manager);
+		btoolbar.setData(AbstractPartRenderer.OWNING_ME, element);
+		btoolbar.requestLayout();
+		return btoolbar;
 	}
 
 	protected void cleanUp(MToolBar toolbarModel) {
@@ -593,9 +593,9 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		}
 		parentManager.update(true);
 
-		ToolBar tb = getToolbarFrom(container.getWidget());
-		if (tb != null) {
-			tb.requestLayout();
+		ToolBar toolbar = getToolbarFrom(container.getWidget());
+		if (toolbar != null) {
+			toolbar.requestLayout();
 		}
 	}
 

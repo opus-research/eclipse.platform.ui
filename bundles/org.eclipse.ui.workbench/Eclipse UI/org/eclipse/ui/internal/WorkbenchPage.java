@@ -33,6 +33,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
@@ -141,6 +142,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchPartSite;
+import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.IWorkingSetManager;
@@ -383,7 +385,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 				ViewReference viewReference = getViewReference(part);
 				if (viewReference != null) {
-					E4PartWrapper legacyPart = new E4PartWrapper(part);
+					E4PartWrapper legacyPart = E4PartWrapper.getE4PartWrapper(part);
 					try {
 						viewReference.initialize(legacyPart);
 					} catch (PartInitException e) {
@@ -2698,6 +2700,9 @@ public class WorkbenchPage implements IWorkbenchPage {
 		broker.subscribe(UIEvents.Contribution.TOPIC_OBJECT, firingHandler);
 		broker.subscribe(UIEvents.ElementContainer.TOPIC_CHILDREN, childrenHandler);
 
+		// Bug 479126 PERSPECTIVE_BAR_EXTRAS setting not taken into account
+		createPerspectiveBarExtras();
+
 		MPerspectiveStack perspectiveStack = getPerspectiveStack();
 		if (perspectiveStack != null) {
 			extendPerspectives(perspectiveStack);
@@ -4056,22 +4061,8 @@ public class WorkbenchPage implements IWorkbenchPage {
 				perspective.getId(), window);
 
 		if (modelPerspective == null) {
-
 			// couldn't find the perspective, create a new one
-			modelPerspective = modelService.createModelElement(MPerspective.class);
-
-			// tag it with the same id
-			modelPerspective.setElementId(perspective.getId());
-
-
-			// instantiate the perspective
-			IPerspectiveFactory factory = ((PerspectiveDescriptor) perspective).createFactory();
-			ModeledPageLayout modelLayout = new ModeledPageLayout(window, modelService,
-					partService, modelPerspective, perspective, this, true);
-			factory.createInitialLayout(modelLayout);
-			PerspectiveTagger.tagPerspective(modelPerspective, modelService);
-			PerspectiveExtensionReader reader = new PerspectiveExtensionReader();
-			reader.extendLayout(getExtensionTracker(), perspective.getId(), modelLayout);
+			modelPerspective = createPerspective(perspective);
 		}
 
 		((ModelServiceImpl) modelService).handleNullRefPlaceHolders(modelPerspective, window);
@@ -4101,6 +4092,27 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 		legacyWindow.firePerspectiveOpened(this, perspective);
 		UIEvents.publishEvent(UIEvents.UILifeCycle.PERSPECTIVE_OPENED, modelPerspective);
+	}
+
+	/**
+	 * @param perspective
+	 * @return never null
+	 */
+	private MPerspective createPerspective(IPerspectiveDescriptor perspective) {
+		MPerspective modelPerspective = modelService.createModelElement(MPerspective.class);
+
+		// tag it with the same id
+		modelPerspective.setElementId(perspective.getId());
+
+		// instantiate the perspective
+		IPerspectiveFactory factory = ((PerspectiveDescriptor) perspective).createFactory();
+		ModeledPageLayout modelLayout = new ModeledPageLayout(window, modelService,
+				partService, modelPerspective, perspective, this, true);
+		factory.createInitialLayout(modelLayout);
+		PerspectiveTagger.tagPerspective(modelPerspective, modelService);
+		PerspectiveExtensionReader reader = new PerspectiveExtensionReader();
+		reader.extendLayout(getExtensionTracker(), perspective.getId(), modelLayout);
+		return modelPerspective;
 	}
 
 	void perspectiveActionSetChanged(Perspective perspective, IActionSetDescriptor descriptor,
@@ -4938,6 +4950,33 @@ public class WorkbenchPage implements IWorkbenchPage {
 				});
 			}
 		}
+		else if (client != null) {
+			if (part.getTransientData().get(E4PartWrapper.E4_WRAPPER_KEY) instanceof E4PartWrapper) {
+				IWorkbenchPart workbenchPart = (IWorkbenchPart) part.getTransientData()
+						.get(E4PartWrapper.E4_WRAPPER_KEY);
+				final IWorkbenchPartReference partReference = getReference(workbenchPart);
+
+				if (partReference != null) {
+					for (final Object listener : partListenerList.getListeners()) {
+						SafeRunner.run(new SafeRunnable() {
+							@Override
+							public void run() throws Exception {
+								((IPartListener) listener).partActivated(workbenchPart);
+							}
+						});
+					}
+
+					for (final Object listener : partListener2List.getListeners()) {
+						SafeRunner.run(new SafeRunnable() {
+							@Override
+							public void run() throws Exception {
+								((IPartListener2) listener).partActivated(partReference);
+							}
+						});
+					}
+				}
+			}
+		}
 	}
 
 	private void firePartDeactivated(MPart part) {
@@ -4962,6 +5001,32 @@ public class WorkbenchPage implements IWorkbenchPage {
 						((IPartListener2) listener).partDeactivated(partReference);
 					}
 				});
+			}
+		} else if (client != null) {
+			if (part.getTransientData().get(E4PartWrapper.E4_WRAPPER_KEY) instanceof E4PartWrapper) {
+				IWorkbenchPart workbenchPart = (IWorkbenchPart) part.getTransientData()
+						.get(E4PartWrapper.E4_WRAPPER_KEY);
+				final IWorkbenchPartReference partReference = getReference(workbenchPart);
+
+				if (partReference != null) {
+					for (final Object listener : partListenerList.getListeners()) {
+						SafeRunner.run(new SafeRunnable() {
+							@Override
+							public void run() throws Exception {
+								((IPartListener) listener).partDeactivated(workbenchPart);
+							}
+						});
+					}
+
+					for (final Object listener : partListener2List.getListeners()) {
+						SafeRunner.run(new SafeRunnable() {
+							@Override
+							public void run() throws Exception {
+								((IPartListener2) listener).partDeactivated(partReference);
+							}
+						});
+					}
+				}
 			}
 		}
 	}
@@ -5504,4 +5569,43 @@ public class WorkbenchPage implements IWorkbenchPage {
 			firePartDeactivated(part);
 		}
 	}
+
+	/**
+	 * Add ToolItems for perspectives specified in "PERSPECTIVE_BAR_EXTRAS"
+	 */
+	private void createPerspectiveBarExtras() {
+		String persps = PrefUtil.getAPIPreferenceStore()
+				.getString(IWorkbenchPreferenceConstants.PERSPECTIVE_BAR_EXTRAS);
+		// e3 allowed spaces and commas as separator
+		String[] parts = persps.split("[, ]"); //$NON-NLS-1$
+		Set<String> perspSet = new LinkedHashSet<>();
+		for (String part : parts) {
+			part = part.trim();
+			if (!part.isEmpty())
+				perspSet.add(part);
+		}
+
+		for (String perspId : perspSet) {
+			MPerspective persp = (MPerspective) modelService.find(perspId, window);
+			if (persp != null)
+				continue; // already in stack, i.e. has already been added above
+			IPerspectiveDescriptor desc = getDescriptorFor(perspId);
+			if (desc == null)
+				continue; // this perspective does not exist
+			persp = createPerspective(desc);
+			persp.setLabel(desc.getLabel());
+			getPerspectiveStack().getChildren().add(persp);
+			// "add" fires Event, causes creation of ToolItem on perspective bar
+		}
+	}
+
+	private IPerspectiveDescriptor getDescriptorFor(String id) {
+		IPerspectiveRegistry perspectiveRegistry = getWorkbenchWindow().getWorkbench().getPerspectiveRegistry();
+		if (perspectiveRegistry instanceof PerspectiveRegistry) {
+			return ((PerspectiveRegistry) perspectiveRegistry).findPerspectiveWithId(id, false);
+		}
+
+		return perspectiveRegistry.findPerspectiveWithId(id);
+	}
+
 }
