@@ -464,8 +464,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 	private IEventBroker eventBroker;
 
-	private IExtensionRegistry registry;
-
 	boolean initializationDone = false;
 
 	private WorkbenchWindow windowBeingCreated = null;
@@ -476,7 +474,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 	private String id;
 	private ServiceRegistration<?> e4WorkbenchService;
-
 
 	/**
 	 * Creates a new workbench.
@@ -505,7 +502,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 		e4Context = appContext;
 		Workbench.instance = this;
 		eventBroker = e4Context.get(IEventBroker.class);
-		registry = e4Context.get(IExtensionRegistry.class);
 
 		appContext.set(getClass().getName(), this);
 		appContext.set(IWorkbench.class, this);
@@ -536,7 +532,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 		// dialog is
 		// to show the user a nice dialog describing the addition.]
 		extensionEventHandler = new ExtensionEventHandler(this);
-		registry.addRegistryChangeListener(extensionEventHandler);
+		Platform.getExtensionRegistry().addRegistryChangeListener(extensionEventHandler);
 		IServiceLocatorCreator slc = new ServiceLocatorCreator();
 		serviceLocator = (ServiceLocator) slc.createServiceLocator(null, null, new IDisposable() {
 			@Override
@@ -2736,12 +2732,12 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 * @return the ids of all plug-ins containing 1 or more startup extensions
 	 */
 	public ContributionInfo[] getEarlyActivatedPlugins() {
-		IExtensionPoint point = registry
-				.getExtensionPoint(PlatformUI.PLUGIN_ID, IWorkbenchRegistryConstants.PL_STARTUP);
+		IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint(
+				PlatformUI.PLUGIN_ID, IWorkbenchRegistryConstants.PL_STARTUP);
 		IExtension[] extensions = point.getExtensions();
 		ArrayList<String> pluginIds = new ArrayList<String>(extensions.length);
-		for (IExtension extension : extensions) {
-			String id = extension.getNamespaceIdentifier();
+		for (int i = 0; i < extensions.length; i++) {
+			String id = extensions[i].getNamespaceIdentifier();
 			if (!pluginIds.contains(id)) {
 				pluginIds.add(id);
 			}
@@ -2774,6 +2770,8 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 * page.
 	 */
 	private void startPlugins() {
+		IExtensionRegistry registry = Platform.getExtensionRegistry();
+
 		// bug 55901: don't use getConfigElements directly, for pre-3.0
 		// compat, make sure to allow both missing class
 		// attribute and a missing startup element
@@ -3537,6 +3535,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 * @since 3.1
 	 */
 	private void addStartupRegistryListener() {
+		IExtensionRegistry registry = Platform.getExtensionRegistry();
 		registry.addRegistryChangeListener(startupRegistryListener);
 	}
 
