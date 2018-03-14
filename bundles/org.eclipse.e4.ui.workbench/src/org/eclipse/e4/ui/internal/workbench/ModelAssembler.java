@@ -65,10 +65,14 @@ public class ModelAssembler {
 
 	final private static String extensionPointID = "org.eclipse.e4.workbench.model"; //$NON-NLS-1$
 
+	private static final String ALWAYS = "always"; //$NON-NLS-1$
+	private static final String INITIAL = "initial"; //$NON-NLS-1$
+	private static final String NOTEXISTS = "notexists"; //$NON-NLS-1$
+
 	/**
 	 * Process the model
 	 */
-	public void processModel() {
+	public void processModel(boolean initial) {
 		IExtensionRegistry registry = RegistryFactory.getRegistry();
 		IExtensionPoint extPoint = registry.getExtensionPoint(extensionPointID);
 		IExtension[] extensions = topoSort(extPoint.getExtensions());
@@ -85,6 +89,9 @@ public class ModelAssembler {
 				if (!"processor".equals(ce.getName()) || !Boolean.parseBoolean(ce.getAttribute("beforefragment"))) { //$NON-NLS-1$ //$NON-NLS-2$
 					continue;
 				}
+				if (!initial && INITIAL.equals(ce.getAttribute("apply"))) { //$NON-NLS-1$
+					continue;
+				}
 				runProcessor(ce);
 			}
 		}
@@ -95,6 +102,11 @@ public class ModelAssembler {
 				if (!"fragment".equals(ce.getName())) { //$NON-NLS-1$
 					continue;
 				}
+
+				if (!initial && INITIAL.equals(ce.getAttribute("apply"))) { //$NON-NLS-1$
+					continue;
+				}
+
 				IContributor contributor = ce.getContributor();
 				String attrURI = ce.getAttribute("uri"); //$NON-NLS-1$
 				if (attrURI == null) {
@@ -141,6 +153,8 @@ public class ModelAssembler {
 					continue;
 				}
 
+				boolean checkExist = !initial && NOTEXISTS.equals(ce.getAttribute("apply")); //$NON-NLS-1$
+
 				MModelFragments fragmentsContainer = (MModelFragments) extensionRoot;
 				List<MModelFragment> fragments = fragmentsContainer.getFragments();
 				boolean evalImports = false;
@@ -154,6 +168,12 @@ public class ModelAssembler {
 						EObject o = (EObject) el;
 
 						E4XMIResource r = (E4XMIResource) o.eResource();
+
+						if (checkExist
+								&& applicationResource.getIDToEObjectMap().containsKey(r.getID(o))) {
+							continue;
+						}
+
 						applicationResource.setID(o, r.getID(o));
 
 						if (contributorURI != null)
