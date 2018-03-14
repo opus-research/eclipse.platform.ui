@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,27 +11,23 @@
 
 package org.eclipse.e4.ui.tests.reconciler;
 
-import static org.junit.Assert.assertNotNull;
-
 import java.io.File;
 import java.io.IOException;
-import org.eclipse.e4.core.contexts.IEclipseContext;
+import junit.framework.TestCase;
 import org.eclipse.e4.ui.internal.workbench.E4XMIResourceFactory;
-import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
+import org.eclipse.e4.ui.model.application.impl.ApplicationFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.Resource.Factory;
 import org.eclipse.emf.ecore.xmi.XMLResource;
-import org.junit.After;
-import org.junit.Before;
 
-public abstract class ModelResourceTest {
+public abstract class ModelResourceTest extends TestCase {
 
 	private File temporaryFile;
 
@@ -43,23 +39,20 @@ public abstract class ModelResourceTest {
 
 	private XMLResource xmlResource;
 
-	protected EModelService ems;
-
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		temporaryFile = new File(System.getProperty("java.io.tmpdir"),
-				getClass().getSimpleName() + "_" + this.getClass().getSimpleName() + ".e4xmi");
+				getClass().getSimpleName() + "_" + getName() + ".e4xmi");
 		temporaryFile.delete();
 		temporaryURI = URI.createFileURI(temporaryFile.getAbsolutePath());
 		factory = createFactory();
 		assertNotNull(factory);
-
-		IEclipseContext defaultContext = E4Application.createDefaultContext();
-		ems = defaultContext.get(EModelService.class);
+		super.setUp();
 	}
 
-	@After
+	@Override
 	protected void tearDown() throws Exception {
+		super.tearDown();
 		factory = null;
 		temporaryFile.delete();
 		temporaryFile = null;
@@ -102,19 +95,21 @@ public abstract class ModelResourceTest {
 			return (MApplication) resource.getContents().get(0);
 		}
 
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		resource.getContents().add((EObject) application);
 		return application;
 	}
 
 	protected MWindow createWindow(MApplication application) {
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		return window;
 	}
 
 	protected MTrimmedWindow createTrimmedWindow(MApplication application) {
-		MTrimmedWindow window = ems.createModelElement(MTrimmedWindow.class);
+		MTrimmedWindow window = BasicFactoryImpl.eINSTANCE
+				.createTrimmedWindow();
 		application.getChildren().add(window);
 		return window;
 	}

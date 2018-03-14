@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 IBM Corporation and others.
+ * Copyright (c) 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,15 +11,12 @@
 
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
+import junit.framework.TestCase;
 import org.eclipse.e4.ui.internal.workbench.swt.CSSConstants;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
@@ -32,43 +29,37 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.osgi.service.event.Event;
 
-public class TabStateHandlerTest {
+public class TabStateHandlerTest extends TestCase {
 	private StackRendererTestable renderer;
 	private TabStateHandler handler;
 	private Shell shell;
 
-	@Before
+	@Override
 	public void setUp() throws Exception {
 		shell = new Shell();
 		renderer = new StackRendererTestable();
 		handler = renderer.new TabStateHandler();
 	}
 
-	@After
+	@Override
 	public void tearDown() throws Exception {
 		shell.dispose();
 	}
 
-	@Test
 	public void testValidateElement() throws Exception {
 		assertTrue(handler.validateElement(MBasicFactory.INSTANCE.createPart()));
 		assertTrue(handler.validateElement(MBasicFactory.INSTANCE
 				.createPartStack()));
 	}
 
-	@Test
 	public void testValidateElementWhenInvalidElement() throws Exception {
 		assertFalse(handler.validateElement(MBasicFactory.INSTANCE
 				.createTrimBar()));
 		assertFalse(handler.validateElement(null));
 	}
 
-	@Test
 	public void testValidateValues() throws Exception {
 		assertTrue(handler.validateValues(null,
 				placeHolder(MBasicFactory.INSTANCE.createPart())));
@@ -78,14 +69,12 @@ public class TabStateHandlerTest {
 				CSSConstants.CSS_CONTENT_CHANGE_CLASS));
 	}
 
-	@Test
 	public void testValidateValuesWhenInvalidValue() throws Exception {
 		assertFalse(handler.validateValues(null,
 				MBasicFactory.INSTANCE.createPart()));
 		assertFalse(handler.validateValues(null, "new not supported tag"));
 	}
 
-	@Test
 	public void testHandleEventWhenTabBusyEvent() throws Exception {
 		// given
 		MPart part = MBasicFactory.INSTANCE.createPart();
@@ -109,7 +98,6 @@ public class TabStateHandlerTest {
 		tabFolder.dispose();
 	}
 
-	@Test
 	public void testHandleEventWhenTabIdleEvent() throws Exception {
 		// given
 		MPart part = MBasicFactory.INSTANCE.createPart();
@@ -133,7 +121,6 @@ public class TabStateHandlerTest {
 		tabFolder.dispose();
 	}
 
-	@Test
 	public void testHandleEventWhenTabContentChangedEventAndTabInactive()
 			throws Exception {
 		// given
@@ -164,7 +151,6 @@ public class TabStateHandlerTest {
 		tabFolder.dispose();
 	}
 
-	@Test
 	public void testHandleEventWhenTabContentChangedEventAndTabActive()
 			throws Exception {
 		// given
@@ -195,7 +181,6 @@ public class TabStateHandlerTest {
 		tabFolder.dispose();
 	}
 
-	@Test
 	public void testHandleEventWhenTabActivateEventAndItsContentChanged()
 			throws Exception {
 		// given
@@ -221,7 +206,6 @@ public class TabStateHandlerTest {
 		tabFolder.dispose();
 	}
 
-	@Test
 	public void testHandleEventWhenTabActivateEventAndTabItemForPartNotFound()
 			throws Exception {
 		// given
@@ -273,7 +257,6 @@ public class TabStateHandlerTest {
 		return (MPlaceholder) Proxy.newProxyInstance(getClass()
 				.getClassLoader(), new Class<?>[] { MPlaceholder.class },
 				new InvocationHandler() {
-					@Override
 					public Object invoke(Object arg0, Method method,
 							Object[] arg2) throws Throwable {
 						if ("getRef".equals(method.getName())) {
@@ -293,17 +276,14 @@ public class TabStateHandlerTest {
 			this.value = value;
 		}
 
-		@Override
 		public String getKey() {
 			return key;
 		}
 
-		@Override
 		public Object getValue() {
 			return value;
 		}
 
-		@Override
 		public Object setValue(Object arg0) {
 			return null;
 		}

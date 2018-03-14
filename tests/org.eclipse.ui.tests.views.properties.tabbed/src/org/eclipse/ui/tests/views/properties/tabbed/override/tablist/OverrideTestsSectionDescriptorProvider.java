@@ -36,7 +36,11 @@ public class OverrideTestsSectionDescriptorProvider implements
 
 	private ISectionDescriptor[] sectionDescriptors;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.views.properties.tabbed.ISectionDescriptorProvider#getSectionDescriptors()
+	 */
 	public ISectionDescriptor[] getSectionDescriptors() {
 		if (sectionDescriptors == null) {
 			sectionDescriptors = new ISectionDescriptor[] { new OverrideTestsSectionDescriptor() };

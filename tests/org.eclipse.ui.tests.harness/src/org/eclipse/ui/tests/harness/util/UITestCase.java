@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 474957
  *******************************************************************************/
 package org.eclipse.ui.tests.harness.util;
 
@@ -17,6 +16,8 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import junit.framework.TestCase;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -30,8 +31,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
-
-import junit.framework.TestCase;
 
 /**
  * <code>UITestCase</code> is a useful super class for most
@@ -204,6 +203,7 @@ public abstract class UITestCase extends TestCase {
      */
     @Override
 	protected final void tearDown() throws Exception {
+        super.tearDown();
         trace(this.getName() + ": tearDown...\n"); //$NON-NLS-1$
         removeWindowListener();
         doTearDown();

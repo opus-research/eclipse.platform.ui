@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Nikolay Botev - bug 240651
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 459964
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -337,7 +336,7 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 	@Override
 	IWorkbenchPart createErrorPart() {
 		IStatus status = new Status(IStatus.ERROR, WorkbenchPlugin.PI_WORKBENCH, NLS.bind(
-				WorkbenchMessages.EditorManager_missing_editor_descriptor, descriptorId), new Exception());
+				WorkbenchMessages.EditorManager_missing_editor_descriptor, descriptorId));
 		IEditorRegistry registry = getPage().getWorkbenchWindow().getWorkbench()
 				.getEditorRegistry();
 		descriptor = (EditorDescriptor) registry.findEditor(EditorRegistry.EMPTY_EDITOR_ID);
@@ -406,7 +405,7 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 		return null;
 	}
 
-	private static HashMap<String, Set<EditorActionBars>> actionCache = new HashMap<>();
+	private static HashMap<String, Set<EditorActionBars>> actionCache = new HashMap<String, Set<EditorActionBars>>();
 
 	/*
 	 * Creates the action bars for an editor. Editors of the same type should
@@ -432,7 +431,7 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 		EditorActionBars actionBars = new EditorActionBars(page, page.getWorkbenchWindow(), type);
 		actionBars.addRef();
 		if (candidates == null) {
-			candidates = new HashSet<>(3);
+			candidates = new HashSet<EditorActionBars>(3);
 			candidates.add(actionBars);
 			actionCache.put(type, candidates);
 		} else
