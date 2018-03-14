@@ -35,7 +35,7 @@ public class TaskPropertiesDialog extends DialogTaskProperties {
 	 * resource and initial attributes for the new task, use
 	 * <code>setResource</code> and <code>setInitialAttributes</code>. To
 	 * show or modify an existing task, use <code>setMarker</code>.
-	 * 
+	 *
 	 * @param parentShell
 	 *            the parent shell
 	 */
@@ -45,11 +45,12 @@ public class TaskPropertiesDialog extends DialogTaskProperties {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.jface.window.Dialog#getDialogBoundsSettings()
-	 * 
+	 *
 	 * @since 3.2
 	 */
+	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
 		IDialogSettings settings = IDEWorkbenchPlugin.getDefault()
 				.getDialogSettings();
@@ -59,13 +60,14 @@ public class TaskPropertiesDialog extends DialogTaskProperties {
 		}
 		return section;
 	}
-	
+
     /**
      * Sets the marker to show or modify.
-     * 
+     *
      * @param marker the marker, or <code>null</code> to create a new marker
      */
-    public void setMarker(IMarker marker) {
+    @Override
+	public void setMarker(IMarker marker) {
     	// Method is overridden because API is being inherited from an internal class.
         super.setMarker(marker);
     }
@@ -74,10 +76,11 @@ public class TaskPropertiesDialog extends DialogTaskProperties {
      * Returns the marker being created or modified.
      * For a new marker, this returns <code>null</code> until
      * the dialog returns, but is non-null after.
-     * 
+     *
      * @return the marker
      */
-    public IMarker getMarker() {
+    @Override
+	public IMarker getMarker() {
     	// Method is overridden because API is being inherited from an internal class.
         return super.getMarker();
     }
@@ -85,10 +88,11 @@ public class TaskPropertiesDialog extends DialogTaskProperties {
     /**
      * Sets the resource to use when creating a new task.
      * If not set, the new task is created on the workspace root.
-     * 
+     *
      * @param resource the resource
      */
-    public void setResource(IResource resource) {
+    @Override
+	public void setResource(IResource resource) {
     	// Method is overridden because API is being inherited from an internal class.
         super.setResource(resource);
     }
@@ -97,10 +101,11 @@ public class TaskPropertiesDialog extends DialogTaskProperties {
      * Returns the resource to use when creating a new task,
      * or <code>null</code> if none has been set.
      * If not set, the new task is created on the workspace root.
-     * 
+     *
      * @return the resource
      */
-    public IResource getResource() {
+    @Override
+	public IResource getResource() {
     	// Method is overridden because API is being inherited from an internal class.
         return super.getResource();
     }
@@ -108,10 +113,11 @@ public class TaskPropertiesDialog extends DialogTaskProperties {
     /**
      * Sets initial attributes to use when creating a new task.
      * If not set, the new task is created with default attributes.
-     * 
+     *
      * @param initialAttributes the initial attributes
      */
-    public void setInitialAttributes(Map initialAttributes) {
+    @Override
+	public void setInitialAttributes(Map initialAttributes) {
     	// Method is overridden because API is being inherited from an internal class.
         super.setInitialAttributes(initialAttributes);
     }
@@ -120,10 +126,11 @@ public class TaskPropertiesDialog extends DialogTaskProperties {
      * Returns the initial attributes to use when creating a new task,
      * or <code>null</code> if not set.
      * If not set, the new task is created with default attributes.
-     * 
+     *
      * @return the initial attributes
      */
-    public Map getInitialAttributes() {
+    @Override
+	public Map getInitialAttributes() {
     	// Method is overridden because API is being inherited from an internal class.
         return super.getInitialAttributes();
     }

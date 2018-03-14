@@ -35,6 +35,7 @@ public class StickyViewManagerTest extends UITestCase {
 		super(testName);
 	}
 
+	@Override
 	protected void doSetUp() throws Exception {
 		// preserve the original behaviour
 		originalPreference = PlatformUI.getPreferenceStore().getBoolean(
@@ -46,6 +47,7 @@ public class StickyViewManagerTest extends UITestCase {
 		super.doSetUp();
 	}
 
+	@Override
 	protected void doTearDown() throws Exception {
 		super.doTearDown();
 		// revert to the original behaviour to ensure future tests are not
@@ -74,9 +76,9 @@ public class StickyViewManagerTest extends UITestCase {
 		IPerspectiveRegistry registry = fWorkbench.getPerspectiveRegistry();
 		IPerspectiveDescriptor[] descriptors = registry.getPerspectives();
 
-		for (int i = 0; i < descriptors.length; i++) {
+		for (IPerspectiveDescriptor descriptor : descriptors) {
 			// switch to every perspective we know of
-			page.setPerspective(descriptors[i]);
+			page.setPerspective(descriptor);
 			// check that the sticky view is in all of these perspectives
 			assertNotNull(page.findViewReference(
 					"org.eclipse.ui.tests.api.MockViewPartMultSticky", null));
@@ -109,10 +111,10 @@ public class StickyViewManagerTest extends UITestCase {
 		IPerspectiveRegistry registry = fWorkbench.getPerspectiveRegistry();
 		IPerspectiveDescriptor[] descriptors = registry.getPerspectives();
 
-		for (int i = 0; i < descriptors.length; i++) {
+		for (IPerspectiveDescriptor descriptor : descriptors) {
 			// check that every single perspective now has the special views
 			// hidden
-			page.setPerspective(descriptors[i]);
+			page.setPerspective(descriptor);
 			assertNull(page.findViewReference(
 					"org.eclipse.ui.tests.api.MockViewPartMultSticky", null));
 			assertNull(page.findViewReference(

@@ -23,7 +23,7 @@ import org.eclipse.ui.PlatformUI;
     /**
      * Create the Defaults action. This action is used to set
      * the properties back to their default values.
-     * 
+     *
      * @param viewer the viewer
      * @param name the name
      */
@@ -36,7 +36,8 @@ import org.eclipse.ui.PlatformUI;
     /**
      * Reset the properties to their default values.
      */
-    public void run() {
+    @Override
+	public void run() {
         getPropertySheet().deactivateCellEditor();
         getPropertySheet().resetProperties();
     }

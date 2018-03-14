@@ -29,7 +29,7 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
  * Tests [I]FileEditorInput API.
- * 
+ *
  * @since 3.1
  */
 public class FileEditorInputTest extends UITestCase {
@@ -40,7 +40,7 @@ public class FileEditorInputTest extends UITestCase {
     public FileEditorInputTest(String testName) {
         super(testName);
     }
-    
+
     /**
      * Regression test for bug 72337 - [IDE] FileEditorInput .equals() not implemented against interface
      */
@@ -53,61 +53,74 @@ public class FileEditorInputTest extends UITestCase {
         assertTrue(inputA1.equals(inputA2));
         assertTrue(inputA2.equals(inputA1));
     }
-    
+
     class OtherFileEditorInput implements IFileEditorInput {
         private IFile file;
-        
+
         public OtherFileEditorInput(IFile file) {
             this.file = file;
         }
-        
-        public IFile getFile() {
+
+        @Override
+		public IFile getFile() {
             return file;
         }
 
         /**
 		 * @throws CoreException if this method fails
 		 */
-        public IStorage getStorage() throws CoreException {
+        @Override
+		public IStorage getStorage() throws CoreException {
             return file;
         }
 
-        public boolean exists() {
+        @Override
+		public boolean exists() {
             return file.exists();
         }
 
-        public ImageDescriptor getImageDescriptor() {
+        @Override
+		public ImageDescriptor getImageDescriptor() {
             return null;
         }
 
-        public String getName() {
+        @Override
+		public String getName() {
             return file.getName();
         }
 
-        public IPersistableElement getPersistable() {
+        @Override
+		public IPersistableElement getPersistable() {
             return null;
         }
 
-        public String getToolTipText() {
+        @Override
+		public String getToolTipText() {
             return file.getFullPath().toString();
         }
 
-        public Object getAdapter(Class adapter) {
-            if (adapter == IResource.class)
-                return file;
-            if (adapter == IFile.class)
-                return file;
+        @Override
+		public Object getAdapter(Class adapter) {
+            if (adapter == IResource.class) {
+				return file;
+			}
+            if (adapter == IFile.class) {
+				return file;
+			}
             return null;
         }
-        
-        public boolean equals(Object obj) {
-            if (!(obj instanceof IFileEditorInput))
-                return false;
+
+        @Override
+		public boolean equals(Object obj) {
+            if (!(obj instanceof IFileEditorInput)) {
+				return false;
+			}
             IFileEditorInput other = (IFileEditorInput) obj;
             return file.equals(other.getFile());
         }
-        
-        public int hashCode() {
+
+        @Override
+		public int hashCode() {
             return file.hashCode();
         }
     }

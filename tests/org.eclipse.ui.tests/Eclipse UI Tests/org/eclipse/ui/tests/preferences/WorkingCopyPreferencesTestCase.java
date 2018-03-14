@@ -30,7 +30,7 @@ public class WorkingCopyPreferencesTestCase extends UITestCase {
 		// set the value in the real node
 		String key = "key";
 		String value = "value";
-		IEclipsePreferences eNode = new InstanceScope().getNode("working.copy.tests.testRemoveKey");
+		IEclipsePreferences eNode = InstanceScope.INSTANCE.getNode("working.copy.tests.testRemoveKey");
 		eNode.put(key, value);
 		assertEquals("1.0", value, eNode.get(key, null));
 
@@ -54,14 +54,14 @@ public class WorkingCopyPreferencesTestCase extends UITestCase {
 		// set the value in the real node
 		String key = "key";
 		String value = "value";
-		IEclipsePreferences eNode = new InstanceScope().getNode("working.copy.tests.testRemoveKey");
+		IEclipsePreferences eNode = InstanceScope.INSTANCE.getNode("working.copy.tests.testRemoveKey");
 		eNode.put(key, value);
 		assertEquals("1.0", value, eNode.get(key, null));
 
 		// create a working copy
 		WorkingCopyManager manager = new WorkingCopyManager();
 		IEclipsePreferences prefs = manager.getWorkingCopy(eNode);
-		
+
 		// remove the node
 		try {
 			prefs.removeNode();
