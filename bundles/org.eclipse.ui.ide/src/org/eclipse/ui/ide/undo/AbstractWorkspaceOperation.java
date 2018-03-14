@@ -20,12 +20,13 @@ import org.eclipse.core.commands.operations.OperationStatus;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceRuleFactory;
 import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.mapping.IResourceChangeDescriptionFactory;
 import org.eclipse.core.resources.mapping.ResourceChangeValidator;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.ICoreRunnable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -637,7 +638,7 @@ public abstract class AbstractWorkspaceOperation extends AbstractOperation
 	 *         <code>null</code> if there are no scheduling restrictions for
 	 *         this operation.
 	 *
-	 * @see IWorkspace#run(IWorkspaceRunnable, ISchedulingRule, int,
+	 * @see IWorkspace#run(ICoreRunnable, ISchedulingRule, int,
 	 *      IProgressMonitor)
 	 */
 	protected ISchedulingRule getExecuteSchedulingRule() {
@@ -655,7 +656,7 @@ public abstract class AbstractWorkspaceOperation extends AbstractOperation
 	 *         <code>null</code> if there are no scheduling restrictions for
 	 *         this operation.
 	 *
-	 * @see IWorkspace#run(IWorkspaceRunnable, ISchedulingRule, int,
+	 * @see IWorkspace#run(ICoreRunnable, ISchedulingRule, int,
 	 *      IProgressMonitor)
 	 */
 	protected ISchedulingRule getUndoSchedulingRule() {
@@ -672,7 +673,7 @@ public abstract class AbstractWorkspaceOperation extends AbstractOperation
 	 *         <code>null</code> if there are no scheduling restrictions for
 	 *         this operation.
 	 *
-	 * @see IWorkspace#run(IWorkspaceRunnable, ISchedulingRule, int,
+	 * @see IWorkspace#run(ICoreRunnable, ISchedulingRule, int,
 	 *      IProgressMonitor)
 	 */
 	protected ISchedulingRule getRedoSchedulingRule() {
@@ -723,11 +724,9 @@ public abstract class AbstractWorkspaceOperation extends AbstractOperation
 	 *
 	 */
 	protected Shell getShell(IAdaptable uiInfo) {
-		if (uiInfo != null) {
-			Shell shell = uiInfo.getAdapter(Shell.class);
-			if (shell != null) {
-				return shell;
-			}
+		Shell shell = Adapters.getAdapter(uiInfo, Shell.class, true);
+		if (shell != null) {
+			return shell;
 		}
 		return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 	}
