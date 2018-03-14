@@ -3,11 +3,11 @@
 <schema targetNamespace="org.eclipse.ui.ide" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.eclipse.ui.ide" id="unknownEditorStrategy" name="Strategies to handle unassociated files"/>
+         <meta.schema plugin="org.eclipse.ui.ide" id="unassociatedEditorStrategy" name="Unassociated Editor Strategy"/>
       </appInfo>
       <documentation>
          &lt;p&gt;This extension point allows to plug different strategies for supporting unassociated files inside the IDE. Strategies can be such as forcing a specific editor, asking user to choose an editor, polling a remote registry to find an editor...&lt;/p&gt;
-&lt;p&gt;Users and extenders are able to choose which strategy to use by setting the related org.eclipse.ui.ide.unknownEditorStrategy preference to the id of their favourite strategy.&lt;br/&gt;
+&lt;p&gt;Users and extenders are able to choose which strategy to use by setting the related org.eclipse.ui.ide.unassociatedEditorStrategy preference to the id of their favourite strategy.&lt;br/&gt;
 The default strategy is to check for system editor and to open the Eclipse text editor if no relevant editor is found.
 &lt;/p&gt;
       </documentation>
@@ -26,21 +26,21 @@ The default strategy is to check for system editor and to open the Eclipse text 
          <attribute name="point" type="string" use="required">
             <annotation>
                <documentation>
-
+                  
                </documentation>
             </annotation>
          </attribute>
          <attribute name="id" type="string">
             <annotation>
                <documentation>
-
+                  
                </documentation>
             </annotation>
          </attribute>
          <attribute name="name" type="string">
             <annotation>
                <documentation>
-
+                  
                </documentation>
                <appInfo>
                   <meta.attribute translatable="true"/>
@@ -55,28 +55,35 @@ The default strategy is to check for system editor and to open the Eclipse text 
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-
+                  a unique id that will be used to identify this unassociated editor strategy
                </documentation>
             </annotation>
          </attribute>
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-
+                  the fully qualified class name implementing the interface org.eclipse.ui.ide.IUnassociatedEditorStrategy
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.ui.ide.IUnknownEditorStrategy"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.ui.ide.IUnassociatedEditorStrategy"/>
                </appInfo>
             </annotation>
          </attribute>
          <attribute name="label" type="string" use="required">
             <annotation>
                <documentation>
-                  Short label describing the strategy. Will be used to present the various strategies to user in Preference Page and other related UI entries.
+                  a short label describing the strategy. Will be used to present the various strategies to user in Preference Page and other related UI entries.
                </documentation>
                <appInfo>
                   <meta.attribute translatable="true"/>
                </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="interactive" type="boolean" use="required">
+            <annotation>
+               <documentation>
+                  declares whether the strategy is interactive, requires user actions or control. In some contexts, interactive strategies will be ignored as operations have to happen without interaction.
+               </documentation>
             </annotation>
          </attribute>
       </complexType>
@@ -105,7 +112,7 @@ The default strategy is to check for system editor and to open the Eclipse text 
          <meta.section type="apiinfo"/>
       </appInfo>
       <documentation>
-         This adds a new interface IUnknownEditorStrategy to the API of org.eclipse.ui.ide.
+         This adds a new interface IUnassociatedEditorStrategy to the API of org.eclipse.ui.ide.
       </documentation>
    </annotation>
 
@@ -115,7 +122,7 @@ The default strategy is to check for system editor and to open the Eclipse text 
          <meta.section type="copyright"/>
       </appInfo>
       <documentation>
-         Copyright (c) 2015 Red Hat Inc.&lt;br&gt;
+         Copyright (c) 2015, 2016 Red Hat Inc. and others.&lt;br&gt;
 All rights reserved. This program and the accompanying materials are made
 available under the terms of the Eclipse Public License v1.0 which accompanies
 this distribution, and is available at &lt;a
