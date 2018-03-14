@@ -29,16 +29,18 @@ import java.util.Set;
  * It intentionally violates the {@link Set} contract, which requires the use of
  * {@link #equals(Object)} when comparing elements.
  *
+ * @param <E>
+ *
  * @since 1.2
  */
-public class IdentitySet implements Set {
-	private final Set wrappedSet;
+public class IdentitySet<E> implements Set<E> {
+	private final Set<IdentityWrapper<E>> wrappedSet;
 
 	/**
 	 * Constructs an IdentitySet.
 	 */
 	public IdentitySet() {
-		this.wrappedSet = new HashSet();
+		this.wrappedSet = new HashSet<>();
 	}
 
 	/**
@@ -48,21 +50,21 @@ public class IdentitySet implements Set {
 	 * @param collection
 	 *            the collection whose elements are to be added to this set.
 	 */
-	public IdentitySet(Collection collection) {
+	public IdentitySet(Collection<? extends E> collection) {
 		this();
 		addAll(collection);
 	}
 
 	@Override
-	public boolean add(Object o) {
+	public boolean add(E o) {
 		return wrappedSet.add(IdentityWrapper.wrap(o));
 	}
 
 	@Override
-	public boolean addAll(Collection c) {
+	public boolean addAll(Collection<? extends E> c) {
 		boolean changed = false;
-		for (Iterator iterator = c.iterator(); iterator.hasNext();)
-			changed |= wrappedSet.add(IdentityWrapper.wrap(iterator.next()));
+		for (Iterator<? extends E> iterator = c.iterator(); iterator.hasNext();)
+			changed |= wrappedSet.add(IdentityWrapper.<E> wrap(iterator.next()));
 		return changed;
 	}
 
@@ -73,12 +75,12 @@ public class IdentitySet implements Set {
 
 	@Override
 	public boolean contains(Object o) {
-		return wrappedSet.contains(IdentityWrapper.wrap(o));
+		return wrappedSet.contains(IdentityWrapper.<Object> wrap(o));
 	}
 
 	@Override
-	public boolean containsAll(Collection c) {
-		for (Iterator iterator = c.iterator(); iterator.hasNext();)
+	public boolean containsAll(Collection<?> c) {
+		for (Iterator<?> iterator = c.iterator(); iterator.hasNext();)
 			if (!wrappedSet.contains(IdentityWrapper.wrap(iterator.next())))
 				return false;
 		return true;
@@ -90,17 +92,18 @@ public class IdentitySet implements Set {
 	}
 
 	@Override
-	public Iterator iterator() {
-		final Iterator wrappedIterator = wrappedSet.iterator();
-		return new Iterator() {
+	public Iterator<E> iterator() {
+		final Iterator<IdentityWrapper<E>> wrappedIterator = wrappedSet
+				.iterator();
+		return new Iterator<E>() {
 			@Override
 			public boolean hasNext() {
 				return wrappedIterator.hasNext();
 			}
 
 			@Override
-			public Object next() {
-				return ((IdentityWrapper) wrappedIterator.next()).unwrap();
+			public E next() {
+				return wrappedIterator.next().unwrap();
 			}
 
 			@Override
@@ -116,21 +119,21 @@ public class IdentitySet implements Set {
 	}
 
 	@Override
-	public boolean removeAll(Collection c) {
+	public boolean removeAll(Collection<?> c) {
 		boolean changed = false;
-		for (Iterator iterator = c.iterator(); iterator.hasNext();)
+		for (Iterator<?> iterator = c.iterator(); iterator.hasNext();)
 			changed |= remove(iterator.next());
 		return changed;
 	}
 
 	@Override
-	public boolean retainAll(Collection c) {
+	public boolean retainAll(Collection<?> c) {
 		// Have to do this the slow way to ensure correct comparisons. i.e.
 		// cannot delegate to c.contains(it) since we can't be sure will
 		// compare elements the way we want.
 		boolean changed = false;
 		Object[] retainAll = c.toArray();
-		outer: for (Iterator iterator = iterator(); iterator.hasNext();) {
+		outer: for (Iterator<?> iterator = iterator(); iterator.hasNext();) {
 			Object element = iterator.next();
 			for (int i = 0; i < retainAll.length; i++) {
 				if (element == retainAll[i]) {
@@ -153,18 +156,19 @@ public class IdentitySet implements Set {
 		return toArray(new Object[wrappedSet.size()]);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Object[] toArray(Object[] a) {
+	public <T> T[] toArray(T[] a) {
 		int size = wrappedSet.size();
-		IdentityWrapper[] wrappedArray = (IdentityWrapper[]) wrappedSet
+		IdentityWrapper<?>[] wrappedArray = wrappedSet
 				.toArray(new IdentityWrapper[size]);
-		Object[] result = a;
+		T[] result = a;
 		if (a.length < size) {
-			result = (Object[]) Array.newInstance(a.getClass()
-					.getComponentType(), size);
+			result = (T[]) Array.newInstance(a.getClass().getComponentType(),
+					size);
 		}
 		for (int i = 0; i < size; i++)
-			result[i] = wrappedArray[i].unwrap();
+			result[i] = (T) wrappedArray[i].unwrap();
 		return result;
 	}
 
@@ -174,15 +178,15 @@ public class IdentitySet implements Set {
 			return true;
 		if (!(obj instanceof Set))
 			return false;
-		Set that = (Set) obj;
+		Set<?> that = (Set<?>) obj;
 		return size() == that.size() && containsAll(that);
 	}
 
 	@Override
 	public int hashCode() {
 		int hash = 0;
-		for (Iterator iterator = iterator(); iterator.hasNext();) {
-			Object element = iterator.next();
+		for (Iterator<E> iterator = iterator(); iterator.hasNext();) {
+			E element = iterator.next();
 			hash += element == null ? 0 : element.hashCode();
 		}
 		return hash;

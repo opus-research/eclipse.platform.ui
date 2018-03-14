@@ -28,8 +28,8 @@ public class NumberToDoubleConverter extends NumberToNumberConverter {
 	 * @param fromType
 	 * @param primitive
 	 */
-	public NumberToDoubleConverter(NumberFormat numberFormat, Class fromType,
-			boolean primitive) {
+	public NumberToDoubleConverter(NumberFormat numberFormat,
+			Class<?> fromType, boolean primitive) {
 		super(numberFormat, fromType, (primitive) ? Double.TYPE : Double.class);
 	}
 
