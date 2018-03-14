@@ -588,7 +588,13 @@ public class PartServiceImpl implements EPartService {
 				if (activeChild != null) {
 					activeChild.deactivate();
 				}
-				perspective.getContext().activate();
+				if (target.getContext() != null && target.getContext().get(MPerspective.class) != null
+						&& target.getContext().get(MPerspective.class).getContext() == perspective.getContext()) {
+					target.getContext().activateBranch();
+				} else {
+					perspective.getContext().activate();
+				}
+
 				modelService.bringToTop(target);
 				activate(target, true, false);
 				return;
@@ -719,7 +725,7 @@ public class PartServiceImpl implements EPartService {
 	/**
 	 * Records the specified parent part's selected element in the activation history if the parent
 	 * is a stack.
-	 * 
+	 *
 	 * @param part
 	 *            the part whose parent's selected element should be checked for activation history
 	 *            recording
@@ -741,7 +747,7 @@ public class PartServiceImpl implements EPartService {
 
 	/**
 	 * Records the specified parent 's selected element in the activation history.
-	 * 
+	 *
 	 * @param parent
 	 *            the element whose selected element should be checked for activation history
 	 *            recording
@@ -841,7 +847,7 @@ public class PartServiceImpl implements EPartService {
 	 * Adds a part to the current container if it isn't already in the container. The part may still
 	 * be added to the container if the part supports having multiple copies of itself in a given
 	 * container.
-	 * 
+	 *
 	 * @param providedPart
 	 *            the part to add
 	 * @param localPart
@@ -1051,7 +1057,7 @@ public class PartServiceImpl implements EPartService {
 	 * Returns the parent container of the specified element. If one cannot be found, a check will
 	 * be performed to see whether the element is being represented by a placeholder, if it is, the
 	 * placeholder's parent will be returned, if any.
-	 * 
+	 *
 	 * @param element
 	 *            the element to query
 	 * @return the element's parent container, or the parent container of the specified element's

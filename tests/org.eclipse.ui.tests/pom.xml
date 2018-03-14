@@ -19,10 +19,11 @@
   </parent>
   <groupId>org.eclipse.ui</groupId>
   <artifactId>org.eclipse.ui.tests</artifactId>
-  <version>3.10.0-SNAPSHOT</version>
+  <version>3.10.100-SNAPSHOT</version>
   <packaging>eclipse-test-plugin</packaging>
 
   <properties>
+    <skipTests>false</skipTests>
    	<testSuiteUITests>**/org/eclipse/ui/tests/UiTestSuite.java</testSuiteUITests>
 	<testSuiteJFace>**/org/eclipse/jface/tests/AllTests.java</testSuiteJFace>
   </properties>
@@ -36,7 +37,6 @@
 				<configuration>
 					<includes>
 						<include>${testSuiteJFace}</include>
-					 	<include>${testSuiteUITests}</include>
 					</includes>
 					<useUIHarness>true</useUIHarness>
 					<useUIThread>true</useUIThread>

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2014 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -51,21 +51,21 @@ import org.eclipse.ui.navigator.INavigatorContentService;
 
 
 /**
- * 
+ *
  * @see CommonNavigator
  * @see INavigatorContentService
  * @since 3.2
- * 
+ *
  */
 public final class ProjectExplorer extends CommonNavigator {
 
 	/**
 	 * Provides a constant for the standard instance of the Common Navigator.
-	 * 
+	 *
 	 * @see PlatformUI#getWorkbench()
 	 * @see IWorkbench#getActiveWorkbenchWindow()
 	 * @see IWorkbenchWindow#getActivePage()
-	 * 
+	 *
 	 * @see IWorkbenchPage#findView(String)
 	 * @see IWorkbenchPage#findViewReference(String)
 	 */
@@ -85,22 +85,22 @@ public final class ProjectExplorer extends CommonNavigator {
 
 	/**
 	 * Used only in the case of top level = PROJECTS and only when some
-	 * working sets are selected. 
+	 * working sets are selected.
 	 */
 	private String workingSetLabel;
 
 	@Override
 	public void createPartControl(Composite aParent) {
 		super.createPartControl(aParent);
-		
+
 		if (!false)
 			getCommonViewer().setMapper(new ResourceToItemsMapper(getCommonViewer()));
-	}	
-	
+	}
+
 	/**
 	 * The superclass does not deal with the content description, handle it
 	 * here.
-	 * 
+	 *
 	 * @noreference This method is not intended to be referenced by clients.
 	 */
 	@Override
@@ -120,7 +120,7 @@ public final class ProjectExplorer extends CommonNavigator {
 				return;
 			}
 			if (input instanceof IAdaptable) {
-				IWorkbenchAdapter wbadapter = (IWorkbenchAdapter) ((IAdaptable) input)
+				IWorkbenchAdapter wbadapter = ((IAdaptable) input)
 						.getAdapter(IWorkbenchAdapter.class);
 				if (wbadapter != null) {
 					setContentDescription(wbadapter.getLabel(input));
@@ -137,7 +137,7 @@ public final class ProjectExplorer extends CommonNavigator {
 
 	/**
 	 * Returns the tool tip text for the given element.
-	 * 
+	 *
 	 * @param element
 	 *            the element
 	 * @return the tooltip
