@@ -15,13 +15,14 @@ import org.eclipse.jface.tests.viewers.TestModelChange;
 
 public class AddElementAction extends TestBrowserAction {
 
-    public AddElementAction(String label, TestBrowser browser) {
-        super(label, browser);
-        //		window.addFocusChangedListener(this);
-    }
+	public AddElementAction(String label, TestBrowser browser) {
+		super(label, browser);
+		// window.addFocusChangedListener(this);
+	}
 
-    public void run() {
-        TestElement element = (TestElement) getBrowser().getViewer().getInput();
-        element.addChild(TestModelChange.INSERT);
-    }
+	@Override
+	public void run() {
+		TestElement element = (TestElement) getBrowser().getViewer().getInput();
+		element.addChild(TestModelChange.INSERT);
+	}
 }

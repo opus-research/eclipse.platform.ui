@@ -11,7 +11,6 @@
 
 package org.eclipse.jface.tests.wizards;
 
-import org.eclipse.jface.dialogs.IDialogPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -33,9 +32,7 @@ public class TheTestWizardPage extends WizardPage {
 		super(name);
 	}
 
-	/**
-	 * @see IDialogPage#createControl(Composite)
-	 */
+	@Override
 	public void createControl(Composite parent) {
 		Composite container = new Composite(parent, SWT.NULL);
 		GridLayout layout = new GridLayout();
@@ -49,6 +46,7 @@ public class TheTestWizardPage extends WizardPage {
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		textInputField.setLayoutData(gd);
 		textInputField.addModifyListener(new ModifyListener() {
+			@Override
 			public void modifyText(ModifyEvent e) {
 				dialogChanged();
 			}
@@ -65,7 +63,6 @@ public class TheTestWizardPage extends WizardPage {
 	/**
 	 * Handle dialog values changing
 	 */
-
 	private void dialogChanged() {
 		if (textInputField.getText().equals(BAD_TEXT_FIELD_CONTENTS)) {
 			setPageComplete(false);
@@ -89,9 +86,7 @@ public class TheTestWizardPage extends WizardPage {
 		this.throwExceptionOnDispose = throwExceptionOnDispose;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.dialogs.DialogPage#dispose()
-	 */
+	@Override
 	public void dispose() {
 		super.dispose();
 		if(throwExceptionOnDispose)

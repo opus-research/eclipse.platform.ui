@@ -32,7 +32,7 @@ public class TheTestWizard extends Wizard {
 	/**
 	 * Adding the page to the wizard.
 	 */
-
+	@Override
 	public void addPages() {
 		page1 = new TheTestWizardPage(page1Name);
 		addPage(page1);
@@ -46,6 +46,7 @@ public class TheTestWizard extends Wizard {
 	 * This method is called when 'Finish' button is pressed in
 	 * the wizard. 
 	 */
+	@Override
 	public boolean performFinish() {
 		WizardTest.DID_FINISH = true;
 		return true;
@@ -58,9 +59,7 @@ public class TheTestWizard extends Wizard {
 		this.throwExceptionOnDispose = throwExceptionOnDispose;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.wizard.Wizard#dispose()
-	 */
+	@Override
 	public void dispose() {
 		super.dispose();
 		if(throwExceptionOnDispose)

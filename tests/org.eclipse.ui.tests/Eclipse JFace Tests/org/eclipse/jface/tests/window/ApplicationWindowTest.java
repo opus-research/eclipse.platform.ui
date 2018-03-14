@@ -23,6 +23,7 @@ public class ApplicationWindowTest extends TestCase {
 
 	private ApplicationWindow window;
 
+	@Override
 	protected void tearDown() throws Exception {
 		if (window != null) {
 			// close the window
@@ -35,17 +36,20 @@ public class ApplicationWindowTest extends TestCase {
 	private void testBug334093(boolean fork, boolean cancelable)
 			throws Exception {
 		window = new ApplicationWindow(null) {
+			@Override
 			public void create() {
 				addStatusLine();
 				super.create();
 			}
 
+			@Override
 			protected void createTrimWidgets(Shell shell) {
 				// don't actually create the status line controls
 			}
 		};
 		window.create();
 		window.run(fork, cancelable, new IRunnableWithProgress() {
+			@Override
 			public void run(IProgressMonitor monitor) {
 				monitor.beginTask("beginTask", 10);
 				monitor.setTaskName("setTaskName");
@@ -66,20 +70,12 @@ public class ApplicationWindowTest extends TestCase {
 		});
 	}
 
-	public void testBug334093_TrueTrue() throws Exception {
-		testBug334093(true, true);
+	public void testBug334093() throws Exception {
+		boolean[] options = new boolean[] { true, false };
+		for (boolean forkOption : options) {
+			for (boolean cancelableOpton : options) {
+				testBug334093(forkOption, cancelableOpton);
+			}
+		}
 	}
-
-	public void testBug334093_TrueFalse() throws Exception {
-		testBug334093(true, false);
-	}
-
-	public void testBug334093_FalseTrue() throws Exception {
-		testBug334093(false, true);
-	}
-
-	public void testBug334093_FalseFalse() throws Exception {
-		testBug334093(false, false);
-	}
-
 }

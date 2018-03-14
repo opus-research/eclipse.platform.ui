@@ -35,6 +35,7 @@ public class TheTestWizardDialog extends WizardDialog {
 		return getButton(IDialogConstants.FINISH_ID);
 	}
 	
+	@Override
 	public Button getCancelButton() {
 		return getButton(IDialogConstants.CANCEL_ID);
 	}
@@ -47,18 +48,23 @@ public class TheTestWizardDialog extends WizardDialog {
 		return getButton(IDialogConstants.NEXT_ID);
 	}
 	
+	@Override
 	public void finishPressed() {
 		super.finishPressed();
 	}
+	@Override
 	public void cancelPressed() {
 		super.cancelPressed();
 	}
+	@Override
 	public void backPressed() {
 		super.backPressed();
 	}
+	@Override
 	public void nextPressed() {
 		super.nextPressed();
 	}
+	@Override
 	public void buttonPressed(int buttonId) {
 		super.buttonPressed(buttonId);
 	}

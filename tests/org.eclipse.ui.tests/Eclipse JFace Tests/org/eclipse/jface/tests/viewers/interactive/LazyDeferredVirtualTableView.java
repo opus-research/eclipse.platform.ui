@@ -30,11 +30,7 @@ public class LazyDeferredVirtualTableView extends VirtualTableView {
 		super();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.tests.viewers.interactive.VirtualTableView#getContentProvider()
-	 */
+	@Override
 	protected IContentProvider getContentProvider() {
 		return new ILazyContentProvider() {
 
@@ -43,8 +39,9 @@ public class LazyDeferredVirtualTableView extends VirtualTableView {
 			int rangeEnd = -1;
 
 			UIJob updateJob = new UIJob("Update") {
+				@Override
 				public IStatus runInUIThread(IProgressMonitor monitor) {
-					if(viewer.getControl().isDisposed())
+					if (viewer.getControl().isDisposed())
 						return Status.CANCEL_STATUS;
 					int rangeLength = rangeEnd - rangeStart;
 					for (int i = 0; i <= rangeLength; i++) {
@@ -57,12 +54,7 @@ public class LazyDeferredVirtualTableView extends VirtualTableView {
 				}
 			};
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.viewers.ILazyContentProvider#updateElements(int,
-			 *      int)
-			 */
+			@Override
 			public void updateElement(int index) {
 
 				int begin = Math.max(0, index - 50);
@@ -111,21 +103,12 @@ public class LazyDeferredVirtualTableView extends VirtualTableView {
 				}
 			}
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
-			 */
+			@Override
 			public void dispose() {
 				// Do Nothing
 			}
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
-			 *      java.lang.Object, java.lang.Object)
-			 */
+			@Override
 			public void inputChanged(Viewer viewer, Object oldInput,
 					Object newInput) {
 				// Do nothing.
@@ -133,9 +116,7 @@ public class LazyDeferredVirtualTableView extends VirtualTableView {
 		};
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.tests.viewers.interactive.VirtualTableView#resetInput()
-	 */
+	@Override
 	protected void resetInput() {
 		viewer.setItemCount(itemCount);
 		super.resetInput();

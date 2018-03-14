@@ -29,10 +29,8 @@ public class TestTree extends TestBrowser {
         fExpandAllAction = new ExpandAllAction("Expand All", this);
     }
 
-    /**
-     * 
-     */
-    public Viewer createViewer(Composite parent) {
+    @Override
+	public Viewer createViewer(Composite parent) {
         TreeViewer viewer = new TreeViewer(parent);
         viewer.setContentProvider(new TestModelContentProvider());
         viewer.setUseHashlookup(true);
@@ -57,7 +55,8 @@ public class TestTree extends TestBrowser {
     /**
      * Adds the expand all action to the tests menu.
      */
-    protected void viewerFillMenuBar(MenuManager mgr) {
+    @Override
+	protected void viewerFillMenuBar(MenuManager mgr) {
         MenuManager testMenu = (MenuManager) (mgr.findMenuUsingPath("tests"));
         testMenu.add(new Separator());
         testMenu.add(fExpandAllAction);

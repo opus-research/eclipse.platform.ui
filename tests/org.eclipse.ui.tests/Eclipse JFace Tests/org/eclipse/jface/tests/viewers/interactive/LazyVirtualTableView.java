@@ -18,8 +18,7 @@ import org.eclipse.jface.viewers.ILazyContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
 /**
- * The LazyVirtualTableView is the VirtualTableView with
- * lazy content.
+ * The LazyVirtualTableView is the VirtualTableView with lazy content.
  */
 public class LazyVirtualTableView extends VirtualTableView {
 
@@ -43,37 +42,29 @@ public class LazyVirtualTableView extends VirtualTableView {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.tests.viewers.interactive.VirtualTableView#getContentProvider()
-	 */
+	@Override
 	protected IContentProvider getContentProvider() {
 		return new ILazyContentProvider() {
-			
-			/* (non-Javadoc)
-			 * @see org.eclipse.jface.viewers.ILazyContentProvider#updateElements(int, int)
-			 */
+
+			@Override
 			public void updateElement(int index) {
-		        viewer.replace(elements.get(index), index);
-			}
-			/* (non-Javadoc)
-			 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
-			 */
-			public void dispose() {
-				//Do Nothing
+				viewer.replace(elements.get(index), index);
 			}
 
-			/* (non-Javadoc)
-			 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
-			 */
-			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+			@Override
+			public void dispose() {
+				// Do Nothing
+			}
+
+			@Override
+			public void inputChanged(Viewer viewer, Object oldInput,
+					Object newInput) {
 				// Do nothing.
 			}
 		};
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.tests.viewers.interactive.VirtualTableView#doRemove(java.lang.Object[])
-	 */
+
+	@Override
 	protected void doRemove(Object[] selection, int[] selectionIndices) {
 		for (int i = 0; i < selectionIndices.length; i++) {
 			int index = selectionIndices[i];
@@ -82,9 +73,7 @@ public class LazyVirtualTableView extends VirtualTableView {
 		super.doRemove(selection, selectionIndices);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.tests.viewers.interactive.VirtualTableView#resetInput()
-	 */
+	@Override
 	protected void resetInput() {
 		viewer.setItemCount(itemCount);
 		super.resetInput();

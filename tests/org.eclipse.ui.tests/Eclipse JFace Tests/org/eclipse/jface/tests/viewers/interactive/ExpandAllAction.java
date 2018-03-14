@@ -15,13 +15,14 @@ import org.eclipse.jface.viewers.Viewer;
 
 public class ExpandAllAction extends TestBrowserAction {
 
-    public ExpandAllAction(String label, TestBrowser browser) {
-        super(label, browser);
-    }
+	public ExpandAllAction(String label, TestBrowser browser) {
+		super(label, browser);
+	}
 
-    public void run() {
-        Viewer viewer = getBrowser().getViewer();
-        if (viewer instanceof AbstractTreeViewer)
-            ((AbstractTreeViewer) viewer).expandAll();
-    }
+	@Override
+	public void run() {
+		Viewer viewer = getBrowser().getViewer();
+		if (viewer instanceof AbstractTreeViewer)
+			((AbstractTreeViewer) viewer).expandAll();
+	}
 }

@@ -19,7 +19,8 @@ public class SetLabelProviderAction extends TestBrowserAction {
         super(label, browser);
     }
 
-    public void run() {
+    @Override
+	public void run() {
         ((ContentViewer) getBrowser().getViewer())
                 .setLabelProvider(new TestLabelProvider());
     }

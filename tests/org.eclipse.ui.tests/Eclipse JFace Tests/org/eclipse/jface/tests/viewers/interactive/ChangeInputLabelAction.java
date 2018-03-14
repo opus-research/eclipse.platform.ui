@@ -18,7 +18,8 @@ public class ChangeInputLabelAction extends TestBrowserAction {
         super(label, browser);
     }
 
-    public void run() {
+	@Override
+	public void run() {
         TestElement element = getBrowser().getInput();
         element.setLabel(element.getLabel() + " changed");
     }

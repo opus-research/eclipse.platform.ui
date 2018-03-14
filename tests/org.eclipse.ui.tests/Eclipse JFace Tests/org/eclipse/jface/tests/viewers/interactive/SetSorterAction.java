@@ -19,7 +19,8 @@ public class SetSorterAction extends TestBrowserAction {
         super(label, browser);
     }
 
-    public void run() {
+    @Override
+	public void run() {
         Viewer viewer = getBrowser().getViewer();
         if (viewer instanceof StructuredViewer) {
             StructuredViewer v = (StructuredViewer) viewer;

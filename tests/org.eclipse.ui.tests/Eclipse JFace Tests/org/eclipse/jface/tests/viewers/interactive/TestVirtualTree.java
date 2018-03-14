@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.TreeItem;
 
 public class TestVirtualTree extends TestTree {
 
+	@Override
 	public Viewer createViewer(Composite parent) {
 		Tree tree = new Tree(parent, SWT.VIRTUAL);
 		tree.addListener(SWT.SetData, new Listener() {
@@ -34,6 +35,7 @@ public class TestVirtualTree extends TestTree {
 				return getPosition(parentItem) + "." + parentItem.indexOf(item);
 			}
 
+			@Override
 			public void handleEvent(Event event) {
 				String position = getPosition((TreeItem) event.item);
 				if (position.endsWith(".32"))
@@ -57,6 +59,7 @@ public class TestVirtualTree extends TestTree {
 		TestBrowser browser = new TestVirtualTree();
 		if (args.length > 0 && args[0].equals("-twopanes"))
 			browser.show2Panes();
+
 		browser.setBlockOnOpen(true);
 		browser.open(TestElement.createModel(3, 10));
 	}
