@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Angelo Zerr and others.
+ * Copyright (c) 2008, 2014 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,11 +38,11 @@ public abstract class ElementAdapter implements Element, CSSStylableElement {
 
 	protected CSSEngine engine;
 
-	private Map <String, CSSStyleDeclaration> defaultStyleDeclarationMap = new HashMap<>();
+	private Map /* <String, CSSStyleDeclaration> */defaultStyleDeclarationMap = new HashMap();
 
-	private CSSExtendedProperties style;
+	private CSSExtendedProperties style = null;
 
-	private List<String> staticPseudoInstances;
+	private List staticPseudoInstances;
 
 	public ElementAdapter(Object nativeWidget, CSSEngine engine) {
 		this.nativeWidget = nativeWidget;
@@ -56,7 +56,7 @@ public abstract class ElementAdapter implements Element, CSSStylableElement {
 	 */
 	public void addStaticPseudoInstance(String pseudoE) {
 		if (staticPseudoInstances == null) {
-			staticPseudoInstances = new ArrayList<>();
+			staticPseudoInstances = new ArrayList();
 		}
 		staticPseudoInstances.add(pseudoE);
 	}
@@ -358,11 +358,12 @@ public abstract class ElementAdapter implements Element, CSSStylableElement {
 
 	@Override
 	public CSSStyleDeclaration getDefaultStyleDeclaration(String pseudoE) {
-		return defaultStyleDeclarationMap.get(pseudoE);
+		return (CSSStyleDeclaration) defaultStyleDeclarationMap.get(pseudoE);
 	}
 
 	@Override
-	public void setDefaultStyleDeclaration(String pseudoE, CSSStyleDeclaration declaration) {
+	public void setDefaultStyleDeclaration(String pseudoE,
+			CSSStyleDeclaration declaration) {
 		this.defaultStyleDeclarationMap.put(pseudoE, declaration);
 	}
 
@@ -389,7 +390,7 @@ public abstract class ElementAdapter implements Element, CSSStylableElement {
 		if (staticPseudoInstances == null) {
 			return EMPTY_STRING;
 		}
-		return staticPseudoInstances.toArray(EMPTY_STRING);
+		return (String[]) staticPseudoInstances.toArray(EMPTY_STRING);
 	}
 
 	@Override

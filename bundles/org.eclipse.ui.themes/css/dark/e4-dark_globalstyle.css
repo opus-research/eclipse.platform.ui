@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Andrea Guarinoni and others.
+ * Copyright (c) 2010, 2014 Andrea Guarinoni and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,10 +7,7 @@
  *
  * Contributors:
  *     Andrea Guarinoni <andrea.guarinoni.dev@outlook.com> - initial API and implementation
- *     Stefan Winkler <stefan@winklerweb.net> - Bug 434189, 430848
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 431635
- *     Fabio Zadrozny <fabiofz@gmail.com> - Bug 465148, 465711
- *     Lars Vogel <Lars.Vogel@vogella.com> Bug 463652,466275
+ *     Stefan Winkler <stefan@winklerweb.net> - Bug 434189
  *******************************************************************************/
 
 /*******************************************************************************
@@ -25,7 +22,7 @@
 /* ############################## Global Styles ############################## */
 
 Composite, ScrolledComposite, ExpandableComposite, TabFolder, CLabel, Label,
-ToolBar, ToolItem, Sash, Group, Hyperlink, RefactoringLocationControl, Link, FilteredTree,
+ToolItem, Sash, Group, Hyperlink, RefactoringLocationControl, Link, FilteredTree,
 ProxyEntriesComposite, NonProxyHostsComposite, DelayedFilterCheckboxTree,
 Splitter, ScrolledPageContent, ViewForm, LaunchConfigurationFilteredTree,
 ContainerSelectionGroup, BrowseCatalogItem, EncodingSettings,
@@ -93,15 +90,6 @@ Text {
     background-color: #515658;
     color: #cccccc;
 }
-
-
-SashForm > StyledText {
-	/*	Fix StyledText inside a SashForm */
-    background-color: #202020;
-    color: #cccccc;
-}
-
-
 Text[style~='SWT.DROP_DOWN'],
 TextSearchControl /* SWT-BUG: background color is hard-coded */,
 TextSearchControl > Label {
@@ -319,12 +307,10 @@ CTabFolder {
     swt-selected-tab-fill: '#org-eclipse-ui-workbench-ACTIVE_TAB_BG_END'; /* title background for selected tab */
     swt-shadow-visible: false;
     swt-corner-radius: 16px;
-    unselected-hot-tab-color-background: #161616; /* Bug 465711 */
 }
 CTabFolder[style~='SWT.DOWN'][style~='SWT.BOTTOM'] {
     /* Set the styles for the bottom inner tabs (Bug 430051): */
     swt-tab-renderer: url('bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/org.eclipse.e4.ui.workbench.renderers.swt.CTabRendering');
-    unselected-hot-tab-color-background: #161616; /* Bug 465711 */
 }
 
 Form,
@@ -335,29 +321,9 @@ FormHeading {
     color: #9AC9D8;
 }
 
-Form {
-	/* Bug 465148: Additional styling for the Form */
-    text-background-color: #505F70;
-
-	tb-toggle-hover-color: #313538;
-	tb-toggle-color: #313538;
-	h-hover-full-color: #313538;
-	h-hover-light-color: #313538;
-	h-bottom-keyline-2-color: #313538;
-	h-bottom-keyline-1-color: #313538;
-
-	/* We also have to force the background mode (the
-	 * Label/ToolBar in the heading should inherit it).
-	 */
-    swt-background-mode: 'force';
-}
-
 Section {
-       background-color: #4F5355;
-       color: #AEBED0;
-       background-color-titlebar: #4F5355;
-       background-color-gradient-titlebar: #4F5355;
-       border-color-titlebar: #4F5355;
+    background-color: #4F5355;
+    color: #AEBED0;
 }
 
 Form > LayoutComposite > LayoutComposite > * {
@@ -387,11 +353,6 @@ LayoutComposite > Combo {
 LayoutComposite > Table {
     background-color: #333;
     color: #FFF;
-}
-
-HeapStatus {
-	background-color: #41464a;
- 	color: black;
 }
 
 Twistie {
@@ -452,12 +413,8 @@ FlyoutControlComposite, FlyoutControlComposite ToolBar, FlyoutControlComposite C
  * which does not look very nice.
  */
 Label#org-eclipse-ui-splash-progressText {
-	background-color: inherit; /* transparent */
+	background-color: #f7f7f7;
 	color: #9c9696; /* see property startupForegroundColor in the product */
-}
-
-Label#org-eclipse-ui-buildid-text {
-	background-color: inherit; /* transparent */
 }
 
 ProgressIndicator#org-eclipse-ui-splash-progressIndicator {

@@ -967,13 +967,7 @@
             defaultHandler="org.eclipse.ui.internal.handlers.QuitHandler"
             description="%command.exit.description"
             id="org.eclipse.ui.file.exit"
-            name="%command.exit.name">
-         <commandParameter
-               id="mayPrompt"
-               name="%command.exit.mayPrompt.name"
-               optional="true">
-         </commandParameter>
-      </command>
+            name="%command.exit.name"/>
       <command
             name="%command.undo.name"
             description="%command.undo.description"
@@ -2546,5 +2540,14 @@
             class="org.eclipse.ui.internal.about.AboutSystemPage"
             id="31.SystemPage">
           </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.themes">
+      <theme
+            id="org.eclipse.ui.theme1">
+      </theme>
+      <themeElementCategory
+            id="org.eclipse.ui.themeElementCategory1">
+      </themeElementCategory>
    </extension>
 </plugin>

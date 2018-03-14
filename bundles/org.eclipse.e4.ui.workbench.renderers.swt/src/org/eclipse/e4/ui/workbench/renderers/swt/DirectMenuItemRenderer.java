@@ -10,9 +10,11 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
+import javax.inject.Inject;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.menu.ItemType;
 import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
@@ -29,6 +31,8 @@ import org.eclipse.swt.widgets.MenuItem;
  */
 public class DirectMenuItemRenderer extends MenuItemRenderer {
 
+	@Inject
+	Logger logger;
 
 	@Override
 	public Object createWidget(final MUIElement element, Object parent) {

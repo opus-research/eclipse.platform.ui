@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Angelo Zerr and others.
+ * Copyright (c) 2008, 2013 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,8 +9,6 @@
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  *     IBM Corporation
  *     Kai Toedter - added radial gradient support
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 461688
- *     Robert Roth <robert.roth.off@gmail.com> - Bug 283255
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.properties;
 
@@ -36,7 +34,6 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
@@ -54,7 +51,7 @@ public class GradientBackgroundListener implements Listener {
 	private DisposeListener disposeListener = new DisposeListener() {
 		@Override
 		public void widgetDisposed(DisposeEvent e) {
-			GradientBackgroundListener.remove(control);
+			dispose();
 		}
 	};
 
@@ -165,8 +162,9 @@ public class GradientBackgroundListener implements Listener {
 			List<Color> colors = new ArrayList<Color>();
 			for (Iterator<?> iterator = grad.getRGBs().iterator(); iterator
 					.hasNext();) {
-				RGBA rgba = (RGBA) iterator.next();
-				Color color = new Color(control.getDisplay(), rgba);
+				RGB rgb = (RGB) iterator.next();
+				Color color = new Color(control.getDisplay(), rgb.red,
+						rgb.green, rgb.blue);
 				colors.add(color);
 			}
 			fillGradient(gc, new Rectangle(0, 0, x, y), colors,
