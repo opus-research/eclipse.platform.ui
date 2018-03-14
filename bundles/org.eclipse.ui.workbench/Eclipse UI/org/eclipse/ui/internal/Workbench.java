@@ -205,6 +205,7 @@ import org.eclipse.ui.internal.dialogs.PropertyPageContributorManager;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityPart;
 import org.eclipse.ui.internal.e4.compatibility.E4Util;
+import org.eclipse.ui.internal.e4.migration.WorkbenchMigrationProcessor;
 import org.eclipse.ui.internal.handlers.LegacyHandlerService;
 import org.eclipse.ui.internal.help.WorkbenchHelpSystem;
 import org.eclipse.ui.internal.intro.IIntroRegistry;
@@ -289,7 +290,9 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 	private static final String WORKBENCH_AUTO_SAVE_BACKGROUND_JOB = "Workbench Auto-Save Background Job"; //$NON-NLS-1$
 
-	private static String MEMENTO_KEY = "memento"; //$NON-NLS-1$
+	public static final String MEMENTO_KEY = "memento"; //$NON-NLS-1$
+
+	public static final String EDITOR_TAG = "Editor"; //$NON-NLS-1$
 
 	private static final String PROP_VM = "eclipse.vm"; //$NON-NLS-1$
 	private static final String PROP_VMARGS = "eclipse.vmargs"; //$NON-NLS-1$
@@ -354,7 +357,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 	static final String VERSION_STRING[] = { "0.046", "2.0" }; //$NON-NLS-1$ //$NON-NLS-2$
 
-	static final String DEFAULT_WORKBENCH_STATE_FILENAME = "workbench.xml"; //$NON-NLS-1$
+	public static final String DEFAULT_WORKBENCH_STATE_FILENAME = "workbench.xml"; //$NON-NLS-1$
 
 	/**
 	 * Holds onto the only instance of Workbench.
@@ -568,6 +571,10 @@ public final class Workbench extends EventManager implements IWorkbench,
 		return instance;
 	}
 
+	private static boolean isFirstE4WorkbenchRun(MApplication app) {
+		return app.getContext().containsKey(E4Workbench.NO_SAVED_MODEL_FOUND);
+	}
+
 	/**
 	 * Creates the workbench and associates it with the the given display and
 	 * workbench advisor, and runs the workbench UI. This entails processing and
@@ -619,9 +626,30 @@ public final class Workbench extends EventManager implements IWorkbench,
 					E4Application e4app = (E4Application) obj;
 					E4Workbench e4Workbench = e4app.createE4Workbench(getApplicationContext(), display);
 
+					MApplication appModel = e4Workbench.getApplication();
+					IEclipseContext context = e4Workbench.getContext();
+
+					WorkbenchMigrationProcessor migrationProcessor = null;
+					try {
+						migrationProcessor = ContextInjectionFactory.make(
+							WorkbenchMigrationProcessor.class, context);
+					} catch (@SuppressWarnings("restriction") InjectionException e) {
+						WorkbenchPlugin.log(e);
+					}
+
+					if (migrationProcessor != null && isFirstE4WorkbenchRun(appModel)
+							&& migrationProcessor.legacyWorkbenchDetected()) {
+						try {
+							WorkbenchPlugin.log(StatusUtil.newStatus(IStatus.INFO, "Workbench migration started", null)); //$NON-NLS-1$
+							migrationProcessor.process();
+						} catch (Exception e) {
+							WorkbenchPlugin.log("Workbench migration failed", e); //$NON-NLS-1$
+							migrationProcessor.restoreDefaultModel();
+						}
+					}
+
 					// create the workbench instance
-					Workbench workbench = new Workbench(display, advisor, e4Workbench
-							.getApplication(), e4Workbench.getContext());
+					Workbench workbench = new Workbench(display, advisor, appModel, context);
 
 					// prime the splash nice and early
 					if (createSplash)
@@ -645,10 +673,15 @@ public final class Workbench extends EventManager implements IWorkbench,
 							WorkbenchPlugin.getDefault().addBundleListener(bundleListener);
 						}
 					}
-					MApplication appModel = e4Workbench.getApplication();
 					setSearchContribution(appModel, true);
 					// run the legacy workbench once
 					returnCode[0] = workbench.runUI();
+					if (migrationProcessor != null && migrationProcessor.isWorkbenchMigrated()) {
+						migrationProcessor.updatePartsAfterMigration(WorkbenchPlugin.getDefault()
+								.getPerspectiveRegistry(), WorkbenchPlugin.getDefault()
+								.getViewRegistry());
+						WorkbenchPlugin.log(StatusUtil.newStatus(IStatus.INFO, "Workbench migration finished", null)); //$NON-NLS-1$
+					}
 					if (returnCode[0] == PlatformUI.RETURN_OK) {
 						// run the e4 event loop and instantiate ... well, stuff
 						e4Workbench.createAndRunUI(e4Workbench.getApplication());
@@ -1996,7 +2029,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 		if (!found) {
 			MPartDescriptor descriptor = org.eclipse.e4.ui.model.application.descriptor.basic.impl.BasicFactoryImpl.eINSTANCE
 					.createPartDescriptor();
-			descriptor.getTags().add("Editor"); //$NON-NLS-1$
+			descriptor.getTags().add(EDITOR_TAG);
 			descriptor.setCloseable(true);
 			descriptor.setAllowMultiple(true);
 			descriptor.setElementId(CompatibilityEditor.MODEL_ELEMENT_ID);
