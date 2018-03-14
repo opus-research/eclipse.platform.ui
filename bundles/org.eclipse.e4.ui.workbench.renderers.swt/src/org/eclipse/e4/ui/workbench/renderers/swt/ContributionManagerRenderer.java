@@ -21,7 +21,6 @@ import java.util.WeakHashMap;
 import javax.inject.Inject;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
-import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.UIEvents;
@@ -32,19 +31,25 @@ import org.eclipse.swt.widgets.Shell;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
+/**
+ *
+ */
+@SuppressWarnings("javadoc")
 public abstract class ContributionManagerRenderer<Model extends MUIElement, ModelEl extends MUIElement, Manager, ContrRec>
-		extends SWTPartRenderer {
+extends SWTPartRenderer {
 	private final String MANAGER_FOR_MODEL = getClass().getName() + ".managerForModel"; //$NON-NLS-1$
 
 	private final String CONTRIBUTION_FOR_MODEL = getClass().getName() + ".contributionForModel"; //$NON-NLS-1$
 
+	private final String CONTRIBUTION_RECORD_FOR_MODEL = getClass().getName()
+			+ ".contrRecForModel"; //$NON-NLS-1$
+
+	private final String CONTIBUTION_RECORD_LIST_FOR_MODEL = getClass()
+			.getName() + ".contrRecListForModel"; //$NON-NLS-1$
+
 	private Map<Manager, WeakReference<Model>> managerToModel = new WeakHashMap<Manager, WeakReference<Model>>();
 
 	private Map<IContributionItem, WeakReference<ModelEl>> contributionToModel = new WeakHashMap<IContributionItem, WeakReference<ModelEl>>();
-
-	private Map<ModelEl, ContrRec> modelContributionToRecord = new WeakHashMap<ModelEl, ContrRec>();
-
-	private Map<ModelEl, ArrayList<ContrRec>> sharedElementToRecord = new WeakHashMap<ModelEl, ArrayList<ContrRec>>();
 
 	@Inject
 	protected Logger logger;
@@ -54,9 +59,6 @@ public abstract class ContributionManagerRenderer<Model extends MUIElement, Mode
 
 	@Inject
 	protected EModelService modelService;
-
-	@Inject
-	protected MApplication application;
 
 	private EventHandler closedWindowHandler = new EventHandler() {
 		@Override
@@ -90,15 +92,6 @@ public abstract class ContributionManagerRenderer<Model extends MUIElement, Mode
 					}
 				}
 			}
-
-			for (ModelEl modelEl : new ArrayList<ModelEl>(
-					sharedElementToRecord.keySet())) {
-				MWindow parentWindow = modelService
-						.getTopLevelWindowFor(modelEl.getParent());
-				if (window == parentWindow) {
-					sharedElementToRecord.remove(modelEl);
-				}
-			}
 		}
 
 		private void logCacheState(String phaseName) {
@@ -107,8 +100,6 @@ public abstract class ContributionManagerRenderer<Model extends MUIElement, Mode
 						"{0}: managerToModel = {1}", new Object[] { phaseName, managerToModel.size() }); //$NON-NLS-1$
 				logger.debug(
 						"{0}: contributionToModel = {1}", new Object[] { phaseName, contributionToModel.size() }); //$NON-NLS-1$
-				logger.debug(
-						"{0}: sharedElementToRecord = {1}", new Object[] { phaseName, sharedElementToRecord.size() }); //$NON-NLS-1$
 			}
 		}
 	};
@@ -164,12 +155,18 @@ public abstract class ContributionManagerRenderer<Model extends MUIElement, Mode
 		contributionToModel.remove(item);
 	}
 
-	public ContrRec getContributionRecord(ModelEl element) {
-		return modelContributionToRecord.get(element);
+	public void linkElementToContributionRecord(ModelEl modelEl, ContrRec record) {
+		modelEl.getTransientData().put(CONTRIBUTION_RECORD_FOR_MODEL, record);
 	}
 
-	public void linkElementToContributionRecord(ModelEl element, ContrRec record) {
-		modelContributionToRecord.put(element, record);
+	@SuppressWarnings("unchecked")
+	public ContrRec getContributionRecord(MUIElement element) {
+		return (ContrRec) element.getTransientData().get(
+				CONTRIBUTION_RECORD_FOR_MODEL);
+	}
+
+	protected void removeContributionRecord(MUIElement element) {
+		element.getTransientData().remove(CONTRIBUTION_RECORD_FOR_MODEL);
 	}
 
 	/**
@@ -178,35 +175,45 @@ public abstract class ContributionManagerRenderer<Model extends MUIElement, Mode
 	 * @return the array of active ContributionRecords.
 	 */
 	@SuppressWarnings("unchecked")
-	public ContrRec[] getContributionRecords() {
-		HashSet<ContrRec> records = new HashSet<ContrRec>(
-				modelContributionToRecord.values());
+	public ContrRec[] getContributionRecords(ModelEl... modelEls) {
+		HashSet<ContrRec> records = new HashSet<ContrRec>();
+		for (ModelEl modelEl: modelEls) {
+			records.add(getContributionRecord(modelEl));
+		}
 		return (ContrRec[]) records.toArray();
 	}
 
-	protected Map<ModelEl, ContrRec> getModelContributionToRecord() {
-		return modelContributionToRecord;
-	}
-
-	public List<ContrRec> getList(ModelEl item) {
-		ArrayList<ContrRec> tmp = sharedElementToRecord.get(item);
+	@SuppressWarnings("unchecked")
+	public List<ContrRec> getList(MUIElement modelEl) {
+		List<ContrRec> tmp = (List<ContrRec>) modelEl.getTransientData().get(
+				CONTIBUTION_RECORD_LIST_FOR_MODEL);
 		if (tmp == null) {
 			tmp = new ArrayList<ContrRec>();
-			sharedElementToRecord.put(item, tmp);
 		}
 		return tmp;
 	}
 
-	public void addRecord(ModelEl item, ContrRec rec) {
-		getList(item).add(rec);
+	@SuppressWarnings("unchecked")
+	public void addRecord(ModelEl modelEl, ContrRec rec) {
+		List<ContrRec> tmp = (List<ContrRec>) modelEl.getTransientData().get(
+				CONTIBUTION_RECORD_LIST_FOR_MODEL);
+		if (tmp == null) {
+			tmp = new ArrayList<ContrRec>();
+			modelEl.getTransientData().put(CONTIBUTION_RECORD_LIST_FOR_MODEL,
+					tmp);
+		}
+		tmp.add(rec);
 	}
 
-	public void removeRecord(ModelEl item, ContrRec rec) {
-		ArrayList<ContrRec> tmp = sharedElementToRecord.get(item);
+	@SuppressWarnings("unchecked")
+	public void removeRecord(ModelEl modelEl, ContrRec rec) {
+		List<ContrRec> tmp = (List<ContrRec>) modelEl.getTransientData().get(
+				CONTIBUTION_RECORD_LIST_FOR_MODEL);
 		if (tmp != null) {
 			tmp.remove(rec);
 			if (tmp.isEmpty()) {
-				sharedElementToRecord.remove(item);
+				modelEl.getTransientData().remove(
+						CONTIBUTION_RECORD_LIST_FOR_MODEL);
 			}
 		}
 	}

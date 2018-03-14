@@ -33,6 +33,7 @@ import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.internal.workbench.swt.CSSRenderingUtils;
+import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
@@ -53,6 +54,7 @@ import org.eclipse.e4.ui.workbench.Selector;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.ElementContainer;
 import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
+import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.action.AbstractGroupMarker;
 import org.eclipse.jface.action.ContributionItem;
@@ -101,7 +103,7 @@ public class ToolBarManagerRenderer
 	 * This is a persistedState 'key' which can be used by the renderer
 	 * implementation to decide that a user interface element has been hidden by
 	 * the user
-	 *
+	 * 
 	 */
 	// TODO migrate to IPresentationEngine after the Luna release
 	public static final String HIDDEN_BY_USER = "HIDDEN_BY_USER"; //$NON-NLS-1$
@@ -112,6 +114,12 @@ public class ToolBarManagerRenderer
 	 * The context menu for this trim stack's items.
 	 */
 	private Menu toolbarMenu;
+
+	@Inject
+	private MApplication application;
+
+	@Inject
+	EModelService modelService;
 
 	private EventHandler itemUpdater = new EventHandler() {
 		@Override
@@ -173,6 +181,7 @@ public class ToolBarManagerRenderer
 				} else {
 					IContributionItem ici = getContribution(itemModel);
 					clearModelToContribution(itemModel, ici);
+
 					if (ici != null && parent != null) {
 						parent.remove(ici);
 					}
@@ -331,8 +340,10 @@ public class ToolBarManagerRenderer
 		}
 	}
 
+	@Override
 	@PostConstruct
 	public void init() {
+		super.init();
 		eventBroker.subscribe(UIEvents.UILabel.TOPIC_ALL, itemUpdater);
 		eventBroker.subscribe(UIEvents.Item.TOPIC_SELECTED, selectionUpdater);
 		eventBroker.subscribe(UIEvents.Item.TOPIC_ENABLED, enabledUpdater);
@@ -365,6 +376,7 @@ public class ToolBarManagerRenderer
 		context.runAndTrack(enablementUpdater);
 	}
 
+	@Override
 	@PreDestroy
 	public void contextDisposed() {
 		eventBroker.unsubscribe(itemUpdater);
@@ -372,6 +384,7 @@ public class ToolBarManagerRenderer
 		eventBroker.unsubscribe(enabledUpdater);
 		eventBroker.unsubscribe(toBeRenderedUpdater);
 		eventBroker.unsubscribe(childAdditionUpdater);
+		super.contextDisposed();
 	}
 
 	@Override
@@ -583,8 +596,7 @@ public class ToolBarManagerRenderer
 	 * @param element
 	 */
 	protected void cleanUp(MToolBar toolbarModel) {
-		Collection<ToolBarContributionRecord> vals = getModelContributionToRecord()
-				.values();
+		Collection<ToolBarContributionRecord> vals = getList(toolbarModel);
 		for (ToolBarContributionRecord record : vals
 				.toArray(new ToolBarContributionRecord[vals.size()])) {
 			if (record.toolbarModel == toolbarModel) {
@@ -603,7 +615,7 @@ public class ToolBarManagerRenderer
 
 	public void cleanUpCopy(ToolBarContributionRecord record,
 			MToolBarElement copy) {
-		getModelContributionToRecord().remove(copy);
+		removeContributionRecord(copy);
 		IContributionItem ici = getContribution(copy);
 		clearModelToContribution(copy, ici);
 		if (ici != null) {
@@ -901,11 +913,11 @@ public class ToolBarManagerRenderer
 	}
 
 	public MToolBar getToolBarModel(ToolBarManager manager) {
-		return super.getModel(manager);
+		return getModel(manager);
 	}
 
 	public MToolBarElement getToolElement(IContributionItem item) {
-		return super.getModelElement(item);
+		return getModelElement(item);
 	}
 
 	public void reconcileManagerToModel(IToolBarManager menuManager,
