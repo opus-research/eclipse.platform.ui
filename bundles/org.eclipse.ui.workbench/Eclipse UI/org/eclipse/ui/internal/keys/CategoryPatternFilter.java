@@ -36,11 +36,17 @@ class CategoryPatternFilter extends PatternFilter {
 			setPattern("org.eclipse.ui.keys.optimization.true"); //$NON-NLS-1$
 		}
 	}
-
+	
 	public boolean isFilteringCategories() {
 		return filterCategories;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.dialogs.PatternFilter#isLeafMatch(org.eclipse.jface.viewers.Viewer,
+	 *      java.lang.Object)
+	 */
 	@Override
 	protected boolean isLeafMatch(Viewer viewer, Object element) {
 		if (filterCategories) {

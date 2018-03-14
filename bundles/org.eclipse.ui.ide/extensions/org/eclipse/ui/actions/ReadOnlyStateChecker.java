@@ -43,7 +43,7 @@ public class ReadOnlyStateChecker {
     private boolean cancelSelected = false;
 
     private boolean ignoreLinkedResources = false;
-
+    
     private String READ_ONLY_EXCEPTION_MESSAGE = IDEWorkbenchMessages.ReadOnlyCheck_problems;
 
     /**
@@ -99,7 +99,7 @@ public class ReadOnlyStateChecker {
      * Check the supplied resources to see if they are read only. If so then
 	 * prompt the user to see if they can be deleted.Return those that were
 	 * accepted.
-	 *
+	 * 
      * @param itemsToCheck
      * @return the resulting selected resources
      */
@@ -111,8 +111,7 @@ public class ReadOnlyStateChecker {
             result = checkReadOnlyResources(itemsToCheck, selections);
         } catch (final CoreException exception) {
             shell.getDisplay().syncExec(new Runnable() {
-                @Override
-				public void run() {
+                public void run() {
                     ErrorDialog.openError(shell, READ_ONLY_EXCEPTION_MESSAGE,
                             null, exception.getStatus());
                 }
@@ -202,7 +201,7 @@ public class ReadOnlyStateChecker {
 
     /**
 	 * Returns whether the given resource should be checked for read-only state.
-	 *
+	 * 
 	 * @param resourceToCheck the resource to check
 	 * @return <code>true</code> to check it, <code>false</code> to skip it
 	 */
@@ -218,13 +217,13 @@ public class ReadOnlyStateChecker {
 	/**
      * Open a message dialog with Yes No, Yes To All and Cancel buttons. Return the
      * code that indicates the selection.
-     * @return int
+     * @return int 
      *	one of
      *		YES_TO_ALL_ID
      *		YES_ID
      *		NO_ID
      *		CANCEL_ID
-     *
+     * 		
      * @param resource - the resource being queried.
      */
     private int queryYesToAllNoCancel(IResource resource) {
@@ -237,14 +236,12 @@ public class ReadOnlyStateChecker {
                         IDialogConstants.YES_TO_ALL_LABEL,
                         IDialogConstants.NO_LABEL,
                         IDialogConstants.CANCEL_LABEL }, 0) {
-        	@Override
-			protected int getShellStyle() {
+        	protected int getShellStyle() {
         		return super.getShellStyle() | SWT.SHEET;
         	}
         };
         shell.getDisplay().syncExec(new Runnable() {
-            @Override
-			public void run() {
+            public void run() {
                 dialog.open();
             }
         });
@@ -260,10 +257,10 @@ public class ReadOnlyStateChecker {
 		}
         return IDialogConstants.CANCEL_ID;
     }
-
+    
     /**
      * Returns whether to ignore linked resources.
-     *
+     * 
      * @return <code>true</code> to ignore linked resources, <code>false</code> to consider them
      * @since 3.1
      */
@@ -274,7 +271,7 @@ public class ReadOnlyStateChecker {
     /**
      * Sets whether to ignore linked resources.
      * The default is <code>false</code>.
-     *
+     * 
      * @param ignore <code>true</code> to ignore linked resources, <code>false</code> to consider them
      * @since 3.1
      */

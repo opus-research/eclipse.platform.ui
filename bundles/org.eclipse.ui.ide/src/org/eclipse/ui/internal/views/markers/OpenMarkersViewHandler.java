@@ -25,18 +25,17 @@ import org.eclipse.ui.views.markers.internal.MarkerMessages;
 
 /**
  * OpenMarkersViewHandler is used to open another markers view.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class OpenMarkersViewHandler extends MarkerViewHandler {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
 	 */
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		ExtendedMarkersView part = getView(event);
 		if (part == null)
@@ -72,17 +71,16 @@ public class OpenMarkersViewHandler extends MarkerViewHandler {
 
 	/**
 	 * Get the input validator for the receiver.
-	 *
+	 * 
 	 * @return IInputValidator
 	 */
 	private IInputValidator getValidator() {
 		return new IInputValidator() {
 			/*
 			 * (non-Javadoc)
-			 *
+			 * 
 			 * @see org.eclipse.jface.dialogs.IInputValidator#isValid(java.lang.String)
 			 */
-			@Override
 			public String isValid(String newText) {
 				if (newText.length() > 0)
 					return null;

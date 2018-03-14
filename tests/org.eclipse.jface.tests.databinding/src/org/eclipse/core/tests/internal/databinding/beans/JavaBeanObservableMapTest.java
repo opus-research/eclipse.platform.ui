@@ -39,7 +39,7 @@ import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 
 /**
  * @since 3.2
- *
+ * 
  */
 public class JavaBeanObservableMapTest extends AbstractDefaultRealmTestCase {
 	private Bean model1;
@@ -53,7 +53,6 @@ public class JavaBeanObservableMapTest extends AbstractDefaultRealmTestCase {
 	private IObservableMap map;
 	private IBeanObservable beanObservable;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 

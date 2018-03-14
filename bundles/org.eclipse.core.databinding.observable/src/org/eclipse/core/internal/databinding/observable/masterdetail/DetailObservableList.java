@@ -35,7 +35,7 @@ import org.eclipse.core.runtime.Assert;
 
 /**
  * @since 3.2
- *
+ * 
  */
 
 public class DetailObservableList extends ObservableList implements IObserving {
@@ -43,7 +43,6 @@ public class DetailObservableList extends ObservableList implements IObserving {
 	private boolean updating = false;
 
 	private IListChangeListener innerChangeListener = new IListChangeListener() {
-		@Override
 		public void handleListChange(ListChangeEvent event) {
 			if (!updating) {
 				fireListChange(event.diff);
@@ -78,7 +77,6 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		this.detailType = detailType;
 
 		outerObservableValue.addDisposeListener(new IDisposeListener() {
-			@Override
 			public void handleDispose(DisposeEvent staleEvent) {
 				dispose();
 			}
@@ -94,7 +92,6 @@ public class DetailObservableList extends ObservableList implements IObserving {
 	}
 
 	IValueChangeListener outerChangeListener = new IValueChangeListener() {
-		@Override
 		public void handleValueChange(ValueChangeEvent event) {
 			if (isDisposed())
 				return;
@@ -139,7 +136,6 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		}
 	}
 
-	@Override
 	public boolean add(final Object o) {
 		ObservableTracker.setIgnore(true);
 		try {
@@ -149,7 +145,6 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		}
 	}
 
-	@Override
 	public void add(final int index, final Object element) {
 		ObservableTracker.setIgnore(true);
 		try {
@@ -159,7 +154,6 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		}
 	}
 
-	@Override
 	public boolean remove(final Object o) {
 		ObservableTracker.setIgnore(true);
 		try {
@@ -169,7 +163,6 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		}
 	}
 
-	@Override
 	public Object set(final int index, final Object element) {
 		ObservableTracker.setIgnore(true);
 		try {
@@ -179,7 +172,6 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		}
 	}
 
-	@Override
 	public Object move(final int oldIndex, final int newIndex) {
 		if (innerObservableList != null) {
 			ObservableTracker.setIgnore(true);
@@ -192,7 +184,6 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		return super.move(oldIndex, newIndex);
 	}
 
-	@Override
 	public Object remove(final int index) {
 		ObservableTracker.setIgnore(true);
 		try {
@@ -202,7 +193,6 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		}
 	}
 
-	@Override
 	public boolean addAll(final Collection c) {
 		ObservableTracker.setIgnore(true);
 		try {
@@ -212,7 +202,6 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		}
 	}
 
-	@Override
 	public boolean addAll(final int index, final Collection c) {
 		ObservableTracker.setIgnore(true);
 		try {
@@ -222,7 +211,6 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		}
 	}
 
-	@Override
 	public boolean removeAll(final Collection c) {
 		ObservableTracker.setIgnore(true);
 		try {
@@ -232,7 +220,6 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		}
 	}
 
-	@Override
 	public boolean retainAll(final Collection c) {
 		ObservableTracker.setIgnore(true);
 		try {
@@ -242,7 +229,6 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		}
 	}
 
-	@Override
 	public void clear() {
 		ObservableTracker.setIgnore(true);
 		try {
@@ -252,7 +238,6 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		}
 	}
 
-	@Override
 	public synchronized void dispose() {
 		super.dispose();
 
@@ -271,7 +256,6 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		innerChangeListener = null;
 	}
 
-	@Override
 	public Object getObserved() {
 		if (innerObservableList instanceof IObserving) {
 			return ((IObserving) innerObservableList).getObserved();

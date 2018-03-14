@@ -40,8 +40,10 @@ public class TitleTestView extends ViewPart {
 
     Label cdLabel;
 
-    @Override
-	public void createPartControl(Composite parent) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+     */
+    public void createPartControl(Composite parent) {
         composite = new Composite(parent, SWT.NONE);
         CellLayout layout = new CellLayout(2).setColumn(0, Row.fixed())
                 .setColumn(1, Row.growing());
@@ -53,8 +55,7 @@ public class TitleTestView extends ViewPart {
         title.setText(getTitle());
 
         title.addModifyListener(new ModifyListener() {
-            @Override
-			public void modifyText(ModifyEvent e) {
+            public void modifyText(ModifyEvent e) {
                 setTitle(title.getText());
             }
         });
@@ -64,8 +65,7 @@ public class TitleTestView extends ViewPart {
         name = new Text(composite, SWT.BORDER);
         name.setText(getPartName());
         name.addModifyListener(new ModifyListener() {
-            @Override
-			public void modifyText(ModifyEvent e) {
+            public void modifyText(ModifyEvent e) {
                 setPartName(name.getText());
             }
         });
@@ -75,8 +75,7 @@ public class TitleTestView extends ViewPart {
         contentDescription = new Text(composite, SWT.BORDER);
         contentDescription.setText(getContentDescription());
         contentDescription.addModifyListener(new ModifyListener() {
-            @Override
-			public void modifyText(ModifyEvent e) {
+            public void modifyText(ModifyEvent e) {
                 setContentDescription(contentDescription.getText());
             }
         });
@@ -96,8 +95,10 @@ public class TitleTestView extends ViewPart {
         updateLabels();
 
         addPropertyListener(new IPropertyListener() {
-            @Override
-			public void propertyChanged(Object source, int propId) {
+            /* (non-Javadoc)
+             * @see org.eclipse.ui.IPropertyListener#propertyChanged(java.lang.Object, int)
+             */
+            public void propertyChanged(Object source, int propId) {
                 updateLabels();
             }
         });
@@ -109,8 +110,10 @@ public class TitleTestView extends ViewPart {
         cdLabel.setText(getContentDescription());
     }
 
-    @Override
-	public void setFocus() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbenchPart#setFocus()
+     */
+    public void setFocus() {
 
     }
 

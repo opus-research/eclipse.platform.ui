@@ -141,9 +141,7 @@ abstract class NameAndDescriptionToolTip extends ToolTip {
 			GridDataFactory.generate(textLabel, 1, 1);
 		}
 
-		if (text != null) {
-			textLabel.setText(text);
-		}
+		textLabel.setText(text);
 		textLabel.setForeground(fg);
 		textLabel.setBackground(bg);
 		return textLabel;

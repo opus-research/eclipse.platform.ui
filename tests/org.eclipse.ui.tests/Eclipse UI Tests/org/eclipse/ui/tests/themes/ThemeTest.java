@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.themes;
 
@@ -23,7 +22,7 @@ import org.eclipse.ui.themes.IThemeManager;
  */
 public abstract class ThemeTest extends UITestCase {
 	private static final String MOCK_CSS_THEME = "org.eclipse.e4.ui.css.theme.mock";
-
+	
     protected static final String BOGUSID = "BOGUSID";
 
     protected static final String THEME1 = "theme1";
@@ -38,15 +37,14 @@ public abstract class ThemeTest extends UITestCase {
 
     protected static String formatArray(Object[] datas) {
         StringBuffer buffer = new StringBuffer();
-        if (datas == null) {
-			buffer.append("null");
-		} else {
+        if (datas == null)
+            buffer.append("null");
+        else {
             buffer.append('[');
             for (int i = 0; i < datas.length; i++) {
                 buffer.append(datas[i]);
-                if (i != datas.length - 1) {
-					buffer.append(',');
-				}
+                if (i != datas.length - 1)
+                    buffer.append(',');
             }
         }
         return buffer.toString();
@@ -62,23 +60,27 @@ public abstract class ThemeTest extends UITestCase {
         // TODO Auto-generated constructor stub
     }
 
-    @Override
-	protected void doSetUp() throws Exception {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.tests.util.UITestCase#doSetUp()
+     */
+    protected void doSetUp() throws Exception {
         super.doSetUp();
         fManager = fWorkbench.getThemeManager();
         fManager.setCurrentTheme(IThemeManager.DEFAULT_THEME);
-
-        mockCSSTheme();
+        
+        mockCSSTheme();    
     }
 
     private void mockCSSTheme() {
-		IThemeEngine themeEngine = fWorkbench.getService(IThemeEngine.class);
-        org.eclipse.e4.ui.css.swt.theme.ITheme currentTheme = themeEngine.getActiveTheme();
+    	IThemeEngine themeEngine = (IThemeEngine) fWorkbench.getService(IThemeEngine.class);
+        org.eclipse.e4.ui.css.swt.theme.ITheme currentTheme = themeEngine.getActiveTheme(); 
         if (currentTheme != null && !MOCK_CSS_THEME.equals(currentTheme.getId())) {
         	themeEngine.setTheme(MOCK_CSS_THEME, false);
         }
     }
-
+    
     /**
      * @return
      */

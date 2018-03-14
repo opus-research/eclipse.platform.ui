@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.ToolItem;
  * Unlike group markers, separators do have a visual representation for
  * menus and toolbars.
  * <p>
- * This class may be instantiated; it is not intended to be
+ * This class may be instantiated; it is not intended to be 
  * subclassed outside the framework.
  * </p>
  * @noextend This class is not intended to be subclassed by clients.
@@ -39,13 +39,17 @@ public class Separator extends AbstractGroupMarker {
      * Creates a new separator which also defines a new group having the given group name.
      * The group name must not be <code>null</code> or the empty string.
      * The group name is also used as the item id.
-     *
+     * 
      * @param groupName the group name of the separator
      */
     public Separator(String groupName) {
         super(groupName);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IContributionItem.
+     * Fills the given menu with a SWT separator MenuItem.
+     */
     @Override
 	public void fill(Menu menu, int index) {
         if (index >= 0) {
@@ -55,6 +59,10 @@ public class Separator extends AbstractGroupMarker {
 		}
     }
 
+    /* (non-Javadoc)
+     * Method declared on IContributionItem.
+     * Fills the given tool bar with a SWT separator ToolItem.
+     */
     @Override
 	public void fill(ToolBar toolbar, int index) {
         if (index >= 0) {
@@ -64,8 +72,8 @@ public class Separator extends AbstractGroupMarker {
 		}
     }
 
-    /**
-     * The <code>Separator</code> implementation of this <code>IContributionItem</code>
+    /** 
+     * The <code>Separator</code> implementation of this <code>IContributionItem</code> 
      * method returns <code>true</code>
      */
     @Override

@@ -31,7 +31,7 @@ import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 
 /**
  * @since 3.2
- *
+ * 
  */
 public class ValidatedObservableValueTest extends AbstractDefaultRealmTestCase {
 	private ValidatedObservableValue validated;
@@ -41,7 +41,6 @@ public class ValidatedObservableValueTest extends AbstractDefaultRealmTestCase {
 	private Object oldValue;
 	private Object newValue;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		oldValue = new Object();
@@ -230,12 +229,10 @@ public class ValidatedObservableValueTest extends AbstractDefaultRealmTestCase {
 			super(realm);
 		}
 
-		@Override
 		protected Object doGetValue() {
 			return value;
 		}
 
-		@Override
 		protected void doSetValue(Object value) {
 			Object oldValue = this.value;
 			if (overrideValue != null)
@@ -245,18 +242,15 @@ public class ValidatedObservableValueTest extends AbstractDefaultRealmTestCase {
 			fireValueChange(Diffs.createValueDiff(oldValue, value));
 		}
 
-		@Override
 		public Object getValueType() {
 			return Object.class;
 		}
 
-		@Override
 		protected void fireStale() {
 			stale = true;
 			super.fireStale();
 		}
 
-		@Override
 		public boolean isStale() {
 			return stale;
 		}
@@ -272,22 +266,18 @@ public class ValidatedObservableValueTest extends AbstractDefaultRealmTestCase {
 	static class Delegate extends AbstractObservableValueContractDelegate {
 		private Object valueType = new Object();
 
-		@Override
 		public IObservableValue createObservableValue(Realm realm) {
 			return new ValidatedObservableValueStub(realm, valueType);
 		}
 
-		@Override
 		public Object createValue(IObservableValue observable) {
 			return new Object();
 		}
 
-		@Override
 		public Object getValueType(IObservableValue observable) {
 			return valueType;
 		}
 
-		@Override
 		public void change(IObservable observable) {
 			ValidatedObservableValueStub validated = (ValidatedObservableValueStub) observable;
 			IObservableValue target = validated.target;

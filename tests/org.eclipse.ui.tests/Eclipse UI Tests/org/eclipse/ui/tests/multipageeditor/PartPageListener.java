@@ -25,55 +25,73 @@ public class PartPageListener implements IPartListener2, IPageChangedListener {
 	public int pageChangeCount;
 	public PageChangedEvent currentChangeEvent;
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IPartListener2#partActivated(org.eclipse.ui.IWorkbenchPartReference)
+	 */
 	public void partActivated(IWorkbenchPartReference partRef) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IPartListener2#partBroughtToTop(org.eclipse.ui.IWorkbenchPartReference)
+	 */
 	public void partBroughtToTop(IWorkbenchPartReference partRef) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IPartListener2#partClosed(org.eclipse.ui.IWorkbenchPartReference)
+	 */
 	public void partClosed(IWorkbenchPartReference partRef) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IPartListener2#partDeactivated(org.eclipse.ui.IWorkbenchPartReference)
+	 */
 	public void partDeactivated(IWorkbenchPartReference partRef) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IPartListener2#partHidden(org.eclipse.ui.IWorkbenchPartReference)
+	 */
 	public void partHidden(IWorkbenchPartReference partRef) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IPartListener2#partInputChanged(org.eclipse.ui.IWorkbenchPartReference)
+	 */
 	public void partInputChanged(IWorkbenchPartReference partRef) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IPartListener2#partOpened(org.eclipse.ui.IWorkbenchPartReference)
+	 */
 	public void partOpened(IWorkbenchPartReference partRef) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IPartListener2#partVisible(org.eclipse.ui.IWorkbenchPartReference)
+	 */
 	public void partVisible(IWorkbenchPartReference partRef) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.IPageChangedListener#pageChanged(org.eclipse.jface.dialogs.PageChangedEvent)
+	 */
 	public void pageChanged(PageChangedEvent event) {
 		pageChangeCount++;
 		currentChangeEvent = event;

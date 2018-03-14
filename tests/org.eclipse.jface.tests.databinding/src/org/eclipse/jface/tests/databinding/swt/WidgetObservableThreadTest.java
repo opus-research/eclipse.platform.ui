@@ -25,18 +25,16 @@ import org.eclipse.swt.widgets.Text;
 
 /**
  * @since 3.2
- *
+ * 
  */
 public class WidgetObservableThreadTest extends AbstractSWTTestCase {
 	protected ThreadRealm threadRealm;
 	private DataBindingContext ctx;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		threadRealm = new ThreadRealm();
 		new Thread() {
-			@Override
 			public void run() {
 				RealmTester.setDefault(threadRealm);
 				threadRealm.init(Thread.currentThread());
@@ -47,11 +45,9 @@ public class WidgetObservableThreadTest extends AbstractSWTTestCase {
         threadRealm.waitUntilBlocking();
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		if (ctx != null) {
 			threadRealm.exec(new Runnable() {
-				@Override
 				public void run() {
 					ctx.dispose();
 					ctx = null;
@@ -74,7 +70,6 @@ public class WidgetObservableThreadTest extends AbstractSWTTestCase {
 		assertEquals("", text.getText());
 
 		threadRealm.exec(new Runnable() {
-			@Override
 			public void run() {
 				ctx = new DataBindingContext();
 				ctx.bindValue(WidgetProperties.text(SWT.Modify).observe(text),
@@ -100,7 +95,6 @@ public class WidgetObservableThreadTest extends AbstractSWTTestCase {
 		assertEquals("newValue", text.getText());
 
 		threadRealm.exec(new Runnable() {
-			@Override
 			public void run() {
 				bean.setValue("newerValue");
 			}

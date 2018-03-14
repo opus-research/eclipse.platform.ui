@@ -25,7 +25,6 @@ public class TestLabelProviderCyan extends TestStyledLabelProvider {
 
 	public static TestLabelProviderCyan instance;
 
-	@Override
 	protected void initSubclass() {
 		backgroundColor = Display.getCurrent().getSystemColor(
 				SWT.COLOR_CYAN);

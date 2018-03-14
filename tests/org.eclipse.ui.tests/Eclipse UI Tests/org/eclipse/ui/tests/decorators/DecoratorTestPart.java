@@ -21,7 +21,7 @@ import org.eclipse.ui.part.ViewPart;
 /**
  * The DecoratorTestPart is the abstract superclass of the ViewParts that are
  * used for decorator tests.
- *
+ * 
  */
 public abstract class DecoratorTestPart extends ViewPart {
 
@@ -39,7 +39,7 @@ public abstract class DecoratorTestPart extends ViewPart {
 
 	/**
 	 * Get the label provider for the receiver.
-	 *
+	 * 
 	 * @return
 	 */
 	protected DecoratingLabelProvider getLabelProvider() {
@@ -53,13 +53,17 @@ public abstract class DecoratorTestPart extends ViewPart {
 
 	/**
 	 * Get the listener for the suite.
-	 *
+	 * 
 	 * @return
 	 */
 	private ILabelProviderListener getDecoratorManagerListener() {
 		listener = new ILabelProviderListener() {
 
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.viewers.ILabelProviderListener#labelProviderChanged(org.eclipse.jface.viewers.LabelProviderChangedEvent)
+			 */
 			public void labelProviderChanged(LabelProviderChangedEvent event) {
 				// Reset the end time each time we get an update
 				endTime = System.currentTimeMillis() + DELAY_TIME;
@@ -71,9 +75,8 @@ public abstract class DecoratorTestPart extends ViewPart {
 	}
 
 	public void readAndDispatchForUpdates() {
-		while (System.currentTimeMillis() < endTime) {
+		while (System.currentTimeMillis() < endTime)
 			Display.getCurrent().readAndDispatch();
-		}
 
 	}
 
@@ -82,7 +85,6 @@ public abstract class DecoratorTestPart extends ViewPart {
 
 	}
 
-	@Override
 	public void dispose() {
 		PlatformUI.getWorkbench().getDecoratorManager()
 				.removeListener(listener);

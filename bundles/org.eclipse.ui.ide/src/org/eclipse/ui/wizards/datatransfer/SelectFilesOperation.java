@@ -140,8 +140,7 @@ public class SelectFilesOperation implements IRunnableWithProgress {
     /**
      * Runs the operation.
      */
-    @Override
-	public void run(IProgressMonitor monitor) throws InterruptedException {
+    public void run(IProgressMonitor monitor) throws InterruptedException {
         try {
             this.monitor = monitor;
             monitor.beginTask(DataTransferMessages.DataTransfer_scanningMatching, IProgressMonitor.UNKNOWN);

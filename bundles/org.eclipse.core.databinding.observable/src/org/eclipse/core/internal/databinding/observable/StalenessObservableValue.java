@@ -21,13 +21,12 @@ import org.eclipse.core.databinding.observable.value.AbstractObservableValue;
 
 /**
  * An observable value that tracks the staleness of an {@link IObservable}.
- *
+ * 
  * @since 1.1
  */
 public class StalenessObservableValue extends AbstractObservableValue {
 
 	private class MyListener implements IChangeListener, IStaleListener {
-		@Override
 		public void handleChange(ChangeEvent event) {
 			if (stale && !event.getObservable().isStale()) {
 				stale = false;
@@ -36,7 +35,6 @@ public class StalenessObservableValue extends AbstractObservableValue {
 			}
 		}
 
-		@Override
 		public void handleStale(StaleEvent staleEvent) {
 			if (!stale) {
 				stale = true;
@@ -53,7 +51,7 @@ public class StalenessObservableValue extends AbstractObservableValue {
 	/**
 	 * Constructs a StalenessObservableValue that tracks the staleness of the
 	 * given {@link IObservable}.
-	 *
+	 * 
 	 * @param observable
 	 *            the observable to track
 	 */
@@ -65,17 +63,14 @@ public class StalenessObservableValue extends AbstractObservableValue {
 		tracked.addStaleListener(listener);
 	}
 
-	@Override
 	protected Object doGetValue() {
 		return tracked.isStale() ? Boolean.TRUE : Boolean.FALSE;
 	}
 
-	@Override
 	public Object getValueType() {
 		return Boolean.TYPE;
 	}
 
-	@Override
 	public synchronized void dispose() {
 		if (tracked != null) {
 			tracked.removeChangeListener(listener);

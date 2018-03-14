@@ -91,8 +91,7 @@ public class OpenSystemEditorAction extends SelectionListenerAction {
     /* (non-Javadoc)
      * Method declared on IAction.
      */
-    @Override
-	public void run() {
+    public void run() {
         Iterator itr = getSelectedResources().iterator();
         while (itr.hasNext()) {
             IResource resource = (IResource) itr.next();
@@ -107,8 +106,7 @@ public class OpenSystemEditorAction extends SelectionListenerAction {
      * <code>SelectionListenerAction</code> method enables the action only
      * if the selection contains just file resources.
      */
-    @Override
-	protected boolean updateSelection(IStructuredSelection selection) {
+    protected boolean updateSelection(IStructuredSelection selection) {
         return super.updateSelection(selection)
                 && selectionIsOfType(IResource.FILE);
     }

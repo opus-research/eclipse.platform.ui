@@ -10,6 +10,8 @@
 
 The class specified by the startup element&apos;s class attribute will be instantiated and earlyStartup() will be called on the result. Do not specify the plug-in class as the value of the class attribute, or it will be instantiated twice (once by regular plug-in activation, and once by this mechanism).
 
+If the extension does not provide a class as an attribute on the startup element, the plug-in&apos;s activator (plug-in class) must implement &lt;samp&gt;org.eclipse.ui.IStartup&lt;/samp&gt;. Note that this form is deprecated and should no longer be used. Its functioning relies on the availability of the org.eclipse.core.runtime.compatibility plug-in and the org.eclipse.core.runtime.compatibility.registry fragment.
+
 Plug-ins that provide an extension to this extension point are listed in the workbench preferences and the user may disable any plug-in from early startup.
       </documentation>
    </annotation>
@@ -53,7 +55,7 @@ Plug-ins that provide an extension to this extension point are listed in the wor
 
    <element name="startup">
       <complexType>
-         <attribute name="class" type="string" use="required">
+         <attribute name="class" type="string">
             <annotation>
                <documentation>
                   a fully qualified name of the class that implements 
@@ -67,6 +69,15 @@ Mandatory since 3.0. Do not specify the plug-in class as it would be instantiate
          </attribute>
       </complexType>
    </element>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="apiInfo"/>
+      </appInfo>
+      <documentation>
+         See interface &lt;samp&gt;org.eclipse.ui.IStartup&lt;/samp&gt;.
+      </documentation>
+   </annotation>
 
    <annotation>
       <appInfo>
@@ -88,15 +99,6 @@ Mandatory since 3.0. Do not specify the plug-in class as it would be instantiate
      &lt;startup class=&quot;org.eclipse.example.StartupClass&quot;/&gt;
    &lt;/extension&gt;
 &lt;/pre&gt;
-      </documentation>
-   </annotation>
-
-   <annotation>
-      <appInfo>
-         <meta.section type="apiInfo"/>
-      </appInfo>
-      <documentation>
-         See interface &lt;samp&gt;org.eclipse.ui.IStartup&lt;/samp&gt;.
       </documentation>
    </annotation>
 

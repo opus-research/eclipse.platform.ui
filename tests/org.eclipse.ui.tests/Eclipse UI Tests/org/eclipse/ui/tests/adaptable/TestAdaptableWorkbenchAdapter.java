@@ -36,11 +36,9 @@ public class TestAdaptableWorkbenchAdapter extends LabelProvider implements
     /*
      * @see IWorkbenchAdapter#getChildren(Object)
      */
-    @Override
-	public Object[] getChildren(Object o) {
-        if (o instanceof AdaptableResourceWrapper) {
-			return ((AdaptableResourceWrapper) o).getChildren();
-		}
+    public Object[] getChildren(Object o) {
+        if (o instanceof AdaptableResourceWrapper)
+            return ((AdaptableResourceWrapper) o).getChildren();
         if (o instanceof IResource) {
             AdaptableResourceWrapper wrapper = new AdaptableResourceWrapper(
                     (IResource) o);
@@ -52,30 +50,25 @@ public class TestAdaptableWorkbenchAdapter extends LabelProvider implements
     /*
      * @see IWorkbenchAdapter#getImageDescriptor(Object)
      */
-    @Override
-	public ImageDescriptor getImageDescriptor(Object object) {
+    public ImageDescriptor getImageDescriptor(Object object) {
         return null;
     }
 
     /*
      * @see IWorkbenchAdapter#getLabel(Object)
      */
-    @Override
-	public String getLabel(Object o) {
-        if (o instanceof AdaptableResourceWrapper) {
-			return ((AdaptableResourceWrapper) o).getLabel();
-		}
+    public String getLabel(Object o) {
+        if (o instanceof AdaptableResourceWrapper)
+            return ((AdaptableResourceWrapper) o).getLabel();
 		return null;
     }
 
     /*
      * @see IWorkbenchAdapter#getParent(Object)
      */
-    @Override
-	public Object getParent(Object o) {
-        if (o instanceof AdaptableResourceWrapper) {
-			return ((AdaptableResourceWrapper) o).getParent();
-		}
+    public Object getParent(Object o) {
+        if (o instanceof AdaptableResourceWrapper)
+            return ((AdaptableResourceWrapper) o).getParent();
 		return null;
     }
 
@@ -105,11 +98,13 @@ public class TestAdaptableWorkbenchAdapter extends LabelProvider implements
         return input;
     }
 
+    /* (non-Javadoc)
+     * Method declared on IBaseLabelProvider
+     */
     /**
      * Disposes of all allocated images.
      */
-    @Override
-	public final void dispose() {
+    public final void dispose() {
     }
 
     /**
@@ -121,20 +116,21 @@ public class TestAdaptableWorkbenchAdapter extends LabelProvider implements
         if (!(o instanceof IAdaptable)) {
             return null;
         }
-		return ((IAdaptable) o).getAdapter(IWorkbenchAdapter.class);
+        return (IWorkbenchAdapter) ((IAdaptable) o)
+                .getAdapter(IWorkbenchAdapter.class);
     }
 
-    @Override
-	public final Image getImage(Object element) {
+    /* (non-Javadoc)
+     * Method declared on ILabelProvider
+     */
+    public final Image getImage(Object element) {
         //obtain the base image by querying the element
         IWorkbenchAdapter adapter = getAdapter(element);
-        if (adapter == null) {
-			return null;
-		}
+        if (adapter == null)
+            return null;
         ImageDescriptor descriptor = adapter.getImageDescriptor(element);
-        if (descriptor == null) {
-			return null;
-		}
+        if (descriptor == null)
+            return null;
 
         //add any annotations to the image descriptor
         descriptor = decorateImage(descriptor, element);
@@ -142,14 +138,14 @@ public class TestAdaptableWorkbenchAdapter extends LabelProvider implements
         return descriptor.createImage();
     }
 
-    @Override
-	public final String getText(Object element) {
+    /* (non-Javadoc)
+     * Method declared on ILabelProvider
+     */
+    public final String getText(Object element) {
         //query the element for its label
         IWorkbenchAdapter adapter = getAdapter(element);
         if (adapter == null)
-		 {
-			return ""; //$NON-NLS-1$
-		}
+            return ""; //$NON-NLS-1$
         String label = adapter.getLabel(element);
 
         //return the decorated label
