@@ -75,7 +75,7 @@ public class ImportWizard extends Wizard {
     @Override
 	public void addPages() {
         addPage(new SelectionPage(this.workbench, this.selection,
-                getAvailableImportWizards(), WorkbenchMessages.ImportWizard_selectSource));
+                getAvailableImportWizards(), WorkbenchMessages.ImportWizard_selectWizard));
     }
 
     /**
