@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.api;
 
-import static org.junit.Assert.assertArrayEquals;
-
 import java.lang.reflect.Method;
 
 import org.eclipse.core.resources.IWorkspace;
@@ -252,50 +250,31 @@ public class IAggregateWorkingSetTest extends UITestCase {
 			assertEquals("Failed to add workingset" + nameB, wSetB, manager
 					.getWorkingSet(nameB));
 
-			assertEquals(0, wSetB.getComponents().length);
-
 			invokeMethod(AggregateWorkingSet.class, "setComponents", wSetB,
 					new Object[] { new IWorkingSet[] {
 							wSetA, wSetC } },
 					new Class[] { new IWorkingSet[] {}.getClass() });
 
-			assertEquals(2, wSetB.getComponents().length);
-
-			IMemento workingSets = saveAndRemoveAllWorkingSets();
-			processEvents();
-			waitForJobs(500, 3000);
-
-			assertNull(manager.getWorkingSet(nameA));
-			assertNull(manager.getWorkingSet(nameB));
-			assertNull(manager.getWorkingSet(nameC));
-
-			assertArrayEquals(new IWorkingSet[0], manager.getAllWorkingSets());
-
-			restoreWorkingSetManager(workingSets);
-			processEvents();
-			waitForJobs(500, 3000);
+			saveRestoreWorkingSetManager();
 
 			IAggregateWorkingSet restoredB = (IAggregateWorkingSet) manager
 					.getWorkingSet(nameB);
-			assertNotNull("Unable to save/restore correctly", restoredB);
+			assertTrue("Unable to save/restore correctly", restoredB!=null);
 
 			IAggregateWorkingSet restoredC = (IAggregateWorkingSet) manager
 			.getWorkingSet(nameC);
-			assertNotNull("Unable to save/restore correctly", restoredC);
+			assertTrue("Unable to save/restore correctly", restoredC!=null);
 
 			IWorkingSet[] componenets1=wSetB.getComponents();
-			IWorkingSet[] componenets2 = restoredB.getComponents();
+			IWorkingSet[] componenets2=((IAggregateWorkingSet) manager
+					.getWorkingSet(nameB)).getComponents();
 
 			if (componenets1.length != componenets2.length) {
-				assertEquals(nameB + " has lost data in the process of save/restore: " + restoredB, componenets1.length,
-						componenets2.length);
+				fail(nameB + " has lost data in the process of save/restore");
 			} else {
 	            for (int i = 0; i < componenets1.length; i++) {
 					if (!componenets1[i].equals(componenets2[i])) {
-						assertEquals(nameB + " has lost data in the process of save/restore: " + restoredB,
-								componenets1[i].toString(), componenets2[i].toString());
-						fail("equals() and toString() do not match for: " + componenets1[i] + " and "
-								+ componenets2[i]);
+						fail(nameB + " has lost data in the process of save/restore");
 					}
 				}
 	        }
@@ -317,7 +296,7 @@ public class IAggregateWorkingSetTest extends UITestCase {
 		}
 	}
 
-	private IMemento saveAndRemoveAllWorkingSets() {
+	private void saveRestoreWorkingSetManager() {
 		IMemento managerMemento = XMLMemento
 				.createWriteRoot(IWorkbenchConstants.TAG_WORKING_SET_MANAGER);
 		IWorkingSetManager manager = fWorkbench.getWorkingSetManager();
@@ -340,12 +319,6 @@ public class IAggregateWorkingSetTest extends UITestCase {
 			manager.removeWorkingSet(set);
 		}
 		//manager.dispose(); //not needed, also cause problems
-		return managerMemento;
-	}
-
-	private void restoreWorkingSetManager(IMemento managerMemento) {
-		IWorkingSetManager manager = fWorkbench.getWorkingSetManager();
-
 		invokeMethod(AbstractWorkingSetManager.class, "restoreWorkingSetState",
 				manager, new Object[] { managerMemento },
 				new Class[] { IMemento.class });

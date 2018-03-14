@@ -22,7 +22,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWindowListener;
@@ -230,30 +229,6 @@ public abstract class UITestCase extends TestCase {
             while (display.readAndDispatch())
                 ;
     }
-
-	/**
-	 * Utility for waiting until the execution of jobs of any family has
-	 * finished or timeout is reached. If no jobs are running, the method waits
-	 * given minimum wait time. While this method is waiting for jobs, UI events
-	 * are processed.
-	 *
-	 * @param minTimeMs
-	 *            minimum wait time in milliseconds
-	 * @param maxTimeMs
-	 *            maximum wait time in milliseconds
-	 */
-	public static void waitForJobs(long minTimeMs, long maxTimeMs) {
-		if (maxTimeMs < minTimeMs) {
-			throw new IllegalArgumentException("Max time is smaller as min time!");
-		}
-		final long start = System.currentTimeMillis();
-		while (System.currentTimeMillis() - start < minTimeMs) {
-			processEvents();
-		}
-		while (!Job.getJobManager().isIdle() && System.currentTimeMillis() - start < maxTimeMs) {
-			processEvents();
-		}
-	}
 
     protected static interface Condition {
     	public boolean compute();
