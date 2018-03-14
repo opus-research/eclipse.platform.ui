@@ -20,6 +20,7 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
 import org.eclipse.e4.ui.model.application.ui.advanced.*;
 import org.eclipse.e4.ui.model.application.ui.advanced.impl.AdvancedPackageImpl;
+import org.eclipse.e4.ui.model.application.ui.basic.MDialogElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
@@ -129,6 +130,7 @@ public class AdvancedSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseGenericTile(area);
 				if (result == null) result = casePartSashContainerElement(area);
 				if (result == null) result = caseWindowElement(area);
+				if (result == null) result = caseDialogElement(area);
 				if (result == null) result = caseElementContainer(area);
 				if (result == null) result = caseUIElement(area);
 				if (result == null) result = caseApplicationElement(area);
@@ -362,6 +364,21 @@ public class AdvancedSwitch<T1> extends Switch<T1> {
 	 * @generated
 	 */
 	public <T extends MUIElement> T1 caseGenericTile(MGenericTile<T> object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Dialog Element</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Dialog Element</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T1 caseDialogElement(MDialogElement object) {
 		return null;
 	}
 

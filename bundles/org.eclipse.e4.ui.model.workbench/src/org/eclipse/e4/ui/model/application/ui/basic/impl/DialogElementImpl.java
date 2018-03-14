@@ -4,30 +4,32 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
 package org.eclipse.e4.ui.model.application.ui.basic.impl;
 
-import org.eclipse.e4.ui.model.application.ui.basic.MWizardDialog;
+import org.eclipse.e4.ui.model.application.ui.basic.MDialogElement;
+
+import org.eclipse.e4.ui.model.application.ui.impl.UIElementImpl;
 
 import org.eclipse.emf.ecore.EClass;
 
 /**
  * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Wizard Dialog</b></em>'.
+ * An implementation of the model object '<em><b>Dialog Element</b></em>'.
  * <!-- end-user-doc -->
  *
  * @generated
  */
-public class WizardDialogImpl extends DialogImpl implements MWizardDialog {
+public class DialogElementImpl extends UIElementImpl implements MDialogElement {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected WizardDialogImpl() {
+	protected DialogElementImpl() {
 		super();
 	}
 
@@ -38,7 +40,7 @@ public class WizardDialogImpl extends DialogImpl implements MWizardDialog {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return BasicPackageImpl.Literals.WIZARD_DIALOG;
+		return BasicPackageImpl.Literals.DIALOG_ELEMENT;
 	}
 
-} //WizardDialogImpl
+} //DialogElementImpl

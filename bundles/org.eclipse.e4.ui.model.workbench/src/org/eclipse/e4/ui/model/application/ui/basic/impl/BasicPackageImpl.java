@@ -16,6 +16,7 @@ import org.eclipse.e4.ui.model.application.ui.advanced.impl.AdvancedPackageImpl;
 import org.eclipse.e4.ui.model.application.ui.basic.MBasicFactory;
 import org.eclipse.e4.ui.model.application.ui.basic.MCompositePart;
 import org.eclipse.e4.ui.model.application.ui.basic.MDialog;
+import org.eclipse.e4.ui.model.application.ui.basic.MDialogElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MInputPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
@@ -27,7 +28,8 @@ import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindowElement;
-import org.eclipse.e4.ui.model.application.ui.basic.MWizardDialog;
+import org.eclipse.e4.ui.model.application.ui.basic.MWizard;
+import org.eclipse.e4.ui.model.application.ui.basic.MWizardElement;
 import org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuPackageImpl;
 import org.eclipse.emf.ecore.EAttribute;
@@ -36,6 +38,7 @@ import org.eclipse.emf.ecore.EFactory;
 import org.eclipse.emf.ecore.EGenericType;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
+import org.eclipse.emf.ecore.ETypeParameter;
 import org.eclipse.emf.ecore.impl.EPackageImpl;
 
 /**
@@ -503,13 +506,22 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int PART__LOCALIZED_DESCRIPTION = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 17;
 
 	/**
+	 * The feature id for the '<em><b>Dialogs</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int PART__DIALOGS = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 18;
+
+	/**
 	 * The number of structural features of the '<em>Part</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int PART_FEATURE_COUNT = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 18;
+	public static final int PART_FEATURE_COUNT = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 19;
 
 	/**
 	 * The operation id for the '<em>Update Localization</em>' operation.
@@ -844,6 +856,15 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int COMPOSITE_PART__LOCALIZED_DESCRIPTION = PART__LOCALIZED_DESCRIPTION;
+
+	/**
+	 * The feature id for the '<em><b>Dialogs</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__DIALOGS = PART__DIALOGS;
 
 	/**
 	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
@@ -1204,6 +1225,15 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int INPUT_PART__LOCALIZED_DESCRIPTION = PART__LOCALIZED_DESCRIPTION;
+
+	/**
+	 * The feature id for the '<em><b>Dialogs</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int INPUT_PART__DIALOGS = PART__DIALOGS;
 
 	/**
 	 * The feature id for the '<em><b>Input URI</b></em>' attribute.
@@ -3241,175 +3271,13 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int DIALOG = 12;
 
 	/**
-	 * The feature id for the '<em><b>Element Id</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIALOG__ELEMENT_ID = WINDOW__ELEMENT_ID;
-
-	/**
-	 * The feature id for the '<em><b>Persisted State</b></em>' map.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIALOG__PERSISTED_STATE = WINDOW__PERSISTED_STATE;
-
-	/**
-	 * The feature id for the '<em><b>Tags</b></em>' attribute list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIALOG__TAGS = WINDOW__TAGS;
-
-	/**
-	 * The feature id for the '<em><b>Contributor URI</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIALOG__CONTRIBUTOR_URI = WINDOW__CONTRIBUTOR_URI;
-
-	/**
-	 * The feature id for the '<em><b>Transient Data</b></em>' map.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIALOG__TRANSIENT_DATA = WINDOW__TRANSIENT_DATA;
-
-	/**
-	 * The feature id for the '<em><b>Widget</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIALOG__WIDGET = WINDOW__WIDGET;
-
-	/**
-	 * The feature id for the '<em><b>Renderer</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIALOG__RENDERER = WINDOW__RENDERER;
-
-	/**
-	 * The feature id for the '<em><b>To Be Rendered</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIALOG__TO_BE_RENDERED = WINDOW__TO_BE_RENDERED;
-
-	/**
-	 * The feature id for the '<em><b>On Top</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIALOG__ON_TOP = WINDOW__ON_TOP;
-
-	/**
-	 * The feature id for the '<em><b>Visible</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIALOG__VISIBLE = WINDOW__VISIBLE;
-
-	/**
-	 * The feature id for the '<em><b>Parent</b></em>' container reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIALOG__PARENT = WINDOW__PARENT;
-
-	/**
-	 * The feature id for the '<em><b>Container Data</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIALOG__CONTAINER_DATA = WINDOW__CONTAINER_DATA;
-
-	/**
-	 * The feature id for the '<em><b>Cur Shared Ref</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIALOG__CUR_SHARED_REF = WINDOW__CUR_SHARED_REF;
-
-	/**
-	 * The feature id for the '<em><b>Visible When</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIALOG__VISIBLE_WHEN = WINDOW__VISIBLE_WHEN;
-
-	/**
-	 * The feature id for the '<em><b>Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIALOG__ACCESSIBILITY_PHRASE = WINDOW__ACCESSIBILITY_PHRASE;
-
-	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIALOG__LOCALIZED_ACCESSIBILITY_PHRASE = WINDOW__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
-	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIALOG__CHILDREN = WINDOW__CHILDREN;
-
-	/**
-	 * The feature id for the '<em><b>Selected Element</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIALOG__SELECTED_ELEMENT = WINDOW__SELECTED_ELEMENT;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DIALOG__LABEL = WINDOW__LABEL;
+	public static final int DIALOG__LABEL = UiPackageImpl.UI_LABEL__LABEL;
 
 	/**
 	 * The feature id for the '<em><b>Icon URI</b></em>' attribute.
@@ -3418,7 +3286,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DIALOG__ICON_URI = WINDOW__ICON_URI;
+	public static final int DIALOG__ICON_URI = UiPackageImpl.UI_LABEL__ICON_URI;
 
 	/**
 	 * The feature id for the '<em><b>Tooltip</b></em>' attribute.
@@ -3427,7 +3295,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DIALOG__TOOLTIP = WINDOW__TOOLTIP;
+	public static final int DIALOG__TOOLTIP = UiPackageImpl.UI_LABEL__TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
@@ -3436,7 +3304,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DIALOG__LOCALIZED_LABEL = WINDOW__LOCALIZED_LABEL;
+	public static final int DIALOG__LOCALIZED_LABEL = UiPackageImpl.UI_LABEL__LOCALIZED_LABEL;
 
 	/**
 	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
@@ -3445,7 +3313,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DIALOG__LOCALIZED_TOOLTIP = WINDOW__LOCALIZED_TOOLTIP;
+	public static final int DIALOG__LOCALIZED_TOOLTIP = UiPackageImpl.UI_LABEL__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Context</b></em>' attribute.
@@ -3454,7 +3322,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DIALOG__CONTEXT = WINDOW__CONTEXT;
+	public static final int DIALOG__CONTEXT = UiPackageImpl.UI_LABEL_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Variables</b></em>' attribute list.
@@ -3463,7 +3331,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DIALOG__VARIABLES = WINDOW__VARIABLES;
+	public static final int DIALOG__VARIABLES = UiPackageImpl.UI_LABEL_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Properties</b></em>' map.
@@ -3472,7 +3340,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DIALOG__PROPERTIES = WINDOW__PROPERTIES;
+	public static final int DIALOG__PROPERTIES = UiPackageImpl.UI_LABEL_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Handlers</b></em>' containment reference list.
@@ -3481,7 +3349,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DIALOG__HANDLERS = WINDOW__HANDLERS;
+	public static final int DIALOG__HANDLERS = UiPackageImpl.UI_LABEL_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Binding Contexts</b></em>' reference list.
@@ -3490,25 +3358,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DIALOG__BINDING_CONTEXTS = WINDOW__BINDING_CONTEXTS;
-
-	/**
-	 * The feature id for the '<em><b>Snippets</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIALOG__SNIPPETS = WINDOW__SNIPPETS;
-
-	/**
-	 * The feature id for the '<em><b>Main Menu</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIALOG__MAIN_MENU = WINDOW__MAIN_MENU;
+	public static final int DIALOG__BINDING_CONTEXTS = UiPackageImpl.UI_LABEL_FEATURE_COUNT + 4;
 
 	/**
 	 * The feature id for the '<em><b>X</b></em>' attribute.
@@ -3517,7 +3367,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DIALOG__X = WINDOW__X;
+	public static final int DIALOG__X = UiPackageImpl.UI_LABEL_FEATURE_COUNT + 5;
 
 	/**
 	 * The feature id for the '<em><b>Y</b></em>' attribute.
@@ -3526,7 +3376,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DIALOG__Y = WINDOW__Y;
+	public static final int DIALOG__Y = UiPackageImpl.UI_LABEL_FEATURE_COUNT + 6;
 
 	/**
 	 * The feature id for the '<em><b>Width</b></em>' attribute.
@@ -3535,7 +3385,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DIALOG__WIDTH = WINDOW__WIDTH;
+	public static final int DIALOG__WIDTH = UiPackageImpl.UI_LABEL_FEATURE_COUNT + 7;
 
 	/**
 	 * The feature id for the '<em><b>Height</b></em>' attribute.
@@ -3544,25 +3394,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DIALOG__HEIGHT = WINDOW__HEIGHT;
-
-	/**
-	 * The feature id for the '<em><b>Windows</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIALOG__WINDOWS = WINDOW__WINDOWS;
-
-	/**
-	 * The feature id for the '<em><b>Shared Elements</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIALOG__SHARED_ELEMENTS = WINDOW__SHARED_ELEMENTS;
+	public static final int DIALOG__HEIGHT = UiPackageImpl.UI_LABEL_FEATURE_COUNT + 8;
 
 	/**
 	 * The number of structural features of the '<em>Dialog</em>' class.
@@ -3571,7 +3403,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DIALOG_FEATURE_COUNT = WINDOW_FEATURE_COUNT + 0;
+	public static final int DIALOG_FEATURE_COUNT = UiPackageImpl.UI_LABEL_FEATURE_COUNT + 9;
 
 	/**
 	 * The operation id for the '<em>Update Localization</em>' operation.
@@ -3580,7 +3412,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DIALOG___UPDATE_LOCALIZATION = WINDOW___UPDATE_LOCALIZATION;
+	public static final int DIALOG___UPDATE_LOCALIZATION = UiPackageImpl.UI_LABEL___UPDATE_LOCALIZATION;
 
 	/**
 	 * The number of operations of the '<em>Dialog</em>' class.
@@ -3589,17 +3421,17 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DIALOG_OPERATION_COUNT = WINDOW_OPERATION_COUNT + 0;
+	public static final int DIALOG_OPERATION_COUNT = UiPackageImpl.UI_LABEL_OPERATION_COUNT + 0;
 
 	/**
-	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.basic.impl.WizardDialogImpl <em>Wizard Dialog</em>}' class.
+	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.basic.impl.WizardImpl <em>Wizard</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.WizardDialogImpl
-	 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl#getWizardDialog()
+	 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.WizardImpl
+	 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl#getWizard()
 	 * @generated
 	 */
-	public static final int WIZARD_DIALOG = 13;
+	public static final int WIZARD = 13;
 
 	/**
 	 * The feature id for the '<em><b>Element Id</b></em>' attribute.
@@ -3608,7 +3440,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WIZARD_DIALOG__ELEMENT_ID = DIALOG__ELEMENT_ID;
+	public static final int WIZARD__ELEMENT_ID = UiPackageImpl.ELEMENT_CONTAINER__ELEMENT_ID;
 
 	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
@@ -3617,7 +3449,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WIZARD_DIALOG__PERSISTED_STATE = DIALOG__PERSISTED_STATE;
+	public static final int WIZARD__PERSISTED_STATE = UiPackageImpl.ELEMENT_CONTAINER__PERSISTED_STATE;
 
 	/**
 	 * The feature id for the '<em><b>Tags</b></em>' attribute list.
@@ -3626,7 +3458,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WIZARD_DIALOG__TAGS = DIALOG__TAGS;
+	public static final int WIZARD__TAGS = UiPackageImpl.ELEMENT_CONTAINER__TAGS;
 
 	/**
 	 * The feature id for the '<em><b>Contributor URI</b></em>' attribute.
@@ -3635,7 +3467,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WIZARD_DIALOG__CONTRIBUTOR_URI = DIALOG__CONTRIBUTOR_URI;
+	public static final int WIZARD__CONTRIBUTOR_URI = UiPackageImpl.ELEMENT_CONTAINER__CONTRIBUTOR_URI;
 
 	/**
 	 * The feature id for the '<em><b>Transient Data</b></em>' map.
@@ -3644,7 +3476,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WIZARD_DIALOG__TRANSIENT_DATA = DIALOG__TRANSIENT_DATA;
+	public static final int WIZARD__TRANSIENT_DATA = UiPackageImpl.ELEMENT_CONTAINER__TRANSIENT_DATA;
 
 	/**
 	 * The feature id for the '<em><b>Widget</b></em>' attribute.
@@ -3653,7 +3485,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WIZARD_DIALOG__WIDGET = DIALOG__WIDGET;
+	public static final int WIZARD__WIDGET = UiPackageImpl.ELEMENT_CONTAINER__WIDGET;
 
 	/**
 	 * The feature id for the '<em><b>Renderer</b></em>' attribute.
@@ -3662,7 +3494,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WIZARD_DIALOG__RENDERER = DIALOG__RENDERER;
+	public static final int WIZARD__RENDERER = UiPackageImpl.ELEMENT_CONTAINER__RENDERER;
 
 	/**
 	 * The feature id for the '<em><b>To Be Rendered</b></em>' attribute.
@@ -3671,7 +3503,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WIZARD_DIALOG__TO_BE_RENDERED = DIALOG__TO_BE_RENDERED;
+	public static final int WIZARD__TO_BE_RENDERED = UiPackageImpl.ELEMENT_CONTAINER__TO_BE_RENDERED;
 
 	/**
 	 * The feature id for the '<em><b>On Top</b></em>' attribute.
@@ -3680,7 +3512,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WIZARD_DIALOG__ON_TOP = DIALOG__ON_TOP;
+	public static final int WIZARD__ON_TOP = UiPackageImpl.ELEMENT_CONTAINER__ON_TOP;
 
 	/**
 	 * The feature id for the '<em><b>Visible</b></em>' attribute.
@@ -3689,7 +3521,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WIZARD_DIALOG__VISIBLE = DIALOG__VISIBLE;
+	public static final int WIZARD__VISIBLE = UiPackageImpl.ELEMENT_CONTAINER__VISIBLE;
 
 	/**
 	 * The feature id for the '<em><b>Parent</b></em>' container reference.
@@ -3698,7 +3530,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WIZARD_DIALOG__PARENT = DIALOG__PARENT;
+	public static final int WIZARD__PARENT = UiPackageImpl.ELEMENT_CONTAINER__PARENT;
 
 	/**
 	 * The feature id for the '<em><b>Container Data</b></em>' attribute.
@@ -3707,7 +3539,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WIZARD_DIALOG__CONTAINER_DATA = DIALOG__CONTAINER_DATA;
+	public static final int WIZARD__CONTAINER_DATA = UiPackageImpl.ELEMENT_CONTAINER__CONTAINER_DATA;
 
 	/**
 	 * The feature id for the '<em><b>Cur Shared Ref</b></em>' reference.
@@ -3716,7 +3548,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WIZARD_DIALOG__CUR_SHARED_REF = DIALOG__CUR_SHARED_REF;
+	public static final int WIZARD__CUR_SHARED_REF = UiPackageImpl.ELEMENT_CONTAINER__CUR_SHARED_REF;
 
 	/**
 	 * The feature id for the '<em><b>Visible When</b></em>' containment reference.
@@ -3725,7 +3557,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WIZARD_DIALOG__VISIBLE_WHEN = DIALOG__VISIBLE_WHEN;
+	public static final int WIZARD__VISIBLE_WHEN = UiPackageImpl.ELEMENT_CONTAINER__VISIBLE_WHEN;
 
 	/**
 	 * The feature id for the '<em><b>Accessibility Phrase</b></em>' attribute.
@@ -3734,7 +3566,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WIZARD_DIALOG__ACCESSIBILITY_PHRASE = DIALOG__ACCESSIBILITY_PHRASE;
+	public static final int WIZARD__ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER__ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
@@ -3743,7 +3575,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WIZARD_DIALOG__LOCALIZED_ACCESSIBILITY_PHRASE = DIALOG__LOCALIZED_ACCESSIBILITY_PHRASE;
+	public static final int WIZARD__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER__LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
@@ -3752,7 +3584,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WIZARD_DIALOG__CHILDREN = DIALOG__CHILDREN;
+	public static final int WIZARD__CHILDREN = UiPackageImpl.ELEMENT_CONTAINER__CHILDREN;
 
 	/**
 	 * The feature id for the '<em><b>Selected Element</b></em>' reference.
@@ -3761,178 +3593,16 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WIZARD_DIALOG__SELECTED_ELEMENT = DIALOG__SELECTED_ELEMENT;
+	public static final int WIZARD__SELECTED_ELEMENT = UiPackageImpl.ELEMENT_CONTAINER__SELECTED_ELEMENT;
 
 	/**
-	 * The feature id for the '<em><b>Label</b></em>' attribute.
+	 * The number of structural features of the '<em>Wizard</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WIZARD_DIALOG__LABEL = DIALOG__LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Icon URI</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int WIZARD_DIALOG__ICON_URI = DIALOG__ICON_URI;
-
-	/**
-	 * The feature id for the '<em><b>Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int WIZARD_DIALOG__TOOLTIP = DIALOG__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int WIZARD_DIALOG__LOCALIZED_LABEL = DIALOG__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int WIZARD_DIALOG__LOCALIZED_TOOLTIP = DIALOG__LOCALIZED_TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Context</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int WIZARD_DIALOG__CONTEXT = DIALOG__CONTEXT;
-
-	/**
-	 * The feature id for the '<em><b>Variables</b></em>' attribute list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int WIZARD_DIALOG__VARIABLES = DIALOG__VARIABLES;
-
-	/**
-	 * The feature id for the '<em><b>Properties</b></em>' map.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int WIZARD_DIALOG__PROPERTIES = DIALOG__PROPERTIES;
-
-	/**
-	 * The feature id for the '<em><b>Handlers</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int WIZARD_DIALOG__HANDLERS = DIALOG__HANDLERS;
-
-	/**
-	 * The feature id for the '<em><b>Binding Contexts</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int WIZARD_DIALOG__BINDING_CONTEXTS = DIALOG__BINDING_CONTEXTS;
-
-	/**
-	 * The feature id for the '<em><b>Snippets</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int WIZARD_DIALOG__SNIPPETS = DIALOG__SNIPPETS;
-
-	/**
-	 * The feature id for the '<em><b>Main Menu</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int WIZARD_DIALOG__MAIN_MENU = DIALOG__MAIN_MENU;
-
-	/**
-	 * The feature id for the '<em><b>X</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int WIZARD_DIALOG__X = DIALOG__X;
-
-	/**
-	 * The feature id for the '<em><b>Y</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int WIZARD_DIALOG__Y = DIALOG__Y;
-
-	/**
-	 * The feature id for the '<em><b>Width</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int WIZARD_DIALOG__WIDTH = DIALOG__WIDTH;
-
-	/**
-	 * The feature id for the '<em><b>Height</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int WIZARD_DIALOG__HEIGHT = DIALOG__HEIGHT;
-
-	/**
-	 * The feature id for the '<em><b>Windows</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int WIZARD_DIALOG__WINDOWS = DIALOG__WINDOWS;
-
-	/**
-	 * The feature id for the '<em><b>Shared Elements</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int WIZARD_DIALOG__SHARED_ELEMENTS = DIALOG__SHARED_ELEMENTS;
-
-	/**
-	 * The number of structural features of the '<em>Wizard Dialog</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int WIZARD_DIALOG_FEATURE_COUNT = DIALOG_FEATURE_COUNT + 0;
+	public static final int WIZARD_FEATURE_COUNT = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 0;
 
 	/**
 	 * The operation id for the '<em>Update Localization</em>' operation.
@@ -3941,16 +3611,378 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WIZARD_DIALOG___UPDATE_LOCALIZATION = DIALOG___UPDATE_LOCALIZATION;
+	public static final int WIZARD___UPDATE_LOCALIZATION = UiPackageImpl.ELEMENT_CONTAINER___UPDATE_LOCALIZATION;
 
 	/**
-	 * The number of operations of the '<em>Wizard Dialog</em>' class.
+	 * The number of operations of the '<em>Wizard</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WIZARD_DIALOG_OPERATION_COUNT = DIALOG_OPERATION_COUNT + 0;
+	public static final int WIZARD_OPERATION_COUNT = UiPackageImpl.ELEMENT_CONTAINER_OPERATION_COUNT + 0;
+
+	/**
+	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.basic.impl.DialogElementImpl <em>Dialog Element</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.DialogElementImpl
+	 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl#getDialogElement()
+	 * @generated
+	 */
+	public static final int DIALOG_ELEMENT = 14;
+
+	/**
+	 * The feature id for the '<em><b>Element Id</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG_ELEMENT__ELEMENT_ID = UiPackageImpl.UI_ELEMENT__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Persisted State</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG_ELEMENT__PERSISTED_STATE = UiPackageImpl.UI_ELEMENT__PERSISTED_STATE;
+
+	/**
+	 * The feature id for the '<em><b>Tags</b></em>' attribute list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG_ELEMENT__TAGS = UiPackageImpl.UI_ELEMENT__TAGS;
+
+	/**
+	 * The feature id for the '<em><b>Contributor URI</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG_ELEMENT__CONTRIBUTOR_URI = UiPackageImpl.UI_ELEMENT__CONTRIBUTOR_URI;
+
+	/**
+	 * The feature id for the '<em><b>Transient Data</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG_ELEMENT__TRANSIENT_DATA = UiPackageImpl.UI_ELEMENT__TRANSIENT_DATA;
+
+	/**
+	 * The feature id for the '<em><b>Widget</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG_ELEMENT__WIDGET = UiPackageImpl.UI_ELEMENT__WIDGET;
+
+	/**
+	 * The feature id for the '<em><b>Renderer</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG_ELEMENT__RENDERER = UiPackageImpl.UI_ELEMENT__RENDERER;
+
+	/**
+	 * The feature id for the '<em><b>To Be Rendered</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG_ELEMENT__TO_BE_RENDERED = UiPackageImpl.UI_ELEMENT__TO_BE_RENDERED;
+
+	/**
+	 * The feature id for the '<em><b>On Top</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG_ELEMENT__ON_TOP = UiPackageImpl.UI_ELEMENT__ON_TOP;
+
+	/**
+	 * The feature id for the '<em><b>Visible</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG_ELEMENT__VISIBLE = UiPackageImpl.UI_ELEMENT__VISIBLE;
+
+	/**
+	 * The feature id for the '<em><b>Parent</b></em>' container reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG_ELEMENT__PARENT = UiPackageImpl.UI_ELEMENT__PARENT;
+
+	/**
+	 * The feature id for the '<em><b>Container Data</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG_ELEMENT__CONTAINER_DATA = UiPackageImpl.UI_ELEMENT__CONTAINER_DATA;
+
+	/**
+	 * The feature id for the '<em><b>Cur Shared Ref</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG_ELEMENT__CUR_SHARED_REF = UiPackageImpl.UI_ELEMENT__CUR_SHARED_REF;
+
+	/**
+	 * The feature id for the '<em><b>Visible When</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG_ELEMENT__VISIBLE_WHEN = UiPackageImpl.UI_ELEMENT__VISIBLE_WHEN;
+
+	/**
+	 * The feature id for the '<em><b>Accessibility Phrase</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG_ELEMENT__ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The number of structural features of the '<em>Dialog Element</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG_ELEMENT_FEATURE_COUNT = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 0;
+
+	/**
+	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG_ELEMENT___UPDATE_LOCALIZATION = UiPackageImpl.UI_ELEMENT___UPDATE_LOCALIZATION;
+
+	/**
+	 * The number of operations of the '<em>Dialog Element</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG_ELEMENT_OPERATION_COUNT = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 0;
+
+	/**
+	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.basic.impl.WizardElementImpl <em>Wizard Element</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.WizardElementImpl
+	 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl#getWizardElement()
+	 * @generated
+	 */
+	public static final int WIZARD_ELEMENT = 15;
+
+	/**
+	 * The feature id for the '<em><b>Element Id</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_ELEMENT__ELEMENT_ID = UiPackageImpl.UI_ELEMENT__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Persisted State</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_ELEMENT__PERSISTED_STATE = UiPackageImpl.UI_ELEMENT__PERSISTED_STATE;
+
+	/**
+	 * The feature id for the '<em><b>Tags</b></em>' attribute list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_ELEMENT__TAGS = UiPackageImpl.UI_ELEMENT__TAGS;
+
+	/**
+	 * The feature id for the '<em><b>Contributor URI</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_ELEMENT__CONTRIBUTOR_URI = UiPackageImpl.UI_ELEMENT__CONTRIBUTOR_URI;
+
+	/**
+	 * The feature id for the '<em><b>Transient Data</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_ELEMENT__TRANSIENT_DATA = UiPackageImpl.UI_ELEMENT__TRANSIENT_DATA;
+
+	/**
+	 * The feature id for the '<em><b>Widget</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_ELEMENT__WIDGET = UiPackageImpl.UI_ELEMENT__WIDGET;
+
+	/**
+	 * The feature id for the '<em><b>Renderer</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_ELEMENT__RENDERER = UiPackageImpl.UI_ELEMENT__RENDERER;
+
+	/**
+	 * The feature id for the '<em><b>To Be Rendered</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_ELEMENT__TO_BE_RENDERED = UiPackageImpl.UI_ELEMENT__TO_BE_RENDERED;
+
+	/**
+	 * The feature id for the '<em><b>On Top</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_ELEMENT__ON_TOP = UiPackageImpl.UI_ELEMENT__ON_TOP;
+
+	/**
+	 * The feature id for the '<em><b>Visible</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_ELEMENT__VISIBLE = UiPackageImpl.UI_ELEMENT__VISIBLE;
+
+	/**
+	 * The feature id for the '<em><b>Parent</b></em>' container reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_ELEMENT__PARENT = UiPackageImpl.UI_ELEMENT__PARENT;
+
+	/**
+	 * The feature id for the '<em><b>Container Data</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_ELEMENT__CONTAINER_DATA = UiPackageImpl.UI_ELEMENT__CONTAINER_DATA;
+
+	/**
+	 * The feature id for the '<em><b>Cur Shared Ref</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_ELEMENT__CUR_SHARED_REF = UiPackageImpl.UI_ELEMENT__CUR_SHARED_REF;
+
+	/**
+	 * The feature id for the '<em><b>Visible When</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_ELEMENT__VISIBLE_WHEN = UiPackageImpl.UI_ELEMENT__VISIBLE_WHEN;
+
+	/**
+	 * The feature id for the '<em><b>Accessibility Phrase</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_ELEMENT__ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The number of structural features of the '<em>Wizard Element</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_ELEMENT_FEATURE_COUNT = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 0;
+
+	/**
+	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_ELEMENT___UPDATE_LOCALIZATION = UiPackageImpl.UI_ELEMENT___UPDATE_LOCALIZATION;
+
+	/**
+	 * The number of operations of the '<em>Wizard Element</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_ELEMENT_OPERATION_COUNT = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 0;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -4048,7 +4080,21 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass wizardDialogEClass = null;
+	private EClass wizardEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass dialogElementEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass wizardElementEClass = null;
 
 	/**
 	 * Creates an instance of the model <b>Package</b>, registered with
@@ -4208,6 +4254,20 @@ public class BasicPackageImpl extends EPackageImpl {
 	 */
 	public EAttribute getPart_LocalizedDescription() {
 		return (EAttribute)partEClass.getEStructuralFeatures().get(4);
+	}
+
+
+	/**
+	 * Returns the meta object for the reference list '{@link org.eclipse.e4.ui.model.application.ui.basic.MPart#getDialogs <em>Dialogs</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Dialogs</em>'.
+	 * @see org.eclipse.e4.ui.model.application.ui.basic.MPart#getDialogs()
+	 * @see #getPart()
+	 * @generated
+	 */
+	public EReference getPart_Dialogs() {
+		return (EReference)partEClass.getEStructuralFeatures().get(5);
 	}
 
 
@@ -4478,15 +4538,97 @@ public class BasicPackageImpl extends EPackageImpl {
 
 
 	/**
-	 * Returns the meta object for class '{@link org.eclipse.e4.ui.model.application.ui.basic.MWizardDialog <em>Wizard Dialog</em>}'.
+	 * Returns the meta object for the attribute '{@link org.eclipse.e4.ui.model.application.ui.basic.MDialog#getX <em>X</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Wizard Dialog</em>'.
-	 * @see org.eclipse.e4.ui.model.application.ui.basic.MWizardDialog
+	 * @return the meta object for the attribute '<em>X</em>'.
+	 * @see org.eclipse.e4.ui.model.application.ui.basic.MDialog#getX()
+	 * @see #getDialog()
 	 * @generated
 	 */
-	public EClass getWizardDialog() {
-		return wizardDialogEClass;
+	public EAttribute getDialog_X() {
+		return (EAttribute)dialogEClass.getEStructuralFeatures().get(0);
+	}
+
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.e4.ui.model.application.ui.basic.MDialog#getY <em>Y</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Y</em>'.
+	 * @see org.eclipse.e4.ui.model.application.ui.basic.MDialog#getY()
+	 * @see #getDialog()
+	 * @generated
+	 */
+	public EAttribute getDialog_Y() {
+		return (EAttribute)dialogEClass.getEStructuralFeatures().get(1);
+	}
+
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.e4.ui.model.application.ui.basic.MDialog#getWidth <em>Width</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Width</em>'.
+	 * @see org.eclipse.e4.ui.model.application.ui.basic.MDialog#getWidth()
+	 * @see #getDialog()
+	 * @generated
+	 */
+	public EAttribute getDialog_Width() {
+		return (EAttribute)dialogEClass.getEStructuralFeatures().get(2);
+	}
+
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.e4.ui.model.application.ui.basic.MDialog#getHeight <em>Height</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Height</em>'.
+	 * @see org.eclipse.e4.ui.model.application.ui.basic.MDialog#getHeight()
+	 * @see #getDialog()
+	 * @generated
+	 */
+	public EAttribute getDialog_Height() {
+		return (EAttribute)dialogEClass.getEStructuralFeatures().get(3);
+	}
+
+
+	/**
+	 * Returns the meta object for class '{@link org.eclipse.e4.ui.model.application.ui.basic.MWizard <em>Wizard</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Wizard</em>'.
+	 * @see org.eclipse.e4.ui.model.application.ui.basic.MWizard
+	 * @generated
+	 */
+	public EClass getWizard() {
+		return wizardEClass;
+	}
+
+
+	/**
+	 * Returns the meta object for class '{@link org.eclipse.e4.ui.model.application.ui.basic.MDialogElement <em>Dialog Element</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Dialog Element</em>'.
+	 * @see org.eclipse.e4.ui.model.application.ui.basic.MDialogElement
+	 * @generated
+	 */
+	public EClass getDialogElement() {
+		return dialogElementEClass;
+	}
+
+
+	/**
+	 * Returns the meta object for class '{@link org.eclipse.e4.ui.model.application.ui.basic.MWizardElement <em>Wizard Element</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Wizard Element</em>'.
+	 * @see org.eclipse.e4.ui.model.application.ui.basic.MWizardElement
+	 * @generated
+	 */
+	public EClass getWizardElement() {
+		return wizardElementEClass;
 	}
 
 
@@ -4526,6 +4668,7 @@ public class BasicPackageImpl extends EPackageImpl {
 		createEAttribute(partEClass, PART__CLOSEABLE);
 		createEAttribute(partEClass, PART__DESCRIPTION);
 		createEAttribute(partEClass, PART__LOCALIZED_DESCRIPTION);
+		createEReference(partEClass, PART__DIALOGS);
 
 		compositePartEClass = createEClass(COMPOSITE_PART);
 
@@ -4559,8 +4702,16 @@ public class BasicPackageImpl extends EPackageImpl {
 		stackElementEClass = createEClass(STACK_ELEMENT);
 
 		dialogEClass = createEClass(DIALOG);
+		createEAttribute(dialogEClass, DIALOG__X);
+		createEAttribute(dialogEClass, DIALOG__Y);
+		createEAttribute(dialogEClass, DIALOG__WIDTH);
+		createEAttribute(dialogEClass, DIALOG__HEIGHT);
 
-		wizardDialogEClass = createEClass(WIZARD_DIALOG);
+		wizardEClass = createEClass(WIZARD);
+
+		dialogElementEClass = createEClass(DIALOG_ELEMENT);
+
+		wizardElementEClass = createEClass(WIZARD_ELEMENT);
 	}
 
 	/**
@@ -4593,8 +4744,11 @@ public class BasicPackageImpl extends EPackageImpl {
 		MenuPackageImpl theMenuPackage = (MenuPackageImpl)EPackage.Registry.INSTANCE.getEPackage(MenuPackageImpl.eNS_URI);
 
 		// Create type parameters
+		ETypeParameter dialogEClass_T = addETypeParameter(dialogEClass, "T"); //$NON-NLS-1$
 
 		// Set bounds for type parameters
+		EGenericType g1 = createEGenericType(theUiPackage.getUIElement());
+		dialogEClass_T.getEBounds().add(g1);
 
 		// Add supertypes to classes
 		partEClass.getESuperTypes().add(theUiPackage.getUIElement());
@@ -4607,7 +4761,9 @@ public class BasicPackageImpl extends EPackageImpl {
 		partEClass.getESuperTypes().add(theUiPackage.getDirtyable());
 		partEClass.getESuperTypes().add(theCommandsPackage.getBindings());
 		partEClass.getESuperTypes().add(this.getWindowElement());
-		EGenericType g1 = createEGenericType(this.getPart());
+		partEClass.getESuperTypes().add(this.getDialogElement());
+		partEClass.getESuperTypes().add(this.getWizardElement());
+		g1 = createEGenericType(this.getPart());
 		compositePartEClass.getEGenericSuperTypes().add(g1);
 		g1 = createEGenericType(theUiPackage.getGenericTile());
 		EGenericType g2 = createEGenericType(this.getPartSashContainerElement());
@@ -4623,6 +4779,8 @@ public class BasicPackageImpl extends EPackageImpl {
 		partStackEClass.getEGenericSuperTypes().add(g1);
 		g1 = createEGenericType(this.getWindowElement());
 		partStackEClass.getEGenericSuperTypes().add(g1);
+		g1 = createEGenericType(this.getDialogElement());
+		partStackEClass.getEGenericSuperTypes().add(g1);
 		g1 = createEGenericType(theUiPackage.getGenericTile());
 		g2 = createEGenericType(this.getPartSashContainerElement());
 		g1.getETypeArguments().add(g2);
@@ -4630,6 +4788,8 @@ public class BasicPackageImpl extends EPackageImpl {
 		g1 = createEGenericType(this.getPartSashContainerElement());
 		partSashContainerEClass.getEGenericSuperTypes().add(g1);
 		g1 = createEGenericType(this.getWindowElement());
+		partSashContainerEClass.getEGenericSuperTypes().add(g1);
+		g1 = createEGenericType(this.getDialogElement());
 		partSashContainerEClass.getEGenericSuperTypes().add(g1);
 		g1 = createEGenericType(theUiPackage.getElementContainer());
 		g2 = createEGenericType(this.getWindowElement());
@@ -4656,8 +4816,18 @@ public class BasicPackageImpl extends EPackageImpl {
 		g1 = createEGenericType(theUiPackage.getUIElement());
 		trimBarEClass.getEGenericSuperTypes().add(g1);
 		stackElementEClass.getESuperTypes().add(theUiPackage.getUIElement());
-		dialogEClass.getESuperTypes().add(this.getWindow());
-		wizardDialogEClass.getESuperTypes().add(this.getDialog());
+		dialogEClass.getESuperTypes().add(theUiPackage.getUILabel());
+		dialogEClass.getESuperTypes().add(theUiPackage.getContext());
+		dialogEClass.getESuperTypes().add(theCommandsPackage.getHandlerContainer());
+		dialogEClass.getESuperTypes().add(theCommandsPackage.getBindings());
+		g1 = createEGenericType(theUiPackage.getElementContainer());
+		g2 = createEGenericType(this.getWindowElement());
+		g1.getETypeArguments().add(g2);
+		wizardEClass.getEGenericSuperTypes().add(g1);
+		g1 = createEGenericType(this.getDialogElement());
+		wizardEClass.getEGenericSuperTypes().add(g1);
+		dialogElementEClass.getESuperTypes().add(theUiPackage.getUIElement());
+		wizardElementEClass.getESuperTypes().add(theUiPackage.getUIElement());
 
 		// Initialize classes, features, and operations; add parameters
 		initEClass(partEClass, MPart.class, "Part", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
@@ -4666,6 +4836,7 @@ public class BasicPackageImpl extends EPackageImpl {
 		initEAttribute(getPart_Closeable(), ecorePackage.getEBoolean(), "closeable", "false", 0, 1, MPart.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$ //$NON-NLS-2$
 		initEAttribute(getPart_Description(), ecorePackage.getEString(), "description", null, 0, 1, MPart.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 		initEAttribute(getPart_LocalizedDescription(), ecorePackage.getEString(), "localizedDescription", null, 0, 1, MPart.class, IS_TRANSIENT, IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
+		initEReference(getPart_Dialogs(), this.getDialog(), null, "dialogs", null, 0, -1, MPart.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 
 		initEClass(compositePartEClass, MCompositePart.class, "CompositePart", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 
@@ -4699,8 +4870,16 @@ public class BasicPackageImpl extends EPackageImpl {
 		initEClass(stackElementEClass, MStackElement.class, "StackElement", IS_ABSTRACT, IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 
 		initEClass(dialogEClass, MDialog.class, "Dialog", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
+		initEAttribute(getDialog_X(), ecorePackage.getEInt(), "x", "-2147483648", 0, 1, MDialog.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$ //$NON-NLS-2$
+		initEAttribute(getDialog_Y(), ecorePackage.getEInt(), "y", "-2147483648", 0, 1, MDialog.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$ //$NON-NLS-2$
+		initEAttribute(getDialog_Width(), ecorePackage.getEInt(), "width", "-1", 0, 1, MDialog.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$ //$NON-NLS-2$
+		initEAttribute(getDialog_Height(), ecorePackage.getEInt(), "height", "-1", 0, 1, MDialog.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$ //$NON-NLS-2$
 
-		initEClass(wizardDialogEClass, MWizardDialog.class, "WizardDialog", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
+		initEClass(wizardEClass, MWizard.class, "Wizard", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
+
+		initEClass(dialogElementEClass, MDialogElement.class, "DialogElement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
+
+		initEClass(wizardElementEClass, MWizardElement.class, "WizardElement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 	}
 
 	/**
@@ -4765,6 +4944,14 @@ public class BasicPackageImpl extends EPackageImpl {
 		 * @generated
 		 */
 		public static final EAttribute PART__LOCALIZED_DESCRIPTION = eINSTANCE.getPart_LocalizedDescription();
+
+		/**
+		 * The meta object literal for the '<em><b>Dialogs</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		public static final EReference PART__DIALOGS = eINSTANCE.getPart_Dialogs();
 
 		/**
 		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.basic.impl.CompositePartImpl <em>Composite Part</em>}' class.
@@ -4959,14 +5146,66 @@ public class BasicPackageImpl extends EPackageImpl {
 		public static final EClass DIALOG = eINSTANCE.getDialog();
 
 		/**
-		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.basic.impl.WizardDialogImpl <em>Wizard Dialog</em>}' class.
+		 * The meta object literal for the '<em><b>X</b></em>' attribute feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.WizardDialogImpl
-		 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl#getWizardDialog()
 		 * @generated
 		 */
-		public static final EClass WIZARD_DIALOG = eINSTANCE.getWizardDialog();
+		public static final EAttribute DIALOG__X = eINSTANCE.getDialog_X();
+
+		/**
+		 * The meta object literal for the '<em><b>Y</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		public static final EAttribute DIALOG__Y = eINSTANCE.getDialog_Y();
+
+		/**
+		 * The meta object literal for the '<em><b>Width</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		public static final EAttribute DIALOG__WIDTH = eINSTANCE.getDialog_Width();
+
+		/**
+		 * The meta object literal for the '<em><b>Height</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		public static final EAttribute DIALOG__HEIGHT = eINSTANCE.getDialog_Height();
+
+		/**
+		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.basic.impl.WizardImpl <em>Wizard</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.WizardImpl
+		 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl#getWizard()
+		 * @generated
+		 */
+		public static final EClass WIZARD = eINSTANCE.getWizard();
+
+		/**
+		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.basic.impl.DialogElementImpl <em>Dialog Element</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.DialogElementImpl
+		 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl#getDialogElement()
+		 * @generated
+		 */
+		public static final EClass DIALOG_ELEMENT = eINSTANCE.getDialogElement();
+
+		/**
+		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.basic.impl.WizardElementImpl <em>Wizard Element</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.WizardElementImpl
+		 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl#getWizardElement()
+		 * @generated
+		 */
+		public static final EClass WIZARD_ELEMENT = eINSTANCE.getWizardElement();
 
 	}
 
