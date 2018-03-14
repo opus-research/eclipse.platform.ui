@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,7 +39,7 @@ public class ControlSegment extends ObjectSegment implements IFocusSelectable {
 		this.height = height;
 	}
 
-	public Control getControl(Hashtable<String, Object> resourceTable) {
+	public Control getControl(Hashtable resourceTable) {
 		Object obj = resourceTable.get(getObjectId());
 		if (obj instanceof Control) {
 			Control c = (Control)obj;
@@ -49,8 +49,7 @@ public class ControlSegment extends ObjectSegment implements IFocusSelectable {
 		return null;
 	}
 
-	@Override
-	protected Point getObjectSize(Hashtable<String, Object> resourceTable, int wHint) {
+	protected Point getObjectSize(Hashtable resourceTable, int wHint) {
 		Control control = getControl(resourceTable);
 		if (control==null)
 			return new Point(0,0);
@@ -65,8 +64,7 @@ public class ControlSegment extends ObjectSegment implements IFocusSelectable {
 		return size;
 	}
 
-	@Override
-	public void layout(GC gc, int width, Locator loc, Hashtable<String, Object> resourceTable,
+	public void layout(GC gc, int width, Locator loc, Hashtable resourceTable,
 			boolean selected) {
 		super.layout(gc, width, loc, resourceTable, selected);
 		Control control = getControl(resourceTable);
@@ -74,8 +72,7 @@ public class ControlSegment extends ObjectSegment implements IFocusSelectable {
 			control.setBounds(getBounds());
 	}
 
-	@Override
-	public boolean setFocus(Hashtable<String, Object> resourceTable, boolean next) {
+	public boolean setFocus(Hashtable resourceTable, boolean next) {
 		Control c = getControl(resourceTable);
 		if (c!=null) {
 			return setFocus(c, next);
@@ -88,8 +85,8 @@ public class ControlSegment extends ObjectSegment implements IFocusSelectable {
 			Composite comp = (Composite)c;
 			Control [] tabList = comp.getTabList();
 			if (direction) {
-				for (Control element : tabList) {
-					if (setFocus(element, direction))
+				for (int i=0; i<tabList.length; i++) {
+					if (setFocus(tabList[i], direction))
 						return true;
 				}
 			}
@@ -105,8 +102,7 @@ public class ControlSegment extends ObjectSegment implements IFocusSelectable {
 		return c.setFocus();
 	}
 
-	@Override
-	public boolean isFocusSelectable(Hashtable<String, Object> resourceTable) {
+	public boolean isFocusSelectable(Hashtable resourceTable) {
 		Control c = getControl(resourceTable);
 		if (c!=null)
 			return true;

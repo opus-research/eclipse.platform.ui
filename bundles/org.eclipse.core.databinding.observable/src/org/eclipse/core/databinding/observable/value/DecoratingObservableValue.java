@@ -9,13 +9,11 @@
  *     Matthew Hall - initial API and implementation (bug 237718)
  *     Matthew Hall - but 246626
  *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
- *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  ******************************************************************************/
 
 package org.eclipse.core.databinding.observable.value;
 
 import org.eclipse.core.databinding.observable.DecoratingObservable;
-import org.eclipse.core.databinding.observable.Diffs;
 
 /**
  * An observable value which decorates another observable value.
@@ -55,7 +53,7 @@ public class DecoratingObservableValue<T> extends DecoratingObservable
 		removeListener(ValueChangeEvent.TYPE, listener);
 	}
 
-	protected void fireValueChange(ValueDiff<T> diff) {
+	protected void fireValueChange(ValueDiff<? extends T> diff) {
 		// fire general change event first
 		super.fireChange();
 		fireEvent(new ValueChangeEvent<>(this, diff));
@@ -100,7 +98,7 @@ public class DecoratingObservableValue<T> extends DecoratingObservable
 	 *            the change event received from the decorated observable
 	 */
 	protected void handleValueChange(final ValueChangeEvent<? extends T> event) {
-		fireValueChange(Diffs.unmodifiableDiff(event.diff));
+		fireValueChange(event.diff);
 	}
 
 	@Override

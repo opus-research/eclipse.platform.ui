@@ -39,7 +39,6 @@ public final class ContentDescriberForTestsOnly implements ITextContentDescriber
 	private static final int SIMULATED_CALCULATION_TIME = 75;
 	private static final QualifiedName[] SUPPORTED_OPTIONS = {IContentDescription.CHARSET, IContentDescription.BYTE_ORDER_MARK};
 
-	@Override
 	public int describe(InputStream contents, IContentDescription description) throws IOException {
 		int result = IContentDescriber.INDETERMINATE;
 
@@ -58,7 +57,6 @@ public final class ContentDescriberForTestsOnly implements ITextContentDescriber
 		return result;
 	}
 
-	@Override
 	public int describe(Reader contents, IContentDescription description) throws IOException {
 		int result = IContentDescriber.INDETERMINATE;
 
@@ -77,7 +75,6 @@ public final class ContentDescriberForTestsOnly implements ITextContentDescriber
 		return result;
 	}
 
-	@Override
 	public QualifiedName[] getSupportedOptions() {
 
 		return SUPPORTED_OPTIONS;

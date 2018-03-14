@@ -21,8 +21,7 @@ public class Folder
         super(name);
     }
 
-    @Override
-	public Image getImage() {
+    public Image getImage() {
         return PlatformUI.getWorkbench().getSharedImages().getImage(
             ISharedImages.IMG_OBJ_FOLDER);
     }

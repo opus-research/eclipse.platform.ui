@@ -238,7 +238,7 @@ class Markers {
 	 */
 	private Map<MarkerGroupingEntry, Integer> groupMarkerEntries(MarkerEntry[] entries, MarkerGroup group,
 			int k, IProgressMonitor monitor) {
-		TreeMap<MarkerGroupingEntry, List<MarkerEntry>> map = new TreeMap<>(
+		TreeMap<MarkerGroupingEntry, List<MarkerEntry>> map = new TreeMap<MarkerGroupingEntry, List<MarkerEntry>>(
 				group.getEntriesComparator());
 		for (int i = 0; i <= k; i++) {
 			IMarker marker = entries[i].getMarker();
@@ -260,7 +260,7 @@ class Markers {
 				entries[i].checkIfMarkerStale();
 			}
 		}
-		TreeMap<MarkerGroupingEntry, Integer> result = new TreeMap<>(
+		TreeMap<MarkerGroupingEntry, Integer> result = new TreeMap<MarkerGroupingEntry, Integer>(
 				group.getEntriesComparator());
 		Iterator<MarkerGroupingEntry> keys = map.keySet().iterator();
 		int i = 0;

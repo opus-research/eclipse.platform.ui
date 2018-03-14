@@ -9,7 +9,6 @@
  *     Matthew Hall - initial API and implementation (bug 237718)
  *     Matthew Hall - but 246626, 226289
  *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
- *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  ******************************************************************************/
 
 package org.eclipse.core.databinding.observable.map;
@@ -20,7 +19,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.databinding.observable.DecoratingObservable;
-import org.eclipse.core.databinding.observable.Diffs;
 
 /**
  * An observable map which decorates another observable map.
@@ -72,10 +70,10 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 		return decorated.getValueType();
 	}
 
-	protected void fireMapChange(MapDiff<K, V> diff) {
+	protected void fireMapChange(MapDiff<? extends K, ? extends V> diff) {
 		// fire general change event first
 		super.fireChange();
-		fireEvent(new MapChangeEvent<>(this, diff));
+		fireEvent(new MapChangeEvent<K, V>(this, diff));
 	}
 
 	@Override
@@ -117,7 +115,7 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 	 *            the change event received from the decorated observable
 	 */
 	protected void handleMapChange(final MapChangeEvent<? extends K, ? extends V> event) {
-		fireMapChange(Diffs.unmodifiableDiff(event.diff));
+		fireMapChange(event.diff);
 	}
 
 	@Override

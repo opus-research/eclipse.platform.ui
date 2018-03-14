@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -123,7 +123,7 @@ public final class ExternalActionManager {
 		 * will be removed from this set and the listener removed. This value
 		 * may be empty, but never <code>null</code>.
 		 */
-		private final Set<String> loggedCommandIds = new HashSet<>();
+		private final Set<String> loggedCommandIds = new HashSet<String>();
 
 		/**
 		 * The list of listeners that have registered for property change
@@ -131,7 +131,7 @@ public final class ExternalActionManager {
 		 * to listeners (<code>IPropertyChangeListener</code> or
 		 * <code>ListenerList</code> of <code>IPropertyChangeListener</code>).
 		 */
-		private final Map<String, Object> registeredListeners = new HashMap<>();
+		private final Map<String, Object> registeredListeners = new HashMap<String, Object>();
 
 		/**
 		 * Constructs a new instance of <code>CommandCallback</code> with the
