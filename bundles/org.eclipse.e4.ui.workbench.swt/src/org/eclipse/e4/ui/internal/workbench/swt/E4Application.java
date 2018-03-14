@@ -126,7 +126,12 @@ public class E4Application implements IApplication {
 		return display;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.
+	 * IApplicationContext)
+	 */
 	public Object start(IApplicationContext applicationContext)
 			throws Exception {
 		// set the display name before the Display is
@@ -301,12 +306,12 @@ public class E4Application implements IApplication {
 		}
 		appContext.set(E4Application.THEME_ID, themeId);
 
-		// validate static CSS URI
-		if (cssURI != null && !cssURI.startsWith("platform:/plugin/")) {
+		// Temporary to support old property as well
+		if (cssURI != null && !cssURI.startsWith("platform:")) {
 			System.err
-					.println("Warning. "
-							+ "Use the \"platform:/plugin/Bundle-SymbolicName/path/filename.extension\" "
-							+ "URI for the \"" + IWorkbench.CSS_URI_ARG + "\" parameter."); //$NON-NLS-1$
+					.println("Warning "
+							+ cssURI
+							+ " changed its meaning it is used now to run without theme support");
 			appContext.set(E4Application.THEME_ID, cssURI);
 		}
 

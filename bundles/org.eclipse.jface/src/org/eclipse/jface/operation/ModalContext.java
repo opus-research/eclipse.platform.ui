@@ -147,7 +147,6 @@ public class ModalContext {
 				// Make sure that all events in the asynchronous event queue
 				// are dispatched.
 				display.syncExec(new Runnable() {
-					@Override
 					public void run() {
 						// do nothing
 					}

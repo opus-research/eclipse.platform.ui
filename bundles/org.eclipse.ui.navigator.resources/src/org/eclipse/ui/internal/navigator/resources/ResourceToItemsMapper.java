@@ -18,6 +18,7 @@ import java.util.Stack;
 import org.eclipse.swt.widgets.Item;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.navigator.ICommonViewerMapper;
+
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 
@@ -63,7 +64,6 @@ public class ResourceToItemsMapper implements ICommonViewerMapper {
 					_resourceToItem.put(resource, list);
 				}
 			} else { // List
-				@SuppressWarnings("unchecked")
 				List<Item> list = (List<Item>) existingMapping;
 				if (!list.contains(item)) {
 					list.add(item);
@@ -81,7 +81,6 @@ public class ResourceToItemsMapper implements ICommonViewerMapper {
 			} else if (existingMapping instanceof Item) {
 				_resourceToItem.remove(resource);
 			} else { // List
-				@SuppressWarnings("unchecked")
 				List<Item> list = (List<Item>) existingMapping;
 				list.remove(item);
 				if (list.isEmpty()) {
@@ -131,7 +130,6 @@ public class ResourceToItemsMapper implements ICommonViewerMapper {
 		} else if (obj instanceof Item) {
 			updateItem((Item) obj);
 		} else { // List of Items
-			@SuppressWarnings("unchecked")
 			List<Item> list = (List<Item>) obj;
 			for (Item item : list) {
 				updateItem(item);
