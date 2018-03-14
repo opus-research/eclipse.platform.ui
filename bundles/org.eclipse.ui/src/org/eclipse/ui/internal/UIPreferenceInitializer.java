@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,9 +19,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.NodeChangeEvent;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.NodeChangeEvent;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.IWorkbenchPreferenceConstants;
@@ -40,11 +40,12 @@ import org.osgi.service.prefs.BackingStoreException;
  */
 public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 
-	@Override
 	public void initializeDefaultPreferences() {
 
+
 		IScopeContext context = new DefaultScope();
-		IEclipsePreferences node = context.getNode(UIPlugin.getDefault().getBundle().getSymbolicName());
+		IEclipsePreferences node = context.getNode(UIPlugin.getDefault()
+				.getBundle().getSymbolicName());
 		node.put(IWorkbenchPreferenceConstants.OPEN_NEW_PERSPECTIVE,
 				IWorkbenchPreferenceConstants.OPEN_PERSPECTIVE_REPLACE);
 
@@ -61,15 +62,26 @@ public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 		// setting, it remains as a preference to allow product overrides of the
 		// initial state of linking in the Navigator. By default, linking is
 		// off.
-		node.putBoolean(IWorkbenchPreferenceConstants.LINK_NAVIGATOR_TO_EDITOR, false);
+		node.putBoolean(IWorkbenchPreferenceConstants.LINK_NAVIGATOR_TO_EDITOR,
+				false);
 
-		node.putBoolean(IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS, true);
+		node
+				.putBoolean(
+						IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS,
+						true);
 		node.putBoolean(IWorkbenchPreferenceConstants.ENABLE_ANIMATIONS, false);
 		node.putBoolean(IWorkbenchPreferenceConstants.USE_COLORED_LABELS, true);
-		node.put(IWorkbenchPreferenceConstants.DOCK_PERSPECTIVE_BAR, IWorkbenchPreferenceConstants.TOP_LEFT);
-		node.putBoolean(IWorkbenchPreferenceConstants.SHOW_TEXT_ON_PERSPECTIVE_BAR, true);
-		node.putBoolean(IWorkbenchPreferenceConstants.SHOW_OTHER_IN_PERSPECTIVE_MENU, true);
-		node.putBoolean(IWorkbenchPreferenceConstants.SHOW_OPEN_ON_PERSPECTIVE_BAR, true);
+		node.put(IWorkbenchPreferenceConstants.DOCK_PERSPECTIVE_BAR,
+				IWorkbenchPreferenceConstants.TOP_LEFT);
+		node.putBoolean(
+				IWorkbenchPreferenceConstants.SHOW_TEXT_ON_PERSPECTIVE_BAR,
+				true);
+		node.putBoolean(
+				IWorkbenchPreferenceConstants.SHOW_OTHER_IN_PERSPECTIVE_MENU,
+				true);
+		node.putBoolean(
+				IWorkbenchPreferenceConstants.SHOW_OPEN_ON_PERSPECTIVE_BAR,
+				true);
 
 		// the fast view bar should be on the bottom of a fresh workspace
 		node.put(IWorkbenchPreferenceConstants.INITIAL_FAST_VIEW_BAR_LOCATION,
@@ -87,41 +99,57 @@ public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 
 		// The default minimum character width for editor tabs is undefined
 		// (i.e., -1)
-		node.putInt(IWorkbenchPreferenceConstants.EDITOR_MINIMUM_CHARACTERS, -1);
+		node
+				.putInt(
+						IWorkbenchPreferenceConstants.EDITOR_MINIMUM_CHARACTERS,
+						-1);
 
 		// The default minimum character width for view tabs is 1
 		node.putInt(IWorkbenchPreferenceConstants.VIEW_MINIMUM_CHARACTERS, 1);
 
 		// Default for closing editors on exit.
-		node.putBoolean(IWorkbenchPreferenceConstants.CLOSE_EDITORS_ON_EXIT, false);
+		node.putBoolean(IWorkbenchPreferenceConstants.CLOSE_EDITORS_ON_EXIT,
+				false);
 
 		// Default for using window working sets
-		node.putBoolean(IWorkbenchPreferenceConstants.USE_WINDOW_WORKING_SET_BY_DEFAULT, false);
+		node
+				.putBoolean(
+						IWorkbenchPreferenceConstants.USE_WINDOW_WORKING_SET_BY_DEFAULT,
+						false);
 
 		// Default for showing filter text widget that determines what is shown
 		// in a FilteredTree
-		node.putBoolean(IWorkbenchPreferenceConstants.SHOW_FILTERED_TEXTS, true);
+		node
+				.putBoolean(IWorkbenchPreferenceConstants.SHOW_FILTERED_TEXTS,
+						true);
 
 		// Default for enabling detached views
-		node.putBoolean(IWorkbenchPreferenceConstants.ENABLE_DETACHED_VIEWS, true);
+		node.putBoolean(IWorkbenchPreferenceConstants.ENABLE_DETACHED_VIEWS,
+				true);
 
 		// Default for prompting for save when saveables are still held on to by
 		// other parts
-		node.putBoolean(IWorkbenchPreferenceConstants.PROMPT_WHEN_SAVEABLE_STILL_OPEN, true);
+		node.putBoolean(
+				IWorkbenchPreferenceConstants.PROMPT_WHEN_SAVEABLE_STILL_OPEN,
+				true);
 
 		// Default the min/max behaviour to the old (3.2) style
 		node.putBoolean(IWorkbenchPreferenceConstants.ENABLE_NEW_MIN_MAX, true);
 
 		// By default the Fast View Bar allows to select a new fast view from
 		// the view list
-		node.putBoolean(IWorkbenchPreferenceConstants.DISABLE_NEW_FAST_VIEW, false);
+		node.putBoolean(IWorkbenchPreferenceConstants.DISABLE_NEW_FAST_VIEW,
+				false);
 
 		// Default the sticky view close behaviour to the new style
-		node.putBoolean(IWorkbenchPreferenceConstants.ENABLE_32_STICKY_CLOSE_BEHAVIOR, false);
+		node.putBoolean(
+				IWorkbenchPreferenceConstants.ENABLE_32_STICKY_CLOSE_BEHAVIOR,
+				false);
 
 		node.putInt(IWorkbenchPreferenceConstants.VIEW_TAB_POSITION, SWT.TOP);
 		node.putInt(IWorkbenchPreferenceConstants.EDITOR_TAB_POSITION, SWT.TOP);
-		node.putBoolean(IWorkbenchPreferenceConstants.SHOW_MULTIPLE_EDITOR_TABS, true);
+		node.putBoolean(
+				IWorkbenchPreferenceConstants.SHOW_MULTIPLE_EDITOR_TABS, true);
 
 		node.putInt(IWorkbenchPreferenceConstants.RECENTLY_USED_WORKINGSETS_SIZE, 5);
 
@@ -131,7 +159,8 @@ public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 				.getPreferencesService().getRootNode()
 				.node(InstanceScope.SCOPE);
 
-		final String uiName = UIPlugin.getDefault().getBundle().getSymbolicName();
+		final String uiName = UIPlugin.getDefault().getBundle()
+				.getSymbolicName();
 		try {
 			if (rootNode.nodeExists(uiName)) {
 				((IEclipsePreferences) rootNode.node(uiName))
@@ -145,22 +174,42 @@ public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 			UIPlugin.getDefault().getLog().log(status);
 		}
 
-		rootNode.addNodeChangeListener(new IEclipsePreferences.INodeChangeListener() {
-			@Override
-			public void added(NodeChangeEvent event) {
-				if (!event.getChild().name().equals(uiName)) {
-					return;
-				}
-				((IEclipsePreferences) event.getChild())
-						.addPreferenceChangeListener(PlatformUIPreferenceListener.getSingleton());
-			}
+		rootNode
+				.addNodeChangeListener(new IEclipsePreferences.INodeChangeListener() {
+					/*
+					 * (non-Javadoc)
+					 *
+					 * @see
+					 * org.eclipse.core.runtime.preferences.IEclipsePreferences
+					 * .INodeChangeListener
+					 * #added(org.eclipse.core.runtime.preferences
+					 * .IEclipsePreferences.NodeChangeEvent)
+					 */
+					public void added(NodeChangeEvent event) {
+						if (!event.getChild().name().equals(uiName)) {
+							return;
+						}
+						((IEclipsePreferences) event.getChild())
+								.addPreferenceChangeListener(PlatformUIPreferenceListener
+										.getSingleton());
 
-			@Override
-			public void removed(NodeChangeEvent event) {
-				// Nothing to do here
-			}
+					}
 
-		});
+					/*
+					 * (non-Javadoc)
+					 *
+					 * @see
+					 * org.eclipse.core.runtime.preferences.IEclipsePreferences
+					 * .INodeChangeListener
+					 * #removed(org.eclipse.core.runtime.preferences
+					 * .IEclipsePreferences.NodeChangeEvent)
+					 */
+					public void removed(NodeChangeEvent event) {
+						// Nothing to do here
+
+					}
+
+				});
 	}
 
 	/**
@@ -168,29 +217,40 @@ public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 	 */
 	private void migrateInternalPreferences() {
 
-		IPreferenceStore internalStore = WorkbenchPlugin.getDefault().getPreferenceStore();
+		IPreferenceStore internalStore = WorkbenchPlugin.getDefault()
+				.getPreferenceStore();
 		IPreferenceStore apiStore = PlatformUI.getPreferenceStore();
 		// Is there a value there?
-		if (internalStore.contains(IWorkbenchPreferenceConstants.VIEW_TAB_POSITION)) {
+		if (internalStore
+				.contains(IWorkbenchPreferenceConstants.VIEW_TAB_POSITION)) {
 			apiStore.setValue(IWorkbenchPreferenceConstants.VIEW_TAB_POSITION,
 					internalStore.getInt(IWorkbenchPreferenceConstants.VIEW_TAB_POSITION));
-			internalStore.setToDefault(IWorkbenchPreferenceConstants.VIEW_TAB_POSITION);
+			internalStore
+				.setToDefault(IWorkbenchPreferenceConstants.VIEW_TAB_POSITION);
 		}
 
 		// Is there a value there?
-		if (internalStore.contains(IWorkbenchPreferenceConstants.EDITOR_TAB_POSITION)) {
+		if (internalStore
+				.contains(IWorkbenchPreferenceConstants.EDITOR_TAB_POSITION)) {
 
-			apiStore.setValue(IWorkbenchPreferenceConstants.EDITOR_TAB_POSITION,
+			apiStore.setValue(
+					IWorkbenchPreferenceConstants.EDITOR_TAB_POSITION,
 					internalStore.getInt(IWorkbenchPreferenceConstants.EDITOR_TAB_POSITION));
-			internalStore.setToDefault(IWorkbenchPreferenceConstants.EDITOR_TAB_POSITION);
+			internalStore
+				.setToDefault(IWorkbenchPreferenceConstants.EDITOR_TAB_POSITION);
 		}
 
 		// As default is true we need to check if a value was set
 
-		if (internalStore.contains(IWorkbenchPreferenceConstants.SHOW_MULTIPLE_EDITOR_TABS)) {
-			apiStore.setValue(IWorkbenchPreferenceConstants.SHOW_MULTIPLE_EDITOR_TABS,
-					internalStore.getBoolean(IWorkbenchPreferenceConstants.SHOW_MULTIPLE_EDITOR_TABS));
-			internalStore.setToDefault(IWorkbenchPreferenceConstants.SHOW_MULTIPLE_EDITOR_TABS);
+		if (internalStore
+				.contains(IWorkbenchPreferenceConstants.SHOW_MULTIPLE_EDITOR_TABS)) {
+			apiStore
+					.setValue(
+							IWorkbenchPreferenceConstants.SHOW_MULTIPLE_EDITOR_TABS,
+							internalStore
+							.getBoolean(IWorkbenchPreferenceConstants.SHOW_MULTIPLE_EDITOR_TABS));
+			internalStore
+					.setToDefault(IWorkbenchPreferenceConstants.SHOW_MULTIPLE_EDITOR_TABS);
 		}
 	}
 
