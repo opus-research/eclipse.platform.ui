@@ -128,7 +128,6 @@ public abstract class Window implements IShellProvider {
 		 * 
 		 * @see org.eclipse.jface.window.Window.IExceptionHandler#handleException(java.lang.Throwable)
 		 */
-		@Override
 		public void handleException(Throwable t) {
 			if (t instanceof ThreadDeath) {
 				// Don't catch ThreadDeath as this is a normal occurrence when
@@ -156,8 +155,7 @@ public abstract class Window implements IShellProvider {
      * Object used to locate the default parent for modal shells
      */
     private static IShellProvider defaultModalParent = new IShellProvider() {
-        @Override
-		public Shell getShell() {
+        public Shell getShell() {
             Display d = Display.getCurrent();
             
             if (d == null) {
@@ -232,7 +230,6 @@ public abstract class Window implements IShellProvider {
 	 * Internal class for informing this window when fonts change.
 	 */
 	private class FontChangeListener implements IPropertyChangeListener {
-		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			handleFontChange(event);
 		}
@@ -362,7 +359,7 @@ public abstract class Window implements IShellProvider {
 		// The equivalent in the multi-image version seems to be to remove the
 		// disposed images from the array passed to the shell.
 		if (defaultImages != null && defaultImages.length > 0) {
-			ArrayList<Image> nonDisposedImages = new ArrayList<Image>(defaultImages.length);
+			ArrayList nonDisposedImages = new ArrayList(defaultImages.length);
 			for (int i = 0; i < defaultImages.length; ++i) {
 				if (defaultImages[i] != null && !defaultImages[i].isDisposed()) {
 					nonDisposedImages.add(defaultImages[i]);
@@ -491,7 +488,6 @@ public abstract class Window implements IShellProvider {
 		Shell newShell = new Shell(newParent, getShellStyle());
 
 		resizeListener = new Listener() {
-			@Override
 			public void handleEvent(Event e) {
 				resizeHasOccurred = true;
 			}
@@ -667,7 +663,6 @@ public abstract class Window implements IShellProvider {
 	 * @return this window's shell, or <code>null</code> if this window's
 	 *         shell has not been created yet
 	 */
-	@Override
 	public Shell getShell() {
 		return shell;
 	}
@@ -687,7 +682,6 @@ public abstract class Window implements IShellProvider {
 	 */
 	protected ShellListener getShellListener() {
 		return new ShellAdapter() {
-			@Override
 			public void shellClosed(ShellEvent event) {
 				event.doit = false; // don't close now
 				if (canHandleShellCloseEvent()) {

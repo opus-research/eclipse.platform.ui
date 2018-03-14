@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2014 IBM Corporation and others.
+ * Copyright (c) 2007, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 
 package org.eclipse.ui.internal.keys.model;
@@ -17,10 +16,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
 import org.eclipse.core.commands.CommandManager;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.common.NotDefinedException;
@@ -29,7 +26,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.e4.ui.bindings.EBindingService;
 import org.eclipse.jface.bindings.Binding;
 import org.eclipse.jface.bindings.BindingManager;
 import org.eclipse.jface.bindings.Scheme;
@@ -134,7 +130,7 @@ public class KeyController {
 	}
 
 	private static BindingManager loadModelBackend(IServiceLocator locator) {
-		IBindingService bindingService = locator
+		IBindingService bindingService = (IBindingService) locator
 				.getService(IBindingService.class);
 		BindingManager bindingManager = new BindingManager(
 				new ContextManager(), new CommandManager());
@@ -159,17 +155,7 @@ public class KeyController {
 		
 		bindingManager.setLocale(bindingService.getLocale());
 		bindingManager.setPlatform(bindingService.getPlatform());
-
-		Set<Binding> bindings = new HashSet<Binding>();
-		EBindingService eBindingService = locator
-				.getService(EBindingService.class);
-		bindings.addAll(eBindingService.getActiveBindings());
-		for (Binding binding : bindingService.getBindings()) {
-			bindings.add(binding);
-		}
-
-		bindingManager.setBindings(bindings.toArray(new Binding[0]));
-
+		bindingManager.setBindings(bindingService.getBindings());
 		return bindingManager;
 	}
 
@@ -191,7 +177,6 @@ public class KeyController {
 
 	private void addSetContextListener() {
 		addPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getSource() == contextModel
 						&& CommonModel.PROP_SELECTED_ELEMENT.equals(event
@@ -204,7 +189,6 @@ public class KeyController {
 
 	private void addSetBindingListener() {
 		addPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getSource() == bindingModel
 						&& CommonModel.PROP_SELECTED_ELEMENT.equals(event
@@ -227,7 +211,6 @@ public class KeyController {
 
 	private void addSetConflictListener() {
 		addPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getSource() == conflictModel
 						&& CommonModel.PROP_SELECTED_ELEMENT.equals(event
@@ -243,7 +226,6 @@ public class KeyController {
 
 	private void addSetKeySequenceListener() {
 		addPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (BindingElement.PROP_TRIGGER.equals(event.getProperty())) {
 					updateTrigger((BindingElement) event.getSource(),
@@ -256,7 +238,6 @@ public class KeyController {
 
 	private void addSetModelObjectListener() {
 		addPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getSource() instanceof BindingElement
 						&& ModelElement.PROP_MODEL_OBJECT.equals(event
@@ -288,7 +269,6 @@ public class KeyController {
 
 	private void addSetSchemeListener() {
 		addPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getSource() == fSchemeModel
 						&& CommonModel.PROP_SELECTED_ELEMENT.equals(event
@@ -524,7 +504,6 @@ public class KeyController {
 		}
 
 		final SafeRunnable runnable = new SafeRunnable() {
-			@Override
 			public final void run() throws IOException {
 				Writer fileWriter = null;
 				try {

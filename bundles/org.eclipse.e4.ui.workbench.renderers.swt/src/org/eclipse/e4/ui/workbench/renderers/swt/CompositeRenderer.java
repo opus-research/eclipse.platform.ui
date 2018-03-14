@@ -29,7 +29,6 @@ public class CompositeRenderer extends SWTPartRenderer {
 		super();
 	}
 
-	@Override
 	public Object createWidget(MUIElement element, Object parent) {
 		if (!(element instanceof MPart) || !(parent instanceof Composite))
 			return null;

@@ -22,7 +22,6 @@ public class CSSPropertyBorderVisibleSWTHandler extends AbstractCSSPropertySWTHa
 
 	public static final ICSSPropertyHandler INSTANCE = new CSSPropertyBorderVisibleSWTHandler();
 	
-	@Override
 	public void applyCSSProperty(Control control, String property,
 		    CSSValue value, String pseudo, CSSEngine engine) throws Exception {
 		boolean isBorderVisible = (Boolean)engine.convert(value, Boolean.class, null);
@@ -32,7 +31,6 @@ public class CSSPropertyBorderVisibleSWTHandler extends AbstractCSSPropertySWTHa
 		}
 	}
 
-	@Override
 	public String retrieveCSSProperty(Control control, String property,
 			String pseudo, CSSEngine engine) throws Exception {
 		if (control instanceof CTabFolder) {

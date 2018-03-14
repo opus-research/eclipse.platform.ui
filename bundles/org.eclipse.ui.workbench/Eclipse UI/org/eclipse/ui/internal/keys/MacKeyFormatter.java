@@ -27,8 +27,7 @@ public final class MacKeyFormatter extends AbstractKeyFormatter {
     private final static class MacModifierKeyComparator extends
             AbstractModifierKeyComparator {
 
-        @Override
-		protected int rank(ModifierKey modifierKey) {
+        protected int rank(ModifierKey modifierKey) {
             if (ModifierKey.SHIFT.equals(modifierKey)) {
                 return 0;
             }
@@ -80,26 +79,22 @@ public final class MacKeyFormatter extends AbstractKeyFormatter {
         KEY_LOOKUP.put(SpecialKey.PAGE_UP.toString(), "\u21DE");  //$NON-NLS-1$
     }
 
-    @Override
-	public String format(Key key) {
+    public String format(Key key) {
         String string = (String) KEY_LOOKUP.get(key.toString());
         return string != null ? string : super.format(key);
     }
 
-    @Override
-	protected String getKeyDelimiter() {
+    protected String getKeyDelimiter() {
         return Util.translateString(RESOURCE_BUNDLE, KEY_DELIMITER_KEY,
                 Util.ZERO_LENGTH_STRING, false, false);
     }
 
-    @Override
-	protected String getKeyStrokeDelimiter() {
+    protected String getKeyStrokeDelimiter() {
         return Util.translateString(RESOURCE_BUNDLE, KEY_STROKE_DELIMITER_KEY,
                 KeySequence.KEY_STROKE_DELIMITER, false, false);
     }
 
-    @Override
-	protected Comparator getModifierKeyComparator() {
+    protected Comparator getModifierKeyComparator() {
         return MODIFIER_KEY_COMPARATOR;
     }
 }

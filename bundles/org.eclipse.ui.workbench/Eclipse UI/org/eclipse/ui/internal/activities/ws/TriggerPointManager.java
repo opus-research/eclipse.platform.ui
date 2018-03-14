@@ -48,8 +48,7 @@ public class TriggerPointManager implements ITriggerPointManager, IExtensionChan
                      * 
                      * @see org.eclipse.ui.activities.ITriggerPoint#getId()
                      */
-                    @Override
-					public String getId() {
+                    public String getId() {
                         return ITriggerPointManager.UNKNOWN_TRIGGER_POINT_ID;
                     }
 
@@ -58,8 +57,7 @@ public class TriggerPointManager implements ITriggerPointManager, IExtensionChan
                      * 
                      * @see org.eclipse.ui.activities.ITriggerPoint#getStringHint(java.lang.String)
                      */
-                    @Override
-					public String getStringHint(String key) {
+                    public String getStringHint(String key) {
                         if (ITriggerPoint.HINT_INTERACTIVE.equals(key)) {
                             // TODO: change to false when we have mapped our
                             // trigger points
@@ -73,8 +71,7 @@ public class TriggerPointManager implements ITriggerPointManager, IExtensionChan
                      * 
                      * @see org.eclipse.ui.activities.ITriggerPoint#getBooleanHint(java.lang.String)
                      */
-                    @Override
-					public boolean getBooleanHint(String key) {
+                    public boolean getBooleanHint(String key) {
                         if (ITriggerPoint.HINT_INTERACTIVE.equals(key)) {
                             // TODO: change to false when we have mapped our
                             // trigger points
@@ -99,8 +96,7 @@ public class TriggerPointManager implements ITriggerPointManager, IExtensionChan
      * 
      * @see org.eclipse.ui.activities.ITriggerPointManager#getTriggerPoint(java.lang.String)
      */
-    @Override
-	public ITriggerPoint getTriggerPoint(String id) {
+    public ITriggerPoint getTriggerPoint(String id) {
         return (ITriggerPoint) triggerMap.get(id);
     }
 
@@ -109,8 +105,7 @@ public class TriggerPointManager implements ITriggerPointManager, IExtensionChan
      * 
      * @see org.eclipse.ui.activities.ITriggerPointManager#getDefinedTriggerPointIds()
      */
-    @Override
-	public Set getDefinedTriggerPointIds() {
+    public Set getDefinedTriggerPointIds() {
         return triggerMap.entrySet();
     }
 
@@ -120,8 +115,7 @@ public class TriggerPointManager implements ITriggerPointManager, IExtensionChan
      * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionRemovalHandler#removeInstance(org.eclipse.core.runtime.IExtension,
      *      java.lang.Object[])
      */
-    @Override
-	public void removeExtension(IExtension extension, Object[] objects) {
+    public void removeExtension(IExtension extension, Object[] objects) {
         for (int i = 0; i < objects.length; i++) {
             Object object = objects[i];
             if (object instanceof RegistryTriggerPoint) {
@@ -136,8 +130,7 @@ public class TriggerPointManager implements ITriggerPointManager, IExtensionChan
      * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionAdditionHandler#addInstance(org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker,
      *      org.eclipse.core.runtime.IExtension)
      */
-    @Override
-	public void addExtension(IExtensionTracker tracker, IExtension extension) {
+    public void addExtension(IExtensionTracker tracker, IExtension extension) {
         IConfigurationElement[] elements = extension.getConfigurationElements();
         for (int i = 0; i < elements.length; i++) {
             IConfigurationElement element = elements[i];

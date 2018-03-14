@@ -78,8 +78,7 @@ public class WorkingSetTypePage extends WizardPage {
 	 * 
 	 * @see org.eclipse.jface.wizard.IWizardPage#canFlipToNextPage()
 	 */
-    @Override
-	public boolean canFlipToNextPage() {
+    public boolean canFlipToNextPage() {
         return isPageComplete();
     }
 
@@ -88,8 +87,7 @@ public class WorkingSetTypePage extends WizardPage {
      * 
      * @see org.eclipse.jface.dialogs.IDialogPage#createControl(Composite)
      */
-    @Override
-	public void createControl(Composite parent) {
+    public void createControl(Composite parent) {
         Font font = parent.getFont();
         Composite composite = new Composite(parent, SWT.NULL);
         composite.setLayout(new GridLayout());
@@ -112,14 +110,12 @@ public class WorkingSetTypePage extends WizardPage {
         typesListViewer.getTable().setFont(font);
         typesListViewer
                 .addSelectionChangedListener(new ISelectionChangedListener() {
-                    @Override
-					public void selectionChanged(SelectionChangedEvent event) {
+                    public void selectionChanged(SelectionChangedEvent event) {
                         handleSelectionChanged();
                     }
                 });
         typesListViewer.addDoubleClickListener(new IDoubleClickListener() {
-            @Override
-			public void doubleClick(DoubleClickEvent event) {
+            public void doubleClick(DoubleClickEvent event) {
                 handleDoubleClick();
             }
         });
@@ -132,7 +128,6 @@ public class WorkingSetTypePage extends WizardPage {
 			 * 
 			 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
 			 */
-			@Override
 			public String getText(Object element) {
 				return ((WorkingSetDescriptor)element).getName();
 			}
@@ -140,7 +135,6 @@ public class WorkingSetTypePage extends WizardPage {
 			/* (non-Javadoc)
 			 * @see org.eclipse.jface.viewers.BaseLabelProvider#dispose()
 			 */
-			@Override
 			public void dispose() {
 				images.dispose();
 				super.dispose();
@@ -151,7 +145,6 @@ public class WorkingSetTypePage extends WizardPage {
 			 * 
 			 * @see org.eclipse.jface.viewers.LabelProvider#getImage(java.lang.Object)
 			 */
-			@Override
 			public Image getImage(Object element) {
 				ImageDescriptor imageDescriptor = ((WorkingSetDescriptor) element)
 						.getIcon();
@@ -168,8 +161,7 @@ public class WorkingSetTypePage extends WizardPage {
      * 
      * @see org.eclipse.jface.dialogs.IDialogPage#dispose()
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         super.dispose();
     }
 

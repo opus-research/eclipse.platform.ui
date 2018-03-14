@@ -20,7 +20,6 @@ public class CSSPropertyMaximizeVisibleSWTHandler extends
 
 	public static final ICSSPropertyHandler INSTANCE = new CSSPropertyMaximizeVisibleSWTHandler();
 
-	@Override
 	public void applyCSSProperty(Control control, String property,
 			CSSValue value, String pseudo, CSSEngine engine) throws Exception {
 		boolean isMaxVisible = (Boolean) engine.convert(value, Boolean.class,
@@ -31,7 +30,6 @@ public class CSSPropertyMaximizeVisibleSWTHandler extends
 		}
 	}
 
-	@Override
 	public String retrieveCSSProperty(Control control, String property,
 			String pseudo, CSSEngine engine) throws Exception {
 		if (control instanceof CTabFolder) {

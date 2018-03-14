@@ -69,8 +69,7 @@ public class NewWizardDropDownAction extends Action implements
         /* (non-Javadoc)
          * @see org.eclipse.jface.action.IMenuCreator#getMenu(org.eclipse.swt.widgets.Control)
          */
-        @Override
-		public Menu getMenu(Control parent) {
+        public Menu getMenu(Control parent) {
             createDropDownMenuMgr();
             return dropDownMenuMgr.createContextMenu(parent);
         }
@@ -78,8 +77,7 @@ public class NewWizardDropDownAction extends Action implements
         /* (non-Javadoc)
          * @see org.eclipse.jface.action.IMenuCreator#getMenu(org.eclipse.swt.widgets.Menu)
          */
-        @Override
-		public Menu getMenu(Menu parent) {
+        public Menu getMenu(Menu parent) {
             createDropDownMenuMgr();
             Menu menu = new Menu(parent);
             IContributionItem[] items = dropDownMenuMgr.getItems();
@@ -98,21 +96,11 @@ public class NewWizardDropDownAction extends Action implements
         /* (non-Javadoc)
          * @see org.eclipse.jface.action.IMenuCreator#dispose()
          */
-        @Override
-		public void dispose() {
-			if (dropDownMenuMgr != null) {
-				// remove the wizard menu before disposing the menu manager, the
-				// wizard menu is a workbench action and it should only be
-				// disposed when the workbench window itself is disposed,
-				// IMenuCreators will be disposed when the action is disposed,
-				// we do not want this, the menu's disposal will be handled when
-				// the owning action (NewWizardDropDownAction) is disposed, see
-				// bug 309716
-				dropDownMenuMgr.remove(newWizardMenu);
-
-				dropDownMenuMgr.dispose();
-				dropDownMenuMgr = null;
-			}
+        public void dispose() {
+            if (dropDownMenuMgr != null) {
+                dropDownMenuMgr.dispose();
+                dropDownMenuMgr = null;
+            }
         }
     };
 
@@ -163,8 +151,7 @@ public class NewWizardDropDownAction extends Action implements
     /* (non-Javadoc)
      * @see org.eclipse.ui.actions.ActionFactory.IWorkbenchAction#dispose()
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         if (workbenchWindow == null) {
             // action has already been disposed
             return;
@@ -179,8 +166,7 @@ public class NewWizardDropDownAction extends Action implements
     /**
      * Runs the action, which opens the New wizard dialog.
      */
-    @Override
-	public void run() {
+    public void run() {
         if (workbenchWindow == null) {
             // action has been disposed
             return;

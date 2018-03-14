@@ -50,16 +50,14 @@ public class WorkbenchBrowserSupport extends AbstractWorkbenchBrowserSupport {
         /* (non-Javadoc)
          * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker, org.eclipse.core.runtime.IExtension)
          */
-        @Override
-		public void addExtension(IExtensionTracker tracker,IExtension extension) {
+        public void addExtension(IExtensionTracker tracker,IExtension extension) {
             //Do nothing
         }
 
         /* (non-Javadoc)
          * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension, java.lang.Object[])
          */
-        @Override
-		public void removeExtension(IExtension source, Object[] objects) {
+        public void removeExtension(IExtension source, Object[] objects) {
 			for (int i = 0; i < objects.length; i++) {
 				if (objects[i] == activeSupport) {
 					dispose();
@@ -93,7 +91,6 @@ public class WorkbenchBrowserSupport extends AbstractWorkbenchBrowserSupport {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#createBrowser(int, java.lang.String, java.lang.String, java.lang.String)
 	 */
-	@Override
 	public IWebBrowser createBrowser(int style, String browserId, String name,
 			String tooltip) throws PartInitException {
 		return getActiveSupport()
@@ -103,7 +100,6 @@ public class WorkbenchBrowserSupport extends AbstractWorkbenchBrowserSupport {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#createBrowser(java.lang.String)
 	 */
-	@Override
 	public IWebBrowser createBrowser(String browserId) throws PartInitException {
 		return getActiveSupport().createBrowser(browserId);
 	}
@@ -111,7 +107,6 @@ public class WorkbenchBrowserSupport extends AbstractWorkbenchBrowserSupport {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#isInternalWebBrowserAvailable()
 	 */
-	@Override
 	public boolean isInternalWebBrowserAvailable() {
 		return getActiveSupport().isInternalWebBrowserAvailable();
 	}
@@ -143,7 +138,6 @@ public class WorkbenchBrowserSupport extends AbstractWorkbenchBrowserSupport {
 			 * 
 			 * @see java.lang.Runnable#run()
 			 */
-			@Override
 			public void run() {
                 IConfigurationElement[] elements = Platform
                         .getExtensionRegistry().getConfigurationElementsFor(

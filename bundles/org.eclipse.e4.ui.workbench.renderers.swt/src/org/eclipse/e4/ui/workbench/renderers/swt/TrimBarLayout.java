@@ -90,7 +90,6 @@ public class TrimBarLayout extends Layout {
 	 * org.eclipse.swt.widgets.Layout#computeSize(org.eclipse.swt.widgets.Composite
 	 * , int, int, boolean)
 	 */
-	@Override
 	protected Point computeSize(Composite composite, int wHint, int hHint,
 			boolean flushCache) {
 		// Clear the current cache
@@ -200,7 +199,6 @@ public class TrimBarLayout extends Layout {
 		return !barVisible;
 	}
 
-	@Override
 	protected void layout(Composite composite, boolean flushCache) {
 		Rectangle bounds = composite.getBounds();
 

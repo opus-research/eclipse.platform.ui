@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Tristan Hume - <trishume@gmail.com> -
  *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  *     		Implemented workbench auto-save to correctly restore state in case of crash.
- *     Terry Parker <tparker@google.com> - Bug 416673
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -129,27 +128,6 @@ public class ResourceHandler implements IModelResourceHandler {
 
 	}
 
-	/**
-	 * @return {@code true} if the current application model has top-level windows.
-	 */
-	public boolean hasTopLevelWindows() {
-		return hasTopLevelWindows(resource);
-	}
-
-	/**
-	 * @return {@code true} if the specified application model has top-level windows.
-	 */
-	private boolean hasTopLevelWindows(Resource applicationResource) {
-		if (applicationResource == null || applicationResource.getContents() == null) {
-			// If the application resource doesn't exist or has no contents, then it has no
-			// top-level windows (and we are in an error state).
-			return false;
-		}
-		MApplication application = (MApplication) applicationResource.getContents().get(0);
-		return !application.getChildren().isEmpty();
-	}
-
-	@Override
 	public Resource loadMostRecentModel() {
 		// This is temporary code to migrate existing delta files into full models
 		if (deltaRestore && saveAndRestore && !clearPersistedState) {
@@ -170,7 +148,7 @@ public class ResourceHandler implements IModelResourceHandler {
 					context.set(MApplication.class, appElement);
 					ModelAssembler contribProcessor = ContextInjectionFactory.make(
 							ModelAssembler.class, context);
-					contribProcessor.processModel(true);
+					contribProcessor.processModel();
 
 					File deltaOldFile = new File(baseLocation, "deltas_42M7migration.xml"); //$NON-NLS-1$
 					deltaFile.renameTo(deltaOldFile);
@@ -194,12 +172,8 @@ public class ResourceHandler implements IModelResourceHandler {
 						logger.error(e);
 					}
 				}
-				if (appElement != null) {
+				if (appElement != null)
 					resource.getContents().add((EObject) appElement);
-					if (!hasTopLevelWindows(resource) && logger != null) {
-						logger.error("No top-level windows seen when migrating from existing delta files"); //$NON-NLS-1$
-					}
-				}
 				return resource;
 			}
 		}
@@ -224,35 +198,16 @@ public class ResourceHandler implements IModelResourceHandler {
 		// long lastApplicationModification = getLastApplicationModification();
 		// boolean restore = restoreLastModified > lastApplicationModification;
 		boolean restore = restoreLastModified > 0;
-		boolean initialModel;
 
 		resource = null;
 		if (restore && saveAndRestore) {
 			resource = loadResource(restoreLocation);
-			// If the saved model does not have any top-level windows, Eclipse will exit
-			// immediately, so throw out the persisted state and reinitialize with the defaults.
-			if (!hasTopLevelWindows(resource)) {
-				if (logger != null) {
-					logger.error(new Exception(), // log a stack trace to help debug the corruption
-							"The persisted workbench has no top-level windows, so reinitializing with defaults."); //$NON-NLS-1$
-				}
-				resource = null;
-			}
 		}
 		if (resource == null) {
 			Resource applicationResource = loadResource(applicationDefinitionInstance);
-			if (!hasTopLevelWindows(applicationResource) && logger != null) {
-				logger.error(
-						new Exception(), // log a stack trace to help debug the corruption
-						"Initializing from the application definition instance yields no top-level windows! " //$NON-NLS-1$
-								+ "Continuing execution, but the missing windows may cause other initialization failures."); //$NON-NLS-1$
-			}
 			MApplication theApp = (MApplication) applicationResource.getContents().get(0);
 			resource = createResourceWithApp(theApp);
 			context.set(E4Workbench.NO_SAVED_MODEL_FOUND, Boolean.TRUE);
-			initialModel = true;
-		} else {
-			initialModel = false;
 		}
 
 		// Add model items described in the model extension point
@@ -262,18 +217,11 @@ public class ResourceHandler implements IModelResourceHandler {
 		this.context.set(MApplication.class, appElement);
 		ModelAssembler contribProcessor = ContextInjectionFactory.make(ModelAssembler.class,
 				context);
-		contribProcessor.processModel(initialModel);
-
-		if (!clearPersistedState) {
-			CommandLineOptionModelProcessor processor = ContextInjectionFactory.make(
-					CommandLineOptionModelProcessor.class, context);
-			processor.process();
-		}
+		contribProcessor.processModel();
 
 		return resource;
 	}
 
-	@Override
 	public void save() throws IOException {
 		if (saveAndRestore)
 			resource.save(null);
@@ -286,7 +234,6 @@ public class ResourceHandler implements IModelResourceHandler {
 	 *            the application model to add to the resource
 	 * @return a resource with a proper save path with the model as contents
 	 */
-	@Override
 	public Resource createResourceWithApp(MApplication theApp) {
 		Resource res = createResource();
 		res.getContents().add((EObject) theApp);

@@ -78,11 +78,11 @@ public class CommandCallbackTest extends UITestCase {
 	 */
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
-		commandService = fWorkbench
+		commandService = (ICommandService) fWorkbench
 				.getService(ICommandService.class);
 		cmd1 = commandService.getCommand(CMD1_ID);
 		cmd2 = commandService.getCommand(CMD2_ID);
-		handlerService = fWorkbench
+		handlerService = (IHandlerService) fWorkbench
 				.getService(IHandlerService.class);
 		cmd1Handler = new CallbackHandler();
 		cmd1Activation = handlerService.activateHandler(CMD1_ID, cmd1Handler);
@@ -412,7 +412,7 @@ public class CommandCallbackTest extends UITestCase {
 
 	public void testCommandThroughWindow() throws Exception {
 		IWorkbenchWindow window = openTestWindow();
-		ICommandService cs = window
+		ICommandService cs = (ICommandService) window
 				.getService(ICommandService.class);
 		IParameter parmProt = cmd2.getParameter(PROT_PARAM_ID);
 		IParameter parmHost = cmd2.getParameter(HOST_PARAM_ID);
@@ -452,7 +452,7 @@ public class CommandCallbackTest extends UITestCase {
 		ParameterizedCommand pc2 = new ParameterizedCommand(cmd1, null);
 
 		IWorkbenchWindow window = openTestWindow();
-		ICommandService cs = window
+		ICommandService cs = (ICommandService) window
 				.getService(ICommandService.class);
 
 		IElementReference cr1 = commandService.registerElementForCommand(pc1,
