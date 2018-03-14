@@ -21,7 +21,9 @@ import org.eclipse.core.runtime.CoreException;
  */
 public class AndFileInfoMatcher extends CompoundFileInfoMatcher {
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.resources.AbstractFileInfoMatcher#matches(org.eclipse.core.filesystem.IFileInfo)
+	 */
 	public boolean matches(IContainer parent, IFileInfo fileInfo) throws CoreException {
 		for (int i = 0; i < matchers.length; i++) {
 			if (!matchers[i].matches(parent, fileInfo))

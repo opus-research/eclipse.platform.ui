@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2009 IBM Corporation and others.
+ * Copyright (c) 2007, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -660,7 +660,7 @@ import com.ibm.icu.text.NumberFormat;
 	 * Returns {@link Boolean#TRUE} if the from type is assignable to the to
 	 * type, or {@link Boolean#FALSE} if it not, or <code>null</code> if
 	 * unknown.
-	 *
+	 * 
 	 * @param fromType
 	 * @param toType
 	 * @return whether fromType is assignable to toType, or <code>null</code>
@@ -700,17 +700,14 @@ import com.ibm.icu.text.NumberFormat;
 			this.fromType = fromType;
 		}
 
-		@Override
 		public Object convert(Object fromObject) {
 			return fromObject;
 		}
 
-		@Override
 		public Object getFromType() {
 			return fromType;
 		}
 
-		@Override
 		public Object getToType() {
 			return toType;
 		}

@@ -39,21 +39,21 @@ public final class JXPathContextImpl implements XPathContext {
 			} else if( o instanceof NodeSet ) {
 				List<?> l = ((NodeSet) o).getValues();
 				if( l.size() > 0 && l.get(0) instanceof EObject ) {
-					return eClassName(l.get(0));
+					return eClassName((EObject) l.get(0));
 				}
 			} else if( o instanceof Pointer ) {
 				if( ((Pointer) o).getValue() instanceof EObject ) {
-					return eClassName(((Pointer) o).getValue());
+					return eClassName((EObject) ((Pointer) o).getValue());
 				}
 			}
-
+			
 			return null;
 		}
 	}
-
+	
 	/**
 	 * Create a new context
-	 *
+	 * 
 	 * @param contextBean
 	 *            the context bean (=root of the xpath expression)
 	 */
@@ -64,7 +64,7 @@ public final class JXPathContextImpl implements XPathContext {
 
 	/**
 	 * Create a new child context
-	 *
+	 * 
 	 * @param parentContext
 	 *            the parent
 	 * @param contextBean
@@ -75,17 +75,14 @@ public final class JXPathContextImpl implements XPathContext {
 		this.context = JXPathContext.newContext(jContext, contextBean);
 	}
 
-	@Override
 	public Object getValue(String xpath) {
 		return context.getValue(xpath);
 	}
 
-	@Override
 	public Object getValue(String xpath, Class<?> requiredType) {
 		return context.getValue(xpath, requiredType);
 	}
 
-	@Override
 	public <Type> Iterator<Type> iterate(String xpath) {
 		return context.iterate(xpath);
 	}

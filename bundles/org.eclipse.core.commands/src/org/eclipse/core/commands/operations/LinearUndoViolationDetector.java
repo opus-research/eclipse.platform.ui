@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.Status;
  * model. Once a violation is detected, subclasses implement the specific
  * behavior for indicating whether or not the undo/redo should proceed.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public abstract class LinearUndoViolationDetector implements IOperationApprover {
@@ -37,7 +37,7 @@ public abstract class LinearUndoViolationDetector implements IOperationApprover 
 	 * A linear redo violation is defined as a request to redo a particular
 	 * operation even if it is not the most recently added operation to the redo
 	 * history.
-	 *
+	 * 
 	 * @param operation
 	 *            the operation for which a linear redo violation has been
 	 *            detected.
@@ -51,7 +51,7 @@ public abstract class LinearUndoViolationDetector implements IOperationApprover 
 	 *            user if necessary. When this parameter is not
 	 *            <code>null</code>, it should minimally contain an adapter
 	 *            for the org.eclipse.swt.widgets.Shell.class.
-	 *
+	 * 
 	 * @return the IStatus describing whether the redo violation is allowed. The
 	 *         redo will not proceed if the status severity is not
 	 *         <code>OK</code>, and the caller requesting the redo will be
@@ -68,7 +68,7 @@ public abstract class LinearUndoViolationDetector implements IOperationApprover 
 	 * A linear undo violation is defined as a request to undo a particular
 	 * operation even if it is not the most recently added operation to the undo
 	 * history.
-	 *
+	 * 
 	 * @param operation
 	 *            the operation for which a linear undo violation has been
 	 *            detected.
@@ -82,7 +82,7 @@ public abstract class LinearUndoViolationDetector implements IOperationApprover 
 	 *            user if necessary. When this parameter is not
 	 *            <code>null</code>, it should minimally contain an adapter
 	 *            for the org.eclipse.swt.widgets.Shell.class.
-	 *
+	 * 
 	 * @return the IStatus describing whether the undo violation is allowed. The
 	 *         undo will not proceed if the status severity is not
 	 *         <code>OK</code>, and the caller requesting the undo will be
@@ -95,12 +95,11 @@ public abstract class LinearUndoViolationDetector implements IOperationApprover 
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.core.commands.operations.IOperationApprover#proceedRedoing(org.eclipse.core.commands.operations.IUndoableOperation,
 	 *      org.eclipse.core.commands.operations.IOperationHistory,
 	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
-	@Override
 	public final IStatus proceedRedoing(IUndoableOperation operation,
 			IOperationHistory history, IAdaptable info) {
 		IUndoContext[] contexts = operation.getContexts();
@@ -119,13 +118,12 @@ public abstract class LinearUndoViolationDetector implements IOperationApprover 
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.core.commands.operations.IOperationApprover#proceedUndoing(org.eclipse.core.commands.operations.IUndoableOperation,
 	 *      org.eclipse.core.commands.operations.IOperationHistory,
 	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
 
-	@Override
 	public final IStatus proceedUndoing(IUndoableOperation operation,
 			IOperationHistory history, IAdaptable info) {
 		IUndoContext[] contexts = operation.getContexts();

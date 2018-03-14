@@ -26,8 +26,7 @@ public class TestModelContentProvider implements ITestModelListener,
         IStructuredContentProvider, ITreeContentProvider {
     Viewer fViewer;
 
-    @Override
-	public void dispose() {
+    public void dispose() {
     }
 
     protected void doInsert(TestModelChange change) {
@@ -82,34 +81,28 @@ public class TestModelContentProvider implements ITestModelListener,
         }
     }
 
-    @Override
-	public Object[] getChildren(Object element) {
+    public Object[] getChildren(Object element) {
         TestElement testElement = (TestElement) element;
         int count = testElement.getChildCount();
         TestElement[] children = new TestElement[count];
-        for (int i = 0; i < count; ++i) {
-			children[i] = testElement.getChildAt(i);
-		}
+        for (int i = 0; i < count; ++i)
+            children[i] = testElement.getChildAt(i);
         return children;
     }
 
-    @Override
-	public Object[] getElements(Object element) {
+    public Object[] getElements(Object element) {
         return getChildren(element);
     }
 
-    @Override
-	public Object getParent(Object element) {
+    public Object getParent(Object element) {
         return ((TestElement) element).getContainer();
     }
 
-    @Override
-	public boolean hasChildren(Object element) {
+    public boolean hasChildren(Object element) {
         return ((TestElement) element).getChildCount() > 0;
     }
 
-    @Override
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         fViewer = viewer;
         TestElement oldElement = (TestElement) oldInput;
         if (oldElement != null) {
@@ -125,8 +118,7 @@ public class TestModelContentProvider implements ITestModelListener,
         return ((TestElement) element).isDeleted();
     }
 
-    @Override
-	public void testModelChanged(TestModelChange change) {
+    public void testModelChanged(TestModelChange change) {
         switch (change.getKind()) {
         case TestModelChange.INSERT:
             doInsert(change);

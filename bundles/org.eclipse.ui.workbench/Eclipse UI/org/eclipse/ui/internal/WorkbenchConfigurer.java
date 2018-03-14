@@ -34,7 +34,7 @@ import org.eclipse.ui.application.WorkbenchAdvisor;
  * <p>
  * This class is not intended to be instantiated or subclassed by clients.
  * </p>
- *
+ * 
  * @since 3.0
  */
 public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
@@ -47,7 +47,7 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
     private Map extraData = new HashMap();
 
     /**
-     * Indicates whether workbench state should be saved on close and
+     * Indicates whether workbench state should be saved on close and 
      * restored on subsequent open.
      */
     private boolean saveAndRestore = false;
@@ -60,10 +60,10 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
 
     /**
      * Indicates the behaviour when the last window is closed.
-     * If <code>true</code>, the workbench will exit (saving the last window's state,
+     * If <code>true</code>, the workbench will exit (saving the last window's state, 
      * if configured to do so).
      * If <code>false</code> the window will be closed, leaving the workbench running.
-     *
+     * 
      * @since 3.1
      */
 	private boolean exitOnLastWindowClose = true;
@@ -120,16 +120,25 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
         return ((WorkbenchWindow) window).getWindowConfigurer();
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.application.IWorkbenchConfigurer#getSaveAndRestore()
+     */
     @Override
 	public boolean getSaveAndRestore() {
         return saveAndRestore;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.application.IWorkbenchConfigurer#setSaveAndRestore(boolean)
+     */
     @Override
 	public void setSaveAndRestore(boolean enabled) {
         saveAndRestore = enabled;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.application.IWorkbenchConfigurer#getData
+     */
     @Override
 	public Object getData(String key) {
         if (key == null) {
@@ -138,6 +147,9 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
         return extraData.get(key);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.application.IWorkbenchConfigurer#setData(String, Object)
+     */
     @Override
 	public void setData(String key, Object data) {
         if (key == null) {
@@ -150,6 +162,9 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.application.IWorkbenchConfigurer#emergencyClose()
+     */
     @Override
 	public void emergencyClose() {
         if (!isEmergencyClosing) {
@@ -163,31 +178,49 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
 
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.application.IWorkbenchConfigurer#emergencyClosing()
+     */
     @Override
 	public boolean emergencyClosing() {
         return isEmergencyClosing;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.application.IWorkbenchConfigurer#restoreState()
+     */
     @Override
 	public IStatus restoreState() {
 		return Status.OK_STATUS;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.application.IWorkbenchConfigurer#openFirstTimeWindow()
+     */
     @Override
 	public void openFirstTimeWindow() {
         ((Workbench) getWorkbench()).openFirstTimeWindow();
     }
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.application.IWorkbenchConfigurer#restoreWorkbenchWindow(org.eclipse.ui.IMemento)
+	 */
 	@Override
 	public IWorkbenchWindowConfigurer restoreWorkbenchWindow(IMemento memento) throws WorkbenchException {
 		return getWindowConfigurer(null);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.application.IWorkbenchConfigurer#getExitOnLastWindowClose()
+	 */
 	@Override
 	public boolean getExitOnLastWindowClose() {
 		return exitOnLastWindowClose;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.application.IWorkbenchConfigurer#setExitOnLastWindowClose(boolean)
+	 */
 	@Override
 	public void setExitOnLastWindowClose(boolean enabled) {
 		exitOnLastWindowClose = enabled;

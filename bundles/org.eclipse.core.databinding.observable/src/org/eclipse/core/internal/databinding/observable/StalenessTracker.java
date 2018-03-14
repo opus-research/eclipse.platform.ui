@@ -23,7 +23,7 @@ import org.eclipse.core.internal.databinding.identity.IdentityMap;
 
 /**
  * @since 1.0
- *
+ * 
  */
 public class StalenessTracker {
 
@@ -34,12 +34,10 @@ public class StalenessTracker {
 	private final IStalenessConsumer stalenessConsumer;
 
 	private class ChildListener implements IStaleListener, IChangeListener {
-		@Override
 		public void handleStale(StaleEvent event) {
 			processStalenessChange((IObservable) event.getSource(), true);
 		}
 
-		@Override
 		public void handleChange(ChangeEvent event) {
 			processStalenessChange((IObservable) event.getSource(), true);
 		}
@@ -49,7 +47,7 @@ public class StalenessTracker {
 
 	/**
 	 * @param observables
-	 * @param stalenessConsumer
+	 * @param stalenessConsumer 
 	 */
 	public StalenessTracker(IObservable[] observables,
 			IStalenessConsumer stalenessConsumer) {

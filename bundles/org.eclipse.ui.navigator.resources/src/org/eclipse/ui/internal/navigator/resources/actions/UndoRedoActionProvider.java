@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     IBM Corporation - initial API and implementation
+ *     IBM Corporation - initial API and implementation 
  *       (was originally RefactorActionProvider.java)
- *     Oakland Software (Francis Upton - francisu@ieee.org)
+ *     Oakland Software (Francis Upton - francisu@ieee.org) 
  *        bug 214271 Undo/redo not enabled if nothing selected
  ******************************************************************************/
 
@@ -26,15 +26,20 @@ import org.eclipse.ui.operations.UndoRedoActionGroup;
 
 /**
  * @since 3.4
- *
+ * 
  */
 public class UndoRedoActionProvider extends CommonActionProvider {
 
 	private UndoRedoActionGroup undoRedoGroup;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.navigator.CommonActionProvider#init(org.eclipse.ui.navigator.ICommonActionExtensionSite)
+	 */
 	@Override
 	public void init(ICommonActionExtensionSite anActionSite) {
-		IUndoContext workspaceContext = ResourcesPlugin
+		IUndoContext workspaceContext = (IUndoContext) ResourcesPlugin
 				.getWorkspace().getAdapter(IUndoContext.class);
 		undoRedoGroup = new UndoRedoActionGroup(((ICommonViewerWorkbenchSite) anActionSite.getViewSite()).getSite(),
 				workspaceContext, true);

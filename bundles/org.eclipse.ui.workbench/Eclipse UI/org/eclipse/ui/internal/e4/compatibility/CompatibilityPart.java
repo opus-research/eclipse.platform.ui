@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,9 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Steven Spungin <steven@spungin.tv> - Bug 436908
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
- *     Snjezana Peco <snjezana.peco@redhat.com> - Bug 414888
  ******************************************************************************/
 
 package org.eclipse.ui.internal.e4.compatibility;
@@ -20,12 +17,10 @@ import javax.inject.Inject;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.Persist;
-import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.model.application.ui.MDirtyable;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
@@ -137,11 +132,6 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 		this.part = part;
 	}
 
-	@PersistState
-	void persistState() {
-		ContextInjectionFactory.invoke(wrapped, PersistState.class, part.getContext(), null);
-	}
-
 	public abstract WorkbenchPartReference getReference();
 
 	protected boolean createPartControl(final IWorkbenchPart legacyPart, Composite parent) {
@@ -190,9 +180,6 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 				} else {
 					selectionProvider.addSelectionChangedListener(postListener);
 				}
-				ESelectionService selectionService = (ESelectionService) part.getContext().get(
-						ESelectionService.class.getName());
-				selectionService.setSelection(selectionProvider.getSelection());
 			}
 		}
 		return true;
@@ -266,7 +253,7 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 	 * <p>
 	 * See bug 308492.
 	 * </p>
-	 *
+	 * 
 	 * @return if the part is currently being disposed
 	 */
 	public boolean isBeingDisposed() {
@@ -373,9 +360,8 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 					}
 					break;
 				case IWorkbenchPartConstants.PROP_DIRTY:
-					ISaveablePart saveable = SaveableHelper.getSaveable(wrapped);
-					if (saveable != null) {
-						((MDirtyable) part).setDirty(saveable.isDirty());
+					if (wrapped instanceof ISaveablePart) {
+						((MDirtyable) part).setDirty(((ISaveablePart) wrapped).isDirty());
 					}
 					break;
 				case IWorkbenchPartConstants.PROP_INPUT:
@@ -417,12 +403,10 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 
 	@Persist
 	void doSave() {
-		ISaveablePart saveable = SaveableHelper.getSaveable(wrapped);
-		if (saveable != null) {
-			SaveableHelper.savePart(saveable, wrapped, getReference().getSite()
+		if (wrapped instanceof ISaveablePart) {
+			SaveableHelper.savePart((ISaveablePart) wrapped, wrapped, getReference().getSite()
 					.getWorkbenchWindow(), false);
 		}
-		// ContextInjectionFactory.invoke(wrapped, Persist.class, part.getContext(), null);
 	}
 
 	public IWorkbenchPart getPart() {
@@ -432,7 +416,7 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 	public MPart getModel() {
 		return part;
 	}
-
+	
 	@Override
 	public void selectionChanged(SelectionChangedEvent e) {
 		ESelectionService selectionService = (ESelectionService) part.getContext().get(

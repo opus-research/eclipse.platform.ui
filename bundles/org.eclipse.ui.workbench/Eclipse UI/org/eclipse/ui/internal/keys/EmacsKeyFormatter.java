@@ -23,7 +23,7 @@ import org.eclipse.ui.keys.ModifierKey;
 /**
  * A key formatter providing the Emacs-style accelerators using single letters
  * to represent the modifier keys.
- *
+ * 
  * @since 3.0
  */
 public class EmacsKeyFormatter extends AbstractKeyFormatter {
@@ -44,7 +44,7 @@ public class EmacsKeyFormatter extends AbstractKeyFormatter {
     /**
      * Formats an individual key into a human readable format. This converts
      * the key into a format similar to Xemacs.
-     *
+     * 
      * @param key
      *            The key to format; must not be <code>null</code>.
      * @return The key formatted as a string; should not be <code>null</code>.
@@ -62,18 +62,33 @@ public class EmacsKeyFormatter extends AbstractKeyFormatter {
         return super.format(key).toLowerCase();
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.keys.AbstractKeyFormatter#getKeyDelimiter()
+     */
     @Override
 	protected String getKeyDelimiter() {
         return Util.translateString(RESOURCE_BUNDLE, KEY_DELIMITER_KEY,
                 KeyStroke.KEY_DELIMITER, false, false);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.keys.AbstractKeyFormatter#getKeyStrokeDelimiter()
+     */
     @Override
 	protected String getKeyStrokeDelimiter() {
         return Util.translateString(RESOURCE_BUNDLE, KEY_STROKE_DELIMITER_KEY,
                 KeySequence.KEY_STROKE_DELIMITER, false, false);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.keys.AbstractKeyFormatter#getModifierKeyComparator()
+     */
     @Override
 	protected Comparator getModifierKeyComparator() {
         return EMACS_MODIFIER_KEY_COMPARATOR;

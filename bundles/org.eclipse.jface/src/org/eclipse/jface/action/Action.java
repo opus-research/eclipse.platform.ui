@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -60,7 +60,7 @@ public abstract class Action extends AbstractAction {
 
 	/**
 	 * Converts an accelerator key code to a string representation.
-	 *
+	 * 
 	 * @param keyCode
 	 *            the key code to be translated
 	 * @return a string representation of the key code
@@ -72,7 +72,7 @@ public abstract class Action extends AbstractAction {
 	/**
 	 * Parses the given accelerator text, and converts it to an accelerator key
 	 * code.
-	 *
+	 * 
 	 * @param acceleratorText
 	 *            the accelerator text
 	 * @return the SWT key code, or 0 if there is no accelerator
@@ -105,7 +105,7 @@ public abstract class Action extends AbstractAction {
 	 * <li><code>"F1"</code>, <code>"F2"</code> through <code>"F12"</code></li>
 	 * </ul>
 	 * </p>
-	 *
+	 * 
 	 * @param token
 	 *            the key name
 	 * @return the SWT key code, <code>-1</code> if no match was found
@@ -121,7 +121,7 @@ public abstract class Action extends AbstractAction {
 	 * the key code is not an SWT code (for example if it a key code for the key
 	 * 'S'), a string containing a character representation of the key code is
 	 * returned.
-	 *
+	 * 
 	 * @param keyCode
 	 *            the key code to be translated
 	 * @return the string representation of the key code
@@ -138,7 +138,7 @@ public abstract class Action extends AbstractAction {
 	 * ignored): <code>"CTRL"</code>, <code>"SHIFT"</code>,
 	 * <code>"ALT"</code>, and <code>"COMMAND"</code>. The given modifier
 	 * key name is converted to upper case before comparison.
-	 *
+	 * 
 	 * @param token
 	 *            the modifier key name
 	 * @return the SWT modifier bit, or <code>0</code> if no match was found
@@ -152,7 +152,7 @@ public abstract class Action extends AbstractAction {
 	 * Returns a string representation of an SWT modifier bit (SWT.CTRL,
 	 * SWT.ALT, SWT.SHIFT, and SWT.COMMAND). Returns <code>null</code> if the
 	 * key code is not an SWT modifier bit.
-	 *
+	 * 
 	 * @param keyCode
 	 *            the SWT modifier bit to be translated
 	 * @return the string representation of the SWT modifier bit, or
@@ -169,7 +169,7 @@ public abstract class Action extends AbstractAction {
 	 * given string. The accelerator text appears at the end of the text, and is
 	 * separated from the main part by the last tab character <code>'\t'</code>
 	 * (or the last <code>'@'</code> if there is no tab).
-	 *
+	 * 
 	 * @param text
 	 *            the text
 	 * @return the text sans accelerator
@@ -182,11 +182,11 @@ public abstract class Action extends AbstractAction {
 	 * Convenience method for removing any mnemonics from the given string. For
 	 * example, <code>removeMnemonics("&Open")</code> will return
 	 * <code>"Open"</code>.
-	 *
+	 * 
 	 * @param text
 	 *            the text
 	 * @return the text sans mnemonics
-	 *
+	 * 
 	 * @since 3.0
 	 */
 	public static String removeMnemonics(String text) {
@@ -271,7 +271,7 @@ public abstract class Action extends AbstractAction {
 	/**
 	 * Creates a new action with the given text and no image. Calls the zero-arg
 	 * constructor, then <code>setText</code>.
-	 *
+	 * 
 	 * @param text
 	 *            the string used as the text for the action, or
 	 *            <code>null</code> if there is no text
@@ -286,7 +286,7 @@ public abstract class Action extends AbstractAction {
 	 * Creates a new action with the given text and image. Calls the zero-arg
 	 * constructor, then <code>setText</code> and
 	 * <code>setImageDescriptor</code>.
-	 *
+	 * 
 	 * @param text
 	 *            the action's text, or <code>null</code> if there is no text
 	 * @param image
@@ -302,7 +302,7 @@ public abstract class Action extends AbstractAction {
 
 	/**
 	 * Creates a new action with the given text and style.
-	 *
+	 * 
 	 * @param text
 	 *            the action's text, or <code>null</code> if there is no text
 	 * @param style
@@ -329,16 +329,26 @@ public abstract class Action extends AbstractAction {
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public int getAccelerator() {
 		return accelerator;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 * 
+	 */
 	@Override
 	public String getActionDefinitionId() {
 		return actionDefinitionId;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public String getDescription() {
 		if (description != null) {
@@ -347,31 +357,49 @@ public abstract class Action extends AbstractAction {
 		return getToolTipText();
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public ImageDescriptor getDisabledImageDescriptor() {
 		return disabledImage;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public HelpListener getHelpListener() {
 		return helpListener;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public ImageDescriptor getHoverImageDescriptor() {
 		return hoverImage;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public String getId() {
 		return id;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public ImageDescriptor getImageDescriptor() {
 		return image;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public IMenuCreator getMenuCreator() {
 		// The default drop down menu value is only used
@@ -386,6 +414,9 @@ public abstract class Action extends AbstractAction {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public int getStyle() {
 		// Infer the style from the value field.
@@ -406,26 +437,41 @@ public abstract class Action extends AbstractAction {
 		return AS_PUSH_BUTTON;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public String getText() {
 		return text;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public String getToolTipText() {
 		return toolTipText;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public boolean isChecked() {
 		return value == VAL_TOGGLE_BTN_ON || value == VAL_RADIO_BTN_ON;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public boolean isEnabled() {
 		return enabled;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public boolean isHandled() {
 		return true;
@@ -434,7 +480,7 @@ public abstract class Action extends AbstractAction {
 	/**
 	 * Reports the outcome of the running of this action via the
 	 * {@link IAction#RESULT} property.
-	 *
+	 * 
 	 * @param success
 	 *            <code>true</code> if the action succeeded and
 	 *            <code>false</code> if the action failed or was not completed
@@ -463,7 +509,7 @@ public abstract class Action extends AbstractAction {
 	 * the event argument, and simply calls <code>run()</code>. Subclasses
 	 * should override this method if they need information from the triggering
 	 * event, or override <code>run()</code> if not.
-	 *
+	 * 
 	 * @param event
 	 *            the SWT event which triggered this action being run
 	 * @since 2.0
@@ -473,16 +519,25 @@ public abstract class Action extends AbstractAction {
 		run();
 	}
 
+	/*
+	 * @see IAction#setAccelerator(int)
+	 */
 	@Override
 	public void setAccelerator(int keycode) {
 		this.accelerator = keycode;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public void setActionDefinitionId(String id) {
 		actionDefinitionId = id;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public void setChecked(boolean checked) {
 		Object newValue = null;
@@ -509,6 +564,9 @@ public abstract class Action extends AbstractAction {
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public void setDescription(String text) {
 
@@ -522,6 +580,9 @@ public abstract class Action extends AbstractAction {
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public void setDisabledImageDescriptor(ImageDescriptor newImage) {
 		if (disabledImage != newImage) {
@@ -531,6 +592,9 @@ public abstract class Action extends AbstractAction {
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public void setEnabled(boolean enabled) {
 		if (enabled != this.enabled) {
@@ -541,11 +605,17 @@ public abstract class Action extends AbstractAction {
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public void setHelpListener(HelpListener listener) {
 		helpListener = listener;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public void setHoverImageDescriptor(ImageDescriptor newImage) {
 		if (hoverImage != newImage) {
@@ -555,11 +625,17 @@ public abstract class Action extends AbstractAction {
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public void setId(String id) {
 		this.id = id;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public void setImageDescriptor(ImageDescriptor newImage) {
 		if (image != newImage) {
@@ -574,7 +650,7 @@ public abstract class Action extends AbstractAction {
 	 * <p>
 	 * Note that if this method is called, it overrides the check status.
 	 * </p>
-	 *
+	 * 
 	 * @param creator
 	 *            the menu creator, or <code>null</code> if none
 	 */
@@ -592,6 +668,9 @@ public abstract class Action extends AbstractAction {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.IAction#setText(java.lang.String)
+	 */
 	@Override
 	public void setText(String text) {
 		String oldText = this.text;
@@ -621,7 +700,7 @@ public abstract class Action extends AbstractAction {
 	 * Fires a property change event for the <code>TOOL_TIP_TEXT</code>
 	 * property if the tool tip text actually changes as a consequence.
 	 * </p>
-	 *
+	 * 
 	 * @param toolTipText
 	 *            the tool tip text, or <code>null</code> if none
 	 */

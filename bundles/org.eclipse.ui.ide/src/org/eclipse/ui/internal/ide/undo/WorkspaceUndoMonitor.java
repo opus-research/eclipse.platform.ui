@@ -30,11 +30,11 @@ import org.eclipse.ui.internal.ide.Policy;
 /**
  * WorkspaceUndoMonitor monitors the workspace for resource changes and
  * periodically checks the undo history to make sure it is valid.
- *
+ * 
  * This class is not intended to be instantiated or used by clients.
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 public class WorkspaceUndoMonitor {
 
@@ -55,7 +55,7 @@ public class WorkspaceUndoMonitor {
 
 	/**
 	 * Get the singleton instance of this class.
-	 *
+	 * 
 	 * @return the singleton instance of this class.
 	 */
 	public static WorkspaceUndoMonitor getInstance() {
@@ -107,17 +107,16 @@ public class WorkspaceUndoMonitor {
 
 	/**
 	 * Get a change listener for listening to resource changes.
-	 *
+	 * 
 	 * @return the resource change listeners
 	 */
 	private IResourceChangeListener getResourceChangeListener() {
 		return new IResourceChangeListener() {
 			/*
 			 * (non-Javadoc)
-			 *
+			 * 
 			 * @see org.eclipse.core.resources.IResourceChangeListener#resourceChanged(org.eclipse.core.resources.IResourceChangeEvent)
 			 */
-			@Override
 			public void resourceChanged(IResourceChangeEvent event) {
 				// If there is an operation in progress, this event is to be
 				// ignored.
@@ -139,7 +138,7 @@ public class WorkspaceUndoMonitor {
 
 	/**
 	 * Get a change listener for listening to operation history changes.
-	 *
+	 * 
 	 * @return the resource change listeners
 	 */
 	private IOperationHistoryListener getOperationHistoryListener() {
@@ -147,10 +146,9 @@ public class WorkspaceUndoMonitor {
 
 			/*
 			 * (non-Javadoc)
-			 *
+			 * 
 			 * @see org.eclipse.core.commands.operations.IOperationHistoryListener#historyNotification(org.eclipse.core.commands.operations.OperationHistoryEvent)
 			 */
-			@Override
 			public void historyNotification(OperationHistoryEvent event) {
 				// We only care about events that have the workspace undo
 				// context.

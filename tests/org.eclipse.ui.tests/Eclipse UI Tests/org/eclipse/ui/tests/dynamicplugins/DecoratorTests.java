@@ -19,7 +19,7 @@ import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
  * @since 3.1
  */
 public class DecoratorTests extends DynamicTestCase {
-
+	
 	public static final String FULL1 = "fullDecorator1";
 	public static final String LIGHT1 = "lightDecorator1";
 	public static final String LIGHT2 = "lightDecorator2";
@@ -30,7 +30,7 @@ public class DecoratorTests extends DynamicTestCase {
 	public DecoratorTests(String testName) {
 		super(testName);
 	}
-
+	
 	public void testDecorators() {
 		assertFalse(hasDecorator(FULL1));
 		assertFalse(hasDecorator(LIGHT1));
@@ -44,34 +44,41 @@ public class DecoratorTests extends DynamicTestCase {
 		assertFalse(hasDecorator(LIGHT1));
 		assertFalse(hasDecorator(LIGHT2));
 	}
-
+	
 	public boolean hasDecorator(String id) {
 		DecoratorManager manager = WorkbenchPlugin.getDefault().getDecoratorManager();
 		DecoratorDefinition [] definitions = manager.getAllDecoratorDefinitions();
-		for (DecoratorDefinition definition : definitions) {
-			if (definition.getId().equals(id)) {
+		for (int i = 0; i < definitions.length; i++) {
+			if (definitions[i].getId().equals(id))
 				return true;
-			}
 		}
 		return false;
 	}
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionId()
+	 */
 	protected String getExtensionId() {
 		return "newDecorator1.testDynamicDecoratorAddition";
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionPoint()
+	 */
 	protected String getExtensionPoint() {
 		return IWorkbenchRegistryConstants.PL_DECORATORS;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getInstallLocation()
+	 */
 	protected String getInstallLocation() {
 		return "data/org.eclipse.newDecorator1";
 	}
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getMarkerClass()
+	 */
 	protected String getMarkerClass() {
 		return "org.eclipse.ui.dynamic.DynamicLabelDecorator";
 	}

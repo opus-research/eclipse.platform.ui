@@ -33,7 +33,7 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 /**
  *	Operation for exporting a resource and its children to a new .zip or
  *  .tar.gz file.
- *
+ *  
  *  @since 3.1
  */
 public class ArchiveFileExportOperation implements IRunnableWithProgress {
@@ -50,7 +50,7 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
     private List errorTable = new ArrayList(1); //IStatus
 
     private boolean useCompression = true;
-
+    
     private boolean useTarFormat = false;
 
     private boolean createLeadupStructure = true;
@@ -162,7 +162,7 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
             throws InterruptedException {
         exportResource(exportResource, 1);
     }
-
+    
     /**
      * Creates and returns the string that should be used as the name of the entry in the archive.
      * @param exportResource the resource to export
@@ -173,7 +173,8 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
         if (createLeadupStructure) {
         	return fullPath.makeRelative().toString();
         }
-		return fullPath.removeFirstSegments(fullPath.segmentCount() - leadupDepth).makeRelative().toString();
+		return fullPath.removeFirstSegments(
+                fullPath.segmentCount() - leadupDepth).toString();
     }
 
     /**
@@ -212,7 +213,7 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
                 // this should never happen because an #isAccessible check is done before #members is invoked
                 addError(NLS.bind(DataTransferMessages.DataTransfer_errorExporting, exportResource.getFullPath()), e);
             }
-
+            
             if (children.length == 0) { // create an entry for empty containers, see bug 278402
             	String destinationName = createDestinationName(leadupDepth, exportResource);
                 try {
@@ -299,8 +300,7 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
      *	Export the resources that were previously specified for export
      *	(or if a single resource was specified then export it recursively)
      */
-    @Override
-	public void run(IProgressMonitor progressMonitor)
+    public void run(IProgressMonitor progressMonitor)
             throws InvocationTargetException, InterruptedException {
         this.monitor = progressMonitor;
 
@@ -361,11 +361,11 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
     public void setUseCompression(boolean value) {
         useCompression = value;
     }
-
+    
     /**
      * Set this boolean indicating whether the file should be output
      * in tar.gz format rather than .zip format.
-     *
+     * 
      * @param value boolean
      */
     public void setUseTarFormat(boolean value) {

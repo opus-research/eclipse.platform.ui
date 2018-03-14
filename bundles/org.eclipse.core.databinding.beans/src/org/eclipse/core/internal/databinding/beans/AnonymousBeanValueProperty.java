@@ -23,7 +23,7 @@ import org.eclipse.core.databinding.property.value.IValueProperty;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class AnonymousBeanValueProperty extends DelegatingValueProperty {
 	private final String propertyName;
@@ -40,7 +40,6 @@ public class AnonymousBeanValueProperty extends DelegatingValueProperty {
 		this.delegates = new HashMap();
 	}
 
-	@Override
 	protected IValueProperty doGetDelegate(Object source) {
 		return getClassDelegate(source.getClass());
 	}
@@ -60,7 +59,6 @@ public class AnonymousBeanValueProperty extends DelegatingValueProperty {
 		return delegate;
 	}
 
-	@Override
 	public IObservableValue observeDetail(IObservableValue master) {
 		Object valueType = getValueType();
 		if (valueType == null)
@@ -77,7 +75,6 @@ public class AnonymousBeanValueProperty extends DelegatingValueProperty {
 		return null;
 	}
 
-	@Override
 	public String toString() {
 		String s = "?." + propertyName; //$NON-NLS-1$
 		Class valueType = (Class) getValueType();

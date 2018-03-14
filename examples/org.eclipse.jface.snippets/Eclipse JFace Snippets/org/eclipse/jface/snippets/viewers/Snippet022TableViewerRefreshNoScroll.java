@@ -8,7 +8,6 @@
  * Contributors:
  *     Tom Schindl - initial API and implementation
  *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414565
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 442278
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -37,6 +36,8 @@ import org.eclipse.swt.widgets.TableItem;
  * A simple TableViewer to demonstrating how viewers could be refresh and
  * scrolling avoided in 3.2. In 3.3 implementors should consider using the
  * {@link StructuredViewer#refresh(Object, boolean)} instead.
+ *
+ * @author Tom Schindl <tom.schindl@bestsolution.at>
  *
  */
 public class Snippet022TableViewerRefreshNoScroll {
@@ -87,7 +88,8 @@ public class Snippet022TableViewerRefreshNoScroll {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				v.getTable().setTopIndex(0);
-				IStructuredSelection selection = v.getStructuredSelection();
+				IStructuredSelection selection = (IStructuredSelection) v
+						.getSelection();
 				v.getTable().deselectAll();
 				v.refresh();
 				if (!selection.isEmpty()) {

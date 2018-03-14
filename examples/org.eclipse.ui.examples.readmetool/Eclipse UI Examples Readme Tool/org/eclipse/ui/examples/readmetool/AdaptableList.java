@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,9 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.runtime.IAdaptable;
-
 import org.eclipse.jface.resource.ImageDescriptor;
-
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
 /**
@@ -27,7 +25,7 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
  * and navigation.
  */
 public class AdaptableList implements IWorkbenchAdapter, IAdaptable {
-    protected List<IAdaptable> children = new ArrayList<>();
+    protected List children = new ArrayList();
 
     /**
      * Creates a new adaptable list with the given children.
@@ -49,9 +47,9 @@ public class AdaptableList implements IWorkbenchAdapter, IAdaptable {
      * Adds all the adaptable objects in the given enumeration to this list.
      * Returns this list.
      */
-    public AdaptableList add(Iterator<IAdaptable> iterator) {
+    public AdaptableList add(Iterator iterator) {
         while (iterator.hasNext()) {
-            add(iterator.next());
+            add((IAdaptable) iterator.next());
         }
         return this;
     }
@@ -65,11 +63,12 @@ public class AdaptableList implements IWorkbenchAdapter, IAdaptable {
         return this;
     }
 
-    @SuppressWarnings("unchecked")
-	@Override
-	public <T> T getAdapter(Class<T> adapter) {
+    /* (non-Javadoc)
+     * Method declared on IAdaptable
+     */
+    public Object getAdapter(Class adapter) {
         if (adapter == IWorkbenchAdapter.class)
-            return (T)this;
+            return this;
         return null;
     }
 
@@ -80,23 +79,31 @@ public class AdaptableList implements IWorkbenchAdapter, IAdaptable {
         return children.toArray();
     }
 
-    @Override
-	public Object[] getChildren(Object o) {
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchAdapter
+     */
+    public Object[] getChildren(Object o) {
         return children.toArray();
     }
 
-    @Override
-	public ImageDescriptor getImageDescriptor(Object object) {
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchAdapter
+     */
+    public ImageDescriptor getImageDescriptor(Object object) {
         return null;
     }
 
-    @Override
-	public String getLabel(Object object) {
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchAdapter
+     */
+    public String getLabel(Object object) {
         return object == null ? "" : object.toString(); //$NON-NLS-1$
     }
 
-    @Override
-	public Object getParent(Object object) {
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchAdapter
+     */
+    public Object getParent(Object object) {
         return null;
     }
 

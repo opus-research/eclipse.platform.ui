@@ -27,24 +27,21 @@ public class IViewSiteTest extends IWorkbenchPartSiteTest {
     /**
      * @see IWorkbenchPartSiteTest#getTestPartName()
      */
-    @Override
-	protected String getTestPartName() throws Throwable {
+    protected String getTestPartName() throws Throwable {
         return MockViewPart.NAME;
     }
 
     /**
      * @see IWorkbenchPartSiteTest#getTestPartId()
      */
-    @Override
-	protected String getTestPartId() throws Throwable {
+    protected String getTestPartId() throws Throwable {
         return MockViewPart.ID;
     }
 
     /**
      * @see IWorkbenchPartSiteTest#createTestPart(IWorkbenchPage)
      */
-    @Override
-	protected IWorkbenchPart createTestPart(IWorkbenchPage page)
+    protected IWorkbenchPart createTestPart(IWorkbenchPage page)
             throws Throwable {
         return page.showView(MockViewPart.ID);
     }

@@ -23,75 +23,67 @@ import org.eclipse.ui.navigator.ICommonViewerWorkbenchSite;
 
 /**
  * Provides a delegate implementation of {@link ICommonViewerWorkbenchSite}.
- *
+ * 
  * @since 3.2
- *
+ * 
  */
 public class CommonViewerSiteIViewSiteDelegate implements ICommonViewerWorkbenchSite {
 
-	private IViewSite viewSite;
+	private IViewSite viewSite; 
 
 	/**
-	 *
+	 * 
 	 * @param aViewSite
 	 */
 	public CommonViewerSiteIViewSiteDelegate(IViewSite aViewSite) {
-		viewSite = aViewSite;
+		viewSite = aViewSite; 
 	}
 
-	@Override
 	public String getId() {
 		return viewSite.getId();
 	}
 
-	@Override
 	public IActionBars getActionBars() {
 		return viewSite.getActionBars();
 	}
 
-	@Override
 	public Object getAdapter(Class adapter) {
 		return viewSite.getAdapter(adapter);
 	}
 
-	@Override
 	public IWorkbenchPage getPage() {
 		return viewSite.getPage();
 	}
 
-	@Override
 	public ISelectionProvider getSelectionProvider() {
 		return viewSite.getSelectionProvider();
 	}
 
-	@Override
 	public void setSelectionProvider(ISelectionProvider aSelectionProvider) {
 		viewSite.setSelectionProvider(aSelectionProvider);
 	}
 
-	@Override
 	public Shell getShell() {
 		return viewSite.getShell();
 	}
 
-	@Override
 	public IWorkbenchWindow getWorkbenchWindow() {
 		return viewSite.getWorkbenchWindow();
 	}
 
-	@Override
 	public void registerContextMenu(String menuId, MenuManager menuManager,
 			ISelectionProvider selectionProvider) {
 		viewSite.registerContextMenu(menuId, menuManager, selectionProvider);
 	}
-
-	@Override
-	public IWorkbenchPart getPart() {
+ 
+	public IWorkbenchPart getPart() { 
 		return viewSite.getPart();
 	}
 
-	@Override
-	public IWorkbenchPartSite getSite() {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.navigator.ICommonViewerWorkbenchSite#getSite()
+	 */
+	public IWorkbenchPartSite getSite() { 
 		return viewSite;
 	}
 

@@ -44,7 +44,7 @@ import org.eclipse.ui.tests.TestPlugin;
 import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
- *
+ * 
  * The dynamic test manipualtes the categories, activities and their definitions
  * and ensures that their content and their listeners are behaving properly.
  */
@@ -76,12 +76,12 @@ public class DynamicTest extends UITestCase {
     static final int ACTIVITY_ACTIVITY_BINDINGS_CHANGED = 9;
 
     static final int DESCRIPTION_CHANGED = 10;
-
+    
     static final int DEFAULT_ENABLED_CHANGED = 11;
 
     /**
      * Constructor.
-     *
+     * 
      * @param testName
      *            Test's name.
      */
@@ -94,7 +94,7 @@ public class DynamicTest extends UITestCase {
 
     /**
      * Test sizes of what has been read.
-     *
+     *  
      */
     public void testSizes() {
         assertTrue(activityManager.getDefinedCategoryIds().size() == 6);
@@ -104,7 +104,7 @@ public class DynamicTest extends UITestCase {
 
     /**
      * Test activity bindings.
-     *
+     *  
      */
     public void testActivityPatternBindings() {
         IActivity first_activity = activityManager
@@ -126,7 +126,7 @@ public class DynamicTest extends UITestCase {
 
     /**
      * Test the enabled activities.
-     *
+     *  
      */
     public void testEnabledActivities() {
         // Add an enabled activity
@@ -145,15 +145,14 @@ public class DynamicTest extends UITestCase {
 
     /**
      * Test the identifier listener.
-     *
+     *  
      */
     public void testIdentifiersListener() {
         final IIdentifier enabledIdentifier = activityManager
                 .getIdentifier("org.eclipse.pattern3"); //$NON-NLS-1$
         assertTrue(enabledIdentifier.isEnabled());
         enabledIdentifier.addIdentifierListener(new IIdentifierListener() {
-            @Override
-			public void identifierChanged(IdentifierEvent identifierEvent) {
+            public void identifierChanged(IdentifierEvent identifierEvent) {
                 switch (listenerType) {
                 case ACTIVITY_ENABLED_CHANGED:
                     assertTrue(identifierEvent.hasEnabledChanged());
@@ -204,13 +203,12 @@ public class DynamicTest extends UITestCase {
 
     /**
      * Test the activity manager listener.
-     *
+     *  
      */
     public void testActivityManagerListener() {
         activityManager
                 .addActivityManagerListener(new IActivityManagerListener() {
-                    @Override
-					public void activityManagerChanged(
+                    public void activityManagerChanged(
                             ActivityManagerEvent activityManagerEvent) {
                         switch (listenerType) {
                         case ENABLED_ACTIVITYIDS_CHANGED:
@@ -224,7 +222,7 @@ public class DynamicTest extends UITestCase {
                         case DEFINED_ACTIVITYIDS_CHANGED:
                             assertTrue(activityManagerEvent
                                     .haveDefinedActivityIdsChanged());
-                            break;
+                            break; 
                         }
                         listenerType = -1;
                     }
@@ -262,15 +260,14 @@ public class DynamicTest extends UITestCase {
 
     /**
      * Test the activity listener.
-     *
+     *  
      */
     public void testActivityListener() {
         final String activity_to_listen_name = "Activity 18"; //$NON-NLS-1$
         final IActivity activity_to_listen = activityManager
                 .getActivity("org.eclipse.activity18"); //$NON-NLS-1$
         activity_to_listen.addActivityListener(new IActivityListener() {
-            @Override
-			public void activityChanged(ActivityEvent activityEvent) {
+            public void activityChanged(ActivityEvent activityEvent) {
                 switch (listenerType) {
                 case DEFINED_CHANGED:
                     assertTrue(activityEvent.hasDefinedChanged());
@@ -359,7 +356,7 @@ public class DynamicTest extends UITestCase {
         } catch (NotDefinedException e1) {
             fail(e1.getMessage());
         }
-
+        
         listenerType = DEFAULT_ENABLED_CHANGED;
         fixedModelRegistry.removeDefaultEnabledActivity(activity_to_listen.getId());
         assertTrue(listenerType == -1);
@@ -372,15 +369,14 @@ public class DynamicTest extends UITestCase {
 
     /**
      * Test the category listener.
-     *
+     *  
      */
     public void testCategoryListener() {
         final ICategory category_to_listen = activityManager
                 .getCategory((String) activityManager.getDefinedCategoryIds()
                         .toArray()[0]);
         category_to_listen.addCategoryListener(new ICategoryListener() {
-            @Override
-			public void categoryChanged(CategoryEvent categoryEvent) {
+            public void categoryChanged(CategoryEvent categoryEvent) {
                 switch (listenerType) {
                 case DEFINED_CHANGED:
                     assertTrue(categoryEvent.hasDefinedChanged());
@@ -445,7 +441,7 @@ public class DynamicTest extends UITestCase {
         }
         assertTrue(listenerType == -1);
     }
-
+    
 	/**
 	 * Tests to ensure dynamism with regard to the extension registry.
 	 */
@@ -463,7 +459,6 @@ public class DynamicTest extends UITestCase {
 		final boolean[] registryChanged = new boolean[] { false, false };
 		activity.addActivityListener(new IActivityListener() {
 
-			@Override
 			public void activityChanged(ActivityEvent activityEvent) {
 				registryChanged[0] = true;
 
@@ -471,7 +466,6 @@ public class DynamicTest extends UITestCase {
 		});
 		category.addCategoryListener(new ICategoryListener() {
 
-			@Override
 			public void categoryChanged(CategoryEvent categoryEvent) {
 				System.err.println("categoryChanged");
 				registryChanged[1] = true;
@@ -496,9 +490,8 @@ public class DynamicTest extends UITestCase {
 			ExtensionRegistry registry = (ExtensionRegistry) RegistryFactory
 					.getRegistry();
 			if (!registry.addContribution(is, contrib, false, null, null,
-					registry.getTemporaryUserToken())) {
+					registry.getTemporaryUserToken()))
 				throw new RuntimeException();
-			}
 		} catch (UnsupportedEncodingException e) {
 			fail(e.getMessage(), e);
 		}
@@ -510,11 +503,9 @@ public class DynamicTest extends UITestCase {
 				&& System.currentTimeMillis() < endTime) {
 
 			Display display = PlatformUI.getWorkbench().getDisplay();
-			if (display != null && !display.isDisposed()) {
-				while (display.readAndDispatch()) {
+			if (display != null && !display.isDisposed())
+				while (display.readAndDispatch())
 					;
-				}
-			}
 			display.sleep();
 
 		}
