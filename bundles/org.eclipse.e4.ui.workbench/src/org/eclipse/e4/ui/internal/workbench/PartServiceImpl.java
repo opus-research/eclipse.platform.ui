@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel (Lars.Vogel@vogella.com) - Bug 416082,  472654
+ *     Lars Vogel (Lars.Vogel@vogella.com) - Bug 416082,  472654, 395825
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 450411
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 463962
  ******************************************************************************/
@@ -643,6 +643,16 @@ public class PartServiceImpl implements EPartService {
 	}
 
 	@Override
+	public void switchPerspective(String perspectiveId) {
+		List<MPerspective> result = modelService.findElements(getWindow(), perspectiveId, MPerspective.class, null);
+		if (!result.isEmpty()) {
+			switchPerspective(result.get(0));
+			return;
+		}
+		logger.error("Perspective with ID " + perspectiveId + " not found in the current window."); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	@Override
 	public void activate(MPart part) {
 		activate(part, true);
 	}
@@ -1150,7 +1160,7 @@ public class PartServiceImpl implements EPartService {
 				return null;
 			}
 		}
-		return showPart(addPart(part), partState);
+		return showPart(part, partState);
 	}
 
 	@Override
