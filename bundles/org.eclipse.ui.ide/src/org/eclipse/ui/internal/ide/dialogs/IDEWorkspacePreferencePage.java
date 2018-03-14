@@ -19,11 +19,7 @@ import java.util.List;
 import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.IntegerFieldEditor;
@@ -72,7 +68,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage
     private IntegerFieldEditor saveInterval;
 
 	private FieldEditor workspaceName;
-	private FieldEditor showLocationInWindowTitle;
 
 	private Button autoRefreshButton;
 
@@ -105,17 +100,16 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 
 		GridData data = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
 		area.getControl().setLayoutData(data);
-
-		createSpace(composite);
+        
+		Label space = new Label(composite,SWT.NONE);
+		space.setLayoutData(new GridData());
+		
         createAutoBuildPref(composite);
         createAutoRefreshControls(composite);
         createSaveAllBeforeBuildPref(composite);
         createCloseUnrelatedProjPrefControls(composite);
-
+        
         createSpace(composite);
-		createWorkspaceLocationGroup(composite);
-
-		createSpace(composite);
         createSaveIntervalGroup(composite);
         createWindowTitleGroup(composite);
 		createSpace(composite);
@@ -186,54 +180,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage
         autoBuildButton.setSelection(ResourcesPlugin.getWorkspace()
                 .isAutoBuilding());
     }
-
-	/**
-	 * Create a composite that contains entry fields specifying the workspace
-	 * location.
-	 *
-	 * @param composite
-	 *            the Composite the group is created in.
-	 */
-	private void createWorkspaceLocationGroup(Composite composite) {
-		Composite groupComposite = new Composite(composite, SWT.LEFT);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(groupComposite);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(groupComposite);
-
-		// true workspace location
-		Label locationLabel = new Label(groupComposite, SWT.NONE);
-		locationLabel.setText(IDEWorkbenchMessages.IDEWorkspacePreference_workspaceLocation);
-		GridDataFactory.fillDefaults().applyTo(locationLabel);
-		Text workspacePath = new Text(groupComposite, SWT.READ_ONLY);
-		workspacePath.setBackground(workspacePath.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-		workspacePath.setText(getTrueWorkspaceLocation());
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(workspacePath);
-
-		// whether to show location in the window title
-		String workspaceLocationFromCommandLine = getWorkspaceLocationFromCommandLine();
-		if (workspaceLocationFromCommandLine != null) {
-			Button showWorkspace = new Button(groupComposite, SWT.CHECK);
-			if (getTrueWorkspaceLocation().equals(workspaceLocationFromCommandLine)) {
-				showWorkspace.setText(IDEWorkbenchMessages.IDEWorkspacePreference_showLocationInWindowTitle);
-			} else {
-				showWorkspace.setText(NLS.bind(
-						IDEWorkbenchMessages.IDEWorkspacePreference_showLocationInWindowTitle_withValue,
-						workspaceLocationFromCommandLine));
-			}
-			showWorkspace.setSelection(true);
-			showWorkspace.setEnabled(false);
-			showWorkspace.setToolTipText(workspaceLocationFromCommandLine);
-			GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(showWorkspace);
-		} else {
-			Composite showComposite = new Composite(composite, SWT.LEFT);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(showComposite);
-			GridLayoutFactory.fillDefaults().applyTo(showComposite);
-			showLocationInWindowTitle = new BooleanFieldEditor(IDEInternalPreferences.SHOW_LOCATION,
-					IDEWorkbenchMessages.IDEWorkspacePreference_showLocationInWindowTitle, showComposite);
-			showLocationInWindowTitle.setPage(this);
-			showLocationInWindowTitle.setPreferenceStore(getIDEPreferenceStore());
-			showLocationInWindowTitle.load();
-		}
-	}
 
     /**
      * Create a composite that contains entry fields specifying save interval
@@ -483,9 +429,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage
                 .setSelection(store
                         .getDefaultBoolean(IDEInternalPreferences.SAVE_ALL_BEFORE_BUILD));
         saveInterval.loadDefault();
-		if (showLocationInWindowTitle != null) {
-			showLocationInWindowTitle.loadDefault();
-		}
         workspaceName.loadDefault();
         
         boolean closeUnrelatedProj = store.getDefaultBoolean(IDEInternalPreferences.CLOSE_UNRELATED_PROJECTS);
@@ -561,9 +504,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage
             }
         }
         
-		if (showLocationInWindowTitle != null) {
-			showLocationInWindowTitle.store();
-		}
         workspaceName.store();
 
 		systemExplorer.store();
@@ -589,41 +529,5 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 
 		return super.performOk();
     }
-
-	/**
-	 * @return the workspace location string to be presented in the window
-	 *         title, or <code>null</code> if the location is not to be shown
-	 */
-	public static String getWorkspaceLocationForWindowTitle() {
-		String workspaceLocationFromCommandLine = getWorkspaceLocationFromCommandLine();
-		if (workspaceLocationFromCommandLine != null) {
-			return workspaceLocationFromCommandLine;
-		}
-		if (IDEWorkbenchPlugin.getDefault().getPreferenceStore().getBoolean(IDEInternalPreferences.SHOW_LOCATION)) {
-			return getTrueWorkspaceLocation();
-		}
-		return null;
-	}
-
-	private static String getTrueWorkspaceLocation() {
-		return Platform.getLocation().toOSString();
-	}
-
-	private static String getWorkspaceLocationFromCommandLine() {
-		String[] cmdLineArgs = Platform.getCommandLineArgs();
-		for (int i = 0; i < cmdLineArgs.length; i++) {
-			if ("-showlocation".equalsIgnoreCase(cmdLineArgs[i])) { //$NON-NLS-1$
-				String name = null;
-				if (cmdLineArgs.length > i + 1) {
-					name = cmdLineArgs[i + 1];
-				}
-				if (name != null && name.indexOf("-") == -1) { //$NON-NLS-1$
-					return name;
-				}
-				return getTrueWorkspaceLocation();
-			}
-		}
-		return null;
-	}
 
 }
