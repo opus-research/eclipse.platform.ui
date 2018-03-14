@@ -13,8 +13,6 @@
 
 package org.eclipse.jface.viewers;
 
-import java.lang.reflect.Array;
-
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -25,11 +23,10 @@ import org.eclipse.swt.widgets.Widget;
 
 /**
  * TableViewerRow is the Table specific implementation of ViewerRow
- * @param <E> Type of an single element of the model
  * @since 3.3
  *
  */
-public class TableViewerRow<E> extends ViewerRow<E> {
+public class TableViewerRow extends ViewerRow {
 	private TableItem item;
 
 	/**
@@ -123,7 +120,7 @@ public class TableViewerRow<E> extends ViewerRow<E> {
 	}
 
 	@Override
-	public ViewerRow<E> getNeighbor(int direction, boolean sameLevel) {
+	public ViewerRow getNeighbor(int direction, boolean sameLevel) {
 		if( direction == ViewerRow.ABOVE ) {
 			return getRowAbove();
 		} else if( direction == ViewerRow.BELOW ) {
@@ -134,24 +131,24 @@ public class TableViewerRow<E> extends ViewerRow<E> {
 	}
 
 
-	private ViewerRow<E> getRowAbove() {
+	private ViewerRow getRowAbove() {
 		int index = item.getParent().indexOf(item) - 1;
 
 		if( index >= 0 ) {
-			return new TableViewerRow<E>(item.getParent().getItem(index));
+			return new TableViewerRow(item.getParent().getItem(index));
 		}
 
 		return null;
 	}
 
-	private ViewerRow<E> getRowBelow() {
+	private ViewerRow getRowBelow() {
 		int index = item.getParent().indexOf(item) + 1;
 
 		if( index < item.getParent().getItemCount() ) {
 			TableItem tmp = item.getParent().getItem(index);
 			//TODO NULL can happen in case of VIRTUAL => How do we deal with that
 			if( tmp != null ) {
-				return new TableViewerRow<E>(tmp);
+				return new TableViewerRow(tmp);
 			}
 		}
 
@@ -159,22 +156,18 @@ public class TableViewerRow<E> extends ViewerRow<E> {
 	}
 
 	@Override
-	public TreePath<E> getTreePath() {
-		@SuppressWarnings("unchecked")
-		E[] segments = (E[]) Array.newInstance(item.getData().getClass(), 1);
-		return new TreePath<E>(segments);
+	public TreePath getTreePath() {
+		return new TreePath(new Object[] {item.getData()});
 	}
 
 	@Override
 	public Object clone() {
-		return new TableViewerRow<E>(item);
+		return new TableViewerRow(item);
 	}
 
 	@Override
-	public E getElement() {
-		@SuppressWarnings("unchecked")
-		E element = (E)item.getData();
-		return element;
+	public Object getElement() {
+		return item.getData();
 	}
 
 	@Override

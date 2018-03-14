@@ -9,7 +9,6 @@
  *     Tom Schindl - initial API and implementation
  *     IBM - Improvement for Bug 159625 [Snippets] Update Snippet011CustomTooltips to reflect new API
  *     Lars Vogel (lars.vogel@gmail.com) - Bug 413427
- *     Hendrik Still <hendrik.still@gammas.de> - bug 417676
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -40,11 +39,9 @@ import org.eclipse.swt.widgets.Shell;
 
 public class Snippet037FancyCustomTooltips {
 
-	private static class FancyToolTipSupport extends
-			ColumnViewerToolTipSupport<String, Object> {
+	private static class FancyToolTipSupport extends ColumnViewerToolTipSupport {
 
-		protected FancyToolTipSupport(ColumnViewer<String, Object> viewer,
-				int style,
+		protected FancyToolTipSupport(ColumnViewer viewer, int style,
 				boolean manualActivation) {
 			super(viewer, style, manualActivation);
 		}
@@ -72,8 +69,7 @@ public class Snippet037FancyCustomTooltips {
 			return false;
 		}
 
-		public static final void enableFor(ColumnViewer<String, Object> viewer,
-				int style) {
+		public static final void enableFor(ColumnViewer viewer, int style) {
 			new FancyToolTipSupport(viewer, style, false);
 		}
 	}
@@ -86,45 +82,43 @@ public class Snippet037FancyCustomTooltips {
 		Shell shell = new Shell(display);
 		shell.setLayout(new FillLayout());
 
-		TableViewer<String, Object> v = new TableViewer<String, Object>(shell,
-				SWT.FULL_SELECTION);
+		TableViewer v = new TableViewer(shell, SWT.FULL_SELECTION);
 		v.getTable().setLinesVisible(true);
 		v.getTable().setHeaderVisible(true);
-		v.setContentProvider(ArrayContentProvider.getInstance(String.class));
+		v.setContentProvider(ArrayContentProvider.getInstance());
 		FancyToolTipSupport.enableFor(v, ToolTip.NO_RECREATE);
 
-    CellLabelProvider<String> labelProvider = new CellLabelProvider<String>() {
+		CellLabelProvider labelProvider = new CellLabelProvider() {
 
 			@Override
-      public String getToolTipText(String element) {
+			public String getToolTipText(Object element) {
 				return "<html><body>Tooltip ("
 						+ element
 						+ ")<br /><a href='http://www.bestsolution.at' target='_NEW'>www.bestsolution.at</a></body></html>";
 			}
 
 			@Override
-			public Point getToolTipShift(String object) {
+			public Point getToolTipShift(Object object) {
 				return new Point(5, 5);
 			}
 
 			@Override
-			public int getToolTipDisplayDelayTime(String object) {
+			public int getToolTipDisplayDelayTime(Object object) {
 				return 2000;
 			}
 
 			@Override
-			public int getToolTipTimeDisplayed(String object) {
+			public int getToolTipTimeDisplayed(Object object) {
 				return 5000;
 			}
 
 			@Override
-			public void update(ViewerCell<String> cell) {
+			public void update(ViewerCell cell) {
 				cell.setText(cell.getElement().toString());
 			}
 		};
 
-		TableViewerColumn<String, Object> column = new TableViewerColumn<String, Object>(
-				v, SWT.NONE);
+		TableViewerColumn column = new TableViewerColumn(v, SWT.NONE);
 		column.setLabelProvider(labelProvider);
 		column.getColumn().setText("Column 1");
 		column.getColumn().setWidth(100);

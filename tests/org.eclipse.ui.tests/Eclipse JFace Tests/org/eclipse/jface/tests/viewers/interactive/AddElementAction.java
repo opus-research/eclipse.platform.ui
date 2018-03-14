@@ -22,8 +22,8 @@ public class AddElementAction extends TestBrowserAction {
 	}
 
 	@Override
-    public void run() {
-        TestElement element = getBrowser().getViewer().getInput();
-        element.addChild(TestModelChange.INSERT);
-    }
+	public void run() {
+		TestElement element = (TestElement) getBrowser().getViewer().getInput();
+		element.addChild(TestModelChange.INSERT);
+	}
 }

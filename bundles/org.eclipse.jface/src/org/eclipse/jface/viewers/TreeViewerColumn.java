@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 Tom Schindl and others.
+ * Copyright (c) 2006 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
- *     Hendrik Still <hendrik.still@gammas.de> - bug 413973
  ******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -18,13 +17,11 @@ import org.eclipse.swt.widgets.TreeColumn;
 /**
  * ViewerColumn implementation for TreeViewer to enable column-specific label
  * providers and editing support.
- * @param <E> Type of an element of the model
- * @param <I> Type of the input
  *
  * @since 3.3
  *
  */
-public final class TreeViewerColumn<E,I> extends ViewerColumn<E,I> {
+public final class TreeViewerColumn extends ViewerColumn {
 	private TreeColumn column;
 
 	/**
@@ -39,7 +36,7 @@ public final class TreeViewerColumn<E,I> extends ViewerColumn<E,I> {
 	 *            see {@link TreeColumn}
 	 * @see TreeColumn#TreeColumn(Tree, int)
 	 */
-	public TreeViewerColumn(TreeViewer<E,I> viewer, int style) {
+	public TreeViewerColumn(TreeViewer viewer, int style) {
 		this(viewer, style, -1);
 	}
 
@@ -57,7 +54,7 @@ public final class TreeViewerColumn<E,I> extends ViewerColumn<E,I> {
 	 *            the index at which to place the newly created column
 	 * @see TreeColumn#TreeColumn(Tree, int, int)
 	 */
-	public TreeViewerColumn(TreeViewer<E,I> viewer, int style, int index) {
+	public TreeViewerColumn(TreeViewer viewer, int style, int index) {
 		this(viewer, createColumn(viewer.getTree(), style, index));
 	}
 
@@ -70,7 +67,7 @@ public final class TreeViewerColumn<E,I> extends ViewerColumn<E,I> {
 	 * @param column
 	 *            the underlying tree column
 	 */
-	public TreeViewerColumn(TreeViewer<E,I> viewer, TreeColumn column) {
+	public TreeViewerColumn(TreeViewer viewer, TreeColumn column) {
 		super(viewer, column);
 		this.column = column;
 	}

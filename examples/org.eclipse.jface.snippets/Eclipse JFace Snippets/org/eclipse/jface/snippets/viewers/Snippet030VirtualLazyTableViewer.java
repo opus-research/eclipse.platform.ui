@@ -8,13 +8,9 @@
  * Contributors:
  *     Tom Schindl - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 414565
- *     Hendrik Still <hendrik.still@gammas.de> - bug 417676
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.jface.viewers.ILazyContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -29,13 +25,14 @@ import org.eclipse.swt.widgets.Shell;
  * A simple TableViewer to demonstrate usage of an ILazyContentProvider. You can
  * compare this snippet to the Snippet029VirtualTableViewer to see the small but
  * needed difference.
+ *
  */
 public class Snippet030VirtualLazyTableViewer {
-	private class MyContentProvider implements ILazyContentProvider<List<MyModel>> {
-		private TableViewer<MyModel,List<MyModel>> viewer;
-		private List<MyModel> elements;
+	private class MyContentProvider implements ILazyContentProvider {
+		private TableViewer viewer;
+		private MyModel[] elements;
 
-		public MyContentProvider(TableViewer<MyModel,List<MyModel>> viewer) {
+		public MyContentProvider(TableViewer viewer) {
 			this.viewer = viewer;
 		}
 
@@ -45,13 +42,13 @@ public class Snippet030VirtualLazyTableViewer {
 		}
 
 		@Override
-		public void inputChanged(Viewer<? extends List<MyModel>> viewer, List<MyModel> oldInput, List<MyModel> newInput) {
-			this.elements = newInput;
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+			this.elements = (MyModel[]) newInput;
 		}
 
 		@Override
 		public void updateElement(int index) {
-			viewer.replace(elements.get(index), index);
+			viewer.replace(elements[index], index);
 		}
 
 	}
@@ -70,23 +67,25 @@ public class Snippet030VirtualLazyTableViewer {
 	}
 
 	public Snippet030VirtualLazyTableViewer(Shell shell) {
-		final TableViewer<MyModel,List<MyModel>> v = new TableViewer<MyModel,List<MyModel>>(shell, SWT.VIRTUAL);
-		v.setLabelProvider(new LabelProvider<MyModel>());
+		final TableViewer v = new TableViewer(shell, SWT.VIRTUAL);
+		v.setLabelProvider(new LabelProvider());
 		v.setContentProvider(new MyContentProvider(v));
 		v.setUseHashlookup(true);
-		List<MyModel> model = createModel();
+		MyModel[] model = createModel();
 		v.setInput(model);
-		v.setItemCount(model.size()); // This is the difference when using a
+		v.setItemCount(model.length); // This is the difference when using a
 		// ILazyContentProvider
 
 		v.getTable().setLinesVisible(true);
 	}
 
-	private List<MyModel> createModel() {
-		List<MyModel> elements = new ArrayList<MyModel>(10000);
-		for( int i = 0; i < 10000; i++ ) {
-			elements.add(i,new MyModel(i));
+	private MyModel[] createModel() {
+		MyModel[] elements = new MyModel[10000];
+
+		for (int i = 0; i < 10000; i++) {
+			elements[i] = new MyModel(i);
 		}
+
 		return elements;
 	}
 

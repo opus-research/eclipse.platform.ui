@@ -11,8 +11,6 @@
  *******************************************************************************/
 package org.eclipse.jface.tests.viewers.interactive;
 
-import java.util.List;
-
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -33,7 +31,7 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class VirtualTableView extends ViewPart {
 
-	TableViewer<String, Object> viewer;
+	TableViewer viewer;
 
 	int itemCount = 10000;
 
@@ -47,7 +45,7 @@ public class VirtualTableView extends ViewPart {
 	@Override
 	public void createPartControl(Composite parent) {
 
-		viewer = new TableViewer<String, Object>(parent, SWT.VIRTUAL);
+		viewer = new TableViewer(parent, SWT.VIRTUAL);
 		viewer.setContentProvider(getContentProvider());
 		viewer.setInput(this);
 		viewer.setItemCount(itemCount);
@@ -69,18 +67,15 @@ public class VirtualTableView extends ViewPart {
 		delete.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				String[] ar = new String[((IStructuredSelection) viewer
-						.getSelection()).toArray().length];
-				List<String> selectionList = ((IStructuredSelection) viewer
-						.getSelection()).toList();
-				String[] selection = selectionList.toArray(ar);
-				doRemove(selection, viewer.getTable().getSelectionIndices());
+				Object[] selection = ((IStructuredSelection) viewer
+						.getSelection()).toArray();
+				doRemove(selection);
 			}
 		});
 
 	}
 
-	protected void doRemove(String[] selection, int[] selectionIndices) {
+	final protected void doRemove(Object[] selection) {
 		viewer.remove(selection);
 	}
 
@@ -89,8 +84,8 @@ public class VirtualTableView extends ViewPart {
 	 *
 	 * @return IContentProvider
 	 */
-	protected IContentProvider<Object> getContentProvider() {
-		return new IStructuredContentProvider<String, Object>() {
+	protected IContentProvider getContentProvider() {
+		return new IStructuredContentProvider() {
 			@Override
 			public void dispose() {
 				// Nothing to do here.
@@ -98,7 +93,7 @@ public class VirtualTableView extends ViewPart {
 			}
 
 			@Override
-			public String[] getElements(Object inputElement) {
+			public Object[] getElements(Object inputElement) {
 				String[] elements = new String[itemCount];
 				for (int i = 0; i < itemCount; i++) {
 					elements[i] = "Element " + String.valueOf(i);
@@ -107,9 +102,10 @@ public class VirtualTableView extends ViewPart {
 			}
 
 			@Override
-			public void inputChanged(Viewer<? extends Object> viewer,
-					Object oldInput, Object newInput) {
-				// TODO Auto-generated method stub
+			public void inputChanged(Viewer viewer, Object oldInput,
+					Object newInput) {
+				// Nothing to do here.
+
 			}
 		};
 	}

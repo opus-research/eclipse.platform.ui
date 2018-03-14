@@ -11,7 +11,6 @@
  *******************************************************************************/
 package org.eclipse.jface.tests.viewers.interactive;
 
-import org.eclipse.jface.tests.viewers.TestElement;
 import org.eclipse.jface.tests.viewers.TestLabelProvider;
 import org.eclipse.jface.viewers.ContentViewer;
 
@@ -23,7 +22,7 @@ public class SetLabelProviderAction extends TestBrowserAction {
 
     @Override
 	public void run() {
-        ((ContentViewer<TestElement,TestElement>) getBrowser().getViewer())
-                .setLabelProvider(new TestLabelProvider<TestElement>());
+        ((ContentViewer) getBrowser().getViewer())
+                .setLabelProvider(new TestLabelProvider());
     }
 }

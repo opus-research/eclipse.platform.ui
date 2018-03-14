@@ -27,13 +27,11 @@ import org.eclipse.swt.widgets.Widget;
  * ViewerRow is the abstract superclass of the part that represents items in a
  * Table or Tree. Implementors of {@link ColumnViewer} have to provide a
  * concrete implementation for the underlying widget
- * 
- * @param <E>
- *            Type of an element of the model
+ *
  * @since 3.3
  *
  */
-public abstract class ViewerRow<E> implements Cloneable {
+public abstract class ViewerRow implements Cloneable {
 
 	/**
 	 * Constant denoting the row above the current one (value is 1).
@@ -171,7 +169,7 @@ public abstract class ViewerRow<E> implements Cloneable {
 	 * @return @return {@link ViewerCell} or <code>null</code> if the point is
 	 *         not in the bounds of a cell
 	 */
-	public ViewerCell<E> getCell(Point point) {
+	public ViewerCell getCell(Point point) {
 		int index = getColumnIndex(point);
 		return getCell(index);
 	}
@@ -205,12 +203,10 @@ public abstract class ViewerRow<E> implements Cloneable {
 	 * @param column
 	 * @return {@link ViewerCell} or <code>null</code> if the index is negative.
 	 */
-	public ViewerCell<E> getCell(int column) {
-		if (column >= 0){
-			@SuppressWarnings("unchecked")
-			ViewerRow<E> viewerRow = (ViewerRow<E>) clone();
-			return new ViewerCell<E>(viewerRow, column, getElement());
-		}
+	public ViewerCell getCell(int column) {
+		if (column >= 0)
+			return new ViewerCell((ViewerRow) clone(), column, getElement());
+
 		return null;
 	}
 
@@ -233,14 +229,14 @@ public abstract class ViewerRow<E> implements Cloneable {
 	 *            if <code>true</code>, search only within sibling rows
 	 * @return the row above/below, or <code>null</code> if not found
 	 */
-	public abstract ViewerRow<E> getNeighbor(int direction, boolean sameLevel);
+	public abstract ViewerRow getNeighbor(int direction, boolean sameLevel);
 
 	/**
 	 * The tree path used to identify an element by the unique path
 	 *
 	 * @return the path
 	 */
-	public abstract TreePath<E> getTreePath();
+	public abstract TreePath getTreePath();
 
 	@Override
 	public abstract Object clone();
@@ -248,7 +244,7 @@ public abstract class ViewerRow<E> implements Cloneable {
 	/**
 	 * @return the model element
 	 */
-	public abstract E getElement();
+	public abstract Object getElement();
 
 	@Override
 	public int hashCode() {
@@ -267,8 +263,7 @@ public abstract class ViewerRow<E> implements Cloneable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		@SuppressWarnings("unchecked")
-		final ViewerRow<E> other = (ViewerRow<E>) obj;
+		final ViewerRow other = (ViewerRow) obj;
 		if (getItem() == null) {
 			if (other.getItem() != null)
 				return false;
@@ -285,7 +280,7 @@ public abstract class ViewerRow<E> implements Cloneable {
 	 *            the current index (as shown in the UI)
 	 * @return the cell at the currently visible index
 	 */
-	ViewerCell<E> getCellAtVisualIndex(int visualIndex) {
+	ViewerCell getCellAtVisualIndex(int visualIndex) {
 		return getCell(getCreationIndex(visualIndex));
 	}
 

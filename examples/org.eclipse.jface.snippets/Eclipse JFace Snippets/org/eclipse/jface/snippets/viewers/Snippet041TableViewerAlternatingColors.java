@@ -9,7 +9,6 @@
  *     Tom Schindl - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 413427, 475361
  *     Jeanderson Candido (http://jeandersonbc.github.io) - Bug 414565
- *     Hendrik Still <hendrik.still@gammas.de> - bug 417676
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -92,11 +91,10 @@ public class Snippet041TableViewerAlternatingColors {
 	final private OptimizedIndexSearcher searcher = new OptimizedIndexSearcher();
 
 	public Snippet041TableViewerAlternatingColors(Shell shell) {
-		final TableViewer<MyModel, List<MyModel>> viewer = new TableViewer<MyModel, List<MyModel>>(
-				shell, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
+		final TableViewer viewer = new TableViewer(shell, SWT.BORDER
+				| SWT.FULL_SELECTION | SWT.VIRTUAL);
 
-		viewer.setContentProvider(ArrayContentProvider
-				.getInstance(MyModel.class));
+		viewer.setContentProvider(ArrayContentProvider.getInstance());
 		String[] labels = { "Column 1", "Column 2" };
 		for (String label : labels) {
 			createColumnFor(viewer, label);
@@ -127,34 +125,33 @@ public class Snippet041TableViewerAlternatingColors {
 		};
 	}
 
-	private ViewerFilter<MyModel, List<MyModel>> createFilterForViewer() {
-		return new ViewerFilter<MyModel, List<MyModel>>() {
+	private ViewerFilter createFilterForViewer() {
+		return new ViewerFilter() {
 
 			@Override
-			public boolean select(Viewer<List<MyModel>> viewer,
-					Object parentElement, MyModel element) {
-				return element.counter % 2 == 0;
+			public boolean select(Viewer viewer, Object parentElement,
+					Object element) {
+
+				return ((MyModel) element).counter % 2 == 0;
 			}
 		};
 	}
 
-	private TableViewerColumn<MyModel, List<MyModel>> createColumnFor(
-			TableViewer<MyModel, List<MyModel>> viewer, String label) {
-		TableViewerColumn<MyModel, List<MyModel>> column = new TableViewerColumn<MyModel, List<MyModel>>(
-				viewer, SWT.NONE);
+	private TableViewerColumn createColumnFor(TableViewer viewer, String label) {
+		TableViewerColumn column;
+		column = new TableViewerColumn(viewer, SWT.NONE);
 		column.getColumn().setWidth(200);
 		column.getColumn().setText(label);
 		column.setLabelProvider(createLabelProviderFor(viewer));
 		return column;
 	}
 
-  private ColumnLabelProvider<MyModel> createLabelProviderFor(
-			final TableViewer viewer) {
-    return new ColumnLabelProvider<MyModel>() {
+	private ColumnLabelProvider createLabelProviderFor(final TableViewer viewer) {
+		return new ColumnLabelProvider() {
 			boolean isEvenIdx = true;
 
 			@Override
-			public Color getBackground(MyModel element) {
+			public Color getBackground(Object element) {
 				Color grayColor = viewer.getTable().getDisplay()
 						.getSystemColor(SWT.COLOR_GRAY);
 
@@ -162,7 +159,7 @@ public class Snippet041TableViewerAlternatingColors {
 			}
 
 			@Override
-			public void update(ViewerCell<MyModel> cell) {
+			public void update(ViewerCell cell) {
 				isEvenIdx = searcher.isEven((TableItem) cell.getItem());
 				super.update(cell);
 			}

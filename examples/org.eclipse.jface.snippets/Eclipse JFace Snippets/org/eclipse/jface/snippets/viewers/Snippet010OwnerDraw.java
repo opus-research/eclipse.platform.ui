@@ -11,7 +11,6 @@
  * 	   Lars Vogel <lars.vogel@gmail.com >- Bug 387367
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 414565
  *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414565
- *     Hendrik Still <hendrik.still@gammas.de> - bug 417676
  *******************************************************************************/
 package org.eclipse.jface.snippets.viewers;
 
@@ -34,6 +33,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
 
+
 public class Snippet010OwnerDraw {
 
 	public static void main(String[] args) {
@@ -48,9 +48,8 @@ public class Snippet010OwnerDraw {
 
 		shell.open();
 
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch())
-				display.sleep();
+		while (!shell.isDisposed ()) {
+			if (!display.readAndDispatch ()) display.sleep ();
 		}
 		display.dispose();
 	}
@@ -144,15 +143,15 @@ public class Snippet010OwnerDraw {
 			TextLayout layout = new TextLayout(display);
 			layout.setText(buffer.toString());
 
-			TextStyle plain = new TextStyle(
-					JFaceResources.getFont(JFaceResources.DEFAULT_FONT),
-					display.getSystemColor(SWT.COLOR_LIST_FOREGROUND),
-					display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+			TextStyle plain = new TextStyle(JFaceResources
+					.getFont(JFaceResources.DEFAULT_FONT), display
+					.getSystemColor(SWT.COLOR_LIST_FOREGROUND), display
+					.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
 			TextStyle italic = new TextStyle(JFaceResources.getFontRegistry()
-					.getItalic(JFaceResources.DEFAULT_FONT),
-					display.getSystemColor(SWT.COLOR_BLUE),
-					display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+					.getItalic(JFaceResources.DEFAULT_FONT), display
+					.getSystemColor(SWT.COLOR_BLUE), display
+					.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
 			layout.setStyle(plain, 0, name.length() - 1);
 			layout.setStyle(italic, name.length(), buffer.length() - 1);
@@ -286,7 +285,7 @@ public class Snippet010OwnerDraw {
 		}
 	}
 
-	private TableViewer<CountryEntry, CountryEntry[]> viewer;
+	private TableViewer viewer;
 
 	private CountryEntry[] entries;
 
@@ -297,24 +296,25 @@ public class Snippet010OwnerDraw {
 		entries[2] = new EnglandEntry();
 	}
 
+
 	public void createPartControl(Composite parent) {
-		viewer = new TableViewer<CountryEntry, CountryEntry[]>(parent,
-				SWT.FULL_SELECTION);
-		viewer.setContentProvider(ArrayContentProvider
-				.getInstance(CountryEntry.class));
+		viewer = new TableViewer(parent, SWT.FULL_SELECTION);
+		viewer.setContentProvider(ArrayContentProvider.getInstance());
 
 		createColumns();
 
-    viewer.setLabelProvider(new OwnerDrawLabelProvider<CountryEntry>() {
+		viewer.setLabelProvider(new OwnerDrawLabelProvider() {
 			@Override
-			protected void measure(Event event, CountryEntry element) {
-				event.setBounds(new Rectangle(event.x, event.y, element
-						.getWidth(event), element.getHeight(event)));
+			protected void measure(Event event, Object element) {
+				CountryEntry country = (CountryEntry) element;
+				event.setBounds(new Rectangle(event.x, event.y, country.getWidth(event),
+						country.getHeight(event)));
 			}
 
 			@Override
-			protected void paint(Event event, CountryEntry element) {
-				element.draw(event);
+			protected void paint(Event event, Object element) {
+				CountryEntry entry = (CountryEntry) element;
+				entry.draw(event);
 
 			}
 		});

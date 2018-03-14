@@ -11,7 +11,6 @@
  *******************************************************************************/
 package org.eclipse.jface.tests.viewers.interactive;
 
-import org.eclipse.jface.tests.viewers.TestElement;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
 
@@ -23,9 +22,9 @@ public class SetSorterAction extends TestBrowserAction {
 
     @Override
 	public void run() {
-        Viewer<TestElement> viewer = getBrowser().getViewer();
+        Viewer viewer = getBrowser().getViewer();
         if (viewer instanceof StructuredViewer) {
-            StructuredViewer<TestElement,TestElement> v = (StructuredViewer<TestElement,TestElement>) viewer;
+            StructuredViewer v = (StructuredViewer) viewer;
             v.setSorter(new Sorter());
         }
     }
