@@ -32,12 +32,14 @@ import org.eclipse.swt.widgets.Item;
 /**
  * This is the base for all editor implementations of Viewers. ColumnViewer
  * implementors have to subclass this class and implement the missing methods
+ * @param <E> Type of an single element of the model
+ * @param <I> Type of the input
  *
  * @since 3.3
  * @see TableViewerEditor
  * @see TreeViewerEditor
  */
-public abstract class ColumnViewerEditor {
+public abstract class ColumnViewerEditor<E,I> {
 	private CellEditor cellEditor;
 
 	private ICellEditorListener cellEditorListener;
@@ -46,15 +48,15 @@ public abstract class ColumnViewerEditor {
 
 	private MouseListener mouseListener;
 
-	private ColumnViewer viewer;
+	private ColumnViewer<E,I> viewer;
 
 	private TraverseListener tabeditingListener;
 
-	private ViewerCell cell;
+	private ViewerCell<E> cell;
 
 	private ListenerList editorActivationListener;
 
-	private ColumnViewerEditorActivationStrategy editorActivationStrategy;
+	private ColumnViewerEditorActivationStrategy<E,I> editorActivationStrategy;
 
 	private boolean inEditorDeactivation;
 
@@ -117,8 +119,8 @@ public abstract class ColumnViewerEditor {
 	 *            <li>{@link ColumnViewerEditor#TABBING_VERTICAL}</li>
 	 *            </ul>
 	 */
-	protected ColumnViewerEditor(final ColumnViewer viewer,
-			ColumnViewerEditorActivationStrategy editorActivationStrategy,
+	protected ColumnViewerEditor(final ColumnViewer<E,I> viewer,
+			ColumnViewerEditorActivationStrategy<E,I> editorActivationStrategy,
 			int feature) {
 		this.viewer = viewer;
 		this.editorActivationStrategy = editorActivationStrategy;
@@ -162,8 +164,8 @@ public abstract class ColumnViewerEditor {
 
 	private boolean activateCellEditor(final ColumnViewerEditorActivationEvent activationEvent) {
 
-		ViewerColumn part = viewer.getViewerColumn(cell.getColumnIndex());
-		Object element = cell.getElement();
+		ViewerColumn<E,I> part = viewer.getViewerColumn(cell.getColumnIndex());
+		E element = cell.getElement();
 
 		if (part != null && part.getEditingSupport() != null
 				&& part.getEditingSupport().canEdit(element)) {
@@ -446,7 +448,9 @@ public abstract class ColumnViewerEditor {
 				applyEditorValue();
 			}
 
-			this.cell = (ViewerCell) event.getSource();
+			@SuppressWarnings("unchecked")
+			ViewerCell<E> viewerCell = (ViewerCell<E>) event.getSource();
+			this.cell = viewerCell;
 
 			// Only null if we are not in a deactivation process see bug 260892
 			if( ! activateCellEditor(event) && ! inEditorDeactivation ) {
@@ -457,7 +461,7 @@ public abstract class ColumnViewerEditor {
 	}
 
 	private void saveEditorValue(CellEditor cellEditor) {
-		ViewerColumn part = viewer.getViewerColumn(cell.getColumnIndex());
+		ViewerColumn<E,I> part = viewer.getViewerColumn(cell.getColumnIndex());
 
 		if (part != null && part.getEditingSupport() != null) {
 			part.getEditingSupport().saveCellEditorValue(cellEditor, cell);
@@ -532,10 +536,10 @@ public abstract class ColumnViewerEditor {
 	 * @param event
 	 *            the traverse event
 	 */
-	protected void processTraverseEvent(int columnIndex, ViewerRow row,
+	protected void processTraverseEvent(int columnIndex, ViewerRow<E> row,
 			TraverseEvent event) {
 
-		ViewerCell cell2edit = null;
+		ViewerCell<E> cell2edit = null;
 
 		if (event.detail == SWT.TRAVERSE_TAB_PREVIOUS) {
 			event.doit = false;
@@ -570,11 +574,11 @@ public abstract class ColumnViewerEditor {
 		}
 	}
 
-	private ViewerCell searchCellAboveBelow(ViewerRow row, ColumnViewer viewer,
+	private ViewerCell<E> searchCellAboveBelow(ViewerRow<E> row, ColumnViewer<E,I> viewer,
 			int columnIndex, boolean above) {
-		ViewerCell rv = null;
+		ViewerCell<E> rv = null;
 
-		ViewerRow newRow = null;
+		ViewerRow<E> newRow = null;
 
 		if (above) {
 			newRow = row.getNeighbor(ViewerRow.ABOVE, false);
@@ -583,12 +587,16 @@ public abstract class ColumnViewerEditor {
 		}
 
 		if (newRow != null) {
-			ViewerColumn column = viewer.getViewerColumn(columnIndex);
-			if (column != null
-					&& column.getEditingSupport() != null
-					&& column.getEditingSupport().canEdit(
-							newRow.getItem().getData())) {
-				rv = newRow.getCell(columnIndex);
+			ViewerColumn<E,I> column = viewer.getViewerColumn(columnIndex);
+			if (column != null && column.getEditingSupport() != null) {
+				@SuppressWarnings("unchecked")
+				E element = (E) newRow.getItem().getData();
+				if (column.getEditingSupport().canEdit(element)) {
+					rv = newRow.getCell(columnIndex);
+				} else {
+					rv = searchCellAboveBelow(newRow, viewer, columnIndex,
+							above);
+				}
 			} else {
 				rv = searchCellAboveBelow(newRow, viewer, columnIndex, above);
 			}
@@ -597,16 +605,16 @@ public abstract class ColumnViewerEditor {
 		return rv;
 	}
 
-	private boolean isCellEditable(ColumnViewer viewer, ViewerCell cell) {
-		ViewerColumn column = viewer.getViewerColumn(cell.getColumnIndex());
+	private boolean isCellEditable(ColumnViewer<E,I> viewer, ViewerCell<E> cell) {
+		ViewerColumn<E,I> column = viewer.getViewerColumn(cell.getColumnIndex());
 		return column != null && column.getEditingSupport() != null
 				&& column.getEditingSupport().canEdit(cell.getElement());
 	}
 
-	private ViewerCell searchPreviousCell(ViewerRow row,
-			ViewerCell currentCell, ViewerCell originalCell, ColumnViewer viewer) {
-		ViewerCell rv = null;
-		ViewerCell previousCell;
+	private ViewerCell<E> searchPreviousCell(ViewerRow<E> row,
+			ViewerCell<E> currentCell, ViewerCell<E> originalCell, ColumnViewer<E,I> viewer) {
+		ViewerCell<E> rv = null;
+		ViewerCell<E> previousCell;
 
 		if (currentCell != null) {
 			previousCell = currentCell.getNeighbor(ViewerCell.LEFT, true);
@@ -635,7 +643,7 @@ public abstract class ColumnViewerEditor {
 			if ((feature & TABBING_CYCLE_IN_ROW) == TABBING_CYCLE_IN_ROW) {
 				rv = searchPreviousCell(row, null, originalCell, viewer);
 			} else if ((feature & TABBING_MOVE_TO_ROW_NEIGHBOR) == TABBING_MOVE_TO_ROW_NEIGHBOR) {
-				ViewerRow rowAbove = row.getNeighbor(ViewerRow.ABOVE, false);
+				ViewerRow<E> rowAbove = row.getNeighbor(ViewerRow.ABOVE, false);
 				if (rowAbove != null) {
 					rv = searchPreviousCell(rowAbove, null, originalCell,
 							viewer);
@@ -646,11 +654,11 @@ public abstract class ColumnViewerEditor {
 		return rv;
 	}
 
-	private ViewerCell searchNextCell(ViewerRow row, ViewerCell currentCell,
-			ViewerCell originalCell, ColumnViewer viewer) {
-		ViewerCell rv = null;
+	private ViewerCell<E> searchNextCell(ViewerRow<E> row, ViewerCell<E> currentCell,
+			ViewerCell<E> originalCell, ColumnViewer<E,I> viewer) {
+		ViewerCell<E> rv = null;
 
-		ViewerCell nextCell;
+		ViewerCell<E> nextCell;
 
 		if (currentCell != null) {
 			nextCell = currentCell.getNeighbor(ViewerCell.RIGHT, true);
@@ -673,7 +681,7 @@ public abstract class ColumnViewerEditor {
 			if ((feature & TABBING_CYCLE_IN_ROW) == TABBING_CYCLE_IN_ROW) {
 				rv = searchNextCell(row, null, originalCell, viewer);
 			} else if ((feature & TABBING_MOVE_TO_ROW_NEIGHBOR) == TABBING_MOVE_TO_ROW_NEIGHBOR) {
-				ViewerRow rowBelow = row.getNeighbor(ViewerRow.BELOW, false);
+				ViewerRow<E> rowBelow = row.getNeighbor(ViewerRow.BELOW, false);
 				if (rowBelow != null) {
 					rv = searchNextCell(rowBelow, null, originalCell, viewer);
 				}
@@ -709,7 +717,7 @@ public abstract class ColumnViewerEditor {
 	 * @param event
 	 *            the event requesting to update the focusCell
 	 */
-	protected abstract void updateFocusCell(ViewerCell focusCell,
+	protected abstract void updateFocusCell(ViewerCell<E> focusCell,
 			ColumnViewerEditorActivationEvent event);
 
 	/**
@@ -718,14 +726,14 @@ public abstract class ColumnViewerEditor {
 	 *         returned
 	 *
 	 */
-	public ViewerCell getFocusCell() {
+	public ViewerCell<E> getFocusCell() {
 		return null;
 	}
 
 	/**
 	 * @return the viewer working for
 	 */
-	protected ColumnViewer getViewer() {
+	protected ColumnViewer<E,I> getViewer() {
 		return viewer;
 	}
 }
