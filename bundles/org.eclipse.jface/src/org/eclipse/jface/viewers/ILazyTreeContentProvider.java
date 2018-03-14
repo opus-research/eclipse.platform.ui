@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     John Cortell, Freescale - bug 289409
- *     Hendrik Still <hendrik.still@gammas.de> - bug 413973
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -17,12 +16,9 @@ package org.eclipse.jface.viewers;
  * using the SWT.VIRTUAL flag that only wish to return their contents as they
  * are queried.
  *
- * @param <E> Type of an single element of the model
- * @param <I> Type of the input
- *
  * @since 3.2
  */
-public interface ILazyTreeContentProvider<E,I> extends IContentProvider<I> {
+public interface ILazyTreeContentProvider extends IContentProvider {
 	/**
 	 * Called when a previously-blank item becomes visible in the TreeViewer. If
 	 * the content provider knows the child element for the given parent at this
@@ -49,7 +45,7 @@ public interface ILazyTreeContentProvider<E,I> extends IContentProvider<I> {
 	 * @param index
 	 *            The index of the element to update in the tree
 	 */
-	public void updateElement(E parent, int index);
+	public void updateElement(Object parent, int index);
 
 	/**
 	 * Called when the TreeViewer needs an up-to-date child count for the given
@@ -66,7 +62,7 @@ public interface ILazyTreeContentProvider<E,I> extends IContentProvider<I> {
 	 * @param currentChildCount
 	 * 			  The current child count for the element that needs updating
 	 */
-	public void updateChildCount(E element, int currentChildCount);
+	public void updateChildCount(Object element, int currentChildCount);
 
     /**
      * Returns the parent for the given element, or <code>null</code>
@@ -78,5 +74,5 @@ public interface ILazyTreeContentProvider<E,I> extends IContentProvider<I> {
      * @return the parent element, or <code>null</code> if it
      *   has none or if the parent cannot be computed
      */
-	public E getParent(E element);
+	public Object getParent(Object element);
 }

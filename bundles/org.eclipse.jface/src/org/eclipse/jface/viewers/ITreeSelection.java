@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414057
- ******************************************************************************/
+ *******************************************************************************/
 package org.eclipse.jface.viewers;
 
 /**
@@ -18,9 +17,8 @@ package org.eclipse.jface.viewers;
  * use the standard implementation of this interface, {@link TreeSelection}.
  * <code>TreeSelection</code> adds API for getting the {@link IElementComparer}
  * of a selection (if available). This is important for clients who want to
- * create a slightly modified tree selection based on an existing tree
- * selection. The recommended coding pattern in this case is as follows:
- *
+ * create a slightly modified tree selection based on an existing tree selection.
+ * The recommended coding pattern in this case is as follows:
  * <pre>
  * ITreeSelection selection = (ITreeSelection)treeViewer.getSelection();
  * TreePath[] paths = selection.getPaths();
@@ -31,34 +29,29 @@ package org.eclipse.jface.viewers;
  * TreePath[] modifiedPaths = ... // modify as required
  * TreeSelection modifiedSelection = new TreeSelection(modifiedPaths, comparer);
  * </pre>
- *
  * See bugs 135818 and 133375 for details.
  * </p>
- *
- * @param <E>
- *            Type of the selected element
  *
  * @since 3.2
  *
  */
-public interface ITreeSelection<E> extends IStructuredSelection<E> {
+public interface ITreeSelection extends IStructuredSelection {
 
 	/**
 	 * Returns the paths in this selection
 	 *
 	 * @return the paths in this selection
 	 */
-	public TreePath<E>[] getPaths();
+	public TreePath[] getPaths();
 
 	/**
-	 * Returns the paths in this selection whose last segment is equal to the
-	 * given element
+	 * Returns the paths in this selection whose last segment is equal
+	 * to the given element
 	 *
-	 * @param element
-	 *            the element to get the tree paths for
+	 * @param element the element to get the tree paths for
 	 *
 	 * @return the array of tree paths
 	 */
-	public TreePath<E>[] getPathsFor(E element);
+	public TreePath[] getPathsFor(Object element);
 
 }

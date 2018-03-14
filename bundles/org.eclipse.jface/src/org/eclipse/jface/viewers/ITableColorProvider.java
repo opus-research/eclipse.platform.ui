@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     Initial implementation - Gunnar Ahlberg (IBS AB, www.ibs.net)
  *     IBM Corporation - further revisions
- *     Hendrik Still <hendrik.still@gammas.de> - bug 415561
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -18,10 +17,9 @@ import org.eclipse.swt.graphics.Color;
 /**
  * Interface to provide color representation for a given cell within
  * the row for an element in a table.
- * @param <E> Type of an single element of the model
  * @since 3.1
  */
-public interface ITableColorProvider<E> {
+public interface ITableColorProvider {
 
     /**
      * Provides a foreground color for the given element.
@@ -32,7 +30,7 @@ public interface ITableColorProvider<E> {
      * @return the foreground color for the element, or <code>null</code> to
      *         use the default foreground color
      */
-    Color getForeground(E element, int columnIndex);
+    Color getForeground(Object element, int columnIndex);
 
     /**
      * Provides a background color for the given element at the specified index
@@ -43,5 +41,5 @@ public interface ITableColorProvider<E> {
      *         use the default background color
      *
      */
-    Color getBackground(E element, int columnIndex);
+    Color getBackground(Object element, int columnIndex);
 }

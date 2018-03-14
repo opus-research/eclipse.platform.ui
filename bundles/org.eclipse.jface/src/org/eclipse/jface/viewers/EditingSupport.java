@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
  *     											   fix in bug 151295,167325,201905
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 402445
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -19,23 +18,18 @@ import org.eclipse.core.runtime.Assert;
 /**
  * EditingSupport is the abstract superclass of the support for cell editing.
  *
- * @param <E>
- *            Type of an single element of the model
- * @param <I>
- *            Type of the input
- *
  * @since 3.3
  *
  */
-public abstract class EditingSupport<E,I> {
+public abstract class EditingSupport {
 
-	private ColumnViewer<E, I> viewer;
+	private ColumnViewer viewer;
 
 	/**
 	 * @param viewer
 	 *            a new viewer
 	 */
-	public EditingSupport(ColumnViewer<E,I> viewer) {
+	public EditingSupport(ColumnViewer viewer) {
 		Assert.isNotNull(viewer, "Viewer is not allowed to be null"); //$NON-NLS-1$
 		this.viewer = viewer;
 	}
@@ -47,7 +41,7 @@ public abstract class EditingSupport<E,I> {
 	 *            the model element
 	 * @return the CellEditor
 	 */
-	protected abstract CellEditor getCellEditor(E element);
+	protected abstract CellEditor getCellEditor(Object element);
 
 	/**
 	 * Is the cell editable
@@ -56,7 +50,7 @@ public abstract class EditingSupport<E,I> {
 	 *            the model element
 	 * @return true if editable
 	 */
-	protected abstract boolean canEdit(E element);
+	protected abstract boolean canEdit(Object element);
 
 	/**
 	 * Get the value to set to the editor
@@ -65,7 +59,7 @@ public abstract class EditingSupport<E,I> {
 	 *            the model element
 	 * @return the value shown
 	 */
-	protected abstract Object getValue(E element);
+	protected abstract Object getValue(Object element);
 
 	/**
 	 * Sets the new value on the given element. Note that implementers need to
@@ -83,12 +77,12 @@ public abstract class EditingSupport<E,I> {
 	 * @param value
 	 *            the new value
 	 */
-	protected abstract void setValue(E element, Object value);
+	protected abstract void setValue(Object element, Object value);
 
 	/**
 	 * @return the viewer this editing support works for
 	 */
-	public ColumnViewer<E,I> getViewer() {
+	public ColumnViewer getViewer() {
 		return viewer;
 	}
 
@@ -101,7 +95,7 @@ public abstract class EditingSupport<E,I> {
 	 * @param cell
 	 *            the cell the editor is working for
 	 */
-	protected void initializeCellEditorValue(CellEditor cellEditor, ViewerCell<E> cell) {
+	protected void initializeCellEditorValue(CellEditor cellEditor, ViewerCell cell) {
 		Object value = getValue(cell.getElement());
 		cellEditor.setValue(value);
 	}
@@ -114,7 +108,7 @@ public abstract class EditingSupport<E,I> {
 	 * @param cell
 	 * 			  the cell the editor is working for
 	 */
-	protected void saveCellEditorValue(CellEditor cellEditor, ViewerCell<E> cell) {
+	protected void saveCellEditorValue(CellEditor cellEditor, ViewerCell cell) {
 		Object value = cellEditor.getValue();
 		setValue(cell.getElement(), value);
 	}
