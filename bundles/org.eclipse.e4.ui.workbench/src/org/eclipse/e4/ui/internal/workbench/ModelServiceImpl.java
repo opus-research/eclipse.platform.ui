@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -73,7 +73,6 @@ public class ModelServiceImpl implements EModelService {
 	// Cleans up after a hosted element is disposed
 	private EventHandler hostedElementHandler = new EventHandler() {
 
-		@Override
 		public void handleEvent(Event event) {
 			final MUIElement changedElement = (MUIElement) event.getProperty(EventTags.ELEMENT);
 			if (!changedElement.getTags().contains(HOSTED_ELEMENT)) {
@@ -118,7 +117,11 @@ public class ModelServiceImpl implements EModelService {
 				appContext.get(IExtensionRegistry.class));
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.e4.ui.workbench.modeling.EModelService#createModelElement(java.lang.Class)
+	 */
 	@SuppressWarnings("unchecked")
 	public final <T extends MApplicationElement> T createModelElement(Class<T> elementType) {
 		if (elementType == null) {
@@ -234,21 +237,24 @@ public class ModelServiceImpl implements EModelService {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.e4.ui.workbench.modeling.EModelService#findElements(org.eclipse.e4.ui.model.
+	 * application.ui.MUIElement, java.lang.String, java.lang.Class, java.util.List)
+	 */
 	public <T> List<T> findElements(MUIElement searchRoot, String id, Class<T> clazz,
 			List<String> tagsToMatch) {
 		ElementMatcher matcher = new ElementMatcher(id, clazz, tagsToMatch);
 		return findElements(searchRoot, ANYWHERE, matcher);
 	}
 
-	@Override
 	public <T> List<T> findElements(MUIElement searchRoot, String id, Class<T> clazz,
 			List<String> tagsToMatch, int searchFlags) {
 		ElementMatcher matcher = new ElementMatcher(id, clazz, tagsToMatch);
 		return findElements(searchRoot, searchFlags, matcher);
 	}
 
-	@Override
 	public <T> List<T> findElements(MApplicationElement searchRoot, int searchFlags,
 			Selector matcher) {
 		List<T> elements = new ArrayList<T>();
@@ -265,7 +271,12 @@ public class ModelServiceImpl implements EModelService {
 		return elements;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.e4.ui.workbench.modeling.EModelService#find(java.lang.String,
+	 * org.eclipse.e4.ui.model.application.MElementContainer)
+	 */
 	public MUIElement find(String id, MUIElement searchRoot) {
 		if (id == null || id.length() == 0) {
 			return null;
@@ -278,7 +289,13 @@ public class ModelServiceImpl implements EModelService {
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.e4.ui.workbench.modeling.EModelService#countRenderableChildren(org.eclipse.e4
+	 * .ui.model.application.ui.MUIElement)
+	 */
 	public int countRenderableChildren(MUIElement element) {
 		if (!(element instanceof MElementContainer<?>)) {
 			return 0;
@@ -295,12 +312,23 @@ public class ModelServiceImpl implements EModelService {
 		return count;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.e4.ui.workbench.modeling.EModelService#getContainingContext(org.eclipse.e4.ui
+	 * .model .application.MUIElement)
+	 */
 	public IEclipseContext getContainingContext(MUIElement element) {
 		return ModelUtils.getContainingContext(element);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.e4.ui.workbench.modeling.EModelService#cloneElement(org.eclipse.e4.ui.model.
+	 * application.ui.MUIElement, java.lang.String)
+	 */
 	public MUIElement cloneElement(MUIElement element, MSnippetContainer snippetContainer) {
 		EObject eObj = (EObject) element;
 		MUIElement clone = (MUIElement) EcoreUtil.copy(eObj);
@@ -331,7 +359,12 @@ public class ModelServiceImpl implements EModelService {
 		return clone;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.e4.ui.workbench.modeling.EModelService#cloneSnippet(org.eclipse.e4.ui.model.
+	 * application.MApplication, java.lang.String)
+	 */
 	public MUIElement cloneSnippet(MSnippetContainer snippetContainer, String snippetId,
 			MWindow refWin) {
 		if (snippetContainer == null || snippetId == null || snippetId.length() == 0) {
@@ -367,7 +400,12 @@ public class ModelServiceImpl implements EModelService {
 		return element;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.e4.ui.workbench.modeling.EModelService#findSnippet(org.eclipse.e4.ui.model.
+	 * application.ui.MSnippetContainer, java.lang.String)
+	 */
 	public MUIElement findSnippet(MSnippetContainer snippetContainer, String id) {
 		if (snippetContainer == null || id == null || id.length() == 0) {
 			return null;
@@ -383,7 +421,12 @@ public class ModelServiceImpl implements EModelService {
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.e4.ui.workbench.modeling.EModelService#findHandler(org.eclipse.e4.ui.model.
+	 * application.commands.MHandlerContainer, java.lang.String)
+	 */
 	public MHandler findHandler(MHandlerContainer handlerContainer, String id) {
 		if (handlerContainer == null || id == null || id.length() == 0) {
 			return null;
@@ -398,7 +441,13 @@ public class ModelServiceImpl implements EModelService {
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.e4.ui.workbench.modeling.EModelService#bringToTop(org.eclipse.e4.ui.model.application
+	 * .ui.MUIElement)
+	 */
 	public void bringToTop(MUIElement element) {
 		if (element instanceof MApplication) {
 			return;
@@ -453,7 +502,13 @@ public class ModelServiceImpl implements EModelService {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.e4.ui.workbench.modeling.EModelService#findPlaceholderFor(org.eclipse.e4.ui.model
+	 * .application.ui.basic.MWindow, org.eclipse.e4.ui.model.application.ui.MUIElement)
+	 */
 	public MPlaceholder findPlaceholderFor(MWindow window, MUIElement element) {
 		List<MPlaceholder> phList = findPerspectiveElements(window, null, MPlaceholder.class, null);
 		List<MPlaceholder> elementRefs = new ArrayList<MPlaceholder>();
@@ -483,23 +538,47 @@ public class ModelServiceImpl implements EModelService {
 		return elementRefs.get(0);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.e4.ui.workbench.modeling.EModelService#move(org.eclipse.e4.ui.model.application.
+	 * MUIElement, org.eclipse.e4.ui.model.application.MElementContainer)
+	 */
 	public void move(MUIElement element, MElementContainer<MUIElement> newParent) {
 		move(element, newParent, -1, false);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.e4.ui.workbench.modeling.EModelService#move(org.eclipse.e4.ui.model.application.
+	 * MUIElement, org.eclipse.e4.ui.model.application.MElementContainer, boolean)
+	 */
 	public void move(MUIElement element, MElementContainer<MUIElement> newParent,
 			boolean leavePlaceholder) {
 		move(element, newParent, -1, leavePlaceholder);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.e4.ui.workbench.modeling.EModelService#move(org.eclipse.e4.ui.model.application.
+	 * MUIElement, org.eclipse.e4.ui.model.application.MElementContainer, int)
+	 */
 	public void move(MUIElement element, MElementContainer<MUIElement> newParent, int index) {
 		move(element, newParent, index, false);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.e4.ui.workbench.modeling.EModelService#move(org.eclipse.e4.ui.model.application.
+	 * MUIElement, org.eclipse.e4.ui.model.application.MElementContainer, int, boolean)
+	 */
 	public void move(MUIElement element, MElementContainer<MUIElement> newParent, int index,
 			boolean leavePlaceholder) {
 		// Cache where we were
@@ -539,7 +618,14 @@ public class ModelServiceImpl implements EModelService {
 		curParent.getChildren().add(index, newSash);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.e4.ui.workbench.modeling.EModelService#insert(org.eclipse.e4.ui.model.application
+	 * .MPartSashContainerElement, org.eclipse.e4.ui.model.application.MPartSashContainerElement,
+	 * int, int)
+	 */
 	public void insert(MPartSashContainerElement toInsert, MPartSashContainerElement relTo,
 			int where, float ratio) {
 		assert (toInsert != null && relTo != null);
@@ -680,7 +766,13 @@ public class ModelServiceImpl implements EModelService {
 		return (pscHorizontal && horizontal) || (!pscHorizontal && !horizontal);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.e4.ui.workbench.modeling.EModelService#detach(org.eclipse.e4.ui.model.application
+	 * .MPartSashContainerElement)
+	 */
 	public void detach(MPartSashContainerElement element, int x, int y, int width, int height) {
 		// If we're showing through a placehoilder then detach it...
 		if (element.getCurSharedRef() != null) {
@@ -693,6 +785,7 @@ public class ModelServiceImpl implements EModelService {
 
 		MTrimmedWindow newWindow = MBasicFactory.INSTANCE.createTrimmedWindow();
 
+		// HACK! should either be args or should be computed from the control being detached
 		newWindow.setX(x);
 		newWindow.setY(y);
 		newWindow.setWidth(width);
@@ -734,7 +827,13 @@ public class ModelServiceImpl implements EModelService {
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.e4.ui.workbench.modeling.EModelService#getTrim(org.eclipse.e4.ui.model.application
+	 * .ui.basic.MTrimmedWindow, org.eclipse.e4.ui.model.application.ui.SideValue)
+	 */
 	public MTrimBar getTrim(MTrimmedWindow window, SideValue sv) {
 		List<MTrimBar> bars = window.getTrimBars();
 		for (MTrimBar bar : bars) {
@@ -762,7 +861,13 @@ public class ModelServiceImpl implements EModelService {
 		return newBar;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.e4.ui.workbench.modeling.EModelService#getTopLevelWindowFor(org.eclipse.e4.ui
+	 * .model .application.ui.MUIElement)
+	 */
 	public MWindow getTopLevelWindowFor(MUIElement element) {
 		EObject eObj = (EObject) element;
 		while (eObj != null && !(eObj.eContainer() instanceof MApplication)) {
@@ -776,7 +881,13 @@ public class ModelServiceImpl implements EModelService {
 		return null; // Ooops!
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.e4.ui.workbench.modeling.EModelService#getPerspectiveFor(org.eclipse.e4.ui.model
+	 * .application.ui.MUIElement)
+	 */
 	public MPerspective getPerspectiveFor(MUIElement element) {
 
 		while (true) {
@@ -799,7 +910,6 @@ public class ModelServiceImpl implements EModelService {
 		}
 	}
 
-	@Override
 	public void resetPerspectiveModel(MPerspective persp, MWindow window) {
 		resetPerspectiveModel(persp, window, true);
 	}
@@ -865,7 +975,6 @@ public class ModelServiceImpl implements EModelService {
 		}
 	}
 
-	@Override
 	public void removePerspectiveModel(MPerspective persp, MWindow window) {
 		// pick a new perspective to become active (if any)
 		MUIElement psElement = persp.getParent();
@@ -893,7 +1002,13 @@ public class ModelServiceImpl implements EModelService {
 		ps.getChildren().remove(persp);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.e4.ui.workbench.modeling.EModelService#getActivePerspective(org.eclipse.e4.ui
+	 * .model.application.ui.basic.MWindow)
+	 */
 	public MPerspective getActivePerspective(MWindow window) {
 		List<MPerspectiveStack> pStacks = findElements(window, null, MPerspectiveStack.class, null);
 		if (pStacks.size() == 1) {
@@ -903,7 +1018,13 @@ public class ModelServiceImpl implements EModelService {
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.e4.ui.workbench.modeling.EModelService#toBeRenderedCount(org.eclipse.e4.ui.model
+	 * .application.ui.MElementContainer)
+	 */
 	public int toBeRenderedCount(MElementContainer<?> container) {
 		int count = 0;
 		for (MUIElement child : container.getChildren()) {
@@ -914,7 +1035,12 @@ public class ModelServiceImpl implements EModelService {
 		return count;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.e4.ui.workbench.modeling.EModelService#getContainer(org.eclipse.e4.ui.model.
+	 * application.ui.MUIElement)
+	 */
 	public MUIElement getContainer(MUIElement element) {
 		if (element == null) {
 			return null;
@@ -923,7 +1049,6 @@ public class ModelServiceImpl implements EModelService {
 		return (MUIElement) ((EObject) element).eContainer();
 	}
 
-	@Override
 	public int getElementLocation(MUIElement element) {
 		if (element == null) {
 			return NOT_IN_UI;
@@ -985,7 +1110,11 @@ public class ModelServiceImpl implements EModelService {
 		return NOT_IN_UI;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.e4.ui.workbench.modeling.EModelService#getPartDescriptor(java.lang.String)
+	 */
 	public MPartDescriptor getPartDescriptor(String id) {
 		MApplication application = appContext.get(MApplication.class);
 
@@ -1001,7 +1130,14 @@ public class ModelServiceImpl implements EModelService {
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.e4.ui.workbench.modeling.EModelService#removeLocalPlaceholders(org.eclipse.e4
+	 * .ui.model.application.ui.basic.MWindow,
+	 * org.eclipse.e4.ui.model.application.ui.advanced.MPerspective)
+	 */
 	public void hideLocalPlaceholders(MWindow window, MPerspective perspective) {
 		List<MPlaceholder> globals = findElements(window, null, MPlaceholder.class, null,
 				OUTSIDE_PERSPECTIVE | IN_SHARED_AREA);
@@ -1045,7 +1181,13 @@ public class ModelServiceImpl implements EModelService {
 		setStackVisibility(parent.getParent());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.e4.ui.workbench.modeling.EModelService#isLastEditorStack(org.eclipse.e4.ui.model
+	 * .application.ui.MUIElement)
+	 */
 	public boolean isLastEditorStack(MUIElement stack) {
 		if (!(stack instanceof MPartStack)) {
 			return false;
@@ -1072,7 +1214,13 @@ public class ModelServiceImpl implements EModelService {
 		return count < 2 && stack.isToBeRendered();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.e4.ui.workbench.modeling.EModelService#hostElement(org.eclipse.e4.ui.model.
+	 * application.ui.MUIElement, org.eclipse.e4.ui.model.application.ui.basic.MWindow,
+	 * java.lang.Object, org.eclipse.e4.core.contexts.IEclipseContext)
+	 */
 	public void hostElement(MUIElement element, MWindow hostWindow, Object uiContainer,
 			IEclipseContext hostContext) {
 		// This is subtle; unless the element is hooked into the model it won't fire events
@@ -1083,7 +1231,13 @@ public class ModelServiceImpl implements EModelService {
 		renderer.createGui(element, uiContainer, hostContext);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.e4.ui.workbench.modeling.EModelService#isHostedElement(org.eclipse.e4.ui.model
+	 * .application.ui.MUIElement, org.eclipse.e4.ui.model.application.ui.basic.MWindow)
+	 */
 	public boolean isHostedElement(MUIElement element, MWindow hostWindow) {
 		MUIElement curElement = element;
 		while (curElement != null && !curElement.getTags().contains(HOSTED_ELEMENT)) {
