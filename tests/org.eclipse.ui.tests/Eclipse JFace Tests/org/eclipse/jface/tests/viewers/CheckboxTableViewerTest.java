@@ -103,6 +103,47 @@ public class CheckboxTableViewerTest extends TableViewerTest {
 				//instead of 2 -- a result of using deprecated code
 			assertNull(getViewerColumn((TableViewer) fViewer, 3));
 	    }
+
+		@Override
+		public void testRemoveAtPosition_selectedElement0() {
+			/*
+			 * This tableViewer cannot set multiple selections. The test is not
+			 * applicable.
+			 */
+		}
+
+		@Override
+		public void testRemoveAtPosition_selectedElement1() {
+			/*
+			 * This tableViewer cannot set multiple selections. The test is not
+			 * applicable.
+			 */
+		}
+
+		@Override
+		public void testRemoveAtPosition_selectedElement2() {
+			/*
+			 * This tableViewer cannot set multiple selections. The test is not
+			 * applicable.
+			 */
+		}
+
+		@Override
+		public void testRemoveAtPosition_notSelectedElement() {
+			/*
+			 * This tableViewer cannot set multiple selections. The test is not
+			 * applicable.
+			 */
+		}
+
+		@Override
+		public void testRemoveAtPosition_selectedElement3() {
+			/*
+			 * This tableViewer cannot set multiple selections. The test is not
+			 * applicable.
+			 */
+		}
+
     }
 
     public static class FactoryMethod extends CheckboxTableViewerTest {
@@ -112,7 +153,7 @@ public class CheckboxTableViewerTest extends TableViewerTest {
 
 	    @Override
 		protected StructuredViewer createViewer(Composite parent) {
-	    	TableViewer viewer = CheckboxTableViewer.newCheckList(parent, SWT.NONE);
+			TableViewer viewer = CheckboxTableViewer.newCheckList(parent, SWT.MULTI);
 
 	        Table table = viewer.getTable();
 	        table.setLinesVisible(true);
@@ -148,7 +189,7 @@ public class CheckboxTableViewerTest extends TableViewerTest {
 
     @Override
 	protected StructuredViewer createViewer(Composite parent) {
-        Table table = new Table(parent, SWT.CHECK | SWT.BORDER);
+		Table table = new Table(parent, SWT.CHECK | SWT.BORDER | SWT.MULTI);
         table.setLinesVisible(true);
         TableLayout layout = new TableLayout();
         table.setLayout(layout);

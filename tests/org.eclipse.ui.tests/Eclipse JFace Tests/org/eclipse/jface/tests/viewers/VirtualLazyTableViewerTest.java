@@ -167,4 +167,89 @@ public class VirtualLazyTableViewerTest extends VirtualTableViewerTest {
 		// based on the assumption that all items
 		// are created.
 	}
+
+	@Override
+	public void testRemoveAtPosition_selectedElement0() {
+		// This test has to remove the child at index 0 before removing the item
+		// from the table. The content provider is asked for the structured
+		// selection to update it after the table item removal. When the table
+		// is virtual and the content provider is lazy the returned content by
+		// the lazy content provider for the selection indices is wrong as the
+		// selection was shifted by the remove operation.
+		this.preRemoveTableItemHookExecutable = new Runnable() {
+			@Override
+			public void run() {
+				fRootElement.fChildren.remove(0);
+			}
+		};
+		super.testRemoveAtPosition_selectedElement0();
+	}
+
+	@Override
+	public void testRemoveAtPosition_selectedElement1() {
+		// This test has to remove the child at index 1 before removing the item
+		// from the table. The content provider is asked for the structured
+		// selection to update it after the table item removal. When the table
+		// is virtual and the content provider is lazy the returned content by
+		// the lazy content provider for the selection indices is wrong as the
+		// selection was shifted by the remove operation.
+		this.preRemoveTableItemHookExecutable = new Runnable() {
+			@Override
+			public void run() {
+				fRootElement.fChildren.remove(1);
+			}
+		};
+		super.testRemoveAtPosition_selectedElement1();
+	}
+
+	@Override
+	public void testRemoveAtPosition_selectedElement2() {
+		// This test has to remove the child at index 2 before removing the item
+		// from the table. The content provider is asked for the structured
+		// selection to update it after the table item removal. When the table
+		// is virtual and the content provider is lazy the returned content by
+		// the lazy content provider for the selection indices is wrong as the
+		// selection was shifted by the remove operation.
+		this.preRemoveTableItemHookExecutable = new Runnable() {
+			@Override
+			public void run() {
+				fRootElement.fChildren.remove(2);
+			}
+		};
+		super.testRemoveAtPosition_selectedElement2();
+	}
+
+	@Override
+	public void testRemoveAtPosition_selectedElement3() {
+		// This test has to remove the child at index 4 before removing the item
+		// from the table. The content provider is asked for the structured
+		// selection to update it after the table item removal. When the table
+		// is virtual and the content provider is lazy the returned content by
+		// the lazy content provider for the selection indices is wrong as the
+		// selection was shifted by the remove operation.
+		this.preRemoveTableItemHookExecutable = new Runnable() {
+			@Override
+			public void run() {
+				fRootElement.fChildren.remove(4);
+			}
+		};
+		super.testRemoveAtPosition_selectedElement3();
+	}
+
+	@Override
+	public void testRemoveAtPosition_notSelectedElement() {
+		// This test has to remove the child at index 3 before removing the item
+		// from the table. The content provider is asked for the structured
+		// selection to update it after the table item removal. When the table
+		// is virtual and the content provider is lazy the returned content by
+		// the lazy content provider for the selection indices is wrong as the
+		// selection was shifted by the remove operation.
+		this.preRemoveTableItemHookExecutable = new Runnable() {
+			@Override
+			public void run() {
+				fRootElement.fChildren.remove(3);
+			}
+		};
+		super.testRemoveAtPosition_notSelectedElement();
+	}
 }
