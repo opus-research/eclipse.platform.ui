@@ -13,14 +13,12 @@
 package org.eclipse.e4.core.commands;
 
 import java.lang.reflect.Field;
-import java.util.LinkedList;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import org.eclipse.core.commands.CommandManager;
 import org.eclipse.e4.core.commands.internal.CommandServiceImpl;
 import org.eclipse.e4.core.commands.internal.HandlerServiceCreationFunction;
 import org.eclipse.e4.core.commands.internal.HandlerServiceImpl;
-import org.eclipse.e4.core.commands.internal.HandlerServiceImpl.ExecutionContexts;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 
@@ -48,14 +46,13 @@ public class CommandServiceAddon {
 
 		// handler service
 		context.set(EHandlerService.class.getName(), new HandlerServiceCreationFunction());
-		context.set("_handlerExecutionStack", new LinkedList<ExecutionContexts>()); //$NON-NLS-1$
 		// provide the initial application context, just in case.
 		HandlerServiceImpl.push(context, null);
 	}
 
 	@PreDestroy
-	void cleanup(IEclipseContext context) {
-		HandlerServiceImpl.pop(context);
+	void cleanup() {
+		HandlerServiceImpl.pop();
 	}
 
 	/**

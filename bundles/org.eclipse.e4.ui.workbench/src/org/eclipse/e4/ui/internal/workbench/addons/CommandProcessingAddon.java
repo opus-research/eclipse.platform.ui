@@ -26,8 +26,6 @@ import org.eclipse.core.commands.ParameterType;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.internal.HandlerServiceImpl;
-import org.eclipse.e4.core.commands.internal.IContextProvider;
-import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.internal.workbench.Activator;
 import org.eclipse.e4.ui.internal.workbench.Parameter;
@@ -67,22 +65,6 @@ public class CommandProcessingAddon {
 	private EventHandler additionHandler;
 
 	private ICommandManagerListener cmListener;
-
-	private IContextProvider provider;
-
-	/**
-	 * @param context
-	 */
-	@Inject
-	public CommandProcessingAddon(final IEclipseContext context) {
-		this.provider = new IContextProvider() {
-
-			@Override
-			public IEclipseContext getContext() {
-				return context;
-			}
-		};
-	}
 
 	/**
 	 * @param cmd
@@ -176,7 +158,7 @@ public class CommandProcessingAddon {
 						final Command command = commandManagerEvent.getCommandManager().getCommand(
 								commandId);
 						if (command.getHandler() == null) {
-							command.setHandler(HandlerServiceImpl.getHandler(commandId, provider));
+							command.setHandler(HandlerServiceImpl.getHandler(commandId));
 						}
 						try {
 							MCategory categoryModel = findCategory(command.getCategory().getId());
