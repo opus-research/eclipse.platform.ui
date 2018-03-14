@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 Matthew Hall and others.
+ * Copyright (c) 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 263709)
  *     Matthew Hall - bugs 265561, 262287
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.internal.databinding.property.value;
@@ -19,7 +18,6 @@ import org.eclipse.core.databinding.observable.StaleEvent;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.IValueChangeListener;
 import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
-import org.eclipse.core.databinding.observable.value.ValueDiff;
 import org.eclipse.core.databinding.property.INativePropertyListener;
 import org.eclipse.core.databinding.property.IProperty;
 import org.eclipse.core.databinding.property.ISimplePropertyListener;
@@ -27,8 +25,6 @@ import org.eclipse.core.databinding.property.NativePropertyListener;
 import org.eclipse.core.databinding.property.value.SimpleValueProperty;
 
 /**
- * @param <T>
- *            type of the value of the property
  * @since 3.3
  *
  */
@@ -39,7 +35,7 @@ import org.eclipse.core.databinding.property.value.SimpleValueProperty;
  * observeDetail(IObservableValue) we just cast the source object to
  * IObservableValue and return it.
  */
-public class ObservableValueProperty<T> extends SimpleValueProperty<IObservableValue<T>, T> {
+public class ObservableValueProperty extends SimpleValueProperty {
 	private final Object valueType;
 
 	/**
@@ -55,30 +51,30 @@ public class ObservableValueProperty<T> extends SimpleValueProperty<IObservableV
 	}
 
 	@Override
-	protected T doGetValue(IObservableValue<T> source) {
-		return source.getValue();
+	protected Object doGetValue(Object source) {
+		return ((IObservableValue) source).getValue();
 	}
 
 	@Override
-	protected void doSetValue(IObservableValue<T> source, T value) {
-		source.setValue(value);
+	protected void doSetValue(Object source, Object value) {
+		((IObservableValue) source).setValue(value);
 	}
 
 	@Override
-	public INativePropertyListener<IObservableValue<T>> adaptListener(
-			ISimplePropertyListener<ValueDiff<T>> listener) {
+	public INativePropertyListener adaptListener(
+			ISimplePropertyListener listener) {
 		return new Listener(this, listener);
 	}
 
-	private class Listener extends NativePropertyListener<IObservableValue<T>, ValueDiff<T>>
-			implements IValueChangeListener<T>, IStaleListener {
-		Listener(IProperty property, ISimplePropertyListener<ValueDiff<T>> listener) {
+	private class Listener extends NativePropertyListener implements
+			IValueChangeListener, IStaleListener {
+		Listener(IProperty property, ISimplePropertyListener listener) {
 			super(property, listener);
 		}
 
 		@Override
-		public void handleValueChange(ValueChangeEvent<T> event) {
-			fireChange(event.getObservableValue(), event.diff);
+		public void handleValueChange(ValueChangeEvent event) {
+			fireChange(event.getObservable(), event.diff);
 		}
 
 		@Override
@@ -87,24 +83,24 @@ public class ObservableValueProperty<T> extends SimpleValueProperty<IObservableV
 		}
 
 		@Override
-		protected void doAddTo(IObservableValue<T> source) {
-			IObservableValue<T> observable = source;
+		protected void doAddTo(Object source) {
+			IObservableValue observable = (IObservableValue) source;
 			observable.addValueChangeListener(this);
 			observable.addStaleListener(this);
 		}
 
 		@Override
-		protected void doRemoveFrom(IObservableValue<T> source) {
-			IObservableValue<T> observable = source;
+		protected void doRemoveFrom(Object source) {
+			IObservableValue observable = (IObservableValue) source;
 			observable.removeValueChangeListener(this);
 			observable.removeStaleListener(this);
 		}
 	}
 
 	@Override
-	public IObservableValue<T> observe(Realm realm, IObservableValue<T> source) {
+	public IObservableValue observe(Realm realm, Object source) {
 		// Ignore realm if different
-		return source;
+		return (IObservableValue) source;
 	}
 
 	@Override
