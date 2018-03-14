@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 400714, 441267
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Replace deprecated API usage in WorkbenchPlugin#createExtension - http://bugs.eclipse.org/400714 
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -241,7 +241,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 
         preferenceManager = null;
         if (viewRegistry != null) {
-			// nothing to dispose for viewRegistry
+            viewRegistry.dispose();
             viewRegistry = null;
         }
         if (perspRegistry != null) {

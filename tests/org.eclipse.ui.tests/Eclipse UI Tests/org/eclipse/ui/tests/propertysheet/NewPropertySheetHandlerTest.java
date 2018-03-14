@@ -56,9 +56,9 @@ public class NewPropertySheetHandlerTest extends AbstractPropertySheetTest {
 	}
 
 	private ExecutionEvent getExecutionEvent() {
-		IHandlerService handlerService = PlatformUI
+		IHandlerService handlerService = (IHandlerService) PlatformUI
 				.getWorkbench().getService(IHandlerService.class);
-		ICommandService commandService = PlatformUI
+		ICommandService commandService = (ICommandService) PlatformUI
 				.getWorkbench().getService(ICommandService.class);
 		IEvaluationContext evalContext = handlerService.getCurrentState();
 		Command command = commandService
