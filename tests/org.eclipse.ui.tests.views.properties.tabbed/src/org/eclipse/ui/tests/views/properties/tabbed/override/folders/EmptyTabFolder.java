@@ -33,6 +33,12 @@ import org.eclipse.ui.tests.views.properties.tabbed.override.items.IOverrideTest
  */
 public class EmptyTabFolder extends AbstractTabFolder {
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see asd.views.folders.ISampleViewFolder#appliesTo(org.eclipse.ui.IWorkbenchPart,
+	 *      org.eclipse.jface.viewers.ISelection)
+	 */
 	public boolean appliesTo(IWorkbenchPart part, ISelection selection) {
 		if (part instanceof OverrideTestsView) {
 			if (selection instanceof IStructuredSelection) {
@@ -45,7 +51,6 @@ public class EmptyTabFolder extends AbstractTabFolder {
 		return false;
 	}
 
-	@Override
 	public IOverrideTestsItem[] getItem() {
 		return new IOverrideTestsItem[] { new EmptyItem() };
 	}
