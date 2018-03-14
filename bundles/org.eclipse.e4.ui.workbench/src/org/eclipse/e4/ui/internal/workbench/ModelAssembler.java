@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 BestSolution.at and others.
+ * Copyright (c) 2010, 2015 BestSolution.at and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,8 @@
  *
  * Contributors:
  *     Tom Schindl<tom.schindl@bestsolution.at> - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430075, 430080, 431464, 433336
- *     René Brandstetter - Bug 419749 - [Workbench] [e4 Workbench] - Remove the deprecated PackageAdmin
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430075, 430080, 431464, 433336, 472654
+ *     René Brandstetter - Bug 419749
  *     Brian de Alwis (MTI) - Bug 433053
  ******************************************************************************/
 
@@ -36,6 +36,7 @@ import org.eclipse.e4.ui.model.fragment.MModelFragment;
 import org.eclipse.e4.ui.model.fragment.MModelFragments;
 import org.eclipse.e4.ui.model.fragment.impl.FragmentPackageImpl;
 import org.eclipse.e4.ui.model.internal.ModelUtils;
+import org.eclipse.emf.common.util.Diagnostic;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
@@ -43,6 +44,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.util.Diagnostician;
 import org.eclipse.emf.ecore.util.EContentsEList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -75,8 +77,8 @@ public class ModelAssembler {
 		IExtensionPoint extPoint = registry.getExtensionPoint(extensionPointID);
 		IExtension[] extensions = new ExtensionsSort().sort(extPoint.getExtensions());
 
-		List<MApplicationElement> imports = new ArrayList<MApplicationElement>();
-		List<MApplicationElement> addedElements = new ArrayList<MApplicationElement>();
+		List<MApplicationElement> imports = new ArrayList<>();
+		List<MApplicationElement> addedElements = new ArrayList<>();
 
 		// run processors which are marked to run before fragments
 		runProcessors(extensions, initial, false);
@@ -159,6 +161,14 @@ public class ModelAssembler {
 		List<MModelFragment> fragments = fragmentsContainer.getFragments();
 		boolean evalImports = false;
 		for (MModelFragment fragment : fragments) {
+			Diagnostic validationResult = Diagnostician.INSTANCE.validate((EObject) fragment);
+			int severity = validationResult.getSeverity();
+			if (severity == Diagnostic.ERROR) {
+				logger.error("Fragment from \"" + uri.toString() + "\" of \"" + bundleName // $NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
+																							// //$NON-NLS-2$
+						+ "\" could not be validated and will not be merged \"{0}\"", fragment); // $NON-NLS-1$ //$NON-NLS-1$
+				continue;
+			}
 			List<MApplicationElement> elements = fragment.getElements();
 			if (elements.size() == 0) {
 				continue;
@@ -194,6 +204,8 @@ public class ModelAssembler {
 			if (merged.size() > 0) {
 				evalImports = true;
 				addedElements.addAll(merged);
+			} else {
+				logger.debug("Nothing to merge for \"{0}\"", uri); //$NON-NLS-1$
 			}
 		}
 
@@ -266,7 +278,7 @@ public class ModelAssembler {
 		if (imports.isEmpty())
 			return;
 		// now that we have all components loaded, resolve imports
-		Map<MApplicationElement, MApplicationElement> importMaps = new HashMap<MApplicationElement, MApplicationElement>();
+		Map<MApplicationElement, MApplicationElement> importMaps = new HashMap<>();
 		for (MApplicationElement importedElement : imports) {
 			MApplicationElement realElement = ModelUtils.findElementById(application,
 					importedElement.getElementId());
@@ -278,7 +290,7 @@ public class ModelAssembler {
 		}
 
 		TreeIterator<EObject> it = EcoreUtil.getAllContents(addedElements);
-		List<Runnable> commands = new ArrayList<Runnable>();
+		List<Runnable> commands = new ArrayList<>();
 
 		// TODO Probably use EcoreUtil.UsageCrossReferencer
 		while (it.hasNext()) {

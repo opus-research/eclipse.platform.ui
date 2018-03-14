@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -106,9 +106,6 @@ public class ZipLeveledStructureProvider implements
 		childList.add(entry);
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IImportStructureProvider
-	 */
 	@Override
 	public List getChildren(Object element) {
 		if (children == null) {
@@ -118,9 +115,6 @@ public class ZipLeveledStructureProvider implements
 		return ((List) children.get(element));
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IImportStructureProvider
-	 */
 	@Override
 	public InputStream getContents(Object element) {
 		try {
@@ -154,17 +148,11 @@ public class ZipLeveledStructureProvider implements
 		return path;
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IImportStructureProvider
-	 */
 	@Override
 	public String getFullPath(Object element) {
 		return stripPath(((ZipEntry) element).getName());
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IImportStructureProvider
-	 */
 	@Override
 	public String getLabel(Object element) {
 		if (element.equals(root)) {
@@ -194,10 +182,6 @@ public class ZipLeveledStructureProvider implements
 	}
 
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.internal.wizards.datatransfer.ILeveledImportStructureProvider#closeArchive()
-	 */
 	@Override
 	public boolean closeArchive(){
 		try {
@@ -238,9 +222,6 @@ public class ZipLeveledStructureProvider implements
 		}
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IImportStructureProvider
-	 */
 	@Override
 	public boolean isFolder(Object element) {
 		return ((ZipEntry) element).isDirectory();
