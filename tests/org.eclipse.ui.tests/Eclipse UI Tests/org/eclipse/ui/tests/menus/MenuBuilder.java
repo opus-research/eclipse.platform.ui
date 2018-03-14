@@ -14,6 +14,7 @@ package org.eclipse.ui.tests.menus;
 import org.eclipse.core.expressions.EvaluationResult;
 import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.IEvaluationContext;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -53,7 +54,6 @@ public class MenuBuilder {
 		}
 		viewMenuAddition = new AbstractContributionFactory(
 				"menu:org.eclipse.ui.tests.api.MenuTestHarness?after=additions", TestPlugin.PLUGIN_ID) {
-			@Override
 			public void createContributionItems(IServiceLocator serviceLocator,
 					IContributionRoot additions) {
 				CommandContributionItem item = new CommandContributionItem(serviceLocator,
@@ -92,7 +92,6 @@ public class MenuBuilder {
 
 		viewToolbarAddition = new AbstractContributionFactory(
 				"toolbar:org.eclipse.ui.tests.api.MenuTestHarness", TestPlugin.PLUGIN_ID) {
-			@Override
 			public void createContributionItems(IServiceLocator serviceLocator,
 					IContributionRoot additions) {
 				CommandContributionItem item = new CommandContributionItem(serviceLocator,
@@ -103,7 +102,6 @@ public class MenuBuilder {
 				additions.addContributionItem(item, null);
 				WorkbenchWindowControlContribution widget = new WorkbenchWindowControlContribution(
 						"org.eclipse.ui.tests.menus.itemX26") {
-					@Override
 					protected Control createControl(Composite parent) {
 						Text textCtrl = new Text(parent, SWT.BORDER);
 						textCtrl.setText("ABCDEFGHI");
@@ -137,7 +135,6 @@ public class MenuBuilder {
 
 		AbstractContributionFactory searchContribution = new AbstractContributionFactory(
 				"menu:org.eclipse.ui.main.menu?after=navigate", TestPlugin.PLUGIN_ID) {
-			@Override
 			public void createContributionItems(IServiceLocator menuService,
 					IContributionRoot additions) {
 				MenuManager search = new MenuManager("Se&arch",
@@ -168,7 +165,6 @@ public class MenuBuilder {
 						"icons/full/obj16/jsearch_obj.gif");
 		AbstractContributionFactory factory = new AbstractContributionFactory(
 				"menu:org.eclipse.search.menu?after=dialogGroup", TestPlugin.PLUGIN_ID) {
-			@Override
 			public void createContributionItems(IServiceLocator serviceLocator,
 					IContributionRoot additions) {
 				CommandContributionItem item = new CommandContributionItem(serviceLocator,
@@ -183,7 +179,6 @@ public class MenuBuilder {
 
 		factory = new AbstractContributionFactory(
 				"menu:org.eclipse.search.menu?after=contextMenuActionsGroup", TestPlugin.PLUGIN_ID) {
-			@Override
 			public void createContributionItems(IServiceLocator serviceLocator
 					,
 					IContributionRoot additions) {
@@ -258,8 +253,13 @@ public class MenuBuilder {
 
 		}
 
-		@Override
-		public EvaluationResult evaluate(IEvaluationContext context) {
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.expressions.Expression#evaluate(org.eclipse.core.expressions.IEvaluationContext)
+		 */
+		public EvaluationResult evaluate(IEvaluationContext context)
+				throws CoreException {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -280,7 +280,6 @@ public class MenuBuilder {
 						"icons/full/elcl16/load_wiki.gif");
 		AbstractContributionFactory factory = new AbstractContributionFactory(
 				"popup:org.eclipse.ui.menus.popup.any?after=additions", TestPlugin.PLUGIN_ID) {
-			@Override
 			public void createContributionItems(IServiceLocator serviceLocator,
 					IContributionRoot additions) {
 				CommandContributionItem item = new CommandContributionItem(serviceLocator,
@@ -310,7 +309,6 @@ public class MenuBuilder {
 						"icons/full/eobj16/scramble.gif");
 		AbstractContributionFactory factory = new AbstractContributionFactory(
 				"popup:#TextEditorContext?after=additions", TestPlugin.PLUGIN_ID) {
-			@Override
 			public void createContributionItems(IServiceLocator serviceLocator,
 					IContributionRoot additions) {
 				CommandContributionItem item = new CommandContributionItem(serviceLocator,

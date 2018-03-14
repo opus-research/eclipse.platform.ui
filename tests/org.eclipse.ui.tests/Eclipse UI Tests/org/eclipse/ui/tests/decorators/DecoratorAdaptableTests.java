@@ -52,8 +52,7 @@ public class DecoratorAdaptableTests extends UITestCase {
         return result.decorateWithText("Default label");
     }
     
-	private void assertDecorated(String testSubName, String[] expectedSuffixes,
-			Object[] elements, Class adaptedClass, boolean shouldHaveMatches) {
+    private void assertDecorated(String testSubName, String[] expectedSuffixes, Object[] elements, Class adaptedClass, boolean shouldHaveMatches) throws CoreException {
         for (int i = 0; i < elements.length; i++) {
             Object object = elements[i];
             String text = getDecorationTextFor(object);
@@ -69,8 +68,7 @@ public class DecoratorAdaptableTests extends UITestCase {
         
     }
 
-    @Override
-	protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         PlatformUI.getWorkbench().getDecoratorManager().setEnabled(TestAdaptableDecoratorContributor.ID, true);
         PlatformUI.getWorkbench().getDecoratorManager().setEnabled(TestUnadaptableDecoratorContributor.ID, true);
         PlatformUI.getWorkbench().getDecoratorManager().setEnabled(TestResourceDecoratorContributor.ID, true);
@@ -78,8 +76,7 @@ public class DecoratorAdaptableTests extends UITestCase {
         super.doSetUp();
     }
     
-    @Override
-	protected void doTearDown() throws Exception {
+    protected void doTearDown() throws Exception {
         PlatformUI.getWorkbench().getDecoratorManager().setEnabled(TestAdaptableDecoratorContributor.ID, false);
         PlatformUI.getWorkbench().getDecoratorManager().setEnabled(TestUnadaptableDecoratorContributor.ID, false);
         PlatformUI.getWorkbench().getDecoratorManager().setEnabled(TestResourceDecoratorContributor.ID, false);
@@ -92,7 +89,7 @@ public class DecoratorAdaptableTests extends UITestCase {
      * 
      * @since 3.1
      */
-	public final void testAdaptables() {
+    public final void testAdaptables() throws CoreException {
         // Assert that decorators contributed to ICommon are applied to the given object
         assertDecorated("1", 
                 new String[] {TestAdaptableDecoratorContributor.SUFFIX}, 
@@ -121,7 +118,7 @@ public class DecoratorAdaptableTests extends UITestCase {
      * 
      * @since 3.1
      */
-	public final void testNonAdaptableContributions() {
+    public final void testNonAdaptableContributions() throws CoreException {
         assertDecorated("1",
                 new String[] {TestUnadaptableDecoratorContributor.SUFFIX}, 
                 new Object[] {

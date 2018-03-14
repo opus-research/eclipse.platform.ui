@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerActivation;
 import org.eclipse.ui.handlers.IHandlerService;
@@ -43,7 +44,6 @@ public class CommandActionTest extends UITestCase {
 	 * 
 	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
 	 */
-	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		handlerService = (IHandlerService) fWorkbench
@@ -60,7 +60,6 @@ public class CommandActionTest extends UITestCase {
 	 * 
 	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doTearDown()
 	 */
-	@Override
 	protected void doTearDown() throws Exception {
 		if (cmd1Activation != null) {
 			handlerService.deactivateHandler(cmd1Activation);
@@ -78,8 +77,13 @@ public class CommandActionTest extends UITestCase {
 		public String paramValue1 = null;
 		public String paramValue2 = null;
 
-		@Override
-		public Object execute(ExecutionEvent event) {
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+		 */
+
+		public Object execute(ExecutionEvent event) throws ExecutionException {
 
 			paramValue1 = event.getParameter("protocol");
 			paramValue2 = event.getParameter("host");
@@ -91,8 +95,12 @@ public class CommandActionTest extends UITestCase {
 	private static class VerifyHandler extends AbstractHandler {
 		public int count = 0;
 
-		@Override
-		public Object execute(ExecutionEvent event) {
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+		 */
+		public Object execute(ExecutionEvent event) throws ExecutionException {
 
 			count++;
 			return null;

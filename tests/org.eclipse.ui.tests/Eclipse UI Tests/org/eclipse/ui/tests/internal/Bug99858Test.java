@@ -170,7 +170,6 @@ public class Bug99858Test extends TestCase {
 			fTestingMode = true;
 		}
 
-		@Override
 		public void run() {
 			super.run();
 			fRan = true;
@@ -200,19 +199,17 @@ public class Bug99858Test extends TestCase {
 	/**
 	 * After an internal action, see if there are any outstanding SWT events.
 	 */
-	private void chewUpEvents() {
+	private void chewUpEvents() throws InterruptedException {
 		Display display = Display.getCurrent();
 		while (display.readAndDispatch())
 			;
 	}
 	
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		AdvancedValidationUserApprover.AUTOMATED_MODE = true;
 	}
 	
-	@Override
 	protected void tearDown() throws Exception {
 		AdvancedValidationUserApprover.AUTOMATED_MODE = false;
 		super.tearDown();

@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
 /**
@@ -35,58 +36,67 @@ public class ContextEditorPart extends EditorPart {
 	private ISelectionProvider selectionProvider = null;
 	private Menu contextMenu;
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	public void doSave(IProgressMonitor arg0) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.EditorPart#doSaveAs()
+	 */
 	public void doSaveAs() {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
-	public void init(IEditorSite arg0, IEditorInput arg1) {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.EditorPart#init(org.eclipse.ui.IEditorSite, org.eclipse.ui.IEditorInput)
+	 */
+	public void init(IEditorSite arg0, IEditorInput arg1)
+			throws PartInitException {
 		setSite(arg0);
 		setInput(arg1);
 		selectionProvider = new ISelectionProvider() {
-			@Override
 			public void addSelectionChangedListener(
 					ISelectionChangedListener listener) {
 			}
 
-			@Override
 			public ISelection getSelection() {
 				return new StructuredSelection("Hi there");
 			}
 
-			@Override
 			public void removeSelectionChangedListener(
 					ISelectionChangedListener listener) {
 			}
 
-			@Override
 			public void setSelection(ISelection selection) {
 			}
 		};
 		getSite().setSelectionProvider(selectionProvider);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.EditorPart#isDirty()
+	 */
 	public boolean isDirty() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.EditorPart#isSaveAsAllowed()
+	 */
 	public boolean isSaveAsAllowed() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createPartControl(Composite parent) {
 		text = new Text(parent, SWT.MULTI|SWT.WRAP);
 		text.setText("Hi there");
@@ -98,7 +108,9 @@ public class ContextEditorPart extends EditorPart {
 		getSite().registerContextMenu(manager, selectionProvider);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+	 */
 	public void setFocus() {
 		text.setFocus();
 	}

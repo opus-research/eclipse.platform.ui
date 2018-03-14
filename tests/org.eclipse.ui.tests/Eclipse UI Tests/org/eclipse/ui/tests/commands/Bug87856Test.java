@@ -57,8 +57,8 @@ public class Bug87856Test extends UITestCase {
 		// Submit a handler.
 		IHandler handler = new AbstractHandler() {
 
-			@Override
-			public Object execute(Map parameterValuesByName) {
+			public Object execute(Map parameterValuesByName)
+					throws org.eclipse.ui.commands.ExecutionException {
 				// Do nothing
 				return null;
 			}

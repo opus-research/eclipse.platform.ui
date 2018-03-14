@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IKeyBindingService;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
 /**
@@ -50,8 +51,12 @@ public final class TestKeyBindingMultiPageEditorPart extends EditorPart {
         this.number = number;
     }
 
-    @Override
-	public void createPartControl(Composite parent) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+     */
+    public void createPartControl(Composite parent) {
         Composite composite = new Composite(parent, SWT.NONE);
         composite.setLayout(new RowLayout());
         Text text1 = new Text(composite, SWT.NONE);
@@ -60,13 +65,21 @@ public final class TestKeyBindingMultiPageEditorPart extends EditorPart {
         text2.setText("Red"); //$NON-NLS-1$
     }
 
-    @Override
-	public void doSave(IProgressMonitor monitor) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.IProgressMonitor)
+     */
+    public void doSave(IProgressMonitor monitor) {
         // Do nothing.
     }
 
-    @Override
-	public void doSaveAs() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.part.EditorPart#doSaveAs()
+     */
+    public void doSaveAs() {
         throw new UnsupportedOperationException("Not implemented in this test."); //$NON-NLS-1$
 
     }
@@ -80,8 +93,14 @@ public final class TestKeyBindingMultiPageEditorPart extends EditorPart {
         // Do nothing.
     }
 
-	@Override
-	public void init(IEditorSite site, IEditorInput input) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.part.EditorPart#init(org.eclipse.ui.IEditorSite,
+     *      org.eclipse.ui.IEditorInput)
+     */
+    public void init(IEditorSite site, IEditorInput input)
+            throws PartInitException {
         setInput(input);
         setSite(site);
         setPartName("Editor"); //$NON-NLS-1$
@@ -89,18 +108,30 @@ public final class TestKeyBindingMultiPageEditorPart extends EditorPart {
         setTitleToolTip("Moooooo"); //$NON-NLS-1$
     }
 
-    @Override
-	public boolean isDirty() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.part.EditorPart#isDirty()
+     */
+    public boolean isDirty() {
         return false;
     }
 
-    @Override
-	public boolean isSaveAsAllowed() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.part.EditorPart#isSaveAsAllowed()
+     */
+    public boolean isSaveAsAllowed() {
         return false;
     }
 
-    @Override
-	public void setFocus() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+     */
+    public void setFocus() {
         final boolean odds = (number % 2) > 0;
         final String scope1 = "org.eclipse.ui.tests.scope1"; //$NON-NLS-1$
         final String scope2 = "org.eclipse.ui.tests.scope2"; //$NON-NLS-1$

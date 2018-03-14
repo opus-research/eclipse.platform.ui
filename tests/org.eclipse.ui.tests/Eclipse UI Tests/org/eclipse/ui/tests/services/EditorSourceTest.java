@@ -17,6 +17,7 @@ import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.IEditorInput;
@@ -43,7 +44,13 @@ public class EditorSourceTest extends UITestCase {
 		public int count = 0;
 		public boolean currentValue;
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org
+		 * .eclipse.jface.util.PropertyChangeEvent)
+		 */
 		public void propertyChange(PropertyChangeEvent event) {
 			count++;
 			if (event.getProperty() == IEvaluationService.RESULT
@@ -61,13 +68,26 @@ public class EditorSourceTest extends UITestCase {
 			editorInput = i;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.core.expressions.Expression#collectExpressionInfo(org
+		 * .eclipse.core.expressions.ExpressionInfo)
+		 */
 		public void collectExpressionInfo(ExpressionInfo info) {
 			info.addVariableNameAccess(ISources.ACTIVE_EDITOR_INPUT_NAME);
 		}
 
-		@Override
-		public EvaluationResult evaluate(IEvaluationContext context) {
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.core.expressions.Expression#evaluate(org.eclipse.core
+		 * .expressions.IEvaluationContext)
+		 */
+		public EvaluationResult evaluate(IEvaluationContext context)
+				throws CoreException {
 			stateInput = context.getVariable(ISources.ACTIVE_EDITOR_INPUT_NAME);
 			return EvaluationResult.valueOf(Util
 					.equals(stateInput, editorInput));
@@ -83,7 +103,11 @@ public class EditorSourceTest extends UITestCase {
 		super(testName);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
+	 */
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		project = FileUtil.createProject("testActiveEditor");

@@ -21,6 +21,7 @@ import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.CommandManager;
 import org.eclipse.core.commands.IParameter;
 import org.eclipse.core.commands.IParameterValues;
+import org.eclipse.core.commands.ParameterValuesException;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.commands.contexts.Context;
@@ -83,7 +84,6 @@ public final class BindingManagerTest extends UITestCase {
 	 * Creates a new context manager and a binding manager for use in the test
 	 * cases.
 	 */
-	@Override
 	protected final void doSetUp() {
 		commandManager = new CommandManager();
 		contextManager = new ContextManager();
@@ -93,7 +93,6 @@ public final class BindingManagerTest extends UITestCase {
 	/**
 	 * Releases the context manager and binding manager for garbage collection.
 	 */
-	@Override
 	protected final void doTearDown() {
 		bindingManager = null;
 		contextManager = null;
@@ -904,22 +903,18 @@ public final class BindingManagerTest extends UITestCase {
 		Command cmd = commandManager.getCommand(commandId);
 		IParameter[] parms = new IParameter[1];
 		parms[0] = new IParameter() {
-			@Override
 			public String getId() {
 				return "viewId";
 			}
 
-			@Override
 			public String getName() {
 				return "View Id";
 			}
 
-			@Override
-			public IParameterValues getValues() {
+			public IParameterValues getValues() throws ParameterValuesException {
 				return null;
 			}
 
-			@Override
 			public boolean isOptional() {
 				return false;
 			}
