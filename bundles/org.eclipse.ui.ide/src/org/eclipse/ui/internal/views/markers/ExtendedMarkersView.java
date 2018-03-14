@@ -10,7 +10,6 @@
  *     Andrew Gvozdev -  Bug 364039 - Add "Delete All Markers"
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442440
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 446864, 466927
  *******************************************************************************/
 package org.eclipse.ui.internal.views.markers;
 
@@ -33,13 +32,16 @@ import org.eclipse.jface.action.ContributionManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.viewers.ColumnPixelData;
+import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILazyTreeContentProvider;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -54,6 +56,8 @@ import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.HelpEvent;
+import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -456,14 +460,17 @@ public class ExtendedMarkersView extends ViewPart {
 	 * @since 3.8
 	 */
 	private void addDoubleClickListener() {
-		viewer.addDoubleClickListener(event -> {
-			ISelection selection = event.getSelection();
-			if(selection instanceof ITreeSelection) {
-				ITreeSelection ss = (ITreeSelection) selection;
-				if(ss.size() == 1) {
-					Object obj = ss.getFirstElement();
-					if(viewer.isExpandable(obj)) {
-						viewer.setExpandedState(obj, !viewer.getExpandedState(obj));
+		viewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
+			public void doubleClick(DoubleClickEvent event) {
+				ISelection selection = event.getSelection();
+				if(selection instanceof ITreeSelection) {
+					ITreeSelection ss = (ITreeSelection) selection;
+					if(ss.size() == 1) {
+						Object obj = ss.getFirstElement();
+						if(viewer.isExpandable(obj)) {
+							viewer.setExpandedState(obj, !viewer.getExpandedState(obj));
+						}
 					}
 				}
 			}
@@ -488,10 +495,13 @@ public class ExtendedMarkersView extends ViewPart {
 	 *
 	 */
 	private void addSelectionListener() {
-		viewer.addSelectionChangedListener(event -> {
-			ISelection selection = event.getSelection();
-			if (selection instanceof IStructuredSelection){
-				updateStatusLine((IStructuredSelection)selection);
+		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				ISelection selection = event.getSelection();
+				if (selection instanceof IStructuredSelection){
+					updateStatusLine((IStructuredSelection)selection);
+				}
 			}
 		});
 	}
@@ -501,14 +511,19 @@ public class ExtendedMarkersView extends ViewPart {
 	 */
 	private void addHelpListener() {
 		// Set help on the view itself
-		viewer.getControl().addHelpListener(e -> {
-			Object provider = getAdapter(IContextProvider.class);
-			if (provider == null)
-				return;
+		viewer.getControl().addHelpListener(new HelpListener() {
 
-			IContext context = ((IContextProvider) provider)
-					.getContext(viewer.getControl());
-			PlatformUI.getWorkbench().getHelpSystem().displayHelp(context);
+			@Override
+			public void helpRequested(HelpEvent e) {
+				Object provider = getAdapter(IContextProvider.class);
+				if (provider == null)
+					return;
+
+				IContext context = ((IContextProvider) provider)
+						.getContext(viewer.getControl());
+				PlatformUI.getWorkbench().getHelpSystem().displayHelp(context);
+			}
+
 		});
 	}
 
@@ -822,30 +837,10 @@ public class ExtendedMarkersView extends ViewPart {
 			@Override
 			public void partVisible(IWorkbenchPartReference partRef) {
 				if (partRef.getId().equals(getSite().getId())) {
-					isViewVisible = true;
-					boolean needUpdate = hasPendingChanges();
-					if (needUpdate) {
-						// trigger UI update, the data is changed meanwhile
-						builder.getUpdateScheduler().scheduleUIUpdate(MarkerUpdateScheduler.SHORT_DELAY);
-					} else {
-						// data is same as before, only clear tooltip
-						setTitleToolTip(null);
-					}
+					isViewVisible= true;
+					pageSelectionListener.selectionChanged(null, getSite().getPage().getSelection());
+					setTitleToolTip(null);
 				}
-			}
-
-			/**
-			 * @return true if the builder noticed that marker updates were made
-			 *         but UI is not updated yet
-			 */
-			private boolean hasPendingChanges() {
-				boolean[] changeFlags = builder.readChangeFlags();
-				for (boolean b : changeFlags) {
-					if (b) {
-						return true;
-					}
-				}
-				return false;
 			}
 		};
 	}
@@ -1411,9 +1406,7 @@ public class ExtendedMarkersView extends ViewPart {
 
 		setContentDescription(statusMessage);
 
-		if (isVisible()) {
-			setTitleToolTip(null);
-		} else {
+		if (!"".equals(getTitleToolTip())) { //$NON-NLS-1$
 			setTitleToolTip(statusMessage);
 		}
 		updateTitleImage(counts);

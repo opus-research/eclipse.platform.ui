@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench;
 
@@ -69,12 +68,10 @@ public class UIEvents {
 	/**
 	 * Event sent when a enabled update is requested for tool-items.
 	 * <p>
-	 * As a value you may pass in to the {@link IEventBroker#DATA}:
+	 * As a value you can pass in to the {@link IEventBroker}:
 	 * <ul>
-	 * <li>the special value {@link #ALL_ELEMENT_ID} to request changes of all
-	 * applicable elements (the default)</li>
-	 * <li>the {@link MApplicationElement#getElementId()} of the element to
-	 * check</li>
+	 * <li>the {@link MApplicationElement#getElementId()} of the element to check</li>
+	 * <li>the special value {@link #ALL_ELEMENT_ID}</li>
 	 * <li>instance of {@link Selector}</li>
 	 * </ul>
 	 * </p>
@@ -339,7 +336,7 @@ public class UIEvents {
 		if (topic == null || topic.length() == 0 || changedElement == null)
 			return false;
 
-		Map<String, Object> argMap = new HashMap<>(1);
+		Map<String, Object> argMap = new HashMap<String, Object>(1);
 		argMap.put(EventTags.ELEMENT, changedElement);
 		return publishEvent(topic, argMap);
 	}

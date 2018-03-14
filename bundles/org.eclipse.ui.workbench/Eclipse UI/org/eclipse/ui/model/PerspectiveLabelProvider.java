@@ -67,6 +67,9 @@ public final class PerspectiveLabelProvider extends LabelProvider implements
         this.markDefault = markDefault;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ILabelProvider
+     */
     @Override
 	public final Image getImage(Object element) {
         if (element instanceof IPerspectiveDescriptor) {
@@ -86,6 +89,9 @@ public final class PerspectiveLabelProvider extends LabelProvider implements
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ILabelProvider
+     */
     @Override
 	public final void dispose() {
         for (Iterator i = imageCache.values().iterator(); i.hasNext();) {
@@ -94,6 +100,9 @@ public final class PerspectiveLabelProvider extends LabelProvider implements
         imageCache.clear();
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ILabelProvider
+     */
     @Override
 	public final String getText(Object element) {
         if (element instanceof IPerspectiveDescriptor) {

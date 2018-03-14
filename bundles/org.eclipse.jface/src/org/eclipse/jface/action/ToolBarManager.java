@@ -259,7 +259,7 @@ public class ToolBarManager extends ContributionManager implements IToolBarManag
 
 		// clean contains all active items without double separators
 		IContributionItem[] items = getItems();
-		ArrayList<IContributionItem> clean = new ArrayList<>(items.length);
+		ArrayList<IContributionItem> clean = new ArrayList<IContributionItem>(items.length);
 		IContributionItem separator = null;
 		for (IContributionItem ci : items) {
 			if (!isChildVisible(ci)) {
@@ -282,7 +282,7 @@ public class ToolBarManager extends ContributionManager implements IToolBarManag
 
 		// determine obsolete items (removed or non active)
 		ToolItem[] mi = toolBar.getItems();
-		ArrayList<ToolItem> toRemove = new ArrayList<>(mi.length);
+		ArrayList<ToolItem> toRemove = new ArrayList<ToolItem>(mi.length);
 		for (ToolItem item : mi) {
 			// there may be null items in a toolbar
 			if (item == null) {
@@ -296,8 +296,12 @@ public class ToolBarManager extends ContributionManager implements IToolBarManag
 			}
 		}
 
+		// Turn redraw off to minimize flicker,
+		boolean useRedraw = (clean.size() - (mi.length - toRemove.size())) >= 0;
 		try {
-			toolBar.setRedraw(false);
+			if (useRedraw) {
+				toolBar.setRedraw(false);
+			}
 
 			// remove obsolete items
 			for (int i = toRemove.size(); --i >= 0;) {
@@ -365,7 +369,9 @@ public class ToolBarManager extends ContributionManager implements IToolBarManag
 
 			// turn redraw back on if we turned it off above
 		} finally {
-			toolBar.setRedraw(true);
+			if (useRedraw) {
+				toolBar.setRedraw(true);
+			}
 		}
 
 		int newCount = toolBar.getItemCount();
