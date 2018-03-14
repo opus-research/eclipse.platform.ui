@@ -125,8 +125,6 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 	 */
 	private HashSet ignoredViews;
 
-	private boolean wasHidden;
-
     /**
      * Creates a property sheet view.
      */
@@ -304,9 +302,6 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 
     @Override
 	protected void partHidden(IWorkbenchPart part) {
-		if (part == this) {
-			wasHidden = true;
-		}
     	// Explicitly ignore parts becoming hidden as this
     	// can cause issues when the Property View is maximized
     	// See bug 325743 for more details
@@ -319,19 +314,6 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
      */
     @Override
 	public void partActivated(IWorkbenchPart part) {
-		if (wasHidden && part == this) {
-			wasHidden = false;
-			super.partActivated(part);
-			if (currentPart != null) {
-				IPropertySheetPage page = (IPropertySheetPage) getCurrentPage();
-				if (page != null) {
-					page.selectionChanged(currentPart, currentSelection);
-				}
-				updateContentDescription();
-			}
-			return;
-		}
-
 		IContributedContentsView view = Adapters.adapt(part, IContributedContentsView.class);
         IWorkbenchPart source = null;
         if (view != null) {
@@ -366,6 +348,10 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 		if (part == null || !part.equals(currentPart)) {
 			return;
 		}
+		boolean visible = getSite() != null && getSite().getPage().isPartVisible(this);
+		if (!visible) {
+			return;
+		}
 
 		// we ignore null selection, or if we are pinned, or our own selection
 		// or same selection
@@ -375,11 +361,6 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 
         currentPart = part;
         currentSelection = sel;
-
-		boolean visible = getSite() != null && getSite().getPage().isPartVisible(this);
-		if (!visible) {
-			return;
-		}
 
         // pass the selection to the page
         IPropertySheetPage page = (IPropertySheetPage) getCurrentPage();
