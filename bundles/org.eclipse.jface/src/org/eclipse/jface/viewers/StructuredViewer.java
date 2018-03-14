@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Tom Schindl - bug 151205
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 402439
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 402439, 475689
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -22,11 +22,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.internal.InternalPolicy;
-import org.eclipse.jface.util.IOpenEventListener;
 import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.util.Policy;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.TableTreeItem;
 import org.eclipse.swt.dnd.DragSource;
 import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.DropTarget;
@@ -270,6 +270,39 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 			clear();
 		}
 
+		@Override
+		public void applyFontsAndColors(TableTreeItem control) {
+
+			if(colorProvider == null){
+				if(usedDecorators){
+					//If there is no provider only apply set values
+					if(background != null) {
+						control.setBackground(background);
+					}
+
+					if(foreground != null) {
+						control.setForeground(foreground);
+					}
+				}
+			}
+			else{
+				//Always set the value if there is a provider
+				control.setBackground(background);
+				control.setForeground(foreground);
+			}
+
+			if(fontProvider == null){
+				if(usedDecorators && font != null) {
+					control.setFont(font);
+				}
+			} else {
+				control.setFont(font);
+			}
+
+			clear();
+		}
+
+
 	}
 
 	/**
@@ -353,6 +386,29 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 		 * @param control
 		 */
 		public void applyFontsAndColors(TreeItem control) {
+			if(usedDecorators){
+				//If there is no provider only apply set values
+				if(background != null) {
+					control.setBackground(background);
+				}
+
+				if(foreground != null) {
+					control.setForeground(foreground);
+				}
+
+				if(font != null) {
+					control.setFont(font);
+				}
+			}
+			clear();
+		}
+
+		/**
+		 * Apply the fonts and colors to the control if
+		 * required.
+		 * @param control
+		 */
+		public void applyFontsAndColors(TableTreeItem control) {
 			if(usedDecorators){
 				//If there is no provider only apply set values
 				if(background != null) {
@@ -1212,12 +1268,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 				handlePostSelect(e);
 			}
 		});
-		handler.addOpenListener(new IOpenEventListener() {
-			@Override
-			public void handleOpen(SelectionEvent e) {
-				StructuredViewer.this.handleOpen(e);
-			}
-		});
+		handler.addOpenListener(StructuredViewer.this::handleOpen);
 	}
 
 	/**
@@ -1463,12 +1514,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 *            the element
 	 */
 	public void refresh(final Object element) {
-		preservingSelection(new Runnable() {
-			@Override
-			public void run() {
-				internalRefresh(element);
-			}
-		});
+		preservingSelection(() -> internalRefresh(element));
 	}
 
 	/**
@@ -1491,12 +1537,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 * @since 2.0
 	 */
 	public void refresh(final Object element, final boolean updateLabels) {
-		preservingSelection(new Runnable() {
-			@Override
-			public void run() {
-				internalRefresh(element, updateLabels);
-			}
-		});
+		preservingSelection(() -> internalRefresh(element, updateLabels));
 	}
 
 	/**
@@ -2075,12 +2116,9 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 			}
 		}
 		if (needsRefilter) {
-			preservingSelection(new Runnable() {
-				@Override
-				public void run() {
-					internalRefresh(getRoot());
-					refreshOccurred = true;
-				}
+			preservingSelection(() -> {
+				internalRefresh(getRoot());
+				refreshOccurred = true;
 			});
 			return;
 		}
