@@ -29,7 +29,6 @@ import org.eclipse.swt.widgets.Slider;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.ui.internal.forms.widgets.FormUtil;
 
 /**
  * Caches the preferred size of an SWT control
@@ -427,7 +426,7 @@ public class SizeCache {
         }
 
         if (minimumWidth == -1) {
-            Point minWidth = controlComputeSize(FormUtil.getWidthHint(5, control), SWT.DEFAULT);
+			Point minWidth = controlComputeSize(5, SWT.DEFAULT);
             minimumWidth = minWidth.x;
             heightAtMinimumWidth = minWidth.y;
         }
