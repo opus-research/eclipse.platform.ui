@@ -22,7 +22,6 @@ import org.eclipse.core.databinding.observable.IObservablesListener;
  * @since 1.0
  *
  */
-@FunctionalInterface
 public interface IValueChangingListener<T> extends IObservablesListener {
 
 	/**

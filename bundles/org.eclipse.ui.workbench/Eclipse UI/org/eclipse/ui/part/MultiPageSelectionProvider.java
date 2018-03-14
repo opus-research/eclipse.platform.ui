@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,12 +39,12 @@ public class MultiPageSelectionProvider implements IPostSelectionProvider {
      * Registered selection changed listeners (element type:
      * <code>ISelectionChangedListener</code>).
      */
-	private ListenerList<ISelectionChangedListener> listeners = new ListenerList<>();
+    private ListenerList listeners = new ListenerList();
 
     /**
      * Registered post selection changed listeners.
      */
-	private ListenerList<ISelectionChangedListener> postListeners = new ListenerList<>();
+    private ListenerList postListeners = new ListenerList();
 
     /**
      * The multi-page editor.
@@ -85,6 +85,7 @@ public class MultiPageSelectionProvider implements IPostSelectionProvider {
      * @param event the selection changed event
      */
     public void fireSelectionChanged(final SelectionChangedEvent event) {
+        Object[] listeners = this.listeners.getListeners();
         fireEventChange(event, listeners);
     }
 
@@ -96,12 +97,13 @@ public class MultiPageSelectionProvider implements IPostSelectionProvider {
      * @since 3.2
      */
     public void firePostSelectionChanged(final SelectionChangedEvent event) {
-		fireEventChange(event, postListeners);
+		Object[] listeners = postListeners.getListeners();
+		fireEventChange(event, listeners);
 	}
 
-	private void fireEventChange(final SelectionChangedEvent event,
-			ListenerList<ISelectionChangedListener> listenersList) {
-		for (final ISelectionChangedListener l : listenersList) {
+	private void fireEventChange(final SelectionChangedEvent event, Object[] listeners) {
+		for (int i = 0; i < listeners.length; ++i) {
+            final ISelectionChangedListener l = (ISelectionChangedListener) listeners[i];
             SafeRunner.run(new SafeRunnable() {
                 @Override
 				public void run() {

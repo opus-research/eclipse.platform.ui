@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,7 +32,6 @@ import org.eclipse.ui.internal.ide.IIDEHelpContextIds;
 import org.eclipse.ui.internal.ide.misc.CheckboxTreeAndListGroup;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
-import org.eclipse.ui.views.navigator.ResourceComparator;
 
 /**
  * A standard resource selection dialog which solicits a list of resources from
@@ -139,10 +138,8 @@ public class ResourceSelectionDialog extends SelectionDialog {
                 getResourceProvider(IResource.FOLDER | IResource.PROJECT
                         | IResource.ROOT), WorkbenchLabelProvider
                         .getDecoratingWorkbenchLabelProvider(),
-                        new ResourceComparator(ResourceComparator.NAME),
                 getResourceProvider(IResource.FILE), WorkbenchLabelProvider
-                        .getDecoratingWorkbenchLabelProvider(),
-                        new ResourceComparator(ResourceComparator.NAME),SWT.NONE,
+                        .getDecoratingWorkbenchLabelProvider(), SWT.NONE,
                 // since this page has no other significantly-sized
                 // widgets we need to hardcode the combined widget's
                 // size, otherwise it will open too small

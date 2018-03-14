@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,8 @@ package org.eclipse.ui.internal.menus;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.ContextFunction;
@@ -45,6 +47,7 @@ import org.eclipse.e4.ui.workbench.renderers.swt.ToolBarManagerRenderer;
 import org.eclipse.e4.ui.workbench.swt.factories.IRendererFactory;
 import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.jface.action.ContributionManager;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.widgets.Menu;
@@ -55,6 +58,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.WorkbenchWindow;
+import org.eclipse.ui.internal.e4.compatibility.E4Util;
 import org.eclipse.ui.internal.services.IWorkbenchLocationService;
 import org.eclipse.ui.internal.services.ServiceLocator;
 import org.eclipse.ui.menus.AbstractContributionFactory;
@@ -89,12 +93,14 @@ public class WorkbenchMenuService implements IMenuService {
 
 	@Override
 	public void addSourceProvider(ISourceProvider provider) {
-		// TODO Auto-generated method
+		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void removeSourceProvider(ISourceProvider provider) {
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
@@ -153,6 +159,17 @@ public class WorkbenchMenuService implements IMenuService {
 		MApplication app = e4Context.get(MApplication.class);
 		app.getMenuContributions().add(menuContribution);
 
+		// // OK, now update any managers that use this uri
+		// for (Map.Entry<ContributionManager, MenuLocationURI> entry :
+		// managers.entrySet()) {
+		// MenuLocationURI mgrURI = entry.getValue();
+		// if (mgrURI.getScheme().equals(location.getScheme())
+		// && mgrURI.getPath().equals(location.getPath())) {
+		// ContributionManager mgr = entry.getKey();
+		// populateContributionManager(mgr, mgrURI.toString());
+		// mgr.update(true);
+		// }
+		// }
 	}
 
 	private void processToolbarChildren(AbstractContributionFactory factory,
@@ -185,13 +202,31 @@ public class WorkbenchMenuService implements IMenuService {
 			}
 		}
 
+		// // OK, now remove any managers that use this uri
+		// MenuLocationURI location = new
+		// MenuLocationURI(factory.getLocation());
+		// List<ContributionManager> toRemove = new
+		// ArrayList<ContributionManager>();
+		// for (Map.Entry<ContributionManager, MenuLocationURI> entry :
+		// managers.entrySet()) {
+		// MenuLocationURI mgrURI = entry.getValue();
+		// if (mgrURI.getScheme().equals(location.getScheme())
+		// && mgrURI.getPath().equals(location.getPath())) {
+		// toRemove.add(entry.getKey());
+		// }
+		// }
+		// for (ContributionManager mgr : toRemove) {
+		// mgr.removeAll();
+		// managers.remove(mgr);
+		// }
 	}
 
 	protected IWorkbenchWindow getWindow() {
 		if (serviceLocator == null)
 			return null;
 
-		IWorkbenchLocationService wls = serviceLocator.getService(IWorkbenchLocationService.class);
+		IWorkbenchLocationService wls = (IWorkbenchLocationService) serviceLocator
+				.getService(IWorkbenchLocationService.class);
 
 		IWorkbenchWindow window = null;
 		if (window == null) {
@@ -485,6 +520,31 @@ public class WorkbenchMenuService implements IMenuService {
 	 */
 	public void readRegistry() {
 		persistence.read();
+	}
+
+	public void updateManagers() {
+		E4Util.unsupported("WorkbenchMenuService.updateManagers - time to update ... something"); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param item
+	 * @param visibleWhen
+	 * @param restriction
+	 * @param createIdentifierId
+	 */
+	public void registerVisibleWhen(IContributionItem item, Expression visibleWhen,
+			Set restriction, String createIdentifierId) {
+		// TODO Remove - no longer used
+
+	}
+
+	/**
+	 * @param item
+	 * @param restriction
+	 */
+	public void unregisterVisibleWhen(IContributionItem item, Set restriction) {
+		// TODO Remove - no longer used
+
 	}
 
 }

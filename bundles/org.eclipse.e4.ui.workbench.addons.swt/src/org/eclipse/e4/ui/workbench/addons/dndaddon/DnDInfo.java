@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -62,9 +62,8 @@ class DnDInfo {
 		offsetY = yOffset;
 		dragHostBounds = null;
 
-		if (dragHost == null) {
+		if (dragHost == null)
 			return;
-		}
 
 		// Punch a 'hole' where the cursor is using a region
 		Region rgn = dragHost.getRegion();
@@ -85,9 +84,8 @@ class DnDInfo {
 	}
 
 	public void setDragHostBounds(Rectangle displayRect) {
-		if (dragHost == null) {
+		if (dragHost == null)
 			return;
-		}
 
 		dragHostBounds = displayRect;
 
@@ -123,9 +121,8 @@ class DnDInfo {
 	}
 
 	private void setItemInfo() {
-		if (curElement == null) {
+		if (curElement == null)
 			return;
-		}
 
 		Control ctrl = (Control) curElement.getWidget();
 
@@ -156,9 +153,8 @@ class DnDInfo {
 	}
 
 	private MUIElement getModelElement(Control ctrl) {
-		if (ctrl == null) {
+		if (ctrl == null)
 			return null;
-		}
 
 		MUIElement element = (MUIElement) ctrl.getData(AbstractPartRenderer.OWNING_ME);
 		if (element != null) {
@@ -170,16 +166,14 @@ class DnDInfo {
 
 	public void update() {
 		final Display display = Display.getCurrent();
-		if (display == null) {
+		if (display == null)
 			return;
-		}
 
 		// If we're in the same location presume the info is OK
 		Point cPoint = display.getCursorLocation();
 		if (cPoint != null && cursorPos != null && cPoint.x == cursorPos.x
-				&& cPoint.y == cursorPos.y) {
+				&& cPoint.y == cursorPos.y)
 			return;
-		}
 
 		reset();
 
@@ -200,10 +194,9 @@ class DnDInfo {
 			}
 		}
 
-		curCtrl = DragAndDropUtil.findControl(display, display.getCursorLocation());
-		if (curCtrl == null) {
+		curCtrl = display.getCursorControl();
+		if (curCtrl == null)
 			return;
-		}
 
 		curElement = getModelElement(curCtrl);
 		setItemInfo();
@@ -211,9 +204,8 @@ class DnDInfo {
 
 	public void update(DragDetectEvent e) {
 		reset();
-		if (!(e.widget instanceof Control)) {
+		if (!(e.widget instanceof Control))
 			return;
-		}
 		curCtrl = (Control) e.widget;
 		cursorPos = new Point(e.x, e.y);
 		cursorPos = curCtrl.getDisplay().map(curCtrl, null, cursorPos);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Serge Beauchamp (Freescale Semiconductor) - Bug 229633
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472784
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -438,7 +437,7 @@ public class CopyFilesAndFoldersOperation {
 				IDEWorkbenchMessages.CopyFilesAndFoldersOperation_CopyResourcesTask, resources.length);
 
 		for (int i = 0; i < resources.length; i++) {
-			SubMonitor iterationMonitor = subMonitor.split(1).setWorkRemaining(100);
+			SubMonitor iterationProgress = subMonitor.newChild(1).setWorkRemaining(100);
 			IResource source = resources[i];
 			IPath destinationPath = destination.append(source.getName());
 			IWorkspace workspace = source.getWorkspace();
@@ -450,45 +449,49 @@ public class CopyFilesAndFoldersOperation {
 				// children of the folder.
 				if (homogenousResources(source, existing)) {
 					IResource[] children = ((IContainer) source).members();
-					copy(children, destinationPath, iterationMonitor.split(100));
+					copy(children, destinationPath, iterationProgress.newChild(100));
 				} else {
 					// delete the destination folder, copying a linked folder
 					// over an unlinked one or vice versa. Fixes bug 28772.
-					delete(existing, iterationMonitor.split(10));
-					source.copy(destinationPath, IResource.SHALLOW, iterationMonitor.split(90));
+					delete(existing, iterationProgress.newChild(10));
+					source.copy(destinationPath, IResource.SHALLOW, iterationProgress.newChild(90));
 				}
 			} else {
 				if (existing != null) {
 					if (homogenousResources(source, existing)) {
-						copyExisting(source, existing, iterationMonitor.split(100));
+						copyExisting(source, existing, iterationProgress.newChild(100));
 					} else {
 						if (existing != null) {
 							// Copying a linked resource over unlinked or vice
 							// versa.
 							// Can't use setContents here. Fixes bug 28772.
-							delete(existing, iterationMonitor.split(10));
+							delete(existing, iterationProgress.newChild(10));
 						}
-						iterationMonitor.setWorkRemaining(100);
+						iterationProgress.setWorkRemaining(100);
 
 						if ((createLinks || createVirtualFoldersAndLinks) && (source.isLinked() == false)
 								&& (source.isVirtual() == false)) {
 							if (source.getType() == IResource.FILE) {
 								IFile file = workspaceRoot.getFile(destinationPath);
 								file.createLink(createRelativePath(source.getLocationURI(), file), 0,
-										iterationMonitor.split(100));
+										iterationProgress.newChild(100));
 							} else {
 								IFolder folder = workspaceRoot.getFolder(destinationPath);
 								if (createVirtualFoldersAndLinks) {
-									folder.create(IResource.VIRTUAL, true, iterationMonitor.split(1));
+									folder.create(IResource.VIRTUAL, true, subMonitor.newChild(1));
 									IResource[] members = ((IContainer) source).members();
 									if (members.length > 0)
-										copy(members, destinationPath, iterationMonitor.split(99));
+										copy(members, destinationPath, iterationProgress.newChild(100));
 								} else
 									folder.createLink(createRelativePath(source.getLocationURI(), folder), 0,
-											iterationMonitor.split(100));
+											iterationProgress.newChild(100));
 							}
 						} else
-							source.copy(destinationPath, IResource.SHALLOW, iterationMonitor.split(100));
+							source.copy(destinationPath, IResource.SHALLOW, iterationProgress.newChild(100));
+					}
+
+					if (subMonitor.isCanceled()) {
+						throw new OperationCanceledException();
 					}
 				}
 			}
@@ -536,7 +539,7 @@ public class CopyFilesAndFoldersOperation {
 			IFile sourceFile = getFile(source);
 
 			if (sourceFile != null) {
-				existingFile.setContents(sourceFile.getContents(), IResource.KEEP_HISTORY, subMonitor.split(1));
+				existingFile.setContents(sourceFile.getContents(), IResource.KEEP_HISTORY, subMonitor.newChild(1));
 			}
 		}
 	}
@@ -652,7 +655,8 @@ public class CopyFilesAndFoldersOperation {
 		IDEWorkbenchPlugin.getDefault().getLog().log(
 				StatusUtil.newStatus(IStatus.ERROR, MessageFormat.format(
 						"Exception in {0}.performCopy(): {1}", //$NON-NLS-1$
-						getClass().getName(), e.getTargetException()), null));
+						new Object[] { getClass().getName(),
+								e.getTargetException() }), null));
 		displayError(NLS
 				.bind(
 						IDEWorkbenchMessages.CopyFilesAndFoldersOperation_internalError,
@@ -1044,7 +1048,7 @@ public class CopyFilesAndFoldersOperation {
 	 *         <code>null</code> if the resource does not adapt to IFile
 	 */
 	protected IFile getFile(IResource resource) {
-		return Adapters.adapt(resource, IFile.class);
+		return Adapters.getAdapter(resource, IFile.class, true);
 	}
 
 	/**
@@ -1076,7 +1080,7 @@ public class CopyFilesAndFoldersOperation {
 	 *         <code>null</code> if the resource does not adapt to IFolder
 	 */
 	protected IFolder getFolder(IResource resource) {
-		return Adapters.adapt(resource, IFolder.class);
+		return Adapters.getAdapter(resource, IFolder.class, true);
 	}
 
 	/**
@@ -1295,13 +1299,9 @@ public class CopyFilesAndFoldersOperation {
 				copyMoveOp.setCreateLinks(createLinks);
 				copyMoveOp.setRelativeVariable(relativeVariable);
 			}
-			// If we are copying files and folders, do not execute the operation
-			// in the undo history, since the creation of a new file is not
-			// added to undo history and modification of a file is not added to
-			// the same undo history and therefore a redo cannot be properly
-			// done. Just execute it directly so it won't be added to the undo
-			// history.
-			op.execute(monitor, WorkspaceUndoUtil.getUIInfoAdapter(messageShell));
+			PlatformUI.getWorkbench().getOperationSupport()
+					.getOperationHistory().execute(op, monitor,
+							WorkspaceUndoUtil.getUIInfoAdapter(messageShell));
 		} catch (ExecutionException e) {
 			if (e.getCause() instanceof CoreException) {
 				recordError((CoreException) e.getCause());
@@ -1351,13 +1351,9 @@ public class CopyFilesAndFoldersOperation {
 					destinationPaths,
 					IDEWorkbenchMessages.CopyFilesAndFoldersOperation_copyTitle);
 			op.setModelProviderIds(getModelProviderIds());
-			// If we are copying files and folders, do not execute the operation
-			// in the undo history, since the creation of a new file is not
-			// added to undo history and modification of a file is not added to
-			// the same undo history and therefore a redo cannot be properly
-			// done. Just execute it directly so it won't be added to the undo
-			// history.
-			op.execute(monitor, WorkspaceUndoUtil.getUIInfoAdapter(messageShell));
+			PlatformUI.getWorkbench().getOperationSupport()
+					.getOperationHistory().execute(op, monitor,
+							WorkspaceUndoUtil.getUIInfoAdapter(messageShell));
 		} catch (ExecutionException e) {
 			if (e.getCause() instanceof CoreException) {
 				recordError((CoreException) e.getCause());
@@ -1827,9 +1823,9 @@ public class CopyFilesAndFoldersOperation {
 		errorStatus = null;
 		if (copyResources.length > 0) {
 			if (copyWithAutoRename) {
-				performCopyWithAutoRename(copyResources, destinationPath, subMonitor.split(90));
+				performCopyWithAutoRename(copyResources, destinationPath, subMonitor.newChild(90));
 			} else {
-				performCopy(copyResources, destinationPath, subMonitor.split(90));
+				performCopy(copyResources, destinationPath, subMonitor.newChild(90));
 			}
 		}
 		copiedResources[0] = copyResources;

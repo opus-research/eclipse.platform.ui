@@ -67,7 +67,8 @@ import org.eclipse.ui.part.PageBookView;
  * @noinstantiate This class is not intended to be instantiated by clients.
  * @noextend This class is not intended to be subclassed by clients.
  */
-public class ContentOutline extends PageBookView implements ISelectionProvider, ISelectionChangedListener {
+public class ContentOutline extends PageBookView implements ISelectionProvider,
+        ISelectionChangedListener {
 
 
 
@@ -123,7 +124,7 @@ public class ContentOutline extends PageBookView implements ISelectionProvider, 
     @Override
 	protected PageRec doCreatePage(IWorkbenchPart part) {
         // Try to get an outline page.
-		IContentOutlinePage page = Adapters.adapt(part, IContentOutlinePage.class);
+		IContentOutlinePage page = Adapters.getAdapter(part, IContentOutlinePage.class, true);
 		if (page != null) {
             if (page instanceof IPageBookViewPage) {
 				initPage((IPageBookViewPage) page);

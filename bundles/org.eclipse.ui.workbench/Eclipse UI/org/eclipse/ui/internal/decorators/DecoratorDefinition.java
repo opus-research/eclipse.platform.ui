@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -68,30 +68,18 @@ public abstract class DecoratorDefinition implements IPluginContribution {
     }
 
     /**
-	 * Gets the name.
-	 *
-	 * @return Returns the label attribute from the decorator contribution, or
-	 *         null if the underlined definition is not valid anymore
-	 */
+     * Gets the name.
+     * @return Returns a String
+     */
     public String getName() {
-		if (!definingElement.isValid()) {
-			crashDisable();
-			return null;
-		}
         return definingElement.getAttribute(ATT_LABEL);
     }
 
     /**
-	 * Returns the description
-	 *
-	 * @return Returns the label attribute from the decorator contribution, or
-	 *         null if the underlined definition is not valid anymore
-	 */
+     * Returns the description.
+     * @return String
+     */
     public String getDescription() {
-		if (!definingElement.isValid()) {
-			crashDisable();
-			return null;
-		}
         return RegistryReader.getDescription(definingElement);
     }
 
@@ -148,10 +136,6 @@ public abstract class DecoratorDefinition implements IPluginContribution {
      * applied to adapted types
      */
     public boolean isAdaptable() {
-		if (!definingElement.isValid()) {
-			crashDisable();
-			return false;
-		}
     	return Boolean.valueOf(definingElement.getAttribute(ATT_ADAPTABLE)).booleanValue();
     }
 
@@ -190,10 +174,6 @@ public abstract class DecoratorDefinition implements IPluginContribution {
      * Initialize the enablement expression for this decorator
      */
     protected void initializeEnablement() {
-		if (!definingElement.isValid()) {
-			crashDisable();
-			return;
-		}
         IConfigurationElement[] elements = definingElement.getChildren(CHILD_ENABLEMENT);
         if (elements.length == 0) {
             String className = definingElement.getAttribute(ATT_OBJECT_CLASS);
@@ -301,8 +281,7 @@ public abstract class DecoratorDefinition implements IPluginContribution {
     		if(expression != null) {
 				return expression.isEnabledFor(element);
 			}
-			// Always on if no expression and is still enabled
-			return isEnabled();
+    		return true;//Always on if no expression
     	}
     	return false;
 
@@ -310,12 +289,7 @@ public abstract class DecoratorDefinition implements IPluginContribution {
 
 	@Override
 	public String getPluginId() {
-		IConfigurationElement element = getConfigurationElement();
-		if (!element.isValid()) {
-			crashDisable();
-			return null;
-		}
-		return element.getContributor().getName();
+		return getConfigurationElement().getContributor().getName();
 	}
 
 	@Override
