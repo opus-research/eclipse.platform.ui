@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 485848, 485850
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 485848
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -169,7 +169,7 @@ public class AreaRenderer extends SWTPartRenderer {
 
 		curComp.setData(AbstractPartRenderer.OWNING_ME, null);
 		bindWidget(areaModel, ctf);
-		ctf.requestLayout();
+		ctf.getParent().layout(null, SWT.ALL | SWT.DEFER | SWT.CHANGED);
 	}
 
 	private void ensureComposite(MArea areaModel) {
