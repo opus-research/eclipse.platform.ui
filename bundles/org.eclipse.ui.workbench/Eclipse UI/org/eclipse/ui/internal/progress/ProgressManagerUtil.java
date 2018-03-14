@@ -402,7 +402,8 @@ public class ProgressManagerUtil {
 	 * @return Shell
 	 */
 	public static Shell getNonModalShell() {
-		MApplication application = PlatformUI.getWorkbench().getService(MApplication.class);
+		MApplication application = (MApplication) PlatformUI.getWorkbench().getService(
+				MApplication.class);
 		if (application == null) {
 			// better safe than sorry
 			return null;

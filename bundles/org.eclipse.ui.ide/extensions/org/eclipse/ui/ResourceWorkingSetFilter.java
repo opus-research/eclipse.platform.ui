@@ -62,7 +62,7 @@ public class ResourceWorkingSetFilter extends ViewerFilter {
             resource = (IResource) element;
         } else if (element instanceof IAdaptable) {
             IAdaptable adaptable = (IAdaptable) element;
-            resource = adaptable.getAdapter(IResource.class);
+            resource = (IResource) adaptable.getAdapter(IResource.class);
         }
         if (resource != null) {
             return isEnclosed(resource);
@@ -93,7 +93,8 @@ public class ResourceWorkingSetFilter extends ViewerFilter {
 
         for (int i = 0; i < workingSetElements.length; i++) {
             IAdaptable workingSetElement = workingSetElements[i];
-            IContainmentAdapter containmentAdapter = workingSetElement.getAdapter(IContainmentAdapter.class);
+            IContainmentAdapter containmentAdapter = (IContainmentAdapter) workingSetElement
+                    .getAdapter(IContainmentAdapter.class);
 
             // if there is no IContainmentAdapter defined for the working
             // set element type fall back to using resource based
@@ -138,7 +139,8 @@ public class ResourceWorkingSetFilter extends ViewerFilter {
         if (workingSetElement instanceof IResource) {
             workingSetResource = (IResource) workingSetElement;
         } else {
-            workingSetResource = workingSetElement.getAdapter(IResource.class);
+            workingSetResource = (IResource) workingSetElement
+                    .getAdapter(IResource.class);
         }
         if (workingSetResource != null) {
             IPath resourcePath = workingSetResource.getFullPath();

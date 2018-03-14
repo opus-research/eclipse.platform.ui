@@ -252,7 +252,8 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 		// not originate
 		// in our context.
 		if (uiInfo != null) {
-			IUndoContext originatingContext = Util.getAdapter(uiInfo, IUndoContext.class);
+			IUndoContext originatingContext = (IUndoContext) Util.getAdapter(uiInfo,
+					IUndoContext.class);
 			if (originatingContext != null
 					&& !(originatingContext.matches(context))) {
 				return false;

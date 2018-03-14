@@ -2297,7 +2297,8 @@ UIEvents.Context.TOPIC_CONTEXT,
 			}
 		});
 
-		IContextService cxs = ContextInjectionFactory.make(ContextService.class, e4Context);
+		IContextService cxs = (IContextService) ContextInjectionFactory.make(ContextService.class,
+				e4Context);
 
 		final IContextService contextService = cxs;
 
