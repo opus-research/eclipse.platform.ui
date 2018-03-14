@@ -23,7 +23,6 @@
   <modules>
     <!--
     <module>org.eclipse.e4.emf.xpath.test</module>
-    <module>org.eclipse.e4.ui.compat.tests.tweaklet</module>
     <module>org.eclipse.e4.ui.keybinding.tests</module>
     <module>org.eclipse.e4.ui.menu.tests</module>
     <module>org.eclipse.e4.ui.menu.tests.debug</module>
