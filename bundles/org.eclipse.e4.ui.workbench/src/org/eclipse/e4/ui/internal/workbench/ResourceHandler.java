@@ -148,7 +148,8 @@ public class ResourceHandler implements IModelResourceHandler {
 					context.set(MApplication.class, appElement);
 					ModelAssembler contribProcessor = ContextInjectionFactory.make(
 							ModelAssembler.class, context);
-					contribProcessor.processModel();
+
+					contribProcessor.processModel(ModelAssembler.DURING_MODEL_CREATION);
 
 					File deltaOldFile = new File(baseLocation, "deltas_42M7migration.xml"); //$NON-NLS-1$
 					deltaFile.renameTo(deltaOldFile);
@@ -213,11 +214,11 @@ public class ResourceHandler implements IModelResourceHandler {
 		// Add model items described in the model extension point
 		// This has to be done before commands are put into the context
 		MApplication appElement = (MApplication) resource.getContents().get(0);
-
 		this.context.set(MApplication.class, appElement);
 		ModelAssembler contribProcessor = ContextInjectionFactory.make(ModelAssembler.class,
 				context);
-		contribProcessor.processModel();
+
+		contribProcessor.processModel(ModelAssembler.DURING_MODEL_CREATION);
 
 		if (!clearPersistedState) {
 			CommandLineOptionModelProcessor processor = ContextInjectionFactory.make(
