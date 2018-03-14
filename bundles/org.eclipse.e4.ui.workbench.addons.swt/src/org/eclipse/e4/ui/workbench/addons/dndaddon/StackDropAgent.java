@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 431404
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.addons.dndaddon;
@@ -25,7 +24,6 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -195,13 +193,15 @@ public class StackDropAgent extends DropAgent {
 		} else {
 			if (dropIndex < dropCTF.getItemCount()) {
 				Rectangle itemBounds = dropCTF.getItem(dropIndex).getBounds();
+				itemBounds.width = 2;
 				itemBounds = Display.getCurrent().map(dropCTF, null, itemBounds);
-				addDropFeedback(itemBounds);
+				dndManager.frameRect(itemBounds);
 			} else if (dropCTF.getItemCount() > 0) {
 				Rectangle itemBounds = dropCTF.getItem(dropIndex - 1).getBounds();
 				itemBounds.x = itemBounds.x + itemBounds.width;
+				itemBounds.width = 2;
 				itemBounds = Display.getCurrent().map(dropCTF, null, itemBounds);
-				addDropFeedback(itemBounds);
+				dndManager.frameRect(itemBounds);
 			} else {
 				Rectangle fr = new Rectangle(tabArea.x, tabArea.y, tabArea.width, tabArea.height);
 				fr.width = 2;
@@ -216,31 +216,6 @@ public class StackDropAgent extends DropAgent {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Add drop feedback image, centered at the top-left point of the given item
-	 * bounds. The image is an arrow made by stacked rectangles
-	 */
-	private void addDropFeedback(Rectangle itemBounds) {
-		// totalWidth/2 = totalHeight/2 = 8
-		int x = itemBounds.x - 16 / 2;
-		int y = itemBounds.y - 16 / 2;
-		dndManager.clearOverlay();
-		// 8 rectangles are the 16x16 dropdown triangle
-		addRect(x, y, 0, 0, 16, 2);
-		addRect(x, y, 1, 2, 14, 2);
-		addRect(x, y, 2, 4, 12, 2);
-		addRect(x, y, 3, 6, 10, 2);
-		addRect(x, y, 4, 8, 8, 2);
-		addRect(x, y, 5, 10, 6, 2);
-		addRect(x, y, 6, 12, 4, 2);
-		addRect(x, y, 7, 14, 2, 2);
-	}
-
-	/** Adds a rectangle to the dndManager */
-	private void addRect(int xBase, int yBase, int x, int y, int w, int h) {
-		dndManager.addImage(new Rectangle(xBase + x, yBase + y, w, h), new Image(Display.getCurrent(), w, h));
 	}
 
 	/**
