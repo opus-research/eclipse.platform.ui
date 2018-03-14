@@ -55,7 +55,7 @@ public interface MStringModelFragment extends MModelFragment {
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Featurename</em>' attribute.
 	 * @see #setFeaturename(String)
-	 * @model required="true"
+	 * @model
 	 * @generated
 	 */
 	String getFeaturename();
@@ -96,7 +96,7 @@ public interface MStringModelFragment extends MModelFragment {
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Parent Element Id</em>' attribute.
 	 * @see #setParentElementId(String)
-	 * @model required="true"
+	 * @model
 	 * @generated
 	 */
 	String getParentElementId();
