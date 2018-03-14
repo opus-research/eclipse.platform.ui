@@ -76,14 +76,13 @@ AbstractCSSPropertyBackgroundHandler {
 				CTabFolder folder = ((CTabItem) widget).getParent();
 				if ("selected".equals(pseudo)) {
 					// tab folder selection manages gradients
-					folder.setSelectionBackground(newColor);
+					CSSSWTColorHelper.setSelectionBackground(folder, newColor);
 				} else {
-					folder.setBackground(newColor);
+					CSSSWTColorHelper.setBackground(folder, newColor);
 				}
 			} else if (widget instanceof Control) {
 				GradientBackgroundListener.remove((Control) widget);
-				((Control) widget).setBackground(newColor);
-				//CompositeElement.setBackgroundOverriddenByCSSMarker(widget);
+				CSSSWTColorHelper.setBackground((Control) widget, newColor);
 			}
 		} else if (value.getCssValueType() == CSSValue.CSS_VALUE_LIST) {
 			Gradient grad = (Gradient) engine.convert(value, Gradient.class,
@@ -122,30 +121,19 @@ AbstractCSSPropertyBackgroundHandler {
 	public void applyCSSPropertyBackgroundImage(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		// Widget control = (Widget) element;
-		Widget control = (Widget) ((WidgetElement) element).getNativeWidget();
-		Image image = (Image) engine.convert(value, Image.class, control
-				.getDisplay());
-		if (control instanceof CTabFolder && "selected".equals(pseudo)) {
-			((CTabFolder) control).setSelectionBackground(image);
-		} else if (control instanceof Button) {
-			Button button = ((Button) control);
+		Widget widget = (Widget) ((WidgetElement) element).getNativeWidget();
+		Image image = (Image) engine.convert(value, Image.class,
+				widget.getDisplay());
+		if (widget instanceof CTabFolder && "selected".equals(pseudo)) {
+			((CTabFolder) widget).setSelectionBackground(image);
+		} else if (widget instanceof Button) {
+			Button button = ((Button) widget);
 			// Image oldImage = button.getImage();
 			// if (oldImage != null)
 			// oldImage.dispose();
-			CSSSWTImageHelper.storeDefaultImage(button);
-			button.setImage(image);
-
-		} else {
-			try {
-				if (control instanceof Control) {
-					((Control) control).setBackgroundImage(image);
-				}
-			} catch (Throwable e) {
-				//TODO replace with eclipse logging
-				// if (logger.isWarnEnabled())
-				// logger
-				// .warn("Impossible to manage backround-image, This SWT version doesn't support control.setBackgroundImage(Image image) Method");
-			}
+			CSSSWTImageHelper.setImage(button, image);
+		} else if (widget instanceof Control) {
+			CSSSWTImageHelper.setBackgroundImage((Control) widget, image);
 		}
 	}
 
