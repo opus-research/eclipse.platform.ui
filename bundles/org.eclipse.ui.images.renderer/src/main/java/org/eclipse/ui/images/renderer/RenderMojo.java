@@ -17,7 +17,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -48,8 +47,6 @@ import org.w3c.dom.svg.SVGDocument;
 import com.jhlabs.image.ContrastFilter;
 import com.jhlabs.image.GrayscaleFilter;
 import com.jhlabs.image.HSBAdjustFilter;
-import com.jhlabs.image.PointFilter;
-import com.jhlabs.image.TransferFilter;
 
 /**
  * <p>Mojo which renders SVG icons into PNG format.</p>
@@ -88,7 +85,7 @@ public class RenderMojo extends AbstractMojo {
             .synchronizedList(new ArrayList<IconEntry>(5));
 
     /** The amount of scaling to apply to rasterized images. */
-    private double outputScale;
+    private int outputScale;
 
     /** Used for creating desaturated icons */
     private GrayscaleFilter grayFilter;
@@ -164,8 +161,8 @@ public class RenderMojo extends AbstractMojo {
         int nativeWidth = Integer.parseInt(nativeWidthStr);
         int nativeHeight = Integer.parseInt(nativeHeightStr);
 
-        int outputWidth = (int) (nativeWidth * outputScale);
-        int outputHeight = (int) (nativeHeight * outputScale);
+        int outputWidth = nativeWidth * outputScale;
+        int outputHeight = nativeHeight * outputScale;
 
         // Guesstimate the PNG size in memory, BAOS will enlarge if necessary.
         int outputInitSize = nativeWidth * nativeHeight * 4 + 1024;
@@ -254,13 +251,7 @@ public class RenderMojo extends AbstractMojo {
      */
     private void writeIcon(IconEntry icon, int width, int height, BufferedImage sourceImage) {
         try {
-            String outputName = icon.nameBase;
-            if (outputScale != 1) {
-                String scaleId = outputScale == (double) (int) outputScale ? Integer.toString((int) outputScale): Double.toString(outputScale);
-                outputName += "@" + scaleId + "x";
-            }
-            outputName += ".png";
-            ImageIO.write(sourceImage, "PNG", new File(icon.outputPath, outputName));
+            ImageIO.write(sourceImage, "PNG", new File(icon.outputPath, icon.nameBase + ".png"));
 
             if (icon.disabledPath != null) {
                 BufferedImage desaturated16 = desaturator.filter(
@@ -268,11 +259,11 @@ public class RenderMojo extends AbstractMojo {
 
                 BufferedImage deconstrast = decontrast.filter(desaturated16, null);
 
-                ImageIO.write(deconstrast, "PNG", new File(icon.disabledPath, outputName));
+                ImageIO.write(deconstrast, "PNG", new File(icon.disabledPath, icon.nameBase + ".png"));
             }
         } catch (Exception e1) {
             log.error("Failed to resize rendered icon to output size: "  +
-                               icon.nameBase, e1);
+                               icon.nameBase + " - " + e1.getMessage());
             failedIcons.add(icon);
         }
     }
@@ -457,7 +448,7 @@ public class RenderMojo extends AbstractMojo {
      * @param threads the number of threads to render with
      * @param scale multiplier to use with icon output dimensions
      */
-    private void init(int threads, double scale) {
+    private void init(int threads, int scale) {
         this.threads = threads;
         this.outputScale = Math.max(1, scale);
         icons = new ArrayList<IconEntry>();
@@ -470,19 +461,8 @@ public class RenderMojo extends AbstractMojo {
         desaturator.setSFactor(0.0f);
 
         decontrast = new ContrastFilter();
-        decontrast.setBrightness(2.9f);
-        decontrast.setContrast(0.2f);
-        initFilter(decontrast);
-    }
-
-    /**
-     * Work around the fact that {@link com.jhlabs.image.TransferFilter#initialize()}
-     * is not thread-safe.
-     * @param filter the filter
-     */
-    private void initFilter(TransferFilter filter) {
-		filter.filter(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB),
-				new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB));
+             decontrast.setBrightness(2.9f);
+             decontrast.setContrast(0.2f);
     }
 
     /**
@@ -506,13 +486,10 @@ public class RenderMojo extends AbstractMojo {
 
         // if high res is enabled, the icons output size will be scaled by iconScale
         // Defaults to 1, meaning native size
-        double iconScale = 1;
+        int iconScale = 1;
         String iconScaleStr = System.getProperty(ECLIPSE_SVG_SCALE);
-        if (iconScaleStr != null) {
-            iconScale = Double.parseDouble(iconScaleStr);
-            if (iconScale != 1 && iconScale != 1.5 && iconScale != 2) {
-                log.warn("Unusual scale factor: " + iconScaleStr + " (@" + iconScale + "x)");
-            }
+        if(iconScaleStr != null) {
+            iconScale = Integer.parseInt(iconScaleStr);
         }
 
         // Track the time it takes to render the entire set
@@ -523,7 +500,7 @@ public class RenderMojo extends AbstractMojo {
 
         String workingDirectory = System.getProperty("user.dir");
 
-        File outputDir = new File(workingDirectory + (iconScale == 1 ? "/eclipse-png/" : "/eclipse-png-highdpi/"));
+        File outputDir = new File(workingDirectory+"/eclipse-png/");
         File iconDirectoryRoot = new File("eclipse-svg/");
 
         // Search each subdir in the root dir for svg icons
@@ -535,10 +512,7 @@ public class RenderMojo extends AbstractMojo {
             String dirName = file.getName();
 
             // Where to place the rendered icon
-            File outputBase = new File(outputDir, (iconScale == 1 ? dirName : dirName + ".highdpi"));
-            if (iconScale != 1) {
-                createFragmentFiles(outputBase, dirName);
-            }
+            File outputBase = new File(outputDir, dirName);
 
             IconGatherer.gatherIcons(icons, "svg", file, file, outputBase, true);
         }
@@ -562,49 +536,6 @@ public class RenderMojo extends AbstractMojo {
 
         log.info("Rasterization operations completed, Took: "
                 + (System.currentTimeMillis() - totalStartTime) + " ms.");
-    }
-
-    private void createFragmentFiles(File outputBase, String dirName) {
-        createFile(new File(outputBase, "build.properties"), "bin.includes = META-INF/,icons/,.\n");
-        createFile(new File(outputBase, ".project"), "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
-                "<projectDescription>\n" + 
-                "    <name>" + dirName + ".highdpi</name>\n" + 
-                "    <comment></comment>\n" + 
-                "    <projects>\n" + 
-                "    </projects>\n" + 
-                "    <buildSpec>\n" + 
-                "        <buildCommand>\n" + 
-                "            <name>org.eclipse.pde.ManifestBuilder</name>\n" + 
-                "            <arguments>\n" + 
-                "            </arguments>\n" + 
-                "        </buildCommand>\n" + 
-                "        <buildCommand>\n" + 
-                "            <name>org.eclipse.pde.SchemaBuilder</name>\n" + 
-                "            <arguments>\n" + 
-                "            </arguments>\n" + 
-                "        </buildCommand>\n" + 
-                "    </buildSpec>\n" + 
-                "    <natures>\n" + 
-                "        <nature>org.eclipse.pde.PluginNature</nature>\n" + 
-                "    </natures>\n" + 
-                "</projectDescription>\n");
-        createFile(new File(outputBase, "META-INF/MANIFEST.MF"), "Manifest-Version: 1.0\n" + 
-                "Bundle-ManifestVersion: 2\n" + 
-                "Bundle-Name: " + dirName + ".highdpi\n" + 
-                "Bundle-SymbolicName: " + dirName + ".highdpi\n" + 
-                "Bundle-Version: 0.1.0.qualifier\n" + 
-                "Fragment-Host: " + dirName + "\n");
-    }
-
-    private void createFile(File file, String contents) {
-        try {
-            file.getParentFile().mkdirs();
-            FileWriter writer = new FileWriter(file);
-            writer.write(contents);
-            writer.close();
-        } catch (IOException e) {
-            log.error(e);
-        }
     }
 
 }

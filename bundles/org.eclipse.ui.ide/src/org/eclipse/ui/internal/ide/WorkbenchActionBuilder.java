@@ -39,6 +39,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.util.Util;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPageListener;
@@ -672,21 +673,8 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         menu.add(openPreferencesItem);
 
 		// Workaround for bug 461311. Radio buttons in the main menu can cause
-		// Eclipse to crash on window managers like unity that use menu proxies.
-		String menuProxy = System.getenv("UBUNTU_MENUPROXY"); //$NON-NLS-1$
-		String desktopSession = System.getenv("DESKTOP_SESSION"); //$NON-NLS-1$
-		String os = Platform.getOS();
-		String ws = Platform.getWS();
-		// Setting this property to false disables the workaround. Omitting the
-		// property or setting it to any other value
-		// enables the workaround
-		boolean workaroundEnabled = !"false".equals(System.getProperty("eclipse.workaround.bug461311")); //$NON-NLS-1$ //$NON-NLS-2$
-
-		boolean radioButtonsMightCauseCrash = ((menuProxy == null) || !menuProxy.equals("0")) //$NON-NLS-1$
-				&& Platform.WS_GTK.equals(ws) && Platform.OS_LINUX.equals(os)
-				&& (desktopSession == null || desktopSession.equals("ubuntu")) //$NON-NLS-1$
-				&& workaroundEnabled;
-		if (!radioButtonsMightCauseCrash) {
+		// Eclipse to crash on GTK.
+		if (!SWT.getPlatform().equals("gtk")) { //$NON-NLS-1$
 			menu.add(ContributionItemFactory.OPEN_WINDOWS.create(getWindow()));
 		}
         return menu;
