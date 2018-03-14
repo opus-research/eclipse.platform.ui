@@ -27,6 +27,7 @@ import org.eclipse.jface.layout.LayoutConstants;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -323,10 +324,11 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 	}
 
 	protected void updateDescription() {
-		IStructuredSelection selection = viewer.getStructuredSelection();
+		ISelection selection = viewer.getSelection();
 		String desc = ""; //$NON-NLS-1$
 		if (!selection.isEmpty()) {
-			Object element = selection.getFirstElement();
+			Object element = ((IStructuredSelection) selection)
+					.getFirstElement();
 			if ((element instanceof PreferenceTransferElement)) {
 				desc = ((PreferenceTransferElement) element).getDescription();
 			}
@@ -367,10 +369,9 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 		buttonComposite.setLayoutData(data);
 		buttonComposite.setFont(parentFont);
 		
-		selectAllButton = new Button(buttonComposite, SWT.PUSH);
-		selectAllButton.setText(PreferencesMessages.SelectionDialog_selectLabel);
-		selectAllButton.setData(new Integer(IDialogConstants.SELECT_ALL_ID));
-		setButtonLayoutData(selectAllButton);
+		selectAllButton = createButton(buttonComposite,
+				IDialogConstants.SELECT_ALL_ID,
+				PreferencesMessages.SelectionDialog_selectLabel, false);
 
 		SelectionListener listener = new SelectionAdapter() {
 			@Override
@@ -382,10 +383,9 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 		selectAllButton.addSelectionListener(listener);
 		selectAllButton.setFont(parentFont);
 		
-		deselectAllButton = new Button(buttonComposite, SWT.PUSH);
-		deselectAllButton.setText(PreferencesMessages.SelectionDialog_deselectLabel);
-		deselectAllButton.setData(new Integer(IDialogConstants.DESELECT_ALL_ID));
-		setButtonLayoutData(deselectAllButton);
+		deselectAllButton = createButton(buttonComposite,
+				IDialogConstants.DESELECT_ALL_ID,
+				PreferencesMessages.SelectionDialog_deselectLabel, false);
 
 		listener = new SelectionAdapter() {
 			@Override
@@ -546,6 +546,11 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.dialogs.WizardDataTransferPage#saveWidgetValues()
+	 */
 	protected void saveWidgetValues() {
 
 		IDialogSettings settings = getDialogSettings();
@@ -943,12 +948,22 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 		destinationNameField.setText(value);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.DialogPage#dispose()
+	 */
 	@Override
 	public void dispose() {
 		super.dispose();
 		transfers = null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.dialogs.WizardDataTransferPage#allowNewContainerName()
+	 */
 	protected boolean allowNewContainerName() {
 		return true;
 	}

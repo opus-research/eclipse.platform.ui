@@ -36,7 +36,7 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
     private static final String[] directoryNames = { "dir1", "dir2" };
 
     private static final String[] fileNames = { "file1.txt", "file2.txt" };
-
+    
     private String localDirectory;
 
     private IProject project;
@@ -65,15 +65,13 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
     /*
      * @see IOverwriteQuery#queryOverwrite(String)
      */
-    @Override
-	public String queryOverwrite(String pathString) {
+    public String queryOverwrite(String pathString) {
         //Always return an empty String - we aren't
         //doing anything interesting
         return "";
     }
 
-    @Override
-	protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         super.doSetUp();
         Class testClass = Class
                 .forName("org.eclipse.ui.tests.datatransfer.ImportOperationTest");
@@ -92,8 +90,8 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
         File rootDirectory = new File(localDirectory);
         rootDirectory.mkdir();
         localDirectory = rootDirectory.getAbsolutePath();
-        for (String directoryName : directoryNames) {
-            createSubDirectory(localDirectory, directoryName);
+        for (int i = 0; i < directoryNames.length; i++) {
+            createSubDirectory(localDirectory, directoryNames[i]);
         }
     }
 
@@ -101,8 +99,7 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
      * Tear down. Delete the project we created and all of the
      * files on the file system.
      */
-    @Override
-	protected void doTearDown() throws Exception {
+    protected void doTearDown() throws Exception {
         super.doTearDown();
         try {
             project.delete(true, true, null);
@@ -194,9 +191,9 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
             IResource[] resources = ((IContainer) targetFolder).members();
             assertEquals("Import failed to import all directories",
                     directoryNames.length, resources.length);
-            for (IResource resource : resources) {
-                assertTrue("Import failed", resource instanceof IContainer);
-                verifyFolder((IContainer) resource);
+            for (int i = 0; i < resources.length; i++) {
+                assertTrue("Import failed", resources[i] instanceof IContainer);
+                verifyFolder((IContainer) resources[i]);
             }
         } catch (CoreException e) {
             fail(e.toString());
@@ -232,7 +229,7 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
 
     /**
      * Verifies that all files were imported.
-     *
+     * 
      * @param folderCount number of folders that were imported
      */
     private void verifyFiles(int folderCount) {
@@ -245,9 +242,9 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
             IResource[] resources = ((IContainer) targetFolder).members();
             assertEquals("Import failed to import all directories",
                     folderCount, resources.length);
-            for (IResource resource : resources) {
-                assertTrue("Import failed", resource instanceof IContainer);
-                verifyFolder((IContainer) resource);
+            for (int i = 0; i < resources.length; i++) {
+                assertTrue("Import failed", resources[i] instanceof IContainer);
+                verifyFolder((IContainer) resources[i]);
             }
         } catch (CoreException e) {
             fail(e.toString());
@@ -262,12 +259,12 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
             IResource[] files = folder.members();
             assertEquals("Import failed to import all files", fileNames.length,
                     files.length);
-            for (String fileName : fileNames) {
+            for (int j = 0; j < fileNames.length; j++) {
+                String fileName = fileNames[j];
                 int k;
                 for (k = 0; k < files.length; k++) {
-                    if (fileName.equals(files[k].getName())) {
-						break;
-					}
+                    if (fileName.equals(files[k].getName()))
+                        break;
                 }
                 assertTrue("Import failed to import file " + fileName,
                         k < fileNames.length);

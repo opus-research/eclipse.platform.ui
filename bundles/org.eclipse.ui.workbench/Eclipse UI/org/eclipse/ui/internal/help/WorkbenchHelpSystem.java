@@ -170,16 +170,27 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 
 	/**
 	 * Handles dynamic removal of the help system.
-	 *
+	 * 
 	 * @since 3.1
 	 */
+    /**
+     * Handles dynamic removal of the help system.
+     * 
+     * @since 3.1
+     */
     private IExtensionChangeHandler handler = new IExtensionChangeHandler() {
-
-    	@Override
+        
+        /* (non-Javadoc)
+         * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker, org.eclipse.core.runtime.IExtension)
+         */
+        @Override
 		public void addExtension(IExtensionTracker tracker,IExtension extension) {
             //Do nothing
         }
-
+        
+        /* (non-Javadoc)
+         * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension, java.lang.Object[])
+         */
         @Override
 		public void removeExtension(IExtension source, Object[] objects) {
             for (int i = 0; i < objects.length; i++) {
@@ -455,6 +466,11 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see java.lang.Runnable#run()
+			 */
 			@Override
 			public void run() {
 				// get the help UI extension from the registry
@@ -860,6 +876,11 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		};
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#displayHelp()
+	 */
 	@Override
 	public void displayHelp() {
 		AbstractHelpUI helpUI = getHelpUI();
@@ -867,7 +888,12 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 			helpUI.displayHelp();
 		}
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#displaySearch()
+	 */
 	@Override
 	public void displaySearch() {
 		AbstractHelpUI helpUI = getHelpUI();
@@ -875,7 +901,12 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 			helpUI.displaySearch();
 		}
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#displaySearch()
+	 */
 	@Override
 	public void displayDynamicHelp() {
 		AbstractHelpUI helpUI = getHelpUI();
@@ -883,7 +914,12 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 			helpUI.displayDynamicHelp();
 		}
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#search(java.lang.String)
+	 */
 	@Override
 	public void search(String expression) {
 		AbstractHelpUI helpUI = getHelpUI();
@@ -891,7 +927,10 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 			helpUI.search(expression);
 		}
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#resolve(java.lang.String, boolean)
+	 */
 	@Override
 	public URL resolve(String href, boolean documentOnly) {
 		AbstractHelpUI helpUI = getHelpUI();
@@ -900,7 +939,13 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		}
 		return null;
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#displayContext(org.eclipse.help.IContext,
+	 *      int, int)
+	 */
 	@Override
 	public void displayContext(IContext context, int x, int y) {
 		if (context == null) {
@@ -912,6 +957,11 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#displayHelpResource(java.lang.String)
+	 */
 	@Override
 	public void displayHelpResource(String href) {
 		if (href == null) {
@@ -923,6 +973,11 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#displayHelp(java.lang.String)
+	 */
 	@Override
 	public void displayHelp(String contextId) {
 		IContext context = HelpSystem.getContext(contextId);
@@ -932,6 +987,11 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#displayHelp(org.eclipse.help.IContext)
+	 */
 	@Override
 	public void displayHelp(IContext context) {
 		Point point = computePopUpLocation(Display.getCurrent());
@@ -941,6 +1001,11 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#isContextHelpDisplayed()
+	 */
 	@Override
 	public boolean isContextHelpDisplayed() {
 		if (!isInitialized) {
@@ -950,6 +1015,12 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		return helpUI != null && helpUI.isContextHelpDisplayed();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#setHelp(org.eclipse.jface.action.IAction,
+	 *      java.lang.String)
+	 */
 	@Override
 	public void setHelp(final IAction action, final String contextId) {
 		if (WorkbenchPlugin.DEBUG)
@@ -970,6 +1041,12 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		});
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#setHelp(org.eclipse.swt.widgets.Control,
+	 *      java.lang.String)
+	 */
 	@Override
 	public void setHelp(Control control, String contextId) {
 		if (WorkbenchPlugin.DEBUG)
@@ -980,6 +1057,12 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		control.addHelpListener(getHelpListener());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#setHelp(org.eclipse.swt.widgets.Menu,
+	 *      java.lang.String)
+	 */
 	@Override
 	public void setHelp(Menu menu, String contextId) {
 		if (WorkbenchPlugin.DEBUG)
@@ -990,6 +1073,12 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		menu.addHelpListener(getHelpListener());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#setHelp(org.eclipse.swt.widgets.MenuItem,
+	 *      java.lang.String)
+	 */
 	@Override
 	public void setHelp(MenuItem item, String contextId) {
 
@@ -1003,6 +1092,8 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	}
 
 	/*
+	 * (non-Javadoc)
+	 * 
 	 * Traces all calls to the setHelp method in an attempt to find and report
 	 * duplicated context IDs.
 	 */
@@ -1035,6 +1126,9 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#hasHelpUI()
+	 */
 	@Override
 	public boolean hasHelpUI() {
 		return getHelpUI() != null;

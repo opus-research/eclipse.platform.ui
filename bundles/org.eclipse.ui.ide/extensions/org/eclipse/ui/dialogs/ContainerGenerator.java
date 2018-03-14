@@ -29,7 +29,7 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 
 /**
- * For creating folder resources that currently do not exist,
+ * For creating folder resources that currently do not exist, 
  * along a given workspace path.
  * <p>
  * This class may be instantiated; it is not intended to be subclassed.
@@ -163,8 +163,7 @@ public class ContainerGenerator {
     public IContainer generateContainer(IProgressMonitor monitor)
             throws CoreException {
         IDEWorkbenchPlugin.getPluginWorkspace().run(new IWorkspaceRunnable() {
-            @Override
-			public void run(IProgressMonitor monitor) throws CoreException {
+            public void run(IProgressMonitor monitor) throws CoreException {
                 monitor
                         .beginTask(
                                 IDEWorkbenchMessages.ContainerGenerator_progressMessage, 1000 * containerFullPath.segmentCount());

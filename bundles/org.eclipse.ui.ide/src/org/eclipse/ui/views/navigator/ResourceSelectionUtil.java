@@ -30,7 +30,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
  * @noextend This class is not intended to be subclassed by clients.
  * @deprecated as of 3.5, use {@link org.eclipse.ui.ide.ResourceSelectionUtil} instead.
  */
-@Deprecated
 public class ResourceSelectionUtil {
     /* (non-Javadoc)
      * Private constructor to block instantiation.
@@ -39,9 +38,9 @@ public class ResourceSelectionUtil {
     }
 
     /**
-     * Returns whether the types of the resources in the given selection are among
+     * Returns whether the types of the resources in the given selection are among 
      * the specified resource types.
-     *
+     * 
      * @param selection the selection
      * @param resourceMask resource mask formed by bitwise OR of resource type
      *   constants (defined on <code>IResource</code>)
@@ -68,7 +67,7 @@ public class ResourceSelectionUtil {
     /**
      * Returns the selection adapted to IResource. Returns null
      * if any of the entries are not adaptable.
-     *
+     * 
      * @param selection the selection
      * @param resourceMask resource mask formed by bitwise OR of resource type
      *   constants (defined on <code>IResource</code>)
@@ -98,13 +97,13 @@ public class ResourceSelectionUtil {
     }
 
     /**
-     * Returns whether the type of the given resource is among the specified
+     * Returns whether the type of the given resource is among the specified 
      * resource types.
-     *
+     * 
      * @param resource the resource
      * @param resourceMask resource mask formed by bitwise OR of resource type
      *   constants (defined on <code>IResource</code>)
-     * @return <code>true</code> if the resources has a matching type, and
+     * @return <code>true</code> if the resources has a matching type, and 
      *   <code>false</code> otherwise
      * @see IResource#getType()
      */

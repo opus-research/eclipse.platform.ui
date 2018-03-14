@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -113,13 +113,8 @@ public class ProgressAnimationItem extends AnimationItem implements
 						        StatusReporter.SHOW, new Object[0]);
 						removeTopElement(ji);
 					}
-					
-					// To fix a bug (335543) introduced in 3.6.1.
-					// doAction() should return if progress region button was
-					// selected to open a job result action or command.
-					if (execute(ji, job)) {
-						return;
-					}
+
+					execute(ji, job);
 				}
 			}
 		}
@@ -131,16 +126,14 @@ public class ProgressAnimationItem extends AnimationItem implements
 	/**
 	 * @param ji
 	 * @param job
-	 * @return <code>true</code> if Action or Command is executed
 	 */
-	private boolean execute(JobInfo ji, Job job) {
+	private void execute(JobInfo ji, Job job) {
 
 		Object prop = job.getProperty(IProgressConstants.ACTION_PROPERTY);
 		if (prop instanceof IAction && ((IAction) prop).isEnabled()) {
 			IAction action = (IAction) prop;
 			action.run();
 			removeTopElement(ji);
-			return true;
 		}
 
 		prop = job.getProperty(IProgressConstants.COMMAND_PROPERTY);
@@ -148,9 +141,7 @@ public class ProgressAnimationItem extends AnimationItem implements
 			ParameterizedCommand command = (ParameterizedCommand) prop;
 			getEHandlerService().executeHandler(command);
 			removeTopElement(ji);
-			return true;
 		}
-		return false;
 	}
 
 	/**

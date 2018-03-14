@@ -60,6 +60,10 @@ public class BooleanPropertyAction extends Action {
         setChecked(preferenceStore.getBoolean(property));
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.jface.action.IAction#run()
+     */
     @Override
 	public void run() {
         preferenceStore.setValue(property, isChecked());

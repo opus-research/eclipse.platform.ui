@@ -52,8 +52,7 @@ public class IEditorActionDelegateTest extends IActionDelegateTest {
     /**
      * @see IActionDelegateTest#createActionWidget()
      */
-    @Override
-	protected Object createActionWidget() throws Throwable {
+    protected Object createActionWidget() throws Throwable {
         editor = openEditor(fPage, "X");
         return editor;
     }
@@ -61,8 +60,7 @@ public class IEditorActionDelegateTest extends IActionDelegateTest {
     /**
      * @see IActionDelegateTest#runAction()
      */
-    @Override
-	protected void runAction(Object widget) throws Throwable {
+    protected void runAction(Object widget) throws Throwable {
         MockEditorPart editor = (MockEditorPart) widget;
         MockEditorActionBarContributor contributor = (MockEditorActionBarContributor) editor
                 .getEditorSite().getActionBarContributor();
@@ -73,8 +71,7 @@ public class IEditorActionDelegateTest extends IActionDelegateTest {
     /**
      * @see IActionDelegateTest#fireSelection()
      */
-    @Override
-	protected void fireSelection(Object widget) throws Throwable {
+    protected void fireSelection(Object widget) throws Throwable {
         MockEditorPart editor = (MockEditorPart) widget;
         editor.fireSelection();
     }

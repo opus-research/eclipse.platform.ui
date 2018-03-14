@@ -83,22 +83,19 @@ public class TextActionHandler {
     private Text activeTextControl;
 
     private MouseAdapter mouseAdapter = new MouseAdapter() {
-        @Override
-		public void mouseUp(MouseEvent e) {
+        public void mouseUp(MouseEvent e) {
             updateActionsEnableState();
         }
     };
 
     private KeyAdapter keyAdapter = new KeyAdapter() {
-        @Override
-		public void keyReleased(KeyEvent e) {
+        public void keyReleased(KeyEvent e) {
             updateActionsEnableState();
         }
     };
 
     private class TextControlListener implements Listener {
-        @Override
-		public void handleEvent(Event event) {
+        public void handleEvent(Event event) {
             switch (event.type) {
             case SWT.Activate:
                 activeTextControl = (Text) event.widget;
@@ -122,8 +119,7 @@ public class TextActionHandler {
             this.actionHandler = actionHandler;
         }
 
-        @Override
-		public void propertyChange(PropertyChangeEvent event) {
+        public void propertyChange(PropertyChangeEvent event) {
             if (activeTextControl != null) {
 				return;
 			}
@@ -143,8 +139,7 @@ public class TextActionHandler {
             		INavigatorHelpContextIds.TEXT_DELETE_ACTION);
         }
 
-        @Override
-		public void runWithEvent(Event event) {
+        public void runWithEvent(Event event) {
             if (activeTextControl != null && !activeTextControl.isDisposed()) {
                 activeTextControl.clearSelection();
                 return;
@@ -182,8 +177,7 @@ public class TextActionHandler {
             		INavigatorHelpContextIds.TEXT_CUT_ACTION);
         }
 
-        @Override
-		public void runWithEvent(Event event) {
+        public void runWithEvent(Event event) {
             if (activeTextControl != null && !activeTextControl.isDisposed()) {
                 activeTextControl.cut();
                 return;
@@ -219,8 +213,7 @@ public class TextActionHandler {
             		INavigatorHelpContextIds.TEXT_COPY_ACTION);
         }
 
-        @Override
-		public void runWithEvent(Event event) {
+        public void runWithEvent(Event event) {
             if (activeTextControl != null && !activeTextControl.isDisposed()) {
                 activeTextControl.copy();
                 return;
@@ -256,8 +249,7 @@ public class TextActionHandler {
             		INavigatorHelpContextIds.TEXT_PASTE_ACTION);
         }
 
-        @Override
-		public void runWithEvent(Event event) {
+        public void runWithEvent(Event event) {
             if (activeTextControl != null && !activeTextControl.isDisposed()) {
                 activeTextControl.paste();
                 return;
@@ -293,8 +285,7 @@ public class TextActionHandler {
 					INavigatorHelpContextIds.TEXT_SELECT_ALL_ACTION);
         }
 
-        @Override
-		public void runWithEvent(Event event) {
+        public void runWithEvent(Event event) {
             if (activeTextControl != null && !activeTextControl.isDisposed()) {
                 activeTextControl.selectAll();
                 return;

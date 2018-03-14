@@ -19,9 +19,9 @@ import org.eclipse.ui.views.markers.internal.TaskFilter;
 
 /**
  * CompletionFieldFilter is the field filter for marker fields.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class CompletionFieldFilter extends CompatibilityFieldFilter {
 
@@ -41,7 +41,6 @@ public class CompletionFieldFilter extends CompatibilityFieldFilter {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.internal.provisional.views.markers.api.MarkerFieldFilter#loadSettings(org.eclipse.ui.IMemento)
 	 */
-	@Override
 	public void loadSettings(IMemento memento) {
 		Integer completionValue = memento.getInteger(COMPLETION_ATTRIBUTE);
 		if (completionValue == null)
@@ -49,11 +48,10 @@ public class CompletionFieldFilter extends CompatibilityFieldFilter {
 		completion = completionValue.intValue();
 
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.internal.views.markers.CompatibilityFieldFilter#loadLegacySettings(org.eclipse.ui.IMemento, org.eclipse.ui.internal.views.markers.MarkerContentGenerator)
 	 */
-	@Override
 	void loadLegacySettings(IMemento memento, MarkerContentGenerator generator) {
 
 		String setting = memento.getString(TaskFilter.TAG_DONE);
@@ -61,23 +59,21 @@ public class CompletionFieldFilter extends CompatibilityFieldFilter {
 		if (setting != null) {
 			completion = Boolean.valueOf(setting).booleanValue() ? COMPLETED : NOT_COMPLETED;
 		}
-
+		
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.internal.views.markers.CompatibilityFieldFilter#initialize(org.eclipse.ui.views.markers.internal.ProblemFilter)
 	 */
-	@Override
 	public void initialize(ProblemFilter problemFilter) {
 		//Problem filters have no completion value
-
+		
 	}
 
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.MarkerFieldFilter#saveSettings(org.eclipse.ui.IMemento)
 	 */
-	@Override
 	public void saveSettings(IMemento memento) {
 		memento.putInteger(COMPLETION_ATTRIBUTE, completion);
 
@@ -86,7 +82,6 @@ public class CompletionFieldFilter extends CompatibilityFieldFilter {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.MarkerFieldFilter#select(org.eclipse.ui.views.markers.MarkerItem)
 	 */
-	@Override
 	public boolean select(MarkerItem item) {
 
 		if (completion == ALL_SELECTED)
@@ -104,7 +99,7 @@ public class CompletionFieldFilter extends CompatibilityFieldFilter {
 
 	/**
 	 * Get the completion settings.
-	 * @return int
+	 * @return int 
 	 * @see #COMPLETED
 	 * @see #NOT_COMPLETED
 	 */
@@ -121,12 +116,11 @@ public class CompletionFieldFilter extends CompatibilityFieldFilter {
 	void setCompletion(int completion) {
 		this.completion = completion;
 	}
-
+	
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.MarkerFieldFilter#populateWorkingCopy(org.eclipse.ui.views.markers.MarkerFieldFilter)
 	 */
-	@Override
 	public void populateWorkingCopy(MarkerFieldFilter copy) {
 		super.populateWorkingCopy(copy);
 		((CompletionFieldFilter)copy).setCompletion(getCompletion());

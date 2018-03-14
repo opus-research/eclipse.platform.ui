@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Benjamin Cabe <benjamin.cabe@anyware-tech.com> -
+ *     Benjamin Cabe <benjamin.cabe@anyware-tech.com> - 
  *     	Fix for Bug 222375 [Markers] copy markers from markers view should 'pretty print'
  *******************************************************************************/
 package org.eclipse.ui.internal.views.markers;
@@ -23,18 +23,17 @@ import org.eclipse.ui.views.markers.MarkerViewHandler;
 /**
  * MarkerCopyHandler is the handler for the copy action when the markers view is
  * selected.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class MarkerCopyHandler extends MarkerViewHandler {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
 	 */
-	@Override
 	public Object execute(ExecutionEvent event) {
 		ExtendedMarkersView view = getView(event);
 		if (view == null)
@@ -46,7 +45,7 @@ public class MarkerCopyHandler extends MarkerViewHandler {
 
 	/**
 	 * Set the workbench clipboard for the markers.
-	 *
+	 * 
 	 * @param view
 	 */
 	private void setClipboard(ExtendedMarkersView view) {
@@ -74,7 +73,7 @@ public class MarkerCopyHandler extends MarkerViewHandler {
 	/**
 	 * Creates a plain-text report of the selected markers based on predefined
 	 * properties.
-	 *
+	 * 
 	 * @param view
 	 *            the view being copied
 	 * @param markers
@@ -84,7 +83,7 @@ public class MarkerCopyHandler extends MarkerViewHandler {
 		StringBuffer report = new StringBuffer();
 
 		MarkerField[] fields = view.getVisibleFields();
-
+		
 		final String NEWLINE = System.getProperty("line.separator"); //$NON-NLS-1$
 		final char DELIMITER = '\t';
 

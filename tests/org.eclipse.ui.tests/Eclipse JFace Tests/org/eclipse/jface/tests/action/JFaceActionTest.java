@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * Abstract superclass of all JFace action tests.
- *
+ * 
  * @since 3.1
  */
 public abstract class JFaceActionTest extends TestCase {
@@ -28,14 +28,16 @@ public abstract class JFaceActionTest extends TestCase {
 
     /**
      * Constructs a new test with the given name
-     *
+     * 
      * @param name the name of the test
      */
     protected JFaceActionTest(String name) {
         super(name);
     }
 
-    @Override
+    /* (non-Javadoc)
+     * @see junit.framework.TestCase#setUp()
+     */
     protected void setUp() throws Exception {
 	    display = Display.getCurrent();
 	    if (display == null) {
@@ -46,18 +48,20 @@ public abstract class JFaceActionTest extends TestCase {
 	    shell.setLayout(new FillLayout());
 	    shell.open();
     }
-
-    @Override
+    
+    /* (non-Javadoc)
+     * @see junit.framework.TestCase#tearDown()
+     */
     protected void tearDown() throws Exception {
        shell.dispose();
     }
-
+    
     protected Display getDisplay() {
         return display;
     }
-
+    
     protected Shell getShell() {
         return shell;
     }
-
+    
 }

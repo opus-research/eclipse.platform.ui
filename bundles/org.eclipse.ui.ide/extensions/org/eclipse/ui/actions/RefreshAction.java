@@ -70,12 +70,11 @@ public class RefreshAction extends WorkspaceAction {
 
 	/**
 	 * Creates a new action.
-	 *
+	 * 
 	 * @param shell
 	 *            the shell for any dialogs
 	 * @deprecated See {@link #RefreshAction(IShellProvider)}
 	 */
-	@Deprecated
 	public RefreshAction(Shell shell) {
 		super(shell, IDEWorkbenchMessages.RefreshAction_text);
 		initAction();
@@ -83,7 +82,7 @@ public class RefreshAction extends WorkspaceAction {
 
 	/**
 	 * Creates a new action.
-	 *
+	 * 
 	 * @param provider
 	 *            the IShellProvider for any dialogs.
 	 * @since 3.4
@@ -92,7 +91,7 @@ public class RefreshAction extends WorkspaceAction {
 		super(provider, IDEWorkbenchMessages.RefreshAction_text);
 		initAction();
 	}
-
+	
 	/**
 	 * Initializes for the constructor.
 	 */
@@ -124,7 +123,6 @@ public class RefreshAction extends WorkspaceAction {
 					message, MessageDialog.QUESTION, new String[] {
 							IDialogConstants.YES_LABEL,
 							IDialogConstants.NO_LABEL }, 0) {
-				@Override
 				protected int getShellStyle() {
 					return super.getShellStyle() | SWT.SHEET;
 				}
@@ -134,7 +132,6 @@ public class RefreshAction extends WorkspaceAction {
 			// Must prompt user in UI thread (we're in the operation thread
 			// here).
 			getShell().getDisplay().syncExec(new Runnable() {
-				@Override
 				public void run() {
 					dialog.open();
 				}
@@ -147,17 +144,23 @@ public class RefreshAction extends WorkspaceAction {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on WorkspaceAction.
+	 */
 	protected String getOperationMessage() {
 		return IDEWorkbenchMessages.RefreshAction_progressMessage;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on WorkspaceAction.
+	 */
 	protected String getProblemsMessage() {
 		return IDEWorkbenchMessages.RefreshAction_problemMessage;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on WorkspaceAction.
+	 */
 	protected String getProblemsTitle() {
 		return IDEWorkbenchMessages.RefreshAction_problemTitle;
 	}
@@ -166,7 +169,6 @@ public class RefreshAction extends WorkspaceAction {
 	 * Returns a list containing the workspace root if the selection would
 	 * otherwise be empty.
 	 */
-	@Override
 	protected List getSelectedResources() {
 		List resources = super.getSelectedResources();
 		if (resources.isEmpty()) {
@@ -182,7 +184,6 @@ public class RefreshAction extends WorkspaceAction {
 	 * enabled if the selection is empty, but is disabled if any of the selected
 	 * elements are not resources.
 	 */
-	@Override
 	protected boolean updateSelection(IStructuredSelection s) {
 		return (super.updateSelection(s) || s.isEmpty())
 				&& getSelectedNonResources().size() == 0;
@@ -190,7 +191,7 @@ public class RefreshAction extends WorkspaceAction {
 
 	/**
 	 * Handle the key release.
-	 *
+	 * 
 	 * @param event
 	 *            the event
 	 */
@@ -211,7 +212,11 @@ public class RefreshAction extends WorkspaceAction {
 		selectionChanged(currentSelection);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.actions.WorkspaceAction#createOperation(org.eclipse.core.runtime.IStatus[])
+	 */
 	final protected IRunnableWithProgress createOperation(
 			final IStatus[] errorStatus) {
 		ISchedulingRule rule = null;
@@ -230,7 +235,6 @@ public class RefreshAction extends WorkspaceAction {
 					.next()));
 		}
 		return new WorkspaceModifyOperation(rule) {
-			@Override
 			public void execute(IProgressMonitor monitor) {
 				MultiStatus errors = null;
 				monitor.beginTask("", resources.size() * 1000); //$NON-NLS-1$
@@ -266,7 +270,7 @@ public class RefreshAction extends WorkspaceAction {
 	 * This method may be extended to refresh model objects related to the
 	 * resource.
 	 * </p>
-	 *
+	 * 
 	 * @param resource
 	 *            the resource to refresh. Must not be <code>null</code>.
 	 * @param monitor
@@ -291,15 +295,16 @@ public class RefreshAction extends WorkspaceAction {
 		}
 		resource.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 	}
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.actions.WorkspaceAction#run()
+	 */
 	public void run() {
 		final IStatus[] errorStatus = new IStatus[1];
 		errorStatus[0] = Status.OK_STATUS;
 		final WorkspaceModifyOperation op = (WorkspaceModifyOperation) createOperation(errorStatus);
 		WorkspaceJob job = new WorkspaceJob("refresh") { //$NON-NLS-1$
 
-			@Override
 			public IStatus runInWorkspace(IProgressMonitor monitor)
 					throws CoreException {
 				try {
@@ -315,7 +320,7 @@ public class RefreshAction extends WorkspaceAction {
 				}
 				return errorStatus[0];
 			}
-
+			
 		};
 		ISchedulingRule rule = op.getRule();
 		if (rule != null) {

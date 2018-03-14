@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,10 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Alexander Kurtakov <akurtako@redhat.com> - Bug 459761
  *******************************************************************************/
 
 package org.eclipse.jface.bindings.keys;
 
-import java.util.Locale;
 import java.util.StringTokenizer;
 
 import org.eclipse.jface.bindings.Trigger;
@@ -46,7 +44,7 @@ import org.eclipse.jface.util.Util;
  * 
  * @since 3.1
  */
-public final class KeyStroke extends Trigger {
+public final class KeyStroke extends Trigger implements Comparable {
 
 	/**
 	 * The delimiter between multiple keys in a single key strokes -- expressed
@@ -130,7 +128,7 @@ public final class KeyStroke extends Trigger {
 
 			if (i % 2 == 0) {
 				if (stringTokenizer.hasMoreTokens()) {
-					token = token.toUpperCase(Locale.ENGLISH);
+					token = token.toUpperCase();
 					final int modifierKey = lookup.formalModifierLookup(token);
 					if (modifierKey == NO_KEY) {
 						throw new ParseException(
@@ -144,7 +142,7 @@ public final class KeyStroke extends Trigger {
 					naturalKey = token.charAt(0);
 
 				} else {
-					token = token.toUpperCase(Locale.ENGLISH);
+					token = token.toUpperCase();
 					naturalKey = lookup.formalKeyLookup(token);
 				}
 			}
@@ -186,6 +184,11 @@ public final class KeyStroke extends Trigger {
 		this.naturalKey = naturalKey;
 	}
 
+    /*
+     * (non-Javadoc)
+     * 
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
 	@Override
 	public final int compareTo(final Object object) {
 		final KeyStroke keyStroke = (KeyStroke) object;
@@ -198,6 +201,11 @@ public final class KeyStroke extends Trigger {
 		return compareTo;
 	}
 
+    /*
+     * (non-Javadoc)
+     * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public final boolean equals(final Object object) {
 		if (!(object instanceof KeyStroke)) {
@@ -243,6 +251,11 @@ public final class KeyStroke extends Trigger {
 		return naturalKey;
 	}
 
+    /*
+     * (non-Javadoc)
+     * 
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public final int hashCode() {
 		return modifierKeys << 4 + naturalKey;

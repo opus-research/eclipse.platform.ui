@@ -35,27 +35,27 @@ import org.xml.sax.helpers.DefaultHandler;
  * A parser for the the welcome page
  */
 public class WelcomeParser extends DefaultHandler {
-    private static final String TAG_WELCOME_PAGE = "welcomePage"; //$NON-NLS-1$
+    private static final String TAG_WELCOME_PAGE = "welcomePage"; //$NON-NLS-1$	
 
-    private static final String TAG_INTRO = "intro"; //$NON-NLS-1$
+    private static final String TAG_INTRO = "intro"; //$NON-NLS-1$	
 
-    private static final String TAG_ITEM = "item"; //$NON-NLS-1$
+    private static final String TAG_ITEM = "item"; //$NON-NLS-1$	
 
-    private static final String TAG_BOLD = "b"; //$NON-NLS-1$
+    private static final String TAG_BOLD = "b"; //$NON-NLS-1$	
 
-    private static final String TAG_ACTION = "action"; //$NON-NLS-1$
+    private static final String TAG_ACTION = "action"; //$NON-NLS-1$	
 
-    private static final String TAG_PARAGRAPH = "p"; //$NON-NLS-1$
+    private static final String TAG_PARAGRAPH = "p"; //$NON-NLS-1$	
 
-    private static final String TAG_TOPIC = "topic"; //$NON-NLS-1$
+    private static final String TAG_TOPIC = "topic"; //$NON-NLS-1$	
 
-    private static final String ATT_TITLE = "title"; //$NON-NLS-1$
+    private static final String ATT_TITLE = "title"; //$NON-NLS-1$	
 
-    private static final String ATT_FORMAT = "format"; //$NON-NLS-1$
+    private static final String ATT_FORMAT = "format"; //$NON-NLS-1$	
 
-    private static final String ATT_PLUGIN_ID = "pluginId"; //$NON-NLS-1$
+    private static final String ATT_PLUGIN_ID = "pluginId"; //$NON-NLS-1$	
 
-    private static final String ATT_CLASS = "class"; //$NON-NLS-1$
+    private static final String ATT_CLASS = "class"; //$NON-NLS-1$	
 
     private static final String ATT_ID = "id"; //$NON-NLS-1$
 
@@ -82,53 +82,42 @@ public class WelcomeParser extends DefaultHandler {
             parent = p;
         }
 
-        @Override
-		public void characters(char[] ch, int start, int length)
+        public void characters(char[] ch, int start, int length)
                 throws SAXException {
         }
 
-        @Override
-		public void endDocument() throws SAXException {
+        public void endDocument() throws SAXException {
         }
 
-        @Override
-		public void endElement(String namespaceURI, String localName,
+        public void endElement(String namespaceURI, String localName,
                 String qName) throws SAXException {
         }
 
-        @Override
-		public void endPrefixMapping(String prefix) throws SAXException {
+        public void endPrefixMapping(String prefix) throws SAXException {
         }
 
-        @Override
-		public void ignorableWhitespace(char[] ch, int start, int length)
+        public void ignorableWhitespace(char[] ch, int start, int length)
                 throws SAXException {
         }
 
-        @Override
-		public void processingInstruction(String target, String data)
+        public void processingInstruction(String target, String data)
                 throws SAXException {
         }
 
-        @Override
-		public void setDocumentLocator(Locator locator) {
+        public void setDocumentLocator(Locator locator) {
         }
 
-        @Override
-		public void skippedEntity(String name) throws SAXException {
+        public void skippedEntity(String name) throws SAXException {
         }
 
-        @Override
-		public void startDocument() throws SAXException {
+        public void startDocument() throws SAXException {
         }
 
-        @Override
-		public void startElement(String namespaceURI, String localName,
+        public void startElement(String namespaceURI, String localName,
                 String qName, Attributes atts) throws SAXException {
         }
 
-        @Override
-		public void startPrefixMapping(String prefix, String uri)
+        public void startPrefixMapping(String prefix, String uri)
                 throws SAXException {
         }
     }
@@ -138,8 +127,7 @@ public class WelcomeParser extends DefaultHandler {
             title = newTitle;
         }
 
-        @Override
-		public void startElement(String namespaceURI, String localName,
+        public void startElement(String namespaceURI, String localName,
                 String qName, Attributes atts) throws SAXException {
             if (localName.equals(TAG_INTRO)) {
                 ItemHandler h = new IntroItemHandler();
@@ -179,14 +167,12 @@ public class WelcomeParser extends DefaultHandler {
         protected int wrapStart;
 
         private class BoldHandler extends WelcomeContentHandler {
-            @Override
-			public void characters(char[] ch, int start, int length)
+            public void characters(char[] ch, int start, int length)
                     throws SAXException {
                 ItemHandler.this.characters(ch, start, length);
             }
 
-            @Override
-			public void endElement(String namespaceURI, String localName,
+            public void endElement(String namespaceURI, String localName,
                     String qName) throws SAXException {
                 if (localName.equals(TAG_BOLD)) {
                     boldRanges.add(new int[] { textStart, offset - textStart });
@@ -201,14 +187,12 @@ public class WelcomeParser extends DefaultHandler {
                 classes.add(className);
             }
 
-            @Override
-			public void characters(char[] ch, int start, int length)
+            public void characters(char[] ch, int start, int length)
                     throws SAXException {
                 ItemHandler.this.characters(ch, start, length);
             }
 
-            @Override
-			public void endElement(String namespaceURI, String localName,
+            public void endElement(String namespaceURI, String localName,
                     String qName) throws SAXException {
                 if (localName.equals(TAG_ACTION)) {
                     actionRanges
@@ -224,14 +208,12 @@ public class WelcomeParser extends DefaultHandler {
                 helpHrefs.add(href);
             }
 
-            @Override
-			public void characters(char[] ch, int start, int length)
+            public void characters(char[] ch, int start, int length)
                     throws SAXException {
                 ItemHandler.this.characters(ch, start, length);
             }
 
-            @Override
-			public void endElement(String namespaceURI, String localName,
+            public void endElement(String namespaceURI, String localName,
                     String qName) throws SAXException {
                 if (localName.equals(TAG_TOPIC)) {
                     helpRanges.add(new int[] { textStart, offset - textStart });
@@ -267,8 +249,7 @@ public class WelcomeParser extends DefaultHandler {
                     (String[]) helpHrefs.toArray(new String[helpHrefs.size()]));
         }
 
-        @Override
-		public void characters(char[] ch, int start, int length)
+        public void characters(char[] ch, int start, int length)
                 throws SAXException {
             for (int i = 0; i < length; i++) {
                 text.append(ch[start + i]);
@@ -276,8 +257,7 @@ public class WelcomeParser extends DefaultHandler {
             offset += length;
         }
 
-        @Override
-		public void startElement(String namespaceURI, String localName,
+        public void startElement(String namespaceURI, String localName,
                 String qName, Attributes atts) throws SAXException {
             textStart = offset;
             if (localName.equals(TAG_BOLD)) {
@@ -299,8 +279,7 @@ public class WelcomeParser extends DefaultHandler {
             }
         }
 
-        @Override
-		public void endElement(String namespaceURI, String localName,
+        public void endElement(String namespaceURI, String localName,
                 String qName) throws SAXException {
             if (localName.equals(TAG_ITEM)) {
                 items.add(constructWelcomeItem());
@@ -312,8 +291,7 @@ public class WelcomeParser extends DefaultHandler {
     }
 
     private class IntroItemHandler extends ItemHandler {
-        @Override
-		public void endElement(String namespaceURI, String localName,
+        public void endElement(String namespaceURI, String localName,
                 String qName) throws SAXException {
             if (localName.equals(TAG_INTRO)) {
                 introItem = constructWelcomeItem();
@@ -388,8 +366,7 @@ public class WelcomeParser extends DefaultHandler {
     /**
      * Handles the start element
      */
-    @Override
-	public void startElement(String namespaceURI, String localName,
+    public void startElement(String namespaceURI, String localName,
             String qName, Attributes atts) throws SAXException {
         if (localName.equals(TAG_WELCOME_PAGE)) {
             WelcomeContentHandler h = new WelcomePageHandler(atts

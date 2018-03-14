@@ -91,6 +91,9 @@ public final class ActivitiesPreferencePage extends PreferencePage implements
                 IPreferenceConstants.SHOULD_PROMPT_FOR_ENABLEMENT));
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
+     */
     @Override
 	protected Control createContents(Composite parent) {
     	initializeDialogUnits(parent);
@@ -117,12 +120,18 @@ public final class ActivitiesPreferencePage extends PreferencePage implements
         return composite;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
+     */
     @Override
 	public void init(IWorkbench aWorkbench) {
         this.workbench = aWorkbench;
         setPreferenceStore(WorkbenchPlugin.getDefault().getPreferenceStore());
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.preference.IPreferencePage#performOk()
+     */
     @Override
 	public boolean performOk() {
         enabler.updateActivityStates();
@@ -135,6 +144,9 @@ public final class ActivitiesPreferencePage extends PreferencePage implements
         return true;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
+     */
     @Override
 	protected void performDefaults() {
         enabler.restoreDefaults();
@@ -144,6 +156,9 @@ public final class ActivitiesPreferencePage extends PreferencePage implements
         super.performDefaults();
     }
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
+	 */
 	@Override
 	public void setInitializationData(IConfigurationElement config, String propertyName, Object data) {
 		if (data instanceof Hashtable) {

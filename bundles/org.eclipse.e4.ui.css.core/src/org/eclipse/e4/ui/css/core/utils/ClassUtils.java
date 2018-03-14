@@ -21,17 +21,12 @@ public class ClassUtils {
 	 * @param c
 	 * @return
 	 */
-	public static String getSimpleName(Class<?> c) {
+	public static String getSimpleName(Class c) {
 		String name = c.getName();
 		int index = name.lastIndexOf(".");
 		if (index > 0) {
 			name = name.substring(index + 1, name.length());
 		}
-
-		// inner classes contain a "$" as in Outer$Inner. As "$" is not allowed
-		// as part of a CSS selector
-		// we translate a "$" into a "-" here.
-		name = name.replace('$', '-');
 		return name;
 	}
 
@@ -41,7 +36,7 @@ public class ClassUtils {
 	 * @param c
 	 * @return
 	 */
-	public static String getPackageName(Class<?> c) {
+	public static String getPackageName(Class c) {
 		String name = c.getName();
 		int index = name.lastIndexOf(".");
 		if (index > 0) {

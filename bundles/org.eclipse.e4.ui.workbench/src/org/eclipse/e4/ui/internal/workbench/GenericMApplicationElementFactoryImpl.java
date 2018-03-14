@@ -171,6 +171,13 @@ final class GenericMApplicationElementFactoryImpl {
 			return classToEClass.get(elementType);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.core.runtime.IRegistryEventListener#added(org.eclipse.core.runtime.IExtension
+		 * [])
+		 */
 		@Override
 		public void added(IExtension[] extensions) {
 			for (IExtension extension : extensions) {
@@ -185,6 +192,13 @@ final class GenericMApplicationElementFactoryImpl {
 			}
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.core.runtime.IRegistryEventListener#removed(org.eclipse.core.runtime.IExtension
+		 * [])
+		 */
 		@Override
 		public void removed(IExtension[] extensions) {
 			for (IExtension extension : extensions) {
@@ -200,11 +214,23 @@ final class GenericMApplicationElementFactoryImpl {
 			}
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.runtime.IRegistryEventListener#added(org.eclipse.core.runtime.
+		 * IExtensionPoint[])
+		 */
 		@Override
 		public void added(IExtensionPoint[] extensionPoints) {
 			// not of interest
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.runtime.IRegistryEventListener#removed(org.eclipse.core.runtime.
+		 * IExtensionPoint[])
+		 */
 		@Override
 		public void removed(IExtensionPoint[] extensionPoints) {
 			// not of interest

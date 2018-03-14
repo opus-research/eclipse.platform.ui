@@ -16,9 +16,9 @@ import org.eclipse.core.expressions.PropertyTester;
 /**
  * ContentGeneratorPropertyTester is the property tester for what content
  * generator is being shown.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class MarkersViewPropertyTester extends PropertyTester {
 
@@ -39,11 +39,10 @@ public class MarkersViewPropertyTester extends PropertyTester {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.core.expressions.IPropertyTester#test(java.lang.Object,
 	 *      java.lang.String, java.lang.Object[], java.lang.Object)
 	 */
-	@Override
 	public boolean test(Object receiver, String property, Object[] args,
 			Object expectedValue) {
 
@@ -64,7 +63,7 @@ public class MarkersViewPropertyTester extends PropertyTester {
 
 	/**
 	 * Test if the content generator in the args match the receiver.
-	 *
+	 * 
 	 * @param view
 	 * @param args
 	 * @return boolean

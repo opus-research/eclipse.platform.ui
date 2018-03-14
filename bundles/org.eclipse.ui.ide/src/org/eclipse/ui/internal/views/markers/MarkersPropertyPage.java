@@ -44,9 +44,9 @@ import org.eclipse.ui.views.markers.internal.Util;
 
 /**
  * MarkersPropertyPage is the property page for a marker.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class MarkersPropertyPage extends PropertyPage {
 
@@ -62,7 +62,6 @@ public class MarkersPropertyPage extends PropertyPage {
 		super();
 	}
 
-	@Override
 	protected Control createContents(Composite parent) {
 		// initialize resources/properties
 
@@ -116,7 +115,7 @@ public class MarkersPropertyPage extends PropertyPage {
 
 	/**
 	 * Method createCreationTimeArea.
-	 *
+	 * 
 	 * @param parent
 	 */
 	private void createCreationTimeArea(Composite parent) {
@@ -150,7 +149,7 @@ public class MarkersPropertyPage extends PropertyPage {
 	/**
 	 * This method is intended to be overridden by subclasses. The attributes
 	 * area is created between the creation time area and the resource area.
-	 *
+	 * 
 	 * @param parent
 	 *            the parent composite
 	 */
@@ -168,7 +167,7 @@ public class MarkersPropertyPage extends PropertyPage {
 
 	/**
 	 * Create the attributes area for editing a task
-	 *
+	 * 
 	 * @param parent
 	 */
 	private void createTaskAttributes(Composite parent) {
@@ -199,9 +198,9 @@ public class MarkersPropertyPage extends PropertyPage {
 		GridData gridData = new GridData();
 		gridData.horizontalIndent = convertHorizontalDLUsToPixels(20);
 		completedCheckbox.setLayoutData(gridData);
-
+		
 		completedCheckbox.setEnabled(Util.isEditable(marker));
-
+		
 		Object done;
 		try {
 			done = marker.getAttribute(IMarker.DONE);
@@ -216,7 +215,7 @@ public class MarkersPropertyPage extends PropertyPage {
 
 	/**
 	 * Create the attributes area for problems
-	 *
+	 * 
 	 * @param parent
 	 */
 	private void createProblemAttributes(Composite parent) {
@@ -293,11 +292,10 @@ public class MarkersPropertyPage extends PropertyPage {
 		}
 
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.preference.PreferencePage#performOk()
 	 */
-	@Override
 	public boolean performOk() {
 		if (marker == null || Util.isEditable(marker)) {
 			saveChanges();

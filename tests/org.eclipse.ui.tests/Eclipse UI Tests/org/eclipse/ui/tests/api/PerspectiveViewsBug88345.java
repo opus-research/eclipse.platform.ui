@@ -17,7 +17,7 @@ import org.eclipse.ui.IPerspectiveFactory;
  * This perspective is used for testing api. It defines an initial layout with
  * placeholders for some views, to be used to test closing fast views. The
  * placeholders are added at top level (not in any folder).
- *
+ * 
  * @since 3.1.1
  */
 public class PerspectiveViewsBug88345 implements IPerspectiveFactory {
@@ -34,7 +34,6 @@ public class PerspectiveViewsBug88345 implements IPerspectiveFactory {
 		// do nothing
 	}
 
-	@Override
 	public void createInitialLayout(IPageLayout layout) {
 		layout.addView(MockViewPart.IDMULT, IPageLayout.LEFT, 0.33f,
 				IPageLayout.ID_EDITOR_AREA);
@@ -42,7 +41,7 @@ public class PerspectiveViewsBug88345 implements IPerspectiveFactory {
 				IPageLayout.RIGHT, 0.25f, IPageLayout.ID_EDITOR_AREA);
 		layout.addView(PROP_SHEET_ID, IPageLayout.RIGHT, 0.75f, NORMAL_VIEW_ID);
 		layout.getViewLayout(MockViewPart.IDMULT).setCloseable(false);
-
+		
 		// added for the bug 99723 test
 		layout.addFastView(MOVE_ID);
 		layout.getViewLayout(MOVE_ID).setMoveable(false);

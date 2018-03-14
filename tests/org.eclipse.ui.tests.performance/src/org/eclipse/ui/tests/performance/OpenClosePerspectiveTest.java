@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 
 package org.eclipse.ui.tests.performance;
@@ -106,19 +105,19 @@ public class OpenClosePerspectiveTest extends BasicPerformanceTest {
     private void closePerspective(IWorkbenchPage activePage) {
 		IPerspectiveDescriptor persp = activePage.getPerspective();
 
-		ICommandService commandService = fWorkbench
+		ICommandService commandService = (ICommandService) fWorkbench
 				.getService(ICommandService.class);
 		Command command = commandService
 				.getCommand("org.eclipse.ui.window.closePerspective");
 
-		HashMap<String, String> parameters = new HashMap<String, String>();
+		HashMap parameters = new HashMap();
 		parameters.put(IWorkbenchCommandConstants.WINDOW_CLOSE_PERSPECTIVE_PARM_ID,
 				persp.getId());
 
 		ParameterizedCommand pCommand = ParameterizedCommand.generateCommand(
 				command, parameters);
 
-		IHandlerService handlerService = fWorkbench
+		IHandlerService handlerService = (IHandlerService) fWorkbench
 				.getService(IHandlerService.class);
 		try {
 			handlerService.executeCommand(pCommand, null);

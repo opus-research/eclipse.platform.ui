@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,7 +41,7 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 /**
  * Implements the open workspace action. Opens a dialog prompting for a
  * directory and then restarts the IDE on that workspace.
- *
+ * 
  * @since 3.0
  */
 public class OpenWorkspaceAction extends Action implements
@@ -50,9 +50,9 @@ public class OpenWorkspaceAction extends Action implements
 	/**
 	 * Action responsible for opening the "Other..." dialog (ie: the workspace
 	 * chooser).
-	 *
+	 * 
 	 * @since 3.3
-	 *
+	 * 
 	 */
 	class OpenDialogAction extends Action {
 
@@ -61,7 +61,11 @@ public class OpenWorkspaceAction extends Action implements
 			setToolTipText(IDEWorkbenchMessages.OpenWorkspaceAction_toolTip);
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.action.Action#run()
+		 */
 		public void run() {
 			OpenWorkspaceAction.this.run();
 		}
@@ -69,7 +73,7 @@ public class OpenWorkspaceAction extends Action implements
 
 	/**
 	 * Action responsible for opening a specific workspace location
-	 *
+	 * 
 	 * @since 3.3
 	 */
 	class WorkspaceMRUAction extends Action {
@@ -88,7 +92,11 @@ public class OpenWorkspaceAction extends Action implements
 			this.data = data;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.action.Action#run()
+		 */
 		public void run() {
 			data.workspaceSelected(location);
 			data.writePersistedData();
@@ -113,8 +121,8 @@ public class OpenWorkspaceAction extends Action implements
 	private static final String NEW_LINE = "\n"; //$NON-NLS-1$
 
 	private IWorkbenchWindow window;
-
-
+	
+	
 	private IContributionItem[] getContributionItems() {
 		ArrayList list = new ArrayList();
 		final ChooseWorkspaceData data = new ChooseWorkspaceData(Platform
@@ -134,7 +142,7 @@ public class OpenWorkspaceAction extends Action implements
 		return (IContributionItem[]) list
 				.toArray(new IContributionItem[list.size()]);
 	}
-
+	
 	class MenuCreator implements IMenuCreator {
 		ArrayList menus = new ArrayList();
 
@@ -150,11 +158,14 @@ public class OpenWorkspaceAction extends Action implements
 			}
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.action.IMenuCreator#getMenu(org.eclipse.swt.widgets.Control)
+		 */
 		public Menu getMenu(Control parent) {
 			createDropDownMenuMgr();
 			dropDownMenuMgr.addMenuListener(new IMenuListener() {
-				@Override
 				public void menuAboutToShow(IMenuManager manager) {
 					IContributionItem[] items = getContributionItems();
 					for (int i = 0; i < items.length; i++) {
@@ -166,12 +177,15 @@ public class OpenWorkspaceAction extends Action implements
 			return dropDownMenuMgr.createContextMenu(parent);
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.action.IMenuCreator#getMenu(org.eclipse.swt.widgets.Menu)
+		 */
 		public Menu getMenu(Menu parent) {
 			createDropDownMenuMgr();
 			final Menu menu = new Menu(parent);
 			menu.addListener(SWT.Show, new Listener() {
-				@Override
 				public void handleEvent(Event event) {
 					if (menu.isDisposed()) {
 						return;
@@ -191,7 +205,11 @@ public class OpenWorkspaceAction extends Action implements
 			return menu;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.action.IMenuCreator#dispose()
+		 */
 		public void dispose() {
 			if (dropDownMenuMgr != null) {
 				dropDownMenuMgr.dispose();
@@ -212,7 +230,7 @@ public class OpenWorkspaceAction extends Action implements
 	/**
 	 * Set definition for this action and text so that it will be used for File
 	 * -&gt; Open Workspace in the argument window.
-	 *
+	 * 
 	 * @param window
 	 *            the window in which this action should appear
 	 */
@@ -232,7 +250,11 @@ public class OpenWorkspaceAction extends Action implements
 		setMenuCreator(new MenuCreator());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.Action#run()
+	 */
 	public void run() {
 		String path = promptForWorkspace();
 		if (path == null) {
@@ -244,7 +266,7 @@ public class OpenWorkspaceAction extends Action implements
 
 	/**
 	 * Restart the workbench using the specified path as the workspace location.
-	 *
+	 * 
 	 * @param path
 	 *            the location
 	 * @since 3.3
@@ -262,7 +284,7 @@ public class OpenWorkspaceAction extends Action implements
 
 	/**
 	 * Use the ChooseWorkspaceDialog to get the new workspace from the user.
-	 *
+	 * 
 	 * @return a string naming the new workspace and null if cancel was selected
 	 */
 	private String promptForWorkspace() {
@@ -288,7 +310,7 @@ public class OpenWorkspaceAction extends Action implements
 	 * Create and return a string with command line options for eclipse.exe that
 	 * will launch a new workbench that is the same as the currently running
 	 * one, but using the argument directory as its workspace.
-	 *
+	 * 
 	 * @param workspace
 	 *            the directory to use as the new workspace
 	 * @return a string of command line options or null on error
@@ -325,17 +347,14 @@ public class OpenWorkspaceAction extends Action implements
 			result.append(workspace);
 			result.append(NEW_LINE);
 		} else {
-			// find the index of the arg to add/replace its value
+			// find the index of the arg to replace its value
 			int cmd_data_pos = property.lastIndexOf(CMD_DATA);
 			if (cmd_data_pos != -1) {
 				cmd_data_pos += CMD_DATA.length() + 1;
 				result.append(property.substring(0, cmd_data_pos));
 				result.append(workspace);
-				// append from the next arg
-				int nextArg = property.indexOf("\n-", cmd_data_pos - 1); //$NON-NLS-1$
-				if (nextArg != -1) {
-					result.append(property.substring(nextArg));
-				}
+				result.append(property.substring(property.indexOf('\n',
+						cmd_data_pos)));
 			} else {
 				result.append(CMD_DATA);
 				result.append(NEW_LINE);
@@ -348,9 +367,6 @@ public class OpenWorkspaceAction extends Action implements
 		// put the vmargs back at the very end (the eclipse.commands property
 		// already contains the -vm arg)
 		if (vmargs != null) {
-			if (result.charAt(result.length() - 1) != '\n') {
-				result.append('\n');
-			}
 			result.append(CMD_VMARGS);
 			result.append(NEW_LINE);
 			result.append(vmargs);
@@ -359,7 +375,11 @@ public class OpenWorkspaceAction extends Action implements
 		return result.toString();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.Action#dispose()
+	 */
 	public void dispose() {
 		window = null;
 	}

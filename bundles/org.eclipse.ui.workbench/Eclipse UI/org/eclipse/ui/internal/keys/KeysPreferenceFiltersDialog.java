@@ -69,6 +69,11 @@ public class KeysPreferenceFiltersDialog extends ViewSettingsDialog {
 		super(parentShell);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.preferences.ViewSettingsDialog#performDefaults()
+	 */
 	@Override
 	protected void performDefaults() {
 		actionSetFilterCheckBox.setSelection(true);
@@ -77,6 +82,11 @@ public class KeysPreferenceFiltersDialog extends ViewSettingsDialog {
 		super.performDefaults();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite topComposite = (Composite) super.createDialogArea(parent);
@@ -101,6 +111,11 @@ public class KeysPreferenceFiltersDialog extends ViewSettingsDialog {
 		return topComposite;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
+	 */
 	@Override
 	protected void okPressed() {
 		filterActionSet = actionSetFilterCheckBox.getSelection();
@@ -109,6 +124,11 @@ public class KeysPreferenceFiltersDialog extends ViewSettingsDialog {
 		super.okPressed();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
+	 */
 	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);

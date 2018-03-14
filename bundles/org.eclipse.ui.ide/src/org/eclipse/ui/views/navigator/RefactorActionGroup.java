@@ -29,11 +29,10 @@ import org.eclipse.ui.actions.TextActionHandler;
 /**
  * This is the action group for refactor actions,
  * including global action handlers for copy, paste and delete.
- *
+ * 
  * @since 2.0
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
-@Deprecated
 public class RefactorActionGroup extends ResourceNavigatorActionGroup {
 
     private Clipboard clipboard;
@@ -54,8 +53,7 @@ public class RefactorActionGroup extends ResourceNavigatorActionGroup {
         super(navigator);
     }
 
-    @Override
-	public void dispose() {
+    public void dispose() {
         if (clipboard != null) {
             clipboard.dispose();
             clipboard = null;
@@ -63,8 +61,7 @@ public class RefactorActionGroup extends ResourceNavigatorActionGroup {
         super.dispose();
     }
 
-    @Override
-	public void fillContextMenu(IMenuManager menu) {
+    public void fillContextMenu(IMenuManager menu) {
         IStructuredSelection selection = (IStructuredSelection) getContext()
                 .getSelection();
 
@@ -87,8 +84,7 @@ public class RefactorActionGroup extends ResourceNavigatorActionGroup {
         }
     }
 
-    @Override
-	public void fillActionBars(IActionBars actionBars) {
+    public void fillActionBars(IActionBars actionBars) {
         textActionHandler = new TextActionHandler(actionBars); // hooks handlers
         textActionHandler.setCopyAction(copyAction);
         textActionHandler.setPasteAction(pasteAction);
@@ -104,8 +100,7 @@ public class RefactorActionGroup extends ResourceNavigatorActionGroup {
     /**
      * Handles a key pressed event by invoking the appropriate action.
      */
-    @Override
-	public void handleKeyPressed(KeyEvent event) {
+    public void handleKeyPressed(KeyEvent event) {
         if (event.character == SWT.DEL && event.stateMask == 0) {
             if (deleteAction.isEnabled()) {
                 deleteAction.run();
@@ -124,8 +119,7 @@ public class RefactorActionGroup extends ResourceNavigatorActionGroup {
         }
     }
 
-    @Override
-	protected void makeActions() {
+    protected void makeActions() {
         TreeViewer treeViewer = navigator.getViewer();
         IShellProvider provider = navigator.getSite();
         clipboard = new Clipboard(provider.getShell().getDisplay());
@@ -153,8 +147,7 @@ public class RefactorActionGroup extends ResourceNavigatorActionGroup {
                 .getImageDescriptor(ISharedImages.IMG_TOOL_DELETE));
     }
 
-    @Override
-	public void updateActionBars() {
+    public void updateActionBars() {
         IStructuredSelection selection = (IStructuredSelection) getContext()
                 .getSelection();
 

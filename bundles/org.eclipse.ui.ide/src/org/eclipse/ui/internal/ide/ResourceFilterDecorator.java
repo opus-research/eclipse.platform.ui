@@ -36,7 +36,6 @@ public class ResourceFilterDecorator implements ILightweightLabelDecorator {
 				.getIDEImageDescriptor(IMG_MARKERS_RESOURCE_FILTER_DECORATION_PATH);
 	}
 
-	@Override
 	public void decorate(Object element, IDecoration decoration) {
 
 		if (element instanceof IContainer == false) {
@@ -53,20 +52,16 @@ public class ResourceFilterDecorator implements ILightweightLabelDecorator {
 		}
 	}
 
-	@Override
 	public void addListener(ILabelProviderListener listener) {
 	}
 
-	@Override
 	public void dispose() {
 	}
 
-	@Override
 	public boolean isLabelProperty(Object element, String property) {
 		return false;
 	}
 
-	@Override
 	public void removeListener(ILabelProviderListener listener) {
 	}
 

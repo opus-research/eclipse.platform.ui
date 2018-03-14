@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,14 +7,13 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Rüdiger Herrmann - fix for bug 418420
+ *     R�diger Herrmann - fix for bug 418420
  *******************************************************************************/
 package org.eclipse.jface.fieldassist;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.util.Util;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusEvent;
@@ -363,9 +362,8 @@ public class ControlDecoration {
 			int y = -extent.y - hah + 1;
 			int x = arrowOnLeft ? -hao + haw / 2 : -extent.x + hao + haw / 2;
 
-			Point hoverSize = hoverShell.getSize();
-			Rectangle hoverBounds = control.getDisplay().map(control.getParent(), null, decorationRectangle.x + x, decorationRectangle.y + y, hoverSize.x, hoverSize.y);
-			hoverShell.setLocation(hoverBounds.x, hoverBounds.y);
+			hoverShell.setLocation(control.getParent().toDisplay(
+					decorationRectangle.x + x, decorationRectangle.y + y));
 		}
 
 		/*
@@ -739,9 +737,6 @@ public class ControlDecoration {
 				c = null;
 			} else if (c instanceof Shell) {
 				// We just installed on a shell, so don't go further
-				c = null;
-			} else if (c instanceof ScrolledComposite) {
-				// ScrolledComposites manage their contents
 				c = null;
 			} else {
 				c = c.getParent();

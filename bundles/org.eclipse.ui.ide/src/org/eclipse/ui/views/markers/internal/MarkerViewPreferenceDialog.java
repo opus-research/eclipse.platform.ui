@@ -27,9 +27,9 @@ import org.eclipse.ui.preferences.ViewSettingsDialog;
 /**
  * The MarkerViewPreferenceDialog is the dialog that is used for preference
  * settings in a markers view.
- *
+ * 
  * @since 3.1
- *
+ * 
  */
 public class MarkerViewPreferenceDialog extends ViewSettingsDialog {
 
@@ -47,7 +47,7 @@ public class MarkerViewPreferenceDialog extends ViewSettingsDialog {
 
 	/**
 	 * Create a new instance of the receiver.
-	 *
+	 * 
 	 * @param parentShell
 	 * @param enablementPreference
 	 *            The key for the enablement preference.
@@ -67,10 +67,9 @@ public class MarkerViewPreferenceDialog extends ViewSettingsDialog {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
 	 */
-	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
 		newShell.setText(dialogTitle);
@@ -78,10 +77,9 @@ public class MarkerViewPreferenceDialog extends ViewSettingsDialog {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
 	 */
-	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite topComposite = (Composite) super.createDialogArea(parent);
 
@@ -103,7 +101,6 @@ public class MarkerViewPreferenceDialog extends ViewSettingsDialog {
 			/* (non-Javadoc)
 			 * @see org.eclipse.jface.preference.IntegerFieldEditor#checkState()
 			 */
-			@Override
 			protected boolean checkState() {
 				boolean state = super.checkState();
 				Button okButton = getButton(IDialogConstants.OK_ID);
@@ -123,7 +120,6 @@ public class MarkerViewPreferenceDialog extends ViewSettingsDialog {
 		enablementButton.setLayoutData(checkedData);
 
 		enablementButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				setLimitEditorEnablement(editArea, enablementButton
 						.getSelection());
@@ -137,7 +133,7 @@ public class MarkerViewPreferenceDialog extends ViewSettingsDialog {
 
 	/**
 	 * Enable the limitEditor based on checked.
-	 *
+	 * 
 	 * @param control
 	 *            The parent of the editor
 	 * @param checked
@@ -148,10 +144,9 @@ public class MarkerViewPreferenceDialog extends ViewSettingsDialog {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
 	 */
-	@Override
 	protected void okPressed() {
 		limitEditor.store();
 		IDEWorkbenchPlugin.getDefault().getPreferenceStore().setValue(
@@ -162,10 +157,9 @@ public class MarkerViewPreferenceDialog extends ViewSettingsDialog {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.preferences.ViewSettingsDialog#performDefaults()
 	 */
-	@Override
 	protected void performDefaults() {
 		super.performDefaults();
 		limitEditor.loadDefault();

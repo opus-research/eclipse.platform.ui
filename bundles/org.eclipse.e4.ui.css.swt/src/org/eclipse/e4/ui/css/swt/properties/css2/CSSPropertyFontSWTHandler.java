@@ -27,7 +27,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Item;
@@ -51,30 +50,37 @@ implements ICSSPropertyHandler2 {
 
 		if (widget instanceof CTabItem) {
 			CTabItem item = (CTabItem) widget;
-			CSSSWTFontHelper.setFont(item, font);
+			if (item.getFont() != font) {
+				CSSSWTFontHelper.storeDefaultFont(item);
+				item.setFont(font);
+			}
 		} else if (widget instanceof CTabFolder) {
 			CTabFolder folder = (CTabFolder) widget;
-			CSSSWTFontHelper.setFont(folder, font);
-			updateChildrenFonts(folder, font);
-		} else if (widget instanceof Control) {
-			Control control = (Control)widget;
-			final boolean isLayoutDeferred = (control instanceof Composite) && ((Composite)control).isLayoutDeferred();
-			if (isLayoutDeferred) {
-				control.setRedraw(false);
-			}
 			try {
-				CSSSWTFontHelper.setFont(control, font);
-			} finally {
-				if (isLayoutDeferred) {
-					control.setRedraw(true);
+				folder.setRedraw(false);
+				if (folder.getFont() != font) {
+					CSSSWTFontHelper.storeDefaultFont(folder);
+					folder.setFont(font);
 				}
+				updateChildrenFonts(folder, font);
+			} finally {
+				folder.setRedraw(true);
+			}
+		} else if (widget instanceof Control) {
+			Control control = (Control) widget;
+			if (control.getFont() != font) {
+				CSSSWTFontHelper.storeDefaultFont(control);
+				control.setFont(font);
 			}
 		}
 	}
 
 	private static void updateChildrenFonts(CTabFolder folder, Font font) {
 		for (CTabItem item : folder.getItems()) {
-			CSSSWTFontHelper.setFont(item, font);
+			if (item.getFont() != font) {
+				CSSSWTFontHelper.storeDefaultFont(item);
+				item.setFont(font);
+			}
 		}
 	}
 

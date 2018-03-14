@@ -19,7 +19,7 @@ import org.eclipse.jface.viewers.ViewerComparator;
 /**
  * CategorySorter is the sorter that takes categories and the viewer into
  * account.
- *
+ * 
  */
 public class CategoryComparator extends ViewerComparator implements Comparator {
 	TableComparator innerSorter;
@@ -30,7 +30,7 @@ public class CategoryComparator extends ViewerComparator implements Comparator {
 
 	/**
 	 * Create a new instance of the receiver wrapping a sorter.
-	 *
+	 * 
 	 * @param sorter
 	 */
 	CategoryComparator(TableComparator sorter) {
@@ -39,7 +39,7 @@ public class CategoryComparator extends ViewerComparator implements Comparator {
 
 	/**
 	 * Compare obj1 and obj starting with field depth.
-	 *
+	 * 
 	 * @param obj1
 	 * @param obj2
 	 * @param depth
@@ -74,28 +74,26 @@ public class CategoryComparator extends ViewerComparator implements Comparator {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.jface.viewers.ViewerSorter#compare(org.eclipse.jface.viewers.Viewer,
 	 *      java.lang.Object, java.lang.Object)
 	 */
-	@Override
 	public int compare(Viewer viewer, Object e1, Object e2) {
 		return compare(e1, e2, 0, true);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 	 */
-	@Override
 	public int compare(Object arg0, Object arg1) {
 		return compare(arg0, arg1, 0, true);
 	}
 
 	/**
 	 * Get the category field.
-	 *
+	 * 
 	 * @return IField
 	 */
 	public IField getCategoryField() {
@@ -104,7 +102,7 @@ public class CategoryComparator extends ViewerComparator implements Comparator {
 
 	/**
 	 * Set the field that we are categorizing by.
-	 *
+	 * 
 	 * @param field
 	 */
 	public void setCategoryField(IField field) {
@@ -113,7 +111,7 @@ public class CategoryComparator extends ViewerComparator implements Comparator {
 
 	/**
 	 * Set the inner sorter to the new sorter.
-	 *
+	 * 
 	 * @param sorter2
 	 */
 	public void setTableSorter(TableComparator sorter2) {
@@ -123,7 +121,7 @@ public class CategoryComparator extends ViewerComparator implements Comparator {
 
 	/**
 	 * Save the state of the receiver.
-	 *
+	 * 
 	 * @param dialogSettings
 	 */
 	public void saveState(IDialogSettings dialogSettings) {
@@ -149,7 +147,7 @@ public class CategoryComparator extends ViewerComparator implements Comparator {
 
 	/**
 	 * Restore the state of the receiver from the dialog settings.
-	 *
+	 * 
 	 * @param dialogSettings
 	 * @param view
 	 */

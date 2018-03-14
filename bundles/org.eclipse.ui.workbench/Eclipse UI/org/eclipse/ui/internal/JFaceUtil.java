@@ -81,7 +81,6 @@ final class JFaceUtil {
 			Policy.TRACE_TOOLBAR = "true".equalsIgnoreCase(Platform.getDebugOption(Policy.JFACE + "/trace/toolbarDisposal")); //$NON-NLS-1$ //$NON-NLS-2$
 			InternalPolicy.DEBUG_LOG_REENTRANT_VIEWER_CALLS = "true".equalsIgnoreCase(Platform.getDebugOption(Policy.JFACE + "/debug/viewers/reentrantViewerCalls")); //$NON-NLS-1$ //$NON-NLS-2$
 			InternalPolicy.DEBUG_LOG_EQUAL_VIEWER_ELEMENTS = "true".equalsIgnoreCase(Platform.getDebugOption(Policy.JFACE + "/debug/viewers/equalElements")); //$NON-NLS-1$ //$NON-NLS-2$
-			InternalPolicy.DEBUG_BIDI_UTILS = "true".equalsIgnoreCase(Platform.getDebugOption(Policy.JFACE + "/debug/bidiUtils")); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
@@ -94,6 +93,11 @@ final class JFaceUtil {
 		final String workbenchName = WorkbenchPlugin.getDefault().getBundle().getSymbolicName();
 		
 		rootNode.addNodeChangeListener(new IEclipsePreferences.INodeChangeListener() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.core.runtime.preferences.IEclipsePreferences.INodeChangeListener#added(org.eclipse.core.runtime.preferences.IEclipsePreferences.NodeChangeEvent)
+			 */
 			@Override
 			public void added(NodeChangeEvent event) {
 				if (!event.getChild().name().equals(workbenchName)) {
@@ -102,6 +106,11 @@ final class JFaceUtil {
 				((IEclipsePreferences) event.getChild()).addPreferenceChangeListener(PlatformUIPreferenceListener.getSingleton());
 
 			}
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.core.runtime.preferences.IEclipsePreferences.INodeChangeListener#removed(org.eclipse.core.runtime.preferences.IEclipsePreferences.NodeChangeEvent)
+			 */
 			@Override
 			public void removed(NodeChangeEvent event) {
 				// Nothing to do here

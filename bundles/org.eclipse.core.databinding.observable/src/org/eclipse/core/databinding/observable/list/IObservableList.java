@@ -53,104 +53,87 @@ public interface IObservableList extends List, IObservableCollection {
 	/**
 	 * @TrackedGetter
 	 */
-    @Override
-	public int size();
+    public int size();
 
 	/**
 	 * @TrackedGetter
 	 */
-    @Override
-	public boolean isEmpty();
+    public boolean isEmpty();
 
 	/**
 	 * @TrackedGetter
 	 */
-    @Override
-	public boolean contains(Object o);
+    public boolean contains(Object o);
 
 	/**
 	 * @TrackedGetter
 	 */
-    @Override
-	public Iterator iterator();
+    public Iterator iterator();
 
 	/**
 	 * @TrackedGetter
 	 */
-    @Override
-	public Object[] toArray();
+    public Object[] toArray();
 
 	/**
 	 * @TrackedGetter
 	 */
-    @Override
-	public Object[] toArray(Object a[]);
+    public Object[] toArray(Object a[]);
 
 	/**
 	 * 
 	 */
-    @Override
-	public boolean add(Object o);
+    public boolean add(Object o);
 
 	/**
 	 * 
 	 */
-    @Override
-	public boolean remove(Object o);
+    public boolean remove(Object o);
 
 	/**
 	 * @TrackedGetter
 	 */
-    @Override
-	public boolean containsAll(Collection c);
+    public boolean containsAll(Collection c);
 
 	/**
 	 * 
 	 */
-    @Override
-	public boolean addAll(Collection c);
+    public boolean addAll(Collection c);
 
 	/**
 	 * 
 	 */
-    @Override
-	public boolean addAll(int index, Collection c);
+    public boolean addAll(int index, Collection c);
 
 	/**
 	 * 
 	 */
-    @Override
-	public boolean removeAll(Collection c);
+    public boolean removeAll(Collection c);
 
 	/**
 	 *
 	 */
-    @Override
-	public boolean retainAll(Collection c);
+    public boolean retainAll(Collection c);
 
 	/**
 	 * @TrackedGetter
 	 */
-    @Override
-	public boolean equals(Object o);
+    public boolean equals(Object o);
 
 	/**
 	 * @TrackedGetter
 	 */
-    @Override
-	public int hashCode();
+    public int hashCode();
 
 	/**
 	 * @TrackedGetter
 	 */
-    @Override
-	public Object get(int index);
+    public Object get(int index);
 
 	/**
 	 * 
 	 */
-    @Override
-	public Object set(int index, Object element);
+    public Object set(int index, Object element);
 
 	/**
 	 * Moves the element located at <code>oldIndex</code> to
@@ -180,42 +163,35 @@ public interface IObservableList extends List, IObservableCollection {
 	/**
 	 * 
 	 */
-    @Override
-	public Object remove(int index);
+    public Object remove(int index);
 
 	/**
 	 * @TrackedGetter
 	 */
-    @Override
-	public int indexOf(Object o);
+    public int indexOf(Object o);
 
 	/**
 	 * @TrackedGetter
 	 */
-    @Override
-	public int lastIndexOf(Object o);
+    public int lastIndexOf(Object o);
 
 	/**
 	 * @TrackedGetter
 	 */
-    @Override
-	public ListIterator listIterator();
+    public ListIterator listIterator();
 
 	/**
 	 * @TrackedGetter
 	 */
-    @Override
-	public ListIterator listIterator(int index);
+    public ListIterator listIterator(int index);
 
 	/**
 	 * @TrackedGetter
 	 */
-    @Override
-	public List subList(int fromIndex, int toIndex);
+    public List subList(int fromIndex, int toIndex);
 
 	/**
 	 * @return the type of the elements or <code>null</code> if untyped
 	 */
-	@Override
 	Object getElementType();
 }

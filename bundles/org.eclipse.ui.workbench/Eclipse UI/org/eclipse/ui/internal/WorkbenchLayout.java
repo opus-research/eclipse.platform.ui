@@ -88,6 +88,12 @@ public class WorkbenchLayout extends Layout {
 	 */
 	private class LeftBannerLayout extends Layout {
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.swt.widgets.Layout#computeSize(org.eclipse.swt.widgets.Composite,
+		 *      int, int, boolean)
+		 */
 		@Override
 		protected Point computeSize(Composite composite, int wHint, int hHint,
 				boolean flushCache) {
@@ -96,6 +102,12 @@ public class WorkbenchLayout extends Layout {
 			return new Point(wHint, WorkbenchLayout.this.topMax);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.swt.widgets.Layout#layout(org.eclipse.swt.widgets.Composite,
+		 *      boolean)
+		 */
 		@Override
 		protected void layout(Composite composite, boolean flushCache) {
 		}
@@ -185,6 +197,12 @@ public class WorkbenchLayout extends Layout {
 		// Create the left composite and override its 'computeSize'
 		// to delegate to the 'primary' command trim area
 		Composite bannerLeft = new Composite(banner, SWT.NONE) {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.widgets.Composite#computeSize(int, int,
+			 *      boolean)
+			 */
 			@Override
 			public Point computeSize(int wHint, int hHint, boolean changed) {
 				// If we're doing a 'real' workbench layout then delegate to the
@@ -204,6 +222,12 @@ public class WorkbenchLayout extends Layout {
 
 		// Create the right hand part of the CBanner
 		Composite bannerRight = new Composite(banner, SWT.NONE) {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.widgets.Composite#computeSize(int, int,
+			 *      boolean)
+			 */
 			@Override
 			public Point computeSize(int wHint, int hHint, boolean changed) {
 				// If we're doing a 'real' workbench layout then delegate to the
@@ -238,6 +262,15 @@ public class WorkbenchLayout extends Layout {
 		banner.moveBelow(null);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.widgets.Layout#computeSize(org.eclipse.swt.widgets.Composite,
+	 *      int, int, boolean)
+	 * 
+	 * Note that this is arbitrary since the we're a top level shell (so
+	 * computeSize won't be called.
+	 */
 	@Override
 	protected Point computeSize(Composite composite, int wHint, int hHint,
 			boolean flushCache) {
@@ -251,6 +284,14 @@ public class WorkbenchLayout extends Layout {
 		return size;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.widgets.Layout#layout(org.eclipse.swt.widgets.Composite,
+	 *      boolean)
+	 * 
+	 * TODO: Supply a full description of the layout mechanicsS
+	 */
 	@Override
 	protected void layout(Composite composite, boolean flushCache) {
 		layoutComposite = composite;

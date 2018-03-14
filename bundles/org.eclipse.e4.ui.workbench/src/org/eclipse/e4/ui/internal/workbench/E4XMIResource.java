@@ -162,11 +162,23 @@ public class E4XMIResource extends XMIResourceImpl {
 				});
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl#createXMLHelper()
+	 */
 	@Override
 	protected XMLHelper createXMLHelper() {
 		// Handle mapping of deprecated types
 		return new XMIHelperImpl(this) {
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see
+			 * org.eclipse.emf.ecore.xmi.impl.XMLHelperImpl#createObject(org.eclipse.emf.ecore.EFactory
+			 * , org.eclipse.emf.ecore.EClassifier)
+			 */
 			@Override
 			public EObject createObject(EFactory eFactory, EClassifier type) {
 				if (MMenuFactory.INSTANCE == eFactory && type != null && type.getName() != null) {
@@ -178,6 +190,13 @@ public class E4XMIResource extends XMIResourceImpl {
 				return super.createObject(eFactory, type);
 			}
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see
+			 * org.eclipse.emf.ecore.xmi.impl.XMLHelperImpl#getType(org.eclipse.emf.ecore.EFactory,
+			 * java.lang.String)
+			 */
 			@Override
 			public EClassifier getType(EFactory eFactory, String typeName) {
 				if (deprecatedTypeMappings.containsKey(typeName)) {

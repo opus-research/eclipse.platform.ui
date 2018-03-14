@@ -20,12 +20,11 @@ import org.eclipse.swt.dnd.TransferData;
  * dropAccept does not contain the drop data. The selection may be used for
  * validation purposes so that the drop can be aborted if appropriate. This
  * class is not intended to be subclassed.
- *
+ * 
  * @since 2.1
  * @noextend This class is not intended to be subclassed by clients.
  * @deprecated as of 3.5, use {@link org.eclipse.jface.util.LocalSelectionTransfer} instead
  */
-@Deprecated
 public class LocalSelectionTransfer extends
 		org.eclipse.jface.util.LocalSelectionTransfer {
 
@@ -49,7 +48,7 @@ public class LocalSelectionTransfer extends
 
 	/**
 	 * Returns the singleton.
-	 *
+	 * 
 	 * @return the singleton
 	 */
 	public static LocalSelectionTransfer getInstance() {
@@ -58,48 +57,43 @@ public class LocalSelectionTransfer extends
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.jface.util.LocalSelectionTransfer#getSelection()
 	 */
-	@Override
 	public ISelection getSelection() {
 		return jfaceTransfer.getSelection();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.jface.util.LocalSelectionTransfer#getSelectionSetTime()
 	 */
-	@Override
 	public long getSelectionSetTime() {
 		return jfaceTransfer.getSelectionSetTime();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.jface.util.LocalSelectionTransfer#setSelection(org.eclipse.jface.viewers.ISelection)
 	 */
-	@Override
 	public void setSelection(ISelection s) {
 		jfaceTransfer.setSelection(s);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.jface.util.LocalSelectionTransfer#setSelectionSetTime(long)
 	 */
-	@Override
 	public void setSelectionSetTime(long time) {
 		jfaceTransfer.setSelectionSetTime(time);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.util.LocalSelectionTransfer#javaToNative(java.lang.Object, org.eclipse.swt.dnd.TransferData)
 	 */
-	@Override
 	public void javaToNative(Object object, TransferData transferData) {
 		jfaceTransfer.javaToNative(object, transferData);
 	}
@@ -107,7 +101,6 @@ public class LocalSelectionTransfer extends
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.util.LocalSelectionTransfer#nativeToJava(org.eclipse.swt.dnd.TransferData)
 	 */
-	@Override
 	public Object nativeToJava(TransferData transferData) {
 		return jfaceTransfer.nativeToJava(transferData);
 	}
