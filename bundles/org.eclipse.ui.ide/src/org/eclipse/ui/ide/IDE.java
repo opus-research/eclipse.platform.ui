@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 411578
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 485201
  *******************************************************************************/
 package org.eclipse.ui.ide;
 
@@ -69,7 +68,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.MultiPartInitException;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.ide.AskUserViaPopupUnknownEditorStrategy;
 import org.eclipse.ui.internal.ide.EditorAssociationOverrideDescriptor;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
@@ -1013,13 +1011,6 @@ public final class IDE {
 
 		IUnknownEditorStrategy strategy = getUnknowEditorStrategy();
 		IEditorDescriptor editorDesc = strategy.getEditorDescriptor(name, editorReg);
-
-		// user cancelled the operation
-		if (strategy instanceof AskUserViaPopupUnknownEditorStrategy) {
-			if (((AskUserViaPopupUnknownEditorStrategy) strategy).isUserCancelled()) {
-				throw new PartInitException(IDEWorkbenchMessages.IDE_noFileEditorChoose);
-			}
-		}
 
 		// if no valid editor found, bail out
 		if (editorDesc == null) {
