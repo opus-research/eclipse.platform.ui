@@ -11,6 +11,10 @@
          IBM Corporation - initial API and implementation
  -->
 <plugin>
+
+ <extension-point id="installationPages" name="%ExtPoint.installationPages" schema="schema/installationPages.exsd"/>
+   <extension-point id="systemSummarySections" name="systemSummarySections" schema="schema/systemSummarySections.exsd"/>
+
    <extension
          id="E4Application"
          name="%extension.e4application.name"
@@ -50,5 +54,31 @@
                type="org.eclipse.core.expressions.ICountable">
          </adapter>
       </factory>
+   </extension>
+   <extension
+         point="org.eclipse.e4.ui.workbench.swt.installationPages">
+      <page
+            class="org.eclipse.e4.ui.internal.workbench.swt.dialog.about.ui.AboutFeaturesPage"
+            id="FeaturePage"
+            name="%installationPage.feature.name">
+      </page>
+      <page
+            class="org.eclipse.e4.ui.internal.workbench.swt.dialog.about.ui.AboutPluginsPage"
+            id="PluginPage"
+            name="%installationPage.plugins.name">
+      </page>
+      <page
+            class="org.eclipse.e4.ui.internal.workbench.swt.dialog.about.ui.AboutSystemPage"
+            id="SystemPage"
+            name="%installationPage.system.name">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.e4.ui.workbench.swt.systemSummarySections">
+      <section
+            class="org.eclipse.e4.ui.internal.workbench.swt.dialog.about.ui.ConfigurationLogDefaultSection"
+            id="logSection"
+            sectionTitle="sectionTitle">
+      </section>
    </extension>
 </plugin>
