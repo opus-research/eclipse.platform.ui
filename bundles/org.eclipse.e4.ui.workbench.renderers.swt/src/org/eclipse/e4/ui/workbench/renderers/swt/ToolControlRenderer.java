@@ -215,7 +215,6 @@ public class ToolControlRenderer extends SWTPartRenderer {
 			MenuItem hideItem = new MenuItem(toolControlMenu, SWT.NONE);
 			hideItem.setText(Messages.ToolBarManagerRenderer_MenuCloseText);
 			hideItem.addListener(SWT.Selection, new Listener() {
-				@Override
 				public void handleEvent(org.eclipse.swt.widgets.Event event) {
 					toolControl.getTags().add(
 							IPresentationEngine.HIDDEN_EXPLICITLY);
@@ -229,7 +228,6 @@ public class ToolControlRenderer extends SWTPartRenderer {
 		restoreHiddenItems
 				.setText(Messages.ToolBarManagerRenderer_MenuRestoreText);
 		restoreHiddenItems.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(org.eclipse.swt.widgets.Event event) {
 				removeHiddenTags(toolControl);
 			}

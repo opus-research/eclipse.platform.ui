@@ -138,7 +138,7 @@ public abstract class ToolTip {
 	 */
 	public void setData(String key, Object value) {
 		if (data == null) {
-			data = new HashMap<>();
+			data = new HashMap<String, Object>();
 		}
 		data.put(key, value);
 	}
