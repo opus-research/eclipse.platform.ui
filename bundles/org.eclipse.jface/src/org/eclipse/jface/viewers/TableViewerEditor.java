@@ -25,20 +25,17 @@ import org.eclipse.swt.widgets.TableItem;
 
 /**
  * This is an editor-implementation for {@link Table}
-
- * @param <E> Type of an single element of the model
- * @param <I> Type of the input
  *
  * @since 3.3
  *
  */
-public final class TableViewerEditor<E,I> extends ColumnViewerEditor<E,I> {
+public final class TableViewerEditor extends ColumnViewerEditor {
 	/**
 	 * This viewer's table editor.
 	 */
 	private TableEditor tableEditor;
 
-	private SWTFocusCellManager<E,I> focusCellManager;
+	private SWTFocusCellManager focusCellManager;
 
 	/**
 	 * @param viewer
@@ -50,8 +47,8 @@ public final class TableViewerEditor<E,I> extends ColumnViewerEditor<E,I> {
 	 * @param feature
 	 *            the feature mask
 	 */
-	TableViewerEditor(TableViewer<E,I> viewer, SWTFocusCellManager<E,I> focusCellManager,
-			ColumnViewerEditorActivationStrategy<E,I> editorActivationStrategy,
+	TableViewerEditor(TableViewer viewer, SWTFocusCellManager focusCellManager,
+			ColumnViewerEditorActivationStrategy editorActivationStrategy,
 			int feature) {
 		super(viewer, editorActivationStrategy, feature);
 		tableEditor = new TableEditor(viewer.getTable());
@@ -78,11 +75,11 @@ public final class TableViewerEditor<E,I> extends ColumnViewerEditor<E,I> {
 	 *            </ul>
 	 * @see #create(TableViewer, ColumnViewerEditorActivationStrategy, int)
 	 */
-	public static <E,I> void create(TableViewer<E,I> viewer,
-			SWTFocusCellManager<E,I> focusCellManager,
-			ColumnViewerEditorActivationStrategy<E,I> editorActivationStrategy,
+	public static void create(TableViewer viewer,
+			SWTFocusCellManager focusCellManager,
+			ColumnViewerEditorActivationStrategy editorActivationStrategy,
 			int feature) {
-		TableViewerEditor<E,I> editor = new TableViewerEditor<>(viewer,
+		TableViewerEditor editor = new TableViewerEditor(viewer,
 				focusCellManager, editorActivationStrategy, feature);
 		viewer.setColumnViewerEditor(editor);
 		if (focusCellManager != null) {
@@ -107,8 +104,8 @@ public final class TableViewerEditor<E,I> extends ColumnViewerEditor<E,I> {
 	 *            <li>{@link ColumnViewerEditor#TABBING_VERTICAL}</li>
 	 *            </ul>
 	 */
-	public static <E,I> void create(TableViewer<E,I> viewer,
-			ColumnViewerEditorActivationStrategy<E,I> editorActivationStrategy,
+	public static void create(TableViewer viewer,
+			ColumnViewerEditorActivationStrategy editorActivationStrategy,
 			int feature) {
 		create(viewer, null, editorActivationStrategy, feature);
 	}
@@ -131,7 +128,7 @@ public final class TableViewerEditor<E,I> extends ColumnViewerEditor<E,I> {
 	}
 
 	@Override
-	public ViewerCell<E> getFocusCell() {
+	public ViewerCell getFocusCell() {
 		if (focusCellManager != null) {
 			return focusCellManager.getFocusCell();
 		}
@@ -140,14 +137,14 @@ public final class TableViewerEditor<E,I> extends ColumnViewerEditor<E,I> {
 	}
 
 	@Override
-	protected void updateFocusCell(ViewerCell<E> focusCell,
+	protected void updateFocusCell(ViewerCell focusCell,
 			ColumnViewerEditorActivationEvent event) {
 		// Update the focus cell when we activated the editor with these 2
 		// events
 		if (event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC
 				|| event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL) {
 
-			List<E> l = getViewer().getSelectionFromWidget();
+			List l = getViewer().getSelectionFromWidget();
 
 			if (!l.contains(focusCell.getElement())) {
 				getViewer().setSelection(

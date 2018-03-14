@@ -41,11 +41,11 @@ import org.eclipse.swt.widgets.Widget;
  * </p>
  * <p>
  * As of 3.1 the TableViewer now supports the SWT.VIRTUAL flag. If the
- * underlying table is SWT.VIRTUAL, the content provider may implement
- * {@link ILazyContentProvider} instead of {@link IStructuredContentProvider} .
- * Note that in this case, the viewer does not support sorting or filtering.
- * Also note that in this case, the Widget based APIs may return null if the
- * element is not specified or not created yet.
+ * underlying table is SWT.VIRTUAL, the content provider may implement {@link
+ * ILazyContentProvider} instead of {@link IStructuredContentProvider} . Note
+ * that in this case, the viewer does not support sorting or filtering. Also
+ * note that in this case, the Widget based APIs may return null if the element
+ * is not specified or not created yet.
  * </p>
  * <p>
  * Users of SWT.VIRTUAL should also avoid using getItems() from the Table within
@@ -54,21 +54,16 @@ import org.eclipse.swt.widgets.Widget;
  * of the items thereby eliminating the performance improvements of SWT.VIRTUAL.
  * </p>
  * <p>
- * Users setting up an editable table with more than 1 column <b>have</b> to
- * pass the SWT.FULL_SELECTION style bit
+ * Users setting up an editable table with more than 1 column <b>have</b> to pass the
+ * SWT.FULL_SELECTION style bit
  * </p>
- * 
- * @param <E>
- *            Type of an single element of the model
- * @param <I>
- *            Type of the input
  *
  * @see SWT#VIRTUAL
  * @see #doFindItem(Object)
  * @see #internalRefresh(Object, boolean)
  * @noextend This class is not intended to be subclassed by clients.
  */
-public class TableViewer<E,I> extends AbstractTableViewer<E,I>  {
+public class TableViewer extends AbstractTableViewer {
 	/**
 	 * This viewer's table control.
 	 */
@@ -77,7 +72,7 @@ public class TableViewer<E,I> extends AbstractTableViewer<E,I>  {
 	/**
 	 * The cached row which is reused all over
 	 */
-	private TableViewerRow<E> cachedRow;
+	private TableViewerRow cachedRow;
 
 	/**
 	 * Creates a table viewer on a newly-created table control under the given
@@ -136,9 +131,9 @@ public class TableViewer<E,I> extends AbstractTableViewer<E,I>  {
 	}
 
 	@Override
-	protected ColumnViewerEditor<E,I> createViewerEditor() {
-		return new TableViewerEditor<>(this, null,
-				new ColumnViewerEditorActivationStrategy<>(this),
+	protected ColumnViewerEditor createViewerEditor() {
+		return new TableViewerEditor(this, null,
+				new ColumnViewerEditorActivationStrategy(this),
 				ColumnViewerEditor.DEFAULT);
 	}
 
@@ -168,9 +163,9 @@ public class TableViewer<E,I> extends AbstractTableViewer<E,I>  {
 	}
 
 	@Override
-	protected ViewerRow<E> getViewerRowFromItem(Widget item) {
+	protected ViewerRow getViewerRowFromItem(Widget item) {
 		if (cachedRow == null) {
-			cachedRow = new TableViewerRow<>((TableItem) item);
+			cachedRow = new TableViewerRow((TableItem) item);
 		} else {
 			cachedRow.setItem((TableItem) item);
 		}
@@ -187,7 +182,7 @@ public class TableViewer<E,I> extends AbstractTableViewer<E,I>  {
 	 * @since 3.3
 	 */
 	@Override
-	protected ViewerRow<E> internalCreateNewRowPart(int style, int rowIndex) {
+	protected ViewerRow internalCreateNewRowPart(int style, int rowIndex) {
 		TableItem item;
 
 		if (rowIndex >= 0) {
@@ -407,7 +402,7 @@ public class TableViewer<E,I> extends AbstractTableViewer<E,I>  {
 	}
 
 	@Override
-	public void remove(E[] elements) {
+	public void remove(Object[] elements) {
 		assertElementsNotNull(elements);
 		if (checkBusy())
 			return;
@@ -418,21 +413,19 @@ public class TableViewer<E,I> extends AbstractTableViewer<E,I>  {
 		// deselect any items that are being removed, see bug 97786
 		boolean deselectedItems = false;
 		Object elementToBeRemoved = null;
-		CustomHashtable<E,E> elementsToBeRemoved = null;
+		CustomHashtable elementsToBeRemoved = null;
 		if (elements.length == 1) {
 			elementToBeRemoved = elements[0];
 		} else {
-			elementsToBeRemoved = new CustomHashtable<>(getComparer());
-			for (int i = 0; i < elements.length; i++) {
-				E element = elements[i];
+			elementsToBeRemoved = new CustomHashtable(getComparer());
+			for (Object element : elements) {
 				elementsToBeRemoved.put(element, element);
 			}
 		}
 		int[] selectionIndices = doGetSelectionIndices();
 		for (int index : selectionIndices) {
 			Item item = doGetItem(index);
-			@SuppressWarnings("unchecked")
-			E data = (E) item.getData();
+			Object data = item.getData();
 			if (data != null) {
 				if ((elementsToBeRemoved != null && elementsToBeRemoved
 						.containsKey(data))
@@ -452,11 +445,10 @@ public class TableViewer<E,I> extends AbstractTableViewer<E,I>  {
 	}
 
 	@Override
-	protected Widget doFindItem(E element) {
-		IContentProvider<? super I> contentProvider = getContentProvider();
+	protected Widget doFindItem(Object element) {
+		IContentProvider contentProvider = getContentProvider();
 		if (contentProvider instanceof IIndexableLazyContentProvider) {
-			@SuppressWarnings("unchecked")
-			IIndexableLazyContentProvider<E,? super I> indexable = (IIndexableLazyContentProvider<E,? super I>) contentProvider;
+			IIndexableLazyContentProvider indexable = (IIndexableLazyContentProvider) contentProvider;
 			int idx = indexable.findElement(element);
 			if (idx != -1) {
 				return doGetItem(idx);
