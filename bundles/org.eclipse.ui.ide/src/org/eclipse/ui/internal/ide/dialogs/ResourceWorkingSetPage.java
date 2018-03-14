@@ -18,7 +18,6 @@ import java.util.List;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
@@ -108,7 +107,13 @@ public class ResourceWorkingSetPage extends WizardPage implements
         IPath containerPath = container.getFullPath();
 
         for (int i = 0; i < elements.length; i++) {
-			IResource resource = Adapters.getAdapter(elements[i], IResource.class, true);
+            IResource resource = null;
+
+            if (elements[i] instanceof IResource) {
+				resource = (IResource) elements[i];
+			} else {
+				resource = elements[i].getAdapter(IResource.class);
+			}
 
             if (resource != null) {
                 IPath resourcePath = resource.getFullPath();
@@ -389,12 +394,22 @@ public class ResourceWorkingSetPage extends WizardPage implements
 		    		continue;
 		    	}
 		    	item = (IAdaptable)items[i];
-				IContainer container = Adapters.getAdapter(item, IContainer.class, true);
+		        IContainer container = null;
+		        IResource resource = null;
 
+		        if (item instanceof IContainer) {
+		            container = (IContainer) item;
+		        } else {
+		            container = item.getAdapter(IContainer.class);
+		        }
 		        if (container != null) {
 		            setSubtreeChecked(container, true, true);
 		        }
-				IResource resource = Adapters.getAdapter(item, IResource.class, true);
+		        if (item instanceof IResource) {
+		            resource = (IResource) item;
+		        } else {
+		            resource = item.getAdapter(IResource.class);
+		        }
 		        if (resource != null && resource.isAccessible() == false) {
 		            IProject project = resource.getProject();
 		            if (tree.getChecked(project) == false) {
