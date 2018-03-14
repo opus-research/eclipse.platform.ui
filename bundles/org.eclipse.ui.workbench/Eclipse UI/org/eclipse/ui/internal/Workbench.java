@@ -123,6 +123,7 @@ import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.util.BidiUtils;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -222,6 +223,7 @@ import org.eclipse.ui.internal.services.SourceProviderService;
 import org.eclipse.ui.internal.services.WorkbenchLocationService;
 import org.eclipse.ui.internal.splash.EclipseSplashHandler;
 import org.eclipse.ui.internal.splash.SplashHandlerFactory;
+import org.eclipse.ui.internal.testing.ContributionInfoMessages;
 import org.eclipse.ui.internal.testing.WorkbenchTestable;
 import org.eclipse.ui.internal.themes.ColorDefinition;
 import org.eclipse.ui.internal.themes.FontDefinition;
@@ -245,6 +247,7 @@ import org.eclipse.ui.services.ISourceProviderService;
 import org.eclipse.ui.splash.AbstractSplashHandler;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.swt.IFocusService;
+import org.eclipse.ui.testing.ContributionInfo;
 import org.eclipse.ui.themes.IThemeManager;
 import org.eclipse.ui.views.IViewDescriptor;
 import org.eclipse.ui.views.IViewRegistry;
@@ -580,6 +583,13 @@ public final class Workbench extends EventManager implements IWorkbench,
 				System.setProperty(org.eclipse.e4.ui.workbench.IWorkbench.XMI_URI_ARG,
 						"org.eclipse.ui.workbench/LegacyIDE.e4xmi"); //$NON-NLS-1$
 				Object obj = getApplication(Platform.getCommandLineArgs());
+
+				IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
+				if (!store.isDefault(IPreferenceConstants.LAYOUT_DIRECTION)) {
+					int orientation = store.getInt(IPreferenceConstants.LAYOUT_DIRECTION);
+					Window.setDefaultOrientation(orientation);
+				}
+
 				if (obj instanceof E4Application) {
 					E4Application e4app = (E4Application) obj;
 					E4Workbench e4Workbench = e4app.createE4Workbench(getApplicationContext(),
@@ -1606,6 +1616,9 @@ public final class Workbench extends EventManager implements IWorkbench,
 		// initialize workbench single-click vs double-click behavior
 		initializeSingleClickOption();
 
+		initializeGlobalization();
+		initializeNLExtensions();
+
 		initializeWorkbenchImages();
 
 		StartupThreading.runWithoutExceptions(new StartupRunnable() {
@@ -1711,6 +1724,26 @@ public final class Workbench extends EventManager implements IWorkbench,
 			}
 		}
 		OpenStrategy.setOpenMethod(singleClickMethod);
+	}
+
+	private void initializeGlobalization() {
+		IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
+
+		if (!store.isDefault(IPreferenceConstants.BIDI_SUPPORT)) {
+			BidiUtils.setBidiSupport(store.getBoolean(IPreferenceConstants.BIDI_SUPPORT));
+		}
+		if (!store.isDefault(IPreferenceConstants.TEXT_DIRECTION)) {
+			BidiUtils.setTextDirection(store.getString(IPreferenceConstants.TEXT_DIRECTION));
+		}
+	}
+
+	private void initializeNLExtensions() {
+		IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
+		if (!store.isDefault(IPreferenceConstants.NL_EXTENSIONS)) {
+			String nlExtensions = store.getString(IPreferenceConstants.NL_EXTENSIONS);
+			ULocale.setDefault(Category.FORMAT, new ULocale(ULocale.getDefault(Category.FORMAT)
+					.getBaseName() + nlExtensions));
+		}
 	}
 
 	/*
@@ -2539,7 +2572,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 * 
 	 * @return the ids of all plug-ins containing 1 or more startup extensions
 	 */
-	public String[] getEarlyActivatedPlugins() {
+	public ContributionInfo[] getEarlyActivatedPlugins() {
 		IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint(
 				PlatformUI.PLUGIN_ID, IWorkbenchRegistryConstants.PL_STARTUP);
 		IExtension[] extensions = point.getExtensions();
@@ -2550,7 +2583,13 @@ UIEvents.Context.TOPIC_CONTEXT,
 				pluginIds.add(id);
 			}
 		}
-		return (String[]) pluginIds.toArray(new String[pluginIds.size()]);
+		ContributionInfo[] result = new ContributionInfo[pluginIds.size()];
+		for (int i = 0; i < result.length; i++) {
+			result[i] = new ContributionInfo((String) pluginIds.get(i),
+					ContributionInfoMessages.ContributionInfo_EarlyStartupPlugin, null);
+
+		}
+		return result;
 	}
 
 	/**
