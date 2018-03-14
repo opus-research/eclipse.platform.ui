@@ -63,4 +63,8 @@ public class CSSValueListImpl extends AbstractCSSNode implements CSSValueList {
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
 	}
 
+	public void addAll(CSSValueListImpl values){
+		this.values.addAll(values.values);
+	}
+
 }
