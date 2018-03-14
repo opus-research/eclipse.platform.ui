@@ -13,7 +13,6 @@
  *     - Fix for bug 208602 - [Dialogs] Open Type dialog needs accessible labels
  *  Simon Muschel <smuschel@gmx.de> - bug 258493
  *  Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
- *  Simon Scholz <simon.scholz@vogella.com> - Bug 452350
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -2296,15 +2295,15 @@ public abstract class FilteredItemsSelectionDialog extends
 		protected SearchPattern patternMatcher;
 
 		/**
-		 * Creates new instance of ItemsFilter with implicit prefix matching.
+		 * Creates new instance of ItemsFilter.
 		 */
 		public ItemsFilter() {
 			this(new SearchPattern());
 		}
 
 		/**
-		 * Creates new instance of ItemsFilter with implicit prefix matching.
-		 *
+		 * Creates new instance of ItemsFilter.
+		 * 
 		 * @param searchPattern
 		 *            the pattern to be used when filtering
 		 */
@@ -2314,11 +2313,6 @@ public abstract class FilteredItemsSelectionDialog extends
 			if (pattern != null && !pattern.getText().equals("*")) { //$NON-NLS-1$
 				stringPattern = pattern.getText();
 			}
-
-			if (stringPattern.indexOf("*") != 0 && stringPattern.indexOf("?") != 0 && stringPattern.indexOf(".") != 0) {//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				stringPattern = "*" + stringPattern; //$NON-NLS-1$
-			}
-
 			patternMatcher.setPattern(stringPattern);
 		}
 
