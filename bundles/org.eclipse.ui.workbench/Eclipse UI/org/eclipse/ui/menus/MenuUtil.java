@@ -20,15 +20,6 @@ package org.eclipse.ui.menus;
  */
 public class MenuUtil {
 	/**
-	 *
-	 * Application Menu
-	 *
-	 * @since 3.107
-	 *
-	 * */
-	public final static String APPLICATION_MENU = "menu:org.eclipse.ui.application.menu"; //$NON-NLS-1$
-
-	/**
 	 * Workbench Menu. On supported platforms, this menu is shown when no
 	 * workbench windows are active
 	 * 
