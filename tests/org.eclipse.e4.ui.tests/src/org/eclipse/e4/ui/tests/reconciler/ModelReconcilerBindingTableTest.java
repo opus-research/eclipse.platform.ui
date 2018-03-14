@@ -19,6 +19,7 @@ import java.util.Collection;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MBindingContext;
 import org.eclipse.e4.ui.model.application.commands.MBindingTable;
+import org.eclipse.e4.ui.model.application.commands.impl.CommandsFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
 import org.junit.Test;
@@ -30,10 +31,12 @@ public abstract class ModelReconcilerBindingTableTest extends
 	public void testBindingTable_BindingContext_Set() {
 		MApplication application = createApplication();
 
-		MBindingTable bindingTable = ems.createModelElement(MBindingTable.class);
+		MBindingTable bindingTable = CommandsFactoryImpl.eINSTANCE
+				.createBindingTable();
 		application.getBindingTables().add(bindingTable);
 
-		MBindingContext bindingContext = ems.createModelElement(MBindingContext.class);
+		MBindingContext bindingContext = CommandsFactoryImpl.eINSTANCE
+				.createBindingContext();
 		application.getRootContext().add(bindingContext);
 
 		saveModel();
@@ -70,10 +73,12 @@ public abstract class ModelReconcilerBindingTableTest extends
 	public void testBindingTable_BindingContext_Unset() {
 		MApplication application = createApplication();
 
-		MBindingTable bindingTable = ems.createModelElement(MBindingTable.class);
+		MBindingTable bindingTable = CommandsFactoryImpl.eINSTANCE
+				.createBindingTable();
 		application.getBindingTables().add(bindingTable);
 
-		MBindingContext bindingContext = ems.createModelElement(MBindingContext.class);
+		MBindingContext bindingContext = CommandsFactoryImpl.eINSTANCE
+				.createBindingContext();
 		bindingTable.setBindingContext(bindingContext);
 		application.getRootContext().add(bindingContext);
 

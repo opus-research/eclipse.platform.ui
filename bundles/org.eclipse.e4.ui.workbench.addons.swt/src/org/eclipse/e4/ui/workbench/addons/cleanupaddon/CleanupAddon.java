@@ -233,7 +233,9 @@ public class CleanupAddon {
 				// Reparent the control to 'limbo'
 				Composite curParent = ctrl.getParent();
 				ctrl.setParent(limbo);
-				curParent.requestLayout();
+				curParent.layout(true);
+				if (curParent.getShell() != curParent)
+					curParent.requestLayout();
 
 				// Always leave Window's in the presentation
 				if ((Object) parent instanceof MWindow)

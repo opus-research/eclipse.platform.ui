@@ -16,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Collection;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
+import org.eclipse.e4.ui.model.application.descriptor.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
 import org.junit.Test;
@@ -25,7 +26,8 @@ public abstract class ModelReconcilerPartDescriptorTest extends
 
 	private void testPartDescriptor_AllowMultiple(boolean before, boolean after) {
 		MApplication application = createApplication();
-		MPartDescriptor descriptor = ems.createModelElement(MPartDescriptor.class);
+		MPartDescriptor descriptor = BasicFactoryImpl.eINSTANCE
+				.createPartDescriptor();
 		application.getDescriptors().add(descriptor);
 
 		descriptor.setAllowMultiple(before);
@@ -73,7 +75,8 @@ public abstract class ModelReconcilerPartDescriptorTest extends
 
 	private void testUIItem_Tooltip(String before, String after) {
 		MApplication application = createApplication();
-		MPartDescriptor descriptor = ems.createModelElement(MPartDescriptor.class);
+		MPartDescriptor descriptor = BasicFactoryImpl.eINSTANCE
+				.createPartDescriptor();
 		application.getDescriptors().add(descriptor);
 
 		descriptor.setCategory(before);

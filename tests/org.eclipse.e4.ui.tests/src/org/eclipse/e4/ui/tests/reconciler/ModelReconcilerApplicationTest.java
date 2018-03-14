@@ -16,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Collection;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
+import org.eclipse.e4.ui.model.application.commands.impl.CommandsFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
 import org.junit.Test;
@@ -32,7 +33,7 @@ public abstract class ModelReconcilerApplicationTest extends
 		ModelReconciler reconciler = createModelReconciler();
 		reconciler.recordChanges(application);
 
-		MCommand command = ems.createModelElement(MCommand.class);
+		MCommand command = CommandsFactoryImpl.eINSTANCE.createCommand();
 		command.setCommandName("newCommand");
 		application.getCommands().add(command);
 
@@ -56,7 +57,7 @@ public abstract class ModelReconcilerApplicationTest extends
 	public void testApplication_Commands_Remove() {
 		MApplication application = createApplication();
 
-		MCommand command = ems.createModelElement(MCommand.class);
+		MCommand command = CommandsFactoryImpl.eINSTANCE.createCommand();
 		application.getCommands().add(command);
 
 		saveModel();
