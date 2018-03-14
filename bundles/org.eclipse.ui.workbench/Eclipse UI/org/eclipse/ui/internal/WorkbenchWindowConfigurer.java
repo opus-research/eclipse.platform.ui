@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2011 IBM Corporation and others.
+ * Copyright (c) 2003, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 441184
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -39,7 +40,9 @@ import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.ui.application.IWorkbenchConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchAdvisor;
+import org.eclipse.ui.internal.e4.compatibility.E4Util;
 import org.eclipse.ui.internal.provisional.application.IActionBarConfigurer2;
+import org.eclipse.ui.presentations.AbstractPresentationFactory;
 
 /**
  * Internal class providing special access for configuring workbench windows.
@@ -549,6 +552,23 @@ public final class WorkbenchWindowConfigurer implements
     @Override
 	public void setInitialSize(Point size) {
         initialSize = size;
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer
+     */
+    @Override
+	public AbstractPresentationFactory getPresentationFactory() {
+		E4Util.unsupported("Not supported anymore"); //$NON-NLS-1$
+		return null;
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer
+     */
+    @Override
+	public void setPresentationFactory(AbstractPresentationFactory factory) {
+		E4Util.unsupported("Not supported anymore"); //$NON-NLS-1$
     }
 
     /**
