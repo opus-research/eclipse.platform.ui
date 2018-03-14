@@ -198,7 +198,7 @@ public class WizardArchiveFileResourceExportPage1 extends
         op.setCreateLeadupStructure(createDirectoryStructureButton
                 .getSelection());
         op.setUseCompression(compressContentsCheckbox.getSelection());
-        op.setIncludeLinkedResources(resolveLinkedResourcesCheckbox.getSelection());
+        op.setResolveLinks(resolveLinkedResourcesCheckbox.getSelection());
         op.setUseTarFormat(targzFormatButton.getSelection());
 
         try {

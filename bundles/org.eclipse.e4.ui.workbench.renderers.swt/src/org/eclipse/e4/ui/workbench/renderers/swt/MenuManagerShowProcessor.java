@@ -14,6 +14,7 @@
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import javax.inject.Inject;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
@@ -68,6 +69,8 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 	@Optional
 	private Logger logger;
 
+	private HashMap<Menu, Runnable> pendingCleanup = new HashMap<>();
+
 	@Override
 	public void menuAboutToShow(IMenuManager manager) {
 		if (!(manager instanceof MenuManager)) {
@@ -78,7 +81,7 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 		final Menu menu = menuManager.getMenu();
 
 		if (menuModel != null && menuManager != null) {
-			cleanUp(menuModel, menuManager);
+			cleanUp(menu, menuModel, menuManager);
 		}
 		if (menuModel instanceof MPopupMenu) {
 			showPopup(menu, (MPopupMenu) menuModel, menuManager);
@@ -191,15 +194,17 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 		}
 	}
 
-	/**
-	 * Remove all of the items created by any dynamic contributions on the
-	 * menuModel.
-	 *
-	 * @param menuModel
-	 * @param menuManager
-	 */
-	private void cleanUp(MMenu menuModel, MenuManager menuManager) {
-		renderer.removeDynamicMenuContributions(menuManager, menuModel);
+	private void cleanUp(final Menu menu, MMenu menuModel,
+			MenuManager menuManager) {
+		trace("cleanUp", menu, null); //$NON-NLS-1$
+		if (pendingCleanup.isEmpty()) {
+			return;
+		}
+		Runnable cleanUp = pendingCleanup.remove(menu);
+		if (cleanUp != null) {
+			trace("cleanUp.run()", menu, null); //$NON-NLS-1$
+			cleanUp.run();
+		}
 	}
 
 	private void showPopup(final Menu menu, final MPopupMenu menuModel,

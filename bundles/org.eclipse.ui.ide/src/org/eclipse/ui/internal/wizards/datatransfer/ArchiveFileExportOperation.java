@@ -381,7 +381,7 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
 	 * @param value
 	 *            boolean
 	 */
-	public void setIncludeLinkedResources(boolean value) {
+	public void setResolveLinks(boolean value) {
 		resolveLinks = value;
 	}
 }
