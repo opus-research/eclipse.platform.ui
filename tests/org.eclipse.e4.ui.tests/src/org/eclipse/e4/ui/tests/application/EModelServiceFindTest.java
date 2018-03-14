@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 433228
  ******************************************************************************/
 package org.eclipse.e4.ui.tests.application;
 
@@ -16,7 +15,6 @@ import java.util.List;
 import junit.framework.TestCase;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.E4XMIResource;
-import org.eclipse.e4.ui.internal.workbench.ModelServiceImpl;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
@@ -29,10 +27,12 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
+import org.eclipse.e4.ui.model.application.ui.advanced.impl.AdvancedFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.workbench.Selector;
@@ -49,12 +49,9 @@ public class EModelServiceFindTest extends TestCase {
 
 	MApplication app = null;
 
-	private EModelService modelService;
-
 	@Override
 	protected void setUp() throws Exception {
 		applicationContext = E4Application.createDefaultContext();
-		modelService = new ModelServiceImpl(applicationContext);
 		super.setUp();
 	}
 
@@ -397,35 +394,34 @@ public class EModelServiceFindTest extends TestCase {
 		MApplication application = createApplication();
 		application.setContext(applicationContext);
 
-		MWindow window = modelService.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 
-		MPerspectiveStack perspectiveStack = modelService
-				.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
+				.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 
-		MPerspective perspectiveA = modelService
-				.createModelElement(MPerspective.class);
+		MPerspective perspectiveA = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveStack.getChildren().add(perspectiveA);
 
-		MPerspective perspectiveB = modelService
-				.createModelElement(MPerspective.class);
+		MPerspective perspectiveB = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveStack.getChildren().add(perspectiveB);
 
-		MPartStack partStack = modelService
-				.createModelElement(MPartStack.class);
+		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getSharedElements().add(partStack);
 
-		MPart part = modelService.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		partStack.getChildren().add(part);
 
-		MPlaceholder placeholderA = modelService
-				.createModelElement(MPlaceholder.class);
+		MPlaceholder placeholderA = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 		placeholderA.setRef(partStack);
 		perspectiveA.getChildren().add(placeholderA);
 
-		MPlaceholder placeholderB = modelService
-				.createModelElement(MPlaceholder.class);
+		MPlaceholder placeholderB = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 		placeholderB.setRef(partStack);
 		perspectiveB.getChildren().add(placeholderB);
 

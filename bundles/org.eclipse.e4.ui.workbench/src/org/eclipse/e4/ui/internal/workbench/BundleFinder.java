@@ -65,9 +65,6 @@ final class BundleFinder implements BundleTrackerCustomizer<List<Bundle>> {
 	@Override
 	public List<Bundle> addingBundle(Bundle bundle, BundleEvent event) {
 		String bundleSymName = bundle.getSymbolicName();
-		if (bundleSymName == null) {
-			return null;
-		}
 
 		List<Bundle> bundlesWithSameSymName = trackedBundles.get(bundleSymName);
 		if (bundlesWithSameSymName == null) {
