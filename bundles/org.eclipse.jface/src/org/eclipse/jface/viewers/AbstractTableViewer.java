@@ -16,7 +16,6 @@ package org.eclipse.jface.viewers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -460,9 +459,8 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 			return getVirtualSelection();
 		}
 		Widget[] items = doGetSelection();
-		ArrayList list = new ArrayList(items.length);
-		for (int i = 0; i < items.length; i++) {
-			Widget item = items[i];
+		List<Object> list = new ArrayList<>(items.length);
+		for (Widget item : items) {
 			Object e = item.getData();
 			if (e != null) {
 				list.add(e);
@@ -478,14 +476,13 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * @return List of Object
 	 */
 
-	private List getVirtualSelection() {
+	private List<Object> getVirtualSelection() {
 
-		List result = new ArrayList();
+		List<Object> result = new ArrayList<>();
 		int[] selectionIndices = doGetSelectionIndices();
 		if (getContentProvider() instanceof ILazyContentProvider) {
 			ILazyContentProvider lazy = (ILazyContentProvider) getContentProvider();
-			for (int i = 0; i < selectionIndices.length; i++) {
-				int selectionIndex = selectionIndices[i];
+			for (int selectionIndex : selectionIndices) {
 				lazy.updateElement(selectionIndex);// Start the update
 				// check for the case where the content provider changed the number of items
 				if (selectionIndex < doGetItemCount()) {
@@ -499,10 +496,9 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 				}
 			}
 		} else {
-			for (int i = 0; i < selectionIndices.length; i++) {
+			for (int selectionIndex : selectionIndices) {
 				Object element = null;
 				// See if it is cached
-				int selectionIndex = selectionIndices[i];
 				if (selectionIndex < virtualManager.cachedElements.length) {
 					element = virtualManager.cachedElements[selectionIndex];
 				}
@@ -804,6 +800,33 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	}
 
 	/**
+	 * Removes the given element at the given position from the primary control.
+	 *
+	 * @param elementToBeRemoved
+	 *            the element
+	 * @param removeIndex
+	 *            the position from which the element will be removed.
+	 *            Zero-relative.
+	 * @since 3.12
+	 * @see #getControl()
+	 */
+	public void removeAtPosition(Object elementToBeRemoved, final int removeIndex) {
+		if (checkBusy())
+			return;
+		if (elementToBeRemoved == null || removeIndex < 0)
+			return;
+
+		Item item = doGetItem(removeIndex);
+		if (equals(item.getData(), elementToBeRemoved)) {
+			disassociate(item);
+			if (virtualManager != null) {
+				virtualManager.removeIndices(new int[] { removeIndex });
+			}
+			doRemove(new int[] { removeIndex });
+		}
+	}
+
+	/**
 	 * Removes the given element from this table viewer. The selection is
 	 * updated if necessary.
 	 * <p>
@@ -867,13 +890,10 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 			if( ! list.isEmpty() ) {
 				int[] indices = new int[list.size()];
 
-				Iterator it = list.iterator();
 				Item[] items = doGetItems();
-				Object modelElement;
 
 				int count = 0;
-				while( it.hasNext() ) {
-					modelElement = it.next();
+				for (Object modelElement : list) {
 					boolean found = false;
 					for (int i = 0; i < items.length && !found; i++) {
 						if (equals(modelElement, items[i].getData())) {
@@ -900,15 +920,14 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * @param reveal
 	 *            Whether or not reveal the first item.
 	 */
-	private void virtualSetSelectionToWidget(List list, boolean reveal) {
+	private void virtualSetSelectionToWidget(List<Object> list, boolean reveal) {
 		int size = list.size();
 		int[] indices = new int[list.size()];
 
 		Item firstItem = null;
 		int count = 0;
-		HashSet virtualElements = new HashSet();
-		for (int i = 0; i < size; ++i) {
-			Object o = list.get(i);
+		HashSet<Object> virtualElements = new HashSet<>();
+		for (Object o : list) {
 			Widget w = findItem(o);
 			if (w instanceof Item) {
 				Item item = (Item) w;
@@ -1104,7 +1123,7 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * @param index
 	 *            the index of the column to return
 	 * @return the column at the given index
-	 * @exception IllegalArgumentException -
+	 * @exception IllegalArgumentException
 	 *                if the index is not between 0 and the number of elements
 	 *                in the list minus 1 (inclusive)
 	 *
@@ -1119,7 +1138,7 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * @param index
 	 *            the index of the item to return
 	 * @return the item at the given index
-	 * @exception IllegalArgumentException -
+	 * @exception IllegalArgumentException
 	 *                if the index is not between 0 and the number of elements
 	 *                in the list minus 1 (inclusive)
 	 *
@@ -1163,7 +1182,8 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * Resets the given item in the receiver. The text, icon and other attributes
 	 * of the item are set to their default values.
 	 *
-	 * @param item the item to reset
+	 * @param item
+	 *            the item to reset
 	 *
 	 * @since 3.3
 	 */
@@ -1178,7 +1198,7 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * @param end
 	 *            the end of the range
 	 *
-	 * @exception IllegalArgumentException -
+	 * @exception IllegalArgumentException
 	 *                if either the start or end are not between 0 and the
 	 *                number of elements in the list minus 1 (inclusive)
 	 *
@@ -1200,7 +1220,7 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * @param indices
 	 *            the array of indices of the items
 	 *
-	 * @exception IllegalArgumentException -
+	 * @exception IllegalArgumentException
 	 *                if the array is null, or if any of the indices is not
 	 *                between 0 and the number of elements in the list minus 1
 	 *                (inclusive)
@@ -1217,7 +1237,7 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * @param item
 	 *            the item to be shown
 	 *
-	 * @exception IllegalArgumentException -
+	 * @exception IllegalArgumentException
 	 *                if the item is null
 	 *
 	 * @since 3.3
@@ -1240,9 +1260,11 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * items are specified, then all items are ignored.
 	 * </p>
 	 *
-	 * @param items the array of items
+	 * @param items
+	 *            the array of items
 	 *
-	 * @exception IllegalArgumentException - if the array of items is null
+	 * @exception IllegalArgumentException
+	 *                if the array of items is null
 	 *
 	 * @since 3.3
 	 */
@@ -1266,9 +1288,11 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * single-select and multiple indices are specified, then all indices are ignored.
 	 * </p>
 	 *
-	 * @param indices the indices of the items to select
+	 * @param indices
+	 *            the indices of the items to select
 	 *
-	 * @exception IllegalArgumentException - if the array of indices is null
+	 * @exception IllegalArgumentException
+	 *                if the array of indices is null
 	 *
 	 * @since 3.3
 	 */
@@ -1283,7 +1307,7 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * @param index
 	 *            the index of the item to clear
 	 *
-	 * @exception IllegalArgumentException -
+	 * @exception IllegalArgumentException
 	 *                if the index is not between 0 and the number of elements
 	 *                in the list minus 1 (inclusive)
 	 *
@@ -1293,8 +1317,6 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * @since 3.3
 	 */
 	protected abstract void doClear(int index);
-
-
 
 	/**
 	 * Selects the items at the given zero-relative indices in the receiver.
@@ -1307,9 +1329,11 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * then all indices are ignored.
 	 * </p>
 	 *
-	 * @param indices the array of indices for the items to select
+	 * @param indices
+	 *            the array of indices for the items to select
 	 *
-	 * @exception IllegalArgumentException - if the array of indices is null
+	 * @exception IllegalArgumentException
+	 *                if the array of indices is null
 	 *
 	 */
 	protected abstract void doSelect(int[] indices);
