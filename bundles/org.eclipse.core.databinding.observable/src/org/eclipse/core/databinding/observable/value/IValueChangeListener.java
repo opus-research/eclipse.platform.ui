@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.value;
@@ -17,14 +16,10 @@ import org.eclipse.core.databinding.observable.IObservablesListener;
 /**
  * Listener for changes to observable values.
  *
- * @param <T>
- *            the type of value being observed
- *
  * @since 1.0
  *
  */
-@FunctionalInterface
-public interface IValueChangeListener<T> extends IObservablesListener {
+public interface IValueChangeListener extends IObservablesListener {
 
 	/**
 	 * Handles a change to an observable value. The given event object must only
@@ -35,5 +30,6 @@ public interface IValueChangeListener<T> extends IObservablesListener {
 	 * @param event
 	 *            the event
 	 */
-	void handleValueChange(ValueChangeEvent<? extends T> event);
+	void handleValueChange(ValueChangeEvent event);
+
 }

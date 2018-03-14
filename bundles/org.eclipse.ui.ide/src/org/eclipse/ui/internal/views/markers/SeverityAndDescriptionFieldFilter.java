@@ -38,6 +38,11 @@ public abstract class SeverityAndDescriptionFieldFilter extends DescriptionField
 		super();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.provisional.views.markers.MarkerFieldFilter#initialize(java.util.Map)
+	 */
 	@Override
 	public void initialize(Map values) {
 		Object value = values.get(IMarker.SEVERITY);
@@ -56,6 +61,11 @@ public abstract class SeverityAndDescriptionFieldFilter extends DescriptionField
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.provisional.views.markers.MarkerFieldFilter#populateWorkingCopy(org.eclipse.ui.internal.provisional.views.markers.MarkerFieldFilter)
+	 */
 	@Override
 	public void populateWorkingCopy(MarkerFieldFilter copy) {
 		super.populateWorkingCopy(copy);
@@ -63,6 +73,11 @@ public abstract class SeverityAndDescriptionFieldFilter extends DescriptionField
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.provisional.views.markers.MarkerFieldFilter#saveSettings(org.eclipse.ui.IMemento)
+	 */
 	@Override
 	public void saveSettings(IMemento memento) {
 		super.saveSettings(memento);
@@ -70,6 +85,11 @@ public abstract class SeverityAndDescriptionFieldFilter extends DescriptionField
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.provisional.views.markers.MarkerFieldFilter#loadSettings(org.eclipse.ui.IMemento)
+	 */
 	@Override
 	public void loadSettings(IMemento memento) {
 		super.loadSettings(memento);

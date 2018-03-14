@@ -12,14 +12,11 @@
  *     Craig Foote (Footeware.ca) - https://bugs.eclipse.org/325743
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 460405
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 417447
- *     Stefan Winkler <stefan@winklerweb.net> - Bug 477848
  *******************************************************************************/
 package org.eclipse.ui.views.properties;
 
 import java.util.HashSet;
-import java.util.Set;
 
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -43,6 +40,7 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.internal.views.ViewsPlugin;
 import org.eclipse.ui.internal.views.properties.PropertiesMessages;
 import org.eclipse.ui.part.IContributedContentsView;
 import org.eclipse.ui.part.IPage;
@@ -123,7 +121,7 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 	/**
 	 * Set of workbench parts, which should not be used as a source for PropertySheet
 	 */
-	private HashSet<String> ignoredViews;
+	private HashSet ignoredViews;
 
     /**
      * Creates a property sheet view.
@@ -136,7 +134,8 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 
     @Override
 	protected IPage createDefaultPage(PageBook book) {
-		IPageBookViewPage page = (IPageBookViewPage) Adapters.getAdapter(this, IPropertySheetPage.class, true);
+        IPageBookViewPage page = (IPageBookViewPage) ViewsPlugin.getAdapter(this,
+                IPropertySheetPage.class, false);
         if(page == null) {
         	page = new PropertySheetPage();
         }
@@ -198,7 +197,8 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
     	if(part instanceof PropertySheet) {
     		return null;
     	}
-		IPropertySheetPage page = Adapters.getAdapter(part, IPropertySheetPage.class, true);
+		IPropertySheetPage page = ViewsPlugin.getAdapter(part,
+                IPropertySheetPage.class, false);
         if (page != null) {
             if (page instanceof IPageBookViewPage) {
 				initPage((IPageBookViewPage) page);
@@ -282,7 +282,10 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
      */
     @Override
 	public void partActivated(IWorkbenchPart part) {
-		IContributedContentsView view = Adapters.getAdapter(part, IContributedContentsView.class, true);
+    	// Look for a declaratively-contributed adapter - including not yet loaded adapter factories.
+    	// See bug 86362 [PropertiesView] Can not access AdapterFactory, when plugin is not loaded.
+		IContributedContentsView view = ViewsPlugin.getAdapter(part,
+                IContributedContentsView.class, true);
         IWorkbenchPart source = null;
         if (view != null) {
 			source = view.getContributingPart();
@@ -351,9 +354,9 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 	 * @since 3.2
 	 */
 	@Override
-	protected <T> T getViewAdapter(Class<T> key) {
+	protected Object getViewAdapter(Class key) {
 		if (ISaveablePart.class.equals(key)) {
-			return key.cast(getSaveablePart());
+			return getSaveablePart();
 		}
 		return super.getViewAdapter(key);
 	}
@@ -418,18 +421,18 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 		updateContentDescription();
 	}
 
-	private Set<String> getIgnoredViews() {
+	private HashSet getIgnoredViews() {
 		if (ignoredViews == null) {
-			ignoredViews = new HashSet<>();
+			ignoredViews = new HashSet();
 	        IExtensionRegistry registry = RegistryFactory.getRegistry();
 	        IExtensionPoint ep = registry.getExtensionPoint(EXT_POINT);
 			if (ep != null) {
 				IExtension[] extensions = ep.getExtensions();
-				for (IExtension extension : extensions) {
-					IConfigurationElement[] elements = extension.getConfigurationElements();
-					for (IConfigurationElement element : elements) {
-						if ("excludeSources".equalsIgnoreCase(element.getName())) { //$NON-NLS-1$
-							String id = element.getAttribute("id"); //$NON-NLS-1$
+				for (int i = 0; i < extensions.length; i++) {
+					IConfigurationElement[] elements = extensions[i].getConfigurationElements();
+					for (int j = 0; j < elements.length; j++) {
+						if ("excludeSources".equalsIgnoreCase(elements[j].getName())) { //$NON-NLS-1$
+							String id = elements[j].getAttribute("id"); //$NON-NLS-1$
 							if (id != null)
 								ignoredViews.add(id);
 						}

@@ -102,6 +102,9 @@ public class NewWizardMenu extends BaseNewWizardMenu {
         // Must be done after constructor to ensure field initialization.
     }
 
+    /* (non-Javadoc)
+     * Fills the menu with New Wizards.
+     */
     private void fillMenu(IContributionManager innerMgr) {
         // Remove all.
         innerMgr.removeAll();
@@ -162,6 +165,9 @@ public class NewWizardMenu extends BaseNewWizardMenu {
 		return false;
 	}
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.actions.BaseNewWizardMenu#addItems(org.eclipse.jface.action.IContributionManager)
+     */
     @Override
 	protected void addItems(List list) {
     	ArrayList shortCuts= new ArrayList();
@@ -200,6 +206,9 @@ public class NewWizardMenu extends BaseNewWizardMenu {
 		return false;
 	}
 
+	/* (non-Javadoc)
+	 * Method declared on IContributionItem.
+	 */
 	@Override
 	public boolean isEnabled() {
 		return enabled;
@@ -215,6 +224,9 @@ public class NewWizardMenu extends BaseNewWizardMenu {
 		this.enabled = enabledValue;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.actions.BaseNewWizardMenu#getContributionItems()
+	 */
 	@Override
 	protected IContributionItem[] getContributionItems() {
 		if (isEnabled()) {

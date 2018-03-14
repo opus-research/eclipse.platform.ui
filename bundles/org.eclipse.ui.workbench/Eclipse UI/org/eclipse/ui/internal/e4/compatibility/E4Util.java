@@ -40,6 +40,9 @@ public class E4Util {
 	public static void unsupported(String msg) throws UnsupportedOperationException {
 		if (DEBUG_E4)
 			WorkbenchPlugin.log("unsupported: " + msg); //$NON-NLS-1$
+		// UnsupportedOperationException ex = new
+		// UnsupportedOperationException(msg);
+		// throw ex;
 	}
 
 	public static void message(String msg) throws UnsupportedOperationException {
