@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <jeandersonbc@gmail.com> - Bug 425962
  ******************************************************************************/
 
 package org.eclipse.e4.ui.bindings.internal;
