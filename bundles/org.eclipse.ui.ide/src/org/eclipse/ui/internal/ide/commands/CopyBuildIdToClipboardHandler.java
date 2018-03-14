@@ -17,7 +17,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.internal.ConfigurationInfo;
 
 /**
@@ -29,19 +29,16 @@ import org.eclipse.ui.internal.ConfigurationInfo;
  */
 public class CopyBuildIdToClipboardHandler extends AbstractHandler {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
-	 */
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		final String buildId = ConfigurationInfo.getBuildId();
 		if (buildId == null || buildId.length() == 0)
 			throw new ExecutionException("No build ID in this instance."); //$NON-NLS-1$
 		Clipboard clipboard = null;
+		Display display = Display.getCurrent();
 		try {
-			clipboard = new Clipboard(HandlerUtil.getActiveShell(event)
-					.getDisplay());
+			
+			clipboard = new Clipboard(display);
 			clipboard.setContents(new Object[] { buildId },
 					new Transfer[] { TextTransfer.getInstance() });
 		} finally {
