@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Tom Hochstein (Freescale) - Bug 407522 - Perspective reset not working correctly
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422040
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422040, 431992
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
