@@ -82,6 +82,10 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 
 					boolean pinnedVal = "true".equals(createReadRoot.getString(IWorkbenchConstants.TAG_PINNED)); //$NON-NLS-1$
 					setPinned(pinnedVal);
+
+					String ttip = createReadRoot.getString(IWorkbenchConstants.TAG_TOOLTIP);
+					part.getTransientData().put(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY,
+							ttip);
 				}
 			} catch (WorkbenchException e) {
 				WorkbenchPlugin.log(e);
@@ -225,15 +229,7 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 	}
 
 	public String getTitle() {
-		// First check if the tooltip has been over-ridden
-		String label = (String) getModel().getTransientData().get(
-				IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY);
-
-		// Use the part's label
-		if (label == null || label.length() == 0)
-			label = Util.safeString(getModel().getLocalizedLabel());
-
-		// Use the descriptor's label or the input's name
+		String label = Util.safeString(getModel().getLocalizedLabel());
 		if (label.length() == 0) {
 			if (input == null) {
 				if (descriptor != null) {
