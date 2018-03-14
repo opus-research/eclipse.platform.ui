@@ -75,14 +75,14 @@ public class LTKLauncher {
 
 	private static boolean runCommand(String commandId,
 			IStructuredSelection selection) {
-		ICommandService commandService = (ICommandService) PlatformUI
+		ICommandService commandService = PlatformUI
 				.getWorkbench().getService(ICommandService.class);
 		Command cmd = commandService.getCommand(commandId);
 		if (!cmd.isDefined()) {
 			return false;
 		}
 
-		IHandlerService handlerService = (IHandlerService) PlatformUI
+		IHandlerService handlerService = PlatformUI
 				.getWorkbench().getService(IHandlerService.class);
 		EvaluationContext c = null;
 		if (selection != null) {
