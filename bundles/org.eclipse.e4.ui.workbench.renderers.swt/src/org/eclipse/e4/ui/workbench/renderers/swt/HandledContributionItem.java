@@ -232,6 +232,11 @@ public class HandledContributionItem extends ContributionItem {
 	private void generateCommand() {
 		if (model.getCommand() != null && model.getWbCommand() == null) {
 			String cmdId = model.getCommand().getElementId();
+			if (cmdId == null) {
+				Activator.log(IStatus.ERROR, "Unable to generate parameterized command for " + model //$NON-NLS-1$
+						+ ". ElementId is not allowed to be null."); //$NON-NLS-1$
+				return;
+			}
 			List<MParameter> modelParms = model.getParameters();
 			Map<String, Object> parameters = new HashMap<String, Object>(4);
 			for (MParameter mParm : modelParms) {
