@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -132,7 +132,7 @@ public class CopyProjectOperation extends AbstractCopyOrMoveResourcesOperation {
 			throws CoreException {
 		SubMonitor subMonitor = SubMonitor.convert(monitor, 1);
 		// Delete the project that was copied
-		WorkspaceUndoUtil.delete(resources, subMonitor.newChild(1), uiInfo, true);
+		WorkspaceUndoUtil.delete(resources, subMonitor.split(1), uiInfo, true);
 		// Set the target resource to the original
 		setTargetResources(new IResource[] { originalProject });
 		setResourceDescriptions(new ResourceDescription[0]);
