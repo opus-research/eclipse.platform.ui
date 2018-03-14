@@ -23,7 +23,6 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
-import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
@@ -139,16 +138,6 @@ public class CleanupAddon {
 		}
 	}
 
-	/**
-	 * Returns true if and only if the given element should make itself visible
-	 * when its first child becomes visible and make itself invisible whenever
-	 * its last child becomes invisible. Defaults to false for unknown element
-	 * types
-	 */
-	private static boolean shouldReactToChildVisibilityChanges(MUIElement theElement) {
-		return (theElement instanceof MPartSashContainer || theElement instanceof MPartStack);
-	}
-
 	@Inject
 	@Optional
 	private void subscribeVisibilityChanged(
@@ -160,17 +149,14 @@ public class CleanupAddon {
 		if (changedObj.getWidget() instanceof Shell) {
 			((Shell) changedObj.getWidget()).setVisible(changedObj.isVisible());
 		} else if (changedObj.getWidget() instanceof Rectangle) {
-			MElementContainer<MUIElement> parent = changedObj.getParent();
-			if (!shouldReactToChildVisibilityChanges(parent)) {
-				return;
-			}
-
 			if (changedObj.isVisible()) {
 				// Make all the parents visible
+				MUIElement parent = changedObj.getParent();
 				if (!parent.isVisible())
 					parent.setVisible(true);
 			} else {
 				// If there are no more 'visible' children then make the parent go away too
+				MElementContainer<MUIElement> parent = changedObj.getParent();
 				boolean makeInvisible = true;
 				for (MUIElement kid : parent.getChildren()) {
 					if (kid.isToBeRendered() && kid.isVisible()) {
@@ -187,7 +173,6 @@ public class CleanupAddon {
 			if (parent == null || ((Object) parent) instanceof MToolBar) {
 				return;
 			}
-
 			if (changedObj.isVisible()) {
 				if (parent.getRenderer() != null) {
 					Object myParent = ((AbstractPartRenderer) parent.getRenderer())
@@ -211,12 +196,8 @@ public class CleanupAddon {
 						ctrl.getShell().layout(new Control[] { ctrl }, SWT.DEFER);
 					}
 
-					if (!shouldReactToChildVisibilityChanges(parent)) {
-						return;
-					}
-
 					// Check if the parent is visible
-					if (!parent.isVisible() && !parent.getTags().contains(IPresentationEngine.HIDDEN_EXPLICITLY))
+					if (!parent.isVisible())
 						parent.setVisible(true);
 				}
 			} else {
@@ -240,10 +221,6 @@ public class CleanupAddon {
 						makeParentInvisible = false;
 						break;
 					}
-				}
-
-				if (!shouldReactToChildVisibilityChanges(parent)) {
-					return;
 				}
 
 				// Special check: If a perspective goes invisibe we need to make its
