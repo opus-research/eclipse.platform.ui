@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,8 +40,6 @@ import org.eclipse.ui.views.IViewDescriptor;
 import org.eclipse.ui.views.IViewRegistry;
 
 public class ViewRegistry implements IViewRegistry {
-
-	public static final String VIEW_TAG = "View"; //$NON-NLS-1$
 
 	@Inject
 	private MApplication application;
@@ -124,7 +122,7 @@ public class ViewRegistry implements IViewRegistry {
 		descriptor.setLabel(element.getAttribute(IWorkbenchRegistryConstants.ATT_NAME));
 
 		List<String> tags = descriptor.getTags();
-		tags.add(VIEW_TAG);
+		tags.add("View"); //$NON-NLS-1$
 
 		descriptor.setCloseable(true);
 		descriptor.setAllowMultiple(Boolean.parseBoolean(element
