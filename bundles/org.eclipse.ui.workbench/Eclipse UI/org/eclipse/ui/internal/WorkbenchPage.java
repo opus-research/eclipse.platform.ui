@@ -33,6 +33,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
@@ -140,6 +141,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchPartSite;
+import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.IWorkingSetManager;
@@ -2697,6 +2699,9 @@ public class WorkbenchPage implements IWorkbenchPage {
 		broker.subscribe(UIEvents.Contribution.TOPIC_OBJECT, firingHandler);
 		broker.subscribe(UIEvents.ElementContainer.TOPIC_CHILDREN, childrenHandler);
 
+		// Bug 479126 PERSPECTIVE_BAR_EXTRAS setting not taken into account
+		createPerspectiveBarExtras();
+
 		MPerspectiveStack perspectiveStack = getPerspectiveStack();
 		if (perspectiveStack != null) {
 			extendPerspectives(perspectiveStack);
@@ -4067,7 +4072,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 	 * @param perspective
 	 * @return never null
 	 */
-	public MPerspective createPerspective(IPerspectiveDescriptor perspective) {
+	private MPerspective createPerspective(IPerspectiveDescriptor perspective) {
 		MPerspective modelPerspective = modelService.createModelElement(MPerspective.class);
 
 		// tag it with the same id
@@ -5485,4 +5490,46 @@ public class WorkbenchPage implements IWorkbenchPage {
 			firePartDeactivated(part);
 		}
 	}
+
+	/**
+	 * Add ToolItems for perspectives specified in "PERSPECTIVE_BAR_EXTRAS"
+	 */
+	private void createPerspectiveBarExtras() {
+		String persps = PrefUtil.getAPIPreferenceStore()
+				.getString(IWorkbenchPreferenceConstants.PERSPECTIVE_BAR_EXTRAS);
+		// e3 allowed spaces and commas as separator
+		String[] parts = persps.split(" "); //$NON-NLS-1$
+		Set<String> perspSet = new LinkedHashSet<>();
+		for (String part : parts) {
+			String[] parts2 = part.split(","); //$NON-NLS-1$
+			for (String part2 : parts2) {
+				part2 = part2.trim();
+				if (!part2.isEmpty())
+					perspSet.add(part2);
+			}
+		}
+
+		for (String perspId : perspSet) {
+			MPerspective persp = (MPerspective) modelService.find(perspId, window);
+			if (persp != null)
+				continue; // already in stack, i.e. has already been added above
+			IPerspectiveDescriptor desc = getDescriptorFor(perspId);
+			if (desc == null)
+				continue; // this perspective does not exist
+			persp = createPerspective(desc);
+			persp.setLabel(desc.getLabel());
+			getPerspectiveStack().getChildren().add(persp);
+			// "add" fires Event, causes creation of ToolItem on perspective bar
+		}
+	}
+
+	private IPerspectiveDescriptor getDescriptorFor(String id) {
+		IPerspectiveRegistry perspectiveRegistry = PlatformUI.getWorkbench().getPerspectiveRegistry();
+		if (perspectiveRegistry instanceof PerspectiveRegistry) {
+			return ((PerspectiveRegistry) perspectiveRegistry).findPerspectiveWithId(id, false);
+		}
+
+		return perspectiveRegistry.findPerspectiveWithId(id);
+	}
+
 }
