@@ -241,19 +241,16 @@ public class PageSite implements IPageSite, INestable {
 		selectionProvider = provider;
 	}
 
-	/* Package */IEclipseContext getSiteContext() {
-		return e4Context;
-	}
-
 	@Override
 	public void activate() {
 		active = true;
-
+		e4Context.activate();
 		serviceLocator.activate();
 
 		if (contextService != null) {
 			contextService.activate();
 		}
+
 	}
 
 	@Override
@@ -264,5 +261,6 @@ public class PageSite implements IPageSite, INestable {
 		}
 
 		serviceLocator.deactivate();
+		e4Context.deactivate();
 	}
 }
