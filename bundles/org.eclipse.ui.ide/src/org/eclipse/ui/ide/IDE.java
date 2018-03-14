@@ -721,8 +721,7 @@ public final class IDE {
 	}
 
 	/**
-	 * Returns an editor id appropriate for opening the given file
-	 * store.
+	 * Returns an editor id appropriate for opening the given file store.
 	 * <p>
 	 * The editor descriptor is determined using a multi-step process. This
 	 * method will attempt to resolve the editor based on content-type bindings
@@ -742,13 +741,14 @@ public final class IDE {
 	 * </ol>
 	 * </p>
 	 * 
-	 * @param fileStore 
+	 * @param fileStore
 	 *            the file store
 	 * @return the id of an editor, appropriate for opening the file
 	 * @throws PartInitException
 	 *             if no editor can be found
+	 * @since 3.10
 	 */
-	private static String getEditorId(IFileStore fileStore) throws PartInitException {
+	public static String getEditorId(IFileStore fileStore) throws PartInitException {
 		String name = fileStore.fetchInfo().getName();
 		if (name == null) {
 			throw new IllegalArgumentException();
