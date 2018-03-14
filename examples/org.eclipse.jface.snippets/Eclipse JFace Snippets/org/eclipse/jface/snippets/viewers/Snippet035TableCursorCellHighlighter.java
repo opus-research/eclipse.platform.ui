@@ -8,7 +8,6 @@
  * Contributors:
  *     Tom Schindl - initial API and implementation
  *     Lars Vogel (lars.vogel@gmail.com) - Bug 413427
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414565
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -47,16 +46,32 @@ public class Snippet035TableCursorCellHighlighter {
 
 	private class MyContentProvider implements IStructuredContentProvider {
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+		 */
 		@Override
 		public Object[] getElements(Object inputElement) {
 			return (MyModel[]) inputElement;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+		 */
 		@Override
 		public void dispose() {
 
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
+		 *      java.lang.Object, java.lang.Object)
+		 */
 		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 
@@ -121,13 +136,11 @@ public class Snippet035TableCursorCellHighlighter {
 	}
 
 	public Snippet035TableCursorCellHighlighter(Shell shell) {
-		int style = SWT.BORDER | SWT.HIDE_SELECTION | SWT.FULL_SELECTION;
-		final TableViewer v = new TableViewer(shell, style);
+		final TableViewer v = new TableViewer(shell, SWT.BORDER|SWT.HIDE_SELECTION|SWT.FULL_SELECTION);
 		v.setLabelProvider(new MyLabelProvider());
 		v.setContentProvider(new MyContentProvider());
 
-		v.setCellEditors(new CellEditor[] { new TextCellEditor(v.getTable()),
-				new TextCellEditor(v.getTable()) });
+		v.setCellEditors(new CellEditor[] { new TextCellEditor(v.getTable()), new TextCellEditor(v.getTable()) });
 		v.setCellModifier(new ICellModifier() {
 
 			@Override
@@ -147,13 +160,10 @@ public class Snippet035TableCursorCellHighlighter {
 
 		});
 
-		v.setColumnProperties(new String[] { "1", "2" });
+		v.setColumnProperties(new String[] {"1","2"});
 
-		TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(
-				v, new CursorCellHighlighter(v, new TableCursor(v)));
-		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(
-				v) {
-
+		TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(v,new CursorCellHighlighter(v,new TableCursor(v)));
+		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(v) {
 			@Override
 			protected boolean isEditorActivationEvent(
 					ColumnViewerEditorActivationEvent event) {
@@ -164,12 +174,10 @@ public class Snippet035TableCursorCellHighlighter {
 			}
 		};
 
-		int features = ColumnViewerEditor.TABBING_HORIZONTAL
+		TableViewerEditor.create(v, focusCellManager, actSupport, ColumnViewerEditor.TABBING_HORIZONTAL
 				| ColumnViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR
-				| ColumnViewerEditor.TABBING_VERTICAL
-				| ColumnViewerEditor.KEYBOARD_ACTIVATION;
+				| ColumnViewerEditor.TABBING_VERTICAL | ColumnViewerEditor.KEYBOARD_ACTIVATION);
 
-		TableViewerEditor.create(v, focusCellManager, actSupport, features);
 
 		TableColumn column = new TableColumn(v.getTable(), SWT.NONE);
 		column.setWidth(200);
@@ -188,9 +196,10 @@ public class Snippet035TableCursorCellHighlighter {
 	private MyModel[] createModel() {
 		MyModel[] elements = new MyModel[10];
 
-		for (int i = 0; i < elements.length; i++) {
+		for (int i = 0; i < 10; i++) {
 			elements[i] = new MyModel(i);
 		}
+
 		return elements;
 	}
 
@@ -209,6 +218,7 @@ public class Snippet035TableCursorCellHighlighter {
 			if (!display.readAndDispatch())
 				display.sleep();
 		}
+
 		display.dispose();
 
 	}
