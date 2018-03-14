@@ -20,7 +20,7 @@ public class IntegerConverter extends AbstractParameterValueConverter {
 			throws ParameterValueConversionException {
 		try {
 			int val = Integer.parseInt(parameterValue);
-			return Integer.valueOf(val);
+			return new Integer(val);
 		} catch (NumberFormatException ex) {
 			throw new ParameterValueConversionException(
 					"Error parsing value: " + parameterValue, ex);

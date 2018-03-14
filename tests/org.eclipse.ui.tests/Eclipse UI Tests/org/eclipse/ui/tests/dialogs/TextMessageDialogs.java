@@ -12,13 +12,13 @@ package org.eclipse.ui.tests.dialogs;
 
 import java.util.ResourceBundle;
 
+import junit.framework.TestCase;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.tests.harness.util.DialogCheck;
-
-import junit.framework.TestCase;
 
 public class TextMessageDialogs extends TestCase {
 
@@ -53,7 +53,9 @@ public class TextMessageDialogs extends TestCase {
      */
     private MessageDialog getConfirmDialog(String title, String message) {
         return new MessageDialog(getShell(), title, null, message,
-				MessageDialog.QUESTION, 0, IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL);
+                MessageDialog.QUESTION, new String[] {
+                        IDialogConstants.OK_LABEL,
+                        IDialogConstants.CANCEL_LABEL }, 0);
     }
 
 
@@ -67,7 +69,9 @@ public class TextMessageDialogs extends TestCase {
      */
     private MessageDialog getQuestionDialog(String title, String message) {
         return new MessageDialog(getShell(), title, null, message,
-				MessageDialog.QUESTION, 0, IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL);
+                MessageDialog.QUESTION,
+                new String[] { IDialogConstants.YES_LABEL,
+                        IDialogConstants.NO_LABEL }, 0);
     }
 
    public void testCloseFileDeleted() {
@@ -91,9 +95,11 @@ public class TextMessageDialogs extends TestCase {
                 getEditorString("Editor_error_activated_deleted_save_title"),
                 null,
                 getEditorString("Editor_error_activated_deleted_save_message"),
-                MessageDialog.QUESTION, 0,
-				getEditorString("Editor_error_activated_deleted_save_button_save"),
-				getEditorString("Editor_error_activated_deleted_save_button_close"));
+                MessageDialog.QUESTION,
+                new String[] {
+                        getEditorString("Editor_error_activated_deleted_save_button_save"),
+                        getEditorString("Editor_error_activated_deleted_save_button_close") },
+                0);
         DialogCheck.assertDialog(dialog, this);
     }
 

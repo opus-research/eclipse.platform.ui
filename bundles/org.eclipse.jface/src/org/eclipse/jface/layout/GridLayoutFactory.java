@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -375,45 +375,4 @@ public final class GridLayoutFactory {
         applyTo(c);
         LayoutGenerator.generateLayout(c);
     }
-
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("GridLayoutFactory.fillDefaults()\n"); //$NON-NLS-1$
-		if (l.numColumns > 1) {
-			builder.append("    .numColumns("); //$NON-NLS-1$
-			builder.append(l.numColumns);
-			builder.append(")\n"); //$NON-NLS-1$
-		}
-		if (l.makeColumnsEqualWidth) {
-			builder.append("    .equalWidth(true)\n"); //$NON-NLS-1$
-		}
-		if (l.marginBottom != 0 || l.marginTop != 0 || l.marginLeft != 0 || l.marginRight != 0) {
-			builder.append("    .extendedMargins("); //$NON-NLS-1$
-			builder.append(l.marginLeft);
-			builder.append(", "); //$NON-NLS-1$
-			builder.append(l.marginRight);
-			builder.append(", "); //$NON-NLS-1$
-			builder.append(l.marginTop);
-			builder.append(", "); //$NON-NLS-1$
-			builder.append(l.marginBottom);
-			builder.append(")\n"); //$NON-NLS-1$
-		}
-		if (l.marginWidth != 0 || l.marginHeight != 0) {
-			builder.append("    .margins("); //$NON-NLS-1$
-			builder.append(l.marginWidth);
-			builder.append(", "); //$NON-NLS-1$
-			builder.append(l.marginHeight);
-			builder.append(")\n"); //$NON-NLS-1$
-		}
-		Point defaultSpacing = LayoutConstants.getSpacing();
-		if (defaultSpacing.x != l.horizontalSpacing || defaultSpacing.y != l.verticalSpacing) {
-			builder.append("    .spacing("); //$NON-NLS-1$
-			builder.append(l.horizontalSpacing);
-			builder.append(", "); //$NON-NLS-1$
-			builder.append(l.verticalSpacing);
-			builder.append(")\n"); //$NON-NLS-1$
-		}
-		return builder.toString();
-	}
 }

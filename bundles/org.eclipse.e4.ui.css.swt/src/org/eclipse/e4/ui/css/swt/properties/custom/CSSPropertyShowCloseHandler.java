@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 Remy Chi Jian Suen and others.
+ * Copyright (c) 2009, 2012 Remy Chi Jian Suen and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,6 +25,8 @@ import org.w3c.dom.css.CSSStyleDeclaration;
 import org.w3c.dom.css.CSSValue;
 
 public class CSSPropertyShowCloseHandler extends CTabETabHelper implements ICSSPropertyHandler {
+
+	public static final ICSSPropertyHandler INSTANCE = new CSSPropertyShowCloseHandler();
 
 	private static final String CSS_CTABITEM_SELECTED_SHOW_CLOSE_LISTENER_KEY = "CSS_CTABFOLDER_SELECTED_SHOW_CLOSE_LISTENER_KEY"; //$NON-NLS-1$
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,8 +12,8 @@
 package org.eclipse.ui.forms.widgets;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.Scanner;
 
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.window.Window;
@@ -38,7 +38,9 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
@@ -106,12 +108,11 @@ public class FormToolkit {
 	KeyboardHandler keyboardHandler;
 
 	private class BorderPainter implements PaintListener {
-		@Override
 		public void paintControl(PaintEvent event) {
 			Composite composite = (Composite) event.widget;
 			Control[] children = composite.getChildren();
-			for (Control element : children) {
-				Control c = element;
+			for (int i = 0; i < children.length; i++) {
+				Control c = children[i];
 				boolean inactiveBorder = false;
 				boolean textBorder = false;
 				if (!c.isVisible())
@@ -170,7 +171,6 @@ public class FormToolkit {
 	private static class VisibilityHandler extends FocusAdapter {
 		private boolean handleNextFocusGained = true;
 
-		@Override
 		public void focusGained(FocusEvent e) {
 			if (!handleNextFocusGained) {
 				handleNextFocusGained = true;
@@ -182,7 +182,6 @@ public class FormToolkit {
 			}
 		}
 
-		@Override
 		public void focusLost(FocusEvent e) {
 			Widget w = e.widget;
 			if (w instanceof Control) {
@@ -192,7 +191,6 @@ public class FormToolkit {
 	}
 
 	private static class KeyboardHandler extends KeyAdapter {
-		@Override
 		public void keyPressed(KeyEvent e) {
 			Widget w = e.widget;
 			if (w instanceof Control) {
@@ -203,7 +201,7 @@ public class FormToolkit {
 	}
 
 	private class BoldFontHolder {
-		private Map<Font, Font> fontMap;
+		private Map fontMap;
 
 		public BoldFontHolder() {
 		}
@@ -214,11 +212,11 @@ public class FormToolkit {
 			}
 
 			if (fontMap == null) {
-				fontMap = new HashMap<>();
+				fontMap = new HashMap();
 			}
 
 			if (fontMap.containsKey(font)) {
-				return fontMap.get(font);
+				return (Font) fontMap.get(font);
 			}
 
 			Font boldFont = FormFonts.getInstance().getBoldFont(colors.getDisplay(),
@@ -232,7 +230,8 @@ public class FormToolkit {
 			if (fontMap == null) {
 				return;
 			}
-			for (Font boldFont : fontMap.values()) {
+			for (Iterator iter = fontMap.values().iterator(); iter.hasNext();) {
+				Font boldFont = (Font) iter.next();
 				if (boldFont != null && colors.getDisplay() != null) {
 					FormFonts.getInstance().markFinished(boldFont,
 							colors.getDisplay());
@@ -325,15 +324,18 @@ public class FormToolkit {
 	 */
 	public Composite createCompositeSeparator(Composite parent) {
 		final Composite composite = new Composite(parent, orientation);
-		composite.addListener(SWT.Paint, e -> {
-			if (composite.isDisposed())
-				return;
-			Rectangle bounds = composite.getBounds();
-			GC gc = e.gc;
-			gc.setForeground(colors.getColor(IFormColors.SEPARATOR));
-			if (colors.getBackground() != null)
-				gc.setBackground(colors.getBackground());
-			gc.fillGradientRectangle(0, 0, bounds.width, bounds.height, false);
+		composite.addListener(SWT.Paint, new Listener() {
+			public void handleEvent(Event e) {
+				if (composite.isDisposed())
+					return;
+				Rectangle bounds = composite.getBounds();
+				GC gc = e.gc;
+				gc.setForeground(colors.getColor(IFormColors.SEPARATOR));
+				if (colors.getBackground() != null)
+					gc.setBackground(colors.getBackground());
+				gc.fillGradientRectangle(0, 0, bounds.width, bounds.height,
+						false);
+			}
 		});
 		if (parent instanceof Section)
 			((Section) parent).setSeparatorControl(composite);
@@ -489,7 +491,6 @@ public class FormToolkit {
 	public void adapt(Composite composite) {
 		composite.setBackground(colors.getBackground());
 		composite.addMouseListener(new MouseAdapter() {
-			@Override
 			public void mouseDown(MouseEvent e) {
 				((Control) e.widget).setFocus();
 			}
@@ -531,8 +532,8 @@ public class FormToolkit {
 					.getColor(IFormColors.TB_TOGGLE));
 		}
 		section.setFont(boldFontHolder.getBoldFont(parent.getFont()));
-		if ((sectionStyle & ExpandableComposite.TITLE_BAR) != 0
-				|| (sectionStyle & ExpandableComposite.SHORT_TITLE_BAR) != 0) {
+		if ((sectionStyle & Section.TITLE_BAR) != 0
+				|| (sectionStyle & Section.SHORT_TITLE_BAR) != 0) {
 			colors.initializeSectionToolBarColors();
 			section.setTitleBarBackground(colors.getColor(IFormColors.TB_BG));
 			section.setTitleBarBorderColor(colors
@@ -900,8 +901,7 @@ public class FormToolkit {
 	private void initializeBorderStyle() {
 		String osname = System.getProperty("os.name"); //$NON-NLS-1$
 		String osversion = System.getProperty("os.version"); //$NON-NLS-1$
-		if (osname.startsWith("Windows") //$NON-NLS-1$
-				&& compareVersion(osversion, 5, 1) >= 0) {
+		if (osname.startsWith("Windows") && "5.1".compareTo(osversion) <= 0) { //$NON-NLS-1$ //$NON-NLS-2$
 			// Skinned widgets used on newer Windows (e.g. XP (5.1), Vista
 			// (6.0))
 			// Check for Windows Classic. If not used, set the style to BORDER
@@ -910,27 +910,6 @@ public class FormToolkit {
 				borderStyle = SWT.BORDER;
 		} else if (osname.startsWith("Mac")) //$NON-NLS-1$
 			borderStyle = SWT.BORDER;
-	}
-
-	private int compareVersion(String version, int... numbers) {
-		try (Scanner scanner = new Scanner(version)) {
-			scanner.useDelimiter("\\."); //$NON-NLS-1$
-
-			for (int number : numbers) {
-				if (!scanner.hasNextInt())
-					return -1;
-
-				int result = Integer.compare(scanner.nextInt(), number);
-				if (result != 0)
-					return result;
-			}
-
-			while (scanner.hasNextInt())
-				if (scanner.nextInt() > 0)
-					return 1;
-		}
-
-		return 0;
 	}
 
 	/**

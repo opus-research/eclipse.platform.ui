@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright (c) 2000, 2016 IBM Corporation and others.
+ *  Copyright (c) 2000, 2015 IBM Corporation and others.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -24,6 +24,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -60,7 +61,7 @@ public class Section extends ExpandableComposite {
 
 	private Control separator;
 
-	private Hashtable<String, Color> titleColors;
+	private Hashtable titleColors;
 
 	private static final String COLOR_BG = "bg"; //$NON-NLS-1$
 
@@ -87,12 +88,14 @@ public class Section extends ExpandableComposite {
 			descriptionControl = new Text(this, SWT.READ_ONLY | SWT.WRAP | rtl);
 		}
 		if ((style & TITLE_BAR) != 0) {
-			Listener listener = e -> {
-				Image image = Section.super.getBackgroundImage();
-				if (image != null) {
-					FormImages.getInstance().markFinished(image, getDisplay());
+			Listener listener = new Listener() {
+				public void handleEvent(Event e) {
+					Image image = Section.super.getBackgroundImage();
+					if (image != null) {
+						FormImages.getInstance().markFinished(image, getDisplay());
+					}
+					Section.super.setBackgroundImage(null);
 				}
-				Section.super.setBackgroundImage(null);
 			};
 			addListener(SWT.Dispose, listener);
 			addListener(SWT.Resize, listener);
@@ -103,7 +106,6 @@ public class Section extends ExpandableComposite {
 		return ((estyle & TITLE_BAR) != 0) ? SWT.NO_BACKGROUND : SWT.NULL;
 	}
 
-	@Override
 	protected void internalSetExpanded(boolean expanded) {
 		super.internalSetExpanded(expanded);
 		if ((getExpansionStyle() & TITLE_BAR) != 0) {
@@ -188,7 +190,6 @@ public class Section extends ExpandableComposite {
 	 *
 	 * @return separator control or <samp>null </samp> if not set.
 	 */
-	@Override
 	public Control getSeparatorControl() {
 		return separator;
 	}
@@ -199,7 +200,6 @@ public class Section extends ExpandableComposite {
 	 * @param bg
 	 *            the new background
 	 */
-	@Override
 	public void setBackground(Color bg) {
 		super.setBackground(bg);
 		if (descriptionControl != null
@@ -213,7 +213,6 @@ public class Section extends ExpandableComposite {
 	 * @param fg
 	 *            the new foreground.
 	 */
-	@Override
 	public void setForeground(Color fg) {
 		super.setForeground(fg);
 		if (descriptionControl != null
@@ -230,7 +229,6 @@ public class Section extends ExpandableComposite {
 	 *         not set by the client.
 	 * @see #setDescriptionControl(org.eclipse.swt.widgets.Control)
 	 */
-	@Override
 	public Control getDescriptionControl() {
 		return descriptionControl;
 	}
@@ -297,7 +295,7 @@ public class Section extends ExpandableComposite {
 	public Color getTitleBarBorderColor() {
 		if (titleColors == null)
 			return null;
-		return titleColors.get(COLOR_BORDER);
+		return (Color) titleColors.get(COLOR_BORDER);
 	}
 
 	/**
@@ -311,7 +309,7 @@ public class Section extends ExpandableComposite {
 			return null;
 		if ((getExpansionStyle() & SHORT_TITLE_BAR) != 0)
 			return getBackground();
-		return titleColors.get(COLOR_GBG);
+		return (Color) titleColors.get(COLOR_GBG);
 	}
 
 	/**
@@ -322,18 +320,17 @@ public class Section extends ExpandableComposite {
 	public Color getTitleBarBackground() {
 		if (titleColors == null)
 			return null;
-		return titleColors.get(COLOR_BG);
+		return (Color) titleColors.get(COLOR_BG);
 	}
 
 	private void putTitleBarColor(String key, Color color) {
 		if (color == null)
 			return;
 		if (titleColors == null)
-			titleColors = new Hashtable<>();
+			titleColors = new Hashtable();
 		titleColors.put(key, color);
 	}
 
-	@Override
 	protected void onPaint(PaintEvent e) {
 		Color bg = null;
 		Color fg = null;
@@ -353,9 +350,9 @@ public class Section extends ExpandableComposite {
 			gc = new GC(buffer);
 		}
 		if (titleColors != null) {
-			bg = titleColors.get(COLOR_BG);
+			bg = (Color) titleColors.get(COLOR_BG);
 			fg = getTitleBarForeground();
-			border = titleColors.get(COLOR_BORDER);
+			border = (Color) titleColors.get(COLOR_BORDER);
 		}
 		if (bg == null)
 			bg = getBackground();
@@ -464,7 +461,6 @@ public class Section extends ExpandableComposite {
 	/**
 	 * Background image is used for the title gradient - does nothing.
 	 */
-	@Override
 	public final void setBackgroundImage(Image image) {
 	}
 }

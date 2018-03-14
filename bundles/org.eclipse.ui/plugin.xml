@@ -1103,6 +1103,7 @@
             id="org.eclipse.ui.window.newEditor" />
       <command
             categoryId="org.eclipse.ui.category.window"
+            defaultHandler="org.eclipse.ui.internal.SplitHandler"
             description="%command.splitEditor.description"
             id="org.eclipse.ui.window.splitEditor"
             name="%command.splitEditor.name">
@@ -1161,18 +1162,6 @@
             description="%command.maximizePart.description"
             categoryId="org.eclipse.ui.category.window"
             id="org.eclipse.ui.window.maximizePart" />
-      <command
-            categoryId="org.eclipse.ui.category.window"
-            defaultHandler="org.eclipse.ui.internal.handlers.HideTrimBarsHandler"
-            description="%command.windowsHideTrimbars.description"
-            id="org.eclipse.ui.window.hidetrimbars"
-            name="%command.windowsHideTrimbars.name"/>
-      <command
-            categoryId="org.eclipse.ui.category.window"
-            defaultHandler="org.eclipse.ui.internal.handlers.FullScreenHandler"
-            description="%command.fullscreenmode.description"
-            id="org.eclipse.ui.window.fullscreenmode"
-            name="%command.fullscreenmode.name"/>
       <command
             categoryId="org.eclipse.ui.category.window"
             defaultHandler="org.eclipse.ui.internal.handlers.MinimizePartHandler"
@@ -2248,18 +2237,6 @@
             commandId="org.eclipse.ui.window.openEditorDropDown">
          <enabledWhen>
             <with
-                  variable="activePart">
-               <instanceof
-                     value="org.eclipse.ui.IWorkbenchPart">
-               </instanceof>
-            </with>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="org.eclipse.ui.internal.SplitHandler"
-            commandId="org.eclipse.ui.window.splitEditor">
-         <enabledWhen>
-            <with
                   variable="activeEditor">
                <instanceof
                      value="org.eclipse.ui.IEditorPart">
@@ -2279,7 +2256,7 @@
             </with>
          </enabledWhen>
       </handler>
-       <handler
+      <handler
             class="org.eclipse.ui.internal.handlers.MaximizePartHandler"
             commandId="org.eclipse.ui.window.maximizePart">
          <enabledWhen>

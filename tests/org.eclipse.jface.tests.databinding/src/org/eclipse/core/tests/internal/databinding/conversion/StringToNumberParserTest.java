@@ -24,6 +24,11 @@ import com.ibm.icu.text.NumberFormat;
 public class StringToNumberParserTest extends TestCase {
 	private NumberFormat integerFormat;
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -34,7 +39,7 @@ public class StringToNumberParserTest extends TestCase {
 	public void testParseNonStringThrowsIllegalArgumentException()
 			throws Exception {
 		try {
-			StringToNumberParser.parse(Integer.valueOf(0), integerFormat, false);
+			StringToNumberParser.parse(new Integer(0), integerFormat, false);
 			fail("exception should have been thrown");
 		} catch (IllegalArgumentException e) {
 		}
@@ -55,7 +60,7 @@ public class StringToNumberParserTest extends TestCase {
 	}
 
 	public void testReturnsNumberWhenSuccessfullyParsed() throws Exception {
-		Integer number = Integer.valueOf(5);
+		Integer number = new Integer(5);
 		ParseResult result = StringToNumberParser.parse(integerFormat
 				.format(number.longValue()), integerFormat, false);
 		assertNull(result.getPosition());

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2016 IBM Corporation and others.
+ * Copyright (c) 2003, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -22,9 +21,10 @@ import java.util.Observable;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 /**
@@ -46,14 +46,17 @@ public class BrowserManager extends Observable {
 	}
 
 	private BrowserManager() {
-		pcl = event -> {
-			String property = event.getKey();
-			if (!ignorePreferenceChanges && property.equals("browsers")) { //$NON-NLS-1$
-				loadBrowsers();
-			}
-			if (!property.equals(WebBrowserPreference.PREF_INTERNAL_WEB_BROWSER_HISTORY)) {
-				setChanged();
-				notifyObservers();
+		pcl = new IEclipsePreferences.IPreferenceChangeListener() {
+
+			public void preferenceChange(PreferenceChangeEvent event) {
+				String property = event.getKey();
+				if (!ignorePreferenceChanges && property.equals("browsers")) { //$NON-NLS-1$
+					loadBrowsers();
+				}
+				if (!property.equals(WebBrowserPreference.PREF_INTERNAL_WEB_BROWSER_HISTORY)) {
+					setChanged();
+					notifyObservers();
+				}
 			}
 		};
 
@@ -82,7 +85,7 @@ public class BrowserManager extends Observable {
 	public List<IBrowserDescriptor> getWebBrowsers() {
 		if (browsers == null)
 			loadBrowsers();
-		return new ArrayList<>(browsers);
+		return new ArrayList<IBrowserDescriptor>(browsers);
 	}
 
 	public void loadBrowsers() {
@@ -91,11 +94,11 @@ public class BrowserManager extends Observable {
 		String xmlString = Platform.getPreferencesService().getString
 		    (WebBrowserUIPlugin.PLUGIN_ID,  "browsers", null, null); //$NON-NLS-1$
 		if (xmlString != null && xmlString.length() > 0) {
-			browsers = new ArrayList<>();
+			browsers = new ArrayList<IBrowserDescriptor>();
 
 			try {
-				ByteArrayInputStream in = new ByteArrayInputStream(xmlString.getBytes(StandardCharsets.UTF_8));
-				Reader reader = new InputStreamReader(in, StandardCharsets.UTF_8);
+				ByteArrayInputStream in = new ByteArrayInputStream(xmlString.getBytes("utf-8")); //$NON-NLS-1$
+				Reader reader = new InputStreamReader(in, "utf-8"); //$NON-NLS-1$
 				IMemento memento = XMLMemento.createReadRoot(reader);
 
 				IMemento system = memento.getChild("system"); //$NON-NLS-1$
@@ -168,7 +171,7 @@ public class BrowserManager extends Observable {
 	}
 
 	protected void setupDefaultBrowsers() {
-		browsers = new ArrayList<>();
+		browsers = new ArrayList<IBrowserDescriptor>();
 
 		// add system browser
 		if (WebBrowserUtil.canUseSystemBrowser()) {

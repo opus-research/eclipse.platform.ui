@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2016 IBM Corporation and others.
+ * Copyright (c) 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,84 +38,52 @@ public class SelectionServiceImpl implements ESelectionService {
 
 	@Override
 	public Object getSelection() {
-		SelectionAggregator aggregator = getServiceAggregator();
-		if (aggregator != null) {
-			return aggregator.getSelection();
-		}
-		return null;
+		return getServiceAggregator().getSelection();
 	}
 
 	@Override
 	public Object getSelection(String partId) {
-		SelectionAggregator aggregator = getServiceAggregator();
-		if (aggregator != null) {
-			return aggregator.getSelection(partId);
-		}
-		return null;
+		return getServiceAggregator().getSelection(partId);
 	}
 
 	@Override
 	public void addSelectionListener(ISelectionListener listener) {
-		SelectionAggregator aggregator = getServiceAggregator();
-		if (aggregator != null) {
-			aggregator.addSelectionListener(listener);
-		}
+		getServiceAggregator().addSelectionListener(listener);
 	}
 
 	@Override
 	public void removeSelectionListener(ISelectionListener listener) {
-		SelectionAggregator aggregator = getServiceAggregator();
-		if (aggregator != null) {
-			aggregator.removeSelectionListener(listener);
-		}
+		getServiceAggregator().removeSelectionListener(listener);
 	}
 
 	@Override
 	public void addSelectionListener(String partId, ISelectionListener listener) {
-		SelectionAggregator aggregator = getServiceAggregator();
-		if (aggregator != null) {
-			aggregator.addSelectionListener(partId, listener);
-		}
+		getServiceAggregator().addSelectionListener(partId, listener);
 	}
 
 	@Override
 	public void removeSelectionListener(String partId, ISelectionListener listener) {
-		SelectionAggregator aggregator = getServiceAggregator();
-		if (aggregator != null) {
-			aggregator.removeSelectionListener(partId, listener);
-		}
+		getServiceAggregator().removeSelectionListener(partId, listener);
 	}
 
 	@Override
 	public void addPostSelectionListener(ISelectionListener listener) {
-		SelectionAggregator aggregator = getServiceAggregator();
-		if (aggregator != null) {
-			aggregator.addPostSelectionListener(listener);
-		}
+		getServiceAggregator().addPostSelectionListener(listener);
 	}
 
 	@Override
 	public void removePostSelectionListener(ISelectionListener listener) {
-		SelectionAggregator aggregator = getServiceAggregator();
-		if (aggregator != null) {
-			aggregator.removePostSelectionListener(listener);
-		}
+		getServiceAggregator().removePostSelectionListener(listener);
 	}
 
 	@Override
 	public void addPostSelectionListener(String partId, ISelectionListener listener) {
-		SelectionAggregator aggregator = getServiceAggregator();
-		if (aggregator != null) {
-			aggregator.addPostSelectionListener(partId, listener);
-		}
+		getServiceAggregator().addPostSelectionListener(partId, listener);
 	}
 
 	@Override
 	public void removePostSelectionListener(String partId, ISelectionListener listener) {
-		SelectionAggregator aggregator = getServiceAggregator();
-		if (aggregator != null) {
-			aggregator.removePostSelectionListener(partId, listener);
-		}
+		getServiceAggregator().removePostSelectionListener(partId, listener);
 	}
 
 	private SelectionAggregator getServiceAggregator() {
@@ -126,9 +94,6 @@ public class SelectionServiceImpl implements ESelectionService {
 		if (app == null)
 			return null;
 		MWindow selectedWindow = app.getSelectedElement();
-		IEclipseContext windowContext = selectedWindow.getContext();
-		if (windowContext == null)
-			return null;
-		return windowContext.get(SelectionAggregator.class);
+		return selectedWindow.getContext().get(SelectionAggregator.class);
 	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.ui.forms.editor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.forms.IFormPart;
@@ -46,12 +47,10 @@ public abstract class SharedHeaderFormEditor extends FormEditor {
 			return (FormEditor) getContainer();
 		}
 
-		@Override
 		public void dirtyStateChanged() {
 			getEditor().editorDirtyStateChanged();
 		}
 
-		@Override
 		public void staleStateChanged() {
 			refresh();
 		}
@@ -75,7 +74,6 @@ public abstract class SharedHeaderFormEditor extends FormEditor {
 	 * @see org.eclipse.ui.part.MultiPageEditorPart#createPageContainer(org.eclipse.swt.widgets.Composite)
 	 */
 
-	@Override
 	protected Composite createPageContainer(Composite parent) {
 		parent = super.createPageContainer(parent);
 		parent.setLayout(new FillLayout());
@@ -96,7 +94,6 @@ public abstract class SharedHeaderFormEditor extends FormEditor {
 		return headerForm;
 	}
 
-	@Override
 	protected void createPages() {
 		super.createPages();
 
@@ -107,14 +104,12 @@ public abstract class SharedHeaderFormEditor extends FormEditor {
 		}
 	}
 
-	@Override
 	protected void setActivePage(int pageIndex) {
 		// programmatic focus change
 		wasHeaderActive= false;
 		super.setActivePage(pageIndex);
 	}
 
-	@Override
 	public void setFocus() {
 		installActivationListener();
 		if (wasHeaderActive)
@@ -130,28 +125,33 @@ public abstract class SharedHeaderFormEditor extends FormEditor {
 
 	private void installActivationListener() {
 		if (activationListener == null) {
-			activationListener = event -> {
-				boolean wasHeaderActive = event.widget != getContainer();
+			activationListener = new Listener() {
+				public void handleEvent(Event event) {
+					boolean wasHeaderActive = event.widget != getContainer();
 
-				int activePage = getActivePage();
-				if (SharedHeaderFormEditor.this.wasHeaderActive != wasHeaderActive && activePage != -1
-						&& pages.get(activePage) instanceof IEditorPart) {
+					int activePage = getActivePage();
+					if (SharedHeaderFormEditor.this.wasHeaderActive != wasHeaderActive && activePage != -1 && pages.get(activePage) instanceof IEditorPart) {
 
-					if (wasHeaderActive) {
-						deactivateSite(true, true);
-					} else {
-						activateSite();
+						if (wasHeaderActive) {
+							deactivateSite(true, true);
+						} else {
+							activateSite();
+						}
 					}
-				}
 
-				SharedHeaderFormEditor.this.wasHeaderActive = wasHeaderActive;
+					SharedHeaderFormEditor.this.wasHeaderActive = wasHeaderActive;
+				}
 			};
 			getContainer().addListener(SWT.Activate, activationListener);
 			getHeaderForm().getForm().getForm().getHead().addListener(SWT.Activate, activationListener);
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.forms.editor.FormEditor#dispose()
+	 */
 	public void dispose() {
 		if (headerForm != null) {
 			headerForm.dispose();
@@ -160,7 +160,11 @@ public abstract class SharedHeaderFormEditor extends FormEditor {
 		super.dispose();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.forms.editor.FormEditor#isDirty()
+	 */
 	public boolean isDirty() {
 		if (headerForm != null && headerForm.isDirty()) {
 			return true;
@@ -168,7 +172,11 @@ public abstract class SharedHeaderFormEditor extends FormEditor {
 		return super.isDirty();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.forms.editor.FormEditor#commitPages(boolean)
+	 */
 	protected void commitPages(boolean onSave) {
 		if (headerForm != null && headerForm.isDirty())
 			headerForm.commit(onSave);

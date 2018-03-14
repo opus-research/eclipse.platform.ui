@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -51,7 +51,7 @@ public class GenTopic implements IApplication {
 	private void processLiterals(Class<?> literals)
 			throws IllegalArgumentException, IllegalAccessException {
 		Field[] fields = literals.getFields();
-		Map<String, EClass> classes = new TreeMap<>();
+		Map<String, EClass> classes = new TreeMap<String, EClass>();
 		for (int i = 0; i < fields.length; i++) {
 			Object value = fields[i].get(null);
 			if (value instanceof EClass) {
@@ -84,7 +84,7 @@ public class GenTopic implements IApplication {
 		System.out
 				.print(String.format(topicAllDeclaration, pkgName, className));
 
-		Set<String> names = new TreeSet<>();
+		Set<String> names = new TreeSet<String>();
 		for (EStructuralFeature feature : features) {
 			names.add(feature.getName());
 		}

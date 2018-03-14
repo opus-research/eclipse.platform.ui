@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@ package org.eclipse.ui.internal.registry;
 
 import java.util.ArrayList;
 import java.util.StringTokenizer;
+
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -107,27 +108,39 @@ public class Category implements IWorkbenchAdapter, IPluginContribution, IAdapta
         elements.add(element);
     }
 
-	@Override
-	public <T> T getAdapter(Class<T> adapter) {
+    /* (non-Javadoc)
+     * Method declared on IAdaptable.
+     */
+    @Override
+	public Object getAdapter(Class adapter) {
         if (adapter == IWorkbenchAdapter.class) {
-			return adapter.cast(this);
+			return this;
 		} else if (adapter == IConfigurationElement.class) {
-			return adapter.cast(configurationElement);
+			return configurationElement;
 		} else {
 			return null;
 		}
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchAdapter.
+     */
     @Override
 	public Object[] getChildren(Object o) {
         return getElements().toArray();
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchAdapter.
+     */
     @Override
 	public ImageDescriptor getImageDescriptor(Object object) {
         return WorkbenchImages.getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchAdapter.
+     */
     @Override
 	public String getLabel(Object o) {
         return getLabel();
@@ -235,16 +248,25 @@ public class Category implements IWorkbenchAdapter, IPluginContribution, IAdapta
         return false;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.model.IWorkbenchAdapter#getParent(java.lang.Object)
+     */
     @Override
 	public Object getParent(Object o) {
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.activities.support.IPluginContribution#getLocalId()
+     */
     @Override
 	public String getLocalId() {
         return id;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.activities.support.IPluginContribution#getPluginId()
+     */
     @Override
 	public String getPluginId() {
         return configurationElement == null ? pluginId : configurationElement

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2016 IBM Corporation and others.
+ * Copyright (c) 2006, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.util.Util;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -24,6 +25,7 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
+import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -137,12 +139,12 @@ public class ControlDecoration {
 	/**
 	 * Registered selection listeners.
 	 */
-	private ListenerList<SelectionListener> selectionListeners = new ListenerList<>();
+	private ListenerList selectionListeners = new ListenerList();
 
 	/**
 	 * Registered menu detect listeners.
 	 */
-	private ListenerList<MenuDetectListener> menuDetectListeners = new ListenerList<>();
+	private ListenerList menuDetectListeners = new ListenerList();
 
 	/**
 	 * The focus listener
@@ -271,10 +273,13 @@ public class ControlDecoration {
 					.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
 			hoverShell.setForeground(display
 					.getSystemColor(SWT.COLOR_INFO_FOREGROUND));
-			hoverShell.addPaintListener(pe -> {
-				pe.gc.drawText(text, hm, hm);
-				if (!MAC) {
-					pe.gc.drawPolygon(getPolygon(true));
+			hoverShell.addPaintListener(new PaintListener() {
+				@Override
+				public void paintControl(PaintEvent pe) {
+					pe.gc.drawText(text, hm, hm);
+					if (!MAC) {
+						pe.gc.drawPolygon(getPolygon(true));
+					}
 				}
 			});
 			hoverShell.addMouseListener(new MouseAdapter() {
@@ -593,7 +598,12 @@ public class ControlDecoration {
 	 * the decoration is to be rendered.
 	 */
 	private void addControlListeners() {
-		disposeListener = event -> dispose();
+		disposeListener = new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent event) {
+				dispose();
+			}
+		};
 		printAddListener(control, "DISPOSE"); //$NON-NLS-1$
 		control.addDisposeListener(disposeListener);
 
@@ -618,25 +628,31 @@ public class ControlDecoration {
 		control.addFocusListener(focusListener);
 
 		// Listener for painting the decoration
-		paintListener = event -> {
-			Control control = (Control) event.widget;
-			Rectangle rect = getDecorationRectangle(control);
-			if (shouldShowDecoration()) {
-				event.gc.drawImage(getImage(), rect.x, rect.y);
+		paintListener = new PaintListener() {
+			@Override
+			public void paintControl(PaintEvent event) {
+				Control control = (Control) event.widget;
+				Rectangle rect = getDecorationRectangle(control);
+				if (shouldShowDecoration()) {
+					event.gc.drawImage(getImage(), rect.x, rect.y);
+				}
 			}
 		};
 
 		// Listener for tracking the end of a hover. Only installed
 		// after a hover begins.
-		mouseMoveListener = event -> {
-			if (showHover) {
-				if (!decorationRectangle.contains(event.x, event.y)) {
-					hideHover();
-					// No need to listen any longer
-					printRemoveListener(event.widget, "MOUSEMOVE"); //$NON-NLS-1$
-					((Control) event.widget)
-							.removeMouseMoveListener(mouseMoveListener);
-					moveListeningTarget = null;
+		mouseMoveListener = new MouseMoveListener() {
+			@Override
+			public void mouseMove(MouseEvent event) {
+				if (showHover) {
+					if (!decorationRectangle.contains(event.x, event.y)) {
+						hideHover();
+						// No need to listen any longer
+						printRemoveListener(event.widget, "MOUSEMOVE"); //$NON-NLS-1$
+						((Control) event.widget)
+								.removeMouseMoveListener(mouseMoveListener);
+						moveListeningTarget = null;
+					}
 				}
 			}
 		};
@@ -687,25 +703,28 @@ public class ControlDecoration {
 			}
 		};
 
-		compositeListener = event -> {
-			// Don't forward events if decoration is not showing
-			if (!visible) {
-				return;
-			}
-			// Notify listeners if any are registered.
-			switch (event.type) {
-			case SWT.MouseDown:
-				if (!selectionListeners.isEmpty())
-					notifySelectionListeners(event);
-				break;
-			case SWT.MouseDoubleClick:
-				if (!selectionListeners.isEmpty())
-					notifySelectionListeners(event);
-				break;
-			case SWT.MenuDetect:
-				if (!menuDetectListeners.isEmpty())
-					notifyMenuDetectListeners(event);
-				break;
+		compositeListener = new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				// Don't forward events if decoration is not showing
+				if (!visible) {
+					return;
+				}
+				// Notify listeners if any are registered.
+				switch (event.type) {
+				case SWT.MouseDown:
+					if (!selectionListeners.isEmpty())
+						notifySelectionListeners(event);
+					break;
+				case SWT.MouseDoubleClick:
+					if (!selectionListeners.isEmpty())
+						notifySelectionListeners(event);
+					break;
+				case SWT.MenuDetect:
+					if (!menuDetectListeners.isEmpty())
+						notifyMenuDetectListeners(event);
+					break;
+				}
 			}
 		};
 
@@ -783,18 +802,23 @@ public class ControlDecoration {
 				clientEvent.height = getImage().getBounds().height;
 				clientEvent.width = getImage().getBounds().width;
 			}
+			Object[] listeners;
 			switch (event.type) {
 			case SWT.MouseDoubleClick:
 				if (event.button == 1) {
-					for (SelectionListener l : selectionListeners) {
-						l.widgetDefaultSelected(clientEvent);
+					listeners = selectionListeners.getListeners();
+					for (int i = 0; i < listeners.length; i++) {
+						((SelectionListener) listeners[i])
+								.widgetDefaultSelected(clientEvent);
 					}
 				}
 				break;
 			case SWT.MouseDown:
 				if (event.button == 1) {
-					for (SelectionListener l : selectionListeners) {
-						l.widgetSelected(clientEvent);
+					listeners = selectionListeners.getListeners();
+					for (int i = 0; i < listeners.length; i++) {
+						((SelectionListener) listeners[i])
+								.widgetSelected(clientEvent);
 					}
 				}
 				break;
@@ -806,8 +830,9 @@ public class ControlDecoration {
 		if (getDecorationRectangle(null).contains(event.x, event.y)) {
 			MenuDetectEvent clientEvent = new MenuDetectEvent(event);
 			clientEvent.data = this;
-			for (MenuDetectListener l : menuDetectListeners) {
-				l.menuDetected(clientEvent);
+			Object[] listeners = menuDetectListeners.getListeners();
+			for (int i = 0; i < listeners.length; i++) {
+				((MenuDetectListener) listeners[i]).menuDetected(clientEvent);
 
 			}
 		}
