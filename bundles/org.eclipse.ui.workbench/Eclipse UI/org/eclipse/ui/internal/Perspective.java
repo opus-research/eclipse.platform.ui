@@ -36,6 +36,14 @@ public class Perspective {
 	private final List<IActionSetDescriptor> alwaysOffActionSets;
 	private final MPerspective layout;
 
+	/**
+	 * @param desc
+	 *            can be null
+	 * @param layout
+	 *            non null
+	 * @param page
+	 *            non null
+	 */
 	public Perspective(PerspectiveDescriptor desc, MPerspective layout, WorkbenchPage page) {
 		this.page = page;
 		this.layout = layout;
@@ -130,12 +138,8 @@ public class Perspective {
 		if (descriptor == null) {
 			return;
 		}
-		if (!alwaysOnActionSets.contains(descriptor)) {
-			return;
-		}
-
-		alwaysOnActionSets.remove(descriptor);
-		if (page != null) {
+		boolean removed = alwaysOnActionSets.remove(descriptor);
+		if (removed) {
 			page.perspectiveActionSetChanged(this, descriptor, ActionSetManager.CHANGE_HIDE);
 		}
 	}
@@ -148,9 +152,7 @@ public class Perspective {
 			return;
 		}
 		alwaysOffActionSets.add(descriptor);
-		if (page != null) {
-			page.perspectiveActionSetChanged(this, descriptor, ActionSetManager.CHANGE_MASK);
-		}
+		page.perspectiveActionSetChanged(this, descriptor, ActionSetManager.CHANGE_MASK);
 		removeAlwaysOn(descriptor);
 	}
 
@@ -162,9 +164,7 @@ public class Perspective {
 			return;
 		}
 		alwaysOnActionSets.add(descriptor);
-		if (page != null) {
-			page.perspectiveActionSetChanged(this, descriptor, ActionSetManager.CHANGE_SHOW);
-		}
+		page.perspectiveActionSetChanged(this, descriptor, ActionSetManager.CHANGE_SHOW);
 		removeAlwaysOff(descriptor);
 	}
 
@@ -172,11 +172,8 @@ public class Perspective {
 		if (descriptor == null) {
 			return;
 		}
-		if (!alwaysOffActionSets.contains(descriptor)) {
-			return;
-		}
-		alwaysOffActionSets.remove(descriptor);
-		if (page != null) {
+		boolean removed = alwaysOffActionSets.remove(descriptor);
+		if (removed) {
 			page.perspectiveActionSetChanged(this, descriptor, ActionSetManager.CHANGE_UNMASK);
 		}
 	}
@@ -192,15 +189,13 @@ public class Perspective {
 	}
 
 	public void turnOnActionSets(IActionSetDescriptor[] newArray) {
-		for (int i = 0; i < newArray.length; i++) {
-			IActionSetDescriptor descriptor = newArray[i];
+		for (IActionSetDescriptor descriptor : newArray) {
 			addActionSet(descriptor);
 		}
 	}
 
 	public void turnOffActionSets(IActionSetDescriptor[] toDisable) {
-		for (int i = 0; i < toDisable.length; i++) {
-			IActionSetDescriptor descriptor = toDisable[i];
+		for (IActionSetDescriptor descriptor : toDisable) {
 			turnOffActionSet(descriptor);
 		}
 	}
@@ -214,8 +209,7 @@ public class Perspective {
 		IContextService service = page.getWorkbenchWindow().getService(IContextService.class);
 		try {
 			service.deferUpdates(true);
-			for (int i = 0; i < alwaysOnActionSets.size(); i++) {
-				IActionSetDescriptor desc = alwaysOnActionSets.get(i);
+			for (IActionSetDescriptor desc : alwaysOnActionSets) {
 				if (desc.getId().equals(newDesc.getId())) {
 					removeAlwaysOn(desc);
 					removeAlwaysOff(desc);
@@ -241,16 +235,14 @@ public class Perspective {
 		IContextService service = page.getWorkbenchWindow().getService(IContextService.class);
 		try {
 			service.deferUpdates(true);
-			for (int i = 0; i < alwaysOnActionSets.size(); i++) {
-				IActionSetDescriptor desc = alwaysOnActionSets.get(i);
+			for (IActionSetDescriptor desc : alwaysOnActionSets) {
 				if (desc.getId().equals(id)) {
 					removeAlwaysOn(desc);
 					break;
 				}
 			}
 
-			for (int i = 0; i < alwaysOffActionSets.size(); i++) {
-				IActionSetDescriptor desc = alwaysOffActionSets.get(i);
+			for (IActionSetDescriptor desc : alwaysOffActionSets) {
 				if (desc.getId().equals(id)) {
 					removeAlwaysOff(desc);
 					break;
@@ -259,9 +251,7 @@ public class Perspective {
 			addAlwaysOff(toRemove);
 			// remove tag
 			String tag = ModeledPageLayout.ACTION_SET_TAG + id;
-			if (layout.getTags().contains(tag)) {
-				layout.getTags().remove(tag);
-			}
+			layout.getTags().remove(tag);
 		} finally {
 			service.deferUpdates(false);
 		}
