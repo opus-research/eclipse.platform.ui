@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 411578
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 485201
  *******************************************************************************/
 package org.eclipse.ui.ide;
 
@@ -1012,8 +1013,13 @@ public final class IDE {
 		IUnknownEditorStrategy strategy = getUnknowEditorStrategy();
 		IEditorDescriptor editorDesc = strategy.getEditorDescriptor(name, editorReg);
 
+		// user cancelled the operation
+		if (IStatus.CANCEL == strategy.getStatus()) {
+			throw new PartInitException(IDEWorkbenchMessages.IDE_noFileEditorChoose);
+		}
+
 		// if no valid editor found, bail out
-		if (editorDesc == null) {
+		if (IStatus.ERROR == strategy.getStatus() || editorDesc == null) {
 			throw new PartInitException(
 					IDEWorkbenchMessages.IDE_noFileEditorFound);
 		}

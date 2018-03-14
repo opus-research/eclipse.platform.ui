@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 IBM Corportation, Red Hat Inc. and others
+ * Copyright (c) 2015, 2016 IBM Corporation, Red Hat Inc. and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,9 +7,11 @@
  *
  * Contributors:
  *     Mickael Istria (Red Hat Inc.) - extracted from IDE.getEditorDescription
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 485201
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.ide.IUnknownEditorStrategy;
@@ -20,6 +22,8 @@ import org.eclipse.ui.ide.IUnknownEditorStrategy;
  */
 public final class SystemEditorOrTextEditorStrategy implements IUnknownEditorStrategy {
 	static final String EXTENSION_ID = "org.eclipse.ui.ide.systemEditorThenTextEditor"; //$NON-NLS-1$
+
+	private int status = IStatus.ERROR;
 
 	@Override
 	public IEditorDescriptor getEditorDescriptor(String name, IEditorRegistry editorReg) {
@@ -38,6 +42,18 @@ public final class SystemEditorOrTextEditorStrategy implements IUnknownEditorStr
 		if (editorDesc == null) {
 			editorDesc = editorReg.findEditor(IDEWorkbenchPlugin.DEFAULT_TEXT_EDITOR_ID);
 		}
+
+		status = (editorDesc != null) ? IStatus.OK : IStatus.ERROR;
+
 		return editorDesc;
 	}
+
+	/**
+	 * @return Returns the status.
+	 */
+	@Override
+	public int getStatus() {
+		return status;
+	}
+
 }
