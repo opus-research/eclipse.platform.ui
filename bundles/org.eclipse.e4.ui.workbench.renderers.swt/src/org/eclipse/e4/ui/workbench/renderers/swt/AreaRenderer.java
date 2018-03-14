@@ -7,14 +7,15 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 485848, 485849, 485850
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 485848
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import java.util.List;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
-import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
@@ -28,6 +29,7 @@ import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.osgi.service.event.Event;
+import org.osgi.service.event.EventHandler;
 
 /**
  * Default SWT renderer responsible for an MArea. See
@@ -36,52 +38,72 @@ import org.osgi.service.event.Event;
 public class AreaRenderer extends SWTPartRenderer {
 
 	@Inject
-	@Optional
-	private void handleTopicUpdateLabels(@UIEventTopic(UIEvents.UILabel.TOPIC_ALL) Event event) {
-		// Ensure that this event is for a MArea
-		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MArea))
-			return;
+	private IEventBroker eventBroker;
 
-		MArea areaModel = (MArea) event.getProperty(UIEvents.EventTags.ELEMENT);
-		CTabFolder ctf = (CTabFolder) areaModel.getWidget();
-		CTabItem areaItem = ctf.getItem(0);
+	private EventHandler itemUpdater = new EventHandler() {
+		@Override
+		public void handleEvent(Event event) {
+			// Ensure that this event is for a MArea
+			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MArea))
+				return;
 
-		// No widget == nothing to update
-		if (areaItem == null)
-			return;
+			MArea areaModel = (MArea) event
+					.getProperty(UIEvents.EventTags.ELEMENT);
+			CTabFolder ctf = (CTabFolder) areaModel.getWidget();
+			CTabItem areaItem = ctf.getItem(0);
 
-		String attName = (String) event.getProperty(UIEvents.EventTags.ATTNAME);
-		if (UIEvents.UILabel.LABEL.equals(attName) || UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
-			areaItem.setText(areaModel.getLocalizedLabel());
-		} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
-			areaItem.setImage(getImage(areaModel));
-		} else if (UIEvents.UILabel.TOOLTIP.equals(attName) || UIEvents.UILabel.LOCALIZED_TOOLTIP.equals(attName)) {
-			areaItem.setToolTipText(areaModel.getLocalizedTooltip());
+			// No widget == nothing to update
+			if (areaItem == null)
+				return;
+
+			String attName = (String) event
+					.getProperty(UIEvents.EventTags.ATTNAME);
+			if (UIEvents.UILabel.LABEL.equals(attName)
+					|| UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
+				areaItem.setText(areaModel.getLocalizedLabel());
+			} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
+				areaItem.setImage(getImage(areaModel));
+			} else if (UIEvents.UILabel.TOOLTIP.equals(attName)
+					|| UIEvents.UILabel.LOCALIZED_TOOLTIP.equals(attName)) {
+				areaItem.setToolTipText(areaModel.getLocalizedTooltip());
+			}
 		}
+	};
+
+	private EventHandler widgetListener = new EventHandler() {
+		@Override
+		public void handleEvent(Event event) {
+			final MUIElement changedElement = (MUIElement) event
+					.getProperty(EventTags.ELEMENT);
+			if (!(changedElement instanceof MPartStack))
+				return;
+
+			MArea areaModel = findArea(changedElement);
+			if (areaModel != null)
+				synchCTFState(areaModel);
+		}
+
+		private MArea findArea(MUIElement element) {
+			MUIElement parent = element.getParent();
+			while (parent != null) {
+				if (parent instanceof MArea)
+					return (MArea) parent;
+				parent = parent.getParent();
+			}
+			return null;
+		}
+	};
+
+	@PostConstruct
+	void init() {
+		eventBroker.subscribe(UIEvents.UILabel.TOPIC_ALL, itemUpdater);
+		eventBroker.subscribe(UIElement.TOPIC_WIDGET, widgetListener);
 	}
 
-	@Inject
-	@Optional
-	private void handleTopicWidgets(@UIEventTopic(UIElement.TOPIC_WIDGET) Event event)
-	{
-		final MUIElement changedElement = (MUIElement) event.getProperty(EventTags.ELEMENT);
-		if (!(changedElement instanceof MPartStack))
-			return;
-
-		MArea areaModel = findArea(changedElement);
-		if (areaModel != null)
-			synchCTFState(areaModel);
-	}
-
-
-	private MArea findArea(MUIElement element) {
-		MUIElement parent = element.getParent();
-		while (parent != null) {
-			if (parent instanceof MArea)
-				return (MArea) parent;
-			parent = parent.getParent();
-		}
-		return null;
+	@PreDestroy
+	void contextDisposed() {
+		eventBroker.unsubscribe(itemUpdater);
+		eventBroker.unsubscribe(widgetListener);
 	}
 
 	@Override
@@ -147,7 +169,7 @@ public class AreaRenderer extends SWTPartRenderer {
 
 		curComp.setData(AbstractPartRenderer.OWNING_ME, null);
 		bindWidget(areaModel, ctf);
-		ctf.requestLayout();
+		ctf.getParent().layout(null, SWT.ALL | SWT.DEFER | SWT.CHANGED);
 	}
 
 	private void ensureComposite(MArea areaModel) {
@@ -178,8 +200,6 @@ public class AreaRenderer extends SWTPartRenderer {
 
 			bindWidget(areaModel, innerComp);
 			innerComp.setVisible(true);
-
-			innerComp.getParent().requestLayout();
 			innerComp.getParent().layout(true, true);
 		}
 	}
