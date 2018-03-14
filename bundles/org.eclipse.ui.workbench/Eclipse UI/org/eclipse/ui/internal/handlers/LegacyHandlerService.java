@@ -128,18 +128,16 @@ public class LegacyHandlerService implements IHandlerService {
 				}
 			}
 
-			E4HandlerProxy bestHandler = null;
 			if (bestActivation != null) {
 				if (bestActivation == conflictBest) {
 					WorkbenchPlugin.log("Conflicting handlers for " + commandId + ": {" //$NON-NLS-1$ //$NON-NLS-2$
 							+ conflictBest.getHandler() + "} vs {" //$NON-NLS-1$
 							+ conflictOther.getHandler() + "}"); //$NON-NLS-1$
-				} else {
-					bestHandler = bestActivation.proxy;
 				}
+				return bestActivation.proxy;
 			}
 
-			return bestHandler;
+			return null;
 		}
 	}
 
