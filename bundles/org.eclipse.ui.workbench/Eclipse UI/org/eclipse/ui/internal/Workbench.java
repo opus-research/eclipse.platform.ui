@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Francis Upton - <francisu@ieee.org> -
+ *     Francis Upton - <francisu@ieee.org> - 
  *     		Fix for Bug 217777 [Workbench] Workbench event loop does not terminate if Display is closed
  *     Tristan Hume - <trishume@gmail.com> -
  *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
@@ -615,6 +615,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 					boolean showProgress = PrefUtil.getAPIPreferenceStore().getBoolean(
 									IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP);
+					showProgress = true;
 
 					IProgressMonitor progressMonitor = null;
 					if (handler != null && showProgress) {
