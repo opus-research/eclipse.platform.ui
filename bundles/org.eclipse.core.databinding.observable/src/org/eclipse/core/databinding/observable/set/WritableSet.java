@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Brad Reynolds - bug 147515
  *     Matthew Hall - bug 221351
- *     Steven Spungin <steven@spungin.tv> - Bug 432440
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.set;
@@ -156,23 +155,9 @@ public class WritableSet extends ObservableSet {
 	}
 
 	public void clear() {
-		try {
-			getterCalled();
-		} catch (Exception e) {
-			// Ignore assert for disposed widgets
-		}
-		Set removes;
-		try {
-			// Calling HashSet here was calling HashCode, and that caused issues
-			// with disposed observables.
-			removes = new FakeSet(wrappedSet);
-		} catch (Exception e) {
-			e.printStackTrace();
-			// Ignore assert for disposed widgets
-			removes = new HashSet();
-		} finally {
-			wrappedSet.clear();
-		}
+		getterCalled();
+		Set removes = new HashSet(wrappedSet);
+		wrappedSet.clear();
 		fireSetChange(Diffs.createSetDiff(Collections.EMPTY_SET, removes));
 	}
 
