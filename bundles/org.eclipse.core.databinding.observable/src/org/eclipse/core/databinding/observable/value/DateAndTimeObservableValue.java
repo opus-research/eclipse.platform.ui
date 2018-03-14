@@ -186,7 +186,7 @@ public class DateAndTimeObservableValue extends AbstractObservableValue<Date> {
 	}
 
 	/**
-	 * @since 1.6
+	 * @since 1.7
 	 */
 	@Override
 	protected Date doGetValue() {
@@ -219,7 +219,7 @@ public class DateAndTimeObservableValue extends AbstractObservableValue<Date> {
 	}
 
 	/**
-	 * @since 1.6
+	 * @since 1.7
 	 */
 	@Override
 	protected void doSetValue(Date combinedDate) {

@@ -64,7 +64,7 @@ public class MultiList<E> extends AbstractObservableList<E> {
 	 *
 	 * @param lists
 	 *            the array of observable lists backing this MultiList.
-	 * @since 1.6
+	 * @since 1.7
 	 */
 	public MultiList(List<IObservableList<E>> lists) {
 		this(Realm.getDefault(), lists, null);
@@ -93,7 +93,7 @@ public class MultiList<E> extends AbstractObservableList<E> {
 	 *            the array of observable lists backing this MultiList.
 	 * @param elementType
 	 *            element type of the constructed list.
-	 * @since 1.6
+	 * @since 1.7
 	 */
 	public MultiList(List<IObservableList<E>> lists, Object elementType) {
 		this(Realm.getDefault(), lists, elementType);
@@ -150,7 +150,7 @@ public class MultiList<E> extends AbstractObservableList<E> {
 	 *            the array of observable lists backing this MultiList
 	 * @param elementType
 	 *            element type of the constructed list.
-	 * @since 1.6
+	 * @since 1.7
 	 */
 	public MultiList(Realm realm, List<IObservableList<E>> lists, Object elementType) {
 		super(realm);
