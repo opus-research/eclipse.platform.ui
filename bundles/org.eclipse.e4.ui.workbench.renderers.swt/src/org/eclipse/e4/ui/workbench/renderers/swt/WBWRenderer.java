@@ -326,21 +326,6 @@ public class WBWRenderer extends SWTPartRenderer {
 		eventBroker.unsubscribe(themeDefinitionChanged);
 	}
 
-	/**
-	 * @param wbwModel
-	 * @return Returns the style override bits or -1 if there is no override
-	 */
-	private int getStyleOverride(MWindow wbwModel) {
-		String overrideStr = wbwModel.getPersistedState().get(
-				IPresentationEngine.STYLE_OVERRIDE_KEY);
-		if (overrideStr == null || overrideStr.length() == 0)
-			return -1;
-
-		int val = -1;
-		val = Integer.parseInt(overrideStr);
-		return val;
-	}
-
 	public Object createWidget(MUIElement element, Object parent) {
 		final Widget newWidget;
 
@@ -360,17 +345,16 @@ public class WBWRenderer extends SWTPartRenderer {
 				.getShell();
 
 		final Shell wbwShell;
-
-		int styleOverride = getStyleOverride(wbwModel) | rtlStyle;
 		if (parentShell == null) {
-			int style = styleOverride == -1 ? SWT.SHELL_TRIM | rtlStyle
-					: styleOverride;
-			wbwShell = new Shell(Display.getCurrent(), style);
+			wbwShell = new Shell(Display.getCurrent(), SWT.SHELL_TRIM
+					| rtlStyle);
 			wbwModel.getTags().add("topLevel"); //$NON-NLS-1$
+		} else if (wbwModel.getTags().contains("dragHost")) { //$NON-NLS-1$
+			wbwShell = new Shell(parentShell, SWT.BORDER | rtlStyle);
+			wbwShell.setAlpha(110);
 		} else {
-			int style = SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.CLOSE | rtlStyle;
-			style = styleOverride == -1 ? style : styleOverride;
-			wbwShell = new Shell(parentShell, style);
+			wbwShell = new Shell(parentShell, SWT.TITLE | SWT.RESIZE | SWT.MAX
+					| SWT.CLOSE | rtlStyle);
 
 			// Prevent ESC from closing the DW
 			wbwShell.addTraverseListener(new TraverseListener() {
