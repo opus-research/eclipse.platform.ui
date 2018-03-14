@@ -8,8 +8,12 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Sebastian Davids - bug 128526, bug 128529
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430988, 457434
+<<<<<<< Upstream, based on master
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430988, 457434 
+=======
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430988
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 455527
+>>>>>>> 48dd1d8 Bug 455527 - Use isPartOrPlaceholderInPerspective in Show View
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
@@ -17,12 +21,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.ui.internal.workbench.EHelpService;
 import org.eclipse.e4.ui.internal.workbench.swt.WorkbenchSWTActivator;
 import org.eclipse.e4.ui.model.LocalizationHelper;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.services.help.EHelpService;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.dialogs.Dialog;

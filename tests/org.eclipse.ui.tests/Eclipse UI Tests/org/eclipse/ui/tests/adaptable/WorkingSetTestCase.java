@@ -35,11 +35,11 @@ public class WorkingSetTestCase extends UITestCase {
     }
 
     private ResourceMapping getResourceMapping(IWorkingSet set) {
-		return ((IAdaptable) set).getAdapter(ResourceMapping.class);
+        return (ResourceMapping)((IAdaptable)set).getAdapter(ResourceMapping.class);
     }
 
     private IWorkbenchAdapter getWorkbenchAdapter(IWorkingSet set) {
-		return ((IAdaptable) set).getAdapter(IWorkbenchAdapter.class);
+        return (IWorkbenchAdapter)((IAdaptable)set).getAdapter(IWorkbenchAdapter.class);
     }
 
     private void assertMatches(ResourceMapping mapping, IResource[] resources) throws CoreException {

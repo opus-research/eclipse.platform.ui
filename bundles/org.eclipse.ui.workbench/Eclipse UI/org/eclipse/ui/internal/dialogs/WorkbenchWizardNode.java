@@ -53,7 +53,7 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
      * Creates a <code>WorkbenchWizardNode</code> that holds onto a wizard
      * element.  The wizard element provides information on how to create
      * the wizard supplied by the ISV's extension.
-     *
+     * 
      * @param aWizardPage the wizard page
      * @param element the wizard descriptor
      */
@@ -67,9 +67,9 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
     /**
      * Returns the wizard represented by this wizard node.  <b>Subclasses</b>
      * must override this method.
-     *
+     * 
      * @return the wizard object
-     * @throws CoreException
+     * @throws CoreException 
      */
     public abstract IWorkbenchWizard createWizard() throws CoreException;
 
@@ -92,7 +92,8 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
 
     @Override
 	public String getLocalId() {
-    	IPluginContribution contribution = Util.getAdapter(wizardElement, IPluginContribution.class);
+    	IPluginContribution contribution = (IPluginContribution) Util.getAdapter(wizardElement,
+				IPluginContribution.class);
 		if (contribution != null) {
 			return contribution.getLocalId();
 		}
@@ -101,7 +102,8 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
 
     @Override
 	public String getPluginId() {
-       	IPluginContribution contribution = Util.getAdapter(wizardElement, IPluginContribution.class);
+       	IPluginContribution contribution = (IPluginContribution) Util.getAdapter(wizardElement,
+				IPluginContribution.class);
 		if (contribution != null) {
 			return contribution.getPluginId();
 		}
@@ -127,7 +129,7 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
                              */
                             @Override
 							public void handleException(Throwable e) {
-                               	IPluginContribution contribution = Util.getAdapter(wizardElement, IPluginContribution.class);
+                               	IPluginContribution contribution = (IPluginContribution) Util.getAdapter(wizardElement, IPluginContribution.class);
                                 statuses[0] = new Status(
                                         IStatus.ERROR,
                                         contribution != null ? contribution.getPluginId() : WorkbenchPlugin.PI_WORKBENCH,
@@ -142,7 +144,7 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
                                     workbenchWizard[0] = createWizard();
                                     // create instance of target wizard
                                 } catch (CoreException e) {
-                                	IPluginContribution contribution = Util.getAdapter(wizardElement, IPluginContribution.class);
+                                	IPluginContribution contribution = (IPluginContribution) Util.getAdapter(wizardElement, IPluginContribution.class);
                                 	statuses[0] = new Status(
                                             IStatus.ERROR,
                                             contribution != null ? contribution.getPluginId() : WorkbenchPlugin.PI_WORKBENCH,
@@ -181,7 +183,7 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
 
     /**
      * Returns the wizard element.
-     *
+     * 
      * @return the wizard descriptor
      */
     public IWizardDescriptor getWizardElement() {
