@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -36,6 +35,7 @@ import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.internal.actions.NewWizardShortcutAction;
+import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.wizards.IWizardDescriptor;
 
 /**
@@ -180,7 +180,7 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
                 action = new NewWizardShortcutAction(workbenchWindow,
 						wizardDesc);
 				actions.put(id, action);
-				IConfigurationElement element = Adapters.getAdapter(wizardDesc, IConfigurationElement.class, true);
+				IConfigurationElement element = Util.getAdapter(wizardDesc, IConfigurationElement.class);
 				if (element != null) {
 					workbenchWindow.getExtensionTracker().registerObject(
 							element.getDeclaringExtension(), action,
