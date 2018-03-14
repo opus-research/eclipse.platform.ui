@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 The Pampered Chef and others.
+ * Copyright (c) 2006, 2015 The Pampered Chef and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -365,7 +365,7 @@ public class EditMask {
 			updating = true;
 			try {
 				if (!text.isDisposed()) {
-					Boolean oldIsComplete = new Boolean(editMaskParser.isComplete());
+					Boolean oldIsComplete = Boolean.valueOf(editMaskParser.isComplete());
 
 					editMaskParser.setInput(text.getText());
 					text.setText(editMaskParser.getFormattedResult());
@@ -420,7 +420,7 @@ public class EditMask {
 		}
 
 		private void firePropertyChangeEvents(Boolean oldIsComplete, String newRawText) {
-			Boolean newIsComplete = new Boolean(editMaskParser.isComplete());
+			Boolean newIsComplete = Boolean.valueOf(editMaskParser.isComplete());
 			if (!oldIsComplete.equals(newIsComplete)) {
 				firePropertyChange(FIELD_COMPLETE, oldIsComplete, newIsComplete);
 			}
