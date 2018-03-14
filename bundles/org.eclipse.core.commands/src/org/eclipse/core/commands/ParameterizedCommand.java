@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.internal.commands.util.Util;
@@ -189,7 +188,7 @@ public final class ParameterizedCommand implements Comparable {
 			// This is it, so just return the current parameterizations.
 			for (int i = 0; i < parameterizationCount; i++) {
 				final Parameterization parameterization = (Parameterization) parameterizations.get(i);
-				final List<Parameterization> combination = new ArrayList<>(1);
+				final List<Parameterization> combination = new ArrayList<Parameterization>(1);
 				combination.add(parameterization);
 				parameterizations.set(i, combination);
 			}
@@ -205,7 +204,7 @@ public final class ParameterizedCommand implements Comparable {
 			// This is it, so just return the current parameterizations.
 			for (int i = 0; i < parameterizationCount; i++) {
 				final Parameterization parameterization = (Parameterization) parameterizations.get(i);
-				final List<Parameterization> combination = new ArrayList<>(1);
+				final List<Parameterization> combination = new ArrayList<Parameterization>(1);
 				combination.add(parameterization);
 				parameterizations.set(i, combination);
 			}
@@ -300,9 +299,12 @@ public final class ParameterizedCommand implements Comparable {
 		}
 
 		try {
-			ArrayList<Parameterization> parms = new ArrayList<>();
-			for (Entry<?, ?> entry : ((Map<?, ?>) parameters).entrySet()) {
-				String key = (String) entry.getKey();
+			ArrayList<Parameterization> parms = new ArrayList<Parameterization>();
+			Iterator<?> i = parameters.keySet().iterator();
+
+			// iterate over given parameters
+			while (i.hasNext()) {
+				String key = (String) i.next();
 				IParameter parameter = null;
 				// get the parameter from the command
 				parameter = command.getParameter(key);
@@ -313,15 +315,16 @@ public final class ParameterizedCommand implements Comparable {
 				}
 				ParameterType parameterType = command.getParameterType(key);
 				if (parameterType == null) {
-					parms.add(new Parameterization(parameter, (String) entry.getValue()));
+					parms.add(new Parameterization(parameter,
+							(String) parameters.get(key)));
 				} else {
 					AbstractParameterValueConverter valueConverter = parameterType
 							.getValueConverter();
 					if (valueConverter != null) {
-						String val = valueConverter.convertToString(entry.getValue());
+						String val = valueConverter.convertToString(parameters.get(key));
 						parms.add(new Parameterization(parameter, val));
 					} else {
-						parms.add(new Parameterization(parameter, (String) entry.getValue()));
+						parms.add(new Parameterization(parameter, (String) parameters.get(key)));
 					}
 				}
 			}
@@ -591,7 +594,7 @@ public final class ParameterizedCommand implements Comparable {
 			return Collections.EMPTY_MAP;
 		}
 
-		final Map<String, String> parameterMap = new HashMap<>();
+		final Map<String, String> parameterMap = new HashMap<String, String>();
 		for (int i = 0; i < parameterizations.length; i++) {
 			final Parameterization parameterization = parameterizations[i];
 			parameterMap.put(parameterization.getParameter().getId(), parameterization.getValue());

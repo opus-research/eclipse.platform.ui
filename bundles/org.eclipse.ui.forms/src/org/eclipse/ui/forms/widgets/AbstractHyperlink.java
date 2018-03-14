@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -50,7 +50,7 @@ public abstract class AbstractHyperlink extends Canvas {
 	 */
 	private boolean armed;
 
-	private ListenerList<IHyperlinkListener> listeners;
+	private ListenerList listeners;
 
 	/**
 	 * Amount of the margin width around the hyperlink (default is 1).
@@ -152,7 +152,7 @@ public abstract class AbstractHyperlink extends Canvas {
 	 */
 	public void addHyperlinkListener(IHyperlinkListener listener) {
 		if (listeners == null)
-			listeners = new ListenerList<>();
+			listeners = new ListenerList();
 		listeners.add(listener);
 	}
 
@@ -188,9 +188,12 @@ public abstract class AbstractHyperlink extends Canvas {
 		redraw();
 		if (listeners == null)
 			return;
+		int size = listeners.size();
 		HyperlinkEvent he = new HyperlinkEvent(this, getHref(), getText(),
 				e.stateMask);
-		for (IHyperlinkListener listener : listeners) {
+		Object[] listenerList = listeners.getListeners();
+		for (int i = 0; i < size; i++) {
+			IHyperlinkListener listener = (IHyperlinkListener) listenerList[i];
 			listener.linkEntered(he);
 		}
 	}
@@ -205,9 +208,12 @@ public abstract class AbstractHyperlink extends Canvas {
 		redraw();
 		if (listeners == null)
 			return;
+		int size = listeners.size();
 		HyperlinkEvent he = new HyperlinkEvent(this, getHref(), getText(),
 				e.stateMask);
-		for (IHyperlinkListener listener : listeners) {
+		Object[] listenerList = listeners.getListeners();
+		for (int i = 0; i < size; i++) {
+			IHyperlinkListener listener = (IHyperlinkListener) listenerList[i];
 			listener.linkExited(he);
 		}
 	}
@@ -221,10 +227,13 @@ public abstract class AbstractHyperlink extends Canvas {
 		armed = false;
 		if (listeners == null)
 			return;
+		int size = listeners.size();
 		setCursor(FormsResources.getBusyCursor());
 		HyperlinkEvent he = new HyperlinkEvent(this, getHref(), getText(),
 				e.stateMask);
-		for (IHyperlinkListener listener : listeners) {
+		Object[] listenerList = listeners.getListeners();
+		for (int i = 0; i < size; i++) {
+			IHyperlinkListener listener = (IHyperlinkListener) listenerList[i];
 			listener.linkActivated(he);
 		}
 		if (!isDisposed()) {

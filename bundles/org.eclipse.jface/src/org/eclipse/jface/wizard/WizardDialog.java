@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Chris Gross (schtoo@schtoo.com) - patch for bug 16179
  *     Eugene Ostroukhov <eugeneo@symbian.org> - Bug 287887 [Wizards] [api] Cancel button has two distinct roles
  *     Paul Adams <padams@ittvis.com> - Bug 202534 - [Dialogs] SWT error in Wizard dialog when help is displayed and "Finish" is pressed
- *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 475879
  *******************************************************************************/
 package org.eclipse.jface.wizard;
 
@@ -167,9 +166,9 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 
 	private boolean lockedUI = false;
 
-	private ListenerList<IPageChangedListener> pageChangedListeners = new ListenerList<>();
+	private ListenerList pageChangedListeners = new ListenerList();
 
-	private ListenerList<IPageChangingListener> pageChangingListeners = new ListenerList<>();
+	private ListenerList pageChangingListeners = new ListenerList();
 
 	/**
 	 * A layout for a container which includes several pages, like a notebook,
@@ -548,7 +547,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		button.setText(IDialogConstants.CANCEL_LABEL);
 		setButtonLayoutData(button);
 		button.setFont(parent.getFont());
-		button.setData(Integer.valueOf(IDialogConstants.CANCEL_ID));
+		button.setData(new Integer(IDialogConstants.CANCEL_ID));
 		button.addSelectionListener(cancelListener);
 		return button;
 	}
@@ -1202,9 +1201,9 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 			page.createControl(pageContainer);
 			// the page is responsible for ensuring the created control is
 			// accessible via getControl.
-			Assert.isNotNull(page.getControl(),
-					JFaceResources.format(JFaceResources.getString("WizardDialog.missingSetControl"), //$NON-NLS-1$
-							page.getName()));
+			Assert.isNotNull(page.getControl(), JFaceResources.format(
+					JFaceResources.getString("WizardDialog.missingSetControl"), //$NON-NLS-1$
+					new Object[] { page.getName() }));
 			// ensure the dialog is large enough for this page
 			updateSize(page);
 		}
@@ -1482,7 +1481,9 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 * @since 3.1
 	 */
 	protected void firePageChanged(final PageChangedEvent event) {
-		for (IPageChangedListener l : pageChangedListeners) {
+		Object[] listeners = pageChangedListeners.getListeners();
+		for (int i = 0; i < listeners.length; ++i) {
+			final IPageChangedListener l = (IPageChangedListener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {
 				@Override
 				public void run() {
@@ -1529,7 +1530,9 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 * @since 3.3
 	 */
 	protected void firePageChanging(final PageChangingEvent event) {
-		for (IPageChangingListener l : pageChangingListeners) {
+		Object[] listeners = pageChangingListeners.getListeners();
+		for (int i = 0; i < listeners.length; ++i) {
+			final IPageChangingListener l = (IPageChangingListener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {
 				@Override
 				public void run() {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,7 +41,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -284,7 +283,6 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 	@Deprecated
 	protected void createFile(IFile fileHandle, InputStream contents,
 			IProgressMonitor monitor) throws CoreException {
-		SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
 		if (contents == null) {
 			contents = new ByteArrayInputStream(new byte[0]);
 		}
@@ -292,26 +290,26 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 		try {
 			// Create a new file resource in the workspace
 			if (linkTargetPath != null) {
-				fileHandle.createLink(linkTargetPath, IResource.ALLOW_MISSING_LOCAL, subMonitor.split(100));
+				fileHandle.createLink(linkTargetPath,
+						IResource.ALLOW_MISSING_LOCAL, monitor);
 			} else {
 				IPath path = fileHandle.getFullPath();
 				IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 				int numSegments = path.segmentCount();
-				if (numSegments > 2 && !root.getFolder(path.removeLastSegments(1)).exists()) {
+				if (numSegments > 2
+						&& !root.getFolder(path.removeLastSegments(1)).exists()) {
 					// If the direct parent of the path doesn't exist, try to
-					// create the necessary directories.
-					SubMonitor loopMonitor = subMonitor.split(30);
+					// create the
+					// necessary directories.
 					for (int i = numSegments - 2; i > 0; i--) {
-						loopMonitor.setWorkRemaining(i);
 						IFolder folder = root.getFolder(path
 								.removeLastSegments(i));
 						if (!folder.exists()) {
-							folder.create(false, true, loopMonitor.split(1));
+							folder.create(false, true, monitor);
 						}
 					}
 				}
-				subMonitor.setWorkRemaining(100);
-				fileHandle.create(contents, false, subMonitor.split(100));
+				fileHandle.create(contents, false, monitor);
 			}
 		} catch (CoreException e) {
 			// If the file already existed locally, just refresh to get contents
@@ -320,6 +318,10 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 			} else {
 				throw e;
 			}
+		}
+
+		if (monitor.isCanceled()) {
+			throw new OperationCanceledException();
 		}
 	}
 
@@ -876,10 +878,8 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 		if (resourceName == null)
 			return false;
 		if (resourceName.length() > 0) {
-			IPath newFilePath = containerPath.append(resourceName);
-			if (newFilePath.segmentCount() < 2)
-				return false;
-			IFile newFileHandle = createFileHandle(newFilePath);
+			IPath newFolderPath = containerPath.append(resourceName);
+			IFile newFileHandle = createFileHandle(newFolderPath);
 			IWorkspace workspace = newFileHandle.getWorkspace();
 			return !workspace.validateFiltered(newFileHandle).isOK();
 		}

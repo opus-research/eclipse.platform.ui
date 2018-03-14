@@ -50,6 +50,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -892,7 +893,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 				else if (dirSelected && directory.isDirectory()) {
 
 					if (!collectProjectFilesFromDirectory(files, directory,
-							null, nestedProjects, monitor)) {
+							null, monitor)) {
 						return;
 					}
 					Iterator filesIterator3 = files.iterator();
@@ -1003,15 +1004,13 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 	 * @param files
 	 * @param directory
 	 * @param directoriesVisited
-	 *            Set of canonical paths of directories, used as recursion guard
-	 * @param nestedProjects
-	 *            whether to look for nested projects
+	 * 		Set of canonical paths of directories, used as recursion guard
 	 * @param monitor
-	 *            The monitor to report to
+	 * 		The monitor to report to
 	 * @return boolean <code>true</code> if the operation was completed.
 	 */
-	static boolean collectProjectFilesFromDirectory(Collection<File> files, File directory,
-			Set<String> directoriesVisited, boolean nestedProjects, IProgressMonitor monitor) {
+	private boolean collectProjectFilesFromDirectory(Collection files,
+			File directory, Set directoriesVisited, IProgressMonitor monitor) {
 
 		if (monitor.isCanceled()) {
 			return false;
@@ -1026,7 +1025,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 
 		// Initialize recursion guard for recursive symbolic links
 		if (directoriesVisited == null) {
-			directoriesVisited = new HashSet<>();
+			directoriesVisited = new HashSet();
 			try {
 				directoriesVisited.add(directory.getCanonicalPath());
 			} catch (IOException exception) {
@@ -1038,11 +1037,8 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 
 		// first look for project description files
 		final String dotProject = IProjectDescription.DESCRIPTION_FILE_NAME;
-		List<File> directories = new ArrayList<>();
 		for (File file : contents) {
-			if(file.isDirectory()){
-				directories.add(file);
-			} else if (file.getName().equals(dotProject) && file.isFile()) {
+			if (file.isFile() && file.getName().equals(dotProject)) {
 				files.add(file);
 				if (!nestedProjects) {
 					// don't search sub-directories since we can't have nested
@@ -1053,22 +1049,24 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		}
 		// no project description found or search for nested projects enabled,
 		// so recurse into sub-directories
-		for (File dir : directories) {
-			if (!dir.getName().equals(METADATA_FOLDER)) {
-				try {
-					String canonicalPath = dir.getCanonicalPath();
-					if (!directoriesVisited.add(canonicalPath)) {
-						// already been here --> do not recurse
-						continue;
-					}
-				} catch (IOException exception) {
-					StatusManager.getManager().handle(
-							StatusUtil.newStatus(IStatus.ERROR, exception
-									.getLocalizedMessage(), exception));
+		for (int i = 0; i < contents.length; i++) {
+			if (contents[i].isDirectory()) {
+				if (!contents[i].getName().equals(METADATA_FOLDER)) {
+					try {
+						String canonicalPath = contents[i].getCanonicalPath();
+						if (!directoriesVisited.add(canonicalPath)) {
+							// already been here --> do not recurse
+							continue;
+						}
+					} catch (IOException exception) {
+						StatusManager.getManager().handle(
+								StatusUtil.newStatus(IStatus.ERROR, exception
+										.getLocalizedMessage(), exception));
 
+					}
+					collectProjectFilesFromDirectory(files, contents[i],
+							directoriesVisited, monitor);
 				}
-				collectProjectFilesFromDirectory(files, dir,
-						directoriesVisited, nestedProjects, monitor);
 			}
 		}
 		return true;
@@ -1193,12 +1191,15 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 			@Override
 			protected void execute(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 				SubMonitor subMonitor = SubMonitor.convert(monitor, selected.length);
+				if (subMonitor.isCanceled()) {
+					throw new OperationCanceledException();
+				}
 				// Import as many projects as we can; accumulate errors to
 				// report to the user
 				MultiStatus status = new MultiStatus(IDEWorkbenchPlugin.IDE_WORKBENCH, 1,
 						DataTransferMessages.WizardProjectsImportPage_projectsInWorkspaceAndInvalid, null);
 				for (Object element : selected) {
-					status.add(createExistingProject((ProjectRecord) element, subMonitor.split(1)));
+					status.add(createExistingProject((ProjectRecord) element, subMonitor.newChild(1)));
 				}
 				if (!status.isOK()) {
 					throw new InvocationTargetException(new CoreException(status));
@@ -1297,7 +1298,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 					structureProvider, this, fileSystemObjects);
 			operation.setContext(getShell());
 			try {
-				operation.run(subMonitor.split(1));
+				operation.run(subMonitor.newChild(1));
 			} catch (InvocationTargetException e) {
 				if (e.getCause() instanceof CoreException) {
 					return ((CoreException) e.getCause()).getStatus();
@@ -1341,10 +1342,10 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		subMonitor.setWorkRemaining((copyFiles && importSource != null) ? 2 : 1);
 
 		try {
-			SubMonitor subTask = subMonitor.split(1).setWorkRemaining(100);
+			SubMonitor subTask = subMonitor.newChild(1).setWorkRemaining(100);
 			subTask.setTaskName(DataTransferMessages.WizardProjectsImportPage_CreateProjectsTask);
-			project.create(record.description, subTask.split(30));
-			project.open(IResource.BACKGROUND_REFRESH, subTask.split(70));
+			project.create(record.description, subTask.newChild(30));
+			project.open(IResource.BACKGROUND_REFRESH, subTask.newChild(70));
 			subTask.setTaskName(""); //$NON-NLS-1$
 		} catch (CoreException e) {
 			return e.getStatus();
@@ -1363,7 +1364,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 			// files
 			operation.setCreateContainerStructure(false);
 			try {
-				operation.run(subMonitor.split(1));
+				operation.run(subMonitor.newChild(1));
 			} catch (InvocationTargetException e) {
 				if (e.getCause() instanceof CoreException) {
 					return ((CoreException) e.getCause()).getStatus();

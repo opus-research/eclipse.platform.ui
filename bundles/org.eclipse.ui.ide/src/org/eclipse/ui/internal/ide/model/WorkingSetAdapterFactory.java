@@ -147,7 +147,8 @@ public class WorkingSetAdapterFactory implements IAdapterFactory {
 	}
 
 	static ResourceMapping getContributedResourceMapping(IAdaptable element) {
-		IContributorResourceAdapter resourceAdapter = Adapters.adapt(element, IContributorResourceAdapter.class);
+		IContributorResourceAdapter resourceAdapter = Adapters.getAdapter(element, IContributorResourceAdapter.class,
+				true);
 		if (resourceAdapter != null) {
 			if (resourceAdapter instanceof IContributorResourceAdapter2) {
 				// First, use the mapping contributor adapter to get the mapping
