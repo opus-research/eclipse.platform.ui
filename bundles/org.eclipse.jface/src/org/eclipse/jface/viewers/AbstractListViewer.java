@@ -36,7 +36,7 @@ public abstract class AbstractListViewer extends StructuredViewer {
     /**
      * A list of viewer elements (element type: <code>Object</code>).
      */
-    private java.util.List listMap = new ArrayList();
+	private ArrayList<Object> listMap = new ArrayList<Object>();
 
     /**
      * Adds the given string to the underlying widget at the given index
@@ -235,9 +235,6 @@ public abstract class AbstractListViewer extends StructuredViewer {
         return null;
     }
 
-	/* (non-Javadoc)
-     * Method declared on StructuredViewer.
-     */
     @Override
 	protected void doUpdateItem(Widget data, Object element, boolean fullMap) {
         if (element != null) {
@@ -274,16 +271,10 @@ public abstract class AbstractListViewer extends StructuredViewer {
         return super.getLabelProvider();
     }
 
-    /* (non-Javadoc)
-     * Method declared on Viewer.
-     */
-    /* (non-Javadoc)
-     * Method declared on StructuredViewer.
-     */
     @Override
-	protected List getSelectionFromWidget() {
+	protected List<Object> getSelectionFromWidget() {
         int[] ixs = listGetSelectionIndices();
-        ArrayList list = new ArrayList(ixs.length);
+		ArrayList<Object> list = new ArrayList<Object>(ixs.length);
         for (int i = 0; i < ixs.length; i++) {
             Object e = getElementAt(ixs[i]);
             if (e != null) {
@@ -329,9 +320,6 @@ public abstract class AbstractListViewer extends StructuredViewer {
         return min;
     }
 
-    /* (non-Javadoc)
-     * Method declared on Viewer.
-     */
     @Override
 	protected void inputChanged(Object input, Object oldInput) {
         listMap.clear();
@@ -349,9 +337,6 @@ public abstract class AbstractListViewer extends StructuredViewer {
         listSetItems(labels);
     }
 
-    /* (non-Javadoc)
-     * Method declared on StructuredViewer.
-     */
     @Override
 	protected void internalRefresh(Object element) {
         Control list = getControl();
@@ -361,7 +346,7 @@ public abstract class AbstractListViewer extends StructuredViewer {
 				listMap.clear();
 			}
             unmapAllElements();
-            List selection = getSelectionFromWidget();
+			List<Object> selection = getSelectionFromWidget();
             
             int topIndex = -1;
             if (selection == null || selection.isEmpty()) {
@@ -499,9 +484,6 @@ public abstract class AbstractListViewer extends StructuredViewer {
         super.setLabelProvider(labelProvider);
     }
 
-    /* (non-Javadoc)
-     * Method declared on StructuredViewer.
-     */
     @Override
 	protected void setSelectionToWidget(List in, boolean reveal) {
         if (in == null || in.size() == 0) { // clear selection
