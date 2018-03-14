@@ -37,8 +37,7 @@ public class CompactKeyFormatter extends NativeKeyFormatter {
      * 
      * @see org.eclipse.ui.keys.KeyFormatter#format(org.eclipse.ui.keys.KeySequence)
      */
-    @Override
-	public String format(KeySequence keySequence) {
+    public String format(KeySequence keySequence) {
         StringBuffer stringBuffer = new StringBuffer();
 
         List keyStrokes = keySequence.getKeyStrokes();

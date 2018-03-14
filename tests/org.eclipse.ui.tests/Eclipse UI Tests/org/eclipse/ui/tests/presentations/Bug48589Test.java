@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -76,7 +76,7 @@ public final class Bug48589Test extends UITestCase {
                 textFile, true);
         
         // Get the current title of the text editor.
-        EModelService modelService = window.getService(EModelService.class);
+        EModelService modelService = (EModelService) window.getService(EModelService.class);
         MArea area = modelService.findElements(((WorkbenchWindow)window).getModel() , null, MArea.class, null).get(0);
         MPartStack partStack = modelService.findElements(area, null, MPartStack.class, null).get(0);
         assertTrue(partStack.getWidget() instanceof CTabFolder);

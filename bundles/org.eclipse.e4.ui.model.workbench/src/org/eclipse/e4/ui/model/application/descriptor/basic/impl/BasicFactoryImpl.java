@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008, 2013 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,8 @@
  */
 package org.eclipse.e4.ui.model.application.descriptor.basic.impl;
 
-import org.eclipse.e4.ui.model.application.descriptor.basic.*;
+import org.eclipse.e4.ui.model.application.descriptor.basic.MBasicFactory;
+import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
@@ -40,7 +41,7 @@ public class BasicFactoryImpl extends EFactoryImpl implements MBasicFactory {
 	 */
 	public static BasicFactoryImpl init() {
 		try {
-			BasicFactoryImpl theBasicFactory = (BasicFactoryImpl)EPackage.Registry.INSTANCE.getEFactory(BasicPackageImpl.eNS_URI);
+			BasicFactoryImpl theBasicFactory = (BasicFactoryImpl)EPackage.Registry.INSTANCE.getEFactory("http://www.eclipse.org/ui/2010/UIModel/application/descriptor/basic"); //$NON-NLS-1$ 
 			if (theBasicFactory != null) {
 				return theBasicFactory;
 			}

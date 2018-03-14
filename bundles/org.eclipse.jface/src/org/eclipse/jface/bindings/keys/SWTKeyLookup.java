@@ -273,7 +273,6 @@ public final class SWTKeyLookup implements IKeyLookup {
  	 * @see org.eclipse.jface.bindings.keys.IKeyLookup#formalKeyLookup(java.lang.String)
  	 * 
 	 */	
-	@Override
 	public final int formalKeyLookup(final String name) {
 		final Object value = naturalKeyTable.get(name);
 		if (value instanceof Integer) {
@@ -294,7 +293,6 @@ public final class SWTKeyLookup implements IKeyLookup {
  	 * @see org.eclipse.jface.bindings.keys.IKeyLookup#formalKeyLookupInteger(java.lang.String)
  	 * 
 	 */	
-	@Override
 	public final Integer formalKeyLookupInteger(final String name) {
 		final Object value = naturalKeyTable.get(name);
 		if (value instanceof Integer) {
@@ -310,7 +308,6 @@ public final class SWTKeyLookup implements IKeyLookup {
  	 * @see org.eclipse.jface.bindings.keys.IKeyLookup#formalModifierLookup(java.lang.String)
  	 * 
 	 */	
-	@Override
 	public final int formalModifierLookup(final String name) {
 		final Object value = modifierKeyTable.get(name);
 		if (value instanceof Integer) {
@@ -326,7 +323,6 @@ public final class SWTKeyLookup implements IKeyLookup {
  	 * @see org.eclipse.jface.bindings.keys.IKeyLookup#formalNameLookup(int)
  	 * 
 	 */	
-	@Override
 	public final String formalNameLookup(final int key) {
 		final Integer keyObject = new Integer(key);
 		final Object value = nameTable.get(keyObject);
@@ -343,7 +339,6 @@ public final class SWTKeyLookup implements IKeyLookup {
  	 * @see org.eclipse.jface.bindings.keys.IKeyLookup#getAlt()
  	 * 
 	 */	
-	@Override
 	public final int getAlt() {
 		return SWT.ALT;
 	}
@@ -354,7 +349,6 @@ public final class SWTKeyLookup implements IKeyLookup {
  	 * @see org.eclipse.jface.bindings.keys.IKeyLookup#getCommand()
  	 * 
 	 */	
-	@Override
 	public final int getCommand() {
 		return SWT.COMMAND;
 	}
@@ -365,7 +359,6 @@ public final class SWTKeyLookup implements IKeyLookup {
  	 * @see org.eclipse.jface.bindings.keys.IKeyLookup#getCtrl()
  	 * 
 	 */	
-	@Override
 	public final int getCtrl() {
 		return SWT.CTRL;
 	}
@@ -376,7 +369,6 @@ public final class SWTKeyLookup implements IKeyLookup {
  	 * @see org.eclipse.jface.bindings.keys.IKeyLookup#getShift()
  	 * 
 	 */	
-	@Override
 	public final int getShift() {
 		return SWT.SHIFT;
 	}
@@ -387,7 +379,6 @@ public final class SWTKeyLookup implements IKeyLookup {
  	 * @see org.eclipse.jface.bindings.keys.IKeyLookup#isModifierKey(int)
  	 * 
 	 */	
-	@Override
 	public final boolean isModifierKey(final int key) {
 		return ((key & SWT.MODIFIER_MASK) != 0);
 	}

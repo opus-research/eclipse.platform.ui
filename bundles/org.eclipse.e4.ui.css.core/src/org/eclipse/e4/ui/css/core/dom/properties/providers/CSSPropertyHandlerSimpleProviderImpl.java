@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2012 Angelo Zerr and others.
+ * Copyright (c) 2008, 2009 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -171,7 +171,7 @@ public class CSSPropertyHandlerSimpleProviderImpl extends
 				ICSSPropertyMarginHandler.class);
 		registerDefaultCSSProperty("margin-right",
 				ICSSPropertyMarginHandler.class);
-
+		
 		// Register Padding Properties
 		registerDefaultCSSProperty("padding", ICSSPropertyPaddingHandler.class);
 		registerDefaultCSSProperty("padding-bottom",
@@ -184,7 +184,6 @@ public class CSSPropertyHandlerSimpleProviderImpl extends
 				ICSSPropertyPaddingHandler.class);
 	}
 
-	@Override
 	public Collection<ICSSPropertyHandler> getCSSPropertyHandlers(
 			String property) throws Exception {
 		Class<? extends ICSSPropertyHandler> cl = getCSSPropertyHandlerClass(property);
@@ -237,12 +236,11 @@ public class CSSPropertyHandlerSimpleProviderImpl extends
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.e4.ui.css.core.dom.properties.providers.AbstractCSSPropertyHandlerProvider#getDefaultCSSStyleDeclaration(org.eclipse.e4.ui.css.core.engine.CSSEngine,
 	 *      org.eclipse.e4.ui.css.core.dom.CSSStylableElement,
 	 *      org.w3c.dom.css.CSSStyleDeclaration, java.lang.String)
 	 */
-	@Override
 	public CSSStyleDeclaration getDefaultCSSStyleDeclaration(CSSEngine engine,
 			CSSStylableElement stylableElement, CSSStyleDeclaration newStyle,
 			String pseudoE) throws Exception {
@@ -275,13 +273,11 @@ public class CSSPropertyHandlerSimpleProviderImpl extends
 		return null;
 	}
 
-	@Override
 	public Collection<ICSSPropertyHandler> getCSSPropertyHandlers(
 			Object element, String property) throws Exception {
 		return getCSSPropertyHandlers(property);
 	}
 
-	@Override
 	public Collection<String> getCSSProperties(Object element) {
 		return getAllCSSPropertyNames();
 	}

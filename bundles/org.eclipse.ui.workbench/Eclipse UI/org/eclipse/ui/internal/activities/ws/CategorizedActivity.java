@@ -53,24 +53,21 @@ public class CategorizedActivity implements IActivity {
     /* (non-Javadoc)
      * @see org.eclipse.ui.activities.IActivity#addActivityListener(org.eclipse.ui.activities.IActivityListener)
      */
-    @Override
-	public void addActivityListener(IActivityListener activityListener) {
+    public void addActivityListener(IActivityListener activityListener) {
         activity.addActivityListener(activityListener);
     }
 
     /* (non-Javadoc)
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
-    @Override
-	public int compareTo(Object o) {
+    public int compareTo(Object o) {
         return activity.compareTo(o);
     }
 
     /* (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    @Override
-	public boolean equals(Object o) {
+    public boolean equals(Object o) {
         if (o instanceof CategorizedActivity) {
             if (((CategorizedActivity) o).getCategory().equals(getCategory())) {
 				return ((CategorizedActivity) o).getActivity().equals(
@@ -90,16 +87,14 @@ public class CategorizedActivity implements IActivity {
     /* (non-Javadoc)
      * @see org.eclipse.ui.activities.IActivity#getActivityRequirementBindings()
      */
-    @Override
-	public Set getActivityRequirementBindings() {
+    public Set getActivityRequirementBindings() {
         return activity.getActivityRequirementBindings();
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.activities.IActivity#getActivityPatternBindings()
      */
-    @Override
-	public Set getActivityPatternBindings() {
+    public Set getActivityPatternBindings() {
         return activity.getActivityPatternBindings();
     }
 
@@ -113,77 +108,67 @@ public class CategorizedActivity implements IActivity {
     /* (non-Javadoc)
      * @see org.eclipse.ui.activities.IActivity#getId()
      */
-    @Override
-	public String getId() {
+    public String getId() {
         return activity.getId();
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.activities.IActivity#getName()
      */
-    @Override
-	public String getName() throws NotDefinedException {
+    public String getName() throws NotDefinedException {
         return activity.getName();
     }
 
     /* (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
-    @Override
-	public int hashCode() {
+    public int hashCode() {
         return activity.hashCode();
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.activities.IActivity#isDefined()
      */
-    @Override
-	public boolean isDefined() {
+    public boolean isDefined() {
         return activity.isDefined();
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.activities.IActivity#isEnabled()
      */
-    @Override
-	public boolean isEnabled() {
+    public boolean isEnabled() {
         return activity.isEnabled();
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.activities.IActivity#removeActivityListener(org.eclipse.ui.activities.IActivityListener)
      */
-    @Override
-	public void removeActivityListener(IActivityListener activityListener) {
+    public void removeActivityListener(IActivityListener activityListener) {
         activity.removeActivityListener(activityListener);
     }
 
     /* (non-Javadoc)
      * @see java.lang.Object#toString()
      */
-    @Override
-	public String toString() {
+    public String toString() {
         return category.getId() + " -> " + activity.getId(); //$NON-NLS-1$
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.activities.IActivity#getDescription()
      */
-    @Override
-	public String getDescription() throws NotDefinedException {
+    public String getDescription() throws NotDefinedException {
         return activity.getDescription();
     }
     
     /* (non-Javadoc)
      * @see org.eclipse.ui.activities.IActivity#isDefaultEnabled()
      */
-    @Override
-	public boolean isDefaultEnabled() throws NotDefinedException {
+    public boolean isDefaultEnabled() throws NotDefinedException {
         return activity.isDefaultEnabled();
     }
     
-    @Override
-	public Expression getExpression() {
+    public Expression getExpression() {
     	return activity.getExpression();
     }
 }

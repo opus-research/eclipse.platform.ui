@@ -16,8 +16,7 @@ import org.eclipse.ui.keys.ModifierKey;
 
 abstract class AbstractModifierKeyComparator implements Comparator {
 
-    @Override
-	public int compare(Object left, Object right) {
+    public int compare(Object left, Object right) {
         ModifierKey modifierKeyLeft = (ModifierKey) left;
         ModifierKey modifierKeyRight = (ModifierKey) right;
         int modifierKeyLeftRank = rank(modifierKeyLeft);

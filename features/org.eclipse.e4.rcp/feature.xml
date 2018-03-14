@@ -2,10 +2,11 @@
 <feature
       id="org.eclipse.e4.rcp"
       label="%featureName"
-      version="1.3.100.qualifier"
+      version="1.1.2.qualifier"
       provider-name="%providerName"
+      image="eclipse_update_120.jpg"
       license-feature="org.eclipse.license"
-      license-feature-version="0.0.0">
+      license-feature-version="1.0.0.qualifier">
 
    <description>
       %description
@@ -98,7 +99,7 @@
          id="org.apache.batik.css"
          download-size="0"
          install-size="0"
-         version="1.7.0.qualifier"
+         version="1.6.0.qualifier"
          unpack="false"/>
 
    <plugin
@@ -112,7 +113,7 @@
          id="org.apache.batik.util"
          download-size="0"
          install-size="0"
-         version="1.7.0.qualifier"
+         version="1.6.0.qualifier"
          unpack="false"/>
 
    <plugin
@@ -130,13 +131,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.w3c.dom.events"
-         download-size="0"
-         install-size="0"
-         version="3.0.0.qualifier"
-         unpack="false"/>
-
-   <plugin
          id="javax.inject"
          download-size="0"
          install-size="0"
@@ -147,7 +141,7 @@
          id="javax.annotation"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.0.0.qualifier"
          unpack="false"/>
 
    <plugin
@@ -168,7 +162,7 @@
          id="org.apache.batik.util.gui"
          download-size="0"
          install-size="0"
-         version="1.7.0.qualifier"
+         version="1.6.0.qualifier"
          unpack="false"/>
 
    <plugin
@@ -350,15 +344,14 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.osgi.compatibility.state"
+         id="org.eclipse.osgi.services"
          download-size="0"
          install-size="0"
          version="0.0.0"
-         fragment="true"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.osgi.services"
+         id="org.eclipse.equinox.launcher"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -404,6 +397,7 @@
          version="0.0.0"
          fragment="true"/>
 
+
    <plugin
          id="org.eclipse.equinox.launcher.gtk.linux.ppc"
          os="linux"
@@ -419,6 +413,26 @@
          os="linux"
          ws="gtk"
          arch="ppc64"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"/>
+
+    <plugin
+         id="org.eclipse.equinox.launcher.gtk.linux.ppc64le"
+         os="linux"
+         ws="gtk"
+         arch="ppc64le"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"/>
+
+    <plugin
+         id="org.eclipse.equinox.launcher.gtk.linux.ia64"
+         os="linux"
+         ws="gtk"
+         arch="ia64"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -485,10 +499,10 @@
          fragment="true"/>
 
    <plugin
-         id="org.eclipse.equinox.launcher.gtk.hpux.ia64"
+         id="org.eclipse.equinox.launcher.gtk.hpux.ia64_32"
          os="hpux"
          ws="gtk"
-         arch="ia64"
+         arch="ia64_32"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -642,6 +656,28 @@
          fragment="true"
          unpack="false"/>
 
+    <plugin
+         id="org.eclipse.swt.gtk.linux.ppc64le"
+         os="linux"
+         ws="gtk"
+         arch="ppc64le"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+    <plugin
+         id="org.eclipse.swt.gtk.linux.ia64"
+         os="linux"
+         ws="gtk"
+         arch="ia64"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
    <plugin
          id="org.eclipse.swt.cocoa.macosx.x86_64"
          os="macosx"
@@ -676,10 +712,10 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.swt.gtk.hpux.ia64"
+         id="org.eclipse.swt.gtk.hpux.ia64_32"
          os="hpux"
          ws="gtk"
-         arch="ia64"
+         arch="ia64_32"
          download-size="0"
          install-size="0"
          version="0.0.0"

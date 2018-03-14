@@ -38,7 +38,6 @@ public class WorkingSetSettingsTransfer extends WorkbenchSettingsTransfer {
 	 * 
 	 * @see org.eclipse.ui.preferences.SettingsTransfer#getName()
 	 */
-	@Override
 	public String getName() {
 		return WorkbenchMessages.WorkingSets_Name;
 	}
@@ -48,7 +47,6 @@ public class WorkingSetSettingsTransfer extends WorkbenchSettingsTransfer {
 	 * 
 	 * @see org.eclipse.ui.preferences.SettingsTransfer#transferSettings(org.eclipse.core.runtime.IPath)
 	 */
-	@Override
 	public IStatus transferSettings(IPath newWorkspaceRoot) {
 		IPath dataLocation = getNewWorkbenchStateLocation(newWorkspaceRoot);
 

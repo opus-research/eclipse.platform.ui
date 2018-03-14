@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2011 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,13 +35,7 @@ public class UIEventObjectSupplier extends EventObjectSupplier {
 			this.requestor = requestor;
 		}
 
-		@Override
 		public void handleEvent(org.osgi.service.event.Event event) {
-			if (!requestor.isValid()) {
-				unsubscribe(requestor);
-				return;
-			}
-
 			addCurrentEvent(topic, event);
 			requestor.resolveArguments(false);
 			removeCurrentEvent(topic);
@@ -51,7 +45,6 @@ public class UIEventObjectSupplier extends EventObjectSupplier {
 				return;
 			} else {
 				uiSync.syncExec(new Runnable() {
-					@Override
 					public void run() {
 						requestor.execute();
 					}
@@ -66,12 +59,10 @@ public class UIEventObjectSupplier extends EventObjectSupplier {
 	@Inject @Optional
 	protected Logger logger;
 
-	@Override
 	protected EventHandler makeHandler(String topic, IRequestor requestor) {
 		return new UIEventHandler(topic, requestor);
 	}
 
-	@Override
 	protected String getTopic(IObjectDescriptor descriptor) {
 		if (descriptor == null)
 			return null;

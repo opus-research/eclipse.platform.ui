@@ -47,7 +47,6 @@ public class Snippet035PostSelectionProvider {
 		Display display = new Display();
 
 		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
-			@Override
 			public void run() {
 				Shell shell = new Snippet035PostSelectionProvider()
 						.createShell();

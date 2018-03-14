@@ -101,8 +101,7 @@ public class TreePathViewerSorter extends ViewerSorter {
      */
     public void sort(final Viewer viewer, final TreePath parentPath, Object[] elements) {
         Arrays.sort(elements, new Comparator() {
-            @Override
-			public int compare(Object a, Object b) {
+            public int compare(Object a, Object b) {
                 return TreePathViewerSorter.this.compare(viewer, parentPath, a, b);
             }
         });

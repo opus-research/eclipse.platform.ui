@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -55,8 +55,7 @@ public class WorkbenchPreview implements IThemePreview {
     private ViewForm viewForm;
 
     private IPropertyChangeListener fontAndColorListener = new IPropertyChangeListener() {
-        @Override
-		public void propertyChange(PropertyChangeEvent event) {
+        public void propertyChange(PropertyChangeEvent event) {
             if (!disposed) {
                 setColorsAndFonts();
                 //viewMessage.setSize(viewMessage.computeSize(SWT.DEFAULT, SWT.DEFAULT, true));
@@ -68,8 +67,7 @@ public class WorkbenchPreview implements IThemePreview {
     /* (non-Javadoc)
      * @see org.eclipse.ui.IPresentationPreview#createControl(org.eclipse.swt.widgets.Composite, org.eclipse.ui.themes.ITheme)
      */
-    @Override
-	public void createControl(Composite parent, ITheme currentTheme) {
+    public void createControl(Composite parent, ITheme currentTheme) {
         this.theme = currentTheme;
         folder = new CTabFolder(parent, SWT.BORDER);
         folder.setUnselectedCloseVisible(false);
@@ -159,13 +157,14 @@ public class WorkbenchPreview implements IThemePreview {
 
         folder.setFont(theme.getFontRegistry().get(
                 IWorkbenchThemeConstants.TAB_TEXT_FONT));
+        viewMessage.setFont(theme.getFontRegistry().get(
+                IWorkbenchThemeConstants.VIEW_MESSAGE_TEXT_FONT));
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IPresentationPreview#dispose()
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         disposed = true;
         theme.removePropertyChangeListener(fontAndColorListener);
     }

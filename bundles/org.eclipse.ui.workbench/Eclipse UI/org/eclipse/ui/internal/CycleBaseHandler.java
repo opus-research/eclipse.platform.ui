@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2014 IBM Corporation and others.
+ * Copyright (c) 2007, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Dina Sayed, dsayed@eg.ibm.com, IBM -  bug 276324
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -110,7 +109,6 @@ public abstract class CycleBaseHandler extends AbstractHandler implements
 	 */
 	protected abstract ParameterizedCommand getForwardCommand();
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
 
@@ -185,12 +183,10 @@ public abstract class CycleBaseHandler extends AbstractHandler implements
 		tc.setWidth(table.getClientArea().width);
 		table.setFocus();
 		table.addFocusListener(new FocusListener() {
-			@Override
 			public void focusGained(FocusEvent e) {
 				// Do nothing
 			}
 
-			@Override
 			public void focusLost(FocusEvent e) {
 				cancel(dialog);
 			}
@@ -199,7 +195,6 @@ public abstract class CycleBaseHandler extends AbstractHandler implements
 		table.addMouseMoveListener(new MouseMoveListener() {
 			TableItem fLastItem = null;
 
-			@Override
 			public void mouseMove(MouseEvent e) {
 				if (table.equals(e.getSource())) {
 					Object o = table.getItem(new Point(e.x, e.y));
@@ -221,7 +216,7 @@ public abstract class CycleBaseHandler extends AbstractHandler implements
 
 		setDialogLocation(dialog, activePart);
 
-		final IContextService contextService = window
+		final IContextService contextService = (IContextService) window
 				.getWorkbench().getService(IContextService.class);
 		try {
 			dialog.open();
@@ -295,7 +290,7 @@ public abstract class CycleBaseHandler extends AbstractHandler implements
 		commandForward = getForwardCommand();
 		commandBackward = getBackwardCommand();
 
-		final IBindingService bindingService = window
+		final IBindingService bindingService = (IBindingService) window
 				.getWorkbench().getService(IBindingService.class);
 		forwardTriggerSequences = bindingService
 				.getActiveBindingsFor(commandForward);
@@ -309,7 +304,6 @@ public abstract class CycleBaseHandler extends AbstractHandler implements
 
 			private boolean quickReleaseMode = false;
 
-			@Override
 			public void keyPressed(KeyEvent e) {
 				int keyCode = e.keyCode;
 				char character = e.character;
@@ -389,7 +383,6 @@ public abstract class CycleBaseHandler extends AbstractHandler implements
 				firstKey = false;
 			}
 
-			@Override
 			public void keyReleased(KeyEvent e) {
 				int keyCode = e.keyCode;
 				int stateMask = e.stateMask;
@@ -421,7 +414,6 @@ public abstract class CycleBaseHandler extends AbstractHandler implements
 			 * @param event
 			 *            The trigger event; must not be <code>null</code>.
 			 */
-			@Override
 			public final void keyTraversed(final TraverseEvent event) {
 				event.doit = false;
 			}
@@ -482,17 +474,14 @@ public abstract class CycleBaseHandler extends AbstractHandler implements
 	 */
 	protected void addMouseListener(final Table table, final Shell dialog) {
 		table.addMouseListener(new MouseListener() {
-			@Override
 			public void mouseDoubleClick(MouseEvent e) {
 				ok(dialog, table);
 			}
 
-			@Override
 			public void mouseDown(MouseEvent e) {
 				ok(dialog, table);
 			}
 
-			@Override
 			public void mouseUp(MouseEvent e) {
 				ok(dialog, table);
 			}
@@ -525,7 +514,6 @@ public abstract class CycleBaseHandler extends AbstractHandler implements
 	 * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement,
 	 *      java.lang.String, java.lang.Object)
 	 */
-	@Override
 	public void setInitializationData(IConfigurationElement config,
 			String propertyName, Object data) throws CoreException {
 		gotoDirection = "true".equals(data); //$NON-NLS-1$

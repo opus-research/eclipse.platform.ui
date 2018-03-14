@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,10 +31,12 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWizard;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.activities.ITriggerPoint;
 import org.eclipse.ui.activities.WorkbenchActivityHelper;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.internal.WorkbenchMessages;
+import org.eclipse.ui.internal.decorators.ContributingPluginDecorator;
 import org.eclipse.ui.model.AdaptableList;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.wizards.IWizardCategory;
@@ -112,10 +114,23 @@ public abstract class ImportExportPage extends WorkbenchWizardSelectionPage{
 	                | SWT.V_SCROLL | SWT.BORDER, new WizardPatternFilter(), true);
 	        viewer = filteredTree.getViewer();
 	        filteredTree.setFont(parent.getFont());
-			filteredTree.setQuickSelectionMode(true);
 
 	        viewer.setContentProvider(new WizardContentProvider());
-			viewer.setLabelProvider(new WorkbenchLabelProvider());
+			viewer.setLabelProvider(new DelegatingLabelProviderWithTooltip(
+					new WorkbenchLabelProvider(), PlatformUI.getWorkbench()
+					.getDecoratorManager().getLabelDecorator(ContributingPluginDecorator.ID)) {
+						protected Object unwrapElement(Object element) {
+							if (element instanceof WorkbenchWizardElement) {
+								element = ((WorkbenchWizardElement) element)
+										.getConfigurationElement();
+							}
+							if (element instanceof WizardCollectionElement) {
+								element = ((WizardCollectionElement) element)
+										.getConfigurationElement();
+							}
+							return element;
+						}
+					});
 	        viewer.setComparator(DataTransferWizardCollectionComparator.INSTANCE);
 	        
 	        ArrayList inputArray = new ArrayList();
@@ -190,7 +205,6 @@ public abstract class ImportExportPage extends WorkbenchWizardSelectionPage{
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets.Composite)
 	 */
-	@Override
 	public void createControl(Composite parent) {
 	    Font font = parent.getFont();
 	
@@ -298,8 +312,7 @@ public abstract class ImportExportPage extends WorkbenchWizardSelectionPage{
      */
 	private IWizardNode createWizardNode(IWizardDescriptor element) {
         return new WorkbenchWizardNode(this, element) {
-            @Override
-			public IWorkbenchWizard createWizard() throws CoreException {
+            public IWorkbenchWizard createWizard() throws CoreException {
                 return wizardElement.createWizard();
             }
         };
@@ -427,8 +440,7 @@ public abstract class ImportExportPage extends WorkbenchWizardSelectionPage{
      * (non-Javadoc)
      * @see org.eclipse.jface.wizard.IWizardPage#getNextPage()
      */
-    @Override
-	public IWizardPage getNextPage() { 
+    public IWizardPage getNextPage() { 
     	ITriggerPoint triggerPoint = getTriggerPoint();
         
         if (triggerPoint == null || WorkbenchActivityHelper.allowUseOf(triggerPoint, getSelectedNode())) {

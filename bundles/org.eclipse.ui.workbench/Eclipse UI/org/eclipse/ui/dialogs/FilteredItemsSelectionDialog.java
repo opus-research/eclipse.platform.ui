@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,6 @@
  *  Peter Friese <peter.friese@gentleware.com>
  *     - Fix for bug 208602 - [Dialogs] Open Type dialog needs accessible labels
  *  Simon Muschel <smuschel@gmx.de> - bug 258493
- *  Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -51,7 +50,6 @@ import org.eclipse.jface.action.LegacyActionTools;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ContentViewer;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IContentProvider;
@@ -74,6 +72,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.ACC;
@@ -179,8 +178,6 @@ public abstract class FilteredItemsSelectionDialog extends
 	private ItemsListLabelProvider itemsListLabelProvider;
 
 	private MenuManager menuManager;
-
-	private MenuManager contextMenuManager;
 
 	private boolean multi;
 
@@ -354,7 +351,6 @@ public abstract class FilteredItemsSelectionDialog extends
 	 * 
 	 * @see org.eclipse.jface.window.Window#create()
 	 */
-	@Override
 	public void create() {
 		super.create();
 		pattern.setFocus();
@@ -404,22 +400,17 @@ public abstract class FilteredItemsSelectionDialog extends
 	 * 
 	 * @see org.eclipse.jface.window.Window#close()
 	 */
-	@Override
 	public boolean close() {
 		this.filterJob.cancel();
 		this.refreshCacheJob.cancel();
 		this.refreshProgressMessageJob.cancel();
 		if (showViewHandler != null) {
-			IHandlerService service = PlatformUI
+			IHandlerService service = (IHandlerService) PlatformUI
 					.getWorkbench().getService(IHandlerService.class);
 			service.deactivateHandler(showViewHandler);
 			showViewHandler.getHandler().dispose();
 			showViewHandler = null;
 		}
-		if (menuManager != null)
-			menuManager.dispose();
-		if (contextMenuManager != null)
-			contextMenuManager.dispose();
 		storeDialog(getDialogSettings());
 		return super.close();
 	}
@@ -473,7 +464,6 @@ public abstract class FilteredItemsSelectionDialog extends
 				.length() > 0) ? getMessage()
 				: WorkbenchMessages.FilteredItemsSelectionDialog_patternLabel);
 		headerLabel.addTraverseListener(new TraverseListener() {
-			@Override
 			public void keyTraversed(TraverseEvent e) {
 				if (e.detail == SWT.TRAVERSE_MNEMONIC && e.doit) {
 					e.detail = SWT.TRAVERSE_NONE;
@@ -510,7 +500,6 @@ public abstract class FilteredItemsSelectionDialog extends
 				.setText(WorkbenchMessages.FilteredItemsSelectionDialog_listLabel);
 
 		listLabel.addTraverseListener(new TraverseListener() {
-			@Override
 			public void keyTraversed(TraverseEvent e) {
 				if (e.detail == SWT.TRAVERSE_MNEMONIC && e.doit) {
 					e.detail = SWT.TRAVERSE_NONE;
@@ -538,7 +527,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		toolBar.setLayoutData(data);
 
 		toolBar.addMouseListener(new MouseAdapter() {
-			@Override
 			public void mouseDown(MouseEvent e) {
 				showViewMenu();
 			}
@@ -549,7 +537,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		toolItem
 				.setToolTipText(WorkbenchMessages.FilteredItemsSelectionDialog_menu);
 		toolItem.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				showViewMenu();
 			}
@@ -559,10 +546,9 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		fillViewMenu(menuManager);
 
-		IHandlerService service = PlatformUI.getWorkbench()
+		IHandlerService service = (IHandlerService) PlatformUI.getWorkbench()
 				.getService(IHandlerService.class);
 		IHandler handler = new AbstractHandler() {
-			@Override
 			public Object execute(ExecutionEvent event) {
 				showViewMenu();
 				return null;
@@ -626,17 +612,16 @@ public abstract class FilteredItemsSelectionDialog extends
 		removeHistoryActionContributionItem = new ActionContributionItem(
 				removeHistoryItemAction);
 
-		contextMenuManager = new MenuManager();
-		contextMenuManager.setRemoveAllWhenShown(true);
-		contextMenuManager.addMenuListener(new IMenuListener() {
-			@Override
+		MenuManager manager = new MenuManager();
+		manager.setRemoveAllWhenShown(true);
+		manager.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(IMenuManager manager) {
 				fillContextMenu(manager);
 			}
 		});
 
 		final Table table = list.getTable();
-		Menu menu= contextMenuManager.createContextMenu(table);
+		Menu menu= manager.createContextMenu(table);
 		table.setMenu(menu);
 	}
 
@@ -654,7 +639,6 @@ public abstract class FilteredItemsSelectionDialog extends
 	 * 
 	 * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
 	 */
-	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite dialogArea = (Composite) super.createDialogArea(parent);
 
@@ -672,7 +656,6 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		pattern = new Text(content, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL);
 		pattern.getAccessible().addAccessibleListener(new AccessibleAdapter() {
-			@Override
 			public void getName(AccessibleEvent e) {
 				e.result = LegacyActionTools.removeMnemonics(headerLabel
 						.getText());
@@ -687,7 +670,6 @@ public abstract class FilteredItemsSelectionDialog extends
 				| SWT.BORDER | SWT.V_SCROLL | SWT.VIRTUAL);
 		list.getTable().getAccessible().addAccessibleListener(
 				new AccessibleAdapter() {
-					@Override
 					public void getName(AccessibleEvent e) {
 						if (e.childID == ACC.CHILDID_SELF) {
 							e.result = LegacyActionTools
@@ -707,14 +689,12 @@ public abstract class FilteredItemsSelectionDialog extends
 		createPopupMenu();
 
 		pattern.addModifyListener(new ModifyListener() {
-			@Override
 			public void modifyText(ModifyEvent e) {
 				applyFilter();
 			}
 		});
 
 		pattern.addKeyListener(new KeyAdapter() {
-			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.keyCode == SWT.ARROW_DOWN) {
 					if (list.getTable().getItemCount() > 0) {
@@ -725,7 +705,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		});
 
 		list.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				StructuredSelection selection = (StructuredSelection) event
 						.getSelection();
@@ -734,14 +713,12 @@ public abstract class FilteredItemsSelectionDialog extends
 		});
 
 		list.addDoubleClickListener(new IDoubleClickListener() {
-			@Override
 			public void doubleClick(DoubleClickEvent event) {
 				handleDoubleClick();
 			}
 		});
 
 		list.getTable().addKeyListener(new KeyAdapter() {
-			@Override
 			public void keyPressed(KeyEvent e) {
 
 				if (e.keyCode == SWT.DEL) {
@@ -942,7 +919,6 @@ public abstract class FilteredItemsSelectionDialog extends
 	 * 
 	 * @see org.eclipse.jface.window.Dialog#getDialogBoundsSettings()
 	 */
-	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
 		IDialogSettings settings = getDialogSettings();
 		IDialogSettings section = settings.getSection(DIALOG_BOUNDS_SETTINGS);
@@ -999,7 +975,6 @@ public abstract class FilteredItemsSelectionDialog extends
 	 * 
 	 * @deprecated
 	 */
-	@Deprecated
 	public void updateProgressLabel() {
 		scheduleProgressMessageRefresh();
 	}
@@ -1048,7 +1023,6 @@ public abstract class FilteredItemsSelectionDialog extends
 	 * 
 	 * @see org.eclipse.ui.dialogs.SelectionStatusDialog#computeResult()
 	 */
-	@Override
 	protected void computeResult() {
 
 		List selectedElements = ((StructuredSelection) list.getSelection())
@@ -1073,7 +1047,6 @@ public abstract class FilteredItemsSelectionDialog extends
 	/*
 	 * @see org.eclipse.ui.dialogs.SelectionStatusDialog#updateStatus(org.eclipse.core.runtime.IStatus)
 	 */
-	@Override
 	protected void updateStatus(IStatus status) {
 		this.status = status;
 		super.updateStatus(status);
@@ -1082,7 +1055,6 @@ public abstract class FilteredItemsSelectionDialog extends
 	/*
 	 * @see Dialog#okPressed()
 	 */
-	@Override
 	protected void okPressed() {
 		if (status != null
 				&& (status.isOK() || status.getCode() == IStatus.INFO)) {
@@ -1357,7 +1329,6 @@ public abstract class FilteredItemsSelectionDialog extends
 					IAction.AS_CHECK_BOX);
 		}
 
-		@Override
 		public void run() {
 			details.setVisible(isChecked());
 		}
@@ -1411,7 +1382,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * 
 		 * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
 		 */
-		@Override
 		public IStatus runInUIThread(IProgressMonitor monitor) {
 			if (monitor.isCanceled())
 				return new Status(IStatus.OK, WorkbenchPlugin.PI_WORKBENCH,
@@ -1453,7 +1423,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * 
 		 * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
 		 */
-		@Override
 		public IStatus runInUIThread(IProgressMonitor monitor) {
 
 			if (!progressLabel.isDisposed())
@@ -1521,7 +1490,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * 
 		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
 		 */
-		@Override
 		protected IStatus run(IProgressMonitor monitor) {
 			if (monitor.isCanceled()) {
 				return new Status(IStatus.CANCEL, WorkbenchPlugin.PI_WORKBENCH,
@@ -1549,7 +1517,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * 
 		 * @see org.eclipse.core.runtime.jobs.Job#canceling()
 		 */
-		@Override
 		protected void canceling() {
 			super.canceling();
 			contentProvider.stopReloadingCache();
@@ -1572,7 +1539,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * 
 		 * @see org.eclipse.jface.action.Action#run()
 		 */
-		@Override
 		public void run() {
 			List selectedElements = ((StructuredSelection) list.getSelection())
 					.toList();
@@ -1716,7 +1682,6 @@ public abstract class FilteredItemsSelectionDialog extends
 			return string;
 		}
 
-		@Override
 		public void update(ViewerCell cell) {
 			Object element = cell.getElement();
 
@@ -1776,7 +1741,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * 
 		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.jface.viewers.ILabelProviderListener)
 		 */
-		@Override
 		public void addListener(ILabelProviderListener listener) {
 			listeners.add(listener);
 		}
@@ -1786,7 +1750,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * 
 		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
 		 */
-		@Override
 		public void dispose() {
 			provider.removeListener(this);
 			provider.dispose();
@@ -1805,7 +1768,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang.Object,
 		 *      java.lang.String)
 		 */
-		@Override
 		public boolean isLabelProperty(Object element, String property) {
 			if (provider.isLabelProperty(element, property)) {
 				return true;
@@ -1822,7 +1784,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * 
 		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
 		 */
-		@Override
 		public void removeListener(ILabelProviderListener listener) {
 			listeners.remove(listener);
 		}
@@ -1863,7 +1824,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * 
 		 * @see org.eclipse.jface.viewers.ILabelProviderListener#labelProviderChanged(org.eclipse.jface.viewers.LabelProviderChangedEvent)
 		 */
-		@Override
 		public void labelProviderChanged(LabelProviderChangedEvent event) {
 			Object[] l = listeners.getListeners();
 			for (int i = 0; i < listeners.size(); i++) {
@@ -1943,7 +1903,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * 
 		 * @see org.eclipse.core.runtime.ProgressMonitorWrapper#setTaskName(java.lang.String)
 		 */
-		@Override
 		public void setTaskName(String name) {
 			super.setTaskName(name);
 			this.name = name;
@@ -1955,7 +1914,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * 
 		 * @see org.eclipse.core.runtime.ProgressMonitorWrapper#subTask(java.lang.String)
 		 */
-		@Override
 		public void subTask(String name) {
 			super.subTask(name);
 			this.subName = name;
@@ -1967,7 +1925,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * @see org.eclipse.core.runtime.ProgressMonitorWrapper#beginTask(java.lang.String,
 		 *      int)
 		 */
-		@Override
 		public void beginTask(String name, int totalWork) {
 			super.beginTask(name, totalWork);
 			if (this.name == null)
@@ -1981,7 +1938,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * 
 		 * @see org.eclipse.core.runtime.ProgressMonitorWrapper#worked(int)
 		 */
-		@Override
 		public void worked(int work) {
 			super.worked(work);
 			internalWorked(work);
@@ -1992,7 +1948,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * 
 		 * @see org.eclipse.core.runtime.ProgressMonitorWrapper#done()
 		 */
-		@Override
 		public void done() {
 			done = true;
 			super.done();
@@ -2003,7 +1958,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * 
 		 * @see org.eclipse.core.runtime.ProgressMonitorWrapper#setCanceled(boolean)
 		 */
-		@Override
 		public void setCanceled(boolean b) {
 			done = b;
 			super.setCanceled(b);
@@ -2014,7 +1968,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * 
 		 * @see org.eclipse.core.runtime.ProgressMonitorWrapper#internalWorked(double)
 		 */
-		@Override
 		public void internalWorked(double work) {
 			worked = worked + work;
 		}
@@ -2072,7 +2025,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * 
 		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
 		 */
-		@Override
 		protected IStatus run(IProgressMonitor monitor) {
 
 			this.itemsFilter = filter;
@@ -2126,7 +2078,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * 
 		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
 		 */
-		@Override
 		protected final IStatus run(IProgressMonitor parent) {
 			GranualProgressMonitor monitor = new GranualProgressMonitor(parent);
 			return doRun(monitor);
@@ -2274,7 +2225,6 @@ public abstract class FilteredItemsSelectionDialog extends
 				 * 
 				 * @see java.util.LinkedList#add(java.lang.Object)
 				 */
-				@Override
 				public boolean add(Object arg0) {
 					if (this.size() >= MAX_HISTORY_SIZE) {
 						Iterator iterator = this.iterator();
@@ -2727,7 +2677,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * @param item
 		 * @param itemsFilter
 		 */
-		@Override
 		public void add(Object item, ItemsFilter itemsFilter) {
 			if (itemsFilter == filter) {
 				if (itemsFilter != null) {
@@ -2914,7 +2863,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * 
 		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 		 */
-		@Override
 		public Object[] getElements(Object inputElement) {
 			return lastFilteredItems.toArray();
 		}
@@ -2928,7 +2876,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * 
 		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
 		 */
-		@Override
 		public void dispose() {
 		}
 
@@ -2938,7 +2885,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 		 *      java.lang.Object, java.lang.Object)
 		 */
-		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 
@@ -2947,7 +2893,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * 
 		 * @see org.eclipse.jface.viewers.ILazyContentProvider#updateElement(int)
 		 */
-		@Override
 		public void updateElement(int index) {
 
 			FilteredItemsSelectionDialog.this.list.replace((lastFilteredItems
@@ -3149,7 +3094,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * 
 		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
 		 */
-		@Override
 		public void dispose() {
 		}
 
@@ -3159,7 +3103,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 		 *      java.lang.Object, java.lang.Object)
 		 */
-		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 
@@ -3220,7 +3163,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * @see org.eclipse.jface.viewers.Viewer#inputChanged(java.lang.Object,
 		 *      java.lang.Object)
 		 */
-		@Override
 		protected void inputChanged(Object input, Object oldInput) {
 			if (oldInput == null) {
 				if (input == null) {
@@ -3239,7 +3181,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * 
 		 * @see org.eclipse.jface.viewers.ContentViewer#handleLabelProviderChanged(org.eclipse.jface.viewers.LabelProviderChangedEvent)
 		 */
-		@Override
 		protected void handleLabelProviderChanged(
 				LabelProviderChangedEvent event) {
 			if (event != null) {
@@ -3252,7 +3193,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * 
 		 * @see org.eclipse.jface.viewers.Viewer#getControl()
 		 */
-		@Override
 		public Control getControl() {
 			return label;
 		}
@@ -3262,7 +3202,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * 
 		 * @see org.eclipse.jface.viewers.Viewer#getSelection()
 		 */
-		@Override
 		public ISelection getSelection() {
 			// not supported
 			return null;
@@ -3273,7 +3212,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * 
 		 * @see org.eclipse.jface.viewers.Viewer#refresh()
 		 */
-		@Override
 		public void refresh() {
 			Object input = this.getInput();
 			if (input != null) {
@@ -3307,7 +3245,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * @see org.eclipse.jface.viewers.Viewer#setSelection(org.eclipse.jface.viewers.ISelection,
 		 *      boolean)
 		 */
-		@Override
 		public void setSelection(ISelection selection, boolean reveal) {
 			// not supported
 		}
@@ -3342,7 +3279,6 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * 
 		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 		 */
-		@Override
 		public int compare(Object o1, Object o2) {
 			boolean h1 = isHistoryElement(o1);
 			boolean h2 = isHistoryElement(o2);

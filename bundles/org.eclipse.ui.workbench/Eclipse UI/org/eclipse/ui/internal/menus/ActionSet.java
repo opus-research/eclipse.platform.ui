@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -204,6 +204,9 @@ public class ActionSet {
 
 	protected void addContribution(String idContrib, ArrayList<MMenuContribution> contributions,
 			IConfigurationElement element, boolean isMenu, String parentId) {
+		if (isEditorAction(element)) {
+			return;
+		}
 		MMenuContribution menuContribution = MenuFactoryImpl.eINSTANCE.createMenuContribution();
 		menuContribution.setVisibleWhen(createVisibleWhen());
 		menuContribution.getTags().add(ContributionsAnalyzer.MC_MENU);

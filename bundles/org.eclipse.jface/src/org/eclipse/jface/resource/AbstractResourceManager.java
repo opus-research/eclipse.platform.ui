@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@ package org.eclipse.jface.resource;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map.Entry;
+import java.util.Map;
 
 /**
  * Abstract implementation of ResourceManager. Maintains reference counts for all previously
@@ -28,7 +28,7 @@ abstract class AbstractResourceManager extends ResourceManager {
     /**
      * Map of ResourceDescriptor onto RefCount. (null when empty)
      */
-    private HashMap<DeviceResourceDescriptor, RefCount> map = null;
+    private HashMap map = null;
     
     /**
      * Holds a reference count for a previously-allocated resource
@@ -68,16 +68,15 @@ abstract class AbstractResourceManager extends ResourceManager {
     /* (non-Javadoc)
      * @see ResourceManager#create(DeviceResourceDescriptor)
      */
-    @Override
-	public final Object create(DeviceResourceDescriptor descriptor) throws DeviceResourceException {
+    public final Object create(DeviceResourceDescriptor descriptor) throws DeviceResourceException {
 
         // Lazily allocate the map
         if (map == null) {
-            map = new HashMap<DeviceResourceDescriptor, RefCount>();
+            map = new HashMap();
         }
         
         // Get the current reference count
-        RefCount count = map.get(descriptor);
+        RefCount count = (RefCount)map.get(descriptor);
         if (count != null) {
             // If this resource already exists, increment the reference count and return
             // the existing resource.
@@ -97,15 +96,14 @@ abstract class AbstractResourceManager extends ResourceManager {
     /* (non-Javadoc)
      * @see ResourceManager#destroy(DeviceResourceDescriptor)
      */
-    @Override
-	public final void destroy(DeviceResourceDescriptor descriptor) {
+    public final void destroy(DeviceResourceDescriptor descriptor) {
         // If the map is empty (null) then there are no resources to dispose
         if (map == null) {
             return;
         }
         
         // Find the existing resource
-        RefCount count = map.get(descriptor);
+        RefCount count = (RefCount)map.get(descriptor);
         if (count != null) {
             // If the resource exists, decrement the reference count.
             count.count--;
@@ -128,21 +126,20 @@ abstract class AbstractResourceManager extends ResourceManager {
      * 
      * @since 3.1 
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         super.dispose();
         
         if (map == null) {
             return;
         }
         
-        Collection<Entry<DeviceResourceDescriptor, RefCount>> entries = map.entrySet();
+        Collection entries = map.entrySet();
 
-        for (Iterator<Entry<DeviceResourceDescriptor, RefCount>> iter = entries.iterator(); iter.hasNext();) {
-            Entry<DeviceResourceDescriptor, RefCount> next = iter.next();
+        for (Iterator iter = entries.iterator(); iter.hasNext();) {
+            Map.Entry next = (Map.Entry) iter.next();
             
             Object key = next.getKey();
-            RefCount val = next.getValue();
+            RefCount val = (RefCount)next.getValue();
             
             deallocate(val.resource, (DeviceResourceDescriptor)key);
         }
@@ -153,12 +150,11 @@ abstract class AbstractResourceManager extends ResourceManager {
     /* (non-Javadoc)
      * @see org.eclipse.jface.resource.ResourceManager#find(org.eclipse.jface.resource.DeviceResourceDescriptor)
      */
-    @Override
-	public Object find(DeviceResourceDescriptor descriptor) {
+    public Object find(DeviceResourceDescriptor descriptor) {
         if (map == null) {
             return null;
         }
-        RefCount refCount = map.get(descriptor);
+        RefCount refCount = (RefCount)map.get(descriptor);
         if (refCount == null)
         	return null;
 		return refCount.resource;

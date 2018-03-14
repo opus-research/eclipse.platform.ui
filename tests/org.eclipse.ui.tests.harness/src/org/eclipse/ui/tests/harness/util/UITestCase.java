@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -163,7 +163,7 @@ public abstract class UITestCase extends TestCase {
      * @param msg the trace message
      */
     protected void trace(String msg) {
-        System.out.println(msg);
+        System.err.println(msg);
     }
 
     /**
@@ -273,7 +273,7 @@ public abstract class UITestCase extends TestCase {
 			waitOnShell(window.getShell());
 			return window;
 		} catch (WorkbenchException e) {
-			fail("Problem opening test window", e);
+			fail();
 			return null;
 		}
 	}
@@ -314,10 +314,10 @@ public abstract class UITestCase extends TestCase {
      */
     public IWorkbenchPage openTestPage(IWorkbenchWindow win) {
         IWorkbenchPage[] pages = openTestPage(win, 1);
-        if (pages != null) {
+        if (pages != null)
             return pages[0];
-        }
-        return null;
+        else
+            return null;
     }
 
     /**
@@ -333,7 +333,7 @@ public abstract class UITestCase extends TestCase {
             }
             return pages;
         } catch (WorkbenchException e) {
-        	fail("Problem opening test page", e);
+            fail();
             return null;
         }
     }

@@ -153,8 +153,7 @@ public class NavigationHistoryEntry {
      * (non-Javadoc)
      * Method declared on Object.
      */
-    @Override
-	public String toString() {
+    public String toString() {
         return "Input<" + editorInfo.editorInput + "> Details<" + location + ">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 

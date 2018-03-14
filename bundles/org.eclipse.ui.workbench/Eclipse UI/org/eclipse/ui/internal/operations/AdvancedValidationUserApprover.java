@@ -93,7 +93,6 @@ public class AdvancedValidationUserApprover implements IOperationApprover,
 		// The casts to IAdvancedUndoableOperation and
 		// IAdvancedUndoableOperation2 are safe because these types were checked
 		// in the call chain.
-		@Override
 		public void run(IProgressMonitor pm) {
 			try {
 				switch (doing) {
@@ -142,7 +141,6 @@ public class AdvancedValidationUserApprover implements IOperationApprover,
 	 *      org.eclipse.core.commands.operations.IOperationHistory,
 	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
-	@Override
 	public IStatus proceedRedoing(IUndoableOperation operation,
 			IOperationHistory history, IAdaptable uiInfo) {
 		return proceedWithOperation(operation, history, uiInfo, REDOING);
@@ -155,7 +153,6 @@ public class AdvancedValidationUserApprover implements IOperationApprover,
 	 *      org.eclipse.core.commands.operations.IOperationHistory,
 	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
-	@Override
 	public IStatus proceedUndoing(IUndoableOperation operation,
 			IOperationHistory history, IAdaptable uiInfo) {
 
@@ -169,7 +166,6 @@ public class AdvancedValidationUserApprover implements IOperationApprover,
 	 *      org.eclipse.core.commands.operations.IOperationHistory,
 	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
-	@Override
 	public IStatus proceedExecuting(IUndoableOperation operation,
 			IOperationHistory history, IAdaptable uiInfo) {
 		return proceedWithOperation(operation, history, uiInfo, EXECUTING);
@@ -203,7 +199,6 @@ public class AdvancedValidationUserApprover implements IOperationApprover,
 		// whole thing up in a syncExec.
 		final IStatus[] status = new IStatus[1];
 		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
-			@Override
 			public void run() {
 				// Compute the undoable or redoable status
 				status[0] = computeOperationStatus(operation, history, uiInfo,
