@@ -7,7 +7,7 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728, 430166, 441150
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728, 430166
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -52,6 +52,7 @@ import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.ISaveHandler;
+import org.eclipse.e4.ui.workbench.modeling.ISaveHandler.Save;
 import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.LegacyActionTools;
@@ -193,11 +194,17 @@ public class StackRenderer extends LazyStackRenderer {
 		return itemsToSet;
 	}
 
-
+	/**
+	 * This is the new way to handle UIEvents (as opposed to subscring and
+	 * unsubscribing them with the event broker.
+	 * 
+	 * The method is described in detail at
+	 * http://wiki.eclipse.org/Eclipse4/RCP/Event_Model
+	 */
 	@SuppressWarnings("unchecked")
 	@Inject
 	@Optional
-	private void subscribeTopicTransientDataChanged(
+	private void handleTransientDataEvents(
 			@UIEventTopic(UIEvents.ApplicationElement.TOPIC_TRANSIENTDATA) org.osgi.service.event.Event event) {
 		Object changedElement = event.getProperty(UIEvents.EventTags.ELEMENT);
 
@@ -279,6 +286,10 @@ public class StackRenderer extends LazyStackRenderer {
 		}
 
 		return super.requiresFocus(element);
+	}
+
+	public StackRenderer() {
+		super();
 	}
 
 	@PostConstruct
@@ -1495,15 +1506,26 @@ public class StackRenderer extends LazyStackRenderer {
 			final List<MPart> toPrompt = new ArrayList<MPart>(others);
 			toPrompt.retainAll(partService.getDirtyParts());
 
-			boolean cancel = false;
+			final Save[] response;
 			if (toPrompt.size() > 1) {
-				cancel = !saveHandler.saveParts(toPrompt, true);
+				response = saveHandler.promptToSave(toPrompt);
 			} else if (toPrompt.size() == 1) {
-				cancel = !saveHandler.save(toPrompt.get(0), true);
+				response = new Save[] { saveHandler.promptToSave(toPrompt
+						.get(0)) };
+			} else {
+				response = new Save[] {};
 			}
-			if (cancel) {
-				return;
+			final List<MPart> toSave = new ArrayList<MPart>(toPrompt.size());
+			for (int i = 0; i < response.length; i++) {
+				final Save save = response[i];
+				final MPart mPart = toPrompt.get(i);
+				if (save == Save.CANCEL) {
+					return;
+				} else if (save == Save.YES) {
+					toSave.add(mPart);
+				}
 			}
+			saveHandler.saveParts(toSave, false);
 
 			for (MPart other : others) {
 				partService.hidePart(other);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -168,7 +167,7 @@ public final class KeyBindingService implements INestableKeyBindingService {
 		} else if (activeService instanceof KeyBindingService) {
 			// add all the nested context ids.
 
-			EContextService cs = ((KeyBindingService) activeService).workbenchPartSite
+			EContextService cs = (EContextService) ((KeyBindingService) activeService).workbenchPartSite
 					.getService(EContextService.class);
 			for (String id : ((KeyBindingService) activeService).enabledContextIds) {
 				cs.activateContext(id);
@@ -176,7 +175,7 @@ public final class KeyBindingService implements INestableKeyBindingService {
 			/*
 			 * add all of the nested handler submissions.
 			 */
-			IHandlerService hs = ((KeyBindingService) activeService).workbenchPartSite
+			IHandlerService hs = (IHandlerService) ((KeyBindingService) activeService).workbenchPartSite
 					.getService(IHandlerService.class);
 			Iterator<Entry<IAction, IHandlerActivation>> i = ((KeyBindingService) activeService).actionToProxy
 					.entrySet().iterator();
@@ -210,7 +209,7 @@ public final class KeyBindingService implements INestableKeyBindingService {
 		} else if (activeService instanceof KeyBindingService) {
 			// Remove all the nested context ids.
 
-			EContextService cs = ((KeyBindingService) activeService).workbenchPartSite
+			EContextService cs = (EContextService) ((KeyBindingService) activeService).workbenchPartSite
 					.getService(EContextService.class);
 			for (String id : ((KeyBindingService) activeService).enabledContextIds) {
 				cs.deactivateContext(id);
@@ -220,7 +219,7 @@ public final class KeyBindingService implements INestableKeyBindingService {
 			 * weren't created by this instance (but by the nest instance), and
 			 * hence can't be disposed here.
 			 */
-			IHandlerService hs = ((KeyBindingService) activeService).workbenchPartSite
+			IHandlerService hs = (IHandlerService) ((KeyBindingService) activeService).workbenchPartSite
 					.getService(IHandlerService.class);
 			hs.deactivateHandlers(((KeyBindingService) activeService).actionToProxy.values());
 		}
@@ -242,7 +241,7 @@ public final class KeyBindingService implements INestableKeyBindingService {
 		if (!disposed) {
 			disposed = true;
 			deactivateNestedService();
-			EContextService cs = workbenchPartSite
+			EContextService cs = (EContextService) workbenchPartSite
 					.getService(EContextService.class);
 			for (String id : enabledContextIds) {
 				cs.deactivateContext(id);
@@ -253,7 +252,7 @@ public final class KeyBindingService implements INestableKeyBindingService {
 			 * weren't created by this instance (but by the nest instance), and
 			 * hence can't be disposed here.
 			 */
-			IHandlerService hs = workbenchPartSite
+			IHandlerService hs = (IHandlerService) workbenchPartSite
 					.getService(IHandlerService.class);
 			hs.deactivateHandlers(actionToProxy.values());
 			actionToProxy.clear();
@@ -351,7 +350,7 @@ public final class KeyBindingService implements INestableKeyBindingService {
 				}
 			}
 
-			IHandlerService hs = workbenchPartSite
+			IHandlerService hs = (IHandlerService) workbenchPartSite
 					.getService(IHandlerService.class);
 			actionToProxy.put(action, hs.activateHandler(commandId, new ActionHandler(action),
 					new LegacyHandlerSubmissionExpression(null, partSite.getShell(), partSite)));
@@ -389,7 +388,7 @@ public final class KeyBindingService implements INestableKeyBindingService {
 		}
 		Set<String> oldContextIds = enabledContextIds;
 		enabledContextIds = new HashSet<String>(Arrays.asList(scopes));
-		EContextService cs = workbenchPartSite.getService(EContextService.class);
+		EContextService cs = (EContextService) workbenchPartSite.getService(EContextService.class);
 		addParents(cs, scopes);
 		
 		for (String id : oldContextIds) {
@@ -442,7 +441,7 @@ public final class KeyBindingService implements INestableKeyBindingService {
 		if (activation == null) {
 			return;
 		}
-		IHandlerService hs = workbenchPartSite.getService(IHandlerService.class);
+		IHandlerService hs = (IHandlerService) workbenchPartSite.getService(IHandlerService.class);
 		hs.deactivateHandler(activation);
 	}
 }
