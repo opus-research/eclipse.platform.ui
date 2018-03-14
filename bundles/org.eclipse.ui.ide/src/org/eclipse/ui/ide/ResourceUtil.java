@@ -11,16 +11,12 @@
  *******************************************************************************/
 package org.eclipse.ui.ide;
 
-import javax.jws.soap.SOAPBinding.Use;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.mapping.ResourceMapping;
 import org.eclipse.core.resources.mapping.ResourceTraversal;
 import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
@@ -59,11 +55,7 @@ public final class ResourceUtil {
 		}
         // Note: do not treat IFileEditorInput as a special case.  Use the adapter mechanism instead.
         // See Bug 87288 [IDE] [EditorMgmt] Should avoid explicit checks for [I]FileEditorInput
-        Object o = editorInput.getAdapter(IFile.class);
-        if (o instanceof IFile) {
-			return (IFile) o;
-		}
-        return null;
+		return Adapters.getAdapter(editorInput, IFile.class, true);
     }
 
     /**
@@ -80,9 +72,9 @@ public final class ResourceUtil {
 		}
         // Note: do not treat IFileEditorInput as a special case.  Use the adapter mechanism instead.
         // See Bug 87288 [IDE] [EditorMgmt] Should avoid explicit checks for [I]FileEditorInput
-        Object o = editorInput.getAdapter(IResource.class);
-        if (o instanceof IResource) {
-			return (IResource) o;
+		IResource resource = Adapters.getAdapter(editorInput, IResource.class, true);
+		if (resource != null) {
+			return resource;
 		}
         // the input may adapt to IFile but not IResource
         return getFile(editorInput);
@@ -254,22 +246,9 @@ public final class ResourceUtil {
 	 *   <code>false</code> otherwise
      * @return the adapter
      * @since 3.2
-     *
-     * @deprecated Use {@link Adapters#getAdapter(Object, Class, boolean)} instead
      */
-	@Deprecated
 	public static <T> T getAdapter(Object element, Class<T> adapterType, boolean forceLoad) {
-		if (element instanceof IAdaptable) {{
-			IAdaptable adaptable = (IAdaptable) element;
-			T o = adaptable.getAdapter(adapterType);
-	        if (o != null) {
-	        	return o;
-	        }
-		}
-		if (forceLoad) {
-			return adapterType.cast(Platform.getAdapterManager().loadAdapter(element, adapterType.getName()));
-		}
-		return Platform.getAdapterManager().getAdapter(element, adapterType);
+		return Adapters.getAdapter(element, adapterType, forceLoad);
 	}
 
 }
