@@ -45,7 +45,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MWindow#getHeight <em>Height</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MWindow#getWindows <em>Windows</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MWindow#getSharedElements <em>Shared Elements</em>}</li>
- *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MWindow#getDialogs <em>Dialogs</em>}</li>
  * </ul>
  *
  * @model
@@ -218,20 +217,5 @@ public interface MWindow extends MElementContainer<MWindowElement>, MUILabel, MC
 	 * @generated
 	 */
 	List<MUIElement> getSharedElements();
-
-	/**
-	 * Returns the value of the '<em><b>Dialogs</b></em>' containment reference list.
-	 * The list contents are of type {@link org.eclipse.e4.ui.model.application.ui.basic.MFrame}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Dialogs</em>' containment reference list isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Dialogs</em>' containment reference list.
-	 * @model containment="true"
-	 * @generated
-	 */
-	List<MFrame> getDialogs();
 
 } // MWindow

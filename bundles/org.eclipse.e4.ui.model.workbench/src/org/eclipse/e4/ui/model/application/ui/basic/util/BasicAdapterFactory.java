@@ -137,20 +137,12 @@ public class BasicAdapterFactory extends AdapterFactoryImpl {
 				return createStackElementAdapter();
 			}
 			@Override
-			public Adapter caseFrame(MFrame object) {
-				return createFrameAdapter();
-			}
-			@Override
-			public Adapter caseFrameElement(MFrameElement object) {
-				return createFrameElementAdapter();
-			}
-			@Override
 			public Adapter caseDialog(MDialog object) {
 				return createDialogAdapter();
 			}
 			@Override
-			public Adapter caseWizard(MWizard object) {
-				return createWizardAdapter();
+			public Adapter caseWizardDialog(MWizardDialog object) {
+				return createWizardDialogAdapter();
 			}
 			@Override
 			public Adapter caseApplicationElement(MApplicationElement object) {
@@ -401,34 +393,6 @@ public class BasicAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link org.eclipse.e4.ui.model.application.ui.basic.MFrame <em>Frame</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see org.eclipse.e4.ui.model.application.ui.basic.MFrame
-	 * @generated
-	 */
-	public Adapter createFrameAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link org.eclipse.e4.ui.model.application.ui.basic.MFrameElement <em>Frame Element</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see org.eclipse.e4.ui.model.application.ui.basic.MFrameElement
-	 * @generated
-	 */
-	public Adapter createFrameElementAdapter() {
-		return null;
-	}
-
-	/**
 	 * Creates a new adapter for an object of class '{@link org.eclipse.e4.ui.model.application.ui.basic.MDialog <em>Dialog</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
@@ -443,16 +407,16 @@ public class BasicAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link org.eclipse.e4.ui.model.application.ui.basic.MWizard <em>Wizard</em>}'.
+	 * Creates a new adapter for an object of class '{@link org.eclipse.e4.ui.model.application.ui.basic.MWizardDialog <em>Wizard Dialog</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see org.eclipse.e4.ui.model.application.ui.basic.MWizard
+	 * @see org.eclipse.e4.ui.model.application.ui.basic.MWizardDialog
 	 * @generated
 	 */
-	public Adapter createWizardAdapter() {
+	public Adapter createWizardDialogAdapter() {
 		return null;
 	}
 
