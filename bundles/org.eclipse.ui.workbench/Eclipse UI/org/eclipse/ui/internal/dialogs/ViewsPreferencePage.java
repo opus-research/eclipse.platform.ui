@@ -301,7 +301,7 @@ public class ViewsPreferencePage extends PreferencePage implements
 	}
 
 	private boolean getDefaultMRUValue() {
-		return getSwtRendererPreferences().getBoolean(StackRenderer.MRU_KEY_DEFAULT, StackRenderer.MRU_DEFAULT);
+		return getSwtRendererPreferences().getBoolean(StackRenderer.MRU_KEY_DEFAULT, true);
 	}
 
 	private void setColorsAndFontsTheme(ColorsAndFontsTheme theme) {
