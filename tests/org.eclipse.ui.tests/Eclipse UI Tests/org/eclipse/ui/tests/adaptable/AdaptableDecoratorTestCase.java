@@ -57,7 +57,6 @@ public class AdaptableDecoratorTestCase extends UITestCase implements
 		ts.addTest(new AdaptableDecoratorTestCase("testRefreshLightContributor"));
 		return ts;
 	}
-
 	/**
 	 * Constructor for DecoratorTestCase.
 	 * 
@@ -67,7 +66,9 @@ public class AdaptableDecoratorTestCase extends UITestCase implements
 		super(testName);
 	}
 
-	@Override
+	/**
+	 * Sets up the hierarchy.
+	 */
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		createTestFile();
@@ -91,7 +92,9 @@ public class AdaptableDecoratorTestCase extends UITestCase implements
 		return WorkbenchPlugin.getDefault().getDecoratorManager();
 	}
 
-	@Override
+	/**
+	 * Remove the listener.
+	 */
 	protected void doTearDown() throws Exception {
 
 		if (testProject != null) {
@@ -112,7 +115,7 @@ public class AdaptableDecoratorTestCase extends UITestCase implements
 	/**
 	 * Test enabling the contributor
 	 */
-	public void testEnableDecorator() {
+	public void testEnableDecorator() throws CoreException {
 		getDecoratorManager().updateForEnablementChange();
 		fullDefinition.setEnabled(true);
 		lightDefinition.setEnabled(true);
@@ -148,7 +151,7 @@ public class AdaptableDecoratorTestCase extends UITestCase implements
 	/**
 	 * Refresh the full decorator.
 	 */
-	public void testRefreshLightContributor() {
+	public void testRefreshLightContributor() throws CoreException {
 
 		updated = false;
 		getDecoratorManager().updateForEnablementChange();
@@ -160,7 +163,9 @@ public class AdaptableDecoratorTestCase extends UITestCase implements
 
 	}
 
-	@Override
+	/*
+	 * @see ILabelProviderListener#labelProviderChanged(LabelProviderChangedEvent)
+	 */
 	public void labelProviderChanged(LabelProviderChangedEvent event) {
 		updated = true;
 	}
