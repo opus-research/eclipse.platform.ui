@@ -13,7 +13,6 @@
  *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  *     		Implemented workbench auto-save to correctly restore state in case of crash.
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422533
- *     Terry Parker <tparker@google.com> - Bug 416673
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -1263,26 +1262,12 @@ public final class Workbench extends EventManager implements IWorkbench,
 		}
 	}
 
-	private boolean detectWorkbenchCorruption(MApplication application) {
-		if (application.getChildren().isEmpty()) {
-			WorkbenchPlugin.log(
-					"When auto-saving the workbench model, there were no top-level windows. " //$NON-NLS-1$
-							+ " Skipped saving the model.", //$NON-NLS-1$
-					new Exception()); // log a stack trace to assist debugging
-			return true;
-		}
-		return false;
-	}
-
 	/**
 	 * Copy the model, clean it up and write it out to workbench.xmi. Called as
 	 * part of persist(false) during auto-save.
 	 */
 	private void persistWorkbenchModel() {
 		final MApplication appCopy = (MApplication) EcoreUtil.copy((EObject) application);
-		if (detectWorkbenchCorruption(appCopy)) {
-			return;
-		}
 		final IModelResourceHandler handler = e4Context.get(IModelResourceHandler.class);
 
 		Job cleanAndSaveJob = new Job("Workbench Auto-Save Background Job") { //$NON-NLS-1$
@@ -1291,9 +1276,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 				final Resource res = handler.createResourceWithApp(appCopy);
 				cleanUpCopy(appCopy, e4Context);
 				try {
-					if (!detectWorkbenchCorruption((MApplication) res.getContents().get(0))) {
-						res.save(null);
-					}
+					res.save(null);
 				} catch (IOException e) {
 					// Just auto-save, we don't really care
 				} finally {
@@ -1985,24 +1968,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 					}
 				});
 		
-		eventBroker.subscribe(UIEvents.ElementContainer.TOPIC_CHILDREN, new EventHandler() {
-			@Override
-			public void handleEvent(org.osgi.service.event.Event event) {
-				Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
-				if (!(element instanceof MApplication)) {
-					return;
-				}
-				MApplication app = (MApplication) element;
-				if (UIEvents.isREMOVE(event)) {
-					if (app.getChildren().isEmpty()) {
-						Object oldValue = event.getProperty(UIEvents.EventTags.OLD_VALUE);
-						WorkbenchPlugin.log("The final top level window " + oldValue //$NON-NLS-1$
-								+ " was just removed", new Exception()); //$NON-NLS-1$
-					}
-				}
-			}
-		});
-
 		boolean found = false;
 		List<MPartDescriptor> currentDescriptors = application.getDescriptors();
 		for (MPartDescriptor desc : currentDescriptors) {
@@ -2779,8 +2744,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 		workbenchAutoSave = b;
 	}
 
-	private volatile boolean initDone = false;
-
 	/**
 	 * Internal method for running the workbench UI. This entails processing and
 	 * dispatching events until the workbench is closed or restarted.
@@ -2864,6 +2827,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 
 			if (getSplash() != null) {
 
+				final boolean[] initDone = new boolean[] { false };
 				final Throwable[] error = new Throwable[1];
 				Thread initThread = new Thread() {
 					/*
@@ -2881,13 +2845,8 @@ UIEvents.Context.TOPIC_CONTEXT,
 						} catch (Throwable e) {
 							error[0] = e;
 						} finally {
-							initDone = true;
+							initDone[0] = true;
 							yield();
-							try {
-								Thread.sleep(5);
-							} catch (InterruptedException e) {
-								// this is a no-op in this case.
-							}
 							display.wake();
 						}
 					}
@@ -2895,7 +2854,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 				initThread.start();
 				while (true) {
 					if (!display.readAndDispatch()) {
-						if (initDone)
+						if (initDone[0])
 							break;
 						display.sleep();
 					}

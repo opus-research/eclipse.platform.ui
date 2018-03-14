@@ -12,7 +12,7 @@
  *     								 removes a menu from multiple perspectives
  *     René Brandstetter - Bug 411821 - [QuickAccess] Contribute SearchField
  *                                      through a fragment or other means
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431446, 433979
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431446
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -52,7 +52,6 @@ import org.eclipse.e4.core.di.InjectionException;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
-import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.internal.workbench.PartServiceSaveHandler;
@@ -835,12 +834,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			spacerControl
 					.setContributionURI("bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/org.eclipse.e4.ui.workbench.renderers.swt.LayoutModifierToolControl"); //$NON-NLS-1$
 			spacerControl.getTags().add(TrimBarLayout.SPACER);
-			spacerControl.getTags().add("SHOW_RESTORE_MENU"); //$NON-NLS-1$
 			trimBar.getChildren().add(spacerControl);
-		} else {
-			if (!spacerControl.getTags().contains("SHOW_RESTORE_MENU")) { //$NON-NLS-1$
-				spacerControl.getTags().add("SHOW_RESTORE_MENU"); //$NON-NLS-1$
-			}
 		}
 
 		MToolControl switcherControl = (MToolControl) modelService.find(
@@ -850,23 +844,11 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			switcherControl.setToBeRendered(getWindowConfigurer().getShowPerspectiveBar());
 			switcherControl.setElementId("PerspectiveSwitcher"); //$NON-NLS-1$
 			switcherControl.getTags().add(IPresentationEngine.DRAGGABLE);
-			switcherControl.getTags().add("HIDEABLE"); //$NON-NLS-1$
-			switcherControl.getTags().add("SHOW_RESTORE_MENU"); //$NON-NLS-1$
 			switcherControl
 					.setContributionURI("bundleclass://org.eclipse.ui.workbench/org.eclipse.e4.ui.workbench.addons.perspectiveswitcher.PerspectiveSwitcher"); //$NON-NLS-1$
 			trimBar.getChildren().add(switcherControl);
-		} else if (switcherControl != null) {
-			if (!getWindowConfigurer().getShowPerspectiveBar()) {
-				trimBar.getChildren().remove(switcherControl);
-			} else {
-				List<String> tags = switcherControl.getTags();
-				if (!tags.contains("HIDEABLE")) { //$NON-NLS-1$
-					tags.add("HIDEABLE"); //$NON-NLS-1$
-				}
-				if (!tags.contains("SHOW_RESTORE_MENU")) { //$NON-NLS-1$
-					tags.add("SHOW_RESTORE_MENU"); //$NON-NLS-1$
-				}
-			}
+		} else if (switcherControl != null && !getWindowConfigurer().getShowPerspectiveBar()) {
+			trimBar.getChildren().remove(switcherControl);
 		}
 
 		// render now after everything has been added so contributions can be
@@ -919,51 +901,9 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 					quickAccessElementId, model);
 			if (quickAccessElement != null) {
 				moveControl(quickAccessElement.getParent(), quickAccessElement);
-
-				// target the quick access field specifically
-				if (QUICK_ACCESS_ID.equals(quickAccessElement.getElementId())) {
-					if (model.getTags().contains(QUICK_ACCESS_HIDDEN)) {
-						if (!quickAccessElement.getTags().contains(
-								IPresentationEngine.HIDDEN_EXPLICITLY)) {
-							quickAccessElement.getTags().add(IPresentationEngine.HIDDEN_EXPLICITLY);
-						}
-					}
-				}
 			}
 		}
 
-	}
-
-	private static final String QUICK_ACCESS_ID = "SearchField"; //$NON-NLS-1$
-	private static final String QUICK_ACCESS_HIDDEN = "QUICK_ACCESS_HIDDEN"; //$NON-NLS-1$
-
-	@Inject
-	private void hideQuickAccess(
-			@Optional @UIEventTopic(UIEvents.ApplicationElement.TOPIC_TAGS) Event event) {
-		if (event == null) {
-			return;
-		}
-		Object origin = event.getProperty(UIEvents.EventTags.ELEMENT);
-		if (!(origin instanceof MToolControl)) {
-			return;
-		}
-		MToolControl control = (MToolControl) origin;
-		if (!QUICK_ACCESS_ID.equals(control.getElementId())) {
-			return;
-		}
-		if (UIEvents.isADD(event)) {
-			if (UIEvents.contains(event, UIEvents.EventTags.NEW_VALUE,
-					IPresentationEngine.HIDDEN_EXPLICITLY)) {
-				if (!model.getTags().contains(QUICK_ACCESS_HIDDEN)) {
-					model.getTags().add(QUICK_ACCESS_HIDDEN);
-				}
-			}
-		} else if (UIEvents.isREMOVE(event)) {
-			if (UIEvents.contains(event, UIEvents.EventTags.OLD_VALUE,
-					IPresentationEngine.HIDDEN_EXPLICITLY)) {
-				model.getTags().remove(QUICK_ACCESS_HIDDEN);
-			}
-		}
 	}
 
 	/**
@@ -1915,7 +1855,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 			getActionBarAdvisor().dispose();
 			getWindowAdvisor().dispose();
-			coolbarToTrim.dispose();
 
 			// Null out the progress region. Bug 64024.
 			progressRegion = null;
