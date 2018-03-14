@@ -7,8 +7,7 @@
  *
  * Contributors:
  *     Andrea Guarinoni <andrea.guarinoni.dev@outlook.com> - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 435574
+ *     Lars Vogel - initial API and implementation
  *******************************************************************************/
 
 
@@ -268,14 +267,16 @@
 #org-eclipse-e4-ui-compatibility-editor Canvas > *,
 /* Workaround for CDT folding column SWT-BUG (styles aren't inherited) */
 #org-eclipse-e4-ui-compatibility-editor Canvas > * > * {
-    background-color: #262626;
+    /*background-color: #262626;*/
+    background-color: '#org-eclipse-ui-workbench-INACTIVE_CODE_EDITOR_BG_COLOR';
     /* SWT-BUG: background-color rule for LineNumberRulerColumn is ignored */
 }
 .MPartStack.active #org-eclipse-e4-ui-compatibility-editor Canvas,
 .MPartStack.active #org-eclipse-e4-ui-compatibility-editor Canvas > *,
 /* Workaround for CDT folding column SWT-BUG (styles aren't inherited) */
 .MPartStack.active #org-eclipse-e4-ui-compatibility-editor Canvas > * > * {
-    background-color: #202020;
+    /*background-color: #202020;*/
+    background-color: '#org-eclipse-ui-workbench-ACTIVE_CODE_EDITOR_BG_COLOR';
     /* SWT-BUG: background-color rule for LineNumberRulerColumn is ignored */
 }
 #org-eclipse-e4-ui-compatibility-editor CTabItem {
@@ -314,3 +315,23 @@
     background-color: #252525;
     color: #CCCCCC;
 }
+
+/* begin of the hack for the Bug 433276 */
+.MPartStack#left > Composite,
+.MPartStack#left ToolBar,
+.MPartStack#right > Composite,
+.MPartStack#right ToolBar,
+.MPartStack#bottom > Composite,
+.MPartStack#bottom ToolBar {
+	background-color: '#org-eclipse-ui-workbench-INACTIVE_UNSELECTED_TABS_COLOR_START' '#org-eclipse-ui-workbench-INACTIVE_UNSELECTED_TABS_COLOR_END' 100% 100%;
+}
+
+.MPartStack#left.active > Composite,
+.MPartStack#left.active ToolBar,
+.MPartStack#right.active > Composite,
+.MPartStack#right.active ToolBar,
+.MPartStack#bottom.active > Composite,
+.MPartStack#bottom.active ToolBar {
+	background-color: '#org-eclipse-ui-workbench-ACTIVE_UNSELECTED_TABS_COLOR_START' '#org-eclipse-ui-workbench-ACTIVE_UNSELECTED_TABS_COLOR_END' 100% 100%;
+}
+/* end of the hack */
