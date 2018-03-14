@@ -2246,7 +2246,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			reference.clearResult();
 			boolean ns = reference.evaluate(currentState);
 			if (os != ns) {
-				changeDetected = true;
 				reference.getListener().propertyChange(
 						new PropertyChangeEvent(reference, reference.getProperty(), valueOf(os),
 								valueOf(ns)));
