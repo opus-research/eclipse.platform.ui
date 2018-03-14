@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866, Bug 405471
  *     Sopot Cela <sopotcela@gmail.com>
+ *     Steven Spungin <steven@spungin.tv> - Bug
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -291,13 +292,10 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		eventBroker.unsubscribe(toBeRenderedUpdater);
 
 		ContextInjectionFactory.uninject(MenuManagerEventHelper.getInstance()
-				.getShowHelper(),
-				context);
+				.getShowHelper(), context);
 		MenuManagerEventHelper.getInstance().setShowHelper(null);
-		ContextInjectionFactory.uninject(
-MenuManagerEventHelper.getInstance()
-				.getHideHelper(),
-				context);
+		ContextInjectionFactory.uninject(MenuManagerEventHelper.getInstance()
+				.getHideHelper(), context);
 		MenuManagerEventHelper.getInstance().setHideHelper(null);
 
 		context.remove(MenuManagerRendererFilter.class);
@@ -420,6 +418,11 @@ MenuManagerEventHelper.getInstance()
 			ContributionRecord record = entry.getValue();
 			if (disposedRecords.contains(record))
 				iterator.remove();
+		}
+
+		MenuManager manager = getManager(menuModel);
+		if (manager != null) {
+			manager.markDirty();
 		}
 	}
 
@@ -693,8 +696,7 @@ MenuManagerEventHelper.getInstance()
 	 * @param parentManager
 	 * @param itemModel
 	 */
-	void processRenderedItem(MenuManager parentManager,
- MMenuItem itemModel) {
+	void processRenderedItem(MenuManager parentManager, MMenuItem itemModel) {
 		IContributionItem ici = getContribution(itemModel);
 		if (ici != null) {
 			return;
