@@ -12,6 +12,7 @@
 
 package org.eclipse.jface.examples.databinding.snippets;
 
+import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.observable.ObservableTracker;
 import org.eclipse.core.databinding.observable.Realm;
@@ -52,6 +53,11 @@ public class Snippet008ComputedValue {
 				final Data data = new Data();
 
 				// Bind the UI to the Data.
+				DataBindingContext dbc = new DataBindingContext();
+				dbc.bindValue(SWTObservables.observeText(ui.firstName,
+						SWT.Modify), data.firstName);
+				dbc.bindValue(SWTObservables.observeText(ui.lastName,
+						SWT.Modify), data.lastName);
 
 				// Construct the formatted name observable.
 				FormattedName formattedName = new FormattedName(data.firstName,
