@@ -363,9 +363,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 
 	private Button browseArchivesButton;
 
-	// The last selected path; to minimize searches
-	private String lastPath;
-
 	// constant from WizardArchiveFileResourceImportPage1
 	private static final String[] FILE_IMPORT_MASK = {
 			"*.jar;*.zip;*.tar;*.tar.gz;*.tgz", "*.*" }; //$NON-NLS-1$ //$NON-NLS-2$
@@ -456,11 +453,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				nestedProjects = nestedProjectsCheckbox.getSelection();
-				if (projectFromDirectoryRadio.getSelection()) {
-					updateProjectsList(directoryPathField.getText().trim(), true);
-				} else {
-					updateProjectsList(archivePathField.getText().trim(), true);
-				}
+				updateProjectsStatus();
 			}
 		});
 
@@ -626,9 +619,9 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (projectFromDirectoryRadio.getSelection()) {
-					updateProjectsList(directoryPathField.getText().trim(), true);
+					updateProjectsList(directoryPathField.getText().trim());
 				} else {
-					updateProjectsList(archivePathField.getText().trim(), true);
+					updateProjectsList(archivePathField.getText().trim());
 				}
 			}
 		});
@@ -820,10 +813,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 	 * @param path
 	 */
 	public void updateProjectsList(final String path) {
-		updateProjectsList(path, false);
-	}
-
-	private void updateProjectsList(final String path, boolean forceUpdate) {
 		// on an empty path empty selectedProjects
 		if (path == null || path.length() == 0) {
 			setMessage(DataTransferMessages.WizardProjectsImportPage_ImportProjectsDescription);
@@ -831,15 +820,10 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 			projectsList.refresh(true);
 			projectsList.setCheckedElements(selectedProjects);
 			setPageComplete(projectsList.getCheckedElements().length > 0);
-			lastPath = path;
 			return;
 		}
 
 		final File directory = new File(path);
-		if (path.equals(lastPath) && !forceUpdate) {
-			// unchanged; lastPath is updated here and in the refresh
-			return;
-		}
 
 		// We can't access the radio button from the inner class so get the
 		// status beforehand
@@ -946,7 +930,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 			// Nothing to do if the user interrupts.
 		}
 
-		lastPath = path;
 		updateProjectsStatus();
 	}
 
