@@ -97,8 +97,6 @@ public interface IPresentationEngine {
 	/**
 	 * When applied to an MWindow causes the renderer to render the resulting control as a top level
 	 * window
-	 * 
-	 * @since 1.2
 	 */
 	public static String WINDOW_TOP_LEVEL = "shellTopLevel"; //$NON-NLS-1$
 
