@@ -46,7 +46,7 @@ public class ViewerComparator {
 	/**
 	 * The comparator to use to sort a viewer's contents.
 	 */
-	private Comparator<String> comparator;
+	private Comparator comparator;
 
 	/**
      * Creates a new {@link ViewerComparator}, which uses the default comparator
@@ -63,7 +63,7 @@ public class ViewerComparator {
      * 
 	 * @param comparator
 	 */
-	public ViewerComparator(Comparator<String> comparator) {
+	public ViewerComparator(Comparator comparator){
 		this.comparator = comparator;
 	}
 
@@ -72,7 +72,7 @@ public class ViewerComparator {
 	 * 
 	 * @return the comparator used to sort strings
 	 */
-	protected Comparator<String> getComparator() {
+	protected Comparator getComparator() {
 		if (comparator == null){
 			comparator = Policy.getComparator();
 		}
@@ -186,7 +186,7 @@ public class ViewerComparator {
      */
 	public void sort(final Viewer viewer, Object[] elements) {
 		try {
-			Arrays.sort(elements, new Comparator<Object>() {
+			Arrays.sort(elements, new Comparator() {
 				@Override
 				public int compare(Object a, Object b) {
 					return ViewerComparator.this.compare(viewer, a, b);
