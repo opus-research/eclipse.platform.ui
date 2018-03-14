@@ -2549,8 +2549,9 @@ public class WorkbenchPage implements IWorkbenchPage {
 			List<IViewReference> visibleReferences = new ArrayList<IViewReference>();
 			for (ViewReference reference : viewReferences) {
 				for (MPart part : parts) {
-					if (reference.getId().equals(part.getElementId())
-							&& partService.isPartOrPlaceholderInPerspective(part.getElementId(), perspective)) {
+					if (reference.getModel().getElementId().equals(part.getElementId())
+							&& (isStickyView(reference.getModel().getElementId()) || partService
+									.isPartOrPlaceholderInPerspective(part.getElementId(), perspective))) {
 						// only rendered placeholders are valid view references
 						visibleReferences.add(reference);
 					}
@@ -2562,8 +2563,26 @@ public class WorkbenchPage implements IWorkbenchPage {
 	}
 
     /**
-     * See IWorkbenchPage.
-     */
+	 * Check if the elementId belongs to a sticky view.
+	 * 
+	 * @param elementId
+	 *            id of the part
+	 * @return <code>true</code> in case it is a sticky view and
+	 *         <code>false</code> otherwise
+	 */
+	private boolean isStickyView(String elementId) {
+		IStickyViewDescriptor[] stickyViews = PlatformUI.getWorkbench().getViewRegistry().getStickyViews();
+		for (IStickyViewDescriptor stickyViewDescriptor : stickyViews) {
+			if (stickyViewDescriptor.getId().equals(elementId)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * See IWorkbenchPage.
+	 */
     @Override
 	public IViewPart[] getViews() {
 		IViewReference[] viewReferences = getViewReferences();
