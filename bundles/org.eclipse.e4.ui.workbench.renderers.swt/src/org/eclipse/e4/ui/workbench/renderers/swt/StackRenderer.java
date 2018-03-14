@@ -7,7 +7,7 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728, 430166, 441150, 
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728, 430166, 441150
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -269,37 +269,6 @@ public class StackRenderer extends LazyStackRenderer {
 			}
 		}
 	}
-	
-	
-	@Inject
-	@Optional
-	private void subscribeTopicChildrenChanged(
-			@UIEventTopic(UIEvents.ElementContainer.TOPIC_CHILDREN) Event event) {
-		
-		Object changedObj = event.getProperty(UIEvents.EventTags.ELEMENT);
-		// only interested in changes to toolbars
-		if (!(changedObj instanceof MToolBar)) {
-			return;
-		}
-
-		MUIElement container = modelService
-				.getContainer((MUIElement) changedObj);
-		// check if this is a part's toolbar
-		if (container instanceof MPart) {
-			MElementContainer<?> parent = ((MPart) container).getParent();
-			// only relayout if this part is the selected element and we
-			// actually rendered this element
-			if (parent instanceof MPartStack
-					&& parent.getSelectedElement() == container
-					&& parent.getRenderer() == StackRenderer.this) {
-				Object widget = parent.getWidget();
-				if (widget instanceof CTabFolder) {
-					adjustTopRight((CTabFolder) widget);
-				}
-			}
-		}
-	}
-	
 
 	@Override
 	protected boolean requiresFocus(MPart element) {
@@ -466,6 +435,37 @@ public class StackRenderer extends LazyStackRenderer {
 		eventBroker.subscribe(UIEvents.UIElement.TOPIC_TOBERENDERED,
 				viewMenuUpdater);
 
+		childrenHandler = new EventHandler() {
+			@Override
+			public void handleEvent(Event event) {
+				Object changedObj = event
+						.getProperty(UIEvents.EventTags.ELEMENT);
+				// only interested in changes to toolbars
+				if (!(changedObj instanceof MToolBar)) {
+					return;
+				}
+
+				MUIElement container = modelService
+						.getContainer((MUIElement) changedObj);
+				// check if this is a part's toolbar
+				if (container instanceof MPart) {
+					MElementContainer<?> parent = ((MPart) container)
+							.getParent();
+					// only relayout if this part is the selected element and we
+					// actually rendered this element
+					if (parent instanceof MPartStack
+							&& parent.getSelectedElement() == container
+							&& parent.getRenderer() == StackRenderer.this) {
+						Object widget = parent.getWidget();
+						if (widget instanceof CTabFolder) {
+							adjustTopRight((CTabFolder) widget);
+						}
+					}
+				}
+			}
+		};
+		eventBroker.subscribe(UIEvents.ElementContainer.TOPIC_CHILDREN,
+				childrenHandler);
 
 		stylingHandler = new EventHandler() {
 			@Override
