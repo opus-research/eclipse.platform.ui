@@ -10,7 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,8 +34,8 @@ public class UnknownEditorStrategyRegistry {
 	/**
 	 * @param strategyId
 	 *            The strategy to look for
-	 * @return an instance of the strategy, or null if no strategy is found for
-	 *         this id
+	 * @return an instance of the strategy, or {@code null} if no strategy is
+	 *         found for this id
 	 */
 	public static IUnknownEditorStrategy getStrategy(String strategyId) {
 		if (strategyId == null) {
@@ -60,45 +61,44 @@ public class UnknownEditorStrategyRegistry {
 	private static String readAttribute(IConfigurationElement extension, String attribute) {
 		String res = extension.getAttribute(attribute);
 		if (res == null) {
-			IDEWorkbenchPlugin.log("Missing attribute '" + attribute + "'id' for extension to " + EXTENSION_POINT_ID //$NON-NLS-1$ //$NON-NLS-2$
-					+ " contributed by " + extension.getContributor().getName()); //$NON-NLS-1$
+			IDEWorkbenchPlugin.log("Missing attribute '" + attribute + "' for extension to " + EXTENSION_POINT_ID //$NON-NLS-1$ //$NON-NLS-2$
+					+ " contributed by " + extension.getContributor()); //$NON-NLS-1$
 		}
 		return res;
 	}
 
 	/**
-	 * @return
+	 * Reads the known strategies from registry
+	 *
+	 * @return not modifiable set with all known strategy id's in their
+	 *         definition order
 	 */
 	public static Set<String> retrieveAllStrategies() {
 		populateIdsToLabel();
-		return idsToLabel.keySet();
+		return Collections.unmodifiableSet(idsToLabel.keySet());
 	}
 
 	/**
 	 * @param id
 	 *            the id of the strategy to use
-	 * @return the label for the supplied strategy, or null for unknown
-	 *         strategies or if strategy doesn't have a label associated.
+	 * @return the label for the supplied strategy id, or {@code null} for unknown id.
 	 */
 	public static String getLabel(String id) {
 		if (idsToLabel == null || !idsToLabel.containsKey(id)) {
 			populateIdsToLabel();
 		}
-		if (idsToLabel.containsKey(id)) {
-			return idsToLabel.get(id);
-		}
-		return null;
+		return idsToLabel.get(id);
 	}
 
 	private static void populateIdsToLabel() {
-		Map<String, String> res = new HashMap<>();
+		Map<String, String> res = new LinkedHashMap<>();
 		IExtensionRegistry extRegistry = Platform.getExtensionRegistry();
 		IConfigurationElement[] extensions = extRegistry.getConfigurationElementsFor(EXTENSION_POINT_ID);
 		if (extensions != null) {
 			for (IConfigurationElement extension : extensions) {
 				String extId = readAttribute(extension, "id"); //$NON-NLS-1$
 				String label = readAttribute(extension, "label"); //$NON-NLS-1$
-				if (extId != null) {
+				if (extId != null && label != null) {
 					res.put(extId, label);
 				}
 			}

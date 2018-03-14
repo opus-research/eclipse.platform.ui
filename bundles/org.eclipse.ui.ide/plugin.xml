@@ -2407,18 +2407,18 @@
          point="org.eclipse.ui.ide.unknownEditorStrategy">
       <strategy
             class="org.eclipse.ui.internal.ide.SystemEditorOrTextEditorStrategy"
-            id="SystemEditorThenTextEditor"
-            label="%SystemEditorThenTextEditor">
+            id="org.eclipse.ui.ide.systemEditorThenTextEditor"
+            label="%systemEditorThenTextEditor">
+      </strategy>
+      <strategy
+            class="org.eclipse.ui.internal.ide.TextEditorStrategy"
+            id="org.eclipse.ui.ide.textEditor"
+            label="%textEditor">
       </strategy>
       <strategy
             class="org.eclipse.ui.internal.ide.AskUserViaPopupUnknowEditorStrategy"
             id="org.eclipse.ui.ide.askUserForUnknownEditor"
             label="%askUserViaPopup">
-      </strategy>
-      <strategy
-            class="org.eclipse.ui.internal.ide.TextEditorStrategy"
-            id="TextEditor"
-            label="%textEditor">
       </strategy>
    </extension>
 

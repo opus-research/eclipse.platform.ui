@@ -19,7 +19,7 @@ import org.eclipse.ui.ide.IUnknownEditorStrategy;
  *
  */
 public final class SystemEditorOrTextEditorStrategy implements IUnknownEditorStrategy {
-	public static final String EXTENSION_ID = "SystemEditorThenTextEditor"; //$NON-NLS-1$
+	static final String EXTENSION_ID = "org.eclipse.ui.ide.systemEditorThenTextEditor"; //$NON-NLS-1$
 
 	@Override
 	public IEditorDescriptor getEditorDescriptor(String name, IEditorRegistry editorReg) {

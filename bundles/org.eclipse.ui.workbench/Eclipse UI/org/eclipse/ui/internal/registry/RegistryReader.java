@@ -7,18 +7,17 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Mickael Istria (Red Hat Inc.) - 484105 React to registry additions
  *******************************************************************************/
 package org.eclipse.ui.internal.registry;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.IRegistryEventListener;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 
 /**
@@ -35,7 +34,7 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
  * of the method <code>readElement</code>, as it will not be
  * done by default.
  */
-public abstract class RegistryReader implements IRegistryEventListener {
+public abstract class RegistryReader {
 
     // for dynamic UI - remove this cache to avoid inconsistency
     //protected static Hashtable extensionPoints = new Hashtable();
@@ -172,7 +171,6 @@ public abstract class RegistryReader implements IRegistryEventListener {
         if (point == null) {
 			return;
 		}
-		registry.addListener(this, point.getUniqueIdentifier());
         IExtension[] extensions = point.getExtensions();
         extensions = orderExtensions(extensions);
         for (int i = 0; i < extensions.length; i++) {
@@ -219,26 +217,4 @@ public abstract class RegistryReader implements IRegistryEventListener {
 
 		return candidateChildren[0].getAttribute(IWorkbenchRegistryConstants.ATT_CLASS);
     }
-
-	@Override
-	public void removed(IExtensionPoint[] extensionPoints) {
-		WorkbenchPlugin.log("Removal of extension point not supported"); //$NON-NLS-1$
-	}
-
-	@Override
-	public void removed(IExtension[] extensions) {
-		WorkbenchPlugin.log("Removal of extensions not supported"); //$NON-NLS-1$
-	}
-
-	@Override
-	public void added(IExtensionPoint[] extensionPoints) {
-		WorkbenchPlugin.log("Removal of extension point not supported"); //$NON-NLS-1$
-	}
-
-	@Override
-	public void added(IExtension[] extensions) {
-		for (IExtension ext : extensions) {
-			readExtension(ext);
-		}
-	}
 }
