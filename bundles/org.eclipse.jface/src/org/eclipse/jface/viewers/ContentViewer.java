@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Steven Spungin <steven@spungin.tv> - Bug 401439
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -170,21 +169,17 @@ public abstract class ContentViewer extends Viewer {
      * @param event a dispose event
      */
     protected void handleDispose(DisposeEvent event) {
-		if (contentProvider != null) {
-			try {
-				contentProvider.inputChanged(this, getInput(), null);
-			} catch (Exception e) {
-				// ignore exception
-			}
-			contentProvider.dispose();
-			contentProvider = null;
-		}
-		if (labelProvider != null) {
-			labelProvider.removeListener(labelProviderListener);
-			labelProvider.dispose();
-			labelProvider = null;
-		}
-		input = null;
+        if (contentProvider != null) {
+            contentProvider.inputChanged(this, getInput(), null);
+            contentProvider.dispose();
+            contentProvider = null;
+        }
+        if (labelProvider != null) {
+            labelProvider.removeListener(labelProviderListener);
+            labelProvider.dispose();
+            labelProvider = null;
+        }
+        input = null;
     }
 
     /**
