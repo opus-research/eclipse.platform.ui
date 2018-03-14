@@ -338,7 +338,7 @@ public class UIEvents {
 		if (topic == null || topic.length() == 0 || changedElement == null)
 			return false;
 
-		Map<String, Object> argMap = new HashMap<>(1);
+		Map<String, Object> argMap = new HashMap<String, Object>(1);
 		argMap.put(EventTags.ELEMENT, changedElement);
 		return publishEvent(topic, argMap);
 	}

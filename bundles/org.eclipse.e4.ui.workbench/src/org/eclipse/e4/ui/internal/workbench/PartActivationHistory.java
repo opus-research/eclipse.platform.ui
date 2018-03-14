@@ -35,7 +35,7 @@ class PartActivationHistory {
 
 	private EModelService modelService;
 
-	private LinkedList<MPart> generalActivationHistory = new LinkedList<>();
+	private LinkedList<MPart> generalActivationHistory = new LinkedList<MPart>();
 
 	PartActivationHistory(PartServiceImpl partService, EModelService modelService) {
 		this.partService = partService;
@@ -211,7 +211,7 @@ class PartActivationHistory {
 
 	MPart getActivationCandidate(Collection<MPart> validParts) {
 		// check activation history, since the history is global, we need to filter it down first
-		Collection<MPart> validCandidates = new ArrayList<>();
+		Collection<MPart> validCandidates = new ArrayList<MPart>();
 		for (MPart validPart : generalActivationHistory) {
 			if (validParts.contains(validPart)) {
 				validCandidates.add(validPart);
@@ -268,7 +268,7 @@ class PartActivationHistory {
 		}
 
 		// check activation history, since the history is global, we need to filter it down first
-		Collection<MPart> validCandidates = new ArrayList<>();
+		Collection<MPart> validCandidates = new ArrayList<MPart>();
 		for (MPart validPart : generalActivationHistory) {
 			if (validParts.contains(validPart)) {
 				validCandidates.add(validPart);
@@ -303,7 +303,7 @@ class PartActivationHistory {
 			}
 		}
 
-		List<String> activeTag = new ArrayList<>();
+		List<String> activeTag = new ArrayList<String>();
 		activeTag.add(EPartService.ACTIVE_ON_CLOSE_TAG);
 		List<MPart> activeCandidates = modelService.findElements(perspective, null, MPart.class,
 				activeTag);
