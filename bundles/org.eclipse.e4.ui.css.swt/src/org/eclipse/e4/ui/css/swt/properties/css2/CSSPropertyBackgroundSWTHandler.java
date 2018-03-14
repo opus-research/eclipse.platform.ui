@@ -28,6 +28,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Widget;
+import org.w3c.dom.Node;
 import org.w3c.dom.css.CSSValue;
 
 public class CSSPropertyBackgroundSWTHandler extends
@@ -69,10 +70,24 @@ AbstractCSSPropertyBackgroundHandler {
 	@Override
 	public void applyCSSPropertyBackgroundColor(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
-		Widget widget = (Widget) ((WidgetElement) element).getNativeWidget();
+		WidgetElement widgetElement = ((WidgetElement) element);
+		Widget widget = (Widget) widgetElement.getNativeWidget();
 		if (value.getCssValueType() == CSSValue.CSS_PRIMITIVE_VALUE) {
-			Color newColor = (Color) engine.convert(value, Color.class, widget
-					.getDisplay());
+
+			// allow "inherit" by setting background to the parent's background
+			Color newColor;
+			if ("inherit".equals(value.getCssText())) {
+				Control parentControl = getParentControl(widgetElement);
+				if (parentControl == null) {
+					return;
+				}
+
+				newColor = parentControl.getBackground();
+			} else {
+				newColor = (Color) engine.convert(value, Color.class, widget
+						.getDisplay());
+			}
+
 			if (widget instanceof CTabItem) {
 				CTabFolder folder = ((CTabItem) widget).getParent();
 				if ("selected".equals(pseudo)) {
@@ -106,6 +121,29 @@ AbstractCSSPropertyBackgroundHandler {
 				CompositeElement.setBackgroundOverriddenByCSSMarker(widget);
 			}
 		}
+	}
+
+	/**
+	 * Return the parent native control of the given widget element, if any.
+	 *
+	 * @param widgetElement
+	 *            the widget element to get the parent for
+	 * @return the native parent control or <code>null</code> if no parent
+	 *         exists or if it is not a {@link Control}.
+	 */
+	private Control getParentControl(WidgetElement widgetElement) {
+		Widget parentWidget;
+		Node parentNode = widgetElement.getParentNode();
+		if (!(parentNode instanceof WidgetElement)) {
+			return null;
+		}
+
+		parentWidget = (Widget) ((WidgetElement) parentNode).getNativeWidget();
+		if (!(parentWidget instanceof Control)) {
+			return null;
+		}
+
+		return (Control) parentWidget;
 	}
 
 	/*
