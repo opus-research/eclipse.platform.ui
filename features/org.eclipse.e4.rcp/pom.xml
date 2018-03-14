@@ -14,7 +14,7 @@
   <parent>
     <artifactId>eclipse.platform.ui</artifactId>
     <groupId>eclipse.platform.ui</groupId>
-    <version>4.4.0-SNAPSHOT</version>
+    <version>4.5.0-SNAPSHOT</version>
     <relativePath>../../</relativePath>
   </parent>
   <groupId>org.eclipse.e4.feature</groupId>
@@ -38,7 +38,6 @@
               <excludes>
                 <plugin id="javax.xml"/>
                 <plugin id="org.eclipse.swt"/>
-                <plugin id="org.eclipse.equinox.launcher"/>
                 <plugin id="org.eclipse.equinox.launcher.gtk.solaris.sparc"/>
                 <plugin id="org.eclipse.equinox.launcher.gtk.solaris.x86"/>
                 <plugin id="org.eclipse.equinox.launcher.cocoa.macosx"/>
