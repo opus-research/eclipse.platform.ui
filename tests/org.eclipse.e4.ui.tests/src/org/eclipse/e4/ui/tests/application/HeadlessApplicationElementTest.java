@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.application;
@@ -16,7 +15,6 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.UIEventPublisher;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.emf.common.notify.Notifier;
-import org.junit.Before;
 
 public abstract class HeadlessApplicationElementTest extends
 		HeadlessStartupTest {
@@ -24,8 +22,7 @@ public abstract class HeadlessApplicationElementTest extends
 	protected MApplicationElement applicationElement;
 
 	@Override
-	@Before
-	public void setUp() {
+	protected void setUp() throws Exception {
 		super.setUp();
 		applicationElement = createApplicationElement(applicationContext);
 
@@ -36,5 +33,5 @@ public abstract class HeadlessApplicationElementTest extends
 	}
 
 	protected abstract MApplicationElement createApplicationElement(
-			IEclipseContext appContext);
+			IEclipseContext appContext) throws Exception;
 }

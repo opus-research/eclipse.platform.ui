@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,16 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.application;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 
 import java.util.HashSet;
 import java.util.List;
@@ -49,9 +42,6 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 public abstract class HeadlessApplicationTest extends
 		HeadlessApplicationElementTest {
@@ -61,8 +51,7 @@ public abstract class HeadlessApplicationTest extends
 	protected IPresentationEngine renderer;
 
 	@Override
-	@Before
-	public void setUp() {
+	protected void setUp() throws Exception {
 		super.setUp();
 
 		application = (MApplication) applicationElement;
@@ -77,8 +66,7 @@ public abstract class HeadlessApplicationTest extends
 	}
 
 	@Override
-	@After
-	public void tearDown() {
+	protected void tearDown() throws Exception {
 		for (MWindow window : application.getChildren()) {
 			renderer.removeGui(window);
 		}
@@ -93,29 +81,25 @@ public abstract class HeadlessApplicationTest extends
 	private void addActiveChildEventHandling() {
 	}
 
-	@Test
-	public void testGet_ActiveContexts() {
+	public void testGet_ActiveContexts() throws Exception {
 		IEclipseContext context = application.getContext();
 
 		assertNotNull(context.get(IServiceConstants.ACTIVE_CONTEXTS));
 	}
 
-	@Test
-	public void testGet_Selection() {
+	public void testGet_Selection() throws Exception {
 		IEclipseContext context = application.getContext();
 
 		assertNull(context.get(IServiceConstants.ACTIVE_SELECTION));
 	}
 
-	@Test
-	public void testGet_ActiveChild() {
+	public void testGet_ActiveChild() throws Exception {
 		IEclipseContext context = application.getContext();
 
 		assertNull(context.getActiveChild());
 	}
 
-	@Test
-	public void testGet_ActivePart() {
+	public void testGet_ActivePart() throws Exception {
 		IEclipseContext context = application.getContext();
 
 		assertNull(context.get(IServiceConstants.ACTIVE_PART));
@@ -163,8 +147,7 @@ public abstract class HeadlessApplicationTest extends
 	// assertEquals(null, osgiContext.get(IContextConstants.ACTIVE_CHILD));
 	// }
 
-	@Test
-	public void test_SwitchActivePartsInContext() {
+	public void test_SwitchActivePartsInContext() throws Exception {
 		IEclipseContext context = application.getContext();
 
 		MPart[] parts = getTwoParts();
@@ -194,14 +177,12 @@ public abstract class HeadlessApplicationTest extends
 		assertNotNull(context.getContext());
 	}
 
-	@Test
 	public void testGetFirstPart_GetContext() {
 		// set the active part to ensure that it's actually been rendered
 		getFirstPart().getParent().setSelectedElement(getFirstPart());
 		test_GetContext(getFirstPart());
 	}
 
-	@Test
 	public void testGetSecondPart_GetContext() {
 		// set the active part to ensure that it's actually been rendered
 		getSecondPart().getParent().setSelectedElement(getSecondPart());
@@ -219,13 +200,11 @@ public abstract class HeadlessApplicationTest extends
 		}
 	}
 
-	@Test
 	public void testModify() {
 		testGetFirstPart_GetContext();
 		testModify(getFirstPart());
 	}
 
-	@Test
 	public void testModify2() {
 		testGetSecondPart_GetContext();
 		testModify(getSecondPart());
@@ -270,14 +249,14 @@ public abstract class HeadlessApplicationTest extends
 
 	@Override
 	protected MApplicationElement createApplicationElement(
-			IEclipseContext appContext) {
+			IEclipseContext appContext) throws Exception {
 		return createApplication(appContext, getURI());
 	}
 
 	protected abstract String getURI();
 
 	protected IPresentationEngine createPresentationEngine(
-			String renderingEngineURI) {
+			String renderingEngineURI) throws Exception {
 		IContributionFactory contributionFactory = (IContributionFactory) applicationContext
 				.get(IContributionFactory.class.getName());
 		Object newEngine = contributionFactory.create(renderingEngineURI,
@@ -286,7 +265,7 @@ public abstract class HeadlessApplicationTest extends
 	}
 
 	private MApplication createApplication(IEclipseContext appContext,
-			String appURI) {
+			String appURI) throws Exception {
 		URI initialWorkbenchDefinitionInstance = URI.createPlatformPluginURI(
 				appURI, true);
 
@@ -321,11 +300,7 @@ public abstract class HeadlessApplicationTest extends
 
 		processPartContributions(application.getContext(), resource);
 
-		try {
-			renderer = createPresentationEngine(getEngineURI());
-		} catch (Exception e) {
-			fail("Presentation Engine creation should not fail");
-		}
+		renderer = createPresentationEngine(getEngineURI());
 
 		return application;
 	}
