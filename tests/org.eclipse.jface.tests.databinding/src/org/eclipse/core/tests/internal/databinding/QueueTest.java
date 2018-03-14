@@ -23,7 +23,6 @@ public class QueueTest extends TestCase {
 
 	private Queue queue;
 
-	@Override
 	protected void setUp() throws Exception {
 		this.queue = new Queue();
 	}

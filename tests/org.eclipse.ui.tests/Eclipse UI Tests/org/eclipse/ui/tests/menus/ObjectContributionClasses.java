@@ -31,6 +31,9 @@ public class ObjectContributionClasses implements IAdapterFactory {
 	
 	public static class Common implements ICommon {
 
+		/* (non-Javadoc)
+		 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+		 */
 		@Override
 		public Object getAdapter(Class adapter) {
 			return null;
@@ -63,6 +66,9 @@ public class ObjectContributionClasses implements IAdapterFactory {
 	
 	public static class E implements IAdaptable {
 
+		/* (non-Javadoc)
+		 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+		 */
 		@Override
 		public Object getAdapter(Class adapter) {
 			if (adapter == IF.class)
@@ -75,6 +81,9 @@ public class ObjectContributionClasses implements IAdapterFactory {
 	}
 	
 	public static class F implements IF {
+		/* (non-Javadoc)
+		 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+		 */
 		@Override
 		public Object getAdapter(Class adapter) {
 			return null;
@@ -86,6 +95,9 @@ public class ObjectContributionClasses implements IAdapterFactory {
 	
 	public static class C implements ICommon {
 
+		/* (non-Javadoc)
+		 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+		 */
 		@Override
 		public Object getAdapter(Class adapter) {
 			return null;

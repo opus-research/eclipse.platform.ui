@@ -43,6 +43,11 @@ public class WorkbenchWindowSubordinateSourcesTests extends UITestCase {
 		super(testName);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
+	 */
 	@Override
 	protected void doSetUp() throws Exception {
 		window = (WorkbenchWindow) openTestWindow();

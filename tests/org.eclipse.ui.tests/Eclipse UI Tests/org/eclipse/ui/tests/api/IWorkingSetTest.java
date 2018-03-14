@@ -313,6 +313,9 @@ public class IWorkingSetTest extends UITestCase {
     
     public static class Foo implements IAdaptable {
 
+		/* (non-Javadoc)
+		 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+		 */
 		@Override
 		public Object getAdapter(Class adapter) {
 			// TODO Auto-generated method stub
@@ -326,6 +329,9 @@ public class IWorkingSetTest extends UITestCase {
     
     public class ToFoo implements IAdaptable {
 
+		/* (non-Javadoc)
+		 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+		 */
 		@Override
 		public Object getAdapter(Class adapter) {
 			if (adapter == Foo.class) {
@@ -338,6 +344,9 @@ public class IWorkingSetTest extends UITestCase {
     
     public static class IAImpl implements IA, IAdaptable {
 
+		/* (non-Javadoc)
+		 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+		 */
 		@Override
 		public Object getAdapter(Class adapter) {
 			// TODO Auto-generated method stub
@@ -347,6 +356,9 @@ public class IWorkingSetTest extends UITestCase {
     
     public static class ModelElement implements IModelElement, IAdaptable {
 
+		/* (non-Javadoc)
+		 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+		 */
 		@Override
 		public Object getAdapter(Class adapter) {
 			return null;
