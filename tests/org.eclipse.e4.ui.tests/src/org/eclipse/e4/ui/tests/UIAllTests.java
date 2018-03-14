@@ -26,6 +26,7 @@ import org.eclipse.e4.ui.tests.workbench.Bug308317Test;
 import org.eclipse.e4.ui.tests.workbench.ContextTest;
 import org.eclipse.e4.ui.tests.workbench.HandlerTest;
 import org.eclipse.e4.ui.tests.workbench.InjectionEventTest;
+import org.eclipse.e4.ui.tests.workbench.InjectionThreadDomainTest;
 import org.eclipse.e4.ui.tests.workbench.MMenuItemTest;
 import org.eclipse.e4.ui.tests.workbench.MPartSashContainerTest;
 import org.eclipse.e4.ui.tests.workbench.MPartTest;
@@ -53,6 +54,7 @@ public class UIAllTests extends TestSuite {
 	public UIAllTests() {
 		// Hack: bug 422676, run InjectionEventTest first
 		addTestSuite(InjectionEventTest.class);
+		addTestSuite(InjectionThreadDomainTest.class);
 		addTest(StartupTestSuite.suite());
 		addTestSuite(UIEventTypesTest.class);
 		addTestSuite(Bug299755Test.class);
