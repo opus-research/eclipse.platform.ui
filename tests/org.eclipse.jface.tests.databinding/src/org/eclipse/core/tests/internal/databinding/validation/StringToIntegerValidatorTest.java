@@ -27,7 +27,6 @@ public class StringToIntegerValidatorTest extends
 	 * 
 	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#setupNumberFormat()
 	 */
-	@Override
 	protected NumberFormat setupNumberFormat() {
 		return NumberFormat.getIntegerInstance();
 	}
@@ -37,7 +36,6 @@ public class StringToIntegerValidatorTest extends
 	 * 
 	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#setupValidator(com.ibm.icu.text.NumberFormat)
 	 */
-	@Override
 	protected IValidator setupValidator(NumberFormat numberFormat) {
 		StringToNumberConverter converter = StringToNumberConverter.toInteger(
 				numberFormat, false);
@@ -49,7 +47,6 @@ public class StringToIntegerValidatorTest extends
 	 * 
 	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#getInRangeNumber()
 	 */
-	@Override
 	protected Number getInRangeNumber() {
 		return new Integer(1);
 	}
@@ -59,7 +56,6 @@ public class StringToIntegerValidatorTest extends
 	 * 
 	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#getInvalidString()
 	 */
-	@Override
 	protected String getInvalidString() {
 		return "1.1";
 	}
@@ -69,7 +65,6 @@ public class StringToIntegerValidatorTest extends
 	 * 
 	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#getOutOfRangeNumber()
 	 */
-	@Override
 	protected Number getOutOfRangeNumber() {
 		return new Double(Double.MAX_VALUE);
 	}

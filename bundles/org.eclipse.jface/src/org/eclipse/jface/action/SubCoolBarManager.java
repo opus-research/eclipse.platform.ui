@@ -34,14 +34,18 @@ public class SubCoolBarManager extends SubContributionManager implements
         Assert.isNotNull(mgr);
     }
 
-    @Override
-	public void add(IToolBarManager toolBarManager) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.action.ICoolBarManager#add(org.eclipse.jface.action.IToolBarManager)
+     */
+    public void add(IToolBarManager toolBarManager) {
         Assert.isNotNull(toolBarManager);
         super.add(new ToolBarContributionItem(toolBarManager));
     }
 
-    @Override
-	public int getStyle() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.action.ICoolBarManager#getStyle()
+     */
+    public int getStyle() {
         // It is okay to cast down since we only accept coolBarManager objects in the
         // constructor
         return ((ICoolBarManager) getParent()).getStyle();
@@ -58,27 +62,37 @@ public class SubCoolBarManager extends SubContributionManager implements
         return (ICoolBarManager) getParent();
     }
 
-    @Override
-	public boolean getLockLayout() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.action.ICoolBarManager#isLayoutLocked()
+     */
+    public boolean getLockLayout() {
         return getParentCoolBarManager().getLockLayout();
     }
 
-    @Override
-	public void setLockLayout(boolean value) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.action.ICoolBarManager#lockLayout(boolean)
+     */
+    public void setLockLayout(boolean value) {
     }
 
-    @Override
-	public IMenuManager getContextMenuManager() {
+    /* (non-Javadoc)
+     * SubCoolBarManagers do not have control of the global context menu.
+     */
+    public IMenuManager getContextMenuManager() {
         return null;
     }
 
-    @Override
-	public void setContextMenuManager(IMenuManager menuManager) {
+    /* (non-Javadoc)
+     * In SubCoolBarManager we do nothing.
+     */
+    public void setContextMenuManager(IMenuManager menuManager) {
         // do nothing
     }
 
-    @Override
-	public void update(boolean force) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.action.IContributionManager#update(boolean)
+     */
+    public void update(boolean force) {
         // This method is not governed by visibility.  The client may
         // call <code>setVisible</code> and then force an update.  At that
         // point we need to update the parent.

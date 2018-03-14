@@ -26,16 +26,14 @@ public class PopupMenuExpressionTest extends ActionExpressionTest {
     /**
      * Returns the menu manager containing the actions.
      */
-    @Override
-	protected MenuManager getActionMenuManager(ListView view) throws Throwable {
+    protected MenuManager getActionMenuManager(ListView view) throws Throwable {
         return view.getMenuManager();
     }
 
     /**
      * Tests the visibility of an action.
      */
-    @Override
-	protected void testAction(MenuManager mgr, String action, boolean expected)
+    protected void testAction(MenuManager mgr, String action, boolean expected)
             throws Throwable {
         if (expected)
             assertNotNull(action, ActionUtil.getActionWithLabel(mgr, action));

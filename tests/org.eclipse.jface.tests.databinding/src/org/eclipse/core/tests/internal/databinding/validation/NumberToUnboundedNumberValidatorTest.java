@@ -26,7 +26,6 @@ public class NumberToUnboundedNumberValidatorTest extends
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.tests.internal.databinding.validation.NumberToNumberValidatorTestHarness#doGetOutOfRangeNumber()
 	 */
-	@Override
 	protected Number doGetOutOfRangeNumber() {
 		return null;
 	}
@@ -34,7 +33,6 @@ public class NumberToUnboundedNumberValidatorTest extends
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.tests.internal.databinding.validation.NumberToNumberValidatorTestHarness#doGetToBoxedTypeValidator(java.lang.Class)
 	 */
-	@Override
 	protected NumberToNumberValidator doGetToBoxedTypeValidator(Class fromType) {
 		NumberToBigIntegerConverter converter = new NumberToBigIntegerConverter(NumberFormat.getInstance(), fromType);
 		return new NumberToUnboundedNumberValidator(converter);
@@ -43,7 +41,6 @@ public class NumberToUnboundedNumberValidatorTest extends
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.tests.internal.databinding.validation.NumberToNumberValidatorTestHarness#doGetToPrimitiveValidator(java.lang.Class)
 	 */
-	@Override
 	protected NumberToNumberValidator doGetToPrimitiveValidator(Class fromType) {
 		return null;  // primitive BigInteger does not exist
 	}

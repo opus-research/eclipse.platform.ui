@@ -28,7 +28,6 @@ public class ViewerElementSetTest extends TestCase {
 	IdentityElementComparer comparer;
 	ViewerElementSet set;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		comparer = new IdentityElementComparer();
@@ -228,12 +227,10 @@ public class ViewerElementSetTest extends TestCase {
 	}
 
 	static class IdentityElementComparer implements IElementComparer {
-		@Override
 		public boolean equals(Object a, Object b) {
 			return a == b;
 		}
 
-		@Override
 		public int hashCode(Object element) {
 			return System.identityHashCode(element);
 		}

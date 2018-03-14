@@ -47,7 +47,6 @@ public class TableSingleSelectionObservableValueTest extends
 		super(testName, new Delegate());
 	}
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -56,7 +55,6 @@ public class TableSingleSelectionObservableValueTest extends
 		table = delegate.table;
 	}
 
-	@Override
 	protected IObservable doCreateObservable() {
 		Delegate delegate = (Delegate) getObservableContractDelegate();
 		return delegate.createObservableValue(SWTObservables.getRealm(Display
@@ -99,7 +97,6 @@ public class TableSingleSelectionObservableValueTest extends
 
 		Table table;
 
-		@Override
 		public void setUp() {
 			shell = new Shell();
 			table = new Table(shell, SWT.NONE);
@@ -107,23 +104,19 @@ public class TableSingleSelectionObservableValueTest extends
 			new TableItem(table, SWT.NONE).setText("1");
 		}
 
-		@Override
 		public void tearDown() {
 			shell.dispose();
 		}
 
-		@Override
 		public IObservableValue createObservableValue(Realm realm) {
 			return WidgetProperties.singleSelectionIndex()
 					.observe(realm, table);
 		}
 
-		@Override
 		public Object getValueType(IObservableValue observable) {
 			return Integer.TYPE;
 		}
 
-		@Override
 		public void change(IObservable observable) {
 			int index = createIntegerValue((IObservableValue) observable)
 					.intValue();
@@ -132,7 +125,6 @@ public class TableSingleSelectionObservableValueTest extends
 			table.notifyListeners(SWT.Selection, null);
 		}
 
-		@Override
 		public Object createValue(IObservableValue observable) {
 			return createIntegerValue(observable);
 		}

@@ -38,7 +38,6 @@ public class SWTResourcesRegistry extends AbstractResourcesRegistry {
 		// When SWT Display will dispose, all SWT resources stored
 		// into cache will be dispose it too.
 		display.addListener(SWT.Dispose, new Listener() {
-			@Override
 			public void handleEvent(Event event) {
 				dispose();
 			}
@@ -139,6 +138,7 @@ public class SWTResourcesRegistry extends AbstractResourcesRegistry {
 		return false;
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<Object> removeResourcesByKeyTypeAndType(Class<?> keyType,
 			Class<?>... types) {
 		List<Object> removedResources = new ArrayList<Object>();

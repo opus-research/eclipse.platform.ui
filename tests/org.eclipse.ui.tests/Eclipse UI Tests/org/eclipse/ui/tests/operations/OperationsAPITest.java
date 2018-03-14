@@ -65,7 +65,6 @@ public class OperationsAPITest extends TestCase {
 		super(name);
 	}
 
-	@Override
 	protected void setUp() throws Exception {
 		history = new DefaultOperationHistory();
 		contextA = new ObjectUndoContext("A");
@@ -96,7 +95,6 @@ public class OperationsAPITest extends TestCase {
 		preRedo = 0; postRedo = 0;
 		add = 0; remove = 0; notOK = 0;
 		listener = new IOperationHistoryListener() {
-			@Override
 			public void historyNotification(OperationHistoryEvent event) {
 				switch (event.getEventType()) {
 				case OperationHistoryEvent.ABOUT_TO_EXECUTE:
@@ -136,7 +134,6 @@ public class OperationsAPITest extends TestCase {
 
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		history.removeOperationHistoryListener(listener);
@@ -236,15 +233,12 @@ public class OperationsAPITest extends TestCase {
 		// clear out history which will also reset operation execution counts
 		history.dispose(IOperationHistory.GLOBAL_UNDO_CONTEXT, true, true, false);
 		IUndoableOperation op = new AbstractOperation("Operation with Exception") {
-			@Override
 			public IStatus execute(IProgressMonitor monitor, IAdaptable uiInfo) {
 				return Status.OK_STATUS;
 			}
-			@Override
 			public IStatus undo(IProgressMonitor monitor, IAdaptable uiInfo) {
 				throw new ForcedException("Forced during undo");
 			}
-			@Override
 			public IStatus redo(IProgressMonitor monitor, IAdaptable uiInfo) {
 				throw new ForcedException("Forced during redo");
 			}
@@ -436,11 +430,9 @@ public class OperationsAPITest extends TestCase {
 
 		history.addOperationApprover(new IOperationApprover() {
 
-			@Override
 			public IStatus proceedRedoing(IUndoableOperation o, IOperationHistory h, IAdaptable a) {
 				return Status.CANCEL_STATUS;
 			}
-			@Override
 			public IStatus proceedUndoing(IUndoableOperation o, IOperationHistory h, IAdaptable a) {
 				return Status.CANCEL_STATUS;
 			}
@@ -456,11 +448,9 @@ public class OperationsAPITest extends TestCase {
 	public void testOperationFailure() throws ExecutionException {
 		history.addOperationApprover(new IOperationApprover() {
 
-			@Override
 			public IStatus proceedRedoing(IUndoableOperation o, IOperationHistory h, IAdaptable a) {
 				return Status.OK_STATUS;
 			}
-			@Override
 			public IStatus proceedUndoing(IUndoableOperation o, IOperationHistory h, IAdaptable a) {
 				if (o == op6)
 					return Status.CANCEL_STATUS;
@@ -660,17 +650,14 @@ public class OperationsAPITest extends TestCase {
 
 		history.addOperationApprover(new IOperationApprover2() {
 
-			@Override
 			public IStatus proceedRedoing(IUndoableOperation o, IOperationHistory h, IAdaptable a) {
 				return Status.OK_STATUS;
 			}
-			@Override
 			public IStatus proceedExecuting(IUndoableOperation o, IOperationHistory h, IAdaptable a) {
 				if (o == op6)
 					return Status.CANCEL_STATUS;
 				return Status.OK_STATUS;
 			}
-			@Override
 			public IStatus proceedUndoing(IUndoableOperation o, IOperationHistory h, IAdaptable a) {
 				return Status.OK_STATUS;
 			}
@@ -783,12 +770,10 @@ public class OperationsAPITest extends TestCase {
 		final int [] approvalCount = new int[1];
 		IOperationApprover approver;
 		approver = new IOperationApprover() {
-			@Override
 			public IStatus proceedUndoing(IUndoableOperation op, IOperationHistory history, IAdaptable uiInfo) {
 				approvalCount[0]++;
 				return Status.OK_STATUS;
 			}
-			@Override
 			public IStatus proceedRedoing(IUndoableOperation op, IOperationHistory history, IAdaptable uiInfo) {
 				approvalCount[0]--;
 				return Status.OK_STATUS;

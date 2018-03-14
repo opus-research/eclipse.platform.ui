@@ -57,7 +57,6 @@ public class JavaBeanObservableArrayBasedSetTest extends
 
 	private String propertyName;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -130,7 +129,6 @@ public class JavaBeanObservableArrayBasedSetTest extends
 
 	public void testAdd_FiresPropertyChangeEvent() throws Exception {
 		assertPropertyChangeEvent(bean, new Runnable() {
-			@Override
 			public void run() {
 				set.add("0");
 			}
@@ -167,7 +165,6 @@ public class JavaBeanObservableArrayBasedSetTest extends
 		set.add("0");
 
 		assertPropertyChangeEvent(bean, new Runnable() {
-			@Override
 			public void run() {
 				set.remove("0");
 			}
@@ -202,7 +199,6 @@ public class JavaBeanObservableArrayBasedSetTest extends
 
 	public void testAddAllPropertyChangeEvent() throws Exception {
 		assertPropertyChangeEvent(bean, new Runnable() {
-			@Override
 			public void run() {
 				set.addAll(Arrays.asList(new String[] { "0", "1" }));
 			}
@@ -237,7 +233,6 @@ public class JavaBeanObservableArrayBasedSetTest extends
 	public void testRemoveAllPropertyChangeEvent() throws Exception {
 		set.add("0");
 		assertPropertyChangeEvent(bean, new Runnable() {
-			@Override
 			public void run() {
 				set.removeAll(Arrays.asList(new String[] { "0" }));
 			}
@@ -275,7 +270,6 @@ public class JavaBeanObservableArrayBasedSetTest extends
 		set.addAll(Arrays.asList(new String[] { "0", "1" }));
 
 		assertPropertyChangeEvent(bean, new Runnable() {
-			@Override
 			public void run() {
 				set.retainAll(Arrays.asList(new String[] { "0" }));
 			}
@@ -378,7 +372,6 @@ public class JavaBeanObservableArrayBasedSetTest extends
 
 		PropertyChangeEvent evt;
 
-		@Override
 		public void propertyChange(PropertyChangeEvent evt) {
 			count++;
 			this.evt = evt;
@@ -394,7 +387,6 @@ public class JavaBeanObservableArrayBasedSetTest extends
 	}
 
 	static class Delegate extends AbstractObservableCollectionContractDelegate {
-		@Override
 		public IObservableCollection createObservableCollection(Realm realm,
 				int elementCount) {
 			String propertyName = "array";
@@ -407,17 +399,14 @@ public class JavaBeanObservableArrayBasedSetTest extends
 			return set;
 		}
 
-		@Override
 		public Object createElement(IObservableCollection collection) {
 			return new Object().toString();
 		}
 
-		@Override
 		public Object getElementType(IObservableCollection collection) {
 			return String.class;
 		}
 
-		@Override
 		public void change(IObservable observable) {
 			IObservableSet set = (IObservableSet) observable;
 			set.add(createElement(set));

@@ -36,7 +36,11 @@ import org.eclipse.ui.statushandlers.StatusManager;
 public class IDESelectionConversionService implements
 		ISelectionConversionService {
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.SelectionConversionService#convertToResources(org.eclipse.jface.viewers.IStructuredSelection)
+	 */
 	public IStructuredSelection convertToResources(
 			IStructuredSelection originalSelection) {
 

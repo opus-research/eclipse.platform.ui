@@ -27,13 +27,16 @@ public class GotoActionProvider extends CommonActionProvider {
 
 	private GotoResourceAction gotoAction;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.navigator.CommonActionProvider#init(org.eclipse.ui.navigator.ICommonActionExtensionSite)
+	 */
 	public void init(ICommonActionExtensionSite anActionSite) {
 		gotoAction = new GotoResourceAction(anActionSite.getViewSite().getShell(), (CommonViewer)anActionSite.getStructuredViewer());
 	}
 
 
-	@Override
 	public void fillActionBars(IActionBars actionBars) {
 		actionBars.setGlobalActionHandler(
 				IWorkbenchActionConstants.GO_TO_RESOURCE, gotoAction);

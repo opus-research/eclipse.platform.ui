@@ -32,7 +32,9 @@ public class FIXMEParameters extends FiltersContributionParameters {
 		
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.views.markers.FiltersContributionParameters#getParameterValues()
+	 */
 	public Map getParameterValues() {
 		return fixmeMap;
 	}

@@ -22,13 +22,17 @@ public class JFaceActivator implements BundleActivator {
 
 	private static BundleContext bundleContext;
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
+	 */
 	public void start(BundleContext context) throws Exception {
 		bundleContext = context;
 		InternalPolicy.OSGI_AVAILABLE = true;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
+	 */
 	public void stop(BundleContext context) throws Exception {
 		InternalPolicy.OSGI_AVAILABLE = false;
 		bundleContext = null;

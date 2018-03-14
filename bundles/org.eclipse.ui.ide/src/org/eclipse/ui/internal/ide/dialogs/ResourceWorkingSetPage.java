@@ -132,8 +132,7 @@ public class ResourceWorkingSetPage extends WizardPage implements
      * 
      * @see org.eclipse.jface.wizard.WizardPage#createControl(Composite)
      */
-    @Override
-	public void createControl(Composite parent) {
+    public void createControl(Composite parent) {
     	initializeDialogUnits(parent);
     	
         Composite composite = new Composite(parent, SWT.NULL);
@@ -154,8 +153,7 @@ public class ResourceWorkingSetPage extends WizardPage implements
         text.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL
                 | GridData.HORIZONTAL_ALIGN_FILL));
         text.addModifyListener(new ModifyListener() {
-            @Override
-			public void modifyText(ModifyEvent e) {
+            public void modifyText(ModifyEvent e) {
                 validateInput();
             }
         });
@@ -185,25 +183,21 @@ public class ResourceWorkingSetPage extends WizardPage implements
         tree.getControl().setLayoutData(data);
 
         tree.addCheckStateListener(new ICheckStateListener() {
-            @Override
-			public void checkStateChanged(CheckStateChangedEvent event) {
+            public void checkStateChanged(CheckStateChangedEvent event) {
                 handleCheckStateChange(event);
             }
         });
 
         tree.addTreeListener(new ITreeViewerListener() {
-            @Override
-			public void treeCollapsed(TreeExpansionEvent event) {
+            public void treeCollapsed(TreeExpansionEvent event) {
             }
 
-            @Override
-			public void treeExpanded(TreeExpansionEvent event) {
+            public void treeExpanded(TreeExpansionEvent event) {
                 final Object element = event.getElement();
                 if (tree.getGrayed(element) == false) {
 					BusyIndicator.showWhile(getShell().getDisplay(),
                             new Runnable() {
-                                @Override
-								public void run() {
+                                public void run() {
                                     setSubtreeChecked((IContainer) element,
                                             tree.getChecked(element), false);
                                 }
@@ -225,11 +219,9 @@ public class ResourceWorkingSetPage extends WizardPage implements
 		selectAllButton.setText(IDEWorkbenchMessages.ResourceWorkingSetPage_selectAll_label);
 		selectAllButton.setToolTipText(IDEWorkbenchMessages.ResourceWorkingSetPage_selectAll_toolTip);
 		selectAllButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent selectionEvent) {
 				BusyIndicator.showWhile(getShell().getDisplay(),
 						new Runnable() {
-							@Override
 							public void run() {
 								tree.setCheckedElements(treeContentProvider
 										.getElements(tree.getInput()));
@@ -246,11 +238,9 @@ public class ResourceWorkingSetPage extends WizardPage implements
 		deselectAllButton.setText(IDEWorkbenchMessages.ResourceWorkingSetPage_deselectAll_label);
 		deselectAllButton.setToolTipText(IDEWorkbenchMessages.ResourceWorkingSetPage_deselectAll_toolTip);
 		deselectAllButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent selectionEvent) {
 				BusyIndicator.showWhile(getShell().getDisplay(), new Runnable() {
 
-					@Override
 					public void run() {
 						tree.setCheckedElements(treeContentProvider.getElements(tree.getInput()));
 						setSubtreeChecked((IContainer)tree.getInput(), false, false);
@@ -308,8 +298,7 @@ public class ResourceWorkingSetPage extends WizardPage implements
      * 
      * @see org.eclipse.ui.dialogs.IWorkingSetPage#finish()
      */
-    @Override
-	public void finish() {
+    public void finish() {
         ArrayList resources = new ArrayList(10);
         findCheckedResources(resources, (IContainer) tree.getInput());
         if (workingSet == null) {
@@ -330,8 +319,7 @@ public class ResourceWorkingSetPage extends WizardPage implements
      * 
      * @see org.eclipse.ui.dialogs.IWorkingSetPage#getSelection()
      */
-    @Override
-	public IWorkingSet getSelection() {
+    public IWorkingSet getSelection() {
         return workingSet;
     }
 
@@ -351,8 +339,7 @@ public class ResourceWorkingSetPage extends WizardPage implements
      */
     private void handleCheckStateChange(final CheckStateChangedEvent event) {
         BusyIndicator.showWhile(getShell().getDisplay(), new Runnable() {
-            @Override
-			public void run() {
+            public void run() {
                 IResource resource = (IResource) event.getElement();
                 boolean state = event.getChecked();
 
@@ -393,8 +380,7 @@ public class ResourceWorkingSetPage extends WizardPage implements
      */
     private void initializeCheckedState() {
         BusyIndicator.showWhile(getShell().getDisplay(), new Runnable() {
-            @Override
-			public void run() {
+            public void run() {
             	Object[] items = null;
             	if (workingSet == null) {
 
@@ -459,8 +445,7 @@ public class ResourceWorkingSetPage extends WizardPage implements
      * 
      * @see org.eclipse.ui.dialogs.IWorkingSetPage#setSelection(IWorkingSet)
      */
-    @Override
-	public void setSelection(IWorkingSet workingSet) {
+    public void setSelection(IWorkingSet workingSet) {
         if (workingSet == null) {
             throw new IllegalArgumentException("Working set must not be null"); //$NON-NLS-1$
         }

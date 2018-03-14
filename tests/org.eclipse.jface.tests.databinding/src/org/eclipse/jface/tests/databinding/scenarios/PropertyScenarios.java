@@ -58,15 +58,13 @@ public class PropertyScenarios extends ScenariosTestCase {
 
     private Adventure adventure;
 
-    @Override
-	protected void setUp() throws Exception {
+    protected void setUp() throws Exception {
         super.setUp();
         // do any setup work here
         adventure = SampleData.WINTER_HOLIDAY;
     }
 
-    @Override
-	protected void tearDown() throws Exception {
+    protected void tearDown() throws Exception {
         // do any teardown work here
         super.tearDown();
     }
@@ -77,13 +75,11 @@ public class PropertyScenarios extends ScenariosTestCase {
         final boolean[] focusLostHolder = { false };
         text.addFocusListener(new FocusListener() {
 
-            @Override
-			public void focusGained(FocusEvent e) {
+            public void focusGained(FocusEvent e) {
                 // only interested in focus lost events
             }
 
-            @Override
-			public void focusLost(FocusEvent e) {
+            public void focusLost(FocusEvent e) {
                 focusLostHolder[0] = true;
             }
         });
@@ -189,18 +185,15 @@ public class PropertyScenarios extends ScenariosTestCase {
         adventure.setName("UPPERCASE");
 
         IConverter converter1 = new IConverter() {
-            @Override
-			public Object getFromType() {
+            public Object getFromType() {
                 return String.class;
             }
 
-            @Override
-			public Object getToType() {
+            public Object getToType() {
                 return String.class;
             }
 
-            @Override
-			public Object convert(Object toObject) {
+            public Object convert(Object toObject) {
                 String modelValue = (String) toObject;
                 if (modelValue == null || modelValue.equals("")) {
                     return modelValue;
@@ -211,18 +204,15 @@ public class PropertyScenarios extends ScenariosTestCase {
             }
         };
         IConverter converter2 = new IConverter() {
-            @Override
-			public Object getFromType() {
+            public Object getFromType() {
                 return String.class;
             }
 
-            @Override
-			public Object getToType() {
+            public Object getToType() {
                 return String.class;
             }
 
-            @Override
-			public Object convert(Object fromObject) {
+            public Object convert(Object fromObject) {
                 return ((String) fromObject).toUpperCase();
             }
         };
@@ -250,8 +240,7 @@ public class PropertyScenarios extends ScenariosTestCase {
         adventure.setName("ValidValue");
 
         IValidator validator = new IValidator() {
-            @Override
-			public IStatus validate(Object value) {
+            public IStatus validate(Object value) {
                 String stringValue = (String) value;
                 if (stringValue.length() > 15) {
                     return ValidationStatus.error(max15CharactersMessage);
@@ -299,8 +288,7 @@ public class PropertyScenarios extends ScenariosTestCase {
         final String mustBeCurrencyMessage = "Price must be a currency.";
 
         IValidator validator = new IValidator() {
-            @Override
-			public IStatus validate(Object value) {
+            public IStatus validate(Object value) {
                 String stringValue = (String) value;
                 try {
                     double doubleValue = new Double(stringValue).doubleValue();
@@ -368,15 +356,13 @@ public class PropertyScenarios extends ScenariosTestCase {
         final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.CANADA);
 
         IConverter toCurrency = new Converter(double.class, String.class) {
-            @Override
-			public Object convert(Object toObject) {
+            public Object convert(Object toObject) {
                 return currencyFormat.format(((Double) toObject).doubleValue());
             }
         };
 
         IConverter toDouble = new Converter(String.class, double.class) {
-            @Override
-			public Object convert(Object fromObject) {
+            public Object convert(Object fromObject) {
                 try {
                     return new Double(currencyFormat.parse((String) fromObject).doubleValue());
                 } catch (ParseException e) {
@@ -388,8 +374,7 @@ public class PropertyScenarios extends ScenariosTestCase {
         };
 
         IValidator validator = new IValidator() {
-            @Override
-			public IStatus validate(Object value) {
+            public IStatus validate(Object value) {
                 String stringValue = (String) value;
                 try {
                     double doubleValue = currencyFormat.parse(stringValue).doubleValue();
@@ -497,8 +482,7 @@ new UpdateValueStrategy().setConverter(toDouble).setAfterGetValidator(validator)
                 return new Boolean(!booleanObject.booleanValue());
             }
 
-            @Override
-			public Object convert(Object targetObject) {
+            public Object convert(Object targetObject) {
                 return negated((Boolean) targetObject);
             }
         };
@@ -558,8 +542,7 @@ new UpdateValueStrategy().setConverter(toDouble).setAfterGetValidator(validator)
         IObservableValue uv = BeansObservables.observeValue(adventure, "name");
         
         uv.addChangeListener(new IChangeListener() {
-            @Override
-			public void handleChange(ChangeEvent event) {
+            public void handleChange(ChangeEvent event) {
                 // Count how many times adventure has changed
                 counter[0]++;
             }

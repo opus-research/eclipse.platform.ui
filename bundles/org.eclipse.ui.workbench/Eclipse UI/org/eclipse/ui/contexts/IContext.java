@@ -37,7 +37,6 @@ package org.eclipse.ui.contexts;
  * @deprecated Please use the "org.eclipse.core.commands" plug-in instead.
  * @noimplement This interface is not intended to be implemented by clients.
  */
-@Deprecated
 public interface IContext extends Comparable {
 
     /**

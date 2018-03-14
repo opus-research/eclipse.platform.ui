@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 Matthew Hall and others.
+ * Copyright (c) 2008, 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 124684)
  *     Matthew Hall - bugs 260329, 260337
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 442278, 434283
  ******************************************************************************/
 
 package org.eclipse.jface.examples.databinding.snippets;
@@ -23,12 +22,12 @@ import java.util.Set;
 
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.beans.BeanProperties;
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.value.ComputedValue;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
-import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.ViewerSupport;
 import org.eclipse.jface.databinding.viewers.ViewersObservables;
 import org.eclipse.jface.dialogs.IInputValidator;
@@ -64,7 +63,6 @@ public class Snippet018CheckboxTableViewerCheckedSelection {
 		// The SWT event loop
 		final Display display = Display.getDefault();
 		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
-			@Override
 			public void run() {
 				ViewModel viewModel = createSampleModel();
 
@@ -165,7 +163,6 @@ public class Snippet018CheckboxTableViewerCheckedSelection {
 					this.friends = new HashSet(friends));
 		}
 
-		@Override
 		public String toString() {
 			return name;
 		}
@@ -297,14 +294,13 @@ public class Snippet018CheckboxTableViewerCheckedSelection {
 		private void bindUI() {
 			DataBindingContext dbc = new DataBindingContext();
 
-			final IObservableList people = BeanProperties.list(viewModel.getClass(), "people").observe(viewModel);
+			final IObservableList people = BeansObservables.observeList(Realm
+					.getDefault(), viewModel, "people");
 
 			addPersonButton.addListener(SWT.Selection, new Listener() {
-				@Override
 				public void handleEvent(Event event) {
 					InputDialog dlg = new InputDialog(shell, "Add Person",
 							"Enter name:", "<Name>", new IInputValidator() {
-								@Override
 								public String isValid(String newText) {
 									if (newText == null
 											|| newText.length() == 0)
@@ -323,9 +319,9 @@ public class Snippet018CheckboxTableViewerCheckedSelection {
 			});
 
 			removePersonButton.addListener(SWT.Selection, new Listener() {
-				@Override
 				public void handleEvent(Event event) {
-					IStructuredSelection selected = peopleViewer.getStructuredSelection();
+					IStructuredSelection selected = (IStructuredSelection) peopleViewer
+							.getSelection();
 					if (selected.isEmpty())
 						return;
 					Person person = (Person) selected.getFirstElement();
@@ -342,27 +338,25 @@ public class Snippet018CheckboxTableViewerCheckedSelection {
 					.observeSingleSelection(peopleViewer);
 
 			IObservableValue personSelected = new ComputedValue(Boolean.TYPE) {
-				@Override
 				protected Object calculate() {
 					return Boolean.valueOf(selectedPerson.getValue() != null);
 				}
 			};
-			dbc.bindValue(WidgetProperties.enabled().observe(removePersonButton),
+			dbc.bindValue(SWTObservables.observeEnabled(removePersonButton),
 					personSelected);
-			dbc.bindValue(WidgetProperties.enabled().observe(friendsViewer
+			dbc.bindValue(SWTObservables.observeEnabled(friendsViewer
 					.getTable()), personSelected);
 
-			dbc.bindValue(
-					WidgetProperties.text(SWT.Modify).observe(personName),
-					BeanProperties.value((Class) selectedPerson.getValueType(), "name", String.class)
-					.observeDetail(selectedPerson));
+			dbc.bindValue(SWTObservables.observeText(personName, SWT.Modify),
+					BeansObservables.observeDetailValue(selectedPerson, "name",
+							String.class));
 
 			ViewerSupport.bind(friendsViewer, people, BeanProperties.value(
 					Person.class, "name"));
 
 			dbc.bindSet(ViewersObservables.observeCheckedElements(
-					friendsViewer, Person.class),BeanProperties.set((Class) selectedPerson.getValueType(), "friends", Person.class)
-					.observeDetail(selectedPerson));
+					friendsViewer, Person.class), BeansObservables
+					.observeDetailSet(selectedPerson, "friends", Person.class));
 		}
 	}
 }

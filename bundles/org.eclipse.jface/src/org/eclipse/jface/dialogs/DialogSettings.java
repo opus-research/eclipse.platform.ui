@@ -112,15 +112,19 @@ public class DialogSettings implements IDialogSettings {
         sections = new HashMap<String, IDialogSettings>();
     }
 
-    @Override
-	public IDialogSettings addNewSection(String sectionName) {
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
+    public IDialogSettings addNewSection(String sectionName) {
         DialogSettings section = new DialogSettings(sectionName);
         addSection(section);
         return section;
     }
 
-    @Override
-	public void addSection(IDialogSettings section) {
+	/* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
+    public void addSection(IDialogSettings section) {
         sections.put(section.getName(), section);
     }
 
@@ -151,23 +155,31 @@ public class DialogSettings implements IDialogSettings {
 		return sections.remove(sectionName);
 	}
 
-    @Override
-	public String get(String key) {
+	/* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
+    public String get(String key) {
         return items.get(key);
     }
 
-    @Override
-	public String[] getArray(String key) {
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
+    public String[] getArray(String key) {
         return arrayItems.get(key);
     }
 
-    @Override
-	public boolean getBoolean(String key) {
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
+    public boolean getBoolean(String key) {
         return Boolean.valueOf(items.get(key)).booleanValue();
     }
 
-    @Override
-	public double getDouble(String key) throws NumberFormatException {
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
+    public double getDouble(String key) throws NumberFormatException {
         String setting = items.get(key);
         if (setting == null) {
 			throw new NumberFormatException(
@@ -177,8 +189,10 @@ public class DialogSettings implements IDialogSettings {
         return new Double(setting).doubleValue();
     }
 
-    @Override
-	public float getFloat(String key) throws NumberFormatException {
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
+    public float getFloat(String key) throws NumberFormatException {
         String setting = items.get(key);
         if (setting == null) {
 			throw new NumberFormatException(
@@ -188,8 +202,10 @@ public class DialogSettings implements IDialogSettings {
         return new Float(setting).floatValue();
     }
 
-    @Override
-	public int getInt(String key) throws NumberFormatException {
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
+    public int getInt(String key) throws NumberFormatException {
         String setting = items.get(key);
         if (setting == null) {
             //new Integer(null) will throw a NumberFormatException and meet our spec, but this message
@@ -201,8 +217,10 @@ public class DialogSettings implements IDialogSettings {
         return new Integer(setting).intValue();
     }
 
-    @Override
-	public long getLong(String key) throws NumberFormatException {
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
+    public long getLong(String key) throws NumberFormatException {
         String setting = items.get(key);
         if (setting == null) {
             //new Long(null) will throw a NumberFormatException and meet our spec, but this message
@@ -214,8 +232,10 @@ public class DialogSettings implements IDialogSettings {
         return new Long(setting).longValue();
     }
 
-    @Override
-	public String getName() {
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
+    public String getName() {
         return name;
     }
     
@@ -240,21 +260,27 @@ public class DialogSettings implements IDialogSettings {
 		return section;
 	}
 
-    @Override
-	public IDialogSettings getSection(String sectionName) {
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
+    public IDialogSettings getSection(String sectionName) {
         return sections.get(sectionName);
     }
 
-    @Override
-	public IDialogSettings[] getSections() {
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
+    public IDialogSettings[] getSections() {
         Collection<IDialogSettings> values = sections.values();
         DialogSettings[] result = new DialogSettings[values.size()];
         values.toArray(result);
         return result;
     }
 
-    @Override
-	public void load(Reader r) {
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
+    public void load(Reader r) {
         Document document = null;
         try {
             DocumentBuilder parser = DocumentBuilderFactory.newInstance()
@@ -278,8 +304,10 @@ public class DialogSettings implements IDialogSettings {
         }
     }
 
-    @Override
-	public void load(String fileName) throws IOException {
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
+    public void load(String fileName) throws IOException {
         FileInputStream stream = new FileInputStream(fileName);
         BufferedReader reader = new BufferedReader(new InputStreamReader(
                 stream, "utf-8"));//$NON-NLS-1$
@@ -287,6 +315,9 @@ public class DialogSettings implements IDialogSettings {
         reader.close();
     }
 
+    /* (non-Javadoc)
+     * Load the setting from the <code>document</code>
+     */
     private void load(Document document, Element root) {
         name = root.getAttribute(TAG_NAME);
         NodeList l = root.getElementsByTagName(TAG_ITEM);
@@ -328,56 +359,77 @@ public class DialogSettings implements IDialogSettings {
         }
     }
 
-    @Override
-	public void put(String key, String[] value) {
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
+    public void put(String key, String[] value) {
         arrayItems.put(key, value);
     }
 
-    @Override
-	public void put(String key, double value) {
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
+    public void put(String key, double value) {
         put(key, String.valueOf(value));
     }
 
-    @Override
-	public void put(String key, float value) {
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
+    public void put(String key, float value) {
         put(key, String.valueOf(value));
     }
 
-    @Override
-	public void put(String key, int value) {
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
+    public void put(String key, int value) {
         put(key, String.valueOf(value));
     }
 
-    @Override
-	public void put(String key, long value) {
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
+    public void put(String key, long value) {
         put(key, String.valueOf(value));
     }
 
-    @Override
-	public void put(String key, String value) {
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
+    public void put(String key, String value) {
         items.put(key, value);
     }
 
-    @Override
-	public void put(String key, boolean value) {
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
+    public void put(String key, boolean value) {
         put(key, String.valueOf(value));
     }
 
-	@Override
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
 	public void save(Writer writer) throws IOException {
     	final XMLWriter xmlWriter = new XMLWriter(writer);
     	save(xmlWriter);
     	xmlWriter.flush();
     }
 
-    @Override
-	public void save(String fileName) throws IOException {
+    /* (non-Javadoc)
+     * Method declared on IDialogSettings.
+     */
+    public void save(String fileName) throws IOException {
         FileOutputStream stream = new FileOutputStream(fileName);
         XMLWriter writer = new XMLWriter(stream);
         save(writer);
         writer.close();
     }
 
+    /* (non-Javadoc)
+     * Save the settings in the <code>document</code>.
+     */
     private void save(XMLWriter out) throws IOException {
     	HashMap<String, String> attributes = new HashMap<String, String>(2);
     	attributes.put(TAG_NAME, name == null ? "" : name); //$NON-NLS-1$

@@ -182,7 +182,6 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 			data.horizontalAlignment = GridData.BEGINNING;
 			advancedButton.setLayoutData(data);
 			advancedButton.addSelectionListener(new SelectionAdapter() {
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 					handleAdvancedButtonSelect();
 				}
@@ -190,23 +189,19 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 		}
 		linkedResourceGroup = new CreateLinkedResourceGroup(IResource.FILE,
 				new Listener() {
-					@Override
 					public void handleEvent(Event e) {
 						setPageComplete(validatePage());
 						firstLinkCheck = false;
 					}
 				}, new CreateLinkedResourceGroup.IStringValue() {
-					@Override
 					public void setValue(String string) {
 						resourceGroup.setResource(string);
 					}
 
-					@Override
 					public String getValue() {
 						return resourceGroup.getResource();
 					}
 
-					@Override
 					public IResource getResource() {
 						IPath path = resourceGroup.getContainerFullPath();
 						IWorkspaceRoot root = ResourcesPlugin.getWorkspace()
@@ -232,7 +227,6 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 	/**
 	 * (non-Javadoc) Method declared on IDialogPage.
 	 */
-	@Override
 	public void createControl(Composite parent) {
 		initializeDialogUnits(parent);
 		// top level group
@@ -285,7 +279,6 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 	 *             file content for a subclass, use
 	 *             {@link #getInitialContents()}.
 	 */
-	@Deprecated
 	protected void createFile(IFile fileHandle, InputStream contents,
 			IProgressMonitor monitor) throws CoreException {
 		if (contents == null) {
@@ -440,7 +433,6 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 		}
 
 		IRunnableWithProgress op = new IRunnableWithProgress() {
-			@Override
 			public void run(IProgressMonitor monitor) {
 				CreateFileOperation op = new CreateFileOperation(newFileHandle,
 						linkTargetPath, initialContents,
@@ -455,7 +447,6 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 				} catch (final ExecutionException e) {
 					getContainer().getShell().getDisplay().syncExec(
 							new Runnable() {
-								@Override
 								public void run() {
 									if (e.getCause() instanceof CoreException) {
 										ErrorDialog
@@ -529,7 +520,6 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 	 * @deprecated As of 3.3, scheduling rules are provided by the undoable
 	 *             operation that this page creates and executes.
 	 */
-	@Deprecated
 	protected ISchedulingRule createRule(IResource resource) {
 		IResource parent = resource.getParent();
 		while (parent != null) {
@@ -682,7 +672,6 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 	 * <code>Listener</code> method handles all events and enablements for
 	 * controls on this page. Subclasses may extend.
 	 */
-	@Override
 	public void handleEvent(Event event) {
 		setPageComplete(validatePage());
 	}
@@ -911,7 +900,6 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 	 * 
 	 * @see org.eclipse.jface.dialogs.DialogPage#setVisible(boolean)
 	 */
-	@Override
 	public void setVisible(boolean visible) {
 		super.setVisible(visible);
 		if (visible) {

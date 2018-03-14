@@ -56,7 +56,6 @@ import org.eclipse.ui.model.WorkbenchViewerComparator;
  * @deprecated Use org.eclipse.swt.widgets.FileDialog,
  * @noextend This class is not intended to be subclassed by clients.
  */
-@Deprecated
 public class FileSelectionDialog extends SelectionDialog {
     // the root file representative to populate the viewer with
     private FileSystemElement root;
@@ -108,8 +107,7 @@ public class FileSelectionDialog extends SelectionDialog {
         Button selectButton = new Button(buttonComposite, SWT.PUSH);
         selectButton.setText(SELECT_ALL_TITLE);
         SelectionListener listener = new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 selectionGroup.setAllSelections(true);
             }
         };
@@ -118,8 +116,7 @@ public class FileSelectionDialog extends SelectionDialog {
         Button deselectButton = new Button(buttonComposite, SWT.PUSH);
         deselectButton.setText(DESELECT_ALL_TITLE);
         listener = new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 selectionGroup.setAllSelections(false);
 
             }
@@ -150,15 +147,13 @@ public class FileSelectionDialog extends SelectionDialog {
     /* (non-Javadoc)
      * Method declared in Window.
      */
-    @Override
-	protected void configureShell(Shell shell) {
+    protected void configureShell(Shell shell) {
         super.configureShell(shell);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,
 				IIDEHelpContextIds.FILE_SELECTION_DIALOG);
     }
 
-    @Override
-	public void create() {
+    public void create() {
         super.create();
         initializeDialog();
     }
@@ -166,8 +161,7 @@ public class FileSelectionDialog extends SelectionDialog {
     /* (non-Javadoc)
      * Method declared on Dialog.
      */
-    @Override
-	protected Control createDialogArea(Composite parent) {
+    protected Control createDialogArea(Composite parent) {
         // page group
         Composite composite = (Composite) super.createDialogArea(parent);
 
@@ -188,8 +182,7 @@ public class FileSelectionDialog extends SelectionDialog {
         // size, otherwise it will open too small
 
         ICheckStateListener listener = new ICheckStateListener() {
-            @Override
-			public void checkStateChanged(CheckStateChangedEvent event) {
+            public void checkStateChanged(CheckStateChangedEvent event) {
                 getOkButton().setEnabled(
                         selectionGroup.getCheckedElementCount() > 0);
             }
@@ -221,8 +214,7 @@ public class FileSelectionDialog extends SelectionDialog {
      */
     private ITreeContentProvider getFileProvider() {
         return new WorkbenchContentProvider() {
-            @Override
-			public Object[] getChildren(Object o) {
+            public Object[] getChildren(Object o) {
                 if (o instanceof FileSystemElement) {
                     return ((FileSystemElement) o).getFiles().getChildren(o);
                 }
@@ -237,8 +229,7 @@ public class FileSelectionDialog extends SelectionDialog {
      */
     private ITreeContentProvider getFolderProvider() {
         return new WorkbenchContentProvider() {
-            @Override
-			public Object[] getChildren(Object o) {
+            public Object[] getChildren(Object o) {
                 if (o instanceof FileSystemElement) {
                     return ((FileSystemElement) o).getFolders().getChildren(o);
                 }
@@ -268,8 +259,7 @@ public class FileSelectionDialog extends SelectionDialog {
      * <code>Dialog</code> method builds a list of the selected files for later 
      * retrieval by the client and closes this dialog.
      */
-    @Override
-	protected void okPressed() {
+    protected void okPressed() {
         Iterator resultEnum = selectionGroup.getAllCheckedListItems();
         ArrayList list = new ArrayList();
         while (resultEnum.hasNext()) {

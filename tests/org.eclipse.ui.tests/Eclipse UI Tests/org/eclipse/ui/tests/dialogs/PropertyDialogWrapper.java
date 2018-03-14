@@ -23,8 +23,7 @@ public class PropertyDialogWrapper extends PropertyDialog {
         super(parentShell, manager, selection);
     }
 
-    @Override
-	protected boolean showPage(IPreferenceNode node) {
+    protected boolean showPage(IPreferenceNode node) {
         return super.showPage(node);
     }
 }

@@ -57,7 +57,6 @@ public class TableScenarios extends ScenariosTestCase {
 
 	private TableColumn fancyColumn;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		getComposite().setLayout(new FillLayout());
@@ -82,7 +81,6 @@ public class TableScenarios extends ScenariosTestCase {
 				getShell().getDisplay().getSystemImage(SWT.ICON_INFORMATION), };
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		// do any teardown work here
 		super.tearDown();

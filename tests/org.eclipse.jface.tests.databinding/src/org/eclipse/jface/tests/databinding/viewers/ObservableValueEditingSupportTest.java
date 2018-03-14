@@ -51,7 +51,6 @@ public class ObservableValueEditingSupportTest extends AbstractSWTTestCase {
 	 * 
 	 * @see org.eclipse.jface.tests.databinding.AbstractSWTTestCase#setUp()
 	 */
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -178,7 +177,6 @@ public class ObservableValueEditingSupportTest extends AbstractSWTTestCase {
 			editor = new TextCellEditor((Composite) viewer.getControl());
 		}
 
-		@Override
 		protected boolean canEdit(Object element) {
 			return super.canEdit(element);
 		}
@@ -191,7 +189,6 @@ public class ObservableValueEditingSupportTest extends AbstractSWTTestCase {
 			events.append(event);
 		}
 
-		@Override
 		protected IObservableValue doCreateCellEditorObservable(
 				CellEditor cellEditor) {
 			event("createCellEditorObservable");
@@ -201,14 +198,12 @@ public class ObservableValueEditingSupportTest extends AbstractSWTTestCase {
 					SWT.NONE);
 		}
 
-		@Override
 		protected IObservableValue doCreateElementObservable(Object element,
 				ViewerCell cell) {
 			event("createElementObservable");
 			return model = BeansObservables.observeValue(element, "value");
 		}
 
-		@Override
 		protected Binding createBinding(IObservableValue target,
 				IObservableValue model) {
 			event("createBinding");
@@ -216,7 +211,6 @@ public class ObservableValueEditingSupportTest extends AbstractSWTTestCase {
 			return binding = super.createBinding(target, model);
 		}
 
-		@Override
 		protected CellEditor getCellEditor(Object element) {
 			return editor;
 		}

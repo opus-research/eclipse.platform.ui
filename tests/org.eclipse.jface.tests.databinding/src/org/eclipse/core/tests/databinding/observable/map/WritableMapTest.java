@@ -32,19 +32,16 @@ import org.eclipse.jface.databinding.conformance.util.RealmTester;
  * 
  */
 public class WritableMapTest extends TestCase {
-	@Override
 	protected void setUp() throws Exception {
 		RealmTester.setDefault(new CurrentRealm(true));
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		RealmTester.setDefault(null);
 	}
 
 	public void testPutRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				WritableMap map = new WritableMap();
 				map.put("", "");
@@ -54,7 +51,6 @@ public class WritableMapTest extends TestCase {
 
 	public void testRemoveRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				WritableMap map = new WritableMap();
 				CurrentRealm realm = (CurrentRealm) Realm.getDefault();
@@ -70,7 +66,6 @@ public class WritableMapTest extends TestCase {
 
 	public void testClearRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				WritableMap map = new WritableMap();
 				map.clear();
@@ -80,7 +75,6 @@ public class WritableMapTest extends TestCase {
 
 	public void testPutAllRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				WritableMap map = new WritableMap();
 				map.putAll(Collections.EMPTY_MAP);

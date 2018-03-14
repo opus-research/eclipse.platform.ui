@@ -42,7 +42,6 @@ public class TableViewLabelProvider extends LabelProvider implements
 	 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object,
 	 *      int)
 	 */
-	@Override
 	public Image getColumnImage(Object element, int columnIndex) {
 		if (fields == null || columnIndex < 0 || columnIndex >= fields.length) {
 			return null;
@@ -56,7 +55,6 @@ public class TableViewLabelProvider extends LabelProvider implements
 	 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object,
 	 *      int)
 	 */
-	@Override
 	public String getColumnText(Object element, int columnIndex) {
 		if (fields == null || columnIndex < 0 || columnIndex >= fields.length) {
 			return null;
@@ -64,7 +62,6 @@ public class TableViewLabelProvider extends LabelProvider implements
 		return fields[columnIndex].getValue(element);
 	}
 
-	@Override
 	public Font getFont(Object element) {
 		MarkerNode node = (MarkerNode) element;
 		if (node.isConcrete()) {

@@ -38,7 +38,6 @@ import org.eclipse.ui.part.ISetSelectionTarget;
  * otherwise if it is an <code>IAdaptable</code>, it tries to get the <code>IResource.class</code> adapter.
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
-@Deprecated
 public class ShowInNavigatorAction extends SelectionProviderAction {
     private IWorkbenchPage page;
 
@@ -90,8 +89,7 @@ public class ShowInNavigatorAction extends SelectionProviderAction {
      * Shows the Navigator view and sets its selection to the resources
      * selected in this action's selection provider.
      */
-    @Override
-	public void run() {
+    public void run() {
         List v = getResources(getStructuredSelection());
         if (v.isEmpty()) {
 			return;
@@ -113,8 +111,7 @@ public class ShowInNavigatorAction extends SelectionProviderAction {
      * (non-Javadoc)
      * Method declared on SelectionProviderAction.
      */
-    @Override
-	public void selectionChanged(IStructuredSelection selection) {
+    public void selectionChanged(IStructuredSelection selection) {
         setEnabled(!getResources(selection).isEmpty());
     }
 }

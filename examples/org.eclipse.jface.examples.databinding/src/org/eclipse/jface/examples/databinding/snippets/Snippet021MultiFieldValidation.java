@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 Matthew Hall and others.
+ * Copyright (c) 2008, 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 218269)
  *     Matthew Hall - bug 260329
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 442278, 434283
  ******************************************************************************/
 
 package org.eclipse.jface.examples.databinding.snippets;
@@ -26,7 +25,6 @@ import org.eclipse.core.databinding.validation.MultiValidator;
 import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.databinding.swt.SWTObservables;
-import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.databinding.wizard.WizardPageSupport;
 import org.eclipse.jface.dialogs.IInputValidator;
@@ -53,7 +51,7 @@ import org.eclipse.swt.widgets.Text;
 
 /**
  * @since 3.2
- *
+ * 
  */
 public class Snippet021MultiFieldValidation extends WizardPage {
 
@@ -81,10 +79,9 @@ public class Snippet021MultiFieldValidation extends WizardPage {
 
 	/**
 	 * Create contents of the wizard
-	 *
+	 * 
 	 * @param parent
 	 */
-	@Override
 	public void createControl(Composite parent) {
 		Composite container = new Composite(parent, SWT.NULL);
 		final GridLayout gridLayout = new GridLayout();
@@ -206,18 +203,19 @@ public class Snippet021MultiFieldValidation extends WizardPage {
 	}
 
 	private void bindEvensAndOddsGroup(DataBindingContext dbc) {
-		IObservableValue targetField1 = WidgetProperties.text(SWT.Modify).observe(field1Target);
+		IObservableValue targetField1 = SWTObservables.observeText(
+				field1Target, SWT.Modify);
 		final IObservableValue middleField1 = new WritableValue(null,
 				Integer.TYPE);
 		dbc.bindValue(targetField1, middleField1);
 
-		IObservableValue targetField2 = WidgetProperties.text(SWT.Modify).observe(field2Target);
+		IObservableValue targetField2 = SWTObservables.observeText(
+				field2Target, SWT.Modify);
 		final IObservableValue middleField2 = new WritableValue(null,
 				Integer.TYPE);
 		dbc.bindValue(targetField2, middleField2);
 
 		MultiValidator validator = new MultiValidator() {
-			@Override
 			protected IStatus validate() {
 				Integer field1 = (Integer) middleField1.getValue();
 				Integer field2 = (Integer) middleField2.getValue();
@@ -239,14 +237,15 @@ public class Snippet021MultiFieldValidation extends WizardPage {
 		dbc.bindValue(validator.observeValidatedValue(middleField2),
 				modelField2);
 
-		dbc.bindValue(WidgetProperties.text(SWT.Modify).observe(field1ModelValue),
+		dbc.bindValue(SWTObservables.observeText(field1ModelValue, SWT.Modify),
 				modelField1);
-		dbc.bindValue(WidgetProperties.text(SWT.Modify).observe(field2ModelValue),
+		dbc.bindValue(SWTObservables.observeText(field2ModelValue, SWT.Modify),
 				modelField2);
 	}
 
 	private void bindSumAndAddendsGroup(DataBindingContext dbc) {
-		IObservableValue targetSum = WidgetProperties.text(SWT.Modify).observe(sumTarget);
+		IObservableValue targetSum = SWTObservables.observeText(sumTarget,
+				SWT.Modify);
 		final IObservableValue middleSum = new WritableValue(null, Integer.TYPE);
 		dbc.bindValue(targetSum, middleSum);
 
@@ -256,12 +255,10 @@ public class Snippet021MultiFieldValidation extends WizardPage {
 		addendsTarget.setInput(targetAddends);
 
 		addAddendButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				InputDialog dialog = new InputDialog(getShell(),
 						"Input addend", "Enter an integer addend", "0",
 						new IInputValidator() {
-							@Override
 							public String isValid(String newText) {
 								try {
 									Integer.valueOf(newText);
@@ -280,9 +277,9 @@ public class Snippet021MultiFieldValidation extends WizardPage {
 		});
 
 		removeAddendButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
-				IStructuredSelection selection = addendsTarget.getStructuredSelection();
+				IStructuredSelection selection = (IStructuredSelection) addendsTarget
+						.getSelection();
 				if (!selection.isEmpty())
 					targetAddends.remove(selection.getFirstElement());
 			}
@@ -290,14 +287,13 @@ public class Snippet021MultiFieldValidation extends WizardPage {
 
 		IObservableValue modelSum = new WritableValue(new Integer(5),
 				Integer.TYPE);
-		dbc.bindValue(WidgetProperties.text(SWT.Modify).observe(sumModelValue),
+		dbc.bindValue(SWTObservables.observeText(sumModelValue, SWT.Modify),
 				modelSum);
 
 		IObservableList modelAddends = new WritableList(new ArrayList(),
 				Integer.TYPE);
 
 		MultiValidator validator = new MultiValidator() {
-			@Override
 			protected IStatus validate() {
 				Integer sum = (Integer) middleSum.getValue();
 				int actualSum = 0;
@@ -323,17 +319,14 @@ public class Snippet021MultiFieldValidation extends WizardPage {
 	}
 
 	static class MultiFieldValidationWizard extends Wizard {
-		@Override
 		public void addPages() {
 			addPage(new Snippet021MultiFieldValidation());
 		}
 
-		@Override
 		public String getWindowTitle() {
 			return "Snippet 021 - Multi-field Validation";
 		}
 
-		@Override
 		public boolean performFinish() {
 			return true;
 		}
@@ -343,7 +336,6 @@ public class Snippet021MultiFieldValidation extends WizardPage {
 		Display display = new Display();
 
 		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
-			@Override
 			public void run() {
 				IWizard wizard = new MultiFieldValidationWizard();
 				WizardDialog dialog = new WizardDialog(null, wizard);

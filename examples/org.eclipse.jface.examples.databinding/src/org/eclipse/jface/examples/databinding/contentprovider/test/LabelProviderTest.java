@@ -42,7 +42,7 @@ import org.eclipse.swt.widgets.Shell;
  * Tests UpdatableTreeContentProvider and DirtyIndicationLabelProvider. Creates
  * a tree containing three randomly-generated sets of integers, and one node
  * that contains the union of the other sets.
- *
+ * 
  * @since 1.0
  */
 public class LabelProviderTest {
@@ -60,7 +60,11 @@ public class LabelProviderTest {
 	private Button renameButton;
 
 	private SelectionListener buttonSelectionListener = new SelectionAdapter() {
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+		 */
 		public void widgetSelected(SelectionEvent e) {
 			Button pressed = (Button) e.widget;
 			if (pressed == addButton) {
@@ -78,7 +82,7 @@ public class LabelProviderTest {
 	private IObservableValue selectedRenamable;
 
 	/**
-	 *
+	 * 
 	 */
 	public LabelProviderTest() {
 
@@ -93,13 +97,17 @@ public class LabelProviderTest {
 			list.setLabelProvider(new ListeningLabelProvider(contentProvider
 					.getKnownElements()) {
 				RenamableItem.Listener listener = new RenamableItem.Listener() {
-					@Override
 					public void handleChanged(RenamableItem item) {
 						fireChangeEvent(Collections.singleton(item));
 					}
 				};
 
-				@Override
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see org.eclipse.jface.databinding.viewers.ViewerLabelProvider#updateLabel(org.eclipse.jface.viewers.ViewerLabel,
+				 *      java.lang.Object)
+				 */
 				public void updateLabel(ViewerLabel label, Object element) {
 					if (element instanceof RenamableItem) {
 						RenamableItem item = (RenamableItem) element;
@@ -108,14 +116,12 @@ public class LabelProviderTest {
 					}
 				}
 
-				@Override
 				protected void addListenerTo(Object next) {
 					RenamableItem item = (RenamableItem) next;
 
 					item.addListener(listener);
 				}
 
-				@Override
 				protected void removeListenerFrom(Object next) {
 					RenamableItem item = (RenamableItem) next;
 
@@ -140,7 +146,6 @@ public class LabelProviderTest {
 
 				selectedRenamable
 						.addValueChangeListener(new IValueChangeListener() {
-							@Override
 							public void handleValueChange(ValueChangeEvent event) {
 								boolean shouldEnable = selectedRenamable
 										.getValue() != null;
@@ -185,7 +190,6 @@ public class LabelProviderTest {
 		final Display display = Display.getDefault();
 		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
 
-			@Override
 			public void run() {
 				LabelProviderTest test = new LabelProviderTest();
 				Shell s = test.getShell();

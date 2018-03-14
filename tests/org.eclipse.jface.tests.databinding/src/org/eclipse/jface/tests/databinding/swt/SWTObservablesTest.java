@@ -97,7 +97,6 @@ import org.eclipse.swt.widgets.Widget;
 public class SWTObservablesTest extends AbstractSWTTestCase {
 	private Shell shell;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -105,14 +104,12 @@ public class SWTObservablesTest extends AbstractSWTTestCase {
 		RealmTester.setDefault(SWTObservables.getRealm(shell.getDisplay()));
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 
 		RealmTester.setDefault(null);
 	}
 
-	@Override
 	protected Shell getShell() {
 		if (shell == null) {
 			shell = new Shell(SWT.V_SCROLL);

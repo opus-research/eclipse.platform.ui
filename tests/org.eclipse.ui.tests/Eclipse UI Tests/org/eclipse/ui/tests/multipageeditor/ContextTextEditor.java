@@ -27,12 +27,17 @@ public class ContextTextEditor extends TextEditor {
 
 	public static final String CONTEXT_ID = "org.eclipse.ui.tests.multipageeditor.contextEditor";
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#init(org.eclipse.ui.IEditorSite,
+	 *      org.eclipse.ui.IEditorInput)
+	 */
 	public void init(IEditorSite site, IEditorInput input)
 			throws PartInitException {
 		super.init(site, input);
 		IServiceLocator locator = getSite();
-		IContextService contextService = locator
+		IContextService contextService = (IContextService) locator
 				.getService(IContextService.class);
 
 		// if this was instantiated as a regular editor, the context would

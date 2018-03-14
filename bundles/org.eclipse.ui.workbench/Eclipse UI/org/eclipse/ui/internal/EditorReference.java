@@ -26,7 +26,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
-import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.jface.internal.provisional.action.ICoolBarManager2;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
@@ -82,10 +81,6 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 
 					boolean pinnedVal = "true".equals(createReadRoot.getString(IWorkbenchConstants.TAG_PINNED)); //$NON-NLS-1$
 					setPinned(pinnedVal);
-
-					String ttip = createReadRoot.getString(IWorkbenchConstants.TAG_TOOLTIP);
-					part.getTransientData().put(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY,
-							ttip);
 				}
 			} catch (WorkbenchException e) {
 				WorkbenchPlugin.log(e);
@@ -191,7 +186,6 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 		return descriptorId;
 	}
 
-	@Override
 	public String getFactoryId() {
 		IEditorPart editor = getEditor(false);
 		if (editor == null) {
@@ -220,7 +214,6 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 		return persistable == null ? null : persistable.getFactoryId();
 	}
 
-	@Override
 	public String getName() {
 		IEditorPart editor = getEditor(false);
 		if (input == null) {
@@ -230,7 +223,6 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 		return editor == null ? input.getName() : editor.getEditorInput().getName();
 	}
 
-	@Override
 	public String getTitle() {
 		String label = Util.safeString(getModel().getLocalizedLabel());
 		if (label.length() == 0) {
@@ -288,12 +280,20 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 		return (IEditorInput) input;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IEditorReference#getEditor(boolean)
+	 */
 	public IEditorPart getEditor(boolean restore) {
 		return (IEditorPart) getPart(restore);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IEditorReference#getEditorInput()
+	 */
 	public IEditorInput getEditorInput() throws PartInitException {
 		IEditorPart editor = getEditor(false);
 		if (editor != null) {
@@ -317,6 +317,13 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 		return input;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.e4.compatibility.WorkbenchPartReference#createPart
+	 * ()
+	 */
 	@Override
 	public IWorkbenchPart createPart() throws PartInitException {
 		try {
@@ -352,6 +359,13 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 		return new ErrorEditorPart(status);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.e4.compatibility.WorkbenchPartReference#initialize
+	 * (org.eclipse.ui.IWorkbenchPart)
+	 */
 	@Override
 	public void initialize(IWorkbenchPart part) throws PartInitException {
 		IConfigurationElement element = descriptor.getConfigurationElement();

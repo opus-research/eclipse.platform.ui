@@ -37,7 +37,6 @@ public class CLabelObservableValueTest extends TestCase {
 	private IObservableValue observable;
 	private CLabel label;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -48,7 +47,6 @@ public class CLabelObservableValueTest extends TestCase {
 				.getRealm(Display.getDefault()));
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 
@@ -82,34 +80,28 @@ public class CLabelObservableValueTest extends TestCase {
 
 		CLabel label;
 
-		@Override
 		public void setUp() {
 			shell = new Shell();
 			label = new CLabel(shell, SWT.NONE);
 		}
 
-		@Override
 		public void tearDown() {
 			shell.dispose();
 		}
 
-		@Override
 		public IObservableValue createObservableValue(Realm realm) {
 			return WidgetProperties.text().observe(realm, label);
 		}
 
-		@Override
 		public void change(IObservable observable) {
 			IObservableValue value = (IObservableValue) observable;
 			value.setValue(value.getValue() + "a");
 		}
 
-		@Override
 		public Object getValueType(IObservableValue observable) {
 			return String.class;
 		}
 
-		@Override
 		public Object createValue(IObservableValue observable) {
 			return observable.getValue() + "a";
 		}

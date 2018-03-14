@@ -68,13 +68,17 @@ public abstract class ContributionManager implements IContributionManager {
 		// Do nothing.
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IContributionManager.
+	 */
 	public void add(IAction action) {
 		Assert.isNotNull(action, "Action must not be null"); //$NON-NLS-1$
 		add(new ActionContributionItem(action));
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IContributionManager.
+	 */
 	public void add(IContributionItem item) {
 		Assert.isNotNull(item, "Item must not be null"); //$NON-NLS-1$
 		if (allowItem(item)) {
@@ -127,12 +131,16 @@ public abstract class ContributionManager implements IContributionManager {
 		throw new IllegalArgumentException("Group not found: " + groupName);//$NON-NLS-1$
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IContributionManager.
+	 */
 	public void appendToGroup(String groupName, IAction action) {
 		addToGroup(groupName, new ActionContributionItem(action), true);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IContributionManager.
+	 */
 	public void appendToGroup(String groupName, IContributionItem item) {
 		addToGroup(groupName, item, true);
 	}
@@ -177,7 +185,9 @@ public abstract class ContributionManager implements IContributionManager {
 		System.out.println("   Is dirty: " + isDirty()); //$NON-NLS-1$
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IContributionManager.
+	 */
 	public IContributionItem find(String id) {
 		Iterator<IContributionItem> e = contributions.iterator();
 		while (e.hasNext()) {
@@ -190,7 +200,9 @@ public abstract class ContributionManager implements IContributionManager {
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IContributionManager.
+	 */
 	public IContributionItem[] getItems() {
 		IContributionItem[] items = new IContributionItem[contributions.size()];
 		contributions.toArray(items);
@@ -215,31 +227,25 @@ public abstract class ContributionManager implements IContributionManager {
 	 * 
 	 * @since 2.0
 	 */
-	@Override
 	public IContributionManagerOverrides getOverrides() {
 		if (overrides == null) {
 			overrides = new IContributionManagerOverrides() {
-				@Override
 				public Boolean getEnabled(IContributionItem item) {
 					return null;
 				}
 
-				@Override
 				public Integer getAccelerator(IContributionItem item) {
 					return null;
 				}
 
-				@Override
 				public String getAcceleratorText(IContributionItem item) {
 					return null;
 				}
 
-				@Override
 				public String getText(IContributionItem item) {
 					return null;
 				}
 
-				@Override
 				public Boolean getVisible(IContributionItem item) {
 					return null;
 				}
@@ -312,12 +318,16 @@ public abstract class ContributionManager implements IContributionManager {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IContributionManager.
+	 */
 	public void insertAfter(String ID, IAction action) {
 		insertAfter(ID, new ActionContributionItem(action));
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IContributionManager.
+	 */
 	public void insertAfter(String ID, IContributionItem item) {
 		IContributionItem ci = find(ID);
 		if (ci == null) {
@@ -333,12 +343,16 @@ public abstract class ContributionManager implements IContributionManager {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IContributionManager.
+	 */
 	public void insertBefore(String ID, IAction action) {
 		insertBefore(ID, new ActionContributionItem(action));
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IContributionManager.
+	 */
 	public void insertBefore(String ID, IContributionItem item) {
 		IContributionItem ci = find(ID);
 		if (ci == null) {
@@ -354,7 +368,9 @@ public abstract class ContributionManager implements IContributionManager {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IContributionManager.
+	 */
 	public boolean isDirty() {
 		if (isDirty) {
 			return true;
@@ -370,7 +386,9 @@ public abstract class ContributionManager implements IContributionManager {
 		return false;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IContributionManager.
+	 */
 	public boolean isEmpty() {
 		return contributions.isEmpty();
 	}
@@ -406,22 +424,30 @@ public abstract class ContributionManager implements IContributionManager {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IContributionManager.
+	 */
 	public void markDirty() {
 		setDirty(true);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IContributionManager.
+	 */
 	public void prependToGroup(String groupName, IAction action) {
 		addToGroup(groupName, new ActionContributionItem(action), false);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IContributionManager.
+	 */
 	public void prependToGroup(String groupName, IContributionItem item) {
 		addToGroup(groupName, item, false);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IContributionManager.
+	 */
 	public IContributionItem remove(String ID) {
 		IContributionItem ci = find(ID);
 		if (ci == null) {
@@ -430,7 +456,9 @@ public abstract class ContributionManager implements IContributionManager {
 		return remove(ci);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IContributionManager.
+	 */
 	public IContributionItem remove(IContributionItem item) {
 		if (contributions.remove(item)) {
 			itemRemoved(item);
@@ -439,7 +467,9 @@ public abstract class ContributionManager implements IContributionManager {
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IContributionManager.
+	 */
 	public void removeAll() {
 		IContributionItem[] items = getItems();
 		contributions.clear();

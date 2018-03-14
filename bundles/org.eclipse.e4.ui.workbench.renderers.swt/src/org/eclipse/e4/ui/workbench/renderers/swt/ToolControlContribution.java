@@ -43,6 +43,13 @@ public class ToolControlContribution extends ControlContribution {
 		super(null);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.action.ControlContribution#createControl(org.eclipse
+	 * .swt.widgets.Composite)
+	 */
 	@Override
 	protected Control createControl(Composite parent) {
 		IEclipseContext localContext = EclipseContextFactory.create();
@@ -60,7 +67,6 @@ public class ToolControlContribution extends ControlContribution {
 			model.setObject(tcImpl);
 			newComposite.addDisposeListener(new DisposeListener() {
 
-				@Override
 				public void widgetDisposed(DisposeEvent e) {
 					ContextInjectionFactory.uninject(tcImpl, parentContext);
 					model.setObject(null);

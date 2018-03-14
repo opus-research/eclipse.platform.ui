@@ -1,14 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 429728, 441150
- *     Simon Scholz <scholzsimon@arcor.de - Bug 429729
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -55,7 +53,6 @@ import org.eclipse.e4.ui.workbench.modeling.IWindowCloseHandler;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -87,8 +84,7 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
 /**
- * Default SWT renderer responsible for an instance of MWindow. See
- * {@link WorkbenchRendererFactory}
+ * Render a Window or Workbench Window.
  */
 public class WBWRenderer extends SWTPartRenderer {
 
@@ -98,7 +94,6 @@ public class WBWRenderer extends SWTPartRenderer {
 	private class WindowSizeUpdateJob implements Runnable {
 		public List<MWindow> windowsToUpdate = new ArrayList<MWindow>();
 
-		@Override
 		public void run() {
 			clearSizeUpdate();
 			while (!windowsToUpdate.isEmpty()) {
@@ -128,34 +123,32 @@ public class WBWRenderer extends SWTPartRenderer {
 	private IEventBroker eventBroker;
 
 	@Inject
-	private IEclipseContext context;
-
-	@Inject
 	private IPresentationEngine engine;
 
 	private EventHandler topWindowHandler;
 	private EventHandler shellUpdater;
 	private EventHandler visibilityHandler;
 	private EventHandler sizeHandler;
-	private ThemeDefinitionChangedHandler themeDefinitionChanged;
+	private EventHandler themeDefinitionChanged;
 
 	@Inject
 	private EModelService modelService;
 
-	@Inject
-	private Display display;
+	public WBWRenderer() {
+		super();
+	}
 
 	/**
 	 * Closes the provided detached window.
-	 *
+	 * 
 	 * @param window
 	 *            the detached window to close
 	 * @return <code>true</code> if the window should be closed,
 	 *         <code>false</code> otherwise
 	 */
 	private boolean closeDetachedWindow(MWindow window) {
-		EPartService partService = window.getContext().get(
-				EPartService.class);
+		EPartService partService = (EPartService) window.getContext().get(
+				EPartService.class.getName());
 		List<MPart> parts = modelService.findElements(window, null,
 				MPart.class, null);
 		// this saves one part at a time, not ideal but better than not saving
@@ -175,11 +168,10 @@ public class WBWRenderer extends SWTPartRenderer {
 	}
 
 	@PostConstruct
-	protected void init() {
+	public void init() {
 
 		topWindowHandler = new EventHandler() {
 
-			@Override
 			public void handleEvent(Event event) {
 				// Ensure that this event is for a MApplication
 				if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MApplication))
@@ -205,7 +197,6 @@ public class WBWRenderer extends SWTPartRenderer {
 				topWindowHandler);
 
 		shellUpdater = new EventHandler() {
-			@Override
 			public void handleEvent(Event event) {
 				// Ensure that this event is for a MMenuItem
 				Object objElement = event
@@ -226,15 +217,13 @@ public class WBWRenderer extends SWTPartRenderer {
 				String attName = (String) event
 						.getProperty(UIEvents.EventTags.ATTNAME);
 
-				if (UIEvents.UILabel.LABEL.equals(attName)
-						|| UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
+				if (UIEvents.UILabel.LABEL.equals(attName)) {
 					String newTitle = (String) event
 							.getProperty(UIEvents.EventTags.NEW_VALUE);
 					theShell.setText(newTitle);
 				} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
 					theShell.setImage(getImage(windowModel));
-				} else if (UIEvents.UILabel.TOOLTIP.equals(attName)
-						|| UIEvents.UILabel.LOCALIZED_TOOLTIP.equals(attName)) {
+				} else if (UIEvents.UILabel.TOOLTIP.equals(attName)) {
 					String newTTip = (String) event
 							.getProperty(UIEvents.EventTags.NEW_VALUE);
 					theShell.setToolTipText(newTTip);
@@ -245,7 +234,6 @@ public class WBWRenderer extends SWTPartRenderer {
 		eventBroker.subscribe(UIEvents.UILabel.TOPIC_ALL, shellUpdater);
 
 		visibilityHandler = new EventHandler() {
-			@Override
 			public void handleEvent(Event event) {
 				// Ensure that this event is for a MMenuItem
 				Object objElement = event
@@ -278,7 +266,6 @@ public class WBWRenderer extends SWTPartRenderer {
 				visibilityHandler);
 
 		sizeHandler = new EventHandler() {
-			@Override
 			public void handleEvent(Event event) {
 				if (ignoreSizeChanges)
 					return;
@@ -329,17 +316,14 @@ public class WBWRenderer extends SWTPartRenderer {
 	}
 
 	@PreDestroy
-	protected void contextDisposed() {
+	public void contextDisposed() {
 		eventBroker.unsubscribe(topWindowHandler);
 		eventBroker.unsubscribe(shellUpdater);
 		eventBroker.unsubscribe(visibilityHandler);
 		eventBroker.unsubscribe(sizeHandler);
 		eventBroker.unsubscribe(themeDefinitionChanged);
-
-		themeDefinitionChanged.dispose();
 	}
 
-	@Override
 	public Object createWidget(MUIElement element, Object parent) {
 		final Widget newWidget;
 
@@ -359,25 +343,19 @@ public class WBWRenderer extends SWTPartRenderer {
 				.getShell();
 
 		final Shell wbwShell;
-
-		int styleOverride = getStyleOverride(wbwModel) | rtlStyle;
 		if (parentShell == null) {
-			int style = styleOverride == -1 ? SWT.SHELL_TRIM | rtlStyle
-					: styleOverride;
-			wbwShell = new Shell(display, style);
+			wbwShell = new Shell(Display.getCurrent(), SWT.SHELL_TRIM
+					| rtlStyle);
 			wbwModel.getTags().add("topLevel"); //$NON-NLS-1$
+		} else if (wbwModel.getTags().contains("dragHost")) { //$NON-NLS-1$
+			wbwShell = new Shell(parentShell, SWT.BORDER | rtlStyle);
+			wbwShell.setAlpha(110);
 		} else {
-			int style = SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.CLOSE | rtlStyle;
-			style = styleOverride == -1 ? style : styleOverride;
-			if (wbwModel.getTags().contains(
-					IPresentationEngine.WINDOW_TOP_LEVEL))
-				wbwShell = new Shell(display, style);
-			else
-				wbwShell = new Shell(parentShell, style);
+			wbwShell = new Shell(parentShell, SWT.TITLE | SWT.RESIZE | SWT.MAX
+					| SWT.CLOSE | rtlStyle);
 
 			// Prevent ESC from closing the DW
 			wbwShell.addTraverseListener(new TraverseListener() {
-				@Override
 				public void keyTraversed(TraverseEvent e) {
 					if (e.detail == SWT.TRAVERSE_ESCAPE) {
 						e.doit = false;
@@ -433,17 +411,15 @@ public class WBWRenderer extends SWTPartRenderer {
 		bindWidget(element, newWidget);
 
 		// Add the shell into the WBW's context
-		localContext.set(Shell.class, wbwShell);
+		localContext.set(Shell.class.getName(), wbwShell);
 		localContext.set(E4Workbench.LOCAL_ACTIVE_SHELL, wbwShell);
 		setCloseHandler(wbwModel);
-		localContext.set(IShellProvider.class, new IShellProvider() {
-			@Override
+		localContext.set(IShellProvider.class.getName(), new IShellProvider() {
 			public Shell getShell() {
 				return wbwShell;
 			}
 		});
 		final PartServiceSaveHandler saveHandler = new PartServiceSaveHandler() {
-			@Override
 			public Save promptToSave(MPart dirtyPart) {
 				Shell shell = (Shell) context
 						.get(IServiceConstants.ACTIVE_SHELL);
@@ -455,7 +431,6 @@ public class WBWRenderer extends SWTPartRenderer {
 				return elements.length == 0 ? Save.NO : Save.YES;
 			}
 
-			@Override
 			public Save[] promptToSave(Collection<MPart> dirtyParts) {
 				List<MPart> parts = new ArrayList<MPart>(dirtyParts);
 				Shell shell = (Shell) context
@@ -495,19 +470,19 @@ public class WBWRenderer extends SWTPartRenderer {
 		IEclipseContext context = window.getContext();
 		// no direct model parent, must be a detached window
 		if (window.getParent() == null) {
-			context.set(IWindowCloseHandler.class,
+			context.set(IWindowCloseHandler.class.getName(),
 					new IWindowCloseHandler() {
-						@Override
 						public boolean close(MWindow window) {
 							return closeDetachedWindow(window);
 						}
 					});
 		} else {
-			context.set(IWindowCloseHandler.class,
+			context.set(IWindowCloseHandler.class.getName(),
 					new IWindowCloseHandler() {
-						@Override
 						public boolean close(MWindow window) {
-							EPartService partService = window.getContext().get(EPartService.class);
+							EPartService partService = (EPartService) window
+									.getContext().get(
+											EPartService.class.getName());
 							return partService.saveAll(true);
 						}
 					});
@@ -524,7 +499,6 @@ public class WBWRenderer extends SWTPartRenderer {
 			final Shell shell = (Shell) widget;
 			final MWindow w = (MWindow) me;
 			shell.addControlListener(new ControlListener() {
-				@Override
 				public void controlResized(ControlEvent e) {
 					// Don't store the maximized size in the model
 					if (shell.getMaximized())
@@ -539,7 +513,6 @@ public class WBWRenderer extends SWTPartRenderer {
 					}
 				}
 
-				@Override
 				public void controlMoved(ControlEvent e) {
 					// Don't store the maximized size in the model
 					if (shell.getMaximized())
@@ -556,12 +529,13 @@ public class WBWRenderer extends SWTPartRenderer {
 			});
 
 			shell.addShellListener(new ShellAdapter() {
-				@Override
 				public void shellClosed(ShellEvent e) {
 					// override the shell close event
 					e.doit = false;
 					MWindow window = (MWindow) e.widget.getData(OWNING_ME);
-					IWindowCloseHandler closeHandler = window.getContext().get(IWindowCloseHandler.class);
+					IWindowCloseHandler closeHandler = (IWindowCloseHandler) window
+							.getContext().get(
+									IWindowCloseHandler.class.getName());
 					// if there's no handler or the handler permits the close
 					// request, clean-up as necessary
 					if (closeHandler == null || closeHandler.close(window)) {
@@ -570,7 +544,6 @@ public class WBWRenderer extends SWTPartRenderer {
 				}
 			});
 			shell.addListener(SWT.Activate, new Listener() {
-				@Override
 				public void handleEvent(org.eclipse.swt.widgets.Event event) {
 					MUIElement parentME = w.getParent();
 					if (parentME instanceof MApplication) {
@@ -588,7 +561,6 @@ public class WBWRenderer extends SWTPartRenderer {
 			});
 
 			shell.addListener(SWT.Deactivate, new Listener() {
-				@Override
 				public void handleEvent(org.eclipse.swt.widgets.Event event) {
 					updateNonFocusState(SWT.Deactivate, w);
 				}
@@ -654,6 +626,10 @@ public class WBWRenderer extends SWTPartRenderer {
 	/*
 	 * Processing the contents of a Workbench window has to take into account
 	 * that there may be trim elements contained in its child list. Since the
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartFactory#processContents
+	 * (org.eclipse.e4.ui.model.application.MPart)
 	 */
 	@Override
 	public void processContents(MElementContainer<MUIElement> me) {
@@ -663,7 +639,8 @@ public class WBWRenderer extends SWTPartRenderer {
 		super.processContents(me);
 
 		// Populate the main menu
-		IPresentationEngine renderer = context.get(IPresentationEngine.class);
+		IPresentationEngine renderer = (IPresentationEngine) context
+				.get(IPresentationEngine.class.getName());
 		if (wbwModel.getMainMenu() != null) {
 			renderer.createGui(wbwModel.getMainMenu(), me.getWidget(), null);
 			Shell shell = (Shell) me.getWidget();
@@ -694,6 +671,13 @@ public class WBWRenderer extends SWTPartRenderer {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#getUIContainer
+	 * (org.eclipse.e4.ui.model.application.MUIElement)
+	 */
 	@Override
 	public Object getUIContainer(MUIElement element) {
 		MUIElement parent = element.getParent();
@@ -708,6 +692,13 @@ public class WBWRenderer extends SWTPartRenderer {
 		return tpl.clientArea;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.renderers.PartFactory#postProcess(org.eclipse
+	 * .e4.ui.model.application.MPart)
+	 */
 	@Override
 	public void postProcess(MUIElement shellME) {
 		super.postProcess(shellME);
@@ -717,7 +708,6 @@ public class WBWRenderer extends SWTPartRenderer {
 		// Capture the max/min state
 		final MUIElement disposeME = shellME;
 		shell.addDisposeListener(new DisposeListener() {
-			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				Shell shell = (Shell) e.widget;
 				if (disposeME != null) {
@@ -738,7 +728,6 @@ public class WBWRenderer extends SWTPartRenderer {
 			shell.setMinimized(true);
 
 		shell.layout(true);
-		forceLayout(shell);
 		if (shellME.isVisible()) {
 			shell.open();
 		} else {
@@ -756,6 +745,9 @@ public class WBWRenderer extends SWTPartRenderer {
 
 		return dialog.getCheckedElements();
 	}
+
+	@Inject
+	private IEclipseContext context;
 
 	private void applyDialogStyles(Control control) {
 		IStylingEngine engine = (IStylingEngine) context
@@ -782,13 +774,6 @@ public class WBWRenderer extends SWTPartRenderer {
 			super(shell);
 			this.collection = collection;
 		}
-
-		@Override
-		protected void configureShell(Shell newShell) {
-			super.configureShell(newShell);
-			newShell.setText(SWTRenderersMessages.choosePartsToSaveTitle);
-		}
-
 
 		@Override
 		protected Control createDialogArea(Composite parent) {
@@ -833,19 +818,11 @@ public class WBWRenderer extends SWTPartRenderer {
 			return checkedElements;
 		}
 
-		@Override
-		protected boolean isResizable() {
-			return true;
-		}
-
 	}
 
 	@SuppressWarnings("restriction")
 	protected static class ThemeDefinitionChangedHandler implements
 			EventHandler {
-		protected Set<Resource> unusedResources = new HashSet<Resource>();
-
-		@Override
 		public void handleEvent(Event event) {
 			Object element = event.getProperty(IEventBroker.DATA);
 
@@ -853,6 +830,7 @@ public class WBWRenderer extends SWTPartRenderer {
 				return;
 			}
 
+			List<Object> unusedResources = new ArrayList<Object>();
 			Set<CSSEngine> engines = new HashSet<CSSEngine>();
 
 			// In theory we can have multiple engines since API allows it.
@@ -865,14 +843,13 @@ public class WBWRenderer extends SWTPartRenderer {
 			}
 
 			for (CSSEngine engine : engines) {
-				for (Object resource : removeResources(engine
-						.getResourcesRegistry())) {
-					if (resource instanceof Resource
-							&& !((Resource) resource).isDisposed()) {
-						unusedResources.add((Resource) resource);
-					}
-				}
+				unusedResources.addAll(removeResources(engine
+						.getResourcesRegistry()));
 				engine.reapply();
+			}
+
+			for (Object resource : unusedResources) {
+				disposeResource(resource);
 			}
 		}
 
@@ -890,29 +867,11 @@ public class WBWRenderer extends SWTPartRenderer {
 			return Collections.emptyList();
 		}
 
-		public void dispose() {
-			for (Resource resource : unusedResources) {
-				if (!resource.isDisposed()) {
-					resource.dispose();
-				}
+		protected void disposeResource(Object resource) {
+			if (resource instanceof Resource
+					&& !((Resource) resource).isDisposed()) {
+				((Resource) resource).dispose();
 			}
-			unusedResources.clear();
-		}
-	}
-
-	private void forceLayout(Shell shell) {
-		if (Util.isMac())
-			return; // Bug 431966: Relaunching with many editors opened, the
-					// caret disappears when switching editors.
-
-		int i = 0;
-		while(shell.isLayoutDeferred()) {
-			shell.setLayoutDeferred(false);
-			i++;
-		}
-		while(i > 0) {
-			shell.setLayoutDeferred(true);
-			i--;
 		}
 	}
 }

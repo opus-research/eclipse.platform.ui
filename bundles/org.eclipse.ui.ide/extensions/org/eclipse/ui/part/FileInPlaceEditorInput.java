@@ -38,8 +38,7 @@ public class FileInPlaceEditorInput extends FileEditorInput implements
      * editor if the input's file resource changes.
      */
     private IResourceChangeListener resourceListener = new IResourceChangeListener() {
-        @Override
-		public void resourceChanged(IResourceChangeEvent event) {
+        public void resourceChanged(IResourceChangeEvent event) {
             IResourceDelta mainDelta = event.getDelta();
             if (mainDelta != null && embeddedEditor != null) {
                 IResourceDelta affectedElement = mainDelta.findMember(getFile()
@@ -57,8 +56,7 @@ public class FileInPlaceEditorInput extends FileEditorInput implements
             case IResourceDelta.REMOVED:
                 if ((IResourceDelta.MOVED_TO & delta.getFlags()) != 0) {
                     changeRunnable = new Runnable() {
-                        @Override
-						public void run() {
+                        public void run() {
                             IPath path = delta.getMovedToPath();
                             IFile newFile = delta.getResource().getWorkspace()
                                     .getRoot().getFile(path);
@@ -71,8 +69,7 @@ public class FileInPlaceEditorInput extends FileEditorInput implements
                     };
                 } else {
                     changeRunnable = new Runnable() {
-                        @Override
-						public void run() {
+                        public void run() {
                             if (embeddedEditor != null) {
                                 embeddedEditor.sourceDeleted();
                                 embeddedEditor.getSite().getPage().closeEditor(
@@ -107,8 +104,7 @@ public class FileInPlaceEditorInput extends FileEditorInput implements
     /* (non-Javadoc)
      * @see org.eclipse.ui.IInPlaceEditorInput#setInPlaceEditor(org.eclipse.ui.IInPlaceEditor)
      */
-    @Override
-	public void setInPlaceEditor(IInPlaceEditor editor) {
+    public void setInPlaceEditor(IInPlaceEditor editor) {
         if (embeddedEditor != editor) {
             if (embeddedEditor != null) {
                 getFile().getWorkspace().removeResourceChangeListener(

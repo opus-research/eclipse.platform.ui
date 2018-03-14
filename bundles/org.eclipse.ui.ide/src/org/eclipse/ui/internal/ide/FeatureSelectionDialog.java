@@ -93,8 +93,7 @@ public class FeatureSelectionDialog extends SelectionDialog {
         Arrays.sort(features, new Comparator() {
             Collator coll = Collator.getInstance(Locale.getDefault());
 
-            @Override
-			public int compare(Object a, Object b) {
+            public int compare(Object a, Object b) {
                 AboutInfo i1, i2;
                 String name1, name2;
                 i1 = (AboutInfo) a;
@@ -123,15 +122,19 @@ public class FeatureSelectionDialog extends SelectionDialog {
         setInitialSelections(new Object[0]);
     }
 
-    @Override
-	protected void configureShell(Shell newShell) {
+    /* (non-Javadoc)
+     * Method declared on Window.
+     */
+    protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(newShell,
 				helpContextId);
     }
 
-    @Override
-	protected Control createDialogArea(Composite parent) {
+    /* (non-Javadoc)
+     * Method declared on Dialog.
+     */
+    protected Control createDialogArea(Composite parent) {
         Composite composite = (Composite) super.createDialogArea(parent);
 
         // Create label
@@ -146,8 +149,7 @@ public class FeatureSelectionDialog extends SelectionDialog {
         listViewer.getList().setFont(parent.getFont());
         // Set the label provider		
         listViewer.setLabelProvider(new LabelProvider() {
-            @Override
-			public String getText(Object element) {
+            public String getText(Object element) {
                 // Return the features's label.
                 return element == null ? "" : ((AboutInfo) element).getFeatureLabel(); //$NON-NLS-1$
             }
@@ -166,8 +168,7 @@ public class FeatureSelectionDialog extends SelectionDialog {
 
         // Add a selection change listener
         listViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-            @Override
-			public void selectionChanged(SelectionChangedEvent event) {
+            public void selectionChanged(SelectionChangedEvent event) {
                 // Update OK button enablement
                 getOkButton().setEnabled(!event.getSelection().isEmpty());
             }
@@ -175,16 +176,17 @@ public class FeatureSelectionDialog extends SelectionDialog {
 
         // Add double-click listener
         listViewer.addDoubleClickListener(new IDoubleClickListener() {
-            @Override
-			public void doubleClick(DoubleClickEvent event) {
+            public void doubleClick(DoubleClickEvent event) {
                 okPressed();
             }
         });
         return composite;
     }
 
-    @Override
-	protected void okPressed() {
+    /* (non-Javadoc)
+     * Method declared on Dialog.
+     */
+    protected void okPressed() {
         IStructuredSelection selection = (IStructuredSelection) listViewer
                 .getSelection();
         setResult(selection.toList());

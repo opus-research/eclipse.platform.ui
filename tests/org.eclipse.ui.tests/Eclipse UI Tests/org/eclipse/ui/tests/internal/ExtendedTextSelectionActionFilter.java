@@ -36,8 +36,7 @@ public class ExtendedTextSelectionActionFilter implements IActionFilter {
     /*
      * @see IActionFilter#testAttribute(Object, String, String)
      */
-    @Override
-	public boolean testAttribute(Object target, String name, String value) {
+    public boolean testAttribute(Object target, String name, String value) {
         ITextSelection sel = (ITextSelection) target;
         if (name.equals(IS_EMPTY)) {
             return (sel.getLength() == 0);

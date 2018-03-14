@@ -67,7 +67,9 @@ public abstract class SelectionDialog extends TrayDialog {
 		super(parentShell);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared in Window.
+	 */
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		if (title != null) {
@@ -75,7 +77,9 @@ public abstract class SelectionDialog extends TrayDialog {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on Dialog.
+	 */
 	protected void createButtonsForButtonBar(Composite parent) {
 		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL,
 				true);
@@ -109,7 +113,6 @@ public abstract class SelectionDialog extends TrayDialog {
 	 * @deprecated use getInitialElementSelections() instead
 	 * @return the list of initial selected elements or null
 	 */
-	@Deprecated
 	protected List getInitialSelections() {
 		if (initialSelections.isEmpty()) {
 			return null;
@@ -273,7 +276,6 @@ public abstract class SelectionDialog extends TrayDialog {
 	 * @see Dialog#getDialogBoundsStrategy()
 	 * @see #setDialogBoundsSettings(IDialogSettings, int)
 	 */
-	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
 		return dialogBoundsSettings;
 	}
@@ -292,7 +294,6 @@ public abstract class SelectionDialog extends TrayDialog {
 	 * @see Dialog#getDialogBoundsSettings()
 	 * @see #setDialogBoundsSettings(IDialogSettings, int)
 	 */
-	@Override
 	protected int getDialogBoundsStrategy() {
 		return dialogBoundsStrategy;
 	}
@@ -300,8 +301,7 @@ public abstract class SelectionDialog extends TrayDialog {
     /**
 	 * @since 3.4
 	 */
-    @Override
-	protected boolean isResizable() {
+    protected boolean isResizable() {
     	return true;
     }
 }

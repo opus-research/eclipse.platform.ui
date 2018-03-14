@@ -94,7 +94,11 @@ public class ArbitraryPropertiesViewTest extends TestCase {
 	static class PropListener implements IPropertyChangeListener {
 		public int count = 0;
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
+		 */
 		public void propertyChange(PropertyChangeEvent event) {
 			count++;
 		}

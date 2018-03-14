@@ -43,7 +43,6 @@ public class AllErrorsParameters extends FiltersContributionParameters {
 	 * 
 	 * @see org.eclipse.ui.internal.provisional.views.markers.FiltersContributionParameters#getParameterValues()
 	 */
-	@Override
 	public Map getParameterValues() {
 		return errorsMap;
 	}

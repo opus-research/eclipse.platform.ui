@@ -32,8 +32,7 @@ public class AbstractVetoableValueTest extends TestCase {
                 super(realm);
             }
             
-            @Override
-			protected void doSetApprovedValue(Object value) {
+            protected void doSetApprovedValue(Object value) {
                 count++;
                 this.value = value;
             }      
@@ -52,7 +51,6 @@ public class AbstractVetoableValueTest extends TestCase {
     
     public void testFireValueChangeRealmChecks() throws Exception {
     	RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				VetoableValueStub observable = new VetoableValueStub();
 				observable.fireValueChanging(null);
@@ -69,22 +67,18 @@ public class AbstractVetoableValueTest extends TestCase {
     		super(realm);
     	}
     	
-		@Override
 		protected void doSetApprovedValue(Object value) {
 		}
 
-		@Override
 		protected Object doGetValue() {
 			return null;
 		}
 
 
-		@Override
 		public Object getValueType() {
 			return null;
 		}    	
 		
-		@Override
 		protected boolean fireValueChanging(ValueDiff diff) {
 			return super.fireValueChanging(diff);
 		}

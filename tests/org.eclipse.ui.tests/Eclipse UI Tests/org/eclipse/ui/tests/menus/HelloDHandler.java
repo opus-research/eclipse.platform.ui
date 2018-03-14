@@ -21,12 +21,18 @@ import org.eclipse.core.commands.ExecutionException;
  */
 public class HelloDHandler extends AbstractHandler {
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		throw new ExecutionException("This should never be called");
 	}
 	
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.commands.AbstractHandler#isEnabled()
+	 */
 	public boolean isEnabled() {
 		return false;
 	}

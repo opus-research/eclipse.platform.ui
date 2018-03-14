@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2014 Tom Schindl and others.
+ * Copyright (c) 2007 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,18 +7,17 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
- *     Lars Vogel (lars.vogel@gmail.com) - Bug 413427
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 442343
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
 
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.DefaultToolTip;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
@@ -40,9 +39,9 @@ import org.eclipse.swt.widgets.TableItem;
 /**
  * Example usage of ToolTips with the OLD viewer API but similar to
  * {@link ColumnViewerToolTipSupport}
- *
+ * 
  * @author Tom Schindl <tom.schindl@bestsolution.at>
- *
+ * 
  */
 public class Snippet042ToolTipSupportFor32API {
 	private static Image[] images;
@@ -60,7 +59,6 @@ public class Snippet042ToolTipSupportFor32API {
 			return item.getData();
 		}
 
-		@Override
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
@@ -69,7 +67,6 @@ public class Snippet042ToolTipSupportFor32API {
 			return result;
 		}
 
-		@Override
 		public boolean equals(Object obj) {
 			if (this == obj)
 				return true;
@@ -100,7 +97,6 @@ public class Snippet042ToolTipSupportFor32API {
 			this.viewer = viewer;
 		}
 
-		@Override
 		protected Object getToolTipArea(Event event) {
 			Table table = (Table) event.widget;
 			int columns = table.getColumnCount();
@@ -119,7 +115,6 @@ public class Snippet042ToolTipSupportFor32API {
 			return null;
 		}
 
-		@Override
 		protected Composite createToolTipContentArea(Event event,
 				Composite parent) {
 			Composite comp = new Composite(parent, SWT.NONE);
@@ -138,6 +133,38 @@ public class Snippet042ToolTipSupportFor32API {
 		}
 	}
 
+	private class MyContentProvider implements IStructuredContentProvider {
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+		 */
+		public Object[] getElements(Object inputElement) {
+			return (MyModel[]) inputElement;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+		 */
+		public void dispose() {
+
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
+		 *      java.lang.Object, java.lang.Object)
+		 */
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+
+		}
+
+	}
+
 	public class MyModel {
 		public int counter;
 
@@ -145,7 +172,6 @@ public class Snippet042ToolTipSupportFor32API {
 			this.counter = counter;
 		}
 
-		@Override
 		public String toString() {
 			return "Item " + this.counter;
 		}
@@ -154,7 +180,6 @@ public class Snippet042ToolTipSupportFor32API {
 	public class MyLabelProvider extends LabelProvider implements
 			ITableLabelProvider {
 
-		@Override
 		public Image getColumnImage(Object element, int columnIndex) {
 			if (columnIndex == 1) {
 				return images[((MyModel) element).counter % 4];
@@ -163,7 +188,6 @@ public class Snippet042ToolTipSupportFor32API {
 			return null;
 		}
 
-		@Override
 		public String getColumnText(Object element, int columnIndex) {
 			return "Column " + columnIndex + " => " + element.toString();
 		}
@@ -186,7 +210,7 @@ public class Snippet042ToolTipSupportFor32API {
 		final TableViewer v = new TableViewer(shell, SWT.BORDER
 				| SWT.FULL_SELECTION);
 		v.setLabelProvider(new MyLabelProvider());
-		v.setContentProvider(ArrayContentProvider.getInstance());
+		v.setContentProvider(new MyContentProvider());
 
 		TableColumn column = new TableColumn(v.getTable(), SWT.NONE);
 		column.setWidth(200);

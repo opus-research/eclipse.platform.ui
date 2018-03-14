@@ -12,6 +12,7 @@ package org.eclipse.ui.internal.navigator.resources.workbench;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
@@ -41,19 +42,29 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 		super();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.model.BaseWorkbenchContentProvider#getElements(java.lang.Object)
+	 */
 	public Object[] getElements(Object element) {
 		return super.getChildren(element);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.model.BaseWorkbenchContentProvider#getChildren(java.lang.Object)
+	 */
 	public Object[] getChildren(Object element) {
 		if(element instanceof IResource)
 			return super.getChildren(element);
 		return NO_CHILDREN;
 	}
 	
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.model.BaseWorkbenchContentProvider#hasChildren(java.lang.Object)
+	 */
 	public boolean hasChildren(Object element) {
 		try {
 			if (element instanceof IContainer) {
@@ -71,7 +82,9 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 		return super.hasChildren(element);
 	}
 	
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.model.WorkbenchContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+	 */
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) { 
 		super.inputChanged(viewer, oldInput, newInput);
 		this.viewer = viewer;
@@ -83,7 +96,6 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 	 * 
 	 * @param delta
 	 */
-	@Override
 	protected void processDelta(IResourceDelta delta) {		
 
 		Control ctrl = viewer.getControl();
@@ -92,7 +104,7 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 		}
 		
 		
-		final Collection<Runnable> runnables = new ArrayList<Runnable>();
+		final Collection runnables = new ArrayList();
 		processDelta(delta, runnables);
 
 		if (runnables.isEmpty()) {
@@ -104,7 +116,9 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 			runUpdates(runnables);
 		} else {
 			ctrl.getDisplay().asyncExec(new Runnable(){
-				@Override
+				/* (non-Javadoc)
+				 * @see java.lang.Runnable#run()
+				 */
 				public void run() {
 					//Abort if this happens after disposes
 					Control ctrl = viewer.getControl();
@@ -122,7 +136,7 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 	/**
 	 * Process a resource delta. Add any runnables
 	 */
-	private void processDelta(IResourceDelta delta, Collection<Runnable> runnables) {
+	private void processDelta(IResourceDelta delta, Collection runnables) {
 		//he widget may have been destroyed
 		// by the time this is run. Check for this and do nothing if so.
 		Control ctrl = viewer.getControl();
@@ -237,7 +251,6 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 		final boolean hasRename = numMovedFrom > 0 && numMovedTo > 0;
 		
 		Runnable addAndRemove = new Runnable(){
-			@Override
 			public void run() {
 				if (viewer instanceof AbstractTreeViewer) {
 					AbstractTreeViewer treeViewer = (AbstractTreeViewer) viewer;
@@ -277,7 +290,6 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 	 */
 	private Runnable getRefreshRunnable(final IResource resource) {
 		return new Runnable(){
-			@Override
 			public void run() {
 				((StructuredViewer) viewer).refresh(resource);
 			}
@@ -288,9 +300,10 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 	 * Run all of the runnables that are the widget updates
 	 * @param runnables
 	 */
-	private void runUpdates(Collection<Runnable> runnables) {
-		for (Runnable runnable : runnables) {
-			runnable.run();
+	private void runUpdates(Collection runnables) {
+		Iterator runnableIterator = runnables.iterator();
+		while(runnableIterator.hasNext()){
+			((Runnable)runnableIterator.next()).run();
 		}
 		
 	}

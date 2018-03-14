@@ -90,11 +90,9 @@ public class RelativePathVariableGroup {
 		variableCheckbox.setFont(variableGroup.getFont());
 		variableCheckbox.setLayoutData(gridData);
 		variableCheckbox.addSelectionListener(new SelectionListener() {
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				selectRelativeCombo();
 			}
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				selectRelativeCombo();
 			}
@@ -118,14 +116,12 @@ public class RelativePathVariableGroup {
 		variableCombo.setLayoutData(gridData);
 		variableCombo.setFont(variableGroup.getFont());
 		variableCombo.addSelectionListener(new SelectionListener() {
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				if (variableCombo.getSelectionIndex() == (variableCombo.getItemCount() -1))
 					editVariables();
 				else
 					selectVariable(variableCombo.getItem(variableCombo.getSelectionIndex()));
 			}
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (variableCombo.getSelectionIndex() == (variableCombo.getItemCount() -1))
 					editVariables();

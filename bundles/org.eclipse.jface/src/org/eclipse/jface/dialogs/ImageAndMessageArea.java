@@ -91,7 +91,11 @@ public class ImageAndMessageArea extends Composite {
 		messageField.getLayoutControl().setLayoutData(gd);
 
 		addPaintListener(new PaintListener() {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.PaintListener#paintControl(org.eclipse.swt.events.PaintEvent)
+			 */
 			public void paintControl(PaintEvent e) {
 				onPaint(e);
 			}
@@ -100,6 +104,12 @@ public class ImageAndMessageArea extends Composite {
 		// sets the layout and size to account for the BORDER_MARGIN between
 		// the border drawn around the container and the decorated field.
 		setLayout(new Layout() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.widgets.Layout#layout(org.eclipse.swt.widgets.Composite,
+			 *      boolean)
+			 */
 			@Override
 			public void layout(Composite parent, boolean changed) {
 				Rectangle carea = getClientArea();
@@ -108,6 +118,12 @@ public class ImageAndMessageArea extends Composite {
 						carea.height - (2 * BORDER_MARGIN));
 			}
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.widgets.Layout#computeSize(org.eclipse.swt.widgets.Composite,
+			 *      int, int, boolean)
+			 */
 			@Override
 			public Point computeSize(Composite parent, int wHint, int hHint,
 					boolean changed) {
@@ -124,6 +140,11 @@ public class ImageAndMessageArea extends Composite {
 		setVisible(false);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.widgets.Control#setBackground(org.eclipse.swt.graphics.Color)
+	 */
 	@Override
 	public void setBackground(Color bg) {
 		super.setBackground(bg);
@@ -174,12 +195,22 @@ public class ImageAndMessageArea extends Composite {
 				carea.y + carea.height - 1 });
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.widgets.Control#setFont(org.eclipse.swt.graphics.Font)
+	 */
 	@Override
 	public void setFont(Font font) {
 		super.setFont(font);
 		((Text) messageField.getControl()).setFont(font);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.widgets.Control#setToolTipText(java.lang.String)
+	 */
 	@Override
 	public void setToolTipText(String text) {
 		super.setToolTipText(text);

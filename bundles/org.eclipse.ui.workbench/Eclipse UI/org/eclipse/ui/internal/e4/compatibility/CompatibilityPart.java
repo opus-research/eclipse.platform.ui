@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Steven Spungin <steven@spungin.tv> - Bug 436908
  ******************************************************************************/
 
 package org.eclipse.ui.internal.e4.compatibility;
@@ -18,12 +17,10 @@ import javax.inject.Inject;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.Persist;
-import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.model.application.ui.MDirtyable;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
@@ -50,11 +47,11 @@ import org.eclipse.ui.internal.ErrorEditorPart;
 import org.eclipse.ui.internal.ErrorViewPart;
 import org.eclipse.ui.internal.PartSite;
 import org.eclipse.ui.internal.SaveableHelper;
+import org.eclipse.ui.internal.ViewSite;
 import org.eclipse.ui.internal.WorkbenchPage;
 import org.eclipse.ui.internal.WorkbenchPartReference;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.util.Util;
-import org.eclipse.ui.part.IWorkbenchPartOrientation;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
@@ -85,7 +82,6 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 	 * This handler will be notified when the part's widget has been un/set.
 	 */
 	private EventHandler widgetSetHandler = new EventHandler() {
-		@Override
 		public void handleEvent(Event event) {
 			// check that we're looking at our own part and that the widget is
 			// being unset
@@ -108,7 +104,6 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 	 * un/set.
 	 */
 	private EventHandler objectSetHandler = new EventHandler() {
-		@Override
 		public void handleEvent(Event event) {
 			// check that we're looking at our own part and that the object is
 			// being set
@@ -123,7 +118,6 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 
 	private ISelectionChangedListener postListener = new ISelectionChangedListener() {
 
-		@Override
 		public void selectionChanged(SelectionChangedEvent e) {
 			ESelectionService selectionService = (ESelectionService) part.getContext().get(
 					ESelectionService.class.getName());
@@ -133,11 +127,6 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 
 	CompatibilityPart(MPart part) {
 		this.part = part;
-	}
-
-	@PersistState
-	void persistState() {
-		ContextInjectionFactory.invoke(wrapped, PersistState.class, part.getContext(), null);
 	}
 
 	public abstract WorkbenchPartReference getReference();
@@ -325,12 +314,7 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 		// hook reference listeners to the part
 		// reference.hookPropertyListeners();
 
-		int style = SWT.NONE;
-		if (wrapped instanceof IWorkbenchPartOrientation) {
-			style = ((IWorkbenchPartOrientation) wrapped).getOrientation();
-		}
-
-		Composite parent = new Composite(composite, style);
+		Composite parent = new Composite(composite, SWT.NONE);
 		parent.setLayout(new FillLayout());
 		if (!createPartControl(wrapped, parent)) {
 			return;
@@ -350,7 +334,6 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 		}
 
 		wrapped.addPropertyListener(new IPropertyListener() {
-			@Override
 			public void propertyChanged(Object source, int propId) {
 				switch (propId) {
 				case IWorkbenchPartConstants.PROP_TITLE:
@@ -406,6 +389,7 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 	 * but must call <code>super.disposeSite()</code> in its implementation.
 	 */
 	void disposeSite(PartSite site) {
+		site.deactivateActionBars(site instanceof ViewSite);
 		site.dispose();
 	}
 
@@ -415,7 +399,6 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 			SaveableHelper.savePart((ISaveablePart) wrapped, wrapped, getReference().getSite()
 					.getWorkbenchWindow(), false);
 		}
-		// ContextInjectionFactory.invoke(wrapped, Persist.class, part.getContext(), null);
 	}
 
 	public IWorkbenchPart getPart() {
@@ -426,7 +409,6 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 		return part;
 	}
 	
-	@Override
 	public void selectionChanged(SelectionChangedEvent e) {
 		ESelectionService selectionService = (ESelectionService) part.getContext().get(
 				ESelectionService.class.getName());

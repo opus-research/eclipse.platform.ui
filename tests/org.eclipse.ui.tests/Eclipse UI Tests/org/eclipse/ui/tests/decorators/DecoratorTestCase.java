@@ -39,7 +39,6 @@ public class DecoratorTestCase extends AbstractNavigatorTest implements
 	/**
 	 * Sets up the hierarchy.
 	 */
-	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		createTestFile();
@@ -63,7 +62,6 @@ public class DecoratorTestCase extends AbstractNavigatorTest implements
 	/**
 	 * Remove the listener.
 	 */
-	@Override
 	protected void doTearDown() throws Exception {
 		super.doTearDown();
 		getDecoratorManager().removeListener(this);
@@ -106,7 +104,6 @@ public class DecoratorTestCase extends AbstractNavigatorTest implements
 	/*
 	 * @see ILabelProviderListener#labelProviderChanged(LabelProviderChangedEvent)
 	 */
-	@Override
 	public void labelProviderChanged(LabelProviderChangedEvent event) {
 		updated = true;
 	}

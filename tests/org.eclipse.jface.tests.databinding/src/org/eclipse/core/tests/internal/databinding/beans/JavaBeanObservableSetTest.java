@@ -53,7 +53,6 @@ public class JavaBeanObservableSetTest extends AbstractDefaultRealmTestCase {
 	private String propertyName;
 	private SetChangeEventTracker listener;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -219,7 +218,6 @@ public class JavaBeanObservableSetTest extends AbstractDefaultRealmTestCase {
 
 	private static class Delegate extends
 			AbstractObservableCollectionContractDelegate {
-		@Override
 		public IObservableCollection createObservableCollection(Realm realm,
 				int elementCount) {
 			Bean bean = new Bean();
@@ -232,17 +230,14 @@ public class JavaBeanObservableSetTest extends AbstractDefaultRealmTestCase {
 			return set;
 		}
 
-		@Override
 		public Object createElement(IObservableCollection collection) {
 			return new Object();
 		}
 
-		@Override
 		public Object getElementType(IObservableCollection collection) {
 			return String.class;
 		}
 
-		@Override
 		public void change(IObservable observable) {
 			IObservableSet set = (IObservableSet) observable;
 			set.add(createElement(set));

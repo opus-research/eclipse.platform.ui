@@ -54,8 +54,7 @@ public class ResourceNavigatorTest extends UITestCase {
         super(testName);
     }
 
-    @Override
-	protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         super.doSetUp();
         workbenchWindow = openTestWindow();
         activePage = workbenchWindow.getActivePage();

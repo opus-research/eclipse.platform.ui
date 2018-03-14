@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.api;
 
@@ -24,6 +23,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IReusableEditor;
 import org.eclipse.ui.IShowEditorInput;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.ide.IGotoMarker;
 
 public class MockReusableEditorPart extends MockWorkbenchPart implements IEditorPart,
@@ -49,15 +49,13 @@ public class MockReusableEditorPart extends MockWorkbenchPart implements IEditor
         super();
     }
 
-    @Override
-	public void createPartControl(Composite parent) {
+    public void createPartControl(Composite parent) {
         super.createPartControl(parent);
 
         final Button dirtyToggle = new Button(parent, SWT.CHECK);
         dirtyToggle.setText("Dirty");
         dirtyToggle.addSelectionListener(new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 setDirty(dirtyToggle.getSelection());
             }
         });
@@ -66,8 +64,7 @@ public class MockReusableEditorPart extends MockWorkbenchPart implements IEditor
         final Button saveNeededToggle = new Button(parent, SWT.CHECK);
         saveNeededToggle.setText("Save on close");
         saveNeededToggle.addSelectionListener(new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 setSaveNeeded(saveNeededToggle.getSelection());
             }
         });
@@ -76,8 +73,7 @@ public class MockReusableEditorPart extends MockWorkbenchPart implements IEditor
         final Button saveAsToggle = new Button(parent, SWT.CHECK);
         saveAsToggle.setText("Save as allowed");
         saveAsToggle.addSelectionListener(new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 setSaveAsAllowed(saveAsToggle.getSelection());
             }
         });
@@ -86,8 +82,7 @@ public class MockReusableEditorPart extends MockWorkbenchPart implements IEditor
     /**
      * @see IEditorPart#doSave(IProgressMonitor)
      */
-    @Override
-	public void doSave(IProgressMonitor monitor) {
+    public void doSave(IProgressMonitor monitor) {
         setDirty(false);
         callTrace.add("doSave");
     }
@@ -95,39 +90,35 @@ public class MockReusableEditorPart extends MockWorkbenchPart implements IEditor
     /**
      * @see IEditorPart#doSaveAs()
      */
-    @Override
-	public void doSaveAs() {
+    public void doSaveAs() {
     }
 
     /**
      * @see IEditorPart#getEditorInput()
      */
-    @Override
-	public IEditorInput getEditorInput() {
+    public IEditorInput getEditorInput() {
         return input;
     }
 
     /**
      * @see IEditorPart#getEditorSite()
      */
-    @Override
-	public IEditorSite getEditorSite() {
+    public IEditorSite getEditorSite() {
         return (IEditorSite) getSite();
     }
 
     /**
      * @see org.eclipse.ui.ide.IGotoMarker
      */
-    @Override
-	public void gotoMarker(IMarker marker) {
+    public void gotoMarker(IMarker marker) {
         callTrace.add("gotoMarker");
     }
 
     /**
      * @see IEditorPart#init(IEditorSite, IEditorInput)
      */
-    @Override
-	public void init(IEditorSite site, IEditorInput input) {
+    public void init(IEditorSite site, IEditorInput input)
+            throws PartInitException {
         this.input = input;
         setSite(site);
         callTrace.add("init");
@@ -137,8 +128,7 @@ public class MockReusableEditorPart extends MockWorkbenchPart implements IEditor
     /**
      * @see IEditorPart#isDirty()
      */
-    @Override
-	public boolean isDirty() {
+    public boolean isDirty() {
         callTrace.add("isDirty");
         return dirty;
     }
@@ -151,8 +141,7 @@ public class MockReusableEditorPart extends MockWorkbenchPart implements IEditor
     /**
      * @see IEditorPart#isSaveAsAllowed()
      */
-    @Override
-	public boolean isSaveAsAllowed() {
+    public boolean isSaveAsAllowed() {
         callTrace.add("isSaveAsAllowed");
         return saveAsAllowed;
     }
@@ -160,8 +149,7 @@ public class MockReusableEditorPart extends MockWorkbenchPart implements IEditor
     /**
      * @see IEditorPart#isSaveOnCloseNeeded()
      */
-    @Override
-	public boolean isSaveOnCloseNeeded() {
+    public boolean isSaveOnCloseNeeded() {
         callTrace.add("isSaveOnCloseNeeded");
         return saveNeeded;
     }
@@ -174,17 +162,23 @@ public class MockReusableEditorPart extends MockWorkbenchPart implements IEditor
         saveNeeded = value;
     }
 
-    @Override
-	protected IActionBars getActionBars() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.api.MockWorkbenchPart#getActionBars()
+     */
+    protected IActionBars getActionBars() {
         return getEditorSite().getActionBars();
     }
 
-    @Override
-	public void showEditorInput(IEditorInput editorInput) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IShowEditorInput#showEditorInput(org.eclipse.ui.IEditorInput)
+     */
+    public void showEditorInput(IEditorInput editorInput) {
         callTrace.add("showEditorInput");
     }
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IReusableEditor#setInput(org.eclipse.ui.IEditorInput)
+	 */
 	public void setInput(IEditorInput input) {
 		this.input = input;
 		firePropertyChange(PROP_INPUT);

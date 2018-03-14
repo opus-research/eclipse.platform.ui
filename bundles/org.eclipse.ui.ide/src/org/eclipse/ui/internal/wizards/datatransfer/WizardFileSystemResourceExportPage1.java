@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,10 +21,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.equinox.bidi.StructuredTextTypeHandlerFactory;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.util.BidiUtils;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -105,8 +103,7 @@ public class WizardFileSystemResourceExportPage1 extends
     /** (non-Javadoc)
      * Method declared on IDialogPage.
      */
-    @Override
-	public void createControl(Composite parent) {
+    public void createControl(Composite parent) {
         super.createControl(parent);
         giveFocusToDestination();
         PlatformUI.getWorkbench().getHelpSystem().setHelp(getControl(),
@@ -118,8 +115,7 @@ public class WizardFileSystemResourceExportPage1 extends
      *
      *	@param parent org.eclipse.swt.widgets.Composite
      */
-    @Override
-	protected void createDestinationGroup(Composite parent) {
+    protected void createDestinationGroup(Composite parent) {
 
         Font font = parent.getFont();
         // destination specification group
@@ -145,7 +141,6 @@ public class WizardFileSystemResourceExportPage1 extends
         data.widthHint = SIZING_TEXT_FIELD_WIDTH;
         destinationNameField.setLayoutData(data);
         destinationNameField.setFont(font);
-        BidiUtils.applyBidiProcessing(destinationNameField, StructuredTextTypeHandlerFactory.FILE);
 
         // destination browse button
         destinationBrowseButton = new Button(destinationSelectionGroup,
@@ -162,8 +157,7 @@ public class WizardFileSystemResourceExportPage1 extends
      * Create the buttons in the options group.
      */
 
-    @Override
-	protected void createOptionsGroupButtons(Group optionsGroup) {
+    protected void createOptionsGroupButtons(Group optionsGroup) {
 
         Font font = optionsGroup.getFont();
         createOverwriteExisting(optionsGroup, font);
@@ -348,8 +342,7 @@ public class WizardFileSystemResourceExportPage1 extends
      * Handle all events and enablements for widgets in this page
      * @param e Event
      */
-    @Override
-	public void handleEvent(Event e) {
+    public void handleEvent(Event e) {
         Widget source = e.widget;
 
         if (source == destinationBrowseButton) {
@@ -363,8 +356,7 @@ public class WizardFileSystemResourceExportPage1 extends
      *	Hook method for saving widget values for restoration by the next instance
      *	of this class.
      */
-    @Override
-	protected void internalSaveWidgetValues() {
+    protected void internalSaveWidgetValues() {
         // update directory names history
         IDialogSettings settings = getDialogSettings();
         if (settings != null) {
@@ -391,8 +383,7 @@ public class WizardFileSystemResourceExportPage1 extends
      *	Hook method for restoring widget values to the values that they held
      *	last time this wizard was used to completion.
      */
-    @Override
-	protected void restoreWidgetValues() {
+    protected void restoreWidgetValues() {
         IDialogSettings settings = getDialogSettings();
         if (settings != null) {
             String[] directoryNames = settings
@@ -431,8 +422,7 @@ public class WizardFileSystemResourceExportPage1 extends
      *	Answer a boolean indicating whether the receivers destination specification
      *	widgets currently all contain valid values.
      */
-    @Override
-	protected boolean validateDestinationGroup() {
+    protected boolean validateDestinationGroup() {
         String destinationValue = getDestinationValue();
         if (destinationValue.length() == 0) {
             setMessage(destinationEmptyMessage());
@@ -463,8 +453,7 @@ public class WizardFileSystemResourceExportPage1 extends
      * (non-Javadoc)
      * @see org.eclipse.ui.dialogs.WizardDataTransferPage#validateSourceGroup()
      */
-    @Override
-	protected boolean validateSourceGroup() {
+    protected boolean validateSourceGroup() {
     	// there must be some resources selected for Export
     	boolean isValid = true;
         List resourcesToExport = getWhiteCheckedResources();

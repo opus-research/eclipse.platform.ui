@@ -26,7 +26,6 @@ public class StringToByteValidatorTest extends
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#getInRangeNumber()
 	 */
-	@Override
 	protected Number getInRangeNumber() {
 		return new Byte(Byte.MAX_VALUE);
 	}
@@ -34,7 +33,6 @@ public class StringToByteValidatorTest extends
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#getInvalidString()
 	 */
-	@Override
 	protected String getInvalidString() {
 		return "1.1";
 	}
@@ -42,7 +40,6 @@ public class StringToByteValidatorTest extends
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#getOutOfRangeNumber()
 	 */
-	@Override
 	protected Number getOutOfRangeNumber() {
 		return new Integer(Byte.MAX_VALUE + 1);
 	}
@@ -50,7 +47,6 @@ public class StringToByteValidatorTest extends
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#setupNumberFormat()
 	 */
-	@Override
 	protected NumberFormat setupNumberFormat() {
 		return NumberFormat.getIntegerInstance();
 	}
@@ -58,7 +54,6 @@ public class StringToByteValidatorTest extends
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#setupValidator(com.ibm.icu.text.NumberFormat)
 	 */
-	@Override
 	protected IValidator setupValidator(NumberFormat numberFormat) {
 		StringToByteConverter converter = StringToByteConverter.toByte(numberFormat, false);
 		return new StringToByteValidator(converter);

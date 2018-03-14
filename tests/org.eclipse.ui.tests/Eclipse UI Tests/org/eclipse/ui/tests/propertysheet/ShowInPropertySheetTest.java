@@ -28,7 +28,12 @@ public class ShowInPropertySheetTest extends AbstractPropertySheetTest {
 		super(testName);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.tests.propertysheet.AbstractPropertySheetTest#doSetUp()
+	 */
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 
@@ -36,7 +41,11 @@ public class ShowInPropertySheetTest extends AbstractPropertySheetTest {
 				.showView(IPageLayout.ID_PROP_SHEET);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doTearDown()
+	 */
 	protected void doTearDown() throws Exception {
 		super.doTearDown();
 	}

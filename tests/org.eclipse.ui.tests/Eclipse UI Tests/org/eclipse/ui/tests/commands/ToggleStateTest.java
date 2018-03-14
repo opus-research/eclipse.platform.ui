@@ -51,11 +51,10 @@ public class ToggleStateTest extends UITestCase {
 	}
 	
 	
-	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
-		commandService = fWorkbench.getService(ICommandService.class);
-		handlerService = fWorkbench.getService(IHandlerService.class);
+		commandService = (ICommandService) fWorkbench.getService(ICommandService.class);
+		handlerService = (IHandlerService) fWorkbench.getService(IHandlerService.class);
 	}
 	
 	public void testDefaultValues() throws Exception {
@@ -95,18 +94,12 @@ public class ToggleStateTest extends UITestCase {
 			super(serviceLocator);
 		}
 
-		@Override
 		public void setDisabledIcon(ImageDescriptor desc) {}
-		@Override
 		public void setHoverIcon(ImageDescriptor desc) {}
-		@Override
 		public void setIcon(ImageDescriptor desc) {}
-		@Override
 		public void setText(String text) {}
-		@Override
 		public void setTooltip(String text) {}
 
-		@Override
 		public void setChecked(boolean checked) {
 			this.checked = checked;
 		}

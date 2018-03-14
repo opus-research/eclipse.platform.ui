@@ -65,7 +65,6 @@ public class PolicyTest extends TestCase {
 		try {
 			final IStatus[] statusHolder = new IStatus[1];
 			Policy.setLog(new ILogger() {
-				@Override
 				public void log(IStatus status) {
 					statusHolder[0] = status;
 				}

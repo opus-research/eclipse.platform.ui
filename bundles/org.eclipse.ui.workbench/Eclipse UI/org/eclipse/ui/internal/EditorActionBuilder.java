@@ -33,14 +33,18 @@ public class EditorActionBuilder extends PluginActionBuilder {
     public EditorActionBuilder() {
     }
 
-    @Override
-	protected ActionDescriptor createActionDescriptor(
+    /* (non-Javadoc)
+     * Method declared on PluginActionBuilder.
+     */
+    protected ActionDescriptor createActionDescriptor(
             IConfigurationElement element) {
         return new ActionDescriptor(element, ActionDescriptor.T_EDITOR);
     }
 
-    @Override
-	protected BasicContribution createContribution() {
+    /* (non-Javadoc)
+     * Method declared on PluginActionBuilder.
+     */
+    protected BasicContribution createContribution() {
         return new EditorContribution();
     }
 
@@ -65,8 +69,7 @@ public class EditorActionBuilder extends PluginActionBuilder {
      * contribution element.
      */
     private static class EditorContribution extends BasicContribution {
-        @Override
-		public void dispose() {
+        public void dispose() {
 			disposeActions();
 			super.dispose();
         }
@@ -95,8 +98,7 @@ public class EditorActionBuilder extends PluginActionBuilder {
             this.cache = cache;
         }
 
-        @Override
-		public void dispose() {
+        public void dispose() {
             for (int i = 0; i < cache.size(); i++) {
                 ((EditorContribution) cache.get(i)).dispose();
             }
@@ -114,8 +116,7 @@ public class EditorActionBuilder extends PluginActionBuilder {
                     .toArray(new ActionDescriptor[results.size()]);
         }
 
-        @Override
-		public void init(IActionBars bars, IWorkbenchPage page) {
+        public void init(IActionBars bars, IWorkbenchPage page) {
             for (int i = 0; i < cache.size(); i++) {
                 ((EditorContribution) cache.get(i)).contribute(bars
                         .getMenuManager(), false, bars.getToolBarManager(),
@@ -123,8 +124,7 @@ public class EditorActionBuilder extends PluginActionBuilder {
             }
         }
 
-        @Override
-		public void setActiveEditor(IEditorPart editor) {
+        public void setActiveEditor(IEditorPart editor) {
             for (int i = 0; i < cache.size(); i++) {
                 ((EditorContribution) cache.get(i)).editorChanged(editor);
             }

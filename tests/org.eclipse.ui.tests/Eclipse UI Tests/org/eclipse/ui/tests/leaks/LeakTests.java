@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Remy Chi Jian Suen (Versant Corporation) - bug 255005
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.leaks;
 
@@ -87,15 +86,13 @@ public class LeakTests extends UITestCase {
         return new PhantomReference(object, queue);
     }
 
-    @Override
-	protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         super.doSetUp();
         fWin = openTestWindow(IDE.RESOURCE_PERSPECTIVE_ID);
         fActivePage = fWin.getActivePage();
     }
 
-    @Override
-	protected void doTearDown() throws Exception {
+    protected void doTearDown() throws Exception {
         super.doTearDown();
         fWin = null;
         fActivePage = null;
@@ -145,14 +142,13 @@ public class LeakTests extends UITestCase {
 
 		// create a job to schedule
 		Job doNothingJob = new Job("Does Nothing") { //$NON-NLS-1$
-			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				return Status.OK_STATUS;
 			}
 		};
 
 		// retrieve the progress service
-		IWorkbenchSiteProgressService service = view
+		IWorkbenchSiteProgressService service = (IWorkbenchSiteProgressService) view
 				.getSite().getService(IWorkbenchSiteProgressService.class);
 		// schedule it
 		service.schedule(doNothingJob);
@@ -183,14 +179,13 @@ public class LeakTests extends UITestCase {
 
 		// create a job to schedule
 		Job doNothingJob = new Job("Does Nothing") { //$NON-NLS-1$
-			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				return Status.OK_STATUS;
 			}
 		};
 
 		// retrieve the progress service
-		IWorkbenchSiteProgressService service = view
+		IWorkbenchSiteProgressService service = (IWorkbenchSiteProgressService) view
 				.getSite().getService(IWorkbenchSiteProgressService.class);
 		// schedule it
 		service.schedule(doNothingJob);

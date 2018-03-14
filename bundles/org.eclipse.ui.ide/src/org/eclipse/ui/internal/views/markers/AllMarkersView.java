@@ -35,7 +35,6 @@ public class AllMarkersView extends MarkerSupportView {
 	 * @see org.eclipse.ui.internal.views.markers.ExtendedMarkersView#getUndoContext()
 	 * @since 3.7
 	 */
-	@Override
 	protected IUndoContext getUndoContext() {
 		ObjectUndoContext context= new ObjectUndoContext(new Object(), "All Markers Context"); //$NON-NLS-1$
 		context.addMatch(WorkspaceUndoUtil.getBookmarksUndoContext());

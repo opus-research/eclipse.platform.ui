@@ -208,7 +208,11 @@ public final class KeySequence extends TriggerSequence implements Comparable {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#compareTo(java.lang.Object)
+	 */
 	public final int compareTo(final Object object) {
 		final KeySequence castedObject = (KeySequence) object;
 		return Util.compare(triggers, castedObject.triggers);
@@ -240,6 +244,11 @@ public final class KeySequence extends TriggerSequence implements Comparable {
 		return keyStrokes;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.bindings.TriggerSequence#getPrefixes()
+	 */
 	@Override
 	public final TriggerSequence[] getPrefixes() {
 		final int numberOfPrefixes = triggers.length;

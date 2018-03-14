@@ -41,7 +41,6 @@ public class MultiPageEditorSelectionTest extends UITestCase {
 		super(testName);
 	}
 
-	@Override
 	protected void doTearDown() throws Exception {
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IProject testProject = workspace.getRoot().getProject(PROJECT_NAME);
@@ -61,7 +60,6 @@ public class MultiPageEditorSelectionTest extends UITestCase {
 		IPostSelectionProvider postSelectionProvider = (IPostSelectionProvider) provider;
 		postSelectionProvider
 				.addPostSelectionChangedListener(new ISelectionChangedListener() {
-					@Override
 					public void selectionChanged(SelectionChangedEvent event) {
 						called[0] = true;
 					}

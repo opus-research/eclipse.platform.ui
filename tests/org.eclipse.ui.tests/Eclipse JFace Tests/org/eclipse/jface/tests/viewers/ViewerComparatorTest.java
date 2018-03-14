@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 IBM Corporation and others.
+ * Copyright (c) 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -115,7 +115,9 @@ public abstract class ViewerComparatorTest extends ViewerTestCase {
 	 * label provider
 	 */
 	protected class TeamModelLabelProvider extends LabelProvider{
-		@Override
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
+		 */
 		public String getText(Object element) {
 			if (element instanceof Team)
 				return ((Team)element).name;
@@ -130,7 +132,9 @@ public abstract class ViewerComparatorTest extends ViewerTestCase {
 	 * content provider
 	 */
 	protected class TeamModelContentProvider implements IComparatorModelListener,IStructuredContentProvider{
-		@Override
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+		 */
 		public Object[] getElements(Object inputElement) {
 			if (inputElement instanceof Team){
 				return ((Team)inputElement).members;
@@ -138,11 +142,15 @@ public abstract class ViewerComparatorTest extends ViewerTestCase {
 			return new Object[0];
 		}
 
-		@Override
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+		 */
 		public void dispose() {
 		}
 
-		@Override
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+		 */
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			if (oldInput != null){
 				((Team) oldInput).removeListener(this);;
@@ -153,8 +161,7 @@ public abstract class ViewerComparatorTest extends ViewerTestCase {
 	        }
 		}
 
-	    @Override
-		public void modelChanged(ComparatorModelChange change) {
+	    public void modelChanged(ComparatorModelChange change) {
 	        switch (change.getKind()) {
 	        case TestModelChange.INSERT:
 	            doInsert(change);

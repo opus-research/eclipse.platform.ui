@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 Tom Schindl and others.
+ * Copyright (c) 2006, 2013 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -52,17 +52,14 @@ public class Snippet007FullSelection {
 		v.setContentProvider(ArrayContentProvider.getInstance());
 		v.setCellModifier(new ICellModifier() {
 
-			@Override
 			public boolean canModify(Object element, String property) {
 				return true;
 			}
 
-			@Override
 			public Object getValue(Object element, String property) {
 				return ((MyModel)element).counter + "";
 			}
 
-			@Override
 			public void modify(Object element, String property, Object value) {
 				TableItem item = (TableItem)element;
 				((MyModel)item.getData()).counter = Integer.parseInt(value.toString());
@@ -88,7 +85,9 @@ public class Snippet007FullSelection {
 
 		v.getTable().addListener(SWT.EraseItem, new Listener() {
 
-			@Override
+			/* (non-Javadoc)
+			 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+			 */
 			public void handleEvent(Event event) {
 				event.detail &= ~SWT.SELECTED;
 			}

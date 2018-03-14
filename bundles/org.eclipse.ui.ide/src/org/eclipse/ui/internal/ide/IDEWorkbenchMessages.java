@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,10 +14,6 @@
  * Serge Beauchamp (Freescale Semiconductor) - [252996] Resource filters
  *     Markus Schorn (Wind River Systems) -  bug 284447
  *     James Blackburn (Broadcom Corp.)   -  bug 340978
- * Christian Georgi (SAP) - Bug 423882 - Warn user if workspace is newer than IDE
- * Lars Vogel <Lars.Vogel@vogella.com> - Bug 431862
- *     Gunnar Wagenknecht - [102527] Project Natures property page
- *     Mickael Istria (Red Hat Inc) - [102527] Project Natures property page
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -152,9 +148,6 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String Workbench_addTask;
 	public static String Workbench_addTaskToolTip;
 
-
-	// --- Perspective Menu ---
-	public static String Workbench_perspective;
 
 	// --- Navigate Menu ---
 	public static String Workbench_navigate;
@@ -662,17 +655,6 @@ public class IDEWorkbenchMessages extends NLS {
 	// --- Project References ---
 	public static String ProjectReferencesPage_label;
 
-	// --- Project Natures ---
-	public static String ProjectNaturesPage_label;
-	public static String ProjectNaturesPage_missingNatureText;
-	public static String ProjectNaturesPage_addNature;
-	public static String ProjectNaturesPage_removeNature;
-	public static String ProjectNaturesPage_selectNatureToAddMessage;
-	public static String ProjectNaturesPage_selectNatureToAddTitle;
-	public static String ProjectNaturesPage_changeWarningTitle;
-	public static String ProjectNaturesPage_warningMessage;
-	public static String ProjectNaturesPage_changeWarningQuestion;
-
 	// --- Project Linked Resources References ---
 	public static String ProjectLinkedResourcePage_description;
 	public static String ProjectLinkedResourcePage_pathVariableTabTitle;
@@ -968,11 +950,8 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String IDEApplication_workspaceCannotBeSetMessage;
 	public static String IDEApplication_workspaceCannotLockTitle;
 	public static String IDEApplication_workspaceCannotLockMessage;
-	public static String IDEApplication_versionTitle_newerWorkspace;
-	public static String IDEApplication_versionTitle_olderWorkspace;
-	public static String IDEApplication_versionMessage_newerWorkspace;
-	public static String IDEApplication_versionMessage_olderWorkspace;
-	public static String IDEApplication_version_doNotWarnAgain;
+	public static String IDEApplication_versionTitle;
+	public static String IDEApplication_versionMessage;
 	public static String GlobalBuildAction_BuildRunningTitle;
 	public static String GlobalBuildAction_BuildRunningMessage;
 	public static String CleanDialog_buildCleanAuto;

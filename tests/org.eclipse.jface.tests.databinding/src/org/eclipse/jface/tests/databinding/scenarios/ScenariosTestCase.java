@@ -106,7 +106,6 @@ abstract public class ScenariosTestCase extends TestCase {
 		button.notifyListeners(SWT.Selection, null);
 	}
 
-	@Override
 	protected void setUp() throws Exception {
 		realm = SWTObservables.getRealm(Display.getDefault());
 		RealmTester.setDefault(realm);
@@ -120,7 +119,6 @@ abstract public class ScenariosTestCase extends TestCase {
 		dummyText.setText("dummy");
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		realm = null;
 		getShell().setVisible(false); // same Shell may be reUsed across tests

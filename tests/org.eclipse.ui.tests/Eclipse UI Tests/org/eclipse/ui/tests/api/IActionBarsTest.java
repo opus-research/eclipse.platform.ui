@@ -43,8 +43,7 @@ public class IActionBarsTest extends UITestCase {
             super();
         }
 
-        @Override
-		public void run() {
+        public void run() {
             hasRun = true;
         }
     }
@@ -56,8 +55,7 @@ public class IActionBarsTest extends UITestCase {
         super(testName);
     }
 
-    @Override
-	protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         super.doSetUp();
         fWindow = openTestWindow();
         fPage = fWindow.getActivePage();
@@ -186,8 +184,8 @@ public class IActionBarsTest extends UITestCase {
 	    }
     
     private void runMatchingCommand(IWorkbenchWindow window, String actionId) {
-    	IHandlerService hs = window.getService(IHandlerService.class);
-    	IActionCommandMappingService ms = window.getService(IActionCommandMappingService.class);
+    	IHandlerService hs = (IHandlerService) window.getService(IHandlerService.class);
+    	IActionCommandMappingService ms = (IActionCommandMappingService) window.getService(IActionCommandMappingService.class);
     	String commandId = ms.getCommandId(actionId);
     	assertNotNull(commandId);
     	try {

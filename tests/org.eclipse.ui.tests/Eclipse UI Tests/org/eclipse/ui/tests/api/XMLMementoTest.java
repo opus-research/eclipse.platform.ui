@@ -61,12 +61,10 @@ public class XMLMementoTest extends TestCase {
 		try {
 			XMLMemento.createReadRoot(new Reader() {
 
-				@Override
 				public void close() throws IOException {
 					throw new IOException();
 				}
 
-				@Override
 				public int read(char[] arg0, int arg1, int arg2)
 						throws IOException {
 					throw new IOException();
@@ -132,7 +130,6 @@ public class XMLMementoTest extends TestCase {
 
 		testPutAndGet(new MementoChecker() {
 
-			@Override
 			public void prepareAndCheckBeforeSerialization(
 					XMLMemento mementoToSerialize) {
 				IMemento child = mementoToSerialize.createChild("c", "i");
@@ -142,7 +139,6 @@ public class XMLMementoTest extends TestCase {
 				checkMemento(copiedChild, true);
 			}
 
-			@Override
 			public void checkAfterDeserialization(XMLMemento deserializedMemento) {
 				IMemento child = deserializedMemento.getChild("c");
 				checkMemento(child, true);
@@ -205,7 +201,6 @@ public class XMLMementoTest extends TestCase {
 
 		testPutAndGet(new MementoChecker() {
 
-			@Override
 			public void prepareAndCheckBeforeSerialization(
 					XMLMemento mementoToSerialize) {
 				// check that nothing is there yet
@@ -224,7 +219,6 @@ public class XMLMementoTest extends TestCase {
 				assertEquals(id, child2.getID());
 			}
 
-			@Override
 			public void checkAfterDeserialization(XMLMemento deserializedMemento) {
 				IMemento child1 = deserializedMemento.getChild(type1);
 				assertNotNull(child1);
@@ -242,7 +236,6 @@ public class XMLMementoTest extends TestCase {
 
 		testPutAndGet(new MementoChecker() {
 
-			@Override
 			public void prepareAndCheckBeforeSerialization(
 					XMLMemento mementoToSerialize) {
 				// check that nothing is there yet
@@ -260,7 +253,6 @@ public class XMLMementoTest extends TestCase {
 				assertEquals(id2, child2.getID());
 			}
 
-			@Override
 			public void checkAfterDeserialization(XMLMemento deserializedMemento) {
 				IMemento[] children = deserializedMemento.getChildren(type);
 				assertNotNull(children);
@@ -287,7 +279,6 @@ public class XMLMementoTest extends TestCase {
 
 			testPutAndGet(new MementoChecker() {
 
-				@Override
 				public void prepareAndCheckBeforeSerialization(
 						XMLMemento mementoToSerialize) {
 					assertEquals(null, mementoToSerialize.getChild(type));
@@ -295,7 +286,6 @@ public class XMLMementoTest extends TestCase {
 					assertEquals(id, child.getID());
 				}
 
-				@Override
 				public void checkAfterDeserialization(
 						XMLMemento deserializedMemento) {
 					IMemento child = deserializedMemento.getChild(type);
@@ -319,7 +309,6 @@ public class XMLMementoTest extends TestCase {
 			final Float value = values[i];
 			testPutAndGet(new MementoChecker() {
 
-				@Override
 				public void prepareAndCheckBeforeSerialization(
 						XMLMemento mementoToSerialize) {
 					assertEquals(null, mementoToSerialize.getFloat(key));
@@ -327,7 +316,6 @@ public class XMLMementoTest extends TestCase {
 					assertEquals(value, mementoToSerialize.getFloat(key));
 				}
 
-				@Override
 				public void checkAfterDeserialization(
 						XMLMemento deserializedMemento) {
 					assertEquals(value, deserializedMemento.getFloat(key));
@@ -348,7 +336,6 @@ public class XMLMementoTest extends TestCase {
 
 			testPutAndGet(new MementoChecker() {
 
-				@Override
 				public void prepareAndCheckBeforeSerialization(
 						XMLMemento mementoToSerialize) {
 					assertEquals(null, mementoToSerialize.getInteger(key));
@@ -356,7 +343,6 @@ public class XMLMementoTest extends TestCase {
 					assertEquals(value, mementoToSerialize.getInteger(key));
 				}
 
-				@Override
 				public void checkAfterDeserialization(
 						XMLMemento deserializedMemento) {
 					assertEquals(value, deserializedMemento.getInteger(key));
@@ -369,7 +355,6 @@ public class XMLMementoTest extends TestCase {
 	public void testPutMemento() throws WorkbenchException, IOException {
 		testPutAndGet(new MementoChecker() {
 
-			@Override
 			public void prepareAndCheckBeforeSerialization(
 					XMLMemento mementoToSerialize) {
 				mementoToSerialize.putTextData("unchanged text data");
@@ -390,7 +375,6 @@ public class XMLMementoTest extends TestCase {
 						.getString("neverlost"));
 			}
 
-			@Override
 			public void checkAfterDeserialization(XMLMemento deserializedMemento) {
 				// do not check for text data:
 				checkMemento(deserializedMemento, false);
@@ -414,7 +398,6 @@ public class XMLMementoTest extends TestCase {
 
 			testPutAndGet(new MementoChecker() {
 
-				@Override
 				public void prepareAndCheckBeforeSerialization(
 						XMLMemento mementoToSerialize) {
 					assertEquals(null, mementoToSerialize.getString(key));
@@ -424,7 +407,6 @@ public class XMLMementoTest extends TestCase {
 					helper.toString();
 				}
 
-				@Override
 				public void checkAfterDeserialization(
 						XMLMemento deserializedMemento) {
 					assertEquals(value, deserializedMemento.getString(key));
@@ -440,7 +422,6 @@ public class XMLMementoTest extends TestCase {
 			final String data = values[i];
 			testPutAndGet(new MementoChecker() {
 
-				@Override
 				public void prepareAndCheckBeforeSerialization(
 						XMLMemento mementoToSerialize) {
 					assertEquals(null, mementoToSerialize.getTextData());
@@ -448,7 +429,6 @@ public class XMLMementoTest extends TestCase {
 					assertEquals(data, mementoToSerialize.getTextData());
 				}
 
-				@Override
 				public void checkAfterDeserialization(
 						XMLMemento deserializedMemento) {
 					if (data.equals("")) {
@@ -470,7 +450,6 @@ public class XMLMementoTest extends TestCase {
 			final String key = legalKeys[i];
 			testPutAndGet(new MementoChecker() {
 
-				@Override
 				public void prepareAndCheckBeforeSerialization(
 						XMLMemento mementoToSerialize) {
 					assertEquals(null, mementoToSerialize.getString(key));
@@ -484,7 +463,6 @@ public class XMLMementoTest extends TestCase {
 							.getString(key));
 				}
 
-				@Override
 				public void checkAfterDeserialization(
 						XMLMemento deserializedMemento) {
 					assertEquals("some string", deserializedMemento
@@ -518,7 +496,6 @@ public class XMLMementoTest extends TestCase {
 		final String textData = "\n\tThis is\ntext data\n\t\twith newlines and \ttabs\t\n\t ";
 		testPutAndGet(new MementoChecker() {
 
-			@Override
 			public void prepareAndCheckBeforeSerialization(
 					XMLMemento mementoToSerialize) {
 				mementoToSerialize.createChild("type", "id");
@@ -528,7 +505,6 @@ public class XMLMementoTest extends TestCase {
 				assertEquals(textData, mementoToSerialize.getTextData());
 			}
 
-			@Override
 			public void checkAfterDeserialization(XMLMemento deserializedMemento) {
 				assertEquals(textData, deserializedMemento.getTextData());
 			}

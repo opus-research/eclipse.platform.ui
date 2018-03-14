@@ -89,7 +89,6 @@ public class ImagesTest extends UITestCase {
 	}
 
 
-	@Override
 	protected void doTearDown() throws Exception {
 		super.doTearDown();
 		if (defaultImage != null)

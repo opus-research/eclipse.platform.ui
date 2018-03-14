@@ -34,7 +34,9 @@ public class TestLazyModelContentProvider extends TestModelContentProvider imple
 		}
 	}
 	
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ILazyContentProvider#updateElements(int, int)
+	 */
 	public void updateElement(int index) {
 		
 		((VirtualLazyTableViewerTest)test).updateElementCalled(index);
@@ -46,19 +48,25 @@ public class TestLazyModelContentProvider extends TestModelContentProvider imple
 
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.tests.viewers.TestModelContentProvider#dispose()
+	 */
 	public void dispose() {
 		super.dispose();
 	}
 	
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.tests.viewers.TestModelContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+	 */
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		input = (TestElement) newInput;
 		((TableViewer)viewer).setItemCount(input==null?0:input.getChildCount());
 		super.inputChanged(viewer, oldInput, newInput);
 	}
 	
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.tests.viewers.TestModelContentProvider#getElements(java.lang.Object)
+	 */
 	public Object[] getElements(Object element) {
 		Assert.isTrue(false,"Should not ever call getElements if lazy");
 		return super.getElements(element);

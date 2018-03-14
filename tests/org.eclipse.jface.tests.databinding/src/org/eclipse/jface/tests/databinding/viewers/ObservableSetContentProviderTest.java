@@ -39,7 +39,6 @@ public class ObservableSetContentProviderTest extends AbstractSWTTestCase {
 	private ObservableSetContentProvider contentProvider;
 	private IObservableSet input;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		shell = new Shell();
@@ -52,7 +51,6 @@ public class ObservableSetContentProviderTest extends AbstractSWTTestCase {
 		viewer.setInput(input);
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		shell.dispose();
 		viewer = null;
@@ -124,7 +122,6 @@ public class ObservableSetContentProviderTest extends AbstractSWTTestCase {
 			this.id = id;
 		}
 
-		@Override
 		public boolean equals(Object obj) {
 			if (obj == this)
 				return true;
@@ -136,7 +133,6 @@ public class ObservableSetContentProviderTest extends AbstractSWTTestCase {
 			return this.id == that.id;
 		}
 
-		@Override
 		public int hashCode() {
 			return id;
 		}

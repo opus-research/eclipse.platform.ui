@@ -201,8 +201,7 @@ public class FontRegistry extends ResourceRegistry {
      * Runnable that cleans up the manager on disposal of the display.
      */
     protected Runnable displayRunnable = new Runnable() {
-        @Override
-		public void run() {
+        public void run() {
             clearCaches();
         }
     };
@@ -692,16 +691,25 @@ public class FontRegistry extends ResourceRegistry {
 
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.resource.ResourceRegistry#getKeySet()
+     */
     @Override
 	public Set<String> getKeySet() {
         return Collections.unmodifiableSet(stringToFontData.keySet());
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.resource.ResourceRegistry#hasValueFor(java.lang.String)
+     */
     @Override
 	public boolean hasValueFor(String fontKey) {
         return stringToFontData.containsKey(fontKey);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.resource.ResourceRegistry#clearCaches()
+     */
     @Override
 	protected void clearCaches() {
 

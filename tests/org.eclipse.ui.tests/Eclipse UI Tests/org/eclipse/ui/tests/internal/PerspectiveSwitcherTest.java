@@ -29,7 +29,6 @@ public class PerspectiveSwitcherTest extends UITestCase {
 		super(testName);
 	}
 
-	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		apiPreferenceStore = PrefUtil.getAPIPreferenceStore();
@@ -41,7 +40,6 @@ public class PerspectiveSwitcherTest extends UITestCase {
 				.getString(IWorkbenchPreferenceConstants.DOCK_PERSPECTIVE_BAR);
 	}
 
-	@Override
 	protected void doTearDown() throws Exception {
 		// reset values so we don't screw any assumptions up for other tests
 		// down the line

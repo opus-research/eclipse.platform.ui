@@ -7,12 +7,10 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Stefan Winkler <stefan@winklerweb.net> - Bug 430848
  *******************************************************************************/
 package org.eclipse.ui.splash;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
 import org.eclipse.jface.dialogs.ProgressIndicator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.ProgressMonitorPart;
@@ -36,10 +34,6 @@ import org.eclipse.ui.internal.StartupThreading.StartupRunnable;
  */
 public abstract class BasicSplashHandler extends AbstractSplashHandler {
 
-	private static final String SPLASH_PROGRESS_PART_ID = "org-eclipse-ui-splash-progressPart"; //$NON-NLS-1$
-	private static final String SPLASH_PROGRESS_INDICATOR_ID = "org-eclipse-ui-splash-progressIndicator"; //$NON-NLS-1$
-	private static final String SPLASH_PROGRESS_TEXT_ID = "org-eclipse-ui-splash-progressText"; //$NON-NLS-1$
-
 	/**
 	 * Hacks the progress monitor to have absolute positioning for its controls.
 	 * In addition, all methods that access the controls will be wrapped in an
@@ -49,13 +43,6 @@ public abstract class BasicSplashHandler extends AbstractSplashHandler {
 		public AbsolutePositionProgressMonitorPart(Composite parent) {
 			super(parent, null);
 			setLayout(null);
-			setCSSData();
-		}
-
-		private void setCSSData() {
-			this.setData(CSSSWTConstants.CSS_ID_KEY, SPLASH_PROGRESS_PART_ID);
-			fProgressIndicator.setData(CSSSWTConstants.CSS_ID_KEY, SPLASH_PROGRESS_INDICATOR_ID);
-			fLabel.setData(CSSSWTConstants.CSS_ID_KEY, SPLASH_PROGRESS_TEXT_ID);
 		}
 
 		public ProgressIndicator getProgressIndicator() {
@@ -66,12 +53,13 @@ public abstract class BasicSplashHandler extends AbstractSplashHandler {
 			return fLabel;
 		}
 
-		@Override
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.wizard.ProgressMonitorPart#beginTask(java.lang.String, int)
+		 */
 		public void beginTask(final String name, final int totalWork) {
 
 			updateUI(new Runnable() {
 
-				@Override
 				public void run() {
 					if (isDisposed())
 						return;
@@ -82,12 +70,15 @@ public abstract class BasicSplashHandler extends AbstractSplashHandler {
 
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.wizard.ProgressMonitorPart#done()
+		 */
 		public void done() {
 
 			updateUI(new Runnable() {
 
-				@Override
 				public void run() {
 					if (isDisposed())
 						return;
@@ -97,12 +88,15 @@ public abstract class BasicSplashHandler extends AbstractSplashHandler {
 
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.wizard.ProgressMonitorPart#internalWorked(double)
+		 */
 		public void internalWorked(final double work) {
 
 			updateUI(new Runnable() {
 
-				@Override
 				public void run() {
 					if (isDisposed())
 						return;
@@ -113,12 +107,15 @@ public abstract class BasicSplashHandler extends AbstractSplashHandler {
 
 		}
 		
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.wizard.ProgressMonitorPart#setFont(org.eclipse.swt.graphics.Font)
+		 */
 		public void setFont(final Font font) {
 
 			updateUI(new Runnable() {
 
-				@Override
 				public void run() {
 					if (isDisposed())
 						return;
@@ -128,12 +125,15 @@ public abstract class BasicSplashHandler extends AbstractSplashHandler {
 
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.wizard.ProgressMonitorPart#updateLabel()
+		 */
 		protected void updateLabel() {
 
 			updateUI(new Runnable() {
 
-				@Override
 				public void run() {
 					if (isDisposed())
 						return;
@@ -149,7 +149,11 @@ public abstract class BasicSplashHandler extends AbstractSplashHandler {
 	private Rectangle messageRect;
 	private Rectangle progressRect;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.splash.AbstractSplashHandler#getBundleProgressMonitor()
+	 */
 	public IProgressMonitor getBundleProgressMonitor() {
 		if (monitor == null) {
 			Composite parent = new Composite(getSplash(), Window.getDefaultOrientation());
@@ -176,7 +180,11 @@ public abstract class BasicSplashHandler extends AbstractSplashHandler {
 		return monitor;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.splash.AbstractSplashHandler#dispose()
+	 */
 	public void dispose() {
 		if (foreground != null)
 			foreground.dispose();
@@ -280,7 +288,6 @@ public abstract class BasicSplashHandler extends AbstractSplashHandler {
 			// the UI is fully initialized
 			StartupRunnable startupRunnable = new StartupRunnable() {
 
-				@Override
 				public void runWithException() throws Throwable {
 					r.run();
 				}

@@ -71,17 +71,23 @@ public class ToolBarManager2 extends ToolBarManager implements IToolBarManager2 
 		super(toolbar);
 	}
 	
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.IToolBarManager2#createControl2(org.eclipse.swt.widgets.Composite)
+	 */
 	public Control createControl2(Composite parent) {
 		return createControl(parent);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.IToolBarManager2#getControl2()
+	 */
 	public Control getControl2() {
 		return getControl();
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.IToolBarManager2#getItemCount()
+	 */
 	public int getItemCount() {
 		ToolBar toolBar = getControl();
 		if (toolBar == null || toolBar.isDisposed()) {
@@ -90,7 +96,9 @@ public class ToolBarManager2 extends ToolBarManager implements IToolBarManager2 
 		return toolBar.getItemCount();
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.IToolBarManager2#addPropertyChangeListener(org.eclipse.jface.util.IPropertyChangeListener)
+	 */
 	public void addPropertyChangeListener(IPropertyChangeListener listener) {
 		if (listenerList == null) {
 			listenerList = new ListenerList(ListenerList.IDENTITY);
@@ -99,7 +107,9 @@ public class ToolBarManager2 extends ToolBarManager implements IToolBarManager2 
 		listenerList.add(listener);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.IToolBarManager2#removePropertyChangeListener(org.eclipse.jface.util.IPropertyChangeListener)
+	 */
 	public void removePropertyChangeListener(IPropertyChangeListener listener) {
 		if (listenerList != null) {
 			listenerList.remove(listener);
@@ -150,6 +160,9 @@ public class ToolBarManager2 extends ToolBarManager implements IToolBarManager2 
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.ToolBarManager#relayout(org.eclipse.swt.widgets.ToolBar, int, int)
+	 */
 	@Override
 	protected void relayout(ToolBar layoutBar, int oldCount, int newCount) {
 		super.relayout(layoutBar, oldCount, newCount);

@@ -38,7 +38,6 @@ public class DelayedObservableValueTest extends AbstractDefaultRealmTestCase {
 	private ObservableValueStub target;
 	private IObservableValue delayed;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		target = new ObservableValueStub(Realm.getDefault());
@@ -48,7 +47,6 @@ public class DelayedObservableValueTest extends AbstractDefaultRealmTestCase {
 		delayed = Observables.observeDelayedValue(1, target);
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		target.dispose();
 		target = null;
@@ -81,7 +79,6 @@ public class DelayedObservableValueTest extends AbstractDefaultRealmTestCase {
 
 	public void testGetValue_FiresPendingValueChange() {
 		assertFiresPendingValueChange(new Runnable() {
-			@Override
 			public void run() {
 				final Object value = delayed.getValue();
 				assertEquals(newValue, value);
@@ -130,7 +127,6 @@ public class DelayedObservableValueTest extends AbstractDefaultRealmTestCase {
 
 	public void testWait_FiresPendingValueChange() {
 		assertFiresPendingValueChange(new Runnable() {
-			@Override
 			public void run() {
 				// Give plenty of time for display to run timer task
 				long timeout = time() + 5000;
@@ -186,12 +182,10 @@ public class DelayedObservableValueTest extends AbstractDefaultRealmTestCase {
 			super(realm);
 		}
 
-		@Override
 		protected Object doGetValue() {
 			return value;
 		}
 
-		@Override
 		protected void doSetValue(Object value) {
 			Object oldValue = this.value;
 			if (overrideValue != null)
@@ -201,18 +195,15 @@ public class DelayedObservableValueTest extends AbstractDefaultRealmTestCase {
 			fireValueChange(Diffs.createValueDiff(oldValue, value));
 		}
 
-		@Override
 		public Object getValueType() {
 			return Object.class;
 		}
 
-		@Override
 		protected void fireStale() {
 			stale = true;
 			super.fireStale();
 		}
 
-		@Override
 		public boolean isStale() {
 			return stale;
 		}
@@ -228,24 +219,20 @@ public class DelayedObservableValueTest extends AbstractDefaultRealmTestCase {
 	}
 
 	static class Delegate extends AbstractObservableValueContractDelegate {
-		@Override
 		public IObservableValue createObservableValue(Realm realm) {
 			return Observables.observeDelayedValue(0, new ObservableValueStub(
 					realm));
 		}
 
-		@Override
 		public Object getValueType(IObservableValue observable) {
 			return Object.class;
 		}
 
-		@Override
 		public void change(IObservable observable) {
 			IObservableValue observableValue = (IObservableValue) observable;
 			observableValue.setValue(createValue(observableValue));
 		}
 
-		@Override
 		public Object createValue(IObservableValue observable) {
 			return new Object();
 		}

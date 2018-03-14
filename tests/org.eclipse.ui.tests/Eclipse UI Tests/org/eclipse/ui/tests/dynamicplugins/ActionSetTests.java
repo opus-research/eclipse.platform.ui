@@ -144,18 +144,30 @@ public class ActionSetTests extends DynamicTestCase implements
         assertEquals(0, getActionSetRegistry().getActionSetsFor(PART_ID).length);
     }
 
-    @Override
-	protected String getExtensionId() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionId()
+     */
+    protected String getExtensionId() {
         return "newActionSet1.testDynamicActionSetAddition";
     }
 
-    @Override
-	protected String getExtensionPoint() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionPoint()
+     */
+    protected String getExtensionPoint() {
         return IWorkbenchRegistryConstants.PL_ACTION_SETS;
     }
 
-    @Override
-	protected String getInstallLocation() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getInstallLocation()
+     */
+    protected String getInstallLocation() {
         return "data/org.eclipse.newActionSet1";
     }
 }

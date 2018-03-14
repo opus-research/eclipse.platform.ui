@@ -57,8 +57,7 @@ public class TarFileExporter implements IFileExporter {
      *
      *	@exception java.io.IOException
      */
-    @Override
-	public void finished() throws IOException {
+    public void finished() throws IOException {
         outputStream.close();
         if(gzipOutputStream != null) {
         	gzipOutputStream.close();
@@ -97,8 +96,7 @@ public class TarFileExporter implements IFileExporter {
     	outputStream.closeEntry();    	
     }
 
-    @Override
-	public void write(IContainer container, String destinationPath)
+    public void write(IContainer container, String destinationPath)
             throws IOException {
         TarEntry newEntry = new TarEntry(destinationPath);
         if(container.getLocalTimeStamp() != IResource.NULL_STAMP) {
@@ -123,8 +121,7 @@ public class TarFileExporter implements IFileExporter {
      *  @exception java.io.IOException
      *  @exception org.eclipse.core.runtime.CoreException
      */
-    @Override
-	public void write(IFile resource, String destinationPath)
+    public void write(IFile resource, String destinationPath)
             throws IOException, CoreException {
 
         TarEntry newEntry = new TarEntry(destinationPath);
