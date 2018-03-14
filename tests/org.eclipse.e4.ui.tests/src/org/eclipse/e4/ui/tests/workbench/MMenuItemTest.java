@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -93,7 +93,6 @@ public class MMenuItemTest extends TestCase {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		application.getChildren().add(window);
-		application.setSelectedElement(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class.getName(), application);
 
@@ -171,7 +170,6 @@ public class MMenuItemTest extends TestCase {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		application.getChildren().add(window);
-		application.setSelectedElement(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class.getName(), application);
 
@@ -229,7 +227,6 @@ public class MMenuItemTest extends TestCase {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		application.getChildren().add(window);
-		application.setSelectedElement(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class.getName(), application);
 
@@ -265,7 +262,6 @@ public class MMenuItemTest extends TestCase {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		application.getChildren().add(window);
-		application.setSelectedElement(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class.getName(), application);
 
@@ -312,7 +308,6 @@ public class MMenuItemTest extends TestCase {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		application.getChildren().add(window);
-		application.setSelectedElement(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class.getName(), application);
 
@@ -361,7 +356,6 @@ public class MMenuItemTest extends TestCase {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		application.getChildren().add(window);
-		application.setSelectedElement(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class.getName(), application);
 
@@ -410,7 +404,6 @@ public class MMenuItemTest extends TestCase {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		application.getChildren().add(window);
-		application.setSelectedElement(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class.getName(), application);
 
@@ -460,7 +453,6 @@ public class MMenuItemTest extends TestCase {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		application.getChildren().add(window);
-		application.setSelectedElement(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class.getName(), application);
 		application.getMenuContributions().add(createContribution(false));
@@ -506,7 +498,6 @@ public class MMenuItemTest extends TestCase {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		application.getChildren().add(window);
-		application.setSelectedElement(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class.getName(), application);
 		application.getMenuContributions().add(createContribution(true));
@@ -594,7 +585,6 @@ public class MMenuItemTest extends TestCase {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		application.getChildren().add(window);
-		application.setSelectedElement(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class.getName(), application);
 		createMenuContribution(application);
@@ -673,7 +663,6 @@ public class MMenuItemTest extends TestCase {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		application.getChildren().add(window);
-		application.setSelectedElement(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class.getName(), application);
 
@@ -748,7 +737,6 @@ public class MMenuItemTest extends TestCase {
 				.createApplication();
 		application.getCommands().add(command);
 		application.getChildren().add(window);
-		application.setSelectedElement(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class.getName(), application);
 		// The handler processing addon cannot run until the context
