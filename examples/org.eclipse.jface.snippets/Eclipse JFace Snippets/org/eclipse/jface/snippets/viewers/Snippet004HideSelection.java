@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 - 2014 Tom Schindl and others.
+ * Copyright (c) 2006 - 2013 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     Tom Schindl - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 414565
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414565
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -67,9 +66,10 @@ public class Snippet004HideSelection {
 	private MyModel[] createModel() {
 		MyModel[] elements = new MyModel[10];
 
-		for (int i = 0; i < elements.length; i++) {
+		for (int i = 0; i < 10; i++) {
 			elements[i] = new MyModel(i);
 		}
+
 		return elements;
 	}
 
@@ -84,6 +84,7 @@ public class Snippet004HideSelection {
 			if (!display.readAndDispatch())
 				display.sleep();
 		}
+
 		display.dispose();
 
 	}
