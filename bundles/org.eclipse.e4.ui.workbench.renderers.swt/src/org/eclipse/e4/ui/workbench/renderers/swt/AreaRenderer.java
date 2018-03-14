@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 485848
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 485848, 485849
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -15,7 +15,9 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
@@ -40,35 +42,30 @@ public class AreaRenderer extends SWTPartRenderer {
 	@Inject
 	private IEventBroker eventBroker;
 
-	private EventHandler itemUpdater = new EventHandler() {
-		@Override
-		public void handleEvent(Event event) {
-			// Ensure that this event is for a MArea
-			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MArea))
-				return;
+	@Inject
+	@Optional
+	private void handleTopicUpdateLabels(@UIEventTopic(UIEvents.UILabel.TOPIC_ALL) Event event) {
+		// Ensure that this event is for a MArea
+		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MArea))
+			return;
 
-			MArea areaModel = (MArea) event
-					.getProperty(UIEvents.EventTags.ELEMENT);
-			CTabFolder ctf = (CTabFolder) areaModel.getWidget();
-			CTabItem areaItem = ctf.getItem(0);
+		MArea areaModel = (MArea) event.getProperty(UIEvents.EventTags.ELEMENT);
+		CTabFolder ctf = (CTabFolder) areaModel.getWidget();
+		CTabItem areaItem = ctf.getItem(0);
 
-			// No widget == nothing to update
-			if (areaItem == null)
-				return;
+		// No widget == nothing to update
+		if (areaItem == null)
+			return;
 
-			String attName = (String) event
-					.getProperty(UIEvents.EventTags.ATTNAME);
-			if (UIEvents.UILabel.LABEL.equals(attName)
-					|| UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
-				areaItem.setText(areaModel.getLocalizedLabel());
-			} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
-				areaItem.setImage(getImage(areaModel));
-			} else if (UIEvents.UILabel.TOOLTIP.equals(attName)
-					|| UIEvents.UILabel.LOCALIZED_TOOLTIP.equals(attName)) {
-				areaItem.setToolTipText(areaModel.getLocalizedTooltip());
-			}
+		String attName = (String) event.getProperty(UIEvents.EventTags.ATTNAME);
+		if (UIEvents.UILabel.LABEL.equals(attName) || UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
+			areaItem.setText(areaModel.getLocalizedLabel());
+		} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
+			areaItem.setImage(getImage(areaModel));
+		} else if (UIEvents.UILabel.TOOLTIP.equals(attName) || UIEvents.UILabel.LOCALIZED_TOOLTIP.equals(attName)) {
+			areaItem.setToolTipText(areaModel.getLocalizedTooltip());
 		}
-	};
+	}
 
 	private EventHandler widgetListener = new EventHandler() {
 		@Override
@@ -96,13 +93,11 @@ public class AreaRenderer extends SWTPartRenderer {
 
 	@PostConstruct
 	void init() {
-		eventBroker.subscribe(UIEvents.UILabel.TOPIC_ALL, itemUpdater);
 		eventBroker.subscribe(UIElement.TOPIC_WIDGET, widgetListener);
 	}
 
 	@PreDestroy
 	void contextDisposed() {
-		eventBroker.unsubscribe(itemUpdater);
 		eventBroker.unsubscribe(widgetListener);
 	}
 
