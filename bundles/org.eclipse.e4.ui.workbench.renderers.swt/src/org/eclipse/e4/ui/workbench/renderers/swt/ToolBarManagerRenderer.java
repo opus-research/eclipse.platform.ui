@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -81,6 +81,8 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	private Map<MToolBarElement, ToolBarContributionRecord> modelContributionToRecord = new HashMap<MToolBarElement, ToolBarContributionRecord>();
 
 	private Map<MToolBarElement, ArrayList<ToolBarContributionRecord>> sharedElementToRecord = new HashMap<MToolBarElement, ArrayList<ToolBarContributionRecord>>();
+
+	private ToolItemUpdater enablementUpdater = new ToolItemUpdater();
 
 	// @Inject
 	// private Logger logger;
@@ -611,6 +613,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		if (ici != null) {
 			return;
 		}
+		itemModel.setRenderer(this);
 		AbstractGroupMarker marker = null;
 		if (itemModel.isVisible()
 				&& !itemModel.getTags().contains(
@@ -638,6 +641,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		if (ici != null) {
 			return;
 		}
+		itemModel.setRenderer(this);
 		final IEclipseContext lclContext = getContext(itemModel);
 		ToolControlContribution ci = ContextInjectionFactory.make(
 				ToolControlContribution.class, lclContext);
@@ -657,6 +661,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		if (ici != null) {
 			return;
 		}
+		itemModel.setRenderer(this);
 		final IEclipseContext lclContext = getContext(itemModel);
 		DirectContributionItem ci = ContextInjectionFactory.make(
 				DirectContributionItem.class, lclContext);
@@ -676,6 +681,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		if (ici != null) {
 			return;
 		}
+		itemModel.setRenderer(this);
 		final IEclipseContext lclContext = getContext(itemModel);
 		HandledContributionItem ci = ContextInjectionFactory.make(
 				HandledContributionItem.class, lclContext);
@@ -691,6 +697,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		if (ici != null) {
 			return;
 		}
+		itemModel.setRenderer(this);
 		Object obj = itemModel.getOpaqueItem();
 		if (obj instanceof IContributionItem) {
 			ici = (IContributionItem) obj;
@@ -854,5 +861,13 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 	public IEclipseContext getContext(MUIElement el) {
 		return super.getContext(el);
+	}
+
+	ToolItemUpdater getUpdater() {
+		return enablementUpdater;
+	}
+
+	public void updateEnablement() {
+		enablementUpdater.updateContributionItems();
 	}
 }
