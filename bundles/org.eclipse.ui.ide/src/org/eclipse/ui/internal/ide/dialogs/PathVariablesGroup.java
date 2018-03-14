@@ -14,7 +14,6 @@
 package org.eclipse.ui.internal.ide.dialogs;
 
 import java.net.URI;
-import java.text.Collator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -169,9 +168,7 @@ public class PathVariablesGroup {
         pathVariableManager = ResourcesPlugin.getWorkspace()
                 .getPathVariableManager();
         removedVariableNames = new HashSet();
-        Collator ignoreCaseComparator = Collator.getInstance();
-        ignoreCaseComparator.setStrength(Collator.TERTIARY);
-        tempPathVariables = new TreeMap(ignoreCaseComparator);
+        tempPathVariables = new TreeMap();
         // initialize internal model
         initTemporaryState();
     }
