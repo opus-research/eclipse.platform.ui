@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Erik Chou <ekchou@ymail.com> - Bug 425962
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445664, 442278
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 388476
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 388476, 462216
  *******************************************************************************/
 
 package org.eclipse.ui.internal.dialogs;
@@ -41,6 +41,7 @@ import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -71,8 +72,8 @@ import org.eclipse.ui.internal.themes.IThemeDescriptor;
 import org.eclipse.ui.internal.tweaklets.PreferencePageEnhancer;
 import org.eclipse.ui.internal.tweaklets.Tweaklets;
 import org.eclipse.ui.internal.util.PrefUtil;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.eclipse.ui.themes.IThemeManager;
-import org.osgi.service.prefs.BackingStoreException;
 
 /**
  * The ViewsPreferencePage is the page used to set preferences for the
@@ -90,7 +91,7 @@ public class ViewsPreferencePage extends PreferencePage implements
 	private ITheme currentTheme;
 	private String defaultTheme;
 	private Button enableAnimations;
-	private Button enableMru;
+	private RadioGroupFieldEditor enableMru;
 	private Button useColoredLabels;
 
 	private Text colorsAndFontsThemeDescriptionText;
@@ -245,9 +246,22 @@ public class ViewsPreferencePage extends PreferencePage implements
 				return;
 			}
 		}
-		boolean defaultValue = getDefaultMRUValue();
-		boolean actualValue = prefs.getBoolean(StackRenderer.MRU_KEY, defaultValue);
-		enableMru = createCheckButton(composite, WorkbenchMessages.ViewsPreference_enableMRU, actualValue);
+
+		Composite radioGroup = new Composite(composite, SWT.NULL);
+		GridData data = new GridData(SWT.BEGINNING, SWT.CENTER, true, false, 2, 1);
+		radioGroup.setLayoutData(data);
+		enableMru = new RadioGroupFieldEditor(StackRenderer.MRU_KEY,
+				WorkbenchMessages.ViewsPreference_tabPlacement, 1,
+				new String[][] {
+						new String[] { WorkbenchMessages.ViewsPreference_enableOpeningOrder, Boolean.FALSE.toString() },
+						new String[] { WorkbenchMessages.ViewsPreference_enableMRU, Boolean.TRUE.toString() } },
+				radioGroup, true);
+		ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE,
+				"org.eclipse.e4.ui.workbench.renderers.swt"); //$NON-NLS-1$
+		store.setDefault(StackRenderer.MRU_KEY, Boolean.toString(getDefaultMRUValue()));
+		enableMru.setPreferenceStore(store);
+		enableMru.fillIntoGrid(radioGroup, 2);
+		enableMru.load();
 	}
 
 	protected void createEnableAnimationsPref(Composite composite) {
@@ -285,13 +299,7 @@ public class ViewsPreferencePage extends PreferencePage implements
 		((PreferencePageEnhancer) Tweaklets.get(PreferencePageEnhancer.KEY)).performOK();
 
 		if (enableMru != null) {
-			IEclipsePreferences prefs = getSwtRendererPreferences();
-			prefs.putBoolean(StackRenderer.MRU_KEY, enableMru.getSelection());
-			try {
-				prefs.flush();
-			} catch (BackingStoreException e) {
-				WorkbenchPlugin.log("Failed to set SWT renderer preferences", e); //$NON-NLS-1$
-			}
+			enableMru.store();
 		}
 		return super.performOk();
 	}
@@ -327,7 +335,7 @@ public class ViewsPreferencePage extends PreferencePage implements
 		enableAnimations.setSelection(apiStore.getDefaultBoolean(IWorkbenchPreferenceConstants.ENABLE_ANIMATIONS));
 		useColoredLabels.setSelection(apiStore.getDefaultBoolean(IWorkbenchPreferenceConstants.USE_COLORED_LABELS));
 		if (enableMru != null) {
-			enableMru.setSelection(getDefaultMRUValue());
+			enableMru.loadDefault();
 		}
 		super.performDefaults();
 	}
