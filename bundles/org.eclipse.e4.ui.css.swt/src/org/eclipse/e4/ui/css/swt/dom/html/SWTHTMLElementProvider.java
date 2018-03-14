@@ -34,7 +34,6 @@ public class SWTHTMLElementProvider extends SWTElementProvider {
 	 * 
 	 * @see org.eclipse.e4.ui.core.css.dom.IElementProvider#getElement(java.lang.Object)
 	 */
-	@Override
 	public Element getElement(Object element, CSSEngine engine) {
 		if (element instanceof Widget) {
 			Widget widget = (Widget) element;

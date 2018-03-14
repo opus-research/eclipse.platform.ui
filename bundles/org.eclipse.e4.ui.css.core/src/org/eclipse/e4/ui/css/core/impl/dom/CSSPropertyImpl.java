@@ -38,27 +38,22 @@ public class CSSPropertyImpl implements CSSProperty {
 		this.important = important;
 	}
 
-	@Override
 	public String getName() {
 		return name;
 	}
 
-	@Override
 	public CSSValue getValue() {
 		return value;
 	}
 
-	@Override
 	public boolean isImportant() {
 		return important;
 	}
 
-	@Override
 	public void setImportant(boolean important) {
 		this.important = important;
 	}
 
-	@Override
 	public void setValue(CSSValue value) {
 		this.value = value;
 	}

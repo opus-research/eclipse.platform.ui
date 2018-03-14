@@ -29,7 +29,6 @@ import org.eclipse.equinox.app.IApplicationContext;
 
 public class GenTopic implements IApplication {
 
-	@Override
 	public Object start(IApplicationContext context) throws Exception {
 		try {
 			processLiterals(CommandsPackageImpl.Literals.class);
@@ -104,7 +103,6 @@ public class GenTopic implements IApplication {
 		System.out.print("\n\t}"); //$NON-NLS-1$
 	}
 
-	@Override
 	public void stop() {
 		// nothing to do
 	}
