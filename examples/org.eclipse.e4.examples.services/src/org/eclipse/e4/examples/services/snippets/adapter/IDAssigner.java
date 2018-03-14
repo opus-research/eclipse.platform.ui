@@ -1,4 +1,4 @@
-package org.eclipse.ui.examples.adapterservice.snippets.adapter;
+package org.eclipse.e4.examples.services.snippets.adapter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +13,6 @@ public class IDAssigner implements IAdapterFactory {
 	public IDAssigner() {
 		currentId = 1000;
 	}
-	@Override
 	@SuppressWarnings("rawtypes")
 	public Object getAdapter(final Object adaptableObject, Class adapterType) {
 		if (adapterType.equals(ThingWithId.class)) {
@@ -23,7 +22,6 @@ public class IDAssigner implements IAdapterFactory {
 				assignedIds.put(adaptableObject, id);
 			}
 			return new ThingWithId() {
-				@Override
 				public String getUniqueId() {
 					return assignedIds.get(adaptableObject);
 				}
@@ -32,7 +30,6 @@ public class IDAssigner implements IAdapterFactory {
 		return null;
 	}
 
-	@Override
 	@SuppressWarnings("rawtypes")
 	public Class[] getAdapterList() {
 		return new Class[] { ThingWithId.class };

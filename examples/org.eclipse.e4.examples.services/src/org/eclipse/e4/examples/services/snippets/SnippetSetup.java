@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ui.examples.adapterservice.snippets;
+package org.eclipse.e4.examples.services.snippets;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;

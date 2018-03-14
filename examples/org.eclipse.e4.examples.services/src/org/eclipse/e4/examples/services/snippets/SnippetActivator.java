@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ui.examples.adapterservice.snippets;
+package org.eclipse.e4.examples.services.snippets;
 
 import org.osgi.framework.BundleContext;
 
@@ -22,12 +22,10 @@ public class SnippetActivator implements BundleActivator {
 	public SnippetActivator() {
 	}
 
-	@Override
 	public void start(BundleContext aContext) throws Exception {
 		bundleContext = aContext;
 		SnippetSetup.initializeServices();
 	}
-	@Override
 	public void stop(BundleContext aContext) throws Exception {
 		bundleContext = null;
 	}
