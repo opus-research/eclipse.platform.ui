@@ -434,7 +434,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 					}
 					temp = temp.getParent();
 				}
-				composite.requestLayout();
+				composite.layout(true, true);
 			}
 		}
 	}
