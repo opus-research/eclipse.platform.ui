@@ -7,11 +7,9 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728, 430166
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,8 +19,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -60,7 +56,6 @@ import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.LegacyActionTools;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.ACC;
 import org.eclipse.swt.accessibility.Accessible;
@@ -82,7 +77,10 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.RowData;
@@ -98,25 +96,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 import org.w3c.dom.css.CSSValue;
 
-/**
- * SWT default renderer for a MPartStack model elements
- *
- * Style bits for the underlying CTabFolder can be set via the
- * IPresentation.STYLE_OVERRIDE_KEY key
- *
- */
 public class StackRenderer extends LazyStackRenderer {
-	/**
-	 * 
-	 */
-	private static final String THE_PART_KEY = "thePart"; //$NON-NLS-1$
-
 	@Inject
 	@Named(WorkbenchRendererFactory.SHARED_ELEMENTS_STORE)
 	Map<MUIElement, Set<MPlaceholder>> renderedMap;
@@ -126,9 +110,9 @@ public class StackRenderer extends LazyStackRenderer {
 	private static final String STACK_SELECTED_PART = "stack_selected_part"; //$NON-NLS-1$
 
 	/**
-	 * Add this tag to prevent the next tab's activation from granting focus
-	 * toac the part. This is used to keep the focus on the CTF when traversing
-	 * the tabs using the keyboard.
+	 * Add this tag to prevent the next tab's activation from granting focus to
+	 * the part. This is used to keep the focus on the CTF when traversing the
+	 * tabs using the keyboard.
 	 */
 	private static final String INHIBIT_FOCUS = "InhibitFocus"; //$NON-NLS-1$
 
@@ -278,6 +262,13 @@ public class StackRenderer extends LazyStackRenderer {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#requiresFocus
+	 * (org.eclipse.e4.ui.model.application.ui.basic.MPart)
+	 */
 	@Override
 	protected boolean requiresFocus(MPart element) {
 		MUIElement inStack = element.getCurSharedRef() != null ? element
@@ -592,8 +583,6 @@ public class StackRenderer extends LazyStackRenderer {
 		if (!(element instanceof MPartStack) || !(parent instanceof Composite))
 			return null;
 
-		MPartStack pStack = (MPartStack) element;
-
 		Composite parentComposite = (Composite) parent;
 
 		// Ensure that all rendered PartStacks have an Id
@@ -603,9 +592,8 @@ public class StackRenderer extends LazyStackRenderer {
 			element.setElementId(generatedId);
 		}
 
-		int styleOverride = getStyleOverride(pStack);
-		int style = styleOverride == -1 ? SWT.BORDER : styleOverride;
-		final CTabFolder ctf = new CTabFolder(parentComposite, style);
+		// TBD: need to define attributes to handle this
+		final CTabFolder ctf = new CTabFolder(parentComposite, SWT.BORDER);
 		ctf.setMRUVisible(getInitialMRUValue(ctf));
 
 		// Adjust the minimum chars based on the location
@@ -713,7 +701,7 @@ public class StackRenderer extends LazyStackRenderer {
 			// Gather the parameters...old part, new part...
 			MPartStack stack = (MPartStack) ctf.getData(OWNING_ME);
 			MUIElement element = stack.getSelectedElement();
-			MPart curPart = (MPart) ctf.getTopRight().getData(THE_PART_KEY);
+			MPart curPart = (MPart) ctf.getTopRight().getData("thePart"); //$NON-NLS-1$
 			MPart part = null;
 			if (element != null) {
 				part = (MPart) ((element instanceof MPart) ? element
@@ -744,13 +732,13 @@ public class StackRenderer extends LazyStackRenderer {
 			// visible or not
 			RowData rd = (RowData) menuTB.getLayoutData();
 			if (needsMenu) {
-				menuTB.getItem(0).setData(THE_PART_KEY, part);
+				menuTB.getItem(0).setData("thePart", part); //$NON-NLS-1$
 				menuTB.moveBelow(null);
 				menuTB.pack();
 				rd.exclude = false;
 				menuTB.setVisible(true);
 			} else {
-				menuTB.getItem(0).setData(THE_PART_KEY, null);
+				menuTB.getItem(0).setData("thePart", null); //$NON-NLS-1$
 				rd.exclude = true;
 				menuTB.setVisible(false);
 			}
@@ -772,11 +760,11 @@ public class StackRenderer extends LazyStackRenderer {
 			}
 
 			if (needsMenu || needsTB) {
-				ctf.getTopRight().setData(THE_PART_KEY, part);
+				ctf.getTopRight().setData("thePart", part); //$NON-NLS-1$
 				ctf.getTopRight().pack(true);
 				ctf.getTopRight().setVisible(true);
 			} else {
-				ctf.getTopRight().setData(THE_PART_KEY, null);
+				ctf.getTopRight().setData("thePart", null); //$NON-NLS-1$
 				ctf.getTopRight().setVisible(false);
 			}
 
@@ -1252,10 +1240,7 @@ public class StackRenderer extends LazyStackRenderer {
 	 * @param item
 	 */
 	protected void showMenu(ToolItem item) {
-		MPart part = (MPart) item.getData(THE_PART_KEY);
-		if (part == null) {
-			return;
-		}
+		MPart part = (MPart) item.getData("thePart"); //$NON-NLS-1$
 		Control ctrl = (Control) part.getWidget();
 		MMenu menuModel = getViewMenu(part);
 		if (menuModel == null || !menuModel.isToBeRendered())
@@ -1280,7 +1265,7 @@ public class StackRenderer extends LazyStackRenderer {
 		swtMenu.setLocation(displayAt);
 		swtMenu.setVisible(true);
 
-		Display display = swtMenu.getDisplay();
+		Display display = Display.getCurrent();
 		while (!swtMenu.isDisposed() && swtMenu.isVisible()) {
 			if (!display.readAndDispatch())
 				display.sleep();
@@ -1293,12 +1278,42 @@ public class StackRenderer extends LazyStackRenderer {
 
 	private Image getViewMenuImage() {
 		if (viewMenuImage == null) {
-			Bundle bundle = FrameworkUtil.getBundle(this.getClass());
-			URL url = FileLocator.find(bundle, new Path(
-					"icons/full/etool16/view_dropdown.png"), null); //$NON-NLS-1$
-			ImageDescriptor imageDescriptor = ImageDescriptor
-					.createFromURL(url);
-			viewMenuImage = imageDescriptor.createImage();
+			Display d = Display.getCurrent();
+
+			Image viewMenu = new Image(d, 16, 16);
+			Image viewMenuMask = new Image(d, 16, 16);
+
+			Display display = Display.getCurrent();
+			GC gc = new GC(viewMenu);
+			GC maskgc = new GC(viewMenuMask);
+			gc.setForeground(display
+					.getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW));
+			gc.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+
+			int[] shapeArray = new int[] { 6, 1, 15, 1, 11, 5, 10, 5 };
+			gc.fillPolygon(shapeArray);
+			gc.drawPolygon(shapeArray);
+
+			Color black = display.getSystemColor(SWT.COLOR_BLACK);
+			Color white = display.getSystemColor(SWT.COLOR_WHITE);
+
+			maskgc.setBackground(black);
+			maskgc.fillRectangle(0, 0, 16, 16);
+
+			maskgc.setBackground(white);
+			maskgc.setForeground(white);
+			maskgc.fillPolygon(shapeArray);
+			maskgc.drawPolygon(shapeArray);
+			gc.dispose();
+			maskgc.dispose();
+
+			ImageData data = viewMenu.getImageData();
+			data.transparentPixel = data.getPixel(0, 0);
+
+			viewMenuImage = new Image(d, viewMenu.getImageData(),
+					viewMenuMask.getImageData());
+			viewMenu.dispose();
+			viewMenuMask.dispose();
 		}
 		return viewMenuImage;
 	}
@@ -1622,5 +1637,4 @@ public class StackRenderer extends LazyStackRenderer {
 			return newValue == null && tagName.equals(oldValue);
 		}
 	}
-
 }

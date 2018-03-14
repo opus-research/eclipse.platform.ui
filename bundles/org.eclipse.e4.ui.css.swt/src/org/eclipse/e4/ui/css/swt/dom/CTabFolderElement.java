@@ -16,7 +16,6 @@ import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.internal.css.swt.ICTabRendering;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Widget;
@@ -82,11 +81,10 @@ public class CTabFolderElement extends CompositeElement {
 
 	@Override
 	public void reset() {
+		super.reset();
 		CTabFolder folder = (CTabFolder) getWidget();
 		folder.setSelectionBackground((Color) null);
 		folder.setSelectionForeground((Color) null);
-		folder.setSelectionBackground((Image) null);
-
 		folder.setBackground(null, null);
 		resetChildrenBackground(folder);
 
@@ -100,7 +98,6 @@ public class CTabFolderElement extends CompositeElement {
 			renderer.setOuterKeyline(null);
 			renderer.setShadowColor(null);
 		}
-		super.reset();
 	}
 
 	private void resetChildrenBackground(Composite composite) {
