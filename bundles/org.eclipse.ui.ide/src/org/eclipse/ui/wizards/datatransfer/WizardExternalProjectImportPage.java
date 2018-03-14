@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,7 +23,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
@@ -438,11 +437,8 @@ public class WizardExternalProjectImportPage extends WizardPage {
 			protected void execute(IProgressMonitor monitor)
                     throws CoreException {
 				SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
-				project.create(description, subMonitor.newChild(50));
-				if (subMonitor.isCanceled()) {
-					throw new OperationCanceledException();
-				}
-				project.open(IResource.BACKGROUND_REFRESH, subMonitor.newChild(50));
+				project.create(description, subMonitor.split(50));
+				project.open(IResource.BACKGROUND_REFRESH, subMonitor.split(50));
             }
         };
 

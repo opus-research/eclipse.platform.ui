@@ -5,7 +5,9 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ MaximizableChildrenTag.class })
+@SuiteClasses({
+//	MaximizeBugTest.class, 
+	MaximizePartSashContainerPlaceholderTest.class })
 public class AllTests {
 
 }

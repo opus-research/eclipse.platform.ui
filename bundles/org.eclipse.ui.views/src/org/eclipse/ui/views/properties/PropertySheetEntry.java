@@ -10,20 +10,18 @@
  *     Gunnar Wagenknecht - fix for bug 21756 [PropertiesView] property view sorting
  *     Kevin Milburn - [Bug 423214] [PropertiesView] add support for IColorProvider and IFontProvider
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 460405
- *     Stefan Winkler <stefan@winklerweb.net>- Bug 477848
  *******************************************************************************/
 
 package org.eclipse.ui.views.properties;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.commands.common.EventManager;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ICellEditorListener;
 import org.eclipse.jface.viewers.IColorProvider;
@@ -33,7 +31,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.internal.views.ViewsPlugin;
 
 /**
  * <code>PropertySheetEntry</code> is an implementation of
@@ -54,8 +51,7 @@ import org.eclipse.ui.internal.views.ViewsPlugin;
  *
  * @since 3.0 (was previously internal)
  */
-public class PropertySheetEntry extends EventManager implements
-		IPropertySheetEntry {
+public class PropertySheetEntry extends EventManager implements IPropertySheetEntry {
 
 	/**
 	 * The values we are displaying/editing. These objects repesent the value of
@@ -161,14 +157,14 @@ public class PropertySheetEntry extends EventManager implements
 	 *
 	 * @return List
 	 */
-	private List<IPropertyDescriptor> computeMergedPropertyDescriptors() {
+	private List computeMergedPropertyDescriptors() {
 		if (values.length == 0) {
-			return Collections.emptyList();
+			return new ArrayList(0);
 		}
 
 		IPropertySource firstSource = getPropertySource(values[0]);
 		if (firstSource == null) {
-			return Collections.emptyList();
+			return new ArrayList(0);
 		}
 
 		if (values.length == 1) {
@@ -176,41 +172,41 @@ public class PropertySheetEntry extends EventManager implements
 		}
 
 		// get all descriptors from each object
-		ArrayList<Map<Object, IPropertyDescriptor>> propertyDescriptorMaps = new ArrayList<>(values.length);
+		Map[] propertyDescriptorMaps = new Map[values.length];
 		for (int i = 0; i < values.length; i++) {
 			Object object = values[i];
 			IPropertySource source = getPropertySource(object);
 			if (source == null) {
 				// if one of the selected items is not a property source
 				// then we show no properties
-				return Collections.emptyList();
+				return new ArrayList(0);
 			}
 			// get the property descriptors keyed by id
-			propertyDescriptorMaps.add(computePropertyDescriptorsFor(source));
+			propertyDescriptorMaps[i] = computePropertyDescriptorsFor(source);
 		}
 
 		// intersect
-		Map<Object, IPropertyDescriptor> intersection = propertyDescriptorMaps.get(0);
-		for (int i = 1; i < propertyDescriptorMaps.size(); i++) {
+		Map intersection = propertyDescriptorMaps[0];
+		for (int i = 1; i < propertyDescriptorMaps.length; i++) {
 			// get the current ids
-			Set<Object> ids = intersection.keySet();
-			for (Object id : ids) {
-				IPropertyDescriptor descriptor = propertyDescriptorMaps.get(i).get(id);
-				if (descriptor == null ||
-						// see if the descriptors (which have the same id) are
+			Object[] ids = intersection.keySet().toArray();
+			for (int j = 0; j < ids.length; j++) {
+				Object object = propertyDescriptorMaps[i].get(ids[j]);
+				if (object == null ||
+				// see if the descriptors (which have the same id) are
 						// compatible
-						!(intersection.get(id).isCompatibleWith(descriptor))) {
-					intersection.remove(id);
+						!((IPropertyDescriptor) intersection.get(ids[j]))
+								.isCompatibleWith((IPropertyDescriptor) object)) {
+					intersection.remove(ids[j]);
 				}
 			}
 		}
 
 		// sorting is handled in the PropertySheetViewer, return unsorted (in
 		// the original order)
-		ArrayList<IPropertyDescriptor> result = new ArrayList<IPropertyDescriptor>(intersection.size());
+		ArrayList result = new ArrayList(intersection.size());
 		IPropertyDescriptor[] firstDescs = firstSource.getPropertyDescriptors();
-		for (int i = 0; i < firstDescs.length; i++) {
-			IPropertyDescriptor desc = firstDescs[i];
+		for (IPropertyDescriptor desc : firstDescs) {
 			if (intersection.containsKey(desc.getId())) {
 				result.add(desc);
 			}
@@ -219,18 +215,18 @@ public class PropertySheetEntry extends EventManager implements
 	}
 
 	/**
-	 * Returns an map of property descritptors (keyed on id) for the given
+	 * Returns an map of property descriptors (keyed on id) for the given
 	 * property source.
 	 *
 	 * @param source
 	 *            a property source for which to obtain descriptors
-	 * @return a table of decriptors keyed on their id
+	 * @return a table of descriptors keyed on their id
 	 */
-	private Map<Object, IPropertyDescriptor> computePropertyDescriptorsFor(IPropertySource source) {
+	private Map computePropertyDescriptorsFor(IPropertySource source) {
 		IPropertyDescriptor[] descriptors = source.getPropertyDescriptors();
-		Map<Object, IPropertyDescriptor> result = new HashMap<>(descriptors.length * 2 + 1);
-		for (int i = 0; i < descriptors.length; i++) {
-			result.put(descriptors[i].getId(), descriptors[i]);
+		Map result = new HashMap(descriptors.length * 2 + 1);
+		for (IPropertyDescriptor desc : descriptors) {
+			result.put(desc.getId(), desc);
 		}
 		return result;
 	}
@@ -240,13 +236,13 @@ public class PropertySheetEntry extends EventManager implements
 	 */
 	private void createChildEntries() {
 		// get the current descriptors
-		List<IPropertyDescriptor> descriptors = computeMergedPropertyDescriptors();
+		List descriptors = computeMergedPropertyDescriptors();
 
 		// rebuild child entries using old when possible
 		PropertySheetEntry[] newEntries = new PropertySheetEntry[descriptors
 				.size()];
 		for (int i = 0; i < descriptors.size(); i++) {
-			IPropertyDescriptor d = descriptors.get(i);
+			IPropertyDescriptor d = (IPropertyDescriptor) descriptors.get(i);
 			// create new entry
 			PropertySheetEntry entry = createChildEntry();
 			entry.setDescriptor(d);
@@ -284,12 +280,12 @@ public class PropertySheetEntry extends EventManager implements
 		PropertySheetEntry[] entriesToDispose = childEntries;
 		childEntries = null;
 		if (entriesToDispose != null) {
-			for (int i = 0; i < entriesToDispose.length; i++) {
+			for (PropertySheetEntry element : entriesToDispose) {
 				// an error in a property source may cause refreshChildEntries
 				// to fail. Since the Workbench handles such errors we
 				// can be left in a state where a child entry is null.
-				if (entriesToDispose[i] != null) {
-					entriesToDispose[i].dispose();
+				if (element != null) {
+					element.dispose();
 				}
 			}
 		}
@@ -301,8 +297,8 @@ public class PropertySheetEntry extends EventManager implements
 	 */
 	private void fireChildEntriesChanged() {
 		Object[] array = getListeners();
-		for (int i = 0; i < array.length; i++) {
-			IPropertySheetEntryListener listener = (IPropertySheetEntryListener) array[i];
+		for (Object element : array) {
+			IPropertySheetEntryListener listener = (IPropertySheetEntryListener) element;
 			listener.childEntriesChanged(this);
 		}
 	}
@@ -313,8 +309,8 @@ public class PropertySheetEntry extends EventManager implements
 	 */
 	private void fireErrorMessageChanged() {
 		Object[] array = getListeners();
-		for (int i = 0; i < array.length; i++) {
-			IPropertySheetEntryListener listener = (IPropertySheetEntryListener) array[i];
+		for (Object element : array) {
+			IPropertySheetEntryListener listener = (IPropertySheetEntryListener) element;
 			listener.errorMessageChanged(this);
 		}
 	}
@@ -325,8 +321,8 @@ public class PropertySheetEntry extends EventManager implements
 	 */
 	private void fireValueChanged() {
 		Object[] array = getListeners();
-		for (int i = 0; i < array.length; i++) {
-			IPropertySheetEntryListener listener = (IPropertySheetEntryListener) array[i];
+		for (Object element : array) {
+			IPropertySheetEntryListener listener = (IPropertySheetEntryListener) element;
 			listener.valueChanged(this);
 		}
 	}
@@ -447,14 +443,13 @@ public class PropertySheetEntry extends EventManager implements
 		IPropertySourceProvider provider = propertySourceProvider;
 
 		if (provider == null && object != null) {
-			provider = ViewsPlugin.getAdapter(object,
-                    IPropertySourceProvider.class, false);
+			provider = Adapters.adapt(object, IPropertySourceProvider.class);
         }
 
 		if (provider != null) {
 			result = provider.getPropertySource(object);
 		} else {
-			result = ViewsPlugin.getAdapter(object, IPropertySource.class, false);
+			result = Adapters.adapt(object, IPropertySource.class);
         }
 
 		sources.put(object, result);
@@ -508,19 +503,18 @@ public class PropertySheetEntry extends EventManager implements
 		}
 
 		// get the current descriptors
-		List<IPropertyDescriptor> descriptors = computeMergedPropertyDescriptors();
+		List descriptors = computeMergedPropertyDescriptors();
 
 		// cache old entries by their descriptor id
-		Map<Object, PropertySheetEntry> entryCache = new HashMap<>(childEntries.length * 2 + 1);
-		for (int i = 0; i < childEntries.length; i++) {
-			PropertySheetEntry childEntry = childEntries[i];
+		Map entryCache = new HashMap(childEntries.length * 2 + 1);
+		for (PropertySheetEntry childEntry : childEntries) {
 			if (childEntry != null) {
 				entryCache.put(childEntry.getDescriptor().getId(), childEntry);
 			}
 		}
 
 		// create a list of entries to dispose
-		List<PropertySheetEntry> entriesToDispose = new ArrayList<>(Arrays.asList(childEntries));
+		List entriesToDispose = new ArrayList(Arrays.asList(childEntries));
 
 		// clear the old entries
 		this.childEntries = null;
@@ -530,9 +524,9 @@ public class PropertySheetEntry extends EventManager implements
 				.size()];
 		boolean entriesChanged = descriptors.size() != entryCache.size();
 		for (int i = 0; i < descriptors.size(); i++) {
-			IPropertyDescriptor d = descriptors.get(i);
+			IPropertyDescriptor d = (IPropertyDescriptor) descriptors.get(i);
 			// see if we have an entry matching this descriptor
-			PropertySheetEntry entry = entryCache.get(d
+			PropertySheetEntry entry = (PropertySheetEntry) entryCache.get(d
 					.getId());
 			if (entry != null) {
 				// reuse old entry
@@ -612,8 +606,8 @@ public class PropertySheetEntry extends EventManager implements
 		// Use our parent's values to reset our values.
 		boolean change = false;
 		Object[] objects = parent.getValues();
-		for (int i = 0; i < objects.length; i++) {
-			IPropertySource source = getPropertySource(objects[i]);
+		for (Object object : objects) {
+			IPropertySource source = getPropertySource(object);
 			if (source.isPropertySet(descriptor.getId())) {
 				// fix for https://bugs.eclipse.org/bugs/show_bug.cgi?id=21756
 				if (source instanceof IPropertySource2) {
@@ -718,7 +712,7 @@ public class PropertySheetEntry extends EventManager implements
 	@Override
 	public void setValues(Object[] objects) {
 		values = objects;
-		sources = new HashMap<>(values.length * 2 + 1);
+		sources = new HashMap(values.length * 2 + 1);
 
 		if (values.length == 0) {
 			editValue = null;

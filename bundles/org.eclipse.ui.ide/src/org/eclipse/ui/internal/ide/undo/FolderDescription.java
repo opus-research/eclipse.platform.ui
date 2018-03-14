@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 
 /**
@@ -83,25 +82,19 @@ public class FolderDescription extends ContainerDescription {
 		IFolder folderHandle = (IFolder) resource;
 		SubMonitor subMonitor = SubMonitor.convert(mon, 300);
 		subMonitor.setTaskName(UndoMessages.FolderDescription_NewFolderProgress);
-		if (subMonitor.isCanceled()) {
-			throw new OperationCanceledException();
-		}
 		if (filters != null) {
-			SubMonitor loopMonitor = subMonitor.newChild(100).setWorkRemaining(filters.length);
+			SubMonitor loopMonitor = subMonitor.split(100).setWorkRemaining(filters.length);
 			for (int i = 0; i < filters.length; i++) {
 				folderHandle.createFilter(filters[i].getType(), filters[i].getFileInfoMatcherDescription(), 0,
-						loopMonitor.newChild(1));
+						loopMonitor.split(1));
 			}
 		}
 		subMonitor.setWorkRemaining(200);
 		if (location != null) {
-			folderHandle.createLink(location, IResource.ALLOW_MISSING_LOCAL, subMonitor.newChild(100));
+			folderHandle.createLink(location, IResource.ALLOW_MISSING_LOCAL, subMonitor.split(100));
 		} else {
-			folderHandle.create(virtual ? IResource.VIRTUAL : 0, true, subMonitor.newChild(100));
+			folderHandle.create(virtual ? IResource.VIRTUAL : 0, true, subMonitor.split(100));
 		}
-		if (subMonitor.isCanceled()) {
-			throw new OperationCanceledException();
-		}
-		createChildResources(folderHandle, subMonitor.newChild(100));
+		createChildResources(folderHandle, subMonitor.split(100));
 	}
 }

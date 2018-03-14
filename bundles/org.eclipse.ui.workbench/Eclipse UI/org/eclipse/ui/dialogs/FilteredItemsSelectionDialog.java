@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -132,8 +132,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
  *
  * @since 3.3
  */
-public abstract class FilteredItemsSelectionDialog extends
-		SelectionStatusDialog {
+public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog {
 
 	private static final String DIALOG_BOUNDS_SETTINGS = "DialogBoundsSettings"; //$NON-NLS-1$
 
@@ -2095,7 +2094,7 @@ public abstract class FilteredItemsSelectionDialog extends
 									WorkbenchMessages.FilteredItemsSelectionDialog_searchJob_taskName,
 									100);
 
-				fillContentProvider(contentProvider, itemsFilter, subMonitor.newChild(95));
+				fillContentProvider(contentProvider, itemsFilter, subMonitor.split(95));
 
 				if (monitor != null && !monitor.isCanceled()) {
 					subMonitor.worked(2);
@@ -2821,14 +2820,14 @@ public abstract class FilteredItemsSelectionDialog extends
 
 			// the TableViewer's root (the input) is treated as parent
 
-			lastFilteredItems = Arrays.asList(getFilteredItems(list.getInput(), subMonitor.newChild(100)));
+			lastFilteredItems = Arrays.asList(getFilteredItems(list.getInput(), subMonitor.split(100)));
 
 			if (reset || subMonitor.isCanceled()) {
 				return;
 			}
 
 			if (checkDuplicates) {
-				checkDuplicates(subMonitor.newChild(100));
+				checkDuplicates(subMonitor.split(100));
 			}
 		}
 

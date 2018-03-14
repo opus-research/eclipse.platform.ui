@@ -177,7 +177,6 @@ import org.eclipse.ui.internal.menus.IActionSetsListener;
 import org.eclipse.ui.internal.menus.LegacyActionPersistence;
 import org.eclipse.ui.internal.menus.MenuHelper;
 import org.eclipse.ui.internal.menus.SlaveMenuService;
-import org.eclipse.ui.internal.menus.WorkbenchMenuService;
 import org.eclipse.ui.internal.misc.UIListenerLogging;
 import org.eclipse.ui.internal.progress.ProgressRegion;
 import org.eclipse.ui.internal.provisional.application.IActionBarConfigurer2;
@@ -208,6 +207,10 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	 * The 'elementId' of the spacer used to right-align it in the trim
 	 */
 	public static final String PERSPECTIVE_SPACER_ID = "PerspectiveSpacer"; //$NON-NLS-1$
+
+	public static final String STATUS_LINE_ID = "org.eclipse.ui.StatusLine"; //$NON-NLS-1$
+
+	public static final String TRIM_CONTRIBUTION_URI = "bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.StandardTrim"; //$NON-NLS-1$
 
 	private static final String MAIN_TOOLBAR_ID = ActionSet.MAIN_TOOLBAR;
 	private static final String COMMAND_ID_TOGGLE_COOLBAR = "org.eclipse.ui.ToggleCoolbarAction"; //$NON-NLS-1$
@@ -1115,12 +1118,11 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	private void populateStandardTrim(MTrimBar bottomTrim) {
 		// StatusLine
 		MToolControl slElement = (MToolControl) modelService.find(
-				"org.eclipse.ui.StatusLine", model); //$NON-NLS-1$
+STATUS_LINE_ID, model);
 		if (slElement == null) {
 			slElement = modelService.createModelElement(MToolControl.class);
-			slElement.setElementId("org.eclipse.ui.StatusLine"); //$NON-NLS-1$
-			slElement
-					.setContributionURI("bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.StandardTrim"); //$NON-NLS-1$
+			slElement.setElementId(STATUS_LINE_ID);
+			slElement.setContributionURI(TRIM_CONTRIBUTION_URI);
 			bottomTrim.getChildren().add(slElement);
 		}
 		slElement.setToBeRendered(statusLineVisible);
@@ -1132,8 +1134,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		if (hsElement == null) {
 			hsElement = modelService.createModelElement(MToolControl.class);
 			hsElement.setElementId("org.eclipse.ui.HeapStatus"); //$NON-NLS-1$
-			hsElement
-					.setContributionURI("bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.StandardTrim"); //$NON-NLS-1$
+			hsElement.setContributionURI(TRIM_CONTRIBUTION_URI);
 			hsElement.getTags().add(IPresentationEngine.DRAGGABLE);
 			bottomTrim.getChildren().add(hsElement);
 		}
@@ -1146,8 +1147,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			pbElement = modelService.createModelElement(MToolControl.class);
 			pbElement.setElementId("org.eclipse.ui.ProgressBar"); //$NON-NLS-1$
 			pbElement.getTags().add(IPresentationEngine.DRAGGABLE);
-			pbElement
-					.setContributionURI("bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.StandardTrim"); //$NON-NLS-1$
+			pbElement.setContributionURI(TRIM_CONTRIBUTION_URI);
 			bottomTrim.getChildren().add(pbElement);
 		}
 		pbElement.setToBeRendered(getWindowConfigurer().getShowProgressIndicator());
@@ -1196,7 +1196,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 									boolean isBefore = "before".equals(orders[0].getAttribute("position")); //$NON-NLS-1$//$NON-NLS-2$
 									String relTo = orders[0].getAttribute("relativeTo"); //$NON-NLS-1$
 									if ("status".equals(relTo)) //$NON-NLS-1$
-										relTo = "org.eclipse.ui.StatusLine"; //$NON-NLS-1$
+										relTo = STATUS_LINE_ID;
 
 									createdTrim = addTrimElement(bottomTrim, item, id, isBefore,
 											relTo, classSpec);
@@ -1540,8 +1540,33 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	 * Assumes that busy cursor is active.
 	 */
 	private boolean busyClose(boolean remove) {
-		if (closing)
+		/*
+		 * Warning: Intricate flow of control and re-entrant invocations of this
+		 * method:
+		 *
+		 * - busyClose(true) is called from WorkbenchWindow#close() when the
+		 * user closes a workbench window.
+		 *
+		 * - busyClose(false) is called from Workbench#close(int, boolean). This
+		 * happens on File > Exit/Restart, [Mac] Quit Eclipse, AND ... tadaa ...
+		 * from busyClose(true) when the user closes the last window => [Case A]
+		 *
+		 * Additional complication: busyClose(true) can also be called again
+		 * when someone runs an event loop during the shutdown sequence. In that
+		 * case, the nested busyClose(true) should be dropped (bug 381555) =>
+		 * [Case B]
+		 */
+		if (closing) {
+			// [Case A] Window is already closing.
 			return false;
+		}
+		if (updateDisabled && remove) {
+			// [Case B] User closed this window, which triggered
+			// "workbench.close()", during which the user tried to close this
+			// window again.
+			return false;
+		}
+
 		// Whether the window was actually closed or not
 		boolean windowClosed = false;
 
@@ -2136,7 +2161,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 				// Disable everything in the bottom trim except the status line
 				if (tpl.bottom != null && !tpl.bottom.isDisposed() && tpl.bottom.isEnabled()) {
-					MUIElement statusLine = modelService.find("org.eclipse.ui.StatusLine", model); //$NON-NLS-1$
+					MUIElement statusLine = modelService.find(STATUS_LINE_ID, model);
 					Object slCtrl = statusLine != null ? statusLine.getWidget() : null;
 					for (Control bottomCtrl : tpl.bottom.getChildren()) {
 						if (bottomCtrl != slCtrl)
@@ -2239,7 +2264,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		IEvaluationService es = (IEvaluationService) serviceLocator
 				.getService(IEvaluationService.class);
 		IEvaluationContext currentState = es.getCurrentState();
-		boolean changeDetected = false;
 		for (int i = 0; i < refs.length; i++) {
 			EvaluationReference reference = refs[i];
 			reference.setPostingChanges(true);
@@ -2248,16 +2272,9 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			reference.clearResult();
 			boolean ns = reference.evaluate(currentState);
 			if (os != ns) {
-				changeDetected = true;
 				reference.getListener().propertyChange(
 						new PropertyChangeEvent(reference, reference.getProperty(), valueOf(os),
 								valueOf(ns)));
-			}
-		}
-		if (changeDetected) {
-			IMenuService ms = getWorkbench().getService(IMenuService.class);
-			if (ms instanceof WorkbenchMenuService) {
-				((WorkbenchMenuService) ms).updateManagers();
 			}
 		}
 	}
@@ -2664,34 +2681,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	}
 
 	/**
-     * Tell the workbench window a visible state for the fastview bar. This is
-     * only applicable if the window configurer also wishes the fast view bar to
-     * be visible.
-     *
-     * @param visible
-     *            <code>true</code> or <code>false</code>
-     * @since 3.2
-     * @deprecated discontinued support for fast views
-     */
-    @Deprecated
-    public void setFastViewBarVisible(boolean visible) {
-        // not supported anymore
-    }
-
-     /**
-	 * Returns the visible state for the fastview bar of the workbench window.
-	 *
-	 * @return <code>false</code>
-	 * @since 3.2
-	 * @deprecated discontinued support for fast views
-	 */
-    @Deprecated
-    public boolean getFastViewBarVisible() {
-        // not supported anymore
-        return false;
-    }
-
-	/**
 	 * @param visible
 	 *            whether the perspective bar should be shown. This is only
 	 *            applicable if the window configurer also wishes either the
@@ -2719,15 +2708,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	public boolean getStatusLineVisible() {
 		return statusLineVisible;
 	}
-
-    /**
-     * @return <code>false</code>
-     * @deprecated discontinued support for fast views
-     */
-    @Deprecated
-    public boolean getShowFastViewBars() {
-        return false;
-    }
 
 	protected boolean showTopSeperator() {
 		return false;

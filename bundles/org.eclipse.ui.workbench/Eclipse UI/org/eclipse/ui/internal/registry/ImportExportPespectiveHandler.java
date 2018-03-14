@@ -40,6 +40,7 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
+import org.eclipse.ui.internal.e4.compatibility.ModeledPageLayout;
 import org.eclipse.ui.internal.e4.migration.PerspectiveBuilder;
 import org.eclipse.ui.internal.e4.migration.PerspectiveReader;
 import org.eclipse.ui.internal.wizards.preferences.PreferencesExportWizard;
@@ -89,7 +90,7 @@ public class ImportExportPespectiveHandler {
 	private List<String> importedPersps = new ArrayList<>();
 	private Map<String, String> minMaxPersistedState;
 
-	private Boolean impExpEnabled;
+	private static Boolean impExpEnabled;
 
 	@PostConstruct
 	private void init() {
@@ -121,10 +122,32 @@ public class ImportExportPespectiveHandler {
 		MPerspective perspective = null;
 		try {
 			perspective = perspFromString((String) event.getNewValue());
+			addShowInTags(perspective);
 		} catch (IOException e) {
 			logError(event, e);
 		}
 		addPerspectiveToWorkbench(perspective);
+	}
+
+	private void addShowInTags(MPerspective perspective) {
+		if (perspective != null) {
+			String targetId = getOriginalId(perspective.getElementId());
+			ArrayList<String> showInTags = PerspectiveBuilder.getShowInPartFromRegistry(targetId);
+			if (showInTags != null) {
+				List<String> newTags = new ArrayList<>();
+				for (String showIn : showInTags) {
+					newTags.add(ModeledPageLayout.SHOW_IN_PART_TAG + showIn);
+				}
+				perspective.getTags().addAll(newTags);
+			}
+		}
+	}
+
+	private String getOriginalId(String id) {
+		int index = id.lastIndexOf('.');
+		if (index == -1)
+			return id;
+		return id.substring(0, index);
 	}
 
 	private void importPerspective3x(PreferenceChangeEvent event) {
@@ -161,12 +184,10 @@ public class ImportExportPespectiveHandler {
 		String perspToOverwriteId = perspToOverwrite.getId();
 		// a perspective with the same label exists, but has different ID
 		if (!perspective.getElementId().equals(perspToOverwriteId)) {
-			logger.warn(String.format("Cannot import perspective \"%s\" because a perspective" //$NON-NLS-1$
-					+ " with the same label but different ID exists in the workbench", perspective.getElementId())); //$NON-NLS-1$
-		} else {
-			perspectiveRegistry.deletePerspective(perspToOverwrite);
-			perspectiveRegistry.addPerspective(perspective);
+			perspective.setElementId(perspToOverwriteId);
 		}
+		perspectiveRegistry.deletePerspective(perspToOverwrite);
+		perspectiveRegistry.addPerspective(perspective);
 		importToolbarsLocation(perspective);
 	}
 
@@ -329,9 +350,14 @@ public class ImportExportPespectiveHandler {
 
 	}
 
-	private boolean isImpExpEnabled() {
+	public static boolean isImpExpEnabled() {
 		if (impExpEnabled == null) {
-			impExpEnabled = Boolean.parseBoolean(System.getProperty("e4.impExpPerspectiveEnabled")); //$NON-NLS-1$
+			String propertyStr = System.getProperty("e4.impExpPerspectiveEnabled"); //$NON-NLS-1$
+			if (propertyStr == null) {
+				impExpEnabled = true;
+			} else {
+				impExpEnabled = Boolean.parseBoolean(propertyStr);
+			}
 		}
 		return impExpEnabled;
 	}

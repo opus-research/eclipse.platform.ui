@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2013 IBM Corporation and others.
+ * Copyright (c) 2011, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 483842
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.addons.cleanupaddon;
@@ -34,7 +35,6 @@ import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.renderers.swt.SashLayout;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -216,7 +216,7 @@ public class CleanupAddon {
 							ctrl.moveBelow(prevControl);
 						else
 							ctrl.moveAbove(null);
-						ctrl.getShell().layout(new Control[] { ctrl }, SWT.DEFER);
+						ctrl.requestLayout();
 					}
 
 					if (!shouldReactToChildVisibilityChanges(parent)) {
@@ -233,9 +233,7 @@ public class CleanupAddon {
 				// Reparent the control to 'limbo'
 				Composite curParent = ctrl.getParent();
 				ctrl.setParent(limbo);
-				curParent.layout(true);
-				if (curParent.getShell() != curParent)
-					curParent.getShell().layout(new Control[] { curParent }, SWT.DEFER);
+				curParent.requestLayout();
 
 				// Always leave Window's in the presentation
 				if ((Object) parent instanceof MWindow)

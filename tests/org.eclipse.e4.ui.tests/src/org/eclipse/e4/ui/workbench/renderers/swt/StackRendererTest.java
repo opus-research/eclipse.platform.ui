@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 IBM Corporation and others.
+ * Copyright (c) 2013, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,8 @@
 
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
+import static org.junit.Assert.assertEquals;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -18,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import junit.framework.TestCase;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.swt.CSSConstants;
@@ -37,19 +38,21 @@ import org.eclipse.e4.ui.services.internal.events.EventBroker;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.widgets.Display;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class StackRendererTest extends TestCase {
+public class StackRendererTest {
 	private IEclipseContext context;
 	private E4Workbench wb;
 	private MPart part;
 	private CTabItemStylingMethodsListener executedMethodsListener;
 	private MPartStack partStack;
 
-	@Override
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		context = E4Application.createDefaultContext();
-		context.set(E4Workbench.PRESENTATION_URI_ARG,
-				PartRenderingEngine.engineURI);
+		context.set(E4Workbench.PRESENTATION_URI_ARG, PartRenderingEngine.engineURI);
 
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -65,7 +68,7 @@ public class StackRendererTest extends TestCase {
 		partStack.getChildren().add(part);
 
 		application.setContext(context);
-		context.set(MApplication.class.getName(), application);
+		context.set(MApplication.class, application);
 
 		executedMethodsListener = new CTabItemStylingMethodsListener(part);
 
@@ -82,14 +85,15 @@ public class StackRendererTest extends TestCase {
 			;
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() throws Exception {
 		if (wb != null) {
 			wb.close();
 		}
 		context.dispose();
 	}
 
+	@Test
 	public void testTabStateHandlerWhenOneOfSupportedTagChangeEvents()
 			throws Exception {
 		// given
@@ -110,10 +114,10 @@ public class StackRendererTest extends TestCase {
 						.getMethodExecutionCount("setClassnameAndId(.+)"));
 	}
 
+	@Test
 	public void testTabStateHandlerWhenSelectionChangedEvent() throws Exception {
 		// given
-		MPlaceholder placeHolder = AdvancedFactoryImpl.eINSTANCE
-				.createPlaceholder();
+		MPlaceholder placeHolder = AdvancedFactoryImpl.eINSTANCE.createPlaceholder();
 		placeHolder.setRef(part);
 
 		HashMap<String, Object> params = new HashMap<String, Object>();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -450,7 +451,7 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 			List<SaveablesProvider> result = new ArrayList<SaveablesProvider>();
 			for (int i = 0; i < descriptors.length; i++) {
 				NavigatorContentDescriptor descriptor = (NavigatorContentDescriptor) descriptors[i];
-				String pluginId = ((NavigatorContentDescriptor) descriptor)
+				String pluginId = descriptor
 						.getContribution().getPluginId();
 				if (Platform.getBundle(pluginId).getState() != Bundle.ACTIVE) {
 					List<NavigatorContentDescriptor> inactiveDescriptors = inactivePluginsWithSaveablesProviders
@@ -488,7 +489,7 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 		ITreeContentProvider contentProvider = extension
 				.getContentProvider();
 
-        return (SaveablesProvider)AdaptabilityUtility.getAdapter(contentProvider, SaveablesProvider.class);
+		return Adapters.adapt(contentProvider, SaveablesProvider.class);
 	}
 
 	private void recomputeSaveablesAndNotify(boolean recomputeProviders,

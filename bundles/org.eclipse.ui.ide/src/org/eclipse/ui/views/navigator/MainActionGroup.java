@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,6 +21,7 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -209,9 +210,8 @@ public class MainActionGroup extends ResourceNavigatorActionGroup {
         workingSetGroup.setWorkingSet(navigator.getWorkingSet());
         sortAndFilterGroup = new SortAndFilterActionGroup(navigator);
         workspaceGroup = new WorkspaceActionGroup(navigator);
-        IUndoContext workspaceContext= ResourcesPlugin.getWorkspace().getAdapter(IUndoContext.class);
+		IUndoContext workspaceContext = Adapters.adapt(ResourcesPlugin.getWorkspace(), IUndoContext.class);
 		undoRedoGroup= new UndoRedoActionGroup(getNavigator().getSite(), workspaceContext, true);
-
     }
 
     /**

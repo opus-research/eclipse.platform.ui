@@ -22,8 +22,8 @@
   <packaging>eclipse-test-plugin</packaging>
 
   <properties>
-  	<testSuite>${project.artifactId}</testSuite>
-  	<testClass>org.eclipse.e4.ui.workbench.addons.swt.test.AllTests</testClass>
+	<unitTestSuite>org.eclipse.e4.ui.workbench.addons.swt.test.AllTests</unitTestSuite>
+ 	<skipTests>false</skipTests>
   </properties>
 
   <build>
@@ -33,8 +33,15 @@
   			<artifactId>tycho-surefire-plugin</artifactId>
   			<version>${tycho.version}</version>
   			<configuration>
-  				<useUIHarness>false</useUIHarness>
-  				<useUIThread>false</useUIThread>
+  				<useUIHarness>true</useUIHarness>
+  				<useUIThread>true</useUIThread>
+  				<dependencies>
+					<dependency>
+						<type>eclipse-plugin</type>
+						<artifactId>org.eclipse.e4.ui.workbench.addons.swt</artifactId>
+						<version>0.0.0</version>
+					</dependency>
+  				</dependencies>
   			</configuration>
   		</plugin>
   	</plugins>

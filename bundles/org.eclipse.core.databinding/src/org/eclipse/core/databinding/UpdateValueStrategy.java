@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2009 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -584,4 +584,15 @@ public class UpdateValueStrategy extends UpdateStrategy {
 		}
 	}
 
+	/**
+	 * Create an {@link UpdateValueStrategy} with a converter
+	 *
+	 * @param converter
+	 *            the converter
+	 * @return the update value strategy
+	 * @since 1.6
+	 */
+	public static UpdateValueStrategy create(IConverter converter) {
+		return new UpdateValueStrategy().setConverter(converter);
+	}
 }

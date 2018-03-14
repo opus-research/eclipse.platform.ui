@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,8 +30,8 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -272,7 +272,7 @@ public class ImportOperation extends WorkspaceModifyOperation {
                 }
                 if (provider.isFolder(nextSource)) {
 					collectExistingReadonlyFiles(newDestinationPath, provider.getChildren(nextSource), noOverwrite,
-							overwriteReadonly, POLICY_FORCE_OVERWRITE, subMonitor.newChild(100));
+							overwriteReadonly, POLICY_FORCE_OVERWRITE, subMonitor.split(100));
 				}
             } else {
                 IFile file = getFile(newDestination);
@@ -376,16 +376,16 @@ public class ImportOperation extends WorkspaceModifyOperation {
             if (selectedFiles == null) {
 				ContainerGenerator generator = new ContainerGenerator(destinationPath);
 				subMonitor.worked(3);
-				validateFiles(Arrays.asList(new Object[] { source }), subMonitor.newChild(3));
-				destinationContainer = generator.generateContainer(subMonitor.newChild(4));
-				importRecursivelyFrom(source, POLICY_DEFAULT, subMonitor.newChild(90));
+				validateFiles(Arrays.asList(new Object[] { source }), subMonitor.split(3));
+				destinationContainer = generator.generateContainer(subMonitor.split(4));
+				importRecursivelyFrom(source, POLICY_DEFAULT, subMonitor.split(90));
             } else {
                 // Choose twice the selected files size to take folders into account
 				ContainerGenerator generator = new ContainerGenerator(destinationPath);
 				subMonitor.worked(3);
-				validateFiles(selectedFiles, subMonitor.newChild(3));
-				destinationContainer = generator.generateContainer(subMonitor.newChild(4));
-				importFileSystemObjects(selectedFiles, subMonitor.newChild(90));
+				validateFiles(selectedFiles, subMonitor.split(3));
+				destinationContainer = generator.generateContainer(subMonitor.split(4));
+				importFileSystemObjects(selectedFiles, subMonitor.split(90));
             }
         } catch (CoreException e) {
             errorTable.add(e.getStatus());
@@ -427,15 +427,10 @@ public class ImportOperation extends WorkspaceModifyOperation {
      * 	<code>null</code> if the resource does not adapt to IFile
      */
     IFile getFile(IResource resource) {
-        if (resource instanceof IFile) {
-            return (IFile) resource;
-        }
-        Object adapted = ((IAdaptable) resource).getAdapter(IFile.class);
-        if(adapted == null) {
-			return null;
-		}
-        return (IFile) adapted;
-
+		// TODO: Check if this is necessary. No IResource should
+		// adapt to IFile unless it *is* an IFile. An instanceof check
+		// might be better
+		return Adapters.adapt(resource, IFile.class);
     }
 
     /**
@@ -446,14 +441,10 @@ public class ImportOperation extends WorkspaceModifyOperation {
      * 	<code>null</code> if the resource does not adapt to IFolder
      */
     IFolder getFolder(IResource resource) {
-        if (resource instanceof IFolder) {
-            return (IFolder) resource;
-        }
-        Object adapted = ((IAdaptable) resource).getAdapter(IFolder.class);
-        if(adapted == null) {
-			return null;
-		}
-        return (IFolder) adapted;
+		// TODO: Check if this is necessary. No IResource should
+		// adapt to IFolder unless it *is* an IFolder. An instanceof
+		// check might be better
+		return Adapters.adapt(resource, IFolder.class);
     }
 
     /**
@@ -548,19 +539,19 @@ public class ImportOperation extends WorkspaceModifyOperation {
 		try {
 			if (createVirtualFolder || createLinks || createLinkFilesOnly) {
 				if (targetResource.exists())
-					targetResource.delete(true, subMonitor.newChild(50));
+					targetResource.delete(true, subMonitor.split(50));
 				targetResource.createLink(
 						createRelativePath(new Path(provider.getFullPath(fileObject)), targetResource), 0,
-						subMonitor.newChild(50));
+						subMonitor.split(50));
 			} else {
 				if (targetResource.exists()) {
 					if (targetResource.isLinked()) {
-						targetResource.delete(true, subMonitor.newChild(50));
-						targetResource.create(contentStream, false, subMonitor.newChild(50));
+						targetResource.delete(true, subMonitor.split(50));
+						targetResource.create(contentStream, false, subMonitor.split(50));
 					} else
-						targetResource.setContents(contentStream, IResource.KEEP_HISTORY, subMonitor.newChild(100));
+						targetResource.setContents(contentStream, IResource.KEEP_HISTORY, subMonitor.split(100));
 				} else
-					targetResource.create(contentStream, false, subMonitor.newChild(100));
+					targetResource.create(contentStream, false, subMonitor.split(100));
 			}
 			setResourceAttributes(targetResource, fileObject);
 
@@ -635,7 +626,7 @@ public class ImportOperation extends WorkspaceModifyOperation {
 		SubMonitor subMonitor = SubMonitor.convert(monitor, filesToImport.size());
         Iterator filesEnum = filesToImport.iterator();
         while (filesEnum.hasNext()) {
-			SubMonitor iterationMonitor = subMonitor.newChild(1);
+			SubMonitor iterationMonitor = subMonitor.split(1);
             Object fileSystemObject = filesEnum.next();
             if (source == null) {
                 // We just import what we are given into the destination
@@ -756,21 +747,17 @@ public class ImportOperation extends WorkspaceModifyOperation {
      */
 	void importRecursivelyFrom(Object fileSystemObject, int policy, IProgressMonitor mon) throws CoreException {
 		SubMonitor subMonitor = SubMonitor.convert(mon, 100);
-		if (subMonitor.isCanceled()) {
-			throw new OperationCanceledException();
-		}
-
         if (!provider.isFolder(fileSystemObject)) {
-			importFile(fileSystemObject, policy, subMonitor.newChild(100));
+			importFile(fileSystemObject, policy, subMonitor.split(100));
             return;
         }
 
-		int childPolicy = importFolder(fileSystemObject, policy, subMonitor.newChild(10));
+		int childPolicy = importFolder(fileSystemObject, policy, subMonitor.split(10));
         if (childPolicy != POLICY_SKIP_CHILDREN) {
 			List children = provider.getChildren(fileSystemObject);
-			SubMonitor loopMonitor = subMonitor.newChild(90).setWorkRemaining(children.size());
+			SubMonitor loopMonitor = subMonitor.split(90).setWorkRemaining(children.size());
 			for (Object child : children) {
-				importRecursivelyFrom(child, childPolicy, loopMonitor.newChild(1));
+				importRecursivelyFrom(child, childPolicy, loopMonitor.split(1));
 			}
         }
     }

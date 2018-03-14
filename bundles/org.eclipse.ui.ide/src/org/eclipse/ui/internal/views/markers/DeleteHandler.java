@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2011 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -50,8 +50,8 @@ public class DeleteHandler extends MarkerViewHandler {
 				null, // icon
 				MarkerMessages.deleteActionConfirmMessage,
 				MessageDialog.WARNING,
-				new String[] { IDialogConstants.YES_LABEL,
-						IDialogConstants.NO_LABEL }, 0);
+				0,
+				IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL);
 
 		if (dialog.open() != 0) {
 			return view;
