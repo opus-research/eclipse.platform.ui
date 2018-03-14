@@ -17,6 +17,7 @@
  * Christian Georgi (SAP) - Bug 423882 - Warn user if workspace is newer than IDE
  * Lars Vogel <Lars.Vogel@vogella.com> - Bug 431862
  * Christian Georgi (SAP SE)           - bug 432480, bug 458811
+ * Kaloyan Raev - [142228] Open unknown file types in text editor
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -980,6 +981,7 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String IDEEditorsPreferencePage_WorkbenchPreference_viewsRelatedLink;
 	public static String IDEEditorsPreferencePage_WorkbenchPreference_FileEditorsRelatedLink;
     public static String IDEEditorsPreferencePage_WorkbenchPreference_contentTypesRelatedLink;
+	public static String IDEEditorsPreferencePage_WorkbenchPreference_openUnknownTextFilesInTextEditor;
 	public static String WorkbenchEncoding_invalidCharset;
 	public static String CopyProjectAction_confirm;
 	public static String CopyProjectAction_warning;

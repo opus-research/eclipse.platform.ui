@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2013 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Kaloyan Raev - [142228] Open unknown file types in text editor
  *******************************************************************************/
 package org.eclipse.ui.ide;
 
@@ -253,6 +254,21 @@ public final class IDE {
 		 * @since 3.10
 		 */
 		public static final String WORKSPACE_NAME = "WORKSPACE_NAME"; //$NON-NLS-1$
+
+		/**
+		 * Specifies whether text files of unknown type should open in the
+		 * internal text editor by default.
+		 *
+		 * Boolean-valued: <code>true</code> if unknown text files open in the
+		 * internal text editor, and <code>false</code> if the operating system
+		 * should be checked if there is a program that can open this file type.
+		 * <p>
+		 * The default value for this preference is: <code>true</code>
+		 * </p>
+		 *
+		 * @since 3.11
+		 */
+		public static final String OPEN_UNKNOWN_TEXT_FILE_IN_TEXT_EDITOR = "OPEN_UNKNOWN_TEXT_FILE_IN_TEXT_EDITOR"; //$NON-NLS-1$
 	}
 
 	/**
