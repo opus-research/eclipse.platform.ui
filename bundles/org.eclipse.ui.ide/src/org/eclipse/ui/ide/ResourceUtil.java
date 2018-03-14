@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 461762
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 478686
  *******************************************************************************/
 package org.eclipse.ui.ide;
 
@@ -15,9 +16,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.mapping.ResourceMapping;
 import org.eclipse.core.resources.mapping.ResourceTraversal;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
@@ -56,11 +56,7 @@ public final class ResourceUtil {
 		}
         // Note: do not treat IFileEditorInput as a special case.  Use the adapter mechanism instead.
         // See Bug 87288 [IDE] [EditorMgmt] Should avoid explicit checks for [I]FileEditorInput
-        Object o = editorInput.getAdapter(IFile.class);
-        if (o instanceof IFile) {
-			return (IFile) o;
-		}
-        return null;
+		return Adapters.adapt(editorInput, IFile.class);
     }
 
     /**
@@ -77,9 +73,9 @@ public final class ResourceUtil {
 		}
         // Note: do not treat IFileEditorInput as a special case.  Use the adapter mechanism instead.
         // See Bug 87288 [IDE] [EditorMgmt] Should avoid explicit checks for [I]FileEditorInput
-        Object o = editorInput.getAdapter(IResource.class);
-        if (o instanceof IResource) {
-			return (IResource) o;
+		IResource resource = Adapters.adapt(editorInput, IResource.class);
+		if (resource != null) {
+			return resource;
 		}
         // the input may adapt to IFile but not IResource
         return getFile(editorInput);
@@ -242,28 +238,16 @@ public final class ResourceUtil {
 
 
 	/**
-     * Returns the specified adapter for the given element, or <code>null</code>
-     * if no such adapter was found.
-     *
-     * @param element the model element
-	 * @param adapterType the type of adapter to look up
-	 * @param forceLoad <code>true</code> to force loading of the plug-in providing the adapter,
-	 *   <code>false</code> otherwise
-     * @return the adapter
-     * @since 3.2
-     */
+	 * See Javadoc of {@link Adapters#adapt(Object, Class, boolean)}.
+	 *
+	 * @since 3.2
+	 *
+	 * @deprecated Use {@link Adapters#adapt(Object, Class, boolean)}
+	 *             instead
+	 */
+	@Deprecated
 	public static <T> T getAdapter(Object element, Class<T> adapterType, boolean forceLoad) {
-		if (element instanceof IAdaptable) {
-			IAdaptable adaptable = (IAdaptable) element;
-			T o = adaptable.getAdapter(adapterType);
-	        if (o != null) {
-	        	return o;
-	        }
-		}
-		if (forceLoad) {
-			return adapterType.cast(Platform.getAdapterManager().loadAdapter(element, adapterType.getName()));
-		}
-		return Platform.getAdapterManager().getAdapter(element, adapterType);
+		return Adapters.adapt(element, adapterType, forceLoad);
 	}
 
 }

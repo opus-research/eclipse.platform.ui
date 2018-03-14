@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -46,7 +47,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.Saveable;
 import org.eclipse.ui.internal.dialogs.EventLoopProgressMonitor;
 import org.eclipse.ui.internal.misc.StatusUtil;
-import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.progress.IJobRunnable;
 import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
 import org.eclipse.ui.statushandlers.StatusManager;
@@ -115,13 +115,13 @@ public class SaveableHelper {
 					String message = NLS.bind(WorkbenchMessages.EditorManager_saveChangesQuestion,
 							LegacyActionTools.escapeMnemonics(part.getTitle()));
 					// Show a dialog.
-					String[] buttons = new String[] {
-							IDialogConstants.YES_LABEL,
-							IDialogConstants.NO_LABEL,
-							IDialogConstants.CANCEL_LABEL };
 					MessageDialog d = new MessageDialog(window.getShell(),
 							WorkbenchMessages.Save_Resource, null, message,
-							MessageDialog.QUESTION, buttons, 0) {
+							MessageDialog.QUESTION,
+							0,
+							IDialogConstants.YES_LABEL,
+							IDialogConstants.NO_LABEL,
+							IDialogConstants.CANCEL_LABEL) {
 						@Override
 						protected int getShellStyle() {
 							return super.getShellStyle() | SWT.SHEET;
@@ -396,8 +396,8 @@ public class SaveableHelper {
 				// this will cause the parts tabs to show the ongoing background operation
 				for (int i = 0; i < parts.length; i++) {
 					IWorkbenchPart workbenchPart = parts[i];
-					IWorkbenchSiteProgressService progressService = workbenchPart.getSite().getAdapter(
-									IWorkbenchSiteProgressService.class);
+					IWorkbenchSiteProgressService progressService = Adapters.adapt(workbenchPart.getSite(),
+							IWorkbenchSiteProgressService.class);
 					progressService.showBusyForFamily(model);
 				}
 				model.disableUI(parts, blockUntilSaved);
@@ -497,10 +497,7 @@ public class SaveableHelper {
 	}
 
 	public static ISaveablePart getSaveable(Object o) {
-		if (o instanceof ISaveablePart) {
-			return (ISaveablePart) o;
-		}
-		return Util.getAdapter(o, ISaveablePart.class);
+		return Adapters.adapt(o, ISaveablePart.class);
 	}
 
 	public static boolean isSaveable(Object o) {
@@ -512,7 +509,7 @@ public class SaveableHelper {
 		if (saveable instanceof ISaveablePart2) {
 			return (ISaveablePart2) saveable;
 		}
-		return Util.getAdapter(o, ISaveablePart2.class);
+		return Adapters.adapt(o, ISaveablePart2.class);
 	}
 
 	public static boolean isSaveable2(Object o) {
