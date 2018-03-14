@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Remy Chi Jian Suen <remy.suen@gmail.com> - Bug 175069 [Preferences] ResourceInfoPage is not setting dialog font on all widgets
  *     Serge Beauchamp (Freescale Semiconductor) - [229633] Project Path Variable Support
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 474273
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
@@ -42,7 +41,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.content.IContentDescription;
-import org.eclipse.core.runtime.jobs.IJobFunction;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ErrorDialog;
@@ -1052,9 +1050,9 @@ public class ResourceInfoPage extends PropertyPage {
 	}
 
 	private void scheduleRecursiveChangesJob(final IResource resource, final List/*<IResourceChange>*/ changes) {
-		Job.create(IDEWorkbenchMessages.ResourceInfo_recursiveChangesJobName, new IJobFunction() {
+		new Job(IDEWorkbenchMessages.ResourceInfo_recursiveChangesJobName) {
 			@Override
-			public IStatus run(final IProgressMonitor monitor) {
+			protected IStatus run(final IProgressMonitor monitor) {
 				try {
 					List/*<IResource>*/ toVisit = getResourcesToVisit(resource);
 
@@ -1089,7 +1087,7 @@ public class ResourceInfoPage extends PropertyPage {
 				}
 				return Status.OK_STATUS;
 			}
-		}).schedule();
+		}.schedule();
 	}
 
 	/**

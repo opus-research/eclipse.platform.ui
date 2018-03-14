@@ -62,12 +62,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.internal.C;
 import org.eclipse.swt.internal.Callback;
-import org.eclipse.swt.internal.cocoa.NSButton;
-import org.eclipse.swt.internal.cocoa.NSControl;
-import org.eclipse.swt.internal.cocoa.NSString;
-import org.eclipse.swt.internal.cocoa.NSToolbar;
-import org.eclipse.swt.internal.cocoa.NSWindow;
-import org.eclipse.swt.internal.cocoa.OS;
+import org.eclipse.swt.internal.gtk.OS;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
@@ -196,7 +191,6 @@ public class CocoaUIHandler {
 
 		final Display display = Display.getDefault();
 		display.syncExec(new Runnable() {
-			@Override
 			public void run() {
 				allocateDelegate(display);
 
@@ -237,7 +231,6 @@ public class CocoaUIHandler {
 			invokeMethod(OS.class, "object_setInstanceVariable", //$NON-NLS-1$
 					new Object[] { idValue, SWT_OBJECT, wrapPointer(delegateJniRef) });
 			display.disposeExec(new Runnable() {
-				@Override
 				public void run() {
 					// TODO Auto-generated method stub
 					if (delegateJniRef != 0) {
@@ -501,7 +494,6 @@ public class CocoaUIHandler {
 			MenuItem item = findMenuItemById(topLevelMenu, menuItemId);
 			if (item != null) {
 				item.addSelectionListener(new SelectionAdapter() {
-					@Override
 					public void widgetSelected(SelectionEvent e) {
 						if (runCommand(commandId) || runAction(commandId)) {
 							e.doit = false;

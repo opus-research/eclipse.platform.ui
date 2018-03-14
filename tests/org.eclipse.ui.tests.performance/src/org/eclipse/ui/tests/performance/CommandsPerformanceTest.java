@@ -178,7 +178,6 @@ public final class CommandsPerformanceTest extends BasicPerformanceTest {
 	 * @throws NotDefinedException
 	 *             If something went wrong initializing the active scheme.
 	 */
-	@Override
 	protected final void doSetUp() throws NotDefinedException, Exception {
 		super.doSetUp();
 
@@ -348,7 +347,6 @@ public final class CommandsPerformanceTest extends BasicPerformanceTest {
 		bindingManager.setBindings(bindings);
 	}
 
-	@Override
 	protected final void doTearDown() throws Exception {
 		bindingManager = null;
 		commandManager = null;
