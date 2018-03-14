@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,10 +8,11 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Dan Rubel <dan_rubel@instantiations.com>
- *     - Fix for bug 11490 - define hidden view (placeholder for view) in plugin.xml    
+ *     - Fix for bug 11490 - define hidden view (placeholder for view) in plugin.xml
  *     Markus Alexander Kuppe, Versant Corporation - bug #215797
  *     Semion Chichelnitsky (semion@il.ibm.com) - bug 208564
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 441184, 441280
+ *     Denis Zygann <d.zygann@web.de> - Bug 457390
  *******************************************************************************/
 package org.eclipse.ui.internal.registry;
 
@@ -19,7 +20,7 @@ import org.eclipse.ui.PlatformUI;
 
 /**
  * Interface containing various registry constants (tag and attribute names).
- * 
+ *
  * @since 3.1
  */
 public interface IWorkbenchRegistryConstants {
@@ -53,7 +54,7 @@ public interface IWorkbenchRegistryConstants {
 	 * Attribute that specifies whether a view gets restored upon workbench restart. Value <code>restorable</code>.
 	 */
 	public static String ATT_RESTORABLE = "restorable"; //$NON-NLS-1$
-	
+
 	/**
 	 * Attribute that specifies whether a wizard is immediately capable of
 	 * finishing. Value <code>canFinishEarly</code>.
@@ -70,7 +71,7 @@ public interface IWorkbenchRegistryConstants {
 	 * Category id attribute. Value <code>categoryId</code>.
 	 */
 	public static String ATT_CATEGORY_ID = "categoryId"; //$NON-NLS-1$
-	
+
 	/**
 	 * The name of the attribute storing checkEnabled for the visibleWhen
 	 * element. Value <code>checkEnabled</code>.
@@ -85,7 +86,7 @@ public interface IWorkbenchRegistryConstants {
 	/**
 	 * Sticky view closable attribute. Value <code>closable</code>.
 	 */
-	public static String ATT_CLOSEABLE = "closeable"; //$NON-NLS-1$    
+	public static String ATT_CLOSEABLE = "closeable"; //$NON-NLS-1$
 
 	/**
 	 * Color factory attribute. Value <code>colorFactory</code>.
@@ -112,7 +113,7 @@ public interface IWorkbenchRegistryConstants {
 	 * Intro content detector class attribute (optional). Value <code>contentDetector</code>.
 	 */
 	public static String ATT_CONTENT_DETECTOR = "contentDetector"; //$NON-NLS-1$
-	
+
 	/**
 	 * Editor content type id binding attribute. Value
 	 * <code>contentTypeId</code>.
@@ -159,7 +160,7 @@ public interface IWorkbenchRegistryConstants {
 	/**
 	 * Resembles a deactivated SYSTEM binding. Value <code>deleted</code>.
 	 */
-	public static String ATT_DELETED = "deleted";//$NON-NLS-1$	
+	public static String ATT_DELETED = "deleted";//$NON-NLS-1$
 
 	/**
 	 * The name of the description attribute, which appears on named handle
@@ -186,11 +187,6 @@ public interface IWorkbenchRegistryConstants {
 	 * Editor extensions attribute. Value <code>extensions</code>.
 	 */
 	public static String ATT_EXTENSIONS = "extensions";//$NON-NLS-1$
-
-	/**
-	 * View ratio attribute. Value <code>fastViewWidthRatio</code>.
-	 */
-	public static String ATT_FAST_VIEW_WIDTH_RATIO = "fastViewWidthRatio"; //$NON-NLS-1$
 
 	/**
 	 * Editor filenames attribute. Value <code>filenames</code>.
@@ -486,10 +482,10 @@ public interface IWorkbenchRegistryConstants {
 	 * Perspective singleton attribute. Value <code>singleton</code>.
 	 */
 	public static String ATT_SINGLETON = "singleton";//$NON-NLS-1$
-	
+
 	/**
 	 * Splash id attribute.  Value <code>splashId</code>.
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	public static String ATT_SPLASH_ID = "splashId"; //$NON-NLS-1$
@@ -568,21 +564,21 @@ public interface IWorkbenchRegistryConstants {
 	/**
 	 * The legacy extension point (2.1.x and earlier) for specifying a key
 	 * binding scheme.
-	 * 
+	 *
 	 * @since 3.1.1
 	 */
 	public static String PL_ACCELERATOR_CONFIGURATIONS = "acceleratorConfigurations"; //$NON-NLS-1$
 
 	/**
 	 * The legacy extension point (2.1.x and earlier) for specifying a context.
-	 * 
+	 *
 	 * @since 3.1.1
 	 */
 	public static String PL_ACCELERATOR_SCOPES = "acceleratorScopes"; //$NON-NLS-1$
 
 	/**
 	 * The legacy extension point (2.1.x and earlier) for specifying a command.
-	 * 
+	 *
 	 * @since 3.1.1
 	 */
 	public static String PL_ACTION_DEFINITIONS = "actionDefinitions"; //$NON-NLS-1$
@@ -598,7 +594,7 @@ public interface IWorkbenchRegistryConstants {
 	/**
 	 * The extension point (3.1 and later) for specifying bindings, such as
 	 * keyboard shortcuts.
-	 * 
+	 *
 	 * @since 3.1.1
 	 */
 	public static String PL_BINDINGS = "bindings"; //$NON-NLS-1$
@@ -609,7 +605,7 @@ public interface IWorkbenchRegistryConstants {
 
 	/**
 	 * The extension point (3.2 and later) for associating images with commands.
-	 * 
+	 *
 	 * @since 3.2
 	 */
 	public static String PL_COMMAND_IMAGES = "commandImages"; //$NON-NLS-1$
@@ -618,14 +614,14 @@ public interface IWorkbenchRegistryConstants {
 	 * The extension point (2.1.x and later) for specifying a command. A lot of
 	 * other things have appeared first in this extension point and then been
 	 * moved to their own extension point.
-	 * 
+	 *
 	 * @since 3.1.1
 	 */
 	public static String PL_COMMANDS = "commands"; //$NON-NLS-1$
 
 	/**
 	 * The extension point (3.0 and later) for specifying a context.
-	 * 
+	 *
 	 * @since 3.1.1
 	 */
 	public static String PL_CONTEXTS = "contexts"; //$NON-NLS-1$
@@ -651,7 +647,7 @@ public interface IWorkbenchRegistryConstants {
 
 	/**
 	 * The extension point (3.1 and later) for specifying handlers.
-	 * 
+	 *
 	 * @since 3.1.1
 	 */
 	public static String PL_HANDLERS = "handlers"; //$NON-NLS-1$
@@ -664,21 +660,21 @@ public interface IWorkbenchRegistryConstants {
 
 	/**
 	 * The extension point for keyword definitions.
-	 * 
+	 *
 	 * @since 3.1
 	 */
 	public static String PL_KEYWORDS = "keywords"; //$NON-NLS-1$
 
 	/**
 	 * The extension point (3.2 and later) for specifying menu contributions.
-	 * 
+	 *
 	 * @since 3.2
 	 */
 	public static String PL_MENUS = "menus"; //$NON-NLS-1$
 
 	/**
 	 * The extension point (3.3 and later) for specifying menu contributions.
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	public static String PL_MENU_CONTRIBUTION = "menuContribution"; //$NON-NLS-1$
@@ -698,7 +694,7 @@ public interface IWorkbenchRegistryConstants {
 	public static String PL_PROPERTY_PAGES = "propertyPages"; //$NON-NLS-1$
 
 	public static String PL_STARTUP = "startup"; //$NON-NLS-1$
-	
+
 	/**
 	 * @since 3.3
 	 */
@@ -921,7 +917,7 @@ public interface IWorkbenchRegistryConstants {
 	/**
 	 * Category presentation tag. Value <code>categoryPresentationBinding</code>
 	 * .
-	 * 
+	 *
 	 * @deprecated used by the removal presentation API
 	 */
 	@Deprecated
@@ -940,7 +936,7 @@ public interface IWorkbenchRegistryConstants {
 	/**
 	 * Color override tag. Value <code>colorOverride</code>.
 	 */
-	public static String TAG_COLOROVERRIDE = "colorOverride"; //$NON-NLS-1$    
+	public static String TAG_COLOROVERRIDE = "colorOverride"; //$NON-NLS-1$
 
 	/**
 	 * Color value tag. Value <code>colorValue</code>.
@@ -1045,7 +1041,7 @@ public interface IWorkbenchRegistryConstants {
 	/**
 	 * The name of the element storing a group.
 	 */
-	public static String TAG_GROUP = "group"; //$NON-NLS-1$ 
+	public static String TAG_GROUP = "group"; //$NON-NLS-1$
 
 	/**
 	 * Group marker tag. Value <code>groupMarker</code>.
@@ -1107,7 +1103,7 @@ public interface IWorkbenchRegistryConstants {
 	/**
 	 * The name of the element defining the insertion point for menu
 	 * additions.
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	public static String TAG_LOCATION_URI = "locationURI"; //$NON-NLS-1$
@@ -1196,8 +1192,8 @@ public interface IWorkbenchRegistryConstants {
 	 * Separator tag. Value <code>separator</code>.
 	 */
 	public static String TAG_SEPARATOR = "separator"; //$NON-NLS-1$
-	
-	
+
+
 	/**
 	 * Tag for the settings transfer entry.
 	 */
@@ -1212,15 +1208,14 @@ public interface IWorkbenchRegistryConstants {
 	 * The name of the element storing some state.
 	 */
 	public static String TAG_STATE = "state"; //$NON-NLS-1$
-	
-	
+
 	/**
 	 * The name of the element describing splash handlers. Value
 	 * <code>splashHandler</code>.
 	 * @since 3.3
 	 */
 	public static String TAG_SPLASH_HANDLER = "splashHandler"; //$NON-NLS-1$
-	
+
 
 	/**
 	 * The name of the element describing splash handler product bindings. Value
@@ -1228,7 +1223,7 @@ public interface IWorkbenchRegistryConstants {
 	 * @since 3.3
 	 */
 	public static String TAG_SPLASH_HANDLER_PRODUCT_BINDING = "splashHandlerProductBinding"; //$NON-NLS-1$
-	
+
 	/**
 	 * Sticky view tag. Value <code>stickyView</code>.
 	 */
@@ -1336,15 +1331,15 @@ public interface IWorkbenchRegistryConstants {
 	public static String TYPE_WIDGET = "widget"; //$NON-NLS-1$
 
 	public static String TAG_TOOLBAR = "toolbar"; //$NON-NLS-1$
-	
+
 	public static String TAG_SERVICE_FACTORY = "serviceFactory"; //$NON-NLS-1$
-	
+
 	public static String TAG_SERVICE = "service"; //$NON-NLS-1$
 
 	public static final String ATTR_FACTORY_CLASS = "factoryClass"; //$NON-NLS-1$
 
 	public static final String ATTR_SERVICE_CLASS = "serviceClass"; //$NON-NLS-1$
-	
+
 	public static final String TAG_SOURCE_PROVIDER = "sourceProvider"; //$NON-NLS-1$
 
 	public static final String ATTR_PROVIDER = "provider"; //$NON-NLS-1$
@@ -1352,7 +1347,7 @@ public interface IWorkbenchRegistryConstants {
 	public static final String TAG_VARIABLE = "variable"; //$NON-NLS-1$
 
 	public static final String ATT_PRIORITY_LEVEL = "priorityLevel"; //$NON-NLS-1$
-	
+
 	public static final String ATT_MODE = "mode"; //$NON-NLS-1$
 
 	public static final String ATT_PLATFORMS = "platforms"; //$NON-NLS-1$
@@ -1367,7 +1362,7 @@ public interface IWorkbenchRegistryConstants {
 
 	public static final String ATT_THEME_ID = "themeId"; //$NON-NLS-1$
 
-	public static final String ATT_COLOR_AND_FONT_ID = "colorAndFontId"; //$NON-NLS-1$ 
+	public static final String ATT_COLOR_AND_FONT_ID = "colorAndFontId"; //$NON-NLS-1$
 
 	public static final String ATT_OS_VERSION = "os_version"; //$NON-NLS-1$
 }
