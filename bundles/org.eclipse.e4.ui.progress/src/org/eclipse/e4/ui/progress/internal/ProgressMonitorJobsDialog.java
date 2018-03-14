@@ -86,6 +86,11 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
         this.finishedJobs = finishedJobs;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
+     */
     @Override
 	protected Control createDialogArea(Composite parent) {
         Composite top = (Composite) super.createDialogArea(parent);
@@ -134,6 +139,12 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
             viewer = new DetailedProgressViewer(viewerComposite, SWT.MULTI
                     | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER, progressService, finishedJobs);
             viewer.setComparator(new ViewerComparator() {
+                /*
+                 * (non-Javadoc)
+                 *
+                 * @see org.eclipse.jface.viewers.ViewerComparator#compare(org.eclipse.jface.viewers.Viewer,
+                 *      java.lang.Object, java.lang.Object)
+                 */
                 @Override
 				@SuppressWarnings("unchecked")
                 public int compare(Viewer testViewer, Object e1, Object e2) {
@@ -157,6 +168,11 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
+     */
     @Override
 	protected void createButtonsForButtonBar(Composite parent) {
         super.createButtonsForButtonBar(parent);
@@ -187,6 +203,11 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
                 ProgressMessages.ProgressMonitorJobsDialog_DetailsTitle,
                 false);
         detailsButton.addSelectionListener(new SelectionAdapter() {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+             */
             @Override
 			public void widgetSelected(SelectionEvent e) {
                 handleDetailsButtonSelect();
@@ -196,6 +217,11 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
         detailsButton.setEnabled(enableDetailsButton);
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.dialogs.IconAndMessageDialog#createButtonBar(org.eclipse.swt.widgets.Composite)
+     */
     @Override
 	protected Control createButtonBar(Composite parent) {
         Composite composite = new Composite(parent, SWT.NONE);
@@ -223,6 +249,11 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
         return composite;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.dialogs.ProgressMonitorDialog#clearCursors()
+     */
     @Override
 	protected void clearCursors() {
         if (detailsButton != null && !detailsButton.isDisposed()) {
@@ -231,6 +262,11 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
         super.clearCursors();
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.dialogs.ProgressMonitorDialog#updateForSetBlocked(org.eclipse.core.runtime.IStatus)
+     */
     @Override
 	protected void updateForSetBlocked(IStatus reason) {
     	if(alreadyClosed)
@@ -243,6 +279,12 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
 		}
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.dialogs.ProgressMonitorDialog#run(boolean,
+     *      boolean, org.eclipse.jface.operation.IRunnableWithProgress)
+     */
     @Override
 	public void run(boolean fork, boolean cancelable,
             IRunnableWithProgress runnable) throws InvocationTargetException,
@@ -287,6 +329,12 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
             IProgressMonitor superMonitor = ProgressMonitorJobsDialog.super
                     .getProgressMonitor();
 
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.core.runtime.IProgressMonitor#beginTask(java.lang.String,
+             *      int)
+             */
             @Override
 			public void beginTask(String name, int totalWork) {
                 superMonitor.beginTask(name, totalWork);
@@ -314,6 +362,9 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
 					return;
 				}
             	getUISynchronize().syncExec(new Runnable() {
+                    /* (non-Javadoc)
+                     * @see java.lang.Runnable#run()
+                     */
                     @Override
 					public void run() {
 						//Reset the watch if it is not safe to open
@@ -329,29 +380,54 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
                 });
             }
 
+			/*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.core.runtime.IProgressMonitor#done()
+             */
             @Override
 			public void done() {
                 superMonitor.done();
                 checkTicking();
             }
 
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.core.runtime.IProgressMonitor#internalWorked(double)
+             */
             @Override
 			public void internalWorked(double work) {
                 superMonitor.internalWorked(work);
                 checkTicking();
             }
 
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.core.runtime.IProgressMonitor#isCanceled()
+             */
             @Override
 			public boolean isCanceled() {
                 return superMonitor.isCanceled();
             }
 
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.core.runtime.IProgressMonitor#setCanceled(boolean)
+             */
             @Override
 			public void setCanceled(boolean value) {
                 superMonitor.setCanceled(value);
 
             }
 
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.core.runtime.IProgressMonitor#setTaskName(java.lang.String)
+             */
             @Override
 			public void setTaskName(String name) {
                 superMonitor.setTaskName(name);
@@ -359,12 +435,22 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
 
             }
 
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.core.runtime.IProgressMonitor#subTask(java.lang.String)
+             */
             @Override
 			public void subTask(String name) {
                 superMonitor.subTask(name);
                 checkTicking();
             }
 
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.core.runtime.IProgressMonitor#worked(int)
+             */
             @Override
 			public void worked(int work) {
                 superMonitor.worked(work);
@@ -372,6 +458,11 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
 
             }
 
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.core.runtime.IProgressMonitorWithBlocking#clearBlocked()
+             */
             @Override
 			public void clearBlocked() {
                 //We want to open on blocking too
@@ -382,6 +473,11 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
 
             }
 
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.core.runtime.IProgressMonitorWithBlocking#setBlocked(org.eclipse.core.runtime.IStatus)
+             */
             @Override
 			public void setBlocked(IStatus reason) {
                 openDialog();
@@ -395,6 +491,11 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
         };
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.dialogs.ProgressMonitorDialog#getProgressMonitor()
+     */
     @Override
 	public IProgressMonitor getProgressMonitor() {
         if (wrapperedMonitor == null) {
@@ -403,6 +504,11 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
         return wrapperedMonitor;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.dialogs.ProgressMonitorDialog#close()
+     */
     @Override
 	public boolean close() {
         alreadyClosed = true;//As this sometimes delayed cache if it was already closed
@@ -413,6 +519,10 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
         return result;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#isResizable()
+     */
     @Override
 	protected boolean isResizable() {
     	return true;

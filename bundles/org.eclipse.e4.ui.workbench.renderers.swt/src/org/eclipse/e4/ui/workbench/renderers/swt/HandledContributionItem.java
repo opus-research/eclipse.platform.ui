@@ -11,8 +11,9 @@
  *     Snjezana Peco <snjezana.peco@redhat.com> - Memory leaks in Juno when opening and closing XML Editor - http://bugs.eclipse.org/397909
  *     Marco Descher <marco@descher.at> - Bug 397677
  *     Dmitry Spiridenok - Bug 429756
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445723, 450863, 472654
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445723, 450863
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 461026
+ *     Daniel Kruegler <daniel.kruegler@gmail.com> - Bug 473779
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -239,7 +240,7 @@ public class HandledContributionItem extends ContributionItem {
 				return;
 			}
 			List<MParameter> modelParms = model.getParameters();
-			Map<String, Object> parameters = new HashMap<>(4);
+			Map<String, Object> parameters = new HashMap<String, Object>(4);
 			for (MParameter mParm : modelParms) {
 				parameters.put(mParm.getName(), mParm.getValue());
 			}
@@ -462,6 +463,8 @@ public class HandledContributionItem extends ContributionItem {
 		} else {
 			item.setText(""); //$NON-NLS-1$
 		}
+		final String tooltip = getToolTipText();
+		item.setToolTipText(tooltip);
 		item.setSelection(model.isSelected());
 		item.setEnabled(model.isEnabled());
 	}
