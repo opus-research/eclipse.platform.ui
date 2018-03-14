@@ -50,7 +50,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -1191,15 +1190,12 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 			@Override
 			protected void execute(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 				SubMonitor subMonitor = SubMonitor.convert(monitor, selected.length);
-				if (subMonitor.isCanceled()) {
-					throw new OperationCanceledException();
-				}
 				// Import as many projects as we can; accumulate errors to
 				// report to the user
 				MultiStatus status = new MultiStatus(IDEWorkbenchPlugin.IDE_WORKBENCH, 1,
 						DataTransferMessages.WizardProjectsImportPage_projectsInWorkspaceAndInvalid, null);
 				for (Object element : selected) {
-					status.add(createExistingProject((ProjectRecord) element, subMonitor.newChild(1)));
+					status.add(createExistingProject((ProjectRecord) element, subMonitor.split(1)));
 				}
 				if (!status.isOK()) {
 					throw new InvocationTargetException(new CoreException(status));
@@ -1298,7 +1294,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 					structureProvider, this, fileSystemObjects);
 			operation.setContext(getShell());
 			try {
-				operation.run(subMonitor.newChild(1));
+				operation.run(subMonitor.split(1));
 			} catch (InvocationTargetException e) {
 				if (e.getCause() instanceof CoreException) {
 					return ((CoreException) e.getCause()).getStatus();
@@ -1342,10 +1338,10 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		subMonitor.setWorkRemaining((copyFiles && importSource != null) ? 2 : 1);
 
 		try {
-			SubMonitor subTask = subMonitor.newChild(1).setWorkRemaining(100);
+			SubMonitor subTask = subMonitor.split(1).setWorkRemaining(100);
 			subTask.setTaskName(DataTransferMessages.WizardProjectsImportPage_CreateProjectsTask);
-			project.create(record.description, subTask.newChild(30));
-			project.open(IResource.BACKGROUND_REFRESH, subTask.newChild(70));
+			project.create(record.description, subTask.split(30));
+			project.open(IResource.BACKGROUND_REFRESH, subTask.split(70));
 			subTask.setTaskName(""); //$NON-NLS-1$
 		} catch (CoreException e) {
 			return e.getStatus();
@@ -1364,7 +1360,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 			// files
 			operation.setCreateContainerStructure(false);
 			try {
-				operation.run(subMonitor.newChild(1));
+				operation.run(subMonitor.split(1));
 			} catch (InvocationTargetException e) {
 				if (e.getCause() instanceof CoreException) {
 					return ((CoreException) e.getCause()).getStatus();
