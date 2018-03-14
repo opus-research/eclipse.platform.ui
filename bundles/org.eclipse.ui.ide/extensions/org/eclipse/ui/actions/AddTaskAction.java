@@ -48,10 +48,12 @@ public class AddTaskAction extends SelectionListenerAction {
      * @param shell shell to use to show any dialogs
      * @deprecated See {@link #AddTaskAction(IShellProvider)}
      */
-    public AddTaskAction(final Shell shell) {
+    @Deprecated
+	public AddTaskAction(final Shell shell) {
         super(IDEWorkbenchMessages.AddTaskLabel);
         Assert.isNotNull(shell);
         this.shellProvider = new IShellProvider() {
+			@Override
 			public Shell getShell() {
 				return shell;
 			} };
@@ -106,10 +108,8 @@ public class AddTaskAction extends SelectionListenerAction {
         return resource;
     }
 
-    /* (non-Javadoc)
-     * Method declared on IAction.
-     */
-    public void run() {
+    @Override
+	public void run() {
         IResource resource = getElement(getStructuredSelection());
         if (resource != null) {
             DialogTaskProperties dialog = new DialogTaskProperties(
@@ -127,7 +127,8 @@ public class AddTaskAction extends SelectionListenerAction {
      * 
      * @param selection the selection to update the enabled state for
      */
-    protected boolean updateSelection(IStructuredSelection selection) {
+    @Override
+	protected boolean updateSelection(IStructuredSelection selection) {
         return super.updateSelection(selection)
                 && getElement(selection) != null;
     }

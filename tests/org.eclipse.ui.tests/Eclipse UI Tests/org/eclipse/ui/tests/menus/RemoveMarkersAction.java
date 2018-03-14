@@ -32,35 +32,29 @@ public class RemoveMarkersAction implements IWorkbenchWindowActionDelegate {
     private IWorkbenchWindow window;
 
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#dispose()
-     */
-    public void dispose() {
+    @Override
+	public void dispose() {
         // TODO Auto-generated method stub
 
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui.IWorkbenchWindow)
-     */
-    public void init(IWorkbenchWindow window) {
+    @Override
+	public void init(IWorkbenchWindow window) {
         this.window = window;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
-     */
-    public void run(IAction action) {
+    @Override
+	public void run(IAction action) {
         try {
 	        IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-	        
+
 	        IMarker[] markers = root.findMarkers(AddMarkersAction.CATEGORY_TEST_MARKER, false, IResource.DEPTH_ZERO);
-	        
-	        for (int i = 0; i < markers.length; i++) {
-	            String message = (String) markers[i].getAttribute(IMarker.MESSAGE);
+
+	        for (IMarker marker : markers) {
+	            String message = (String) marker.getAttribute(IMarker.MESSAGE);
 
 	            if (message != null && message.startsWith("this is a test")) {
-	                markers[i].delete();
+	                marker.delete();
 	            }
 	        }
         } catch (CoreException e) {
@@ -84,11 +78,9 @@ public class RemoveMarkersAction implements IWorkbenchWindowActionDelegate {
         ErrorDialog.openError(window.getShell(), "Error", msg, status);
     }
 
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
-     */
-    public void selectionChanged(IAction action, ISelection selection) {
+
+    @Override
+	public void selectionChanged(IAction action, ISelection selection) {
         // TODO Auto-generated method stub
 
     }

@@ -24,6 +24,7 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.modeling.ISaveHandler;
 import org.eclipse.ui.ISaveablePart2;
 import org.eclipse.ui.IViewReference;
@@ -38,11 +39,12 @@ public class APITestUtils {
 
 	static class TestSaveHandler extends PartServiceSaveHandler {
 		private int response;
-		
+
 		public void setResponse(int response) {
 			this.response = response;
 		}
 
+		@Override
 		public Save promptToSave(MPart dirtyPart) {
 			switch (response) {
 			case 0: return Save.YES;
@@ -54,6 +56,7 @@ public class APITestUtils {
 			throw new RuntimeException();
 		}
 
+		@Override
 		public Save[] promptToSave(Collection<MPart> dirtyParts) {
 			Save save = promptToSave((MPart) null);
 			Save[] prompt = new Save[dirtyParts.size()];
@@ -62,7 +65,7 @@ public class APITestUtils {
 		}
 
 	}
-	
+
 	public static boolean isFastView(IViewReference ref) {
 		MPart part = ((WorkbenchPartReference) ref).getModel();
 		MUIElement parent = part.getParent();
@@ -75,29 +78,32 @@ public class APITestUtils {
 
 		if (parent != null) {
 			List<String> tags = parent.getTags();
-			return tags.contains("Minimized") //$NON-NLS-1$
-					|| tags.contains("MinimizedByZoom"); //$NON-NLS-1$
+			return tags.contains(IPresentationEngine.MINIMIZED) || tags.contains(IPresentationEngine.MINIMIZED_BY_ZOOM);
 		}
 		return false;
 	}
-	
+
 	public static void saveableHelperSetAutomatedResponse(final int response) {
 		SaveableHelper.testSetAutomatedResponse(response);
 		Workbench workbench = (Workbench) PlatformUI.getWorkbench();
 		MApplication application = workbench.getApplication();
-		
+
 		IEclipseContext context = application.getContext();
 		saveableHelperSetAutomatedResponse(response, context);
-		
-		while (workbench.getDisplay().readAndDispatch());
-		
-		for (MWindow window : application.getChildren()) {
-			saveableHelperSetAutomatedResponse(response, window.getContext());	
+
+		while (workbench.getDisplay().readAndDispatch()) {
+			;
 		}
-		
-		while (workbench.getDisplay().readAndDispatch());
+
+		for (MWindow window : application.getChildren()) {
+			saveableHelperSetAutomatedResponse(response, window.getContext());
+		}
+
+		while (workbench.getDisplay().readAndDispatch()) {
+			;
+		}
 	}
-	
+
 	private static void saveableHelperSetAutomatedResponse(final int response,
 			IEclipseContext context) {
 		ISaveHandler saveHandler = (ISaveHandler) context.get(ISaveHandler.class.getName());

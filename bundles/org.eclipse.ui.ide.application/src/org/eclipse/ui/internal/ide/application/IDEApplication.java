@@ -28,10 +28,13 @@ import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
+import org.eclipse.jface.preference.IPersistentPreferenceStore;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.osgi.util.NLS;
@@ -42,9 +45,11 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.ide.ChooseWorkspaceData;
 import org.eclipse.ui.internal.ide.ChooseWorkspaceDialog;
+import org.eclipse.ui.internal.ide.IDEInternalPreferences;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.ide.StatusUtil;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
@@ -100,10 +105,8 @@ public class IDEApplication implements IApplication, IExecutableExtension {
         // There is nothing to do for IDEApplication
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.IApplicationContext context)
-     */
-    public Object start(IApplicationContext appContext) throws Exception {
+    @Override
+	public Object start(IApplicationContext appContext) throws Exception {
         Display display = createDisplay();
         // processor must be created before we start event loop
         DelayedEventsProcessor processor = new DelayedEventsProcessor(display);
@@ -165,10 +168,8 @@ public class IDEApplication implements IApplication, IExecutableExtension {
         return PlatformUI.createDisplay();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
-     */
-    public void setInitializationData(IConfigurationElement config,
+    @Override
+	public void setInitializationData(IConfigurationElement config,
             String propertyName, Object data) {
         // There is nothing to do for IDEApplication
     }
@@ -181,7 +182,8 @@ public class IDEApplication implements IApplication, IExecutableExtension {
      * @return <code>null</code> if a valid instance location has been set and an exit code
      *         otherwise
      */
-    private Object checkInstanceLocation(Shell shell, Map applicationArguments) {
+    @SuppressWarnings("rawtypes")
+	private Object checkInstanceLocation(Shell shell, Map applicationArguments) {
         // -data @none was specified but an ide requires workspace
         Location instanceLoc = Platform.getInstanceLocation();
         if (instanceLoc == null) {
@@ -285,7 +287,8 @@ public class IDEApplication implements IApplication, IExecutableExtension {
         }
     }
 
-	private static boolean isDevLaunchMode(Map args) {
+    @SuppressWarnings("rawtypes")
+    private static boolean isDevLaunchMode(Map args) {
 		// see org.eclipse.pde.internal.core.PluginPathFinder.isDevLaunchMode()
 		if (Boolean.getBoolean("eclipse.pde.launch")) //$NON-NLS-1$
 			return true;
@@ -311,7 +314,12 @@ public class IDEApplication implements IApplication, IExecutableExtension {
         URL url = null;
         do {
         	// okay to use the shell now - this is the splash shell
-            new ChooseWorkspaceDialog(shell, launchData, false, true).prompt(force);
+			new ChooseWorkspaceDialog(shell, launchData, false, true) {
+				@Override
+				protected Shell getParentShell() {
+					return null;
+				}
+			}.prompt(force);
             String instancePath = launchData.getSelection();
             if (instancePath == null) {
 				return null;
@@ -415,10 +423,26 @@ public class IDEApplication implements IApplication, IExecutableExtension {
 			message = NLS.bind(IDEWorkbenchMessages.IDEApplication_versionMessage_newerWorkspace, url.getFile());
 		}
 
-		MessageDialog dialog = new MessageDialog(shell, title, null, message, severity,
-				new String[] {IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL}, 0);
-		return dialog.open() == Window.OK;
-    }
+		IPersistentPreferenceStore prefStore = new ScopedPreferenceStore(ConfigurationScope.INSTANCE, IDEWorkbenchPlugin.IDE_WORKBENCH);
+		boolean keepOnWarning = prefStore.getBoolean(IDEInternalPreferences.WARN_ABOUT_WORKSPACE_INCOMPATIBILITY);
+		if (keepOnWarning) {
+			MessageDialogWithToggle dialog = new MessageDialogWithToggle(shell, title, null, message, severity,
+					new String[] {IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL}, 0,
+					IDEWorkbenchMessages.IDEApplication_version_doNotWarnAgain, false);
+			if (dialog.open() != Window.OK) {
+				return false;
+			}
+			keepOnWarning = !dialog.getToggleState();
+			try {
+				prefStore.setValue(IDEInternalPreferences.WARN_ABOUT_WORKSPACE_INCOMPATIBILITY, keepOnWarning);
+				prefStore.save();
+			} catch (IOException e) {
+				IDEWorkbenchPlugin.log("Error writing to configuration preferences", //$NON-NLS-1$
+					new Status(IStatus.ERROR, IDEWorkbenchPlugin.IDE_WORKBENCH, e.getMessage(), e));
+			}
+		}
+		return true;
+	}
 
     /**
      * Look at the argument URL for the workspace's version information. Return
@@ -446,8 +470,10 @@ public class IDEApplication implements IApplication, IExecutableExtension {
             if (versionString != null) {
                 return Version.parseVersion(versionString);
             }
-
-            // be graceful if coming from legacy workspaces
+            versionString= props.getProperty(WORKSPACE_CHECK_REFERENCE_BUNDLE_NAME_LEGACY);
+            if (versionString != null) {
+                return Version.parseVersion(versionString);
+            }
             return null;
         } catch (IOException e) {
             IDEWorkbenchPlugin.log("Could not read version file " + versionFile, new Status( //$NON-NLS-1$
@@ -558,15 +584,14 @@ public class IDEApplication implements IApplication, IExecutableExtension {
         return new Version(version.getMajor(), version.getMinor(), 0);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.equinox.app.IApplication#stop()
-     */
+	@Override
 	public void stop() {
 		final IWorkbench workbench = PlatformUI.getWorkbench();
 		if (workbench == null)
 			return;
 		final Display display = workbench.getDisplay();
 		display.syncExec(new Runnable() {
+			@Override
 			public void run() {
 				if (!display.isDisposed())
 					workbench.close();

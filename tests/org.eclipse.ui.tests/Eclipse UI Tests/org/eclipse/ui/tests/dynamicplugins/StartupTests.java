@@ -30,7 +30,7 @@ public class StartupTests extends DynamicTestCase {
 	/**
 	 * Tests to ensure that the IStartup implementation in the bundle is run
 	 * when the bundle is loaded.
-	 * 
+	 *
 	 * @throws ClassNotFoundException
 	 * @throws SecurityException
 	 * @throws NoSuchFieldException
@@ -51,38 +51,22 @@ public class StartupTests extends DynamicTestCase {
 		assertNotNull(field.get(null));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionId()
-	 */
+	@Override
 	protected String getExtensionId() {
 		return "newStartup1.testDynamicStartupAddition";
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionPoint()
-	 */
+	@Override
 	protected String getExtensionPoint() {
 		return IWorkbenchRegistryConstants.PL_STARTUP;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getInstallLocation()
-	 */
+	@Override
 	protected String getInstallLocation() {
 		return "data/org.eclipse.newStartup1";
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getMarkerClass()
-	 */
+	@Override
 	protected String getMarkerClass() {
 		return "org.eclipse.ui.dynamic.DynamicStartup";
 	}

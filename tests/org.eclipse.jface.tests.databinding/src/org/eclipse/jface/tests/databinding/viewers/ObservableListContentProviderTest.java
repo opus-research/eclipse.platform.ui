@@ -20,7 +20,7 @@ import org.eclipse.core.databinding.observable.Observables;
 import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.list.WritableList;
 import org.eclipse.core.databinding.observable.set.IObservableSet;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 import org.eclipse.jface.viewers.TableViewer;
@@ -35,6 +35,7 @@ public class ObservableListContentProviderTest extends
 	private ObservableListContentProvider contentProvider;
 	private IObservableList input;
 
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		shell = new Shell();
@@ -47,6 +48,7 @@ public class ObservableListContentProviderTest extends
 		viewer.setInput(input);
 	}
 
+	@Override
 	protected void tearDown() throws Exception {
 		shell.dispose();
 		viewer = null;
@@ -56,13 +58,13 @@ public class ObservableListContentProviderTest extends
 
 	public void testKnownElements_Realm() throws Exception {
 		assertSame("realm for the known elements should be the SWT realm",
-				SWTObservables.getRealm(Display.getDefault()), contentProvider
+				DisplayRealm.getRealm(Display.getDefault()), contentProvider
 						.getKnownElements().getRealm());
 	}
 
 	public void testRealizedElements_Realm() {
 		assertSame("realm for the realized elements should be the SWT realm",
-				SWTObservables.getRealm(Display.getDefault()), contentProvider
+				DisplayRealm.getRealm(Display.getDefault()), contentProvider
 						.getRealizedElements().getRealm());
 	}
 
@@ -118,6 +120,7 @@ public class ObservableListContentProviderTest extends
 			this.id = id;
 		}
 
+		@Override
 		public boolean equals(Object obj) {
 			if (obj == this)
 				return true;
@@ -129,6 +132,7 @@ public class ObservableListContentProviderTest extends
 			return this.id == that.id;
 		}
 
+		@Override
 		public int hashCode() {
 			return id;
 		}

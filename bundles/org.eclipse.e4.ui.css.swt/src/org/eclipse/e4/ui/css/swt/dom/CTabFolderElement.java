@@ -7,9 +7,7 @@
  *
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
- *     IBM Corporation - initial API and implementation
  *     Brian de Alwis (MTI) - Performance tweaks (Bug 430829)
- *     Steven Spungin <steven@spungin.tv> - Bug 401439
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.dom;
 
@@ -19,6 +17,7 @@ import org.eclipse.e4.ui.css.core.dom.ArrayNodeList;
 import org.eclipse.e4.ui.css.core.dom.CSSStylableElement;
 import org.eclipse.e4.ui.css.core.dom.ChildVisibilityAwareElement;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
+import org.eclipse.e4.ui.css.swt.helpers.CSSSWTColorHelper;
 import org.eclipse.e4.ui.internal.css.swt.ICTabRendering;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
@@ -108,22 +107,7 @@ public class CTabFolderElement extends CompositeElement implements ChildVisibili
 
 			if (widget instanceof CTabFolder) {
 				// if it's a CTabFolder, include the child items in the count
-				for (CTabItem tabItem : ((CTabFolder) widget).getItems()) {
-					if (tabItem.isDisposed()) {
-						// This is a workaround for bug 401439.
-						// widget (CTabFolder) is internally marked as inDispose
-						// It has disposed the CTabItem, but has not taken it out of the items array.
-						// The actual part is not attached to the model, but also was not disposed because of an uncaught exception.
-						//
-						// Do not return disposed items to the CSS engine by not including any elements after this disposed item.
-						// Worst case is that several visible items will not be styled.
-						//
-						// Other patches have prevented this code from getting called, so this just is a cautionary measure that may eventually be removed.
-						break;
-					} else {
-						childCount++;
-					}
-				}
+				childCount += ((CTabFolder) widget).getItemCount();
 			}
 		}
 		return childCount;
@@ -135,7 +119,6 @@ public class CTabFolderElement extends CompositeElement implements ChildVisibili
 		folder.setSelectionBackground((Color) null);
 		folder.setSelectionForeground((Color) null);
 		folder.setSelectionBackground((Image) null);
-
 		folder.setBackground(null, null);
 		resetChildrenBackground(folder);
 
@@ -150,39 +133,6 @@ public class CTabFolderElement extends CompositeElement implements ChildVisibili
 			renderer.setShadowColor(null);
 		}
 		super.reset();
-	}
-
-	private void resetChildrenBackground(Composite composite) {
-		for (Control control : composite.getChildren()) {
-			resetChildBackground(control);
-			if (control instanceof Composite) {
-				resetChildrenBackground((Composite) control);
-			}
-		}
-	}
-
-	private void resetChildBackground(Control control) {
-		Color backgroundSetByRenderer = (Color) control
-				.getData(BACKGROUND_SET_BY_TAB_RENDERER);
-		if (backgroundSetByRenderer != null) {
-			if (control.getBackground() == backgroundSetByRenderer) {
-				control.setBackground(null);
-			}
-			control.setData(BACKGROUND_SET_BY_TAB_RENDERER, null);
-		}
-	}
-
-	public static void setBackgroundOverriddenDuringRenderering(
-			Composite composite, Color background) {
-		composite.setBackground(background);
-		composite.setData(BACKGROUND_SET_BY_TAB_RENDERER, background);
-
-		for (Control control : composite.getChildren()) {
-			if (!CompositeElement.hasBackgroundOverriddenByCSS(control)) {
-				control.setBackground(background);
-				control.setData(BACKGROUND_SET_BY_TAB_RENDERER, background);
-			}
-		}
 	}
 
 	@Override
@@ -210,6 +160,39 @@ public class CTabFolderElement extends CompositeElement implements ChildVisibili
 			}
 		}
 		return new ArrayNodeList(visible, engine);
+	}
+
+	private void resetChildrenBackground(Composite composite) {
+		for (Control control : composite.getChildren()) {
+			resetChildBackground(control);
+			if (control instanceof Composite) {
+				resetChildrenBackground((Composite) control);
+			}
+		}
+	}
+
+	private void resetChildBackground(Control control) {
+		Color backgroundSetByRenderer = (Color) control
+				.getData(BACKGROUND_SET_BY_TAB_RENDERER);
+		if (backgroundSetByRenderer != null) {
+			if (control.getBackground() == backgroundSetByRenderer) {
+				control.setBackground(null);
+			}
+			control.setData(BACKGROUND_SET_BY_TAB_RENDERER, null);
+		}
+	}
+
+	public static void setBackgroundOverriddenDuringRenderering(
+			Composite composite, Color background) {
+		CSSSWTColorHelper.setBackground(composite, background);
+		composite.setData(BACKGROUND_SET_BY_TAB_RENDERER, background);
+
+		for (Control control : composite.getChildren()) {
+			if (!CompositeElement.hasBackgroundOverriddenByCSS(control)) {
+				CSSSWTColorHelper.setBackground(control, background);
+				control.setData(BACKGROUND_SET_BY_TAB_RENDERER, background);
+			}
+		}
 	}
 }
 

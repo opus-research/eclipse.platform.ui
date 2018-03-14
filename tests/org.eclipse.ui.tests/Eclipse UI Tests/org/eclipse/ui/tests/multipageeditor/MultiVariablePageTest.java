@@ -46,7 +46,7 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
  * <p>
  * It also checks for changing Contexts.
  * </p>
- * 
+ *
  * @since 3.2
  */
 public class MultiVariablePageTest extends UITestCase {
@@ -69,7 +69,7 @@ public class MultiVariablePageTest extends UITestCase {
 	 * Make sure that setting the active page programmatically calls
 	 * pageChanged(int) on the way. This method is overridden in a lot of
 	 * editors to provide their functionality on page changes.
-	 * 
+	 *
 	 * @throws Throwable
 	 */
 	public void testSetActivePage() throws Throwable {
@@ -100,7 +100,7 @@ public class MultiVariablePageTest extends UITestCase {
 	/**
 	 * Make sure that removing a page that is a Control (instead of an editor)
 	 * disposes of the Control immediately.
-	 * 
+	 *
 	 * @throws Throwable
 	 */
 	public void testRemovePage() throws Throwable {
@@ -128,7 +128,7 @@ public class MultiVariablePageTest extends UITestCase {
 	 * Now the MPEP site's selection provider should by default support post
 	 * selection listeners. Since the MVPE is based on Text editors, we should
 	 * be getting the post selection events when we change pages.
-	 * 
+	 *
 	 * @throws Throwable
 	 *             on error cases
 	 */
@@ -146,6 +146,7 @@ public class MultiVariablePageTest extends UITestCase {
 
 		fPostCalled = 0;
 		ISelectionChangedListener listener = new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				++fPostCalled;
 			}
@@ -190,12 +191,12 @@ public class MultiVariablePageTest extends UITestCase {
 	/**
 	 * Make sure that contexts are activated-deactivated by pages changes and
 	 * other editors.
-	 * 
+	 *
 	 * @throws Throwable
 	 *             on error
 	 */
 	public void testContextActivation() throws Throwable {
-		IContextService globalService = (IContextService) getWorkbench()
+		IContextService globalService = getWorkbench()
 				.getService(IContextService.class);
 
 		// Open a new test window.
@@ -233,7 +234,7 @@ public class MultiVariablePageTest extends UITestCase {
 
 	/**
 	 * Assert if the contextId is active in the contextService.
-	 * 
+	 *
 	 * @param contextService
 	 * @param contextId
 	 * @param isActive
@@ -248,13 +249,7 @@ public class MultiVariablePageTest extends UITestCase {
 		MultiPageEditorPart editor;
 		Object page;
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.jface.dialogs.IPageChangedListener#pageChanged(org.eclipse
-		 * .jface.dialogs.PageChangedEvent)
-		 */
+		@Override
 		public void pageChanged(PageChangedEvent event) {
 			editor = (MultiPageEditorPart) event.getSource();
 			page = event.getSelectedPage();

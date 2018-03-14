@@ -113,13 +113,9 @@ public class CopyResourcesOperation extends
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
 	 * This implementation copies the resources.
-	 * 
-	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#doExecute(org.eclipse.core.runtime.IProgressMonitor,
-	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
+	@Override
 	protected void doExecute(IProgressMonitor monitor, IAdaptable uiInfo)
 			throws CoreException {
 		copy(monitor, uiInfo);
@@ -189,14 +185,10 @@ public class CopyResourcesOperation extends
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
 	 * This implementation deletes the previously made copies and restores any
 	 * resources that were overwritten by the copy.
-	 * 
-	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#doUndo(org.eclipse.core.runtime.IProgressMonitor,
-	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
+	@Override
 	protected void doUndo(IProgressMonitor monitor, IAdaptable uiInfo)
 			throws CoreException {
 		monitor.beginTask("", 2); //$NON-NLS-1$
@@ -216,12 +208,7 @@ public class CopyResourcesOperation extends
 		monitor.done();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#updateResourceChangeDescriptionFactory(org.eclipse.core.resources.mapping.IResourceChangeDescriptionFactory,
-	 *      int)
-	 */
+	@Override
 	protected boolean updateResourceChangeDescriptionFactory(
 			IResourceChangeDescriptionFactory factory, int operation) {
 		boolean update = false;
@@ -250,13 +237,10 @@ public class CopyResourcesOperation extends
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
 	 * This implementation computes the ability to delete the original copy and
 	 * restore any overwritten resources.
-	 * 
-	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#computeUndoableStatus(org.eclipse.core.runtime.IProgressMonitor)
 	 */
+	@Override
 	public IStatus computeUndoableStatus(IProgressMonitor monitor) {
 		IStatus status = super.computeUndoableStatus(monitor);
 		if (!status.isOK()) {

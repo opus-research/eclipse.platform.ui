@@ -70,8 +70,10 @@ public class SafeDelegateTreeContentProvider implements
 	/**
 	 * 
 	 */
+	@Override
 	public void dispose() {
 		SafeRunner.run(new NavigatorSafeRunnable() {
+			@Override
 			public void run() throws Exception {
 				contentProvider.dispose(); 
 			}
@@ -79,15 +81,12 @@ public class SafeDelegateTreeContentProvider implements
 		
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
+	@Override
 	public boolean equals(Object anObject) {
 		return contentProvider.equals(anObject);
 	}
 
+	@Override
 	public Object[] getChildren(Object aParentElement) {
 		if (aParentElement instanceof TreePath) {
 			TreePath tp = (TreePath) aParentElement;
@@ -97,43 +96,40 @@ public class SafeDelegateTreeContentProvider implements
 		return children;
 	}
 
+	@Override
 	public Object[] getElements(Object anInputElement) {
 		Object[] elements = contentProvider.getElements(anInputElement);
 		return elements;
 	}
 
+	@Override
 	public Object getParent(Object anElement) {
 		return contentProvider.getParent(anElement);
 	}
 
+	@Override
 	public boolean hasChildren(Object anElement) {
 		return contentProvider.hasChildren(anElement);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#hashCode()
-	 */
+	@Override
 	public int hashCode() {
 		return contentProvider.hashCode();
 	}
 
+	@Override
 	public void inputChanged(final Viewer aViewer, final Object anOldInput, final Object aNewInput) {
 		viewer = (StructuredViewer) aViewer;
 		
 		SafeRunner.run(new NavigatorSafeRunnable() {
+			@Override
 			public void run() throws Exception {
 				contentProvider.inputChanged(aViewer, anOldInput, aNewInput);
 			}
 		});
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
+	@Override
 	public String toString() {
 		return contentProvider.toString();
 	}
@@ -146,6 +142,7 @@ public class SafeDelegateTreeContentProvider implements
 		return contentProvider;
 	}
 
+	@Override
 	public void restoreState(IMemento aMemento) {
 		if (contentProvider != null && contentProvider instanceof IMementoAware) {
 			((IMementoAware) contentProvider).restoreState(aMemento);
@@ -153,6 +150,7 @@ public class SafeDelegateTreeContentProvider implements
 
 	}
 
+	@Override
 	public void saveState(IMemento aMemento) {
 		if (contentProvider != null && contentProvider instanceof IMementoAware) {
 			((IMementoAware) contentProvider).saveState(aMemento);
@@ -160,18 +158,14 @@ public class SafeDelegateTreeContentProvider implements
 
 	}
 
+	@Override
 	public void init(ICommonContentExtensionSite aConfig) {
 		if (contentProvider instanceof ICommonContentProvider) {
 			((ICommonContentProvider) contentProvider).init(aConfig);
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.navigator.IPipelinedTreeContentProvider#getPipelinedChildren(java.lang.Object,
-	 *      java.util.Set)
-	 */
+	@Override
 	public void getPipelinedChildren(Object aParent, Set theCurrentChildren) {
 		if (contentProvider instanceof IPipelinedTreeContentProvider) {
 			((IPipelinedTreeContentProvider) contentProvider)
@@ -180,12 +174,7 @@ public class SafeDelegateTreeContentProvider implements
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.navigator.IPipelinedTreeContentProvider#getPipelinedElements(java.lang.Object,
-	 *      java.util.Set)
-	 */
+	@Override
 	public void getPipelinedElements(Object anInput, Set theCurrentElements) {
 		if (contentProvider instanceof IPipelinedTreeContentProvider) {
 			((IPipelinedTreeContentProvider) contentProvider)
@@ -193,12 +182,7 @@ public class SafeDelegateTreeContentProvider implements
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.navigator.IPipelinedTreeContentProvider#getPipelinedParent(java.lang.Object,
-	 *      java.lang.Object)
-	 */
+	@Override
 	public Object getPipelinedParent(Object anObject, Object aSuggestedParent) {
 		if (contentProvider instanceof IPipelinedTreeContentProvider) {
 			return ((IPipelinedTreeContentProvider) contentProvider)
@@ -207,11 +191,7 @@ public class SafeDelegateTreeContentProvider implements
 		return anObject;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.navigator.IPipelinedTreeContentProvider#interceptAdd(org.eclipse.ui.navigator.PipelinedShapeModification)
-	 */
+	@Override
 	public PipelinedShapeModification interceptAdd(
 			PipelinedShapeModification anAddModification) { 
 		if (contentProvider instanceof IPipelinedTreeContentProvider) {
@@ -221,11 +201,7 @@ public class SafeDelegateTreeContentProvider implements
 		return anAddModification;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.navigator.IPipelinedTreeContentProvider#interceptRemove(org.eclipse.ui.navigator.PipelinedShapeModification)
-	 */
+	@Override
 	public PipelinedShapeModification interceptRemove(
 			PipelinedShapeModification aRemoveModification) { 
 		if (contentProvider instanceof IPipelinedTreeContentProvider) {
@@ -235,11 +211,7 @@ public class SafeDelegateTreeContentProvider implements
 		return aRemoveModification;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.navigator.IPipelinedTreeContentProvider#interceptRefresh(org.eclipse.ui.navigator.PipelinedViewerUpdate)
-	 */
+	@Override
 	public boolean interceptRefresh(
 			PipelinedViewerUpdate aRefreshSynchronization) {
 		if (contentProvider instanceof IPipelinedTreeContentProvider) {
@@ -249,11 +221,7 @@ public class SafeDelegateTreeContentProvider implements
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.navigator.IPipelinedTreeContentProvider#interceptUpdate(org.eclipse.ui.navigator.PipelinedViewerUpdate)
-	 */
+	@Override
 	public boolean interceptUpdate(
 			PipelinedViewerUpdate anUpdateSynchronization) {
 		if (contentProvider instanceof IPipelinedTreeContentProvider) {
@@ -263,9 +231,7 @@ public class SafeDelegateTreeContentProvider implements
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreePathContentProvider#getChildren(org.eclipse.jface.viewers.TreePath)
-	 */
+	@Override
 	public Object[] getChildren(TreePath parentPath) {
 		if (contentProvider instanceof ITreePathContentProvider) {
 			ITreePathContentProvider tpcp = (ITreePathContentProvider) contentProvider;
@@ -275,9 +241,7 @@ public class SafeDelegateTreeContentProvider implements
 		return getChildren(parentPath.getLastSegment());
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreePathContentProvider#hasChildren(org.eclipse.jface.viewers.TreePath)
-	 */
+	@Override
 	public boolean hasChildren(TreePath path) {
 		if (contentProvider instanceof ITreePathContentProvider) {
 			ITreePathContentProvider tpcp = (ITreePathContentProvider) contentProvider;
@@ -286,9 +250,7 @@ public class SafeDelegateTreeContentProvider implements
 		return hasChildren(path.getLastSegment());
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreePathContentProvider#getParents(java.lang.Object)
-	 */
+	@Override
 	public TreePath[] getParents(Object element) {
 		if (contentProvider instanceof ITreePathContentProvider) {
 			ITreePathContentProvider tpcp = (ITreePathContentProvider) contentProvider;
@@ -308,9 +270,7 @@ public class SafeDelegateTreeContentProvider implements
 		return NO_PATHS;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.navigator.IPipelinedTreeContentProviderHasChildren#hasPipelinedChildren(java.lang.Object, boolean)
-	 */
+	@Override
 	public boolean hasPipelinedChildren(Object anInput, boolean currentHasChildren) {
 		if (contentProvider instanceof IPipelinedTreeContentProvider2) {
 			return ((IPipelinedTreeContentProvider2) contentProvider)
