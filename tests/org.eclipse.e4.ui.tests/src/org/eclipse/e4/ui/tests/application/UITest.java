@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2015 IBM Corporation and others.
+ * Copyright (c) 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,10 +48,13 @@ public class UITest {
 
 	protected IPresentationEngine getEngine() {
 		if (engine == null) {
-			IContributionFactory contributionFactory = applicationContext.get(IContributionFactory.class);
-			Object newEngine = contributionFactory.create(engineURI, applicationContext);
+			IContributionFactory contributionFactory = (IContributionFactory) applicationContext
+					.get(IContributionFactory.class.getName());
+			Object newEngine = contributionFactory.create(engineURI,
+					applicationContext);
 			assertTrue(newEngine instanceof IPresentationEngine);
-			applicationContext.set(IPresentationEngine.class.getName(), newEngine);
+			applicationContext.set(IPresentationEngine.class.getName(),
+					newEngine);
 
 			engine = (IPresentationEngine) newEngine;
 		}

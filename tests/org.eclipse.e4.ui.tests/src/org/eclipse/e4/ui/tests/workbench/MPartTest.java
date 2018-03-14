@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,7 +41,8 @@ public class MPartTest {
 	@Before
 	public void setUp() throws Exception {
 		appContext = E4Application.createDefaultContext();
-		appContext.set(E4Workbench.PRESENTATION_URI_ARG, PartRenderingEngine.engineURI);
+		appContext.set(E4Workbench.PRESENTATION_URI_ARG,
+				PartRenderingEngine.engineURI);
 	}
 
 	@After
@@ -56,15 +57,17 @@ public class MPartTest {
 	public void testSetName() {
 		final MWindow window = createWindowWithOneView("Part Name");
 
-		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
 
-		MPartSashContainer container = (MPartSashContainer) window.getChildren().get(0);
+		MPartSashContainer container = (MPartSashContainer) window
+				.getChildren().get(0);
 		MPartStack stack = (MPartStack) container.getChildren().get(0);
 		MPart part = (MPart) stack.getChildren().get(0);
 
@@ -80,15 +83,17 @@ public class MPartTest {
 	public void testCTabItem_GetImage() {
 		final MWindow window = createWindowWithOneView("Part Name");
 
-		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
 
-		MPartSashContainer container = (MPartSashContainer) window.getChildren().get(0);
+		MPartSashContainer container = (MPartSashContainer) window
+				.getChildren().get(0);
 		MPartStack stack = (MPartStack) container.getChildren().get(0);
 
 		CTabFolder folder = (CTabFolder) stack.getWidget();
@@ -99,15 +104,17 @@ public class MPartTest {
 	private void testDeclaredName(String declared, String expected) {
 		final MWindow window = createWindowWithOneView(declared);
 
-		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
 
-		MPartSashContainer container = (MPartSashContainer) window.getChildren().get(0);
+		MPartSashContainer container = (MPartSashContainer) window
+				.getChildren().get(0);
 		MPartStack stack = (MPartStack) container.getChildren().get(0);
 		CTabFolder folder = (CTabFolder) stack.getWidget();
 		CTabItem item = folder.getItem(0);
@@ -132,15 +139,17 @@ public class MPartTest {
 	private void testDeclaredTooltip(String partToolTip, String expectedToolTip) {
 		final MWindow window = createWindowWithOneView("Part Name", partToolTip);
 
-		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
 
-		MPartSashContainer container = (MPartSashContainer) window.getChildren().get(0);
+		MPartSashContainer container = (MPartSashContainer) window
+				.getChildren().get(0);
 		MPartStack stack = (MPartStack) container.getChildren().get(0);
 
 		CTabFolder folder = (CTabFolder) stack.getWidget();
@@ -166,15 +175,17 @@ public class MPartTest {
 	private void testMPart_setTooltip(String partToolTip, String expectedToolTip) {
 		final MWindow window = createWindowWithOneView("Part Name");
 
-		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
 
-		MPartSashContainer container = (MPartSashContainer) window.getChildren().get(0);
+		MPartSashContainer container = (MPartSashContainer) window
+				.getChildren().get(0);
 		MPartStack stack = (MPartStack) container.getChildren().get(0);
 		MPart part = (MPart) stack.getChildren().get(0);
 
@@ -205,19 +216,22 @@ public class MPartTest {
 	public void testMPart_getContext() {
 		final MWindow window = createWindowWithOneView("Part Name");
 
-		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
 
-		MPartSashContainer container = (MPartSashContainer) window.getChildren().get(0);
+		MPartSashContainer container = (MPartSashContainer) window
+				.getChildren().get(0);
 		MPartStack stack = (MPartStack) container.getChildren().get(0);
 		MPart part = (MPart) stack.getChildren().get(0);
 
-		IPresentationEngine renderer = appContext.get(IPresentationEngine.class);
+		IPresentationEngine renderer = (IPresentationEngine) appContext
+				.get(IPresentationEngine.class.getName());
 		renderer.removeGui(part);
 		assertNull(part.getContext());
 	}
@@ -226,15 +240,17 @@ public class MPartTest {
 	public void testMPartBug369866() {
 		final MWindow window = createWindowWithOneView("Part");
 
-		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
 
-		MPartSashContainer container = (MPartSashContainer) window.getChildren().get(0);
+		MPartSashContainer container = (MPartSashContainer) window
+				.getChildren().get(0);
 		MPartStack stack = (MPartStack) container.getChildren().get(0);
 		MPart part = (MPart) stack.getChildren().get(0);
 
@@ -268,7 +284,8 @@ public class MPartTest {
 		window.setHeight(300);
 		window.setWidth(400);
 		window.setLabel("MyWindow");
-		MPartSashContainer sash = BasicFactoryImpl.eINSTANCE.createPartSashContainer();
+		MPartSashContainer sash = BasicFactoryImpl.eINSTANCE
+				.createPartSashContainer();
 		window.getChildren().add(sash);
 		MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		sash.getChildren().add(stack);
@@ -276,9 +293,10 @@ public class MPartTest {
 		stack.getChildren().add(contributedPart);
 		contributedPart.setLabel(partName);
 		contributedPart.setTooltip(toolTip);
-		contributedPart.setIconURI("platform:/plugin/org.eclipse.e4.ui.tests/icons/filenav_nav.png");
-		contributedPart.setContributionURI(
-				"bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
+		contributedPart
+				.setIconURI("platform:/plugin/org.eclipse.e4.ui.tests/icons/filenav_nav.gif");
+		contributedPart
+				.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
 		return window;
 	}
