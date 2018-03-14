@@ -2003,6 +2003,14 @@ UIEvents.Context.TOPIC_CONTEXT,
 			}
 		});
 
+		eventBroker.subscribe(UIEvents.UILifeCycle.APP_STARTUP_COMPLETE, new EventHandler() {
+			@Override
+			public void handleEvent(org.osgi.service.event.Event event) {
+				// Let the advisor run its start up code.
+				advisor.postStartup(); // May trigger a close/restart.
+			}
+		});
+
 		boolean found = false;
 		List<MPartDescriptor> currentDescriptors = application.getDescriptors();
 		for (MPartDescriptor desc : currentDescriptors) {
@@ -2915,11 +2923,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 				// initialize workbench and restore or open one window
 				initOK[0] = init();
 
-			}
-
-			// let the advisor run its start up code
-			if (initOK[0]) {
-				advisor.postStartup(); // may trigger a close/restart
 			}
 
 			if (initOK[0] && runEventLoop) {
