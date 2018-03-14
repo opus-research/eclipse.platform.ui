@@ -24,13 +24,13 @@ import org.eclipse.ui.services.IServiceScopes;
 
 /**
  * @since 3.4
- *
+ * 
  */
 public class CommandServiceFactory extends AbstractServiceFactory {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * org.eclipse.ui.services.AbstractServiceFactory#create(java.lang.Class,
 	 * org.eclipse.ui.services.IServiceLocator,
@@ -65,7 +65,7 @@ public class CommandServiceFactory extends AbstractServiceFactory {
 		if (parent instanceof SlaveCommandService) {
 			IServiceLocator pageSite = wls.getPageSite();
 			if (pageSite != null) {
-				MContext context = pageSite.getService(MContext.class);
+				MContext context = (MContext) pageSite.getService(MContext.class);
 				if (context == null) {
 					return new SlaveCommandService((ICommandService) parent,
 							IServiceScopes.PAGESITE_SCOPE, pageSite);
@@ -75,7 +75,7 @@ public class CommandServiceFactory extends AbstractServiceFactory {
 			}
 			IServiceLocator mpepSite = wls.getMultiPageEditorSite();
 			if (mpepSite != null) {
-				MContext context = mpepSite.getService(MContext.class);
+				MContext context = (MContext) mpepSite.getService(MContext.class);
 				if (context == null) {
 					return new SlaveCommandService((ICommandService) parent,
 							IServiceScopes.MPESITE_SCOPE, mpepSite);
