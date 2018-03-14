@@ -10,8 +10,9 @@
  *******************************************************************************/
 package org.eclipse.jface.util;
 
-import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.TableTree;
+import org.eclipse.swt.custom.TableTreeItem;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
@@ -24,6 +25,8 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
+
+import org.eclipse.core.runtime.ListenerList;
 
 /**
  * Implementation of single-click and double-click strategies.
@@ -339,16 +342,19 @@ public class OpenStrategy {
 					}
                     mouseMoveEvent = e;
                     final Runnable runnable[] = new Runnable[1];
-                    runnable[0] = () -> {
-					    long time = System.currentTimeMillis();
-					    int diff = (int) (time - startTime);
-					    if (diff <= TIME) {
-					        display.timerExec(diff * 2 / 3, runnable[0]);
-					    } else {
-					        timerStarted = false;
-					        setSelection(mouseMoveEvent);
-					    }
-					};
+                    runnable[0] = new Runnable() {
+                        @Override
+						public void run() {
+                            long time = System.currentTimeMillis();
+                            int diff = (int) (time - startTime);
+                            if (diff <= TIME) {
+                                display.timerExec(diff * 2 / 3, runnable[0]);
+                            } else {
+                                timerStarted = false;
+                                setSelection(mouseMoveEvent);
+                            }
+                        }
+                    };
                     startTime = System.currentTimeMillis();
                     if (!timerStarted) {
                         timerStarted = true;
@@ -412,22 +418,29 @@ public class OpenStrategy {
                     // want to delay any selection until the last arrowDown/Up occurs.  This
                     // handles the case where the user presses arrowDown/Up successively.
                     // We only want to open an editor for the last selected item.
-                    display.asyncExec(() -> {
-					    if (arrowKeyDown) {
-					        display.timerExec(TIME, () -> {
-							    if (id == count[0]) {
-							        firePostSelectionEvent(new SelectionEvent(
-							                e));
-							        if ((CURRENT_METHOD & ARROW_KEYS_OPEN) != 0) {
-										fireOpenEvent(new SelectionEvent(
-							                    e));
-									}
-							    }
-							});
-					    } else {
-					        firePostSelectionEvent(new SelectionEvent(e));
-					    }
-					});
+                    display.asyncExec(new Runnable() {
+                        @Override
+						public void run() {
+                            if (arrowKeyDown) {
+                                display.timerExec(TIME, new Runnable() {
+
+                                    @Override
+									public void run() {
+                                        if (id == count[0]) {
+                                            firePostSelectionEvent(new SelectionEvent(
+                                                    e));
+                                            if ((CURRENT_METHOD & ARROW_KEYS_OPEN) != 0) {
+												fireOpenEvent(new SelectionEvent(
+                                                        e));
+											}
+                                        }
+                                    }
+                                });
+                            } else {
+                                firePostSelectionEvent(new SelectionEvent(e));
+                            }
+                        }
+                    });
                     break;
                 }
             }
@@ -466,6 +479,13 @@ public class OpenStrategy {
                     TableItem item = table.getItem(new Point(e.x, e.y));
                     if (item != null) {
 						table.setSelection(new TableItem[] { item });
+					}
+                    selEvent.item = item;
+                } else if (w instanceof TableTree) {
+                    TableTree table = (TableTree) w;
+                    TableTreeItem item = table.getItem(new Point(e.x, e.y));
+                    if (item != null) {
+						table.setSelection(new TableTreeItem[] { item });
 					}
                     selEvent.item = item;
                 } else {

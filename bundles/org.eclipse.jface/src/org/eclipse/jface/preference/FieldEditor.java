@@ -17,6 +17,8 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.layout.GridData;
@@ -385,7 +387,12 @@ public abstract class FieldEditor {
             if (text != null) {
 				label.setText(text);
 			}
-            label.addDisposeListener(event -> label = null);
+            label.addDisposeListener(new DisposeListener() {
+                @Override
+				public void widgetDisposed(DisposeEvent event) {
+                    label = null;
+                }
+            });
         } else {
             checkParent(label, parent);
         }

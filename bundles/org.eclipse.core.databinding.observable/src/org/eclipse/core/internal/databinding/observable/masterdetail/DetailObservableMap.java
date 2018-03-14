@@ -10,7 +10,6 @@
  *     Matthew Hall - bug 223114, 226289, 247875, 246782, 249526, 268022,
  *                    251424
  *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
- *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  ******************************************************************************/
 
 package org.eclipse.core.internal.databinding.observable.masterdetail;
@@ -75,7 +74,7 @@ public class DetailObservableMap<M, K, V> extends ObservableMap<K, V>implements 
 		@Override
 		public void handleMapChange(MapChangeEvent<? extends K, ? extends V> event) {
 			if (!updating) {
-				fireMapChange(Diffs.unmodifiableDiff(event.diff));
+				fireMapChange(event.diff);
 			}
 		}
 	};

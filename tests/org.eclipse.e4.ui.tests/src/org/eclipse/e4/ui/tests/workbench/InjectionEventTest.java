@@ -137,12 +137,10 @@ public class InjectionEventTest extends TestCase {
 		context.set(Realm.class, DisplayRealm.getRealm(d));
 		context.set(UISynchronize.class, new UISynchronize() {
 
-			@Override
 			public void syncExec(Runnable runnable) {
 				d.syncExec(runnable);
 			}
 
-			@Override
 			public void asyncExec(Runnable runnable) {
 				d.asyncExec(runnable);
 			}
@@ -228,12 +226,10 @@ public class InjectionEventTest extends TestCase {
 		context.set(Realm.class, DisplayRealm.getRealm(d));
 		context.set(UISynchronize.class, new UISynchronize() {
 
-			@Override
 			public void syncExec(Runnable runnable) {
 				d.syncExec(runnable);
 			}
 
-			@Override
 			public void asyncExec(Runnable runnable) {
 				d.asyncExec(runnable);
 			}
