@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.IResourceUtilities;
@@ -121,8 +122,21 @@ public class ViewLabelProvider extends ColumnLabelProvider {
 					modelService.getActivePerspective(window), elementId, MPart.class, null);
 
 			if (findElements.size() > 0) {
-				MPart mPart = findElements.get(0);
-				if (mPart.isVisible() && mPart.isToBeRendered()) {
+				MPart part = findElements.get(0);
+
+				// if that is a shared part, check the placeholders
+				if (window.getSharedElements().contains(part)) {
+					List<MPlaceholder> placeholders = modelService.findElements(
+							modelService.getActivePerspective(window), elementId, MPlaceholder.class, null);
+					for (MPlaceholder mPlaceholder : placeholders) {
+						if (mPlaceholder.isVisible() && mPlaceholder.isToBeRendered()) {
+							return dimmedForeground;
+						}
+					}
+					return null;
+				}
+				// not a shared part
+				if (part.isVisible() && part.isToBeRendered()) {
 					return dimmedForeground;
 				}
 			}
