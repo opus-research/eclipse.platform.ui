@@ -1150,7 +1150,7 @@ public class PartServiceImpl implements EPartService {
 				return null;
 			}
 		}
-		return showPart(part, partState);
+		return showPart(addPart(part), partState);
 	}
 
 	@Override
