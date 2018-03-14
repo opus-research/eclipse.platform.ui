@@ -2779,8 +2779,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 		workbenchAutoSave = b;
 	}
 
-	private volatile boolean initDone = false;
-
 	/**
 	 * Internal method for running the workbench UI. This entails processing and
 	 * dispatching events until the workbench is closed or restarted.
@@ -2864,6 +2862,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 
 			if (getSplash() != null) {
 
+				final boolean[] initDone = new boolean[] { false };
 				final Throwable[] error = new Throwable[1];
 				Thread initThread = new Thread() {
 					/*
@@ -2881,7 +2880,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 						} catch (Throwable e) {
 							error[0] = e;
 						} finally {
-							initDone = true;
+							initDone[0] = true;
 							yield();
 							display.wake();
 						}
@@ -2890,7 +2889,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 				initThread.start();
 				while (true) {
 					if (!display.readAndDispatch()) {
-						if (initDone)
+						if (initDone[0])
 							break;
 						display.sleep();
 					}
