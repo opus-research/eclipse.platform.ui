@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.internal.util;
 
@@ -45,8 +44,7 @@ public class FailureDialog extends Dialog {
     /* (non-Javadoc)
      * Method declared on Window.
      */
-    @Override
-	protected void configureShell(Shell newShell) {
+    protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
         newShell.setText("Dialog Test Failed");
     }
@@ -54,8 +52,7 @@ public class FailureDialog extends Dialog {
     /* (non-Javadoc)
      * Method declared on Dialog.
      */
-    @Override
-	protected void createButtonsForButtonBar(Composite parent) {
+    protected void createButtonsForButtonBar(Composite parent) {
         createButton(parent, IDialogConstants.OK_ID, "&OK", true);
         createButton(parent, IDialogConstants.CANCEL_ID,
                 IDialogConstants.CANCEL_LABEL, false);
@@ -64,8 +61,7 @@ public class FailureDialog extends Dialog {
     /* (non-Javadoc)
      * Method declared on Dialog.
      */
-    @Override
-	protected Control createDialogArea(Composite parent) {
+    protected Control createDialogArea(Composite parent) {
         // page group
         Composite composite = (Composite) super.createDialogArea(parent);
         composite.setSize(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -88,8 +84,7 @@ public class FailureDialog extends Dialog {
     /* (non-Javadoc)
      * Method declared on Dialog.
      */
-    @Override
-	protected void okPressed() {
+    protected void okPressed() {
         _log = _text.getText();
         super.okPressed();
     }
@@ -99,7 +94,11 @@ public class FailureDialog extends Dialog {
      * the dialog.
      */
     String getText() {
-		return (_log == null) ? "Empty entry." : _log;
+        if (_log == null) {
+            return "Empty entry.";
+        } else {
+            return _log;
+        }
     }
 
     /*
@@ -115,8 +114,7 @@ public class FailureDialog extends Dialog {
      * Returns a string representation of this class which
      * the text contained in the input area of the dialog.
      */
-    @Override
-	public String toString() {
+    public String toString() {
         return getText();
     }
 }
