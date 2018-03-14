@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Martin Boyle <martingboyle@gmail.com> - Fix for 
  *     		Bug 183013 [Wizards] Error importing into linked EFS folder - "undefined path variable"
- *     Marc-Andre Laperle (Ericsson) - Bug 279902 - [Import/Export] WizardResourceImportPage.createDestinationGroup is final
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -25,7 +24,6 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.equinox.bidi.StructuredTextTypeHandlerFactory;
 import org.eclipse.jface.util.BidiUtils;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -182,7 +180,7 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
      *
      * @param parent the parent control
      */
-    protected void createDestinationGroup(Composite parent) {
+    protected final void createDestinationGroup(Composite parent) {
         // container specification group
         Composite containerGroup = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout();
@@ -309,15 +307,7 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
      * @return IPath
      */
     protected IPath getResourcePath() {
-        if (this.containerNameField != null) {
-            return getPathFromText(this.containerNameField);
-        }
-
-        if (this.initialContainerFieldValue != null && this.initialContainerFieldValue.length() > 0) {
-            return new Path(this.initialContainerFieldValue).makeAbsolute();
-        }
-
-        return Path.EMPTY;
+        return getPathFromText(this.containerNameField);
     }
 
     /**
