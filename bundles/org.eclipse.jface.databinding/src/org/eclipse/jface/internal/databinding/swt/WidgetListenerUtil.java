@@ -37,9 +37,12 @@ public class WidgetListenerUtil {
 		if (display == Display.getCurrent()) {
 			widget.addListener(event, listener);
 		} else {
-			DisplayRealm.getRealm(display).exec(() -> {
-				if (!widget.isDisposed())
-					widget.addListener(event, listener);
+			DisplayRealm.getRealm(display).exec(new Runnable() {
+				@Override
+				public void run() {
+					if (!widget.isDisposed())
+						widget.addListener(event, listener);
+				}
 			});
 		}
 	}
@@ -60,9 +63,12 @@ public class WidgetListenerUtil {
 		if (display == Display.getCurrent()) {
 			widget.removeListener(event, listener);
 		} else {
-			DisplayRealm.getRealm(display).exec(() -> {
-				if (!widget.isDisposed())
-					widget.removeListener(event, listener);
+			DisplayRealm.getRealm(display).exec(new Runnable() {
+				@Override
+				public void run() {
+					if (!widget.isDisposed())
+						widget.removeListener(event, listener);
+				}
 			});
 		}
 	}

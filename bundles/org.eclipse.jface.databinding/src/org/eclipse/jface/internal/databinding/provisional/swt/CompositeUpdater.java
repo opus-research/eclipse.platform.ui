@@ -64,7 +64,12 @@ public abstract class CompositeUpdater {
 
 		private void updateIfNecessary() {
 			if (dirty) {
-				dependencies = ObservableTracker.runAndMonitor(() -> updateWidget(widget, element), this, null);
+				dependencies = ObservableTracker.runAndMonitor(new Runnable() {
+					@Override
+					public void run() {
+						updateWidget(widget, element);
+					}
+				}, this, null);
 				dirty = false;
 			}
 		}

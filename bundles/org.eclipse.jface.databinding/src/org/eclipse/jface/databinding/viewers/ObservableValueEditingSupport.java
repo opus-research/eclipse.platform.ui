@@ -15,6 +15,8 @@ package org.eclipse.jface.databinding.viewers;
 import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
+import org.eclipse.core.databinding.observable.ChangeEvent;
+import org.eclipse.core.databinding.observable.IChangeListener;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.property.value.IValueProperty;
 import org.eclipse.core.runtime.Assert;
@@ -165,7 +167,12 @@ public abstract class ObservableValueEditingSupport extends EditingSupport {
 
 		Binding binding = createBinding(target, model);
 
-		target.addChangeListener(event -> dirty = true);
+		target.addChangeListener(new IChangeListener() {
+			@Override
+			public void handleChange(ChangeEvent event) {
+				dirty = true;
+			}
+		});
 
 		Assert.isNotNull(binding, "createBinding(...) did not return a binding"); //$NON-NLS-1$
 

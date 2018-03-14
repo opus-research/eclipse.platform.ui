@@ -16,6 +16,7 @@ import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.ObservableTracker;
 import org.eclipse.core.databinding.observable.list.IListChangeListener;
 import org.eclipse.core.databinding.observable.list.IObservableList;
+import org.eclipse.core.databinding.observable.list.ListChangeEvent;
 import org.eclipse.core.databinding.observable.list.ListDiffEntry;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
@@ -79,7 +80,12 @@ public abstract class TableUpdater {
 
 		private void updateIfNecessary(final int indexOfItem) {
 			if (dirty) {
-				dependencies = ObservableTracker.runAndMonitor(() -> updateItem(indexOfItem, item, element), this, null);
+				dependencies = ObservableTracker.runAndMonitor(new Runnable() {
+					@Override
+					public void run() {
+						updateItem(indexOfItem, item, element);
+					}
+				}, this, null);
 				dirty = false;
 			}
 		}
@@ -146,18 +152,21 @@ public abstract class TableUpdater {
 
 	private Table table;
 
-	private IListChangeListener listChangeListener = event -> {
-		ListDiffEntry[] differences = event.diff.getDifferences();
-		for (int i = 0; i < differences.length; i++) {
-			ListDiffEntry entry = differences[i];
-			if (entry.isAddition()) {
-				TableItem item = new TableItem(table, SWT.NONE, entry
-						.getPosition());
-				UpdateRunnable updateRunnable = new UpdateRunnable(item, entry.getElement());
-				item.setData(updateRunnable);
-				updateRunnable.makeDirty();
-			} else {
-				table.getItem(entry.getPosition()).dispose();
+	private IListChangeListener listChangeListener = new IListChangeListener() {
+		@Override
+		public void handleListChange(ListChangeEvent event) {
+			ListDiffEntry[] differences = event.diff.getDifferences();
+			for (int i = 0; i < differences.length; i++) {
+				ListDiffEntry entry = differences[i];
+				if (entry.isAddition()) {
+					TableItem item = new TableItem(table, SWT.NONE, entry
+							.getPosition());
+					UpdateRunnable updateRunnable = new UpdateRunnable(item, entry.getElement());
+					item.setData(updateRunnable);
+					updateRunnable.makeDirty();
+				} else {
+					table.getItem(entry.getPosition()).dispose();
+				}
 			}
 		}
 	};

@@ -18,6 +18,7 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.databinding.swt.ISWTObservableValue;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Widget;
 
@@ -30,16 +31,24 @@ public class SWTVetoableValueDecorator extends DecoratingVetoableValue
 	private Widget widget;
 	private WidgetStringValueProperty property;
 
-	private Listener verifyListener = event -> {
-		String currentText = (String) property.getValue(widget);
-		String newText = currentText.substring(0, event.start) + event.text
-				+ currentText.substring(event.end);
-		if (!fireValueChanging(Diffs.createValueDiff(currentText, newText))) {
-			event.doit = false;
+	private Listener verifyListener = new Listener() {
+		@Override
+		public void handleEvent(Event event) {
+			String currentText = (String) property.getValue(widget);
+			String newText = currentText.substring(0, event.start) + event.text
+					+ currentText.substring(event.end);
+			if (!fireValueChanging(Diffs.createValueDiff(currentText, newText))) {
+				event.doit = false;
+			}
 		}
 	};
 
-	private Listener disposeListener = event -> SWTVetoableValueDecorator.this.dispose();
+	private Listener disposeListener = new Listener() {
+		@Override
+		public void handleEvent(Event event) {
+			SWTVetoableValueDecorator.this.dispose();
+		}
+	};
 
 	/**
 	 * @param widget

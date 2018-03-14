@@ -16,6 +16,7 @@ import org.eclipse.core.databinding.observable.list.DecoratingObservableList;
 import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.jface.databinding.swt.ISWTObservableList;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Widget;
 
@@ -38,7 +39,12 @@ public class SWTObservableListDecorator extends DecoratingObservableList
 				disposeListener);
 	}
 
-	private Listener disposeListener = event -> SWTObservableListDecorator.this.dispose();
+	private Listener disposeListener = new Listener() {
+		@Override
+		public void handleEvent(Event event) {
+			SWTObservableListDecorator.this.dispose();
+		}
+	};
 
 	@Override
 	public synchronized void dispose() {

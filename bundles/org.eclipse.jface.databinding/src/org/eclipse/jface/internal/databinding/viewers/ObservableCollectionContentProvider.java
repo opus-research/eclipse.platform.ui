@@ -13,6 +13,7 @@
 
 package org.eclipse.jface.internal.databinding.viewers;
 
+import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.IObservableCollection;
 import org.eclipse.core.databinding.observable.Observables;
 import org.eclipse.core.databinding.observable.masterdetail.IObservableFactory;
@@ -91,12 +92,15 @@ public abstract class ObservableCollectionContentProvider implements
 		viewerObservable = new WritableValue(DisplayRealm.getRealm(display));
 		viewerUpdater = null;
 
-		elementSetFactory = target -> {
-			IElementComparer comparer = null;
-			if (target instanceof StructuredViewer)
-				comparer = ((StructuredViewer) target).getComparer();
-			return ObservableViewerElementSet.withComparer(DisplayRealm
-					.getRealm(display), null, comparer);
+		elementSetFactory = new IObservableFactory() {
+			@Override
+			public IObservable createObservable(Object target) {
+				IElementComparer comparer = null;
+				if (target instanceof StructuredViewer)
+					comparer = ((StructuredViewer) target).getComparer();
+				return ObservableViewerElementSet.withComparer(DisplayRealm
+						.getRealm(display), null, comparer);
+			}
 		};
 		knownElements = MasterDetailObservables.detailSet(viewerObservable,
 				elementSetFactory, null);
@@ -124,9 +128,12 @@ public abstract class ObservableCollectionContentProvider implements
 	private void asyncUpdateRealizedElements() {
 		if (realizedElements == null)
 			return;
-		display.asyncExec(() -> {
-			if (realizedElements != null) {
-				realizedElements.addAll(knownElements);
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				if (realizedElements != null) {
+					realizedElements.addAll(knownElements);
+				}
 			}
 		});
 	}

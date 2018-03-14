@@ -33,9 +33,12 @@ public class WorkQueue {
 
 	private Set pendingWorkSet = new HashSet();
 
-	private Runnable updateJob = () -> {
-		doUpdate();
-		updateScheduled = false;
+	private Runnable updateJob = new Runnable() {
+		@Override
+		public void run() {
+			doUpdate();
+			updateScheduled = false;
+		}
 	};
 
 	/**

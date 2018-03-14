@@ -91,7 +91,12 @@ public abstract class MenuUpdater {
 
 	}
 
-	private Runnable updateRunnable = () -> updateMenu();
+	private Runnable updateRunnable = new Runnable() {
+		@Override
+		public void run() {
+			updateMenu();
+		}
+	};
 
 	private PrivateInterface privateInterface = new PrivateInterface();
 	private Menu theMenu;

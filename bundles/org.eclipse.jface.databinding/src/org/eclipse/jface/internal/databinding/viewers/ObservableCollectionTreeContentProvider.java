@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.IObservableCollection;
 import org.eclipse.core.databinding.observable.IObservablesListener;
 import org.eclipse.core.databinding.observable.Observables;
@@ -110,8 +111,13 @@ public abstract class ObservableCollectionTreeContentProvider implements
 		viewerObservable = new WritableValue(realm);
 		viewerUpdater = null;
 
-		elementSetFactory = target -> ObservableViewerElementSet.withComparer(realm, null,
-				getElementComparer((Viewer) target));
+		elementSetFactory = new IObservableFactory() {
+			@Override
+			public IObservable createObservable(Object target) {
+				return ObservableViewerElementSet.withComparer(realm, null,
+						getElementComparer((Viewer) target));
+			}
+		};
 		knownElements = MasterDetailObservables.detailSet(viewerObservable,
 				elementSetFactory, null);
 		unmodifiableKnownElements = Observables
@@ -208,14 +214,17 @@ public abstract class ObservableCollectionTreeContentProvider implements
 			return;
 		if (!realizedElements.equals(knownElements)) {
 			if (asyncUpdateRunnable == null) {
-				asyncUpdateRunnable = () -> {
-					// If we've been disposed, exit early
-					if (knownElements == null) {
-						return;
-					}
-					asyncUpdatePending = false;
-					if (realizedElements != null) {
-						realizedElements.addAll(knownElements);
+				asyncUpdateRunnable = new Runnable() {
+					@Override
+					public void run() {
+						// If we've been disposed, exit early
+						if (knownElements == null) {
+							return;
+						}
+						asyncUpdatePending = false;
+						if (realizedElements != null) {
+							realizedElements.addAll(knownElements);
+						}
 					}
 				};
 			}
