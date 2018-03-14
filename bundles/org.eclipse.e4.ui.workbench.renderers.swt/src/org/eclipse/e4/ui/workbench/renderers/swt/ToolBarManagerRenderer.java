@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 410426
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 426535, 433234, 431868
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 426535
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 431778
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
@@ -16,10 +16,8 @@ package org.eclipse.e4.ui.workbench.renderers.swt;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -41,7 +39,6 @@ import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.SideValue;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
-import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MDirectToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
@@ -85,7 +82,9 @@ import org.osgi.service.event.EventHandler;
 /**
  * Create a contribute part.
  */
-public class ToolBarManagerRenderer extends SWTPartRenderer {
+public class ToolBarManagerRenderer
+		extends
+		ContributionManagerRenderer<MToolBar, MToolBarElement, ToolBarManager, ToolBarContributionRecord> {
 
 	private static final Selector ALL_SELECTOR = new Selector() {
 
@@ -100,15 +99,14 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	public static final String UPDATE_VARS = "ToolBarManagerRenderer.updateVars"; //$NON-NLS-1$
 	private static final String DISPOSE_ADDED = "ToolBarManagerRenderer.disposeAdded"; //$NON-NLS-1$
 
-	private Map<MToolBar, ToolBarManager> modelToManager = new HashMap<MToolBar, ToolBarManager>();
-	private Map<ToolBarManager, MToolBar> managerToModel = new HashMap<ToolBarManager, MToolBar>();
-
-	private Map<MToolBarElement, IContributionItem> modelToContribution = new HashMap<MToolBarElement, IContributionItem>();
-	private Map<IContributionItem, MToolBarElement> contributionToModel = new HashMap<IContributionItem, MToolBarElement>();
-
-	private Map<MToolBarElement, ToolBarContributionRecord> modelContributionToRecord = new HashMap<MToolBarElement, ToolBarContributionRecord>();
-
-	private Map<MToolBarElement, ArrayList<ToolBarContributionRecord>> sharedElementToRecord = new HashMap<MToolBarElement, ArrayList<ToolBarContributionRecord>>();
+	/**
+	 * This is a persistedState 'key' which can be used by the renderer
+	 * implementation to decide that a user interface element has been hidden by
+	 * the user
+	 * 
+	 */
+	// TODO migrate to IPresentationEngine after the Luna release
+	public static final String HIDDEN_BY_USER = "HIDDEN_BY_USER"; //$NON-NLS-1$
 
 	private ToolItemUpdater enablementUpdater = new ToolItemUpdater();
 
@@ -117,17 +115,12 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	 */
 	private Menu toolbarMenu;
 
-	// @Inject
-	// private Logger logger;
-
 	@Inject
 	private MApplication application;
 
 	@Inject
 	EModelService modelService;
 
-	@Inject
-	IEventBroker eventBroker;
 	private EventHandler itemUpdater = new EventHandler() {
 		@Override
 		public void handleEvent(Event event) {
@@ -186,8 +179,9 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 						}
 					}
 				} else {
-					IContributionItem ici = modelToContribution
-							.remove(itemModel);
+					IContributionItem ici = getContribution(itemModel);
+					clearModelToContribution(itemModel, ici);
+
 					if (ici != null && parent != null) {
 						parent.remove(ici);
 					}
@@ -319,13 +313,13 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 		if (UIEvents.isADD(event)) {
 			if (UIEvents.contains(event, UIEvents.EventTags.NEW_VALUE,
-					IPresentationEngine.HIDDEN_EXPLICITLY)) {
+					HIDDEN_BY_USER)) {
 				changedElement.setVisible(false);
 				changedElement.setToBeRendered(false);
 			}
 		} else if (UIEvents.isREMOVE(event)) {
 			if (UIEvents.contains(event, UIEvents.EventTags.OLD_VALUE,
-					IPresentationEngine.HIDDEN_EXPLICITLY)) {
+					HIDDEN_BY_USER)) {
 				changedElement.setVisible(true);
 				changedElement.setToBeRendered(true);
 			}
@@ -339,16 +333,17 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		List<MToolBar> toolBars = modelService.findElements(application, null,
 				MToolBar.class, null);
 		for (MToolBar mToolBar : toolBars) {
-			if (mToolBar.getTags().contains(
-					IPresentationEngine.HIDDEN_EXPLICITLY)) {
+			if (mToolBar.getTags().contains(HIDDEN_BY_USER)) {
 				mToolBar.setVisible(false);
 				mToolBar.setToBeRendered(false);
 			}
 		}
 	}
 
+	@Override
 	@PostConstruct
 	public void init() {
+		super.init();
 		eventBroker.subscribe(UIEvents.UILabel.TOPIC_ALL, itemUpdater);
 		eventBroker.subscribe(UIEvents.Item.TOPIC_SELECTED, selectionUpdater);
 		eventBroker.subscribe(UIEvents.Item.TOPIC_ENABLED, enabledUpdater);
@@ -381,6 +376,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		context.runAndTrack(enablementUpdater);
 	}
 
+	@Override
 	@PreDestroy
 	public void contextDisposed() {
 		eventBroker.unsubscribe(itemUpdater);
@@ -388,6 +384,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		eventBroker.unsubscribe(enabledUpdater);
 		eventBroker.unsubscribe(toBeRenderedUpdater);
 		eventBroker.unsubscribe(childAdditionUpdater);
+		super.contextDisposed();
 	}
 
 	@Override
@@ -432,8 +429,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		hideItem.setText(Messages.ToolBarManagerRenderer_MenuCloseText);
 		hideItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(org.eclipse.swt.widgets.Event event) {
-				toolbarModel.getTags().add(
-						IPresentationEngine.HIDDEN_EXPLICITLY);
+				toolbarModel.getTags().add(HIDDEN_BY_USER);
 			}
 		});
 
@@ -444,7 +440,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 				.setText(Messages.ToolBarManagerRenderer_MenuRestoreText);
 		restoreHiddenItems.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(org.eclipse.swt.widgets.Event event) {
-				removeHiddenTags(toolbarModel);
+				removeHiddenByUserTags(toolbarModel);
 			}
 		});
 		renderedCtrl.setMenu(toolbarMenu);
@@ -474,15 +470,13 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	private void addCleanupDisposeListener(final MToolBar toolbarModel,
 			ToolBar control) {
 
-		final Map<String, Object> transientData = toolbarModel
-				.getTransientData();
-		if (!transientData.containsKey(DISPOSE_ADDED)) {
-			transientData.put(DISPOSE_ADDED, Boolean.TRUE);
+		if (!toolbarModel.getTags().contains(DISPOSE_ADDED)) {
+			toolbarModel.getTags().add(DISPOSE_ADDED);
 			control.addDisposeListener(new DisposeListener() {
 				@Override
 				public void widgetDisposed(DisposeEvent e) {
 					cleanUp(toolbarModel);
-					transientData.remove(DISPOSE_ADDED);
+					toolbarModel.getTags().remove(DISPOSE_ADDED);
 				}
 			});
 		}
@@ -602,8 +596,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	 * @param element
 	 */
 	protected void cleanUp(MToolBar toolbarModel) {
-		Collection<ToolBarContributionRecord> vals = modelContributionToRecord
-				.values();
+		Collection<ToolBarContributionRecord> vals = getList(toolbarModel);
 		for (ToolBarContributionRecord record : vals
 				.toArray(new ToolBarContributionRecord[vals.size()])) {
 			if (record.toolbarModel == toolbarModel) {
@@ -622,7 +615,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 	public void cleanUpCopy(ToolBarContributionRecord record,
 			MToolBarElement copy) {
-		modelContributionToRecord.remove(copy);
+		removeContributionRecord(copy);
 		IContributionItem ici = getContribution(copy);
 		clearModelToContribution(copy, ici);
 		if (ici != null) {
@@ -919,62 +912,12 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		}
 	}
 
-	public ToolBarManager getManager(MToolBar model) {
-		return modelToManager.get(model);
-	}
-
 	public MToolBar getToolBarModel(ToolBarManager manager) {
-		return managerToModel.get(manager);
-	}
-
-	public void linkModelToManager(MToolBar model, ToolBarManager manager) {
-		modelToManager.put(model, manager);
-		managerToModel.put(manager, model);
-	}
-
-	public void clearModelToManager(MToolBar model, ToolBarManager manager) {
-		modelToManager.remove(model);
-		managerToModel.remove(manager);
-	}
-
-	public IContributionItem getContribution(MToolBarElement element) {
-		return modelToContribution.get(element);
+		return getModel(manager);
 	}
 
 	public MToolBarElement getToolElement(IContributionItem item) {
-		return contributionToModel.get(item);
-	}
-
-	public void linkModelToContribution(MToolBarElement model,
-			IContributionItem item) {
-		modelToContribution.put(model, item);
-		contributionToModel.put(item, model);
-	}
-
-	public void clearModelToContribution(MToolBarElement model,
-			IContributionItem item) {
-		modelToContribution.remove(model);
-		contributionToModel.remove(item);
-	}
-
-	public ArrayList<ToolBarContributionRecord> getList(MToolBarElement item) {
-		ArrayList<ToolBarContributionRecord> tmp = sharedElementToRecord
-				.get(item);
-		if (tmp == null) {
-			tmp = new ArrayList<ToolBarContributionRecord>();
-			sharedElementToRecord.put(item, tmp);
-		}
-		return tmp;
-	}
-
-	public void linkElementToContributionRecord(MToolBarElement element,
-			ToolBarContributionRecord record) {
-		modelContributionToRecord.put(element, record);
-	}
-
-	public ToolBarContributionRecord getContributionRecord(
-			MToolBarElement element) {
-		return modelContributionToRecord.get(element);
+		return getModelElement(item);
 	}
 
 	public void reconcileManagerToModel(IToolBarManager menuManager,
@@ -1056,18 +999,16 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	}
 
 	/**
-	 * Removes the IPresentationEngine.HIDDEN_EXPLICITLY from the trimbar
-	 * entries. Having a separate logic for toolbars and toolcontrols would be
-	 * confusing for the user, hence we remove this tag for both these types
-	 *
+	 * Removes the IPresentationEngine.HIDDEN_BY_USER from the toolbars
+	 * 
 	 * @param toolbarModel
 	 */
-	private void removeHiddenTags(MToolBar toolbarModel) {
+	private void removeHiddenByUserTags(MToolBar toolbarModel) {
 		MWindow mWindow = modelService.getTopLevelWindowFor(toolbarModel);
-		List<MTrimElement> trimElements = modelService.findElements(mWindow,
-				null, MTrimElement.class, null);
-		for (MTrimElement trimElement : trimElements) {
-			trimElement.getTags().remove(IPresentationEngine.HIDDEN_EXPLICITLY);
+		List<MToolBar> toolBars = modelService.findElements(mWindow, null,
+				MToolBar.class, null);
+		for (MToolBar mToolBar : toolBars) {
+			mToolBar.getTags().remove(HIDDEN_BY_USER);
 		}
 	}
 
