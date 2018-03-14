@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Steven Spungin <steven@spungin.tv> - Bug 361731, 401043
  ******************************************************************************/
 
 package org.eclipse.ui.internal.e4.compatibility;
@@ -15,8 +14,6 @@ package org.eclipse.ui.internal.e4.compatibility;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.eclipse.e4.ui.internal.workbench.PartSizeInfo;
-import org.eclipse.e4.ui.internal.workbench.PartSizeInfo.PartResizeMode;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
@@ -506,8 +503,8 @@ public class ModeledPageLayout implements IPageLayout {
 		return getLastElement(children.get(children.size() - 1));
 	}
 
-	private MPartStack insertStack(String stackId, int relationship, float ratio, String refId,
-			boolean visible) {
+	private MPartStack insertStack(String stackId, int relationship,
+			float ratio, String refId, boolean visible) {
 		MUIElement refModel = findElement(perspModel, refId);
 		if (refModel == null) {
 			WorkbenchPlugin.log(NLS.bind(WorkbenchMessages.PageLayout_missingRefPart, refId));
@@ -540,7 +537,8 @@ public class ModeledPageLayout implements IPageLayout {
 		return stack;
 	}
 
-	public static void replace(MUIElement relTo, MElementContainer<MUIElement> newParent) {
+	public static void replace(MUIElement relTo,
+			MElementContainer<MUIElement> newParent) {
 		if (relTo == null || newParent == null)
 			return;
 
@@ -570,7 +568,8 @@ public class ModeledPageLayout implements IPageLayout {
 		newParent.getChildren().add(relTo);
 	}
 
-	public static void insert(MUIElement toInsert, MUIElement relTo, int swtSide, int ratio) {
+	public static void insert(MUIElement toInsert, MUIElement relTo,
+			int swtSide, int ratio) {
 		if (toInsert == null || relTo == null)
 			return;
 
@@ -579,36 +578,36 @@ public class ModeledPageLayout implements IPageLayout {
 			List<MUIElement> children = relParent.getChildren();
 			int index = children.indexOf(relTo);
 			MPartSashContainer psc = BasicFactoryImpl.eINSTANCE.createPartSashContainer();
-			PartSizeInfo.copy(psc, relTo);
+			psc.setContainerData(relTo.getContainerData());
 			relParent.getChildren().add(index + 1, psc);
 
 			switch (swtSide) {
 			case SWT.LEFT:
 				psc.getChildren().add((MPartSashContainerElement) toInsert);
 				psc.getChildren().add((MPartSashContainerElement) relTo);
-				PartSizeInfo.get(toInsert).set(ratio, "", PartResizeMode.WEIGHTED); //$NON-NLS-1$
-				PartSizeInfo.get(relTo).set(10000 - ratio, "", PartResizeMode.WEIGHTED); //$NON-NLS-1$
+				toInsert.setContainerData("" + ratio); //$NON-NLS-1$
+				relTo.setContainerData("" + (10000 - ratio)); //$NON-NLS-1$
 				psc.setHorizontal(true);
 				break;
 			case SWT.RIGHT:
 				psc.getChildren().add((MPartSashContainerElement) relTo);
 				psc.getChildren().add((MPartSashContainerElement) toInsert);
-				PartSizeInfo.get(relTo).set(ratio, "", PartResizeMode.WEIGHTED); //$NON-NLS-1$
-				PartSizeInfo.get(toInsert).set(10000 - ratio, "", PartResizeMode.WEIGHTED); //$NON-NLS-1$
+				relTo.setContainerData("" + ratio); //$NON-NLS-1$
+				toInsert.setContainerData("" + (10000 - ratio)); //$NON-NLS-1$
 				psc.setHorizontal(true);
 				break;
 			case SWT.TOP:
 				psc.getChildren().add((MPartSashContainerElement) toInsert);
 				psc.getChildren().add((MPartSashContainerElement) relTo);
-				PartSizeInfo.get(toInsert).set(ratio, "", PartResizeMode.WEIGHTED); //$NON-NLS-1$
-				PartSizeInfo.get(relTo).set(10000 - ratio, "", PartResizeMode.WEIGHTED); //$NON-NLS-1$
+				toInsert.setContainerData("" + ratio); //$NON-NLS-1$
+				relTo.setContainerData("" + (10000 - ratio)); //$NON-NLS-1$
 				psc.setHorizontal(false);
 				break;
 			case SWT.BOTTOM:
 				psc.getChildren().add((MPartSashContainerElement) relTo);
 				psc.getChildren().add((MPartSashContainerElement) toInsert);
-				PartSizeInfo.get(relTo).set(ratio, "", PartResizeMode.WEIGHTED); //$NON-NLS-1$
-				PartSizeInfo.get(toInsert).set(10000 - ratio, "", PartResizeMode.WEIGHTED); //$NON-NLS-1$
+				relTo.setContainerData("" + ratio); //$NON-NLS-1$
+				toInsert.setContainerData("" + (10000 - ratio)); //$NON-NLS-1$
 				psc.setHorizontal(false);
 				break;
 			}
@@ -626,7 +625,8 @@ public class ModeledPageLayout implements IPageLayout {
 		}
 	}
 
-	public static void insert(MUIElement toInsert, MUIElement relTo, int swtSide, float ratio) {
+	public static void insert(MUIElement toInsert, MUIElement relTo,
+			int swtSide, float ratio) {
 		int pct = (int) (ratio * 10000);
 		insert(toInsert, relTo, swtSide, pct);
 	}
