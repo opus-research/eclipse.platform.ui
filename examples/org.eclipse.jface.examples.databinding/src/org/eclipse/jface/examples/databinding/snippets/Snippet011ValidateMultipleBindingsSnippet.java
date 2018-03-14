@@ -1,5 +1,5 @@
-/*******************************************************************************
- * Copyright (c) 2007, 2014 Brad Reynolds and others.
+ /*******************************************************************************
+ * Copyright (c) 2007 Brad Reynolds and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Brad Reynolds - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 434287
  ******************************************************************************/
 
 package org.eclipse.jface.examples.databinding.snippets;
@@ -41,7 +40,6 @@ public class Snippet011ValidateMultipleBindingsSnippet {
 	public static void main(String[] args) {
 		Realm.runWithDefault(SWTObservables.getRealm(Display.getDefault()),
 				new Runnable() {
-					@Override
 					public void run() {
 						Snippet011ValidateMultipleBindingsSnippet.run();
 					}
@@ -66,7 +64,6 @@ public class Snippet011ValidateMultipleBindingsSnippet {
 
 		// DEBUG - print to show value change
 		model.value1.addValueChangeListener(new IValueChangeListener() {
-			@Override
 			public void handleValueChange(ValueChangeEvent event) {
 				System.out.println("Value 1: " + model.value1.getValue());
 			}
@@ -74,7 +71,6 @@ public class Snippet011ValidateMultipleBindingsSnippet {
 
 		// DEBUG - print to show value change
 		model.value2.addValueChangeListener(new IValueChangeListener() {
-			@Override
 			public void handleValueChange(ValueChangeEvent event) {
 				System.out.println("Value 2: " + model.value2.getValue());
 			}
@@ -107,15 +103,10 @@ public class Snippet011ValidateMultipleBindingsSnippet {
 			this.other = other;
 		}
 
-		@Override
 		public IStatus validate(Object value) {
 			if (!value.equals(other.getValue())) {
-				// DEBUG - print validation result
-				System.out.println("Validation fine");
 				return ValidationStatus.ok();
 			}
-			// DEBUG - print validation result
-			System.out.println("Validation error: values cannot be the same");
 			return ValidationStatus.error("values cannot be the same");
 		}
 	}
