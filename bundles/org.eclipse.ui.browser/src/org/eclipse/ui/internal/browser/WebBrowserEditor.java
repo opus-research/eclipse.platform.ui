@@ -17,6 +17,7 @@ import java.net.URL;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.osgi.util.NLS;
@@ -62,6 +63,9 @@ public class WebBrowserEditor extends EditorPart implements IBrowserViewerContai
 		super();
 	}
 
+	/*
+	 * Creates the SWT controls for this workbench part.
+	 */
 	@Override
 	public void createPartControl(Composite parent) {
 		WebBrowserEditorInput input = getWebBrowserEditorInput();

@@ -59,6 +59,9 @@ public class MozillaBrowser extends AbstractWebBrowser {
 		return executable;
 	}
 
+	/*
+	 * @see IBrowser#displayURL(String)
+	 */
 	@Override
 	public void openURL(URL url2) {
 		String url = null;
