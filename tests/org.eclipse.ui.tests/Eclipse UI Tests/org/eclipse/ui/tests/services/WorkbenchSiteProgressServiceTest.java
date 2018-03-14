@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2011 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -44,6 +44,7 @@ public class WorkbenchSiteProgressServiceTest extends UITestCase{
 	private WorkbenchSiteProgressService progressService;
 	private IWorkbenchPartSite site;
     
+	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		window = openTestWindow("org.eclipse.ui.resourcePerspective");
@@ -61,9 +62,8 @@ public class WorkbenchSiteProgressServiceTest extends UITestCase{
 	}
 	
 	public void testWaitCursor() throws Exception {
-		
-		
-		// first fire a job with cursor set to true and check the cursor
+		// Fire a job with cursor set to true and check the cursor
+
 		LongJob jobWithCursor = new LongJob();
 		
 		progressService.schedule(jobWithCursor, 0, true);
@@ -92,12 +92,16 @@ public class WorkbenchSiteProgressServiceTest extends UITestCase{
 		processEvents();
 		cursor = ((Control) ((PartSite)site).getModel().getWidget()).getCursor();
 		assertNull(cursor); // no jobs, no cursor
+	}
 
-		// Now fire two jobs, first one with cursor & delay, the second one without any cursor or delay
-		// Till the first job starts running, there should not be a cursor, after it starts running cursor should be present
+	public void testWaitCursorConcurrentJobs() throws Exception {
+		// Fire two jobs, first one with cursor & delay,
+		// the second one without any cursor or delay.
+		// Till the first job starts running, there should not be a cursor,
+		// after it starts running cursor should be present.
 
 		LongJob jobWithoutCursor = new LongJob();
-		jobWithCursor = new LongJob();
+		LongJob jobWithCursor = new LongJob();
 		
 		progressService.schedule(jobWithCursor, 2000, true);
 		progressService.schedule(jobWithoutCursor, 0, false);
@@ -113,7 +117,8 @@ public class WorkbenchSiteProgressServiceTest extends UITestCase{
 		
 		forceUpdate();
 		processEvents();
-		cursor = ((Control) ((PartSite)site).getModel().getWidget()).getCursor();
+		Cursor cursor = ((Control) ((PartSite) site).getModel().getWidget())
+				.getCursor();
 		assertNull(cursor); // jobWithoutCursor is scheduled to run first - no cursor now
 		
 		while(jobWithCursor.getState() != Job.RUNNING) {
@@ -129,6 +134,22 @@ public class WorkbenchSiteProgressServiceTest extends UITestCase{
 		processEvents();
 		cursor = ((Control) ((PartSite)site).getModel().getWidget()).getCursor();
 		assertNotNull(cursor); // both running now - cursor should be set
+
+		jobWithCursor.cancel();
+		jobWithoutCursor.cancel();
+		processEvents();
+
+		// wait till the jobs are done
+		while (jobWithCursor.getState() == Job.RUNNING
+				|| jobWithoutCursor.getState() == Job.RUNNING) {
+			Thread.sleep(100);
+		}
+
+		processEvents();
+		forceUpdate();
+		processEvents();
+		cursor = ((Control) ((PartSite)site).getModel().getWidget()).getCursor();
+		assertNull(cursor); // no jobs, no cursor
 	}
 
 	class LongJob extends Job{
@@ -138,6 +159,7 @@ public class WorkbenchSiteProgressServiceTest extends UITestCase{
 			super("LongJob");
 		}
 		
+		@Override
 		protected IStatus run(IProgressMonitor monitor) {
 			
 			monitor.beginTask("job starts", 1000);
