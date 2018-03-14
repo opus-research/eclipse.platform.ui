@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,12 +11,7 @@
 
 package org.eclipse.e4.ui.tests.workbench;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
+import junit.framework.TestCase;
 import org.eclipse.e4.core.commands.CommandServiceAddon;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -46,42 +41,49 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.Widget;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
 
 /**
  *
  */
-public class MWindowTest {
+public class MWindowTest extends TestCase {
 	protected IEclipseContext appContext;
 	protected E4Workbench wb;
 
-	@Before
-	public void setUp() throws Exception {
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see junit.framework.TestCase#setUp()
+	 */
+	@Override
+	protected void setUp() throws Exception {
 		appContext = E4Application.createDefaultContext();
 		ContextInjectionFactory.make(CommandServiceAddon.class, appContext);
-		appContext.set(E4Workbench.PRESENTATION_URI_ARG, PartRenderingEngine.engineURI);
+		appContext.set(E4Workbench.PRESENTATION_URI_ARG,
+				PartRenderingEngine.engineURI);
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see junit.framework.TestCase#tearDown()
+	 */
+	@Override
+	protected void tearDown() throws Exception {
 		if (wb != null) {
 			wb.close();
 		}
 		appContext.dispose();
 	}
 
-	@Test
 	public void testCreateWindow() {
 		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setLabel("MyWindow");
 
-		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
@@ -93,15 +95,15 @@ public class MWindowTest {
 		assertEquals(topWidget, appContext.get(IServiceConstants.ACTIVE_SHELL));
 	}
 
-	@Test
 	public void testWindowVisibility() {
 		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setLabel("MyWindow");
 
-		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
@@ -120,16 +122,16 @@ public class MWindowTest {
 		assertTrue(shell.getVisible() == true);
 	}
 
-	@Test
 	public void testWindowInvisibleCreate() {
 		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setLabel("MyWindow");
 		window.setVisible(false);
 
-		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
@@ -142,19 +144,20 @@ public class MWindowTest {
 		assertTrue(shell.getVisible() == false);
 	}
 
-	@Test
 	public void testCreateView() {
 		final MWindow window = createWindowWithOneView();
 
-		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
 
-		MPartSashContainer container = (MPartSashContainer) window.getChildren().get(0);
+		MPartSashContainer container = (MPartSashContainer) window
+				.getChildren().get(0);
 		MPartStack stack = (MPartStack) container.getChildren().get(0);
 
 		CTabFolder folder = (CTabFolder) stack.getWidget();
@@ -166,14 +169,14 @@ public class MWindowTest {
 		assertTrue(viewPart[0] instanceof Tree);
 	}
 
-	@Test
 	public void testContextChildren() {
 		final MWindow window = createWindowWithOneView();
 
-		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
@@ -195,7 +198,8 @@ public class MWindowTest {
 
 		// "activate" the part, same as (in theory) an
 		// SWT.Activate event.
-		AbstractPartRenderer factory = (AbstractPartRenderer) modelPart.getRenderer();
+		AbstractPartRenderer factory = (AbstractPartRenderer) modelPart
+				.getRenderer();
 		factory.activate(modelPart);
 
 		IEclipseContext next = child.getActiveChild();
@@ -215,18 +219,19 @@ public class MWindowTest {
 		assertEquals(window, contextPart.getParent().getParent().getParent());
 	}
 
-	@Test
 	public void testCreateMenu() {
 		final MWindow window = createWindowWithOneViewAndMenu();
 
-		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
-		((MenuManager) ((Widget) window.getMainMenu().getWidget()).getData()).updateAll(true);
+		((MenuManager) ((Widget) window.getMainMenu().getWidget()).getData())
+				.updateAll(true);
 
 		Widget topWidget = (Widget) window.getWidget();
 		assertNotNull(topWidget);
@@ -244,7 +249,8 @@ public class MWindowTest {
 
 		MMenu mainMenu = window.getMainMenu();
 		MMenu modelFileMenu = (MMenu) mainMenu.getChildren().get(0);
-		final MMenuItem item2Model = (MMenuItem) modelFileMenu.getChildren().get(0);
+		final MMenuItem item2Model = (MMenuItem) modelFileMenu.getChildren()
+				.get(0);
 		item2Model.setToBeRendered(false);
 		fileMenu.notifyListeners(SWT.Show, null);
 		assertEquals(1, fileMenu.getItemCount());
@@ -256,15 +262,15 @@ public class MWindowTest {
 		fileMenu.notifyListeners(SWT.Hide, null);
 	}
 
-	@Test
 	public void testWindow_Name() {
 		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setLabel("windowName");
 
-		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
@@ -283,8 +289,6 @@ public class MWindowTest {
 		assertEquals("windowName2", shell.getText());
 	}
 
-	@Ignore
-	@Test
 	public void TODOtestWindow_X() {
 		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setX(200);
@@ -292,10 +296,11 @@ public class MWindowTest {
 		window.setWidth(200);
 		window.setHeight(200);
 
-		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
@@ -321,8 +326,6 @@ public class MWindowTest {
 		assertEquals(300, bounds.x);
 	}
 
-	@Ignore
-	@Test
 	public void TODOtestWindow_Y() {
 		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setX(200);
@@ -330,10 +333,11 @@ public class MWindowTest {
 		window.setWidth(200);
 		window.setHeight(200);
 
-		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
@@ -359,7 +363,6 @@ public class MWindowTest {
 		assertEquals(300, bounds.y);
 	}
 
-	@Test
 	public void testWindow_Width() {
 		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setX(200);
@@ -367,10 +370,11 @@ public class MWindowTest {
 		window.setWidth(200);
 		window.setHeight(200);
 
-		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
@@ -393,7 +397,6 @@ public class MWindowTest {
 		assertEquals(300, shell.getBounds().width);
 	}
 
-	@Test
 	public void testWindow_Height() {
 		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setX(200);
@@ -401,10 +404,11 @@ public class MWindowTest {
 		window.setWidth(200);
 		window.setHeight(200);
 
-		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
@@ -428,7 +432,8 @@ public class MWindowTest {
 	}
 
 	private MPart getContributedPart(MWindow window) {
-		MPartSashContainer psc = (MPartSashContainer) window.getChildren().get(0);
+		MPartSashContainer psc = (MPartSashContainer) window.getChildren().get(
+				0);
 		MPartStack stack = (MPartStack) psc.getChildren().get(0);
 		MPart part = (MPart) stack.getChildren().get(0);
 		assertTrue("part is incorrect type " + part, part instanceof MPart);
@@ -440,15 +445,16 @@ public class MWindowTest {
 		window.setHeight(300);
 		window.setWidth(400);
 		window.setLabel("MyWindow");
-		MPartSashContainer sash = BasicFactoryImpl.eINSTANCE.createPartSashContainer();
+		MPartSashContainer sash = BasicFactoryImpl.eINSTANCE
+				.createPartSashContainer();
 		window.getChildren().add(sash);
 		MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		sash.getChildren().add(stack);
 		MPart contributedPart = BasicFactoryImpl.eINSTANCE.createPart();
 		stack.getChildren().add(contributedPart);
 		contributedPart.setLabel("Sample View");
-		contributedPart.setContributionURI(
-				"bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
+		contributedPart
+				.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 
 		return window;
 	}
@@ -462,11 +468,13 @@ public class MWindowTest {
 		fileMenu.setElementId("file");
 		menuBar.getChildren().add(fileMenu);
 
-		final MMenuItem item1 = MenuFactoryImpl.eINSTANCE.createDirectMenuItem();
+		final MMenuItem item1 = MenuFactoryImpl.eINSTANCE
+				.createDirectMenuItem();
 		item1.setElementId("item1");
 		item1.setLabel("item1");
 		fileMenu.getChildren().add(item1);
-		final MMenuItem item2 = MenuFactoryImpl.eINSTANCE.createDirectMenuItem();
+		final MMenuItem item2 = MenuFactoryImpl.eINSTANCE
+				.createDirectMenuItem();
 		item2.setElementId("item2");
 		item2.setLabel("item2");
 		fileMenu.getChildren().add(item2);

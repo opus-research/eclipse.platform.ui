@@ -137,7 +137,7 @@ public class Mocks {
 				return this;
 			}
 			if (equalsMethod.equals(method)) {
-				return Boolean.valueOf(proxy == args[0]);
+				return new Boolean(proxy == args[0]);
 			}
 			MethodCall methodCall = new MethodCall(method, args);
 			if (previousCallHistory != null) {

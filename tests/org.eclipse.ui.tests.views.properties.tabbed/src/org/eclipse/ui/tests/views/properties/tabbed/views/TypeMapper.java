@@ -16,8 +16,7 @@ import org.eclipse.ui.views.properties.tabbed.AbstractTypeMapper;
 public class TypeMapper
     extends AbstractTypeMapper {
 
-    @Override
-	public Class mapType(Object object) {
+    public Class mapType(Object object) {
         if (object instanceof TreeNode) {
             return ((TreeNode) object).getValue().getClass();
         }
