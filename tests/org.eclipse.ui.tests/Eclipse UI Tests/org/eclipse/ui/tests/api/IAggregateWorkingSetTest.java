@@ -299,8 +299,6 @@ public class IAggregateWorkingSetTest extends UITestCase {
 						synchronized (propertyFiredSuccessfully) {
 							propertyFiredSuccessfully[0] = true;
 						}
-					} catch (Exception e) {
-						System.out.println(e.toString());
 					} finally {
 						manager.removePropertyChangeListener(this);
 					}
