@@ -28,7 +28,9 @@ public abstract class ViewPreferencesAction extends Action {
 		super(WorkbenchMessages.OpenPreferences_text); 
 	}
 	
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.Action#run()
+	 */
 	public void run() {
 		openViewPreferencesDialog();
 	}

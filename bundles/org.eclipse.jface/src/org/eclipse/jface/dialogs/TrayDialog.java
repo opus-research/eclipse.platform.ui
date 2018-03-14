@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation and others.
+ * Copyright (c) 2005, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -68,7 +68,6 @@ public abstract class TrayDialog extends Dialog {
 			this.shell = shell;
 		}
 
-		@Override
 		public void controlResized (ControlEvent event) {
 				int newWidth = shell.getSize().x;
 				if (newWidth != shellWidth) {					
@@ -208,7 +207,9 @@ public abstract class TrayDialog extends Dialog {
 		return false;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.window.Window#handleShellCloseEvent()
+	 */
 	protected void handleShellCloseEvent() {
 		/*
 		 * Close the tray to ensure that those dialogs that remember their
@@ -221,7 +222,9 @@ public abstract class TrayDialog extends Dialog {
 		super.handleShellCloseEvent();
 	}
 	
-	@Override
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#createButtonBar(org.eclipse.swt.widgets.Composite)
+     */
 	protected Control createButtonBar(Composite parent) {
     	Composite composite = new Composite(parent, SWT.NONE);
     	GridLayout layout = new GridLayout();
@@ -274,7 +277,6 @@ public abstract class TrayDialog extends Dialog {
 		final Cursor cursor = new Cursor(parent.getDisplay(), SWT.CURSOR_HAND);
 		toolBar.setCursor(cursor);
 		toolBar.addDisposeListener(new DisposeListener() {
-			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				cursor.dispose();
 			}
@@ -283,8 +285,7 @@ public abstract class TrayDialog extends Dialog {
 		fHelpButton.setImage(image);
 		fHelpButton.setToolTipText(JFaceResources.getString("helpToolTip")); //$NON-NLS-1$
 		fHelpButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
 				helpPressed();
             }
         });
@@ -302,8 +303,7 @@ public abstract class TrayDialog extends Dialog {
 		link.setText("<a>"+IDialogConstants.HELP_LABEL+"</a>"); //$NON-NLS-1$ //$NON-NLS-2$
 		link.setToolTipText(IDialogConstants.HELP_LABEL);
 		link.addSelectionListener(new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
 				helpPressed();
             }
         });
@@ -347,7 +347,6 @@ public abstract class TrayDialog extends Dialog {
 	 * @see org.eclipse.jface.window.Window#getLayout()
 	 * @return a newly created layout or <code>null</code> for no layout
 	 */
-	@Override
 	protected Layout getLayout() {
 		GridLayout layout = (GridLayout)super.getLayout();
 		layout.numColumns = 5;
@@ -434,7 +433,6 @@ public abstract class TrayDialog extends Dialog {
 		Rectangle bounds = shell.getBounds();
 		shell.setBounds(bounds.x - ((getDefaultOrientation() == SWT.RIGHT_TO_LEFT) ? trayWidth : 0), bounds.y, bounds.width + trayWidth, bounds.height);
 		sash.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(Event event) {
 				if (event.detail != SWT.DRAG) {
 					Rectangle clientArea = shell.getClientArea();

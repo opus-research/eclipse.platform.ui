@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2014 IBM Corporation and others.
+ * Copyright (c) 2003, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
- *     Christian Georgi (SAP)            - Bug 432480
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.application;
 
@@ -19,12 +17,24 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.ibm.icu.text.Collator;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.ServiceReference;
+import org.osgi.framework.Version;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
+
 import org.eclipse.core.internal.resources.Workspace;
 import org.eclipse.core.net.proxy.IProxyService;
-import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.resources.WorkspaceJob;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IAdaptable;
@@ -38,8 +48,12 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.ProgressMonitorWrapper;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.ui.internal.workbench.E4Workbench;
+
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.resources.WorkspaceJob;
+
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -49,14 +63,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.Policy;
 import org.eclipse.jface.window.Window;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Shell;
+
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.application.IWorkbenchConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
@@ -78,11 +85,6 @@ import org.eclipse.ui.internal.ide.undo.WorkspaceUndoMonitor;
 import org.eclipse.ui.internal.progress.ProgressMonitorJobsDialog;
 import org.eclipse.ui.progress.IProgressService;
 import org.eclipse.ui.statushandlers.AbstractStatusHandler;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.ServiceReference;
-import org.osgi.framework.Version;
-
-import com.ibm.icu.text.Collator;
 
 /**
  * IDE-specified workbench advisor which configures the workbench for use as an
@@ -106,11 +108,17 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	private static IDEWorkbenchAdvisor workbenchAdvisor = null;
 
 	/**
+	 * Contains the workspace location if the -showlocation command line
+	 * argument is specified, or <code>null</code> if not specified.
+	 */
+	private String workspaceLocation = null;
+
+	/**
 	 * Ordered map of versioned feature ids -> info that are new for this
 	 * session; <code>null</code> if uninitialized. Key type:
 	 * <code>String</code>, Value type: <code>AboutInfo</code>.
 	 */
-	private Map<String, AboutInfo> newlyAddedBundleGroups;
+	private Map newlyAddedBundleGroups;
 
 	/**
 	 * Array of <code>AboutInfo</code> for all new installed features that
@@ -158,7 +166,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		workbenchAdvisor = this;
 		
 		Listener closeListener = new Listener() {
-			@Override
 			public void handleEvent(Event event) {
 				boolean doExit = IDEWorkbenchWindowAdvisor.promptOnExit(null);
 				event.doit = doExit;
@@ -178,7 +185,11 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		this.delayedEventsProcessor = processor;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#initialize
+	 */
 	public void initialize(IWorkbenchConfigurer configurer) {
 
 		PluginActionBuilder.setAllowIdeLogging(true);
@@ -188,6 +199,26 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 		// register workspace adapters
 		IDE.registerAdapters();
+
+		// get the command line arguments
+		String[] cmdLineArgs = Platform.getCommandLineArgs();
+
+		// include the workspace location in the title
+		// if the command line option -showlocation is specified
+		for (int i = 0; i < cmdLineArgs.length; i++) {
+			if ("-showlocation".equalsIgnoreCase(cmdLineArgs[i])) { //$NON-NLS-1$
+				String name = null;
+				if (cmdLineArgs.length > i + 1) {
+					name = cmdLineArgs[i + 1];
+				}
+				if (name != null && name.indexOf("-") == -1) { //$NON-NLS-1$
+					workspaceLocation = name;
+				} else {
+					workspaceLocation = Platform.getLocation().toOSString();
+				}
+				break;
+			}
+		}
 
 		// register shared images
 		declareWorkbenchImages();
@@ -207,7 +238,11 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		Policy.setComparator(Collator.getInstance());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#preStartup()
+	 */
 	public void preStartup() {
 
 		// Suspend background jobs while we startup
@@ -224,7 +259,11 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 				ResourcesPlugin.FAMILY_AUTO_BUILD);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#postStartup()
+	 */
 	public void postStartup() {
 		try {
 			refreshFromLocal();
@@ -248,7 +287,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		Bundle bundle = Platform.getBundle("org.eclipse.ui.ide"); //$NON-NLS-1$
 		Object proxyService = null;
 		if (bundle != null) {
-			ServiceReference<IProxyService> ref = bundle.getBundleContext().getServiceReference(IProxyService.class);
+			ServiceReference ref = bundle.getBundleContext().getServiceReference(IProxyService.class.getName());
 			if (ref != null)
 				proxyService = bundle.getBundleContext().getService(ref);
 		}
@@ -266,7 +305,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 			boolean currentHighContrast = Display.getCurrent()
 					.getHighContrast();
 
-			@Override
 			public void handleEvent(org.eclipse.swt.widgets.Event event) {
 				if (Display.getCurrent().getHighContrast() == currentHighContrast)
 					return;
@@ -288,7 +326,11 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#postShutdown
+	 */
 	public void postShutdown() {
 		if (activityHelper != null) {
 			activityHelper.shutdown();
@@ -307,14 +349,22 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#preShutdown()
+	 */
 	public boolean preShutdown() {
 		Display.getCurrent().removeListener(SWT.Settings,
 				settingsChangeListener);
 		return super.preShutdown();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#createWorkbenchWindowAdvisor(org.eclipse.ui.application.IWorkbenchWindowConfigurer)
+	 */
 	public WorkbenchWindowAdvisor createWorkbenchWindowAdvisor(
 			IWorkbenchWindowConfigurer configurer) {
 		return new IDEWorkbenchWindowAdvisor(this, configurer);
@@ -349,7 +399,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 		final IContainer root = ResourcesPlugin.getWorkspace().getRoot();
 		Job job = new WorkspaceJob(IDEWorkbenchMessages.Workspace_refreshing) {
-			@Override
 			public IStatus runInWorkspace(IProgressMonitor monitor)
 					throws CoreException {
 				root.refreshLocal(IResource.DEPTH_INFINITE, monitor);
@@ -371,21 +420,26 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 			this.dialog = dialog;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.core.runtime.ProgressMonitorWrapper#internalWorked(double)
+		 */
 		public void internalWorked(double work) {
 			super.internalWorked(work);
 			total += work;
 			updateProgressDetails();
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.core.runtime.ProgressMonitorWrapper#worked(int)
+		 */
 		public void worked(int work) {
 			super.worked(work);
 			total += work;
 			updateProgressDetails();
 		}
 
-		@Override
 		public void beginTask(String name, int totalWork) {
 			super.beginTask(name, totalWork);
 			subTask(IDEWorkbenchMessages.IDEWorkbenchAdvisor_preHistoryCompaction);
@@ -410,7 +464,10 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 			super(parent);
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.ui.internal.progress.ProgressMonitorJobsDialog#createDetailsButton(org.eclipse.swt.widgets.Composite)
+		 */
 		protected void createButtonsForButtonBar(Composite parent) {
 			super.createButtonsForButtonBar(parent);
 			registerCancelButtonListener();
@@ -418,7 +475,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 		public void registerCancelButtonListener() {
 			cancel.addSelectionListener(new SelectionAdapter() {
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 					subTaskLabel.setText(""); //$NON-NLS-1$
 				}
@@ -442,7 +498,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 					.getDescription().isApplyFileStatePolicy();
 
 			IRunnableWithProgress runnable = new IRunnableWithProgress() {
-				@Override
 				public void run(IProgressMonitor monitor) {
 					try {
 						if (applyPolicy)
@@ -478,12 +533,20 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#getDefaultPageInput
+	 */
 	public IAdaptable getDefaultPageInput() {
 		return ResourcesPlugin.getWorkspace().getRoot();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor
+	 */
 	public String getInitialWindowPerspectiveId() {
 		int index = PlatformUI.getWorkbench().getWorkbenchWindowCount() - 1;
 
@@ -507,9 +570,9 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	 *         <code>String</code>, value type: <code>AboutInfo</code>)
 	 * @since 3.0
 	 */
-	private Map<String, AboutInfo> computeBundleGroupMap() {
+	private Map computeBundleGroupMap() {
 		// use tree map to get predicable order
-		Map<String, AboutInfo> ids = new TreeMap<String, AboutInfo>();
+		Map ids = new TreeMap();
 
 		IBundleGroupProvider[] providers = Platform.getBundleGroupProviders();
 		for (int i = 0; i < providers.length; ++i) {
@@ -538,7 +601,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	 *         <code>String</code>) -> infos (value type:
 	 *         <code>AboutInfo</code>).
 	 */
-	public Map<String, AboutInfo> getNewlyAddedBundleGroups() {
+	public Map getNewlyAddedBundleGroups() {
 		if (newlyAddedBundleGroups == null) {
 			newlyAddedBundleGroups = createNewBundleGroupsMap();
 		}
@@ -548,7 +611,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	/**
 	 * Updates the old features setting and returns a map of new features.
 	 */
-	private Map<String, AboutInfo> createNewBundleGroupsMap() {
+	private Map createNewBundleGroupsMap() {
 		// retrieve list of installed bundle groups from last session
 		IDialogSettings settings = IDEWorkbenchPlugin.getDefault()
 				.getDialogSettings();
@@ -556,7 +619,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 		// get a map of currently installed bundle groups and store it for next
 		// session
-		Map<String, AboutInfo> bundleGroups = computeBundleGroupMap();
+		Map bundleGroups = computeBundleGroupMap();
 		String[] currentFeaturesArray = new String[bundleGroups.size()];
 		bundleGroups.keySet().toArray(currentFeaturesArray);
 		settings.put(INSTALLED_FEATURES, currentFeaturesArray);
@@ -573,7 +636,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 	/**
 	 * Declares all IDE-specific workbench images. This includes both "shared"
-	 * images (named in {@link org.eclipse.ui.ide.IDE.SharedImages}) and internal images (named in
+	 * images (named in {@link IDE.SharedImages}) and internal images (named in
 	 * {@link org.eclipse.ui.internal.ide.IDEInternalWorkbenchImages}).
 	 * 
 	 * @see IWorkbenchConfigurer#declareImage
@@ -610,31 +673,31 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_ETOOL_BUILD_EXEC, PATH_ETOOL
-						+ "build_exec.png", false); //$NON-NLS-1$
+						+ "build_exec.gif", false); //$NON-NLS-1$
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_ETOOL_BUILD_EXEC_HOVER,
-				PATH_ETOOL + "build_exec.png", false); //$NON-NLS-1$
+				PATH_ETOOL + "build_exec.gif", false); //$NON-NLS-1$
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_ETOOL_BUILD_EXEC_DISABLED,
-				PATH_DTOOL + "build_exec.png", false); //$NON-NLS-1$
+				PATH_DTOOL + "build_exec.gif", false); //$NON-NLS-1$
 
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_ETOOL_SEARCH_SRC, PATH_ETOOL
-						+ "search_src.png", false); //$NON-NLS-1$
+						+ "search_src.gif", false); //$NON-NLS-1$
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_ETOOL_SEARCH_SRC_HOVER,
-				PATH_ETOOL + "search_src.png", false); //$NON-NLS-1$
+				PATH_ETOOL + "search_src.gif", false); //$NON-NLS-1$
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_ETOOL_SEARCH_SRC_DISABLED,
-				PATH_DTOOL + "search_src.png", false); //$NON-NLS-1$
+				PATH_DTOOL + "search_src.gif", false); //$NON-NLS-1$
 
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_ETOOL_NEXT_NAV, PATH_ETOOL
-						+ "next_nav.png", false); //$NON-NLS-1$
+						+ "next_nav.gif", false); //$NON-NLS-1$
 
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_ETOOL_PREVIOUS_NAV, PATH_ETOOL
-						+ "prev_nav.png", false); //$NON-NLS-1$
+						+ "prev_nav.gif", false); //$NON-NLS-1$
 
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_WIZBAN_NEWPRJ_WIZ, PATH_WIZBAN
@@ -673,101 +736,101 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 						+ "quick_fix.png", false); //$NON-NLS-1$
 
 		declareWorkbenchImage(ideBundle, IDE.SharedImages.IMG_OBJ_PROJECT,
-				PATH_OBJECT + "prj_obj.png", true); //$NON-NLS-1$
+				PATH_OBJECT + "prj_obj.gif", true); //$NON-NLS-1$
 		declareWorkbenchImage(ideBundle,
 				IDE.SharedImages.IMG_OBJ_PROJECT_CLOSED, PATH_OBJECT
-						+ "cprj_obj.png", true); //$NON-NLS-1$
+						+ "cprj_obj.gif", true); //$NON-NLS-1$
 		declareWorkbenchImage(ideBundle, IDE.SharedImages.IMG_OPEN_MARKER,
-				PATH_ELOCALTOOL + "gotoobj_tsk.png", true); //$NON-NLS-1$
+				PATH_ELOCALTOOL + "gotoobj_tsk.gif", true); //$NON-NLS-1$
 
 
 		// Quick fix icons
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_ELCL_QUICK_FIX_ENABLED,
-				PATH_ELOCALTOOL + "smartmode_co.png", true); //$NON-NLS-1$
+				PATH_ELOCALTOOL + "smartmode_co.gif", true); //$NON-NLS-1$
 
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_DLCL_QUICK_FIX_DISABLED,
-				PATH_DLOCALTOOL + "smartmode_co.png", true); //$NON-NLS-1$
+				PATH_DLOCALTOOL + "smartmode_co.gif", true); //$NON-NLS-1$
 
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_OBJS_FIXABLE_WARNING,
-				PATH_OBJECT + "quickfix_warning_obj.png", true); //$NON-NLS-1$
+				PATH_OBJECT + "quickfix_warning_obj.gif", true); //$NON-NLS-1$
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_OBJS_FIXABLE_ERROR,
-				PATH_OBJECT + "quickfix_error_obj.png", true); //$NON-NLS-1$
+				PATH_OBJECT + "quickfix_error_obj.gif", true); //$NON-NLS-1$
 
 
 		// task objects
 		// declareRegistryImage(IDEInternalWorkbenchImages.IMG_OBJS_HPRIO_TSK,
-		// PATH_OBJECT+"hprio_tsk.png");
+		// PATH_OBJECT+"hprio_tsk.gif");
 		// declareRegistryImage(IDEInternalWorkbenchImages.IMG_OBJS_MPRIO_TSK,
-		// PATH_OBJECT+"mprio_tsk.png");
+		// PATH_OBJECT+"mprio_tsk.gif");
 		// declareRegistryImage(IDEInternalWorkbenchImages.IMG_OBJS_LPRIO_TSK,
-		// PATH_OBJECT+"lprio_tsk.png");
+		// PATH_OBJECT+"lprio_tsk.gif");
 
 		declareWorkbenchImage(ideBundle, IDE.SharedImages.IMG_OBJS_TASK_TSK,
-				PATH_OBJECT + "taskmrk_tsk.png", true); //$NON-NLS-1$
+				PATH_OBJECT + "taskmrk_tsk.gif", true); //$NON-NLS-1$
 		declareWorkbenchImage(ideBundle, IDE.SharedImages.IMG_OBJS_BKMRK_TSK,
-				PATH_OBJECT + "bkmrk_tsk.png", true); //$NON-NLS-1$
+				PATH_OBJECT + "bkmrk_tsk.gif", true); //$NON-NLS-1$
 
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_OBJS_COMPLETE_TSK, PATH_OBJECT
-						+ "complete_tsk.png", true); //$NON-NLS-1$
+						+ "complete_tsk.gif", true); //$NON-NLS-1$
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_OBJS_INCOMPLETE_TSK, PATH_OBJECT
-						+ "incomplete_tsk.png", true); //$NON-NLS-1$
+						+ "incomplete_tsk.gif", true); //$NON-NLS-1$
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_OBJS_WELCOME_ITEM, PATH_OBJECT
-						+ "welcome_item.png", true); //$NON-NLS-1$
+						+ "welcome_item.gif", true); //$NON-NLS-1$
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_OBJS_WELCOME_BANNER, PATH_OBJECT
-						+ "welcome_banner.png", true); //$NON-NLS-1$
+						+ "welcome_banner.gif", true); //$NON-NLS-1$
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_OBJS_ERROR_PATH, PATH_OBJECT
-						+ "error_tsk.png", true); //$NON-NLS-1$
+						+ "error_tsk.gif", true); //$NON-NLS-1$
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_OBJS_WARNING_PATH, PATH_OBJECT
-						+ "warn_tsk.png", true); //$NON-NLS-1$
+						+ "warn_tsk.gif", true); //$NON-NLS-1$
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_OBJS_INFO_PATH, PATH_OBJECT
-						+ "info_tsk.png", true); //$NON-NLS-1$
+						+ "info_tsk.gif", true); //$NON-NLS-1$
 
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_LCL_FLAT_LAYOUT, PATH_ELOCALTOOL
-						+ "flatLayout.png", true); //$NON-NLS-1$
+						+ "flatLayout.gif", true); //$NON-NLS-1$
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_LCL_HIERARCHICAL_LAYOUT,
-				PATH_ELOCALTOOL + "hierarchicalLayout.png", true); //$NON-NLS-1$
+				PATH_ELOCALTOOL + "hierarchicalLayout.gif", true); //$NON-NLS-1$
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_ETOOL_PROBLEM_CATEGORY,
-				PATH_ETOOL + "problem_category.png", true); //$NON-NLS-1$
+				PATH_ETOOL + "problem_category.gif", true); //$NON-NLS-1$
 
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_ETOOL_PROBLEMS_VIEW,
-				PATH_EVIEW + "problems_view.png", true); //$NON-NLS-1$
+				PATH_EVIEW + "problems_view.gif", true); //$NON-NLS-1$
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_ETOOL_PROBLEMS_VIEW_ERROR,
-				PATH_EVIEW + "problems_view_error.png", true); //$NON-NLS-1$
+				PATH_EVIEW + "problems_view_error.gif", true); //$NON-NLS-1$
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_ETOOL_PROBLEMS_VIEW_WARNING,
-				PATH_EVIEW + "problems_view_warning.png", true); //$NON-NLS-1$
+				PATH_EVIEW + "problems_view_warning.gif", true); //$NON-NLS-1$
 
 		// synchronization indicator objects
 		// declareRegistryImage(IDEInternalWorkbenchImages.IMG_OBJS_WBET_STAT,
-		// PATH_OVERLAY+"wbet_stat.png");
+		// PATH_OVERLAY+"wbet_stat.gif");
 		// declareRegistryImage(IDEInternalWorkbenchImages.IMG_OBJS_SBET_STAT,
-		// PATH_OVERLAY+"sbet_stat.png");
+		// PATH_OVERLAY+"sbet_stat.gif");
 		// declareRegistryImage(IDEInternalWorkbenchImages.IMG_OBJS_CONFLICT_STAT,
-		// PATH_OVERLAY+"conflict_stat.png");
+		// PATH_OVERLAY+"conflict_stat.gif");
 
 		// content locality indicator objects
 		// declareRegistryImage(IDEInternalWorkbenchImages.IMG_OBJS_NOTLOCAL_STAT,
-		// PATH_STAT+"notlocal_stat.png");
+		// PATH_STAT+"notlocal_stat.gif");
 		// declareRegistryImage(IDEInternalWorkbenchImages.IMG_OBJS_LOCAL_STAT,
-		// PATH_STAT+"local_stat.png");
+		// PATH_STAT+"local_stat.gif");
 		// declareRegistryImage(IDEInternalWorkbenchImages.IMG_OBJS_FILLLOCAL_STAT,
-		// PATH_STAT+"filllocal_stat.png");
+		// PATH_STAT+"filllocal_stat.gif");
 	}
 
 	/**
@@ -790,32 +853,22 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		getWorkbenchConfigurer().declareImage(symbolicName, desc, shared);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#getMainPreferencePageId
+	 */
 	public String getMainPreferencePageId() {
 		// indicate that we want the Workench preference page to be prominent
 		return WORKBENCH_PREFERENCE_CATEGORY_ID;
 	}
 
 	/**
-	 * Returns the location to show in the window title, depending on a
-	 * {@link IDEInternalPreferences#SHOW_LOCATION user preference}. Note that
-	 * this may be overridden by the '-showlocation' command line argument.
-	 *
-	 * @return the location string, or <code>null</code> if the location is not
-	 *         being shown
+	 * @return the workspace location string, or <code>null</code> if the
+	 *         location is not being shown
 	 */
 	public String getWorkspaceLocation() {
-		// read command line, which has priority
-		IEclipseContext context = getWorkbenchConfigurer().getWorkbench().getService(IEclipseContext.class);
-		String location = (String) context.get(E4Workbench.FORCED_SHOW_LOCATION);
-		if (location != null) {
-			return location;
-		}
-		// read the preference
-		if (IDEWorkbenchPlugin.getDefault().getPreferenceStore().getBoolean(IDEInternalPreferences.SHOW_LOCATION)) {
-			return Platform.getLocation().toOSString();
-		}
-		return null;
+		return workspaceLocation;
 	}
 
 	/**
@@ -826,10 +879,10 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		if (welcomePerspectiveInfos == null) {
 			// support old welcome perspectives if intro plugin is not present
 			if (!hasIntro()) {
-				Map<String, AboutInfo> m = getNewlyAddedBundleGroups();
-				ArrayList<AboutInfo> list = new ArrayList<AboutInfo>(m.size());
-				for (Iterator<AboutInfo> i = m.values().iterator(); i.hasNext();) {
-					AboutInfo info = i.next();
+				Map m = getNewlyAddedBundleGroups();
+				ArrayList list = new ArrayList(m.size());
+				for (Iterator i = m.values().iterator(); i.hasNext();) {
+					AboutInfo info = (AboutInfo) i.next();
 					if (info != null && info.getWelcomePerspectiveId() != null
 							&& info.getWelcomePageURL() != null) {
 						list.add(info);
@@ -842,7 +895,11 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		return welcomePerspectiveInfos;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#getWorkbenchErrorHandler()
+	 */
 	public synchronized AbstractStatusHandler getWorkbenchErrorHandler() {
 		if (ideWorkbenchErrorHandler == null) {
 			ideWorkbenchErrorHandler = new IDEWorkbenchErrorHandler(
@@ -851,7 +908,9 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		return ideWorkbenchErrorHandler;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#eventLoopIdle(org.eclipse.swt.widgets.Display)
+	 */
 	public void eventLoopIdle(Display display) {
 		if (delayedEventsProcessor != null)
 			delayedEventsProcessor.catchUp(display);

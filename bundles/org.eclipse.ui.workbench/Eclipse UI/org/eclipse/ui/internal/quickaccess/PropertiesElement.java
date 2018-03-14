@@ -33,7 +33,6 @@ public class PropertiesElement extends QuickAccessElement {
 		this.preferenceNode = preferenceNode;
 	}
 	
-	@Override
 	public void execute() {
 		IWorkbenchWindow window = PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow();
@@ -44,12 +43,10 @@ public class PropertiesElement extends QuickAccessElement {
 		}
 	}
 
-	@Override
 	public String getId() {
 		return preferenceNode.getId();
 	}
 
-	@Override
 	public ImageDescriptor getImageDescriptor() {
 		Image image = preferenceNode.getLabelImage();
 		if (image != null) {
@@ -59,12 +56,10 @@ public class PropertiesElement extends QuickAccessElement {
 		return null;
 	}
 
-	@Override
 	public String getLabel() {
 		return preferenceNode.getLabelText();
 	}
 	
-	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -73,7 +68,6 @@ public class PropertiesElement extends QuickAccessElement {
 		return result;
 	}
 
-	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;

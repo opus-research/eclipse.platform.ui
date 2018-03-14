@@ -20,7 +20,6 @@ import org.eclipse.ui.IWorkbenchCommandConstants;
  * @since 2.1
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
-@Deprecated
 public class ToggleLinkingAction extends ResourceNavigatorAction {
 
 
@@ -39,8 +38,7 @@ public class ToggleLinkingAction extends ResourceNavigatorAction {
     /**
      * Runs the action.
      */
-    @Override
-	public void run() {
+    public void run() {
         getNavigator().setLinkingEnabled(isChecked());
     }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 433450
  ******************************************************************************/
 
 package org.eclipse.ui.internal.e4.compatibility;
@@ -22,13 +21,14 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
+import org.eclipse.e4.ui.model.application.ui.advanced.impl.AdvancedFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.workbench.IPresentationEngine;
+import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.osgi.util.NLS;
@@ -101,7 +101,13 @@ public class ModeledPageLayout implements IPageLayout {
 			this.element = element;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ui.activities.IIdentifierListener#identifierChanged(org
+		 * .eclipse.ui.activities.IdentifierEvent)
+		 */
 		public void identifierChanged(IdentifierEvent identifierEvent) {
 			IIdentifier identifier = identifierEvent.getIdentifier();
 
@@ -143,10 +149,10 @@ public class ModeledPageLayout implements IPageLayout {
 		}
 
 		if (sharedArea == null) {
-			sharedArea = modelService.createModelElement(MArea.class);
+			sharedArea = AdvancedFactoryImpl.eINSTANCE.createArea();
 			// sharedArea.setLabel("Editor Area"); //$NON-NLS-1$
 
-			editorStack = modelService.createModelElement(MPartStack.class);
+			editorStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 			// temporary HACK for bug 303982
 			editorStack.getTags().add("newtablook"); //$NON-NLS-1$
 			editorStack.getTags().add("org.eclipse.e4.primaryDataStack"); //$NON-NLS-1$
@@ -164,7 +170,7 @@ public class ModeledPageLayout implements IPageLayout {
 			}
 		}
 
-		eaRef = modelService.createModelElement(MPlaceholder.class);
+		eaRef = AdvancedFactoryImpl.eINSTANCE.createPlaceholder();
 		eaRef.setElementId(getEditorArea());
 		eaRef.setRef(sharedArea);
 
@@ -182,74 +188,50 @@ public class ModeledPageLayout implements IPageLayout {
 		return perspModel;
 	}
 
-	@Override
 	public void addActionSet(String actionSetId) {
 		perspModel.getTags().add(ACTION_SET_TAG + actionSetId);
 	}
 
-	@Override
 	public void addFastView(String viewId) {
 		E4Util.unsupported("addFastView: " + viewId); //$NON-NLS-1$
 	}
 
-	@Override
 	public void addFastView(String viewId, float ratio) {
 		E4Util.unsupported("addFastView: " + viewId); //$NON-NLS-1$
 	}
 
-	@Override
 	public void addNewWizardShortcut(String id) {
 		perspModel.getTags().add(NEW_WIZARD_TAG + id);
 	}
 
-	@Override
 	public void addPerspectiveShortcut(String id) {
 		perspModel.getTags().add(PERSP_SHORTCUT_TAG + id);
 	}
 
-	@Override
 	public void addPlaceholder(String viewId, int relationship, float ratio,
 			String refId) {
 		insertView(viewId, relationship, ratio, refId, false, true);
 	}
 
-	@Override
 	public void addShowInPart(String id) {
 		perspModel.getTags().add(SHOW_IN_PART_TAG + id);
 	}
 
-	@Override
 	public void addShowViewShortcut(String id) {
 		perspModel.getTags().add(SHOW_VIEW_TAG + id);
 	}
 
-	@Override
 	public void addStandaloneView(String viewId, boolean showTitle,
 			int relationship, float ratio, String refId) {
-		MUIElement newElement = insertView(viewId, relationship, ratio, refId, true, showTitle);
-		if (newElement instanceof MPartStack) {
-			MPartStack stack = (MPartStack) newElement;
-			stack.getTags().add(IPresentationEngine.STANDALONE);
-			stack.getChildren().get(0).getTags().add(IPresentationEngine.NO_MOVE);
-		} else {
-			newElement.getTags().add(IPresentationEngine.STANDALONE);
-		}
+		insertView(viewId, relationship, ratio, refId, true, false);
 	}
 
-	@Override
 	public void addStandaloneViewPlaceholder(String viewId, int relationship,
 			float ratio, String refId, boolean showTitle) {
-		MUIElement newElement = insertView(viewId, relationship, ratio, refId, false, showTitle);
-		if (newElement instanceof MPartStack) {
-			MPartStack stack = (MPartStack) newElement;
-			stack.getTags().add(IPresentationEngine.STANDALONE);
-			stack.getChildren().get(0).getTags().add(IPresentationEngine.NO_MOVE);
-		} else {
-			newElement.getTags().add(IPresentationEngine.STANDALONE);
-		}
+		insertView(viewId, relationship, ratio, refId, false,
+				false);
 	}
 
-	@Override
 	public void addView(String viewId, int relationship, float ratio, String refId) {
 		insertView(viewId, relationship, ratio, refId, true, true);
 	}
@@ -280,7 +262,6 @@ public class ModeledPageLayout implements IPageLayout {
 		identifier.addIdentifierListener(new ViewActivator(element));
 	}
 
-	@Override
 	public IFolderLayout createFolder(String folderId, int relationship,
 			float ratio, String refId) {
 		MPartStack stack = insertStack(folderId, relationship, ratio, refId,
@@ -288,7 +269,6 @@ public class ModeledPageLayout implements IPageLayout {
 		return new ModeledFolderLayout(this, application, stack);
 	}
 
-	@Override
 	public IPlaceholderFolderLayout createPlaceholderFolder(String folderId,
 			int relationship, float ratio, String refId) {
 		MPartStack Stack = insertStack(folderId, relationship, ratio, refId,
@@ -296,7 +276,6 @@ public class ModeledPageLayout implements IPageLayout {
 		return new ModeledPlaceholderFolderLayout(this, application, Stack);
 	}
 
-	@Override
 	public IPerspectiveDescriptor getDescriptor() {
 		return descriptor;
 	}
@@ -305,17 +284,14 @@ public class ModeledPageLayout implements IPageLayout {
 		return IPageLayout.ID_EDITOR_AREA;
 	}
 
-	@Override
 	public String getEditorArea() {
 		return internalGetEditorArea();
 	}
 
-	@Override
 	public int getEditorReuseThreshold() {
 		return -1;
 	}
 
-	@Override
 	public IPlaceholderFolderLayout getFolderForView(String id) {
 		MPart view = findPart(perspModel, id);
 		if (view == null)
@@ -328,7 +304,6 @@ public class ModeledPageLayout implements IPageLayout {
 		return new ModeledPlaceholderFolderLayout(this, application, (MPartStack) stack);
 	}
 
-	@Override
 	public IViewLayout getViewLayout(String id) {
 		MPart view = findPart(perspModel, id);
 		if (view != null)
@@ -341,27 +316,22 @@ public class ModeledPageLayout implements IPageLayout {
 		return null;
 	}
 
-	@Override
 	public boolean isEditorAreaVisible() {
 		return true;
 	}
 
-	@Override
 	public boolean isFixed() {
 		return false;
 	}
 
-	@Override
 	public void setEditorAreaVisible(boolean showEditorArea) {
 		eaRef.setToBeRendered(showEditorArea);
 	}
 
-	@Override
 	public void setEditorReuseThreshold(int openEditors) {
 		// ignored, no-op, same as 3.x implementation
 	}
 
-	@Override
 	public void setFixed(boolean isFixed) {
 		// perspModel.setFixed(isFixed);
 	}
@@ -410,8 +380,8 @@ public class ModeledPageLayout implements IPageLayout {
 		return null;
 	}
 
-	private MPartStack createStack(String id, boolean visible) {
-		MPartStack newStack = modelService.createModelElement(MPartStack.class);
+	public static MPartStack createStack(String id, boolean visible) {
+		MPartStack newStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		// temporary HACK for bug 303982
 		newStack.getTags().add("newtablook"); //$NON-NLS-1$
 		newStack.setElementId(id);
@@ -419,7 +389,7 @@ public class ModeledPageLayout implements IPageLayout {
 		return newStack;
 	}
 
-	private MUIElement insertView(String viewId, int relationship, float ratio,
+	private void insertView(String viewId, int relationship, float ratio,
 			String refId, boolean visible, boolean withStack) {
 
 		// Hide views that are filtered by capabilities
@@ -428,15 +398,12 @@ public class ModeledPageLayout implements IPageLayout {
 		MStackElement viewModel = createViewModel(application, viewId, visible && !isFiltered,
 				page, partService,
 				createReferences);
-		MUIElement retVal = viewModel;
-
 		if (viewModel != null) {
 			if (withStack) {
 				String stackId = viewId + "MStack"; // Default id...basically unusable //$NON-NLS-1$
 				MPartStack stack = insertStack(stackId, relationship, ratio, refId, visible
 						& !isFiltered);
 				stack.getChildren().add(viewModel);
-				retVal = stack;
 			} else {
 				insert(viewModel, findRefModel(refId), plRelToSwt(relationship), ratio);
 			}
@@ -446,8 +413,6 @@ public class ModeledPageLayout implements IPageLayout {
 		if (isFiltered) {
 			addViewActivator(viewModel);
 		}
-
-		return retVal;
 	}
 
 	private MUIElement findRefModel(String refId) {
@@ -560,7 +525,7 @@ public class ModeledPageLayout implements IPageLayout {
 		newParent.getChildren().add(relTo);
 	}
 
-	private void insert(MUIElement toInsert, MUIElement relTo,
+	public static void insert(MUIElement toInsert, MUIElement relTo,
 			int swtSide, int ratio) {
 		if (toInsert == null || relTo == null)
 			return;
@@ -569,7 +534,7 @@ public class ModeledPageLayout implements IPageLayout {
 		if (relParent != null) {
 			List<MUIElement> children = relParent.getChildren();
 			int index = children.indexOf(relTo);
-			MPartSashContainer psc = modelService.createModelElement(MPartSashContainer.class);
+			MPartSashContainer psc = BasicFactoryImpl.eINSTANCE.createPartSashContainer();
 			psc.setContainerData(relTo.getContainerData());
 			relParent.getChildren().add(index + 1, psc);
 
@@ -607,7 +572,12 @@ public class ModeledPageLayout implements IPageLayout {
 			if (relTo.isToBeRendered() || toInsert.isToBeRendered()) {
 				// one of the items to be inserted should be rendered, render
 				// all parent elements as well
-				resetToBeRenderedFlag(psc, true);
+				MUIElement parent = psc.getParent();
+				while (parent != null && !(parent instanceof MPerspective)) {
+					parent.setToBeRendered(true);
+					parent = parent.getParent();
+				}
+				psc.setToBeRendered(true);
 			} else {
 				// no child elements need to be rendered, the parent part sash
 				// container does not need to be rendered either then
@@ -617,7 +587,7 @@ public class ModeledPageLayout implements IPageLayout {
 		}
 	}
 
-	private void insert(MUIElement toInsert, MUIElement relTo,
+	public static void insert(MUIElement toInsert, MUIElement relTo,
 			int swtSide, float ratio) {
 		int pct = (int) (ratio * 10000);
 		insert(toInsert, relTo, swtSide, pct);
@@ -694,20 +664,11 @@ public class ModeledPageLayout implements IPageLayout {
 				stack.setSelectedElement(viewModel);
 			}
 
-			if (visible || viewModel.isToBeRendered()) {
+			if (visible) {
 				// ensure that the parent is being rendered, it may have been a
 				// placeholder folder so its flag may actually be false
-				resetToBeRenderedFlag(viewModel, true);
+				refModel.setToBeRendered(true);
 			}
 		}
-	}
-
-	private static void resetToBeRenderedFlag(MUIElement element, boolean toBeRendered) {
-		MUIElement parent = element.getParent();
-		while (parent != null && !(parent instanceof MPerspective)) {
-			parent.setToBeRendered(toBeRendered);
-			parent = parent.getParent();
-		}
-		element.setToBeRendered(toBeRendered);
 	}
 }

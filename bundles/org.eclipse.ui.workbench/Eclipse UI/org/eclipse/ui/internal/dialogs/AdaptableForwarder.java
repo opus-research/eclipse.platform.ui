@@ -32,7 +32,9 @@ public class AdaptableForwarder implements IAdaptable {
 		this.element = element;
 	}
 	
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+	 */
 	public Object getAdapter(Class adapter) {
         return Util.getAdapter(element, adapter);
 	}

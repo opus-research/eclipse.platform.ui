@@ -52,16 +52,14 @@ public class SelectBuildWorkingSetAction extends Action implements
         return sets[0];
     }
 
-    @Override
-	public void run() {
+    public void run() {
         IWorkingSet set = queryForWorkingSet();
         if (set != null) {
             new BuildSetAction(set, window, actionBars).run();
         }
     }
 
-    @Override
-	public void dispose() {
+    public void dispose() {
     }
 
     public void setActionBars(IActionBarConfigurer actionBars) {

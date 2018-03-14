@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 433603
  *******************************************************************************/
 package org.eclipse.ui.tests.adaptable;
 
@@ -58,17 +57,18 @@ public class AdaptableDecoratorTestCase extends UITestCase implements
 		ts.addTest(new AdaptableDecoratorTestCase("testRefreshLightContributor"));
 		return ts;
 	}
-
 	/**
 	 * Constructor for DecoratorTestCase.
-	 *
+	 * 
 	 * @param testName
 	 */
 	public AdaptableDecoratorTestCase(String testName) {
 		super(testName);
 	}
 
-	@Override
+	/**
+	 * Sets up the hierarchy.
+	 */
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		createTestFile();
@@ -78,15 +78,13 @@ public class AdaptableDecoratorTestCase extends UITestCase implements
 
 		DecoratorDefinition[] definitions = WorkbenchPlugin.getDefault()
 				.getDecoratorManager().getAllDecoratorDefinitions();
-		for (DecoratorDefinition definition : definitions) {
-			if (definition.getId().equals(
-					"org.eclipse.ui.tests.adaptable.decorator")) {
-				fullDefinition = definition;
-			}
-			if (definition.getId().equals(
-					"org.eclipse.ui.tests.decorators.lightweightdecorator")) {
-				lightDefinition = definition;
-			}
+		for (int i = 0; i < definitions.length; i++) {
+			if (definitions[i].getId().equals(
+					"org.eclipse.ui.tests.adaptable.decorator"))
+				fullDefinition = definitions[i];
+			if (definitions[i].getId().equals(
+					"org.eclipse.ui.tests.decorators.lightweightdecorator"))
+				lightDefinition = definitions[i];
 		}
 	}
 
@@ -94,7 +92,9 @@ public class AdaptableDecoratorTestCase extends UITestCase implements
 		return WorkbenchPlugin.getDefault().getDecoratorManager();
 	}
 
-	@Override
+	/**
+	 * Remove the listener.
+	 */
 	protected void doTearDown() throws Exception {
 
 		if (testProject != null) {
@@ -115,7 +115,7 @@ public class AdaptableDecoratorTestCase extends UITestCase implements
 	/**
 	 * Test enabling the contributor
 	 */
-	public void testEnableDecorator() {
+	public void testEnableDecorator() throws CoreException {
 		getDecoratorManager().updateForEnablementChange();
 		fullDefinition.setEnabled(true);
 		lightDefinition.setEnabled(true);
@@ -151,7 +151,7 @@ public class AdaptableDecoratorTestCase extends UITestCase implements
 	/**
 	 * Refresh the full decorator.
 	 */
-	public void testRefreshLightContributor() {
+	public void testRefreshLightContributor() throws CoreException {
 
 		updated = false;
 		getDecoratorManager().updateForEnablementChange();
@@ -163,7 +163,9 @@ public class AdaptableDecoratorTestCase extends UITestCase implements
 
 	}
 
-	@Override
+	/*
+	 * @see ILabelProviderListener#labelProviderChanged(LabelProviderChangedEvent)
+	 */
 	public void labelProviderChanged(LabelProviderChangedEvent event) {
 		updated = true;
 	}

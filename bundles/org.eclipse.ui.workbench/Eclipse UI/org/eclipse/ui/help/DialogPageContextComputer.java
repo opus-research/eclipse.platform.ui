@@ -26,7 +26,6 @@ import org.eclipse.swt.widgets.Control;
  * @deprecated nested contexts are no longer supported by the help support system
  * @noextend This class is not intended to be subclassed by clients.
  */
-@Deprecated
 public class DialogPageContextComputer implements IContextComputer {
     private IDialogPage page;
 
@@ -99,8 +98,7 @@ public class DialogPageContextComputer implements IContextComputer {
     /* (non-Javadoc)
      * Method declared on IContextComputer.
      */
-    @Override
-	public Object[] computeContexts(HelpEvent event) {
+    public Object[] computeContexts(HelpEvent event) {
         contextList = new ArrayList();
 
         // Add the local context
@@ -119,8 +117,7 @@ public class DialogPageContextComputer implements IContextComputer {
     /* (non-Javadoc)
      * Method declared on IContextComputer.
      */
-    @Override
-	public Object[] getLocalContexts(HelpEvent event) {
+    public Object[] getLocalContexts(HelpEvent event) {
         return new Object[] { context };
     }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 450411
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench.modeling;
 
@@ -27,7 +26,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPart;
  * </p>
  * 
  * @since 1.0
- * @noimplement This interface is not intended to be implemented by clients.
  */
 public interface EPartService {
 
@@ -248,19 +246,9 @@ public interface EPartService {
 	 * If the part has been tagged with the {@link #REMOVE_ON_HIDE_TAG} tag, it will be removed from
 	 * the model when the service hides it.
 	 * </p>
-	 * <p>
-	 * To save the part before hiding, use {@link #savePart(MPart, boolean)}:
-	 * </p>
-	 * 
-	 * <pre>
-	 * if (partService.savePart(part, true)) {
-	 * 	partService.hidePart(part);
-	 * }
-	 * </pre>
 	 * 
 	 * @param part
 	 *            the part to hide
-	 * @see #savePart(MPart, boolean)
 	 */
 	public void hidePart(MPart part);
 
@@ -270,22 +258,12 @@ public interface EPartService {
 	 * If <code>force</code> is <code>true</code> or the part has been tagged with the
 	 * {@link #REMOVE_ON_HIDE_TAG} tag, it will be removed from the model when the service hides it.
 	 * </p>
-	 * <p>
-	 * To save the part before hiding, use {@link #savePart(MPart, boolean)}:
-	 * </p>
-	 * 
-	 * <pre>
-	 * if (partService.savePart(part, true)) {
-	 * 	partService.hidePart(part);
-	 * }
-	 * </pre>
 	 * 
 	 * @param part
 	 *            the part to hide
 	 * @param force
 	 *            if the part should be removed from the model regardless of its
 	 *            {@link #REMOVE_ON_HIDE_TAG} tag
-	 * @see #savePart(MPart, boolean)
 	 */
 	public void hidePart(MPart part, boolean force);
 
@@ -308,7 +286,6 @@ public interface EPartService {
 	 *            <code>false</code> to save changes without asking
 	 * @return <code>true</code> if the operation completed successfully, <code>false</code> if the
 	 *         user canceled the operation or if an error occurred while saving the changes
-	 * @see #hidePart(MPart, boolean)
 	 */
 	public boolean savePart(MPart part, boolean confirm);
 
@@ -342,21 +319,8 @@ public interface EPartService {
 	 * @param perspective
 	 *            the perspective to switch to, must not be <code>null</code> and it must be a
 	 *            perspective that's being managed by this service
-	 * @noreference This method is not intended to be referenced by clients.
+	 * @noreference This method is not intended to be referenced by clients as it may be removed or
+	 *              moved to another interface.
 	 */
 	public void switchPerspective(MPerspective perspective);
-
-	/**
-	 * Indicates whether a part with a certain elementId is currently rendered in a certain
-	 * perspective or not.
-	 *
-	 * @param elementId
-	 *            the id of the part, which should be checked
-	 * @param perspective
-	 *            the perspective, which may contain the part with the given elementId
-	 * @return <code>true</code> if the part with the given elementId is rendered in the given
-	 *         perspective and <code>false</code> otherwise
-	 * @since 1.3
-	 */
-	public boolean isPartOrPlaceholderInPerspective(String elementId, MPerspective perspective);
 }

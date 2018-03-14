@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -256,16 +256,14 @@ public class WelcomeEditor extends EditorPart {
      */
     private void addListeners(StyledText styledText) {
         styledText.addMouseListener(new MouseAdapter() {
-            @Override
-			public void mouseDown(MouseEvent e) {
+            public void mouseDown(MouseEvent e) {
                 if (e.button != 1) {
                     return;
                 }
                 mouseDown = true;
             }
 
-            @Override
-			public void mouseUp(MouseEvent e) {
+            public void mouseUp(MouseEvent e) {
                 mouseDown = false;
                 StyledText text = (StyledText) e.widget;
                 WelcomeItem item = (WelcomeItem) e.widget.getData();
@@ -289,8 +287,7 @@ public class WelcomeEditor extends EditorPart {
         });
 
         styledText.addMouseMoveListener(new MouseMoveListener() {
-            @Override
-			public void mouseMove(MouseEvent e) {
+            public void mouseMove(MouseEvent e) {
                 // Do not change cursor on drag events
                 if (mouseDown) {
                     if (!dragEvent) {
@@ -319,8 +316,7 @@ public class WelcomeEditor extends EditorPart {
         });
 
         styledText.addTraverseListener(new TraverseListener() {
-            @Override
-			public void keyTraversed(TraverseEvent e) {
+            public void keyTraversed(TraverseEvent e) {
                 StyledText text = (StyledText) e.widget;
 
                 switch (e.detail) {
@@ -414,13 +410,11 @@ public class WelcomeEditor extends EditorPart {
         });
 
         styledText.addKeyListener(new KeyListener() {
-            @Override
-			public void keyReleased(KeyEvent e) {
+            public void keyReleased(KeyEvent e) {
                 //Ignore a key release
             }
 
-            @Override
-			public void keyPressed(KeyEvent event) {
+            public void keyPressed(KeyEvent event) {
                 StyledText text = (StyledText) event.widget;
                 if (event.character == ' ' || event.character == SWT.CR) {
                     if (text != null) {
@@ -460,14 +454,12 @@ public class WelcomeEditor extends EditorPart {
         });
 
         styledText.addFocusListener(new FocusAdapter() {
-            @Override
-			public void focusLost(FocusEvent e) {
+            public void focusLost(FocusEvent e) {
                 // Remember current text widget
                 lastNavigatedText = (StyledText) e.widget;
             }
 
-            @Override
-			public void focusGained(FocusEvent e) {
+            public void focusGained(FocusEvent e) {
                 currentText = (StyledText) e.widget;
 
                 // Remove highlighted selection if text widget has changed
@@ -478,16 +470,15 @@ public class WelcomeEditor extends EditorPart {
 				}
 
                 // enable/disable copy action
-				copyAction.setEnabled(currentText.isTextSelected());
+                copyAction.setEnabled(currentText.getSelectionCount() > 0);
             }
         });
 
         styledText.addSelectionListener(new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 // enable/disable copy action			
                 StyledText text = (StyledText) e.widget;
-				copyAction.setEnabled(text.isTextSelected());
+                copyAction.setEnabled(text.getSelectionCount() > 0);
             }
         });
     }
@@ -626,8 +617,7 @@ public class WelcomeEditor extends EditorPart {
                     + (layout.marginWidth * 2);
             final int adjustFirst = HINDENT + (layout.marginWidth * 2);
             infoArea.addListener(SWT.Resize, new Listener() {
-                @Override
-				public void handleEvent(Event event) {
+                public void handleEvent(Event event) {
                     int w = scrolledComposite.getClientArea().width;
                     // if the horizontal scroll bar exists, we want to wrap to the
                     // minimum wrap width
@@ -691,8 +681,7 @@ public class WelcomeEditor extends EditorPart {
      *
      * @param parent the parent control
      */
-    @Override
-	public void createPartControl(Composite parent) {
+    public void createPartControl(Composite parent) {
         // read our contents
         readFile();
         if (parser == null) {
@@ -723,8 +712,7 @@ public class WelcomeEditor extends EditorPart {
 				editorComposite, IIDEHelpContextIds.WELCOME_EDITOR);
 
         this.colorListener = new IPropertyChangeListener() {
-            @Override
-			public void propertyChange(PropertyChangeEvent event) {
+            public void propertyChange(PropertyChangeEvent event) {
                 if (event.getProperty()
                         .equals(JFacePreferences.HYPERLINK_COLOR)) {
                     Color fg = JFaceColors.getHyperlinkText(editorComposite
@@ -770,8 +758,7 @@ public class WelcomeEditor extends EditorPart {
 
         // Message label
         final CLabel messageLabel = new CLabel(titleArea, SWT.LEFT) {
-            @Override
-			protected String shortenText(GC gc, String text, int width) {
+            protected String shortenText(GC gc, String text, int width) {
                 if (gc.textExtent(text, SWT.DRAW_MNEMONIC).x <= width) {
 					return text;
 				}
@@ -795,8 +782,7 @@ public class WelcomeEditor extends EditorPart {
         messageLabel.setFont(JFaceResources.getHeaderFont());
 
         final IPropertyChangeListener fontListener = new IPropertyChangeListener() {
-            @Override
-			public void propertyChange(PropertyChangeEvent event) {
+            public void propertyChange(PropertyChangeEvent event) {
                 if (JFaceResources.HEADER_FONT.equals(event.getProperty())) {
                     messageLabel.setFont(JFaceResources.getHeaderFont());
                 }
@@ -804,8 +790,7 @@ public class WelcomeEditor extends EditorPart {
         };
 
         messageLabel.addDisposeListener(new DisposeListener() {
-            @Override
-			public void widgetDisposed(DisposeEvent event) {
+            public void widgetDisposed(DisposeEvent event) {
                 JFaceResources.getFontRegistry().removeListener(fontListener);
             }
         });
@@ -832,8 +817,7 @@ public class WelcomeEditor extends EditorPart {
      * <code>IWorkbenchPart</code> method disposes the title image
      * loaded by <code>setInitializationData</code>. Subclasses may extend.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         super.dispose();
         if (busyCursor != null) {
 			busyCursor.dispose();
@@ -847,7 +831,7 @@ public class WelcomeEditor extends EditorPart {
         }
     }
 
-    /**
+    /* (non-Javadoc)
      * Saves the contents of this editor.
      * <p>
      * Subclasses must override this method to implement the open-save-close lifecycle
@@ -856,12 +840,11 @@ public class WelcomeEditor extends EditorPart {
      *
      * @see IEditorPart
      */
-    @Override
-	public void doSave(IProgressMonitor monitor) {
+    public void doSave(IProgressMonitor monitor) {
         // do nothing
     }
 
-    /**
+    /* (non-Javadoc)
      * Saves the contents of this editor to another object.
      * <p>
      * Subclasses must override this method to implement the open-save-close lifecycle
@@ -870,8 +853,7 @@ public class WelcomeEditor extends EditorPart {
      *
      * @see IEditorPart
      */
-    @Override
-	public void doSaveAs() {
+    public void doSaveAs() {
         // do nothing	
     }
 
@@ -899,7 +881,7 @@ public class WelcomeEditor extends EditorPart {
         return parser.getItems();
     }
 
-    /**
+    /* (non-Javadoc)
      * Sets the cursor and selection state for this editor to the passage defined
      * by the given marker.
      * <p>
@@ -912,7 +894,7 @@ public class WelcomeEditor extends EditorPart {
         // do nothing
     }
 
-    /**
+    /* (non-Javadoc)
      * Initializes the editor part with a site and input.
      * <p>
      * Subclasses of <code>EditorPart</code> must implement this method.  Within
@@ -926,8 +908,7 @@ public class WelcomeEditor extends EditorPart {
      *		setInput(editorInput);
      * </pre>
      */
-    @Override
-	public void init(IEditorSite site, IEditorInput input)
+    public void init(IEditorSite site, IEditorInput input)
             throws PartInitException {
         if (!(input instanceof WelcomeEditorInput)) {
 			throw new PartInitException(
@@ -937,7 +918,7 @@ public class WelcomeEditor extends EditorPart {
         setInput(input);
     }
 
-    /**
+    /* (non-Javadoc)
      * Returns whether the contents of this editor have changed since the last save
      * operation.
      * <p>
@@ -947,12 +928,11 @@ public class WelcomeEditor extends EditorPart {
      *
      * @see IEditorPart
      */
-    @Override
-	public boolean isDirty() {
+    public boolean isDirty() {
         return false;
     }
 
-    /**
+    /* (non-Javadoc)
      * Returns whether the "save as" operation is supported by this editor.
      * <p>
      * Subclasses must override this method to implement the open-save-close lifecycle
@@ -961,8 +941,7 @@ public class WelcomeEditor extends EditorPart {
      *
      * @see IEditorPart
      */
-    @Override
-	public boolean isSaveAsAllowed() {
+    public boolean isSaveAsAllowed() {
         return false;
     }
 
@@ -1031,8 +1010,7 @@ public class WelcomeEditor extends EditorPart {
      * appropriate times).
      * </p>
      */
-    @Override
-	public void setFocus() {
+    public void setFocus() {
         if ((editorComposite != null) && (lastNavigatedText == null)
                 && (currentText == null)) {
 			editorComposite.setFocus();

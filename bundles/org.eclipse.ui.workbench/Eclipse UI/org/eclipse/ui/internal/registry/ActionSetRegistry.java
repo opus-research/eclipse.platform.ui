@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 package org.eclipse.ui.internal.registry;
 
@@ -64,7 +63,7 @@ public class ActionSetRegistry implements IExtensionChangeHandler {
      * Creates the action set registry.
      */
     public ActionSetRegistry() {
-    	contextService = PlatformUI
+    	contextService = (IContextService) PlatformUI
 				.getWorkbench().getService(IContextService.class);
 		PlatformUI.getWorkbench().getExtensionTracker().registerHandler(
                 this,
@@ -230,8 +229,7 @@ public class ActionSetRegistry implements IExtensionChangeHandler {
     /* (non-Javadoc)
      * @see org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamichelpers.IExtensionTracker, org.eclipse.core.runtime.IExtension)
      */
-    @Override
-	public void addExtension(IExtensionTracker tracker, IExtension extension) {
+    public void addExtension(IExtensionTracker tracker, IExtension extension) {
         String extensionPointUniqueIdentifier = extension.getExtensionPointUniqueIdentifier();
         if (extensionPointUniqueIdentifier.equals(getActionSetExtensionPoint().getUniqueIdentifier())) {
             addActionSets(tracker, extension);
@@ -309,8 +307,7 @@ public class ActionSetRegistry implements IExtensionChangeHandler {
     /* (non-Javadoc)
      * @see org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension, java.lang.Object[])
      */
-    @Override
-	public void removeExtension(IExtension extension, Object[] objects) {
+    public void removeExtension(IExtension extension, Object[] objects) {
         String extensionPointUniqueIdentifier = extension.getExtensionPointUniqueIdentifier();
         if (extensionPointUniqueIdentifier.equals(getActionSetExtensionPoint().getUniqueIdentifier())) {
             removeActionSets(objects);
