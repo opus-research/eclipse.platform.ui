@@ -74,8 +74,9 @@ class BookmarkContentProvider implements IStructuredContentProvider,
         // of the existing bookmarks.  Otherwise, return an empty list.
         if (element instanceof IResource) {
 			return getBookmarks((IResource) element);
+		} else {
+			return new Object[0];
 		}
-		return new Object[0];
     }
 
     @Override
@@ -133,8 +134,9 @@ class BookmarkContentProvider implements IStructuredContentProvider,
     public boolean hasChildren(Object element) {
         if (element instanceof IWorkspace) {
 			return true;
+		} else {
+			return false;
 		}
-		return false;
     }
 
     @Override
@@ -157,7 +159,7 @@ class BookmarkContentProvider implements IStructuredContentProvider,
 	public void resourceChanged(final IResourceChangeEvent event) {
 
         // gather all marker changes from the delta.
-        // be sure to do this in the calling thread,
+        // be sure to do this in the calling thread, 
         // as the delta is destroyed when this method returns
         final List additions = new ArrayList();
         final List removals = new ArrayList();
