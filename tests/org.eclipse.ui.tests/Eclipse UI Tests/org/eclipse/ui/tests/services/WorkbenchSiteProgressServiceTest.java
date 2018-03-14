@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2011 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -44,6 +44,7 @@ public class WorkbenchSiteProgressServiceTest extends UITestCase{
 	private WorkbenchSiteProgressService progressService;
 	private IWorkbenchPartSite site;
     
+	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		window = openTestWindow("org.eclipse.ui.resourcePerspective");
@@ -61,74 +62,104 @@ public class WorkbenchSiteProgressServiceTest extends UITestCase{
 	}
 	
 	public void testWaitCursor() throws Exception {
-		
-		
-		// first fire a job with cursor set to true and check the cursor
+		// Fire a job with cursor set to true and check the cursor
+
 		LongJob jobWithCursor = new LongJob();
-		
-		progressService.schedule(jobWithCursor, 0, true);
-		
-		while(jobWithCursor.getState() != Job.RUNNING) {
-			Thread.sleep(100);
-		}
-		
-		processEvents();
-		forceUpdate();		
-		processEvents();
-		
-		Cursor cursor = ((Control) ((PartSite)site).getModel().getWidget()).getCursor();
-		assertNotNull(cursor);
-		
-		jobWithCursor.cancel();
-		processEvents();
 
-		 // wait till this job is done
-		while(jobWithCursor.getState() == Job.RUNNING) {
-			Thread.sleep(100);
+		try {
+			progressService.schedule(jobWithCursor, 0, true);
+
+			while (jobWithCursor.getState() != Job.RUNNING) {
+				Thread.sleep(100);
+			}
+
+			processEvents();
+			forceUpdate();
+			processEvents();
+
+			Cursor cursor = ((Control) ((PartSite) site).getModel().getWidget())
+			        .getCursor();
+			assertNotNull(cursor);
+		} finally {
+			jobWithCursor.cancel();
+			processEvents();
+
+			// wait till this job is done
+			while (jobWithCursor.getState() == Job.RUNNING) {
+				Thread.sleep(100);
+			}
+
+			processEvents();
+			forceUpdate();
+			processEvents();
 		}
-		
-		processEvents();
-		forceUpdate();
-		processEvents();
-		cursor = ((Control) ((PartSite)site).getModel().getWidget()).getCursor();
+		Cursor cursor = ((Control) ((PartSite) site).getModel().getWidget())
+		        .getCursor();
 		assertNull(cursor); // no jobs, no cursor
+	}
 
-		// Now fire two jobs, first one with cursor & delay, the second one without any cursor or delay
-		// Till the first job starts running, there should not be a cursor, after it starts running cursor should be present
+	public void testWaitCursorConcurrentJobs() throws Exception {
+		// Fire two jobs, first one with cursor & delay,
+		// the second one without any cursor or delay.
+		// Till the first job starts running, there should not be a cursor,
+		// after it starts running cursor should be present.
 
 		LongJob jobWithoutCursor = new LongJob();
-		jobWithCursor = new LongJob();
-		
-		progressService.schedule(jobWithCursor, 2000, true);
-		progressService.schedule(jobWithoutCursor, 0, false);
-		
-		while(jobWithoutCursor.getState() != Job.RUNNING) {
-			Thread.sleep(100);
-		}
-		
-		processEvents();
+		LongJob jobWithCursor = new LongJob();
 
-		// we just want the jobWithoutCursor running
-		assertTrue(jobWithCursor.getState() != Job.RUNNING); 
-		
-		forceUpdate();
-		processEvents();
-		cursor = ((Control) ((PartSite)site).getModel().getWidget()).getCursor();
-		assertNull(cursor); // jobWithoutCursor is scheduled to run first - no cursor now
-		
-		while(jobWithCursor.getState() != Job.RUNNING) {
-			Thread.sleep(100);
-		}
-		
-		processEvents();
-		
-		// both jobs should be running
-		assertTrue(jobWithCursor.getState() == Job.RUNNING && jobWithoutCursor.getState() == Job.RUNNING);
+		try {
+			progressService.schedule(jobWithCursor, 2000, true);
+			progressService.schedule(jobWithoutCursor, 0, false);
 
-		forceUpdate();		
-		processEvents();
-		cursor = ((Control) ((PartSite)site).getModel().getWidget()).getCursor();
-		assertNotNull(cursor); // both running now - cursor should be set
+			while (jobWithoutCursor.getState() != Job.RUNNING) {
+				Thread.sleep(100);
+			}
+
+			processEvents();
+
+			// we just want the jobWithoutCursor running
+			assertTrue(jobWithCursor.getState() != Job.RUNNING);
+
+			forceUpdate();
+			processEvents();
+			Cursor cursor = ((Control) ((PartSite) site).getModel().getWidget())
+			        .getCursor();
+			assertNull(cursor); // jobWithoutCursor is scheduled to run first -
+								// no cursor now
+
+			while (jobWithCursor.getState() != Job.RUNNING) {
+				Thread.sleep(100);
+			}
+
+			processEvents();
+
+			// both jobs should be running
+			assertTrue(jobWithCursor.getState() == Job.RUNNING
+			        && jobWithoutCursor.getState() == Job.RUNNING);
+
+			forceUpdate();
+			processEvents();
+			cursor = ((Control) ((PartSite) site).getModel().getWidget())
+			        .getCursor();
+			assertNotNull(cursor); // both running now - cursor should be set
+		} finally {
+			jobWithCursor.cancel();
+			jobWithoutCursor.cancel();
+			processEvents();
+
+			// wait till the jobs are done
+			while (jobWithCursor.getState() == Job.RUNNING
+			        || jobWithoutCursor.getState() == Job.RUNNING) {
+				Thread.sleep(100);
+			}
+
+			processEvents();
+			forceUpdate();
+			processEvents();
+		}
+		Cursor cursor = ((Control) ((PartSite) site).getModel().getWidget())
+		        .getCursor();
+		assertNull(cursor); // no jobs, no cursor
 	}
 
 	class LongJob extends Job{
@@ -138,6 +169,7 @@ public class WorkbenchSiteProgressServiceTest extends UITestCase{
 			super("LongJob");
 		}
 		
+		@Override
 		protected IStatus run(IProgressMonitor monitor) {
 			
 			monitor.beginTask("job starts", 1000);
