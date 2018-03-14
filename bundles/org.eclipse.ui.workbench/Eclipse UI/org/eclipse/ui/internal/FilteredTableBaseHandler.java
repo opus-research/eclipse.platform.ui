@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2016 Patrik Suzzi and others.
+ * Copyright (c) 2017 Patrik Suzzi and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 368977, 504088, 504089, 504090, 504091
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 368977, 504088, 504089, 504090, 504091, 509232, 506019
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -190,7 +190,7 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 		table.setBackground(getBackground());
 
 		tableViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
-		tableViewerColumn.setLabelProvider(getColumnLabelProvider());
+		setLabelProvider(tableViewerColumn);
 		tc = tableViewerColumn.getColumn();
 		tc.setResizable(false);
 
@@ -218,14 +218,17 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 			break;
 		default:
 			int i;
+			int currentItemIndex = getCurrentItemIndex();
 			if (gotoDirection) {
-				i= getCurrentItemIndex() + 1;
-				if (i >= tableItemCount)
-					i= 0;
+				i= currentItemIndex + 1;
+				if (i >= tableItemCount) {
+					i = 0;
+				}
 			} else {
-				i= getCurrentItemIndex() - 1;
-				if (i < 0)
-					i= tableItemCount - 1;
+				i= currentItemIndex - 1;
+				if (i < 0) {
+					i = tableItemCount - 1;
+				}
 			}
 			table.setSelection(i);
 		}
@@ -744,6 +747,26 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 		return perspectiveLabelProvider;
 	}
 
+	/** Returns the text for the given {@link WorkbenchPartReference} */
+	protected String getWorkbenchPartReferenceText(WorkbenchPartReference ref) {
+		if (ref.isDirty()) {
+			return "*" + ref.getTitle(); //$NON-NLS-1$
+		}
+		return ref.getTitle();
+	}
+
+	/**
+	 * Sets the label provider for the only column visible in the table.
+	 * Subclasses can override this method to style the table, using a
+	 * StyledCellLabelProvider.
+	 *
+	 * @param tableViewerColumn
+	 * @return
+	 */
+	protected void setLabelProvider(TableViewerColumn tableViewerColumn) {
+		tableViewerColumn.setLabelProvider(getColumnLabelProvider());
+	}
+
 	/** Default ColumnLabelProvider. The table has only one column */
 	protected ColumnLabelProvider getColumnLabelProvider() {
 		return new ColumnLabelProvider() {
@@ -752,11 +775,7 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 				if (element instanceof FilteredTableItem) {
 					return ((FilteredTableItem) element).text;
 				} else if (element instanceof WorkbenchPartReference) {
-					WorkbenchPartReference ref = ((WorkbenchPartReference) element);
-					if (ref.isDirty()) {
-						return "*" + ref.getTitle(); //$NON-NLS-1$
-					}
-					return ref.getTitle();
+					return getWorkbenchPartReferenceText((WorkbenchPartReference) element);
 				} else if (element instanceof IPerspectiveDescriptor) {
 					IPerspectiveDescriptor desc = (IPerspectiveDescriptor) element;
 					String text = getPerspectiveLabelProvider().getText(desc);
@@ -807,7 +826,6 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 	protected String getTableHeader(IWorkbenchPart activePart) {
 		return EMPTY_STRING;
 	}
-
 
 	public Object getSelection() {
 		return selection;

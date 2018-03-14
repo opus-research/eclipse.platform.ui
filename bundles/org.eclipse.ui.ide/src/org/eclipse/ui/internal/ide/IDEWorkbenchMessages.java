@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -200,6 +200,7 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String PromptOnExitDialog_message0;
 	public static String PromptOnExitDialog_message1;
 	public static String PromptOnExitDialog_choice;
+	public static String PromptOnExitDialog_button_label_exit;
 
 	public static String Workbench_shortcuts;
 	public static String Workbench_openNewWindow;
@@ -607,6 +608,7 @@ public class IDEWorkbenchMessages extends NLS {
 
 	// --- Startup preferences ---
 	public static String StartupPreferencePage_refreshButton;
+	public static String StartupPreferencePage_showProblemsButton;
 	public static String StartupPreferencePage_launchPromptButton;
 	public static String StartupPreferencePage_exitPromptButton;
 
@@ -953,6 +955,7 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String ChooseWorkspaceDialog_defaultProductName;
 	public static String ChooseWorkspaceDialog_workspaceEntryLabel;
 	public static String ChooseWorkspaceDialog_browseLabel;
+	public static String ChooseWorkspaceDialog_launchLabel;
 	public static String ChooseWorkspaceDialog_directoryBrowserTitle;
 	public static String ChooseWorkspaceDialog_directoryBrowserMessage;
 	public static String ChooseWorkspaceDialog_removeWorkspaceSelection;
@@ -987,13 +990,15 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String CleanDialog_buildCleanAuto;
 	public static String CleanDialog_buildCleanManual;
 	public static String CleanDialog_title;
-	public static String CleanDialog_cleanAllButton;
-	public static String CleanDialog_cleanSelectedButton;
+	public static String CleanDialog_clean_button_label;
+	public static String CleanDialog_selectAllButton;
+	public static String CleanDialog_deselectedAllButton;
 	public static String CleanDialog_buildNowButton;
 	public static String CleanDialog_globalBuildButton;
 	public static String CleanDialog_buildSelectedProjectsButton;
 	public static String CleanDialog_cleanSelectedTaskName;
 	public static String CleanDialog_cleanAllTaskName;
+	public static String CleanDialog_alwaysCleanAllButton;
 	public static String IDEEncoding_EncodingJob;
 	public static String IDEEditorsPreferencePage_WorkbenchPreference_viewsRelatedLink;
 	public static String IDEEditorsPreferencePage_WorkbenchPreference_FileEditorsRelatedLink;
@@ -1020,8 +1025,6 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String SystemSettingsChange_message;
 	public static String SystemSettingsChange_yes;
 	public static String SystemSettingsChange_no;
-
-	public static String UnsupportedVM_message;
 
 	public static String IDEWorkbenchActivityHelper_jobName;
 
