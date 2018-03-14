@@ -237,20 +237,7 @@ public class ViewsPreferencePage extends PreferencePage implements
 		return button;
 	}
 
-	private Label createLabel(Composite composite, String text) {
-		Label label = new Label(composite, SWT.NONE);
-		GridData data = new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1);
-		label.setLayoutData(data);
-		label.setText(text);
-		return label;
-	}
-
 	protected void createEnableMruPref(Composite composite) {
-		createLabel(composite, ""); //$NON-NLS-1$
-		createLabel(composite, WorkbenchMessages.ViewsPreference_visibleTabs_description);
-		// ((GridData) enableMru.getLayoutData()).horizontalIndent = 20;
-		// new Label(composite,
-		// SWT.NONE).setText(WorkbenchMessages.ViewsPreference_visibleTabs_description);
 		IEclipsePreferences prefs = getSwtRendererPreferences();
 		if (engine != null) {
 			boolean mruControlledByCSS = prefs.getBoolean(StackRenderer.MRU_CONTROLLED_BY_CSS_KEY, false);
@@ -261,8 +248,6 @@ public class ViewsPreferencePage extends PreferencePage implements
 		boolean defaultValue = getDefaultMRUValue();
 		boolean actualValue = prefs.getBoolean(StackRenderer.MRU_KEY, defaultValue);
 		enableMru = createCheckButton(composite, WorkbenchMessages.ViewsPreference_enableMRU, actualValue);
-		// ((GridData) enableMru.getLayoutData()).horizontalIndent = 20;
-		// ((GridData) enableMru.getLayoutData()).horizontalSpan = 1;
 	}
 
 	protected void createEnableAnimationsPref(Composite composite) {
