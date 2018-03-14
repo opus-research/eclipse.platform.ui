@@ -7,7 +7,6 @@
  *
  * Contributors:
  * IBM - Initial API and implementation
- * Steven Spungin <steven@spungin.tv> - Bug 436923
  *******************************************************************************/
 package org.eclipse.ui.internal.progress;
 
@@ -112,11 +111,11 @@ class ProgressMonitorFocusJobDialog extends ProgressMonitorJobsDialog {
 				ProgressManagerUtil.animateDown(shellPosition);
 			}
 		});
-		runInWorkspace.setCursor(getArrowCursor());
+		runInWorkspace.setCursor(arrowCursor);
 
 		cancel = createButton(parent, IDialogConstants.CANCEL_ID,
 				IDialogConstants.CANCEL_LABEL, false);
-		cancel.setCursor(getArrowCursor());
+		cancel.setCursor(arrowCursor);
 
 		createDetailsButton(parent);
 	}
