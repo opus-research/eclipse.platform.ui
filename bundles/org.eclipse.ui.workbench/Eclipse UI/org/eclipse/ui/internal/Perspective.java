@@ -16,8 +16,11 @@ package org.eclipse.ui.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPerspectiveDescriptor;
@@ -40,26 +43,32 @@ public class Perspective {
     // Editor Area management
 	// protected LayoutPart editorArea;
 	// protected PartPlaceholder editorHolder;
-	protected boolean editorHidden;
-	protected boolean editorAreaRestoreOnUnzoom;
+    protected boolean editorHidden = false;
+    protected boolean editorAreaRestoreOnUnzoom = false;
     protected int editorAreaState = IWorkbenchPage.STATE_RESTORED;
 
 	// private ViewFactory viewFactory;
     
-	protected final List<IActionSetDescriptor> alwaysOnActionSets;
+    protected ArrayList alwaysOnActionSets;
 
-	protected final List<IActionSetDescriptor> alwaysOffActionSets;
+    protected ArrayList alwaysOffActionSets;
     
     /**	IDs of menu items the user has chosen to hide	*/
-	protected final Collection<String> hideMenuIDs;
+    protected Collection hideMenuIDs;
     
     /**	IDs of toolbar items the user has chosen to hide	*/
-	protected final Collection<String> hideToolBarIDs;
+    protected Collection hideToolBarIDs;
 
     //private List fastViews;
 	// protected FastViewManager fastViewManager = null;
 
+    private Map mapIDtoViewLayoutRec;
+
     protected boolean fixed;
+
+    protected ArrayList showInPartIds;
+
+    protected HashMap showInTimes = new HashMap();
 
     protected IMemento memento;
 
@@ -67,18 +76,16 @@ public class Perspective {
      * Reference to the part that was previously active
      * when this perspective was deactivated.
      */
-	private IWorkbenchPartReference oldPartRef;
+    private IWorkbenchPartReference oldPartRef = null;
 
-	protected boolean shouldHideEditorsOnActivate;
+    protected boolean shouldHideEditorsOnActivate = false;
 
+	// protected PageLayout layout;
 	protected MPerspective layout;
 
     /**
-	 * 
-	 * @param desc
-	 * @param layout
-	 * @param page
-	 */
+     * ViewManager constructor comment.
+     */
 	public Perspective(PerspectiveDescriptor desc, MPerspective layout, WorkbenchPage page) {
         this(page);
 		this.layout = layout;
@@ -87,10 +94,11 @@ public class Perspective {
 
 	public void initActionSets() {
 		if (descriptor != null) {
-			List<IActionSetDescriptor> temp = new ArrayList<IActionSetDescriptor>();
-			List<String> ids = ModeledPageLayout.getIds(layout, ModeledPageLayout.ACTION_SET_TAG);
-			createInitialActionSets(temp, ids);
-			for (IActionSetDescriptor descriptor : temp) {
+			List temp = new ArrayList();
+			createInitialActionSets(temp,
+					ModeledPageLayout.getIds(layout, ModeledPageLayout.ACTION_SET_TAG));
+			for (Iterator iter = temp.iterator(); iter.hasNext();) {
+				IActionSetDescriptor descriptor = (IActionSetDescriptor) iter.next();
 				if (!alwaysOnActionSets.contains(descriptor)) {
 					alwaysOnActionSets.add(descriptor);
 				}
@@ -103,19 +111,25 @@ public class Perspective {
      */
 	protected Perspective(WorkbenchPage page) {
         this.page = page;
-        alwaysOnActionSets = new ArrayList<IActionSetDescriptor>(2);
-        alwaysOffActionSets = new ArrayList<IActionSetDescriptor>(2);
-		hideMenuIDs = new HashSet<String>();
-		hideToolBarIDs = new HashSet<String>();
+        alwaysOnActionSets = new ArrayList(2);
+        alwaysOffActionSets = new ArrayList(2);
+        hideMenuIDs = new HashSet();
+        hideToolBarIDs = new HashSet();
+        
+        
+        mapIDtoViewLayoutRec = new HashMap();
     }
 
 
     /**
      * Create the initial list of action sets.
      */
-	protected void createInitialActionSets(List<IActionSetDescriptor> outputList, List<String> stringList) {
-		ActionSetRegistry reg = WorkbenchPlugin.getDefault().getActionSetRegistry();
-		for (String id : stringList) {
+    protected void createInitialActionSets(List outputList, List stringList) {
+        ActionSetRegistry reg = WorkbenchPlugin.getDefault()
+                .getActionSetRegistry();
+        Iterator iter = stringList.iterator();
+        while (iter.hasNext()) {
+            String id = (String) iter.next();
             IActionSetDescriptor desc = reg.findActionSet(id);
             if (desc != null) {
 				outputList.add(desc);
@@ -130,12 +144,12 @@ public class Perspective {
      * Dispose the perspective and all views contained within.
      */
     public void dispose() {
+        // Get rid of presentation.
+		mapIDtoViewLayoutRec.clear();
     }
 
 	/**
 	 * Returns the perspective.
-	 * 
-	 * @return can return null!
 	 */
     public IPerspectiveDescriptor getDesc() {
         return descriptor;
@@ -161,13 +175,20 @@ public class Perspective {
     }
 
     /**
-	 * Returns the ids of the parts to list in the Show In... dialog. This is a
-	 * List of Strings.
-	 * 
-	 * @return non null list of strings
-	 */
-	public List<?> getShowInPartIds() {
+     * Returns the ids of the parts to list in the Show In... dialog.
+     * This is a List of Strings.
+     */
+    public ArrayList getShowInPartIds() {
 		return page.getShowInPartIds();
+    }
+
+    /**
+     * Returns the time at which the last Show In was performed
+     * for the given target part, or 0 if unknown.
+     */
+    public long getShowInTime(String partId) {
+        Long t = (Long) showInTimes.get(partId);
+        return t == null ? 0L : t.longValue();
     }
 
     /**
@@ -237,7 +258,7 @@ public class Perspective {
     /**
      * Returns the ActionSets read from perspectiveExtensions in the registry.  
      */
-	protected List<?> getPerspectiveExtensionActionSets() {
+    protected ArrayList getPerspectiveExtensionActionSets() {
 		return page.getPerspectiveExtensionActionSets(descriptor.getOriginalId());
     }
     
@@ -288,7 +309,8 @@ public class Perspective {
     	try {
 			service.deferUpdates(true);
 			for (int i = 0; i < alwaysOnActionSets.size(); i++) {
-				IActionSetDescriptor desc = alwaysOnActionSets.get(i);
+				IActionSetDescriptor desc = (IActionSetDescriptor) alwaysOnActionSets
+						.get(i);
 				if (desc.getId().equals(newDesc.getId())) {
 					removeAlwaysOn(desc);
 					removeAlwaysOff(desc);
@@ -315,7 +337,8 @@ public class Perspective {
     	try {
 			service.deferUpdates(true);
 			for (int i = 0; i < alwaysOnActionSets.size(); i++) {
-				IActionSetDescriptor desc = alwaysOnActionSets.get(i);
+				IActionSetDescriptor desc = (IActionSetDescriptor) alwaysOnActionSets
+						.get(i);
 				if (desc.getId().equals(id)) {
 					removeAlwaysOn(desc);
 					break;
@@ -323,7 +346,8 @@ public class Perspective {
 			}
 
 			for (int i = 0; i < alwaysOffActionSets.size(); i++) {
-				IActionSetDescriptor desc = alwaysOffActionSets.get(i);
+				IActionSetDescriptor desc = (IActionSetDescriptor) alwaysOffActionSets
+						.get(i);
 				if (desc.getId().equals(id)) {
 					removeAlwaysOff(desc);
 					break;
@@ -341,20 +365,20 @@ public class Perspective {
     }
     
     public IActionSetDescriptor[] getAlwaysOnActionSets() {
-        return alwaysOnActionSets.toArray(new IActionSetDescriptor[alwaysOnActionSets.size()]);
+        return (IActionSetDescriptor[]) alwaysOnActionSets.toArray(new IActionSetDescriptor[alwaysOnActionSets.size()]);
     }
     
     public IActionSetDescriptor[] getAlwaysOffActionSets() {
-        return alwaysOffActionSets.toArray(new IActionSetDescriptor[alwaysOffActionSets.size()]);
+        return (IActionSetDescriptor[]) alwaysOffActionSets.toArray(new IActionSetDescriptor[alwaysOffActionSets.size()]);
     }
 	
 	/**	@return a Collection of IDs of items to be hidden from the menu bar	*/
-	public Collection<String> getHiddenMenuItems() {
+	public Collection getHiddenMenuItems() {
 		return hideMenuIDs;
 	}
 	
 	/**	@return a Collection of IDs of items to be hidden from the tool bar	*/
-	public Collection<String> getHiddenToolbarItems() {
+	public Collection getHiddenToolbarItems() {
 		return hideToolBarIDs;
 	}
 	
