@@ -2379,5 +2379,13 @@
              </or>
       </definition>
    </extension>
+   <extension
+         id="id1"
+         point="org.eclipse.e4.workbench.model">
+      <fragment
+            apply="notexists"
+            uri="model/fragment.e4xmi">
+      </fragment>
+   </extension>
 
 </plugin>
