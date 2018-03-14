@@ -12,7 +12,6 @@ package org.eclipse.jface.preference;
 
 import java.util.Arrays;
 import java.util.StringTokenizer;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.StringConverter;
@@ -77,8 +76,12 @@ public class PreferenceConverter {
      */
     public static final FontData FONTDATA_DEFAULT_DEFAULT;
     static {
-    	
-        FONTDATA_ARRAY_DEFAULT_DEFAULT = readDefaultFontData();
+		Display display = Display.getCurrent();
+		if (display == null) {
+			display = Display.getDefault ();
+		}
+		
+        FONTDATA_ARRAY_DEFAULT_DEFAULT = display.getSystemFont().getFontData();
         /**
          * The default-default value for <code>FontData</code> preferences.
          * This is left in for compatibility purposes. It is recommended that
@@ -87,21 +90,6 @@ public class PreferenceConverter {
 
         FONTDATA_DEFAULT_DEFAULT = FONTDATA_ARRAY_DEFAULT_DEFAULT[0];
     }
-    
-	private static FontData[] readDefaultFontData() {
-		final Display display = Display.getCurrent() == null ? Display.getDefault() : Display.getCurrent();
-
-		final AtomicReference<FontData[]> result = new AtomicReference<FontData[]>();
-
-		display.syncExec(new Runnable() {
-
-			public void run() {
-				result.set(display.getSystemFont().getFontData());
-			}
-		});
-
-		return result.get();
-	}
 
     /* (non-Javadoc)
      * private constructor to prevent instantiation.
