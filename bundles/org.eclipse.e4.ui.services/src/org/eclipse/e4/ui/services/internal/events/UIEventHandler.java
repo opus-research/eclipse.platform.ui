@@ -35,6 +35,7 @@ public class UIEventHandler implements EventHandler {
 		else {
 			uiSync.syncExec(new Runnable() {
 				
+				@Override
 				public void run() {
 					eventHandler.handleEvent(event);
 				}
