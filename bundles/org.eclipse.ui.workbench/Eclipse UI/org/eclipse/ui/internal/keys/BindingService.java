@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import org.eclipse.core.commands.CommandManager;
@@ -231,7 +232,12 @@ public final class BindingService implements IBindingService {
 	 * @see org.eclipse.ui.keys.IBindingService#getBindings()
 	 */
 	public Binding[] getBindings() {
-		return manager.getBindings();
+		Set<Binding> bindings = new HashSet<Binding>();
+		bindings.addAll(bindingService.getActiveBindings());
+		for (Binding binding : manager.getBindings()) {
+			bindings.add(binding);
+		}
+		return bindings.toArray(new Binding[0]);
 	}
 
 	/*
