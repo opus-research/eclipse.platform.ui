@@ -56,8 +56,7 @@ public class SelectionAggregator {
 				MPart part = (MPart) element;
 
 				String partId = part.getElementId();
-				if (targetedListeners.containsKey(partId)
-						|| targetedPostListeners.containsKey(partId))
+				if (targetedListeners.containsKey(partId))
 					track(part);
 			}
 		}
