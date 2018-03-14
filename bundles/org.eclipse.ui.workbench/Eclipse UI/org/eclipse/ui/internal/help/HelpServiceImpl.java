@@ -22,10 +22,4 @@ public class HelpServiceImpl implements EHelpService {
 			WorkbenchHelpSystem.getInstance().displayHelp(contextId);
 		}
 	}
-
-	@Override
-	public void setHelp(Object element, String helpContextId) {
-		// TODO Auto-generated method stub
-
-	}
 }
