@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -323,32 +323,32 @@ public class WorkbenchPage implements IWorkbenchPage {
 		try {
 			service.deferUpdates(true);
 			if (newPersp != null) {
-				List<IActionSetDescriptor> newAlwaysOn = newPersp.getAlwaysOnActionSets();
-				for (int i = 0; i < newAlwaysOn.size(); i++) {
-					IActionSetDescriptor descriptor = newAlwaysOn.get(i);
+				IActionSetDescriptor[] newAlwaysOn = newPersp.getAlwaysOnActionSets();
+				for (int i = 0; i < newAlwaysOn.length; i++) {
+					IActionSetDescriptor descriptor = newAlwaysOn[i];
 
 					actionSets.showAction(descriptor);
 				}
 
-				List<IActionSetDescriptor> newAlwaysOff = newPersp.getAlwaysOffActionSets();
-				for (int i = 0; i < newAlwaysOff.size(); i++) {
-					IActionSetDescriptor descriptor = newAlwaysOff.get(i);
+				IActionSetDescriptor[] newAlwaysOff = newPersp.getAlwaysOffActionSets();
+				for (int i = 0; i < newAlwaysOff.length; i++) {
+					IActionSetDescriptor descriptor = newAlwaysOff[i];
 
 					actionSets.maskAction(descriptor);
 				}
 			}
 
 			if (oldPersp != null) {
-				List<IActionSetDescriptor> oldAlwaysOn = oldPersp.getAlwaysOnActionSets();
-				for (int i = 0; i < oldAlwaysOn.size(); i++) {
-					IActionSetDescriptor descriptor = oldAlwaysOn.get(i);
+				IActionSetDescriptor[] newAlwaysOn = oldPersp.getAlwaysOnActionSets();
+				for (int i = 0; i < newAlwaysOn.length; i++) {
+					IActionSetDescriptor descriptor = newAlwaysOn[i];
 
 					actionSets.hideAction(descriptor);
 				}
 
-				List<IActionSetDescriptor> oldAlwaysOff = oldPersp.getAlwaysOffActionSets();
-				for (int i = 0; i < oldAlwaysOff.size(); i++) {
-					IActionSetDescriptor descriptor = oldAlwaysOff.get(i);
+				IActionSetDescriptor[] newAlwaysOff = oldPersp.getAlwaysOffActionSets();
+				for (int i = 0; i < newAlwaysOff.length; i++) {
+					IActionSetDescriptor descriptor = newAlwaysOff[i];
 
 					actionSets.unmaskAction(descriptor);
 				}
@@ -2498,13 +2498,13 @@ public class WorkbenchPage implements IWorkbenchPage {
 		MPerspective perspective = getCurrentPerspective();
 		if (perspective != null) {
 			int scope = allPerspectives ? WINDOW_SCOPE : EModelService.PRESENTATION;
-			List<MPart> parts = modelService.findElements(window, null, MPart.class, null, scope);
+			List<MPlaceholder> placeholders = modelService.findElements(window, null,
+					MPlaceholder.class, null, scope);
 			List<IViewReference> visibleReferences = new ArrayList<IViewReference>();
 			for (ViewReference reference : viewReferences) {
-				for (MPart part : parts) {
-					if (reference.getModel().getElementId().equals(part.getElementId())
-							&& (isStickyView(reference.getModel().getElementId()) || partService
-									.isPartOrPlaceholderInPerspective(part.getElementId(), perspective))) {
+				for (MPlaceholder placeholder : placeholders) {
+					if (reference.getModel() == placeholder.getRef()
+							&& placeholder.isToBeRendered()) {
 						// only rendered placeholders are valid view references
 						visibleReferences.add(reference);
 					}
@@ -2513,24 +2513,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 			return visibleReferences.toArray(new IViewReference[visibleReferences.size()]);
 		}
 		return new IViewReference[0];
-	}
-
-    /**
-	 * Check if the elementId belongs to a sticky view.
-	 *
-	 * @param elementId
-	 *            id of the part
-	 * @return <code>true</code> in case it is a sticky view and
-	 *         <code>false</code> otherwise
-	 */
-	private boolean isStickyView(String elementId) {
-		IStickyViewDescriptor[] stickyViews = PlatformUI.getWorkbench().getViewRegistry().getStickyViews();
-		for (IStickyViewDescriptor stickyViewDescriptor : stickyViews) {
-			if (stickyViewDescriptor.getId().equals(elementId)) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	/**
@@ -3469,14 +3451,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 		}
 
 		// deactivate and activate other action sets as
-		Perspective oldPersp = getPerspective(persp);
-		Perspective dummyPersp = getPerspective(dummyPerspective);
-		updateActionSets(oldPersp, dummyPersp);
-		oldPersp.getAlwaysOnActionSets().clear();
-		oldPersp.getAlwaysOnActionSets().addAll(dummyPersp.getAlwaysOnActionSets());
-		oldPersp.getAlwaysOffActionSets().clear();
-		oldPersp.getAlwaysOffActionSets().addAll(dummyPersp.getAlwaysOffActionSets());
-
+		updateActionSets(getPerspective(persp), getPerspective(dummyPerspective));
 		modelToPerspectiveMapping.remove(dummyPerspective);
 
 		// partly fixing toolbar refresh issue, see bug 383569 comment 10
@@ -4072,7 +4047,7 @@ public class WorkbenchPage implements IWorkbenchPage {
              
              IActionSetDescriptor desc = reg.findActionSet(actionSetID);
              if (desc != null) {
-				List<IActionSetDescriptor> offActionSets = persp.getAlwaysOffActionSets();
+				IActionSetDescriptor[] offActionSets = persp.getAlwaysOffActionSets();
 				for (IActionSetDescriptor off : offActionSets) {
 					if (off.getId().equals(desc.getId())) {
 						return;
