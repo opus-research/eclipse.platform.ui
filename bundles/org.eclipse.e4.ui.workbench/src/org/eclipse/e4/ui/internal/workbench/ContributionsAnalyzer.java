@@ -45,6 +45,9 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 public final class ContributionsAnalyzer {
+
+	private static final String ADDITIONS = "additions"; //$NON-NLS-1$
+
 	public static void trace(String msg, Throwable error) {
 		Activator.trace("/trace/menus", msg, error); //$NON-NLS-1$
 	}
@@ -393,7 +396,7 @@ public final class ContributionsAnalyzer {
 			}
 			idx++;
 		}
-		return id.equals("additions") ? menuModel.getChildren().size() : -1; //$NON-NLS-1$
+		return id.equals(ADDITIONS) ? menuModel.getChildren().size() : -1;
 	}
 
 	public static MCommand getCommandById(MApplication app, String cmdId) {
@@ -626,26 +629,58 @@ public final class ContributionsAnalyzer {
 			if (slot == null) {
 				continue;
 			}
-			MMenuContribution toContribute = null;
-			for (MMenuContribution item : slot) {
-				if (toContribute == null) {
-					toContribute = item;
-					continue;
-				}
-				Object[] array = item.getChildren().toArray();
-				for (int c = 0; c < array.length; c++) {
-					MMenuElement me = (MMenuElement) array[c];
-					if (!containsMatching(toContribute.getChildren(), me)) {
-						toContribute.getChildren().add(me);
-					}
-				}
-			}
+
+			MMenuContribution toContribute = mergeMenuContributions(slot);
 			if (toContribute != null) {
 				toContribute.setWidget(null);
 				result.add(toContribute);
 			}
 		}
 		trace("mergeContributions: final size: " + result.size(), null); //$NON-NLS-1$
+	}
+
+	private static MMenuContribution mergeMenuContributions(
+			ArrayList<MMenuContribution> contributionsToMerge) {
+
+		// sorting contributions
+		List<MMenuContribution> orderedContributions = new ArrayList<MMenuContribution>();
+
+		for (MMenuContribution contribution : contributionsToMerge) {
+			if (hasAdditions(contribution)) {
+				orderedContributions.add(0, contribution);
+			} else {
+				orderedContributions.add(contribution);
+			}
+		}
+
+		// merging menu items
+		MMenuContribution toContribute = null;
+		for (MMenuContribution item : orderedContributions) {
+			if (toContribute == null) {
+				toContribute = item;
+				continue;
+			}
+			int insertionIndex = getIndex(toContribute, item.getPositionInParent());
+			Object[] array = item.getChildren().toArray();
+			for (int c = 0; c < array.length; c++) {
+				MMenuElement me = (MMenuElement) array[c];
+				if (!containsMatching(toContribute.getChildren(), me)) {
+					toContribute.getChildren().add(insertionIndex, me);
+					insertionIndex++;
+				}
+			}
+		}
+
+		return toContribute;
+	}
+
+	private static boolean hasAdditions(MMenuContribution contribution) {
+		for (MMenuElement child : contribution.getChildren()) {
+			if (Util.equals(ADDITIONS, child.getElementId())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static boolean containsMatching(List<MMenuElement> children, MMenuElement me) {
