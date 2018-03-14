@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.about;
 
-import java.util.ArrayList;
-import java.util.StringTokenizer;
 import org.eclipse.jface.resource.JFaceColors;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
@@ -40,60 +38,12 @@ public class AboutTextManager {
 	 * 
 	 * @param s
 	 * @return AboutItem
+	 * 
+	 * @deprecated see AboutUtils.scan(s)
 	 */
+	@Deprecated
     public static AboutItem scan(String s) {
-		ArrayList<int[]> linkRanges = new ArrayList<int[]>();
-		ArrayList<String> links = new ArrayList<String>();
-        
-        // slightly modified version of jface url detection
-        // see org.eclipse.jface.text.hyperlink.URLHyperlinkDetector
-        
-		int urlSeparatorOffset= s.indexOf("://"); //$NON-NLS-1$
-		while(urlSeparatorOffset >= 0) {
-	
-			boolean startDoubleQuote= false;
-	
-			// URL protocol (left to "://")
-			int urlOffset= urlSeparatorOffset;
-			char ch;
-			do {
-				urlOffset--;
-				ch= ' ';
-				if (urlOffset > -1)
-					ch= s.charAt(urlOffset);
-				startDoubleQuote= ch == '"';
-			} while (Character.isUnicodeIdentifierStart(ch));
-			urlOffset++;
-			
-	
-			// Right to "://"
-			StringTokenizer tokenizer= new StringTokenizer(s.substring(urlSeparatorOffset + 3), " \t\n\r\f<>", false); //$NON-NLS-1$
-			if (!tokenizer.hasMoreTokens())
-				return null;
-	
-			int urlLength= tokenizer.nextToken().length() + 3 + urlSeparatorOffset - urlOffset;
-	
-			if (startDoubleQuote) {
-				int endOffset= -1;
-				int nextDoubleQuote= s.indexOf('"', urlOffset);
-				int nextWhitespace= s.indexOf(' ', urlOffset);
-				if (nextDoubleQuote != -1 && nextWhitespace != -1)
-					endOffset= Math.min(nextDoubleQuote, nextWhitespace);
-				else if (nextDoubleQuote != -1)
-					endOffset= nextDoubleQuote;
-				else if (nextWhitespace != -1)
-					endOffset= nextWhitespace;
-				if (endOffset != -1)
-					urlLength= endOffset - urlOffset;
-			}
-			
-			linkRanges.add(new int[] { urlOffset, urlLength });
-			links.add(s.substring(urlOffset, urlOffset+urlLength));
-			
-			urlSeparatorOffset= s.indexOf("://", urlOffset+urlLength+1); //$NON-NLS-1$
-		}
-		return new AboutItem(s, linkRanges.toArray(new int[linkRanges.size()][2]),
-				links.toArray(new String[links.size()]));
+		return AboutUtils.scan(s);
     }
 	private StyledText styledText;
 	

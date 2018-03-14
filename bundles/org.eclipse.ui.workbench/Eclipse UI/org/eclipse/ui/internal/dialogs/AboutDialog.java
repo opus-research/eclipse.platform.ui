@@ -12,7 +12,6 @@ package org.eclipse.ui.internal.dialogs;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-
 import org.eclipse.core.runtime.IBundleGroup;
 import org.eclipse.core.runtime.IBundleGroupProvider;
 import org.eclipse.core.runtime.IProduct;
@@ -57,6 +56,7 @@ import org.eclipse.ui.internal.about.AboutBundleGroupData;
 import org.eclipse.ui.internal.about.AboutFeaturesButtonManager;
 import org.eclipse.ui.internal.about.AboutItem;
 import org.eclipse.ui.internal.about.AboutTextManager;
+import org.eclipse.ui.internal.about.AboutUtils;
 import org.eclipse.ui.internal.about.InstallationDialog;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
@@ -209,7 +209,7 @@ public class AboutDialog extends TrayDialog {
                     || aboutImage.getBounds().width <= MAX_IMAGE_WIDTH_FOR_TEXT) {
                 String aboutText = ProductProperties.getAboutText(product);
                 if (aboutText != null) {
-					item = AboutTextManager.scan(aboutText);
+					item = AboutUtils.scan(aboutText);
 				}
             }
 
