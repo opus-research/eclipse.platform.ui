@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,9 +39,6 @@ public class MessagePage extends Page {
         // do nothing
     }
 
-    /* (non-Javadoc)
-     * Method declared on IPage.
-     */
     @Override
 	public void createControl(Composite parent) {
         // Message in default page of Outline should have margins
@@ -52,9 +49,6 @@ public class MessagePage extends Page {
         msgLabel.setText(message);
     }
 
-    /* (non-Javadoc)
-     * Method declared on IPage.
-     */
     @Override
 	public Control getControl() {
         return pgComp;

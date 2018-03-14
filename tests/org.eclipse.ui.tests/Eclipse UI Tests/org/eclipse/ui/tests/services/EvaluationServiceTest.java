@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2011 IBM Corporation and others.
+ * Copyright (c) 2007, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 433603
  *******************************************************************************/
 
 package org.eclipse.ui.tests.services;
@@ -24,7 +25,6 @@ import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.internal.expressions.TestExpression;
 import org.eclipse.core.internal.expressions.WithExpression;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
@@ -58,11 +58,11 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public class EvaluationServiceTest extends UITestCase {
 	/**
-	 * 
+	 *
 	 */
 	private static final String CHECK_HANDLER_ID = "org.eclipse.ui.tests.services.checkHandler";
 	private static final String CONTEXT_ID1 = "org.eclipse.ui.command.contexts.evaluationService1";
@@ -78,11 +78,6 @@ public class EvaluationServiceTest extends UITestCase {
 		public int count = 0;
 		public boolean currentValue;
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
-		 */
 		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			count++;
@@ -98,38 +93,38 @@ public class EvaluationServiceTest extends UITestCase {
 		IPerspectiveDescriptor resourecePerspective = registry.findPerspectiveWithId("org.eclipse.ui.resourcePerspective");
 		IPerspectiveDescriptor javaPerspective = registry.findPerspectiveWithId("org.eclipse.jdt.ui.JavaPerspective");
 		String viewId = "org.eclipse.ui.tests.SelectionProviderView";
-		
+
 		IWorkbenchWindow window = openTestWindow();
 		IWorkbenchPage activePage = window.getActivePage();
-		
+
 		// show view in resource perspective
 		activePage.setPerspective(resourecePerspective);
 		SelectionProviderView view = (SelectionProviderView) activePage.showView(viewId);
 		processEvents();
-		
+
 		// show view in java perspective
 		activePage.setPerspective(javaPerspective);
 		activePage.showView(viewId);
 		processEvents();
-		
+
 		// now set the selection
-		IStructuredSelection selection = new StructuredSelection(new String("testing selection")); 
+		IStructuredSelection selection = new StructuredSelection(new String("testing selection"));
 		view.setSelection(selection);
 		processEvents();
-		
+
 		// switch perspective & check selection
 		activePage.setPerspective(resourecePerspective);
 		processEvents();
-		
-		IEvaluationService service = (IEvaluationService) window.getService(IEvaluationService.class);
+
+		IEvaluationService service = window.getService(IEvaluationService.class);
 		Object currentSelection = service.getCurrentState().getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
 		assertEquals(selection, currentSelection);
-		
+
 	}
-	
+
 	public void testBasicService() throws Exception {
 		IWorkbenchWindow window = openTestWindow();
-		IEvaluationService service = (IEvaluationService) window
+		IEvaluationService service = window
 				.getService(IEvaluationService.class);
 		assertNotNull(service);
 
@@ -145,7 +140,7 @@ public class EvaluationServiceTest extends UITestCase {
 			assertEquals(1, listener.count);
 			assertFalse(listener.currentValue);
 
-			contextService = (IContextService) window
+			contextService = window
 					.getService(IContextService.class);
 			context1 = contextService.activateContext(CONTEXT_ID1);
 			assertEquals(2, listener.count);
@@ -179,7 +174,7 @@ public class EvaluationServiceTest extends UITestCase {
 
 	public void testTwoEvaluations() throws Exception {
 		IWorkbenchWindow window = openTestWindow();
-		IEvaluationService service = (IEvaluationService) window
+		IEvaluationService service = window
 				.getService(IEvaluationService.class);
 		assertNotNull(service);
 
@@ -205,7 +200,7 @@ public class EvaluationServiceTest extends UITestCase {
 			assertFalse(listener2.currentValue);
 			evalRef2.setResult(true);
 
-			contextService = (IContextService) window
+			contextService = window
 					.getService(IContextService.class);
 			context1 = contextService.activateContext(CONTEXT_ID1);
 			assertEquals(2, listener1.count);
@@ -241,10 +236,10 @@ public class EvaluationServiceTest extends UITestCase {
 	// TODO fix testRestriction
 	public void TODOtestRestriction() {
 		IWorkbenchWindow window = openTestWindow();
-		IEvaluationService evaluationService = (IEvaluationService) window
+		IEvaluationService evaluationService = window
 				.getService(IEvaluationService.class);
 		assertNotNull(evaluationService);
-		IContextService contextService = (IContextService) window
+		IContextService contextService = window
 				.getService(IContextService.class);
 		assertNotNull(contextService);
 
@@ -258,8 +253,9 @@ public class EvaluationServiceTest extends UITestCase {
 
 			@Override
 			public void propertyChange(PropertyChangeEvent event) {
-				if (event.getProperty().equals("foo"))
+				if (event.getProperty().equals("foo")) {
 					propertyChanged[0] = true;
+				}
 
 			}
 		};
@@ -271,8 +267,9 @@ public class EvaluationServiceTest extends UITestCase {
 
 			@Override
 			public void propertyChange(PropertyChangeEvent event) {
-				if (event.getProperty().equals("foo"))
+				if (event.getProperty().equals("foo")) {
 					propertyShouldChange[0] = true;
+				}
 
 			}
 		};
@@ -319,7 +316,7 @@ public class EvaluationServiceTest extends UITestCase {
 	// TODO fix testScopedService
 	public void TODOtestScopedService() throws Exception {
 		IWorkbenchWindow window = openTestWindow();
-		IEvaluationService service = (IEvaluationService) window
+		IEvaluationService service = window
 				.getService(IEvaluationService.class);
 		assertNotNull(service);
 		//assertTrue(service instanceof SlaveEvaluationService);
@@ -335,7 +332,7 @@ public class EvaluationServiceTest extends UITestCase {
 			assertEquals(1, listener.count);
 			assertFalse(listener.currentValue);
 
-			contextService = (IContextService) window.getWorkbench()
+			contextService = window.getWorkbench()
 					.getService(IContextService.class);
 			context1 = contextService.activateContext(CONTEXT_ID1);
 			assertEquals(2, listener.count);
@@ -364,19 +361,13 @@ public class EvaluationServiceTest extends UITestCase {
 			this.lookFor = lookFor;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.core.expressions.Expression#collectExpressionInfo(org.eclipse.core.expressions.ExpressionInfo)
-		 */
 		@Override
 		public void collectExpressionInfo(ExpressionInfo info) {
 			info.addVariableNameAccess("username");
 		}
 
 		@Override
-		public EvaluationResult evaluate(IEvaluationContext context)
-				throws CoreException {
+		public EvaluationResult evaluate(IEvaluationContext context) {
 			String variable = (String) context.getVariable("username");
 			return lookFor.equals(variable) ? EvaluationResult.TRUE
 					: EvaluationResult.FALSE;
@@ -385,7 +376,7 @@ public class EvaluationServiceTest extends UITestCase {
 
 	public void testSourceProvider() throws Exception {
 		IWorkbenchWindow window = openTestWindow();
-		IEvaluationService service = (IEvaluationService) window
+		IEvaluationService service = window
 				.getService(IEvaluationService.class);
 		assertNotNull(service);
 
@@ -397,7 +388,7 @@ public class EvaluationServiceTest extends UITestCase {
 		assertFalse(listener.currentValue);
 		assertEquals(1, listener.count);
 
-		ISourceProviderService sps = (ISourceProviderService) window
+		ISourceProviderService sps = window
 				.getService(ISourceProviderService.class);
 		ActiveUserSourceProvider userProvider = (ActiveUserSourceProvider) sps
 				.getSourceProvider("username");
@@ -414,10 +405,10 @@ public class EvaluationServiceTest extends UITestCase {
 		assertFalse(listener.currentValue);
 		assertEquals(3, listener.count);
 	}
-	
+
 	public void testSourceProviderPriority() throws Exception {
-		IHandlerService hs = (IHandlerService) getWorkbench().getService(IHandlerService.class);
-		
+		IHandlerService hs = getWorkbench().getService(IHandlerService.class);
+
 		Collection activations = null;
 		// fill in a set of activations
 		String hsClassName = hs.getClass().getName();
@@ -426,7 +417,7 @@ public class EvaluationServiceTest extends UITestCase {
 			hpField.setAccessible(true);
 
 			HandlerPersistence hp = (HandlerPersistence) hpField.get(hs);
-			
+
 			Field activationsField = hp.getClass().getDeclaredField("handlerActivations");
 			activationsField.setAccessible(true);
 			activations = (Collection) activationsField.get(hp);
@@ -444,7 +435,7 @@ public class EvaluationServiceTest extends UITestCase {
 		} else {
 			fail("Incorrect handler service: " + hsClassName);
 		}
-		
+
 		IHandlerActivation activation = null;
 		Iterator i = activations.iterator();
 		while (i.hasNext()) {
@@ -453,16 +444,16 @@ public class EvaluationServiceTest extends UITestCase {
 				activation = ha;
 			}
 		}
-		
-		
+
+
 		assertNotNull("Could not find activation for " + CHECK_HANDLER_ID, activation);
-		
+
 		assertEquals(ISources.ACTIVE_CONTEXT<<1, activation.getSourcePriority());
 	}
 
 	public void testPropertyChange() throws Exception {
 		IWorkbenchWindow window = openTestWindow();
-		IEvaluationService service = (IEvaluationService) window
+		IEvaluationService service = window
 				.getService(IEvaluationService.class);
 		assertNotNull(service);
 		MyEval listener = new MyEval();
@@ -483,11 +474,11 @@ public class EvaluationServiceTest extends UITestCase {
 				listener, IEvaluationService.RESULT);
 		assertFalse(listener.currentValue);
 		assertEquals(1, listener.count);
-		
+
 		StaticVarPropertyTester.result = true;
 		assertFalse(listener.currentValue);
 		assertEquals(1, listener.count);
-		
+
 		service.requestEvaluation("org.eclipse.ui.tests.class.method");
 		assertTrue(listener.currentValue);
 		assertEquals(2, listener.count);
@@ -496,9 +487,9 @@ public class EvaluationServiceTest extends UITestCase {
 		assertTrue(listener.currentValue);
 		assertEquals(2, listener.count);
 	}
-	
+
 	public void testPlatformProperty() throws Exception {
-		IEvaluationService evaluationService = (IEvaluationService) PlatformUI
+		IEvaluationService evaluationService = PlatformUI
 				.getWorkbench().getService(IEvaluationService.class);
 		TestExpression test = new TestExpression("org.eclipse.core.runtime",
 				"bundleState",
@@ -508,12 +499,12 @@ public class EvaluationServiceTest extends UITestCase {
 		EvaluationResult result= exp.evaluate(evaluationService.getCurrentState());
 		assertEquals(EvaluationResult.TRUE, result);
 	}
-	
+
 	public void XtestSystemProperty() throws Exception {
 		// this is not added, as the ability to test system properties with
 		// no '.' seems unhelpful
 		System.setProperty("isHere", "true");
-		IEvaluationService evaluationService = (IEvaluationService) PlatformUI
+		IEvaluationService evaluationService = PlatformUI
 				.getWorkbench().getService(IEvaluationService.class);
 		TestExpression test = new TestExpression("org.eclipse.core.runtime",
 				"isHere",
@@ -526,7 +517,7 @@ public class EvaluationServiceTest extends UITestCase {
 		assertEquals(EvaluationResult.TRUE, result);
 
 	}
-	
+
 	static class ActivePartIdExpression extends Expression {
 		private String partId;
 
@@ -534,26 +525,12 @@ public class EvaluationServiceTest extends UITestCase {
 			partId = id;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.core.expressions.Expression#collectExpressionInfo(org
-		 * .eclipse.core.expressions.ExpressionInfo)
-		 */
 		@Override
 		public void collectExpressionInfo(ExpressionInfo info) {
 			info.addVariableNameAccess(ISources.ACTIVE_PART_ID_NAME);
 			info.addVariableNameAccess(ISources.ACTIVE_CURRENT_SELECTION_NAME);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.core.expressions.Expression#evaluate(org.eclipse.core
-		 * .expressions.IEvaluationContext)
-		 */
 		@Override
 		public EvaluationResult evaluate(IEvaluationContext context){
 			Object v = context.getVariable(ISources.ACTIVE_PART_ID_NAME);
@@ -572,9 +549,9 @@ public class EvaluationServiceTest extends UITestCase {
 	}
 
 	public void testWorkbenchProvider() throws Exception {
-		
+
 		IWorkbenchWindow window = openTestWindow();
-		final IEvaluationService service = (IEvaluationService) window
+		final IEvaluationService service = window
 				.getWorkbench().getService(IEvaluationService.class);
 		assertNotNull(service);
 
@@ -620,10 +597,10 @@ public class EvaluationServiceTest extends UITestCase {
 				listener, "PROP");
 		int callIdx = 0;
 		try {
-			
+
 			// initially ID_2 is showed
 			assertSelection(selection, callIdx, TextSelection.class, SelectionProviderView.ID_2);
-			
+
 			page.activate(view1);
 			processEvents();
 			callIdx++;
@@ -644,7 +621,7 @@ public class EvaluationServiceTest extends UITestCase {
 
 			// no change
 			assertEquals(callIdx + 1, selection.size());
-			
+
 			SelectionProviderView view3 = (SelectionProviderView) page2
 					.showView(org.eclipse.ui.tests.SelectionProviderView.ID);
 			processEvents();
@@ -654,12 +631,12 @@ public class EvaluationServiceTest extends UITestCase {
 			assertSelection(selection, callIdx, StructuredSelection.class, SelectionProviderView.ID);
 			assertEquals(window2.getActivePage().getActivePart().getSite().getId(),
 					service.getCurrentState().getVariable(ISources.ACTIVE_PART_ID_NAME));
-			
+
 			view3.setSelection(new TreeSelection(new TreePath(new Object[] {"nothing"})));
 			processEvents();
 			// selection changes, but view id remains the same - so no callIdx increments
 			assertEquals(callIdx + 1, selection.size());
-			
+
 			window.getShell().forceActive();
 			processEvents();
 			// the shell activate should have forced another change
@@ -678,8 +655,7 @@ public class EvaluationServiceTest extends UITestCase {
 		assertEquals(callIdx + 1, selection.size());
 		assertEquals(clazz, getSelection(selection, callIdx)
 				.getClass());
-		assertEquals(viewId,
-				getPart(selection, callIdx).getSite().getId());
+		assertEquals(viewId, getPart(selection, callIdx).getSite().getId());
 	}
 
 	private ISelection getSelection(final ArrayList selection, int idx) {

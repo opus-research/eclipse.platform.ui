@@ -23,12 +23,12 @@ public abstract class AbstractContentAssistCommandAdapterTest extends
 
 	protected void executeContentAssistHandler() throws Exception {
 		// retrieve the content assist handler and run it
-		IHandlerService handlerService = (IHandlerService) PlatformUI
+		IHandlerService handlerService = PlatformUI
 				.getWorkbench().getService(IHandlerService.class);
 		handlerService.executeCommand(
 				IWorkbenchCommandConstants.EDIT_CONTENT_ASSIST, null);
 	}
-	
+
 	public void testHandlerPromptsPopup() throws Exception {
 		getFieldAssistWindow().open();
 
@@ -79,7 +79,7 @@ public abstract class AbstractContentAssistCommandAdapterTest extends
 
 		sendFocusInToControl();
 		sendKeyDownToControl('o');
-		
+
 		assertOneShellUp();
 	}
 

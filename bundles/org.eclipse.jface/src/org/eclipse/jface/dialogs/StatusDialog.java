@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,20 +7,18 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     R�diger Herrmann - 395426: [JFace] StatusDialog should escape ampersand in status message
+ *     Rüdiger Herrmann - 395426: [JFace] StatusDialog should escape ampersand in status message
  *******************************************************************************/
 package org.eclipse.jface.dialogs;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.LegacyActionTools;
-import org.eclipse.jface.resource.JFaceColors;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.Policy;
 import org.eclipse.jface.util.Util;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -34,7 +32,7 @@ import org.eclipse.swt.widgets.Shell;
  * The status message is specified in an IStatus which can be of severity ERROR,
  * WARNING, INFO or OK. The OK button is enabled or disabled depending on the
  * status.
- * 
+ *
  * @since 3.1
  */
 public abstract class StatusDialog extends TrayDialog {
@@ -56,11 +54,9 @@ public abstract class StatusDialog extends TrayDialog {
 	 */
 	private class MessageLine extends CLabel {
 
-		private Color fNormalMsgAreaBackground;
-
 		/**
 		 * Creates a new message line as a child of the given parent.
-		 * 
+		 *
 		 * @param parent
 		 */
 		public MessageLine(Composite parent) {
@@ -70,18 +66,17 @@ public abstract class StatusDialog extends TrayDialog {
 		/**
 		 * Creates a new message line as a child of the parent and with the
 		 * given SWT stylebits.
-		 * 
+		 *
 		 * @param parent
 		 * @param style
 		 */
 		public MessageLine(Composite parent, int style) {
 			super(parent, style);
-			fNormalMsgAreaBackground = getBackground();
 		}
 
 		/**
 		 * Find an image assocated with the status.
-		 * 
+		 *
 		 * @param status
 		 * @return Image
 		 */
@@ -100,7 +95,7 @@ public abstract class StatusDialog extends TrayDialog {
 
 		/**
 		 * Sets the message and image to the given status.
-		 * 
+		 *
 		 * @param status
 		 *            IStatus or <code>null</code>. <code>null</code> will
 		 *            set the empty text and no image.
@@ -114,22 +109,20 @@ public abstract class StatusDialog extends TrayDialog {
 					// Foundation 1.0 compiler
 					// see https://bugs.eclipse.org/bugs/show_bug.cgi?id=140576
 					MessageLine.this.setImage(findImage(status));
-					setBackground(JFaceColors.getErrorBackground(getDisplay()));
 					return;
 				}
 			}
-			setText(""); //$NON-NLS-1$	
+			setText(""); //$NON-NLS-1$
 			// unqualified call of setImage is too ambiguous for Foundation 1.0
 			// compiler
 			// see https://bugs.eclipse.org/bugs/show_bug.cgi?id=140576
 			MessageLine.this.setImage(null);
-			setBackground(fNormalMsgAreaBackground);
 		}
 	}
 
 	/**
 	 * Creates an instance of a status dialog.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent Shell of the dialog
 	 */
@@ -142,7 +135,7 @@ public abstract class StatusDialog extends TrayDialog {
 	/**
 	 * Specifies whether status line appears to the left of the buttons
 	 * (default) or above them.
-	 * 
+	 *
 	 * @param aboveButtons
 	 *            if <code>true</code> status line is placed above buttons; if
 	 *            <code>false</code> to the right
@@ -154,7 +147,7 @@ public abstract class StatusDialog extends TrayDialog {
 	/**
 	 * Update the dialog's status line to reflect the given status. It is safe
 	 * to call this method before the dialog has been opened.
-	 * 
+	 *
 	 * @param status
 	 *            the status to set
 	 */
@@ -168,7 +161,7 @@ public abstract class StatusDialog extends TrayDialog {
 
 	/**
 	 * Returns the last status.
-	 * 
+	 *
 	 * @return IStatus
 	 */
 	public IStatus getStatus() {
@@ -178,7 +171,7 @@ public abstract class StatusDialog extends TrayDialog {
 	/**
 	 * Updates the status of the ok button to reflect the given status.
 	 * Subclasses may override this method to update additional buttons.
-	 * 
+	 *
 	 * @param status
 	 *            the status.
 	 */
@@ -275,7 +268,7 @@ public abstract class StatusDialog extends TrayDialog {
 
 	/**
 	 * Sets the title for this dialog.
-	 * 
+	 *
 	 * @param title
 	 *            the title.
 	 */
@@ -289,7 +282,7 @@ public abstract class StatusDialog extends TrayDialog {
 
 	/**
 	 * Sets the image for this dialog.
-	 * 
+	 *
 	 * @param image
 	 *            the image.
 	 */

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2013 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,6 +40,7 @@ public class ProgressManagerUtil {
 
 	@SuppressWarnings("unchecked")
 	static class ProgressViewerComparator extends ViewerComparator {
+		@Override
 		@SuppressWarnings("rawtypes")
 		public int compare(Viewer testViewer, Object e1, Object e2) {
 			return ((Comparable) e1).compareTo(e2);
@@ -49,12 +50,12 @@ public class ProgressManagerUtil {
 		public void sort(final Viewer viewer, Object[] elements) {
 			/*
 			 * https://bugs.eclipse.org/371354
-			 * 
+			 *
 			 * This ordering is inherently unstable, since it relies on
 			 * modifiable properties of the elements: E.g. the default
 			 * implementation in JobTreeElement compares getDisplayString(),
 			 * many of whose implementations use getPercentDone().
-			 * 
+			 *
 			 * JavaSE 7+'s TimSort introduced a breaking change: It now throws a
 			 * new IllegalArgumentException for bad comparators. Workaround is
 			 * to retry a few times.
@@ -62,6 +63,7 @@ public class ProgressManagerUtil {
 			for (int retries = 3; retries > 0; retries--) {
 				try {
 					Arrays.sort(elements, new Comparator<Object>() {
+						@Override
 						public int compare(Object a, Object b) {
 							return ProgressViewerComparator.this.compare(viewer, a, b);
 						}
@@ -96,7 +98,7 @@ public class ProgressManagerUtil {
 
 	/**
 	 * Return a status for the exception.
-	 * 
+	 *
 	 * @param exception
 	 * @return IStatus
 	 */
@@ -108,7 +110,7 @@ public class ProgressManagerUtil {
 
 	/**
 	 * Log the exception for debugging.
-	 * 
+	 *
 	 * @param exception
 	 */
 	static void logException(Throwable exception) {
@@ -127,7 +129,7 @@ public class ProgressManagerUtil {
 	// }
 	/**
 	 * Return a viewer comparator for looking at the jobs.
-	 * 
+	 *
 	 * @return ViewerComparator
 	 */
 	public static ViewerComparator getProgressViewerComparator() {
@@ -136,7 +138,7 @@ public class ProgressManagerUtil {
 
 	/**
 	 * Open the progress view in the supplied window.
-	 * 
+	 *
 	 * @param window
 	 */
 	// TODO E4
@@ -155,7 +157,7 @@ public class ProgressManagerUtil {
 	 * the given width. The default implementation replaces characters in the
 	 * center of the original string with an ellipsis ("..."). Override if you
 	 * need a different strategy.
-	 * 
+	 *
 	 * @param textValue
 	 * @param control
 	 * @return String
@@ -198,7 +200,7 @@ public class ProgressManagerUtil {
 	/**
 	 * Find the second index of a whitespace. Return the first index if there
 	 * isn't one or 0 if there is no space at all.
-	 * 
+	 *
 	 * @param textValue
 	 * @param gc
 	 *            The GC to test max length
@@ -245,7 +247,7 @@ public class ProgressManagerUtil {
 	 * If there are any modal shells open reschedule openJob to wait until they
 	 * are closed. Return true if it rescheduled, false if there is nothing
 	 * blocking it.
-	 * 
+	 *
 	 * @param openJob
 	 * @return boolean. true if the job was rescheduled due to modal dialogs.
 	 */
@@ -265,7 +267,7 @@ public class ProgressManagerUtil {
 	 * Return whether or not it is safe to open this dialog. If so then return
 	 * <code>true</code>. If not then set it to open itself when it has had
 	 * ProgressManager#longOperationTime worth of ticks.
-	 * 
+	 *
 	 * @param dialog
 	 *            ProgressMonitorJobsDialog that will be opening
 	 * @param excludedShell
@@ -283,14 +285,14 @@ public class ProgressManagerUtil {
 		dialog.watchTicks();
 		return false;
 	}
-	
+
 	/**
 	 * Return the modal shell that is currently open. If there isn't one then
 	 * return null. If there are stacked modal shells, return the top one.
-	 * 
+	 *
 	 * @param shell
 	 *            A shell to exclude from the search. May be <code>null</code>.
-	 * 
+	 *
 	 * @return Shell or <code>null</code>.
 	 */
 
@@ -305,11 +307,11 @@ public class ProgressManagerUtil {
 		// Start with the shell to exclude and check it's shells
 		return getModalChildExcluding(shell.getShells(), shell);
 	}
-	        
+
 	/**
 	 * Return the modal shell that is currently open. If there isn't one then
 	 * return null.
-	 * 
+	 *
 	 * @param toSearch shells to search for modal children
 	 * @param toExclude shell to ignore
 	 * @return the most specific modal child, or null if none
@@ -327,7 +329,7 @@ public class ProgressManagerUtil {
 			if(shell.equals(toExclude)) {
 				continue;
 			}
-			
+
 			// Check if this shell has a modal child
 			Shell[] children = shell.getShells();
 			Shell modalChild = getModalChildExcluding(children, toExclude);
@@ -343,13 +345,13 @@ public class ProgressManagerUtil {
 
 		return null;
 	}
-	 
+
 	/**
 	 * Utility method to get the best parenting possible for a dialog. If there
 	 * is a modal shell create it so as to avoid two modal dialogs. If not then
 	 * return the shell of the active workbench window. If neither can be found
 	 * return null.
-	 * 
+	 *
 	 * @return Shell or <code>null</code>
 	 */
 	public static Shell getDefaultParent() {
@@ -363,7 +365,7 @@ public class ProgressManagerUtil {
 
 	/**
 	 * Get the active non modal shell. If there isn't one return null.
-	 * 
+	 *
 	 * @return Shell
 	 */
 	public static Shell getNonModalShell() {
@@ -387,8 +389,8 @@ public class ProgressManagerUtil {
 		}
 		return null;
 	}
-	
-	
+
+
 //TODO E4
 //	/**
 //	 * Animate the closing of a window given the start position down to the
@@ -483,7 +485,6 @@ public class ProgressManagerUtil {
 //			return null;
 //		}
 //	}
-	
-	
+
+
 }
-	

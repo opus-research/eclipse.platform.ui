@@ -19,48 +19,42 @@ public class TestEmptyContentProvider implements ITreeContentProvider {
 	private static final Object[] NO_CHILDREN = new Object[0];
 
 	public static boolean _throw;
-	
+
 	public static void resetTest() {
 		_throw = false;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
-	 */
+	@Override
 	public Object[] getChildren(Object parentElement) {
 		if (_throw)
 			throw new RuntimeException("Throwing...");
 		return NO_CHILDREN;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
-	 */
+	@Override
 	public Object getParent(Object element) {
 		if (_throw)
 			throw new RuntimeException("Throwing...");
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
-	 */
+	@Override
 	public boolean hasChildren(Object element) {
 		if (_throw)
 			throw new RuntimeException("Throwing...");
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
-	 */
+	@Override
 	public Object[] getElements(Object inputElement) {
 		if (_throw)
 			throw new RuntimeException("Throwing...");
 		return NO_CHILDREN;
 	}
 
+	@Override
 	public void dispose() {}
+	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
 
 }

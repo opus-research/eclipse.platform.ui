@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 Matt Carter and others.
+ * Copyright (c) 2007, 2014 Matt Carter and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,11 +27,7 @@ public class CharacterToStringConverter extends Converter {
 		this.primitive = primitive;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.databinding.conversion.IConverter#convert(java.lang.Object)
-	 */
+	@Override
 	public Object convert(Object fromObject) {
 		// Null is allowed when the type is not primitive.
 		if (fromObject == null) {

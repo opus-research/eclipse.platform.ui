@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -27,18 +27,12 @@ import org.eclipse.ui.tests.views.properties.tabbed.override.items.IOverrideTest
  * properties view before the migration to the tabbed properties view and the
  * override tabs support. When elements are selected in the OverrideTestsView,
  * TabFolder/TabItem are displayed for the elements.
- * 
+ *
  * @author Anthony Hunter
  * @since 3.4
  */
 public class EmptyTabFolder extends AbstractTabFolder {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see asd.views.folders.ISampleViewFolder#appliesTo(org.eclipse.ui.IWorkbenchPart,
-	 *      org.eclipse.jface.viewers.ISelection)
-	 */
 	public boolean appliesTo(IWorkbenchPart part, ISelection selection) {
 		if (part instanceof OverrideTestsView) {
 			if (selection instanceof IStructuredSelection) {
@@ -51,6 +45,7 @@ public class EmptyTabFolder extends AbstractTabFolder {
 		return false;
 	}
 
+	@Override
 	public IOverrideTestsItem[] getItem() {
 		return new IOverrideTestsItem[] { new EmptyItem() };
 	}

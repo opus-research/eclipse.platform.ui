@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ import com.ibm.icu.text.NumberFormat;
  * This class is a temporary as this ability exists in NumberToStringConverter
  * except that short and byte are missing.
  * </p>
- * 
+ *
  * @since 1.0
  */
 public class IntegerToStringConverter extends Converter {
@@ -43,11 +43,7 @@ public class IntegerToStringConverter extends Converter {
 		this.boxedType = boxedType;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.databinding.conversion.IConverter#convert(java.lang.Object)
-	 */
+	@Override
 	public Object convert(Object fromObject) {
 		// Null is allowed when the type is not primitve.
 		if (fromObject == null && !primitive) {

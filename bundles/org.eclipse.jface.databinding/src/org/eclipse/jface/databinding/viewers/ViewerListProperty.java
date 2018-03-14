@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,7 @@ package org.eclipse.jface.databinding.viewers;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.property.list.SimpleListProperty;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.internal.databinding.viewers.ViewerObservableListDecorator;
 import org.eclipse.jface.viewers.Viewer;
 
@@ -29,11 +29,12 @@ import org.eclipse.jface.viewers.Viewer;
  * <li>All <code>observe()</code> methods should return an
  * {@link IViewerObservableList}
  * </ul>
- * 
+ *
  * @since 1.3
  */
 public abstract class ViewerListProperty extends SimpleListProperty implements
 		IViewerListProperty {
+	@Override
 	public IObservableList observe(Object source) {
 		if (source instanceof Viewer) {
 			return observe((Viewer) source);
@@ -41,6 +42,7 @@ public abstract class ViewerListProperty extends SimpleListProperty implements
 		return super.observe(source);
 	}
 
+	@Override
 	public IObservableList observe(Realm realm, Object source) {
 		IObservableList observable = super.observe(realm, source);
 		if (source instanceof Viewer)
@@ -49,8 +51,9 @@ public abstract class ViewerListProperty extends SimpleListProperty implements
 		return observable;
 	}
 
+	@Override
 	public IViewerObservableList observe(Viewer viewer) {
-		return (IViewerObservableList) observe(SWTObservables.getRealm(viewer
+		return (IViewerObservableList) observe(DisplayRealm.getRealm(viewer
 				.getControl().getDisplay()), viewer);
 	}
 }

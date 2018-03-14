@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -86,15 +86,15 @@ public class ProgressInfoItem extends Composite {
 	ToolBar actionBar;
 
 	ToolItem actionButton;
-	
-	List<Link> taskEntries = new ArrayList<Link>(0);
+
+	List<Link> taskEntries = new ArrayList<>(0);
 
 	private ProgressBar progressBar;
 
 	private Label jobImageLabel;
-	
+
 	private IProgressService progressService;
-	
+
 	private FinishedJobs finishedJobs;
 
 	static final int MAX_PROGRESS_HEIGHT = 12;
@@ -164,7 +164,7 @@ public class ProgressInfoItem extends Composite {
 	/**
 	 * Create a new instance of the receiver with the specified parent, style
 	 * and info object/
-	 * 
+	 *
 	 * @param parent
 	 * @param style
 	 * @param progressInfo
@@ -221,17 +221,14 @@ public class ProgressInfoItem extends Composite {
 		actionButton
 				.setToolTipText(ProgressMessages.NewProgressView_CancelJobToolTip);
 		actionButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				actionButton.setEnabled(false);
 				cancelOrRemove();
 			}
 		});
 		actionBar.addListener(SWT.Traverse, new Listener() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
-			 */
+			@Override
 			public void handleEvent(Event event) {
 				if (indexListener == null) {
 					return;
@@ -258,11 +255,7 @@ public class ProgressInfoItem extends Composite {
 		progressLabel.setLayoutData(progressData);
 
 		mouseListener = new MouseAdapter() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.swt.events.MouseListener#mouseDown(org.eclipse.swt.events.MouseEvent)
-			 */
+			@Override
 			public void mouseDown(MouseEvent e) {
 				if (indexListener != null) {
 					indexListener.select();
@@ -288,7 +281,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Set the layout of the widgets for the no progress case.
-	 * 
+	 *
 	 */
 	private void setLayoutsForNoProgress() {
 
@@ -311,7 +304,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Cancel or remove the reciever.
-	 * 
+	 *
 	 */
 	protected void cancelOrRemove() {
 
@@ -325,7 +318,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Get the image for the info.
-	 * 
+	 *
 	 * @return Image
 	 */
 	private Image getInfoImage() {
@@ -361,7 +354,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Return a resource manager for the receiver.
-	 * 
+	 *
 	 * @return {@link ResourceManager}
 	 */
 	private ResourceManager getResourceManager() {
@@ -373,7 +366,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Get the main title for the receiver.
-	 * 
+	 *
 	 * @return String
 	 */
 	private String getMainTitle() {
@@ -389,9 +382,9 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Get the name and status for a jobInfo
-	 * 
+	 *
 	 * @param jobInfo
-	 * 
+	 *
 	 * @return String
 	 */
 	public String getJobNameAndStatus(JobInfo jobInfo) {
@@ -433,7 +426,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Return the finished String for a job.
-	 * 
+	 *
 	 * @param job
 	 *            the completed Job
 	 * @param withTime
@@ -453,7 +446,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Get the time string the finished job
-	 * 
+	 *
 	 * @return String or <code>null</code> if this is not one of the finished
 	 *         jobs.
 	 */
@@ -467,7 +460,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Refresh the contents of the receiver.
-	 * 
+	 *
 	 */
 	void refresh() {
 
@@ -581,7 +574,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Return whether or not the receiver is a completed job.
-	 * 
+	 *
 	 * @return boolean <code>true</code> if the state is Job#NONE.
 	 */
 	private boolean isCompleted() {
@@ -598,7 +591,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Return the job infos in the receiver.
-	 * 
+	 *
 	 * @return JobInfo[]
 	 */
 	public JobInfo[] getJobInfos() {
@@ -613,7 +606,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Return whether or not the receiver is being displayed as running.
-	 * 
+	 *
 	 * @return boolean
 	 */
 	private boolean isRunning() {
@@ -629,7 +622,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Get the current percent done.
-	 * 
+	 *
 	 * @return int
 	 */
 	private int getPercentDone() {
@@ -653,7 +646,7 @@ public class ProgressInfoItem extends Composite {
 	/**
 	 * Set the images in the toolbar based on whether the receiver is finished
 	 * or not. Also update tooltips if required.
-	 * 
+	 *
 	 */
 	private void updateToolBarValues() {
 		if (isCompleted()) {
@@ -683,7 +676,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Create the progress bar and apply any style bits from style.
-	 * 
+	 *
 	 * @param style
 	 */
 	void createProgressBar(int style) {
@@ -722,7 +715,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Set the text of the link to the taskString.
-	 * 
+	 *
 	 * @param taskString
 	 */
 	void setLinkText(Job linkJob, String taskString, int index) {
@@ -755,22 +748,14 @@ public class ProgressInfoItem extends Composite {
 			link.setLayoutData(linkData);
 
 			link.addSelectionListener(new SelectionAdapter() {
-				/*
-				 * (non-Javadoc)
-				 * 
-				 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-				 */
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					executeTrigger();
 				}
 			});
 
 			link.addListener(SWT.Resize, new Listener() {
-				/*
-				 * (non-Javadoc)
-				 * 
-				 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
-				 */
+				@Override
 				public void handleEvent(Event event) {
 
 					Object text = link.getData(TEXT_KEY);
@@ -824,7 +809,7 @@ public class ProgressInfoItem extends Composite {
 		} else if (data instanceof ParameterizedCommand) {
 			getEHandlerService().executeHandler((ParameterizedCommand) data);
 		}
-		
+
 		if (link.isDisposed()) {
 			return;
 		}
@@ -840,7 +825,7 @@ public class ProgressInfoItem extends Composite {
 	/**
 	 * Update the trigger key if either action is available and enabled or
 	 * command is available
-	 * 
+	 *
 	 * @param trigger
 	 *            {@link Object} or <code>null</code>
 	 * @param link
@@ -862,7 +847,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Update the text in the link
-	 * 
+	 *
 	 * @param taskString
 	 * @param link
 	 */
@@ -876,7 +861,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Set the color base on the index
-	 * 
+	 *
 	 * @param i
 	 */
 	public void setColor(int i) {
@@ -903,7 +888,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Set the foreground of all widgets to the supplied color.
-	 * 
+	 *
 	 * @param color
 	 */
 	private void setAllForegrounds(Color color) {
@@ -919,7 +904,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Set the background of all widgets to the supplied color.
-	 * 
+	 *
 	 * @param color
 	 */
 	private void setAllBackgrounds(Color color) {
@@ -937,7 +922,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Set the focus to the button.
-	 * 
+	 *
 	 */
 	void setButtonFocus() {
 		actionBar.setFocus();
@@ -945,7 +930,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Set the selection colors.
-	 * 
+	 *
 	 * @param select
 	 *            boolean that indicates whether or not to show selection.
 	 */
@@ -959,7 +944,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Set the listener for index changes.
-	 * 
+	 *
 	 * @param indexListener
 	 */
 	void setIndexListener(IndexListener indexListener) {
@@ -968,7 +953,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Return whether or not the receiver is selected.
-	 * 
+	 *
 	 * @return boolean
 	 */
 	boolean isSelected() {
@@ -978,7 +963,7 @@ public class ProgressInfoItem extends Composite {
 	/**
 	 * Set whether or not the receiver is being displayed based on the top and
 	 * bottom of the currently visible area.
-	 * 
+	 *
 	 * @param top
 	 * @param bottom
 	 */
@@ -991,7 +976,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Set whether or not the receiver is being displayed
-	 * 
+	 *
 	 * @param displayed
 	 */
 	private void setDisplayed(boolean displayed) {
@@ -1001,10 +986,8 @@ public class ProgressInfoItem extends Composite {
 		if (refresh)
 			refresh();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.swt.widgets.Widget#dispose()
-	 */
+
+	@Override
 	public void dispose() {
 		super.dispose();
 		if(resourceManager != null)
@@ -1023,9 +1006,9 @@ public class ProgressInfoItem extends Composite {
 		        .getSymbolicName();
 		return element == null ? text : text + " (" + bundleId + ")"; //$NON-NLS-1$//$NON-NLS-2$
 	}
-	
+
 	protected EHandlerService getEHandlerService() {
 		return Services.getInstance().getEHandlerService();
 	}
-	
+
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2006 IBM Corporation and others.
+ * Copyright (c) 2004, 2006, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,13 +7,17 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 436344
  *******************************************************************************/
 package org.eclipse.ui.tests.rcp;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import junit.framework.TestCase;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
@@ -21,49 +25,53 @@ import org.eclipse.ui.IWorkbenchListener;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.application.WorkbenchAdvisor;
 import org.eclipse.ui.tests.rcp.util.WorkbenchAdvisorObserver;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Tests for IWorkbenchListener API and implementation.
  */
-public class WorkbenchListenerTest extends TestCase {
+public class WorkbenchListenerTest {
 
-    public WorkbenchListenerTest(String name) {
-        super(name);
-    }
 
     private Display display = null;
 
-    protected void setUp() throws Exception {
-        super.setUp();
+	@Before
+	public void setUp() throws Exception {
 
         assertNull(display);
         display = PlatformUI.createDisplay();
         assertNotNull(display);
     }
 
-    protected void tearDown() throws Exception {
+	@After
+	public void tearDown() throws Exception {
         assertNotNull(display);
         display.dispose();
         assertTrue(display.isDisposed());
 
-        super.tearDown();
     }
 
     /**
      * Brings the workbench up and tries to shut it down twice, the first time with a veto
      * from the IWorkbenchListener.  Tests for the correct sequence of notifications.
      */
-    public void testPreAndPostShutdown() {
+	@Test
+	public void testPreAndPostShutdown() {
     	final boolean[] proceed = new boolean[1];
-    	final List operations = new ArrayList();
+		final List<String> operations = new ArrayList<String>();
         WorkbenchAdvisor wa = new WorkbenchAdvisorObserver(1) {
-        	public void postStartup() {
+        	@Override
+			public void postStartup() {
         		IWorkbench workbench = getWorkbenchConfigurer().getWorkbench();
         		workbench.addWorkbenchListener(new IWorkbenchListener() {
+					@Override
 					public boolean preShutdown(IWorkbench workbench, boolean forced) {
 						operations.add(PRE_SHUTDOWN);
 						return proceed[0];
 					}
+					@Override
 					public void postShutdown(IWorkbench workbench) {
 						operations.add(POST_SHUTDOWN);
 					}
@@ -84,5 +92,5 @@ public class WorkbenchListenerTest extends TestCase {
         assertEquals(WorkbenchAdvisorObserver.POST_SHUTDOWN, operations.get(2));
     }
 
-    
+
 }

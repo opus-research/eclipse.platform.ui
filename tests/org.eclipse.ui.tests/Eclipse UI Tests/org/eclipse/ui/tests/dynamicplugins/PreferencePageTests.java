@@ -42,33 +42,25 @@ public class PreferencePageTests extends DynamicTestCase {
 		node.createPage();
 		removeBundle();
 		assertNull(preferenceManager.find("dynamic.parentPage"));
-		assertNull(preferenceManager.find("dynamic.parentPage/dynamic.childPage"));		
+		assertNull(preferenceManager.find("dynamic.parentPage/dynamic.childPage"));
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionId()
-	 */
+
+	@Override
 	protected String getExtensionId() {
 		return "newPreferencePage1.testDynamicPreferencePageAddition";
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionPoint()
-	 */
+	@Override
 	protected String getExtensionPoint() {
 		return IWorkbenchRegistryConstants.PL_PREFERENCES;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getInstallLocation()
-	 */
+	@Override
 	protected String getInstallLocation() {
 		return "data/org.eclipse.newPreferencePage1";
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getMarkerClass()
-	 */
+
+	@Override
 	protected String getMarkerClass() {
 		return "org.eclipse.ui.dynamic.DynamicPreferencePage";
 	}

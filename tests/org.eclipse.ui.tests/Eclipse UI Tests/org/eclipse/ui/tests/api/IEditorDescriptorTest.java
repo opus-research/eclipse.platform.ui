@@ -24,7 +24,8 @@ public class IEditorDescriptorTest extends TestCase {
         super(testName);
     }
 
-    public void setUp() {
+    @Override
+	public void setUp() {
         IFileEditorMapping mapping = (IFileEditorMapping) ArrayUtil
                 .pickRandom(PlatformUI.getWorkbench().getEditorRegistry()
                         .getFileEditorMappings());
@@ -32,17 +33,20 @@ public class IEditorDescriptorTest extends TestCase {
     }
 
     public void testGetId() throws Throwable {
-        for (int i = 0; i < fEditors.length; i++)
-            assertNotNull(fEditors[i].getId());
+        for (IEditorDescriptor fEditor : fEditors) {
+			assertNotNull(fEditor.getId());
+		}
     }
 
     public void testGetImageDescriptor() throws Throwable {
-        for (int i = 0; i < fEditors.length; i++)
-            assertNotNull(fEditors[i].getImageDescriptor());
+        for (IEditorDescriptor fEditor : fEditors) {
+			assertNotNull(fEditor.getImageDescriptor());
+		}
     }
 
     public void testGetLabel() throws Throwable {
-        for (int i = 0; i < fEditors.length; i++)
-            assertNotNull(fEditors[i].getLabel());
+        for (IEditorDescriptor fEditor : fEditors) {
+			assertNotNull(fEditor.getLabel());
+		}
     }
 }

@@ -7,16 +7,13 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Stefan Winkler <stefan@winklerweb.net> - Bug 242231
  ******************************************************************************/
 
 package org.eclipse.jface.tests.viewers;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TableViewer;
@@ -39,6 +36,7 @@ public class Bug180504TableViewerTest extends ViewerTestCase {
 		// TODO Auto-generated constructor stub
 	}
 
+	@Override
 	protected StructuredViewer createViewer(Composite parent) {
 		final TableViewer tableViewer = new TableViewer(parent, SWT.FULL_SELECTION);
 		tableViewer.setContentProvider(new ArrayContentProvider());
@@ -46,14 +44,17 @@ public class Bug180504TableViewerTest extends ViewerTestCase {
 				tableViewer.getTable()) });
 		tableViewer.setColumnProperties(new String[] { "0" });
 		tableViewer.setCellModifier(new ICellModifier() {
+			@Override
 			public boolean canModify(Object element, String property) {
 				return true;
 			}
 
+			@Override
 			public Object getValue(Object element, String property) {
 				return "";
 			}
 
+			@Override
 			public void modify(Object element, String property, Object value) {
 				tableViewer.getControl().dispose();
 			}
@@ -65,11 +66,13 @@ public class Bug180504TableViewerTest extends ViewerTestCase {
 		return tableViewer;
 	}
 
+	@Override
 	protected void setUpModel() {
 		// don't do anything here - we are not using the normal fModel and
 		// fRootElement
 	}
 
+	@Override
 	protected void setInput() {
 		String[] ar = new String[100];
 		for( int i = 0; i < ar.length; i++ ) {
@@ -84,28 +87,7 @@ public class Bug180504TableViewerTest extends ViewerTestCase {
 
 	public void testBug180504ApplyEditor() {
 		getTableViewer().editElement(getTableViewer().getElementAt(0), 0);
-		Method m;
-		try {
-			m = ColumnViewer.class.getDeclaredMethod("applyEditorValue", new Class[0]);
-			m.setAccessible(true);
-			m.invoke(getTableViewer(), new Object[0]);
-		} catch (SecurityException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-
-		}
+		getTableViewer().applyEditorValue();
 	}
 
 	public void testBug180504CancleEditor() {

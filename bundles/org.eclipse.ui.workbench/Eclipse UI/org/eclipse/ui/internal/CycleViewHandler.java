@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2010 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,19 +7,31 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 454143, 461063
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
 
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.e4.ui.internal.workbench.PartServiceImpl;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.commands.ICommandService;
 
 /**
@@ -27,66 +39,99 @@ import org.eclipse.ui.commands.ICommandService;
  * <p>
  * Replacement for CyclePartAction
  * </p>
- * 
+ *
  * @since 3.3
  *
  */
 public class CycleViewHandler extends CycleBaseHandler {
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.CycleBaseHandler#addItems(org.eclipse.swt.widgets.Table, org.eclipse.ui.internal.WorkbenchPage)
-	 */
 	@Override
 	protected void addItems(Table table, WorkbenchPage page) {
-		IWorkbenchPartReference refs[] = page.getSortedParts();
+
+		EPartService partService = page.getWorkbenchWindow().getService(EPartService.class);
+		EModelService modelService = page.getWorkbenchWindow().getService(EModelService.class);
+		MPerspective currentPerspective = page.getCurrentPerspective();
+
 		boolean includeEditor = true;
 
-		for (int i = 0; i < refs.length; i++) {
-			if (refs[i] instanceof IEditorReference) {
+		List<MPart> partsOfActivePerspective = modelService.findElements(currentPerspective, null, MPart.class, null);
+
+		Collection<MPart> sortedParts = getPartListSortedByActivation(partService, partsOfActivePerspective);
+
+		for (MPart part : sortedParts) {
+			if (!partService.isPartOrPlaceholderInPerspective(part.getElementId(), currentPerspective)) {
+				continue;
+			}
+
+			if (part.getTags().contains("Editor")) { //$NON-NLS-1$
 				if (includeEditor) {
-					IEditorReference activeEditor = (IEditorReference) refs[i];
+					IEditorPart activeEditor = page.getActiveEditor();
 					TableItem item = new TableItem(table, SWT.NONE);
 					item.setText(WorkbenchMessages.CyclePartAction_editor);
 					item.setImage(activeEditor.getTitleImage());
-					item.setData(activeEditor);
+					if (activeEditor.getSite() instanceof PartSite) {
+						item.setData(((PartSite) activeEditor.getSite()).getPartReference());
+					} else {
+						item.setData(part);
+					}
 					includeEditor = false;
 				}
 			} else {
 				TableItem item = new TableItem(table, SWT.NONE);
-				item.setText(refs[i].getTitle());
-				item.setImage(refs[i].getTitleImage());
-				item.setData(refs[i]);
+				item.setText(part.getLabel());
+				IWorkbenchWindow iwbw = page.getWorkbenchWindow();
+				if (iwbw instanceof WorkbenchWindow) {
+					WorkbenchWindow wbw = (WorkbenchWindow) iwbw;
+					if (part != null && wbw.getModel().getRenderer() instanceof SWTPartRenderer) {
+						SWTPartRenderer r = (SWTPartRenderer) wbw.getModel().getRenderer();
+						item.setImage(r.getImage(part));
+					}
+				}
+				item.setData(part);
 			}
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.CycleBaseHandler#getBackwardCommand()
-	 */
+	private Collection<MPart> getPartListSortedByActivation(EPartService partService, List<MPart> parts) {
+		if (partService instanceof PartServiceImpl) {
+			PartServiceImpl partServiceImpl = (PartServiceImpl) partService;
+
+			List<MPart> activationList = partServiceImpl.getActivationList();
+			if (activationList.isEmpty()) {
+				return parts;
+			}
+			Set<MPart> partList = new LinkedHashSet<>(activationList);
+
+			// remove all parts, which are not in the part list of the current
+			// perspective
+			partList.retainAll(parts);
+
+			// add all remaining parts of the part list
+			partList.addAll(parts);
+			return partList;
+		}
+
+		return parts;
+	}
+
 	@Override
 	protected ParameterizedCommand getBackwardCommand() {
 		// TODO Auto-generated method stub
-		final ICommandService commandService = (ICommandService) window.getWorkbench().getService(ICommandService.class);
+		final ICommandService commandService = window.getWorkbench().getService(ICommandService.class);
 		final Command command = commandService.getCommand(IWorkbenchCommandConstants.WINDOW_PREVIOUS_VIEW);
 		ParameterizedCommand commandBack = new ParameterizedCommand(command, null);
 		return commandBack;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.CycleBaseHandler#getForwardCommand()
-	 */
 	@Override
 	protected ParameterizedCommand getForwardCommand() {
 		// TODO Auto-generated method stub
-		final ICommandService commandService = (ICommandService) window.getWorkbench().getService(ICommandService.class);
+		final ICommandService commandService = window.getWorkbench().getService(ICommandService.class);
 		final Command command = commandService.getCommand(IWorkbenchCommandConstants.WINDOW_NEXT_VIEW);
 		ParameterizedCommand commandF = new ParameterizedCommand(command, null);
 		return commandF;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.CycleBaseHandler#getTableHeader()
-	 */
 	@Override
 	protected String getTableHeader(IWorkbenchPart activePart) {
 		// TODO Auto-generated method stub

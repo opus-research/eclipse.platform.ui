@@ -25,16 +25,14 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 
 /**
  * Provides tree contents for objects that have the IWorkbenchAdapter
- * adapter registered. 
+ * adapter registered.
  */
 public class TestAdaptableContentProvider implements ITreeContentProvider,
         IResourceChangeListener {
     protected Viewer viewer;
 
-    /* (non-Javadoc)
-     * Method declared on IContentProvider.
-     */
-    public void dispose() {
+    @Override
+	public void dispose() {
         if (viewer != null) {
             Object obj = viewer.getInput();
             if (obj instanceof IWorkspace) {
@@ -56,10 +54,8 @@ public class TestAdaptableContentProvider implements ITreeContentProvider,
         return TestAdaptableWorkbenchAdapter.getInstance();
     }
 
-    /* (non-Javadoc)
-     * Method declared on ITreeContentProvider.
-     */
-    public Object[] getChildren(Object element) {
+    @Override
+	public Object[] getChildren(Object element) {
         IWorkbenchAdapter adapter = getAdapter(element);
         if (adapter != null) {
             return adapter.getChildren(element);
@@ -67,17 +63,13 @@ public class TestAdaptableContentProvider implements ITreeContentProvider,
         return new Object[0];
     }
 
-    /* (non-Javadoc)
-     * Method declared on IStructuredContentProvider.
-     */
-    public Object[] getElements(Object element) {
+    @Override
+	public Object[] getElements(Object element) {
         return getChildren(element);
     }
 
-    /* (non-Javadoc)
-     * Method declared on ITreeContentProvider.
-     */
-    public Object getParent(Object element) {
+    @Override
+	public Object getParent(Object element) {
         IWorkbenchAdapter adapter = getAdapter(element);
         if (adapter != null) {
             return adapter.getParent(element);
@@ -85,17 +77,13 @@ public class TestAdaptableContentProvider implements ITreeContentProvider,
         return null;
     }
 
-    /* (non-Javadoc)
-     * Method declared on ITreeContentProvider.
-     */
-    public boolean hasChildren(Object element) {
+    @Override
+	public boolean hasChildren(Object element) {
         return getChildren(element).length > 0;
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContentProvider.
-     */
-    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+    @Override
+	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         this.viewer = viewer;
         IWorkspace oldWorkspace = null;
         IWorkspace newWorkspace = null;
@@ -121,26 +109,27 @@ public class TestAdaptableContentProvider implements ITreeContentProvider,
     }
 
     /**
-     * Process a resource delta.  
+     * Process a resource delta.
      */
     protected void processDelta(IResourceDelta delta) {
         // This method runs inside a syncExec.  The widget may have been destroyed
         // by the time this is run.  Check for this and do nothing if so.
         Control ctrl = viewer.getControl();
-        if (ctrl == null || ctrl.isDisposed())
-            return;
+        if (ctrl == null || ctrl.isDisposed()) {
+			return;
+		}
 
         // Get the affected resource
         IResource resource = delta.getResource();
 
         // If any children have changed type, just do a full refresh of this parent,
-        // since a simple update on such children won't work, 
+        // since a simple update on such children won't work,
         // and trying to map the change to a remove and add is too dicey.
         // The case is: folder A renamed to existing file B, answering yes to overwrite B.
         IResourceDelta[] affectedChildren = delta
                 .getAffectedChildren(IResourceDelta.CHANGED);
-        for (int i = 0; i < affectedChildren.length; i++) {
-            if ((affectedChildren[i].getFlags() & IResourceDelta.TYPE) != 0) {
+        for (IResourceDelta element : affectedChildren) {
+            if ((element.getFlags() & IResourceDelta.TYPE) != 0) {
                 ((StructuredViewer) viewer).refresh(resource);
                 return;
             }
@@ -155,8 +144,8 @@ public class TestAdaptableContentProvider implements ITreeContentProvider,
         }
 
         // Handle changed children .
-        for (int i = 0; i < affectedChildren.length; i++) {
-            processDelta(affectedChildren[i]);
+        for (IResourceDelta element : affectedChildren) {
+            processDelta(element);
         }
 
         // Process removals before additions, to avoid multiple equal elements in the viewer.
@@ -165,8 +154,9 @@ public class TestAdaptableContentProvider implements ITreeContentProvider,
         affectedChildren = delta.getAffectedChildren(IResourceDelta.REMOVED);
         if (affectedChildren.length > 0) {
             Object[] affected = new Object[affectedChildren.length];
-            for (int i = 0; i < affectedChildren.length; i++)
-                affected[i] = affectedChildren[i].getResource();
+            for (int i = 0; i < affectedChildren.length; i++) {
+				affected[i] = affectedChildren[i].getResource();
+			}
             if (viewer instanceof AbstractTreeViewer) {
                 ((AbstractTreeViewer) viewer).remove(affected);
             } else {
@@ -178,8 +168,9 @@ public class TestAdaptableContentProvider implements ITreeContentProvider,
         affectedChildren = delta.getAffectedChildren(IResourceDelta.ADDED);
         if (affectedChildren.length > 0) {
             Object[] affected = new Object[affectedChildren.length];
-            for (int i = 0; i < affectedChildren.length; i++)
-                affected[i] = affectedChildren[i].getResource();
+            for (int i = 0; i < affectedChildren.length; i++) {
+				affected[i] = affectedChildren[i].getResource();
+			}
             if (viewer instanceof AbstractTreeViewer) {
                 ((AbstractTreeViewer) viewer).add(resource, affected);
             } else {
@@ -194,7 +185,8 @@ public class TestAdaptableContentProvider implements ITreeContentProvider,
      *
      * @see IResourceChangeListener#resourceChanged
      */
-    public void resourceChanged(final IResourceChangeEvent event) {
+    @Override
+	public void resourceChanged(final IResourceChangeEvent event) {
         final IResourceDelta delta = event.getDelta();
         Control ctrl = viewer.getControl();
         if (ctrl != null && !ctrl.isDisposed()) {
@@ -202,7 +194,8 @@ public class TestAdaptableContentProvider implements ITreeContentProvider,
             // must be traversed in this method.  It is destroyed
             // when this method returns.
             ctrl.getDisplay().syncExec(new Runnable() {
-                public void run() {
+                @Override
+				public void run() {
                     processDelta(delta);
                 }
             });

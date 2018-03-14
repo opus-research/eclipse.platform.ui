@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2009 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,9 +12,9 @@ package org.eclipse.core.internal.databinding.observable;
 
 /**
  * Created to avoid a dependency on java.util.LinkedList, see bug 205224.
- * 
+ *
  * @since 1.1
- * 
+ *
  */
 public class Queue {
 
@@ -33,7 +33,7 @@ public class Queue {
 
 	/**
 	 * Adds the given object to the end of the queue.
-	 * 
+	 *
 	 * @param o
 	 */
 	public void enqueue(Object o) {
@@ -48,7 +48,7 @@ public class Queue {
 
 	/**
 	 * Returns the first object in the queue. The queue must not be empty.
-	 * 
+	 *
 	 * @return the first object
 	 */
 	public Object dequeue() {
@@ -66,7 +66,7 @@ public class Queue {
 
 	/**
 	 * Returns <code>true</code> if the list is empty.
-	 * 
+	 *
 	 * @return <code>true</code> if the list is empty
 	 */
 	public boolean isEmpty() {

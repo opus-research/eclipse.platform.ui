@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,7 @@ import org.eclipse.ui.internal.util.Util;
  * Abstract base implementation of all workbench views.
  * <p>
  * This class should be subclassed by clients wishing to define new views.
- * The name of the subclass should be given as the <code>"class"</code> 
+ * The name of the subclass should be given as the <code>"class"</code>
  * attribute in a <code>view</code> extension contributed to the workbench's
  * view extension point (named <code>"org.eclipse.ui.views"</code>).
  * For example, the plug-in's XML markup might contain:
@@ -51,7 +51,7 @@ import org.eclipse.ui.internal.util.Util;
  * <p>
  * Subclasses may extend or reimplement the following methods as required:
  * <ul>
- *   <li><code>setInitializationData</code> - extend to provide additional 
+ *   <li><code>setInitializationData</code> - extend to provide additional
  *       initialization when view extension is instantiated</li>
  *   <li><code>init(IWorkbenchPartSite)</code> - extend to provide additional
  *       initialization when view is assigned its site</li>
@@ -65,12 +65,9 @@ public abstract class ViewPart extends WorkbenchPart implements IViewPart {
     /**
      * Listens to PROP_TITLE property changes in this object until the first call to
      * setContentDescription. Used for compatibility with old parts that call setTitle
-     * or overload getTitle instead of using setContentDescription. 
+     * or overload getTitle instead of using setContentDescription.
      */
     private IPropertyListener compatibilityTitleListener = new IPropertyListener() {
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.IPropertyListener#propertyChanged(java.lang.Object, int)
-         */
         @Override
 		public void propertyChanged(Object source, int propId) {
             if (propId == IWorkbenchPartConstants.PROP_TITLE) {
@@ -88,18 +85,12 @@ public abstract class ViewPart extends WorkbenchPart implements IViewPart {
         addPropertyListener(compatibilityTitleListener);
     }
 
-    /* (non-Javadoc)
-     * Method declared on IViewPart.
-     */
     @Override
 	public IViewSite getViewSite() {
         return (IViewSite) getSite();
     }
 
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.IViewPart#init(org.eclipse.ui.IViewSite)
-     */
+
     @Override
 	public void init(IViewSite site) throws PartInitException {
         setSite(site);
@@ -107,10 +98,6 @@ public abstract class ViewPart extends WorkbenchPart implements IViewPart {
         setDefaultContentDescription();
     }
 
-    /* 
-     * (non-Javadoc)
-     * @see org.eclipse.ui.IViewPart#init(org.eclipse.ui.IViewSite, org.eclipse.ui.IMemento)
-     */
     @Override
 	public void init(IViewSite site, IMemento memento) throws PartInitException {
     	/*
@@ -126,18 +113,12 @@ public abstract class ViewPart extends WorkbenchPart implements IViewPart {
         init(site);
     }
 
-  
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.IViewPart#saveState(org.eclipse.ui.IMemento)
-     */
+
     @Override
 	public void saveState(IMemento memento) {
         // do nothing
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.part.WorkbenchPart#setPartName(java.lang.String)
-     */
     @Override
 	protected void setPartName(String partName) {
         if (compatibilityTitleListener != null) {
@@ -148,9 +129,6 @@ public abstract class ViewPart extends WorkbenchPart implements IViewPart {
         super.setPartName(partName);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.part.WorkbenchPart#setContentDescription(java.lang.String)
-     */
     @Override
 	protected void setContentDescription(String description) {
         if (compatibilityTitleListener != null) {
@@ -161,9 +139,6 @@ public abstract class ViewPart extends WorkbenchPart implements IViewPart {
         super.setContentDescription(description);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
-     */
     @Override
 	public void setInitializationData(IConfigurationElement cfig,
             String propertyName, Object data) {
@@ -187,16 +162,9 @@ public abstract class ViewPart extends WorkbenchPart implements IViewPart {
         }
     }
 
-    /**
-     * Checks that the given site is valid for this type of part.
-     * The site for a view must be an <code>IViewSite</code>.
-     * 
-     * @param site the site to check
-     * @since 3.1
-     */
     @Override
 	protected final void checkSite(IWorkbenchPartSite site) {
         super.checkSite(site);
         Assert.isTrue(site instanceof IViewSite, "The site for a view must be an IViewSite"); //$NON-NLS-1$
-    }    
+    }
 }

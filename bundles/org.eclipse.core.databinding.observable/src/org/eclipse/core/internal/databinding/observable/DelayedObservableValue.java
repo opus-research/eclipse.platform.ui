@@ -1,15 +1,16 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2009 Matthew Hall and others.
+ * Copyright (c) 2007, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  * 		Matthew Hall - initial API and implementation (bug 180746)
  * 		Boris Bokowski, IBM - initial API and implementation
  * 		Matthew Hall - bugs 212223, 208332, 245647
  *  	Will Horn - bug 215297
+ *  	Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.internal.databinding.observable;
@@ -36,21 +37,24 @@ import org.eclipse.core.databinding.observable.value.ValueDiff;
  * in an UI field. To notify about pending changes, a DelayedObservableValue
  * fires a stale event when the wrapped observable value fires a change event,
  * and remains stale as long as a value change is pending.
- * 
+ *
  * Note that this class will not forward {@link ValueChangingEvent} events from
  * a wrapped {@link IVetoableValue}.
- * 
+ *
+ * @param <T>
+ *            the type of the object being observed
+ *
  * @since 1.2
  */
-public class DelayedObservableValue extends AbstractObservableValue implements
-		IStaleListener, IValueChangeListener {
+public class DelayedObservableValue<T> extends AbstractObservableValue<T>
+		implements IStaleListener, IValueChangeListener<T> {
 	class ValueUpdater implements Runnable {
-		private final Object oldValue;
+		private final T oldValue;
 
 		boolean cancel = false;
 		boolean running = false;
 
-		ValueUpdater(Object oldValue) {
+		ValueUpdater(T oldValue) {
 			this.oldValue = oldValue;
 		}
 
@@ -58,6 +62,7 @@ public class DelayedObservableValue extends AbstractObservableValue implements
 			cancel = true;
 		}
 
+		@Override
 		public void run() {
 			if (!cancel)
 				try {
@@ -70,10 +75,10 @@ public class DelayedObservableValue extends AbstractObservableValue implements
 	}
 
 	private final int delay;
-	private IObservableValue observable;
+	private IObservableValue<T> observable;
 
 	private boolean dirty = true;
-	private Object cachedValue = null;
+	private T cachedValue = null;
 
 	private boolean updating = false;
 
@@ -84,13 +89,13 @@ public class DelayedObservableValue extends AbstractObservableValue implements
 	 * <code>ISWTObservableValue</code> and configured to fire change events
 	 * once there have been no value changes in the observable for
 	 * <code>delay</code> milliseconds.
-	 * 
+	 *
 	 * @param delayMillis
 	 * @param observable
 	 * @throws IllegalArgumentException
 	 *             if <code>updateEventType</code> is an incorrect type.
 	 */
-	public DelayedObservableValue(int delayMillis, IObservableValue observable) {
+	public DelayedObservableValue(int delayMillis, IObservableValue<T> observable) {
 		super(observable.getRealm());
 		this.delay = delayMillis;
 		this.observable = observable;
@@ -101,17 +106,20 @@ public class DelayedObservableValue extends AbstractObservableValue implements
 		cachedValue = doGetValue();
 	}
 
-	public void handleValueChange(ValueChangeEvent event) {
+	@Override
+	public void handleValueChange(ValueChangeEvent<? extends T> event) {
 		if (!updating)
 			makeDirty();
 	}
 
+	@Override
 	public void handleStale(StaleEvent staleEvent) {
 		if (!updating)
 			fireStale();
 	}
 
-	protected Object doGetValue() {
+	@Override
+	protected T doGetValue() {
 		if (dirty) {
 			cachedValue = observable.getValue();
 			dirty = false;
@@ -125,7 +133,8 @@ public class DelayedObservableValue extends AbstractObservableValue implements
 		return cachedValue;
 	}
 
-	protected void doSetValue(Object value) {
+	@Override
+	protected void doSetValue(T value) {
 		updating = true;
 		try {
 			// Principle of least surprise: setValue overrides any pending
@@ -133,7 +142,7 @@ public class DelayedObservableValue extends AbstractObservableValue implements
 			dirty = false;
 			cancelScheduledUpdate();
 
-			Object oldValue = cachedValue;
+			T oldValue = cachedValue;
 			observable.setValue(value);
 			// Bug 215297 - target observable could veto or override value
 			// passed to setValue(). Make sure we cache whatever is set.
@@ -146,6 +155,7 @@ public class DelayedObservableValue extends AbstractObservableValue implements
 		}
 	}
 
+	@Override
 	public boolean isStale() {
 		ObservableTracker.getterCalled(this);
 		return (dirty && updater != null) || observable.isStale();
@@ -154,13 +164,15 @@ public class DelayedObservableValue extends AbstractObservableValue implements
 	/**
 	 * Returns the type of the value from {@link #doGetValue()}, i.e.
 	 * String.class
-	 * 
+	 *
 	 * @see org.eclipse.core.databinding.observable.value.IObservableValue#getValueType()
 	 */
+	@Override
 	public Object getValueType() {
 		return observable.getValueType();
 	}
 
+	@Override
 	public synchronized void dispose() {
 		cancelScheduledUpdate();
 		if (observable != null) {
@@ -191,14 +203,16 @@ public class DelayedObservableValue extends AbstractObservableValue implements
 		getRealm().timerExec(delay, updater);
 	}
 
-	private void internalFireValueChange(final Object oldValue) {
+	private void internalFireValueChange(final T oldValue) {
 		cancelScheduledUpdate();
-		fireValueChange(new ValueDiff() {
-			public Object getOldValue() {
+		fireValueChange(new ValueDiff<T>() {
+			@Override
+			public T getOldValue() {
 				return oldValue;
 			}
 
-			public Object getNewValue() {
+			@Override
+			public T getNewValue() {
 				return getValue();
 			}
 		});

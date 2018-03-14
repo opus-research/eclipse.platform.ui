@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -218,12 +218,6 @@ public class SplitDropAgent2 extends DropAgent {
 		return onEdge;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.e4.ui.workbench.addons.dndaddon.DropAgent#dragEnter(org.eclipse.e4.ui.model.
-	 * application.ui.MUIElement, org.eclipse.e4.ui.workbench.addons.dndaddon.DnDInfo)
-	 */
 	@Override
 	public void dragEnter(final MUIElement dragElement, DnDInfo info) {
 		super.dragEnter(dragElement, info);
@@ -271,12 +265,6 @@ public class SplitDropAgent2 extends DropAgent {
 		return -1;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.e4.ui.workbench.addons.dndaddon.DropAgent#dragLeave(org.eclipse.e4.ui.model.
-	 * application.ui.MUIElement, org.eclipse.e4.ui.workbench.addons.dndaddon.DnDInfo)
-	 */
 	@Override
 	public void dragLeave(MUIElement dragElement, DnDInfo info) {
 		dndManager.clearOverlay();
@@ -317,25 +305,17 @@ public class SplitDropAgent2 extends DropAgent {
 
 		// Adjust the relToElement based on the location of the dragElement
 		if (relToElement instanceof MArea) {
-			if (!isModified()) {
-				if (dragElementLocation == EModelService.IN_SHARED_AREA) {
-					MArea area = (MArea) relToElement;
-					relToElement = area.getChildren().get(0);
-				} else if (dragElementLocation == EModelService.IN_ACTIVE_PERSPECTIVE) {
-					relToElement = relToElement.getCurSharedRef();
-				}
-			} else {
-				if (dragElementLocation == EModelService.IN_SHARED_AREA) {
-					relToElement = relToElement.getCurSharedRef();
-				} else if (dragElementLocation == EModelService.IN_ACTIVE_PERSPECTIVE) {
-					MArea area = (MArea) relToElement;
-					relToElement = area.getChildren().get(0);
-				}
+			// make it difficult to drag outside parts into the shared area
+			boolean fromSharedArea = dragElementLocation == EModelService.IN_SHARED_AREA;
+			// if from shared area and no modifier, is ok
+			// if not from shared area and modifier is on, then ok
+			boolean shouldBePlacedInSharedArea = fromSharedArea == !isModified();
+			if (shouldBePlacedInSharedArea) {
+				MArea area = (MArea) relToElement;
+				relToElement = area.getChildren().get(0);
 			}
 		} else if (relToElement instanceof MPerspective) {
-			if (dragElementLocation == EModelService.OUTSIDE_PERSPECTIVE) {
-				relToElement = relToElement.getParent();
-			} else if (dragElementLocation == EModelService.IN_ACTIVE_PERSPECTIVE) {
+			if (dragElementLocation == EModelService.IN_ACTIVE_PERSPECTIVE) {
 				MPerspective persp = (MPerspective) relToElement;
 				relToElement = persp.getChildren().get(0);
 			}
@@ -354,13 +334,6 @@ public class SplitDropAgent2 extends DropAgent {
 						.getModelService().isLastEditorStack(relToElement));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.addons.dndaddon.DropAgent#track(org.eclipse.e4.ui.model.application
-	 * .ui.MUIElement, org.eclipse.e4.ui.workbench.addons.dndaddon.DnDInfo)
-	 */
 	@Override
 	public boolean track(MUIElement dragElement, DnDInfo info) {
 		if (getTargetElement(dragElement, info) != relToElement) {

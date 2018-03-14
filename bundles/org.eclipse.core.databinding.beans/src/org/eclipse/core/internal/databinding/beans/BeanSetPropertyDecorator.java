@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,7 @@ import org.eclipse.core.databinding.property.set.SetProperty;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public class BeanSetPropertyDecorator extends SetProperty implements
 		IBeanSetProperty {
@@ -45,55 +45,67 @@ public class BeanSetPropertyDecorator extends SetProperty implements
 		this.propertyDescriptor = propertyDescriptor;
 	}
 
+	@Override
 	public PropertyDescriptor getPropertyDescriptor() {
 		return propertyDescriptor;
 	}
 
+	@Override
 	public Object getElementType() {
 		return delegate.getElementType();
 	}
 
+	@Override
 	protected Set doGetSet(Object source) {
 		return delegate.getSet(source);
 	}
 
+	@Override
 	protected void doSetSet(Object source, Set set) {
 		delegate.setSet(source, set);
 	}
 
+	@Override
 	protected void doUpdateSet(Object source, SetDiff diff) {
 		delegate.updateSet(source, diff);
 	}
 
+	@Override
 	public IBeanMapProperty values(String propertyName) {
 		return values(propertyName, null);
 	}
 
+	@Override
 	public IBeanMapProperty values(String propertyName, Class valueType) {
 		Class beanClass = (Class) delegate.getElementType();
 		return values(BeanProperties.value(beanClass, propertyName, valueType));
 	}
 
+	@Override
 	public IBeanMapProperty values(IBeanValueProperty property) {
 		return new BeanMapPropertyDecorator(super.values(property),
 				property.getPropertyDescriptor());
 	}
 
+	@Override
 	public IObservableSet observe(Object source) {
 		return new BeanObservableSetDecorator(delegate.observe(source),
 				propertyDescriptor);
 	}
 
+	@Override
 	public IObservableSet observe(Realm realm, Object source) {
 		return new BeanObservableSetDecorator(delegate.observe(realm, source),
 				propertyDescriptor);
 	}
 
+	@Override
 	public IObservableSet observeDetail(IObservableValue master) {
 		return new BeanObservableSetDecorator(delegate.observeDetail(master),
 				propertyDescriptor);
 	}
 
+	@Override
 	public String toString() {
 		return delegate.toString();
 	}

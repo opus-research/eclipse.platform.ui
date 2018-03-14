@@ -30,12 +30,14 @@ public class SyncExecWhileUIThreadWaitsForLock extends TestCase {
 		final boolean[] blocked = new boolean[] {false};
 		final boolean[] lockAcquired= new boolean[] {false};
 		Thread locking = new Thread("SyncExecWhileUIThreadWaitsForLock") {
+			@Override
 			public void run() {
 				try {
 					//first make sure this background thread owns the lock
 					lock.acquire();
 					//spawn an asyncExec that will cause the UI thread to be blocked
 					Display.getDefault().asyncExec(new Runnable() {
+						@Override
 						public void run() {
 							blocked[0] = true;
 							lock.acquire();
@@ -53,6 +55,7 @@ public class SyncExecWhileUIThreadWaitsForLock extends TestCase {
 					//now attempt to do a syncExec that also acquires the lock
 					//this should succeed even while the above asyncExec is blocked, thanks to UISynchronizer
 					Display.getDefault().syncExec(new Runnable() {
+						@Override
 						public void run() {
 							try {
 								//use a timeout to avoid deadlock in case of regression
@@ -76,11 +79,13 @@ public class SyncExecWhileUIThreadWaitsForLock extends TestCase {
 		Display display = Display.getDefault();
 		while (!lockAcquired[0]) {
 			//spin event loop so that asyncExed above gets run
-			if (!display.readAndDispatch())
+			if (!display.readAndDispatch()) {
 				display.sleep();
+			}
 			//if we waited too long, fail the test
-			if (System.currentTimeMillis()-waitStart > 60000)
+			if (System.currentTimeMillis()-waitStart > 60000) {
 				assertTrue("Deadlock occurred", false);
+			}
 		}
 		//if we get here, the test succeeded
 	}

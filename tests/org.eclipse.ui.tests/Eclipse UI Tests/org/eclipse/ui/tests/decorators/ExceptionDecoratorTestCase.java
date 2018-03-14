@@ -41,37 +41,37 @@ public class ExceptionDecoratorTestCase extends DecoratorEnablementTestCase
     /**
      * Sets up the hierarchy.
      */
-    protected void doSetUp() throws Exception {
+    @Override
+	protected void doSetUp() throws Exception {
         //reset the static fields so that the decorators will fail
         HeavyNullImageDecorator.fail = true;
         HeavyNullTextDecorator.fail = true;
         NullImageDecorator.fail = true;
         DecoratorDefinition[] definitions = WorkbenchPlugin.getDefault()
                 .getDecoratorManager().getAllDecoratorDefinitions();
-        for (int i = 0; i < definitions.length; i++) {
-            String id = definitions[i].getId();
+        for (DecoratorDefinition definition2 : definitions) {
+            String id = definition2.getId();
             if (id.equals("org.eclipse.ui.tests.heavyNullImageDecorator")
                     || id.equals("org.eclipse.ui.tests.heavyNullTextDecorator")) {
-                definitions[i].setEnabled(true);
-                problemDecorators.add(definitions[i]);
+                definition2.setEnabled(true);
+                problemDecorators.add(definition2);
             }
 
             //Do not cache the light one - the disabling issues
             //still need to be worked out.
             if (id.equals("org.eclipse.ui.tests.lightNullImageDecorator")) {
-                definitions[i].setEnabled(true);
-                light = definitions[i];
+                definition2.setEnabled(true);
+                light = definition2;
             }
         }
         super.doSetUp();
-    } /* (non-Javadoc)
-     * @see org.eclipse.ui.tests.navigator.LightweightDecoratorTestCase#doTearDown()
-     */
+	}
 
-    protected void doTearDown() throws Exception {
+    @Override
+	protected void doTearDown() throws Exception {
         super.doTearDown();
 
-        //Need to wait for decoration to end to allow for all 
+        //Need to wait for decoration to end to allow for all
         //errors to occur
         try {
             Platform.getJobManager().join(DecoratorManager.FAMILY_DECORATE,

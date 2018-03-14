@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,7 @@ import org.eclipse.ui.navigator.INavigatorContentService;
 
 /**
  * @since 3.2
- * 
+ *
  */
 public class CommonDropDescriptorManager {
 
@@ -40,10 +40,10 @@ public class CommonDropDescriptorManager {
 	 * A map of (INavigatorContentDescriptor,
 	 * CommonDropAdapterDescriptor)-pairs.
 	 */
-	private final Map dropDescriptors = new TreeMap(ExtensionSequenceNumberComparator.INSTANCE);
+	private final Map<INavigatorContentDescriptor, List> dropDescriptors = new TreeMap<INavigatorContentDescriptor, List>(ExtensionSequenceNumberComparator.INSTANCE);
 
 	/**
-	 * 
+	 *
 	 * @return An initialized singleton instance of the
 	 *         CommonDropDescriptorManager.
 	 */
@@ -56,7 +56,7 @@ public class CommonDropDescriptorManager {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param aDropTarget
 	 *            The drop target of the operation
 	 * @param aContentService
@@ -67,17 +67,17 @@ public class CommonDropDescriptorManager {
 	 */
 	public CommonDropAdapterDescriptor[] findCommonDropAdapterAssistants(Object aDropTarget, INavigatorContentService aContentService) {
 
-		Set foundDescriptors = new LinkedHashSet();
-		for (Iterator iter = dropDescriptors.keySet().iterator(); iter
+		Set<CommonDropAdapterDescriptor> foundDescriptors = new LinkedHashSet<CommonDropAdapterDescriptor>();
+		for (Iterator<INavigatorContentDescriptor> iter = dropDescriptors.keySet().iterator(); iter
 				.hasNext();) {
-			INavigatorContentDescriptor contentDescriptor = (INavigatorContentDescriptor) iter
+			INavigatorContentDescriptor contentDescriptor = iter
 					.next();
 			if (aContentService.isVisible(contentDescriptor.getId())
 					&& aContentService.isActive(contentDescriptor.getId())) {
-				List dropDescriptors = getDropDescriptors(contentDescriptor);
-				for (Iterator iterator = dropDescriptors.iterator(); iterator
+				List<CommonDropAdapterDescriptor> dropDescriptors = getDropDescriptors(contentDescriptor);
+				for (Iterator<CommonDropAdapterDescriptor> iterator = dropDescriptors.iterator(); iterator
 						.hasNext();) {
-					CommonDropAdapterDescriptor dropDescriptor = (CommonDropAdapterDescriptor) iterator
+					CommonDropAdapterDescriptor dropDescriptor = iterator
 							.next();
 					if (dropDescriptor.isDropElementSupported(aDropTarget)) {
 						foundDescriptors.add(dropDescriptor);
@@ -89,22 +89,22 @@ public class CommonDropDescriptorManager {
 		if (foundDescriptors.isEmpty()) {
 			return NO_DESCRIPTORS;
 		}
-		return (CommonDropAdapterDescriptor[]) foundDescriptors
+		return foundDescriptors
 				.toArray(new CommonDropAdapterDescriptor[foundDescriptors
 						.size()]);
 	}
 
-	private List getDropDescriptors(
+	private List<CommonDropAdapterDescriptor> getDropDescriptors(
 			INavigatorContentDescriptor aContentDescriptor) {
-		List descriptors = (List) dropDescriptors.get(aContentDescriptor);
+		List<CommonDropAdapterDescriptor> descriptors = dropDescriptors.get(aContentDescriptor);
 		if (descriptors != null) {
 			return descriptors;
 		}
 		synchronized (dropDescriptors) {
-			descriptors = (List) dropDescriptors.get(aContentDescriptor);
+			descriptors = dropDescriptors.get(aContentDescriptor);
 			if (descriptors == null) {
 				dropDescriptors.put(aContentDescriptor,
-						(descriptors = new ArrayList()));
+						(descriptors = new ArrayList<CommonDropAdapterDescriptor>()));
 			}
 
 		}
@@ -119,7 +119,7 @@ public class CommonDropDescriptorManager {
 	 */
 	private void addCommonDropAdapter(
 			INavigatorContentDescriptor aContentDescriptor,
-			CommonDropAdapterDescriptor aDropDescriptor) { 
+			CommonDropAdapterDescriptor aDropDescriptor) {
 		getDropDescriptors(aContentDescriptor).add(aDropDescriptor);
 	}
 
@@ -130,11 +130,7 @@ public class CommonDropDescriptorManager {
 		private CommonDropAdapterRegistry() {
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ui.internal.navigator.extensions.RegistryReader#readElement(org.eclipse.core.runtime.IConfigurationElement)
-		 */
+		@Override
 		protected boolean readElement(IConfigurationElement element) {
 
 			if (TAG_NAVIGATOR_CONTENT.equals(element.getName())) {
@@ -151,7 +147,7 @@ public class CommonDropDescriptorManager {
 						for (int i = 0; i < commonDropAdapters.length; i++) {
 							addCommonDropAdapter(contentDescriptor,
 									new CommonDropAdapterDescriptor(commonDropAdapters[i], contentDescriptor));
-						} 
+						}
 					}
 				}
 

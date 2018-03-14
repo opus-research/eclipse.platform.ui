@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,52 +11,31 @@
 
 package org.eclipse.e4.ui.tests.reconciler.xml;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
-public class XMLModelReconcilerTestSuite extends TestSuite {
+@RunWith(Suite.class)
+@Suite.SuiteClasses({ XMLModelReconcilerApplicationTest.class, XMLModelReconcilerApplicationElementTest.class,
+		XMLModelReconcilerBindingContainerTest.class, XMLModelReconcilerBindingTableTest.class,
+		XMLModelReconcilerCommandTest.class, XMLModelReconcilerContributionTest.class,
+		XMLModelReconcilerElementContainerTest.class, XMLModelReconcilerGenericTileTest.class,
+		XMLModelReconcilerHandlerContainerTest.class, XMLModelReconcilerHandlerTest.class,
+		XMLModelReconcilerHandledItemTest.class, XMLModelReconcilerItemTest.class,
+		XMLModelReconcilerKeyBindingTest.class, XMLModelReconcilerKeySequenceTest.class,
+		XMLModelReconcilerMenuTest.class, XMLModelReconcilerMenuContributionTest.class,
+		XMLModelReconcilerMenuContributionsTest.class, XMLModelReconcilerMenuItemTest.class,
+		XMLModelReconcilerParameterTest.class, XMLModelReconcilerPartTest.class,
+		XMLModelReconcilerPartDescriptorTest.class, XMLModelReconcilerPerspectiveTest.class,
+		XMLModelReconcilerPlaceholderTest.class, XMLModelReconcilerToolBarContributionTest.class,
+		XMLModelReconcilerToolBarContributionsTest.class, XMLModelReconcilerToolBarTest.class,
+		XMLModelReconcilerTrimContainerTest.class, XMLModelReconcilerTrimContributionTest.class,
+		XMLModelReconcilerTrimContributionsTest.class, XMLModelReconcilerUIElementTest.class,
+		XMLModelReconcilerUIItemTest.class, XMLModelReconcilerWindowTest.class,
 
-	public static Test suite() {
-		return new XMLModelReconcilerTestSuite();
-	}
+		XMLModelReconcilerScenarioTest.class,
 
-	public XMLModelReconcilerTestSuite() {
-		addTestSuite(XMLModelReconcilerApplicationTest.class);
-		addTestSuite(XMLModelReconcilerApplicationElementTest.class);
-		addTestSuite(XMLModelReconcilerBindingContainerTest.class);
-		addTestSuite(XMLModelReconcilerBindingTableTest.class);
-		addTestSuite(XMLModelReconcilerCommandTest.class);
-		addTestSuite(XMLModelReconcilerContributionTest.class);
-		addTestSuite(XMLModelReconcilerElementContainerTest.class);
-		addTestSuite(XMLModelReconcilerGenericTileTest.class);
-		addTestSuite(XMLModelReconcilerHandlerContainerTest.class);
-		addTestSuite(XMLModelReconcilerHandlerTest.class);
-		addTestSuite(XMLModelReconcilerHandledItemTest.class);
-		addTestSuite(XMLModelReconcilerItemTest.class);
-		addTestSuite(XMLModelReconcilerKeyBindingTest.class);
-		addTestSuite(XMLModelReconcilerKeySequenceTest.class);
-		addTestSuite(XMLModelReconcilerMenuTest.class);
-		addTestSuite(XMLModelReconcilerMenuContributionTest.class);
-		addTestSuite(XMLModelReconcilerMenuContributionsTest.class);
-		addTestSuite(XMLModelReconcilerMenuItemTest.class);
-		addTestSuite(XMLModelReconcilerParameterTest.class);
-		addTestSuite(XMLModelReconcilerPartTest.class);
-		addTestSuite(XMLModelReconcilerPartDescriptorTest.class);
-		addTestSuite(XMLModelReconcilerPerspectiveTest.class);
-		addTestSuite(XMLModelReconcilerPlaceholderTest.class);
-		addTestSuite(XMLModelReconcilerToolBarContributionTest.class);
-		addTestSuite(XMLModelReconcilerToolBarContributionsTest.class);
-		addTestSuite(XMLModelReconcilerToolBarTest.class);
-		addTestSuite(XMLModelReconcilerTrimContainerTest.class);
-		addTestSuite(XMLModelReconcilerTrimContributionTest.class);
-		addTestSuite(XMLModelReconcilerTrimContributionsTest.class);
-		addTestSuite(XMLModelReconcilerUIElementTest.class);
-		addTestSuite(XMLModelReconcilerUIItemTest.class);
-		addTestSuite(XMLModelReconcilerWindowTest.class);
+		ModelReconcilingServiceTest.class,
 
-		addTestSuite(XMLModelReconcilerScenarioTest.class);
-
-		addTestSuite(ModelReconcilingServiceTest.class);
-	}
-
+})
+public class XMLModelReconcilerTestSuite {
 }

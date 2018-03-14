@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,8 +17,8 @@ import org.eclipse.core.runtime.IPath;
  * file in the local file system.
  * <p>
  * Clients should implement this interface to define a new type of editor
- * launcher.  Each new launcher must be registered as an editor in the 
- * workbench's editor extension point 
+ * launcher.  Each new launcher must be registered as an editor in the
+ * workbench's editor extension point
  * (named <code>"org.eclipse.ui.editors"</code>).
  *
  * For example, the plug-in's XML markup might contain:
@@ -44,7 +44,7 @@ import org.eclipse.core.runtime.IPath;
 public interface IEditorLauncher {
 
     /**
-     * Launches this external editor to edit the file at the given 
+     * Launches this external editor to edit the file at the given
      * location in the local file system.
      *
      * @param file the local file system path of the file to edit
