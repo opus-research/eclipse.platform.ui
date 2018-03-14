@@ -1,4 +1,4 @@
-package org.eclipse.ui.examples.rcp.mail;
+package org.eclipse.ui.tutorials.rcp.part3;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -16,7 +16,7 @@ public class MessagePopupAction extends Action {
         setId(ICommandIds.CMD_OPEN_MESSAGE);
         // Associate the action with a pre-defined command, to allow key bindings.
         setActionDefinitionId(ICommandIds.CMD_OPEN_MESSAGE);
-        setImageDescriptor(org.eclipse.ui.examples.rcp.mail.Part3Plugin.getImageDescriptor("/icons/sample3.gif"));
+        setImageDescriptor(org.eclipse.ui.tutorials.rcp.part3.Part3Plugin.getImageDescriptor("/icons/sample3.gif"));
     }
 
     public void run() {

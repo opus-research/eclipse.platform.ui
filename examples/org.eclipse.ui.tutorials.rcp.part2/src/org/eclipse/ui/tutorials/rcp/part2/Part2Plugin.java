@@ -1,4 +1,4 @@
-package org.eclipse.ui.examples.rcp.mail;
+package org.eclipse.ui.tutorials.rcp.part2;
 
 import org.eclipse.ui.plugin.*;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -7,15 +7,15 @@ import org.osgi.framework.BundleContext;
 /**
  * The main plugin class to be used in the desktop.
  */
-public class Part3Plugin extends AbstractUIPlugin {
+public class Part2Plugin extends AbstractUIPlugin {
 
 	//The shared instance.
-	private static Part3Plugin plugin;
+	private static Part2Plugin plugin;
 	
 	/**
 	 * The constructor.
 	 */
-	public Part3Plugin() {
+	public Part2Plugin() {
 		plugin = this;
 	}
 
@@ -37,7 +37,7 @@ public class Part3Plugin extends AbstractUIPlugin {
 	/**
 	 * Returns the shared instance.
 	 */
-	public static Part3Plugin getDefault() {
+	public static Part2Plugin getDefault() {
 		return plugin;
 	}
 
@@ -49,6 +49,6 @@ public class Part3Plugin extends AbstractUIPlugin {
 	 * @return the image descriptor
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
-		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ui.tutorials.rcp.part3", path);
+		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ui.tutorials.rcp.part2", path);
 	}
 }

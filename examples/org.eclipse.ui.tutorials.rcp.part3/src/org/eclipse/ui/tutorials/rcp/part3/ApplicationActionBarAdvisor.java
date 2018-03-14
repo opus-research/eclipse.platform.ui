@@ -1,4 +1,4 @@
-package org.eclipse.ui.examples.rcp.mail;
+package org.eclipse.ui.tutorials.rcp.part3;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.GroupMarker;

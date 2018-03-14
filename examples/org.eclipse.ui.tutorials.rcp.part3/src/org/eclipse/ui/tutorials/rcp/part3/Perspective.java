@@ -1,4 +1,4 @@
-package org.eclipse.ui.examples.rcp.mail;
+package org.eclipse.ui.tutorials.rcp.part3;
 
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;

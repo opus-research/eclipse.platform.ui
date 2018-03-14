@@ -7,7 +7,7 @@
          point="org.eclipse.core.runtime.applications">
       <application>
          <run
-               class="org.eclipse.ui.examples.rcp.mail.Application">
+               class="org.eclipse.ui.tutorials.rcp.part3.Application">
          </run>
       </application>
    </extension>
@@ -15,7 +15,7 @@
          point="org.eclipse.ui.perspectives">
       <perspective
             name="Part3 Perspective"
-            class="org.eclipse.ui.examples.rcp.mail.Perspective"
+            class="org.eclipse.ui.tutorials.rcp.part3.Perspective"
             id="org.eclipse.ui.tutorials.rcp.part3.perspective">
       </perspective>
    </extension>
@@ -25,14 +25,14 @@
             name="Message"
             allowMultiple="true"
             icon="icons/sample2.gif"
-            class="org.eclipse.ui.examples.rcp.mail.View"
+            class="org.eclipse.ui.tutorials.rcp.part3.View"
             id="org.eclipse.ui.tutorials.rcp.part3.view">
       </view>
       <view
             name="Mailboxes"
             allowMultiple="true"
             icon="icons/sample3.gif"
-            class="org.eclipse.ui.examples.rcp.mail.NavigationView"
+            class="org.eclipse.ui.tutorials.rcp.part3.NavigationView"
             id="org.eclipse.ui.tutorials.rcp.part3.navigationView">
       </view>
    </extension>
