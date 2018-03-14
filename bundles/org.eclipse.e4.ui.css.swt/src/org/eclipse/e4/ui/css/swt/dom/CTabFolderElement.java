@@ -8,61 +8,29 @@
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  *     IBM Corporation - initial API and implementation
- *     Brian de Alwis (MTI) - Performance tweaks (Bug 430829)
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.dom;
 
-import org.eclipse.e4.ui.css.core.dom.ArrayNodeList;
-
 import org.eclipse.e4.ui.css.core.dom.CSSStylableElement;
-import org.eclipse.e4.ui.css.core.dom.ChildVisibilityAwareElement;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.internal.css.swt.ICTabRendering;
 import org.eclipse.swt.custom.CTabFolder;
-import org.eclipse.swt.custom.CTabItem;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Widget;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * {@link CSSStylableElement} implementation which wrap SWT {@link CTabFolder}.
  *
  */
-public class CTabFolderElement extends CompositeElement implements ChildVisibilityAwareElement {
+public class CTabFolderElement extends CompositeElement {
 	private final static String BACKGROUND_SET_BY_TAB_RENDERER = "bgSetByTabRenderer"; //$NON-NLS-1$
-
-	private SelectionListener selectionListener = new SelectionAdapter() {
-		@Override
-		public void widgetSelected(SelectionEvent e) {
-			applyStyles(getWidget(), true);
-		}
-
-	};
 
 	public CTabFolderElement(CTabFolder tabFolder, CSSEngine engine) {
 		super(tabFolder, engine);
-	}
-
-	@Override
-	public void initialize() {
-		super.initialize();
-		((CTabFolder) getControl()).addSelectionListener(selectionListener);
-	}
-
-	@Override
-	public void dispose() {
-		CTabFolder ctf = (CTabFolder) getControl();
-		if (ctf != null && !ctf.isDisposed()) {
-			ctf.removeSelectionListener(selectionListener);
-		}
-		super.dispose();
 	}
 
 	/**
@@ -166,28 +134,6 @@ public class CTabFolderElement extends CompositeElement implements ChildVisibili
 				control.setData(BACKGROUND_SET_BY_TAB_RENDERER, background);
 			}
 		}
-	}
-
-	@Override
-	public NodeList getVisibleChildNodes() {
-		CTabFolder folder = (CTabFolder) getWidget();
-		int selected = folder.getSelectionIndex();
-		if (selected < 0) {
-			return null;
-		}
-		// CTabFolder#getChildren() exposes the "tab controls" (the toolbars and
-		// the top-right area), as well as the composites used to host the
-		// CTabItem contents. We need to expose both the visible CTabItem and
-		// the its control
-
-		CTabItem item = folder.getItem(selected);
-
-		// If item.getControl() is not yet set, we pretend it doesn't exist
-		if (item.getControl() == null) {
-			return null;
-		}
-		return new ArrayNodeList(new Object[] { item, item.getControl() },
-				getEngine(folder));
 	}
 }
 
