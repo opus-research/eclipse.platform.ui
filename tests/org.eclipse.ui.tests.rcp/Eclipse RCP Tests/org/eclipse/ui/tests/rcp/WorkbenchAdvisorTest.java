@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,14 +7,15 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.rcp;
 
+import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
+
 import org.eclipse.ui.IWindowListener;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -24,7 +25,6 @@ import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchAdvisor;
 import org.eclipse.ui.internal.progress.ProgressManagerUtil;
 import org.eclipse.ui.tests.rcp.util.WorkbenchAdvisorObserver;
-import org.junit.Assert;
 
 public class WorkbenchAdvisorTest extends TestCase {
 
@@ -334,6 +334,6 @@ class WorkbenchAdvisorExceptionObserver extends WorkbenchAdvisorObserver {
         //     test results.
 
         exceptionCaught = true;
-		Assert.assertEquals(runtimeException, exception);
+        Assert.assertEquals(runtimeException, exception);
     }
 }

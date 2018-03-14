@@ -197,7 +197,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 			SelectionService service = (SelectionService) getWorkbenchWindow()
 					.getSelectionService();
 			service.updateSelection(getWorkbenchPart(part));
-			
+
 			updateActivations(part);
 			firePartActivated(part);
 		}
