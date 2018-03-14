@@ -109,6 +109,10 @@ public class WorkbenchMessages extends NLS {
 	public static String ExportResourcesAction_toolTip;
 	public static String ImportResourcesAction_text;
 	public static String ImportResourcesAction_toolTip;
+	public static String OpenBrowserHandler_NoInfoDialogMessage;
+
+
+	public static String OpenBrowserHandler_NoInfoDialogTitle;
 
 
 	public static String OpenRecent_errorTitle;
@@ -174,6 +178,7 @@ public class WorkbenchMessages extends NLS {
 
     public static String ShowView_title;
 	public static String ShowView_shellTitle;
+	public static String ShowView_errorTitle;
 	public static String ShowView_selectViewHelp;
 	public static String ShowView_noDesc;
 
@@ -181,6 +186,7 @@ public class WorkbenchMessages extends NLS {
 	public static String ToggleEditor_showEditors;
 	public static String ToggleEditor_toolTip;
 
+	public static String LockToolBarAction_text;
 	public static String LockToolBarAction_toolTip;
 
 	public static String EditActionSetsAction_text;
@@ -282,7 +288,9 @@ public class WorkbenchMessages extends NLS {
 	public static String CyclePerspectiveAction_header;
 	public static String ActivateEditorAction_text;
 	public static String ActivateEditorAction_toolTip;
+	public static String MaximizePartAction_text;
 	public static String MaximizePartAction_toolTip;
+	public static String MinimizePartAction_text;
 	public static String MinimizePartAction_toolTip;
 
 
@@ -328,6 +336,7 @@ public class WorkbenchMessages extends NLS {
 	public static String AboutFeaturesDialog_featureName;
 	public static String AboutFeaturesDialog_featureId;
 	public static String AboutFeaturesDialog_version;
+	public static String AboutFeaturesDialog_signed;
 	public static String AboutFeaturesDialog_provider;
 	public static String AboutFeaturesDialog_moreInfo;
 	public static String AboutFeaturesDialog_pluginsInfo;
