@@ -14,7 +14,7 @@ package org.eclipse.jface.tests.databinding.swt;
 
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.conformance.util.RealmTester;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.tests.databinding.AbstractSWTTestCase;
 import org.eclipse.swt.SWT;
@@ -56,6 +56,7 @@ public class WidgetPropertiesTest extends AbstractSWTTestCase {
 	private Image image1;
 	private Image image2;
 
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -67,15 +68,17 @@ public class WidgetPropertiesTest extends AbstractSWTTestCase {
 		image1 = shell.getDisplay().getSystemImage(SWT.ICON_WARNING);
 		image2 = shell.getDisplay().getSystemImage(SWT.ICON_ERROR);
 
-		RealmTester.setDefault(SWTObservables.getRealm(shell.getDisplay()));
+		RealmTester.setDefault(DisplayRealm.getRealm(shell.getDisplay()));
 	}
 
+	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 
 		RealmTester.setDefault(null);
 	}
 
+	@Override
 	protected Shell getShell() {
 		if (shell == null) {
 			shell = new Shell(SWT.V_SCROLL);

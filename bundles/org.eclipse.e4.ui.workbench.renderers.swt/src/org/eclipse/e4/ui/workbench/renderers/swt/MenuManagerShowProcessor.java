@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866, 
+ *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866,
  *         Bug403081, Bug 403083
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
@@ -71,13 +71,6 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 
 	private HashMap<Menu, Runnable> pendingCleanup = new HashMap<Menu, Runnable>();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.IMenuListener#menuAboutToShow(org.eclipse.jface
-	 * .action.IMenuManager)
-	 */
 	@Override
 	public void menuAboutToShow(IMenuManager manager) {
 		if (!(manager instanceof MenuManager)) {
@@ -105,15 +98,6 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.IMenuListener2#menuAboutToHide(org.eclipse.jface
-	 * .action.IMenuManager)
-	 * 
-	 * SWT.Show post processing method for MenuManager
-	 */
 	@Override
 	public void menuAboutToHide(IMenuManager manager) {
 		if (!(manager instanceof MenuManager)) {
@@ -138,10 +122,10 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 	/**
 	 * Process dynamic menu contributions provided by
 	 * {@link MDynamicMenuContribution} application model elements
-	 * 
+	 *
 	 * @param menuModel
 	 * @param menuManager
-	 * 
+	 *
 	 */
 	private void processDynamicElements(MMenu menuModel, MenuManager menuManager) {
 		MMenuElement[] ml = menuModel.getChildren().toArray(
