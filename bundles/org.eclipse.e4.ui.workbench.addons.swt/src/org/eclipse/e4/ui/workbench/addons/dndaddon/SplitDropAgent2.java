@@ -93,7 +93,7 @@ public class SplitDropAgent2 extends DropAgent {
 	}
 
 	private boolean isInCursorShell(DnDInfo info, Control ctrl) {
-		if (info.curCtrl == null || info.curCtrl.isDisposed())
+		if (ctrl == null || info.curCtrl == null || info.curCtrl.isDisposed())
 			return false;
 		Shell infoShell = (Shell) (info.curCtrl instanceof Shell ? info.curCtrl : info.curCtrl
 				.getShell());
@@ -283,6 +283,8 @@ public class SplitDropAgent2 extends DropAgent {
 		clearFeedback();
 		relToElement = null;
 
+		reactivatePart(dragElement);
+
 		super.dragLeave(dragElement, info);
 	}
 
@@ -341,7 +343,7 @@ public class SplitDropAgent2 extends DropAgent {
 
 		dndManager.getModelService().insert(toInsert, (MPartSashContainerElement) relToElement,
 				where, ratio);
-		reactivatePart(dragElement);
+		// reactivatePart(dragElement);
 
 		return true;
 	}

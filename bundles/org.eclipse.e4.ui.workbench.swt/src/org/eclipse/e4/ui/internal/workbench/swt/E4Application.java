@@ -11,6 +11,7 @@
  *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  *     		Implemented workbench auto-save to correctly restore state in case of crash.
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 366364
+ *     Terry Parker <tparker@google.com> - Bug 416673
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench.swt;
@@ -36,6 +37,7 @@ import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
 import org.eclipse.e4.core.internal.services.EclipseAdapter;
+import org.eclipse.e4.core.internal.services.ResourceBundleHelper;
 import org.eclipse.e4.core.services.adapter.Adapter;
 import org.eclipse.e4.core.services.contributions.IContributionFactory;
 import org.eclipse.e4.core.services.log.ILoggerProvider;
@@ -184,10 +186,19 @@ public class E4Application implements IApplication {
 
 	public void saveModel() {
 		try {
-			handler.save();
+			if (!(handler instanceof ResourceHandler)
+					|| ((ResourceHandler) handler).hasTopLevelWindows()) {
+				handler.save();
+			} else {
+				Logger logger = new WorkbenchLogger(PLUGIN_ID);
+				logger.error(
+						new Exception(), // log a stack trace for debugging
+						"Attempted to save a workbench model that had no top-level windows! " //$NON-NLS-1$
+								+ "Skipped saving the model to avoid corruption."); //$NON-NLS-1$
+			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Logger logger = new WorkbenchLogger(PLUGIN_ID);
+			logger.error(e, "Error saving the workbench model"); //$NON-NLS-1$
 		}
 	}
 
@@ -528,8 +539,13 @@ public class E4Application implements IApplication {
 		});
 
 		// translation
-		String locale = Locale.getDefault().toString();
-		appContext.set(TranslationService.LOCALE, locale);
+		String defaultLocaleString = Locale.getDefault().toString();
+
+		// ensure the default Locale value is correct
+		Locale transformedLocale = ResourceBundleHelper.toLocale(
+				defaultLocaleString, Locale.ENGLISH);
+
+		appContext.set(TranslationService.LOCALE, transformedLocale.toString());
 		TranslationService bundleTranslationProvider = TranslationProviderFactory
 				.bundleTranslationService(appContext);
 		appContext.set(TranslationService.class, bundleTranslationProvider);
