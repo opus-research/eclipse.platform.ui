@@ -23,6 +23,7 @@ import com.ibm.icu.text.Collator;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -31,8 +32,10 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+
 import org.eclipse.core.internal.resources.Workspace;
 import org.eclipse.core.net.proxy.IProxyService;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IAdaptable;
@@ -46,10 +49,12 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.ProgressMonitorWrapper;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
+
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -59,6 +64,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.Policy;
 import org.eclipse.jface.window.Window;
+
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.application.IWorkbenchConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
@@ -113,7 +119,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	 * session; <code>null</code> if uninitialized. Key type:
 	 * <code>String</code>, Value type: <code>AboutInfo</code>.
 	 */
-	private Map<String, AboutInfo> newlyAddedBundleGroups;
+	private Map newlyAddedBundleGroups;
 
 	/**
 	 * Array of <code>AboutInfo</code> for all new installed features that
@@ -565,9 +571,9 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	 *         <code>String</code>, value type: <code>AboutInfo</code>)
 	 * @since 3.0
 	 */
-	private Map<String, AboutInfo> computeBundleGroupMap() {
+	private Map computeBundleGroupMap() {
 		// use tree map to get predicable order
-		Map<String, AboutInfo> ids = new TreeMap<String, AboutInfo>();
+		Map ids = new TreeMap();
 
 		IBundleGroupProvider[] providers = Platform.getBundleGroupProviders();
 		for (int i = 0; i < providers.length; ++i) {
@@ -596,7 +602,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	 *         <code>String</code>) -> infos (value type:
 	 *         <code>AboutInfo</code>).
 	 */
-	public Map<String, AboutInfo> getNewlyAddedBundleGroups() {
+	public Map getNewlyAddedBundleGroups() {
 		if (newlyAddedBundleGroups == null) {
 			newlyAddedBundleGroups = createNewBundleGroupsMap();
 		}
@@ -606,7 +612,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	/**
 	 * Updates the old features setting and returns a map of new features.
 	 */
-	private Map<String, AboutInfo> createNewBundleGroupsMap() {
+	private Map createNewBundleGroupsMap() {
 		// retrieve list of installed bundle groups from last session
 		IDialogSettings settings = IDEWorkbenchPlugin.getDefault()
 				.getDialogSettings();
@@ -614,7 +620,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 		// get a map of currently installed bundle groups and store it for next
 		// session
-		Map<String, AboutInfo> bundleGroups = computeBundleGroupMap();
+		Map bundleGroups = computeBundleGroupMap();
 		String[] currentFeaturesArray = new String[bundleGroups.size()];
 		bundleGroups.keySet().toArray(currentFeaturesArray);
 		settings.put(INSTALLED_FEATURES, currentFeaturesArray);
@@ -874,10 +880,10 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		if (welcomePerspectiveInfos == null) {
 			// support old welcome perspectives if intro plugin is not present
 			if (!hasIntro()) {
-				Map<String, AboutInfo> m = getNewlyAddedBundleGroups();
-				ArrayList<AboutInfo> list = new ArrayList<AboutInfo>(m.size());
-				for (Iterator<AboutInfo> i = m.values().iterator(); i.hasNext();) {
-					AboutInfo info = i.next();
+				Map m = getNewlyAddedBundleGroups();
+				ArrayList list = new ArrayList(m.size());
+				for (Iterator i = m.values().iterator(); i.hasNext();) {
+					AboutInfo info = (AboutInfo) i.next();
 					if (info != null && info.getWelcomePerspectiveId() != null
 							&& info.getWelcomePageURL() != null) {
 						list.add(info);
