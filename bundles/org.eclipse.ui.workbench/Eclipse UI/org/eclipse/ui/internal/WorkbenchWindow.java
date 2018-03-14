@@ -12,7 +12,7 @@
  *     								 removes a menu from multiple perspectives
  *     René Brandstetter - Bug 411821 - [QuickAccess] Contribute SearchField
  *                                      through a fragment or other means
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431446, 433979
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431446
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -844,7 +844,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			switcherControl.setToBeRendered(getWindowConfigurer().getShowPerspectiveBar());
 			switcherControl.setElementId("PerspectiveSwitcher"); //$NON-NLS-1$
 			switcherControl.getTags().add(IPresentationEngine.DRAGGABLE);
-			switcherControl.getTags().add("CLOSABLE"); //$NON-NLS-1$
 			switcherControl
 					.setContributionURI("bundleclass://org.eclipse.ui.workbench/org.eclipse.e4.ui.workbench.addons.perspectiveswitcher.PerspectiveSwitcher"); //$NON-NLS-1$
 			trimBar.getChildren().add(switcherControl);
