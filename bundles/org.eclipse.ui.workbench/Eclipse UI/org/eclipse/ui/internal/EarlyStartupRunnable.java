@@ -43,9 +43,7 @@ public class EarlyStartupRunnable extends SafeRunnable {
 	public void run() throws Exception {
 		IConfigurationElement[] configElements = extension.getConfigurationElements();
 		if (configElements.length == 0) {
-			missingStartupElementMessage("The org.eclipse.ui.IStartup extension from '" + //$NON-NLS-1$
-						extension.getNamespaceIdentifier() + "' does not provide a valid '" //$NON-NLS-1$
-					+ IWorkbenchConstants.TAG_STARTUP + "' element."); //$NON-NLS-1$
+			handleException(null);
 		}
         // look for the startup tag in each element and run the extension
         for (IConfigurationElement element : configElements) {
@@ -54,11 +52,6 @@ public class EarlyStartupRunnable extends SafeRunnable {
             }
         }
     }
-
-	private void missingStartupElementMessage(String message) {
-		IStatus status = new Status(IStatus.ERROR, extension.getNamespaceIdentifier(), 0, message, null);
-		WorkbenchPlugin.log(status);
-	}
 
     @Override
 	public void handleException(Throwable exception) {
