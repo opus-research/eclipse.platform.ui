@@ -7,7 +7,6 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Steven Spungin - Bug 441874
  *******************************************************************************/
 package org.eclipse.e4.ui.services.internal.events;
 
@@ -41,7 +40,6 @@ public class EventBroker implements IEventBroker {
 	private Map<EventHandler, Collection<ServiceRegistration<?>>> registrations = new HashMap<EventHandler, Collection<ServiceRegistration<?>>>();
 
 	@Inject
-	@Optional
 	Logger logger;
 	
 	@Inject
@@ -76,7 +74,7 @@ public class EventBroker implements IEventBroker {
 	public boolean send(String topic, Object data) {
 		Event event = constructEvent(topic, data);
 		EventAdmin eventAdmin = Activator.getDefault().getEventAdmin();
-		if (eventAdmin == null && logger != null) {
+		if (eventAdmin == null) {
 			logger.error(NLS.bind(ServiceMessages.NO_EVENT_ADMIN, event.toString()));
 			return false;
 		}
@@ -88,7 +86,7 @@ public class EventBroker implements IEventBroker {
 	public boolean post(String topic, Object data) {
 		Event event = constructEvent(topic, data);
 		EventAdmin eventAdmin = Activator.getDefault().getEventAdmin();
-		if (eventAdmin == null && logger != null) {
+		if (eventAdmin == null) {
 			logger.error(NLS.bind(ServiceMessages.NO_EVENT_ADMIN, event.toString()));
 			return false;
 		}
@@ -121,7 +119,7 @@ public class EventBroker implements IEventBroker {
 	@Override
 	public boolean subscribe(String topic, String filter, EventHandler eventHandler, boolean headless) {
 		BundleContext bundleContext = Activator.getDefault().getBundleContext();
-		if (bundleContext == null && logger != null) {
+		if (bundleContext == null) {
 			logger.error(NLS.bind(ServiceMessages.NO_BUNDLE_CONTEXT, topic));
 			return false;
 		}
