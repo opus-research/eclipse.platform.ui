@@ -361,14 +361,16 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				}
 
 				ViewReference viewReference = getViewReference(part);
-				E4PartWrapper legacyPart = new E4PartWrapper(part);
-				try {
-					viewReference.initialize(legacyPart);
-				} catch (PartInitException e) {
-					WorkbenchPlugin.log(e);
+				if (viewReference != null) {
+					E4PartWrapper legacyPart = new E4PartWrapper(part);
+					try {
+						viewReference.initialize(legacyPart);
+					} catch (PartInitException e) {
+						WorkbenchPlugin.log(e);
+					}
+					part.getTransientData().put(E4PartWrapper.E4_WRAPPER_KEY, legacyPart);
+					return legacyPart;
 				}
-				part.getTransientData().put(E4PartWrapper.E4_WRAPPER_KEY, legacyPart);
-				return legacyPart;
 			}
 		}
 		return null;
@@ -832,17 +834,29 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	 * An event handler that listens for an MArea's widget being set so that we
 	 * can install DND support into its control.
 	 */
-	private EventHandler areaWidgetHandler = new EventHandler() {
+	private EventHandler widgetHandler = new EventHandler() {
 		public void handleEvent(Event event) {
 			Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
-			// we are only interested in MAreas
+			Object newValue = event.getProperty(UIEvents.EventTags.NEW_VALUE);
+
 			if (element instanceof MArea) {
-				// make sure this area is contained within this window
+				// If it's an MArea in this window install the DND handling
 				if (modelService.findElements(window, null, MArea.class, null).contains(element)) {
-					Object newValue = event.getProperty(UIEvents.EventTags.NEW_VALUE);
 					if (newValue instanceof Control) {
 						installAreaDropSupport((Control) newValue);
 					}
+				}
+			} else if (element instanceof MPart && newValue == null) {
+				// If it's a 'e4' part then remove the reference for it
+				MPart changedPart = (MPart) element;
+				Object impl = changedPart.getObject();
+				if (impl != null && !(impl instanceof CompatibilityPart)) {
+					EditorReference eRef = getEditorReference(changedPart);
+					if (eRef != null)
+						editorReferences.remove(eRef);
+					ViewReference vRef = getViewReference(changedPart);
+					if (vRef != null)
+						viewReferences.remove(eRef);
 				}
 			}
 		}
@@ -1192,8 +1206,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		part = showPart(mode, part);
 
 		ViewReference ref = getViewReference(part);
-		legacyWindow.firePerspectiveChanged(this, getPerspective(), ref, CHANGE_VIEW_SHOW);
-		legacyWindow.firePerspectiveChanged(this, getPerspective(), CHANGE_VIEW_SHOW);
 
 		return (IViewPart) ref.getPart(true);
 	}
@@ -1703,7 +1715,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 			legacyWindow.setActivePage(null);
 			partService.removePartListener(e4PartListener);
 			broker.unsubscribe(selectionHandler);
-			broker.unsubscribe(areaWidgetHandler);
+			broker.unsubscribe(widgetHandler);
 			broker.unsubscribe(referenceRemovalEventHandler);
 			broker.unsubscribe(firingHandler);
 			broker.unsubscribe(childrenHandler);
@@ -2142,28 +2154,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
     
     public IWorkbenchPart getActivePart() {
 		MPart part = partService.getActivePart();
-		if (part != null) {
-			Object object = part.getObject();
-			if (object instanceof CompatibilityPart) {
-				return ((CompatibilityPart) object).getPart();
-			} else if (object != null) {
-				if (part.getTransientData().get(E4PartWrapper.E4_WRAPPER_KEY) instanceof E4PartWrapper) {
-					return (IWorkbenchPart) part.getTransientData().get(
-							E4PartWrapper.E4_WRAPPER_KEY);
-				}
-
-				ViewReference viewReference = getViewReference(part);
-				E4PartWrapper legacyPart = new E4PartWrapper(part);
-				try {
-					viewReference.initialize(legacyPart);
-				} catch (PartInitException e) {
-					WorkbenchPlugin.log(e);
-				}
-				part.getTransientData().put(E4PartWrapper.E4_WRAPPER_KEY, legacyPart);
-				return legacyPart;
-			}
-		}
-		return null;
+		return getWorkbenchPart(part);
 	}
 
 	/*
@@ -2558,9 +2549,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
     			}
     		}
 		}
-
-		// Notify interested listeners after the hide
-		legacyWindow.firePerspectiveChanged(this, getPerspective(), CHANGE_VIEW_HIDE);
 	}
 
 	public void hideView(IViewPart view) {
@@ -2630,7 +2618,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		}
 
 		broker.subscribe(UIEvents.ElementContainer.TOPIC_SELECTEDELEMENT, selectionHandler);
-		broker.subscribe(UIEvents.UIElement.TOPIC_WIDGET, areaWidgetHandler);
+		broker.subscribe(UIEvents.UIElement.TOPIC_WIDGET, widgetHandler);
 		broker.subscribe(UIEvents.UIElement.TOPIC_TOBERENDERED, referenceRemovalEventHandler);
 		broker.subscribe(UIEvents.Contribution.TOPIC_OBJECT, firingHandler);
 		broker.subscribe(UIEvents.ElementContainer.TOPIC_CHILDREN, childrenHandler);
@@ -4891,6 +4879,12 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		if (part instanceof IPageChangeProvider) {
 			((IPageChangeProvider) part).addPageChangedListener(pageChangedListener);
 		}
+
+		if (compatibilityPart instanceof CompatibilityView) {
+			legacyWindow.firePerspectiveChanged(this, getPerspective(), partReference,
+					CHANGE_VIEW_SHOW);
+			legacyWindow.firePerspectiveChanged(this, getPerspective(), CHANGE_VIEW_SHOW);
+		}
 	}
 
 	public void firePartClosed(CompatibilityPart compatibilityPart) {
@@ -4952,6 +4946,12 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 		if (part instanceof IPageChangeProvider) {
 			((IPageChangeProvider) part).removePageChangedListener(pageChangedListener);
+		}
+
+		if (compatibilityPart instanceof CompatibilityView) {
+			legacyWindow.firePerspectiveChanged(this, getPerspective(), partReference,
+					CHANGE_VIEW_HIDE);
+			legacyWindow.firePerspectiveChanged(this, getPerspective(), CHANGE_VIEW_HIDE);
 		}
 	}
 
