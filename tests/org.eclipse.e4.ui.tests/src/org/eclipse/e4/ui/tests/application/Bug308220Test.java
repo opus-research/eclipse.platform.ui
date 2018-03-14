@@ -8,15 +8,12 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440893
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 package org.eclipse.e4.ui.tests.application;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
 import javax.inject.Inject;
 import javax.inject.Named;
+import junit.framework.TestCase;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
@@ -24,9 +21,8 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.services.IServiceConstants;
-import org.junit.Test;
 
-public class Bug308220Test {
+public class Bug308220Test extends TestCase {
 
 	static class WindowService {
 		Object activePart;
@@ -38,8 +34,7 @@ public class Bug308220Test {
 		}
 	}
 
-	@Test
-	public void testBug308220() {
+	public void testBug308220() throws Exception {
 		IEclipseContext app = EclipseContextFactory.create();
 
 		// lookup function that goes down the context's active child chain
@@ -60,7 +55,6 @@ public class Bug308220Test {
 		});
 
 		app.runAndTrack(new RunAndTrack() {
-			@Override
 			public boolean changed(IEclipseContext context) {
 				// remove this line to pass the test
 				context.get(IServiceConstants.ACTIVE_PART);
@@ -82,10 +76,10 @@ public class Bug308220Test {
 		part.activate();
 		windowA.activate();
 
-		WindowService windowServiceA = ContextInjectionFactory.make(
-				WindowService.class, windowA);
-		WindowService windowServiceB = ContextInjectionFactory.make(
-				WindowService.class, windowB);
+		WindowService windowServiceA = ContextInjectionFactory
+				.make(WindowService.class, windowA);
+		WindowService windowServiceB = ContextInjectionFactory
+				.make(WindowService.class, windowB);
 
 		// windowA should have an active part, it was set earlier
 		assertEquals(o1, windowServiceA.activePart);
