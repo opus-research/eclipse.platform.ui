@@ -11,7 +11,6 @@
 
 package org.eclipse.jface.snippets.layout;
 
-
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -30,37 +29,24 @@ import org.eclipse.swt.widgets.TableColumn;
 
 /**
  * A simple TableViewer to demonstrate usage
- * 
+ *
  * @author Tom Schindl <tom.schindl@bestsolution.at>
  * @since 3.3M3
  */
 public class Snippet016TableLayout {
 	private class MyContentProvider implements IStructuredContentProvider {
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
-		 */
+		@Override
 		public Object[] getElements(Object inputElement) {
 			return (MyModel[]) inputElement;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
-		 */
+		@Override
 		public void dispose() {
 
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
-		 *      java.lang.Object, java.lang.Object)
-		 */
+		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 
 		}
@@ -70,10 +56,12 @@ public class Snippet016TableLayout {
 	private class MyLabelProvider extends LabelProvider implements
 			ITableLabelProvider {
 
+		@Override
 		public Image getColumnImage(Object element, int columnIndex) {
 			return null;
 		}
 
+		@Override
 		public String getColumnText(Object element, int columnIndex) {
 			return columnIndex + " - " + element;
 		}
@@ -87,6 +75,7 @@ public class Snippet016TableLayout {
 			this.counter = counter;
 		}
 
+		@Override
 		public String toString() {
 			return "Item " + this.counter;
 		}
@@ -100,20 +89,23 @@ public class Snippet016TableLayout {
 
 		TableColumnLayout ad = new TableColumnLayout();
 		comp.setLayout(ad);
-		
-		TableColumn column = new TableColumn(v.getTable(), SWT.NONE);
-		column.setText("Column 1");
-		column.setMoveable(true);
-		ad.setColumnData(column, new ColumnWeightData(90, 290));
 
-		column = new TableColumn(v.getTable(), SWT.NONE);
-		column.setText("Column 2");
-		column.setMoveable(true);
-		ad.setColumnData(column, new ColumnWeightData(10, 200));
+		TableColumn column1 = createTableColumn(v.getTable(), "Column 1");
+		TableColumn column2 = createTableColumn(v.getTable(), "Column 2");
+
+		ad.setColumnData(column1, new ColumnWeightData(90, 290));
+		ad.setColumnData(column2, new ColumnWeightData(10, 200));
 
 		MyModel[] model = createModel();
 		v.setInput(model);
 		v.getTable().setLinesVisible(true);
+	}
+
+	private TableColumn createTableColumn(Table table, String textColumn) {
+		TableColumn column = new TableColumn(table, SWT.NONE);
+		column.setText(textColumn);
+		column.setMoveable(true);
+		return column;
 	}
 
 	private MyModel[] createModel() {
@@ -132,9 +124,9 @@ public class Snippet016TableLayout {
 	public static void main(String[] args) {
 		Display display = new Display();
 		Shell shell = new Shell(display);
-		//shell.setSize(400, 150);
+		// shell.setSize(400, 150);
 		shell.setLayout(new FillLayout());
-		
+
 		new Snippet016TableLayout(shell);
 		shell.open();
 

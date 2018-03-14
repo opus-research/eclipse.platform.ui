@@ -24,7 +24,7 @@ public class Snippet058VistaProgressBars {
 
 	/**
 	 * Open a progress monitor dialog and switch the blocking.
-	 * 
+	 *
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -35,11 +35,8 @@ public class Snippet058VistaProgressBars {
 
 		try {
 			dialog.run(true, true, new IRunnableWithProgress() {
-				/*
-				 * (non-Javadoc)
-				 * 
-				 * @see org.eclipse.jface.operation.IRunnableWithProgress#run(org.eclipse.core.runtime.IProgressMonitor)
-				 */
+
+				@Override
 				public void run(IProgressMonitor monitor)
 						throws InvocationTargetException, InterruptedException {
 
@@ -71,11 +68,8 @@ public class Snippet058VistaProgressBars {
 
 	private static void spin(final Display display) {
 		display.syncExec(new Runnable() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see java.lang.Runnable#run()
-			 */
+
+			@Override
 			public void run() {
 				long endTime = System.currentTimeMillis() + 1000;
 
