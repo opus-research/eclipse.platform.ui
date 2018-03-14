@@ -7,11 +7,9 @@
  *
  * Contributors:
  *     Tasktop Technologies - initial API and implementation
- *     Red Hat Inc. - Bugs 474127, 474132
+ *     Red Hat Inc. - Bug 474127
  *******************************************************************************/
 package org.eclipse.ui.tests.progress;
-
-import static org.junit.Assert.assertEquals;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -32,16 +30,19 @@ import org.eclipse.ui.internal.progress.ProgressAnimationItem;
 import org.eclipse.ui.internal.progress.ProgressManager;
 import org.eclipse.ui.internal.progress.ProgressRegion;
 import org.eclipse.ui.progress.IProgressConstants;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
-public class ProgressAnimationItemTest {
+import junit.framework.TestCase;
+
+public class ProgressAnimationItemTest extends TestCase {
 	private Shell shell;
 	private ProgressAnimationItem animationItem;
 
-	@Before
-	public void setUp() {
+	public ProgressAnimationItemTest(String testName) {
+		super(testName);
+	}
+
+	@Override
+	protected void setUp() throws Exception {
 		Display display = PlatformUI.getWorkbench().getDisplay();
 		shell = new Shell(display);
 		shell.setSize(400, 300);
@@ -51,13 +52,12 @@ public class ProgressAnimationItemTest {
 		animationItem = createProgressAnimationItem(composite);
 	}
 
-	@After
-	public void tearDown() {
+	@Override
+	protected void tearDown() throws Exception {
 		FinishedJobs.getInstance().clearAll();
 		shell.dispose();
 	}
 
-	@Test
 	public void testSingleJobRefreshOnce() throws Exception {
 		createAndScheduleJob();
 
@@ -66,7 +66,6 @@ public class ProgressAnimationItemTest {
 		assertSingleAccessibleListener();
 	}
 
-	@Test
 	public void testTwoJobsRefreshOnce() throws Exception {
 		createAndScheduleJob();
 		createAndScheduleJob();
@@ -76,7 +75,6 @@ public class ProgressAnimationItemTest {
 		assertSingleAccessibleListener();
 	}
 
-	@Test
 	public void testSingleJobRefreshTwice() throws Exception {
 		createAndScheduleJob();
 
