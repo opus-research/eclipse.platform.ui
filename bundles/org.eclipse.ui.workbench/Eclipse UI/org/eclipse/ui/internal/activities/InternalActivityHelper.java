@@ -13,7 +13,6 @@ package org.eclipse.ui.internal.activities;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
 import org.eclipse.ui.activities.IActivityManager;
 import org.eclipse.ui.activities.ICategory;
 import org.eclipse.ui.activities.ICategoryActivityBinding;
@@ -38,7 +37,7 @@ import org.eclipse.ui.activities.ICategoryActivityBinding;
  */
 public final class InternalActivityHelper {
 
-	public static Set getActivityIdsForCategory(
+	public static Set<String> getActivityIdsForCategory(
 			IActivityManager activityManager, ICategory category) {
 		Set bindings = category.getCategoryActivityBindings();
 		Set activityIds = new HashSet();
