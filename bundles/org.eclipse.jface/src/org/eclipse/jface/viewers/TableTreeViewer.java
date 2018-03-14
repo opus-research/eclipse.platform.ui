@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -56,7 +56,6 @@ import org.eclipse.swt.widgets.Widget;
  * @deprecated As of 3.1 use {@link TreeViewer} instead
  * @noextend This class is not intended to be subclassed by clients.
  */
-@Deprecated
 public class TableTreeViewer extends AbstractTreeViewer {
 	/**
 	 * Internal table viewer implementation.
@@ -145,7 +144,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 						cellEditor.setFocus();
 						if (focusListener == null) {
 							focusListener = new FocusAdapter() {
-								@Override
 								public void focusLost(FocusEvent e) {
 									applyEditorValue();
 								}
@@ -153,7 +151,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 						}
 						control.addFocusListener(focusListener);
 						mouseListener = new MouseAdapter() {
-							@Override
 							public void mouseDown(MouseEvent e) {
 								// time wrap?
 								// check for expiration of doubleClickTime
@@ -494,7 +491,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared on AbstractTreeViewer.
 	 */
-	@Override
 	protected void addTreeListener(Control c, TreeListener listener) {
 		((TableTree) c).addTreeListener(listener);
 	}
@@ -503,7 +499,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	 * Cancels a currently active cell editor. All changes already done in the
 	 * cell editor are lost.
 	 */
-	@Override
 	public void cancelEditing() {
 		tableEditorImpl.cancelEditing();
 	}
@@ -511,7 +506,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared on AbstractTreeViewer.
 	 */
-	@Override
 	protected void doUpdateItem(Item item, Object element) {
 		// update icon and label
 		// Similar code in TableTreeViewer.doUpdateItem()
@@ -575,7 +569,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	 * @param column
 	 *            the column number
 	 */
-	@Override
 	public void editElement(Object element, int column) {
 		tableEditorImpl.editElement(element, column);
 	}
@@ -585,7 +578,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	 * 
 	 * @return the list of cell editors
 	 */
-	@Override
 	public CellEditor[] getCellEditors() {
 		return tableEditorImpl.getCellEditors();
 	}
@@ -595,7 +587,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	 * 
 	 * @return the cell modifier
 	 */
-	@Override
 	public ICellModifier getCellModifier() {
 		return tableEditorImpl.getCellModifier();
 	}
@@ -603,7 +594,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared on AbstractTreeViewer.
 	 */
-	@Override
 	protected Item[] getChildren(Widget o) {
 		if (o instanceof TableTreeItem) {
 			return ((TableTreeItem) o).getItems();
@@ -620,7 +610,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	 * @see org.eclipse.jface.viewers.AbstractTreeViewer#getChild(org.eclipse.swt.widgets.Widget,
 	 *      int)
 	 */
-	@Override
 	protected Item getChild(Widget widget, int index) {
 		if (widget instanceof TableTreeItem) {
 			return ((TableTreeItem) widget).getItem(index);
@@ -638,7 +627,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	 * 
 	 * @return the list of column properties
 	 */
-	@Override
 	public Object[] getColumnProperties() {
 		return tableEditorImpl.getColumnProperties();
 	}
@@ -646,7 +634,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared on Viewer.
 	 */
-	@Override
 	public Control getControl() {
 		return tableTree;
 	}
@@ -676,7 +663,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared on AbstractTreeViewer.
 	 */
-	@Override
 	protected boolean getExpanded(Item item) {
 		return ((TableTreeItem) item).getExpanded();
 	}
@@ -686,7 +672,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	 * 
 	 * @see org.eclipse.jface.viewers.ColumnViewer#getItemAt(org.eclipse.swt.graphics.Point)
 	 */
-	@Override
 	protected Item getItemAt(Point p) {
 		return getTableTree().getTable().getItem(p);
 	}
@@ -694,7 +679,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared on AbstractTreeViewer.
 	 */
-	@Override
 	protected int getItemCount(Control widget) {
 		return ((TableTree) widget).getItemCount();
 	}
@@ -702,7 +686,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared on AbstractTreeViewer.
 	 */
-	@Override
 	protected int getItemCount(Item item) {
 		return ((TableTreeItem) item).getItemCount();
 	}
@@ -710,7 +693,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared on AbstractTreeViewer.
 	 */
-	@Override
 	protected org.eclipse.swt.widgets.Item[] getItems(
 			org.eclipse.swt.widgets.Item item) {
 		return ((TableTreeItem) item).getItems();
@@ -726,7 +708,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	 * <code>ILabelProvider</code>, then it provides only the label text and
 	 * image for the first column, and any remaining columns are blank.
 	 */
-	@Override
 	public IBaseLabelProvider getLabelProvider() {
 		return super.getLabelProvider();
 	}
@@ -734,7 +715,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared on AbstractTreeViewer.
 	 */
-	@Override
 	protected Item getParentItem(Item item) {
 		return ((TableTreeItem) item).getParentItem();
 	}
@@ -742,7 +722,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared on AbstractTreeViewer.
 	 */
-	@Override
 	protected Item[] getSelection(Control widget) {
 		return ((TableTree) widget).getSelection();
 	}
@@ -759,11 +738,9 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared on AbstractTreeViewer.
 	 */
-	@Override
 	protected void hookControl(Control control) {
 		super.hookControl(control);
 		tableTree.getTable().addMouseListener(new MouseAdapter() {
-			@Override
 			public void mouseDown(MouseEvent e) {
 				/*
 				 * If user clicked on the [+] or [-], do not activate
@@ -793,7 +770,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	 * @return <code>true</code> if there is an active cell editor, and
 	 *         <code>false</code> otherwise
 	 */
-	@Override
 	public boolean isCellEditorActive() {
 		return tableEditorImpl.isCellEditorActive();
 	}
@@ -801,7 +777,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared in AbstractTreeViewer.
 	 */
-	@Override
 	protected Item newItem(Widget parent, int flags, int ix) {
 		TableTreeItem item;
 		if (ix >= 0) {
@@ -823,7 +798,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared in AbstractTreeViewer.
 	 */
-	@Override
 	protected void removeAll(Control widget) {
 		((TableTree) widget).removeAll();
 	}
@@ -834,7 +808,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	 * @param editors
 	 *            the list of cell editors
 	 */
-	@Override
 	public void setCellEditors(CellEditor[] editors) {
 		tableEditorImpl.setCellEditors(editors);
 	}
@@ -845,7 +818,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	 * @param modifier
 	 *            the cell modifier
 	 */
-	@Override
 	public void setCellModifier(ICellModifier modifier) {
 		tableEditorImpl.setCellModifier(modifier);
 	}
@@ -858,7 +830,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	 * @param columnProperties
 	 *            the list of column properties
 	 */
-	@Override
 	public void setColumnProperties(String[] columnProperties) {
 		tableEditorImpl.setColumnProperties(columnProperties);
 	}
@@ -866,7 +837,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared in AbstractTreeViewer.
 	 */
-	@Override
 	protected void setExpanded(Item node, boolean expand) {
 		((TableTreeItem) node).setExpanded(expand);
 	}
@@ -874,7 +844,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared in AbstractTreeViewer.
 	 */
-	@Override
 	protected void setSelection(List items) {
 		TableTreeItem[] newItems = new TableTreeItem[items.size()];
 		items.toArray(newItems);
@@ -884,7 +853,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	/*
 	 * (non-Javadoc) Method declared in AbstractTreeViewer.
 	 */
-	@Override
 	protected void showItem(Item item) {
 		getTableTree().showItem((TableTreeItem) item);
 	}
