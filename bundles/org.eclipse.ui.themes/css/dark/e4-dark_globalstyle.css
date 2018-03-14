@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     Andrea Guarinoni <andrea.guarinoni.dev@outlook.com> - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - initial API and implementation, Bug 372517
+ *     Lars Vogel <Lars.Vogel@vogella.com> - initial API and implementation
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 431635
  *     Stefan Winkler <stefan@winklerweb.net> - Bug 434189, 430848, 431845
  *******************************************************************************/
@@ -21,8 +21,8 @@
 }
 
 Label,
-Button,
-{
+Button[style~='SWT.RADIO'],
+Button[style~='SWT.CHECK'] {
 	background-color: COLOR-TRANSPARENT;
 }
 
