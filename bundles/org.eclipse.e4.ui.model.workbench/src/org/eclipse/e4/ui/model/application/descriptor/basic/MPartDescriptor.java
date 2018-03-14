@@ -1,17 +1,16 @@
 /**
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
 package org.eclipse.e4.ui.model.application.descriptor.basic;
 
 import java.util.List;
-import java.util.Map;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.commands.MBindings;
 import org.eclipse.e4.ui.model.application.commands.MHandlerContainer;
@@ -36,7 +35,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
  *
  * <p>
  * The following features are supported:
- * </p>
  * <ul>
  *   <li>{@link org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor#isAllowMultiple <em>Allow Multiple</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor#getCategory <em>Category</em>}</li>
@@ -47,9 +45,8 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
  *   <li>{@link org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor#getContributionURI <em>Contribution URI</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor#getDescription <em>Description</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor#getLocalizedDescription <em>Localized Description</em>}</li>
- *   <li>{@link org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor#getVariables <em>Variables</em>}</li>
- *   <li>{@link org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor#getProperties <em>Properties</em>}</li>
  * </ul>
+ * </p>
  *
  * @model
  * @generated
@@ -274,43 +271,5 @@ public interface MPartDescriptor extends MApplicationElement, MUILabel, MHandler
 	 * @generated
 	 */
 	String getLocalizedDescription();
-
-	/**
-	 * Returns the value of the '<em><b>Variables</b></em>' attribute list. The
-	 * list contents are of type {@link java.lang.String}. <!-- begin-user-doc
-	 * --> <!-- end-user-doc --> <!-- begin-model-doc -->
-	 * <p>
-	 * <strong>Developers</strong>: Add more detailed documentation by editing
-	 * this comment in org.eclipse.ui.model.workbench/model/UIElements.ecore.
-	 * There is a GenModel/documentation node under each type and attribute.
-	 * </p>
-	 * <!-- end-model-doc -->
-	 * 
-	 * @return the value of the '<em>Variables</em>' attribute list.
-	 * @model ordered="false"
-	 * @generated
-	 * @since 1.2
-	 */
-	List<String> getVariables();
-
-	/**
-	 * Returns the value of the '<em><b>Properties</b></em>' map. The key is of
-	 * type {@link java.lang.String}, and the value is of type
-	 * {@link java.lang.String}, <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
-	 * <p>
-	 * <strong>Developers</strong>: Add more detailed documentation by editing
-	 * this comment in org.eclipse.ui.model.workbench/model/UIElements.ecore.
-	 * There is a GenModel/documentation node under each type and attribute.
-	 * </p>
-	 * <!-- end-model-doc -->
-	 * 
-	 * @return the value of the '<em>Properties</em>' map.
-	 * @model mapType=
-	 *        "org.eclipse.e4.ui.model.application.StringToStringMap<org.eclipse.emf.ecore.EString, org.eclipse.emf.ecore.EString>"
-	 * @generated
-	 * @since 1.2
-	 */
-	Map<String, String> getProperties();
 
 } // MPartDescriptor

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,11 +24,11 @@ import org.eclipse.ui.statushandlers.StatusManager;
 
 /**
  * Command handler to show a particular view.
- *
+ * 
  * @since 3.0
  */
 public final class ShowViewHandler extends AbstractHandler {
-
+	
 	/**
 	 * The identifier of the view this handler should open. This value should
 	 * never be <code>null</code>.
@@ -37,7 +37,7 @@ public final class ShowViewHandler extends AbstractHandler {
 
 	/**
 	 * Constructs a new instance of <code>ShowViewHandler</code>.
-	 *
+	 * 
 	 * @param viewId
 	 *            The identifier of the view this handler should open; must not
 	 *            be <code>null</code>.
@@ -47,7 +47,7 @@ public final class ShowViewHandler extends AbstractHandler {
 	}
 
 	@Override
-	public final Object execute(final ExecutionEvent event)
+	public final Object execute(final ExecutionEvent event) 
 			throws ExecutionException {
 		final IWorkbenchWindow activeWorkbenchWindow = HandlerUtil
 				.getActiveWorkbenchWindowChecked(event);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,22 +37,25 @@ public class OpenPreferencesAction extends Action implements ActionFactory.IWork
 	}
 
 	/**
-	 * Create a new <code>OpenPreferenceAction</code> and initialize it
+	 * Create a new <code>OpenPreferenceAction</code> and initialize it 
 	 * from the given resource bundle.
 	 * @param window
 	 */
 	public OpenPreferencesAction(IWorkbenchWindow window) {
-		super(WorkbenchMessages.OpenPreferences_text);
+		super(WorkbenchMessages.OpenPreferences_text); 
 		if (window == null) {
 			throw new IllegalArgumentException();
 		}
 		this.workbenchWindow = window;
 		// @issue action id not set
-		setToolTipText(WorkbenchMessages.OpenPreferences_toolTip);
+		setToolTipText(WorkbenchMessages.OpenPreferences_toolTip); 
 		window.getWorkbench().getHelpSystem().setHelp(this,
 				IWorkbenchHelpContextIds.OPEN_PREFERENCES_ACTION);
 	}
 
+	/* (non-Javadoc)
+	 * Method declared on Action.
+	 */
 	@Override
 	public void run() {
 		if (workbenchWindow == null) {
@@ -63,6 +66,9 @@ public class OpenPreferencesAction extends Action implements ActionFactory.IWork
 		dialog.open();
 	}
 
+	/* (non-Javadoc)
+	 * Method declared on ActionFactory.IWorkbenchAction.
+	 */
 	@Override
 	public void dispose() {
 		workbenchWindow = null;

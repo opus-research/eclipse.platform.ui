@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Christian Janz  - <christian.janz@gmail.com> Fix for Bug 385592
- *     Denis Zygann <d.zygann@web.de> - Bug 457390
  *******************************************************************************/
 package org.eclipse.ui.tests.api;
 
@@ -16,13 +15,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.core.commands.Command;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.expressions.IEvaluationContext;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.NotEnabledException;
+import org.eclipse.core.commands.NotHandledException;
+import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -34,17 +34,16 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.swt.events.ShellListener;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveRegistry;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
-import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -54,10 +53,10 @@ import org.eclipse.ui.IWorkingSetManager;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
+import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.editors.text.TextEditor;
-import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.internal.WorkbenchPage;
@@ -73,11 +72,7 @@ import org.eclipse.ui.tests.harness.util.FileUtil;
 import org.eclipse.ui.tests.harness.util.UITestCase;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.views.contentoutline.ContentOutline;
-import org.junit.Assume;
-import org.junit.FixMethodOrder;
-import org.junit.runners.MethodSorters;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class IWorkbenchPageTest extends UITestCase {
 
 	private IWorkbenchPage fActivePage;
@@ -85,21 +80,20 @@ public class IWorkbenchPageTest extends UITestCase {
 	private IWorkbenchWindow fWin;
 
 	private IProject proj;
-
+	
 	private int logCount;
 	private IStatus logStatus;
 	String getMessage() {
 		return logStatus==null?"No message":logStatus.getMessage();
 	}
 	ILogListener openAndHideListener = new ILogListener() {
-		@Override
 		public void logging(IStatus status, String plugin) {
 			logStatus = status;
 			logCount++;
 		}
 	};
-
-
+	
+	
 	private int partHiddenCount = 0;
 	private IWorkbenchPartReference partHiddenRef = null;
 	private int partVisibleCount = 0;
@@ -107,39 +101,31 @@ public class IWorkbenchPageTest extends UITestCase {
 	private int partActiveCount = 0;
 	private IWorkbenchPartReference partActiveRef = null;
 	IPartListener2 partListener2 = new IPartListener2() {
-		@Override
 		public void partActivated(IWorkbenchPartReference partRef) {
 			partActiveCount++;
 			partActiveRef = partRef;
 		}
 
-		@Override
 		public void partBroughtToTop(IWorkbenchPartReference partRef) {
 		}
 
-		@Override
 		public void partClosed(IWorkbenchPartReference partRef) {
 		}
 
-		@Override
 		public void partDeactivated(IWorkbenchPartReference partRef) {
 		}
 
-		@Override
 		public void partHidden(IWorkbenchPartReference partRef) {
 			partHiddenCount++;
 			partHiddenRef = partRef;
 		}
 
-		@Override
 		public void partInputChanged(IWorkbenchPartReference partRef) {
 		}
 
-		@Override
 		public void partOpened(IWorkbenchPartReference partRef) {
 		}
 
-		@Override
 		public void partVisible(IWorkbenchPartReference partRef) {
 			partVisibleCount++;
 			partVisibleRef = partRef;
@@ -150,7 +136,6 @@ public class IWorkbenchPageTest extends UITestCase {
 		super(testName);
 	}
 
-	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		fWin = openTestWindow();
@@ -160,19 +145,18 @@ public class IWorkbenchPageTest extends UITestCase {
 		Platform.addLogListener(openAndHideListener);
 	}
 
-	@Override
 	protected void doTearDown() throws Exception {
-		Platform.removeLogListener(openAndHideListener);
+		super.doTearDown();
 		if (proj != null) {
 			FileUtil.deleteProject(proj);
 			proj = null;
 		}
-		super.doTearDown();
+		Platform.removeLogListener(openAndHideListener);
 	}
 
 	/**
 	 * Tests the new working set API.
-	 *
+	 * 
 	 * @since 3.2
 	 */
 	public void testWorkingSets1() {
@@ -217,18 +201,16 @@ public class IWorkbenchPageTest extends UITestCase {
 			assertNotNull(sets);
 			assertEquals(0, sets.length);
 		} finally {
-			if (set1 != null) {
+			if (set1 != null)
 				manager.removeWorkingSet(set1);
-			}
-			if (set2 != null) {
+			if (set2 != null)
 				manager.removeWorkingSet(set2);
-			}
 		}
 	}
 
 	/**
 	 * Tests the new working set API.
-	 *
+	 * 
 	 * @since 3.2
 	 */
 	public void testWorkingSets2() {
@@ -240,7 +222,7 @@ public class IWorkbenchPageTest extends UITestCase {
 
 	/**
 	 * Tests the working set listeners.
-	 *
+	 * 
 	 * @since 3.2
 	 */
 	public void testWorkingSets3() {
@@ -252,7 +234,6 @@ public class IWorkbenchPageTest extends UITestCase {
 		sets[0] = new IWorkingSet[0];
 		IPropertyChangeListener listener = new IPropertyChangeListener() {
 
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				IWorkingSet[] oldSets = (IWorkingSet[]) event.getOldValue();
 				assertTrue(Arrays.equals(sets[0], oldSets));
@@ -277,9 +258,8 @@ public class IWorkbenchPageTest extends UITestCase {
 
 		} finally {
 			fActivePage.removePropertyChangeListener(listener);
-			if (set1 != null) {
+			if (set1 != null)
 				manager.removeWorkingSet(set1);
-			}
 		}
 	}
 
@@ -325,21 +305,19 @@ public class IWorkbenchPageTest extends UITestCase {
 					.getAggregateWorkingSet().getName());
 			assertEquals(1, fActivePage.getWorkingSets().length);
 		} finally {
-			if (set1 != null) {
+			if (set1 != null)
 				manager.removeWorkingSet(set1);
-			}
 		}
 	}
 
-	/**
-	 * Test the VIEW_VISIBLE parameter for showView, opening the view in the
+	/**	 * Test the VIEW_VISIBLE parameter for showView, opening the view in the
 	 * stack that does not contain the active view. Ensures that the created
 	 * view is not the active part but is the top part in its stack.
 	 */
 	public void testView_VISIBLE2() throws PartInitException {
 		fActivePage.setPerspective(WorkbenchPlugin.getDefault()
 				.getPerspectiveRegistry().findPerspectiveWithId(
-						ViewPerspective.ID));
+						"org.eclipse.ui.tests.api.ViewPerspective"));
 
 		// create a part to be active
 		IViewPart activePart = fActivePage.showView(MockViewPart.ID3);
@@ -354,30 +332,6 @@ public class IWorkbenchPageTest extends UITestCase {
 		assertEquals(fActivePage.findView(MockViewPart.ID), stack[1]);
 
 		assertTrue(fActivePage.isPartVisible(createdPart));
-
-		assertEquals(activePart, fActivePage.getActivePart());
-	}
-
-	/**
-	 * Test the VIEW_ACTIVE parameter for showView, opening the view in the stack that does not
-	 * contain the active view. Ensures that the created view is not the active part but is the top
-	 * part in its stack.
-	 */
-	public void testView_ACTIVE2() throws PartInitException {
-		fActivePage.setPerspective(WorkbenchPlugin.getDefault().getPerspectiveRegistry().findPerspectiveWithId(ViewPerspective.ID));
-
-		// create a part to be active
-		fActivePage.showView(MockViewPart.ID3);
-
-		IViewPart activePart= fActivePage.showView(MockViewPart.ID2, null, IWorkbenchPage.VIEW_ACTIVATE);
-
-		IViewPart[] stack= fActivePage.getViewStack(activePart);
-		assertEquals(2, stack.length);
-
-		assertEquals(activePart, stack[0]);
-		assertEquals(fActivePage.findView(MockViewPart.ID), stack[1]);
-
-		assertTrue(fActivePage.isPartVisible(activePart));
 
 		assertEquals(activePart, fActivePage.getActivePart());
 	}
@@ -801,7 +755,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		IEditorPart markerEditor = IDE.openEditor(fActivePage, marker);
 		assertNotNull(markerEditor);
 		assertTrue(markerEditor instanceof MockEditorPart);
-
+		
 		// these shouldn't be the same, if they are it's a bug
 		assertFalse(markerEditor == regularEditor);
 		assertFalse(markerEditor.equals(regularEditor));
@@ -878,56 +832,56 @@ public class IWorkbenchPageTest extends UITestCase {
 		fActivePage.bringToTop(part2);
 		assertEquals(callTrace.contains("partBroughtToTop"), true);
 	}
-
+	
 	/**
 	 * Test to ensure that a minimized view can be brought to the top and
 	 * consequently made visible.
-	 *
+	 * 
 	 * @param hasEditors whether there should be editors open or not
 	 */
 	private void testBringToTop_MinimizedViewBug292966(boolean hasEditors) throws Throwable {
 		// first show the view we're going to test
 		IViewPart propertiesView = fActivePage.showView(IPageLayout.ID_PROP_SHEET);
 		assertNotNull(propertiesView);
-
+		
 		proj = FileUtil.createProject("testOpenEditor");
 		// open an editor
 		IEditorPart editor = IDE.openEditor(fActivePage, FileUtil.createFile(
 				"a.mock1", proj));
 		assertNotNull("The editor could not be opened", editor); //$NON-NLS-1$
 		assertTrue("The editor is not visible", fActivePage.isPartVisible(editor)); //$NON-NLS-1$
-
+		
 		if (!hasEditors) {
 			// close editors if we don't want them opened for this test
 			fActivePage.closeAllEditors(false);
 			assertEquals("All the editors should have been closed", 0, fActivePage.getEditorReferences().length); //$NON-NLS-1$
 		}
-
+		
 		// minimize the view we're testing
 		fActivePage.setPartState(fActivePage.getReference(propertiesView), IWorkbenchPage.STATE_MINIMIZED);
 		assertFalse("A minimized view should not be visible", fActivePage.isPartVisible(propertiesView)); //$NON-NLS-1$
-
+		
 		// open another view so that it now becomes the active part container
 		IViewPart projectExplorer = fActivePage.showView(IPageLayout.ID_PROJECT_EXPLORER);
 		// get the list of views that shares the stack with this other view
 		IViewPart[] viewStack = fActivePage.getViewStack(projectExplorer);
 		// make sure that we didn't inadvertently bring back the test view by mistake
-		for (IViewPart element : viewStack) {
+		for (int i = 0; i < viewStack.length; i++) {
 			assertFalse("The properties view should not be on the same stack as the project explorer", //$NON-NLS-1$
-					element.getSite().getId().equals(IPageLayout.ID_PROP_SHEET));
+					viewStack[i].getSite().getId().equals(IPageLayout.ID_PROP_SHEET));
 		}
-
+		
 		// bring the test view back from its minimized state
 		fActivePage.bringToTop(propertiesView);
 		// the view should be visible
 		assertTrue("Invoking bringToTop(IWorkbenchPart) should cause the part to be visible", //$NON-NLS-1$
 				fActivePage.isPartVisible(propertiesView));
 	}
-
+	
 	public void XXXtestBringToTop_MinimizedViewWithEditorsBug292966() throws Throwable {
 		testBringToTop_MinimizedViewBug292966(false);
 	}
-
+	
 	public void XXXtestBringToTop_MinimizedViewWithoutEditorsBug292966() throws Throwable {
 		testBringToTop_MinimizedViewBug292966(true);
 	}
@@ -936,7 +890,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		/*
 		 * Commented out because until test case can be updated to work with new
 		 * window/page/perspective implementation
-		 *
+		 * 
 		 * assertEquals(fActivePage.getWorkbenchWindow(), fWin); IWorkbenchPage
 		 * page = openTestPage(fWin); assertEquals(page.getWorkbenchWindow(),
 		 * fWin);
@@ -1033,6 +987,77 @@ public class IWorkbenchPageTest extends UITestCase {
 		assertEquals(exceptionThrown, true);
 	}
 
+	/**
+	 * Tests showing multi-instance views (as fast views). This is a regression
+	 * test for bug 76669 - [Perspectives] NullPointerException in
+	 * Perspective.getFastViewWidthRatio()
+	 */
+	public void XXXtestShowViewMultFast() throws Throwable {
+		/*
+		 * javadoc: Shows the view identified by the given view id and secondary
+		 * id in this page and gives it focus. This allows multiple instances of
+		 * a particular view to be created. They are disambiguated using the
+		 * secondary id.
+		 */
+		MockViewPart view = (MockViewPart) fActivePage
+				.showView(MockViewPart.IDMULT);
+		assertNotNull(view);
+		assertTrue(view.getCallHistory().verifyOrder(
+				new String[] { "init", "createPartControl", "setFocus" }));
+		MockViewPart view2 = (MockViewPart) fActivePage.showView(
+				MockViewPart.IDMULT, "2", IWorkbenchPage.VIEW_ACTIVATE);
+		assertNotNull(view2);
+		assertTrue(view2.getCallHistory().verifyOrder(
+				new String[] { "init", "createPartControl", "setFocus" }));
+		assertTrue(!view.equals(view2));
+
+//		IViewReference ref = (IViewReference) fActivePage.getReference(view);
+//		IViewReference ref2 = (IViewReference) fActivePage.getReference(view2);
+//		facade.addFastView(fActivePage, ref);
+//		facade.addFastView(fActivePage, ref2);
+		
+		// FIXME: No implementation
+		fail("facade.addFastView() contained no implementation");
+
+
+		fActivePage.activate(view);
+		assertEquals(view, fActivePage.getActivePart());
+
+		fActivePage.activate(view2);
+		assertEquals(view2, fActivePage.getActivePart());
+	}
+
+	/**
+	 * Tests saving the page state when there is a fast view that is also a
+	 * multi-instance view. This is a regression test for bug 76669 -
+	 * [Perspectives] NullPointerException in
+	 * Perspective.getFastViewWidthRatio()
+	 */
+	public void XXXtestBug76669() throws Throwable {
+//		MockViewPart view = (MockViewPart) fActivePage
+//				.showView(MockViewPart.IDMULT);
+//		MockViewPart view2 = (MockViewPart) fActivePage.showView(
+//				MockViewPart.IDMULT, "2", IWorkbenchPage.VIEW_ACTIVATE);
+
+//		IViewReference ref = (IViewReference) fActivePage.getReference(view);
+//		IViewReference ref2 = (IViewReference) fActivePage.getReference(view2);
+//		facade.addFastView(fActivePage, ref);
+//		facade.addFastView(fActivePage, ref2);
+		
+		// FIXME: No implementation
+		fail("facade.addFastView() contained no implementation");
+
+		IMemento memento = XMLMemento.createWriteRoot("page");
+//		facade.saveState(fActivePage, memento);
+		// FIXME: No implementation
+		fail("facade.saveState() had no implementation");
+
+		IMemento persps = memento.getChild("perspectives");
+		IMemento persp = persps.getChildren("perspective")[0];
+		IMemento[] fastViews = persp.getChild("fastViews").getChildren("view");
+		assertEquals(2, fastViews.length);
+	}
+
 	public void testFindView() throws Throwable {
 		String id = MockViewPart.ID3;
 		// id of valid, but not open view
@@ -1046,185 +1071,24 @@ public class IWorkbenchPageTest extends UITestCase {
 		assertNull(fActivePage.findView(id));
 	}
 
-	/**
-	 * See https://bugs.eclipse.org/bugs/show_bug.cgi?id=471782
-	 */
 	public void testFindViewReference() throws Throwable {
-		fWin.getWorkbench().showPerspective(ViewPerspective.ID, fWin);
-		processEvents();
-		assertNull(fActivePage.findView(MockViewPart.ID4));
-		assertNull(fActivePage.findView(MockViewPart.ID2));
-		assertNotNull(fActivePage.findView(MockViewPart.ID));
-
+		fActivePage.getWorkbenchWindow().getWorkbench().showPerspective(
+				SessionPerspective.ID, fActivePage.getWorkbenchWindow());
 		assertNull(fActivePage.findViewReference(MockViewPart.ID4));
-		assertNull(fActivePage.findViewReference(MockViewPart.ID2));
-		assertNotNull(fActivePage.findViewReference(MockViewPart.ID));
-
-		fActivePage.showView(MockViewPart.ID2);
-		assertNotNull(fActivePage.findViewReference(MockViewPart.ID2));
-		assertNotNull(fActivePage.findView(MockViewPart.ID2));
-
-		fWin.getWorkbench().showPerspective(SessionPerspective.ID, fWin);
-		processEvents();
-		assertNull(fActivePage.findView(MockViewPart.ID4));
-		assertNull(fActivePage.findView(MockViewPart.ID2));
-		assertNotNull(fActivePage.findView(SessionView.VIEW_ID));
-
-		assertNull(fActivePage.findViewReference(MockViewPart.ID4));
-		assertNull(fActivePage.findViewReference(MockViewPart.ID2));
-		assertNotNull(fActivePage.findViewReference(SessionView.VIEW_ID));
-
-		fActivePage.showView(MockViewPart.ID2);
-		assertNotNull(fActivePage.findView(MockViewPart.ID2));
-		assertNotNull(fActivePage.findViewReference(MockViewPart.ID2));
 
 		fActivePage.showView(MockViewPart.ID4);
-		assertNotNull(fActivePage.findView(MockViewPart.ID4));
 		assertNotNull(fActivePage.findViewReference(MockViewPart.ID4));
-	}
-
-	/**
-	 * See https://bugs.eclipse.org/bugs/show_bug.cgi?id=471782
-	 */
-	public void testFindViewReferenceAfterShowViewCommand() throws Throwable {
-		boolean activeShell = forceActive(fWin.getShell());
-
-		final AtomicBoolean shellIsActive = new AtomicBoolean(activeShell);
-		Assume.assumeTrue(shellIsActive.get());
-
-		ShellListener shellListener = new ShellStateListener(shellIsActive);
-		fWin.getShell().addShellListener(shellListener);
-
-		fWin.getWorkbench().showPerspective(ViewPerspective.ID, fWin);
-		processEvents();
-		assertNull(fActivePage.findView(MockViewPart.ID4));
-		assertNull(fActivePage.findView(MockViewPart.ID2));
-		assertNotNull(fActivePage.findView(MockViewPart.ID));
-
-		assertNull(fActivePage.findViewReference(MockViewPart.ID4));
-		assertNull(fActivePage.findViewReference(MockViewPart.ID2));
-		assertNotNull(fActivePage.findViewReference(MockViewPart.ID));
-
-		Assume.assumeTrue(forceActive(fWin.getShell()));
-
-		showViewViaCommand(MockViewPart.ID2);
-
-		Assume.assumeTrue(fWin.getShell().isVisible());
-		Assume.assumeTrue(PlatformUI.getWorkbench().getActiveWorkbenchWindow() == fWin);
-		Assume.assumeTrue(shellIsActive.get());
-
-		assertNotNull(fActivePage.findView(MockViewPart.ID2));
-		assertNotNull(fActivePage.findViewReference(MockViewPart.ID2));
-
-		fWin.getWorkbench().showPerspective(SessionPerspective.ID, fWin);
-		processEvents();
-		assertNull(fActivePage.findView(MockViewPart.ID2));
-		assertNull(fActivePage.findView(MockViewPart.ID4));
-		assertNotNull(fActivePage.findView(SessionView.VIEW_ID));
-
-		assertNull(fActivePage.findViewReference(MockViewPart.ID2));
-		assertNull(fActivePage.findViewReference(MockViewPart.ID4));
-		assertNotNull(fActivePage.findViewReference(SessionView.VIEW_ID));
-
-		showViewViaCommand(MockViewPart.ID2);
-		assertNotNull(fActivePage.findView(MockViewPart.ID2));
-		assertNotNull(fActivePage.findViewReference(MockViewPart.ID2));
-
-		showViewViaCommand(MockViewPart.ID4);
-		assertNotNull(fActivePage.findView(MockViewPart.ID4));
-		assertNotNull(fActivePage.findViewReference(MockViewPart.ID4));
-	}
-
-	/**
-	 * See https://bugs.eclipse.org/bugs/show_bug.cgi?id=471782
-	 */
-	public void testFindHistoryViewReferenceAfterShowViewCommand() throws Throwable {
-		boolean activeShell = forceActive(fWin.getShell());
-
-		final AtomicBoolean shellIsActive = new AtomicBoolean(activeShell);
-		Assume.assumeTrue(shellIsActive.get());
-
-		ShellListener shellListener = new ShellStateListener(shellIsActive);
-		fWin.getShell().addShellListener(shellListener);
-
-		String historyView = "org.eclipse.team.ui.GenericHistoryView";
-		fWin.getWorkbench().showPerspective(ViewPerspective.ID, fWin);
-		processEvents();
-		assertNull(fActivePage.findView(MockViewPart.ID4));
-		assertNull(fActivePage.findView(MockViewPart.ID2));
-		assertNotNull(fActivePage.findView(MockViewPart.ID));
-
-		assertNull(fActivePage.findViewReference(MockViewPart.ID4));
-		assertNull(fActivePage.findViewReference(MockViewPart.ID2));
-		assertNull(fActivePage.findViewReference(historyView));
-		assertNotNull(fActivePage.findViewReference(MockViewPart.ID));
-
-		Assume.assumeTrue(forceActive(fWin.getShell()));
-		showViewViaCommand(historyView);
-
-		Assume.assumeTrue(fWin.getShell().isVisible());
-		Assume.assumeTrue(PlatformUI.getWorkbench().getActiveWorkbenchWindow() == fWin);
-		Assume.assumeTrue(shellIsActive.get());
-
-		assertNotNull(fActivePage.findView(historyView));
-		assertNotNull(fActivePage.findViewReference(historyView));
-
-		fWin.getWorkbench().showPerspective(SessionPerspective.ID, fWin);
-		processEvents();
-		assertNull(fActivePage.findView(MockViewPart.ID2));
-		assertNull(fActivePage.findView(MockViewPart.ID4));
-		assertNull(fActivePage.findView(historyView));
-		assertNotNull(fActivePage.findView(SessionView.VIEW_ID));
-
-		assertNull(fActivePage.findViewReference(MockViewPart.ID2));
-		assertNull(fActivePage.findViewReference(MockViewPart.ID4));
-		assertNull(fActivePage.findViewReference(historyView));
-		assertNotNull(fActivePage.findViewReference(SessionView.VIEW_ID));
-
-		showViewViaCommand(historyView);
-		assertNotNull(fActivePage.findView(historyView));
-		assertNotNull(fActivePage.findViewReference(historyView));
-	}
-
-	private void showViewViaCommand(String viewId) throws Throwable {
-		waitForJobs(500, 3000);
-		Map<String, String> parameters = new HashMap<String, String>();
-		parameters.put(IWorkbenchCommandConstants.VIEWS_SHOW_VIEW_PARM_ID, viewId);
-
-		Command command = createCommand(IWorkbenchCommandConstants.VIEWS_SHOW_VIEW);
-		ExecutionEvent event = createEvent(command, parameters);
-
-		// org.eclipse.ui.handlers.ShowViewHandler needs the *right* window!
-		assertEquals(fWin, HandlerUtil.getActiveWorkbenchWindow(event));
-
-		command.executeWithChecks(event);
-		processEvents();
-		waitForJobs(500, 3000);
-	}
-
-	private ExecutionEvent createEvent(Command command, Map<String, String> parameters) {
-		IWorkbench workbench = getWorkbench();
-		IHandlerService handlerService = workbench.getService(IHandlerService.class);
-		IEvaluationContext contextSnapshot = handlerService.createContextSnapshot(true);
-		ExecutionEvent event = new ExecutionEvent(command, parameters, null, contextSnapshot);
-		return event;
-	}
-
-	private Command createCommand(String id) {
-		ICommandService commandService = getWorkbench().getService(ICommandService.class);
-		return commandService.getCommand(id);
 	}
 
 	public void testFindSecondaryViewReference() throws Throwable {
 		fActivePage.getWorkbenchWindow().getWorkbench().showPerspective(
 				SessionPerspective.ID, fActivePage.getWorkbenchWindow());
-		processEvents();
 		assertNull(fActivePage.findViewReference(MockViewPart.IDMULT, "1"));
-
+		
 		fActivePage.showView(MockViewPart.IDMULT, "1", IWorkbenchPage.VIEW_ACTIVATE);
 		assertNotNull(fActivePage.findViewReference(MockViewPart.IDMULT, "1"));
 	}
-
+	
 	public void testGetViews() throws Throwable {
 		int totalBefore = fActivePage.getViewReferences().length;
 
@@ -1320,7 +1184,7 @@ public class IWorkbenchPageTest extends UITestCase {
 	/**
 	 * Tests that a close will fall back to the default if the view returns
 	 * ISaveable2.DEFAULT.
-	 *
+	 * 
 	 * @throws Throwable
 	 */
 	public void testCloseWithSaveNeeded() throws Throwable {
@@ -1370,7 +1234,7 @@ public class IWorkbenchPageTest extends UITestCase {
 	/**
 	 * Tests that a close will fall back to the default if the view returns
 	 * ISaveable2.DEFAULT.
-	 *
+	 * 
 	 * @throws Throwable
 	 */
 	public void testSaveEffectsSharedModel() throws Throwable {
@@ -1483,7 +1347,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		 * It is possible that some action may query the isDirty value of the
 		 * editor to update its enabled state. There is nothing wrong in doing
 		 * that, so do not test for no isDirty call here.
-		 *
+		 * 
 		 * assertEquals(callTrace.contains( "isDirty"), false);
 		 */
 		assertEquals(callTrace.contains("doSave"), false);
@@ -1499,9 +1363,8 @@ public class IWorkbenchPageTest extends UITestCase {
 		MockEditorPart[] mocks = new MockEditorPart[total];
 
 		proj = FileUtil.createProject("testCloseEditors");
-		for (int i = 0; i < total; i++) {
+		for (int i = 0; i < total; i++)
 			files[i] = FileUtil.createFile(i + ".mock2", proj);
-		}
 
 		/*
 		 * javadoc: If the page has open editors with unsaved content and save
@@ -1567,9 +1430,8 @@ public class IWorkbenchPageTest extends UITestCase {
 		MockEditorPart[] mocks = new MockEditorPart[total];
 
 		proj = FileUtil.createProject("testOpenEditor");
-		for (int i = 0; i < total; i++) {
+		for (int i = 0; i < total; i++)
 			files[i] = FileUtil.createFile(i + ".mock2", proj);
-		}
 
 		/*
 		 * javadoc: If the page has open editors with unsaved content and save
@@ -1693,9 +1555,8 @@ public class IWorkbenchPageTest extends UITestCase {
 		// of the contents of the dirty editors without confirmation, this
 		// should not
 		// save any as they are not parented by the resource provided
-		for (int i = 0; i < total; i++) {
+		for (int i = 0; i < total; i++)
 			mocks[i].setDirty(true);
-		}
 
 		IResource emptyProj = FileUtil
 				.createProject("testOpenEditorEmptyProject");
@@ -1723,9 +1584,8 @@ public class IWorkbenchPageTest extends UITestCase {
 		// of the contents of the dirty editors without confirmation, this
 		// should not
 		// save any as they are not parented by the resource provided
-		for (int i = 0; i < total; i++) {
+		for (int i = 0; i < total; i++)
 			mocks[i].setDirty(true);
-		}
 		assertEquals(IDE.saveAllEditors(new IResource[] {}, false), true);
 		for (int i = 0; i < total; i++) {
 			// the editors were not in the empty project hence still dirty
@@ -1734,9 +1594,8 @@ public class IWorkbenchPageTest extends UITestCase {
 		}
 
 		// clear the dirty state so the tearDown does not open a confirm dialog.
-		for (int i = 0; i < total; i++) {
+		for (int i = 0; i < total; i++)
 			mocks[i].setDirty(false);
-		}
 	}
 
 	public void XXXtestSaveAllEditors() throws Throwable {
@@ -1783,14 +1642,12 @@ public class IWorkbenchPageTest extends UITestCase {
 		}
 
 		// save all dirty editors without confirmation
-		for (int i = 0; i < total; i++) {
+		for (int i = 0; i < total; i++)
 			mocks[i].setDirty(true);
-		}
 		assertEquals(fActivePage.saveAllEditors(false), true);
-		for (int i = 0; i < total; i++) {
+		for (int i = 0; i < total; i++)
 			assertEquals(callTraces[i].verifyOrder(new String[] { "isDirty",
 					"doSave" }), true);
-		}
 	}
 
 	public void testGetEditors() throws Throwable {
@@ -1871,32 +1728,30 @@ public class IWorkbenchPageTest extends UITestCase {
 
 	/**
 	 * Return whether or not the editor exists in the current page.
-	 *
+	 * 
 	 * @param editor
 	 * @return boolean
 	 */
 	private boolean hasEditor(IEditorPart editor) {
 		IEditorReference[] references = fActivePage.getEditorReferences();
-		for (IEditorReference reference : references) {
-			if (reference.getEditor(false).equals(editor)) {
+		for (int i = 0; i < references.length; i++) {
+			if (references[i].getEditor(false).equals(editor))
 				return true;
-			}
 		}
 		return false;
 	}
 
 	/**
 	 * Return whether or not the view exists in the current page.
-	 *
+	 * 
 	 * @param editor
 	 * @return boolean
 	 */
 	private boolean hasView(IViewPart view) {
 		IViewReference[] references = fActivePage.getViewReferences();
-		for (IViewReference reference : references) {
-			if (reference.getView(false).equals(view)) {
+		for (int i = 0; i < references.length; i++) {
+			if (references[i].getView(false).equals(view))
 				return true;
-			}
 		}
 		return false;
 	}
@@ -1942,12 +1797,12 @@ public class IWorkbenchPageTest extends UITestCase {
 	/**
 	 * Test the VIEW_CREATE parameter for showView. Ensures that the created
 	 * view is not the active part.
-	 *
+	 * 
 	 */
 	public void testView_CREATE1() throws PartInitException {
 		fActivePage.setPerspective(fActivePage.getWorkbenchWindow().getWorkbench()
 				.getPerspectiveRegistry().findPerspectiveWithId(
-							ViewPerspective.ID));
+							"org.eclipse.ui.tests.api.ViewPerspective"));
 
 		// create a part to be active
 		IViewPart activePart = fActivePage.showView(MockViewPart.ID);
@@ -1972,7 +1827,7 @@ public class IWorkbenchPageTest extends UITestCase {
 	public void testView_CREATE2() throws PartInitException {
 		fActivePage.setPerspective(fActivePage.getWorkbenchWindow().getWorkbench()
 				.getPerspectiveRegistry().findPerspectiveWithId(
-						ViewPerspective.ID));
+						"org.eclipse.ui.tests.api.ViewPerspective"));
 
 		// create a part to be active
 		IViewPart activePart = fActivePage.showView(MockViewPart.ID3);
@@ -1997,7 +1852,7 @@ public class IWorkbenchPageTest extends UITestCase {
 	public void testView_CREATE3() throws PartInitException {
 		fActivePage.setPerspective(fActivePage.getWorkbenchWindow().getWorkbench()
 				.getPerspectiveRegistry().findPerspectiveWithId(
-						ViewPerspective.ID));
+						"org.eclipse.ui.tests.api.ViewPerspective"));
 
 		// create a part to be active
 		IViewPart activePart = fActivePage.showView(MockViewPart.ID3);
@@ -2022,7 +1877,7 @@ public class IWorkbenchPageTest extends UITestCase {
 	public void testView_VISIBLE1() throws PartInitException {
 		fActivePage.setPerspective(fActivePage.getWorkbenchWindow().getWorkbench()
 				.getPerspectiveRegistry().findPerspectiveWithId(
-						ViewPerspective.ID));
+						"org.eclipse.ui.tests.api.ViewPerspective"));
 
 		// create a part to be active
 		IViewPart activePart = fActivePage.showView(MockViewPart.ID);
@@ -2047,7 +1902,7 @@ public class IWorkbenchPageTest extends UITestCase {
 	public void testView_VISIBLE3() throws PartInitException {
 		fActivePage.setPerspective(fActivePage.getWorkbenchWindow().getWorkbench()
 					.getPerspectiveRegistry().findPerspectiveWithId(
-							ViewPerspective.ID));
+							"org.eclipse.ui.tests.api.ViewPerspective"));
 
 		// create a part to be active
 		IViewPart activePart = fActivePage.showView(MockViewPart.ID3);
@@ -2065,9 +1920,53 @@ public class IWorkbenchPageTest extends UITestCase {
 	}
 
 	/**
+	 * Test opening a perspective with a fast view.
+	 */
+	public void XXXtestOpenPerspectiveWithFastView() {
+
+		try {
+			fWin.getWorkbench().showPerspective(
+					PerspectiveWithFastView.PERSP_ID, fWin);
+		} catch (WorkbenchException e) {
+			fail("Unexpected WorkbenchException: " + e);
+		}
+
+//		IViewReference[] fastViews = facade.getFastViews(fActivePage);
+		// FIXME: No implementation
+		fail("facade.getFastViews() had no implementation");
+
+//		assertEquals(fastViews.length, 1);
+//		assertEquals(fastViews[0].getId(),
+//				"org.eclipse.ui.views.ResourceNavigator");
+		assertEquals(fActivePage.getViewReferences().length, 1);
+		assertTrue(fActivePage.getViewReferences()[0].isFastView());
+		
+		IPerspectiveDescriptor persp = fActivePage.getPerspective();
+		
+		ICommandService commandService = (ICommandService) fWorkbench.getService(ICommandService.class);
+		Command command = commandService.getCommand("org.eclipse.ui.window.closePerspective");
+		
+		HashMap<String, String> parameters = new HashMap<String, String>();
+		parameters.put(IWorkbenchCommandConstants.WINDOW_CLOSE_PERSPECTIVE_PARM_ID, persp.getId());
+		
+		ParameterizedCommand pCommand = ParameterizedCommand.generateCommand(command, parameters);
+		
+		IHandlerService handlerService = (IHandlerService) fWorkbench
+				.getService(IHandlerService.class);
+		try {
+			handlerService.executeCommand(pCommand, null);
+		} catch (ExecutionException e1) {
+		} catch (NotDefinedException e1) {
+		} catch (NotEnabledException e1) {
+		} catch (NotHandledException e1) {
+		}
+
+	}
+
+	/**
 	 * Test opening a perspective with placeholders for multi instance views.
 	 * The placeholders are added at top level (not in any folder).
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	public void XXXtestOpenPerspectiveWithMultiViewPlaceholdersAtTopLevel() {
@@ -2095,7 +1994,7 @@ public class IWorkbenchPageTest extends UITestCase {
 	 * The placeholders are added in a placeholder folder. This is a regression
 	 * test for bug 72383 [Perspectives] Placeholder folder error with multiple
 	 * instance views
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	public void XXXtestOpenPerspectiveWithMultiViewPlaceholdersInPlaceholderFolder() {
@@ -2124,7 +2023,7 @@ public class IWorkbenchPageTest extends UITestCase {
 	/**
 	 * Test opening a perspective with placeholders for multi instance views.
 	 * The placeholders are added at top level (not in any folder).
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	public void XXXtestOpenPerspectiveWithMultiViewPlaceholdersInFolder() {
@@ -2151,7 +2050,7 @@ public class IWorkbenchPageTest extends UITestCase {
 
 	/**
 	 * Tests the getNewWizardShortcuts() method.
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	public void testGetNewWizardShortcuts() {
@@ -2169,7 +2068,7 @@ public class IWorkbenchPageTest extends UITestCase {
 
 	/**
 	 * Tests the getShowViewShortcuts() method.
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	public void testGetShowViewShortcuts() {
@@ -2189,7 +2088,7 @@ public class IWorkbenchPageTest extends UITestCase {
 
 	/**
 	 * Tests the getPerspectiveShortcuts() method.
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	public void testGetPerspectiveShortcuts() {
@@ -2201,7 +2100,7 @@ public class IWorkbenchPageTest extends UITestCase {
 
 	/**
 	 * Tests the getOpenPerspectives() method.
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	public void XXXtestGetOpenPerspectives() {
@@ -2237,7 +2136,7 @@ public class IWorkbenchPageTest extends UITestCase {
 
 	/**
 	 * Tests the getSortedPerspectives() method.
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	public void XXXtestGetSortedPerspectives() {
@@ -2274,7 +2173,7 @@ public class IWorkbenchPageTest extends UITestCase {
 
 	/**
 	 * Tests the closePerspective method.
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	public void XXXtestClosePerspective() {
@@ -2309,14 +2208,14 @@ public class IWorkbenchPageTest extends UITestCase {
 		assertEquals(0, openPersps.length);
 		assertNull(fWin.getActivePage()); // page closed
 	}
-
+	
  	/**
 	 * This tests that closing a perspective will not bring a prompt up for
 	 * {@link org.eclipse.ui.ISaveablePart ISaveablePart} implementations that
 	 * are returning false for their
 	 * {@link org.eclipse.ui.ISaveablePart#isSaveOnCloseNeeded()
 	 * isSaveOnCloseNeeded()} implementation.
-	 *
+	 * 
 	 * @see #testCloseAllPerspectivesDoesNotPromptBug272070()
 	 */
 	public void testClosePerspectiveDoesNotPromptBug272070() throws Exception {
@@ -2383,7 +2282,7 @@ public class IWorkbenchPageTest extends UITestCase {
 
 	/**
 	 * Tests the closeAllPerspectives method.
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	public void XXXtestCloseAllPerspectives() {
@@ -2413,14 +2312,14 @@ public class IWorkbenchPageTest extends UITestCase {
 		assertEquals(0, openPersps.length);
 		assertNull(fWin.getActivePage()); // page closed
 	}
-
+	
  	/**
 	 * This tests that closing all perspectives will not bring a prompt up for
 	 * {@link org.eclipse.ui.ISaveablePart ISaveablePart} implementations that
 	 * are returning false for their
 	 * {@link org.eclipse.ui.ISaveablePart#isSaveOnCloseNeeded()
 	 * isSaveOnCloseNeeded()} implementation.
-	 *
+	 * 
 	 * @see #testClosePerspectiveDoesNotPromptBug272070()
 	 */
 	public void testCloseAllPerspectivesDoesNotPromptBug272070()
@@ -2524,7 +2423,7 @@ public class IWorkbenchPageTest extends UITestCase {
 	 * Tests that IShowEditorInput.showEditorInput is called when a matching
 	 * editor is found during openEditor, and is not called when a new editor is
 	 * opened.
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	public void testShowEditorInput() throws Exception {
@@ -2542,7 +2441,7 @@ public class IWorkbenchPageTest extends UITestCase {
 	/**
 	 * Tests that the openEditor and findEditor variants that accepts match
 	 * flags work as expected.
-	 *
+	 * 
 	 * @since 3.2
 	 */
 	public void XXXtestOpenAndFindEditorWithMatchFlags() throws Exception {
@@ -2648,12 +2547,12 @@ public class IWorkbenchPageTest extends UITestCase {
 		assertEquals(1, refs.length);
 		assertEquals(part4, refs[0].getPart(true));
 	}
-
-
+	
+	
 	/**
 	 * Create and hide a single editor, and check it is reflected in the
 	 * editor references.  Check that close still works.
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public void XXXtestOpenAndHideEditor1() throws Exception {
@@ -2671,12 +2570,12 @@ public class IWorkbenchPageTest extends UITestCase {
 		assertEquals(0, fActivePage.getEditorReferences().length);
 		assertEquals(getMessage(), 0, logCount);
 	}
-
+	
 	/**
 	 * Create and remove 2 editors.  Check that the removed editor
 	 * is not returned in the list of references.  Check that
 	 * close still works.
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public void XXXtestOpenAndHideEditor2() throws Exception {
@@ -2690,7 +2589,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		IEditorPart editor2 = IDE.openEditor(fActivePage, file2);
 		assertTrue(editor2 instanceof MockEditorPart);
 		IEditorReference editorRef2 = (IEditorReference) fActivePage.getReference(editor2);
-
+		
 		fActivePage.hideEditor(editorRef);
 		IEditorReference[] refs = fActivePage.getEditorReferences();
 		assertEquals(1, refs.length);
@@ -2698,7 +2597,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		fActivePage.showEditor(editorRef);
 		refs = fActivePage.getEditorReferences();
 		assertEquals(2, refs.length);
-
+		
 		fActivePage.hideEditor(editorRef2);
 		refs = fActivePage.getEditorReferences();
 		assertEquals(1, refs.length);
@@ -2711,7 +2610,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		fActivePage.showEditor(editorRef2);
 		refs = fActivePage.getEditorReferences();
 		assertEquals(2, refs.length);
-
+		
 		fActivePage.closeAllEditors(true);
 		refs = fActivePage.getEditorReferences();
 		assertEquals(0, refs.length);
@@ -2722,7 +2621,7 @@ public class IWorkbenchPageTest extends UITestCase {
 	 * Create 2 editors and hide one.  When added back and then closed, there
 	 * should only be one editor.  Adding back the closed editor should
 	 * generate a log message and not effect the list of editors.
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public void XXXtestOpenAndHideEditor3() throws Exception {
@@ -2736,7 +2635,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		IEditorPart editor2 = IDE.openEditor(fActivePage, file2);
 		assertTrue(editor2 instanceof MockEditorPart);
 		IEditorReference editorRef2 = (IEditorReference) fActivePage.getReference(editor2);
-
+		
 		fActivePage.hideEditor(editorRef2);
 		IEditorReference[] refs = fActivePage.getEditorReferences();
 		assertEquals(1, refs.length);
@@ -2755,7 +2654,7 @@ public class IWorkbenchPageTest extends UITestCase {
 	/**
 	 * Create 2 editors, and remove and show one of them.  Trying to
 	 * add it a second time should not effect the list of editor references.
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public void XXXtestOpenAndHideEditor4() throws Exception {
@@ -2769,7 +2668,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		IEditorPart editor2 = IDE.openEditor(fActivePage, file2);
 		assertTrue(editor2 instanceof MockEditorPart);
 		IEditorReference editorRef2 = (IEditorReference) fActivePage.getReference(editor2);
-
+		
 		fActivePage.hideEditor(editorRef2);
 		IEditorReference[] refs = fActivePage.getEditorReferences();
 		assertEquals(1, refs.length);
@@ -2782,12 +2681,12 @@ public class IWorkbenchPageTest extends UITestCase {
 		assertEquals(2, refs.length);
 		assertEquals(getMessage(), 0, logCount);
 	}
-
+	
 	/**
 	 * Create 2 editors that effect the Content Outline view.  Make
-	 * sure that hiding and showing the active editor effects the
+	 * sure that hiding and showing the active editor effects the 
 	 * outline view.
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public void XXXtestOpenAndHideEditor5() throws Exception {
@@ -2800,34 +2699,34 @@ public class IWorkbenchPageTest extends UITestCase {
 				.getReference(editor);
 		IEditorPart editor2 = IDE.openEditor(fActivePage, file2);
 		assertTrue(editor2.getClass().getName().endsWith("CompilationUnitEditor"));
-
+		
 		ContentOutline outline = (ContentOutline) fActivePage.showView(IPageLayout.ID_OUTLINE);
 		IPage page2 = outline.getCurrentPage();
 		fActivePage.activate(editor);
 		processEvents();
 		IPage page = outline.getCurrentPage();
 		assertFalse(page2==page);
-
+		
 		assertEquals(getMessage(), 0, logCount);
-
+		
 		fActivePage.hideEditor(editorRef);
 		assertEquals(page2, outline.getCurrentPage());
 		assertEquals(getMessage(), 0, logCount);
-
+		
 		fActivePage.showEditor(editorRef);
 		assertEquals(page2, outline.getCurrentPage());
 		assertEquals(getMessage(), 0, logCount);
-
+		
 		fActivePage.activate(editor);
 		assertEquals(page, outline.getCurrentPage());
 		assertEquals(getMessage(), 0, logCount);
 	}
-
+	
 	/**
 	 * Create one editor.  Make sure hiding and showing it effects
 	 * the outline view, and that when hidden the outline view
 	 * reflects the default page.
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public void XXXtestOpenAndHideEditor6() throws Exception {
@@ -2837,28 +2736,28 @@ public class IWorkbenchPageTest extends UITestCase {
 		assertTrue(editor.getClass().getName().endsWith("CompilationUnitEditor"));
 		IEditorReference editorRef = (IEditorReference) fActivePage
 				.getReference(editor);
-
+		
 		ContentOutline outline = (ContentOutline) fActivePage.showView(IPageLayout.ID_OUTLINE);
 		IPage defaultPage = outline.getDefaultPage();
 		assertNotNull(defaultPage);
-
+		
 		processEvents();
 		IPage page = outline.getCurrentPage();
 		assertFalse(defaultPage==page);
-
+		
 		assertEquals(getMessage(), 0, logCount);
 		assertEquals(0, partHiddenCount);
 		fActivePage.addPartListener(partListener2);
 		fActivePage.hideEditor(editorRef);
 		processEvents();
-
+		
 		assertEquals(1, partHiddenCount);
 		assertEquals(editorRef, partHiddenRef);
-
+		
 		assertEquals(defaultPage, outline.getCurrentPage());
 		//assertEquals(page, outline.getCurrentPage());
 		assertEquals(getMessage(), 0, logCount);
-
+				
 		assertEquals(0, partVisibleCount);
 		fActivePage.showEditor(editorRef);
 		processEvents();
@@ -2866,7 +2765,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		assertEquals(getMessage(), 0, logCount);
 		assertEquals(1, partVisibleCount);
 		assertEquals(editorRef, partVisibleRef);
-
+		
 		fActivePage.activate(editor);
 		assertEquals(page, outline.getCurrentPage());
 		assertEquals(getMessage(), 0, logCount);
@@ -2875,7 +2774,7 @@ public class IWorkbenchPageTest extends UITestCase {
 	/**
 	 * Create one editor.  Make sure hiding the editor updates
 	 * the window title.
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public void XXXtestOpenAndHideEditor7() throws Exception {
@@ -2885,20 +2784,20 @@ public class IWorkbenchPageTest extends UITestCase {
 		assertTrue(editor.getClass().getName().endsWith("CompilationUnitEditor"));
 		IEditorReference editorRef = (IEditorReference) fActivePage
 				.getReference(editor);
-
+		
 		processEvents();
-
+		
 		String firstTitle = fWin.getShell().getText();
-
+		
 		assertEquals(getMessage(), 0, logCount);
 		assertEquals(0, partHiddenCount);
 		fActivePage.addPartListener(partListener2);
 		fActivePage.hideEditor(editorRef);
 		processEvents();
-
+		
 		assertEquals(1, partHiddenCount);
 		assertEquals(editorRef, partHiddenRef);
-
+				
 		String nextTitle = fWin.getShell().getText();
 		String tooltip = editor.getTitleToolTip();
 		assertNotNull(tooltip);
@@ -2906,7 +2805,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		assertEquals(2, split.length);
 		String nextTitleRebuilt = split[0] + "- " + tooltip + " -" + split[1];
 		assertEquals(firstTitle, nextTitleRebuilt);
-
+		
 		assertEquals(0, partVisibleCount);
 		fActivePage.showEditor(editorRef);
 		processEvents();
@@ -2915,15 +2814,15 @@ public class IWorkbenchPageTest extends UITestCase {
 		assertEquals(editorRef, partVisibleRef);
 		nextTitle = fWin.getShell().getText();
 		assertEquals(firstTitle, nextTitle);
-
+		
 		fActivePage.activate(editor);
 		assertEquals(getMessage(), 0, logCount);
 	}
-
+	
 	/**
 	 * Create one editor.  Make sure hiding the editor that is the active part
 	 * causes another part to become active.
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public void XXXtestOpenAndHideEditor8() throws Exception {
@@ -2933,16 +2832,16 @@ public class IWorkbenchPageTest extends UITestCase {
 		assertTrue(editor.getClass().getName().endsWith("CompilationUnitEditor"));
 		IEditorReference editorRef = (IEditorReference) fActivePage
 				.getReference(editor);
-
+		
 		ContentOutline outline = (ContentOutline) fActivePage.showView(IPageLayout.ID_OUTLINE);
 		IPage defaultPage = outline.getDefaultPage();
 		assertNotNull(defaultPage);
 		fActivePage.activate(editor);
-
+		
 		processEvents();
 		IPage page = outline.getCurrentPage();
 		assertFalse(defaultPage==page);
-
+		
 		partActiveCount = 0;
 		partActiveRef = null;
 		assertEquals(getMessage(), 0, logCount);
@@ -2950,21 +2849,21 @@ public class IWorkbenchPageTest extends UITestCase {
 		fActivePage.addPartListener(partListener2);
 		fActivePage.hideEditor(editorRef);
 		processEvents();
-
+		
 		assertEquals(1, partHiddenCount);
 		assertEquals(editorRef, partHiddenRef);
 		assertEquals(1, partActiveCount);
 		assertFalse(partActiveRef == editorRef);
-
+		
 		fActivePage.showEditor(editorRef);
-
+		
 		assertEquals(getMessage(), 0, logCount);
 	}
 
 	/**
 	 * Create a java editor.  Make a change.  Validate the enabled state
 	 * of some commands.
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public void XXXtestOpenAndHideEditor9() throws Exception {
@@ -2979,7 +2878,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		fActivePage.activate(editor);
 
 		processEvents();
-		ICommandService cs = fActivePage.getWorkbenchWindow()
+		ICommandService cs = (ICommandService) fActivePage.getWorkbenchWindow()
 				.getService(ICommandService.class);
 		Command undo = cs.getCommand("org.eclipse.ui.edit.undo");
 		assertTrue(undo.isDefined());
@@ -2991,26 +2890,52 @@ public class IWorkbenchPageTest extends UITestCase {
 				textEditor.getEditorInput());
 		doc.replace(0, 1, "  ");
 		fActivePage.saveEditor(editor, false);
-
+		
 		processEvents();
 		assertTrue(undo.isEnabled());
-
+		
 		assertEquals(getMessage(), 0, logCount);
 		fActivePage.hideEditor(editorRef);
 		processEvents();
 
 		assertFalse(undo.isEnabled());
-
+		
 		fActivePage.showEditor(editorRef);
-
+		
 		assertTrue(undo.isEnabled());
-
+		
 		assertEquals(getMessage(), 0, logCount);
 	}
 
 	/**
+	 * Create and hide a single editor, and check it is reflected in the
+	 * editor references.  Check that closing the hidden editor still works.
+	 * 
+	 * @throws Exception
+	 */
+	public void XXXtestOpenAndHideEditor10() throws Exception {
+		proj = FileUtil.createProject("testOpenAndHideEditor");
+		IFile file1 = FileUtil.createFile("a.mock1", proj);
+		IEditorPart editor = IDE.openEditor(fActivePage, file1);
+		assertTrue(editor instanceof MockEditorPart);
+		IEditorReference editorRef = (IEditorReference) fActivePage
+				.getReference(editor);
+		fActivePage.hideEditor(editorRef);
+		assertEquals(0, fActivePage.getEditorReferences().length);
+		fActivePage.showEditor(editorRef);
+		assertEquals(1, fActivePage.getEditorReferences().length);
+		fActivePage.hideEditor(editorRef);
+		processEvents();
+		fActivePage.closeAllEditors(false);
+		assertEquals(getMessage(), 0, logCount);
+		assertEquals(0, fActivePage.getEditorReferences().length);
+		((WorkbenchPage)fActivePage).resetHiddenEditors();
+		assertEquals(0, fActivePage.getEditorReferences().length);
+	}
+	
+	/**
 	 * Test opening multiple editors for an edge case: one input.
-	 *
+	 * 
 	 * openEditors(IWorkbenchPage page, IFile[] inputs)
 	 */
 	public void testOpenEditors1() throws Throwable {
@@ -3024,26 +2949,26 @@ public class IWorkbenchPageTest extends UITestCase {
 		assertNotNull(refs);
 		assertEquals(1, refs.length);
 		assertNotNull(refs[0]);
-
+		
 		// Check: the editor is materialized
 		IEditorPart editor0 = refs[0].getEditor(false);
 		assertNotNull(editor0);
-
+		
 		// Check: the first file corresponds to the active editor
 		assertEquals(fActivePage.getActiveEditor(), editor0);
 
 		// Check: created editor match its input
 		assertEquals(editor0.getSite().getId(), fWorkbench.getEditorRegistry()
 				.getDefaultEditor(inputs[0].getName()).getId());
-
+		
 		// Check: reference's title matches the file name
 		assertEquals(fileName0, refs[0].getTitle());
 	}
-
+	
 	/**
-	 * Test opening multiple editors for three inputs. Only first editor
+	 * Test opening multiple editors for three inputs. Only first editor 
 	 * should be materialized; it also should be the active editor.
-	 *
+	 * 
 	 * openEditors(IWorkbenchPage page, IFile[] inputs)
 	 */
 	public void testOpenEditors3() throws Throwable {
@@ -3063,90 +2988,90 @@ public class IWorkbenchPageTest extends UITestCase {
 		assertNotNull(refs[0]);
 		assertNotNull(refs[1]);
 		assertNotNull(refs[2]);
-
+		
 		// Check: the first file got an editor materialized, rest of the files did not
 		IEditorPart editor0 = refs[0].getEditor(false);
 		assertNotNull(editor0);
 		assertNull(refs[1].getEditor(false));
 		assertNull(refs[2].getEditor(false));
-
+		
 		// Check: the first file corresponds to the active editor
 		assertEquals(fActivePage.getActiveEditor(), editor0);
 
 		// Check: created editors match their inputs
 		assertEquals(editor0.getSite().getId(), fWorkbench.getEditorRegistry()
 				.getDefaultEditor(inputs[0].getName()).getId());
-
+		
 		// Check: rest of the editors can be materialized
 		IEditorPart editor1 = refs[1].getEditor(true);
 		assertNotNull(editor1);
-
+		
 		// Check: those editors match their inputs too
 		assertEquals(editor1.getSite().getId(), fWorkbench.getEditorRegistry()
 				.getDefaultEditor(inputs[1].getName()).getId());
-
+		
 		// Check: reference's title matches the file name
 		assertEquals(fileName1, refs[0].getTitle());
 		assertEquals(fileName2, refs[1].getTitle());
 		assertEquals(fileName3, refs[2].getTitle());
 	}
-
+	
 	/**
-	 * Test editor reuse when opening multiple editors. The internal editors
+	 * Test editor reuse when opening multiple editors. The internal editors 
 	 * with matching {id, input} should be reused.
-	 *
+	 * 
 	 * openEditors(IWorkbenchPage page, IFile[] inputs)
 	 */
 	public void XXXtestOpenEditorsReuse() throws Throwable {
 		proj = FileUtil.createProject("testOpenEditors");
-
+		
 		String fileName1 = "test1.txt";
 		String fileName2 = "test2.txt";
 		String fileName3 = "test3.txt";
 		int flag = IWorkbenchPage.MATCH_INPUT | IWorkbenchPage.MATCH_ID; // use both matches
-
+		
 		// open three files
 		IFile[] inputs = new IFile[3];
 		inputs[0] = FileUtil.createFile(fileName1, proj);
 		inputs[1] = FileUtil.createFile(fileName2, proj);
 		inputs[2] = FileUtil.createFile(fileName3, proj);
 		IEditorReference[] refs = IDE.openEditors(fActivePage, inputs);
-
+		
 		// open two of the same files in mixed order, 1st (materialized) and 3rd (not materialized)
 		String editorID = fWorkbench.getEditorRegistry().getDefaultEditor(inputs[0].getName()).getId();
-		IEditorInput[] inputs2 = new IEditorInput[] {
-				new FileEditorInput(inputs[1]),
+		IEditorInput[] inputs2 = new IEditorInput[] { 
+				new FileEditorInput(inputs[1]), 
 				new FileEditorInput(inputs[0]) };
 		String[] editorIDs2 = new String [] { editorID, editorID} ;
-
+		
 		IEditorReference[] refs2 = fActivePage.openEditors(inputs2, editorIDs2, flag);
 		assertNotNull(refs2);
 		assertEquals(2, refs2.length);
-
+		
 		// now input1 is materialized and has focus
 		IEditorPart editor = refs2[0].getEditor(false);
 		assertNotNull(editor);
 		assertEquals(fActivePage.getActiveEditor(), editor);
-
+		
 		// check that the same editor was created
 		assertEquals(refs2[0].getEditor(true), refs[1].getEditor(true));
 		assertEquals(refs2[1].getEditor(true), refs[0].getEditor(true));
-
+		
 		// open a file with different editor IDs, materialized (input0) and non-materialzed (input3)
 		String editorIDAlt = fWorkbench.getEditorRegistry().getDefaultEditor("abc.log").getId();
-		IEditorInput[] inputs3 = new IEditorInput[] {
-				new FileEditorInput(inputs[0]),
+		IEditorInput[] inputs3 = new IEditorInput[] { 
+				new FileEditorInput(inputs[0]), 
 				new FileEditorInput(inputs[2]) };
 		String[] editorIDs3 = new String [] { editorIDAlt, editorIDAlt} ;
-
+		
 		IEditorReference[] refs3 = fActivePage.openEditors(inputs3, editorIDs3, flag);
 		assertNotNull(refs3);
 		assertEquals(2, refs3.length);
-
+		
 		assertFalse(refs2[0].equals(refs[0]));
 		assertFalse(refs2[1].equals(refs[2]));
 	}
-
+	
 	/**
 	 * A generic test to validate IWorkbenchPage's
 	 * {@link IWorkbenchPage#setPartState(IWorkbenchPartReference, int)
@@ -3162,28 +3087,28 @@ public class IWorkbenchPageTest extends UITestCase {
 				.getReference(view);
 		fActivePage.setPartState(reference, IWorkbenchPage.STATE_MINIMIZED);
 
-		// since it's minimized
-		assertTrue("This view should be minimized", APITestUtils.isViewMinimized(reference));
+		// since it's minimized, it should be a fast view
+		assertTrue("A minimized view should be a fast view", APITestUtils.isFastView(reference));
 
 		// try to restore it
 		fActivePage.setPartState(reference, IWorkbenchPage.STATE_RESTORED);
-		// since it's maximized
-		assertFalse("This view should not be restored", APITestUtils.isViewMinimized(reference));
+		// since it's maximized, it should not be a fast view
+		assertFalse("A restored view should not be a fast view", APITestUtils.isFastView(reference));
 	}
 
 	/**
 	 * Create and hide a single editor in a new window.  Close the window.
 	 * Make sure there are no editor errors.
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public void XXXtestOpenAndHideEditor11() throws Exception {
 		proj = FileUtil.createProject("testOpenAndHideEditor");
 		IFile file1 = FileUtil.createFile("a.mock1", proj);
-
+		
 		IWorkbenchWindow window = openTestWindow();
 		IWorkbenchPage page = window.getActivePage();
-
+		
 		IEditorPart editor = IDE.openEditor(page, file1);
 		assertTrue(editor instanceof MockEditorPart);
 		IEditorReference editorRef = (IEditorReference) page
@@ -3200,4 +3125,30 @@ public class IWorkbenchPageTest extends UITestCase {
 		assertEquals(0, page.getEditorReferences().length);
 	}
 
+	/**
+	 * Create and hide a single editor.  Close it while it's hidden
+	 * and make sure that it doesn't die.
+	 * 
+	 * @throws Exception
+	 */
+	public void XXXtestOpenAndHideEditor12() throws Exception {
+		proj = FileUtil.createProject("testOpenAndHideEditor");
+		IFile file1 = FileUtil.createFile("a.mock1", proj);
+		IEditorPart editor = IDE.openEditor(fActivePage, file1);
+		assertTrue(editor instanceof MockEditorPart);
+		IEditorReference editorRef = (IEditorReference) fActivePage
+				.getReference(editor);
+		fActivePage.hideEditor(editorRef);
+		assertEquals(0, fActivePage.getEditorReferences().length);
+		fActivePage.showEditor(editorRef);
+		assertEquals(1, fActivePage.getEditorReferences().length);
+		fActivePage.hideEditor(editorRef);
+		processEvents();
+		fActivePage.closeEditor(editor, false);
+		processEvents();
+		((WorkbenchPage)fActivePage).resetHiddenEditors();
+		assertEquals(0, fActivePage.getEditorReferences().length);
+		assertEquals(getMessage(), 0, logCount);
+		assertEquals(0, fActivePage.getEditorReferences().length);
+	}
 }

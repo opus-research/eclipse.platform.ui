@@ -1,10 +1,10 @@
 /**
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
@@ -53,13 +53,13 @@ import org.eclipse.e4.ui.model.application.ui.menu.MTrimContributions;
  *
  * <p>
  * The following features are supported:
- * </p>
  * <ul>
  *   <li>{@link org.eclipse.e4.ui.model.application.MApplication#getCommands <em>Commands</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.MApplication#getAddons <em>Addons</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.MApplication#getCategories <em>Categories</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.MApplication#getDialogs <em>Dialogs</em>}</li>
  * </ul>
+ * </p>
  *
  * @model
  * @generated
@@ -84,14 +84,6 @@ public interface MApplication extends MElementContainer<MWindow>, MContext, MHan
 	 * @generated
 	 */
 	List<MCommand> getCommands();
-
-	/**
-	 * Returns the model element for the command identified via the elementId or
-	 * null if the element cannot be found
-	 *
-	 * @since 1.2
-	 */
-	MCommand getCommand(String elementId);
 
 	/**
 	 * Returns the value of the '<em><b>Addons</b></em>' containment reference list.

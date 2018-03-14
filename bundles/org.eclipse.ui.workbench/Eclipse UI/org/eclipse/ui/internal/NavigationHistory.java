@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -47,7 +47,7 @@ public class NavigationHistory implements INavigationHistory {
     private int ignoreEntries;
 
     private ArrayList history = new ArrayList(CAPACITY);
-
+    
     Map perTabHistoryMap = new HashMap();
 
     private ArrayList editors = new ArrayList(CAPACITY);
@@ -58,7 +58,7 @@ public class NavigationHistory implements INavigationHistory {
 
 	/**
 	 * Creates a new NavigationHistory to keep the NavigationLocation entries of the specified page.
-	 *
+	 * 
 	 * @param page the workbench page
 	 */
     public NavigationHistory(final IWorkbenchPage page) {
@@ -79,11 +79,11 @@ public class NavigationHistory implements INavigationHistory {
             @Override
 			public void partOpened(IWorkbenchPartReference partRef) {
             }
-
+			
             @Override
 			public void partHidden(IWorkbenchPartReference partRef) {
             }
-
+			
             @Override
 			public void partVisible(IWorkbenchPartReference partRef) {
             }
@@ -99,12 +99,12 @@ public class NavigationHistory implements INavigationHistory {
             	}
 				updateNavigationHistory(partRef, true);
             }
-
+			
 			@Override
 			public void partInputChanged(IWorkbenchPartReference partRef) {
 				updateNavigationHistory(partRef, false);
 			}
-
+			
 			private void updateNavigationHistory(IWorkbenchPartReference partRef, boolean partClosed) {
                 if (partRef != null && partRef.getPart(false) instanceof IEditorPart) {
                     IEditorPart editor = (IEditorPart) partRef.getPart(false);
@@ -158,14 +158,14 @@ public class NavigationHistory implements INavigationHistory {
                             }
 						}
                     }
-
+                    
                     /*
                      * Promote the entry of the last closed editor to be the active
                      * one, see: https://bugs.eclipse.org/bugs/show_bug.cgi?id=154431
                      */
                     if (!isEntryDisposed && page.getActiveEditor() == null && activeEntry < history.size())
                     	activeEntry++;
-
+                    
                     updateActions();
                 }
             }
@@ -175,7 +175,7 @@ public class NavigationHistory implements INavigationHistory {
     private Display getDisplay() {
         return page.getWorkbenchWindow().getShell().getDisplay();
     }
-
+    
     private boolean isPerTabHistoryEnabled() {
 		return false;
     }
@@ -212,6 +212,10 @@ public class NavigationHistory implements INavigationHistory {
         });
     }
 
+    /*
+     * (non-Javadoc)
+     * Method declared on INavigationHistory.
+     */
     @Override
 	public void markLocation(IEditorPart part) {
         addEntry(part);
@@ -258,6 +262,10 @@ public class NavigationHistory implements INavigationHistory {
         return entries;
     }
 
+    /*
+     * (non-Javadoc)
+     * Method declared on INavigationHistory.
+     */
     @Override
 	public INavigationLocation[] getLocations() {
         INavigationLocation result[] = new INavigationLocation[history.size()];
@@ -268,6 +276,10 @@ public class NavigationHistory implements INavigationHistory {
         return result;
     }
 
+    /*
+     * (non-Javadoc)
+     * Method declared on INavigationHistory.
+     */
     @Override
 	public INavigationLocation getCurrentLocation() {
         NavigationHistoryEntry entry = getEntry(activeEntry);
@@ -691,18 +703,18 @@ public class NavigationHistory implements INavigationHistory {
         }
         editors.remove(dup);
     }
-
+    
     /*********************************************************/
     /*** new per-tab history code                          ***/
     /*********************************************************/
-
-
+    
+    
     private static class PerTabHistory {
     	LinkedList backwardEntries = new LinkedList();
     	NavigationHistoryEntry currentEntry = null;
     	LinkedList forwardEntries = new LinkedList();
     }
-
+    
     private void setNewCurrentEntryForTab(PerTabHistory perTabHistory, NavigationHistoryEntry entry) {
     	if (perTabHistory.currentEntry != null) {
     		perTabHistory.backwardEntries.addFirst(perTabHistory.currentEntry);
@@ -710,7 +722,7 @@ public class NavigationHistory implements INavigationHistory {
     	perTabHistory.currentEntry = entry;
     	removeEntriesForTab(perTabHistory.forwardEntries);
     }
-
+    
     private Object getCookieForTab(IEditorPart part) {
     	if (part != null) {
 	        IWorkbenchPartSite site = part.getSite();
@@ -724,7 +736,7 @@ public class NavigationHistory implements INavigationHistory {
     	}
     	return null;
     }
-
+    
     private void markLocationForTab(IEditorPart part) {
     	if (part instanceof ErrorEditorPart) {
     		updateActions();
@@ -758,7 +770,7 @@ public class NavigationHistory implements INavigationHistory {
 		}
 		updateActions();
 	}
-
+    
     public void updateCookieForTab(Object oldCookie, Object newCookie) {
     	if (newCookie.equals(oldCookie)) {
     		return;
@@ -768,7 +780,7 @@ public class NavigationHistory implements INavigationHistory {
     		perTabHistoryMap.put(newCookie, perTabHistory);
     	}
     }
-
+    
     private void gotoEntryForTab(NavigationHistoryEntry target, boolean forward) {
     	Object editorTabCookie = getCookieForTab(page.getActiveEditor());
     	if (editorTabCookie!=null) {
@@ -808,7 +820,7 @@ public class NavigationHistory implements INavigationHistory {
 	    	}
     	}
     }
-
+    
 	private void forwardForTab() {
     	Object editorTabCookie = getCookieForTab(page.getActiveEditor());
     	if (editorTabCookie!=null) {
@@ -838,7 +850,7 @@ public class NavigationHistory implements INavigationHistory {
 	    	}
     	}
     }
-
+    
     private void backwardForTab() {
     	Object editorTabCookie = getCookieForTab(page.getActiveEditor());
     	if (editorTabCookie!=null) {
@@ -865,7 +877,7 @@ public class NavigationHistory implements INavigationHistory {
 	    	}
     	}
     }
-
+    
     private boolean hasEntriesForTab(boolean forward) {
     	Object editorTabCookie = getCookieForTab(page.getActiveEditor());
     	if (editorTabCookie!=null) {
@@ -880,7 +892,7 @@ public class NavigationHistory implements INavigationHistory {
 
 	/**
 	 * Returns entries in restore order.
-	 *
+	 * 
 	 * @param forward <code>true</code> for forward and <code>false</code> for backward history
 	 * @return the navigation history entries
 	 */
@@ -898,7 +910,7 @@ public class NavigationHistory implements INavigationHistory {
 		}
 		return new NavigationHistoryEntry[0];
 	}
-
+    
     private void disposeHistoryForTabs() {
     	Object[] keys = perTabHistoryMap.keySet().toArray();
     	for (int i = 0; i < keys.length; i++) {
@@ -934,7 +946,7 @@ public class NavigationHistory implements INavigationHistory {
         IWorkbenchPartSite site = editor.getSite();
         if (site == null) // might happen if site has not being initialized yet
         	return false;
-        String editorID = site.getId();
+        String editorID = site.getId(); 
         if (editorID == null) // should not happen for an editor
         	return false;
         if (!editorID.equals(e.editorInfo.editorID))

@@ -8,19 +8,15 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440893
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 436344
  *******************************************************************************/
 package org.eclipse.e4.ui.bindings.tests;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+
+import junit.framework.TestCase;
 
 import org.eclipse.core.commands.Category;
 import org.eclipse.core.commands.Command;
@@ -36,10 +32,8 @@ import org.eclipse.e4.ui.bindings.internal.ContextSet;
 import org.eclipse.jface.bindings.Binding;
 import org.eclipse.jface.bindings.keys.KeyBinding;
 import org.eclipse.jface.bindings.keys.KeySequence;
-import org.junit.Before;
-import org.junit.Test;
 
-public class BindingTableTests {
+public class BindingTableTests extends TestCase {
 	private static final String ID_DIALOG = "org.eclipse.ui.contexts.dialog";
 	private static final String ID_DIALOG_AND_WINDOW = "org.eclipse.ui.contexts.dialogAndWindow";
 	private static final String ID_WINDOW = "org.eclipse.ui.contexts.window";
@@ -86,12 +80,12 @@ public class BindingTableTests {
 	static ContextManager contextManager = null;
 	static IEclipseContext workbenchContext;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		if (loadedBindings == null) {
 			IEclipseContext globalContext = Activator.getDefault().getGlobalContext();
 			workbenchContext = globalContext.createChild("workbenchContext");
-			loadedBindings = new ArrayList<>();
+			loadedBindings = new ArrayList<Binding>();
 			contextManager = new ContextManager();
 			ContextSet.setComparator(new ContextSet.CComp(contextManager));
 			for (int i = 0; i < CONTEXTS.length; i += 3) {
@@ -117,7 +111,6 @@ public class BindingTableTests {
 		}
 	}
 
-	@Test
 	public void testOneTable() throws Exception {
 		Binding about = getTestBinding(ABOUT_ID);
 		KeySequence aboutSeq = KeySequence.getInstance("CTRL+5 A");
@@ -142,7 +135,6 @@ public class BindingTableTests {
 		assertEquals(about, ((ArrayList<Binding>) partialMatches).get(0));
 	}
 
-	@Test
 	public void testTwoKeysOneCommand() throws Exception {
 		BindingTable table = loadTable(ID_WINDOW);
 		Binding paste = getTestBinding(PASTE_ID);
@@ -156,8 +148,7 @@ public class BindingTableTests {
 		assertEquals(pasteCmd, match2.getParameterizedCommand());
 	}
 
-	@Test
-	public void testLookupShortcut() {
+	public void testLookupShortcut() throws Exception {
 		BindingTable table = loadTable(ID_WINDOW);
 		Binding paste = getTestBinding(PASTE_ID);
 
@@ -166,7 +157,6 @@ public class BindingTableTests {
 		assertEquals(paste, match);
 	}
 
-	@Test
 	public void testLookupShortcuts() throws Exception {
 		BindingTable table = loadTable(ID_WINDOW);
 		Binding paste = getTestBinding(PASTE_ID);
@@ -181,7 +171,6 @@ public class BindingTableTests {
 		assertEquals(second, it.next().getTriggerSequence());
 	}
 
-	@Test
 	public void testPartialMatch() throws Exception {
 		BindingTable table = loadTable(ID_DIALOG_AND_WINDOW);
 		KeySequence ctrl5 = KeySequence.getInstance("CTRL+5");
@@ -190,11 +179,10 @@ public class BindingTableTests {
 		assertFalse(table.isPartialMatch(ctrl8));
 	}
 
-	@Test
-	public void testContextSet() {
+	public void testContextSet() throws Exception {
 		BindingTableManager manager = ContextInjectionFactory
 				.make(BindingTableManager.class, workbenchContext);
-		ArrayList<Context> window = new ArrayList<>();
+		ArrayList<Context> window = new ArrayList<Context>();
 		Context winContext = contextManager.getContext(ID_WINDOW);
 		Context dawContext = contextManager.getContext(ID_DIALOG_AND_WINDOW);
 		window.add(winContext);
@@ -203,7 +191,7 @@ public class BindingTableTests {
 		assertContextSet(windowSet, new String[] { ID_DIALOG_AND_WINDOW,
 				ID_WINDOW });
 
-		ArrayList<Context> text = new ArrayList<>(window);
+		ArrayList<Context> text = new ArrayList<Context>(window);
 		Context textContext = contextManager.getContext(ID_TEXT);
 		text.add(textContext);
 		ContextSet textSet = manager.createContextSet(text);
@@ -211,11 +199,10 @@ public class BindingTableTests {
 				ID_WINDOW, ID_TEXT });
 	}
 
-	@Test
-	public void testContextSetSibling() {
+	public void testContextSetSibling() throws Exception {
 		BindingTableManager manager = ContextInjectionFactory
 				.make(BindingTableManager.class, workbenchContext);
-		ArrayList<Context> all = new ArrayList<>();
+		ArrayList<Context> all = new ArrayList<Context>();
 		for (int i = 0; i < CONTEXTS.length; i += 3) {
 			Context context = contextManager.getContext(CONTEXTS[i]);
 			all.add(context);
@@ -224,8 +211,7 @@ public class BindingTableTests {
 		assertContextSet(set, ORDERED_IDS);
 	}
 
-	@Test
-	public void testSingleParentChainPerfectMatch() {
+	public void testSingleParentChainPerfectMatch() throws Exception {
 		BindingTableManager manager = ContextInjectionFactory
 				.make(BindingTableManager.class, workbenchContext);
 
@@ -233,14 +219,14 @@ public class BindingTableTests {
 		manager.addTable(loadTable(ID_WINDOW));
 		manager.addTable(loadTable(ID_TEXT));
 
-		ArrayList<Context> window = new ArrayList<>();
+		ArrayList<Context> window = new ArrayList<Context>();
 		Context winContext = contextManager.getContext(ID_WINDOW);
 		Context dawContext = contextManager.getContext(ID_DIALOG_AND_WINDOW);
 		window.add(winContext);
 		window.add(dawContext);
 		ContextSet windowSet = manager.createContextSet(window);
 
-		ArrayList<Context> text = new ArrayList<>(window);
+		ArrayList<Context> text = new ArrayList<Context>(window);
 		Context textContext = contextManager.getContext(ID_TEXT);
 		text.add(textContext);
 		ContextSet textSet = manager.createContextSet(text);
@@ -262,7 +248,6 @@ public class BindingTableTests {
 		assertEquals(about, match);
 	}
 
-	@Test
 	public void testSiblingsPerfectMatch() throws Exception {
 		BindingTableManager manager = createManager();
 
@@ -271,7 +256,7 @@ public class BindingTableTests {
 
 		assertEquals(correctIndent.getTriggerSequence(), indentLine
 				.getTriggerSequence());
-		ArrayList<Context> all = new ArrayList<>();
+		ArrayList<Context> all = new ArrayList<Context>();
 		for (int i = 0; i < CONTEXTS.length; i += 3) {
 			Context context = contextManager.getContext(CONTEXTS[i]);
 			all.add(context);
@@ -282,7 +267,6 @@ public class BindingTableTests {
 		assertEquals(indentLine, match);
 	}
 
-	@Test
 	public void testOneSiblingAtATimePerfectMatch() throws Exception {
 		BindingTableManager manager = createManager();
 
@@ -293,7 +277,7 @@ public class BindingTableTests {
 
 		ContextSet javaSet = createJavaSet(manager);
 
-		ArrayList<Context> jsList = new ArrayList<>();
+		ArrayList<Context> jsList = new ArrayList<Context>();
 		for (int i = 0; i < CONTEXTS.length; i += 3) {
 			Context context = contextManager.getContext(CONTEXTS[i]);
 			if (!ID_JAVA.equals(context.getId())) {
@@ -311,12 +295,11 @@ public class BindingTableTests {
 		assertEquals(indentLine, match);
 	}
 
-	@Test
 	public void testManagerLookupShortcut() throws Exception {
 		BindingTableManager manager = createManager();
 		Binding paste = getTestBinding(PASTE_ID);
 
-		ArrayList<Context> window = new ArrayList<>();
+		ArrayList<Context> window = new ArrayList<Context>();
 		Context winContext = contextManager.getContext(ID_WINDOW);
 		Context dawContext = contextManager.getContext(ID_DIALOG_AND_WINDOW);
 		window.add(winContext);
@@ -328,7 +311,6 @@ public class BindingTableTests {
 		assertEquals(paste, match);
 	}
 
-	@Test
 	public void testManagerLookupShortcutLongChain() throws Exception {
 		BindingTableManager manager = createManager();
 		Binding paste = getTestBinding(PASTE_ID);
@@ -340,7 +322,6 @@ public class BindingTableTests {
 		assertEquals(paste, match);
 	}
 
-	@Test
 	public void testManagerLookupAllShortcuts() throws Exception {
 		BindingTableManager manager = createManager();
 		Binding paste = getTestBinding(PASTE_ID);
@@ -359,7 +340,6 @@ public class BindingTableTests {
 		assertEquals(third, it.next().getTriggerSequence());
 	}
 
-	@Test
 	public void testManagerPartialMatch() throws Exception {
 		BindingTableManager manager = createManager();
 		Binding about = getTestBinding(ABOUT_ID);
@@ -422,7 +402,7 @@ public class BindingTableTests {
 	}
 
 	private ContextSet createJavaSet(BindingTableManager manager) {
-		ArrayList<Context> javaList = new ArrayList<>();
+		ArrayList<Context> javaList = new ArrayList<Context>();
 		for (int i = 0; i < CONTEXTS.length; i += 3) {
 			if (CONTEXTS[i].equals(ID_JS) || CONTEXTS[i].equals(ID_DIALOG)) {
 				continue;

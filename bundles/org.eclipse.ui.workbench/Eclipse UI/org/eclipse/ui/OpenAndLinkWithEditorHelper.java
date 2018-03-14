@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2016 IBM Corporation and others.
+ * Copyright (c) 2008, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,7 @@ import org.eclipse.jface.viewers.StructuredViewer;
 
 /**
  * Helper for opening editors on the viewer's selection and link the selection with the editor.
- *
+ * 
  * @since 3.5
  */
 public abstract class OpenAndLinkWithEditorHelper {
@@ -73,7 +73,7 @@ public abstract class OpenAndLinkWithEditorHelper {
 
 	/**
 	 * Creates a new helper for the given viewer.
-	 *
+	 * 
 	 * @param viewer the viewer
 	 */
 	public OpenAndLinkWithEditorHelper(StructuredViewer viewer) {
@@ -87,7 +87,7 @@ public abstract class OpenAndLinkWithEditorHelper {
 
 	/**
 	 * Sets whether editor that corresponds to the viewer's selection should be brought to front.
-	 *
+	 * 
 	 * @param enabled <code>true</code> to enable, <code>false</code> to disable
 	 */
 	public void setLinkWithEditor(boolean enabled) {
@@ -112,7 +112,7 @@ public abstract class OpenAndLinkWithEditorHelper {
 	 * <p>
 	 * <strong>Note:</strong> The implementation must not open a new editor.
 	 * </p>
-	 *
+	 * 
 	 * @param selection the viewer's selection
 	 * @since 3.5
 	 */
@@ -120,7 +120,7 @@ public abstract class OpenAndLinkWithEditorHelper {
 
 	/**
 	 * Tells to open an editor for the given selection.
-	 *
+	 * 
 	 * @param selection the viewer's selection
 	 * @param activate <code>true</code> if the editor should be activated, <code>false</code>
 	 *            otherwise
@@ -141,7 +141,7 @@ public abstract class OpenAndLinkWithEditorHelper {
 	 * <p>
 	 * The default implementation does nothing i.e. does not implement linking.
 	 * </p>
-	 *
+	 * 
 	 * @param selection
 	 *            the viewer's selection
 	 * @since 3.5, non-abstract since 4.3

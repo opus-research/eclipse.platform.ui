@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,13 +10,9 @@
  ******************************************************************************/
 package org.eclipse.e4.ui.tests.workbench;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import junit.framework.TestCase;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
@@ -29,14 +25,14 @@ import org.eclipse.e4.core.di.extensions.EventUtils;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.tests.Activator;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.swt.widgets.Display;
-import org.junit.Before;
-import org.junit.Test;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
 import org.osgi.service.event.EventAdmin;
 
-public class InjectionEventTest {
+public class InjectionEventTest extends TestCase {
 
 	static protected boolean testFailed = false;
 
@@ -119,14 +115,18 @@ public class InjectionEventTest {
 
 	private EventAdminHelper helper;
 
-	@Before
-	public void setUp() throws Exception {
-		BundleContext bundleContext = Activator.getDefault().getBundle().getBundleContext();
-		IEclipseContext localContext = EclipseContextFactory.getServiceContext(bundleContext);
-		helper = ContextInjectionFactory.make(EventAdminHelper.class, localContext);
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+		ensureEventAdminStarted();
+		BundleContext bundleContext = Activator.getDefault().getBundle()
+				.getBundleContext();
+		IEclipseContext localContext = EclipseContextFactory
+				.getServiceContext(bundleContext);
+		helper = ContextInjectionFactory.make(EventAdminHelper.class,
+				localContext);
 	}
 
-	@Test
 	public void testEventInjection() {
 		IInjector injector = InjectorFactory.getDefault();
 		injector.addBinding(MyBinding.class);
@@ -134,15 +134,13 @@ public class InjectionEventTest {
 		IEclipseContext context = EclipseContextFactory.create();
 		final Display d = Display.getDefault();
 
-		context.set(Realm.class, DisplayRealm.getRealm(d));
+		context.set(Realm.class, SWTObservables.getRealm(d));
 		context.set(UISynchronize.class, new UISynchronize() {
 
-			@Override
 			public void syncExec(Runnable runnable) {
 				d.syncExec(runnable);
 			}
 
-			@Override
 			public void asyncExec(Runnable runnable) {
 				d.asyncExec(runnable);
 			}
@@ -208,7 +206,6 @@ public class InjectionEventTest {
 	// NOTE: this test relies on GC being actually done on the test object.
 	// Java does not guarantee that to happen, so, if this test starts to fail
 	// intermittently, feel free to comment it
-	@Test
 	public void testEventInjectionUnsubscribe() {
 		IInjector injector = InjectorFactory.getDefault();
 		injector.addBinding(MyBinding.class);
@@ -222,20 +219,17 @@ public class InjectionEventTest {
 									// subscribed
 	}
 
-	@Test
 	public void testInjectWildCard() {
 		IEclipseContext context = EclipseContextFactory.create();
 		final Display d = Display.getDefault();
 
-		context.set(Realm.class, DisplayRealm.getRealm(d));
+		context.set(Realm.class, SWTObservables.getRealm(d));
 		context.set(UISynchronize.class, new UISynchronize() {
 
-			@Override
 			public void syncExec(Runnable runnable) {
 				d.syncExec(runnable);
 			}
 
-			@Override
 			public void asyncExec(Runnable runnable) {
 				d.asyncExec(runnable);
 			}
@@ -266,4 +260,21 @@ public class InjectionEventTest {
 		target.valid = false;
 	}
 
+	private void ensureEventAdminStarted() {
+		if (Activator.getDefault().getEventAdmin() == null) {
+			Bundle[] bundles = Activator.getDefault().getBundle()
+					.getBundleContext().getBundles();
+			for (Bundle bundle : bundles) {
+				if (!"org.eclipse.equinox.event".equals(bundle
+						.getSymbolicName()))
+					continue;
+				try {
+					bundle.start(Bundle.START_TRANSIENT);
+				} catch (BundleException e) {
+					e.printStackTrace();
+				}
+				break;
+			}
+		}
+	}
 }

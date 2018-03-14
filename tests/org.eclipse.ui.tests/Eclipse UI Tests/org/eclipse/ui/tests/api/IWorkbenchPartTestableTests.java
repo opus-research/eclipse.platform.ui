@@ -28,7 +28,7 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class IWorkbenchPartTestableTests extends UITestCase {
 
@@ -78,15 +78,18 @@ public class IWorkbenchPartTestableTests extends UITestCase {
 	 * @param encounteredControls
 	 */
 	private void testParts(Object[] parts, Set encounteredControls) {
-		for (Object part : parts) {
+		for (int i = 0; i < parts.length; i++) {
 			String title = null;
 			IWorkbenchPartTestable testable = null;
 			if (parts instanceof IWorkbenchPart[]) {
-				testable = ((IWorkbenchPart) part).getSite().getAdapter(IWorkbenchPartTestable.class);
-				title = ((IWorkbenchPart) part).getTitle();
+				testable = (IWorkbenchPartTestable) ((IWorkbenchPart) parts[i])
+						.getSite().getAdapter(IWorkbenchPartTestable.class);
+				title = ((IWorkbenchPart) parts[i]).getTitle();
 			} else {
-				testable = ((IIntroPart) part).getIntroSite().getAdapter(IWorkbenchPartTestable.class);
-				title = ((IIntroPart) part).getTitle();
+				testable = (IWorkbenchPartTestable) ((IIntroPart) parts[i])
+						.getIntroSite()
+						.getAdapter(IWorkbenchPartTestable.class);
+				title = ((IIntroPart) parts[i]).getTitle();
 			}
 			assertNotNull(title + " has null testable", testable);
 			assertTrue(title + " has previously encountered control",

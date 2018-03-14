@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 IBM Corporation and others.
+ * Copyright (c) 2013, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,8 +11,6 @@
 
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -25,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import junit.framework.TestCase;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.core.resources.IResourcesRegistry;
@@ -38,15 +37,12 @@ import org.eclipse.e4.ui.workbench.renderers.swt.WBWRenderer.ThemeDefinitionChan
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Resource;
-import org.junit.Test;
 import org.osgi.service.event.Event;
 
 /**
  *
  */
-public class ThemeDefinitionChangedHandlerTest {
-
-	@Test
+public class ThemeDefinitionChangedHandlerTest extends TestCase {
 	public void testHandleEventWhenThemeChanged() throws Exception {
 		// given
 		final MApplication application = ApplicationFactoryImpl.eINSTANCE
@@ -102,7 +98,6 @@ public class ThemeDefinitionChangedHandlerTest {
 		verify(resource2, never()).dispose();
 	}
 
-	@Test
 	public void testHandleEventWhenElementIsNotMApplication() throws Exception {
 		// given
 		HashMap<String, Object> params = new HashMap<String, Object>();
@@ -124,7 +119,6 @@ public class ThemeDefinitionChangedHandlerTest {
 		assertEquals(0, handler.getUnusedResources().size());
 	}
 
-	@Test
 	public void testHandleEventWhenCSSEngineNotFoundForWidget()
 			throws Exception {
 		// given
@@ -159,7 +153,6 @@ public class ThemeDefinitionChangedHandlerTest {
 		assertEquals(0, handler.getUnusedResources().size());
 	}
 
-	@Test
 	public void testDisposeHandler() throws Exception {
 		// given
 		ThemeDefinitionChangedHandlerTestable handler = spy(new ThemeDefinitionChangedHandlerTestable());

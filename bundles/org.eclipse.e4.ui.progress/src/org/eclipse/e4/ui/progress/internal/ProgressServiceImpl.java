@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Philipp Bumann <bumannp@gmail.com> - Bug 477602
  ******************************************************************************/
 
 package org.eclipse.e4.ui.progress.internal;
@@ -47,13 +46,13 @@ import org.eclipse.swt.widgets.Shell;
 public class ProgressServiceImpl implements IProgressService {
 
 	private static final String IMAGE_KEY = "org.eclipse.ui.progress.images"; //$NON-NLS-1$
-
-	private Hashtable<Object, String> imageKeyTable = new Hashtable<>();
-
+	
+	private Hashtable<Object, String> imageKeyTable = new Hashtable<Object, String>();
+	
 	@Inject
 	@Optional
 	ProgressManager progressManager;
-
+	
 	@Inject
 	@Optional
 	FinishedJobs finishedJobs;
@@ -65,7 +64,7 @@ public class ProgressServiceImpl implements IProgressService {
 	@Inject
 	@Optional
 	UISynchronize uiSynchronize;
-
+	
 	@Override
 	public int getLongOperationTime() {
 		return 800;
@@ -91,7 +90,6 @@ public class ProgressServiceImpl implements IProgressService {
 				context,
 				runnable, rule);
 		uiSynchronize.syncExec(new Runnable() {
-			@Override
 			public void run() {
 				BusyIndicator.showWhile(getDisplay(), runnableWithStatus);
 			}
@@ -116,12 +114,18 @@ public class ProgressServiceImpl implements IProgressService {
 		while (families.hasMoreElements()) {
 			Object next = families.nextElement();
 			if (job.belongsTo(next)) {
-				return JFaceResources.getImageRegistry().get(imageKeyTable.get(next));
+				return JFaceResources.getImageRegistry().get(
+						(String) imageKeyTable.get(next));
 			}
 		}
 		return null;
 	}
 
+	/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.progress.IProgressService#busyCursorWhile(org.eclipse.jface.operation.IRunnableWithProgress)
+		 */
 	@Override
 	public void busyCursorWhile(final IRunnableWithProgress runnable)
 			throws InvocationTargetException, InterruptedException {
@@ -133,7 +137,6 @@ public class ProgressServiceImpl implements IProgressService {
 		final InterruptedException[] interrupt = new InterruptedException[1];
 		// show a busy cursor until the dialog opens
 		Runnable dialogWaitRunnable = new Runnable() {
-			@Override
 			public void run() {
 				try {
 					dialog.setOpenOnRun(false);
@@ -157,7 +160,12 @@ public class ProgressServiceImpl implements IProgressService {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.operation.IRunnableContext#run(boolean, boolean,
+	 *      org.eclipse.jface.operation.IRunnableWithProgress)
+	 */
 	public void run(boolean fork, boolean cancelable,
 			IRunnableWithProgress runnable) throws InvocationTargetException,
 			InterruptedException {
@@ -172,8 +180,14 @@ public class ProgressServiceImpl implements IProgressService {
 
 		busyCursorWhile(runnable);
 	}
-
-
+	
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.progress.IProgressService#showInDialog(org.eclipse.swt.widgets.Shell,
+	 *      org.eclipse.core.runtime.jobs.Job)
+	 */
 	@Override
 	public void showInDialog(Shell shell, Job job) {
 		if (shouldRunInBackground()) {
@@ -185,16 +199,16 @@ public class ProgressServiceImpl implements IProgressService {
 		        finishedJobs);
 		dialog.show(job, shell);
 	}
-
+	
 	/**
 	 * Return whether or not dialogs should be run in the background
-	 *
+	 * 
 	 * @return <code>true</code> if the dialog should not be shown.
 	 */
 	protected boolean shouldRunInBackground() {
 		return Preferences.getBoolean(IProgressConstants.RUN_IN_BACKGROUND);
 	}
-
+	
 	private class RunnableWithStatus implements Runnable {
 
 		IStatus status = Status.OK_STATUS;
@@ -209,7 +223,6 @@ public class ProgressServiceImpl implements IProgressService {
 			this.rule = rule;
 		}
 
-		@Override
 		public void run() {
 			IJobManager manager = Job.getJobManager();
 			try {
@@ -232,7 +245,7 @@ public class ProgressServiceImpl implements IProgressService {
 		/**
 		 * Get a progress monitor that forwards to an event loop monitor.
 		 * Override #setBlocked() so that we always open the blocked dialog.
-		 *
+		 * 
 		 * @return the monitor on the event loop
 		 */
 		private IProgressMonitor getEventLoopMonitor() {
@@ -242,7 +255,6 @@ public class ProgressServiceImpl implements IProgressService {
 
 			return new EventLoopProgressMonitor(new NullProgressMonitor()) {
 
-				@Override
 				public void setBlocked(IStatus reason) {
 
 					// Set a shell to open with as we want to create
@@ -260,11 +272,11 @@ public class ProgressServiceImpl implements IProgressService {
 		}
 
 	}
-
+	
 	/**
 	 * Show the busy cursor while the runnable is running. Schedule a job to
 	 * replace it with a progress dialog.
-	 *
+	 * 
 	 * @param dialogWaitRunnable
 	 * @param dialog
 	 */
@@ -282,7 +294,7 @@ public class ProgressServiceImpl implements IProgressService {
 
 	/**
 	 * Schedule the job that will open the progress monitor dialog
-	 *
+	 * 
 	 * @param dialog
 	 *            the dialog to open
 	 */
@@ -291,7 +303,11 @@ public class ProgressServiceImpl implements IProgressService {
 
 		final Job updateJob = new UIJob(
 				ProgressMessages.ProgressManager_openJobName) {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
+			 */
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				setUserInterfaceActive(true);
 				if (ProgressManagerUtil.safeToOpen(dialog, null)) {
@@ -308,7 +324,7 @@ public class ProgressServiceImpl implements IProgressService {
 	/**
 	 * Iterate through all of the windows and set them to be disabled or enabled
 	 * as appropriate.'
-	 *
+	 * 
 	 * @param active
 	 *            The set the windows will be set to.
 	 */
@@ -329,7 +345,7 @@ public class ProgressServiceImpl implements IProgressService {
 			}
 		}
 	}
-
+	
 	protected Display getDisplay() {
 		return Services.getInstance().getDisplay();
 	}

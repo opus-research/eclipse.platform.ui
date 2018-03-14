@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -212,7 +212,7 @@ class FiltersDialog extends TrayDialog {
 
         /**
          * Creates the working set filter selection widgets.
-         *
+         * 
          * @param parent the parent composite of the working set widgets
          */
         WorkingSetGroup(Composite parent) {
@@ -234,7 +234,7 @@ class FiltersDialog extends TrayDialog {
 
 		/**
 		 * Returns whether or not a working set filter should be used
-		 *
+		 * 
 		 * @return true=a working set filter should be used false=a working set filter should not be
 		 *         used
 		 */
@@ -245,7 +245,7 @@ class FiltersDialog extends TrayDialog {
         /**
          * Returns the selected working set filter or null if none
          * is selected.
-         *
+         * 
          * @return the selected working set filter or null if none
          * 	is selected.
          */
@@ -255,7 +255,7 @@ class FiltersDialog extends TrayDialog {
 
         /**
          * Sets the working set filter selection.
-         *
+         * 
          * @param selected true=a working set filter should be used
          * 	false=no working set filter should be used
          */
@@ -296,7 +296,7 @@ class FiltersDialog extends TrayDialog {
 
         /**
          * Sets the specified working set.
-         *
+         * 
          * @param workingSet the working set
          */
         void setWorkingSet(IWorkingSet workingSet) {
@@ -340,17 +340,20 @@ class FiltersDialog extends TrayDialog {
     private Text markerLimit;
 
     SelectionListener selectionListener = new SelectionAdapter() {
-        @Override
-		public void widgetSelected(SelectionEvent e) {
+        public void widgetSelected(SelectionEvent e) {
             FiltersDialog.this.widgetSelected(e);
         }
     };
 
-    private ICheckStateListener checkStateListener = event -> FiltersDialog.this.checkStateChanged(event);
+    private ICheckStateListener checkStateListener = new ICheckStateListener() {
+        public void checkStateChanged(CheckStateChangedEvent event) {
+            FiltersDialog.this.checkStateChanged(event);
+        }
+    };
 
     /**
      * Creates a new filters dialog.
-     *
+     * 
      * @param parentShell the parent shell
      */
     public FiltersDialog(Shell parentShell) {
@@ -358,8 +361,10 @@ class FiltersDialog extends TrayDialog {
         initTypes();
     }
 
-    @Override
-	protected void buttonPressed(int buttonId) {
+    /* (non-Javadoc)
+     * Method declared on Dialog.
+     */
+    protected void buttonPressed(int buttonId) {
         if (RESET_ID == buttonId) {
             resetPressed();
         } else if (SELECT_ID == buttonId) {
@@ -371,7 +376,7 @@ class FiltersDialog extends TrayDialog {
 
     /**
      * Check state change.
-     *
+     * 
      * @param event the event
      */
     public void checkStateChanged(CheckStateChangedEvent event) {
@@ -384,8 +389,10 @@ class FiltersDialog extends TrayDialog {
         updateEnabledState();
     }
 
-    @Override
-	protected void configureShell(Shell newShell) {
+    /* (non-Javadoc)
+     * Method declared on Window.
+     */
+    protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
         newShell.setText(TaskListMessages.TaskList_filter);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(newShell,
@@ -423,8 +430,7 @@ class FiltersDialog extends TrayDialog {
         reset.setData(new Integer(RESET_ID));
 
         reset.addSelectionListener(new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent event) {
+            public void widgetSelected(SelectionEvent event) {
                 buttonPressed(((Integer) event.widget.getData()).intValue());
             }
         });
@@ -471,8 +477,10 @@ class FiltersDialog extends TrayDialog {
         return combo;
     }
 
-    @Override
-	protected Control createDialogArea(Composite parent) {
+    /* (non-Javadoc)
+     * Method declared on Dialog.
+     */
+    protected Control createDialogArea(Composite parent) {
         Composite composite = (Composite) super.createDialogArea(parent);
         createMarkerLimitArea(composite);
         createTypesArea(composite);
@@ -488,7 +496,7 @@ class FiltersDialog extends TrayDialog {
 
     /**
      * Creates a separator line above the OK/Cancel buttons bar
-     *
+     * 
      * @param parent the parent composite
      */
     void createSeparatorLine(Composite parent) {
@@ -561,35 +569,29 @@ class FiltersDialog extends TrayDialog {
 
     ITreeContentProvider getContentProvider() {
         return new ITreeContentProvider() {
-            @Override
-			public void inputChanged(Viewer viewer, Object oldInput,
+            public void inputChanged(Viewer viewer, Object oldInput,
                     Object newInput) {
             }
 
-            @Override
-			public void dispose() {
+            public void dispose() {
             }
 
-            @Override
-			public Object[] getElements(Object inputElement) {
+            public Object[] getElements(Object inputElement) {
                 return new Object[] {
                         markerTypesModel.getType(IMarker.PROBLEM),
                         markerTypesModel.getType(IMarker.TASK) };
             }
 
-            @Override
-			public Object[] getChildren(Object parentElement) {
+            public Object[] getChildren(Object parentElement) {
                 MarkerType type = (MarkerType) parentElement;
                 return type.getSubtypes();
             }
 
-            @Override
-			public Object getParent(Object element) {
+            public Object getParent(Object element) {
                 return null;
             }
 
-            @Override
-			public boolean hasChildren(Object element) {
+            public boolean hasChildren(Object element) {
                 return getChildren(element).length > 0;
             }
         };
@@ -627,8 +629,7 @@ class FiltersDialog extends TrayDialog {
 
     ILabelProvider getLabelProvider() {
         return new LabelProvider() {
-            @Override
-			public String getText(Object element) {
+            public String getText(Object element) {
                 MarkerType type = (MarkerType) element;
                 return type.getLabel();
             }
@@ -658,8 +659,7 @@ class FiltersDialog extends TrayDialog {
             Collections.sort(typesList, new Comparator() {
                 Collator collator = Collator.getInstance();
 
-                @Override
-				public int compare(Object o1, Object o2) {
+                public int compare(Object o1, Object o2) {
                     return collator.compare(((MarkerType) o1).getLabel(),
                             ((MarkerType) o2).getLabel());
                 }
@@ -703,8 +703,7 @@ class FiltersDialog extends TrayDialog {
 
     private ViewerComparator getViewerComparator() {
         return new ViewerComparator() {
-            @Override
-			public int compare(Viewer viewer, Object e1, Object e2) {
+            public int compare(Viewer viewer, Object e1, Object e2) {
                 MarkerType t1 = (MarkerType) e1;
                 MarkerType t2 = (MarkerType) e2;
                 return getComparator().compare(t1.getLabel(), t2.getLabel());
@@ -775,8 +774,7 @@ class FiltersDialog extends TrayDialog {
      * Must be done here rather than by extending open()
      * because after super.open() is called, the widgetry is disposed.
      */
-    @Override
-	protected void okPressed() {
+    protected void okPressed() {
         try {
             int parseResult = Integer.parseInt(this.markerLimit.getText());
 
@@ -950,7 +948,7 @@ class FiltersDialog extends TrayDialog {
 
 	/**
 	 * Handles selection on a check box or combo box.
-	 *
+	 * 
 	 * @param e the selection event
 	 */
     void widgetSelected(SelectionEvent e) {

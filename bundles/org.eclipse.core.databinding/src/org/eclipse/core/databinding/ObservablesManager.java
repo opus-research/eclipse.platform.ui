@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -81,8 +81,8 @@ public class ObservablesManager {
 	public void addObservablesFromContext(DataBindingContext context,
 			boolean trackTargets, boolean trackModels) {
 		if (trackTargets || trackModels) {
-			contexts.put(context, new Pair(Boolean.valueOf(trackTargets),
-					Boolean.valueOf(trackModels)));
+			contexts.put(context, new Pair(new Boolean(trackTargets),
+					new Boolean(trackModels)));
 		}
 	}
 
@@ -94,7 +94,7 @@ public class ObservablesManager {
 	 * <a href="https://bugs.eclipse.org/278550">bug 278550</a>. If we cannot
 	 * find a way to make this API work, it will be deprecated as of 3.6.</em>
 	 * </p>
-	 *
+	 * 
 	 * @param runnable
 	 *            the runnable to execute
 	 * @since 1.2

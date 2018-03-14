@@ -28,7 +28,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 /**
  * Added as a result of the bug 226547:
  * https://bugs.eclipse.org/bugs/show_bug.cgi?id=226547
- *
+ * 
  * @since 3.5
  */
 public class PreferencesDialogTest extends TestCase {
@@ -38,13 +38,11 @@ public class PreferencesDialogTest extends TestCase {
 
 	public Shell shell;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		shell = new Shell();
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		if (shell != null) {
 			shell.dispose();
@@ -76,9 +74,8 @@ public class PreferencesDialogTest extends TestCase {
 			// Should be no exceptions.
 			dialog.open();
 		} finally {
-			if (dialog != null) {
+			if (dialog != null)
 				dialog.close();
-			}
 		}
 	}
 
@@ -95,7 +92,7 @@ public class PreferencesDialogTest extends TestCase {
 		IPreferencePage page2 = new SamplePreferencePage("Sub", "Second Sample");
 		IPreferenceNode node2 = new PreferenceNode("Sub", page2);
 		manager.addToRoot(node2);
-
+		
 		PreferenceDialog dialog = null;
 		try {
 			dialog = new PreferenceDialog(shell, manager);
@@ -105,14 +102,13 @@ public class PreferencesDialogTest extends TestCase {
 			// Should be no exceptions.
 			dialog.open();
 		} finally {
-			if (dialog != null) {
+			if (dialog != null)
 				dialog.close();
-			}
 			manager.remove(node2);
 			manager.remove(node1);
 		}
 	}
-
+	
 	/**
 	 * Test preference dialog with a custom manager, custom nodes, this time
 	 * using an icon.
@@ -142,9 +138,8 @@ public class PreferencesDialogTest extends TestCase {
 			// pages with icons
 			dialog.open();
 		} finally {
-			if (dialog != null) {
+			if (dialog != null)
 				dialog.close();
-			}
 		}
 	}
 
@@ -180,9 +175,8 @@ public class PreferencesDialogTest extends TestCase {
 			TreeItem item = dialog.getTreeViewer().getTree().getItem(0);
 			assertEquals("Aaa", item.getText());
 		} finally {
-			if (dialog != null) {
+			if (dialog != null)
 				dialog.close();
-			}
 		}
 	}
 }

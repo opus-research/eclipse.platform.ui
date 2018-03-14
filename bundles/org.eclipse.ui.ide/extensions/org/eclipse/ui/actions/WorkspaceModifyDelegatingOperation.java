@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,7 +36,7 @@ public class WorkspaceModifyDelegatingOperation extends
     /**
      * Creates a new operation which will delegate its work to the given
      * runnable using the provided scheduling rule.
-     *
+     * 
      * @param content
      *            the runnable to delegate to when this operation is executed
      * @param rule
@@ -51,7 +51,7 @@ public class WorkspaceModifyDelegatingOperation extends
     /**
      * Creates a new operation which will delegate its work to the given
      * runnable. Schedule using the supplied s
-     *
+     * 
      * @param content
      *            the runnable to delegate to when this operation is executed
      */
@@ -60,8 +60,10 @@ public class WorkspaceModifyDelegatingOperation extends
         this.content = content;
     }
 
-    @Override
-	protected void execute(IProgressMonitor monitor) throws CoreException,
+    /*
+     * (non-Javadoc) Method declared on WorkbenchModifyOperation.
+     */
+    protected void execute(IProgressMonitor monitor) throws CoreException,
             InterruptedException {
         try {
             content.run(monitor);

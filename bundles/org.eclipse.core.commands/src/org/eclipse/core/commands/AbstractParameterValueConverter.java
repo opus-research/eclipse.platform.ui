@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,7 +33,7 @@ package org.eclipse.core.commands;
  * {@link ParameterType#define(String, AbstractParameterValueConverter)} by
  * clients.
  * </p>
- *
+ * 
  * @see ParameterType#define(String, AbstractParameterValueConverter)
  * @see ParameterizedCommand#serialize()
  * @since 3.2
@@ -43,7 +43,7 @@ public abstract class AbstractParameterValueConverter {
 	/**
 	 * Converts a string encoded command parameter value into the parameter
 	 * value object.
-	 *
+	 * 
 	 * @param parameterValue
 	 *            a command parameter value string describing an object; may be
 	 *            <code>null</code>
@@ -59,7 +59,7 @@ public abstract class AbstractParameterValueConverter {
 	/**
 	 * Converts a command parameter value object into a string that encodes a
 	 * reference to the object or serialization of the object.
-	 *
+	 * 
 	 * @param parameterValue
 	 *            an object to convert into an identifying string; may be
 	 *            <code>null</code>

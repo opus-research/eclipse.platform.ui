@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,14 +41,12 @@ public class VirtualResourceDecorator implements ILightweightLabelDecorator {
 	/**
 	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(ILabelProviderListener)
 	 */
-	@Override
 	public void addListener(ILabelProviderListener listener) {
 	}
 
 	/**
 	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
 	 */
-	@Override
 	public void dispose() {
 		// no resources to dispose
 	}
@@ -57,7 +55,6 @@ public class VirtualResourceDecorator implements ILightweightLabelDecorator {
 	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang.Object,
 	 *      java.lang.String)
 	 */
-	@Override
 	public boolean isLabelProperty(Object element, String property) {
 		return false;
 	}
@@ -65,13 +62,12 @@ public class VirtualResourceDecorator implements ILightweightLabelDecorator {
 	/**
 	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(ILabelProviderListener)
 	 */
-	@Override
 	public void removeListener(ILabelProviderListener listener) {
 	}
 
 	/**
 	 * Replaces the resource image, if the given element is a virtual resource.
-	 *
+	 * 
 	 * @param element
 	 *            element to decorate
 	 * @param decoration
@@ -79,7 +75,6 @@ public class VirtualResourceDecorator implements ILightweightLabelDecorator {
 	 * @see org.eclipse.jface.viewers.ILightweightLabelDecorator#decorate(Object,
 	 *      IDecoration)
 	 */
-	@Override
 	public void decorate(Object element, IDecoration decoration) {
 		if (element instanceof IFolder && ((IResource) element).isVirtual()) {
 			decoration.addOverlay(VIRTUAL_FOLDER, IDecoration.BOTTOM_RIGHT);

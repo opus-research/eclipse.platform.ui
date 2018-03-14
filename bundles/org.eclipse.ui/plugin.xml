@@ -36,6 +36,7 @@
    <extension-point id="popupMenus" name="%ExtPoint.popupMenus" schema="schema/popupMenus.exsd"/>
    <extension-point id="preferencePages" name="%ExtPoint.preferencePages" schema="schema/preferencePages.exsd"/>
    <extension-point id="preferenceTransfer" name="%ExtPoint.preferenceTransfer" schema="schema/preferenceTransfer.exsd"/>
+   <extension-point id="presentationFactories" name="%ExtPoint.presentationFactories" schema="schema/presentationFactories.exsd"/>
    <extension-point id="propertyPages" name="%ExtPoint.propertyPages" schema="schema/propertyPages.exsd"/>
    <extension-point id="services" name="%ExtPoint.services" schema="schema/services.exsd"/>
    <extension-point id="splashHandlers" name="%ExtPoint.splashHandlers" schema="schema/splashHandlers.exsd"/>
@@ -732,13 +733,13 @@
          </parameter>
       </key>
       <key
-            locale="ja"
+            locale="jp"
             contextId="org.eclipse.ui.contexts.window"
             sequence="M1+_"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
       </key>
       <key
-      		locale="ja"
+      		locale="jp"
             commandId="org.eclipse.ui.window.splitEditor"
             contextId="org.eclipse.ui.contexts.window"
             sequence="M1+M2+-"
@@ -759,7 +760,7 @@
             platform="carbon"
             commandId="org.eclipse.ui.window.splitEditor"
             contextId="org.eclipse.ui.contexts.window"
-            sequence="COMMAND+SHIFT+-"
+            sequence="Command+Shift+-"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
          <parameter
                id="Splitter.isHorizontal"
@@ -787,7 +788,7 @@
             platform="carbon"
             commandId="org.eclipse.ui.window.splitEditor"
             contextId="org.eclipse.ui.contexts.window"
-            sequence="COMMAND+SHIFT+["
+            sequence="Command+Shift+["
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
          <parameter
                id="Splitter.isHorizontal"
@@ -922,7 +923,7 @@
             description="%command.save.description"
             defaultHandler="org.eclipse.ui.internal.handlers.SaveHandler"
             categoryId="org.eclipse.ui.category.file"
-            id="org.eclipse.ui.file.save"/>
+            id="org.eclipse.ui.file.save" />
       <command
             name="%command.saveAs.name"
             description="%command.saveAs.description"
@@ -967,13 +968,7 @@
             defaultHandler="org.eclipse.ui.internal.handlers.QuitHandler"
             description="%command.exit.description"
             id="org.eclipse.ui.file.exit"
-            name="%command.exit.name">
-         <commandParameter
-               id="mayPrompt"
-               name="%command.exit.mayPrompt.name"
-               optional="true">
-         </commandParameter>
-      </command>
+            name="%command.exit.name"/>
       <command
             name="%command.undo.name"
             description="%command.undo.description"
@@ -1162,12 +1157,6 @@
             description="%command.maximizePart.description"
             categoryId="org.eclipse.ui.category.window"
             id="org.eclipse.ui.window.maximizePart" />
-      <command
-            categoryId="org.eclipse.ui.category.window"
-            defaultHandler="org.eclipse.ui.internal.handlers.HideTrimBarsHandler"
-            description="%command.windowsHideTrimbars.description"
-            id="org.eclipse.ui.window.hidetrimbars"
-            name="%command.windowsHideTrimbars.name"/>
       <command
             categoryId="org.eclipse.ui.category.window"
             defaultHandler="org.eclipse.ui.internal.handlers.MinimizePartHandler"
@@ -1540,6 +1529,14 @@
             %Presentation.misc.desc
          </description>
       </themeElementCategory>
+      <categoryPresentationBinding
+            categoryId="org.eclipse.ui.presentation.default"
+            presentationId="org.eclipse.ui.presentations.default">
+      </categoryPresentationBinding>
+      <categoryPresentationBinding
+            categoryId="org.eclipse.ui.presentation.default"
+            presentationId="org.eclipse.ui.presentations.r30">
+      </categoryPresentationBinding>
       <fontDefinition
             label="%FontsPreference.BannerFontLabel"
             categoryId="org.eclipse.ui.workbenchMisc"
@@ -2262,7 +2259,7 @@
             </with>
          </enabledWhen>
       </handler>
-       <handler
+      <handler
             class="org.eclipse.ui.internal.handlers.MaximizePartHandler"
             commandId="org.eclipse.ui.window.maximizePart">
          <enabledWhen>

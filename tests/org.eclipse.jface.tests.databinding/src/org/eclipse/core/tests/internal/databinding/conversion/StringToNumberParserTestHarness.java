@@ -40,7 +40,7 @@ public abstract class StringToNumberParserTestHarness extends TestCase {
 		assertTrue("valid byte", assertValid(new Byte((byte) 1)));
 		assertTrue("valid byte min", assertValid(new Byte(Byte.MIN_VALUE)));
 		assertTrue("valid byte max", assertValid(new Byte(Byte.MAX_VALUE)));
-
+		
 		// test shorts
 		assertTrue("valid short", assertValid(new Short((short) 1)));
 		boolean result = assertValid(new Short(Short.MIN_VALUE));
@@ -143,7 +143,7 @@ public abstract class StringToNumberParserTestHarness extends TestCase {
 		BigDecimal bigDecimalMax = new BigDecimal(max.doubleValue());
 		bigDecimalMax = bigDecimalMax.add(new BigDecimal(1));
 		assertFalse("invalid BigInteger max", assertValid(bigDecimalMax.toBigInteger()));
-
+		
 		// test BigDecimals
 		assertTrue("valid BigDecimal", assertValid(new BigDecimal(1)));
 		assertFalse("invalid BigDecimal min", assertValid(bigDecimalMin));
@@ -156,7 +156,7 @@ public abstract class StringToNumberParserTestHarness extends TestCase {
 		 * replacement plugin. So in order to ensure that we handle Number's
 		 * that are not part of the JDK stub a number implemenation and ensure
 		 * that the double representation of this number is used.
-		 *
+		 * 
 		 * @throws Exception
 		 */
 		class MyNumber extends Number {
@@ -169,23 +169,39 @@ public abstract class StringToNumberParserTestHarness extends TestCase {
 
 			private static final long serialVersionUID = 1L;
 
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see java.lang.Number#doubleValue()
+			 */
 			public double doubleValue() {
 				count++;
 				return value;
 			}
 
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see java.lang.Number#floatValue()
+			 */
 			public float floatValue() {
 				return 0;
 			}
 
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see java.lang.Number#intValue()
+			 */
 			public int intValue() {
 				return 0;
 			}
 
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see java.lang.Number#longValue()
+			 */
 			public long longValue() {
 				return 0;
 			}

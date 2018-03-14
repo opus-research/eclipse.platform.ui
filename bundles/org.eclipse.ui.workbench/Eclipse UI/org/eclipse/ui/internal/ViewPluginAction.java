@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,6 +38,9 @@ public final class ViewPluginAction extends PartPluginAction {
         registerSelectionListener(viewPart);
     }
 
+    /* (non-Javadoc)
+     * Method declared on PluginAction.
+     */
     @Override
 	protected IActionDelegate validateDelegate(Object obj)
             throws WorkbenchException {
@@ -49,6 +52,9 @@ public final class ViewPluginAction extends PartPluginAction {
 		}
     }
 
+    /* (non-Javadoc)
+     * Method declared on PluginAction.
+     */
     @Override
 	protected void initDelegate() {
         super.initDelegate();
@@ -65,7 +71,10 @@ public final class ViewPluginAction extends PartPluginAction {
 	public boolean isOkToCreateDelegate() {
         return super.isOkToCreateDelegate() && viewPart != null;
     }
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.PluginAction#dispose()
+	 */
 	@Override
 	public void dispose() {
 		unregisterSelectionListener(viewPart);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 BestSolution.at and others.
+ * Copyright (c) 2009, 2010 BestSolution.at and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,12 +20,12 @@ public interface ISWTResourceUtilities extends
 
 	/**
 	 * Low-level utility to stamp an adornment onto a given Image.
-	 *
+	 * 
 	 * @param toAdorn
 	 *            The image to be adorned (must not be null)
 	 * @param adornment
 	 *            The image to adorn with.
-	 *
+	 * 
 	 * @return The adorned image or 'toAdorn' if 'adornment' is null
 	 */
 	public Image adornImage(Image toAdorn, Image adornment);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 The Pampered Chef and others.
+ * Copyright (c) 2006 The Pampered Chef and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@ package org.eclipse.jface.examples.databinding.mask;
 
 /**
  * Indicates a parse error while parsing an edit mask.
- *
+ * 
  * @since 3.3
  */
 public class EditMaskParseException extends RuntimeException {

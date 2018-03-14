@@ -22,16 +22,20 @@ public class CheckboxTreeViewerMissingTest extends CheckboxTreeViewerTest {
     private static Image testImage;
 
     public static Image getMissingImage() {
-        if (testImage == null) {
-			testImage = ImageDescriptor.createFromFile(TestLabelProvider.class,
+        if (testImage == null)
+            testImage = ImageDescriptor.createFromFile(TestLabelProvider.class,
                     "images/missing.gif").createImage();
-		}
         return testImage;
     }
 
     public static class CheckboxMissingTableTestLabelProvider extends
             CheckboxTreeViewerTest.CheckboxTableTestLabelProvider implements
             ITableLabelProvider {
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.eclipse.jface.tests.viewers.StructuredViewerTest.TestLabelProvider#getImage(java.lang.Object)
+         */
         @Override
 		public Image getImage(Object element) {
             return getMissingImage();
@@ -43,11 +47,20 @@ public class CheckboxTreeViewerMissingTest extends CheckboxTreeViewerTest {
         super(name);
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#getTestLabelProvider()
+     */
     @Override
 	public IBaseLabelProvider getTestLabelProvider() {
         return new CheckboxMissingTableTestLabelProvider();
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#tearDown()
+     */
     @Override
 	public void tearDown() {
         super.tearDown();
@@ -57,6 +70,9 @@ public class CheckboxTreeViewerMissingTest extends CheckboxTreeViewerTest {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#testLabelProvider()
+     */
     @Override
 	public void testLabelProvider() {
         super.testLabelProvider();

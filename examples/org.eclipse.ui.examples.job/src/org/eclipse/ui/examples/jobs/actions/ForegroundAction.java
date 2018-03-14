@@ -18,11 +18,9 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
 public class ForegroundAction implements IWorkbenchWindowActionDelegate {
-	@Override
 	public void run(IAction action) {
 		try {
 			ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
-				@Override
 				public void run(IProgressMonitor monitor) {
 					//no-op
 				}
@@ -33,15 +31,12 @@ public class ForegroundAction implements IWorkbenchWindowActionDelegate {
 			e.printStackTrace();
 		}
 	}
-	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
 		//do nothing
 	}
-	@Override
 	public void dispose() {
 		//do nothing
 	}
-	@Override
 	public void init(IWorkbenchWindow window) {
 		//do nothing
 	}

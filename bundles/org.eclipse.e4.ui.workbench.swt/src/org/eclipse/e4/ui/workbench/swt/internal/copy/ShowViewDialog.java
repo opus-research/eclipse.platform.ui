@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -81,7 +81,7 @@ public class ShowViewDialog extends Dialog implements
 
 	/**
 	 * Constructs a new ShowViewDialog.
-	 *
+	 * 
 	 * @param window
 	 *            the workbench window
 	 * @param viewReg
@@ -179,7 +179,7 @@ public class ShowViewDialog extends Dialog implements
 
 	/**
 	 * Create a new filtered tree viewer in the parent.
-	 *
+	 * 
 	 * @param parent
 	 *            the parent <code>Composite</code>.
 	 */
@@ -217,7 +217,7 @@ public class ShowViewDialog extends Dialog implements
 
 	/**
 	 * Return whether or not there are less than two views in the list.
-	 *
+	 * 
 	 * @param tree
 	 * @return <code>true</code> if there are less than two views in the list.
 	 */
@@ -266,7 +266,7 @@ public class ShowViewDialog extends Dialog implements
 
 	/**
 	 * Returns the descriptors for the selected views.
-	 *
+	 * 
 	 * @return the descriptors for the selected views
 	 */
 	public MPartDescriptor[] getSelection() {
@@ -275,7 +275,7 @@ public class ShowViewDialog extends Dialog implements
 
 	/**
 	 * Layout the top control.
-	 *
+	 * 
 	 * @param control
 	 *            the control.
 	 */
@@ -378,12 +378,12 @@ public class ShowViewDialog extends Dialog implements
 	 * Update the selection object.
 	 */
 	protected void updateSelection(SelectionChangedEvent event) {
-		ArrayList<MPartDescriptor> descs = new ArrayList<>();
+		ArrayList descs = new ArrayList();
 		IStructuredSelection sel = (IStructuredSelection) event.getSelection();
-		for (Iterator<?> i = sel.iterator(); i.hasNext();) {
+		for (Iterator i = sel.iterator(); i.hasNext();) {
 			Object o = i.next();
 			if (o instanceof MPartDescriptor) {
-				descs.add((MPartDescriptor) o);
+				descs.add(o);
 			}
 		}
 
@@ -400,8 +400,8 @@ public class ShowViewDialog extends Dialog implements
 		// popup the description for the selected view
 		if (descriptionHint.isVisible() && event.keyCode == SWT.F2
 				&& event.stateMask == 0) {
-			ITreeSelection selection = filteredTree.getViewer()
-					.getStructuredSelection();
+			ITreeSelection selection = (ITreeSelection) filteredTree
+					.getViewer().getSelection();
 			// only show description if one view is selected
 			if (selection.size() == 1) {
 				Object o = selection.getFirstElement();

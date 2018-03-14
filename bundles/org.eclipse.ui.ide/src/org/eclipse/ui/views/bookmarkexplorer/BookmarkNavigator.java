@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,8 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
- *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 461762
- *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 
 package org.eclipse.ui.views.bookmarkexplorer;
@@ -22,7 +20,9 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -32,7 +32,11 @@ import org.eclipse.jface.viewers.ColumnLayoutData;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.IOpenListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.OpenEvent;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TableLayout;
@@ -66,7 +70,6 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
-import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.views.bookmarkexplorer.BookmarkMessages;
 import org.eclipse.ui.internal.views.markers.ExtendedMarkersView;
@@ -89,7 +92,6 @@ import org.eclipse.ui.views.navigator.ShowInNavigatorAction;
  * @noinstantiate This class is not intended to be instantiated by clients.
  * @noextend This class is not intended to be subclassed by clients.
  */
-@Deprecated
 public class BookmarkNavigator extends ViewPart {
     private Table table;
 
@@ -153,7 +155,7 @@ public class BookmarkNavigator extends ViewPart {
     private static final String TAG_VERTICAL_POSITION = "verticalPosition";//$NON-NLS-1$
 
     private static final String TAG_HORIZONTAL_POSITION = "horizontalPosition";//$NON-NLS-1$
-
+	
     class SortByAction extends Action {
 
         private int column;
@@ -165,8 +167,7 @@ public class BookmarkNavigator extends ViewPart {
             this.column = column;
         }
 
-        @Override
-		public void run() {
+        public void run() {
         	comparator.setTopPriority(column);
             updateSortState();
             viewer.refresh();
@@ -191,8 +192,7 @@ public class BookmarkNavigator extends ViewPart {
             this.direction = direction;
         }
 
-        @Override
-		public void run() {
+        public void run() {
         	comparator.setTopPriorityDirection(direction);
             updateSortState();
             viewer.refresh();
@@ -252,7 +252,11 @@ public class BookmarkNavigator extends ViewPart {
         // support action contributions.
         MenuManager mgr = new MenuManager();
         mgr.setRemoveAllWhenShown(true);
-        mgr.addMenuListener(mgr1 -> fillContextMenu(mgr1));
+        mgr.addMenuListener(new IMenuListener() {
+            public void menuAboutToShow(IMenuManager mgr) {
+                fillContextMenu(mgr);
+            }
+        });
         Menu menu = mgr.createContextMenu(viewer.getControl());
         viewer.getControl().setMenu(menu);
         getSite().registerContextMenu(mgr, viewer);
@@ -275,19 +279,28 @@ public class BookmarkNavigator extends ViewPart {
                 selectAllAction);
 
         // Set the double click action.
-        viewer.addOpenListener(event -> openAction.run());
-        viewer.addSelectionChangedListener(event -> handleSelectionChanged((IStructuredSelection) event
-		        .getSelection()));
+        viewer.addOpenListener(new IOpenListener() {
+            public void open(OpenEvent event) {
+                openAction.run();
+            }
+        });
+        viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+            public void selectionChanged(SelectionChangedEvent event) {
+                handleSelectionChanged((IStructuredSelection) event
+                        .getSelection());
+            }
+        });
         viewer.getControl().addKeyListener(new KeyAdapter() {
-            @Override
-			public void keyPressed(KeyEvent e) {
+            public void keyPressed(KeyEvent e) {
                 handleKeyPressed(e);
             }
         });
     }
 
-    @Override
-	public void createPartControl(Composite parent) {
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchPart.
+     */
+    public void createPartControl(Composite parent) {
         clipboard = new Clipboard(parent.getDisplay());
         createTable(parent);
         viewer = new TableViewer(table);
@@ -322,8 +335,7 @@ public class BookmarkNavigator extends ViewPart {
                 IBookmarkHelpContextIds.BOOKMARK_VIEW);
     }
 
-    @Override
-	public void dispose() {
+    public void dispose() {
         if (clipboard != null) {
 			clipboard.dispose();
 		}
@@ -348,22 +360,33 @@ public class BookmarkNavigator extends ViewPart {
         manager.add(editAction);
     }
 
-    @Override
-	public <T> T getAdapter(Class<T> adapterClass) {
-		if (adapterClass == IShowInSource.class) {
-			return adapterClass.cast((IShowInSource) () -> new ShowInContext(null, getViewer().getSelection()));
+    /* (non-Javadoc)
+     * @see org.eclipse.core.runtime.IAdaptable#getAdapter(Class)
+     */
+    public Object getAdapter(Class adapter) {
+        if (adapter == IShowInSource.class) {
+            return new IShowInSource() {
+                public ShowInContext getShowInContext() {
+                    return new ShowInContext(null, getViewer().getSelection());
+                }
+            };
         }
-		if (adapterClass == IShowInTargetList.class) {
-			return adapterClass.cast((IShowInTargetList) () -> new String[] { IPageLayout.ID_RES_NAV });
+        if (adapter == IShowInTargetList.class) {
+            return new IShowInTargetList() {
+                public String[] getShowInTargetIds() {
+                    return new String[] { IPageLayout.ID_RES_NAV };
+                }
+
+            };
         }
-		return super.getAdapter(adapterClass);
+        return super.getAdapter(adapter);
     }
 
     /**
      * Returns the UI plugin for the bookmarks view.
      */
     static AbstractUIPlugin getPlugin() {
-		return WorkbenchPlugin.getDefault();
+        return (AbstractUIPlugin) Platform.getPlugin(PlatformUI.PLUGIN_ID);
     }
 
     /**
@@ -414,8 +437,10 @@ public class BookmarkNavigator extends ViewPart {
         showInNavigatorAction.selectionChanged(selection);
     }
 
-    @Override
-	public void init(IViewSite site, IMemento memento) throws PartInitException {
+    /* (non-Javadoc)
+     * Method declared on IViewPart.
+     */
+    public void init(IViewSite site, IMemento memento) throws PartInitException {
         super.init(site, memento);
         this.memento = memento;
     }
@@ -428,13 +453,11 @@ public class BookmarkNavigator extends ViewPart {
         Transfer[] transferTypes = new Transfer[] {
                 MarkerTransfer.getInstance(), TextTransfer.getInstance() };
         DragSourceListener listener = new DragSourceAdapter() {
-            @Override
-			public void dragSetData(DragSourceEvent event) {
+            public void dragSetData(DragSourceEvent event) {
                 performDragSetData(event);
             }
 
-            @Override
-			public void dragFinished(DragSourceEvent event) {
+            public void dragFinished(DragSourceEvent event) {
             }
         };
         viewer.addDragSupport(operations, transferTypes, listener);
@@ -480,7 +503,8 @@ public class BookmarkNavigator extends ViewPart {
             IMemento markerMems[] = selectionMem.getChildren(TAG_MARKER);
             for (int i = 0; i < markerMems.length; i++) {
                 try {
-                    long id = Long.parseLong(markerMems[i].getString(TAG_ID));
+                    long id = new Long(markerMems[i].getString(TAG_ID))
+                            .longValue();
                     IResource resource = root.findMember(markerMems[i]
                             .getString(TAG_RESOURCE));
                     if (resource != null) {
@@ -502,7 +526,7 @@ public class BookmarkNavigator extends ViewPart {
             try {
                 String posStr = memento.getString(TAG_VERTICAL_POSITION);
                 int position;
-                position = Integer.parseInt(posStr);
+                position = new Integer(posStr).intValue();
                 bar.setSelection(position);
             } catch (NumberFormatException e) {
             }
@@ -512,7 +536,7 @@ public class BookmarkNavigator extends ViewPart {
             try {
                 String posStr = memento.getString(TAG_HORIZONTAL_POSITION);
                 int position;
-                position = Integer.parseInt(posStr);
+                position = new Integer(posStr).intValue();
                 bar.setSelection(position);
             } catch (NumberFormatException e) {
             }
@@ -522,8 +546,7 @@ public class BookmarkNavigator extends ViewPart {
         viewer.refresh();
     }
 
-    @Override
-	public void saveState(IMemento memento) {
+    public void saveState(IMemento memento) {
         if (viewer == null) {
             if (this.memento != null) {
 				memento.putMemento(this.memento);
@@ -556,8 +579,10 @@ public class BookmarkNavigator extends ViewPart {
 
     }
 
-    @Override
-	public void setFocus() {
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchPart.
+     */
+    public void setFocus() {
         if (viewer != null) {
 			viewer.getControl().setFocus();
 		}
@@ -574,8 +599,7 @@ public class BookmarkNavigator extends ViewPart {
              * presses on the same column header will
              * toggle sorting order (ascending/descending).
              */
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 // column selected - first column doesn't count
                 int column = table.indexOf((TableColumn) e.widget) - 1;
                 if (column == comparator.getTopPriority()) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,7 @@ import org.eclipse.ui.commands.NotDefinedException;
 /**
  * A wrapper around the new {@link Scheme} class, providing supported for the
  * old {@link IKeyConfiguration} interface.
- *
+ * 
  * @since 3.1
  */
 public final class SchemeLegacyWrapper implements IKeyConfiguration {
@@ -37,7 +37,7 @@ public final class SchemeLegacyWrapper implements IKeyConfiguration {
 
 	/**
 	 * Constructs a new instance of <code>SchemeWrapper</code>.
-	 *
+	 * 
 	 * @param scheme
 	 *            The scheme to be wrapped; must not be <code>null</code>.
 	 * @param bindingManager
@@ -59,6 +59,11 @@ public final class SchemeLegacyWrapper implements IKeyConfiguration {
 		this.bindingManager = bindingManager;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.commands.IKeyConfiguration#addKeyConfigurationListener(org.eclipse.ui.commands.IKeyConfigurationListener)
+	 */
 	@Override
 	public void addKeyConfigurationListener(
 			IKeyConfigurationListener keyConfigurationListener) {
@@ -66,11 +71,21 @@ public final class SchemeLegacyWrapper implements IKeyConfiguration {
 				keyConfigurationListener, bindingManager));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
 	@Override
 	public int compareTo(Object o) {
 		return scheme.compareTo(o);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.commands.IKeyConfiguration#getDescription()
+	 */
 	@Override
 	public String getDescription() throws NotDefinedException {
 		try {
@@ -80,11 +95,21 @@ public final class SchemeLegacyWrapper implements IKeyConfiguration {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.commands.IKeyConfiguration#getId()
+	 */
 	@Override
 	public String getId() {
 		return scheme.getId();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.commands.IKeyConfiguration#getName()
+	 */
 	@Override
 	public String getName() throws NotDefinedException {
 		try {
@@ -94,6 +119,11 @@ public final class SchemeLegacyWrapper implements IKeyConfiguration {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.commands.IKeyConfiguration#getParentId()
+	 */
 	@Override
 	public String getParentId() throws NotDefinedException {
 		try {
@@ -103,16 +133,31 @@ public final class SchemeLegacyWrapper implements IKeyConfiguration {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.commands.IKeyConfiguration#isActive()
+	 */
 	@Override
 	public boolean isActive() {
 		return scheme.getId().equals(bindingManager.getActiveScheme().getId());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.commands.IKeyConfiguration#isDefined()
+	 */
 	@Override
 	public boolean isDefined() {
 		return scheme.isDefined();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.commands.IKeyConfiguration#removeKeyConfigurationListener(org.eclipse.ui.commands.IKeyConfigurationListener)
+	 */
 	@Override
 	public void removeKeyConfigurationListener(
 			IKeyConfigurationListener keyConfigurationListener) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -67,9 +67,9 @@ import org.eclipse.ui.testing.IWorkbenchPartTestable;
  * including the part, its pane, active contributions, selection provider, etc.
  * Together, these components make up the complete behavior for a part as if it
  * was implemented by one person.
- *
+ * 
  * The <code>PartSite</code> lifecycle is as follows ..
- *
+ * 
  * <ol>
  * <li>a site is constructed </li>
  * <li>a part is constructed and stored in the part </li>
@@ -88,7 +88,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 	 * is provided so that different implementations of the
 	 * <code>IWorkbenchPartSite</code> interface don't have to worry about how
 	 * context menus should work.
-	 *
+	 * 
 	 * @param menuId
 	 *            the menu id
 	 * @param menuManager
@@ -170,7 +170,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 
 	/**
 	 * Build the part site.
-	 *
+	 * 
 	 * @param ref
 	 *            the part reference
 	 * @param part
@@ -193,8 +193,8 @@ public abstract class PartSite implements IWorkbenchPartSite {
 		setWindow((MWindow) parent);
 
 		e4Context = model.getContext();
-		IServiceLocatorCreator slc = e4Context
-				.get(IServiceLocatorCreator.class);
+		IServiceLocatorCreator slc = (IServiceLocatorCreator) e4Context
+				.get(IServiceLocatorCreator.class.getName());
 		IWorkbenchWindow workbenchWindow = getWorkbenchWindow();
 		this.serviceLocator = (ServiceLocator) slc.createServiceLocator(workbenchWindow, null,
 				new IDisposable() {
@@ -212,8 +212,9 @@ public abstract class PartSite implements IWorkbenchPartSite {
 
 	private void setWindow(MWindow window) {
 		MWindow topWindow = getTopLevelModelWindow(window);
-		MApplication application = topWindow.getContext().get(MApplication.class);
-		Workbench workbench = (Workbench) application.getContext().get(IWorkbench.class);
+		MApplication application = (MApplication) topWindow.getContext().get(
+				MApplication.class.getName());
+		Workbench workbench = (Workbench) application.getContext().get(IWorkbench.class.getName());
 
 		workbenchWindow = workbench.createWorkbenchWindow(
 				workbench.getDefaultPageInput(),
@@ -228,7 +229,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 	private void initializeDefaultServices() {
 		IHandlerService handlerService = new LegacyHandlerService(e4Context,
 				new ActivePartExpression(part));
-		e4Context.set(IHandlerService.class, handlerService);
+		e4Context.set(IHandlerService.class.getName(), handlerService);
 
 		serviceLocator.registerService(IWorkbenchLocationService.class,
 				new WorkbenchLocationService(IServiceScopes.PARTSITE_SCOPE,
@@ -381,6 +382,11 @@ public abstract class PartSite implements IWorkbenchPartSite {
 		return actionBars;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPartSite#getId()
+	 */
 	@Override
 	public String getId() {
 		return extensionId == null ? element == null ? model.getElementId() : element
@@ -388,11 +394,21 @@ public abstract class PartSite implements IWorkbenchPartSite {
 				: extensionId;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPartSite#getPluginId()
+	 */
 	@Override
 	public String getPluginId() {
 		return element == null ? model.getElementId() : element.getNamespaceIdentifier();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPartSite#getRegisteredName()
+	 */
 	@Override
 	public String getRegisteredName() {
 		return element == null ? model.getLocalizedLabel() : element
@@ -401,7 +417,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 
 	/**
 	 * Returns the page containing this workbench site's part.
-	 *
+	 * 
 	 * @return the page containing this part
 	 */
 	@Override
@@ -435,7 +451,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 
 	/**
 	 * Returns the shell containing this part.
-	 *
+	 * 
 	 * @return the shell containing this part
 	 */
 	@Override
@@ -482,7 +498,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 
 	/**
 	 * Returns the workbench window containing this part.
-	 *
+	 * 
 	 * @return the workbench window containing this part
 	 */
 	@Override
@@ -557,7 +573,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 	 */
 	@Override
 	public IKeyBindingService getKeyBindingService() {
-		return e4Context.get(IKeyBindingService.class);
+		return (IKeyBindingService) e4Context.get(IKeyBindingService.class.getName());
 	}
 
 	protected String getInitialScopeId() {
@@ -566,7 +582,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 
 	/**
 	 * Get an adapter for this type.
-	 *
+	 * 
 	 * @param adapter
 	 * @return
 	 */
@@ -576,7 +592,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 		if (IWorkbenchSiteProgressService.class == adapter) {
 			return getService(adapter);
 		}
-
+		
 		if (IWorkbenchPartTestable.class == adapter) {
 			return new WorkbenchPartTestable(this);
 		}
@@ -605,7 +621,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 
 	/**
 	 * Get a progress service for the receiver.
-	 *
+	 * 
 	 * @return WorkbenchSiteProgressService
 	 */
 	WorkbenchSiteProgressService getSiteProgressService() {
@@ -626,7 +642,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 	/**
 	 * Prints out the identifier, the plug-in identifier and the registered
 	 * name. This is for debugging purposes only.
-	 *
+	 * 
 	 * @since 3.2
 	 */
 	@Override

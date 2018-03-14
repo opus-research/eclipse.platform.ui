@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,9 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -38,10 +40,10 @@ import org.eclipse.swt.widgets.Shell;
  * </p>
  * <p>
  * Typical usage is:
- *
+ * 
  * <pre>
- *
- *
+ *  
+ *   
  *    try {
  *       IRunnableWithProgress op = ...;
  *       new ProgressMonitorDialog(activeShell).run(true, true, op);
@@ -50,10 +52,10 @@ import org.eclipse.swt.widgets.Shell;
  *    } catch (InterruptedException e) {
  *       // handle cancelation
  *    }
- *
- *
+ *    
+ *   
  * </pre>
- *
+ * 
  * </p>
  * <p>
  * Note that the ProgressMonitorDialog is not intended to be used with multiple
@@ -253,6 +255,11 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 			}
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.runtime.IProgressMonitorWithBlocking#clearBlocked()
+		 */
 		@Override
 		public void clearBlocked() {
 			if (getShell() == null || getShell().isDisposed())
@@ -261,6 +268,11 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 			updateForClearBlocked();
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.runtime.IProgressMonitorWithBlocking#setBlocked(org.eclipse.core.runtime.IStatus)
+		 */
 		@Override
 		public void setBlocked(IStatus reason) {
 			if (getShell() == null || getShell().isDisposed())
@@ -277,12 +289,12 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 		progressIndicator.showNormal();
 		setMessage(task, true);
 		imageLabel.setImage(getImage());
-
+		
 	}
 
 	/**
 	 * Set blocked state from the receiver.
-	 *
+	 * 
 	 * @param reason
 	 *            IStatus that gives the details
 	 */
@@ -290,13 +302,13 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 		progressIndicator.showPaused();
 		setMessage(reason.getMessage(), true);
 		imageLabel.setImage(getImage());
-
+		
 	}
 
 	/**
 	 * Creates a progress monitor dialog under the given shell. The dialog has a
 	 * standard title and no image. <code>open</code> is non-blocking.
-	 *
+	 * 
 	 * @param parent
 	 *            the parent shell, or <code>null</code> to create a top-level
 	 *            shell
@@ -316,19 +328,24 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 
 	/**
 	 * Enables the cancel button (asynchronously).
-	 *
+	 * 
 	 * @param b
 	 *            The state to set the button to.
 	 */
 	private void asyncSetOperationCancelButtonEnabled(final boolean b) {
 		if (getShell() != null) {
-			getShell().getDisplay().asyncExec(() -> setOperationCancelButtonEnabled(b));
+			getShell().getDisplay().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					setOperationCancelButtonEnabled(b);
+				}
+			});
 		}
 	}
 
 	/**
 	 * The cancel button has been pressed.
-	 *
+	 * 
 	 * @since 3.0
 	 */
 	@Override
@@ -342,6 +359,9 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 		super.cancelPressed();
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on Window.
+	 */
 	/**
 	 * The <code>ProgressMonitorDialog</code> implementation of this method
 	 * only closes the dialog if there are no currently running runnables.
@@ -357,7 +377,7 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 
 	/**
 	 * Clear the cursors in the dialog.
-	 *
+	 * 
 	 * @since 3.0
 	 */
 	protected void clearCursors() {
@@ -378,6 +398,9 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 		waitCursor = null;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared in Window.
+	 */
 	@Override
 	protected void configureShell(final Shell shell) {
 		super.configureShell(shell);
@@ -388,9 +411,24 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 		shell.setCursor(waitCursor);
 		// Add a listener to set the message properly when the dialog becomes
 		// visible
-		shell.addListener(SWT.Show, event -> shell.getDisplay().asyncExec(() -> setMessage(message, true)));
+		shell.addListener(SWT.Show, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				// We need to async the message update since the Show precedes
+				// visibility
+				shell.getDisplay().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						setMessage(message, true);
+					}
+				});
+			}
+		});
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on Dialog.
+	 */
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		// cancel button
@@ -399,7 +437,7 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 
 	/**
 	 * Creates the cancel button.
-	 *
+	 * 
 	 * @param parent
 	 *            the parent composite
 	 * @since 3.0
@@ -414,6 +452,9 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 		setOperationCancelButtonEnabled(enableCancelButton);
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on Dialog.
+	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		setMessage(DEFAULT_TASKNAME, false);
@@ -438,6 +479,11 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 		return parent;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.window.Window#getInitialSize()
+	 */
 	@Override
 	protected Point getInitialSize() {
 		Point calculatedSize = super.getInitialSize();
@@ -450,7 +496,7 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 	/**
 	 * Returns the progress monitor to use for operations run in this progress
 	 * dialog.
-	 *
+	 * 
 	 * @return the progress monitor
 	 */
 	public IProgressMonitor getProgressMonitor() {
@@ -488,7 +534,7 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 	/**
 	 * Returns whether the dialog should be opened before the operation is run.
 	 * Defaults to <code>true</code>
-	 *
+	 * 
 	 * @return <code>true</code> to open the dialog before run,
 	 *         <code>false</code> to only create the dialog, but not open it
 	 * @since 3.0
@@ -501,7 +547,7 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 	 * Sets whether the dialog should be opened before the operation is run.
 	 * NOTE: Setting this to false and not forking a process may starve any
 	 * asyncExec that tries to open the dialog later.
-	 *
+	 * 
 	 * @param openOnRun
 	 *            <code>true</code> to open the dialog before run,
 	 *            <code>false</code> to only create the dialog, but not open
@@ -514,7 +560,7 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 
 	/**
 	 * Returns the nesting depth of running operations.
-	 *
+	 * 
 	 * @return the nesting depth of running operations
 	 * @since 3.0
 	 */
@@ -524,7 +570,7 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 
 	/**
 	 * Increments the nesting depth of running operations.
-	 *
+	 * 
 	 * @since 3.0
 	 */
 	protected void incrementNestingDepth() {
@@ -533,9 +579,9 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 
 	/**
 	 * Decrements the nesting depth of running operations.
-	 *
+	 * 
 	 * @since 3.0
-	 *
+	 * 
 	 */
 	protected void decrementNestingDepth() {
 		nestingDepth--;
@@ -545,7 +591,7 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 	 * Called just before the operation is run. Default behaviour is to open or
 	 * create the dialog, based on the setting of <code>getOpenOnRun</code>,
 	 * and increment the nesting depth.
-	 *
+	 * 
 	 * @since 3.0
 	 */
 	protected void aboutToRun() {
@@ -560,7 +606,7 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 	/**
 	 * Called just after the operation is run. Default behaviour is to decrement
 	 * the nesting depth, and close the dialog.
-	 *
+	 * 
 	 * @since 3.0
 	 */
 	protected void finishedRun() {
@@ -570,7 +616,7 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 
 	/**
 	 * Sets whether the progress dialog is cancelable or not.
-	 *
+	 * 
 	 * @param cancelable
 	 *            <code>true</code> if the end user can cancel this progress
 	 *            dialog, and <code>false</code> if it cannot be canceled
@@ -585,7 +631,7 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 
 	/**
 	 * Helper to enable/disable Cancel button for this dialog.
-	 *
+	 * 
 	 * @param b
 	 *            <code>true</code> to enable the cancel button, and
 	 *            <code>false</code> to disable it
@@ -594,10 +640,15 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 	protected void setOperationCancelButtonEnabled(boolean b) {
 		operationCancelableState = b;
 		if (cancel != null && !cancel.isDisposed()) {
-			cancel.setEnabled(b);
+			cancel.setEnabled(b);	
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.IconAndMessageDialog#getImage()
+	 */
 	@Override
 	protected Image getImage() {
 		return getInfoImage();
@@ -605,7 +656,7 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 
 	/**
 	 * Set the message in the message label.
-	 *
+	 * 
 	 * @param messageString
 	 *            The string for the new message.
 	 * @param force
@@ -633,6 +684,11 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 		messageLabel.update();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.window.Window#open()
+	 */
 	@Override
 	public int open() {
 		// Check to be sure it is not already done. If it is just return OK.

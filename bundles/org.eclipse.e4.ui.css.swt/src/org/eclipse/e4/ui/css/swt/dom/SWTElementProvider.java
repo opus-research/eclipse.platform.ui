@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Angelo Zerr and others.
+ * Copyright (c) 2008, 2014 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430639
- *     Fabio Zadrozny <fabiofz@gmail.com> - Bug 434201, 434309
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.dom;
 
@@ -22,12 +21,10 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.Widget;
 import org.w3c.dom.Element;
 
@@ -49,8 +46,6 @@ public class SWTElementProvider implements IElementProvider {
 
 	@Override
 	public Element getElement(Object element, CSSEngine engine) {
-		// Note that the order is important (must appear before
-		// Control/Item/Widget)
 		if (element instanceof Text) {
 			return new TextElement((Text) element, engine);
 		}
@@ -68,12 +63,6 @@ public class SWTElementProvider implements IElementProvider {
 		}
 		if (element instanceof ToolBar) {
 			return new ToolBarElement((ToolBar) element, engine);
-		}
-		if (element instanceof Tree) {
-			return new TreeElement((Tree) element, engine);
-		}
-		if (element instanceof Table) {
-			return new TableElement((Table) element, engine);
 		}
 		if (element instanceof Composite) {
 			return new CompositeElement((Composite) element, engine);

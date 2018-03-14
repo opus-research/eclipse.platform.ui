@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,7 +38,7 @@ public class WizardArchiveFileResourceExportPage1 extends
 
     // widgets
     protected Button compressContentsCheckbox;
-
+    
     private Button zipFormatButton;
     private Button targzFormatButton;
 
@@ -50,7 +50,7 @@ public class WizardArchiveFileResourceExportPage1 extends
     private final static String STORE_COMPRESS_CONTENTS_ID = "WizardZipFileResourceExportPage1.STORE_COMPRESS_CONTENTS_ID"; //$NON-NLS-1$
 
     /**
-     *	Create an instance of this class.
+     *	Create an instance of this class. 
      *
      *	@param name java.lang.String
      */
@@ -69,8 +69,10 @@ public class WizardArchiveFileResourceExportPage1 extends
         setDescription(DataTransferMessages.ArchiveExport_description);
     }
 
-    @Override
-	public void createControl(Composite parent) {
+    /** (non-Javadoc)
+     * Method declared on IDialogPage.
+     */
+    public void createControl(Composite parent) {
         super.createControl(parent);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(getControl(),
                 IDataTransferHelpContextIds.ZIP_FILE_EXPORT_WIZARD_PAGE);
@@ -80,24 +82,21 @@ public class WizardArchiveFileResourceExportPage1 extends
      *	Create the export options specification widgets.
      *
      */
-    @Override
-	protected void createOptionsGroupButtons(Group optionsGroup) {
+    protected void createOptionsGroupButtons(Group optionsGroup) {
     	Font font = optionsGroup.getFont();
     	optionsGroup.setLayout(new GridLayout(2, true));
-
+    	
     	Composite left = new Composite(optionsGroup, SWT.NONE);
     	left.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true, false));
     	left.setLayout(new GridLayout(1, true));
 
         createFileFormatOptions(left, font);
-
+        
         // compress... checkbox
         compressContentsCheckbox = new Button(left, SWT.CHECK
                 | SWT.LEFT);
         compressContentsCheckbox.setText(DataTransferMessages.ZipExport_compressContents);
         compressContentsCheckbox.setFont(font);
-
-		createResolveLinkedResources(left, font);
 
         Composite right = new Composite(optionsGroup, SWT.NONE);
         right.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true, false));
@@ -129,8 +128,8 @@ public class WizardArchiveFileResourceExportPage1 extends
         targzFormatButton.setText(DataTransferMessages.ArchiveExport_saveInTarFormat);
         targzFormatButton.setSelection(false);
         targzFormatButton.setFont(font);
-    }
-
+    }    
+    
     /**
      * Returns a boolean indicating whether the directory portion of the
      * passed pathname is valid and available for use.
@@ -198,7 +197,6 @@ public class WizardArchiveFileResourceExportPage1 extends
         op.setCreateLeadupStructure(createDirectoryStructureButton
                 .getSelection());
         op.setUseCompression(compressContentsCheckbox.getSelection());
-        op.setIncludeLinkedResources(resolveLinkedResourcesCheckbox.getSelection());
         op.setUseTarFormat(targzFormatButton.getSelection());
 
         try {
@@ -228,10 +226,9 @@ public class WizardArchiveFileResourceExportPage1 extends
      * not close.
      * @returns boolean
      */
-    @Override
-	public boolean finish() {
+    public boolean finish() {
     	List resourcesToExport = getWhiteCheckedResources();
-
+    	
         if (!ensureTargetIsValid()) {
 			return false;
 		}
@@ -248,8 +245,7 @@ public class WizardArchiveFileResourceExportPage1 extends
     /**
      *	Answer the string to display in the receiver as the destination type
      */
-    @Override
-	protected String getDestinationLabel() {
+    protected String getDestinationLabel() {
         return DataTransferMessages.ArchiveExport_destinationLabel;
     }
 
@@ -257,14 +253,13 @@ public class WizardArchiveFileResourceExportPage1 extends
      *	Answer the contents of self's destination specification widget.  If this
      *	value does not have a suffix then add it first.
      */
-    @Override
-	protected String getDestinationValue() {
+    protected String getDestinationValue() {
         String idealSuffix = getOutputSuffix();
         String destinationText = super.getDestinationValue();
 
-        // only append a suffix if the destination doesn't already have a . in
-        // its last path segment.
-        // Also prevent the user from selecting a directory.  Allowing this will
+        // only append a suffix if the destination doesn't already have a . in 
+        // its last path segment.  
+        // Also prevent the user from selecting a directory.  Allowing this will 
         // create a ".zip" file in the directory
         if (destinationText.length() != 0
                 && !destinationText.endsWith(File.separator)) {
@@ -303,8 +298,7 @@ public class WizardArchiveFileResourceExportPage1 extends
      *	Open an appropriate destination browser so that the user can specify a source
      *	to import from
      */
-    @Override
-	protected void handleDestinationBrowseButtonPressed() {
+    protected void handleDestinationBrowseButtonPressed() {
         FileDialog dialog = new FileDialog(getContainer().getShell(), SWT.SAVE | SWT.SHEET);
         dialog.setFilterExtensions(new String[] { "*.zip;*.tar.gz;*.tar;*.tgz", "*.*" }); //$NON-NLS-1$ //$NON-NLS-2$
         dialog.setText(DataTransferMessages.ArchiveExport_selectDestinationTitle);
@@ -327,8 +321,7 @@ public class WizardArchiveFileResourceExportPage1 extends
      *	Hook method for saving widget values for restoration by the next instance
      *	of this class.
      */
-    @Override
-	protected void internalSaveWidgetValues() {
+    protected void internalSaveWidgetValues() {
         // update directory names history
         IDialogSettings settings = getDialogSettings();
         if (settings != null) {
@@ -353,8 +346,7 @@ public class WizardArchiveFileResourceExportPage1 extends
      *	Hook method for restoring widget values to the values that they held
      *	last time this wizard was used to completion.
      */
-    @Override
-	protected void restoreWidgetValues() {
+    protected void restoreWidgetValues() {
         IDialogSettings settings = getDialogSettings();
         if (settings != null) {
             String[] directoryNames = settings
@@ -380,17 +372,18 @@ public class WizardArchiveFileResourceExportPage1 extends
         }
     }
 
-    @Override
-	protected String destinationEmptyMessage() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.wizards.datatransfer.WizardFileSystemResourceExportPage1#destinationEmptyMessage()
+     */
+    protected String destinationEmptyMessage() {
         return DataTransferMessages.ArchiveExport_destinationEmpty;
     }
-
+    
     /**
      *	Answer a boolean indicating whether the receivers destination specification
      *	widgets currently all contain valid values.
      */
-    @Override
-	protected boolean validateDestinationGroup() {
+    protected boolean validateDestinationGroup() {
     	String destinationValue = getDestinationValue();
     	if (destinationValue.endsWith(".tar")) { //$NON-NLS-1$
     		compressContentsCheckbox.setSelection(false);
@@ -405,7 +398,7 @@ public class WizardArchiveFileResourceExportPage1 extends
     		zipFormatButton.setSelection(true);
     		targzFormatButton.setSelection(false);
     	}
-
+    	
     	return super.validateDestinationGroup();
     }
 }

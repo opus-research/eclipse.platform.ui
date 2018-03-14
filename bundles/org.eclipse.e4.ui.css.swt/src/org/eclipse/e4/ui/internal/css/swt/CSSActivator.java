@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright (c) 2010, 2016 IBM Corporation and others.
+ *  Copyright (c) 2010, 2013 IBM Corporation and others.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -29,6 +29,10 @@ public class CSSActivator implements BundleActivator {
 
 	public static CSSActivator getDefault() {
 		return activator;
+	}
+
+	public Bundle getBundle() {
+		return context.getBundle();
 	}
 
 	public PackageAdmin getBundleAdmin() {
@@ -62,6 +66,10 @@ public class CSSActivator implements BundleActivator {
 		return null;
 	}
 
+	public BundleContext getContext() {
+		return context;
+	}
+
 	@Override
 	public void start(BundleContext context) throws Exception {
 		activator = this;
@@ -82,7 +90,7 @@ public class CSSActivator implements BundleActivator {
 			colorAndFontProviderTracker.close();
 			colorAndFontProviderTracker = null;
 		}
-		this.context = null;
+		context = null;
 	}
 
 	private LogService getLogger() {

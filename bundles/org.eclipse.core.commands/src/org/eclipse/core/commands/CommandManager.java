@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2016 IBM Corporation and others.
+ * Copyright (c) 2004, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,6 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 import org.eclipse.core.commands.common.HandleObjectManager;
-import org.eclipse.core.commands.common.NamedHandleObject;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.runtime.ListenerList;
 
@@ -31,7 +30,7 @@ import org.eclipse.core.runtime.ListenerList;
  * possible to listen to changes in the collection of commands by attaching a
  * listener to the manager.
  * </p>
- *
+ * 
  * @see CommandManager#getCommand(String)
  * @since 3.1
  */
@@ -42,16 +41,17 @@ public final class CommandManager extends HandleObjectManager implements
 	 * A listener that forwards incoming execution events to execution listeners
 	 * on this manager. The execution events will come from any command on this
 	 * manager.
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	private final class ExecutionListener implements
 			IExecutionListenerWithChecks {
 
-		@Override
 		public void notDefined(String commandId, NotDefinedException exception) {
 			if (executionListeners != null) {
-				for (final IExecutionListener object : executionListeners) {
+				final Object[] listeners = executionListeners.getListeners();
+				for (int i = 0; i < listeners.length; i++) {
+					final Object object = listeners[i];
 					if (object instanceof IExecutionListenerWithChecks) {
 						final IExecutionListenerWithChecks listener = (IExecutionListenerWithChecks) object;
 						listener.notDefined(commandId, exception);
@@ -60,10 +60,11 @@ public final class CommandManager extends HandleObjectManager implements
 			}
 		}
 
-		@Override
 		public void notEnabled(String commandId, NotEnabledException exception) {
 			if (executionListeners != null) {
-				for (final IExecutionListener object : executionListeners) {
+				final Object[] listeners = executionListeners.getListeners();
+				for (int i = 0; i < listeners.length; i++) {
+					final Object object = listeners[i];
 					if (object instanceof IExecutionListenerWithChecks) {
 						final IExecutionListenerWithChecks listener = (IExecutionListenerWithChecks) object;
 						listener.notEnabled(commandId, exception);
@@ -72,42 +73,58 @@ public final class CommandManager extends HandleObjectManager implements
 			}
 		}
 
-		@Override
 		public final void notHandled(final String commandId,
 				final NotHandledException exception) {
 			if (executionListeners != null) {
-				for (final IExecutionListener listener : executionListeners) {
-					listener.notHandled(commandId, exception);
+				final Object[] listeners = executionListeners.getListeners();
+				for (int i = 0; i < listeners.length; i++) {
+					final Object object = listeners[i];
+					if (object instanceof IExecutionListener) {
+						final IExecutionListener listener = (IExecutionListener) object;
+						listener.notHandled(commandId, exception);
+					}
 				}
 			}
 		}
 
-		@Override
 		public final void postExecuteFailure(final String commandId,
 				final ExecutionException exception) {
 			if (executionListeners != null) {
-				for (final IExecutionListener listener : executionListeners) {
-					listener.postExecuteFailure(commandId, exception);
+				final Object[] listeners = executionListeners.getListeners();
+				for (int i = 0; i < listeners.length; i++) {
+					final Object object = listeners[i];
+					if (object instanceof IExecutionListener) {
+						final IExecutionListener listener = (IExecutionListener) object;
+						listener.postExecuteFailure(commandId, exception);
+					}
 				}
 			}
 		}
 
-		@Override
 		public final void postExecuteSuccess(final String commandId,
 				final Object returnValue) {
 			if (executionListeners != null) {
-				for (final IExecutionListener listener : executionListeners) {
-					listener.postExecuteSuccess(commandId, returnValue);
+				final Object[] listeners = executionListeners.getListeners();
+				for (int i = 0; i < listeners.length; i++) {
+					final Object object = listeners[i];
+					if (object instanceof IExecutionListener) {
+						final IExecutionListener listener = (IExecutionListener) object;
+						listener.postExecuteSuccess(commandId, returnValue);
+					}
 				}
 			}
 		}
 
-		@Override
 		public final void preExecute(final String commandId,
 				final ExecutionEvent event) {
 			if (executionListeners != null) {
-				for (final IExecutionListener listener : executionListeners) {
-					listener.preExecute(commandId, event);
+				final Object[] listeners = executionListeners.getListeners();
+				for (int i = 0; i < listeners.length; i++) {
+					final Object object = listeners[i];
+					if (object instanceof IExecutionListener) {
+						final IExecutionListener listener = (IExecutionListener) object;
+						listener.preExecute(commandId, event);
+					}
 				}
 			}
 		}
@@ -116,7 +133,7 @@ public final class CommandManager extends HandleObjectManager implements
 	/**
 	 * The identifier of the category in which all auto-generated commands will
 	 * appear. This value must never be <code>null</code>.
-	 *
+	 * 
 	 * @since 3.2
 	 */
 	public static final String AUTOGENERATED_CATEGORY_ID = "org.eclipse.core.commands.categories.autogenerated"; //$NON-NLS-1$
@@ -157,7 +174,7 @@ public final class CommandManager extends HandleObjectManager implements
 	 * <p>
 	 * See also ParameterizedCommand.escape(String)
 	 * </p>
-	 *
+	 * 
 	 * @param escapedText
 	 *            a <code>String</code> that may contain escaped special
 	 *            characters for command serialization.
@@ -221,60 +238,60 @@ public final class CommandManager extends HandleObjectManager implements
 	 * <code>Category</code>). This collection may be empty, but it is never
 	 * <code>null</code>.
 	 */
-	private final Map<String, Category> categoriesById = new HashMap<>();
+	private final Map categoriesById = new HashMap();
 
 	/**
 	 * The set of identifiers for those categories that are defined. This value
 	 * may be empty, but it is never <code>null</code>.
 	 */
-	private final Set<String> definedCategoryIds = new HashSet<>();
+	private final Set definedCategoryIds = new HashSet();
 
 	/**
 	 * The set of identifiers for those command parameter types that are
 	 * defined. This value may be empty, but it is never <code>null</code>.
-	 *
+	 * 
 	 * @since 3.2
 	 */
-	private final Set<String> definedParameterTypeIds = new HashSet<>();
+	private final Set definedParameterTypeIds = new HashSet();
 
 	/**
 	 * The execution listener for this command manager. This just forwards
 	 * events from commands controlled by this manager to listeners on this
 	 * manager.
 	 */
-	private IExecutionListenerWithChecks executionListener;
-
+	private IExecutionListenerWithChecks executionListener = null;
+	
 	private boolean shouldCommandFireEvents = true;
 
 	/**
 	 * The collection of execution listeners. This collection is
 	 * <code>null</code> if there are no listeners.
 	 */
-	private ListenerList<IExecutionListener> executionListeners;
+	private ListenerList executionListeners = null;
 
 	/**
 	 * The help context identifiers ({@link String}) for a handler ({@link IHandler}).
 	 * This map may be empty, but it is never <code>null</code>. Entries are
 	 * removed if all strong references to the handler are removed.
-	 *
+	 * 
 	 * @since 3.2
 	 */
-	private final Map<IHandler, String> helpContextIdsByHandler = new WeakHashMap<>();
+	private final Map helpContextIdsByHandler = new WeakHashMap();
 
 	/**
 	 * The map of parameter type identifiers (<code>String</code>) to
 	 * parameter types ( <code>ParameterType</code>). This collection may be
 	 * empty, but it is never <code>null</code>.
-	 *
+	 * 
 	 * @since 3.2
 	 */
-	private final Map<String, ParameterType> parameterTypesById = new HashMap<>();
+	private final Map parameterTypesById = new HashMap();
 
 	/**
 	 * Adds a listener to this command manager. The listener will be notified
 	 * when the set of defined commands changes. This can be used to track the
 	 * global appearance and disappearance of commands.
-	 *
+	 * 
 	 * @param listener
 	 *            The listener to attach; must not be <code>null</code>.
 	 */
@@ -287,7 +304,7 @@ public final class CommandManager extends HandleObjectManager implements
 	 * Adds an execution listener to this manager. This listener will be
 	 * notified if any of the commands controlled by this manager execute. This
 	 * can be used to support macros and instrumentation of commands.
-	 *
+	 * 
 	 * @param listener
 	 *            The listener to attach; must not be <code>null</code>.
 	 */
@@ -298,11 +315,11 @@ public final class CommandManager extends HandleObjectManager implements
 		}
 
 		if (executionListeners == null) {
-			executionListeners = new ListenerList<>(ListenerList.IDENTITY);
+			executionListeners = new ListenerList(ListenerList.IDENTITY);
 
 			// Add an execution listener to every command.
 			executionListener = new ExecutionListener();
-			final Iterator<NamedHandleObject> commandItr = handleObjectsById.values().iterator();
+			final Iterator commandItr = handleObjectsById.values().iterator();
 			while (commandItr.hasNext()) {
 				final Command command = (Command) commandItr.next();
 				command.addExecutionListener(executionListener);
@@ -313,7 +330,11 @@ public final class CommandManager extends HandleObjectManager implements
 		executionListeners.add(listener);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.ICategoryListener#categoryChanged(org.eclipse.core.commands.CategoryEvent)
+	 */
 	public final void categoryChanged(CategoryEvent categoryEvent) {
 		if (categoryEvent.isDefinedChanged()) {
 			final Category category = categoryEvent.getCategory();
@@ -331,7 +352,11 @@ public final class CommandManager extends HandleObjectManager implements
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.commands.ICommandListener#commandChanged(org.eclipse.commands.CommandEvent)
+	 */
 	public final void commandChanged(final CommandEvent commandEvent) {
 		if (commandEvent.isDefinedChanged()) {
 			final Command command = commandEvent.getCommand();
@@ -353,7 +378,7 @@ public final class CommandManager extends HandleObjectManager implements
 	 * Sets the name and description of the category for uncategorized commands.
 	 * This is the category that will be returned if
 	 * {@link #getCategory(String)} is called with <code>null</code>.
-	 *
+	 * 
 	 * @param name
 	 *            The name of the category for uncategorized commands; must not
 	 *            be <code>null</code>.
@@ -391,7 +416,7 @@ public final class CommandManager extends HandleObjectManager implements
 	 * an exception if there is a problem processing the serialization string or
 	 * the encoded command is undefined.
 	 * </p>
-	 *
+	 * 
 	 * @param serializedParameterizedCommand
 	 *            a string representing a command id and parameter ids and
 	 *            values; must not be <code>null</code>
@@ -448,7 +473,7 @@ public final class CommandManager extends HandleObjectManager implements
 	/**
 	 * Notifies all of the listeners to this manager that the set of defined
 	 * command identifiers has changed.
-	 *
+	 * 
 	 * @param event
 	 *            The event to send to all of the listeners; must not be
 	 *            <code>null</code>.
@@ -468,18 +493,19 @@ public final class CommandManager extends HandleObjectManager implements
 	/**
 	 * Returns all of the commands known by this manager -- defined and
 	 * undefined.
-	 *
+	 * 
 	 * @return All of the commands; may be empty, but never <code>null</code>.
 	 * @since 3.2
 	 */
 	public final Command[] getAllCommands() {
-		return (Command[]) handleObjectsById.values().toArray(new Command[handleObjectsById.size()]);
+		return (Command[]) handleObjectsById.values().toArray(
+				new Command[handleObjectsById.size()]);
 	}
 
 	/**
 	 * Gets the category with the given identifier. If no such category
 	 * currently exists, then the category will be created (but be undefined).
-	 *
+	 * 
 	 * @param categoryId
 	 *            The identifier to find; must not be <code>null</code>. If
 	 *            the category is <code>null</code>, then a category suitable
@@ -495,7 +521,7 @@ public final class CommandManager extends HandleObjectManager implements
 
 		checkId(categoryId);
 
-		Category category = categoriesById.get(categoryId);
+		Category category = (Category) categoriesById.get(categoryId);
 		if (category == null) {
 			category = new Category(categoryId);
 			categoriesById.put(categoryId, category);
@@ -508,7 +534,7 @@ public final class CommandManager extends HandleObjectManager implements
 	/**
 	 * Gets the command with the given identifier. If no such command currently
 	 * exists, then the command will be created (but will be undefined).
-	 *
+	 * 
 	 * @param commandId
 	 *            The identifier to find; must not be <code>null</code> and
 	 *            must not be zero-length.
@@ -536,17 +562,17 @@ public final class CommandManager extends HandleObjectManager implements
 
 	/**
 	 * Returns the categories that are defined.
-	 *
+	 * 
 	 * @return The defined categories; this value may be empty, but it is never
 	 *         <code>null</code>.
 	 * @since 3.2
 	 */
 	public final Category[] getDefinedCategories() {
 		final Category[] categories = new Category[definedCategoryIds.size()];
-		final Iterator<String> categoryIdItr = definedCategoryIds.iterator();
+		final Iterator categoryIdItr = definedCategoryIds.iterator();
 		int i = 0;
 		while (categoryIdItr.hasNext()) {
-			String categoryId = categoryIdItr.next();
+			String categoryId = (String) categoryIdItr.next();
 			categories[i++] = getCategory(categoryId);
 		}
 		return categories;
@@ -554,53 +580,51 @@ public final class CommandManager extends HandleObjectManager implements
 
 	/**
 	 * Returns the set of identifiers for those category that are defined.
-	 *
+	 * 
 	 * @return The set of defined category identifiers; this value may be empty,
 	 *         but it is never <code>null</code>.
 	 */
-	@SuppressWarnings("rawtypes")
 	public final Set getDefinedCategoryIds() {
 		return Collections.unmodifiableSet(definedCategoryIds);
 	}
 
 	/**
 	 * Returns the set of identifiers for those commands that are defined.
-	 *
+	 * 
 	 * @return The set of defined command identifiers; this value may be empty,
 	 *         but it is never <code>null</code>.
 	 */
-	@SuppressWarnings("rawtypes")
 	public final Set getDefinedCommandIds() {
 		return getDefinedHandleObjectIds();
 	}
 
 	/**
 	 * Returns the commands that are defined.
-	 *
+	 * 
 	 * @return The defined commands; this value may be empty, but it is never
 	 *         <code>null</code>.
 	 * @since 3.2
 	 */
 	public final Command[] getDefinedCommands() {
-		return (Command[]) definedHandleObjects.toArray(new Command[definedHandleObjects.size()]);
+		return (Command[]) definedHandleObjects
+				.toArray(new Command[definedHandleObjects.size()]);
 	}
 
 	/**
 	 * Returns the set of identifiers for those parameter types that are
 	 * defined.
-	 *
+	 * 
 	 * @return The set of defined command parameter type identifiers; this value
 	 *         may be empty, but it is never <code>null</code>.
 	 * @since 3.2
 	 */
-	@SuppressWarnings("rawtypes")
 	public final Set getDefinedParameterTypeIds() {
 		return Collections.unmodifiableSet(definedParameterTypeIds);
 	}
 
 	/**
 	 * Returns the command parameter types that are defined.
-	 *
+	 * 
 	 * @return The defined command parameter types; this value may be empty, but
 	 *         it is never <code>null</code>.
 	 * @since 3.2
@@ -608,10 +632,10 @@ public final class CommandManager extends HandleObjectManager implements
 	public final ParameterType[] getDefinedParameterTypes() {
 		final ParameterType[] parameterTypes = new ParameterType[definedParameterTypeIds
 				.size()];
-		final Iterator<String> iterator = definedParameterTypeIds.iterator();
+		final Iterator iterator = definedParameterTypeIds.iterator();
 		int i = 0;
 		while (iterator.hasNext()) {
-			final String parameterTypeId = iterator.next();
+			final String parameterTypeId = (String) iterator.next();
 			parameterTypes[i++] = getParameterType(parameterTypeId);
 		}
 		return parameterTypes;
@@ -623,7 +647,7 @@ public final class CommandManager extends HandleObjectManager implements
 	 * does not have a help context identifier, then the help context identifier
 	 * for the command is returned. If neither has a help context identifier,
 	 * then <code>null</code> is returned.
-	 *
+	 * 
 	 * @param command
 	 *            The command for which the help context should be retrieved;
 	 *            must not be <code>null</code>.
@@ -633,7 +657,8 @@ public final class CommandManager extends HandleObjectManager implements
 	 *             If the given command is not defined.
 	 * @since 3.2
 	 */
-	public final String getHelpContextId(final Command command) throws NotDefinedException {
+	public final String getHelpContextId(final Command command)
+			throws NotDefinedException {
 		// Check if the command is defined.
 		if (!command.isDefined()) {
 			throw new NotDefinedException("The command is not defined. " //$NON-NLS-1$
@@ -643,7 +668,8 @@ public final class CommandManager extends HandleObjectManager implements
 		// Check the handler.
 		final IHandler handler = command.getHandler();
 		if (handler != null) {
-			final String helpContextId = helpContextIdsByHandler.get(handler);
+			final String helpContextId = (String) helpContextIdsByHandler
+					.get(handler);
 			if (helpContextId != null) {
 				return helpContextId;
 			}
@@ -657,7 +683,7 @@ public final class CommandManager extends HandleObjectManager implements
 	 * Returns an array of parameterizations for the provided command by
 	 * deriving the parameter ids and values from the provided
 	 * <code>serializedParameters</code> string.
-	 *
+	 * 
 	 * @param serializedParameters
 	 *            a String encoding parameter ids and values; must not be
 	 *            <code>null</code>.
@@ -669,10 +695,12 @@ public final class CommandManager extends HandleObjectManager implements
 	 *             if there is an error deserializing the parameters
 	 * @since 3.2
 	 */
-	private final Parameterization[] getParameterizations(String serializedParameters, final IParameter[] parameters)
+	private final Parameterization[] getParameterizations(
+			String serializedParameters, final IParameter[] parameters)
 			throws SerializationException {
 
-		if (serializedParameters == null || (serializedParameters.length() == 0)) {
+		if (serializedParameters == null
+				|| (serializedParameters.length() == 0)) {
 			return null;
 		}
 
@@ -680,7 +708,7 @@ public final class CommandManager extends HandleObjectManager implements
 			return null;
 		}
 
-		final ArrayList<Parameterization> paramList = new ArrayList<>();
+		final ArrayList paramList = new ArrayList();
 
 		int commaPosition; // split off each param by looking for ','
 		do {
@@ -692,10 +720,12 @@ public final class CommandManager extends HandleObjectManager implements
 				idEqualsValue = serializedParameters;
 			} else {
 				// take the first parameter...
-				idEqualsValue = serializedParameters.substring(0, commaPosition);
+				idEqualsValue = serializedParameters
+						.substring(0, commaPosition);
 
 				// ... and put the rest back into serializedParameters
-				serializedParameters = serializedParameters.substring(commaPosition + 1);
+				serializedParameters = serializedParameters
+						.substring(commaPosition + 1);
 			}
 
 			final int equalsPosition = unescapedIndexOf(idEqualsValue, '=');
@@ -707,28 +737,32 @@ public final class CommandManager extends HandleObjectManager implements
 				parameterId = unescape(idEqualsValue);
 				parameterValue = null;
 			} else {
-				parameterId = unescape(idEqualsValue.substring(0, equalsPosition));
-				parameterValue = unescape(idEqualsValue.substring(equalsPosition + 1));
+				parameterId = unescape(idEqualsValue.substring(0,
+						equalsPosition));
+				parameterValue = unescape(idEqualsValue
+						.substring(equalsPosition + 1));
 			}
 
 			for (int i = 0; i < parameters.length; i++) {
 				final IParameter parameter = parameters[i];
 				if (parameter.getId().equals(parameterId)) {
-					paramList.add(new Parameterization(parameter, parameterValue));
+					paramList.add(new Parameterization(parameter,
+							parameterValue));
 					break;
 				}
 			}
 
 		} while (commaPosition != -1);
 
-		return paramList.toArray(new Parameterization[paramList.size()]);
+		return (Parameterization[]) paramList
+				.toArray(new Parameterization[paramList.size()]);
 	}
 
 	/**
 	 * Gets the command {@link ParameterType} with the given identifier. If no
 	 * such command parameter type currently exists, then the command parameter
 	 * type will be created (but will be undefined).
-	 *
+	 * 
 	 * @param parameterTypeId
 	 *            The identifier to find; must not be <code>null</code> and
 	 *            must not be zero-length.
@@ -739,7 +773,8 @@ public final class CommandManager extends HandleObjectManager implements
 	public final ParameterType getParameterType(final String parameterTypeId) {
 		checkId(parameterTypeId);
 
-		ParameterType parameterType = parameterTypesById.get(parameterTypeId);
+		ParameterType parameterType = (ParameterType) parameterTypesById
+				.get(parameterTypeId);
 		if (parameterType == null) {
 			parameterType = new ParameterType(parameterTypeId);
 			parameterTypesById.put(parameterTypeId, parameterType);
@@ -751,13 +786,14 @@ public final class CommandManager extends HandleObjectManager implements
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 * @since 3.2
 	 */
-	@Override
-	public final void parameterTypeChanged(final ParameterTypeEvent parameterTypeEvent) {
+	public final void parameterTypeChanged(
+			final ParameterTypeEvent parameterTypeEvent) {
 		if (parameterTypeEvent.isDefinedChanged()) {
-			final ParameterType parameterType = parameterTypeEvent.getParameterType();
+			final ParameterType parameterType = parameterTypeEvent
+					.getParameterType();
 			final String parameterTypeId = parameterType.getId();
 			final boolean parameterTypeIdAdded = parameterType.isDefined();
 			if (parameterTypeIdAdded) {
@@ -766,23 +802,25 @@ public final class CommandManager extends HandleObjectManager implements
 				definedParameterTypeIds.remove(parameterTypeId);
 			}
 
-			fireCommandManagerChanged(new CommandManagerEvent(this, parameterTypeId, parameterTypeIdAdded, true));
+			fireCommandManagerChanged(new CommandManagerEvent(this,
+					parameterTypeId, parameterTypeIdAdded, true));
 		}
 	}
 
 	/**
 	 * Removes a listener from this command manager.
-	 *
+	 * 
 	 * @param listener
 	 *            The listener to be removed; must not be <code>null</code>.
 	 */
-	public final void removeCommandManagerListener(final ICommandManagerListener listener) {
+	public final void removeCommandManagerListener(
+			final ICommandManagerListener listener) {
 		removeListenerObject(listener);
 	}
 
 	/**
 	 * Removes an execution listener from this command manager.
-	 *
+	 * 
 	 * @param listener
 	 *            The listener to be removed; must not be <code>null</code>.
 	 */
@@ -801,7 +839,7 @@ public final class CommandManager extends HandleObjectManager implements
 			executionListeners = null;
 
 			// Remove the execution listener to every command.
-			final Iterator<NamedHandleObject> commandItr = handleObjectsById.values().iterator();
+			final Iterator commandItr = handleObjectsById.values().iterator();
 			while (commandItr.hasNext()) {
 				final Command command = (Command) commandItr.next();
 				command.removeExecutionListener(executionListener);
@@ -816,7 +854,7 @@ public final class CommandManager extends HandleObjectManager implements
 	 * is <code>null</code> or the command id does not exist in the map, then
 	 * the command becomes unhandled. Otherwise, the handler is set to the
 	 * corresponding value in the map.
-	 *
+	 * 
 	 * @param handlersByCommandId
 	 *            A map of command identifiers (<code>String</code>) to
 	 *            handlers (<code>IHandler</code>). This map may be
@@ -824,15 +862,15 @@ public final class CommandManager extends HandleObjectManager implements
 	 *            Similarly, if the map is empty, then all commands will become
 	 *            unhandled.
 	 */
-	public final void setHandlersByCommandId(@SuppressWarnings("rawtypes") final Map handlersByCommandId) {
+	public final void setHandlersByCommandId(final Map handlersByCommandId) {
 		// Make that all the reference commands are created.
-		final Iterator<?> commandIdItr = handlersByCommandId.keySet().iterator();
+		final Iterator commandIdItr = handlersByCommandId.keySet().iterator();
 		while (commandIdItr.hasNext()) {
 			getCommand((String) commandIdItr.next());
 		}
 
 		// Now, set-up the handlers on all of the existing commands.
-		final Iterator<NamedHandleObject> commandItr = handleObjectsById.values().iterator();
+		final Iterator commandItr = handleObjectsById.values().iterator();
 		while (commandItr.hasNext()) {
 			final Command command = (Command) commandItr.next();
 			final String commandId = command.getId();
@@ -847,7 +885,7 @@ public final class CommandManager extends HandleObjectManager implements
 
 	/**
 	 * Sets the help context identifier to associate with a particular handler.
-	 *
+	 * 
 	 * @param handler
 	 *            The handler with which to register a help context identifier;
 	 *            must not be <code>null</code>.
@@ -857,7 +895,8 @@ public final class CommandManager extends HandleObjectManager implements
 	 *            removed.
 	 * @since 3.2
 	 */
-	public final void setHelpContextId(final IHandler handler, final String helpContextId) {
+	public final void setHelpContextId(final IHandler handler,
+			final String helpContextId) {
 		if (handler == null) {
 			throw new NullPointerException("The handler cannot be null"); //$NON-NLS-1$
 		}
@@ -874,7 +913,7 @@ public final class CommandManager extends HandleObjectManager implements
 	 * character. This is used by {@link #deserialize(String)} and
 	 * {@link #getParameterizations(String, IParameter[])} to parse the
 	 * serialized parameterized command string.
-	 *
+	 * 
 	 * @param escapedText
 	 *            the string to search for the index of <code>ch</code> in
 	 * @param ch
@@ -906,7 +945,7 @@ public final class CommandManager extends HandleObjectManager implements
 		return pos;
 
 	}
-
+	
 	/**
 	 * Fires the <code>notEnabled</code> event for
 	 * <code>executionListeners</code>.
@@ -914,7 +953,7 @@ public final class CommandManager extends HandleObjectManager implements
 	 * <b>Note:</b> This supports bridging actions to the command framework,
 	 * and should not be used outside the framework.
 	 * </p>
-	 *
+	 * 
 	 * @param commandId
 	 *            The command id of the command about to execute, never
 	 *            <code>null</code>.
@@ -927,7 +966,7 @@ public final class CommandManager extends HandleObjectManager implements
 			executionListener.notEnabled(commandId, exception);
 		}
 	}
-
+	
 	/**
 	 * Fires the <code>notDefined</code> event for
 	 * <code>executionListeners</code>.
@@ -935,7 +974,7 @@ public final class CommandManager extends HandleObjectManager implements
 	 * <b>Note:</b> This supports bridging actions to the command framework,
 	 * and should not be used outside the framework.
 	 * </p>
-	 *
+	 * 
 	 * @param commandId
 	 *            The command id of the command about to execute, never
 	 *            <code>null</code>.
@@ -948,7 +987,7 @@ public final class CommandManager extends HandleObjectManager implements
 			executionListener.notDefined(commandId, exception);
 		}
 	}
-
+	
 	/**
 	 * Fires the <code>preExecute</code> event for
 	 * <code>executionListeners</code>.
@@ -956,7 +995,7 @@ public final class CommandManager extends HandleObjectManager implements
 	 * <b>Note:</b> This supports bridging actions to the command framework,
 	 * and should not be used outside the framework.
 	 * </p>
-	 *
+	 * 
 	 * @param commandId
 	 *            The command id of the command about to execute, never
 	 *            <code>null</code>.
@@ -969,7 +1008,7 @@ public final class CommandManager extends HandleObjectManager implements
 			executionListener.preExecute(commandId, event);
 		}
 	}
-
+	
 	/**
 	 * Fires the <code>postExecuteSuccess</code> event for
 	 * <code>executionListeners</code>.
@@ -977,7 +1016,7 @@ public final class CommandManager extends HandleObjectManager implements
 	 * <b>Note:</b> This supports bridging actions to the command framework,
 	 * and should not be used outside the framework.
 	 * </p>
-	 *
+	 * 
 	 * @param commandId
 	 *            The command id of the command executed, never
 	 *            <code>null</code>.
@@ -990,7 +1029,7 @@ public final class CommandManager extends HandleObjectManager implements
 			executionListener.postExecuteSuccess(commandId, returnValue);
 		}
 	}
-
+	
 	/**
 	 * Fires the <code>postExecuteFailure</code> event for
 	 * <code>executionListeners</code>.
@@ -998,7 +1037,7 @@ public final class CommandManager extends HandleObjectManager implements
 	 * <b>Note:</b> This supports bridging actions to the command framework,
 	 * and should not be used outside the framework.
 	 * </p>
-	 *
+	 * 
 	 * @param commandId
 	 *            The command id of the command executed, never
 	 *            <code>null</code>.
@@ -1006,7 +1045,7 @@ public final class CommandManager extends HandleObjectManager implements
 	 *            The exception, never <code>null</code>.
 	 * @since 3.4
 	 */
-	public void firePostExecuteFailure(String commandId,
+	public void firePostExecuteFailure(String commandId, 
 			ExecutionException exception) {
 		if (executionListener != null) {
 			executionListener.postExecuteFailure(commandId, exception);

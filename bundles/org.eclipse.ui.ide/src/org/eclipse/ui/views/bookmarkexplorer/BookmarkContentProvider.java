@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,8 +48,7 @@ class BookmarkContentProvider implements IStructuredContentProvider,
      * The visual part that is using this content provider is about
      * to be disposed. Deallocate all allocated SWT resources.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         IResource resource = (IResource) viewer.getInput();
         if (resource != null) {
             resource.getWorkspace().removeResourceChangeListener(this);
@@ -74,12 +73,12 @@ class BookmarkContentProvider implements IStructuredContentProvider,
         // of the existing bookmarks.  Otherwise, return an empty list.
         if (element instanceof IResource) {
 			return getBookmarks((IResource) element);
+		} else {
+			return new Object[0];
 		}
-		return new Object[0];
     }
 
-    @Override
-	public Object[] getElements(Object element) {
+    public Object[] getElements(Object element) {
         return getChildren(element);
     }
 
@@ -120,9 +119,9 @@ class BookmarkContentProvider implements IStructuredContentProvider,
         }
     }
 
-	/*
-	 * Method declared on ITreeContentProvider,
-	 */
+    /* (non-Javadoc)
+     * Method declared on ITreeContentProvider,
+     */
     public Object getParent(Object element) {
         return input;
     }
@@ -133,12 +132,12 @@ class BookmarkContentProvider implements IStructuredContentProvider,
     public boolean hasChildren(Object element) {
         if (element instanceof IWorkspace) {
 			return true;
+		} else {
+			return false;
 		}
-		return false;
     }
 
-    @Override
-	public void inputChanged(Viewer newViewer, Object oldInput, Object newInput) {
+    public void inputChanged(Viewer newViewer, Object oldInput, Object newInput) {
         if (oldInput == null) {
             IResource resource = (IResource) newInput;
             resource.getWorkspace().addResourceChangeListener(this);
@@ -153,11 +152,10 @@ class BookmarkContentProvider implements IStructuredContentProvider,
      *
      * @see IResourceChangeListener#resourceChanged
      */
-    @Override
-	public void resourceChanged(final IResourceChangeEvent event) {
+    public void resourceChanged(final IResourceChangeEvent event) {
 
         // gather all marker changes from the delta.
-        // be sure to do this in the calling thread,
+        // be sure to do this in the calling thread, 
         // as the delta is destroyed when this method returns
         final List additions = new ArrayList();
         final List removals = new ArrayList();
@@ -171,16 +169,18 @@ class BookmarkContentProvider implements IStructuredContentProvider,
 
         // update the viewer based on the marker changes, in the UI thread
         if (additions.size() + removals.size() + changes.size() > 0) {
-            viewer.getControl().getDisplay().asyncExec(() -> {
-			    // This method runs inside an asyncExec.  The widget may have been destroyed
-			    // by the time this is run.  Check for this and do nothing if so.
-			    Control ctrl = viewer.getControl();
-			    if (ctrl == null || ctrl.isDisposed()) {
-					return;
-				}
+            viewer.getControl().getDisplay().asyncExec(new Runnable() {
+                public void run() {
+                    // This method runs inside an asyncExec.  The widget may have been destroyed
+                    // by the time this is run.  Check for this and do nothing if so.
+                    Control ctrl = viewer.getControl();
+                    if (ctrl == null || ctrl.isDisposed()) {
+						return;
+					}
 
-			    viewer.refresh();
-			});
+                    viewer.refresh();
+                }
+            });
         }
     }
 }

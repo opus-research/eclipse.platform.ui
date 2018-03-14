@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,7 +31,6 @@ import org.eclipse.ui.views.framelist.UpAction;
  * This is the action group for the goto actions.
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
-@Deprecated
 public class GotoActionGroup extends ResourceNavigatorActionGroup {
 
     private BackAction backAction;
@@ -48,8 +47,7 @@ public class GotoActionGroup extends ResourceNavigatorActionGroup {
         super(navigator);
     }
 
-    @Override
-	public void fillContextMenu(IMenuManager menu) {
+    public void fillContextMenu(IMenuManager menu) {
         IStructuredSelection selection = (IStructuredSelection) getContext()
                 .getSelection();
         if (selection.size() == 1) {
@@ -70,8 +68,7 @@ public class GotoActionGroup extends ResourceNavigatorActionGroup {
         }
     }
 
-    @Override
-	public void fillActionBars(IActionBars actionBars) {
+    public void fillActionBars(IActionBars actionBars) {
         actionBars.setGlobalActionHandler(IWorkbenchActionConstants.GO_INTO,
                 goIntoAction);
         actionBars.setGlobalActionHandler(ActionFactory.BACK.getId(),
@@ -89,8 +86,7 @@ public class GotoActionGroup extends ResourceNavigatorActionGroup {
         toolBar.add(upAction);
     }
 
-    @Override
-	protected void makeActions() {
+    protected void makeActions() {
         FrameList frameList = navigator.getFrameList();
         goIntoAction = new GoIntoAction(frameList);
         backAction = new BackAction(frameList);
@@ -100,8 +96,7 @@ public class GotoActionGroup extends ResourceNavigatorActionGroup {
                 ResourceNavigatorMessages.GoToResource_label);
     }
 
-    @Override
-	public void updateActionBars() {
+    public void updateActionBars() {
         ActionContext context = getContext();
         boolean enable = false;
 

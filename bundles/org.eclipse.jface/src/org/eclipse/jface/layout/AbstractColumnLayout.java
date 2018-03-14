@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,9 +24,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Scrollable;
 import org.eclipse.swt.widgets.Widget;
 
@@ -34,12 +34,12 @@ import org.eclipse.swt.widgets.Widget;
  * The AbstractColumnLayout is a {@link Layout} used to set the size of a table
  * in a consistent way even during a resize unlike a {@link TableLayout} which
  * only sets initial sizes.
- *
+ * 
  * <p>
  * <b>You can only add the layout to a container whose only child is the
  * table/tree control you want the layouts applied to.</b>
  * </p>
- *
+ * 
  * @since 3.4
  */
 public abstract class AbstractColumnLayout extends Layout {
@@ -66,38 +66,23 @@ public abstract class AbstractColumnLayout extends Layout {
 
 	private boolean relayout = true;
 
-	private boolean adjustForScrollBar = false;
+	private Listener resizeListener = new Listener() {
 
-	private Listener resizeListener = event -> {
-		if (!inupdateMode) {
-			updateColumnData(event.widget);
+		@Override
+		public void handleEvent(Event event) {
+			if (!inupdateMode) {
+				updateColumnData(event.widget);
+			}
 		}
+
 	};
 
 	/**
-	 * Creates a new abstract column layout.
-	 */
-	public AbstractColumnLayout() {
-	}
-
-	/**
-	 * Creates a new abstract column layout.
-	 *
-	 * @param adjustForScrollBar
-	 *            <code>true</code> if the layout should reserve space for the
-	 *            vertical scroll bar
-	 * @since 3.12
-	 */
-	public AbstractColumnLayout(boolean adjustForScrollBar) {
-		this.adjustForScrollBar = adjustForScrollBar;
-	}
-
-	/**
 	 * Adds a new column of data to this table layout.
-	 *
+	 * 
 	 * @param column
 	 *            the column
-	 *
+	 * 
 	 * @param data
 	 *            the column layout data
 	 */
@@ -113,7 +98,7 @@ public abstract class AbstractColumnLayout extends Layout {
 	/**
 	 * Compute the size of the table or tree based on the ColumnLayoutData and
 	 * the width and height hint.
-	 *
+	 * 
 	 * @param scrollable
 	 *            the widget to compute
 	 * @param wHint
@@ -126,10 +111,7 @@ public abstract class AbstractColumnLayout extends Layout {
 			int hHint) {
 		Point result = scrollable.computeSize(wHint, hHint);
 
-		int width = scrollable.getBorderWidth() * 2;
-		if (adjustForScrollBar && scrollable.getVerticalBar() != null) {
-			width += scrollable.getVerticalBar().getSize().x;
-		}
+		int width = 0;
 		int size = getColumnCount(scrollable);
 		for (int i = 0; i < size; ++i) {
 			ColumnLayoutData layoutData = getLayoutData(scrollable, i);
@@ -146,7 +128,8 @@ public abstract class AbstractColumnLayout extends Layout {
 				Assert.isTrue(false, "Unknown column layout data"); //$NON-NLS-1$
 			}
 		}
-		result.x = width;
+		if (width > result.x)
+			result.x = width;
 
 		return result;
 	}
@@ -154,7 +137,7 @@ public abstract class AbstractColumnLayout extends Layout {
 	/**
 	 * Layout the scrollable based on the supplied width and area. Only increase
 	 * the size of the scrollable if increase is <code>true</code>.
-	 *
+	 * 
 	 * @param scrollable
 	 * @param width
 	 * @param area
@@ -189,12 +172,6 @@ public abstract class AbstractColumnLayout extends Layout {
 				totalWeight += cw.weight;
 			} else {
 				Assert.isTrue(false, "Unknown column layout data"); //$NON-NLS-1$
-			}
-		}
-		if (adjustForScrollBar) {
-			ScrollBar verticalBar = scrollable.getVerticalBar();
-			if (verticalBar != null && scrollable.getScrollbarsMode() == SWT.NONE && !verticalBar.isVisible()) {
-				fixedWidth += verticalBar.getSize().x;
 			}
 		}
 
@@ -241,12 +218,26 @@ public abstract class AbstractColumnLayout extends Layout {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.widgets.Layout#computeSize(org.eclipse.swt.widgets.Composite
+	 * , int, int, boolean)
+	 */
 	@Override
 	protected Point computeSize(Composite composite, int wHint, int hHint,
 			boolean flushCache) {
 		return computeTableTreeSize(getControl(composite), wHint, hHint);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.widgets.Layout#layout(org.eclipse.swt.widgets.Composite,
+	 * boolean)
+	 */
 	@Override
 	protected void layout(Composite composite, boolean flushCache) {
 		Rectangle area = composite.getClientArea();
@@ -268,7 +259,7 @@ public abstract class AbstractColumnLayout extends Layout {
 
 	/**
 	 * Compute the area required for trim.
-	 *
+	 * 
 	 * @param area
 	 * @param scrollable
 	 * @param currentWidth
@@ -292,7 +283,7 @@ public abstract class AbstractColumnLayout extends Layout {
 
 	/**
 	 * Get the control being laid out.
-	 *
+	 * 
 	 * @param composite
 	 *            the composite with the layout
 	 * @return {@link Scrollable}
@@ -303,10 +294,10 @@ public abstract class AbstractColumnLayout extends Layout {
 
 	/**
 	 * Get the number of columns for the receiver.
-	 *
+	 * 
 	 * @param tableTree
 	 *            the control
-	 *
+	 * 
 	 * @return the number of columns
      * @since 3.5
 	 */
@@ -314,10 +305,10 @@ public abstract class AbstractColumnLayout extends Layout {
 
 	/**
 	 * Set the widths of the columns.
-	 *
+	 * 
 	 * @param tableTree
 	 *            the control
-	 *
+	 * 
 	 * @param widths
 	 *            the widths of the column
      * @since 3.5
@@ -326,7 +317,7 @@ public abstract class AbstractColumnLayout extends Layout {
 
 	/**
 	 * Get the layout data for a column
-	 *
+	 * 
 	 * @param tableTree
 	 *            the control
 	 * @param columnIndex
@@ -339,7 +330,7 @@ public abstract class AbstractColumnLayout extends Layout {
 
 	/**
 	 * Update the layout data for a column
-	 *
+	 * 
 	 * @param column
 	 *            the column
      * @since 3.5
@@ -350,7 +341,7 @@ public abstract class AbstractColumnLayout extends Layout {
 	 * The number of extra pixels taken as horizontal trim by the table column.
 	 * To ensure there are N pixels available for the content of the column,
 	 * assign N+COLUMN_TRIM for the column width.
-	 *
+	 * 
 	 * @return the trim used by the columns
 	 * @since 3.4
 	 */

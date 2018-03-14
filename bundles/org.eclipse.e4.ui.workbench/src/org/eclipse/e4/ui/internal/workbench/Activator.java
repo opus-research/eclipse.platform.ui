@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,8 @@ import org.eclipse.osgi.service.debug.DebugTrace;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Filter;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.BundleTracker;
@@ -50,7 +52,7 @@ public class Activator implements BundleActivator {
 
 	/**
 	 * Get the default activator.
-	 *
+	 * 
 	 * @return a BundleActivator
 	 */
 	public static Activator getDefault() {
@@ -80,13 +82,31 @@ public class Activator implements BundleActivator {
 		return context;
 	}
 
+	/**
+	 * @return the instance Location service
+	 */
+	public Location getInstanceLocation() {
+		if (locationTracker == null) {
+			Filter filter = null;
+			try {
+				filter = context.createFilter(Location.INSTANCE_FILTER);
+			} catch (InvalidSyntaxException e) {
+				// ignore this. It should never happen as we have tested the
+				// above format.
+			}
+			locationTracker = new ServiceTracker<Location, Location>(context, filter, null);
+			locationTracker.open();
+		}
+		return locationTracker.getService();
+	}
+
 	@Override
 	public void start(BundleContext context) throws Exception {
 		activator = this;
 		this.context = context;
 
 		// track required bundles
-		resolvedBundles = new BundleTracker<>(context, Bundle.RESOLVED
+		resolvedBundles = new BundleTracker<List<Bundle>>(context, Bundle.RESOLVED
 				| Bundle.STARTING | Bundle.ACTIVE | Bundle.STOPPING, bundleFinder);
 		resolvedBundles.open();
 	}
@@ -117,7 +137,7 @@ public class Activator implements BundleActivator {
 		if (debugTracker == null) {
 			if (context == null)
 				return null;
-			debugTracker = new ServiceTracker<>(context,
+			debugTracker = new ServiceTracker<DebugOptions, DebugOptions>(context,
 					DebugOptions.class.getName(), null);
 			debugTracker.open();
 		}
@@ -149,7 +169,7 @@ public class Activator implements BundleActivator {
 			logService = logTracker.getService();
 		} else {
 			if (context != null) {
-				logTracker = new ServiceTracker<>(context,
+				logTracker = new ServiceTracker<LogService, LogService>(context,
 						LogService.class.getName(), null);
 				logTracker.open();
 				logService = logTracker.getService();

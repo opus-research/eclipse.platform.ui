@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,13 +13,13 @@ package org.eclipse.jface.contexts;
 /**
  * <p>
  * A list of well-known context identifiers. The context identifiers use the
- * prefix "org.eclipse.ui" for historical reasons. These contexts exist as part
+ * prefix "org.eclipse.ui" for historical reasons. These contexts exist as part 
  * of JFace.
  * </p>
  * <p>
  * This interface should not be implemented or extended by clients.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public interface IContextIds {

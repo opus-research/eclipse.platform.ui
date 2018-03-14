@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Gunnar Wagenknecht - fix for bug 21756 [PropertiesView] property view sorting
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 460405
  *******************************************************************************/
 
 package org.eclipse.ui.views.properties;
@@ -21,7 +20,6 @@ import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.ConfigureColumns;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ISelection;
@@ -52,12 +50,10 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.help.IContextComputer;
 import org.eclipse.ui.help.IWorkbenchHelpSystem;
+import org.eclipse.ui.internal.views.ViewsPlugin;
 import org.eclipse.ui.internal.views.properties.PropertiesMessages;
 import org.eclipse.ui.part.CellEditorActionHandler;
 import org.eclipse.ui.part.Page;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
 
 /**
  * The standard implementation of property sheet page which presents
@@ -95,7 +91,7 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
     public static final String HELP_CONTEXT_PROPERTY_SHEET_PAGE = "org.eclipse.ui.property_sheet_page_help_context"; //$NON-NLS-1$
 
     private PropertySheetViewer viewer;
-
+    
     private PropertySheetSorter sorter;
 
     private IPropertySheetEntry rootEntry;
@@ -121,19 +117,16 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
 	/**
 	 * Part listener which cleans up this page when the source part is closed.
 	 * This is hooked only when there is a source part.
-	 *
+	 * 
 	 * @since 3.2
 	 */
 	private class PartListener implements IPartListener {
-		@Override
 		public void partActivated(IWorkbenchPart part) {
 		}
 
-		@Override
 		public void partBroughtToTop(IWorkbenchPart part) {
 		}
 
-		@Override
 		public void partClosed(IWorkbenchPart part) {
 			if (sourcePart == part) {
 				if (sourcePart != null)
@@ -145,19 +138,17 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
 			}
 		}
 
-		@Override
 		public void partDeactivated(IWorkbenchPart part) {
 		}
 
-		@Override
 		public void partOpened(IWorkbenchPart part) {
 		}
 	}
-
+	
 	private PartListener partListener = new PartListener();
 
 	private Action columnsAction;
-
+	
     /**
      * Creates a new property sheet page.
      */
@@ -165,12 +156,14 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
         super();
     }
 
-    @Override
-	public void createControl(Composite parent) {
+    /* (non-Javadoc)
+     * Method declared on <code>IPage</code>.
+     */
+    public void createControl(Composite parent) {
         // create a new viewer
         viewer = new PropertySheetViewer(parent);
         viewer.setSorter(sorter);
-
+        
         // set the model for the viewer
         if (rootEntry == null) {
             // create a new root
@@ -185,8 +178,7 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
         viewer.addActivationListener(getCellEditorActivationListener());
         // add a listener to track when the entry selection changes
         viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-            @Override
-			public void selectionChanged(SelectionChangedEvent event) {
+            public void selectionChanged(SelectionChangedEvent event) {
                 handleEntrySelection(event.getSelection());
             }
         });
@@ -206,8 +198,7 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
             /*
              * @see HelpListener#helpRequested(HelpEvent)
              */
-            @Override
-			public void helpRequested(HelpEvent e) {
+            public void helpRequested(HelpEvent e) {
                 // Get the context for the selected item
                 IStructuredSelection selection = (IStructuredSelection) viewer
                         .getSelection();
@@ -217,7 +208,7 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
                     Object helpContextId = entry.getHelpContextIds();
                     if (helpContextId != null) {
                     	IWorkbenchHelpSystem helpSystem = PlatformUI.getWorkbench().getHelpSystem();
-
+                    	
                         // Since 2.0 the only valid type for helpContextIds
                         // is a String (a single id).
                         if (helpContextId instanceof String) {
@@ -244,17 +235,16 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
 
 			/**
 			 * Returns the first help context.
-			 *
+			 * 
 			 * @param helpContext the help context which is either an array of contexts (strings
 			 *            and/or {@linkplain IContext}s) or an {@link IContextComputer}
-			 *
+			 * 
 			 * @param e the help event
 			 * @return the first context which is either a <code>String</code>, {@link IContext} or
 			 *         <code>null</code> if none
 			 * @deprecated As of 2.0, nested contexts are no longer supported by the help support
 			 *             system
 			 */
-			@Deprecated
 			private Object getFirstContext(Object helpContext, HelpEvent e) {
 				Object[] contexts;
 				if (helpContext instanceof IContextComputer) {
@@ -276,8 +266,7 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
      * The <code>PropertySheetPage</code> implementation of this <code>IPage</code> method
      * disposes of this page's entries.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         super.dispose();
         if (sourcePart != null) {
         	sourcePart.getSite().getPage().removePartListener(partListener);
@@ -295,22 +284,21 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
     /**
      * The <code>PropertySheetPage</code> implementation of this <code>IAdaptable</code> method
      * handles the <code>ISaveablePart</code> adapter by delegating to the source part.
-     *
+     * 
      * @since 3.2
      */
-    @Override
-	public <T> T getAdapter(Class<T> adapter) {
+    public Object getAdapter(Class adapter) {
 		if (ISaveablePart.class.equals(adapter)) {
-			return adapter.cast(getSaveablePart());
+			return getSaveablePart();
 		}
     	return null;
     }
-
+    
 	/**
 	 * Returns an <code>ISaveablePart</code> that delegates to the source part
 	 * for the current page if it implements <code>ISaveablePart</code>, or
 	 * <code>null</code> otherwise.
-	 *
+	 * 
 	 * @return an <code>ISaveablePart</code> or <code>null</code>
 	 * @since 3.2
 	 */
@@ -320,7 +308,7 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
 		}
 		return null;
 	}
-
+    
     /**
      * Returns the cell editor activation listener for this page
      * @return ICellEditorActivationListener the cell editor activation listener for this page
@@ -328,15 +316,13 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
     private ICellEditorActivationListener getCellEditorActivationListener() {
         if (cellEditorActivationListener == null) {
             cellEditorActivationListener = new ICellEditorActivationListener() {
-                @Override
-				public void cellEditorActivated(CellEditor cellEditor) {
+                public void cellEditorActivated(CellEditor cellEditor) {
                     if (cellEditorActionHandler != null) {
 						cellEditorActionHandler.addCellEditor(cellEditor);
 					}
                 }
 
-                @Override
-				public void cellEditorDeactivated(CellEditor cellEditor) {
+                public void cellEditorDeactivated(CellEditor cellEditor) {
                     if (cellEditorActionHandler != null) {
 						cellEditorActionHandler.removeCellEditor(cellEditor);
 					}
@@ -346,8 +332,10 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
         return cellEditorActivationListener;
     }
 
-    @Override
-	public Control getControl() {
+    /* (non-Javadoc)
+     * Method declared on IPage (and Page).
+     */
+    public Control getControl() {
         if (viewer == null) {
 			return null;
 		}
@@ -378,13 +366,11 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
         int operations = DND.DROP_COPY;
         Transfer[] transferTypes = new Transfer[] { TextTransfer.getInstance() };
         DragSourceListener listener = new DragSourceAdapter() {
-            @Override
-			public void dragSetData(DragSourceEvent event) {
+            public void dragSetData(DragSourceEvent event) {
                 performDragSetData(event);
             }
 
-            @Override
-			public void dragFinished(DragSourceEvent event) {
+            public void dragFinished(DragSourceEvent event) {
                 //Nothing to do here
             }
         };
@@ -430,53 +416,50 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
         defaultsAction = new DefaultsAction(viewer, "defaults"); //$NON-NLS-1$
         defaultsAction.setText(PropertiesMessages.Defaults_text);
         defaultsAction.setToolTipText(PropertiesMessages.Defaults_toolTip);
-        defaultsAction.setImageDescriptor(createImageDescriptor("elcl16/defaults_ps.png")); //$NON-NLS-1$
-		defaultsAction.setDisabledImageDescriptor(createImageDescriptor("dlcl16/defaults_ps.png")); //$NON-NLS-1$
+        defaultsAction
+                .setImageDescriptor(ViewsPlugin.getViewImageDescriptor("elcl16/defaults_ps.png")); //$NON-NLS-1$
+        defaultsAction
+                .setDisabledImageDescriptor(ViewsPlugin.getViewImageDescriptor("dlcl16/defaults_ps.png")); //$NON-NLS-1$
         defaultsAction.setEnabled(false);
 
         // Show Advanced Properties
         filterAction = new FilterAction(viewer, "filter"); //$NON-NLS-1$
         filterAction.setText(PropertiesMessages.Filter_text);
         filterAction.setToolTipText(PropertiesMessages.Filter_toolTip);
-		filterAction.setImageDescriptor(createImageDescriptor("elcl16/filter_ps.png")); //$NON-NLS-1$
+        filterAction
+                .setImageDescriptor(ViewsPlugin.getViewImageDescriptor("elcl16/filter_ps.png")); //$NON-NLS-1$
         filterAction.setChecked(false);
 
         // Show Categories
         categoriesAction = new CategoriesAction(viewer, "categories"); //$NON-NLS-1$
         categoriesAction.setText(PropertiesMessages.Categories_text);
         categoriesAction.setToolTipText(PropertiesMessages.Categories_toolTip);
-		categoriesAction.setImageDescriptor(createImageDescriptor("elcl16/tree_mode.png")); //$NON-NLS-1$
+        categoriesAction
+                .setImageDescriptor(ViewsPlugin.getViewImageDescriptor("elcl16/tree_mode.png")); //$NON-NLS-1$
         categoriesAction.setChecked(true);
 
         // Columns...
         columnsAction = new Action(PropertiesMessages.Columns_text){
-        	@Override
-			public void run() {
+        	public void run() {
         		Tree tree = (Tree) viewer.getControl();
         		ConfigureColumns.forTree(tree, new SameShellProvider(tree));
         	}
 		};
         columnsAction.setToolTipText(PropertiesMessages.Columns_toolTip);
-
+        
         // Copy
         Shell shell = viewer.getControl().getShell();
         clipboard = new Clipboard(shell.getDisplay());
         copyAction = new CopyPropertyAction(viewer, "copy", clipboard); //$NON-NLS-1$
         copyAction.setText(PropertiesMessages.CopyProperty_text);
-		copyAction.setImageDescriptor(sharedImages.getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
+        copyAction.setImageDescriptor(sharedImages
+                .getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
     }
 
-	// Replacement for the bundle activator, see Bug 481956
-	private ImageDescriptor createImageDescriptor(String relativeIconPath) {
-		String ICONS_PATH = "$nl$/icons/full/";//$NON-NLS-1$
-		Bundle bundle = FrameworkUtil.getBundle(PropertySheetPage.class);
-		ImageDescriptor imageDescriptor = AbstractUIPlugin
-				.imageDescriptorFromPlugin(bundle.getSymbolicName(), ICONS_PATH + relativeIconPath);
-		return imageDescriptor;
-    }
-
-    @Override
-	public void makeContributions(IMenuManager menuManager,
+    /* (non-Javadoc)
+     * Method declared on IPage (and Page).
+     */
+    public void makeContributions(IMenuManager menuManager,
             IToolBarManager toolBarManager, IStatusLineManager statusLineManager) {
 
         // add actions to the tool bar
@@ -508,8 +491,10 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
         viewer.setInput(viewer.getInput());
     }
 
-    @Override
-	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+    /* (non-Javadoc)
+     * Method declared on ISelectionListener.
+     */
+    public void selectionChanged(IWorkbenchPart part, ISelection selection) {
         if (viewer == null) {
 			return;
 		}
@@ -518,7 +503,7 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
         	sourcePart.getSite().getPage().removePartListener(partListener);
         	sourcePart = null;
         }
-
+        
         // change the viewer input since the workbench selection has changed.
         if (selection instanceof IStructuredSelection) {
         	sourcePart = part;
@@ -538,8 +523,7 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
      * Subclasses may reimplement.
      * </p>
      */
-    @Override
-	public void setActionBars(IActionBars actionBars) {
+    public void setActionBars(IActionBars actionBars) {
         super.setActionBars(actionBars);
         cellEditorActionHandler = new CellEditorActionHandler(actionBars);
         cellEditorActionHandler.setCopyAction(copyAction);
@@ -548,8 +532,7 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
     /**
      * Sets focus to a part in the page.
      */
-    @Override
-	public void setFocus() {
+    public void setFocus() {
         viewer.getControl().setFocus();
     }
 
@@ -599,7 +582,7 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
 		this.sorter = sorter;
         if (viewer != null) {
         	viewer.setSorter(sorter);
-
+        	
         	// the following will trigger an update
         	if(null != viewer.getRootEntry()) {
 				viewer.setRootEntry(rootEntry);
