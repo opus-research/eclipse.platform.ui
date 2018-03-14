@@ -27,7 +27,7 @@ public class HideFolderWhenProjectIsShownAsNested extends ViewerFilter {
 		CommonViewer commonViewer = (CommonViewer)viewer;
 		if (commonViewer.getNavigatorContentService().getActivationService().isNavigatorExtensionActive(NestedProjectsContentProvider.EXTENSION_ID)) {
 			if (element instanceof IFolder) {
-				if (NestedProjectManager.getInstance().isShownAsProject((IFolder) element)) {
+				if (NestedProjectManager.isShownAsProject((IFolder)element)) {
 					return false;
 				}
 			}
