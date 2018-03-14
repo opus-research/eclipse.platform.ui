@@ -401,15 +401,9 @@ MenuManagerEventHelper.getInstance()
 			newMenu = menuManager.createContextMenu((Control) parent);
 			// we can't be sure this is the correct parent.
 			// ((Control) parent).setMenu(newMenu);
-			if (element instanceof MPopupMenu && element.isVisible()) {
-				Object data = getUIContainer(element);
-				if (data instanceof Control && parent.equals(data)) {
-					((Control) parent).setMenu(newMenu);
-				}
-			}
 			newMenu.setData(menuManager);
 		}
-		if (menuManager != null && !menuManager.getRemoveAllWhenShown()) {
+		if (!menuManager.getRemoveAllWhenShown()) {
 			processContributions(menuModel, menuModel.getElementId(), menuBar,
 					menuModel instanceof MPopupMenu);
 		}
