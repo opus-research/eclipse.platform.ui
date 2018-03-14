@@ -338,7 +338,6 @@ public class ErrorDialog extends IconAndMessageDialog {
 			/*
 			 * @see SelectionListener.widgetSelected (SelectionEvent)
 			 */
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				copyToClipboard();
 			}
@@ -346,7 +345,6 @@ public class ErrorDialog extends IconAndMessageDialog {
 			/*
 			 * @see SelectionListener.widgetDefaultSelected(SelectionEvent)
 			 */
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				copyToClipboard();
 			}

@@ -66,6 +66,11 @@ abstract class AbstractComboBoxCellEditor extends CellEditor {
 	AbstractComboBoxCellEditor() {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.CellEditor#activate(org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent)
+	 */
 	@Override
 	public void activate(ColumnViewerEditorActivationEvent activationEvent) {
 		super.activate(activationEvent);
@@ -88,7 +93,6 @@ abstract class AbstractComboBoxCellEditor extends CellEditor {
 			if (dropDown) {
 				getControl().getDisplay().asyncExec(new Runnable() {
 
-					@Override
 					public void run() {
 						((CCombo) getControl()).setListVisible(true);
 					}

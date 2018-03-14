@@ -1,13 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2013 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- ******************************************************************************/
 package org.eclipse.ui.internal;
 
 import java.util.List;
@@ -40,7 +30,6 @@ public class SplitHandler extends AbstractHandler {
 	public SplitHandler() {
 	}
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		// Only works for the active editor
 		IEditorPart activeEditor = HandlerUtil.getActiveEditor(event);
@@ -62,26 +51,17 @@ public class SplitHandler extends AbstractHandler {
 
 		window.getShell().setRedraw(false);
 		try {
-			// Determine which part has the tags
 			MStackElement stackSelElement = stack.getSelectedElement();
-			MPart taggedEditor = editorPart;
 			if (stackSelElement instanceof MCompositePart) {
 				List<MPart> innerElements = modelService.findElements(stackSelElement, null, MPart.class, null);
-				taggedEditor = innerElements.get(1); // '0' is the composite part
-			}
-
-			if ("false".equals(event.getParameter("Splitter.isHorizontal"))) { //$NON-NLS-1$ //$NON-NLS-2$
-				if (taggedEditor.getTags().contains(IPresentationEngine.SPLIT_VERTICAL)) {
-					taggedEditor.getTags().remove(IPresentationEngine.SPLIT_VERTICAL);
-				} else {
-					editorPart.getTags().remove(IPresentationEngine.SPLIT_HORIZONTAL);
-					editorPart.getTags().add(IPresentationEngine.SPLIT_VERTICAL);
-				}
+				MPart originalEditor = innerElements.get(1); // '0' is the composite part
+				
+				originalEditor.getTags().remove(IPresentationEngine.SPLIT_HORIZONTAL);
+				originalEditor.getTags().remove(IPresentationEngine.SPLIT_VERTICAL);
 			} else {
-				if (taggedEditor.getTags().contains(IPresentationEngine.SPLIT_HORIZONTAL)) {
-					taggedEditor.getTags().remove(IPresentationEngine.SPLIT_HORIZONTAL);
+				if ("false".equals(event.getParameter("Splitter.isHorizontal"))) { //$NON-NLS-1$ //$NON-NLS-2$
+					editorPart.getTags().add(IPresentationEngine.SPLIT_VERTICAL);
 				} else {
-					editorPart.getTags().remove(IPresentationEngine.SPLIT_VERTICAL);
 					editorPart.getTags().add(IPresentationEngine.SPLIT_HORIZONTAL);
 				}
 			}

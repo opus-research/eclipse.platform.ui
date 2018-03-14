@@ -44,7 +44,6 @@ public class ResourcesLocatorManager implements IResourcesLocatorManager {
 	 *
 	 * @see org.eclipse.e4.ui.css.core.util.resources.IResourcesLocatorManager#registerResourceLocator(org.eclipse.e4.ui.css.core.util.resources.IResourceLocator)
 	 */
-	@Override
 	public void registerResourceLocator(IResourceLocator resourceLocator) {
 		if (uriResolvers == null)
 			uriResolvers = new ArrayList();
@@ -60,7 +59,6 @@ public class ResourcesLocatorManager implements IResourcesLocatorManager {
 	 *
 	 * @see org.eclipse.e4.ui.css.core.util.resources.IResourcesLocatorManager#unregisterResourceLocator(org.eclipse.e4.ui.css.core.util.resources.IResourceLocator)
 	 */
-	@Override
 	public void unregisterResourceLocator(IResourceLocator resourceLocator) {
 		if (uriResolvers == null)
 			return;
@@ -72,7 +70,6 @@ public class ResourcesLocatorManager implements IResourcesLocatorManager {
 	 *
 	 * @see org.eclipse.e4.ui.css.core.util.resources.IURIResolver#resolve(java.lang.String)
 	 */
-	@Override
 	public String resolve(String uri) {
 		if (StringUtils.isEmpty(uri))
 			return null;
@@ -90,7 +87,6 @@ public class ResourcesLocatorManager implements IResourcesLocatorManager {
 		return null;
 	}
 
-	@Override
 	public InputStream getInputStream(String uri) throws Exception {
 		if (StringUtils.isEmpty(uri))
 			return null;
@@ -113,7 +109,6 @@ public class ResourcesLocatorManager implements IResourcesLocatorManager {
 		return null;
 	}
 
-	@Override
 	public Reader getReader(String uri) throws Exception {
 		if (StringUtils.isEmpty(uri))
 			return null;

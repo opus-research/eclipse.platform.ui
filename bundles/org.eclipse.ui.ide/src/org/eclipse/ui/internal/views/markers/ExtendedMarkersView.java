@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2014 IBM Corporation and others.
+ * Copyright (c) 2007, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -169,8 +169,6 @@ public class ExtendedMarkersView extends ViewPart {
 	private UndoActionHandler undoAction;
 
 	private RedoActionHandler redoAction;
-
-	private boolean isViewVisible= true;
 
 
 	/**
@@ -490,7 +488,8 @@ public class ExtendedMarkersView extends ViewPart {
 		partListener = getPartListener();
 		getSite().getPage().addPartListener(partListener);
 
-		pageSelectionListener.selectionChanged(getSite().getPage().getActivePart(), getSite().getPage().getSelection());
+		pageSelectionListener.selectionChanged(getSite().getPage()
+				.getActivePart(), getSite().getPage().getSelection());
 	}
 
 	/**
@@ -889,7 +888,6 @@ public class ExtendedMarkersView extends ViewPart {
 			 */
 			public void partHidden(IWorkbenchPartReference partRef) {
 				if (partRef.getId().equals(getSite().getId())) {
-					isViewVisible= false;
 					Markers markers = getActiveViewerInputClone();
 					Integer[] counts = markers.getMarkerCounts();
 					setTitleToolTip(getStatusMessage(markers, counts));
@@ -926,8 +924,8 @@ public class ExtendedMarkersView extends ViewPart {
 			 */
 			public void partVisible(IWorkbenchPartReference partRef) {
 				if (partRef.getId().equals(getSite().getId())) {
-					isViewVisible= true;
-					pageSelectionListener.selectionChanged(null, getSite().getPage()
+					pageSelectionListener.selectionChanged(getSite().getPage()
+							.getActivePart(), getSite().getPage()
 							.getSelection());
 					setTitleToolTip(null);
 				}
@@ -1024,15 +1022,22 @@ public class ExtendedMarkersView extends ViewPart {
 			}
 			return status;
 		}
-		String message= MessageFormat.format(
-				MarkerMessages.errorsAndWarningsSummaryBreakdown,
-				counts[0], counts[1], /* combine infos and others */ counts[2] + counts[3]);
+		// combine counts for infos and others
+		counts = new Integer[] { counts[0], counts[1],
+				new Integer(counts[2].intValue() + counts[3].intValue()) };
 		if (filteredCount < 0 || filteredCount >= totalCount)
-			return message;
+			return MessageFormat.format(
+					MarkerMessages.errorsAndWarningsSummaryBreakdown, counts);
 		return NLS
 				.bind(
 						MarkerMessages.problem_filter_matchedMessage,
-						new Object[] {message, new Integer(filteredCount), new Integer(totalCount) });
+						new Object[] {
+								MessageFormat
+										.format(
+												MarkerMessages.errorsAndWarningsSummaryBreakdown,
+												counts),
+								new Integer(filteredCount),
+								new Integer(totalCount) });
 	}
 
 	/**
@@ -1492,6 +1497,9 @@ public class ExtendedMarkersView extends ViewPart {
 	 */
 	private String getStatusSummary(MarkerEntry[] entries) {
 		Integer[] counts = Markers.getMarkerCounts(entries);
+		// combine counts for infos and others
+		counts = new Integer[] { counts[0], counts[1],
+				new Integer(counts[2].intValue() + counts[3].intValue()) };
 		if (counts[0].intValue() == 0 && counts[1].intValue() == 0) {
 			// In case of tasks view and bookmarks view, show only selection
 			// count
@@ -1507,7 +1515,7 @@ public class ExtendedMarkersView extends ViewPart {
 								MessageFormat
 										.format(
 												MarkerMessages.errorsAndWarningsSummaryBreakdown,
-												counts[0], counts[1], /* combine infos and others */ counts[2] + counts[3])});
+												counts) });
 	}
 
 	/**
@@ -1787,8 +1795,10 @@ public class ExtendedMarkersView extends ViewPart {
 
 		public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 
-			// Do not respond to our own selections
-			if (part == ExtendedMarkersView.this)
+			// Do not respond to our own selections or if we are not
+			// visible
+			if (part == ExtendedMarkersView.this
+					|| !(getSite().getPage().isPartVisible(part)))
 				return;
 
 			// get Objects to adapt
@@ -1817,7 +1827,7 @@ public class ExtendedMarkersView extends ViewPart {
 				}
 			}
 			MarkerContentGenerator generator = view.getGenerator();
-			generator.updateSelectedResource(selectedElements.toArray(), part == null);
+			generator.updateSelectedResource(selectedElements.toArray());
 		}
 
 	}
@@ -1844,15 +1854,4 @@ public class ExtendedMarkersView extends ViewPart {
 		return markers.length == 1 ? MarkerMessages.deleteMarker_operationName : MarkerMessages.deleteMarkers_operationName;
 	}
 
-	/**
-	 * Tells whether this view is visible.
-	 * <p>
-	 * See bug 401632 why we can't use {@link IWorkbenchPage#isPartVisible(IWorkbenchPart)}.
-	 * </p>
-	 * 
-	 * @return <code>true</code> if this view is visible, <code>false</code> otherwise
-	 */
-	boolean isVisible() {
-		return isViewVisible;
-	}
 }
