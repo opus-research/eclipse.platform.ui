@@ -19,15 +19,16 @@ import org.eclipse.core.internal.databinding.BindingMessages;
 import org.eclipse.core.runtime.IStatus;
 
 /**
- * ReadOnlyValidator. A validator that can be used as a partial validator for read-only fields.
+ * ReadOnlyValidator. A validator that can be used as a partial validator for
+ * read-only fields.
  */
-public class ReadOnlyValidator implements IValidator {
+public class ReadOnlyValidator implements IValidator<Object> {
 
 	private static ReadOnlyValidator singleton = null;
 
 	/**
 	 * Returns the ReadOnlyValidator
-	 *
+	 * 
 	 * @return the ReadOnlyValidator
 	 */
 	public static ReadOnlyValidator getDefault() {
