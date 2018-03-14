@@ -63,7 +63,6 @@ public class ProjectLocationMoveDialog extends SelectionDialog {
 	 * 
 	 * @see org.eclipse.ui.dialogs.SelectionDialog#setMessage(java.lang.String)
 	 */
-	@Override
 	public void setMessage(String message) {
 		super.setMessage(message);
 		if (statusMessageLabel != null) {
@@ -84,7 +83,6 @@ public class ProjectLocationMoveDialog extends SelectionDialog {
 	/*
 	 * (non-Javadoc) Method declared in Window.
 	 */
-	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,
@@ -94,7 +92,6 @@ public class ProjectLocationMoveDialog extends SelectionDialog {
 	/*
 	 * (non-Javadoc) Method declared on Dialog.
 	 */
-	@Override
 	protected Control createContents(Composite parent) {
 		Control content = super.createContents(parent);
 		getOkButton().setEnabled(false);
@@ -104,7 +101,6 @@ public class ProjectLocationMoveDialog extends SelectionDialog {
 	/*
 	 * (non-Javadoc) Method declared on Dialog.
 	 */
-	@Override
 	protected Control createDialogArea(Composite parent) {
 		// page group
 		Composite composite = (Composite) super.createDialogArea(parent);
@@ -139,7 +135,6 @@ public class ProjectLocationMoveDialog extends SelectionDialog {
 			/* (non-Javadoc)
 			 * @see org.eclipse.ui.internal.ide.dialogs.ProjectContentsLocationArea.IErrorMessageReporter#reportError(java.lang.String)
 			 */
-			@Override
 			public void reportError(String errorMessage, boolean notError) {
 				setMessage(errorMessage);
 				
@@ -159,7 +154,6 @@ public class ProjectLocationMoveDialog extends SelectionDialog {
 	 * <code>Dialog</code> method builds a two element list - the first
 	 * element is the project name and the second one is the location.
 	 */
-	@Override
 	protected void okPressed() {
 
 		ArrayList list = new ArrayList();

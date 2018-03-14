@@ -160,8 +160,7 @@ public class DragTest extends UITestCaseWithResult {
     	this(dragSource, dropTarget, log, "");
     }
     
-    @Override
-	public void doSetUp() throws Exception {
+    public void doSetUp() throws Exception {
         // don't allow UITestCase to manage the deactivation of our window
         manageWindows(false);
         //window = (WorkbenchWindow)openTestWindow();
@@ -243,8 +242,7 @@ public class DragTest extends UITestCaseWithResult {
     	}
     }
     
-    @Override
-	public String performTest() throws Throwable {
+    public String performTest() throws Throwable {
         // Uncomment the following line to 'stall' the tests here...
         //stallTest();
 

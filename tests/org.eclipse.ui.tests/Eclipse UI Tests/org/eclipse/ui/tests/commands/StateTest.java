@@ -45,13 +45,11 @@ public class StateTest extends UITestCase {
 		Object currentValue;
 		String textValue;
 
-		@Override
 		public final Object execute(final ExecutionEvent event) {
 			getState(OBJECT_STATE_ID).setValue(OBJECT_CHANGED);
 			return OBJECT_CHANGED;
 		}
 
-		@Override
 		public final void handleStateChange(final State state,
 				final Object oldValue) {
 			if (OBJECT_STATE_ID.equals(state.getId())) {
@@ -66,7 +64,6 @@ public class StateTest extends UITestCase {
 		Object currentValue;
 		String textValue;
 
-		@Override
 		public final void handleStateChange(final State state,
 				final Object oldValue) {
 
@@ -123,7 +120,6 @@ public class StateTest extends UITestCase {
 		super(name);
 	}
 
-	@Override
 	protected final void doSetUp() {
 		// Reset the object state to the initial object.
 		final ICommandService commandService = fWorkbench
@@ -139,7 +135,6 @@ public class StateTest extends UITestCase {
 		handlerActivation = handlerService.activateHandler(COMMAND_ID, handler);
 	}
 
-	@Override
 	protected final void doTearDown() {
 		// Unregister the object state handler.
 		final IHandlerService handlerService = fWorkbench
