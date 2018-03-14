@@ -34,7 +34,6 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.inject.Inject;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -48,9 +47,7 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.internal.workbench.PartServiceImpl;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
@@ -69,11 +66,8 @@ import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindowElement;
-import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
-import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
-import org.eclipse.e4.ui.workbench.addons.minmax.TrimStack;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
@@ -184,7 +178,8 @@ import org.osgi.service.event.EventHandler;
 /**
  * A collection of views and editors in a workbench.
  */
-public class WorkbenchPage implements IWorkbenchPage {
+public class WorkbenchPage extends CompatibleWorkbenchPage implements
+        IWorkbenchPage {
 
 	private static final String ATT_AGGREGATE_WORKING_SET_ID = "aggregateWorkingSetId"; //$NON-NLS-1$
 
@@ -877,52 +872,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 		}
 	};
 
-	@Inject
-	@Optional
-	private void handleMinimizedStacks(
-			@UIEventTopic(UIEvents.ApplicationElement.TOPIC_TAGS) Event event) {
-		Object changedObj = event.getProperty(EventTags.ELEMENT);
-
-		if (!(changedObj instanceof MToolControl))
-			return;
-
-		final MToolControl minimizedStack = (MToolControl) changedObj;
-
-		if (!(minimizedStack.getObject() instanceof TrimStack))
-			return;
-
-		TrimStack ts = (TrimStack) minimizedStack.getObject();
-		if (!(ts.getMinimizedElement() instanceof MPartStack))
-			return;
-
-		MPartStack stack = (MPartStack) ts.getMinimizedElement();
-		MUIElement stackSel = stack.getSelectedElement();
-		MPart thePart = null;
-		if (stackSel instanceof MPart) {
-			thePart = (MPart) stackSel;
-		} else if (stackSel instanceof MPlaceholder) {
-			MPlaceholder ph = (MPlaceholder) stackSel;
-			if (ph.getRef() instanceof MPart) {
-				thePart = (MPart) ph.getRef();
-			}
-		}
-
-		if (thePart == null)
-			return;
-
-		if (UIEvents.isADD(event)) {
-			if (UIEvents.contains(event, UIEvents.EventTags.NEW_VALUE,
-					TrimStack.MINIMIZED_AND_SHOWING)) {
-				firePartVisible(thePart);
-			}
-		} else if (UIEvents.isREMOVE(event)) {
-			if (UIEvents.contains(event, UIEvents.EventTags.OLD_VALUE,
-					TrimStack.MINIMIZED_AND_SHOWING)) {
-				firePartHidden(thePart);
-			}
-		}
-	}
-
 	/**
 	 * Boolean field to determine whether DND support has been added to the
 	 * shared area yet.
@@ -1191,10 +1140,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 			editorReference.setPage(this);
 		}
 
-		// Avoid dups
-		if (!editorReferences.contains(editorReference)) {
-			editorReferences.add(editorReference);
-		}
+		editorReferences.add(editorReference);
 	}
 
 	MPartDescriptor findDescriptor(String id) {
@@ -3441,7 +3387,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 		// reset complete
 		legacyWindow.firePerspectiveChanged(this, desc, CHANGE_RESET_COMPLETE);
-		UIEvents.publishEvent(UIEvents.UILifeCycle.PERSPECTIVE_RESET, persp);
 	}
 
 	private void initActionSetListener() {
@@ -5190,9 +5135,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 	 */
 	private void unzoomSharedArea() {
 		MPerspective curPersp = getPerspectiveStack().getSelectedElement();
-		if (curPersp == null)
-			return;
-
 		MPlaceholder eaPH = (MPlaceholder) modelService.find(IPageLayout.ID_EDITOR_AREA, curPersp);
 		for (MPart part : modelService.findElements(eaPH, null, MPart.class, null)) {
 			if (part.isToBeRendered()) {

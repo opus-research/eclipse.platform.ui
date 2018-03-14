@@ -90,7 +90,6 @@ public class DuckType implements InvocationHandler {
 	protected Object object;
 	protected Class objectClass;
 	
-	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
       if (method.getName().equals("equals") && args != null && args.length == 1) {
          return new Boolean(equals(args[0]));
@@ -108,8 +107,7 @@ public class DuckType implements InvocationHandler {
 		return realMethod.invoke(object, args);
 	}
    
-   @Override
-public boolean equals(Object obj) {
+   public boolean equals(Object obj) {
       if (obj instanceof Wrapper) {
          Wrapper proxy = (Wrapper) obj;
          Object wrappedValue = proxy.duckType_GetWrappedValue();
@@ -118,8 +116,7 @@ public boolean equals(Object obj) {
       return obj == this || super.equals(obj) || object.equals(obj);
    }
    
-   @Override
-public int hashCode() {
+   public int hashCode() {
       return object.hashCode();
    }
 }

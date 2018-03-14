@@ -155,7 +155,6 @@ public class Snippet027ExternalValidator extends WizardPage {
 	 * 
 	 * @param parent
 	 */
-	@Override
 	public void createControl(Composite parent) {
 		Composite container = new Composite(parent, SWT.NULL);
 		final GridLayout gridLayout = new GridLayout();
@@ -207,7 +206,6 @@ public class Snippet027ExternalValidator extends WizardPage {
 				phone, null, null);
 
 		MultiValidator validator = new MultiValidator() {
-			@Override
 			protected IStatus validate() {
 
 				// Everything accessed here will trigger re-validation.
@@ -226,17 +224,14 @@ public class Snippet027ExternalValidator extends WizardPage {
 	}
 
 	static class ExternalValidationWizard extends Wizard {
-		@Override
 		public void addPages() {
 			addPage(new Snippet027ExternalValidator());
 		}
 
-		@Override
 		public String getWindowTitle() {
 			return "Snippet 024 - External Validation";
 		}
 
-		@Override
 		public boolean performFinish() {
 			return true;
 		}
@@ -246,7 +241,6 @@ public class Snippet027ExternalValidator extends WizardPage {
 		Display display = new Display();
 
 		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
-			@Override
 			public void run() {
 				IWizard wizard = new ExternalValidationWizard();
 				WizardDialog dialog = new WizardDialog(null, wizard);

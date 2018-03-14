@@ -206,7 +206,8 @@ public class StackRenderer extends LazyStackRenderer {
 	@Optional
 	private void handleTransientDataEvents(
 			@UIEventTopic(UIEvents.ApplicationElement.TOPIC_TRANSIENTDATA) org.osgi.service.event.Event event) {
-		Object changedElement = event.getProperty(UIEvents.EventTags.ELEMENT);
+		MUIElement changedElement = (MUIElement) event
+				.getProperty(UIEvents.EventTags.ELEMENT);
 
 		if (!(changedElement instanceof MPart))
 			return;
@@ -871,8 +872,7 @@ public class StackRenderer extends LazyStackRenderer {
 			MElementContainer<MUIElement> stack) {
 		if (stack == null)
 			stack = element.getParent();
-		if (!(stack.getWidget() instanceof CTabFolder))
-			return null;
+
 		CTabFolder ctf = (CTabFolder) stack.getWidget();
 		if (ctf == null || ctf.isDisposed())
 			return null;

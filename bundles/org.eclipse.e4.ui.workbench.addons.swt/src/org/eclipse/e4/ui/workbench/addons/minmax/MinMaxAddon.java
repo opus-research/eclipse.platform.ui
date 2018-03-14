@@ -460,25 +460,6 @@ public class MinMaxAddon {
 	}
 
 	/**
-	 * Handles the event that the perspective is reset
-	 * 
-	 * @param event
-	 */
-	@Inject
-	@Optional
-	private void subscribeTopicPerspReset(
-			@UIEventTopic(UIEvents.UILifeCycle.PERSPECTIVE_RESET) Event event) {
-		final MPerspective resetPersp = (MPerspective) event.getProperty(EventTags.ELEMENT);
-
-		// Find any minimized stacks and show their trim
-		List<MUIElement> minimizedElements = modelService.findElements(resetPersp, null,
-				MUIElement.class, Arrays.asList(IPresentationEngine.MINIMIZED));
-		for (MUIElement element : minimizedElements) {
-			createTrim(element);
-		}
-	}
-
-	/**
 	 * Handles the event that the perspective is opened
 	 * 
 	 * @param event
@@ -621,14 +602,7 @@ public class MinMaxAddon {
 		if (curMax.size() > 0) {
 			MUIElement maxElement = curMax.get(0);
 			List<MUIElement> elementsLeftToRestore = getElementsToRestore(maxElement);
-
-			// Are any stacks still minimized ?
-			boolean unMax = true;
-			for (MUIElement toRestore : elementsLeftToRestore) {
-				if (!toRestore.isVisible())
-					unMax = false;
-			}
-			if (unMax) {
+			if (elementsLeftToRestore.size() == 0) {
 				maxElement.getTags().remove(IPresentationEngine.MAXIMIZED);
 			}
 		}

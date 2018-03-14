@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *      Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 435949
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -131,7 +130,6 @@ public final class ContributionsAnalyzer {
 				}
 			}
 		}
-		ArrayList<MMenuContribution> includedPopups = new ArrayList<MMenuContribution>();
 		for (MMenuContribution menuContribution : menuContributionList) {
 			String parentID = menuContribution.getParentId();
 			if (parentID == null) {
@@ -142,18 +140,12 @@ public final class ContributionsAnalyzer {
 			boolean popupAny = includePopups && menuModel instanceof MPopupMenu
 					&& POPUP_PARENT_ID.equals(parentID);
 			boolean filtered = isFiltered(menuModel, menuContribution, includePopups);
-			if (!filtered && menuContribution.isToBeRendered() && popupAny) {
-				// process POPUP_ANY first
-				toContribute.add(menuContribution);
-			} else {
-				if (filtered || (!popupTarget && !parentID.equals(id))
-				|| !menuContribution.isToBeRendered()) {
-					continue;
-				}
-				includedPopups.add(menuContribution);
+			if (filtered || (!popupAny && !popupTarget && !parentID.equals(id))
+					|| !menuContribution.isToBeRendered()) {
+				continue;
 			}
+			toContribute.add(menuContribution);
 		}
-		toContribute.addAll(includedPopups);
 	}
 
 	public static void gatherMenuContributions(final MMenu menuModel,
@@ -641,15 +633,10 @@ public final class ContributionsAnalyzer {
 					continue;
 				}
 				Object[] array = item.getChildren().toArray();
-				int idx = getIndex(toContribute, item.getPositionInParent());
-				if (idx == -1) {
-					idx = 0;
-				}
 				for (int c = 0; c < array.length; c++) {
 					MMenuElement me = (MMenuElement) array[c];
 					if (!containsMatching(toContribute.getChildren(), me)) {
-						toContribute.getChildren().add(idx, me);
-						idx++;
+						toContribute.getChildren().add(me);
 					}
 				}
 			}
