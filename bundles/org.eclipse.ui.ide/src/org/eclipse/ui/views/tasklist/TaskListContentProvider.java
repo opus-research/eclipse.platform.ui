@@ -141,9 +141,10 @@ class TaskListContentProvider implements IStructuredContentProvider,
 
         if (filter.isShowingAll()) {
             return NLS.bind(TaskListMessages.TaskList_titleSummaryUnfiltered, new Integer(visibleMarkerCount));
+        } else {
+            return NLS.bind(TaskListMessages.TaskList_titleSummaryFiltered, new Integer(visibleMarkerCount),
+			new Integer(getTotalMarkerCount()));
         }
-		return NLS.bind(TaskListMessages.TaskList_titleSummaryFiltered, new Integer(visibleMarkerCount),
-				new Integer(getTotalMarkerCount()));
     }
 
     /**
@@ -416,19 +417,20 @@ class TaskListContentProvider implements IStructuredContentProvider,
                 }
 
                 return new IMarker[0];
-			}
-			if (isMarkerLimitExceeded()) {
-				setMarkerLimitExceeded(false);
+            } else {
+                if (isMarkerLimitExceeded()) {
+                    setMarkerLimitExceeded(false);
 
-				viewer.getControl().getDisplay().syncExec(new Runnable() {
-					@Override
-					public void run() {
-						viewer.refresh();
-					}
-				});
-			}
+                    viewer.getControl().getDisplay().syncExec(new Runnable() {
+                        @Override
+						public void run() {
+                            viewer.refresh();
+                        }
+                    });
+                }
 
-			return markers;
+                return markers;
+            }
         } catch (CoreException e) {
             return new IMarker[0];
         }
