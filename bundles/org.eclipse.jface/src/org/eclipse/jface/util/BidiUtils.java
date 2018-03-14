@@ -268,7 +268,6 @@ public final class BidiUtils {
 		final SegmentListener listener = getSegmentListener(handlingType);
 		if (listener != null) {
 			field.addBidiSegmentListener(new BidiSegmentListener() {
-				@Override
 				public void lineGetSegments(BidiSegmentEvent event) {
 					listener.getSegments(event);
 				}
