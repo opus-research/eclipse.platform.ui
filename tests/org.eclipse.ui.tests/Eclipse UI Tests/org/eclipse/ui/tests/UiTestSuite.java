@@ -21,7 +21,6 @@ import org.eclipse.ui.tests.dialogs.UIAutomatedSuite;
 import org.eclipse.ui.tests.encoding.EncodingTestSuite;
 import org.eclipse.ui.tests.fieldassist.FieldAssistTestSuite;
 import org.eclipse.ui.tests.keys.KeysTestSuite;
-import org.eclipse.ui.tests.multipageeditor.MultiPageEditorTestSuite;
 import org.eclipse.ui.tests.navigator.NavigatorTestSuite;
 import org.eclipse.ui.tests.operations.OperationsTestSuite;
 import org.eclipse.ui.tests.preferences.PreferencesTestSuite;
@@ -53,8 +52,7 @@ import org.junit.runners.Suite;
 	ServicesTestSuite.class,
 	ProgressTestSuite.class,
 	PropertySheetTestSuite.class,
-	AdaptableTestSuite.class,
-	MultiPageEditorTestSuite.class
+	AdaptableTestSuite.class
 })
 public class UiTestSuite {
 
@@ -63,6 +61,7 @@ public class UiTestSuite {
 	// InternalTestSuite.class,
 	// ZoomTestSuite.class,
 	// DynamicPluginsTestSuite.class,
+	// MultiPageEditorTestSuite.class,
 	// CommandsTestSuite.class,
 	// ContextsTestSuite.class,
 	// DragTestSuite.class,
