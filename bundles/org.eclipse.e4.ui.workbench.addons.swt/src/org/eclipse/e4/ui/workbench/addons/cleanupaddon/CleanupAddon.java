@@ -22,7 +22,6 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
-import org.eclipse.e4.ui.model.application.ui.basic.MCompositePart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
@@ -146,15 +145,8 @@ public class CleanupAddon {
 	 * its last child becomes invisible. Defaults to false for unknown element
 	 * types
 	 */
-	private static boolean shouldReactToChildVisibilityChanges(MUIElement theElement) {
-		// TODO: It may be possible to remove the instanceof checks and just use
-		// IPresentationEngine.HIDDEN_EXPLICITLY. However, that would require
-		// explicitly setting IPresentationEngine.HIDDEN_EXPLICITLY on every
-		// object where we want to keep it hidden even if it has a visible child
-		// (such as the main toolbar).
-		return (theElement instanceof MPartSashContainer || theElement instanceof MPartStack
-				|| theElement instanceof MCompositePart)
-				&& !theElement.getTags().contains(IPresentationEngine.HIDDEN_EXPLICITLY);
+	boolean shouldReactToChildVisibilityChanges(MUIElement theElement) {
+		return (theElement instanceof MPartSashContainer || theElement instanceof MPartStack);
 	}
 
 	@Inject
