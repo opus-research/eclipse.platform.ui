@@ -44,6 +44,8 @@ import org.eclipse.swt.accessibility.AccessibleAdapter;
 import org.eclipse.swt.accessibility.AccessibleEvent;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -205,7 +207,23 @@ public class SearchField {
 			@Override
 			public void shellClosed(ShellEvent e) {
 				quickAccessContents.doClose();
-				e.doit = false;
+				e.doit = false; // That would prevent shell from being disposed
+			}
+		});
+		shell.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				storeShellSize();
+			}
+		});
+		text.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				if (!shell.isDisposed()) {
+					// Text control is about to be destroyed, it's time to
+					// get rid of invisible shell attached to this text control
+					shell.dispose();
+				}
 			}
 		});
 		GridLayoutFactory.fillDefaults().applyTo(shell);
@@ -577,8 +595,15 @@ public class SearchField {
 		dialogSettings.put(ORDERED_PROVIDERS, orderedProviders);
 		dialogSettings.put(TEXT_ENTRIES, textEntries);
 		dialogSettings.put(TEXT_ARRAY, textArray);
-		dialogSettings.put(DIALOG_HEIGHT, shell.getSize().y);
-		dialogSettings.put(DIALOG_WIDTH, shell.getSize().x);
+		// shell size stored when shell is disposed
+	}
+
+	private void storeShellSize() {
+		if (!shell.isDisposed()) {
+			IDialogSettings dialogSettings = getDialogSettings();
+			dialogSettings.put(DIALOG_HEIGHT, shell.getSize().y);
+			dialogSettings.put(DIALOG_WIDTH, shell.getSize().x);
+		}
 	}
 
 	private IDialogSettings getDialogSettings() {
