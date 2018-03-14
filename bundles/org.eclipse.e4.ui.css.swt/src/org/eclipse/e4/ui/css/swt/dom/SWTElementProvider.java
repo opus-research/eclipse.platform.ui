@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2016 Angelo Zerr and others.
+ * Copyright (c) 2008, 2015 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Item;
-import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
@@ -52,9 +51,6 @@ public class SWTElementProvider implements IElementProvider {
 	public Element getElement(Object element, CSSEngine engine) {
 		// Note that the order is important (must appear before
 		// Control/Item/Widget)
-		if (element instanceof Link) {
-			return new LinkElement((Link) element, engine);
-		}
 		if (element instanceof Text) {
 			return new TextElement((Text) element, engine);
 		}
