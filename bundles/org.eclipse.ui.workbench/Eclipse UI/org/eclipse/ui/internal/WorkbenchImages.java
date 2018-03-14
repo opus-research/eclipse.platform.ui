@@ -64,7 +64,7 @@ import org.eclipse.ui.internal.util.BundleUtility;
  */
 public/*final*/class WorkbenchImages {
 
-    private static Map descriptors;
+	private static Map<String, ImageDescriptor> descriptors;
 
     private static ImageRegistry imageRegistry;
 
@@ -525,7 +525,7 @@ public/*final*/class WorkbenchImages {
      * 
      * @return the map from symbolic name to ImageDescriptor.
      */
-    public static Map getDescriptors() {
+	public static Map<String, ImageDescriptor> getDescriptors() {
         if (descriptors == null) {
             initializeImageRegistry();
         }
@@ -563,7 +563,7 @@ public/*final*/class WorkbenchImages {
      * @return the image descriptor 
      */
     public static ImageDescriptor getImageDescriptor(String symbolicName) {
-        return (ImageDescriptor) getDescriptors().get(symbolicName);
+		return getDescriptors().get(symbolicName);
     }
 
     /**
@@ -631,7 +631,7 @@ public/*final*/class WorkbenchImages {
 	 */
     private static void initializeImageRegistry() {
         imageRegistry = new ImageRegistry();
-        descriptors = new HashMap();
+		descriptors = new HashMap<String, ImageDescriptor>();
         declareImages();
     }
     
