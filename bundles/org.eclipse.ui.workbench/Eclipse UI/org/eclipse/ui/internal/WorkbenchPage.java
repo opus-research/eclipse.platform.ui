@@ -73,6 +73,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
+import org.eclipse.e4.ui.workbench.addons.minmax.TrimStack;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
@@ -183,7 +184,8 @@ import org.osgi.service.event.EventHandler;
 /**
  * A collection of views and editors in a workbench.
  */
-public class WorkbenchPage implements IWorkbenchPage {
+public class WorkbenchPage extends CompatibleWorkbenchPage implements
+        IWorkbenchPage {
 
 	private static final String ATT_AGGREGATE_WORKING_SET_ID = "aggregateWorkingSetId"; //$NON-NLS-1$
 
@@ -887,13 +889,10 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 		final MToolControl minimizedStack = (MToolControl) changedObj;
 
-		// Note: The non-API type TrimStack is not imported to avoid
-		// https://bugs.eclipse.org/435521
-		if (!(minimizedStack.getObject() instanceof org.eclipse.e4.ui.workbench.addons.minmax.TrimStack))
+		if (!(minimizedStack.getObject() instanceof TrimStack))
 			return;
 
-		org.eclipse.e4.ui.workbench.addons.minmax.TrimStack ts = (org.eclipse.e4.ui.workbench.addons.minmax.TrimStack) minimizedStack
-				.getObject();
+		TrimStack ts = (TrimStack) minimizedStack.getObject();
 		if (!(ts.getMinimizedElement() instanceof MPartStack))
 			return;
 
@@ -914,12 +913,12 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 		if (UIEvents.isADD(event)) {
 			if (UIEvents.contains(event, UIEvents.EventTags.NEW_VALUE,
-					org.eclipse.e4.ui.workbench.addons.minmax.TrimStack.MINIMIZED_AND_SHOWING)) {
+					TrimStack.MINIMIZED_AND_SHOWING)) {
 				firePartVisible(thePart);
 			}
 		} else if (UIEvents.isREMOVE(event)) {
 			if (UIEvents.contains(event, UIEvents.EventTags.OLD_VALUE,
-					org.eclipse.e4.ui.workbench.addons.minmax.TrimStack.MINIMIZED_AND_SHOWING)) {
+					TrimStack.MINIMIZED_AND_SHOWING)) {
 				firePartHidden(thePart);
 			}
 		}

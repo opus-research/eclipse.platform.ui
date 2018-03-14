@@ -94,7 +94,6 @@ public class TableFontProviderTest extends StructuredViewerTest {
 	 * 
 	 * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#setUp()
 	 */
-	@Override
 	public void setUp() {
 		super.setUp();
 		font1 = JFaceResources.getFont(JFaceResources.BANNER_FONT);
@@ -116,7 +115,6 @@ public class TableFontProviderTest extends StructuredViewerTest {
 	 * 
 	 * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#createViewer(org.eclipse.swt.widgets.Composite)
 	 */
-	@Override
 	protected StructuredViewer createViewer(Composite parent) {
 		TableViewer viewer = new TableViewer(parent);
 		viewer.setContentProvider(new TestModelContentProvider());
@@ -142,7 +140,6 @@ public class TableFontProviderTest extends StructuredViewerTest {
 		return viewer;
 	}
 
-	@Override
 	protected int getItemCount() {
 		TestElement first = fRootElement.getFirstChild();
 		TableItem ti = (TableItem) fViewer.testFindItem(first);
@@ -150,7 +147,6 @@ public class TableFontProviderTest extends StructuredViewerTest {
 		return table.getItemCount();
 	}
 
-	@Override
 	protected String getItemText(int at) {
 		Table table = (Table) fViewer.getControl();
 		return table.getItem(at).getText();
@@ -172,7 +168,6 @@ public class TableFontProviderTest extends StructuredViewerTest {
 	class TableFontViewLabelProvider extends TableTestLabelProvider implements
 			ITableFontProvider {
 
-		@Override
 		public Image getColumnImage(Object obj, int index) {
 			return null;
 		}
@@ -183,7 +178,6 @@ public class TableFontProviderTest extends StructuredViewerTest {
 		 * @see org.eclipse.jface.viewers.ITableFontProvider#getFont(java.lang.Object,
 		 *      int)
 		 */
-		@Override
 		public Font getFont(Object element, int columnIndex) {
 			switch (columnIndex) {
 			case 0:
@@ -206,7 +200,6 @@ public class TableFontProviderTest extends StructuredViewerTest {
 		 * 
 		 * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
 		 */
-		@Override
 		public Font getFont(Object element) {
 			return font1;
 		}
