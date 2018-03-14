@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 460405
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.modeling;
 
@@ -21,16 +22,19 @@ import org.eclipse.emf.ecore.EStructuralFeature;
  * @since 1.0
  */
 public class EObjModelHandler extends ModelHandlerBase implements IAdapterFactory {
-	public EObjModelHandler() {
+
+	@Override
+	public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
+		if (adapterType.isInstance(this)) {
+			@SuppressWarnings("unchecked")
+			T modelHandlerBase = (T) this;
+			return modelHandlerBase;
+		}
+		return null;
 	}
 
 	@Override
-	public Object getAdapter(Object adaptableObject, Class adapterType) {
-		return this;
-	}
-
-	@Override
-	public Class[] getAdapterList() {
+	public Class<?>[] getAdapterList() {
 		return new Class[] { ModelHandlerBase.class };
 	}
 
@@ -62,7 +66,7 @@ public class EObjModelHandler extends ModelHandlerBase implements IAdapterFactor
 		EList<EStructuralFeature> features = eObj.eClass().getEAllStructuralFeatures();
 		String[] ids = new String[features.size()];
 		int count = 0;
-		for (Iterator iterator = features.iterator(); iterator.hasNext();) {
+		for (Iterator<?> iterator = features.iterator(); iterator.hasNext();) {
 			EStructuralFeature structuralFeature = (EStructuralFeature) iterator.next();
 			String featureName = structuralFeature.getName();
 			ids[count++] = featureName;
