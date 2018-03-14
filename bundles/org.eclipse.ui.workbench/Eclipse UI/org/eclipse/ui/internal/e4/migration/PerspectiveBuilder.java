@@ -419,20 +419,7 @@ public class PerspectiveBuilder {
 		List<String> views = perspReader.getDefaultFastViewBarViewIds();
 		if (views.size() > 0) {
 			stack = layoutUtils.createStack(DEFAULT_FASTVIEW_STACK, true);
-			MPartSashContainer psc = modelService.createModelElement(MPartSashContainer.class);
-			psc.setHorizontal(true);
-			psc.setContainerData(Integer.toString(5000));
-			stack.setContainerData(Integer.toString(2500));
-			psc.getChildren().add(stack);
-			List<MPartSashContainer> list = modelService.findElements(perspective, null, MPartSashContainer.class,
-					null);
-			if (list == null || list.size() == 0) {
-				perspective.getChildren().add(psc);
-			} else {
-				int size = list.size();
-				MPartSashContainer container = list.get(size - 1);
-				container.getChildren().add(psc);
-			}
+			perspective.getChildren().add(stack);
 			setPartState(stack, org.eclipse.ui.internal.e4.migration.InfoReader.PartState.MINIMIZED);
 
 			for (String view : views) {
@@ -544,7 +531,9 @@ public class PerspectiveBuilder {
 		}
 		addLayoutTagsToPlaceholder(placeholder, partId);
 		stack.getChildren().add(placeholder);
-		viewPlaceholders.put(partId, placeholder);
+		if (viewPlaceholders.get(partId) != null) {
+			viewPlaceholders.put(partId, placeholder);
+		}
 	}
 
 	private void addLayoutTagsToPlaceholder(MPlaceholder placeholder, String partId) {
