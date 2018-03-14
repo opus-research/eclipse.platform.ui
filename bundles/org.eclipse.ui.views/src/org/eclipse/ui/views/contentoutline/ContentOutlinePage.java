@@ -104,8 +104,8 @@ public abstract class ContentOutlinePage extends Page implements
 
         // fire the event
         Object[] listeners = selectionChangedListeners.getListeners();
-        for (int i = 0; i < listeners.length; ++i) {
-            final ISelectionChangedListener l = (ISelectionChangedListener) listeners[i];
+        for (Object listener : listeners) {
+            final ISelectionChangedListener l = (ISelectionChangedListener) listener;
             SafeRunner.run(new SafeRunnable() {
                 @Override
 				public void run() {
