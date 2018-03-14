@@ -23,7 +23,7 @@
   <packaging>eclipse-test-plugin</packaging>
 
   <properties>
-	<testSuiteMonitoring>org.eclipse.ui.internal.monitoring.MonitoringTestSuite</testSuiteMonitoring>
+	<testSuite>org.eclipse.ui.internal.monitoring.MonitoringTestSuite</testSuite>
  	<skipTests>false</skipTests>
   </properties>
 
