@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Sergey Prigogin (Google) - Bug 234331 - IStructuredSelection should be Iterable
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -17,22 +16,21 @@ import java.util.List;
 /**
  * A selection containing elements.
  */
-public interface IStructuredSelection extends ISelection, Iterable<Object> {
+public interface IStructuredSelection extends ISelection {
     /**
      * Returns the first element in this selection, or <code>null</code>
      * if the selection is empty.
      *
      * @return an element, or <code>null</code> if none
      */
-	public Object getFirstElement();
+    public Object getFirstElement();
 
     /**
      * Returns an iterator over the elements of this selection.
      *
      * @return an iterator over the selected elements
      */
-	@Override
-	public Iterator<Object> iterator();
+    public Iterator iterator();
 
     /**
      * Returns the number of elements selected in this selection.
@@ -56,5 +54,5 @@ public interface IStructuredSelection extends ISelection, Iterable<Object> {
      *
      * @return the selected elements as a list
      */
-	public <T> List<T> toList();
+    public List toList();
 }
