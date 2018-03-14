@@ -11,6 +11,7 @@
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 426535, 433234, 431868
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 431778
  *     Andrey Loskutov <loskutov@gmx.de> - Bugs 383569, 457198
+ *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 431990
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -212,6 +213,9 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			ToolBar tb = parent.getControl();
 			if (tb != null && !tb.isDisposed()) {
 				tb.pack(true);
+				if (tb.getParent() != null) {
+					tb.getParent().pack(true);
+				}
 				tb.getShell().layout(new Control[] { tb }, SWT.DEFER);
 			}
 		}
@@ -417,11 +421,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 				@Override
 				public void widgetDisposed(DisposeEvent e) {
 					cleanUp(toolbarModel);
-					Object dispose = transientData.get(POST_PROCESSING_DISPOSE);
-					if (dispose instanceof Runnable) {
-						((Runnable) dispose).run();
-					}
-					transientData.remove(POST_PROCESSING_DISPOSE);
 					transientData.remove(DISPOSE_ADDED);
 				}
 			});
