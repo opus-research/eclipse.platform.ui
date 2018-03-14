@@ -34,6 +34,7 @@ import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EFactory;
 import org.eclipse.emf.ecore.EGenericType;
+import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.impl.EPackageImpl;
@@ -332,15 +333,6 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int PART__ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int PART__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Contribution URI</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -413,31 +405,13 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int PART__TOOLTIP = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 7;
 
 	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int PART__LOCALIZED_LABEL = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 8;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int PART__LOCALIZED_TOOLTIP = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 9;
-
-	/**
 	 * The feature id for the '<em><b>Handlers</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int PART__HANDLERS = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 10;
+	public static final int PART__HANDLERS = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 8;
 
 	/**
 	 * The feature id for the '<em><b>Dirty</b></em>' attribute.
@@ -446,7 +420,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int PART__DIRTY = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 11;
+	public static final int PART__DIRTY = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 9;
 
 	/**
 	 * The feature id for the '<em><b>Binding Contexts</b></em>' reference list.
@@ -455,7 +429,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int PART__BINDING_CONTEXTS = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 12;
+	public static final int PART__BINDING_CONTEXTS = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 10;
 
 	/**
 	 * The feature id for the '<em><b>Menus</b></em>' containment reference list.
@@ -464,7 +438,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int PART__MENUS = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 13;
+	public static final int PART__MENUS = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 11;
 
 	/**
 	 * The feature id for the '<em><b>Toolbar</b></em>' containment reference.
@@ -473,7 +447,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int PART__TOOLBAR = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 14;
+	public static final int PART__TOOLBAR = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 12;
 
 	/**
 	 * The feature id for the '<em><b>Closeable</b></em>' attribute.
@@ -482,7 +456,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int PART__CLOSEABLE = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 15;
+	public static final int PART__CLOSEABLE = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 13;
 
 	/**
 	 * The feature id for the '<em><b>Description</b></em>' attribute.
@@ -491,16 +465,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int PART__DESCRIPTION = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 16;
-
-	/**
-	 * The feature id for the '<em><b>Localized Description</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int PART__LOCALIZED_DESCRIPTION = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 17;
+	public static final int PART__DESCRIPTION = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 14;
 
 	/**
 	 * The number of structural features of the '<em>Part</em>' class.
@@ -509,16 +474,43 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int PART_FEATURE_COUNT = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 18;
+	public static final int PART_FEATURE_COUNT = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 15;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int PART___UPDATE_LOCALIZATION = UiPackageImpl.UI_ELEMENT___UPDATE_LOCALIZATION;
+	public static final int PART___GET_LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int PART___GET_LOCALIZED_LABEL = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 0;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int PART___GET_LOCALIZED_TOOLTIP = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 1;
+
+	/**
+	 * The operation id for the '<em>Get Localized Description</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int PART___GET_LOCALIZED_DESCRIPTION = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 2;
 
 	/**
 	 * The number of operations of the '<em>Part</em>' class.
@@ -527,7 +519,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int PART_OPERATION_COUNT = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 0;
+	public static final int PART_OPERATION_COUNT = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 3;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.basic.impl.CompositePartImpl <em>Composite Part</em>}' class.
@@ -675,15 +667,6 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int COMPOSITE_PART__ACCESSIBILITY_PHRASE = PART__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int COMPOSITE_PART__LOCALIZED_ACCESSIBILITY_PHRASE = PART__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Contribution URI</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -756,24 +739,6 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int COMPOSITE_PART__TOOLTIP = PART__TOOLTIP;
 
 	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int COMPOSITE_PART__LOCALIZED_LABEL = PART__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int COMPOSITE_PART__LOCALIZED_TOOLTIP = PART__LOCALIZED_TOOLTIP;
-
-	/**
 	 * The feature id for the '<em><b>Handlers</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -837,15 +802,6 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int COMPOSITE_PART__DESCRIPTION = PART__DESCRIPTION;
 
 	/**
-	 * The feature id for the '<em><b>Localized Description</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int COMPOSITE_PART__LOCALIZED_DESCRIPTION = PART__LOCALIZED_DESCRIPTION;
-
-	/**
 	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -882,13 +838,40 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int COMPOSITE_PART_FEATURE_COUNT = PART_FEATURE_COUNT + 3;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int COMPOSITE_PART___UPDATE_LOCALIZATION = PART___UPDATE_LOCALIZATION;
+	public static final int COMPOSITE_PART___GET_LOCALIZED_ACCESSIBILITY_PHRASE = PART___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART___GET_LOCALIZED_LABEL = PART___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART___GET_LOCALIZED_TOOLTIP = PART___GET_LOCALIZED_TOOLTIP;
+
+	/**
+	 * The operation id for the '<em>Get Localized Description</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART___GET_LOCALIZED_DESCRIPTION = PART___GET_LOCALIZED_DESCRIPTION;
 
 	/**
 	 * The number of operations of the '<em>Composite Part</em>' class.
@@ -1035,15 +1018,6 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int INPUT_PART__ACCESSIBILITY_PHRASE = PART__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int INPUT_PART__LOCALIZED_ACCESSIBILITY_PHRASE = PART__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Contribution URI</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1116,24 +1090,6 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int INPUT_PART__TOOLTIP = PART__TOOLTIP;
 
 	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int INPUT_PART__LOCALIZED_LABEL = PART__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int INPUT_PART__LOCALIZED_TOOLTIP = PART__LOCALIZED_TOOLTIP;
-
-	/**
 	 * The feature id for the '<em><b>Handlers</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1197,15 +1153,6 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int INPUT_PART__DESCRIPTION = PART__DESCRIPTION;
 
 	/**
-	 * The feature id for the '<em><b>Localized Description</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int INPUT_PART__LOCALIZED_DESCRIPTION = PART__LOCALIZED_DESCRIPTION;
-
-	/**
 	 * The feature id for the '<em><b>Input URI</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1224,13 +1171,40 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int INPUT_PART_FEATURE_COUNT = PART_FEATURE_COUNT + 1;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int INPUT_PART___UPDATE_LOCALIZATION = PART___UPDATE_LOCALIZATION;
+	public static final int INPUT_PART___GET_LOCALIZED_ACCESSIBILITY_PHRASE = PART___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int INPUT_PART___GET_LOCALIZED_LABEL = PART___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int INPUT_PART___GET_LOCALIZED_TOOLTIP = PART___GET_LOCALIZED_TOOLTIP;
+
+	/**
+	 * The operation id for the '<em>Get Localized Description</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int INPUT_PART___GET_LOCALIZED_DESCRIPTION = PART___GET_LOCALIZED_DESCRIPTION;
 
 	/**
 	 * The number of operations of the '<em>Input Part</em>' class.
@@ -1377,15 +1351,6 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int PART_STACK__ACCESSIBILITY_PHRASE = UiPackageImpl.GENERIC_STACK__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int PART_STACK__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.GENERIC_STACK__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1413,13 +1378,13 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int PART_STACK_FEATURE_COUNT = UiPackageImpl.GENERIC_STACK_FEATURE_COUNT + 0;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int PART_STACK___UPDATE_LOCALIZATION = UiPackageImpl.GENERIC_STACK___UPDATE_LOCALIZATION;
+	public static final int PART_STACK___GET_LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.GENERIC_STACK___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The number of operations of the '<em>Part Stack</em>' class.
@@ -1566,15 +1531,6 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int PART_SASH_CONTAINER__ACCESSIBILITY_PHRASE = UiPackageImpl.GENERIC_TILE__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int PART_SASH_CONTAINER__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.GENERIC_TILE__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1611,13 +1567,13 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int PART_SASH_CONTAINER_FEATURE_COUNT = UiPackageImpl.GENERIC_TILE_FEATURE_COUNT + 0;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int PART_SASH_CONTAINER___UPDATE_LOCALIZATION = UiPackageImpl.GENERIC_TILE___UPDATE_LOCALIZATION;
+	public static final int PART_SASH_CONTAINER___GET_LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.GENERIC_TILE___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The number of operations of the '<em>Part Sash Container</em>' class.
@@ -1764,15 +1720,6 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int WINDOW__ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int WINDOW__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1818,31 +1765,13 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int WINDOW__TOOLTIP = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 2;
 
 	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int WINDOW__LOCALIZED_LABEL = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 3;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int WINDOW__LOCALIZED_TOOLTIP = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 4;
-
-	/**
 	 * The feature id for the '<em><b>Context</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WINDOW__CONTEXT = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 5;
+	public static final int WINDOW__CONTEXT = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Variables</b></em>' attribute list.
@@ -1851,7 +1780,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WINDOW__VARIABLES = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 6;
+	public static final int WINDOW__VARIABLES = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 4;
 
 	/**
 	 * The feature id for the '<em><b>Properties</b></em>' map.
@@ -1860,7 +1789,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WINDOW__PROPERTIES = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 7;
+	public static final int WINDOW__PROPERTIES = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 5;
 
 	/**
 	 * The feature id for the '<em><b>Handlers</b></em>' containment reference list.
@@ -1869,7 +1798,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WINDOW__HANDLERS = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 8;
+	public static final int WINDOW__HANDLERS = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 6;
 
 	/**
 	 * The feature id for the '<em><b>Binding Contexts</b></em>' reference list.
@@ -1878,7 +1807,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WINDOW__BINDING_CONTEXTS = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 9;
+	public static final int WINDOW__BINDING_CONTEXTS = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 7;
 
 	/**
 	 * The feature id for the '<em><b>Snippets</b></em>' containment reference list.
@@ -1887,7 +1816,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WINDOW__SNIPPETS = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 10;
+	public static final int WINDOW__SNIPPETS = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 8;
 
 	/**
 	 * The feature id for the '<em><b>Main Menu</b></em>' containment reference.
@@ -1896,7 +1825,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WINDOW__MAIN_MENU = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 11;
+	public static final int WINDOW__MAIN_MENU = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 9;
 
 	/**
 	 * The feature id for the '<em><b>X</b></em>' attribute.
@@ -1905,7 +1834,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WINDOW__X = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 12;
+	public static final int WINDOW__X = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 10;
 
 	/**
 	 * The feature id for the '<em><b>Y</b></em>' attribute.
@@ -1914,7 +1843,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WINDOW__Y = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 13;
+	public static final int WINDOW__Y = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 11;
 
 	/**
 	 * The feature id for the '<em><b>Width</b></em>' attribute.
@@ -1923,7 +1852,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WINDOW__WIDTH = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 14;
+	public static final int WINDOW__WIDTH = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 12;
 
 	/**
 	 * The feature id for the '<em><b>Height</b></em>' attribute.
@@ -1932,7 +1861,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WINDOW__HEIGHT = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 15;
+	public static final int WINDOW__HEIGHT = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 13;
 
 	/**
 	 * The feature id for the '<em><b>Windows</b></em>' containment reference list.
@@ -1941,7 +1870,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WINDOW__WINDOWS = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 16;
+	public static final int WINDOW__WINDOWS = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 14;
 
 	/**
 	 * The feature id for the '<em><b>Shared Elements</b></em>' containment reference list.
@@ -1950,7 +1879,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WINDOW__SHARED_ELEMENTS = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 17;
+	public static final int WINDOW__SHARED_ELEMENTS = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 15;
 
 	/**
 	 * The number of structural features of the '<em>Window</em>' class.
@@ -1959,16 +1888,34 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WINDOW_FEATURE_COUNT = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 18;
+	public static final int WINDOW_FEATURE_COUNT = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 16;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WINDOW___UPDATE_LOCALIZATION = UiPackageImpl.ELEMENT_CONTAINER___UPDATE_LOCALIZATION;
+	public static final int WINDOW___GET_LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WINDOW___GET_LOCALIZED_LABEL = UiPackageImpl.ELEMENT_CONTAINER_OPERATION_COUNT + 0;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WINDOW___GET_LOCALIZED_TOOLTIP = UiPackageImpl.ELEMENT_CONTAINER_OPERATION_COUNT + 1;
 
 	/**
 	 * The number of operations of the '<em>Window</em>' class.
@@ -1977,7 +1924,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WINDOW_OPERATION_COUNT = UiPackageImpl.ELEMENT_CONTAINER_OPERATION_COUNT + 0;
+	public static final int WINDOW_OPERATION_COUNT = UiPackageImpl.ELEMENT_CONTAINER_OPERATION_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Element Id</b></em>' attribute.
@@ -2115,15 +2062,6 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int TRIMMED_WINDOW__ACCESSIBILITY_PHRASE = WINDOW__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int TRIMMED_WINDOW__LOCALIZED_ACCESSIBILITY_PHRASE = WINDOW__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2167,24 +2105,6 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int TRIMMED_WINDOW__TOOLTIP = WINDOW__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int TRIMMED_WINDOW__LOCALIZED_LABEL = WINDOW__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int TRIMMED_WINDOW__LOCALIZED_TOOLTIP = WINDOW__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Context</b></em>' attribute.
@@ -2322,13 +2242,31 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int TRIMMED_WINDOW_FEATURE_COUNT = WINDOW_FEATURE_COUNT + 1;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int TRIMMED_WINDOW___UPDATE_LOCALIZATION = WINDOW___UPDATE_LOCALIZATION;
+	public static final int TRIMMED_WINDOW___GET_LOCALIZED_ACCESSIBILITY_PHRASE = WINDOW___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int TRIMMED_WINDOW___GET_LOCALIZED_LABEL = WINDOW___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int TRIMMED_WINDOW___GET_LOCALIZED_TOOLTIP = WINDOW___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The number of operations of the '<em>Trimmed Window</em>' class.
@@ -2475,15 +2413,6 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int TRIM_ELEMENT__ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int TRIM_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The number of structural features of the '<em>Trim Element</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2493,13 +2422,13 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int TRIM_ELEMENT_FEATURE_COUNT = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 0;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int TRIM_ELEMENT___UPDATE_LOCALIZATION = UiPackageImpl.UI_ELEMENT___UPDATE_LOCALIZATION;
+	public static final int TRIM_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The number of operations of the '<em>Trim Element</em>' class.
@@ -2646,15 +2575,6 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int PART_SASH_CONTAINER_ELEMENT__ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int PART_SASH_CONTAINER_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The number of structural features of the '<em>Part Sash Container Element</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2664,13 +2584,13 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int PART_SASH_CONTAINER_ELEMENT_FEATURE_COUNT = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 0;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int PART_SASH_CONTAINER_ELEMENT___UPDATE_LOCALIZATION = UiPackageImpl.UI_ELEMENT___UPDATE_LOCALIZATION;
+	public static final int PART_SASH_CONTAINER_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The number of operations of the '<em>Part Sash Container Element</em>' class.
@@ -2817,15 +2737,6 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int WINDOW_ELEMENT__ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int WINDOW_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The number of structural features of the '<em>Window Element</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2835,13 +2746,13 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int WINDOW_ELEMENT_FEATURE_COUNT = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 0;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WINDOW_ELEMENT___UPDATE_LOCALIZATION = UiPackageImpl.UI_ELEMENT___UPDATE_LOCALIZATION;
+	public static final int WINDOW_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The number of operations of the '<em>Window Element</em>' class.
@@ -2988,15 +2899,6 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int TRIM_BAR__ACCESSIBILITY_PHRASE = UiPackageImpl.GENERIC_TRIM_CONTAINER__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int TRIM_BAR__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.GENERIC_TRIM_CONTAINER__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3042,13 +2944,13 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int TRIM_BAR_FEATURE_COUNT = UiPackageImpl.GENERIC_TRIM_CONTAINER_FEATURE_COUNT + 1;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int TRIM_BAR___UPDATE_LOCALIZATION = UiPackageImpl.GENERIC_TRIM_CONTAINER___UPDATE_LOCALIZATION;
+	public static final int TRIM_BAR___GET_LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.GENERIC_TRIM_CONTAINER___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The number of operations of the '<em>Trim Bar</em>' class.
@@ -3195,15 +3097,6 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int STACK_ELEMENT__ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int STACK_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The number of structural features of the '<em>Stack Element</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3213,13 +3106,13 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int STACK_ELEMENT_FEATURE_COUNT = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 0;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int STACK_ELEMENT___UPDATE_LOCALIZATION = UiPackageImpl.UI_ELEMENT___UPDATE_LOCALIZATION;
+	public static final int STACK_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The number of operations of the '<em>Stack Element</em>' class.
@@ -3376,15 +3269,6 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int DIALOG__ACCESSIBILITY_PHRASE = WINDOW__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIALOG__LOCALIZED_ACCESSIBILITY_PHRASE = WINDOW__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3428,24 +3312,6 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int DIALOG__TOOLTIP = WINDOW__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIALOG__LOCALIZED_LABEL = WINDOW__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIALOG__LOCALIZED_TOOLTIP = WINDOW__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Context</b></em>' attribute.
@@ -3574,13 +3440,31 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int DIALOG_FEATURE_COUNT = WINDOW_FEATURE_COUNT + 0;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DIALOG___UPDATE_LOCALIZATION = WINDOW___UPDATE_LOCALIZATION;
+	public static final int DIALOG___GET_LOCALIZED_ACCESSIBILITY_PHRASE = WINDOW___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG___GET_LOCALIZED_LABEL = WINDOW___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG___GET_LOCALIZED_TOOLTIP = WINDOW___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The number of operations of the '<em>Dialog</em>' class.
@@ -3737,15 +3621,6 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int WIZARD_DIALOG__ACCESSIBILITY_PHRASE = DIALOG__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int WIZARD_DIALOG__LOCALIZED_ACCESSIBILITY_PHRASE = DIALOG__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3789,24 +3664,6 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int WIZARD_DIALOG__TOOLTIP = DIALOG__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int WIZARD_DIALOG__LOCALIZED_LABEL = DIALOG__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int WIZARD_DIALOG__LOCALIZED_TOOLTIP = DIALOG__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Context</b></em>' attribute.
@@ -3935,13 +3792,31 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int WIZARD_DIALOG_FEATURE_COUNT = DIALOG_FEATURE_COUNT + 0;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int WIZARD_DIALOG___UPDATE_LOCALIZATION = DIALOG___UPDATE_LOCALIZATION;
+	public static final int WIZARD_DIALOG___GET_LOCALIZED_ACCESSIBILITY_PHRASE = DIALOG___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG___GET_LOCALIZED_LABEL = DIALOG___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG___GET_LOCALIZED_TOOLTIP = DIALOG___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The number of operations of the '<em>Wizard Dialog</em>' class.
@@ -4198,16 +4073,15 @@ public class BasicPackageImpl extends EPackageImpl {
 
 
 	/**
-	 * Returns the meta object for the attribute '{@link org.eclipse.e4.ui.model.application.ui.basic.MPart#getLocalizedDescription <em>Localized Description</em>}'.
+	 * Returns the meta object for the '{@link org.eclipse.e4.ui.model.application.ui.basic.MPart#getLocalizedDescription() <em>Get Localized Description</em>}' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Localized Description</em>'.
+	 * @return the meta object for the '<em>Get Localized Description</em>' operation.
 	 * @see org.eclipse.e4.ui.model.application.ui.basic.MPart#getLocalizedDescription()
-	 * @see #getPart()
 	 * @generated
 	 */
-	public EAttribute getPart_LocalizedDescription() {
-		return (EAttribute)partEClass.getEStructuralFeatures().get(4);
+	public EOperation getPart__GetLocalizedDescription() {
+		return partEClass.getEOperations().get(0);
 	}
 
 
@@ -4525,7 +4399,7 @@ public class BasicPackageImpl extends EPackageImpl {
 		createEReference(partEClass, PART__TOOLBAR);
 		createEAttribute(partEClass, PART__CLOSEABLE);
 		createEAttribute(partEClass, PART__DESCRIPTION);
-		createEAttribute(partEClass, PART__LOCALIZED_DESCRIPTION);
+		createEOperation(partEClass, PART___GET_LOCALIZED_DESCRIPTION);
 
 		compositePartEClass = createEClass(COMPOSITE_PART);
 
@@ -4665,7 +4539,8 @@ public class BasicPackageImpl extends EPackageImpl {
 		initEReference(getPart_Toolbar(), theMenuPackage.getToolBar(), null, "toolbar", null, 0, 1, MPart.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 		initEAttribute(getPart_Closeable(), ecorePackage.getEBoolean(), "closeable", "false", 0, 1, MPart.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$ //$NON-NLS-2$
 		initEAttribute(getPart_Description(), ecorePackage.getEString(), "description", null, 0, 1, MPart.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
-		initEAttribute(getPart_LocalizedDescription(), ecorePackage.getEString(), "localizedDescription", null, 0, 1, MPart.class, IS_TRANSIENT, IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
+
+		initEOperation(getPart__GetLocalizedDescription(), ecorePackage.getEString(), "getLocalizedDescription", 0, 1, IS_UNIQUE, IS_ORDERED); //$NON-NLS-1$
 
 		initEClass(compositePartEClass, MCompositePart.class, "CompositePart", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 
@@ -4759,12 +4634,12 @@ public class BasicPackageImpl extends EPackageImpl {
 		public static final EAttribute PART__DESCRIPTION = eINSTANCE.getPart_Description();
 
 		/**
-		 * The meta object literal for the '<em><b>Localized Description</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Get Localized Description</b></em>' operation.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		public static final EAttribute PART__LOCALIZED_DESCRIPTION = eINSTANCE.getPart_LocalizedDescription();
+		public static final EOperation PART___GET_LOCALIZED_DESCRIPTION = eINSTANCE.getPart__GetLocalizedDescription();
 
 		/**
 		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.basic.impl.CompositePartImpl <em>Composite Part</em>}' class.
