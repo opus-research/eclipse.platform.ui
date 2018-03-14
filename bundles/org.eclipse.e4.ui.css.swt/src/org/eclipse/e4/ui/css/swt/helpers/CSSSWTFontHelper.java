@@ -485,24 +485,16 @@ public class CSSSWTFontHelper {
 	public static void restoreDefaultFont(Control control) {
 		Font defaultFont = (Font) control.getData(DEFAULT_FONT);
 		if (defaultFont != null) {
-			if (defaultFont.isDisposed()) {
-				defaultFont = control.getDisplay().getSystemFont();
-			}
-			if (defaultFont != control.getFont()) {
-				control.setFont(defaultFont);
-			}
+			control.setFont(defaultFont.isDisposed() ? control.getDisplay()
+					.getSystemFont() : defaultFont);
 		}
 	}
 
 	public static void restoreDefaultFont(CTabItem item) {
 		Font defaultFont = (Font) item.getData(DEFAULT_FONT);
 		if (defaultFont != null) {
-			if (defaultFont.isDisposed()) {
-				defaultFont = item.getDisplay().getSystemFont();
-			}
-			if (defaultFont != item.getFont()) {
-				item.setFont(defaultFont);
-			}
+			item.setFont(defaultFont.isDisposed() ? item.getDisplay()
+					.getSystemFont() : defaultFont);
 		}
 	}
 }
