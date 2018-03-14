@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,7 +43,6 @@ import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.internal.views.properties.PropertiesMessages;
 import org.eclipse.ui.part.IContributedContentsView;
@@ -240,12 +239,10 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 
 		IEditorPart activeEditor = page.getActiveEditor();
 		if (activeEditor != null && isImportant(activeEditor)) {
-			if (activeEditor.getSite().getSelectionProvider() != null) {
-				ISelection selection = activeEditor.getSite().getSelectionProvider().getSelection();
-				if (originalSel.equals(selection)) {
-					bootstrapSelection = originalSel;
-					return activeEditor;
-				}
+			ISelection selection = activeEditor.getSite().getSelectionProvider().getSelection();
+			if (originalSel.equals(selection)) {
+				bootstrapSelection = originalSel;
+				return activeEditor;
 			}
 		}
 		IViewReference[] viewrefs = page.getViewReferences();
@@ -254,7 +251,7 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 			if (part == null || part == this || !page.isPartVisible(part)) {
 				continue;
 			}
-			if (!isImportant(part) || part.getSite().getSelectionProvider() == null) {
+			if (!isImportant(part)) {
 				continue;
 			}
 			ISelection selection = part.getSite().getSelectionProvider().getSelection();
@@ -336,16 +333,11 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 			return;
 		}
 		if (wasHidden) {
-			IWorkbenchPartSite site = getSite();
-			IWorkbenchPage page = site.getPage();
-			IViewPart[] stack = page.getViewStack(this);
-			if (stack != null) {
-				for (IViewPart vPart : stack) {
-					if (vPart == part) {
-						// don't react on activation of parts from same stack,
-						// see bug 485154.
-						return;
-					}
+			IViewPart[] stack = getSite().getPage().getViewStack(this);
+			for (IViewPart vPart : stack) {
+				if (vPart == part) {
+					// don't react on activation of parts from same stack, see bug 485154.
+					return;
 				}
 			}
 		}

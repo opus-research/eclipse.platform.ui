@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2016 IBM Corporation and others.
+ * Copyright (c) 2008, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -147,8 +147,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 			Object w = createGui(changedElement);
 			if (w instanceof Control && !(w instanceof Shell)) {
 				fixZOrder(changedElement);
-				Control control = (Control) w;
-				control.requestLayout();
 			}
 		} else {
 			Activator.trace(Policy.DEBUG_RENDERER, "visible -> false", null); //$NON-NLS-1$
@@ -422,6 +420,21 @@ public class PartRenderingEngine implements IPresentationEngine {
 				break;
 			} else if (kid.getWidget() instanceof Control && kid.isVisible()) {
 				prevCtrl = (Control) kid.getWidget();
+			}
+		}
+
+		Object widget = parent.getWidget();
+		if (widget instanceof Composite) {
+			Composite composite = (Composite) widget;
+			if (composite.getShell() == elementCtrl.getShell()) {
+				Composite temp = elementCtrl.getParent();
+				while (temp != composite) {
+					if (temp == null) {
+						return;
+					}
+					temp = temp.getParent();
+				}
+				composite.requestLayout();
 			}
 		}
 	}
