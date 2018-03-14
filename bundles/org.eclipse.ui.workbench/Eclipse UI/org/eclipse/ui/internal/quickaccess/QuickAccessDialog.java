@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
+ *     René Brandstetter - Bug 433778
  *******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 
@@ -200,8 +201,19 @@ public class QuickAccessDialog extends PopupDialog {
 								if (selectedElement instanceof QuickAccessElement) {
 									addPreviousPick(text, selectedElement);
 									storeDialog(getDialogSettings());
-									QuickAccessElement element = (QuickAccessElement) selectedElement;
-									element.execute();
+
+									/*
+									 * Execute after the dialog has been fully
+									 * closed/disposed and the correct
+									 * EclipseContext is in place.
+									 */
+									final QuickAccessElement element = (QuickAccessElement) selectedElement;
+									window.getShell().getDisplay().asyncExec(new Runnable() {
+										@Override
+										public void run() {
+											element.execute();
+										}
+									});
 								}
 							}
 						};

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  ******************************************************************************/
-
 package org.eclipse.e4.ui.workbench.addons.minmax;
 
 import java.util.HashMap;
@@ -24,8 +23,6 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.internal.workbench.swt.CSSRenderingUtils;
 import org.eclipse.e4.ui.internal.workbench.swt.ShellActivationListener;
-import org.eclipse.e4.ui.model.application.MAddon;
-import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MGenericStack;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
@@ -37,7 +34,6 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MCompositePart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
-import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
@@ -53,6 +49,7 @@ import org.eclipse.e4.ui.workbench.renderers.swt.TrimmedPartLayout;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
@@ -74,6 +71,7 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.osgi.service.event.EventHandler;
 
+
 /**
  * Class for representing window trim containing minimized views and shared areas
  */
@@ -94,7 +92,7 @@ public class TrimStack {
 
 	static final String STATE_YSIZE = "YSize"; //$NON-NLS-1$
 
-	private static final String MINIMIZED_AND_SHOWING = "MinimizzedAndShowing"; //$NON-NLS-1$
+	public static final String MINIMIZED_AND_SHOWING = "MinimizedAndShowing"; //$NON-NLS-1$
 
 	private Image layoutImage;
 
@@ -199,6 +197,16 @@ public class TrimStack {
 		if (stringObject != null && stringObject instanceof String)
 			result = (String) stringObject;
 
+		if (result == null || result.length() == 0)
+			return null;
+
+		if (element instanceof MUILabel) {
+			String label = ((MUILabel)element).getLocalizedLabel();
+			if (label != null && label.length() > 0) {
+				result = label + ' ' + '(' + result + ')';
+			}
+		}
+
 		return result;
 	}
 
@@ -293,18 +301,6 @@ public class TrimStack {
 			showStack(false);
 		}
 	};
-
-	private MAddon minMaxAddon;
-
-	@Inject
-	private void setMinMaxElement(MApplication theApp) {
-		for (MAddon addon : theApp.getAddons()) {
-			String uri = addon.getContributionURI();
-			if (uri != null && uri.contains("MinMaxAddon")) { //$NON-NLS-1$
-				minMaxAddon = addon;
-			}
-		}
-	}
 
 	private void fixToolItemSelection() {
 		if (trimStackTB == null || trimStackTB.isDisposed())
@@ -659,13 +655,13 @@ public class TrimStack {
 	 */
 	private void createUseOverlaysMenu() {
 		MenuItem useOverlaysItem = new MenuItem(trimStackMenu, SWT.CHECK);
-		useOverlaysItem.setText(Messages.TrimStack_Use_Overlays);
-		useOverlaysItem.setSelection(useOverlays());
+		useOverlaysItem.setText(Messages.TrimStack_Show_In_Original_Location);
+		useOverlaysItem.setSelection(!useOverlays());
 		useOverlaysItem.addListener(SWT.Selection, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				if (minMaxAddon != null) {
-					minMaxAddon.getPersistedState().put(USE_OVERLAYS_KEY,
+				if (toolControl != null) {
+					toolControl.getPersistedState().put(USE_OVERLAYS_KEY,
 							Boolean.toString(!useOverlays()));
 				}
 			}
@@ -944,6 +940,15 @@ public class TrimStack {
 				originalParent = ctrl.getParent();
 				ctrl.setParent(hostPane);
 
+				// Hack ! Force a resize of the CTF to make sure the hosted
+				// view is the correct size...see bug 434062 for details
+				if (ctrl instanceof CTabFolder) {
+					CTabFolder ctf = (CTabFolder) ctrl;
+					Rectangle bb = ctf.getBounds();
+					bb.width--;
+					ctf.setBounds(bb);
+				}
+
 				clientAreaComposite.addControlListener(caResizeListener);
 
 				// Set the initial location
@@ -987,8 +992,9 @@ public class TrimStack {
 
 				// See if we can find an element to activate...
 				MPart partToActivate = null;
-				MElementContainer<MPartSashContainerElement> curContainer = area;
-				while (partToActivate == null && curContainer.getSelectedElement() != null) {
+				MElementContainer<?> curContainer = area;
+				MUIElement selectedElement = curContainer.getSelectedElement();
+				while (partToActivate == null && selectedElement != null) {
 					if (curContainer.getSelectedElement() instanceof MPart) {
 						partToActivate = (MPart) curContainer.getSelectedElement();
 					} else if (curContainer.getSelectedElement() instanceof MPlaceholder) {
@@ -997,8 +1003,7 @@ public class TrimStack {
 							partToActivate = (MPart) ph.getRef();
 						}
 					} else if (curContainer.getSelectedElement() instanceof MElementContainer<?>) {
-						curContainer = (MElementContainer<MPartSashContainerElement>) curContainer
-								.getSelectedElement();
+						curContainer = (MElementContainer<?>) curContainer.getSelectedElement();
 					}
 				}
 
@@ -1051,10 +1056,10 @@ public class TrimStack {
 	 *         to temporarily restore the stack into the current presentation.
 	 */
 	private boolean useOverlays() {
-		if (minMaxAddon == null)
+		if (toolControl == null)
 			return true;
 
-		String useOverlays = minMaxAddon.getPersistedState().get(USE_OVERLAYS_KEY);
+		String useOverlays = toolControl.getPersistedState().get(USE_OVERLAYS_KEY);
 		if (useOverlays == null)
 			useOverlays = "true"; //$NON-NLS-1$
 		return Boolean.parseBoolean(useOverlays);

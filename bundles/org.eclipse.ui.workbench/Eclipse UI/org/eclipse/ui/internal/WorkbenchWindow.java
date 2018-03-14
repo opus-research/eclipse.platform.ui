@@ -12,7 +12,7 @@
  *     								 removes a menu from multiple perspectives
  *     René Brandstetter - Bug 411821 - [QuickAccess] Contribute SearchField
  *                                      through a fragment or other means
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431446
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431446, 433979
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -201,6 +201,11 @@ import org.osgi.service.event.EventHandler;
  * A window within the workbench.
  */
 public class WorkbenchWindow implements IWorkbenchWindow {
+
+	/**
+	 * The 'elementId' of the spacer used to right-align it in the trim
+	 */
+	public static final String PERSPECTIVE_SPACER_ID = "PerspectiveSpacer"; //$NON-NLS-1$
 
 	private static final String MAIN_TOOLBAR_ID = "org.eclipse.ui.main.toolbar"; //$NON-NLS-1$
 	private static final String COMMAND_ID_TOGGLE_COOLBAR = "org.eclipse.ui.ToggleCoolbarAction"; //$NON-NLS-1$
@@ -806,6 +811,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 	void populateTopTrimContributions() {
 		getCoolBarManager2().update(true);
+		getCoolBarManager2().add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
 
 		final MTrimBar trimBar = getTopTrim();
 		// TODO why aren't these added as trim contributions
@@ -821,26 +827,45 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		 * and so on, buttons which are normally placed at the beginning of the
 		 * trimbar (left) would be moved to the end of it (right).)
 		 */
-		MToolControl spacerControl = (MToolControl) modelService.find("PerspectiveSpacer", model); //$NON-NLS-1$
+		MToolControl spacerControl = (MToolControl) modelService.find(PERSPECTIVE_SPACER_ID, model);
 		if (spacerControl == null) {
 			spacerControl = modelService.createModelElement(MToolControl.class);
-			spacerControl.setElementId("PerspectiveSpacer"); //$NON-NLS-1$
+			spacerControl.setElementId(PERSPECTIVE_SPACER_ID);
 			spacerControl
 					.setContributionURI("bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/org.eclipse.e4.ui.workbench.renderers.swt.LayoutModifierToolControl"); //$NON-NLS-1$
 			spacerControl.getTags().add(TrimBarLayout.SPACER);
+			spacerControl.getTags().add("SHOW_RESTORE_MENU"); //$NON-NLS-1$
 			trimBar.getChildren().add(spacerControl);
+		} else {
+			if (!spacerControl.getTags().contains("SHOW_RESTORE_MENU")) { //$NON-NLS-1$
+				spacerControl.getTags().add("SHOW_RESTORE_MENU"); //$NON-NLS-1$
+			}
 		}
 
 		MToolControl switcherControl = (MToolControl) modelService.find(
 				"PerspectiveSwitcher", model); //$NON-NLS-1$
-		if (switcherControl == null) {
+		if (switcherControl == null && getWindowConfigurer().getShowPerspectiveBar()) {
 			switcherControl = modelService.createModelElement(MToolControl.class);
 			switcherControl.setToBeRendered(getWindowConfigurer().getShowPerspectiveBar());
 			switcherControl.setElementId("PerspectiveSwitcher"); //$NON-NLS-1$
 			switcherControl.getTags().add(IPresentationEngine.DRAGGABLE);
+			switcherControl.getTags().add("HIDEABLE"); //$NON-NLS-1$
+			switcherControl.getTags().add("SHOW_RESTORE_MENU"); //$NON-NLS-1$
 			switcherControl
 					.setContributionURI("bundleclass://org.eclipse.ui.workbench/org.eclipse.e4.ui.workbench.addons.perspectiveswitcher.PerspectiveSwitcher"); //$NON-NLS-1$
 			trimBar.getChildren().add(switcherControl);
+		} else if (switcherControl != null) {
+			if (!getWindowConfigurer().getShowPerspectiveBar()) {
+				trimBar.getChildren().remove(switcherControl);
+			} else {
+				List<String> tags = switcherControl.getTags();
+				if (!tags.contains("HIDEABLE")) { //$NON-NLS-1$
+					tags.add("HIDEABLE"); //$NON-NLS-1$
+				}
+				if (!tags.contains("SHOW_RESTORE_MENU")) { //$NON-NLS-1$
+					tags.add("SHOW_RESTORE_MENU"); //$NON-NLS-1$
+				}
+			}
 		}
 
 		// render now after everything has been added so contributions can be
@@ -1847,6 +1872,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 			getActionBarAdvisor().dispose();
 			getWindowAdvisor().dispose();
+			coolbarToTrim.dispose();
 
 			// Null out the progress region. Bug 64024.
 			progressRegion = null;
