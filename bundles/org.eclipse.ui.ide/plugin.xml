@@ -478,6 +478,9 @@
             id="org.eclipse.ui.ide.editors"
             label="%PreferenceKeywords.Editors"/>
       <keyword
+            id="org.eclipse.ui.ide.globalization"
+            label="%PreferenceKeywords.Globalization"/>
+      <keyword
             id="org.eclipse.ui.ide.reuse"
             label="%PreferenceKeywords.Reuse"/>
       <keyword
@@ -545,6 +548,13 @@
             class="org.eclipse.ui.internal.ide.dialogs.IDEWorkbenchPreferencePage"
             id="org.eclipse.ui.preferencePages.Workbench">
          <keywordReference id="org.eclipse.ui.ide.general"/>
+      </page>
+      <page
+            name="%PreferencePages.Globalization"
+            category="org.eclipse.ui.preferencePages.Workbench"
+            class="org.eclipse.ui.internal.dialogs.GlobalizationPreferencePage"
+            id="org.eclipse.ui.preferencePages.Globalization">
+         <keywordReference id="org.eclipse.ui.ide.globalization"/>
       </page>
       <page
             name="%PreferencePages.Editors"
@@ -1655,22 +1665,21 @@
    <extension
          point="org.eclipse.ui.menus">
          <menuContribution
-               allPopups="false"
-               locationURI="menu:window?after=org.eclipse.ui.editors">
-            <menu
-                  label="%menu.toolbar">
-               <command
-                     commandId="org.eclipse.ui.ToggleCoolbarAction"
-                     style="push"
-                     tooltip="%menu.toggleCoolbar.tooltip">
-               </command>
-               <command
-                     commandId="org.eclipse.ui.resetCoolbarAction"
-                     style="push"
-                     tooltip="%menu.resetCoolbar.tooltip">
-               </command>
-            </menu>
-         </menuContribution>
+            locationURI="menu:window?after=org.eclipse.ui.editors">
+         <command
+               commandId="org.eclipse.ui.ToggleCoolbarAction"
+               tooltip="%menu.toggleCoolbar.tooltip"
+               style="push">
+         </command>
+      </menuContribution>
+         <menuContribution
+            locationURI="menu:window?after=org.eclipse.ui.editors">
+         <command
+               commandId="org.eclipse.ui.resetCoolbarAction"
+               tooltip="%menu.resetCoolbar.tooltip"
+               style="push">
+         </command>
+      </menuContribution>
       <menuContribution
             locationURI="popup:windowCoolbarContextMenu">
          <command
