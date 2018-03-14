@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2010 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,6 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.application.IWorkbenchConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchAdvisor;
@@ -44,7 +43,7 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
      * value type: <code>Object</code>).
      * @see #setData
      */
-    private Map extraData = new HashMap();
+	private Map<String, Object> extraData = new HashMap<String, Object>();
 
     /**
      * Indicates whether workbench state should be saved on close and
@@ -179,7 +178,7 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
     }
 
 	@Override
-	public IWorkbenchWindowConfigurer restoreWorkbenchWindow(IMemento memento) throws WorkbenchException {
+	public IWorkbenchWindowConfigurer restoreWorkbenchWindow(IMemento memento) {
 		return getWindowConfigurer(null);
 	}
 
