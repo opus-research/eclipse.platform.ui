@@ -177,7 +177,8 @@ public class PropertySheetEntry extends EventManager implements
 
 		// get all descriptors from each object
 		ArrayList<Map<Object, IPropertyDescriptor>> propertyDescriptorMaps = new ArrayList<>(values.length);
-		for (Object object : values) {
+		for (int i = 0; i < values.length; i++) {
+			Object object = values[i];
 			IPropertySource source = getPropertySource(object);
 			if (source == null) {
 				// if one of the selected items is not a property source
@@ -208,7 +209,8 @@ public class PropertySheetEntry extends EventManager implements
 		// the original order)
 		ArrayList<IPropertyDescriptor> result = new ArrayList<IPropertyDescriptor>(intersection.size());
 		IPropertyDescriptor[] firstDescs = firstSource.getPropertyDescriptors();
-		for (IPropertyDescriptor desc : firstDescs) {
+		for (int i = 0; i < firstDescs.length; i++) {
+			IPropertyDescriptor desc = firstDescs[i];
 			if (intersection.containsKey(desc.getId())) {
 				result.add(desc);
 			}
@@ -227,8 +229,8 @@ public class PropertySheetEntry extends EventManager implements
 	private Map<Object, IPropertyDescriptor> computePropertyDescriptorsFor(IPropertySource source) {
 		IPropertyDescriptor[] descriptors = source.getPropertyDescriptors();
 		Map<Object, IPropertyDescriptor> result = new HashMap<>(descriptors.length * 2 + 1);
-		for (IPropertyDescriptor descriptor2 : descriptors) {
-			result.put(descriptor2.getId(), descriptor2);
+		for (int i = 0; i < descriptors.length; i++) {
+			result.put(descriptors[i].getId(), descriptors[i]);
 		}
 		return result;
 	}
@@ -282,12 +284,12 @@ public class PropertySheetEntry extends EventManager implements
 		PropertySheetEntry[] entriesToDispose = childEntries;
 		childEntries = null;
 		if (entriesToDispose != null) {
-			for (PropertySheetEntry element : entriesToDispose) {
+			for (int i = 0; i < entriesToDispose.length; i++) {
 				// an error in a property source may cause refreshChildEntries
 				// to fail. Since the Workbench handles such errors we
 				// can be left in a state where a child entry is null.
-				if (element != null) {
-					element.dispose();
+				if (entriesToDispose[i] != null) {
+					entriesToDispose[i].dispose();
 				}
 			}
 		}
@@ -299,8 +301,8 @@ public class PropertySheetEntry extends EventManager implements
 	 */
 	private void fireChildEntriesChanged() {
 		Object[] array = getListeners();
-		for (Object element : array) {
-			IPropertySheetEntryListener listener = (IPropertySheetEntryListener) element;
+		for (int i = 0; i < array.length; i++) {
+			IPropertySheetEntryListener listener = (IPropertySheetEntryListener) array[i];
 			listener.childEntriesChanged(this);
 		}
 	}
@@ -311,8 +313,8 @@ public class PropertySheetEntry extends EventManager implements
 	 */
 	private void fireErrorMessageChanged() {
 		Object[] array = getListeners();
-		for (Object element : array) {
-			IPropertySheetEntryListener listener = (IPropertySheetEntryListener) element;
+		for (int i = 0; i < array.length; i++) {
+			IPropertySheetEntryListener listener = (IPropertySheetEntryListener) array[i];
 			listener.errorMessageChanged(this);
 		}
 	}
@@ -323,8 +325,8 @@ public class PropertySheetEntry extends EventManager implements
 	 */
 	private void fireValueChanged() {
 		Object[] array = getListeners();
-		for (Object element : array) {
-			IPropertySheetEntryListener listener = (IPropertySheetEntryListener) element;
+		for (int i = 0; i < array.length; i++) {
+			IPropertySheetEntryListener listener = (IPropertySheetEntryListener) array[i];
 			listener.valueChanged(this);
 		}
 	}
@@ -509,7 +511,8 @@ public class PropertySheetEntry extends EventManager implements
 
 		// cache old entries by their descriptor id
 		Map<Object, PropertySheetEntry> entryCache = new HashMap<>(childEntries.length * 2 + 1);
-		for (PropertySheetEntry childEntry : childEntries) {
+		for (int i = 0; i < childEntries.length; i++) {
+			PropertySheetEntry childEntry = childEntries[i];
 			if (childEntry != null) {
 				entryCache.put(childEntry.getDescriptor().getId(), childEntry);
 			}
@@ -608,8 +611,8 @@ public class PropertySheetEntry extends EventManager implements
 		// Use our parent's values to reset our values.
 		boolean change = false;
 		Object[] objects = parent.getValues();
-		for (Object object : objects) {
-			IPropertySource source = getPropertySource(object);
+		for (int i = 0; i < objects.length; i++) {
+			IPropertySource source = getPropertySource(objects[i]);
 			if (source.isPropertySet(descriptor.getId())) {
 				// fix for https://bugs.eclipse.org/bugs/show_bug.cgi?id=21756
 				if (source instanceof IPropertySource2) {
