@@ -12,11 +12,6 @@ package org.eclipse.ui.part;
 
 import java.util.Stack;
 
-/*
- * A <code>DrillStack</code> manages a stack of DrillFrames.
- * This class is not intended for use beyond the package.
- */
-
 /* package */class DrillStack {
     Stack fStack = null;
 

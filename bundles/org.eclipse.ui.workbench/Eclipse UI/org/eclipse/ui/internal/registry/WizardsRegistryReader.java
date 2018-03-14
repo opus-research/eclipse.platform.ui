@@ -11,7 +11,6 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.registry;
 
-import com.ibm.icu.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -20,6 +19,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.StringTokenizer;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
@@ -30,6 +30,8 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.dialogs.WizardCollectionElement;
 import org.eclipse.ui.internal.dialogs.WorkbenchWizardElement;
 import org.eclipse.ui.internal.util.Util;
+
+import com.ibm.icu.text.Collator;
 
 /**
  *  Instances access the registry that is provided at creation time
@@ -119,10 +121,6 @@ public class WizardsRegistryReader extends RegistryReader {
         plugin = pluginId;
     }
 
-	/*
-	 * <p> This implementation uses a defering strategy. For more info see
-	 * <code>readWizards</code>. </p>
-	 */
     protected void addNewElementToResult(WorkbenchWizardElement element,
             IConfigurationElement config) {
         // TODO: can we remove the config parameter?

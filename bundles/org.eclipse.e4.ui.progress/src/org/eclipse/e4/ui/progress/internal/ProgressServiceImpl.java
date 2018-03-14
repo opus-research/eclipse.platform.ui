@@ -47,7 +47,7 @@ public class ProgressServiceImpl implements IProgressService {
 
 	private static final String IMAGE_KEY = "org.eclipse.ui.progress.images"; //$NON-NLS-1$
 
-	private Hashtable<Object, String> imageKeyTable = new Hashtable<>();
+	private Hashtable<Object, String> imageKeyTable = new Hashtable<Object, String>();
 
 	@Inject
 	@Optional
@@ -90,7 +90,6 @@ public class ProgressServiceImpl implements IProgressService {
 				context,
 				runnable, rule);
 		uiSynchronize.syncExec(new Runnable() {
-			@Override
 			public void run() {
 				BusyIndicator.showWhile(getDisplay(), runnableWithStatus);
 			}
@@ -122,11 +121,6 @@ public class ProgressServiceImpl implements IProgressService {
 		return null;
 	}
 
-	/*
-		 * (non-Javadoc)
-		 *
-		 * @see org.eclipse.ui.progress.IProgressService#busyCursorWhile(org.eclipse.jface.operation.IRunnableWithProgress)
-		 */
 	@Override
 	public void busyCursorWhile(final IRunnableWithProgress runnable)
 			throws InvocationTargetException, InterruptedException {
@@ -138,7 +132,6 @@ public class ProgressServiceImpl implements IProgressService {
 		final InterruptedException[] interrupt = new InterruptedException[1];
 		// show a busy cursor until the dialog opens
 		Runnable dialogWaitRunnable = new Runnable() {
-			@Override
 			public void run() {
 				try {
 					dialog.setOpenOnRun(false);
@@ -162,13 +155,6 @@ public class ProgressServiceImpl implements IProgressService {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.jface.operation.IRunnableContext#run(boolean, boolean,
-	 *      org.eclipse.jface.operation.IRunnableWithProgress)
-	 */
-	@Override
 	public void run(boolean fork, boolean cancelable,
 			IRunnableWithProgress runnable) throws InvocationTargetException,
 			InterruptedException {
@@ -185,12 +171,6 @@ public class ProgressServiceImpl implements IProgressService {
 	}
 
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.progress.IProgressService#showInDialog(org.eclipse.swt.widgets.Shell,
-	 *      org.eclipse.core.runtime.jobs.Job)
-	 */
 	@Override
 	public void showInDialog(Shell shell, Job job) {
 		if (shouldRunInBackground()) {
@@ -226,7 +206,6 @@ public class ProgressServiceImpl implements IProgressService {
 			this.rule = rule;
 		}
 
-		@Override
 		public void run() {
 			IJobManager manager = Job.getJobManager();
 			try {
@@ -259,7 +238,6 @@ public class ProgressServiceImpl implements IProgressService {
 
 			return new EventLoopProgressMonitor(new NullProgressMonitor()) {
 
-				@Override
 				public void setBlocked(IStatus reason) {
 
 					// Set a shell to open with as we want to create
@@ -308,12 +286,6 @@ public class ProgressServiceImpl implements IProgressService {
 
 		final Job updateJob = new UIJob(
 				ProgressMessages.ProgressManager_openJobName) {
-			/*
-			 * (non-Javadoc)
-			 *
-			 * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
-			 */
-			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				setUserInterfaceActive(true);
 				if (ProgressManagerUtil.safeToOpen(dialog, null)) {
