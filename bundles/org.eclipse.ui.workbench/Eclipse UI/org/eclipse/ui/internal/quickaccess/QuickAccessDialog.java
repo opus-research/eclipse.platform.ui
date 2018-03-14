@@ -14,11 +14,17 @@ package org.eclipse.ui.internal.quickaccess;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtensionDelta;
+import org.eclipse.core.runtime.IRegistryChangeEvent;
+import org.eclipse.core.runtime.IRegistryChangeListener;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
@@ -74,7 +80,8 @@ public class QuickAccessDialog extends PopupDialog {
 	static final int MAXIMUM_NUMBER_OF_TEXT_ENTRIES_PER_ELEMENT = 3;
 	protected Map textMap = new HashMap();
 	protected Map elementMap = new HashMap();
-	protected Map providerMap;
+
+	private IRegistryChangeListener registryChangeListener;
 
 	public QuickAccessDialog(final IWorkbenchWindow window, final Command invokingCommand) {
 		super(ProgressManagerUtil.getDefaultParent(), SWT.RESIZE, true, true, // persist
@@ -89,6 +96,7 @@ public class QuickAccessDialog extends PopupDialog {
 		BusyIndicator.showWhile(window.getShell() == null ? null : window.getShell().getDisplay(),
 				new Runnable() {
 
+
 					@Override
 					public void run() {
 						final CommandProvider commandProvider = new CommandProvider();
@@ -101,11 +109,47 @@ public class QuickAccessDialog extends PopupDialog {
 								new PerspectiveProvider(), commandProvider, new ActionProvider(),
 								new WizardProvider(), new PreferenceProvider(),
 								new PropertiesProvider() };
-						providerMap = new HashMap();
-						for (int i = 0; i < providers.length; i++) {
-							providerMap.put(providers[i].getId(), providers[i]);
+				/*
+				 * Listen to changes in the registry. If an extension is removed
+				 * that contains something in our previousPicksList, then remove
+				 * it from that list.
+				 */
+				registryChangeListener = new IRegistryChangeListener() {
+					@Override
+					public void registryChanged(IRegistryChangeEvent event) {
+						for (IExtensionDelta delta : event.getExtensionDeltas()) {
+							if (delta.getKind() != IExtensionDelta.REMOVED)
+								continue;
+							for (IConfigurationElement element : delta.getExtension().getConfigurationElements()) {
+								removeElementsNamed(getProviderId(element));
+							}
 						}
-						QuickAccessDialog.this.contents = new QuickAccessContents(providers) {
+					}
+
+					private String getProviderId(IConfigurationElement element) {
+						return element.getNamespaceIdentifier()
+								+ "." + element.getAttribute(ExtensionQuickAccessProvider.ATTRIBUTE_ID); //$NON-NLS-1$
+					}
+
+					private void removeElementsNamed(String id) {
+						Iterator<QuickAccessElement> iterator = previousPicksList.iterator();
+						while (iterator.hasNext()) {
+							QuickAccessProvider provider = iterator.next().getProvider();
+							if (provider instanceof ExtensionQuickAccessProvider) {
+								if (((ExtensionQuickAccessProvider) provider).getId() == id) {
+									iterator.remove();
+									for (QuickAccessElement element : provider.getElements()) {
+										elementMap.remove(element.getId());
+									}
+								}
+							}
+						}
+					}
+				};
+				Platform.getExtensionRegistry().addRegistryChangeListener(registryChangeListener,
+						"org.eclipse.ui.workbench"); //$NON-NLS-1$
+
+				QuickAccessDialog.this.contents = new QuickAccessContents(providers, model.getContext()) {
 							@Override
 							protected void updateFeedback(boolean filterTextEmpty,
 									boolean showAllMatches) {
@@ -322,6 +366,7 @@ public class QuickAccessDialog extends PopupDialog {
 
 	@Override
 	public boolean close() {
+		Platform.getExtensionRegistry().removeRegistryChangeListener(registryChangeListener);
 		storeDialog(getDialogSettings());
 		return super.close();
 	}
@@ -397,11 +442,24 @@ public class QuickAccessDialog extends PopupDialog {
 			elementMap = new HashMap();
 			textMap = new HashMap();
 			previousPicksList = new LinkedList();
+
+			/*
+			 * Moved from the constructor. We only ever use this map in this
+			 * method and this private method is only called once, so create the
+			 * map only when it's required. Keeping this as a field would
+			 * require that we remove references to providers when the bundle
+			 * that defines the provider is deactivated.
+			 */
+			Map<String, QuickAccessProvider> providerMap = new HashMap<>();
+			for (QuickAccessProvider provider : contents.getProviders()) {
+				providerMap.put(provider.getId(), provider);
+			}
+
 			if (orderedElements != null && orderedProviders != null && textEntries != null
 					&& textArray != null) {
 				int arrayIndex = 0;
 				for (int i = 0; i < orderedElements.length; i++) {
-					QuickAccessProvider quickAccessProvider = (QuickAccessProvider) providerMap
+					QuickAccessProvider quickAccessProvider = providerMap
 							.get(orderedProviders[i]);
 					int numTexts = Integer.parseInt(textEntries[i]);
 					if (quickAccessProvider != null) {
