@@ -83,9 +83,10 @@ public class CSSResourcesHelpers {
 
 	public static String getCSSFontPropertiesKey(
 			CSS2FontProperties fontProperties) {
-		return fontProperties.getFamily() + "_" + fontProperties.getSize()
-				+ "_" + fontProperties.getStyle() + "_"
-				+ fontProperties.getWeight();
+		return fontProperties.getFamily().getCssText() + "_" 
+				+ fontProperties.getSize().getCssText() + "_"
+				+ fontProperties.getStyle().getCssText() + "_" 
+				+ fontProperties.getWeight().getCssText();
 	}
 
 	/**
