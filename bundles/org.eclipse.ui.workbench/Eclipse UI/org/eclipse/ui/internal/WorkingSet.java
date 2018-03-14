@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.ui.internal;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -232,10 +233,9 @@ public class WorkingSet extends AbstractWorkingSet {
 
 	@Override
 	public void setElements(IAdaptable[] newElements) {
-		AbstractWorkingSet oldWorkingSet = safeClone();
-		oldWorkingSet.disconnect();
 		internalSetElements(newElements);
-		fireWorkingSetChanged(IWorkingSetManager.CHANGE_WORKING_SET_CONTENT_CHANGE, oldWorkingSet);
+		fireWorkingSetChanged(
+				IWorkingSetManager.CHANGE_WORKING_SET_CONTENT_CHANGE, null);
 	}
 
 	@Override
