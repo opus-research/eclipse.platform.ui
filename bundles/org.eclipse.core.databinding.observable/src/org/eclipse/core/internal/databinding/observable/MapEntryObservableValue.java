@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Marko Topolnik and others.
+ * Copyright (c) 2008 Marko Topolnik and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     Marko Topolnik - initial API and implementation (bug 184830)
  *     Matthew Hall - bug 184830
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.internal.databinding.observable;
@@ -26,12 +25,10 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 /**
  * An {@link IObservableValue} that tracks the value of an entry in an
  * {@link IObservableMap}, identified by the entry's key.
- *
+ * 
  * @param <K>
- *            the type of the keys in this map
  * @param <V>
- *            the type of the values in this map
- *
+ * 
  * @since 1.1
  */
 public class MapEntryObservableValue<K, V> extends AbstractObservableValue<V> {
@@ -41,7 +38,7 @@ public class MapEntryObservableValue<K, V> extends AbstractObservableValue<V> {
 
 	private IMapChangeListener<K, V> changeListener = new IMapChangeListener<K, V>() {
 		@Override
-		public void handleMapChange(final MapChangeEvent<? extends K, ? extends V> event) {
+		public void handleMapChange(final MapChangeEvent<K, V> event) {
 			if (event.diff.getAddedKeys().contains(key)) {
 				final V newValue = event.diff.getNewValue(key);
 				if (newValue != null) {

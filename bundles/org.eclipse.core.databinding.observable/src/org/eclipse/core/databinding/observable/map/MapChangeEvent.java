@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
- *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  ******************************************************************************/
 
 package org.eclipse.core.databinding.observable.map;
@@ -19,7 +17,7 @@ import org.eclipse.core.databinding.observable.ObservableEvent;
 /**
  * Map change event describing an incremental change of an
  * {@link IObservableMap} object.
- *
+ * 
  * @param <K>
  *            type of the keys to the map
  * @param <V>
@@ -27,7 +25,7 @@ import org.eclipse.core.databinding.observable.ObservableEvent;
  * @since 1.0
  *
  */
-public class MapChangeEvent<K, V> extends ObservableEvent {
+public class MapChangeEvent<K, V> extends ObservableEvent<MapChangeEvent<K, V>> {
 
 	/**
 	 *
@@ -42,6 +40,12 @@ public class MapChangeEvent<K, V> extends ObservableEvent {
 	public MapDiff<K, V> diff;
 
 	/**
+	 * Always identical to <code>EventObject.source</code> but the type
+	 * information is maintained.
+	 */
+	private IObservableMap<K, V> typedSource;
+
+	/**
 	 * Creates a new map change event
 	 *
 	 * @param source
@@ -51,6 +55,7 @@ public class MapChangeEvent<K, V> extends ObservableEvent {
 	 */
 	public MapChangeEvent(IObservableMap<K, V> source, MapDiff<K, V> diff) {
 		super(source);
+		this.typedSource = source;
 		this.diff = diff;
 	}
 
@@ -59,12 +64,10 @@ public class MapChangeEvent<K, V> extends ObservableEvent {
 	 *
 	 * @return the observable map from which this event originated
 	 */
-	@SuppressWarnings("unchecked")
 	public IObservableMap<K, V> getObservableMap() {
-		return (IObservableMap<K, V>) getSource();
+		return typedSource;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void dispatch(IObservablesListener listener) {
 		((IMapChangeListener<K, V>) listener).handleMapChange(this);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,8 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Brad Reynolds - bug 164653
  *     Matthew Hall - bugs 208332, 263691
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
- *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.value;
@@ -26,9 +24,8 @@ import org.eclipse.core.databinding.observable.Realm;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- *
+ * 
  * @param <T>
- *            the type of value being observed
  * @since 1.0
  *
  */
@@ -50,13 +47,13 @@ abstract public class AbstractObservableValue<T> extends AbstractObservable
 
 	@Override
 	public synchronized void addValueChangeListener(
-			IValueChangeListener<? super T> listener) {
+			IValueChangeListener<T> listener) {
 		addListener(ValueChangeEvent.TYPE, listener);
 	}
 
 	@Override
 	public synchronized void removeValueChangeListener(
-			IValueChangeListener<? super T> listener) {
+			IValueChangeListener<T> listener) {
 		removeListener(ValueChangeEvent.TYPE, listener);
 	}
 
@@ -79,7 +76,7 @@ abstract public class AbstractObservableValue<T> extends AbstractObservable
 	protected void fireValueChange(ValueDiff<T> diff) {
 		// fire general change event first
 		super.fireChange();
-		fireEvent(new ValueChangeEvent<>(this, diff));
+		fireEvent(new ValueChangeEvent<T>(this, diff));
 	}
 
 	@Override

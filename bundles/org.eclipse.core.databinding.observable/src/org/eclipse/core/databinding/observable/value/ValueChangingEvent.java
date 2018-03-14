@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.databinding.observable.value;
@@ -19,14 +18,14 @@ import org.eclipse.core.databinding.observable.ObservableEvent;
  * Value changing event describing a pending change of an
  * {@link IObservableValue} object's current value. Listeners can veto the
  * pending change by setting {@link #veto} to <code>true</code>.
- *
+ * 
  * @param <T>
- *            the type of value being observed
- *
+ * 
  * @since 1.0
  *
  */
-public class ValueChangingEvent<T> extends ObservableEvent {
+public class ValueChangingEvent<T> extends
+		ObservableEvent<ValueChangingEvent<T>> {
 
 	/**
 	 *
@@ -63,12 +62,10 @@ public class ValueChangingEvent<T> extends ObservableEvent {
 	/**
 	 * @return the observable value from which this event originated
 	 */
-	@SuppressWarnings("unchecked")
-	public IObservableValue<T> getObservableValue() {
-		return (IObservableValue<T>) source;
+	public IObservableValue<?> getObservableValue() {
+		return (IObservableValue<?>) source;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void dispatch(IObservablesListener listener) {
 		((IValueChangingListener<T>) listener).handleValueChanging(this);

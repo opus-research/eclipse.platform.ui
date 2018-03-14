@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Ovidio Mallo and others.
+ * Copyright (c) 2010, 2011 Ovidio Mallo and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Ovidio Mallo - initial API and implementation (bug 305367)
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.internal.databinding.observable.masterdetail;
@@ -39,9 +38,9 @@ public class SetDetailValueObservableMap<M, E> extends
 
 	private IObservableFactory<? super M, IObservableValue<E>> observableValueFactory;
 
-	private Map<M, IObservableValue<E>> detailObservableValueMap = new HashMap<>();
+	private Map<M, IObservableValue<E>> detailObservableValueMap = new HashMap<M, IObservableValue<E>>();
 
-	private IdentitySet<IObservableValue<?>> staleDetailObservables = new IdentitySet<>();
+	private IdentitySet<IObservableValue<?>> staleDetailObservables = new IdentitySet<IObservableValue<?>>();
 
 	private IStaleListener detailStaleListener = new IStaleListener() {
 		@Override
@@ -70,7 +69,7 @@ public class SetDetailValueObservableMap<M, E> extends
 
 		detailValue.addValueChangeListener(new IValueChangeListener<E>() {
 			@Override
-			public void handleValueChange(ValueChangeEvent<? extends E> event) {
+			public void handleValueChange(ValueChangeEvent<E> event) {
 				if (!event.getObservableValue().isStale()) {
 					staleDetailObservables.remove(detailValue);
 				}
@@ -89,26 +88,29 @@ public class SetDetailValueObservableMap<M, E> extends
 			return;
 		}
 
-		IObservableValue<E> detailValue = detailObservableValueMap.remove(removedKey);
+		IObservableValue<E> detailValue = detailObservableValueMap
+				.remove(removedKey);
 		staleDetailObservables.remove(detailValue);
 		detailValue.dispose();
 	}
 
 	private IObservableValue<E> getDetailObservableValue(M masterKey) {
-		IObservableValue<E> detailValue = detailObservableValueMap.get(masterKey);
+		IObservableValue<E> detailValue = detailObservableValueMap
+				.get(masterKey);
 
 		if (detailValue == null) {
 			ObservableTracker.setIgnore(true);
 			try {
-				detailValue = observableValueFactory.createObservable(masterKey);
+				detailValue = observableValueFactory
+						.createObservable(masterKey);
+
+				detailObservableValueMap.put(masterKey, detailValue);
+
+				if (detailValue.isStale()) {
+					addStaleDetailObservable(detailValue);
+				}
 			} finally {
 				ObservableTracker.setIgnore(false);
-			}
-
-			detailObservableValueMap.put(masterKey, detailValue);
-
-			if (detailValue.isStale()) {
-				addStaleDetailObservable(detailValue);
 			}
 		}
 
@@ -152,7 +154,6 @@ public class SetDetailValueObservableMap<M, E> extends
 			return null;
 		}
 
-		@SuppressWarnings("unchecked")
 		IObservableValue<E> detailValue = getDetailObservableValue((M) key);
 		E oldValue = detailValue.getValue();
 

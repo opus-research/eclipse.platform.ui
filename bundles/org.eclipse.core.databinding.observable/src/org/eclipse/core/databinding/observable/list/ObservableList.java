@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,8 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Brad Reynolds - bugs 164653, 167204
  *     Matthew Hall - bugs 208858, 208332, 274450
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
- *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.list;
@@ -34,10 +32,9 @@ import org.eclipse.core.databinding.observable.Realm;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- *
+ * 
  * @param <E>
- *            the type of the elements in this list
- *
+ * 
  * @since 1.0
  *
  */
@@ -66,13 +63,13 @@ public abstract class ObservableList<E> extends AbstractObservable implements
 
 	@Override
 	public synchronized void addListChangeListener(
-			IListChangeListener<? super E> listener) {
+			IListChangeListener<E> listener) {
 		addListener(ListChangeEvent.TYPE, listener);
 	}
 
 	@Override
 	public synchronized void removeListChangeListener(
-			IListChangeListener<? super E> listener) {
+			IListChangeListener<E> listener) {
 		removeListener(ListChangeEvent.TYPE, listener);
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,21 +8,17 @@
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 237718)
  *     Matthew Hall - bug 246626
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
- *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.set;
 
 import org.eclipse.core.databinding.observable.DecoratingObservableCollection;
-import org.eclipse.core.databinding.observable.Diffs;
 
 /**
  * An observable set which decorates another observable set.
- *
+ * 
  * @param <E>
- *            the type of the elements in this set
- *
+ * 
  * @since 1.2
  */
 public class DecoratingObservableSet<E> extends
@@ -67,7 +63,7 @@ public class DecoratingObservableSet<E> extends
 	protected void fireSetChange(SetDiff<E> diff) {
 		// fire general change event first
 		super.fireChange();
-		fireEvent(new SetChangeEvent<>(this, diff));
+		fireEvent(new SetChangeEvent<E>(this, diff));
 	}
 
 	@Override
@@ -81,7 +77,7 @@ public class DecoratingObservableSet<E> extends
 		if (setChangeListener == null) {
 			setChangeListener = new ISetChangeListener<E>() {
 				@Override
-				public void handleSetChange(SetChangeEvent<? extends E> event) {
+				public void handleSetChange(SetChangeEvent<E> event) {
 					DecoratingObservableSet.this.handleSetChange(event);
 				}
 			};
@@ -108,8 +104,8 @@ public class DecoratingObservableSet<E> extends
 	 * @param event
 	 *            the change event received from the decorated observable
 	 */
-	protected void handleSetChange(final SetChangeEvent<? extends E> event) {
-		fireSetChange(Diffs.unmodifiableDiff(event.diff));
+	protected void handleSetChange(final SetChangeEvent<E> event) {
+		fireSetChange(event.diff);
 	}
 
 	@Override

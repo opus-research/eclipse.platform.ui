@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Brad Reynolds - bugs 116920, 147515
  *     Matthew Hall - bug 274081
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 package org.eclipse.core.databinding.observable.value;
 
@@ -59,10 +58,9 @@ import org.eclipse.core.databinding.observable.list.IObservableList;
  * addends.add(new Integer(10));
  * System.out.println(sum.getValue()); // =&gt; 13
  * </pre>
- *
+ * 
  * @param <T>
- *            the type of value being observed
- *
+ * 
  * @since 1.0
  */
 public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
@@ -294,7 +292,7 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 
 	@Override
 	public synchronized void addValueChangeListener(
-			IValueChangeListener<? super T> listener) {
+			IValueChangeListener<T> listener) {
 		super.addValueChangeListener(listener);
 		// If somebody is listening, we need to make sure we attach our own
 		// listeners

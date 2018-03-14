@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,8 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bugs 208332, 274450
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
- *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.set;
@@ -31,10 +29,9 @@ import org.eclipse.core.databinding.observable.Realm;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- *
+ * 
  * @param <E>
- *            the type of elements in this collection
- *
+ * 
  * @since 1.0
  *
  */
@@ -58,12 +55,14 @@ public abstract class ObservableSet<E> extends AbstractObservable implements
 	}
 
 	@Override
-	public synchronized void addSetChangeListener(ISetChangeListener<? super E> listener) {
+	public synchronized void addSetChangeListener(
+			ISetChangeListener<? super E> listener) {
 		addListener(SetChangeEvent.TYPE, listener);
 	}
 
 	@Override
-	public synchronized void removeSetChangeListener(ISetChangeListener<? super E> listener) {
+	public synchronized void removeSetChangeListener(
+			ISetChangeListener<? super E> listener) {
 		removeListener(SetChangeEvent.TYPE, listener);
 	}
 
@@ -71,7 +70,7 @@ public abstract class ObservableSet<E> extends AbstractObservable implements
 		// fire general change event first
 		super.fireChange();
 
-		fireEvent(new SetChangeEvent<>(this, diff));
+		fireEvent(new SetChangeEvent<E>(this, diff));
 	}
 
 	@Override

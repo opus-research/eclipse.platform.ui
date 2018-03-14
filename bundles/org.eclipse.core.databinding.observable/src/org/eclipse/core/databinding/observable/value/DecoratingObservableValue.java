@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,21 +8,17 @@
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 237718)
  *     Matthew Hall - but 246626
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
- *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  ******************************************************************************/
 
 package org.eclipse.core.databinding.observable.value;
 
 import org.eclipse.core.databinding.observable.DecoratingObservable;
-import org.eclipse.core.databinding.observable.Diffs;
 
 /**
  * An observable value which decorates another observable value.
- *
+ * 
  * @param <T>
- *            the type of value being observed
- *
+ * 
  * @since 1.2
  */
 public class DecoratingObservableValue<T> extends DecoratingObservable
@@ -46,19 +42,21 @@ public class DecoratingObservableValue<T> extends DecoratingObservable
 	}
 
 	@Override
-	public synchronized void addValueChangeListener(IValueChangeListener<? super T> listener) {
+	public synchronized void addValueChangeListener(
+			IValueChangeListener<T> listener) {
 		addListener(ValueChangeEvent.TYPE, listener);
 	}
 
 	@Override
-	public synchronized void removeValueChangeListener(IValueChangeListener<? super T> listener) {
+	public synchronized void removeValueChangeListener(
+			IValueChangeListener<T> listener) {
 		removeListener(ValueChangeEvent.TYPE, listener);
 	}
 
 	protected void fireValueChange(ValueDiff<T> diff) {
 		// fire general change event first
 		super.fireChange();
-		fireEvent(new ValueChangeEvent<>(this, diff));
+		fireEvent(new ValueChangeEvent<T>(this, diff));
 	}
 
 	@Override
@@ -72,7 +70,7 @@ public class DecoratingObservableValue<T> extends DecoratingObservable
 		if (valueChangeListener == null) {
 			valueChangeListener = new IValueChangeListener<T>() {
 				@Override
-				public void handleValueChange(ValueChangeEvent<? extends T> event) {
+				public void handleValueChange(ValueChangeEvent<T> event) {
 					DecoratingObservableValue.this.handleValueChange(event);
 				}
 			};
@@ -99,8 +97,8 @@ public class DecoratingObservableValue<T> extends DecoratingObservable
 	 * @param event
 	 *            the change event received from the decorated observable
 	 */
-	protected void handleValueChange(final ValueChangeEvent<? extends T> event) {
-		fireValueChange(Diffs.unmodifiableDiff(event.diff));
+	protected void handleValueChange(final ValueChangeEvent<T> event) {
+		fireValueChange(event.diff);
 	}
 
 	@Override

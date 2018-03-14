@@ -101,6 +101,9 @@ public class MarkerQuery {
         return new MarkerQueryResult(values);
     }
 
+    /* (non-Javadoc)
+     * Method declared on Object.
+     */
     @Override
 	public boolean equals(Object o) {
         if (!(o instanceof MarkerQuery)) {
@@ -129,6 +132,9 @@ public class MarkerQuery {
         return true;
     }
 
+    /* (non-Javadoc)
+     * Method declared on Object.
+     */
     @Override
 	public int hashCode() {
         return hashCode;

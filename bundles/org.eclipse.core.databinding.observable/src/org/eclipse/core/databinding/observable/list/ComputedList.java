@@ -1,5 +1,5 @@
 /************************************************************************************************************
- * Copyright (c) 2007, 2015 Matthew Hall and others.
+ * Copyright (c) 2007, 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  * 		IBM Corporation - initial API and implementation
  * 		Brad Reynolds - initial API and implementation (through bug 116920 and bug 147515)
  * 		Matthew Hall - bugs 211786, 274081
- * 		Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ***********************************************************************************************************/
 package org.eclipse.core.databinding.observable.list;
 
@@ -73,7 +72,6 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
  * </pre>
  *
  * @param <E>
- *            the list element type
  *
  * @since 1.1
  */
@@ -258,7 +256,7 @@ public abstract class ComputedList<E> extends AbstractObservableList<E> {
 				List<ListDiffEntry<E>> differences;
 
 				@Override
-				public ListDiffEntry<E>[] getDifferences() {
+				public ListDiffEntry<?>[] getDifferences() {
 					if (differences == null)
 						return Diffs.computeListDiff(oldList, getList())
 								.getDifferences();
@@ -309,7 +307,7 @@ public abstract class ComputedList<E> extends AbstractObservableList<E> {
 	}
 
 	@Override
-	public synchronized void addListChangeListener(IListChangeListener<? super E> listener) {
+	public synchronized void addListChangeListener(IListChangeListener<E> listener) {
 		super.addListChangeListener(listener);
 		// If somebody is listening, we need to make sure we attach our own
 		// listeners

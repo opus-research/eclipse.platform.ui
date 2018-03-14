@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Brad Reynolds - bug 168153
  *     Boris Bokowski - bug 245647
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable;
@@ -80,7 +79,7 @@ import org.eclipse.core.runtime.Status;
  */
 public abstract class Realm {
 
-	private static ThreadLocal<Realm> defaultRealm = new ThreadLocal<>();
+	private static ThreadLocal<Realm> defaultRealm = new ThreadLocal<Realm>();
 
 	/**
 	 * Returns the default realm for the calling thread, or <code>null</code> if

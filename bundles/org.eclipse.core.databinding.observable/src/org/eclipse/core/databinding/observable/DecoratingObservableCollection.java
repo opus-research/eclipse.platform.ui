@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2010 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 237718)
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.databinding.observable;
@@ -17,12 +16,13 @@ import java.util.Iterator;
 
 /**
  * An observable collection which decorates another observable collection
- *
+ * 
  * @param <E>
- *
+ * 
  * @since 1.2
  */
-public class DecoratingObservableCollection<E> extends DecoratingObservable implements IObservableCollection<E> {
+public class DecoratingObservableCollection<E> extends DecoratingObservable
+		implements IObservableCollection<E> {
 	private IObservableCollection<E> decorated;
 
 	/**
