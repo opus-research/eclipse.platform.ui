@@ -295,8 +295,8 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
 	 * @return whether it is applicable
 	 */
 
-    public boolean isApplicableTo(List list, IObjectContributor contributor) {
-        Iterator elements = list.iterator();
+	public boolean isApplicableTo(List<Object> list, IObjectContributor contributor) {
+		Iterator<Object> elements = list.iterator();
         while (elements.hasNext()) {
             if (contributor.isApplicableTo(elements.next()) == false) {
 				return false;
@@ -313,9 +313,9 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
      */
     public void registerContributor(IObjectContributor contributor,
             String targetType) {
-        List contributorList = (List) contributors.get(targetType);
+		List<IObjectContributor> contributorList = contributors.get(targetType);
         if (contributorList == null) {
-            contributorList = new ArrayList(5);
+			contributorList = new ArrayList<IObjectContributor>(5);
             contributors.put(targetType, contributorList);
         }
         contributorList.add(contributor);
@@ -339,7 +339,7 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
      * Unregister all contributors.
      */
     public void unregisterAllContributors() {
-        contributors = new Hashtable(5);
+		contributors = new Hashtable<String, List<IObjectContributor>>(5);
         flushLookup();
     }
 
@@ -351,7 +351,7 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
      */
     public void unregisterContributor(IObjectContributor contributor,
             String targetType) {    	
-        List contributorList = (List) contributors.get(targetType);
+		List<IObjectContributor> contributorList = contributors.get(targetType);
         if (contributorList == null) {
 			return;
 		}
@@ -503,7 +503,7 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
 	 * @param results
 	 * @since 3.1
 	 */
-	protected void removeCommonAdapters(List adapters, List<Class<?>> results) {
+	protected void removeCommonAdapters(List<String> adapters, List<Class<?>> results) {
 		for (Iterator<Class<?>> it = results.iterator(); it.hasNext();) {
 			Class<?> clazz = it.next();
 			List<Class<?>> commonTypes = computeCombinedOrder(clazz);
@@ -535,13 +535,14 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
         return result;
     }
 
-	private List<IObjectContributor> filterOnlyAdaptableContributors(List contributors) {
-		List adaptableContributors = null;
-		for (Iterator it = contributors.iterator(); it.hasNext();) {
-			IObjectContributor c = (IObjectContributor) it.next();
+	private List<IObjectContributor> filterOnlyAdaptableContributors(
+			List<IObjectContributor> contributors) {
+		List<IObjectContributor> adaptableContributors = null;
+		for (Iterator<IObjectContributor> it = contributors.iterator(); it.hasNext();) {
+			IObjectContributor c = it.next();
 			if(c.canAdapt()) {
 				if(adaptableContributors == null) {
-					adaptableContributors = new ArrayList();
+					adaptableContributors = new ArrayList<IObjectContributor>();
 				}
 				adaptableContributors.add(c);
 			}
@@ -577,11 +578,11 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
      * @param elements a list of model elements (<code>Object</code>)
      * @return the list of interested contributors (<code>IObjectContributor</code>)
      */
-	protected List<IObjectContributor> getContributors(List elements) {
+	protected List<IObjectContributor> getContributors(List<Object> elements) {
         // Calculate the common class, interfaces, and adapters registered
         // via the IAdapterManager.
 		List<String> commonAdapters = new ArrayList<String>();
-		List commonClasses = getCommonClasses(elements, commonAdapters);
+		List<Class<?>> commonClasses = getCommonClasses(elements, commonAdapters);
         
         // Get the resource class. It will be null if any of the
         // elements are resources themselves or do not adapt to
@@ -599,8 +600,7 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
         }
         if (commonClasses != null && !commonClasses.isEmpty()) {
             for (int i = 0; i < commonClasses.size(); i++) {
-                List results = getObjectContributors((Class) commonClasses
-                        .get(i));
+				List<IObjectContributor> results = getObjectContributors(commonClasses.get(i));
                 addAll(contributors, results);
             }
         }
@@ -635,7 +635,8 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
 	 * This assumes that toAdd is efficient to index (i.e. it's an ArrayList or some other RandomAccessList),
 	 * which is the case for all uses in this class.
 	 */
-	private static void addAll(Collection collection, List toAdd) {
+	private static void addAll(Collection<IObjectContributor> collection,
+			List<IObjectContributor> toAdd) {
 		for (int i = 0, size = toAdd.size(); i < size; ++i) {
 			collection.add(toAdd.get(i));
 		}
@@ -666,7 +667,7 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
      * Returns the common denominator class, interfaces, and adapters 
      * for the given collection of objects.
      */
-	private List getCommonClasses(List objects, List<String> commonAdapters) {
+	private List<Class<?>> getCommonClasses(List<Object> objects, List<String> commonAdapters) {
         if (objects == null || objects.size() == 0) {
 			return null;
 		}
@@ -691,7 +692,7 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
 
         // Cache of all types found in the selection - this is needed
         // to compute common adapters.
-        List lastCommonTypes = new ArrayList();
+		List<Class<?>> lastCommonTypes = new ArrayList<Class<?>>();
 
         boolean classesEmpty = classes.isEmpty();
         boolean interfacesEmpty = interfaces.isEmpty();
@@ -760,8 +761,8 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
 
         // Once the common classes, interfaces, and adapters are
         // calculated, let's prune the lists to remove duplicates.       
-        ArrayList results = new ArrayList(4);
-        ArrayList superClasses = new ArrayList(4);
+		ArrayList<Class<?>> results = new ArrayList<Class<?>>(4);
+		ArrayList<Class<?>> superClasses = new ArrayList<Class<?>>(4);
         if (!classesEmpty) {
             for (int j = 0; j < classes.size(); j++) {
                 if (classes.get(j) != null) {
@@ -790,10 +791,10 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
      * Returns <code>true</code> if all objects in the given list are of the same class,
      * <code>false</code> otherwise.
 	 */
-	private boolean allSameClass(List objects) {
+	private boolean allSameClass(List<Object> objects) {
 		int size = objects.size();
 		if (size <= 1) return true;
-		Class clazz = objects.get(0).getClass();
+		Class<?> clazz = objects.get(0).getClass();
 		for (int i = 1; i < size; ++i) {
 			if (!objects.get(i).getClass().equals(clazz)) {
 				return false;
@@ -802,7 +803,7 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
 		return true;
 	}
 
-	private boolean extractCommonClasses(List classes, List otherClasses) {
+	private boolean extractCommonClasses(List<Class<?>> classes, List<Class<?>> otherClasses) {
         boolean classesEmpty = true;
         if (otherClasses.isEmpty()) {
             // When no super classes, then it is obvious there
@@ -837,9 +838,9 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
         adapters.clear();
     }
 
-    private void removeCommonInterfaces(List superClasses, List types,
-            List results) {
-        List dropInterfaces = null;
+	private void removeCommonInterfaces(List<Class<?>> superClasses, List<Class<?>> types,
+			List<Class<?>> results) {
+		List<Class<?>> dropInterfaces = null;
         if (!superClasses.isEmpty()) {
             dropInterfaces = computeInterfaceOrder(superClasses);
         }
@@ -875,17 +876,17 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
      * Do not return a resource class if the objects are resources
      * themselves so as to prevent double registration of actions.
      */
-    private Class getCommonResourceClass(List objects) {
+	private Class<?> getCommonResourceClass(List<Object> objects) {
         if (objects == null || objects.size() == 0) {
             return null;
         }
-        Class resourceClass = LegacyResourceSupport.getResourceClass();
+		Class<?> resourceClass = LegacyResourceSupport.getResourceClass();
         if (resourceClass == null) {
             // resources plug-in not loaded - no resources. period.
             return null;
         }
 
-        List testList = new ArrayList(objects.size());
+		List<Object> testList = new ArrayList<Object>(objects.size());
 
         for (int i = 0; i < objects.size(); i++) {
             Object object = objects.get(i);
@@ -914,11 +915,11 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
     /**
      * Return the ResourceMapping class if the elements all adapt to it.
      */
-	private Class<?> getResourceMappingClass(List objects) {
+	private Class<?> getResourceMappingClass(List<Object> objects) {
         if (objects == null || objects.size() == 0) {
             return null;
         }
-        Class resourceMappingClass = LegacyResourceSupport
+		Class<?> resourceMappingClass = LegacyResourceSupport
                 .getResourceMappingClass();
         if (resourceMappingClass == null) {
             // resources plug-in not loaded - no resources. period.
@@ -952,11 +953,11 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
      * Returns the common denominator class for the given
      * collection of objects.
      */
-    private Class getCommonClass(List objects) {
+	private Class<?> getCommonClass(List<Object> objects) {
         if (objects == null || objects.size() == 0) {
 			return null;
 		}
-        Class commonClass = objects.get(0).getClass();
+		Class<?> commonClass = objects.get(0).getClass();
         // try easy
         if (objects.size() == 1) {
 			return commonClass;
@@ -965,7 +966,7 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
 
         for (int i = 1; i < objects.size(); i++) {
             Object object = objects.get(i);
-            Class newClass = object.getClass();
+			Class<?> newClass = object.getClass();
             // try the short cut
             if (newClass.equals(commonClass)) {
 				continue;
@@ -984,13 +985,13 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
      * Returns the common denominator class for
      * two input classes.
      */
-    private Class getCommonClass(Class class1, Class class2) {
-        List list1 = computeCombinedOrder(class1);
-        List list2 = computeCombinedOrder(class2);
+	private Class<?> getCommonClass(Class<?> class1, Class<?> class2) {
+		List<Class<?>> list1 = computeCombinedOrder(class1);
+		List<Class<?>> list2 = computeCombinedOrder(class2);
         for (int i = 0; i < list1.size(); i++) {
             for (int j = 0; j < list2.size(); j++) {
-                Class candidate1 = (Class) list1.get(i);
-                Class candidate2 = (Class) list2.get(j);
+				Class<?> candidate1 = list1.get(i);
+				Class<?> candidate2 = list2.get(j);
                 if (candidate1.equals(candidate2)) {
 					return candidate1;
 				}
