@@ -37,7 +37,11 @@ public class ListViewerRefreshTest extends ViewerTest {
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.tests.performance.ViewerTest#createViewer(org.eclipse.swt.widgets.Shell)
+	 */
 	protected StructuredViewer createViewer(Shell shell) {
 		viewer = new ListViewer(shell);
 		contentProvider = new RefreshTestContentProvider(
@@ -60,7 +64,6 @@ public class ListViewerRefreshTest extends ViewerTest {
 		openBrowser();
 
 		exercise(new TestRunnable() {
-			@Override
 			public void run() {
 				startMeasuring();
 				viewer.refresh();
