@@ -91,9 +91,6 @@ public class PreferenceConverter {
         FONTDATA_DEFAULT_DEFAULT = FONTDATA_ARRAY_DEFAULT_DEFAULT[0];
     }
 
-    /* (non-Javadoc)
-     * private constructor to prevent instantiation.
-     */
     private PreferenceConverter() {
         //no-op
     }
