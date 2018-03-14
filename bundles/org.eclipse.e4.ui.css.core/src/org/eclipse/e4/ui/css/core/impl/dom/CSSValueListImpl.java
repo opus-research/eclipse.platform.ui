@@ -23,7 +23,7 @@ public class CSSValueListImpl extends AbstractCSSNode implements CSSValueList {
 	List<CSSValue> values;
 
 	public CSSValueListImpl(LexicalUnit parsePropertyValue) {
-		values = new ArrayList<CSSValue>();
+		values = new ArrayList<>();
 
 		LexicalUnit unit = parsePropertyValue;
 		while(unit != null) {
@@ -59,8 +59,16 @@ public class CSSValueListImpl extends AbstractCSSNode implements CSSValueList {
 
 	@Override
 	public void setCssText(String arg0) throws DOMException {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
+	}
+
+	@Override
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		for (CSSValue cssValue : values) {
+			sb.append(cssValue.getCssText() + "\n");
+		}
+		return sb.toString();
 	}
 
 }

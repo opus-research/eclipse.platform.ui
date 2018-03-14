@@ -38,6 +38,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.ISaveablesLifecycleListener;
+import org.eclipse.ui.ISecondarySaveableSource;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
@@ -51,7 +52,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.Saveable;
 import org.eclipse.ui.SaveablesLifecycleEvent;
 import org.eclipse.ui.internal.DefaultSaveable;
-import org.eclipse.ui.internal.ISecondarySaveableSource;
 import org.eclipse.ui.internal.SaveablesList;
 import org.eclipse.ui.internal.views.properties.PropertiesMessages;
 import org.eclipse.ui.part.IContributedContentsView;
@@ -134,9 +134,16 @@ public class PropertySheet extends PageBookView
 	/**
 	 * Set of workbench parts, which should not be used as a source for PropertySheet
 	 */
-	private HashSet ignoredViews;
+	private HashSet<String> ignoredViews;
 
+	/** the view was hidden */
 	private boolean wasHidden;
+
+	/**
+	 * the selection update which was made during the view was hidden need to be
+	 * propagated to IPropertySheetPage
+	 */
+	private boolean selectionUpdatePending;
 
 	private final SaveablesTracker saveablesTracker;
 
@@ -363,6 +370,11 @@ public class PropertySheet extends PageBookView
 	@Override
 	protected void partVisible(IWorkbenchPart part) {
 	    super.partVisible(part);
+		if (wasHidden && part == this) {
+			if (selectionUpdatePending) {
+				showSelectionAndDescription();
+			}
+		}
 	}
 
     @Override
@@ -385,12 +397,8 @@ public class PropertySheet extends PageBookView
 		if (wasHidden && part == this) {
 			wasHidden = false;
 			super.partActivated(part);
-			if (currentPart != null) {
-				IPropertySheetPage page = (IPropertySheetPage) getCurrentPage();
-				if (page != null) {
-					page.selectionChanged(currentPart, currentSelection);
-				}
-				updateContentDescription();
+			if (selectionUpdatePending) {
+				showSelectionAndDescription();
 			}
 			return;
 		}
@@ -455,16 +463,12 @@ public class PropertySheet extends PageBookView
 
 		boolean visible = getSite() != null && getSite().getPage().isPartVisible(this);
 		if (!visible) {
+			selectionUpdatePending = true;
 			return;
 		}
 
         // pass the selection to the page
-        IPropertySheetPage page = (IPropertySheetPage) getCurrentPage();
-        if (page != null) {
-			page.selectionChanged(currentPart, currentSelection);
-		}
-
-        updateContentDescription();
+		showSelectionAndDescription();
     }
 
 	private void updateContentDescription() {
@@ -475,6 +479,18 @@ public class PropertySheet extends PageBookView
 		}
 		// since our selection changes, our dirty state might change too
 		firePropertyChange(IWorkbenchPartConstants.PROP_DIRTY);
+	}
+
+	private void showSelectionAndDescription() {
+		selectionUpdatePending = false;
+		if (currentPart == null || currentSelection == null) {
+			return;
+		}
+		IPropertySheetPage page = (IPropertySheetPage) getCurrentPage();
+		if (page != null) {
+			page.selectionChanged(currentPart, currentSelection);
+		}
+		updateContentDescription();
 	}
 
 	/**
@@ -504,7 +520,8 @@ public class PropertySheet extends PageBookView
 	 * {@link IAdaptable} and return adapter to
 	 * {@link ISecondarySaveableSource}.
 	 *
-	 * @return returns {@code false} by default.
+	 * @return returns {@code false} if the dirty state indication behavior is
+	 *         not desired.
 	 * @since 3.9
 	 */
 	@Override
@@ -536,10 +553,11 @@ public class PropertySheet extends PageBookView
 	 *
 	 * @since 3.2
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	protected Object getViewAdapter(Class key) {
+	protected <T> T getViewAdapter(Class<T> key) {
 		if (ISaveablePart.class.equals(key)) {
-			return getSaveablePart();
+			return (T) getSaveablePart();
 		}
 		return super.getViewAdapter(key);
 	}
@@ -568,21 +586,11 @@ public class PropertySheet extends PageBookView
 		return pinPropertySheetAction != null && pinPropertySheetAction.isChecked();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @since 3.4
-	 */
 	@Override
 	public ShowInContext getShowInContext() {
 		return new PropertyShowInContext(currentPart, currentSelection);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @since 3.4
-	 */
 	@Override
 	public boolean show(ShowInContext aContext) {
 		if (!isPinned()
@@ -604,9 +612,9 @@ public class PropertySheet extends PageBookView
 		updateContentDescription();
 	}
 
-	private HashSet getIgnoredViews() {
+	private HashSet<String> getIgnoredViews() {
 		if (ignoredViews == null) {
-			ignoredViews = new HashSet();
+			ignoredViews = new HashSet<>();
 	        IExtensionRegistry registry = RegistryFactory.getRegistry();
 	        IExtensionPoint ep = registry.getExtensionPoint(EXT_POINT);
 			if (ep != null) {
@@ -630,37 +638,21 @@ public class PropertySheet extends PageBookView
 		return getIgnoredViews().contains(partID);
 	}
 
-	/**
-	 * @see org.eclipse.core.runtime.IRegistryEventListener#added(org.eclipse.core.runtime.IExtension[])
-	 * @since 3.5
-	 */
 	@Override
 	public void added(IExtension[] extensions) {
 		ignoredViews = null;
 	}
 
-	/**
-	 * @see org.eclipse.core.runtime.IRegistryEventListener#added(org.eclipse.core.runtime.IExtensionPoint[])
-	 * @since 3.5
-	 */
 	@Override
 	public void added(IExtensionPoint[] extensionPoints) {
 		ignoredViews = null;
 	}
 
-	/**
-	 * @see org.eclipse.core.runtime.IRegistryEventListener#removed(org.eclipse.core.runtime.IExtension[])
-	 * @since 3.5
-	 */
 	@Override
 	public void removed(IExtension[] extensions) {
 		ignoredViews = null;
 	}
 
-	/**
-	 * @see org.eclipse.core.runtime.IRegistryEventListener#removed(org.eclipse.core.runtime.IExtensionPoint[])
-	 * @since 3.5
-	 */
 	@Override
 	public void removed(IExtensionPoint[] extensionPoints) {
 		ignoredViews = null;
