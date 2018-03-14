@@ -13,7 +13,6 @@ package org.eclipse.ui.views.tasklist;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IAdaptable;
 
 /**
@@ -48,9 +47,9 @@ class DefaultTaskListResourceAdapter implements ITaskListResourceAdapter {
     @Override
 	public IResource getAffectedResource(IAdaptable adaptable) {
 
-		IResource resource = Adapters.getAdapter(adaptable, IResource.class, true);
+        IResource resource = adaptable.getAdapter(IResource.class);
         if (resource == null) {
-			return Adapters.getAdapter(resource, IFile.class, true);
+			return adaptable.getAdapter(IFile.class);
 		}
 		return resource;
 
