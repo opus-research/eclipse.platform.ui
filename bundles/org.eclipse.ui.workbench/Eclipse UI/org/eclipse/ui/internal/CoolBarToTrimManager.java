@@ -116,6 +116,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 	}
 
 	private void add(MTrimBar trimBar, int idx, IContributionItem item) {
+
 		if (item instanceof IToolBarContributionItem) {
 			IToolBarManager mgr = ((IToolBarContributionItem) item).getToolBarManager();
 			if (!(mgr instanceof ToolBarManager)) {
@@ -141,11 +142,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			}
 			toolBar.setToBeRendered(true);
 			if (!tbFound) {
-				if (idx < 0) {
-					trimBar.getChildren().add(toolBar);
-				} else {
-					trimBar.getChildren().add(idx, toolBar);
-				}
+				add(trimBar, idx, toolBar);
 			}
 			workbenchTrimElements.add(toolBar);
 			manager.setOverrides(toolbarOverrides);
@@ -181,15 +178,28 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			toolBar.getChildren().add(separator);
 			toolBar.setToBeRendered(false);
 			if (!tbFound) {
-				if (idx < 0) {
-					topTrim.getChildren().add(toolBar);
-				} else {
-					topTrim.getChildren().add(idx, toolBar);
-				}
+				add(topTrim, idx, toolBar);
 			}
 			workbenchTrimElements.add(toolBar);
 		}
 
+	}
+
+	private void add(MTrimBar trimBar, int idx, MToolBar toolBar) {
+		if (idx < 0) {
+			idx = trimBar.getChildren().size() - 1;
+			while (idx > -1) {
+				if ("afterAdditions".equals(trimBar.getChildren().get(idx).getElementId())) { //$NON-NLS-1$ 	
+					break;
+				}
+				idx--;
+			}
+		}
+		if (idx < 0) {
+			trimBar.getChildren().add(toolBar);
+		} else {
+			trimBar.getChildren().add(idx, toolBar);
+		}
 	}
 
 	/*
