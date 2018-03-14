@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -376,14 +377,13 @@ public final class BindingManager extends HandleObjectManager implements
 	 *         trigger (<code>TriggerSequence</code>) to command identifier (<code>String</code>).
 	 *         This value will never be <code>null</code>, but may be empty.
 	 */
-	private final Map buildPrefixTable(final Map activeBindings) {
-		final Map prefixTable = new HashMap();
+	private final Map<TriggerSequence, Map<TriggerSequence, Binding>> buildPrefixTable(final Map activeBindings) {
+		final Map<TriggerSequence, Map<TriggerSequence, Binding>> prefixTable = new HashMap<TriggerSequence, Map<TriggerSequence, Binding>>();
 
-		final Iterator bindingItr = activeBindings.entrySet().iterator();
+		final Iterator<Map.Entry<TriggerSequence, ?>> bindingItr = activeBindings.entrySet().iterator();
 		while (bindingItr.hasNext()) {
-			final Map.Entry entry = (Map.Entry) bindingItr.next();
-			final TriggerSequence triggerSequence = (TriggerSequence) entry
-					.getKey();
+			final Entry<TriggerSequence, ?> entry = bindingItr.next();
+			final TriggerSequence triggerSequence = entry.getKey();
 
 			// Add the perfect match.
 			if (!prefixTable.containsKey(triggerSequence)) {
@@ -400,11 +400,11 @@ public final class BindingManager extends HandleObjectManager implements
 			final Binding binding = (Binding) entry.getValue();
 			for (int i = 0; i < prefixesLength; i++) {
 				final TriggerSequence prefix = prefixes[i];
-				final Object value = prefixTable.get(prefix);
-				if ((prefixTable.containsKey(prefix)) && (value instanceof Map)) {
-					((Map) value).put(triggerSequence, binding);
+				final Map<TriggerSequence, Binding> value = prefixTable.get(prefix);
+				if ((prefixTable.containsKey(prefix)) && (value != null)) {
+					value.put(triggerSequence, binding);
 				} else {
-					final Map map = new HashMap();
+					final Map<TriggerSequence, Binding> map = new HashMap<TriggerSequence, Binding>();
 					prefixTable.put(prefix, map);
 					map.put(triggerSequence, binding);
 				}
@@ -749,11 +749,11 @@ public final class BindingManager extends HandleObjectManager implements
 	 *         <code>null</code>. The keys and values are both strings.
 	 */
 	private final Map createContextTreeFor(final Set contextIds) {
-		final Map contextTree = new HashMap();
+		final Map<String, String> contextTree = new HashMap<String, String>();
 
-		final Iterator contextIdItr = contextIds.iterator();
+		final Iterator<String> contextIdItr = contextIds.iterator();
 		while (contextIdItr.hasNext()) {
-			String childContextId = (String) contextIdItr.next();
+			String childContextId = contextIdItr.next();
 			while (childContextId != null) {
 				// Check if we've already got the part of the tree from here up.
 				if (contextTree.containsKey(childContextId)) {
@@ -2167,7 +2167,8 @@ public final class BindingManager extends HandleObjectManager implements
 	 *            solution.
 	 */
 	private final void setActiveBindings(final Map activeBindings,
-			final Map activeBindingsByCommandId, final Map prefixTable,
+			final Map activeBindingsByCommandId,
+			final Map<TriggerSequence, Map<TriggerSequence, Binding>> prefixTable,
 			final Map conflicts) {
 		this.activeBindings = activeBindings;
 		final Map previousBindingsByParameterizedCommand = this.activeBindingsByParameterizedCommand;
