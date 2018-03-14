@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -173,7 +172,7 @@ public class SaveableHelper {
 	 */
 	private static boolean saveModels(ISaveablesSource modelSource, final IWorkbenchWindow window, final boolean confirm) {
 		Saveable[] selectedModels = modelSource.getActiveSaveables();
-		final ArrayList<Saveable> dirtyModels = new ArrayList<>();
+		final ArrayList<Saveable> dirtyModels = new ArrayList<Saveable>();
 		for (int i = 0; i < selectedModels.length; i++) {
 			Saveable model = selectedModels[i];
 			if (model.isDirty()) {
@@ -435,7 +434,7 @@ public class SaveableHelper {
 	}
 
 	private static void notifySaveAction(final IWorkbenchPart[] parts) {
-		Set<IWorkbenchWindow> wwindows = new HashSet<>();
+		Set<IWorkbenchWindow> wwindows = new HashSet<IWorkbenchWindow>();
 		for (int i = 0; i < parts.length; i++) {
 			wwindows.add(parts[i].getSite().getWorkbenchWindow());
 		}
@@ -453,7 +452,7 @@ public class SaveableHelper {
 	 * @return true if the user canceled.
 	 */
 	private static boolean waitForBackgroundSaveJob(final Saveable model) {
-		List<Saveable> models = new ArrayList<>();
+		List<Saveable> models = new ArrayList<Saveable>();
 		models.add(model);
 		return waitForBackgroundSaveJobs(models);
 	}
