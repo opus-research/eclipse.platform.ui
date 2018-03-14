@@ -13,7 +13,6 @@ package org.eclipse.ui.wizards.datatransfer;
 import java.util.List;
 
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -68,6 +67,9 @@ public class FileSystemExportWizard extends Wizard implements IExportWizard {
         setDialogSettings(section);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
     @Override
 	public void addPages() {
         super.addPages();
@@ -76,10 +78,13 @@ public class FileSystemExportWizard extends Wizard implements IExportWizard {
     }
 
 
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchWizard.
+     */
     @Override
 	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
         this.selection = currentSelection;
-		List<?> selectedResources = IDE.computeSelectedResources(currentSelection);
+        List selectedResources = IDE.computeSelectedResources(currentSelection);
         if (!selectedResources.isEmpty()) {
             this.selection = new StructuredSelection(selectedResources);
         }
@@ -90,12 +95,13 @@ public class FileSystemExportWizard extends Wizard implements IExportWizard {
                     .getActivePage();
             if (page != null) {
                 IEditorPart currentEditor = page.getActiveEditor();
-				if (currentEditor != null) {
-					Object selectedResource = Adapters.adapt(currentEditor.getEditorInput(), IResource.class);
-					if (selectedResource != null) {
-						selection = new StructuredSelection(selectedResource);
-					}
-				}
+                if (currentEditor != null) {
+                    Object selectedResource = currentEditor.getEditorInput()
+                            .getAdapter(IResource.class);
+                    if (selectedResource != null) {
+                        selection = new StructuredSelection(selectedResource);
+                    }
+                }
             }
         }
 
@@ -104,6 +110,9 @@ public class FileSystemExportWizard extends Wizard implements IExportWizard {
         setNeedsProgressMonitor(true);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
     @Override
 	public boolean performFinish() {
         return mainPage.finish();

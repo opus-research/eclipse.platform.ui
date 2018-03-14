@@ -106,10 +106,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 	private static final String defaultFactoryUrl = "bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/"
 			+ "org.eclipse.e4.ui.workbench.renderers.swt.WorkbenchRendererFactory";
-
-	public static final String ENABLED_THEME_KEY = "themeEnabled";
-
-	private static boolean enableThemePreference;
 	private String factoryUrl;
 
 	IRendererFactory curFactory = null;
@@ -123,11 +119,11 @@ public class PartRenderingEngine implements IPresentationEngine {
 	private void subscribeTopicToBeRendered(@EventTopic(UIEvents.UIElement.TOPIC_TOBERENDERED) Event event) {
 
 		MUIElement changedElement = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
-		MUIElement parent = changedElement.getParent();
+		MElementContainer<?> parent = changedElement.getParent();
 
 		// Handle Detached Windows
 		if (parent == null) {
-			parent = (MUIElement) ((EObject) changedElement).eContainer();
+			parent = (MElementContainer<?>) ((EObject) changedElement).eContainer();
 		}
 
 		// menus are not handled here... ??
@@ -152,13 +148,8 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 			// Ensure that the element about to be removed is not the
 			// selected element
-			if (parent instanceof MElementContainer<?>) {
-				@SuppressWarnings("unchecked")
-				MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) parent;
-				if (container.getSelectedElement() == changedElement) {
-					container.setSelectedElement(null);
-				}
-			}
+			if (parent.getSelectedElement() == changedElement)
+				parent.setSelectedElement(null);
 
 			if (okToRender) {
 				// Un-maximize the element before tearing it down
@@ -483,9 +474,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 		curFactory = factory;
 		context.set(IRendererFactory.class, curFactory);
 
-		IEclipsePreferences node = InstanceScope.INSTANCE.getNode("org.eclipse.e4.ui.workbench.renderers.swt");
-		enableThemePreference = node.getBoolean(ENABLED_THEME_KEY, true);
-
 		cssThemeChangedHandler = new StylingPreferencesHandler(context.get(Display.class));
 	}
 
@@ -758,6 +746,13 @@ public class PartRenderingEngine implements IPresentationEngine {
 		return safeCreateGui(element, parent, parentContext);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.e4.ui.workbench.IPresentationEngine#focusGui(org.eclipse.
+	 * e4.ui.model.application.ui.MUIElement)
+	 */
 	@Override
 	public void focusGui(MUIElement element) {
 		AbstractPartRenderer renderer = (AbstractPartRenderer) element
@@ -1231,7 +1226,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 			IEclipseContext appContext) {
 		String cssTheme = (String) appContext.get(E4Application.THEME_ID);
 		String cssURI = (String) appContext.get(IWorkbench.CSS_URI_ARG);
-		if ("none".equals(cssTheme) || (!enableThemePreference)) {
+		if ("none".equals(cssTheme)) {
 			appContext.set(IStylingEngine.SERVICE_NAME, new IStylingEngine() {
 				@Override
 				public void setClassname(Object widget, String classname) {

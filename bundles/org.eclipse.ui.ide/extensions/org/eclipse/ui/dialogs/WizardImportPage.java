@@ -106,6 +106,9 @@ public abstract class WizardImportPage extends WizardDataTransferPage {
         return true;
     }
 
+    /** (non-Javadoc)
+     * Method declared on IDialogPage.
+     */
     @Override
 	public void createControl(Composite parent) {
         Composite composite = new Composite(parent, SWT.NULL);

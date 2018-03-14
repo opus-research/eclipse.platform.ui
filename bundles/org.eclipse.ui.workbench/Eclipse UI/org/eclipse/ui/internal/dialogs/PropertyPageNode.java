@@ -65,6 +65,9 @@ public class PropertyPageNode extends WorkbenchPreferenceExtensionNode {
         setPage(page);
     }
 
+    /** (non-Javadoc)
+     * Method declared on IPreferenceNode.
+     */
     @Override
 	public void disposeResources() {
 

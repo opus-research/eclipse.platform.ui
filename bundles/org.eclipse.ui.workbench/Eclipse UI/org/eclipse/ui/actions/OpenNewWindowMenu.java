@@ -71,9 +71,9 @@ public class OpenNewWindowMenu extends PerspectiveMenu {
         this.pageInput = input;
     }
 
-	/**
-	 * Opens a new window with a particular perspective and input.
-	 */
+    /* (non-Javadoc)
+     * Opens a new window with a particular perspective and input.
+     */
     @Override
 	protected void run(IPerspectiveDescriptor desc) {
         // Verify page input.

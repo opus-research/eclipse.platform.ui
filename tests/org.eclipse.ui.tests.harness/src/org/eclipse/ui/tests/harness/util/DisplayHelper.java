@@ -110,7 +110,6 @@ public abstract class DisplayHelper {
 	 */
 	public static void sleep(Display display, long millis) {
 		new DisplayHelper() {
-			@Override
 			public boolean condition() {
 				return false;
 			}

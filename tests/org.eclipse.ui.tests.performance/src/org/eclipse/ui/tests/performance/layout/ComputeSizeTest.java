@@ -40,8 +40,7 @@ public class ComputeSizeTest extends BasicPerformanceTest {
     /**
      * Run the test
      */
-    @Override
-	protected void runTest() throws CoreException, WorkbenchException {
+    protected void runTest() throws CoreException, WorkbenchException {
 
         widgetFactory.init();
         final Composite widget = widgetFactory.getControl();

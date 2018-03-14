@@ -73,6 +73,9 @@ public class StickyViewDescriptor implements IStickyViewDescriptor,
 		return configurationElement;
 	}
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.views.IStickyViewDescriptor#getLocation()
+     */
     @Override
 	public int getLocation() {
     	int direction = IPageLayout.RIGHT;
@@ -91,6 +94,9 @@ public class StickyViewDescriptor implements IStickyViewDescriptor,
         return direction;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.registry.IStickyViewDescriptor#getId()
+     */
     @Override
 	public String getId() {
         return id;
@@ -107,6 +113,9 @@ public class StickyViewDescriptor implements IStickyViewDescriptor,
     }
 
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.registry.IStickyViewDescriptor#isFixed()
+     */
     @Override
 	public boolean isCloseable() {
     	boolean closeable = true;
@@ -117,6 +126,9 @@ public class StickyViewDescriptor implements IStickyViewDescriptor,
         return closeable;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.registry.IStickyViewDescriptor#isMoveable()
+     */
     @Override
 	public boolean isMoveable() {
     	boolean moveable = true;

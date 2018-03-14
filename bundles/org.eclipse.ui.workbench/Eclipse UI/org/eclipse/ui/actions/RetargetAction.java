@@ -133,6 +133,10 @@ public class RetargetAction extends PartEventAction implements
         enableAccelerator = b;
     }
 
+    /* (non-Javadoc)
+     * Retaget actions do not have accelerators.  It is up to the
+     * part to hook the accelerator.
+     */
     @Override
 	public int getAccelerator() {
         if (enableAccelerator) {
@@ -288,6 +292,9 @@ public class RetargetAction extends PartEventAction implements
                 newHandler);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IAction.
+     */
     @Override
 	public void setChecked(boolean checked) {
         super.setChecked(checked);

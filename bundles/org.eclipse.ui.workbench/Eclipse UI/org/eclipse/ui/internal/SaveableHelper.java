@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -19,13 +18,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
@@ -47,6 +46,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.Saveable;
 import org.eclipse.ui.internal.dialogs.EventLoopProgressMonitor;
 import org.eclipse.ui.internal.misc.StatusUtil;
+import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.progress.IJobRunnable;
 import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
 import org.eclipse.ui.statushandlers.StatusManager;
@@ -115,13 +115,13 @@ public class SaveableHelper {
 					String message = NLS.bind(WorkbenchMessages.EditorManager_saveChangesQuestion,
 							LegacyActionTools.escapeMnemonics(part.getTitle()));
 					// Show a dialog.
-					MessageDialog d = new MessageDialog(window.getShell(),
-							WorkbenchMessages.Save_Resource, null, message,
-							MessageDialog.QUESTION,
-							0,
+					String[] buttons = new String[] {
 							IDialogConstants.YES_LABEL,
 							IDialogConstants.NO_LABEL,
-							IDialogConstants.CANCEL_LABEL) {
+							IDialogConstants.CANCEL_LABEL };
+					MessageDialog d = new MessageDialog(window.getShell(),
+							WorkbenchMessages.Save_Resource, null, message,
+							MessageDialog.QUESTION, buttons, 0) {
 						@Override
 						protected int getShellStyle() {
 							return super.getShellStyle() | SWT.SHEET;
@@ -172,7 +172,7 @@ public class SaveableHelper {
 	 */
 	private static boolean saveModels(ISaveablesSource modelSource, final IWorkbenchWindow window, final boolean confirm) {
 		Saveable[] selectedModels = modelSource.getActiveSaveables();
-		final ArrayList<Saveable> dirtyModels = new ArrayList<>();
+		final ArrayList<Saveable> dirtyModels = new ArrayList<Saveable>();
 		for (int i = 0; i < selectedModels.length; i++) {
 			Saveable model = selectedModels[i];
 			if (model.isDirty()) {
@@ -188,18 +188,18 @@ public class SaveableHelper {
 			@Override
 			public void run(IProgressMonitor monitor) {
 				IProgressMonitor monitorWrap = new EventLoopProgressMonitor(monitor);
-				SubMonitor subMonitor = SubMonitor.convert(monitorWrap, WorkbenchMessages.Save, dirtyModels.size());
+				monitorWrap.beginTask(WorkbenchMessages.Save, dirtyModels.size());
 				try {
 					for (Iterator<Saveable> i = dirtyModels.iterator(); i.hasNext();) {
 						Saveable model = i.next();
 						// handle case where this model got saved as a result of
 						// saving another
 						if (!model.isDirty()) {
-							subMonitor.worked(1);
+							monitor.worked(1);
 							continue;
 						}
-						doSaveModel(model, subMonitor.newChild(1), window, confirm);
-						if (subMonitor.isCanceled()) {
+						doSaveModel(model, new SubProgressMonitor(monitorWrap, 1), window, confirm);
+						if (monitor.isCanceled()) {
 							break;
 						}
 					}
@@ -396,8 +396,8 @@ public class SaveableHelper {
 				// this will cause the parts tabs to show the ongoing background operation
 				for (int i = 0; i < parts.length; i++) {
 					IWorkbenchPart workbenchPart = parts[i];
-					IWorkbenchSiteProgressService progressService = Adapters.adapt(workbenchPart.getSite(),
-							IWorkbenchSiteProgressService.class);
+					IWorkbenchSiteProgressService progressService = workbenchPart.getSite().getAdapter(
+									IWorkbenchSiteProgressService.class);
 					progressService.showBusyForFamily(model);
 				}
 				model.disableUI(parts, blockUntilSaved);
@@ -434,7 +434,7 @@ public class SaveableHelper {
 	}
 
 	private static void notifySaveAction(final IWorkbenchPart[] parts) {
-		Set<IWorkbenchWindow> wwindows = new HashSet<>();
+		Set<IWorkbenchWindow> wwindows = new HashSet<IWorkbenchWindow>();
 		for (int i = 0; i < parts.length; i++) {
 			wwindows.add(parts[i].getSite().getWorkbenchWindow());
 		}
@@ -452,7 +452,7 @@ public class SaveableHelper {
 	 * @return true if the user canceled.
 	 */
 	private static boolean waitForBackgroundSaveJob(final Saveable model) {
-		List<Saveable> models = new ArrayList<>();
+		List<Saveable> models = new ArrayList<Saveable>();
 		models.add(model);
 		return waitForBackgroundSaveJobs(models);
 	}
@@ -497,7 +497,10 @@ public class SaveableHelper {
 	}
 
 	public static ISaveablePart getSaveable(Object o) {
-		return Adapters.adapt(o, ISaveablePart.class);
+		if (o instanceof ISaveablePart) {
+			return (ISaveablePart) o;
+		}
+		return Util.getAdapter(o, ISaveablePart.class);
 	}
 
 	public static boolean isSaveable(Object o) {
@@ -509,7 +512,7 @@ public class SaveableHelper {
 		if (saveable instanceof ISaveablePart2) {
 			return (ISaveablePart2) saveable;
 		}
-		return Adapters.adapt(o, ISaveablePart2.class);
+		return Util.getAdapter(o, ISaveablePart2.class);
 	}
 
 	public static boolean isSaveable2(Object o) {

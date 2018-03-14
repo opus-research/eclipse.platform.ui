@@ -76,6 +76,9 @@ class NewWizardSelectionPage extends WorkbenchWizardSelectionPage {
     		}
     }
 
+    /** (non-Javadoc)
+     * Method declared on IDialogPage.
+     */
     @Override
 	public void createControl(Composite parent) {
         IDialogSettings settings = getDialogSettings();

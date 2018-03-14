@@ -45,7 +45,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
@@ -169,9 +171,12 @@ public class NewFolderDialog extends SelectionStatusDialog {
 			});
 		}
 		linkedResourceGroup = new CreateLinkedResourceGroup(IResource.FOLDER,
-				e -> {
-					validateLinkedResource();
-					firstLinkCheck = false;
+				new Listener() {
+					@Override
+					public void handleEvent(Event e) {
+						validateLinkedResource();
+						firstLinkCheck = false;
+					}
 				}, new CreateLinkedResourceGroup.IStringValue() {
 					@Override
 					public void setValue(String string) {
@@ -226,7 +231,12 @@ public class NewFolderDialog extends SelectionStatusDialog {
 		data.widthHint = IDialogConstants.ENTRY_FIELD_WIDTH;
 		folderNameField.setLayoutData(data);
 		folderNameField.setFont(font);
-		folderNameField.addListener(SWT.Modify, event -> validateLinkedResource());
+		folderNameField.addListener(SWT.Modify, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				validateLinkedResource();
+			}
+		});
 	}
 
 	/**

@@ -180,6 +180,9 @@ public final class ActionHandler extends AbstractHandler {
     }
 
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.commands.IHandler#execute(java.util.Map)
+     */
 	@Override
 	@Deprecated
     public Object execute(Map parameterValuesByName) throws ExecutionException {
@@ -207,6 +210,9 @@ public final class ActionHandler extends AbstractHandler {
         return action;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.commands.IHandler#getAttributeValuesByName()
+     */
 	@Override
 	@Deprecated
     public Map getAttributeValuesByName() {
@@ -256,6 +262,9 @@ public final class ActionHandler extends AbstractHandler {
         }
     }
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	@Deprecated
 	public final String toString() {

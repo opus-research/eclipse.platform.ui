@@ -39,25 +39,41 @@ public abstract class AbstractTabList implements IOverrideTestsTabList {
 
 	private int selectedTabItem;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.tests.views.properties.tabbed.override.tablist.IOverrideTestsTabList#appliesTo(org.eclipse.ui.tests.views.properties.tabbed.model.Element)
+	 */
 	public boolean appliesTo(Element element) {
 		return false;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.tests.views.properties.tabbed.override.tablist.IOverrideTestsTabList#createControls(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createControls(Composite parent) {
 		this.composite = parent;
 		OverrideTestsTabItem activeTab = (OverrideTestsTabItem) (getTabs()[selectedTabItem]);
 		activeTab.getItem().createControls(parent);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.tests.views.properties.tabbed.override.tablist.IOverrideTestsTabList#dispose()
+	 */
 	public void dispose() {
 		OverrideTestsTabItem activeTab = (OverrideTestsTabItem) (getTabs()[selectedTabItem]);
 		activeTab.getItem().dispose();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.views.properties.tabbed.IOverridableTabList#getTabs()
+	 */
 	public ITabItem[] getTabs() {
 		IOverrideTestsItem[] items = getItems();
 		OverrideTestsTabItem[] tabs = new OverrideTestsTabItem[items.length];
@@ -72,7 +88,11 @@ public abstract class AbstractTabList implements IOverrideTestsTabList {
 		return tabs;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.tests.views.properties.tabbed.override.tablist.IOverrideTestsTabList#selectionChanged(org.eclipse.ui.tests.views.properties.tabbed.model.Element)
+	 */
 	public void selectionChanged(Element element) {
 		ITabItem[] tabs = getTabs();
 		for (int i = 0; i < tabs.length; i++) {
@@ -83,7 +103,11 @@ public abstract class AbstractTabList implements IOverrideTestsTabList {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.views.properties.tabbed.IOverridableTabList#selectTab(int)
+	 */
 	public void selectTab(int index) {
 		if (selectedTabItem == index) {
 			return;
