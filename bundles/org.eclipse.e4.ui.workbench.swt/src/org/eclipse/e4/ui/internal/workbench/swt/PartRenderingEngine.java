@@ -15,8 +15,10 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -25,6 +27,8 @@ import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -42,6 +46,8 @@ import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.e4.ui.css.swt.theme.IThemeManager;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.e4.ui.internal.css.swt.preference.PreferenceNode;
 import org.eclipse.e4.ui.internal.workbench.Activator;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.Policy;
@@ -83,6 +89,7 @@ import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.testing.TestableObject;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
+import org.osgi.service.prefs.BackingStoreException;
 import org.w3c.dom.Element;
 import org.w3c.dom.css.CSSStyleDeclaration;
 
@@ -1233,6 +1240,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 			IEclipseContext appContext) {
 		String cssTheme = (String) appContext.get(E4Application.THEME_ID);
 		String cssURI = (String) appContext.get(IWorkbench.CSS_URI_ARG);
+		IThemeEngine themeEngineForEvent = null;
 
 		if ("none".equals(cssTheme)) {
 			appContext.set(IStylingEngine.SERVICE_NAME, new IStylingEngine() {
@@ -1265,6 +1273,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 		} else if (cssTheme != null) {
 			final IThemeEngine themeEngine = createThemeEngine(display,
 					appContext);
+			themeEngineForEvent = themeEngine;
 			String cssResourcesURI = (String) appContext
 					.get(IWorkbench.CSS_RESOURCE_URI_ARG);
 
@@ -1401,6 +1410,16 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 		IEventBroker broker = appContext.get(IEventBroker.class);
 		if (broker != null) {
+			Map<String, Object> data = null;
+			if (themeEngineForEvent != null) {
+				data = new HashMap<String, Object>();
+				data.put(IThemeEngine.Events.THEME_ENGINE, themeEngineForEvent);
+				data.put(IThemeEngine.Events.THEME,
+						themeEngineForEvent.getActiveTheme());
+				data.put(IThemeEngine.Events.DEVICE, display);
+				data.put(IThemeEngine.Events.RESTORE, false);
+			}
+			broker.send(IThemeEngine.Events.THEME_CHANGED, data);
 			broker.send(UIEvents.UILifeCycle.THEME_CHANGED, null);
 		}
 	}
@@ -1418,5 +1437,56 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 		appContext.set(IThemeEngine.class.getName(), themeEngine);
 		return themeEngine;
+	}
+
+	@Inject
+	private void themeChanged(
+			@Optional @UIEventTopic(IThemeEngine.Events.THEME_CHANGED) Event event) {
+		if (event != null) {
+			resetOverriddenPreferences();
+			overridePreferences(getThemeEngine(event));
+		}
+	}
+
+	private void resetOverriddenPreferences() {
+		for (PreferenceNode node : getPreferenceNodes()) {
+			IEclipsePreferences preferences = node.getPreferenceNode();
+			for (String key : node.getOverriddenPreferences().keySet()) {
+				preferences.remove(key);
+			}
+			node.getOverriddenPreferences().clear();
+		}
+	}
+
+	private HashSet<PreferenceNode> prefNodes = null;
+
+	private Set<PreferenceNode> getPreferenceNodes() {
+		if (prefNodes == null) {
+			prefNodes = new HashSet<PreferenceNode>();
+			try {
+				for (String nodeId : InstanceScope.INSTANCE.getNode("")
+						.childrenNames()) {
+					prefNodes.add(new PreferenceNode(nodeId));
+				}
+			} catch (BackingStoreException exc) {
+				// TODO log the error, and no pref node support
+			}
+		}
+		return prefNodes;
+	}
+
+	private void overridePreferences(IThemeEngine themeEngine) {
+		if (themeEngine == null) {
+			return;
+		}
+		for (PreferenceNode node : getPreferenceNodes()) {
+			themeEngine.applyStyles(node, false);
+			System.err.println("Applied to " + node.getId());
+		}
+	}
+
+	private IThemeEngine getThemeEngine(Event event) {
+		return (IThemeEngine) event
+				.getProperty(IThemeEngine.Events.THEME_ENGINE);
 	}
 }
