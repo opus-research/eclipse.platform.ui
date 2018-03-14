@@ -25,7 +25,14 @@ import org.eclipse.e4.ui.css.swt.properties.converters.CSSValueSWTImageConverter
 import org.eclipse.e4.ui.css.swt.properties.converters.CSSValueSWTRGBConverterImpl;
 import org.eclipse.e4.ui.css.swt.resources.SWTResourceRegistryKeyFactory;
 import org.eclipse.e4.ui.css.swt.resources.SWTResourcesRegistry;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.Widget;
 import org.w3c.dom.Element;
 
@@ -34,6 +41,9 @@ import org.w3c.dom.Element;
  * to SWT widgets.
  */
 public abstract class AbstractCSSSWTEngineImpl extends CSSEngineImpl {
+	private static final String NEEDS_TO_BE_REDRAW = "AbstractCSSSWTEngineImpl.needsToBeRedraw";
+
+	private static final String HAS_REFRESH_LISTENERS = "AbstractCSSSWTEngineImpl.hasRefreshListeners";
 
 	protected Display display;
 
@@ -139,4 +149,55 @@ public abstract class AbstractCSSSWTEngineImpl extends CSSEngineImpl {
 		return false;
 	}
 
+	@Override
+	public void applyStyles(Object element, boolean applyStylesToChildNodes,
+			boolean computeDefaultStyle) {
+		super.applyStyles(element, applyStylesToChildNodes, computeDefaultStyle);
+
+		if (needsRefreshListeners(element)) {
+			initRefreshListeners((Widget) element);
+		}
+	}
+
+	// Workaround for the refreshing issue, reported with the Bug 433858
+	private boolean needsRefreshListeners(Object element) {
+		return element instanceof Tree;
+	}
+
+	private void initRefreshListeners(Widget widget) {
+		if (widget.getData(HAS_REFRESH_LISTENERS) != null) {
+			return; // already initialized;
+		}
+		widget.setData(HAS_REFRESH_LISTENERS, true);
+
+
+		final Listener focusInListener = new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				event.widget.setData(NEEDS_TO_BE_REDRAW, true);
+			}
+		};
+		widget.addListener(SWT.FocusIn, focusInListener);
+
+		final Listener selectionChangedListener = new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				if (event.widget.getData(NEEDS_TO_BE_REDRAW) != null) {
+					event.widget.setData(NEEDS_TO_BE_REDRAW, null);
+					if (event.widget instanceof Control) {
+						((Control) event.widget).redraw();
+					}
+				}
+			}
+		};
+		widget.addListener(SWT.Selection, selectionChangedListener);
+
+		widget.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				e.widget.removeListener(SWT.FocusIn, focusInListener);
+				e.widget.removeListener(SWT.Selection, selectionChangedListener);
+			}
+		});
+	}
 }
