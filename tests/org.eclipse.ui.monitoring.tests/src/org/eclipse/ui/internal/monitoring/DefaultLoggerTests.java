@@ -8,6 +8,7 @@
  * Contributors:
  *     Marcus Eng (Google) - initial API and implementation
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 443391
+ *     Sergey Prigogin (Google)
  *******************************************************************************/
 package org.eclipse.ui.internal.monitoring;
 
@@ -43,7 +44,7 @@ public class DefaultLoggerTests {
 
 	@Before
 	public void setUp() {
-		logger = new DefaultUiFreezeEventLogger();
+		logger = new DefaultUiFreezeEventLogger(DURATION * 10);
 		createLogListener();
 	}
 
