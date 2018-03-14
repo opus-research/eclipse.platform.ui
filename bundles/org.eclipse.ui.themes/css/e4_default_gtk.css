@@ -12,6 +12,20 @@
 
 @import url("platform:/plugin/org.eclipse.ui.themes/css/e4_basestyle.css");
 
+Tree {
+	swt-selection-background-color: #363636;
+	swt-hot-background-color: #2F2F2F;
+	swt-selection-border-color: #6B6B6B;
+	swt-hot-border-color: #545454;
+}
+
+Table {
+	swt-selection-background-color: #363636;
+	swt-hot-background-color: #2F2F2F;
+	swt-selection-border-color: #6B6B6B;
+	swt-hot-border-color: #545454;
+}
+
 ColorDefinition#org-eclipse-ui-workbench-ACTIVE_UNSELECTED_TABS_COLOR_START {
 	color: #DCDCDC;
 }

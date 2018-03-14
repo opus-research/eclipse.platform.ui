@@ -9,7 +9,7 @@
  *     Andrea Guarinoni <andrea.guarinoni.dev@outlook.com> - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - initial API and implementation
  *     Stefan Winkler <stefan@winklerweb.net> - Bug 431845
- *     Fabio Zadrozny <fabiofz@gmail.com> - Bug 434201
+ *     Fabio Zadrozny <fabiofz@gmail.com> - Bug 434201, 434309
  *******************************************************************************/
 
 @import url("platform:/plugin/org.eclipse.ui.themes/css/dark/e4-dark_basestyle.css");
@@ -19,4 +19,15 @@
 Tree {
 	swt-tree-arrows-color:#cccccc;
 	swt-tree-arrows-mode: triangle;  /* triangle or square */
+	swt-selection-background-color: #363636;
+	swt-hot-background-color: #2F2F2F;
+	swt-selection-border-color: #6B6B6B;
+	swt-hot-border-color: #545454;
+}
+
+Table {
+	swt-selection-background-color: #363636;
+	swt-hot-background-color: #2F2F2F;
+	swt-selection-border-color: #6B6B6B;
+	swt-hot-border-color: #545454;
 }
