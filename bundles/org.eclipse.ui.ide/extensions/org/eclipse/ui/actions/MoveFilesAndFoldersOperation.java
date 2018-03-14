@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -77,41 +77,42 @@ public class MoveFilesAndFoldersOperation extends CopyFilesAndFoldersOperation {
 	@Override
 	protected void copy(IResource[] resources, IPath destination, IProgressMonitor monitor) throws CoreException {
 		SubMonitor subMonitor = SubMonitor.convert(monitor, resources.length);
-		for (IResource resource : resources) {
+		for (int i = 0; i < resources.length; i++) {
 			SubMonitor iterationMonitor = subMonitor.split(1).setWorkRemaining(100);
-			IPath destinationPath = destination.append(resource.getName());
-			IWorkspace workspace = resource.getWorkspace();
+			IResource source = resources[i];
+			IPath destinationPath = destination.append(source.getName());
+			IWorkspace workspace = source.getWorkspace();
 			IWorkspaceRoot workspaceRoot = workspace.getRoot();
 			IResource existing = workspaceRoot.findMember(destinationPath);
-			if (resource.getType() == IResource.FOLDER && existing != null) {
+			if (source.getType() == IResource.FOLDER && existing != null) {
 				// the resource is a folder and it exists in the destination,
 				// move the children of the folder.
-				if (homogenousResources(resource, existing)) {
-					IResource[] children = ((IContainer) resource).members();
+				if (homogenousResources(source, existing)) {
+					IResource[] children = ((IContainer) source).members();
 					copy(children, destinationPath, iterationMonitor.split(50));
-					delete(resource, iterationMonitor.split(50));
+					delete(source, iterationMonitor.split(50));
 				} else {
 					// delete the destination folder, moving a linked folder
 					// over an unlinked one or vice versa. Fixes bug 28772.
 					delete(existing, iterationMonitor.split(50));
-					resource.move(destinationPath, IResource.SHALLOW | IResource.KEEP_HISTORY,
+					source.move(destinationPath, IResource.SHALLOW | IResource.KEEP_HISTORY,
 							iterationMonitor.split(50));
 				}
 			} else {
 				// if we're merging folders, we could be overwriting an existing
 				// file
 				if (existing != null) {
-					if (homogenousResources(resource, existing)) {
-						moveExisting(resource, existing, iterationMonitor.split(100));
+					if (homogenousResources(source, existing)) {
+						moveExisting(source, existing, iterationMonitor.split(100));
 					} else {
 						// Moving a linked resource over unlinked or vice versa.
 						// Can't use setContents here. Fixes bug 28772.
 						delete(existing, iterationMonitor.split(50));
-						resource.move(destinationPath, IResource.SHALLOW | IResource.KEEP_HISTORY,
+						source.move(destinationPath, IResource.SHALLOW | IResource.KEEP_HISTORY,
 								iterationMonitor.split(50));
 					}
 				} else {
-					resource.move(destinationPath, IResource.SHALLOW | IResource.KEEP_HISTORY,
+					source.move(destinationPath, IResource.SHALLOW | IResource.KEEP_HISTORY,
 							iterationMonitor.split(100));
 				}
 			}
@@ -209,25 +210,27 @@ public class MoveFilesAndFoldersOperation extends CopyFilesAndFoldersOperation {
 			IResource[] sourceResources) {
 		IPath destinationLocation = destination.getLocation();
 
-		for (IResource sourceRessource : sourceResources) {
+		for (int i = 0; i < sourceResources.length; i++) {
+			IResource sourceResource = sourceResources[i];
+
 			// is the source being copied onto itself?
-			if (sourceRessource.getParent().equals(destination)) {
+			if (sourceResource.getParent().equals(destination)) {
 				return NLS
 						.bind(
 								IDEWorkbenchMessages.MoveFilesAndFoldersOperation_sameSourceAndDest,
-								sourceRessource.getName());
+								sourceResource.getName());
 			}
 			// test if linked source is copied onto itself. Fixes bug 29913.
 			if (destinationLocation != null) {
-				IPath sourceLocation = sourceRessource.getLocation();
+				IPath sourceLocation = sourceResource.getLocation();
 				IPath destinationResource = destinationLocation
-						.append(sourceRessource.getName());
+						.append(sourceResource.getName());
 				if (sourceLocation != null
 						&& sourceLocation.isPrefixOf(destinationResource)) {
 					return NLS
 							.bind(
 									IDEWorkbenchMessages.MoveFilesAndFoldersOperation_sameSourceAndDest,
-									sourceRessource.getName());
+									sourceResource.getName());
 				}
 			}
 		}

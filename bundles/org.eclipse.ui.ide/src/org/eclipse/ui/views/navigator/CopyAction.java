@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -111,7 +111,7 @@ import org.eclipse.ui.part.ResourceTransfer;
         final int length = resources.length;
         int actualLength = 0;
         String[] fileNames = new String[length];
-        StringBuilder buf = new StringBuilder();
+        StringBuffer buf = new StringBuffer();
         for (int i = 0; i < length; i++) {
             IPath location = resources[i].getLocation();
             // location may be null. See bug 29491.

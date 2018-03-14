@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -63,7 +63,7 @@ public class BuildSetMenu extends ContributionItem {
      * @param index the index to add it at
      */
     private void addMnemonic(BuildSetAction action, int index) {
-        StringBuilder label = new StringBuilder();
+        StringBuffer label = new StringBuffer();
         //add the numerical accelerator
         if (index < 9) {
             label.append('&');
@@ -104,8 +104,8 @@ public class BuildSetMenu extends ContributionItem {
         if (last != null) {
 			// add it only if it has not been removed
 			boolean found = false;
-			for (IWorkingSet set : sets) {
-				if (set.equals(last.getWorkingSet())){
+			for (int i = 0; i < sets.length; i++) {
+				if (sets[i].equals(last.getWorkingSet())){
 					found = true;
 					break;
 				}
@@ -122,11 +122,11 @@ public class BuildSetMenu extends ContributionItem {
 			}
         }
         //add build actions for the most recently used working sets
-        for (IWorkingSet set : sets) {
-            if (lastSet != null && lastSet.equals(set)) {
+        for (int i = 0; i < sets.length; i++) {
+            if (lastSet != null && lastSet.equals(sets[i])) {
 				continue;
 			}
-            BuildSetAction action = new BuildSetAction(set, window,
+            BuildSetAction action = new BuildSetAction(sets[i], window,
                     actionBars);
             addMnemonic(action, accel++);
             action.setEnabled(!isAutoBuilding);

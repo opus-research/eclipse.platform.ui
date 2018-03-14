@@ -20,11 +20,9 @@ import org.w3c.dom.Element;
 public interface IElementProvider {
 
 	/**
-	 * Return the w3c {@link Element} which wrap the native widget
-	 * <code>element</code> (SWT Control, Swing JComponent). The
-	 * <code>element</code> can be the w3c Element. The provider should check
-	 * that the supplied widgets/objects are compatible with the provided CSS
-	 * Engine.
+	 * Return the w3c Element which wrap the native widget <code>element</code>
+	 * (SWT Control, Swing JComponent). The <code>element</code> can be the
+	 * w3c Element.
 	 *
 	 * @param element
 	 * @param engine

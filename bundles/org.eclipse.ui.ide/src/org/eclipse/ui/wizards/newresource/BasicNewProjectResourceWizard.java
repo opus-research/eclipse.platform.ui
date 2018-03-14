@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -37,14 +36,12 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveRegistry;
@@ -520,12 +517,15 @@ try {
 	 *            the id to query.
 	 * @since 3.0
 	 */
-	private static void addPerspectiveAndDescendants(List perspectiveIds, String id) {
-		IPerspectiveRegistry registry = PlatformUI.getWorkbench().getPerspectiveRegistry();
-		for (IPerspectiveDescriptor perspective : registry.getPerspectives()) {
+	private static void addPerspectiveAndDescendants(List perspectiveIds,
+			String id) {
+		IPerspectiveRegistry registry = PlatformUI.getWorkbench()
+				.getPerspectiveRegistry();
+		IPerspectiveDescriptor[] perspectives = registry.getPerspectives();
+		for (int i = 0; i < perspectives.length; i++) {
 			// @issue illegal ref to workbench internal class;
 			// consider adding getOriginalId() as API on IPerspectiveDescriptor
-			PerspectiveDescriptor descriptor = ((PerspectiveDescriptor) perspective);
+			PerspectiveDescriptor descriptor = ((PerspectiveDescriptor) perspectives[i]);
 			if (descriptor.getOriginalId().equals(id)) {
 				perspectiveIds.add(descriptor.getId());
 			}
@@ -564,12 +564,12 @@ try {
 					ResourceMessages.NewProject_perspSwitchMessageWithDesc,
 					new String[] { finalPersp.getLabel(), desc });
 
-		LinkedHashMap<String, Integer> buttonLabelToId = new LinkedHashMap<>();
-		buttonLabelToId.put(ResourceMessages.NewProject_perspSwitchButtonLabel, IDialogConstants.YES_ID);
-		buttonLabelToId.put(IDialogConstants.NO_LABEL, IDialogConstants.NO_ID);
-		MessageDialogWithToggle dialog = MessageDialogWithToggle.open(MessageDialog.QUESTION, window.getShell(),
-				ResourceMessages.NewProject_perspSwitchTitle, message, null, false, store,
-				IDEInternalPreferences.PROJECT_SWITCH_PERSP_MODE, SWT.NONE, buttonLabelToId);
+		MessageDialogWithToggle dialog = MessageDialogWithToggle
+				.openYesNoQuestion(window.getShell(),
+						ResourceMessages.NewProject_perspSwitchTitle, message,
+						null /* use the default message for the toggle */,
+						false /* toggle is initially unchecked */, store,
+						IDEInternalPreferences.PROJECT_SWITCH_PERSP_MODE);
 		int result = dialog.getReturnCode();
 
 		// If we are not going to prompt anymore propogate the choice.

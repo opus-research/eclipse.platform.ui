@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -127,8 +127,9 @@ public class ResourcePatternFilter extends ViewerFilter {
 		IResource resource = Adapters.adapt(element, IResource.class);
         if (resource != null) {
             String name = resource.getName();
-			for (StringMatcher testMatcher : getMatchers()) {
-                if (testMatcher.match(name)) {
+            StringMatcher[] testMatchers = getMatchers();
+            for (int i = 0; i < testMatchers.length; i++) {
+                if (testMatchers[i].match(name)) {
 					return false;
 				}
             }

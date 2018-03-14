@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 package org.eclipse.ui.internal.navigator;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.expressions.ElementHandler;
@@ -49,9 +50,9 @@ public class CustomAndExpression extends Expression {
 			@Override
 			public void run() throws Exception {
 				fExpressions = new ArrayList<Expression>();
-				for (IConfigurationElement configurationElement : children) {
+				for (int i = 0; i < children.length; i++) {
 					fExpressions.add(ElementHandler.getDefault().create(
-							ExpressionConverter.getDefault(), configurationElement));
+							ExpressionConverter.getDefault(), children[i]));
 				}
 			}
 		});
@@ -65,7 +66,8 @@ public class CustomAndExpression extends Expression {
 		}
 		NavigatorPlugin.Evaluator evaluator = new NavigatorPlugin.Evaluator();
 		EvaluationResult result = EvaluationResult.TRUE;
-		for (Expression expression : fExpressions) {
+		for (Iterator<Expression> iter = fExpressions.iterator(); iter.hasNext();) {
+			Expression expression = iter.next();
 			evaluator.expression = expression;
 			evaluator.scope = scope;
 			SafeRunner.run(evaluator);

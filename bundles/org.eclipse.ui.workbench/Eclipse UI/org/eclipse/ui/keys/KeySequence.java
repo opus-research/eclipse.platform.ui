@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
+
 import org.eclipse.ui.internal.util.Util;
 
 /**
@@ -252,6 +253,9 @@ public final class KeySequence implements Comparable {
         }
     }
 
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     @Override
 	public int compareTo(Object object) {
         KeySequence castedObject = (KeySequence) object;
@@ -279,6 +283,9 @@ public final class KeySequence implements Comparable {
         return Util.endsWith(keyStrokes, keySequence.keyStrokes, equals);
     }
 
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     @Override
 	public boolean equals(Object object) {
         if (!(object instanceof KeySequence)) {
@@ -309,6 +316,9 @@ public final class KeySequence implements Comparable {
         return keyStrokes;
     }
 
+    /**
+     * @see java.lang.Object#hashCode()
+     */
     @Override
 	public int hashCode() {
         if (!hashCodeComputed) {
@@ -367,6 +377,7 @@ public final class KeySequence implements Comparable {
      *
      * @return The formal string representation for this key sequence.
      *         Guaranteed not to be <code>null</code>.
+     * @see java.lang.Object#toString()
      */
     @Override
 	public String toString() {

@@ -322,7 +322,7 @@ public class ListDelegatingValueObservableList<S, T extends S, E> extends Abstra
 
 		for (ListIterator<T> it = masterList.listIterator(); it.hasNext();) {
 			if (masterElement == it.next())
-				indices.add(Integer.valueOf(it.previousIndex()));
+				indices.add(new Integer(it.previousIndex()));
 		}
 
 		int[] result = new int[indices.size()];
@@ -334,7 +334,8 @@ public class ListDelegatingValueObservableList<S, T extends S, E> extends Abstra
 
 	private void fireListChange(int[] indices, E oldValue, E newValue) {
 		List<ListDiffEntry<E>> differences = new ArrayList<>(indices.length * 2);
-		for (int index : indices) {
+		for (int i = 0; i < indices.length; i++) {
+			int index = indices[i];
 			differences.add(Diffs.createListDiffEntry(index, false, oldValue));
 			differences.add(Diffs.createListDiffEntry(index, true, newValue));
 		}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -122,10 +122,13 @@ public class MainActionGroup extends ResourceNavigatorActionGroup {
         if (delta == null) {
             return;
         }
-		for (IResourceDelta projectDelta : delta.getAffectedChildren(IResourceDelta.CHANGED)) {
+        IResourceDelta[] projDeltas = delta
+                .getAffectedChildren(IResourceDelta.CHANGED);
+        for (int i = 0; i < projDeltas.length; ++i) {
+            IResourceDelta projDelta = projDeltas[i];
             //changing the project open state or description will affect open/close/build action enablement
-			if ((projectDelta.getFlags() & (IResourceDelta.OPEN | IResourceDelta.DESCRIPTION)) != 0) {
-				if (sel.contains(projectDelta.getResource())) {
+            if ((projDelta.getFlags() & (IResourceDelta.OPEN | IResourceDelta.DESCRIPTION)) != 0) {
+                if (sel.contains(projDelta.getResource())) {
                     getNavigator().getSite().getShell().getDisplay().syncExec(
                             () -> {
 							    addTaskAction.selectionChanged(selection);

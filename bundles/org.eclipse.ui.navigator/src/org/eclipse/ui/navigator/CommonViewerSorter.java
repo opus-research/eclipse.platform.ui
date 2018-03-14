@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -149,8 +149,8 @@ public final class CommonViewerSorter extends TreePathViewerSorter {
     	// Have to get the parent path from the content provider
     	NavigatorContentServiceContentProvider cp = (NavigatorContentServiceContentProvider) contentService.createCommonContentProvider();
     	TreePath[] parentPaths = cp.getParents(element);
-    	for (TreePath parentPath : parentPaths) {
-    		if (isSorterProperty(parentPath, element, property))
+    	for (int i = 0; i < parentPaths.length; i++) {
+    		if (isSorterProperty(parentPaths[i], element, property))
     			return true;
     	}
     	return false;

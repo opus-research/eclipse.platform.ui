@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -191,7 +191,8 @@ class TasksFilter extends ViewerFilter implements Cloneable {
         if (elementPath.isEmpty() || elementPath.isRoot()) {
             return false;
         }
-        for (IAdaptable workingSetElement : workingSetElements) {
+        for (int i = 0; i < workingSetElements.length; i++) {
+            IAdaptable workingSetElement = workingSetElements[i];
             IContainmentAdapter containmentAdapter = workingSetElement.getAdapter(IContainmentAdapter.class);
 
             // if there is no IContainmentAdapter defined for the working
@@ -319,8 +320,8 @@ class TasksFilter extends ViewerFilter implements Cloneable {
      * @param memento a memento to receive the object state
      */
     public void saveState(IMemento memento) {
-        for (String type : types) {
-            memento.createChild(TAG_TYPE).putString(TAG_ID, type);
+        for (int i = 0; i < types.length; i++) {
+            memento.createChild(TAG_TYPE).putString(TAG_ID, types[i]);
         }
         memento.putInteger(TAG_ON_RESOURCE, onResource);
         if (workingSet != null) {
@@ -361,8 +362,8 @@ class TasksFilter extends ViewerFilter implements Cloneable {
     }
 
     private boolean selectByType(IMarker marker) {
-        for (String type : types) {
-            if (MarkerUtil.isMarkerType(marker, type)) {
+        for (int i = 0; i < types.length; ++i) {
+            if (MarkerUtil.isMarkerType(marker, types[i])) {
 				return true;
 			}
         }
@@ -370,8 +371,8 @@ class TasksFilter extends ViewerFilter implements Cloneable {
     }
 
     private boolean selectByType(IMarkerDelta markerDelta) {
-        for (String type : types) {
-            if (markerDelta.isSubtypeOf(type)) {
+        for (int i = 0; i < types.length; ++i) {
+            if (markerDelta.isSubtypeOf(types[i])) {
 				return true;
 			}
         }

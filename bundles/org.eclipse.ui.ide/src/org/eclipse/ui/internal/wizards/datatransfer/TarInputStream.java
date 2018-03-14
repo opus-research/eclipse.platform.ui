@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2016 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,6 @@ package org.eclipse.ui.internal.wizards.datatransfer;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Input stream for reading files in ustar format (tar) compatible
@@ -115,7 +114,7 @@ public class TarInputStream extends FilterInputStream
 		int pos, i;
 
 		pos = 148;
-		StringBuilder checksumString = new StringBuilder();
+		StringBuffer checksumString = new StringBuffer();
 		for(i = 0; i < 8; i++) {
 			if(header[pos + i] == ' ') {
 				continue;
@@ -204,14 +203,14 @@ public class TarInputStream extends FilterInputStream
 		while (pos < 100 && header[pos] != 0) {
 			pos++;
 		}
-		String name = new String(header, 0, pos, StandardCharsets.UTF_8);
+		String name = new String(header, 0, pos, "UTF8"); //$NON-NLS-1$
 		// Prepend the prefix here.
 		pos = 345;
 		if(header[pos] != 0) {
 			while (pos < 500 && header[pos] != 0) {
 				pos++;
 			}
-			String prefix = new String(header, 345, pos - 345, StandardCharsets.UTF_8);
+			String prefix = new String(header, 345, pos - 345, "UTF8"); //$NON-NLS-1$
 			name = prefix + "/" + name; //$NON-NLS-1$
 		}
 
@@ -227,7 +226,7 @@ public class TarInputStream extends FilterInputStream
 		}
 
 		pos = 100;
-		StringBuilder mode = new StringBuilder();
+		StringBuffer mode = new StringBuffer();
 		for(i = 0; i < 8; i++) {
 			if(header[pos + i] == 0) {
 				break;
@@ -248,7 +247,7 @@ public class TarInputStream extends FilterInputStream
 		}
 
 		pos = 100 + 24;
-		StringBuilder size = new StringBuilder();
+		StringBuffer size = new StringBuffer();
 		for(i = 0; i < 12; i++) {
 			if(header[pos + i] == 0) {
 				break;
@@ -308,7 +307,7 @@ public class TarInputStream extends FilterInputStream
 			while (pos < longNameData.length && longNameData[pos] != 0) {
 				pos++;
 			}
-			longLinkName = new String(longNameData, 0, pos, StandardCharsets.UTF_8);
+			longLinkName = new String(longNameData, 0, pos, "UTF8"); //$NON-NLS-1$
 			return getNextEntryInternal();
 		}
 		return entry;

@@ -20,7 +20,6 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Layout;
-import org.eclipse.ui.internal.forms.widgets.FormUtil;
 
 /**
  * This implementation of the layout algorithm attempts to position controls in
@@ -319,9 +318,7 @@ public final class TableWrapLayout extends Layout implements ILayoutExtension {
 					if (k < j + span - 1)
 						cwidth += horizontalSpacing;
 				}
-				Point size = FormUtil.computeControlSize(cache.getCache(td.childIndex), cwidth - td.indent, td.maxWidth,
-						td.maxHeight, isFillAligned(child));
-				size.x += td.indent;
+				Point size = computeSize(td.childIndex, cwidth, td.indent, td.maxWidth, td.maxHeight);
 				td.compWidth = cwidth;
 				if (td.heightHint != SWT.DEFAULT) {
 					size = new Point(size.x, td.heightHint);
@@ -395,6 +392,20 @@ public final class TableWrapLayout extends Layout implements ILayoutExtension {
 		return widths;
 	}
 
+	Point computeSize(int childIndex, int width, int indent, int maxWidth, int maxHeight) {
+		int widthArg = width - indent;
+		SizeCache controlCache = cache.getCache(childIndex);
+		if (!isWrap(controlCache.getControl()))
+			widthArg = SWT.DEFAULT;
+		Point size = controlCache.computeSize(widthArg, SWT.DEFAULT);
+		if (maxWidth!=SWT.DEFAULT)
+			size.x = Math.min(size.x, maxWidth);
+		if (maxHeight!=SWT.DEFAULT)
+			size.y = Math.min(size.y, maxHeight);
+		size.x += indent;
+		return size;
+	}
+
 	void placeControl(Control control, TableWrapData td, int x, int y,
 			int[] rowHeights, int row) {
 		int xloc = x + td.indent;
@@ -414,16 +425,16 @@ public final class TableWrapLayout extends Layout implements ILayoutExtension {
 			}
 		}
 		// align horizontally
-		if (isFillAligned(control)) {
-			width = colWidth;
-		} else if (td.align == TableWrapData.CENTER) {
-			xloc = x + (colWidth - width) / 2;
+		if (td.align == TableWrapData.CENTER) {
+			xloc = x + colWidth / 2 - width / 2;
 		} else if (td.align == TableWrapData.RIGHT) {
 			xloc = x + colWidth - width;
+		} else if (td.align == TableWrapData.FILL) {
+			width = colWidth;
 		}
 		// align vertically
 		if (td.valign == TableWrapData.MIDDLE) {
-			yloc = y + (slotHeight - height) / 2;
+			yloc = y + slotHeight / 2 - height / 2;
 		} else if (td.valign == TableWrapData.BOTTOM) {
 			yloc = y + slotHeight - height;
 		} else if (td.valign == TableWrapData.FILL) {
@@ -544,7 +555,7 @@ public final class TableWrapLayout extends Layout implements ILayoutExtension {
 			if (col.intValue() == affectedColumn)
 				return;
 		}
-		growingColumns.add(Integer.valueOf(affectedColumn));
+		growingColumns.add(new Integer(affectedColumn));
 	}
 
 	private void updateGrowingRows(Vector<Integer> growingRows, TableWrapData spec,
@@ -555,7 +566,7 @@ public final class TableWrapLayout extends Layout implements ILayoutExtension {
 			if (irow.intValue() == affectedRow)
 				return;
 		}
-		growingRows.add(Integer.valueOf(affectedRow));
+		growingRows.add(new Integer(affectedRow));
 	}
 
 	private TableWrapData[] createEmptyRow() {
@@ -658,9 +669,7 @@ public final class TableWrapLayout extends Layout implements ILayoutExtension {
 				}
 				int cy = td.heightHint;
 				if (cy == SWT.DEFAULT) {
-					SizeCache controlCache = cache.getCache(td.childIndex);
-					Point size = FormUtil.computeControlSize(controlCache, cwidth - td.indent, td.maxWidth,
-							td.maxHeight, isFillAligned(child));
+					Point size = computeSize(td.childIndex, cwidth, td.indent, td.maxWidth, td.maxHeight);
 					cy = size.y;
 				}
 				RowSpan rowspan = rowspans.get(child);
@@ -843,16 +852,7 @@ public final class TableWrapLayout extends Layout implements ILayoutExtension {
 		}
 	}
 
-	boolean isFillAligned(Control control) {
-		Object layoutData = control.getLayoutData();
-
-		if (layoutData instanceof TableWrapData) {
-			TableWrapData tableWrapData = (TableWrapData) layoutData;
-
-			if (tableWrapData.align == TableWrapData.FILL) {
-				return true;
-			}
-		}
+	boolean isWrap(Control control) {
 		if (control instanceof Composite
 				&& ((Composite) control).getLayout() instanceof ILayoutExtension)
 			return true;

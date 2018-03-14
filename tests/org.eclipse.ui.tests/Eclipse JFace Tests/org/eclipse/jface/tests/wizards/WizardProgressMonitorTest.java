@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2017 Remy Chi Jian Suen and others.
+ * Copyright (c) 2009, 2014 Remy Chi Jian Suen and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,9 @@
 
 package org.eclipse.jface.tests.wizards;
 
+import junit.framework.TestCase;
+
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.ProgressMonitorPart;
@@ -20,8 +23,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Layout;
-
-import junit.framework.TestCase;
 
 public class WizardProgressMonitorTest extends TestCase {
 
@@ -90,20 +91,25 @@ public class WizardProgressMonitorTest extends TestCase {
 
 
 	protected IRunnableWithProgress getRunnable(final String taskName) {
-		return monitor -> {
+		return new IRunnableWithProgress() {
+			@Override
+			public void run(IProgressMonitor monitor) {
 
-			// check that the label is empty
-			assertEquals("The progress monitor's label is not initially empty", //$NON-NLS-1$
-					"", dialog.getProgressMonitorLabelText()); //$NON-NLS-1$
+				// check that the label is empty
+				assertEquals(
+						"The progress monitor's label is not initially empty", //$NON-NLS-1$
+						"", dialog.getProgressMonitorLabelText()); //$NON-NLS-1$
 
-			// check the subtask as well
-			String subTask = dialog.getProgressMonitorSubTaskText();
-			if (subTask != null && subTask.length() != 0) {
-				fail("The progress monitor's subtask is not initially empty"); //$NON-NLS-1$
+				// check the subtask as well
+				String subTask = dialog.getProgressMonitorSubTaskText();
+				if(subTask !=null && subTask.length() != 0)
+				 {
+					fail("The progress monitor's subtask is not initially empty"); //$NON-NLS-1$
+				}
+
+				monitor.beginTask(taskName, 1);
+				monitor.subTask("some sub task"); //$NON-NLS-1$
 			}
-
-			monitor.beginTask(taskName, 1);
-			monitor.subTask("some sub task"); //$NON-NLS-1$
 		};
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,11 +14,8 @@ package org.eclipse.ui.internal.navigator.sorters;
 import org.eclipse.core.expressions.EvaluationResult;
 import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.IEvaluationContext;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.SafeRunner;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.ui.internal.navigator.CustomAndExpression;
 import org.eclipse.ui.internal.navigator.NavigatorPlugin;
@@ -97,64 +94,12 @@ public class CommonSorterDescriptor implements INavigatorContentExtPtConstants {
 		SafeRunner.run(new NavigatorSafeRunnable(element) {
 			@Override
 			public void run() throws Exception {
-				sorter[0] = createSorterInstance();
+				sorter[0] = (ViewerSorter) element.createExecutableExtension(ATT_CLASS);
 			}
 		});
 		if (sorter[0] != null)
 			return sorter[0];
 		return SkeletonViewerSorter.INSTANCE;
-	}
-
-	private ViewerSorter createSorterInstance() throws CoreException {
-		Object contributed = element.createExecutableExtension(ATT_CLASS);
-		if (contributed instanceof ViewerSorter) {
-			return (ViewerSorter) contributed;
-		}
-		if (contributed instanceof ViewerComparator) {
-			return new WrappedViewerComparator((ViewerComparator) contributed);
-		}
-		throw new ClassCastException("Class contributed by " + element.getNamespaceIdentifier() + //$NON-NLS-1$
-				" to " + INavigatorContentExtPtConstants.TAG_NAVIGATOR_CONTENT + //$NON-NLS-1$
-				"/" + INavigatorContentExtPtConstants.TAG_COMMON_SORTER //$NON-NLS-1$
-				+ " is not an instance of " + ViewerComparator.class.getName() + ": " + contributed.getClass().getName() //$NON-NLS-1$ //$NON-NLS-2$
-		);
-	}
-
-	/**
-	 * Public for tests only.
-	 */
-	public static class WrappedViewerComparator extends ViewerSorter {
-
-		private final ViewerComparator comparator;
-
-		public WrappedViewerComparator(ViewerComparator comparator) {
-			this.comparator = comparator;
-		}
-
-		@Override
-		public int category(Object element) {
-			return comparator.category(element);
-		}
-
-		@Override
-		public int compare(Viewer viewer, Object e1, Object e2) {
-			return comparator.compare(viewer, e1, e2);
-		}
-
-		@Override
-		public boolean isSorterProperty(Object element, String property) {
-			return comparator.isSorterProperty(element, property);
-		}
-
-		/**
-		 * Public for tests only.
-		 *
-		 * @return Returns the original comparator instance wrapped by this
-		 *         instance.
-		 */
-		public ViewerComparator getWrappedComparator() {
-			return comparator;
-		}
 	}
 
 	@Override

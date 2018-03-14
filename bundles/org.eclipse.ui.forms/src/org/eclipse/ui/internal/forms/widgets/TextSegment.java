@@ -115,7 +115,7 @@ public class TextSegment extends ParagraphSegment {
 	}
 
 	private String cleanup(String text) {
-		StringBuilder buf = new StringBuilder();
+		StringBuffer buf = new StringBuffer();
 		for (int i = 0; i < text.length(); i++) {
 			char c = text.charAt(i);
 			if (c == '\n' || c == '\r' || c == '\f') {

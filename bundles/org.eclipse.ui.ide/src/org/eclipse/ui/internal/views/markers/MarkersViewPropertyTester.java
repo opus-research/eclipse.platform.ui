@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -66,12 +66,12 @@ public class MarkersViewPropertyTester extends PropertyTester {
 	private boolean testContentGenerator(ExtendedMarkersView view, Object[] args) {
 
 		String currentGenerator = view.getBuilder().getGenerator().getId();
-		for (Object arg : args) {
-			if (arg.equals(currentGenerator))
+		for (int i = 0; i < args.length; i++) {
+			if (args[i].equals(currentGenerator))
 				return true;
 
 			// The value 'any' works for any content generator
-			if (arg.equals(ANY_CONTENT_GENERATOR))
+			if (args[i].equals(ANY_CONTENT_GENERATOR))
 				return true;
 		}
 		return false;

@@ -17,7 +17,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.resources.IMarker;
@@ -211,7 +210,8 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 		Map<String, Collection<IConfigurationElement>> generatorExtensions = new HashMap<>();
 		Map<String, MarkerGroupingEntry> entryIDsToEntries = new HashMap<>();
 		Set<AttributeMarkerGrouping> attributeMappings = new HashSet<>();
-		for (IExtension extension : extensions) {
+		for (int i = 0; i < extensions.length; i++) {
+			IExtension extension = extensions[i];
 			processExtension(tracker, extension, groupingEntries,
 					entryIDsToEntries, attributeMappings, generatorExtensions);
 		}
@@ -244,7 +244,8 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 			Map<String, Collection<IConfigurationElement>> generatorExtensions) {
 		IConfigurationElement[] elements = extension.getConfigurationElements();
 
-		for (IConfigurationElement element : elements) {
+		for (int j = 0; j < elements.length; j++) {
+			IConfigurationElement element = elements[j];
 			if (element.getName().equals(PROBLEM_FILTER)) {
 				ProblemFilter filter = newFilter(element);
 				registeredFilters.put(filter.getId(), filter);
@@ -287,8 +288,8 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 			if (element.getName().equals(MARKER_CATEGORY)) {
 				String[] markerTypes = getMarkerTypes(element);
 				String categoryName = element.getAttribute(MarkerSupportInternalUtilities.ATTRIBUTE_NAME);
-				for (String markerType : markerTypes) {
-					categories.put(markerType, categoryName);
+				for (int i = 0; i < markerTypes.length; i++) {
+					categories.put(markerTypes[i], categoryName);
 				}
 				tracker.registerObject(extension, categoryName, IExtensionTracker.REF_STRONG);
 				continue;
@@ -390,17 +391,20 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 	 * @param groupingEntries
 	 */
 	private void processGroupingEntries(Map<String, Collection<MarkerGroupingEntry>> groupingEntries) {
-		for (Entry<String, Collection<MarkerGroupingEntry>> entry : groupingEntries.entrySet()) {
-			String nextGroupId = entry.getKey();
+		Iterator<String> entriesIterator = groupingEntries.keySet().iterator();
+		while (entriesIterator.hasNext()) {
+			String nextGroupId = entriesIterator.next();
+			Iterator<MarkerGroupingEntry> nextEntriesIterator = groupingEntries.get(nextGroupId).iterator();
 			if (markerGroups.containsKey(nextGroupId)) {
-				MarkerGroup group = markerGroups.get(nextGroupId);
-				for (MarkerGroupingEntry markerGroupingEntry : entry.getValue()) {
-					markerGroupingEntry.setGroup(group);
+				while (nextEntriesIterator.hasNext()) {
+					MarkerGroupingEntry next = nextEntriesIterator.next();
+					next.setGroup(markerGroups.get(nextGroupId));
 				}
 			} else {
-				for (MarkerGroupingEntry markerGroupingEntry : entry.getValue()) {
+				while (nextEntriesIterator.hasNext()) {
+					MarkerGroupingEntry next = nextEntriesIterator.next();
 					IDEWorkbenchPlugin.log(NLS.bind("markerGroupingEntry {0} defines invalid group {1}", //$NON-NLS-1$
-							new String[] { markerGroupingEntry.getId(), nextGroupId }));
+							new String[] { next.getId(), nextGroupId }));
 				}
 			}
 		}
@@ -430,12 +434,12 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 			}
 			IConfigurationElement[] mappings = attributeGrouping.getElement().getChildren(ATTRIBUTE_MAPPING);
 
-			for (IConfigurationElement mapping : mappings) {
-				String entryId = mapping.getAttribute(MARKER_GROUPING_ENTRY);
+			for (int i = 0; i < mappings.length; i++) {
+				String entryId = mappings[i].getAttribute(MARKER_GROUPING_ENTRY);
 
 				if (entryIDsToEntries.containsKey(entryId)) {
 					MarkerGroupingEntry entry = entryIDsToEntries.get(entryId);
-					entry.getMarkerGroup().mapAttribute(attributeGrouping, entry, mapping.getAttribute(VALUE));
+					entry.getMarkerGroup().mapAttribute(attributeGrouping, entry, mappings[i].getAttribute(VALUE));
 				} else {
 					IDEWorkbenchPlugin.log(NLS.bind(
 							"Reference to invaild markerGroupingEntry {0}", //$NON-NLS-1$
@@ -582,18 +586,19 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 		}
 
 		List<MarkerType> selectedTypes = new ArrayList<>();
-		for (IConfigurationElement type : element.getChildren(SELECTED_TYPE)) {
-			String markerId = type.getAttribute(MARKER_ID);
+		IConfigurationElement[] types = element.getChildren(SELECTED_TYPE);
+		for (int j = 0; j < types.length; j++) {
+			String markerId = types[j].getAttribute(MARKER_ID);
 			if (markerId != null) {
-				MarkerType markerType = filter.getMarkerType(markerId);
-				if (markerType == null) {
+				MarkerType type = filter.getMarkerType(markerId);
+				if (type == null) {
 					IStatus status = new Status(IStatus.WARNING, IDEWorkbenchPlugin.IDE_WORKBENCH, IStatus.WARNING,
 							NLS.bind(MarkerMessages.ProblemFilterRegistry_nullType,
 									new Object[] { markerId, filter.getName() }),
 							null);
 					IDEWorkbenchPlugin.getDefault().getLog().log(status);
 				} else {
-					selectedTypes.add(markerType);
+					selectedTypes.add(type);
 				}
 			}
 		}
@@ -608,46 +613,46 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 	@Override
 	public void removeExtension(IExtension extension, Object[] objects) {
 
-		for (Object object : objects) {
-			if (object instanceof ProblemFilter) {
-				registeredFilters.remove(object);
+		for (int i = 0; i < objects.length; i++) {
+			if (objects[i] instanceof ProblemFilter) {
+				registeredFilters.remove(objects[i]);
 				continue;
 			}
 
-			if (object instanceof MarkerGroup) {
-				markerGroups.remove(((MarkerGroup) object).getId());
+			if (objects[i] instanceof MarkerGroup) {
+				markerGroups.remove(((MarkerGroup) objects[i]).getId());
 				continue;
 			}
 
-			if (object instanceof MarkerGroupingEntry) {
-				MarkerGroupingEntry entry = (MarkerGroupingEntry) object;
+			if (objects[i] instanceof MarkerGroupingEntry) {
+				MarkerGroupingEntry entry = (MarkerGroupingEntry) objects[i];
 				entry.getMarkerGroup().remove(entry);
 				continue;
 			}
 
-			if (object instanceof AttributeMarkerGrouping) {
-				AttributeMarkerGrouping entry = (AttributeMarkerGrouping) object;
+			if (objects[i] instanceof AttributeMarkerGrouping) {
+				AttributeMarkerGrouping entry = (AttributeMarkerGrouping) objects[i];
 				entry.unmap();
 				continue;
 			}
 
-			if (object instanceof String) {
-				removeValues((String) object, categories);
+			if (objects[i] instanceof String) {
+				removeValues((String) objects[i], categories);
 				continue;
 			}
 
-			if (object instanceof MarkerField) {
-				fields.remove(MarkerSupportInternalUtilities.getId((MarkerField) object));
+			if (objects[i] instanceof MarkerField) {
+				fields.remove(MarkerSupportInternalUtilities.getId((MarkerField) objects[i]));
 				continue;
 			}
 
-			if (object instanceof ContentGeneratorDescriptor) {
-				generators.remove(((ContentGeneratorDescriptor) object).getId());
+			if (objects[i] instanceof ContentGeneratorDescriptor) {
+				generators.remove(((ContentGeneratorDescriptor) objects[i]).getId());
 				continue;
 			}
 
-			if (object instanceof IConfigurationElement) {
-				IConfigurationElement element = (IConfigurationElement) object;
+			if (objects[i] instanceof IConfigurationElement) {
+				IConfigurationElement element = (IConfigurationElement) objects[i];
 				ContentGeneratorDescriptor generatorDesc = generators.get(element.getAttribute(ATTRIBUTE_GENERATOR_ID));
 				generatorDesc.removeExtension(element);
 				continue;
@@ -664,13 +669,16 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 	 */
 	private void removeValues(String value, Map<String, String> cache) {
 		Collection<String> keysToRemove = new ArrayList<>();
-		for (Entry<String, String> entry : cache.entrySet()) {
-			if (entry.getValue().equals(value)) {
-				keysToRemove.add(entry.getKey());
+		Iterator<String> keys = cache.keySet().iterator();
+		while (keys.hasNext()) {
+			String key = keys.next();
+			if (cache.get(key).equals(value)) {
+				keysToRemove.add(key);
 			}
 		}
-		for (String toRemove : keysToRemove) {
-			cache.remove(toRemove);
+		Iterator<String> keysToRemoveIterator = keysToRemove.iterator();
+		while (keysToRemoveIterator.hasNext()) {
+			cache.remove(keysToRemoveIterator.next());
 		}
 	}
 
@@ -743,15 +751,16 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 	 * @return TableSorter or <code>null</code>.
 	 */
 	private TableComparator findSorterInChildren(String typeName, MarkerType type) {
+		MarkerType[] types = type.getAllSubTypes();
 		TableComparator defaultSorter = null;
 		if (hierarchyOrders.containsKey(type.getId())) {
 			defaultSorter = hierarchyOrders.get(type.getId());
 		}
 
-		for (MarkerType markerSubType : type.getAllSubTypes()) {
-			MarkerType[] subtypes = markerSubType.getAllSubTypes();
-			for (MarkerType subtype : subtypes) {
-				TableComparator sorter = findSorterInChildren(typeName, subtype);
+		for (int i = 0; i < types.length; i++) {
+			MarkerType[] subtypes = types[i].getAllSubTypes();
+			for (int j = 0; j < subtypes.length; j++) {
+				TableComparator sorter = findSorterInChildren(typeName, subtypes[j]);
 				if (sorter != null) {
 					return sorter;
 				}

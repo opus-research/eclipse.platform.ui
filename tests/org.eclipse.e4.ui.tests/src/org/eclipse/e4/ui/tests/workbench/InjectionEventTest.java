@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,7 @@ import org.eclipse.e4.core.di.IInjector;
 import org.eclipse.e4.core.di.InjectorFactory;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.EventTopic;
-import org.eclipse.e4.core.di.internal.extensions.util.EventUtils;
+import org.eclipse.e4.core.di.extensions.EventUtils;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.tests.Activator;
@@ -33,7 +33,9 @@ import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.swt.widgets.Display;
 import org.junit.Before;
 import org.junit.Test;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
 import org.osgi.service.event.EventAdmin;
 
 public class InjectionEventTest {
@@ -121,9 +123,13 @@ public class InjectionEventTest {
 
 	@Before
 	public void setUp() throws Exception {
-		BundleContext bundleContext = Activator.getDefault().getBundle().getBundleContext();
-		IEclipseContext localContext = EclipseContextFactory.getServiceContext(bundleContext);
-		helper = ContextInjectionFactory.make(EventAdminHelper.class, localContext);
+		ensureEventAdminStarted();
+		BundleContext bundleContext = Activator.getDefault().getBundle()
+				.getBundleContext();
+		IEclipseContext localContext = EclipseContextFactory
+				.getServiceContext(bundleContext);
+		helper = ContextInjectionFactory.make(EventAdminHelper.class,
+				localContext);
 	}
 
 	@Test
@@ -266,4 +272,21 @@ public class InjectionEventTest {
 		target.valid = false;
 	}
 
+	private void ensureEventAdminStarted() {
+		if (Activator.getDefault().getEventAdmin() == null) {
+			Bundle[] bundles = Activator.getDefault().getBundle()
+					.getBundleContext().getBundles();
+			for (Bundle bundle : bundles) {
+				if (!"org.eclipse.equinox.event".equals(bundle
+						.getSymbolicName()))
+					continue;
+				try {
+					bundle.start(Bundle.START_TRANSIENT);
+				} catch (BundleException e) {
+					e.printStackTrace();
+				}
+				break;
+			}
+		}
+	}
 }

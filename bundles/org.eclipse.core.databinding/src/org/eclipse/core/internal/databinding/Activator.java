@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 Tom Schindl and others.
+ * Copyright (c) 2007, 2008 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -82,8 +82,9 @@ public class Activator implements BundleActivator {
 		}
 
 		if (status.isMultiStatus()) {
-			for (IStatus child : status.getChildren()) {
-				childlist.add(createLogEntry(child));
+			IStatus[] children = status.getChildren();
+			for (int i = 0; i < children.length; i++) {
+				childlist.add(createLogEntry(children[i]));
 			}
 		}
 

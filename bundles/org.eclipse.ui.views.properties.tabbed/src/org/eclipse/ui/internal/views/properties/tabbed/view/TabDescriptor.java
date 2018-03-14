@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2001, 2016 IBM Corporation and others.
+ * Copyright (c) 2001, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,25 +7,24 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 package org.eclipse.ui.internal.views.properties.tabbed.view;
+
+import com.ibm.icu.text.MessageFormat;
+
+import org.eclipse.swt.graphics.Image;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.swt.graphics.Image;
+
+import org.eclipse.ui.internal.views.properties.tabbed.TabbedPropertyViewPlugin;
 import org.eclipse.ui.internal.views.properties.tabbed.TabbedPropertyViewStatusCodes;
 import org.eclipse.ui.internal.views.properties.tabbed.l10n.TabbedPropertyMessages;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.views.properties.tabbed.AbstractTabDescriptor;
 import org.eclipse.ui.views.properties.tabbed.ISectionDescriptor;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
-
-import com.ibm.icu.text.MessageFormat;
 
 /**
  * Represents the default implementation of a tab descriptor on the tabbed
@@ -99,7 +98,6 @@ public class TabDescriptor extends AbstractTabDescriptor {
 	 *
 	 * @return the unique identifier for the tab.
 	 */
-	@Override
 	public String getId() {
 		return id;
 	}
@@ -109,7 +107,6 @@ public class TabDescriptor extends AbstractTabDescriptor {
 	 *
 	 * @return the text label for the tab.
 	 */
-	@Override
 	public String getLabel() {
 		return label;
 	}
@@ -121,7 +118,6 @@ public class TabDescriptor extends AbstractTabDescriptor {
 	 *
 	 * @return the identifier of the tab.
 	 */
-	@Override
 	public String getAfterTab() {
 		if (afterTab == null) {
 			return super.getAfterTab();
@@ -134,7 +130,6 @@ public class TabDescriptor extends AbstractTabDescriptor {
 	 *
 	 * @return Get the category this tab belongs to.
 	 */
-	@Override
 	public String getCategory() {
 		return category;
 	}
@@ -187,7 +182,9 @@ public class TabDescriptor extends AbstractTabDescriptor {
 		return false;
 	}
 
-	@Override
+	/**
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString() {
 		return getId();
 	}
@@ -205,11 +202,11 @@ public class TabDescriptor extends AbstractTabDescriptor {
 			CoreException exception) {
 		String pluginId = configurationElement.getDeclaringExtension()
 				.getNamespaceIdentifier();
-		String message = MessageFormat.format(TAB_ERROR, pluginId);
+		String message = MessageFormat.format(TAB_ERROR,
+				new Object[] { pluginId });
 		IStatus status = new Status(IStatus.ERROR, pluginId,
 				TabbedPropertyViewStatusCodes.TAB_ERROR, message, exception);
-		Bundle bundle = FrameworkUtil.getBundle(TabDescriptor.class);
-		Platform.getLog(bundle).log(status);
+		TabbedPropertyViewPlugin.getPlugin().getLog().log(status);
 	}
 
 	/**
@@ -261,7 +258,6 @@ public class TabDescriptor extends AbstractTabDescriptor {
 	 *
 	 * @return the image for the tab.
 	 */
-	@Override
 	public Image getImage() {
 		return image;
 	}
@@ -271,7 +267,6 @@ public class TabDescriptor extends AbstractTabDescriptor {
 	 *
 	 * @return <code>true</code> if the tab is selected.
 	 */
-	@Override
 	public boolean isSelected() {
 		return selected;
 	}
@@ -281,7 +276,6 @@ public class TabDescriptor extends AbstractTabDescriptor {
 	 *
 	 * @return <code>true</code> if the tab should be displayed as indented.
 	 */
-	@Override
 	public boolean isIndented() {
 		return indented;
 	}
@@ -291,7 +285,6 @@ public class TabDescriptor extends AbstractTabDescriptor {
 	 *
 	 * @return the text label for the tab.
 	 */
-	@Override
 	public String getText() {
 		return label;
 	}

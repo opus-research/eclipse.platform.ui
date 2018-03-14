@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -174,12 +174,12 @@ public final class NavigatorActivationService implements
 			boolean toEnable) {
 
 		if (toEnable) {
-			for (String aNavigatorExtensionId : aNavigatorExtensionIds) {
-				activatedExtensionsMap.put(aNavigatorExtensionId, Boolean.TRUE);
+			for (int i = 0; i < aNavigatorExtensionIds.length; i++) {
+				activatedExtensionsMap.put(aNavigatorExtensionIds[i], Boolean.TRUE);
 			}
 		} else {
-			for (String aNavigatorExtensionId : aNavigatorExtensionIds) {
-				activatedExtensionsMap.put(aNavigatorExtensionId, Boolean.FALSE);
+			for (int i = 0; i < aNavigatorExtensionIds.length; i++) {
+				activatedExtensionsMap.put(aNavigatorExtensionIds[i], Boolean.FALSE);
 			}
 		}
 		notifyListeners(aNavigatorExtensionIds, toEnable);
@@ -248,8 +248,8 @@ public final class NavigatorActivationService implements
 				Arrays.sort(navigatorExtensionIds);
 
 			Object[] listenerArray = listeners.getListeners();
-			for (Object element : listenerArray) {
-				((IExtensionActivationListener) element)
+			for (int i = 0; i < listenerArray.length; i++) {
+				((IExtensionActivationListener) listenerArray[i])
 						.onExtensionActivation(contentService.getViewerId(),
 								navigatorExtensionIds, toEnable);
 			}
@@ -272,15 +272,15 @@ public final class NavigatorActivationService implements
 			String id = null;
 			String booleanString = null;
 			int indx=0;
-			for (String contentExtensionId : contentExtensionIds) {
-				if( (indx = contentExtensionId.indexOf(EQUALS)) > -1) {
+			for (int i = 0; i < contentExtensionIds.length; i++) {
+				if( (indx = contentExtensionIds[i].indexOf(EQUALS)) > -1) {
 					// up to but not including the equals
-					id = contentExtensionId.substring(0, indx);
-					booleanString = contentExtensionId.substring(indx+1, contentExtensionId.length());
+					id = contentExtensionIds[i].substring(0, indx);
+					booleanString = contentExtensionIds[i].substring(indx+1, contentExtensionIds[i].length());
 					activatedExtensionsMap.put(id, Boolean.valueOf(booleanString));
 				} else {
 					// IS THIS THE RIGHT WAY TO HANDLE THIS CASE?
-					NavigatorContentDescriptor descriptor = CONTENT_DESCRIPTOR_REGISTRY.getContentDescriptor(contentExtensionId);
+					NavigatorContentDescriptor descriptor = CONTENT_DESCRIPTOR_REGISTRY.getContentDescriptor(contentExtensionIds[i]);
 					if(descriptor != null)
 						activatedExtensionsMap.put(id, Boolean.valueOf(descriptor.isActiveByDefault()));
 				}
@@ -295,9 +295,9 @@ public final class NavigatorActivationService implements
 			 */
 			INavigatorContentDescriptor[] contentDescriptors = CONTENT_DESCRIPTOR_REGISTRY
 					.getAllContentDescriptors();
-			for (INavigatorContentDescriptor contentDescriptor : contentDescriptors) {
-				if (contentDescriptor.isActiveByDefault()) {
-					activatedExtensionsMap.put(contentDescriptor.getId(), Boolean.TRUE);
+			for (int i = 0; i < contentDescriptors.length; i++) {
+				if (contentDescriptors[i].isActiveByDefault()) {
+					activatedExtensionsMap.put(contentDescriptors[i].getId(), Boolean.TRUE);
 				}
 			}
 		}
@@ -314,9 +314,9 @@ public final class NavigatorActivationService implements
 
 		Set<NavigatorContentDescriptor> activatedDescriptors = new HashSet<NavigatorContentDescriptor>();
 		setActive(extensionIds, true);
-		for (String extensionId : extensionIds) {
+		for (int extId = 0; extId < extensionIds.length; extId++) {
 			activatedDescriptors.add(CONTENT_DESCRIPTOR_REGISTRY
-					.getContentDescriptor(extensionId));
+					.getContentDescriptor(extensionIds[extId]));
 		}
 
 		if (toDeactivateAllOthers) {
@@ -324,10 +324,11 @@ public final class NavigatorActivationService implements
 					.getAllContentDescriptors();
 			List<NavigatorContentDescriptor> descriptorList = new ArrayList<NavigatorContentDescriptor>(Arrays.asList(descriptors));
 
-			for (NavigatorContentDescriptor descriptor : descriptors) {
-				for (String extensionId : extensionIds) {
-					if (descriptor.getId().equals(extensionId)) {
-						descriptorList.remove(descriptor);
+			for (int descriptorIndx = 0; descriptorIndx < descriptors.length; descriptorIndx++) {
+				for (int extId = 0; extId < extensionIds.length; extId++) {
+					if (descriptors[descriptorIndx].getId().equals(
+							extensionIds[extId])) {
+						descriptorList.remove(descriptors[descriptorIndx]);
 					}
 				}
 			}
@@ -361,10 +362,11 @@ public final class NavigatorActivationService implements
 					.getAllContentDescriptors();
 			List<NavigatorContentDescriptor> descriptorList = new ArrayList<NavigatorContentDescriptor>(Arrays.asList(descriptors));
 
-			for (NavigatorContentDescriptor descriptor : descriptors) {
-				for (String extensionId : extensionIds) {
-					if (descriptor.getId().equals(extensionId)) {
-						descriptorList.remove(descriptor);
+			for (int descriptorIndx = 0; descriptorIndx < descriptors.length; descriptorIndx++) {
+				for (int extId = 0; extId < extensionIds.length; extId++) {
+					if (descriptors[descriptorIndx].getId().equals(
+							extensionIds[extId])) {
+						descriptorList.remove(descriptors[descriptorIndx]);
 					}
 				}
 			}

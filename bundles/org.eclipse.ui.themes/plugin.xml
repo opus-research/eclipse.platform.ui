@@ -3,6 +3,12 @@
 <plugin>
    <extension
          point="org.eclipse.e4.ui.css.swt.theme">
+   <theme
+         basestylesheeturi="css/e4_default_gtk.css"
+         id="org.eclipse.e4.ui.css.theme.e4_default"
+         label="%theme.aix"
+         os="aix">
+   </theme>
       <theme
             basestylesheeturi="css/e4_classic_winxp.css"
             id="org.eclipse.e4.ui.css.theme.e4_classic"
@@ -32,14 +38,26 @@
             label="%theme.gtk"
             os="linux">
       </theme>
+   <theme
+         basestylesheeturi="css/e4_classic_winxp.css"
+         id="org.eclipse.e4.ui.css.theme.e4_default"
+         label="%theme.hpux"
+         os="hpux">
+   </theme>
       <theme
             basestylesheeturi="css/e4_default_mac.css"
             id="org.eclipse.e4.ui.css.theme.e4_default"
             label="%theme.mac"
             os="macosx">
       </theme>
+   <theme
+         basestylesheeturi="css/e4_default_gtk.css"
+         id="org.eclipse.e4.ui.css.theme.e4_default"
+         label="%theme.solaris"
+         os="solaris">
+   </theme>
       <theme
-            basestylesheeturi="css/e4_default_win.css"
+            basestylesheeturi="css/e4_default_win7.css"
             id="org.eclipse.e4.ui.css.theme.e4_default"
             label="%theme.win"
             os="win32"

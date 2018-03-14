@@ -331,7 +331,8 @@ public class PatternFilter extends ViewerFilter {
 
 		// Otherwise check if any of the words of the text matches
 		String[] words = getWords(text);
-		for (String word : words) {
+		for (int i = 0; i < words.length; i++) {
+			String word = words[i];
 			if (match(word)) {
 				return true;
 			}

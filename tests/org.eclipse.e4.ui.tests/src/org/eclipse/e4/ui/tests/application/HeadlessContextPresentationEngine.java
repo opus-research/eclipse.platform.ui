@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -74,10 +74,9 @@ public class HeadlessContextPresentationEngine implements IPresentationEngine {
 	private static void populateModelInterfaces(MContext contextModel,
 			IEclipseContext context, Class<?>[] interfaces) {
 		for (Class<?> intf : interfaces) {
-			if (Policy.DEBUG_CONTEXTS) {
-				Activator.trace(Policy.DEBUG_CONTEXTS_FLAG, "Adding " + intf.getName() + " for " //$NON-NLS-1$ //$NON-NLS-2$
-						+ contextModel.getClass().getName(), null);
-			}
+			Activator.trace(Policy.DEBUG_CONTEXTS,
+					"Adding " + intf.getName() + " for " //$NON-NLS-1$ //$NON-NLS-2$
+							+ contextModel.getClass().getName(), null);
 			context.set(intf.getName(), contextModel);
 
 			populateModelInterfaces(contextModel, context, intf.getInterfaces());

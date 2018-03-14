@@ -13,6 +13,7 @@ package org.eclipse.ui.internal.progress;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -75,6 +76,7 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 						return !progressViewer.getControl().isDisposed();
 					}
 
+
 					@Override
 					public boolean shouldRun() {
 						return !progressViewer.getControl().isDisposed();
@@ -94,7 +96,8 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 						if (element == null) {
 							refresh();
 						} else {
-							ProgressViewerContentProvider.this.remove(new Object[] { element });
+							ProgressViewerContentProvider.this
+									.remove(new Object[] { element });
 						}
 						return Status.OK_STATUS;
 					}
@@ -115,8 +118,9 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 
 	@Override
 	public void refresh(Object[] elements) {
-		for (Object refresh : getRoots(elements, true)) {
-			progressViewer.refresh(refresh, true);
+		Object[] refreshes = getRoots(elements, true);
+		for (int i = 0; i < refreshes.length; i++) {
+			progressViewer.refresh(refreshes[i], true);
 		}
 	}
 
@@ -134,7 +138,8 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 
 		Set all = new HashSet();
 
-		for (Object element : elements) {
+		for (int i = 0; i < elements.length; i++) {
+			Object element = elements[i];
 			all.add(element);
 		}
 
@@ -165,19 +170,19 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 			return elements;
 		}
 		HashSet roots = new HashSet();
-		for (Object element : elements) {
-			JobTreeElement jobTreeElement = (JobTreeElement) element;
-			if (jobTreeElement.isJobInfo()) {
-				GroupInfo group = ((JobInfo) jobTreeElement).getGroupInfo();
+		for (int i = 0; i < elements.length; i++) {
+			JobTreeElement element = (JobTreeElement) elements[i];
+			if (element.isJobInfo()) {
+				GroupInfo group = ((JobInfo) element).getGroupInfo();
 				if (group == null) {
-					roots.add(jobTreeElement);
+					roots.add(element);
 				} else {
 					if (subWithParent) {
 						roots.add(group);
 					}
 				}
 			} else {
-				roots.add(jobTreeElement);
+				roots.add(element);
 			}
 		}
 		return roots.toArray();

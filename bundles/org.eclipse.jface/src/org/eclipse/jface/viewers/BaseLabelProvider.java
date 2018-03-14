@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -64,8 +64,8 @@ public class BaseLabelProvider extends EventManager implements IBaseLabelProvide
 	 */
 	protected void fireLabelProviderChanged(final LabelProviderChangedEvent event) {
 		Object[] listeners = getListeners();
-		for (Object listener : listeners) {
-			final ILabelProviderListener l = (ILabelProviderListener) listener;
+		for (int i = 0; i < listeners.length; ++i) {
+			final ILabelProviderListener l = (ILabelProviderListener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {
 				@Override
 				public void run() {

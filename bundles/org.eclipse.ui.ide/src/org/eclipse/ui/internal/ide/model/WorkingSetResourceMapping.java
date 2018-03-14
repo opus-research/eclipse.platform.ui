@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -56,8 +56,12 @@ public class WorkingSetResourceMapping extends ResourceMapping {
 	@Override
 	public IProject[] getProjects() {
 		Set<IProject> result = new HashSet<>();
-		for (ResourceMapping mapping : getMappings()) {
-			for (IProject project : mapping.getProjects()) {
+		ResourceMapping[] mappings = getMappings();
+		for (int i = 0; i < mappings.length; i++) {
+			ResourceMapping mapping = mappings[i];
+			IProject[] projects = mapping.getProjects();
+			for (int j = 0; j < projects.length; j++) {
+				IProject project = projects[j];
 				result.add(project);
 			}
 		}
@@ -71,7 +75,8 @@ public class WorkingSetResourceMapping extends ResourceMapping {
 		SubMonitor subMonitor = SubMonitor.convert(mon, mappings.length);
 
 		List<ResourceTraversal> result = new ArrayList<>();
-		for (ResourceMapping mapping : mappings) {
+		for (int i = 0; i < mappings.length; i++) {
+			ResourceMapping mapping = mappings[i];
 			result.addAll(Arrays.asList(mapping.getTraversals(context, subMonitor.split(1))));
 		}
 		return result.toArray(new ResourceTraversal[result.size()]);
@@ -82,11 +87,13 @@ public class WorkingSetResourceMapping extends ResourceMapping {
 	 * @return the mappings contained in the set
 	 */
 	private ResourceMapping[] getMappings() {
+		IAdaptable[] elements = set.getElements();
 		List<ResourceMapping> result = new ArrayList<>();
-		for (IAdaptable adaptable : set.getElements()) {
-			ResourceMapping mapping = WorkingSetAdapterFactory.getContributedResourceMapping(adaptable);
+		for (int i = 0; i < elements.length; i++) {
+			IAdaptable element = elements[i];
+			ResourceMapping mapping = WorkingSetAdapterFactory.getContributedResourceMapping(element);
 			if (mapping == null) {
-				mapping = WorkingSetAdapterFactory.getResourceMapping(adaptable);
+				mapping = WorkingSetAdapterFactory.getResourceMapping(element);
 			}
 			if (mapping != null) {
 				result.add(mapping);
@@ -97,7 +104,9 @@ public class WorkingSetResourceMapping extends ResourceMapping {
 
 	@Override
 	public boolean contains(ResourceMapping mapping) {
-		for (ResourceMapping childMapping : getMappings()) {
+		ResourceMapping[] mappings = getMappings();
+		for (int i = 0; i < mappings.length; i++) {
+			ResourceMapping childMapping = mappings[i];
 			if (childMapping.contains(mapping)) {
 				return true;
 			}

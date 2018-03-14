@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -154,8 +154,9 @@ public class CopyProjectOperation extends AbstractCopyOrMoveResourcesOperation {
 			IResourceChangeDescriptionFactory factory, int operation) {
 		boolean update = false;
 		if (operation == UNDO) {
-			for (IResource resource : resources) {
+			for (int i = 0; i < resources.length; i++) {
 				update = true;
+				IResource resource = resources[i];
 				factory.delete(resource);
 			}
 		} else {

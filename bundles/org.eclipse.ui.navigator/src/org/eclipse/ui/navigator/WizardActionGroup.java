@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -206,9 +205,9 @@ public final class WizardActionGroup extends ActionGroup {
 			Map<String, SortedSet> groups = findGroups();
 			SortedSet sortedWizards = null;
 			String menuGroupId = null;
-			for (Entry<String, SortedSet> entry : groups.entrySet()) {
-				menuGroupId = entry.getKey();
-				sortedWizards = entry.getValue();
+			for (Iterator<String> menuGroupItr = groups.keySet().iterator(); menuGroupItr.hasNext();) {
+				menuGroupId = menuGroupItr.next();
+				sortedWizards = groups.get(menuGroupId);
 				menu.add(new Separator(menuGroupId));
 				for (Iterator wizardItr = sortedWizards.iterator(); wizardItr.hasNext();) {
 					menu.add((IAction) wizardItr.next());
@@ -225,14 +224,14 @@ public final class WizardActionGroup extends ActionGroup {
 		Map<String, SortedSet> groups = new TreeMap<String, SortedSet>();
 		SortedSet<IAction> sortedWizards = null;
 		String menuGroupId = null;
-		for (CommonWizardDescriptor descriptor : descriptors) {
-			menuGroupId = descriptor.getMenuGroupId() != null ?
-							descriptor.getMenuGroupId() : CommonWizardDescriptor.DEFAULT_MENU_GROUP_ID;
+		for (int i = 0; i < descriptors.length; i++) {
+			menuGroupId = descriptors[i].getMenuGroupId() != null ?
+							descriptors[i].getMenuGroupId() : CommonWizardDescriptor.DEFAULT_MENU_GROUP_ID;
 			sortedWizards = groups.get(menuGroupId);
 			if(sortedWizards == null) {
-				groups.put(descriptor.getMenuGroupId(), sortedWizards = new TreeSet<IAction>(ActionComparator.INSTANCE));
+				groups.put(descriptors[i].getMenuGroupId(), sortedWizards = new TreeSet<IAction>(ActionComparator.INSTANCE));
 			}
-			if ((action = getAction(descriptor.getWizardId())) != null) {
+			if ((action = getAction(descriptors[i].getWizardId())) != null) {
 				sortedWizards.add(action);
 			}
 		}

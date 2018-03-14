@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2016 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,6 +20,8 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Layout;
@@ -31,9 +33,11 @@ import org.osgi.service.event.Event;
  */
 public class SashRenderer extends SWTPartRenderer {
 
+	private static final int UNDEFINED_WEIGHT = -1;
 	private static final int DEFAULT_WEIGHT = 5000;
 
 	private int processedContent = 0;
+
 
 	@SuppressWarnings("unchecked")
 	@Inject
@@ -50,7 +54,8 @@ public class SashRenderer extends SWTPartRenderer {
 	@SuppressWarnings("unchecked")
 	@Inject
 	@Optional
-	private void subscribeTopicSashWeightChanged(@UIEventTopic(UIEvents.UIElement.TOPIC_CONTAINERDATA) Event event) {
+	private void subscribeTopicSashWeightChanged(
+			@UIEventTopic(UIEvents.UIElement.TOPIC_CONTAINERDATA) Event event) {
 		// Ensure that this event is for a MPartSashContainer
 		MUIElement element = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
 		if (element.getRenderer() != SashRenderer.this) {
@@ -67,9 +72,8 @@ public class SashRenderer extends SWTPartRenderer {
 			return;
 		}
 		// layout the containing Composite
-		while (!(pscModel.getWidget() instanceof Composite)) {
+		while (!(pscModel.getWidget() instanceof Composite))
 			pscModel = pscModel.getParent();
-		}
 
 		Composite s = (Composite) pscModel.getWidget();
 		Layout layout = s.getLayout();
@@ -92,9 +96,12 @@ public class SashRenderer extends SWTPartRenderer {
 
 			// If my layout's container gets disposed 'unbind' the sash elements
 			if (parent instanceof Composite) {
-				((Composite) parent).addDisposeListener(e -> {
-					element.setWidget(null);
-					element.setRenderer(null);
+				((Composite) parent).addDisposeListener(new DisposeListener() {
+					@Override
+					public void widgetDisposed(DisposeEvent e) {
+						element.setWidget(null);
+						element.setRenderer(null);
+					}
 				});
 			}
 			return newRect;
@@ -113,9 +120,8 @@ public class SashRenderer extends SWTPartRenderer {
 			}
 		}
 		// This is a 'root' sash container, create a composite
-		if (sashComposite == null) {
+		if (sashComposite == null)
 			sashComposite = new Composite((Composite) parent, SWT.NONE);
-		}
 		sashComposite.setLayout(new SashLayout(sashComposite, element));
 
 		return sashComposite;
@@ -126,7 +132,11 @@ public class SashRenderer extends SWTPartRenderer {
 		super.childRendered(parentElement, element);
 
 		// Ensure that the element's 'containerInfo' is initialized
-		ensureLayoutWeight(element);
+		int weight = getLayoutWeight(element);
+		if (weight == UNDEFINED_WEIGHT) {
+			element.setContainerData(Integer.toString(DEFAULT_WEIGHT));
+		}
+
 		forceLayout(parentElement);
 	}
 
@@ -154,32 +164,31 @@ public class SashRenderer extends SWTPartRenderer {
 	public Object getUIContainer(MUIElement element) {
 		// OK, find the 'root' of the sash container
 		MUIElement parentElement = element.getParent();
-		while (parentElement.getRenderer() == this && !(parentElement.getWidget() instanceof Composite)) {
+		while (parentElement.getRenderer() == this
+				&& !(parentElement.getWidget() instanceof Composite))
 			parentElement = parentElement.getParent();
-		}
 
-		if (parentElement.getWidget() instanceof Composite) {
+		if (parentElement.getWidget() instanceof Composite)
 			return parentElement.getWidget();
-		}
+
 		return null;
 	}
 
 	/*
-	 * Container data is used by the SashLayout to determine the size of the
-	 * control
+	 *
 	 */
-	private static void ensureLayoutWeight(MUIElement element) {
-		int weight = DEFAULT_WEIGHT;
-
+	private static int getLayoutWeight(MUIElement element) {
 		String info = element.getContainerData();
-		if (info != null && info.length() > 0) {
-			try {
-				int value = Integer.parseInt(info);
-				weight = value;
-			} catch (NumberFormatException e) {
-				// continue to use the default value
-			}
+		if (info == null || info.length() == 0) {
+			element.setContainerData(Integer.toString(10000));
+			info = element.getContainerData();
 		}
-		element.setContainerData(Integer.toString(weight));
+
+		try {
+			int value = Integer.parseInt(info);
+			return value;
+		} catch (NumberFormatException e) {
+			return UNDEFINED_WEIGHT;
+		}
 	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2016 IBM Corporation and others.
+ * Copyright (c) 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -83,8 +82,6 @@ public class PerspectiveBuilder {
 
 	private ModeledPageLayoutUtils layoutUtils;
 
-	private Integer defaultFastViewSide;
-
 	@PostConstruct
 	private void postConstruct() {
 		layoutUtils = new ModeledPageLayoutUtils(modelService);
@@ -95,11 +92,6 @@ public class PerspectiveBuilder {
 		tags = perspective.getTags();
 		populate();
 		return perspective;
-	}
-
-	public MPerspective createPerspective(Integer defaultFastViewSide) {
-		this.defaultFastViewSide = defaultFastViewSide;
-		return createPerspective();
 	}
 
 	private void create() {
@@ -145,13 +137,12 @@ public class PerspectiveBuilder {
 
 	private void processStandaloneViews() {
 		Map<String, ViewLayoutReader> viewLayouts = perspReader.getViewLayouts();
-		for (Entry<String, ViewLayoutReader> entry : viewLayouts.entrySet()) {
-			String viewId = entry.getKey();
+		for (String viewId : viewLayouts.keySet()) {
 			MPlaceholder placeholder = viewPlaceholders.get(viewId);
 			if (placeholder == null) {
 				continue;
 			}
-			if (entry.getValue().isStandalone()) {
+			if (viewLayouts.get(viewId).isStandalone()) {
 				MElementContainer<MUIElement> parent = placeholder.getParent();
 				placeholder.setContainerData(parent.getContainerData());
 				parent.getChildren().remove(placeholder);
@@ -192,24 +183,7 @@ public class PerspectiveBuilder {
 
 		if (defaultFastViews.size() > 0) {
 			sb.append(DEFAULT_FASTVIEW_STACK).append(' ');
-			if (defaultFastViewSide != null) {
-				switch (defaultFastViewSide) {
-				case SWT.TOP:
-					sb.append(SideValue.TOP_VALUE).append(' ').append(topCounter++);
-					break;
-				case SWT.BOTTOM:
-					sb.append(SideValue.BOTTOM_VALUE).append(' ').append(bottomCounter++);
-					break;
-				case SWT.RIGHT:
-					sb.append(SideValue.RIGHT_VALUE).append(' ').append(rightCounter++);
-					break;
-				default:
-					sb.append(SideValue.LEFT_VALUE).append(' ').append(leftCounter++);
-					break;
-				}
-			} else {
-				sb.append(SideValue.BOTTOM_VALUE).append(' ').append(bottomCounter++);
-			}
+			sb.append(SideValue.BOTTOM_VALUE).append(' ').append(bottomCounter++);
 			sb.append('#');
 		}
 
@@ -421,20 +395,7 @@ public class PerspectiveBuilder {
 		List<String> views = perspReader.getDefaultFastViewBarViewIds();
 		if (views.size() > 0) {
 			stack = layoutUtils.createStack(DEFAULT_FASTVIEW_STACK, true);
-			MPartSashContainer psc = modelService.createModelElement(MPartSashContainer.class);
-			psc.setHorizontal(true);
-			psc.setContainerData(Integer.toString(5000));
-			stack.setContainerData(Integer.toString(2500));
-			psc.getChildren().add(stack);
-			List<MPartSashContainer> list = modelService.findElements(perspective, null, MPartSashContainer.class,
-					null);
-			if (list == null || list.size() == 0) {
-				perspective.getChildren().add(psc);
-			} else {
-				int size = list.size();
-				MPartSashContainer container = list.get(size - 1);
-				container.getChildren().add(psc);
-			}
+			perspective.getChildren().add(stack);
 			setPartState(stack, org.eclipse.ui.internal.e4.migration.InfoReader.PartState.MINIMIZED);
 
 			for (String view : views) {
@@ -502,8 +463,8 @@ public class PerspectiveBuilder {
 		}
 		List<MStackElement> originalOrder = new ArrayList<>(renderedViews);
 		stackChildren.clear();
-		for (int element : partOrder) {
-			stackChildren.add(originalOrder.get(element));
+		for (int i = 0; i < partOrder.length; i++) {
+			stackChildren.add(originalOrder.get(partOrder[i]));
 		}
 		originalOrder.removeAll(stackChildren);
 		stackChildren.addAll(originalOrder);
@@ -546,7 +507,9 @@ public class PerspectiveBuilder {
 		}
 		addLayoutTagsToPlaceholder(placeholder, partId);
 		stack.getChildren().add(placeholder);
-		viewPlaceholders.put(partId, placeholder);
+		if (viewPlaceholders.get(partId) != null) {
+			viewPlaceholders.put(partId, placeholder);
+		}
 	}
 
 	private void addLayoutTagsToPlaceholder(MPlaceholder placeholder, String partId) {
@@ -616,8 +579,8 @@ public class PerspectiveBuilder {
 		ArrayList<String> list = new ArrayList<>();
 		IExtension[] extensions = getPerspectiveExtensions();
 		if (extensions != null) {
-			for (IExtension extension : extensions) {
-				list.addAll(getExtensionShowInPartFromRegistry(extension, targetId));
+			for (int i = 0; i < extensions.length; i++) {
+				list.addAll(getExtensionShowInPartFromRegistry(extensions[i], targetId));
 			}
 		}
 		return list;
@@ -637,12 +600,12 @@ public class PerspectiveBuilder {
 	private static ArrayList<String> getExtensionShowInPartFromRegistry(IExtension extension, String targetId) {
 		ArrayList<String> list = new ArrayList<>();
 		IConfigurationElement[] configElements = extension.getConfigurationElements();
-		for (IConfigurationElement configElement : configElements) {
-			String type = configElement.getName();
+		for (int j = 0; j < configElements.length; j++) {
+			String type = configElements[j].getName();
 			if (type.equals(IWorkbenchRegistryConstants.TAG_PERSPECTIVE_EXTENSION)) {
-				String id = configElement.getAttribute(IWorkbenchRegistryConstants.ATT_TARGET_ID);
+				String id = configElements[j].getAttribute(IWorkbenchRegistryConstants.ATT_TARGET_ID);
 				if (targetId.equals(id) || "*".equals(id)) { //$NON-NLS-1$
-					list.addAll(getConfigElementShowInPartsFromRegistry(configElement));
+					list.addAll(getConfigElementShowInPartsFromRegistry(configElements[j]));
 				}
 			}
 		}
@@ -653,7 +616,8 @@ public class PerspectiveBuilder {
 		ArrayList<String> list = new ArrayList<>();
 		String tag = IWorkbenchRegistryConstants.TAG_SHOW_IN_PART;
 		IConfigurationElement[] children = configElement.getChildren();
-		for (IConfigurationElement child : children) {
+		for (int nX = 0; nX < children.length; nX++) {
+			IConfigurationElement child = children[nX];
 			String ctype = child.getName();
 			if (tag.equals(ctype)) {
 				String tid = child.getAttribute(IWorkbenchRegistryConstants.ATT_ID);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -125,13 +125,13 @@ public class TreeFrame extends Frame {
         IMemento[] elementMem = memento.getChildren(TAG_ELEMENT);
         List elements = new ArrayList(elementMem.length);
 
-        for (IMemento currentMemento : elementMem) {
-            String factoryID = currentMemento.getString(TAG_FACTORY_ID);
+        for (int i = 0; i < elementMem.length; i++) {
+            String factoryID = elementMem[i].getString(TAG_FACTORY_ID);
             if (factoryID != null) {
                 IElementFactory factory = PlatformUI.getWorkbench()
                         .getElementFactory(factoryID);
                 if (factory != null) {
-					elements.add(factory.createElement(currentMemento));
+					elements.add(factory.createElement(elementMem[i]));
 				}
             }
         }
@@ -186,8 +186,8 @@ public class TreeFrame extends Frame {
      * @param memento memento to persist elements in
      */
     private void saveElements(Object[] elements, IMemento memento) {
-        for (Object element : elements) {
-			IPersistableElement persistable = Adapters.adapt(element, IPersistableElement.class);
+        for (int i = 0; i < elements.length; i++) {
+			IPersistableElement persistable = Adapters.adapt(elements[i], IPersistableElement.class);
 			if (persistable != null) {
 				IMemento elementMem = memento.createChild(TAG_ELEMENT);
 				elementMem.putString(TAG_FACTORY_ID, persistable.getFactoryId());

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -96,8 +96,6 @@ public class WizardArchiveFileResourceExportPage1 extends
                 | SWT.LEFT);
         compressContentsCheckbox.setText(DataTransferMessages.ZipExport_compressContents);
         compressContentsCheckbox.setFont(font);
-
-		createResolveLinkedResources(left, font);
 
         Composite right = new Composite(optionsGroup, SWT.NONE);
         right.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true, false));
@@ -198,7 +196,6 @@ public class WizardArchiveFileResourceExportPage1 extends
         op.setCreateLeadupStructure(createDirectoryStructureButton
                 .getSelection());
         op.setUseCompression(compressContentsCheckbox.getSelection());
-        op.setIncludeLinkedResources(resolveLinkedResourcesCheckbox.getSelection());
         op.setUseTarFormat(targzFormatButton.getSelection());
 
         try {
@@ -365,8 +362,8 @@ public class WizardArchiveFileResourceExportPage1 extends
 
             // destination
             setDestinationValue(directoryNames[0]);
-            for (String directoryName : directoryNames) {
-				addDestinationItem(directoryName);
+            for (int i = 0; i < directoryNames.length; i++) {
+				addDestinationItem(directoryNames[i]);
 			}
 
             boolean setStructure = settings

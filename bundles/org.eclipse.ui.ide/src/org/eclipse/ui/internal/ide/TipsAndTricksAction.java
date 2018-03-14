@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -70,9 +70,9 @@ public class TipsAndTricksAction extends PartEventAction implements
         AboutInfo[] featureInfos = IDEWorkbenchPlugin.getDefault()
                 .getFeatureInfos();
         ArrayList tipsAndTricksFeatures = new ArrayList(featureInfos.length);
-        for (AboutInfo featureInfo : featureInfos) {
-            if (featureInfo.getTipsAndTricksHref() != null) {
-				tipsAndTricksFeatures.add(featureInfo);
+        for (int i = 0; i < featureInfos.length; i++) {
+            if (featureInfos[i].getTipsAndTricksHref() != null) {
+				tipsAndTricksFeatures.add(featureInfos[i]);
 			}
         }
 

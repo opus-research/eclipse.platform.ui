@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -49,19 +49,20 @@ public class BuildUtilities {
 	 */
 	public static IProject[] extractProjects(Object[] selection) {
 		HashSet projects = new HashSet();
-		for (Object currentSelection : selection) {
-			IResource resource = ResourceUtil.getResource(currentSelection);
+		for (int i = 0; i < selection.length; i++) {
+			Object element = selection[i];
+			IResource resource = ResourceUtil.getResource(element);
 			if (resource != null) {
 				projects.add(resource.getProject());
 			} else {
-				ResourceMapping mapping = ResourceUtil.getResourceMapping(currentSelection);
+				ResourceMapping mapping = ResourceUtil.getResourceMapping(element);
 				if (mapping != null) {
 					IProject[] theProjects = mapping.getProjects();
-					for (IProject theProject : theProjects) {
-						projects.add(theProject);
+					for (int j = 0; j < theProjects.length; j++) {
+						projects.add(theProjects[j]);
 					}
 				} else {
-					Object marker = ResourceUtil.getAdapter(currentSelection, IMarker.class, false);
+					Object marker = ResourceUtil.getAdapter(element, IMarker.class, false);
 					if (marker instanceof IMarker) {
 						IProject project = ((IMarker) marker).getResource().getProject();
 						if (project != null) {
@@ -151,8 +152,9 @@ public class BuildUtilities {
 			}
 			try {
 				IProjectDescription description = projects[i].getDescription();
-				for (ICommand buildSpec : description.getBuildSpec()) {
-					if (buildSpec.isBuilding(trigger) == value) {
+				ICommand[] buildSpec = description.getBuildSpec();
+				for (int j = 0; j < buildSpec.length; j++) {
+					if (buildSpec[j].isBuilding(trigger) == value) {
 						return true;
 					}
 				}
@@ -174,12 +176,16 @@ public class BuildUtilities {
 			return;
 		}
 		IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
-		for (IWorkbenchWindow window : windows) {
-			for (IWorkbenchPage page : window.getPages()) {
+		for (int i = 0; i < windows.length; i++) {
+			IWorkbenchPage[] pages = windows[i].getPages();
+			for (int j = 0; j < pages.length; j++) {
+				IWorkbenchPage page = pages[j];
 				if (projects == null) {
 					page.saveAllEditors(false);
 				} else {
-					for (IEditorPart editor : page.getDirtyEditors()) {
+					IEditorPart[] editors = page.getDirtyEditors();
+					for (int k = 0; k < editors.length; k++) {
+						IEditorPart editor = editors[k];
 						IFile inputFile = ResourceUtil.getFile(editor.getEditorInput());
 						if (inputFile != null) {
 							if (projects.contains(inputFile.getProject())) {

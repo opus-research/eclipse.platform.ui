@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -76,7 +76,7 @@ public class MarkerCopyHandler extends MarkerViewHandler {
 	 * @return the marker report
 	 */
 	static String createMarkerReport(ExtendedMarkersView view, IMarker[] markers) {
-		StringBuilder report = new StringBuilder();
+		StringBuffer report = new StringBuffer();
 
 		MarkerField[] fields = view.getVisibleFields();
 
@@ -93,11 +93,11 @@ public class MarkerCopyHandler extends MarkerViewHandler {
 			}
 		}
 
-		for (IMarker marker : markers) {
+		for (int i = 0; i < markers.length; i++) {
 
 			for (int j = 0; j < fields.length; j++) {
 				report.append(fields[j].getValue(MarkerSupportInternalUtilities
-						.newMarkerItem(marker)));
+						.newMarkerItem(markers[i])));
 				if (j == fields.length - 1) {
 					report.append(NEWLINE);
 				} else {

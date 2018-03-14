@@ -58,7 +58,8 @@ public abstract class ComputedObservableMap<K, V> extends AbstractObservableMap<
 			Set<K> removedKeys = new HashSet<K>(event.diff.getRemovals());
 			Map<K, V> oldValues = new HashMap<>();
 			Map<K, V> newValues = new HashMap<>();
-			for (K removedKey : removedKeys) {
+			for (Iterator<K> it = removedKeys.iterator(); it.hasNext();) {
+				K removedKey = it.next();
 				V oldValue = null;
 				if (removedKey != null) {
 					oldValue = doGet(removedKey);
@@ -67,7 +68,8 @@ public abstract class ComputedObservableMap<K, V> extends AbstractObservableMap<
 				}
 				oldValues.put(removedKey, oldValue);
 			}
-			for (K addedKey : addedKeys) {
+			for (Iterator<K> it = addedKeys.iterator(); it.hasNext();) {
+				K addedKey = it.next();
 				V newValue = null;
 				if (addedKey != null) {
 					newValue = doGet(addedKey);
@@ -192,7 +194,8 @@ public abstract class ComputedObservableMap<K, V> extends AbstractObservableMap<
 			knownKeys = new IdentitySet<>();
 			keySet.addSetChangeListener(setChangeListener);
 			keySet.addStaleListener(staleListener);
-			for (K key : this.keySet) {
+			for (Iterator<K> it = this.keySet.iterator(); it.hasNext();) {
+				K key = it.next();
 				hookListener(key);
 				knownKeys.add(key);
 			}

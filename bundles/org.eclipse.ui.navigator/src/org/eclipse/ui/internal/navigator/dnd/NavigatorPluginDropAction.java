@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -61,10 +61,10 @@ public class NavigatorPluginDropAction implements IDropActionDelegate {
 							selection);
 
 			IStatus valid = null;
-			for (CommonDropAdapterAssistant assistant : assistants) {
-				valid = assistant.validatePluginTransferDrop(selection, target);
+			for (int i = 0; i < assistants.length; i++) {
+				valid = assistants[i].validatePluginTransferDrop(selection, target);
 				if (valid != null && valid.isOK()) {
-					valid = assistant.handlePluginTransferDrop(selection, target);
+					valid = assistants[i].handlePluginTransferDrop(selection, target);
 					return valid != null && valid.isOK();
 				}
 			}

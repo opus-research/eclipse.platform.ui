@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2017 Ruediger Herrmann and others.
+ * Copyright (c) 2006 Ruediger Herrmann and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,10 @@
  *******************************************************************************/
 package org.eclipse.jface.tests.viewers;
 
+import junit.framework.TestCase;
+
+import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.util.ILogger;
 import org.eclipse.jface.util.ISafeRunnableRunner;
 import org.eclipse.jface.util.Policy;
@@ -17,7 +21,6 @@ import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IElementComparer;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.swt.SWT;
@@ -25,17 +28,11 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import junit.framework.TestCase;
-
 public class ComboViewerComparerTest extends TestCase {
 
 	private Shell shell;
 
 	private StructuredViewer viewer;
-
-	private ILogger oldLogger;
-
-	private ISafeRunnableRunner oldRunner;
 
 	private static final class TestElement {
 
@@ -71,7 +68,7 @@ public class ComboViewerComparerTest extends TestCase {
 		// Select equal element with different identity
 		TestElement aElement = new TestElement("a");
 		viewer.setSelection(new StructuredSelection(aElement));
-		IStructuredSelection sel = viewer.getStructuredSelection();
+		StructuredSelection sel = ((StructuredSelection) viewer.getSelection());
 		assertEquals(false, sel.isEmpty());
 		TestElement selectedElement = (TestElement) sel.getFirstElement();
 		assertEquals(aElement.getName(), selectedElement.getName());
@@ -79,14 +76,20 @@ public class ComboViewerComparerTest extends TestCase {
 
 	@Override
 	protected void setUp() {
-		oldLogger = Policy.getLog();
-		oldRunner = SafeRunnable.getRunner();
-		Policy.setLog(status -> fail(status.getMessage()));
-		SafeRunnable.setRunner(code -> {
-			try {
-				code.run();
-			} catch (Throwable th) {
-				throw new RuntimeException(th);
+		Policy.setLog(new ILogger() {
+			@Override
+			public void log(IStatus status) {
+				fail(status.getMessage());
+			}
+		});
+		SafeRunnable.setRunner(new ISafeRunnableRunner() {
+			@Override
+			public void run(ISafeRunnable code) {
+				try {
+					code.run();
+				} catch (Throwable th) {
+					throw new RuntimeException(th);
+				}
 			}
 		});
 		Display display = Display.getCurrent();
@@ -102,8 +105,6 @@ public class ComboViewerComparerTest extends TestCase {
 
 	@Override
 	protected void tearDown() {
-		Policy.setLog(oldLogger);
-		SafeRunnable.setRunner(oldRunner);
 		processEvents();
 		viewer = null;
 		if (shell != null) {
