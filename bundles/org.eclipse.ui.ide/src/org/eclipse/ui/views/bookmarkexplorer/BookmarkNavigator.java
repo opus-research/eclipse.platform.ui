@@ -305,6 +305,9 @@ public class BookmarkNavigator extends ViewPart {
         });
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchPart.
+     */
     @Override
 	public void createPartControl(Composite parent) {
         clipboard = new Clipboard(parent.getDisplay());
@@ -444,6 +447,9 @@ public class BookmarkNavigator extends ViewPart {
         showInNavigatorAction.selectionChanged(selection);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IViewPart.
+     */
     @Override
 	public void init(IViewSite site, IMemento memento) throws PartInitException {
         super.init(site, memento);
@@ -587,6 +593,9 @@ public class BookmarkNavigator extends ViewPart {
 
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchPart.
+     */
     @Override
 	public void setFocus() {
         if (viewer != null) {
