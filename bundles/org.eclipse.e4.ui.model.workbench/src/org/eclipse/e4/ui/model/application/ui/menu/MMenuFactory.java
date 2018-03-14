@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ package org.eclipse.e4.ui.model.application.ui.menu;
  * <!-- begin-user-doc -->
  * The <b>Factory</b> for the model.
  * It provides a create method for each non-abstract class of the model.
+ * @since 1.0
  * <!-- end-user-doc -->
  * @generated
  */
@@ -127,24 +128,6 @@ public interface MMenuFactory {
 	MToolBarSeparator createToolBarSeparator();
 
 	/**
-	 * Returns a new object of class '<em>Rendered Menu</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Rendered Menu</em>'.
-	 * @generated
-	 */
-	MRenderedMenu createRenderedMenu();
-
-	/**
-	 * Returns a new object of class '<em>Rendered Tool Bar</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Rendered Tool Bar</em>'.
-	 * @generated
-	 */
-	MRenderedToolBar createRenderedToolBar();
-
-	/**
 	 * Returns a new object of class '<em>Tool Bar Contribution</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -163,48 +146,12 @@ public interface MMenuFactory {
 	MTrimContribution createTrimContribution();
 
 	/**
-	 * Returns a new object of class '<em>Rendered Menu Item</em>'.
+	 * Returns a new object of class '<em>Dynamic Menu Contribution</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Rendered Menu Item</em>'.
+	 * @return a new object of class '<em>Dynamic Menu Contribution</em>'.
 	 * @generated
 	 */
-	MRenderedMenuItem createRenderedMenuItem();
-
-	/**
-	 * Returns a new object of class '<em>Opaque Tool Item</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Opaque Tool Item</em>'.
-	 * @generated
-	 */
-	MOpaqueToolItem createOpaqueToolItem();
-
-	/**
-	 * Returns a new object of class '<em>Opaque Menu Item</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Opaque Menu Item</em>'.
-	 * @generated
-	 */
-	MOpaqueMenuItem createOpaqueMenuItem();
-
-	/**
-	 * Returns a new object of class '<em>Opaque Menu Separator</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Opaque Menu Separator</em>'.
-	 * @generated
-	 */
-	MOpaqueMenuSeparator createOpaqueMenuSeparator();
-
-	/**
-	 * Returns a new object of class '<em>Opaque Menu</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Opaque Menu</em>'.
-	 * @generated
-	 */
-	MOpaqueMenu createOpaqueMenu();
+	MDynamicMenuContribution createDynamicMenuContribution();
 
 } //MMenuFactory

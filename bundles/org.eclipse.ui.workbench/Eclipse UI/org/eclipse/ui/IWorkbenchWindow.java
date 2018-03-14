@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
 package org.eclipse.ui;
 
 import java.lang.reflect.InvocationTargetException;
-
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.jface.operation.IRunnableContext;
@@ -73,7 +72,8 @@ public interface IWorkbenchWindow extends IPageService, IRunnableContext,
      * 
      * @return the active page, or <code>null</code> if none
      */
-    public IWorkbenchPage getActivePage();
+    @Override
+	public IWorkbenchPage getActivePage();
 
     /**
      * Returns a list of the pages in this workbench window.
@@ -108,7 +108,8 @@ public interface IWorkbenchWindow extends IPageService, IRunnableContext,
      * @return the shell containing this window's controls or <code>null</code>
      *   if the shell has not been created yet or if the window has been closed
      */
-    public Shell getShell();
+    @Override
+	public Shell getShell();
 
     /**
      * Returns the workbench for this window.
@@ -196,14 +197,15 @@ public interface IWorkbenchWindow extends IPageService, IRunnableContext,
      * 
      * @since 3.2
      */
-    public void run(boolean fork, boolean cancelable, IRunnableWithProgress runnable) throws InvocationTargetException, InterruptedException;
+    @Override
+	public void run(boolean fork, boolean cancelable, IRunnableWithProgress runnable) throws InvocationTargetException, InterruptedException;
 
     /**
-     * Sets or clears the currently active page for this workbench window.
-     * 
-     * @param page
-     *            the new active page
-     */
+	 * Sets or clears the currently active page for this workbench window.
+	 * 
+	 * @param page
+	 *            the new active page, or <code>null</code> for no active page
+	 */
     public void setActivePage(IWorkbenchPage page);
     
     /**

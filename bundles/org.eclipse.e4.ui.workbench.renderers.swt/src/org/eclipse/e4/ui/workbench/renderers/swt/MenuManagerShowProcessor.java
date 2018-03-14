@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2012 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,17 +7,30 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866, 
+ *         Bug403081, Bug 403083
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.inject.Inject;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.contributions.IContributionFactory;
+import org.eclipse.e4.core.services.log.Logger;
+import org.eclipse.e4.ui.di.AboutToShow;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.internal.workbench.swt.Policy;
 import org.eclipse.e4.ui.internal.workbench.swt.WorkbenchSWTActivator;
 import org.eclipse.e4.ui.model.application.ui.MContext;
+import org.eclipse.e4.ui.model.application.ui.menu.MDynamicMenuContribution;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
+import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MPopupMenu;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.swt.factories.IRendererFactory;
@@ -49,6 +62,13 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 	@Inject
 	private MenuManagerRenderer renderer;
 
+	@Inject
+	private IContributionFactory contributionFactory;
+
+	@Inject
+	@Optional
+	private Logger logger;
+
 	private HashMap<Menu, Runnable> pendingCleanup = new HashMap<Menu, Runnable>();
 
 	/*
@@ -58,6 +78,7 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 	 * org.eclipse.jface.action.IMenuListener#menuAboutToShow(org.eclipse.jface
 	 * .action.IMenuManager)
 	 */
+	@Override
 	public void menuAboutToShow(IMenuManager manager) {
 		if (!(manager instanceof MenuManager)) {
 			return;
@@ -65,6 +86,7 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 		MenuManager menuManager = (MenuManager) manager;
 		final MMenu menuModel = renderer.getMenuModel(menuManager);
 		final Menu menu = menuManager.getMenu();
+
 		if (menuModel != null && menuManager != null) {
 			cleanUp(menu, menuModel, menuManager);
 		}
@@ -89,7 +111,10 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 	 * @see
 	 * org.eclipse.jface.action.IMenuListener2#menuAboutToHide(org.eclipse.jface
 	 * .action.IMenuManager)
+	 * 
+	 * SWT.Show post processing method for MenuManager
 	 */
+	@Override
 	public void menuAboutToHide(IMenuManager manager) {
 		if (!(manager instanceof MenuManager)) {
 			return;
@@ -98,7 +123,103 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 		final MMenu menuModel = renderer.getMenuModel(menuManager);
 		final Menu menu = menuManager.getMenu();
 		if (menuModel != null) {
+			processDynamicElements(menuModel, menuManager);
 			showMenu(menu, menuModel, menuManager);
+		}
+	}
+
+	/**
+	 * HashMap key for storage of {@link MDynamicMenuContribution} elements used
+	 * in {@link #processDynamicElements(MMenu, MenuManager)}
+	 */
+	protected static final String DYNAMIC_ELEMENT_STORAGE_KEY = MenuManagerShowProcessor.class
+			.getSimpleName() + ".dynamicElements"; //$NON-NLS-1$
+
+	/**
+	 * Process dynamic menu contributions provided by
+	 * {@link MDynamicMenuContribution} application model elements
+	 * 
+	 * @param menuModel
+	 * @param menuManager
+	 * 
+	 */
+	private void processDynamicElements(MMenu menuModel, MenuManager menuManager) {
+		MMenuElement[] ml = menuModel.getChildren().toArray(
+				new MMenuElement[menuModel.getChildren().size()]);
+		for (int i = 0; i < ml.length; i++) {
+
+			MMenuElement currentMenuElement = ml[i];
+			if (currentMenuElement instanceof MDynamicMenuContribution) {
+				Object contribution = ((MDynamicMenuContribution) currentMenuElement)
+						.getObject();
+				if (contribution == null) {
+					IEclipseContext context = modelService
+							.getContainingContext(menuModel);
+					contribution = contributionFactory.create(
+							((MDynamicMenuContribution) currentMenuElement)
+									.getContributionURI(), context);
+					((MDynamicMenuContribution) currentMenuElement)
+							.setObject(contribution);
+				}
+
+				IEclipseContext dynamicMenuContext = EclipseContextFactory
+						.create();
+				ArrayList<MMenuElement> mel = new ArrayList<MMenuElement>();
+				dynamicMenuContext.set(List.class, mel);
+				IEclipseContext parentContext = modelService
+						.getContainingContext(currentMenuElement);
+				Object rc = ContextInjectionFactory.invoke(contribution,
+						AboutToShow.class, parentContext, dynamicMenuContext,
+						this);
+				dynamicMenuContext.dispose();
+				if (rc == this) {
+					if (logger != null) {
+						logger.error("Missing @AboutToShow method in " + contribution); //$NON-NLS-1$
+					}
+					continue;
+				}
+
+				// remove existing entries for this dynamic contribution item if
+				// there are any
+				Map<String, Object> storageMap = currentMenuElement
+						.getTransientData();
+				@SuppressWarnings("unchecked")
+				ArrayList<MMenuElement> dump = (ArrayList<MMenuElement>) storageMap
+						.get(DYNAMIC_ELEMENT_STORAGE_KEY);
+				if (dump != null && dump.size() > 0)
+					renderer.removeDynamicMenuContributions(menuManager,
+							menuModel, dump);
+
+				storageMap.remove(DYNAMIC_ELEMENT_STORAGE_KEY);
+
+				if (mel.size() > 0) {
+
+					int position = 0;
+					while (position < menuModel.getChildren().size()) {
+						if (currentMenuElement == menuModel.getChildren().get(
+								position)) {
+							position++;
+							break;
+						}
+						position++;
+					}
+
+					// ensure that each element of the list has a valid element
+					// id
+					// and set the parent of the entries
+					for (int j = 0; j < mel.size(); j++) {
+						MMenuElement menuElement = mel.get(j);
+						if (menuElement.getElementId() == null
+								|| menuElement.getElementId().length() < 1) {
+							menuElement.setElementId(currentMenuElement
+									.getElementId() + "." + j); //$NON-NLS-1$
+						}
+						menuModel.getChildren().add(position++, menuElement);
+						renderer.modelProcessSwitch(menuManager, menuElement);
+					}
+					storageMap.put(DYNAMIC_ELEMENT_STORAGE_KEY, mel);
+				}
+			}
 		}
 	}
 

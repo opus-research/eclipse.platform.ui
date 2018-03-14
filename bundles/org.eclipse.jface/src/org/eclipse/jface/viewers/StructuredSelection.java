@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,8 +14,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.resource.JFaceResources;
 
 /**
  * A concrete implementation of the <code>IStructuredSelection</code> interface,
@@ -109,7 +109,8 @@ public class StructuredSelection implements IStructuredSelection {
      * @param o the other object
      * @return <code>true</code> if they are equal, and <code>false</code> otherwise
      */
-    public boolean equals(Object o) {
+    @Override
+	public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
@@ -149,46 +150,34 @@ public class StructuredSelection implements IStructuredSelection {
         return true;
     }
 
-    /* (non-Javadoc)
-     * Method declared in IStructuredSelection.
-     */
-    public Object getFirstElement() {
+    @Override
+	public Object getFirstElement() {
         return isEmpty() ? null : elements[0];
     }
 
-    /* (non-Javadoc)
-     * Method declared in ISelection.
-     */
-    public boolean isEmpty() {
+    @Override
+	public boolean isEmpty() {
         return elements == null || elements.length == 0;
     }
 
-    /* (non-Javadoc)
-     * Method declared in IStructuredSelection.
-     */
-    public Iterator iterator() {
+    @Override
+	public Iterator iterator() {
         return Arrays.asList(elements == null ? new Object[0] : elements)
                 .iterator();
     }
 
-    /* (non-Javadoc)
-     * Method declared in IStructuredSelection.
-     */
-    public int size() {
+    @Override
+	public int size() {
         return elements == null ? 0 : elements.length;
     }
 
-    /* (non-Javadoc)
-     * Method declared in IStructuredSelection.
-     */
-    public Object[] toArray() {
+    @Override
+	public Object[] toArray() {
         return elements == null ? new Object[0] : (Object[]) elements.clone();
     }
 
-    /* (non-Javadoc)
-     * Method declared in IStructuredSelection.
-     */
-    public List toList() {
+    @Override
+	public List toList() {
         return Arrays.asList(elements == null ? new Object[0] : elements);
     }
 
@@ -198,7 +187,8 @@ public class StructuredSelection implements IStructuredSelection {
      *
      * @return debug string
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return isEmpty() ? JFaceResources.getString("<empty_selection>") : toList().toString(); //$NON-NLS-1$
     }
 }
