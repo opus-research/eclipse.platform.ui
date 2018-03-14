@@ -71,6 +71,7 @@ public class BasicPartList extends AbstractTableInformationControl {
 			return super.getFont(element);
 		}
 
+		@Override
 		public String getText(Object element) {
 			if (element instanceof MDirtyable
 					&& ((MDirtyable) element).isDirty()) {
@@ -79,6 +80,7 @@ public class BasicPartList extends AbstractTableInformationControl {
 			return ((MUILabel) element).getLocalizedLabel();
 		}
 
+		@Override
 		public Image getImage(Object element) {
 			String iconURI = ((MUILabel) element).getIconURI();
 			if (iconURI == null) {
@@ -87,10 +89,12 @@ public class BasicPartList extends AbstractTableInformationControl {
 			return getLabelImage(iconURI);
 		}
 
+		@Override
 		public String getToolTipText(Object element) {
 			return ((MUILabel) element).getLocalizedTooltip();
 		}
 
+		@Override
 		public boolean useNativeToolTip(Object object) {
 			return true;
 		}
@@ -111,6 +115,8 @@ public class BasicPartList extends AbstractTableInformationControl {
 
 	private StackRenderer renderer;
 
+	// private ISaveHandler saveHandler;
+
 	public BasicPartList(Shell parent, int shellStyle, int treeStyler,
 			EPartService partService, MElementContainer<?> input,
 			StackRenderer renderer, ISWTResourceUtilities utils,
@@ -120,6 +126,7 @@ public class BasicPartList extends AbstractTableInformationControl {
 		this.input = input;
 		this.renderer = renderer;
 		this.utils = utils;
+		// this.saveHandler = saveHandler;
 		if (alphabetical && getTableViewer() != null) {
 			getTableViewer().setComparator(new ViewerComparator());
 		}
@@ -136,6 +143,7 @@ public class BasicPartList extends AbstractTableInformationControl {
 		return image;
 	}
 
+	@Override
 	protected TableViewer createTableViewer(Composite parent, int style) {
 		Table table = new Table(parent, SWT.SINGLE | (style & ~SWT.MULTI));
 		table.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false,
@@ -147,6 +155,7 @@ public class BasicPartList extends AbstractTableInformationControl {
 
 		ColumnViewerToolTipSupport.enableFor(tableViewer);
 		table.addListener(SWT.Dispose, new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				for (Image image : images.values()) {
 					image.dispose();
@@ -180,6 +189,7 @@ public class BasicPartList extends AbstractTableInformationControl {
 		selectFirstMatch();
 	}
 
+	@Override
 	protected void gotoSelectedElement() {
 		Object selectedElement = getSelectedElement();
 
@@ -191,11 +201,20 @@ public class BasicPartList extends AbstractTableInformationControl {
 		}
 	}
 
+	@Override
 	protected boolean deleteSelectedElements() {
 		Object selectedElement = getSelectedElement();
 		if (selectedElement != null) {
-			partService.hidePart((MPart) selectedElement);
+			if (partService.savePart((MPart) selectedElement, true))
+				partService.hidePart((MPart) selectedElement);
 
+			if (getShell() == null) {
+				// Bug 421170: Contract says to return true if there are no
+				// elements left. In this case, there is no shell left because
+				// we popped a save dialog and auto-closed the list. Ergo, there
+				// are no elements left.
+				return true;
+			}
 			if (getInput().isEmpty()) {
 				getShell().dispose();
 				return true;
