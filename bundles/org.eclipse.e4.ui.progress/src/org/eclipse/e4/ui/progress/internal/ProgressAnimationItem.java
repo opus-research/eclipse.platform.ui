@@ -85,6 +85,7 @@ public class ProgressAnimationItem extends AnimationItem implements
 
 		progressRegion = region;
 		mouseListener = new MouseAdapter() {
+			@Override
 			public void mouseDoubleClick(MouseEvent e) {
 				doAction();
 			}
@@ -234,12 +235,19 @@ public class ProgressAnimationItem extends AnimationItem implements
 		toolbar.getParent().layout(); // must layout
 
     	toolbar.getAccessible().addAccessibleListener(new AccessibleAdapter() {
-        	public void getName(AccessibleEvent e) {
+        	@Override
+			public void getName(AccessibleEvent e) {
         		e.result = tt;
         	}
         });
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.progress.AnimationItem#createAnimationItem(org.eclipse.swt.widgets.Composite)
+	 */
+	@Override
 	protected Control createAnimationItem(Composite parent) {
 
 		if (okImage == null) {
@@ -253,6 +261,7 @@ public class ProgressAnimationItem extends AnimationItem implements
 
 		top = new Composite(parent, SWT.NULL);
 		top.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				finishedJobs.removeListener(
 						ProgressAnimationItem.this);
@@ -297,6 +306,7 @@ public class ProgressAnimationItem extends AnimationItem implements
 
 		toolButton = new ToolItem(toolbar, SWT.NONE);
 		toolButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				doAction();
 			}
@@ -318,10 +328,22 @@ public class ProgressAnimationItem extends AnimationItem implements
 		return (flags & SWT.HORIZONTAL) != 0;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.progress.AnimationItem#getControl()
+	 */
+	@Override
 	public Control getControl() {
 		return top;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.progress.AnimationItem#animationDone()
+	 */
+	@Override
 	void animationDone() {
 		super.animationDone();
 		animationRunning = false;
@@ -339,6 +361,12 @@ public class ProgressAnimationItem extends AnimationItem implements
 		return animationRunning;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.progress.AnimationItem#animationStart()
+	 */
+	@Override
 	void animationStart() {
 		super.animationStart();
 		animationRunning = true;
@@ -349,18 +377,22 @@ public class ProgressAnimationItem extends AnimationItem implements
 		refresh();
 	}
 
+	@Override
 	public void removed(JobTreeElement info) {
 		final Display display = Display.getDefault();
 		display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				refresh();
 			}
 		});
 	}
 
+	@Override
 	public void finished(final JobTreeElement jte) {
 		final Display display = Display.getDefault();
 		display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				refresh();
 			}

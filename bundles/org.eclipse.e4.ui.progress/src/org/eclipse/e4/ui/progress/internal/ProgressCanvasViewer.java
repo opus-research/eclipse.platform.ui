@@ -43,7 +43,7 @@ public class ProgressCanvasViewer extends AbstractProgressViewer {
 
     Object[] displayedItems = new Object[0];
 
-    private final static List<Object> EMPTY_LIST = new ArrayList<Object>();
+    private final static List<Object> EMPTY_LIST = new ArrayList<>();
 
     /**
      * Font metrics to use for determining pixel sizes.
@@ -87,51 +87,109 @@ public class ProgressCanvasViewer extends AbstractProgressViewer {
      * tab traversal order.  Defeating it here is more self-contained then
      * setting the tab list on the shell or other parent composite.
      */
-    protected void hookControl(Control control) {
+    @Override
+	protected void hookControl(Control control) {
         control.addDisposeListener(new DisposeListener() {
-            public void widgetDisposed(DisposeEvent event) {
+            @Override
+			public void widgetDisposed(DisposeEvent event) {
                 handleDispose(event);
             }
         });
     }
 
-    protected Widget doFindInputItem(Object element) {
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.viewers.StructuredViewer#doFindInputItem(java.lang.Object)
+     */
+    @Override
+	protected Widget doFindInputItem(Object element) {
         return null; // No widgets associated with items
     }
 
-    protected Widget doFindItem(Object element) {
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.viewers.StructuredViewer#doFindItem(java.lang.Object)
+     */
+    @Override
+	protected Widget doFindItem(Object element) {
         return null; // No widgets associated with items
     }
 
-    protected void doUpdateItem(Widget item, Object element, boolean fullMap) {
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.viewers.StructuredViewer#doUpdateItem(org.eclipse.swt.widgets.Widget,
+     *      java.lang.Object, boolean)
+     */
+    @Override
+	protected void doUpdateItem(Widget item, Object element, boolean fullMap) {
         canvas.redraw();
     }
 
-    protected List<Object> getSelectionFromWidget() {
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.viewers.StructuredViewer#getSelectionFromWidget()
+     */
+    @Override
+	protected List<Object> getSelectionFromWidget() {
         //No selection on a Canvas
         return EMPTY_LIST;
     }
 
-    protected void internalRefresh(Object element) {
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.viewers.StructuredViewer#internalRefresh(java.lang.Object)
+     */
+    @Override
+	protected void internalRefresh(Object element) {
         displayedItems = getSortedChildren(getRoot());
         canvas.redraw();
     }
 
-    public void reveal(Object element) {
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.viewers.StructuredViewer#reveal(java.lang.Object)
+     */
+    @Override
+	public void reveal(Object element) {
         //Nothing to do here as we do not scroll
     }
 
-    protected void setSelectionToWidget(@SuppressWarnings("rawtypes") List l, boolean reveal) {
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.viewers.StructuredViewer#setSelectionToWidget(java.util.List,
+     *      boolean)
+     */
+    @Override
+	protected void setSelectionToWidget(@SuppressWarnings("rawtypes") List l, boolean reveal) {
         //Do nothing as there is no selection
     }
 
-    public Control getControl() {
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.viewers.Viewer#getControl()
+     */
+    @Override
+	public Control getControl() {
         return canvas;
     }
 
     private void initializeListeners() {
         canvas.addPaintListener(new PaintListener() {
-            public void paintControl(PaintEvent event) {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.swt.events.PaintListener#paintControl(org.eclipse.swt.events.PaintEvent)
+             */
+            @Override
+			public void paintControl(PaintEvent event) {
 
                 GC gc = event.gc;
                 Transform transform = null;
@@ -177,7 +235,11 @@ public class ProgressCanvasViewer extends AbstractProgressViewer {
         });
     }
 
-    public void setLabelProvider(IBaseLabelProvider labelProvider) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ContentViewer#setLabelProvider(org.eclipse.jface.viewers.IBaseLabelProvider)
+     */
+    @Override
+	public void setLabelProvider(IBaseLabelProvider labelProvider) {
         Assert.isTrue(labelProvider instanceof ILabelProvider);
         super.setLabelProvider(labelProvider);
     }
@@ -209,11 +271,19 @@ public class ProgressCanvasViewer extends AbstractProgressViewer {
         return new Point(fontWidth, fontHeight);
     }
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.progress.AbstractProgressViewer#add(java.lang.Object[])
+	 */
+	@Override
 	public void add(Object[] elements) {
 		refresh(true);
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.progress.AbstractProgressViewer#remove(java.lang.Object[])
+	 */
+	@Override
 	public void remove(Object[] elements) {
 		refresh(true);
 

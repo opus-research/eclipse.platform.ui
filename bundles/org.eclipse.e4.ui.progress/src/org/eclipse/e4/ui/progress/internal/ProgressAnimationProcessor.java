@@ -39,6 +39,11 @@ class ProgressAnimationProcessor implements IAnimationProcessor {
 
     List<AnimationItem> items = Collections.synchronizedList(new ArrayList<AnimationItem>());
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.ui.internal.progress.IAnimationProcessor#startAnimation(org.eclipse.core.runtime.IProgressMonitor)
+     */
     public void startAnimationLoop(IProgressMonitor monitor) {
 
         // Create an off-screen image to draw on, and a GC to draw with.
@@ -61,26 +66,55 @@ class ProgressAnimationProcessor implements IAnimationProcessor {
 
     }
 
-    public void addItem(AnimationItem item) {
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.ui.internal.progress.IAnimationProcessor#addItem(org.eclipse.ui.internal.progress.AnimationItem)
+     */
+    @Override
+	public void addItem(AnimationItem item) {
         Assert.isTrue(item instanceof ProgressAnimationItem);
         items.add(item);
     }
 
-    public void removeItem(AnimationItem item) {
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.ui.internal.progress.IAnimationProcessor#removeItem(org.eclipse.ui.internal.progress.AnimationItem)
+     */
+    @Override
+	public void removeItem(AnimationItem item) {
         Assert.isTrue(item instanceof ProgressAnimationItem);
         items.remove(item);
     }
 
-    public boolean hasItems() {
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.ui.internal.progress.IAnimationProcessor#hasItems()
+     */
+    @Override
+	public boolean hasItems() {
         return items.size() > 0;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.ui.internal.progress.IAnimationProcessor#itemsInactiveRedraw()
+     */
     public void itemsInactiveRedraw() {
         //Nothing to do here as SWT handles redraw
 
     }
 
-    public void animationStarted() {
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.ui.internal.progress.IAnimationProcessor#animationStarted(org.eclipse.core.runtime.IProgressMonitor)
+     */
+    @Override
+	public void animationStarted() {
         AnimationItem[] animationItems = getAnimationItems();
         for (int i = 0; i < animationItems.length; i++) {
             animationItems[i].animationStart();
@@ -88,7 +122,13 @@ class ProgressAnimationProcessor implements IAnimationProcessor {
 
     }
 
-    public int getPreferredWidth() {
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.ui.internal.progress.IAnimationProcessor#getPreferredWidth()
+     */
+    @Override
+	public int getPreferredWidth() {
         return 30;
     }
 
@@ -104,7 +144,11 @@ class ProgressAnimationProcessor implements IAnimationProcessor {
         return animationItems;
     }
 
-    public void animationFinished() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.progress.IAnimationProcessor#animationFinished()
+     */
+    @Override
+	public void animationFinished() {
         AnimationItem[] animationItems = getAnimationItems();
         for (int i = 0; i < animationItems.length; i++) {
             animationItems[i].animationDone();
@@ -112,7 +156,11 @@ class ProgressAnimationProcessor implements IAnimationProcessor {
 
     }
 
-    public boolean isProcessorJob(Job job) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.progress.IAnimationProcessor#isProcessorJob(org.eclipse.core.runtime.jobs.Job)
+     */
+    @Override
+	public boolean isProcessorJob(Job job) {
         // We have no jobs
         return false;
     }
