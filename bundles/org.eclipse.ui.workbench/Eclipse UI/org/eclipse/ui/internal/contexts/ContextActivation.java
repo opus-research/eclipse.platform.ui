@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,7 +31,7 @@ import org.eclipse.ui.internal.services.EvaluationResultCache;
  * <p>
  * Note: this class has a natural ordering that is inconsistent with equals.
  * </p>
- * 
+ *
  * @since 3.1
  */
 final class ContextActivation extends EvaluationResultCache implements
@@ -51,7 +51,7 @@ final class ContextActivation extends EvaluationResultCache implements
 
 	/**
 	 * Constructs a new instance of <code>ContextActivation</code>.
-	 * 
+	 *
 	 * @param contextId
 	 *            The identifier for the context which should be activated. This
 	 *            value must not be <code>null</code>.

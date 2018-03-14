@@ -31,22 +31,15 @@ public class BookmarksView extends MarkerSupportView {
 	 */
 	public BookmarksView() {
 		super(MarkerSupportRegistry.BOOKMARKS_GENERATOR);
-		
+
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.views.markers.internal.MarkerView#getUndoContext()
-	 * @since 3.7
-	 */
+	@Override
 	protected IUndoContext getUndoContext() {
 		return WorkspaceUndoUtil.getBookmarksUndoContext();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.views.markers.ExtendedMarkersView#getDeleteOperationName(org.eclipse.core.resources.IMarker[])
-	 * @since 3.7
-	 */
+	@Override
 	protected String getDeleteOperationName(IMarker[] markers) {
 		Assert.isLegal(markers.length > 0);
 		return markers.length == 1 ? MarkerMessages.deleteBookmarkMarker_operationName : MarkerMessages.deleteBookmarkMarkers_operationName;

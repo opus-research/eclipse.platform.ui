@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,7 @@
 package org.eclipse.ui.internal;
 
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.INullSelectionListener;
@@ -39,7 +39,7 @@ public abstract class AbstractPartSelectionTracker {
 
     /**
      * Constructs a part selection tracker for the part with the given id.
-     * 
+     *
      * @param id part identifier
      */
     public AbstractPartSelectionTracker(String partId) {
@@ -48,7 +48,7 @@ public abstract class AbstractPartSelectionTracker {
 
     /**
      * Adds a selection listener to this tracker
-     * 
+     *
      * @param listener the listener to add
      */
     public void addSelectionListener(ISelectionListener listener) {
@@ -57,7 +57,7 @@ public abstract class AbstractPartSelectionTracker {
 
     /**
      * Adds a post selection listener to this tracker
-     * 
+     *
      * @param listener the listener to add
      */
     public void addPostSelectionListener(ISelectionListener listener) {
@@ -65,14 +65,14 @@ public abstract class AbstractPartSelectionTracker {
     }
 
     /**
-     * Returns the selection from the part being tracked, 
+     * Returns the selection from the part being tracked,
      * or <code>null</code> if the part is closed or has no selection.
      */
     public abstract ISelection getSelection();
 
     /**
      * Removes a selection listener from this tracker.
-     * 
+     *
      * @param listener the listener to remove
      */
     public void removeSelectionListener(ISelectionListener listener) {
@@ -81,7 +81,7 @@ public abstract class AbstractPartSelectionTracker {
 
     /**
      * Removes a post selection listener from this tracker.
-     * 
+     *
      * @param listener the listener to remove
      */
     public void removePostSelectionListener(ISelectionListener listener) {
@@ -103,7 +103,7 @@ public abstract class AbstractPartSelectionTracker {
 
     /**
      * Fires a selection event to the listeners.
-     * 
+     *
      * @param part the part or <code>null</code> if no active part
      * @param sel the selection or <code>null</code> if no active selection
      * @param listeners the list of listeners to notify
@@ -114,7 +114,7 @@ public abstract class AbstractPartSelectionTracker {
             final ISelectionListener l = (ISelectionListener) array[i];
             if ((part != null && sel != null)
                     || l instanceof INullSelectionListener) {
-                Platform.run(new SafeRunnable() {
+                SafeRunner.run(new SafeRunnable() {
                     @Override
 					public void run() {
                         l.selectionChanged(part, sel);
@@ -126,7 +126,7 @@ public abstract class AbstractPartSelectionTracker {
 
     /**
      * Fires a post selection event to the listeners.
-     * 
+     *
      * @param part the part or <code>null</code> if no active part
      * @param sel the selection or <code>null</code> if no active selection
      * @param listeners the list of listeners to notify
@@ -138,7 +138,7 @@ public abstract class AbstractPartSelectionTracker {
             final ISelectionListener l = (ISelectionListener) array[i];
             if ((part != null && sel != null)
                     || l instanceof INullSelectionListener) {
-                Platform.run(new SafeRunnable() {
+                SafeRunner.run(new SafeRunnable() {
                     @Override
 					public void run() {
                         l.selectionChanged(part, sel);
@@ -150,7 +150,7 @@ public abstract class AbstractPartSelectionTracker {
 
     /**
      * Sets the id of the part that this tracks.
-     * 
+     *
      * @param id view identifier
      */
     private void setPartId(String partId) {
@@ -159,7 +159,7 @@ public abstract class AbstractPartSelectionTracker {
 
     /**
      * Returns the id of the part that this tracks.
-     * 
+     *
      * @return part identifier
      */
     protected String getPartId() {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2012 Tom Schindl and others.
+ * Copyright (c) 2010, 2015 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,11 +20,11 @@ import org.eclipse.swt.widgets.Display;
 
 public class ThemeEngineManager implements IThemeManager {
 	private static final String KEY = "org.eclipse.e4.ui.css.swt.theme";
-	
+
 	@Override
 	public IThemeEngine getEngineForDisplay(Display display) {
 		IThemeEngine engine = (IThemeEngine) display.getData(KEY);
-		
+
 		if( engine == null ) {
 			engine = new ThemeEngine(display);
 			engine.addCSSEngine(getCSSSWTEngine(display));

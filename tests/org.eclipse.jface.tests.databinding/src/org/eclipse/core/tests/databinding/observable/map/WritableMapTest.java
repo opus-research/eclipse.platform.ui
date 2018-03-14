@@ -29,19 +29,22 @@ import org.eclipse.jface.databinding.conformance.util.RealmTester;
 
 /**
  * @since 3.2
- * 
+ *
  */
 public class WritableMapTest extends TestCase {
+	@Override
 	protected void setUp() throws Exception {
 		RealmTester.setDefault(new CurrentRealm(true));
 	}
 
+	@Override
 	protected void tearDown() throws Exception {
 		RealmTester.setDefault(null);
 	}
 
 	public void testPutRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
+			@Override
 			public void run() {
 				WritableMap map = new WritableMap();
 				map.put("", "");
@@ -51,6 +54,7 @@ public class WritableMapTest extends TestCase {
 
 	public void testRemoveRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
+			@Override
 			public void run() {
 				WritableMap map = new WritableMap();
 				CurrentRealm realm = (CurrentRealm) Realm.getDefault();
@@ -66,6 +70,7 @@ public class WritableMapTest extends TestCase {
 
 	public void testClearRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
+			@Override
 			public void run() {
 				WritableMap map = new WritableMap();
 				map.clear();
@@ -75,31 +80,32 @@ public class WritableMapTest extends TestCase {
 
 	public void testPutAllRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
+			@Override
 			public void run() {
 				WritableMap map = new WritableMap();
 				map.putAll(Collections.EMPTY_MAP);
 			}
 		});
 	}
-	
+
 	public void testPutWithExistingKeyMapChangeEvent() throws Exception {
 		WritableMap map = new WritableMap();
 		String key = "key";
 		String value = "value";
 		map.put(key, value);
-		
+
 		MapChangeEventTracker listener = new MapChangeEventTracker();
 		map.addMapChangeListener(listener);
-		
+
 		assertEquals(0, listener.count);
-		
+
 		String newValue = "new value";
 		map.put(key, newValue);
-		
+
 		assertEquals(1, listener.count);
 		MapChangeEvent event = listener.event;
-		
-		
+
+
 		Set changedKeys = event.diff.getChangedKeys();
 		assertEquals(1, changedKeys.size());
 		assertTrue(changedKeys.contains(key));
@@ -121,7 +127,7 @@ public class WritableMapTest extends TestCase {
 		map.put(key, equalValue);
 
 		assertEquals(0, tracker.count);
-		
+
 	}
 
 	public void testPutNullKey_SingleAdditionChangeEvent() {

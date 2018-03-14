@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,7 +40,7 @@ public class ObjectActionContributorReader extends RegistryReader {
     }
 
     /**
-     * Implements abstract method to handle configuration elements. 
+     * Implements abstract method to handle configuration elements.
      */
     @Override
 	protected boolean readElement(IConfigurationElement element) {
@@ -59,7 +59,7 @@ public class ObjectActionContributorReader extends RegistryReader {
     /**
      * Reads the registry and registers popup menu contributors
      * found there.
-     * 
+     *
      * @param mng the manager to read into
      */
     public void readPopupContributors(ObjectActionContributorManager mng) {
@@ -70,8 +70,8 @@ public class ObjectActionContributorReader extends RegistryReader {
     }
 
     /**
-     * Set the manager to read into. 
-     * 
+     * Set the manager to read into.
+     *
      * @param mng the manager
      */
     public void setManager(ObjectActionContributorManager mng) {

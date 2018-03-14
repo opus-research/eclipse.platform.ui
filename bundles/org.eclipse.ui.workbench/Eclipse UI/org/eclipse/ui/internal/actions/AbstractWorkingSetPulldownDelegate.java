@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,7 +34,7 @@ import org.eclipse.ui.internal.registry.WorkingSetRegistry;
 
 /**
  * Baseclass for working set pulldown actions.
- * 
+ *
  * @since 3.3
  */
 public abstract class AbstractWorkingSetPulldownDelegate implements
@@ -49,7 +49,7 @@ public abstract class AbstractWorkingSetPulldownDelegate implements
 	private IWorkbenchWindow window;
 
 	/**
-	 * 
+	 *
 	 */
 	public AbstractWorkingSetPulldownDelegate() {
 		super();
@@ -113,7 +113,7 @@ public abstract class AbstractWorkingSetPulldownDelegate implements
 	/**
 	 * Split the working sets known by the manager into arrays based on their
 	 * defining page Id.
-	 * 
+	 *
 	 * @return an array of arrays
 	 */
 	protected IWorkingSet[][] splitSets() {

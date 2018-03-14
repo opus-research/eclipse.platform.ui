@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2007 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,18 +29,18 @@ import org.eclipse.ui.internal.forms.Messages;
  * Since forms with wrapped text typically don't have a preferred size, it is
  * important to set the initial dialog size upon creation:
  * <p>
- * 
+ *
  * <pre>
  * MyFormDialog dialog = new MyFormDialog(shell);
  * dialog.create();
  * dialog.getShell().setSize(500, 500);
  * dialog.open();
  * </pre>
- * 
+ *
  * <p>
  * Otherwise, the dialog may open very wide.
  * <p>
- * 
+ *
  * @since 3.3
  */
 
@@ -49,7 +49,7 @@ public class FormDialog extends TrayDialog {
 
 	/**
 	 * Creates a new form dialog for a provided parent shell.
-	 * 
+	 *
 	 * @param shell
 	 *            the parent shell
 	 */
@@ -60,7 +60,7 @@ public class FormDialog extends TrayDialog {
 
 	/**
 	 * Creates a new form dialog for a provided parent shell provider.
-	 * 
+	 *
 	 * @param parentShellProvider
 	 *            the parent shell provider
 	 */
@@ -68,22 +68,14 @@ public class FormDialog extends TrayDialog {
 		super(parentShellProvider);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.TrayDialog#close()
-	 */
+	@Override
 	public boolean close() {
 		boolean rcode = super.close();
 		toolkit.dispose();
 		return rcode;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
-	 */
+	@Override
 	protected Control createDialogArea(Composite parent) {
 		toolkit = new FormToolkit(parent.getDisplay());
 		ScrolledForm sform = toolkit.createScrolledForm(parent);
@@ -94,11 +86,7 @@ public class FormDialog extends TrayDialog {
 		return sform;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.TrayDialog#createButtonBar(org.eclipse.swt.widgets.Composite)
-	 */
+	@Override
 	protected Control createButtonBar(Composite parent) {
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		//Composite sep = new Composite(parent, SWT.NULL);
@@ -113,7 +101,7 @@ public class FormDialog extends TrayDialog {
 	/**
 	 * Configures the dialog form and creates form content. Clients should
 	 * override this method.
-	 * 
+	 *
 	 * @param mform
 	 *            the dialog form
 	 */

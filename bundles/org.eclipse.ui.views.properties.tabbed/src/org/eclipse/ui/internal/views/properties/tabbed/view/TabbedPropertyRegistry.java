@@ -1,10 +1,10 @@
 /*******************************************************************************
- * Copyright (c) 2001, 2010 IBM Corporation and others.
+ * Copyright (c) 2001, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -44,7 +44,7 @@ import org.eclipse.ui.views.properties.tabbed.ITypeMapper;
 /**
  * Provides information about the tabbed property extension points. Each tabbed
  * property registry is associated with a unique contributor ID.
- * 
+ *
  * @author Anthony Hunter
  */
 public class TabbedPropertyRegistry {
@@ -167,7 +167,7 @@ public class TabbedPropertyRegistry {
 
 	/**
 	 * Gets the categories that are valid for this contributor.
-	 * 
+	 *
 	 * @param configurationElement
 	 *            the configuration element for this contributor.
 	 */
@@ -184,7 +184,7 @@ public class TabbedPropertyRegistry {
 	/**
 	 * Handle the error when an issue is found loading from the configuration
 	 * element.
-	 * 
+	 *
 	 * @param id
 	 *            the configuration id.
 	 * @param exception
@@ -267,7 +267,7 @@ public class TabbedPropertyRegistry {
 
 	/**
 	 * Returns all section descriptors for the provided selection.
-	 * 
+	 *
 	 * @param part
 	 *            the workbench part containing the selection
 	 * @param selection
@@ -405,8 +405,7 @@ public class TabbedPropertyRegistry {
 			}
 		}
 		// could not append the section to any of the existing tabs - log error
-		String message = MessageFormat.format(NO_TAB_ERROR, new Object[] {
-				section.getId(), section.getTargetTab() });
+		String message = MessageFormat.format(NO_TAB_ERROR, section.getId(), section.getTargetTab());
 		IStatus status = new Status(IStatus.ERROR, TabbedPropertyViewPlugin
 				.getPlugin().getBundle().getSymbolicName(),
 				TabbedPropertyViewStatusCodes.NO_TAB_ERROR, message, null);
@@ -485,7 +484,7 @@ public class TabbedPropertyRegistry {
 
 	/**
 	 * Gets the type mapper for the contributor.
-	 * 
+	 *
 	 * @return the type mapper for the contributor.
 	 */
 	public ITypeMapper getTypeMapper() {
@@ -494,7 +493,7 @@ public class TabbedPropertyRegistry {
 
 	/**
 	 * Gets the label provider for the contributor.
-	 * 
+	 *
 	 * @return the label provider for the contributor.
 	 */
 	public ILabelProvider getLabelProvider() {
@@ -503,7 +502,7 @@ public class TabbedPropertyRegistry {
 
 	/**
 	 * Gets the action provider for the contributor.
-	 * 
+	 *
 	 * @return the action provider for the contributor.
 	 */
 	public IActionProvider getActionProvider() {
@@ -512,7 +511,7 @@ public class TabbedPropertyRegistry {
 
 	/**
 	 * Gets the tab list content provider for the contributor.
-	 * 
+	 *
 	 * @return the tab list content provider for the contributor.
 	 */
 	public IStructuredContentProvider getTabListContentProvider() {
@@ -525,7 +524,7 @@ public class TabbedPropertyRegistry {
 	/**
 	 * Handle the tab error when an issue is found loading from the
 	 * configuration element.
-	 * 
+	 *
 	 * @param configurationElement
 	 *            the configuration element
 	 */
@@ -533,8 +532,7 @@ public class TabbedPropertyRegistry {
 			String category) {
 		String pluginId = configurationElement.getDeclaringExtension()
 				.getNamespaceIdentifier();
-		String message = MessageFormat.format(TAB_ERROR, new Object[] {
-				pluginId, category });
+		String message = MessageFormat.format(TAB_ERROR, pluginId, category );
 		IStatus status = new Status(IStatus.ERROR, pluginId,
 				TabbedPropertyViewStatusCodes.TAB_ERROR, message, null);
 		TabbedPropertyViewPlugin.getPlugin().getLog().log(status);
@@ -542,7 +540,7 @@ public class TabbedPropertyRegistry {
 
 	/**
 	 * Disposes this registry.
-	 * 
+	 *
 	 * @since 3.7
 	 */
 	public void dispose() {

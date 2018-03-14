@@ -30,10 +30,11 @@ import org.eclipse.ui.actions.MoveResourceAction;
  * The ResourceNavigatorMoveAction is a resource move that aso updates the navigator
  * to show the result of the move.
  * It also delegates to MoveProjectAction as needed.
- * 
+ *
  * @since 2.0
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
+@Deprecated
 public class ResourceNavigatorMoveAction extends MoveResourceAction {
     private StructuredViewer viewer;
 
@@ -53,10 +54,8 @@ public class ResourceNavigatorMoveAction extends MoveResourceAction {
         this.moveProjectAction = new MoveProjectAction(shell);
     }
 
-    /* (non-Javadoc)
-     * Method declared on IAction.
-     */
-    public void run() {
+    @Override
+	public void run() {
         if (moveProjectAction.isEnabled()) {
             moveProjectAction.run();
             return;
@@ -82,7 +81,8 @@ public class ResourceNavigatorMoveAction extends MoveResourceAction {
 
     }
 
-    protected boolean updateSelection(IStructuredSelection selection) {
+    @Override
+	protected boolean updateSelection(IStructuredSelection selection) {
         moveProjectAction.selectionChanged(selection);
         return super.updateSelection(selection)
                 || moveProjectAction.isEnabled();

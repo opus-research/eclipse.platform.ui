@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,9 +27,9 @@ import org.eclipse.ui.services.IDisposable;
  * This class is not intended for use outside of the
  * <code>org.eclipse.ui.workbench</code> plug-in.
  * </p>
- * 
+ *
  * @since 3.4
- * 
+ *
  */
 public class SlavePartService implements IPartService, IDisposable {
 
@@ -43,7 +43,7 @@ public class SlavePartService implements IPartService, IDisposable {
 
 	/**
 	 * Constructs a new instance.
-	 * 
+	 *
 	 * @param parentPartService
 	 *            The parent part service for this slave. Never
 	 *            <code>null</code>.

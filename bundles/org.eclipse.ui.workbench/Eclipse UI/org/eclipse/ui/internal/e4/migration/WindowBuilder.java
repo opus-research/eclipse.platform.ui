@@ -171,7 +171,7 @@ public class WindowBuilder {
 	}
 
 	private void addEditors() {
-		Map<MPartStack, InfoReader> stackToReader = new HashMap<MPartStack, InfoReader>();
+		Map<MPartStack, InfoReader> stackToReader = new HashMap<>();
 
 		// add stacks to shared area
 		List<InfoReader> stackReaders = windowReader.getEditorStacks();
@@ -217,7 +217,7 @@ public class WindowBuilder {
 			}
 			int[] partOrder = stackReader.getPartOrder();
 			List<MStackElement> stackChildren = editorStack.getChildren();
-			List<MStackElement> originalOrder = new ArrayList<MStackElement>(stackChildren);
+			List<MStackElement> originalOrder = new ArrayList<>(stackChildren);
 			MStackElement selectedElement = editorStack.getSelectedElement();
 			stackChildren.clear();
 			for (int i = 0; i < partOrder.length; i++) {

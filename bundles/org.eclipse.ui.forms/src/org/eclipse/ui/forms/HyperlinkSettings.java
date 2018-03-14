@@ -1,24 +1,25 @@
 /*******************************************************************************
- *  Copyright (c) 2000, 2013 IBM Corporation and others.
+ *  Copyright (c) 2000, 2015 IBM Corporation and others.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
  *  http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  *  Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.ui.forms;
 import org.eclipse.jface.resource.JFaceColors;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.internal.forms.widgets.*;
+import org.eclipse.ui.internal.forms.widgets.FormsResources;
 /**
  * Manages color and underline mode settings for a group of hyperlinks. The
  * class is extended by HyperlinkGroup but is otherwise not intended to be
  * subclassed.
- * 
+ *
  * @since 3.0
  * @noextend This class is not intended to be subclassed by clients.
  */
@@ -43,7 +44,7 @@ public class HyperlinkSettings {
 	private Color activeForeground;
 	/**
 	 * The constructor.
-	 * 
+	 *
 	 * @param display
 	 *            the display to use when creating colors.
 	 */
@@ -53,7 +54,7 @@ public class HyperlinkSettings {
 	/**
 	 * Initializes the hyperlink foregrounds from the JFace defaults set for the
 	 * entire workbench.
-	 * 
+	 *
 	 * @see JFaceColors
 	 * @param display
 	 *            the display to use when creating colors
@@ -68,7 +69,7 @@ public class HyperlinkSettings {
 	}
 	/**
 	 * Returns the background to use for the active hyperlink.
-	 * 
+	 *
 	 * @return active hyperlink background
 	 */
 	public Color getActiveBackground() {
@@ -76,7 +77,7 @@ public class HyperlinkSettings {
 	}
 	/**
 	 * Returns the foreground to use for the active hyperlink.
-	 * 
+	 *
 	 * @return active hyperlink foreground
 	 */
 	public Color getActiveForeground() {
@@ -84,7 +85,7 @@ public class HyperlinkSettings {
 	}
 	/**
 	 * Returns the background to use for the normal hyperlink.
-	 * 
+	 *
 	 * @return normal hyperlink background
 	 */
 	public Color getBackground() {
@@ -94,7 +95,7 @@ public class HyperlinkSettings {
 	 * Returns the cursor to use when the hyperlink is active. This cursor will
 	 * be shown before hyperlink listeners have been notified of hyperlink
 	 * activation and hidden when the notification method returns.
-	 * 
+	 *
 	 * @return the busy cursor
 	 */
 	public Cursor getBusyCursor() {
@@ -102,7 +103,7 @@ public class HyperlinkSettings {
 	}
 	/**
 	 * Returns the cursor to use when over text.
-	 * 
+	 *
 	 * @return the text cursor
 	 */
 	public Cursor getTextCursor() {
@@ -110,7 +111,7 @@ public class HyperlinkSettings {
 	}
 	/**
 	 * Returns the foreground to use for the normal hyperlink.
-	 * 
+	 *
 	 * @return the normal hyperlink foreground
 	 */
 	public Color getForeground() {
@@ -118,7 +119,7 @@ public class HyperlinkSettings {
 	}
 	/**
 	 * Returns the cursor to use when hovering over the hyperlink.
-	 * 
+	 *
 	 * @return the hyperlink cursor
 	 */
 	public Cursor getHyperlinkCursor() {
@@ -127,7 +128,7 @@ public class HyperlinkSettings {
 	/**
 	 * Returns the underline mode to be used for all the hyperlinks in this
 	 * group.
-	 * 
+	 *
 	 * @return one of UNDERLINE_NEVER, UNDERLINE_ALWAYS, UNDERLINE_HOVER
 	 */
 	public int getHyperlinkUnderlineMode() {
@@ -135,7 +136,7 @@ public class HyperlinkSettings {
 	}
 	/**
 	 * Sets the new active hyperlink background for all the links.
-	 * 
+	 *
 	 * @param newActiveBackground
 	 *            the new active background
 	 */
@@ -144,7 +145,7 @@ public class HyperlinkSettings {
 	}
 	/**
 	 * Sets the new active hyperlink foreground for all the links.
-	 * 
+	 *
 	 * @param newActiveForeground
 	 *            the new active foreground
 	 */
@@ -153,7 +154,7 @@ public class HyperlinkSettings {
 	}
 	/**
 	 * Sets the new hyperlink background for all the links.
-	 * 
+	 *
 	 * @param newBackground
 	 *            the new hyperlink background
 	 */
@@ -162,7 +163,7 @@ public class HyperlinkSettings {
 	}
 	/**
 	 * Sets the new hyperlink foreground for all the links.
-	 * 
+	 *
 	 * @param newForeground
 	 *            the new hyperlink foreground
 	 */
@@ -171,7 +172,7 @@ public class HyperlinkSettings {
 	}
 	/**
 	 * Sets the new hyperlink underline mode for all the links in this group.
-	 * 
+	 *
 	 * @param mode
 	 *            one of <code>UNDERLINE_NEVER</code>,
 	 *            <code>UNDERLINE_HOVER</code> and

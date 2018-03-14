@@ -81,8 +81,8 @@ public class ObservablesManager {
 	public void addObservablesFromContext(DataBindingContext context,
 			boolean trackTargets, boolean trackModels) {
 		if (trackTargets || trackModels) {
-			contexts.put(context, new Pair(new Boolean(trackTargets),
-					new Boolean(trackModels)));
+			contexts.put(context, new Pair(Boolean.valueOf(trackTargets),
+					Boolean.valueOf(trackModels)));
 		}
 	}
 
@@ -94,7 +94,7 @@ public class ObservablesManager {
 	 * <a href="https://bugs.eclipse.org/278550">bug 278550</a>. If we cannot
 	 * find a way to make this API work, it will be deprecated as of 3.6.</em>
 	 * </p>
-	 * 
+	 *
 	 * @param runnable
 	 *            the runnable to execute
 	 * @since 1.2

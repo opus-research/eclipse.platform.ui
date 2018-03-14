@@ -24,12 +24,13 @@ import org.eclipse.ui.actions.WorkspaceModifyOperation;
  * 1) acquire a lock in the UI thread
  * 2) execute an operation (e.g. MoveFilesAndFoldersOperation) which spawns a modal context thread
  * 3) modal context tries to acquire lock held by UI thread
- * 
+ *
  * This sequence would cause a deadlock, so an exception is thrown by ModalContext.
  * This test asserts that the exception is thrown and that deadlock does not occur.
  */
 public class TestBug108162 extends TestCase {
 	class LockAcquiringOperation extends WorkspaceModifyOperation {
+		@Override
 		public void execute(final IProgressMonitor pm) {
 			//empty operation is sufficient to cause deadlock
 		}
@@ -50,6 +51,7 @@ public class TestBug108162 extends TestCase {
 	 */
 	public void testBug() throws CoreException {
 		workspace.run(new IWorkspaceRunnable() {
+			@Override
 			public void run(IProgressMonitor monitor) {
 				ProgressMonitorDialog dialog = new ProgressMonitorDialog(new Shell());
 				try {

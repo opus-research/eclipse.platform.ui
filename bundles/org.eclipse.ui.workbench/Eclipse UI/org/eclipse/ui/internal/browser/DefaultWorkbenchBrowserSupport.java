@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ import org.eclipse.ui.browser.IWebBrowser;
  * This class is used when no alternative implementation is plugged in via the
  * 'org.eclipse.ui.browserSupport' extension point.
  * </p>
- * 
+ *
  * @since 3.1
  */
 public class DefaultWorkbenchBrowserSupport extends
@@ -54,12 +54,6 @@ public class DefaultWorkbenchBrowserSupport extends
 		return new DefaultWebBrowser(this, browserId);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#createBrowser(int,
-	 *      java.lang.String, java.lang.String, java.lang.String)
-	 */
 	@Override
 	public IWebBrowser createBrowser(int style, String browserId, String name,
 			String tooltip) throws PartInitException {
@@ -72,16 +66,11 @@ public class DefaultWorkbenchBrowserSupport extends
 		return browser;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#createBrowser(java.lang.String)
-	 */
 	@Override
 	public IWebBrowser createBrowser(String browserId) throws PartInitException {
 		return createBrowser(AS_EXTERNAL, browserId, null, null);
 	}
-	
+
 	private String getDefaultId() {
 		String id = null;
 		for (int i = 0; i < Integer.MAX_VALUE; i++) {

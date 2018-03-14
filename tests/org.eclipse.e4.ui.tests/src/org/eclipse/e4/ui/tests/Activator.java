@@ -35,23 +35,13 @@ public class Activator extends Plugin {
 	public Activator() {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
-	 */
+	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
-	 */
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		if (eventAdminTracker != null) {
 			eventAdminTracker.close();
@@ -67,7 +57,7 @@ public class Activator extends Plugin {
 
 	/**
 	 * Returns the shared instance
-	 * 
+	 *
 	 * @return the shared instance
 	 */
 	public static Activator getDefault() {
@@ -100,7 +90,7 @@ public class Activator extends Plugin {
 
 	/**
 	 * Generate a platform URI referencing the provided class.
-	 * 
+	 *
 	 * @param clazz
 	 *            the class to be referenced
 	 * @return the platform-based URI: bundleclass://X/X.Y

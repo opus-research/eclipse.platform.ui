@@ -37,17 +37,19 @@ public class IDeprecatedWorkbenchPageTest extends UITestCase {
 	private IWorkbenchWindow fWin;
 
 	private IProject proj;
-	
+
 	public IDeprecatedWorkbenchPageTest(String testName) {
 		super(testName);
 	}
 
+	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		fWin = openTestWindow();
 		fActivePage = fWin.getActivePage();
 	}
 
+	@Override
 	protected void doTearDown() throws Exception {
 		super.doTearDown();
 		if (proj != null) {
@@ -142,7 +144,7 @@ public class IDeprecatedWorkbenchPageTest extends UITestCase {
 		/*
 		 * Commented out because until test case can be updated to work with new
 		 * window/page/perspective implementation
-		 * 
+		 *
 		 * assertEquals(fActivePage.getWorkbenchWindow(), fWin); IWorkbenchPage
 		 * page = openTestPage(fWin); assertEquals(page.getWorkbenchWindow(),
 		 * fWin);
@@ -629,7 +631,7 @@ public class IDeprecatedWorkbenchPageTest extends UITestCase {
 		 * It is possible that some action may query the isDirty value of the
 		 * editor to update its enabled state. There is nothing wrong in doing
 		 * that, so do not test for no isDirty call here.
-		 * 
+		 *
 		 * assertEquals(callTrace.contains( "isDirty"), false);
 		 */
 		assertEquals(callTrace.contains("doSave"), false);
@@ -644,8 +646,9 @@ public class IDeprecatedWorkbenchPageTest extends UITestCase {
 		MockEditorPart[] mocks = new MockEditorPart[total];
 
 		proj = FileUtil.createProject("testOpenEditor");
-		for (int i = 0; i < total; i++)
+		for (int i = 0; i < total; i++) {
 			files[i] = FileUtil.createFile(i + ".mock2", proj);
+		}
 
 		/*
 		 * javadoc: If the page has open editors with unsaved content and save
@@ -766,12 +769,14 @@ public class IDeprecatedWorkbenchPageTest extends UITestCase {
 		}
 
 		// save all dirty editors without confirmation
-		for (int i = 0; i < total; i++)
+		for (int i = 0; i < total; i++) {
 			mocks[i].setDirty(true);
+		}
 		assertEquals(fActivePage.saveAllEditors(false), true);
-		for (int i = 0; i < total; i++)
+		for (int i = 0; i < total; i++) {
 			assertEquals(callTraces[i].verifyOrder(new String[] { "isDirty",
 					"doSave" }), true);
+		}
 	}
 
 	public void testGetEditors() throws Throwable {
@@ -833,7 +838,7 @@ public class IDeprecatedWorkbenchPageTest extends UITestCase {
 //		assertEquals(facade.getActionSetCount(fActivePage), totalBefore);
 
 //		facade.assertActionSetId(fActivePage, id, false);
-		
+
 		fail("facade.assertActionSetId() had no implementation");
 	}
 }

@@ -25,7 +25,7 @@ public class WorkbenchMementoReader extends MementoReader {
 
 	List<WindowReader> getWindowReaders() {
 		IMemento[] windowMems = getChildren(IWorkbenchConstants.TAG_WINDOW);
-		List<WindowReader> windows = new ArrayList<WindowReader>(windowMems.length);
+		List<WindowReader> windows = new ArrayList<>(windowMems.length);
 		for (IMemento windowMem : windowMems) {
 			windows.add(new WindowReader(windowMem));
 		}

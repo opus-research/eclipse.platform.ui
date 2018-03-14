@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2007 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.actions;
 
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.ErrorDialog;
@@ -29,11 +30,10 @@ import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 import org.eclipse.ui.internal.LegacyResourceSupport;
 import org.eclipse.ui.internal.WorkbenchMessages;
-import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.wizards.IWizardDescriptor;
 
 /**
- * Opens a specific new wizard. 
+ * Opens a specific new wizard.
  */
 public class NewWizardShortcutAction extends Action implements
         IPluginContribution {
@@ -48,7 +48,7 @@ public class NewWizardShortcutAction extends Action implements
      * The wizard dialog height
      */
     private static final int SIZING_WIZARD_HEIGHT = 500;
-    
+
     private IWorkbenchWindow window;
 
     /**
@@ -69,16 +69,13 @@ public class NewWizardShortcutAction extends Action implements
 
     /**
      * Get the wizard descriptor for this action.
-     * 
-     * @return the wizard descriptor 
+     *
+     * @return the wizard descriptor
      */
     public IWizardDescriptor getWizardDescriptor() {
 		return wizardElement;
 	}
-   
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IAction#run()
-     */
+
     @Override
 	public void run() {
         // create instance of target wizard
@@ -105,7 +102,7 @@ public class NewWizardShortcutAction extends Action implements
                 IEditorInput input = ((IEditorPart) part).getEditorInput();
                 Class fileClass = LegacyResourceSupport.getFileClass();
                 if (input != null && fileClass != null) {
-                    Object file = Util.getAdapter(input, fileClass);
+					Object file = Adapters.adapt(input, fileClass);
                     if (file != null) {
                         selectionToPass = new StructuredSelection(file);
                     }
@@ -127,7 +124,7 @@ public class NewWizardShortcutAction extends Action implements
                 Math.max(SIZING_WIZARD_HEIGHT, defaultSize.y));
         window.getWorkbench().getHelpSystem().setHelp(dialog.getShell(),
 				IWorkbenchHelpContextIds.NEW_WIZARD_SHORTCUT);
-        
+
         // if the wizard can finish early and doesn't have any pages, just finish it.
         if (wizardElement.canFinishEarly() && !wizardElement.hasPages()) {
 			wizard.performFinish();
@@ -137,9 +134,6 @@ public class NewWizardShortcutAction extends Action implements
 		}
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.IPluginContribution#getLocalId()
-     */
     @Override
 	public String getLocalId() {
     	IPluginContribution contribution = getPluginContribution();
@@ -149,9 +143,6 @@ public class NewWizardShortcutAction extends Action implements
     	return wizardElement.getId();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.IPluginContribution#getPluginId()
-     */
     @Override
 	public String getPluginId() {
     	IPluginContribution contribution = getPluginContribution();
@@ -160,15 +151,14 @@ public class NewWizardShortcutAction extends Action implements
 		}
     	return null;
     }
-    
+
     /**
      * Return the plugin contribution associated with the wizard.
-     * 
+     *
      * @return the contribution or <code>null</code>
      * @since 3.1
      */
     private IPluginContribution getPluginContribution() {
-		return (IPluginContribution) Util.getAdapter(wizardElement,
-				IPluginContribution.class);
+		return Adapters.adapt(wizardElement, IPluginContribution.class);
 	}
 }

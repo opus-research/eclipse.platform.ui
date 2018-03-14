@@ -22,7 +22,7 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableValueContractDelegate;
 import org.eclipse.jface.databinding.conformance.swt.SWTMutableObservableValueContractTest;
 import org.eclipse.jface.databinding.conformance.util.ValueChangeEventTracker;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
@@ -37,6 +37,7 @@ public class CComboObservableValueTextTest extends TestCase {
 
 	private CCombo combo;
 
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -45,6 +46,7 @@ public class CComboObservableValueTextTest extends TestCase {
 		combo = delegate.combo;
 	}
 
+	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 
@@ -53,7 +55,7 @@ public class CComboObservableValueTextTest extends TestCase {
 
 	public void testModify_NotifiesObservable() throws Exception {
 		IObservableValue observable = delegate
-				.createObservableValue(SWTObservables.getRealm(Display
+				.createObservableValue(DisplayRealm.getRealm(Display
 						.getDefault()));
 		ValueChangeEventTracker listener = ValueChangeEventTracker
 				.observe(observable);
@@ -78,28 +80,34 @@ public class CComboObservableValueTextTest extends TestCase {
 
 		private Shell shell;
 
+		@Override
 		public void setUp() {
 			shell = new Shell();
 			combo = new CCombo(shell, SWT.NONE);
 		}
 
+		@Override
 		public void tearDown() {
 			shell.dispose();
 		}
 
+		@Override
 		public IObservableValue createObservableValue(Realm realm) {
 			return WidgetProperties.text().observe(realm, combo);
 		}
 
+		@Override
 		public void change(IObservable observable) {
 			IObservableValue ov = (IObservableValue) observable;
 			ov.setValue(createValue(ov));
 		}
 
+		@Override
 		public Object getValueType(IObservableValue observable) {
 			return String.class;
 		}
 
+		@Override
 		public Object createValue(IObservableValue observable) {
 			return observable.getValue() + "a";
 		}
