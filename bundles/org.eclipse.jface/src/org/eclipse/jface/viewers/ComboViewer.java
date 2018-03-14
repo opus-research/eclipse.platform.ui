@@ -123,16 +123,18 @@ public class ComboViewer extends AbstractListViewer {
 	protected int[] listGetSelectionIndices() {
         if (combo == null) {
             return new int[] { ccombo.getSelectionIndex() };
+        } else {
+            return new int[] { combo.getSelectionIndex() };
         }
-        return new int[] { combo.getSelectionIndex() };
     }
 
     @Override
 	protected int listGetItemCount() {
         if (combo == null) {
             return ccombo.getItemCount();
+        } else {
+            return combo.getItemCount();
         }
-        return combo.getItemCount();
     }
 
     @Override
@@ -169,8 +171,9 @@ public class ComboViewer extends AbstractListViewer {
 	public Control getControl() {
         if (combo == null) {
             return ccombo;
+        } else {
+            return combo;
         }
-        return combo;
     }
 
     /**
