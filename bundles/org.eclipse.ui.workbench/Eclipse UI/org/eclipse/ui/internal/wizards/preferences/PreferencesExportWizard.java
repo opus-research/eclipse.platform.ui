@@ -79,7 +79,7 @@ public class PreferencesExportWizard extends Wizard implements IExportWizard {
     @Override
 	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
 		eventBroker = workbench.getService(IEventBroker.class);
-		setWindowTitle(PreferencesMessages.PreferencesExportWizard_export);
+        setWindowTitle(PreferencesMessages.PreferencesExportWizard_export);
         setDefaultPageImageDescriptor(WorkbenchImages
                 .getImageDescriptor(IWorkbenchGraphicConstants.IMG_WIZBAN_EXPORT_PREF_WIZ));
         setNeedsProgressMonitor(true);

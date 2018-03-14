@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -24,7 +25,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
@@ -172,7 +172,7 @@ public class SaveableHelper {
 	 */
 	private static boolean saveModels(ISaveablesSource modelSource, final IWorkbenchWindow window, final boolean confirm) {
 		Saveable[] selectedModels = modelSource.getActiveSaveables();
-		final ArrayList<Saveable> dirtyModels = new ArrayList<Saveable>();
+		final ArrayList<Saveable> dirtyModels = new ArrayList<>();
 		for (int i = 0; i < selectedModels.length; i++) {
 			Saveable model = selectedModels[i];
 			if (model.isDirty()) {
@@ -188,18 +188,18 @@ public class SaveableHelper {
 			@Override
 			public void run(IProgressMonitor monitor) {
 				IProgressMonitor monitorWrap = new EventLoopProgressMonitor(monitor);
-				monitorWrap.beginTask(WorkbenchMessages.Save, dirtyModels.size());
+				SubMonitor subMonitor = SubMonitor.convert(monitorWrap, WorkbenchMessages.Save, dirtyModels.size());
 				try {
 					for (Iterator<Saveable> i = dirtyModels.iterator(); i.hasNext();) {
 						Saveable model = i.next();
 						// handle case where this model got saved as a result of
 						// saving another
 						if (!model.isDirty()) {
-							monitor.worked(1);
+							subMonitor.worked(1);
 							continue;
 						}
-						doSaveModel(model, new SubProgressMonitor(monitorWrap, 1), window, confirm);
-						if (monitor.isCanceled()) {
+						doSaveModel(model, subMonitor.newChild(1), window, confirm);
+						if (subMonitor.isCanceled()) {
 							break;
 						}
 					}
@@ -434,7 +434,7 @@ public class SaveableHelper {
 	}
 
 	private static void notifySaveAction(final IWorkbenchPart[] parts) {
-		Set<IWorkbenchWindow> wwindows = new HashSet<IWorkbenchWindow>();
+		Set<IWorkbenchWindow> wwindows = new HashSet<>();
 		for (int i = 0; i < parts.length; i++) {
 			wwindows.add(parts[i].getSite().getWorkbenchWindow());
 		}
@@ -452,7 +452,7 @@ public class SaveableHelper {
 	 * @return true if the user canceled.
 	 */
 	private static boolean waitForBackgroundSaveJob(final Saveable model) {
-		List<Saveable> models = new ArrayList<Saveable>();
+		List<Saveable> models = new ArrayList<>();
 		models.add(model);
 		return waitForBackgroundSaveJobs(models);
 	}

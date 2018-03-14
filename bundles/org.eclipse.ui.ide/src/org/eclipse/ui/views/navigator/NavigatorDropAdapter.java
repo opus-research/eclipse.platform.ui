@@ -90,9 +90,6 @@ public class NavigatorDropAdapter extends PluginDropAdapter implements IOverwrit
     }
 
 
-    /* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ViewerDropAdapter#dragOperationChanged(org.eclipse.swt.dnd.DropTargetEvent)
-	 */
 	@Override
 	public void dragOperationChanged(DropTargetEvent event) {
 		super.dragOperationChanged(event);
@@ -286,13 +283,10 @@ public class NavigatorDropAdapter extends PluginDropAdapter implements IOverwrit
         // Run the import operation asynchronously.
         // Otherwise the drag source (e.g., Windows Explorer) will be blocked
         // while the operation executes. Fixes bug 16478.
-        Display.getCurrent().asyncExec(new Runnable() {
-            @Override
-			public void run() {
-                getShell().forceActive();
-				new CopyFilesAndFoldersOperation(getShell()).copyOrLinkFiles(names, target, currentOperation);
-            }
-        });
+        Display.getCurrent().asyncExec(() -> {
+		    getShell().forceActive();
+			new CopyFilesAndFoldersOperation(getShell()).copyOrLinkFiles(names, target, currentOperation);
+		});
         return problems;
     }
 
@@ -420,18 +414,15 @@ public class NavigatorDropAdapter extends PluginDropAdapter implements IOverwrit
         final String[] options = { IDialogConstants.YES_LABEL,
                 IDialogConstants.YES_TO_ALL_LABEL, IDialogConstants.NO_LABEL,
                 IDialogConstants.CANCEL_LABEL };
-        getDisplay().syncExec(new Runnable() {
-            @Override
-			public void run() {
-                MessageDialog dialog = new MessageDialog(
-                        getShell(),
-                        ResourceNavigatorMessages.DropAdapter_question, null, msg, MessageDialog.QUESTION, options, 0);
-                dialog.open();
-                int returnVal = dialog.getReturnCode();
-                String[] returnCodes = { YES, ALL, NO, CANCEL };
-                returnCode[0] = returnVal < 0 ? CANCEL : returnCodes[returnVal];
-            }
-        });
+        getDisplay().syncExec(() -> {
+		    MessageDialog dialog = new MessageDialog(
+		            getShell(),
+		            ResourceNavigatorMessages.DropAdapter_question, null, msg, MessageDialog.QUESTION, options, 0);
+		    dialog.open();
+		    int returnVal = dialog.getReturnCode();
+		    String[] returnCodes = { YES, ALL, NO, CANCEL };
+		    returnCode[0] = returnVal < 0 ? CANCEL : returnCodes[returnVal];
+		});
         if (returnCode[0] == ALL) {
 			alwaysOverwrite = true;
 		}
