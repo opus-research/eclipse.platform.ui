@@ -16,7 +16,6 @@ package org.eclipse.core.databinding.observable.map;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,9 +30,14 @@ import org.eclipse.core.internal.databinding.observable.Util;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
+ *
+ * @param <K>
+ *            the type of the keys in this map
+ * @param <V>
+ *            the type of the values in this map
  * @since 1.0
  */
-public class WritableMap extends ObservableMap {
+public class WritableMap<K, V> extends ObservableMap<K, V> {
 	private final Object keyType;
 	private final Object valueType;
 
@@ -76,7 +80,7 @@ public class WritableMap extends ObservableMap {
 	 * @since 1.2
 	 */
 	public WritableMap(Realm realm, Object keyType, Object valueType) {
-		super(realm, new HashMap());
+		super(realm, new HashMap<K, V>());
 		this.keyType = keyType;
 		this.valueType = valueType;
 	}
@@ -98,23 +102,23 @@ public class WritableMap extends ObservableMap {
 	}
 
 	/**
-	 * Associates the provided <code>value</code> with the <code>key</code>.  Must be invoked from the current realm.
+	 * Associates the provided <code>value</code> with the <code>key</code>.
+	 * Must be invoked from the current realm.
 	 */
 	@Override
-	public Object put(Object key, Object value) {
+	public V put(K key, V value) {
 		checkRealm();
 
 		boolean containedKeyBefore = wrappedMap.containsKey(key);
-		Object result = wrappedMap.put(key, value);
+		V result = wrappedMap.put(key, value);
 		boolean containedKeyAfter = wrappedMap.containsKey(key);
 
 		if (containedKeyBefore != containedKeyAfter
 				|| !Util.equals(result, value)) {
-			MapDiff diff;
+			MapDiff<K, V> diff;
 			if (containedKeyBefore) {
 				if (containedKeyAfter) {
-					diff = Diffs
-							.createMapDiffSingleChange(key, result, value);
+					diff = Diffs.createMapDiffSingleChange(key, result, value);
 				} else {
 					diff = Diffs.createMapDiffSingleRemove(key, result);
 				}
@@ -127,45 +131,46 @@ public class WritableMap extends ObservableMap {
 	}
 
 	/**
-	 * Removes the value with the provide <code>key</code>.  Must be invoked from the current realm.
+	 * Removes the value with the provide <code>key</code>. Must be invoked from
+	 * the current realm.
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	public Object remove(Object key) {
+	public V remove(Object key) {
 		checkRealm();
 		if (wrappedMap.containsKey(key)) {
-			Object result = wrappedMap.remove(key);
-			fireMapChange(Diffs.createMapDiffSingleRemove(key, result));
+			V result = wrappedMap.remove(key);
+			fireMapChange(Diffs.createMapDiffSingleRemove((K) key, result));
 			return result;
 		}
 		return null;
 	}
 
 	/**
-	 * Clears the map.  Must be invoked from the current realm.
+	 * Clears the map. Must be invoked from the current realm.
 	 */
 	@Override
 	public void clear() {
 		checkRealm();
 		if (!isEmpty()) {
-			Map copy = new HashMap(wrappedMap);
+			Map<K, V> copy = new HashMap<>(wrappedMap);
 			wrappedMap.clear();
 			fireMapChange(Diffs.createMapDiffRemoveAll(copy));
 		}
 	}
 
 	/**
-	 * Adds the provided <code>map</code>'s contents to this map.  Must be invoked from the current realm.
+	 * Adds the provided <code>map</code>'s contents to this map. Must be
+	 * invoked from the current realm.
 	 */
 	@Override
-	public void putAll(Map map) {
+	public void putAll(Map<? extends K, ? extends V> map) {
 		checkRealm();
-		Set addedKeys = new HashSet(map.size());
-		Map changes = new HashMap(map.size());
-		for (Iterator it = map.entrySet().iterator(); it.hasNext();) {
-			Map.Entry entry = (Entry) it.next();
+		Set<K> addedKeys = new HashSet<>(map.size());
+		Map<K, V> changes = new HashMap<>(map.size());
+		for (Map.Entry<? extends K, ? extends V> entry : map.entrySet()) {
 			boolean add = !wrappedMap.containsKey(entry.getKey());
-			Object previousValue = wrappedMap.put(entry.getKey(), entry
-					.getValue());
+			V previousValue = wrappedMap.put(entry.getKey(), entry.getValue());
 			if (add) {
 				addedKeys.add(entry.getKey());
 			} else {
@@ -173,7 +178,8 @@ public class WritableMap extends ObservableMap {
 			}
 		}
 		if (!addedKeys.isEmpty() || !changes.isEmpty()) {
-			fireMapChange(Diffs.createMapDiff(addedKeys, Collections.EMPTY_SET,
+			Set<K> removedKeys = Collections.emptySet();
+			fireMapChange(Diffs.createMapDiff(addedKeys, removedKeys,
 					changes.keySet(), changes, wrappedMap));
 		}
 	}

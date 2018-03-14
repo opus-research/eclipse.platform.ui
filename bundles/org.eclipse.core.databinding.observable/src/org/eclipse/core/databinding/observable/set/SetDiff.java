@@ -20,20 +20,23 @@ import java.util.Set;
 import org.eclipse.core.databinding.observable.IDiff;
 
 /**
- * @since 1.0
+ * Describes the difference between two sets
  *
+ * @param <E>
+ *            the type of elements in this diff
+ * @since 1.0
  */
-public abstract class SetDiff implements IDiff {
+public abstract class SetDiff<E> implements IDiff {
 
 	/**
 	 * @return the set of added elements
 	 */
-	public abstract Set getAdditions();
+	public abstract Set<E> getAdditions();
 
 	/**
 	 * @return the set of removed elements
 	 */
-	public abstract Set getRemovals();
+	public abstract Set<E> getRemovals();
 
 	/**
 	 * Returns true if the diff has no added or removed elements.
@@ -52,7 +55,7 @@ public abstract class SetDiff implements IDiff {
 	 *            the set to which the diff will be applied
 	 * @since 1.2
 	 */
-	public void applyTo(Set set) {
+	public void applyTo(Set<E> set) {
 		set.addAll(getAdditions());
 		set.removeAll(getRemovals());
 	}
@@ -72,27 +75,27 @@ public abstract class SetDiff implements IDiff {
 	 *         were passed to the {@link #applyTo(Set)} method.
 	 * @since 1.3
 	 */
-	public Set simulateOn(Set set) {
-		return new DeltaSet(set, this);
+	public Set<E> simulateOn(Set<E> set) {
+		return new DeltaSet<>(set, this);
 	}
 
-	private static class DeltaSet extends AbstractSet {
-		private Set original;
-		private final SetDiff diff;
+	private static class DeltaSet<E> extends AbstractSet<E> {
+		private Set<E> original;
+		private final SetDiff<E> diff;
 
-		public DeltaSet(Set original, SetDiff diff) {
+		public DeltaSet(Set<E> original, SetDiff<E> diff) {
 			this.original = original;
 			this.diff = diff;
 		}
 
 		@Override
-		public Iterator iterator() {
-			return new Iterator() {
-				Iterator orig = original.iterator();
-				Iterator add = diff.getAdditions().iterator();
+		public Iterator<E> iterator() {
+			return new Iterator<E>() {
+				Iterator<E> orig = original.iterator();
+				Iterator<E> add = diff.getAdditions().iterator();
 
 				boolean haveNext = false;
-				Object next;
+				E next;
 
 				@Override
 				public boolean hasNext() {
@@ -100,10 +103,10 @@ public abstract class SetDiff implements IDiff {
 				}
 
 				@Override
-				public Object next() {
+				public E next() {
 					if (!findNext())
 						throw new NoSuchElementException();
-					Object myNext = next;
+					E myNext = next;
 					haveNext = false;
 					next = null;
 					return myNext;
@@ -113,7 +116,7 @@ public abstract class SetDiff implements IDiff {
 					if (haveNext)
 						return true;
 					while (true) {
-						Object candidate;
+						E candidate;
 						if (orig.hasNext())
 							candidate = orig.next();
 						else if (add.hasNext())
@@ -156,14 +159,13 @@ public abstract class SetDiff implements IDiff {
 	@Override
 	public String toString() {
 		StringBuffer buffer = new StringBuffer();
-		buffer.append(getClass().getName()).append("{additions [") //$NON-NLS-1$
-				.append(
-						getAdditions() != null ? getAdditions().toString()
-								: "null") //$NON-NLS-1$
+		buffer.append(getClass().getName())
+				.append("{additions [") //$NON-NLS-1$
+				.append(getAdditions() != null ? getAdditions().toString()
+						: "null") //$NON-NLS-1$
 				.append("], removals [") //$NON-NLS-1$
-				.append(
-						getRemovals() != null ? getRemovals().toString()
-								: "null") //$NON-NLS-1$
+				.append(getRemovals() != null ? getRemovals().toString()
+						: "null") //$NON-NLS-1$
 				.append("]}"); //$NON-NLS-1$
 
 		return buffer.toString();

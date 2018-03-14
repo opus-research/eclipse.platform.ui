@@ -27,15 +27,18 @@ import org.eclipse.core.databinding.observable.set.IObservableSet;
  * in the originating wrapped list are propagated and thrown from this instance
  * when appropriate. All mutators throw an UnsupportedOperationException.
  *
+ * @param <E>
+ *            the type of the elements in this set
+ *
  * @since 1.1
  */
-public class UnmodifiableObservableSet extends DecoratingObservableSet {
-	private Set unmodifiableSet;
+public class UnmodifiableObservableSet<E> extends DecoratingObservableSet<E> {
+	private Set<E> unmodifiableSet;
 
 	/**
 	 * @param decorated
 	 */
-	public UnmodifiableObservableSet(IObservableSet decorated) {
+	public UnmodifiableObservableSet(IObservableSet<E> decorated) {
 		super(decorated, false);
 
 		this.unmodifiableSet = Collections.unmodifiableSet(decorated);
@@ -47,7 +50,7 @@ public class UnmodifiableObservableSet extends DecoratingObservableSet {
 	}
 
 	@Override
-	public boolean addAll(Collection c) {
+	public boolean addAll(Collection<? extends E> c) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -57,7 +60,7 @@ public class UnmodifiableObservableSet extends DecoratingObservableSet {
 	}
 
 	@Override
-	public Iterator iterator() {
+	public Iterator<E> iterator() {
 		getterCalled();
 		return unmodifiableSet.iterator();
 	}
@@ -68,12 +71,12 @@ public class UnmodifiableObservableSet extends DecoratingObservableSet {
 	}
 
 	@Override
-	public boolean removeAll(Collection c) {
+	public boolean removeAll(Collection<?> c) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public boolean retainAll(Collection c) {
+	public boolean retainAll(Collection<?> c) {
 		throw new UnsupportedOperationException();
 	}
 

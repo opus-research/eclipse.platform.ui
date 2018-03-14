@@ -55,10 +55,8 @@ import org.eclipse.core.runtime.ListenerList;
 				length = listenerTypes.length;
 				System.arraycopy(listenerTypes, 0,
 						listenerTypes = new Object[length + 1], 0, length);
-				System
-						.arraycopy(listenerLists, 0,
-								listenerLists = new ListenerList[length + 1],
-								0, length);
+				System.arraycopy(listenerLists, 0,
+						listenerLists = new ListenerList[length + 1], 0, length);
 			}
 			listenerTypes[length] = listenerType;
 			listenerLists[length] = new ListenerList();

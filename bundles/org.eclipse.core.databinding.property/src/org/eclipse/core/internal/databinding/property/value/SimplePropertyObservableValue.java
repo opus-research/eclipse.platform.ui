@@ -18,7 +18,6 @@ import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.AbstractObservableValue;
 import org.eclipse.core.databinding.observable.value.ValueDiff;
 import org.eclipse.core.databinding.property.INativePropertyListener;
-import org.eclipse.core.databinding.property.IProperty;
 import org.eclipse.core.databinding.property.IPropertyObservable;
 import org.eclipse.core.databinding.property.ISimplePropertyListener;
 import org.eclipse.core.databinding.property.SimplePropertyEvent;
@@ -26,27 +25,32 @@ import org.eclipse.core.databinding.property.value.SimpleValueProperty;
 import org.eclipse.core.internal.databinding.property.Util;
 
 /**
+ * @param <S>
+ *            type of the source object
+ * @param <T>
+ *            type of the value of the property
  * @since 1.2
  *
  */
-public class SimplePropertyObservableValue extends AbstractObservableValue
-		implements IPropertyObservable {
-	private Object source;
-	private SimpleValueProperty property;
+public class SimplePropertyObservableValue<S, T> extends
+		AbstractObservableValue<T> implements
+		IPropertyObservable<SimpleValueProperty<S, T>> {
+	private S source;
+	private SimpleValueProperty<S, T> property;
 
 	private boolean updating = false;
-	private Object cachedValue;
+	private T cachedValue;
 	private boolean stale;
 
-	private INativePropertyListener listener;
+	private INativePropertyListener<S> listener;
 
 	/**
 	 * @param realm
 	 * @param source
 	 * @param property
 	 */
-	public SimplePropertyObservableValue(Realm realm, Object source,
-			SimpleValueProperty property) {
+	public SimplePropertyObservableValue(Realm realm, S source,
+			SimpleValueProperty<S, T> property) {
 		super(realm);
 		this.source = source;
 		this.property = property;
@@ -57,16 +61,16 @@ public class SimplePropertyObservableValue extends AbstractObservableValue
 		if (!isDisposed()) {
 			if (listener == null) {
 				listener = property
-						.adaptListener(new ISimplePropertyListener() {
+						.adaptListener(new ISimplePropertyListener<ValueDiff<T>>() {
 							@Override
 							public void handleEvent(
-									final SimplePropertyEvent event) {
+									final SimplePropertyEvent<ValueDiff<T>> event) {
 								if (!isDisposed() && !updating) {
 									getRealm().exec(new Runnable() {
 										@Override
 										public void run() {
 											if (event.type == SimplePropertyEvent.CHANGE) {
-												notifyIfChanged((ValueDiff) event.diff);
+												notifyIfChanged(event.diff);
 											} else if (event.type == SimplePropertyEvent.STALE
 													&& !stale) {
 												stale = true;
@@ -99,13 +103,13 @@ public class SimplePropertyObservableValue extends AbstractObservableValue
 	}
 
 	@Override
-	protected Object doGetValue() {
+	protected T doGetValue() {
 		notifyIfChanged(null);
 		return property.getValue(source);
 	}
 
 	@Override
-	protected void doSetValue(Object value) {
+	protected void doSetValue(T value) {
 		updating = true;
 		try {
 			property.setValue(source, value);
@@ -116,10 +120,10 @@ public class SimplePropertyObservableValue extends AbstractObservableValue
 		notifyIfChanged(null);
 	}
 
-	private void notifyIfChanged(ValueDiff diff) {
+	private void notifyIfChanged(ValueDiff<T> diff) {
 		if (hasListeners()) {
-			Object oldValue = cachedValue;
-			Object newValue = cachedValue = property.getValue(source);
+			T oldValue = cachedValue;
+			T newValue = cachedValue = property.getValue(source);
 			if (diff == null)
 				diff = Diffs.createValueDiff(oldValue, newValue);
 			if (!Util.equals(oldValue, newValue) || stale) {
@@ -140,7 +144,7 @@ public class SimplePropertyObservableValue extends AbstractObservableValue
 	}
 
 	@Override
-	public IProperty getProperty() {
+	public SimpleValueProperty<S, T> getProperty() {
 		return property;
 	}
 
