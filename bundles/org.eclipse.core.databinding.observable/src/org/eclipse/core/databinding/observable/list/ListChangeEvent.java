@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
- *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.list;
@@ -38,7 +37,7 @@ public class ListChangeEvent<E> extends ObservableEvent {
 	 * Description of the change to the source observable list. Listeners must
 	 * not change this field.
 	 */
-	public ListDiff<E> diff;
+	public ListDiff<? extends E> diff;
 
 	/**
 	 * Always identical to <code>EventObject.source</code> but the type
@@ -54,7 +53,7 @@ public class ListChangeEvent<E> extends ObservableEvent {
 	 * @param diff
 	 *            the list change
 	 */
-	public ListChangeEvent(IObservableList<E> source, ListDiff<E> diff) {
+	public ListChangeEvent(IObservableList<E> source, ListDiff<? extends E> diff) {
 		super(source);
 		this.typedSource = source;
 		this.diff = diff;

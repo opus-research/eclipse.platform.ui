@@ -11,7 +11,6 @@
  *     Matthew Hall - bugs 118516, 146397, 226289, 246103, 249526, 264307,
  *                    349038
  *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
- *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.map;
@@ -251,10 +250,10 @@ public abstract class AbstractObservableMap<K, V> extends AbstractMap<K, V>
 	 *
 	 * @param diff
 	 */
-	protected void fireMapChange(MapDiff<K, V> diff) {
+	protected void fireMapChange(MapDiff<? extends K, ? extends V> diff) {
 		checkRealm();
 		fireChange();
-		changeSupport.fireEvent(new MapChangeEvent<>(this, diff));
+		changeSupport.fireEvent(new MapChangeEvent<K, V>(this, diff));
 	}
 
 	/**
