@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
- *     Lars.Vogel <Lars.VOgel@vogella.com> - Bug 414565, 475361
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 414565
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -69,7 +69,7 @@ public class Snippet002TreeViewer {
 
 	public class MyModel {
 		public MyModel parent;
-		public List<MyModel> child = new ArrayList<>();
+		public List<MyModel> child = new ArrayList<MyModel>();
 		public int counter;
 
 		public MyModel(int counter, MyModel parent) {

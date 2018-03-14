@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 414565, 442278, 475361
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 414565, 442278
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -74,7 +74,7 @@ public class Snippet005TreeCustomMenu {
 	public class MyModel {
 		public MyModel parent;
 
-		public List<MyModel> child = new ArrayList<>();
+		public List<MyModel> child = new ArrayList<MyModel>();
 
 		public int counter;
 
