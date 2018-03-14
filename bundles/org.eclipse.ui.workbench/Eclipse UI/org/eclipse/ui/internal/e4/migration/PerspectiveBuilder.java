@@ -74,15 +74,13 @@ public class PerspectiveBuilder {
 
 	private List<String> defaultFastViews;
 
-	private Map<String, MPlaceholder> viewPlaceholders = new HashMap<>();
+	private Map<String, MPlaceholder> viewPlaceholders = new HashMap<String, MPlaceholder>();
 
 	private Map<String, ViewLayoutReader> viewLayouts;
 
 	private MPlaceholder editorAreaPlaceholder;
 
 	private ModeledPageLayoutUtils layoutUtils;
-
-	private Integer defaultFastViewSide;
 
 	@PostConstruct
 	private void postConstruct() {
@@ -94,11 +92,6 @@ public class PerspectiveBuilder {
 		tags = perspective.getTags();
 		populate();
 		return perspective;
-	}
-
-	public MPerspective createPerspective(Integer defaultFastViewSide) {
-		this.defaultFastViewSide = defaultFastViewSide;
-		return createPerspective();
 	}
 
 	private void create() {
@@ -190,24 +183,7 @@ public class PerspectiveBuilder {
 
 		if (defaultFastViews.size() > 0) {
 			sb.append(DEFAULT_FASTVIEW_STACK).append(' ');
-			if (defaultFastViewSide != null) {
-				switch (defaultFastViewSide) {
-				case SWT.TOP:
-					sb.append(SideValue.TOP_VALUE).append(' ').append(topCounter++);
-					break;
-				case SWT.BOTTOM:
-					sb.append(SideValue.BOTTOM_VALUE).append(' ').append(bottomCounter++);
-					break;
-				case SWT.RIGHT:
-					sb.append(SideValue.RIGHT_VALUE).append(' ').append(rightCounter++);
-					break;
-				default:
-					sb.append(SideValue.LEFT_VALUE).append(' ').append(leftCounter++);
-					break;
-				}
-			} else {
-				sb.append(SideValue.BOTTOM_VALUE).append(' ').append(bottomCounter++);
-			}
+			sb.append(SideValue.BOTTOM_VALUE).append(' ').append(bottomCounter++);
 			sb.append('#');
 		}
 
@@ -485,7 +461,7 @@ public class PerspectiveBuilder {
 		if (partOrder == null || partOrder.length != renderedViews.size()) {
 			return;
 		}
-		List<MStackElement> originalOrder = new ArrayList<>(renderedViews);
+		List<MStackElement> originalOrder = new ArrayList<MStackElement>(renderedViews);
 		stackChildren.clear();
 		for (int i = 0; i < partOrder.length; i++) {
 			stackChildren.add(originalOrder.get(partOrder[i]));
@@ -495,7 +471,7 @@ public class PerspectiveBuilder {
 	}
 
 	private List<MStackElement> getRenderedViews(MPartStack stack) {
-		List<MStackElement> renderedViews = new ArrayList<>();
+		List<MStackElement> renderedViews = new ArrayList<MStackElement>();
 		for (MStackElement element : stack.getChildren()) {
 			if (element.isToBeRendered()) {
 				renderedViews.add(element);
@@ -600,7 +576,7 @@ public class PerspectiveBuilder {
 	}
 
 	public static ArrayList<String> getShowInPartFromRegistry(String targetId) {
-		ArrayList<String> list = new ArrayList<>();
+		ArrayList<String> list = new ArrayList<String>();
 		IExtension[] extensions = getPerspectiveExtensions();
 		if (extensions != null) {
 			for (int i = 0; i < extensions.length; i++) {
@@ -622,7 +598,7 @@ public class PerspectiveBuilder {
 	}
 
 	private static ArrayList<String> getExtensionShowInPartFromRegistry(IExtension extension, String targetId) {
-		ArrayList<String> list = new ArrayList<>();
+		ArrayList<String> list = new ArrayList<String>();
 		IConfigurationElement[] configElements = extension.getConfigurationElements();
 		for (int j = 0; j < configElements.length; j++) {
 			String type = configElements[j].getName();
@@ -637,7 +613,7 @@ public class PerspectiveBuilder {
 	}
 
 	private static ArrayList<String> getConfigElementShowInPartsFromRegistry(IConfigurationElement configElement) {
-		ArrayList<String> list = new ArrayList<>();
+		ArrayList<String> list = new ArrayList<String>();
 		String tag = IWorkbenchRegistryConstants.TAG_SHOW_IN_PART;
 		IConfigurationElement[] children = configElement.getChildren();
 		for (int nX = 0; nX < children.length; nX++) {

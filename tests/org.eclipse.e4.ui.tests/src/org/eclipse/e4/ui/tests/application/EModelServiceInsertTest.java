@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,15 +10,12 @@
  ******************************************************************************/
 package org.eclipse.e4.ui.tests.application;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
+import junit.framework.TestCase;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.impl.ApplicationFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
-import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
@@ -26,23 +23,22 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
-public class EModelServiceInsertTest {
+public class EModelServiceInsertTest extends TestCase {
 
 	private IEclipseContext applicationContext;
 
 	MApplication app = null;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		applicationContext = E4Application.createDefaultContext();
+		super.setUp();
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
 		applicationContext.dispose();
 	}
 
@@ -96,8 +92,10 @@ public class EModelServiceInsertTest {
 		return app;
 	}
 
-	private void testInsert(MApplication app, String relToId, int where, float ratio) {
-		EModelService modelService = app.getContext().get(EModelService.class);
+	private void testInsert(MApplication app, String relToId, int where,
+			int ratio) {
+		EModelService modelService = (EModelService) app.getContext().get(
+				EModelService.class.getName());
 		assertNotNull(modelService);
 
 		MUIElement relTo = modelService.find(relToId, app);
@@ -130,87 +128,43 @@ public class EModelServiceInsertTest {
 		}
 	}
 
-	@Test
 	public void testSimpleInsertAbove() {
 		MApplication application = createSimpleApplication();
-		testInsert(application, "theStack", EModelService.ABOVE, .25f);
+		testInsert(application, "theStack", EModelService.ABOVE, 25);
 	}
 
-	@Test
 	public void testSimpleInsertBelow() {
 		MApplication application = createSimpleApplication();
-		testInsert(application, "theStack", EModelService.BELOW, .25f);
+		testInsert(application, "theStack", EModelService.BELOW, 25);
 	}
 
-	@Test
 	public void testSimpleInsertLeftOf() {
 		MApplication application = createSimpleApplication();
-		testInsert(application, "theStack", EModelService.LEFT_OF, .25f);
+		testInsert(application, "theStack", EModelService.LEFT_OF, 25);
 	}
 
-	@Test
 	public void testSimpleInsertRightOf() {
 		MApplication application = createSimpleApplication();
-		testInsert(application, "theStack", EModelService.RIGHT_OF, .25f);
+		testInsert(application, "theStack", EModelService.RIGHT_OF, 25);
 	}
 
-	@Test
 	public void testInsertAbove() {
 		MApplication application = createApplication();
-		testInsert(application, "theStack", EModelService.ABOVE, .35f);
+		testInsert(application, "theStack", EModelService.ABOVE, 35);
 	}
 
-	@Test
 	public void testInsertBelow() {
 		MApplication application = createApplication();
-		testInsert(application, "theStack", EModelService.BELOW, .35f);
+		testInsert(application, "theStack", EModelService.BELOW, 35);
 	}
 
-	@Test
 	public void testInsertLeftOf() {
 		MApplication application = createApplication();
-		testInsert(application, "theStack", EModelService.LEFT_OF, .35f);
+		testInsert(application, "theStack", EModelService.LEFT_OF, 35);
 	}
 
-	@Test
 	public void testInsertRightOf() {
 		MApplication application = createApplication();
-		testInsert(application, "theStack", EModelService.RIGHT_OF, .35f);
-	}
-
-	@Test
-	public void testInsertRightOfSharedStack() {
-		EModelService modelService = (EModelService) applicationContext.get(EModelService.class.getName());
-		assertNotNull(modelService);
-		app = modelService.createModelElement(MApplication.class);
-		app.setContext(applicationContext);
-		MWindow window = modelService.createModelElement(MWindow.class);
-		window.setElementId("main.Window");
-		app.getChildren().add(window);
-
-		MPartSashContainer psc = modelService.createModelElement(MPartSashContainer.class);
-		psc.setHorizontal(true);
-		psc.setElementId("topSash");
-		window.getChildren().add(psc);
-
-		MPartStack sharedStack = modelService.createModelElement(MPartStack.class);
-		sharedStack.setElementId("sharedStack");
-		window.getSharedElements().add(sharedStack);
-
-		MPart part1 = BasicFactoryImpl.eINSTANCE.createPart();
-		part1.setElementId("part1");
-		sharedStack.getChildren().add(part1);
-
-		MPlaceholder sharedStackRef = modelService.createModelElement(MPlaceholder.class);
-		sharedStackRef.setElementId(sharedStack.getElementId());
-		sharedStackRef.setRef(sharedStack);
-
-		psc.getChildren().add(sharedStackRef);
-		// setup complete
-
-		MPart newPart = modelService.createModelElement(MPart.class);
-		newPart.setElementId("part2");
-
-		modelService.insert(newPart, sharedStack, EModelService.BELOW, 0.5f);
+		testInsert(application, "theStack", EModelService.RIGHT_OF, 35);
 	}
 }

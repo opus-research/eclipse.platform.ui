@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,8 +41,7 @@ public class PopulateRootOperation extends SelectFilesOperation {
      * - if the file system object is a file then it must have an extension
      *   suitable for selection
      */
-    @Override
-	protected FileSystemElement createElement(FileSystemElement parent,
+    protected FileSystemElement createElement(FileSystemElement parent,
             Object fileSystemObject) throws InterruptedException {
 
         //Iterate on level deep

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 The Pampered Chef, Inc. and others.
+ * Copyright (c) 2006, 2009 The Pampered Chef, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,8 +9,6 @@
  *     The Pampered Chef, Inc. - initial API and implementation
  *     Tom Schindl - cell editing
  *     Matthew Hall - bugs 260329, 260337
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 434283
- *     Patrik Suzzi - 479848
  ******************************************************************************/
 
 package org.eclipse.jface.examples.databinding.snippets;
@@ -22,11 +20,11 @@ import java.util.List;
 
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.beans.BeanProperties;
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.list.WritableList;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
-import org.eclipse.jface.databinding.swt.WidgetProperties;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.viewers.ObservableValueEditingSupport;
 import org.eclipse.jface.databinding.viewers.ViewerSupport;
 import org.eclipse.jface.databinding.viewers.ViewersObservables;
@@ -50,7 +48,7 @@ import org.eclipse.swt.widgets.Table;
 public class Snippet013TableViewerEditing {
 	public static void main(String[] args) {
 		final Display display = new Display();
-		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
+		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
 			@Override
 			public void run() {
 				ViewModel viewModel = new ViewModel();
@@ -146,7 +144,7 @@ public class Snippet013TableViewerEditing {
 	 * Editing support that uses JFace Data Binding to control the editing
 	 * lifecycle. The standard EditingSupport get/setValue(...) lifecycle is not
 	 * used.
-	 *
+	 * 
 	 * @since 3.3
 	 */
 	private static class InlineEditingSupport extends
@@ -172,13 +170,14 @@ public class Snippet013TableViewerEditing {
 		protected IObservableValue doCreateCellEditorObservable(
 				CellEditor cellEditor) {
 
-			return WidgetProperties.text(SWT.Modify).observe(cellEditor.getControl());
+			return SWTObservables.observeText(cellEditor.getControl(),
+					SWT.Modify);
 		}
 
 		@Override
 		protected IObservableValue doCreateElementObservable(Object element,
 				ViewerCell cell) {
-			return BeanProperties.value(element.getClass(), "name").observe(element);
+			return BeansObservables.observeValue(element, "name");
 		}
 	}
 
@@ -232,9 +231,9 @@ public class Snippet013TableViewerEditing {
 			// bind selectedCommitter label to the name of the current selection
 			IObservableValue selection = ViewersObservables
 					.observeSingleSelection(peopleViewer);
-			bindingContext.bindValue(WidgetProperties.text().observe(selectedCommitter),
-					BeanProperties.value((Class) selection.getValueType(), "name", String.class)
-					.observeDetail(selection));
+			bindingContext.bindValue(SWTObservables
+					.observeText(selectedCommitter), BeansObservables
+					.observeDetailValue(selection, "name", String.class));
 		}
 	}
 

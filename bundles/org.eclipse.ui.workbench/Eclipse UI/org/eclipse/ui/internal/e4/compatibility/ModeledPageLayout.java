@@ -7,8 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 433450
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 
 package org.eclipse.ui.internal.e4.compatibility;
@@ -23,11 +21,13 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
+import org.eclipse.e4.ui.model.application.ui.advanced.impl.AdvancedFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
@@ -62,14 +62,13 @@ public class ModeledPageLayout implements IPageLayout {
 	public static final String EDITOR_STACK_TAG = "EditorStack"; //$NON-NLS-1$
 	public static final String HIDDEN_MENU_PREFIX = "persp.hideMenuSC:"; //$NON-NLS-1$
 	public static final String HIDDEN_TOOLBAR_PREFIX = "persp.hideToolbarSC:"; //$NON-NLS-1$
-	public static final String HIDDEN_ACTIONSET_PREFIX = "persp.hideActionSetSC:"; //$NON-NLS-1$
 	public static final String HIDDEN_ITEMS_KEY = "persp.hiddenItems"; //$NON-NLS-1$
 
 	public static List<String> getIds(MPerspective model, String tagPrefix) {
 		if (model == null) {
 			return Collections.emptyList();
 		}
-		ArrayList<String> result = new ArrayList<>();
+		ArrayList<String> result = new ArrayList<String>();
 		for (String tag : model.getTags()) {
 			if (tag.startsWith(tagPrefix)) {
 				result.add(tag.substring(tagPrefix.length()));
@@ -104,6 +103,13 @@ public class ModeledPageLayout implements IPageLayout {
 			this.element = element;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ui.activities.IIdentifierListener#identifierChanged(org
+		 * .eclipse.ui.activities.IdentifierEvent)
+		 */
 		@Override
 		public void identifierChanged(IdentifierEvent identifierEvent) {
 			IIdentifier identifier = identifierEvent.getIdentifier();
@@ -147,10 +153,12 @@ public class ModeledPageLayout implements IPageLayout {
 		}
 
 		if (sharedArea == null) {
-			sharedArea = modelService.createModelElement(MArea.class);
+			sharedArea = AdvancedFactoryImpl.eINSTANCE.createArea();
 			// sharedArea.setLabel("Editor Area"); //$NON-NLS-1$
 
-			editorStack = modelService.createModelElement(MPartStack.class);
+			editorStack = BasicFactoryImpl.eINSTANCE.createPartStack();
+			// temporary HACK for bug 303982
+			editorStack.getTags().add("newtablook"); //$NON-NLS-1$
 			editorStack.getTags().add("org.eclipse.e4.primaryDataStack"); //$NON-NLS-1$
 			editorStack.getTags().add(EDITOR_STACK_TAG);
 			editorStack.setElementId("org.eclipse.e4.primaryDataStack"); //$NON-NLS-1$
@@ -166,7 +174,7 @@ public class ModeledPageLayout implements IPageLayout {
 			}
 		}
 
-		eaRef = modelService.createModelElement(MPlaceholder.class);
+		eaRef = AdvancedFactoryImpl.eINSTANCE.createPlaceholder();
 		eaRef.setElementId(getEditorArea());
 		eaRef.setRef(sharedArea);
 
@@ -416,7 +424,8 @@ public class ModeledPageLayout implements IPageLayout {
 				stack.getChildren().add(viewModel);
 				retVal = stack;
 			} else {
-				layoutUtils.insert(viewModel, findRefModel(refId), layoutUtils.plRelToSwt(relationship), ratio);
+				layoutUtils.insert(viewModel, findRefModel(refId),
+						layoutUtils.plRelToSwt(relationship), ratio);
 			}
 
 		}
@@ -460,7 +469,7 @@ public class ModeledPageLayout implements IPageLayout {
 	 * containers underneath the current perspective. If this element's parent
 	 * is the perspective itself, the element will be returned. The perspective
 	 * will only be returned if the perspective itself has no children.
-	 *
+	 * 
 	 * @return the parent of the final element in the recursion chain of
 	 *         children, or the element itself if its parent is the perspective,
 	 *         or the perspective if the perspective itself has no children
@@ -479,7 +488,8 @@ public class ModeledPageLayout implements IPageLayout {
 		if (refModel == null) {
 			WorkbenchPlugin.log(NLS.bind(WorkbenchMessages.PageLayout_missingRefPart, refId));
 			MPartStack stack = layoutUtils.createStack(stackId, visible);
-			layoutUtils.insert(stack, getLastElement(), layoutUtils.plRelToSwt(relationship), ratio);
+			layoutUtils
+					.insert(stack, getLastElement(), layoutUtils.plRelToSwt(relationship), ratio);
 			return stack;
 		}
 		// If the 'refModel' is -not- a stack then find one
@@ -597,33 +607,32 @@ public class ModeledPageLayout implements IPageLayout {
 			E4Util.unsupported("stackView: failed to find " + refId + " for " + id); //$NON-NLS-1$//$NON-NLS-2$
 			return;
 		}
-
-		// Hide views that are filtered by capabilities
-		boolean isFiltered = isViewFiltered(id);
-		boolean toBeRendered = visible && !isFiltered;
-
-		MStackElement viewModel = createViewModel(application, id, toBeRendered, page, partService,
+		MStackElement viewModel = createViewModel(application, id, visible, page, partService,
 				createReferences);
 		if (viewModel != null) {
 			MPartStack stack = (MPartStack) refModel;
 			boolean wasEmpty = stack.getChildren().isEmpty();
 			stack.getChildren().add(viewModel);
-			if (wasEmpty && toBeRendered) {
+			if (wasEmpty && visible) {
 				// the stack didn't originally have any children, set this as
 				// the selected element
 				stack.setSelectedElement(viewModel);
 			}
 
-			if (viewModel.isToBeRendered()) {
+			if (visible || viewModel.isToBeRendered()) {
 				// ensure that the parent is being rendered, it may have been a
 				// placeholder folder so its flag may actually be false
-				layoutUtils.resetToBeRenderedFlag(viewModel, true);
-			}
-
-			if (isFiltered) {
-				addViewActivator(viewModel);
+				resetToBeRenderedFlag(viewModel, true);
 			}
 		}
 	}
 
+	private static void resetToBeRenderedFlag(MUIElement element, boolean toBeRendered) {
+		MUIElement parent = element.getParent();
+		while (parent != null && !(parent instanceof MPerspective)) {
+			parent.setToBeRendered(toBeRendered);
+			parent = parent.getParent();
+		}
+		element.setToBeRendered(toBeRendered);
+	}
 }

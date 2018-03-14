@@ -59,42 +59,40 @@ public class WizardProgressMonitorTest extends TestCase {
 
 		// normal "stop button" behavior
 		dialog.useStopButton = true;
-
+		
 		// open the dialog
 		dialog.open();
 
 		// run task A, we don't fork so we can make a UI call within the
 		// runnable
 		dialog.run(false, true, getRunnable(taskNames[0]));
-
+		
 		performAsserts();
 
 		// run task B now, again, we don't fork so we can make a UI call within
 		// the runnable
 		dialog.run(false, true, getRunnable(taskNames[1]));
-
+		
 		// check that the label has been cleared
 		performAsserts();
 	}
 
 	protected void performAsserts() {
-
+		
 		assertEquals("The progress monitor's label should have been cleared", //$NON-NLS-1$
 				"", dialog.getProgressMonitorLabelText()); //$NON-NLS-1$
-
+		
 		String subTask = dialog.getProgressMonitorSubTaskText();
 		if(subTask !=null && subTask.length() != 0)
-		 {
 			fail("The progress monitor's subtask should have been cleared"); //$NON-NLS-1$
-		}
 	}
 
-
+	
 	protected IRunnableWithProgress getRunnable(final String taskName) {
 		return new IRunnableWithProgress() {
 			@Override
 			public void run(IProgressMonitor monitor) {
-
+				
 				// check that the label is empty
 				assertEquals(
 						"The progress monitor's label is not initially empty", //$NON-NLS-1$
@@ -103,22 +101,20 @@ public class WizardProgressMonitorTest extends TestCase {
 				// check the subtask as well
 				String subTask = dialog.getProgressMonitorSubTaskText();
 				if(subTask !=null && subTask.length() != 0)
-				 {
 					fail("The progress monitor's subtask is not initially empty"); //$NON-NLS-1$
-				}
-
+				
 				monitor.beginTask(taskName, 1);
 				monitor.subTask("some sub task"); //$NON-NLS-1$
 			}
 		};
 	}
-
+	
 	/**
 	 * A wizard dialog that leverages ProgressMonitorPartSubclass to expose the
 	 * progress monitor's label text.
 	 */
 	class ProgressMonitoringWizardDialog extends WizardDialog {
-
+		
 		boolean useStopButton;
 
 		ProgressMonitoringWizardDialog(IWizard newWizard) {
@@ -135,7 +131,7 @@ public class WizardProgressMonitorTest extends TestCase {
 			ProgressMonitorPartSubclass monitor = (ProgressMonitorPartSubclass) getProgressMonitor();
 			return monitor.getLabelText();
 		}
-
+		
 		public String getProgressMonitorSubTaskText() {
 			ProgressMonitorPartSubclass monitor = (ProgressMonitorPartSubclass) getProgressMonitor();
 			return monitor.getSubTaskText();
@@ -156,13 +152,13 @@ public class WizardProgressMonitorTest extends TestCase {
 		public String getLabelText() {
 			return fLabel.getText();
 		}
-
+		
 		public String getSubTaskText() {
 			return fSubTaskName;
 		}
 
 	}
-
+	
 	/**
 	 * This test ensures that a wizard dialog subclass which overrides the
 	 * #getProgressMonitorPart method and returns a monitor without the stop button
@@ -175,23 +171,23 @@ public class WizardProgressMonitorTest extends TestCase {
 
 		// no stop button, this is an invalid configuration
 		dialog.useStopButton = false;
-
+		
 		// open the dialog
 		dialog.open();
 
 		// run task A, we don't fork so we can make a UI call within the
 		// runnable
 		dialog.run(false, true, getRunnable(taskNames[0]));
-
+		
 		performAsserts();
 
 		// run task B now, again, we don't fork so we can make a UI call within
 		// the runnable
 		dialog.run(false, true, getRunnable(taskNames[1]));
-
+		
 		// check that the label has been cleared
 		performAsserts();
-
+		
 		// we are successful simply by getting here without exception
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,9 +26,9 @@ import com.ibm.icu.text.Collator;
  * for the time being because the CommonSorter extension point uses a ViewerSorter.
  * We should provide an option for a ViewerComparator and then we can remove this
  * class.
- *
+ * 
  * @since 3.2
- *
+ * 
  */
 public class ResourceExtensionSorter extends ResourceSorter {
 
@@ -37,17 +37,17 @@ public class ResourceExtensionSorter extends ResourceSorter {
 	/**
 	 * Construct a sorter that uses the name of the resource as its sorting
 	 * criteria.
-	 *
+	 * 
 	 */
 	public ResourceExtensionSorter() {
 		super(ResourceSorter.NAME);
 		icuCollator = Collator.getInstance();
 	}
-
+	
     @Override
 	protected int compareNames(IResource resource1, IResource resource2) {
     	return icuCollator.compare(resource1.getName(), resource2.getName());
     }
 
-
+	
 }

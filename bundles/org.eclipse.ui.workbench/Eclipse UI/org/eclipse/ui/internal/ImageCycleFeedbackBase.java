@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,9 +24,9 @@ import org.eclipse.ui.statushandlers.StatusManager;
 
 /**
  * Base class for Cyclic animations.
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 public abstract class ImageCycleFeedbackBase extends AnimationFeedbackBase {
 	protected Image[] images;
@@ -48,7 +48,7 @@ public abstract class ImageCycleFeedbackBase extends AnimationFeedbackBase {
 	}
 
 	/**
-	 *
+	 * 
 	 * @param parentShell
 	 * @param images :
 	 *            an array of images
@@ -60,20 +60,20 @@ public abstract class ImageCycleFeedbackBase extends AnimationFeedbackBase {
 
 	/**
 	 * Set the image during progress without caching.
-	 *
+	 * 
 	 * @param image
 	 */
 	public abstract void showImage(Image image);
 
 	/**
 	 * Save initial Image which would be stoppedImage
-	 *
+	 * 
 	 */
 	public abstract void saveStoppedImage();
 
 	/**
 	 * Set the stopped Image upon animation completion
-	 *
+	 * 
 	 * @param image
 	 */
 	public abstract void setStoppedImage(Image image);
@@ -116,6 +116,11 @@ public abstract class ImageCycleFeedbackBase extends AnimationFeedbackBase {
 			final Image finalImage = image;
 
 			display.syncExec(new Runnable() {
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see java.lang.Runnable#run()
+				 */
 				@Override
 				public void run() {
 					showImage(finalImage);

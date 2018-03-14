@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MPopupMenu;
 import org.eclipse.e4.ui.services.EMenuService;
-import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.swt.factories.IRendererFactory;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
@@ -36,8 +35,10 @@ public class MenuService implements EMenuService {
 		for (MMenu mmenu : myPart.getMenus()) {
 			if (menuId.equals(mmenu.getElementId())
 					&& mmenu instanceof MPopupMenu) {
-				Menu menu = registerMenu(parentControl, (MPopupMenu) mmenu, myPart.getContext());
+				Menu menu = registerMenu(parentControl, (MPopupMenu) mmenu,
+						myPart.getContext());
 				if (menu != null) {
+					parentControl.setMenu(menu);
 					return true;
 				}
 				return false;
@@ -46,23 +47,22 @@ public class MenuService implements EMenuService {
 		return false;
 	}
 
-	public static Menu registerMenu(final Control parentControl, final MPopupMenu mmenu, IEclipseContext context) {
+	public static Menu registerMenu(final Control parentControl,
+			final MPopupMenu mmenu, IEclipseContext context) {
 		if (mmenu.getWidget() != null) {
 			return (Menu) mmenu.getWidget();
 		}
 		// we need to delegate to the renderer so that it "processes" the
 		// MenuManager correctly
 		IRendererFactory rendererFactory = context.get(IRendererFactory.class);
-		AbstractPartRenderer renderer = rendererFactory.getRenderer(mmenu, parentControl);
-		mmenu.setRenderer(renderer);
-		IEclipseContext popupContext = context.createChild("popup:" + mmenu.getElementId());
+		AbstractPartRenderer renderer = rendererFactory.getRenderer(mmenu,
+				parentControl);
+
+		IEclipseContext popupContext = context.createChild("popup:"
+				+ mmenu.getElementId());
 		mmenu.setContext(popupContext);
-		if (mmenu.getParent() == null) {
-			mmenu.getTransientData().put(IPresentationEngine.RENDERING_PARENT_KEY, parentControl);
-		}
 		Object widget = renderer.createWidget(mmenu, parentControl);
 		if (!(widget instanceof Menu)) {
-			mmenu.getTransientData().remove(IPresentationEngine.RENDERING_PARENT_KEY);
 			return null;
 		}
 		renderer.bindWidget(mmenu, widget);
@@ -71,20 +71,18 @@ public class MenuService implements EMenuService {
 		// Process its internal structure through the renderer that created
 		// it
 		Object castObject = mmenu;
-		@SuppressWarnings("unchecked")
-		MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) castObject;
-		renderer.processContents(container);
+		renderer.processContents((MElementContainer<MUIElement>) castObject);
 
 		// Allow a final chance to set up
 		renderer.postProcess(mmenu);
 
 		// Now that we have a widget let the parent (if any) know
-		MElementContainer<MUIElement> parentElement = mmenu.getParent();
-		if (parentElement != null) {
-			AbstractPartRenderer parentRenderer = rendererFactory.getRenderer(parentElement, null);
-			if (parentRenderer != null) {
+		if (mmenu.getParent() instanceof MUIElement) {
+			MElementContainer<MUIElement> parentElement = mmenu.getParent();
+			AbstractPartRenderer parentRenderer = rendererFactory.getRenderer(
+					parentElement, null);
+			if (parentRenderer != null)
 				parentRenderer.childRendered(parentElement, mmenu);
-			}
 		}
 
 		return (Menu) widget;

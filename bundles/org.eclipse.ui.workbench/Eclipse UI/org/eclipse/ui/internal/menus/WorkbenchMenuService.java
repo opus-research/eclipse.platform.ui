@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 
 package org.eclipse.ui.internal.menus;
@@ -15,6 +14,8 @@ package org.eclipse.ui.internal.menus;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.ContextFunction;
@@ -45,6 +46,7 @@ import org.eclipse.e4.ui.workbench.renderers.swt.ToolBarManagerRenderer;
 import org.eclipse.e4.ui.workbench.swt.factories.IRendererFactory;
 import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.jface.action.ContributionManager;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.widgets.Menu;
@@ -55,6 +57,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.WorkbenchWindow;
+import org.eclipse.ui.internal.e4.compatibility.E4Util;
 import org.eclipse.ui.internal.services.IWorkbenchLocationService;
 import org.eclipse.ui.internal.services.ServiceLocator;
 import org.eclipse.ui.menus.AbstractContributionFactory;
@@ -62,7 +65,7 @@ import org.eclipse.ui.menus.IMenuService;
 
 /**
  * @since 3.5
- *
+ * 
  */
 public class WorkbenchMenuService implements IMenuService {
 
@@ -72,7 +75,7 @@ public class WorkbenchMenuService implements IMenuService {
 	private ServiceLocator serviceLocator;
 	private ExpressionContext legacyContext;
 	private MenuPersistence persistence;
-	private Map<AbstractContributionFactory, Object> factoriesToContributions = new HashMap<>();
+	private Map<AbstractContributionFactory, Object> factoriesToContributions = new HashMap<AbstractContributionFactory, Object>();
 	private EModelService modelService;
 
 	/**
@@ -87,18 +90,37 @@ public class WorkbenchMenuService implements IMenuService {
 		persistence = new MenuPersistence(e4Context.get(MApplication.class), e4Context);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.services.IServiceWithSources#addSourceProvider(org.eclipse
+	 * .ui.ISourceProvider)
+	 */
 	@Override
 	public void addSourceProvider(ISourceProvider provider) {
-		// TODO Auto-generated method 
+		// TODO Auto-generated method stub
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.services.IServiceWithSources#removeSourceProvider(org.
+	 * eclipse.ui.ISourceProvider)
+	 */
 	@Override
 	public void removeSourceProvider(ISourceProvider provider) {
 		// TODO Auto-generated method stub
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.services.IDisposable#dispose()
+	 */
 	@Override
 	public void dispose() {
 		persistence.dispose();
@@ -108,6 +130,13 @@ public class WorkbenchMenuService implements IMenuService {
 		return location.getScheme().startsWith("toolbar"); //$NON-NLS-1$
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.menus.IMenuService#addContributionFactory(org.eclipse.
+	 * ui.menus.AbstractContributionFactory)
+	 */
 	@Override
 	public void addContributionFactory(final AbstractContributionFactory factory) {
 		MenuLocationURI location = new MenuLocationURI(factory.getLocation());
@@ -155,6 +184,17 @@ public class WorkbenchMenuService implements IMenuService {
 		MApplication app = e4Context.get(MApplication.class);
 		app.getMenuContributions().add(menuContribution);
 
+		// // OK, now update any managers that use this uri
+		// for (Map.Entry<ContributionManager, MenuLocationURI> entry :
+		// managers.entrySet()) {
+		// MenuLocationURI mgrURI = entry.getValue();
+		// if (mgrURI.getScheme().equals(location.getScheme())
+		// && mgrURI.getPath().equals(location.getPath())) {
+		// ContributionManager mgr = entry.getKey();
+		// populateContributionManager(mgr, mgrURI.toString());
+		// mgr.update(true);
+		// }
+		// }
 	}
 
 	private void processToolbarChildren(AbstractContributionFactory factory,
@@ -173,6 +213,13 @@ public class WorkbenchMenuService implements IMenuService {
 		app.getToolBarContributions().add(toolBarContribution);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.menus.IMenuService#removeContributionFactory(org.eclipse
+	 * .ui.menus.AbstractContributionFactory)
+	 */
 	@Override
 	public void removeContributionFactory(AbstractContributionFactory factory) {
 		Object contribution;
@@ -187,6 +234,23 @@ public class WorkbenchMenuService implements IMenuService {
 			}
 		}
 
+		// // OK, now remove any managers that use this uri
+		// MenuLocationURI location = new
+		// MenuLocationURI(factory.getLocation());
+		// List<ContributionManager> toRemove = new
+		// ArrayList<ContributionManager>();
+		// for (Map.Entry<ContributionManager, MenuLocationURI> entry :
+		// managers.entrySet()) {
+		// MenuLocationURI mgrURI = entry.getValue();
+		// if (mgrURI.getScheme().equals(location.getScheme())
+		// && mgrURI.getPath().equals(location.getPath())) {
+		// toRemove.add(entry.getKey());
+		// }
+		// }
+		// for (ContributionManager mgr : toRemove) {
+		// mgr.removeAll();
+		// managers.remove(mgr);
+		// }
 	}
 
 	protected IWorkbenchWindow getWindow() {
@@ -212,6 +276,13 @@ public class WorkbenchMenuService implements IMenuService {
 		return window;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.menus.IMenuService#populateContributionManager(org.eclipse
+	 * .jface.action.ContributionManager, java.lang.String)
+	 */
 	@Override
 	public void populateContributionManager(ContributionManager mgr, String location) {
 		MApplicationElement model = getPartToExtend();
@@ -313,7 +384,7 @@ public class WorkbenchMenuService implements IMenuService {
 		ArrayList<MToolBar> toolbars = (ArrayList<MToolBar>) model.getTransientData().get(
 				POPULATED_TOOL_BARS);
 		if (toolbars == null) {
-			toolbars = new ArrayList<>();
+			toolbars = new ArrayList<MToolBar>();
 			model.getTransientData().put(POPULATED_TOOL_BARS, toolbars);
 		}
 		if (toolbars.contains(tb)) {
@@ -327,7 +398,7 @@ public class WorkbenchMenuService implements IMenuService {
 	private void addMenu(MApplicationElement model, MMenu menu, IEclipseContext ctx) {
 		ArrayList<MMenu> menus = (ArrayList<MMenu>) model.getTransientData().get(POPULATED_MENUS);
 		if (menus == null) {
-			menus = new ArrayList<>();
+			menus = new ArrayList<MMenu>();
 			model.getTransientData().put(POPULATED_MENUS, menus);
 		}
 		if (menus.contains(menu)) {
@@ -391,6 +462,13 @@ public class WorkbenchMenuService implements IMenuService {
 		return (MPart) e4Context.getActiveLeaf().get(IServiceConstants.ACTIVE_PART);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.menus.IMenuService#releaseContributions(org.eclipse.jface
+	 * .action.ContributionManager)
+	 */
 	@Override
 	public void releaseContributions(ContributionManager mgr) {
 		if (mgr instanceof MenuManager) {
@@ -474,6 +552,11 @@ public class WorkbenchMenuService implements IMenuService {
 		mMenu.getTransientData().remove(ModelUtils.CONTAINING_PARENT);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.menus.IMenuService#getCurrentState()
+	 */
 	@Override
 	public IEvaluationContext getCurrentState() {
 		if (legacyContext == null) {
@@ -488,6 +571,31 @@ public class WorkbenchMenuService implements IMenuService {
 	 */
 	public void readRegistry() {
 		persistence.read();
+	}
+
+	public void updateManagers() {
+		E4Util.unsupported("WorkbenchMenuService.updateManagers - time to update ... something"); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param item
+	 * @param visibleWhen
+	 * @param restriction
+	 * @param createIdentifierId
+	 */
+	public void registerVisibleWhen(IContributionItem item, Expression visibleWhen,
+			Set restriction, String createIdentifierId) {
+		// TODO Remove - no longer used
+
+	}
+
+	/**
+	 * @param item
+	 * @param restriction
+	 */
+	public void unregisterVisibleWhen(IContributionItem item, Set restriction) {
+		// TODO Remove - no longer used
+
 	}
 
 }

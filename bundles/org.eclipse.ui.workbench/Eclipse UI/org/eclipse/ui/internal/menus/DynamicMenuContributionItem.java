@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,11 +30,11 @@ import org.eclipse.ui.services.IServiceLocator;
  * It currently supports placement in menus.
  * </p>
  * <p>
- *
+ * 
  * @author Prakash G.R.
- *
+ * 
  * @since 3.5
- *
+ * 
  */
 public class DynamicMenuContributionItem extends ContributionItem {
 
@@ -45,14 +45,14 @@ public class DynamicMenuContributionItem extends ContributionItem {
 
 	/**
 	 * Creates a DynamicMenuContributionItem
-	 *
+	 * 
 	 * @param id
 	 *            - Id of the menu item
 	 * @param locator
 	 *            - The Service Locator
 	 * @param dynamicAddition
 	 *            - The Configuration Element defined in the plugin.xml
-	 *
+	 * 
 	 */
 	public DynamicMenuContributionItem(String id, IServiceLocator locator,
 			IConfigurationElement dynamicAddition) {
@@ -62,6 +62,11 @@ public class DynamicMenuContributionItem extends ContributionItem {
 		this.dynamicAddition = dynamicAddition;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.ContributionItem#isDynamic()
+	 */
 	@Override
 	public boolean isDynamic() {
 		if (loadedDynamicContribution != null) {
@@ -70,6 +75,11 @@ public class DynamicMenuContributionItem extends ContributionItem {
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.ContributionItem#isDirty()
+	 */
 	@Override
 	public boolean isDirty() {
 		if (loadedDynamicContribution != null) {
@@ -78,6 +88,11 @@ public class DynamicMenuContributionItem extends ContributionItem {
 		return super.isDirty();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.ContributionItem#isEnabled()
+	 */
 	@Override
 	public boolean isEnabled() {
 		if (loadedDynamicContribution != null) {
@@ -86,6 +101,11 @@ public class DynamicMenuContributionItem extends ContributionItem {
 		return super.isEnabled();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.ContributionItem#isGroupMarker()
+	 */
 	@Override
 	public boolean isGroupMarker() {
 		if (loadedDynamicContribution != null) {
@@ -94,6 +114,11 @@ public class DynamicMenuContributionItem extends ContributionItem {
 		return super.isGroupMarker();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.ContributionItem#isSeparator()
+	 */
 	@Override
 	public boolean isSeparator() {
 		if (loadedDynamicContribution != null) {
@@ -102,6 +127,11 @@ public class DynamicMenuContributionItem extends ContributionItem {
 		return super.isSeparator();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.ContributionItem#isVisible()
+	 */
 	@Override
 	public boolean isVisible() {
 		if (loadedDynamicContribution != null) {
@@ -110,6 +140,11 @@ public class DynamicMenuContributionItem extends ContributionItem {
 		return super.isVisible();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.ContributionItem#saveWidgetState()
+	 */
 	@Override
 	public void saveWidgetState() {
 		if (loadedDynamicContribution != null) {
@@ -118,6 +153,11 @@ public class DynamicMenuContributionItem extends ContributionItem {
 		super.saveWidgetState();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.ContributionItem#setVisible(boolean)
+	 */
 	@Override
 	public void setVisible(boolean visible) {
 		if (loadedDynamicContribution != null) {
@@ -126,6 +166,13 @@ public class DynamicMenuContributionItem extends ContributionItem {
 		super.setVisible(visible);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets
+	 * .Composite)
+	 */
 	@Override
 	public void fill(Composite parent) {
 		IContributionItem contributionItem = getContributionItem();
@@ -133,6 +180,13 @@ public class DynamicMenuContributionItem extends ContributionItem {
 			contributionItem.fill(parent);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets
+	 * .CoolBar, int)
+	 */
 	@Override
 	public void fill(CoolBar parent, int index) {
 		IContributionItem contributionItem = getContributionItem();
@@ -140,6 +194,13 @@ public class DynamicMenuContributionItem extends ContributionItem {
 			contributionItem.fill(parent, index);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets
+	 * .Menu, int)
+	 */
 	@Override
 	public void fill(Menu menu, int index) {
 		IContributionItem contributionItem = getContributionItem();
@@ -147,6 +208,13 @@ public class DynamicMenuContributionItem extends ContributionItem {
 			contributionItem.fill(menu, index);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets
+	 * .ToolBar, int)
+	 */
 	@Override
 	public void fill(ToolBar parent, int index) {
 		IContributionItem contributionItem = getContributionItem();
@@ -180,6 +248,11 @@ public class DynamicMenuContributionItem extends ContributionItem {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.ContributionItem#dispose()
+	 */
 	@Override
 	public void dispose() {
 		if (loadedDynamicContribution != null) {
@@ -189,6 +262,11 @@ public class DynamicMenuContributionItem extends ContributionItem {
 		super.dispose();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.ContributionItem#update()
+	 */
 	@Override
 	public void update() {
 		if (loadedDynamicContribution != null) {
@@ -203,6 +281,13 @@ public class DynamicMenuContributionItem extends ContributionItem {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.action.ContributionItem#setParent(org.eclipse.jface
+	 * .action.IContributionManager)
+	 */
 	@Override
 	public void setParent(IContributionManager parent) {
 		super.setParent(parent);

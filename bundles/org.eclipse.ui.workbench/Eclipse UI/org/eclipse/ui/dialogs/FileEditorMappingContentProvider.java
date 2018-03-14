@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,7 @@ import org.eclipse.ui.IFileEditorMapping;
  * A content provider for displaying of <code>IFileEditorMapping</code>
  * objects in viewers.
  * <p>
- * This class has a singleton instance,
+ * This class has a singleton instance, 
  * <code>FileEditorMappingContentProvider.INSTANCE</code>,
  * which can be used any place this kind of content provider is needed.
  * </p>
@@ -41,16 +41,25 @@ public class FileEditorMappingContentProvider implements
         super();
     }
 
+    /* (non-Javadoc)
+     * Method declared on IContentProvider.
+     */
     @Override
 	public void dispose() {
     }
 
+    /* (non-Javadoc)
+     * Method declared on IStructuredContentProvider.
+     */
     @Override
 	public Object[] getElements(Object element) {
         IFileEditorMapping[] array = (IFileEditorMapping[]) element;
         return array == null ? new Object[0] : array;
     }
 
+    /* (non-Javadoc)
+     * Method declared on IContentProvider.
+     */
     @Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
     }

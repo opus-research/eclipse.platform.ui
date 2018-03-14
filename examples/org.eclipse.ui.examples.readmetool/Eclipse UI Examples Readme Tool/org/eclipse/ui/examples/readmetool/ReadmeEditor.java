@@ -44,63 +44,63 @@ public class ReadmeEditor extends TextEditor {
         super();
     }
 
-	@Override
+    /* (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.StatusTextEditor#createPartControl(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
-
+		
 		StyledText tw = getSourceViewer().getTextWidget();
-
+		
 		// Add a 'TextTransfer' drop target to the editor
 		int ops = DND.DROP_DEFAULT | DND.DROP_COPY;
 		Transfer[] transfers = { TextTransfer.getInstance() };
 		DropTargetListener editorListener = new DropTargetListener() {
 
-			@Override
 			public void dragEnter(DropTargetEvent event) {
 				event.detail = DND.DROP_COPY;
 			}
 
-			@Override
 			public void dragLeave(DropTargetEvent event) {
 			}
 
-			@Override
 			public void dragOperationChanged(DropTargetEvent event) {
 				event.detail = DND.DROP_COPY;
 			}
 
-			@Override
 			public void dragOver(DropTargetEvent event) {
 				event.feedback = DND.FEEDBACK_SCROLL | DND.FEEDBACK_SELECT;
 			}
 
-			@Override
 			public void drop(DropTargetEvent event) {
 		        if (TextTransfer.getInstance().isSupportedType(event.currentDataType)) {
 					String text = (String) event.data;
 					getSourceViewer().getTextWidget().insert(text);
-				}
+				} 
 			}
 
-			@Override
 			public void dropAccept(DropTargetEvent event) {
 			}
-
+			
 		};
-
-		IDragAndDropService dtSvc = getSite().getService(IDragAndDropService.class);
+		
+		IDragAndDropService dtSvc = (IDragAndDropService) getSite().getService(IDragAndDropService.class);
 		dtSvc.addMergedDropTarget(tw, ops, transfers, editorListener);
 	}
-
-    @Override
-	public void doSave(IProgressMonitor monitor) {
+	
+    /** (non-Javadoc)
+     * Method declared on IEditorPart
+     */
+    public void doSave(IProgressMonitor monitor) {
         super.doSave(monitor);
         if (page != null)
             page.update();
     }
 
-    @Override
-	public Object getAdapter(Class key) {
+    /** (non-Javadoc)
+     * Method declared on IAdaptable
+     */
+    public Object getAdapter(Class key) {
         if (key.equals(IContentOutlinePage.class)) {
             IEditorInput input = getEditorInput();
             if (input instanceof IFileEditorInput) {
@@ -112,8 +112,10 @@ public class ReadmeEditor extends TextEditor {
         return super.getAdapter(key);
     }
 
-    @Override
-	protected void editorContextMenuAboutToShow(IMenuManager parentMenu) {
+    /** (non-Javadoc)
+     * Method declared on AbstractTextEditor
+     */
+    protected void editorContextMenuAboutToShow(IMenuManager parentMenu) {
         super.editorContextMenuAboutToShow(parentMenu);
         parentMenu.add(new Separator());
         IMenuManager subMenu = new MenuManager(MessageUtil.getString("Add")); //$NON-NLS-1$

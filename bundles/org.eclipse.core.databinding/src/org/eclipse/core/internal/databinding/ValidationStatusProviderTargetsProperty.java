@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 Matthew Hall and others.
+ * Copyright (c) 2009, 2010 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,35 +22,29 @@ import org.eclipse.core.databinding.property.list.ListProperty;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class ValidationStatusProviderTargetsProperty extends ListProperty {
-	@Override
 	public Object getElementType() {
 		return IObservable.class;
 	}
 
-	@Override
 	protected List doGetList(Object source) {
 		return ((ValidationStatusProvider) source).getTargets();
 	}
 
-	@Override
 	protected void doSetList(Object source, List list) {
 		throw new UnsupportedOperationException(toString() + " is unmodifiable"); //$NON-NLS-1$
 	}
 
-	@Override
 	protected void doUpdateList(Object source, ListDiff diff) {
 		throw new UnsupportedOperationException(toString() + " is unmodifiable"); //$NON-NLS-1$
 	}
 
-	@Override
 	public IObservableList observe(Realm realm, Object source) {
 		return ((ValidationStatusProvider) source).getTargets();
 	}
 
-	@Override
 	public String toString() {
 		return "ValidationStatusProvider#targets[] <IObservable>"; //$NON-NLS-1$
 	}

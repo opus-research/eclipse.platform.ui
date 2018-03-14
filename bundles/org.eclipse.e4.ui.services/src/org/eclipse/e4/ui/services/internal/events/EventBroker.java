@@ -1,13 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Steven Spungin - Bug 441874
  *******************************************************************************/
 package org.eclipse.e4.ui.services.internal.events;
 
@@ -36,18 +35,17 @@ import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 
 public class EventBroker implements IEventBroker {
-
+	
 	// TBD synchronization
 	private Map<EventHandler, Collection<ServiceRegistration<?>>> registrations = new HashMap<EventHandler, Collection<ServiceRegistration<?>>>();
 
 	@Inject
-	@Optional
 	Logger logger;
-
+	
 	@Inject
 	@Optional
 	UISynchronize uiSync;
-
+	
 	// This is a temporary code to ensure that bundle containing
 	// EventAdmin implementation is started. This code it to be removed once
 	// the proper method to start EventAdmin is added.
@@ -67,7 +65,7 @@ public class EventBroker implements IEventBroker {
 			}
 		}
 	}
-
+	
 	public EventBroker() {
 		// placeholder
 	}
@@ -77,9 +75,7 @@ public class EventBroker implements IEventBroker {
 		Event event = constructEvent(topic, data);
 		EventAdmin eventAdmin = Activator.getDefault().getEventAdmin();
 		if (eventAdmin == null) {
-			if (logger != null) {
-				logger.error(NLS.bind(ServiceMessages.NO_EVENT_ADMIN, event.toString()));
-			}
+			logger.error(NLS.bind(ServiceMessages.NO_EVENT_ADMIN, event.toString()));
 			return false;
 		}
 		eventAdmin.sendEvent(event);
@@ -91,9 +87,7 @@ public class EventBroker implements IEventBroker {
 		Event event = constructEvent(topic, data);
 		EventAdmin eventAdmin = Activator.getDefault().getEventAdmin();
 		if (eventAdmin == null) {
-			if (logger != null) {
-				logger.error(NLS.bind(ServiceMessages.NO_EVENT_ADMIN, event.toString()));
-			}
+			logger.error(NLS.bind(ServiceMessages.NO_EVENT_ADMIN, event.toString()));
 			return false;
 		}
 		eventAdmin.postEvent(event);
@@ -126,9 +120,7 @@ public class EventBroker implements IEventBroker {
 	public boolean subscribe(String topic, String filter, EventHandler eventHandler, boolean headless) {
 		BundleContext bundleContext = Activator.getDefault().getBundleContext();
 		if (bundleContext == null) {
-			if (logger != null) {
-				logger.error(NLS.bind(ServiceMessages.NO_BUNDLE_CONTEXT, topic));
-			}
+			logger.error(NLS.bind(ServiceMessages.NO_BUNDLE_CONTEXT, topic));
 			return false;
 		}
 		String[] topics = new String[] {topic};
@@ -160,7 +152,7 @@ public class EventBroker implements IEventBroker {
 		}
 		return true;
 	}
-
+	
 	@PreDestroy
 	void dispose() {
 		Collection<Collection<ServiceRegistration<?>>> values = new ArrayList<Collection<ServiceRegistration<?>>>(

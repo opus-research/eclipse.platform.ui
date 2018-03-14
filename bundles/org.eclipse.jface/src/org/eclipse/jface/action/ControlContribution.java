@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,8 +20,8 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
 /**
- * An abstract contribution item implementation for adding an arbitrary
- * SWT control to a tool bar.
+ * An abstract contribution item implementation for adding an arbitrary 
+ * SWT control to a tool bar. 
  * Note, however, that these items cannot be contributed to menu bars.
  * <p>
  * The <code>createControl</code> framework method must be implemented
@@ -43,7 +43,7 @@ public abstract class ControlContribution extends ContributionItem {
      * to a tool bar.  This is needed to determine the width of the tool bar item
      * containing the given control.
      * <p>
-     * The default implementation of this framework method returns
+     * The default implementation of this framework method returns 
      * <code>control.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x</code>.
      * Subclasses may override if required.
      * </p>

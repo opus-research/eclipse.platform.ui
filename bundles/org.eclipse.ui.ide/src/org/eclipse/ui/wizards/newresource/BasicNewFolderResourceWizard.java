@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,7 +48,7 @@ public class BasicNewFolderResourceWizard extends BasicNewResourceWizard {
 	 * @since 3.4
 	 */
 	public static final String WIZARD_ID = "org.eclipse.ui.wizards.new.folder"; //$NON-NLS-1$
-
+	
     private WizardNewFolderMainPage mainPage;
 
     /**
@@ -58,29 +58,37 @@ public class BasicNewFolderResourceWizard extends BasicNewResourceWizard {
         super();
     }
 
-    @Override
-	public void addPages() {
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
+    public void addPages() {
         super.addPages();
-        mainPage = new WizardNewFolderMainPage(ResourceMessages.NewFolder_text, getSelection());
+        mainPage = new WizardNewFolderMainPage(ResourceMessages.NewFolder_text, getSelection()); 
         addPage(mainPage);
     }
 
-    @Override
-	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchWizard.
+     */
+    public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
         super.init(workbench, currentSelection);
         setWindowTitle(ResourceMessages.NewFolder_title);
         setNeedsProgressMonitor(true);
     }
 
-    @Override
-	protected void initializeDefaultPageImageDescriptor() {
+    /* (non-Javadoc)
+     * Method declared on BasicNewResourceWizard.
+     */
+    protected void initializeDefaultPageImageDescriptor() {
       ImageDescriptor desc = IDEWorkbenchPlugin.getIDEImageDescriptor("wizban/newfolder_wiz.png");//$NON-NLS-1$
       setDefaultPageImageDescriptor(desc);
-
+       
     }
 
-    @Override
-	public boolean performFinish() {
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
+    public boolean performFinish() {
         IFolder folder = mainPage.createNewFolder();
         if (folder == null) {
 			return false;

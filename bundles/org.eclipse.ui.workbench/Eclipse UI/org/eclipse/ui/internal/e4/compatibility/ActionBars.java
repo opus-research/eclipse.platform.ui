@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -45,6 +45,11 @@ public class ActionBars extends SubActionBars {
 		this.part = part;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IActionBars#getMenuManager()
+	 */
 	@Override
 	public IMenuManager getMenuManager() {
 		if (menuManager == null) {
@@ -54,6 +59,11 @@ public class ActionBars extends SubActionBars {
 	}
 
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IActionBars#getToolBarManager()
+	 */
 	@Override
 	public IToolBarManager getToolBarManager() {
 		if (toolbarManager == null) {
@@ -62,6 +72,11 @@ public class ActionBars extends SubActionBars {
 		return toolbarManager;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IActionBars#updateActionBars()
+	 */
 	@Override
 	public void updateActionBars() {
 		// FIXME compat: updateActionBars : should do something useful
@@ -170,6 +185,11 @@ public class ActionBars extends SubActionBars {
 				: parent != null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.SubActionBars#dispose()
+	 */
 	@Override
 	public void dispose() {
 		menuManager.dispose();

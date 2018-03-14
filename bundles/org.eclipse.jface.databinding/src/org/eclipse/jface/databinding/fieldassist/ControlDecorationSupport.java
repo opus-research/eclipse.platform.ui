@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 Matthew Hall and others.
+ * Copyright (c) 2009, 2010 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,8 +8,6 @@
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 268472)
  *     Matthew Hall - bug 300953
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 413611
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 481620
  ******************************************************************************/
 
 package org.eclipse.jface.databinding.fieldassist;
@@ -46,7 +44,7 @@ import org.eclipse.swt.widgets.Widget;
  * {@link ValidationStatusProvider} with {@link ControlDecoration}s mirroring
  * the current validation status. Only those target observables which implement
  * {@link ISWTObservable} or {@link IViewerObservable} are decorated.
- *
+ * 
  * @since 1.4
  */
 public class ControlDecorationSupport {
@@ -56,7 +54,7 @@ public class ControlDecorationSupport {
 	 * {@link ControlDecoration} over the underlying SWT control of all target
 	 * observables that implement {@link ISWTObservable} or
 	 * {@link IViewerObservable}.
-	 *
+	 * 
 	 * @param validationStatusProvider
 	 *            the {@link ValidationStatusProvider} to monitor.
 	 * @param position
@@ -80,7 +78,7 @@ public class ControlDecorationSupport {
 	 * {@link ControlDecoration} over the underlying SWT control of all target
 	 * observables that implement {@link ISWTObservable} or
 	 * {@link IViewerObservable}.
-	 *
+	 * 
 	 * @param validationStatusProvider
 	 *            the {@link ValidationStatusProvider} to monitor.
 	 * @param position
@@ -108,7 +106,7 @@ public class ControlDecorationSupport {
 	 * {@link ControlDecoration} over the underlying SWT control of all target
 	 * observables that implement {@link ISWTObservable} or
 	 * {@link IViewerObservable}.
-	 *
+	 * 
 	 * @param validationStatusProvider
 	 *            the {@link ValidationStatusProvider} to monitor.
 	 * @param position
@@ -137,31 +135,34 @@ public class ControlDecorationSupport {
 	private final Composite composite;
 	private final ControlDecorationUpdater updater;
 
-	private IObservableValue<IStatus> validationStatus;
-	private IObservableList<IObservable> targets;
+	private IObservableValue validationStatus;
+	private IObservableList targets;
 
 	private IDisposeListener disposeListener = new IDisposeListener() {
-		@Override
 		public void handleDispose(DisposeEvent staleEvent) {
 			dispose();
 		}
 	};
 
-	private IValueChangeListener<IStatus> statusChangeListener = new IValueChangeListener<IStatus>() {
-		@Override
-		public void handleValueChange(ValueChangeEvent<? extends IStatus> event) {
-			statusChanged(validationStatus.getValue());
+	private IValueChangeListener statusChangeListener = new IValueChangeListener() {
+		public void handleValueChange(ValueChangeEvent event) {
+			statusChanged((IStatus) validationStatus.getValue());
 		}
 	};
 
-	private IListChangeListener<IObservable> targetsChangeListener = new IListChangeListener<IObservable>() {
+	private IListChangeListener targetsChangeListener = new IListChangeListener() {
+		public void handleListChange(ListChangeEvent event) {
+			event.diff.accept(new ListDiffVisitor() {
+				public void handleAdd(int index, Object element) {
+					targetAdded((IObservable) element);
+				}
 
-		@Override
-		public void handleListChange(ListChangeEvent<? extends IObservable> event) {
-			event.diff.accept(new TargetsListDiffAdvisor<>());
-			statusChanged(validationStatus.getValue());
+				public void handleRemove(int index, Object element) {
+					targetRemoved((IObservable) element);
+				}
+			});
+			statusChanged((IStatus) validationStatus.getValue());
 		}
-
 	};
 
 	private static class TargetDecoration {
@@ -174,21 +175,7 @@ public class ControlDecorationSupport {
 		}
 	}
 
-	private class TargetsListDiffAdvisor<E extends IObservable> extends ListDiffVisitor<E> {
-
-		@Override
-		public void handleAdd(int index, E element) {
-			targetAdded(element);
-		}
-
-		@Override
-		public void handleRemove(int index, E element) {
-			targetRemoved(element);
-		}
-
-	}
-
-	private List<TargetDecoration> targetDecorations;
+	private List targetDecorations;
 
 	private ControlDecorationSupport(
 			ValidationStatusProvider validationStatusProvider, int position,
@@ -203,7 +190,7 @@ public class ControlDecorationSupport {
 		this.targets = validationStatusProvider.getTargets();
 		Assert.isTrue(!this.targets.isDisposed());
 
-		this.targetDecorations = new ArrayList<TargetDecoration>();
+		this.targetDecorations = new ArrayList();
 
 		validationStatus.addDisposeListener(disposeListener);
 		validationStatus.addValueChangeListener(statusChangeListener);
@@ -211,10 +198,10 @@ public class ControlDecorationSupport {
 		targets.addDisposeListener(disposeListener);
 		targets.addListChangeListener(targetsChangeListener);
 
-		for (Iterator<?> it = targets.iterator(); it.hasNext();)
+		for (Iterator it = targets.iterator(); it.hasNext();)
 			targetAdded((IObservable) it.next());
 
-		statusChanged(validationStatus.getValue());
+		statusChanged((IStatus) validationStatus.getValue());
 	}
 
 	private void targetAdded(IObservable target) {
@@ -225,8 +212,8 @@ public class ControlDecorationSupport {
 	}
 
 	private void targetRemoved(IObservable target) {
-		for (Iterator<TargetDecoration> it = targetDecorations.iterator(); it.hasNext();) {
-			TargetDecoration targetDecoration = it.next();
+		for (Iterator it = targetDecorations.iterator(); it.hasNext();) {
+			TargetDecoration targetDecoration = (TargetDecoration) it.next();
 			if (targetDecoration.target == target) {
 				targetDecoration.decoration.dispose();
 				it.remove();
@@ -264,8 +251,8 @@ public class ControlDecorationSupport {
 	}
 
 	private void statusChanged(IStatus status) {
-		for (Iterator<TargetDecoration> it = targetDecorations.iterator(); it.hasNext();) {
-			TargetDecoration targetDecoration = it.next();
+		for (Iterator it = targetDecorations.iterator(); it.hasNext();) {
+			TargetDecoration targetDecoration = (TargetDecoration) it.next();
 			ControlDecoration decoration = targetDecoration.decoration;
 			updater.update(decoration, status);
 		}
@@ -294,8 +281,8 @@ public class ControlDecorationSupport {
 		targetsChangeListener = null;
 
 		if (targetDecorations != null) {
-			for (Iterator<TargetDecoration> it = targetDecorations.iterator(); it.hasNext();) {
-				TargetDecoration targetDecoration = it
+			for (Iterator it = targetDecorations.iterator(); it.hasNext();) {
+				TargetDecoration targetDecoration = (TargetDecoration) it
 						.next();
 				targetDecoration.decoration.dispose();
 			}

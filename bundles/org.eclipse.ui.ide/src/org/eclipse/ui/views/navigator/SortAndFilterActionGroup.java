@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,6 @@ import org.eclipse.ui.internal.views.navigator.ResourceNavigatorMessages;
  * This is the action group for the sort and filter actions.
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
-@Deprecated
 public class SortAndFilterActionGroup extends ResourceNavigatorActionGroup {
 
     private SortViewAction sortByTypeAction;
@@ -31,16 +30,15 @@ public class SortAndFilterActionGroup extends ResourceNavigatorActionGroup {
     private FilterSelectionAction filterAction;
 
     /**
-     * Constructor.
-     *
+     * Constructor. 
+     * 
      * @param navigator
      */
     public SortAndFilterActionGroup(IResourceNavigator navigator) {
         super(navigator);
     }
 
-    @Override
-	protected void makeActions() {
+    protected void makeActions() {
         sortByNameAction = new SortViewAction(navigator, false);
         sortByTypeAction = new SortViewAction(navigator, true);
 
@@ -52,8 +50,7 @@ public class SortAndFilterActionGroup extends ResourceNavigatorActionGroup {
                 .setImageDescriptor(getImageDescriptor("elcl16/filter_ps.png"));//$NON-NLS-1$
     }
 
-    @Override
-	public void fillActionBars(IActionBars actionBars) {
+    public void fillActionBars(IActionBars actionBars) {
         IMenuManager menu = actionBars.getMenuManager();
         IMenuManager submenu = new MenuManager(ResourceNavigatorMessages.ResourceNavigator_sort);
         menu.add(submenu);
@@ -62,8 +59,7 @@ public class SortAndFilterActionGroup extends ResourceNavigatorActionGroup {
         menu.add(filterAction);
     }
 
-    @Override
-	public void updateActionBars() {
+    public void updateActionBars() {
         int criteria = navigator.getComparator().getCriteria();
         sortByNameAction.setChecked(criteria == ResourceComparator.NAME);
         sortByTypeAction.setChecked(criteria == ResourceComparator.TYPE);

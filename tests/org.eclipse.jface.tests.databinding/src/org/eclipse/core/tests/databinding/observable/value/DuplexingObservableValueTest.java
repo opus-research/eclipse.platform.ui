@@ -22,13 +22,12 @@ import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 
 /**
  * @since 1.0
- *
+ * 
  */
 public class DuplexingObservableValueTest extends AbstractDefaultRealmTestCase {
 	private IObservableList list;
 	private DuplexingObservableValue observable;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		list = new WritableList(new ArrayList(), String.class);
@@ -36,7 +35,6 @@ public class DuplexingObservableValueTest extends AbstractDefaultRealmTestCase {
 
 	public void testValueType_InheritFromTargetList() throws Exception {
 		observable = new DuplexingObservableValue(list) {
-			@Override
 			protected Object coalesceElements(Collection elements) {
 				return null;
 			}
@@ -48,7 +46,6 @@ public class DuplexingObservableValueTest extends AbstractDefaultRealmTestCase {
 
 	public void testValueType_ProvidedInConstructor() throws Exception {
 		observable = new DuplexingObservableValue(list, Object.class) {
-			@Override
 			protected Object coalesceElements(Collection elements) {
 				return null;
 			}

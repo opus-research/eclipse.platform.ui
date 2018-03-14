@@ -39,16 +39,6 @@ public class WindowReader extends MementoReader {
 		return windowBounds;
 	}
 
-	boolean isMaximized() {
-		return getBoolean(IWorkbenchConstants.TAG_MAXIMIZED, false);
-
-	}
-
-	boolean isMinimized() {
-		return getBoolean(IWorkbenchConstants.TAG_MINIMIZED, false);
-
-	}
-
 	boolean isCoolbarVisible() {
 		IMemento trimLayoutMem = getChild(IWorkbenchConstants.TAG_TRIM);
 		if (trimLayoutMem == null) {
@@ -114,7 +104,7 @@ public class WindowReader extends MementoReader {
 	}
 
 	List<PerspectiveReader> getPerspectiveReaders() {
-		List<PerspectiveReader> perspectives = new ArrayList<>();
+		List<PerspectiveReader> perspectives = new ArrayList<PerspectiveReader>();
 		IMemento perspContainer = getPerspectiveContainer();
 		if (perspContainer != null) {
 			IMemento[] perspectiveMems = perspContainer
@@ -156,7 +146,7 @@ public class WindowReader extends MementoReader {
 
 	List<InfoReader> getEditorStacks() {
 		IMemento editorArea = getEditorArea();
-		List<InfoReader> readers = new ArrayList<>();
+		List<InfoReader> readers = new ArrayList<InfoReader>();
 		if (editorArea != null) {
 			IMemento[] editorStackMems = editorArea.getChildren(IWorkbenchConstants.TAG_INFO);
 			for (IMemento memento : editorStackMems) {
@@ -164,15 +154,6 @@ public class WindowReader extends MementoReader {
 			}
 		}
 		return readers;
-	}
-
-	public Integer getDefaultFastViewSide() {
-		Integer defaultFastViewSide = null;
-		IMemento fastViewData = getChild("fastViewData"); //$NON-NLS-1$
-		if (fastViewData != null) {
-			defaultFastViewSide = fastViewData.getInteger(IWorkbenchConstants.TAG_FAST_VIEW_SIDE);
-		}
-		return defaultFastViewSide;
 	}
 
 	private IMemento getEditorArea() {
@@ -184,7 +165,7 @@ public class WindowReader extends MementoReader {
 	}
 
 	List<EditorReader> getEditors() {
-		List<EditorReader> readers = new ArrayList<>();
+		List<EditorReader> readers = new ArrayList<EditorReader>();
 		IMemento editors = getEditorsMemento();
 		if (editors != null) {
 			IMemento[] editorMems = editors.getChildren(IWorkbenchConstants.TAG_EDITOR);
@@ -204,7 +185,7 @@ public class WindowReader extends MementoReader {
 	}
 
 	List<ViewReader> getViews() {
-		List<ViewReader> readers = new ArrayList<>();
+		List<ViewReader> readers = new ArrayList<ViewReader>();
 		IMemento page = getPage();
 		if (page == null) {
 			return readers;

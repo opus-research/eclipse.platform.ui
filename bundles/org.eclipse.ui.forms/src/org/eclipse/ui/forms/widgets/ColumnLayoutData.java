@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,7 @@ import org.eclipse.swt.SWT;
  * class. You can control width and height hints, as well as horizontal
  * alignment using instances of this class. As with other layouts, they are not
  * required to get the default behaviour.
- *
+ * 
  * @see ColumnLayout
  * @since 3.0
  */
@@ -54,7 +54,7 @@ public final class ColumnLayoutData {
 	public int horizontalAlignment = FILL;
 	/**
 	 * Convinience constructor for the class.
-	 *
+	 * 
 	 * @param wHint
 	 *            width hint for the control
 	 * @param hHint
@@ -66,7 +66,7 @@ public final class ColumnLayoutData {
 	}
 	/**
 	 * Convinience constructor for the class.
-	 *
+	 * 
 	 * @param wHint
 	 *            width hint for the control
 	 */
@@ -75,7 +75,7 @@ public final class ColumnLayoutData {
 	}
 	/**
 	 * The default constructor.
-	 *
+	 *  
 	 */
 	public ColumnLayoutData() {
 	}

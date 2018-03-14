@@ -25,14 +25,13 @@ public class FastTableViewerRefreshTest extends TableViewerRefreshTest {
 
 	/**
 	 * Test the time for doing a refresh.
-	 *
+	 * 
 	 * @throws Throwable
 	 */
 	public void testRefreshMultiple() throws Throwable {
 		openBrowser();
 
 		exercise(new TestRunnable() {
-			@Override
 			public void run() {
 				startMeasuring();
 				for (int i = 0; i < 10; i++) {
@@ -51,7 +50,7 @@ public class FastTableViewerRefreshTest extends TableViewerRefreshTest {
 
 	/**
 	 * Test the time for doing a refresh.
-	 *
+	 * 
 	 * @throws Throwable
 	 */
 	public void testUpdateMultiple() throws Throwable {
@@ -59,7 +58,6 @@ public class FastTableViewerRefreshTest extends TableViewerRefreshTest {
 
 		exercise(
 				new TestRunnable() {
-					@Override
 					public void run() {
 						startMeasuring();
 						for (int i = 0; i < 10; i++) {

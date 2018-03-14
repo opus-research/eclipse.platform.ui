@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,19 +15,19 @@ package org.eclipse.ui.navigator;
  * A descriptive construct to relay information about a menu insertion point;
  * including the name of the insertion point and whether the item should be
  * rendered as a separator or group marker.
- *
+ * 
  * @since 3.2
- *
+ * 
  */
 public final class MenuInsertionPoint {
 	private String name;
 
 	private boolean isSeparator;
-
+	
 	private String toString;
 
 	/**
-	 *
+	 * 
 	 * @param aName
 	 *            The name that clients will refer to when inserting items into
 	 *            the menu at this point.
@@ -43,7 +43,7 @@ public final class MenuInsertionPoint {
 	}
 
 	/**
-	 *
+	 * 
 	 * @return True if the point should be rendered as a
 	 *         org.eclipse.jface.action.Separator (a "bar" in the menu); or
 	 *         false if the point should be rendered as a
@@ -54,7 +54,7 @@ public final class MenuInsertionPoint {
 	}
 
 	/**
-	 *
+	 * 
 	 * @return The name that clients will refer to when inserting items into the
 	 *         menu at this point.
 	 */
@@ -62,8 +62,7 @@ public final class MenuInsertionPoint {
 		return name;
 	}
 
-	@Override
-	public String toString() {
+	public String toString() { 
 		if(toString == null) {
 			toString = "MenuInsertionPoint[name=\""+name+"\", isSeparator="+isSeparator+"]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}

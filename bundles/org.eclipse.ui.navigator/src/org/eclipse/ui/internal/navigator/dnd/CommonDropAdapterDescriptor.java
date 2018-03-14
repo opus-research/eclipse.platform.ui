@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,7 +26,7 @@ import org.eclipse.ui.navigator.INavigatorContentDescriptor;
 
 /**
  * @since 3.2
- *
+ * 
  */
 public final class CommonDropAdapterDescriptor implements
 		INavigatorContentExtPtConstants {
@@ -53,18 +53,18 @@ public final class CommonDropAdapterDescriptor implements
 	}
 
 	/**
-	 *
+	 * 
 	 * @param anElement
 	 *            The element from the set of elements being dragged.
 	 * @return True if the element matches the drag expression from the
 	 *         extension.
 	 */
-	public boolean isDragElementSupported(Object anElement) {
-		return contentDescriptor.isPossibleChild(anElement);
+	public boolean isDragElementSupported(Object anElement) { 
+		return contentDescriptor.isPossibleChild(anElement); 
 	}
 
 	/**
-	 *
+	 * 
 	 * @param aSelection
 	 *            The set of elements being dragged.
 	 * @return True if the element matches the drag expression from the
@@ -78,7 +78,7 @@ public final class CommonDropAdapterDescriptor implements
 	}
 
 	/**
-	 *
+	 * 
 	 * @param anElement
 	 *            The element from the set of elements benig dropped.
 	 * @return True if the element matches the drop expression from the
@@ -93,14 +93,13 @@ public final class CommonDropAdapterDescriptor implements
 	}
 
 	/**
-	 *
+	 * 
 	 * @return An instance of {@link CommonDropAdapterAssistant} from the
 	 *         descriptor or {@link SkeletonCommonDropAssistant}.
 	 */
 	public CommonDropAdapterAssistant createDropAssistant() {
 		final CommonDropAdapterAssistant[] retValue = new CommonDropAdapterAssistant[1];
 		SafeRunner.run(new NavigatorSafeRunnable(element) {
-			@Override
 			public void run() throws Exception {
 				retValue[0] = (CommonDropAdapterAssistant) element
 						.createExecutableExtension(ATT_CLASS);
@@ -112,7 +111,7 @@ public final class CommonDropAdapterDescriptor implements
 	}
 
 	/**
-	 *
+	 * 
 	 * @return The content descriptor that contains this drop descriptor.
 	 */
 	public INavigatorContentDescriptor getContentDescriptor() {

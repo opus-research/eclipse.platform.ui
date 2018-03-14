@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,7 +23,7 @@ public class CommonNavigatorFrameSource extends TreeViewerFrameSource {
 
     /**
      * Constructs a new frame source for the specified common navigator.
-     *
+     * 
      * @param navigator the common navigator
      */
     public CommonNavigatorFrameSource(CommonNavigator navigator) {
@@ -36,8 +36,7 @@ public class CommonNavigatorFrameSource extends TreeViewerFrameSource {
      * by setting the frame's tool tip text to show the full path for the input
      * element.
      */
-    @Override
-	protected TreeFrame createFrame(Object input) {
+    protected TreeFrame createFrame(Object input) {
         TreeFrame frame = super.createFrame(input);
         frame.setName(navigator.getTitle());
         frame.setToolTipText(navigator.getFrameToolTipText(input));
@@ -47,11 +46,10 @@ public class CommonNavigatorFrameSource extends TreeViewerFrameSource {
     /**
      * Also updates the navigator's title.
      */
-    @Override
-	protected void frameChanged(TreeFrame frame) {
+    protected void frameChanged(TreeFrame frame) {
         super.frameChanged(frame);
         navigator.updateTitle();
     }
-
-
+    
+    
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,7 @@ package org.eclipse.ui.internal;
  * NOTE: this is a test harness at this time. This class may be removed
  * before the release of 3.2.
  * </b></p>
- *
+ * 
  * @since 3.2
  *
  */
@@ -29,7 +29,7 @@ public class TrimDragPreferences {
 	 */
 
 	private static int thresholdPref = 50;
-
+	
 	/**
 	 * 'true' means that each trim element can have a different 'height'
 	 */

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,7 +36,7 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 
 
 /**
- * Standard action for opening an editor on local file(s).
+ * Standard action for opening an editor on local file(s). 
  * <p>
  * This class may be instantiated; it is not intended to be subclassed.
  * </p>
@@ -53,28 +53,38 @@ public class OpenLocalFileAction extends Action implements IWorkbenchWindowActio
 		setEnabled(true);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#dispose()
+	 */
 	public void dispose() {
 		window =  null;
 		filterPath =  null;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui.IWorkbenchWindow)
+	 */
 	public void init(IWorkbenchWindow window) {
 		this.window =  window;
 		filterPath =  System.getProperty("user.home"); //$NON-NLS-1$
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
+	 */
 	public void run(IAction action) {
 		run();
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
+	 */
 	public void selectionChanged(IAction action, ISelection selection) {
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.Action#run()
+	 */
 	public void run() {
 		FileDialog dialog =  new FileDialog(window.getShell(), SWT.OPEN | SWT.MULTI);
 		dialog.setText(IDEWorkbenchMessages.OpenLocalFileAction_title);

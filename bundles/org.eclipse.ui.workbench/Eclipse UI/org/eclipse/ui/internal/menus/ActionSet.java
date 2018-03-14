@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 
 package org.eclipse.ui.internal.menus;
@@ -51,7 +50,7 @@ import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
 
 /**
  * @since e4
- *
+ * 
  */
 public class ActionSet {
 
@@ -64,8 +63,8 @@ public class ActionSet {
 
 	protected Expression visibleWhen;
 
-	private HashSet<String> menuContributionGroupIds = new HashSet<>();
-	private HashSet<String> toolbarContributionGroupIds = new HashSet<>();
+	private HashSet<String> menuContributionGroupIds = new HashSet<String>();
+	private HashSet<String> toolbarContributionGroupIds = new HashSet<String>();
 	private String id;
 
 	public String getId() {
@@ -123,7 +122,7 @@ public class ActionSet {
 	}
 
 	private Set<String> actionSetPartAssociations(String actionSetId) {
-		HashSet<String> result = new HashSet<>();
+		HashSet<String> result = new HashSet<String>();
 		final IExtensionRegistry registry = Platform.getExtensionRegistry();
 		final IConfigurationElement[] associations = registry
 				.getConfigurationElementsFor(PlatformUI.PLUGIN_ID + '.'
