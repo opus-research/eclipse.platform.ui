@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2016 IBM Corporation and others.
+ * Copyright (c) 2007, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Manumitting Technologies Inc - bug 488721
  ******************************************************************************/
 
 package org.eclipse.ui.internal.quickaccess;
@@ -147,8 +146,10 @@ class QuickAccessEntry {
 			if (firstInCategory || providerMatchRegions.length > 0) {
 				textLayout.setText(provider.getName());
 				if (boldStyle != null) {
-					for (int[] matchRegion : providerMatchRegions) {
-						textLayout.setStyle(boldStyle, matchRegion[0], matchRegion[1]);
+					for (int i = 0; i < providerMatchRegions.length; i++) {
+						int[] matchRegion = providerMatchRegions[i];
+						textLayout.setStyle(boldStyle, matchRegion[0],
+								matchRegion[1]);
 					}
 				}
 			} else {
@@ -156,24 +157,14 @@ class QuickAccessEntry {
 			}
 			break;
 		case 1:
-			textLayout.setText(element.getLabel());
-			// Two situations for measuring icons:
-			// - command with very large icon image (500x500) [scale down]
-			// - command with normal image (16x16) but small text-height (8pt)
 			Image image = getImage(element, resourceManager);
 			Rectangle imageRect = image.getBounds();
-			Rectangle textBounds = textLayout.getBounds();
-			int iconSize = imageRect.height;
-			// Heuristic: only scale image if has double the pixels
-			if (iconSize > 16 && iconSize >= 2 * textBounds.height) {
-				// image will be scaled down to fit
-				iconSize = textBounds.height;
-			}
-			// include additional line 1 for category separator
-			event.height = Math.max(event.height, iconSize + 3);
-			event.width += iconSize + 4;
+			event.width += imageRect.width + 4;
+			event.height = Math.max(event.height, imageRect.height + 2);
+			textLayout.setText(element.getLabel());
 			if (boldStyle != null) {
-				for (int[] matchRegion : elementMatchRegions) {
+				for (int i = 0; i < elementMatchRegions.length; i++) {
+					int[] matchRegion = elementMatchRegions[i];
 					textLayout.setStyle(boldStyle, matchRegion[0], matchRegion[1]);
 				}
 			}
@@ -193,7 +184,8 @@ class QuickAccessEntry {
 			if (firstInCategory || providerMatchRegions.length > 0) {
 				textLayout.setText(provider.getName());
 				if (boldStyle != null) {
-					for (int[] matchRegion : providerMatchRegions) {
+					for (int i = 0; i < providerMatchRegions.length; i++) {
+						int[] matchRegion = providerMatchRegions[i];
 						textLayout.setStyle(boldStyle, matchRegion[0],
 								matchRegion[1]);
 					}
@@ -217,37 +209,25 @@ class QuickAccessEntry {
 							StyledString.QUALIFIER_STYLER, new StyledString(commandElement
 									.getCommand()));
 					StyleRange[] styleRanges = styledString.getStyleRanges();
-					for (StyleRange styleRange : styleRanges) {
-						textLayout.setStyle(styleRange, styleRange.start,
-								styleRange.start + styleRange.length);
+					for (int i = 0; i < styleRanges.length; i++) {
+						textLayout.setStyle(styleRanges[i], styleRanges[i].start,
+								styleRanges[i].start + styleRanges[i].length);
 					}
 				}
 			}
-			// draw images to fit square area sized by the text area
 			Image image = getImage(element, resourceManager);
-			Rectangle availableBounds = ((TableItem) event.item).getTextBounds(event.index);
-			Rectangle requiredBounds = textLayout.getBounds();
-			Rectangle imageBounds = image.getBounds();
-			// 3 = top + bottom + category lines
-			int maxImageSize = availableBounds.height - 3;
-			// preserve aspect ratio
-			int destHeight = Math.min(imageBounds.height, maxImageSize);
-			int destWidth = destHeight * imageBounds.width / imageBounds.height;
-			// and centre within available space; remove 1 from height for
-			// category separator
-			int startX = (maxImageSize - destWidth) / 2;
-			int startY = (availableBounds.height - 1 - destHeight) / 2;
-			event.gc.drawImage(image, 0, 0, imageBounds.width, imageBounds.height,
-					availableBounds.x + startX, availableBounds.y + startY,
-					destWidth, destHeight);
+			event.gc.drawImage(image, event.x + 1, event.y + 1);
 			textLayout.setText(label);
 			if (boldStyle != null) {
-				for (int[] matchRegion : elementMatchRegions) {
+				for (int i = 0; i < elementMatchRegions.length; i++) {
+					int[] matchRegion = elementMatchRegions[i];
 					textLayout.setStyle(boldStyle, matchRegion[0], matchRegion[1]);
 				}
 			}
-			textLayout.draw(event.gc, availableBounds.x + maxImageSize + 4,
-					availableBounds.y + (availableBounds.height - requiredBounds.height) / 2);
+			Rectangle availableBounds = ((TableItem) event.item).getTextBounds(event.index);
+			Rectangle requiredBounds = textLayout.getBounds();
+			textLayout.draw(event.gc, availableBounds.x + 1 + image.getBounds().width, availableBounds.y
+					+ (availableBounds.height - requiredBounds.height) / 2);
 			break;
 		}
 		if (lastInCategory) {

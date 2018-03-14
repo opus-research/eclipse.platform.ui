@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
 
 package org.eclipse.ui.internal.views.markers;
 
-import org.eclipse.ui.views.markers.MarkerFieldFilter;
 import org.eclipse.ui.views.markers.internal.ProblemFilter;
 
 /**
@@ -39,21 +38,41 @@ public class CompatibilityMarkerFieldFilterGroup extends MarkerFieldFilterGroup 
 		setScope(filter.getOnResource());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.views.markers.MarkerFieldFilterGroup#getID()
+	 */
 	@Override
 	public String getID() {
 		return problemFilter.getId();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.views.markers.MarkerFieldFilterGroup#getName()
+	 */
 	@Override
 	public String getName() {
 		return problemFilter.getName();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.views.markers.MarkerFieldFilterGroup#isSystem()
+	 */
 	@Override
 	public boolean isSystem() {
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.views.markers.MarkerFieldFilterGroup#makeWorkingCopy()
+	 */
 	@Override
 	MarkerFieldFilterGroup makeWorkingCopy() {
 
@@ -65,13 +84,19 @@ public class CompatibilityMarkerFieldFilterGroup extends MarkerFieldFilterGroup 
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.views.markers.MarkerFieldFilterGroup#calculateFilters()
+	 */
 	@Override
 	protected void calculateFilters() {
 		super.calculateFilters();
 		// Now initialize with the ProblemFilter
-		for (MarkerFieldFilter fieldFilter : fieldFilters) {
-			if (fieldFilter instanceof CompatibilityFieldFilter)
-				((CompatibilityFieldFilter) fieldFilter).initialize(problemFilter);
+		for (int i = 0; i < fieldFilters.length; i++) {
+			if (fieldFilters[i] instanceof CompatibilityFieldFilter)
+				((CompatibilityFieldFilter) fieldFilters[i])
+						.initialize(problemFilter);
 		}
 	}
 

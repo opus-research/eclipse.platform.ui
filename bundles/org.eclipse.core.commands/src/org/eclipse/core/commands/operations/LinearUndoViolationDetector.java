@@ -93,11 +93,19 @@ public abstract class LinearUndoViolationDetector implements IOperationApprover 
 			IUndoableOperation operation, IUndoContext context,
 			IOperationHistory history, IAdaptable info);
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.core.commands.operations.IOperationApprover#proceedRedoing(org.eclipse.core.commands.operations.IUndoableOperation,
+	 *      org.eclipse.core.commands.operations.IOperationHistory,
+	 *      org.eclipse.core.runtime.IAdaptable)
+	 */
 	@Override
 	public final IStatus proceedRedoing(IUndoableOperation operation,
 			IOperationHistory history, IAdaptable info) {
 		IUndoContext[] contexts = operation.getContexts();
-		for (IUndoContext context : contexts) {
+		for (int i = 0; i < contexts.length; i++) {
+			IUndoContext context = contexts[i];
 			if (history.getRedoOperation(context) != operation) {
 				IStatus status = allowLinearRedoViolation(operation, context,
 						history, info);
@@ -109,12 +117,20 @@ public abstract class LinearUndoViolationDetector implements IOperationApprover 
 		return Status.OK_STATUS;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.core.commands.operations.IOperationApprover#proceedUndoing(org.eclipse.core.commands.operations.IUndoableOperation,
+	 *      org.eclipse.core.commands.operations.IOperationHistory,
+	 *      org.eclipse.core.runtime.IAdaptable)
+	 */
 
 	@Override
 	public final IStatus proceedUndoing(IUndoableOperation operation,
 			IOperationHistory history, IAdaptable info) {
 		IUndoContext[] contexts = operation.getContexts();
-		for (IUndoContext context : contexts) {
+		for (int i = 0; i < contexts.length; i++) {
+			IUndoContext context = contexts[i];
 			if (history.getUndoOperation(context) != operation) {
 				IStatus status = allowLinearUndoViolation(operation, context,
 						history, info);

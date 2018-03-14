@@ -73,7 +73,6 @@ public class ExtendedNodeImpl extends NodeImpl implements ExtendedNode {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String getName() {
 		return name;
 	}
@@ -83,7 +82,6 @@ public class ExtendedNodeImpl extends NodeImpl implements ExtendedNode {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void setName(String newName) {
 		String oldName = name;
 		name = newName;
@@ -158,7 +156,7 @@ public class ExtendedNodeImpl extends NodeImpl implements ExtendedNode {
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuilder result = new StringBuilder(super.toString());
+		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (name: ");
 		result.append(name);
 		result.append(')');

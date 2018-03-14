@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
- *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 488978
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -55,7 +53,7 @@ public class MenuManagerRendererFilter implements Listener {
 	static final String TMP_ORIGINAL_CONTEXT = "MenuServiceFilter.original.context"; //$NON-NLS-1$
 
 	private static void trace(String msg, Widget menu, MMenu menuModel) {
-		WorkbenchSWTActivator.trace(Policy.DEBUG_MENUS_FLAG, msg + ": " + menu + ": " //$NON-NLS-1$ //$NON-NLS-2$
+		WorkbenchSWTActivator.trace(Policy.MENUS, msg + ": " + menu + ": " //$NON-NLS-1$ //$NON-NLS-2$
 				+ menuModel, null);
 	}
 
@@ -68,7 +66,7 @@ public class MenuManagerRendererFilter implements Listener {
 	@Inject
 	private MenuManagerRenderer renderer;
 
-	private HashMap<Menu, Runnable> pendingCleanup = new HashMap<>();
+	private HashMap<Menu, Runnable> pendingCleanup = new HashMap<Menu, Runnable>();
 
 	private class SafeWrapper implements ISafeRunnable {
 		Event event;
@@ -111,9 +109,7 @@ public class MenuManagerRendererFilter implements Listener {
 			return;
 		}
 		if (event.type == SWT.Dispose) {
-			if (Policy.DEBUG_MENUS) {
-				trace("handleMenu.Dispose", menu, null); //$NON-NLS-1$
-			}
+			trace("handleMenu.Dispose", menu, null); //$NON-NLS-1$
 			cleanUp(menu, null, null);
 			return;
 		}
@@ -122,7 +118,8 @@ public class MenuManagerRendererFilter implements Listener {
 		MenuManager menuManager = null;
 		Object obj = menu.getData(AbstractPartRenderer.OWNING_ME);
 		if (obj == null) {
-			Object tmp = menu.getData(MenuManager.MANAGER_KEY);
+			Object tmp = menu
+					.getData("org.eclipse.jface.action.MenuManager.managerKey"); //$NON-NLS-1$
 			if (tmp instanceof MenuManager) {
 				MenuManager tmpManager = (MenuManager) tmp;
 				menuManager = tmpManager;
@@ -154,7 +151,7 @@ public class MenuManagerRendererFilter implements Listener {
 	public static void collectInfo(ExpressionInfo info, final MMenu menuModel,
 			final MenuManagerRenderer renderer,
 			final IEclipseContext evalContext, boolean recurse) {
-		HashSet<ContributionRecord> records = new HashSet<>();
+		HashSet<ContributionRecord> records = new HashSet<ContributionRecord>();
 		for (MMenuElement element : menuModel.getChildren()) {
 			ContributionRecord record = renderer.getContributionRecord(element);
 			if (record != null) {
@@ -183,7 +180,7 @@ public class MenuManagerRendererFilter implements Listener {
 			final IEclipseContext evalContext, final int recurseLevel,
 			boolean updateEnablement) {
 		final ExpressionContext exprContext = new ExpressionContext(evalContext);
-		HashSet<ContributionRecord> records = new HashSet<>();
+		HashSet<ContributionRecord> records = new HashSet<ContributionRecord>();
 		for (MMenuElement element : menuModel.getChildren()) {
 			ContributionRecord record = renderer.getContributionRecord(element);
 			if (record != null) {
@@ -277,17 +274,13 @@ public class MenuManagerRendererFilter implements Listener {
 
 	public void cleanUp(final Menu menu, MMenu menuModel,
 			MenuManager menuManager) {
-		if (Policy.DEBUG_MENUS) {
-			trace("cleanUp", menu, null); //$NON-NLS-1$
-		}
+		trace("cleanUp", menu, null); //$NON-NLS-1$
 		if (pendingCleanup.isEmpty()) {
 			return;
 		}
 		Runnable cleanUp = pendingCleanup.remove(menu);
 		if (cleanUp != null) {
-			if (Policy.DEBUG_MENUS) {
-				trace("cleanUp.run()", menu, null); //$NON-NLS-1$
-			}
+			trace("cleanUp.run()", menu, null); //$NON-NLS-1$
 			cleanUp.run();
 		}
 	}

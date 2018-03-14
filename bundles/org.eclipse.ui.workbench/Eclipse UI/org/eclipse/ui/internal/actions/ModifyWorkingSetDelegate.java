@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -156,17 +156,30 @@ public class ModifyWorkingSetDelegate extends
 	public ModifyWorkingSetDelegate() {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
+	 */
 	@Override
 	public void run(IAction action) {
 		contextMenuCreator.createMenu();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate2#runWithEvent(org.eclipse.jface.action.IAction, org.eclipse.swt.widgets.Event)
+	 */
 	@Override
 	public void runWithEvent(IAction action, Event event) {
 		if (event.type == SWT.KeyDown || event.type == SWT.KeyUp)
 			run(action);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.actions.AbstractWorkingSetPulldownDelegate#init(org.eclipse.ui.IWorkbenchWindow)
+	 */
 	@Override
 	public void init(IWorkbenchWindow window) {
 		super.init(window);
@@ -174,6 +187,11 @@ public class ModifyWorkingSetDelegate extends
 				.addPropertyChangeListener(listener);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.actions.AbstractWorkingSetPulldownDelegate#dispose()
+	 */
 	@Override
 	public void dispose() {
 		getWindow().getWorkbench().getWorkingSetManager()
@@ -235,10 +253,13 @@ public class ModifyWorkingSetDelegate extends
 		// separator.
 		boolean needsSeparator = false;
 
-		for (IWorkingSet[] sets : typedSets) {
+		for (int i = 0; i < typedSets.length; i++) {
 			int oldCount = menuItems.size();
 
-			for (IWorkingSet set : sets) {
+			IWorkingSet[] sets = typedSets[i];
+			for (int j = 0; j < sets.length; j++) {
+				IWorkingSet set = sets[j];
+
 				Set existingElements = new HashSet();
 				existingElements.addAll(Arrays
 						.asList(set.getElements()));
@@ -258,8 +279,8 @@ public class ModifyWorkingSetDelegate extends
 					}
 				}
 				else if (adaptables.length > 0) {
-					for (IAdaptable adaptable : adaptables) {
-						if (existingElements.contains(adaptable)){
+					for (int k = 0; k < adaptables.length; k++) {
+						if (existingElements.contains(adaptables[k])){
 							visible = true; // show if any element
 											// is present in removal
 							break;
@@ -304,6 +325,12 @@ public class ModifyWorkingSetDelegate extends
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.actions.AbstractWorkingSetPulldownDelegate#selectionChanged(org.eclipse.jface.action.IAction,
+	 *      org.eclipse.jface.viewers.ISelection)
+	 */
 	@Override
 	public void selectionChanged(IAction actionProxy, ISelection selection) {
 		super.selectionChanged(actionProxy, selection);
@@ -312,8 +339,8 @@ public class ModifyWorkingSetDelegate extends
 					.toArray();
 			// ensure every item is of type IAdaptable and is NOT an IWorkingSet (minimal fix for 157799)
 			boolean minimallyOkay = true;
-			for (Object selectedElement : selectedElements) {
-				Object object = selectedElement;
+			for (int i = 0; i < selectedElements.length; i++) {
+				Object object = selectedElements[i];
 				if (!(object instanceof IAdaptable) || object instanceof IWorkingSet) {
 					minimallyOkay = false;
 					break;
@@ -326,6 +353,12 @@ public class ModifyWorkingSetDelegate extends
 			actionProxy.setEnabled(false);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement,
+	 *      java.lang.String, java.lang.Object)
+	 */
 	@Override
 	public void setInitializationData(IConfigurationElement config,
 			String propertyName, Object data) {
@@ -334,6 +367,9 @@ public class ModifyWorkingSetDelegate extends
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate2#init(org.eclipse.jface.action.IAction)
+	 */
 	@Override
 	public void init(IAction action) {
 		this.actionProxy = action;

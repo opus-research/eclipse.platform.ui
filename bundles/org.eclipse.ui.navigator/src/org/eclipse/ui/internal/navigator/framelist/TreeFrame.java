@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,6 @@ package org.eclipse.ui.internal.navigator.framelist;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -126,13 +125,13 @@ public class TreeFrame extends Frame {
         IMemento[] elementMem = memento.getChildren(TAG_ELEMENT);
         List<IAdaptable> elements = new ArrayList<IAdaptable>(elementMem.length);
 
-        for (IMemento element : elementMem) {
-            String factoryID = element.getString(TAG_FACTORY_ID);
+        for (int i = 0; i < elementMem.length; i++) {
+            String factoryID = elementMem[i].getString(TAG_FACTORY_ID);
             if (factoryID != null) {
                 IElementFactory factory = PlatformUI.getWorkbench()
                         .getElementFactory(factoryID);
                 if (factory != null) {
-					elements.add(factory.createElement(element));
+					elements.add(factory.createElement(elementMem[i]));
 				}
             }
         }
@@ -187,12 +186,16 @@ public class TreeFrame extends Frame {
      * @param memento memento to persist elements in
      */
     private void saveElements(Object[] elements, IMemento memento) {
-        for (Object element : elements) {
-			IPersistableElement persistable = Adapters.adapt(element, IPersistableElement.class);
-			if (persistable != null) {
-				IMemento elementMem = memento.createChild(TAG_ELEMENT);
-				elementMem.putString(TAG_FACTORY_ID, persistable.getFactoryId());
-				persistable.saveState(elementMem);
+        for (int i = 0; i < elements.length; i++) {
+            if (elements[i] instanceof IAdaptable) {
+                IPersistableElement persistable = (IPersistableElement) ((IAdaptable) elements[i])
+                        .getAdapter(IPersistableElement.class);
+                if (persistable != null) {
+                    IMemento elementMem = memento.createChild(TAG_ELEMENT);
+                    elementMem.putString(TAG_FACTORY_ID, persistable
+                            .getFactoryId());
+                    persistable.saveState(elementMem);
+                }
             }
         }
     }
@@ -203,7 +206,12 @@ public class TreeFrame extends Frame {
      * @param memento memento to persist the frame state in.
      */
     public void saveState(IMemento memento) {
-		IPersistableElement persistable = Adapters.adapt(input, IPersistableElement.class);
+        if (!(input instanceof IAdaptable)) {
+			return;
+		}
+
+        IPersistableElement persistable = (IPersistableElement) ((IAdaptable) input)
+                .getAdapter(IPersistableElement.class);
         if (persistable != null) {
             IMemento frameMemento = memento.createChild(TAG_FRAME_INPUT);
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -181,7 +181,8 @@ public final class HandlerPersistence extends RegistryPersistence {
 		// Sort the commands extension point based on element name.
 		final IConfigurationElement[] commandsExtensionPoint = registry
 				.getConfigurationElementsFor(EXTENSION_COMMANDS);
-		for (final IConfigurationElement configurationElement : commandsExtensionPoint) {
+		for (int i = 0; i < commandsExtensionPoint.length; i++) {
+			final IConfigurationElement configurationElement = commandsExtensionPoint[i];
 			final String name = configurationElement.getName();
 
 			// Check if it is a handler submission or a command definition.
@@ -199,7 +200,8 @@ public final class HandlerPersistence extends RegistryPersistence {
 		// Sort the handler extension point based on element name.
 		final IConfigurationElement[] handlersExtensionPoint = registry
 				.getConfigurationElementsFor(EXTENSION_HANDLERS);
-		for (final IConfigurationElement configurationElement : handlersExtensionPoint) {
+		for (int i = 0; i < handlersExtensionPoint.length; i++) {
+			final IConfigurationElement configurationElement = handlersExtensionPoint[i];
 			final String name = configurationElement.getName();
 
 			// Check if it is a handler submission or a command definition.

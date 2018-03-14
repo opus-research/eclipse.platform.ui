@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -123,8 +123,9 @@ public abstract class ImportExportPage extends WorkbenchWizardSelectionPage{
 
 	        if (wizardCategories != null) {
 	            if (wizardCategories.getParent() == null) {
-					for (IWizardCategory wizardCategory : wizardCategories.getCategories()) {
-						inputArray.add(wizardCategory);
+	                IWizardCategory [] children = wizardCategories.getCategories();
+	                for (int i = 0; i < children.length; i++) {
+                		inputArray.add(children[i]);
 	                }
 	            } else {
 	                expandTop = true;
@@ -323,9 +324,9 @@ public abstract class ImportExportPage extends WorkbenchWizardSelectionPage{
         List categoriesToExpand = new ArrayList(expandedCategoryPaths.length);
 
         if (wizardCategories != null) {
-            for (String expandedCategoryPath : expandedCategoryPaths) {
+            for (int i = 0; i < expandedCategoryPaths.length; i++) {
                 IWizardCategory category = wizardCategories
-                        .findCategory(new Path(expandedCategoryPath));
+                        .findCategory(new Path(expandedCategoryPaths[i]));
                 if (category != null) {
 					categoriesToExpand.add(category);
 				}
@@ -376,10 +377,10 @@ public abstract class ImportExportPage extends WorkbenchWizardSelectionPage{
     protected void storeExpandedCategories(String setting, TreeViewer viewer) {
         Object[] expandedElements = viewer.getExpandedElements();
         List expandedElementPaths = new ArrayList(expandedElements.length);
-        for (Object expandedElement : expandedElements) {
-            if (expandedElement instanceof IWizardCategory) {
+        for (int i = 0; i < expandedElements.length; ++i) {
+            if (expandedElements[i] instanceof IWizardCategory) {
 				expandedElementPaths
-                        .add(((IWizardCategory) expandedElement)
+                        .add(((IWizardCategory) expandedElements[i])
                                 .getPath().toString());
 			}
         }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,6 +23,8 @@ import org.eclipse.jface.fieldassist.IContentProposalProvider;
 import org.eclipse.jface.fieldassist.IControlContentAdapter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.widgets.Control;
@@ -212,7 +214,12 @@ public class ContentAssistCommandAdapter extends ContentProposalAdapter {
 				}
 			}
 		});
-		control.addDisposeListener(e -> deactivateHandler());
+		control.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				deactivateHandler();
+			}
+		});
 	}
 
 	/**
@@ -265,6 +272,14 @@ public class ContentAssistCommandAdapter extends ContentProposalAdapter {
 		return dec;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * Overridden to hide and show the content assist decoration
+	 *
+	 * @see org.eclipse.jface.fieldassist.ContentProposalAdapter#setEnabled(boolean)
+	 * @since 3.3
+	 */
 	@Override
 	public void setEnabled(boolean enabled) {
 		super.setEnabled(enabled);

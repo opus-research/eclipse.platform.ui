@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,23 +43,31 @@ public class PerformanceEditorPart extends EditorPart {
         super();
     }
 
-    @Override
-	public void doSave(IProgressMonitor monitor) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.ISaveablePart#doSave(org.eclipse.core.runtime.IProgressMonitor)
+     */
+    public void doSave(IProgressMonitor monitor) {
     }
 
-    @Override
-	public void doSaveAs() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.ISaveablePart#doSaveAs()
+     */
+    public void doSaveAs() {
     }
 
-    @Override
-	public void init(IEditorSite site, IEditorInput input)
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IEditorPart#init(org.eclipse.ui.IEditorSite, org.eclipse.ui.IEditorInput)
+     */
+    public void init(IEditorSite site, IEditorInput input)
             throws PartInitException {
         super.setSite(site);
         super.setInput(input);
     }
 
-    @Override
-	public boolean isDirty() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.ISaveablePart#isDirty()
+     */
+    public boolean isDirty() {
         return dirty;
     }
 
@@ -67,24 +75,32 @@ public class PerformanceEditorPart extends EditorPart {
         this.dirty = dirty;
     }
 
-    @Override
-	public boolean isSaveAsAllowed() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.ISaveablePart#isSaveAsAllowed()
+     */
+    public boolean isSaveAsAllowed() {
         return false;
     }
 
-    @Override
-	public void createPartControl(Composite parent) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+     */
+    public void createPartControl(Composite parent) {
         control = new Label(parent, SWT.NONE);
 
     }
 
-    @Override
-	public void setFocus() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbenchPart#setFocus()
+     */
+    public void setFocus() {
         control.setFocus();
     }
 
-    @Override
-	public void setInitializationData(IConfigurationElement cfig,
+    /* (non-Javadoc)
+     * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
+     */
+    public void setInitializationData(IConfigurationElement cfig,
             String propertyName, Object data) {
         super.setInitializationData(cfig, propertyName, data);
 
@@ -97,17 +113,17 @@ public class PerformanceEditorPart extends EditorPart {
 
         }
     }
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> T getAdapter(Class<T> adapter) {
+    /* (non-Javadoc)
+     * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+     */
+    public Object getAdapter(Class adapter) {
         Object object = null;
         if (useOutline && adapter.equals(IContentOutlinePage.class)) {
             object = new ContentOutlinePage() {
             };
         }
         if (object != null)
-			return (T) object;
+            return object;
         return super.getAdapter(adapter);
     }
 }

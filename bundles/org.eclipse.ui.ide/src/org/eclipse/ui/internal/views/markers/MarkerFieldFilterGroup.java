@@ -23,7 +23,6 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -172,8 +171,9 @@ class MarkerFieldFilterGroup {
 	protected void calculateFilters() {
 		Map<String, String> values = getValues();
 		Collection<MarkerFieldFilter> filters = new ArrayList<>();
-		for (MarkerField visibleField : generator.getVisibleFields()) {
-			MarkerFieldFilter fieldFilter = MarkerSupportInternalUtilities.generateFilter(visibleField);
+		MarkerField[] fields = generator.getVisibleFields();
+		for (int i = 0; i < fields.length; i++) {
+			MarkerFieldFilter fieldFilter = MarkerSupportInternalUtilities.generateFilter(fields[i]);
 			if (fieldFilter != null) {
 				filters.add(fieldFilter);
 
@@ -200,9 +200,10 @@ class MarkerFieldFilterGroup {
 	 * @return MarkerFieldFilter
 	 */
 	public MarkerFieldFilter getFilter(MarkerField field) {
-		for (MarkerFieldFilter filter : getFieldFilters()) {
-			if (filter.getField().equals(field)) {
-				return filter;
+		MarkerFieldFilter[] filters = getFieldFilters();
+		for (int i = 0; i < filters.length; i++) {
+			if (filters[i].getField().equals(field)) {
+				return filters[i];
 			}
 		}
 		return null;
@@ -261,8 +262,8 @@ class MarkerFieldFilterGroup {
 		IAdaptable[] elements = workingSet.getElements();
 		List<IResource> result = new ArrayList<>(elements.length);
 
-		for (IAdaptable adaptable : elements) {
-			IResource next = Adapters.adapt(adaptable, IResource.class);
+		for (int idx = 0; idx < elements.length; idx++) {
+			IResource next = elements[idx].getAdapter(IResource.class);
 			if (next != null) {
 				result.add(next);
 			}
@@ -343,8 +344,8 @@ class MarkerFieldFilterGroup {
 		if (wSetResources == null) {
 			computeWorkingSetResources();
 		}
-		for (IResource wSetResource : wSetResources) {
-			if(wSetResource.getFullPath().isPrefixOf(resource.getFullPath())){
+		for (int i = 0; i < wSetResources.length; i++) {
+			if(wSetResources[i].getFullPath().isPrefixOf(resource.getFullPath())){
 				return true;
 			}
 		}
@@ -423,9 +424,10 @@ class MarkerFieldFilterGroup {
 			}
 		}
 
-		for (MarkerFieldFilter filter : getFieldFilters()) {
-			if (filter instanceof CompatibilityFieldFilter) {
-				((CompatibilityFieldFilter) filter).loadLegacySettings(memento, generator);
+		MarkerFieldFilter[] filters = getFieldFilters();
+		for (int i = 0; i < filters.length; i++) {
+			if (filters[i] instanceof CompatibilityFieldFilter) {
+				((CompatibilityFieldFilter) filters[i]).loadLegacySettings(memento, generator);
 			}
 		}
 	}
@@ -455,11 +457,14 @@ class MarkerFieldFilterGroup {
 		}
 
 		Map<String, MarkerFieldFilter> filterMap = new HashMap<>();
-		for (MarkerFieldFilter filter : getFieldFilters()) {
-			filterMap.put(MarkerSupportInternalUtilities.getId(filter.getField()), filter);
+		MarkerFieldFilter[] filters = getFieldFilters();
+		for (int i = 0; i < filters.length; i++) {
+			filterMap.put(MarkerSupportInternalUtilities.getId(filters[i].getField()), filters[i]);
 		}
 
-		for (IMemento childMemento : memento.getChildren(TAG_FIELD_FILTER_ENTRY)) {
+		IMemento[] children = memento.getChildren(TAG_FIELD_FILTER_ENTRY);
+		for (int i = 0; i < children.length; i++) {
+			IMemento childMemento = children[i];
 			String filterId = childMemento.getID();
 			if (filterMap.containsKey(filterId)) {
 				MarkerFieldFilter filter = filterMap.get(filterId);
@@ -567,11 +572,12 @@ class MarkerFieldFilterGroup {
 			memento.putString(MarkerSupportInternalUtilities.ATTRIBUTE_NAME, getName());
 			memento.putString(IMemento.TAG_ID, getID());
 		}
+		MarkerFieldFilter[] filters = getFieldFilters();
 
-		for (MarkerFieldFilter filter : getFieldFilters()) {
+		for (int i = 0; i < filters.length; i++) {
 			IMemento child = memento.createChild(TAG_FIELD_FILTER_ENTRY,
-					MarkerSupportInternalUtilities.getId(filter.getField()));
-			filter.saveSettings(child);
+					MarkerSupportInternalUtilities.getId(filters[i].getField()));
+			filters[i].saveSettings(child);
 		}
 	}
 
@@ -609,8 +615,8 @@ class MarkerFieldFilterGroup {
 			}
 		}
 
-		for (MarkerFieldFilter filter : filters) {
-			if (filter.select(entry)) {
+		for (int i = 0; i < filters.length; i++) {
+			if (filters[i].select(entry)) {
 				continue;
 			}
 			return false;
@@ -692,8 +698,8 @@ class MarkerFieldFilterGroup {
 		}
 		case MarkerFieldFilterGroup.ON_SELECTED_ONLY: {
 			IPath  markerPath=entry.getMarker().getResource().getFullPath();
-			for (IResource resource : resources) {
-				if(markerPath.equals(resource.getFullPath())){
+			for (int i = 0; i < resources.length; i++) {
+				if(markerPath.equals(resources[i].getFullPath())){
 					return true;
 				}
 			}
@@ -701,8 +707,8 @@ class MarkerFieldFilterGroup {
 		}
 		case MarkerFieldFilterGroup.ON_SELECTED_AND_CHILDREN: {
 			IPath  markerPath=entry.getMarker().getResource().getFullPath();
-			for (IResource resource : resources) {
-				if(resource.getFullPath().isPrefixOf(markerPath)){
+			for (int i = 0; i < resources.length; i++) {
+				if(resources[i].getFullPath().isPrefixOf(markerPath)){
 					return true;
 				}
 			}
@@ -711,8 +717,8 @@ class MarkerFieldFilterGroup {
 		case MarkerFieldFilterGroup.ON_ANY_IN_SAME_CONTAINER: {
 			IPath  markerProjectPath=entry.getMarker().getResource().getFullPath();
 			IProject[] projects=MarkerResourceUtil.getProjects(resources);
-			for (IProject project : projects) {
-				if(project.getFullPath().isPrefixOf(markerProjectPath)){
+			for (int i = 0; i < projects.length; i++) {
+				if(projects[i].getFullPath().isPrefixOf(markerProjectPath)){
 					return true;
 				}
 			}

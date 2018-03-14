@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,15 +48,16 @@ public class ContainerContentProvider implements ITreeContentProvider {
 	public Object[] getChildren(Object element) {
         if (element instanceof IWorkspace) {
             // check if closed projects should be shown
-			IProject[] allProjects = ((IWorkspace) element).getRoot().getProjects();
+            IProject[] allProjects = ((IWorkspace) element).getRoot()
+                    .getProjects();
             if (showClosedProjects) {
 				return allProjects;
 			}
 
             ArrayList accessibleProjects = new ArrayList();
-			for (IProject project : allProjects) {
-				if (project.isOpen()) {
-					accessibleProjects.add(project);
+            for (int i = 0; i < allProjects.length; i++) {
+                if (allProjects[i].isOpen()) {
+                    accessibleProjects.add(allProjects[i]);
                 }
             }
             return accessibleProjects.toArray();
@@ -65,9 +66,10 @@ public class ContainerContentProvider implements ITreeContentProvider {
             if (container.isAccessible()) {
                 try {
                     List children = new ArrayList();
-					for (IResource member : container.members()) {
-                        if (member.getType() != IResource.FILE) {
-                            children.add(member);
+                    IResource[] members = container.members();
+                    for (int i = 0; i < members.length; i++) {
+                        if (members[i].getType() != IResource.FILE) {
+                            children.add(members[i]);
                         }
                     }
                     return children.toArray();

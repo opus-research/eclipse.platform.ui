@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -81,33 +81,36 @@ public abstract class UIJob extends Job {
         if (asyncDisplay == null || asyncDisplay.isDisposed()) {
             return Status.CANCEL_STATUS;
         }
-        asyncDisplay.asyncExec(() -> {
-		    IStatus result = null;
-		    Throwable throwable = null;
-		    try {
-		        //As we are in the UI Thread we can
-		        //always know what to tell the job.
-		        setThread(Thread.currentThread());
-		        if (monitor.isCanceled()) {
-					result = Status.CANCEL_STATUS;
-				} else {
-		           	UIStats.start(UIStats.UI_JOB, getName());
-		            result = runInUIThread(monitor);
-		        }
+        asyncDisplay.asyncExec(new Runnable() {
+            @Override
+			public void run() {
+                IStatus result = null;
+                Throwable throwable = null;
+                try {
+                    //As we are in the UI Thread we can
+                    //always know what to tell the job.
+                    setThread(Thread.currentThread());
+                    if (monitor.isCanceled()) {
+						result = Status.CANCEL_STATUS;
+					} else {
+                       	UIStats.start(UIStats.UI_JOB, getName());
+                        result = runInUIThread(monitor);
+                    }
 
-		    } catch(Throwable t){
-		    	throwable = t;
-		    } finally {
-		   		UIStats.end(UIStats.UI_JOB, UIJob.this, getName());
-		        if (result == null) {
-					result = new Status(IStatus.ERROR,
-		                    PlatformUI.PLUGIN_ID, IStatus.ERROR,
-		                    ProgressMessages.InternalError,
-		                    throwable);
-				}
-		        done(result);
-		    }
-		});
+                } catch(Throwable t){
+                	throwable = t;
+                } finally {
+               		UIStats.end(UIStats.UI_JOB, UIJob.this, getName());
+                    if (result == null) {
+						result = new Status(IStatus.ERROR,
+                                PlatformUI.PLUGIN_ID, IStatus.ERROR,
+                                ProgressMessages.InternalError,
+                                throwable);
+					}
+                    done(result);
+                }
+            }
+        });
         return Job.ASYNC_FINISH;
     }
 

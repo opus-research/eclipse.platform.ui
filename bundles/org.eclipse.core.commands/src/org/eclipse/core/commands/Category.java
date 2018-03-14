@@ -138,10 +138,16 @@ public final class Category extends NamedHandleObject {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.core.commands.common.HandleObject#toString()
+	 */
 	@Override
 	public String toString() {
 		if (string == null) {
-			final StringBuilder stringBuffer = new StringBuilder("Category("); //$NON-NLS-1$
+			final StringBuffer stringBuffer = new StringBuffer();
+			stringBuffer.append("Category("); //$NON-NLS-1$
             stringBuffer.append(id);
             stringBuffer.append(',');
             stringBuffer.append(name);
@@ -155,6 +161,11 @@ public final class Category extends NamedHandleObject {
 		return string;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.core.commands.common.HandleObject#undefine()
+	 */
 	@Override
 	public void undefine() {
 		string = null;

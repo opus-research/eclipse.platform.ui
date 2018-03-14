@@ -23,7 +23,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.mapping.ResourceMapping;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -106,7 +105,7 @@ public class MarkerFilter implements Cloneable {
 
 	protected boolean enabled;
 
-	private IResource[] focusResources;
+	private IResource[] focusResource;
 
 	private Set<String> cachedWorkingSet;
 
@@ -124,8 +123,8 @@ public class MarkerFilter implements Cloneable {
 	MarkerFilter(String filterName, String[] rootTypes) {
 		name = filterName;
 
-		for (String rootType : rootTypes) {
-			MarkerType type = MarkerTypesModel.getInstance().getType(rootType);
+		for (int i = 0; i < rootTypes.length; i++) {
+			MarkerType type = MarkerTypesModel.getInstance().getType(rootTypes[i]);
 
 			if (!this.rootTypes.contains(type)) {
 				this.rootTypes.add(type);
@@ -156,8 +155,10 @@ public class MarkerFilter implements Cloneable {
 			types.add(type);
 		}
 
-		for (MarkerType subType : type.getSubtypes()) {
-			addAllSubTypes(types, subType);
+		MarkerType[] subTypes = type.getSubtypes();
+
+		for (int i = 0; i < subTypes.length; i++) {
+			addAllSubTypes(types, subTypes[i]);
 		}
 	}
 
@@ -191,8 +192,8 @@ public class MarkerFilter implements Cloneable {
 		IAdaptable[] elements = workingSet.getElements();
 		List<IResource> result = new ArrayList<>(elements.length);
 
-		for (IAdaptable adaptable : elements) {
-			IResource next = Adapters.adapt(adaptable, IResource.class);
+		for (int idx = 0; idx < elements.length; idx++) {
+			IResource next = elements[idx].getAdapter(IResource.class);
 			if (next != null) {
 				result.add(next);
 			}
@@ -220,7 +221,8 @@ public class MarkerFilter implements Cloneable {
 	 * Adds the paths of all resources in the given array to the given set.
 	 */
 	private void addResourcesAndChildren(HashSet<String> result, IResource[] resources) {
-		for (IResource currentResource : resources) {
+		for (int idx = 0; idx < resources.length; idx++) {
+			IResource currentResource = resources[idx];
 			result.add(currentResource.getFullPath().toString());
 			if (currentResource instanceof IContainer) {
 				IContainer cont = (IContainer) currentResource;
@@ -257,14 +259,14 @@ public class MarkerFilter implements Cloneable {
 	static Collection<IProject> getProjectsAsCollection(Object[] elements) {
 		HashSet<IProject> projects = new HashSet<>();
 
-		for (Object element : elements) {
-			if (element instanceof IResource) {
-				projects.add(((IResource) element).getProject());
+		for (int idx = 0; idx < elements.length; idx++) {
+			if (elements[idx] instanceof IResource) {
+				projects.add(((IResource) elements[idx]).getProject());
 			} else {
-				IProject[] mappingProjects = (((ResourceMapping) element)
+				IProject[] mappingProjects = (((ResourceMapping) elements[idx])
 						.getProjects());
-				for (IProject mappingProject : mappingProjects) {
-					projects.add(mappingProject);
+				for (int i = 0; i < mappingProjects.length; i++) {
+					projects.add(mappingProjects[i]);
 				}
 			}
 		}
@@ -301,7 +303,7 @@ public class MarkerFilter implements Cloneable {
 			return true;
 		}
 
-		if (focusResources == null) {
+		if (focusResource == null) {
 			return true;
 		}
 
@@ -317,8 +319,8 @@ public class MarkerFilter implements Cloneable {
 				return false;
 			}
 
-			for (IResource focusResource : focusResources) {
-				IProject selectedProject = focusResource.getProject();
+			for (int i = 0; i < focusResource.length; i++) {
+				IProject selectedProject = focusResource[i].getProject();
 				if (selectedProject == null) {
 					continue;
 				}
@@ -328,16 +330,16 @@ public class MarkerFilter implements Cloneable {
 				}
 			}
 		} else if (onResource == ON_SELECTED_ONLY) {
-			for (IResource focusResource : focusResources) {
-				if (resource.equals(focusResource)) {
+			for (int i = 0; i < focusResource.length; i++) {
+				if (resource.equals(focusResource[i])) {
 					return true;
 				}
 			}
 		} else if (onResource == ON_SELECTED_AND_CHILDREN) {
-			for (IResource focusResource : focusResources) {
+			for (int i = 0; i < focusResource.length; i++) {
 				IResource parentResource = resource;
 				while (parentResource != null) {
-					if (parentResource.equals(focusResource)) {
+					if (parentResource.equals(focusResource[i])) {
 						return true;
 					}
 					parentResource = parentResource.getParent();
@@ -414,7 +416,7 @@ public class MarkerFilter implements Cloneable {
 	 * @return the selected resource(s) withing the workbench.
 	 */
 	IResource[] getFocusResource() {
-		return focusResources;
+		return focusResource;
 	}
 
 	/**
@@ -423,7 +425,7 @@ public class MarkerFilter implements Cloneable {
 	 * @param resources
 	 */
 	public void setFocusResource(IResource[] resources) {
-		focusResources = resources;
+		focusResource = resources;
 	}
 
 	/**

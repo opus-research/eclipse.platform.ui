@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -303,8 +303,8 @@ public class BindingModel extends CommonModel {
 			Collection conflictsList = conflictModel.getConflicts();
 			if (conflictsList != null) {
 				Object[] conflicts = conflictsList.toArray();
-				for (Object conflict : conflicts) {
-					BindingElement be = (BindingElement) conflict;
+				for (int i = 0; i < conflicts.length; i++) {
+					BindingElement be = (BindingElement) conflicts[i];
 					if (be == bindingElement) {
 						continue;
 					}
@@ -361,14 +361,14 @@ public class BindingModel extends CommonModel {
 		Binding[] managerBindings = bindingManager.getBindings();
 		ArrayList systemBindings = new ArrayList();
 		ArrayList removalBindings = new ArrayList();
-		for (Binding managerBinding : managerBindings) {
-			if (managerBinding.getParameterizedCommand() == null) {
-				removalBindings.add(managerBinding);
-			} else if (managerBinding.getParameterizedCommand().equals(cmd)) {
-				if (managerBinding.getType() == Binding.USER) {
-					bindingManager.removeBinding(managerBinding);
-				} else if (managerBinding.getType() == Binding.SYSTEM) {
-					systemBindings.add(managerBinding);
+		for (int i = 0; i < managerBindings.length; i++) {
+			if (managerBindings[i].getParameterizedCommand() == null) {
+				removalBindings.add(managerBindings[i]);
+			} else if (managerBindings[i].getParameterizedCommand().equals(cmd)) {
+				if (managerBindings[i].getType() == Binding.USER) {
+					bindingManager.removeBinding(managerBindings[i]);
+				} else if (managerBindings[i].getType() == Binding.SYSTEM) {
+					systemBindings.add(managerBindings[i]);
 				}
 			}
 		}

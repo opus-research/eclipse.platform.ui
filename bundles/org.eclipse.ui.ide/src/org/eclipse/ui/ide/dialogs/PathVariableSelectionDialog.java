@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,6 +27,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.SelectionDialog;
@@ -78,7 +80,12 @@ public final class PathVariableSelectionDialog extends SelectionDialog {
         setTitle(IDEWorkbenchMessages.PathVariableSelectionDialog_title);
         this.variableType = variableType;
         pathVariablesGroup = new PathVariablesGroup(false, variableType,
-                event -> updateExtendButtonState());
+                new Listener() {
+                    @Override
+					public void handleEvent(Event event) {
+                        updateExtendButtonState();
+                    }
+                });
         pathVariablesGroup.setSaveVariablesOnChange(true);
         setShellStyle(getShellStyle() | SWT.SHEET);
     }

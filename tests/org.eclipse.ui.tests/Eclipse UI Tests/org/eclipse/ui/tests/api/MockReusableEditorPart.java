@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,13 +20,14 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IReusableEditor;
 import org.eclipse.ui.IShowEditorInput;
 import org.eclipse.ui.ide.IGotoMarker;
 
-public class MockReusableEditorPart extends MockWorkbenchPart
-		implements IGotoMarker, IShowEditorInput, IReusableEditor {
+public class MockReusableEditorPart extends MockWorkbenchPart implements IEditorPart,
+        IGotoMarker, IShowEditorInput, IReusableEditor {
 
     private static final String BASE = "org.eclipse.ui.tests.api.MockReusableEditorPart";
 
@@ -82,31 +83,49 @@ public class MockReusableEditorPart extends MockWorkbenchPart
         });
         saveAsToggle.setSelection(saveAsAllowed);
     }
+    /**
+     * @see IEditorPart#doSave(IProgressMonitor)
+     */
     @Override
 	public void doSave(IProgressMonitor monitor) {
         setDirty(false);
         callTrace.add("doSave");
     }
 
+    /**
+     * @see IEditorPart#doSaveAs()
+     */
     @Override
 	public void doSaveAs() {
     }
 
+    /**
+     * @see IEditorPart#getEditorInput()
+     */
     @Override
 	public IEditorInput getEditorInput() {
         return input;
     }
 
+    /**
+     * @see IEditorPart#getEditorSite()
+     */
     @Override
 	public IEditorSite getEditorSite() {
         return (IEditorSite) getSite();
     }
 
+    /**
+     * @see org.eclipse.ui.ide.IGotoMarker
+     */
     @Override
 	public void gotoMarker(IMarker marker) {
         callTrace.add("gotoMarker");
     }
 
+    /**
+     * @see IEditorPart#init(IEditorSite, IEditorInput)
+     */
     @Override
 	public void init(IEditorSite site, IEditorInput input) {
         this.input = input;
@@ -115,6 +134,9 @@ public class MockReusableEditorPart extends MockWorkbenchPart
         setSiteInitialized();
     }
 
+    /**
+     * @see IEditorPart#isDirty()
+     */
     @Override
 	public boolean isDirty() {
         callTrace.add("isDirty");
@@ -126,12 +148,18 @@ public class MockReusableEditorPart extends MockWorkbenchPart
         firePropertyChange(PROP_DIRTY);
     }
 
+    /**
+     * @see IEditorPart#isSaveAsAllowed()
+     */
     @Override
 	public boolean isSaveAsAllowed() {
         callTrace.add("isSaveAsAllowed");
         return saveAsAllowed;
     }
 
+    /**
+     * @see IEditorPart#isSaveOnCloseNeeded()
+     */
     @Override
 	public boolean isSaveOnCloseNeeded() {
         callTrace.add("isSaveOnCloseNeeded");

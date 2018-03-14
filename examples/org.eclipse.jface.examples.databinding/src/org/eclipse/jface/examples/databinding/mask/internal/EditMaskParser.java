@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 The Pampered Chef and others.
+ * Copyright (c) 2006 The Pampered Chef and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,6 @@
 package org.eclipse.jface.examples.databinding.mask.internal;
 
 import java.util.LinkedList;
-import java.util.List;
 
 import org.eclipse.jface.examples.databinding.mask.EditMaskParseException;
 
@@ -28,14 +27,14 @@ public class EditMaskParser {
 	 * @throws EditMaskParseException
 	 */
 	public EditMaskParser(String editMask) throws EditMaskParseException {
-		List<EditMaskLexerAndToken> tokens = new LinkedList<>();
+		LinkedList tokens = new LinkedList();
 		int position = 0;
 		while (position < editMask.length()) {
 			EditMaskLexerAndToken token = new EditMaskLexerAndToken();
 			position += token.initializeEditMask(editMask, position);
 			tokens.add(token);
 		}
-		expectedTokens = tokens.toArray(new EditMaskLexerAndToken[tokens.size()]);
+		expectedTokens = (EditMaskLexerAndToken[]) tokens.toArray(new EditMaskLexerAndToken[tokens.size()]);
 	}
 
 	/**
@@ -68,7 +67,7 @@ public class EditMaskParser {
 	 * @return the formatted version of the user input
 	 */
 	public String getFormattedResult() {
-		StringBuilder result = new StringBuilder();
+		StringBuffer result = new StringBuffer();
 		for (int i = 0; i < expectedTokens.length; i++) {
 			String outputChar = expectedTokens[i].getInput();
 			if (outputChar == null) {
@@ -83,7 +82,7 @@ public class EditMaskParser {
 	 * @return the user input with all literals removed
 	 */
 	public String getRawResult() {
-		StringBuilder result = new StringBuilder();
+		StringBuffer result = new StringBuffer();
 		for (int i = 0; i < expectedTokens.length; i++) {
 			if (expectedTokens[i].isReadOnly()) {
 				continue;

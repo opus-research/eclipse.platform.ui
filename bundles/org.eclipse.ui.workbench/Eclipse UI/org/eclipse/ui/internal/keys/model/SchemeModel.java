@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.ui.internal.keys.model;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eclipse.jface.bindings.BindingManager;
 import org.eclipse.jface.bindings.Scheme;
 
@@ -37,12 +38,13 @@ public class SchemeModel extends CommonModel {
 	 */
 	public void init(BindingManager bindingManager) {
 		schemes = new ArrayList();
-		for (Scheme definedScheme : bindingManager.getDefinedSchemes()) {
+		Scheme[] definedSchemes = bindingManager.getDefinedSchemes();
+		for (int i = 0; i < definedSchemes.length; i++) {
 			SchemeElement se = new SchemeElement(controller);
-			se.init(definedScheme);
+			se.init(definedSchemes[i]);
 			se.setParent(this);
 			schemes.add(se);
-			if (definedScheme == bindingManager.getActiveScheme()) {
+			if (definedSchemes[i] == bindingManager.getActiveScheme()) {
 				setSelectedElement(se);
 			}
 		}

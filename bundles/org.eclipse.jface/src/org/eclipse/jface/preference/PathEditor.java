@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -57,10 +57,10 @@ public class PathEditor extends ListEditor {
 
     @Override
 	protected String createList(String[] items) {
-        StringBuilder path = new StringBuilder("");//$NON-NLS-1$
+        StringBuffer path = new StringBuffer("");//$NON-NLS-1$
 
-        for (String item : items) {
-            path.append(item);
+        for (int i = 0; i < items.length; i++) {
+            path.append(items[i]);
             path.append(File.pathSeparator);
         }
         return path.toString();
@@ -93,7 +93,7 @@ public class PathEditor extends ListEditor {
 	protected String[] parseString(String stringList) {
         StringTokenizer st = new StringTokenizer(stringList, File.pathSeparator
                 + "\n\r");//$NON-NLS-1$
-        ArrayList<Object> v = new ArrayList<>();
+        ArrayList<Object> v = new ArrayList<Object>();
         while (st.hasMoreElements()) {
             v.add(st.nextElement());
         }

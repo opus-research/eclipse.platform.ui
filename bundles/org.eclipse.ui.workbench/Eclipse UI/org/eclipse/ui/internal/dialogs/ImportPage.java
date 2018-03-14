@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,11 +7,14 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Alain Bernard <alain.bernard1224@gmail.com> - Bug 281490
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.activities.ITriggerPoint;
@@ -59,10 +62,20 @@ public class ImportPage extends ImportExportPage {
 		IWizardCategory root = WorkbenchPlugin.getDefault()
 			.getImportWizardRegistry().getRootCategory();
 		importTree = new CategorizedWizardSelectionTree(
-				root, WorkbenchMessages.ImportWizard_selectWizard);
+				root, WorkbenchMessages.ImportWizard_selectSource);
 		Composite importComp = importTree.createControl(parent);
-		importTree.getViewer().addSelectionChangedListener(event -> listSelectionChanged(event.getSelection()));
-		importTree.getViewer().addDoubleClickListener(event -> treeDoubleClicked(event));
+		importTree.getViewer().addSelectionChangedListener(new ISelectionChangedListener(){
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				listSelectionChanged(event.getSelection());
+			}
+		});
+		importTree.getViewer().addDoubleClickListener(new IDoubleClickListener(){
+	    	@Override
+			public void doubleClick(DoubleClickEvent event) {
+	    		treeDoubleClicked(event);
+	    	}
+	    });
 		setTreeViewer(importTree.getViewer());
 		return importComp;
 	}
@@ -90,7 +103,7 @@ public class ImportPage extends ImportExportPage {
 
 	@Override
 	protected void updateMessage(){
-		setMessage(WorkbenchMessages.ImportExportPage_chooseImportWizard);
+		setMessage(WorkbenchMessages.ImportExportPage_chooseImportSource);
 		super.updateMessage();
 	}
 }

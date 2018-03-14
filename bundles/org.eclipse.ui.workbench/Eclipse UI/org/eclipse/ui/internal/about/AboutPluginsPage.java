@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,40 +10,34 @@
  *  	Sebastian Davids <sdavids@gmx.de> - Fix for bug 19346 - Dialog
  * 		font should be activated and used by other components.
  *      Robin Stocker <robin@nibor.org> - Add filter text field
- *      Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
- *      Simon Scholz <simon.scholz@vogella.com> - Bug 488704, 491316
  *******************************************************************************/
 package org.eclipse.ui.internal.about;
-
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.util.ConfigureColumns;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
@@ -51,13 +45,16 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -88,12 +85,12 @@ public class AboutPluginsPage extends ProductInfoPage {
 		/**
 		 * Queue containing bundle signing info to be resolved.
 		 */
-		private LinkedList<AboutBundleData> resolveQueue = new LinkedList<>();
+		private LinkedList<AboutBundleData> resolveQueue = new LinkedList<AboutBundleData>();
 
 		/**
 		 * Queue containing bundle data that's been resolve and needs updating.
 		 */
-		private List<AboutBundleData> updateQueue = new ArrayList<>();
+		private List<AboutBundleData> updateQueue = new ArrayList<AboutBundleData>();
 
 		/*
 		 * this job will attempt to discover the signing state of a given bundle
@@ -151,6 +148,13 @@ public class AboutPluginsPage extends ProductInfoPage {
 				setPriority(Job.DECORATE);
 			}
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see
+			 * org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.
+			 * runtime.IProgressMonitor)
+			 */
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				while (true) {
@@ -174,6 +178,13 @@ public class AboutPluginsPage extends ProductInfoPage {
 			}
 		};
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see
+		 * org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java
+		 * .lang.Object, int)
+		 */
 		@Override
 		public Image getColumnImage(Object element, int columnIndex) {
 			if (columnIndex == 0) {
@@ -197,6 +208,13 @@ public class AboutPluginsPage extends ProductInfoPage {
 			return null;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see
+		 * org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.
+		 * lang.Object, int)
+		 */
 		@Override
 		public String getColumnText(Object element, int columnIndex) {
 			if (element instanceof AboutBundleData) {
@@ -253,6 +271,7 @@ public class AboutPluginsPage extends ProductInfoPage {
 
 	};
 	private Bundle[] bundles = WorkbenchPlugin.getDefault().getBundles();
+	private AboutBundleData[] bundleInfos;
 	private SashForm sashForm;
 	private BundleSigningInfo signingArea;
 
@@ -274,7 +293,8 @@ public class AboutPluginsPage extends ProductInfoPage {
 	protected void handleSigningInfoPressed() {
 		if (signingArea == null) {
 			signingArea = new BundleSigningInfo();
-			AboutBundleData bundleInfo = (AboutBundleData) vendorInfo.getStructuredSelection().getFirstElement();
+			AboutBundleData bundleInfo = (AboutBundleData) ((IStructuredSelection) vendorInfo
+					.getSelection()).getFirstElement();
 			signingArea.setData(bundleInfo);
 
 			signingArea.createContents(sashForm);
@@ -312,6 +332,18 @@ public class AboutPluginsPage extends ProductInfoPage {
 	public void createControl(Composite parent) {
 		initializeDialogUnits(parent);
 
+		// create a data object for each bundle, remove duplicates, and include
+		// only resolved bundles (bug 65548)
+		Map<String, AboutBundleData> map = new HashMap<String, AboutBundleData>();
+		for (int i = 0; i < bundles.length; ++i) {
+			AboutBundleData data = new AboutBundleData(bundles[i]);
+			if (BundleUtility.isReady(data.getState())
+					&& !map.containsKey(data.getVersionedId())) {
+				map.put(data.getVersionedId(), data);
+			}
+		}
+		bundleInfos = map.values().toArray(
+				new AboutBundleData[0]);
 		WorkbenchPlugin.class.getSigners();
 
 		sashForm = new SashForm(parent, SWT.HORIZONTAL | SWT.SMOOTH);
@@ -336,26 +368,6 @@ public class AboutPluginsPage extends ProductInfoPage {
 		setControl(outer);
 	}
 
-	private void calculateAboutBundleData(Consumer<Collection<AboutBundleData>> aboutBundleDataConsumer,
-			Display display) {
-		Job loadBundleDataJob = Job.create(WorkbenchMessages.AboutPluginsPage_Load_Bundle_Data, monitor -> {
-			// create a data object for each bundle, remove duplicates, and
-			// include only resolved bundles (bug 65548)
-			SubMonitor subMonitor = SubMonitor.convert(monitor, bundles.length + 1);
-			Map<String, AboutBundleData> map = new HashMap<>();
-			for (Bundle bundle : bundles) {
-				subMonitor.split(1);
-				AboutBundleData data = new AboutBundleData(bundle);
-				if (BundleUtility.isReady(data.getState()) && !map.containsKey(data.getVersionedId())) {
-					map.put(data.getVersionedId(), data);
-				}
-			}
-			subMonitor.split(1);
-			display.asyncExec(() -> aboutBundleDataConsumer.accept(map.values()));
-		});
-		loadBundleDataJob.schedule();
-	}
-
 	/**
 	 * Create the table part of the dialog.
 	 *
@@ -374,7 +386,13 @@ public class AboutPluginsPage extends ProductInfoPage {
 		vendorInfo.getTable().setHeaderVisible(true);
 		vendorInfo.getTable().setLinesVisible(true);
 		vendorInfo.getTable().setFont(parent.getFont());
-		vendorInfo.addSelectionChangedListener(event -> checkEnablement());
+		vendorInfo.addSelectionChangedListener(new ISelectionChangedListener() {
+
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				checkEnablement();
+			}
+		});
 
 		final TableComparator comparator = new TableComparator();
 		vendorInfo.setComparator(comparator);
@@ -395,16 +413,24 @@ public class AboutPluginsPage extends ProductInfoPage {
 			column.setWidth(columnWidths[i]);
 			column.setText(columnTitles[i]);
 			final int columnIndex = i;
-			column.addSelectionListener(widgetSelectedAdapter(e -> updateTableSorting(columnIndex)));
+			column.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					updateTableSorting(columnIndex);
+				}
+			});
 		}
 
 		vendorInfo.setContentProvider(new ArrayContentProvider());
 		vendorInfo.setLabelProvider(new BundleTableLabelProvider());
 
 		final BundlePatternFilter searchFilter = new BundlePatternFilter();
-		filterText.addModifyListener(e -> {
-			searchFilter.setPattern(filterText.getText());
-			vendorInfo.refresh();
+		filterText.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				searchFilter.setPattern(filterText.getText());
+				vendorInfo.refresh();
+			}
 		});
 		vendorInfo.addFilter(searchFilter);
 
@@ -413,7 +439,7 @@ public class AboutPluginsPage extends ProductInfoPage {
 		gridData.heightHint = convertVerticalDLUsToPixels(TABLE_HEIGHT);
 		vendorInfo.getTable().setLayoutData(gridData);
 
-		calculateAboutBundleData(vendorInfo::setInput, parent.getDisplay());
+		vendorInfo.setInput(bundleInfos);
 	}
 
 	/**
@@ -455,13 +481,14 @@ public class AboutPluginsPage extends ProductInfoPage {
 			return null;
 		}
 
-		URL aboutUrl = FileLocator.find(bundle, baseNLPath.append(PLUGININFO), null);
+		URL aboutUrl = Platform.find(bundle, baseNLPath.append(PLUGININFO),
+				null);
 		if (!makeLocal) {
 			return aboutUrl;
 		}
 		if (aboutUrl != null) {
 			try {
-				URL result = FileLocator.toFileURL(aboutUrl);
+				URL result = Platform.asLocalURL(aboutUrl);
 				try {
 					// Make local all content in the "about" directory.
 					// This is needed to handle jar'ed plug-ins.
@@ -469,7 +496,7 @@ public class AboutPluginsPage extends ProductInfoPage {
 					// subdirs.
 					URL about = new URL(aboutUrl, "about_files"); //$NON-NLS-1$
 					if (about != null) {
-						FileLocator.toFileURL(about);
+						Platform.asLocalURL(about);
 					}
 				} catch (IOException e) {
 					// skip the about dir if its not found or there are other
@@ -483,6 +510,11 @@ public class AboutPluginsPage extends ProductInfoPage {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.about.ProductInfoPage#getId()
+	 */
 	@Override
 	String getId() {
 		return ID;
@@ -491,7 +523,8 @@ public class AboutPluginsPage extends ProductInfoPage {
 	private void checkEnablement() {
 		// enable if there is an item selected and that
 		// item has additional info
-		IStructuredSelection selection = vendorInfo.getStructuredSelection();
+		IStructuredSelection selection = (IStructuredSelection) vendorInfo
+				.getSelection();
 		if (selection.getFirstElement() instanceof AboutBundleData) {
 			AboutBundleData selected = (AboutBundleData) selection
 					.getFirstElement();
@@ -559,7 +592,8 @@ public class AboutPluginsPage extends ProductInfoPage {
 		if (vendorInfo.getSelection().isEmpty())
 			return;
 
-		AboutBundleData bundleInfo = (AboutBundleData) vendorInfo.getStructuredSelection().getFirstElement();
+		AboutBundleData bundleInfo = (AboutBundleData) ((IStructuredSelection) vendorInfo
+				.getSelection()).getFirstElement();
 
 		if (!AboutUtils.openBrowser(getShell(),
 				getMoreInfoURL(bundleInfo, true))) {
@@ -587,6 +621,13 @@ class TableComparator extends ViewerComparator {
 	private boolean ascending = true;
 	private boolean lastAscending = true;
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.jface.viewers.ViewerComparator#compare(org.eclipse.jface.
+	 * viewers.Viewer, java.lang.Object, java.lang.Object)
+	 */
 	@Override
 	public int compare(Viewer viewer, Object e1, Object e2) {
 		if (sortColumn == 0 && e1 instanceof AboutBundleData

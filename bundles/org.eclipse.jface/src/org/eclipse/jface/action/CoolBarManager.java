@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,7 +46,7 @@ public class CoolBarManager extends ContributionManager implements
     /**
      * The original creation order of the contribution items.
      */
-    private ArrayList<IContributionItem> cbItemsCreationOrder = new ArrayList<>();
+    private ArrayList<IContributionItem> cbItemsCreationOrder = new ArrayList<IContributionItem>();
 
     /**
      * MenuManager for cool bar pop-up menu, or null if none.
@@ -172,7 +172,9 @@ public class CoolBarManager extends ContributionManager implements
 
         // Cycle through the current list looking for duplicates.
         IContributionItem[] currentItems = getItems();
-        for (IContributionItem currentItem : currentItems) {
+        for (int i = 0; i < currentItems.length; i++) {
+            IContributionItem currentItem = currentItems[i];
+
             // We ignore null entries.
             if (currentItem == null) {
                 continue;
@@ -254,12 +256,12 @@ public class CoolBarManager extends ContributionManager implements
             coolBar = null;
         }
         IContributionItem[] items = getItems();
-        for (IContributionItem item : items) {
+        for (int i = 0; i < items.length; i++) {
             // Disposes of the contribution item.
             // If Contribution Item is a toolbar then it will dispose of
             // all the nested
             // contribution items.
-            item.dispose();
+            items[i].dispose();
         }
         // If a context menu existed then dispose of it.
         if (contextMenuManager != null) {
@@ -309,7 +311,8 @@ public class CoolBarManager extends ContributionManager implements
 			return null;
 		}
 
-        for (CoolItem coolItem : items) {
+        for (int i = 0; i < items.length; i++) {
+            CoolItem coolItem = items[i];
             IContributionItem data = (IContributionItem) coolItem.getData();
             if (data != null && data.equals(item)) {
 				return coolItem;
@@ -384,9 +387,9 @@ public class CoolBarManager extends ContributionManager implements
      */
     private ArrayList<IContributionItem> getItemList() {
         IContributionItem[] cbItems = getItems();
-        ArrayList<IContributionItem> list = new ArrayList<>(cbItems.length);
-        for (IContributionItem cbItem : cbItems) {
-            list.add(cbItem);
+        ArrayList<IContributionItem> list = new ArrayList<IContributionItem>(cbItems.length);
+        for (int i = 0; i < cbItems.length; i++) {
+            list.add(cbItems[i]);
         }
         return list;
     }
@@ -562,7 +565,7 @@ public class CoolBarManager extends ContributionManager implements
         // Traverse through all cool items in the coolbar add them to a new
         // data structure
         // in the correct order
-        ArrayList<IContributionItem> displayedItems = new ArrayList<>(coolBar.getItemCount());
+        ArrayList<IContributionItem> displayedItems = new ArrayList<IContributionItem>(coolBar.getItemCount());
         for (int i = 0; i < coolItems.length; i++) {
             CoolItem coolItem = coolItems[i];
             if (coolItem.getData() instanceof IContributionItem) {
@@ -581,7 +584,7 @@ public class CoolBarManager extends ContributionManager implements
         }
 
         // Determine which rows are invisible
-        ArrayList<Integer> existingVisibleRows = new ArrayList<>(4);
+        ArrayList<Integer> existingVisibleRows = new ArrayList<Integer>(4);
         ListIterator<IContributionItem> rowIterator = contributionList.listIterator();
         collapseSeparators(rowIterator);
         int numRow = 0;
@@ -591,7 +594,7 @@ public class CoolBarManager extends ContributionManager implements
                 IContributionItem cbItem = rowIterator
                         .next();
                 if (displayedItems.contains(cbItem)) {
-					existingVisibleRows.add(Integer.valueOf(numRow));
+                    existingVisibleRows.add(new Integer(numRow));
                     break;
                 }
                 if (cbItem.isSeparator()) {
@@ -608,7 +611,7 @@ public class CoolBarManager extends ContributionManager implements
             row = existingRows.next().intValue();
         }
 
-        HashMap<IContributionItem, Integer> itemLocation = new HashMap<>();
+        HashMap<IContributionItem, Integer> itemLocation = new HashMap<IContributionItem, Integer>();
         for (ListIterator<IContributionItem> locationIterator = displayedItems.listIterator(); locationIterator
                 .hasNext();) {
             IContributionItem item = locationIterator
@@ -621,7 +624,7 @@ public class CoolBarManager extends ContributionManager implements
                     row++;
                 }
             } else {
-				itemLocation.put(item, Integer.valueOf(row));
+                itemLocation.put(item, new Integer(row));
             }
 
         }
@@ -767,8 +770,8 @@ public class CoolBarManager extends ContributionManager implements
         // dispose of all the cool items on the cool bar manager
         if (coolBar != null) {
             CoolItem[] coolItems = coolBar.getItems();
-            for (CoolItem coolItem : coolItems) {
-                dispose(coolItem);
+            for (int i = 0; i < coolItems.length; i++) {
+                dispose(coolItems[i]);
             }
         }
         // Set the internal structure to this order
@@ -817,8 +820,9 @@ public class CoolBarManager extends ContributionManager implements
              * a cool bar.
              */
             final IContributionItem[] items = getItems();
-            final List<IContributionItem> visibleItems = new ArrayList<>(items.length);
-            for (final IContributionItem item : items) {
+            final List<IContributionItem> visibleItems = new ArrayList<IContributionItem>(items.length);
+            for (int i = 0; i < items.length; i++) {
+                final IContributionItem item = items[i];
                 if (isChildVisible(item)) {
                     visibleItems.add(item);
                 }
@@ -830,14 +834,14 @@ public class CoolBarManager extends ContributionManager implements
              * to be disposed. Dynamic items are also removed.
              */
             CoolItem[] coolItems = coolBar.getItems();
-            final ArrayList<CoolItem> coolItemsToRemove = new ArrayList<>(coolItems.length);
-            for (CoolItem coolItem : coolItems) {
-                final Object data = coolItem.getData();
+            final ArrayList<CoolItem> coolItemsToRemove = new ArrayList<CoolItem>(coolItems.length);
+            for (int i = 0; i < coolItems.length; i++) {
+                final Object data = coolItems[i].getData();
                 if ((data == null)
                         || (!visibleItems.contains(data))
                         || ((data instanceof IContributionItem) && ((IContributionItem) data)
                                 .isDynamic())) {
-                    coolItemsToRemove.add(coolItem);
+                    coolItemsToRemove.add(coolItems[i]);
                 }
             }
 
@@ -926,7 +930,8 @@ public class CoolBarManager extends ContributionManager implements
             updateWrapIndices();
 
             // Update the sizes.
-            for (IContributionItem item : items) {
+            for (int i = 0; i < items.length; i++) {
+                IContributionItem item = items[i];
                 item.update(SIZE);
             }
 
@@ -953,7 +958,7 @@ public class CoolBarManager extends ContributionManager implements
         if (coolBar != null) {
             CoolItem[] items = coolBar.getItems();
             if (items != null) {
-                ArrayList<Control> children = new ArrayList<>(items.length);
+                ArrayList<Control> children = new ArrayList<Control>(items.length);
                 for (int i = 0; i < items.length; i++) {
                     if ((items[i].getControl() != null)
                             && (!items[i].getControl().isDisposed())) {
@@ -985,7 +990,8 @@ public class CoolBarManager extends ContributionManager implements
         int j = 0;
         CoolItem[] coolItems = (coolBar == null) ? null : coolBar.getItems();
 
-		for (IContributionItem item : items) {
+        for (int i = 0; i < items.length; i++) {
+            IContributionItem item = items[i];
             CoolItem coolItem = findCoolItem(coolItems, item);
             if (item.isSeparator()) {
                 foundSeparator = true;

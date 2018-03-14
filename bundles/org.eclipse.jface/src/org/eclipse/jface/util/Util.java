@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,7 +34,7 @@ public final class Util {
 	 * change and never be <code>null</code>.
 	 */
 	public static final SortedSet<?> EMPTY_SORTED_SET = Collections
-			.unmodifiableSortedSet(new TreeSet<>());
+			.unmodifiableSortedSet(new TreeSet<Object>());
 
 	/**
 	 * A common zero-length string. It avoids needing write <code>NON-NLS</code>
@@ -349,7 +349,8 @@ public final class Util {
 		}
 
 		int hashCode = 89;
-		for (final Object object : objects) {
+		for (int i = 0; i < objects.length; i++) {
+			final Object object = objects[i];
 			if (object != null) {
 				hashCode = hashCode * 31 + object.hashCode();
 			}
@@ -406,7 +407,7 @@ public final class Util {
 			return "null"; //$NON-NLS-1$
 		}
 
-		final StringBuilder buffer = new StringBuilder();
+		final StringBuffer buffer = new StringBuffer();
 		buffer.append('[');
 
 		final int length = array.length;
@@ -479,7 +480,7 @@ public final class Util {
 			return src;
 		}
 
-		StringBuilder buf = new StringBuilder();
+		StringBuffer buf = new StringBuffer();
 		int beginIndex = 0;
 		while (idx != -1 && idx < len) {
 			buf.append(src.substring(beginIndex, idx));

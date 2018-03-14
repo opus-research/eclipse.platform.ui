@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -91,7 +91,8 @@ public final class TabContents {
         layout.verticalSpacing = 0;
         pageComposite.setLayout(layout);
 
-        for (final ISection section : sections) {
+        for (int i = 0; i < sections.length; i++) {
+            final ISection section = sections[i];
             final Composite sectionComposite = page.getWidgetFactory()
                 .createComposite(pageComposite, SWT.NO_FOCUS);
             sectionComposite.setLayout(new FillLayout());
@@ -103,8 +104,7 @@ public final class TabContents {
 
             ISafeRunnable runnable = new SafeRunnable() {
 
-                @Override
-				public void run()
+                public void run()
                     throws Exception {
                     section.createControls(sectionComposite, page);
                 }
@@ -118,11 +118,11 @@ public final class TabContents {
      * Dispose of page's sections controls.
      */
     public void dispose() {
-        for (final ISection section : sections) {
+        for (int i = 0; i < sections.length; i++) {
+            final ISection section = sections[i];
             ISafeRunnable runnable = new SafeRunnable() {
 
-                @Override
-				public void run()
+                public void run()
                     throws Exception {
                     section.dispose();
                 }
@@ -135,11 +135,11 @@ public final class TabContents {
      * Sends the lifecycle event to the page's sections.
      */
     public void aboutToBeShown() {
-        for (final ISection section : sections) {
+        for (int i = 0; i < sections.length; i++) {
+            final ISection section = sections[i];
             ISafeRunnable runnable = new SafeRunnable() {
 
-                @Override
-				public void run()
+                public void run()
                     throws Exception {
                     section.aboutToBeShown();
                 }
@@ -152,11 +152,11 @@ public final class TabContents {
      * Sends the lifecycle event to the page's sections.
      */
     public void aboutToBeHidden() {
-        for (final ISection section : sections) {
+        for (int i = 0; i < sections.length; i++) {
+            final ISection section = sections[i];
             ISafeRunnable runnable = new SafeRunnable() {
 
-                @Override
-				public void run()
+                public void run()
                     throws Exception {
                     section.aboutToBeHidden();
                 }
@@ -172,11 +172,11 @@ public final class TabContents {
      * @param selection
      */
     public void setInput(final IWorkbenchPart part, final ISelection selection) {
-        for (final ISection section : sections) {
+        for (int i = 0; i < sections.length; i++) {
+            final ISection section = sections[i];
             ISafeRunnable runnable = new SafeRunnable() {
 
-                @Override
-				public void run()
+                public void run()
                     throws Exception {
                     section.setInput(part, selection);
                 }
@@ -208,11 +208,11 @@ public final class TabContents {
      */
     public void refresh() {
         if (controlsCreated) {
-            for (final ISection section : sections) {
+            for (int i = 0; i < sections.length; i++) {
+                final ISection section = sections[i];
                 ISafeRunnable runnable = new SafeRunnable() {
 
-                    @Override
-					public void run()
+                    public void run()
                         throws Exception {
                         section.refresh();
                     }

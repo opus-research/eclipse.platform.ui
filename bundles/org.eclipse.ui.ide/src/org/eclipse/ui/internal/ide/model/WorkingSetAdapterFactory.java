@@ -13,9 +13,9 @@ package org.eclipse.ui.internal.ide.model;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.mapping.ResourceMapping;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IAdapterFactory;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IContributorResourceAdapter;
 import org.eclipse.ui.IWorkingSet;
@@ -37,10 +37,12 @@ public class WorkingSetAdapterFactory implements IAdapterFactory {
 		public ResourceMapping getAdaptedResourceMapping(IAdaptable adaptable) {
 			if (adaptable instanceof IWorkingSet) {
 				IWorkingSet workingSet = (IWorkingSet) adaptable;
-				for (IAdaptable currentAdaptable : workingSet.getElements()) {
-					ResourceMapping mapping = getContributedResourceMapping(currentAdaptable);
+				IAdaptable[] elements = workingSet.getElements();
+				for (int i = 0; i < elements.length; i++) {
+					IAdaptable element = elements[i];
+					ResourceMapping mapping = getContributedResourceMapping(element);
 					if (mapping == null) {
-						mapping = getResourceMapping(currentAdaptable);
+						mapping = getResourceMapping(element);
 					}
 					if (mapping != null) {
 						return new WorkingSetResourceMapping(workingSet);
@@ -109,8 +111,10 @@ public class WorkingSetAdapterFactory implements IAdapterFactory {
 			}
 			if (adapterType == ResourceMapping.class) {
 				IWorkingSet workingSet = (IWorkingSet) adaptableObject;
-				for (IAdaptable adaptable : workingSet.getElements()) {
-					ResourceMapping mapping = getResourceMapping(adaptable);
+				IAdaptable[] elements = workingSet.getElements();
+				for (int i = 0; i < elements.length; i++) {
+					IAdaptable element = elements[i];
+					ResourceMapping mapping = getResourceMapping(element);
 					if (mapping != null) {
 						return adapterType.cast(new WorkingSetResourceMapping(workingSet));
 					}
@@ -127,14 +131,14 @@ public class WorkingSetAdapterFactory implements IAdapterFactory {
 
 	static ResourceMapping getResourceMapping(Object o) {
 		// First, ask the object directly for a resource mapping
-		ResourceMapping mapping = Adapters.adapt(o, ResourceMapping.class);
+		ResourceMapping mapping = internalGetAdapter(o, ResourceMapping.class);
 		if (mapping != null) {
 			return mapping;
 		}
 		// If this fails, ask for a resource and convert to a resource mapping
-		IResource resource = Adapters.adapt(o, IResource.class);
+		IResource resource = internalGetAdapter(o, IResource.class);
 		if (resource != null) {
-			mapping = Adapters.adapt(resource, ResourceMapping.class);
+			mapping = internalGetAdapter(resource, ResourceMapping.class);
 			if (mapping != null) {
 				return mapping;
 			}
@@ -143,7 +147,7 @@ public class WorkingSetAdapterFactory implements IAdapterFactory {
 	}
 
 	static ResourceMapping getContributedResourceMapping(IAdaptable element) {
-		IContributorResourceAdapter resourceAdapter = Adapters.adapt(element, IContributorResourceAdapter.class);
+		Object resourceAdapter = internalGetAdapter(element, IContributorResourceAdapter.class);
 		if (resourceAdapter != null) {
 			if (resourceAdapter instanceof IContributorResourceAdapter2) {
 				// First, use the mapping contributor adapter to get the mapping
@@ -153,17 +157,33 @@ public class WorkingSetAdapterFactory implements IAdapterFactory {
 					return mapping;
 				}
 			}
-			// Next, use the resource adapter to get a resource and then get
-			// the mapping for that resource
-			IResource resource = resourceAdapter.getAdaptedResource(element);
-			if (resource != null) {
-				ResourceMapping mapping = Adapters.adapt(resource, ResourceMapping.class);
-				if (mapping != null) {
-					return mapping;
+			if (resourceAdapter instanceof IContributorResourceAdapter) {
+				// Next, use the resource adapter to get a resource and then get
+				// the mapping for that resource
+				IResource resource = ((IContributorResourceAdapter) resourceAdapter).getAdaptedResource(element);
+				if (resource != null) {
+					ResourceMapping mapping = internalGetAdapter(resource, ResourceMapping.class);
+					if (mapping != null) {
+						return mapping;
+					}
 				}
 			}
 		}
 		return null;
+	}
+
+	static <T> T internalGetAdapter(Object o, Class<T> adapterType) {
+		if (o instanceof IAdaptable) {
+			IAdaptable element = (IAdaptable) o;
+			T adapted = element.getAdapter(adapterType);
+			if (adapted != null) {
+				return adapterType.cast(adapted);
+			}
+		}
+		// Fallback to the adapter manager in case the object doesn't
+		// implement getAdapter or in the case where the implementation
+		// doesn't consult the manager
+		return Platform.getAdapterManager().getAdapter(o, adapterType);
 	}
 
 }

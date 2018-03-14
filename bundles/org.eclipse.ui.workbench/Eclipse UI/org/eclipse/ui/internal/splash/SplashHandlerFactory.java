@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.ui.internal.splash;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -54,10 +55,12 @@ public final class SplashHandlerFactory {
 		IExtension[] extensions = point.getExtensions();
 		Map idToSplash = new HashMap(); // String->ConfigurationElement
 		String[] targetId = new String[1];
-		for (IExtension extension : extensions) {
-			IConfigurationElement[] children = extension.getConfigurationElements();
-			for (IConfigurationElement element : children) {
-				AbstractSplashHandler handler = processElement(element, idToSplash, targetId, product);
+		for (int i = 0; i < extensions.length; i++) {
+			IConfigurationElement[] children = extensions[i]
+					.getConfigurationElements();
+			for (int j = 0; j < children.length; j++) {
+				AbstractSplashHandler handler = processElement(children[j],
+						idToSplash, targetId, product);
 				if (handler != null)
 					return handler;
 
@@ -128,6 +131,11 @@ public final class SplashHandlerFactory {
 		final AbstractSplashHandler[] handler = new AbstractSplashHandler[1];
 		SafeRunner.run(new SafeRunnable() {
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.core.runtime.ISafeRunnable#run()
+			 */
 			@Override
 			public void run() throws Exception {
 				handler[0] = (AbstractSplashHandler) WorkbenchPlugin
@@ -135,6 +143,11 @@ public final class SplashHandlerFactory {
 								IWorkbenchRegistryConstants.ATT_CLASS);
 			}
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.jface.util.SafeRunnable#handleException(java.lang.Throwable)
+			 */
 			@Override
 			public void handleException(Throwable e) {
 				WorkbenchPlugin

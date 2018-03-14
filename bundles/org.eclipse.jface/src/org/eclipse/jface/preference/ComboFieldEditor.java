@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,10 +12,10 @@
 package org.eclipse.jface.preference;
 
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -71,7 +71,8 @@ public class ComboFieldEditor extends FieldEditor {
 		if (table == null) {
 			return false;
 		}
-		for (String[] array : table) {
+		for (int i = 0; i < table.length; i++) {
+			String[] array = table[i];
 			if (array == null || array.length != 2) {
 				return false;
 			}
@@ -151,13 +152,16 @@ public class ComboFieldEditor extends FieldEditor {
 				fCombo.add(fEntryNamesAndValues[i][0], i);
 			}
 
-			fCombo.addSelectionListener(widgetSelectedAdapter(evt -> {
-				String oldValue = fValue;
-				String name = fCombo.getText();
-				fValue = getValueForName(name);
-				setPresentsDefaultValue(false);
-				fireValueChanged(VALUE, oldValue, fValue);
-			}));
+			fCombo.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent evt) {
+					String oldValue = fValue;
+					String name = fCombo.getText();
+					fValue = getValueForName(name);
+					setPresentsDefaultValue(false);
+					fireValueChanged(VALUE, oldValue, fValue);
+				}
+			});
 		}
 		return fCombo;
 	}
@@ -166,7 +170,8 @@ public class ComboFieldEditor extends FieldEditor {
 	 * Given the name (label) of an entry, return the corresponding value.
 	 */
 	private String getValueForName(String name) {
-		for (String[] entry : fEntryNamesAndValues) {
+		for (int i = 0; i < fEntryNamesAndValues.length; i++) {
+			String[] entry = fEntryNamesAndValues[i];
 			if (name.equals(entry[0])) {
 				return entry[1];
 			}
@@ -179,9 +184,9 @@ public class ComboFieldEditor extends FieldEditor {
 	 */
 	private void updateComboForValue(String value) {
 		fValue = value;
-		for (String[] fEntryNamesAndValue : fEntryNamesAndValues) {
-			if (value.equals(fEntryNamesAndValue[1])) {
-				fCombo.setText(fEntryNamesAndValue[0]);
+		for (int i = 0; i < fEntryNamesAndValues.length; i++) {
+			if (value.equals(fEntryNamesAndValues[i][1])) {
+				fCombo.setText(fEntryNamesAndValues[i][0]);
 				return;
 			}
 		}

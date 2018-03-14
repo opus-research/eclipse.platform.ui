@@ -223,19 +223,19 @@ public class Name implements IPropertySource {
      */
     @Override
 	public String toString() {
-        StringBuilder outStringBuilder = new StringBuilder();
+        StringBuffer outStringBuffer = new StringBuffer();
         if (getFirstName() != FIRSTNAME_DEFAULT) {
-            outStringBuilder.append(getFirstName());
-            outStringBuilder.append(" "); //$NON-NLS-1$
+            outStringBuffer.append(getFirstName());
+            outStringBuffer.append(" "); //$NON-NLS-1$
         }
         if (getInitial() != MIDDLENAME_DEFAULT) {
-            outStringBuilder.append(getInitial());
-            outStringBuilder.append(" "); //$NON-NLS-1$
+            outStringBuffer.append(getInitial());
+            outStringBuffer.append(" "); //$NON-NLS-1$
         }
         if (getLastName() != LASTNAME_DEFAULT) {
-            outStringBuilder.append(getLastName());
+            outStringBuffer.append(getLastName());
         }
 
-        return outStringBuilder.toString();
+        return outStringBuffer.toString();
     }
 }

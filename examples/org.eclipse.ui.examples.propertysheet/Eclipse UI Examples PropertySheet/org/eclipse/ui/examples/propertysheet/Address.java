@@ -62,7 +62,7 @@ public class Address implements IPropertySource {
     private static final String CITY_DEFAULT = MessageUtil
             .getString("unspecified_city"); //$NON-NLS-1$
 
-    private static final Integer PROVINCE_DEFAULT = Integer.valueOf(0);
+    private static final Integer PROVINCE_DEFAULT = new Integer(0);
 
     private static final String POSTALCODE_DEFAULT = "A1B2C3"; //$NON-NLS-1$
 
@@ -103,7 +103,7 @@ public class Address implements IPropertySource {
                 final char space = ' ';
 
                 //removes white space
-                StringBuilder postalCodeBuffer = new StringBuilder(6);
+                StringBuffer postalCodeBuffer = new StringBuffer(6);
                 char current;
                 for (int i = 0; i < length; i++) {
                     current = testPostalCode.charAt(i);
@@ -363,20 +363,20 @@ public class Address implements IPropertySource {
      */
     @Override
 	public String toString() {
-        StringBuilder outStringBuilder = new StringBuilder();
+        StringBuffer outStringBuffer = new StringBuffer();
         final String comma_space = ", "; //$NON-NLS-1$
         final String space = " "; //$NON-NLS-1$
         if (!getStreet().equals(STREET_DEFAULT)) {
-            outStringBuilder.append(getStreet());
-            outStringBuilder.append(comma_space);
+            outStringBuffer.append(getStreet());
+            outStringBuffer.append(comma_space);
         }
 
-        outStringBuilder.append(getCity());
-        outStringBuilder.append(space);
-        outStringBuilder.append(provinceValues[getProvince().intValue()]);
-        outStringBuilder.append(comma_space);
-        outStringBuilder.append(getPostalCode());
+        outStringBuffer.append(getCity());
+        outStringBuffer.append(space);
+        outStringBuffer.append(provinceValues[getProvince().intValue()]);
+        outStringBuffer.append(comma_space);
+        outStringBuffer.append(getPostalCode());
 
-        return outStringBuilder.toString();
+        return outStringBuffer.toString();
     }
 }

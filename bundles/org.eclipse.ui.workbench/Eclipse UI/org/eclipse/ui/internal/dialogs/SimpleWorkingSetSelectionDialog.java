@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,17 +7,21 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 481490
  ******************************************************************************/
 
 package org.eclipse.ui.internal.dialogs;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
@@ -65,13 +69,14 @@ public class SimpleWorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 			if (!set.isEditable())
 				return false;
 
-			Set<String> workingSetTypeIds = getSupportedWorkingSetIds();
+			Set workingSetTypeIds = getSupportedWorkingSetIds();
 			if (workingSetTypeIds == null)
 				return true;
-			for (String workingSetTypeId : workingSetTypeIds) {
-				if (workingSetTypeId.equals(set.getId())) {
+
+			for (Iterator i = workingSetTypeIds.iterator(); i.hasNext();) {
+				String workingSetTypeId = (String) i.next();
+				if (workingSetTypeId.equals(set.getId()))
 					return true;
-				}
 			}
 
 			return false;
@@ -94,7 +99,8 @@ public class SimpleWorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 	 * @param canEdit
 	 *            whether or not this dialog will display edit controls
 	 */
-	public SimpleWorkingSetSelectionDialog(Shell shell, String[] workingSetTypeIds, IWorkingSet[] selectedWorkingSets,
+	public SimpleWorkingSetSelectionDialog(Shell shell,
+			String[] workingSetTypeIds, IWorkingSet[] selectedWorkingSets,
 			boolean canEdit) {
 		super(shell, workingSetTypeIds, canEdit);
 		this.initialSelection = selectedWorkingSets;
@@ -124,9 +130,14 @@ public class SimpleWorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 		IWorkingSet[] workingSets = PlatformUI.getWorkbench().getWorkingSetManager()
 				.getWorkingSets();
 		viewer.setInput(workingSets);
-		viewer.setFilters(new Filter());
+		viewer.setFilters(new ViewerFilter[] { new Filter() });
 
-		viewer.addSelectionChangedListener(event -> handleSelectionChanged());
+		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				handleSelectionChanged();
+			}
+		});
 		viewer.setCheckedElements(initialSelection);
 
 		GridData viewerData = new GridData(GridData.FILL_BOTH);
@@ -158,7 +169,11 @@ public class SimpleWorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 
 	@Override
 	protected List getSelectedWorkingSets() {
-		return viewer.getStructuredSelection().toList();
+		ISelection selection = viewer.getSelection();
+		if (selection instanceof IStructuredSelection) {
+			return ((IStructuredSelection) selection).toList();
+		}
+		return null;
 	}
 
 	@Override
@@ -166,12 +181,6 @@ public class SimpleWorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 		viewer.setInput(PlatformUI.getWorkbench().getWorkingSetManager()
 				.getWorkingSets());
 		super.availableWorkingSetsChanged();
-	}
-
-	@Override
-	protected void workingSetAdded(IWorkingSet addedSet) {
-		viewer.setChecked(addedSet, true);
-		updateButtonAvailability();
 	}
 
 	/**

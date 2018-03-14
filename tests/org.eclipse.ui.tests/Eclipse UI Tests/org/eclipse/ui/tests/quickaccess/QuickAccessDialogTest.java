@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2017 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 504029
  ******************************************************************************/
 
 package org.eclipse.ui.tests.quickaccess;
@@ -20,6 +19,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.internal.WorkbenchWindow;
+import org.eclipse.ui.internal.quickaccess.QuickAccessMessages;
 import org.eclipse.ui.internal.quickaccess.SearchField;
 import org.eclipse.ui.tests.harness.util.UITestCase;
 
@@ -31,9 +31,6 @@ public class QuickAccessDialogTest extends UITestCase {
 
 	private SearchField searchField;
 
-	// As defined in QuickAccessDialog and in SearchField
-	private static final int MAXIMUM_NUMBER_OF_ELEMENTS = 60;
-
 	/**
 	 * @param testName
 	 */
@@ -43,8 +40,6 @@ public class QuickAccessDialogTest extends UITestCase {
 
 	@Override
 	protected void doSetUp() throws Exception {
-		super.doSetUp();
-		openTestWindow();
 		WorkbenchWindow workbenchWindow = (WorkbenchWindow) getWorkbench()
 				.getActiveWorkbenchWindow();
 		MWindow window = workbenchWindow.getModel();
@@ -99,25 +94,53 @@ public class QuickAccessDialogTest extends UITestCase {
 	public void testTextFilter(){
 		final Table table = searchField.getQuickAccessTable();
 		Text text = searchField.getQuickAccessSearchText();
-		assertTrue("Quick access filter should be empty", text.getText().isEmpty());
-		assertTrue("Quick access table should be empty", table.getItemCount() == 0);
+		assertTrue("Quick access table should say to start typing", table.getItemCount() == 1);
+		assertSame("Quick access table should say to start typing", QuickAccessMessages.QuickAccess_StartTypingToFindMatches, table.getItem(0).getText(1));
 
 		text.setText("T");
-		processEventsUntil(() -> table.getItemCount() > 1, 200);
+		processEventsUntil(new Condition() {
+			@Override
+			public boolean compute() {
+				return table.getItemCount() > 1;
+			};
+		}, 200);
 		int oldCount = table.getItemCount();
 		assertTrue("Not enough quick access items for simple filter", oldCount > 3);
-		assertTrue("Too many quick access items for size of table", oldCount < MAXIMUM_NUMBER_OF_ELEMENTS);
+		assertTrue("Too many quick access items for size of table", oldCount < 30);
 		final String oldFirstItemText = table.getItem(0).getText(1);
 
 		text.setText("E");
-		processEventsUntil(() -> table.getItemCount() > 1 && !table.getItem(0).getText(1).equals(oldFirstItemText),
-				200);
+		processEventsUntil(new Condition() {
+			@Override
+			public boolean compute() {
+				return table.getItemCount() > 1 && !table.getItem(0).getText(1).equals(oldFirstItemText);
+			};
+		}, 200);
 		String newFirstItemText = table.getItem(0).getText(1);
 		assertNotSame("The quick access items should have changed", newFirstItemText, oldFirstItemText);
 		int newCount = table.getItemCount();
 		assertTrue("Not enough quick access items for simple filter", newCount > 3);
-		assertTrue("Too many quick access items for size of table", newCount < MAXIMUM_NUMBER_OF_ELEMENTS);
+		assertTrue("Too many quick access items for size of table", newCount < 30);
 
+		text.setText("QWERTYUIOPTEST");
+		processEventsUntil(new Condition() {
+			@Override
+			public boolean compute() {
+				return table.getItemCount() == 1;
+			};
+		}, 200);
+		assertTrue("Quick access table should say no results found", table.getItemCount() == 1);
+		assertSame("Quick access table should say no results found", QuickAccessMessages.QuickAccessContents_NoMatchingResults, table.getItem(0).getText());
+
+		text.setText("");
+		processEventsUntil(new Condition() {
+			@Override
+			public boolean compute() {
+				return table.getItemCount() == 1;
+			};
+		}, 200);
+		assertTrue("Quick access table should say to start typing", table.getItemCount() == 1);
+		assertSame("Quick access table should say to start typing", QuickAccessMessages.QuickAccess_StartTypingToFindMatches, table.getItem(0).getText(1));
 	}
 
 	/**
@@ -135,21 +158,31 @@ public class QuickAccessDialogTest extends UITestCase {
 		assertTrue("Quick access dialog should be visible now", shell.isVisible());
 		final Table table = searchField.getQuickAccessTable();
 		Text text = searchField.getQuickAccessSearchText();
-		assertTrue("Quick access filter should be empty", text.getText().isEmpty());
-		assertTrue("Quick access table should be empty", table.getItemCount() == 0);
+		assertTrue("Quick access table should say to start typing", table.getItemCount() == 1);
+		assertSame("Quick access table should say to start typing", QuickAccessMessages.QuickAccess_StartTypingToFindMatches, table.getItem(0).getText(1));
 
 		// Set a filter to get some items
 		text.setText("T");
-		processEventsUntil(() -> table.getItemCount() > 1, 200);
+		processEventsUntil(new Condition() {
+			@Override
+			public boolean compute() {
+				return table.getItemCount() > 1;
+			};
+		}, 200);
 		final int oldCount = table.getItemCount();
 		assertTrue("Not enough quick access items for simple filter", oldCount > 3);
-		assertTrue("Too many quick access items for size of table", oldCount < MAXIMUM_NUMBER_OF_ELEMENTS);
+		assertTrue("Too many quick access items for size of table", oldCount < 30);
 		final String oldFirstItemText = table.getItem(0).getText(1);
 
 		// Run the handler to turn on show all
 		handlerService
 		.executeCommand("org.eclipse.ui.window.quickAccess", null); //$NON-NLS-1$
-		processEventsUntil(() -> table.getItemCount() != oldCount, 200);
+		processEventsUntil(new Condition() {
+			@Override
+			public boolean compute() {
+				return table.getItemCount() != oldCount;
+			};
+		}, 200);
 		final int newCount = table.getItemCount();
 		assertTrue("Turning on show all should display more items", newCount > oldCount);
 		assertEquals("Turning on show all should not change the top item", oldFirstItemText, table.getItem(0).getText(1));
@@ -157,7 +190,12 @@ public class QuickAccessDialogTest extends UITestCase {
 		// Run the handler to turn off show all
 		handlerService
 		.executeCommand("org.eclipse.ui.window.quickAccess", null); //$NON-NLS-1$
-		processEventsUntil(() -> table.getItemCount() != newCount, 200);
+		processEventsUntil(new Condition() {
+			@Override
+			public boolean compute() {
+				return table.getItemCount() != newCount;
+			};
+		}, 200);
 		// Note: The table count may one off from the old count because of shell resizing (scroll bars being added then removed)
 		assertTrue("Turning off show all should limit items shown", table.getItemCount() < newCount);
 		assertEquals("Turning off show all should not change the top item", oldFirstItemText, table.getItem(0).getText(1));
@@ -165,7 +203,12 @@ public class QuickAccessDialogTest extends UITestCase {
 		// Run the handler to turn on show all
 		handlerService
 		.executeCommand("org.eclipse.ui.window.quickAccess", null); //$NON-NLS-1$
-		processEventsUntil(() -> table.getItemCount() != oldCount, 200);
+		processEventsUntil(new Condition() {
+			@Override
+			public boolean compute() {
+				return table.getItemCount() != oldCount;
+			};
+		}, 200);
 		assertEquals("Turning on show all twice shouldn't change the items", newCount, table.getItemCount());
 		assertEquals("Turning on show all twice shouldn't change the top item", oldFirstItemText, table.getItem(0).getText(1));
 
@@ -174,7 +217,12 @@ public class QuickAccessDialogTest extends UITestCase {
 		handlerService
 		.executeCommand("org.eclipse.ui.window.quickAccess", null); //$NON-NLS-1$
 		text.setText("T");
-		processEventsUntil(() -> table.getItemCount() > 1, 200);
+		processEventsUntil(new Condition() {
+			@Override
+			public boolean compute() {
+				return table.getItemCount() > 1;
+			};
+		}, 200);
 		// Note: The table count may one off from the old count because of shell resizing (scroll bars being added then removed)
 		assertTrue("Show all should be turned off when the shell is closed and reopened", table.getItemCount() < newCount);
 	}

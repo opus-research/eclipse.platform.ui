@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,10 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
@@ -85,97 +89,155 @@ public class ProgressCanvasViewer extends AbstractProgressViewer {
      */
     @Override
 	protected void hookControl(Control control) {
-        control.addDisposeListener(event -> handleDispose(event));
+        control.addDisposeListener(new DisposeListener() {
+            @Override
+			public void widgetDisposed(DisposeEvent event) {
+                handleDispose(event);
+            }
+        });
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.viewers.StructuredViewer#doFindInputItem(java.lang.Object)
+     */
     @Override
 	protected Widget doFindInputItem(Object element) {
         return null; // No widgets associated with items
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.viewers.StructuredViewer#doFindItem(java.lang.Object)
+     */
     @Override
 	protected Widget doFindItem(Object element) {
         return null; // No widgets associated with items
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.viewers.StructuredViewer#doUpdateItem(org.eclipse.swt.widgets.Widget,
+     *      java.lang.Object, boolean)
+     */
     @Override
 	protected void doUpdateItem(Widget item, Object element, boolean fullMap) {
         canvas.redraw();
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.viewers.StructuredViewer#getSelectionFromWidget()
+     */
     @Override
 	protected List getSelectionFromWidget() {
         //No selection on a Canvas
         return EMPTY_LIST;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.viewers.StructuredViewer#internalRefresh(java.lang.Object)
+     */
     @Override
 	protected void internalRefresh(Object element) {
         displayedItems = getSortedChildren(getRoot());
         canvas.redraw();
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.viewers.StructuredViewer#reveal(java.lang.Object)
+     */
     @Override
 	public void reveal(Object element) {
         //Nothing to do here as we do not scroll
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.viewers.StructuredViewer#setSelectionToWidget(java.util.List,
+     *      boolean)
+     */
     @Override
 	protected void setSelectionToWidget(List l, boolean reveal) {
         //Do nothing as there is no selection
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.viewers.Viewer#getControl()
+     */
     @Override
 	public Control getControl() {
         return canvas;
     }
 
     private void initializeListeners() {
-        canvas.addPaintListener(event -> {
+        canvas.addPaintListener(new PaintListener() {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.swt.events.PaintListener#paintControl(org.eclipse.swt.events.PaintEvent)
+             */
+            @Override
+			public void paintControl(PaintEvent event) {
 
-		    GC gc = event.gc;
-		    Transform transform = null;
-		    if (orientation == SWT.VERTICAL) {
-		        transform = new Transform(event.display);
-		    	transform.translate(TrimUtil.TRIM_DEFAULT_HEIGHT, 0);
-		    	transform.rotate(90);
-		    }
-		    ILabelProvider labelProvider = (ILabelProvider) getLabelProvider();
+                GC gc = event.gc;
+                Transform transform = null;
+                if (orientation == SWT.VERTICAL) {
+	                transform = new Transform(event.display);
+	            	transform.translate(TrimUtil.TRIM_DEFAULT_HEIGHT, 0);
+	            	transform.rotate(90);
+                }
+                ILabelProvider labelProvider = (ILabelProvider) getLabelProvider();
 
-		    int itemCount = Math.min(displayedItems.length, numShowItems);
+                int itemCount = Math.min(displayedItems.length, numShowItems);
 
-		    int yOffset = 0;
-		    int xOffset = 0;
-		    if (numShowItems == 1) {//If there is a single item try to center it
-		        Rectangle clientArea = canvas.getParent().getClientArea();
-		        if (orientation == SWT.HORIZONTAL) {
-		        	int size1 = clientArea.height;
-		            yOffset = size1 - (fontMetrics.getHeight());
-		            yOffset = yOffset / 2;
-		        } else {
-		        	int size2 = clientArea.width;
-		        	xOffset = size2 - (fontMetrics.getHeight());
-		        	xOffset = xOffset / 2;
-		        }
-		    }
+                int yOffset = 0;
+                int xOffset = 0;
+                if (numShowItems == 1) {//If there is a single item try to center it
+                    Rectangle clientArea = canvas.getParent().getClientArea();
+                    if (orientation == SWT.HORIZONTAL) {
+                    	int size = clientArea.height;
+	                    yOffset = size - (fontMetrics.getHeight());
+	                    yOffset = yOffset / 2;
+                    } else {
+                    	int size = clientArea.width;
+                    	xOffset = size - (fontMetrics.getHeight());
+                    	xOffset = xOffset / 2;
+                    }
+                }
 
-		    for (int i = 0; i < itemCount; i++) {
-		        String string = labelProvider.getText(displayedItems[i]);
-		        if(string == null) {
-					string = "";//$NON-NLS-1$
-				}
-		        if (orientation == SWT.HORIZONTAL) {
-		        	gc.drawString(string, 2, yOffset + (i * fontMetrics.getHeight()), true);
-		        } else {
-		        	gc.setTransform(transform);
-		        	gc.drawString(string, xOffset + (i * fontMetrics.getHeight()), 2, true);
-		        }
-		    }
-		    if (transform != null)
-		    	transform.dispose();
-		});
+                for (int i = 0; i < itemCount; i++) {
+                    String string = labelProvider.getText(displayedItems[i]);
+                    if(string == null) {
+						string = "";//$NON-NLS-1$
+					}
+                    if (orientation == SWT.HORIZONTAL) {
+                    	gc.drawString(string, 2, yOffset + (i * fontMetrics.getHeight()), true);
+                    } else {
+		            	gc.setTransform(transform);
+                    	gc.drawString(string, xOffset + (i * fontMetrics.getHeight()), 2, true);
+                    }
+                }
+                if (transform != null)
+                	transform.dispose();
+            }
+        });
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ContentViewer#setLabelProvider(org.eclipse.jface.viewers.IBaseLabelProvider)
+     */
     @Override
 	public void setLabelProvider(IBaseLabelProvider labelProvider) {
         Assert.isTrue(labelProvider instanceof ILabelProvider);
@@ -209,12 +271,18 @@ public class ProgressCanvasViewer extends AbstractProgressViewer {
         return new Point(fontWidth, fontHeight);
     }
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.progress.AbstractProgressViewer#add(java.lang.Object[])
+	 */
 	@Override
 	public void add(Object[] elements) {
 		refresh(true);
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.progress.AbstractProgressViewer#remove(java.lang.Object[])
+	 */
 	@Override
 	public void remove(Object[] elements) {
 		refresh(true);

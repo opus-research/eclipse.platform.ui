@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,13 +20,12 @@ import org.eclipse.core.commands.operations.OperationStatus;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceRuleFactory;
 import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.mapping.IResourceChangeDescriptionFactory;
 import org.eclipse.core.resources.mapping.ResourceChangeValidator;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.ICoreRunnable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -194,7 +193,12 @@ public abstract class AbstractWorkspaceOperation extends AbstractOperation
 	public IStatus execute(IProgressMonitor monitor, final IAdaptable uiInfo)
 			throws ExecutionException {
 		try {
-			getWorkspace().run(monitor1 -> doExecute(monitor1, uiInfo), getExecuteSchedulingRule(), IWorkspace.AVOID_UPDATE, monitor);
+			getWorkspace().run(new IWorkspaceRunnable() {
+				@Override
+				public void run(IProgressMonitor monitor) throws CoreException {
+					doExecute(monitor, uiInfo);
+				}
+			}, getExecuteSchedulingRule(), IWorkspace.AVOID_UPDATE, monitor);
 		} catch (final CoreException e) {
 			throw new ExecutionException(NLS.bind(
 					UndoMessages.AbstractWorkspaceOperation_ExecuteErrorTitle,
@@ -231,7 +235,12 @@ public abstract class AbstractWorkspaceOperation extends AbstractOperation
 	public IStatus redo(IProgressMonitor monitor, final IAdaptable uiInfo)
 			throws ExecutionException {
 		try {
-			getWorkspace().run(monitor1 -> doExecute(monitor1, uiInfo), getRedoSchedulingRule(), IWorkspace.AVOID_UPDATE, monitor);
+			getWorkspace().run(new IWorkspaceRunnable() {
+				@Override
+				public void run(IProgressMonitor monitor) throws CoreException {
+					doExecute(monitor, uiInfo);
+				}
+			}, getRedoSchedulingRule(), IWorkspace.AVOID_UPDATE, monitor);
 		} catch (final CoreException e) {
 			throw new ExecutionException(NLS.bind(
 					UndoMessages.AbstractWorkspaceOperation_RedoErrorTitle,
@@ -269,7 +278,12 @@ public abstract class AbstractWorkspaceOperation extends AbstractOperation
 	public IStatus undo(IProgressMonitor monitor, final IAdaptable uiInfo)
 			throws ExecutionException {
 		try {
-			getWorkspace().run(monitor1 -> doUndo(monitor1, uiInfo), getUndoSchedulingRule(), IWorkspace.AVOID_UPDATE, monitor);
+			getWorkspace().run(new IWorkspaceRunnable() {
+				@Override
+				public void run(IProgressMonitor monitor) throws CoreException {
+					doUndo(monitor, uiInfo);
+				}
+			}, getUndoSchedulingRule(), IWorkspace.AVOID_UPDATE, monitor);
 		} catch (final CoreException e) {
 			throw new ExecutionException(NLS.bind(
 					UndoMessages.AbstractWorkspaceOperation_UndoErrorTitle,
@@ -619,8 +633,8 @@ public abstract class AbstractWorkspaceOperation extends AbstractOperation
 		if (resources == null || resources.length == 0) {
 			return false;
 		}
-		for (IResource resource : resources) {
-			if (resource.getType() == IResource.PROJECT) {
+		for (int i = 0; i < resources.length; i++) {
+			if (resources[i].getType() == IResource.PROJECT) {
 				return true;
 			}
 		}
@@ -638,7 +652,7 @@ public abstract class AbstractWorkspaceOperation extends AbstractOperation
 	 *         <code>null</code> if there are no scheduling restrictions for
 	 *         this operation.
 	 *
-	 * @see IWorkspace#run(ICoreRunnable, ISchedulingRule, int,
+	 * @see IWorkspace#run(IWorkspaceRunnable, ISchedulingRule, int,
 	 *      IProgressMonitor)
 	 */
 	protected ISchedulingRule getExecuteSchedulingRule() {
@@ -656,7 +670,7 @@ public abstract class AbstractWorkspaceOperation extends AbstractOperation
 	 *         <code>null</code> if there are no scheduling restrictions for
 	 *         this operation.
 	 *
-	 * @see IWorkspace#run(ICoreRunnable, ISchedulingRule, int,
+	 * @see IWorkspace#run(IWorkspaceRunnable, ISchedulingRule, int,
 	 *      IProgressMonitor)
 	 */
 	protected ISchedulingRule getUndoSchedulingRule() {
@@ -673,7 +687,7 @@ public abstract class AbstractWorkspaceOperation extends AbstractOperation
 	 *         <code>null</code> if there are no scheduling restrictions for
 	 *         this operation.
 	 *
-	 * @see IWorkspace#run(ICoreRunnable, ISchedulingRule, int,
+	 * @see IWorkspace#run(IWorkspaceRunnable, ISchedulingRule, int,
 	 *      IProgressMonitor)
 	 */
 	protected ISchedulingRule getRedoSchedulingRule() {
@@ -724,9 +738,11 @@ public abstract class AbstractWorkspaceOperation extends AbstractOperation
 	 *
 	 */
 	protected Shell getShell(IAdaptable uiInfo) {
-		Shell shell = Adapters.adapt(uiInfo, Shell.class);
-		if (shell != null) {
-			return shell;
+		if (uiInfo != null) {
+			Shell shell = uiInfo.getAdapter(Shell.class);
+			if (shell != null) {
+				return shell;
+			}
 		}
 		return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 	}

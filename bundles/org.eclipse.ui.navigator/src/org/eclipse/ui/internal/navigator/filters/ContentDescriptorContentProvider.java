@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 IBM Corporation and others.
+ * Copyright (c) 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -82,9 +82,9 @@ class ContentDescriptorContentProvider implements ITreeContentProvider {
 		boolean enabled;
 
 		TableItem[] descriptorTableItems = talbleViewer.getTable().getItems();
-		for (TableItem descriptorTableItem : descriptorTableItems) {
-			if (descriptorTableItem.getData() instanceof INavigatorContentDescriptor) {
-				descriptor = (INavigatorContentDescriptor) descriptorTableItem
+		for (int i = 0; i < descriptorTableItems.length; i++) {
+			if (descriptorTableItems[i].getData() instanceof INavigatorContentDescriptor) {
+				descriptor = (INavigatorContentDescriptor) descriptorTableItems[i]
 						.getData();
 				enabled = contentService.getActivationService()
 						.isNavigatorExtensionActive(descriptor.getId());

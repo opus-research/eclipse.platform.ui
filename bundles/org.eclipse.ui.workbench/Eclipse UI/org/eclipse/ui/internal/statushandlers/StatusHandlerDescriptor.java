@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.ui.internal.statushandlers;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.ui.IPluginContribution;
@@ -68,9 +69,13 @@ public class StatusHandlerDescriptor implements IPluginContribution {
 
 			Map params = new HashMap();
 
-			for (IConfigurationElement configElement : parameters) {
-				params.put(configElement.getAttribute(IWorkbenchRegistryConstants.ATT_NAME),
-						configElement.getAttribute(IWorkbenchRegistryConstants.ATT_VALUE));
+			for (int i = 0; i < parameters.length; i++) {
+				params
+						.put(
+								parameters[i]
+										.getAttribute(IWorkbenchRegistryConstants.ATT_NAME),
+								parameters[i]
+										.getAttribute(IWorkbenchRegistryConstants.ATT_VALUE));
 			}
 
 			statusHandler.setParams(params);
@@ -85,11 +90,15 @@ public class StatusHandlerDescriptor implements IPluginContribution {
 	 * @return prefix parameter
 	 */
 	public String getPrefix() {
-		IConfigurationElement parameters[] = configElement.getChildren(IWorkbenchRegistryConstants.TAG_PARAMETER);
+		IConfigurationElement parameters[] = configElement
+				.getChildren(IWorkbenchRegistryConstants.TAG_PARAMETER);
 
-		for (IConfigurationElement configElement : parameters) {
-			if (configElement.getAttribute(IWorkbenchRegistryConstants.ATT_NAME).equals(PREFIX)) {
-				prefix = configElement.getAttribute(IWorkbenchRegistryConstants.ATT_VALUE);
+		for (int i = 0; i < parameters.length; i++) {
+			if (parameters[i]
+					.getAttribute(IWorkbenchRegistryConstants.ATT_NAME).equals(
+							PREFIX)) {
+				prefix = parameters[i]
+						.getAttribute(IWorkbenchRegistryConstants.ATT_VALUE);
 			}
 		}
 		return prefix;
@@ -104,11 +113,21 @@ public class StatusHandlerDescriptor implements IPluginContribution {
 		return id;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.IPluginContribution#getLocalId()
+	 */
 	@Override
 	public String getLocalId() {
 		return id;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.IPluginContribution#getPluginId()
+	 */
 	@Override
 	public String getPluginId() {
 		return pluginId;

@@ -252,8 +252,8 @@ public class TableComparator extends ViewerComparator implements Comparator {
 	}
 
 	private boolean verifyDirections(int[] directions) {
-		for (int direction : directions) {
-			if (direction != ASCENDING && direction != DESCENDING) {
+		for (int i = 0; i < directions.length; i++) {
+			if (directions[i] != ASCENDING && directions[i] != DESCENDING) {
 				return false;
 			}
 		}
@@ -347,7 +347,12 @@ public class TableComparator extends ViewerComparator implements Comparator {
 	 * @param end
 	 */
 	public void sort(final Viewer viewer, Object[] elements, int start, int end) {
-		Arrays.sort(elements, start, end, (a, b) -> TableComparator.this.compare(viewer, a, b));
+		Arrays.sort(elements, start, end, new Comparator() {
+			@Override
+			public int compare(Object a, Object b) {
+				return TableComparator.this.compare(viewer, a, b);
+			}
+		});
 	}
 
 }

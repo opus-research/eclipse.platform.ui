@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 474273
  *******************************************************************************/
 
 package org.eclipse.ui.internal.about;
@@ -22,13 +21,14 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.Map.Entry;
+
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.IJobFunction;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.JFaceResources;
@@ -63,6 +63,9 @@ public class BundleSigningInfo {
 	private Text date;
 	private StyledText certificate;
 	private AboutBundleData data;
+
+	public BundleSigningInfo() {
+	}
 
 	public void setData(AboutBundleData data) {
 		this.data = data;
@@ -153,54 +156,59 @@ public class BundleSigningInfo {
 		}
 
 		final AboutBundleData myData = data;
-		final Job signerJob = Job.create(NLS.bind(
+		final Job signerJob = new Job(NLS.bind(
 				WorkbenchMessages.BundleSigningTray_Determine_Signer_For,
-				myData.getId()), (IJobFunction) monitor -> {
-					try {
-						if (myData != data)
-							return Status.OK_STATUS;
-						SignedContent signedContent = contentFactory
-								.getSignedContent(myData.getBundle());
-						if (myData != data)
-							return Status.OK_STATUS;
-						SignerInfo[] signers = signedContent.getSignerInfos();
-						final String signerText, dateText;
-						if (!isOpen() && BundleSigningInfo.this.data == myData)
-							return Status.OK_STATUS;
+				myData.getId())) {
 
-						if (signers.length == 0) {
-							signerText = WorkbenchMessages.BundleSigningTray_Unsigned;
-							dateText = WorkbenchMessages.BundleSigningTray_Unsigned;
-						} else {
-							Properties[] certs = parseCerts(signers[0]
-									.getCertificateChain());
-							if (certs.length == 0)
-								signerText = WorkbenchMessages.BundleSigningTray_Unknown;
-							else {
-								StringBuilder buffer = new StringBuilder();
-								for (Iterator i = certs[0].entrySet().iterator(); i
-										.hasNext();) {
-									Map.Entry entry = (Entry) i.next();
-									buffer.append(entry.getKey());
-									buffer.append('=');
-									buffer.append(entry.getValue());
-									if (i.hasNext())
-										buffer.append('\n');
-								}
-								signerText = buffer.toString();
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				try {
+					if (myData != data)
+						return Status.OK_STATUS;
+					SignedContent signedContent = contentFactory
+							.getSignedContent(myData.getBundle());
+					if (myData != data)
+						return Status.OK_STATUS;
+					SignerInfo[] signers = signedContent.getSignerInfos();
+					final String signerText, dateText;
+					if (!isOpen() && BundleSigningInfo.this.data == myData)
+						return Status.OK_STATUS;
+
+					if (signers.length == 0) {
+						signerText = WorkbenchMessages.BundleSigningTray_Unsigned;
+						dateText = WorkbenchMessages.BundleSigningTray_Unsigned;
+					} else {
+						Properties[] certs = parseCerts(signers[0]
+								.getCertificateChain());
+						if (certs.length == 0)
+							signerText = WorkbenchMessages.BundleSigningTray_Unknown;
+						else {
+							StringBuffer buffer = new StringBuffer();
+							for (Iterator i = certs[0].entrySet().iterator(); i
+									.hasNext();) {
+								Map.Entry entry = (Entry) i.next();
+								buffer.append(entry.getKey());
+								buffer.append('=');
+								buffer.append(entry.getValue());
+								if (i.hasNext())
+									buffer.append('\n');
 							}
-
-							Date signDate = signedContent
-									.getSigningTime(signers[0]);
-							if (signDate != null)
-								dateText = DateFormat.getDateTimeInstance().format(
-										signDate);
-							else
-								dateText = WorkbenchMessages.BundleSigningTray_Unknown;
+							signerText = buffer.toString();
 						}
 
-						PlatformUI.getWorkbench().getDisplay().asyncExec(
-								() -> {
+						Date signDate = signedContent
+								.getSigningTime(signers[0]);
+						if (signDate != null)
+							dateText = DateFormat.getDateTimeInstance().format(
+									signDate);
+						else
+							dateText = WorkbenchMessages.BundleSigningTray_Unknown;
+					}
+
+					PlatformUI.getWorkbench().getDisplay().asyncExec(
+							new Runnable() {
+								@Override
+								public void run() {
 									// check to see if the tray is still visible
 									// and if
 									// we're still looking at the same item
@@ -209,30 +217,37 @@ public class BundleSigningInfo {
 										return;
 									certificate.setText(signerText);
 									date.setText(dateText);
-								});
+								}
+							});
 
-					} catch (IOException e1) {
-						return new Status(IStatus.ERROR,
-								WorkbenchPlugin.PI_WORKBENCH, e1.getMessage(), e1);
-					} catch (GeneralSecurityException e2) {
-						return new Status(IStatus.ERROR,
-								WorkbenchPlugin.PI_WORKBENCH, e2.getMessage(), e2);
-					}
-					return Status.OK_STATUS;
-				});
+				} catch (IOException e) {
+					return new Status(IStatus.ERROR,
+							WorkbenchPlugin.PI_WORKBENCH, e.getMessage(), e);
+				} catch (GeneralSecurityException e) {
+					return new Status(IStatus.ERROR,
+							WorkbenchPlugin.PI_WORKBENCH, e.getMessage(), e);
+				}
+				return Status.OK_STATUS;
+			}
+		};
 		signerJob.setSystem(true);
 		signerJob.belongsTo(signerJob);
 		signerJob.schedule();
 
-		Job cleanup = Job.create(WorkbenchMessages.BundleSigningTray_Unget_Signing_Service, (IJobFunction) monitor -> {
-			try {
-				Job.getJobManager().join(signerJob, monitor);
-			} catch (OperationCanceledException e1) {
-			} catch (InterruptedException e2) {
+		Job cleanup = new Job(
+				WorkbenchMessages.BundleSigningTray_Unget_Signing_Service) {
+
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				try {
+					getJobManager().join(signerJob, monitor);
+				} catch (OperationCanceledException e) {
+				} catch (InterruptedException e) {
+				}
+				bundleContext.ungetService(factoryRef);
+				return Status.OK_STATUS;
 			}
-			bundleContext.ungetService(factoryRef);
-			return Status.OK_STATUS;
-		});
+		};
 		cleanup.setSystem(true);
 		cleanup.schedule();
 

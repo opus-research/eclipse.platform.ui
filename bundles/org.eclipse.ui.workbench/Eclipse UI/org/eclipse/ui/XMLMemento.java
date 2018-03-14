@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -369,7 +369,7 @@ public final class XMLMemento implements IMemento {
 		}
         String strValue = attr.getValue();
         try {
-			return Integer.valueOf(strValue);
+            return new Integer(strValue);
         } catch (NumberFormatException e) {
             WorkbenchPlugin
                     .log("Memento problem - invalid integer for key: " + key //$NON-NLS-1$
@@ -675,7 +675,7 @@ public final class XMLMemento implements IMemento {
     	}
 
     	private void startTag(Element element, boolean hasChildren) {
-    		StringBuilder sb = new StringBuilder();
+    		StringBuffer sb = new StringBuffer();
     		sb.append("<"); //$NON-NLS-1$
     		sb.append(element.getTagName());
     		NamedNodeMap attributes = element.getAttributes();
@@ -692,14 +692,14 @@ public final class XMLMemento implements IMemento {
     	}
 
     	private void endTag(Element element) {
-    		StringBuilder sb = new StringBuilder();
+    		StringBuffer sb = new StringBuffer();
     		sb.append("</"); //$NON-NLS-1$
     		sb.append(element.getNodeName());
     		sb.append(">"); //$NON-NLS-1$
    			print(sb.toString());
     	}
 
-    	private static void appendEscapedChar(StringBuilder buffer, char c) {
+    	private static void appendEscapedChar(StringBuffer buffer, char c) {
     		String replacement = getReplacement(c);
     		if (replacement != null) {
     			buffer.append('&');
@@ -711,7 +711,7 @@ public final class XMLMemento implements IMemento {
     	}
 
     	private static String getEscaped(String s) {
-    		StringBuilder result = new StringBuilder(s.length() + 10);
+    		StringBuffer result = new StringBuffer(s.length() + 10);
     		for (int i = 0; i < s.length(); ++i) {
 				appendEscapedChar(result, s.charAt(i));
 			}

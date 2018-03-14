@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Friederike Schertel <friederike@schertel.org> - Bug 478336
  *******************************************************************************/
 
 package org.eclipse.ui.internal.handlers;
@@ -31,6 +30,8 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -135,7 +136,7 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 	 * A collection of objects listening to changes to this manager. This
 	 * collection is <code>null</code> if there are no listeners.
 	 */
-	private transient ListenerList<IHandlerListener> listenerList = null;
+	private transient ListenerList listenerList = null;
 
 	/**
 	 * The image style to use when selecting the images to display for this
@@ -225,7 +226,7 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 	@Override
 	public final void addHandlerListener(final IHandlerListener handlerListener) {
 		if (listenerList == null) {
-			listenerList = new ListenerList<>(ListenerList.IDENTITY);
+			listenerList = new ListenerList(ListenerList.IDENTITY);
 		}
 
 		listenerList.add(handlerListener);
@@ -233,6 +234,8 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 
 	@Override
 	public void addState(String id, State state) {
+		// TODO Auto-generated method stub
+
 	}
 
 
@@ -396,8 +399,11 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 		if (action == null) {
 			action = new CommandLegacyActionWrapper(actionId, command, style,
 					window);
-			action.addPropertyChangeListener(event -> {
-				// TODO Update the state somehow.
+			action.addPropertyChangeListener(new IPropertyChangeListener() {
+				@Override
+				public final void propertyChange(final PropertyChangeEvent event) {
+					// TODO Update the state somehow.
+				}
 			});
 		}
 		return action;
@@ -415,11 +421,13 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 
 	@Override
 	public State getState(String stateId) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String[] getStateIds() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -487,6 +495,9 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.commands.IHandler2#setEnabled(java.lang.Object)
+	 */
 	@Override
 	public void setEnabled(Object evaluationContext) {
 		if (!(evaluationContext instanceof IEvaluationContext)) {
@@ -504,7 +515,7 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 				}
 			} catch (final CoreException e) {
 				// We will just fall through an let it return false.
-				final StringBuilder message = new StringBuilder(
+				final StringBuffer message = new StringBuffer(
 						"An exception occurred while evaluating the enabledWhen expression for "); //$NON-NLS-1$
 				if (delegate != null) {
 					message.append(delegate);
@@ -657,6 +668,8 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 
 	@Override
 	public void removeState(String stateId) {
+		// TODO Auto-generated method stub
+
 	}
 
 	private final void selectionChanged(final ISelection selection) {
@@ -694,7 +707,7 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 
 	@Override
 	public final String toString() {
-		final StringBuilder buffer = new StringBuilder();
+		final StringBuffer buffer = new StringBuffer();
 		buffer.append("ActionDelegateHandlerProxy("); //$NON-NLS-1$
 		buffer.append(getDelegate());
 		if (element != null) {
@@ -703,8 +716,6 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 				final String className = element
 						.getAttribute(delegateAttributeName);
 				buffer.append(className);
-				final String namespaceId = element.getNamespaceIdentifier();
-				buffer.append(" in ").append(namespaceId); //$NON-NLS-1$
 			} catch (InvalidRegistryObjectException e) {
 				buffer.append(actionId);
 			}
@@ -713,14 +724,23 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 		return buffer.toString();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IPartListener2#partActivated(org.eclipse.ui.IWorkbenchPartReference)
+	 */
 	@Override
 	public void partActivated(IWorkbenchPartReference partRef) {
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IPartListener2#partBroughtToTop(org.eclipse.ui.IWorkbenchPartReference)
+	 */
 	@Override
 	public void partBroughtToTop(IWorkbenchPartReference partRef) {
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IPartListener2#partClosed(org.eclipse.ui.IWorkbenchPartReference)
+	 */
 	@Override
 	public void partClosed(IWorkbenchPartReference partRef) {
 		if (currentPart != null && partRef.getPart(false) == currentPart) {
@@ -728,22 +748,37 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IPartListener2#partDeactivated(org.eclipse.ui.IWorkbenchPartReference)
+	 */
 	@Override
 	public void partDeactivated(IWorkbenchPartReference partRef) {
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IPartListener2#partHidden(org.eclipse.ui.IWorkbenchPartReference)
+	 */
 	@Override
 	public void partHidden(IWorkbenchPartReference partRef) {
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IPartListener2#partInputChanged(org.eclipse.ui.IWorkbenchPartReference)
+	 */
 	@Override
 	public void partInputChanged(IWorkbenchPartReference partRef) {
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IPartListener2#partOpened(org.eclipse.ui.IWorkbenchPartReference)
+	 */
 	@Override
 	public void partOpened(IWorkbenchPartReference partRef) {
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IPartListener2#partVisible(org.eclipse.ui.IWorkbenchPartReference)
+	 */
 	@Override
 	public void partVisible(IWorkbenchPartReference partRef) {
 	}

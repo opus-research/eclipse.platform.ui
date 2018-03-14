@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,6 @@
  *     Stefan Xenos, IBM - bug 156790: Adopt GridLayoutFactory within JFace
  *******************************************************************************/
 package org.eclipse.jface.dialogs;
-
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,8 +27,12 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.Util;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
@@ -158,9 +160,13 @@ public class PopupDialog extends Window {
 	private class ResizeAction extends Action {
 
 		ResizeAction() {
-			super(JFaceResources.getString("PopupDialog.resize"), IAction.AS_PUSH_BUTTON); //$NON-NLS-1$
+			super(JFaceResources.getString("PopupDialog.resize"), //$NON-NLS-1$
+					IAction.AS_PUSH_BUTTON);
 		}
 
+		/*
+		 * @see org.eclipse.jface.action.Action#run()
+		 */
 		@Override
 		public void run() {
 			performTrackerAction(SWT.RESIZE);
@@ -174,7 +180,8 @@ public class PopupDialog extends Window {
 	private class PersistBoundsAction extends Action {
 
 		PersistBoundsAction() {
-			super(JFaceResources.getString("PopupDialog.persistBounds"), IAction.AS_CHECK_BOX); //$NON-NLS-1$
+			super(JFaceResources.getString("PopupDialog.persistBounds"), //$NON-NLS-1$
+					IAction.AS_CHECK_BOX);
 			setChecked(persistLocation && persistSize);
 		}
 
@@ -192,7 +199,8 @@ public class PopupDialog extends Window {
 	private class PersistSizeAction extends Action {
 
 		PersistSizeAction() {
-			super(JFaceResources.getString("PopupDialog.persistSize"), IAction.AS_CHECK_BOX); //$NON-NLS-1$
+			super(JFaceResources.getString("PopupDialog.persistSize"), //$NON-NLS-1$
+					IAction.AS_CHECK_BOX);
 			setChecked(persistSize);
 		}
 
@@ -209,7 +217,8 @@ public class PopupDialog extends Window {
 	private class PersistLocationAction extends Action {
 
 		PersistLocationAction() {
-			super(JFaceResources.getString("PopupDialog.persistLocation"), IAction.AS_CHECK_BOX); //$NON-NLS-1$
+			super(JFaceResources.getString("PopupDialog.persistLocation"), //$NON-NLS-1$
+					IAction.AS_CHECK_BOX);
 			setChecked(persistLocation);
 		}
 
@@ -223,7 +232,8 @@ public class PopupDialog extends Window {
 	 * Shell style appropriate for a simple hover popup that cannot get focus.
 	 *
 	 */
-	public final static int HOVER_SHELLSTYLE = SWT.NO_FOCUS | SWT.ON_TOP | SWT.TOOL;
+	public final static int HOVER_SHELLSTYLE = SWT.NO_FOCUS | SWT.ON_TOP
+			| SWT.TOOL;
 
 	/**
 	 * Shell style appropriate for an info popup that can get focus.
@@ -571,96 +581,82 @@ public class PopupDialog extends Window {
 	protected void configureShell(Shell shell) {
 		GridLayoutFactory.fillDefaults().margins(0, 0).spacing(5, 5).applyTo(
 				shell);
-		shell.addListener(SWT.Deactivate, event -> {
-			/*
-			 * Close if we are deactivating and have no child shells. If we
-			 * have child shells, we are deactivating due to their opening.
-			 *
-			 * Feature in GTK: this causes the Quick Outline/Type Hierarchy
-			 * Shell to close on re-size/movement on Gtk3. For this reason,
-			 * the asyncClose() call is disabled in GTK. See Eclipse Bugs
-			 * 466500 and 113577 for more information.
-			 */
-			if (listenToDeactivate && event.widget == getShell()
-					&& getShell().getShells().length == 0) {
-				if (!Util.isGtk()) {
-					asyncClose();
-				}
-			} else {
+
+		shell.addListener(SWT.Deactivate, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
 				/*
-				 * We typically ignore deactivates to work around
-				 * platform-specific event ordering. Now that we've ignored
-				 * whatever we were supposed to, start listening to
-				 * deactivates. Example issues can be found in
-				 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=123392
+				 * Close if we are deactivating and have no child shells. If we
+				 * have child shells, we are deactivating due to their opening.
+				 * On X, we receive this when a menu child (such as the system
+				 * menu) of the shell opens, but I have not found a way to
+				 * distinguish that case here. Hence bug #113577 still exists.
 				 */
-				listenToDeactivate = true;
+				if (listenToDeactivate && event.widget == getShell()
+						&& getShell().getShells().length == 0) {
+					asyncClose();
+				} else {
+					/*
+					 * We typically ignore deactivates to work around
+					 * platform-specific event ordering. Now that we've ignored
+					 * whatever we were supposed to, start listening to
+					 * deactivates. Example issues can be found in
+					 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=123392
+					 */
+					listenToDeactivate = true;
+				}
 			}
 		});
 		// Set this true whenever we activate. It may have been turned
 		// off by a menu or secondary popup showing.
-		shell.addListener(SWT.Activate, event -> {
-			// ignore this event if we have launched a child
-			if (event.widget == getShell() && getShell().getShells().length == 0) {
-				listenToDeactivate = true;
-				// Typically we start listening for parent deactivate after
-				// we are activated, except on the Mac, where the deactivate
-				// is received after activate.
-				// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=100668
-				listenToParentDeactivate = !Util.isMac();
+		shell.addListener(SWT.Activate, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				// ignore this event if we have launched a child
+				if (event.widget == getShell()
+						&& getShell().getShells().length == 0) {
+					listenToDeactivate = true;
+					// Typically we start listening for parent deactivate after
+					// we are activated, except on the Mac, where the deactivate
+					// is received after activate.
+					// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=100668
+					listenToParentDeactivate = !Util.isMac();
+				}
 			}
 		});
 
-		final Composite parent = shell.getParent();
-		if (parent != null) {
-			if ((getShellStyle() & SWT.ON_TOP) != 0) {
-				parentDeactivateListener = event -> {
+		if ((getShellStyle() & SWT.ON_TOP) != 0 && shell.getParent() != null) {
+			parentDeactivateListener = new Listener() {
+				@Override
+				public void handleEvent(Event event) {
 					if (listenToParentDeactivate) {
 						asyncClose();
 					} else {
 						// Our first deactivate, now start listening on the Mac.
 						listenToParentDeactivate = listenToDeactivate;
 					}
-				};
-				parent.addListener(SWT.Deactivate, parentDeactivateListener);
-			} else if (Util.isGtk()) {
-				/*
-				 * Fix for bug 485745 on GTK: popup does not close on parent
-				 * shell activation.
-				 */
-				parent.addListener(SWT.Activate, new Listener() {
-					@Override
-					public void handleEvent(Event event) {
-						/*
-						 * NB: we must wait with closing until
-						 * listenToDeactivate is set to true, otherwise it may
-						 * happen that the popup closes immediately after
-						 * showing up (seem to be timing issue with shell
-						 * creation).
-						 *
-						 * E.g. "Display" popup does not need this, but
-						 * "Show all Instances" and "Show all References" do.
-						 * They all are InspectPopupDialog instances...
-						 */
-						if (event.widget != parent || !listenToDeactivate || parent.isDisposed()) {
-							return;
-						}
-						parent.removeListener(SWT.Activate, this);
-						asyncClose();
-					}
-				});
-			}
+				}
+			};
+			shell.getParent().addListener(SWT.Deactivate,
+					parentDeactivateListener);
 		}
 
-		shell.addDisposeListener(event -> handleDispose());
+		shell.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent event) {
+				handleDispose();
+			}
+		});
 	}
 
 	private void asyncClose() {
 		// workaround for https://bugs.eclipse.org/bugs/show_bug.cgi?id=152010
-		Shell shell = getShell();
-		if (shell != null && !shell.isDisposed()) {
-			shell.getDisplay().asyncExec(() -> close());
-		}
+		getShell().getDisplay().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				close();
+			}
+		});
 	}
 
 	/**
@@ -809,7 +805,8 @@ public class PopupDialog extends Window {
 
 		Composite titleAreaComposite = new Composite(parent, SWT.NONE);
 		getPopupLayout().copy().numColumns(2).applyTo(titleAreaComposite);
-		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(titleAreaComposite);
+		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true,
+				false).applyTo(titleAreaComposite);
 
 		createTitleControl(titleAreaComposite);
 
@@ -872,17 +869,10 @@ public class PopupDialog extends Window {
 		GridDataFactory.fillDefaults().grab(true, false).align(SWT.FILL,
 				SWT.BEGINNING).applyTo(infoLabel);
 		Display display = parent.getDisplay();
-
-		Color backgroundColor = getBackground();
-		if (backgroundColor == null)
-			backgroundColor = getDefaultBackground();
-		Color foregroundColor = getForeground();
-		if (foregroundColor == null)
-			foregroundColor = getDefaultForeground();
 		infoColor = new Color(display, blend(
-				backgroundColor.getRGB(), foregroundColor.getRGB(),
+				display.getSystemColor(SWT.COLOR_INFO_BACKGROUND).getRGB(),
+				display.getSystemColor(SWT.COLOR_INFO_FOREGROUND).getRGB(),
 				0.56f));
-
 		infoLabel.setForeground(infoColor);
 		return infoLabel;
 	}
@@ -938,11 +928,19 @@ public class PopupDialog extends Window {
 		toolBar = new ToolBar(parent, SWT.FLAT);
 		ToolItem viewMenuButton = new ToolItem(toolBar, SWT.PUSH, 0);
 
-		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(toolBar);
+		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(
+				toolBar);
 		viewMenuButton.setImage(JFaceResources.getImage(POPUP_IMG_MENU));
-		viewMenuButton.setDisabledImage(JFaceResources.getImage(POPUP_IMG_MENU_DISABLED));
-		viewMenuButton.setToolTipText(JFaceResources.getString("PopupDialog.menuTooltip")); //$NON-NLS-1$
-		viewMenuButton.addSelectionListener(widgetSelectedAdapter(e -> showDialogMenu()));
+		viewMenuButton.setDisabledImage(JFaceResources
+				.getImage(POPUP_IMG_MENU_DISABLED));
+		viewMenuButton.setToolTipText(JFaceResources
+				.getString("PopupDialog.menuTooltip")); //$NON-NLS-1$
+		viewMenuButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				showDialogMenu();
+			}
+		});
 		// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=177183
 		toolBar.addMouseListener(new MouseAdapter() {
 			@Override
@@ -1323,6 +1321,11 @@ public class PopupDialog extends Window {
 	protected void adjustBounds() {
 	}
 
+	/**
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.window.Window#getInitialLocation(org.eclipse.swt.graphics.Point)
+	 */
 	@Override
 	protected Point getInitialLocation(Point initialSize) {
 		Point result = getDefaultLocation(initialSize);
@@ -1407,10 +1410,8 @@ public class PopupDialog extends Window {
 	 * @return the default foreground color.
 	 */
 	private Color getDefaultForeground() {
-		if ((getShellStyle() & SWT.NO_FOCUS) != 0) {
-			return getShell().getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND);
-		}
-		return getShell().getDisplay().getSystemColor(SWT.COLOR_LIST_FOREGROUND);
+		return getShell().getDisplay()
+				.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
 	}
 
 	/**
@@ -1419,10 +1420,8 @@ public class PopupDialog extends Window {
 	 * @return the default background color
 	 */
 	private Color getDefaultBackground() {
-		if ((getShellStyle() & SWT.NO_FOCUS) != 0) {
-			return getShell().getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND);
-		}
-		return getShell().getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
+		return getShell().getDisplay()
+				.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
 	}
 
 	/**
@@ -1437,8 +1436,8 @@ public class PopupDialog extends Window {
 		if (titleLabel != null) {
 			Font font = titleLabel.getFont();
 			FontData[] fontDatas = font.getFontData();
-			for (FontData fontData : fontDatas) {
-				fontData.setStyle(SWT.BOLD);
+			for (int i = 0; i < fontDatas.length; i++) {
+				fontDatas[i].setStyle(SWT.BOLD);
 			}
 			titleFont = new Font(titleLabel.getDisplay(), fontDatas);
 			titleLabel.setFont(titleFont);
@@ -1447,8 +1446,8 @@ public class PopupDialog extends Window {
 		if (infoLabel != null) {
 			Font font = infoLabel.getFont();
 			FontData[] fontDatas = font.getFontData();
-			for (FontData fontData : fontDatas) {
-				fontData.setHeight(fontData.getHeight() * 9 / 10);
+			for (int i = 0; i < fontDatas.length; i++) {
+				fontDatas[i].setHeight(fontDatas[i].getHeight() * 9 / 10);
 			}
 			infoFont = new Font(infoLabel.getDisplay(), fontDatas);
 			infoLabel.setFont(infoFont);
@@ -1474,8 +1473,8 @@ public class PopupDialog extends Window {
 		}
 		if (control instanceof Composite) {
 			Control[] children = ((Composite) control).getChildren();
-			for (Control element : children) {
-				applyForegroundColor(color, element, exclusions);
+			for (int i = 0; i < children.length; i++) {
+				applyForegroundColor(color, children[i], exclusions);
 			}
 		}
 	}
@@ -1499,8 +1498,8 @@ public class PopupDialog extends Window {
 		}
 		if (control instanceof Composite) {
 			Control[] children = ((Composite) control).getChildren();
-			for (Control element : children) {
-				applyBackgroundColor(color, element, exclusions);
+			for (int i = 0; i < children.length; i++) {
+				applyBackgroundColor(color, children[i], exclusions);
 			}
 		}
 	}
@@ -1548,7 +1547,7 @@ public class PopupDialog extends Window {
 	 * @return the List of controls
 	 */
 	protected List<Control> getForegroundColorExclusions() {
-		List<Control> list = new ArrayList<>(3);
+		List<Control> list = new ArrayList<Control>(3);
 		if (infoLabel != null) {
 			list.add(infoLabel);
 		}
@@ -1569,7 +1568,7 @@ public class PopupDialog extends Window {
 	 * @return the List of controls
 	 */
 	protected List<Control> getBackgroundColorExclusions() {
-		List<Control> list = new ArrayList<>(2);
+		List<Control> list = new ArrayList<Control>(2);
 		if (titleSeparator != null) {
 			list.add(titleSeparator);
 		}

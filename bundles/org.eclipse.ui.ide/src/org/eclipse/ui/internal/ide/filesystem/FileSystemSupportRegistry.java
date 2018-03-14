@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -99,18 +99,24 @@ public class FileSystemSupportRegistry implements IExtensionChangeHandler {
 	 * Create a new instance of the receiver.
 	 */
 	public FileSystemSupportRegistry() {
-		IExtensionTracker tracker = PlatformUI.getWorkbench().getExtensionTracker();
+
+		IExtensionTracker tracker = PlatformUI.getWorkbench()
+				.getExtensionTracker();
 		IExtensionPoint point = Platform.getExtensionRegistry()
 				.getExtensionPoint(IDEWorkbenchPlugin.IDE_WORKBENCH,
 						FILESYSTEM_SUPPORT);
 		if (point == null) {
 			return;
 		}
+		IExtension[] extensions = point.getExtensions();
 		// initial population
-		for (IExtension extension : point.getExtensions()) {
+		for (int i = 0; i < extensions.length; i++) {
+			IExtension extension = extensions[i];
 			processExtension(tracker, extension);
 		}
-		tracker.registerHandler(this, ExtensionTracker.createExtensionPointFilter(point));
+		tracker.registerHandler(this, ExtensionTracker
+				.createExtensionPointFilter(point));
+
 	}
 
 	@Override
@@ -121,8 +127,8 @@ public class FileSystemSupportRegistry implements IExtensionChangeHandler {
 
 	@Override
 	public void removeExtension(IExtension extension, Object[] objects) {
-		for (Object object : objects) {
-			registeredContributions.remove(object);
+		for (int i = 0; i < objects.length; i++) {
+			registeredContributions.remove(objects[i]);
 		}
 		allConfigurations = null;//Clear the cache
 
@@ -134,11 +140,16 @@ public class FileSystemSupportRegistry implements IExtensionChangeHandler {
 	 * @param tracker
 	 * @param extension
 	 */
-	private void processExtension(IExtensionTracker tracker, IExtension extension) {
-		for (IConfigurationElement configElement : extension.getConfigurationElements()) {
-			FileSystemConfiguration contribution = newConfiguration(configElement);
+	private void processExtension(IExtensionTracker tracker,
+			IExtension extension) {
+		IConfigurationElement[] elements = extension.getConfigurationElements();
+		for (int j = 0; j < elements.length; j++) {
+			IConfigurationElement element = elements[j];
+			FileSystemConfiguration contribution = newConfiguration(element);
 			registeredContributions.add(contribution);
-			tracker.registerObject(extension, contribution, IExtensionTracker.REF_STRONG);
+			tracker.registerObject(extension, contribution,
+					IExtensionTracker.REF_STRONG);
+
 		}
 	}
 

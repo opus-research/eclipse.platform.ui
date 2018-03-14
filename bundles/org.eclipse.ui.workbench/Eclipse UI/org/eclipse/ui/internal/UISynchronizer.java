@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.ui.internal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Synchronizer;
 import org.eclipse.ui.internal.StartupThreading.StartupRunnable;
@@ -144,14 +145,24 @@ public class UISynchronizer extends Synchronizer {
             super.syncExec(runnable);
             return;
         }
-        PendingSyncExec work = new PendingSyncExec(runnable);
+        Semaphore work = new Semaphore(runnable);
         work.setOperationThread(Thread.currentThread());
         lockListener.addPendingWork(work);
-        asyncExec(() -> lockListener.doPendingWork());
-
-		try {
-			work.waitUntilExecuted(lockListener);
-		} catch (InterruptedException e) {
-		}
-	}
+        asyncExec(new Runnable() {
+            @Override
+			public void run() {
+                lockListener.doPendingWork();
+            }
+        });
+        try {
+            //even if the UI was not blocked earlier, it might become blocked
+            //before it can serve the asyncExec to do the pending work
+            do {
+                if (lockListener.isUIWaiting()) {
+					lockListener.interruptUI();
+				}
+            } while (!work.acquire(1000));
+        } catch (InterruptedException e) {
+        }
+    }
 }

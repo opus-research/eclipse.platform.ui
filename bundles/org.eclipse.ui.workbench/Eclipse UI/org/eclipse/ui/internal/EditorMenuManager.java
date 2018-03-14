@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,7 +38,9 @@ public class EditorMenuManager extends SubMenuManager {
          */
         public void updateEnabledAllowed() {
             // update the items in the map
-			for (IContributionItem item : EditorMenuManager.super.getItems()) {
+            IContributionItem[] items = EditorMenuManager.super.getItems();
+            for (int i = 0; i < items.length; i++) {
+                IContributionItem item = items[i];
                 item.update(IContributionManagerOverrides.P_ENABLED);
             }
             // update the wrapped menus
@@ -69,7 +71,7 @@ public class EditorMenuManager extends SubMenuManager {
                         item);
 			} else {
 				// no acclerator if the item is disabled
-				return Integer.valueOf(0);
+                return new Integer(0);
 			}
         }
 
@@ -199,8 +201,9 @@ public class EditorMenuManager extends SubMenuManager {
     }
 
     protected void getAllContributedActions(HashSet set) {
-		for (IContributionItem item : super.getItems()) {
-			getAllContributedActions(set, item);
+        IContributionItem[] items = super.getItems();
+        for (int i = 0; i < items.length; i++) {
+			getAllContributedActions(set, items[i]);
 		}
         if (wrappers == null) {
 			return;
@@ -213,8 +216,9 @@ public class EditorMenuManager extends SubMenuManager {
 
     protected void getAllContributedActions(HashSet set, IContributionItem item) {
         if (item instanceof MenuManager) {
-			for (IContributionItem subItem : ((MenuManager) item).getItems()) {
-				getAllContributedActions(set, subItem);
+            IContributionItem subItems[] = ((MenuManager) item).getItems();
+            for (int j = 0; j < subItems.length; j++) {
+				getAllContributedActions(set, subItems[j]);
 			}
         } else if (item instanceof ActionContributionItem) {
             set.add(((ActionContributionItem) item).getAction());

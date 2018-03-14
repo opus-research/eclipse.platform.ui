@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2001, 2017 IBM Corporation and others.
+ * Copyright (c) 2001, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.Adapters;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -113,24 +114,19 @@ public class TabbedPropertySheetPage
 	 */
 	private IPartListener partActivationListener = new IPartListener() {
 
-		@Override
 		public void partActivated(IWorkbenchPart part) {
 			handlePartActivated(part);
 		}
 
-		@Override
 		public void partBroughtToTop(IWorkbenchPart part) {
 		}
 
-		@Override
 		public void partClosed(IWorkbenchPart part) {
 		}
 
-		@Override
 		public void partDeactivated(IWorkbenchPart part) {
 		}
 
-		@Override
 		public void partOpened(IWorkbenchPart part) {
 		}
 	};
@@ -155,7 +151,6 @@ public class TabbedPropertySheetPage
 		/**
 		 * @see org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor#getContributorId()
 		 */
-		@Override
 		public String getContributorId() {
 			return contributorId;
 		}
@@ -168,7 +163,6 @@ public class TabbedPropertySheetPage
 	class TabbedPropertySheetPageLabelProvider
 		extends LabelProvider {
 
-		@Override
 		public String getText(Object element) {
 			if (element instanceof ITabDescriptor) {
 				return ((ITabDescriptor) element).getLabel();
@@ -186,7 +180,6 @@ public class TabbedPropertySheetPage
 		/**
 		 * Shows the tab associated with the selection.
 		 */
-		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
 			IStructuredSelection selection = (IStructuredSelection) event
 				.getSelection();
@@ -329,7 +322,8 @@ public class TabbedPropertySheetPage
 			 * Is the part is a IContributedContentsView for the contributor,
 			 * for example, outline view.
 			 */
-			IContributedContentsView view = Adapters.adapt(part, IContributedContentsView.class);
+			IContributedContentsView view = (IContributedContentsView) part
+				.getAdapter(IContributedContentsView.class);
 			if (view == null
 				|| (view.getContributingPart() != null && !view
 					.getContributingPart().equals(contributor))) {
@@ -352,7 +346,6 @@ public class TabbedPropertySheetPage
 	/**
 	 * @see org.eclipse.ui.part.IPage#createControl(org.eclipse.swt.widgets.Composite)
 	 */
-	@Override
 	public void createControl(Composite parent) {
 		widgetFactory = new TabbedPropertySheetWidgetFactory();
 		tabbedPropertyComposite = new TabbedPropertyComposite(parent,
@@ -377,7 +370,6 @@ public class TabbedPropertySheetPage
 		tabbedPropertyComposite.getScrolledComposite().addControlListener(
 				new ControlAdapter() {
 
-					@Override
 					public void controlResized(ControlEvent e) {
 						resizeScrolledComposite();
 					}
@@ -486,7 +478,6 @@ public class TabbedPropertySheetPage
 	/**
 	 * @see org.eclipse.ui.part.IPage#dispose()
 	 */
-	@Override
 	public void dispose() {
 
 		disposeContributor();
@@ -517,7 +508,6 @@ public class TabbedPropertySheetPage
 	/**
 	 * @see org.eclipse.ui.part.IPage#getControl()
 	 */
-	@Override
 	public Control getControl() {
 		return tabbedPropertyComposite;
 	}
@@ -525,7 +515,6 @@ public class TabbedPropertySheetPage
 	/**
 	 * @see org.eclipse.ui.part.IPage#setActionBars(org.eclipse.ui.IActionBars)
 	 */
-	@Override
 	public void setActionBars(IActionBars actionBars) {
 		// Override the undo and redo global action handlers
 		// to use the contributor action handlers
@@ -555,7 +544,6 @@ public class TabbedPropertySheetPage
 	/**
 	 * @see org.eclipse.ui.part.IPage#setFocus()
 	 */
-	@Override
 	public void setFocus() {
 		getControl().setFocus();
 	}
@@ -564,7 +552,6 @@ public class TabbedPropertySheetPage
 	 * @see org.eclipse.ui.ISelectionListener#selectionChanged(org.eclipse.ui.IWorkbenchPart,
 	 *      org.eclipse.jface.viewers.ISelection)
 	 */
-	@Override
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 		setInput(part, selection);
 	}
@@ -670,19 +657,19 @@ public class TabbedPropertySheetPage
 	protected void updateTabs(ITabDescriptor[] descriptors) {
 		Map newTabs = new HashMap(descriptors.length * 2);
 		boolean disposingCurrentTab = (currentTab != null);
-		for (ITabDescriptor descriptor : descriptors) {
+		for (int i = 0; i < descriptors.length; i++) {
 			TabContents tab = (TabContents) descriptorToTab
-					.remove(descriptor);
+					.remove(descriptors[i]);
 
 			if (tab != null && tab.controlsHaveBeenCreated()) {
 				if (tab == currentTab) {
 					disposingCurrentTab = false;
 				}
 			} else {
-				tab = createTab(descriptor);
+				tab = createTab(descriptors[i]);
 			}
 
-			newTabs.put(descriptor, tab);
+			newTabs.put(descriptors[i], tab);
 		}
 		if (disposingCurrentTab) {
 			/**
@@ -870,7 +857,6 @@ public class TabbedPropertySheetPage
 	/**
 	 * @see org.eclipse.jface.viewers.ILabelProviderListener#labelProviderChanged(org.eclipse.jface.viewers.LabelProviderChangedEvent)
 	 */
-	@Override
 	public void labelProviderChanged(LabelProviderChangedEvent event) {
 		refreshTitleBar();
 	}
@@ -882,8 +868,27 @@ public class TabbedPropertySheetPage
      *            the selected element
      * @return the TabbedPropertySheetPageContributor or null if not applicable
      */
-	private ITabbedPropertySheetPageContributor getTabbedPropertySheetPageContributor(Object object) {
-		return Adapters.adapt(object, ITabbedPropertySheetPageContributor.class);
+    private ITabbedPropertySheetPageContributor getTabbedPropertySheetPageContributor(
+            Object object) {
+        if (object instanceof ITabbedPropertySheetPageContributor) {
+            return (ITabbedPropertySheetPageContributor) object;
+        }
+
+        if (object instanceof IAdaptable
+            && ((IAdaptable) object)
+                .getAdapter(ITabbedPropertySheetPageContributor.class) != null) {
+            return (ITabbedPropertySheetPageContributor) (((IAdaptable) object)
+                .getAdapter(ITabbedPropertySheetPageContributor.class));
+        }
+
+        if (Platform.getAdapterManager().hasAdapter(object,
+            ITabbedPropertySheetPageContributor.class.getName())) {
+            return (ITabbedPropertySheetPageContributor) Platform
+                .getAdapterManager().loadAdapter(object,
+                    ITabbedPropertySheetPageContributor.class.getName());
+        }
+
+        return null;
 	}
 
 	/**

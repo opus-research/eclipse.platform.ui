@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 IBM Corporation and others.
+ * Copyright (c) 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,26 +16,11 @@ package org.eclipse.e4.ui.internal.workbench;
  *
  */
 public class Policy {
-	public static final String DEBUG_FLAG = "/debug"; //$NON-NLS-1$
-	public static final String DEBUG_CMDS_FLAG = "/trace/commands"; //$NON-NLS-1$
-	public static final String DEBUG_MENUS_FLAG = "/trace/menus"; //$NON-NLS-1$
-	public static final String DEBUG_CONTEXTS_FLAG = "/trace/eclipse.context"; //$NON-NLS-1$
-	public static final String DEBUG_CONTEXTS_VERBOSE_FLAG = "/trace/eclipse.context.verbose"; //$NON-NLS-1$
-	public static final String DEBUG_WORKBENCH_FLAG = "/trace/workbench"; //$NON-NLS-1$
-	public static final String DEBUG_RENDERER_FLAG = "/trace/renderer"; //$NON-NLS-1$
-
-	/***/
-	public static boolean DEBUG;
-	/***/
-	public static boolean DEBUG_CMDS;
-	/***/
-	public static boolean DEBUG_MENUS;
-	/***/
-	public static boolean DEBUG_CONTEXTS;
-	/***/
-	public static boolean DEBUG_CONTEXTS_VERBOSE;
-	/***/
-	public static boolean DEBUG_WORKBENCH;
-	/***/
-	public static boolean DEBUG_RENDERER;
+	public static final String DEBUG = "/debug"; //$NON-NLS-1$
+	public static final String DEBUG_CMDS = "/trace/commands"; //$NON-NLS-1$
+	public static final String DEBUG_MENUS = "/trace/menus"; //$NON-NLS-1$
+	public static final String DEBUG_CONTEXTS = "/trace/eclipse.context"; //$NON-NLS-1$
+	public static final String DEBUG_CONTEXTS_VERBOSE = "/trace/eclipse.context.verbose"; //$NON-NLS-1$
+	public static final String DEBUG_WORKBENCH = "/trace/workbench"; //$NON-NLS-1$
+	public static final String DEBUG_RENDERER = "/trace/renderer"; //$NON-NLS-1$
 }

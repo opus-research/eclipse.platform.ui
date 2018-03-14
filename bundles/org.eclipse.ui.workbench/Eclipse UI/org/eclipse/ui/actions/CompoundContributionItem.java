@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,12 @@ import org.eclipse.swt.widgets.Menu;
  */
 public abstract class CompoundContributionItem extends ContributionItem {
 
-    private IMenuListener menuListener = manager -> manager.markDirty();
+    private IMenuListener menuListener = new IMenuListener() {
+        @Override
+		public void menuAboutToShow(IMenuManager manager) {
+            manager.markDirty();
+        }
+    };
 
     private IContributionItem[] oldItems;
 
@@ -45,6 +50,9 @@ public abstract class CompoundContributionItem extends ContributionItem {
         super(id);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets.Menu, int)
+     */
     @Override
 	public void fill(Menu menu, int index) {
         if (index == -1) {
@@ -55,7 +63,8 @@ public abstract class CompoundContributionItem extends ContributionItem {
 		if (index > menu.getItemCount()) {
 			index = menu.getItemCount();
 		}
-        for (IContributionItem item : items) {
+        for (int i = 0; i < items.length; i++) {
+            IContributionItem item = items[i];
             int oldItemCount = menu.getItemCount();
             if (item.isVisible()) {
                 item.fill(menu, index);
@@ -83,24 +92,34 @@ public abstract class CompoundContributionItem extends ContributionItem {
 
 	private void disposeOldItems() {
         if (oldItems != null) {
-            for (IContributionItem oldItem : oldItems) {
+            for (int i = 0; i < oldItems.length; i++) {
+                IContributionItem oldItem = oldItems[i];
                 oldItem.dispose();
             }
             oldItems = null;
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.action.ContributionItem#isDirty()
+     */
     @Override
 	public boolean isDirty() {
 		return true;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.action.ContributionItem#isDynamic()
+     */
     @Override
 	public boolean isDynamic() {
         return true;
     }
 
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.action.ContributionItem#setParent(org.eclipse.jface.action.IContributionManager)
+     */
     @Override
 	public void setParent(IContributionManager parent) {
         if (getParent() instanceof IMenuManager) {
@@ -114,6 +133,11 @@ public abstract class CompoundContributionItem extends ContributionItem {
         super.setParent(parent);
     }
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.action.ContributionItem#dispose()
+	 */
 	@Override
 	public void dispose() {
 		disposeOldItems();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2016 IBM Corporation and others.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Mickael Istria (Red Hat Inc.) - [266030] Allow "others" working set
  *******************************************************************************/
 
 package org.eclipse.ui.internal.navigator.resources.actions;
@@ -56,7 +55,7 @@ public class WorkingSetRootModeActionGroup extends ActionGroup {
 	private IAction workingSetsAction = null;
 	private IAction projectsAction = null;
 	private IAction[] actions;
-	private int currentRadioSelection;
+	private int currentSelection;
 	private MenuItem[] items;
 
 	private class TopLevelContentAction extends Action  {
@@ -132,55 +131,45 @@ public class WorkingSetRootModeActionGroup extends ActionGroup {
 
 		for (int i = 0; i < actions.length; i++) {
 			final int j = i;
-			final IAction action = actions[i];
-			ContributionItem item = new ContributionItem() {
+
+			viewMenu.add(new ContributionItem() {
 
 				@Override
 				public void fill(Menu menu, int index) {
 
 					int style = SWT.CHECK;
-					if ((action.getStyle() & IAction.AS_RADIO_BUTTON) != 0)
+					if ((actions[j].getStyle() & IAction.AS_RADIO_BUTTON) != 0)
 						style = SWT.RADIO;
 
 					final MenuItem mi = new MenuItem(menu, style, index);
 					items[j] = mi;
-					mi.setText(action.getText());
-					mi.setSelection(currentRadioSelection == j);
-					if (style == SWT.RADIO) {
-						mi.addSelectionListener(new SelectionAdapter() {
+					mi.setText(actions[j].getText());
+					mi.setSelection(currentSelection == j);
+					mi.addSelectionListener(new SelectionAdapter() {
 
-							@Override
-							public void widgetSelected(SelectionEvent e) {
-								if (currentRadioSelection == j) {
-									items[currentRadioSelection].setSelection(true);
-									return;
-								}
-								actions[j].run();
-
-								// Update checked state
-								items[currentRadioSelection].setSelection(false);
-								currentRadioSelection = j;
-								items[currentRadioSelection].setSelection(true);
+						@Override
+						public void widgetSelected(SelectionEvent e) {
+							if (currentSelection == j) {
+								items[currentSelection].setSelection(true);
+								return;
 							}
-						});
-					} else {
-						mi.addSelectionListener(new SelectionAdapter() {
+							actions[j].run();
 
-							@Override
-							public void widgetSelected(SelectionEvent e) {
-								action.run();
-							}
-						});
-					}
-					mi.setEnabled(action.isEnabled());
+							// Update checked state
+							items[currentSelection].setSelection(false);
+							currentSelection = j;
+							items[currentSelection].setSelection(true);
+						}
+
+					});
+
 				}
 
 				@Override
 				public boolean isDynamic() {
 					return false;
 				}
-			};
-			viewMenu.add(item);
+			});
 		}
 	}
 
@@ -200,7 +189,7 @@ public class WorkingSetRootModeActionGroup extends ActionGroup {
 				.setText(WorkbenchNavigatorMessages.WorkingSetRootModeActionGroup_Working_Set_);
 		workingSetsAction.setImageDescriptor(WorkbenchNavigatorPlugin
 				.getDefault().getImageRegistry().getDescriptor(
-						"full/obj16/workingsets.png")); //$NON-NLS-1$
+						"full/obj16/workingsets.gif")); //$NON-NLS-1$
 
 		return new IAction[] { projectsAction, workingSetsAction };
 	}
@@ -215,7 +204,7 @@ public class WorkingSetRootModeActionGroup extends ActionGroup {
 		if (actions == null)
 			actions = createActions();
 
-		currentRadioSelection = showTopLevelWorkingSets ? 1 : 0;
+		currentSelection = showTopLevelWorkingSets ? 1 : 0;
 		workingSetsAction.setChecked(showTopLevelWorkingSets);
 		projectsAction.setChecked(!showTopLevelWorkingSets);
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,8 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.ui.internal;
-
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -22,6 +20,8 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.osgi.util.TextProcessor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.IEditorDescriptor;
@@ -88,10 +88,10 @@ public class ReopenEditorMenu extends ContributionItem {
      * @return a string suitable for an MRU file menu
      */
     public static String calcText(int index, String name, String toolTip, boolean rtl) {
-        StringBuilder sb = new StringBuilder();
+        StringBuffer sb = new StringBuffer();
 
         int mnemonic = index + 1;
-        StringBuilder nm = new StringBuilder();
+        StringBuffer nm = new StringBuffer();
         nm.append(mnemonic);
         if (mnemonic <= MAX_MNEMONIC_SIZE) {
         	nm.insert(nm.length() - (mnemonic + "").length(), '&'); //$NON-NLS-1$
@@ -229,7 +229,12 @@ public class ReopenEditorMenu extends ContributionItem {
                     MenuItem mi = new MenuItem(menu, SWT.PUSH, menuIndex[0]);
                     ++menuIndex[0];
                     mi.setText(text);
-                    mi.addSelectionListener(widgetSelectedAdapter(e -> open(item)));
+                    mi.addSelectionListener(new SelectionAdapter() {
+                        @Override
+						public void widgetSelected(SelectionEvent e) {
+                            open(item);
+                        }
+                    });
                 }
 
                 @Override

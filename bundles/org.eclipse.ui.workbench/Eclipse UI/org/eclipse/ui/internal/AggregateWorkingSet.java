@@ -1,4 +1,4 @@
-/* Copyright (c) 2005, 2015 IBM Corporation and others.
+/* Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,8 +12,9 @@ package org.eclipse.ui.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.Set;
+
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -96,8 +97,7 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 		}
 		inElementConstruction = true;
 		try {
-			// use *linked* set to maintain predictable elements order
-			Set<IAdaptable> elements = new LinkedHashSet<>();
+			Set elements = new HashSet();
 			IWorkingSet[] localComponents = getComponentsInternal();
 			for (int i = 0; i < localComponents.length; i++) {
 				IWorkingSet workingSet = localComponents[i];
@@ -116,7 +116,8 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 					continue;
 				}
 			}
-			internalSetElements(elements.toArray(new IAdaptable[elements.size()]));
+			internalSetElements((IAdaptable[]) elements
+					.toArray(new IAdaptable[elements.size()]));
 			if (fireEvent) {
 				fireWorkingSetChanged(
 					IWorkingSetManager.CHANGE_WORKING_SET_CONTENT_CHANGE, null);
@@ -178,8 +179,11 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 			memento.putString(AbstractWorkingSet.TAG_AGGREGATE, Boolean.TRUE
 					.toString());
 
-			for (IWorkingSet workingSet : getComponentsInternal()) {
-				memento.createChild(IWorkbenchConstants.TAG_WORKING_SET, workingSet.getName());
+			IWorkingSet[] localComponents = getComponentsInternal();
+			for (int i = 0; i < localComponents.length; i++) {
+				IWorkingSet componentSet = localComponents[i];
+				memento.createChild(IWorkbenchConstants.TAG_WORKING_SET,
+						componentSet.getName());
 			}
 		}
 	}
@@ -237,7 +241,8 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 		} else if (property
 				.equals(IWorkingSetManager.CHANGE_WORKING_SET_CONTENT_CHANGE)) {
 			IWorkingSet[] localComponents = getComponentsInternal();
-			for (IWorkingSet set : localComponents) {
+			for (int i = 0; i < localComponents.length; i++) {
+				IWorkingSet set = localComponents[i];
 				if (set.equals(event.getNewValue())) {
 					constructElements(true);
 					break;
@@ -256,8 +261,9 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 				.getChildren(IWorkbenchConstants.TAG_WORKING_SET);
 		ArrayList list = new ArrayList(workingSetReferences.length);
 
-		for (IMemento memento : workingSetReferences) {
-			String setId = memento.getID();
+		for (int i = 0; i < workingSetReferences.length; i++) {
+			IMemento setReference = workingSetReferences[i];
+			String setId = setReference.getID();
 			IWorkingSet set = manager.getWorkingSet(setId);
 			if (set != null) {
 				list.add(set);
@@ -284,7 +290,7 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 
 	@Override
 	public int hashCode() {
-		int hashCode = getName().hashCode() & java.util.Arrays.hashCode(getComponentsInternal());
+		int hashCode = getName().hashCode() & getComponentsInternal().hashCode();
 		return hashCode;
 	}
 
@@ -311,10 +317,4 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 	public IAdaptable[] adaptElements(IAdaptable[] objects) {
 		return new IAdaptable[0];
 	}
-
-	@Override
-	public String toString() {
-		return "AWS [name=" + getName() + ", components=" + Arrays.toString(getComponentsInternal()) + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	}
-
 }

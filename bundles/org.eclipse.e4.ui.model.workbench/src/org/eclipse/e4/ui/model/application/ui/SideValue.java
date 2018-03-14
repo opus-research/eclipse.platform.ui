@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -162,7 +162,8 @@ public enum SideValue implements InternalSideValue {
 	 * @generated
 	 */
 	public static SideValue get(String literal) {
-		for (SideValue result : VALUES_ARRAY) {
+		for (int i = 0; i < VALUES_ARRAY.length; ++i) {
+			SideValue result = VALUES_ARRAY[i];
 			if (result.toString().equals(literal)) {
 				return result;
 			}
@@ -179,7 +180,8 @@ public enum SideValue implements InternalSideValue {
 	 * @generated
 	 */
 	public static SideValue getByName(String name) {
-		for (SideValue result : VALUES_ARRAY) {
+		for (int i = 0; i < VALUES_ARRAY.length; ++i) {
+			SideValue result = VALUES_ARRAY[i];
 			if (result.getName().equals(name)) {
 				return result;
 			}

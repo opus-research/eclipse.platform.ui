@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,10 +14,11 @@
 package org.eclipse.jface.resource;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
@@ -53,7 +54,12 @@ public class ImageRegistry {
 
     private Map<String, Entry> table;
 
-	private Runnable disposeRunnable = this::dispose;
+    private Runnable disposeRunnable = new Runnable() {
+        @Override
+		public void run() {
+            dispose();
+        }
+    };
 
     /**
      * Contains the data for an entry in the registry.
@@ -103,8 +109,8 @@ public class ImageRegistry {
         }
 
         @Override
-		public ImageData getImageData(int zoom) {
-			return original.getImageData(zoom);
+		public ImageData getImageData() {
+            return original.getImageData();
         }
     }
 
@@ -189,7 +195,12 @@ public class ImageRegistry {
             if (swtKey != -1) {
                 final Image[] image = new Image[1];
                 final int id = swtKey;
-                display.syncExec(() -> image[0] = display.getSystemImage(id));
+                display.syncExec(new Runnable() {
+                    @Override
+					public void run() {
+                        image[0] = display.getSystemImage(id);
+                    }
+                });
                 return image[0];
             }
         }
@@ -313,7 +324,7 @@ public class ImageRegistry {
 
     private Map<String, Entry> getTable() {
         if (table == null) {
-            table = new HashMap<>(10);
+            table = new HashMap<String, Entry>(10);
         }
         return table;
     }
@@ -328,7 +339,8 @@ public class ImageRegistry {
         manager.cancelDisposeExec(disposeRunnable);
 
         if (table != null) {
-            for (Entry entry : table.values()) {
+            for (Iterator<Entry> i = table.values().iterator(); i.hasNext();) {
+                Entry entry = i.next();
                 if (entry.image != null) {
                     manager.destroyImage(entry.descriptor);
                 }

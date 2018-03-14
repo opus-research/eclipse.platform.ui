@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,11 +11,12 @@
 
 package org.eclipse.ui.internal.services;
 
+import org.eclipse.e4.core.commands.ExpressionContext;
+
 import org.eclipse.core.expressions.EvaluationResult;
 import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
 import org.eclipse.e4.ui.internal.workbench.Activator;
@@ -48,20 +49,46 @@ public class EvaluationReference extends RunAndTrack implements IEvaluationRefer
 		this.sourcePriority = SourcePriorityNameMapping.computeSourcePriority(expression);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.ui.internal.services.IEvaluationResultCache#clearResult()
+	 */
 	@Override
 	public void clearResult() {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.ui.internal.services.IEvaluationResultCache#getExpression()
+	 */
 	@Override
 	public Expression getExpression() {
 		return expression;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.ui.internal.services.IEvaluationResultCache#getSourcePriority
+	 * ()
+	 */
 	@Override
 	public int getSourcePriority() {
 		return sourcePriority;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.ui.internal.services.IEvaluationResultCache#evaluate(org.
+	 * eclipse.core.expressions.IEvaluationContext)
+	 */
 	@Override
 	public boolean evaluate(IEvaluationContext context) {
 		if (expression == null) {
@@ -70,19 +97,31 @@ public class EvaluationReference extends RunAndTrack implements IEvaluationRefer
 			try {
 				cache = expression.evaluate(context) != EvaluationResult.FALSE;
 			} catch (CoreException e) {
-				if (Policy.DEBUG_CMDS) {
-					Activator.trace(Policy.DEBUG_CMDS_FLAG, "Failed to calculate active", e); //$NON-NLS-1$
-				}
+				Activator.trace(Policy.DEBUG_CMDS, "Failed to calculate active", e); //$NON-NLS-1$
 			}
 		}
 		return cache;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.ui.internal.services.IEvaluationResultCache#setResult(boolean
+	 * )
+	 */
 	@Override
 	public void setResult(boolean result) {
 		cache = result;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.e4.core.services.context.IRunAndTrack#notify(org.eclipse.
+	 * e4.core.services.context.ContextChangeEvent)
+	 */
 	@Override
 	public boolean changed(IEclipseContext context) {
 		if (!participating) {
@@ -114,11 +153,21 @@ public class EvaluationReference extends RunAndTrack implements IEvaluationRefer
 		hasRun = true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.services.IEvaluationReference#getListener()
+	 */
 	@Override
 	public IPropertyChangeListener getListener() {
 		return listener;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.services.IEvaluationReference#getProperty()
+	 */
 	@Override
 	public String getProperty() {
 		return property;

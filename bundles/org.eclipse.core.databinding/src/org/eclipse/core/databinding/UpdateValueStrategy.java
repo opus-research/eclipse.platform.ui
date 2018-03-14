@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2017 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,6 +20,8 @@ import java.util.HashMap;
 import org.eclipse.core.databinding.conversion.IConverter;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.validation.IValidator;
+import org.eclipse.core.databinding.validation.ValidationStatus;
+import org.eclipse.core.internal.databinding.BindingMessages;
 import org.eclipse.core.internal.databinding.Pair;
 import org.eclipse.core.internal.databinding.conversion.NumberToBigDecimalConverter;
 import org.eclipse.core.internal.databinding.conversion.NumberToBigIntegerConverter;
@@ -127,7 +129,7 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	/**
 	 * Policy constant denoting that the source observable's state should be
 	 * tracked, and that validation, conversion and updating the destination
-	 * observable's value should be performed automatically on every change of
+	 * observable's value should be performed automaticlly on every change of
 	 * the source observable value.
 	 */
 	public static int POLICY_UPDATE = notInlined(8);
@@ -148,6 +150,8 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	protected IValidator afterGetValidator;
 	protected IValidator afterConvertValidator;
 	protected IValidator beforeSetValidator;
+	protected IConverter converter;
+
 	private int updatePolicy;
 
 	private static ValidatorRegistry validatorRegistry = new ValidatorRegistry();
@@ -203,6 +207,20 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	}
 
 	/**
+	 * Converts the value from the source type to the destination type.
+	 * <p>
+	 * Default implementation will use the {@link #setConverter(IConverter)
+	 * converter} if one exists. If no converter exists no conversion occurs.
+	 * </p>
+	 *
+	 * @param value
+	 * @return the converted value
+	 */
+	public Object convert(Object value) {
+		return converter == null ? value : converter.convert(value);
+	}
+
+	/**
 	 * Tries to create a validator that can validate values of type fromType.
 	 * Returns <code>null</code> if no validator could be created. Either toType
 	 * or modelDescription can be <code>null</code>, but not both.
@@ -213,7 +231,13 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	 */
 	protected IValidator createValidator(Object fromType, Object toType) {
 		if (fromType == null || toType == null) {
-			return value -> Status.OK_STATUS;
+			return new IValidator() {
+
+				@Override
+				public IStatus validate(Object value) {
+					return Status.OK_STATUS;
+				}
+			};
 		}
 
 		return findValidator(fromType, toType);
@@ -462,7 +486,11 @@ public class UpdateValueStrategy extends UpdateStrategy {
 		try {
 			observableValue.setValue(value);
 		} catch (Exception ex) {
-			return logErrorWhileSettingValue(ex);
+			return ValidationStatus
+					.error(
+							BindingMessages
+									.getString(BindingMessages.VALUEBINDING_ERROR_WHILE_SETTING_VALUE),
+							ex);
 		}
 		return Status.OK_STATUS;
 	}
@@ -540,21 +568,20 @@ public class UpdateValueStrategy extends UpdateStrategy {
 			if (result != null)
 				return result;
 			if (fromClass != null && toClass != null && fromClass == toClass) {
-				return value -> Status.OK_STATUS;
+				return new IValidator() {
+					@Override
+					public IStatus validate(Object value) {
+						return Status.OK_STATUS;
+					}
+				};
 			}
-			return value -> Status.OK_STATUS;
+			return new IValidator() {
+				@Override
+				public IStatus validate(Object value) {
+					return Status.OK_STATUS;
+				}
+			};
 		}
 	}
 
-	/**
-	 * Create an {@link UpdateValueStrategy} with a converter
-	 *
-	 * @param converter
-	 *            the converter
-	 * @return the update value strategy
-	 * @since 1.6
-	 */
-	public static UpdateValueStrategy create(IConverter converter) {
-		return new UpdateValueStrategy().setConverter(converter);
-	}
 }

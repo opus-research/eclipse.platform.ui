@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -47,15 +47,21 @@ public class WorkbenchBrowserSupport extends AbstractWorkbenchBrowserSupport {
 
 	private IExtensionChangeHandler handler = new IExtensionChangeHandler() {
 
+        /* (non-Javadoc)
+         * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker, org.eclipse.core.runtime.IExtension)
+         */
         @Override
 		public void addExtension(IExtensionTracker tracker,IExtension extension) {
             //Do nothing
         }
 
+        /* (non-Javadoc)
+         * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension, java.lang.Object[])
+         */
         @Override
 		public void removeExtension(IExtension source, Object[] objects) {
-			for (Object object : objects) {
-				if (object == activeSupport) {
+			for (int i = 0; i < objects.length; i++) {
+				if (objects[i] == activeSupport) {
 					dispose();
 					// remove ourselves - we'll be added again in initalize if
 					// needed
@@ -84,6 +90,9 @@ public class WorkbenchBrowserSupport extends AbstractWorkbenchBrowserSupport {
 		return instance;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#createBrowser(int, java.lang.String, java.lang.String, java.lang.String)
+	 */
 	@Override
 	public IWebBrowser createBrowser(int style, String browserId, String name,
 			String tooltip) throws PartInitException {
@@ -91,11 +100,17 @@ public class WorkbenchBrowserSupport extends AbstractWorkbenchBrowserSupport {
 				.createBrowser(style, browserId, name, tooltip);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#createBrowser(java.lang.String)
+	 */
 	@Override
 	public IWebBrowser createBrowser(String browserId) throws PartInitException {
 		return getActiveSupport().createBrowser(browserId);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#isInternalWebBrowserAvailable()
+	 */
 	@Override
 	public boolean isInternalWebBrowserAvailable() {
 		return getActiveSupport().isInternalWebBrowserAvailable();
@@ -123,6 +138,11 @@ public class WorkbenchBrowserSupport extends AbstractWorkbenchBrowserSupport {
 
 	private void loadActiveSupport() {
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see java.lang.Runnable#run()
+			 */
 			@Override
 			public void run() {
                 IConfigurationElement[] elements = Platform
@@ -150,9 +170,9 @@ public class WorkbenchBrowserSupport extends AbstractWorkbenchBrowserSupport {
              * @return the element or <code>null</code>
              */
             private IConfigurationElement findDesiredElement(IConfigurationElement [] elements) {
-                for (IConfigurationElement element : elements) {
-                    if (desiredBrowserSupportId.equals(element.getDeclaringExtension().getUniqueIdentifier())) {
-						return element;
+                for (int i = 0; i < elements.length; i++) {
+                    if (desiredBrowserSupportId.equals(elements[i].getDeclaringExtension().getUniqueIdentifier())) {
+						return elements[i];
 					}
                 }
                 return null;
@@ -173,7 +193,8 @@ public class WorkbenchBrowserSupport extends AbstractWorkbenchBrowserSupport {
 				// find the first default element and
 				// the first non-default element. If non-default
 				// is found, pick it. Otherwise, use default.
-				for (IConfigurationElement element : elements) {
+				for (int i = 0; i < elements.length; i++) {
+					IConfigurationElement element = elements[i];
 					if (element.getName().equals(IWorkbenchRegistryConstants.TAG_SUPPORT)) {
 						String def = element.getAttribute(IWorkbenchRegistryConstants.ATT_DEFAULT);
 						if (def != null && Boolean.valueOf(def).booleanValue()) {

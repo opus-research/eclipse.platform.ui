@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import org.eclipse.jface.preference.IPreferenceNode;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -114,8 +115,9 @@ public class PreferencePatternFilter extends PatternFilter {
 		}
 
 		// Also need to check the keywords
-		for (String keyword : getKeywords(node)) {
-			if (wordMatches(keyword)) {
+		String[] keywords = getKeywords(node);
+		for (int i = 0; i < keywords.length; i++){
+			if (wordMatches(keywords[i])) {
 				return true;
 			}
 		}

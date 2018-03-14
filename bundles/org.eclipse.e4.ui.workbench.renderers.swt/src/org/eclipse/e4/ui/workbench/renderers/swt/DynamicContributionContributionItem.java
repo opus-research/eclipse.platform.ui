@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 MEDEVIT, FHV and others.
+ * Copyright (c) 2013 MEDEVIT, FHV and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,12 @@ import org.eclipse.jface.action.IMenuManager;
 class DynamicContributionContributionItem extends ContributionItem {
 	private MDynamicMenuContribution model;
 
-	private IMenuListener menuListener = manager -> manager.markDirty();
+	private IMenuListener menuListener = new IMenuListener() {
+		@Override
+		public void menuAboutToShow(IMenuManager manager) {
+			manager.markDirty();
+		}
+	};
 
 	/**
 	 * Create the item and associated model;

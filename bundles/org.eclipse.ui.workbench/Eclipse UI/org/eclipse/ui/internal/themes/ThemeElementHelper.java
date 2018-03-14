@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -64,13 +64,14 @@ public final class ThemeElementHelper {
         Arrays.sort(copyOfDefinitions, new IThemeRegistry.HierarchyComparator(
                 definitions));
 
-        for (FontDefinition definition : copyOfDefinitions) {
+        for (int i = 0; i < copyOfDefinitions.length; i++) {
+            FontDefinition definition = copyOfDefinitions[i];
             installFont(definition, theme, store, true);
         }
 
         if (defaults != null) {
-            for (FontDefinition fontDef : defaults) {
-                installFont(fontDef, theme, store, false);
+            for (int i = 0; i < defaults.length; i++) {
+                installFont(defaults[i], theme, store, false);
             }
         }
     }
@@ -123,13 +124,16 @@ public final class ThemeElementHelper {
 
 			//If in high contrast, ignore the defaults in jface and use the default (system) font.
 			//This is a hack to address bug #205474. See bug #228207 for a future fix.
-			FontData[] fontData = JFaceResources.getFontRegistry()
-					.getFontData(display.getHighContrast() ? JFaceResources.DEFAULT_FONT : id);
+			FontData[] fontData = JFaceResources.getFontRegistry().getFontData(
+				display.getHighContrast()
+					? JFaceResources.DEFAULT_FONT
+					: id
+			);
 			defaultFont = registry.bestDataArray(fontData, display);
         }
 
         if (setInRegistry) {
-			if (prefFont == null || prefFont == PreferenceConverter.getFontDataArrayDefaultDefault()) {
+			if (prefFont == null || prefFont == PreferenceConverter.FONTDATA_ARRAY_DEFAULT_DEFAULT) {
 				if (definition.getValue() != null) {
 					prefFont = definition.getValue();
 				} else if (definition.getDefaultsTo() != null) {
@@ -139,9 +143,6 @@ public final class ThemeElementHelper {
 					prefFont = defaultFont;
 				}
             }
-			if (!definition.isEditable()) {
-				prefFont = defaultFont;
-			}
 
             if (prefFont != null) {
                 registry.put(id, prefFont);
@@ -187,13 +188,14 @@ public final class ThemeElementHelper {
         Arrays.sort(copyOfDefinitions, new IThemeRegistry.HierarchyComparator(
                 definitions));
 
-        for (ColorDefinition definition : copyOfDefinitions) {
+        for (int i = 0; i < copyOfDefinitions.length; i++) {
+            ColorDefinition definition = copyOfDefinitions[i];
             installColor(definition, theme, store, true);
         }
 
         if (defaults != null) {
-			for (ColorDefinition colorDef : defaults) {
-				installColor(colorDef, theme, store, false);
+            for (int i = 0; i < defaults.length; i++) {
+                installColor(defaults[i], theme, store, false);
             }
         }
     }
@@ -262,7 +264,8 @@ public final class ThemeElementHelper {
 		System.arraycopy(allDefs, 0, copy, 0, allDefs.length);
 
         Arrays.sort(allDefs, new IThemeRegistry.HierarchyComparator(copy));
-        for (IHierarchalThemeElementDefinition def : allDefs) {
+        for (int i = 0; i < allDefs.length; i++) {
+            IHierarchalThemeElementDefinition def = allDefs[i];
             if (def.getDefaultsTo() != null) {
                 if (set.contains(def.getDefaultsTo())) {
 					set.add(def);
@@ -320,12 +323,10 @@ public final class ThemeElementHelper {
 				prefColor = definition.getValue();
 			} else if (definition.getDefaultsTo() != null) {
 				prefColor = registry.getRGB(definition.getDefaultsTo());
+			} else {
+				prefColor = defaultColor;
 			}
-		}
-
-		if (prefColor == null || !definition.isEditable()) {
-			prefColor = defaultColor;
-		}
+        }
 
         if (setInRegistry) {
         	registry.put(id, prefColor);
@@ -364,7 +365,8 @@ public final class ThemeElementHelper {
     public static String[] splitPropertyName(Theme theme, String property) {
     	IThemeDescriptor[] descriptors = WorkbenchPlugin.getDefault()
 				.getThemeRegistry().getThemes();
-		for (IThemeDescriptor themeDescriptor : descriptors) {
+		for (int i = 0; i < descriptors.length; i++) {
+			IThemeDescriptor themeDescriptor = descriptors[i];
 			String id = themeDescriptor.getId();
 			if (property.startsWith(id + '.')) { // the property starts with
 													// a known theme ID -

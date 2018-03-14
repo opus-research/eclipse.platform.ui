@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -271,7 +271,9 @@ public abstract class PreferencePersistence extends RegistryPersistence {
 		}
 
 		final Collection parameters = new ArrayList();
-		for (final IMemento parameterMemento : parameterMementos) {
+		for (int i = 0; i < parameterMementos.length; i++) {
+			final IMemento parameterMemento = parameterMementos[i];
+
 			// Read out the id.
 			final String id = parameterMemento.getString(ATT_ID);
 			if ((id == null) || (id.length() == 0)) {
@@ -285,7 +287,8 @@ public abstract class PreferencePersistence extends RegistryPersistence {
 			try {
 				final IParameter[] commandParameters = command.getParameters();
 				if (parameters != null) {
-					for (final IParameter currentParameter : commandParameters) {
+					for (int j = 0; j < commandParameters.length; j++) {
+						final IParameter currentParameter = commandParameters[j];
 						if (Util.equals(currentParameter.getId(), id)) {
 							parameter = currentParameter;
 							break;
@@ -429,9 +432,12 @@ public abstract class PreferencePersistence extends RegistryPersistence {
 	protected PreferencePersistence() {
 		super();
 
-		preferenceChangeListener = event -> {
-			if (isChangeImportant(event)) {
-				read();
+		preferenceChangeListener = new IPropertyChangeListener() {
+			@Override
+			public final void propertyChange(final PropertyChangeEvent event) {
+				if (isChangeImportant(event)) {
+					read();
+				}
 			}
 		};
 	}

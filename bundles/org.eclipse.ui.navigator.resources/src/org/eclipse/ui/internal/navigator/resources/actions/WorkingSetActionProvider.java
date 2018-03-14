@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2016 IBM Corporation and others.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     anton.leherbauer@windriver.com - bug 212389 [CommonNavigator] working set issues:
  *         missing project, window working set inconsistency
- *     Mickael Istria (Red Hat Inc.) - [266030] Allow "others" working set
  *******************************************************************************/
 
 package org.eclipse.ui.internal.navigator.resources.actions;
@@ -185,8 +184,8 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 		@Override
 		public void onExtensionActivation(String aViewerId, String[] theNavigatorExtensionIds, boolean isActive) {
 
-			for (String theNavigatorExtensionId : theNavigatorExtensionIds) {
-				if (WorkingSetsContentProvider.EXTENSION_ID.equals(theNavigatorExtensionId)) {
+			for (int i = 0; i < theNavigatorExtensionIds.length; i++) {
+				if (WorkingSetsContentProvider.EXTENSION_ID.equals(theNavigatorExtensionIds[i])) {
 					if (isActive) {
 						extensionStateModel = contentService.findStateModel(WorkingSetsContentProvider.EXTENSION_ID);
 						workingSetRootModeActionGroup.setStateModel(extensionStateModel);
@@ -268,9 +267,9 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 	private void setWorkingSetFilter(IWorkingSet workingSet, boolean firstTime) {
 		ResourceWorkingSetFilter workingSetFilter = null;
 		ViewerFilter[] filters = viewer.getFilters();
-		for (ViewerFilter filter : filters) {
-			if (filter instanceof ResourceWorkingSetFilter) {
-				workingSetFilter = (ResourceWorkingSetFilter) filter;
+		for (int i = 0; i < filters.length; i++) {
+			if (filters[i] instanceof ResourceWorkingSetFilter) {
+				workingSetFilter = (ResourceWorkingSetFilter) filters[i];
 				break;
 			}
 		}
@@ -286,12 +285,7 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 				new Status(IStatus.ERROR, WorkbenchNavigatorPlugin.PLUGIN_ID, ""));  //$NON-NLS-1$
 			return;
 		}
-		if (extensionStateModel.getBooleanProperty(WorkingSetsContentProvider.SHOW_TOP_LEVEL_WORKING_SETS)) {
-			// a filter would hide the "Others" working set content
-			workingSetFilter.setWorkingSet(null);
-		} else {
-			workingSetFilter.setWorkingSet(emptyWorkingSet ? null : workingSet);
-		}
+		workingSetFilter.setWorkingSet(emptyWorkingSet ? null : workingSet);
 	}
 
 	/**

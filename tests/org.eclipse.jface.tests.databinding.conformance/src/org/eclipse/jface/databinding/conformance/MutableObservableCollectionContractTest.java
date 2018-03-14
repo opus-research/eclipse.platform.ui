@@ -289,7 +289,6 @@ public class MutableObservableCollectionContractTest extends
 		collection.add(element);
 
 		assertDoesNotContainDuringChangeEvent(new Runnable() {
-			@Override
 			public void run() {
 				collection.clear();
 			}
@@ -341,7 +340,7 @@ public class MutableObservableCollectionContractTest extends
 		listener.contains = true;
 		collection.remove(elementNotContained);
 		assertFalse(
-				formatFail(new StringBuilder("When ")
+				formatFail(new StringBuffer("When ")
 						.append(methodName)
 						.append(" fires a change event the element should have been removed from the Collection.")
 						.toString()), listener.contains);
@@ -368,7 +367,7 @@ public class MutableObservableCollectionContractTest extends
 		runnable.run();
 
 		assertTrue(
-				formatFail(new StringBuilder("When ")
+				formatFail(new StringBuffer("When ")
 						.append(methodName)
 						.append(" fires a change event the element should have been added to the Collection.")
 						.toString()), listener.contains);
@@ -391,7 +390,6 @@ public class MutableObservableCollectionContractTest extends
 			return this;
 		}
 
-		@Override
 		public void handleChange(ChangeEvent event) {
 			contains = collection.contains(element);
 		}

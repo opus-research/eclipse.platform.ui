@@ -35,6 +35,10 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MenuDetectEvent;
+import org.eclipse.swt.events.MenuDetectListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Rectangle;
@@ -60,35 +64,29 @@ public class FieldAssistTestDialog extends StatusDialog {
 	class SpinnerContentAdapter implements IControlContentAdapter {
 		// We are only implementing this for our internal use, not for
 		// content assist, so many of the methods are ignored.
-		@Override
 		public String getControlContents(Control control) {
-			return Integer.valueOf(((Spinner) control).getSelection()).toString();
+			return new Integer(((Spinner) control).getSelection()).toString();
 		}
 
-		@Override
 		public void setControlContents(Control control, String text,
 				int cursorPosition) {
 			// ignore
 		}
 
-		@Override
 		public void insertControlContents(Control control, String text,
 				int cursorPosition) {
 			// ignore
 		}
 
-		@Override
 		public int getCursorPosition(Control control) {
 			// ignore
 			return 0;
 		}
 
-		@Override
 		public Rectangle getInsertionBounds(Control control) {
 			return control.getBounds();
 		}
 
-		@Override
 		public void setCursorPosition(Control control, int index) {
 			// ignore
 		}
@@ -199,7 +197,6 @@ public class FieldAssistTestDialog extends StatusDialog {
 			super(dec, control, adapter);
 		}
 
-		@Override
 		boolean isValid() {
 			String contents = getContents();
 			for (int i = 0; i < contents.length(); i++) {
@@ -210,36 +207,30 @@ public class FieldAssistTestDialog extends StatusDialog {
 			return true;
 		}
 
-		@Override
 		String getErrorMessage() {
 			return TaskAssistExampleMessages.ExampleDialog_UserError;
 		}
 
-		@Override
 		boolean isWarning() {
 			return getContents().equals(
 					TaskAssistExampleMessages.ExampleDialog_WarningName);
 		}
 
-		@Override
 		String getWarningMessage() {
 			return TaskAssistExampleMessages.ExampleDialog_UserWarning;
 		}
 
-		@Override
 		boolean hasContentAssist() {
 			return true;
 		}
 
-		@Override
 		boolean hasQuickFix() {
 			return true;
 		}
 
-		@Override
 		void quickFix() {
 			String contents = getContents();
-			StringBuilder lettersOnly = new StringBuilder();
+			StringBuffer lettersOnly = new StringBuffer();
 			int length = contents.length();
 			for (int i = 0; i < length;) {
 				char ch = contents.charAt(i++);
@@ -250,7 +241,6 @@ public class FieldAssistTestDialog extends StatusDialog {
 			setContents(lettersOnly.toString());
 		}
 
-		@Override
 		void dispose() {
 			if (quickFixMenu != null) {
 				quickFixMenu.dispose();
@@ -266,19 +256,16 @@ public class FieldAssistTestDialog extends StatusDialog {
 			super(dec, control, adapter);
 		}
 
-		@Override
 		boolean isValid() {
 			// We seed the spinner with valid values always.
 			return true;
 		}
 
-		@Override
 		boolean isWarning() {
 			Spinner spinner = (Spinner) control;
 			return spinner.getSelection() > 65;
 		}
 
-		@Override
 		String getWarningMessage() {
 			return TaskAssistExampleMessages.ExampleDialog_AgeWarning;
 		}
@@ -302,7 +289,7 @@ public class FieldAssistTestDialog extends StatusDialog {
 
 	/**
 	 * Open the example dialog.
-	 *
+	 * 
 	 * @param parent
 	 *            the parent shell
 	 * @param username
@@ -315,7 +302,6 @@ public class FieldAssistTestDialog extends StatusDialog {
 		getPreferenceValues();
 	}
 
-	@Override
 	protected Control createDialogArea(Composite parent) {
 
 		Composite outer = (Composite) super.createDialogArea(parent);
@@ -429,7 +415,8 @@ public class FieldAssistTestDialog extends StatusDialog {
 	}
 
 	GridData getFieldGridData() {
-		int margin = FieldDecorationRegistry.getDefault().getMaximumDecorationWidth();
+		int margin = FieldDecorationRegistry.getDefault()
+				.getMaximumDecorationWidth();
 		GridData data = new GridData();
 		data.horizontalAlignment = SWT.FILL;
 		data.widthHint = IDialogConstants.ENTRY_FIELD_WIDTH + margin;
@@ -438,7 +425,7 @@ public class FieldAssistTestDialog extends StatusDialog {
 		return data;
 
 	}
-
+	
 	GridData getMultiLineTextFieldGridData() {
 		int margin = FieldDecorationRegistry.getDefault()
 				.getMaximumDecorationWidth();
@@ -523,36 +510,36 @@ public class FieldAssistTestDialog extends StatusDialog {
 	}
 
 	private IContentProposalProvider getContentProposalProvider() {
-		return (contents, position) -> {
-			IContentProposal[] proposals = new IContentProposal[validUsers.length];
-			for (int i = 0; i < validUsers.length; i++) {
-				final String user = validUsers[i];
-				proposals[i] = new IContentProposal() {
-					@Override
-					public String getContent() {
-						return user;
-					}
-
-					@Override
-					public String getLabel() {
-						return user;
-					}
-
-					@Override
-					public String getDescription() {
-						if (showSecondaryPopup && !user.equals("tori")) {
-							return MessageFormat.format(TaskAssistExampleMessages.ExampleDialog_ProposalDescription, user);
+		return new IContentProposalProvider() {
+			public IContentProposal[] getProposals(String contents, int position) {
+				IContentProposal[] proposals = new IContentProposal[validUsers.length];
+				for (int i = 0; i < validUsers.length; i++) {
+					final String user = validUsers[i];
+					proposals[i] = new IContentProposal() {
+						public String getContent() {
+							return user;
 						}
-						return null;
-					}
 
-					@Override
-					public int getCursorPosition() {
-						return user.length();
-					}
-				};
+						public String getLabel() {
+							return user;
+						}
+
+						public String getDescription() {
+							if (showSecondaryPopup && !user.equals("tori"))  //$NON-NLS-1$
+								return MessageFormat
+										.format(
+												TaskAssistExampleMessages.ExampleDialog_ProposalDescription,
+												new String[] { user });
+							return null;
+						}
+
+						public int getCursorPosition() {
+							return user.length();
+						}
+					};
+				}
+				return proposals;
 			}
-			return proposals;
 		};
 	}
 
@@ -562,13 +549,11 @@ public class FieldAssistTestDialog extends StatusDialog {
 		String acceptanceStyle = store
 				.getString(PreferenceConstants.PREF_CONTENTASSISTRESULT);
 		if (acceptanceStyle
-				.equals(PreferenceConstants.PREF_CONTENTASSISTRESULT_INSERT)) {
+				.equals(PreferenceConstants.PREF_CONTENTASSISTRESULT_INSERT))
 			return ContentProposalAdapter.PROPOSAL_INSERT;
-		}
 		if (acceptanceStyle
-				.equals(PreferenceConstants.PREF_CONTENTASSISTRESULT_REPLACE)) {
+				.equals(PreferenceConstants.PREF_CONTENTASSISTRESULT_REPLACE))
 			return ContentProposalAdapter.PROPOSAL_REPLACE;
-		}
 		return ContentProposalAdapter.PROPOSAL_IGNORE;
 	}
 
@@ -578,13 +563,11 @@ public class FieldAssistTestDialog extends StatusDialog {
 		String acceptanceStyle = store
 				.getString(PreferenceConstants.PREF_CONTENTASSISTFILTER);
 		if (acceptanceStyle
-				.equals(PreferenceConstants.PREF_CONTENTASSISTFILTER_CHAR)) {
+				.equals(PreferenceConstants.PREF_CONTENTASSISTFILTER_CHAR))
 			return ContentProposalAdapter.FILTER_CHARACTER;
-		}
 		if (acceptanceStyle
-				.equals(PreferenceConstants.PREF_CONTENTASSISTFILTER_CUMULATIVE)) {
+				.equals(PreferenceConstants.PREF_CONTENTASSISTFILTER_CUMULATIVE))
 			return ContentProposalAdapter.FILTER_CUMULATIVE;
-		}
 		return ContentProposalAdapter.FILTER_NONE;
 	}
 
@@ -601,7 +584,8 @@ public class FieldAssistTestDialog extends StatusDialog {
 	}
 
 	int getDecorationLocationBits() {
-		IPreferenceStore store = FieldAssistPlugin.getDefault().getPreferenceStore();
+		IPreferenceStore store = FieldAssistPlugin.getDefault()
+				.getPreferenceStore();
 		int bits = 0;
 		String vert = store
 				.getString(PreferenceConstants.PREF_DECORATOR_VERTICALLOCATION);
@@ -644,10 +628,10 @@ public class FieldAssistTestDialog extends StatusDialog {
 
 		// Create a field representing a user name
 		Text text = new Text(main, SWT.BORDER);
-		ControlDecoration dec = new ControlDecoration(text, getDecorationLocationBits());
+		ControlDecoration dec = new ControlDecoration(text,
+				getDecorationLocationBits());
 		dec.setMarginWidth(marginWidth);
 		dec.addSelectionListener(new SelectionListener() {
-			@Override
 			public void widgetSelected(SelectionEvent event) {
 				MessageDialog
 						.openInformation(
@@ -656,28 +640,33 @@ public class FieldAssistTestDialog extends StatusDialog {
 								TaskAssistExampleMessages.ExampleDialog_SelectionMessage);
 			}
 
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				// Nothing on default select
 			}
 		});
 
 		textField = new UserField(dec, text, new TextContentAdapter());
-		dec.addMenuDetectListener(event -> {
-			// no quick fix if we aren't in error state.
-			if (textField.isValid()) {
-				return;
+		dec.addMenuDetectListener(new MenuDetectListener() {
+			public void menuDetected(MenuDetectEvent event) {
+				// no quick fix if we aren't in error state.
+				if (textField.isValid()) {
+					return;
+				}
+				if (textField.quickFixMenu == null) {
+					textField.quickFixMenu = createQuickFixMenu(textField);
+				}
+				textField.quickFixMenu.setLocation(event.x, event.y);
+				textField.quickFixMenu.setVisible(true);
 			}
-			if (textField.quickFixMenu == null) {
-				textField.quickFixMenu = createQuickFixMenu(textField);
-			}
-			textField.quickFixMenu.setLocation(event.x, event.y);
-			textField.quickFixMenu.setVisible(true);
 		});
 		if (showRequiredFieldLabelIndicator && textField.isRequiredField()) {
 			addRequiredFieldIndicator(label);
 		}
-		text.addModifyListener(event -> handleModify(textField));
+		text.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent event) {
+				handleModify(textField);
+			}
+		});
 
 		text.setText(username);
 		installContentProposalAdapter(text, new TextContentAdapter());
@@ -692,19 +681,20 @@ public class FieldAssistTestDialog extends StatusDialog {
 		dec.setMarginWidth(marginWidth);
 		comboField = new UserField(dec, combo, new ComboContentAdapter());
 
-		dec.addMenuDetectListener(event -> {
-			// no quick fix if we aren't in error state.
-			if (comboField.isValid()) {
-				return;
+		dec.addMenuDetectListener(new MenuDetectListener() {
+			public void menuDetected(MenuDetectEvent event) {
+				// no quick fix if we aren't in error state.
+				if (comboField.isValid()) {
+					return;
+				}
+				if (comboField.quickFixMenu == null) {
+					comboField.quickFixMenu = createQuickFixMenu(comboField);
+				}
+				comboField.quickFixMenu.setLocation(event.x, event.y);
+				comboField.quickFixMenu.setVisible(true);
 			}
-			if (comboField.quickFixMenu == null) {
-				comboField.quickFixMenu = createQuickFixMenu(comboField);
-			}
-			comboField.quickFixMenu.setLocation(event.x, event.y);
-			comboField.quickFixMenu.setVisible(true);
 		});
 		dec.addSelectionListener(new SelectionListener() {
-			@Override
 			public void widgetDefaultSelected(SelectionEvent event) {
 				MessageDialog
 						.openInformation(
@@ -713,7 +703,6 @@ public class FieldAssistTestDialog extends StatusDialog {
 								TaskAssistExampleMessages.ExampleDialog_DefaultSelectionMessage);
 			}
 
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				// Do nothing on selection
 			}
@@ -722,7 +711,11 @@ public class FieldAssistTestDialog extends StatusDialog {
 		if (showRequiredFieldLabelIndicator) {
 			addRequiredFieldIndicator(label);
 		}
-		combo.addModifyListener(event -> handleModify(comboField));
+		combo.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent event) {
+				handleModify(comboField);
+			}
+		});
 
 		combo.setText(username);
 		combo.setItems(validUsers);
@@ -742,7 +735,11 @@ public class FieldAssistTestDialog extends StatusDialog {
 		}
 		final SmartField spinnerField = new AgeField(dec, spinner,
 				new SpinnerContentAdapter());
-		spinner.addModifyListener(event -> handleModify(spinnerField));
+		spinner.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent event) {
+				handleModify(spinnerField);
+			}
+		});
 		spinner.setSelection(40);
 		spinner.setLayoutData(getFieldGridData());
 
@@ -755,12 +752,12 @@ public class FieldAssistTestDialog extends StatusDialog {
 		if (showRequiredFieldLabelIndicator) {
 			addRequiredFieldIndicator(label);
 		}
-
+		
 		// This tests multi-line text popup placement
 		label = new Label(main, SWT.LEFT);
 		label.setText(TaskAssistExampleMessages.FieldAssistTestDialog_Comments);
 		text = new Text(main, SWT.BORDER | SWT.MULTI | SWT.WRAP);
-		text.setText(TaskAssistExampleMessages.FieldAssistTestDialog_CommentsDefaultContent);
+		text.setText(TaskAssistExampleMessages.FieldAssistTestDialog_CommentsDefaultContent); 
 		text.setLayoutData(getMultiLineTextFieldGridData());
 		if (showRequiredFieldLabelIndicator) {
 			addRequiredFieldIndicator(label);
@@ -772,14 +769,13 @@ public class FieldAssistTestDialog extends StatusDialog {
 	Menu createQuickFixMenu(final SmartField field) {
 		Menu newMenu = new Menu(field.control);
 		MenuItem item = new MenuItem(newMenu, SWT.PUSH);
-		item.setText(TaskAssistExampleMessages.ExampleDialog_DecorationMenuItem);
+		item
+				.setText(TaskAssistExampleMessages.ExampleDialog_DecorationMenuItem);
 		item.addSelectionListener(new SelectionListener() {
-			@Override
 			public void widgetSelected(SelectionEvent event) {
 				field.quickFix();
 			}
 
-			@Override
 			public void widgetDefaultSelected(SelectionEvent event) {
 
 			}
@@ -839,14 +835,16 @@ public class FieldAssistTestDialog extends StatusDialog {
 		}
 	}
 
-	@Override
 	public boolean close() {
 		textField.dispose();
 		comboField.dispose();
 		return super.close();
 	}
-
-	@Override
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.Dialog#isResizable()
+	 */
 	protected boolean isResizable() {
 		return true;
 	}

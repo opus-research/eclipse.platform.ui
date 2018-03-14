@@ -18,8 +18,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -40,14 +38,12 @@ import org.eclipse.e4.ui.bindings.EBindingService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
-import org.eclipse.e4.ui.model.application.commands.MParameter;
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MHandledItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
@@ -57,6 +53,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenuItem;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.e4.ui.workbench.renderers.swt.HandledMenuItemRenderer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -196,7 +193,6 @@ public class CocoaUIHandler {
 
 		final Display display = Display.getDefault();
 		display.syncExec(new Runnable() {
-			@Override
 			public void run() {
 				allocateDelegate(display);
 
@@ -237,7 +233,6 @@ public class CocoaUIHandler {
 			invokeMethod(OS.class, "object_setInstanceVariable", //$NON-NLS-1$
 					new Object[] { idValue, SWT_OBJECT, wrapPointer(delegateJniRef) });
 			display.disposeExec(new Runnable() {
-				@Override
 				public void run() {
 					// TODO Auto-generated method stub
 					if (delegateJniRef != 0) {
@@ -501,7 +496,6 @@ public class CocoaUIHandler {
 			MenuItem item = findMenuItemById(topLevelMenu, menuItemId);
 			if (item != null) {
 				item.addSelectionListener(new SelectionAdapter() {
-					@Override
 					public void widgetSelected(SelectionEvent e) {
 						if (runCommand(commandId) || runAction(commandId)) {
 							e.doit = false;
@@ -605,7 +599,7 @@ public class CocoaUIHandler {
 			EHandlerService service = (EHandlerService) lclContext.get(EHandlerService.class.getName());
 			ParameterizedCommand cmd = hmi.getWbCommand();
 			if (cmd == null) {
-				cmd = generateParameterizedCommand(hmi);
+				cmd = HandledMenuItemRenderer.generateParameterizedCommand(hmi, lclContext);
 			}
 			lclContext.set(MItem.class.getName(), item);
 			service.executeHandler(cmd);
@@ -769,7 +763,7 @@ public class CocoaUIHandler {
 			method = clazz.getMethod("object_getInstanceVariable", new Class[] { //$NON-NLS-1$
 					int.class, byte[].class, int[].class });
 			int[] resultPtr = new int[1];
-			method.invoke(null, new Object[] { Integer.valueOf((int) delegateId), name, resultPtr });
+			method.invoke(null, new Object[] { new Integer((int) delegateId), name, resultPtr });
 			return new long[] { resultPtr[0] };
 		}
 	}
@@ -817,20 +811,6 @@ public class CocoaUIHandler {
 		if (PTR_CLASS == long.class)
 			return new Long(value);
 		else
-			return Integer.valueOf((int) value);
-	}
-
-	private ParameterizedCommand generateParameterizedCommand(final MHandledItem item) {
-		Map<String, Object> parameters = null;
-		List<MParameter> modelParms = item.getParameters();
-		if (modelParms != null && !modelParms.isEmpty()) {
-			parameters = new HashMap<String, Object>();
-			for (MParameter mParm : modelParms) {
-				parameters.put(mParm.getName(), mParm.getValue());
-			}
-		}
-		ParameterizedCommand cmd = commandService.createCommand(item.getCommand().getElementId(), parameters);
-		item.setWbCommand(cmd);
-		return cmd;
+			return new Integer((int) value);
 	}
 }

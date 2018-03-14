@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2016 IBM Corporation and others.
+ * Copyright (c) 2004, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,20 +7,17 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 package org.eclipse.ui.tests.browser.internal;
 
 import java.text.MessageFormat;
 import java.util.Iterator;
 
+import junit.framework.Assert;
+import junit.framework.TestCase;
+
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.preference.IPreferenceNode;
-import org.eclipse.jface.preference.PreferenceDialog;
-import org.eclipse.jface.preference.PreferenceManager;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.StructuredSelection;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
@@ -28,6 +25,14 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.preference.IPreferenceNode;
+import org.eclipse.jface.preference.PreferenceDialog;
+import org.eclipse.jface.preference.PreferenceManager;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
+
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.dialogs.PropertyDialog;
@@ -35,14 +40,11 @@ import org.eclipse.ui.internal.dialogs.PropertyPageContributorManager;
 import org.eclipse.ui.internal.dialogs.PropertyPageManager;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
-import junit.framework.Assert;
-
 public class UITestHelper {
 	private static class PreferenceDialogWrapper extends PreferenceDialog {
 		public PreferenceDialogWrapper(Shell parentShell, PreferenceManager manager) {
 			super(parentShell, manager);
 		}
-		@Override
 		protected boolean showPage(IPreferenceNode node) {
 			return super.showPage(node);
 		}
@@ -52,7 +54,6 @@ public class UITestHelper {
 		public PropertyDialogWrapper(Shell parentShell, PreferenceManager manager, ISelection selection) {
 			super(parentShell, manager, selection);
 		}
-		@Override
 		protected boolean showPage(IPreferenceNode node) {
 			return super.showPage(node);
 		}
@@ -93,7 +94,7 @@ public class UITestHelper {
 		// fill the manager with contributions from the matching contributors
 		PropertyPageContributorManager.getManager().contribute(manager, element);
 
-		IWorkbenchAdapter adapter = element.getAdapter(IWorkbenchAdapter.class);
+		IWorkbenchAdapter adapter = (IWorkbenchAdapter)element.getAdapter(IWorkbenchAdapter.class);
 		if (adapter != null) {
 			name = adapter.getLabel(element);
 		}
@@ -103,7 +104,7 @@ public class UITestHelper {
 		if (!pages.hasNext())
 			return null;
 
-		title = MessageFormat.format("PropertyDialog.propertyMessage", name);
+		title = MessageFormat.format("PropertyDialog.propertyMessage", new Object[] {name});
 		dialog = new PropertyDialogWrapper(getShell(), manager, new StructuredSelection(element));
 		dialog.create();
 		dialog.getShell().setText(title);
@@ -181,7 +182,7 @@ public class UITestHelper {
 		}
 
 		String message =
-			new StringBuilder("Warning: ")
+			new StringBuffer("Warning: ")
 				.append(widget)
 				.append("\n\tActual Width -> ")
 				.append(size.x)
@@ -213,7 +214,7 @@ public class UITestHelper {
 				preferred.x /= (size.y / preferred.y);
 			}
 		}
-		String message = new StringBuilder("Warning: ").append(widget)
+		String message = new StringBuffer("Warning: ").append(widget)
 			.append("\n\tActual Width -> ").append(size.x)
 			.append("\n\tRecommended Width -> ").append(preferred.x).toString();
 		if (preferred.x > size.x) {

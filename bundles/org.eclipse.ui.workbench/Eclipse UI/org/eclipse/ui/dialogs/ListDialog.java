@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,10 @@
 package org.eclipse.ui.dialogs;
 
 import java.util.List;
+
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -108,11 +111,14 @@ public class ListDialog extends SelectionDialog {
         fTableViewer.setContentProvider(fContentProvider);
         fTableViewer.setLabelProvider(fLabelProvider);
         fTableViewer.setInput(fInput);
-        fTableViewer.addDoubleClickListener(event -> {
-		    if (fAddCancelButton) {
-				okPressed();
-			}
-		});
+        fTableViewer.addDoubleClickListener(new IDoubleClickListener() {
+            @Override
+			public void doubleClick(DoubleClickEvent event) {
+                if (fAddCancelButton) {
+					okPressed();
+				}
+            }
+        });
         List initialSelection = getInitialElementSelections();
         if (initialSelection != null) {
 			fTableViewer
@@ -141,7 +147,8 @@ public class ListDialog extends SelectionDialog {
     @Override
 	protected void okPressed() {
         // Build a list of selected children.
-		IStructuredSelection selection = fTableViewer.getStructuredSelection();
+        IStructuredSelection selection = (IStructuredSelection) fTableViewer
+                .getSelection();
         setResult(selection.toList());
         super.okPressed();
     }

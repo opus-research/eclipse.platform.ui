@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 Angelo Zerr and others.
+ * Copyright (c) 2008, 2013 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,14 +14,12 @@ package org.eclipse.e4.ui.css.swt.engine;
 import org.eclipse.core.runtime.RegistryFactory;
 import org.eclipse.e4.ui.css.core.impl.engine.RegistryCSSElementProvider;
 import org.eclipse.e4.ui.css.core.impl.engine.RegistryCSSPropertyHandlerProvider;
-import org.eclipse.e4.ui.internal.css.swt.CSSActivator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
-import org.osgi.service.log.LogService;
 
 /**
  * CSS SWT Engine implementation which configure CSSEngineImpl to apply styles
@@ -79,7 +77,8 @@ public class CSSSWTEngineImpl extends AbstractCSSSWTEngineImpl {
 				s.reskin(SWT.ALL);
 				applyStyles(s, true);
 			} catch (Exception e) {
-				CSSActivator.getDefault().log(LogService.LOG_ERROR, e.getMessage(), e);
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			} finally {
 				s.setRedraw(true);
 			}

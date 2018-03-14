@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,8 +48,8 @@ public class PreferenceContentProvider implements ITreeContentProvider {
 
         IPreferenceNode[] children = parent.getSubNodes();
 
-        for (IPreferenceNode element : children) {
-            found = findParent(element, target);
+        for (int i = 0; i < children.length; i++) {
+            found = findParent(children[i], target);
             if (found != null) {
 				return found;
 			}

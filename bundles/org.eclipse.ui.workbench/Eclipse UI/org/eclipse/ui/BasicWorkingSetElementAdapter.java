@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -89,8 +89,8 @@ public final class BasicWorkingSetElementAdapter implements
 	@Override
 	public IAdaptable[] adaptElements(IWorkingSet ws, IAdaptable[] elements) {
 		List adaptedElements = new ArrayList();
-		for (IAdaptable element : elements) {
-			IAdaptable adaptable = adapt(element);
+		for (int i = 0; i < elements.length; i++) {
+			IAdaptable adaptable = adapt(elements[i]);
 			if (adaptable != null)
 				adaptedElements.add(adaptable);
 		}
@@ -109,8 +109,8 @@ public final class BasicWorkingSetElementAdapter implements
 	 *         adaptable, or <code>null</code>.
 	 */
 	private IAdaptable adapt(IAdaptable adaptable) {
-		for (Type preferredType : preferredTypes) {
-			IAdaptable adaptedAdaptable = adapt(preferredType, adaptable);
+		for (int i = 0; i < preferredTypes.length; i++) {
+			IAdaptable adaptedAdaptable = adapt(preferredTypes[i], adaptable);
 			if (adaptedAdaptable != null)
 				return adaptedAdaptable;
 		}
@@ -131,7 +131,8 @@ public final class BasicWorkingSetElementAdapter implements
 		IAdapterManager adapterManager = Platform.getAdapterManager();
 		Class[] directClasses = adapterManager.computeClassOrder(adaptable
 				.getClass());
-		for (Class clazz : directClasses) {
+		for (int i = 0; i < directClasses.length; i++) {
+			Class clazz = directClasses[i];
 			if (clazz.getName().equals(type.className))
 				return adaptable;
 		}

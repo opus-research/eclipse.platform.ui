@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,13 +10,13 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.actions;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -60,6 +60,9 @@ public class HelpSearchContributionItem extends ControlContribution {
 		this.window = window;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.ControlContribution#createControl(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	protected Control createControl(Composite parent) {
 		combo = new Combo(parent, SWT.NONE);
@@ -78,15 +81,21 @@ public class HelpSearchContributionItem extends ControlContribution {
 				}
 			}
 		});
-		combo.addSelectionListener(widgetSelectedAdapter(e -> {
-			int index = combo.getSelectionIndex();
-			if (index != -1) {
-				doSearch(combo.getItem(index), false);
+		combo.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				int index = combo.getSelectionIndex();
+				if (index != -1) {
+					doSearch(combo.getItem(index), false);
+				}
 			}
-		}));
+		});
 		return combo;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.ControlContribution#computeWidth(org.eclipse.swt.widgets.Control)
+	 */
 	@Override
 	protected int computeWidth(Control control) {
 		return control.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x;

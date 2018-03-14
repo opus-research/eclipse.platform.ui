@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,12 +19,16 @@ import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -149,11 +153,15 @@ public class OpenWorkspaceAction extends Action implements
 		@Override
 		public Menu getMenu(Control parent) {
 			createDropDownMenuMgr();
-			dropDownMenuMgr.addMenuListener(manager -> {
-				for (IContributionItem contributionItem : getContributionItems()) {
-					manager.add(contributionItem);
+			dropDownMenuMgr.addMenuListener(new IMenuListener() {
+				@Override
+				public void menuAboutToShow(IMenuManager manager) {
+					IContributionItem[] items = getContributionItems();
+					for (int i = 0; i < items.length; i++) {
+						manager.add(items[i]);
+					}
+					manager.add(new OpenDialogAction());
 				}
-				manager.add(new OpenDialogAction());
 			});
 			return dropDownMenuMgr.createContextMenu(parent);
 		}
@@ -162,18 +170,23 @@ public class OpenWorkspaceAction extends Action implements
 		public Menu getMenu(Menu parent) {
 			createDropDownMenuMgr();
 			final Menu menu = new Menu(parent);
-			menu.addListener(SWT.Show, event -> {
-				if (menu.isDisposed()) {
-					return;
+			menu.addListener(SWT.Show, new Listener() {
+				@Override
+				public void handleEvent(Event event) {
+					if (menu.isDisposed()) {
+						return;
+					}
+					MenuItem[] items = menu.getItems();
+					for (int i = 0; i < items.length; i++) {
+						items[i].dispose();
+					}
+					IContributionItem[] contributions = getContributionItems();
+					for (int i = 0; i < contributions.length; i++) {
+						contributions[i].fill(menu, -1);
+					}
+					new ActionContributionItem(new OpenDialogAction()).fill(
+							menu, -1);
 				}
-				for (MenuItem item : menu.getItems()) {
-					item.dispose();
-				}
-				for (IContributionItem contribution : getContributionItems()) {
-					contribution.fill(menu, -1);
-				}
-				new ActionContributionItem(new OpenDialogAction()).fill(
-						menu, -1);
 			});
 			return menu;
 		}
@@ -294,7 +307,7 @@ public class OpenWorkspaceAction extends Action implements
 			return null;
 		}
 
-		StringBuilder result = new StringBuilder(512);
+		StringBuffer result = new StringBuffer(512);
 		result.append(property);
 		result.append(NEW_LINE);
 

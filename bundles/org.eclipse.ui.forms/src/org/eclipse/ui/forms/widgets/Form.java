@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -106,26 +106,28 @@ public class Form extends Composite {
 	private MessageManager messageManager;
 
 	private class FormLayout extends Layout implements ILayoutExtension {
-		@Override
 		public int computeMinimumWidth(Composite composite, boolean flushCache) {
-			initCaches(flushCache);
-			return Math.max(headCache.computeMinimumWidth(), bodyCache.computeMinimumWidth());
+			return computeSize(composite, 5, SWT.DEFAULT, flushCache).x;
 		}
 
-		@Override
 		public int computeMaximumWidth(Composite composite, boolean flushCache) {
 			return computeSize(composite, SWT.DEFAULT, SWT.DEFAULT, flushCache).x;
 		}
 
-		@Override
 		public Point computeSize(Composite composite, int wHint, int hHint,
 				boolean flushCache) {
-			initCaches(flushCache);
+			if (flushCache) {
+				bodyCache.flush();
+				headCache.flush();
+			}
+			bodyCache.setControl(body);
+			headCache.setControl(head);
 
 			int width = 0;
 			int height = 0;
 
-			Point hsize = headCache.computeSize(wHint, SWT.DEFAULT);
+			Point hsize = headCache.computeSize(FormUtil.getWidthHint(wHint,
+					head), SWT.DEFAULT);
 			width = Math.max(hsize.x, width);
 			height = hsize.y;
 
@@ -135,30 +137,26 @@ public class Form extends Composite {
 			if (ignoreBody)
 				bsize = new Point(0,0);
 			else
-				bsize = bodyCache.computeSize(wHint, SWT.DEFAULT);
+				bsize = bodyCache.computeSize(FormUtil.getWidthHint(wHint,
+					body), SWT.DEFAULT);
 			width = Math.max(bsize.x, width);
 			height += bsize.y;
 			return new Point(width, height);
 		}
 
-		@Override
 		protected void layout(Composite composite, boolean flushCache) {
-			initCaches(flushCache);
-			Rectangle carea = composite.getClientArea();
-
-			Point hsize = headCache.computeSize(carea.width, SWT.DEFAULT);
-			headCache.setBounds(0, 0, carea.width, hsize.y);
-			bodyCache
-					.setBounds(0, hsize.y, carea.width, carea.height - hsize.y);
-		}
-
-		private void initCaches(boolean flushCache) {
 			if (flushCache) {
 				bodyCache.flush();
 				headCache.flush();
 			}
 			bodyCache.setControl(body);
 			headCache.setControl(head);
+			Rectangle carea = composite.getClientArea();
+
+			Point hsize = headCache.computeSize(carea.width, SWT.DEFAULT);
+			headCache.setBounds(0, 0, carea.width, hsize.y);
+			bodyCache
+					.setBounds(0, hsize.y, carea.width, carea.height - hsize.y);
 		}
 	}
 
@@ -173,7 +171,7 @@ public class Form extends Composite {
 		super.setLayout(new FormLayout());
 		head = new FormHeading(this, SWT.NULL);
 		head.setMenu(parent.getMenu());
-		body = new Composite(this, SWT.NULL);
+		body = new LayoutComposite(this, SWT.NULL);
 		body.setMenu(parent.getMenu());
 	}
 
@@ -183,7 +181,6 @@ public class Form extends Composite {
 	 * @param menu
 	 *            the parent menu
 	 */
-	@Override
 	public void setMenu(Menu menu) {
 		super.setMenu(menu);
 		head.setMenu(menu);
@@ -191,9 +188,16 @@ public class Form extends Composite {
 	}
 
 	/**
+	 * Fully delegates the size computation to the internal layout manager.
+	 */
+	public final Point computeSize(int wHint, int hHint, boolean changed) {
+		return ((FormLayout) getLayout()).computeSize(this, wHint, hHint,
+				changed);
+	}
+
+	/**
 	 * Prevents from changing the custom control layout.
 	 */
-	@Override
 	public final void setLayout(Layout layout) {
 	}
 
@@ -223,7 +227,6 @@ public class Form extends Composite {
 	 * @param fg
 	 *            the foreground color
 	 */
-	@Override
 	public void setForeground(Color fg) {
 		super.setForeground(fg);
 		head.setForeground(fg);
@@ -237,7 +240,6 @@ public class Form extends Composite {
 	 * @param bg
 	 *            the background color
 	 */
-	@Override
 	public void setBackground(Color bg) {
 		super.setBackground(bg);
 		head.setBackground(bg);
@@ -250,7 +252,6 @@ public class Form extends Composite {
 	 * @param font
 	 *            the new font
 	 */
-	@Override
 	public void setFont(Font font) {
 		super.setFont(font);
 		head.setFont(font);
@@ -262,7 +263,7 @@ public class Form extends Composite {
 	 * <p>
 	 * <strong>Note:</strong> Mnemonics are indicated by an '&amp;' that causes
 	 * the next character to be the mnemonic. Mnemonics are not applicable in
-	 * the case of the form title but need to be taken into account due to the
+	 * the case of the form title but need to be taken into acount due to the
 	 * usage of the underlying widget that renders mnemonics in the title area.
 	 * The mnemonic indicator character '&amp;' can be escaped by doubling it in
 	 * the string, causing a single '&amp;' to be displayed.
@@ -323,7 +324,6 @@ public class Form extends Composite {
 	 *
 	 * @return the background image or <code>null</code> if not specified.
 	 */
-	@Override
 	public Image getBackgroundImage() {
 		return head.getHeadingBackgroundImage();
 	}
@@ -341,7 +341,6 @@ public class Form extends Composite {
 	 *            the head background image.
 	 *
 	 */
-	@Override
 	public void setBackgroundImage(Image backgroundImage) {
 		head.setHeadingBackgroundImage(backgroundImage);
 	}
@@ -481,7 +480,6 @@ public class Form extends Composite {
 	 *             either painted at 0,0 and/or tiled.
 	 * @return SWT.LEFT
 	 */
-	@Deprecated
 	public int getBackgroundImageAlignment() {
 		return SWT.LEFT;
 	}
@@ -495,7 +493,6 @@ public class Form extends Composite {
 	 *            The backgroundImageAlignment to set.
 	 * @since 3.1
 	 */
-	@Deprecated
 	public void setBackgroundImageAlignment(int backgroundImageAlignment) {
 	}
 
@@ -507,7 +504,6 @@ public class Form extends Composite {
 	 * @return true
 	 * @since 3.1
 	 */
-	@Deprecated
 	public boolean isBackgroundImageClipped() {
 		return true;
 	}
@@ -521,7 +517,6 @@ public class Form extends Composite {
 	 *            the value to set
 	 * @since 3.1
 	 */
-	@Deprecated
 	public void setBackgroundImageClipped(boolean backgroundImageClipped) {
 	}
 
@@ -560,7 +555,6 @@ public class Form extends Composite {
 	 * @deprecated use <code>getHeadColor(IFormColors.H_BOTTOM_KEYLINE2)</code>
 	 */
 
-	@Deprecated
 	public Color getSeparatorColor() {
 		return head.getColor(IFormColors.H_BOTTOM_KEYLINE2);
 	}
@@ -575,7 +569,6 @@ public class Form extends Composite {
 	 * @deprecated use
 	 *             <code>setHeadColor(IFormColors.H_BOTTOM_KEYLINE2, separatorColor)</code>
 	 */
-	@Deprecated
 	public void setSeparatorColor(Color separatorColor) {
 		head.putColor(IFormColors.H_BOTTOM_KEYLINE2, separatorColor);
 	}
@@ -763,10 +756,20 @@ public class Form extends Composite {
 		head.addDropSupport(operations, transferTypes, listener);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.dialogs.IMessageProvider#getMessage()
+	 */
 	public String getMessage() {
 		return head.getMessage();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.dialogs.IMessageProvider#getMessageType()
+	 */
 	public int getMessageType() {
 		return head.getMessageType();
 	}

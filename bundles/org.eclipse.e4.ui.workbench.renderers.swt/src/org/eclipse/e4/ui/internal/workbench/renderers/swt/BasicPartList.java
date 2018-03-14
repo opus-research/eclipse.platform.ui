@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench.renderers.swt;
@@ -81,7 +80,7 @@ public class BasicPartList extends AbstractTableInformationControl {
 
 		@Override
 		public String getToolTipText(Object element) {
-			return renderer.getToolTip((MUILabel) element);
+			return ((MUILabel) element).getLocalizedTooltip();
 		}
 
 		@Override
@@ -143,7 +142,7 @@ public class BasicPartList extends AbstractTableInformationControl {
 	}
 
 	private List<Object> getInput() {
-		List<Object> list = new ArrayList<>();
+		List<Object> list = new ArrayList<Object>();
 		for (MUIElement element : input.getChildren()) {
 			if (element instanceof MPlaceholder) {
 				if (!element.isToBeRendered() || !element.isVisible()) {
@@ -179,15 +178,11 @@ public class BasicPartList extends AbstractTableInformationControl {
 	}
 
 	@Override
-	protected boolean deleteSelectedElement(Object selectedElement) {
-		if (selectedElement == null) {
-			selectedElement = getSelectedElement();
-		}
-		if (selectedElement instanceof MPart) {
-			MPart part = (MPart) selectedElement;
-			if (partService.savePart(part, true)) {
-				partService.hidePart(part);
-			}
+	protected boolean deleteSelectedElements() {
+		Object selectedElement = getSelectedElement();
+		if (selectedElement != null) {
+			if (partService.savePart((MPart) selectedElement, true))
+				partService.hidePart((MPart) selectedElement);
 
 			if (getShell() == null) {
 				// Bug 421170: Contract says to return true if there are no
@@ -202,8 +197,11 @@ public class BasicPartList extends AbstractTableInformationControl {
 			}
 
 			// Remove part from viewer model
-			List<?> viewerInput = (List<?>) getTableViewer().getInput();
+			@SuppressWarnings("unchecked")
+			List<Object> viewerInput = (List<Object>) getTableViewer()
+					.getInput();
 			viewerInput.remove(selectedElement);
+
 		}
 		return false;
 

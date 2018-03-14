@@ -25,7 +25,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.mapping.ResourceMapping;
 import org.eclipse.core.resources.mapping.ResourceMappingContext;
 import org.eclipse.core.resources.mapping.ResourceTraversal;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -89,8 +88,9 @@ class MarkerResourceUtil {
 			resourceSet.add(root);
 			return resourceSet;
 		}
-		for (Object clone : resourceSet.toArray()) {
-			IResource resource = (IResource) clone;
+		Object[] clones = resourceSet.toArray();
+		for (int i = 0; i < clones.length; i++) {
+			IResource resource = (IResource) clones[i];
 			Iterator<IResource> iterator = resourceSet.iterator();
 			while (iterator.hasNext()) {
 				IResource resToRemove = iterator.next();
@@ -245,21 +245,23 @@ class MarkerResourceUtil {
 		}
 		case MarkerFieldFilterGroup.ON_SELECTED_ONLY:
 		case MarkerFieldFilterGroup.ON_SELECTED_AND_CHILDREN: {
-			for (IResource selectedResource : selectedResources) {
-				resourceSet.add(selectedResource);
+			for (int i = 0; i < selectedResources.length; i++) {
+				resourceSet.add(selectedResources[i]);
 			}
 			break;
 		}
 		case MarkerFieldFilterGroup.ON_ANY_IN_SAME_CONTAINER: {
-			for (IResource resource : getProjects(selectedResources)) {
-				resourceSet.add(resource);
+			IResource[] resources = getProjects(selectedResources);
+			for (int i = 0; i < resources.length; i++) {
+				resourceSet.add(resources[i]);
 			}
 			break;
 		}
 		case MarkerFieldFilterGroup.ON_WORKING_SET: {
 			group.refresh();
-			for (IResource resource : group.getResourcesInWorkingSet()) {
-				resourceSet.add(resource);
+			IResource[] resources = group.getResourcesInWorkingSet();
+			for (int i = 0; i < resources.length; i++) {
+				resourceSet.add(resources[i]);
 			}
 			break;
 		}
@@ -292,12 +294,13 @@ class MarkerResourceUtil {
 	 */
 	static Collection<IProject> getProjectsAsCollection(Object[] elements) {
 		HashSet<IProject> projects = new HashSet<>();
-		for (Object element : elements) {
-			if (element instanceof IResource) {
-				projects.add(((IResource) element).getProject());
+		for (int idx = 0; idx < elements.length; idx++) {
+			if (elements[idx] instanceof IResource) {
+				projects.add(((IResource) elements[idx]).getProject());
 			} else {
-				for (IProject mappingProject : ((ResourceMapping) element).getProjects()) {
-					projects.add(mappingProject);
+				IProject[] mappingProjects = (((ResourceMapping) elements[idx]).getProjects());
+				for (int i = 0; i < mappingProjects.length; i++) {
+					projects.add(mappingProjects[i]);
 				}
 			}
 		}
@@ -315,9 +318,11 @@ class MarkerResourceUtil {
 			ResourceTraversal[] traversals = resourceMapping.getTraversals(
 					ResourceMappingContext.LOCAL_CONTEXT,
 					new NullProgressMonitor());
-			for (ResourceTraversal traversal : traversals) {
-				for (IResource resource : traversal.getResources()) {
-					resourceCollection.add(resource);
+			for (int i = 0; i < traversals.length; i++) {
+				ResourceTraversal traversal = traversals[i];
+				IResource[] result = traversal.getResources();
+				for (int j = 0; j < result.length; j++) {
+					resourceCollection.add(result[j]);
 				}
 			}
 		} catch (CoreException e) {
@@ -341,19 +346,19 @@ class MarkerResourceUtil {
 	static Object adapt2ResourceElement(Object object) {
 		IResource resource = null;
 		if (object instanceof IAdaptable) {
-			ITaskListResourceAdapter adapter = Adapters.adapt(object, ITaskListResourceAdapter.class);
+			ITaskListResourceAdapter adapter = Util.getAdapter(object, ITaskListResourceAdapter.class);
 			if (adapter != null) {
 				resource = adapter.getAffectedResource((IAdaptable) object);
 			}
 		}
 		if (resource == null) {
-			resource = Adapters.adapt(object, IResource.class);
+			resource = Util.getAdapter(object, IResource.class);
 		}
 		if (resource == null) {
-			resource = Adapters.adapt(object, IFile.class);
+			resource = Util.getAdapter(object, IFile.class);
 		}
 		if (resource == null) {
-			ResourceMapping mapping = Adapters.adapt(object, ResourceMapping.class);
+			ResourceMapping mapping = Util.getAdapter(object, ResourceMapping.class);
 			if (mapping != null) {
 				return mapping;
 			}
@@ -382,11 +387,12 @@ class MarkerResourceUtil {
 	static HashSet<MarkerType> getAllSubTypes(String[] typeIds) {
 		HashSet<MarkerType> set = new HashSet<>();
 		MarkerTypesModel typesModel = MarkerTypesModel.getInstance();
-		for (String typeId : typeIds) {
-			MarkerType type = typesModel.getType(typeId);
+		for (int i = 0; i < typeIds.length; i++) {
+			MarkerType type = typesModel.getType(typeIds[i]);
 			set.add(type);
-			for (MarkerType sub : type.getAllSubTypes()) {
-				set.add(sub);
+			MarkerType[] subs = type.getAllSubTypes();
+			for (int j = 0; j < subs.length; j++) {
+				set.add(subs[j]);
 			}
 		}
 		return set;
@@ -412,12 +418,12 @@ class MarkerResourceUtil {
 	static HashSet<MarkerType> getMutuallyExclusiveSupers(String[] typeIds) {
 		HashSet<MarkerType> set = new HashSet<>();
 		MarkerTypesModel typesModel = MarkerTypesModel.getInstance();
-		for (String typeId : typeIds) {
-			MarkerType type = typesModel.getType(typeId);
+		for (int i = 0; i < typeIds.length; i++) {
+			MarkerType type = typesModel.getType(typeIds[i]);
 			set.add(type);
 		}
-		for (String typeId : typeIds) {
-			MarkerType type = typesModel.getType(typeId);
+		for (int i = 0; i < typeIds.length; i++) {
+			MarkerType type = typesModel.getType(typeIds[i]);
 			MarkerType[] subs = type.getAllSubTypes();
 			HashSet<MarkerType> subsOnly = new HashSet<>(Arrays.asList(subs));
 			subsOnly.remove(type);

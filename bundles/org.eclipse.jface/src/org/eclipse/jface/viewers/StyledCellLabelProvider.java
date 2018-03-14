@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -283,8 +283,8 @@ public abstract class StyledCellLabelProvider extends OwnerDrawLabelProvider {
 
 		StyleRange[] styleRanges = cell.getStyleRanges();
 		if (styleRanges != null) { // user didn't fill styled ranges
-			for (StyleRange styleRange : styleRanges) {
-				StyleRange curr = prepareStyleRange(styleRange, applyColors);
+			for (int i = 0; i < styleRanges.length; i++) {
+				StyleRange curr = prepareStyleRange(styleRanges[i], applyColors);
 				layout.setStyle(curr, curr.start, curr.start + curr.length - 1);
 				if (curr.font != null) {
 					containsOtherFont= true;

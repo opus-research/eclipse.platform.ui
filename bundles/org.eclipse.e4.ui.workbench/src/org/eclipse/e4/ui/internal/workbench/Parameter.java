@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 IBM Corporation and others.
+ * Copyright (c) 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -224,7 +224,7 @@ public final class Parameter implements IParameter, ITypedParameter {
 	@Override
 	public final String toString() {
 		if (string == null) {
-			final StringBuilder buffer = new StringBuilder();
+			final StringBuffer buffer = new StringBuffer();
 
 			buffer.append("Parameter("); //$NON-NLS-1$
 			buffer.append(id);

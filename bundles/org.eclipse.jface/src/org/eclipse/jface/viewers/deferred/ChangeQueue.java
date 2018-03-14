@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.jface.viewers.deferred;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
@@ -80,7 +81,7 @@ final class ChangeQueue {
 		}
 	}
 
-	private LinkedList<Change> queue = new LinkedList<>();
+	private LinkedList queue = new LinkedList();
 
 	/**
 	 * Create a change of the given type and elements and enqueue it.
@@ -100,8 +101,10 @@ final class ChangeQueue {
 		// A SET event makes all previous adds, removes, and sets redundant... so remove
 		// them from the queue
 		if (toQueue.type == SET) {
-			LinkedList<Change> newQueue = new LinkedList<>();
-			for (Change next : queue) {
+			LinkedList newQueue = new LinkedList();
+			for (Iterator iter = queue.iterator(); iter.hasNext();) {
+				Change next = (Change) iter.next();
+
 				if (next.getType() == ADD || next.getType() == REMOVE || next.getType() == SET) {
 					continue;
 				}
@@ -119,7 +122,7 @@ final class ChangeQueue {
 	 * @return the first change
 	 */
 	public synchronized Change dequeue() {
-		Change result = queue.removeFirst();
+		Change result = (Change)queue.removeFirst();
 		return result;
 	}
 

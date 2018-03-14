@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -129,8 +129,8 @@ public class PreferenceManager {
 			sequence.add(node);
 		}
         IPreferenceNode[] subnodes = node.getSubNodes();
-        for (IPreferenceNode subnode : subnodes) {
-            buildSequence(subnode, sequence, order);
+        for (int i = 0; i < subnodes.length; i++) {
+            buildSequence(subnodes[i], sequence, order);
         }
         if (order == POST_ORDER) {
 			sequence.add(node);
@@ -187,10 +187,10 @@ public class PreferenceManager {
     public List<IPreferenceNode> getElements(int order) {
         Assert.isTrue(order == PRE_ORDER || order == POST_ORDER,
                 "invalid traversal order");//$NON-NLS-1$
-        ArrayList<IPreferenceNode> sequence = new ArrayList<>();
+        ArrayList<IPreferenceNode> sequence = new ArrayList<IPreferenceNode>();
         IPreferenceNode[] subnodes = getRoot().getSubNodes();
-        for (IPreferenceNode subnode : subnodes) {
-			buildSequence(subnode, sequence, order);
+        for (int i = 0; i < subnodes.length; i++) {
+			buildSequence(subnodes[i], sequence, order);
 		}
         return sequence;
     }

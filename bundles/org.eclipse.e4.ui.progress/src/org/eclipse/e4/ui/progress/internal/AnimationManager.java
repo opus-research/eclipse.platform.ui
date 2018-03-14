@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -66,8 +66,12 @@ public class AnimationManager {
 
         animationUpdateJob = new UIJob(ProgressMessages.AnimationManager_AnimationStart) {
 
-            @Override
-			public IStatus runInUIThread(IProgressMonitor monitor) {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
+             */
+            public IStatus runInUIThread(IProgressMonitor monitor) {
 
                 if (animated) {
 					animationProcessor.animationStarted();
@@ -134,13 +138,21 @@ public class AnimationManager {
         return new IJobProgressManagerListener() {
             Set<Job> jobs = Collections.synchronizedSet(new HashSet<Job>());
 
-            @Override
-			public void addJob(JobInfo info) {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#addJob(org.eclipse.ui.internal.progress.JobInfo)
+             */
+            public void addJob(JobInfo info) {
                 incrementJobCount(info);
             }
 
-            @Override
-			public void refreshJobInfo(JobInfo info) {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#refreshJobInfo(org.eclipse.ui.internal.progress.JobInfo)
+             */
+            public void refreshJobInfo(JobInfo info) {
                 int state = info.getJob().getState();
                 if (state == Job.RUNNING) {
 					addJob(info);
@@ -149,23 +161,35 @@ public class AnimationManager {
 				}
             }
 
-            @Override
-			public void refreshAll() {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#refreshAll()
+             */
+            public void refreshAll() {
                 jobs.clear();
                 setAnimated(false);
                 JobInfo[] currentInfos = progressManager.getJobInfos(showsDebug());
-                for (JobInfo currentInfo : currentInfos) {
-                    addJob(currentInfo);
+                for (int i = 0; i < currentInfos.length; i++) {
+                    addJob(currentInfos[i]);
                 }
             }
 
-            @Override
-			public void removeJob(JobInfo info) {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#remove(org.eclipse.ui.internal.progress.JobInfo)
+             */
+            public void removeJob(JobInfo info) {
                 decrementJobCount(info.getJob());
             }
 
-            @Override
-			public boolean showsDebug() {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#showsDebug()
+             */
+            public boolean showsDebug() {
                 return false;
             }
 
@@ -200,18 +224,30 @@ public class AnimationManager {
                         || animationProcessor.isProcessorJob(job);
             }
 
-            @Override
-			public void addGroup(GroupInfo info) {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#addGroup(org.eclipse.ui.internal.progress.GroupInfo)
+             */
+            public void addGroup(GroupInfo info) {
                 //Don't care about groups
             }
 
-            @Override
-			public void removeGroup(GroupInfo group) {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#removeGroup(org.eclipse.ui.internal.progress.GroupInfo)
+             */
+            public void removeGroup(GroupInfo group) {
                 //Don't care about groups
             }
 
-            @Override
-			public void refreshGroup(GroupInfo info) {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#refreshGroup(org.eclipse.ui.internal.progress.GroupInfo)
+             */
+            public void refreshGroup(GroupInfo info) {
                 //Don't care about groups
             }
         };

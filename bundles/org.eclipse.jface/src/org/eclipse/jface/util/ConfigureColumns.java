@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,8 +22,10 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -238,11 +240,11 @@ public class ConfigureColumns {
 					| SWT.H_SCROLL /*
 									 * | SWT.CHECK
 									 */);
-			for (ColumnObject columnObject : columnObjects) {
+			for (int i = 0; i < columnObjects.length; i++) {
 				TableItem tableItem = new TableItem(table, SWT.NONE);
-				tableItem.setText(columnObject.name);
-				tableItem.setImage(columnObject.image);
-				tableItem.setData(columnObject);
+				tableItem.setText(columnObjects[i].name);
+				tableItem.setImage(columnObjects[i].image);
+				tableItem.setData(columnObjects[i]);
 			}
 
 			GridDataFactory.defaultsFor(table).span(1, moveableColumnsFound ? 3 : 1)
@@ -251,12 +253,22 @@ public class ConfigureColumns {
 			if (moveableColumnsFound) {
 				upButton = new Button(composite, SWT.PUSH);
 				upButton.setText(JFaceResources.getString("ConfigureColumnsDialog_up")); //$NON-NLS-1$
-				upButton.addListener(SWT.Selection, event -> handleMove(table, true));
+				upButton.addListener(SWT.Selection, new Listener() {
+					@Override
+					public void handleEvent(Event event) {
+						handleMove(table, true);
+					}
+				});
 				setButtonLayoutData(upButton);
 				downButton = new Button(composite, SWT.PUSH);
 				downButton.setText(JFaceResources
 						.getString("ConfigureColumnsDialog_down")); //$NON-NLS-1$
-				downButton.addListener(SWT.Selection, event -> handleMove(table, false));
+				downButton.addListener(SWT.Selection, new Listener() {
+					@Override
+					public void handleEvent(Event event) {
+						handleMove(table, false);
+					}
+				});
 				setButtonLayoutData(downButton);
 
 				// filler label
@@ -280,17 +292,25 @@ public class ConfigureColumns {
 
 			GridLayoutFactory.swtDefaults().numColumns(numColumns).applyTo(composite);
 
-			table.addListener(SWT.Selection, event -> handleSelectionChanged(table.indexOf((TableItem) event.item)));
-			text.addListener(SWT.Modify, event -> {
-				ColumnObject columnObject = columnObjects[table.getSelectionIndex()];
-				if (!columnObject.resizable) {
-					return;
+			table.addListener(SWT.Selection, new Listener() {
+				@Override
+				public void handleEvent(Event event) {
+					handleSelectionChanged(table.indexOf((TableItem) event.item));
 				}
-				try {
-					int width = Integer.parseInt(text.getText());
-					columnObject.width = width;
-				} catch (NumberFormatException ex) {
-					// ignore for now
+			});
+			text.addListener(SWT.Modify, new Listener() {
+				@Override
+				public void handleEvent(Event event) {
+					ColumnObject columnObject = columnObjects[table.getSelectionIndex()];
+					if (!columnObject.resizable) {
+						return;
+					}
+					try {
+						int width = Integer.parseInt(text.getText());
+						columnObject.width = width;
+					} catch (NumberFormatException ex) {
+						// ignore for now
+					}
 				}
 			});
 

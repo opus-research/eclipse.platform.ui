@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -87,11 +87,12 @@ final class DerivedImageDescriptor extends ImageDescriptor {
         return result;
     }
 
-	@Override
-	public ImageData getImageData(int zoom) {
-		Image image = internalCreateImage(Display.getCurrent());
-		ImageData result = image.getImageData(zoom);
-		image.dispose();
-		return result;
-	}
+    @Override
+	public ImageData getImageData() {
+        Image image = internalCreateImage(Display.getCurrent());
+        ImageData result = image.getImageData();
+        image.dispose();
+        return result;
+    }
+
 }

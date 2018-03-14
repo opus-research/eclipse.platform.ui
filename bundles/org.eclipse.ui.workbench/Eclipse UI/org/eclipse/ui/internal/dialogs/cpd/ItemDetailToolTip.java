@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,8 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 445538
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs.cpd;
 
@@ -17,6 +15,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -145,7 +144,7 @@ class ItemDetailToolTip extends NameAndDescriptionToolTip {
 					text = WorkbenchMessages.HideItems_itemInUnavailableCommand;
 				} else {
 					//i.e. has children
-					Set<ActionSet> actionGroup = new LinkedHashSet<>();
+					Set<ActionSet> actionGroup = new LinkedHashSet<ActionSet>();
 					ItemDetailToolTip.collectDescendantCommandGroups(actionGroup, item,
 							filter);
 
@@ -161,12 +160,15 @@ class ItemDetailToolTip extends NameAndDescriptionToolTip {
 						//i.e. multiple children
 						String commandGroupList = null;
 
-						for (ActionSet actionSet : actionGroup) {
+						for (Iterator<ActionSet> i = actionGroup.iterator(); i.hasNext();) {
+							ActionSet actionSet = i.next();
+
 							// For each action set, make a link for it, set
 							// the href to its id
 							String commandGroupLink = MessageFormat.format(
 									"<a href=\"{0}\">{1}</a>", //$NON-NLS-1$
-									actionSet.descriptor.getId(), actionSet.descriptor.getLabel());
+									new Object[] { actionSet.descriptor.getId(),
+											actionSet.descriptor.getLabel() });
 
 							if (commandGroupList == null) {
 								commandGroupList = commandGroupLink;
@@ -211,7 +213,7 @@ class ItemDetailToolTip extends NameAndDescriptionToolTip {
 		// Show key binding info
 		if (showKeyBindings && CustomizePerspectiveDialog.getCommandID(item) != null) {
 			// See if there is a command associated with the command id
-			ICommandService commandService = dialog.window
+			ICommandService commandService = (ICommandService) dialog.window
 					.getService(ICommandService.class);
 			Command command = commandService.getCommand(CustomizePerspectiveDialog.getCommandID(item));
 
@@ -249,7 +251,7 @@ class ItemDetailToolTip extends NameAndDescriptionToolTip {
 				// bindings
 				final Object highlight;
 				if (bindings.length == 0) {
-					Map<String, String> parameters = new HashMap<>();
+					Map<String, String> parameters = new HashMap<String, String>();
 
 					// If item is a shortcut, need to add a parameter to go
 					// to
@@ -284,7 +286,7 @@ class ItemDetailToolTip extends NameAndDescriptionToolTip {
 				bindingLink.addSelectionListener(new SelectionListener() {
 					@Override
 					public void widgetDefaultSelected(SelectionEvent e) {
-						widgetSelected(e);
+						widgetDefaultSelected(e);
 					}
 
 					@Override
@@ -302,13 +304,14 @@ class ItemDetailToolTip extends NameAndDescriptionToolTip {
 		// Show dynamic menu item info
 		if (item instanceof DynamicContributionItem) {
 			DynamicContributionItem dynamic = ((DynamicContributionItem) item);
-			StringBuilder text = new StringBuilder();
+			StringBuffer text = new StringBuffer();
 			final List<MenuItem> currentItems = dynamic.getCurrentItems();
 
 			if (currentItems.size() > 0) {
 				// Create a list of the currently displayed items
 				text.append(WorkbenchMessages.HideItems_dynamicItemList);
-				for (MenuItem menuItem : currentItems) {
+				for (Iterator<MenuItem> i = currentItems.iterator(); i.hasNext();) {
+					MenuItem menuItem = i.next();
 					text.append(CustomizePerspectiveDialog.NEW_LINE).append("- ") //$NON-NLS-1$
 							.append(menuItem.getText());
 				}
@@ -385,7 +388,8 @@ class ItemDetailToolTip extends NameAndDescriptionToolTip {
 	 * Gets the keybindings associated with a ContributionItem.
 	 */
 	static Binding[] getKeyBindings(WorkbenchWindow window, DisplayItem item) {
-		IBindingService bindingService = window.getService(IBindingService.class);
+		IBindingService bindingService = (IBindingService) window
+				.getService(IBindingService.class);
 
 		if (!(bindingService instanceof BindingService)) {
 			return new Binding[0];
@@ -400,10 +404,10 @@ class ItemDetailToolTip extends NameAndDescriptionToolTip {
 		Collection<?> allBindings = bindingManager
 				.getActiveBindingsDisregardingContextFlat();
 
-		List<Binding> foundBindings = new ArrayList<>(2);
+		List<Binding> foundBindings = new ArrayList<Binding>(2);
 
-		for (Object name : allBindings) {
-			Binding binding = (Binding) name;
+		for (Iterator<?> i = allBindings.iterator(); i.hasNext();) {
+			Binding binding = (Binding) i.next();
 			if (binding.getParameterizedCommand() == null) {
 				continue;
 			}

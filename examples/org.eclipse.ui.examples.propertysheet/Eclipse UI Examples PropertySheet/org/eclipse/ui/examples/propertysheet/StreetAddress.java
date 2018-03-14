@@ -29,7 +29,7 @@ public class StreetAddress implements IPropertySource {
     private String streetName;
 
     //default property values
-    private static final Integer BUILD_NO_DEFAULT = Integer.valueOf(0);
+    private static final Integer BUILD_NO_DEFAULT = new Integer(0);
 
     private static final String APTBOX_DEFAULT = MessageUtil
             .getString("unspecified"); //$NON-NLS-1$
@@ -77,7 +77,7 @@ public class StreetAddress implements IPropertySource {
      */
     public StreetAddress(int buildNo, String streetName) {
         super();
-        setBuildNo(Integer.valueOf(buildNo));
+        setBuildNo(new Integer(buildNo));
         setStreetName(streetName);
     }
 
@@ -86,7 +86,7 @@ public class StreetAddress implements IPropertySource {
      */
     public StreetAddress(int buildNo, String aptBox, String streetName) {
         super();
-        setBuildNo(Integer.valueOf(buildNo));
+        setBuildNo(new Integer(buildNo));
         setAptBox(aptBox);
         setStreetName(streetName);
     }
@@ -219,7 +219,7 @@ public class StreetAddress implements IPropertySource {
 	public void setPropertyValue(Object name, Object value) {
         if (name.equals(P_ID_BUILD_NO)) {
             try {
-                setBuildNo(Integer.valueOf(Integer.parseInt((String) value)));
+                setBuildNo(new Integer(Integer.parseInt((String) value)));
             } catch (NumberFormatException e) {
                 setBuildNo(BUILD_NO_DEFAULT);
             }
@@ -248,18 +248,18 @@ public class StreetAddress implements IPropertySource {
      */
     @Override
 	public String toString() {
-        StringBuilder outStringBuilder = new StringBuilder();
+        StringBuffer outStringBuffer = new StringBuffer();
         if (!getAptBox().equals(APTBOX_DEFAULT)) {
-            outStringBuilder.append(getAptBox());
-            outStringBuilder.append(", "); //$NON-NLS-1$
+            outStringBuffer.append(getAptBox());
+            outStringBuffer.append(", "); //$NON-NLS-1$
         }
         if (!getBuildNo().equals(BUILD_NO_DEFAULT)) {
-            outStringBuilder.append(getBuildNo());
-            outStringBuilder.append(" "); //$NON-NLS-1$
+            outStringBuffer.append(getBuildNo());
+            outStringBuffer.append(" "); //$NON-NLS-1$
         }
         if (!getStreetName().equals(STREETNAME_DEFAULT)) {
-            outStringBuilder.append(getStreetName());
+            outStringBuffer.append(getStreetName());
         }
-        return outStringBuilder.toString();
+        return outStringBuffer.toString();
     }
 }

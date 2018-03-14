@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench.addons;
@@ -104,9 +103,7 @@ public class CommandProcessingAddon {
 
 	@PostConstruct
 	public void init() {
-		if (Policy.DEBUG_CMDS) {
-			Activator.trace(Policy.DEBUG_CMDS_FLAG, "Initialize commands from model", null); //$NON-NLS-1$
-		}
+		Activator.trace(Policy.DEBUG_CMDS, "Initialize commands from model", null); //$NON-NLS-1$
 		undefinedCategory = commandService.defineCategory(MApplication.class.getName(),
 				"Application Category", null); //$NON-NLS-1$
 		createCategories();
@@ -215,7 +212,7 @@ public class CommandProcessingAddon {
 		String desc = localize(cmdModel.getDescription(), cmdModel);
 		List<MCommandParameter> modelParms = cmdModel.getParameters();
 		if (modelParms != null && !modelParms.isEmpty()) {
-			ArrayList<Parameter> parmList = new ArrayList<>();
+			ArrayList<Parameter> parmList = new ArrayList<Parameter>();
 			for (MCommandParameter cmdParm : modelParms) {
 				ParameterType parameterType = null;
 				if (cmdParm.getTypeId() != null && cmdParm.getTypeId().length() > 0) {
@@ -230,8 +227,7 @@ public class CommandProcessingAddon {
 		if (cmdModel.getCategory() != null) {
 			cat = commandService.getCategory(cmdModel.getCategory().getElementId());
 		}
-		commandService.defineCommand(id, name, desc, cat, parms,
-				cmdModel.getPersistedState().get("HelpContextId")); //$NON-NLS-1$
+		commandService.defineCommand(id, name, desc, cat, parms);
 	}
 
 	private void createCategories() {

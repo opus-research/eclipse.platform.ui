@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -205,19 +206,26 @@ public class WorkingSetRegistry implements IExtensionChangeHandler {
         reader.readWorkingSets(Platform.getExtensionRegistry(), this);
     }
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamichelpers.IExtensionTracker, org.eclipse.core.runtime.IExtension)
+	 */
 	@Override
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
 		WorkingSetRegistryReader reader = new WorkingSetRegistryReader(this);
-		for (IConfigurationElement element : extension.getConfigurationElements()) {
-			reader.readElement(element);
+		IConfigurationElement[] elements = extension.getConfigurationElements();
+        for (int i = 0; i < elements.length; i++) {
+			reader.readElement(elements[i]);
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension, java.lang.Object[])
+	 */
 	@Override
 	public void removeExtension(IExtension extension, Object[] objects) {
-		for (Object object : objects) {
-            if (object instanceof WorkingSetDescriptor) {
-                WorkingSetDescriptor desc = (WorkingSetDescriptor) object;
+		for (int i = 0; i < objects.length; i++) {
+            if (objects[i] instanceof WorkingSetDescriptor) {
+                WorkingSetDescriptor desc = (WorkingSetDescriptor) objects[i];
                 workingSetDescriptors.remove(desc.getId());
             }
         }

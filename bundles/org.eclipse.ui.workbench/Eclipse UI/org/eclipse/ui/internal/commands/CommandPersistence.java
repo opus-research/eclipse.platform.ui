@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -248,7 +248,8 @@ public final class CommandPersistence extends RegistryPersistence {
 
 		int insertionIndex = 0;
 		Parameter[] parameters = new Parameter[parameterElements.length];
-		for (final IConfigurationElement parameterElement : parameterElements) {
+		for (int i = 0; i < parameterElements.length; i++) {
+			final IConfigurationElement parameterElement = parameterElements[i];
 			// Read out the id
 			final String id = readRequired(parameterElement, ATT_ID,
 					warningsToLog, "Parameters need an id"); //$NON-NLS-1$
@@ -383,7 +384,9 @@ public final class CommandPersistence extends RegistryPersistence {
 			return;
 		}
 
-		for (final IConfigurationElement stateElement : stateElements) {
+		for (int i = 0; i < stateElements.length; i++) {
+			final IConfigurationElement stateElement = stateElements[i];
+
 			final String id = readRequired(stateElement, ATT_ID, warningsToLog, "State needs an id"); //$NON-NLS-1$
 			if (id == null) {
 				continue;
@@ -464,7 +467,8 @@ public final class CommandPersistence extends RegistryPersistence {
 		// Sort the commands extension point based on element name.
 		final IConfigurationElement[] commandsExtensionPoint = registry
 				.getConfigurationElementsFor(EXTENSION_COMMANDS);
-		for (final IConfigurationElement configurationElement : commandsExtensionPoint) {
+		for (int i = 0; i < commandsExtensionPoint.length; i++) {
+			final IConfigurationElement configurationElement = commandsExtensionPoint[i];
 			final String name = configurationElement.getName();
 
 			// Check if it is a binding definition.
@@ -486,7 +490,8 @@ public final class CommandPersistence extends RegistryPersistence {
 
 		final IConfigurationElement[] actionDefinitionsExtensionPoint = registry
 				.getConfigurationElementsFor(EXTENSION_ACTION_DEFINITIONS);
-		for (final IConfigurationElement configurationElement : actionDefinitionsExtensionPoint) {
+		for (int i = 0; i < actionDefinitionsExtensionPoint.length; i++) {
+			final IConfigurationElement configurationElement = actionDefinitionsExtensionPoint[i];
 			final String name = configurationElement.getName();
 
 			if (TAG_ACTION_DEFINITION.equals(name)) {

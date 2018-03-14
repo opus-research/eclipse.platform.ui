@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,6 +46,9 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
         this.resourceFilter = filter;
     }
 
+    /* (non-Javadoc)
+     * Method declared on IContentProvider.
+     */
     @Override
 	public void dispose() {
     }
@@ -74,6 +77,9 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
         return definedFilters;
     }
 
+    /* (non-Javadoc)
+     * Method declared on IStructuredContentProvider.
+     */
     @Override
 	public Object[] getElements(Object inputElement) {
         return getDefinedFilters().toArray();
@@ -88,6 +94,9 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
         return this.resourceFilter.getPatterns();
     }
 
+    /* (non-Javadoc)
+     * Method declared on IContentProvider.
+     */
     @Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
     }
@@ -102,14 +111,17 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 				.getExtensionPoint(IDEWorkbenchPlugin.IDE_WORKBENCH + '.'
 						+ ResourcePatternFilter.FILTERS_TAG);
 		if (extension != null) {
-			for (IExtension currentExtension : extension.getExtensions()) {
-				IConfigurationElement[] configElements = currentExtension.getConfigurationElements();
-				for (IConfigurationElement configElement : configElements) {
-					String pattern = configElement.getAttribute("pattern");//$NON-NLS-1$
+			IExtension[] extensions = extension.getExtensions();
+			for (int i = 0; i < extensions.length; i++) {
+				IConfigurationElement[] configElements = extensions[i]
+						.getConfigurationElements();
+				for (int j = 0; j < configElements.length; j++) {
+					String pattern = configElements[j].getAttribute("pattern");//$NON-NLS-1$
 					if (pattern != null) {
 						definedFilters.add(pattern);
 					}
-					String selected = configElement.getAttribute("selected");//$NON-NLS-1$
+					String selected = configElements[j]
+							.getAttribute("selected");//$NON-NLS-1$
 					if (selected != null && selected.equalsIgnoreCase("true")) { //$NON-NLS-1$
 						defaultFilters.add(pattern);
 					}

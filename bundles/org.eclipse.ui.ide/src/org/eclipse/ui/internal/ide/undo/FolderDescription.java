@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,8 +20,8 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.ui.ide.dialogs.UIResourceFilterDescription;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.SubProgressMonitor;
 
 /**
  * FolderDescription is a lightweight description that describes a folder to be
@@ -67,6 +67,11 @@ public class FolderDescription extends ContainerDescription {
 		this.location = linkLocation;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.ide.undo.ContainerDescription#createResourceHandle()
+	 */
 	@Override
 	public IResource createResourceHandle() {
 		IWorkspaceRoot workspaceRoot = getWorkspace().getRoot();
@@ -74,28 +79,48 @@ public class FolderDescription extends ContainerDescription {
 		return workspaceRoot.getFolder(folderPath);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.ide.undo.ResourceDescription#createExistentResourceFromHandle(org.eclipse.core.resources.IResource,
+	 *      org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
-	public void createExistentResourceFromHandle(IResource resource, IProgressMonitor mon) throws CoreException {
+	public void createExistentResourceFromHandle(IResource resource,
+			IProgressMonitor monitor) throws CoreException {
+
 		Assert.isLegal(resource instanceof IFolder);
 		if (resource.exists()) {
 			return;
 		}
 		IFolder folderHandle = (IFolder) resource;
-		SubMonitor subMonitor = SubMonitor.convert(mon, 300);
-		subMonitor.setTaskName(UndoMessages.FolderDescription_NewFolderProgress);
-		if (filters != null) {
-			SubMonitor loopMonitor = subMonitor.split(100).setWorkRemaining(filters.length);
-			for (UIResourceFilterDescription filter : filters) {
-				folderHandle.createFilter(filter.getType(), filter.getFileInfoMatcherDescription(), 0,
-						loopMonitor.split(1));
+		try {
+			monitor.beginTask("", 200); //$NON-NLS-1$
+			monitor.setTaskName(UndoMessages.FolderDescription_NewFolderProgress);
+			if (monitor.isCanceled()) {
+				throw new OperationCanceledException();
 			}
+			if (filters != null) {
+				for (int i = 0; i < filters.length; i++) {
+					folderHandle.createFilter(filters[i].getType(), filters[i].getFileInfoMatcherDescription(), 0, new SubProgressMonitor(
+							monitor, 100));
+				}
+			}
+			if (location != null) {
+				folderHandle.createLink(location,
+						IResource.ALLOW_MISSING_LOCAL, new SubProgressMonitor(
+								monitor, 100));
+			} else {
+				folderHandle.create(virtual ? IResource.VIRTUAL:0, true, new SubProgressMonitor(
+						monitor, 100));
+			}
+			if (monitor.isCanceled()) {
+				throw new OperationCanceledException();
+			}
+			createChildResources(folderHandle, monitor, 100);
+
+		} finally {
+			monitor.done();
 		}
-		subMonitor.setWorkRemaining(200);
-		if (location != null) {
-			folderHandle.createLink(location, IResource.ALLOW_MISSING_LOCAL, subMonitor.split(100));
-		} else {
-			folderHandle.create(virtual ? IResource.VIRTUAL : 0, true, subMonitor.split(100));
-		}
-		createChildResources(folderHandle, subMonitor.split(100));
 	}
 }

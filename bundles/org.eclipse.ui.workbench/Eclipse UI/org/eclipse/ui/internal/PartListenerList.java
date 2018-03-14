@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -64,14 +64,15 @@ public class PartListenerList extends EventManager {
      * Notifies the listener that a part has been activated.
      */
     public void firePartActivated(final IWorkbenchPart part) {
-		for (Object listener : getListeners()) {
-			final IPartListener partListener = (IPartListener) listener;
+        Object[] array = getListeners();
+        for (int i = 0; i < array.length; i++) {
+            final IPartListener l = (IPartListener) array[i];
             fireEvent(new SafeRunnable() {
                 @Override
 				public void run() {
-					partListener.partActivated(part);
+                    l.partActivated(part);
                 }
-			}, partListener, part, "activated::"); //$NON-NLS-1$
+            }, l, part, "activated::"); //$NON-NLS-1$
         }
     }
 
@@ -79,14 +80,15 @@ public class PartListenerList extends EventManager {
      * Notifies the listener that a part has been brought to top.
      */
     public void firePartBroughtToTop(final IWorkbenchPart part) {
-		for (Object listener : getListeners()) {
-			final IPartListener partListener = (IPartListener) listener;
+        Object[] array = getListeners();
+        for (int i = 0; i < array.length; i++) {
+            final IPartListener l = (IPartListener) array[i];
             fireEvent(new SafeRunnable() {
                 @Override
 				public void run() {
-					partListener.partBroughtToTop(part);
+                    l.partBroughtToTop(part);
                 }
-			}, partListener, part, "broughtToTop::"); //$NON-NLS-1$
+            }, l, part, "broughtToTop::"); //$NON-NLS-1$
         }
     }
 
@@ -94,14 +96,15 @@ public class PartListenerList extends EventManager {
      * Notifies the listener that a part has been closed
      */
     public void firePartClosed(final IWorkbenchPart part) {
-		for (Object element : getListeners()) {
-			final IPartListener partListener = (IPartListener) element;
+        Object[] array = getListeners();
+        for (int i = 0; i < array.length; i++) {
+            final IPartListener l = (IPartListener) array[i];
             fireEvent(new SafeRunnable() {
                 @Override
 				public void run() {
-					partListener.partClosed(part);
+                    l.partClosed(part);
                 }
-			}, partListener, part, "closed::"); //$NON-NLS-1$
+            }, l, part, "closed::"); //$NON-NLS-1$
         }
     }
 
@@ -109,14 +112,15 @@ public class PartListenerList extends EventManager {
      * Notifies the listener that a part has been deactivated.
      */
     public void firePartDeactivated(final IWorkbenchPart part) {
-		for (Object listener : getListeners()) {
-			final IPartListener partListener = (IPartListener) listener;
+        Object[] array = getListeners();
+        for (int i = 0; i < array.length; i++) {
+            final IPartListener l = (IPartListener) array[i];
             fireEvent(new SafeRunnable() {
                 @Override
 				public void run() {
-					partListener.partDeactivated(part);
+                    l.partDeactivated(part);
                 }
-			}, partListener, part, "deactivated::"); //$NON-NLS-1$
+            }, l, part, "deactivated::"); //$NON-NLS-1$
         }
     }
 
@@ -124,14 +128,15 @@ public class PartListenerList extends EventManager {
      * Notifies the listener that a part has been opened.
      */
     public void firePartOpened(final IWorkbenchPart part) {
-		for (Object listener : getListeners()) {
-			final IPartListener partListener = (IPartListener) listener;
+        Object[] array = getListeners();
+        for (int i = 0; i < array.length; i++) {
+            final IPartListener l = (IPartListener) array[i];
             fireEvent(new SafeRunnable() {
                 @Override
 				public void run() {
-					partListener.partOpened(part);
+                    l.partOpened(part);
                 }
-			}, partListener, part, "opened::"); //$NON-NLS-1$
+            }, l, part, "opened::"); //$NON-NLS-1$
         }
     }
 

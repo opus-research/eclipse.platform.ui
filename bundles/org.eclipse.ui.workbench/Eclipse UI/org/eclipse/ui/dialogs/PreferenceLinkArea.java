@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,14 +10,14 @@
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import com.ibm.icu.text.MessageFormat;
 import java.util.Iterator;
 
 import org.eclipse.jface.preference.IPreferenceNode;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Link;
@@ -68,7 +68,12 @@ public class PreferenceLinkArea extends Object {
 			result = MessageFormat.format(message, node.getLabelText());
 
             //Only add the selection listener if the node is found
-            pageLink.addSelectionListener(widgetSelectedAdapter(e -> pageContainer.openPage(pageId, pageData)));
+            pageLink.addSelectionListener(new SelectionAdapter() {
+                @Override
+				public void widgetSelected(SelectionEvent e) {
+                    pageContainer.openPage(pageId, pageData);
+                }
+            });
         }
         pageLink.setText(result);
 

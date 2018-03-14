@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -115,7 +115,7 @@ public final class Priority implements Comparable {
 	@Deprecated
 	public String toString() {
 		if (string == null) {
-			final StringBuilder stringBuffer = new StringBuilder();
+			final StringBuffer stringBuffer = new StringBuffer();
 			stringBuffer.append("[value="); //$NON-NLS-1$
 			stringBuffer.append(value);
 			stringBuffer.append(']');

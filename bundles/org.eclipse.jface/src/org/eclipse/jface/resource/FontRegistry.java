@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -181,26 +181,31 @@ public class FontRegistry extends ResourceRegistry {
      * (key type: <code>String</code>,
      *  value type: <code>FontRecord</code>.
      */
-    private Map<String, FontRecord> stringToFontRecord = new HashMap<>(7);
+    private Map<String, FontRecord> stringToFontRecord = new HashMap<String, FontRecord>(7);
 
     /**
      * Table of known font data, keyed by symbolic font name
      * (key type: <code>String</code>,
      *  value type: <code>org.eclipse.swt.graphics.FontData[]</code>).
      */
-    private Map<String, FontData[]> stringToFontData = new HashMap<>(7);
+    private Map<String, FontData[]> stringToFontData = new HashMap<String, FontData[]>(7);
 
     /**
      * Collection of Fonts that are now stale to be disposed
      * when it is safe to do so (i.e. on shutdown).
      * @see List
      */
-    private List<Font> staleFonts = new ArrayList<>();
+    private List<Font> staleFonts = new ArrayList<Font>();
 
     /**
      * Runnable that cleans up the manager on disposal of the display.
      */
-	protected Runnable displayRunnable = this::clearCaches;
+    protected Runnable displayRunnable = new Runnable() {
+        @Override
+		public void run() {
+            clearCaches();
+        }
+    };
 
 	private boolean displayDisposeHooked;
 
@@ -384,7 +389,9 @@ public class FontRegistry extends ResourceRegistry {
 	 */
     @Deprecated
 	public FontData bestData(FontData[] fonts, Display display) {
-        for (FontData fd : fonts) {
+        for (int i = 0; i < fonts.length; i++) {
+            FontData fd = fonts[i];
+
             if (fd == null) {
 				break;
 			}
@@ -445,8 +452,10 @@ public class FontRegistry extends ResourceRegistry {
      * @since 3.1
      */
     public FontData [] filterData(FontData [] fonts, Display display) {
-    	ArrayList<FontData> good = new ArrayList<>(fonts.length);
-    	for (FontData fd : fonts) {
+    	ArrayList<FontData> good = new ArrayList<FontData>(fonts.length);
+    	for (int i = 0; i < fonts.length; i++) {
+            FontData fd = fonts[i];
+
             if (fd == null) {
 				continue;
 			}
@@ -736,7 +745,8 @@ public class FontRegistry extends ResourceRegistry {
         // set if a fontdata isn't used.
         int height = fd.getHeight();
         String name = fd.getName();
-        for (FontData fixed : fixedFonts) {
+        for (int i = 0; i < fixedFonts.length; i++) {
+            FontData fixed = fixedFonts[i];
             if (fixed.getHeight() == height && fixed.getName().equals(name)) {
 				return true;
 			}

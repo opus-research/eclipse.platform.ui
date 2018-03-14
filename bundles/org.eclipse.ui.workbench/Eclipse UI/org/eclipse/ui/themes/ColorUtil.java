@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.ui.themes;
 
@@ -41,7 +40,8 @@ public final class ColorUtil {
 	private static RGB process(String value) {
 		Field [] fields = getFields();
 		try {
-			for (Field field : fields) {
+			for (int i = 0; i < fields.length; i++) {
+				Field field = fields[i];
 				if (field.getName().equals(value)) {
 					return getSystemColor(field.getInt(null));
 				}
@@ -66,9 +66,10 @@ public final class ColorUtil {
 		if (cachedFields == null) {
 			Class<SWT> clazz = SWT.class;
 			Field[] allFields = clazz.getDeclaredFields();
-			ArrayList<Field> applicableFields = new ArrayList<>(allFields.length);
+			ArrayList<Field> applicableFields = new ArrayList<Field>(allFields.length);
 
-			for (Field field : allFields) {
+			for (int i = 0; i < allFields.length; i++) {
+				Field field = allFields[i];
 				if (field.getType() == Integer.TYPE
 						&& Modifier.isStatic(field.getModifiers())
 						&& Modifier.isPublic(field.getModifiers())

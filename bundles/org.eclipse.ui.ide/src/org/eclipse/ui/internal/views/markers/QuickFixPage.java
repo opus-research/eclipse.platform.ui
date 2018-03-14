@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2017 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,14 +20,19 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
@@ -51,7 +56,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.IMarkerResolution2;
-import org.eclipse.ui.IMarkerResolutionRelevance;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.OpenAndLinkWithEditorHelper;
 import org.eclipse.ui.PartInitException;
@@ -189,10 +193,15 @@ public class QuickFixPage extends WizardPage {
 		selectAll.setLayoutData(new GridData(SWT.FILL, SWT.NONE, false, false));
 
 		selectAll.addSelectionListener(new SelectionAdapter() {
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+			 */
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				markersTable.setAllChecked(true);
-				setPageComplete(!resolutionsList.getStructuredSelection().isEmpty());
+				setPageComplete(!resolutionsList.getSelection().isEmpty());
 			}
 		});
 
@@ -202,6 +211,11 @@ public class QuickFixPage extends WizardPage {
 				.setLayoutData(new GridData(SWT.FILL, SWT.NONE, false, false));
 
 		deselectAll.addSelectionListener(new SelectionAdapter() {
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+			 */
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				markersTable.setAllChecked(false);
@@ -219,16 +233,32 @@ public class QuickFixPage extends WizardPage {
 		resolutionsList= new TableViewer(control, SWT.BORDER | SWT.SINGLE
 				| SWT.V_SCROLL);
 		resolutionsList.setContentProvider(new IStructuredContentProvider() {
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+			 */
 			@Override
 			public Object[] getElements(Object inputElement) {
 				return resolutions.keySet().toArray();
 			}
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+			 */
 			@Override
 			public void dispose() {
 
 			}
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
+			 *      java.lang.Object, java.lang.Object)
+			 */
 			@Override
 			public void inputChanged(Viewer viewer, Object oldInput,
 					Object newInput) {
@@ -237,11 +267,22 @@ public class QuickFixPage extends WizardPage {
 		});
 
 		resolutionsList.setLabelProvider(new LabelProvider() {
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
+			 */
 			@Override
 			public String getText(Object element) {
 				return ((IMarkerResolution) element).getLabel();
 			}
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.jface.viewers.LabelProvider#getImage(java.lang.Object)
+			 * @since 3.7
+			 */
 			@Override
 			public Image getImage(Object element) {
 				return element instanceof IMarkerResolution2 ? ((IMarkerResolution2)element).getImage() : null;
@@ -251,35 +292,31 @@ public class QuickFixPage extends WizardPage {
 		resolutionsList.setInput(this);
 
 		resolutionsList.setComparator(new ViewerComparator() {
-			/**
-			 * This comparator compares the resolutions based on the relevance of the
-			 * resolutions. Any resolution that doesn't implement IMarkerResolutionRelevance
-			 * will be deemed to have relevance 0 (default value for relevance). If both
-			 * resolutions have the same relevance, then marker resolution label string will
-			 * be used for comparing the resolutions.
+			/*
+			 * (non-Javadoc)
 			 *
-			 * @see IMarkerResolutionRelevance#getRelevanceForResolution()
+			 * @see org.eclipse.jface.viewers.ViewerComparator#compare(org.eclipse.jface.viewers.Viewer,
+			 *      java.lang.Object, java.lang.Object)
 			 */
 			@Override
 			public int compare(Viewer viewer, Object e1, Object e2) {
-				int relevanceMarker1 = (e1 instanceof IMarkerResolutionRelevance)
-						? ((IMarkerResolutionRelevance) e1).getRelevanceForResolution()
-						: 0;
-				int relevanceMarker2 = (e2 instanceof IMarkerResolutionRelevance)
-						? ((IMarkerResolutionRelevance) e2).getRelevanceForResolution()
-						: 0;
-				if (relevanceMarker1 != relevanceMarker2) {
-					return Integer.valueOf(relevanceMarker2).compareTo(Integer.valueOf(relevanceMarker1));
-				}
 				return ((IMarkerResolution) e1).getLabel().compareTo(
 						((IMarkerResolution)e2).getLabel());
 			}
 		});
 
 		resolutionsList
-				.addSelectionChangedListener(event -> {
-					markersTable.refresh();
-					setPageComplete(markersTable.getCheckedElements().length > 0);
+				.addSelectionChangedListener(new ISelectionChangedListener() {
+					/*
+					 * (non-Javadoc)
+					 *
+					 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
+					 */
+					@Override
+					public void selectionChanged(SelectionChangedEvent event) {
+						markersTable.refresh();
+						setPageComplete(markersTable.getCheckedElements().length > 0);
+					}
 				});
 	}
 
@@ -295,11 +332,21 @@ public class QuickFixPage extends WizardPage {
 		createTableColumns();
 
 		markersTable.setContentProvider(new IStructuredContentProvider() {
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+			 */
 			@Override
 			public void dispose() {
 
 			}
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+			 */
 			@Override
 			public Object[] getElements(Object inputElement) {
 				IMarkerResolution selected = getSelectedResolution();
@@ -313,6 +360,12 @@ public class QuickFixPage extends WizardPage {
 				return MarkerSupportInternalUtilities.EMPTY_MARKER_ARRAY;
 			}
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
+			 *      java.lang.Object, java.lang.Object)
+			 */
 			@Override
 			public void inputChanged(Viewer viewer, Object oldInput,
 					Object newInput) {
@@ -322,6 +375,12 @@ public class QuickFixPage extends WizardPage {
 
 		markersTable.setLabelProvider(new ITableLabelProvider() {
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object,
+			 *      int)
+			 */
 			@Override
 			public Image getColumnImage(Object element, int columnIndex) {
 				if (columnIndex == 0)
@@ -330,6 +389,12 @@ public class QuickFixPage extends WizardPage {
 				return null;
 			}
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object,
+			 *      int)
+			 */
 			@Override
 			public String getColumnText(Object element, int columnIndex) {
 				IMarker marker =(IMarker) element;
@@ -355,23 +420,44 @@ public class QuickFixPage extends WizardPage {
 				return lineNumberString;
 			}
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.jface.viewers.ILabelProviderListener)
+			 */
 			@Override
 			public void addListener(ILabelProviderListener listener) {
 				// do nothing
 
 			}
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
+			 */
 			@Override
 			public void dispose() {
 				// do nothing
 
 			}
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang.Object,
+			 *      java.lang.String)
+			 */
 			@Override
 			public boolean isLabelProperty(Object element, String property) {
 				return false;
 			}
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
+			 */
 			@Override
 			public void removeListener(ILabelProviderListener listener) {
 				// do nothing
@@ -379,13 +465,21 @@ public class QuickFixPage extends WizardPage {
 			}
 		});
 
-		markersTable.addCheckStateListener(event -> {
-			if (event.getChecked() == true) {
-				setPageComplete(true);
-			} else {
-				setPageComplete(markersTable.getCheckedElements().length > 0);
-			}
+		markersTable.addCheckStateListener(new ICheckStateListener() {
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.jface.viewers.ICheckStateListener#checkStateChanged(org.eclipse.jface.viewers.CheckStateChangedEvent)
+			 */
+			@Override
+			public void checkStateChanged(CheckStateChangedEvent event) {
+				if (event.getChecked() == true) {
+					setPageComplete(true);
+				} else {
+					setPageComplete(markersTable.getCheckedElements().length > 0);
+				}
 
+			}
 		});
 
 		new OpenAndLinkWithEditorHelper(markersTable) {
@@ -480,10 +574,15 @@ public class QuickFixPage extends WizardPage {
 		if (resolution instanceof WorkbenchMarkerResolution) {
 
 			try {
-				getWizard().getContainer().run(false, true, monitor1 -> {
-					IMarker[] markers = new IMarker[checked.length];
-					System.arraycopy(checked, 0, markers, 0, checked.length);
-					((WorkbenchMarkerResolution) resolution).run(markers, monitor1);
+				getWizard().getContainer().run(false, true, new IRunnableWithProgress() {
+
+					@Override
+					public void run(IProgressMonitor monitor1) {
+						IMarker[] markers = new IMarker[checked.length];
+						System.arraycopy(checked, 0, markers, 0, checked.length);
+						((WorkbenchMarkerResolution) resolution).run(markers, monitor1);
+					}
+
 				});
 			} catch (InvocationTargetException e) {
 				StatusManager.getManager().handle(
@@ -496,19 +595,24 @@ public class QuickFixPage extends WizardPage {
 		} else {
 
 			try {
-				getWizard().getContainer().run(false, true, monitor1 -> {
-					monitor1.beginTask(MarkerMessages.MarkerResolutionDialog_Fixing, checked.length);
-					for (Object checkedElement : checked) {
-						// Allow paint events and wake up the button
-						getShell().getDisplay().readAndDispatch();
-						if (monitor1.isCanceled()) {
-							return;
+				getWizard().getContainer().run(false, true, new IRunnableWithProgress() {
+
+					@Override
+					public void run(IProgressMonitor monitor1) {
+						monitor1.beginTask(MarkerMessages.MarkerResolutionDialog_Fixing, checked.length);
+						for (int i = 0; i < checked.length; i++) {
+							// Allow paint events and wake up the button
+							getShell().getDisplay().readAndDispatch();
+							if (monitor1.isCanceled()) {
+								return;
+							}
+							IMarker marker = (IMarker) checked[i];
+							monitor1.subTask(Util.getProperty(IMarker.MESSAGE, marker));
+							resolution.run(marker);
+							monitor1.worked(1);
 						}
-						IMarker marker = (IMarker) checkedElement;
-						monitor1.subTask(Util.getProperty(IMarker.MESSAGE, marker));
-						resolution.run(marker);
-						monitor1.worked(1);
 					}
+
 				});
 			} catch (InvocationTargetException e) {
 				StatusManager.getManager().handle(

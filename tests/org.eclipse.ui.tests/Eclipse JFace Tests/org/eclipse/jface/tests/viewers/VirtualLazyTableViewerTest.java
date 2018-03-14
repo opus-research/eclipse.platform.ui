@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2017 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Table;
  */
 public class VirtualLazyTableViewerTest extends VirtualTableViewerTest {
 
-	private List<Integer> updatedElements;
+	private List updatedElements;
 	// by default, no failure is triggered when updateElement is called
 	int updatedElementFailureTriggerIndex = -1;
 
@@ -45,7 +45,7 @@ public class VirtualLazyTableViewerTest extends VirtualTableViewerTest {
 
 	@Override
 	public void setUp() {
-		updatedElements = new ArrayList<>();
+		updatedElements = new ArrayList();
 		super.setUp();
 		processEvents();
 	}
@@ -64,7 +64,7 @@ public class VirtualLazyTableViewerTest extends VirtualTableViewerTest {
 
 	// this method is called from TestLazyModelContentProvider
 	public void updateElementCalled(int index) {
-		updatedElements.add(Integer.valueOf(index));
+		updatedElements.add(new Integer(index));
 		if(updatedElementFailureTriggerIndex!=-1 && updatedElements.size()>=updatedElementFailureTriggerIndex) {
 			fail("unexpected call to updateElement, this is the " + updatedElements.size() + "th call");
 		}
@@ -91,7 +91,8 @@ public class VirtualLazyTableViewerTest extends VirtualTableViewerTest {
 
 		table.showSelection();
 
-		IStructuredSelection result = fViewer.getStructuredSelection();
+		IStructuredSelection result = (IStructuredSelection) fViewer
+				.getSelection();
 		assertEquals(selectionSize, result.size());
 		assertTrue("First elements do not match ",
 				result.getFirstElement() == children[indices[0]]);

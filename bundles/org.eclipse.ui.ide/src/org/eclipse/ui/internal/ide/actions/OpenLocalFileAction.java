@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -76,7 +76,7 @@ public class OpenLocalFileAction extends Action implements IWorkbenchWindowActio
 
 	@Override
 	public void run() {
-		FileDialog dialog =  new FileDialog(window.getShell(), SWT.OPEN | SWT.MULTI | SWT.SHEET);
+		FileDialog dialog =  new FileDialog(window.getShell(), SWT.OPEN | SWT.MULTI);
 		dialog.setText(IDEWorkbenchMessages.OpenLocalFileAction_title);
 		dialog.setFilterPath(filterPath);
 		dialog.open();
@@ -86,10 +86,10 @@ public class OpenLocalFileAction extends Action implements IWorkbenchWindowActio
 			filterPath =  dialog.getFilterPath();
 
 			int numberOfFilesNotFound =  0;
-			StringBuilder notFound =  new StringBuilder();
-			for (String name : names) {
+			StringBuffer notFound =  new StringBuffer();
+			for (int i =  0; i < names.length; i++) {
 				IFileStore fileStore =  EFS.getLocalFileSystem().getStore(new Path(filterPath));
-				fileStore =  fileStore.getChild(name);
+				fileStore =  fileStore.getChild(names[i]);
 				IFileInfo fetchInfo = fileStore.fetchInfo();
 				if (!fetchInfo.isDirectory() && fetchInfo.exists()) {
 					IWorkbenchPage page =  window.getActivePage();

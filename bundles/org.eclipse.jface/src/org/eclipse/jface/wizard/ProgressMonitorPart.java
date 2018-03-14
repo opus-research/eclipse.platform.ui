@@ -9,11 +9,8 @@
  *     IBM Corporation - initial API and implementation
  *     Eugene Ostroukhov <eugeneo@symbian.org> -  Bug 287887 [Wizards] [api] Cancel button has two distinct roles
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440270
- *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 475879
  *******************************************************************************/
 package org.eclipse.jface.wizard;
-
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -23,6 +20,10 @@ import org.eclipse.jface.dialogs.ProgressIndicator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontMetrics;
@@ -32,6 +33,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Listener;
@@ -70,12 +72,15 @@ public class ProgressMonitorPart extends Composite implements
     protected IStatus blockedStatus;
 
     /** the cancel lister attached to the cancel component */
-    protected Listener fCancelListener = e -> {
-	    setCanceled(true);
-	    if (fCancelComponent != null) {
-			fCancelComponent.setEnabled(false);
-		}
-	};
+    protected Listener fCancelListener = new Listener() {
+        @Override
+		public void handleEvent(Event e) {
+            setCanceled(true);
+            if (fCancelComponent != null) {
+				fCancelComponent.setEnabled(false);
+			}
+        }
+    };
 
     /** toolbar for managing stop button **/
     private ToolBar fToolBar;
@@ -157,12 +162,10 @@ public class ProgressMonitorPart extends Composite implements
         fTaskName = name;
         fSubTaskName = ""; //$NON-NLS-1$
         updateLabel();
-		if (!fProgressIndicator.isDisposed()) {
-			if (totalWork == IProgressMonitor.UNKNOWN || totalWork == 0) {
-				fProgressIndicator.beginAnimatedTask();
-			} else {
-				fProgressIndicator.beginTask(totalWork);
-			}
+        if (totalWork == IProgressMonitor.UNKNOWN || totalWork == 0) {
+            fProgressIndicator.beginAnimatedTask();
+        } else {
+            fProgressIndicator.beginTask(totalWork);
         }
         if (fToolBar != null && !fToolBar.isDisposed()) {
         	fToolBar.setVisible(true);
@@ -192,7 +195,7 @@ public class ProgressMonitorPart extends Composite implements
 			return in;
 		}
         int length = in.length();
-        StringBuilder out = new StringBuilder(length + 1);
+        StringBuffer out = new StringBuffer(length + 1);
         for (int i = 0; i < length; i++) {
             char c = in.charAt(i);
             if (c == '&') {
@@ -256,21 +259,27 @@ public class ProgressMonitorPart extends Composite implements
         	fStopButton = new ToolItem(fToolBar, SWT.PUSH);
         	// It would have been nice to use the fCancelListener, but that
         	// listener operates on the fCancelComponent which must be a control.
-        	fStopButton.addSelectionListener(widgetSelectedAdapter(e -> {
-				setCanceled(true);
-				if (fStopButton != null) {
-					fStopButton.setEnabled(false);
-				}
-			}));
+        	fStopButton.addSelectionListener(new SelectionAdapter() {
+        		@Override
+				public void widgetSelected(SelectionEvent e) {
+        			setCanceled(true);
+        			if (fStopButton != null) {
+        				fStopButton.setEnabled(false);
+        			}
+        		}
+        	});
         	final Image stopImage = ImageDescriptor.createFromFile(
         			ProgressMonitorPart.class, "images/stop.png").createImage(getDisplay()); //$NON-NLS-1$
         	final Cursor arrowCursor = new Cursor(this.getDisplay(), SWT.CURSOR_ARROW);
         	fToolBar.setCursor(arrowCursor);
         	fStopButton.setImage(stopImage);
-        	fStopButton.addDisposeListener(e -> {
-				stopImage.dispose();
-				arrowCursor.dispose();
-			});
+        	fStopButton.addDisposeListener(new DisposeListener() {
+        		@Override
+				public void widgetDisposed(DisposeEvent e) {
+        			stopImage.dispose();
+        			arrowCursor.dispose();
+        		}
+        	});
         	fStopButton.setEnabled(false);
 			fStopButton.setToolTipText(JFaceResources.getString("ProgressMonitorPart.cancelToolTip")); //$NON-NLS-1$
         }
@@ -278,9 +287,7 @@ public class ProgressMonitorPart extends Composite implements
 
     @Override
 	public void internalWorked(double work) {
-		if (!fProgressIndicator.isDisposed()) {
-			fProgressIndicator.worked(work);
-		}
+        fProgressIndicator.worked(work);
     }
 
     @Override
@@ -334,9 +341,6 @@ public class ProgressMonitorPart extends Composite implements
      * Updates the label with the current task and subtask names.
      */
     protected void updateLabel() {
-		if (fLabel.isDisposed() || fLabel.isAutoDirection()) {
-			return;
-		}
         if (blockedStatus == null) {
             String text = taskLabel();
             fLabel.setText(text);
@@ -358,7 +362,8 @@ public class ProgressMonitorPart extends Composite implements
 
 		if (hasTask) {
 			if (hasSubtask)
-				return escapeMetaCharacters(JFaceResources.format("Set_SubTask", fTaskName, fSubTaskName));//$NON-NLS-1$
+				return escapeMetaCharacters(JFaceResources.format(
+    					"Set_SubTask", new Object[] { fTaskName, fSubTaskName }));//$NON-NLS-1$
    			return escapeMetaCharacters(fTaskName);
 
     	} else if (hasSubtask) {

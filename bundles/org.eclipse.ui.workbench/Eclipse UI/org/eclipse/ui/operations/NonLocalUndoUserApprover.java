@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,12 +11,12 @@
 package org.eclipse.ui.operations;
 
 import java.util.ArrayList;
+
 import org.eclipse.core.commands.operations.IAdvancedUndoableOperation;
 import org.eclipse.core.commands.operations.IOperationApprover;
 import org.eclipse.core.commands.operations.IOperationHistory;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.commands.operations.IUndoableOperation;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -26,6 +26,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchMessages;
+import org.eclipse.ui.internal.util.Util;
 
 /**
  * <p>
@@ -99,6 +100,13 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 		this.elements = affectedObjects;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.core.commands.operations.IOperationApprover#proceedRedoing(org.eclipse.core.commands.operations.IUndoableOperation,
+	 *      org.eclipse.core.commands.operations.IOperationHistory,
+	 *      org.eclipse.core.runtime.IAdaptable)
+	 */
 	@Override
 	public IStatus proceedRedoing(IUndoableOperation operation,
 			IOperationHistory history, IAdaptable uiInfo) {
@@ -114,6 +122,13 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 		return proceedWithOperation(operation, message, WorkbenchMessages.Operations_discardRedo, WorkbenchMessages.Workbench_redoToolTip);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.core.commands.operations.IOperationApprover#proceedUndoing(org.eclipse.core.commands.operations.IUndoableOperation,
+	 *      org.eclipse.core.commands.operations.IOperationHistory,
+	 *      org.eclipse.core.runtime.IAdaptable)
+	 */
 	@Override
 	public IStatus proceedUndoing(IUndoableOperation operation,
 			IOperationHistory history, IAdaptable uiInfo) {
@@ -164,7 +179,8 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 			// empty
 			// array of affected objects is considered a local change.
 			local = true;
-			for (Object modifiedElement : modifiedElements) {
+			for (int i = 0; i < modifiedElements.length; i++) {
+				Object modifiedElement = modifiedElements[i];
 				if (!elementsContains(modifiedElement)) {
 					// the modified element is not known by the editor
 					local = false;
@@ -172,7 +188,8 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 					// preferred
 					// comparison class has been provided.
 					if (affectedObjectsClass != null) {
-						Object adapter = Adapters.adapt(modifiedElement, affectedObjectsClass);
+						Object adapter = Util.getAdapter(modifiedElement,
+								affectedObjectsClass);
 						if (adapter != null && elementsContains(adapter)) {
 							local = true;
 						}
@@ -194,12 +211,14 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 		// a syncExec because operation approval notifications may come from
 		// a background thread.
 		final int[] answer = new int[1];
-		PlatformUI.getWorkbench().getDisplay().syncExec(() -> {
-			MessageDialog dialog = new MessageDialog(part.getSite().getShell(), title,
-					null, message, MessageDialog.QUESTION, 0, IDialogConstants.OK_LABEL, discardButton,
-					IDialogConstants.CANCEL_LABEL); // yes is the default
-		    answer[0] = dialog.open();
-});
+		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
+			@Override
+			public void run() {
+				MessageDialog dialog = new MessageDialog(part.getSite().getShell(), title,
+						null, message, MessageDialog.QUESTION, new String[] { IDialogConstants.OK_LABEL,
+		                        discardButton, IDialogConstants.CANCEL_LABEL }, 0); // yes is the default
+		        answer[0] = dialog.open();
+		}});
 		switch (answer[0]) {
 		case 0:
 			return Status.OK_STATUS;
@@ -233,7 +252,7 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 		// not originate
 		// in our context.
 		if (uiInfo != null) {
-			IUndoContext originatingContext = Adapters.adapt(uiInfo, IUndoContext.class);
+			IUndoContext originatingContext = Util.getAdapter(uiInfo, IUndoContext.class);
 			if (originatingContext != null
 					&& !(originatingContext.matches(context))) {
 				return false;
@@ -256,11 +275,12 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 			// may provide on the preferred class if they are not instances of
 			// the preferred class. This is done only once.
 			elementsAndAdapters = new ArrayList(elements.length);
-			for (Object element : elements) {
+			for (int i = 0; i < elements.length; i++) {
+				Object element = elements[i];
 				elementsAndAdapters.add(element);
 				if (affectedObjectsClass != null
 						&& !affectedObjectsClass.isInstance(element)) {
-					Object adapter = Adapters.adapt(element, affectedObjectsClass);
+					Object adapter = Util.getAdapter(element, affectedObjectsClass);
 					if (adapter != null) {
 						elementsAndAdapters.add(adapter);
 					}

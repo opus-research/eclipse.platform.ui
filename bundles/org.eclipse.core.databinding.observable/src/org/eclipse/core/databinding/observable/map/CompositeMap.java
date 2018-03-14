@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2017 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,12 +8,12 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bug 233306, 226289, 190881
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 package org.eclipse.core.databinding.observable.map;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,235 +38,245 @@ import org.eclipse.core.runtime.Assert;
  * listeners may be invoked from any thread.
  * </p>
  *
- * @param <K>
- *            the type of the keys in this map
- * @param <I>
- *            the type of the intermediate values
- * @param <V>
- *            the type of the values in this map
- *
  * @since 1.1
  *
  */
-public class CompositeMap<K, I, V> extends ObservableMap<K, V> {
+public class CompositeMap extends ObservableMap {
 	// adds that need to go through the second map and thus will be picked up by
 	// secondMapListener.
-	private Set<I> pendingAdds = new HashSet<>();
+	private Set pendingAdds = new HashSet();
 
 	// Removes that need to go through the second map and thus will be picked up
 	// by secondMapListener. Maps from value being removed to key being removed.
-	private Map<I, K> pendingRemoves = new HashMap<>();
+	private Map pendingRemoves = new HashMap();
 
 	// Changes that need to go through the second map and thus will be picked up
-	// by secondMapListener. Maps from old value to new value and new value to
-	// old
+	// by secondMapListener. Maps from old value to new value and new value to old
 	// value.
-	private Map<I, I> pendingChanges = new HashMap<>();
+	private Map pendingChanges = new HashMap();
 
-	private BidiObservableMap<K, I> firstMap;
-	private IObservableMap<I, V> secondMap;
-	private WritableSetPlus<I> rangeSet = new WritableSetPlus<>();
+	private IMapChangeListener firstMapListener = new IMapChangeListener() {
 
-	private IMapChangeListener<K, I> firstMapListener = event -> {
-		MapDiff<? extends K, ? extends I> diff = event.diff;
-		Set<I> rangeSetAdditions = new HashSet<>();
-		Set<I> rangeSetRemovals = new HashSet<>();
-		final Set<K> adds = new HashSet<>();
-		final Set<K> changes = new HashSet<>();
-		final Set<K> removes = new HashSet<>();
-		final Map<K, V> oldValues = new HashMap<>();
+		@Override
+		public void handleMapChange(MapChangeEvent event) {
+			MapDiff diff = event.diff;
+			Set rangeSetAdditions = new HashSet();
+			Set rangeSetRemovals = new HashSet();
+			final Set adds = new HashSet();
+			final Set changes = new HashSet();
+			final Set removes = new HashSet();
+			final Map oldValues = new HashMap();
 
-		for (K addedKey : diff.getAddedKeys()) {
-			I newValue1 = diff.getNewValue(addedKey);
-			if (!rangeSet.contains(newValue1)) {
-				pendingAdds.add(newValue1);
-				rangeSetAdditions.add(newValue1);
-			} else {
-				adds.add(addedKey);
-				wrappedMap.put(addedKey, secondMap.get(newValue1));
-			}
-		}
-		for (K changedKey : diff.getChangedKeys()) {
-			I oldValue1 = diff.getOldValue(changedKey);
-			I newValue2 = diff.getNewValue(changedKey);
-			boolean removed = firstMap.getKeys(oldValue1).isEmpty();
-			boolean added = !rangeSet.contains(newValue2);
-			if (removed) {
-				pendingRemoves.put(oldValue1, changedKey);
-				rangeSetRemovals.add(oldValue1);
-			}
-			if (added) {
-				pendingAdds.add(newValue2);
-				rangeSetAdditions.add(newValue2);
-			}
-			if (added || removed) {
-				pendingChanges.put(oldValue1, newValue2);
-				pendingChanges.put(newValue2, oldValue1);
-			} else {
-				changes.add(changedKey);
-				oldValues.put(changedKey, secondMap.get(oldValue1));
-				wrappedMap.put(changedKey, secondMap.get(newValue2));
-			}
-		}
-		for (K removedKey : diff.getRemovedKeys()) {
-			I oldValue2 = diff.getOldValue(removedKey);
-			if (firstMap.getKeys(oldValue2).isEmpty()) {
-				pendingRemoves.put(oldValue2, removedKey);
-				rangeSetRemovals.add(oldValue2);
-			} else {
-				removes.add(removedKey);
-				oldValues.put(removedKey, secondMap.get(oldValue2));
-				wrappedMap.remove(removedKey);
-			}
-		}
-
-		if (adds.size() > 0 || removes.size() > 0 || changes.size() > 0) {
-			fireMapChange(new MapDiff<K, V>() {
-
-				@Override
-				public Set<K> getAddedKeys() {
-					return adds;
+			for (Iterator it = diff.getAddedKeys().iterator(); it.hasNext();) {
+				Object addedKey = it.next();
+				Object newValue = diff.getNewValue(addedKey);
+				if (!rangeSet.contains(newValue)) {
+					pendingAdds.add(newValue);
+					rangeSetAdditions.add(newValue);
+				} else {
+					adds.add(addedKey);
+					wrappedMap.put(addedKey, secondMap.get(newValue));
 				}
-
-				@Override
-				public Set<K> getChangedKeys() {
-					return changes;
+			}
+			for (Iterator it = diff.getChangedKeys().iterator(); it.hasNext();) {
+				Object changedKey = it.next();
+				Object oldValue = diff.getOldValue(changedKey);
+				Object newValue = diff.getNewValue(changedKey);
+				boolean removed = firstMap.getKeys(oldValue).isEmpty();
+				boolean added = !rangeSet.contains(newValue);
+				if (removed) {
+					pendingRemoves.put(oldValue, changedKey);
+					rangeSetRemovals.add(oldValue);
 				}
-
-				@Override
-				public V getNewValue(Object key) {
-					return wrappedMap.get(key);
+				if (added) {
+					pendingAdds.add(newValue);
+					rangeSetAdditions.add(newValue);
 				}
-
-				@Override
-				public V getOldValue(Object key) {
-					return oldValues.get(key);
+				if (added || removed) {
+					pendingChanges.put(oldValue, newValue);
+					pendingChanges.put(newValue, oldValue);
+				} else {
+					changes.add(changedKey);
+					oldValues.put(changedKey, oldValue);
+					wrappedMap.put(changedKey, secondMap.get(newValue));
 				}
-
-				@Override
-				public Set<K> getRemovedKeys() {
-					return removes;
+			}
+			for (Iterator it = diff.getRemovedKeys().iterator(); it.hasNext();) {
+				Object removedKey = it.next();
+				Object oldValue = diff.getOldValue(removedKey);
+				if (firstMap.getKeys(oldValue).isEmpty()) {
+					pendingRemoves.put(oldValue, removedKey);
+					rangeSetRemovals.add(oldValue);
+				} else {
+					removes.add(removedKey);
+					oldValues.put(removedKey, secondMap.get(oldValue));
+					wrappedMap.remove(removedKey);
 				}
-			});
-		}
+			}
 
-		if (rangeSetAdditions.size() > 0 || rangeSetRemovals.size() > 0) {
-			rangeSet.addAndRemove(rangeSetAdditions, rangeSetRemovals);
+			if (adds.size() > 0 || removes.size() > 0 || changes.size() > 0) {
+				fireMapChange(new MapDiff() {
+
+					@Override
+					public Set getAddedKeys() {
+						return adds;
+					}
+
+					@Override
+					public Set getChangedKeys() {
+						return changes;
+					}
+
+					@Override
+					public Object getNewValue(Object key) {
+						return wrappedMap.get(key);
+					}
+
+					@Override
+					public Object getOldValue(Object key) {
+						return oldValues.get(key);
+					}
+
+					@Override
+					public Set getRemovedKeys() {
+						return removes;
+					}
+				});
+			}
+
+			if (rangeSetAdditions.size() > 0 || rangeSetRemovals.size() > 0) {
+				rangeSet.addAndRemove(rangeSetAdditions, rangeSetRemovals);
+			}
 		}
 	};
 
-	private IMapChangeListener<I, V> secondMapListener = event -> {
-		MapDiff<? extends I, ? extends V> diff = event.diff;
-		final Set<K> adds = new HashSet<>();
-		final Set<K> changes = new HashSet<>();
-		final Set<K> removes = new HashSet<>();
-		final Map<K, V> oldValues = new HashMap<>();
-		final Map<K, V> newValues = new HashMap<>();
-		Set<I> addedKeys = new HashSet<I>(diff.getAddedKeys());
-		Set<I> removedKeys = new HashSet<I>(diff.getRemovedKeys());
+	private IMapChangeListener secondMapListener = new IMapChangeListener() {
 
-		for (I addedKey : addedKeys) {
-			Set<K> elements1 = firstMap.getKeys(addedKey);
-			V newValue1 = diff.getNewValue(addedKey);
-			if (pendingChanges.containsKey(addedKey)) {
-				I oldKey = pendingChanges.remove(addedKey);
-				V oldValue1;
-				if (removedKeys.remove(oldKey)) {
-					oldValue1 = diff.getOldValue(oldKey);
+		@Override
+		public void handleMapChange(MapChangeEvent event) {
+			MapDiff diff = event.diff;
+			final Set adds = new HashSet();
+			final Set changes = new HashSet();
+			final Set removes = new HashSet();
+			final Map oldValues = new HashMap();
+			final Map newValues = new HashMap();
+			Set addedKeys = new HashSet(diff.getAddedKeys());
+			Set removedKeys = new HashSet(diff.getRemovedKeys());
+
+			for (Iterator it = addedKeys.iterator(); it.hasNext();) {
+				Object addedKey = it.next();
+				Set elements = firstMap.getKeys(addedKey);
+				Object newValue = diff.getNewValue(addedKey);
+				if (pendingChanges.containsKey(addedKey)) {
+					Object oldKey = pendingChanges.remove(addedKey);
+					Object oldValue;
+					if (removedKeys.remove(oldKey)) {
+						oldValue = diff.getOldValue(oldKey);
+					} else {
+						oldValue = secondMap.get(oldKey);
+					}
+					pendingChanges.remove(oldKey);
+					pendingAdds.remove(addedKey);
+					pendingRemoves.remove(oldKey);
+					for (Iterator it2 = elements.iterator(); it2.hasNext();) {
+						Object element = it2.next();
+						changes.add(element);
+						oldValues.put(element, oldValue);
+						newValues.put(element, newValue);
+						wrappedMap.put(element, newValue);
+					}
+				} else if (pendingAdds.remove(addedKey)) {
+					for (Iterator it2 = elements.iterator(); it2.hasNext();) {
+						Object element = it2.next();
+						adds.add(element);
+						newValues.put(element, newValue);
+						wrappedMap.put(element, newValue);
+					}
 				} else {
-					oldValue1 = secondMap.get(oldKey);
+					Assert.isTrue(false, "unexpected case"); //$NON-NLS-1$
 				}
-				pendingChanges.remove(oldKey);
-				pendingAdds.remove(addedKey);
-				pendingRemoves.remove(oldKey);
-				for (K element1 : elements1) {
-					changes.add(element1);
-					oldValues.put(element1, oldValue1);
-					newValues.put(element1, newValue1);
-					wrappedMap.put(element1, newValue1);
-				}
-			} else if (pendingAdds.remove(addedKey)) {
-				for (K element2 : elements1) {
-					adds.add(element2);
-					newValues.put(element2, newValue1);
-					wrappedMap.put(element2, newValue1);
-				}
-			} else {
-				Assert.isTrue(false, "unexpected case"); //$NON-NLS-1$
 			}
-		}
-		for (I changedKey : diff.getChangedKeys()) {
-			Set<K> elements2 = firstMap.getKeys(changedKey);
-			for (K element3 : elements2) {
-				changes.add(element3);
-				oldValues.put(element3, diff.getOldValue(changedKey));
-				V newValue2 = diff.getNewValue(changedKey);
-				newValues.put(element3, newValue2);
-				wrappedMap.put(element3, newValue2);
+			for (Iterator it = diff.getChangedKeys().iterator(); it.hasNext();) {
+				Object changedKey = it.next();
+				Set elements = firstMap.getKeys(changedKey);
+				for (Iterator it2 = elements.iterator(); it2.hasNext();) {
+					Object element = it2.next();
+					changes.add(element);
+					oldValues.put(element, diff.getOldValue(changedKey));
+					Object newValue = diff.getNewValue(changedKey);
+					newValues.put(element, newValue);
+					wrappedMap.put(element, newValue);
+				}
 			}
-		}
-		for (I removedKey : removedKeys) {
-			K element4 = pendingRemoves.remove(removedKey);
-			if (element4 != null) {
-				if (pendingChanges.containsKey(removedKey)) {
-					Object newKey = pendingChanges.remove(removedKey);
-					pendingChanges.remove(newKey);
-					pendingAdds.remove(newKey);
-					pendingRemoves.remove(removedKey);
-					changes.add(element4);
-					oldValues.put(element4, diff.getOldValue(removedKey));
-					V newValue3 = secondMap.get(newKey);
-					newValues.put(element4, newValue3);
-					wrappedMap.put(element4, newValue3);
+			for (Iterator it = removedKeys.iterator(); it.hasNext();) {
+				Object removedKey = it.next();
+				Object element = pendingRemoves.remove(removedKey);
+				if (element != null) {
+					if (pendingChanges.containsKey(removedKey)) {
+						Object newKey = pendingChanges.remove(removedKey);
+						pendingChanges.remove(newKey);
+						pendingAdds.remove(newKey);
+						pendingRemoves.remove(removedKey);
+						changes.add(element);
+						oldValues.put(element, diff.getOldValue(removedKey));
+						Object newValue = secondMap.get(newKey);
+						newValues.put(element, newValue);
+						wrappedMap.put(element, newValue);
+					} else {
+						removes.add(element);
+						Object oldValue = diff.getOldValue(removedKey);
+						oldValues.put(element, oldValue);
+						wrappedMap.remove(element);
+					}
 				} else {
-					removes.add(element4);
-					V oldValue2 = diff.getOldValue(removedKey);
-					oldValues.put(element4, oldValue2);
-					wrappedMap.remove(element4);
+					Assert.isTrue(false, "unexpected case"); //$NON-NLS-1$
 				}
-			} else {
-				Assert.isTrue(false, "unexpected case"); //$NON-NLS-1$
 			}
-		}
 
-		if (adds.size() > 0 || removes.size() > 0 || changes.size() > 0) {
-			fireMapChange(new MapDiff<K, V>() {
+			if (adds.size() > 0 || removes.size() > 0 || changes.size() > 0) {
+				fireMapChange(new MapDiff() {
 
-				@Override
-				public Set<K> getAddedKeys() {
-					return adds;
-				}
+					@Override
+					public Set getAddedKeys() {
+						return adds;
+					}
 
-				@Override
-				public Set<K> getChangedKeys() {
-					return changes;
-				}
+					@Override
+					public Set getChangedKeys() {
+						return changes;
+					}
 
-				@Override
-				public V getNewValue(Object key) {
-					return newValues.get(key);
-				}
+					@Override
+					public Object getNewValue(Object key) {
+						return newValues.get(key);
+					}
 
-				@Override
-				public V getOldValue(Object key) {
-					return oldValues.get(key);
-				}
+					@Override
+					public Object getOldValue(Object key) {
+						return oldValues.get(key);
+					}
 
-				@Override
-				public Set<K> getRemovedKeys() {
-					return removes;
-				}
-			});
+					@Override
+					public Set getRemovedKeys() {
+						return removes;
+					}
+				});
+			}
 		}
 	};
 
-	private static class WritableSetPlus<E> extends WritableSet<E> {
-		void addAndRemove(Set<E> additions, Set<E> removals) {
+	private BidiObservableMap firstMap;
+	private IObservableMap secondMap;
+
+	private static class WritableSetPlus extends WritableSet {
+		void addAndRemove(Set additions, Set removals) {
 			wrappedSet.removeAll(removals);
 			wrappedSet.addAll(additions);
 			fireSetChange(Diffs.createSetDiff(additions, removals));
 		}
 	}
+
+	private WritableSetPlus rangeSet = new WritableSetPlus();
 
 	/**
 	 * Creates a new composite map. Because the key set of the second map is
@@ -281,15 +291,17 @@ public class CompositeMap<K, I, V> extends ObservableMap<K, V> {
 	 *            a factory that creates the second map when given an observable
 	 *            set representing the value set of <code>firstMap</code>.
 	 */
-	public CompositeMap(IObservableMap<K, I> firstMap,
-			IObservableFactory<Set<I>, IObservableMap<I, V>> secondMapFactory) {
-		super(firstMap.getRealm(), new HashMap<K, V>());
-		this.firstMap = new BidiObservableMap<>(firstMap);
+	public CompositeMap(IObservableMap firstMap,
+			IObservableFactory secondMapFactory) {
+		super(firstMap.getRealm(), new HashMap());
+		this.firstMap = new BidiObservableMap(firstMap);
 		this.firstMap.addMapChangeListener(firstMapListener);
 		rangeSet.addAll(this.firstMap.values());
-		this.secondMap = secondMapFactory.createObservable(rangeSet);
+		this.secondMap = (IObservableMap) secondMapFactory
+				.createObservable(rangeSet);
 		secondMap.addMapChangeListener(secondMapListener);
-		for (Entry<K, I> entry : this.firstMap.entrySet()) {
+		for (Iterator it = this.firstMap.entrySet().iterator(); it.hasNext();) {
+			Map.Entry entry = (Entry) it.next();
 			wrappedMap.put(entry.getKey(), secondMap.get(entry.getValue()));
 		}
 	}

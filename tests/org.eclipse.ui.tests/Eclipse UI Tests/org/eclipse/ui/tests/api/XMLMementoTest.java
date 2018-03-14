@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2017 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,11 +15,11 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 
+import junit.framework.TestCase;
+
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
-
-import junit.framework.TestCase;
 
 /**
  * Testing XMLMemento (see bug 93262). Emphasis is on ensuring that the 3.1
@@ -335,9 +335,9 @@ public class XMLMementoTest extends TestCase {
 	public void testPutAndGetInteger() throws WorkbenchException, IOException {
 		final String key = "key";
 
-		Integer[] values = new Integer[] { Integer.valueOf(36254), Integer.valueOf(0),
-				Integer.valueOf(1), Integer.valueOf(-36254),
-				Integer.valueOf(Integer.MAX_VALUE), Integer.valueOf(Integer.MIN_VALUE) };
+		Integer[] values = new Integer[] { new Integer(36254), new Integer(0),
+				new Integer(1), new Integer(-36254),
+				new Integer(Integer.MAX_VALUE), new Integer(Integer.MIN_VALUE) };
 
 		for (final Integer value : values) {
 			testPutAndGet(new MementoChecker() {
@@ -537,14 +537,14 @@ public class XMLMementoTest extends TestCase {
 
 		mementoChecker.prepareAndCheckBeforeSerialization(mementoToSerialize);
 
-		try (StringWriter writer = new StringWriter()) {
-			mementoToSerialize.save(writer);
-			StringReader reader = new StringReader(writer.getBuffer().toString());
-			XMLMemento deserializedMemento = XMLMemento.createReadRoot(reader);
-			mementoChecker.checkAfterDeserialization(deserializedMemento);
-		}
+		StringWriter writer = new StringWriter();
+		mementoToSerialize.save(writer);
+		writer.close();
 
+		StringReader reader = new StringReader(writer.getBuffer().toString());
+		XMLMemento deserializedMemento = XMLMemento.createReadRoot(reader);
 
+		mementoChecker.checkAfterDeserialization(deserializedMemento);
 	}
 
 	   public void testMementoWithTextContent113659() throws Exception {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.ACC;
 import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -49,7 +50,7 @@ public abstract class AbstractHyperlink extends Canvas {
 	 */
 	private boolean armed;
 
-	private ListenerList<IHyperlinkListener> listeners;
+	private ListenerList listeners;
 
 	/**
 	 * Amount of the margin width around the hyperlink (default is 1).
@@ -71,52 +72,62 @@ public abstract class AbstractHyperlink extends Canvas {
 	 */
 	public AbstractHyperlink(Composite parent, int style) {
 		super(parent, style);
-		addListener(SWT.KeyDown, e -> {
-			if (e.character == '\r') {
-				handleActivate(e);
+		addListener(SWT.KeyDown, new Listener() {
+			public void handleEvent(Event e) {
+				if (e.character == '\r') {
+					handleActivate(e);
+				}
 			}
 		});
-		addPaintListener(e -> paint(e));
-		addListener(SWT.Traverse, e -> {
-			switch (e.detail) {
-			case SWT.TRAVERSE_PAGE_NEXT:
-			case SWT.TRAVERSE_PAGE_PREVIOUS:
-			case SWT.TRAVERSE_ARROW_NEXT:
-			case SWT.TRAVERSE_ARROW_PREVIOUS:
-			case SWT.TRAVERSE_RETURN:
-				e.doit = false;
-				return;
+		addPaintListener(new PaintListener() {
+			public void paintControl(PaintEvent e) {
+				paint(e);
 			}
-			e.doit = true;
 		});
-		Listener listener = e -> {
-			switch (e.type) {
-			case SWT.FocusIn:
-				hasFocus = true;
-				handleEnter(e);
-				break;
-			case SWT.FocusOut:
-				hasFocus = false;
-				handleExit(e);
-				break;
-			case SWT.DefaultSelection:
-				handleActivate(e);
-				break;
-			case SWT.MouseEnter:
-				handleEnter(e);
-				break;
-			case SWT.MouseExit:
-				handleExit(e);
-				break;
-			case SWT.MouseDown:
-				handleMouseDown(e);
-				break;
-			case SWT.MouseUp:
-				handleMouseUp(e);
-				break;
-			case SWT.MouseMove:
-				handleMouseMove(e);
-				break;
+		addListener(SWT.Traverse, new Listener() {
+			public void handleEvent(Event e) {
+				switch (e.detail) {
+				case SWT.TRAVERSE_PAGE_NEXT:
+				case SWT.TRAVERSE_PAGE_PREVIOUS:
+				case SWT.TRAVERSE_ARROW_NEXT:
+				case SWT.TRAVERSE_ARROW_PREVIOUS:
+				case SWT.TRAVERSE_RETURN:
+					e.doit = false;
+					return;
+				}
+				e.doit = true;
+			}
+		});
+		Listener listener = new Listener() {
+			public void handleEvent(Event e) {
+				switch (e.type) {
+				case SWT.FocusIn:
+					hasFocus = true;
+					handleEnter(e);
+					break;
+				case SWT.FocusOut:
+					hasFocus = false;
+					handleExit(e);
+					break;
+				case SWT.DefaultSelection:
+					handleActivate(e);
+					break;
+				case SWT.MouseEnter:
+					handleEnter(e);
+					break;
+				case SWT.MouseExit:
+					handleExit(e);
+					break;
+				case SWT.MouseDown:
+					handleMouseDown(e);
+					break;
+				case SWT.MouseUp:
+					handleMouseUp(e);
+					break;
+				case SWT.MouseMove:
+					handleMouseMove(e);
+					break;
+				}
 			}
 		};
 		addListener(SWT.MouseEnter, listener);
@@ -137,7 +148,7 @@ public abstract class AbstractHyperlink extends Canvas {
 	 */
 	public void addHyperlinkListener(IHyperlinkListener listener) {
 		if (listeners == null)
-			listeners = new ListenerList<>();
+			listeners = new ListenerList();
 		listeners.add(listener);
 	}
 
@@ -173,9 +184,12 @@ public abstract class AbstractHyperlink extends Canvas {
 		redraw();
 		if (listeners == null)
 			return;
+		int size = listeners.size();
 		HyperlinkEvent he = new HyperlinkEvent(this, getHref(), getText(),
 				e.stateMask);
-		for (IHyperlinkListener listener : listeners) {
+		Object[] listenerList = listeners.getListeners();
+		for (int i = 0; i < size; i++) {
+			IHyperlinkListener listener = (IHyperlinkListener) listenerList[i];
 			listener.linkEntered(he);
 		}
 	}
@@ -190,9 +204,12 @@ public abstract class AbstractHyperlink extends Canvas {
 		redraw();
 		if (listeners == null)
 			return;
+		int size = listeners.size();
 		HyperlinkEvent he = new HyperlinkEvent(this, getHref(), getText(),
 				e.stateMask);
-		for (IHyperlinkListener listener : listeners) {
+		Object[] listenerList = listeners.getListeners();
+		for (int i = 0; i < size; i++) {
+			IHyperlinkListener listener = (IHyperlinkListener) listenerList[i];
 			listener.linkExited(he);
 		}
 	}
@@ -206,10 +223,13 @@ public abstract class AbstractHyperlink extends Canvas {
 		armed = false;
 		if (listeners == null)
 			return;
+		int size = listeners.size();
 		setCursor(FormsResources.getBusyCursor());
 		HyperlinkEvent he = new HyperlinkEvent(this, getHref(), getText(),
 				e.stateMask);
-		for (IHyperlinkListener listener : listeners) {
+		Object[] listenerList = listeners.getListeners();
+		for (int i = 0; i < size; i++) {
+			IHyperlinkListener listener = (IHyperlinkListener) listenerList[i];
 			listener.linkActivated(he);
 		}
 		if (!isDisposed()) {
@@ -315,7 +335,11 @@ public abstract class AbstractHyperlink extends Canvas {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.swt.widgets.Control#setEnabled(boolean)
+	 */
+
 	public void setEnabled (boolean enabled) {
 		boolean needsRedraw = enabled != getEnabled();
 		super.setEnabled(enabled);

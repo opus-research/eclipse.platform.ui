@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -54,9 +54,7 @@ public class ContextProcessingAddon {
 	}
 
 	private void defineContexts() {
-		if (Policy.DEBUG_CMDS) {
-			Activator.trace(Policy.DEBUG_CMDS_FLAG, "Initialize contexts and parents from model", null); //$NON-NLS-1$
-		}
+		Activator.trace(Policy.DEBUG_CMDS, "Initialize contexts and parents from model", null); //$NON-NLS-1$
 		for (MBindingContext root : application.getRootContext()) {
 			defineContexts(null, root);
 		}

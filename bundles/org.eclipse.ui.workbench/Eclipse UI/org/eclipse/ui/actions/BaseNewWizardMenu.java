@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,10 +15,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.eclipse.core.runtime.Adapters;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IRegistryChangeEvent;
 import org.eclipse.core.runtime.IRegistryChangeListener;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler;
@@ -35,6 +36,7 @@ import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.internal.actions.NewWizardShortcutAction;
+import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.wizards.IWizardDescriptor;
 
 /**
@@ -59,15 +61,21 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
 
     private final IExtensionChangeHandler configListener = new IExtensionChangeHandler() {
 
+        /* (non-Javadoc)
+         * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension, java.lang.Object[])
+         */
         @Override
 		public void removeExtension(IExtension source, Object[] objects) {
-            for (Object object : objects) {
-                if (object instanceof NewWizardShortcutAction) {
-                    actions.values().remove(object);
+            for (int i = 0; i < objects.length; i++) {
+                if (objects[i] instanceof NewWizardShortcutAction) {
+                    actions.values().remove(objects[i]);
                 }
             }
         }
 
+        /* (non-Javadoc)
+         * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker, org.eclipse.core.runtime.IExtension)
+         */
         @Override
 		public void addExtension(IExtensionTracker tracker, IExtension extension) {
             // Do nothing
@@ -77,13 +85,18 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
     /**
      * TODO: should this be done with an addition listener?
      */
-    private final IRegistryChangeListener registryListener = event -> {
-	    // reset the reader.
-	    // TODO This is expensive.  Can we be more selective?
-	    if (getParent() != null) {
-	        getParent().markDirty();
-	    }
-	};
+    private final IRegistryChangeListener registryListener = new IRegistryChangeListener() {
+
+        @Override
+		public void registryChanged(IRegistryChangeEvent event) {
+            // reset the reader.
+            // TODO This is expensive.  Can we be more selective?
+            if (getParent() != null) {
+                getParent().markDirty();
+            }
+        }
+
+    };
 
     private ActionFactory.IWorkbenchAction showDlgAction;
 
@@ -136,8 +149,8 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
         IWorkbenchPage page = workbenchWindow.getActivePage();
         if (page != null) {
             String[] wizardIds = page.getNewWizardShortcuts();
-            for (String wizardId : wizardIds) {
-                IAction action = getAction(wizardId);
+            for (int i = 0; i < wizardIds.length; i++) {
+                IAction action = getAction(wizardIds[i]);
                 if (action != null) {
                     if (!WorkbenchActivityHelper.filterItem(action)) {
                         list.add(new ActionContributionItem(action));
@@ -149,6 +162,11 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
         return added;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.action.IContributionItem#dispose()
+     */
     @Override
 	public void dispose() {
         if (workbenchWindow != null) {
@@ -160,9 +178,10 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
         }
     }
 
-	/*
-	 * Returns the action for the given wizard id, or null if not found.
-	 */
+    /*
+     * (non-Javadoc) Returns the action for the given wizard id, or null if not
+     * found.
+     */
     private IAction getAction(String id) {
         // Keep a cache, rather than creating a new action each time,
         // so that image caching in ActionContributionItem works.
@@ -174,7 +193,7 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
                 action = new NewWizardShortcutAction(workbenchWindow,
 						wizardDesc);
 				actions.put(id, action);
-				IConfigurationElement element = Adapters.adapt(wizardDesc, IConfigurationElement.class);
+				IConfigurationElement element = Util.getAdapter(wizardDesc, IConfigurationElement.class);
 				if (element != null) {
 					workbenchWindow.getExtensionTracker().registerObject(
 							element.getDeclaringExtension(), action,
@@ -185,6 +204,11 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
         return action;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.ui.actions.CompoundContributionItem#getContributionItems()
+     */
     @Override
 	protected IContributionItem[] getContributionItems() {
         ArrayList list = new ArrayList();

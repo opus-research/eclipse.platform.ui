@@ -34,8 +34,10 @@ public class ConstantAreaLayout extends Layout {
         this.preferredWidth = preferredWidth;
     }
 
-    @Override
-	protected Point computeSize(Composite composite, int wHint, int hHint,
+    /* (non-Javadoc)
+     * @see org.eclipse.swt.widgets.Layout#computeSize(org.eclipse.swt.widgets.Composite, int, int, boolean)
+     */
+    protected Point computeSize(Composite composite, int wHint, int hHint,
             boolean flushCache) {
 
         if (wHint == 0 || hHint == 0) {
@@ -57,8 +59,10 @@ public class ConstantAreaLayout extends Layout {
         return new Point(wHint, hHint);
     }
 
-    @Override
-	protected void layout(Composite composite, boolean flushCache) {
+    /* (non-Javadoc)
+     * @see org.eclipse.swt.widgets.Layout#layout(org.eclipse.swt.widgets.Composite, boolean)
+     */
+    protected void layout(Composite composite, boolean flushCache) {
 
     }
 

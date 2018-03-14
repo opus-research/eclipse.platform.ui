@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,6 +20,8 @@ import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.DropTargetListener;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dnd.IDragAndDropService;
@@ -87,11 +89,11 @@ public class EditorSiteDragAndDropServiceImpl implements IDragAndDropService, ID
 			// Combine the two sets of transfers into one array
 			Transfer[] allTransfers = new Transfer[secondaryTransfers.length+primaryTransfers.length];
 			int curTransfer = 0;
-			for (Transfer primaryTransfer : primaryTransfers) {
-				allTransfers[curTransfer++] = primaryTransfer;
+			for (int i = 0; i < primaryTransfers.length; i++) {
+				allTransfers[curTransfer++] = primaryTransfers[i];
 			}
-			for (Transfer secondaryTransfer : secondaryTransfers) {
-				allTransfers[curTransfer++] = secondaryTransfer;
+			for (int i = 0; i < secondaryTransfers.length; i++) {
+				allTransfers[curTransfer++] = secondaryTransfers[i];
 			}
 			realDropTarget.setTransfer(allTransfers);
 
@@ -139,8 +141,8 @@ public class EditorSiteDragAndDropServiceImpl implements IDragAndDropService, ID
 		}
 
 		private boolean isSupportedType(Transfer[] transfers, TransferData transferType) {
-			for (Transfer transfer : transfers) {
-				if (transfer.isSupportedType(transferType))
+			for (int i = 0; i < transfers.length; i++) {
+				if (transfers[i].isSupportedType(transferType))
 					return true;
 			}
 			return false;
@@ -174,9 +176,12 @@ public class EditorSiteDragAndDropServiceImpl implements IDragAndDropService, ID
 				editorSiteOps, editorSiteTransfers, editorSiteListener);
 		addedListeners.add(newTarget);
 
-		newTarget.realDropTarget.addDisposeListener(e -> {
-			Object mdt = e.widget.getData(MDT_KEY);
-			addedListeners.remove(mdt);
+		newTarget.realDropTarget.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				Object mdt = e.widget.getData(MDT_KEY);
+				addedListeners.remove(mdt);
+			}
 		});
 	}
 

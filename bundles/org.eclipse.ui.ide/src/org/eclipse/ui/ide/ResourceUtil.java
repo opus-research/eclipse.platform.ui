@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 461762
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 478686
  *******************************************************************************/
 package org.eclipse.ui.ide;
 
@@ -16,8 +15,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.mapping.ResourceMapping;
 import org.eclipse.core.resources.mapping.ResourceTraversal;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
@@ -51,9 +51,16 @@ public final class ResourceUtil {
      * @return the file corresponding to the editor input, or <code>null</code>
      */
     public static IFile getFile(IEditorInput editorInput) {
+		if (editorInput == null) {
+			return null;
+		}
         // Note: do not treat IFileEditorInput as a special case.  Use the adapter mechanism instead.
         // See Bug 87288 [IDE] [EditorMgmt] Should avoid explicit checks for [I]FileEditorInput
-		return Adapters.adapt(editorInput, IFile.class);
+        Object o = editorInput.getAdapter(IFile.class);
+        if (o instanceof IFile) {
+			return (IFile) o;
+		}
+        return null;
     }
 
     /**
@@ -70,12 +77,12 @@ public final class ResourceUtil {
 		}
         // Note: do not treat IFileEditorInput as a special case.  Use the adapter mechanism instead.
         // See Bug 87288 [IDE] [EditorMgmt] Should avoid explicit checks for [I]FileEditorInput
-		IResource resource = Adapters.adapt(editorInput, IResource.class);
-		if (resource != null) {
-			return resource;
+        Object o = editorInput.getAdapter(IResource.class);
+        if (o instanceof IResource) {
+			return (IResource) o;
 		}
         // the input may adapt to IFile but not IResource
-		return Adapters.adapt(editorInput, IFile.class);
+        return getFile(editorInput);
     }
 
     /**
@@ -94,7 +101,9 @@ public final class ResourceUtil {
         }
         // check for editors that have their own kind of input that adapts to IFile,
         // being careful not to force loading of the editor
-		for (IEditorReference ref : page.getEditorReferences()) {
+        IEditorReference[] refs = page.getEditorReferences();
+        for (int i = 0; i < refs.length; i++) {
+            IEditorReference ref = refs[i];
             IEditorPart part = ref.getEditor(false);
             if (part != null) {
                 IFile editorFile = getFile(part.getEditorInput());
@@ -115,7 +124,13 @@ public final class ResourceUtil {
      * @since 3.2
      */
     public static IResource getResource(Object element) {
-		return Adapters.adapt(element, IResource.class);
+		if (element == null) {
+			return null;
+		}
+		if (element instanceof IResource) {
+			return (IResource) element;
+		}
+		return getAdapter(element, IResource.class, true);
     }
 
     /**
@@ -143,15 +158,15 @@ public final class ResourceUtil {
 		}
 
 		// try for IFile adapter (before IResource adapter, since it's more specific)
-		IFile file = Adapters.adapt(element, IFile.class);
-		if (file != null) {
-			return file;
+		Object adapter = getAdapter(element, IFile.class, true);
+		if (adapter instanceof IFile) {
+			return (IFile) adapter;
 		}
 
 		// try for IResource adapter
-		IResource resource = Adapters.adapt(element, IResource.class);
-		if (resource instanceof IFile) {
-			return (IFile) resource;
+		adapter = getAdapter(element, IResource.class, true);
+		if (adapter instanceof IFile) {
+			return (IFile) adapter;
 		}
 		return null;
     }
@@ -165,7 +180,21 @@ public final class ResourceUtil {
      * @since 3.2
      */
     public static ResourceMapping getResourceMapping(Object element) {
-		return Adapters.adapt(element, ResourceMapping.class);
+		if (element == null) {
+			return null;
+		}
+
+		// try direct instanceof check
+		if (element instanceof ResourceMapping) {
+			return (ResourceMapping) element;
+		}
+
+		// try for ResourceMapping adapter
+		Object adapter = getAdapter(element, ResourceMapping.class, true);
+		if (adapter instanceof ResourceMapping) {
+			return (ResourceMapping) adapter;
+		}
+		return null;
 	}
 
     /**
@@ -199,7 +228,7 @@ public final class ResourceUtil {
 	    		return null;
 	    	}
 	    	ResourceTraversal traversal = traversals[0];
-			// TODO: need to honor traversal flags
+	    	// TODO: need to honour traversal flags
 	    	IResource[] resources = traversal.getResources();
 	    	if (resources.length != 1) {
 	    		return null;
@@ -213,14 +242,28 @@ public final class ResourceUtil {
 
 
 	/**
-	 * See Javadoc of {@link Adapters#adapt(Object, Class, boolean)}.
-	 *
-	 * @since 3.2
-	 *
-	 * @deprecated Use {@link Adapters#adapt(Object, Class, boolean)} instead.
-	 */
-	@Deprecated
+     * Returns the specified adapter for the given element, or <code>null</code>
+     * if no such adapter was found.
+     *
+     * @param element the model element
+	 * @param adapterType the type of adapter to look up
+	 * @param forceLoad <code>true</code> to force loading of the plug-in providing the adapter,
+	 *   <code>false</code> otherwise
+     * @return the adapter
+     * @since 3.2
+     */
 	public static <T> T getAdapter(Object element, Class<T> adapterType, boolean forceLoad) {
-		return Adapters.adapt(element, adapterType, forceLoad);
+		if (element instanceof IAdaptable) {
+			IAdaptable adaptable = (IAdaptable) element;
+			T o = adaptable.getAdapter(adapterType);
+	        if (o != null) {
+	        	return o;
+	        }
+		}
+		if (forceLoad) {
+			return adapterType.cast(Platform.getAdapterManager().loadAdapter(element, adapterType.getName()));
+		}
+		return Platform.getAdapterManager().getAdapter(element, adapterType);
 	}
+
 }

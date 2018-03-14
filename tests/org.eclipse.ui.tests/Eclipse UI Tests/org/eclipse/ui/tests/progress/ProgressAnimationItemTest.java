@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2017 Tasktop Technologies and others.
+ * Copyright (c) 2015 Tasktop Technologies and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,15 +7,14 @@
  *
  * Contributors:
  *     Tasktop Technologies - initial API and implementation
- *     Red Hat Inc. - Bugs 474127, 474132
  *******************************************************************************/
 package org.eclipse.ui.tests.progress;
 
-import static org.junit.Assert.assertEquals;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Collection;
+import java.util.Vector;
+
+import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.SWT;
@@ -32,16 +31,17 @@ import org.eclipse.ui.internal.progress.ProgressAnimationItem;
 import org.eclipse.ui.internal.progress.ProgressManager;
 import org.eclipse.ui.internal.progress.ProgressRegion;
 import org.eclipse.ui.progress.IProgressConstants;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
-public class ProgressAnimationItemTest {
+public class ProgressAnimationItemTest extends TestCase {
 	private Shell shell;
 	private ProgressAnimationItem animationItem;
 
-	@Before
-	public void setUp() {
+	public ProgressAnimationItemTest(String testName) {
+		super(testName);
+	}
+
+	@Override
+	protected void setUp() throws Exception {
 		Display display = PlatformUI.getWorkbench().getDisplay();
 		shell = new Shell(display);
 		shell.setSize(400, 300);
@@ -51,38 +51,32 @@ public class ProgressAnimationItemTest {
 		animationItem = createProgressAnimationItem(composite);
 	}
 
-	@After
-	public void tearDown() {
+	@Override
+	protected void tearDown() throws Exception {
 		FinishedJobs.getInstance().clearAll();
 		shell.dispose();
 	}
 
-	@Test
 	public void testSingleJobRefreshOnce() throws Exception {
 		createAndScheduleJob();
 
-		ProgressManager.getInstance().notifyListeners();
 		refresh();
 
 		assertSingleAccessibleListener();
 	}
 
-	@Test
 	public void testTwoJobsRefreshOnce() throws Exception {
 		createAndScheduleJob();
 		createAndScheduleJob();
 
-		ProgressManager.getInstance().notifyListeners();
 		refresh();
 
 		assertSingleAccessibleListener();
 	}
 
-	@Test
 	public void testSingleJobRefreshTwice() throws Exception {
 		createAndScheduleJob();
 
-		ProgressManager.getInstance().notifyListeners();
 		refresh();
 		refresh();
 
@@ -91,13 +85,15 @@ public class ProgressAnimationItemTest {
 
 	private ProgressAnimationItem createProgressAnimationItem(Composite composite) {
 		ProgressRegion progressRegion = new ProgressRegion();
-		progressRegion.createContents(composite);
+		progressRegion.createContents(composite, null);
 		return (ProgressAnimationItem) progressRegion.getAnimationItem();
 	}
 
 	private static void createAndScheduleJob() throws InterruptedException {
 		DummyJob job = new DummyJob("Keep me", Status.OK_STATUS);
 		job.setProperty(IProgressConstants.KEEP_PROPERTY, true);
+		ExtendedJobInfo info = new ExtendedJobInfo(job);
+		ProgressManager.getInstance().addJobInfo(info);
 		job.schedule();
 		job.join();
 	}
@@ -130,7 +126,7 @@ public class ProgressAnimationItemTest {
 	private static int getAccessibleListenersSize(Accessible accessible) throws Exception {
 		Field f = Accessible.class.getDeclaredField("accessibleListeners");
 		f.setAccessible(true);
-		Collection<?> accessibleListeners = (Collection<?>) f.get(accessible);
+		Vector accessibleListeners = (Vector) f.get(accessible);
 		return accessibleListeners == null ? 0 : accessibleListeners.size();
 	}
 

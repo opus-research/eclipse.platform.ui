@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,9 +11,8 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.api;
 
-import static org.junit.Assert.assertArrayEquals;
+import junit.framework.TestCase;
 
-import org.eclipse.core.internal.content.ContentTypeManager;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -36,12 +35,7 @@ import org.eclipse.ui.tests.TestPlugin;
 import org.eclipse.ui.tests.harness.util.ArrayUtil;
 import org.eclipse.ui.tests.harness.util.CallHistory;
 import org.eclipse.ui.tests.harness.util.FileUtil;
-import org.junit.FixMethodOrder;
-import org.junit.runners.MethodSorters;
 
-import junit.framework.TestCase;
-
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class IEditorRegistryTest extends TestCase {
 	private IEditorRegistry fReg;
 
@@ -418,9 +412,9 @@ public class IEditorRegistryTest extends TestCase {
 	}
 
 	public void testSwitchDefaultToExternalBug236104() {
-		IEditorDescriptor editor = fReg.getDefaultEditor("a.mock1");
-		assertNotNull("Default editor should not be null", editor);
-		assertEquals(editor.getId(), MockEditorPart.ID1);
+		IEditorDescriptor htmlDescriptor = fReg.getDefaultEditor("test.html");
+		assertNotNull("Default editor for html files should not be null",
+				htmlDescriptor);
 
 		IFileEditorMapping[] src = fReg.getFileEditorMappings();
 		FileEditorMapping[] maps = new FileEditorMapping[src.length];
@@ -428,7 +422,7 @@ public class IEditorRegistryTest extends TestCase {
 		FileEditorMapping map = null;
 
 		for (FileEditorMapping map2 : maps) {
-			if (map2.getExtension().equals("mock1")) {
+			if (map2.getExtension().equals("html")) {
 				map = map2;
 				break;
 			}
@@ -448,14 +442,14 @@ public class IEditorRegistryTest extends TestCase {
 			PrefUtil.savePrefs();
 
 			IEditorDescriptor newDescriptor = fReg
-					.getDefaultEditor("a.mock1");
+					.getDefaultEditor("test.html");
 
 			assertEquals(
 					"Parameter replaceDescriptor should be the same as parameter new Descriptor",
 					replacementDescriptor, newDescriptor);
 			assertFalse(
-					"Parameter replaceDescriptor should not be equals to a.mock1 Descriptor",
-					replacementDescriptor.equals(editor));
+					"Parameter replaceDescriptor should not be equals to htmlDescriptor",
+					replacementDescriptor.equals(htmlDescriptor));
 		} finally {
 			src = fReg.getFileEditorMappings();
 			maps = new FileEditorMapping[src.length];
@@ -463,7 +457,7 @@ public class IEditorRegistryTest extends TestCase {
 			map = null;
 
 			for (FileEditorMapping map2 : maps) {
-				if (map2.getExtension().equals("mock1")) {
+				if (map2.getExtension().equals("html")) {
 					map = map2;
 					break;
 				}
@@ -473,7 +467,7 @@ public class IEditorRegistryTest extends TestCase {
 					"Parameter map should not be null before setting the default editor",
 					map);
 
-			map.setDefaultEditor(editor);
+			map.setDefaultEditor((EditorDescriptor) htmlDescriptor);
 			((EditorRegistry) fReg).setFileEditorMappings(maps);
 			((EditorRegistry) fReg).saveAssociations();
 			PrefUtil.savePrefs();
@@ -522,61 +516,4 @@ public class IEditorRegistryTest extends TestCase {
 		}
 	}
 
-	public void testRemoveExtension() {
-		FileEditorMapping mapping1 = new FileEditorMapping(null, "testRemoveExtension1");
-		FileEditorMapping mapping2 = new FileEditorMapping(null, "testRemoveExtension2");
-		EditorDescriptor editor = EditorDescriptor.createForProgram("notepad.exe");
-		mapping1.addEditor(editor);
-		mapping2.addEditor(editor);
-		FileEditorMapping[] src = (FileEditorMapping[]) fReg.getFileEditorMappings();
-		FileEditorMapping[] maps = new FileEditorMapping[src.length + 2];
-		System.arraycopy(src, 0, maps, 0, src.length);
-		maps[maps.length - 1] = mapping1;
-		maps[maps.length - 2] = mapping2;
-		try {
-			((EditorRegistry) fReg).setFileEditorMappings(maps);
-			((EditorRegistry) fReg).saveAssociations();
-
-			IEditorDescriptor editor1 = fReg.getDefaultEditor("a.testRemoveExtension1");
-			assertEquals(editor, editor1);
-			IEditorDescriptor editor2 = fReg.getDefaultEditor("a.testRemoveExtension2");
-			assertEquals(editor, editor2);
-
-			EditorDescriptor[] descriptors = new EditorDescriptor[] { editor };
-			((EditorRegistry) fReg).removeExtension(null, descriptors);
-
-			editor1 = fReg.getDefaultEditor("a.testRemoveExtension1");
-			assertNull(editor1);
-			editor2 = fReg.getDefaultEditor("a.testRemoveExtension2");
-			assertNull(editor2);
-			IFileEditorMapping[] mappings = fReg.getFileEditorMappings();
-			assertEquals(src.length, mappings.length);
-		} finally {
-			((EditorRegistry) fReg).setFileEditorMappings(src);
-			((EditorRegistry) fReg).saveAssociations();
-		}
-	}
-
-	public void testAddContentTypeBinding_bug502837() {
-		IEditorDescriptor[] editors = fReg.getEditors("blah.bug502837");
-		assertEquals(1, editors.length);
-		assertEquals(MockEditorPart.ID1, editors[0].getId());
-	}
-
-	public void testRemoveContentType_bug520239() throws CoreException {
-		ContentTypeManager contentTypeManager = (ContentTypeManager) Platform.getContentTypeManager();
-		IContentType contentType = contentTypeManager.addContentType("bug520239", "bug520239", null);
-		contentType.addFileSpec("bug520239", IContentType.FILE_EXTENSION_SPEC);
-		assertArrayEquals("No editor should be bound by default", new IEditorDescriptor[0],
-				fReg.getEditors("blah.bug520239"));
-
-		IEditorDescriptor anEditor = ((EditorRegistry) fReg).getSortedEditorsFromPlugins()[0];
-		((EditorRegistry) fReg).addUserAssociation(contentType, anEditor);
-		assertArrayEquals("Missing editor association", new IEditorDescriptor[] { anEditor },
-				fReg.getEditors("blah.bug520239"));
-
-		contentTypeManager.removeContentType(contentType.getId());
-		assertArrayEquals("No editor should be bound after contenttype removal", new IEditorDescriptor[0],
-				fReg.getEditors("blah.bug520239"));
-	}
 }

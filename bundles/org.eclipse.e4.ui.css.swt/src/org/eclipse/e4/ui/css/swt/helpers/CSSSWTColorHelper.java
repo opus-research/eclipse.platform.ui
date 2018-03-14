@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Angelo Zerr and others.
+ * Copyright (c) 2008, 2014 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 import org.eclipse.e4.ui.css.core.css2.CSS2ColorHelper;
 import org.eclipse.e4.ui.css.core.css2.CSS2RGBColorImpl;
 import org.eclipse.e4.ui.css.core.dom.properties.Gradient;
@@ -42,7 +41,7 @@ import org.w3c.dom.css.RGBColor;
 public class CSSSWTColorHelper {
 	public static final String COLOR_DEFINITION_MARKER = "#";
 
-	private static final Pattern HEX_COLOR_VALUE_PATTERN = Pattern.compile("#[a-fA-F0-9]{6}");
+	private static final String HEX_COLOR_VALUE_PATTERN = "#[a-fA-F0-9]{6}";
 
 	private static Field[] cachedFields;
 
@@ -92,7 +91,7 @@ public class CSSSWTColorHelper {
 
 	public static boolean hasColorDefinitionAsValue(String name) {
 		if (name.startsWith(COLOR_DEFINITION_MARKER)) {
-			return !HEX_COLOR_VALUE_PATTERN.matcher(name).matches();
+			return !name.matches(HEX_COLOR_VALUE_PATTERN);
 		}
 		return false;
 	}
@@ -199,7 +198,7 @@ public class CSSSWTColorHelper {
 			percent = (int) value
 			.getFloatValue(CSSPrimitiveValue.CSS_PERCENTAGE);
 		}
-		return Integer.valueOf(percent);
+		return new Integer(percent);
 	}
 
 	public static Gradient getGradient(CSSValueList list, Display display) {
@@ -268,7 +267,7 @@ public class CSSSWTColorHelper {
 		if (grad.getRGBs().size() == grad.getPercents().size() + 1) {
 			int[] percents = new int[grad.getPercents().size()];
 			for (int i = 0; i < percents.length; i++) {
-				int value = (grad.getPercents().get(i)).intValue();
+				int value = ((Integer) grad.getPercents().get(i)).intValue();
 				if (value < 0 || value > 100) {
 					// TODO this should be an exception because bad source
 					// format
@@ -326,9 +325,7 @@ public class CSSSWTColorHelper {
 		IColorAndFontProvider provider = CSSActivator.getDefault().getColorAndFontProvider();
 		if (provider != null) {
 			RGB rgb = provider.getColor(normalizeId(name.substring(1)));
-			if (rgb != null) {
-				return new RGBA(rgb.red, rgb.green, rgb.blue, 255);
-			}
+			return new RGBA(rgb.red, rgb.green, rgb.blue, 255);
 		}
 		return null;
 	}

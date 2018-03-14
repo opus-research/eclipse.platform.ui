@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,10 +12,9 @@
  *     								 removes a menu from multiple perspectives
  *     René Brandstetter - Bug 411821 - [QuickAccess] Contribute SearchField
  *                                      through a fragment or other means
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 431446, 433979, 440810, 441184, 472654, 486632
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 431446, 433979, 440810, 441184
  *     Denis Zygann <d.zygann@web.de> - Bug 457390
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
- *     Axel Richard <axel.richard@obeo.fr> - Bug 354538
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -33,7 +32,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.expressions.Expression;
@@ -75,7 +73,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
-import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
@@ -173,11 +170,14 @@ import org.eclipse.ui.internal.e4.compatibility.SelectionService;
 import org.eclipse.ui.internal.handlers.ActionCommandMappingService;
 import org.eclipse.ui.internal.handlers.IActionCommandMappingService;
 import org.eclipse.ui.internal.handlers.LegacyHandlerService;
+import org.eclipse.ui.internal.layout.ITrimManager;
+import org.eclipse.ui.internal.layout.IWindowTrim;
 import org.eclipse.ui.internal.menus.ActionSet;
 import org.eclipse.ui.internal.menus.IActionSetsListener;
 import org.eclipse.ui.internal.menus.LegacyActionPersistence;
 import org.eclipse.ui.internal.menus.MenuHelper;
 import org.eclipse.ui.internal.menus.SlaveMenuService;
+import org.eclipse.ui.internal.menus.WorkbenchMenuService;
 import org.eclipse.ui.internal.misc.UIListenerLogging;
 import org.eclipse.ui.internal.progress.ProgressRegion;
 import org.eclipse.ui.internal.provisional.application.IActionBarConfigurer2;
@@ -208,10 +208,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	 * The 'elementId' of the spacer used to right-align it in the trim
 	 */
 	public static final String PERSPECTIVE_SPACER_ID = "PerspectiveSpacer"; //$NON-NLS-1$
-
-	public static final String STATUS_LINE_ID = "org.eclipse.ui.StatusLine"; //$NON-NLS-1$
-
-	public static final String TRIM_CONTRIBUTION_URI = "bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.StandardTrim"; //$NON-NLS-1$
 
 	private static final String MAIN_TOOLBAR_ID = ActionSet.MAIN_TOOLBAR;
 	private static final String COMMAND_ID_TOGGLE_COOLBAR = "org.eclipse.ui.ToggleCoolbarAction"; //$NON-NLS-1$
@@ -252,10 +248,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 	private ActionBarAdvisor actionBarAdvisor;
 
-	private MenuManagerRenderer renderer;
-
-	private MMenu mainMenu;
-
 	private PageListenerList pageListeners = new PageListenerList();
 
 	private PerspectiveListenerList perspectiveListeners = new PerspectiveListenerList();
@@ -272,9 +264,9 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 	ProgressRegion progressRegion = null;
 
-	private List<MTrimElement> workbenchTrimElements = new ArrayList<>();
+	private List<MTrimElement> workbenchTrimElements = new ArrayList<MTrimElement>();
 
-	private Map<MToolControl, IConfigurationElement> iceMap = new HashMap<>();
+	private Map<MToolControl, IConfigurationElement> iceMap = new HashMap<MToolControl, IConfigurationElement>();
 
 	public IConfigurationElement getICEFor(MToolControl mtc) {
 		return iceMap.get(mtc);
@@ -308,7 +300,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	 *
 	 * @since 3.3
 	 */
-	private ListenerList<IPropertyChangeListener> genericPropertyListeners = new ListenerList<>();
+	private ListenerList genericPropertyListeners = new ListenerList();
 
 	private IAdaptable input;
 
@@ -559,7 +551,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 							return ((MPart) element).getLocalizedLabel();
 						}
 					};
-					List<MPart> parts = new ArrayList<>(dirtyParts);
+					List<MPart> parts = new ArrayList<MPart>(dirtyParts);
 					ListSelectionDialog dialog = new ListSelectionDialog(getShell(), parts,
 							ArrayContentProvider.getInstance(), labelProvider,
 							WorkbenchMessages.EditorManager_saveResourcesMessage);
@@ -688,10 +680,10 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 			Shell shell = (Shell) model.getWidget();
 			if (model.getMainMenu() == null) {
-				mainMenu = modelService.createModelElement(MMenu.class);
+				final MMenu mainMenu = modelService.createModelElement(MMenu.class);
 				mainMenu.setElementId(ActionSet.MAIN_MENU);
 
-				renderer = (MenuManagerRenderer) rendererFactory
+				final MenuManagerRenderer renderer = (MenuManagerRenderer) rendererFactory
 						.getRenderer(mainMenu, null);
 				renderer.linkModelToManager(mainMenu, menuManager);
 				fill(renderer, mainMenu, menuManager);
@@ -790,15 +782,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		} finally {
 			HandlerServiceImpl.pop();
 		}
-	}
-
-	@PreDestroy
-	void preDestroy() {
-		if (mainMenu != null) {
-			renderer.clearModelToManager(mainMenu, menuManager);
-			mainMenu = null;
-		}
-		renderer = null;
 	}
 
 	private void configureShell(Shell shell, IEclipseContext context) {
@@ -1132,11 +1115,12 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	private void populateStandardTrim(MTrimBar bottomTrim) {
 		// StatusLine
 		MToolControl slElement = (MToolControl) modelService.find(
-STATUS_LINE_ID, model);
+				"org.eclipse.ui.StatusLine", model); //$NON-NLS-1$
 		if (slElement == null) {
 			slElement = modelService.createModelElement(MToolControl.class);
-			slElement.setElementId(STATUS_LINE_ID);
-			slElement.setContributionURI(TRIM_CONTRIBUTION_URI);
+			slElement.setElementId("org.eclipse.ui.StatusLine"); //$NON-NLS-1$
+			slElement
+					.setContributionURI("bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.StandardTrim"); //$NON-NLS-1$
 			bottomTrim.getChildren().add(slElement);
 		}
 		slElement.setToBeRendered(statusLineVisible);
@@ -1148,7 +1132,8 @@ STATUS_LINE_ID, model);
 		if (hsElement == null) {
 			hsElement = modelService.createModelElement(MToolControl.class);
 			hsElement.setElementId("org.eclipse.ui.HeapStatus"); //$NON-NLS-1$
-			hsElement.setContributionURI(TRIM_CONTRIBUTION_URI);
+			hsElement
+					.setContributionURI("bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.StandardTrim"); //$NON-NLS-1$
 			hsElement.getTags().add(IPresentationEngine.DRAGGABLE);
 			bottomTrim.getChildren().add(hsElement);
 		}
@@ -1161,7 +1146,8 @@ STATUS_LINE_ID, model);
 			pbElement = modelService.createModelElement(MToolControl.class);
 			pbElement.setElementId("org.eclipse.ui.ProgressBar"); //$NON-NLS-1$
 			pbElement.getTags().add(IPresentationEngine.DRAGGABLE);
-			pbElement.setContributionURI(TRIM_CONTRIBUTION_URI);
+			pbElement
+					.setContributionURI("bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.StandardTrim"); //$NON-NLS-1$
 			bottomTrim.getChildren().add(pbElement);
 		}
 		pbElement.setToBeRendered(getWindowConfigurer().getShowProgressIndicator());
@@ -1171,7 +1157,7 @@ STATUS_LINE_ID, model);
 		// Part 1: Add groups
 		IConfigurationElement[] exts = extensionRegistry
 				.getConfigurationElementsFor("org.eclipse.ui.menus"); //$NON-NLS-1$
-		List<IConfigurationElement> items = new ArrayList<>();
+		List<IConfigurationElement> items = new ArrayList<IConfigurationElement>();
 		for (IConfigurationElement ice : exts) {
 			if ("group".equals(ice.getName()) || "widget".equals(ice.getName())) { //$NON-NLS-1$ //$NON-NLS-2$
 				items.add(ice);
@@ -1183,7 +1169,7 @@ STATUS_LINE_ID, model);
 
 		// Iterate over the items until they've all been placed or until
 		// an iteration doesn't place anything
-		List<IConfigurationElement> handledElements = new ArrayList<>();
+		List<IConfigurationElement> handledElements = new ArrayList<IConfigurationElement>();
 		handledElements.add(items.get(0)); // Hack!! startup seeding
 		MUIElement createdTrim = null;
 		while (items.size() > 0 && handledElements.size() > 0) {
@@ -1210,7 +1196,7 @@ STATUS_LINE_ID, model);
 									boolean isBefore = "before".equals(orders[0].getAttribute("position")); //$NON-NLS-1$//$NON-NLS-2$
 									String relTo = orders[0].getAttribute("relativeTo"); //$NON-NLS-1$
 									if ("status".equals(relTo)) //$NON-NLS-1$
-										relTo = STATUS_LINE_ID;
+										relTo = "org.eclipse.ui.StatusLine"; //$NON-NLS-1$
 
 									createdTrim = addTrimElement(bottomTrim, item, id, isBefore,
 											relTo, classSpec);
@@ -1387,13 +1373,13 @@ STATUS_LINE_ID, model);
 	 * <code>ActionHandler</code>. This map is never <code>null</code>, and is
 	 * never empty as long as at least one global action has been registered.
 	 */
-	private Map<String, ActionHandler> globalActionHandlersByCommandId = new HashMap<>();
+	private Map<String, ActionHandler> globalActionHandlersByCommandId = new HashMap<String, ActionHandler>();
 
 	/**
 	 * The list of handler submissions submitted to the workbench command
 	 * support. This list may be empty, but it is never <code>null</code>.
 	 */
-	private List<IHandlerActivation> handlerActivations = new ArrayList<>();
+	private List<IHandlerActivation> handlerActivations = new ArrayList<IHandlerActivation>();
 
 	/**
 	 * The number of large updates that are currently going on. If this is
@@ -1431,7 +1417,7 @@ STATUS_LINE_ID, model);
 			if (globalAction instanceof CommandAction) {
 				final String actionId = globalAction.getId();
 				if (actionId != null) {
-					final IActionCommandMappingService mappingService = serviceLocator
+					final IActionCommandMappingService mappingService = (IActionCommandMappingService) serviceLocator
 							.getService(IActionCommandMappingService.class);
 					mappingService.map(actionId, commandId);
 				}
@@ -1458,16 +1444,16 @@ STATUS_LINE_ID, model);
 	 * </p>
 	 */
 	void submitGlobalActions() {
-		final IHandlerService handlerService = getService(IHandlerService.class);
+		final IHandlerService handlerService = (IHandlerService) getService(IHandlerService.class);
 
 		/*
 		 * Mash the action sets and global actions together, with global actions
 		 * taking priority.
 		 */
-		Map<String, ActionHandler> handlersByCommandId = new HashMap<>();
+		Map<String, ActionHandler> handlersByCommandId = new HashMap<String, ActionHandler>();
 		handlersByCommandId.putAll(globalActionHandlersByCommandId);
 
-		List<IHandlerActivation> newHandlers = new ArrayList<>(
+		List<IHandlerActivation> newHandlers = new ArrayList<IHandlerActivation>(
 				handlersByCommandId.size());
 
 		Iterator<IHandlerActivation> existingIter = handlerActivations.iterator();
@@ -1488,7 +1474,9 @@ STATUS_LINE_ID, model);
 		final Shell shell = getShell();
 		if (shell != null) {
 			final Expression expression = new ActiveShellExpression(shell);
-			for (Entry<String, ActionHandler> entry : handlersByCommandId.entrySet()) {
+			for (Iterator<Entry<String, ActionHandler>> iterator = handlersByCommandId.entrySet()
+					.iterator(); iterator.hasNext();) {
+				Entry<String, ActionHandler> entry = iterator.next();
 				String commandId = entry.getKey();
 				IHandler handler = entry.getValue();
 				newHandlers.add(handlerService.activateHandler(commandId, handler, expression));
@@ -1523,9 +1511,10 @@ STATUS_LINE_ID, model);
 	private void firePropertyChanged(final String property, final Object oldValue,
 			final Object newValue) {
 		PropertyChangeEvent event = new PropertyChangeEvent(this, property, oldValue, newValue);
-		for (Object listener : genericPropertyListeners.getListeners()) {
-			IPropertyChangeListener propertyChangeListener = (IPropertyChangeListener) listener;
-			propertyChangeListener.propertyChange(event);
+		Object[] listeners = genericPropertyListeners.getListeners();
+		for (int i = 0; i < listeners.length; i++) {
+			IPropertyChangeListener listener = (IPropertyChangeListener) listeners[i];
+			listener.propertyChange(event);
 		}
 	}
 
@@ -1704,11 +1693,12 @@ STATUS_LINE_ID, model);
 	 */
 	private void allowUpdates(IMenuManager menuManager) {
 		menuManager.markDirty();
-		for (IContributionItem item : menuManager.getItems()) {
-			if (item instanceof IMenuManager) {
-				allowUpdates((IMenuManager) item);
-			} else if (item instanceof SubContributionItem) {
-				final IContributionItem innerItem = ((SubContributionItem) item).getInnerItem();
+		final IContributionItem[] items = menuManager.getItems();
+		for (int i = 0; i < items.length; i++) {
+			if (items[i] instanceof IMenuManager) {
+				allowUpdates((IMenuManager) items[i]);
+			} else if (items[i] instanceof SubContributionItem) {
+				final IContributionItem innerItem = ((SubContributionItem) items[i]).getInnerItem();
 				if (innerItem instanceof IMenuManager) {
 					allowUpdates((IMenuManager) innerItem);
 				}
@@ -1883,7 +1873,7 @@ STATUS_LINE_ID, model);
 	}
 
 	private void hideNonRestorableViews() {
-		List<MPart> sharedPartsToRemove = new ArrayList<>();
+		List<MPart> sharedPartsToRemove = new ArrayList<MPart>();
 		List<MPlaceholder> phList = modelService
 				.findElements(model, null, MPlaceholder.class, null);
 		for (MPlaceholder ph : phList) {
@@ -1913,8 +1903,7 @@ STATUS_LINE_ID, model);
 				// We need to do our own cleanup here...
 				int vc = modelService.countRenderableChildren(phParent);
 				if (vc == 0) {
-					if (!isLastEditorStack(phParent))
-						phParent.setToBeRendered(false);
+					phParent.setToBeRendered(false);
 				}
 			}
 		}
@@ -1924,10 +1913,6 @@ STATUS_LINE_ID, model);
 		for (MPart partToRemove : sharedPartsToRemove) {
 			seList.remove(partToRemove);
 		}
-	}
-
-	private boolean isLastEditorStack(MUIElement element) {
-		return modelService.isLastEditorStack(element);
 	}
 
 	/**
@@ -1984,14 +1969,7 @@ STATUS_LINE_ID, model);
 			// Null out the progress region. Bug 64024.
 			progressRegion = null;
 
-			// Opposite of setup() and fill()
 			MWindow window = model;
-			if (window.getMainMenu() != null) {
-				MMenu mainMenu = window.getMainMenu();
-				final MenuManagerRenderer renderer = (MenuManagerRenderer) rendererFactory.getRenderer(mainMenu, null);
-				cleanupMenuManagerRec(renderer, mainMenu);
-			}
-
 			engine.removeGui(model);
 
 			MElementContainer<MUIElement> parent = window.getParent();
@@ -2019,16 +1997,6 @@ STATUS_LINE_ID, model);
 			menuRestrictions.clear();
 		}
 		return true;
-	}
-
-	private void cleanupMenuManagerRec(MenuManagerRenderer renderer, MMenu m) {
-		for (MMenuElement e : m.getChildren()) {
-			// renderer.clearModelToContribution(e, null);
-			if (e instanceof MMenu) {
-				cleanupMenuManagerRec(renderer, (MMenu) e);
-			}
-		}
-		renderer.clearModelToManager(m, null);
 	}
 
 	/**
@@ -2161,7 +2129,7 @@ STATUS_LINE_ID, model);
 
 			IBindingService bs = model.getContext().get(IBindingService.class);
 			boolean keyFilterEnabled = bs.isKeyFilterEnabled();
-			List<Control> toEnable = new ArrayList<>();
+			List<Control> toEnable = new ArrayList<Control>();
 			Shell theShell = getShell();
 			Display display = theShell.getDisplay();
 			Control currentFocus = display.getFocusControl();
@@ -2193,7 +2161,7 @@ STATUS_LINE_ID, model);
 
 				// Disable everything in the bottom trim except the status line
 				if (tpl.bottom != null && !tpl.bottom.isDisposed() && tpl.bottom.isEnabled()) {
-					MUIElement statusLine = modelService.find(STATUS_LINE_ID, model);
+					MUIElement statusLine = modelService.find("org.eclipse.ui.StatusLine", model); //$NON-NLS-1$
 					Object slCtrl = statusLine != null ? statusLine.getWidget() : null;
 					for (Control bottomCtrl : tpl.bottom.getChildren()) {
 						if (bottomCtrl != slCtrl)
@@ -2231,7 +2199,7 @@ STATUS_LINE_ID, model);
 				manager.setCancelEnabled(wasCancelEnabled);
 
 				// re-enable the main menu if necessary
-				if (enableMainMenu && model != null && model.getMainMenu() != null) {
+				if (enableMainMenu) {
 					Menu mainMenu = (Menu) model.getMainMenu().getWidget();
 					mainMenu.setEnabled(true);
 				}
@@ -2277,7 +2245,7 @@ STATUS_LINE_ID, model);
 		}
 	}
 
-	private Set<Object> menuRestrictions = new HashSet<>();
+	private Set<Object> menuRestrictions = new HashSet<Object>();
 
 	private Boolean valueOf(boolean result) {
 		return result ? Boolean.TRUE : Boolean.FALSE;
@@ -2293,19 +2261,28 @@ STATUS_LINE_ID, model);
 		}
 		EvaluationReference[] refs = menuRestrictions
 				.toArray(new EvaluationReference[menuRestrictions.size()]);
-		IEvaluationService es = serviceLocator
+		IEvaluationService es = (IEvaluationService) serviceLocator
 				.getService(IEvaluationService.class);
 		IEvaluationContext currentState = es.getCurrentState();
-		for (EvaluationReference reference : refs) {
+		boolean changeDetected = false;
+		for (int i = 0; i < refs.length; i++) {
+			EvaluationReference reference = refs[i];
 			reference.setPostingChanges(true);
 
 			boolean os = reference.evaluate(currentState);
 			reference.clearResult();
 			boolean ns = reference.evaluate(currentState);
 			if (os != ns) {
+				changeDetected = true;
 				reference.getListener().propertyChange(
 						new PropertyChangeEvent(reference, reference.getProperty(), valueOf(os),
 								valueOf(ns)));
+			}
+		}
+		if (changeDetected) {
+			IMenuService ms = getWorkbench().getService(IMenuService.class);
+			if (ms instanceof WorkbenchMenuService) {
+				((WorkbenchMenuService) ms).updateManagers();
 			}
 		}
 	}
@@ -2452,18 +2429,21 @@ STATUS_LINE_ID, model);
 		// there is a separator for the additions group thus >= 2
 	}
 
-	private ListenerList<IActionSetsListener> actionSetListeners = null;
+	private ListenerList actionSetListeners = null;
 
-	private ListenerList<IBackgroundSaveListener> backgroundSaveListeners = new ListenerList<>(ListenerList.IDENTITY);
+	private ListenerList backgroundSaveListeners = new ListenerList(ListenerList.IDENTITY);
 
 	private SelectionService selectionService;
+
+	private ITrimManager trimManager;
 
 	private ActionPresentation actionPresentation;
 
 	private final void fireActionSetsChanged() {
 		if (actionSetListeners != null) {
-			for (Object listener : actionSetListeners.getListeners()) {
-				final IActionSetsListener actionSetsListener = (IActionSetsListener) listener;
+			final Object[] listeners = actionSetListeners.getListeners();
+			for (int i = 0; i < listeners.length; i++) {
+				final IActionSetsListener listener = (IActionSetsListener) listeners[i];
 				final WorkbenchPage currentPage = (WorkbenchPage) getActivePage();
 				final IActionSetDescriptor[] newActionSets;
 				if (currentPage == null) {
@@ -2472,14 +2452,14 @@ STATUS_LINE_ID, model);
 					newActionSets = currentPage.getActionSets();
 				}
 				final ActionSetsEvent event = new ActionSetsEvent(newActionSets);
-				actionSetsListener.actionSetsChanged(event);
+				listener.actionSetsChanged(event);
 			}
 		}
 	}
 
 	final void addActionSetsListener(final IActionSetsListener listener) {
 		if (actionSetListeners == null) {
-			actionSetListeners = new ListenerList<>();
+			actionSetListeners = new ListenerList();
 		}
 
 		actionSetListeners.add(listener);
@@ -2709,6 +2689,34 @@ STATUS_LINE_ID, model);
 	}
 
 	/**
+     * Tell the workbench window a visible state for the fastview bar. This is
+     * only applicable if the window configurer also wishes the fast view bar to
+     * be visible.
+     *
+     * @param visible
+     *            <code>true</code> or <code>false</code>
+     * @since 3.2
+     * @deprecated discontinued support for fast views
+     */
+    @Deprecated
+    public void setFastViewBarVisible(boolean visible) {
+        // not supported anymore
+    }
+
+     /**
+	 * Returns the visible state for the fastview bar of the workbench window.
+	 *
+	 * @return <code>false</code>
+	 * @since 3.2
+	 * @deprecated discontinued support for fast views
+	 */
+    @Deprecated
+    public boolean getFastViewBarVisible() {
+        // not supported anymore
+        return false;
+    }
+
+	/**
 	 * @param visible
 	 *            whether the perspective bar should be shown. This is only
 	 *            applicable if the window configurer also wishes either the
@@ -2737,6 +2745,15 @@ STATUS_LINE_ID, model);
 		return statusLineVisible;
 	}
 
+    /**
+     * @return <code>false</code>
+     * @deprecated discontinued support for fast views
+     */
+    @Deprecated
+    public boolean getShowFastViewBars() {
+        return false;
+    }
+
 	protected boolean showTopSeperator() {
 		return false;
 	}
@@ -2761,6 +2778,60 @@ STATUS_LINE_ID, model);
 	 */
 	IAdaptable getDefaultPageInput() {
 		return getWorkbenchImpl().getDefaultPageInput();
+	}
+
+	public ITrimManager getTrimManager() {
+		if (trimManager == null) {
+			// HACK !! Add a 'null' trim manager...this is specifically in place
+			// to prevent an NPE when using Intro's 'Go to Workbench' handling
+			// See Bug 365625 for details...
+			trimManager = new ITrimManager() {
+				@Override
+				public void addTrim(int areaId, IWindowTrim trim) {
+				}
+
+				@Override
+				public void addTrim(int areaId, IWindowTrim trim, IWindowTrim beforeMe) {
+				}
+
+				@Override
+				public void removeTrim(IWindowTrim toRemove) {
+				}
+
+				@Override
+				public IWindowTrim getTrim(String id) {
+					return null;
+				}
+
+				@Override
+				public int[] getAreaIds() {
+					return null;
+				}
+
+				@Override
+				public List getAreaTrim(int areaId) {
+					return null;
+				}
+
+				@Override
+				public void updateAreaTrim(int id, List trim, boolean removeExtra) {
+				}
+
+				@Override
+				public List getAllTrim() {
+					return null;
+				}
+
+				@Override
+				public void setTrimVisible(IWindowTrim trim, boolean visible) {
+				}
+
+				@Override
+				public void forceLayout() {
+				}
+			};
+		}
+		return trimManager;
 	}
 
 	/**
@@ -2804,12 +2875,12 @@ STATUS_LINE_ID, model);
 	}
 
 	@Override
-	public final <T> T getService(final Class<T> key) {
+	public final Object getService(final Class key) {
 		return serviceLocator.getService(key);
 	}
 
 	@Override
-	public final boolean hasService(final Class<?> key) {
+	public final boolean hasService(final Class key) {
 		return serviceLocator.hasService(key);
 	}
 
@@ -2832,8 +2903,8 @@ STATUS_LINE_ID, model);
 		if (getWindowConfigurer().getShowPerspectiveBar()) {
 			setPerspectiveBarVisible(!perspectivebarVisible);
 		}
-		ICommandService commandService = getService(ICommandService.class);
-		Map<String, WorkbenchWindow> filter = new HashMap<>();
+		ICommandService commandService = (ICommandService) getService(ICommandService.class);
+		Map<String, WorkbenchWindow> filter = new HashMap<String, WorkbenchWindow>();
 		filter.put(IServiceScopes.WINDOW_SCOPE, this);
 		commandService.refreshElements(COMMAND_ID_TOGGLE_COOLBAR, filter);
 	}
@@ -2863,9 +2934,10 @@ STATUS_LINE_ID, model);
 	}
 
 	/* package */void fireBackgroundSaveStarted() {
-		for (Object listener : backgroundSaveListeners.getListeners()) {
-			IBackgroundSaveListener backgroundSaveListener = (IBackgroundSaveListener) listener;
-			backgroundSaveListener.handleBackgroundSaveStarted();
+		Object[] listeners = backgroundSaveListeners.getListeners();
+		for (int i = 0; i < listeners.length; i++) {
+			IBackgroundSaveListener listener = (IBackgroundSaveListener) listeners[i];
+			listener.handleBackgroundSaveStarted();
 		}
 	}
 
@@ -2898,7 +2970,7 @@ STATUS_LINE_ID, model);
 	}
 
 	public CoolBarManager getCoolBarManager() {
-		WorkbenchPlugin.log(new Exception("Bad call to getCoolBarManager()")); //$NON-NLS-1$
+		new Exception("Bad call to getCoolBarManager()").printStackTrace(); //$NON-NLS-1$
 		return oldCBM;
 	}
 

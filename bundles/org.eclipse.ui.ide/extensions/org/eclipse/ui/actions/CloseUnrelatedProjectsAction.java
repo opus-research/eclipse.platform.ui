@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2016 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Dina Sayed, dsayed@eg.ibm.com, IBM -  bug 269844
  *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 462760
- *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -55,7 +54,7 @@ public class CloseUnrelatedProjectsAction extends CloseResourceAction {
 	 */
 	public static final String ID = PlatformUI.PLUGIN_ID + ".CloseUnrelatedProjectsAction"; //$NON-NLS-1$
 
-	private List<IResource> projectsToClose = new ArrayList<>();
+	private final List<IResource> projectsToClose = new ArrayList<>();
 
 	private boolean selectionDirty = true;
 
@@ -70,18 +69,18 @@ public class CloseUnrelatedProjectsAction extends CloseResourceAction {
 	private static DisjointSet<IProject> buildConnectedComponents(IProject[] projects) {
 		//initially each vertex is in a set by itself
 		DisjointSet<IProject> set = new DisjointSet<>();
-		for (IProject project : projects) {
-			set.makeSet(project);
+		for (int i = 0; i < projects.length; i++) {
+			set.makeSet(projects[i]);
 		}
-		for (IProject project : projects) {
+		for (int i = 0; i < projects.length; i++) {
 			try {
-				IProject[] references = project.getReferencedProjects();
+				IProject[] references = projects[i].getReferencedProjects();
 				//each reference represents an edge in the project reference
 				//digraph from projects[i] -> references[j]
-				for (IProject reference : references) {
-					IProject setOne = set.findSet(project);
+				for (int j = 0; j < references.length; j++) {
+					IProject setOne = set.findSet(projects[i]);
 					//note that referenced projects may not exist in the workspace
-					IProject setTwo = set.findSet(reference);
+					IProject setTwo = set.findSet(references[j]);
 					//these two projects are related, so join their sets
 					if (setOne != null && setTwo != null && setOne != setTwo) {
 						set.union(setOne, setTwo);
@@ -158,7 +157,8 @@ public class CloseUnrelatedProjectsAction extends CloseResourceAction {
 			}
 			message = NLS.bind(IDEWorkbenchMessages.CloseUnrelatedProjectsAction_confirmMsg1, projectName);
 		} else // if more then one project is selected then print there number
-			message = NLS.bind(IDEWorkbenchMessages.CloseUnrelatedProjectsAction_confirmMsgN, selectionSize);
+			message = NLS.bind(IDEWorkbenchMessages.CloseUnrelatedProjectsAction_confirmMsgN,
+					new Integer(selectionSize));
 
 			MessageDialogWithToggle dialog = MessageDialogWithToggle.openOkCancelConfirm(
 						getShell(), IDEWorkbenchMessages.CloseUnrelatedProjectsAction_toolTip,
@@ -190,7 +190,7 @@ public class CloseUnrelatedProjectsAction extends CloseResourceAction {
 	/**
 	 * Computes the related projects of the selection.
 	 */
-	private List<IResource> computeRelated(List<? extends IResource> selection) {
+	private void computeRelated(List<? extends IResource> selection) {
 		//build the connected component set for all projects in the workspace
 		DisjointSet<IProject> set = buildConnectedComponents(ResourcesPlugin.getWorkspace().getRoot().getProjects());
 		//remove the connected components that the selected projects are in
@@ -198,9 +198,8 @@ public class CloseUnrelatedProjectsAction extends CloseResourceAction {
 			set.removeSet(resource);
 		}
 		//the remainder of the projects in the disjoint set are unrelated to the selection
-		List<IResource> projects = new ArrayList<>();
-		set.toList(projects);
-		return projects;
+		projectsToClose.clear();
+		set.toList(projectsToClose);
 	}
 
 	@Override
@@ -209,7 +208,7 @@ public class CloseUnrelatedProjectsAction extends CloseResourceAction {
 			List<? extends IResource> newSelection = super.getSelectedResources();
 			if (!oldSelection.equals(newSelection)) {
 				oldSelection = newSelection;
-				projectsToClose = computeRelated(newSelection);
+				computeRelated(newSelection);
 			}
 			selectionDirty = false;
 		}
@@ -230,7 +229,8 @@ public class CloseUnrelatedProjectsAction extends CloseResourceAction {
 			IResourceDelta delta = event.getDelta();
 			if (delta != null) {
 				IResourceDelta[] projDeltas = delta.getAffectedChildren(IResourceDelta.CHANGED);
-				for (IResourceDelta projDelta : projDeltas) {
+				for (int i = 0; i < projDeltas.length; ++i) {
+					IResourceDelta projDelta = projDeltas[i];
 					//changing either the description or the open state can affect enablement
 					if ((projDelta.getFlags() & (IResourceDelta.OPEN | IResourceDelta.DESCRIPTION)) != 0) {
 						selectionChanged(getStructuredSelection());

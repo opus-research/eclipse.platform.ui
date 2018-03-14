@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,8 @@
  *     Tom Schindl <tom.schindl@bestsolution.at> - bug 194587
  *******************************************************************************/
 package org.eclipse.core.databinding.util;
+
+import org.eclipse.core.runtime.IStatus;
 
 /**
  * The Policy class handles settings for behaviour, debug flags and logging
@@ -38,10 +40,13 @@ public class Policy {
 	 * Returns the dummy log to use if none has been set
 	 */
 	private static ILogger getDummyLog() {
-		return status -> {
-			System.err.println(status.toString());
-			if (status.getException() != null) {
-				status.getException().printStackTrace(System.err);
+		return new ILogger() {
+			@Override
+			public void log(IStatus status) {
+				System.err.println(status.toString());
+				if( status.getException() != null ) {
+					status.getException().printStackTrace(System.err);
+				}
 			}
 		};
 	}

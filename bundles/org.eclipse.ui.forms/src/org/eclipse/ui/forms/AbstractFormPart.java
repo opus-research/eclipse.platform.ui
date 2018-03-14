@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi  <psuzzi@gmail.com> - Bug 498814
  *******************************************************************************/
 package org.eclipse.ui.forms;
 /**
@@ -26,7 +25,6 @@ public abstract class AbstractFormPart implements IFormPart {
 	/**
 	 * @see org.eclipse.ui.forms.IFormPart#initialize(org.eclipse.ui.forms.IManagedForm)
 	 */
-	@Override
 	public void initialize(IManagedForm form) {
 		this.managedForm = form;
 	}
@@ -42,7 +40,6 @@ public abstract class AbstractFormPart implements IFormPart {
 	 * Disposes the part. Subclasses should override to release any system
 	 * resources.
 	 */
-	@Override
 	public void dispose() {
 	}
 	/**
@@ -52,7 +49,6 @@ public abstract class AbstractFormPart implements IFormPart {
 	 *            <code>true</code> if the request to commit has arrived as a
 	 *            result of the 'save' action.
 	 */
-	@Override
 	public void commit(boolean onSave) {
 		dirty = false;
 	}
@@ -64,21 +60,18 @@ public abstract class AbstractFormPart implements IFormPart {
 	 *            the form input object
 	 * @return <code>false</code>
 	 */
-	@Override
 	public boolean setFormInput(Object input) {
 		return false;
 	}
 	/**
 	 * Instructs the part to grab keyboard focus.
 	 */
-	@Override
 	public void setFocus() {
 	}
 	/**
 	 * Refreshes the section after becoming stale (falling behind data in the
 	 * model). Subclasses must call 'super' when overriding this method.
 	 */
-	@Override
 	public void refresh() {
 		stale = false;
 		// since we have refreshed, any changes we had in the
@@ -90,9 +83,6 @@ public abstract class AbstractFormPart implements IFormPart {
 	 * user interaction with the widgets in the section.
 	 */
 	public void markDirty() {
-		if (dirty) {
-			return;
-		}
 		dirty = true;
 		managedForm.dirtyStateChanged();
 	}
@@ -103,7 +93,6 @@ public abstract class AbstractFormPart implements IFormPart {
 	 * @return <code>true</code> if the part is dirty, <code>false</code>
 	 *         otherwise.
 	 */
-	@Override
 	public boolean isDirty() {
 		return dirty;
 	}
@@ -114,7 +103,6 @@ public abstract class AbstractFormPart implements IFormPart {
 	 * @return <code>true</code> if the part is stale, <code>false</code>
 	 *         otherwise.
 	 */
-	@Override
 	public boolean isStale() {
 		return stale;
 	}

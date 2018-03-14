@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -394,7 +394,9 @@ public class EditorActionBars extends SubActionBars2 {
 		}
 		this.enabledAllowed = enabledAllowed;
 		if (coolItemToolBarMgr != null) {
-			for (IContributionItem item : coolItemToolBarMgr.getItems()) {
+			IContributionItem[] items = coolItemToolBarMgr.getItems();
+			for (int i = 0; i < items.length; i++) {
+				IContributionItem item = items[i];
 				if (item != null) {
 					item.update(IContributionManagerOverrides.P_ENABLED);
 				}
@@ -462,7 +464,9 @@ public class EditorActionBars extends SubActionBars2 {
 
 		ICoolBarManager coolBarManager = getCastedParent().getCoolBarManager();
 		if ((coolItemToolBarMgr != null) && (coolBarManager != null)) {
-			for (IContributionItem item : coolItemToolBarMgr.getItems()) {
+			IContributionItem[] items = coolItemToolBarMgr.getItems();
+			for (int i = 0; i < items.length; i++) {
+				IContributionItem item = items[i];
 				item.setVisible(visible || !forceVisibility);
 				coolItemToolBarMgr.markDirty();
 				if (!coolBarManager.isDirty()) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,8 +14,6 @@
  *      does not display sort direction
  *******************************************************************************/
 package org.eclipse.ui.internal.about;
-
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,6 +31,10 @@ import org.eclipse.jface.util.ConfigureColumns;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -119,11 +121,11 @@ public class AboutFeaturesPage extends ProductInfoPage {
 			// create a descriptive object for each BundleGroup
 			LinkedList groups = new LinkedList();
 			if (providers != null) {
-				for (IBundleGroupProvider provider : providers) {
-					IBundleGroup[] bundleGroups = provider
+				for (int i = 0; i < providers.length; ++i) {
+					IBundleGroup[] bundleGroups = providers[i]
 							.getBundleGroups();
-					for (IBundleGroup bundleGroup : bundleGroups) {
-						groups.add(new AboutBundleGroupData(bundleGroup));
+					for (int j = 0; j < bundleGroups.length; ++j) {
+						groups.add(new AboutBundleGroupData(bundleGroups[j]));
 					}
 				}
 			}
@@ -185,7 +187,12 @@ public class AboutFeaturesPage extends ProductInfoPage {
 	@Override
 	public void createControl(Composite parent) {
 		initializeDialogUnits(parent);
-		parent.getShell().addDisposeListener(arg0 -> disposeImages());
+		parent.getShell().addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent arg0) {
+				disposeImages();
+			}
+		});
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
 				IWorkbenchHelpContextIds.ABOUT_FEATURES_DIALOG);
 
@@ -265,16 +272,19 @@ public class AboutFeaturesPage extends ProductInfoPage {
 
 		table.setLinesVisible(true);
 		table.setFont(parent.getFont());
-		table.addSelectionListener(widgetSelectedAdapter(e -> {
-			// If there is no item, nothing we can do.
-			// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=266177
-			if (e.item == null)
-				return;
-			AboutBundleGroupData info = (AboutBundleGroupData) e.item
-					.getData();
-			updateInfoArea(info);
-			updateButtons(info);
-		}));
+		table.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				// If there is no item, nothing we can do.
+				// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=266177
+				if (e.item == null)
+					return;
+				AboutBundleGroupData info = (AboutBundleGroupData) e.item
+						.getData();
+				updateInfoArea(info);
+				updateButtons(info);
+			}
+		});
 
 		int[] columnWidths = { convertHorizontalDLUsToPixels(120),
 				convertHorizontalDLUsToPixels(120),
@@ -286,7 +296,12 @@ public class AboutFeaturesPage extends ProductInfoPage {
 			tableColumn.setWidth(columnWidths[i]);
 			tableColumn.setText(columnTitles[i]);
 			final int columnIndex = i;
-			tableColumn.addSelectionListener(widgetSelectedAdapter(e -> sort(columnIndex)));
+			tableColumn.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					sort(columnIndex);
+				}
+			});
 		}
 
 		// create a table row for each bundle group
@@ -470,6 +485,11 @@ public class AboutFeaturesPage extends ProductInfoPage {
 				info.getVersion(), info.getId() };
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.about.TableListPage#getSelectionValue()
+	 */
 	protected Collection getSelectionValue() {
 		if (table == null || table.isDisposed())
 			return null;
@@ -506,6 +526,9 @@ public class AboutFeaturesPage extends ProductInfoPage {
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on Dialog.
+	 */
 	@Override
 	protected void buttonPressed(int buttonId) {
 		switch (buttonId) {

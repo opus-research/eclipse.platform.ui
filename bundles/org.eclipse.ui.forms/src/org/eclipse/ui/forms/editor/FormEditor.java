@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Mickael Istria (Red Hat Inc.) - Bug 478587
  *******************************************************************************/
 package org.eclipse.ui.forms.editor;
 
@@ -63,7 +62,7 @@ public abstract class FormEditor extends MultiPageEditorPart  {
 	 * <p>
 	 * Subclasses can access this field but should not modify it.
 	 */
-	protected Vector<Object> pages = new Vector<>();
+	protected Vector pages = new Vector();
 
 	private FormToolkit toolkit;
 
@@ -80,7 +79,6 @@ public abstract class FormEditor extends MultiPageEditorPart  {
 			super(formEditor);
 		}
 
-		@Override
 		public ISelection getSelection() {
 			IEditorPart activeEditor = ((FormEditor) getMultiPageEditor())
 					.getActiveEditor();
@@ -96,7 +94,9 @@ public abstract class FormEditor extends MultiPageEditorPart  {
 			return StructuredSelection.EMPTY;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc) Method declared on <code> ISelectionProvider </code> .
+		 */
 		public void setSelection(ISelection selection) {
 			IEditorPart activeEditor = ((FormEditor) getMultiPageEditor())
 					.getActiveEditor();
@@ -122,7 +122,6 @@ public abstract class FormEditor extends MultiPageEditorPart  {
 	/**
 	 * Overrides super to plug in a different selection provider.
 	 */
-	@Override
 	public void init(IEditorSite site, IEditorInput input)
 			throws PartInitException {
 		setSite(site);
@@ -135,12 +134,13 @@ public abstract class FormEditor extends MultiPageEditorPart  {
 	 *
 	 * @see #addPages
 	 */
-	@Override
 	protected void createPages() {
 		addPages();
 	}
 
-	@Override
+	/*
+	 * @see org.eclipse.ui.part.MultiPageEditorPart#createPageContainer(org.eclipse.swt.widgets.Composite)
+	 */
 	protected Composite createPageContainer(Composite parent) {
 		parent = super.createPageContainer(parent);
 		toolkit = createToolkit(parent.getDisplay());
@@ -168,13 +168,13 @@ public abstract class FormEditor extends MultiPageEditorPart  {
 	 */
 	protected abstract void addPages();
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.dialogs.IPageChangeProvider#getSelectedPage()
+	 */
 	public Object getSelectedPage() {
-		int index = getActivePage();
-		if (index != -1) {
-			return pages.get(index);
-		}
-		return null;
+		return getActivePageInstance();
 	}
 
 	/**
@@ -216,7 +216,6 @@ public abstract class FormEditor extends MultiPageEditorPart  {
 	 *            the page control to add
 	 * @return the 0-based index of the newly added page
 	 */
-	@Override
 	public int addPage(Control control) {
 		int i = super.addPage(control);
 		try {
@@ -237,7 +236,6 @@ public abstract class FormEditor extends MultiPageEditorPart  {
 	 *            the index at which to add the page (0-based)
 	 * @since 3.1
 	 */
-	@Override
 	public void addPage(int index, Control control) {
 		super.addPage(index, control);
 		try {
@@ -258,7 +256,6 @@ public abstract class FormEditor extends MultiPageEditorPart  {
 	 * @since 3.1
 	 */
 
-	@Override
 	public boolean isDirty() {
 		if (pages != null) {
 			for (int i = 0; i < pages.size(); i++) {
@@ -306,7 +303,6 @@ public abstract class FormEditor extends MultiPageEditorPart  {
 	 *
 	 * @see MultiPageEditorPart#addPage(IEditorPart, IEditorInput)
 	 */
-	@Override
 	public int addPage(IEditorPart editor, IEditorInput input)
 			throws PartInitException {
 		int index = super.addPage(editor, input);
@@ -324,7 +320,6 @@ public abstract class FormEditor extends MultiPageEditorPart  {
 	 * @see MultiPageEditorPart#addPage(int, IEditorPart, IEditorInput)
 	 * @since 3.1
 	 */
-	@Override
 	public void addPage(int index, IEditorPart editor, IEditorInput input)
 			throws PartInitException {
 		super.addPage(index, editor, input);
@@ -359,7 +354,6 @@ public abstract class FormEditor extends MultiPageEditorPart  {
 	 * @param pageIndex
 	 *            the 0-based index of the page in the editor
 	 */
-	@Override
 	public void removePage(int pageIndex) {
 		if (pageIndex >= 0 && pageIndex < pages.size()) {
 			Object page = pages.get(pageIndex);
@@ -397,7 +391,6 @@ public abstract class FormEditor extends MultiPageEditorPart  {
 	 * Disposes the pages and the toolkit after disposing the editor itself.
 	 * Subclasses must call 'super' when reimplementing the method.
 	 */
-	@Override
 	public void dispose() {
 		super.dispose();
 		for (int i = 0; i < pages.size(); i++) {
@@ -433,7 +426,6 @@ public abstract class FormEditor extends MultiPageEditorPart  {
 	 *
 	 * @return the active nested editor
 	 */
-	@Override
 	public IEditorPart getActiveEditor() {
 		return super.getActiveEditor();
 	}
@@ -458,7 +450,6 @@ public abstract class FormEditor extends MultiPageEditorPart  {
 	/**
 	 * @see MultiPageEditorPart#pageChange(int)
 	 */
-	@Override
 	protected void pageChange(int newPageIndex) {
 		// fix for windows handles
 		int oldPageIndex = getCurrentPage();
@@ -586,9 +577,8 @@ public abstract class FormEditor extends MultiPageEditorPart  {
 
 	/**
 	 * Returns active page instance if the currently selected page index is not
-	 * -1 and active page is a IFormPage, or <code>null</code> otherwise.
+	 * -1, or <code>null</code> if it is.
 	 *
-	 * @see MultiPageEditorPart#getSelectedPage()
 	 * @return active page instance if selected, or <code>null</code> if no
 	 *         page is currently active.
 	 */
@@ -605,7 +595,6 @@ public abstract class FormEditor extends MultiPageEditorPart  {
 	/**
 	 * @see MultiPageEditorPart#setActivePage(int)
 	 */
-	@Override
 	protected void setActivePage(int pageIndex) {
 		// fix for window handles problem
 		// this should be called only when the editor is first opened
@@ -646,9 +635,11 @@ public abstract class FormEditor extends MultiPageEditorPart  {
 	 */
 	public void close(final boolean save) {
 		Display display = getSite().getShell().getDisplay();
-		display.asyncExec(() -> {
-			if (toolkit != null) {
-				getSite().getPage().closeEditor(FormEditor.this, save);
+		display.asyncExec(new Runnable() {
+			public void run() {
+				if (toolkit != null) {
+					getSite().getPage().closeEditor(FormEditor.this, save);
+				}
 			}
 		});
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import org.eclipse.core.runtime.Adapters;
+
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -163,9 +163,9 @@ public class ActionExpression {
 			}
 
 			list = new ArrayList(children.length);
-			for (IConfigurationElement configElement : children) {
-				String tag = configElement.getName();
-				AbstractExpression expr = createExpression(configElement);
+			for (int i = 0; i < children.length; i++) {
+				String tag = children[i].getName();
+				AbstractExpression expr = createExpression(children[i]);
 				if (EXP_TYPE_OBJECT_CLASS.equals(tag)) {
 					list.add(0, expr);
 				} else {
@@ -185,8 +185,8 @@ public class ActionExpression {
 					if (classNames == null) {
 						classNames = new ArrayList();
 					}
-					for (String objectClass : objectClasses) {
-						classNames.add(objectClass);
+					for (int i = 0; i < objectClasses.length; i++) {
+						classNames.add(objectClasses[i]);
 					}
 				}
 			}
@@ -328,8 +328,8 @@ public class ActionExpression {
 				return true;
 			}
 			Class[] superInterfaces = interfaceToCheck.getInterfaces();
-			for (Class superInterface : superInterfaces) {
-				if (checkInterfaceHierarchy(superInterface)) {
+			for (int i = 0; i < superInterfaces.length; i++) {
+				if (checkInterfaceHierarchy(superInterfaces[i])) {
 					return true;
 				}
 			}
@@ -389,8 +389,8 @@ public class ActionExpression {
 
 				// test all the interfaces the class implements
 				Class[] interfaces = clazz.getInterfaces();
-				for (Class currentInterface : interfaces) {
-					if (checkInterfaceHierarchy(currentInterface)) {
+				for (int i = 0; i < interfaces.length; i++) {
+					if (checkInterfaceHierarchy(interfaces[i])) {
 						return true;
 					}
 				}
@@ -451,7 +451,7 @@ public class ActionExpression {
 		}
 
 		private IActionFilter getActionFilter(Object object) {
-			return Adapters.adapt(object, IActionFilter.class);
+			return Util.getAdapter(object, IActionFilter.class);
 		}
 
 		/**
@@ -492,7 +492,7 @@ public class ActionExpression {
 				return false;
 			}
 
-			Object res = Adapters.adapt(object, resourceClass);
+			Object res = Util.getAdapter(object, resourceClass);
 			if (res == null) {
 				return false;
 			}
@@ -921,7 +921,7 @@ public class ActionExpression {
 		try {
 			root = new SingleExpression(element);
 		} catch (IllegalStateException e) {
-			WorkbenchPlugin.log(e);
+			e.printStackTrace();
 			root = null;
 		}
 	}

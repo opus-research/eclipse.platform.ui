@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -44,7 +44,7 @@ public abstract class ContributionManager implements IContributionManager {
 	/**
 	 * The list of contribution items.
 	 */
-	private List<IContributionItem> contributions = new ArrayList<>();
+	private List<IContributionItem> contributions = new ArrayList<IContributionItem>();
 
 	/**
 	 * Indicates whether the widgets are in sync with the contributions.
@@ -360,7 +360,8 @@ public abstract class ContributionManager implements IContributionManager {
 			return true;
 		}
 		if (hasDynamicItems()) {
-			for (IContributionItem item : contributions) {
+			for (Iterator<IContributionItem> iter = contributions.iterator(); iter.hasNext();) {
+				IContributionItem item = iter.next();
 				if (item.isDirty()) {
 					return true;
 				}
@@ -442,7 +443,8 @@ public abstract class ContributionManager implements IContributionManager {
 	public void removeAll() {
 		IContributionItem[] items = getItems();
 		contributions.clear();
-		for (IContributionItem item : items) {
+		for (int i = 0; i < items.length; i++) {
+			IContributionItem item = items[i];
 			itemRemoved(item);
 		}
 		dynamicItems = 0;
@@ -536,9 +538,9 @@ public abstract class ContributionManager implements IContributionManager {
 	 */
 	protected void internalSetItems(IContributionItem[] items) {
 		contributions.clear();
-		for (IContributionItem item : items) {
-			if (allowItem(item)) {
-				contributions.add(item);
+		for (int i = 0; i < items.length; i++) {
+			if (allowItem(items[i])) {
+				contributions.add(items[i]);
 			}
 		}
 	}

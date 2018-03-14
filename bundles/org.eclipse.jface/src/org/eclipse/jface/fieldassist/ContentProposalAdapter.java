@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,6 +22,8 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.SelectionEvent;
@@ -90,28 +92,31 @@ public class ContentProposalAdapter {
 					 * scrollbar. Do this in an async since the focus is not
 					 * actually switched when this event is received.
 					 */
-					e.display.asyncExec(() -> {
-						if (isValid()) {
-							if (scrollbarClicked || hasFocus()) {
-								return;
+					e.display.asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							if (isValid()) {
+								if (scrollbarClicked || hasFocus()) {
+									return;
+								}
+								// Workaround a problem on X and Mac, whereby at
+								// this point, the focus control is not known.
+								// This can happen, for example, when resizing
+								// the popup shell on the Mac.
+								// Check the active shell.
+								Shell activeShell = e.display.getActiveShell();
+								if (activeShell == getShell()
+										|| (infoPopup != null && infoPopup
+												.getShell() == activeShell)) {
+									return;
+								}
+								/*
+								 * System.out.println(e);
+								 * System.out.println(e.display.getFocusControl());
+								 * System.out.println(e.display.getActiveShell());
+								 */
+								close();
 							}
-							// Workaround a problem on X and Mac, whereby at
-							// this point, the focus control is not known.
-							// This can happen, for example, when resizing
-							// the popup shell on the Mac.
-							// Check the active shell.
-							Shell activeShell = e.display.getActiveShell();
-							if (activeShell == getShell()
-									|| (infoPopup != null && infoPopup
-											.getShell() == activeShell)) {
-								return;
-							}
-							/*
-							 * System.out.println(e);
-							 * System.out.println(e.display.getFocusControl());
-							 * System.out.println(e.display.getActiveShell());
-							 */
-							close();
 						}
 					});
 					return;
@@ -624,7 +629,12 @@ public class ContentProposalAdapter {
 				proposalTable = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL
 						| SWT.VIRTUAL);
 
-				Listener listener = event -> handleSetData(event);
+				Listener listener = new Listener() {
+					@Override
+					public void handleEvent(Event event) {
+						handleSetData(event);
+					}
+				};
 				proposalTable.addListener(SWT.SetData, listener);
 			} else {
 				proposalTable = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL);
@@ -698,10 +708,13 @@ public class ContentProposalAdapter {
 				getShell().setBounds(initialX, initialY, popupSize.x, popupSize.y);
 
 			// Now set up a listener to monitor any changes in size.
-			getShell().addListener(SWT.Resize, e -> {
-				popupSize = getShell().getSize();
-				if (infoPopup != null) {
-					infoPopup.adjustBounds();
+			getShell().addListener(SWT.Resize, new Listener() {
+				@Override
+				public void handleEvent(Event e) {
+					popupSize = getShell().getSize();
+					if (infoPopup != null) {
+						infoPopup.adjustBounds();
+					}
 				}
 			});
 		}
@@ -911,40 +924,52 @@ public class ContentProposalAdapter {
 				// before creating the popup. We do not use Jobs since this
 				// code must be able to run independently of the Eclipse
 				// runtime.
-				Runnable runnable = () -> {
-					pendingDescriptionUpdate = true;
-					try {
-						Thread.sleep(POPUP_DELAY);
-					} catch (InterruptedException e) {
-					}
-					if (!isValid()) {
-						return;
-					}
-					getShell().getDisplay().syncExec(() -> {
-						// Query the current selection since we have
-						// been delayed
-						IContentProposal p = getSelectedProposal();
-						if (p != null) {
-							String description = p.getDescription();
-							if (description != null) {
-								if (infoPopup == null) {
-									infoPopup = new InfoPopupDialog(
-											getShell());
-									infoPopup.open();
-									infoPopup
-											.getShell()
-											.addDisposeListener(
-													event -> infoPopup = null);
-								}
-								infoPopup.setContents(p
-										.getDescription());
-							} else if (infoPopup != null) {
-								infoPopup.close();
-							}
-							pendingDescriptionUpdate = false;
-
+				Runnable runnable = new Runnable() {
+					@Override
+					public void run() {
+						pendingDescriptionUpdate = true;
+						try {
+							Thread.sleep(POPUP_DELAY);
+						} catch (InterruptedException e) {
 						}
-					});
+						if (!isValid()) {
+							return;
+						}
+						getShell().getDisplay().syncExec(new Runnable() {
+							@Override
+							public void run() {
+								// Query the current selection since we have
+								// been delayed
+								IContentProposal p = getSelectedProposal();
+								if (p != null) {
+									String description = p.getDescription();
+									if (description != null) {
+										if (infoPopup == null) {
+											infoPopup = new InfoPopupDialog(
+													getShell());
+											infoPopup.open();
+											infoPopup
+													.getShell()
+													.addDisposeListener(
+															new DisposeListener() {
+																@Override
+																public void widgetDisposed(
+																		DisposeEvent event) {
+																	infoPopup = null;
+																}
+															});
+										}
+										infoPopup.setContents(p
+												.getDescription());
+									} else if (infoPopup != null) {
+										infoPopup.close();
+									}
+									pendingDescriptionUpdate = false;
+
+								}
+							}
+						});
+					}
 				};
 				Thread t = new Thread(runnable);
 				t.start();
@@ -992,9 +1017,12 @@ public class ContentProposalAdapter {
 		 */
 		private void asyncRecomputeProposals(final String filterText) {
 			if (isValid()) {
-				control.getDisplay().asyncExec(() -> {
-					recordCursorPosition();
-					recomputeProposals(filterText);
+				control.getDisplay().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						recordCursorPosition();
+						recomputeProposals(filterText);
+					}
 				});
 			} else {
 				recomputeProposals(filterText);
@@ -1013,13 +1041,13 @@ public class ContentProposalAdapter {
 
 			// Check each string for a match. Use the string displayed to the
 			// user, not the proposal content.
-			ArrayList<IContentProposal> list = new ArrayList<>();
-			for (IContentProposal proposal : proposals) {
-				String string = getString(proposal);
+			ArrayList<IContentProposal> list = new ArrayList<IContentProposal>();
+			for (int i = 0; i < proposals.length; i++) {
+				String string = getString(proposals[i]);
 				if (string.length() >= filterString.length()
 						&& string.substring(0, filterString.length())
 								.equalsIgnoreCase(filterString)) {
-					list.add(proposal);
+					list.add(proposals[i]);
 				}
 
 			}
@@ -1184,12 +1212,12 @@ public class ContentProposalAdapter {
 	/*
 	 * The list of IContentProposalListener listeners.
 	 */
-	private ListenerList<IContentProposalListener> proposalListeners = new ListenerList<>();
+	private ListenerList proposalListeners = new ListenerList();
 
 	/*
 	 * The list of IContentProposalListener2 listeners.
 	 */
-	private ListenerList<IContentProposalListener2> proposalListeners2 = new ListenerList<>();
+	private ListenerList proposalListeners2 = new ListenerList();
 
 	/*
 	 * Flag that indicates whether the adapter is enabled. In some cases,
@@ -1664,11 +1692,11 @@ public class ContentProposalAdapter {
 				case SWT.Traverse:
 				case SWT.KeyDown:
 					if (DEBUG) {
-						StringBuilder sb;
+						StringBuffer sb;
 						if (e.type == SWT.Traverse) {
-							sb = new StringBuilder("Traverse"); //$NON-NLS-1$
+							sb = new StringBuffer("Traverse"); //$NON-NLS-1$
 						} else {
-							sb = new StringBuilder("KeyDown"); //$NON-NLS-1$
+							sb = new StringBuffer("KeyDown"); //$NON-NLS-1$
 						}
 						sb.append(" received by adapter"); //$NON-NLS-1$
 						dump(sb.toString(), e);
@@ -1678,11 +1706,11 @@ public class ContentProposalAdapter {
 					if (popup != null) {
 						popup.getTargetControlListener().handleEvent(e);
 						if (DEBUG) {
-							StringBuilder sb;
+							StringBuffer sb;
 							if (e.type == SWT.Traverse) {
-								sb = new StringBuilder("Traverse"); //$NON-NLS-1$
+								sb = new StringBuffer("Traverse"); //$NON-NLS-1$
 							} else {
-								sb = new StringBuilder("KeyDown"); //$NON-NLS-1$
+								sb = new StringBuffer("KeyDown"); //$NON-NLS-1$
 							}
 							sb.append(" after being handled by popup"); //$NON-NLS-1$
 							dump(sb.toString(), e);
@@ -1810,7 +1838,7 @@ public class ContentProposalAdapter {
 			 *            the event
 			 */
 			private void dump(String who, Event e) {
-				StringBuilder sb = new StringBuilder(
+				StringBuffer sb = new StringBuffer(
 						"--- [ContentProposalAdapter]\n"); //$NON-NLS-1$
 				sb.append(who);
 				sb.append(" - e: keyCode=" + e.keyCode + hex(e.keyCode)); //$NON-NLS-1$
@@ -1861,7 +1889,12 @@ public class ContentProposalAdapter {
 					recordCursorPosition();
 					popup = new ContentProposalPopup(null, proposals);
 					popup.open();
-					popup.getShell().addDisposeListener(event -> popup = null);
+					popup.getShell().addDisposeListener(new DisposeListener() {
+						@Override
+						public void widgetDisposed(DisposeEvent event) {
+							popup = null;
+						}
+					});
 					internalPopupOpened();
 					notifyPopupOpened();
 				} else if (!autoActivated) {
@@ -2013,16 +2046,24 @@ public class ContentProposalAdapter {
 	 */
 	private void autoActivate() {
 		if (autoActivationDelay > 0) {
-			Runnable runnable = () -> {
-				receivedKeyDown = false;
-				try {
-					Thread.sleep(autoActivationDelay);
-				} catch (InterruptedException e) {
+			Runnable runnable = new Runnable() {
+				@Override
+				public void run() {
+					receivedKeyDown = false;
+					try {
+						Thread.sleep(autoActivationDelay);
+					} catch (InterruptedException e) {
+					}
+					if (!isValid() || receivedKeyDown) {
+						return;
+					}
+					getControl().getDisplay().syncExec(new Runnable() {
+						@Override
+						public void run() {
+							openProposalPopup(true);
+						}
+					});
 				}
-				if (!isValid() || receivedKeyDown) {
-					return;
-				}
-				getControl().getDisplay().syncExec(() -> openProposalPopup(true));
 			};
 			Thread t = new Thread(runnable);
 			t.start();
@@ -2033,9 +2074,12 @@ public class ContentProposalAdapter {
 			// some event that will cause the cursor position or
 			// other important info to change as a result of this
 			// event occurring.
-			getControl().getDisplay().asyncExec(() -> {
-				if (isValid()) {
-					openProposalPopup(true);
+			getControl().getDisplay().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					if (isValid()) {
+						openProposalPopup(true);
+					}
 				}
 			});
 		}
@@ -2048,8 +2092,10 @@ public class ContentProposalAdapter {
 		if (DEBUG) {
 			System.out.println("Notify listeners - proposal accepted."); //$NON-NLS-1$
 		}
-		for (IContentProposalListener l : proposalListeners) {
-			l.proposalAccepted(proposal);
+		final Object[] listenerArray = proposalListeners.getListeners();
+		for (int i = 0; i < listenerArray.length; i++) {
+			((IContentProposalListener) listenerArray[i])
+					.proposalAccepted(proposal);
 		}
 	}
 
@@ -2060,8 +2106,10 @@ public class ContentProposalAdapter {
 		if (DEBUG) {
 			System.out.println("Notify listeners - popup opened."); //$NON-NLS-1$
 		}
-		for (IContentProposalListener2 l : proposalListeners2) {
-			l.proposalPopupOpened(this);
+		final Object[] listenerArray = proposalListeners2.getListeners();
+		for (int i = 0; i < listenerArray.length; i++) {
+			((IContentProposalListener2) listenerArray[i])
+					.proposalPopupOpened(this);
 		}
 	}
 
@@ -2072,8 +2120,10 @@ public class ContentProposalAdapter {
 		if (DEBUG) {
 			System.out.println("Notify listeners - popup closed."); //$NON-NLS-1$
 		}
-		for (IContentProposalListener2 l : proposalListeners2) {
-			l.proposalPopupClosed(this);
+		final Object[] listenerArray = proposalListeners2.getListeners();
+		for (int i = 0; i < listenerArray.length; i++) {
+			((IContentProposalListener2) listenerArray[i])
+					.proposalPopupClosed(this);
 		}
 	}
 

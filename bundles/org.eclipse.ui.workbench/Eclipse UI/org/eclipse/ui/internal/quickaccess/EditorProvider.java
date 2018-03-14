@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,8 +43,9 @@ public class EditorProvider extends QuickAccessProvider {
 			if (activePage == null) {
 				return new QuickAccessElement[0];
 			}
-			for (IEditorReference editor : activePage.getEditorReferences()) {
-				EditorElement editorElement = new EditorElement(editor,
+			IEditorReference[] editors = activePage.getEditorReferences();
+			for (int i = 0; i < editors.length; i++) {
+				EditorElement editorElement = new EditorElement(editors[i],
 						this);
 				idToElement.put(editorElement.getId(), editorElement);
 			}

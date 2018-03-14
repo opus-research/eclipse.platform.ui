@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 IBM Corporation and others.
+ * Copyright (c) 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -72,14 +72,11 @@ public class SaveAllHandler extends AbstractSaveHandler {
 		// look if any such saveables exist and are dirty.
 		SaveablesList saveablesList = (SaveablesList) window.getWorkbench().getService(
 				ISaveablesLifecycleListener.class);
-		if (saveablesList == null) {
-			return EvaluationResult.FALSE;
-		}
-
-		for (ISaveablesSource nonPartSource : saveablesList.getNonPartSources()) {
-			Saveable[] saveables = nonPartSource.getSaveables();
-			for (Saveable saveable : saveables) {
-				if (saveable.isDirty()) {
+		ISaveablesSource[] nonPartSources = saveablesList.getNonPartSources();
+		for (int i = 0; i < nonPartSources.length; i++) {
+			Saveable[] saveables = nonPartSources[i].getSaveables();
+			for (int j = 0; j < saveables.length; j++) {
+				if (saveables[j].isDirty()) {
 					return EvaluationResult.TRUE;
 				}
 			}

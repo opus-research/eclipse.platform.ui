@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -194,7 +194,8 @@ public final class CommandImagePersistence extends RegistryPersistence {
 		// Sort the commands extension point based on element name.
 		final IConfigurationElement[] commandImagesExtensionPoint = registry
 				.getConfigurationElementsFor(EXTENSION_COMMAND_IMAGES);
-		for (final IConfigurationElement configurationElement : commandImagesExtensionPoint) {
+		for (int i = 0; i < commandImagesExtensionPoint.length; i++) {
+			final IConfigurationElement configurationElement = commandImagesExtensionPoint[i];
 			final String name = configurationElement.getName();
 
 			// Check if it is a binding definition.

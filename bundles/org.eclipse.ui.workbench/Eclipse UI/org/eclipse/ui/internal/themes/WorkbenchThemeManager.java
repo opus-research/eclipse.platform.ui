@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2016 IBM Corporation and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,6 +33,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.Workbench;
@@ -84,14 +86,18 @@ public class WorkbenchThemeManager extends EventManager implements
 
 	private ITheme currentTheme;
 
-	private IPropertyChangeListener currentThemeListener = event -> {
-		firePropertyChange(event);
-		if (event.getSource() instanceof FontRegistry) {
-			JFaceResources.getFontRegistry().put(event.getProperty(),
-					(FontData[]) event.getNewValue());
-		} else if (event.getSource() instanceof ColorRegistry) {
-			JFaceResources.getColorRegistry().put(event.getProperty(),
-					(RGB) event.getNewValue());
+	private IPropertyChangeListener currentThemeListener = new IPropertyChangeListener() {
+
+		@Override
+		public void propertyChange(PropertyChangeEvent event) {
+			firePropertyChange(event);
+			if (event.getSource() instanceof FontRegistry) {
+				JFaceResources.getFontRegistry().put(event.getProperty(),
+						(FontData[]) event.getNewValue());
+			} else if (event.getSource() instanceof ColorRegistry) {
+				JFaceResources.getColorRegistry().put(event.getProperty(),
+						(RGB) event.getNewValue());
+			}
 		}
 	};
 
@@ -133,8 +139,8 @@ public class WorkbenchThemeManager extends EventManager implements
 
 		// copy the font values from preferences.
 		FontRegistry jfaceFonts = JFaceResources.getFontRegistry();
-		for (Object fontRegistryKey : jfaceFonts.getKeySet()) {
-			String key = (String) fontRegistryKey;
+		for (Iterator i = jfaceFonts.getKeySet().iterator(); i.hasNext();) {
+			String key = (String) i.next();
 			defaultThemeFontRegistry.put(key, jfaceFonts.getFontData(key));
 		}
 
@@ -147,7 +153,12 @@ public class WorkbenchThemeManager extends EventManager implements
 
 		final boolean highContrast = Display.getCurrent().getHighContrast();
 
-		Display.getCurrent().addListener(SWT.Settings, event -> updateThemes());
+		Display.getCurrent().addListener(SWT.Settings, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				updateThemes();
+			}
+		});
 
 		// If in HC, *always* use the system default.
 		// This ignores any default theme set via plugin_customization.ini
@@ -157,8 +168,8 @@ public class WorkbenchThemeManager extends EventManager implements
 		PrefUtil.getAPIPreferenceStore().setDefault(
 				IWorkbenchPreferenceConstants.CURRENT_THEME_ID, themeId);
 
-		context = Workbench.getInstance().getService(IEclipseContext.class);
-		eventBroker = Workbench.getInstance().getService(IEventBroker.class);
+		context = (IEclipseContext) Workbench.getInstance().getService(IEclipseContext.class);
+		eventBroker = (IEventBroker) Workbench.getInstance().getService(IEventBroker.class);
 		if (eventBroker != null) {
 			eventBroker.subscribe(UIEvents.UILifeCycle.THEME_CHANGED, themeChangedHandler);
 			eventBroker.subscribe(IThemeEngine.Events.THEME_CHANGED, themeChangedHandler);
@@ -181,8 +192,9 @@ public class WorkbenchThemeManager extends EventManager implements
 
         IThemeDescriptor[] themeDescriptors = getThemeRegistry().getThemes();
 
-       	for (IThemeDescriptor themeDescriptor : themeDescriptors) {
-        	ITheme theme = (ITheme) themes.get(themeDescriptor);
+       	for (int i=0; i < themeDescriptors.length; i++) {
+        	IThemeDescriptor themeDescriptor = themeDescriptors[i];
+    		ITheme theme = (ITheme) themes.get(themeDescriptor);
     		//If theme is in our themes table then its already been populated
     		if (theme != null) {
                 ColorDefinition[] colorDefinitions = themeDescriptor.getColors();
@@ -227,8 +239,10 @@ public class WorkbenchThemeManager extends EventManager implements
 	}
 
 	protected void firePropertyChange(PropertyChangeEvent event) {
-		for (Object listener : getListeners()) {
-			((IPropertyChangeListener) listener).propertyChange(event);
+		Object[] listeners = getListeners();
+
+		for (int i = 0; i < listeners.length; i++) {
+			((IPropertyChangeListener) listeners[i]).propertyChange(event);
 		}
 	}
 
@@ -349,16 +363,18 @@ public class WorkbenchThemeManager extends EventManager implements
 			{
 				ColorRegistry jfaceColors = JFaceResources.getColorRegistry();
 				ColorRegistry themeColors = currentTheme.getColorRegistry();
-				for (Object themeColorKey : themeColors.getKeySet()) {
-					String key = (String) themeColorKey;
+				for (Iterator i = themeColors.getKeySet().iterator(); i
+						.hasNext();) {
+					String key = (String) i.next();
 					jfaceColors.put(key, themeColors.getRGB(key));
 				}
 			}
 			{
 				FontRegistry jfaceFonts = JFaceResources.getFontRegistry();
 				FontRegistry themeFonts = currentTheme.getFontRegistry();
-				for (Object themeFontKey : themeFonts.getKeySet()) {
-					String key = (String) themeFontKey;
+				for (Iterator i = themeFonts.getKeySet().iterator(); i
+						.hasNext();) {
+					String key = (String) i.next();
 					jfaceFonts.put(key, themeFonts.getFontData(key));
 				}
 			}
@@ -437,7 +453,7 @@ public class WorkbenchThemeManager extends EventManager implements
 				if (def.isOverridden()) {
 					def.resetToDefaultValue();
 					fontRegistry.put(def.getId(), def.getValue() != null ? def.getValue()
-							: PreferenceConverter.getFontDataArrayDefaultDefault());
+							: PreferenceConverter.FONTDATA_ARRAY_DEFAULT_DEFAULT);
 				}
 			}
 			for (ColorDefinition def : themeRegistry.getColors()) {

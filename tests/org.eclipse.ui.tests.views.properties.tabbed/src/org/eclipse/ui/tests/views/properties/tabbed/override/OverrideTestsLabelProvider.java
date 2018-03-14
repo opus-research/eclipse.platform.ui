@@ -24,17 +24,31 @@ import org.eclipse.ui.tests.views.properties.tabbed.model.Element;
 public class OverrideTestsLabelProvider extends LabelProvider implements
 		ITableLabelProvider {
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object,
+	 *      int)
+	 */
 	public Image getColumnImage(Object obj, int index) {
 		return getImage(obj);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object,
+	 *      int)
+	 */
 	public String getColumnText(Object obj, int index) {
 		return getText(obj);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.LabelProvider#getImage(java.lang.Object)
+	 */
 	public Image getImage(Object object) {
 		if (object instanceof Element) {
 			Element element = (Element) object;
@@ -43,7 +57,11 @@ public class OverrideTestsLabelProvider extends LabelProvider implements
 		return super.getImage(object);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
+	 */
 	public String getText(Object object) {
 		if (object instanceof Element) {
 			Element element = (Element) object;

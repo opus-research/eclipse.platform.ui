@@ -41,14 +41,23 @@ public class OverrideTestsSelectionProvider implements ISelectionProvider {
 		this.viewer = aViewer;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#addSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
+	 */
 	public void addSelectionChangedListener(ISelectionChangedListener listener) {
 		selectionChangedListeners.add(listener);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#getSelection()
+	 */
 	public ISelection getSelection() {
-		IStructuredSelection structuredSelection = viewer.getStructuredSelection();
+		ISelection selection = viewer.getSelection();
+		IStructuredSelection structuredSelection = (IStructuredSelection) selection;
 		if (structuredSelection.isEmpty()) {
 			return new OverrideTestsSelection(null);
 		}
@@ -56,7 +65,11 @@ public class OverrideTestsSelectionProvider implements ISelectionProvider {
 		return new OverrideTestsSelection(element);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#removeSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
+	 */
 	public void removeSelectionChangedListener(
 			ISelectionChangedListener listener) {
 		selectionChangedListeners.remove(listener);
@@ -78,7 +91,11 @@ public class OverrideTestsSelectionProvider implements ISelectionProvider {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#setSelection(org.eclipse.jface.viewers.ISelection)
+	 */
 	public void setSelection(ISelection selection) {
 		viewer.setSelection(selection);
 	}

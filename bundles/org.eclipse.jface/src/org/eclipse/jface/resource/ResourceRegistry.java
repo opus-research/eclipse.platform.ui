@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -65,9 +65,9 @@ public abstract class ResourceRegistry extends EventManager {
         if (myListeners.length > 0) {
             PropertyChangeEvent event = new PropertyChangeEvent(this, name,
                     oldValue, newValue);
-            for (Object myListener : myListeners) {
+            for (int i = 0; i < myListeners.length; ++i) {
                 try {
-                    ((IPropertyChangeListener) myListener)
+                    ((IPropertyChangeListener) myListeners[i])
                             .propertyChange(event);
                 } catch (Exception e) {
                     // TODO: how to log?

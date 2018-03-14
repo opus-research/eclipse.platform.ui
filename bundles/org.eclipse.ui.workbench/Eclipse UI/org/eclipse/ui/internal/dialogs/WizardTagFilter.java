@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,9 +38,10 @@ public class WizardTagFilter extends ViewerFilter {
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
 		if (element instanceof IWizardDescriptor) {
 			IWizardDescriptor desc = (IWizardDescriptor)element;
-			for (String tag : desc.getTags()) {
-				for (String myTag : myTags) {
-					if (tag.equals(myTag)) {
+			String [] tags = desc.getTags();
+			for (int i = 0; i < tags.length; i++) {
+				for (int j = 0; j < myTags.length; j++) {
+					if (tags[i].equals(myTags[j])) {
 						return true;
 					}
 				}

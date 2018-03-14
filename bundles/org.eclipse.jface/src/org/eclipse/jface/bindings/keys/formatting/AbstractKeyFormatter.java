@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -89,7 +89,7 @@ public abstract class AbstractKeyFormatter implements IKeyFormatter {
 
 	@Override
 	public String format(KeySequence keySequence) {
-		StringBuilder stringBuffer = new StringBuilder();
+		StringBuffer stringBuffer = new StringBuffer();
 
 		final KeyStroke[] keyStrokes = keySequence.getKeyStrokes();
 		final int keyStrokesLength = keyStrokes.length;
@@ -111,9 +111,10 @@ public abstract class AbstractKeyFormatter implements IKeyFormatter {
 		// Format the modifier keys, in sorted order.
 		final int modifierKeys = keyStroke.getModifierKeys();
 		final int[] sortedModifierKeys = sortModifierKeys(modifierKeys);
-		final StringBuilder stringBuffer = new StringBuilder();
+		final StringBuffer stringBuffer = new StringBuffer();
 		if (sortedModifierKeys != null) {
-			for (final int modifierKey : sortedModifierKeys) {
+			for (int i = 0; i < sortedModifierKeys.length; i++) {
+				final int modifierKey = sortedModifierKeys[i];
 				if (modifierKey != KeyStroke.NO_KEY) {
 					stringBuffer.append(format(modifierKey));
 					stringBuffer.append(keyDelimiter);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -123,7 +123,7 @@ public final class ExternalActionManager {
 		 * will be removed from this set and the listener removed. This value
 		 * may be empty, but never <code>null</code>.
 		 */
-		private final Set<String> loggedCommandIds = new HashSet<>();
+		private final Set<String> loggedCommandIds = new HashSet<String>();
 
 		/**
 		 * The list of listeners that have registered for property change
@@ -131,7 +131,7 @@ public final class ExternalActionManager {
 		 * to listeners (<code>IPropertyChangeListener</code> or
 		 * <code>ListenerList</code> of <code>IPropertyChangeListener</code>).
 		 */
-		private final Map<String, Object> registeredListeners = new HashMap<>();
+		private final Map<String, Object> registeredListeners = new HashMap<String, Object>();
 
 		/**
 		 * Constructs a new instance of <code>CommandCallback</code> with the
@@ -148,7 +148,18 @@ public final class ExternalActionManager {
 		 */
 		public CommandCallback(final BindingManager bindingManager,
 				final CommandManager commandManager) {
-			this(bindingManager, commandManager, commandId -> true, action -> true);
+			this(bindingManager, commandManager, new IActiveChecker() {
+				@Override
+				public boolean isActive(String commandId) {
+					return true;
+				}
+
+			}, new IExecuteApplicable() {
+				@Override
+				public boolean isApplicable(IAction action) {
+					return true;
+				}
+			});
 		}
 		/**
 		 * Constructs a new instance of <code>CommandCallback</code> with the
@@ -169,7 +180,13 @@ public final class ExternalActionManager {
 		public CommandCallback(final BindingManager bindingManager,
 				final CommandManager commandManager,
 				final IActiveChecker activeChecker) {
-			this(bindingManager, commandManager, activeChecker, action -> true);
+			this(bindingManager, commandManager, activeChecker,
+					new IExecuteApplicable() {
+				@Override
+				public boolean isApplicable(IAction action) {
+					return true;
+				}
+			});
 		}
 		/**
 		 * Constructs a new instance of <code>CommandCallback</code> with the
@@ -261,8 +278,8 @@ public final class ExternalActionManager {
 								.getManager(), IAction.TEXT, null, null);
 						if (value instanceof ListenerList) {
 							Object[] listeners= ((ListenerList) value).getListeners();
-							for (Object l : listeners) {
-								final IPropertyChangeListener listener = (IPropertyChangeListener) l;
+							for (int i = 0; i < listeners.length; i++) {
+								final IPropertyChangeListener listener = (IPropertyChangeListener) listeners[i];
 								listener.propertyChange(propertyChangeEvent);
 							}
 						} else {
@@ -289,7 +306,7 @@ public final class ExternalActionManager {
 						final KeyStroke keyStroke = (KeyStroke) trigger;
 						final int accelerator = SWTKeySupport
 								.convertKeyStrokeToAccelerator(keyStroke);
-						return Integer.valueOf(accelerator);
+						return new Integer(accelerator);
 					}
 				}
 			}

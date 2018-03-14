@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
 import org.eclipse.ui.AbstractSourceProvider;
 import org.eclipse.ui.ISourceProvider;
 import org.eclipse.ui.services.IDisposable;
@@ -83,7 +84,9 @@ public final class SourceProviderService implements ISourceProviderService,
 			throw new NullPointerException("The source provider cannot be null"); //$NON-NLS-1$
 		}
 
-		for (final String sourceName : sourceProvider.getProvidedSourceNames()) {
+		final String[] sourceNames = sourceProvider.getProvidedSourceNames();
+		for (int i = 0; i < sourceNames.length; i++) {
+			final String sourceName = sourceNames[i];
 			sourceProvidersByName.put(sourceName, sourceProvider);
 		}
 		sourceProviders.add(sourceProvider);
@@ -94,16 +97,18 @@ public final class SourceProviderService implements ISourceProviderService,
 			throw new NullPointerException("The source provider cannot be null"); //$NON-NLS-1$
 		}
 
-		for (String sourceName : sourceProvider.getProvidedSourceNames()) {
-			sourceProvidersByName.remove(sourceName);
+		final String[] sourceNames = sourceProvider.getProvidedSourceNames();
+		for (int i = 0; i < sourceNames.length; i++) {
+			sourceProvidersByName.remove(sourceNames[i]);
 		}
 		sourceProviders.remove(sourceProvider);
 	}
 
 	public final void readRegistry() {
-		for (AbstractSourceProvider sourceProvider : WorkbenchServiceRegistry.getRegistry().getSourceProviders()) {
-			sourceProvider.initialize(locator);
-			registerProvider(sourceProvider);
+		AbstractSourceProvider[] sp = WorkbenchServiceRegistry.getRegistry().getSourceProviders();
+		for (int i = 0; i < sp.length; i++) {
+			sp[i].initialize(locator);
+			registerProvider(sp[i]);
 		}
 	}
 }

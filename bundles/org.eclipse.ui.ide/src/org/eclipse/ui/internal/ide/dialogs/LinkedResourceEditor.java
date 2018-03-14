@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,8 +8,6 @@
  * Contributors:
  *     Serge Beauchamp (Freescale Semiconductor) - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
- *     Mickael Istria (Red Hat Inc.) - Bug 486901
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 490700
  ******************************************************************************/
 
 package org.eclipse.ui.internal.ide.dialogs;
@@ -29,12 +27,14 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -45,9 +45,11 @@ import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
@@ -205,7 +207,7 @@ public class LinkedResourceEditor {
         Label variableLabel = new Label(pageComponent, SWT.LEFT);
         variableLabel.setText(NLS
 				.bind(IDEWorkbenchMessages.LinkedResourceEditor_descriptionBlock,
-				fProject != null ? fProject.getName() : "")); //$NON-NLS-1$
+						fProject != null? fProject.getName():new String()));
 
         data = new GridData();
         data.horizontalAlignment = GridData.FILL;
@@ -221,7 +223,12 @@ public class LinkedResourceEditor {
 
 		fTree = new TreeViewer(treeComposite, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
 
-		fTree.addSelectionChangedListener(event -> updateSelection());
+		fTree.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				updateSelection();
+			}
+		});
 
 		data = new GridData(GridData.FILL_BOTH);
 		data.heightHint = fTree.getTree().getItemHeight() * 10;
@@ -377,10 +384,10 @@ public class LinkedResourceEditor {
 			if (parentElement instanceof LinkedResourceEditor) {
 				ArrayList list = new ArrayList();
 				Object[] objs = { BROKEN, ABSOLUTE, FIXED };
-				for (Object obj : objs) {
-					Object[] children = getChildren(obj);
+				for (int i = 0; i < objs.length; i++) {
+					Object[] children = getChildren(objs[i]);
 					if (children != null && children.length > 0)
-						list.add(obj);
+						list.add(objs[i]);
 				}
 				return list.toArray(new Object[0]);
 			} else if (parentElement instanceof String) {
@@ -436,11 +443,18 @@ public class LinkedResourceEditor {
 																		 * >
 																		 */();
 			try {
-				fProject.accept(resource -> {
-if (resource.isLinked() && !resource.isVirtual())
-				resources.add(resource);
-return true;
-});
+				fProject.accept(new IResourceVisitor() {
+					/**
+					 * @throws CoreException
+					 */
+					@Override
+					public boolean visit(IResource resource)
+							throws CoreException {
+						if (resource.isLinked() && !resource.isVirtual())
+							resources.add(resource);
+						return true;
+					}
+				});
 			} catch (CoreException e) {
 			}
 			projectFiles = (IResource[]) resources.toArray(new IResource[0]);
@@ -456,7 +470,8 @@ return true;
 		fBrokenResources = new TreeMap/* <String, IResource> */();
 		fFixedResources = new TreeMap/* <String, IResource> */();
 		fAbsoluteResources = new TreeMap/* <String, IResource> */();
-		for (IResource resource : projectFiles) {
+		for (int i = 0; i < projectFiles.length; i++) {
+			IResource resource = projectFiles[i];
 			String fullPath = resource.getFullPath().toPortableString();
 			try {
 				if (exists(resource)) {
@@ -503,8 +518,8 @@ return true;
 	}
 
 	boolean areFixed(IResource[] res) {
-		for (IResource resource : res) {
-			String fullPath = resource.getFullPath().toPortableString();
+		for (int i = 0; i < res.length; i++) {
+			String fullPath = res[i].getFullPath().toPortableString();
 			if (!fFixedResources.containsKey(fullPath))
 				return false;
 		}
@@ -546,21 +561,32 @@ return true;
 				IDEWorkbenchMessages.LinkedResourceEditor_removeTitle,
 				IDEWorkbenchMessages.LinkedResourceEditor_removeMessage)) {
 			final IResource[] selectedResources = getSelectedResource();
-			final ArrayList<IResource> removedResources = new ArrayList<>();
+			final ArrayList/*<IResource>*/ removedResources = new ArrayList();
 
-			IRunnableWithProgress op = monitor -> {
-				SubMonitor subMonitor = SubMonitor.convert(monitor,
-						IDEWorkbenchMessages.LinkedResourceEditor_removingMessage, selectedResources.length);
-				for (IResource selectedResource : selectedResources) {
-					String fullPath = selectedResource.getFullPath().toPortableString();
+			IRunnableWithProgress op = new IRunnableWithProgress() {
+				@Override
+				public void run(IProgressMonitor monitor) {
 					try {
-						selectedResource.delete(true, subMonitor.split(1));
-						removedResources.add(selectedResource);
-						fBrokenResources.remove(fullPath);
-						fFixedResources.remove(fullPath);
-						fAbsoluteResources.remove(fullPath);
-					} catch (CoreException e) {
-						e.printStackTrace();
+						monitor.beginTask(
+								IDEWorkbenchMessages.LinkedResourceEditor_removingMessage,
+								selectedResources.length);
+						for (int i = 0; i < selectedResources.length; i++) {
+							if (monitor.isCanceled())
+								break;
+							String fullPath = selectedResources[i]
+									.getFullPath().toPortableString();
+							try {
+								selectedResources[i].delete(true, new SubProgressMonitor(monitor, 1));
+								removedResources.add(selectedResources[i]);
+								fBrokenResources.remove(fullPath);
+								fFixedResources.remove(fullPath);
+								fAbsoluteResources.remove(fullPath);
+							} catch (CoreException e) {
+								e.printStackTrace();
+							}
+						}
+					} finally {
+						monitor.done();
 					}
 				}
 			};
@@ -633,7 +659,7 @@ return true;
 	 */
 	private void reportResult(IResource[] selectedResources,
 			ArrayList/* <String> */report, String title) {
-		StringBuilder message = new StringBuilder();
+		StringBuffer message = new StringBuffer();
 		Iterator/* <String> */stringIt = report.iterator();
 		while (stringIt.hasNext()) {
 			message.append(stringIt.next());
@@ -641,9 +667,12 @@ return true;
 				message.append("\n"); //$NON-NLS-1$
 		}
 		final String resultMessage = message.toString();
-		MessageDialog dialog = new MessageDialog(fConvertAbsoluteButton.getShell(), title, null,
-				IDEWorkbenchMessages.LinkedResourceEditor_convertionResults, MessageDialog.INFORMATION, 0,
-				IDEWorkbenchMessages.linkedResourceEditor_OK) {
+		MessageDialog dialog = new MessageDialog(fConvertAbsoluteButton
+				.getShell(), title, null,
+				IDEWorkbenchMessages.LinkedResourceEditor_convertionResults,
+				MessageDialog.INFORMATION,
+				new String[] { IDEWorkbenchMessages.linkedResourceEditor_OK },
+				0) {
 
 			@Override
 			protected boolean isResizable() {
@@ -902,7 +931,7 @@ return true;
 			else
 				variableName = variableName.substring(0, variableName.length() -1); // remove the tailing ':'
 		}
-		StringBuilder buf = new StringBuilder();
+		StringBuffer buf = new StringBuffer();
 		for (int i = 0; i < variableName.length(); i++) {
 			char c = variableName.charAt(i);
 			if (Character.isLetterOrDigit(c) || (c == '_'))
@@ -939,7 +968,7 @@ return true;
 		try {
 			setLinkLocation(resource, location);
 		} catch (Exception e) {
-			IDEWorkbenchPlugin.log(e.getMessage(), e);
+			e.printStackTrace();
 		}
 		reparent(new IResource[] { resource });
 	}
@@ -947,7 +976,8 @@ return true;
 	void reparent(IResource[] resources) {
 		boolean changed = false;
 
-		for (IResource resource : resources) {
+		for (int i = 0; i < resources.length; i++) {
+			IResource resource = resources[i];
 			boolean isBroken;
 			try {
 				isBroken = !exists(resource);

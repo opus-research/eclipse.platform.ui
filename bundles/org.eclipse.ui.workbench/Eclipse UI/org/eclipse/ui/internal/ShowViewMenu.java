@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -76,13 +76,16 @@ public class ShowViewMenu extends ContributionItem {
 
 	private static final String NO_TARGETS_MSG = WorkbenchMessages.Workbench_showInNoTargets;
 
-	private Comparator actionComparator = (o1, o2) -> {
-		if (collator == null) {
-			collator = Collator.getInstance();
+	private Comparator actionComparator = new Comparator() {
+		@Override
+		public int compare(Object o1, Object o2) {
+			if (collator == null) {
+				collator = Collator.getInstance();
+			}
+			CommandContributionItemParameter a1 = (CommandContributionItemParameter) o1;
+			CommandContributionItemParameter a2 = (CommandContributionItemParameter) o2;
+			return collator.compare(a1.label, a2.label);
 		}
-		CommandContributionItemParameter a1 = (CommandContributionItemParameter) o1;
-		CommandContributionItemParameter a2 = (CommandContributionItemParameter) o2;
-		return collator.compare(a1.label, a2.label);
 	};
 
 	private Action showDlgAction;
@@ -94,7 +97,12 @@ public class ShowViewMenu extends ContributionItem {
 
 	private MenuManager menuManager;
 
-	private IMenuListener menuListener = manager -> manager.markDirty();
+	private IMenuListener menuListener = new IMenuListener() {
+		@Override
+		public void menuAboutToShow(IMenuManager manager) {
+			manager.markDirty();
+		}
+	};
 	private boolean makeFast;
 
 	private static Collator collator;
@@ -321,8 +329,8 @@ public class ShowViewMenu extends ContributionItem {
 			item.setText(NO_TARGETS_MSG);
 			item.setEnabled(false);
 		} else {
-			for (IContributionItem item : items) {
-				item.fill(menu, index++);
+			for (int i = 0; i < items.length; i++) {
+				items[i].fill(menu, index++);
 			}
 		}
 	}

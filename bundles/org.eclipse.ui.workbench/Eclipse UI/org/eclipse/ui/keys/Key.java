@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -68,6 +68,9 @@ public abstract class Key implements Comparable {
 		return Util.compare(key, ((Key) object).key);
 	}
 
+	/**
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public final boolean equals(final Object object) {
 		if (!(object instanceof Key)) {
@@ -77,6 +80,9 @@ public abstract class Key implements Comparable {
 		return key == ((Key) object).key;
 	}
 
+	/**
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public final int hashCode() {
 		return Util.hashCode(key);
@@ -87,6 +93,7 @@ public abstract class Key implements Comparable {
 	 *
 	 * @return The formal string representation for this key. Guaranteed not to
 	 *         be <code>null</code>.
+	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public final String toString() {

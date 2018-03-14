@@ -94,6 +94,9 @@ public final class Context extends NamedHandleObject implements Comparable {
         listeners.add(listener);
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
     @Override
 	public final int compareTo(final Object object) {
         final Context scheme = (Context) object;
@@ -233,7 +236,8 @@ public final class Context extends NamedHandleObject implements Comparable {
     @Override
 	public final String toString() {
         if (string == null) {
-			final StringBuilder stringBuffer = new StringBuilder("Context("); //$NON-NLS-1$
+            final StringBuffer stringBuffer = new StringBuffer();
+            stringBuffer.append("Context("); //$NON-NLS-1$
             stringBuffer.append(id);
             stringBuffer.append(',');
             stringBuffer.append(name);

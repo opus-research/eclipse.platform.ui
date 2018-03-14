@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2016 IBM Corporation and others.
+ * Copyright (c) 2004, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -182,8 +182,8 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 
         @Override
 		public void removeExtension(IExtension source, Object[] objects) {
-            for (Object object : objects) {
-                if (object == pluggableHelpUI) {
+            for (int i = 0; i < objects.length; i++) {
+                if (objects[i] == pluggableHelpUI) {
                     isInitialized = false;
                     pluggableHelpUI = null;
                     helpCompatibilityWrapper = null;
@@ -307,7 +307,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		@Override
 		public boolean isContextHelpDisplayed() {
 			// real method - forward to pluggedhelp UI
-			return WorkbenchHelpSystem.this.isContextHelpDisplayed();
+			return isContextHelpDisplayed();
 		}
 	}
 
@@ -485,7 +485,8 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 
 			private IConfigurationElement findElement(
 					String desiredHelpSystemId, IExtension[] extensions) {
-				for (IExtension extension : extensions) {
+				for (int i = 0; i < extensions.length; i++) {
+					IExtension extension = extensions[i];
 					if (desiredHelpSystemId.equals(extension.getUniqueIdentifier())) {
 						IConfigurationElement[] elements = extension
 								.getConfigurationElements();
@@ -605,24 +606,27 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 */
 	@Deprecated
 	public void setHelp(IAction action, final Object[] contexts) {
-		for (Object context : contexts) {
-			Assert.isTrue(context instanceof String
-					|| context instanceof IContext);
+		for (int i = 0; i < contexts.length; i++) {
+			Assert.isTrue(contexts[i] instanceof String
+					|| contexts[i] instanceof IContext);
 		}
-		action.setHelpListener(event -> {
-			if (contexts != null && contexts.length > 0
-					&& getHelpUI() != null) {
-				// determine the context
-				IContext context = null;
-				if (contexts[0] instanceof String) {
-					context = HelpSystem.getContext((String) contexts[0]);
-				} else if (contexts[0] instanceof IContext) {
-					context = (IContext) contexts[0];
-				}
-				if (context != null) {
-					Point point = computePopUpLocation(event.widget
-							.getDisplay());
-					displayContext(context, point.x, point.y);
+		action.setHelpListener(new HelpListener() {
+			@Override
+			public void helpRequested(HelpEvent event) {
+				if (contexts != null && contexts.length > 0
+						&& getHelpUI() != null) {
+					// determine the context
+					IContext context = null;
+					if (contexts[0] instanceof String) {
+						context = HelpSystem.getContext((String) contexts[0]);
+					} else if (contexts[0] instanceof IContext) {
+						context = (IContext) contexts[0];
+					}
+					if (context != null) {
+						Point point = computePopUpLocation(event.widget
+								.getDisplay());
+						displayContext(context, point.x, point.y);
+					}
 				}
 			}
 		});
@@ -646,22 +650,25 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 */
 	@Deprecated
 	public void setHelp(IAction action, final IContextComputer computer) {
-		action.setHelpListener(event -> {
-			Object[] helpContexts = computer.computeContexts(event);
-			if (helpContexts != null && helpContexts.length > 0
-					&& getHelpUI() != null) {
-				// determine the context
-				IContext context = null;
-				if (helpContexts[0] instanceof String) {
-					context = HelpSystem
-							.getContext((String) helpContexts[0]);
-				} else if (helpContexts[0] instanceof IContext) {
-					context = (IContext) helpContexts[0];
-				}
-				if (context != null) {
-					Point point = computePopUpLocation(event.widget
-							.getDisplay());
-					displayContext(context, point.x, point.y);
+		action.setHelpListener(new HelpListener() {
+			@Override
+			public void helpRequested(HelpEvent event) {
+				Object[] helpContexts = computer.computeContexts(event);
+				if (helpContexts != null && helpContexts.length > 0
+						&& getHelpUI() != null) {
+					// determine the context
+					IContext context = null;
+					if (helpContexts[0] instanceof String) {
+						context = HelpSystem
+								.getContext((String) helpContexts[0]);
+					} else if (helpContexts[0] instanceof IContext) {
+						context = (IContext) helpContexts[0];
+					}
+					if (context != null) {
+						Point point = computePopUpLocation(event.widget
+								.getDisplay());
+						displayContext(context, point.x, point.y);
+					}
 				}
 			}
 		});
@@ -685,9 +692,9 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 */
 	@Deprecated
 	public void setHelp(Control control, Object[] contexts) {
-		for (Object context : contexts) {
-			Assert.isTrue(context instanceof String
-					|| context instanceof IContext);
+		for (int i = 0; i < contexts.length; i++) {
+			Assert.isTrue(contexts[i] instanceof String
+					|| contexts[i] instanceof IContext);
 		}
 
 		control.setData(HELP_KEY, contexts);
@@ -738,9 +745,9 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 */
 	@Deprecated
 	public void setHelp(Menu menu, Object[] contexts) {
-		for (Object context : contexts) {
-			Assert.isTrue(context instanceof String
-					|| context instanceof IContext);
+		for (int i = 0; i < contexts.length; i++) {
+			Assert.isTrue(contexts[i] instanceof String
+					|| contexts[i] instanceof IContext);
 		}
 		menu.setData(HELP_KEY, contexts);
 		// ensure that the listener is only registered once
@@ -790,9 +797,9 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 */
 	@Deprecated
 	public void setHelp(MenuItem item, Object[] contexts) {
-		for (Object context : contexts) {
-			Assert.isTrue(context instanceof String
-					|| context instanceof IContext);
+		for (int i = 0; i < contexts.length; i++) {
+			Assert.isTrue(contexts[i] instanceof String
+					|| contexts[i] instanceof IContext);
 		}
 		item.setData(HELP_KEY, contexts);
 		// ensure that the listener is only registered once
@@ -838,13 +845,16 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		// TODO Need a help ID from the context
 		// final String contextId = command.getHelpId();
 		final String contextId = ""; //$NON-NLS-1$
-		return event -> {
-			if (getHelpUI() != null) {
-				IContext context = HelpSystem.getContext(contextId);
-				if (context != null) {
-					Point point = computePopUpLocation(event.widget
-							.getDisplay());
-					displayContext(context, point.x, point.y);
+		return new HelpListener() {
+			@Override
+			public void helpRequested(HelpEvent event) {
+				if (getHelpUI() != null) {
+					IContext context = HelpSystem.getContext(contextId);
+					if (context != null) {
+						Point point = computePopUpLocation(event.widget
+								.getDisplay());
+						displayContext(context, point.x, point.y);
+					}
 				}
 			}
 		};
@@ -944,14 +954,17 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	public void setHelp(final IAction action, final String contextId) {
 		if (WorkbenchPlugin.DEBUG)
 			setHelpTrace(contextId);
-		action.setHelpListener(event -> {
-			if (getHelpUI() != null) {
-				IContext context = HelpSystem.getContext(contextId);
-				if (context != null) {
-					Point point = computePopUpLocation(event.widget
-							.getDisplay());
-					String title = LegacyActionTools.removeMnemonics(action.getText());
-					displayContext(new ContextWithTitle(context, title), point.x, point.y);
+		action.setHelpListener(new HelpListener() {
+			@Override
+			public void helpRequested(HelpEvent event) {
+				if (getHelpUI() != null) {
+					IContext context = HelpSystem.getContext(contextId);
+					if (context != null) {
+						Point point = computePopUpLocation(event.widget
+								.getDisplay());
+						String title = LegacyActionTools.removeMnemonics(action.getText());
+						displayContext(new ContextWithTitle(context, title), point.x, point.y);
+					}
 				}
 			}
 		});

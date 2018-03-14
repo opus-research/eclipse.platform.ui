@@ -104,7 +104,8 @@ public class UndoHistoryView extends ViewPart implements
 	 * undo context.
 	 */
 
-	class ViewContentProvider implements IStructuredContentProvider, IOperationHistoryListener {
+	class ViewContentProvider implements IStructuredContentProvider,
+			IOperationHistoryListener {
 
 		@Override
 		public void inputChanged(Viewer v, Object oldInput, Object newInput) {
@@ -252,7 +253,7 @@ public class UndoHistoryView extends ViewPart implements
 	private IUndoContext selectContext() {
 		// This would be better implemented as a view filter, but for now, we
 		// will use a dialog that collects the available undo contexts.
-		List<IUndoContext> input = new ArrayList<>();
+		List<IUndoContext> input = new ArrayList<IUndoContext>();
 		IUndoableOperation[] operations = history
 				.getUndoHistory(IOperationHistory.GLOBAL_UNDO_CONTEXT);
 		for (IUndoableOperation operation : operations) {
@@ -334,9 +335,10 @@ public class UndoHistoryView extends ViewPart implements
 		manager.add(filterAction);
 		manager.add(refreshListAction);
 
-		IStructuredSelection selection = viewer.getStructuredSelection();
+		ISelection selection = viewer.getSelection();
 		if (!selection.isEmpty()) {
-			IUndoableOperation operation = (IUndoableOperation) selection.getFirstElement();
+			IUndoableOperation operation = (IUndoableOperation) ((IStructuredSelection) selection)
+					.getFirstElement();
 			selectiveUndoAction.setEnabled(operation.canUndo());
 		} else {
 			selectiveUndoAction.setEnabled(false);
@@ -368,7 +370,9 @@ public class UndoHistoryView extends ViewPart implements
 		selectiveUndoAction = new Action() {
 			@Override
 			public void run() {
-				IUndoableOperation operation = (IUndoableOperation) viewer.getStructuredSelection().getFirstElement();
+				ISelection selection = viewer.getSelection();
+				IUndoableOperation operation = (IUndoableOperation) ((IStructuredSelection) selection)
+						.getFirstElement();
 				if (operation.canUndo()) {
 					try {
 						history.undoOperation(operation, null, undoAction);
@@ -400,11 +404,13 @@ public class UndoHistoryView extends ViewPart implements
 		doubleClickAction = new Action() {
 			@Override
 			public void run() {
-				IUndoableOperation operation = (IUndoableOperation) viewer.getStructuredSelection().getFirstElement();
-				StringBuilder buf = new StringBuilder(operation.getLabel());
+				ISelection selection = viewer.getSelection();
+				IUndoableOperation operation = (IUndoableOperation) ((IStructuredSelection) selection)
+						.getFirstElement();
+				StringBuffer buf = new StringBuffer(operation.getLabel());
 				buf.append("\n");
 				buf.append("Enabled=");	//$NON-NLS-1$
-				buf.append(Boolean.valueOf(operation.canUndo()).toString());
+				buf.append(new Boolean(operation.canUndo()).toString());
 				buf.append("\n");
 				buf.append(operation.getClass().toString());
 				showMessage(buf.toString());
@@ -438,7 +444,7 @@ public class UndoHistoryView extends ViewPart implements
 	 */
 	@Override
 	public void selectionChanged(SelectionChangedEvent event) {
-		ISelection selection = viewer.getStructuredSelection();
+		ISelection selection = viewer.getSelection();
 		boolean enabled = !selection.isEmpty();
 		selectiveUndoAction.setEnabled(enabled);
 	}

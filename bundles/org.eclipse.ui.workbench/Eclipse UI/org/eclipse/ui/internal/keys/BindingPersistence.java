@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -718,8 +718,9 @@ public class BindingPersistence extends PreferencePersistence {
 
 		List bindings = new ArrayList();
 
-		for (IConfigurationElement sequenceModifier : sequenceModifiers) {
+		for (int i = 0; i < sequenceModifiers.length; i++) {
 
+			IConfigurationElement sequenceModifier = sequenceModifiers[i];
 			String findSequence = sequenceModifier.getAttribute(ATT_FIND);
 
 			if (keySequenceText.startsWith(findSequence)) {
@@ -800,8 +801,8 @@ public class BindingPersistence extends PreferencePersistence {
 
 		String platform = SWT.getPlatform();
 		boolean modifierExists = false;
-		for (String currentPlatform : platforms) {
-			if(currentPlatform.equals(platform)) {
+		for (int i = 0; i < platforms.length; i++) {
+			if(platforms[i].equals(platform)) {
 				modifierExists = true;
 				break;
 			}
@@ -825,10 +826,12 @@ public class BindingPersistence extends PreferencePersistence {
 	private static IConfigurationElement[] getSequenceModifierElements(IConfigurationElement configurationElement) {
 
 		IExtension extension = configurationElement.getDeclaringExtension();
+		IConfigurationElement[] configurationElements = extension.getConfigurationElements();
 		List modifierElements = new ArrayList();
-		for (final IConfigurationElement configElement : extension.getConfigurationElements()) {
-			if(TAG_SEQUENCE_MODIFIER.equals(configElement.getName()))
-				modifierElements.add(configElement);
+		for (int i = 0; i < configurationElements.length; i++) {
+			final IConfigurationElement anElement = configurationElements[i];
+			if(TAG_SEQUENCE_MODIFIER.equals(anElement.getName()))
+				modifierElements.add(anElement);
 		}
 		return (IConfigurationElement[]) modifierElements.toArray(new IConfigurationElement[modifierElements.size()]);
 	}
@@ -1002,8 +1005,8 @@ public class BindingPersistence extends PreferencePersistence {
 		// Undefine all the previous handle objects.
 		final HandleObject[] handleObjects = bindingManager.getDefinedSchemes();
 		if (handleObjects != null) {
-			for (HandleObject handleObject : handleObjects) {
-				handleObject.undefine();
+			for (int i = 0; i < handleObjects.length; i++) {
+				handleObjects[i].undefine();
 			}
 		}
 
@@ -1289,7 +1292,8 @@ public class BindingPersistence extends PreferencePersistence {
 		// Sort the bindings extension point based on element name.
 		final IConfigurationElement[] bindingsExtensionPoint = registry
 				.getConfigurationElementsFor(EXTENSION_BINDINGS);
-		for (final IConfigurationElement configurationElement : bindingsExtensionPoint) {
+		for (int i = 0; i < bindingsExtensionPoint.length; i++) {
+			final IConfigurationElement configurationElement = bindingsExtensionPoint[i];
 			final String name = configurationElement.getName();
 
 			// Check if it is a binding definition.
@@ -1310,7 +1314,8 @@ public class BindingPersistence extends PreferencePersistence {
 		// Sort the commands extension point based on element name.
 		final IConfigurationElement[] commandsExtensionPoint = registry
 				.getConfigurationElementsFor(EXTENSION_COMMANDS);
-		for (final IConfigurationElement configurationElement : commandsExtensionPoint) {
+		for (int i = 0; i < commandsExtensionPoint.length; i++) {
+			final IConfigurationElement configurationElement = commandsExtensionPoint[i];
 			final String name = configurationElement.getName();
 
 			// Check if it is a binding definition.
@@ -1339,7 +1344,8 @@ public class BindingPersistence extends PreferencePersistence {
 		 */
 		final IConfigurationElement[] acceleratorConfigurationsExtensionPoint = registry
 				.getConfigurationElementsFor(EXTENSION_ACCELERATOR_CONFIGURATIONS);
-		for (final IConfigurationElement configurationElement : acceleratorConfigurationsExtensionPoint) {
+		for (int i = 0; i < acceleratorConfigurationsExtensionPoint.length; i++) {
+			final IConfigurationElement configurationElement = acceleratorConfigurationsExtensionPoint[i];
 			final String name = configurationElement.getName();
 
 			// Check if the name matches the accelerator configuration element

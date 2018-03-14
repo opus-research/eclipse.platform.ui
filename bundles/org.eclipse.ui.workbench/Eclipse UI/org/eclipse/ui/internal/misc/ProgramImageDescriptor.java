@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -58,12 +58,12 @@ public class ProgramImageDescriptor extends ImageDescriptor {
      * in this descriptor.
      */
     @Override
-	public ImageData getImageData(int zoom) {
+	public ImageData getImageData() {
         /*This is a user defined offset into the file which always
          *returns us the defualt - return the default regardless*/
 
         return WorkbenchImages.getImageDescriptor(ISharedImages.IMG_OBJ_FILE)
-				.getImageData(zoom);
+                .getImageData();
     }
 
     /**

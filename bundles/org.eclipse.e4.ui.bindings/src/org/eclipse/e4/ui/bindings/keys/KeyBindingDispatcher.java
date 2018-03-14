@@ -1,22 +1,20 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2017 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *  IBM Corporation - initial API and implementation
- *  Mickael Istria (Red Hat Inc.) - [517068] conflicts consider enabled commands
+ *     IBM Corporation - initial API and implementation
  ******************************************************************************/
 
 package org.eclipse.e4.ui.bindings.keys;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionException;
@@ -267,7 +265,8 @@ public class KeyBindingDispatcher {
 		final EHandlerService handlerService = getHandlerService();
 		final Command command = parameterizedCommand.getCommand();
 
-		final IEclipseContext staticContext = createContext(trigger);
+		final IEclipseContext staticContext = EclipseContextFactory.create("keys-staticContext"); //$NON-NLS-1$
+		staticContext.set(Event.class, trigger);
 
 		final boolean commandDefined = command.isDefined();
 		// boolean commandEnabled;
@@ -303,12 +302,6 @@ public class KeyBindingDispatcher {
 			staticContext.dispose();
 		}
 		return (commandDefined && commandHandled);
-	}
-
-	private IEclipseContext createContext(final Event trigger) {
-		final IEclipseContext staticContext = EclipseContextFactory.create("keys-staticContext"); //$NON-NLS-1$
-		staticContext.set(Event.class, trigger);
-		return staticContext;
 	}
 
 	/**
@@ -414,6 +407,19 @@ public class KeyBindingDispatcher {
 	}
 
 	/**
+	 * Determines whether the key sequence is a perfect match for any command. If there is a match,
+	 * then the corresponding command identifier is returned.
+	 *
+	 * @param keySequence
+	 *            The key sequence to check for a match; must never be <code>null</code>.
+	 * @return The perfectly matching command; <code>null</code> if no command matches.
+	 */
+	private ParameterizedCommand getPerfectMatch(KeySequence keySequence) {
+		Binding perfectMatch = getBindingService().getPerfectMatch(keySequence);
+		return perfectMatch == null ? null : perfectMatch.getParameterizedCommand();
+	}
+
+	/**
 	 * Changes the key binding state to the given value. This should be an incremental change, but
 	 * there are no checks to guarantee this is so. It also sets up a <code>Shell</code> to be
 	 * displayed after one second has elapsed. This shell will show the user the possible
@@ -468,38 +474,14 @@ public class KeyBindingDispatcher {
 	}
 
 	/**
-	 * Determines whether the key sequence perfectly matches on of the active key
-	 * bindings.
+	 * Determines whether the key sequence perfectly matches on of the active key bindings.
 	 *
 	 * @param keySequence
-	 *            The key sequence to check for a perfect match; must never be
-	 *            <code>null</code>.
-	 * @param context
-	 * @return <code>true</code> if there is a perfect match; <code>false</code>
-	 *         otherwise.
+	 *            The key sequence to check for a perfect match; must never be <code>null</code>.
+	 * @return <code>true</code> if there is a perfect match; <code>false</code> otherwise.
 	 */
-	private boolean isUniqueMatch(KeySequence keySequence, IEclipseContext context) {
-		return getBindingService().isPerfectMatch(keySequence)
-				|| getExecutableMatches(keySequence, context).size() == 1;
-	}
-
-	/**
-	 * @param keySequence
-	 * @param context2
-	 * @return
-	 */
-	private Collection<Binding> getExecutableMatches(KeySequence keySequence, IEclipseContext context2) {
-		Binding binding = getBindingService().getPerfectMatch(keySequence);
-		if (binding != null) {
-			return Collections.singleton(binding);
-		}
-		Collection<Binding> conflicts = getBindingService().getConflictsFor(keySequence);
-		if (conflicts != null) {
-			return conflicts.stream()
-					.filter(match -> getHandlerService().canExecute(match.getParameterizedCommand(), context))
-					.collect(Collectors.toList());
-		}
-		return Collections.emptySet();
+	private boolean isPerfectMatch(KeySequence keySequence) {
+		return getBindingService().isPerfectMatch(keySequence);
 	}
 
 	/**
@@ -511,18 +493,16 @@ public class KeyBindingDispatcher {
 		KeySequence errorSequence = null;
 		Collection<Binding> errorMatch = null;
 
-		IEclipseContext createContext = createContext(event);
 		KeySequence sequenceBeforeKeyStroke = state;
-		for (KeyStroke keyStroke : potentialKeyStrokes) {
+		for (Iterator<KeyStroke> iterator = potentialKeyStrokes.iterator(); iterator.hasNext();) {
 			KeySequence sequenceAfterKeyStroke = KeySequence.getInstance(sequenceBeforeKeyStroke,
-					keyStroke);
+					iterator.next());
 			if (isPartialMatch(sequenceAfterKeyStroke)) {
 				incrementState(sequenceAfterKeyStroke);
 				return true;
 
-			} else if (isUniqueMatch(sequenceAfterKeyStroke, createContext)) {
-				final ParameterizedCommand cmd = getExecutableMatches(sequenceAfterKeyStroke, context).iterator().next()
-						.getParameterizedCommand();
+			} else if (isPerfectMatch(sequenceAfterKeyStroke)) {
+				final ParameterizedCommand cmd = getPerfectMatch(sequenceAfterKeyStroke);
 				try {
 					return executeCommand(cmd, event) || !sequenceBeforeKeyStroke.isEmpty();
 				} catch (final CommandException e) {
@@ -539,10 +519,11 @@ public class KeyBindingDispatcher {
 				return false;
 
 			} else {
-				Collection<Binding> errorMatches = getExecutableMatches(sequenceAfterKeyStroke, context);
-				if (errorMatches != null && !errorMatches.isEmpty()) {
+				Collection<Binding> matches = getBindingService().getConflictsFor(
+						sequenceAfterKeyStroke);
+				if (matches != null && !matches.isEmpty()) {
 					errorSequence = sequenceAfterKeyStroke;
-					errorMatch = errorMatches;
+					errorMatch = matches;
 				}
 			}
 		}

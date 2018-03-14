@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2017 IBM Corporation and others.
+ * Copyright (c) 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,11 +11,12 @@
 package org.eclipse.e4.ui.bindings.tests;
 
 
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.log.LogService;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -40,14 +41,40 @@ public class Activator implements BundleActivator {
 		return plugin;
 	}
 
-	@Override
 	public void start(BundleContext context) throws Exception {
 		plugin = this;
 		serviceContext = EclipseContextFactory.getServiceContext(context);
 		appContext = serviceContext.createChild();
+		addLogService(appContext);
 	}
 
-	@Override
+	private void addLogService(IEclipseContext context) {
+		context.set(LogService.class.getName(), new LogService() {
+
+			public void log(int level, String message) {
+				System.out.println(level + ": " + message);
+			}
+
+			public void log(int level, String message, Throwable exception) {
+				System.out.println(level + ": " + message);
+				if (exception != null) {
+					exception.printStackTrace();
+				}
+			}
+
+			public void log(ServiceReference sr, int level, String message) {
+				// TODO Auto-generated method stub
+
+			}
+
+			public void log(ServiceReference sr, int level, String message,
+					Throwable exception) {
+				// TODO Auto-generated method stub
+
+			}
+		});
+	}
+
 	public void stop(BundleContext context) throws Exception {
 		serviceContext.dispose();
 		plugin = null;

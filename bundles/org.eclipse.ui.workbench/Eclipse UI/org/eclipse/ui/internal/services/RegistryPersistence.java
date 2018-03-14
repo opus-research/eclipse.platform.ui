@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -385,7 +385,9 @@ public abstract class RegistryPersistence implements IDisposable,
 		}
 
 		final Collection parameters = new ArrayList();
-		for (final IConfigurationElement parameterElement : parameterElements) {
+		for (int i = 0; i < parameterElements.length; i++) {
+			final IConfigurationElement parameterElement = parameterElements[i];
+
 			// Read out the id.
 			final String id = parameterElement.getAttribute(ATT_ID);
 			if ((id == null) || (id.length() == 0)) {
@@ -400,7 +402,8 @@ public abstract class RegistryPersistence implements IDisposable,
 			try {
 				final IParameter[] commandParameters = command.getParameters();
 				if (parameters != null) {
-					for (final IParameter currentParameter : commandParameters) {
+					for (int j = 0; j < commandParameters.length; j++) {
+						final IParameter currentParameter = commandParameters[j];
 						if (Util.equals(currentParameter.getId(), id)) {
 							parameter = currentParameter;
 							break;
@@ -588,9 +591,17 @@ public abstract class RegistryPersistence implements IDisposable,
 	 * change listener is created.
 	 */
 	protected RegistryPersistence() {
-		registryChangeListener = event -> {
-			if (isChangeImportant(event)) {
-				Display.getDefault().asyncExec(() -> read());
+		registryChangeListener = new IRegistryChangeListener() {
+			@Override
+			public final void registryChanged(final IRegistryChangeEvent event) {
+				if (isChangeImportant(event)) {
+					Display.getDefault().asyncExec(new Runnable() {
+						@Override
+						public final void run() {
+							read();
+						}
+					});
+				}
 			}
 		};
 	}

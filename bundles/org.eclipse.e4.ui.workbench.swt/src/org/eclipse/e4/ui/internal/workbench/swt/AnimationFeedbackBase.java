@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,8 @@
 package org.eclipse.e4.ui.internal.workbench.swt;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -35,9 +37,12 @@ public abstract class AnimationFeedbackBase {
 	public AnimationFeedbackBase(Shell parentShell) {
 		baseShell = parentShell;
 
-		baseShell.addDisposeListener(e -> {
-			if (engine != null)
-				engine.cancelAnimation();
+		baseShell.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				if (engine != null)
+					engine.cancelAnimation();
+			}
 		});
 	}
 
@@ -91,9 +96,12 @@ public abstract class AnimationFeedbackBase {
 		if (animationShell == null) {
 			animationShell = new Shell(getBaseShell(), SWT.NO_TRIM | SWT.ON_TOP);
 
-			animationShell.addDisposeListener(e -> {
-				if (engine != null)
-					engine.cancelAnimation();
+			animationShell.addDisposeListener(new DisposeListener() {
+				@Override
+				public void widgetDisposed(DisposeEvent e) {
+					if (engine != null)
+						engine.cancelAnimation();
+				}
 			});
 		}
 

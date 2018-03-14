@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 
 package org.eclipse.ui.internal.menus;
@@ -28,7 +27,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
-import org.eclipse.e4.ui.internal.workbench.swt.Policy;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MCoreExpression;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
@@ -65,8 +63,8 @@ public class ActionSet {
 
 	protected Expression visibleWhen;
 
-	private HashSet<String> menuContributionGroupIds = new HashSet<>();
-	private HashSet<String> toolbarContributionGroupIds = new HashSet<>();
+	private HashSet<String> menuContributionGroupIds = new HashSet<String>();
+	private HashSet<String> toolbarContributionGroupIds = new HashSet<String>();
 	private String id;
 
 	public String getId() {
@@ -124,7 +122,7 @@ public class ActionSet {
 	}
 
 	private Set<String> actionSetPartAssociations(String actionSetId) {
-		HashSet<String> result = new HashSet<>();
+		HashSet<String> result = new HashSet<String>();
 		final IExtensionRegistry registry = Platform.getExtensionRegistry();
 		final IConfigurationElement[] associations = registry
 				.getConfigurationElementsFor(PlatformUI.PLUGIN_ID + '.'
@@ -139,10 +137,8 @@ public class ActionSet {
 			for (IConfigurationElement part : children) {
 				String id = MenuHelper.getId(part);
 				if (id != null && id.length() > 0) {
-					if (Policy.DEBUG_MENUS) {
-						MenuHelper.trace(IWorkbenchRegistryConstants.PL_ACTION_SET_PART_ASSOCIATIONS + ':' + actionSetId
-								+ ':' + id, null);
-					}
+					MenuHelper.trace(IWorkbenchRegistryConstants.PL_ACTION_SET_PART_ASSOCIATIONS
+							+ ':' + actionSetId + ':' + id, null);
 					result.add(id);
 				}
 			}

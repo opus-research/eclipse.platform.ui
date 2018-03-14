@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -56,7 +56,7 @@ public class ComboContentAdapter implements IControlContentAdapter,
 		Combo combo = (Combo) control;
 		String contents = combo.getText();
 		Point selection = combo.getSelection();
-		StringBuilder sb = new StringBuilder();
+		StringBuffer sb = new StringBuffer();
 		sb.append(contents.substring(0, selection.x));
 		sb.append(text);
 		if (selection.y < contents.length()) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -161,8 +161,6 @@ public interface IWorkbenchConstants {
 
     public static final String TAG_CLASS = "class"; //$NON-NLS-1$
 
-	public static final String TAG_USE_DEPENDENCY_INJECTION = "inject"; //$NON-NLS-1$
-
     public static final String TAG_FILE = "file"; //$NON-NLS-1$
 
     public static final String TAG_DESCRIPTOR = "descriptor"; //$NON-NLS-1$
@@ -214,8 +212,6 @@ public interface IWorkbenchConstants {
     public static final String TAG_LAYOUT = "layout"; //$NON-NLS-1$
 
     public static final String TAG_EXTENSION = "extension"; //$NON-NLS-1$
-
-	public static final String TAG_CONTENT_TYPE = "contentType"; //$NON-NLS-1$
 
     public static final String TAG_NAME = "name"; //$NON-NLS-1$
 

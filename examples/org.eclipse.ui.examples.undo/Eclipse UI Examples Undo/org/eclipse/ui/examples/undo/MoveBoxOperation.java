@@ -66,19 +66,19 @@ public class MoveBoxOperation extends BoxOperation {
 
 	@Override
 	public String getLabel() {
-		final StringBuilder stringBuffer = new StringBuilder();
+		final StringBuffer stringBuffer = new StringBuffer();
 		stringBuffer.append(super.getLabel());
 		stringBuffer.append("["); //$NON-NLS-1$
 		stringBuffer.append("("); //$NON-NLS-1$
-		stringBuffer.append(Integer.valueOf(origin.x).toString());
+		stringBuffer.append(new Integer(origin.x).toString());
 		stringBuffer.append(", "); //$NON-NLS-1$
-		stringBuffer.append(Integer.valueOf(origin.y).toString());
+		stringBuffer.append(new Integer(origin.y).toString());
 		stringBuffer.append(')');
 		stringBuffer.append(", "); //$NON-NLS-1$
 		stringBuffer.append("("); //$NON-NLS-1$
-		stringBuffer.append(Integer.valueOf(target.x).toString());
+		stringBuffer.append(new Integer(target.x).toString());
 		stringBuffer.append(", "); //$NON-NLS-1$
-		stringBuffer.append(Integer.valueOf(target.y).toString());
+		stringBuffer.append(new Integer(target.y).toString());
 		stringBuffer.append(')');
 		stringBuffer.append(']');
 		return stringBuffer.toString();

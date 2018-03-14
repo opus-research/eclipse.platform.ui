@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2016 Tom Schindl and others.
+ * Copyright (c) 2006, 2014 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     Tom Schindl - initial API and implementation
  *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414565
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 475361, 489234
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -172,7 +171,7 @@ public class Snippet048TreeViewerTabWithCheckboxFor3_3 {
 
 			@Override
 			protected Object getValue(Object element) {
-				return Boolean.valueOf(((MyModel) element).bool);
+				return new Boolean(((MyModel) element).bool);
 			}
 
 			@Override
@@ -195,7 +194,7 @@ public class Snippet048TreeViewerTabWithCheckboxFor3_3 {
 					try {
 						Method m = ColumnViewerEditor.class.getDeclaredMethod("processTraverseEvent", new Class[] {int.class,ViewerRow.class,TraverseEvent.class});
 						m.setAccessible(true);
-						m.invoke(editor, new Object[] { Integer.valueOf(cell.getColumnIndex()), cell.getViewerRow(), e });
+						m.invoke(editor, new Object[] { new Integer(cell.getColumnIndex()), cell.getViewerRow(), e });
 					} catch (SecurityException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -291,7 +290,7 @@ public class Snippet048TreeViewerTabWithCheckboxFor3_3 {
 	public class MyModel {
 
 		public MyModel parent;
-		public List<MyModel> child = new ArrayList<>();
+		public List<MyModel> child = new ArrayList<MyModel>();
 		public int counter;
 		public boolean bool;
 

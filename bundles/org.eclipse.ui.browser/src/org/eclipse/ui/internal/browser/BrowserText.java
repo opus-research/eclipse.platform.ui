@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,8 @@ import java.io.StringWriter;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -58,8 +59,7 @@ public class BrowserText {
             super(parent, style);
         }
 
-        @Override
-		public void reflow(boolean flushCache) {
+        public void reflow(boolean flushCache) {
             updateWidth(this);
             super.reflow(flushCache);
         }
@@ -91,9 +91,15 @@ public class BrowserText {
         link.setText(Messages.BrowserText_link);
         link.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         link.setToolTipText(Messages.BrowserText_tooltip);
-		link.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
-			BusyIndicator.showWhile(link.getDisplay(), () -> doOpenExternal());
-		}));
+        link.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent e) {
+                BusyIndicator.showWhile(link.getDisplay(), new Runnable() {
+                    public void run() {
+                        doOpenExternal();
+                    }
+                });
+            }
+        });
         link.setBackground(bg);
         sep = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
         sep.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -108,9 +114,11 @@ public class BrowserText {
         text.setBackground(bg);
         button = new Button(parent, SWT.PUSH);
         updateButtonText();
-		button.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
-			toggleException();
-		}));
+        button.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent e) {
+                toggleException();
+            }
+        });
         exception = new Text(parent, SWT.MULTI);
         loadExceptionText();
         GridData gd = new GridData(GridData.FILL_BOTH);
@@ -120,10 +128,10 @@ public class BrowserText {
 
     private void loadExceptionText() {
         StringWriter swriter = new StringWriter();
-		try (PrintWriter writer = new PrintWriter(swriter)) {
-			writer.println(ex.getMessage());
-			ex.printStackTrace(writer);
-		}
+        PrintWriter writer = new PrintWriter(swriter);
+        writer.println(ex.getMessage());
+        ex.printStackTrace(writer);
+        writer.close();
         exception.setText(swriter.toString());
     }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -60,14 +60,15 @@ public class PageListenerList extends EventManager {
      * Notifies the listener that a part has been activated.
      */
     public void firePageActivated(final IWorkbenchPage page) {
-		for (Object listener : getListeners()) {
-			final IPageListener pageListener = (IPageListener) listener;
+        Object[] array = getListeners();
+        for (int i = 0; i < array.length; i++) {
+            final IPageListener l = (IPageListener) array[i];
             fireEvent(new SafeRunnable() {
                 @Override
 				public void run() {
-					pageListener.pageActivated(page);
+                    l.pageActivated(page);
                 }
-			}, pageListener, page, "activated::"); //$NON-NLS-1$
+            }, l, page, "activated::"); //$NON-NLS-1$
         }
     }
 
@@ -75,14 +76,15 @@ public class PageListenerList extends EventManager {
      * Notifies the listener that a part has been closed
      */
     public void firePageClosed(final IWorkbenchPage page) {
-		for (Object listener : getListeners()) {
-			final IPageListener pageListener = (IPageListener) listener;
+        Object[] array = getListeners();
+        for (int i = 0; i < array.length; i++) {
+            final IPageListener l = (IPageListener) array[i];
             fireEvent(new SafeRunnable() {
                 @Override
 				public void run() {
-					pageListener.pageClosed(page);
+                    l.pageClosed(page);
                 }
-			}, pageListener, page, "closed::"); //$NON-NLS-1$
+            }, l, page, "closed::"); //$NON-NLS-1$
         }
     }
 
@@ -90,14 +92,15 @@ public class PageListenerList extends EventManager {
      * Notifies the listener that a part has been opened.
      */
     public void firePageOpened(final IWorkbenchPage page) {
-		for (Object listener : getListeners()) {
-			final IPageListener pageListener = (IPageListener) listener;
+        Object[] listeners = getListeners();
+        for (int i = 0; i < listeners.length; i++) {
+            final IPageListener l = (IPageListener) listeners[i];
             fireEvent(new SafeRunnable() {
                 @Override
 				public void run() {
-					pageListener.pageOpened(page);
+                    l.pageOpened(page);
                 }
-			}, pageListener, page, "opened::"); //$NON-NLS-1$
+            }, l, page, "opened::"); //$NON-NLS-1$
         }
     }
 

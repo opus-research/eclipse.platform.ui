@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -147,8 +147,8 @@ public class NavigatorDnDService implements INavigatorDnDService {
 			TransferData aTransferType) {
 
 		Set assistants = new LinkedHashSet();
-		for (CommonDropAdapterDescriptor descriptor : descriptors) {
-			CommonDropAdapterAssistant asst = getAssistant(descriptor);
+		for (int i = 0; i < descriptors.length; i++) {
+			CommonDropAdapterAssistant asst = getAssistant(descriptors[i]);
 			if (asst.isSupportedType(aTransferType)) {
 				assistants.add(asst);
 			}
@@ -163,9 +163,9 @@ public class NavigatorDnDService implements INavigatorDnDService {
 
 		Set assistants = new LinkedHashSet();
 
-		for (CommonDropAdapterDescriptor descriptor : descriptors) {
-			if(descriptor.areDragElementsSupported(aSelection)) {
-				assistants.add(getAssistant(descriptor));
+		for (int i = 0; i < descriptors.length; i++) {
+			if(descriptors[i].areDragElementsSupported(aSelection)) {
+				assistants.add(getAssistant(descriptors[i]));
 			}
 		}
 

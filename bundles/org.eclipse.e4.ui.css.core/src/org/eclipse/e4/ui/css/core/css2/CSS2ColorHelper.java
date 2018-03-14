@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 Angelo Zerr and others.
+ * Copyright (c) 2008 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,12 +30,12 @@ public class CSS2ColorHelper {
 	/**
 	 * Map with key=color name and value=hexadecimal color.
 	 */
-	private static Map<String, String> colorNamesMap = new HashMap<>();
+	private static Map<String, String> colorNamesMap = new HashMap<String, String>();
 
 	/**
 	 * Map with key=hexadecimal color and value=color name.
 	 */
-	private static Map<String, String> colorHexasMap = new HashMap<>();
+	private static Map<String, String> colorHexasMap = new HashMap<String, String>();
 
 	/**
 	 * Return w3c {@link RGBColor} from string value. Format String value is

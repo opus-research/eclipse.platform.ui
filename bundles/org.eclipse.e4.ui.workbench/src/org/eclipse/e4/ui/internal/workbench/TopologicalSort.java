@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Brian de Alwis (MTI) - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -16,8 +15,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -66,11 +65,11 @@ import java.util.Map;
  *            ID
  */
 public abstract class TopologicalSort<T, ID> {
-	private final Map<ID, Collection<T>> mappedObjects = new LinkedHashMap<>();
+	private final Map<ID, Collection<T>> mappedObjects = new HashMap<ID, Collection<T>>();
 	// Captures the bundles that are listed as requirements for a particular bundle.
-	private final Map<ID, Collection<ID>> requires = new LinkedHashMap<>();
+	private final Map<ID, Collection<ID>> requires = new HashMap<ID, Collection<ID>>();
 	// Captures the bundles that list a particular bundle as a requirement
-	private final Map<ID, Collection<ID>> depends = new LinkedHashMap<>();
+	private final Map<ID, Collection<ID>> depends = new HashMap<ID, Collection<ID>>();
 
 	/**
 	 * Return the identifier for the given object. The implementation properly tracks where multiple
@@ -130,7 +129,7 @@ public abstract class TopologicalSort<T, ID> {
 		// In case of a cycle, one of the nodes involved in the cycle should have
 		// higher in-degree from some other non-cyclic node
 		int resultsIndex = 0;
-		List<ID> sortedByOutdegree = new ArrayList<>(requires.keySet());
+		List<ID> sortedByOutdegree = new ArrayList<ID>(requires.keySet());
 		Comparator<ID> outdegreeSorter = new Comparator<ID>() {
 			@Override
 			public int compare(ID o1, ID o2) {
@@ -151,7 +150,7 @@ public abstract class TopologicalSort<T, ID> {
 			if (!requires.get(sortedByOutdegree.get(0)).isEmpty()) {
 				Collections.sort(sortedByOutdegree, outdegreeSorter);
 			}
-			LinkedList<ID> cycleToBeDone = new LinkedList<>();
+			LinkedList<ID> cycleToBeDone = new LinkedList<ID>();
 			cycleToBeDone.add(sortedByOutdegree.remove(0));
 			while (!cycleToBeDone.isEmpty()) {
 				ID bundleId = cycleToBeDone.removeFirst();
@@ -185,7 +184,7 @@ public abstract class TopologicalSort<T, ID> {
 			ID id = getId(o);
 			Collection<T> exts = mappedObjects.get(id);
 			if (exts == null) {
-				mappedObjects.put(id, exts = new LinkedHashSet<>());
+				mappedObjects.put(id, exts = new HashSet<T>());
 			}
 			exts.add(o);
 		}
@@ -196,8 +195,8 @@ public abstract class TopologicalSort<T, ID> {
 		requires.clear();
 		depends.clear();
 		for (ID id : mappedObjects.keySet()) {
-			requires.put(id, new LinkedHashSet<ID>());
-			depends.put(id, new LinkedHashSet<ID>());
+			requires.put(id, new HashSet<ID>());
+			depends.put(id, new HashSet<ID>());
 		}
 
 		// now populate the dependency graph

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -169,7 +169,8 @@ public final class ContextPersistence extends RegistryPersistence {
 		 */
 		final IConfigurationElement[] acceleratorScopesExtensionPoint = registry
 				.getConfigurationElementsFor(EXTENSION_ACCELERATOR_SCOPES);
-		for (final IConfigurationElement configurationElement : acceleratorScopesExtensionPoint) {
+		for (int i = 0; i < acceleratorScopesExtensionPoint.length; i++) {
+			final IConfigurationElement configurationElement = acceleratorScopesExtensionPoint[i];
 			final String name = configurationElement.getName();
 
 			// Check if it is a binding definition.
@@ -186,7 +187,8 @@ public final class ContextPersistence extends RegistryPersistence {
 		 */
 		final IConfigurationElement[] commandsExtensionPoint = registry
 				.getConfigurationElementsFor(EXTENSION_COMMANDS);
-		for (final IConfigurationElement configurationElement : commandsExtensionPoint) {
+		for (int i = 0; i < commandsExtensionPoint.length; i++) {
+			final IConfigurationElement configurationElement = commandsExtensionPoint[i];
 			final String name = configurationElement.getName();
 
 			// Check if it is a binding definition.
@@ -207,7 +209,8 @@ public final class ContextPersistence extends RegistryPersistence {
 		 */
 		final IConfigurationElement[] contextsExtensionPoint = registry
 				.getConfigurationElementsFor(EXTENSION_CONTEXTS);
-		for (final IConfigurationElement configurationElement : contextsExtensionPoint) {
+		for (int i = 0; i < contextsExtensionPoint.length; i++) {
+			final IConfigurationElement configurationElement = contextsExtensionPoint[i];
 			final String name = configurationElement.getName();
 
 			// Check if it is a binding definition.

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
  *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 461762
- *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 
 package org.eclipse.ui.views.bookmarkexplorer;
@@ -22,7 +21,9 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -32,7 +33,11 @@ import org.eclipse.jface.viewers.ColumnLayoutData;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.IOpenListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.OpenEvent;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TableLayout;
@@ -66,7 +71,6 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
-import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.views.bookmarkexplorer.BookmarkMessages;
 import org.eclipse.ui.internal.views.markers.ExtendedMarkersView;
@@ -252,7 +256,12 @@ public class BookmarkNavigator extends ViewPart {
         // support action contributions.
         MenuManager mgr = new MenuManager();
         mgr.setRemoveAllWhenShown(true);
-        mgr.addMenuListener(mgr1 -> fillContextMenu(mgr1));
+        mgr.addMenuListener(new IMenuListener() {
+            @Override
+			public void menuAboutToShow(IMenuManager mgr) {
+                fillContextMenu(mgr);
+            }
+        });
         Menu menu = mgr.createContextMenu(viewer.getControl());
         viewer.getControl().setMenu(menu);
         getSite().registerContextMenu(mgr, viewer);
@@ -275,9 +284,19 @@ public class BookmarkNavigator extends ViewPart {
                 selectAllAction);
 
         // Set the double click action.
-        viewer.addOpenListener(event -> openAction.run());
-        viewer.addSelectionChangedListener(event -> handleSelectionChanged((IStructuredSelection) event
-		        .getSelection()));
+        viewer.addOpenListener(new IOpenListener() {
+            @Override
+			public void open(OpenEvent event) {
+                openAction.run();
+            }
+        });
+        viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+            @Override
+			public void selectionChanged(SelectionChangedEvent event) {
+                handleSelectionChanged((IStructuredSelection) event
+                        .getSelection());
+            }
+        });
         viewer.getControl().addKeyListener(new KeyAdapter() {
             @Override
 			public void keyPressed(KeyEvent e) {
@@ -286,6 +305,9 @@ public class BookmarkNavigator extends ViewPart {
         });
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchPart.
+     */
     @Override
 	public void createPartControl(Composite parent) {
         clipboard = new Clipboard(parent.getDisplay());
@@ -351,10 +373,21 @@ public class BookmarkNavigator extends ViewPart {
     @Override
 	public <T> T getAdapter(Class<T> adapterClass) {
 		if (adapterClass == IShowInSource.class) {
-			return adapterClass.cast((IShowInSource) () -> new ShowInContext(null, getViewer().getSelection()));
+			return adapterClass.cast(new IShowInSource() {
+                @Override
+				public ShowInContext getShowInContext() {
+                    return new ShowInContext(null, getViewer().getSelection());
+                }
+			});
         }
 		if (adapterClass == IShowInTargetList.class) {
-			return adapterClass.cast((IShowInTargetList) () -> new String[] { IPageLayout.ID_RES_NAV });
+			return adapterClass.cast(new IShowInTargetList() {
+                @Override
+				public String[] getShowInTargetIds() {
+                    return new String[] { IPageLayout.ID_RES_NAV };
+                }
+
+			});
         }
 		return super.getAdapter(adapterClass);
     }
@@ -363,7 +396,7 @@ public class BookmarkNavigator extends ViewPart {
      * Returns the UI plugin for the bookmarks view.
      */
     static AbstractUIPlugin getPlugin() {
-		return WorkbenchPlugin.getDefault();
+        return (AbstractUIPlugin) Platform.getPlugin(PlatformUI.PLUGIN_ID);
     }
 
     /**
@@ -414,6 +447,9 @@ public class BookmarkNavigator extends ViewPart {
         showInNavigatorAction.selectionChanged(selection);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IViewPart.
+     */
     @Override
 	public void init(IViewSite site, IMemento memento) throws PartInitException {
         super.init(site, memento);
@@ -446,13 +482,15 @@ public class BookmarkNavigator extends ViewPart {
      */
     void performDragSetData(DragSourceEvent event) {
         if (MarkerTransfer.getInstance().isSupportedType(event.dataType)) {
-			event.data = viewer.getStructuredSelection().toArray();
+            event.data = ((IStructuredSelection) viewer.getSelection())
+                    .toArray();
             return;
         }
         if (TextTransfer.getInstance().isSupportedType(event.dataType)) {
-			Object[] markers = viewer.getStructuredSelection().toArray();
+            Object[] markers = ((IStructuredSelection) viewer.getSelection())
+                    .toArray();
             if (markers != null) {
-                StringBuilder buffer = new StringBuilder();
+                StringBuffer buffer = new StringBuffer();
                 ILabelProvider provider = (ILabelProvider) getViewer()
                         .getLabelProvider();
                 for (int i = 0; i < markers.length; i++) {
@@ -475,10 +513,12 @@ public class BookmarkNavigator extends ViewPart {
         IMemento selectionMem = memento.getChild(TAG_SELECTION);
         if (selectionMem != null) {
             ArrayList selectionList = new ArrayList();
-			for (IMemento markerMem : selectionMem.getChildren(TAG_MARKER)) {
+            IMemento markerMems[] = selectionMem.getChildren(TAG_MARKER);
+            for (int i = 0; i < markerMems.length; i++) {
                 try {
-                    long id = Long.parseLong(markerMem.getString(TAG_ID));
-                    IResource resource = root.findMember(markerMem
+                    long id = new Long(markerMems[i].getString(TAG_ID))
+                            .longValue();
+                    IResource resource = root.findMember(markerMems[i]
                             .getString(TAG_RESOURCE));
                     if (resource != null) {
                         IMarker marker = resource.findMarker(id);
@@ -499,7 +539,7 @@ public class BookmarkNavigator extends ViewPart {
             try {
                 String posStr = memento.getString(TAG_VERTICAL_POSITION);
                 int position;
-                position = Integer.parseInt(posStr);
+                position = new Integer(posStr).intValue();
                 bar.setSelection(position);
             } catch (NumberFormatException e) {
             }
@@ -509,7 +549,7 @@ public class BookmarkNavigator extends ViewPart {
             try {
                 String posStr = memento.getString(TAG_HORIZONTAL_POSITION);
                 int position;
-                position = Integer.parseInt(posStr);
+                position = new Integer(posStr).intValue();
                 bar.setSelection(position);
             } catch (NumberFormatException e) {
             }
@@ -529,13 +569,15 @@ public class BookmarkNavigator extends ViewPart {
         }
 
         Scrollable scrollable = (Scrollable) viewer.getControl();
-		Object markers[] = viewer.getStructuredSelection().toArray();
+        Object markers[] = ((IStructuredSelection) viewer.getSelection())
+                .toArray();
         if (markers.length > 0) {
             IMemento selectionMem = memento.createChild(TAG_SELECTION);
-            for (Object currentMarker : markers) {
+            for (int i = 0; i < markers.length; i++) {
                 IMemento elementMem = selectionMem.createChild(TAG_MARKER);
-                IMarker marker = (IMarker) currentMarker;
-				elementMem.putString(TAG_RESOURCE, marker.getResource().getFullPath().toString());
+                IMarker marker = (IMarker) markers[i];
+                elementMem.putString(TAG_RESOURCE, marker.getResource()
+                        .getFullPath().toString());
                 elementMem.putString(TAG_ID, String.valueOf(marker.getId()));
             }
         }
@@ -551,6 +593,9 @@ public class BookmarkNavigator extends ViewPart {
 
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchPart.
+     */
     @Override
 	public void setFocus() {
         if (viewer != null) {
@@ -697,9 +742,9 @@ public class BookmarkNavigator extends ViewPart {
         IMarker[] markerData = (IMarker[]) getClipboard().getContents(transfer);
         boolean canPaste = false;
         if (markerData != null) {
-            for (IMarker marker : markerData) {
+            for (int i = 0; i < markerData.length; i++) {
                 try {
-                    if (marker.getType().equals(IMarker.BOOKMARK)) {
+                    if (markerData[i].getType().equals(IMarker.BOOKMARK)) {
                         canPaste = true;
                         break;
                     }

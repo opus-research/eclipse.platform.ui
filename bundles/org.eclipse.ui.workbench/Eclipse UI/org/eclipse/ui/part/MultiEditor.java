@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.internal.IWorkbenchThemeConstants;
@@ -103,11 +105,14 @@ public abstract class MultiEditor extends AbstractMultiEditor {
         Composite content = new Composite(parent, SWT.NONE);
         content.setLayout(new FillLayout());
         e.createPartControl(content);
-        parent.addListener(SWT.Activate, event -> {
-		    if (event.type == SWT.Activate) {
-				activateEditor(e);
-			}
-		});
+        parent.addListener(SWT.Activate, new Listener() {
+            @Override
+			public void handleEvent(Event event) {
+                if (event.type == SWT.Activate) {
+					activateEditor(e);
+				}
+            }
+        });
         return content;
     }
 

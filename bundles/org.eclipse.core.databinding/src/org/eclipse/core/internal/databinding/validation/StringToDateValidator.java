@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2014 IBM Corporation and others.
+ * Copyright (c) 2007, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -55,7 +55,7 @@ public class StringToDateValidator implements IValidator {
 		// FIXME We need to use the information from the
 		// converter, not use another instance of DateConversionSupport.
 		FormatUtil util = new FormatUtil();
-		StringBuilder samples = new StringBuilder();
+		StringBuffer samples = new StringBuffer();
 		for (int formatterIdx = 1; formatterIdx < util.numFormatters() - 2; formatterIdx++) {
 			samples.append('\'');
 			samples.append(util.format(sampleDate, formatterIdx));

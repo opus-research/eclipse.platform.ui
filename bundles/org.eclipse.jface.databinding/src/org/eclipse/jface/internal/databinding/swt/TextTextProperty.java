@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,8 +39,8 @@ public class TextTextProperty extends WidgetStringValueProperty {
 
 	private static int[] checkEvents(int[] events) {
 		if (events != null)
-			for (int event : events)
-				checkEvent(event);
+			for (int i = 0; i < events.length; i++)
+				checkEvent(events[i]);
 		return events;
 	}
 
@@ -53,8 +53,8 @@ public class TextTextProperty extends WidgetStringValueProperty {
 
 	private static int[] staleEvents(int[] changeEvents) {
 		if (changeEvents != null)
-			for (int changeEvent : changeEvents)
-				if (changeEvent == SWT.Modify)
+			for (int i = 0; i < changeEvents.length; i++)
+				if (changeEvents[i] == SWT.Modify)
 					return null;
 		return new int[] { SWT.Modify };
 	}

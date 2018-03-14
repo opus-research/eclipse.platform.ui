@@ -69,7 +69,6 @@ public class MenuItemImpl extends MenuElementImpl implements MenuItem {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public char getMnemonic() {
 		return mnemonic;
 	}
@@ -79,7 +78,6 @@ public class MenuItemImpl extends MenuElementImpl implements MenuItem {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void setMnemonic(char newMnemonic) {
 		char oldMnemonic = mnemonic;
 		mnemonic = newMnemonic;
@@ -154,7 +152,7 @@ public class MenuItemImpl extends MenuElementImpl implements MenuItem {
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuilder result = new StringBuilder(super.toString());
+		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (mnemonic: ");
 		result.append(mnemonic);
 		result.append(')');

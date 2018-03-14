@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2017 Ovidio Mallo and others.
+ * Copyright (c) 2010, 2011 Ovidio Mallo and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Ovidio Mallo - initial API and implementation (bug 305367)
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.internal.databinding.observable.masterdetail;
@@ -20,6 +19,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.databinding.observable.Diffs;
+import org.eclipse.core.databinding.observable.DisposeEvent;
+import org.eclipse.core.databinding.observable.IDisposeListener;
 import org.eclipse.core.databinding.observable.IObserving;
 import org.eclipse.core.databinding.observable.IStaleListener;
 import org.eclipse.core.databinding.observable.ObservableTracker;
@@ -27,50 +28,53 @@ import org.eclipse.core.databinding.observable.StaleEvent;
 import org.eclipse.core.databinding.observable.map.AbstractObservableMap;
 import org.eclipse.core.databinding.observable.map.IMapChangeListener;
 import org.eclipse.core.databinding.observable.map.IObservableMap;
+import org.eclipse.core.databinding.observable.map.MapChangeEvent;
 import org.eclipse.core.databinding.observable.map.MapDiff;
 import org.eclipse.core.databinding.observable.masterdetail.IObservableFactory;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.databinding.observable.value.IValueChangeListener;
+import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
 import org.eclipse.core.internal.databinding.identity.IdentityMap;
 import org.eclipse.core.internal.databinding.identity.IdentitySet;
 import org.eclipse.core.internal.databinding.observable.Util;
 
 /**
- * @param <K>
- *            type of the keys (the keys to both the given master observable map
- *            and the keys to the returned detail map, both of which are the
- *            same set of keys)
- * @param <M>
- *            type of the master observables in the master set, being the values
- *            of the given master observable map
- * @param <E>
- *            type of the detail elements, being the values of the returned
- *            detail map
  * @since 1.4
  */
-public class MapDetailValueObservableMap<K, M, E> extends
-		AbstractObservableMap<K, E> implements IObserving {
+public class MapDetailValueObservableMap extends AbstractObservableMap
+		implements IObserving {
 
-	private IObservableMap<K, M> masterMap;
+	private IObservableMap masterMap;
 
-	private IObservableFactory<? super M, IObservableValue<E>> observableValueFactory;
+	private IObservableFactory observableValueFactory;
 
 	private Object detailValueType;
 
-	private Set<Map.Entry<K, E>> entrySet;
+	private Set entrySet;
 
-	private IdentityHashMap<K, IObservableValue<E>> keyDetailMap = new IdentityHashMap<>();
+	private IdentityHashMap keyDetailMap = new IdentityHashMap();
 
-	private IdentitySet<IObservableValue<E>> staleDetailObservables = new IdentitySet<>();
+	private IdentitySet staleDetailObservables = new IdentitySet();
 
-	private IMapChangeListener<K, M> masterMapListener = event -> handleMasterMapChange(event.diff);
+	private IMapChangeListener masterMapListener = new IMapChangeListener() {
+		@Override
+		public void handleMapChange(MapChangeEvent event) {
+			handleMasterMapChange(event.diff);
+		}
+	};
 
-	private IStaleListener masterStaleListener = staleEvent -> fireStale();
-
-	private IStaleListener detailStaleListener = new IStaleListener() {
-		@SuppressWarnings("unchecked")
+	private IStaleListener masterStaleListener = new IStaleListener() {
 		@Override
 		public void handleStale(StaleEvent staleEvent) {
-			addStaleDetailObservable((IObservableValue<E>) staleEvent.getObservable());
+			fireStale();
+		}
+	};
+
+	private IStaleListener detailStaleListener = new IStaleListener() {
+		@Override
+		public void handleStale(StaleEvent staleEvent) {
+			addStaleDetailObservable((IObservableValue) staleEvent
+					.getObservable());
 		}
 	};
 
@@ -79,10 +83,8 @@ public class MapDetailValueObservableMap<K, M, E> extends
 	 * @param observableValueFactory
 	 * @param detailValueType
 	 */
-	public MapDetailValueObservableMap(
-			IObservableMap<K, M> masterMap,
-			IObservableFactory<? super M, IObservableValue<E>> observableValueFactory,
-			Object detailValueType) {
+	public MapDetailValueObservableMap(IObservableMap masterMap,
+			IObservableFactory observableValueFactory, Object detailValueType) {
 		super(masterMap.getRealm());
 		this.masterMap = masterMap;
 		this.observableValueFactory = observableValueFactory;
@@ -91,36 +93,45 @@ public class MapDetailValueObservableMap<K, M, E> extends
 		// Add change/stale/dispose listeners on the master map.
 		masterMap.addMapChangeListener(masterMapListener);
 		masterMap.addStaleListener(masterStaleListener);
-		masterMap.addDisposeListener(event -> MapDetailValueObservableMap.this.dispose());
+		masterMap.addDisposeListener(new IDisposeListener() {
+			@Override
+			public void handleDispose(DisposeEvent event) {
+				MapDetailValueObservableMap.this.dispose();
+			}
+		});
 
 		// Initialize the map with the current state of the master map.
-		Map<K, M> emptyMap = Collections.emptyMap();
-		MapDiff<K, M> initMasterDiff = Diffs.computeMapDiff(emptyMap, masterMap);
+		MapDiff initMasterDiff = Diffs.computeMapDiff(Collections.EMPTY_MAP,
+				masterMap);
 		handleMasterMapChange(initMasterDiff);
 	}
 
-	private void handleMasterMapChange(MapDiff<? extends K, ? extends M> diff) {
+	private void handleMasterMapChange(MapDiff diff) {
 		// Collect the detail values for the master values in the input diff.
-		IdentityMap<K, E> oldValues = new IdentityMap<>();
-		IdentityMap<K, E> newValues = new IdentityMap<>();
+		IdentityMap oldValues = new IdentityMap();
+		IdentityMap newValues = new IdentityMap();
 
 		// Handle added master values.
-		Set<? extends K> addedKeys = diff.getAddedKeys();
-		for (K addedKey : addedKeys) {
+		Set addedKeys = diff.getAddedKeys();
+		for (Iterator iter = addedKeys.iterator(); iter.hasNext();) {
+			Object addedKey = iter.next();
+
 			// For added master values, we set up a new detail observable.
 			addDetailObservable(addedKey);
 
 			// Get the value of the created detail observable for the new diff.
-			IObservableValue<E> detailValue = getDetailObservableValue(addedKey);
+			IObservableValue detailValue = getDetailObservableValue(addedKey);
 			newValues.put(addedKey, detailValue.getValue());
 		}
 
 		// Handle removed master values.
-		Set<? extends K> removedKeys = diff.getRemovedKeys();
-		for (K removedKey : removedKeys) {
+		Set removedKeys = diff.getRemovedKeys();
+		for (Iterator iter = removedKeys.iterator(); iter.hasNext();) {
+			Object removedKey = iter.next();
+
 			// First of all, get the current detail value and add it to the set
 			// of old values of the new diff.
-			IObservableValue<E> detailValue = getDetailObservableValue(removedKey);
+			IObservableValue detailValue = getDetailObservableValue(removedKey);
 			oldValues.put(removedKey, detailValue.getValue());
 
 			// For removed master values, we dispose the detail observable.
@@ -128,11 +139,13 @@ public class MapDetailValueObservableMap<K, M, E> extends
 		}
 
 		// Handle changed master values.
-		Set<? extends K> changedKeys = diff.getChangedKeys();
-		for (K changedKey : changedKeys) {
+		Set changedKeys = diff.getChangedKeys();
+		for (Iterator iter = changedKeys.iterator(); iter.hasNext();) {
+			Object changedKey = iter.next();
+
 			// Get the detail value prior to the change and add it to the set of
 			// old values of the new diff.
-			IObservableValue<E> oldDetailValue = getDetailObservableValue(changedKey);
+			IObservableValue oldDetailValue = getDetailObservableValue(changedKey);
 			oldValues.put(changedKey, oldDetailValue.getValue());
 
 			// Remove the old detail value for the old master value and add it
@@ -141,7 +154,7 @@ public class MapDetailValueObservableMap<K, M, E> extends
 			addDetailObservable(changedKey);
 
 			// Get the new detail value and add it to the set of new values.
-			IObservableValue<E> newDetailValue = getDetailObservableValue(changedKey);
+			IObservableValue newDetailValue = getDetailObservableValue(changedKey);
 			newValues.put(changedKey, newDetailValue.getValue());
 		}
 
@@ -150,23 +163,27 @@ public class MapDetailValueObservableMap<K, M, E> extends
 				oldValues, newValues));
 	}
 
-	private void addDetailObservable(final K addedKey) {
-		M masterElement = masterMap.get(addedKey);
+	private void addDetailObservable(final Object addedKey) {
+		Object masterElement = masterMap.get(addedKey);
 
-		IObservableValue<E> detailValue = keyDetailMap.get(addedKey);
+		IObservableValue detailValue = (IObservableValue) keyDetailMap
+				.get(addedKey);
 
 		if (detailValue == null) {
 			detailValue = createDetailObservable(masterElement);
 
 			keyDetailMap.put(addedKey, detailValue);
 
-			detailValue.addValueChangeListener(event -> {
-				if (!event.getObservableValue().isStale()) {
-					staleDetailObservables.remove(event.getSource());
-				}
+			detailValue.addValueChangeListener(new IValueChangeListener() {
+				@Override
+				public void handleValueChange(ValueChangeEvent event) {
+					if (!event.getObservableValue().isStale()) {
+						staleDetailObservables.remove(event.getSource());
+					}
 
-				fireMapChange(
-						Diffs.createMapDiffSingleChange(addedKey, event.diff.getOldValue(), event.diff.getNewValue()));
+					fireMapChange(Diffs.createMapDiffSingleChange(addedKey,
+							event.diff.getOldValue(), event.diff.getNewValue()));
+				}
 			});
 
 			if (detailValue.isStale()) {
@@ -177,10 +194,11 @@ public class MapDetailValueObservableMap<K, M, E> extends
 		detailValue.addStaleListener(detailStaleListener);
 	}
 
-	private IObservableValue<E> createDetailObservable(M masterElement) {
+	private IObservableValue createDetailObservable(Object masterElement) {
 		ObservableTracker.setIgnore(true);
 		try {
-			return observableValueFactory.createObservable(masterElement);
+			return (IObservableValue) observableValueFactory
+					.createObservable(masterElement);
 		} finally {
 			ObservableTracker.setIgnore(false);
 		}
@@ -191,16 +209,17 @@ public class MapDetailValueObservableMap<K, M, E> extends
 			return;
 		}
 
-		IObservableValue<E> detailValue = keyDetailMap.remove(removedKey);
+		IObservableValue detailValue = (IObservableValue) keyDetailMap
+				.remove(removedKey);
 		staleDetailObservables.remove(detailValue);
 		detailValue.dispose();
 	}
 
-	private IObservableValue<E> getDetailObservableValue(Object masterKey) {
-		return keyDetailMap.get(masterKey);
+	private IObservableValue getDetailObservableValue(Object masterKey) {
+		return (IObservableValue) keyDetailMap.get(masterKey);
 	}
 
-	private void addStaleDetailObservable(IObservableValue<E> detailObservable) {
+	private void addStaleDetailObservable(IObservableValue detailObservable) {
 		boolean wasStale = isStale();
 		staleDetailObservables.add(detailObservable);
 		if (!wasStale) {
@@ -209,32 +228,32 @@ public class MapDetailValueObservableMap<K, M, E> extends
 	}
 
 	@Override
-	public Set<K> keySet() {
+	public Set keySet() {
 		getterCalled();
 
 		return masterMap.keySet();
 	}
 
 	@Override
-	public E get(Object key) {
+	public Object get(Object key) {
 		getterCalled();
 
 		if (!containsKey(key)) {
 			return null;
 		}
 
-		IObservableValue<E> detailValue = getDetailObservableValue(key);
+		IObservableValue detailValue = getDetailObservableValue(key);
 		return detailValue.getValue();
 	}
 
 	@Override
-	public E put(K key, E value) {
+	public Object put(Object key, Object value) {
 		if (!containsKey(key)) {
 			return null;
 		}
 
-		IObservableValue<E> detailValue = getDetailObservableValue(key);
-		E oldValue = detailValue.getValue();
+		IObservableValue detailValue = getDetailObservableValue(key);
+		Object oldValue = detailValue.getValue();
 		detailValue.setValue(value);
 		return oldValue;
 	}
@@ -247,15 +266,15 @@ public class MapDetailValueObservableMap<K, M, E> extends
 	}
 
 	@Override
-	public E remove(Object key) {
+	public Object remove(Object key) {
 		checkRealm();
 
 		if (!containsKey(key)) {
 			return null;
 		}
 
-		IObservableValue<E> detailValue = getDetailObservableValue(key);
-		E oldValue = detailValue.getValue();
+		IObservableValue detailValue = getDetailObservableValue(key);
+		Object oldValue = detailValue.getValue();
 
 		masterMap.remove(key);
 
@@ -300,7 +319,9 @@ public class MapDetailValueObservableMap<K, M, E> extends
 		}
 
 		if (keyDetailMap != null) {
-			for (IObservableValue<E> detailValue : keyDetailMap.values()) {
+			for (Iterator iter = keyDetailMap.values().iterator(); iter
+					.hasNext();) {
+				IObservableValue detailValue = (IObservableValue) iter.next();
 				detailValue.dispose();
 			}
 			keyDetailMap.clear();
@@ -318,7 +339,7 @@ public class MapDetailValueObservableMap<K, M, E> extends
 	}
 
 	@Override
-	public Set<Map.Entry<K, E>> entrySet() {
+	public Set entrySet() {
 		getterCalled();
 
 		if (entrySet == null) {
@@ -331,12 +352,12 @@ public class MapDetailValueObservableMap<K, M, E> extends
 		ObservableTracker.getterCalled(this);
 	}
 
-	private class EntrySet extends AbstractSet<Map.Entry<K, E>> {
+	private class EntrySet extends AbstractSet {
 
 		@Override
-		public Iterator<Map.Entry<K, E>> iterator() {
-			final Iterator<K> keyIterator = keySet().iterator();
-			return new Iterator<Map.Entry<K, E>>() {
+		public Iterator iterator() {
+			final Iterator keyIterator = keySet().iterator();
+			return new Iterator() {
 
 				@Override
 				public boolean hasNext() {
@@ -344,8 +365,8 @@ public class MapDetailValueObservableMap<K, M, E> extends
 				}
 
 				@Override
-				public Map.Entry<K, E> next() {
-					K key = keyIterator.next();
+				public Object next() {
+					Object key = keyIterator.next();
 					return new MapEntry(key);
 				}
 
@@ -362,27 +383,27 @@ public class MapDetailValueObservableMap<K, M, E> extends
 		}
 	}
 
-	private final class MapEntry implements Map.Entry<K, E> {
+	private final class MapEntry implements Map.Entry {
 
-		private final K key;
+		private final Object key;
 
-		private MapEntry(K key) {
+		private MapEntry(Object key) {
 			this.key = key;
 		}
 
 		@Override
-		public K getKey() {
+		public Object getKey() {
 			MapDetailValueObservableMap.this.getterCalled();
 			return key;
 		}
 
 		@Override
-		public E getValue() {
+		public Object getValue() {
 			return MapDetailValueObservableMap.this.get(getKey());
 		}
 
 		@Override
-		public E setValue(E value) {
+		public Object setValue(Object value) {
 			return MapDetailValueObservableMap.this.put(getKey(), value);
 		}
 
@@ -395,7 +416,7 @@ public class MapDetailValueObservableMap<K, M, E> extends
 				return false;
 			if (!(o instanceof Map.Entry))
 				return false;
-			Map.Entry<?, ?> that = (Map.Entry<?, ?>) o;
+			Map.Entry that = (Map.Entry) o;
 			return Util.equals(this.getKey(), that.getKey())
 					&& Util.equals(this.getValue(), that.getValue());
 		}

@@ -29,8 +29,7 @@ public class LabelProvider
     /**
      * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
      */
-    @Override
-	public Image getImage(Object obj) {
+    public Image getImage(Object obj) {
         if (obj == null || obj.equals(StructuredSelection.EMPTY)) {
             return null;
         }
@@ -48,8 +47,7 @@ public class LabelProvider
     /**
      * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
      */
-    @Override
-	public String getText(Object obj) {
+    public String getText(Object obj) {
         if (obj == null || obj.equals(StructuredSelection.EMPTY)) {
             return null;
         }
@@ -62,7 +60,7 @@ public class LabelProvider
             obj = structuredSelection.getFirstElement();
             size = structuredSelection.size();
         }
-        StringBuilder ret = new StringBuilder();
+        StringBuffer ret = new StringBuffer();
         Element element = (Element) ((TreeNode) obj).getValue();
         String type = element.getClass().getName();
         String name = element.getName();

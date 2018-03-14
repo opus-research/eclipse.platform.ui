@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,13 +10,15 @@
  *******************************************************************************/
 package org.eclipse.jface.preference;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.StringConverter;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
@@ -82,11 +84,14 @@ public class FontFieldEditor extends FieldEditor {
         public DefaultPreviewer(String s, Composite parent) {
             string = s;
             text = new Text(parent, SWT.READ_ONLY | SWT.BORDER);
-            text.addDisposeListener(e -> {
-			    if (font != null) {
-					font.dispose();
-				}
-			});
+            text.addDisposeListener(new DisposeListener() {
+                @Override
+				public void widgetDisposed(DisposeEvent e) {
+                    if (font != null) {
+						font.dispose();
+					}
+                }
+            });
             if (string != null) {
 				text.setText(string);
 			}
@@ -240,25 +245,36 @@ public class FontFieldEditor extends FieldEditor {
             if (changeButtonText != null) {
 				changeFontButton.setText(changeButtonText);
 			}
-            changeFontButton.addSelectionListener(widgetSelectedAdapter(event -> {
-				FontDialog fontDialog = new FontDialog(changeFontButton.getShell());
-			    if (chosenFont != null) {
-					fontDialog.setFontList(chosenFont);
-				}
-			    FontData font = fontDialog.open();
-			    if (font != null) {
-			        FontData[] oldFont = chosenFont;
-			        if (oldFont == null) {
-						oldFont = JFaceResources.getDefaultFont().getFontData();
+            changeFontButton.addSelectionListener(new SelectionAdapter() {
+                @Override
+				public void widgetSelected(SelectionEvent event) {
+                    FontDialog fontDialog = new FontDialog(changeFontButton
+                            .getShell());
+                    if (chosenFont != null) {
+						fontDialog.setFontList(chosenFont);
 					}
-			        setPresentsDefaultValue(false);
-			        FontData[] newData = new FontData[1];
-			        newData[0] = font;
-			        updateFont(newData);
-			        fireValueChanged(VALUE, oldFont[0], font);
-			    }
-			}));
-            changeFontButton.addDisposeListener(event -> changeFontButton = null);
+                    FontData font = fontDialog.open();
+                    if (font != null) {
+                        FontData[] oldFont = chosenFont;
+                        if (oldFont == null) {
+							oldFont = JFaceResources.getDefaultFont()
+                                    .getFontData();
+						}
+                        setPresentsDefaultValue(false);
+                        FontData[] newData = new FontData[1];
+                        newData[0] = font;
+                        updateFont(newData);
+                        fireValueChanged(VALUE, oldFont[0], font);
+                    }
+
+                }
+            });
+            changeFontButton.addDisposeListener(new DisposeListener() {
+                @Override
+				public void widgetDisposed(DisposeEvent event) {
+                    changeFontButton = null;
+                }
+            });
             changeFontButton.setFont(parent.getFont());
             setButtonLayoutData(changeFontButton);
         } else {
@@ -312,7 +328,12 @@ public class FontFieldEditor extends FieldEditor {
         if (valueControl == null) {
             valueControl = new Label(parent, SWT.LEFT);
             valueControl.setFont(parent.getFont());
-            valueControl.addDisposeListener(event -> valueControl = null);
+            valueControl.addDisposeListener(new DisposeListener() {
+                @Override
+				public void widgetDisposed(DisposeEvent event) {
+                    valueControl = null;
+                }
+            });
         } else {
             checkParent(valueControl, parent);
         }

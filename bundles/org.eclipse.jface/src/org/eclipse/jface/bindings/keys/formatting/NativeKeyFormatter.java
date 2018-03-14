@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     SAP SE <christian.georgi@sap.com> - Bug 475629: Key modifier order on MacOS
  *******************************************************************************/
 
 package org.eclipse.jface.bindings.keys.formatting;
@@ -41,7 +40,7 @@ public final class NativeKeyFormatter extends AbstractKeyFormatter {
 	/**
 	 * A look-up table for the string representations of various carbon keys.
 	 */
-	private final static HashMap<String, String> CARBON_KEY_LOOK_UP = new HashMap<>();
+	private final static HashMap CARBON_KEY_LOOK_UP = new HashMap();
 
 	/**
 	 * The resource bundle used by <code>format()</code> to translate formal
@@ -98,7 +97,7 @@ public final class NativeKeyFormatter extends AbstractKeyFormatter {
 
 		// TODO consider platform-specific resource bundles
 		if (Util.isMac()) {
-			String formattedName = CARBON_KEY_LOOK_UP.get(name);
+			String formattedName = (String) CARBON_KEY_LOOK_UP.get(name);
 			if (formattedName != null) {
 				return formattedName;
 			}
@@ -161,16 +160,14 @@ public final class NativeKeyFormatter extends AbstractKeyFormatter {
 			}
 
 		} else if (Util.isMac()) {
-			// As per order in OS X HIG
-			// https://developer.apple.com/library/mac/documentation/UserExperience/Conceptual/OSXHIGuidelines/Keyboard.html
+			if ((modifierKeys & lookup.getShift()) != 0) {
+				sortedKeys[index++] = lookup.getShift();
+			}
 			if ((modifierKeys & lookup.getCtrl()) != 0) {
 				sortedKeys[index++] = lookup.getCtrl();
 			}
 			if ((modifierKeys & lookup.getAlt()) != 0) {
 				sortedKeys[index++] = lookup.getAlt();
-			}
-			if ((modifierKeys & lookup.getShift()) != 0) {
-				sortedKeys[index++] = lookup.getShift();
 			}
 			if ((modifierKeys & lookup.getCommand()) != 0) {
 				sortedKeys[index++] = lookup.getCommand();

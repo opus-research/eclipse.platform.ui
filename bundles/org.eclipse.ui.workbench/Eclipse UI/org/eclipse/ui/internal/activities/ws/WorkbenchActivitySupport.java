@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.ui.internal.activities.ws;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -87,6 +88,9 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
                     private Set lastEnabled = new HashSet(
                             mutableActivityManager.getEnabledActivityIds());
 
+                    /* (non-Javadoc)
+                     * @see org.eclipse.ui.activities.IActivityManagerListener#activityManagerChanged(org.eclipse.ui.activities.ActivityManagerEvent)
+                     */
                     @Override
 					public void activityManagerChanged(
                             ActivityManagerEvent activityManagerEvent) {
@@ -102,13 +106,16 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
 							}
 
                             // refresh the managers on all windows.
-							final IWorkbench workbench = PlatformUI.getWorkbench();
-							IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
-                            for (IWorkbenchWindow wWindow : windows) {
-                                if (wWindow instanceof WorkbenchWindow) {
-                                    final WorkbenchWindow window = (WorkbenchWindow) wWindow;
+                            final IWorkbench workbench = PlatformUI
+                                    .getWorkbench();
+                            IWorkbenchWindow[] windows = workbench
+                                    .getWorkbenchWindows();
+                            for (int i = 0; i < windows.length; i++) {
+                                if (windows[i] instanceof WorkbenchWindow) {
+                                    final WorkbenchWindow window = (WorkbenchWindow) windows[i];
 
-									final ProgressMonitorDialog dialog = new ProgressMonitorDialog(window.getShell());
+                                    final ProgressMonitorDialog dialog = new ProgressMonitorDialog(
+                                            window.getShell());
 
                                     final IRunnableWithProgress runnable = new IRunnableWithProgress() {
 
@@ -122,6 +129,9 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
                                          */
                                         private boolean dialogOpened = false;
 
+                                        /* (non-Javadoc)
+                                         * @see org.eclipse.jface.operation.IRunnableWithProgress#run(org.eclipse.core.runtime.IProgressMonitor)
+                                         */
                                         @Override
 										public void run(IProgressMonitor monitor) {
 
@@ -148,10 +158,13 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
                                             // update all of the (realized) views in all of the pages
                                             IWorkbenchPage[] pages = window
                                                     .getPages();
-                                            for (IWorkbenchPage page : pages) {
-												IViewReference[] refs = page.getViewReferences();
-                                                for (IViewReference ref : refs) {
-													IViewPart part = ref.getView(false);
+                                            for (int j = 0; j < pages.length; j++) {
+                                                IWorkbenchPage page = pages[j];
+                                                IViewReference[] refs = page
+                                                        .getViewReferences();
+                                                for (int k = 0; k < refs.length; k++) {
+                                                    IViewPart part = refs[k]
+                                                            .getView(false);
                                                     if (part != null) {
                                                         updateViewBars(part);
                                                     }
@@ -247,23 +260,39 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
                                     dialog.setOpenOnRun(false);
                                     // run this in the UI thread
                                     workbench.getDisplay().asyncExec(
-                                            () -> BusyIndicator
-											        .showWhile(
-											                workbench
-											                        .getDisplay(),
-											                () -> {
-															    try {
-															        dialog
-															                .run(
-															                        false,
-															                        false,
-															                        runnable);
-															    } catch (InvocationTargetException e1) {
-															        log(e1);
-															    } catch (InterruptedException e2) {
-															        log(e2);
-															    }
-															}));
+                                            new Runnable() {
+
+                                                /* (non-Javadoc)
+                                                 * @see java.lang.Runnable#run()
+                                                 */
+                                                @Override
+												public void run() {
+                                                    BusyIndicator
+                                                            .showWhile(
+                                                                    workbench
+                                                                            .getDisplay(),
+                                                                    new Runnable() {
+
+                                                                        /* (non-Javadoc)
+                                                                         * @see java.lang.Runnable#run()
+                                                                         */
+                                                                        @Override
+																		public void run() {
+                                                                            try {
+                                                                                dialog
+                                                                                        .run(
+                                                                                                false,
+                                                                                                false,
+                                                                                                runnable);
+                                                                            } catch (InvocationTargetException e) {
+                                                                                log(e);
+                                                                            } catch (InterruptedException e) {
+                                                                                log(e);
+                                                                            }
+                                                                        }
+                                                                    });
+                                                }
+                                            });
                                 }
                             }
                         }
@@ -281,16 +310,25 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
                 });
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.activities.IWorkbenchActivitySupport#getActivityManager()
+     */
     @Override
 	public IActivityManager getActivityManager() {
         return proxyActivityManager;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.activities.IWorkbenchActivitySupport#setEnabledActivityIds(java.util.Set)
+     */
     @Override
 	public void setEnabledActivityIds(Set enabledActivityIds) {
         mutableActivityManager.setEnabledActivityIds(enabledActivityIds);
     }
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.activities.IWorkbenchActivitySupport#getImageDescriptor(org.eclipse.ui.activities.IActivity)
+	 */
 	@Override
 	public ImageDescriptor getImageDescriptor(IActivity activity) {
 		if (activity.isDefined()) {
@@ -304,6 +342,9 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
 				.getImageDescriptor(IWorkbenchGraphicConstants.IMG_OBJ_ACTIVITY);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.activities.IWorkbenchActivitySupport#getImageDescriptor(org.eclipse.ui.activities.ICategory)
+	 */
 	@Override
 	public ImageDescriptor getImageDescriptor(ICategory category) {
 		if (category.isDefined()) {
@@ -409,11 +450,17 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
 		return advisor;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.activities.IWorkbenchActivitySupport#getTriggerPointManager()
+	 */
 	@Override
 	public ITriggerPointManager getTriggerPointManager() {
 		return triggerPointManager;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker, org.eclipse.core.runtime.IExtension)
+	 */
 	@Override
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
 		// reset the advisor if it's the "default" advisor.
@@ -435,16 +482,22 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
 				PlatformUI.PLUGIN_ID, IWorkbenchRegistryConstants.PL_ACTIVITYSUPPORT);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension, java.lang.Object[])
+	 */
 	@Override
 	public void removeExtension(IExtension extension, Object[] objects) {
-		for (Object object : objects) {
-			if (object == advisor) {
+		for (int i = 0; i < objects.length; i++) {
+			if (objects[i] == advisor) {
 				advisor = null;
 				break;
 			}
 		}
 	}
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.activities.IWorkbenchActivitySupport#createWorkingCopy()
+     */
     @Override
 	public IMutableActivityManager createWorkingCopy() {
         MutableActivityManager clone = (MutableActivityManager) mutableActivityManager.clone();

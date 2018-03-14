@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -99,8 +99,9 @@ public class ObjectActionContributorManager extends ObjectContributorManager {
 
         // Second pass, add the contributions that are applicable to
         // the selection.
-		for (IObjectActionContributor contributor : contributors) {
-			if (contributor.contributeObjectActions(part, popupMenu, selProv,
+		for (Iterator<IObjectActionContributor> it = contributors.iterator(); it.hasNext();) {
+			IObjectActionContributor contributor = it.next();
+            if (contributor.contributeObjectActions(part, popupMenu, selProv,
                     overrides)) {
 				actualContributions = true;
 				alreadyContributed.add(contributor);
@@ -131,10 +132,10 @@ public class ObjectActionContributorManager extends ObjectContributorManager {
 	@Override
 	public void addExtension(IExtensionTracker tracker, IExtension addedExtension) {
         IConfigurationElement[] addedElements = addedExtension.getConfigurationElements();
-        for (IConfigurationElement addedElement : addedElements) {
+        for (int i = 0; i < addedElements.length; i++) {
             ObjectActionContributorReader reader = new ObjectActionContributorReader();
             reader.setManager(this);
-            reader.readElement(addedElement);
+            reader.readElement(addedElements[i]);
         }
     }
 

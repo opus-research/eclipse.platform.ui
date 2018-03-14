@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,13 +7,13 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 400714, 441267, 441184, 445723, 445724, 472654, 481608
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 400714, 441267, 441184, 445723, 445724
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
 
 import com.ibm.icu.text.MessageFormat;
+import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -71,6 +71,7 @@ import org.eclipse.ui.internal.themes.IThemeRegistry;
 import org.eclipse.ui.internal.themes.ThemeRegistry;
 import org.eclipse.ui.internal.themes.ThemeRegistryReader;
 import org.eclipse.ui.internal.util.BundleUtility;
+import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.internal.wizards.ExportWizardRegistry;
 import org.eclipse.ui.internal.wizards.ImportWizardRegistry;
 import org.eclipse.ui.internal.wizards.NewWizardRegistry;
@@ -84,6 +85,9 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.BundleListener;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.util.tracker.ServiceTracker;
 
 /**
@@ -151,7 +155,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
     private BundleContext bundleContext;
 
     // The set of currently starting bundles
-	private Collection<Bundle> startingBundles = new HashSet<>();
+	private Collection<Bundle> startingBundles = new HashSet<Bundle>();
 
     /**
      * Global workbench ui plugin flag. Only workbench implementation is allowed to use this flag
@@ -282,14 +286,17 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
             }
             final Object[] ret = new Object[1];
             final CoreException[] exc = new CoreException[1];
-            BusyIndicator.showWhile(null, () -> {
-			    try {
-			        ret[0] = element
-			                .createExecutableExtension(classAttribute);
-			    } catch (CoreException e) {
-			        exc[0] = e;
-			    }
-			});
+            BusyIndicator.showWhile(null, new Runnable() {
+                @Override
+				public void run() {
+                    try {
+                        ret[0] = element
+                                .createExecutableExtension(classAttribute);
+                    } catch (CoreException e) {
+                        exc[0] = e;
+                    }
+                }
+            });
             if (exc[0] != null) {
 				throw exc[0];
 			}
@@ -493,10 +500,10 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
         IConfigurationElement targetElement = null;
         IConfigurationElement[] configElements = extensionPoint
                 .getConfigurationElements();
-        for (IConfigurationElement configElement : configElements) {
-            String strID = configElement.getAttribute("id"); //$NON-NLS-1$
+        for (int j = 0; j < configElements.length; j++) {
+            String strID = configElements[j].getAttribute("id"); //$NON-NLS-1$
             if (targetID.equals(strID)) {
-                targetElement = configElement;
+                targetElement = configElements[j];
                 break;
             }
         }
@@ -732,7 +739,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      */
     public static void log(Class clazz, String methodName, Throwable t) {
         String msg = MessageFormat.format("Exception in {0}.{1}: {2}", //$NON-NLS-1$
-				clazz.getName(), methodName, t);
+                new Object[] { clazz.getName(), methodName, t });
         log(msg, t);
     }
 
@@ -846,12 +853,12 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 			}
 		}
 		if (bidiParams != null) {
-			String[] bidiProps = bidiParams.split(";"); //$NON-NLS-1$
-			for (String bidiProp : bidiProps) {
-				int eqPos = bidiProp.indexOf("="); //$NON-NLS-1$
-				if ((eqPos > 0) && (eqPos < bidiProp.length() - 1)) {
-					String nameProp = bidiProp.substring(0, eqPos);
-					String valProp = bidiProp.substring(eqPos + 1);
+			String[] bidiProps = Util.getArrayFromList(bidiParams, ";"); //$NON-NLS-1$
+			for (int i = 0; i < bidiProps.length; ++i) {
+				int eqPos = bidiProps[i].indexOf("="); //$NON-NLS-1$
+				if ((eqPos > 0) && (eqPos < bidiProps[i].length() - 1)) {
+					String nameProp = bidiProps[i].substring(0, eqPos);
+					String valProp = bidiProps[i].substring(eqPos + 1);
 					if (nameProp.equals(BIDI_SUPPORT_OPTION)) {
 						BidiUtils.setBidiSupport("y".equals(valProp)); //$NON-NLS-1$
 					} else if (nameProp.equalsIgnoreCase(BIDI_TEXTDIR_OPTION)) {
@@ -910,7 +917,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 			// and premature attempt to resolve class reference
 			boolean isBidi = com.ibm.icu.text.Bidi.requiresBidi(message.toCharArray(), 0,
 					message.length());
-			return Boolean.valueOf(isBidi);
+			return new Boolean(isBidi);
 		} catch (NoClassDefFoundError e) {
 			// the ICU Base bundle used in place of ICU?
 			return null;
@@ -1155,12 +1162,40 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		return bundleContext.getBundles().length;
 	}
 
+	/* package */ OutputStream getSplashStream() {
+		// assumes the output stream is available as a service
+		// see EclipseStarter.publishSplashScreen
+		ServiceReference[] ref;
+		try {
+			ref = bundleContext.getServiceReferences(OutputStream.class.getName(), null);
+		} catch (InvalidSyntaxException e) {
+			return null;
+		}
+		if(ref==null) {
+			return null;
+		}
+		for (int i = 0; i < ref.length; i++) {
+			String name = (String) ref[i].getProperty("name"); //$NON-NLS-1$
+			if (name != null && name.equals("splashstream")) {  //$NON-NLS-1$
+				Object result = bundleContext.getService(ref[i]);
+				bundleContext.ungetService(ref[i]);
+				return (OutputStream) result;
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * @return the bundle listener for this plug-in
 	 */
 	private BundleListener getBundleListener() {
 		if (bundleListener == null) {
-			bundleListener = event -> WorkbenchPlugin.this.bundleChanged(event);
+			bundleListener = new SynchronousBundleListener() {
+				@Override
+				public void bundleChanged(BundleEvent event) {
+					WorkbenchPlugin.this.bundleChanged(event);
+				}
+			};
 		}
 		return bundleListener;
 	}
@@ -1236,7 +1271,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 			// we're on a 32 bit platform so invoke it with splash
 			// handle as an int
 			splashShell = (Shell) method.invoke(null, new Object[] { display,
-					Integer.valueOf(splashHandle) });
+					new Integer(splashHandle) });
 		} catch (NoSuchMethodException e) {
 			// look for the 64 bit internal_new shell method
 			try {
@@ -1418,7 +1453,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 			@Override
 			public Object compute(IEclipseContext context, String contextKey) {
 				if (editorRegistry == null) {
-					editorRegistry = new EditorRegistry(Platform.getContentTypeManager());
+					editorRegistry = new EditorRegistry();
 				}
 				return editorRegistry;
 			}

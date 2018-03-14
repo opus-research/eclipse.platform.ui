@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ui.about;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import org.eclipse.jface.dialogs.DialogPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
@@ -129,8 +129,13 @@ public abstract class InstallationPage extends DialogPage {
 	protected Button createButton(Composite parent, int id, String label) {
 		Button button = new Button(parent, SWT.PUSH);
 		button.setText(label);
-		button.setData(Integer.valueOf(id));
-		button.addSelectionListener(widgetSelectedAdapter(event -> buttonPressed(((Integer) event.widget.getData()).intValue())));
+		button.setData(new Integer(id));
+		button.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				buttonPressed(((Integer) event.widget.getData()).intValue());
+			}
+		});
 		container.registerPageButton(this, button);
 		return button;
 	}

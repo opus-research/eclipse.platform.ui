@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -57,7 +57,7 @@ public class ShowPartPaneMenuHandler extends AbstractEvaluationHandler {
 				Composite partContainer = (Composite) model.getWidget();
 				if (partContainer != null) {
 					Composite parent = partContainer.getParent();
-					while (parent != null) {
+					while (parent != null && parent instanceof Composite) {
 						if (parent instanceof CTabFolder) {
 							CTabFolder ctf = (CTabFolder) parent;
 							final CTabItem item = ctf.getSelection();

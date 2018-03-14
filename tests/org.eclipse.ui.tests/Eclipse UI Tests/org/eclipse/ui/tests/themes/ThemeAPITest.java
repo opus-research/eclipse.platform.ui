@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Mickael Istria (Red Hat Inc.) - 483359 Remove erroneous test
  *******************************************************************************/
 package org.eclipse.ui.tests.themes;
 
@@ -18,6 +17,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.resource.ColorRegistry;
+import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
@@ -159,9 +159,9 @@ public class ThemeAPITest extends ThemeTest {
     private void checkEvents(ThemePropertyListener listener, Object source,
             Object oldObject, Object newObject) {
         boolean array = oldObject instanceof Object[];
-		List<PropertyChangeEvent> events = listener.getEvents();
+        List events = listener.getEvents();
         assertEquals(2, events.size());
-        PropertyChangeEvent event = events.get(0);
+        PropertyChangeEvent event = (PropertyChangeEvent) events.get(0);
 
         assertEquals(source, event.getSource());
         if (array) {
@@ -174,7 +174,7 @@ public class ThemeAPITest extends ThemeTest {
             assertEquals(newObject, event.getNewValue());
         }
 
-        event = events.get(1);
+        event = (PropertyChangeEvent) events.get(1);
         assertEquals(source, event.getSource());
         if (array) {
             assertArrayEquals((Object[]) oldObject, (Object[]) event
@@ -282,35 +282,35 @@ public class ThemeAPITest extends ThemeTest {
 
     public void testDataKeySet_data1() {
         ITheme defaultTheme = getDefaultTheme();
-		Set<String> themeKeys = defaultTheme.keySet();
+        Set themeKeys = defaultTheme.keySet();
 
         assertTrue(themeKeys.contains(DATA1));
     }
 
     public void testDataKeySet_data2() {
         ITheme defaultTheme = getDefaultTheme();
-		Set<String> themeKeys = defaultTheme.keySet();
+        Set themeKeys = defaultTheme.keySet();
 
         assertTrue(themeKeys.contains(DATA2));
     }
 
     public void testDataKeySet_int1() {
         ITheme defaultTheme = getDefaultTheme();
-		Set<String> themeKeys = defaultTheme.keySet();
+        Set themeKeys = defaultTheme.keySet();
 
         assertTrue(themeKeys.contains(INT1));
     }
 
     public void testDataKeySet_bool1() {
         ITheme defaultTheme = getDefaultTheme();
-		Set<String> themeKeys = defaultTheme.keySet();
+        Set themeKeys = defaultTheme.keySet();
 
         assertTrue(themeKeys.contains(BOOL1));
     }
 
     public void testDataKeySet_BOGUSKEY() {
         ITheme defaultTheme = getDefaultTheme();
-		Set<String> themeKeys = defaultTheme.keySet();
+        Set themeKeys = defaultTheme.keySet();
 
         assertFalse(themeKeys.contains(BOGUSKEY));
     }
@@ -406,6 +406,29 @@ public class ThemeAPITest extends ThemeTest {
         ITheme theme1 = getTheme1();
         assertEquals(theme1.getColorRegistry().getRGB(DEFAULTEDCOLOR2),
                 theme1.getColorRegistry().getRGB(DEFAULTEDCOLOR3));
+    }
+
+    public void testFontCascadeEvents() {
+        ITheme currentTheme = fManager.getCurrentTheme();
+        assertNotNull(currentTheme);
+
+        ThemePropertyListener managerListener = new ThemePropertyListener();
+        ThemePropertyListener themeListener = new ThemePropertyListener();
+        fManager.addPropertyChangeListener(managerListener);
+        currentTheme.addPropertyChangeListener(themeListener);
+
+        FontRegistry fontRegistry = currentTheme.getFontRegistry();
+        FontData[] oldFont = fontRegistry.getFontData(VALFONT);
+        FontData[] newFont = new FontData[] { new FontData("Courier", 30,
+                SWT.ITALIC) };
+        fontRegistry.put(VALFONT, newFont);
+        fontRegistry.put(VALFONT, oldFont);
+
+        checkEvents(managerListener, fontRegistry, oldFont, newFont);
+        checkEvents(themeListener, fontRegistry, oldFont, newFont);
+
+        fManager.removePropertyChangeListener(managerListener);
+        currentTheme.removePropertyChangeListener(themeListener);
     }
 
     public void testFontPreferenceListener_def_novalfont() {
@@ -575,9 +598,9 @@ public class ThemeAPITest extends ThemeTest {
         ITheme newCurrentTheme = fManager.getCurrentTheme();
         ITheme theme1 = getTheme1();
         assertEquals(theme1, newCurrentTheme);
-		List<PropertyChangeEvent> events = listener.getEvents();
+        List events = listener.getEvents();
         assertEquals(1, events.size());
-		PropertyChangeEvent event = events.get(0);
+        PropertyChangeEvent event = ((PropertyChangeEvent) events.get(0));
         assertEquals(IThemeManager.CHANGE_CURRENT_THEME, event.getProperty());
         assertEquals(currentTheme, event.getOldValue());
         assertEquals(newCurrentTheme, event.getNewValue());

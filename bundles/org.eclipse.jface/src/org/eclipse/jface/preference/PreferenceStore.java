@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -121,8 +121,8 @@ public class PreferenceStore extends EventManager implements
 				&& (oldValue == null || !oldValue.equals(newValue))) {
 			final PropertyChangeEvent pe = new PropertyChangeEvent(this, name,
 					oldValue, newValue);
-			for (Object finalListener : finalListeners) {
-				final IPropertyChangeListener l = (IPropertyChangeListener) finalListener;
+			for (int i = 0; i < finalListeners.length; ++i) {
+				final IPropertyChangeListener l = (IPropertyChangeListener) finalListeners[i];
 				SafeRunnable.run(new SafeRunnable(JFaceResources
 						.getString("PreferenceStore.changeError")) { //$NON-NLS-1$
 							@Override
@@ -537,7 +537,8 @@ public class PreferenceStore extends EventManager implements
 		if (oldValue != value) {
 			setValue(properties, name, value);
 			dirty = true;
-			firePropertyChangeEvent(name, Integer.valueOf(oldValue), Integer.valueOf(value));
+			firePropertyChangeEvent(name, new Integer(oldValue), new Integer(
+					value));
 		}
 	}
 

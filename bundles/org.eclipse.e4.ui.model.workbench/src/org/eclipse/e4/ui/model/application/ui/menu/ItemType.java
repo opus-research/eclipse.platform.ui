@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -135,7 +135,8 @@ public enum ItemType implements InternalItemType {
 	 * @generated
 	 */
 	public static ItemType get(String literal) {
-		for (ItemType result : VALUES_ARRAY) {
+		for (int i = 0; i < VALUES_ARRAY.length; ++i) {
+			ItemType result = VALUES_ARRAY[i];
 			if (result.toString().equals(literal)) {
 				return result;
 			}
@@ -152,7 +153,8 @@ public enum ItemType implements InternalItemType {
 	 * @generated
 	 */
 	public static ItemType getByName(String name) {
-		for (ItemType result : VALUES_ARRAY) {
+		for (int i = 0; i < VALUES_ARRAY.length; ++i) {
+			ItemType result = VALUES_ARRAY[i];
 			if (result.getName().equals(name)) {
 				return result;
 			}

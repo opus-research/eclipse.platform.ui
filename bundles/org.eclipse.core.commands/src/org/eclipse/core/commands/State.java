@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -70,9 +70,10 @@ public class State extends EventManager {
 	 *            The old value; may be anything.
 	 */
 	protected final void fireStateChanged(final Object oldValue) {
-		for (Object listener : getListeners()) {
-			final IStateListener stateListener = (IStateListener) listener;
-			stateListener.handleStateChange(this, oldValue);
+		final Object[] listeners = getListeners();
+		for (int i = 0; i < listeners.length; i++) {
+			final IStateListener listener = (IStateListener) listeners[i];
+			listener.handleStateChange(this, oldValue);
 		}
 	}
 

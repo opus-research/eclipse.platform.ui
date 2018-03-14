@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
@@ -97,8 +98,8 @@ public class WorkbenchStatusDialogManagerImpl {
 		if (children == null || children.length == 0) {
 			return status.matches(mask) || (handleOKStatuses && status.isOK());
 		}
-		for (IStatus child : children) {
-			if (child.matches(mask)) {
+		for (int i = 0; i < children.length; i++) {
+			if (children[i].matches(mask)) {
 				return true;
 			}
 		}
@@ -138,7 +139,7 @@ public class WorkbenchStatusDialogManagerImpl {
 	 * @return populated dialogState
 	 */
 	public Map initDialogState(Map dialogState, int displayMask, String dialogTitle) {
-		dialogState.put(IStatusDialogConstants.MASK, Integer.valueOf(displayMask));
+		dialogState.put(IStatusDialogConstants.MASK, new Integer(displayMask));
 		dialogState.put(IStatusDialogConstants.TITLE,
 				dialogTitle == null ? JFaceResources
 						.getString("Problem_Occurred") : //$NON-NLS-1$
@@ -207,6 +208,7 @@ public class WorkbenchStatusDialogManagerImpl {
 			WorkbenchPlugin.log(statusAdapter.getStatus());
 			// log the problem with status handling
 			WorkbenchPlugin.log(e);
+			e.printStackTrace();
 		}
 	}
 
@@ -244,7 +246,7 @@ public class WorkbenchStatusDialogManagerImpl {
 		if (isDialogClosed()) {
 
 			getErrors().add(statusAdapter);
-			getModals().put(statusAdapter, Boolean.valueOf(modal));
+			getModals().put(statusAdapter, new Boolean(modal));
 			// Delay prompting if the status adapter property is set
 			if (shouldPrompt(statusAdapter)) {
 				// notify all interested parties that status adapters will be
@@ -307,7 +309,7 @@ public class WorkbenchStatusDialogManagerImpl {
 	private void openStatusDialog(final boolean modal,
 			final StatusAdapter statusAdapter) {
 		getErrors().add(statusAdapter);
-		getModals().put(statusAdapter, Boolean.valueOf(modal));
+		getModals().put(statusAdapter, new Boolean(modal));
 		boolean shouldBeModal = shouldBeModal();
 		if (shouldBeModal ^ dialog.isModal()) {
 			dialog.getShell().removeDisposeListener(disposeListener);
@@ -362,9 +364,11 @@ public class WorkbenchStatusDialogManagerImpl {
 	 * @return true if any StatusHandler should be displayed in modal window
 	 */
 	public boolean shouldBeModal() {
-		Map<?, ?> modals = (Map<?, ?>) dialogState
+		Map modals = (Map) dialogState
 				.get(IStatusDialogConstants.STATUS_MODALS);
-		for (Object value : modals.values()) {
+		for (Iterator it = modals.keySet().iterator(); it.hasNext();) {
+			Object o = it.next();
+			Object value = modals.get(o);
 			if (value instanceof Boolean) {
 				Boolean b = (Boolean) value;
 				if (b.booleanValue()) {

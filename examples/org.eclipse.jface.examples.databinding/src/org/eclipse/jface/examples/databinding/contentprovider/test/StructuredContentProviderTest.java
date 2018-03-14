@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -135,11 +135,11 @@ public class StructuredContentProviderTest {
 				operation.setText("Select transformation"); //$NON-NLS-1$
 
 				createRadioButton(operation, currentFunction, "f(x) = x", //$NON-NLS-1$
-						Integer.valueOf(SomeMathFunction.OP_IDENTITY));
+						new Integer(SomeMathFunction.OP_IDENTITY));
 				createRadioButton(operation, currentFunction, "f(x) = 2 * x", //$NON-NLS-1$
-						Integer.valueOf(SomeMathFunction.OP_MULTIPLY));
+						new Integer(SomeMathFunction.OP_MULTIPLY));
 				createRadioButton(operation, currentFunction,
-						"f(x) = floor(x)", Integer.valueOf( //$NON-NLS-1$
+						"f(x) = floor(x)", new Integer( //$NON-NLS-1$
 								SomeMathFunction.OP_ROUND));
 
 				GridLayout layout = new GridLayout();
@@ -197,7 +197,7 @@ public class StructuredContentProviderTest {
 		// elements in the inputSet.
 		// We will allow the user to change the current function through a set
 		// of radio buttons
-		currentFunction = new WritableValue(realm, Integer.valueOf(
+		currentFunction = new WritableValue(realm, new Integer(
 				SomeMathFunction.OP_MULTIPLY), null);
 
 		// mathFunction implements the selected function

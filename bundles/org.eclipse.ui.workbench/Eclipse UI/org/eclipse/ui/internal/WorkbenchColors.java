@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,8 +25,8 @@ public class WorkbenchColors {
      * Dispose all color pre-allocated by the workbench.
      */
     private static void disposeWorkbenchColors() {
-        for (Color workbenchColor : workbenchColors) {
-            workbenchColor.dispose();
+        for (int i = 0; i < workbenchColors.length; i++) {
+            workbenchColors[i].dispose();
         }
         workbenchColors = null;
     }

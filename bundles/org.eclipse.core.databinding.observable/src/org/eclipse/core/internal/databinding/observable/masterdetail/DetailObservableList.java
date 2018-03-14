@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2017 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,6 @@
  *     Brad Reynolds - bug 147515
  *     Matthew Hall - bug 221351, 247875, 246782, 249526, 268022, 251424
  *     Ovidio Mallo - bug 241318
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
- *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  *******************************************************************************/
 package org.eclipse.core.internal.databinding.observable.masterdetail;
 
@@ -21,41 +19,45 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.databinding.observable.Diffs;
+import org.eclipse.core.databinding.observable.DisposeEvent;
+import org.eclipse.core.databinding.observable.IDisposeListener;
 import org.eclipse.core.databinding.observable.IObserving;
 import org.eclipse.core.databinding.observable.ObservableTracker;
 import org.eclipse.core.databinding.observable.list.IListChangeListener;
 import org.eclipse.core.databinding.observable.list.IObservableList;
+import org.eclipse.core.databinding.observable.list.ListChangeEvent;
 import org.eclipse.core.databinding.observable.list.ObservableList;
 import org.eclipse.core.databinding.observable.masterdetail.IObservableFactory;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.IValueChangeListener;
+import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
 import org.eclipse.core.runtime.Assert;
 
 /**
- * @param <M>
- *            type of the master observable
- * @param <E>
- *            type of the elements in the inner observable list
  * @since 3.2
  *
  */
-public class DetailObservableList<M, E> extends ObservableList<E>implements IObserving {
+
+public class DetailObservableList extends ObservableList implements IObserving {
 
 	private boolean updating = false;
 
-	private IListChangeListener<E> innerChangeListener = event -> {
-		if (!updating) {
-			fireListChange(Diffs.unmodifiableDiff(event.diff));
+	private IListChangeListener innerChangeListener = new IListChangeListener() {
+		@Override
+		public void handleListChange(ListChangeEvent event) {
+			if (!updating) {
+				fireListChange(event.diff);
+			}
 		}
 	};
 
-	private M currentOuterValue;
+	private Object currentOuterValue;
 
-	private IObservableList<E> innerObservableList;
+	private IObservableList innerObservableList;
 
-	private IObservableFactory<? super M, IObservableList<E>> factory;
+	private IObservableFactory factory;
 
-	private IObservableValue<M> outerObservableValue;
+	private IObservableValue outerObservableValue;
 
 	private Object detailType;
 
@@ -64,10 +66,10 @@ public class DetailObservableList<M, E> extends ObservableList<E>implements IObs
 	 * @param outerObservableValue
 	 * @param detailType
 	 */
-	public DetailObservableList(
-			IObservableFactory<? super M, IObservableList<E>> factory,
-			IObservableValue<M> outerObservableValue, Object detailType) {
-		super(outerObservableValue.getRealm(), Collections.<E> emptyList(), detailType);
+	public DetailObservableList(IObservableFactory factory,
+			IObservableValue outerObservableValue, Object detailType) {
+		super(outerObservableValue.getRealm(), Collections.EMPTY_LIST,
+				detailType);
 		Assert.isTrue(!outerObservableValue.isDisposed(),
 				"Master observable is disposed"); //$NON-NLS-1$
 
@@ -75,7 +77,12 @@ public class DetailObservableList<M, E> extends ObservableList<E>implements IObs
 		this.outerObservableValue = outerObservableValue;
 		this.detailType = detailType;
 
-		outerObservableValue.addDisposeListener(staleEvent -> dispose());
+		outerObservableValue.addDisposeListener(new IDisposeListener() {
+			@Override
+			public void handleDispose(DisposeEvent staleEvent) {
+				dispose();
+			}
+		});
 
 		ObservableTracker.setIgnore(true);
 		try {
@@ -86,16 +93,19 @@ public class DetailObservableList<M, E> extends ObservableList<E>implements IObs
 		outerObservableValue.addValueChangeListener(outerChangeListener);
 	}
 
-	IValueChangeListener<M> outerChangeListener = event -> {
-		if (isDisposed())
-			return;
-		ObservableTracker.setIgnore(true);
-		try {
-			List<E> oldList = new ArrayList<E>(wrappedList);
-			updateInnerObservableList();
-			fireListChange(Diffs.computeListDiff(oldList, wrappedList));
-		} finally {
-			ObservableTracker.setIgnore(false);
+	IValueChangeListener outerChangeListener = new IValueChangeListener() {
+		@Override
+		public void handleValueChange(ValueChangeEvent event) {
+			if (isDisposed())
+				return;
+			ObservableTracker.setIgnore(true);
+			try {
+				List oldList = new ArrayList(wrappedList);
+				updateInnerObservableList();
+				fireListChange(Diffs.computeListDiff(oldList, wrappedList));
+			} finally {
+				ObservableTracker.setIgnore(false);
+			}
 		}
 	};
 
@@ -107,11 +117,11 @@ public class DetailObservableList<M, E> extends ObservableList<E>implements IObs
 		currentOuterValue = outerObservableValue.getValue();
 		if (currentOuterValue == null) {
 			innerObservableList = null;
-			wrappedList = Collections.emptyList();
+			wrappedList = Collections.EMPTY_LIST;
 		} else {
 			ObservableTracker.setIgnore(true);
 			try {
-				innerObservableList = factory
+				innerObservableList = (IObservableList) factory
 						.createObservable(currentOuterValue);
 			} finally {
 				ObservableTracker.setIgnore(false);
@@ -130,7 +140,7 @@ public class DetailObservableList<M, E> extends ObservableList<E>implements IObs
 	}
 
 	@Override
-	public boolean add(final E o) {
+	public boolean add(final Object o) {
 		ObservableTracker.setIgnore(true);
 		try {
 			return wrappedList.add(o);
@@ -140,7 +150,7 @@ public class DetailObservableList<M, E> extends ObservableList<E>implements IObs
 	}
 
 	@Override
-	public void add(final int index, final E element) {
+	public void add(final int index, final Object element) {
 		ObservableTracker.setIgnore(true);
 		try {
 			wrappedList.add(index, element);
@@ -160,7 +170,7 @@ public class DetailObservableList<M, E> extends ObservableList<E>implements IObs
 	}
 
 	@Override
-	public E set(final int index, final E element) {
+	public Object set(final int index, final Object element) {
 		ObservableTracker.setIgnore(true);
 		try {
 			return wrappedList.set(index, element);
@@ -170,7 +180,7 @@ public class DetailObservableList<M, E> extends ObservableList<E>implements IObs
 	}
 
 	@Override
-	public E move(final int oldIndex, final int newIndex) {
+	public Object move(final int oldIndex, final int newIndex) {
 		if (innerObservableList != null) {
 			ObservableTracker.setIgnore(true);
 			try {
@@ -183,7 +193,7 @@ public class DetailObservableList<M, E> extends ObservableList<E>implements IObs
 	}
 
 	@Override
-	public E remove(final int index) {
+	public Object remove(final int index) {
 		ObservableTracker.setIgnore(true);
 		try {
 			return wrappedList.remove(index);
@@ -193,7 +203,7 @@ public class DetailObservableList<M, E> extends ObservableList<E>implements IObs
 	}
 
 	@Override
-	public boolean addAll(final Collection<? extends E> c) {
+	public boolean addAll(final Collection c) {
 		ObservableTracker.setIgnore(true);
 		try {
 			return wrappedList.addAll(c);
@@ -203,7 +213,7 @@ public class DetailObservableList<M, E> extends ObservableList<E>implements IObs
 	}
 
 	@Override
-	public boolean addAll(final int index, final Collection<? extends E> c) {
+	public boolean addAll(final int index, final Collection c) {
 		ObservableTracker.setIgnore(true);
 		try {
 			return wrappedList.addAll(index, c);
@@ -213,7 +223,7 @@ public class DetailObservableList<M, E> extends ObservableList<E>implements IObs
 	}
 
 	@Override
-	public boolean removeAll(final Collection<?> c) {
+	public boolean removeAll(final Collection c) {
 		ObservableTracker.setIgnore(true);
 		try {
 			return wrappedList.removeAll(c);
@@ -223,7 +233,7 @@ public class DetailObservableList<M, E> extends ObservableList<E>implements IObs
 	}
 
 	@Override
-	public boolean retainAll(final Collection<?> c) {
+	public boolean retainAll(final Collection c) {
 		ObservableTracker.setIgnore(true);
 		try {
 			return wrappedList.retainAll(c);

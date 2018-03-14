@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -281,8 +281,8 @@ public abstract class WizardPropertyPage extends PropertyPage {
 	 */
 	private void rebuildWizardPage() {
 		Control[] children= fWizardPageContainer.getChildren();
-		for (Control controlElement : children) {
-			controlElement.dispose();
+		for (int i= 0; i < children.length; i++) {
+			children[i].dispose();
 		}
 
 		createWizardPageContent(fWizardPageContainer);

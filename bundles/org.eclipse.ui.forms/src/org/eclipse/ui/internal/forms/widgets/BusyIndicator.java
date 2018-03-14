@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2016 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,10 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -55,7 +58,6 @@ public final class BusyIndicator extends Canvas {
 
 		dpy = getDisplay();
 		timer = new Runnable() {
-			@Override
 			public void run () {
 				if (isDisposed()) return;
 				redraw();
@@ -67,12 +69,19 @@ public final class BusyIndicator extends Canvas {
 			}
 		};
 
-		addPaintListener(event -> onPaint(event));
+		addPaintListener(new PaintListener() {
+			public void paintControl(PaintEvent event) {
+				onPaint(event);
+			}
+		});
 
-		addDisposeListener(e -> clearImages());
+		addDisposeListener(new DisposeListener() {
+			public void widgetDisposed(DisposeEvent e) {
+				clearImages();
+			}
+		});
 	}
 
-	@Override
 	public Point computeSize(int wHint, int hHint, boolean changed) {
 //		checkWidget();
 		Point size = new Point(0, 0);
@@ -91,7 +100,9 @@ public final class BusyIndicator extends Canvas {
 		return size;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.widgets.Control#forceFocus()
+	 */
 	public boolean forceFocus() {
 		return false;
 	}

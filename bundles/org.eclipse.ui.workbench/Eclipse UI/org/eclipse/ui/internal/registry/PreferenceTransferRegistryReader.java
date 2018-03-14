@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ package org.eclipse.ui.internal.registry;
 import com.ibm.icu.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,16 +82,24 @@ public class PreferenceTransferRegistryReader extends RegistryReader {
 		readPreferenceTransfers();
 		PreferenceTransferElement[] transfers = new PreferenceTransferElement[preferenceTransfers
 				.size()];
-		Collections.sort(preferenceTransfers, (o1, o2) -> {
-			String name1 = ((PreferenceTransferElement) o1).getName();
-			String name2 = ((PreferenceTransferElement) o2).getName();
+		Collections.sort(preferenceTransfers, new Comparator() {
+			@Override
+			public int compare(Object o1, Object o2) {
+				String name1 = ((PreferenceTransferElement) o1).getName();
+				String name2 = ((PreferenceTransferElement) o2).getName();
 
-			return Collator.getInstance().compare(name1, name2);
+				return Collator.getInstance().compare(name1, name2);
+			}
 		});
 		preferenceTransfers.toArray(transfers);
 		return transfers;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.registry.RegistryReader#readElement(org.eclipse.core.runtime.IConfigurationElement)
+	 */
 	@Override
 	protected boolean readElement(IConfigurationElement element) {
 		if (element.getName().equals(IWorkbenchRegistryConstants.TAG_TRANSFER)) {
@@ -149,24 +158,29 @@ public class PreferenceTransferRegistryReader extends RegistryReader {
 	 *         <code>null</code> for all nodes
 	 */
 	public static Map getEntry(IConfigurationElement element) {
-		IConfigurationElement[] entries = element.getChildren(IWorkbenchRegistryConstants.TAG_ENTRY);
+		IConfigurationElement[] entries = element
+				.getChildren(IWorkbenchRegistryConstants.TAG_ENTRY);
 		if (entries.length == 0) {
 			return null;
 		}
 		Map map = new HashMap(entries.length);
-		for (IConfigurationElement entry : entries) {
-			IConfigurationElement[] keys = entry.getChildren(IWorkbenchRegistryConstants.ATT_KEY);
+		for (int i = 0; i < entries.length; i++) {
+			IConfigurationElement entry = entries[i];
+			IConfigurationElement[] keys = entry
+					.getChildren(IWorkbenchRegistryConstants.ATT_KEY);
 			PreferenceFilterEntry[] prefFilters = null;
 			if (keys.length > 0) {
 				prefFilters = new PreferenceFilterEntry[keys.length];
 				for (int j = 0; j < keys.length; j++) {
 					IConfigurationElement keyElement = keys[j];
-					prefFilters[j] = new PreferenceFilterEntry(
-							keyElement.getAttribute(IWorkbenchRegistryConstants.ATT_NAME),
-							keyElement.getAttribute(IWorkbenchRegistryConstants.ATT_MATCH_TYPE));
+					prefFilters[j] = new PreferenceFilterEntry(keyElement
+									.getAttribute(IWorkbenchRegistryConstants.ATT_NAME),
+							keyElement
+									.getAttribute(IWorkbenchRegistryConstants.ATT_MATCH_TYPE));
 				}
 			}
-			map.put(entry.getAttribute(IWorkbenchRegistryConstants.ATT_NODE), prefFilters);
+			map.put(entry.getAttribute(IWorkbenchRegistryConstants.ATT_NODE),
+					prefFilters);
 		}
 		return map;
 	}

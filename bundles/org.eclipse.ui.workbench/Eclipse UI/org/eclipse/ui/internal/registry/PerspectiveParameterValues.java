@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,7 +31,8 @@ public final class PerspectiveParameterValues implements IParameterValues {
 
 		final IPerspectiveDescriptor[] perspectives = PlatformUI.getWorkbench()
 				.getPerspectiveRegistry().getPerspectives();
-		for (final IPerspectiveDescriptor perspective : perspectives) {
+		for (int i = 0; i < perspectives.length; i++) {
+			final IPerspectiveDescriptor perspective = perspectives[i];
 			values.put(perspective.getLabel(), perspective.getId());
 		}
 

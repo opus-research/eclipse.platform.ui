@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,7 +23,7 @@ public class CSSValueListImpl extends AbstractCSSNode implements CSSValueList {
 	List<CSSValue> values;
 
 	public CSSValueListImpl(LexicalUnit parsePropertyValue) {
-		values = new ArrayList<>();
+		values = new ArrayList<CSSValue>();
 
 		LexicalUnit unit = parsePropertyValue;
 		while(unit != null) {
@@ -32,16 +32,28 @@ public class CSSValueListImpl extends AbstractCSSNode implements CSSValueList {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSValueList#getLength()
+	 */
 	@Override
 	public int getLength() {
 		return values.size();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSValueList#item(int)
+	 */
 	@Override
 	public CSSValue item(int index) {
 		return values.get(index);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSValue#getCssText()
+	 */
 	@Override
 	public String getCssText() {
 		StringBuilder buffer = new StringBuilder();
@@ -52,23 +64,23 @@ public class CSSValueListImpl extends AbstractCSSNode implements CSSValueList {
 		return buffer.toString().trim();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSValue#getCssValueType()
+	 */
 	@Override
 	public short getCssValueType() {
 		return CSS_VALUE_LIST;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSValue#setCssText(java.lang.String)
+	 */
 	@Override
 	public void setCssText(String arg0) throws DOMException {
+		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		for (CSSValue cssValue : values) {
-			sb.append(cssValue.getCssText() + "\n");
-		}
-		return sb.toString();
 	}
 
 }

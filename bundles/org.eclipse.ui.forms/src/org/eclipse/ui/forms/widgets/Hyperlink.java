@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,19 +11,11 @@
 package org.eclipse.ui.forms.widgets;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.accessibility.ACC;
-import org.eclipse.swt.accessibility.Accessible;
-import org.eclipse.swt.accessibility.AccessibleAdapter;
-import org.eclipse.swt.accessibility.AccessibleControlAdapter;
-import org.eclipse.swt.accessibility.AccessibleControlEvent;
-import org.eclipse.swt.accessibility.AccessibleEvent;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.accessibility.*;
+import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.FormColors;
-import org.eclipse.ui.internal.forms.widgets.FormUtil;
+import org.eclipse.ui.internal.forms.widgets.*;
 
 /**
  * Hyperlink is a concrete implementation of the abstract base class that draws
@@ -68,27 +60,23 @@ public class Hyperlink extends AbstractHyperlink {
 	protected void initAccessible() {
 		Accessible accessible = getAccessible();
 		accessible.addAccessibleListener(new AccessibleAdapter() {
-			@Override
 			public void getName(AccessibleEvent e) {
 				e.result = getText();
 				if (e.result == null)
 					getHelp(e);
 			}
 
-			@Override
 			public void getHelp(AccessibleEvent e) {
 				e.result = getToolTipText();
 			}
 		});
 		accessible.addAccessibleControlListener(new AccessibleControlAdapter() {
-			@Override
 			public void getChildAtPoint(AccessibleControlEvent e) {
 				Point pt = toControl(new Point(e.x, e.y));
 				e.childID = (getBounds().contains(pt)) ? ACC.CHILDID_SELF
 						: ACC.CHILDID_NONE;
 			}
 
-			@Override
 			public void getLocation(AccessibleControlEvent e) {
 				Rectangle location = getBounds();
 				Point pt = toDisplay(new Point(location.x, location.y));
@@ -98,22 +86,18 @@ public class Hyperlink extends AbstractHyperlink {
 				e.height = location.height;
 			}
 
-			@Override
 			public void getChildCount(AccessibleControlEvent e) {
 				e.detail = 0;
 			}
 
-			@Override
 			public void getRole(AccessibleControlEvent e) {
 				e.detail = ACC.ROLE_LINK;
 			}
 
-			@Override
 			public void getDefaultAction (AccessibleControlEvent e) {
 				e.result = SWT.getMessage ("SWT_Press"); //$NON-NLS-1$
 			}
 
-			@Override
 			public void getState(AccessibleControlEvent e) {
 				int state = ACC.STATE_NORMAL;
 				if (Hyperlink.this.getSelection())
@@ -149,32 +133,15 @@ public class Hyperlink extends AbstractHyperlink {
 	/**
 	 * Overrides the parent by incorporating the margin.
 	 */
-	@Override
 	public Point computeSize(int wHint, int hHint, boolean changed) {
 		checkWidget();
 		int innerWidth = wHint;
-		if (innerWidth != SWT.DEFAULT) {
+		if (innerWidth != SWT.DEFAULT)
 			innerWidth -= marginWidth * 2;
-			if (innerWidth < 0)
-				innerWidth = 0;
-		}
-		int innerHeight = hHint;
-		if (innerHeight != SWT.DEFAULT) {
-			innerHeight -= marginHeight * 2;
-			if (innerHeight < 0)
-				innerHeight = 0;
-		}
-		Point textSize = computeTextSize(innerWidth, innerHeight);
+		Point textSize = computeTextSize(innerWidth, hHint);
 		int textWidth = textSize.x + 2 * marginWidth;
 		int textHeight = textSize.y + 2 * marginHeight;
-		if (wHint != SWT.DEFAULT) {
-			textWidth = wHint;
-		}
-		if (hHint != SWT.DEFAULT) {
-			textHeight = hHint;
-		}
-		Rectangle trim = computeTrim(0, 0, textWidth, textHeight);
-		return new Point(trim.width, trim.height);
+		return new Point(textWidth, textHeight);
 	}
 
 	/**
@@ -182,18 +149,21 @@ public class Hyperlink extends AbstractHyperlink {
 	 *
 	 * @return hyperlink text
 	 */
-	@Override
 	public String getText() {
 		return text;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.widgets.Control#getToolTipText()
+	 */
 	public String getToolTipText () {
 		checkWidget();
 		return appToolTipText;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.widgets.Control#setToolTipText(java.lang.String)
+	 */
 	public void setToolTipText (String string) {
 		super.setToolTipText (string);
 		appToolTipText = super.getToolTipText();
@@ -219,7 +189,6 @@ public class Hyperlink extends AbstractHyperlink {
 	 * @param gc
 	 *            graphic context
 	 */
-	@Override
 	protected void paintHyperlink(GC gc) {
 		Rectangle carea = getClientArea();
 		Rectangle bounds = new Rectangle(marginWidth, marginHeight, carea.width

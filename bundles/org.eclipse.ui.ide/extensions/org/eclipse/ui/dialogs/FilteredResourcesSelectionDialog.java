@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,8 +21,6 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
@@ -41,8 +39,9 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -50,15 +49,12 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMemento;
@@ -152,7 +148,6 @@ public class FilteredResourcesSelectionDialog extends
 		setSelectionHistory(new ResourceSelectionHistory());
 
 		setTitle(IDEWorkbenchMessages.OpenResourceDialog_title);
-		setMessage(IDEWorkbenchMessages.OpenResourceDialog_message);
 
 		/*
 		 * Allow location of paths relative to a searchContainer, which is
@@ -299,41 +294,44 @@ public class FilteredResourcesSelectionDialog extends
 		menuManager.add(this.groupResourcesByLocationAction);
 
 		workingSetFilterActionGroup = new WorkingSetFilterActionGroup(
-				getShell(), event -> {
-					String property = event.getProperty();
+				getShell(), new IPropertyChangeListener() {
+					@Override
+					public void propertyChange(PropertyChangeEvent event) {
+						String property = event.getProperty();
 
-					if (WorkingSetFilterActionGroup.CHANGE_WORKING_SET
-							.equals(property)) {
+						if (WorkingSetFilterActionGroup.CHANGE_WORKING_SET
+								.equals(property)) {
 
-						IWorkingSet workingSet = (IWorkingSet) event
-								.getNewValue();
+							IWorkingSet workingSet = (IWorkingSet) event
+									.getNewValue();
 
-						if (workingSet != null
-								&& !(workingSet.isAggregateWorkingSet() && workingSet
-										.isEmpty())) {
-							workingSetFilter.setWorkingSet(workingSet);
-							setSubtitle(workingSet.getLabel());
-						} else {
-							IWorkbenchWindow window = PlatformUI
-									.getWorkbench()
-									.getActiveWorkbenchWindow();
+							if (workingSet != null
+									&& !(workingSet.isAggregateWorkingSet() && workingSet
+											.isEmpty())) {
+								workingSetFilter.setWorkingSet(workingSet);
+								setSubtitle(workingSet.getLabel());
+							} else {
+								IWorkbenchWindow window = PlatformUI
+										.getWorkbench()
+										.getActiveWorkbenchWindow();
 
-							if (window != null) {
-								IWorkbenchPage page = window
-										.getActivePage();
-								workingSet = page.getAggregateWorkingSet();
+								if (window != null) {
+									IWorkbenchPage page = window
+											.getActivePage();
+									workingSet = page.getAggregateWorkingSet();
 
-								if (workingSet.isAggregateWorkingSet()
-										&& workingSet.isEmpty()) {
-									workingSet = null;
+									if (workingSet.isAggregateWorkingSet()
+											&& workingSet.isEmpty()) {
+										workingSet = null;
+									}
 								}
+
+								workingSetFilter.setWorkingSet(workingSet);
+								setSubtitle(null);
 							}
 
-							workingSetFilter.setWorkingSet(workingSet);
-							setSubtitle(null);
+							scheduleRefresh();
 						}
-
-						scheduleRefresh();
 					}
 				});
 
@@ -355,9 +353,9 @@ public class FilteredResourcesSelectionDialog extends
 
 		List resultToReturn = new ArrayList();
 
-		for (Object element : result) {
-			if (element instanceof IResource) {
-				resultToReturn.add((element));
+		for (int i = 0; i < result.length; i++) {
+			if (result[i] instanceof IResource) {
+				resultToReturn.add((result[i]));
 			}
 		}
 
@@ -415,54 +413,58 @@ public class FilteredResourcesSelectionDialog extends
 
 	@Override
 	protected Comparator getItemsComparator() {
-		return (o1, o2) -> {
-			Collator collator = Collator.getInstance();
-			IResource resource1 = (IResource) o1;
-			IResource resource2 = (IResource) o2;
-			String s1 = resource1.getName();
-			String s2 = resource2.getName();
+		return new Comparator() {
 
-			// Compare names without extension first
-			int s1Dot = s1.lastIndexOf('.');
-			int s2Dot = s2.lastIndexOf('.');
-			String n1 = s1Dot == -1 ? s1 : s1.substring(0, s1Dot);
-			String n2 = s2Dot == -1 ? s2 : s2.substring(0, s2Dot);
-			int comparability = collator.compare(n1, n2);
-			if (comparability != 0)
+			@Override
+			public int compare(Object o1, Object o2) {
+				Collator collator = Collator.getInstance();
+				IResource resource1 = (IResource) o1;
+				IResource resource2 = (IResource) o2;
+				String s1 = resource1.getName();
+				String s2 = resource2.getName();
+
+				// Compare names without extension first
+				int s1Dot = s1.lastIndexOf('.');
+				int s2Dot = s2.lastIndexOf('.');
+				String n1 = s1Dot == -1 ? s1 : s1.substring(0, s1Dot);
+				String n2 = s2Dot == -1 ? s2 : s2.substring(0, s2Dot);
+				int comparability = collator.compare(n1, n2);
+				if (comparability != 0)
+					return comparability;
+
+				// Compare full names
+				if (s1Dot != -1 || s2Dot != -1) {
+					comparability = collator.compare(s1, s2);
+					if (comparability != 0)
+						return comparability;
+				}
+
+				// Search for resource relative paths
+				if (searchContainer != null) {
+					IContainer c1 = resource1.getParent();
+					IContainer c2 = resource2.getParent();
+
+					// Return paths 'closer' to the searchContainer first
+					comparability = pathDistance(c1) - pathDistance(c2);
+					if (comparability != 0)
+						return comparability;
+				}
+
+				// Finally compare full path segments
+				IPath p1 = resource1.getFullPath();
+				IPath p2 = resource2.getFullPath();
+				// Don't compare file names again, so subtract 1
+				int c1 = p1.segmentCount() - 1;
+				int c2 = p2.segmentCount() - 1;
+				for (int i= 0; i < c1 && i < c2; i++) {
+					comparability = collator.compare(p1.segment(i), p2.segment(i));
+					if (comparability != 0)
+						return comparability;
+				}
+				comparability = c1 - c2;
+
 				return comparability;
-
-			// Compare full names
-			if (s1Dot != -1 || s2Dot != -1) {
-				comparability = collator.compare(s1, s2);
-				if (comparability != 0)
-					return comparability;
 			}
-
-			// Search for resource relative paths
-			if (searchContainer != null) {
-				IContainer c11 = resource1.getParent();
-				IContainer c21 = resource2.getParent();
-
-				// Return paths 'closer' to the searchContainer first
-				comparability = pathDistance(c11) - pathDistance(c21);
-				if (comparability != 0)
-					return comparability;
-			}
-
-			// Finally compare full path segments
-			IPath p1 = resource1.getFullPath();
-			IPath p2 = resource2.getFullPath();
-			// Don't compare file names again, so subtract 1
-			int c12 = p1.segmentCount() - 1;
-			int c22 = p2.segmentCount() - 1;
-			for (int i= 0; i < c12 && i < c22; i++) {
-				comparability = collator.compare(p1.segment(i), p2.segment(i));
-				if (comparability != 0)
-					return comparability;
-			}
-			comparability = c12 - c22;
-
-			return comparability;
 		};
 	}
 
@@ -523,7 +525,8 @@ public class FilteredResourcesSelectionDialog extends
 					progressMonitor);
 
 			if (visitor.visit(container.createProxy())) {
-				for (IResource member : members) {
+				for (int i= 0; i < members.length; i++) {
+					IResource member = members[i];
 					if (member.isAccessible())
 						member.accept(visitor, IResource.NONE);
 					progressMonitor.worked(1);
@@ -635,28 +638,14 @@ public class FilteredResourcesSelectionDialog extends
 			}
 
 			IResource res = (IResource) element;
-			StyledString str = new StyledString(res.getName().trim());
 
-			String searchFieldString = ((Text) getPatternControl()).getText();
-			searchFieldString = searchFieldString.replaceAll("\\*", ""); //$NON-NLS-1$//$NON-NLS-2$
-			searchFieldString = searchFieldString.replaceAll("\\?", ""); //$NON-NLS-1$//$NON-NLS-2$
-			Pattern p = Pattern.compile(searchFieldString, Pattern.CASE_INSENSITIVE); // $NON-NLS-1$
-			Matcher m = p.matcher(str);
-			if (m.find()) {
-				str.setStyle(m.start(), m.end() - m.start(), new Styler() {
-					@Override
-					public void applyStyles(TextStyle textStyle) {
-						textStyle.font = JFaceResources.getFontRegistry().getBold(JFaceResources.DEFAULT_FONT);
-					}
-				});
-			}
+			StyledString str = new StyledString(res.getName());
 
 			// extra info for duplicates
 			if (isDuplicateElement(element)) {
 				str.append(" - ", StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
 				str.append(res.getParent().getFullPath().makeRelative().toString(), StyledString.QUALIFIER_STYLER);
 			}
-
 
 //Debugging:
 //			int pathDistance = pathDistance(res.getParent());
@@ -1076,7 +1065,7 @@ public class FilteredResourcesSelectionDialog extends
 			if (!this.enabled) {
 				return elements;
 			}
-			Map<IPath, IResource> bestResourceForPath = new LinkedHashMap<>();
+			Map<IPath, IResource> bestResourceForPath = new LinkedHashMap<IPath, IResource>();
 			for (Object item : elements) {
 				if (item instanceof IResource) {
 					IResource currentResource = (IResource) item;

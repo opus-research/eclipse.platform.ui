@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,7 +37,8 @@ public class BindingTable {
 			return 0;
 		}
 		if (!schemeId2.equals(schemeId1)) {
-			for (final String schemePointer : activeSchemeIds) {
+			for (int i = 0; i < activeSchemeIds.length; i++) {
+				final String schemePointer = activeSchemeIds[i];
 				if (schemeId2.equals(schemePointer)) {
 					return 1;
 				} else if (schemeId1.equals(schemePointer)) {
@@ -92,7 +93,8 @@ public class BindingTable {
 
 		private final int countStrokes(final Trigger[] triggers) {
 			int strokeCount = triggers.length;
-			for (final Trigger trigger : triggers) {
+			for (int i = 0; i < triggers.length; i++) {
+				final Trigger trigger = triggers[i];
 				if (trigger instanceof KeyStroke) {
 					final KeyStroke keyStroke = (KeyStroke) trigger;
 					final int modifierKeys = keyStroke.getModifierKeys();
@@ -145,7 +147,8 @@ public class BindingTable {
 
 	public Collection<Binding> getConflicts() {
 		Collection<Binding> conflictsList = new ArrayList<Binding>();
-		for (ArrayList<Binding> conflictsForTrigger : conflicts.values()) {
+		for (TriggerSequence key : conflicts.keySet()) {
+			ArrayList<Binding> conflictsForTrigger = conflicts.get(key);
 			if (conflictsForTrigger != null) {
 				conflictsList.addAll(conflictsForTrigger);
 			}

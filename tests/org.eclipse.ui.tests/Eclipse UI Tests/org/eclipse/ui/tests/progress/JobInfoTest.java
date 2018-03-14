@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2017 IBM Corporation and others.
+ * Copyright (c) 2011, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,23 +8,19 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Martin W. Kirst <martin.kirst@s1998.tu-chemnitz.de> - jUnit test for Bug 361121 [Progress] DetailedProgressViewer's comparator violates its general contract
- *     Red Hat Inc. - Bug 474132
  ******************************************************************************/
 
 package org.eclipse.ui.tests.progress;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ui.internal.progress.JobInfo;
-import org.junit.Before;
-import org.junit.Test;
 
-public class JobInfoTest {
+public class JobInfoTest extends TestCase {
 
 
 	/**
@@ -44,10 +40,13 @@ public class JobInfoTest {
 	 */
 	static final int YIELDING = 0x40;
 
-	private List<JobInfo> jobinfos = new ArrayList<>();
+	private List jobinfos = new ArrayList();
 
-	@Before
-	public void setUp() throws Exception {
+	/**
+	 * @throws java.lang.Exception
+	 */
+	@Override
+	protected void setUp() throws Exception {
 		int counter = 0;
 		counter = createAndAddJobInfos(false, false, ABOUT_TO_RUN, counter);
 		counter = createAndAddJobInfos(false, true,  ABOUT_TO_RUN, counter);
@@ -80,13 +79,12 @@ public class JobInfoTest {
 	 * Test that {@link org.eclipse.ui.internal.progress.JobInfo#compareTo(Object)}
 	 * is valid implemented and complies to the interface method contract.
 	 */
-	@Test
 	public void testCompareToContractCompliance() {
 		for(int xi = 0; xi<this.jobinfos.size(); xi++) {
-			JobInfo x = jobinfos.get(xi);
+			JobInfo x = (JobInfo) jobinfos.get(xi);
 
 			for(int yi = 0; yi<this.jobinfos.size(); yi++) {
-				JobInfo y = jobinfos.get(yi);
+				JobInfo y = (JobInfo) jobinfos.get(yi);
 				int xyResult = x.compareTo(y);
 				int yxResult = y.compareTo(x);
 				// sgn(compare(x, y)) == -sgn(compare(y, x)) for all x and y.
@@ -94,7 +92,7 @@ public class JobInfoTest {
 						Math.round(Math.signum(xyResult)) , Math.round(-Math.signum(yxResult)));
 
 				for(int zi = 0; zi<this.jobinfos.size(); zi++) {
-					JobInfo z = jobinfos.get(zi);
+					JobInfo z = (JobInfo) jobinfos.get(zi);
 					int xzResult = x.compareTo(z);
 					int yzResult = y.compareTo(z);
 					// ((compare(x, y)>0) && (compare(y, z)>0)) implies compare(x, z)>0.

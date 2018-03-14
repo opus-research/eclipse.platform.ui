@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -76,8 +76,10 @@ public final class PropertyListenerList {
             Collection result = Collections.EMPTY_SET;
             HashSet union = null;
 
-            for (String property : propertyIds) {
-                List existingListeners = (List)listeners.get(property);
+            for (int i = 0; i < propertyIds.length; i++) {
+                String property = propertyIds[i];
+
+    	        List existingListeners = (List)listeners.get(property);
 
     	        if (existingListeners != null) {
     	            if (result == Collections.EMPTY_SET) {
@@ -136,7 +138,9 @@ public final class PropertyListenerList {
     }
 
     public void add(String[] propertyIds, IPropertyMapListener newListener) {
-        for (String id : propertyIds) {
+        for (int i = 0; i < propertyIds.length; i++) {
+            String id = propertyIds[i];
+
             addInternal(id, newListener);
         }
         newListener.listenerAttached();

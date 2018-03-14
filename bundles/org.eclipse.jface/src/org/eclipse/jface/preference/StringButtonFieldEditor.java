@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,11 +13,12 @@ package org.eclipse.jface.preference;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.resource.JFaceResources;
-
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -107,13 +108,21 @@ public abstract class StringButtonFieldEditor extends StringFieldEditor {
 			}
             changeButton.setText(changeButtonText);
             changeButton.setFont(parent.getFont());
-            changeButton.addSelectionListener(widgetSelectedAdapter(evt -> {
-			    String newValue = changePressed();
-			    if (newValue != null) {
-			        setStringValue(newValue);
-			    }
-			}));
-            changeButton.addDisposeListener(event -> changeButton = null);
+            changeButton.addSelectionListener(new SelectionAdapter() {
+                @Override
+				public void widgetSelected(SelectionEvent evt) {
+                    String newValue = changePressed();
+                    if (newValue != null) {
+                        setStringValue(newValue);
+                    }
+                }
+            });
+            changeButton.addDisposeListener(new DisposeListener() {
+                @Override
+				public void widgetDisposed(DisposeEvent event) {
+                    changeButton = null;
+                }
+            });
         } else {
             checkParent(changeButton, parent);
         }

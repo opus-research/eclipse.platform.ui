@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -94,12 +94,13 @@ public abstract class MenuItemImpl extends ItemImpl implements MMenuItem {
 
 	/**
 	 * <!-- begin-user-doc -->
-	 * This class does not support this feature.
 	 * <!-- end-user-doc -->
-	 * @generated NOT
+	 * @generated
 	 */
 	public String getLocalizedMnemonics() {
-		return null;
+		// TODO: implement this method
+		// Ensure that you remove @generated or mark it @generated NOT
+		throw new UnsupportedOperationException();
 	}
 
 	/**

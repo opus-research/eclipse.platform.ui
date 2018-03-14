@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,8 +12,8 @@ package org.eclipse.jface.window;
 
 import java.util.ArrayList;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.util.Geometry;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -28,6 +28,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Monitor;
@@ -113,7 +114,7 @@ public abstract class Window implements IShellProvider {
 		 * Handle the exception.
 		 *
 		 * @param t
-		 *            The exception that occurred.
+		 *            The exception that occured.
 		 */
 		public void handleException(Throwable t);
 	}
@@ -149,29 +150,32 @@ public abstract class Window implements IShellProvider {
     /**
      * Object used to locate the default parent for modal shells
      */
-    private static IShellProvider defaultModalParent = () -> {
-	    Display d = Display.getCurrent();
+    private static IShellProvider defaultModalParent = new IShellProvider() {
+        @Override
+		public Shell getShell() {
+            Display d = Display.getCurrent();
 
-	    if (d == null) {
-	        return null;
-	    }
+            if (d == null) {
+                return null;
+            }
 
-	    Shell parent = d.getActiveShell();
+            Shell parent = d.getActiveShell();
 
-	    // Make sure we don't pick a parent that has a modal child (this can lock the app)
-	    if (parent == null) {
-	        // If this is a top-level window, then there must not be any open modal windows.
-	        parent = getModalChild(Display.getCurrent().getShells());
-	    } else {
-	        // If we picked a parent with a modal child, use the modal child instead
-	        Shell modalChild = getModalChild(parent.getShells());
-	        if (modalChild != null) {
-	            parent = modalChild;
-	        }
-	    }
+            // Make sure we don't pick a parent that has a modal child (this can lock the app)
+            if (parent == null) {
+                // If this is a top-level window, then there must not be any open modal windows.
+                parent = getModalChild(Display.getCurrent().getShells());
+            } else {
+                // If we picked a parent with a modal child, use the modal child instead
+                Shell modalChild = getModalChild(parent.getShells());
+                if (modalChild != null) {
+                    parent = modalChild;
+                }
+            }
 
-	    return parent;
-	};
+            return parent;
+        }
+    };
 
 	/**
 	 * Object that returns the parent shell.
@@ -353,7 +357,7 @@ public abstract class Window implements IShellProvider {
 		// The equivalent in the multi-image version seems to be to remove the
 		// disposed images from the array passed to the shell.
 		if (defaultImages != null && defaultImages.length > 0) {
-			ArrayList<Image> nonDisposedImages = new ArrayList<>(defaultImages.length);
+			ArrayList<Image> nonDisposedImages = new ArrayList<Image>(defaultImages.length);
 			for (int i = 0; i < defaultImages.length; ++i) {
 				if (defaultImages[i] != null && !defaultImages[i].isDisposed()) {
 					nonDisposedImages.add(defaultImages[i]);
@@ -438,7 +442,7 @@ public abstract class Window implements IShellProvider {
 	 * getLayout() to return null.
 	 *
 	 * <p>
-	 * It is common practice to create and return a single composite that
+	 * It is common practise to create and return a single composite that
 	 * contains the entire window contents.
 	 * </p>
 	 *
@@ -481,7 +485,12 @@ public abstract class Window implements IShellProvider {
 		//Create the shell
 		Shell newShell = new Shell(newParent, getShellStyle());
 
-		resizeListener = e -> resizeHasOccurred = true;
+		resizeListener = new Listener() {
+			@Override
+			public void handleEvent(Event e) {
+				resizeHasOccurred = true;
+			}
+		};
 
 		newShell.addListener(SWT.Resize, resizeListener);
 		newShell.setData(this);
@@ -687,8 +696,8 @@ public abstract class Window implements IShellProvider {
 	 * Returns the shell style bits.
 	 * <p>
 	 * The default value is <code>SWT.CLOSE|SWT.MIN|SWT.MAX|SWT.RESIZE</code>.
-	 * Subclasses should call <code>setShellStyle</code> to change this value,
-	 * rather than overriding this method.
+	 * Subclassers should call <code>setShellStyle</code> to change this
+	 * value, rather than overriding this method.
 	 * </p>
 	 *
 	 * @return the shell style bits
@@ -905,7 +914,7 @@ public abstract class Window implements IShellProvider {
 	 *            point to find (display coordinates)
 	 * @param toFind
 	 *            point to find (display coordinates)
-	 * @return the monitor closest to the given point
+	 * @return the montor closest to the given point
 	 */
 	private static Monitor getClosestMonitor(Display toSearch, Point toFind) {
 		int closest = Integer.MAX_VALUE;
@@ -913,7 +922,9 @@ public abstract class Window implements IShellProvider {
 		Monitor[] monitors = toSearch.getMonitors();
 		Monitor result = monitors[0];
 
-		for (Monitor current : monitors) {
+		for (int idx = 0; idx < monitors.length; idx++) {
+			Monitor current = monitors[idx];
+
 			Rectangle clientArea = current.getClientArea();
 
 			if (clientArea.contains(toFind)) {
@@ -1002,8 +1013,8 @@ public abstract class Window implements IShellProvider {
 
 		if (manager != null) {
 			Window[] windows = manager.getWindows();
-			for (Window window : windows) {
-				if (window == this) {
+			for (int i = 0; i < windows.length; i++) {
+				if (windows[i] == this) {
 					return;
 				}
 			}

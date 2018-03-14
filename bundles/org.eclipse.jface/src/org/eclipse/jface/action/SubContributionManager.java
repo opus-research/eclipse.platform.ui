@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,7 +30,7 @@ public abstract class SubContributionManager implements IContributionManager {
      * Maps each item in the manager to a wrapper.  The wrapper is used to
      * control the visibility of each item.
      */
-    private Map<IContributionItem, SubContributionItem> mapItemToWrapper = new HashMap<>();
+    private Map<IContributionItem, SubContributionItem> mapItemToWrapper = new HashMap<IContributionItem, SubContributionItem>();
 
     /**
      * The visibility of the manager,
@@ -267,8 +267,8 @@ public abstract class SubContributionManager implements IContributionManager {
     @Override
 	public void removeAll() {
     	Object[] array = mapItemToWrapper.keySet().toArray();
-    	for (Object element : array) {
-			IContributionItem item = (IContributionItem) element;
+    	for (int i = 0; i < array.length; i++) {
+			IContributionItem item = (IContributionItem) array[i];
 			remove(item);
 		}
         mapItemToWrapper.clear();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,6 +43,14 @@ public class CSSPropertyMarginSWTHandler extends
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.e4.ui.css.core.dom.properties.css2.AbstractCSSPropertyMarginHandler#applyCSSPropertyMargin(java.lang.Object, org.w3c.dom.css.CSSValue, java.lang.String, org.eclipse.e4.ui.css.core.engine.CSSEngine)
+	 * If single value then assigned to all four margins
+	 * If four values then assigned top/right/bottom/left
+	 * If three values then assigned top=v1, left=v2, right=v2, bottom=v3
+	 * If two values then assigned top/bottom=v1, left/right=v2
+	 */
 	@Override
 	public void applyCSSPropertyMargin(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
@@ -60,9 +68,8 @@ public class CSSPropertyMarginSWTHandler extends
 			CSSValueList valueList = (CSSValueList) value;
 			int length = valueList.getLength();
 
-			if(length < 2 || length > 4) {
+			if(length < 2 || length > 4)
 				throw new CSSException("Invalid margin property list length");
-			}
 
 			switch (length) {
 			case 4:
@@ -150,40 +157,33 @@ public class CSSPropertyMarginSWTHandler extends
 	}
 
 	private GridLayout getLayout(Control control) {
-		if (control == null) {
+		if (control == null)
 			return null;
-		}
 		Composite parent = control.getParent();
-		if (parent == null) {
+		if (parent == null)
 			return null;
-		}
-		if(parent.getData(CSSSWTConstants.MARGIN_WRAPPER_KEY) == null) {
+		if(parent.getData(CSSSWTConstants.MARGIN_WRAPPER_KEY) == null)
 			return null;
-		}
 
 		Layout layout = parent.getLayout();
-		if (layout == null || ! (layout instanceof GridLayout)) {
+		if (layout == null || ! (layout instanceof GridLayout))
 			return null;
-		}
 		return (GridLayout) layout;
 	}
 
 	private void setMargin(Object element, int side, CSSValue value, String pseudo) {
-		if(value.getCssValueType() != CSSValue.CSS_PRIMITIVE_VALUE) {
+		if(value.getCssValueType() != CSSValue.CSS_PRIMITIVE_VALUE)
 			return;
-		}
 		int pixelValue = (int) ((CSSPrimitiveValue) value).getFloatValue(CSSPrimitiveValue.CSS_PX);
 
 		Widget widget = SWTElementHelpers.getWidget(element);
 
-		if(! (widget instanceof Control)) {
+		if(! (widget instanceof Control))
 			return;
-		}
 
 		GridLayout layout = getLayout((Control) widget);
-		if(layout == null) {
+		if(layout == null)
 			return;
-		}
 		switch (side) {
 		case TOP:
 			layout.marginTop = pixelValue;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,9 +15,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+
 import org.eclipse.swt.dnd.ByteArrayTransfer;
 import org.eclipse.swt.dnd.TransferData;
-import org.eclipse.ui.internal.WorkbenchPlugin;
 
 /**
  * This class can be used to transfer an instance of <code>PluginTransferData</code>
@@ -95,7 +95,7 @@ public class PluginTransfer extends ByteArrayTransfer {
             dataOut.close();
             super.javaToNative(out.toByteArray(), transferData);
         } catch (IOException e) {
-			WorkbenchPlugin.log(e);
+            e.printStackTrace();
         }
     }
 
@@ -111,7 +111,7 @@ public class PluginTransfer extends ByteArrayTransfer {
             dataIn.readFully(pluginData);
             return new PluginTransferData(extensionName, pluginData);
         } catch (IOException e) {
-			WorkbenchPlugin.log(e);
+            e.printStackTrace();
         }
         //can't get here
         return null;

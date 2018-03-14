@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,15 +7,13 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Ralf M Petter<ralf.petter@gmail.com> - Bug 259846
- *     Karsten Thoms<karsten.thoms@itemis.de> - Bug 521493
  *******************************************************************************/
 package org.eclipse.ui.internal.forms.widgets;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.io.UnsupportedEncodingException;
 import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -40,15 +38,12 @@ public class FormTextModel {
 	 */
 	public class ParseErrorHandler implements ErrorHandler {
 
-		@Override
 		public void error(SAXParseException arg0) throws SAXException {
 		}
 
-		@Override
 		public void fatalError(SAXParseException arg0) throws SAXException {
 		}
 
-		@Override
 		public void warning(SAXParseException arg0) throws SAXException {
 		}
 	}
@@ -58,7 +53,7 @@ public class FormTextModel {
 
 	private boolean whitespaceNormalized = true;
 
-	private Vector<Paragraph> paragraphs;
+	private Vector paragraphs;
 
 	private IFocusSelectable[] selectableSegments;
 
@@ -86,16 +81,16 @@ public class FormTextModel {
 	public Paragraph[] getParagraphs() {
 		if (paragraphs == null)
 			return new Paragraph[0];
-		return paragraphs
+		return (Paragraph[]) paragraphs
 				.toArray(new Paragraph[paragraphs.size()]);
 	}
 
 	public String getAccessibleText() {
 		if (paragraphs == null)
 			return ""; //$NON-NLS-1$
-		StringBuilder sbuf = new StringBuilder();
+		StringBuffer sbuf = new StringBuffer();
 		for (int i = 0; i < paragraphs.size(); i++) {
-			Paragraph paragraph = paragraphs.get(i);
+			Paragraph paragraph = (Paragraph) paragraphs.get(i);
 			String text = paragraph.getAccessibleText();
 			sbuf.append(text);
 		}
@@ -110,9 +105,13 @@ public class FormTextModel {
 			reset();
 			return;
 		}
-		taggedText = taggedText.replace("&", "&amp;"); //$NON-NLS-1$//$NON-NLS-2$
-		InputStream stream = new ByteArrayInputStream(taggedText.getBytes(StandardCharsets.UTF_8));
-		parseInputStream(stream, expandURLs);
+		try {
+			InputStream stream = new ByteArrayInputStream(taggedText
+					.getBytes("UTF8")); //$NON-NLS-1$
+			parseInputStream(stream, expandURLs);
+		} catch (UnsupportedEncodingException e) {
+			SWT.error(SWT.ERROR_UNSUPPORTED_FORMAT, e);
+		}
 	}
 
 	public void parseInputStream(InputStream is, boolean expandURLs) {
@@ -143,7 +142,7 @@ public class FormTextModel {
 		processSubnodes(paragraphs, children, expandURLs);
 	}
 
-	private void processSubnodes(Vector<Paragraph> plist, NodeList children, boolean expandURLs) {
+	private void processSubnodes(Vector plist, NodeList children, boolean expandURLs) {
 		for (int i = 0; i < children.getLength(); i++) {
 			Node child = children.item(i);
 			if (child.getNodeType() == Node.TEXT_NODE) {
@@ -344,15 +343,15 @@ public class FormTextModel {
 		if (align != null) {
 			String value = align.getNodeValue().toLowerCase();
 			if (value.equals("top")) //$NON-NLS-1$
-				segment.setVerticalAlignment(ObjectSegment.TOP);
+				segment.setVerticalAlignment(ImageSegment.TOP);
 			else if (value.equals("middle")) //$NON-NLS-1$
-				segment.setVerticalAlignment(ObjectSegment.MIDDLE);
+				segment.setVerticalAlignment(ImageSegment.MIDDLE);
 			else if (value.equals("bottom")) //$NON-NLS-1$
-				segment.setVerticalAlignment(ObjectSegment.BOTTOM);
+				segment.setVerticalAlignment(ImageSegment.BOTTOM);
 		}
 	}
 
-	private void appendText(String value, StringBuilder buf, int[] spaceCounter) {
+	private void appendText(String value, StringBuffer buf, int[] spaceCounter) {
 		if (!whitespaceNormalized)
 			buf.append(value);
 		else {
@@ -379,7 +378,7 @@ public class FormTextModel {
 
 	private String getNormalizedText(String text) {
 		int[] spaceCounter = new int[1];
-		StringBuilder buf = new StringBuilder();
+		StringBuffer buf = new StringBuffer();
 
 		if (text == null)
 			return null;
@@ -388,20 +387,12 @@ public class FormTextModel {
 	}
 
 	private String getSingleNodeText(Node node) {
-		String text = getNormalizedText(node.getNodeValue());
-		if (!whitespaceNormalized)
-			return text;
-		if (text.length() > 0 && node.getPreviousSibling() == null && isIgnorableWhiteSpace(text.substring(0, 1), true))
-			return text.substring(1);
-		if (text.length() > 1 && node.getNextSibling() == null
-				&& isIgnorableWhiteSpace(text.substring(text.length() - 1), true))
-			return text.substring(0, text.length() - 1);
-		return text;
+		return getNormalizedText(node.getNodeValue());
 	}
 
 	private String getNodeText(Node node) {
 		NodeList children = node.getChildNodes();
-		StringBuilder buf = new StringBuilder();
+		StringBuffer buf = new StringBuffer();
 		int[] spaceCounter = new int[1];
 
 		for (int i = 0; i < children.getLength(); i++) {
@@ -411,10 +402,7 @@ public class FormTextModel {
 				appendText(value, buf, spaceCounter);
 			}
 		}
-		if (whitespaceNormalized) {
-			return buf.toString().trim();
-		}
-		return buf.toString();
+		return buf.toString().trim();
 	}
 
 	private ParagraphSegment processHyperlinkSegment(Node link,
@@ -589,7 +577,7 @@ public class FormTextModel {
 
 	private void reset() {
 		if (paragraphs == null)
-			paragraphs = new Vector<>();
+			paragraphs = new Vector();
 		paragraphs.clear();
 		selectedSegmentIndex = -1;
 		savedSelectedLinkIndex = -1;
@@ -599,16 +587,16 @@ public class FormTextModel {
 	IFocusSelectable[] getFocusSelectableSegments() {
 		if (selectableSegments != null || paragraphs == null)
 			return selectableSegments;
-		Vector<ParagraphSegment> result = new Vector<>();
+		Vector result = new Vector();
 		for (int i = 0; i < paragraphs.size(); i++) {
-			Paragraph p = paragraphs.get(i);
+			Paragraph p = (Paragraph) paragraphs.get(i);
 			ParagraphSegment[] segments = p.getSegments();
-			for (ParagraphSegment segment : segments) {
-				if (segment instanceof IFocusSelectable)
-					result.add(segment);
+			for (int j = 0; j < segments.length; j++) {
+				if (segments[j] instanceof IFocusSelectable)
+					result.add(segments[j]);
 			}
 		}
-		selectableSegments = result
+		selectableSegments = (IFocusSelectable[]) result
 				.toArray(new IFocusSelectable[result.size()]);
 		return selectableSegments;
 	}
@@ -625,7 +613,8 @@ public class FormTextModel {
 
 	public IHyperlinkSegment findHyperlinkAt(int x, int y) {
 		IFocusSelectable[] selectables = getFocusSelectableSegments();
-		for (IFocusSelectable segment : selectables) {
+		for (int i = 0; i < selectables.length; i++) {
+			IFocusSelectable segment = selectables[i];
 			if (segment instanceof IHyperlinkSegment) {
 				IHyperlinkSegment link = (IHyperlinkSegment)segment;
 				if (link.contains(x, y))
@@ -654,7 +643,7 @@ public class FormTextModel {
 
 	public ParagraphSegment findSegmentAt(int x, int y) {
 		for (int i = 0; i < paragraphs.size(); i++) {
-			Paragraph p = paragraphs.get(i);
+			Paragraph p = (Paragraph) paragraphs.get(i);
 			ParagraphSegment segment = p.findSegmentAt(x, y);
 			if (segment != null)
 				return segment;
@@ -664,7 +653,7 @@ public class FormTextModel {
 
 	public void clearCache(String fontId) {
 		for (int i = 0; i < paragraphs.size(); i++) {
-			Paragraph p = paragraphs.get(i);
+			Paragraph p = (Paragraph) paragraphs.get(i);
 			p.clearCache(fontId);
 		}
 	}
@@ -682,8 +671,8 @@ public class FormTextModel {
 	public boolean linkExists(IHyperlinkSegment link) {
 		if (selectableSegments==null)
 			return false;
-		for (IFocusSelectable selectableSegment : selectableSegments) {
-			if (selectableSegment==link)
+		for (int i=0; i<selectableSegments.length; i++) {
+			if (selectableSegments[i]==link)
 				return true;
 		}
 		return false;

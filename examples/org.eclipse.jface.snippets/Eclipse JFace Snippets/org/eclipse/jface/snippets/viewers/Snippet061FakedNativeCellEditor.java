@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 Tom Schindl and others.
+ * Copyright (c) 2006, 2014 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Florian Potschka <signalrauschen@gmail.com> - Bug 260061
  *     Alexander Ljungberg <siker@norwinter.com> - Bug 260061
  *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414565
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 475361
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -391,7 +390,7 @@ public class Snippet061FakedNativeCellEditor {
 
 	public class File {
 		public File parent;
-		public List<File> child = new ArrayList<>();
+		public List<File> child = new ArrayList<File>();
 		public int counter;
 
 		public boolean read;

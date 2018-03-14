@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,13 +12,9 @@ package org.eclipse.ui.forms.editor;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.ui.forms.ManagedForm;
+import org.eclipse.swt.widgets.*;
+import org.eclipse.ui.*;
+import org.eclipse.ui.forms.*;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.part.EditorPart;
 /**
@@ -48,11 +44,9 @@ public class FormPage extends EditorPart implements IFormPage {
 		public FormPage getPage() {
 			return (FormPage)getContainer();
 		}
-		@Override
 		public void dirtyStateChanged() {
 			getPage().getEditor().editorDirtyStateChanged();
 		}
-		@Override
 		public void staleStateChanged() {
 			if (getPage().isActive())
 				refresh();
@@ -90,7 +84,6 @@ public class FormPage extends EditorPart implements IFormPage {
 	 *
 	 * @see IEditorPart#init
 	 */
-	@Override
 	public void init(IEditorSite site, IEditorInput input) {
 		setSite(site);
 		setInput(input);
@@ -101,7 +94,6 @@ public class FormPage extends EditorPart implements IFormPage {
 	 * @param editor
 	 *            the parent editor
 	 */
-	@Override
 	public void initialize(FormEditor editor) {
 		this.editor = editor;
 	}
@@ -110,7 +102,6 @@ public class FormPage extends EditorPart implements IFormPage {
 	 *
 	 * @return parent editor instance
 	 */
-	@Override
 	public FormEditor getEditor() {
 		return editor;
 	}
@@ -119,7 +110,6 @@ public class FormPage extends EditorPart implements IFormPage {
 	 *
 	 * @return the managed form
 	 */
-	@Override
 	public IManagedForm getManagedForm() {
 		return mform;
 	}
@@ -127,7 +117,6 @@ public class FormPage extends EditorPart implements IFormPage {
 	 * Implements the required method by refreshing the form when set active.
 	 * Subclasses must call super when overriding this method.
 	 */
-	@Override
 	public void setActive(boolean active) {
 		if (active) {
 			// We are switching to this page - refresh it
@@ -143,7 +132,6 @@ public class FormPage extends EditorPart implements IFormPage {
 	 * @return <code>true</code> if the page is currently active,
 	 *         <code>false</code> otherwise.
 	 */
-	@Override
 	public boolean isActive() {
 		return this.equals(editor.getActivePageInstance());
 	}
@@ -156,11 +144,14 @@ public class FormPage extends EditorPart implements IFormPage {
 	 * @param parent
 	 *            the page parent composite
 	 */
-	@Override
 	public void createPartControl(Composite parent) {
 		ScrolledForm form = editor.getToolkit().createScrolledForm(parent);
 		mform = new PageForm(this, form);
-		BusyIndicator.showWhile(parent.getDisplay(), () -> createFormContent(mform));
+		BusyIndicator.showWhile(parent.getDisplay(), new Runnable() {
+			public void run() {
+				createFormContent(mform);
+			}
+		});
 	}
 	/**
 	 * Subclasses should override this method to create content in the form
@@ -176,14 +167,12 @@ public class FormPage extends EditorPart implements IFormPage {
 	 *
 	 * @return managed form's control
 	 */
-	@Override
 	public Control getPartControl() {
 		return mform != null ? mform.getForm() : null;
 	}
 	/**
 	 * Disposes the managed form.
 	 */
-	@Override
 	public void dispose() {
 		if (mform != null)
 			mform.dispose();
@@ -193,7 +182,6 @@ public class FormPage extends EditorPart implements IFormPage {
 	 *
 	 * @return the unique page identifier
 	 */
-	@Override
 	public String getId() {
 		return id;
 	}
@@ -203,14 +191,12 @@ public class FormPage extends EditorPart implements IFormPage {
 	 *
 	 * @return <code>null</code>
 	 */
-	@Override
 	public Image getTitleImage() {
 		return null;
 	}
 	/**
 	 * Sets the focus by delegating to the managed form.
 	 */
-	@Override
 	public void setFocus() {
 		if (mform != null)
 			mform.setFocus();
@@ -218,7 +204,6 @@ public class FormPage extends EditorPart implements IFormPage {
 	/**
 	 * @see org.eclipse.ui.ISaveablePart#doSave(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	@Override
 	public void doSave(IProgressMonitor monitor) {
 		if (mform != null)
 			mform.commit(true);
@@ -226,13 +211,11 @@ public class FormPage extends EditorPart implements IFormPage {
 	/**
 	 * @see org.eclipse.ui.ISaveablePart#doSaveAs()
 	 */
-	@Override
 	public void doSaveAs() {
 	}
 	/**
 	 * @see org.eclipse.ui.ISaveablePart#isSaveAsAllowed()
 	 */
-	@Override
 	public boolean isSaveAsAllowed() {
 		return false;
 	}
@@ -244,7 +227,6 @@ public class FormPage extends EditorPart implements IFormPage {
 	 *
 	 * @see org.eclipse.ui.ISaveablePart#isDirty()
 	 */
-	@Override
 	public boolean isDirty() {
 		return mform != null ? mform.isDirty() : false;
 	}
@@ -254,7 +236,6 @@ public class FormPage extends EditorPart implements IFormPage {
 	 * @param index
 	 *            the assigned page index
 	 */
-	@Override
 	public void setIndex(int index) {
 		this.index = index;
 	}
@@ -263,7 +244,6 @@ public class FormPage extends EditorPart implements IFormPage {
 	 *
 	 * @return the page index
 	 */
-	@Override
 	public int getIndex() {
 		return index;
 	}
@@ -272,7 +252,6 @@ public class FormPage extends EditorPart implements IFormPage {
 	 *
 	 * @return <code>false</code>
 	 */
-	@Override
 	public boolean isEditor() {
 		return false;
 	}
@@ -286,7 +265,6 @@ public class FormPage extends EditorPart implements IFormPage {
 	 *         and revealed by one of the managed form parts, <code>false</code>
 	 *         otherwise.
 	 */
-	@Override
 	public boolean selectReveal(Object object) {
 		if (mform != null)
 			return mform.setInput(object);
@@ -296,7 +274,6 @@ public class FormPage extends EditorPart implements IFormPage {
 	 * By default, editor will be allowed to flip the page.
 	 * @return <code>true</code>
 	 */
-	@Override
 	public boolean canLeaveThePage() {
 		return true;
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.commands.IElementUpdater;
@@ -198,11 +199,11 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 	}
 
 	public static void updateStaleCEs(IConfigurationElement[] replacements) {
-		for (IConfigurationElement replacement : replacements) {
+		for (int i = 0; i < replacements.length; i++) {
 			HandlerProxy proxy = (HandlerProxy) CEToProxyMap
-					.get(replacement);
+					.get(replacements[i]);
 			if (proxy != null)
-				proxy.configurationElement = replacement;
+				proxy.configurationElement = replacements[i];
 		}
 	}
 
@@ -245,13 +246,16 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 
 	private IPropertyChangeListener getEnablementListener() {
 		if (enablementListener == null) {
-			enablementListener = event -> {
-				if (event.getProperty() == PROP_ENABLED) {
-					setProxyEnabled(event.getNewValue() == null ? false
-							: ((Boolean) event.getNewValue())
-									.booleanValue());
-					fireHandlerChanged(new HandlerEvent(HandlerProxy.this,
-							true, false));
+			enablementListener = new IPropertyChangeListener() {
+				@Override
+				public void propertyChange(PropertyChangeEvent event) {
+					if (event.getProperty() == PROP_ENABLED) {
+						setProxyEnabled(event.getNewValue() == null ? false
+								: ((Boolean) event.getNewValue())
+										.booleanValue());
+						fireHandlerChanged(new HandlerEvent(HandlerProxy.this,
+								true, false));
+					}
 				}
 			};
 		}
@@ -380,9 +384,14 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 
 	private IHandlerListener getHandlerListener() {
 		if (handlerListener == null) {
-			handlerListener = handlerEvent -> fireHandlerChanged(new HandlerEvent(HandlerProxy.this,
-					handlerEvent.isEnabledChanged(), handlerEvent
-							.isHandledChanged()));
+			handlerListener = new IHandlerListener() {
+				@Override
+				public void handlerChanged(HandlerEvent handlerEvent) {
+					fireHandlerChanged(new HandlerEvent(HandlerProxy.this,
+							handlerEvent.isEnabledChanged(), handlerEvent
+									.isHandledChanged()));
+				}
+			};
 		}
 		return handlerListener;
 	}
@@ -412,8 +421,10 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 		String attribute = configurationElement
 				.getAttribute(handlerAttributeName);
 		if (attribute == null) {
-			for (IConfigurationElement configElement : configurationElement.getChildren(handlerAttributeName)) {
-				String childAttribute = configElement
+			IConfigurationElement[] children = configurationElement
+					.getChildren(handlerAttributeName);
+			for (int i = 0; i < children.length; i++) {
+				String childAttribute = children[i]
 						.getAttribute(IWorkbenchRegistryConstants.ATT_CLASS);
 				if (childAttribute != null) {
 					return childAttribute;
@@ -435,6 +446,12 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.commands.IElementUpdater#updateElement(org.eclipse.ui.menus.UIElement,
+	 *      java.util.Map)
+	 */
 	@Override
 	public void updateElement(UIElement element, Map parameters) {
 		if (checkedState != null) {
@@ -460,6 +477,9 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 		cs.refreshElements(commandId, null);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.commands.IStateListener#handleStateChange(org.eclipse.core.commands.State, java.lang.Object)
+	 */
 	@Override
 	public void handleStateChange(State state, Object oldValue) {
 		if (state.getId().equals(RegistryToggleState.STATE_ID)) {

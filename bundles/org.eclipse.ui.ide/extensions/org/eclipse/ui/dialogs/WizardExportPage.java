@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -147,6 +146,9 @@ public abstract class WizardExportPage extends WizardDataTransferPage {
         return false;
     }
 
+    /** (non-Javadoc)
+     * Method declared on IDialogPage.
+     */
     @Override
 	public void createControl(Composite parent) {
         Composite composite = new Composite(parent, SWT.NULL);
@@ -298,8 +300,8 @@ public abstract class WizardExportPage extends WizardDataTransferPage {
         if (selectedResourceCount == 1) {
 			resourceDetailsDescription.setText(IDEWorkbenchMessages.WizardExportPage_oneResourceSelected);
 		} else {
-			resourceDetailsDescription.setText(
-					NLS.bind(IDEWorkbenchMessages.WizardExportPage_resourceCountMessage, selectedResourceCount));
+			resourceDetailsDescription
+                    .setText(NLS.bind(IDEWorkbenchMessages.WizardExportPage_resourceCountMessage, new Integer(selectedResourceCount)));
 		}
     }
 
@@ -540,8 +542,9 @@ public abstract class WizardExportPage extends WizardDataTransferPage {
 
         if (newSelectedTypes != null) { // ie.- did not press Cancel
             List result = new ArrayList(newSelectedTypes.length);
-            for (Object newSelectedType : newSelectedTypes) {
-				result.add(((IFileEditorMapping) newSelectedType).getExtension());
+            for (int i = 0; i < newSelectedTypes.length; i++) {
+				result.add(((IFileEditorMapping) newSelectedTypes[i])
+                        .getExtension());
 			}
             setTypesToExport(result);
         }
@@ -692,8 +695,8 @@ public abstract class WizardExportPage extends WizardDataTransferPage {
                     if (selectedTypes.length > 0) {
 						typesToExportField.setText(selectedTypes[0]);
 					}
-                    for (String selectedType : selectedTypes) {
-						typesToExportField.add(selectedType);
+                    for (int i = 0; i < selectedTypes.length; i++) {
+						typesToExportField.add(selectedTypes[i]);
 					}
                 }
             }
@@ -747,16 +750,16 @@ public abstract class WizardExportPage extends WizardDataTransferPage {
         try {
             IResource[] members = resource.members();
 
-            for (IResource member : members) {
-                if (member.getType() == IResource.FILE) {
-                    IFile currentFile = (IFile) member;
+            for (int i = 0; i < members.length; i++) {
+                if (members[i].getType() == IResource.FILE) {
+                    IFile currentFile = (IFile) members[i];
                     if (hasExportableExtension(currentFile.getFullPath()
                             .toString())) {
 						selectedResources.add(currentFile);
 					}
                 }
-                if (member.getType() == IResource.FOLDER) {
-                    selectAppropriateFolderContents((IContainer) member);
+                if (members[i].getType() == IResource.FOLDER) {
+                    selectAppropriateFolderContents((IContainer) members[i]);
                 }
             }
         } catch (CoreException e) {
@@ -782,8 +785,8 @@ public abstract class WizardExportPage extends WizardDataTransferPage {
             selectedResources = new ArrayList();
             if (resource instanceof IWorkspaceRoot) {
                 IProject[] projects = ((IWorkspaceRoot) resource).getProjects();
-                for (IProject project : projects) {
-                    selectAppropriateFolderContents(project);
+                for (int i = 0; i < projects.length; i++) {
+                    selectAppropriateFolderContents(projects[i]);
                 }
             } else if (resource instanceof IFile) {
                 IFile file = (IFile) resource;
@@ -856,7 +859,7 @@ public abstract class WizardExportPage extends WizardDataTransferPage {
      *   export" field with (element type: <code>String</code>)
      */
     protected void setTypesToExport(List typeStrings) {
-        StringBuilder result = new StringBuilder();
+        StringBuffer result = new StringBuffer();
         Iterator typesEnum = typeStrings.iterator();
 
         while (typesEnum.hasNext()) {

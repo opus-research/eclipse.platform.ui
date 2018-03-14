@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Tom Schindl - bug 151205, 170381
- *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 481490
  *******************************************************************************/
 package org.eclipse.jface.tests.viewers;
 
@@ -22,6 +21,8 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
@@ -30,7 +31,7 @@ import org.eclipse.swt.widgets.TableItem;
  */
 public class VirtualTableViewerTest extends TableViewerTest {
 
-	Set<TableItem> visibleItems = new HashSet<>();
+	Set visibleItems = new HashSet();
 
 	/**
 	 * Checks if the virtual tree / table functionality can be tested in the current settings.
@@ -64,14 +65,17 @@ public class VirtualTableViewerTest extends TableViewerTest {
 
 	@Override
 	protected TableViewer createTableViewer(Composite parent) {
-		visibleItems = new HashSet<>();
+		visibleItems = new HashSet();
 		TableViewer viewer = new TableViewer(parent, SWT.VIRTUAL | SWT.MULTI);
 		viewer.setUseHashlookup(true);
 		final Table table = viewer.getTable();
-		table.addListener(SWT.SetData, event -> {
-			setDataCalled = true;
-			TableItem item = (TableItem) event.item;
-			visibleItems.add(item);
+		table.addListener(SWT.SetData, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				setDataCalled = true;
+				TableItem item = (TableItem) event.item;
+				visibleItems.add(item);
+			}
 		});
 		return viewer;
 	}
@@ -97,7 +101,7 @@ public class VirtualTableViewerTest extends TableViewerTest {
 	 * @return TableItem[]
 	 */
 	private TableItem[] getVisibleItems() {
-		return visibleItems.toArray(new TableItem[visibleItems.size()]);
+		return (TableItem[]) visibleItems.toArray(new TableItem[visibleItems.size()]);
 	}
 
 	public void testElementsCreated() {
@@ -119,14 +123,14 @@ public class VirtualTableViewerTest extends TableViewerTest {
 	@Override
 	public void testFilter() {
 		ViewerFilter filter = new TestLabelFilter();
-		visibleItems = new HashSet<>();
+		visibleItems = new HashSet();
 		fViewer.addFilter(filter);
 		if (!updateTable()) {
 			return;
 		}
 		assertEquals("filtered count", 5, getItemCount());
 
-		visibleItems = new HashSet<>();
+		visibleItems = new HashSet();
 		fViewer.removeFilter(filter);
 		if (!updateTable()) {
 			return;
@@ -137,22 +141,22 @@ public class VirtualTableViewerTest extends TableViewerTest {
 	@Override
 	public void testSetFilters() {
 		ViewerFilter filter = new TestLabelFilter();
-		visibleItems = new HashSet<>();
-		fViewer.setFilters(filter, new TestLabelFilter2());
+		visibleItems = new HashSet();
+		fViewer.setFilters(new ViewerFilter[] { filter, new TestLabelFilter2() });
 		if (!updateTable()) {
 			return;
 		}
 		assertEquals("2 filters count",1, getItemCount());
 
-		visibleItems = new HashSet<>();
-		fViewer.setFilters(filter);
+		visibleItems = new HashSet();
+		fViewer.setFilters(new ViewerFilter[] { filter });
 		if (!updateTable()) {
 			return;
 		}
 		assertEquals("1 filtered count",5, getItemCount());
 
-		visibleItems = new HashSet<>();
-		fViewer.setFilters();
+		visibleItems = new HashSet();
+		fViewer.setFilters(new ViewerFilter[0]);
 		if (!updateTable()) {
 			return;
 		}
@@ -304,12 +308,13 @@ public class VirtualTableViewerTest extends TableViewerTest {
 		TestElement[] children = fRootElement.getChildren();
 		StructuredSelection selection = new StructuredSelection(children);
 		fViewer.setSelection(selection);
-		IStructuredSelection result = fViewer.getStructuredSelection();
+		IStructuredSelection result = (IStructuredSelection) fViewer
+				.getSelection();
 		assertTrue("Size was " + String.valueOf(result.size()) + " expected "
 				+ String.valueOf(children.length),
 				(result.size() == children.length));
-		Set<TestElement> childrenSet = new HashSet<>(Arrays.asList(children));
-		Set<?> selectedSet = new HashSet<Object>(result.toList());
+		Set childrenSet = new HashSet(Arrays.asList(children));
+		Set selectedSet = new HashSet(result.toList());
 		assertTrue("Elements do not match ", childrenSet.equals(selectedSet));
 	}
 }

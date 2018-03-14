@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -412,7 +412,7 @@ import java.util.NoSuchElementException;
 			return "{}"; //$NON-NLS-1$
 		}
 
-        StringBuilder buffer = new StringBuilder();
+        StringBuffer buffer = new StringBuffer();
         buffer.append('{');
         for (int i = elementData.length; --i >= 0;) {
             HashMapEntry entry = elementData[i];

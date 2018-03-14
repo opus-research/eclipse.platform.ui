@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -324,7 +324,9 @@ public abstract class ResourceManager {
         RuntimeException foundException = null;
 
         Runnable[] execs = disposeExecs.toArray(new Runnable[disposeExecs.size()]);
-        for (Runnable exec : execs) {
+        for (int i = 0; i < execs.length; i++) {
+            Runnable exec = execs[i];
+
             try {
                 exec.run();
             } catch (RuntimeException e) {
@@ -362,7 +364,7 @@ public abstract class ResourceManager {
         Assert.isNotNull(r);
 
         if (disposeExecs == null) {
-            disposeExecs = new ArrayList<>();
+            disposeExecs = new ArrayList<Runnable>();
         }
 
         disposeExecs.add(r);

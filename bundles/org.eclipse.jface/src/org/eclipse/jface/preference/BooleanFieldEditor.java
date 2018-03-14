@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,9 +10,11 @@
  *******************************************************************************/
 package org.eclipse.jface.preference;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -185,12 +187,20 @@ public class BooleanFieldEditor extends FieldEditor {
 		if (checkBox == null) {
 			checkBox = new Button(parent, SWT.CHECK | SWT.LEFT);
 			checkBox.setFont(parent.getFont());
-			checkBox.addSelectionListener(widgetSelectedAdapter(e -> {
-				boolean isSelected = checkBox.getSelection();
-				valueChanged(wasSelected, isSelected);
-				wasSelected = isSelected;
-			}));
-			checkBox.addDisposeListener(event -> checkBox = null);
+			checkBox.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					boolean isSelected = checkBox.getSelection();
+					valueChanged(wasSelected, isSelected);
+					wasSelected = isSelected;
+				}
+			});
+			checkBox.addDisposeListener(new DisposeListener() {
+				@Override
+				public void widgetDisposed(DisposeEvent event) {
+					checkBox = null;
+				}
+			});
 		} else {
 			checkParent(checkBox, parent);
 		}

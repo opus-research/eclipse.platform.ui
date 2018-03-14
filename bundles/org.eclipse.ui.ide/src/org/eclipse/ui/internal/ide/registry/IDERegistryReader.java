@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,13 +40,16 @@ public abstract class IDERegistryReader {
 
     protected static Hashtable extensionPoints = new Hashtable();
 
-    private static final Comparator comparer = (arg0, arg1) -> {
-		IExtension i1 = (IExtension) arg0;
-		String s1 = i1.getNamespace();
-		IExtension i2 = (IExtension) arg1;
-		String s2 = i2.getNamespace();
-		return s1.compareToIgnoreCase(s2);
-	};
+    private static final Comparator comparer = new Comparator() {
+        @Override
+		public int compare(Object arg0, Object arg1) {
+			IExtension i1 = (IExtension) arg0;
+			String s1 = i1.getNamespace();
+			IExtension i2 = (IExtension) arg1;
+			String s2 = i2.getNamespace();
+			return s1.compareToIgnoreCase(s2);
+		}
+    };
 
     /**
      * The constructor.
@@ -75,7 +78,7 @@ public abstract class IDERegistryReader {
     protected void logError(IConfigurationElement element, String text) {
 		IExtension extension = element.getDeclaringExtension();
 		String pluginId = extension.getNamespace();
-		StringBuilder buf = new StringBuilder();
+		StringBuffer buf = new StringBuffer();
 		buf.append("Plugin " + pluginId + ", extension " //$NON-NLS-2$//$NON-NLS-1$
 				+ extension.getExtensionPointUniqueIdentifier());
 		buf.append("\n" + text);//$NON-NLS-1$
@@ -183,8 +186,8 @@ public abstract class IDERegistryReader {
             extensions = orderExtensions(extensions);
             extensionPoints.put(pointId, extensions);
         }
-        for (IExtension extension : extensions) {
-			readExtension(extension);
+        for (int i = 0; i < extensions.length; i++) {
+			readExtension(extensions[i]);
 		}
     }
 }

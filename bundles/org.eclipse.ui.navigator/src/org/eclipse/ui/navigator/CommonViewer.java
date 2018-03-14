@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2016 IBM Corporation and others.
+ * Copyright (c) 2003, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,7 +38,6 @@ import org.eclipse.ui.internal.navigator.NavigatorContentService;
 import org.eclipse.ui.internal.navigator.NavigatorDecoratingLabelProvider;
 import org.eclipse.ui.internal.navigator.NavigatorPipelineService;
 import org.eclipse.ui.internal.navigator.dnd.NavigatorDnDService;
-import org.eclipse.ui.internal.navigator.extensions.NavigatorContentDescriptorManager;
 import org.eclipse.ui.internal.navigator.framelist.FrameList;
 
 /**
@@ -216,17 +215,17 @@ public class CommonViewer extends TreeViewer {
 		Object[] changed = event.getElements();
 		if (changed != null) {
 			List<Object> others = new ArrayList<Object>();
-			for (Object changedElement : changed) {
-				if (changedElement == null)
+			for (int i = 0; i < changed.length; i++) {
+				if (changed[i] == null)
 					continue;
 
 				if (_mapper != null) {
-					if (_mapper.handlesObject(changedElement)) {
-						_mapper.objectChanged(changedElement);
+					if (_mapper.handlesObject(changed[i])) {
+						_mapper.objectChanged(changed[i]);
 						continue;
 					}
 				}
-				others.add(changedElement);
+				others.add(changed[i]);
 			}
 			if (others.isEmpty()) {
 				return;
@@ -325,22 +324,21 @@ public class CommonViewer extends TreeViewer {
 
 	@Override
 	public void refresh(Object element, boolean updateLabels) {
-		// Invalidate caches in NavigatorContentDescriptorManager (see
-		// https://bugs.eclipse.org/436645).
-		NavigatorContentDescriptorManager.getInstance().clearCache();
 
-		if (element != getInput()) {
-			INavigatorPipelineService pipeDream = contentService.getPipelineService();
+		if(element != getInput()) {
+			INavigatorPipelineService pipeDream = contentService
+					.getPipelineService();
 
 			PipelinedViewerUpdate update = new PipelinedViewerUpdate();
 			update.getRefreshTargets().add(element);
 			update.setUpdateLabels(updateLabels);
-			// If the update is modified.
+			/* if the update is modified */
 			if (pipeDream.interceptRefresh(update)) {
-				// Intercept and apply the update.
+				/* intercept and apply the update */
 				boolean toUpdateLabels = update.isUpdateLabels();
-				for (Object elem : update.getRefreshTargets()) {
-					super.refresh(elem, toUpdateLabels);
+				for (Iterator<Object> iter = update.getRefreshTargets().iterator(); iter
+						.hasNext();) {
+					super.refresh(iter.next(), toUpdateLabels);
 				}
 			} else {
 				super.refresh(element, updateLabels);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -61,6 +61,14 @@ public final class LinearUndoViolationUserApprover extends
 		this.context = context;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.core.commands.operations.LinearUndoViolationDetector#allowLinearRedoViolation(org.eclipse.core.commands.operations.IUndoableOperation,
+	 *      org.eclipse.core.commands.operations.IUndoContext,
+	 *      org.eclipse.core.commands.operations.IOperationHistory,
+	 *      org.eclipse.core.runtime.IAdaptable)
+	 */
 	@Override
 	protected IStatus allowLinearRedoViolation(IUndoableOperation operation,
 			IUndoContext context, IOperationHistory history, IAdaptable uiInfo) {
@@ -73,11 +81,14 @@ public final class LinearUndoViolationUserApprover extends
 				WorkbenchMessages.Operations_linearRedoViolation,
 				getTitle(part), operation.getLabel());
 		final boolean [] proceed = new boolean[1];
-		PlatformUI.getWorkbench().getDisplay().syncExec(() -> {
-			// Show a dialog.
-			part.setFocus();
-			proceed[0] = MessageDialog.openQuestion(part.getSite()
-					.getShell(), getTitle(part), message);
+		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
+			@Override
+			public void run() {
+				// Show a dialog.
+				part.setFocus();
+				proceed[0] = MessageDialog.openQuestion(part.getSite()
+						.getShell(), getTitle(part), message);
+			}
 		});
 
 		if (proceed[0]) {
@@ -103,6 +114,14 @@ public final class LinearUndoViolationUserApprover extends
 		return Status.CANCEL_STATUS;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.core.commands.operations.LinearUndoViolationDetector#allowLinearUndoViolation(org.eclipse.core.commands.operations.IUndoableOperation,
+	 *      org.eclipse.core.commands.operations.IUndoContext,
+	 *      org.eclipse.core.commands.operations.IOperationHistory,
+	 *      org.eclipse.core.runtime.IAdaptable)
+	 */
 	@Override
 	protected IStatus allowLinearUndoViolation(IUndoableOperation operation,
 			IUndoContext context, IOperationHistory history, IAdaptable uiInfo) {
@@ -115,11 +134,14 @@ public final class LinearUndoViolationUserApprover extends
 				WorkbenchMessages.Operations_linearUndoViolation,
 				getTitle(part), operation.getLabel());
 		final boolean [] proceed = new boolean[1];
-		PlatformUI.getWorkbench().getDisplay().syncExec(() -> {
-			// Show a dialog.
-			part.setFocus();
-			proceed[0] = MessageDialog.openQuestion(part.getSite()
-					.getShell(), getTitle(part), message);
+		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
+			@Override
+			public void run() {
+				// Show a dialog.
+				part.setFocus();
+				proceed[0] = MessageDialog.openQuestion(part.getSite()
+						.getShell(), getTitle(part), message);
+			}
 		});
 
 		if (proceed[0]) {

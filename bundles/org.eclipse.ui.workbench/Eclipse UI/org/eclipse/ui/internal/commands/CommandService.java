@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -137,9 +137,11 @@ public final class CommandService implements ICommandService, IUpdateService {
 		 * state has a chance to persist any changes.
 		 */
 		final Command[] commands = commandManager.getAllCommands();
-		for (final Command command : commands) {
+		for (int i = 0; i < commands.length; i++) {
+			final Command command = commands[i];
 			final String[] stateIds = command.getStateIds();
-			for (final String stateId : stateIds) {
+			for (int j = 0; j < stateIds.length; j++) {
+				final String stateId = stateIds[j];
 				final State state = command.getState(stateId);
 				if (state instanceof PersistentState) {
 					final PersistentState persistentState = (PersistentState) state;
@@ -237,6 +239,12 @@ public final class CommandService implements ICommandService, IUpdateService {
 	 */
 	private Map commandCallbacks = new HashMap();
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.commands.ICommandService#refreshElements(java.lang.String,
+	 *      java.util.Map)
+	 */
 	@Override
 	public final void refreshElements(String commandId, Map filter) {
 		Command cmd = getCommand(commandId);
@@ -290,6 +298,12 @@ public final class CommandService implements ICommandService, IUpdateService {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.commands.ICommandService#registerElementForCommand(org.eclipse.core.commands.ParameterizedCommand,
+	 *      org.eclipse.ui.menus.UIElement)
+	 */
 	@Override
 	public final IElementReference registerElementForCommand(
 			ParameterizedCommand command, UIElement element)
@@ -310,6 +324,11 @@ public final class CommandService implements ICommandService, IUpdateService {
 		return ref;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.commands.ICommandService#registerElement(org.eclipse.ui.commands.IElementReference)
+	 */
 	@Override
 	public void registerElement(IElementReference elementReference) {
 		List parameterizedCommands = (List) commandCallbacks
@@ -333,6 +352,11 @@ public final class CommandService implements ICommandService, IUpdateService {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.commands.ICommandService#unregisterElement(org.eclipse.ui.commands.IElementReference)
+	 */
 	@Override
 	public void unregisterElement(IElementReference elementReference) {
 		if (commandCallbacks == null)
@@ -354,6 +378,13 @@ public final class CommandService implements ICommandService, IUpdateService {
 		return commandPersistence;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.e4.ui.internal.workbench.renderers.swt.IUpdateService#
+	 * registerElementForUpdate(org.eclipse.core.commands.ParameterizedCommand,
+	 * org.eclipse.e4.ui.model.application.ui.MUILabel)
+	 */
 	@Override
 	public Runnable registerElementForUpdate(ParameterizedCommand parameterizedCommand,
 			final MItem item) {
@@ -394,7 +425,12 @@ public final class CommandService implements ICommandService, IUpdateService {
 		try {
 			final IElementReference reference = registerElementForCommand(parameterizedCommand,
 					element);
-			return () -> unregisterElement(reference);
+			return new Runnable() {
+				@Override
+				public void run() {
+					unregisterElement(reference);
+				}
+			};
 		} catch (NotDefinedException e) {
 			WorkbenchPlugin.log(e);
 		}
