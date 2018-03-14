@@ -17,7 +17,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.core.expressions.EvaluationResult;
 import org.eclipse.core.expressions.Expression;
@@ -37,7 +36,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeSelection;
-import org.eclipse.swt.events.ShellListener;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveRegistry;
 import org.eclipse.ui.ISources;
@@ -57,15 +55,11 @@ import org.eclipse.ui.services.ISourceProviderService;
 import org.eclipse.ui.tests.SelectionProviderView;
 import org.eclipse.ui.tests.commands.ActiveContextExpression;
 import org.eclipse.ui.tests.harness.util.UITestCase;
-import org.junit.Assume;
-import org.junit.FixMethodOrder;
-import org.junit.runners.MethodSorters;
 
 /**
  * @since 3.3
  *
  */
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class EvaluationServiceTest extends UITestCase {
 	/**
 	 *
@@ -81,8 +75,8 @@ public class EvaluationServiceTest extends UITestCase {
 	}
 
 	private static class MyEval implements IPropertyChangeListener {
-		public volatile int count = 0;
-		public volatile boolean currentValue;
+		public int count = 0;
+		public boolean currentValue;
 
 		@Override
 		public void propertyChange(PropertyChangeEvent event) {
@@ -130,14 +124,6 @@ public class EvaluationServiceTest extends UITestCase {
 
 	public void testBasicService() throws Exception {
 		IWorkbenchWindow window = openTestWindow();
-		boolean activeShell = forceActive(window.getShell());
-
-		final AtomicBoolean shellIsActive = new AtomicBoolean(activeShell);
-		Assume.assumeTrue(shellIsActive.get());
-
-		ShellListener shellListener = new ShellStateListener(shellIsActive);
-		window.getShell().addShellListener(shellListener);
-
 		IEvaluationService service = window
 				.getService(IEvaluationService.class);
 		assertNotNull(service);
@@ -154,20 +140,9 @@ public class EvaluationServiceTest extends UITestCase {
 			assertEquals(1, listener.count);
 			assertFalse(listener.currentValue);
 
-			Assume.assumeTrue(forceActive(window.getShell()));
-			processEvents();
-			waitForJobs(500, 3000);
-
 			contextService = window
 					.getService(IContextService.class);
 			context1 = contextService.activateContext(CONTEXT_ID1);
-			processEvents();
-			waitForJobs(500, 3000);
-
-			Assume.assumeTrue(window.getShell().isVisible());
-			Assume.assumeTrue(shellIsActive.get());
-			assertEquals(window, PlatformUI.getWorkbench().getActiveWorkbenchWindow());
-
 			assertEquals(2, listener.count);
 			assertTrue(listener.currentValue);
 
@@ -181,8 +156,6 @@ public class EvaluationServiceTest extends UITestCase {
 			assertEquals(4, listener.count);
 
 			context1 = contextService.activateContext(CONTEXT_ID1);
-			processEvents();
-			waitForJobs(500, 3000);
 			assertEquals(4, listener.count);
 			assertFalse(listener.currentValue);
 			contextService.deactivateContext(context1);
@@ -201,17 +174,10 @@ public class EvaluationServiceTest extends UITestCase {
 
 	public void testTwoEvaluations() throws Exception {
 		IWorkbenchWindow window = openTestWindow();
-		boolean activeShell = forceActive(window.getShell());
-
-		final AtomicBoolean shellIsActive = new AtomicBoolean(activeShell);
-		Assume.assumeTrue(shellIsActive.get());
-
-		ShellListener shellListener = new ShellStateListener(shellIsActive);
-		window.getShell().addShellListener(shellListener);
-
 		IEvaluationService service = window
 				.getService(IEvaluationService.class);
 		assertNotNull(service);
+
 		MyEval listener1 = new MyEval();
 		MyEval listener2 = new MyEval();
 		IContextActivation context1 = null;
@@ -234,22 +200,12 @@ public class EvaluationServiceTest extends UITestCase {
 			assertFalse(listener2.currentValue);
 			evalRef2.setResult(true);
 
-			Assume.assumeTrue(forceActive(window.getShell()));
-			processEvents();
-			waitForJobs(500, 3000);
-
 			contextService = window
 					.getService(IContextService.class);
 			context1 = contextService.activateContext(CONTEXT_ID1);
-			processEvents();
-			waitForJobs(500, 3000);
-
-			Assume.assumeTrue(window.getShell().isVisible());
-			Assume.assumeTrue(shellIsActive.get());
-			assertEquals(window, PlatformUI.getWorkbench().getActiveWorkbenchWindow());
-
 			assertEquals(2, listener1.count);
 			assertTrue(listener1.currentValue);
+			// we already set this guy to true, he should skip
 			assertEquals(1, listener2.count);
 			assertFalse(listener2.currentValue);
 
