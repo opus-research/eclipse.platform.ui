@@ -151,11 +151,6 @@ public class ViewsPreferencePage extends PreferencePage implements
 		engine = context.get(IThemeEngine.class);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.preference.PreferencePage#performOk()
-	 */
 	@Override
 	public boolean performOk() {
 		if (getSelection() != null) {
@@ -201,11 +196,6 @@ public class ViewsPreferencePage extends PreferencePage implements
 		super.performDefaults();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.preference.PreferencePage#performCancel()
-	 */
 	@Override
 	public boolean performCancel() {
 		if (currentTheme != null) {
