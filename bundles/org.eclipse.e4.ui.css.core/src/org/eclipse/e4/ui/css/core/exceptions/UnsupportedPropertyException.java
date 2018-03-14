@@ -27,7 +27,6 @@ public class UnsupportedPropertyException extends Exception {
 		this.property = property;
 	}
 
-	@Override
 	public String getMessage() {
 		return "CSS Property " + property + " is not supported.";
 	}

@@ -178,7 +178,6 @@ final class GenericMApplicationElementFactoryImpl {
 		 * org.eclipse.core.runtime.IRegistryEventListener#added(org.eclipse.core.runtime.IExtension
 		 * [])
 		 */
-		@Override
 		public void added(IExtension[] extensions) {
 			for (IExtension extension : extensions) {
 				List<Class<? extends MApplicationElement>> elementsToCleanup = addToMapping(extension
@@ -199,7 +198,6 @@ final class GenericMApplicationElementFactoryImpl {
 		 * org.eclipse.core.runtime.IRegistryEventListener#removed(org.eclipse.core.runtime.IExtension
 		 * [])
 		 */
-		@Override
 		public void removed(IExtension[] extensions) {
 			for (IExtension extension : extensions) {
 				List<Class<? extends MApplicationElement>> modelClassesToRemove = registeredClasses
@@ -220,7 +218,6 @@ final class GenericMApplicationElementFactoryImpl {
 		 * @see org.eclipse.core.runtime.IRegistryEventListener#added(org.eclipse.core.runtime.
 		 * IExtensionPoint[])
 		 */
-		@Override
 		public void added(IExtensionPoint[] extensionPoints) {
 			// not of interest
 		}
@@ -231,7 +228,6 @@ final class GenericMApplicationElementFactoryImpl {
 		 * @see org.eclipse.core.runtime.IRegistryEventListener#removed(org.eclipse.core.runtime.
 		 * IExtensionPoint[])
 		 */
-		@Override
 		public void removed(IExtensionPoint[] extensionPoints) {
 			// not of interest
 		}
