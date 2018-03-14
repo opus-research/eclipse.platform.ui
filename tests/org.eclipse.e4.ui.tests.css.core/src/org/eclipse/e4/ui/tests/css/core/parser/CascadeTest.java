@@ -69,8 +69,7 @@ public class CascadeTest {
 		button.setClass("special");
 		style = viewCSS.getComputedStyle(button, null);
 		assertEquals("black", style.getPropertyCSSValue("color").getCssText());
-		assertEquals("bold", style.getPropertyCSSValue("font-weight")
-				.getCssText());
+		assertEquals("bold", style.getPropertyCSSValue("font-weight").getCssText());
 	}
 
 	@Test
