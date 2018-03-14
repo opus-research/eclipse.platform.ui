@@ -27,61 +27,61 @@ ThemesExtension { color-definition:
 ColorDefinition#org-eclipse-ui-workbench-INACTIVE_UNSELECTED_TABS_COLOR_START {
 	color: #FFFFFF;
 	category: '#org-eclipse-ui-presentation-default';
-	label: 'Inactive, unselected part color start';
+	label: url('platform:/plugin/org.eclipse.ui.themes?message=INACTIVE_UNSELECTED_TABS_COLOR_START')
 }
 
 ColorDefinition#org-eclipse-ui-workbench-INACTIVE_UNSELECTED_TABS_COLOR_END {
 	color: #FFFFFF;
 	category: '#org-eclipse-ui-presentation-default';
-	label: 'Inactive, unselected part color end';
+	label: url('platform:/plugin/org.eclipse.ui.themes?message=INACTIVE_UNSELECTED_TABS_COLOR_END');
 }
 
 ColorDefinition#org-eclipse-ui-workbench-INACTIVE_TAB_OUTER_KEYLINE_COLOR {
 	color: #FFFFFF;
 	category: '#org-eclipse-ui-presentation-default';
-	label: 'Inactive part outer keyline color';
+	label: url('platform:/plugin/org.eclipse.ui.themes?message=INACTIVE_TAB_OUTER_KEYLINE_COLOR');
 }
 
 ColorDefinition#org-eclipse-ui-workbench-INACTIVE_TAB_INNER_KEYLINE_COLOR {
 	color: #FFFFFF;
 	category: '#org-eclipse-ui-presentation-default';
-	label: 'Inactive part inner keyline color';
+	label: url('platform:/plugin/org.eclipse.ui.themes?message=INACTIVE_TAB_INNER_KEYLINE_COLOR');
 }
 
 ColorDefinition#org-eclipse-ui-workbench-INACTIVE_TAB_OUTLINE_COLOR {
 	color: #B6BCCC;
 	category: '#org-eclipse-ui-presentation-default';
-	label: 'Inactive part outline color';
+	label: url('platform:/plugin/org.eclipse.ui.themes?message=INACTIVE_TAB_OUTLINE_COLOR');
 }
 
 ColorDefinition#org-eclipse-ui-workbench-ACTIVE_UNSELECTED_TABS_COLOR_START {
 	color: #FFFFFF;
 	category: '#org-eclipse-ui-presentation-default';
-	label: 'Active, unselected part color begin';
+	label: url('platform:/plugin/org.eclipse.ui.themes?message=ACTIVE_UNSELECTED_TABS_COLOR_START');
 }
 
 ColorDefinition#org-eclipse-ui-workbench-ACTIVE_UNSELECTED_TABS_COLOR_END {
 	color: #FFFFFF;
 	category: '#org-eclipse-ui-presentation-default';
-	label: 'Active, unselected part color end';
+	label: url('platform:/plugin/org.eclipse.ui.themes?message=ACTIVE_UNSELECTED_TABS_COLOR_END');
 }
 
 ColorDefinition#org-eclipse-ui-workbench-ACTIVE_TAB_OUTER_KEYLINE_COLOR {
-	color: #FFFFFF;
+	color: #CCCCCC;
 	category: '#org-eclipse-ui-presentation-default';
-	label: 'Active part outer keyline color';
+	label: url('platform:/plugin/org.eclipse.ui.themes?message=ACTIVE_TAB_OUTER_KEYLINE_COLOR');
 }
 
 ColorDefinition#org-eclipse-ui-workbench-ACTIVE_TAB_INNER_KEYLINE_COLOR {
 	color: #FFFFFF;
 	category: '#org-eclipse-ui-presentation-default';
-	label: 'Active part inner keyline color';
+	label: url('platform:/plugin/org.eclipse.ui.themes?message=ACTIVE_TAB_INNER_KEYLINE_COLOR');
 }
 
 ColorDefinition#org-eclipse-ui-workbench-ACTIVE_TAB_OUTLINE_COLOR {
 	color: #B6BCCC;
 	category: '#org-eclipse-ui-presentation-default';
-	label: 'Active part outline color';
+	label: url('platform:/plugin/org.eclipse.ui.themes?message=ACTIVE_TAB_OUTLINE_COLOR');
 }
 
 /* Already existing ColorDefinitions overridden for the E4 default theme */
@@ -166,14 +166,6 @@ CTabItem:selected {
 	color: '#org-eclipse-ui-workbench-ACTIVE_NOFOCUS_TAB_TEXT_COLOR';
 }
 
-.MPartStack#left Composite, .MPartStack#right Composite, .MPartStack#bottom Composite {
-	background-color: '#org-eclipse-ui-workbench-INACTIVE_TAB_BG_END';
-}
-
-.MPartStack#left.active Composite, .MPartStack#right.active Composite, .MPartStack#bottom.active Composite {
-	background-color: '#org-eclipse-ui-workbench-ACTIVE_TAB_BG_END';
-}
-
 #PerspectiveSwitcher {
 	eclipse-perspective-keyline-color: #AAB0BF #AAB0BF;
 }
@@ -200,4 +192,14 @@ CTabItem:selected {
 	background-color: #A0A000;
 }
 
+.MPartStack > Composite {
+	background-color: '#org-eclipse-ui-workbench-INACTIVE_TAB_BG_END';
+}
 
+.MPartStack.active > Composite {
+	background-color: '#org-eclipse-ui-workbench-ACTIVE_TAB_BG_END';
+}
+
+.MPartStack.active.noFocus > Composite {
+	background-color: '#org-eclipse-ui-workbench-ACTIVE_NOFOCUS_TAB_BG_END';
+}

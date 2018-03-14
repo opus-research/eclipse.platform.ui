@@ -88,6 +88,7 @@ public class WorkbenchMessages extends NLS {
 	public static String SaveAll_toolTip;
 	public static String Workbench_revert;
 	public static String Workbench_revertToolTip;
+	public static String Workbench_missingPropertyMessage;
 	public static String Workbench_move;
 
 	public static String Workbench_moveToolTip;
@@ -649,6 +650,7 @@ public class WorkbenchMessages extends NLS {
     public static String EditorManager_create_element_returned_null;
     public static String EditorManager_wrong_createElement_result;
     public static String EditorManager_backgroundSaveJobName;
+	public static String EditorManager_largeDocumentWarning;
     
 	public static String EditorPane_pinEditor;
 

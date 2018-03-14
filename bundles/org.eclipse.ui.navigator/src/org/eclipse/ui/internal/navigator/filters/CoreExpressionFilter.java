@@ -37,12 +37,7 @@ public class CoreExpressionFilter extends ViewerFilter {
 		filterExpression = aFilterExpression;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers.Viewer,
-	 *      java.lang.Object, java.lang.Object)
-	 */
+	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
 
 		IEvaluationContext context = NavigatorPlugin.getEvalContext(element);

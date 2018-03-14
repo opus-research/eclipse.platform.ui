@@ -4,12 +4,14 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866, Bug 405471
  *     Sopot Cela <sopotcela@gmail.com>
- *     René Brandstetter <Rene.Brandstetter@gmx.net> - Bug 391430
+ *     Steven Spungin <steven@spungin.tv> - Bug 437747
+ *     Alan Staves <alan.staves@microfocus.com> - Bug 435274
+ *     Patrick Naish <patrick.naish@microfocus.com> - Bug 435274
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -62,8 +64,6 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.action.SubContributionItem;
-import org.eclipse.jface.action.SubMenuManager;
 import org.eclipse.jface.internal.MenuManagerEventHelper;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
@@ -198,8 +198,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 				}
 			}
 
-			if (UIEvents.UIElement.VISIBLE.equals(attName)
-					&& !isReconcileManagerToModel) {
+			if (UIEvents.UIElement.VISIBLE.equals(attName)) {
 				if (element instanceof MMenu) {
 					MMenu menuModel = (MMenu) element;
 					MenuManager manager = getManager(menuModel);
@@ -209,10 +208,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					manager.setVisible(menuModel.isVisible());
 					if (manager.getParent() != null) {
 						manager.getParent().markDirty();
-						// update visibility of parent model element and update
-						// the UI
-						updateParentVisibility(menuModel);
-						((MenuManager) manager.getParent()).update(true);
 					}
 				} else if (element instanceof MMenuElement) {
 					MMenuElement itemModel = (MMenuElement) element;
@@ -224,60 +219,11 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					item.setVisible(itemModel.isVisible());
 					if (item.getParent() != null) {
 						item.getParent().markDirty();
-						// update visibility of parent model element
-						updateParentVisibility(itemModel);
 					}
 				}
 			}
 		}
 	};
-
-	/**
-	 * Updates the visibility of the {@link MMenuElement#getParent()} in the
-	 * same way as the MenuManager checks its visibility.
-	 * <p>
-	 * The check in the MenuManager those the following:
-	 * <ul>
-	 * <li>check the visibility flag of the menu manger</li>
-	 * <li>if the visibility is <code>true</code> --> check the children</li>
-	 * <ul>
-	 * <li>if any child is visible the MenuManager is visible</li>
-	 * <li>if only separators are visible the MenuManager is <b>NOT</b> visible</li>
-	 * </ul>
-	 * </ul>
-	 * </p>
-	 * 
-	 * @param menuElement
-	 *            the menu element on which the parent should be updated
-	 */
-	private static void updateParentVisibility(MMenuElement menuElement) {
-		MElementContainer<MUIElement> parent = menuElement.getParent();
-		if (parent != null) {
-			parent.setVisible(areChildsVisible(parent));
-		}
-	}
-
-	/**
-	 * Checks the child visibility with the same condition as in the MenuManger.
-	 * <p>
-	 * This means childs are visible if one none separator is visible.
-	 * </p>
-	 * 
-	 * @param container
-	 *            the menu container to check
-	 * @return <code>true</code> if one none separator is visible,
-	 *         <code>false</code> otherwise
-	 */
-	private static boolean areChildsVisible(
-			MElementContainer<MUIElement> container) {
-		for (MUIElement child : container.getChildren()) {
-			// same check as the one from the MenuManager
-			if (child.isVisible() && !(child instanceof MMenuSeparator)) {
-				return true;
-			}
-		}
-		return false;
-	}
 
 	private EventHandler selectionUpdater = new EventHandler() {
 		@Override
@@ -311,61 +257,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		}
 	};
 
-	/**
-	 * Flag for skipping the {@link #childrenUpdater}, which indicates a call
-	 * from the {@link #reconcileManagerToModel(MenuManager, MMenu)} method.
-	 */
-	private boolean isReconcileManagerToModel = false;
-
-	/**
-	 * Flag for skipping the {@link #childrenUpdater}, which indicates a call
-	 * from the {@link #processContributions(MMenu, String, boolean, boolean)}
-	 * method.
-	 */
-	private boolean isProcessContributions = false;
-
-	/**
-	 * Flag which indicates a dispose of a menu UI control to prevent an update
-	 * of the menu during its dispose. (UI thread confined!)
-	 */
-	private boolean disposingMenuUIElement = false;
-
-	/**
-	 * EventHanlder which handles the adding and disappearing of menu entries.
-	 */
-	private EventHandler childrenUpdater = new EventHandler() {
-		public void handleEvent(Event event) {
-			// skip the event handling, because it is called from methods of
-			// this class which try to synchronize a MenuManager with the model
-			if (isReconcileManagerToModel || isProcessContributions)
-				return;
-
-			Object changedObj = event.getProperty(UIEvents.EventTags.ELEMENT);
-			if (changedObj instanceof MMenu) {
-				MMenu menuModel = (MMenu) changedObj;
-				MenuManager manager = getManager(menuModel);
-				if (manager == null)
-					return;
-				if (UIEvents.isREMOVE(event)) {
-					// remove can be one or many --> always use a list of
-					// entries
-					@SuppressWarnings("unchecked")
-					Iterable<MMenuElement> toRemove = (Iterable<MMenuElement>) UIEvents
-							.asIterable(event, UIEvents.EventTags.OLD_VALUE);
-
-					handleMenuElementRemove(manager, toRemove);
-				} else if (UIEvents.isADD(event)) {
-					// add can also be one or many --> always use a list of
-					// entries
-					@SuppressWarnings("unchecked")
-					Iterable<MMenuElement> toAdd = (Iterable<MMenuElement>) UIEvents
-							.asIterable(event, UIEvents.EventTags.NEW_VALUE);
-					handleMenuElementAdd(manager, toAdd);
-				}
-			}
-		}
-	};
-
 	private MenuManagerRendererFilter rendererFilter;
 
 	@PostConstruct
@@ -376,8 +267,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		eventBroker.subscribe(UIEvents.Item.TOPIC_ENABLED, enabledUpdater);
 		eventBroker
 				.subscribe(UIEvents.UIElement.TOPIC_ALL, toBeRenderedUpdater);
-		eventBroker.subscribe(UIEvents.ElementContainer.TOPIC_CHILDREN,
-				childrenUpdater);
 
 		context.set(MenuManagerRenderer.class, this);
 		Display display = context.get(Display.class);
@@ -403,7 +292,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		eventBroker.unsubscribe(selectionUpdater);
 		eventBroker.unsubscribe(enabledUpdater);
 		eventBroker.unsubscribe(toBeRenderedUpdater);
-		eventBroker.unsubscribe(childrenUpdater);
 
 		ContextInjectionFactory.uninject(MenuManagerEventHelper.getInstance()
 				.getShowHelper(),
@@ -429,13 +317,6 @@ MenuManagerEventHelper.getInstance()
 		context.remove(MenuManagerRenderer.class);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#createWidget
-	 * (org.eclipse.e4.ui.model.application.ui.MUIElement, java.lang.Object)
-	 */
 	@Override
 	public Object createWidget(MUIElement element, Object parent) {
 		if (!(element instanceof MMenu))
@@ -498,16 +379,10 @@ MenuManagerEventHelper.getInstance()
 			newMenu.addDisposeListener(new DisposeListener() {
 				@Override
 				public void widgetDisposed(DisposeEvent e) {
-					boolean prevDisposingMenuUIElement = disposingMenuUIElement;
-					try {
-						// mark the fact that a dispose is called, because
-						// Widget#isDisposed() will return false during this
-						// event handling (state changes after all
-						// DisposeListener are notified)
-						disposingMenuUIElement = true;
-						cleanUp(menuModel);
-					} finally {
-						disposingMenuUIElement = prevDisposingMenuUIElement;
+					cleanUp(menuModel);
+					MenuManager manager = getManager(menuModel);
+					if (manager != null) {
+						manager.markDirty();
 					}
 				}
 			});
@@ -519,6 +394,11 @@ MenuManagerEventHelper.getInstance()
 	 * @param menuModel
 	 */
 	public void cleanUp(MMenu menuModel) {
+		for (MMenuElement childElement : menuModel.getChildren()) {
+			if (childElement instanceof MMenu) {
+				cleanUp((MMenu) childElement);
+			}
+		}
 		Collection<ContributionRecord> vals = modelContributionToRecord
 				.values();
 		List<ContributionRecord> disposedRecords = new ArrayList<ContributionRecord>();
@@ -578,23 +458,16 @@ MenuManagerEventHelper.getInstance()
 		if (elementId == null) {
 			return;
 		}
-
-		boolean prevProcessContributions = isProcessContributions;
-		isProcessContributions = true;
-		try {
-			final ArrayList<MMenuContribution> toContribute = new ArrayList<MMenuContribution>();
-			ContributionsAnalyzer.XXXgatherMenuContributions(menuModel,
-					application.getMenuContributions(), elementId,
-					toContribute, null, isPopup);
-			generateContributions(menuModel, toContribute, isMenuBar);
-			for (MMenuElement element : menuModel.getChildren()) {
-				if (element instanceof MMenu) {
-					processContributions((MMenu) element,
-							element.getElementId(), false, isPopup);
-				}
+		final ArrayList<MMenuContribution> toContribute = new ArrayList<MMenuContribution>();
+		ContributionsAnalyzer.XXXgatherMenuContributions(menuModel,
+				application.getMenuContributions(), elementId, toContribute,
+				null, isPopup);
+		generateContributions(menuModel, toContribute, isMenuBar);
+		for (MMenuElement element : menuModel.getChildren()) {
+			if (element instanceof MMenu) {
+				processContributions((MMenu) element, element.getElementId(),
+						false, isPopup);
 			}
-		} finally {
-			isProcessContributions = prevProcessContributions;
 		}
 	}
 
@@ -709,13 +582,6 @@ MenuManagerEventHelper.getInstance()
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#processContents
-	 * (org.eclipse.e4.ui.model.application.ui.MElementContainer)
-	 */
 	@Override
 	public void processContents(MElementContainer<MUIElement> container) {
 		// I can either simply stop processing, or we can walk the model
@@ -986,6 +852,10 @@ MenuManagerEventHelper.getInstance()
 	}
 
 	public void clearModelToManager(MMenu model, MenuManager manager) {
+		for (MMenuElement element : model.getChildren()) {
+			IContributionItem ici = getContribution(element);
+			clearModelToContribution(element, ici);
+		}
 		modelToManager.remove(model);
 		managerToModel.remove(manager);
 	}
@@ -1021,7 +891,7 @@ MenuManagerEventHelper.getInstance()
 
 	/**
 	 * Search the records for testing. Look, but don't touch!
-	 * 
+	 *
 	 * @return the array of active ContributionRecords.
 	 */
 	public ContributionRecord[] getContributionRecords() {
@@ -1040,171 +910,139 @@ MenuManagerEventHelper.getInstance()
 	 * @param menuModel
 	 */
 	public void reconcileManagerToModel(MenuManager menuManager, MMenu menuModel) {
-		boolean prevReconcileManagerToModel = isReconcileManagerToModel;
-		isReconcileManagerToModel = true;
-		try {
-			List<MMenuElement> modelChildren = menuModel.getChildren();
+		List<MMenuElement> modelChildren = menuModel.getChildren();
 
-			HashSet<MMenuItem> oldModelItems = new HashSet<MMenuItem>();
-			HashSet<MMenu> oldMenus = new HashSet<MMenu>();
-			HashSet<MMenuSeparator> oldSeps = new HashSet<MMenuSeparator>();
-			for (MMenuElement itemModel : modelChildren) {
-				if (OpaqueElementUtil.isOpaqueMenuSeparator(itemModel)) {
-					oldSeps.add((MMenuSeparator) itemModel);
-				} else if (OpaqueElementUtil.isOpaqueMenuItem(itemModel)) {
-					oldModelItems.add((MMenuItem) itemModel);
-				} else if (OpaqueElementUtil.isOpaqueMenu(itemModel)) {
-					oldMenus.add((MMenu) itemModel);
-				}
+		HashSet<MMenuItem> oldModelItems = new HashSet<MMenuItem>();
+		HashSet<MMenu> oldMenus = new HashSet<MMenu>();
+		HashSet<MMenuSeparator> oldSeps = new HashSet<MMenuSeparator>();
+		for (MMenuElement itemModel : modelChildren) {
+			if (OpaqueElementUtil.isOpaqueMenuSeparator(itemModel)) {
+				oldSeps.add((MMenuSeparator) itemModel);
+			} else if (OpaqueElementUtil.isOpaqueMenuItem(itemModel)) {
+				oldModelItems.add((MMenuItem) itemModel);
+			} else if (OpaqueElementUtil.isOpaqueMenu(itemModel)) {
+				oldMenus.add((MMenu) itemModel);
 			}
+		}
 
-			IContributionItem[] items = menuManager.getItems();
-			for (int src = 0, dest = 0; src < items.length; src++, dest++) {
-				IContributionItem item = items[src];
-
-				if (item instanceof SubContributionItem) {
-					// get the wrapped contribution item
-					item = ((SubContributionItem) item).getInnerItem();
-				}
-
-				if (item instanceof MenuManager) {
-					MenuManager childManager = (MenuManager) item;
-					MMenu childModel = getMenuModel(childManager);
-					if (childModel == null) {
-						MMenu legacyModel = OpaqueElementUtil
-								.createOpaqueMenu();
-						legacyModel.setElementId(childManager.getId());
-						legacyModel.setVisible(childManager.isVisible());
-						legacyModel.setLabel(childManager.getMenuText());
-
-						linkModelToManager(legacyModel, childManager);
-						OpaqueElementUtil.setOpaqueItem(legacyModel,
-								childManager);
-						if (modelChildren.size() > dest) {
-							modelChildren.add(dest, legacyModel);
-						} else {
-							modelChildren.add(legacyModel);
-						}
-						reconcileManagerToModel(childManager, legacyModel);
+		IContributionItem[] items = menuManager.getItems();
+		for (int src = 0, dest = 0; src < items.length; src++, dest++) {
+			IContributionItem item = items[src];
+			if (item instanceof MenuManager) {
+				MenuManager childManager = (MenuManager) item;
+				MMenu childModel = getMenuModel(childManager);
+				if (childModel == null) {
+					MMenu legacyModel = OpaqueElementUtil.createOpaqueMenu();
+					legacyModel.setElementId(childManager.getId());
+					legacyModel.setVisible(childManager.isVisible());
+					linkModelToManager(legacyModel, childManager);
+					OpaqueElementUtil.setOpaqueItem(legacyModel, childManager);
+					if (modelChildren.size() > dest) {
+						modelChildren.add(dest, legacyModel);
 					} else {
-						childModel.setVisible(childManager.isVisible());
-						if (OpaqueElementUtil.isOpaqueMenu(childModel)) {
-							oldMenus.remove(childModel);
-						}
-						if (modelChildren.size() > dest) {
-							if (modelChildren.get(dest) != childModel) {
-								modelChildren.remove(childModel);
-								modelChildren.add(dest, childModel);
-							}
-						} else {
-							modelChildren.add(childModel);
-						}
-						if (childModel instanceof MPopupMenu) {
-							if (((MPopupMenu) childModel).getContext() == null) {
-								IEclipseContext lclContext = getContext(menuModel);
-								if (lclContext != null) {
-									((MPopupMenu) childModel)
-											.setContext(lclContext
-													.createChild(childModel
-															.getElementId()));
-								}
-							}
-						}
-
-						if (childModel.getChildren().size() != childManager
-								.getSize()) {
-							reconcileManagerToModel(childManager, childModel);
-						}
+						modelChildren.add(legacyModel);
 					}
-				} else if (item.isSeparator() || item.isGroupMarker()) {
-					MMenuElement menuElement = getMenuElement(item);
-					if (menuElement == null) {
-						MMenuSeparator legacySep = OpaqueElementUtil
-								.createOpaqueMenuSeparator();
-						legacySep.setElementId(item.getId());
-						legacySep.setVisible(item.isVisible());
-						OpaqueElementUtil.setOpaqueItem(legacySep, item);
-						linkModelToContribution(legacySep, item);
-						if (modelChildren.size() > dest) {
-							modelChildren.add(dest, legacySep);
-						} else {
-							modelChildren.add(legacySep);
-						}
-					} else if (OpaqueElementUtil
-							.isOpaqueMenuSeparator(menuElement)) {
-						MMenuSeparator legacySep = (MMenuSeparator) menuElement;
-						oldSeps.remove(legacySep);
-						if (modelChildren.size() > dest) {
-							if (modelChildren.get(dest) != legacySep) {
-								modelChildren.remove(legacySep);
-								modelChildren.add(dest, legacySep);
-							}
-						} else {
-							modelChildren.add(legacySep);
-						}
-					}
-				} else if (item instanceof SubMenuManager) {
-					/*
-					 * This strange part here is because of "misplaced"
-					 * ActionSetMenuManager which are placed in the main menu
-					 * and under sub-menu. (They cause visibility problems,
-					 * e.g.: org.eclipse.ui.externaltools.ExternalToolsSet which
-					 * is located under the "Run" menu and under the main menu)
-					 */
-					menuManager.remove(items[src]);
+					reconcileManagerToModel(childManager, legacyModel);
 				} else {
-					MMenuElement menuElement = getMenuElement(item);
-					if (menuElement == null) {
-						MMenuItem legacyItem = OpaqueElementUtil
-								.createOpaqueMenuItem();
-						legacyItem.setElementId(item.getId());
-						legacyItem.setVisible(item.isVisible());
-						OpaqueElementUtil.setOpaqueItem(legacyItem, item);
-						linkModelToContribution(legacyItem, item);
-						if (modelChildren.size() > dest) {
-							modelChildren.add(dest, legacyItem);
-						} else {
-							modelChildren.add(legacyItem);
+					if (OpaqueElementUtil.isOpaqueMenu(childModel)) {
+						oldMenus.remove(childModel);
+					}
+					if (modelChildren.size() > dest) {
+						if (modelChildren.get(dest) != childModel) {
+							modelChildren.remove(childModel);
+							modelChildren.add(dest, childModel);
 						}
-					} else if (OpaqueElementUtil.isOpaqueMenuItem(menuElement)) {
-						MMenuItem legacyItem = (MMenuItem) menuElement;
-						oldModelItems.remove(legacyItem);
-						if (modelChildren.size() > dest) {
-							if (modelChildren.get(dest) != legacyItem) {
-								modelChildren.remove(legacyItem);
-								modelChildren.add(dest, legacyItem);
+					} else {
+						modelChildren.add(childModel);
+					}
+					if (childModel instanceof MPopupMenu) {
+						if (((MPopupMenu) childModel).getContext() == null) {
+							IEclipseContext lclContext = getContext(menuModel);
+							if (lclContext != null) {
+								((MPopupMenu) childModel)
+										.setContext(lclContext
+												.createChild(childModel
+														.getElementId()));
 							}
-						} else {
-							modelChildren.add(legacyItem);
 						}
 					}
 				}
-			}
-			if (!oldModelItems.isEmpty()) {
-				modelChildren.removeAll(oldModelItems);
-				for (MMenuItem model : oldModelItems) {
-					IContributionItem ici = (IContributionItem) OpaqueElementUtil
-							.getOpaqueItem(model);
-					clearModelToContribution(model, ici);
+			} else if (item.isSeparator() || item.isGroupMarker()) {
+				MMenuElement menuElement = getMenuElement(item);
+				if (menuElement == null) {
+					MMenuSeparator legacySep = OpaqueElementUtil
+							.createOpaqueMenuSeparator();
+					legacySep.setElementId(item.getId());
+					legacySep.setVisible(item.isVisible());
+					OpaqueElementUtil.setOpaqueItem(legacySep, item);
+					linkModelToContribution(legacySep, item);
+					if (modelChildren.size() > dest) {
+						modelChildren.add(dest, legacySep);
+					} else {
+						modelChildren.add(legacySep);
+					}
+				} else if (OpaqueElementUtil.isOpaqueMenuSeparator(menuElement)) {
+					MMenuSeparator legacySep = (MMenuSeparator) menuElement;
+					oldSeps.remove(legacySep);
+					if (modelChildren.size() > dest) {
+						if (modelChildren.get(dest) != legacySep) {
+							modelChildren.remove(legacySep);
+							modelChildren.add(dest, legacySep);
+						}
+					} else {
+						modelChildren.add(legacySep);
+					}
+				}
+			} else {
+				MMenuElement menuElement = getMenuElement(item);
+				if (menuElement == null) {
+					MMenuItem legacyItem = OpaqueElementUtil
+							.createOpaqueMenuItem();
+					legacyItem.setElementId(item.getId());
+					legacyItem.setVisible(item.isVisible());
+					OpaqueElementUtil.setOpaqueItem(legacyItem, item);
+					linkModelToContribution(legacyItem, item);
+					if (modelChildren.size() > dest) {
+						modelChildren.add(dest, legacyItem);
+					} else {
+						modelChildren.add(legacyItem);
+					}
+				} else if (OpaqueElementUtil.isOpaqueMenuItem(menuElement)) {
+					MMenuItem legacyItem = (MMenuItem) menuElement;
+					oldModelItems.remove(legacyItem);
+					if (modelChildren.size() > dest) {
+						if (modelChildren.get(dest) != legacyItem) {
+							modelChildren.remove(legacyItem);
+							modelChildren.add(dest, legacyItem);
+						}
+					} else {
+						modelChildren.add(legacyItem);
+					}
 				}
 			}
-			if (!oldMenus.isEmpty()) {
-				modelChildren.removeAll(oldMenus);
-				for (MMenu oldMenu : oldMenus) {
-					MenuManager oldManager = getManager(oldMenu);
-					clearModelToManager(oldMenu, oldManager);
-				}
+		}
+		if (!oldModelItems.isEmpty()) {
+			modelChildren.removeAll(oldModelItems);
+			for (MMenuItem model : oldModelItems) {
+				IContributionItem ici = (IContributionItem) OpaqueElementUtil
+						.getOpaqueItem(model);
+				clearModelToContribution(model, ici);
 			}
-			if (!oldSeps.isEmpty()) {
-				modelChildren.removeAll(oldSeps);
-				for (MMenuSeparator model : oldSeps) {
-					IContributionItem item = (IContributionItem) OpaqueElementUtil
-							.getOpaqueItem(model);
-					clearModelToContribution(model, item);
-				}
+		}
+		if (!oldMenus.isEmpty()) {
+			modelChildren.removeAll(oldMenus);
+			for (MMenu oldMenu : oldMenus) {
+				MenuManager oldManager = getManager(oldMenu);
+				clearModelToManager(oldMenu, oldManager);
 			}
-		} finally {
-			isReconcileManagerToModel = prevReconcileManagerToModel;
+		}
+		if (!oldSeps.isEmpty()) {
+			modelChildren.removeAll(oldSeps);
+			for (MMenuSeparator model : oldSeps) {
+				IContributionItem item = (IContributionItem) OpaqueElementUtil
+						.getOpaqueItem(model);
+				clearModelToContribution(model, item);
+			}
 		}
 	}
 
@@ -1241,7 +1079,7 @@ MenuManagerEventHelper.getInstance()
 	/**
 	 * Clean dynamic menu contributions provided by
 	 * {@link MDynamicMenuContribution} application model elements
-	 * 
+	 *
 	 * @param menuManager
 	 * @param menuModel
 	 * @param dump
@@ -1275,71 +1113,5 @@ MenuManagerEventHelper.getInstance()
 		}
 		MenuManager mm = getManager(menu);
 		clearModelToManager(menu, mm);
-	}
-
-	/**
-	 * Handles the create of menu entries.
-	 *
-	 * @param manager
-	 *            the {@link MenuManager} to add the new entries too
-	 * @param menuElements
-	 *            the new entries to add
-	 */
-	private void handleMenuElementAdd(MenuManager manager,
-			Iterable<MMenuElement> menuElements) {
-		Iterator<MMenuElement> iterMenuElements = menuElements.iterator();
-
-		if (!iterMenuElements.hasNext())
-			return;
-
-		while (iterMenuElements.hasNext()) {
-			modelProcessSwitch(manager, iterMenuElements.next());
-		}
-
-		manager.updateAll(false);
-	}
-
-	/**
-	 * Handles the remove of menu entries.
-	 *
-	 * @param manager
-	 *            the {@link MenuManager} to remove the entries from
-	 * @param menuElements
-	 *            the elements to remove
-	 */
-	private void handleMenuElementRemove(MenuManager manager,
-			Iterable<MMenuElement> menuElements) {
-		Iterator<MMenuElement> iterMenuElements = menuElements.iterator();
-
-		if (!iterMenuElements.hasNext())
-			return;
-
-		while (iterMenuElements.hasNext()) {
-			MMenuElement menuElement = iterMenuElements.next();
-			if (menuElement instanceof MMenu) {
-				MMenu menuModel = (MMenu) menuElement;
-				MenuManager mi = getManager(menuModel);
-				manager.remove(mi);
-
-				// clean up (children also)
-				clearModelToManager(menuModel, mi);
-				handleMenuElementRemove(mi, menuModel.getChildren());
-				mi.dispose();
-			} else {
-				IContributionItem ci = getContribution(menuElement);
-				manager.remove(ci);
-
-				// clean up
-				clearModelToContribution(menuElement, ci);
-				ci.dispose();
-			}
-		}
-
-		if (!disposingMenuUIElement) {
-			// update the menu UI only if this method is not called during a
-			// dispose event (see: #createWidget(MUIElement, Object) ->
-			// DisposeListener of the Menu)
-			manager.updateAll(false);
-		}
 	}
 }

@@ -1,5 +1,5 @@
  /****************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,13 +19,18 @@ import java.util.List;
 import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
+import org.eclipse.jface.util.BidiUtils;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
@@ -36,6 +41,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchEncoding;
@@ -66,6 +72,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage
     private IntegerFieldEditor saveInterval;
 
 	private FieldEditor workspaceName;
+	private FieldEditor showLocationInWindowTitle;
 
 	private Button autoRefreshButton;
 
@@ -84,12 +91,8 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 
 	private StringFieldEditor systemExplorer;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.preference.PreferencePage
-     */
-    protected Control createContents(Composite parent) {
+    @Override
+	protected Control createContents(Composite parent) {
 
     	PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
 				IIDEHelpContextIds.WORKSPACE_PREFERENCE_PAGE);
@@ -102,16 +105,17 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 
 		GridData data = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
 		area.getControl().setLayoutData(data);
-        
-		Label space = new Label(composite,SWT.NONE);
-		space.setLayoutData(new GridData());
-		
+
+		createSpace(composite);
         createAutoBuildPref(composite);
         createAutoRefreshControls(composite);
         createSaveAllBeforeBuildPref(composite);
         createCloseUnrelatedProjPrefControls(composite);
-        
+
         createSpace(composite);
+		createWorkspaceLocationGroup(composite);
+
+		createSpace(composite);
         createSaveIntervalGroup(composite);
         createWindowTitleGroup(composite);
 		createSpace(composite);
@@ -183,6 +187,40 @@ public class IDEWorkspacePreferencePage extends PreferencePage
                 .isAutoBuilding());
     }
 
+	/**
+	 * Create a composite that contains entry fields specifying the workspace
+	 * location.
+	 *
+	 * @param composite
+	 *            the Composite the group is created in.
+	 */
+	private void createWorkspaceLocationGroup(Composite composite) {
+		Composite groupComposite = new Composite(composite, SWT.LEFT);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(groupComposite);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(groupComposite);
+
+		// true workspace location
+		Label locationLabel = new Label(groupComposite, SWT.NONE);
+		locationLabel.setText(IDEWorkbenchMessages.IDEWorkspacePreference_workspaceLocation);
+		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(locationLabel);
+		Text workspacePath = new Text(groupComposite, SWT.READ_ONLY);
+		workspacePath.setBackground(workspacePath.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+		workspacePath.setText(Platform.getLocation().toOSString());
+		workspacePath.setToolTipText(workspacePath.getText());
+		workspacePath.setSelection(workspacePath.getText().length());
+		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false)
+				.hint(convertHorizontalDLUsToPixels(200), SWT.DEFAULT).applyTo(workspacePath);
+
+		Composite showLocationComposite = new Composite(composite, SWT.LEFT);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(showLocationComposite);
+		GridLayoutFactory.fillDefaults().applyTo(showLocationComposite);
+		showLocationInWindowTitle = new BooleanFieldEditor(IDEInternalPreferences.SHOW_LOCATION,
+				IDEWorkbenchMessages.IDEWorkspacePreference_showLocationInWindowTitle, showLocationComposite);
+		showLocationInWindowTitle.setPage(this);
+		showLocationInWindowTitle.setPreferenceStore(getIDEPreferenceStore());
+		showLocationInWindowTitle.load();
+	}
+
     /**
      * Create a composite that contains entry fields specifying save interval
      * preference.
@@ -222,7 +260,8 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 
         saveInterval.setPropertyChangeListener(new IPropertyChangeListener() {
 
-            public void propertyChange(PropertyChangeEvent event) {
+            @Override
+			public void propertyChange(PropertyChangeEvent event) {
                 if (event.getProperty().equals(FieldEditor.IS_VALID)) {
 					setValid(saveInterval.isValid());
 				}
@@ -299,9 +338,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 		encodingEditor.setPage(this);
 		encodingEditor.load();
 		encodingEditor.setPropertyChangeListener(new IPropertyChangeListener() {
-			/* (non-Javadoc)
-			 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
-			 */
+			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getProperty().equals(FieldEditor.IS_VALID)) {
 					setValid(encodingEditor.isValid());
@@ -347,7 +384,9 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 
 		systemExplorer = new StringFieldEditor(IDEInternalPreferences.WORKBENCH_SYSTEM_EXPLORER,
 				IDEWorkbenchMessages.IDEWorkbenchPreference_workbenchSystemExplorer, 40, groupComposite);
-		gd = (GridData) systemExplorer.getTextControl(groupComposite).getLayoutData();
+		Text textControl = systemExplorer.getTextControl(groupComposite);
+		BidiUtils.applyBidiProcessing(textControl, BidiUtils.LEFT_TO_RIGHT);
+		gd = (GridData) textControl.getLayoutData();
 		gd.horizontalAlignment = GridData.FILL;
 		gd.grabExcessHorizontalSpace = true;
 		systemExplorer.setPreferenceStore(getIDEPreferenceStore());
@@ -356,6 +395,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 		systemExplorer.load();
 
 		systemExplorer.setPropertyChangeListener(new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getProperty().equals(FieldEditor.IS_VALID)) {
 					setValid(systemExplorer.isValid());
@@ -407,15 +447,16 @@ public class IDEWorkspacePreferencePage extends PreferencePage
                 | GridData.HORIZONTAL_ALIGN_FILL));
         return composite;
     }
-	
+
+	@Override
 	public void init(org.eclipse.ui.IWorkbench workbench) {
-        //no-op
     }
     
     /**
      * The default button has been pressed.
      */
-    protected void performDefaults() {
+    @Override
+	protected void performDefaults() {
 
         // core holds onto this preference.
         boolean autoBuild = ResourcesPlugin.getPlugin().getPluginPreferences()
@@ -427,6 +468,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage
                 .setSelection(store
                         .getDefaultBoolean(IDEInternalPreferences.SAVE_ALL_BEFORE_BUILD));
         saveInterval.loadDefault();
+		showLocationInWindowTitle.loadDefault();
         workspaceName.loadDefault();
         
         boolean closeUnrelatedProj = store.getDefaultBoolean(IDEInternalPreferences.CLOSE_UNRELATED_PROJECTS);
@@ -457,7 +499,8 @@ public class IDEWorkspacePreferencePage extends PreferencePage
     /**
      * The user has pressed Ok. Store/apply this page's values appropriately.
      */
-    public boolean performOk() {
+    @Override
+	public boolean performOk() {
         // set the workspace auto-build flag
         IWorkspaceDescription description = ResourcesPlugin.getWorkspace()
                 .getDescription();
@@ -501,6 +544,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage
             }
         }
         
+		showLocationInWindowTitle.store();
         workspaceName.store();
 
 		systemExplorer.store();

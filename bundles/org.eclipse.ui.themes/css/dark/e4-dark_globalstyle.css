@@ -7,6 +7,8 @@
  *
  * Contributors:
  *     Andrea Guarinoni <andrea.guarinoni.dev@outlook.com> - initial API and implementation
+ *     Stefan Winkler <stefan@winklerweb.net> - Bug 434189
+ *     Stefan Winkler <stefan@winklerweb.net> - Bug 430848
  *******************************************************************************/
 
 /*******************************************************************************
@@ -30,6 +32,7 @@ NewManualServerComposite, ServerTypeComposite, FigureCanvas,
 DependenciesComposite, ListEditorComposite, WrappedPageBook,
 CompareStructureViewerSwitchingPane, CompareContentViewerSwitchingPane,
 QualifiedNameComponent, RefactoringStatusViewer, ImageHyperlink,
+MessageLine,
 Button /* SWT-BUG: checkbox inner label font color is not accessible */,
 ViewForm > ToolBar, /* SWT-BUG: ToolBar do not inherit rules from ViewForm */
 /*Shell [style~='SWT.DROP_DOWN'] > GradientCanvas,*/ /* ignored */
@@ -127,15 +130,6 @@ ScheduleDatePicker > ImageHyperlink {
     color: #dddddd;
 }
 
-MessageLine,
-/* the following are required due to Bug 419482 (see <1>): */
-Shell > Composite > Composite > MessageLine,
-Shell[style~='SWT.RADIO'][style~='SWT.CASCADE'][style~='SWT.SHADOW_ETCHED_IN'][style~='SWT.SHADOW_ETCHED_OUT'][style~='SWT.RESIZE'][style~='SWT.MENU'][style~='SWT.FULL_SELECTION'][style~='SWT.DATE'] > Composite > Composite > MessageLine {
-    background-color:#515658; /* SWT-BUG: background color is hard-coded */
-    color: #E39898;
-}
-
-StyledText,
 Spinner,
 CCombo {
     background-color: #383C3E;
@@ -420,8 +414,12 @@ FlyoutControlComposite, FlyoutControlComposite ToolBar, FlyoutControlComposite C
  * which does not look very nice.
  */
 Label#org-eclipse-ui-splash-progressText {
-	background-color: #f7f7f7;
+	background-color: inherit; /* transparent */
 	color: #9c9696; /* see property startupForegroundColor in the product */
+}
+
+Label#org-eclipse-ui-buildid-text {
+	background-color: inherit; /* transparent */
 }
 
 ProgressIndicator#org-eclipse-ui-splash-progressIndicator {
