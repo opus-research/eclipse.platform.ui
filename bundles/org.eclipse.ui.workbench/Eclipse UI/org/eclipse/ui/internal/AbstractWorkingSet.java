@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,12 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Tomasz Zarna <tomasz.zarna@tasktop.com> - Bug 37183
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
 
 import java.util.ArrayList;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
@@ -28,7 +28,7 @@ import org.eclipse.ui.internal.util.Util;
  *
  * @since 3.2
  */
-public abstract class AbstractWorkingSet implements IAdaptable, IWorkingSet, Cloneable {
+public abstract class AbstractWorkingSet implements IAdaptable, IWorkingSet {
 
 	protected static final String FACTORY_ID = "org.eclipse.ui.internal.WorkingSetFactory"; //$NON-NLS-1$
 
@@ -102,10 +102,9 @@ public abstract class AbstractWorkingSet implements IAdaptable, IWorkingSet, Clo
 			}
 	    }
 
-	    AbstractWorkingSet oldWorkingSet = clone();
 	    name = newName;
 
-	    fireWorkingSetChanged(IWorkingSetManager.CHANGE_WORKING_SET_NAME_CHANGE, oldWorkingSet);
+	    fireWorkingSetChanged(IWorkingSetManager.CHANGE_WORKING_SET_NAME_CHANGE, null);
 
 	    if (labelBoundToName) {
 	    		setLabel(newName);
@@ -123,7 +122,7 @@ public abstract class AbstractWorkingSet implements IAdaptable, IWorkingSet, Clo
 	}
 
 	/**
-	 * Disconnect this working set from its manager, if any.
+	 * Disconnet this working set from its manager, if any.
 	 */
 	public void disconnect() {
 		this.manager= null;
@@ -190,12 +189,11 @@ public abstract class AbstractWorkingSet implements IAdaptable, IWorkingSet, Clo
 
 	@Override
 	public void setLabel(String label) {
-		AbstractWorkingSet oldWorkingSet = clone();
-
 		this.label = label == null ? getName() : label;
 		labelBoundToName = Util.equals(label, name);  // rebind the label to the name
 
-		fireWorkingSetChanged(IWorkingSetManager.CHANGE_WORKING_SET_LABEL_CHANGE, oldWorkingSet);
+		fireWorkingSetChanged(
+				IWorkingSetManager.CHANGE_WORKING_SET_LABEL_CHANGE, null);
 	}
 
 	@Override
@@ -217,15 +215,4 @@ public abstract class AbstractWorkingSet implements IAdaptable, IWorkingSet, Clo
 		this.uniqueId = uniqueId;
 	}
 
-	@Override
-	protected AbstractWorkingSet clone() {
-		try {
-			AbstractWorkingSet clone = (AbstractWorkingSet) super.clone();
-			clone.disconnect();
-			return clone;
-		} catch (CloneNotSupportedException e) {
-			// ignore
-		}
-		return null;
-	}
 }

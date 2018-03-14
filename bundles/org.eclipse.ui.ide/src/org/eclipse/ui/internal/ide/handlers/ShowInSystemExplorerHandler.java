@@ -126,7 +126,7 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 
 		Object selectedObject = ((IStructuredSelection) selection)
 				.getFirstElement();
-		IResource item = org.eclipse.ui.internal.util.Util
+		IResource item = (IResource) org.eclipse.ui.internal.util.Util
 				.getAdapter(selectedObject, IResource.class);
 		return item;
 	}
