@@ -28,7 +28,6 @@ public class UnsupportedClassCSSPropertyException extends Exception {
 		this.clazz = clazz;
 	}
 
-	@Override
 	public String getMessage() {
 		return clazz + " must implement " + ICSSPropertyHandler.class.getName();
 	}
