@@ -450,6 +450,7 @@ MenuManagerEventHelper.getInstance()
 			clearModelToContribution(copy, ici);
 			if (ici != null) {
 				record.getManagerForModel().remove(ici);
+				ici.dispose();
 			}
 		}
 	}
