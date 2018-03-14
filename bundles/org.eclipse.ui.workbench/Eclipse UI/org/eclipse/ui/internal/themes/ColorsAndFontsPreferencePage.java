@@ -694,6 +694,13 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 	private Button goToDefaultButton;
 
 	/**
+	 * The button to expand the tree.
+	 *
+	 * @since 4.5
+	 */
+	private Button expandAllButton;
+
+	/**
 	 * Map of definition FontDefinition->FontData[] capturing the changes
 	 * explicitly made by the user. These changes need to be stored into the
 	 * preference store.
@@ -948,6 +955,9 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 		createSeparator(controlColumn);
 		editDefaultButton = createButton(controlColumn, RESOURCE_BUNDLE.getString("editDefault")); //$NON-NLS-1$
 		goToDefaultButton = createButton(controlColumn, RESOURCE_BUNDLE.getString("goToDefault")); //$NON-NLS-1$
+		createSeparator(controlColumn);
+		expandAllButton = createButton(controlColumn, RESOURCE_BUNDLE.getString("expandAll")); //$NON-NLS-1$
+		expandAllButton.setEnabled(true);
         // --- end of buttons
 
 		createDescriptionControl(mainColumn);
@@ -1342,6 +1352,13 @@ getPreferenceStore(),
 					}
 				}
 				updateControls();
+			}
+		});
+
+		expandAllButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				tree.getViewer().expandAll();
 			}
 		});
 
