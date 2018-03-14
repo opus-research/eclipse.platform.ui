@@ -59,18 +59,15 @@ import org.eclipse.core.databinding.observable.list.IObservableList;
  * System.out.println(sum.getValue()); // =&gt; 13
  * </pre>
  *
- * @param <T>
- *            the type of value being observed
- *
  * @since 1.0
  */
-public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
+public abstract class ComputedValue extends AbstractObservableValue {
 
 	private boolean dirty = true;
 
 	private boolean stale = false;
 
-	private T cachedValue = null;
+	private Object cachedValue = null;
 
 	/**
 	 * Array of observables this computed value depends on. This field has a
@@ -157,7 +154,7 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 	private Object valueType;
 
 	@Override
-	protected final T doGetValue() {
+	protected final Object doGetValue() {
 		if (dirty) {
 			// This line will do the following:
 			// - Run the calculate method
@@ -193,7 +190,7 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 	 *
 	 * @return the object's value
 	 */
-	protected abstract T calculate();
+	protected abstract Object calculate();
 
 	protected final void makeDirty() {
 		if (!dirty) {
@@ -202,18 +199,18 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 			stopListening();
 
 			// copy the old value
-			final T oldValue = cachedValue;
+			final Object oldValue = cachedValue;
 			// Fire the "dirty" event. This implementation recomputes the new
 			// value lazily.
-			fireValueChange(new ValueDiff<T>() {
+			fireValueChange(new ValueDiff() {
 
 				@Override
-				public T getOldValue() {
+				public Object getOldValue() {
 					return oldValue;
 				}
 
 				@Override
-				public T getNewValue() {
+				public Object getNewValue() {
 					return getValue();
 				}
 			});
@@ -293,7 +290,7 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 
 	@Override
 	public synchronized void addValueChangeListener(
-			IValueChangeListener<T> listener) {
+			IValueChangeListener listener) {
 		super.addValueChangeListener(listener);
 		// If somebody is listening, we need to make sure we attach our own
 		// listeners

@@ -40,22 +40,18 @@ import org.eclipse.core.internal.databinding.property.list.SimplePropertyObserva
  * In addition, we recommended overriding {@link #toString()} to return a
  * description suitable for debugging purposes.
  *
- * @param <S>
- *            type of the source object
- * @param <E>
- *            type of the elements in the list
  * @since 1.2
  */
-public abstract class SimpleListProperty<S, E> extends ListProperty<S, E> {
+public abstract class SimpleListProperty extends ListProperty {
 	@Override
-	public IObservableList<E> observe(Realm realm, S source) {
-		return new SimplePropertyObservableList<S, E>(realm, source, this);
+	public IObservableList observe(Realm realm, Object source) {
+		return new SimplePropertyObservableList(realm, source, this);
 	}
 
 	// Accessors
 
 	@Override
-	protected abstract List<E> doGetList(S source);
+	protected abstract List doGetList(Object source);
 
 	// Mutators
 
@@ -69,9 +65,8 @@ public abstract class SimpleListProperty<S, E> extends ListProperty<S, E> {
 	 * @param diff
 	 *            a diff describing the change
 	 * @noreference This method is not intended to be referenced by clients.
-	 * @since 1.6
 	 */
-	public final void setList(S source, List<E> list, ListDiff<E> diff) {
+	public final void setList(Object source, List list, ListDiff diff) {
 		if (source != null && !diff.isEmpty()) {
 			doSetList(source, list, diff);
 		}
@@ -88,17 +83,17 @@ public abstract class SimpleListProperty<S, E> extends ListProperty<S, E> {
 	 *            a diff describing the change
 	 * @noreference This method is not intended to be referenced by clients.
 	 */
-	protected abstract void doSetList(S source, List<E> list, ListDiff<E> diff);
+	protected abstract void doSetList(Object source, List list, ListDiff diff);
 
 	@Override
-	protected void doSetList(S source, List<E> list) {
-		ListDiff<E> diff = Diffs.computeLazyListDiff(doGetList(source), list);
+	protected void doSetList(Object source, List list) {
+		ListDiff diff = Diffs.computeLazyListDiff(doGetList(source), list);
 		doSetList(source, list, diff);
 	}
 
 	@Override
-	protected void doUpdateList(S source, ListDiff<E> diff) {
-		List<E> list = new ArrayList<E>(doGetList(source));
+	protected void doUpdateList(Object source, ListDiff diff) {
+		List list = new ArrayList(doGetList(source));
 		diff.applyTo(list);
 		doSetList(source, list, diff);
 	}
@@ -119,6 +114,6 @@ public abstract class SimpleListProperty<S, E> extends ListProperty<S, E> {
 	 *         APIs for this property.
 	 * @noreference This method is not intended to be referenced by clients.
 	 */
-	public abstract INativePropertyListener<S> adaptListener(
-			ISimplePropertyListener<ListDiff<E>> listener);
+	public abstract INativePropertyListener adaptListener(
+			ISimplePropertyListener listener);
 }

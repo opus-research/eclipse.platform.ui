@@ -71,13 +71,10 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
  * System.out.println(fibonacci); // =&gt; &quot;[0, 1, 1, 2, 3]&quot;
  * </pre>
  *
- * @param <E>
- *            the list element type
- *
  * @since 1.1
  */
-public abstract class ComputedList<E> extends AbstractObservableList<E> {
-	private List<E> cachedList = new ArrayList<E>();
+public abstract class ComputedList extends AbstractObservableList {
+	private List cachedList = new ArrayList();
 
 	private boolean dirty = true;
 	private boolean stale = false;
@@ -183,17 +180,17 @@ public abstract class ComputedList<E> extends AbstractObservableList<E> {
 	}
 
 	@Override
-	public E get(int index) {
+	public Object get(int index) {
 		getterCalled();
 		return doGetList().get(index);
 	}
 
-	private final List<E> getList() {
+	private final List getList() {
 		getterCalled();
 		return doGetList();
 	}
 
-	final List<E> doGetList() {
+	final List doGetList() {
 		if (dirty) {
 			// This line will do the following:
 			// - Run the calculate method
@@ -239,7 +236,7 @@ public abstract class ComputedList<E> extends AbstractObservableList<E> {
 	 *
 	 * @return the object's list.
 	 */
-	protected abstract List<E> calculate();
+	protected abstract List calculate();
 
 	private void makeDirty() {
 		if (!dirty) {
@@ -250,19 +247,18 @@ public abstract class ComputedList<E> extends AbstractObservableList<E> {
 			stopListening();
 
 			// copy the old list
-			final List<E> oldList = new ArrayList<E>(cachedList);
+			final List oldList = new ArrayList(cachedList);
 			// Fire the "dirty" event. This implementation recomputes the new
 			// list lazily.
-			fireListChange(new ListDiff<E>() {
-				List<ListDiffEntry<E>> differences;
+			fireListChange(new ListDiff() {
+				ListDiffEntry[] differences;
 
 				@Override
-				public ListDiffEntry<?>[] getDifferences() {
+				public ListDiffEntry[] getDifferences() {
 					if (differences == null)
-						return Diffs.computeListDiff(oldList, getList())
+						differences = Diffs.computeListDiff(oldList, getList())
 								.getDifferences();
-					return differences.toArray(new ListDiffEntry[differences
-							.size()]);
+					return differences;
 				}
 			});
 		}
@@ -308,7 +304,7 @@ public abstract class ComputedList<E> extends AbstractObservableList<E> {
 	}
 
 	@Override
-	public synchronized void addListChangeListener(IListChangeListener<E> listener) {
+	public synchronized void addListChangeListener(IListChangeListener listener) {
 		super.addListChangeListener(listener);
 		// If somebody is listening, we need to make sure we attach our own
 		// listeners

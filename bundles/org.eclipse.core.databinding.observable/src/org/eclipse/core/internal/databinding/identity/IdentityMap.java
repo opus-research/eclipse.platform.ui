@@ -33,20 +33,16 @@ import org.eclipse.core.runtime.Assert;
  * It intentionally violates the {@link Map} contract, which requires the use of
  * {@link #equals(Object)} when comparing keys.
  *
- * @param <K>
- *            the type of the keys in the map
- * @param <V>
- *            the type of the values in the map
  * @since 1.2
  */
-public class IdentityMap<K, V> implements Map<K, V> {
-	private Map<IdentityWrapper<K>, V> wrappedMap;
+public class IdentityMap implements Map {
+	private Map wrappedMap;
 
 	/**
 	 * Constructs an IdentityMap.
 	 */
 	public IdentityMap() {
-		this.wrappedMap = new HashMap<>();
+		this.wrappedMap = new HashMap();
 	}
 
 	/**
@@ -56,7 +52,7 @@ public class IdentityMap<K, V> implements Map<K, V> {
 	 * @param map
 	 *            the map whose entries are to be added to this map.
 	 */
-	public IdentityMap(Map<? extends K, ? extends V> map) {
+	public IdentityMap(Map map) {
 		this();
 		Assert.isNotNull(map);
 		putAll(map);
@@ -78,17 +74,16 @@ public class IdentityMap<K, V> implements Map<K, V> {
 	}
 
 	@Override
-	public Set<Map.Entry<K, V>> entrySet() {
-		final Set<Map.Entry<IdentityWrapper<K>, V>> wrappedEntrySet = wrappedMap
-				.entrySet();
-		return new Set<Map.Entry<K, V>>() {
+	public Set entrySet() {
+		final Set wrappedEntrySet = wrappedMap.entrySet();
+		return new Set() {
 			@Override
-			public boolean add(Map.Entry<K, V> o) {
+			public boolean add(Object o) {
 				throw new UnsupportedOperationException();
 			}
 
 			@Override
-			public boolean addAll(Collection<? extends Map.Entry<K, V>> c) {
+			public boolean addAll(Collection c) {
 				throw new UnsupportedOperationException();
 			}
 
@@ -99,16 +94,15 @@ public class IdentityMap<K, V> implements Map<K, V> {
 
 			@Override
 			public boolean contains(Object o) {
-				for (Iterator<Map.Entry<K, V>> iterator = iterator(); iterator
-						.hasNext();)
+				for (Iterator iterator = iterator(); iterator.hasNext();)
 					if (iterator.next().equals(o))
 						return true;
 				return false;
 			}
 
 			@Override
-			public boolean containsAll(Collection<?> c) {
-				for (Iterator<?> iterator = c.iterator(); iterator.hasNext();)
+			public boolean containsAll(Collection c) {
+				for (Iterator iterator = c.iterator(); iterator.hasNext();)
 					if (!contains(iterator.next()))
 						return false;
 				return true;
@@ -120,32 +114,32 @@ public class IdentityMap<K, V> implements Map<K, V> {
 			}
 
 			@Override
-			public Iterator<Map.Entry<K, V>> iterator() {
-				final Iterator<Map.Entry<IdentityWrapper<K>, V>> wrappedIterator = wrappedEntrySet
-						.iterator();
-				return new Iterator<Map.Entry<K, V>>() {
+			public Iterator iterator() {
+				final Iterator wrappedIterator = wrappedEntrySet.iterator();
+				return new Iterator() {
 					@Override
 					public boolean hasNext() {
 						return wrappedIterator.hasNext();
 					}
 
 					@Override
-					public Map.Entry<K, V> next() {
-						final Map.Entry<IdentityWrapper<K>, V> wrappedEntry = wrappedIterator
+					public Object next() {
+						final Map.Entry wrappedEntry = (Map.Entry) wrappedIterator
 								.next();
-						return new Map.Entry<K, V>() {
+						return new Map.Entry() {
 							@Override
-							public K getKey() {
-								return wrappedEntry.getKey().unwrap();
+							public Object getKey() {
+								return ((IdentityWrapper) wrappedEntry.getKey())
+										.unwrap();
 							}
 
 							@Override
-							public V getValue() {
+							public Object getValue() {
 								return wrappedEntry.getValue();
 							}
 
 							@Override
-							public V setValue(V value) {
+							public Object setValue(Object value) {
 								return wrappedEntry.setValue(value);
 							}
 
@@ -155,10 +149,10 @@ public class IdentityMap<K, V> implements Map<K, V> {
 									return true;
 								if (obj == null || !(obj instanceof Map.Entry))
 									return false;
-								Map.Entry<?, ?> that = (Map.Entry<?, ?>) obj;
+								Map.Entry that = (Map.Entry) obj;
 								return this.getKey() == that.getKey()
-										&& Util.equals(this.getValue(),
-												that.getValue());
+										&& Util.equals(this.getValue(), that
+												.getValue());
 							}
 
 							@Override
@@ -177,13 +171,12 @@ public class IdentityMap<K, V> implements Map<K, V> {
 
 			@Override
 			public boolean remove(Object o) {
-				final Map.Entry<?, ?> unwrappedEntry = (Map.Entry<?, ?>) o;
-				Object key = unwrappedEntry.getKey();
-				final IdentityWrapper<Object> wrappedKey = IdentityWrapper
-						.wrap(key);
-				Map.Entry<IdentityWrapper<Object>, Object> wrappedEntry = new Map.Entry<IdentityWrapper<Object>, Object>() {
+				final Map.Entry unwrappedEntry = (Map.Entry) o;
+				final IdentityWrapper wrappedKey = IdentityWrapper
+						.wrap(unwrappedEntry.getKey());
+				Map.Entry wrappedEntry = new Map.Entry() {
 					@Override
-					public IdentityWrapper<Object> getKey() {
+					public Object getKey() {
 						return wrappedKey;
 					}
 
@@ -203,9 +196,11 @@ public class IdentityMap<K, V> implements Map<K, V> {
 							return true;
 						if (obj == null || !(obj instanceof Map.Entry))
 							return false;
-						Map.Entry<?, ?> that = (Map.Entry<?, ?>) obj;
+						Map.Entry that = (Map.Entry) obj;
 						return Util.equals(wrappedKey, that.getKey())
-								&& Util.equals(this.getValue(), that.getValue());
+								&& Util
+										.equals(this.getValue(), that
+												.getValue());
 					}
 
 					@Override
@@ -219,19 +214,18 @@ public class IdentityMap<K, V> implements Map<K, V> {
 			}
 
 			@Override
-			public boolean removeAll(Collection<?> c) {
+			public boolean removeAll(Collection c) {
 				boolean changed = false;
-				for (Iterator<?> iterator = c.iterator(); iterator.hasNext();)
+				for (Iterator iterator = c.iterator(); iterator.hasNext();)
 					changed |= remove(iterator.next());
 				return changed;
 			}
 
 			@Override
-			public boolean retainAll(Collection<?> c) {
+			public boolean retainAll(Collection c) {
 				boolean changed = false;
 				Object[] toRetain = c.toArray();
-				outer: for (Iterator<?> iterator = iterator(); iterator
-						.hasNext();) {
+				outer: for (Iterator iterator = iterator(); iterator.hasNext();) {
 					Object entry = iterator.next();
 					for (int i = 0; i < toRetain.length; i++)
 						if (entry.equals(toRetain[i]))
@@ -253,16 +247,16 @@ public class IdentityMap<K, V> implements Map<K, V> {
 			}
 
 			@Override
-			public <T> T[] toArray(T[] a) {
+			public Object[] toArray(Object[] a) {
 				int size = size();
 				if (a.length < size) {
-					a = (T[]) Array.newInstance(
-							a.getClass().getComponentType(), size);
+					a = (Object[]) Array.newInstance(a.getClass()
+							.getComponentType(), size);
 				}
 				int i = 0;
-				for (Iterator<Map.Entry<K, V>> iterator = iterator(); iterator
-						.hasNext();) {
-					a[i++] = (T) iterator.next();
+				for (Iterator iterator = iterator(); iterator.hasNext();) {
+					a[i] = iterator.next();
+					i++;
 				}
 				return a;
 			}
@@ -273,7 +267,7 @@ public class IdentityMap<K, V> implements Map<K, V> {
 					return true;
 				if (obj == null || !(obj instanceof Set))
 					return false;
-				Set<?> that = (Set<?>) obj;
+				Set that = (Set) obj;
 				return this.size() == that.size() && containsAll(that);
 			}
 
@@ -285,7 +279,7 @@ public class IdentityMap<K, V> implements Map<K, V> {
 	}
 
 	@Override
-	public V get(Object key) {
+	public Object get(Object key) {
 		return wrappedMap.get(IdentityWrapper.wrap(key));
 	}
 
@@ -295,16 +289,16 @@ public class IdentityMap<K, V> implements Map<K, V> {
 	}
 
 	@Override
-	public Set<K> keySet() {
-		final Set<IdentityWrapper<K>> wrappedKeySet = wrappedMap.keySet();
-		return new Set<K>() {
+	public Set keySet() {
+		final Set wrappedKeySet = wrappedMap.keySet();
+		return new Set() {
 			@Override
-			public boolean add(K o) {
+			public boolean add(Object o) {
 				throw new UnsupportedOperationException();
 			}
 
 			@Override
-			public boolean addAll(Collection<? extends K> c) {
+			public boolean addAll(Collection c) {
 				throw new UnsupportedOperationException();
 			}
 
@@ -319,8 +313,8 @@ public class IdentityMap<K, V> implements Map<K, V> {
 			}
 
 			@Override
-			public boolean containsAll(Collection<?> c) {
-				for (Iterator<?> iterator = c.iterator(); iterator.hasNext();)
+			public boolean containsAll(Collection c) {
+				for (Iterator iterator = c.iterator(); iterator.hasNext();)
 					if (!wrappedKeySet.contains(IdentityWrapper.wrap(iterator
 							.next())))
 						return false;
@@ -333,18 +327,18 @@ public class IdentityMap<K, V> implements Map<K, V> {
 			}
 
 			@Override
-			public Iterator<K> iterator() {
-				final Iterator<IdentityWrapper<K>> wrappedIterator = wrappedKeySet
-						.iterator();
-				return new Iterator<K>() {
+			public Iterator iterator() {
+				final Iterator wrappedIterator = wrappedKeySet.iterator();
+				return new Iterator() {
 					@Override
 					public boolean hasNext() {
 						return wrappedIterator.hasNext();
 					}
 
 					@Override
-					public K next() {
-						return wrappedIterator.next().unwrap();
+					public Object next() {
+						return ((IdentityWrapper) wrappedIterator.next())
+								.unwrap();
 					}
 
 					@Override
@@ -360,20 +354,19 @@ public class IdentityMap<K, V> implements Map<K, V> {
 			}
 
 			@Override
-			public boolean removeAll(Collection<?> c) {
+			public boolean removeAll(Collection c) {
 				boolean changed = false;
-				for (Iterator<?> iterator = c.iterator(); iterator.hasNext();)
+				for (Iterator iterator = c.iterator(); iterator.hasNext();)
 					changed |= wrappedKeySet.remove(IdentityWrapper
 							.wrap(iterator.next()));
 				return changed;
 			}
 
 			@Override
-			public boolean retainAll(Collection<?> c) {
+			public boolean retainAll(Collection c) {
 				boolean changed = false;
 				Object[] toRetain = c.toArray();
-				outer: for (Iterator<?> iterator = iterator(); iterator
-						.hasNext();) {
+				outer: for (Iterator iterator = iterator(); iterator.hasNext();) {
 					Object element = iterator.next();
 					for (int i = 0; i < toRetain.length; i++)
 						if (element == toRetain[i])
@@ -396,17 +389,17 @@ public class IdentityMap<K, V> implements Map<K, V> {
 			}
 
 			@Override
-			public <T> T[] toArray(T[] a) {
+			public Object[] toArray(Object[] a) {
 				int size = wrappedKeySet.size();
-				T[] result = a;
+				IdentityWrapper[] wrappedArray = (IdentityWrapper[]) wrappedKeySet
+						.toArray(new IdentityWrapper[size]);
+				Object[] result = a;
 				if (a.length < size) {
-					result = (T[]) Array.newInstance(a.getClass()
+					result = (Object[]) Array.newInstance(a.getClass()
 							.getComponentType(), size);
 				}
-				int i = 0;
-				for (IdentityWrapper<K> wrapper : wrappedKeySet) {
-					result[i++] = (T) wrapper.unwrap();
-				}
+				for (int i = 0; i < size; i++)
+					result[i] = wrappedArray[i].unwrap();
 				return result;
 			}
 
@@ -416,7 +409,7 @@ public class IdentityMap<K, V> implements Map<K, V> {
 					return true;
 				if (obj == null || !(obj instanceof Set))
 					return false;
-				Set<?> that = (Set<?>) obj;
+				Set that = (Set) obj;
 				return this.size() == that.size() && containsAll(that);
 			}
 
@@ -428,21 +421,22 @@ public class IdentityMap<K, V> implements Map<K, V> {
 	}
 
 	@Override
-	public V put(K key, V value) {
+	public Object put(Object key, Object value) {
 		return wrappedMap.put(IdentityWrapper.wrap(key), value);
 	}
 
 	@Override
-	public void putAll(Map<? extends K, ? extends V> other) {
-		for (Map.Entry<? extends K, ? extends V> entry : other.entrySet()) {
-			K key = entry.getKey();
-			V value = entry.getValue();
-			wrappedMap.put(IdentityWrapper.wrap(key), value);
+	public void putAll(Map other) {
+		for (Iterator iterator = other.entrySet().iterator(); iterator
+				.hasNext();) {
+			Map.Entry entry = (Map.Entry) iterator.next();
+			wrappedMap.put(IdentityWrapper.wrap(entry.getKey()), entry
+					.getValue());
 		}
 	}
 
 	@Override
-	public V remove(Object key) {
+	public Object remove(Object key) {
 		return wrappedMap.remove(IdentityWrapper.wrap(key));
 	}
 
@@ -452,7 +446,7 @@ public class IdentityMap<K, V> implements Map<K, V> {
 	}
 
 	@Override
-	public Collection<V> values() {
+	public Collection values() {
 		return wrappedMap.values();
 	}
 
@@ -462,7 +456,7 @@ public class IdentityMap<K, V> implements Map<K, V> {
 			return true;
 		if (obj == null || !(obj instanceof Map))
 			return false;
-		Map<?, ?> that = (Map<?, ?>) obj;
+		Map that = (Map) obj;
 		return this.entrySet().equals(that.entrySet());
 	}
 

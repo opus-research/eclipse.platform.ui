@@ -25,12 +25,7 @@ import org.eclipse.core.databinding.property.set.ISetProperty;
 
 /**
  * Interface for value-typed properties
- * 
- * @param <S>
- *            type of the source object
- * @param <T>
- *            type of the value of the property
- * 
+ *
  * @since 1.2
  * @noimplement This interface is not intended to be implemented by clients.
  *              Clients should instead subclass one of the classes that
@@ -40,7 +35,7 @@ import org.eclipse.core.databinding.property.set.ISetProperty;
  * @see ValueProperty
  * @see SimpleValueProperty
  */
-public interface IValueProperty<S, T> extends IProperty {
+public interface IValueProperty extends IProperty {
 	/**
 	 * Returns the value type of the property, or <code>null</code> if untyped.
 	 *
@@ -58,7 +53,7 @@ public interface IValueProperty<S, T> extends IProperty {
 	 *         source.
 	 * @since 1.3
 	 */
-	public T getValue(S source);
+	public Object getValue(Object source);
 
 	/**
 	 * Sets this property on the specified property source to the specified
@@ -76,7 +71,7 @@ public interface IValueProperty<S, T> extends IProperty {
 	 *            the new property value
 	 * @since 1.3
 	 */
-	public void setValue(S source, T value);
+	public void setValue(Object source, Object value);
 
 	/**
 	 * Returns an observable value observing this value property on the given
@@ -87,7 +82,7 @@ public interface IValueProperty<S, T> extends IProperty {
 	 * @return an observable value observing this value property on the given
 	 *         property source
 	 */
-	public IObservableValue<T> observe(S source);
+	public IObservableValue observe(Object source);
 
 	/**
 	 * Returns an observable value observing this value property on the given
@@ -100,7 +95,7 @@ public interface IValueProperty<S, T> extends IProperty {
 	 * @return an observable value observing this value property on the given
 	 *         property source
 	 */
-	public IObservableValue<T> observe(Realm realm, S source);
+	public IObservableValue observe(Realm realm, Object source);
 
 	/**
 	 * Returns a factory for creating observable values tracking this property
@@ -109,7 +104,7 @@ public interface IValueProperty<S, T> extends IProperty {
 	 * @return a factory for creating observable values tracking this property
 	 *         of a particular property source.
 	 */
-	public IObservableFactory<S, IObservableValue<T>> valueFactory();
+	public IObservableFactory valueFactory();
 
 	/**
 	 * Returns a factory for creating observable values in the given realm,
@@ -121,7 +116,7 @@ public interface IValueProperty<S, T> extends IProperty {
 	 * @return a factory for creating observable values in the given realm,
 	 *         tracking this property of a particular property source.
 	 */
-	public IObservableFactory<S, IObservableValue<T>> valueFactory(Realm realm);
+	public IObservableFactory valueFactory(Realm realm);
 
 	/**
 	 * Returns an observable value on the master observable's realm which tracks
@@ -132,8 +127,7 @@ public interface IValueProperty<S, T> extends IProperty {
 	 * @return an observable value which tracks this property of the current
 	 *         value of <code>master</code>.
 	 */
-	public <M extends S> IObservableValue<T> observeDetail(
-			IObservableValue<M> master);
+	public IObservableValue observeDetail(IObservableValue master);
 
 	/**
 	 * Returns an observable list on the master observable's realm which tracks
@@ -144,8 +138,7 @@ public interface IValueProperty<S, T> extends IProperty {
 	 * @return an observable list which tracks this property on each element of
 	 *         the master observable.
 	 */
-	public <M extends S> IObservableList<T> observeDetail(
-			IObservableList<M> master);
+	public IObservableList observeDetail(IObservableList master);
 
 	/**
 	 * Returns an observable map on the master observable's realm where the
@@ -157,8 +150,7 @@ public interface IValueProperty<S, T> extends IProperty {
 	 * @return an observable map that tracks the current value of this property
 	 *         for the elements in the given set.
 	 */
-	public <M extends S> IObservableMap<M, T> observeDetail(
-			IObservableSet<M> master);
+	public IObservableMap observeDetail(IObservableSet master);
 
 	/**
 	 * Returns an observable map on the master observable's realm where the
@@ -172,8 +164,7 @@ public interface IValueProperty<S, T> extends IProperty {
 	 *         the current value of this property for the elements in the given
 	 *         map's values collection
 	 */
-	public <K, V extends S> IObservableMap<K, T> observeDetail(
-			IObservableMap<K, V> master);
+	public IObservableMap observeDetail(IObservableMap master);
 
 	/**
 	 * Returns the nested combination of this property and the specified detail
@@ -185,8 +176,7 @@ public interface IValueProperty<S, T> extends IProperty {
 	 *            the detail property
 	 * @return the nested combination of the master and detail properties
 	 */
-	public <M> IValueProperty<S, M> value(
-			IValueProperty<? super T, M> detailValue);
+	public IValueProperty value(IValueProperty detailValue);
 
 	/**
 	 * Returns the nested combination of this property and the specified detail
@@ -199,7 +189,7 @@ public interface IValueProperty<S, T> extends IProperty {
 	 * @return the nested combination of the master value and detail list
 	 *         properties
 	 */
-	public <E> IListProperty<S, E> list(IListProperty<? super T, E> detailList);
+	public IListProperty list(IListProperty detailList);
 
 	/**
 	 * Returns the nested combination of this property and the specified detail
@@ -212,7 +202,7 @@ public interface IValueProperty<S, T> extends IProperty {
 	 * @return the nested combination of the master value and detail set
 	 *         properties
 	 */
-	public <E> ISetProperty<S, E> set(ISetProperty<? super T, E> detailSet);
+	public ISetProperty set(ISetProperty detailSet);
 
 	/**
 	 * Returns the nested combination of this property and the specified detail
@@ -225,6 +215,5 @@ public interface IValueProperty<S, T> extends IProperty {
 	 * @return the nested combination of the master value and detial map
 	 *         properties
 	 */
-	public <K, V> IMapProperty<S, K, V> map(
-			IMapProperty<? super T, K, V> detailMap);
+	public IMapProperty map(IMapProperty detailMap);
 }
