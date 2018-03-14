@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 Brad Reynolds.
+ * Copyright (c) 2006 Brad Reynolds.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,26 +7,22 @@
  *
  * Contributors:
  *    Brad Reynolds - initial API and implementation
- *    Lars Vogel <Lars.Vogel@vogella.com> - Bug 443804
  *******************************************************************************/
 
 package org.eclipse.ui.tests.harness.tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import java.lang.reflect.UndeclaredThrowableException;
 
+import junit.framework.TestCase;
+
 import org.eclipse.ui.tests.harness.util.Mocks;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * Tests for the Mocks class.
  * 
  * @since 1.1
  */
-public class MocksTest  {
+public class MocksTest extends TestCase {
 	private IPrimitive primitiveMock;
 
 	private static boolean uninitializedBoolean;
@@ -38,13 +34,11 @@ public class MocksTest  {
 	private static float unitializedFloat;
 	private static double unitializedDouble;
 	
-	@Before
-	public void setUp()  {
+	protected void setUp() throws Exception {
 		primitiveMock = (IPrimitive) Mocks.createRelaxedMock(IPrimitive.class);
 	}
 
-	@Test
-	public void testPrimitiveBooleanReturnType() {
+	public void testPrimitiveBooleanReturnType() throws Exception {
 		try {
 			boolean value = primitiveMock.getBoolean();
 			assertEquals(uninitializedBoolean, value);
@@ -53,8 +47,7 @@ public class MocksTest  {
 		}
 	}
 	
-	@Test
-	public void testPrimitiveBooleanSetLastReturnValue() {
+	public void testPrimitiveBooleanSetLastReturnValue() throws Exception {
 		Boolean value = Boolean.TRUE;
 		primitiveMock.getBoolean();
 		Mocks.setLastReturnValue(primitiveMock, value);
@@ -63,8 +56,7 @@ public class MocksTest  {
 		assertEquals(value.booleanValue(), primitiveMock.getBoolean());		
 	}
 	
-	@Test
-	public void testPrimitiveByteReturnType() {
+	public void testPrimitiveByteReturnType() throws Exception {
 		try {
 			byte value = primitiveMock.getByte();
 			assertEquals(unitializedByte, value);
@@ -73,8 +65,7 @@ public class MocksTest  {
 		}
 	}
 	
-	@Test
-	public void testPrimitiveByteSetLastReturnValue() {
+	public void testPrimitiveByteSetLastReturnValue() throws Exception {
 		Byte value = new Byte((byte) 1);
 		primitiveMock.getByte();
 		Mocks.setLastReturnValue(primitiveMock, value);
@@ -83,8 +74,7 @@ public class MocksTest  {
 		assertEquals(value.byteValue(), primitiveMock.getByte());
 	}
 	
-	@Test
-	public void testPrimitiveCharReturnType() {
+	public void testPrimitiveCharReturnType() throws Exception {
 		try {
 			char value = primitiveMock.getChar();
 			assertEquals(unitializedChar, value);
@@ -93,8 +83,7 @@ public class MocksTest  {
 		}
 	}
 	
-	@Test
-	public void testPrimitiveCharSetLastReturnValue() {
+	public void testPrimitiveCharSetLastReturnValue() throws Exception {
 		Character value = new Character('a');
 		primitiveMock.getChar();
 		Mocks.setLastReturnValue(primitiveMock, value);
@@ -103,8 +92,7 @@ public class MocksTest  {
 		assertEquals(value.charValue(), primitiveMock.getChar());
 	}
 	
-	@Test
-	public void testPrimitiveShortReturnType() {
+	public void testPrimitiveShortReturnType() throws Exception {
 		try {
 			short value = primitiveMock.getShort();
 			assertEquals(unitializedShort, value);
@@ -113,8 +101,7 @@ public class MocksTest  {
 		}
 	}
 
-	@Test
-	public void testPrimitiveShortSetLastReturnValue() {
+	public void testPrimitiveShortSetLastReturnValue() throws Exception {
 		Short value = new Short((short) 1);
 		primitiveMock.getShort();
 		Mocks.setLastReturnValue(primitiveMock, value);
@@ -123,8 +110,7 @@ public class MocksTest  {
 		assertEquals(value.shortValue(), primitiveMock.getShort());
 	}
 	
-	@Test
-	public void testPrimitiveIntReturnType() {
+	public void testPrimitiveIntReturnType() throws Exception {
 		try {
 			int value = primitiveMock.getInt();
 			assertEquals(unitializedInt, value);
@@ -133,8 +119,7 @@ public class MocksTest  {
 		}
 	}
 	
-	@Test
-	public void testPrimitiveIntSetLastReturnValue() {
+	public void testPrimitiveIntSetLastReturnValue() throws Exception {
 		Integer value = new Integer(1);
 		primitiveMock.getInt();
 		Mocks.setLastReturnValue(primitiveMock, value);
@@ -143,8 +128,7 @@ public class MocksTest  {
 		assertEquals(value.intValue(), primitiveMock.getInt());
 	}
 	
-	@Test
-	public void testPrimitiveLongReturnType() {
+	public void testPrimitiveLongReturnType() throws Exception {
 		try {
 			long value = primitiveMock.getLong();
 			assertEquals(unitializedLong, value);
@@ -153,8 +137,7 @@ public class MocksTest  {
 		}
 	}
 	
-	@Test
-	public void testPrimitiveLongSetLastReturnValue() {
+	public void testPrimitiveLongSetLastReturnValue() throws Exception {
 		Long value = new Long(1);
 		primitiveMock.getLong();
 		Mocks.setLastReturnValue(primitiveMock, value);
@@ -172,8 +155,7 @@ public class MocksTest  {
 		}
 	}
 	
-	@Test
-	public void testPrimitiveFloatSetLastReturnValue()  {
+	public void testPrimitiveFloatSetLastReturnValue() throws Exception {
 		Float value = new Float(1);
 		primitiveMock.getFloat();
 		Mocks.setLastReturnValue(primitiveMock, value);
@@ -182,8 +164,7 @@ public class MocksTest  {
 		assertEquals(value.floatValue(), primitiveMock.getFloat(), 0);
 	}
 	
-	@Test
-	public void testPrimitiveDoubleReturnType() {
+	public void testPrimitiveDoubleReturnType() throws Exception {
 		try {
 			double value = primitiveMock.getDouble();
 			assertEquals(unitializedDouble, value, 0);
@@ -192,8 +173,7 @@ public class MocksTest  {
 		}
 	}
 	
-	@Test
-	public void testPrimitiveDoubleSetLastReturnValue() {
+	public void testPrimitiveDoubleSetLastReturnValue() throws Exception {
 		Double value = new Double(1);
 		primitiveMock.getDouble();
 		Mocks.setLastReturnValue(primitiveMock, value);
