@@ -12,7 +12,6 @@
 package org.eclipse.ui.internal;
 
 import java.util.ArrayList;
-
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.INavigationLocation;
@@ -63,6 +62,7 @@ public class NavigationHistoryEntry {
     void restoreLocation() {
         if (editorInfo.editorInput != null && editorInfo.editorID != null) {
             try {
+				page.setPerspective(editorInfo.persp);
                 IEditorPart editor = page.openEditor(editorInfo.editorInput,
                         editorInfo.editorID, true);
                 if (location == null) {
