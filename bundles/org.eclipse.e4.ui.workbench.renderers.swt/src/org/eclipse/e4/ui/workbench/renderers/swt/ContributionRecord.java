@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     René Brandstetter <Rene.Brandstetter@gmx.net> - Bug 391430
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.renderers.swt;
@@ -138,19 +137,6 @@ public class ContributionRecord {
 			HashSet<ContributionRecord> recentlyUpdated, MMenuElement item,
 			ExpressionContext exprContext) {
 		boolean currentVisibility = isVisible;
-
-		if (item instanceof MMenu) {
-			MenuManager itemManager = renderer.getManager((MMenu) item);
-			if (itemManager != null) {
-				// if the item isn't visible at the moment return with false
-				// otherwise it was made visible via the UI model element which
-				// changed the visisblity via an event
-				if (!itemManager.isVisible()) {
-					return false;
-				}
-			}
-		}
-
 		if (item instanceof MMenu || item instanceof MMenuSeparator) {
 			ArrayList<ContributionRecord> list = renderer.getList(item);
 			if (list != null) {
