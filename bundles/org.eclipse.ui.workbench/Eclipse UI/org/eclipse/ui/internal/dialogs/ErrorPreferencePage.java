@@ -30,8 +30,7 @@ public class ErrorPreferencePage extends EmptyPreferencePage {
      * 
      * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
      */
-    @Override
-	protected Control createContents(Composite parent) {
+    protected Control createContents(Composite parent) {
         Text text = new Text(parent, SWT.MULTI | SWT.READ_ONLY | SWT.WRAP);
         text.setForeground(JFaceColors.getErrorText(text.getDisplay()));
         text.setBackground(text.getDisplay().getSystemColor(

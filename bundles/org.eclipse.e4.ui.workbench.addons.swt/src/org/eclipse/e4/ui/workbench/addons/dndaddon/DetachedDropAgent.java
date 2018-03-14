@@ -16,7 +16,6 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
-import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
@@ -49,20 +48,11 @@ public class DetachedDropAgent extends DropAgent {
 
 	@Override
 	public boolean drop(MUIElement dragElement, DnDInfo info) {
-		// Ensure that the stack is restored first if minimizdd
-		if (dragElement.getTags().contains(IPresentationEngine.MINIMIZED)) {
-			dragElement.getTags().remove(IPresentationEngine.MINIMIZED);
-		}
-
 		if (dragElement.getCurSharedRef() != null)
 			dragElement = dragElement.getCurSharedRef();
 
 		modelService.detach((MPartSashContainerElement) dragElement, curRect.x, curRect.y,
 				curRect.width, curRect.height);
-
-		// Fully re-activate the part since its location has changed
-		reactivatePart(dragElement);
-
 		return true;
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,11 +13,12 @@ package org.eclipse.e4.ui.tests.application;
 import javax.inject.Inject;
 import javax.inject.Named;
 import junit.framework.TestCase;
-import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.contributions.IContributionFactory;
+import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.UIEventPublisher;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -55,9 +56,9 @@ public class Bug320857Test extends TestCase {
 			MApplication application) {
 		applicationContext.set(MApplication.class.getName(), application);
 		application.setContext(applicationContext);
-		final UIEventPublisher ep = new UIEventPublisher(applicationContext);
-		((Notifier) application).eAdapters().add(ep);
-		applicationContext.set(UIEventPublisher.class, ep);
+		E4Workbench.processHierarchy(application);
+		((Notifier) application).eAdapters().add(
+				new UIEventPublisher(applicationContext));
 	}
 
 	private IPresentationEngine getEngine() {
@@ -113,9 +114,8 @@ public class Bug320857Test extends TestCase {
 		getEngine().createGui(window);
 
 		applicationContext.set(Bug320857.class.getName(),
-				new ContextFunction() {
-					public Object compute(IEclipseContext context,
-							String contextKey) {
+				new IContextFunction() {
+					public Object compute(IEclipseContext context) {
 						return ContextInjectionFactory.make(Bug320857.class,
 								context);
 					}

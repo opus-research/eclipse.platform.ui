@@ -47,16 +47,14 @@ public class ElementListSelectionDialog extends
     /*
      * @see SelectionStatusDialog#computeResult()
      */
-    @Override
-	protected void computeResult() {
+    protected void computeResult() {
         setResult(Arrays.asList(getSelectedElements()));
     }
 
     /*
      * @see Dialog#createDialogArea(Composite)
      */
-    @Override
-	protected Control createDialogArea(Composite parent) {
+    protected Control createDialogArea(Composite parent) {
         Composite contents = (Composite) super.createDialogArea(parent);
 
         createMessageArea(contents);

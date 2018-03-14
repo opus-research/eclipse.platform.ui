@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2012 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -69,7 +69,6 @@ final class HandlerActivation implements IHandlerActivation {
 	 * @see
 	 * org.eclipse.ui.internal.services.IEvaluationResultCache#clearResult()
 	 */
-	@Override
 	public void clearResult() {
 	}
 
@@ -79,7 +78,6 @@ final class HandlerActivation implements IHandlerActivation {
 	 * @see
 	 * org.eclipse.ui.internal.services.IEvaluationResultCache#getExpression()
 	 */
-	@Override
 	public Expression getExpression() {
 		return activeWhen;
 	}
@@ -91,7 +89,6 @@ final class HandlerActivation implements IHandlerActivation {
 	 * org.eclipse.ui.internal.services.IEvaluationResultCache#getSourcePriority
 	 * ()
 	 */
-	@Override
 	public int getSourcePriority() {
 		return sourcePriority;
 	}
@@ -103,7 +100,6 @@ final class HandlerActivation implements IHandlerActivation {
 	 * org.eclipse.ui.internal.services.IEvaluationResultCache#evaluate(org.
 	 * eclipse.core.expressions.IEvaluationContext)
 	 */
-	@Override
 	public boolean evaluate(IEvaluationContext context) {
 		if (activeWhen == null) {
 			active = true;
@@ -132,7 +128,6 @@ final class HandlerActivation implements IHandlerActivation {
 	 * org.eclipse.ui.internal.services.IEvaluationResultCache#setResult(boolean
 	 * )
 	 */
-	@Override
 	public void setResult(boolean result) {
 		active = result;
 	}
@@ -142,7 +137,6 @@ final class HandlerActivation implements IHandlerActivation {
 	 * 
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
-	@Override
 	public int compareTo(Object o) {
 		HandlerActivation activation = (HandlerActivation) o;
 		int difference;
@@ -186,7 +180,6 @@ final class HandlerActivation implements IHandlerActivation {
 	 * 
 	 * @see org.eclipse.ui.handlers.IHandlerActivation#clearActive()
 	 */
-	@Override
 	public void clearActive() {
 		// TODO Auto-generated method stub
 
@@ -197,7 +190,6 @@ final class HandlerActivation implements IHandlerActivation {
 	 * 
 	 * @see org.eclipse.ui.handlers.IHandlerActivation#getCommandId()
 	 */
-	@Override
 	public String getCommandId() {
 		return commandId;
 	}
@@ -207,7 +199,6 @@ final class HandlerActivation implements IHandlerActivation {
 	 * 
 	 * @see org.eclipse.ui.handlers.IHandlerActivation#getDepth()
 	 */
-	@Override
 	public int getDepth() {
 		return 0;
 	}
@@ -217,7 +208,6 @@ final class HandlerActivation implements IHandlerActivation {
 	 * 
 	 * @see org.eclipse.ui.handlers.IHandlerActivation#getHandler()
 	 */
-	@Override
 	public IHandler getHandler() {
 		return handler;
 	}
@@ -227,7 +217,6 @@ final class HandlerActivation implements IHandlerActivation {
 	 * 
 	 * @see org.eclipse.ui.handlers.IHandlerActivation#getHandlerService()
 	 */
-	@Override
 	public IHandlerService getHandlerService() {
 		return (IHandlerService) context.get(IHandlerService.class.getName());
 	}
@@ -239,7 +228,6 @@ final class HandlerActivation implements IHandlerActivation {
 	 * org.eclipse.ui.handlers.IHandlerActivation#isActive(org.eclipse.core.
 	 * expressions.IEvaluationContext)
 	 */
-	@Override
 	public boolean isActive(IEvaluationContext context) {
 		return active;
 	}
