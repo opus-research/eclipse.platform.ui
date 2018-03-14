@@ -93,7 +93,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
-import org.eclipse.e4.ui.model.application.ui.menu.MTrimContribution;
 import org.eclipse.e4.ui.services.EContextService;
 import org.eclipse.e4.ui.workbench.IModelResourceHandler;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
@@ -606,38 +605,20 @@ public final class Workbench extends EventManager implements IWorkbench {
 							WorkbenchPlugin.getDefault().addBundleListener(bundleListener);
 						}
 					}
-					MApplication appModel = e4Workbench.getApplication();
-					setSearchContribution(appModel, true);
 					// run the legacy workbench once
 					returnCode[0] = workbench.runUI();
-					if (returnCode[0] == PlatformUI.RETURN_OK) {
-						// run the e4 event loop and instantiate ... well, stuff
-						e4Workbench.createAndRunUI(e4Workbench.getApplication());
-						WorkbenchMenuService wms = (WorkbenchMenuService) e4Workbench.getContext()
-								.get(IMenuService.class);
-						wms.dispose();
-					}
-					if (returnCode[0] != PlatformUI.RETURN_UNSTARTABLE) {
-						setSearchContribution(appModel, false);
-						e4app.saveModel();
-					}
+					// run the e4 event loop and instantiate ... well, stuff
+					e4Workbench.createAndRunUI(e4Workbench.getApplication());
+					WorkbenchMenuService wms = (WorkbenchMenuService) e4Workbench.getContext().get(
+							IMenuService.class);
+					wms.dispose();
+					e4app.saveModel();
 					e4Workbench.close();
 					returnCode[0] = workbench.returnCode;
 				}
 			}
 		});
 		return returnCode[0];
-	}
-
-	private static void setSearchContribution(MApplication app, boolean enabled) {
-		for (MTrimContribution contribution : app.getTrimContributions()) {
-			if ("org.eclipse.ui.ide.application.trimcontribution.QuickAccess".contains(contribution //$NON-NLS-1$
-					.getElementId())) {
-				// allows us to handle the case where someone opens a workspace
-				// with Luna and then with Kepler
-				contribution.setToBeRendered(enabled);
-			}
-		}
 	}
 
 	private static ServiceTracker instanceAppContext;
@@ -1042,8 +1023,6 @@ public final class Workbench extends EventManager implements IWorkbench {
 	 * @return true if the close succeeded, and false otherwise
 	 */
 	private boolean busyClose(final boolean force) {
-		// Fire an E4 lifecycle notification
-		UIEvents.publishEvent(UIEvents.UILifeCycle.APP_SHUTDOWN_STARTED, application);
 
 		// notify the advisor of preShutdown and allow it to veto if not forced
 		isClosing = advisor.preShutdown();
@@ -1255,7 +1234,6 @@ public final class Workbench extends EventManager implements IWorkbench {
 	private static void cleanUpCopy(MApplication appCopy, IEclipseContext context) {
 		// clean up all trim bars that come from trim bar contributions
 		// the trim elements that need to be removed are stored in the trimBar.
-		setSearchContribution(appCopy, false);
 		EModelService modelService = context.get(EModelService.class);
 		List<MWindow> windows = modelService.findElements(appCopy, null, MWindow.class, null);
 		for (MWindow window : windows) {
@@ -1622,8 +1600,8 @@ public final class Workbench extends EventManager implements IWorkbench {
 					// TODO compat: open the windows here/instantiate the model
 					// TODO compat: instantiate the WW around the model
 					initializationDone = true;
-					if (isClosing() || !advisor.openWindows()) {
-						// if (isClosing()) {
+					// if (isClosing() || !advisor.openWindows()) {
+					if (isClosing()) {
 						bail[0] = true;
 					}
 
@@ -2823,9 +2801,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 				// runEventLoop(handler, display);
 			}
 			returnCode = PlatformUI.RETURN_OK;
-			if (!initOK[0]) {
-				returnCode = PlatformUI.RETURN_UNSTARTABLE;
-			}
 		} catch (final Exception e) {
 			if (!display.isDisposed()) {
 				handler.handleException(e);

@@ -251,15 +251,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int ITEM__ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int ITEM__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -287,31 +278,13 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int ITEM__TOOLTIP = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 2;
 
 	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int ITEM__LOCALIZED_LABEL = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 3;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int ITEM__LOCALIZED_TOOLTIP = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 4;
-
-	/**
 	 * The feature id for the '<em><b>Enabled</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int ITEM__ENABLED = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 5;
+	public static final int ITEM__ENABLED = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Selected</b></em>' attribute.
@@ -320,7 +293,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int ITEM__SELECTED = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 6;
+	public static final int ITEM__SELECTED = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 4;
 
 	/**
 	 * The feature id for the '<em><b>Type</b></em>' attribute.
@@ -329,7 +302,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int ITEM__TYPE = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 7;
+	public static final int ITEM__TYPE = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 5;
 
 	/**
 	 * The number of structural features of the '<em>Item</em>' class.
@@ -338,16 +311,34 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int ITEM_FEATURE_COUNT = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 8;
+	public static final int ITEM_FEATURE_COUNT = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 6;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int ITEM___UPDATE_LOCALIZATION = UiPackageImpl.UI_ELEMENT___UPDATE_LOCALIZATION;
+	public static final int ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int ITEM___GET_LOCALIZED_LABEL = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 0;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int ITEM___GET_LOCALIZED_TOOLTIP = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 1;
 
 	/**
 	 * The number of operations of the '<em>Item</em>' class.
@@ -356,7 +347,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int ITEM_OPERATION_COUNT = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 0;
+	public static final int ITEM_OPERATION_COUNT = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 2;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.menu.impl.HandledItemImpl <em>Handled Item</em>}' class.
@@ -504,15 +495,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int HANDLED_ITEM__ACCESSIBILITY_PHRASE = ITEM__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int HANDLED_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE = ITEM__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -538,24 +520,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int HANDLED_ITEM__TOOLTIP = ITEM__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int HANDLED_ITEM__LOCALIZED_LABEL = ITEM__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int HANDLED_ITEM__LOCALIZED_TOOLTIP = ITEM__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Enabled</b></em>' attribute.
@@ -621,13 +585,31 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int HANDLED_ITEM_FEATURE_COUNT = ITEM_FEATURE_COUNT + 3;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int HANDLED_ITEM___UPDATE_LOCALIZATION = ITEM___UPDATE_LOCALIZATION;
+	public static final int HANDLED_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE = ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int HANDLED_ITEM___GET_LOCALIZED_LABEL = ITEM___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int HANDLED_ITEM___GET_LOCALIZED_TOOLTIP = ITEM___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The number of operations of the '<em>Handled Item</em>' class.
@@ -784,15 +766,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int MENU_ELEMENT__ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int MENU_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -820,31 +793,13 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int MENU_ELEMENT__TOOLTIP = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 2;
 
 	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int MENU_ELEMENT__LOCALIZED_LABEL = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 3;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int MENU_ELEMENT__LOCALIZED_TOOLTIP = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 4;
-
-	/**
 	 * The feature id for the '<em><b>Mnemonics</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int MENU_ELEMENT__MNEMONICS = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 5;
+	public static final int MENU_ELEMENT__MNEMONICS = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 3;
 
 	/**
 	 * The number of structural features of the '<em>Element</em>' class.
@@ -853,16 +808,34 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int MENU_ELEMENT_FEATURE_COUNT = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 6;
+	public static final int MENU_ELEMENT_FEATURE_COUNT = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 4;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int MENU_ELEMENT___UPDATE_LOCALIZATION = UiPackageImpl.UI_ELEMENT___UPDATE_LOCALIZATION;
+	public static final int MENU_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int MENU_ELEMENT___GET_LOCALIZED_LABEL = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 0;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int MENU_ELEMENT___GET_LOCALIZED_TOOLTIP = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 1;
 
 	/**
 	 * The operation id for the '<em>Get Localized Mnemonics</em>' operation.
@@ -871,7 +844,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int MENU_ELEMENT___GET_LOCALIZED_MNEMONICS = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 0;
+	public static final int MENU_ELEMENT___GET_LOCALIZED_MNEMONICS = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 2;
 
 	/**
 	 * The number of operations of the '<em>Element</em>' class.
@@ -880,7 +853,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int MENU_ELEMENT_OPERATION_COUNT = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 1;
+	public static final int MENU_ELEMENT_OPERATION_COUNT = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 3;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.menu.impl.MenuItemImpl <em>Item</em>}' class.
@@ -1028,15 +1001,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int MENU_ITEM__ACCESSIBILITY_PHRASE = ITEM__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int MENU_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE = ITEM__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1062,24 +1026,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int MENU_ITEM__TOOLTIP = ITEM__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int MENU_ITEM__LOCALIZED_LABEL = ITEM__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int MENU_ITEM__LOCALIZED_TOOLTIP = ITEM__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Enabled</b></em>' attribute.
@@ -1127,13 +1073,31 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int MENU_ITEM_FEATURE_COUNT = ITEM_FEATURE_COUNT + 1;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int MENU_ITEM___UPDATE_LOCALIZATION = ITEM___UPDATE_LOCALIZATION;
+	public static final int MENU_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE = ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int MENU_ITEM___GET_LOCALIZED_LABEL = ITEM___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int MENU_ITEM___GET_LOCALIZED_TOOLTIP = ITEM___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The operation id for the '<em>Get Localized Mnemonics</em>' operation.
@@ -1299,15 +1263,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int MENU_SEPARATOR__ACCESSIBILITY_PHRASE = MENU_ELEMENT__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int MENU_SEPARATOR__LOCALIZED_ACCESSIBILITY_PHRASE = MENU_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1335,24 +1290,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int MENU_SEPARATOR__TOOLTIP = MENU_ELEMENT__TOOLTIP;
 
 	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int MENU_SEPARATOR__LOCALIZED_LABEL = MENU_ELEMENT__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int MENU_SEPARATOR__LOCALIZED_TOOLTIP = MENU_ELEMENT__LOCALIZED_TOOLTIP;
-
-	/**
 	 * The feature id for the '<em><b>Mnemonics</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1371,13 +1308,31 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int MENU_SEPARATOR_FEATURE_COUNT = MENU_ELEMENT_FEATURE_COUNT + 0;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int MENU_SEPARATOR___UPDATE_LOCALIZATION = MENU_ELEMENT___UPDATE_LOCALIZATION;
+	public static final int MENU_SEPARATOR___GET_LOCALIZED_ACCESSIBILITY_PHRASE = MENU_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int MENU_SEPARATOR___GET_LOCALIZED_LABEL = MENU_ELEMENT___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int MENU_SEPARATOR___GET_LOCALIZED_TOOLTIP = MENU_ELEMENT___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The operation id for the '<em>Get Localized Mnemonics</em>' operation.
@@ -1543,15 +1498,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int MENU__ACCESSIBILITY_PHRASE = MENU_ELEMENT__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int MENU__LOCALIZED_ACCESSIBILITY_PHRASE = MENU_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1577,24 +1523,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int MENU__TOOLTIP = MENU_ELEMENT__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int MENU__LOCALIZED_LABEL = MENU_ELEMENT__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int MENU__LOCALIZED_TOOLTIP = MENU_ELEMENT__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Mnemonics</b></em>' attribute.
@@ -1642,13 +1570,31 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int MENU_FEATURE_COUNT = MENU_ELEMENT_FEATURE_COUNT + 3;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int MENU___UPDATE_LOCALIZATION = MENU_ELEMENT___UPDATE_LOCALIZATION;
+	public static final int MENU___GET_LOCALIZED_ACCESSIBILITY_PHRASE = MENU_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int MENU___GET_LOCALIZED_LABEL = MENU_ELEMENT___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int MENU___GET_LOCALIZED_TOOLTIP = MENU_ELEMENT___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The operation id for the '<em>Get Localized Mnemonics</em>' operation.
@@ -1814,15 +1760,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int MENU_CONTRIBUTION__ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int MENU_CONTRIBUTION__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1868,13 +1805,13 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int MENU_CONTRIBUTION_FEATURE_COUNT = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 2;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int MENU_CONTRIBUTION___UPDATE_LOCALIZATION = UiPackageImpl.ELEMENT_CONTAINER___UPDATE_LOCALIZATION;
+	public static final int MENU_CONTRIBUTION___GET_LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The number of operations of the '<em>Contribution</em>' class.
@@ -2031,15 +1968,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int POPUP_MENU__ACCESSIBILITY_PHRASE = MENU__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int POPUP_MENU__LOCALIZED_ACCESSIBILITY_PHRASE = MENU__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2065,24 +1993,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int POPUP_MENU__TOOLTIP = MENU__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int POPUP_MENU__LOCALIZED_LABEL = MENU__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int POPUP_MENU__LOCALIZED_TOOLTIP = MENU__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Mnemonics</b></em>' attribute.
@@ -2157,13 +2067,31 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int POPUP_MENU_FEATURE_COUNT = MENU_FEATURE_COUNT + 3;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int POPUP_MENU___UPDATE_LOCALIZATION = MENU___UPDATE_LOCALIZATION;
+	public static final int POPUP_MENU___GET_LOCALIZED_ACCESSIBILITY_PHRASE = MENU___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int POPUP_MENU___GET_LOCALIZED_LABEL = MENU___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int POPUP_MENU___GET_LOCALIZED_TOOLTIP = MENU___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The operation id for the '<em>Get Localized Mnemonics</em>' operation.
@@ -2329,15 +2257,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int DIRECT_MENU_ITEM__ACCESSIBILITY_PHRASE = MENU_ITEM__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIRECT_MENU_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE = MENU_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2363,24 +2282,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int DIRECT_MENU_ITEM__TOOLTIP = MENU_ITEM__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIRECT_MENU_ITEM__LOCALIZED_LABEL = MENU_ITEM__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIRECT_MENU_ITEM__LOCALIZED_TOOLTIP = MENU_ITEM__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Enabled</b></em>' attribute.
@@ -2446,13 +2347,31 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int DIRECT_MENU_ITEM_FEATURE_COUNT = MENU_ITEM_FEATURE_COUNT + 2;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DIRECT_MENU_ITEM___UPDATE_LOCALIZATION = MENU_ITEM___UPDATE_LOCALIZATION;
+	public static final int DIRECT_MENU_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE = MENU_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIRECT_MENU_ITEM___GET_LOCALIZED_LABEL = MENU_ITEM___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIRECT_MENU_ITEM___GET_LOCALIZED_TOOLTIP = MENU_ITEM___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The operation id for the '<em>Get Localized Mnemonics</em>' operation.
@@ -2618,15 +2537,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int HANDLED_MENU_ITEM__ACCESSIBILITY_PHRASE = MENU_ITEM__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int HANDLED_MENU_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE = MENU_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2652,24 +2562,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int HANDLED_MENU_ITEM__TOOLTIP = MENU_ITEM__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int HANDLED_MENU_ITEM__LOCALIZED_LABEL = MENU_ITEM__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int HANDLED_MENU_ITEM__LOCALIZED_TOOLTIP = MENU_ITEM__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Enabled</b></em>' attribute.
@@ -2744,13 +2636,31 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int HANDLED_MENU_ITEM_FEATURE_COUNT = MENU_ITEM_FEATURE_COUNT + 3;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int HANDLED_MENU_ITEM___UPDATE_LOCALIZATION = MENU_ITEM___UPDATE_LOCALIZATION;
+	public static final int HANDLED_MENU_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE = MENU_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int HANDLED_MENU_ITEM___GET_LOCALIZED_LABEL = MENU_ITEM___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int HANDLED_MENU_ITEM___GET_LOCALIZED_TOOLTIP = MENU_ITEM___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The operation id for the '<em>Get Localized Mnemonics</em>' operation.
@@ -2916,15 +2826,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TOOL_ITEM__ACCESSIBILITY_PHRASE = ITEM__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int TOOL_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE = ITEM__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2950,24 +2851,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int TOOL_ITEM__TOOLTIP = ITEM__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int TOOL_ITEM__LOCALIZED_LABEL = ITEM__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int TOOL_ITEM__LOCALIZED_TOOLTIP = ITEM__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Enabled</b></em>' attribute.
@@ -3015,13 +2898,31 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TOOL_ITEM_FEATURE_COUNT = ITEM_FEATURE_COUNT + 1;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int TOOL_ITEM___UPDATE_LOCALIZATION = ITEM___UPDATE_LOCALIZATION;
+	public static final int TOOL_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE = ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int TOOL_ITEM___GET_LOCALIZED_LABEL = ITEM___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int TOOL_ITEM___GET_LOCALIZED_TOOLTIP = ITEM___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The number of operations of the '<em>Tool Item</em>' class.
@@ -3178,15 +3079,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TOOL_BAR__ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int TOOL_BAR__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3214,13 +3106,13 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TOOL_BAR_FEATURE_COUNT = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 0;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int TOOL_BAR___UPDATE_LOCALIZATION = UiPackageImpl.ELEMENT_CONTAINER___UPDATE_LOCALIZATION;
+	public static final int TOOL_BAR___GET_LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The number of operations of the '<em>Tool Bar</em>' class.
@@ -3377,15 +3269,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TOOL_BAR_ELEMENT__ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int TOOL_BAR_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The number of structural features of the '<em>Tool Bar Element</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3395,13 +3278,13 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TOOL_BAR_ELEMENT_FEATURE_COUNT = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 0;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int TOOL_BAR_ELEMENT___UPDATE_LOCALIZATION = UiPackageImpl.UI_ELEMENT___UPDATE_LOCALIZATION;
+	public static final int TOOL_BAR_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The number of operations of the '<em>Tool Bar Element</em>' class.
@@ -3558,15 +3441,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TOOL_CONTROL__ACCESSIBILITY_PHRASE = TOOL_BAR_ELEMENT__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int TOOL_CONTROL__LOCALIZED_ACCESSIBILITY_PHRASE = TOOL_BAR_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Contribution URI</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3594,13 +3468,13 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TOOL_CONTROL_FEATURE_COUNT = TOOL_BAR_ELEMENT_FEATURE_COUNT + 2;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int TOOL_CONTROL___UPDATE_LOCALIZATION = TOOL_BAR_ELEMENT___UPDATE_LOCALIZATION;
+	public static final int TOOL_CONTROL___GET_LOCALIZED_ACCESSIBILITY_PHRASE = TOOL_BAR_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The number of operations of the '<em>Tool Control</em>' class.
@@ -3757,15 +3631,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int HANDLED_TOOL_ITEM__ACCESSIBILITY_PHRASE = TOOL_ITEM__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int HANDLED_TOOL_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE = TOOL_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3791,24 +3656,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int HANDLED_TOOL_ITEM__TOOLTIP = TOOL_ITEM__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int HANDLED_TOOL_ITEM__LOCALIZED_LABEL = TOOL_ITEM__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int HANDLED_TOOL_ITEM__LOCALIZED_TOOLTIP = TOOL_ITEM__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Enabled</b></em>' attribute.
@@ -3883,13 +3730,31 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int HANDLED_TOOL_ITEM_FEATURE_COUNT = TOOL_ITEM_FEATURE_COUNT + 3;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int HANDLED_TOOL_ITEM___UPDATE_LOCALIZATION = TOOL_ITEM___UPDATE_LOCALIZATION;
+	public static final int HANDLED_TOOL_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE = TOOL_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int HANDLED_TOOL_ITEM___GET_LOCALIZED_LABEL = TOOL_ITEM___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int HANDLED_TOOL_ITEM___GET_LOCALIZED_TOOLTIP = TOOL_ITEM___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The number of operations of the '<em>Handled Tool Item</em>' class.
@@ -4046,15 +3911,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int DIRECT_TOOL_ITEM__ACCESSIBILITY_PHRASE = TOOL_ITEM__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIRECT_TOOL_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE = TOOL_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -4080,24 +3936,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int DIRECT_TOOL_ITEM__TOOLTIP = TOOL_ITEM__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIRECT_TOOL_ITEM__LOCALIZED_LABEL = TOOL_ITEM__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIRECT_TOOL_ITEM__LOCALIZED_TOOLTIP = TOOL_ITEM__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Enabled</b></em>' attribute.
@@ -4163,13 +4001,31 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int DIRECT_TOOL_ITEM_FEATURE_COUNT = TOOL_ITEM_FEATURE_COUNT + 2;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DIRECT_TOOL_ITEM___UPDATE_LOCALIZATION = TOOL_ITEM___UPDATE_LOCALIZATION;
+	public static final int DIRECT_TOOL_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE = TOOL_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIRECT_TOOL_ITEM___GET_LOCALIZED_LABEL = TOOL_ITEM___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIRECT_TOOL_ITEM___GET_LOCALIZED_TOOLTIP = TOOL_ITEM___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The number of operations of the '<em>Direct Tool Item</em>' class.
@@ -4326,15 +4182,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TOOL_BAR_SEPARATOR__ACCESSIBILITY_PHRASE = TOOL_BAR_ELEMENT__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int TOOL_BAR_SEPARATOR__LOCALIZED_ACCESSIBILITY_PHRASE = TOOL_BAR_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The number of structural features of the '<em>Tool Bar Separator</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -4344,13 +4191,13 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TOOL_BAR_SEPARATOR_FEATURE_COUNT = TOOL_BAR_ELEMENT_FEATURE_COUNT + 0;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int TOOL_BAR_SEPARATOR___UPDATE_LOCALIZATION = TOOL_BAR_ELEMENT___UPDATE_LOCALIZATION;
+	public static final int TOOL_BAR_SEPARATOR___GET_LOCALIZED_ACCESSIBILITY_PHRASE = TOOL_BAR_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The number of operations of the '<em>Tool Bar Separator</em>' class.
@@ -4544,15 +4391,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int RENDERED_MENU__ACCESSIBILITY_PHRASE = MENU__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int RENDERED_MENU__LOCALIZED_ACCESSIBILITY_PHRASE = MENU__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -4578,24 +4416,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int RENDERED_MENU__TOOLTIP = MENU__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int RENDERED_MENU__LOCALIZED_LABEL = MENU__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int RENDERED_MENU__LOCALIZED_TOOLTIP = MENU__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Mnemonics</b></em>' attribute.
@@ -4652,13 +4472,31 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int RENDERED_MENU_FEATURE_COUNT = MENU_FEATURE_COUNT + 1;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int RENDERED_MENU___UPDATE_LOCALIZATION = MENU___UPDATE_LOCALIZATION;
+	public static final int RENDERED_MENU___GET_LOCALIZED_ACCESSIBILITY_PHRASE = MENU___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU___GET_LOCALIZED_LABEL = MENU___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU___GET_LOCALIZED_TOOLTIP = MENU___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The operation id for the '<em>Get Localized Mnemonics</em>' operation.
@@ -4824,15 +4662,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int RENDERED_TOOL_BAR__ACCESSIBILITY_PHRASE = TOOL_BAR__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int RENDERED_TOOL_BAR__LOCALIZED_ACCESSIBILITY_PHRASE = TOOL_BAR__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -4869,13 +4698,13 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int RENDERED_TOOL_BAR_FEATURE_COUNT = TOOL_BAR_FEATURE_COUNT + 1;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int RENDERED_TOOL_BAR___UPDATE_LOCALIZATION = TOOL_BAR___UPDATE_LOCALIZATION;
+	public static final int RENDERED_TOOL_BAR___GET_LOCALIZED_ACCESSIBILITY_PHRASE = TOOL_BAR___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The number of operations of the '<em>Rendered Tool Bar</em>' class.
@@ -5032,15 +4861,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TOOL_BAR_CONTRIBUTION__ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int TOOL_BAR_CONTRIBUTION__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -5086,13 +4906,13 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TOOL_BAR_CONTRIBUTION_FEATURE_COUNT = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 2;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int TOOL_BAR_CONTRIBUTION___UPDATE_LOCALIZATION = UiPackageImpl.ELEMENT_CONTAINER___UPDATE_LOCALIZATION;
+	public static final int TOOL_BAR_CONTRIBUTION___GET_LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The number of operations of the '<em>Tool Bar Contribution</em>' class.
@@ -5286,15 +5106,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TRIM_CONTRIBUTION__ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int TRIM_CONTRIBUTION__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -5340,13 +5151,13 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TRIM_CONTRIBUTION_FEATURE_COUNT = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 2;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int TRIM_CONTRIBUTION___UPDATE_LOCALIZATION = UiPackageImpl.ELEMENT_CONTAINER___UPDATE_LOCALIZATION;
+	public static final int TRIM_CONTRIBUTION___GET_LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The number of operations of the '<em>Trim Contribution</em>' class.
@@ -5540,15 +5351,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int RENDERED_MENU_ITEM__ACCESSIBILITY_PHRASE = MENU_ITEM__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int RENDERED_MENU_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE = MENU_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -5574,24 +5376,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int RENDERED_MENU_ITEM__TOOLTIP = MENU_ITEM__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int RENDERED_MENU_ITEM__LOCALIZED_LABEL = MENU_ITEM__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int RENDERED_MENU_ITEM__LOCALIZED_TOOLTIP = MENU_ITEM__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Enabled</b></em>' attribute.
@@ -5648,13 +5432,31 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int RENDERED_MENU_ITEM_FEATURE_COUNT = MENU_ITEM_FEATURE_COUNT + 1;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int RENDERED_MENU_ITEM___UPDATE_LOCALIZATION = MENU_ITEM___UPDATE_LOCALIZATION;
+	public static final int RENDERED_MENU_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE = MENU_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU_ITEM___GET_LOCALIZED_LABEL = MENU_ITEM___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU_ITEM___GET_LOCALIZED_TOOLTIP = MENU_ITEM___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The operation id for the '<em>Get Localized Mnemonics</em>' operation.
@@ -5820,15 +5622,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int OPAQUE_TOOL_ITEM__ACCESSIBILITY_PHRASE = TOOL_ITEM__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int OPAQUE_TOOL_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE = TOOL_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -5854,24 +5647,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int OPAQUE_TOOL_ITEM__TOOLTIP = TOOL_ITEM__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int OPAQUE_TOOL_ITEM__LOCALIZED_LABEL = TOOL_ITEM__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int OPAQUE_TOOL_ITEM__LOCALIZED_TOOLTIP = TOOL_ITEM__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Enabled</b></em>' attribute.
@@ -5928,13 +5703,31 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int OPAQUE_TOOL_ITEM_FEATURE_COUNT = TOOL_ITEM_FEATURE_COUNT + 1;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int OPAQUE_TOOL_ITEM___UPDATE_LOCALIZATION = TOOL_ITEM___UPDATE_LOCALIZATION;
+	public static final int OPAQUE_TOOL_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE = TOOL_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM___GET_LOCALIZED_LABEL = TOOL_ITEM___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM___GET_LOCALIZED_TOOLTIP = TOOL_ITEM___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The number of operations of the '<em>Opaque Tool Item</em>' class.
@@ -6091,15 +5884,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int OPAQUE_MENU_ITEM__ACCESSIBILITY_PHRASE = MENU_ITEM__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int OPAQUE_MENU_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE = MENU_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -6125,24 +5909,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int OPAQUE_MENU_ITEM__TOOLTIP = MENU_ITEM__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int OPAQUE_MENU_ITEM__LOCALIZED_LABEL = MENU_ITEM__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int OPAQUE_MENU_ITEM__LOCALIZED_TOOLTIP = MENU_ITEM__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Enabled</b></em>' attribute.
@@ -6199,13 +5965,31 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int OPAQUE_MENU_ITEM_FEATURE_COUNT = MENU_ITEM_FEATURE_COUNT + 1;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int OPAQUE_MENU_ITEM___UPDATE_LOCALIZATION = MENU_ITEM___UPDATE_LOCALIZATION;
+	public static final int OPAQUE_MENU_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE = MENU_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM___GET_LOCALIZED_LABEL = MENU_ITEM___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM___GET_LOCALIZED_TOOLTIP = MENU_ITEM___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The operation id for the '<em>Get Localized Mnemonics</em>' operation.
@@ -6371,15 +6155,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int OPAQUE_MENU_SEPARATOR__ACCESSIBILITY_PHRASE = MENU_SEPARATOR__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int OPAQUE_MENU_SEPARATOR__LOCALIZED_ACCESSIBILITY_PHRASE = MENU_SEPARATOR__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -6405,24 +6180,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int OPAQUE_MENU_SEPARATOR__TOOLTIP = MENU_SEPARATOR__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int OPAQUE_MENU_SEPARATOR__LOCALIZED_LABEL = MENU_SEPARATOR__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int OPAQUE_MENU_SEPARATOR__LOCALIZED_TOOLTIP = MENU_SEPARATOR__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Mnemonics</b></em>' attribute.
@@ -6452,13 +6209,31 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int OPAQUE_MENU_SEPARATOR_FEATURE_COUNT = MENU_SEPARATOR_FEATURE_COUNT + 1;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int OPAQUE_MENU_SEPARATOR___UPDATE_LOCALIZATION = MENU_SEPARATOR___UPDATE_LOCALIZATION;
+	public static final int OPAQUE_MENU_SEPARATOR___GET_LOCALIZED_ACCESSIBILITY_PHRASE = MENU_SEPARATOR___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR___GET_LOCALIZED_LABEL = MENU_SEPARATOR___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR___GET_LOCALIZED_TOOLTIP = MENU_SEPARATOR___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The operation id for the '<em>Get Localized Mnemonics</em>' operation.
@@ -6624,15 +6399,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int OPAQUE_MENU__ACCESSIBILITY_PHRASE = MENU__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int OPAQUE_MENU__LOCALIZED_ACCESSIBILITY_PHRASE = MENU__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -6658,24 +6424,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int OPAQUE_MENU__TOOLTIP = MENU__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int OPAQUE_MENU__LOCALIZED_LABEL = MENU__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int OPAQUE_MENU__LOCALIZED_TOOLTIP = MENU__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Mnemonics</b></em>' attribute.
@@ -6723,13 +6471,31 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int OPAQUE_MENU_FEATURE_COUNT = MENU_FEATURE_COUNT + 0;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int OPAQUE_MENU___UPDATE_LOCALIZATION = MENU___UPDATE_LOCALIZATION;
+	public static final int OPAQUE_MENU___GET_LOCALIZED_ACCESSIBILITY_PHRASE = MENU___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU___GET_LOCALIZED_LABEL = MENU___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU___GET_LOCALIZED_TOOLTIP = MENU___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The operation id for the '<em>Get Localized Mnemonics</em>' operation.
@@ -6895,15 +6661,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int DYNAMIC_MENU_CONTRIBUTION__ACCESSIBILITY_PHRASE = MENU_ITEM__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__LOCALIZED_ACCESSIBILITY_PHRASE = MENU_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -6929,24 +6686,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int DYNAMIC_MENU_CONTRIBUTION__TOOLTIP = MENU_ITEM__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__LOCALIZED_LABEL = MENU_ITEM__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__LOCALIZED_TOOLTIP = MENU_ITEM__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Enabled</b></em>' attribute.
@@ -7012,13 +6751,31 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int DYNAMIC_MENU_CONTRIBUTION_FEATURE_COUNT = MENU_ITEM_FEATURE_COUNT + 2;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION___UPDATE_LOCALIZATION = MENU_ITEM___UPDATE_LOCALIZATION;
+	public static final int DYNAMIC_MENU_CONTRIBUTION___GET_LOCALIZED_ACCESSIBILITY_PHRASE = MENU_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DYNAMIC_MENU_CONTRIBUTION___GET_LOCALIZED_LABEL = MENU_ITEM___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DYNAMIC_MENU_CONTRIBUTION___GET_LOCALIZED_TOOLTIP = MENU_ITEM___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The operation id for the '<em>Get Localized Mnemonics</em>' operation.
