@@ -131,6 +131,11 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 		return result;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.widgets.Composite#layout(boolean)
+	 */
 	public void layout(boolean changed) {
 		if (ignoreLayouts) {
 			return;
@@ -142,11 +147,21 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 		ignoreResizes = false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.custom.ScrolledComposite#setExpandHorizontal(boolean)
+	 */
 	public void setExpandHorizontal(boolean expand) {
 		expandHorizontal = expand;
 		super.setExpandHorizontal(expand);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.custom.ScrolledComposite#setExpandVertical(boolean)
+	 */
 	public void setExpandVertical(boolean expand) {
 		expandVertical = expand;
 		super.setExpandVertical(expand);

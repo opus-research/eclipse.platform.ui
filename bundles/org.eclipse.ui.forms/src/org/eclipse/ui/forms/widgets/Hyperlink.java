@@ -153,11 +153,17 @@ public class Hyperlink extends AbstractHyperlink {
 		return text;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.widgets.Control#getToolTipText()
+	 */
 	public String getToolTipText () {
 		checkWidget();
 		return appToolTipText;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.widgets.Control#setToolTipText(java.lang.String)
+	 */
 	public void setToolTipText (String string) {
 		super.setToolTipText (string);
 		appToolTipText = super.getToolTipText();

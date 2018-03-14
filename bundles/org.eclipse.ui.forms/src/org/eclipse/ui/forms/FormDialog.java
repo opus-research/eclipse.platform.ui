@@ -68,12 +68,22 @@ public class FormDialog extends TrayDialog {
 		super(parentShellProvider);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.TrayDialog#close()
+	 */
 	public boolean close() {
 		boolean rcode = super.close();
 		toolkit.dispose();
 		return rcode;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
+	 */
 	protected Control createDialogArea(Composite parent) {
 		toolkit = new FormToolkit(parent.getDisplay());
 		ScrolledForm sform = toolkit.createScrolledForm(parent);
@@ -84,6 +94,11 @@ public class FormDialog extends TrayDialog {
 		return sform;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.TrayDialog#createButtonBar(org.eclipse.swt.widgets.Composite)
+	 */
 	protected Control createButtonBar(Composite parent) {
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		//Composite sep = new Composite(parent, SWT.NULL);

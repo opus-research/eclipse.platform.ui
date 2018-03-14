@@ -168,6 +168,12 @@ public final class ColumnLayout extends Layout implements ILayoutExtension {
 		return result;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.widgets.Layout#layout(org.eclipse.swt.widgets.Composite,
+	 *      boolean)
+	 */
 	protected void layout(Composite parent, boolean flushCache) {
 		Control[] children = parent.getChildren();
 		Rectangle carea = parent.getClientArea();
@@ -243,10 +249,22 @@ public final class ColumnLayout extends Layout implements ILayoutExtension {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.widgets.ILayoutExtension#computeMaximumWidth(org.eclipse.swt.widgets.Composite,
+	 *      boolean)
+	 */
 	public int computeMaximumWidth(Composite parent, boolean changed) {
 		return computeSize(parent, SWT.DEFAULT, SWT.DEFAULT, changed).x;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.widgets.ILayoutExtension#computeMinimumWidth(org.eclipse.swt.widgets.Composite,
+	 *      boolean)
+	 */
 	public int computeMinimumWidth(Composite parent, boolean changed) {
 		return computeSize(parent, 0, SWT.DEFAULT, changed).x;
 	}

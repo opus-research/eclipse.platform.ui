@@ -106,6 +106,9 @@ public class SectionPart extends AbstractFormPart {
 		getManagedForm().getForm().reflow(false);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.forms.AbstractFormPart#setFocus()
+	 */
 	public void setFocus() {
 		Control client = section.getClient();
 		if (client != null)

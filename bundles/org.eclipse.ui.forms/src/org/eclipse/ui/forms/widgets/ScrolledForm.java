@@ -289,10 +289,20 @@ public class ScrolledForm extends SharedScrolledComposite {
 		this.setMessage(newMessage, newType, null);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.IMessageProvider#getMessage()
+	 */
 	public String getMessage() {
 		return content.getMessage();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.IMessageProvider#getMessageType()
+	 */
 	public int getMessageType() {
 		return content.getMessageType();
 	}

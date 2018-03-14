@@ -94,6 +94,9 @@ public abstract class FormEditor extends MultiPageEditorPart  {
 			return StructuredSelection.EMPTY;
 		}
 
+		/*
+		 * (non-Javadoc) Method declared on <code> ISelectionProvider </code> .
+		 */
 		public void setSelection(ISelection selection) {
 			IEditorPart activeEditor = ((FormEditor) getMultiPageEditor())
 					.getActiveEditor();
@@ -165,6 +168,11 @@ public abstract class FormEditor extends MultiPageEditorPart  {
 	 */
 	protected abstract void addPages();
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.IPageChangeProvider#getSelectedPage()
+	 */
 	public Object getSelectedPage() {
 		return getActivePageInstance();
 	}

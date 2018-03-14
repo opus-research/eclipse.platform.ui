@@ -22,6 +22,9 @@ import org.eclipse.swt.graphics.Rectangle;
  */
 
 public class BreakSegment extends ParagraphSegment {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.forms.internal.widgets.ParagraphSegment#advanceLocator(org.eclipse.swt.graphics.GC, int, org.eclipse.ui.forms.internal.widgets.Locator, java.util.Hashtable)
+	 */
 	public boolean advanceLocator(GC gc, int wHint, Locator locator,
 			Hashtable objectTable, boolean computeHeightOnly) {
 		if (locator.rowHeight==0) {
@@ -46,6 +49,9 @@ public class BreakSegment extends ParagraphSegment {
 	public boolean intersects(Rectangle rect) {
 		return false;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.forms.widgets.ParagraphSegment#layout(org.eclipse.swt.graphics.GC, int, org.eclipse.ui.internal.forms.widgets.Locator, java.util.Hashtable, boolean, org.eclipse.ui.internal.forms.widgets.SelectionData)
+	 */
 	public void layout(GC gc, int width, Locator locator, Hashtable ResourceTable,
 			boolean selected) {
 		locator.resetCaret();
@@ -58,6 +64,9 @@ public class BreakSegment extends ParagraphSegment {
 		locator.rowCounter++;		
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.forms.widgets.ParagraphSegment#computeSelection(org.eclipse.swt.graphics.GC, java.util.Hashtable, boolean, org.eclipse.ui.internal.forms.widgets.SelectionData)
+	 */
 	public void computeSelection(GC gc, Hashtable resourceTable, SelectionData selData) {
 		selData.markNewLine();
 	}

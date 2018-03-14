@@ -38,6 +38,13 @@ public class AggregateHyperlinkSegment extends ParagraphSegment implements
 		segments.add(segment);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.forms.widgets.ParagraphSegment#advanceLocator(org.eclipse.swt.graphics.GC,
+	 *      int, org.eclipse.ui.internal.forms.widgets.Locator,
+	 *      java.util.Hashtable, boolean)
+	 */
 	public boolean advanceLocator(GC gc, int wHint, Locator loc,
 			Hashtable objectTable, boolean computeHeightOnly) {
 		boolean newLine = false;
@@ -65,6 +72,12 @@ public class AggregateHyperlinkSegment extends ParagraphSegment implements
 		this.href = href;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.forms.widgets.IHyperlinkSegment#repaint(org.eclipse.swt.graphics.GC,
+	 *      boolean)
+	 */
 	public void paint(GC gc, boolean hover, Hashtable resourceTable,
 			boolean selected, SelectionData selData, Rectangle repaintRegion) {
 		for (int i = 0; i < segments.size(); i++) {
@@ -83,6 +96,13 @@ public class AggregateHyperlinkSegment extends ParagraphSegment implements
 		return buf.toString();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.forms.widgets.IHyperlinkSegment#paintFocus(org.eclipse.swt.graphics.GC,
+	 *      org.eclipse.swt.graphics.Color, org.eclipse.swt.graphics.Color,
+	 *      boolean)
+	 */
 	public void paintFocus(GC gc, Color bg, Color fg, boolean selected,
 			Rectangle repaintRegion) {
 		for (int i = 0; i < segments.size(); i++) {
@@ -91,6 +111,11 @@ public class AggregateHyperlinkSegment extends ParagraphSegment implements
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.forms.widgets.IHyperlinkSegment#getBounds()
+	 */
 	public Rectangle getBounds() {
 		if (segments.size() == 0)
 			return new Rectangle(Integer.MAX_VALUE, Integer.MAX_VALUE, 0, 0);
@@ -123,6 +148,14 @@ public class AggregateHyperlinkSegment extends ParagraphSegment implements
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.forms.widgets.ParagraphSegment#layout(org.eclipse.swt.graphics.GC,
+	 *      int, org.eclipse.ui.internal.forms.widgets.Locator,
+	 *      java.util.Hashtable, boolean,
+	 *      org.eclipse.ui.internal.forms.widgets.SelectionData)
+	 */
 	public void layout(GC gc, int width, Locator locator,
 			Hashtable resourceTable, boolean selected) {
 		for (int i = 0; i < segments.size(); i++) {
@@ -131,6 +164,13 @@ public class AggregateHyperlinkSegment extends ParagraphSegment implements
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.forms.widgets.ParagraphSegment#computeSelection(org.eclipse.swt.graphics.GC,
+	 *      java.util.Hashtable, boolean,
+	 *      org.eclipse.ui.internal.forms.widgets.SelectionData)
+	 */
 	public void computeSelection(GC gc, Hashtable resourceTable,
 			SelectionData selData) {
 		for (int i = 0; i < segments.size(); i++) {

@@ -74,27 +74,57 @@ public class ManagedForm implements IManagedForm {
 		this.toolkit = toolkit;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#addPart(org.eclipse.ui.forms.IFormPart)
+	 */
 	public void addPart(IFormPart part) {
 		parts.add(part);
 		part.initialize(this);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#removePart(org.eclipse.ui.forms.IFormPart)
+	 */
 	public void removePart(IFormPart part) {
 		parts.remove(part);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#getParts()
+	 */
 	public IFormPart[] getParts() {
 		return (IFormPart[]) parts.toArray(new IFormPart[parts.size()]);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#getToolkit()
+	 */
 	public FormToolkit getToolkit() {
 		return toolkit;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#getForm()
+	 */
 	public ScrolledForm getForm() {
 		return form;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#reflow(boolean)
+	 */
 	public void reflow(boolean changed) {
 		form.reflow(changed);
 	}
@@ -181,6 +211,11 @@ public class ManagedForm implements IManagedForm {
 			form.reflow(true);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#commit(boolean)
+	 */
 	public void commit(boolean onSave) {
 		for (int i = 0; i < parts.size(); i++) {
 			IFormPart part = (IFormPart) parts.get(i);
@@ -189,6 +224,11 @@ public class ManagedForm implements IManagedForm {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#setInput(java.lang.Object)
+	 */
 	public boolean setInput(Object input) {
 		boolean pageResult = false;
 
@@ -202,6 +242,11 @@ public class ManagedForm implements IManagedForm {
 		return pageResult;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#getInput()
+	 */
 	public Object getInput() {
 		return input;
 	}
@@ -216,6 +261,11 @@ public class ManagedForm implements IManagedForm {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#isDirty()
+	 */
 	public boolean isDirty() {
 		for (int i = 0; i < parts.size(); i++) {
 			IFormPart part = (IFormPart) parts.get(i);
@@ -225,6 +275,11 @@ public class ManagedForm implements IManagedForm {
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#isStale()
+	 */
 	public boolean isStale() {
 		for (int i = 0; i < parts.size(); i++) {
 			IFormPart part = (IFormPart) parts.get(i);
@@ -234,20 +289,43 @@ public class ManagedForm implements IManagedForm {
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#dirtyStateChanged()
+	 */
 	public void dirtyStateChanged() {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#staleStateChanged()
+	 */
 	public void staleStateChanged() {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#getContainer()
+	 */
 	public Object getContainer() {
 		return container;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#setContainer(java.lang.Object)
+	 */
 	public void setContainer(Object container) {
 		this.container = container;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.forms.IManagedForm#getMessageManager()
+	 */
 	public IMessageManager getMessageManager() {
 		return form.getMessageManager();
 	}

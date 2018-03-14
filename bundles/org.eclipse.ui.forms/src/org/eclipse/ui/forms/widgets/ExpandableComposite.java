@@ -514,6 +514,12 @@ public class ExpandableComposite extends Canvas {
 			return computeSize(parent, 0, SWT.DEFAULT, changed).x;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.forms.parts.ILayoutExtension#computeMinimumWidth(org.eclipse.swt.widgets.Composite,
+		 *      boolean)
+		 */
 		public int computeMaximumWidth(Composite parent, boolean changed) {
 			return computeSize(parent, SWT.DEFAULT, SWT.DEFAULT, changed).x;
 		}
@@ -683,6 +689,9 @@ public class ExpandableComposite extends Canvas {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.widgets.Control#forceFocus()
+	 */
 	public boolean forceFocus() {
 		return false;
 	}
@@ -765,6 +774,11 @@ public class ExpandableComposite extends Canvas {
 			toggle.setFont(font);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.widgets.Control#setEnabled(boolean)
+	 */
 
 	public void setEnabled(boolean enabled) {
 		if (textLabel != null)

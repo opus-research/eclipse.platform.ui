@@ -89,6 +89,11 @@ public class Twistie extends ToggleHyperlink {
 		return target;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.widgets.Control#setEnabled(boolean)
+	 */
 	public void setEnabled(boolean enabled) {
 		super.setEnabled(enabled);
 		redraw();
