@@ -58,24 +58,32 @@ public class ModelAssembler {
 	/**
 	 * 
 	 */
-	private static final String E3COMPATIBILITY = "e3compatibility"; //$NON-NLS-1$
+	private static final String E4ONLY = "e4only"; //$NON-NLS-1$
+	private static final String E4STEP = "e4step"; //$NON-NLS-1$
+	private static final String LEGACYSTEP = "legacystep"; //$NON-NLS-1$
+	private static final String LEGACYONLY = "legacyonly"; //$NON-NLS-1$
+
+	/**
+	 * 
+	 */
+	private static final String COMPATIBILITY = "compatibility"; //$NON-NLS-1$
 
 	/**
 	 * The application is running without the compatibility layer.
 	 */
-	public static final int E4ONLY = 0;
+	public static final int PURE_E4 = 0;
 
 	/**
 	 * The application is running with the compat layer and fragments and processors that DO NOT
 	 * need to be compatible with the legacy workbench are processed now.
 	 */
-	public static final int E3_E4STEP = 1;
+	public static final int LEGACY_E4STEP = 1;
 
 	/**
 	 * The application is running with the compat layer and fragments and processors that need to be
 	 * compatible with the legacy workbench are processed now.
 	 */
-	public static final int E3_E3STEP = 2;
+	public static final int LEGACY_E3STEP = 2;
 
 	@Inject
 	private Logger logger;
@@ -89,13 +97,13 @@ public class ModelAssembler {
 	final private static String extensionPointID = "org.eclipse.e4.workbench.model"; //$NON-NLS-1$
 
 	/**
-	 * Process the model based on the step field which can be {@link #E4ONLY}, {@link #E3_E4STEP} or
-	 * {@link #E3_E3STEP}.
+	 * Process the model based on the step field which can be {@link #PURE_E4},
+	 * {@link #LEGACY_E4STEP} or {@link #LEGACY_E3STEP}.
 	 * 
 	 * @param step
-	 * @see #E4ONLY
-	 * @see #E3_E4STEP
-	 * @see #E3_E3STEP
+	 * @see #PURE_E4
+	 * @see #LEGACY_E4STEP
+	 * @see #LEGACY_E3STEP
 	 */
 	public void processModel(int step) {
 
@@ -244,7 +252,7 @@ public class ModelAssembler {
 
 	/**
 	 * Check if this configuration element must be run now based on the <code>step</code> parameter
-	 * which can be any of {@link #E4ONLY}, {@link #E3_E4STEP} or {@link #E3_E3STEP}.
+	 * which can be any of {@link #PURE_E4}, {@link #LEGACY_E4STEP} or {@link #LEGACY_E3STEP}.
 	 * 
 	 * @param step
 	 * @param ce
@@ -252,19 +260,58 @@ public class ModelAssembler {
 	 */
 	private boolean compatModeCheck(int step, IConfigurationElement ce) {
 
-		// If there is no legacy step coming then go an process it now
-		if (step == E4ONLY) {
-			return true;
+		// Running in pure E4 mode ignore elements only meant to run on the compat layer.
+		if (step == PURE_E4) {
+			if (E4ONLY.equals(ce.getAttribute(COMPATIBILITY))) {
+				return true;
+			}
+			if (E4STEP.equals(ce.getAttribute(COMPATIBILITY))
+					|| ce.getAttribute(COMPATIBILITY) == null) {
+				return true;
+			}
+			if (LEGACYSTEP.equals(ce.getAttribute(COMPATIBILITY))) {
+				return true;
+			}
+			if (LEGACYONLY.equals(ce.getAttribute(COMPATIBILITY))) {
+				return false;
+			}
+			return false;
 		}
 
-		// If this is the E4 step in the legacy process
-		if (step == E3_E4STEP) {
-			return !Boolean.parseBoolean(ce.getAttribute(E3COMPATIBILITY));
+		// If this is the E4 step in the legacy workbench
+		if (step == LEGACY_E4STEP) {
+			if (E4ONLY.equals(ce.getAttribute(COMPATIBILITY))) {
+				return false;
+			}
+			if (E4STEP.equals(ce.getAttribute(COMPATIBILITY))
+					|| ce.getAttribute(COMPATIBILITY) == null) {
+				return true;
+			}
+			if (LEGACYSTEP.equals(ce.getAttribute(COMPATIBILITY))) {
+				return false;
+			}
+			if (LEGACYONLY.equals(ce.getAttribute(COMPATIBILITY))) {
+				return false;
+			}
+			return false;
 		}
 
-		// If this is the E3 step in the legacy process
-		if (step == E3_E3STEP) {
-			return Boolean.parseBoolean(ce.getAttribute(E3COMPATIBILITY));
+		// If this is the E3 step in the legacy workbench
+		if (step == LEGACY_E3STEP) {
+			if (E4ONLY.equals(ce.getAttribute(COMPATIBILITY))) {
+				return false;
+			}
+			if (E4STEP.equals(ce.getAttribute(COMPATIBILITY))
+					|| ce.getAttribute(COMPATIBILITY) == null) {
+				return false;
+			}
+			if (LEGACYSTEP.equals(ce.getAttribute(COMPATIBILITY))) {
+				return true;
+			}
+			if (LEGACYONLY.equals(ce.getAttribute(COMPATIBILITY))) {
+				return true;
+			}
+			return false;
 		}
 
 		return false;

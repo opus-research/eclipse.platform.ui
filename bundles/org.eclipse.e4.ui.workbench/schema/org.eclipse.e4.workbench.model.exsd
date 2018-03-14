@@ -70,12 +70,34 @@ Whenever possible, the model extensions of dependent bundles are processed befor
                </appInfo>
             </annotation>
          </attribute>
-         <attribute name="e3compatibility" type="boolean" use="default" value="false">
+         <attribute name="compatibility" use="default" value="e4step">
             <annotation>
                <documentation>
-                  This flag is only valid when running 3x applications (mixed mode). If so, it specifies that the fragment has to be processed after the creation of the legacy workbench. This ensures that the complete model has been created.
+                  This fields controls the merging of fragments in case of programming against the compatibility layer.
+&lt;p&gt;&lt;/p&gt;
+Specify one of the following options
+&lt;p&gt;&lt;/p&gt;
+&lt;dl&gt;
+&lt;dt&gt;e4only&lt;/dt&gt;
+&lt;dd&gt;When running in compatibility mode: The fragment will not be merged. When running in pure E4: The fragment will be merged.&lt;/dd&gt;
+&lt;dt&gt;e4step (default)&lt;/dt&gt;&lt;dd&gt;When running in compatibility mode:The fragment will be merged after the creation of the legacy workbench.  When running in pure E4: The fragment will be merged.&lt;/dd&gt;
+&lt;dt&gt;legacystep&lt;/dt&gt;&lt;dd&gt;When running in compatibility mode: The fragment will be merged  after the legacy workbench is created. When running in pure E4: The fragment will be merged.&lt;/dd&gt;
+&lt;dt&gt;legacyonly&lt;/dt&gt;
+&lt;dd&gt;When running in compatibility mode: The fragment will  be merged after the creation of the legacy workbench.  When running in pure E4: The fragment will not be merged.&lt;/dd&gt;&lt;/dl&gt;
                </documentation>
             </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="e4only">
+                  </enumeration>
+                  <enumeration value="e4step">
+                  </enumeration>
+                  <enumeration value="legacystep">
+                  </enumeration>
+                  <enumeration value="legacyonly">
+                  </enumeration>
+               </restriction>
+            </simpleType>
          </attribute>
       </complexType>
    </element>
@@ -107,12 +129,36 @@ Whenever possible, the model extensions of dependent bundles are processed befor
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="e3compatibility" type="boolean" use="default" value="false">
+         <attribute name="compatibility" use="default" value="e4step">
             <annotation>
                <documentation>
-                  This flag is only valid when running 3x applications (mixed mode). If so, it specifies that the processor has to be invoked after the creation of the legacy workbench. This ensures that the complete model has been created.
+                  This fields controls the execution of processors in case of programming against the compatibility layer.
+&lt;p&gt;&lt;/p&gt;
+Specify one of the following options
+&lt;p&gt;&lt;/p&gt;
+&lt;dl&gt;
+&lt;dt&gt;e4only&lt;/dt&gt;
+&lt;dd&gt;When running in compatibility mode: The processor will not be called. When running in pure E4: The processor will be called&lt;/dd&gt;
+&lt;dt&gt;e4step (default)&lt;/dt&gt;
+&lt;dd&gt;When running in compatibility mode: The processor will be called  before the legacy workbench is created. When running in pure E4: The processor will be called&lt;/dd&gt;
+&lt;dt&gt;legacystep&lt;/dt&gt;
+&lt;dd&gt;When running in compatibility mode: The processor will be called after the creation of the legacy workbench.  When running in pure E4: The processor will be called&lt;/dd&gt;
+&lt;dt&gt;legacyonly&lt;/dt&gt;
+&lt;dd&gt;When running in compatibility mode: The processor will be called after the creation of the legacy workbench.  When running in pure E4: The processor will not be called.&lt;/dd&gt;&lt;/dl&gt;
                </documentation>
             </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="e4only">
+                  </enumeration>
+                  <enumeration value="e4step">
+                  </enumeration>
+                  <enumeration value="legacystep">
+                  </enumeration>
+                  <enumeration value="legacyonly">
+                  </enumeration>
+               </restriction>
+            </simpleType>
          </attribute>
       </complexType>
    </element>

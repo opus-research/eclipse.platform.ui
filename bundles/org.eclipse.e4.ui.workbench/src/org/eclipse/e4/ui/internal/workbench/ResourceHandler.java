@@ -153,9 +153,9 @@ public class ResourceHandler implements IModelResourceHandler {
 					String xmiUriArg = System
 							.getProperty(org.eclipse.e4.ui.workbench.IWorkbench.XMI_URI_ARG);
 					if (!("org.eclipse.ui.workbench/LegacyIDE.e4xmi".equals(xmiUriArg))) { //$NON-NLS-1$
-						contribProcessor.processModel(ModelAssembler.E4ONLY);
+						contribProcessor.processModel(ModelAssembler.PURE_E4);
 					} else {
-						contribProcessor.processModel(ModelAssembler.E3_E4STEP);
+						contribProcessor.processModel(ModelAssembler.LEGACY_E4STEP);
 					}
 
 					File deltaOldFile = new File(baseLocation, "deltas_42M7migration.xml"); //$NON-NLS-1$
@@ -227,9 +227,9 @@ public class ResourceHandler implements IModelResourceHandler {
 		// bug 376486
 		String xmiUriArg = System.getProperty(org.eclipse.e4.ui.workbench.IWorkbench.XMI_URI_ARG);
 		if (!("org.eclipse.ui.workbench/LegacyIDE.e4xmi".equals(xmiUriArg))) { //$NON-NLS-1$
-			contribProcessor.processModel(ModelAssembler.E4ONLY);
+			contribProcessor.processModel(ModelAssembler.PURE_E4);
 		} else {
-			contribProcessor.processModel(ModelAssembler.E3_E4STEP);
+			contribProcessor.processModel(ModelAssembler.LEGACY_E4STEP);
 		}
 
 		if (!clearPersistedState) {
