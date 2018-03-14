@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,13 +7,13 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431178 
  *******************************************************************************/
 package org.eclipse.ui;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.ui.internal.ICompatibleWorkbenchPage;
 
 /**
  * A workbench page consists of an arrangement of views and editors intended to
@@ -42,7 +42,8 @@ import org.eclipse.jface.util.IPropertyChangeListener;
  * @see IViewPart
  * @noimplement This interface is not intended to be implemented by clients.
  */
-public interface IWorkbenchPage extends IPartService, ISelectionService {
+public interface IWorkbenchPage extends IPartService, ISelectionService,
+		ICompatibleWorkbenchPage {
 	/**
 	 * An optional attribute within a workspace marker (<code>IMarker</code>)
 	 * which identifies the preferred editor type to be opened when

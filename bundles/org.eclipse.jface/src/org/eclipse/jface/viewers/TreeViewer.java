@@ -471,9 +471,9 @@ public class TreeViewer extends AbstractTreeViewer {
 					selection = adjustSelectionForReplace(selectedItems, selection, item, element, parentItem.getData());
 					// disassociate any different item that represents the
 					// same element under the same parent (the tree)
-					for (Widget element2 : itemsToDisassociate) {
-						if (element2 instanceof TreeItem) {
-							TreeItem itemToDisassociate = (TreeItem) element2;
+					for (Widget widgetToDisassociate : itemsToDisassociate) {
+						if (widgetToDisassociate instanceof TreeItem) {
+							TreeItem itemToDisassociate = (TreeItem) widgetToDisassociate;
 							if (itemToDisassociate != item
 									&& itemToDisassociate.getParentItem() == parentItem) {
 								int indexToDisaccociate = parentItem
@@ -949,8 +949,8 @@ public class TreeViewer extends AbstractTreeViewer {
 					return;
 				}
 				Widget[] items = internalFindItems(elementOrTreePath);
-				for (Widget item2 : items) {
-					TreeItem item = (TreeItem) item2;
+				for (Widget widget : items) {
+					TreeItem item = (TreeItem) widget;
 					if (!hasChildren) {
 						item.setItemCount(0);
 					} else {
