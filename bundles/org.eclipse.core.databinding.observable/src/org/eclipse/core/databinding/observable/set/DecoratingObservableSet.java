@@ -17,14 +17,17 @@ import org.eclipse.core.databinding.observable.DecoratingObservableCollection;
 /**
  * An observable set which decorates another observable set.
  *
+ * @param <E>
+ *            the type of the elements in this set
+ *
  * @since 1.2
  */
-public class DecoratingObservableSet extends DecoratingObservableCollection
-		implements IObservableSet {
+public class DecoratingObservableSet<E> extends
+		DecoratingObservableCollection<E> implements IObservableSet<E> {
 
-	private IObservableSet decorated;
+	private IObservableSet<E> decorated;
 
-	private ISetChangeListener setChangeListener;
+	private ISetChangeListener<E> setChangeListener;
 
 	/**
 	 * Constructs a DecoratingObservableSet which decorates the given
@@ -34,7 +37,7 @@ public class DecoratingObservableSet extends DecoratingObservableCollection
 	 *            the observable set being decorated
 	 * @param disposeDecoratedOnDispose
 	 */
-	public DecoratingObservableSet(IObservableSet decorated,
+	public DecoratingObservableSet(IObservableSet<E> decorated,
 			boolean disposeDecoratedOnDispose) {
 		super(decorated, disposeDecoratedOnDispose);
 		this.decorated = decorated;
@@ -47,19 +50,21 @@ public class DecoratingObservableSet extends DecoratingObservableCollection
 	}
 
 	@Override
-	public synchronized void addSetChangeListener(ISetChangeListener listener) {
+	public synchronized void addSetChangeListener(
+			ISetChangeListener<? super E> listener) {
 		addListener(SetChangeEvent.TYPE, listener);
 	}
 
 	@Override
-	public synchronized void removeSetChangeListener(ISetChangeListener listener) {
+	public synchronized void removeSetChangeListener(
+			ISetChangeListener<? super E> listener) {
 		removeListener(SetChangeEvent.TYPE, listener);
 	}
 
-	protected void fireSetChange(SetDiff diff) {
+	protected void fireSetChange(SetDiff<E> diff) {
 		// fire general change event first
 		super.fireChange();
-		fireEvent(new SetChangeEvent(this, diff));
+		fireEvent(new SetChangeEvent<>(this, diff));
 	}
 
 	@Override
@@ -71,9 +76,9 @@ public class DecoratingObservableSet extends DecoratingObservableCollection
 	@Override
 	protected void firstListenerAdded() {
 		if (setChangeListener == null) {
-			setChangeListener = new ISetChangeListener() {
+			setChangeListener = new ISetChangeListener<E>() {
 				@Override
-				public void handleSetChange(SetChangeEvent event) {
+				public void handleSetChange(SetChangeEvent<E> event) {
 					DecoratingObservableSet.this.handleSetChange(event);
 				}
 			};
@@ -100,7 +105,7 @@ public class DecoratingObservableSet extends DecoratingObservableCollection
 	 * @param event
 	 *            the change event received from the decorated observable
 	 */
-	protected void handleSetChange(final SetChangeEvent event) {
+	protected void handleSetChange(final SetChangeEvent<E> event) {
 		fireSetChange(event.diff);
 	}
 

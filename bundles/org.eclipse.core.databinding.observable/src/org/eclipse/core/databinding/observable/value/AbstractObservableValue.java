@@ -24,10 +24,14 @@ import org.eclipse.core.databinding.observable.Realm;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
+ *
+ * @param <T>
+ *            the type of value being observed
  * @since 1.0
  *
  */
-abstract public class AbstractObservableValue extends AbstractObservable implements IObservableValue {
+abstract public class AbstractObservableValue<T> extends AbstractObservable
+		implements IObservableValue<T> {
 	/**
 	 * Constructs a new instance with the default realm.
 	 */
@@ -43,17 +47,19 @@ abstract public class AbstractObservableValue extends AbstractObservable impleme
 	}
 
 	@Override
-	public synchronized void addValueChangeListener(IValueChangeListener listener) {
+	public synchronized void addValueChangeListener(
+			IValueChangeListener<T> listener) {
 		addListener(ValueChangeEvent.TYPE, listener);
 	}
 
 	@Override
-	public synchronized void removeValueChangeListener(IValueChangeListener listener) {
+	public synchronized void removeValueChangeListener(
+			IValueChangeListener<T> listener) {
 		removeListener(ValueChangeEvent.TYPE, listener);
 	}
 
 	@Override
-	final public void setValue(Object value) {
+	final public void setValue(T value) {
 		checkRealm();
 		doSetValue(value);
 	}
@@ -64,23 +70,23 @@ abstract public class AbstractObservableValue extends AbstractObservable impleme
 	 *
 	 * @param value
 	 */
-	protected void doSetValue(Object value) {
+	protected void doSetValue(T value) {
 		throw new UnsupportedOperationException();
 	}
 
-	protected void fireValueChange(ValueDiff diff) {
+	protected void fireValueChange(ValueDiff<T> diff) {
 		// fire general change event first
 		super.fireChange();
-		fireEvent(new ValueChangeEvent(this, diff));
+		fireEvent(new ValueChangeEvent<>(this, diff));
 	}
 
 	@Override
-	public final Object getValue() {
+	public final T getValue() {
 		getterCalled();
 		return doGetValue();
 	}
 
-	abstract protected Object doGetValue();
+	abstract protected T doGetValue();
 
 	@Override
 	public boolean isStale() {

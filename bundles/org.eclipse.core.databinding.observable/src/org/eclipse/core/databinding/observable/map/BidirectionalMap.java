@@ -20,15 +20,23 @@ import org.eclipse.core.databinding.observable.Realm;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
+ *
  * @since 1.0
+ *
+ * @param <K>
+ *            type of the keys to the map
+ * @param <V>
+ *            type of the values in the map
  *
  * @deprecated This class is deprecated; use {@link BidiObservableMap} instead.
  */
 @Deprecated
-public class BidirectionalMap extends ObservableMap {
-	private IMapChangeListener mapListener = new IMapChangeListener() {
+@SuppressWarnings({ "rawtypes", "unchecked" })
+// OK to ignore warnings in deprecated class
+public class BidirectionalMap<K, V> extends ObservableMap {
+	private IMapChangeListener mapListener = new IMapChangeListener<K, V>() {
 		@Override
-		public void handleMapChange(MapChangeEvent event) {
+		public void handleMapChange(MapChangeEvent<K, V> event) {
 			fireMapChange(event.diff);
 		}
 	};

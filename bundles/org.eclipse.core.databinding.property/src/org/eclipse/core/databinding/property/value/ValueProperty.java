@@ -13,7 +13,6 @@
 
 package org.eclipse.core.databinding.property.value;
 
-import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.map.IObservableMap;
@@ -32,9 +31,13 @@ import org.eclipse.core.internal.databinding.property.ValuePropertyDetailValue;
 /**
  * Abstract implementation of IValueProperty
  *
+ * @param <S>
+ *            type of the source object
+ * @param <T>
+ *            type of the value of the property
  * @since 1.2
  */
-public abstract class ValueProperty implements IValueProperty {
+public abstract class ValueProperty<S, T> implements IValueProperty<S, T> {
 
 	/**
 	 * By default, this method returns <code>null</code> in case the source
@@ -51,7 +54,7 @@ public abstract class ValueProperty implements IValueProperty {
 	 * @since 1.3
 	 */
 	@Override
-	public Object getValue(Object source) {
+	public T getValue(S source) {
 		if (source == null) {
 			return null;
 		}
@@ -67,8 +70,8 @@ public abstract class ValueProperty implements IValueProperty {
 	 * @noreference This method is not intended to be referenced by clients.
 	 * @since 1.3
 	 */
-	protected Object doGetValue(Object source) {
-		IObservableValue observable = observe(source);
+	protected T doGetValue(S source) {
+		IObservableValue<T> observable = observe(source);
 		try {
 			return observable.getValue();
 		} finally {
@@ -80,7 +83,7 @@ public abstract class ValueProperty implements IValueProperty {
 	 * @since 1.3
 	 */
 	@Override
-	public final void setValue(Object source, Object value) {
+	public final void setValue(S source, T value) {
 		if (source != null) {
 			doSetValue(source, value);
 		}
@@ -96,8 +99,8 @@ public abstract class ValueProperty implements IValueProperty {
 	 * @since 1.3
 	 * @noreference This method is not intended to be referenced by clients.
 	 */
-	protected void doSetValue(Object source, Object value) {
-		IObservableValue observable = observe(source);
+	protected void doSetValue(S source, T value) {
+		IObservableValue<T> observable = observe(source);
 		try {
 			observable.setValue(value);
 		} finally {
@@ -106,32 +109,34 @@ public abstract class ValueProperty implements IValueProperty {
 	}
 
 	@Override
-	public IObservableValue observe(Object source) {
+	public IObservableValue<T> observe(S source) {
 		return observe(Realm.getDefault(), source);
 	}
 
 	@Override
-	public IObservableFactory valueFactory() {
-		return new IObservableFactory() {
+	public IObservableFactory<S, IObservableValue<T>> valueFactory() {
+		return new IObservableFactory<S, IObservableValue<T>>() {
 			@Override
-			public IObservable createObservable(Object target) {
+			public IObservableValue<T> createObservable(S target) {
 				return observe(target);
 			}
 		};
 	}
 
 	@Override
-	public IObservableFactory valueFactory(final Realm realm) {
-		return new IObservableFactory() {
+	public IObservableFactory<S, IObservableValue<T>> valueFactory(
+			final Realm realm) {
+		return new IObservableFactory<S, IObservableValue<T>>() {
 			@Override
-			public IObservable createObservable(Object target) {
+			public IObservableValue<T> createObservable(S target) {
 				return observe(realm, target);
 			}
 		};
 	}
 
 	@Override
-	public IObservableValue observeDetail(IObservableValue master) {
+	public <U extends S> IObservableValue<T> observeDetail(
+			IObservableValue<U> master) {
 		return MasterDetailObservables.detailValue(master,
 				valueFactory(master.getRealm()), getValueType());
 	}
@@ -140,7 +145,8 @@ public abstract class ValueProperty implements IValueProperty {
 	 * @since 1.4
 	 */
 	@Override
-	public IObservableList observeDetail(IObservableList master) {
+	public <V extends S> IObservableList<T> observeDetail(
+			IObservableList<V> master) {
 		return MasterDetailObservables.detailValues(master,
 				valueFactory(master.getRealm()), getValueType());
 	}
@@ -149,7 +155,8 @@ public abstract class ValueProperty implements IValueProperty {
 	 * @since 1.4
 	 */
 	@Override
-	public IObservableMap observeDetail(IObservableSet master) {
+	public <V extends S> IObservableMap<V, T> observeDetail(
+			IObservableSet<V> master) {
 		return MasterDetailObservables.detailValues(master,
 				valueFactory(master.getRealm()), getValueType());
 	}
@@ -158,28 +165,32 @@ public abstract class ValueProperty implements IValueProperty {
 	 * @since 1.4
 	 */
 	@Override
-	public IObservableMap observeDetail(IObservableMap master) {
+	public <K, V extends S> IObservableMap<K, T> observeDetail(
+			IObservableMap<K, V> master) {
 		return MasterDetailObservables.detailValues(master,
 				valueFactory(master.getRealm()), getValueType());
 	}
 
 	@Override
-	public final IValueProperty value(IValueProperty detailValue) {
-		return new ValuePropertyDetailValue(this, detailValue);
+	public final <U> IValueProperty<S, U> value(
+			IValueProperty<? super T, U> detailValue) {
+		return new ValuePropertyDetailValue<>(this, detailValue);
 	}
 
 	@Override
-	public final IListProperty list(IListProperty detailList) {
-		return new ValuePropertyDetailList(this, detailList);
+	public final <E> IListProperty<S, E> list(
+			IListProperty<? super T, E> detailList) {
+		return new ValuePropertyDetailList<>(this, detailList);
 	}
 
 	@Override
-	public final ISetProperty set(ISetProperty detailSet) {
-		return new ValuePropertyDetailSet(this, detailSet);
+	public final <E> ISetProperty<S, E> set(ISetProperty<? super T, E> detailSet) {
+		return new ValuePropertyDetailSet<>(this, detailSet);
 	}
 
 	@Override
-	public final IMapProperty map(IMapProperty detailMap) {
-		return new ValuePropertyDetailMap(this, detailMap);
+	public final <K, V> IMapProperty<S, K, V> map(
+			IMapProperty<? super T, K, V> detailMap) {
+		return new ValuePropertyDetailMap<>(this, detailMap);
 	}
 }

@@ -24,11 +24,14 @@ import org.eclipse.core.runtime.Assert;
 /**
  * An immutable {@link IObservableValue}.
  *
+ * @param <T>
+ *            the type of the value being observed
+ *
  * @see WritableValue
  */
-public class ConstantObservableValue implements IObservableValue {
+public class ConstantObservableValue<T> implements IObservableValue<T> {
 	final Realm realm;
-	final Object value;
+	final T value;
 	final Object type;
 
 	/**
@@ -39,7 +42,7 @@ public class ConstantObservableValue implements IObservableValue {
 	 * @param type
 	 *            type
 	 */
-	public ConstantObservableValue(Object value, Object type) {
+	public ConstantObservableValue(T value, Object type) {
 		this(Realm.getDefault(), value, type);
 	}
 
@@ -53,7 +56,7 @@ public class ConstantObservableValue implements IObservableValue {
 	 * @param type
 	 *            type
 	 */
-	public ConstantObservableValue(Realm realm, Object value, Object type) {
+	public ConstantObservableValue(Realm realm, T value, Object type) {
 		Assert.isNotNull(realm, "Realm cannot be null"); //$NON-NLS-1$
 		this.realm = realm;
 		this.value = value;
@@ -67,23 +70,23 @@ public class ConstantObservableValue implements IObservableValue {
 	}
 
 	@Override
-	public Object getValue() {
+	public T getValue() {
 		ObservableTracker.getterCalled(this);
 		return value;
 	}
 
 	@Override
-	public void setValue(Object value) {
+	public void setValue(T value) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public void addValueChangeListener(IValueChangeListener listener) {
+	public void addValueChangeListener(IValueChangeListener<T> listener) {
 		// ignore
 	}
 
 	@Override
-	public void removeValueChangeListener(IValueChangeListener listener) {
+	public void removeValueChangeListener(IValueChangeListener<T> listener) {
 		// ignore
 	}
 
