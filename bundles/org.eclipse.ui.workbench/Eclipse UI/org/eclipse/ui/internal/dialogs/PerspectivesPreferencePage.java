@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Semion Chichelnitsky (semion@il.ibm.com) - bug 278064
+ *     Denis Zygann <d.zygann@web.de> - Bug 330453
  *******************************************************************************/
 
 package org.eclipse.ui.internal.dialogs;
@@ -52,7 +53,6 @@ import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 import org.eclipse.ui.internal.Workbench;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
-import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.internal.registry.PerspectiveDescriptor;
 import org.eclipse.ui.internal.registry.PerspectiveRegistry;
 import org.eclipse.ui.internal.util.Descriptors;
@@ -78,7 +78,7 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 	private ArrayList<IPerspectiveDescriptor> perspToRevert = new ArrayList<IPerspectiveDescriptor>();
 
 	private Table perspectivesTable;
-	
+
 	private Button revertButton;
 
 	private Button deleteButton;
@@ -86,41 +86,18 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 	private Button setDefaultButton;
 
 	// widgets for open perspective mode;
-	private Label openViewModeLabel;
-
 	private Button openSameWindowButton;
 
 	private Button openNewWindowButton;
 
 	private int openPerspMode;
 
-	// widgets for open view mode
-	private int openViewMode;
-
-	private Button openEmbedButton;
-
-	private Button openFastButton;
-
-	private Button fvbHideButton;
-	
-	private boolean isFVBConfigured;
-    
 	// labels
-	private final String FVG_TITLE = WorkbenchMessages.FastViewsGroup_title;
+	private final String OPM_TITLE = WorkbenchMessages.OpenPerspectiveMode_optionsTitle;
 
-	private final String OVM_TITLE = WorkbenchMessages.OpenViewMode_title;
+	private final String OPM_SAME_WINDOW = WorkbenchMessages.OpenPerspectiveMode_sameWindow;
 
-	private final String OVM_EMBED = WorkbenchMessages.OpenViewMode_embed;
-
-	private final String OVM_FAST = WorkbenchMessages.OpenViewMode_fast; 
-
-	private final String FVB_HIDE = WorkbenchMessages.FastViewBar_hide;
-
-	private final String OPM_TITLE = WorkbenchMessages.OpenPerspectiveMode_optionsTitle; 
-
-	private final String OPM_SAME_WINDOW = WorkbenchMessages.OpenPerspectiveMode_sameWindow; 
-
-	private final String OPM_NEW_WINDOW = WorkbenchMessages.OpenPerspectiveMode_newWindow; 
+	private final String OPM_NEW_WINDOW = WorkbenchMessages.OpenPerspectiveMode_newWindow;
 
 	/**
 	 * <code>Comparator</code> to compare two perspective descriptors
@@ -149,7 +126,6 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 		Composite composite = createComposite(parent);
 
 		createOpenPerspButtonGroup(composite);
-		createOpenViewButtonGroup(composite);
 		createCustomizePerspective(composite);
 
 		return composite;
@@ -158,7 +134,7 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 	/**
 	 * Creates the composite which will contain all the preference controls for
 	 * this page.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent composite
 	 * @return the composite for this page
@@ -179,7 +155,7 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 	/**
 	 * Create a composite that contains buttons for selecting the open
 	 * perspective mode.
-	 * 
+	 *
 	 * @param composite
 	 *            the parent composite
 	 */
@@ -222,81 +198,9 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 	}
 
 	/**
-	 * Creates a composite that contains buttons for selecting open view mode.
-	 * 
-	 * @param composite
-	 *            the parent composite
-	 */
-	protected void createOpenViewButtonGroup(Composite composite) {
-
-		Font font = composite.getFont();
-
-		Group buttonComposite = new Group(composite, SWT.LEFT);
-		buttonComposite.setText(FVG_TITLE);
-		buttonComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		buttonComposite.setFont(composite.getFont());
-		GridLayout layout = new GridLayout();
-		layout.numColumns = 2;
-		buttonComposite.setLayout(layout);
-
-		openViewModeLabel = new Label(buttonComposite, SWT.NONE);
-		openViewModeLabel.setText(OVM_TITLE);
-		GridData data = new GridData();
-		data.horizontalSpan = 2;
-		openViewModeLabel.setLayoutData(data);
-
-		openEmbedButton = new Button(buttonComposite, SWT.RADIO);
-		openEmbedButton.setText(OVM_EMBED);
-		openEmbedButton
-				.setSelection(openViewMode == IPreferenceConstants.OVM_EMBED);
-		openEmbedButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				openViewMode = IPreferenceConstants.OVM_EMBED;
-			}
-		});
-		openEmbedButton.setFont(font);
-
-		// Open view as float no longer supported
-		if (openViewMode == IPreferenceConstants.OVM_FLOAT) {
-			openViewMode = IPreferenceConstants.OVM_FAST;
-		}
-
-		openFastButton = new Button(buttonComposite, SWT.RADIO);
-		openFastButton.setText(OVM_FAST);
-		openFastButton
-				.setSelection(openViewMode == IPreferenceConstants.OVM_FAST);
-		openFastButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				openViewMode = IPreferenceConstants.OVM_FAST;
-			}
-		});
-		openFastButton.setFont(font);
-
-		createFVBHideButton(buttonComposite);
-	}
-
-	protected void createFVBHideButton(Composite composite) {
-		if (!isFVBConfigured)
-			return;
-		Font font = composite.getFont();
-		fvbHideButton = new Button(composite, SWT.CHECK);
-		GridData data = new GridData();
-		// data.horizontalIndent = 10;
-		data.horizontalSpan = 2;
-		fvbHideButton.setLayoutData(data);
-		fvbHideButton.setText(FVB_HIDE);
-
-		fvbHideButton.setSelection(this.getPreferenceStore().getBoolean(
-				IPreferenceConstants.FVB_HIDE));
-		fvbHideButton.setFont(font);
-	}
-
-	/**
 	 * Create a table of 3 buttons to enable the user to manage customized
 	 * perspectives.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent for the button parent
 	 * @return Composite that the buttons are created in.
@@ -318,7 +222,7 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 
 		// Add the label
 		Label label = new Label(perspectivesComponent, SWT.LEFT);
-		label.setText(WorkbenchMessages.PerspectivesPreference_available); 
+		label.setText(WorkbenchMessages.PerspectivesPreference_available);
 		GridData data = new GridData();
 		data.horizontalSpan = 2;
 		label.setLayoutData(data);
@@ -349,15 +253,15 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 		Collections.sort(perspectives, comparator);
 		defaultPerspectiveId = perspectiveRegistry.getDefaultPerspective();
 		updatePerspectivesTable();
-		
+
 		// Create vertical button bar.
 		Composite buttonBar = (Composite) createVerticalButtonBar(perspectivesComponent);
 		data = new GridData(GridData.FILL_VERTICAL);
 		buttonBar.setLayoutData(data);
-		
+
 		//Add note label
 		String NOTE_LABEL = WorkbenchMessages.Preference_note;
-		String REVERT_NOTE = WorkbenchMessages.RevertPerspective_note; 
+		String REVERT_NOTE = WorkbenchMessages.RevertPerspective_note;
 		Composite noteComposite = createNoteComposite(font, parent,
                 NOTE_LABEL, REVERT_NOTE);
         GridData noteData = new GridData();
@@ -374,7 +278,7 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 	 * help requests, and registers default buttons with its shell. The button
 	 * id is stored as the buttons client data.
 	 * </p>
-	 * 
+	 *
 	 * @param parent
 	 *            the parent composite
 	 * @param label
@@ -412,7 +316,7 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 
 	/**
 	 * Creates and returns the vertical button bar.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent composite to contain the button bar
 	 * @return the button bar control
@@ -433,14 +337,14 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 		composite.setFont(parent.getFont());
 
 		// Add the buttons to the button bar.
-		setDefaultButton = createVerticalButton(composite, WorkbenchMessages.PerspectivesPreference_MakeDefault, false); 
-		setDefaultButton.setToolTipText(WorkbenchMessages.PerspectivesPreference_MakeDefaultTip); 
+		setDefaultButton = createVerticalButton(composite, WorkbenchMessages.PerspectivesPreference_MakeDefault, false);
+		setDefaultButton.setToolTipText(WorkbenchMessages.PerspectivesPreference_MakeDefaultTip);
 
-		revertButton = createVerticalButton(composite, WorkbenchMessages.PerspectivesPreference_Reset, false); 
-		revertButton.setToolTipText(WorkbenchMessages.PerspectivesPreference_ResetTip); 
+		revertButton = createVerticalButton(composite, WorkbenchMessages.PerspectivesPreference_Reset, false);
+		revertButton.setToolTipText(WorkbenchMessages.PerspectivesPreference_ResetTip);
 
-		deleteButton = createVerticalButton(composite, WorkbenchMessages.PerspectivesPreference_Delete, false); 
-		deleteButton.setToolTipText(WorkbenchMessages.PerspectivesPreference_DeleteTip); 
+		deleteButton = createVerticalButton(composite, WorkbenchMessages.PerspectivesPreference_Delete, false);
+		deleteButton.setToolTipText(WorkbenchMessages.PerspectivesPreference_DeleteTip);
 		updateButtons();
 
 		return composite;
@@ -458,11 +362,7 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 				.getPreferenceStore();
 		setPreferenceStore(store);
 
-		openViewMode = store.getInt(IPreferenceConstants.OPEN_VIEW_MODE);
 		openPerspMode = store.getInt(IPreferenceConstants.OPEN_PERSP_MODE);
-		isFVBConfigured = ((WorkbenchWindow) workbench
-				.getActiveWorkbenchWindow()).getShowFastViewBars();
-
 	}
 
 	/**
@@ -474,20 +374,6 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 		IPreferenceStore store = WorkbenchPlugin.getDefault()
 				.getPreferenceStore();
 
-		openViewMode = store.getDefaultInt(IPreferenceConstants.OPEN_VIEW_MODE);
-		// Open view as float no longer supported
-		if (openViewMode == IPreferenceConstants.OVM_FLOAT) {
-			openViewMode = IPreferenceConstants.OVM_FAST;
-		}
-		openEmbedButton
-				.setSelection(openViewMode == IPreferenceConstants.OVM_EMBED);
-		openFastButton
-				.setSelection(openViewMode == IPreferenceConstants.OVM_FAST);
-
-		if (isFVBConfigured)
-			fvbHideButton.setSelection(store
-					.getDefaultBoolean(IPreferenceConstants.FVB_HIDE));
-
 		openPerspMode = store
 				.getDefaultInt(IPreferenceConstants.OPEN_PERSP_MODE);
 		openSameWindowButton
@@ -496,17 +382,17 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 				.setSelection(IPreferenceConstants.OPM_NEW_WINDOW == openPerspMode);
 
 		String currentDefault = perspectiveRegistry.getDefaultPerspective();
-		
+
 		int index = indexOf(currentDefault);
 		if (index >= 0){
 			defaultPerspectiveId = currentDefault;
 			updatePerspectivesTable();
-			perspectivesTable.setSelection(index);			
+			perspectivesTable.setSelection(index);
 		}
-		
+
 		String newDefault = PrefUtil.getAPIPreferenceStore().getDefaultString(
                 IWorkbenchPreferenceConstants.DEFAULT_PERSPECTIVE_ID);
-		
+
 		IPerspectiveDescriptor desc = null;
         if (newDefault != null) {
 			desc = workbench.getPerspectiveRegistry().findPerspectiveWithId(newDefault);
@@ -514,7 +400,7 @@ public class PerspectivesPreferencePage extends PreferencePage implements
         if (desc == null) {
         	newDefault = workbench.getPerspectiveRegistry().getDefaultPerspective();
         }
-        
+
         defaultPerspectiveId = newDefault;
         updatePerspectivesTable();
 
@@ -545,7 +431,7 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 	 * Return true if there are no open instances of the perspective.  If there are open
 	 * instances of the perspective prompt the user and return true if the user answers "yes"
 	 * to the delete prompt.
-	 * 
+	 *
 	 * @return boolean <code>true</code> if it is OK to delete the perspective
 	 *         either because there are no open instances or the user has
 	 *         confirmed the deletion.
@@ -554,7 +440,7 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 
 		MApplication application = ((Workbench) workbench).getApplication();
 		EModelService modelService = application.getContext().get(EModelService.class);
-		
+
 		if (modelService.findElements(application, desc.getId(), MPerspective.class, null)
 				.isEmpty())
 			return true;
@@ -578,7 +464,7 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 
 		// Don't bother figuring out which window a perspective may be open in,
 		// the number of windows will be small.
-		
+
 		for (IPerspectiveDescriptor perspective : perspToDelete) {
 			IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
 			for (IWorkbenchWindow window : windows) {
@@ -596,20 +482,6 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 		}
 
 		IPreferenceStore store = getPreferenceStore();
-
-		// store the open view mode setting
-		store.setValue(IPreferenceConstants.OPEN_VIEW_MODE, openViewMode);
-
-		if (isFVBConfigured) {
-			store.setValue(IPreferenceConstants.FVB_HIDE, fvbHideButton
-					.getSelection());
-			// WorkbenchPage page = (WorkbenchPage) workbench
-			// .getActiveWorkbenchWindow().getActivePage();
-			// FastViewManager fvm = page.getActivePerspective()
-			// .getFastViewManager();
-			// if (fvm != null)
-			// fvm.updateTrim(FastViewBar.FASTVIEWBAR_ID);
-		}
 
 		// store the open perspective mode setting
 		store.setValue(IPreferenceConstants.OPEN_PERSP_MODE, openPerspMode);
@@ -659,23 +531,23 @@ public class PerspectivesPreferencePage extends PreferencePage implements
         	newPerspectivesTableItem(persp, i, false);
         }
     }
-	
+
 	/**
 	 * Create a new tableItem using given perspective, and set image for the new item.
 	 */
 	protected TableItem newPerspectivesTableItem(IPerspectiveDescriptor persp,
             int index, boolean selected) {
-        
+
         ImageDescriptor image = persp.getImageDescriptor();
-        
+
         TableItem item = new TableItem(perspectivesTable, SWT.NULL, index);
         if (image != null) {
             Descriptors.setImage(item, image);
         }
         String label=persp.getLabel();
         if (persp.getId().equals(defaultPerspectiveId)){
-			label = NLS.bind(WorkbenchMessages.PerspectivesPreference_defaultLabel, label ); 
-    	    
+			label = NLS.bind(WorkbenchMessages.PerspectivesPreference_defaultLabel, label );
+
 		}
         item.setText(label);
         item.setData(persp);
@@ -688,7 +560,7 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 
     /**
 	 * Notifies that this page's button with the given id has been pressed.
-	 * 
+	 *
 	 * @param button
 	 *            the button that was pressed
 	 */
@@ -714,10 +586,10 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 				if (canDeletePerspective(desc)) {
 					perspToDelete.add(desc);
 					perspToRevert.remove(desc);
-					perspectives.remove(desc);				
+					perspectives.remove(desc);
 					updatePerspectivesTable();
 				}
-					
+
 			}
 		} else if (button == setDefaultButton) {
 			defaultPerspectiveId = desc.getId();
