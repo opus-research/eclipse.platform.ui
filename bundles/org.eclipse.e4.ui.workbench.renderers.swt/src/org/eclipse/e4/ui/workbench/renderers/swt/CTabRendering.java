@@ -1077,7 +1077,7 @@ public class CTabRendering extends CTabFolderRenderer implements
 		int[] percents = selectedTabFillPercents;
 
 		if (colors != null && colors.length == 2) {
-			colors = new Color[] { colors[1], colors[1] };
+			colors = new Color[] { colors[1], colors[0] };
 		}
 		if (colors == null) {
 			boolean selected = (state & SWT.SELECTED) != 0;

@@ -246,17 +246,17 @@ public class ModelServiceImpl implements EModelService {
 	public <T> List<T> findElements(MUIElement searchRoot, String id, Class<T> clazz,
 			List<String> tagsToMatch) {
 		ElementMatcher matcher = new ElementMatcher(id, clazz, tagsToMatch);
-		return findElements(searchRoot, ANYWHERE, matcher);
+		return findElements(searchRoot, matcher, ANYWHERE);
 	}
 
 	public <T> List<T> findElements(MUIElement searchRoot, String id, Class<T> clazz,
 			List<String> tagsToMatch, int searchFlags) {
 		ElementMatcher matcher = new ElementMatcher(id, clazz, tagsToMatch);
-		return findElements(searchRoot, searchFlags, matcher);
+		return findElements(searchRoot, matcher, searchFlags);
 	}
 
-	public <T> List<T> findElements(MApplicationElement searchRoot, int searchFlags,
-			Selector matcher) {
+	public <T> List<T> findElements(MApplicationElement searchRoot, Selector matcher,
+			int searchFlags) {
 		List<T> elements = new ArrayList<T>();
 		findElementsRecursive(searchRoot, matcher, elements, searchFlags);
 		return elements;

@@ -158,6 +158,10 @@ public class ProgressMonitorPart extends Composite implements
 		}
 	}
 
+    /**
+     * Implements <code>IProgressMonitor.beginTask</code>.
+     * @see IProgressMonitor#beginTask(java.lang.String, int)
+     */
     @Override
 	public void beginTask(String name, int totalWork) {
         fTaskName = name;
@@ -174,6 +178,10 @@ public class ProgressMonitorPart extends Composite implements
         }
     }
 
+    /**
+     * Implements <code>IProgressMonitor.done</code>.
+     * @see IProgressMonitor#done()
+     */
     @Override
 	public void done() {
         fLabel.setText("");//$NON-NLS-1$
@@ -286,11 +294,19 @@ public class ProgressMonitorPart extends Composite implements
         }
     }
 
+    /**
+     * Implements <code>IProgressMonitor.internalWorked</code>.
+     * @see IProgressMonitor#internalWorked(double)
+     */
     @Override
 	public void internalWorked(double work) {
         fProgressIndicator.worked(work);
     }
 
+    /**
+     * Implements <code>IProgressMonitor.isCanceled</code>.
+     * @see IProgressMonitor#isCanceled()
+     */
     @Override
 	public boolean isCanceled() {
         return fIsCanceled;
@@ -314,11 +330,18 @@ public class ProgressMonitorPart extends Composite implements
 		}
 	}
 
+    /**
+     * Implements <code>IProgressMonitor.setCanceled</code>.
+     * @see IProgressMonitor#setCanceled(boolean)
+     */
     @Override
 	public void setCanceled(boolean b) {
         fIsCanceled = b;
     }
 
+    /**
+     * Sets the progress monitor part's font.
+     */
     @Override
 	public void setFont(Font font) {
         super.setFont(font);
@@ -326,12 +349,20 @@ public class ProgressMonitorPart extends Composite implements
         fProgressIndicator.setFont(font);
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.core.runtime.IProgressMonitor#setTaskName(java.lang.String)
+     */
     @Override
 	public void setTaskName(String name) {
         fTaskName = name;
         updateLabel();
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.core.runtime.IProgressMonitor#subTask(java.lang.String)
+     */
     @Override
 	public void subTask(String name) {
         fSubTaskName = name;
@@ -375,11 +406,18 @@ public class ProgressMonitorPart extends Composite implements
     	}
     }
 
+    /**
+     * Implements <code>IProgressMonitor.worked</code>.
+     * @see IProgressMonitor#worked(int)
+     */
     @Override
 	public void worked(int work) {
         internalWorked(work);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.core.runtime.IProgressMonitorWithBlocking#clearBlocked()
+     */
     @Override
 	public void clearBlocked() {
         blockedStatus = null;
@@ -387,6 +425,9 @@ public class ProgressMonitorPart extends Composite implements
 
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.core.runtime.IProgressMonitorWithBlocking#setBlocked(org.eclipse.core.runtime.IStatus)
+     */
     @Override
 	public void setBlocked(IStatus reason) {
         blockedStatus = reason;
