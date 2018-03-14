@@ -31,7 +31,6 @@ public class AbstractDefaultRealmTestCase extends TestCase {
 	 * 
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -46,7 +45,6 @@ public class AbstractDefaultRealmTestCase extends TestCase {
 	/**
 	 * Removes the default realm.
 	 */
-	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 

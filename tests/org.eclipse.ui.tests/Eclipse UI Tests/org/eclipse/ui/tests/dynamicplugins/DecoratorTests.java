@@ -55,22 +55,30 @@ public class DecoratorTests extends DynamicTestCase {
 		return false;
 	}
 	
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionId()
+	 */
 	protected String getExtensionId() {
 		return "newDecorator1.testDynamicDecoratorAddition";
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionPoint()
+	 */
 	protected String getExtensionPoint() {
 		return IWorkbenchRegistryConstants.PL_DECORATORS;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getInstallLocation()
+	 */
 	protected String getInstallLocation() {
 		return "data/org.eclipse.newDecorator1";
 	}
 	
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getMarkerClass()
+	 */
 	protected String getMarkerClass() {
 		return "org.eclipse.ui.dynamic.DynamicLabelDecorator";
 	}

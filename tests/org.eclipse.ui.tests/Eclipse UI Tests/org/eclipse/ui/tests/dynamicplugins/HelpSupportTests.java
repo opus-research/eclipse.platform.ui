@@ -41,22 +41,30 @@ public class HelpSupportTests extends DynamicTestCase {
 		help.setDesiredHelpSystemId(null);		
 	}
 	
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionId()
+	 */
 	protected String getExtensionId() {
 		return "newHelpSupport1.testDynamicHelpSupportAddition";
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionPoint()
+	 */
 	protected String getExtensionPoint() {
 		return IWorkbenchRegistryConstants.PL_HELPSUPPORT;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getInstallLocation()
+	 */
 	protected String getInstallLocation() {
 		return "data/org.eclipse.newHelpSupport1";
 	}
 	
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getMarkerClass()
+	 */
 	protected String getMarkerClass() {
 		return "org.eclipse.ui.dynamic.DynamicHelpSupport";
 	}

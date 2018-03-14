@@ -74,7 +74,6 @@ public class TreeResizePropertyPage extends PropertyPage {
 	/**
 	 * @see PreferencePage#createContents(Composite)
 	 */
-	@Override
 	protected Control createContents(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
@@ -88,7 +87,11 @@ public class TreeResizePropertyPage extends PropertyPage {
 		return composite;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.PreferencePage#performOk()
+	 */
 	public boolean performOk() {
 		return true;
 	}

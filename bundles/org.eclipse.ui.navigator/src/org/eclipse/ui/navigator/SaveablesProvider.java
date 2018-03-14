@@ -138,7 +138,6 @@ public abstract class SaveablesProvider implements IDisposable {
 	 * Disposes of this saveables provider. Subclasses may extend, but must call
 	 * the super implementation.
 	 */
-	@Override
 	public void dispose() {
 		listener = null;
 	}

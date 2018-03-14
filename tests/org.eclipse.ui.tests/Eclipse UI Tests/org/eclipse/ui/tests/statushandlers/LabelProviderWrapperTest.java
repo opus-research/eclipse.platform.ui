@@ -39,7 +39,9 @@ public class LabelProviderWrapperTest extends TestCase {
 	private LabelProviderWrapper wrapper;
 	private Map dialogState = new HashMap();
 	
-	@Override
+	/* (non-Javadoc)
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	protected void setUp() throws Exception {
 		super.setUp();
 		dialogState = new HashMap();
@@ -48,7 +50,9 @@ public class LabelProviderWrapperTest extends TestCase {
 		wrapper = new LabelProviderWrapper(dialogState);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see junit.framework.TestCase#tearDown()
+	 */
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		wrapper = null;
@@ -57,25 +61,19 @@ public class LabelProviderWrapperTest extends TestCase {
 	public void testDisposing(){
 		final boolean[] disposed = new boolean[]{false};
 		ITableLabelProvider provider = new ITableLabelProvider() {
-			@Override
 			public void removeListener(ILabelProviderListener listener) {
 			}
-			@Override
 			public boolean isLabelProperty(Object element, String property) {
 				return false;
 			}
-			@Override
 			public void dispose() {
 				disposed[0] = true;
 			}
-			@Override
 			public void addListener(ILabelProviderListener listener) {
 			}
-			@Override
 			public String getColumnText(Object element, int columnIndex) {
 				return null;
 			}
-			@Override
 			public Image getColumnImage(Object element, int columnIndex) {
 				return null;
 			}
@@ -131,36 +129,30 @@ public class LabelProviderWrapperTest extends TestCase {
 	
 	public void testDecorating(){
 		dialogState.put(IStatusDialogConstants.DECORATOR, new ILabelDecorator() {
-			@Override
 			public void removeListener(ILabelProviderListener listener) {
 				// TODO Auto-generated method stub
 				
 			}
 			
-			@Override
 			public boolean isLabelProperty(Object element, String property) {
 				// TODO Auto-generated method stub
 				return false;
 			}
 			
-			@Override
 			public void dispose() {
 				// TODO Auto-generated method stub
 				
 			}
 			
-			@Override
 			public void addListener(ILabelProviderListener listener) {
 				// TODO Auto-generated method stub
 				
 			}
 			
-			@Override
 			public String decorateText(String text, Object element) {
 				return "decorated"+text;
 			}
 			
-			@Override
 			public Image decorateImage(Image image, Object element) {
 				// TODO Auto-generated method stub
 				return null;

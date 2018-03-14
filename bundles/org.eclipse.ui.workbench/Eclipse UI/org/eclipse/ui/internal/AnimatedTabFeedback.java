@@ -37,6 +37,9 @@ public class AnimatedTabFeedback extends ImageCycleFeedbackBase {
 		tabItem = item;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.AnimationFeedbackBase#initialize(org.eclipse.ui.internal.AnimationEngine)
+	 */
 	@Override
 	public void initialize(AnimationEngine engine) {
 		// TODO Auto-generated method stub

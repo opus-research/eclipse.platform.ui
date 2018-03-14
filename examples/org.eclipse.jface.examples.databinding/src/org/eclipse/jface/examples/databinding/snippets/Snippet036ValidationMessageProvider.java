@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Ovidio Mallo and others.
+ * Copyright (c) 2009, 2010 Ovidio Mallo and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Ovidio Mallo - initial API and implementation (bug 248877)
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 434283
  ******************************************************************************/
 
 package org.eclipse.jface.examples.databinding.snippets;
@@ -32,7 +31,6 @@ import org.eclipse.jface.databinding.fieldassist.ControlDecorationSupport;
 import org.eclipse.jface.databinding.fieldassist.ControlDecorationUpdater;
 import org.eclipse.jface.databinding.swt.ISWTObservableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
-import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.wizard.WizardPageSupport;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.fieldassist.FieldDecoration;
@@ -145,7 +143,8 @@ public class Snippet036ValidationMessageProvider {
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(text);
 
 			// Create the Text observable.
-			ISWTObservableValue textObservable = WidgetProperties.text(SWT.Modify).observe(text);
+			ISWTObservableValue textObservable = SWTObservables.observeText(
+					text, SWT.Modify);
 
 			// Bind the Text to the model and attach a RequiredValidator.
 			Binding binding = dbc.bindValue(textObservable, modelValue,
