@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Stefan Xenos, IBM; Chris Torrence, ITT Visual Information Solutions - bug 51580
  *     Nikolay Botev - bug 240651
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -520,8 +521,7 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
 	public int computePreferredSize(boolean width, int availableParallel,
             int availablePerpendicular, int preferredResult) {
 
-		ISizeProvider sizeProvider = (ISizeProvider) Util.getAdapter(legacyPart,
-				ISizeProvider.class);
+		ISizeProvider sizeProvider = Util.getAdapter(legacyPart, ISizeProvider.class);
         if (sizeProvider != null) {
             return sizeProvider.computePreferredSize(width, availableParallel, availablePerpendicular, preferredResult);
         }
@@ -531,8 +531,7 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
 
     @Override
 	public int getSizeFlags(boolean width) {
-		ISizeProvider sizeProvider = (ISizeProvider) Util.getAdapter(legacyPart,
-				ISizeProvider.class);
+		ISizeProvider sizeProvider = Util.getAdapter(legacyPart, ISizeProvider.class);
         if (sizeProvider != null) {
             return sizeProvider.getSizeFlags(width);
         }
@@ -565,8 +564,9 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
 	@Override
 	public boolean isDirty() {
 		IWorkbenchPart part = getPart(false);
-		if (part instanceof ISaveablePart) {
-			return ((ISaveablePart) part).isDirty();
+		ISaveablePart saveable = SaveableHelper.getSaveable(part);
+		if (saveable != null) {
+			return saveable.isDirty();
 		}
 		return false;
 	}
