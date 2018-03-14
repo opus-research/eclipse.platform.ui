@@ -299,8 +299,9 @@ public class MinMaxAddon {
 			List<MUIElement> minimizedElements = modelService.findElements(curPersp, null,
 					MUIElement.class, tags);
 			// Show any minimized stack from the current perspective
+			String perspId = '(' + curPersp.getElementId() + ')';
 			for (MUIElement ele : minimizedElements) {
-				String fullId = ele.getElementId() + getMinimizedElementSuffix(ele);
+				String fullId = ele.getElementId() + perspId;
 
 				for (MToolControl tc : tcList) {
 					if (fullId.equals(tc.getElementId())) {
@@ -455,8 +456,7 @@ public class MinMaxAddon {
 
 	private String getStackTrimLoc(MPartStack stack, String perspIdStr) {
 		MWindow stackWin = modelService.getTopLevelWindowFor(stack);// getContainingWindow(stack);
-		MUIElement tcElement = modelService
-				.find(stack.getElementId() + '(' + stackWin.getElementId() + ')' + '.' + perspIdStr, stackWin);
+		MUIElement tcElement = modelService.find(stack.getElementId() + perspIdStr, stackWin);
 		if (tcElement == null)
 			return ""; //$NON-NLS-1$
 
@@ -680,9 +680,16 @@ public class MinMaxAddon {
 		int loc = modelService.getElementLocation(element);
 		if ((loc & EModelService.OUTSIDE_PERSPECTIVE) != 0) {
 			// Minimize all other global stacks
-			List<MPartStack> partStacksToMinimize = findValidElementsToMinimize(element, win, win,
-					null, MPartStack.class, EModelService.OUTSIDE_PERSPECTIVE, false);
-			elementsToMinimize.addAll(partStacksToMinimize);
+			List<MPartStack> globalStacks = modelService.findElements(win, null, MPartStack.class,
+					null, EModelService.OUTSIDE_PERSPECTIVE);
+			for (MPartStack gStack : globalStacks) {
+				if (gStack == element || !gStack.isToBeRendered())
+					continue;
+
+				if (gStack.getWidget() != null && !gStack.getTags().contains(MINIMIZED)) {
+					elementsToMinimize.add(gStack);
+				}
+			}
 
 			// Minimize the Perspective Stack
 			MUIElement perspStack = null;
@@ -702,18 +709,24 @@ public class MinMaxAddon {
 
 				elementsToMinimize.add(perspStack);
 			}
-
-			// Find all editor 'area' outside the perspective
-			List<MPlaceholder> placeholderToMinimize = findValidElementsToMinimize(element, win,
-					win, ID_EDITOR_AREA, MPlaceholder.class, EModelService.OUTSIDE_PERSPECTIVE,
-					true);
-			elementsToMinimize.addAll(placeholderToMinimize);
-
 		} else {
-			List<MPartStack> partStacksToMinimize = findValidElementsToMinimize(element, win,
-					persp == null ? win : persp, null, MPartStack.class,
-					EModelService.PRESENTATION, false);
-			elementsToMinimize.addAll(partStacksToMinimize);
+			List<MPartStack> stacks = modelService.findElements(persp == null ? win : persp, null,
+					MPartStack.class, null, EModelService.PRESENTATION);
+			for (MPartStack theStack : stacks) {
+				if (theStack == element || !theStack.isToBeRendered())
+					continue;
+
+				// Exclude stacks in DW's
+				if (getWindowFor(theStack) != win)
+					continue;
+
+				loc = modelService.getElementLocation(theStack);
+				if (loc != EModelService.IN_SHARED_AREA && theStack.getWidget() != null
+						&& theStack.isVisible() && !theStack.getTags().contains(MINIMIZED)) {
+					elementsToMinimize.add(theStack);
+				}
+			}
+
 			// Find any 'standalone' views *not* in a stack
 			List<String> standaloneTag = new ArrayList<String>();
 			standaloneTag.add(IPresentationEngine.STANDALONE);
@@ -726,61 +739,16 @@ public class MinMaxAddon {
 			}
 
 			// Find the editor 'area'
-			List<MPlaceholder> placeholderToMinimize = findValidElementsToMinimize(element, win,
-					win, ID_EDITOR_AREA, MPlaceholder.class, EModelService.PRESENTATION, true);
-			elementsToMinimize.addAll(placeholderToMinimize);
-		}
-
-		return elementsToMinimize;
-	}
-
-	/**
-	 * Find all elements based on
-	 * {@link EModelService#findElements(MUIElement, String, Class, List, int)} and filter them for
-	 * correct window and visibility.
-	 *
-	 * First all possible elements based on the parameters of EModelService#findElements(MUIElement,
-	 * String, Class, List, int)} are retrieved. Then they are checked to be in the correct window.
-	 * Then a check for the correct location is made and in the end the elements are checked to be
-	 * valid (visible, not yet minimized and have a widget).
-	 *
-	 * @param elementToMaximize
-	 *            the {@link MUIElement} being maximized
-	 * @param currentWindow
-	 *            the window of the elementToMaximize
-	 * @param searchRoot
-	 *            the searchRoot for possible elements
-	 * @param id
-	 *            the id of the element to search
-	 * @param clazz
-	 *            the Class of the elements to find
-	 * @param searchFlag
-	 *            the search flags as defined in {@link EModelService}
-	 * @param allowSharedArea
-	 *            whether the found element is allowed to be in a shared area
-	 * @return the list of elements which should be minimized
-	 */
-	private <T extends MUIElement> List<T> findValidElementsToMinimize(
-			MUIElement elementToMaximize, MWindow currentWindow, MUIElement searchRoot, String id,
-			Class<T> clazz, int searchFlag, boolean allowSharedArea) {
-		List<T> elementsToMinimize = new ArrayList<T>();
-		List<T> elements = modelService.findElements(searchRoot, id, clazz, null, searchFlag);
-		for (T element : elements) {
-			if (element == elementToMaximize || !element.isToBeRendered())
-				continue;
-
-			// Exclude stacks in DW's
-			if (getWindowFor(element) != currentWindow)
-				continue;
-
-			int loc = modelService.getElementLocation(element);
-			boolean inSharedArea = loc == EModelService.IN_SHARED_AREA;
-			boolean validLocation = allowSharedArea || !inSharedArea;
-			if (validLocation && element.getWidget() != null && element.isVisible()
-					&& !element.getTags().contains(MINIMIZED)) {
-				elementsToMinimize.add(element);
+			if (persp != null) {
+				MPlaceholder eaPlaceholder = (MPlaceholder) modelService
+						.find(ID_EDITOR_AREA, persp);
+				if (element != eaPlaceholder && eaPlaceholder != null
+						&& eaPlaceholder.getWidget() != null && eaPlaceholder.isVisible()) {
+					elementsToMinimize.add(eaPlaceholder);
+				}
 			}
 		}
+
 		return elementsToMinimize;
 	}
 
@@ -1040,9 +1008,8 @@ public class MinMaxAddon {
 	private String getMinimizedElementSuffix(MUIElement element) {
 		String id = ID_SUFFIX;
 		MPerspective persp = modelService.getPerspectiveFor(element);
-		MWindow window = getWindowFor(element);
 		if (persp != null) {
-			id = '(' + window.getElementId() + ')' + '.' + '(' + persp.getElementId() + ')';
+			id = '(' + persp.getElementId() + ')';
 		}
 		return id;
 	}

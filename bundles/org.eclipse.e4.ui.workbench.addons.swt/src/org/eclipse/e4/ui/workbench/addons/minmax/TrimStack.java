@@ -800,9 +800,7 @@ public class TrimStack {
 			String toolControlId = toolControl.getElementId();
 			int index = toolControlId.indexOf('(');
 			String stackId = toolControlId.substring(0, index);
-			// retrieve the perspective id
-			String windowPerspId = toolControlId.substring(index + 1, toolControlId.length() - 1);
-			String perspId = windowPerspId.substring(windowPerspId.indexOf('(') + 1, windowPerspId.length());
+			String perspId = toolControlId.substring(index + 1, toolControlId.length() - 1);
 
 			MPerspective persp = null;
 			List<MPerspective> perspectives = modelService.findElements(ps.get(0), perspId,
