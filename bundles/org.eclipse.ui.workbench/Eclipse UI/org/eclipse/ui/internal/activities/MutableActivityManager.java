@@ -936,7 +936,6 @@ public final class MutableActivityManager extends AbstractActivityManager
                  */
                 @Override
 				protected IStatus run(IProgressMonitor monitor) {
-                    final Map identifierEventsByIdentifierId = new HashMap();
                     while (!deferredIdentifiers.isEmpty()) {
                         Identifier identifier = (Identifier) deferredIdentifiers.remove(0);
                         Set activityIds = new HashSet();
@@ -954,12 +953,11 @@ public final class MutableActivityManager extends AbstractActivityManager
                         if (activityIdsChanged) {
                             IdentifierEvent identifierEvent = new IdentifierEvent(identifier, activityIdsChanged,
                                     false);
+                            final Map identifierEventsByIdentifierId = new HashMap(1);
                             identifierEventsByIdentifierId.put(identifier.getId(),
                                     identifierEvent);
-                        }
-                    }
-					if (!identifierEventsByIdentifierId.isEmpty()) {
-                            UIJob notifyJob = new UIJob("Identifier Update Job UI") { //$NON-NLS-1$
+                            UIJob notifyJob = new UIJob("Identifier Update Job") { //$NON-NLS-1$
+
 								@Override
 								public IStatus runInUIThread(
 										IProgressMonitor monitor) {
@@ -970,8 +968,9 @@ public final class MutableActivityManager extends AbstractActivityManager
                             notifyJob.setSystem(true);
                             notifyJob.schedule();
                         }
-                    return Status.OK_STATUS;
                     }
+                    return Status.OK_STATUS;
+                }
             };
             deferredIdentifierJob.setSystem(true);
         }
