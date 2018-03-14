@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 410426
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 426535, 433234, 431868, 472654, 483842
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 426535, 433234, 431868, 472654, 485852
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 431778
  *     Andrey Loskutov <loskutov@gmx.de> - Bugs 383569, 457198
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 431990
@@ -163,10 +163,9 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 				if (parent != null) {
 					modelProcessSwitch(parent, itemModel);
 					parent.update(true);
-					ToolBar tb = parent.getControl();
-					if (tb != null && !tb.isDisposed()) {
-						tb.pack(true);
-						tb.requestLayout();
+					ToolBar toolbar = parent.getControl();
+					if (toolbar != null && !toolbar.isDisposed()) {
+						toolbar.requestLayout();
 					}
 				}
 			} else {
@@ -212,13 +211,9 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 			parent.markDirty();
 			parent.update(true);
-			ToolBar tb = parent.getControl();
-			if (tb != null && !tb.isDisposed()) {
-				tb.pack(true);
-				if (tb.getParent() != null) {
-					tb.getParent().pack(true);
-				}
-				tb.requestLayout();
+			ToolBar toolbar = parent.getControl();
+			if (toolbar != null && !toolbar.isDisposed()) {
+				toolbar.requestLayout();
 			}
 		}
 	}
@@ -600,7 +595,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 		ToolBar tb = getToolbarFrom(container.getWidget());
 		if (tb != null) {
-			tb.pack(true);
 			tb.requestLayout();
 		}
 	}
@@ -650,7 +644,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			}
 			ToolBar toolbar = (ToolBar) getUIContainer(child);
 			if (toolbar != null && !toolbar.isDisposed()) {
-				toolbar.pack(true);
 				toolbar.requestLayout();
 			}
 		}
@@ -662,7 +655,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		processContents(parentElement);
 		ToolBar toolbar = (ToolBar) getUIContainer(element);
 		if (toolbar != null && !toolbar.isDisposed()) {
-			toolbar.pack(true);
 			toolbar.requestLayout();
 		}
 	}

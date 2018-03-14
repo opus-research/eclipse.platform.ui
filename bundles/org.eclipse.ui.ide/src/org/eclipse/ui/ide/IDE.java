@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 411578
  *******************************************************************************/
 package org.eclipse.ui.ide;
 
@@ -70,6 +71,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.ide.EditorAssociationOverrideDescriptor;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
+import org.eclipse.ui.internal.ide.SystemEditorOrTextEditorStrategy;
+import org.eclipse.ui.internal.ide.UnknownEditorStrategyRegistry;
 import org.eclipse.ui.internal.ide.model.StandardPropertiesAdapterFactory;
 import org.eclipse.ui.internal.ide.model.WorkbenchAdapterFactory;
 import org.eclipse.ui.internal.ide.registry.MarkerHelpRegistry;
@@ -134,6 +137,14 @@ public final class IDE {
 	public static final String RESOURCE_PERSPECTIVE_ID = "org.eclipse.ui.resourcePerspective"; //$NON-NLS-1$
 
 	/**
+	 * A preference key to decide which {@link IUnknownEditorStrategy} to use
+	 * when trying to open files without associated editors.
+	 *
+	 * @since 3.12
+	 */
+	public static final String UNKNOWN_EDITOR_STRATEGY_PREFERENCE_KEY = "unknownEditorStrategy";//$NON-NLS-1$
+
+	/**
 	 * Marker help registry mapping markers to help context ids and resolutions;
 	 * lazily initialized on fist access.
 	 */
@@ -188,6 +199,7 @@ public final class IDE {
 	 */
 	public interface Preferences {
 
+
 		/**
 		 * A named preference for how a new perspective should be opened when a
 		 * new project is created.
@@ -217,6 +229,13 @@ public final class IDE {
 		 * @since 3.1
 		 */
 		public static final String SHOW_WORKSPACE_SELECTION_DIALOG = "SHOW_WORKSPACE_SELECTION_DIALOG"; //$NON-NLS-1$
+
+		/**
+		 * Specifies whether the "Recent Workspaces" should be shown
+		 *
+		 * @since 3.12
+		 */
+		public static final String SHOW_RECENT_WORKSPACES = "SHOW_RECENT_WORKSPACES"; //$NON-NLS-1$
 
 		/**
 		 * <p>
@@ -990,26 +1009,8 @@ public final class IDE {
 			return defaultDescriptor;
 		}
 
-		IEditorDescriptor editorDesc = defaultDescriptor;
-
-		// next check the OS for in-place editor (OLE on Win32)
-		if (editorReg.isSystemInPlaceEditorAvailable(name)) {
-			editorDesc = editorReg
-					.findEditor(IEditorRegistry.SYSTEM_INPLACE_EDITOR_ID);
-		}
-
-		// next check with the OS for an external editor
-		if (editorDesc == null
-				&& editorReg.isSystemExternalEditorAvailable(name)) {
-			editorDesc = editorReg
-					.findEditor(IEditorRegistry.SYSTEM_EXTERNAL_EDITOR_ID);
-		}
-
-		// next lookup the default text editor
-		if (editorDesc == null) {
-			editorDesc = editorReg
-					.findEditor(IDEWorkbenchPlugin.DEFAULT_TEXT_EDITOR_ID);
-		}
+		IUnknownEditorStrategy strategy = getUnknowEditorStrategy();
+		IEditorDescriptor editorDesc = strategy.getEditorDescriptor(name, editorReg);
 
 		// if no valid editor found, bail out
 		if (editorDesc == null) {
@@ -1018,6 +1019,21 @@ public final class IDE {
 		}
 
 		return editorDesc;
+	}
+
+	/**
+	 * @return The strategy to use in order to open unknown file. Either as set
+	 *         by preference, or a {@link SystemEditorOrTextEditorStrategy} if none is
+	 *         explicitly configured.
+	 */
+	private static IUnknownEditorStrategy getUnknowEditorStrategy() {
+		String preferedStrategy = IDEWorkbenchPlugin.getDefault().getPreferenceStore()
+				.getString(UNKNOWN_EDITOR_STRATEGY_PREFERENCE_KEY);
+		IUnknownEditorStrategy res = UnknownEditorStrategyRegistry.getStrategy(preferedStrategy);
+		if (res == null) {
+			res = new SystemEditorOrTextEditorStrategy();
+		}
+		return res;
 	}
 
 	/**

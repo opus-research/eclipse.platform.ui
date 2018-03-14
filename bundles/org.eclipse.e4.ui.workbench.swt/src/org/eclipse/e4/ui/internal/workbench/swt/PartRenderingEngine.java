@@ -10,7 +10,6 @@
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 462056
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 457939
  *     Alexander Baranov <achilles-86@mail.ru> - Bug 458460
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 483842
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench.swt;
 
@@ -215,7 +214,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				Control ctrl = (Control) changedElement.getWidget();
 
 				if (!(ctrl instanceof Shell)) {
-					ctrl.requestLayout();
+					ctrl.getShell().layout(new Control[] { ctrl }, SWT.DEFER);
 				}
 
 				ctrl.setParent(getLimboShell());
@@ -300,7 +299,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 						final Control ctrl = (Control) w;
 						fixZOrder(added);
 						if (!ctrl.isDisposed()) {
-							ctrl.requestLayout();
+							ctrl.getShell().layout(new Control[] { ctrl }, SWT.DEFER);
 						}
 					}
 				} else {
@@ -332,7 +331,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				if (removed.getWidget() instanceof Control) {
 					Control ctrl = (Control) removed.getWidget();
 					ctrl.setLayoutData(null);
-					ctrl.requestLayout();
+					ctrl.getParent().layout(new Control[] { ctrl }, SWT.CHANGED | SWT.DEFER);
 				}
 
 				// Ensure that the element about to be removed is not the
