@@ -250,7 +250,10 @@ public class CTabRendering extends CTabFolderRenderer implements
 		// HEADER
 		Rectangle trim = computeTrim(PART_HEADER, state, 0, 0, 0, 0);
 		trim.width = bounds.width - trim.width;
-		trim.height = (parent.getTabHeight() + 1 + header) - trim.height;
+		
+		// XXX: The magic numbers need to be cleaned up. See https://bugs.eclipse.org/425777 for details.
+		trim.height = (parent.getTabHeight() + (onBottom ? 7 : 4)) - trim.height;
+		
 		trim.x = -trim.x;
 		trim.y = onBottom ? bounds.height - parent.getTabHeight() - 1 - header
 				: -trim.y;
