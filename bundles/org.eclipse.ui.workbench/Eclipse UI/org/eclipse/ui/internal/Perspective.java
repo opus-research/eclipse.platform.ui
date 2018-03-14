@@ -29,7 +29,6 @@ import org.eclipse.ui.internal.e4.compatibility.ModeledPageLayout;
 import org.eclipse.ui.internal.registry.ActionSetRegistry;
 import org.eclipse.ui.internal.registry.IActionSetDescriptor;
 import org.eclipse.ui.internal.registry.PerspectiveDescriptor;
-import org.eclipse.ui.presentations.IStackPresentationSite;
 
 /**
  * The ViewManager is a factory for workbench views.  

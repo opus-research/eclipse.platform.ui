@@ -76,7 +76,6 @@ import org.eclipse.ui.internal.wizards.ImportWizardRegistry;
 import org.eclipse.ui.internal.wizards.NewWizardRegistry;
 import org.eclipse.ui.operations.IWorkbenchOperationSupport;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.eclipse.ui.presentations.AbstractPresentationFactory;
 import org.eclipse.ui.testing.TestableObject;
 import org.eclipse.ui.views.IViewRegistry;
 import org.eclipse.ui.wizards.IWizardRegistry;
@@ -524,24 +523,6 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
             factory = null;
         }
         return factory;
-    }
-
-    /**
-     * Returns the presentation factory with the given id, or <code>null</code> if not found.
-     * @param targetID The id of the presentation factory to use.
-     * @return AbstractPresentationFactory or <code>null</code>
-     * if not factory matches that id.
-     */
-    public AbstractPresentationFactory getPresentationFactory(String targetID) {
-        Object o = createExtension(
-                IWorkbenchRegistryConstants.PL_PRESENTATION_FACTORIES,
-                "factory", targetID); //$NON-NLS-1$
-        if (o instanceof AbstractPresentationFactory) {
-            return (AbstractPresentationFactory) o;
-        }
-        WorkbenchPlugin
-                .log("Error creating presentation factory: " + targetID + " -- class is not an AbstractPresentationFactory"); //$NON-NLS-1$ //$NON-NLS-2$
-        return null;
     }
 
     /**
