@@ -19,7 +19,6 @@ import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.Iterator;
-
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -230,6 +229,9 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 				});
 	}
 
+	/**
+	 * (non-Javadoc) Method declared on IDialogPage.
+	 */
 	@Override
 	public void createControl(Composite parent) {
 		initializeDialogUnits(parent);

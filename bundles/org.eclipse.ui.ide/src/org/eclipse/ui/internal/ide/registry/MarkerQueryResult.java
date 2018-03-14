@@ -43,6 +43,9 @@ public class MarkerQueryResult {
         computeHashCode();
     }
 
+    /* (non-Javadoc)
+     * Method declared on Object.
+     */
     @Override
 	public boolean equals(Object o) {
         if (!(o instanceof MarkerQueryResult)) {
@@ -67,6 +70,9 @@ public class MarkerQueryResult {
         return true;
     }
 
+    /* (non-Javadoc)
+     * Method declared on Object.
+     */
     @Override
 	public int hashCode() {
         return hashCode;

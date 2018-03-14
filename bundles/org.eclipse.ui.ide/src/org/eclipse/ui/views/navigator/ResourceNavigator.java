@@ -297,6 +297,9 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
         return new StructuredSelection(list);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchPart.
+     */
     @Override
 	public void createPartControl(Composite parent) {
         TreeViewer viewer = createViewer(parent);
@@ -526,6 +529,9 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
         openAndLinkWithEditorHelper.setLinkWithEditor(linkingEnabled);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchPart.
+     */
     @Override
 	public void dispose() {
         getSite().getPage().removePartListener(partListener);
@@ -868,6 +874,9 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
     protected void handleKeyReleased(KeyEvent event) {
     }
 
+    /* (non-Javadoc)
+     * Method declared on IViewPart.
+     */
     @Override
 	public void init(IViewSite site, IMemento memento) throws PartInitException {
         super.init(site, memento);
