@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 IBM Corporation and others.
+ * Copyright (c) 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -52,7 +52,8 @@ public class StackRendererTest {
 	@Before
 	public void setUp() throws Exception {
 		context = E4Application.createDefaultContext();
-		context.set(E4Workbench.PRESENTATION_URI_ARG, PartRenderingEngine.engineURI);
+		context.set(E4Workbench.PRESENTATION_URI_ARG,
+				PartRenderingEngine.engineURI);
 
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -68,7 +69,7 @@ public class StackRendererTest {
 		partStack.getChildren().add(part);
 
 		application.setContext(context);
-		context.set(MApplication.class, application);
+		context.set(MApplication.class.getName(), application);
 
 		executedMethodsListener = new CTabItemStylingMethodsListener(part);
 
@@ -117,7 +118,8 @@ public class StackRendererTest {
 	@Test
 	public void testTabStateHandlerWhenSelectionChangedEvent() throws Exception {
 		// given
-		MPlaceholder placeHolder = AdvancedFactoryImpl.eINSTANCE.createPlaceholder();
+		MPlaceholder placeHolder = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 		placeHolder.setRef(part);
 
 		HashMap<String, Object> params = new HashMap<String, Object>();
