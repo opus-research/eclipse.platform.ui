@@ -145,6 +145,8 @@ public class ViewRegistry implements IViewRegistry {
 			descriptor.setIconURI(MenuHelper.getImageUrl(workbench.getSharedImages()
 					.getImageDescriptor(ISharedImages.IMG_DEF_VIEW)));
 		} else {
+			iconURI = CompatRegistrySchemeHandler.createIconUri("view", //$NON-NLS-1$
+					element.getAttribute(IWorkbenchRegistryConstants.ATT_ID));
 			descriptor.setIconURI(iconURI);
 		}
 

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.ui.workbench.compatregschemehandler">
+   <implementation class="org.eclipse.ui.internal.registry.CompatRegistrySchemeHandler"/>
+   <service>
+      <provide interface="org.eclipse.e4.ui.internal.workbench.swt.ResourceUtility$UrlSchemeHandler"/>
+   </service>
+</scr:component>

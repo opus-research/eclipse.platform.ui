@@ -30,7 +30,7 @@ import org.eclipse.ui.internal.EditorReference;
 import org.eclipse.ui.internal.PartSite;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPartReference;
-import org.eclipse.ui.internal.menus.MenuHelper;
+import org.eclipse.ui.internal.registry.CompatRegistrySchemeHandler;
 import org.eclipse.ui.internal.registry.EditorDescriptor;
 import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
 import org.eclipse.ui.internal.testing.ContributionInfoMessages;
@@ -106,8 +106,10 @@ public class CompatibilityEditor extends CompatibilityPart {
 		if (descriptor != null) {
 			IConfigurationElement element = descriptor.getConfigurationElement();
 			if (element != null) {
-				String iconURI = MenuHelper.getIconURI(element,
-						IWorkbenchRegistryConstants.ATT_ICON);
+				// String iconURI = MenuHelper.getIconURI(element,
+				// IWorkbenchRegistryConstants.ATT_ICON);
+				String iconURI = CompatRegistrySchemeHandler.createIconUri("editor", //$NON-NLS-1$
+						element.getAttribute(IWorkbenchRegistryConstants.ATT_ID));
 				part.setIconURI(iconURI);
 			}
 			if (descriptor.getPluginId() != null) {
